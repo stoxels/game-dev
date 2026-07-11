@@ -1879,7 +1879,7 @@ const W8 = [
         hintDE: "Theta",
         reveal: "Theta is the notation for an unknown parameter",
         revealDE: "Theta ist die Notation für einen unbekannten Parameter",
-        timer: 300,
+        timer: 1800,
         isForestLevel: true,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
