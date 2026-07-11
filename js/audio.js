@@ -196,16 +196,15 @@ const Audio_Manager = (() => {
         level_10_1: 'audio/bgm_40.mp3',
         level_10_2: 'audio/bgm_40.mp3',
         level_10_3: 'audio/bgm_40.mp3',
-        level_10_4: 'audio/bgm_40.mp3',
-        level_10_5: 'audio/bgm_40.mp3',
-        level_10_6: 'audio/bgm_40.mp3',
-        level_10_7: 'audio/bgm_40.mp3',
-        level_10_8: 'audio/bgm_40.mp3',
-        level_10_9: 'audio/bgm_40.mp3',
-        level_10_10: 'audio/bgm_40.mp3',
-        level_10_11: 'audio/bgm_40.mp3',
-        level_10_12: 'audio/bgm_40.mp3',
-        level_10_13: 'audio/bgm_40.mp3',
+        level_10_4: 'audio/bgm_41.mp3',
+        level_10_5: 'audio/bgm_41.mp3',
+        level_10_6: 'audio/bgm_41.mp3',
+        level_10_7: 'audio/bgm_42.mp3',
+        level_10_8: 'audio/bgm_42.mp3',
+        level_10_9: 'audio/bgm_42.mp3',
+        level_10_10: 'audio/bgm_43.mp3',
+        level_10_11: 'audio/bgm_43.mp3',
+        level_10_12: 'audio/bgm_43.mp3',
 
     };
 
@@ -279,6 +278,11 @@ const Audio_Manager = (() => {
         '9-13': 'level_9_13', '9-14': 'level_9_14', '9-15': 'level_9_15',
         '9-16': 'level_9_16',
 
+        // World 10
+        '10-1': 'level_10_1', '10-2': 'level_10_2', '10-3': 'level_10_3',
+        '10-4': 'level_10_4', '10-5': 'level_10_5', '10-6': 'level_10_6',
+        '10-7': 'level_10_7', '10-8': 'level_10_8', '10-9': 'level_10_9',
+        '10-10': 'level_10_10', '10-11': 'level_10_11', '10-12': 'level_10_12',
 
     };
 
