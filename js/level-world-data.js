@@ -2438,6 +2438,7 @@ const W10 = [
         reveal: "The (1-a) - quantile of a t - distribution with (n-1) degrees of freedom",
         revealDE: "Das (1-a) - Quantil der t - Verteilung mit (n-1) - Freiheitsgraden",
         timer: 1800,
+        isForestLevel: true,
         bonusHint: "Finish with at most 3 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
         bonusType: "lowmiss",

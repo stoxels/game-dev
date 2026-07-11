@@ -1626,7 +1626,7 @@ function _wdLogClickCoords(e, wi, cfg, canvas) {
 
     const x = (((e.clientX - rect.left) - imgX) / imgW * 100).toFixed(1);
     const y = (((e.clientY - rect.top) - imgY) / imgH * 100).toFixed(1);
-    //console.log(`WD wi=${wi}: { x: ${x}, y: ${y} },`);
+    console.log(`WD wi=${wi}: { x: ${x}, y: ${y} },`);
 }
 
 

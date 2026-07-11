@@ -62,6 +62,12 @@ const MATH_GATE_LEVELS = [
     { world: 9, level: 11 },
     { world: 9, level: 13 }, 
     { world: 9, level: 16 },
+    { world: 10, level: 1 },
+    { world: 10, level: 4 },
+    { world: 10, level: 6 },
+    { world: 10, level: 9 },
+    { world: 10, level: 11 },
+
 ];
 
 
