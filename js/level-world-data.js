@@ -2278,6 +2278,22 @@ const W9 = [
 
 const W10 = [
 
+    {   //5x10
+        hint: "p-Value Rejection",
+        hintDE: "p-Wert Ablehnung",
+        reveal: "The Null-Hypothesis is rejected when p < a",
+        revealDE: "Die Nullhypothese wird abgelehnt wenn p < a ist.",
+        timer: 1800,
+        bonusHint: "Complete level",
+        bonusHintDE: "Complete level (DE)",
+        bonusType: "nomiss",
+        bonusParam: 0,
+        grid: G(
+            [1, 1, 1, 0, 0, 0, 0, 1, 1, 1], [1, 0, 1, 0, 0, 1, 0, 0, 0, 1], [1, 1, 1, 0, 1, 0, 0, 1, 1, 1],
+            [1, 0, 0, 0, 0, 1, 0, 1, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 1, 1]
+        )
+    },
+
     {   //5x15
         hint: "Chi-Squared",
         hintDE: "Chiquadrat",
