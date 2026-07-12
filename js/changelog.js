@@ -30,6 +30,7 @@ const CHANGELOG_DATA = [
                     "When going into the Probability Screen after a Convergence event, and then pressing the Back button in the Probability Tree screen, you will now automatically return to the detailed Map Screen of the World you were just in instead of the Overworld Screen.",
                     "Added a Sound Effect for Sylas nature trait.",
                     "The Loaded Dice effect of Trix does now work without having the passive tree nodes active.",
+                    "Tutorial image adjustments",
 
                 ],
 
