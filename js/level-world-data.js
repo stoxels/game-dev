@@ -2501,9 +2501,9 @@ const W10 = [
 const W11 = [
 
     {   //5x20
-        hint: "Unconnected Samples",
+        hint: "Unpaired Samples",
         hintDE: "Unverbundene Stichproben",
-        reveal: "Typically in unconnected samples the sample sizes differ",
+        reveal: "In unpaired samples the sample sizes usually differ",
         revealDE: "Typischerweise sind in unverbundenen Stichproben die Stichprobenumfänge verschieden",
         timer: 1800,
         bonusHint: "Complete level",
