@@ -12,8 +12,10 @@ const CHANGELOG_DATA = [
             {
                 category: "New Features",
                 items: [
+                    "World 10 has been added.",
                     "Added a Replay button to the title screen to replay unlocked storyline beats and the tutorial.",
                     "Fully remade the Infinite Hunger screen for the Outlier class.",
+                    
 
 
 
@@ -36,6 +38,7 @@ const CHANGELOG_DATA = [
                 category: "Bug Fixes",
                 items: [
                     "Fixed a bug that made characters move faster on the world map when resizing the game window mid-walking.",
+                    "Fixed a bug that made Level 8-5 only have 5 minutes duration instead of 30 minutes.",
                 ],
 
             },
