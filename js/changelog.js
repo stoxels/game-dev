@@ -6,13 +6,14 @@
 const CHANGELOG_DATA = [
 
     {
-        version: "v0.25.2 BETA",
+        version: "v0.26 BETA",
         date: "12.07.2026",
         changes: [
             {
                 category: "New Features",
                 items: [
                     "World 10 has been added.",
+                    "World 11 has been added",
                     "Added a Replay button to the title screen to replay unlocked storyline beats and the tutorial.",
                     "Fully remade the Infinite Hunger screen for the Outlier class.",
                     
