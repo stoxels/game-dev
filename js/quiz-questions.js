@@ -417,13 +417,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["Σ x · P(X = x)", "Σ P(X = x)", "max P(X = x)", "Σ x² · P(X = x)"],
             correct: 0
         },
-        {
-            q: "The variance of X using the shift theorem equals:",
-            qDE: "Die Varianz von X nach dem Verschiebungssatz lautet:",
-            opts: ["E[X²] − (E[X])²", "E[X²] + (E[X])²", "(E[X])² − E[X²]", "E[(X − E[X]³)]"],
-            optsDE: ["E[X²] − (E[X])²", "E[X²] + (E[X])²", "(E[X])² − E[X²]", "E[(X − E[X]³)]"],
-            correct: 0
-        },
+
         {
             q: "For independent X and Y, E[X·Y] equals:",
             qDE: "Für unabhängige X und Y gilt E[X·Y] =",
@@ -438,34 +432,10 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["p", "p(1−p)", "p²", "1−p"],
             correct: 0
         },
-        {
-            q: "Var(aX) for a constant a equals:",
-            qDE: "Var(aX) für eine Konstante a ergibt:",
-            opts: ["a² · Var(X)", "a · Var(X)", "Var(X)", "a² + Var(X)"],
-            optsDE: ["a² · Var(X)", "a · Var(X)", "Var(X)", "a² + Var(X)"],
-            correct: 0
-        },
-        {
-            q: "For X ~ Bin(n, p), the expected value E[X] is:",
-            qDE: "Für X ~ Bin(n, p) gilt E[X] =",
-            opts: ["n · p", "n · p · (1−p)", "p / n", "n / p"],
-            optsDE: ["n · p", "n · p · (1−p)", "p / n", "n / p"],
-            correct: 0
-        },
-        {
-            q: "Adding a constant c to X changes the variance by:",
-            qDE: "Das Addieren einer Konstante c zu X verändert die Varianz um:",
-            opts: ["0 — variance is unchanged", "c", "c²", "2c · Var(X)"],
-            optsDE: ["0 — die Varianz ändert sich nicht", "c", "c²", "2c · Var(X)"],
-            correct: 0
-        },
-        {
-            q: "For independent X and Y, Var(X + Y) equals:",
-            qDE: "Für unabhängige X und Y gilt Var(X + Y) =",
-            opts: ["Var(X) + Var(Y)", "Var(X) · Var(Y)", "Var(X) − Var(Y)", "Var(X) + Var(Y) + 2·Cov(X,Y)"],
-            optsDE: ["Var(X) + Var(Y)", "Var(X) · Var(Y)", "Var(X) − Var(Y)", "Var(X) + Var(Y) + 2·Cov(X,Y)"],
-            correct: 0
-        },
+
+
+
+
 
 
         {
@@ -517,13 +487,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["Var(X) + Var(Y) + 2·Cov(X,Y)", "Var(X) + Var(Y)", "Var(X) · Var(Y)", "Var(X) − Var(Y)"],
             correct: 0
         },
-        {
-            q: "For X ~ Bin(n, p), what is Var(X)?",
-            qDE: "Für X ~ Bin(n, p) gilt Var(X) =",
-            opts: ["n·p·(1−p)", "n·p", "p·(1−p)", "n²·p"],
-            optsDE: ["n·p·(1−p)", "n·p", "p·(1−p)", "n²·p"],
-            correct: 0
-        },
+
         {
             q: "Jensen's inequality for a convex function f states that:",
             qDE: "Die Jensensche Ungleichung für eine konvexe Funktion f besagt:",
@@ -650,13 +614,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ['a·E[X] + b·E[Y]', 'E[aX]·E[bY]', 'a·b·E[X+Y]', 'E[X+Y]'],
             correct: 0
         },
-        {
-            q: 'Jensen\'s inequality for a convex function f states:',
-            qDE: 'Die Jensensche Ungleichung für eine konvexe Funktion f besagt:',
-            opts: ['E[f(X)] ≥ f(E[X])', 'E[f(X)] ≤ f(E[X])', 'E[f(X)] = f(E[X])', 'f(E[X]) = 0'],
-            optsDE: ['E[f(X)] ≥ f(E[X])', 'E[f(X)] ≤ f(E[X])', 'E[f(X)] = f(E[X])', 'f(E[X]) = 0'],
-            correct: 0
-        },
+
         {
             q: 'The triangle inequality for expectations states that |E[X + Y]| ≤',
             qDE: 'Die Dreiecksungleichung für Erwartungswerte besagt |E[X + Y]| ≤',

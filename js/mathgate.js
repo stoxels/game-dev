@@ -184,21 +184,45 @@ function mgGetQuestionPool(gi) {
     return MATH_GATE_POOLS[world] || MATH_GATE_POOLS[1];
 }
 
-// Returns a random question from the given pool.
-function mgPickRandomQuestion(pool) {
-    return pool[Math.floor(Math.random() * pool.length)];
+
+// How many recently-shown questions to avoid repeating, per world.
+const MG_RECENT_HISTORY_SIZE = 10;
+
+// Tracks the last N question objects shown per world: { [world]: [q, q, ...] }
+const _mgRecentQuestions = {};
+
+// Records a question as "recently shown" for its world, trimming to the window size.
+function _mgRecordShownQuestion(world, question) {
+    if (!_mgRecentQuestions[world]) _mgRecentQuestions[world] = [];
+    _mgRecentQuestions[world].push(question);
+    if (_mgRecentQuestions[world].length > MG_RECENT_HISTORY_SIZE) {
+        _mgRecentQuestions[world].shift();
+    }
 }
 
-// Returns a random question that is different from the one currently shown.
-// Prevents the same question appearing twice in a row when the player
-// requests a new one after too many failed attempts.
-function mgPickDifferentQuestion(pool) {
+// Returns a random question from the pool, excluding whichever ones were
+// shown in this world's recent history (falls back to the full pool if
+// every question is currently "on cooldown", e.g. tiny pools).
+function mgPickRandomQuestion(pool, world) {
+    const recent = _mgRecentQuestions[world] || [];
+    const avoidSet = new Set(recent);
+    let candidates = pool.filter(q => !avoidSet.has(q));
+    if (candidates.length === 0) candidates = pool;
+
+    const picked = candidates[Math.floor(Math.random() * candidates.length)];
+    _mgRecordShownQuestion(world, picked);
+    return picked;
+}
+
+function mgPickDifferentQuestion(pool, world) {
     let newQuestion;
     do {
-        newQuestion = mgPickRandomQuestion(pool);
+        newQuestion = mgPickRandomQuestion(pool, world);
     } while (newQuestion === currentGateQuestion && pool.length > 1);
     return newQuestion;
 }
+
+
 
 // Returns the localized question text, falling back to English if no
 // German translation exists.
@@ -489,7 +513,7 @@ function _mgInjectPortrait() {
 // modal elements, then opens the modal and focuses the answer input.
 function showMathGate(gi, launchFn) {
     const pool = mgGetQuestionPool(gi);
-    currentGateQuestion = mgPickRandomQuestion(pool);
+    currentGateQuestion = mgPickRandomQuestion(pool, worldOfGi(gi));
     gateAttempts = 0;
 
     // Store gi on the modal so the submit handler knows which level to launch.
@@ -565,7 +589,7 @@ function submitMathGate() {
 // Only becomes available to the player after MG_NEW_QUESTION_THRESHOLD failures.
 function mgNewQuestion() {
     const pool = mgGetQuestionPool(pendingGateGi);
-    currentGateQuestion = mgPickDifferentQuestion(pool);
+    currentGateQuestion = mgPickDifferentQuestion(pool, worldOfGi(pendingGateGi));
     gateAttempts = 0;
 
     mgPopulateQuestion(currentGateQuestion);

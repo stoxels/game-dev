@@ -27,12 +27,14 @@ const CHANGELOG_DATA = [
             {
                 category: "General Adjustments",
                 items: [
-                    "It is now possible to dismiss quest milestone popups by clicking on them.",
+                    "It is now possible to dismiss inference quest milestone popups by clicking on them.",
                     "While a character is walking towards the target node you can now select a different node to cancel the old routing on the next waypoint arrival to walk towards the newly selected node.",
                     "When going into the Probability Screen after a Convergence event, and then pressing the Back button in the Probability Tree screen, you will now automatically return to the detailed Map Screen of the World you were just in instead of the Overworld Screen.",
                     "Added a Sound Effect for Sylas nature trait.",
                     "The Loaded Dice effect of Trix does now work without having the passive tree nodes active.",
                     "Tutorial image adjustments",
+                    "Removed some duplicated Quiz and Excercise questions.",
+                    "The same Quiz or Excercise question can now no longer appear for the next 10 questions.",
 
                 ],
 

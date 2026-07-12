@@ -127,18 +127,38 @@ function _quizBuildMcQuestion(raw) {
 //-------------------QUESTION SELECTION-----------------------------------
 //------------------------------------------------------------------------
 
-// Draws a random question for the given world number.
-// Pulls from both the MC bonus pool and the numeric-input math-gate pool,
-// then normalises the result into a typed question object.
+
+// How many recently-shown questions to avoid repeating, per world.
+const QUIZ_RECENT_HISTORY_SIZE = 10;
+
+// Tracks the last N raw question objects shown per world: { [world]: [raw, raw, ...] }
+const _quizRecentQuestions = {};
+
+// Records a raw question object as "recently shown" for its world.
+function _quizRecordShownQuestion(worldNum, rawQuestion) {
+    if (!_quizRecentQuestions[worldNum]) _quizRecentQuestions[worldNum] = [];
+    _quizRecentQuestions[worldNum].push(rawQuestion);
+    if (_quizRecentQuestions[worldNum].length > QUIZ_RECENT_HISTORY_SIZE) {
+        _quizRecentQuestions[worldNum].shift();
+    }
+}
+
 function getQuizQuestion(worldNum) {
     const pool = _quizBuildQuestionPool(worldNum);
 
     if (!pool.length) {
-        // Absolute fallback — should never happen if pools are set up correctly.
         return { type: 'mc', q: '?', opts: [{ text: '?', isCorrect: true }] };
     }
 
-    const entry = pool[Math.floor(Math.random() * pool.length)];
+    // entry.raw is a stable reference into BONUS_QUIZ_POOLS / MATH_GATE_POOLS,
+    // so it survives across calls even though `pool` itself is rebuilt each time.
+    const recent = _quizRecentQuestions[worldNum] || [];
+    const avoidSet = new Set(recent);
+    let candidates = pool.filter(e => !avoidSet.has(e.raw));
+    if (candidates.length === 0) candidates = pool;
+
+    const entry = candidates[Math.floor(Math.random() * candidates.length)];
+    _quizRecordShownQuestion(worldNum, entry.raw);
 
     return (entry._src === 'input')
         ? _quizBuildInputQuestion(entry.raw)
