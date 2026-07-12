@@ -32,7 +32,7 @@ const TUTORIAL_STEPS = [
     { image: 'step2.png', titleKey: 'tut2_s6_title', textKey: 'tut2_s6_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '30%', left: '65%' } },  // PENALTIES
     { image: 'step2.png', titleKey: 'tut2_s7_title', textKey: 'tut2_s7_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '10%', left: '25%' } },  // BONUS OBJECTIVES
     { image: 'step2.png', titleKey: 'tut2_s8_title', textKey: 'tut2_s8_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '90%', left: '20%' } },  // INVENTORY
-    { image: 'step3.jpeg', titleKey: 'tut2_s9_title', textKey: 'tut2_s9_text', box: { top: '80%', left: '50%' }, arrowTo: null },  // PROBABILITY TREE
+    { image: 'step3.png', titleKey: 'tut2_s9_title', textKey: 'tut2_s9_text', box: { top: '80%', left: '50%' }, arrowTo: null },  // PROBABILITY TREE
     { image: 'step4.jpeg', titleKey: 'tut2_s10_title', textKey: 'tut2_s10_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // INFERENCE
     { image: 'step5.jpeg', titleKey: 'tut2_s11_title', textKey: 'tut2_s11_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // CLASSES
 ];
