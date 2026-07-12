@@ -206,6 +206,19 @@ const Audio_Manager = (() => {
         level_10_11: 'audio/bgm_43.mp3',
         level_10_12: 'audio/bgm_43.mp3',
 
+        // World 11
+        level_11_1: 'audio/bgm_44.mp3',
+        level_11_2: 'audio/bgm_44.mp3',
+        level_11_3: 'audio/bgm_44.mp3',
+        level_11_4: 'audio/bgm_45.mp3',
+        level_11_5: 'audio/bgm_45.mp3',
+        level_11_6: 'audio/bgm_45.mp3',
+        level_11_7: 'audio/bgm_46.mp3',
+        level_11_8: 'audio/bgm_46.mp3',
+        level_11_9: 'audio/bgm_46.mp3',
+        level_11_10: 'audio/bgm_47.mp3',
+        level_11_11: 'audio/bgm_47.mp3',
+
     };
 
 
@@ -283,6 +296,12 @@ const Audio_Manager = (() => {
         '10-4': 'level_10_4', '10-5': 'level_10_5', '10-6': 'level_10_6',
         '10-7': 'level_10_7', '10-8': 'level_10_8', '10-9': 'level_10_9',
         '10-10': 'level_10_10', '10-11': 'level_10_11', '10-12': 'level_10_12',
+
+        // World 11
+        '11-1': 'level_11_1', '11-2': 'level_11_2', '11-3': 'level_11_3',
+        '11-4': 'level_11_4', '11-5': 'level_11_5', '11-6': 'level_11_6',
+        '11-7': 'level_11_7', '11-8': 'level_11_8', '11-9': 'level_11_9',
+        '11-10': 'level_11_10', '11-11': 'level_11_11',
 
     };
 

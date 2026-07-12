@@ -7,7 +7,7 @@ const CHANGELOG_DATA = [
 
     {
         version: "v0.25.2 BETA",
-        date: "10.07.2026",
+        date: "12.07.2026",
         changes: [
             {
                 category: "New Features",
