@@ -491,6 +491,51 @@ function _isWorldAccessible(wi) {
 }
 
 
+/**
+ * Returns true if every level in the given world has been completed at least once.
+ */
+function _isWorldFullyDone(wi) {
+    if (!STATE || !WORLDS || !WORLDS[wi]) return false;
+    const start = WORLD_START_GI[wi];
+    return WORLDS[wi].data.every((_, li) => STATE.done && STATE.done.includes(start + li));
+}
+
+/**
+ * Returns true if every level in the given world has had its bonus objective claimed.
+ */
+function _isWorldBonusComplete(wi) {
+    if (!STATE || !WORLDS || !WORLDS[wi]) return false;
+    const start = WORLD_START_GI[wi];
+    return WORLDS[wi].data.every((_, li) => STATE.bonusDone && STATE.bonusDone.includes(start + li));
+}
+
+/**
+ * Returns true if every level in the given world was cleared on Hard with
+ * all five modifiers active (reuses isMaxCleared from screens-level-select.js).
+ */
+function _isWorldMaxCleared(wi) {
+    if (!STATE || !WORLDS || !WORLDS[wi] || typeof isMaxCleared !== 'function') return false;
+    const start = WORLD_START_GI[wi];
+    return WORLDS[wi].data.every((_, li) => isMaxCleared(start + li));
+}
+
+/**
+ * Returns the "healing" tier (0–3) for a world node's corruption-cleansing
+ * visual effect — the land recovering from the void as the world is cleared:
+ *   0 — not yet fully cleared: corruption remains, no effect
+ *   1 — every level cleared at least once: nature begins to return
+ *   2 — tier 1 + every bonus claimed: vines and leaves visibly sprout
+ *   3 — tier 2 + every level max-cleared (Hard, all mods): full radiant bloom
+ */
+function _getWorldHealingTier(wi) {
+    if (!_isWorldFullyDone(wi)) return 0;
+    if (!_isWorldBonusComplete(wi)) return 1;
+    if (!_isWorldMaxCleared(wi)) return 2;
+    return 3;
+}
+
+
+
 //------------------------------------------------------------------------
 //-------------------ROUTE FINDING (BFS)---------------------------------
 //------------------------------------------------------------------------
@@ -1137,6 +1182,36 @@ function _getWorldNodeIcon(wi, isDone, isLocked) {
     return wi + 1;              // Display 1-based world number for unlocked worlds
 }
 
+
+/**
+ * Builds the healing-effect HTML for a world node, layered behind the ring.
+ */
+function _buildWorldHealingEffectHtml(tier) {
+    let html = `<div class="mv-heal-glow mv-heal-glow-${tier}"></div>`;
+
+    if (tier >= 2) {
+        html += `
+            <div class="mv-heal-vines">
+                <span class="mv-heal-leaf mv-heal-leaf-1">🌿</span>
+                <span class="mv-heal-leaf mv-heal-leaf-2">🌿</span>
+                <span class="mv-heal-leaf mv-heal-leaf-3">🍃</span>
+            </div>`;
+    }
+
+    if (tier >= 3) {
+        html += `
+            <div class="mv-heal-bloom">
+                <span class="mv-heal-petal mv-heal-petal-1">✨</span>
+                <span class="mv-heal-petal mv-heal-petal-2">✨</span>
+                <span class="mv-heal-petal mv-heal-petal-3">🌸</span>
+                <span class="mv-heal-petal mv-heal-petal-4">🌸</span>
+            </div>`;
+    }
+
+    return html;
+}
+
+
 /**
  * Applies the correct CSS state class (done / locked / available) to a world node.
  *
@@ -1144,10 +1219,12 @@ function _getWorldNodeIcon(wi, isDone, isLocked) {
  * @param {boolean} isDone
  * @param {boolean} isLocked
  */
-function _applyWorldNodeStateClass(node, isDone, isLocked) {
+function _applyWorldNodeStateClass(node, isDone, isLocked, healingTier) {
     if (isDone) node.classList.add('done');
     else if (isLocked) node.classList.add('locked');
     else node.classList.add('available');
+
+    if (healingTier > 0) node.classList.add('healing-tier-' + healingTier);
 }
 
 /**
@@ -1176,20 +1253,22 @@ function _buildWorldNode(pos, wi) {
     const canvas = document.getElementById('mv-canvas');
     const isDone = _isWorldComplete(wi);
     const isLocked = !_isWorldAccessible(wi);
+    const healingTier = _getWorldHealingTier(wi); // Nexus (wi 13) safely returns 0
 
     const node = document.createElement('div');
     node.className = 'mv-world-node';
     node.dataset.wi = wi;
-    // Store raw image-% coordinates so _mvRepositionAll can recalculate on resize
     node.dataset.imgX = pos.x;
     node.dataset.imgY = pos.y;
 
     _applyPositionToElement(node, pos.x, pos.y, canvas);
-    _applyWorldNodeStateClass(node, isDone, isLocked);
+    _applyWorldNodeStateClass(node, isDone, isLocked, healingTier);
 
     const icon = _getWorldNodeIcon(wi, isDone, isLocked);
-    const label = _getWorldLabel(wi);
+    const healingHtml = healingTier > 0 ? _buildWorldHealingEffectHtml(healingTier) : '';
+
     node.innerHTML = `
+        ${healingHtml}
         <div class="mv-node-ring">${icon}</div>
     `;
 

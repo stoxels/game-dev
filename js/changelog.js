@@ -7,7 +7,7 @@ const CHANGELOG_DATA = [
 
     {
         version: "v0.26 BETA",
-        date: "12.07.2026",
+        date: "13.07.2026",
         changes: [
             {
                 category: "New Features",
@@ -27,7 +27,7 @@ const CHANGELOG_DATA = [
             {
                 category: "General Adjustments",
                 items: [
-                    "It is now possible to dismiss inference quest milestone popups by clicking on them.",
+                    "It is now possible to dismiss Inference quest milestone popups by clicking on them.",
                     "While a character is walking towards the target node you can now select a different node to cancel the old routing on the next waypoint arrival to walk towards the newly selected node.",
                     "When going into the Probability Screen after a Convergence event, and then pressing the Back button in the Probability Tree screen, you will now automatically return to the detailed Map Screen of the World you were just in instead of the Overworld Screen.",
                     "Added a Sound Effect for Sylas nature trait.",
@@ -35,6 +35,8 @@ const CHANGELOG_DATA = [
                     "Tutorial image adjustments",
                     "Removed some duplicated Quiz and Excercise questions.",
                     "The same Quiz or Excercise question can now no longer appear for the next 10 questions.",
+                    "Moodle Codes Screen has been updated.",
+                    "There is now a new effect on the Overworld Map if all Levels of a specific World have been cleared. This effect is more intense if all levels are cleared and all bonus requirements are met, and even more intense if all levels are cleared, all bonus requirements are met and all levels have been cleared on Hard with all available game modifiers.",
 
                 ],
 
