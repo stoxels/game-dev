@@ -285,11 +285,11 @@ const T = {
         btn_settings_close: '✕ CLOSE',
 
         // Settings Modal
-        settings_title: '⚙ SETTINGS',
-        settings_audio: '🎵 AUDIO',
+        settings_title: 'SETTINGS',
+        settings_audio: 'AUDIO',
         settings_bgm: 'Background Music',
         settings_sfx: 'Sound Effects',
-        settings_controls: '🖱 CONTROLS',
+        settings_controls: 'CONTROLS',
         settings_axis_lock: 'Axis Lock',
         settings_axis_lock_hint: 'Lock drag to starting row or column',
         settings_qmark: 'Question Mark',
@@ -640,11 +640,11 @@ const T = {
         btn_settings_close: '✕ SCHLIESSEN',
 
         // Settings Modal
-        settings_title: '⚙ EINSTELLUNGEN',
-        settings_audio: '🎵 AUDIO',
+        settings_title: 'EINSTELLUNGEN',
+        settings_audio: 'AUDIO',
         settings_bgm: 'Hintergrundmusik',
         settings_sfx: 'Soundeffekte',
-        settings_controls: '🖱 STEUERUNG',
+        settings_controls: 'STEUERUNG',
         settings_axis_lock: 'Achsensperre',
         settings_axis_lock_hint: 'Ziehen auf die Startzeile oder Startspalte beschränken',
         settings_qmark: 'Fragezeichen',

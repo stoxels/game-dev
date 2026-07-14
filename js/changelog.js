@@ -6,6 +6,39 @@
 const CHANGELOG_DATA = [
 
     {
+        version: "v0.27 BETA",
+        date: "14.07.2026",
+        changes: [
+            {
+                category: "New Features",
+                items: [
+                    "Settings Modal has been fully remade.",
+
+                ],
+
+            },
+            {
+                category: "General Adjustments",
+                items: [
+
+                ],
+
+            },
+            {
+                category: "Bug Fixes",
+                items: [
+
+                ],
+
+            },
+
+
+        ],
+
+
+    },
+
+    {
         version: "v0.26 BETA",
         date: "13.07.2026",
         changes: [

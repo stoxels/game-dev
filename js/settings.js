@@ -108,7 +108,6 @@ function applySettings() {
 function setToggleUI(btnId, isEnabled) {
     const btn = document.getElementById(btnId);
     if (!btn) return;
-    btn.textContent = isEnabled ? t('stt_on') : t('stt_off');
     btn.classList.toggle('settings-toggle-off', !isEnabled);
 }
 

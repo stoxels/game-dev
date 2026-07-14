@@ -1,32 +1,160 @@
-
-/* -----------------------------------------------------------------------
+﻿/* -----------------------------------------------------------------------
    ----------------------- SETTINGS MODAL --------------------------------
    -----------------------------------------------------------------------
-   Styles for the in-game settings modal panel. Contains sections with
-   rows of labeled controls (toggles and sliders).
+   Redesigned to use the stone/parchment book asset set from
+   images/Settings/. Structure mirrors setup-screen.css: one big
+   background-image frame, with content positioned/padded to sit inside
+   its inner parchment area.
    ----------------------------------------------------------------------- */
 
-/* Narrower panel width for the settings modal vs the setup box */
-.settings-box {
-    max-width: 480px;
-    width: 100%;
+.modal-box.settings-box {
+    position: relative;
+    width: 92%;
+    max-width: 50%;
+    aspect-ratio: 611 / 409;
+    background-image: url('../images/Settings/settings_background.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: clamp(70px, 9vw, 100px) clamp(36px, 5vw, 60px) clamp(30px, 4vw, 50px);
+    box-sizing: border-box;
+    overflow: visible; /* let plaque + close button hang over the frame edge */
 }
 
-/* One logical group within the settings modal (e.g. Audio, Display) */
-.settings-section {
-    margin-bottom: 24px;
-}
-
-/* Section heading with a bottom divider line */
-.settings-section-title {
-    font-family: var(--PX);
-    font-size: 11px;
-    color: var(--yellow);
+/* -----------------------------------------------------------------------
+   TITLE PLAQUE — overlaps the top edge of the frame, like the mockup
+   ----------------------------------------------------------------------- */
+.settings-box .modal-title {
+    position: absolute;
+    top: 0%; /* ← move plaque up/down relative to frame */
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(220px, 40%, 350px);
+    height: clamp(46px, 6vw, 68px);
+    background-image: url('../images/Settings/settings_title_plague.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--C);
+    font-size: clamp(14px, 1.8vw, 22px);
     letter-spacing: 2px;
+    color: var(--yellow);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    margin: 0;
+    z-index: 3;
+}
+
+/* -----------------------------------------------------------------------
+   CLOSE BUTTON — stone square with X icon, top-right corner
+   ----------------------------------------------------------------------- */
+.settings-box .modal-close {
+    position: absolute;
+    top: 2%; /* ← move close button up/down */
+    right: 2%; /* ← move close button left/right */
+    width: clamp(34px, 4.4vw, 50px);
+    height: clamp(34px, 4.4vw, 50px);
+    background-image: url('../images/Settings/settings_close_button.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    font-size: 0; /* the icon art already shows the X — hide the "✕ CLOSE" text */
+    cursor: pointer;
+    padding: 0;
+    z-index: 4;
+    transition: transform .12s, filter .12s;
+}
+
+    .settings-box .modal-close:hover {
+        filter: brightness(1.2);
+        transform: scale(1.06);
+    }
+
+/* -----------------------------------------------------------------------
+   SECTION — one logical group (AUDIO / CONTROLS)
+   ----------------------------------------------------------------------- */
+.settings-section {
+    margin-bottom: clamp(16px, 2.4vw, 26px);
+}
+
+/* position:relative anchors the absolutely-positioned icon (::before)
+   below — the icon no longer sits in the flex flow, so its size has
+   zero effect on where the title text or anything else sits.
+
+   BASE padding-left below shifts ALL section titles right so they
+   clear the icon by default. Each section then gets its own override
+   further down so you can nudge AUDIO and CONTROLS independently
+   without touching the other. */
+.settings-section-title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    font-family: var(--C);
+    font-size: clamp(13px, 1.7vw, 19px);
+    color: var(--yellow);
+    letter-spacing: 1px;
     text-transform: uppercase;
-    margin-bottom: 14px;
+    margin-bottom: clamp(8px, 1.2vw, 14px);
     padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
+    padding-left: clamp(60px, 8vw, 110px); /* ← default clearance from the icon, both sections */
+    border-bottom: 2px solid rgba(44, 26, 12, 0.35);
+}
+
+/* ---- AUDIO title text — nudge independently here ----
+   Uses the same nth-of-type(2) targeting as the instrument icon below,
+   so this ONLY affects the "AUDIO" heading. */
+.settings-section:nth-of-type(2) .settings-section-title {
+    padding-left: clamp(60px, 8vw, 60px); /* ← move "AUDIO" text left/right (larger = further right) */
+    top: 0px; /* ← move "AUDIO" text up/down */
+}
+
+/* ---- CONTROLS title text — nudge independently here ----
+   Uses the same nth-of-type(3) targeting as the compass icon below,
+   so this ONLY affects the "CONTROLS" heading. */
+.settings-section:nth-of-type(3) .settings-section-title {
+    padding-left: clamp(60px, 8vw, 90px); /* ← move "CONTROLS" text left/right (larger = further right) */
+    top: 0px; /* ← move "CONTROLS" text up/down */
+}
+
+/* Icon before the AUDIO title — lute/gears asset.
+   nth-of-type() counts ALL sibling <div>s inside .settings-box, not
+   just .settings-section ones. The actual div order is:
+     1. .modal-title   (div #1)
+     2. .settings-section (AUDIO)    → div #2
+     3. .settings-section (CONTROLS) → div #3 */
+.settings-section:nth-of-type(2) .settings-section-title::before {
+    content: '';
+    position: absolute;
+    top: -30px; /* ← move icon up/down, independent of layout */
+    left: -60px; /* ← move icon left/right, independent of layout */
+    width: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
+    height: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
+    background-image: url('../images/Settings/settings_instrument.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Icon before the CONTROLS title — compass asset. */
+.settings-section:nth-of-type(3) .settings-section-title::before {
+    content: '';
+    position: absolute;
+    top: -185%;
+    left: -5%;
+    width: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
+    height: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
+    background-image: url('../images/Settings/settings_compass.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* A single setting row: label on the left, control on the right */
@@ -35,24 +163,27 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 8px 0;
+    padding: clamp(6px, 1vw, 10px) 0;
 }
 
 /* Left side of a row: setting name + optional hint text stacked vertically */
 .settings-label {
     font-family: var(--PX);
-    font-size: 12px;
-    color: var(--accent2);
+    font-size: clamp(10px, 1.2vw, 13px);
+    color: var(--yellow);
     display: flex;
     flex-direction: column;
     gap: 3px;
+    position: relative;
+    top: 5%;
+    left: 5%;
 }
 
 /* Small descriptive text shown below the setting name */
 .settings-hint {
     font-family: var(--PX);
-    font-size: 9px;
-    color: var(--setup-opt-inactive);
+    font-size: clamp(8px, 0.9vw, 10px);
+    color: cornsilk;
     font-style: normal;
 }
 
@@ -61,41 +192,182 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-shrink: 0; /* Prevent controls from shrinking on narrow screens */
+    flex-shrink: 0;
+    position: relative;
+    right: 3%;
 }
 
+/* -----------------------------------------------------------------------
+   TOGGLE SWITCH — stone capsule (on-off-stone.png) with a divider in
+   the middle. No thumb graphic — instead, two text labels sit on the
+   button, one per side. Requires two child spans in the HTML:
+     <span class="tgl-on-txt"  data-t="stt_on">ON</span>
+     <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+   The .settings-toggle-off class (already toggled by settings.js)
+   controls which side glows cyan.
+
+   Width is locked with min-width/max-width + flex:0 0 auto so it
+   renders identically whether it's a flex-item of .settings-controls
+   (Audio rows) or a direct flex-item of .settings-row (Controls rows).
+   Do NOT use percentage-based margin/left/top on the child text spans
+   to nudge them — percentages there are relative to this button's own
+   width, so large values (e.g. 40%+) inflate the button's min-content
+   size and break the locked width. Use small px offsets instead (see
+   the per-section override blocks below the base text rule). */
+.settings-toggle {
+    position: relative;
+    width: clamp(80px, 10.5vw, 140px);
+    min-width: clamp(80px, 10.5vw, 140px);
+    max-width: clamp(80px, 10.5vw, 140px);
+    flex: 0 0 auto;
+    height: clamp(30px, 3.6vw, 42px);
+    background-image: url('../images/Settings/on-off-stone.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: filter .12s;
+    /* Lay the two labels left/right of the button's own center, which
+       should line up with the divider baked into on-off-stone.png. */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+    .settings-toggle:hover {
+        filter: brightness(1.15);
+    }
+
+    /* BASE position — flex justify-content:space-between + padding on
+       .settings-toggle already places "ON" left / "OFF" right
+       correctly for BOTH sections. Leave this rule alone; use the two
+       per-section override blocks below to nudge AUDIO or CONTROLS
+       independently. */
+    .settings-toggle .tgl-on-txt,
+    .settings-toggle .tgl-off-txt {
+        font-family: var(--PX);
+        font-size: clamp(9px, 1.1vw, 12px);
+        letter-spacing: 0.5px;
+        color: floralwhite;
+        text-shadow: none;
+        transition: color .15s, text-shadow .15s;
+        pointer-events: none;
+        position: relative;
+        top: 0px;
+        left: 0px;
+    }
+
+/* ---- AUDIO toggle text only — nudge here, doesn't touch CONTROLS ---- */
+.settings-section:nth-of-type(2) .settings-toggle .tgl-on-txt,
+.settings-section:nth-of-type(2) .settings-toggle .tgl-off-txt {
+    top: 5%;
+    left: 0%;
+    margin: 15%;
+}
+
+/* ---- CONTROLS toggle text only — nudge here, doesn't touch AUDIO ---- */
+.settings-section:nth-of-type(3) .settings-toggle .tgl-on-txt,
+.settings-section:nth-of-type(3) .settings-toggle .tgl-off-txt {
+    top: 5%; /* ← move CONTROLS on/off text up/down (px, not %) */
+    left: 0%; /* ← move CONTROLS on/off text left/right (px, not %) */
+    margin:15%;
+}
+
+/* ON state (default, no .settings-toggle-off class): left label glows */
+.settings-toggle:not(.settings-toggle-off) .tgl-on-txt {
+    color: var(--accent);
+    text-shadow: 0 0 8px rgba(0, 220, 220, 0.85);
+}
+
+/* OFF state: right label glows instead */
+.settings-toggle.settings-toggle-off .tgl-off-txt {
+    color: var(--accent);
+    text-shadow: 0 0 8px rgba(0, 220, 220, 0.85);
+}
+
+/* -----------------------------------------------------------------------
+   VOLUME SLIDER — rune-carved track (settings_slider.png) + gem thumb
+   ----------------------------------------------------------------------- */
+.settings-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: clamp(120px, 14vw, 190px);
+    min-width: clamp(120px, 14vw, 190px);
+    max-width: clamp(120px, 14vw, 190px);
+    flex: 0 0 auto;
+    height: clamp(16px, 2vw, 24px);
+    background: transparent;
+    margin: 0;
+    cursor: pointer;
+}
+
+    /* Webkit (Chrome/Edge/Safari) track */
+    .settings-slider::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 100%;
+        background-image: url('../images/Settings/settings_slider.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+    }
+
+    /* Firefox track */
+    .settings-slider::-moz-range-track {
+        width: 100%;
+        height: 100%;
+        background-image: url('../images/Settings/settings_slider.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+    }
+
+    /* Webkit thumb */
+    .settings-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: clamp(20px, 2.4vw, 28px);
+        height: clamp(20px, 2.4vw, 28px);
+        margin-top: 0; /* ← nudge if the gem sits above/below the track visually */
+        background-image: url('../images/Settings/settings_slider_thumb.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Firefox thumb */
+    .settings-slider::-moz-range-thumb {
+        width: clamp(20px, 2.4vw, 28px);
+        height: clamp(20px, 2.4vw, 28px);
+        background-image: url('../images/Settings/settings_slider_thumb.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .settings-slider::-moz-range-progress {
+        background: transparent; /* avoid Firefox's default blue fill over the track art */
+    }
+
+/* Percentage label next to each slider. Fixed `width` (not min-width)
+   keeps .settings-controls the same total size regardless of the
+   displayed value, so the toggle + slider never shift position. */
+.settings-val {
+    font-family: var(--PX);
+    font-size: clamp(9px, 1.1vw, 12px);
+    color: #2c1a0c;
+    width: clamp(34px, 3.6vw, 42px);
+    flex: 0 0 auto;
+    text-align: right;
+}
 
 
 /* -----------------------------------------------------------------------
-   ------------------- SETTINGS TOGGLE BUTTON ----------------------------
+   Unrelated in-game HUD button — left as-is
    ----------------------------------------------------------------------- */
-
-/* ON state - cyan border and text */
-.settings-toggle {
-    font-family: var(--PX);
-    font-size: 11px;
-    background: transparent;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    padding: 5px 14px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    min-width: 52px;
-    transition: all .12s;
-}
-
-/* OFF state - muted border and text */
-.settings-toggle-off {
-    border-color: var(--border2);
-    color: var(--setup-opt-inactive);
-}
-
-
-
-
-
-
-
 .touchpad-mode-btn {
     margin-left: 8px;
     padding: 2px 8px;

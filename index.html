@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STOXELS - v0.26 BETA</title>
+    <title>STOXELS - v0.27 BETA</title>
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/pause.css">
     <link rel="stylesheet" href="css/settings.css">
@@ -65,7 +65,7 @@
 
             <!-- Subtitle + version replace the old <p class="title-tag"> and title-version span -->
             <div class="title-subtitle">CARTOGRAPHERS OF CHANCE</div>
-            <div class="title-version-line">v0.26 BETA</div>
+            <div class="title-version-line">v0.27 BETA</div>
             <div class="title-lang-overlay">
                 <button class="lang-btn active" data-lang="en">EN</button>
                 <button class="lang-btn" data-lang="de">DE</button>
@@ -373,12 +373,15 @@
 
             <!-- AUDIO -->
             <div class="settings-section">
-                <div class="settings-section-title" data-t="settings_audio">🎵 AUDIO</div>
+                <div class="settings-section-title" data-t="settings_audio">AUDIO</div>
 
                 <div class="settings-row">
                     <label class="settings-label" data-t="settings_bgm">Background Music</label>
                     <div class="settings-controls">
-                        <button class="settings-toggle" id="stt-bgm">ON</button>
+                        <button class="settings-toggle" id="stt-bgm">
+                            <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                            <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                        </button>
                         <input type="range" class="settings-slider" id="sld-bgm"
                                min="0" max="100" value="40" step="5">
                         <span class="settings-val" id="val-bgm">40%</span>
@@ -388,7 +391,10 @@
                 <div class="settings-row">
                     <label class="settings-label" data-t="settings_sfx">Sound Effects</label>
                     <div class="settings-controls">
-                        <button class="settings-toggle" id="stt-sfx">ON</button>
+                        <button class="settings-toggle" id="stt-sfx">
+                            <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                            <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                        </button>
                         <input type="range" class="settings-slider" id="sld-sfx"
                                min="0" max="100" value="70" step="5">
                         <span class="settings-val" id="val-sfx">70%</span>
@@ -398,28 +404,37 @@
 
             <!-- CONTROLS -->
             <div class="settings-section">
-                <div class="settings-section-title" data-t="settings_controls">🖱 CONTROLS</div>
+                <div class="settings-section-title" data-t="settings_controls">CONTROLS</div>
 
                 <div class="settings-row">
                     <label class="settings-label">
                         <span data-t="settings_axis_lock">Axis Lock</span>
                         <span class="settings-hint" data-t="settings_axis_lock_hint">Lock drag to starting row or column</span>
                     </label>
-                    <button class="settings-toggle" id="stt-axis">OFF</button>
+                    <button class="settings-toggle" id="stt-axis">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
                 </div>
                 <div class="settings-row">
                     <label class="settings-label">
                         <span data-t="settings_qmark">Question Mark</span>
                         <span class="settings-hint" data-t="settings_qmark_hint">Right Click a X - marked cell to add a yellow ?  </span>
                     </label>
-                    <button class="settings-toggle" id="stt-qmark">ON</button>
+                    <button class="settings-toggle" id="stt-qmark">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
                 </div>
                 <div class="settings-row">
                     <label class="settings-label">
                         <span data-t="settings_touchpad">Touchpad Mode</span>
                         <span class="settings-hint" data-t="settings_touchpad_hint">Adds an in-game button to switch left-click between Fill and Mark</span>
                     </label>
-                    <button class="settings-toggle" id="stt-touchpad">OFF</button>
+                    <button class="settings-toggle" id="stt-touchpad">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
                 </div>
             </div>
 
