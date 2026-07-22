@@ -1,5 +1,4 @@
-﻿
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
 
     //------------------------------------------------------------------------
     //-------------------CONSTANTS & ELEMENT REFERENCES-----------------------
@@ -84,19 +83,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Main menu navigation buttons
     onClick('btn-play', () => {
-        const proceed = () => maybeShowCharacterSelect(() => showTutorial());
-
-        if (!hasSeen('intro_cinematic')) {
-            showBeat('intro_cinematic', { onComplete: proceed });
-        } else {
-            proceed();
-        }
+        showSaveSlotSelect(() => {
+            const proceed = () => maybeShowCharacterSelect(() => showTutorial());
+            if (!hasSeen('intro_cinematic')) {
+                showBeat('intro_cinematic', { onComplete: proceed });
+            } else {
+                proceed();
+            }
+        });
     });
+
+    onClick('btn-save-slots-back', () => showTitle());
+
     onClick('btn-how-to-play', () => showModal('tut-modal'));
     onClick('btn-highscores', () => showHS());
     onClick('btn-codes', () => showCodes());
     onClick('btn-achievements', () => showAchievements());
-    onClick('btn-reset', () => showModal('reset-modal'));
+    onClick('btn-reset', () => {
+        window._pendingResetSlot = null;
+        safeCall('_restoreResetModalTextForFullReset');
+        showModal('reset-modal');
+    });
     onClick('btn-settings', () => { loadSettingsUI(); showModal('settings-modal'); });
 
     // Language switcher buttons (class-based, not id-based)
@@ -174,8 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 cleanupActiveGameSystems();
                 stopTimer();
                 if (typeof _egStopEncounter === 'function') _egStopEncounter();
-                safeCall('_hidePlayerAvatarSimple');  
-                safeCall('_hidePlayerAvatar'); 
+                safeCall('_hidePlayerAvatarSimple');
+                safeCall('_hidePlayerAvatar');
                 goToLevelSelect();
             });
             return;
@@ -184,8 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
         unpauseGame();
         cleanupActiveGameSystems();
         stopTimer();
-        safeCall('_hidePlayerAvatarSimple');  
-        safeCall('_hidePlayerAvatar'); 
+        safeCall('_hidePlayerAvatarSimple');
+        safeCall('_hidePlayerAvatar');
         goToLevelSelect();
     }
 
@@ -254,8 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function onGoToLevelsFromOverlay() {
         cleanupActiveGameSystems();
-        safeCall('_hidePlayerAvatarSimple'); 
-        safeCall('_hidePlayerAvatar'); 
+        safeCall('_hidePlayerAvatarSimple');
+        safeCall('_hidePlayerAvatar');
         goToLevelSelect();
     }
 
@@ -265,8 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function onRetryLevelFromOverlay() {
         cleanupActiveGameSystems();
-        safeCall('_hidePlayerAvatarSimple');  
-        safeCall('_hidePlayerAvatar'); 
+        safeCall('_hidePlayerAvatarSimple');
+        safeCall('_hidePlayerAvatar');
         replayLevel();
     }
 

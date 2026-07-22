@@ -3,16 +3,57 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Ensures the "locked codes" reminder only shows once per game session,
+// instead of after every level completion.
+let _lockedCodesModalShownThisSession = false;
+
+// Same eligibility check as collectCodeUnlockResults(), but read-only —
+// does not mutate STATE.unlockedCodes. Used for the setup-screen reminder only.
+function collectLockedCodesOnly() {
+    const lockedCodes = [];
+    const totalTiers = ACHIEVEMENT_DEFS.reduce((sum, def) => sum + def.tiers.length, 0);
+    const unlockedTiers = ACH_STATE.unlocked.length;
+    const achPctDone = calcAchievementProgress();
+
+    WORLD_CODES.forEach(wc => {
+        if (STATE.unlockedCodes.includes(wc.code)) return;
+        const result = evaluateCodeEligibility(wc, achPctDone);
+        if (result === 'locked_achievements') {
+            lockedCodes.push({
+                wc,
+                needed: Math.ceil(wc.achPct * totalTiers),
+                have: unlockedTiers,
+            });
+        }
+    });
+
+    return lockedCodes;
+}
+
+// Call this once, when the player confirms Game Setup (before entering
+// level select). Shows the locked-codes reminder at most once per session.
+function checkLockedCodesOnSetup() {
+    if (_lockedCodesModalShownThisSession) return;
+
+    const lockedCodes = collectLockedCodesOnly();
+    if (lockedCodes.length) {
+        _lockedCodesModalShownThisSession = true;
+        showLockedCodesModal(lockedCodes);
+    }
+}
+
+
+
 // Each entry defines a Moodle code the player can unlock by reaching
 // a score threshold AND a minimum percentage of all achievement tiers.
 // achPct: 0 means only the score requirement matters for that code.
 
 const WORLD_CODES = [
     { threshold: 10000, achPct: 0, code: 'TY_4_Playing_Stoxels', titleEn: 'Code 1', titleDE: 'Code 1' },
-    { threshold: 25000, achPct: 0.20, code: 'IsThereADog?', titleEn: 'Code 2', titleDE: 'Code 2' },
-    { threshold: 50000, achPct: 0.40, code: 'Stox0rTrix', titleEn: 'Code 3', titleDE: 'Code 3' },
-    { threshold: 75000, achPct: 0.65, code: 'MonstersInStoxels', titleEn: 'Code 4', titleDE: 'Code 4' },
-    { threshold: 100000, achPct: 0.90, code: 'Examn1.0afterStoxels', titleEn: 'Code 5', titleDE: 'Code 5' },
+    { threshold: 25000, achPct: 0.15, code: 'IsThereADog?', titleEn: 'Code 2', titleDE: 'Code 2' },
+    { threshold: 50000, achPct: 0.30, code: 'Stox0rTrix', titleEn: 'Code 3', titleDE: 'Code 3' },
+    { threshold: 75000, achPct: 0.50, code: 'MonstersInStoxels', titleEn: 'Code 4', titleDE: 'Code 4' },
+    { threshold: 100000, achPct: 0.80, code: 'Examn1.0afterStoxels', titleEn: 'Code 5', titleDE: 'Code 5' },
 ];
 
 
@@ -82,12 +123,9 @@ function collectCodeUnlockResults() {
 // Main entry point — call this after a level is beaten or a quiz is finished.
 // Checks for newly unlocked codes, persists state, and triggers UI feedback.
 function checkWorldCodes() {
-    const { newCodes, lockedCodes } = collectCodeUnlockResults();
-
+    const { newCodes } = collectCodeUnlockResults();
     save();
-
     if (newCodes.length) showUnlockedCodesModal(newCodes);
-    if (lockedCodes.length) showLockedCodesModal(lockedCodes);
 }
 
 

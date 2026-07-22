@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/pause.css">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/title-screen.css">
+    <link rel="stylesheet" href="css/save-slots.css">
     <link rel="stylesheet" href="css/screens.css">
     <link rel="stylesheet" href="css/game.css">
     <link rel="stylesheet" href="css/setup-screen.css">
@@ -112,11 +113,13 @@
                 🏆 ACHIEVEMENTS
             </button>
 
+                    <!--
             <button class="title-overlay-btn btn-danger" id="btn-reset"
                     style="--bx: 50%; --by: 55%;"
                     data-t="btn_reset">
                 🗑 RESET
             </button>
+            -->
 
             <button class="title-overlay-btn block-general" id="btn-replay"
                     style="--bx: 30%; --by: 65%;">
@@ -172,6 +175,16 @@
                 <p data-t="tut_s7p">Complete all levels in a World to unlock a Moodle Code. Enter it in Moodle to earn a badge that is stored in your Moodle profile.</p>
             </div>
         </div>
+    </div>
+
+
+    <!-- SAVE SLOT SELECT SCREEN -->
+    <div id="screen-save-slots" class="screen">
+        <div class="ss-topbar">
+            <button class="back-btn" id="btn-save-slots-back">◀ BACK</button>
+            <span class="ss-title">SELECT SAVE FILE</span>
+        </div>
+        <div class="ss-grid" id="save-slots-grid"></div>
     </div>
 
 
@@ -898,6 +911,7 @@
     <script src="js/quests-logic.js"></script>
     <script src="js/quests-styles.js"></script>
     <script src="js/quests-ui.js"></script>
+    <script src="js/screens/screens-save-slots.js"></script>
     <script src="js/state.js"></script>
     <script src="js/difficulty-modifiers.js"></script>
     <script src="js/level-world-data.js"></script>

@@ -1,0 +1,105 @@
+﻿#screen-save-slots.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.ss-topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+}
+
+.ss-title {
+    font-family: var(--PX);
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: var(--accent2);
+}
+
+.ss-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    padding: 10px 24px 24px;
+    overflow-y: auto;
+}
+
+.save-slot-card {
+    position: relative;
+    background: rgba(20, 20, 32, 0.85);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 14px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .12s, transform .12s;
+}
+
+    .save-slot-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+    }
+
+    .save-slot-card.empty {
+        opacity: 0.6;
+        border-style: dashed;
+    }
+
+.ssc-num {
+    font-family: var(--PX);
+    font-size: 10px;
+    color: var(--purple);
+    margin-bottom: 6px;
+}
+
+.ssc-empty {
+    font-family: var(--PX);
+    font-size: 11px;
+    color: var(--green);
+}
+
+/* Character portrait shown instead of the raw character name.
+   Fixed width AND height (not just width) so Stox/Trix/Syla — which are
+   all different source resolutions/aspect ratios — end up the same
+   on-screen size. object-fit: contain scales each image to fit inside
+   this box without stretching or cropping it. */
+.ssc-portrait {
+    display: block;
+    width: 150px; /* ← portrait box size */
+    height: 150px; /* ← portrait box size */
+    object-fit: contain;
+    margin: 4px auto 6px; /* ← portrait position within the card */
+    pointer-events: none;
+}
+
+/* SCORE line — tune independently from the levels-done line below */
+.ssc-score {
+    font-size: 20px; /* ← score text size */
+    color: var(--accent2);
+    margin-top: 2px; /* ← score text position */
+}
+
+/* "X LEVELS DONE" line — tune independently from the score line above */
+.ssc-levels {
+    font-size: 20px; /* ← levels-done text size */
+    color: var(--accent2);
+    margin-top: 2px; /* ← levels-done text position */
+}
+
+.ssc-delete-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: transparent;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+    font-size: 20px;
+    opacity: 0.6;
+}
+
+    .ssc-delete-btn:hover {
+        opacity: 1;
+    }

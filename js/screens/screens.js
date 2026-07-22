@@ -124,9 +124,11 @@ function showSetup() {
 // Confirms setup and navigates to the level select screen.
 function confirmSetup() {
     screenHistory.push('screen-setup');
-    // Map view is the default; player can switch to list view manually
     STATE.mapViewEnabled = true;
     if (typeof save === 'function') save();
+
+    if (typeof checkLockedCodesOnSetup === 'function') checkLockedCodesOnSetup();
+
     if (typeof showMapView === 'function') {
         showMapView();
     } else {

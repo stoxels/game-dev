@@ -232,45 +232,112 @@ function migrateOldSave(s) {
 }
 
 
-// loadRawSave — reads the JSON string from localStorage and parses it.
-//              Returns null if nothing is saved yet or the data is corrupt.
-function loadRawSave() {
+//------------------------------------------------------------------------
+//------------------------SAVE SLOT SYSTEM---------------------------------
+//------------------------------------------------------------------------
+
+const SAVE_SLOT_COUNT = 20;
+const ACTIVE_SLOT_KEY = 'stoxels_active_slot';
+
+// Slot 1 reuses the ORIGINAL 'stoxels' key on purpose — this is what makes
+// existing players' progress show up automatically as "Slot 1" with no
+// migration step required. Slots 2-20 get their own dedicated keys.
+function _slotKey(slotNum) {
+    return slotNum === 1 ? 'stoxels' : `stoxels_slot_${slotNum}`;
+}
+
+// Returns the currently active slot number (1-20), or null if none chosen yet
+// in this browser (e.g. very first load, before the save-select screen ran).
+function getActiveSlot() {
+    const s = parseInt(localStorage.getItem(ACTIVE_SLOT_KEY), 10);
+    return (s >= 1 && s <= SAVE_SLOT_COUNT) ? s : null;
+}
+
+function setActiveSlot(slotNum) {
+    localStorage.setItem(ACTIVE_SLOT_KEY, String(slotNum));
+}
+
+// Reads the raw JSON for a specific slot without making it active.
+function loadRawSaveFromSlot(slotNum) {
     try {
-        return JSON.parse(localStorage.getItem('stoxels') || 'null');
+        return JSON.parse(localStorage.getItem(_slotKey(slotNum)) || 'null');
     } catch {
-        return null; // corrupted data — fall back to a fresh state
+        return null;
     }
 }
 
+// Lightweight summary used to render the save-slot select screen.
+function getSlotSummary(slotNum) {
+    const raw = loadRawSaveFromSlot(slotNum);
+    if (!raw) return { slot: slotNum, empty: true };
+    return {
+        slot: slotNum,
+        empty: false,
+        totalScore: raw.totalScore || 0,
+        levelsDone: (raw.done || []).length,
+        playerCharacter: raw.playerCharacter || null,
+        playerClass: raw.playerClass || null,
+        tutorialDone: !!raw.tutorialDone,
+    };
+}
 
-// initState — called once at startup.
-//             Loads any existing save and runs migration on it, or
-//             returns a fresh default STATE if no save is found.
+// Loads (or freshly creates) the STATE for a given slot, marks it active,
+// and persists immediately. Call this when the player picks a slot on the
+// save-select screen.
+function loadStateFromSlot(slotNum) {
+    let raw = loadRawSaveFromSlot(slotNum);
+    if (raw) {
+        migrateOldSave(raw);
+    } else {
+        raw = buildFreshState();
+    }
+    setActiveSlot(slotNum);
+    STATE = raw;
+    save();
+    return STATE;
+}
+
+// Wipes ONLY the given slot's save data. Used by the "Reset Progress" flow
+// on the title screen — achievements live in their own global key
+// (ACH_SAVE_KEY, achievements.js) and are never touched by this.
+function wipeSlot(slotNum) {
+    localStorage.removeItem(_slotKey(slotNum));
+}
+
+// initState — called once at script load, before the player has necessarily
+// picked a slot on the new save-select screen. Falls back to the last
+// active slot (persisted across reloads), then to legacy Slot 1 data if
+// present, then to a blank state. The save-select screen overwrites STATE
+// properly as soon as Play is clicked.
 function initState() {
-    const saved = loadRawSave();
-    if (saved) {
-        migrateOldSave(saved);
-        return saved;
+    const activeSlot = getActiveSlot();
+    if (activeSlot) {
+        const saved = loadRawSaveFromSlot(activeSlot);
+        if (saved) {
+            migrateOldSave(saved);
+            return saved;
+        }
+    }
+    const legacy = loadRawSaveFromSlot(1);
+    if (legacy) {
+        migrateOldSave(legacy);
+        return legacy;
     }
     return buildFreshState();
 }
 
-
 // STATE — the single source of truth for all persistent progress.
 let STATE = initState();
 
-
-// save — serialises STATE to localStorage.
-//        Called whenever STATE changes (after completing a level,
-//        using or selling an item, unlocking a code, etc.).
-//        passiveTreeAllocated is a Set at runtime but must be serialised
-//        as a plain array since JSON does not support Set.
+// save — serialises STATE into the currently active slot (defaults to
+// Slot 1 if nothing has been explicitly chosen yet, matching old behaviour).
 function save() {
+    const slot = getActiveSlot() || 1;
     const toSave = { ...STATE };
     if (STATE.passiveTreeAllocated instanceof Set) {
         toSave.passiveTreeAllocated = [...STATE.passiveTreeAllocated];
     }
-    localStorage.setItem('stoxels', JSON.stringify(toSave));
+    localStorage.setItem(_slotKey(slot), JSON.stringify(toSave));
 }
 
 
