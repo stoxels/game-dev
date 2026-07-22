@@ -302,6 +302,7 @@ function loadStateFromSlot(slotNum) {
 // (ACH_SAVE_KEY, achievements.js) and are never touched by this.
 function wipeSlot(slotNum) {
     localStorage.removeItem(_slotKey(slotNum));
+    if (typeof resetAllBeatsForSlot === 'function') resetAllBeatsForSlot(slotNum);
 }
 
 // initState — called once at script load, before the player has necessarily

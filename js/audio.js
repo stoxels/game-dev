@@ -30,6 +30,7 @@ const Audio_Manager = (() => {
     // Master on/off switches — kept in sync with SETTINGS when available
     let bgmEnabled = true;
     let sfxEnabled = true;
+    let bgmLocked = false;   // true while a story beat/cutscene owns BGM
 
     // Currently playing BGM track
     let currentBGM = null;   // active HTMLAudioElement
@@ -579,6 +580,7 @@ const Audio_Manager = (() => {
     function playBGM(trackKey) {
         _syncBGMEnabledFromSettings();
         if (!bgmEnabled) return;
+        if (bgmLocked) return;
 
         const src = BGM_TRACKS[trackKey];
         if (!src) return;
@@ -710,6 +712,13 @@ const Audio_Manager = (() => {
         sfxEnabled = enabled;
     }
 
+    function lockBGM() {
+        bgmLocked = true;
+    }
+    function unlockBGM() {
+        bgmLocked = false;
+    }
+
 
     //------------------------------------------------------------------------
     //-------------------PUBLIC API-------------------------------------------
@@ -722,6 +731,8 @@ const Audio_Manager = (() => {
         playRandomBGM,
         stopBGM,
         trackForLevel,
+        lockBGM,     
+        unlockBGM,   
 
         get lastBGMKey() { return _lastBGMKey; },
 

@@ -1469,6 +1469,7 @@ const StorylineRenderer = (() => {
             overlay = null;
             if (typeof onComplete === 'function') onComplete();
             if (typeof Audio_Manager !== 'undefined') {
+                Audio_Manager.unlockBGM();
                 Audio_Manager.playBGM(Audio_Manager._lastBGMKey || 'title');
             }
         }, 720);
@@ -1492,20 +1493,36 @@ const StorylineRenderer = (() => {
         if (isVideo) {
             video = buildVideo(beatId, options);
             videoClipsCheck = _normalizeVideoClips(video);
-            if (!video || videoClipsCheck.length === 0) return;
+            if (!video || videoClipsCheck.length === 0) {
+                if (typeof options.onComplete === 'function') options.onComplete();
+                return;
+            }
         } else if (isSong) {
             song = buildSong(beatId, options);
-            if (!song || !song.audio) return;
+            if (!song || !song.audio) {
+                if (typeof options.onComplete === 'function') options.onComplete();
+                return;
+            }
         } else if (isSlideshow) {
             slideshow = buildSlideshow(beatId, options);
-            if (!slideshow || !slideshow.slides || slideshow.slides.length === 0) return;
+            if (!slideshow || !slideshow.slides || slideshow.slides.length === 0) {
+                if (typeof options.onComplete === 'function') options.onComplete();
+                return;
+            }
         } else {
             pages = buildPages(beatId, options);
-            if (!pages || pages.length === 0) return;
+            if (!pages || pages.length === 0) {
+                if (typeof options.onComplete === 'function') options.onComplete();
+                return;
+            }
         }
 
-        // Skip if already seen (unless forced)
-        if (!options.force && hasSeen(beatId, options)) return;
+        // Skip if already seen (unless forced) — but still resolve onComplete,
+        // otherwise any caller waiting on it to navigate forward gets stuck.
+        if (!options.force && hasSeen(beatId, options)) {
+            if (typeof options.onComplete === 'function') options.onComplete();
+            return;
+        }
         markSeen(beatId, options);
 
         onComplete = options.onComplete || null;
@@ -1514,6 +1531,7 @@ const StorylineRenderer = (() => {
         document.body.appendChild(overlay);
         if (typeof Audio_Manager !== 'undefined') {
             Audio_Manager.stopBGM(300); // short fade so it doesn't cut harshly
+            Audio_Manager.lockBGM();
         }
 
         if (isVideo) {
@@ -1571,15 +1589,11 @@ const StorylineRenderer = (() => {
 // ---------------------------------------------------------------------------
 
 function _seenKey(beatId, options = {}) {
-    // For character beats, include character id in key
-    const suffix = options.character
-        ? `_${options.character}`
-        : options.className
-            ? `_${options.className}`
-            : options.ascendencyClass
-                ? `_${options.ascendencyClass}`
-                : '';
-    return `storyline_seen_${beatId}${suffix}`;
+    const suffix = options.character ? `_${options.character}`
+        : options.className ? `_${options.className}`
+            : options.ascendencyClass ? `_${options.ascendencyClass}` : '';
+    const slot = (typeof getActiveSlot === 'function' ? getActiveSlot() : null) || 1;
+    return `storyline_seen_slot${slot}_${beatId}${suffix}`;
 }
 
 function hasSeen(beatId, options = {}) {
@@ -1619,6 +1633,14 @@ function resetAllBeats() {
             .filter(k => k.startsWith('storyline_seen_'))
             .forEach(k => localStorage.removeItem(k));
     } catch (e) { /* noop */ }
+}
+
+function resetAllBeatsForSlot(slotNum) {
+    try {
+        Object.keys(localStorage)
+            .filter(k => k.startsWith(`storyline_seen_slot${slotNum}_`))
+            .forEach(k => localStorage.removeItem(k));
+    } catch (e) { }
 }
 
 

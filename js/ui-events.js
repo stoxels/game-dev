@@ -99,11 +99,7 @@
     onClick('btn-highscores', () => showHS());
     onClick('btn-codes', () => showCodes());
     onClick('btn-achievements', () => showAchievements());
-    onClick('btn-reset', () => {
-        window._pendingResetSlot = null;
-        safeCall('_restoreResetModalTextForFullReset');
-        showModal('reset-modal');
-    });
+
     onClick('btn-settings', () => { loadSettingsUI(); showModal('settings-modal'); });
 
     // Language switcher buttons (class-based, not id-based)
