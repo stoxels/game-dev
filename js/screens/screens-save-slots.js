@@ -52,7 +52,7 @@ function buildSaveSlotCard(slotNum) {
         : `<div class="ssc-num">SLOT ${slotNum}</div>
            ${portraitHtml}
            <div class="ssc-score">SCORE: ${summary.totalScore}</div>
-           <div class="ssc-levels">${summary.levelsDone} LEVELS DONE</div>
+           <div class="ssc-levels">${summary.levelsDone} STOXELS DONE</div>
            <button class="ssc-delete-btn" data-slot="${slotNum}" title="Delete save">❌</button>`;
 
     card.addEventListener('click', (e) => {
