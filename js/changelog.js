@@ -29,6 +29,8 @@ const CHANGELOG_DATA = [
             {
                 category: "Bug Fixes",
                 items: [
+                    "Fixed some typos",
+                    "Potentially fixed a bug that made using The Witch item not consume the item and not count towards associated achievements.",
 
                 ],
 

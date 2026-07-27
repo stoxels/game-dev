@@ -1548,8 +1548,9 @@ function _getFrugalUseChance() {
 //------------------------------------------------------------------------
 
 function _consumeItem(idx, def, msg) {
-    // If msg is null, the item had no effect and shouldn't be consumed
-    if (!msg) return;
+    // Only null means "no effect, don't consume". '' means an effect
+    // happened but the item's own handler already showed its toast.
+    if (msg === null) return;
 
     // Character banter: react to the item that was just used.
     if (typeof triggerBanter === 'function') {
@@ -1564,7 +1565,7 @@ function _consumeItem(idx, def, msg) {
         _trackItemAchievements(def.id, def);
         updateQuestStats('itemUsed', { defId: def.id, rarity: def.rarity });
         save();
-        showToast(msg + (LANG === 'de' ? ' ♻ Nicht verbraucht!' : ' ♻ Not consumed!'));
+        if (msg) showToast(msg + (LANG === 'de' ? ' ♻ Nicht verbraucht!' : ' ♻ Not consumed!'));
         buildInventoryPanel();
         return;
     }
@@ -1575,7 +1576,7 @@ function _consumeItem(idx, def, msg) {
     _trackItemAchievements(def.id, def);
     updateQuestStats('itemUsed', { defId: def.id, rarity: def.rarity });
     save();
-    showToast(msg);
+    if (msg) showToast(msg);
     buildInventoryPanel();
 }
 
