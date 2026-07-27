@@ -322,7 +322,7 @@ const T = {
         ls_tip_optimize: 'Completed on Hard with all Modifiers, but you can still gain more Score by completing the level faster!',
 
         convergence: 'Convergence',
-        convergence_desc_1: 'You haveve reached a milestone and earned 1 Convergence Point.',
+        convergence_desc_1: 'You have reached a milestone and earned 1 Convergence Point.',
         convergence_open_tree: '🌿 Open Probability Tree',
         convergence_next_level: '▶ Next Level',
         convergence_level_Select: '☰ Select Level',
