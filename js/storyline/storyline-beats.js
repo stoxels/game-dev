@@ -50,6 +50,9 @@ const STORY_BEATS = {
 // of levels actually defined for that world in level-world-data.js.
 // ---------------------------------------------------------------------------
 const REGION_BEAT_TRIGGER_LEVEL = {
+
+    /*
+
     1: 2,   // Probability Peaks
     2: 2,   // Distribution Den
     3: 2,   // Sampling Savanna
@@ -63,6 +66,8 @@ const REGION_BEAT_TRIGGER_LEVEL = {
     11: 2,  // Null Hypothesis Void
     12: 2,  // Bayesian Bay
     13: 2,  // Expectation Plateau
+
+    */
 };
 
 
