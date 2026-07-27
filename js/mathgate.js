@@ -257,6 +257,38 @@ function mgIsAnswerCorrect(entered, question) {
 }
 
 
+
+// Shows/hides the "Tell me why" button depending on whether the current
+// gate question has an explanation available.
+function _mgRefreshWhyButton() {
+    const btn = document.getElementById('mg-why-btn');
+    const box = document.getElementById('mg-explain');
+    if (!btn) return;
+
+    box.style.display = 'none';
+    box.textContent = '';
+
+    const hasExplain = currentGateQuestion && (currentGateQuestion.explain || currentGateQuestion.explainDE);
+    btn.style.display = hasExplain ? 'inline-block' : 'none';
+    btn.onclick = mgToggleExplain;
+}
+
+// Toggles the explanation text box open/closed.
+function mgToggleExplain() {
+    if (!currentGateQuestion) return;
+    const box = document.getElementById('mg-explain');
+    const text = (LANG === 'de' && currentGateQuestion.explainDE)
+        ? currentGateQuestion.explainDE
+        : currentGateQuestion.explain;
+
+    if (box.style.display === 'block') {
+        box.style.display = 'none';
+        return;
+    }
+    box.textContent = '💡 ' + text;
+    box.style.display = 'block';
+}
+
 //------------------------------------------------------------------------
 //----------------------------------REWARDS-------------------------------
 //------------------------------------------------------------------------
@@ -358,6 +390,8 @@ function mgHandleCorrectAnswer() {
 
     if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
 
+    _mgRefreshWhyButton();
+
     setTimeout(() => {
         hideMathGate();
         startLevel(gi);
@@ -418,6 +452,7 @@ function mgHandleWrongAnswer() {
     if (gateAttempts >= MG_NEW_QUESTION_THRESHOLD) mgShowNewQuestionButton();
 
     Audio_Manager.playSFX('quizWrong');
+    _mgRefreshWhyButton();
 }
 
 
@@ -463,6 +498,9 @@ function mgResetModalInputState() {
     document.getElementById('mg-hint-text').textContent = '';
     document.getElementById('mg-new-q-btn').style.display = 'none';
     document.getElementById('mg-submit-btn').disabled = false;
+
+    document.getElementById('mg-why-btn').style.display = 'none';   
+    document.getElementById('mg-explain').style.display = 'none';
 }
 
 function _mgInjectPortrait() {

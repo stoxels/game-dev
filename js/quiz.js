@@ -107,6 +107,8 @@ function _quizBuildInputQuestion(raw) {
         unit: raw.unit || '',
         hintEn: raw.hintEn || '',
         hintDE: raw.hintDE || '',
+        explain: raw.explain || '',       
+        explainDE: raw.explainDE || '',   
     };
 }
 
@@ -119,7 +121,13 @@ function _quizBuildMcQuestion(raw) {
     const optsWithFlag = opts.map((text, i) => ({ text, isCorrect: i === raw.correct }));
     shuffle(optsWithFlag);
 
-    return { type: 'mc', q, opts: optsWithFlag };
+    return {
+        type: 'mc',
+        q,
+        opts: optsWithFlag,
+        explain: raw.explain || '',      
+        explainDE: raw.explainDE || '',  
+    };
 }
 
 
@@ -274,6 +282,44 @@ function _quizTryEliminateWrongAnswer() {
 }
 
 
+
+
+// Shows/hides the "Tell me why" button depending on whether the current
+// question has an explanation available.
+function _quizRefreshWhyButton() {
+    const btn = document.getElementById('quiz-why-btn');
+    const box = document.getElementById('quiz-explain');
+    if (!btn) return;
+
+    box.style.display = 'none';
+    box.textContent = '';
+
+    const hasExplain = currentQuizQuestion && (currentQuizQuestion.explain || currentQuizQuestion.explainDE);
+    btn.style.display = hasExplain ? 'inline-block' : 'none';
+    btn.onclick = quizToggleExplain;
+}
+
+// Toggles the explanation text box open/closed.
+function quizToggleExplain() {
+    if (!currentQuizQuestion) return;
+    const box = document.getElementById('quiz-explain');
+    const text = (LANG === 'de' && currentQuizQuestion.explainDE)
+        ? currentQuizQuestion.explainDE
+        : currentQuizQuestion.explain;
+
+    if (box.style.display === 'block') {
+        box.style.display = 'none';
+        return;
+    }
+    box.textContent = '💡 ' + text;
+    box.style.display = 'block';
+    questStat_primerHintShown && questStat_primerHintShown(); // optional: reuse existing stat, or drop this line
+}
+
+
+
+
+
 //------------------------------------------------------------------------
 //-------------------SHOW QUIZ (MAIN ENTRY POINT)-------------------------
 //------------------------------------------------------------------------
@@ -330,6 +376,9 @@ function showQuiz(worldNum) {
     document.getElementById('quiz-q').textContent = q.q;
 
     _quizResetOverlay();
+
+    document.getElementById('quiz-why-btn').style.display = 'none';  
+    document.getElementById('quiz-explain').style.display = 'none';
 
     if (q.type === 'input') {
         _quizShowInputRow(q);
@@ -587,6 +636,7 @@ function _resolveQuizAnswer(correct) {
 
     document.getElementById('quiz-continue').style.display = 'flex';
     document.getElementById('btn-skip-quiz').style.display = correct ? 'none' : 'flex';
+    _quizRefreshWhyButton();
 }
 
 

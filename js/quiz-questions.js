@@ -15,127 +15,154 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Was repräsentiert die Ergebnismenge Ω?",
             opts: ["All possible outcomes of an experiment", "Only the likely outcomes", "The set of impossible events", "A single random outcome"],
             optsDE: ["Alle möglichen Ergebnisse eines Experiments", "Nur die wahrscheinlichen Ergebnisse", "Die Menge der unmöglichen Ereignisse", "Ein einzelnes zufälliges Ergebnis"],
-            correct: 0
+            correct: 0,
+            explain: "By definition, the sample space Ω collects every outcome an experiment could possibly produce — likely or unlikely, as long as it's possible.",
+            explainDE: "Per Definition enthält die Ergebnismenge Ω alle Ergebnisse, die ein Experiment überhaupt hervorbringen kann — egal ob wahrscheinlich oder unwahrscheinlich, solange sie möglich sind."
         },
         {
             q: "The complement of event A (written Aᶜ) contains:",
             qDE: "Das Komplement des Ereignisses A (Aᶜ) enthält:",
             opts: ["All outcomes NOT in A", "All outcomes in A", "Only impossible outcomes", "The intersection of A with Ω"],
             optsDE: ["Alle Ergebnisse, die NICHT in A liegen", "Alle Ergebnisse in A", "Nur unmögliche Ergebnisse", "Den Schnitt von A mit Ω"],
-            correct: 0
+            correct: 0,
+            explain: "The complement Aᶜ is everything in Ω that is left over once you remove A — i.e. all outcomes where A does not happen.",
+            explainDE: "Das Komplement Aᶜ besteht aus allem, was in Ω übrig bleibt, wenn man A entfernt — also allen Ergebnissen, bei denen A nicht eintritt."
         },
         {
             q: "If A and B are disjoint, then P(A ∩ B) equals:",
             qDE: "Wenn A und B disjunkt sind, gilt P(A ∩ B) =",
             opts: ["0", "P(A) + P(B)", "P(A) · P(B)", "1"],
             optsDE: ["0", "P(A) + P(B)", "P(A) · P(B)", "1"],
-            correct: 0
+            correct: 0,
+            explain: "Disjoint means A and B share no outcomes at all, so their intersection is the empty set ∅, which always has probability 0.",
+            explainDE: "Disjunkt bedeutet, dass A und B keine gemeinsamen Ergebnisse haben, also ist ihr Schnitt die leere Menge ∅, die immer die Wahrscheinlichkeit 0 hat."
         },
         {
             q: "De Morgan's law states that (A ∪ B)ᶜ equals:",
             qDE: "Die Regel von De Morgan besagt, dass (A ∪ B)ᶜ gleich ist mit:",
             opts: ["Aᶜ ∩ Bᶜ", "Aᶜ ∪ Bᶜ", "A ∩ B", "A ∪ B"],
             optsDE: ["Aᶜ ∩ Bᶜ", "Aᶜ ∪ Bᶜ", "A ∩ B", "A ∪ B"],
-            correct: 0
+            correct: 0,
+            explain: "'Not (A or B)' means neither A nor B happened, which is the same as 'not A AND not B' — that's exactly Aᶜ ∩ Bᶜ.",
+            explainDE: "„Nicht (A oder B)” bedeutet, dass weder A noch B eingetreten ist — also „nicht A UND nicht B”, was genau Aᶜ ∩ Bᶜ entspricht."
         },
         {
             q: "A probability measure P must satisfy P(Ω) = ?",
             qDE: "Ein Wahrscheinlichkeitsmaß P muss P(Ω) = ? erfüllen:",
             opts: ["1", "0", "0.5", "Any positive number"],
             optsDE: ["1", "0", "0.5", "Eine beliebige positive Zahl"],
-            correct: 0
+            correct: 0,
+            explain: "Ω contains every possible outcome, so something in Ω is guaranteed to happen — that's why P(Ω) must equal 1 (Kolmogorov's axiom).",
+            explainDE: "Ω enthält alle möglichen Ergebnisse, also tritt garantiert etwas aus Ω ein — deshalb muss P(Ω) = 1 sein (Kolmogorov-Axiom)."
         },
         {
             q: "Which of these CANNOT be a valid probability?",
             qDE: "Welcher dieser Werte kann KEINE gültige Wahrscheinlichkeit sein?",
             opts: ["−0.1", "0", "0.5", "1"],
             optsDE: ["−0,1", "0", "0,5", "1"],
-            correct: 0
+            correct: 0,
+            explain: "Probabilities must always lie between 0 and 1, inclusive. −0.1 is negative, which breaks that rule — it can never be a valid probability.",
+            explainDE: "Wahrscheinlichkeiten müssen immer zwischen 0 und 1 liegen. −0,1 ist negativ und verletzt damit diese Regel — es kann nie eine gültige Wahrscheinlichkeit sein."
         },
         {
             q: "The smallest possible σ-algebra on any non-empty Ω is:",
             qDE: "Die kleinste mögliche σ-Algebra auf einem nicht-leeren Ω ist:",
             opts: ["{∅, Ω}", "The power set of Ω", "{Ω}", "{∅}"],
             optsDE: ["{∅, Ω}", "Die Potenzmenge von Ω", "{Ω}", "{∅}"],
-            correct: 0
+            correct: 0,
+            explain: "A σ-algebra must always contain ∅ and Ω, and be closed under complements/unions. {∅, Ω} already satisfies all of that with nothing extra, so it's the smallest one possible.",
+            explainDE: "Eine σ-Algebra muss immer ∅ und Ω enthalten und unter Komplement/Vereinigung abgeschlossen sein. {∅, Ω} erfüllt das bereits ohne etwas Zusätzliches — deshalb ist es die kleinstmögliche σ-Algebra."
         },
         {
             q: "The inclusion-exclusion formula for P(A ∪ B) is:",
             qDE: "Die Siebformel für P(A ∪ B) lautet:",
             opts: ["P(A) + P(B) − P(A ∩ B)", "P(A) + P(B) + P(A ∩ B)", "P(A) · P(B)", "P(A) − P(B)"],
             optsDE: ["P(A) + P(B) − P(A ∩ B)", "P(A) + P(B) + P(A ∩ B)", "P(A) · P(B)", "P(A) − P(B)"],
-            correct: 0
+            correct: 0,
+            explain: "If you just add P(A) + P(B), you count the overlap P(A ∩ B) twice, so you have to subtract it once to correct for the double-count.",
+            explainDE: "Addiert man einfach P(A) + P(B), wird die Überlappung P(A ∩ B) doppelt gezählt — deshalb muss man sie einmal wieder abziehen."
         },
-
         {
             q: "Two fair dice are rolled. How many outcomes are in the sample space Ω?",
             qDE: "Zwei faire Würfel werden geworfen. Wie viele Ergebnisse hat die Ergebnismenge Ω?",
             opts: ["36", "12", "6", "18"],
             optsDE: ["36", "12", "6", "18"],
-            correct: 0
+            correct: 0,
+            explain: "Each die has 6 possible outcomes, and the two rolls are independent, so the total number of combined outcomes is 6 × 6 = 36.",
+            explainDE: "Jeder Würfel hat 6 mögliche Ergebnisse, und die beiden Würfe sind unabhängig, also ergeben sich insgesamt 6 × 6 = 36 Kombinationen."
         },
         {
             q: "A set Ω has 4 elements. How many subsets does its power set Pot(Ω) contain?",
             qDE: "Eine Menge Ω hat 4 Elemente. Wie viele Teilmengen enthält die Potenzmenge Pot(Ω)?",
             opts: ["16", "8", "4", "12"],
             optsDE: ["16", "8", "4", "12"],
-            correct: 0
+            correct: 0,
+            explain: "A set with n elements has 2ⁿ subsets, since each element can independently be either included or excluded. Here 2⁴ = 16.",
+            explainDE: "Eine Menge mit n Elementen hat 2ⁿ Teilmengen, da jedes Element unabhängig entweder enthalten oder nicht enthalten sein kann. Hier gilt 2⁴ = 16."
         },
         {
             q: "Which of the following is always true for any event A?",
             qDE: "Welche Aussage gilt immer für ein beliebiges Ereignis A?",
             opts: ["P(A) + P(Aᶜ) = 1", "P(A) = P(Aᶜ)", "P(A) · P(Aᶜ) = 1", "P(A) − P(Aᶜ) = 0"],
             optsDE: ["P(A) + P(Aᶜ) = 1", "P(A) = P(Aᶜ)", "P(A) · P(Aᶜ) = 1", "P(A) − P(Aᶜ) = 0"],
-            correct: 0
+            correct: 0,
+            explain: "A and Aᶜ together make up all of Ω and never overlap, so their probabilities must add up to P(Ω) = 1.",
+            explainDE: "A und Aᶜ ergeben zusammen ganz Ω und überschneiden sich nie, daher müssen sich ihre Wahrscheinlichkeiten zu P(Ω) = 1 addieren."
         },
         {
             q: "De Morgan's law states that (A ∩ B)ᶜ equals:",
             qDE: "Die Regel von De-Morgan besagt, dass (A ∩ B)ᶜ gleich ist mit:",
             opts: ["Aᶜ ∪ Bᶜ", "Aᶜ ∩ Bᶜ", "A ∪ B", "A ∩ B"],
             optsDE: ["Aᶜ ∪ Bᶜ", "Aᶜ ∩ Bᶜ", "A ∪ B", "A ∩ B"],
-            correct: 0
+            correct: 0,
+            explain: "'Not (A and B)' means at least one of them failed to happen — that's 'not A OR not B', which is Aᶜ ∪ Bᶜ.",
+            explainDE: "„Nicht (A und B)” bedeutet, dass mindestens eines der beiden nicht eingetreten ist — also „nicht A ODER nicht B”, was Aᶜ ∪ Bᶜ entspricht."
         },
         {
             q: "In a Laplace experiment, all elementary events have:",
             qDE: "In einem Laplace-Experiment haben alle Elementarereignisse:",
             opts: ["Equal probability", "Probability 0", "Probability 1", "Different probabilities"],
             optsDE: ["Gleiche Wahrscheinlichkeit", "Wahrscheinlichkeit 0", "Wahrscheinlichkeit 1", "Unterschiedliche Wahrscheinlichkeiten"],
-            correct: 0
+            correct: 0,
+            explain: "A Laplace experiment is defined by the discrete uniform distribution, meaning every single elementary outcome is equally likely by definition.",
+            explainDE: "Ein Laplace-Experiment ist per Definition diskret gleichverteilt, d.h. jedes Elementarereignis ist per Definition gleich wahrscheinlich."
         },
         {
             q: "Events A and B are mutually exclusive. P(A) = 0.3. What can you say about P(A ∪ B)?",
             qDE: "Die Ereignisse A und B sind disjunkt. P(A) = 0,3. Was gilt für P(A ∪ B)?",
             opts: ["P(A ∪ B) = P(A) + P(B)", "P(A ∪ B) = P(A) · P(B)", "P(A ∪ B) = P(A) − P(B)", "P(A ∪ B) = P(A ∩ B)"],
             optsDE: ["P(A ∪ B) = P(A) + P(B)", "P(A ∪ B) = P(A) · P(B)", "P(A ∪ B) = P(A) − P(B)", "P(A ∪ B) = P(A ∩ B)"],
-            correct: 0
+            correct: 0,
+            explain: "Since A and B never overlap, the general formula P(A) + P(B) − P(A ∩ B) simplifies: P(A ∩ B) = 0, leaving just P(A) + P(B).",
+            explainDE: "Da sich A und B nie überschneiden, vereinfacht sich die allgemeine Formel P(A) + P(B) − P(A ∩ B): P(A ∩ B) = 0, es bleibt nur P(A) + P(B) übrig."
         },
         {
             q: "The impossible event ∅ has probability:",
             qDE: "Das unmögliche Ereignis ∅ hat die Wahrscheinlichkeit:",
             opts: ["0", "1", "0.5", "Undefined"],
             optsDE: ["0", "1", "0,5", "Undefiniert"],
-            correct: 0
+            correct: 0,
+            explain: "∅ contains no outcomes at all, so it can never happen — by the axioms of probability, this always corresponds to probability 0.",
+            explainDE: "∅ enthält keine Ergebnisse und kann daher nie eintreten — nach den Axiomen der Wahrscheinlichkeitsrechnung entspricht das immer der Wahrscheinlichkeit 0."
         },
         {
             q: "A coin is flipped twice. How many elementary events are in the sample space?",
             qDE: "Eine Münze wird zweimal geworfen. Wie viele Elementarereignisse hat die Ergebnismenge?",
             opts: ["4", "2", "8", "6"],
             optsDE: ["4", "2", "8", "6"],
-            correct: 0
+            correct: 0,
+            explain: "Each flip has 2 outcomes (heads/tails), and the two flips are independent, so there are 2 × 2 = 4 possible sequences: HH, HT, TH, TT.",
+            explainDE: "Jeder Wurf hat 2 Ergebnisse (Kopf/Zahl), und die beiden Würfe sind unabhängig, also gibt es 2 × 2 = 4 mögliche Folgen: KK, KZ, ZK, ZZ."
         },
         {
             q: "P(A) = 0.4, P(B) = 0.5, P(A ∩ B) = 0.2. What is P(A ∪ B)?",
             qDE: "P(A) = 0,4, P(B) = 0,5, P(A ∩ B) = 0,2. Was ist P(A ∪ B)?",
             opts: ["0.7", "0.9", "0.2", "0.45"],
             optsDE: ["0,7", "0,9", "0,2", "0,45"],
-            correct: 0
+            correct: 0,
+            explain: "Using inclusion-exclusion: P(A ∪ B) = P(A) + P(B) − P(A ∩ B) = 0.4 + 0.5 − 0.2 = 0.7.",
+            explainDE: "Mit der Siebformel: P(A ∪ B) = P(A) + P(B) − P(A ∩ B) = 0,4 + 0,5 − 0,2 = 0,7."
         },
-
-
-
-
-
-
     ],
 
     // ── WORLD 2 — Combinatorics & Distributions ───────────────────────────

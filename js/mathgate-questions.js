@@ -10,37 +10,43 @@ const MATH_GATE_POOLS = {
     // 
     1: [
 
-        //1. ERGEBNISMENGE (Sample Space) 
+        //1. ERGEBNISMENGE (Sample Space)
 
         {
             q: 'A six-sided fair die is rolled once. How many elements does the sample space Ω contain?',
             qDE: 'Ein sechsseitiger fairer Würfel wird einmal geworfen. Wie viele Elemente enthält die Ergebnismenge Ω?',
             answer: 6, tolerance: 0, unit: 'elements',
             hintEn: 'Ω = {1, 2, 3, 4, 5, 6}',
-            hintDE: 'Ω = {1, 2, 3, 4, 5, 6}'
+            hintDE: 'Ω = {1, 2, 3, 4, 5, 6}',
+            explain: 'A single die roll can land on any of its 6 faces, and each face is a distinct outcome, so Ω = {1,2,3,4,5,6} has 6 elements.',
+            explainDE: 'Ein einzelner Würfelwurf kann auf jeder der 6 Seiten landen, jede Seite ist ein eigenes Ergebnis, also hat Ω = {1,2,3,4,5,6} 6 Elemente.'
         },
         {
             q: 'A fair coin is flipped three times. How many elements are in the sample space?',
             qDE: 'Eine faire Münze wird dreimal geworfen. Wie viele Elemente enthält die Ergebnismenge?',
             answer: 8, tolerance: 0, unit: 'elements',
             hintEn: 'Each flip has 2 outcomes, head or tails.',
-            hintDE: 'Jeder Wurf hat 2 mögliche Ergebnisse, Kopf oder Zahl.'
+            hintDE: 'Jeder Wurf hat 2 mögliche Ergebnisse, Kopf oder Zahl.',
+            explain: 'Each of the 3 flips independently has 2 outcomes, so the total count is 2 × 2 × 2 = 8 possible sequences.',
+            explainDE: 'Jeder der 3 Würfe hat unabhängig 2 Ergebnisse, also insgesamt 2 × 2 × 2 = 8 mögliche Folgen.'
         },
-
         {
             q: 'A fair coin is flipped twice. How many outcomes are in the sample space?',
             qDE: 'Eine faire Münze wird zweimal geworfen. Wie viele Ergebnisse enthält die Ergebnismenge?',
             answer: 4, tolerance: 0, unit: 'outcomes',
             hintEn: 'Each flip has 2 outcomes, head or tails.',
-            hintDE: 'Jeder Wurf hat 2 mögliche Ergebnisse, Kopf oder Zahl.'
+            hintDE: 'Jeder Wurf hat 2 mögliche Ergebnisse, Kopf oder Zahl.',
+            explain: 'Two independent flips, each with 2 outcomes, give 2 × 2 = 4 total sequences: HH, HT, TH, TT.',
+            explainDE: 'Zwei unabhängige Würfe mit je 2 Ergebnissen ergeben 2 × 2 = 4 Folgen: KK, KZ, ZK, ZZ.'
         },
-
         {
             q: 'Two regular fair dice are rolled simultaneously. How many elements does the sample space Ω contain?',
             qDE: 'Zwei reguläre faire Würfel werden gleichzeitig geworfen. Wie viele Elemente enthält die Ergebnismenge Ω?',
             answer: 36, tolerance: 0, unit: 'elements',
             hintEn: 'Count the amount of ordered pairs (i, j) with i, j ∈ {1,…,6}.',
-            hintDE: 'Zähle die geordneten Paare (i, j) mit i, j ∈ {1,…,6}.'
+            hintDE: 'Zähle die geordneten Paare (i, j) mit i, j ∈ {1,…,6}.',
+            explain: 'Each die independently shows one of 6 faces, so the number of ordered pairs (die 1, die 2) is 6 × 6 = 36.',
+            explainDE: 'Jeder Würfel zeigt unabhängig eine von 6 Seiten, also gibt es 6 × 6 = 36 geordnete Paare (Würfel 1, Würfel 2).'
         },
 
         // ── 2. EREIGNIS (Event) ──────────────────────────────────────────────────
@@ -50,30 +56,36 @@ const MATH_GATE_POOLS = {
             qDE: 'Ein fairer Würfel wird geworfen. Ereignis A = „gerade Zahl". Wie viele Elementarereignisse enthält A?',
             answer: 3, tolerance: 0, unit: 'outcomes',
             hintEn: 'A = {2, 4, 6}',
-            hintDE: 'A = {2, 4, 6}'
+            hintDE: 'A = {2, 4, 6}',
+            explain: 'Out of the six faces {1,...,6}, exactly the even ones {2, 4, 6} belong to A — that\'s 3 outcomes.',
+            explainDE: 'Von den sechs Seiten {1,...,6} gehören genau die geraden {2, 4, 6} zu A — das sind 3 Ergebnisse.'
         },
         {
             q: 'A fair die is rolled. Event B = "number greater than 4". What is P(B)? Enter the numerator of the occuring fraction over 6.',
             qDE: 'Ein fairer Würfel wird geworfen. Ereignis B = „Zahl größer als 4". Berechne P(B)? Gib den Zähler des Bruches über 6 ein.',
             answer: 2, tolerance: 0, unit: '/ 6',
             hintEn: 'B = {5, 6}',
-            hintDE: 'B = {5, 6}'
+            hintDE: 'B = {5, 6}',
+            explain: 'The numbers greater than 4 on a die are 5 and 6, so B contains exactly 2 outcomes out of 6.',
+            explainDE: 'Die Zahlen größer als 4 auf einem Würfel sind 5 und 6, also enthält B genau 2 von 6 Ergebnissen.'
         },
-
         {
             q: 'A card is drawn from a standard 52-card deck. Event B = "Drawn card is Heart". What is P(B)? Enter the numerator of the occuring fraction over 52.',
             qDE: 'Eine Karte wird aus einem Standarddeck mit 52 Karten gezogen. Ereignis B = „gezogene Karte ist Herz". Berechne P(B). Gib den Zähler des Bruches über 52 ein.  ',
             answer: 13, tolerance: 0, unit: 'cards',
             hintEn: 'A standard deck has 4 suits of 13 cards each.',
-            hintDE: 'Ein Standarddeck hat 4 Farben mit je 13 Karten.'
+            hintDE: 'Ein Standarddeck hat 4 Farben mit je 13 Karten.',
+            explain: 'A standard deck splits evenly into 4 suits of 13 cards each, and Hearts is one of those suits, so there are 13 favourable cards.',
+            explainDE: 'Ein Standarddeck teilt sich gleichmäßig in 4 Farben zu je 13 Karten auf, und Herz ist eine dieser Farben, also gibt es 13 günstige Karten.'
         },
-
         {
             q: 'A bag has 3 red and 7 blue balls. What is the probability of drawing a red ball? Enter as a percentage.',
             qDE: 'Ein Beutel enthält 3 rote und 7 blaue Bälle. Was ist die Wahrscheinlichkeit, einen roten Ball zu ziehen? Gib als Prozentzahl ein.',
             answer: 30, tolerance: 0, unit: '%',
             hintEn: 'In total there are 10 balls in the bag.',
-            hintDE: 'Insgesamt sind 10 Bälle in dem Beutel.'
+            hintDE: 'Insgesamt sind 10 Bälle in dem Beutel.',
+            explain: 'There are 3 red balls out of 10 total, so P(red) = 3/10 = 0.3, which is 30%.',
+            explainDE: 'Es gibt 3 rote Bälle von insgesamt 10, also P(rot) = 3/10 = 0,3, das entspricht 30%.'
         },
 
         // ── 3. ZUFALLSEXPERIMENT (Random Experiment) ────────────────────────────
@@ -83,17 +95,19 @@ const MATH_GATE_POOLS = {
             qDE: 'Ein Glücksrad hat 5 gleich große Felder. Es wird zweimal gedreht. Wie viele mögliche Ergebnisse gibt es?',
             answer: 25, tolerance: 0, unit: 'outcomes',
             hintEn: 'Each spin has 5 different outcomes.',
-            hintDE: 'Jede Drehung hat 5 Möglichkeiten.'
+            hintDE: 'Jede Drehung hat 5 Möglichkeiten.',
+            explain: 'Each of the 2 independent spins has 5 possible results, giving 5 × 5 = 25 combined outcomes.',
+            explainDE: 'Jede der 2 unabhängigen Drehungen hat 5 mögliche Ergebnisse, also insgesamt 5 × 5 = 25 Kombinationen.'
         },
-
         {
             q: 'A random experiment has sample space Ω = {a, b, c, d}. How many elements does Pot(Ω) have?',
             qDE: 'Ein Zufallsexperiment hat die Ergebnismenge Ω = {a, b, c, d}. Wie viele Elemente hat Pot(Ω)?',
             answer: 16, tolerance: 0, unit: 'subsets',
             hintEn: 'A set with n elements has 2ⁿ subsets.',
-            hintDE: 'Eine Menge mit n Elementen hat 2ⁿ Teilmengen.'
+            hintDE: 'Eine Menge mit n Elementen hat 2ⁿ Teilmengen.',
+            explain: 'Ω has 4 elements, and a set with n elements always has 2ⁿ subsets, so the power set has 2⁴ = 16 elements.',
+            explainDE: 'Ω hat 4 Elemente, und eine Menge mit n Elementen hat immer 2ⁿ Teilmengen, also hat die Potenzmenge 2⁴ = 16 Elemente.'
         },
-
 
         // ── 4. DISJUNKTE EREIGNISSE (Mutually Exclusive Events) ─────────────────
 
@@ -102,21 +116,27 @@ const MATH_GATE_POOLS = {
             qDE: 'P(A) = 0,3 und P(B) = 0,5. A und B sind disjunkt. Was ist P(A ∪ B)?',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'P(A ∪ B) = P(A) + P(B) for disjoint events',
-            hintDE: 'P(A ∪ B) = P(A) + P(B) für disjunkte Ereignisse'
+            hintDE: 'P(A ∪ B) = P(A) + P(B) für disjunkte Ereignisse',
+            explain: 'Since A and B never overlap, P(A ∩ B) = 0, so P(A ∪ B) simplifies to P(A) + P(B) = 0.3 + 0.5 = 0.8.',
+            explainDE: 'Da sich A und B nie überschneiden, ist P(A ∩ B) = 0, also vereinfacht sich P(A ∪ B) zu P(A) + P(B) = 0,3 + 0,5 = 0,8.'
         },
         {
             q: 'A and B are disjoint and P(A ∪ B) = 0.7. If P(A) = 0.4, what is P(B)?',
             qDE: 'A und B sind disjunkt und P(A ∪ B) = 0,7. Falls P(A) = 0,4, was ist P(B)?',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'P(B) = P(A ∪ B) − P(A) for disjoint events',
-            hintDE: 'P(B) = P(A ∪ B) − P(A) für disjunkte Ereignisse'
+            hintDE: 'P(B) = P(A ∪ B) − P(A) für disjunkte Ereignisse',
+            explain: 'For disjoint events P(A ∪ B) = P(A) + P(B), so rearranging gives P(B) = 0.7 − 0.4 = 0.3.',
+            explainDE: 'Für disjunkte Ereignisse gilt P(A ∪ B) = P(A) + P(B), umgestellt ergibt sich P(B) = 0,7 − 0,4 = 0,3.'
         },
         {
             q: 'If A and B are disjoint, what is P(A ∩ B)?',
             qDE: 'Wenn A und B disjunkt sind, was ist P(A ∩ B)?',
             answer: 0, tolerance: 0, unit: '',
             hintEn: 'Disjoint means A ∩ B = ∅.',
-            hintDE: 'Disjunkt bedeutet A ∩ B = ∅'
+            hintDE: 'Disjunkt bedeutet A ∩ B = ∅',
+            explain: 'Disjoint means A and B share no outcomes, so A ∩ B is the empty set, which always has probability 0.',
+            explainDE: 'Disjunkt bedeutet, dass A und B keine gemeinsamen Ergebnisse haben, also ist A ∩ B die leere Menge mit Wahrscheinlichkeit 0.'
         },
 
         // ── 5. EREIGNISALGEBRA / POTENZMENGE (Event Algebra / Power Set) ─────────
@@ -126,15 +146,18 @@ const MATH_GATE_POOLS = {
             qDE: 'Ω = {1, 2, 3}. Wie viele Elemente enthält die Potenzmenge Pot(Ω)?',
             answer: 8, tolerance: 0, unit: 'elements',
             hintEn: 'The power set contains all possible subsets.',
-            hintDE: 'Die Potenzmenge enthält alle möglichen Teilmengen.'
+            hintDE: 'Die Potenzmenge enthält alle möglichen Teilmengen.',
+            explain: 'Ω has 3 elements, and a set with n elements has 2ⁿ subsets, so Pot(Ω) has 2³ = 8 elements.',
+            explainDE: 'Ω hat 3 Elemente, eine Menge mit n Elementen hat 2ⁿ Teilmengen, also hat Pot(Ω) 2³ = 8 Elemente.'
         },
-
         {
             q: 'Ω = {H, T} (coin flip). How many events does the full event algebra contain?',
             qDE: 'Ω = {K, Z} (Münzwurf). Wie viele Ereignisse enthält die vollständige Ereignisalgebra?',
             answer: 4, tolerance: 0, unit: 'events',
             hintEn: 'Pot(Ω) = {∅, {H}, {T}, {H,T}}',
-            hintDE: 'Pot(Ω) = {∅, {K}, {Z}, {K,Z}}'
+            hintDE: 'Pot(Ω) = {∅, {K}, {Z}, {K,Z}}',
+            explain: 'The full event algebra is the power set of Ω. With 2 elements, Ω has 2² = 4 subsets: ∅, {H}, {T}, {H,T}.',
+            explainDE: 'Die vollständige Ereignisalgebra ist die Potenzmenge von Ω. Bei 2 Elementen hat Ω 2² = 4 Teilmengen: ∅, {K}, {Z}, {K,Z}.'
         },
 
         // ── 6. ELEMENTAREREIGNIS (Elementary Event) ──────────────────────────────
@@ -144,16 +167,19 @@ const MATH_GATE_POOLS = {
             qDE: 'Ein fairer sechsseitiger Würfel wird geworfen. Wie viele Elementarereignisse enthält die Ergebnismenge?',
             answer: 6, tolerance: 0, unit: 'elementary events',
             hintEn: 'Each face {1}, {2}, …, {6} is one elementary event.',
-            hintDE: 'Jede Seite {1}, {2}, …, {6} ist ein Elementarereignis.'
+            hintDE: 'Jede Seite {1}, {2}, …, {6} ist ein Elementarereignis.',
+            explain: 'Each single face of the die {1}, {2}, ..., {6} is its own elementary event, giving 6 in total.',
+            explainDE: 'Jede einzelne Seite des Würfels {1}, {2}, ..., {6} ist ein eigenes Elementarereignis, also 6 insgesamt.'
         },
         {
             q: 'In a Laplace experiment with 8 equally likely elementary events, what is the probability of each elementary event? Enter as a decimal.',
             qDE: 'Betrachte ein Laplace-Experiment mit 8 gleich wahrscheinlichen Elementarereignissen. Was ist die Wahrscheinlichkeit jedes Elementarereignisses? Gib als Dezimalzahl ein.',
             answer: 0.125, tolerance: 0.001, unit: '',
             hintEn: 'In a Laplace experiment the probability measure is the discrete uniform distribution.',
-            hintDE: 'In einem Laplace-Experiment ist das Wahrscheinlichkeitsmaß die diskrete Gleichverteilung.'
+            hintDE: 'In einem Laplace-Experiment ist das Wahrscheinlichkeitsmaß die diskrete Gleichverteilung.',
+            explain: 'In a Laplace experiment all outcomes share the probability equally, so with 8 outcomes each gets 1/8 = 0.125.',
+            explainDE: 'In einem Laplace-Experiment teilen sich alle Ergebnisse die Wahrscheinlichkeit gleichmäßig, bei 8 Ergebnissen also je 1/8 = 0,125.'
         },
-
 
         // ── 7. SCHNITT UND VEREINIGUNG (Intersection and Union) ──────────────────
 
@@ -162,21 +188,27 @@ const MATH_GATE_POOLS = {
             qDE: 'P(A) = 0,5, P(B) = 0,4, P(A ∩ B) = 0,2. Was ist P(A ∪ B)?',
             answer: 0.7, tolerance: 0.001, unit: '',
             hintEn: 'Inclusion-exclusion formula: P(A ∪ B) = P(A) + P(B) − P(A ∩ B).',
-            hintDE: 'Siebformel: P(A ∪ B) = P(A) + P(B) − P(A ∩ B).'
+            hintDE: 'Siebformel: P(A ∪ B) = P(A) + P(B) − P(A ∩ B).',
+            explain: 'Using inclusion-exclusion: P(A ∪ B) = 0.5 + 0.4 − 0.2 = 0.7 — the overlap is subtracted once so it isn\'t double-counted.',
+            explainDE: 'Mit der Siebformel: P(A ∪ B) = 0,5 + 0,4 − 0,2 = 0,7 — die Überlappung wird einmal abgezogen, damit sie nicht doppelt gezählt wird.'
         },
         {
             q: 'P(A ∪ B) = 0.8, P(A) = 0.5, P(B) = 0.6. What is P(A ∩ B)?',
             qDE: 'P(A ∪ B) = 0,8, P(A) = 0,5, P(B) = 0,6. Was ist P(A ∩ B)?',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'Rearrange: P(A ∩ B) = P(A) + P(B) − P(A ∪ B).',
-            hintDE: 'Umstellen: P(A ∩ B) = P(A) + P(B) − P(A ∪ B).'
+            hintDE: 'Umstellen: P(A ∩ B) = P(A) + P(B) − P(A ∪ B).',
+            explain: 'Rearranging inclusion-exclusion gives P(A ∩ B) = P(A) + P(B) − P(A ∪ B) = 0.5 + 0.6 − 0.8 = 0.3.',
+            explainDE: 'Umgestellt ergibt sich P(A ∩ B) = P(A) + P(B) − P(A ∪ B) = 0,5 + 0,6 − 0,8 = 0,3.'
         },
         {
             q: 'A fair six-sided die is rolled. A = {1,2,3}, B = {3,4,5}. How many elements are in A ∩ B?',
             qDE: 'Ein fairer sechsseitiger Würfel wird geworfen. A = {1,2,3}, B = {3,4,5}. Wie viele Elemente enthält A ∩ B?',
             answer: 1, tolerance: 0, unit: 'elements',
             hintEn: 'Count the amount of same elements in both sets.',
-            hintDE: 'Zähle die Anzahl der Elemente, die in beiden Mengen vorkommen.'
+            hintDE: 'Zähle die Anzahl der Elemente, die in beiden Mengen vorkommen.',
+            explain: 'Comparing A = {1,2,3} and B = {3,4,5}, the only value appearing in both sets is 3, so |A ∩ B| = 1.',
+            explainDE: 'Vergleicht man A = {1,2,3} und B = {3,4,5}, kommt nur der Wert 3 in beiden Mengen vor, also |A ∩ B| = 1.'
         },
 
         // ── 8. KOMPLEMENT (Complement) ───────────────────────────────────────────
@@ -186,29 +218,36 @@ const MATH_GATE_POOLS = {
             qDE: 'P(A) = 0,35. Was ist P(Aᶜ)? Gib als Dezimalzahl ein.',
             answer: 0.65, tolerance: 0.001, unit: '',
             hintEn: 'P(Aᶜ) = 1 − P(A)',
-            hintDE: 'P(Aᶜ) = 1 − P(A)'
+            hintDE: 'P(Aᶜ) = 1 − P(A)',
+            explain: 'A and Aᶜ together cover all of Ω, so their probabilities sum to 1: P(Aᶜ) = 1 − 0.35 = 0.65.',
+            explainDE: 'A und Aᶜ ergeben zusammen ganz Ω, ihre Wahrscheinlichkeiten summieren sich zu 1: P(Aᶜ) = 1 − 0,35 = 0,65.'
         },
         {
             q: 'P(Aᶜ) = 0.72. What is P(A)? Enter as a decimal.',
             qDE: 'P(Aᶜ) = 0,72. Was ist P(A)? Gib als Dezimalzahl ein.',
             answer: 0.28, tolerance: 0.001, unit: '',
             hintEn: 'P(A) = 1 − P(Aᶜ)',
-            hintDE: 'P(A) = 1 − P(Aᶜ)'
+            hintDE: 'P(A) = 1 − P(Aᶜ)',
+            explain: 'Since P(A) + P(Aᶜ) = 1, we get P(A) = 1 − 0.72 = 0.28.',
+            explainDE: 'Da P(A) + P(Aᶜ) = 1 gilt, folgt P(A) = 1 − 0,72 = 0,28.'
         },
         {
             q: 'A fair six-sided die is rolled. A = {1,2,3,4}. How many elements does Aᶜ contain?',
             qDE: 'Ein fairer sechsseitiger Würfel wird geworfen. A = {1,2,3,4}. Wie viele Elemente enthält Aᶜ?',
             answer: 2, tolerance: 0, unit: 'elements',
             hintEn: 'Which elements of Ω are not in A?',
-            hintDE: 'Welche Elemente von Ω sind nicht in A?'
+            hintDE: 'Welche Elemente von Ω sind nicht in A?',
+            explain: 'Ω = {1,...,6} has 6 elements and A = {1,2,3,4} has 4 of them, so Aᶜ = {5,6} contains the remaining 2.',
+            explainDE: 'Ω = {1,...,6} hat 6 Elemente, A = {1,2,3,4} enthält 4 davon, also enthält Aᶜ = {5,6} die restlichen 2.'
         },
-
         {
             q: 'P(A) = 0.6. What is P(Aᶜ)?',
             qDE: 'P(A) = 0,6. Was ist P(Aᶜ)?',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'The complement rule: P(Aᶜ) = 1 − P(A).',
-            hintDE: 'Komplementregel: P(Aᶜ) = 1 − P(A).'
+            hintDE: 'Komplementregel: P(Aᶜ) = 1 − P(A).',
+            explain: 'By the complement rule, P(Aᶜ) = 1 − P(A) = 1 − 0.6 = 0.4.',
+            explainDE: 'Nach der Komplementregel gilt P(Aᶜ) = 1 − P(A) = 1 − 0,6 = 0,4.'
         },
 
         // ── 9. DE MORGAN REGELN ──────────────────────────────────────────────────
@@ -218,21 +257,27 @@ const MATH_GATE_POOLS = {
             qDE: 'Nach der De-Morgan-Regel gilt: (A ∪ B)ᶜ = Aᶜ __ Bᶜ. Gib 1 für ∩ oder 2 für ∪ ein.',
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'The complement of an union is an intersection.',
-            hintDE: 'Das Komplement einer Vereinigung ist ein Schnitt.'
+            hintDE: 'Das Komplement einer Vereinigung ist ein Schnitt.',
+            explain: '"Not (A or B)" means neither happened, i.e. "not A AND not B" — so the union\'s complement turns into an intersection: Aᶜ ∩ Bᶜ.',
+            explainDE: '„Nicht (A oder B)” bedeutet, dass keines von beiden eintrat, also „nicht A UND nicht B” — das Komplement einer Vereinigung wird so zu einem Schnitt: Aᶜ ∩ Bᶜ.'
         },
         {
             q: 'P(Aᶜ) = 0.3, P(Bᶜ) = 0.4, P(Aᶜ ∩ Bᶜ) = 0.1. By De Morgan, what is P((A ∪ B)ᶜ)?',
             qDE: 'P(Aᶜ) = 0,3, P(Bᶜ) = 0,4, P(Aᶜ ∩ Bᶜ) = 0,1. Was ist P((A ∪ B)ᶜ) gemäß De Morgan?',
             answer: 0.1, tolerance: 0.001, unit: '',
             hintEn: '(A ∪ B)ᶜ = Aᶜ ∩ Bᶜ, so P((A ∪ B)ᶜ) = P(Aᶜ ∩ Bᶜ)',
-            hintDE: '(A ∪ B)ᶜ = Aᶜ ∩ Bᶜ, also P((A ∪ B)ᶜ) = P(Aᶜ ∩ Bᶜ)'
+            hintDE: '(A ∪ B)ᶜ = Aᶜ ∩ Bᶜ, also P((A ∪ B)ᶜ) = P(Aᶜ ∩ Bᶜ)',
+            explain: 'By De Morgan, (A ∪ B)ᶜ equals Aᶜ ∩ Bᶜ exactly, so its probability is simply the given P(Aᶜ ∩ Bᶜ) = 0.1.',
+            explainDE: 'Nach De Morgan ist (A ∪ B)ᶜ genau gleich Aᶜ ∩ Bᶜ, also ist die Wahrscheinlichkeit einfach das gegebene P(Aᶜ ∩ Bᶜ) = 0,1.'
         },
         {
             q: 'P(A ∩ B) = 0.2. By De Morgan, what is P((Aᶜ ∪ Bᶜ)ᶜ)? Enter as a decimal.',
             qDE: 'P(A ∩ B) = 0,2. Nach De Morgan: Was ist P((Aᶜ ∪ Bᶜ)ᶜ)? Gib als Dezimalzahl ein.',
             answer: 0.2, tolerance: 0.001, unit: '',
             hintEn: '(Aᶜ ∪ Bᶜ)ᶜ = A ∩ B by De Morgan.',
-            hintDE: '(Aᶜ ∪ Bᶜ)ᶜ = A ∩ B nach De Morgan.'
+            hintDE: '(Aᶜ ∪ Bᶜ)ᶜ = A ∩ B nach De Morgan.',
+            explain: 'By De Morgan, (Aᶜ ∪ Bᶜ)ᶜ simplifies back to A ∩ B, so its probability is directly the given P(A ∩ B) = 0.2.',
+            explainDE: 'Nach De Morgan vereinfacht sich (Aᶜ ∪ Bᶜ)ᶜ wieder zu A ∩ B, also ist die Wahrscheinlichkeit direkt das gegebene P(A ∩ B) = 0,2.'
         },
 
         // ── 10. DISTRIBUTIVGESETZ (Distributive Law) ─────────────────────────────
@@ -242,21 +287,27 @@ const MATH_GATE_POOLS = {
             qDE: 'Welches Gesetz liefert A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)? Gib 1 für Distributivgesetz, 2 für De Morgan oder 3 für das Gesetz großer Zahlen ein.',
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'The distributive law: A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C).',
-            hintDE: 'Das Distributivgesetz: A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C).'
+            hintDE: 'Das Distributivgesetz: A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C).',
+            explain: 'This identity — distributing ∩ over ∪ — is exactly the distributive law for set operations, analogous to multiplication distributing over addition.',
+            explainDE: 'Diese Identität — Verteilen von ∩ über ∪ — ist genau das Distributivgesetz für Mengenoperationen, analog zur Multiplikation, die sich über die Addition verteilt.'
         },
         {
             q: 'P(A ∩ B) = 0.1, P(A ∩ C) = 0.2, and (A ∩ B) and (A ∩ C) are disjoint. What is P(A ∩ (B ∪ C))?',
             qDE: 'P(A ∩ B) = 0,1, P(A ∩ C) = 0,2, und (A ∩ B) und (A ∩ C) sind disjunkt. Was ist P(A ∩ (B ∪ C))?',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C).',
-            hintDE: 'A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)'
+            hintDE: 'A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)',
+            explain: 'By the distributive law, A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C). Since these two pieces are disjoint, their probabilities just add: 0.1 + 0.2 = 0.3.',
+            explainDE: 'Nach dem Distributivgesetz gilt A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C). Da diese beiden Teile disjunkt sind, addieren sich ihre Wahrscheinlichkeiten einfach: 0,1 + 0,2 = 0,3.'
         },
         {
             q: 'Is A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C) true or false? Enter 1 for true, 0 for false.',
             qDE: 'Ist A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C) wahr oder falsch? Gib 1 für wahr, 0 für falsch ein.',
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'Yes — ∪ distributes over ∩, just as ∩ distributes over ∪.',
-            hintDE: 'Ja — ∩ ist distributiv über ∩, genau wie ∩ über ∪.'
+            hintDE: 'Ja — ∩ ist distributiv über ∩, genau wie ∩ über ∪.',
+            explain: 'The distributive law works in both directions: ∪ distributes over ∩ just as ∩ distributes over ∪, so this identity is true.',
+            explainDE: 'Das Distributivgesetz gilt in beide Richtungen: ∪ verteilt sich über ∩ genau wie ∩ über ∪, also ist diese Identität wahr.'
         },
 
         // ── 11. WAHRSCHEINLICHKEITSMASS (Probability Measure) ────────────────────
@@ -266,21 +317,27 @@ const MATH_GATE_POOLS = {
             qDE: 'Ein Wahrscheinlichkeitsmaß P muss P(Ω) = ? erfüllen.',
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'Kolmogorov axiom.',
-            hintDE: 'Kolmogorov-Axiom.'
+            hintDE: 'Kolmogorov-Axiom.',
+            explain: 'Ω contains every possible outcome, so something in Ω always happens — Kolmogorov\'s axioms require P(Ω) = 1.',
+            explainDE: 'Ω enthält alle möglichen Ergebnisse, also tritt immer etwas aus Ω ein — die Kolmogorov-Axiome fordern P(Ω) = 1.'
         },
         {
             q: 'Events A₁, A₂, A₃ are pairwise disjoint with P(A₁) = 0.25, P(A₂) = 0.55, P(A₃) = 0.1. What is P(A₁ ∪ A₂ ∪ A₃)?',
             qDE: 'Ereignisse A₁, A₂, A₃ sind paarweise disjunkt mit P(A₁) = 0,25, P(A₂) = 0,55, P(A₃) = 0,1. Was ist P(A₁ ∪ A₂ ∪ A₃)?',
             answer: 0.9, tolerance: 0.001, unit: '',
             hintEn: 'σ-additivity.',
-            hintDE: 'σ-Additivität.'
+            hintDE: 'σ-Additivität.',
+            explain: 'Since all three events are pairwise disjoint, σ-additivity lets us simply add: 0.25 + 0.55 + 0.1 = 0.9.',
+            explainDE: 'Da alle drei Ereignisse paarweise disjunkt sind, erlaubt die σ-Additivität einfaches Addieren: 0,25 + 0,55 + 0,1 = 0,9.'
         },
         {
             q: 'Which value CANNOT be a valid probability? Enter 1 for −0.1, 2 for 0, 3 for 0.5, or 4 for 1.',
             qDE: 'Welcher Wert kann KEINE gültige Wahrscheinlichkeit sein? Gib 1 für −0,1, 2 für 0, 3 für 0,5 oder 4 für 1 ein.',
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'Probabilities must satisfy 0 ≤ P(A) ≤ 1. Negative values are impossible.',
-            hintDE: 'Wahrscheinlichkeiten müssen 0 ≤ P(A) ≤ 1 erfüllen. Negative Werte sind unmöglich.'
+            hintDE: 'Wahrscheinlichkeiten müssen 0 ≤ P(A) ≤ 1 erfüllen. Negative Werte sind unmöglich.',
+            explain: 'Every valid probability must lie between 0 and 1, inclusive. −0.1 is negative, so it violates that rule.',
+            explainDE: 'Jede gültige Wahrscheinlichkeit muss zwischen 0 und 1 liegen. −0,1 ist negativ und verletzt damit diese Regel.'
         },
 
         // ── 12. RECHENREGELN FÜR DAS WAHRSCHEINLICHKEITSMASS ─────────────────────
@@ -290,21 +347,27 @@ const MATH_GATE_POOLS = {
             qDE: 'P(A) = 0,6 und P(B) = 0,5. Was ist der maximal mögliche Wert von P(A ∩ B)? Gib als Dezimalzahl ein.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'P(A ∩ B) ≤ min(P(A), P(B)).',
-            hintDE: 'P(A ∩ B) ≤ min(P(A), P(B)).'
+            hintDE: 'P(A ∩ B) ≤ min(P(A), P(B)).',
+            explain: 'The overlap A ∩ B can never be larger than either individual event, so P(A ∩ B) ≤ min(0.6, 0.5) = 0.5 at most.',
+            explainDE: 'Die Überlappung A ∩ B kann nie größer sein als eines der einzelnen Ereignisse, also gilt P(A ∩ B) ≤ min(0,6, 0,5) = 0,5 maximal.'
         },
         {
             q: 'P(A) = 0.7 and P(B) = 0.4. What is the minimum possible value of P(A ∪ B)? Enter as a decimal.',
             qDE: 'P(A) = 0,7 und P(B) = 0.4. Was ist der minimal mögliche Wert von P(A ∪ B)? Gib als Dezimalzahl ein.',
             answer: 0.7, tolerance: 0.001, unit: '',
             hintEn: 'P(A ∪ B) ≥ max(P(A), P(B)).',
-            hintDE: 'P(A ∪ B) ≥ max(P(A), P(B)).'
+            hintDE: 'P(A ∪ B) ≥ max(P(A), P(B)).',
+            explain: 'The union A ∪ B is always at least as large as the bigger individual event, so P(A ∪ B) ≥ max(0.7, 0.4) = 0.7 at minimum.',
+            explainDE: 'Die Vereinigung A ∪ B ist immer mindestens so groß wie das größere Einzelereignis, also gilt P(A ∪ B) ≥ max(0,7, 0,4) = 0,7 minimal.'
         },
         {
             q: 'P(B) = 0.6 and A ⊆ B. What is the maximum possible value of P(A)? Enter as a decimal.',
             qDE: 'P(B) = 0,6 und A ⊆ B. Was ist der maximal mögliche Wert von P(A)? Gib als Dezimalzahl ein.',
             answer: 0.6, tolerance: 0.001, unit: '',
             hintEn: 'Since A ⊆ B, P(A) ≤ P(B).',
-            hintDE: 'Da A ⊆ B, gilt P(A) ≤ P(B).'
+            hintDE: 'Da A ⊆ B, gilt P(A) ≤ P(B).',
+            explain: 'Since A is a subset of B, A can\'t contain more probability than B — so P(A) can be at most P(B) = 0.6.',
+            explainDE: 'Da A eine Teilmenge von B ist, kann A nicht mehr Wahrscheinlichkeit enthalten als B — also kann P(A) höchstens P(B) = 0,6 sein.'
         },
 
     ],
