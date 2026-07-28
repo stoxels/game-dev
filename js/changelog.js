@@ -14,7 +14,7 @@ const CHANGELOG_DATA = [
                 items: [
                     "Settings Modal has been fully remade.",
                     "There are now up to 20 individual Save - Slots. Each one can be reset individually and progress is based per Save - Slot.",
-                    "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text. Currently only works for world 1 questions, will be expanded in the next days.",
+                    "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text. Not all questions have an explaination yet.",
 
                 ],
 
