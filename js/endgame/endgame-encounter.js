@@ -263,6 +263,8 @@ function _egResetEncounterState() {
     _egMonsters = [];
     _egMapDef = cur;
     _egMonsterSpawnCounter = 0;
+    _egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption;
+    _egCancelAbsorptionRegen();
 }
 
 // Starts the combat tick loop at 10Hz.
@@ -308,6 +310,7 @@ function _egStopEncounter() {
     _egCancelSpawnTimers();
     _egStopPickupSpawner();
     _egBossCleanupAll();
+    _egCancelAbsorptionRegen();
     if (typeof _egChainCleanup === 'function') _egChainCleanup();
     _egHideMonsterPanel();
 }
@@ -434,8 +437,8 @@ function _egAnimateMonsterProjectile(monster) {
     const end = _egGetElementCentre(targetHud);
 
     _egFireProjectile(monster.emoji, 'eg-proj-monster', start, end, EG_MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
-        _egPlayerTakeDamage(monster.damageValue);
-        _egApplyPlayerHitFeedback(monster.damageValue);
+        const dealt = _egPlayerTakeDamage(monster.damageValue);
+        if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
     });
 }
 
@@ -443,8 +446,8 @@ function _egAnimateMonsterProjectile(monster) {
 // Only fires if the encounter is still active and the monster is still alive.
 function _egApplyMeleeImpact(monster) {
     if (!_egIsActive() || !_egMonsters.some(m => m.id === monster.id)) return;
-    _egPlayerTakeDamage(monster.damageValue);
-    _egApplyPlayerHitFeedback(monster.damageValue);
+    const dealt = _egPlayerTakeDamage(monster.damageValue);
+    if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
 }
 
 // Physically lunges the monster card toward the player HUD and snaps back.
@@ -718,13 +721,39 @@ function _egDamageTargetById(monsterId, amount) {
     _egUpdateBars();
 }
 
-// Applies incoming monster damage to the player.
-// Triggers the game-over sequence if the player's HP reaches zero.
+
+// Applies incoming monster damage to the player, after dodge/armour/absorption
+// mitigation. Returns the actual HP lost (0 if dodged/fully absorbed) so
+// callers can show an accurate floating number.
 function _egPlayerTakeDamage(amount) {
-    if (!_egIsActive()) return;
-    playerCurrentHP = Math.max(0, playerCurrentHP - amount);
+    if (!_egIsActive()) return 0;
+
+    const stats = _egComputePlayerStats();
+
+    const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion));
+    if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
+        showToast('💨 Dodged!');
+        _egScheduleAbsorptionRegen();
+        return 0;
+    }
+
+    let mitigated = _egCalcArmourMitigation(amount, stats.armour);
+
+    if (_egPlayerAbsorptionCurrent > 0) {
+        const absorbed = Math.min(_egPlayerAbsorptionCurrent, mitigated);
+        _egPlayerAbsorptionCurrent -= absorbed;
+        mitigated -= absorbed;
+    }
+
+    _egScheduleAbsorptionRegen();
+
+    mitigated = Math.max(0, Math.round(mitigated));
+    if (mitigated <= 0) return 0;
+
+    playerCurrentHP = Math.max(0, playerCurrentHP - mitigated);
     _renderPlayerHealth();
     if (playerCurrentHP <= 0) _egGameOver();
+    return mitigated;
 }
 
 

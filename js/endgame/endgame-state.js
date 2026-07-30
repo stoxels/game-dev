@@ -50,6 +50,12 @@ const EG_PLAYER_CHARGE_MAX = 10; // Adjust for how many seconds it takes to char
 const EG_PLAYER_MELEE_DAMAGE = 10; // Default flat damage
 const EG_PLAYER_MELEE_ANIM_DURATION_MS = 500; // Matches monster melee duration
 
+
+// ── Absorption shield state ───────────────────────────────────────────────
+let _egPlayerAbsorptionCurrent = 0;
+let _egPlayerAbsorptionRegenDelayTimer = null;
+let _egPlayerAbsorptionRegenInterval = null;
+
 // --- NEW STATE VARIABLE ---
 let _egPlayerCurrentCharge = 0;
 

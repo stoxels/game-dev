@@ -375,4 +375,17 @@ const WD_WORLD_CONFIGS = [
         ],
     },
 
+
+    // TEMP TESTING — Nexus / Endgame Sandbox, remove after testing
+    {
+        bgImage: 'images/Expectation-Plateau.jpeg', // placeholder, swap for a real Nexus bg later
+        imageAspect: 16 / 9,
+        entrancePos: { x: 50, y: 90 },
+        nodes: [
+            { x: 40, y: 60 },  // W_ENDGAME level 1
+            { x: 60, y: 40 },  // W_ENDGAME level 2
+        ],
+        extraRoads: [],
+    },
+
 ];

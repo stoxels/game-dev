@@ -1114,7 +1114,11 @@ function _buildEnterButton(wi) {
 
     btn.addEventListener('click', () => {
         btn.remove();
-        if (typeof showWorldDetail === 'function') showWorldDetail(wi);
+        if (wi === 13 && typeof showEndgameHub === 'function') {
+            showEndgameHub();
+        } else if (typeof showWorldDetail === 'function') {
+            showWorldDetail(wi);
+        }
     });
 
     return btn;

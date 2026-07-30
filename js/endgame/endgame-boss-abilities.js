@@ -573,9 +573,9 @@ function _egMechVoidSurge(monster, phase) {
 
             if (!survived) {
                 const damage = Math.round(playerMaxHP * EG_VOID_SURGE_DAMAGE_PCT);
-                _egPlayerTakeDamage(damage);
-                _egApplyPlayerHitFeedback(damage);
-                showToast(`🧿 Void Surge hit you for ${damage} HP!`);
+                const dealt = _egPlayerTakeDamage(damage);
+                if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
+                showToast(`🧿 Void Surge hit you for ${dealt} HP!`);
             } else {
                 showToast('✅ You survived the Void Surge!');
             }

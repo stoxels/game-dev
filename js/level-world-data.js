@@ -3097,6 +3097,9 @@ const WORLDS = [
     { label: 'BAYESIAN BAY', labelDE: 'BAYESIAN BAY', data: W12 },
     { label: 'EXPECTATION PLATEAU', labelDE: 'EXPECTATION PLATEAU', data: W13 },
 
+    // TEMP TESTING — remove when done: makes the Nexus enterable
+    { label: '⚔ ENDGAME SANDBOX', labelDE: '⚔ ENDGAME SANDBOX', data: W_ENDGAME },
+
     /*
     { label: 'DevWorld1', labelDE: 'DevWorld1', data: W14 },
     { label: 'DevWorld2', labelDE: 'DevWorld2', data: W15 },
