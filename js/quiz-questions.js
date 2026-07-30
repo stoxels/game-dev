@@ -1701,6 +1701,8 @@ const BONUS_QUIZ_POOLS = {
     // Topics: arithmetisches Mittel, schwaches GGZ, Tschebyscheff-Ungleichung,
     //         stochastische Konvergenz, starkes GGZ, Hauptsatz der Statistik,
     //         fast sichere Konvergenz, Zentraler Grenzwertsatz
+
+
     7: [
 
         // --- Arithmetisches Mittel ---
@@ -1947,7 +1949,9 @@ const BONUS_QUIZ_POOLS = {
                 "Mittelwert und Varianz eines Datensatzes berechnen",
                 "Daten mit Diagrammen und Grafiken visualisieren"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Inferential statistics goes beyond just summarizing the sample at hand — its purpose is to use that sample to say something about the larger population it came from.",
+            explainDE: "Die schließende Statistik geht über die reine Zusammenfassung der vorliegenden Stichprobe hinaus — ihr Zweck ist es, anhand dieser Stichprobe etwas über die größere Grundgesamtheit auszusagen, aus der sie stammt."
         },
         {
             q: "Which of the four tasks of inferential statistics involves choosing which family of distributions could have generated the data?",
@@ -1964,7 +1968,9 @@ const BONUS_QUIZ_POOLS = {
                 "Testen",
                 "Modellvalidierung"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Modelling is the step where we decide on a plausible distributional family for the data, before we can even think about estimating parameters or testing hypotheses within it.",
+            explainDE: "Die Modellierung ist der Schritt, in dem eine plausible Verteilungsfamilie für die Daten festgelegt wird, bevor überhaupt Parameter geschätzt oder Hypothesen innerhalb dieser Familie getestet werden können."
         },
         {
             q: "A researcher computes a numerical value from data to approximate an unknown quantity. Which task is this?",
@@ -1981,7 +1987,9 @@ const BONUS_QUIZ_POOLS = {
                 "Testen",
                 "Modellvalidierung"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Turning data into a concrete numerical approximation of an unknown parameter is precisely what estimation means, as opposed to choosing a model or testing a hypothesis.",
+            explainDE: "Daten in eine konkrete numerische Näherung eines unbekannten Parameters zu überführen, ist genau das, was Schätzen bedeutet, im Unterschied zur Modellwahl oder zum Testen einer Hypothese."
         },
         {
             q: "After fitting a model, a statistician asks: 'Does this model make sense for the data at all?' Which task is this?",
@@ -1998,7 +2006,9 @@ const BONUS_QUIZ_POOLS = {
                 "Modellierung",
                 "Testen"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Checking whether a fitted model actually fits the data well, rather than estimating parameters within it, is the job of model validation.",
+            explainDE: "Zu prüfen, ob ein angepasstes Modell tatsächlich gut zu den Daten passt, anstatt Parameter innerhalb des Modells zu schätzen, ist die Aufgabe der Modellvalidierung."
         },
         {
             q: "Which statement best describes the difference between descriptive and inferential statistics?",
@@ -2015,7 +2025,9 @@ const BONUS_QUIZ_POOLS = {
                 "Schließende Statistik funktioniert nur mit großen Datensätzen",
                 "Beschreibende Statistik erfordert ein Modell; schließende Statistik nicht"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Descriptive statistics stays within the observed data, summarizing it, while inferential statistics uses that data as a stepping stone to conclusions about the wider population.",
+            explainDE: "Die beschreibende Statistik bleibt innerhalb der beobachteten Daten und fasst sie zusammen, während die schließende Statistik diese Daten als Sprungbrett für Rückschlüsse auf die größere Grundgesamtheit nutzt."
         },
 
         // ── 2. STICHPROBENUMFANG UND STICHPROBENRAUM ─────────────────────────────
@@ -2035,7 +2047,9 @@ const BONUS_QUIZ_POOLS = {
                 "Die Gesamtgröße der Grundgesamtheit",
                 "Die Anzahl möglicher Ergebnisse pro Beobachtung"
             ],
-            correct: 0
+            correct: 0,
+            explain: "The sample size simply counts how many individual data points were actually collected, regardless of how large the underlying population or parameter space might be.",
+            explainDE: "Der Stichprobenumfang zählt schlicht, wie viele einzelne Datenpunkte tatsächlich erhoben wurden, unabhängig davon, wie groß die zugrunde liegende Grundgesamtheit oder der Parameterraum ist."
         },
         {
             q: "The sample space of a statistical model is:",
@@ -2052,7 +2066,9 @@ const BONUS_QUIZ_POOLS = {
                 "Die Sammlung aller gezogenen Stichproben",
                 "Die Menge aller Schätzer für den unbekannten Parameter"
             ],
-            correct: 0
+            correct: 0,
+            explain: "The sample space describes what a single observation could possibly look like — it's a property of the data, not to be confused with the parameter space, which concerns the unknown parameter.",
+            explainDE: "Der Stichprobenraum beschreibt, wie eine einzelne Beobachtung möglicherweise aussehen könnte — er ist eine Eigenschaft der Daten und nicht mit dem Parameterraum zu verwechseln, der den unbekannten Parameter betrifft."
         },
         {
             q: "We record whether each of 50 patients recovers (yes/no). What is the sample space for a single observation?",
@@ -2069,7 +2085,9 @@ const BONUS_QUIZ_POOLS = {
                 "Alle reellen Zahlen",
                 "{ja, nein, vielleicht}"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Since each single patient's outcome can only be yes or no, the sample space for one observation is exactly these two possible values — the 50 only matters for the overall sample size.",
+            explainDE: "Da das Ergebnis eines einzelnen Patienten nur ja oder nein sein kann, besteht der Stichprobenraum für eine Beobachtung genau aus diesen zwei möglichen Werten — die 50 spielt nur für den gesamten Stichprobenumfang eine Rolle."
         },
         {
             q: "We model a sample of size n as n random variables X₁, X₂, …, Xₙ. What assumption do we usually make about these variables?",
@@ -2086,7 +2104,9 @@ const BONUS_QUIZ_POOLS = {
                 "Sie sind abhängig und unterschiedlich verteilt",
                 "Sie müssen alle diskret sein"
             ],
-            correct: 0
+            correct: 0,
+            explain: "The standard i.i.d. assumption treats each observation as coming independently from the same underlying distribution, which is what makes tools like the law of large numbers and the CLT applicable.",
+            explainDE: "Die übliche i.i.d.-Annahme behandelt jede Beobachtung als unabhängig aus derselben zugrunde liegenden Verteilung stammend, was Werkzeuge wie das Gesetz der großen Zahlen und den ZGS überhaupt erst anwendbar macht."
         },
 
         // ── 3. PARAMETRISCHES VERTEILUNGSMODELL UND PARAMETERRAUM ────────────────
@@ -2106,7 +2126,9 @@ const BONUS_QUIZ_POOLS = {
                 "Ein Modell, das keine Wahrscheinlichkeitsverteilungen verwendet",
                 "Ein Modell, bei dem alle Parameter im Voraus bekannt sind"
             ],
-            correct: 0
+            correct: 0,
+            explain: "A parametric model doesn't pin down one exact distribution; instead it specifies a whole family of candidate distributions, with the unknown parameter determining which member of the family applies.",
+            explainDE: "Ein parametrisches Modell legt keine einzelne exakte Verteilung fest, sondern beschreibt eine ganze Familie von Kandidatenverteilungen, wobei der unbekannte Parameter bestimmt, welches Mitglied der Familie zutrifft."
         },
         {
             q: "The parameter space is:",
@@ -2123,7 +2145,9 @@ const BONUS_QUIZ_POOLS = {
                 "Die Menge aller möglichen Schätzer",
                 "Der Wertebereich der Verteilungsfunktion"
             ],
-            correct: 0
+            correct: 0,
+            explain: "The parameter space defines the range of legitimate values the unknown parameter could take, keeping it distinct from the sample space, which concerns the data itself.",
+            explainDE: "Der Parameterraum legt den Bereich zulässiger Werte fest, die der unbekannte Parameter annehmen kann, und ist damit klar vom Stichprobenraum zu unterscheiden, der die Daten selbst betrifft."
         },
         {
             q: "We model exam scores as normally distributed with unknown mean μ and known variance 1. The parameter space for μ is:",
@@ -2140,7 +2164,9 @@ const BONUS_QUIZ_POOLS = {
                 "Das Intervall [0, 1]",
                 "Nur ganze Zahlen"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Since a normal distribution's mean can in principle be any real number, with no positivity or boundedness restriction, the parameter space for μ here is all of ℝ.",
+            explainDE: "Da der Erwartungswert einer Normalverteilung grundsätzlich jede reelle Zahl sein kann, ohne Positivitäts- oder Beschränktheitsbedingung, ist der Parameterraum für μ hier ganz ℝ."
         },
         {
             q: "Two researchers study the same coin-flip data. One assumes a Bernoulli model, the other a Normal model. They get different conclusions. What does this illustrate?",
@@ -2157,7 +2183,9 @@ const BONUS_QUIZ_POOLS = {
                 "Schließende Statistik liefert unabhängig vom Modell immer dieselbe Antwort",
                 "Parameter sind über alle Modellfamilien hinweg gleich"
             ],
-            correct: 0
+            correct: 0,
+            explain: "This is a reminder that all inference happens within an assumed model family — pick a different family and the estimates, tests, and conclusions can genuinely differ, even from the same data.",
+            explainDE: "Dies zeigt, dass jede Inferenz innerhalb einer angenommenen Modellfamilie stattfindet — wählt man eine andere Familie, können sich Schätzungen, Tests und Schlussfolgerungen selbst bei denselben Daten tatsächlich unterscheiden."
         },
 
         // ── 4. STATISTIK UND SCHÄTZER ─────────────────────────────────────────────
@@ -2177,7 +2205,9 @@ const BONUS_QUIZ_POOLS = {
                 "Eine beliebige Funktion, die den unbekannten Parameter enthält",
                 "Eine vom Forscher gewählte feste Konstante"
             ],
-            correct: 0
+            correct: 0,
+            explain: "A statistic must be computable from the data alone — if it required knowing the unknown parameter to evaluate it, it wouldn't be usable in practice as a summary or estimator.",
+            explainDE: "Eine Statistik muss allein aus den Daten berechenbar sein — würde man zu ihrer Berechnung den unbekannten Parameter benötigen, wäre sie in der Praxis als Zusammenfassung oder Schätzer nicht nutzbar."
         },
         {
             q: "Why is an estimator considered a random variable?",
@@ -2194,7 +2224,9 @@ const BONUS_QUIZ_POOLS = {
                 "Weil er unendliche Varianz hat",
                 "Weil er nur für stetige Verteilungen definiert ist"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Since an estimator is a function of the sample, and the sample itself is random, a new dataset would generally produce a different estimator value — making the estimator itself random.",
+            explainDE: "Da ein Schätzer eine Funktion der Stichprobe ist und die Stichprobe selbst zufällig ist, würde ein neuer Datensatz im Allgemeinen einen anderen Schätzerwert liefern — der Schätzer selbst ist somit zufällig."
         },
         {
             q: "What does it mean for an estimator to be unbiased?",
@@ -2211,7 +2243,9 @@ const BONUS_QUIZ_POOLS = {
                 "Seine Varianz ist null",
                 "Er ist immer größer als der wahre Parameter"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Unbiasedness is a statement about the average behavior over repeated sampling — the estimator's expected value hits the true parameter, even though any single estimate can still miss it.",
+            explainDE: "Erwartungstreue ist eine Aussage über das durchschnittliche Verhalten bei wiederholter Stichprobenziehung — der Erwartungswert des Schätzers trifft den wahren Parameter, auch wenn ein einzelner Schätzwert davon abweichen kann."
         },
         {
             q: "What is the difference between an estimator and an estimate?",
@@ -2228,7 +2262,9 @@ const BONUS_QUIZ_POOLS = {
                 "Ein Schätzwert ist eine Zufallsvariable; ein Schätzer ist eine feste Zahl",
                 "Es gibt keinen Unterschied — die Begriffe sind austauschbar"
             ],
-            correct: 0
+            correct: 0,
+            explain: "The estimator is the formula or procedure applied to any sample, while the estimate is just the concrete number that comes out once actual observed data is plugged in.",
+            explainDE: "Der Schätzer ist die Formel bzw. das Verfahren, das auf eine beliebige Stichprobe angewendet wird, während der Schätzwert die konkrete Zahl ist, die sich nach Einsetzen der tatsächlich beobachteten Daten ergibt."
         },
 
         // ── 5. EMPIRISCHE VERTEILUNGSFUNKTION ─────────────────────────────────────
@@ -2248,7 +2284,9 @@ const BONUS_QUIZ_POOLS = {
                 "Die Anzahl der Beobachtungen größer als x",
                 "Den Erwartungswert der Verteilung bei x"
             ],
-            correct: 0
+            correct: 0,
+            explain: "By definition, the empirical distribution function at x is just the proportion of the sample lying at or below x, giving a data-based stand-in for the true cumulative distribution.",
+            explainDE: "Per Definition ist die empirische Verteilungsfunktion an der Stelle x einfach der Anteil der Stichprobe, der bei oder unterhalb von x liegt, und liefert so einen datenbasierten Ersatz für die wahre Verteilungsfunktion."
         },
         {
             q: "We observe: 2, 4, 6, 8. What is the value of the empirical distribution function at x = 4?",
@@ -2265,7 +2303,9 @@ const BONUS_QUIZ_POOLS = {
                 "0,75",
                 "1,0"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Two of the four observations (2 and 4) are less than or equal to 4, so the empirical distribution function evaluates to 2/4 = 0.5 at that point.",
+            explainDE: "Zwei der vier Beobachtungen (2 und 4) sind kleiner oder gleich 4, daher ergibt die empirische Verteilungsfunktion an dieser Stelle 2/4 = 0,5."
         },
         {
             q: "What is the empirical distribution function used for in inferential statistics?",
@@ -2282,7 +2322,9 @@ const BONUS_QUIZ_POOLS = {
                 "Zur Definition des Parameterraums",
                 "Zur Erzeugung neuer Zufallsstichproben"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Since the true distribution function is unknown, the empirical distribution function built from the sample serves as a natural, data-driven estimator for it.",
+            explainDE: "Da die wahre Verteilungsfunktion unbekannt ist, dient die aus der Stichprobe gebildete empirische Verteilungsfunktion als naheliegender, datengetriebener Schätzer für sie."
         },
         {
             q: "As the sample size n grows, the empirical distribution function:",
@@ -2299,7 +2341,9 @@ const BONUS_QUIZ_POOLS = {
                 "Bleibt unabhängig von n gleich",
                 "Wird gleich der Dichtefunktion"
             ],
-            correct: 0
+            correct: 0,
+            explain: "This is exactly the content of the Glivenko-Cantelli theorem covered earlier: with more data, the empirical distribution function tracks the true distribution ever more closely.",
+            explainDE: "Dies ist genau der Inhalt des zuvor behandelten Satzes von Glivenko-Cantelli: Mit mehr Daten nähert sich die empirische Verteilungsfunktion der wahren Verteilung immer weiter an."
         },
 
         // ── 6. LIKELIHOOD-PRINZIP UND MAXIMUM-LIKELIHOOD-SCHÄTZER ────────────────
@@ -2319,7 +2363,9 @@ const BONUS_QUIZ_POOLS = {
                 "Die Verteilung von θ über den Parameterraum",
                 "Die Varianz des Schätzers für θ"
             ],
-            correct: 0
+            correct: 0,
+            explain: "The likelihood flips the usual perspective: instead of asking how probable θ is, it fixes the observed data and asks how probable that data would be for each candidate value of θ.",
+            explainDE: "Die Likelihood kehrt die übliche Sichtweise um: Statt zu fragen, wie wahrscheinlich θ ist, hält sie die beobachteten Daten fest und fragt, wie wahrscheinlich diese Daten für jeden möglichen Wert von θ wären."
         },
         {
             q: "The maximum likelihood estimator chooses the parameter value that:",
@@ -2336,7 +2382,9 @@ const BONUS_QUIZ_POOLS = {
                 "In allen Fällen dem Stichprobenmittelwert entspricht",
                 "In der Mitte des Parameterraums liegt"
             ],
-            correct: 0
+            correct: 0,
+            explain: "The maximum likelihood principle picks out whichever parameter value makes the data we actually observed as probable as possible, rather than optimizing variance or any other criterion.",
+            explainDE: "Das Maximum-Likelihood-Prinzip wählt genau den Parameterwert, der die tatsächlich beobachteten Daten so wahrscheinlich wie möglich macht, statt Varianz oder ein anderes Kriterium zu optimieren."
         },
         {
             q: "We observe 7 heads in 10 coin flips and use a Bernoulli model. What is the maximum likelihood estimate for the probability of heads p?",
@@ -2353,7 +2401,9 @@ const BONUS_QUIZ_POOLS = {
                 "0,3",
                 "7"
             ],
-            correct: 0
+            correct: 0,
+            explain: "For a Bernoulli model, the MLE for p is simply the observed relative frequency of successes, so 7 heads out of 10 flips gives p̂ = 0.7.",
+            explainDE: "Für ein Bernoulli-Modell ist der ML-Schätzer für p schlicht die beobachtete relative Häufigkeit der Erfolge, sodass 7 Kopf bei 10 Würfen p̂ = 0,7 ergibt."
         },
         {
             q: "The likelihood principle states that:",
@@ -2370,7 +2420,9 @@ const BONUS_QUIZ_POOLS = {
                 "Die Likelihood-Funktion immer numerisch maximiert werden muss",
                 "Zwei Datensätze unterschiedlicher Größe immer zu unterschiedlichen Schlüssen führen"
             ],
-            correct: 0
+            correct: 0,
+            explain: "The likelihood principle asserts that the likelihood function alone summarizes everything the data can tell us about the parameter — no additional information from the data is relevant beyond it.",
+            explainDE: "Das Likelihood-Prinzip besagt, dass allein die Likelihood-Funktion alles zusammenfasst, was die Daten über den Parameter aussagen können — keine weitere Information aus den Daten ist darüber hinaus relevant."
         },
         {
             q: "Which of the following best describes why the log-likelihood is often used instead of the likelihood?",
@@ -2387,13 +2439,16 @@ const BONUS_QUIZ_POOLS = {
                 "Der Logarithmus verschiebt die Lage des Maximums",
                 "Die Log-Likelihood ist nur für diskrete Verteilungen definiert"
             ],
-            correct: 0
+            correct: 0,
+            explain: "Since the likelihood of i.i.d. data is a product of many terms, taking logs converts it into a sum, which is far simpler to differentiate and maximize while leaving the location of the maximum unchanged.",
+            explainDE: "Da die Likelihood bei i.i.d. Daten ein Produkt vieler Terme ist, wandelt der Logarithmus dieses in eine Summe um, die sich viel leichter ableiten und maximieren lässt, ohne die Lage des Maximums zu verändern."
         },
 
     ],
 
 
 
+    // WORLD 9
     // WORLD 9
     9: [
 
@@ -2403,35 +2458,45 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Ein Schätzer θ̂ für einen Parameter θ heißt erwartungstreu, wenn:",
             opts: ["E[θ̂] = θ for all θ in the parameter space", "θ̂ = θ with probability 1", "Var(θ̂) = 0", "E[θ̂] = 0"],
             optsDE: ["E[θ̂] = θ für alle θ im Parameterraum", "θ̂ = θ mit Wahrscheinlichkeit 1", "Var(θ̂) = 0", "E[θ̂] = 0"],
-            correct: 0
+            correct: 0,
+            explain: "Unbiasedness requires the estimator's expected value to hit the true parameter for every possible value in the parameter space, not just for one particular θ.",
+            explainDE: "Erwartungstreue verlangt, dass der Erwartungswert des Schätzers den wahren Parameter für jeden möglichen Wert im Parameterraum trifft, nicht nur für ein bestimmtes θ."
         },
         {
             q: "The bias of an estimator θ̂ for θ is defined as:",
             qDE: "Der Bias eines Schätzers θ̂ für θ ist definiert als:",
             opts: ["Bias(θ̂) = E[θ̂] − θ", "Bias(θ̂) = θ − θ̂", "Bias(θ̂) = Var(θ̂)", "Bias(θ̂) = E[θ̂²] − θ²"],
             optsDE: ["Bias(θ̂) = E[θ̂] − θ", "Bias(θ̂) = θ − θ̂", "Bias(θ̂) = Var(θ̂)", "Bias(θ̂) = E[θ̂²] − θ²"],
-            correct: 0
+            correct: 0,
+            explain: "The bias measures the systematic gap between what the estimator gives on average and the true parameter value, so it's defined as the expected value minus θ.",
+            explainDE: "Der Bias misst die systematische Abweichung zwischen dem durchschnittlichen Wert des Schätzers und dem wahren Parameterwert, weshalb er als Erwartungswert minus θ definiert ist."
         },
         {
             q: "If g(θ) is a function of the parameter θ, an estimator T for g(θ) is unbiased if:",
             qDE: "Wenn g(θ) eine Funktion des Parameters θ ist, heißt ein Schätzer T für g(θ) erwartungstreu, wenn:",
             opts: ["E[T] = g(θ) for all θ", "E[T] = θ for all θ", "T = g(θ) always", "Var(T) = g(θ)"],
             optsDE: ["E[T] = g(θ) für alle θ", "E[T] = θ für alle θ", "T = g(θ) immer", "Var(T) = g(θ)"],
-            correct: 0
+            correct: 0,
+            explain: "Unbiasedness is always relative to the target being estimated — if the target is g(θ) rather than θ itself, the expectation of T must match g(θ), not θ.",
+            explainDE: "Erwartungstreue bezieht sich immer auf die zu schätzende Zielgröße — ist das Ziel g(θ) statt θ selbst, muss der Erwartungswert von T mit g(θ) übereinstimmen, nicht mit θ."
         },
         {
             q: "If X̄ₙ is unbiased for μ, is X̄ₙ² generally unbiased for μ²?",
             qDE: "Wenn X̄ₙ erwartungstreu für μ ist, ist X̄ₙ² im Allgemeinen erwartungstreu für μ²?",
             opts: ["No, because E[X̄ₙ²] = μ² + Var(X̄ₙ) ≠ μ² in general", "Yes, always", "Yes, but only if μ = 0", "No, because X̄ₙ is never unbiased"],
             optsDE: ["Nein, denn E[X̄ₙ²] = μ² + Var(X̄ₙ) ≠ μ² im Allgemeinen", "Ja, immer", "Ja, aber nur wenn μ = 0", "Nein, denn X̄ₙ ist nie erwartungstreu"],
-            correct: 0
+            correct: 0,
+            explain: "Unbiasedness does not transfer through nonlinear transformations — squaring introduces an extra Var(X̄ₙ) term, so X̄ₙ² is biased upward for μ² unless the variance happens to vanish.",
+            explainDE: "Erwartungstreue überträgt sich nicht durch nichtlineare Transformationen — das Quadrieren führt einen zusätzlichen Var(X̄ₙ)-Term ein, sodass X̄ₙ² für μ² nach oben verzerrt ist, außer die Varianz verschwindet zufällig."
         },
         {
             q: "The sample variance S²ₙ = (1/(n−1))∑(Xᵢ − X̄ₙ)² is used instead of (1/n)∑(Xᵢ − X̄ₙ)² because:",
             qDE: "Die Stichprobenvarianz S²ₙ = (1/(n−1))∑(Xᵢ − X̄ₙ)² wird anstelle von (1/n)∑(Xᵢ − X̄ₙ)² verwendet, weil:",
             opts: ["Dividing by (n−1) makes S²ₙ an unbiased estimator of σ²", "It always gives a smaller value", "It is easier to compute", "It removes the need for X̄ₙ"],
             optsDE: ["Die Division durch (n−1) macht S²ₙ zu einem erwartungstreuen Schätzer für σ²", "Es liefert stets einen kleineren Wert", "Es ist einfacher zu berechnen", "Dadurch entfällt die Notwendigkeit von X̄ₙ"],
-            correct: 0
+            correct: 0,
+            explain: "Dividing by n instead of n−1 systematically underestimates σ² because using X̄ₙ instead of the true μ removes one degree of freedom; correcting for this with (n−1) restores unbiasedness.",
+            explainDE: "Die Division durch n statt n−1 unterschätzt σ² systematisch, da die Verwendung von X̄ₙ anstelle des wahren μ einen Freiheitsgrad kostet; die Korrektur mit (n−1) stellt die Erwartungstreue wieder her."
         },
 
         // --- Asymptotische Erwartungstreue ---
@@ -2440,21 +2505,27 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Ein Schätzer θ̂ₙ heißt asymptotisch erwartungstreu, wenn:",
             opts: ["lim_{n→∞} E[θ̂ₙ] = θ", "E[θ̂ₙ] = θ for every n", "Var(θ̂ₙ) → 0 as n → ∞", "θ̂ₙ → θ almost surely"],
             optsDE: ["lim_{n→∞} E[θ̂ₙ] = θ", "E[θ̂ₙ] = θ für jedes n", "Var(θ̂ₙ) → 0 für n → ∞", "θ̂ₙ → θ fast sicher"],
-            correct: 0
+            correct: 0,
+            explain: "Asymptotic unbiasedness is a weaker, limiting version of unbiasedness: the bias doesn't have to vanish for every finite n, only as n grows without bound.",
+            explainDE: "Asymptotische Erwartungstreue ist eine schwächere, im Grenzwert geltende Version der Erwartungstreue: Der Bias muss nicht für jedes endliche n verschwinden, sondern nur für wachsendes n."
         },
         {
             q: "The biased variance estimator (1/n)∑(Xᵢ − X̄ₙ)² is asymptotically unbiased for σ² because:",
             qDE: "Der verzerrte Varianzschätzer (1/n)∑(Xᵢ − X̄ₙ)² ist asymptotisch erwartungstreu für σ², weil:",
             opts: ["Its bias, proportional to −σ²/n, vanishes as n → ∞", "Its variance is always zero", "It equals S²ₙ for all n", "It never converges"],
             optsDE: ["Sein Bias, proportional zu −σ²/n, verschwindet für n → ∞", "Seine Varianz ist stets null", "Es ist für alle n gleich S²ₙ", "Es konvergiert nie"],
-            correct: 0
+            correct: 0,
+            explain: "The gap between this estimator and the unbiased S²ₙ shrinks like 1/n, so while the bias is present for any finite sample, it disappears in the limit as n → ∞.",
+            explainDE: "Die Lücke zwischen diesem Schätzer und dem erwartungstreuen S²ₙ schrumpft wie 1/n, sodass der Bias zwar für jede endliche Stichprobe vorhanden ist, im Grenzwert n → ∞ jedoch verschwindet."
         },
         {
             q: "An estimator that is unbiased for every finite n is automatically:",
             qDE: "Ein Schätzer, der für jedes endliche n erwartungstreu ist, ist automatisch:",
             opts: ["Asymptotically unbiased as well", "Consistent", "Efficient", "MSE-efficient"],
             optsDE: ["Auch asymptotisch erwartungstreu", "Konsistent", "Effizient", "MSE-effizient"],
-            correct: 0
+            correct: 0,
+            explain: "If the bias is exactly zero for every n, its limit as n → ∞ is trivially zero too, so exact unbiasedness always implies asymptotic unbiasedness — the reverse is not guaranteed.",
+            explainDE: "Ist der Bias für jedes n exakt null, so ist auch sein Grenzwert für n → ∞ trivialerweise null — exakte Erwartungstreue impliziert also stets asymptotische Erwartungstreue, die Umkehrung gilt aber nicht."
         },
 
         // --- MSE und Zerlegung ---
@@ -2463,35 +2534,45 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Der mittlere quadratische Fehler (MSE) eines Schätzers θ̂ für θ ist definiert als:",
             opts: ["MSE(θ̂) = E[(θ̂ − θ)²]", "MSE(θ̂) = E[θ̂] − θ", "MSE(θ̂) = Var(θ̂) · Bias(θ̂)", "MSE(θ̂) = E[θ̂²]"],
             optsDE: ["MSE(θ̂) = E[(θ̂ − θ)²]", "MSE(θ̂) = E[θ̂] − θ", "MSE(θ̂) = Var(θ̂) · Bias(θ̂)", "MSE(θ̂) = E[θ̂²]"],
-            correct: 0
+            correct: 0,
+            explain: "The MSE captures overall estimation error by averaging the squared distance between the estimator and the true parameter, combining both bias and variability into one number.",
+            explainDE: "Der MSE erfasst den Gesamtschätzfehler, indem er die quadrierte Distanz zwischen Schätzer und wahrem Parameter mittelt, und vereint so Bias und Streuung in einer einzigen Kennzahl."
         },
         {
             q: "The bias-variance decomposition of the MSE states that MSE(θ̂) equals:",
             qDE: "Die Bias-Varianz-Zerlegung des MSE besagt, dass MSE(θ̂) gleich ist:",
             opts: ["Var(θ̂) + Bias(θ̂)²", "Var(θ̂) − Bias(θ̂)²", "Var(θ̂) · Bias(θ̂)", "Var(θ̂) + Bias(θ̂)"],
             optsDE: ["Var(θ̂) + Bias(θ̂)²", "Var(θ̂) − Bias(θ̂)²", "Var(θ̂) · Bias(θ̂)", "Var(θ̂) + Bias(θ̂)"],
-            correct: 0
+            correct: 0,
+            explain: "Expanding E[(θ̂ − θ)²] algebraically separates the total error into a variance term and a squared-bias term, both of which contribute positively and must be added together.",
+            explainDE: "Das algebraische Ausmultiplizieren von E[(θ̂ − θ)²] trennt den Gesamtfehler in einen Varianzterm und einen quadrierten Bias-Term auf, die beide positiv beitragen und addiert werden müssen."
         },
         {
             q: "If an estimator θ̂ is unbiased, its MSE simplifies to:",
             qDE: "Wenn ein Schätzer θ̂ erwartungstreu ist, vereinfacht sich sein MSE zu:",
             opts: ["MSE(θ̂) = Var(θ̂)", "MSE(θ̂) = 0", "MSE(θ̂) = Bias(θ̂)²", "MSE(θ̂) = E[θ̂]"],
             optsDE: ["MSE(θ̂) = Var(θ̂)", "MSE(θ̂) = 0", "MSE(θ̂) = Bias(θ̂)²", "MSE(θ̂) = E[θ̂]"],
-            correct: 0
+            correct: 0,
+            explain: "When Bias(θ̂) = 0, the squared-bias term in the decomposition drops out entirely, leaving only the variance as the source of the estimator's error.",
+            explainDE: "Wenn Bias(θ̂) = 0 ist, entfällt der quadrierte Bias-Term in der Zerlegung vollständig, sodass nur die Varianz als Fehlerquelle des Schätzers übrig bleibt."
         },
         {
             q: "An estimator with Bias(θ̂) = 2 and Var(θ̂) = 3 has MSE(θ̂) equal to:",
             qDE: "Ein Schätzer mit Bias(θ̂) = 2 und Var(θ̂) = 3 hat einen MSE(θ̂) von:",
             opts: ["7", "5", "6", "9"],
             optsDE: ["7", "5", "6", "9"],
-            correct: 0
+            correct: 0,
+            explain: "Applying the decomposition MSE = Var + Bias² gives 3 + 2² = 3 + 4 = 7.",
+            explainDE: "Die Anwendung der Zerlegung MSE = Var + Bias² ergibt 3 + 2² = 3 + 4 = 7."
         },
         {
             q: "A biased estimator can have a lower MSE than an unbiased one because:",
             qDE: "Ein verzerrter Schätzer kann einen niedrigeren MSE als ein erwartungstreuer haben, weil:",
             opts: ["A small increase in bias² can be offset by a larger reduction in variance", "Bias always reduces variance to zero", "Unbiased estimators always have infinite variance", "MSE ignores bias entirely"],
             optsDE: ["Eine kleine Zunahme des Bias² kann durch eine größere Reduktion der Varianz ausgeglichen werden", "Bias reduziert die Varianz immer auf null", "Erwartungstreue Schätzer haben immer unendliche Varianz", "MSE ignoriert den Bias vollständig"],
-            correct: 0
+            correct: 0,
+            explain: "Since MSE sums variance and squared bias, deliberately accepting a small bias can sometimes buy a much larger drop in variance, producing a smaller total MSE than an unbiased alternative.",
+            explainDE: "Da der MSE Varianz und quadrierten Bias addiert, kann das bewusste Inkaufnehmen eines kleinen Bias manchmal eine viel größere Reduktion der Varianz erkaufen und so einen kleineren Gesamt-MSE liefern als eine erwartungstreue Alternative."
         },
 
         // --- Konsistenz (schwach / stark) ---
@@ -2500,42 +2581,54 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Ein Schätzer θ̂ₙ heißt schwach konsistent für θ, wenn:",
             opts: ["θ̂ₙ →ᵖ θ as n → ∞ (convergence in probability)", "θ̂ₙ = θ for all n", "θ̂ₙ →ᵃ·ˢ· θ as n → ∞", "E[θ̂ₙ] = θ for all n"],
             optsDE: ["θ̂ₙ →ᵖ θ für n → ∞ (stochastische Konvergenz)", "θ̂ₙ = θ für alle n", "θ̂ₙ →ᵃ·ˢ· θ für n → ∞", "E[θ̂ₙ] = θ für alle n"],
-            correct: 0
+            correct: 0,
+            explain: "Weak consistency is defined directly through convergence in probability: as the sample grows, the estimator becomes increasingly unlikely to deviate far from θ.",
+            explainDE: "Schwache Konsistenz wird direkt über stochastische Konvergenz definiert: Mit wachsender Stichprobe wird es immer unwahrscheinlicher, dass der Schätzer stark von θ abweicht."
         },
         {
             q: "An estimator θ̂ₙ is strongly consistent for θ if:",
             qDE: "Ein Schätzer θ̂ₙ heißt stark konsistent für θ, wenn:",
             opts: ["θ̂ₙ →ᵃ·ˢ· θ as n → ∞ (almost sure convergence)", "θ̂ₙ →ᵖ θ as n → ∞", "Var(θ̂ₙ) = 0 for all n", "θ̂ₙ is unbiased for all n"],
             optsDE: ["θ̂ₙ →ᵃ·ˢ· θ für n → ∞ (fast sichere Konvergenz)", "θ̂ₙ →ᵖ θ für n → ∞", "Var(θ̂ₙ) = 0 für alle n", "θ̂ₙ ist für alle n erwartungstreu"],
-            correct: 0
+            correct: 0,
+            explain: "Strong consistency demands the stronger notion of almost sure convergence, guaranteeing that the sequence of estimates actually settles on θ with probability 1.",
+            explainDE: "Starke Konsistenz verlangt den stärkeren Begriff der fast sicheren Konvergenz und garantiert, dass die Folge der Schätzwerte mit Wahrscheinlichkeit 1 tatsächlich bei θ landet."
         },
         {
             q: "Strong consistency implies weak consistency because:",
             qDE: "Starke Konsistenz impliziert schwache Konsistenz, weil:",
             opts: ["Almost sure convergence implies convergence in probability", "They are defined identically", "Weak consistency requires unbiasedness", "Strong consistency requires a larger sample"],
             optsDE: ["Fast sichere Konvergenz stochastische Konvergenz impliziert", "Sie identisch definiert sind", "Schwache Konsistenz Erwartungstreue voraussetzt", "Starke Konsistenz eine größere Stichprobe erfordert"],
-            correct: 0
+            correct: 0,
+            explain: "This mirrors the general relationship between convergence modes: almost sure convergence is strictly stronger, so it always carries convergence in probability along with it.",
+            explainDE: "Dies spiegelt die allgemeine Beziehung zwischen Konvergenzarten wider: Fast sichere Konvergenz ist strikt stärker und impliziert daher stets auch die stochastische Konvergenz."
         },
         {
             q: "A common sufficient condition for weak consistency, via Chebyshev's inequality, is:",
             qDE: "Eine gängige hinreichende Bedingung für schwache Konsistenz (via Tschebyscheff) ist:",
             opts: ["θ̂ₙ is asymptotically unbiased and Var(θ̂ₙ) → 0 as n → ∞", "θ̂ₙ is unbiased for finite n only", "θ̂ₙ has infinite variance", "θ̂ₙ is a constant"],
             optsDE: ["θ̂ₙ ist asymptotisch erwartungstreu und Var(θ̂ₙ) → 0 für n → ∞", "θ̂ₙ ist nur für endliches n erwartungstreu", "θ̂ₙ hat unendliche Varianz", "θ̂ₙ ist eine Konstante"],
-            correct: 0
+            correct: 0,
+            explain: "Since Chebyshev bounds deviation probability using MSE, and MSE = Var + Bias², having both the variance and the (asymptotic) bias vanish is exactly what's needed to force convergence in probability.",
+            explainDE: "Da die Tschebyscheff-Schranke die Abweichungswahrscheinlichkeit über den MSE beschränkt und MSE = Var + Bias² gilt, ist es genau das Verschwinden von Varianz und (asymptotischem) Bias, das stochastische Konvergenz erzwingt."
         },
         {
             q: "By the Weak Law of Large Numbers, the sample mean X̄ₙ is a consistent estimator for μ provided that:",
             qDE: "Nach dem schwachen Gesetz der großen Zahlen ist X̄ₙ ein konsistenter Schätzer für μ, sofern:",
             opts: ["The Xᵢ are i.i.d. with finite variance", "The Xᵢ are normally distributed", "n is at least 30", "The Xᵢ are dependent"],
             optsDE: ["Die Xᵢ i.i.d. mit endlicher Varianz sind", "Die Xᵢ normalverteilt sind", "n mindestens 30 beträgt", "Die Xᵢ abhängig sind"],
-            correct: 0
+            correct: 0,
+            explain: "This is exactly the Weak Law's condition from world 7: i.i.d. observations with finite variance are enough to guarantee that X̄ₙ converges in probability to μ.",
+            explainDE: "Dies ist genau die Bedingung des schwachen Gesetzes aus Welt 7: i.i.d. Beobachtungen mit endlicher Varianz genügen, um zu garantieren, dass X̄ₙ stochastisch gegen μ konvergiert."
         },
         {
             q: "MSE(θ̂ₙ) → 0 as n → ∞ is sufficient to conclude:",
             qDE: "MSE(θ̂ₙ) → 0 für n → ∞ genügt, um zu folgern:",
             opts: ["θ̂ₙ is (weakly) consistent for θ", "θ̂ₙ is unbiased for every n", "θ̂ₙ is strongly consistent", "θ̂ₙ is efficient"],
             optsDE: ["θ̂ₙ ist (schwach) konsistent für θ", "θ̂ₙ ist für jedes n erwartungstreu", "θ̂ₙ ist stark konsistent", "θ̂ₙ ist effizient"],
-            correct: 0
+            correct: 0,
+            explain: "MSE going to zero forces both variance and bias to vanish, and by Chebyshev-type arguments this is enough to guarantee convergence in probability — but not the stronger almost sure convergence.",
+            explainDE: "Ein gegen null gehender MSE zwingt sowohl die Varianz als auch den Bias zum Verschwinden, und über Tschebyscheff-artige Argumente genügt dies, um stochastische Konvergenz zu garantieren — nicht jedoch die stärkere fast sichere Konvergenz."
         },
 
         // --- Effizienz (unter erwartungstreuen Schätzern) ---
@@ -2544,28 +2637,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Bei zwei erwartungstreuen Schätzern θ̂₁ und θ̂₂ für θ heißt θ̂₁ effizienter als θ̂₂, wenn:",
             opts: ["Var(θ̂₁) ≤ Var(θ̂₂), with strict inequality for at least one θ", "E[θ̂₁] < E[θ̂₂]", "θ̂₁ has a larger sample size", "Var(θ̂₁) = Var(θ̂₂)"],
             optsDE: ["Var(θ̂₁) ≤ Var(θ̂₂), mit strikter Ungleichung für mindestens ein θ", "E[θ̂₁] < E[θ̂₂]", "θ̂₁ eine größere Stichprobe verwendet", "Var(θ̂₁) = Var(θ̂₂)"],
-            correct: 0
+            correct: 0,
+            explain: "Since both estimators are already unbiased, their MSE reduces to variance alone, so efficiency is just a matter of comparing variances directly, with at least one strict inequality needed to break ties.",
+            explainDE: "Da beide Schätzer bereits erwartungstreu sind, reduziert sich ihr MSE allein auf die Varianz, sodass Effizienz einfach dem direkten Vergleich der Varianzen entspricht, wobei mindestens eine strikte Ungleichung nötig ist, um Gleichstand auszuschließen."
         },
         {
             q: "Efficiency, as a criterion for comparing estimators, is only meaningfully defined between:",
             qDE: "Effizienz als Kriterium zum Vergleich von Schätzern ist nur sinnvoll definiert zwischen:",
             opts: ["Two unbiased estimators of the same parameter", "Any two estimators, biased or not", "Two consistent estimators only", "Two estimators with equal variance"],
             optsDE: ["Zwei erwartungstreuen Schätzern desselben Parameters", "Beliebigen zwei Schätzern, verzerrt oder nicht", "Zwei konsistenten Schätzern", "Zwei Schätzern mit gleicher Varianz"],
-            correct: 0
+            correct: 0,
+            explain: "Efficiency as a variance comparison only makes sense once bias is already equal (namely zero) for both estimators; otherwise differing bias would confound a pure variance comparison.",
+            explainDE: "Effizienz als Varianzvergleich ist nur sinnvoll, wenn der Bias bei beiden Schätzern bereits gleich (nämlich null) ist; andernfalls würde ein unterschiedlicher Bias einen reinen Varianzvergleich verfälschen."
         },
         {
             q: "θ̂₁ has Var(θ̂₁) = 4 and θ̂₂ has Var(θ̂₂) = 9; both are unbiased for θ. Which is more efficient?",
             qDE: "θ̂₁ hat Var(θ̂₁) = 4, θ̂₂ hat Var(θ̂₂) = 9; beide sind erwartungstreu für θ. Welcher ist effizienter?",
             opts: ["θ̂₁, since it has the smaller variance", "θ̂₂, since it has the larger variance", "Both are equally efficient", "Neither, efficiency cannot be compared here"],
             optsDE: ["θ̂₁, da er die kleinere Varianz hat", "θ̂₂, da er die größere Varianz hat", "Beide sind gleich effizient", "Keiner, Effizienz ist hier nicht vergleichbar"],
-            correct: 0
+            correct: 0,
+            explain: "With both estimators unbiased, efficiency comes down to variance alone, and 4 < 9 means θ̂₁ concentrates more tightly around θ, making it the more efficient choice.",
+            explainDE: "Da beide Schätzer erwartungstreu sind, kommt es allein auf die Varianz an, und 4 < 9 bedeutet, dass θ̂₁ enger um θ konzentriert ist, was ihn zur effizienteren Wahl macht."
         },
         {
             q: "An unbiased estimator that achieves the Cramér-Rao lower bound is called:",
             qDE: "Ein erwartungstreuer Schätzer, der die Cramér-Rao-Schranke erreicht, heißt:",
             opts: ["Efficient", "Consistent", "Biased", "Asymptotically unbiased"],
             optsDE: ["Effizient", "Konsistent", "Verzerrt", "Asymptotisch erwartungstreu"],
-            correct: 0
+            correct: 0,
+            explain: "The Cramér-Rao bound sets the theoretical minimum possible variance for an unbiased estimator, so any unbiased estimator that actually attains it is, by definition, efficient — it can't be beaten.",
+            explainDE: "Die Cramér-Rao-Schranke legt die theoretisch kleinstmögliche Varianz für einen erwartungstreuen Schätzer fest, sodass jeder erwartungstreue Schätzer, der sie tatsächlich erreicht, per Definition effizient ist — er kann nicht unterboten werden."
         },
 
         // --- MSE-Effizienz (beliebige Schätzer) ---
@@ -2574,28 +2675,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Bei zwei nicht notwendig erwartungstreuen Schätzern θ̂₁ und θ̂₂ für θ heißt θ̂₁ MSE-effizienter als θ̂₂, wenn:",
             opts: ["MSE(θ̂₁) ≤ MSE(θ̂₂), with strict inequality for at least one θ", "Var(θ̂₁) ≤ Var(θ̂₂) regardless of bias", "Bias(θ̂₁) = 0 and Bias(θ̂₂) ≠ 0", "E[θ̂₁] = E[θ̂₂]"],
             optsDE: ["MSE(θ̂₁) ≤ MSE(θ̂₂), mit strikter Ungleichung für mindestens ein θ", "Var(θ̂₁) ≤ Var(θ̂₂) unabhängig vom Bias", "Bias(θ̂₁) = 0 und Bias(θ̂₂) ≠ 0", "E[θ̂₁] = E[θ̂₂]"],
-            correct: 0
+            correct: 0,
+            explain: "Because MSE-efficiency doesn't assume unbiasedness, the comparison must use the full MSE — which folds in both variance and bias² — rather than variance alone.",
+            explainDE: "Da MSE-Effizienz keine Erwartungstreue voraussetzt, muss der Vergleich über den vollständigen MSE erfolgen — der sowohl Varianz als auch Bias² enthält — statt allein über die Varianz."
         },
         {
             q: "Why is MSE-efficiency a more general comparison criterion than (variance-based) efficiency?",
             qDE: "Warum ist MSE-Effizienz ein allgemeineres Vergleichskriterium als (varianzbasierte) Effizienz?",
             opts: ["It can compare any two estimators, including biased ones, not just unbiased ones", "It only applies to consistent estimators", "It ignores variance completely", "It requires both estimators to be unbiased"],
             optsDE: ["Sie kann beliebige zwei Schätzer vergleichen, auch verzerrte, nicht nur erwartungstreue", "Sie gilt nur für konsistente Schätzer", "Sie ignoriert die Varianz vollständig", "Sie setzt voraus, dass beide Schätzer erwartungstreu sind"],
-            correct: 0
+            correct: 0,
+            explain: "Ordinary efficiency only applies once bias is ruled out, but MSE-efficiency accounts for bias directly within its formula, letting it rank biased and unbiased estimators alike on equal footing.",
+            explainDE: "Gewöhnliche Effizienz gilt nur, wenn Bias bereits ausgeschlossen ist, doch MSE-Effizienz berücksichtigt den Bias direkt in ihrer Formel und erlaubt so, verzerrte und erwartungstreue Schätzer gleichberechtigt zu vergleichen."
         },
         {
             q: "θ̂₁ (biased) has MSE = 5; θ̂₂ (unbiased) has MSE = 8. Which is MSE-efficient?",
             qDE: "θ̂₁ (verzerrt) hat MSE = 5; θ̂₂ (erwartungstreu) hat MSE = 8. Welcher ist MSE-effizient?",
             opts: ["θ̂₁, despite being biased, since its MSE is smaller", "θ̂₂, since it is unbiased", "Both, since MSE-efficiency ignores bias", "Neither can be compared"],
             optsDE: ["θ̂₁, trotz Verzerrung, da sein MSE kleiner ist", "θ̂₂, da er erwartungstreu ist", "Beide, da MSE-Effizienz den Bias ignoriert", "Keiner ist vergleichbar"],
-            correct: 0
+            correct: 0,
+            explain: "MSE-efficiency ranks purely by total MSE regardless of bias, so θ̂₁'s smaller MSE of 5 makes it the MSE-efficient choice even though it isn't unbiased.",
+            explainDE: "MSE-Effizienz rangiert rein nach dem Gesamt-MSE unabhängig vom Bias, sodass der kleinere MSE von θ̂₁ mit 5 ihn zur MSE-effizienten Wahl macht, obwohl er nicht erwartungstreu ist."
         },
         {
             q: "If both θ̂₁ and θ̂₂ are unbiased, comparing them by MSE-efficiency reduces to comparing them by:",
             qDE: "Wenn sowohl θ̂₁ als auch θ̂₂ erwartungstreu sind, reduziert sich der Vergleich nach MSE-Effizienz auf den Vergleich nach:",
             opts: ["Variance", "Bias", "Sample size", "Consistency"],
             optsDE: ["Varianz", "Bias", "Stichprobenumfang", "Konsistenz"],
-            correct: 0
+            correct: 0,
+            explain: "With bias equal to zero for both, the bias² term drops out of each MSE, leaving variance as the only thing distinguishing them — so MSE-efficiency collapses back to ordinary efficiency.",
+            explainDE: "Ist der Bias bei beiden gleich null, entfällt der Bias²-Term aus jedem MSE, sodass nur noch die Varianz die beiden unterscheidet — MSE-Effizienz reduziert sich damit wieder auf die gewöhnliche Effizienz."
         },
 
     ],
@@ -2609,35 +2718,45 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Ein Konfidenzintervall mit Konfidenzniveau 1−α wird so konstruiert, dass:",
             opts: ["It contains the true parameter with probability 1−α (over repeated sampling)", "It contains the true parameter with certainty", "It equals the point estimate exactly", "It always has width 1−α"],
             optsDE: ["Es den wahren Parameter mit Wahrscheinlichkeit 1−α überdeckt (bei wiederholter Stichprobenziehung)", "Es den wahren Parameter mit Sicherheit enthält", "Es genau dem Punktschätzer entspricht", "Es stets die Breite 1−α hat"],
-            correct: 0
+            correct: 0,
+            explain: "The confidence level is a statement about the procedure over repeated sampling — 1−α of all intervals constructed this way would capture the true parameter, not a guarantee for any single interval.",
+            explainDE: "Das Konfidenzniveau ist eine Aussage über das Verfahren bei wiederholter Stichprobenziehung — 1−α aller so konstruierten Intervalle würden den wahren Parameter überdecken, nicht eine Garantie für ein einzelnes Intervall."
         },
         {
             q: "A two-sided confidence interval for a parameter θ has the form:",
             qDE: "Ein zweiseitiges Konfidenzintervall für einen Parameter θ hat die Form:",
             opts: ["[θ̂ − c, θ̂ + c] bounding θ from both below and above", "(−∞, θ̂ + c] only", "[θ̂ − c, ∞) only", "A single point estimate θ̂"],
             optsDE: ["[θ̂ − c, θ̂ + c], das θ von unten und oben begrenzt", "Nur (−∞, θ̂ + c]", "Nur [θ̂ − c, ∞)", "Ein einzelner Punktschätzer θ̂"],
-            correct: 0
+            correct: 0,
+            explain: "A two-sided interval brackets the parameter on both ends, providing both a lower and an upper bound around the point estimate, unlike one-sided intervals which only bound in one direction.",
+            explainDE: "Ein zweiseitiges Intervall begrenzt den Parameter auf beiden Seiten und liefert sowohl eine untere als auch eine obere Schranke um den Punktschätzer, im Gegensatz zu einseitigen Intervallen, die nur in eine Richtung begrenzen."
         },
         {
             q: "A one-sided (upper) confidence interval for θ has the form:",
             qDE: "Ein einseitiges (oberes) Konfidenzintervall für θ hat die Form:",
             opts: ["(−∞, θ̂ + c]", "[θ̂ − c, θ̂ + c]", "[θ̂ − c, ∞)", "{θ̂}"],
             optsDE: ["(−∞, θ̂ + c]", "[θ̂ − c, θ̂ + c]", "[θ̂ − c, ∞)", "{θ̂}"],
-            correct: 0
+            correct: 0,
+            explain: "An upper one-sided interval only claims that θ is below some bound, so it extends from negative infinity up to θ̂ + c without imposing any lower limit.",
+            explainDE: "Ein oberes einseitiges Intervall behauptet nur, dass θ unterhalb einer bestimmten Schranke liegt, und erstreckt sich daher von minus unendlich bis θ̂ + c, ohne eine untere Grenze festzulegen."
         },
         {
             q: "Increasing the confidence level from 90% to 99% (all else equal) makes the confidence interval:",
             qDE: "Eine Erhöhung des Konfidenzniveaus von 90% auf 99% (bei sonst gleichen Bedingungen) macht das Konfidenzintervall:",
             opts: ["Wider", "Narrower", "Unchanged", "Negative"],
             optsDE: ["Breiter", "Schmaler", "Unverändert", "Negativ"],
-            correct: 0
+            correct: 0,
+            explain: "Demanding higher confidence means the interval must capture the true parameter more reliably, which requires a larger critical value and therefore a wider interval.",
+            explainDE: "Ein höheres Konfidenzniveau zu fordern bedeutet, dass das Intervall den wahren Parameter zuverlässiger erfassen muss, was einen größeren kritischen Wert und damit ein breiteres Intervall erfordert."
         },
         {
             q: "Increasing the sample size n (all else equal) typically makes a confidence interval:",
             qDE: "Eine Erhöhung des Stichprobenumfangs n (bei sonst gleichen Bedingungen) macht ein Konfidenzintervall typischerweise:",
             opts: ["Narrower", "Wider", "Unchanged", "Undefined"],
             optsDE: ["Schmaler", "Breiter", "Unverändert", "Undefiniert"],
-            correct: 0
+            correct: 0,
+            explain: "Since the margin of error typically shrinks with 1/√n, collecting more data reduces the standard error of the estimator and narrows the interval around it.",
+            explainDE: "Da die Fehlermarge typischerweise mit 1/√n schrumpft, verringert mehr gesammelte Daten den Standardfehler des Schätzers und verengt das Intervall um ihn."
         },
 
         // --- Konfidenzintervall für Erwartungswert ---
@@ -2646,28 +2765,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Für X₁,…,Xₙ i.i.d. N(μ, σ²) mit bekanntem σ² lautet das zweiseitige KI für μ zum Niveau 1−α:",
             opts: ["X̄ₙ ± z_{1−α/2} · σ/√n", "X̄ₙ ± z_{1−α} · σ/√n", "X̄ₙ ± t_{1−α/2} · σ/√n", "X̄ₙ ± σ²/n"],
             optsDE: ["X̄ₙ ± z_{1−α/2} · σ/√n", "X̄ₙ ± z_{1−α} · σ/√n", "X̄ₙ ± t_{1−α/2} · σ/√n", "X̄ₙ ± σ²/n"],
-            correct: 0
+            correct: 0,
+            explain: "Since σ² is known, X̄ₙ standardizes to a standard normal, so the interval uses the normal quantile z_{1−α/2} (splitting α across both tails) applied to the known standard error σ/√n.",
+            explainDE: "Da σ² bekannt ist, standardisiert sich X̄ₙ zu einer Standardnormalverteilung, sodass das Intervall das Normalquantil z_{1−α/2} (das α auf beide Enden aufteilt) auf den bekannten Standardfehler σ/√n anwendet."
         },
         {
             q: "When σ² is unknown and must be estimated from the sample, the two-sided CI for μ uses:",
             qDE: "Wenn σ² unbekannt ist und aus der Stichprobe geschätzt werden muss, verwendet das zweiseitige KI für μ:",
             opts: ["The t-distribution with n−1 degrees of freedom", "The standard normal distribution", "The chi-squared distribution", "The binomial distribution"],
             optsDE: ["Die t-Verteilung mit n−1 Freiheitsgraden", "Die Standardnormalverteilung", "Die Chi-Quadrat-Verteilung", "Die Binomialverteilung"],
-            correct: 0
+            correct: 0,
+            explain: "Replacing the unknown σ with the estimate Sₙ introduces extra variability, and it turns out the resulting standardized statistic follows a t-distribution with n−1 degrees of freedom rather than the normal.",
+            explainDE: "Das Ersetzen des unbekannten σ durch den Schätzer Sₙ führt zusätzliche Variabilität ein, und die daraus resultierende standardisierte Statistik folgt einer t-Verteilung mit n−1 Freiheitsgraden statt der Normalverteilung."
         },
         {
             q: "The two-sided CI for μ with unknown σ² is given by:",
             qDE: "Das zweiseitige KI für μ bei unbekanntem σ² lautet:",
             opts: ["X̄ₙ ± t_{n−1, 1−α/2} · Sₙ/√n", "X̄ₙ ± z_{1−α/2} · Sₙ/√n", "X̄ₙ ± t_{n−1, 1−α/2} · σ/√n", "X̄ₙ ± Sₙ/√n"],
             optsDE: ["X̄ₙ ± t_{n−1, 1−α/2} · Sₙ/√n", "X̄ₙ ± z_{1−α/2} · Sₙ/√n", "X̄ₙ ± t_{n−1, 1−α/2} · σ/√n", "X̄ₙ ± Sₙ/√n"],
-            correct: 0
+            correct: 0,
+            explain: "Both the unknown σ and the normal quantile need to be adjusted together: σ is replaced by its estimate Sₙ, and the critical value must come from the t-distribution rather than the standard normal.",
+            explainDE: "Sowohl das unbekannte σ als auch das Normalquantil müssen zusammen angepasst werden: σ wird durch seinen Schätzer Sₙ ersetzt, und der kritische Wert muss aus der t-Verteilung statt der Standardnormalverteilung stammen."
         },
         {
             q: "A one-sided upper CI for μ (σ² known) at level 1−α is:",
             qDE: "Ein einseitiges oberes KI für μ (σ² bekannt) zum Niveau 1−α lautet:",
             opts: ["(−∞, X̄ₙ + z_{1−α} · σ/√n]", "(−∞, X̄ₙ + z_{1−α/2} · σ/√n]", "[X̄ₙ − z_{1−α} · σ/√n, ∞)", "[X̄ₙ, ∞)"],
             optsDE: ["(−∞, X̄ₙ + z_{1−α} · σ/√n]", "(−∞, X̄ₙ + z_{1−α/2} · σ/√n]", "[X̄ₙ − z_{1−α} · σ/√n, ∞)", "[X̄ₙ, ∞)"],
-            correct: 0
+            correct: 0,
+            explain: "Since a one-sided interval puts all of α into a single tail rather than splitting it, the correct quantile here is z_{1−α}, not z_{1−α/2} which is reserved for two-sided intervals.",
+            explainDE: "Da ein einseitiges Intervall das gesamte α in ein einziges Ende legt, statt es aufzuteilen, ist das richtige Quantil hier z_{1−α}, nicht z_{1−α/2}, das für zweiseitige Intervalle reserviert ist."
         },
 
         // --- Konfidenzintervall für Varianz (Chi-Quadrat) ---
@@ -2676,28 +2803,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Für X₁,…,Xₙ i.i.d. N(μ, σ²) folgt die Größe (n−1)Sₙ²/σ² einer:",
             opts: ["Chi-squared distribution with n−1 degrees of freedom", "Standard normal distribution", "t-distribution with n−1 degrees of freedom", "Binomial distribution"],
             optsDE: ["Chi-Quadrat-Verteilung mit n−1 Freiheitsgraden", "Standardnormalverteilung", "t-Verteilung mit n−1 Freiheitsgraden", "Binomialverteilung"],
-            correct: 0
+            correct: 0,
+            explain: "This standardized sum of squared deviations, scaled by the unknown σ², is a classical result for normal samples: it follows a chi-squared distribution, with degrees of freedom reduced by one for estimating μ.",
+            explainDE: "Diese standardisierte Summe quadrierter Abweichungen, skaliert mit dem unbekannten σ², ist ein klassisches Resultat für Normalstichproben: Sie folgt einer Chi-Quadrat-Verteilung, deren Freiheitsgrade um eins reduziert sind, da μ geschätzt wird."
         },
         {
             q: "The two-sided CI for σ² is constructed using two quantiles of:",
             qDE: "Das zweiseitige KI für σ² wird mithilfe zweier Quantile folgender Verteilung konstruiert:",
             opts: ["The chi-squared distribution with n−1 degrees of freedom", "The standard normal distribution", "The t-distribution", "The exponential distribution"],
             optsDE: ["Der Chi-Quadrat-Verteilung mit n−1 Freiheitsgraden", "Der Standardnormalverteilung", "Der t-Verteilung", "Der Exponentialverteilung"],
-            correct: 0
+            correct: 0,
+            explain: "Because (n−1)Sₙ²/σ² is chi-squared distributed, bounding it between two chi-squared quantiles (at α/2 and 1−α/2) is exactly what's used to isolate σ² into an interval.",
+            explainDE: "Da (n−1)Sₙ²/σ² chi-quadrat-verteilt ist, wird genau das Einschließen zwischen zwei Chi-Quadrat-Quantilen (bei α/2 und 1−α/2) verwendet, um σ² in ein Intervall einzugrenzen."
         },
         {
             q: "The two-sided CI for σ² at level 1−α is:",
             qDE: "Das zweiseitige KI für σ² zum Niveau 1−α lautet:",
             opts: ["[(n−1)Sₙ² / χ²_{n−1, 1−α/2}, (n−1)Sₙ² / χ²_{n−1, α/2}]", "[Sₙ² − χ²_{1−α/2}, Sₙ² + χ²_{1−α/2}]", "X̄ₙ ± χ²_{1−α/2}", "[Sₙ² / χ²_{α/2}, ∞)"],
             optsDE: ["[(n−1)Sₙ² / χ²_{n−1, 1−α/2}, (n−1)Sₙ² / χ²_{n−1, α/2}]", "[Sₙ² − χ²_{1−α/2}, Sₙ² + χ²_{1−α/2}]", "X̄ₙ ± χ²_{1−α/2}", "[Sₙ² / χ²_{α/2}, ∞)"],
-            correct: 0
+            correct: 0,
+            explain: "Isolating σ² from the pivotal quantity (n−1)Sₙ²/σ² between its two chi-squared quantiles flips the inequality direction, producing an interval where the smaller quantile gives the upper bound and vice versa.",
+            explainDE: "Das Isolieren von σ² aus der Pivotgröße (n−1)Sₙ²/σ² zwischen ihren beiden Chi-Quadrat-Quantilen kehrt die Ungleichungsrichtung um, sodass das kleinere Quantil die obere Schranke liefert und umgekehrt."
         },
         {
             q: "Unlike the CI for μ, the CI for σ² based on the chi-squared distribution is generally:",
             qDE: "Im Gegensatz zum KI für μ ist das KI für σ² auf Basis der Chi-Quadrat-Verteilung im Allgemeinen:",
             opts: ["Not symmetric around the point estimate", "Symmetric around the point estimate", "Always of infinite width", "Independent of n"],
             optsDE: ["Nicht symmetrisch um den Punktschätzer", "Symmetrisch um den Punktschätzer", "Stets von unendlicher Breite", "Unabhängig von n"],
-            correct: 0
+            correct: 0,
+            explain: "Because the chi-squared distribution is itself skewed and not symmetric, the resulting interval for σ² inherits that asymmetry, unlike the symmetric ± form of the CI for μ based on the normal or t-distribution.",
+            explainDE: "Da die Chi-Quadrat-Verteilung selbst schief und nicht symmetrisch ist, erbt das resultierende Intervall für σ² diese Asymmetrie, im Gegensatz zur symmetrischen ±-Form des KI für μ auf Basis der Normal- oder t-Verteilung."
         },
 
         // --- Konfidenzintervall für p (Binomialverteilung, approximativ) ---
@@ -2706,21 +2841,27 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Für X ~ Bin(n, p) mit p̂ = X/n beruht das approximative (Wald-)KI für p auf welchem Satz?",
             opts: ["The Central Limit Theorem", "The Law of Large Numbers", "Bayes' theorem", "The Fundamental Theorem of Statistics"],
             optsDE: ["Dem Zentralen Grenzwertsatz", "Dem Gesetz der großen Zahlen", "Dem Satz von Bayes", "Dem Hauptsatz der Statistik"],
-            correct: 0
+            correct: 0,
+            explain: "Since p̂ is itself an average of Bernoulli trials, the CLT justifies treating it as approximately normal for large n, which is exactly what the Wald interval relies on.",
+            explainDE: "Da p̂ selbst ein Mittelwert von Bernoulli-Versuchen ist, rechtfertigt der ZGS, es für großes n als näherungsweise normalverteilt zu behandeln — genau darauf stützt sich das Wald-Intervall."
         },
         {
             q: "The approximate two-sided CI for p (Wald interval) at level 1−α is:",
             qDE: "Das approximative zweiseitige KI für p (Wald-Intervall) zum Niveau 1−α lautet:",
             opts: ["p̂ ± z_{1−α/2} · √(p̂(1−p̂)/n)", "p̂ ± z_{1−α} · √(p̂(1−p̂)/n)", "p̂ ± z_{1−α/2} · p̂(1−p̂)/n", "p̂ ± z_{1−α/2}/√n"],
             optsDE: ["p̂ ± z_{1−α/2} · √(p̂(1−p̂)/n)", "p̂ ± z_{1−α} · √(p̂(1−p̂)/n)", "p̂ ± z_{1−α/2} · p̂(1−p̂)/n", "p̂ ± z_{1−α/2}/√n"],
-            correct: 0
+            correct: 0,
+            explain: "Since Var(p̂) = p(1−p)/n, plugging in p̂ as an estimate and taking the square root gives the estimated standard error, which is then multiplied by the normal quantile z_{1−α/2}.",
+            explainDE: "Da Var(p̂) = p(1−p)/n ist, ergibt das Einsetzen von p̂ als Schätzer und das Ziehen der Quadratwurzel den geschätzten Standardfehler, der dann mit dem Normalquantil z_{1−α/2} multipliziert wird."
         },
         {
             q: "The approximate CI for p is generally considered reliable when:",
             qDE: "Das approximative KI für p gilt im Allgemeinen als zuverlässig, wenn:",
             opts: ["n is large enough that n·p̂ and n·(1−p̂) are both sufficiently large", "n is small and p̂ is close to 0.5", "p̂ = 0 or p̂ = 1", "n is any value at all"],
             optsDE: ["n groß genug ist, sodass n·p̂ und n·(1−p̂) beide ausreichend groß sind", "n klein ist und p̂ nahe 0,5 liegt", "p̂ = 0 oder p̂ = 1 ist", "n einen beliebigen Wert hat"],
-            correct: 0
+            correct: 0,
+            explain: "Since the interval relies on a normal approximation to the binomial, it only works well when both the expected number of successes and failures are large enough for that approximation to hold.",
+            explainDE: "Da sich das Intervall auf eine Normalapproximation der Binomialverteilung stützt, funktioniert es nur gut, wenn sowohl die erwartete Anzahl an Erfolgen als auch an Misserfolgen groß genug ist, damit diese Approximation gültig ist."
         },
 
         // --- Statistische Tests: Grundbegriffe ---
@@ -2729,63 +2870,81 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Beim Hypothesentest repräsentiert die Nullhypothese H₀ typischerweise:",
             opts: ["The default or status-quo claim to be tested against evidence", "The claim the researcher wants to prove", "A claim that is always true", "The sample mean"],
             optsDE: ["Die Standard- bzw. Status-quo-Annahme, die gegen die Evidenz getestet wird", "Die Behauptung, die der Forscher beweisen möchte", "Eine stets wahre Aussage", "Den Stichprobenmittelwert"],
-            correct: 0
+            correct: 0,
+            explain: "H₀ is set up as the conservative baseline assumption, which is only abandoned if the data provide strong enough evidence against it.",
+            explainDE: "H₀ wird als konservative Basisannahme festgelegt, die nur dann aufgegeben wird, wenn die Daten ausreichend starke Evidenz dagegen liefern."
         },
         {
             q: "The alternative hypothesis H₁ represents:",
             qDE: "Die Alternativhypothese H₁ repräsentiert:",
             opts: ["The claim that contradicts H₀ and is accepted if H₀ is rejected", "The claim that is assumed true by default", "A restatement of H₀", "The observed sample data"],
             optsDE: ["Die Behauptung, die H₀ widerspricht und akzeptiert wird, falls H₀ verworfen wird", "Die standardmäßig als wahr angenommene Behauptung", "Eine Umformulierung von H₀", "Die beobachteten Stichprobendaten"],
-            correct: 0
+            correct: 0,
+            explain: "H₁ is the competing claim that stands in direct opposition to H₀, and it's the position we lean toward only once the data have led us to reject the default assumption.",
+            explainDE: "H₁ ist die konkurrierende Behauptung, die direkt der H₀ widerspricht, und ihr wenden wir uns erst zu, wenn die Daten uns dazu veranlasst haben, die Standardannahme zu verwerfen."
         },
         {
             q: "A Type I error occurs when:",
             qDE: "Ein Fehler 1. Art tritt auf, wenn:",
             opts: ["H₀ is true but is rejected", "H₀ is false but is not rejected", "H₀ is true and not rejected", "H₁ is true and accepted"],
             optsDE: ["H₀ wahr ist, aber verworfen wird", "H₀ falsch ist, aber nicht verworfen wird", "H₀ wahr ist und nicht verworfen wird", "H₁ wahr ist und akzeptiert wird"],
-            correct: 0
+            correct: 0,
+            explain: "A Type I error is a false alarm: the null hypothesis was actually correct, but the test mistakenly rejected it anyway.",
+            explainDE: "Ein Fehler 1. Art ist ein Fehlalarm: Die Nullhypothese war eigentlich richtig, doch der Test hat sie fälschlicherweise trotzdem verworfen."
         },
         {
             q: "A Type II error occurs when:",
             qDE: "Ein Fehler 2. Art tritt auf, wenn:",
             opts: ["H₀ is false but is not rejected", "H₀ is true but is rejected", "H₀ is true and not rejected", "H₁ is rejected while true"],
             optsDE: ["H₀ falsch ist, aber nicht verworfen wird", "H₀ wahr ist, aber verworfen wird", "H₀ wahr ist und nicht verworfen wird", "H₁ verworfen wird, obwohl sie wahr ist"],
-            correct: 0
+            correct: 0,
+            explain: "A Type II error is a missed detection: the null hypothesis was actually false, but the test failed to reject it, letting the real effect slip past undetected.",
+            explainDE: "Ein Fehler 2. Art ist eine verpasste Entdeckung: Die Nullhypothese war eigentlich falsch, doch der Test hat sie nicht verworfen, sodass der tatsächliche Effekt unentdeckt blieb."
         },
         {
             q: "The significance level α of a test is defined as:",
             qDE: "Das Signifikanzniveau α eines Tests ist definiert als:",
             opts: ["The maximum allowed probability of a Type I error", "The probability of a Type II error", "The probability that H₀ is true", "The probability that H₁ is true"],
             optsDE: ["Die maximal zulässige Wahrscheinlichkeit für einen Fehler 1. Art", "Die Wahrscheinlichkeit für einen Fehler 2. Art", "Die Wahrscheinlichkeit, dass H₀ wahr ist", "Die Wahrscheinlichkeit, dass H₁ wahr ist"],
-            correct: 0
+            correct: 0,
+            explain: "By construction, a level-α test is designed so that the probability of falsely rejecting a true H₀ never exceeds α — that's the definition of significance level, not a statement about Type II errors.",
+            explainDE: "Ein Test zum Niveau α ist so konstruiert, dass die Wahrscheinlichkeit, eine wahre H₀ fälschlicherweise zu verwerfen, α nie überschreitet — das ist die Definition des Signifikanzniveaus, keine Aussage über Fehler 2. Art."
         },
         {
             q: "The power of a test is defined as:",
             qDE: "Die Power (Trennschärfe) eines Tests ist definiert als:",
             opts: ["1 minus the probability of a Type II error", "The probability of a Type I error", "The significance level α", "The sample size n"],
             optsDE: ["1 minus die Wahrscheinlichkeit eines Fehlers 2. Art", "Die Wahrscheinlichkeit eines Fehlers 1. Art", "Das Signifikanzniveau α", "Der Stichprobenumfang n"],
-            correct: 0
+            correct: 0,
+            explain: "Power measures the test's ability to correctly detect a false H₀, so it's exactly the complement of the Type II error probability — the chance of correctly rejecting when H₁ is true.",
+            explainDE: "Die Power misst die Fähigkeit des Tests, eine falsche H₀ korrekt zu erkennen, und ist damit genau das Komplement der Wahrscheinlichkeit eines Fehlers 2. Art — die Chance, korrekt zu verwerfen, wenn H₁ wahr ist."
         },
         {
             q: "Increasing the sample size n, all else equal, typically has which effect on the power of a test?",
             qDE: "Eine Erhöhung des Stichprobenumfangs n hat, bei sonst gleichen Bedingungen, typischerweise welchen Effekt auf die Power eines Tests?",
             opts: ["It increases the power", "It decreases the power", "It has no effect on power", "It always sets power to 1"],
             optsDE: ["Sie erhöht die Power", "Sie verringert die Power", "Sie hat keinen Einfluss auf die Power", "Sie setzt die Power stets auf 1"],
-            correct: 0
+            correct: 0,
+            explain: "More data reduces the variability of the test statistic, making it easier to distinguish true effects from noise, which increases the test's ability to correctly reject a false H₀.",
+            explainDE: "Mehr Daten verringern die Variabilität der Teststatistik, wodurch echte Effekte leichter vom Rauschen unterschieden werden können, was die Fähigkeit des Tests erhöht, eine falsche H₀ korrekt zu verwerfen."
         },
         {
             q: "The power function (Gütefunktion) of a test, as a function of the true parameter θ, gives:",
             qDE: "Die Gütefunktion eines Tests gibt in Abhängigkeit vom wahren Parameter θ an:",
             opts: ["The probability of rejecting H₀ for each value of θ", "The probability of accepting H₀ for each value of θ", "The sample mean for each θ", "The significance level for each θ"],
             optsDE: ["Die Wahrscheinlichkeit, H₀ für jeden Wert von θ zu verwerfen", "Die Wahrscheinlichkeit, H₀ für jeden Wert von θ anzunehmen", "Den Stichprobenmittelwert für jedes θ", "Das Signifikanzniveau für jedes θ"],
-            correct: 0
+            correct: 0,
+            explain: "The power function traces out the rejection probability across the entire parameter space, letting us see both the Type I error rate (under H₀) and the power (under H₁) in one function.",
+            explainDE: "Die Gütefunktion zeichnet die Verwerfungswahrscheinlichkeit über den gesamten Parameterraum nach und zeigt so sowohl die Fehlerwahrscheinlichkeit 1. Art (unter H₀) als auch die Power (unter H₁) in einer einzigen Funktion."
         },
         {
             q: "For θ values under H₀, the power function of a valid level-α test should be:",
             qDE: "Für θ-Werte unter H₀ sollte die Gütefunktion eines gültigen Tests zum Niveau α:",
             opts: ["At most α", "Exactly 1", "At least 1−α", "Equal to the power"],
             optsDE: ["Höchstens α sein", "Genau 1 sein", "Mindestens 1−α sein", "Gleich der Power sein"],
-            correct: 0
+            correct: 0,
+            explain: "Since rejecting H₀ when it's actually true is a Type I error, a valid level-α test must keep the rejection probability under H₀ bounded by α across the whole null region.",
+            explainDE: "Da das Verwerfen von H₀, wenn sie tatsächlich wahr ist, einen Fehler 1. Art darstellt, muss ein gültiger Test zum Niveau α die Verwerfungswahrscheinlichkeit unter H₀ im gesamten Nullbereich durch α beschränkt halten."
         },
 
         // --- Tests für den Erwartungswert ---
@@ -2794,14 +2953,18 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Für einen Ein-Stichproben-Test von H₀: μ = μ₀ gegen H₁: μ ≠ μ₀ heißt der Test:",
             opts: ["Two-sided (two-tailed) test", "One-sided (one-tailed) test", "Chi-squared test", "Approximate test only"],
             optsDE: ["Zweiseitiger Test", "Einseitiger Test", "Chi-Quadrat-Test", "Nur ein approximativer Test"],
-            correct: 0
+            correct: 0,
+            explain: "Since H₁ allows deviation in either direction (μ could be larger or smaller than μ₀), the rejection region must be split across both tails, making this a two-sided test.",
+            explainDE: "Da H₁ eine Abweichung in beide Richtungen zulässt (μ könnte größer oder kleiner als μ₀ sein), muss der Ablehnungsbereich auf beide Enden aufgeteilt werden, was diesen Test zu einem zweiseitigen macht."
         },
         {
             q: "For a one-sample test of H₀: μ ≤ μ₀ against H₁: μ > μ₀, the test is called:",
             qDE: "Für einen Ein-Stichproben-Test von H₀: μ ≤ μ₀ gegen H₁: μ > μ₀ heißt der Test:",
             opts: ["One-sided (upper-tailed) test", "Two-sided test", "Lower-tailed test only", "A test without a rejection region"],
             optsDE: ["Einseitiger Test (oberer Ablehnungsbereich)", "Zweiseitiger Test", "Nur ein unterer Test", "Ein Test ohne Ablehnungsbereich"],
-            correct: 0
+            correct: 0,
+            explain: "Because H₁ only allows deviation in one direction — μ being larger than μ₀ — the entire rejection region sits in the upper tail, making this an upper-tailed one-sided test.",
+            explainDE: "Da H₁ eine Abweichung nur in eine Richtung zulässt — μ größer als μ₀ — liegt der gesamte Ablehnungsbereich im oberen Ende, was diesen Test zu einem einseitigen oberen Test macht."
         },
         {
             q: "The Gauß-test (one-sample z-test) for the mean is used when:",
@@ -2815,49 +2978,63 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Die Teststatistik des Ein-Stichproben-Gauß-Tests für H₀: μ = μ₀ lautet:",
             opts: ["Z = (X̄ₙ − μ₀) / (σ/√n)", "Z = (X̄ₙ − μ₀) / (Sₙ/√n)", "Z = (X̄ₙ − μ₀) · σ√n", "Z = X̄ₙ / σ"],
             optsDE: ["Z = (X̄ₙ − μ₀) / (σ/√n)", "Z = (X̄ₙ − μ₀) / (Sₙ/√n)", "Z = (X̄ₙ − μ₀) · σ√n", "Z = X̄ₙ / σ"],
-            correct: 0
+            correct: 0,
+            explain: "This statistic standardizes the deviation of X̄ₙ from the hypothesized μ₀ by its known standard error σ/√n, which is exactly what makes it follow a standard normal under H₀.",
+            explainDE: "Diese Statistik standardisiert die Abweichung von X̄ₙ vom hypothetischen μ₀ durch den bekannten Standardfehler σ/√n, wodurch sie unter H₀ genau einer Standardnormalverteilung folgt."
         },
         {
             q: "Under H₀, the test statistic of the one-sample Gauß-test follows:",
             qDE: "Unter H₀ folgt die Teststatistik des Ein-Stichproben-Gauß-Tests:",
             opts: ["The standard normal distribution N(0,1)", "The t-distribution with n−1 degrees of freedom", "The chi-squared distribution", "The binomial distribution"],
             optsDE: ["Der Standardnormalverteilung N(0,1)", "Der t-Verteilung mit n−1 Freiheitsgraden", "Der Chi-Quadrat-Verteilung", "Der Binomialverteilung"],
-            correct: 0
+            correct: 0,
+            explain: "Because σ is known and doesn't need to be estimated, the standardized statistic follows the standard normal distribution exactly, without any correction for extra uncertainty.",
+            explainDE: "Da σ bekannt ist und nicht geschätzt werden muss, folgt die standardisierte Statistik exakt der Standardnormalverteilung, ohne Korrektur für zusätzliche Unsicherheit."
         },
         {
             q: "The one-sample t-test for the mean is used instead of the Gauß-test when:",
             qDE: "Der Ein-Stichproben-t-Test für den Erwartungswert wird anstelle des Gauß-Tests verwendet, wenn:",
             opts: ["The variance σ² is unknown and must be estimated from the sample", "The variance σ² is known exactly", "n is extremely large only", "The data are binomially distributed"],
             optsDE: ["Die Varianz σ² unbekannt ist und aus der Stichprobe geschätzt werden muss", "Die Varianz σ² exakt bekannt ist", "n nur extrem groß ist", "Die Daten binomialverteilt sind"],
-            correct: 0
+            correct: 0,
+            explain: "Whenever the true σ² isn't available and Sₙ has to stand in for it, the extra estimation uncertainty means the t-test — with its t-distributed statistic — is the appropriate choice instead of the Gauß-test.",
+            explainDE: "Wenn das wahre σ² nicht verfügbar ist und Sₙ dafür einspringen muss, bedeutet die zusätzliche Schätzunsicherheit, dass der t-Test — mit seiner t-verteilten Teststatistik — anstelle des Gauß-Tests die passende Wahl ist."
         },
         {
             q: "The test statistic of the one-sample t-test for H₀: μ = μ₀ is:",
             qDE: "Die Teststatistik des Ein-Stichproben-t-Tests für H₀: μ = μ₀ lautet:",
             opts: ["T = (X̄ₙ − μ₀) / (Sₙ/√n)", "T = (X̄ₙ − μ₀) / (σ/√n)", "T = (X̄ₙ − μ₀) · Sₙ√n", "T = X̄ₙ / Sₙ"],
             optsDE: ["T = (X̄ₙ − μ₀) / (Sₙ/√n)", "T = (X̄ₙ − μ₀) / (σ/√n)", "T = (X̄ₙ − μ₀) · Sₙ√n", "T = X̄ₙ / Sₙ"],
-            correct: 0
+            correct: 0,
+            explain: "The t-test statistic mirrors the Gauß-test statistic exactly, but with the unknown σ swapped out for its sample estimate Sₙ, which is why it needs the t-distribution instead of the normal.",
+            explainDE: "Die t-Test-Statistik entspricht genau der Gauß-Test-Statistik, jedoch mit dem unbekannten σ ersetzt durch den Stichprobenschätzer Sₙ, weshalb sie die t-Verteilung statt der Normalverteilung benötigt."
         },
         {
             q: "Under H₀, the test statistic of the one-sample t-test follows:",
             qDE: "Unter H₀ folgt die Teststatistik des Ein-Stichproben-t-Tests:",
             opts: ["The t-distribution with n−1 degrees of freedom", "The standard normal distribution N(0,1)", "The chi-squared distribution with n degrees of freedom", "The F-distribution"],
             optsDE: ["Der t-Verteilung mit n−1 Freiheitsgraden", "Der Standardnormalverteilung N(0,1)", "Der Chi-Quadrat-Verteilung mit n Freiheitsgraden", "Der F-Verteilung"],
-            correct: 0
+            correct: 0,
+            explain: "Estimating σ with Sₙ introduces additional randomness beyond the normal case, and accounting for this exactly gives a t-distribution with n−1 degrees of freedom under H₀.",
+            explainDE: "Die Schätzung von σ durch Sₙ führt zusätzliche Zufälligkeit über den Normalfall hinaus ein, und die exakte Berücksichtigung dessen ergibt unter H₀ eine t-Verteilung mit n−1 Freiheitsgraden."
         },
         {
             q: "For a two-sided Gauß-test at level α, H₀ is rejected when:",
             qDE: "Bei einem zweiseitigen Gauß-Test zum Niveau α wird H₀ verworfen, wenn:",
             opts: ["|Z| > z_{1−α/2}", "Z > z_{1−α}", "Z < z_{α}", "|Z| < z_{1−α/2}"],
             optsDE: ["|Z| > z_{1−α/2}", "Z > z_{1−α}", "Z < z_{α}", "|Z| < z_{1−α/2}"],
-            correct: 0
+            correct: 0,
+            explain: "Since deviations in either direction count as evidence against a two-sided H₀, the rejection region uses the absolute value of Z compared against the split quantile z_{1−α/2}.",
+            explainDE: "Da Abweichungen in beide Richtungen als Evidenz gegen eine zweiseitige H₀ zählen, verwendet der Ablehnungsbereich den Betrag von Z im Vergleich zum aufgeteilten Quantil z_{1−α/2}."
         },
         {
             q: "For a one-sided (upper-tailed) Gauß-test of H₀: μ ≤ μ₀ at level α, H₀ is rejected when:",
             qDE: "Bei einem einseitigen (oberen) Gauß-Test von H₀: μ ≤ μ₀ zum Niveau α wird H₀ verworfen, wenn:",
             opts: ["Z > z_{1−α}", "Z > z_{1−α/2}", "|Z| > z_{1−α}", "Z < z_{1−α}"],
             optsDE: ["Z > z_{1−α}", "Z > z_{1−α/2}", "|Z| > z_{1−α}", "Z < z_{1−α}"],
-            correct: 0
+            correct: 0,
+            explain: "Since only large positive deviations count as evidence against this upper-tailed H₀, the entire α gets placed in the upper tail, using the quantile z_{1−α} rather than z_{1−α/2}.",
+            explainDE: "Da nur große positive Abweichungen als Evidenz gegen diese einseitige obere H₀ zählen, wird das gesamte α in das obere Ende gelegt, mit dem Quantil z_{1−α} statt z_{1−α/2}."
         },
 
         // --- Zusammenhang Test und Konfidenzintervall ---
@@ -2866,21 +3043,27 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Die Dualität zwischen Konfidenzintervallen und Hypothesentests besagt: Ein zweiseitiger Test zum Niveau α verwirft H₀: μ = μ₀ genau dann, wenn:",
             opts: ["μ₀ lies outside the (1−α) confidence interval for μ", "μ₀ lies inside the (1−α) confidence interval for μ", "The sample mean equals μ₀", "The p-value is exactly α"],
             optsDE: ["μ₀ außerhalb des (1−α)-Konfidenzintervalls für μ liegt", "μ₀ innerhalb des (1−α)-Konfidenzintervalls für μ liegt", "Der Stichprobenmittelwert gleich μ₀ ist", "Der p-Wert genau α beträgt"],
-            correct: 0
+            correct: 0,
+            explain: "Both the test and the interval are built from the same standardized statistic, so a value μ₀ that would be rejected by the test is precisely one that falls outside the corresponding confidence interval.",
+            explainDE: "Sowohl der Test als auch das Intervall basieren auf derselben standardisierten Statistik, sodass ein Wert μ₀, der vom Test verworfen würde, genau derjenige ist, der außerhalb des entsprechenden Konfidenzintervalls liegt."
         },
         {
             q: "If the 95% confidence interval for μ is [2.1, 4.8], a two-sided test of H₀: μ = 5 at α = 0.05:",
             qDE: "Wenn das 95%-Konfidenzintervall für μ [2.1, 4.8] ist, ein zweiseitiger Test von H₀: μ = 5 zum Niveau α = 0.05:",
             opts: ["Rejects H₀, since 5 lies outside the interval", "Does not reject H₀, since 5 lies inside the interval", "Cannot be determined from the interval", "Always rejects H₀ regardless of the interval"],
             optsDE: ["Verwirft H₀, da 5 außerhalb des Intervalls liegt", "Verwirft H₀ nicht, da 5 innerhalb des Intervalls liegt", "Kann anhand des Intervalls nicht bestimmt werden", "Verwirft H₀ stets, unabhängig vom Intervall"],
-            correct: 0
+            correct: 0,
+            explain: "Applying the CI-test duality directly: since 5 falls outside [2.1, 4.8], the corresponding two-sided test at the same level would reject H₀: μ = 5.",
+            explainDE: "Wendet man die Dualität von KI und Test direkt an: Da 5 außerhalb von [2.1, 4.8] liegt, würde der entsprechende zweiseitige Test zum gleichen Niveau H₀: μ = 5 verwerfen."
         },
         {
             q: "Constructing a confidence interval and performing a hypothesis test are related because both are based on:",
             qDE: "Die Konstruktion eines Konfidenzintervalls und die Durchführung eines Hypothesentests hängen zusammen, da beide auf Folgendem beruhen:",
             opts: ["The same test statistic and its sampling distribution", "Completely unrelated statistics", "The p-value alone", "The sample size alone"],
             optsDE: ["Derselben Teststatistik und ihrer Stichprobenverteilung", "Vollkommen unabhängigen Statistiken", "Nur dem p-Wert", "Nur dem Stichprobenumfang"],
-            correct: 0
+            correct: 0,
+            explain: "The duality exists precisely because both procedures start from the same pivotal quantity and its known sampling distribution — they're just two different ways of reading the same underlying calculation.",
+            explainDE: "Die Dualität existiert genau deshalb, weil beide Verfahren von derselben Pivotgröße und ihrer bekannten Stichprobenverteilung ausgehen — es sind lediglich zwei verschiedene Arten, dieselbe zugrunde liegende Berechnung zu lesen."
         },
 
         // --- p-Wert ---
@@ -2889,28 +3072,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Der p-Wert eines Tests ist definiert als:",
             opts: ["The probability, under H₀, of observing a test statistic at least as extreme as the one observed", "The probability that H₀ is true", "The significance level α", "The probability that H₁ is true"],
             optsDE: ["Die Wahrscheinlichkeit unter H₀, eine Teststatistik zu beobachten, die mindestens so extrem ist wie die beobachtete", "Die Wahrscheinlichkeit, dass H₀ wahr ist", "Das Signifikanzniveau α", "Die Wahrscheinlichkeit, dass H₁ wahr ist"],
-            correct: 0
+            correct: 0,
+            explain: "The p-value is calculated assuming H₀ is true, asking how surprising the observed data would be under that assumption — it says nothing directly about the probability of H₀ itself.",
+            explainDE: "Der p-Wert wird unter der Annahme berechnet, dass H₀ wahr ist, und fragt, wie überraschend die beobachteten Daten unter dieser Annahme wären — er sagt nichts direkt über die Wahrscheinlichkeit von H₀ selbst aus."
         },
         {
             q: "Using the p-value decision rule, H₀ is rejected at significance level α when:",
             qDE: "Bei der p-Wert-Entscheidungsregel wird H₀ zum Signifikanzniveau α verworfen, wenn:",
             opts: ["p-value ≤ α", "p-value ≥ α", "p-value = 1", "p-value = 0.5"],
             optsDE: ["p-Wert ≤ α", "p-Wert ≥ α", "p-Wert = 1", "p-Wert = 0,5"],
-            correct: 0
+            correct: 0,
+            explain: "A small p-value means the observed data would be unlikely under H₀, so once it drops to or below the pre-set threshold α, that's taken as sufficient evidence to reject H₀.",
+            explainDE: "Ein kleiner p-Wert bedeutet, dass die beobachteten Daten unter H₀ unwahrscheinlich wären, sodass es als ausreichende Evidenz gilt, H₀ zu verwerfen, sobald er auf oder unter die vorab festgelegte Schwelle α fällt."
         },
         {
             q: "A very small p-value (e.g. 0.001) provides:",
             qDE: "Ein sehr kleiner p-Wert (z. B. 0,001) liefert:",
             opts: ["Strong evidence against H₀", "Strong evidence for H₀", "No information at all", "Proof that H₁ is true with certainty"],
             optsDE: ["Starke Evidenz gegen H₀", "Starke Evidenz für H₀", "Überhaupt keine Information", "Den sicheren Beweis, dass H₁ wahr ist"],
-            correct: 0
+            correct: 0,
+            explain: "A p-value this small means data this extreme would be very rare if H₀ were actually true, which counts as strong evidence against H₀ — though it's not absolute proof that H₁ holds.",
+            explainDE: "Ein so kleiner p-Wert bedeutet, dass so extreme Daten sehr selten wären, wenn H₀ tatsächlich wahr wäre, was als starke Evidenz gegen H₀ zählt — jedoch kein absoluter Beweis dafür ist, dass H₁ zutrifft."
         },
         {
             q: "A common misinterpretation of the p-value is to treat it as:",
             qDE: "Eine verbreitete Fehlinterpretation des p-Werts besteht darin, ihn zu behandeln als:",
             opts: ["The probability that H₀ is true given the data", "The probability, under H₀, of data as extreme as observed", "A measure of effect size", "The confidence level"],
             optsDE: ["Die Wahrscheinlichkeit, dass H₀ angesichts der Daten wahr ist", "Die Wahrscheinlichkeit unter H₀, Daten mindestens so extrem wie beobachtet zu erhalten", "Ein Maß für die Effektstärke", "Das Konfidenzniveau"],
-            correct: 0
+            correct: 0,
+            explain: "This is a classic reversal of conditioning: the p-value conditions on H₀ being true and asks about the data, but people often mistakenly flip it into a statement about the probability of H₀ given the data.",
+            explainDE: "Dies ist eine klassische Vertauschung der Bedingung: Der p-Wert setzt voraus, dass H₀ wahr ist, und fragt nach den Daten, doch oft wird er fälschlicherweise umgedreht in eine Aussage über die Wahrscheinlichkeit von H₀ angesichts der Daten."
         },
     ],
 
@@ -2923,28 +3114,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Der asymptotische (approximative) Binomialtest für H₀: p = p₀ verwendet welche Verteilung zur Approximation der Teststatistik?",
             opts: ["The standard normal distribution N(0,1)", "The exact binomial distribution", "The t-distribution", "The chi-squared distribution"],
             optsDE: ["Die Standardnormalverteilung N(0,1)", "Die exakte Binomialverteilung", "Die t-Verteilung", "Die Chi-Quadrat-Verteilung"],
-            correct: 0
+            correct: 0,
+            explain: "Rather than working with the exact (and often cumbersome) binomial distribution, the asymptotic test standardizes p̂ and relies on the normal distribution as an approximation for large n.",
+            explainDE: "Statt mit der exakten (und oft unhandlichen) Binomialverteilung zu arbeiten, standardisiert der asymptotische Test p̂ und stützt sich für großes n approximativ auf die Normalverteilung."
         },
         {
             q: "The test statistic of the asymptotic binomial test for H₀: p = p₀, based on p̂ = X/n, is:",
             qDE: "Die Teststatistik des asymptotischen Binomialtests für H₀: p = p₀, basierend auf p̂ = X/n, lautet:",
             opts: ["Z = (p̂ − p₀) / √(p₀(1−p₀)/n)", "Z = (p̂ − p₀) / √(p̂(1−p̂))", "Z = p̂ / p₀", "Z = (p̂ − p₀) · n"],
             optsDE: ["Z = (p̂ − p₀) / √(p₀(1−p₀)/n)", "Z = (p̂ − p₀) / √(p̂(1−p̂))", "Z = p̂ / p₀", "Z = (p̂ − p₀) · n"],
-            correct: 0
+            correct: 0,
+            explain: "Under H₀, the true variance of p̂ is p₀(1−p₀)/n, so the statistic standardizes the deviation p̂ − p₀ using this hypothesized (not estimated) standard error.",
+            explainDE: "Unter H₀ ist die wahre Varianz von p̂ gleich p₀(1−p₀)/n, sodass die Statistik die Abweichung p̂ − p₀ mit diesem hypothetischen (nicht geschätzten) Standardfehler standardisiert."
         },
         {
             q: "The asymptotic binomial test relies on which theorem to justify the normal approximation?",
             qDE: "Der asymptotische Binomialtest stützt sich auf welchen Satz, um die Normalapproximation zu rechtfertigen?",
             opts: ["The Central Limit Theorem", "The Law of Total Probability", "Bayes' theorem", "The Fundamental Theorem of Statistics"],
             optsDE: ["Den Zentralen Grenzwertsatz", "Den Satz der totalen Wahrscheinlichkeit", "Den Satz von Bayes", "Den Hauptsatz der Statistik"],
-            correct: 0
+            correct: 0,
+            explain: "Since p̂ is an average of i.i.d. Bernoulli variables, the CLT is exactly what justifies treating its standardized form as approximately normal for large n.",
+            explainDE: "Da p̂ ein Durchschnitt i.i.d. Bernoulli-Variablen ist, rechtfertigt genau der ZGS, seine standardisierte Form für großes n als näherungsweise normalverteilt zu behandeln."
         },
         {
             q: "A common rule of thumb for the asymptotic binomial test to be reliable is:",
             qDE: "Eine gängige Faustregel für die Zuverlässigkeit des asymptotischen Binomialtests lautet:",
             opts: ["n·p₀·(1−p₀) is sufficiently large (e.g. ≥ 9)", "n is at least 1000", "p₀ = 0.5 exactly", "The data must be continuous"],
             optsDE: ["n·p₀·(1−p₀) ist ausreichend groß (z. B. ≥ 9)", "n ist mindestens 1000", "p₀ = 0,5 genau", "Die Daten müssen stetig sein"],
-            correct: 0
+            correct: 0,
+            explain: "This quantity relates to how well the binomial's shape is approximated by the normal curve — a small value means the approximation can be poor regardless of how large n itself is.",
+            explainDE: "Diese Größe hängt damit zusammen, wie gut die Form der Binomialverteilung durch die Normalkurve approximiert wird — ein kleiner Wert bedeutet, dass die Approximation schlecht sein kann, unabhängig davon, wie groß n selbst ist."
         },
 
         // --- Verbundenes Design (paired samples) ---
@@ -2953,7 +3152,9 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Bei einem verbundenen Design müssen die beiden Stichproben X₁,…,Xₙ und Y₁,…,Yₙ erfüllen:",
             opts: ["Both samples have the same size n, and Xᵢ and Yᵢ belong to the same unit (e.g. same subject before/after)", "The samples must have different sizes", "The samples must be independent of each other", "The variances must be known"],
             optsDE: ["Beide Stichproben haben denselben Umfang n, und Xᵢ und Yᵢ gehören zur selben Einheit (z. B. dieselbe Person vorher/nachher)", "Die Stichproben müssen unterschiedliche Umfänge haben", "Die Stichproben müssen unabhängig voneinander sein", "Die Varianzen müssen bekannt sein"],
-            correct: 0
+            correct: 0,
+            explain: "The defining feature of pairing is that each Xᵢ is linked to a specific Yᵢ from the same unit, which requires equal sample sizes and rules out treating the two samples as independent.",
+            explainDE: "Das entscheidende Merkmal der Verbundenheit ist, dass jedes Xᵢ mit einem bestimmten Yᵢ derselben Einheit verknüpft ist, was gleiche Stichprobenumfänge erfordert und ausschließt, die beiden Stichproben als unabhängig zu behandeln."
         },
         {
             q: "For a paired design, the differences are defined as:",
@@ -2967,28 +3168,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Die Teststatistik des Tests bei verbundenen Stichproben für den mittleren Unterschied ist T = √n · D̄ / S_D, wobei S_D bezeichnet:",
             opts: ["The sample standard deviation of the differences Dᵢ", "The standard deviation of Xᵢ only", "The standard deviation of Yᵢ only", "The pooled standard deviation of X and Y"],
             optsDE: ["Die Stichprobenstandardabweichung der Differenzen Dᵢ", "Die Standardabweichung von Xᵢ allein", "Die Standardabweichung von Yᵢ allein", "Die gepoolte Standardabweichung von X und Y"],
-            correct: 0
+            correct: 0,
+            explain: "Since the paired test works entirely with the derived differences Dᵢ, the variability that matters is the spread of these differences themselves, not the raw X or Y values individually.",
+            explainDE: "Da der verbundene Test vollständig mit den abgeleiteten Differenzen Dᵢ arbeitet, ist die relevante Variabilität die Streuung dieser Differenzen selbst, nicht die der rohen X- oder Y-Werte einzeln."
         },
         {
             q: "The paired-sample test essentially reduces the two-sample problem to:",
             qDE: "Der Test bei verbundenen Stichproben reduziert das Zwei-Stichproben-Problem im Wesentlichen auf:",
             opts: ["A one-sample t-test on the differences Dᵢ against H₀: E[D] = 0", "A two-sample F-test", "An unpaired t-test", "A chi-squared test"],
             optsDE: ["Einen Ein-Stichproben-t-Test auf die Differenzen Dᵢ gegen H₀: E[D] = 0", "Einen Zwei-Stichproben-F-Test", "Einen unverbundenen t-Test", "Einen Chi-Quadrat-Test"],
-            correct: 0
+            correct: 0,
+            explain: "By collapsing each pair into a single difference Dᵢ, the two-sample comparison becomes equivalent to asking whether these differences have mean zero — precisely a one-sample t-test.",
+            explainDE: "Indem jedes Paar zu einer einzigen Differenz Dᵢ zusammengefasst wird, wird der Zwei-Stichproben-Vergleich äquivalent zur Frage, ob diese Differenzen den Erwartungswert null haben — genau ein Ein-Stichproben-t-Test."
         },
         {
             q: "Under H₀: E[D] = 0, and assuming the Dᵢ are i.i.d. normal, the statistic T = √n · D̄ / S_D follows:",
             qDE: "Unter H₀: E[D] = 0 und unter der Annahme, dass die Dᵢ i.i.d. normalverteilt sind, folgt die Statistik T = √n · D̄ / S_D:",
             opts: ["A t-distribution with n−1 degrees of freedom", "A standard normal distribution", "A chi-squared distribution with n degrees of freedom", "An F-distribution"],
             optsDE: ["Einer t-Verteilung mit n−1 Freiheitsgraden", "Einer Standardnormalverteilung", "Einer Chi-Quadrat-Verteilung mit n Freiheitsgraden", "Einer F-Verteilung"],
-            correct: 0
+            correct: 0,
+            explain: "Since this is really a one-sample t-test applied to the Dᵢ, and the unknown variance of D is estimated by S_D, the standard t-distribution result with n−1 degrees of freedom applies directly.",
+            explainDE: "Da dies im Grunde ein Ein-Stichproben-t-Test angewendet auf die Dᵢ ist und die unbekannte Varianz von D durch S_D geschätzt wird, gilt direkt das übliche t-Verteilungsresultat mit n−1 Freiheitsgraden."
         },
         {
             q: "A paired design is typically preferred over an unpaired design when:",
             qDE: "Ein verbundenes Design wird einem unverbundenen Design typischerweise vorgezogen, wenn:",
             opts: ["Observations naturally come in related pairs (e.g. before/after on the same subject), reducing variability", "The two samples are collected from unrelated subjects", "The sample sizes differ", "The variances are known"],
             optsDE: ["Beobachtungen natürlich in zusammengehörigen Paaren vorliegen (z. B. vorher/nachher bei derselben Person), was die Variabilität verringert", "Die beiden Stichproben von nicht zusammenhängenden Personen stammen", "Die Stichprobenumfänge unterschiedlich sind", "Die Varianzen bekannt sind"],
-            correct: 0
+            correct: 0,
+            explain: "By differencing within the same subject, pairing cancels out subject-specific variability that would otherwise inflate the noise in an unpaired comparison, making the test more sensitive.",
+            explainDE: "Durch die Differenzbildung innerhalb derselben Person hebt die Verbundenheit personenspezifische Variabilität auf, die sonst das Rauschen in einem unverbundenen Vergleich erhöhen würde, was den Test empfindlicher macht."
         },
 
         // --- Unverbundenes Design (unpaired samples) ---
@@ -2997,14 +3206,18 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Bei einem unverbundenen Design wird für die beiden Stichproben X₁,…,Xₘ und Y₁,…,Yₙ angenommen, dass sie:",
             opts: ["Independent of each other, and may have different sample sizes m ≠ n", "Always the same size", "Paired observations on the same units", "Perfectly correlated"],
             optsDE: ["Unabhängig voneinander sind und unterschiedliche Stichprobenumfänge m ≠ n haben können", "Immer denselben Umfang haben", "Gepaarte Beobachtungen derselben Einheiten sind", "Perfekt korreliert sind"],
-            correct: 0
+            correct: 0,
+            explain: "Without any natural pairing link between observations, the two samples are treated as coming from entirely separate groups, so there's no requirement that m and n match.",
+            explainDE: "Ohne eine natürliche Verbindung zwischen den Beobachtungen werden die beiden Stichproben als aus völlig getrennten Gruppen stammend behandelt, sodass keine Anforderung besteht, dass m und n übereinstimmen."
         },
         {
             q: "An unpaired design is typically used when:",
             qDE: "Ein unverbundenes Design wird typischerweise verwendet, wenn:",
             opts: ["The two groups consist of different, unrelated subjects (e.g. treatment vs. control group)", "The same subjects are measured twice", "The sample sizes must be equal", "There is no variability between groups"],
             optsDE: ["Die beiden Gruppen aus unterschiedlichen, nicht zusammenhängenden Personen bestehen (z. B. Behandlungs- vs. Kontrollgruppe)", "Dieselben Personen zweimal gemessen werden", "Die Stichprobenumfänge gleich sein müssen", "Es keine Variabilität zwischen den Gruppen gibt"],
-            correct: 0
+            correct: 0,
+            explain: "When there's no way to link an observation in one group to a specific observation in the other — as with distinct treatment and control subjects — the unpaired design is the natural choice.",
+            explainDE: "Wenn es keine Möglichkeit gibt, eine Beobachtung in einer Gruppe mit einer bestimmten Beobachtung in der anderen zu verknüpfen — wie bei getrennten Behandlungs- und Kontrollpersonen — ist das unverbundene Design die natürliche Wahl."
         },
 
         // --- F-Test auf Varianzhomogenität ---
@@ -3013,28 +3226,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Der F-Test auf Varianzhomogenität testet die Nullhypothese:",
             opts: ["H₀: σ_X² = σ_Y²", "H₀: μ_X = μ_Y", "H₀: σ_X² = 0", "H₀: p_X = p_Y"],
             optsDE: ["H₀: σ_X² = σ_Y²", "H₀: μ_X = μ_Y", "H₀: σ_X² = 0", "H₀: p_X = p_Y"],
-            correct: 0
+            correct: 0,
+            explain: "This test targets equality of spread between the two populations, not equality of their means or proportions — hence the null hypothesis directly compares the two variances.",
+            explainDE: "Dieser Test zielt auf die Gleichheit der Streuung zwischen den beiden Grundgesamtheiten ab, nicht auf die Gleichheit ihrer Mittelwerte oder Anteile — daher vergleicht die Nullhypothese direkt die beiden Varianzen."
         },
         {
             q: "The F-test statistic for comparing two variances is:",
             qDE: "Die F-Teststatistik zum Vergleich zweier Varianzen lautet:",
             opts: ["F = S_X² / S_Y²", "F = S_X² − S_Y²", "F = S_X² · S_Y²", "F = (S_X² + S_Y²) / 2"],
             optsDE: ["F = S_X² / S_Y²", "F = S_X² − S_Y²", "F = S_X² · S_Y²", "F = (S_X² + S_Y²) / 2"],
-            correct: 0
+            correct: 0,
+            explain: "Comparing two variances naturally suggests looking at their ratio: under H₀, this ratio of sample variances should be close to 1, which is what the F-statistic captures.",
+            explainDE: "Der Vergleich zweier Varianzen legt nahe, ihr Verhältnis zu betrachten: Unter H₀ sollte dieses Verhältnis der Stichprobenvarianzen nahe bei 1 liegen, was die F-Statistik erfasst."
         },
         {
             q: "Under H₀: σ_X² = σ_Y², assuming both samples are normal and independent, the F-statistic S_X²/S_Y² follows:",
             qDE: "Unter H₀: σ_X² = σ_Y², bei normalverteilten und unabhängigen Stichproben, folgt die F-Statistik S_X²/S_Y²:",
             opts: ["An F-distribution with (m−1, n−1) degrees of freedom", "A t-distribution with m+n−2 degrees of freedom", "A standard normal distribution", "A chi-squared distribution"],
             optsDE: ["Einer F-Verteilung mit (m−1, n−1) Freiheitsgraden", "Einer t-Verteilung mit m+n−2 Freiheitsgraden", "Einer Standardnormalverteilung", "Einer Chi-Quadrat-Verteilung"],
-            correct: 0
+            correct: 0,
+            explain: "A ratio of two independent chi-squared variables, each divided by its own degrees of freedom, is by definition F-distributed, with (m−1, n−1) degrees of freedom coming from the two sample variances.",
+            explainDE: "Ein Verhältnis zweier unabhängiger Chi-Quadrat-Variablen, jeweils dividiert durch ihre eigenen Freiheitsgrade, ist per Definition F-verteilt, mit den Freiheitsgraden (m−1, n−1), die von den beiden Stichprobenvarianzen stammen."
         },
         {
             q: "Why is the F-test on variance homogeneity often performed before a two-sample t-test?",
             qDE: "Warum wird der F-Test auf Varianzhomogenität oft vor einem Zwei-Stichproben-t-Test durchgeführt?",
             opts: ["To check whether the equal-variance assumption needed for the standard t-test holds, or whether the Welch test should be used instead", "To estimate the sample means", "To determine the correct sample size", "Because it replaces the need for a t-test entirely"],
             optsDE: ["Um zu prüfen, ob die für den Standard-t-Test nötige Annahme gleicher Varianzen zutrifft, oder ob stattdessen der Welch-Test verwendet werden sollte", "Um die Stichprobenmittelwerte zu schätzen", "Um den richtigen Stichprobenumfang zu bestimmen", "Weil er den t-Test vollständig ersetzt"],
-            correct: 0
+            correct: 0,
+            explain: "The standard pooled-variance t-test is only valid under equal variances, so the F-test serves as a preliminary check to decide whether that assumption is reasonable or whether Welch's test is needed instead.",
+            explainDE: "Der Standard-t-Test mit gepoolter Varianz ist nur bei gleichen Varianzen gültig, daher dient der F-Test als vorgeschaltete Prüfung, ob diese Annahme plausibel ist oder ob stattdessen der Welch-Test benötigt wird."
         },
 
         // --- 2-Stichproben-t-Test (gleiche Varianz) ---
@@ -3043,28 +3264,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Der Zwei-Stichproben-t-Test auf einen Lageunterschied μ_X − μ_Y setzt voraus:",
             opts: ["Both samples are normal, independent, and have equal (but unknown) variances", "Both samples have known, possibly unequal variances", "The samples are paired", "The variances are unequal"],
             optsDE: ["Beide Stichproben sind normalverteilt, unabhängig und besitzen gleiche (aber unbekannte) Varianzen", "Beide Stichproben haben bekannte, möglicherweise ungleiche Varianzen", "Die Stichproben sind verbunden", "Die Varianzen sind ungleich"],
-            correct: 0
+            correct: 0,
+            explain: "The standard two-sample t-test's derivation specifically relies on both groups sharing a common (though unknown) variance, which is exactly what allows pooling them into a single variance estimate.",
+            explainDE: "Die Herleitung des Standard-Zwei-Stichproben-t-Tests beruht speziell darauf, dass beide Gruppen eine gemeinsame (wenn auch unbekannte) Varianz teilen, was genau erlaubt, sie zu einem einzigen Varianzschätzer zu poolen."
         },
         {
             q: "In the two-sample t-test (equal variances), the pooled variance estimator S_p² is a weighted average of:",
             qDE: "Beim Zwei-Stichproben-t-Test (gleiche Varianzen) ist der gepoolte Varianzschätzer S_p² ein gewichteter Durchschnitt aus:",
             opts: ["S_X² and S_Y², weighted by their respective degrees of freedom", "X̄ and Ȳ", "m and n only", "The F-statistic and the t-statistic"],
             optsDE: ["S_X² und S_Y², gewichtet nach ihren jeweiligen Freiheitsgraden", "X̄ und Ȳ", "Nur m und n", "Der F-Statistik und der t-Statistik"],
-            correct: 0
+            correct: 0,
+            explain: "Pooling combines the information from both samples' variance estimates, giving more weight to whichever sample has more degrees of freedom (i.e., more data) behind its variance estimate.",
+            explainDE: "Das Poolen kombiniert die Information aus den Varianzschätzern beider Stichproben und gewichtet dabei stärker, welche Stichprobe mehr Freiheitsgrade (d. h. mehr Daten) hinter ihrem Varianzschätzer hat."
         },
         {
             q: "The test statistic for the two-sample t-test with pooled variance S_p² is:",
             qDE: "Die Teststatistik des Zwei-Stichproben-t-Tests mit gepoolter Varianz S_p² lautet:",
             opts: ["T = (X̄ − Ȳ) / (S_p · √(1/m + 1/n))", "T = (X̄ − Ȳ) / S_p", "T = (X̄ − Ȳ) · √(m+n)", "T = (X̄ − Ȳ) / (S_X + S_Y)"],
             optsDE: ["T = (X̄ − Ȳ) / (S_p · √(1/m + 1/n))", "T = (X̄ − Ȳ) / S_p", "T = (X̄ − Ȳ) · √(m+n)", "T = (X̄ − Ȳ) / (S_X + S_Y)"],
-            correct: 0
+            correct: 0,
+            explain: "Since Var(X̄ − Ȳ) = σ²(1/m + 1/n) under the equal-variance assumption, the standard error uses the pooled S_p multiplied by √(1/m + 1/n), which properly accounts for both sample sizes.",
+            explainDE: "Da Var(X̄ − Ȳ) = σ²(1/m + 1/n) unter der Annahme gleicher Varianzen gilt, verwendet der Standardfehler das gepoolte S_p multipliziert mit √(1/m + 1/n), was beide Stichprobenumfänge korrekt berücksichtigt."
         },
         {
             q: "Under H₀: μ_X = μ_Y, the two-sample t-test statistic (equal variances) follows a t-distribution with how many degrees of freedom?",
             qDE: "Unter H₀: μ_X = μ_Y folgt die Zwei-Stichproben-t-Teststatistik (gleiche Varianzen) einer t-Verteilung mit wie vielen Freiheitsgraden?",
             opts: ["m + n − 2", "m + n − 1", "m − 1", "min(m, n) − 1"],
             optsDE: ["m + n − 2", "m + n − 1", "m − 1", "min(m, n) − 1"],
-            correct: 0
+            correct: 0,
+            explain: "Two means (X̄ and Ȳ) are estimated from the combined data, one degree of freedom is lost for each, leaving m + n − 2 degrees of freedom for the pooled variance estimate.",
+            explainDE: "Aus den kombinierten Daten werden zwei Mittelwerte (X̄ und Ȳ) geschätzt, wobei für jeden ein Freiheitsgrad verloren geht, sodass m + n − 2 Freiheitsgrade für den gepoolten Varianzschätzer übrig bleiben."
         },
 
         // --- Welch-Test ---
@@ -3073,28 +3302,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Der Welch-Test wird anstelle des Standard-Zwei-Stichproben-t-Tests verwendet, wenn:",
             opts: ["The two population variances cannot be assumed equal", "The two samples are paired", "The sample sizes are equal", "The variances are known exactly"],
             optsDE: ["Die Varianzen der beiden Grundgesamtheiten nicht als gleich angenommen werden können", "Die beiden Stichproben verbunden sind", "Die Stichprobenumfänge gleich sind", "Die Varianzen exakt bekannt sind"],
-            correct: 0
+            correct: 0,
+            explain: "Since the pooled t-test breaks down when variances genuinely differ between groups, the Welch test was designed specifically to handle that unequal-variance situation correctly.",
+            explainDE: "Da der gepoolte t-Test versagt, wenn sich die Varianzen zwischen den Gruppen tatsächlich unterscheiden, wurde der Welch-Test speziell dafür entwickelt, diese Situation ungleicher Varianzen korrekt zu behandeln."
         },
         {
             q: "The Welch test statistic for μ_X − μ_Y is:",
             qDE: "Die Welch-Teststatistik für μ_X − μ_Y lautet:",
             opts: ["T = (X̄ − Ȳ) / √(S_X²/m + S_Y²/n)", "T = (X̄ − Ȳ) / S_p", "T = (X̄ − Ȳ) · √(m·n)", "T = (X̄ − Ȳ) / (S_X² + S_Y²)"],
             optsDE: ["T = (X̄ − Ȳ) / √(S_X²/m + S_Y²/n)", "T = (X̄ − Ȳ) / S_p", "T = (X̄ − Ȳ) · √(m·n)", "T = (X̄ − Ȳ) / (S_X² + S_Y²)"],
-            correct: 0
+            correct: 0,
+            explain: "Without assuming equal variances, there's no valid pooled estimate to use, so Welch's statistic instead adds the two sample variances separately, each scaled by its own sample size.",
+            explainDE: "Ohne die Annahme gleicher Varianzen gibt es keinen gültigen gepoolten Schätzer, den man verwenden könnte, daher addiert die Welch-Statistik stattdessen die beiden Stichprobenvarianzen getrennt, jeweils skaliert mit ihrem eigenen Stichprobenumfang."
         },
         {
             q: "Unlike the standard two-sample t-test, the Welch test uses degrees of freedom that are:",
             qDE: "Im Gegensatz zum Standard-Zwei-Stichproben-t-Test verwendet der Welch-Test Freiheitsgrade, die:",
             opts: ["Estimated from the data via the Welch–Satterthwaite equation, and generally not an integer", "Always equal to m + n − 2", "Always equal to min(m, n) − 1", "Not needed at all"],
             optsDE: ["Über die Welch-Satterthwaite-Gleichung aus den Daten geschätzt werden und in der Regel keine ganze Zahl sind", "Immer gleich m + n − 2", "Immer gleich min(m, n) − 1", "Überhaupt nicht benötigt werden"],
-            correct: 0
+            correct: 0,
+            explain: "Because the Welch statistic only approximately follows a t-distribution, the Welch–Satterthwaite formula computes an effective, data-dependent degrees-of-freedom value that need not come out as a whole number.",
+            explainDE: "Da die Welch-Statistik nur näherungsweise einer t-Verteilung folgt, berechnet die Welch-Satterthwaite-Formel einen effektiven, datenabhängigen Freiheitsgradwert, der keine ganze Zahl sein muss."
         },
         {
             q: "A key advantage of the Welch test over the pooled-variance t-test is that it remains valid when:",
             qDE: "Ein wesentlicher Vorteil des Welch-Tests gegenüber dem gepoolten t-Test besteht darin, dass er gültig bleibt, wenn:",
             opts: ["The two groups have unequal variances and/or unequal sample sizes", "The two groups have equal variances only", "The data are not normally distributed at all", "The sample sizes must both be small"],
             optsDE: ["Die beiden Gruppen ungleiche Varianzen und/oder ungleiche Stichprobenumfänge haben", "Die beiden Gruppen nur gleiche Varianzen haben", "Die Daten überhaupt nicht normalverteilt sind", "Beide Stichprobenumfänge klein sein müssen"],
-            correct: 0
+            correct: 0,
+            explain: "Because Welch's test never assumes the variances are equal in the first place, it stays valid precisely in the situations — unequal variances, unequal sample sizes — where the pooled t-test would break down.",
+            explainDE: "Da der Welch-Test von vornherein nie gleiche Varianzen annimmt, bleibt er genau in den Situationen gültig — ungleiche Varianzen, ungleiche Stichprobenumfänge — in denen der gepoolte t-Test versagen würde."
         },
 
         // --- 2-Stichproben-Binomialtest ---
@@ -3103,28 +3340,36 @@ const BONUS_QUIZ_POOLS = {
             qDE: "Der Zwei-Stichproben-Binomialtest vergleicht:",
             opts: ["Two proportions p_X and p_Y from two independent binomial samples", "Two variances from two normal samples", "Two paired means", "A single proportion against a fixed value"],
             optsDE: ["Zwei Anteile p_X und p_Y aus zwei unabhängigen Binomialstichproben", "Zwei Varianzen aus zwei Normalstichproben", "Zwei verbundene Mittelwerte", "Einen einzelnen Anteil gegen einen festen Wert"],
-            correct: 0
+            correct: 0,
+            explain: "This test extends the one-sample binomial test to two independent groups, asking whether their underlying success proportions p_X and p_Y differ from each other.",
+            explainDE: "Dieser Test erweitert den Ein-Stichproben-Binomialtest auf zwei unabhängige Gruppen und fragt, ob sich ihre zugrunde liegenden Erfolgsanteile p_X und p_Y voneinander unterscheiden."
         },
         {
             q: "For the two-sample binomial test of H₀: p_X = p_Y, the pooled proportion estimator p̂ is computed as:",
             qDE: "Für den Zwei-Stichproben-Binomialtest von H₀: p_X = p_Y wird der gepoolte Anteilsschätzer p̂ berechnet als:",
             opts: ["(Xₛᵤᵤₘ + Yₛᵤₘ) / (m + n), i.e. total successes over total observations", "(p̂_X + p̂_Y) / 2 only", "p̂_X · p̂_Y", "max(p̂_X, p̂_Y)"],
             optsDE: ["(Summe der Erfolge in X + Y) / (m + n), also Gesamterfolge über Gesamtbeobachtungen", "Nur (p̂_X + p̂_Y) / 2", "p̂_X · p̂_Y", "max(p̂_X, p̂_Y)"],
-            correct: 0
+            correct: 0,
+            explain: "Under H₀ both groups are assumed to share the same true proportion, so the best combined estimate pools all successes and all observations together rather than simply averaging the two separate estimates.",
+            explainDE: "Unter H₀ wird angenommen, dass beide Gruppen denselben wahren Anteil teilen, daher poolt die beste kombinierte Schätzung alle Erfolge und alle Beobachtungen zusammen, statt einfach die beiden getrennten Schätzer zu mitteln."
         },
         {
             q: "The (asymptotic) test statistic for the two-sample binomial test under H₀: p_X = p_Y is approximately:",
             qDE: "Die (asymptotische) Teststatistik des Zwei-Stichproben-Binomialtests unter H₀: p_X = p_Y ist näherungsweise:",
             opts: ["Z = (p̂_X − p̂_Y) / √(p̂(1−p̂)(1/m + 1/n))", "Z = (p̂_X − p̂_Y) / (p̂_X + p̂_Y)", "Z = p̂_X / p̂_Y", "Z = (p̂_X − p̂_Y) · m · n"],
             optsDE: ["Z = (p̂_X − p̂_Y) / √(p̂(1−p̂)(1/m + 1/n))", "Z = (p̂_X − p̂_Y) / (p̂_X + p̂_Y)", "Z = p̂_X / p̂_Y", "Z = (p̂_X − p̂_Y) · m · n"],
-            correct: 0
+            correct: 0,
+            explain: "Using the pooled p̂ as the common variance estimate under H₀, the standard error of p̂_X − p̂_Y becomes √(p̂(1−p̂)(1/m + 1/n)), which standardizes the observed difference in proportions.",
+            explainDE: "Verwendet man das gepoolte p̂ als gemeinsamen Varianzschätzer unter H₀, ergibt sich der Standardfehler von p̂_X − p̂_Y als √(p̂(1−p̂)(1/m + 1/n)), was die beobachtete Differenz der Anteile standardisiert."
         },
         {
             q: "Under H₀, the two-sample binomial test statistic is approximately distributed as:",
             qDE: "Unter H₀ ist die Teststatistik des Zwei-Stichproben-Binomialtests näherungsweise verteilt als:",
             opts: ["N(0, 1)", "t-distribution with m+n−2 degrees of freedom", "Chi-squared distribution", "F-distribution"],
             optsDE: ["N(0, 1)", "t-Verteilung mit m+n−2 Freiheitsgraden", "Chi-Quadrat-Verteilung", "F-Verteilung"],
-            correct: 0
+            correct: 0,
+            explain: "As with the one-sample case, the CLT justifies approximating the standardized difference of proportions by the standard normal distribution when both sample sizes are reasonably large.",
+            explainDE: "Wie im Ein-Stichproben-Fall rechtfertigt der ZGS, die standardisierte Differenz der Anteile durch die Standardnormalverteilung zu approximieren, wenn beide Stichprobenumfänge hinreichend groß sind."
         },
 
     ],

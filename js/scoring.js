@@ -566,9 +566,12 @@ function checkWin() {
 
     if (isFirstClear) STATE.done.push(gi);
     // Region entry beat — fires on first clear of that world's designated trigger level
+    /*
     if (isFirstClear && cur.li === (REGION_BEAT_TRIGGER_LEVEL[cur.world] || 1)) {
         showBeat('region_' + cur.world);
     }
+    */
+
     _wdSyncSpriteToLevel(gi);    // move sprite to the just completed level
 
     // Track per-level mistake record for the "flawless world" achievement.
