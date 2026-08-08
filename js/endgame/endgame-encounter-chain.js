@@ -304,9 +304,14 @@ function _egEndMap() {
     _egFlushRunLootToStash();
     egSaveHubState();
     _egStopEncounter();
+
+    if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
+    if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
+
     showToast('🏆 Map cleared!');
     setTimeout(() => goToLevelSelect(), 2500);
 }
+
 
 // Called by the Leave Map button in the HUD.
 function _egTryLeaveMap() {

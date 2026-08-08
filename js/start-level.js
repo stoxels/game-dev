@@ -103,8 +103,10 @@ function _cleanupPreviousLevel() {
     const isChainTransition = !!window._egSuppressEncounterStop;
     if (!isChainTransition) {
         const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
-        playerMaxHP = baseHP;
-        playerCurrentHP = baseHP;
+        const gearHealthBonus = (typeof _egComputePlayerStats === 'function')
+            ? _egComputePlayerStats().health : 0;
+        playerMaxHP = baseHP + gearHealthBonus;
+        playerCurrentHP = playerMaxHP;
     }
 }
 
@@ -125,7 +127,16 @@ function _resetLevelState() {
 // Returns the base timer value for the current level, halved in Time Trial mode.
 function _calcBaseTime() {
     const cfg = DIFF_CFG[curDiff];
-    const baseTimer = cur.timer || cfg.timerStart;
+    let baseTimer;
+
+    if (cur.isMonsterLevel && cur.egTimeLimit != null) {
+        const gearBonus = (typeof _egComputePlayerStats === 'function')
+            ? (_egComputePlayerStats().timeAdded || 0) : 0;
+        baseTimer = cur.egTimeLimit + gearBonus;
+    } else {
+        baseTimer = cur.timer || cfg.timerStart;
+    }
+
     return curMods.timetrial ? Math.round(baseTimer * 0.5) : baseTimer;
 }
 

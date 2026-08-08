@@ -675,6 +675,20 @@ const Audio_Manager = (() => {
     }
 
 
+    // Plays a random sound effect from the SFX registry.
+    // Useful for previewing SFX volume changes in the settings modal.
+    function _getRandomSFXKey() {
+        const keys = Object.keys(SFX);
+        if (keys.length === 0) return null;
+        return keys[Math.floor(Math.random() * keys.length)];
+    }
+
+    function playRandomSFX() {
+        const key = _getRandomSFXKey();
+        if (key) playSFX(key);
+    }
+
+
     //------------------------------------------------------------------------
     //-------------------VOLUME & TOGGLE CONTROLS-----------------------------
     //------------------------------------------------------------------------
@@ -739,6 +753,7 @@ const Audio_Manager = (() => {
         // SFX
         playSFX,
         stopSFX,
+        playRandomSFX,
         preload,
 
         // Volume & toggles

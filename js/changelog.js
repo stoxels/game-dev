@@ -7,7 +7,7 @@ const CHANGELOG_DATA = [
 
     {
         version: "v0.27 BETA",
-        date: "22.07.2026",
+        date: "08.08.2026",
         changes: [
             {
                 category: "New Features",
@@ -15,7 +15,7 @@ const CHANGELOG_DATA = [
                     "Settings Modal has been fully remade.",
                     "There are now up to 20 individual Save - Slots. Each one can be reset individually and progress is based per Save - Slot.",
                     "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text. Not all questions have an explaination yet.",
-
+                    "Endgame Test Hub has been created",
                 ],
 
             },
@@ -24,6 +24,7 @@ const CHANGELOG_DATA = [
                 items: [
                     "Reduced the amount of achievements required to unlock Moodle Codes 2,3,4,5.",
                     "If you have enough Score to unlock a new Code but insufficient Achievement Points, then previously a Modal Popup occured after every single solved Stoxel. This now only happens after Game Setup and before Level Selection, so once per play session.",
+                    "Adjusting the sound effect volume now plays a random sound effect so the adjustment is instantly noticeable",
                 ],
 
             },

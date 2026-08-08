@@ -1,0 +1,97 @@
+/* ============================================================
+   TEMP: dev mode-select screen + adventure sandbox stub styles.
+   Remove this whole file once Adventure Mode replaces the map.
+   ============================================================ */
+
+.dms-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 20px;
+    font-family: var(--PX, monospace);
+    color: #f5e9c8;
+    text-align: center;
+    padding: 20px;
+}
+
+.dms-title {
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+
+.dms-sub {
+    opacity: 0.7;
+    font-size: 12px;
+    max-width: 480px;
+}
+
+.dms-options {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.dms-card {
+    width: 260px;
+    background: rgba(10, 10, 20, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 18px;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    transition: border-color .15s, transform .15s;
+}
+
+    .dms-card:hover {
+        border-color: #c8a84b;
+        transform: translateY(-2px);
+    }
+
+.dms-card-title {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.dms-card-desc {
+    font-size: 11px;
+    opacity: 0.75;
+    line-height: 1.5;
+}
+
+/* Adventure sandbox */
+
+.adv-topbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.adv-title {
+    font-family: var(--PX, monospace);
+    color: #f5e9c8;
+    letter-spacing: 1px;
+    font-size: 12px;
+}
+
+.adv-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 60px);
+    background: #1a1200;
+    overflow: hidden;
+}
+
+.adv-player-sprite {
+    position: absolute;
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+    pointer-events: none;
+}

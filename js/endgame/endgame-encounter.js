@@ -355,6 +355,27 @@ function _egUpdatePlayerChargeBar() {
 }
 
 
+function _egGetMaxAllowedMistakes() {
+    const def = _egMapDef || cur;
+    if (!def || def.egMaxMistakes == null) return null;
+    const gearBonus = (typeof _egComputePlayerStats === 'function')
+        ? (_egComputePlayerStats().mistakeCount || 0) : 0;
+    return def.egMaxMistakes + gearBonus;
+}
+
+function _egCheckMistakeLimit() {
+    const max = _egGetMaxAllowedMistakes();
+    if (max == null) return;
+    if (typeof mistakeCount !== 'undefined' && mistakeCount > max) {
+        _egStopEncounter();
+        dead = true;
+        stopTimer();
+        document.getElementById('lose-title').textContent = 'Map Failed';
+        document.getElementById('lose-sub').textContent = 'Too many mistakes!';
+        document.getElementById('ov-lose').classList.add('show');
+    }
+}
+
 
 // Runs at 10Hz. Advances every monster's charge bar and fires their attack
 // when the bar fills. Also calls _egBossTick for per-tick boss logic.
@@ -362,6 +383,8 @@ function _egTickLoop() {
     if (!_egIsActive()) return;
     if (typeof dead !== 'undefined' && dead) return;
     if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+
+    _egCheckMistakeLimit(); 
 
     _egBossTick();
     _egMonsters.forEach(_egTickMonster);

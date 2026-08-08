@@ -12,8 +12,8 @@
 // Life Regen, + Life from Hearts
 
 const EG_PLAYER_STATS = {
-    baseHP: 1000, // Starting HP for all monster levels
-    baseDamage: 100, // Damage dealt per correct cell fill
+    baseHP: 100, // Starting HP for all monster levels
+    baseDamage: 10, // Damage dealt per correct cell fill
     chargePushback: 1.5, // Seconds removed from a monster's charge bar on hit
 };
 
@@ -195,6 +195,12 @@ function _egComputePlayerStats() {
             s.armourFlat += item.defenses.armour || 0;
             s.evasionFlat += item.defenses.evasion || 0;
             s.absorptionFlat += item.defenses.absorption || 0;
+        }
+
+        // NEW — weapon's own base damage range feeds into the same physical damage buckets as gear mods
+        if (item.damage) {
+            s.physFlatMin += item.damage.min || 0;
+            s.physFlatMax += item.damage.max || 0;
         }
         (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
             (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {

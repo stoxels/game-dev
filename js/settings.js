@@ -153,6 +153,8 @@ function initToggleControl(btnId, settingsKey, applyOnChange = true) {
 
 // Wires up a single volume slider: converts its 0–100 integer value
 // to a 0–1 float, updates the live label, then saves and applies.
+let _sfxPreviewTimeout = null;
+
 function initSliderControl(sliderId, valueId, settingsKey) {
     document.getElementById(sliderId)?.addEventListener('input', e => {
         SETTINGS[settingsKey] = parseInt(e.target.value) / 100;
@@ -160,6 +162,14 @@ function initSliderControl(sliderId, valueId, settingsKey) {
         if (label) label.textContent = e.target.value + '%';
         saveSettings(SETTINGS);
         applySettings();
+
+        // Preview the new volume with a random SFX (debounced while dragging)
+        if (settingsKey === 'sfxVolume') {
+            clearTimeout(_sfxPreviewTimeout);
+            _sfxPreviewTimeout = setTimeout(() => {
+                Audio_Manager.playRandomSFX();
+            }, 150);
+        }
     });
 }
 

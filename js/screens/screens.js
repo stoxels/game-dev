@@ -121,9 +121,20 @@ function showSetup() {
     switchScreen('screen-setup');
 }
 
-// Confirms setup and navigates to the level select screen.
+// Confirms setup and navigates to the temporary dev mode-select screen.
+// TEMP: once Adventure Mode replaces the world map, this should go straight
+// back to calling launchExistingGame()'s body (or launchAdventureMode()'s),
+// and screen-mode-select / this function's redirect can be deleted.
 function confirmSetup() {
     screenHistory.push('screen-setup');
+    switchScreen('screen-mode-select');
+}
+
+// Launches the existing world-map implementation.
+// This is the exact logic that used to run at the end of confirmSetup() —
+// unchanged, just moved behind the dev mode-select screen.
+function launchExistingGame() {
+    screenHistory.push('screen-mode-select');
     STATE.mapViewEnabled = true;
     if (typeof save === 'function') save();
 
@@ -137,6 +148,14 @@ function confirmSetup() {
     }
 }
 
+// Launches the new Adventure Mode sandbox (see js/adventure-mode.js).
+function launchAdventureMode() {
+    screenHistory.push('screen-mode-select');
+    if (typeof showAdventureMode === 'function') {
+        showAdventureMode();
+    }
+}
+
 // Closes any overlays and active quiz, then navigates to the level select screen.
 // Respects convergence modal and pending class events before transitioning.
 function goToLevelSelect() {
@@ -144,8 +163,16 @@ function goToLevelSelect() {
     closeQuiz();
 
     const _goToCorrectLevelView = () => {
+        // NEW: route back to the endgame test hub if this run was launched from there
+        if (window._egIsTestRun) {
+            window._egIsTestRun = false;
+            if (typeof showEndgameTestHub === 'function') {
+                showEndgameTestHub();
+                return;
+            }
+        }
+
         if (STATE && STATE.mapViewEnabled) {
-            // If a world detail screen was active, go back to that world directly
             if (typeof _wdCurrentWi !== 'undefined' && _wdCurrentWi !== null
                 && typeof showWorldDetail === 'function') {
                 showWorldDetail(_wdCurrentWi);
@@ -242,4 +269,11 @@ function showModal(id) {
 // Hides a modal overlay by its element ID
 function hideModal(id) {
     document.getElementById(id).classList.remove('show');
+}
+
+
+
+function launchEndgameTestMode() {
+    screenHistory.push('screen-mode-select');
+    if (typeof showEndgameTestHub === 'function') showEndgameTestHub();
 }

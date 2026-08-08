@@ -49,6 +49,7 @@
     <link rel="stylesheet" href="css/class_spell_upgrade.css">
     <link rel="stylesheet" href="css/class_ascendency_selection.css">
     <link rel="stylesheet" href="css/reset-game.css">
+    <link rel="stylesheet" href="css/dev-mode-select.css">
 </head>
 <body>
 
@@ -115,12 +116,12 @@
             </button>
 
             <!--
-    <button class="title-overlay-btn btn-danger" id="btn-reset"
-            style="--bx: 50%; --by: 55%;"
-            data-t="btn_reset">
-        🗑 RESET
-    </button>
-    -->
+            <button class="title-overlay-btn btn-danger" id="btn-reset"
+                    style="--bx: 50%; --by: 55%;"
+                    data-t="btn_reset">
+                🗑 RESET
+            </button>
+            -->
 
             <button class="title-overlay-btn block-general" id="btn-replay"
                     style="--bx: 30%; --by: 65%;">
@@ -278,6 +279,43 @@
             </div>
         </div>
     </div>
+
+
+
+    <!-- TEMP: DEV MODE SELECT SCREEN — remove once Adventure Mode replaces the world map -->
+    <div id="screen-mode-select" class="screen">
+        <div class="dms-wrap">
+            <div class="dms-title">SELECT MODE</div>
+            <div class="dms-sub"></div>
+
+            <div class="dms-options">
+                <button class="dms-card" id="btn-mode-existing">
+                    <div class="dms-card-title">🗺️ Regular Game</div>
+                    <div class="dms-card-desc">Launches the regular world-map implementation.</div>
+                </button>
+
+                <button class="dms-card" id="btn-mode-adventure">
+                    <div class="dms-card-title">⚔️ Adventure Mode (Dev)</div>
+                    <div class="dms-card-desc">In development</div>
+                </button>
+
+                <button class="dms-card" id="btn-mode-endgame-test">
+                    <div class="dms-card-title">🧪 Endgame Test</div>
+                    <div class="dms-card-desc">Endgame Map System Test.</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADVENTURE MODE SANDBOX (stub) -->
+    <div id="screen-adventure" class="screen">
+        <div class="adv-topbar">
+            <button class="back-btn" id="btn-adventure-back">◀ BACK</button>
+            <span class="adv-title">ADVENTURE MODE — SANDBOX</span>
+        </div>
+        <div id="adv-canvas-wrap" class="adv-canvas-wrap"></div>
+    </div>
+
 
 
     <!-- RESET MODAL -->
@@ -1012,7 +1050,7 @@
     <script src="js/storyline/storyline-intro-trix.js"></script>
     <script src="js/storyline/storyline-intro-syla.js"></script>
     <script src="js/storyline/storyline-beats.js"></script>
-
+    <script src="js/endgame-testing-screen.js"></script>
 
     <script src="main.js"></script>
 </body>
