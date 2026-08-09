@@ -6,8 +6,8 @@
 
 // Monster level scaling 
 // Applied per level above 1. 
-const EG_LEVEL_HP_SCALE = 0.02; // +2% HP per level above 1
-const EG_LEVEL_DAMAGE_SCALE = 0.01; // +1% damage per level above 1
+const EG_LEVEL_HP_SCALE = 0.12; // +12% HP per level above 1
+const EG_LEVEL_DAMAGE_SCALE = 0.06; // +6% damage per level above 1
 
 // Hard cap on how many monsters (including bosses) can be alive simultaneously.
 // New spawns are silently dropped until a slot opens.

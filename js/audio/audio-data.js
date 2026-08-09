@@ -439,5 +439,6 @@ const SFX = {
     heart_destroyed: 'audio/sfx_heart_destroyed.mp3',
     player_equip_pickup: 'audio/sfx_player_equip_pickup.mp3',
     player_equip_not_pickup: 'audio/sfx_player_equip_not_pickup.mp3',
+    player_defeated: 'audio/sfx_player_defeated.mp3',
 
 };

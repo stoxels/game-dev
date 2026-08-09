@@ -372,6 +372,8 @@ function _egCheckMistakeLimit() {
         stopTimer();
         document.getElementById('lose-title').textContent = 'Map Failed';
         document.getElementById('lose-sub').textContent = 'Too many mistakes!';
+        Audio_Manager.playSFX('player_defeated');
+
         document.getElementById('ov-lose').classList.add('show');
     }
 }
@@ -888,6 +890,7 @@ function _egGameOver() {
     stopTimer();
     document.getElementById('lose-title').textContent = 'Game Over';
     document.getElementById('lose-sub').textContent = 'The monsters overwhelmed you!';
+    Audio_Manager.playSFX('player_defeated');
     document.getElementById('ov-lose').classList.add('show');
 }
 

@@ -6,8 +6,8 @@
 
 // Boss level scaling 
 // Applied per level above 1. 
-const EG_BOSS_LEVEL_HP_SCALE = 0.05; // +5% HP per level above 1
-const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.03; // +3% damage per level above 1
+const EG_BOSS_LEVEL_HP_SCALE = 0.15; // +15% HP per level above 1
+const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.8; // +8% damage per level above 1
 
 
 
