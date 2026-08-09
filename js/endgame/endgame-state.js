@@ -59,6 +59,8 @@ let _egPlayerAbsorptionRegenInterval = null;
 // --- NEW STATE VARIABLE ---
 let _egPlayerCurrentCharge = 0;
 
+// Active currency drops on the grid: key "row-col" → currency def object
+let _egCurrencyDrops = new Map();
 
 
 

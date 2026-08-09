@@ -254,6 +254,10 @@ function markCellWrongAndPenalize(row, col) {
     if (isEndgameLevel() && typeof _egDiscardLootDrop === 'function') {
         _egDiscardLootDrop(row, col);
     }
+
+    if (isEndgameLevel() && typeof _egDiscardCurrencyDrop === 'function') {
+        _egDiscardCurrencyDrop(row, col);
+    }
 }
 
 // Reset consecutive-fill streaks and notify passive systems.
@@ -578,6 +582,7 @@ function handleCorrectFill(row, col) {
     if (isEndgameLevel()) {
         if (typeof _egCheckPickupClaim === 'function') _egCheckPickupClaim(row, col);
         if (typeof _egCheckLootClaim === 'function') _egCheckLootClaim(row, col);
+        if (typeof _egCheckCurrencyDropClaim === 'function') _egCheckCurrencyDropClaim(row, col);
         if (typeof _egOnCorrectCell === 'function') _egOnCorrectCell(row, col);
     }
 
@@ -632,6 +637,10 @@ function applyCell(row, col) {
             if (isEndgameLevel() && typeof _egDiscardLootDrop === 'function') {
                 _egDiscardLootDrop(row, col);
             }
+
+            if (isEndgameLevel() && typeof _egDiscardCurrencyDrop === 'function') {
+                _egDiscardCurrencyDrop(row, col);
+            }
             return;
         }
 
@@ -651,6 +660,7 @@ function applyCell(row, col) {
         && pval === 2 && cur.grid[row][col] === 1) {
         _egDiscardPickup(row, col);
         _egDiscardLootDrop(row, col);
+        if (typeof _egDiscardCurrencyDrop === 'function') _egDiscardCurrencyDrop(row, col);
     }
 
     // Write the new value into the player grid
@@ -671,6 +681,12 @@ function applyCell(row, col) {
     if (isEndgameLevel() && typeof _egCheckLootClaim === 'function'
         && pval === 2 && cur.grid[row][col] === 0) {
         _egCheckLootClaim(row, col);
+    }
+
+    // Endgame: correct right-click mark on an empty-solution cell claims a currency drop
+    if (isEndgameLevel() && typeof _egCheckCurrencyDropClaim === 'function'
+        && pval === 2 && cur.grid[row][col] === 0) {
+        _egCheckCurrencyDropClaim(row, col);
     }
 
     // Refresh display and check for puzzle completion

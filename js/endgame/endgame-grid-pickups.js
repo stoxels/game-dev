@@ -272,6 +272,7 @@ function _egStopPickupSpawner() {
     _egPickups.clear();
 
     if (typeof _egStopLootDrops === 'function') _egStopLootDrops();
+    if (typeof _egStopCurrencyDrops === 'function') _egStopCurrencyDrops();
 }
 
 
@@ -518,4 +519,148 @@ function _egReplaceCarriedLootDrops(items) {
     });
 
     if (items.length > 0) showToast(`📦 Unclaimed loot carried to next puzzle!`);
+}
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------
+//-------------------MONSTER CURRENCY DROPS--------------------------------
+//------------------------------------------------------------------------
+// Same idea as loot drops (above), but for currency orbs. Orbs land on
+// the grid and must be claimed by filling the correct cell — they no
+// longer go straight into the currency strip on kill.
+
+function _egRenderCurrencyDropOverlay(row, col, def) {
+    const el = document.getElementById(`g-${row}-${col}`);
+    if (!el) return;
+    const span = document.createElement('span');
+    span.className = `eg-pickup-overlay eg-pickup-rarity-rare eg-currency-drop-overlay`;
+    span.id = `eg-currency-drop-${row}-${col}`;
+    span.textContent = def.icon || '💰';
+    el.appendChild(span);
+}
+
+function _egRemoveCurrencyDropOverlay(key) {
+    const [r, c] = key.split('-').map(Number);
+    const span = document.getElementById(`eg-currency-drop-${r}-${c}`);
+    if (span) span.remove();
+}
+
+function _egAnimateCurrencyDropClaim(row, col, def) {
+    const el = document.getElementById(`g-${row}-${col}`);
+    if (!el) return;
+    const centre = _egGetElementCentre(el);
+    const floater = document.createElement('div');
+    floater.className = 'eg-pickup-floater';
+    floater.textContent = def.icon || '💰';
+    floater.style.left = `${centre.x}px`;
+    floater.style.top = `${centre.y}px`;
+    document.body.appendChild(floater);
+    setTimeout(() => floater.remove(), 800);
+}
+
+// Called by _egTryDropCurrency() in endgame-currency.js instead of
+// adding the orb straight to the stash.
+function _egSpawnCurrencyDrop(def) {
+    if (!_egIsActive() || !def) return;
+    if (_egCurrencyDrops.size >= 1) return; // one currency drop on board at a time
+
+    const pool = _egBuildPickupEligiblePool();
+    const filtered = pool.filter(([r, c]) =>
+        !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`)
+    );
+    if (filtered.length === 0) return;
+
+    const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
+    const key = `${r}-${c}`;
+
+    _egCurrencyDrops.set(key, def);
+    _egRenderCurrencyDropOverlay(r, c, def);
+
+    const timer = setTimeout(() => {
+        if (_egCurrencyDrops.get(key) === def) {
+            _egCurrencyDrops.delete(key);
+            _egRemoveCurrencyDropOverlay(key);
+        }
+    }, EG_LOOT_DROP_LIFETIME_MS);
+    _egPickupTimers.push(timer);
+}
+
+// Called on correct-cell-fill (mirrors _egCheckLootClaim). Adds the orb
+// to the currency stash via egAddCurrency() and returns true if claimed.
+function _egCheckCurrencyDropClaim(row, col) {
+    if (!_egIsActive()) return false;
+    const key = `${row}-${col}`;
+    const def = _egCurrencyDrops.get(key);
+    if (!def) return false;
+
+    _egCurrencyDrops.delete(key);
+    _egRemoveCurrencyDropOverlay(key);
+    _egAnimateCurrencyDropClaim(row, col, def);
+
+    const added = egAddCurrency(def.id, 1, {
+        name: def.name,
+        icon: def.icon,
+        rarity: 'currency',
+        category: 'currency',
+        description: def.description,
+    });
+
+    Audio_Manager.playSFX('player_equip_pickup');
+    if (added) showToast(`${def.icon} ${def.name} acquired!`);
+    return true;
+}
+
+// Called on wrong-action-on-cell (mirrors _egDiscardLootDrop).
+function _egDiscardCurrencyDrop(row, col) {
+    if (!_egIsActive()) return;
+    const key = `${row}-${col}`;
+    if (!_egCurrencyDrops.has(key)) return;
+    const def = _egCurrencyDrops.get(key);
+    _egCurrencyDrops.delete(key);
+    _egRemoveCurrencyDropOverlay(key);
+    _egAnimatePickupDiscard(row, col, { emoji: def.icon || '💰' });
+
+    Audio_Manager.playSFX('player_equip_not_pickup');
+}
+
+// Clears all active currency drops (called by _egStopPickupSpawner).
+function _egStopCurrencyDrops() {
+    _egCurrencyDrops.forEach((def, key) => _egRemoveCurrencyDropOverlay(key));
+    _egCurrencyDrops.clear();
+}
+
+// Carries an unclaimed currency drop into the next chained puzzle
+// (mirrors _egReplaceCarriedLootDrops).
+function _egReplaceCarriedCurrencyDrops(defs) {
+    if (!defs || defs.length === 0) return;
+
+    defs.forEach(def => {
+        if (_egCurrencyDrops.size >= 1) return;
+
+        const pool = _egBuildPickupEligiblePool();
+        const filtered = pool.filter(([r, c]) =>
+            !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`)
+        );
+        if (filtered.length === 0) return;
+
+        const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
+        const key = `${r}-${c}`;
+
+        _egCurrencyDrops.set(key, def);
+        _egRenderCurrencyDropOverlay(r, c, def);
+
+        const timer = setTimeout(() => {
+            if (_egCurrencyDrops.get(key) === def) {
+                _egCurrencyDrops.delete(key);
+                _egRemoveCurrencyDropOverlay(key);
+            }
+        }, EG_LOOT_DROP_LIFETIME_MS);
+        _egPickupTimers.push(timer);
+    });
 }

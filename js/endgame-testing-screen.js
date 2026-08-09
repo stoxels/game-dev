@@ -49,7 +49,7 @@ const EG_TEST_MAPS = [
         requiredPuzzles: 3,
         requiredQuestions: 0,
         puzzlePool: { minCells: 10, maxCells: 100 },
-        egTimeLimit: 600,     // 10 min baseline, in seconds
+        egTimeLimit: 900,     // 15 min baseline, in seconds
         egMaxMistakes: 5,
     },
 

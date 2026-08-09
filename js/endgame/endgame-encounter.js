@@ -853,7 +853,8 @@ function _egHandleNormalMonsterKill(dying) {
     const totalReached = total > 0 && _egChainKillCount >= total;
     if (!totalReached) _egScheduleRespawn();
 
-    if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(false,dying.level);
+    if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(false, dying.level);
+    if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
 }
 
 // Handles all post-kill logic for a boss monster death.

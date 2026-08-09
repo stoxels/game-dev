@@ -185,6 +185,10 @@ function _egLoadNextChainPuzzle() {
 
     // Snapshot loot still on the grid before buildGrid() destroys the overlays
     const carriedLoot = Array.from(_egLootDrops.values());
+
+    const carriedCurrency = Array.from(_egCurrencyDrops.values());   
+    _egCurrencyDrops.clear();                                        
+
     // Clear the stale map entries — overlays are already gone after buildGrid()
     _egLootDrops.clear();
 
@@ -208,6 +212,10 @@ function _egLoadNextChainPuzzle() {
     // Re-place carried loot after the new grid DOM is fully built
     if (carriedLoot.length > 0) {
         setTimeout(() => _egReplaceCarriedLootDrops(carriedLoot), 400);
+    }
+
+    if (carriedCurrency.length > 0) {                                 // ← add
+        setTimeout(() => _egReplaceCarriedCurrencyDrops(carriedCurrency), 400); // ← add
     }
 }
 
