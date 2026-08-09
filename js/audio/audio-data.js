@@ -430,4 +430,9 @@ const SFX = {
 
     // --- Characters ---
     syla_nature: 'audio/sfx_syla_nature.mp3',
+
+    // --- Endgame ---
+    player_damage_taken: 'audio/sfx_player_damage_taken.mp3',
+    player_shield_damage_taken: 'audio/sfx_player_shield_damage_taken.mp3',
+
 };

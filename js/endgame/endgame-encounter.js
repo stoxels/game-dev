@@ -458,6 +458,8 @@ function _egApplyPlayerHitFeedback(damageValue) {
     hud.style.transform = 'scale(0.95)';
     hud.style.boxShadow = 'inset 0 0 15px rgba(255,0,0,0.8), 0 0 15px rgba(255,0,0,0.8)';
     setTimeout(() => { hud.style.transform = ''; hud.style.boxShadow = ''; }, EG_PLAYER_HIT_FLASH_MS);
+
+    Audio_Manager.playSFX('player_damage_taken');
 }
 
 // Launches a projectile from the monster's card to the player HUD.
@@ -778,6 +780,7 @@ function _egPlayerTakeDamage(amount) {
         const absorbed = Math.min(_egPlayerAbsorptionCurrent, mitigated);
         _egPlayerAbsorptionCurrent -= absorbed;
         mitigated -= absorbed;
+        Audio_Manager.playSFX('player_shield_damage_taken');
     }
 
     _egScheduleAbsorptionRegen();
