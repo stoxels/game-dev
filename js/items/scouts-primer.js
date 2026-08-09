@@ -30,6 +30,22 @@ const PRIMER_TUTOR_ITEM_ORDER = ['mistakeEraser', 'mistakeEraser4', 'mistakeEras
 // Cleared at the start of each new chain (streak === 0).
 let primerUsedQuestions = new Set();
 
+// Passive-tree bonus-row nodes: [skillId, chance, rowsGranted]. Each node rolls independently.
+const PRIMER_ROW_BONUS_TABLE = [
+    ['expanding_front', 0.500, 1],
+    ['widened_formation', 0.250, 2],
+    ['extended_horizon', 0.125, 3],
+    ['total_coverage', 0.050, 4]
+];
+
+// Passive-tree bonus-column nodes: [skillId, chance, colsGranted]. Each node rolls independently.
+const PRIMER_COL_BONUS_TABLE = [
+    ['vertical_insight', 0.500, 1],
+    ['rising_structure', 0.250, 2],
+    ['elevated_scope', 0.125, 3],
+    ['total_survey', 0.050, 4]
+];
+
 
 //------------------------------------------------------------------------
 //-------------------QUESTION SELECTION-----------------------------------
@@ -92,6 +108,13 @@ function getPrimerQuestion() {
 //-------------------MODAL HTML BUILDERS----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
+
+// NOTE (flagged, not removed — see refactor summary "Suspected dead code"):
+// the four helpers below (_primerBuildProgressLabel, _primerBuildStreakDots,
+// _primerBuildFooterText, _primerBuildAnswerHtml) are not called by
+// _primerBuildModalHtml or anywhere else in this file. _primerBuildModalHtml
+// rebuilds equivalent markup inline using different CSS classes (qr-* instead
+// of mg-*/quiz-*), so these look like leftovers from an earlier modal design.
 
 // Returns the progress label string shown above the streak dots.
 // e.g. "Question 2 of 5 — On correct answer: +1 row & +1 column pre-solved"
@@ -458,26 +481,27 @@ function skipPrimer() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Rolls independent bonuses from a [skillId, chance, amount] table and sums
+// the amounts for every node that is owned and rolls successfully. Shared by
+// the row-bonus and column-bonus calculators below (they only differ by table).
+function _primerCalcBonusFromTable(table) {
+    let bonus = 0;
+    for (const [skillId, chance, amount] of table) {
+        if (PT.hasSkill(skillId) && Math.random() < chance) bonus += amount;
+    }
+    return bonus;
+}
+
 // Rolls extra bonus rows from passive tree nodes. Each node is independent.
 // Returns the total number of additional rows to reveal.
 function _primerCalcBonusRows() {
-    let bonus = 0;
-    if (PT.hasSkill('expanding_front') && Math.random() < 0.500) bonus += 1;
-    if (PT.hasSkill('widened_formation') && Math.random() < 0.250) bonus += 2;
-    if (PT.hasSkill('extended_horizon') && Math.random() < 0.125) bonus += 3;
-    if (PT.hasSkill('total_coverage') && Math.random() < 0.050) bonus += 4;
-    return bonus;
+    return _primerCalcBonusFromTable(PRIMER_ROW_BONUS_TABLE);
 }
 
 // Rolls extra bonus columns from passive tree nodes. Each node is independent.
 // Returns the total number of additional columns to reveal.
 function _primerCalcBonusCols() {
-    let bonus = 0;
-    if (PT.hasSkill('vertical_insight') && Math.random() < 0.500) bonus += 1;
-    if (PT.hasSkill('rising_structure') && Math.random() < 0.250) bonus += 2;
-    if (PT.hasSkill('elevated_scope') && Math.random() < 0.125) bonus += 3;
-    if (PT.hasSkill('total_survey') && Math.random() < 0.050) bonus += 4;
-    return bonus;
+    return _primerCalcBonusFromTable(PRIMER_COL_BONUS_TABLE);
 }
 
 // Calculates the final row and column counts to reveal for a given streak,
@@ -504,27 +528,25 @@ function _primerCalcRevealCounts(streakCount, gridRows, gridCols) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Writes the headstart reveal into the live game state for every cell in the
-// given row, then re-renders those cells and updates their clue highlights.
-// Cells that are filled (=1) in the solution are marked as correctly revealed;
-// empty cells that are still blank are marked as correctly crossed out (=2).
-function _primerApplyRevealRow(r, sol, cols) {
-    for (let c = 0; c < cols; c++) {
-        if (sol[r][c] === 1) { revealedGrid[r][c] = true; userGrid[r][c] = 1; }
-        else if (userGrid[r][c] === 0) { userGrid[r][c] = 2; }
-        renderCell(r, c);
-        updClues(r, c);
-    }
+// Writes the headstart reveal into the live game state for a single cell and
+// re-renders it. Filled cells (=1) in the solution are marked as correctly
+// revealed; empty cells that are still blank are marked as crossed out (=2).
+// Shared by the row-wise and column-wise reveal helpers below.
+function _primerRevealCell(r, c, sol) {
+    if (sol[r][c] === 1) { revealedGrid[r][c] = true; userGrid[r][c] = 1; }
+    else if (userGrid[r][c] === 0) { userGrid[r][c] = 2; }
+    renderCell(r, c);
+    updClues(r, c);
 }
 
-// Same as _primerApplyRevealRow but operates on a column instead of a row.
+// Applies the headstart reveal to every cell in the given row.
+function _primerApplyRevealRow(r, sol, cols) {
+    for (let c = 0; c < cols; c++) _primerRevealCell(r, c, sol);
+}
+
+// Applies the headstart reveal to every cell in the given column.
 function _primerApplyRevealCol(c, sol, rows) {
-    for (let r = 0; r < rows; r++) {
-        if (sol[r][c] === 1) { revealedGrid[r][c] = true; userGrid[r][c] = 1; }
-        else if (userGrid[r][c] === 0) { userGrid[r][c] = 2; }
-        renderCell(r, c);
-        updClues(r, c);
-    }
+    for (let r = 0; r < rows; r++) _primerRevealCell(r, c, sol);
 }
 
 // Applies game-state changes for all rows and columns in the headstart reveal,
@@ -575,34 +597,37 @@ function _primerSpawnCellFlare(r, c, colour, extraClass) {
     setTimeout(() => flare.remove(), 900);
 }
 
-// Schedules staggered flare animations across all cells of a single row.
-// Each cell fires 18ms after the previous one for a left-to-right sweep feel.
-// Plays a tick sound every other row.
-function _primerScheduleRowFlares(r, cols, colour, baseDelay, cellDelay, rowIndex) {
-    for (let c = 0; c < cols; c++) {
-        setTimeout(() => _primerSpawnCellFlare(r, c, colour, 'scout-flare-row'), baseDelay + c * 18);
+// Plays a tick sound at the given delay, but only for every other sweep
+// (sweepIndex 0, 2, 4, ...). Shared by the row and column flare schedulers.
+function _primerScheduleTickSound(sweepIndex, delay) {
+    if (sweepIndex % 2 !== 0) return;
+    setTimeout(() => {
+        if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('tick');
+    }, delay);
+}
+
+// Schedules staggered flare animations across one row or column, sweeping
+// cell-by-cell 18ms apart. axis: 'row' sweeps across columns at fixed row
+// `index`; 'col' sweeps down rows at fixed column `index`. Returns the delay
+// at which the next row/column sweep should begin.
+function _primerScheduleAxisFlares(axis, index, sweepLength, colour, extraClass, baseDelay, cellDelay, sweepIndex) {
+    for (let i = 0; i < sweepLength; i++) {
+        const r = axis === 'row' ? index : i;
+        const c = axis === 'row' ? i : index;
+        setTimeout(() => _primerSpawnCellFlare(r, c, colour, extraClass), baseDelay + i * 18);
     }
-    if (rowIndex % 2 === 0) {
-        setTimeout(() => {
-            if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('tick');
-        }, baseDelay);
-    }
+    _primerScheduleTickSound(sweepIndex, baseDelay);
     return baseDelay + cellDelay;
 }
 
-// Schedules staggered flare animations down all cells of a single column.
-// Each cell fires 18ms after the previous one for a top-to-bottom sweep feel.
-// Plays a tick sound every other column.
+// Schedules a left-to-right flare sweep across all cells of a single row.
+function _primerScheduleRowFlares(r, cols, colour, baseDelay, cellDelay, rowIndex) {
+    return _primerScheduleAxisFlares('row', r, cols, colour, 'scout-flare-row', baseDelay, cellDelay, rowIndex);
+}
+
+// Schedules a top-to-bottom flare sweep down all cells of a single column.
 function _primerScheduleColFlares(c, rows, colour, baseDelay, cellDelay, colIndex) {
-    for (let r = 0; r < rows; r++) {
-        setTimeout(() => _primerSpawnCellFlare(r, c, colour, 'scout-flare-col'), baseDelay + r * 18);
-    }
-    if (colIndex % 2 === 0) {
-        setTimeout(() => {
-            if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('tick');
-        }, baseDelay);
-    }
-    return baseDelay + cellDelay;
+    return _primerScheduleAxisFlares('col', c, rows, colour, 'scout-flare-col', baseDelay, cellDelay, colIndex);
 }
 
 // Schedules the full sweep animation across all revealed rows and columns.
@@ -696,6 +721,20 @@ function _primerSpawnPerfectFlare(r, c) {
     _primerSpawnCellFlare(r, c, '#ffd700', 'scout-flare-perfect');
 }
 
+// Schedules one gold flare sweep along a row or column (mirrors
+// _primerScheduleAxisFlares, but with the perfect-reveal's fixed 20ms
+// spacing and constant 80ms gap between sweeps). Returns the delay at which
+// the next sweep should begin.
+function _primerSchedulePerfectAxisFlares(axis, index, sweepLength, baseDelay, sweepIndex) {
+    for (let i = 0; i < sweepLength; i++) {
+        const r = axis === 'row' ? index : i;
+        const c = axis === 'row' ? i : index;
+        setTimeout(() => _primerSpawnPerfectFlare(r, c), baseDelay + i * 20);
+    }
+    _primerScheduleTickSound(sweepIndex, baseDelay);
+    return baseDelay + 80;
+}
+
 // Schedules staggered gold flare sweeps across all revealed rows and columns,
 // identical to the partial sweep but using the perfect gold colour and flare class.
 // Returns the accumulated total delay.
@@ -703,27 +742,11 @@ function _primerSchedulePerfectFlares(rowIdxs, colIdxs, rows, cols) {
     let delay = 60; // small head-start so board glow is visible before flares
 
     rowIdxs.forEach((r, ri) => {
-        for (let c = 0; c < cols; c++) {
-            setTimeout(() => _primerSpawnPerfectFlare(r, c), delay + c * 20);
-        }
-        if (ri % 2 === 0) {
-            setTimeout(() => {
-                if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('tick');
-            }, delay);
-        }
-        delay += 80;
+        delay = _primerSchedulePerfectAxisFlares('row', r, cols, delay, ri);
     });
 
     colIdxs.forEach((c, ci) => {
-        for (let r = 0; r < rows; r++) {
-            setTimeout(() => _primerSpawnPerfectFlare(r, c), delay + r * 20);
-        }
-        if (ci % 2 === 0) {
-            setTimeout(() => {
-                if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('tick');
-            }, delay);
-        }
-        delay += 80;
+        delay = _primerSchedulePerfectAxisFlares('col', c, rows, delay, ci);
     });
 
     return delay;

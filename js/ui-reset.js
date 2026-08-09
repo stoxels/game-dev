@@ -1,9 +1,9 @@
 ﻿//------------------------------------------------------------------------
-//----------------------------RESET---------------------------------------
+//-------------------SAVE WIPE HELPER--------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Removes the persisted save from localStorage � targets ONLY the
+// Removes the persisted save from localStorage — targets ONLY the
 // currently active save slot. Achievements (ACH_SAVE_KEY, achievements.js)
 // and all other save slots are untouched.
 function wipeSaveData() {
@@ -11,20 +11,10 @@ function wipeSaveData() {
     if (typeof wipeSlot === 'function') wipeSlot(slot);
 }
 
-// Triggered when the player confirms the #reset-modal. Dispatches to one of
-// two flows depending on how the modal was opened:
-//  - From the save-slot grid's per-card delete button → wipe ONLY that slot
-//    and stay on the save-slot screen (see showDeleteSlotConfirm(), in
-//    screens-save-slots.js, which sets window._pendingResetSlot).
-//  - From the title screen's Reset button → full reset of the active slot,
-//    same behaviour as before.
-function confirmReset() {
-    if (window._pendingResetSlot) {
-        confirmSlotDelete(window._pendingResetSlot);
-        return;
-    }
-    confirmFullReset();
-}
+//------------------------------------------------------------------------
+//-------------------RESET FLOWS--------------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Wipes a single, specific save slot (not necessarily the active one) and
 // returns to the save-slot select screen so the grid reflects the deletion.
@@ -48,4 +38,24 @@ function confirmFullReset() {
     save(); // writes the blank state back into the active slot
     showTitle();
     showToast(t('toast_reset'));
+}
+
+//------------------------------------------------------------------------
+//-------------------MAIN ENTRY POINT---------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Triggered when the player confirms the #reset-modal. Dispatches to one of
+// two flows depending on how the modal was opened:
+//  - From the save-slot grid's per-card delete button → wipe ONLY that slot
+//    and stay on the save-slot screen (see showDeleteSlotConfirm(), in
+//    screens-save-slots.js, which sets window._pendingResetSlot).
+//  - From the title screen's Reset button → full reset of the active slot,
+//    same behaviour as before.
+function confirmReset() {
+    if (window._pendingResetSlot) {
+        confirmSlotDelete(window._pendingResetSlot);
+        return;
+    }
+    confirmFullReset();
 }

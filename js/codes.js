@@ -3,51 +3,18 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
 // Ensures the "locked codes" reminder only shows once per game session,
 // instead of after every level completion.
 let _lockedCodesModalShownThisSession = false;
 
-// Same eligibility check as collectCodeUnlockResults(), but read-only —
-// does not mutate STATE.unlockedCodes. Used for the setup-screen reminder only.
-function collectLockedCodesOnly() {
-    const lockedCodes = [];
-    const totalTiers = ACHIEVEMENT_DEFS.reduce((sum, def) => sum + def.tiers.length, 0);
-    const unlockedTiers = ACH_STATE.unlocked.length;
-    const achPctDone = calcAchievementProgress();
-
-    WORLD_CODES.forEach(wc => {
-        if (STATE.unlockedCodes.includes(wc.code)) return;
-        const result = evaluateCodeEligibility(wc, achPctDone);
-        if (result === 'locked_achievements') {
-            lockedCodes.push({
-                wc,
-                needed: Math.ceil(wc.achPct * totalTiers),
-                have: unlockedTiers,
-            });
-        }
-    });
-
-    return lockedCodes;
-}
-
-// Call this once, when the player confirms Game Setup (before entering
-// level select). Shows the locked-codes reminder at most once per session.
-function checkLockedCodesOnSetup() {
-    if (_lockedCodesModalShownThisSession) return;
-
-    const lockedCodes = collectLockedCodesOnly();
-    if (lockedCodes.length) {
-        _lockedCodesModalShownThisSession = true;
-        showLockedCodesModal(lockedCodes);
-    }
-}
-
-
-
 // Each entry defines a Moodle code the player can unlock by reaching
 // a score threshold AND a minimum percentage of all achievement tiers.
 // achPct: 0 means only the score requirement matters for that code.
-
 const WORLD_CODES = [
     { threshold: 10000, achPct: 0, code: 'TY_4_Playing_Stoxels', titleEn: 'Code 1', titleDE: 'Code 1' },
     { threshold: 25000, achPct: 0.15, code: 'IsThereADog?', titleEn: 'Code 2', titleDE: 'Code 2' },
@@ -58,9 +25,17 @@ const WORLD_CODES = [
 
 
 //------------------------------------------------------------------------
-//---------------------------UNLOCK LOGIC---------------------------------
+//-------------------ACHIEVEMENT / ELIGIBILITY HELPERS---------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
+
+// Shared tier-count lookup used by every function that needs to compare
+// "achievement tiers unlocked" against "total achievement tiers".
+function _getAchievementTierCounts() {
+    const total = ACHIEVEMENT_DEFS.reduce((sum, def) => sum + def.tiers.length, 0);
+    const have = ACH_STATE.unlocked.length;
+    return { total, have };
+}
 
 // Returns the localised title for a code entry based on the active language
 function getCodeTitle(worldCode) {
@@ -70,9 +45,8 @@ function getCodeTitle(worldCode) {
 // Calculates what fraction of all achievement tiers the player has unlocked.
 // Returns a value between 0 and 1 (e.g. 0.5 = 50 % complete).
 function calcAchievementProgress() {
-    const totalTiers = ACHIEVEMENT_DEFS.reduce((sum, def) => sum + def.tiers.length, 0);
-    const unlockedTiers = ACH_STATE.unlocked.length;
-    return totalTiers > 0 ? unlockedTiers / totalTiers : 0;
+    const { total, have } = _getAchievementTierCounts();
+    return total > 0 ? have / total : 0;
 }
 
 // Evaluates a single WORLD_CODES entry against the player's current
@@ -87,6 +61,22 @@ function evaluateCodeEligibility(worldCode, achPctDone) {
     return 'not_reached';
 }
 
+
+//------------------------------------------------------------------------
+//---------------------------UNLOCK LOGIC---------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Builds the { wc, needed, have } shape used by both the locked-codes
+// collectors and the "locked" modal renderer.
+function _buildLockedCodeEntry(wc, tierCounts) {
+    return {
+        wc,
+        needed: Math.ceil(wc.achPct * tierCounts.total),
+        have: tierCounts.have,
+    };
+}
+
 // Checks every WORLD_CODES entry and sorts them into:
 //   newCodes    — ready to unlock right now
 //   lockedCodes — score met, but not enough achievements yet
@@ -95,8 +85,7 @@ function collectCodeUnlockResults() {
     const newCodes = [];
     const lockedCodes = [];
 
-    const totalTiers = ACHIEVEMENT_DEFS.reduce((sum, def) => sum + def.tiers.length, 0);
-    const unlockedTiers = ACH_STATE.unlocked.length;
+    const tierCounts = _getAchievementTierCounts();
     const achPctDone = calcAchievementProgress();
 
     WORLD_CODES.forEach(wc => {
@@ -109,23 +98,29 @@ function collectCodeUnlockResults() {
             STATE.unlockedCodes.push(wc.code);
             newCodes.push(wc);
         } else if (result === 'locked_achievements') {
-            lockedCodes.push({
-                wc,
-                needed: Math.ceil(wc.achPct * totalTiers),
-                have: unlockedTiers,
-            });
+            lockedCodes.push(_buildLockedCodeEntry(wc, tierCounts));
         }
     });
 
     return { newCodes, lockedCodes };
 }
 
-// Main entry point — call this after a level is beaten or a quiz is finished.
-// Checks for newly unlocked codes, persists state, and triggers UI feedback.
-function checkWorldCodes() {
-    const { newCodes } = collectCodeUnlockResults();
-    save();
-    if (newCodes.length) showUnlockedCodesModal(newCodes);
+// Same eligibility check as collectCodeUnlockResults(), but read-only —
+// does not mutate STATE.unlockedCodes. Used for the setup-screen reminder only.
+function collectLockedCodesOnly() {
+    const lockedCodes = [];
+    const tierCounts = _getAchievementTierCounts();
+    const achPctDone = calcAchievementProgress();
+
+    WORLD_CODES.forEach(wc => {
+        if (STATE.unlockedCodes.includes(wc.code)) return;
+        const result = evaluateCodeEligibility(wc, achPctDone);
+        if (result === 'locked_achievements') {
+            lockedCodes.push(_buildLockedCodeEntry(wc, tierCounts));
+        }
+    });
+
+    return lockedCodes;
 }
 
 
@@ -231,7 +226,6 @@ function showLockedCodesModal(lockedCodes) {
 // text + progress bars to land on the correct slots in the image.
 //------------------------------------------------------------------------
 
-
 /**
  * Builds one requirement line + progress bar block.
  *
@@ -260,7 +254,6 @@ function _mcBuildReqBlock(label, current, required, met, barClass) {
             <div class="mc-bar-fill ${barClass}${metCls}" style="width:${pct}%"></div>
         </div>`;
 }
-
 
 /**
  * Builds the overlay content for one parchment row.
@@ -304,7 +297,6 @@ function _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers) {
     </div>`;
 }
 
-
 /**
  * Builds and injects the redesigned codes screen into #screen-codes.
  * The screen element itself carries the background image via CSS.
@@ -316,18 +308,15 @@ function buildCodesScreen() {
 
     const total = STATE.totalScore;
     const achPct = calcAchievementProgress();
-    const totalAchTiers = ACHIEVEMENT_DEFS.reduce((s, d) => s + d.tiers.length, 0);
-    const unlockedAchTiers = ACH_STATE.unlocked.length;
+    const { total: totalAchTiers, have: unlockedAchTiers } = _getAchievementTierCounts();
 
     const menuText = (typeof t === 'function' ? t('btn_menu') : null) || 'MENU';
-    const totalLbl = (typeof t === 'function' ? t('hs_total') : null) || 'TOTAL SCORE';
     const footerMsg = (typeof t === 'function' ? t('codes_footer') : null)
         || 'Earn points to unlock these powerful achievement codes!';
 
     const rowsHTML = WORLD_CODES.map(wc =>
         _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers)
     ).join('');
-
 
     screenEl.innerHTML = `
         <div class="mc-canvas">
@@ -350,6 +339,31 @@ function buildCodesScreen() {
     if (backBtn) backBtn.addEventListener('click', () => showTitle());
 }
 
+
+//------------------------------------------------------------------------
+//-------------------MAIN ENTRY POINTS-------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Main entry point — call this after a level is beaten or a quiz is finished.
+// Checks for newly unlocked codes, persists state, and triggers UI feedback.
+function checkWorldCodes() {
+    const { newCodes } = collectCodeUnlockResults();
+    save();
+    if (newCodes.length) showUnlockedCodesModal(newCodes);
+}
+
+// Call this once, when the player confirms Game Setup (before entering
+// level select). Shows the locked-codes reminder at most once per session.
+function checkLockedCodesOnSetup() {
+    if (_lockedCodesModalShownThisSession) return;
+
+    const lockedCodes = collectLockedCodesOnly();
+    if (lockedCodes.length) {
+        _lockedCodesModalShownThisSession = true;
+        showLockedCodesModal(lockedCodes);
+    }
+}
 
 /**
  * Navigates to the codes screen.

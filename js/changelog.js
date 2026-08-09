@@ -3,6 +3,9 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Version history shown in the Changelog modal, newest first.
+// Each version has a list of category groups (e.g. "New Features",
+// "Bug Fixes"), each holding a flat list of change-note strings.
 const CHANGELOG_DATA = [
 
     {
@@ -25,6 +28,7 @@ const CHANGELOG_DATA = [
                     "Reduced the amount of achievements required to unlock Moodle Codes 2,3,4,5.",
                     "If you have enough Score to unlock a new Code but insufficient Achievement Points, then previously a Modal Popup occured after every single solved Stoxel. This now only happens after Game Setup and before Level Selection, so once per play session.",
                     "Adjusting the sound effect volume now plays a random sound effect so the adjustment is instantly noticeable",
+                    "Alot of internal code has been refactored and improved.",
                 ],
 
             },
@@ -56,7 +60,7 @@ const CHANGELOG_DATA = [
                     "Added a Replay button to the title screen to replay unlocked storyline beats and the tutorial.",
                     "Fully remade the Data Strike row/col selection panel for the Statistician class.",
                     "Fully remade the Infinite Hunger screen for the Outlier class.",
-                    
+
 
 
 
@@ -115,7 +119,7 @@ const CHANGELOG_DATA = [
 
             },
             {
-                category: "General Adjustments", 
+                category: "General Adjustments",
                 items: [
                     "Adjusted the way the Drag Stroke Counter works. It is now checking for correctly pre-filled correct cells, and if there are any then it starts counting the increased correctly filled counter instead of only the newly created new correct fills.",
                     "Clarified the description of the Unshakeable trait for Stox: Mistake penalties escalate 30% more slowly for Stox. The Trait description has been updated.",
@@ -199,7 +203,7 @@ const CHANGELOG_DATA = [
                     "Started working on Website Responsiveness such that Stoxels looks better on various screen sizes.",
                     "Adjusted unit color on Excercise Questions.",
                     "Class Selections now only register when pressing the Select button, instead of clicking anywhere on the class card.",
-                    
+
                 ],
             },
 
@@ -267,7 +271,7 @@ const CHANGELOG_DATA = [
                     "Outlier: Tail Risk now shows the costs in minutes:seconds instead of only in seconds.",
                     "Probabilist: Precision Mark Bows now only target the cells it has just marked, instead of all marked cells on the grid.",
                     "Bayesian: Bayes Traps Fuse Timer reduced from 10 seconds down to 7 seconds.",
-                    "Random Walker: Brownian Motion and Drifter are now instant abilities.", 
+                    "Random Walker: Brownian Motion and Drifter are now instant abilities.",
                     "Random Walker: Drifter cooldown has been reduced from 10 minutes to 5 minutes.",
                     "Random Walker: Drifter's parting gift is no longer able to walk.",
                     "Random Walker: Drifter's remaining Timer is now additionally also shown as Countdown underneath the icon on the grid.",
@@ -311,8 +315,8 @@ const CHANGELOG_DATA = [
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Builds the HTML string for a single change category group (e.g. "Bug Fixes")
-function buildCategoryGroupHtml(group) {
+// Renders one category group (e.g. "Bug Fixes") as a labeled <ul> block.
+function _buildCategoryGroupHtml(group) {
     const items = group.items
         .map(item => `<li>${item}</li>`)
         .join("");
@@ -324,10 +328,10 @@ function buildCategoryGroupHtml(group) {
         </div>`;
 }
 
-// Builds the HTML string for a single version block, including all its category groups
-function buildVersionBlockHtml(update) {
+// Renders one full version entry (header + all its category groups).
+function _buildVersionBlockHtml(update) {
     const categoryGroupsHtml = update.changes
-        .map(buildCategoryGroupHtml)
+        .map(_buildCategoryGroupHtml)
         .join("");
 
     return `
@@ -340,13 +344,14 @@ function buildVersionBlockHtml(update) {
         </div>`;
 }
 
-// Renders the full changelog into the DOM. Skips if already rendered.
+// Renders the full changelog into the DOM. No-ops if already rendered,
+// so it's safe to call every time the modal opens.
 function renderChangelog() {
     const container = document.getElementById("changelog-content");
     if (container.innerHTML !== "") return;
 
     container.innerHTML = CHANGELOG_DATA
-        .map(buildVersionBlockHtml)
+        .map(_buildVersionBlockHtml)
         .join("");
 }
 
@@ -356,7 +361,7 @@ function renderChangelog() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Opens the changelog modal, rendering its content first if needed
+// Opens the changelog modal, rendering its content first if needed.
 function openChangelog() {
     renderChangelog();
     document.getElementById("changelog-modal").classList.add("show");

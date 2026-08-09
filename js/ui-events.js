@@ -1,4 +1,54 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+﻿//------------------------------------------------------------------------
+//-------------------REPLAY GALLERY (GLOBAL HELPER)-----------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Kept at file scope (not nested inside the DOMContentLoaded closure below)
+// because it's a public, non-underscore function that other files may call.
+
+/**
+ * Populates #replay-content with a button per unlocked (already-seen)
+ * storyline beat, plus a Tutorial entry if the tutorial has been completed.
+ * Called from the "REPLAY" button binding inside the title-screen section.
+ */
+function renderReplayModal() {
+    const container = document.getElementById('replay-content');
+    container.innerHTML = '';
+
+    const entries = getUnlockedReplayEntries(); // storyline-engine.js
+
+    entries.forEach(entry => {
+        const btn = document.createElement('button');
+        btn.className = 'title-btn back-btn';
+        btn.style.display = 'block';
+        btn.style.margin = '8px auto';
+        btn.textContent = `▶ ${entry.label}`;
+        btn.addEventListener('click', () => {
+            hideModal('replay-modal');
+            showBeat(entry.beatId, { ...(entry.options || {}), force: true });
+        });
+        container.appendChild(btn);
+    });
+
+    if (STATE.tutorialDone) {
+        const btn = document.createElement('button');
+        btn.className = 'title-btn back-btn';
+        btn.style.display = 'block';
+        btn.style.margin = '8px auto';
+        btn.textContent = '▶ Tutorial';
+        btn.addEventListener('click', () => {
+            hideModal('replay-modal');
+            replayTutorialFromTitle();
+        });
+        container.appendChild(btn);
+    }
+
+    if (entries.length === 0 && !STATE.tutorialDone) {
+        container.innerHTML = '<p style="text-align:center;opacity:.7;">Nothing unlocked to replay yet.</p>';
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
 
     //------------------------------------------------------------------------
     //-------------------CONSTANTS & ELEMENT REFERENCES-----------------------
@@ -36,8 +86,8 @@
      * Used for optional game-system cleanup functions that may or may not
      * be loaded depending on the active level/module.
      *
-     * @param {string} fnName     - Global function name to check and call
-     * @param {...*}   args       - Arguments forwarded to the function
+     * @param {string} fnName - Global function name to check and call
+     * @param {...*}   args   - Arguments forwarded to the function
      */
     function safeCall(fnName, ...args) {
         if (typeof window[fnName] === 'function') window[fnName](...args);
@@ -81,7 +131,7 @@
         selectedBtn.classList.add('active');
     }
 
-    // Main menu navigation buttons
+    // Main menu navigation buttons.
     onClick('btn-play', () => {
         showSaveSlotSelect(() => {
             const proceed = () => maybeShowCharacterSelect(() => showTutorial());
@@ -102,7 +152,7 @@
 
     onClick('btn-settings', () => { loadSettingsUI(); showModal('settings-modal'); });
 
-    // Language switcher buttons (class-based, not id-based)
+    // Language switcher buttons (class-based, not id-based).
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => onLanguageButtonClick(btn));
     });
@@ -115,12 +165,12 @@
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    // Difficulty selection buttons — each carries a [data-diff] attribute
+    // Difficulty selection buttons — each carries a [data-diff] attribute.
     document.querySelectorAll('[data-diff]').forEach(btn => {
         btn.addEventListener('click', () => selDiff(btn));
     });
 
-    // Modifier toggle buttons — each carries a [data-mod] attribute
+    // Modifier toggle buttons — each carries a [data-mod] attribute.
     document.querySelectorAll('[data-mod]').forEach(btn => {
         btn.addEventListener('click', () => togMod(btn));
     });
@@ -147,13 +197,12 @@
     onClick('btn-adventure-back', () => goToPreviousScreen());
 
 
-
     //------------------------------------------------------------------------
     //-------------------RESET MODAL------------------------------------------
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    // Confirmation button inside the reset modal
+    // Confirmation button inside the reset modal.
     onClick('btn-confirm-reset', () => confirmReset());
 
 
@@ -185,32 +234,12 @@
     }
 
     /**
-     * Handles the "go to level select" button press from inside a level.
-     * Unpauses first so the game state is clean, then runs all system cleanup
-     * before navigating away.
+     * Shows a "leave map?" confirmation modal for endgame monster levels,
+     * warning the player that run items/objective progress will be lost.
+     * Builds the modal DOM once and reuses it on subsequent calls.
+     *
+     * @param {Function} onConfirm - Called if the player confirms leaving
      */
-    function onGoToLevelsFromGame() {
-        if (cur && cur.isMonsterLevel && typeof _egIsActive === 'function' && _egIsActive()) {
-            showEgForfeitConfirm(() => {
-                unpauseGame();
-                cleanupActiveGameSystems();
-                stopTimer();
-                if (typeof _egStopEncounter === 'function') _egStopEncounter();
-                safeCall('_hidePlayerAvatarSimple');
-                safeCall('_hidePlayerAvatar');
-                goToLevelSelect();
-            });
-            return;
-        }
-
-        unpauseGame();
-        cleanupActiveGameSystems();
-        stopTimer();
-        safeCall('_hidePlayerAvatarSimple');
-        safeCall('_hidePlayerAvatar');
-        goToLevelSelect();
-    }
-
     function showEgForfeitConfirm(onConfirm) {
         // Reuse existing modal infrastructure — build a one-off modal overlay.
         let modal = document.getElementById('eg-forfeit-modal');
@@ -248,6 +277,35 @@
         document.getElementById('eg-forfeit-cancel').onclick = () => {
             modal.classList.remove('show');
         };
+    }
+
+    /**
+     * Handles the "go to level select" button press from inside a level.
+     * If an endgame monster encounter is active, asks for confirmation first
+     * (forfeiting the run) before unpausing, cleaning up, and navigating away.
+     * Otherwise unpauses first so the game state is clean, then runs all
+     * system cleanup before navigating.
+     */
+    function onGoToLevelsFromGame() {
+        if (cur && cur.isMonsterLevel && typeof _egIsActive === 'function' && _egIsActive()) {
+            showEgForfeitConfirm(() => {
+                unpauseGame();
+                cleanupActiveGameSystems();
+                stopTimer();
+                if (typeof _egStopEncounter === 'function') _egStopEncounter();
+                safeCall('_hidePlayerAvatarSimple');
+                safeCall('_hidePlayerAvatar');
+                goToLevelSelect();
+            });
+            return;
+        }
+
+        unpauseGame();
+        cleanupActiveGameSystems();
+        stopTimer();
+        safeCall('_hidePlayerAvatarSimple');
+        safeCall('_hidePlayerAvatar');
+        goToLevelSelect();
     }
 
     onClick('btn-go-levels', onGoToLevelsFromGame);
@@ -380,44 +438,12 @@
 });
 
 
-
+//------------------------------------------------------------------------
+//-------------------TOUCHPAD MODE BUTTON (OUTSIDE DOMContentLoaded)------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Left outside the DOMContentLoaded closure exactly as in the original —
+// the script tag loads after this button already exists in the DOM, so the
+// binding works immediately. Not moved into the closure to avoid any change
+// in execution timing relative to the rest of the file's bindings.
 document.getElementById('btn-touchpad-mode')?.addEventListener('click', toggleTouchpadMarkMode);
-
-// renderReplayModal — populates #replay-content with a button per unlocked
-// (already-seen) storyline beat, plus a Tutorial entry if it's been completed.
-function renderReplayModal() {
-    const container = document.getElementById('replay-content');
-    container.innerHTML = '';
-
-    const entries = getUnlockedReplayEntries(); // storyline-engine.js
-
-    entries.forEach(entry => {
-        const btn = document.createElement('button');
-        btn.className = 'title-btn back-btn';
-        btn.style.display = 'block';
-        btn.style.margin = '8px auto';
-        btn.textContent = `▶ ${entry.label}`;
-        btn.addEventListener('click', () => {
-            hideModal('replay-modal');
-            showBeat(entry.beatId, { ...(entry.options || {}), force: true });
-        });
-        container.appendChild(btn);
-    });
-
-    if (STATE.tutorialDone) {
-        const btn = document.createElement('button');
-        btn.className = 'title-btn back-btn';
-        btn.style.display = 'block';
-        btn.style.margin = '8px auto';
-        btn.textContent = '▶ Tutorial';
-        btn.addEventListener('click', () => {
-            hideModal('replay-modal');
-            replayTutorialFromTitle();
-        });
-        container.appendChild(btn);
-    }
-
-    if (entries.length === 0 && !STATE.tutorialDone) {
-        container.innerHTML = '<p style="text-align:center;opacity:.7;">Nothing unlocked to replay yet.</p>';
-    }
-}
