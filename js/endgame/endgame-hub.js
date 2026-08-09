@@ -439,7 +439,9 @@ function _egRenderInventoryCell(row, col) {
     const cell = document.getElementById(`eg-inv-cell-${row}-${col}`);
     if (!cell) return;
     const item = _egInventory[row][col];
-    cell.innerHTML = item ? _egBuildItemChipHTML(item) : '';
+    cell.innerHTML = item
+        ? _egBuildItemChipHTML(item) + _egBuildDeleteBtnHTML(row, col)   // ← delete btn added
+        : '';
 }
 
 // Re-renders the entire main stash grid.
@@ -746,6 +748,7 @@ function _egCreateScreen() {
     screen.innerHTML = _egBuildFullScreenHTML();
     document.body.appendChild(screen);
     _egBindDragEvents();  // defined in endgame-hub-drag-and-drop.js
+    _egInjectDeleteUIStyles();
 }
 
 // Ensures the hub screen element exists in the DOM; creates it on first call.
@@ -810,4 +813,140 @@ function egAddTestItems() {
     });
 
     _egRenderAll();
+}
+
+
+
+
+
+
+
+
+
+// Builds the small "destroy" button overlaid on a stash cell's item chip.
+// Row/col are baked into the onclick so the confirm flow knows which cell to clear.
+function _egBuildDeleteBtnHTML(row, col) {
+    return `<button class="eg-item-delete-btn" title="Destroy item"
+        onclick="event.stopPropagation(); _egRequestDeleteItem(${row}, ${col});">✕</button>`;
+}
+
+
+//------------------------------------------------------------------------
+//-------------------ITEM DELETE (STASH ONLY)------------------------------
+//------------------------------------------------------------------------
+
+// Cell awaiting confirmation, or null when no delete is pending.
+let _egPendingDeleteCell = null;
+
+// Lazily creates the confirm modal DOM (once).
+function _egEnsureDeleteModal() {
+    if (document.getElementById('eg-delete-modal')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'eg-delete-modal';
+    modal.className = 'eg-delete-modal-bg';
+    modal.innerHTML = `
+<div class="eg-delete-modal-box">
+    <div class="eg-delete-modal-title">⚠ DESTROY ITEM</div>
+    <div class="eg-delete-modal-text" id="eg-delete-modal-text"></div>
+    <div class="eg-delete-modal-btns">
+        <button class="eg-delete-modal-btn eg-delete-modal-confirm" onclick="_egConfirmDeleteItem()">🗑 DESTROY</button>
+        <button class="eg-delete-modal-btn eg-delete-modal-cancel" onclick="_egCancelDeleteItem()">CANCEL</button>
+    </div>
+</div>`;
+    document.body.appendChild(modal);
+}
+
+// Opens the confirm modal for the given stash cell.
+function _egRequestDeleteItem(row, col) {
+    const item = _egInventory[row][col];
+    if (!item) return;
+
+    _egEnsureDeleteModal();
+    _egPendingDeleteCell = { row, col };
+
+    const textEl = document.getElementById('eg-delete-modal-text');
+    if (textEl) {
+        textEl.innerHTML = `Are you sure you want to destroy <strong>${item.name || 'this item'}</strong>? This cannot be undone.`;
+    }
+    document.getElementById('eg-delete-modal').classList.add('show');
+}
+
+// Confirms the pending delete: clears the cell, re-renders, saves.
+function _egConfirmDeleteItem() {
+    if (!_egPendingDeleteCell) return;
+    const { row, col } = _egPendingDeleteCell;
+
+    _egInventory[row][col] = null;
+    _egRenderInventoryCell(row, col);
+    _egUpdateInvCount();
+    _egClearTooltip();
+    egSaveHubState();
+
+    _egCancelDeleteItem();
+}
+
+// Closes the modal without deleting anything.
+function _egCancelDeleteItem() {
+    _egPendingDeleteCell = null;
+    const modal = document.getElementById('eg-delete-modal');
+    if (modal) modal.classList.remove('show');
+}
+
+
+
+// Injects styles for the stash delete button and confirm modal. Runs once.
+function _egInjectDeleteUIStyles() {
+    if (document.getElementById('eg-delete-ui-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'eg-delete-ui-styles';
+    style.textContent = `
+        .eg-inv-cell { position: relative; }
+
+        .eg-item-delete-btn {
+            display: none;
+            position: absolute;
+            top: 1px; right: 1px;
+            width: 14px; height: 14px;
+            line-height: 12px;
+            font-size: 10px;
+            text-align: center;
+            background: rgba(180,20,20,0.85);
+            color: #fff;
+            border: 1px solid #700;
+            border-radius: 3px;
+            cursor: pointer;
+            z-index: 5;
+            padding: 0;
+        }
+        .eg-inv-cell:hover .eg-item-delete-btn { display: block; }
+        .eg-item-delete-btn:hover { background: #ff3333; }
+
+        .eg-delete-modal-bg {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 10000;
+            align-items: center; justify-content: center;
+        }
+        .eg-delete-modal-bg.show { display: flex; }
+        .eg-delete-modal-box {
+            background: #1a1a2e;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            padding: 20px 24px;
+            max-width: 340px;
+            text-align: center;
+        }
+        .eg-delete-modal-title { color: #e74c3c; font-weight: 700; margin-bottom: 10px; }
+        .eg-delete-modal-text { color: #ddd; margin-bottom: 16px; font-size: 0.9rem; }
+        .eg-delete-modal-btns { display: flex; gap: 10px; justify-content: center; }
+        .eg-delete-modal-btn { padding: 8px 14px; border-radius: 4px; border: none; cursor: pointer; font-weight: 700; }
+        .eg-delete-modal-confirm { background: #e74c3c; color: #fff; }
+        .eg-delete-modal-confirm:hover { background: #ff5c4d; }
+        .eg-delete-modal-cancel { background: #444; color: #ddd; }
+        .eg-delete-modal-cancel:hover { background: #555; }
+    `;
+    document.head.appendChild(style);
 }
