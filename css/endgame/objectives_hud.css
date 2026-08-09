@@ -176,3 +176,20 @@
 .eg-loot-item-row:hover .eg-nested-tooltip {
     display: block;
 }
+
+
+
+.eg-obj-mistakes-ok {
+    color: #cbd5e1;
+    background: transparent;
+}
+
+.eg-obj-mistakes-warn {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.12);
+}
+
+.eg-obj-mistakes-danger {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.16);
+}

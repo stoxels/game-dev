@@ -348,6 +348,14 @@ function _egUpdateObjectivesHUD() {
         rows.push(_egObjItem('⚔️', `${count}/${req.totalMonsters} Monsters`, done));
     }
 
+    // Mistakes Remaining (only shown if the map defines a mistake limit)
+    const maxMistakes = _egGetMaxAllowedMistakes();
+    if (maxMistakes != null) {
+        const used = typeof mistakeCount !== 'undefined' ? mistakeCount : 0;
+        const remaining = Math.max(0, maxMistakes - used);
+        rows.push(_egBuildMistakesItem(remaining, maxMistakes));
+    }
+
     // Boss (Simplified format)
     if (req.hasBoss) {
         const done = _egBossDefeated();
@@ -443,6 +451,18 @@ function _egObjItem(icon, label, done) {
     return `<div class="eg-obj-item ${done ? 'eg-obj-done' : 'eg-obj-pending'}">${prefix}${label}</div>`;
 }
 
+
+// Builds the "Mistakes Remaining" row. Colour shifts as the buffer shrinks:
+// plenty left = neutral, low = warning, zero = danger.
+function _egBuildMistakesItem(remaining, max) {
+    let cls = 'eg-obj-mistakes-ok';
+    if (remaining <= 0) {
+        cls = 'eg-obj-mistakes-danger';
+    } else if (remaining <= Math.max(1, Math.ceil(max * 0.3))) {
+        cls = 'eg-obj-mistakes-warn';
+    }
+    return `<div class="eg-obj-item ${cls}">❌ ${remaining}/${max} Mistakes Left</div>`;
+}
 
 
 

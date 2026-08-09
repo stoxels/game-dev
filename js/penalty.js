@@ -270,6 +270,8 @@ function applyPenalty(row, col) {
 
     // --- End the game if the timer expired from this penalty ---
     _checkTimerExpiry();
+
+    _updateMistakeCounterHUD()
 }
 
 
@@ -277,3 +279,16 @@ function applyPenalty(row, col) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
+
+// Updates the mistake counter element in the HUD with the current mistake count.
+function _updateMistakeCounterHUD() {
+    const mc = document.getElementById('mistake-counter');
+    if (mc) mc.textContent = `${LANG === 'de' ? 'Fehler' : 'Mistakes'}: ${mistakeCount}`;
+
+    // Endgame integration: keep the "Mistakes Left" objectives row in sync,
+    // and check the map's mistake limit immediately (no tick-loop delay).
+    if (typeof _egIsActive === 'function' && _egIsActive()) {
+        if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
+        if (typeof _egCheckMistakeLimit === 'function') _egCheckMistakeLimit();
+    }
+}
