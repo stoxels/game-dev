@@ -21,7 +21,7 @@ const EG_ITEM_RARITY_TABLE = [
     { rarity: 'common', weight: 550 },
     { rarity: 'uncommon', weight: 290 },
     { rarity: 'rare', weight: 130 },
-    { rarity: 'epic', weight: 30 },
+    { rarity: 'epic', weight: 60 },
 ];
 
 const EG_MOD_CAPS = {

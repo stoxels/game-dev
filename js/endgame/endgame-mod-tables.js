@@ -48,7 +48,7 @@ const EG_MOD_TABLE_HEAD = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -323,7 +323,7 @@ const EG_MOD_TABLE_HEAD = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -333,7 +333,7 @@ const EG_MOD_TABLE_HEAD = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -341,7 +341,7 @@ const EG_MOD_TABLE_HEAD = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -402,7 +402,7 @@ const EG_MOD_TABLE_EARRING = {
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
                 // T3 is expressed in tenths for display — store as float
-                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 30 }
+                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 15 }
             ]
         },
         mana_on_kill: {
@@ -423,7 +423,7 @@ const EG_MOD_TABLE_EARRING = {
             tiers: [
                 { tier: 1, min: 30, max: 40, weight: 100, ilvl: 78 },
                 { tier: 2, min: 18, max: 29, weight: 300, ilvl: 50 },
-                { tier: 3, min: 8, max: 17, weight: 600, ilvl: 20 }
+                { tier: 3, min: 8, max: 17, weight: 600, ilvl: 15 }
             ]
         }
     },
@@ -530,7 +530,7 @@ const EG_MOD_TABLE_EARRING = {
                 { tier: 1, min: 25, max: 30, weight: 150, ilvl: 82 },
                 { tier: 2, min: 18, max: 24, weight: 300, ilvl: 65 },
                 { tier: 3, min: 10, max: 17, weight: 600, ilvl: 40 },
-                { tier: 4, min: 3, max: 9, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 3, max: 9, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -553,7 +553,7 @@ const EG_MOD_TABLE_EARRING = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -561,7 +561,7 @@ const EG_MOD_TABLE_EARRING = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
-                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 40 }
+                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -704,7 +704,7 @@ const EG_MOD_TABLE_AMULET = {
             tiers: [
                 { tier: 1, min: 35, max: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min: 22, max: 34, weight: 300, ilvl: 50 },
-                { tier: 3, min: 10, max: 21, weight: 600, ilvl: 20 }
+                { tier: 3, min: 10, max: 21, weight: 600, ilvl: 15 }
             ]
         },
         mistake_not_count: {
@@ -714,7 +714,7 @@ const EG_MOD_TABLE_AMULET = {
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 40, ilvl: 85 },
                 { tier: 2, min: 6, max: 11, weight: 120, ilvl: 65 },
-                { tier: 3, min: 2, max: 5, weight: 350, ilvl: 35 }
+                { tier: 3, min: 2, max: 5, weight: 350, ilvl: 15 }
             ]
         }
     },
@@ -785,7 +785,7 @@ const EG_MOD_TABLE_AMULET = {
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
-                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 30 }
+                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 15 }
             ]
         },
         absorption_on_kill: {
@@ -840,7 +840,7 @@ const EG_MOD_TABLE_AMULET = {
                 { tier: 1, min: 26, max: 32, weight: 150, ilvl: 82 },
                 { tier: 2, min: 19, max: 25, weight: 300, ilvl: 65 },
                 { tier: 3, min: 11, max: 18, weight: 600, ilvl: 40 },
-                { tier: 4, min: 4, max: 10, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 4, max: 10, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -894,7 +894,7 @@ const EG_MOD_TABLE_AMULET = {
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 50, ilvl: 84 },
                 { tier: 2, min: 4, max: 7, weight: 130, ilvl: 65 },
-                { tier: 3, min: 1, max: 3, weight: 350, ilvl: 38 }
+                { tier: 3, min: 1, max: 3, weight: 350, ilvl: 15 }
             ]
         },
 
@@ -917,7 +917,7 @@ const EG_MOD_TABLE_AMULET = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -925,7 +925,7 @@ const EG_MOD_TABLE_AMULET = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 9, max: 14, weight: 150, ilvl: 75 },
-                { tier: 2, min: 4, max: 8, weight: 400, ilvl: 40 }
+                { tier: 2, min: 4, max: 8, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -1132,7 +1132,7 @@ const EG_MOD_TABLE_SHOULDERS = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -1287,7 +1287,7 @@ const EG_MOD_TABLE_SHOULDERS = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -1363,7 +1363,7 @@ const EG_MOD_TABLE_SHOULDERS = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -1371,7 +1371,7 @@ const EG_MOD_TABLE_SHOULDERS = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -1563,7 +1563,7 @@ const EG_MOD_TABLE_CLOAK = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -1697,7 +1697,7 @@ const EG_MOD_TABLE_CLOAK = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -1768,7 +1768,7 @@ const EG_MOD_TABLE_CLOAK = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -1776,7 +1776,7 @@ const EG_MOD_TABLE_CLOAK = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -1999,7 +1999,7 @@ const EG_MOD_TABLE_CHEST = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -2182,7 +2182,7 @@ const EG_MOD_TABLE_CHEST = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -2266,7 +2266,7 @@ const EG_MOD_TABLE_CHEST = {
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 50, ilvl: 86 },
                 { tier: 2, min: 1, max: 2, weight: 140, ilvl: 68 },
-                { tier: 3, min: 1, max: 1, weight: 380, ilvl: 45 }
+                { tier: 3, min: 1, max: 1, weight: 380, ilvl: 15 }
             ]
         },
         precision_regen: {
@@ -2275,7 +2275,7 @@ const EG_MOD_TABLE_CHEST = {
             tiers: [
                 { tier: 1, min: 4, max: 6, weight: 60, ilvl: 84 },
                 { tier: 2, min: 2, max: 3, weight: 160, ilvl: 65 },
-                { tier: 3, min: 1, max: 1, weight: 400, ilvl: 42 }
+                { tier: 3, min: 1, max: 1, weight: 400, ilvl: 15 }
             ]
         },
 
@@ -2285,7 +2285,7 @@ const EG_MOD_TABLE_CHEST = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -2293,7 +2293,7 @@ const EG_MOD_TABLE_CHEST = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -2556,7 +2556,7 @@ const EG_MOD_TABLE_BRACERS = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         }
     },
@@ -2630,7 +2630,7 @@ const EG_MOD_TABLE_BRACERS = {
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 90, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 220, ilvl: 60 },
-                { tier: 3, min: 0.5, max: 0.9, weight: 520, ilvl: 30 }
+                { tier: 3, min: 0.5, max: 0.9, weight: 520, ilvl: 15 }
             ]
         },
 
@@ -2675,7 +2675,7 @@ const EG_MOD_TABLE_BRACERS = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -2734,7 +2734,7 @@ const EG_MOD_TABLE_BRACERS = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -2742,7 +2742,7 @@ const EG_MOD_TABLE_BRACERS = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -2978,7 +2978,7 @@ const EG_MOD_TABLE_GLOVES = {
             tiers: [
                 { tier: 1, min: 1.8, max: 2.8, weight: 90, ilvl: 82 },
                 { tier: 2, min: 1.0, max: 1.7, weight: 220, ilvl: 60 },
-                { tier: 3, min: 0.4, max: 0.9, weight: 520, ilvl: 30 }
+                { tier: 3, min: 0.4, max: 0.9, weight: 520, ilvl: 15 }
             ]
         },
 
@@ -3006,7 +3006,7 @@ const EG_MOD_TABLE_GLOVES = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -3180,7 +3180,7 @@ const EG_MOD_TABLE_GLOVES = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -3197,7 +3197,7 @@ const EG_MOD_TABLE_GLOVES = {
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 50, ilvl: 84 },
                 { tier: 2, min: 14, max: 24, weight: 140, ilvl: 65 },
-                { tier: 3, min: 5, max: 13, weight: 360, ilvl: 38 }
+                { tier: 3, min: 5, max: 13, weight: 360, ilvl: 15 }
             ]
         },
 
@@ -3207,7 +3207,7 @@ const EG_MOD_TABLE_GLOVES = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -3215,7 +3215,7 @@ const EG_MOD_TABLE_GLOVES = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -3462,7 +3462,7 @@ const EG_MOD_TABLE_BELT = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         }
     },
@@ -3590,7 +3590,7 @@ const EG_MOD_TABLE_BELT = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -3600,7 +3600,7 @@ const EG_MOD_TABLE_BELT = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -3608,7 +3608,7 @@ const EG_MOD_TABLE_BELT = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -3847,7 +3847,7 @@ const EG_MOD_TABLE_PANTS = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -4000,7 +4000,7 @@ const EG_MOD_TABLE_PANTS = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -4041,7 +4041,7 @@ const EG_MOD_TABLE_PANTS = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -4049,7 +4049,7 @@ const EG_MOD_TABLE_PANTS = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -4290,7 +4290,7 @@ const EG_MOD_TABLE_BOOTS = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -4417,7 +4417,7 @@ const EG_MOD_TABLE_BOOTS = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -4459,7 +4459,7 @@ const EG_MOD_TABLE_BOOTS = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -4467,7 +4467,7 @@ const EG_MOD_TABLE_BOOTS = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -4549,7 +4549,7 @@ const EG_MOD_TABLE_RING = {
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
-                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 30 }
+                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 15 }
             ]
         },
 
@@ -4604,7 +4604,7 @@ const EG_MOD_TABLE_RING = {
             tiers: [
                 { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
                 { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
-                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 20 }
+                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -4750,7 +4750,7 @@ const EG_MOD_TABLE_RING = {
                 { tier: 1, min: 26, max: 32, weight: 150, ilvl: 82 },
                 { tier: 2, min: 19, max: 25, weight: 300, ilvl: 65 },
                 { tier: 3, min: 11, max: 18, weight: 600, ilvl: 40 },
-                { tier: 4, min: 4, max: 10, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 4, max: 10, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -4773,7 +4773,7 @@ const EG_MOD_TABLE_RING = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -4781,7 +4781,7 @@ const EG_MOD_TABLE_RING = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
-                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 40 }
+                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
             ]
         },
 
@@ -4800,7 +4800,7 @@ const EG_MOD_TABLE_RING = {
                 { tier: 1, min: 25, max: 35, min2: 35, max2: 50, weight: 60, ilvl: 85 },
                 { tier: 2, min: 16, max: 24, min2: 22, max2: 34, weight: 160, ilvl: 66 },
                 { tier: 3, min: 8, max: 15, min2: 12, max2: 21, weight: 380, ilvl: 42 },
-                { tier: 4, min: 2, max: 7, min2: 5, max2: 11, weight: 880, ilvl: 16 }
+                { tier: 4, min: 2, max: 7, min2: 5, max2: 11, weight: 880, ilvl: 15 }
             ]
         }
     }
@@ -4955,7 +4955,7 @@ const EG_MOD_TABLE_ARCANE = {
             tiers: [
                 { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
                 { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
-                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 20 }
+                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -5063,7 +5063,7 @@ const EG_MOD_TABLE_ARCANE = {
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
-                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 30 }
+                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 15 }
             ]
         },
 
@@ -5108,7 +5108,7 @@ const EG_MOD_TABLE_ARCANE = {
                 { tier: 1, min: 26, max: 32, weight: 150, ilvl: 82 },
                 { tier: 2, min: 19, max: 25, weight: 300, ilvl: 65 },
                 { tier: 3, min: 11, max: 18, weight: 600, ilvl: 40 },
-                { tier: 4, min: 4, max: 10, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 4, max: 10, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -5131,7 +5131,7 @@ const EG_MOD_TABLE_ARCANE = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -5139,7 +5139,7 @@ const EG_MOD_TABLE_ARCANE = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
-                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 40 }
+                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -5247,7 +5247,7 @@ const EG_MOD_TABLE_TALISMAN = {
                 { tier: 1, min: 80, max: 120, weight: 30, ilvl: 88 },
                 { tier: 2, min: 40, max: 79, weight: 90, ilvl: 72 },
                 { tier: 3, min: 15, max: 39, weight: 240, ilvl: 55 },
-                { tier: 4, min: 1, max: 14, weight: 600, ilvl: 35 }
+                { tier: 4, min: 1, max: 14, weight: 600, ilvl: 15 }
             ]
         },
 
@@ -5258,7 +5258,7 @@ const EG_MOD_TABLE_TALISMAN = {
             tiers: [
                 { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
                 { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
-                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 20 }
+                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 15 }
             ]
         },
         mistake_not_count: {
@@ -5267,7 +5267,7 @@ const EG_MOD_TABLE_TALISMAN = {
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 40, ilvl: 85 },
                 { tier: 2, min: 6, max: 11, weight: 120, ilvl: 65 },
-                { tier: 3, min: 2, max: 5, weight: 350, ilvl: 35 }
+                { tier: 3, min: 2, max: 5, weight: 350, ilvl: 15 }
             ]
         }
     },
@@ -5387,7 +5387,7 @@ const EG_MOD_TABLE_TALISMAN = {
                 { tier: 1, min: 28, max: 34, weight: 130, ilvl: 82 },
                 { tier: 2, min: 20, max: 27, weight: 270, ilvl: 65 },
                 { tier: 3, min: 12, max: 19, weight: 540, ilvl: 40 },
-                { tier: 4, min: 4, max: 11, weight: 1080, ilvl: 20 }
+                { tier: 4, min: 4, max: 11, weight: 1080, ilvl: 15 }
             ]
         },
 
@@ -5405,7 +5405,7 @@ const EG_MOD_TABLE_TALISMAN = {
                 { tier: 1, min: 8, max: 12, weight: 60, ilvl: 86 },
                 { tier: 2, min: 4, max: 7, weight: 160, ilvl: 68 },
                 { tier: 3, min: 2, max: 3, weight: 400, ilvl: 46 },
-                { tier: 4, min: 1, max: 1, weight: 950, ilvl: 22 }
+                { tier: 4, min: 1, max: 1, weight: 950, ilvl: 15 }
             ]
         },
 
@@ -5415,7 +5415,7 @@ const EG_MOD_TABLE_TALISMAN = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -5423,7 +5423,7 @@ const EG_MOD_TABLE_TALISMAN = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
-                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 40 }
+                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -5600,7 +5600,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         }
     },
@@ -5736,7 +5736,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 45, ilvl: 84 },
                 { tier: 2, min: 7, max: 11, weight: 120, ilvl: 65 },
-                { tier: 3, min: 2, max: 6, weight: 320, ilvl: 38 }
+                { tier: 3, min: 2, max: 6, weight: 320, ilvl: 15 }
             ]
         },
 
@@ -5766,7 +5766,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -5774,7 +5774,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -6066,7 +6066,7 @@ const EG_MOD_TABLE_WEAPON2 = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         }
     },
@@ -6198,7 +6198,7 @@ const EG_MOD_TABLE_WEAPON2 = {
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
                 { tier: 3, min: 16, max: 25, weight: 600, ilvl: 40 },
-                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 20 }
+                { tier: 4, min: 5, max: 15, weight: 1200, ilvl: 15 }
             ]
         },
 
@@ -6289,7 +6289,7 @@ const EG_MOD_TABLE_WEAPON2 = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -6297,7 +6297,7 @@ const EG_MOD_TABLE_WEAPON2 = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
@@ -6431,7 +6431,7 @@ const EG_MOD_TABLE_RANGED = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 20 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
             ]
         }
     },
@@ -6558,7 +6558,7 @@ const EG_MOD_TABLE_RANGED = {
             tiers: [
                 { tier: 1, min: 7, max: 11, weight: 45, ilvl: 84 },
                 { tier: 2, min: 4, max: 6, weight: 120, ilvl: 65 },
-                { tier: 3, min: 1, max: 3, weight: 320, ilvl: 38 }
+                { tier: 3, min: 1, max: 3, weight: 320, ilvl: 15 }
             ]
         },
 
@@ -6586,7 +6586,7 @@ const EG_MOD_TABLE_RANGED = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 60 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
             ]
         },
         focus: {
@@ -6594,7 +6594,7 @@ const EG_MOD_TABLE_RANGED = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 40 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
             ]
         }
     }
