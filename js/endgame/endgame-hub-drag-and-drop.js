@@ -313,6 +313,7 @@ function _dndFinalizeDrop() {
     egSaveHubState();
     _dndReset();
     _egUpdateInvCount();
+    _egRenderStatsList();
 }
 
 
@@ -454,6 +455,7 @@ function _dndQuickEquipFromStash(invCell) {
     _egRenderEquipSlot(slotId);
     _egRenderInventoryCell(r, c);
     _egUpdateInvCount();
+    _egRenderStatsList();
     egSaveHubState();
 }
 
@@ -480,6 +482,7 @@ function _dndQuickUnequipToStash(equipSlotEl) {
     _egRenderEquipSlot(slotId);
     _egRenderInventoryCell(free.r, free.c);
     _egUpdateInvCount();
+    _egRenderStatsList();
     egSaveHubState();
 }
 

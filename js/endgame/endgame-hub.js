@@ -534,6 +534,33 @@ function _egRenderMapSlot() {
 //-------------------RENDER: FULL REFRESH---------------------------------
 //------------------------------------------------------------------------
 
+
+// Re-renders the aggregated stats list in the character panel's center
+// column. Reads live gear via _egComputePlayerStats() / _egBuildStatsSummaryLines()
+// (endgame-player-stats.js) so it always reflects whatever is currently equipped.
+function _egRenderStatsList() {
+    const el = document.getElementById('eg-stats-list');
+    if (!el) return;
+
+    const stats = _egComputePlayerStats();
+    const lines = _egBuildStatsSummaryLines(stats);
+
+    if (lines.length === 0) {
+        el.innerHTML = `
+<div class="eg-stat-row eg-stat-placeholder">
+    <span class="eg-stat-name">— no stats yet —</span>
+</div>`;
+        return;
+    }
+
+    el.innerHTML = lines.map(line => `
+<div class="eg-stat-row">
+    <span class="eg-stat-name">${line.label}</span>
+    <span class="eg-stat-value">${line.value}</span>
+</div>`).join('');
+}
+
+
 // Triggers a full re-render of every zone in the hub.
 // Call this after any state-changing operation.
 function _egRenderAll() {
@@ -543,6 +570,7 @@ function _egRenderAll() {
     _egRenderCurrencyStash();
     _egRenderMapStash();
     _egUpdateInvCount();
+    _egRenderStatsList();   
 }
 
 

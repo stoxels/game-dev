@@ -301,6 +301,150 @@ function _egScheduleAbsorptionRegen() {
 
 
 
+//------------------------------------------------------------------------
+//-------------------STATS SUMMARY (DISPLAY)-------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Human-readable labels + unit suffix for each stat bucket produced by
+// _egComputePlayerStats(). Buckets not listed here are either internal/derived
+// (armour/evasion/absorption totals, physFlatMin/Max, elemental dmg pairs)
+// and are handled explicitly by _egBuildStatsSummaryLines() instead.
+const EG_STAT_DISPLAY_LABELS = {
+    health: { label: 'Health', suffix: '' },
+    mana: { label: 'Mana', suffix: '' },
+    strength: { label: 'Strength', suffix: '' },
+    agility: { label: 'Agility', suffix: '' },
+    intelligence: { label: 'Intelligence', suffix: '' },
+
+    lifeRegen: { label: 'Life Regen', suffix: '/s' },
+    manaRegen: { label: 'Mana Regen', suffix: '/5s' },
+    manaOnKill: { label: 'Mana on Kill', suffix: '' },
+    absorptionOnKill: { label: 'Absorption on Kill', suffix: '' },
+    lifeOnKill: { label: 'Life on Kill', suffix: '' },
+    manaOnMistake: { label: 'Mana on Mistake', suffix: '' },
+    heartHealFlat: { label: 'Heart Heal', suffix: '' },
+    heartHealIncPct: { label: 'Increased Heart Heal', suffix: '%' },
+    timeAdded: { label: 'Time Added', suffix: 's' },
+
+    fireResist: { label: 'Fire Resistance', suffix: '%' },
+    coldResist: { label: 'Cold Resistance', suffix: '%' },
+    lightningResist: { label: 'Lightning Resistance', suffix: '%' },
+    shadowResist: { label: 'Shadow Resistance', suffix: '%' },
+    arcaneResistFlat: { label: 'Arcane Resistance', suffix: '' },
+
+    accuracy: { label: 'Accuracy', suffix: '' },
+    mistakeCount: { label: 'Allowed Mistakes', suffix: '' },
+    focusPct: { label: 'Focus', suffix: '%' },
+    mistakeNotCountPct: { label: 'Mistake Ignore Chance', suffix: '%' },
+    revealHintPct: { label: 'Reveal Hint Chance', suffix: '%' },
+    chanceForNewQuestionPct: { label: 'Chance for New Question', suffix: '%' },
+
+    critChance: { label: 'Critical Strike Chance', suffix: '%' },
+    critMultiplierPct: { label: 'Critical Strike Multiplier', suffix: '%' },
+
+    physIncPct: { label: 'Increased Physical Damage', suffix: '%' },
+    spellDamageFlat: { label: 'Spell Damage', suffix: '' },
+    spellDamageIncPct: { label: 'Increased Spell Damage', suffix: '%' },
+
+    lifeLeechPct: { label: 'Life Leech', suffix: '%' },
+
+    blockChance: { label: 'Block Chance', suffix: '%' },
+    spellBlockChance: { label: 'Spell Block Chance', suffix: '%' },
+    blockRecoveryPct: { label: 'Block Recovery', suffix: '%' },
+    dodgeChance: { label: 'Dodge Chance', suffix: '%' },
+    spellDodgeChance: { label: 'Spell Dodge Chance', suffix: '%' },
+
+    ignitePct: { label: 'Chance to Ignite', suffix: '%' },
+    freezePct: { label: 'Chance to Freeze', suffix: '%' },
+    shockPct: { label: 'Chance to Shock', suffix: '%' },
+    blindPct: { label: 'Chance to Blind', suffix: '%' },
+    convertPct: { label: 'Chance to Convert', suffix: '%' },
+
+    attackSpeed: { label: 'Attack Speed', suffix: '' },
+    cleavePct: { label: 'Cleave Chance', suffix: '%' },
+    piercePct: { label: 'Pierce Chance', suffix: '%' },
+    snipePct: { label: 'Snipe Chance', suffix: '%' },
+    chainPct: { label: 'Chain Chance', suffix: '%' },
+    splashPct: { label: 'Splash Damage Chance', suffix: '%' },
+    multishotPct: { label: 'Multishot Chance', suffix: '%' },
+    pushbackFlat: { label: 'Pushback', suffix: 's' },
+    overkillPct: { label: 'Overkill Chance', suffix: '%' },
+    staggerPct: { label: 'Stagger Chance', suffix: '%' },
+    preemptiveDodgePct: { label: 'Preemptive Dodge Chance', suffix: '%' },
+    firstStepSeconds: { label: 'First Step', suffix: 's' },
+
+    groundedChancePct: { label: 'Grounded Chance', suffix: '%' },
+    groundedReductionPct: { label: 'Grounded Reduction', suffix: '%' },
+    shieldBashChancePct: { label: 'Shield Bash Chance', suffix: '%' },
+    shieldBashDamageFlat: { label: 'Shield Bash Damage', suffix: '' },
+    channelDamagePerStack: { label: 'Channel Damage per Stack', suffix: '' },
+    channelMaxStacks: { label: 'Max Channel Stacks', suffix: '' },
+    arcaneSurgeStreak: { label: 'Arcane Surge Streak', suffix: '' },
+    arcaneSurgeMana: { label: 'Arcane Surge Mana', suffix: '' },
+    manaToDamagePct: { label: 'Mana to Damage', suffix: '%' },
+    echoChancePct: { label: 'Echo Chance', suffix: '%' },
+    echoDamagePct: { label: 'Echo Damage', suffix: '%' },
+    fatePct: { label: 'Fate', suffix: '%' },
+    wardingHP: { label: 'Warding', suffix: '' },
+
+    absorptionRegenRatePct: { label: 'Absorption Regen Rate', suffix: '%' },
+    fasterAbsorptionRegenStart: { label: 'Faster Absorption Regen Start', suffix: 's' },
+};
+
+// Rounds a value for display: whole numbers stay whole, decimals get 1 digit.
+function _egFormatStatValue(val) {
+    const rounded = Math.round(val * 10) / 10;
+    return Number.isInteger(rounded) ? rounded : rounded.toFixed(1);
+}
+
+// Builds a flat array of { label, value } lines for the aggregated stats
+// panel. Only non-zero stats are included so the list stays readable.
+// Derived defensive totals and damage ranges get custom combined formatting;
+// everything else is driven off EG_STAT_DISPLAY_LABELS.
+function _egBuildStatsSummaryLines(stats) {
+    const lines = [];
+
+    // ── Derived defensive totals (flat + % increased already applied) ──
+    if (stats.health > 0) lines.push({ label: 'Health', value: `+${_egFormatStatValue(stats.health)}` });
+    if (stats.mana > 0) lines.push({ label: 'Mana', value: `+${_egFormatStatValue(stats.mana)}` });
+    if (stats.armour > 0) lines.push({ label: 'Armour', value: `${_egFormatStatValue(stats.armour)}` });
+    if (stats.evasion > 0) lines.push({ label: 'Evasion', value: `${_egFormatStatValue(stats.evasion)}` });
+    if (stats.absorption > 0) lines.push({ label: 'Absorption', value: `${_egFormatStatValue(stats.absorption)}` });
+
+    // ── Physical damage range ────────────────────────────────────────
+    if (stats.physFlatMin > 0 || stats.physFlatMax > 0) {
+        lines.push({ label: 'Physical Damage', value: `${_egFormatStatValue(stats.physFlatMin)}–${_egFormatStatValue(stats.physFlatMax)}` });
+    }
+
+    // ── Elemental damage ranges ──────────────────────────────────────
+    const elementalPairs = [
+        ['fireDmgMin', 'fireDmgMax', 'Fire Damage'],
+        ['coldDmgMin', 'coldDmgMax', 'Cold Damage'],
+        ['lightningDmgMin', 'lightningDmgMax', 'Lightning Damage'],
+        ['shadowDmgMin', 'shadowDmgMax', 'Shadow Damage'],
+    ];
+    elementalPairs.forEach(([minKey, maxKey, label]) => {
+        if (stats[minKey] > 0 || stats[maxKey] > 0) {
+            lines.push({ label, value: `${_egFormatStatValue(stats[minKey])}–${_egFormatStatValue(stats[maxKey])}` });
+        }
+    });
+
+    // ── Everything else ──────────────────────────────────────────────
+    Object.entries(EG_STAT_DISPLAY_LABELS).forEach(([bucket, meta]) => {
+        const val = stats[bucket];
+        if (!val || val === 0) return;
+        lines.push({ label: meta.label, value: `+${_egFormatStatValue(val)}${meta.suffix}` });
+    });
+
+    return lines;
+}
+
+
+
+
+
+
+
 /*
 
 Regular modifier Stats that make sense in Stoxels (there can be some very special ones later on maybe)
@@ -397,3 +541,6 @@ Damage of Spells: (TODO: All class abilities shall have a way to affect monsters
 
 
 */
+
+
+
