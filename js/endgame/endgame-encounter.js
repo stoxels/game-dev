@@ -769,6 +769,7 @@ function _egPlayerTakeDamage(amount) {
     const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion));
     if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
         showToast('💨 Dodged!');
+        Audio_Manager.playSFX('player_dodge_attack');
         _egApplyPlayerMissFeedback();
         _egScheduleAbsorptionRegen();
         return 0;

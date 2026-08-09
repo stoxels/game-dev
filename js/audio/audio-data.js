@@ -434,5 +434,10 @@ const SFX = {
     // --- Endgame ---
     player_damage_taken: 'audio/sfx_player_damage_taken.mp3',
     player_shield_damage_taken: 'audio/sfx_player_shield_damage_taken.mp3',
+    player_dodge_attack: 'audio/sfx_player_dodge_attack.mp3',
+    heart_heals: 'audio/sfx_heart_heals.mp3',
+    heart_destroyed: 'audio/sfx_heart_destroyed.mp3',
+    player_equip_pickup: 'audio/sfx_player_equip_pickup.mp3',
+    player_equip_not_pickup: 'audio/sfx_player_equip_not_pickup.mp3',
 
 };

@@ -49,6 +49,7 @@ const EG_PICKUP_DEFS = {
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
             showToast(`💛 Small Heart! +${heal} HP`);
+            Audio_Manager.playSFX('heart_heals');
         },
     },
     heart_medium: {
@@ -58,6 +59,7 @@ const EG_PICKUP_DEFS = {
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
             showToast(`🧡 Heart! +${heal} HP`);
+            Audio_Manager.playSFX('heart_heals');
         },
     },
     heart_large: {
@@ -67,6 +69,7 @@ const EG_PICKUP_DEFS = {
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
             showToast(`❤️ Large Heart! +${heal} HP`);
+            Audio_Manager.playSFX('heart_heals');
         },
     },
     // Future pickup types go here:
@@ -204,6 +207,8 @@ function _egAnimatePickupDiscard(row, col, def) {
     document.body.appendChild(right);
 
     setTimeout(() => { left.remove(); right.remove(); }, 700);
+
+    
 }
 
 
@@ -293,6 +298,9 @@ function _egCheckPickupClaim(row, col) {
     _egRemovePickupOverlay(key);
     _egAnimatePickupClaim(row, col, def);
     def.onPickup(row, col);
+
+    Audio_Manager.playSFX('player_equip_pickup');
+
     return true;
 }
 
@@ -311,6 +319,8 @@ function _egDiscardPickup(row, col) {
     _egPickups.delete(key);
     _egRemovePickupOverlay(key);
     _egAnimatePickupDiscard(row, col, def); 
+
+    Audio_Manager.playSFX('heart_destroyed');
 }
 
 
@@ -425,6 +435,9 @@ function _egCheckLootClaim(row, col) {
 
     _egRunLoot.push(item);
     _egUpdateObjectivesHUD();
+
+    Audio_Manager.playSFX('player_equip_pickup');
+
     showToast(`📦 Loot! ${item.icon || ''} ${item.name}`);
     return true;
 }
@@ -439,6 +452,8 @@ function _egDiscardLootDrop(row, col) {
     _egLootDrops.delete(key);
     _egRemoveLootOverlay(key);
     _egAnimatePickupDiscard(row, col, { emoji: item.icon || '📦' }); // reuse broken-heart anim
+
+    Audio_Manager.playSFX('player_equip_not_pickup');
 }
 
 // Clears all active loot drops from the board (called by _egStopPickupSpawner).
