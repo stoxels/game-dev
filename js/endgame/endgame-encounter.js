@@ -32,7 +32,7 @@ const EG_PLAYER_HIT_FLASH_MS = 150;
 const EG_DAMAGE_NUMBER_DURATION_MS = 600;
 
 // How long a floating player damage number stays on screen (ms).
-const EG_PLAYER_DAMAGE_NUMBER_DURATION_MS = 500;
+const EG_PLAYER_DAMAGE_NUMBER_DURATION_MS = 1500;
 
 // How long the immune flash and label last on the card (ms).
 const EG_IMMUNE_FLASH_DURATION_MS = 400;
@@ -431,9 +431,20 @@ function _egFireMonsterAttack(monster) {
     }
 }
 
+
+function _egApplyPlayerMissFeedback() {
+    const hud = document.getElementById('player-avatar-wrapper');
+    if (!hud) return;
+    const label = document.createElement('div');
+    label.className = 'eg-player-damage eg-player-miss';
+    label.textContent = 'MISS';
+    hud.appendChild(label);
+    setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
+}
+
 // Applies hit feedback to the player HUD: floating damage number + squish + red glow.
 function _egApplyPlayerHitFeedback(damageValue) {
-    const hud = document.getElementById('class-hud-drag-handle');
+    const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
 
     // Floating damage label
@@ -453,7 +464,7 @@ function _egApplyPlayerHitFeedback(damageValue) {
 // Damage and feedback are applied when the projectile arrives.
 function _egAnimateMonsterProjectile(monster) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
-    const targetHud = document.getElementById('class-hud-drag-handle');
+    const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
 
     const start = _egGetElementCentre(sourceCard);
@@ -477,7 +488,7 @@ function _egApplyMeleeImpact(monster) {
 // Damage triggers at the animation midpoint (impact apex).
 function _egAnimateMonsterMelee(monster) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
-    const targetHud = document.getElementById('class-hud-drag-handle');
+    const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
 
     const start = _egGetElementCentre(sourceCard);
@@ -627,9 +638,9 @@ function _egAnimatePlayerMelee(targetId) {
     avatarWrapper.style.zIndex = '9999';
 
     const anim = avatarWrapper.animate([
-        { transform: 'translate(-50%, -50%) scale(1)' }, // Notice the -50% to maintain its centered anchor
-        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.15)` }, // Apex/Impact
-        { transform: 'translate(-50%, -50%) scale(1)' }
+        { transform: 'translate(0px, 0px) scale(1)' },
+        { transform: `translate(${dx}px, ${dy}px) scale(1.15)` },
+        { transform: 'translate(0px, 0px) scale(1)' }
     ], { duration: EG_PLAYER_MELEE_ANIM_DURATION_MS, easing: 'ease-in-out' });
 
     anim.onfinish = () => {
@@ -756,6 +767,7 @@ function _egPlayerTakeDamage(amount) {
     const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion));
     if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
         showToast('💨 Dodged!');
+        _egApplyPlayerMissFeedback();
         _egScheduleAbsorptionRegen();
         return 0;
     }

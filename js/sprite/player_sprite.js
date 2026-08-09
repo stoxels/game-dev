@@ -351,6 +351,7 @@ function _setAvatarPos(el, x, y) {
     const h = el.offsetHeight || 90;
     const maxX = window.innerWidth - w - 4;
     const maxY = window.innerHeight - h - 4;
+    el.style.bottom = 'auto';   // <-- add this
     el.style.left = Math.max(4, Math.min(maxX, x)) + 'px';
     el.style.top = Math.max(4, Math.min(maxY, y)) + 'px';
     _updateAvatarFacing(el);
@@ -455,6 +456,14 @@ function _renderPlayerAvatar() {
                 </div>
             </div>
 
+            <!-- absorption / shield bar -->
+            <div id="avatar-shield-wrap" style="width: 100%; margin-bottom: 4px; display: none;">
+                <span id="avatar-shield-text" style="font-size: 10px; font-weight: bold; color: #7fd6ff; display: block; text-align: center; text-shadow: 1px 1px 2px black;"></span>
+                <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000;">
+                    <div id="avatar-shield-fill" style="background: #3ec6ff; width: 0%; height: 100%; transition: width 0.1s;"></div>
+                </div>
+            </div>
+
             <div style="width: 100%; margin-bottom: 8px;">
                 <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
                     <div id="avatar-charge-fill" style="background: #4ade80; width: 0%; height: 100%; transition: width 0.1s linear;"></div>
@@ -473,10 +482,28 @@ function _renderPlayerAvatar() {
         _updateAvatarFacing(avatar);
     }
 
+    avatar.style.display = 'flex';   // always ensure visible, regardless of prior hide
+
     // Update health
     const hpPct = Math.max(0, (playerCurrentHP / playerMaxHP) * 100);
     document.getElementById('avatar-hp-text').innerText = `HP: ${playerCurrentHP} / ${playerMaxHP}`;
     document.getElementById('avatar-hp-fill').style.width = hpPct + '%';
+
+    // Update absorption shield
+    const maxAbsorption = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats().absorption : 0;
+    const shieldWrap = document.getElementById('avatar-shield-wrap');
+    const shieldFill = document.getElementById('avatar-shield-fill');
+    const shieldText = document.getElementById('avatar-shield-text');
+    if (shieldWrap && shieldFill && shieldText) {
+        if (maxAbsorption > 0) {
+            shieldWrap.style.display = '';
+            const shieldPct = Math.max(0, Math.min(100, (_egPlayerAbsorptionCurrent / maxAbsorption) * 100));
+            shieldText.innerText = `🛡 ${Math.round(_egPlayerAbsorptionCurrent)} / ${maxAbsorption}`;
+            shieldFill.style.width = shieldPct + '%';
+        } else {
+            shieldWrap.style.display = 'none';
+        }
+    }
 
     // Update charge
     const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / EG_PLAYER_CHARGE_MAX) * 100));
@@ -571,4 +598,15 @@ function _hidePlayerAvatar() {
 function _showPlayerAvatar() {
     const el = document.getElementById('player-avatar-wrapper');
     if (el) el.style.display = 'flex';
+}
+
+
+
+function _renderPlayerHealth() {
+    const hpText = document.getElementById('avatar-hp-text');
+    const hpFill = document.getElementById('avatar-hp-fill');
+    if (!hpText || !hpFill) return;
+    const hpPct = Math.max(0, Math.min(100, (playerCurrentHP / playerMaxHP) * 100));
+    hpText.innerText = `HP: ${playerCurrentHP} / ${playerMaxHP}`;
+    hpFill.style.width = hpPct + '%';
 }

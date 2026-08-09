@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------
-//----------------------------CONSTANTS-----------------------------------
+//----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -41,14 +41,6 @@ const TUTORIAL_STEPS = [
 // theme it per-character later without touching the CSS.
 const TUTORIAL_ARROW_COLOR = '#d4af37';
 
-
-
-
-//------------------------------------------------------------------------
-//----------------------------STATE---------------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
 // tutStep — index of the currently displayed tutorial step (0-based).
 let tutStep = 0;
 
@@ -56,51 +48,14 @@ let tutStep = 0;
 // <img> element when a step actually requests a different background.
 let tutCurrentImageKey = null;
 
-
 // True while replaying the tutorial from the title screen's Replay panel.
 let _tutorialReplayFromTitle = false;
 
 
 
-//------------------------------------------------------------------------
-//------------------------ENTRY POINTS------------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// showTutorial — called from the title screen.
-//   Skips the tutorial and goes straight to setup if already completed.
-function showTutorial() {
-    if (STATE.tutorialDone) {
-        showSetup();
-        return;
-    }
-    screenHistory.push('screen-title');
-    showTutorialScreen();
-}
-
-// replayTutorialFromTitle — rewatch the tutorial even though
-// STATE.tutorialDone is already true (showTutorial() would otherwise skip it).
-function replayTutorialFromTitle() {
-    _tutorialReplayFromTitle = true;
-    screenHistory.push('screen-title');
-    showTutorialScreen();
-}
-
-
-// showTutorialScreen — switches to the tutorial screen and shows the first step.
-function showTutorialScreen() {
-    tutStep = 0;
-    tutCurrentImageKey = null;
-    switchScreen('screen-tutorial');
-    initTutorialClickHandler();
-    renderTutStep();
-}
-
-
-
 
 //------------------------------------------------------------------------
-//-------------------------IMAGE RESOLUTION--------------------------------
+//------------------------IMAGE RESOLUTION---------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -124,7 +79,7 @@ function _tutImagePath(imageFile) {
 
 
 //------------------------------------------------------------------------
-//------------------------STEP UI UPDATERS--------------------------------
+//-------------------------STEP UI UPDATERS---------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -149,21 +104,9 @@ function updateNextButton() {
 
 
 //------------------------------------------------------------------------
-//------------------------STEP RENDERING-----------------------------------
+//------------------------STEP RENDERING------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-
-// renderTutStep — orchestrates rendering the current step: swaps the
-//   background image if needed, then (re)draws the text box and arrow.
-function renderTutStep() {
-    const step = TUTORIAL_STEPS[tutStep];
-    updateStepCounter();
-    updateNextButton();
-
-    ensureTutDemoSkeleton(step);
-    renderTutBox(step);
-    renderTutArrow(step);
-}
 
 // ensureTutDemoSkeleton — makes sure #tut-demo-area contains the background
 //   <img> and the arrow <svg>, swapping the image src only when the step's
@@ -187,35 +130,6 @@ function ensureTutDemoSkeleton(step) {
         tutCurrentImageKey = wantedKey;
         existingImg.src = _tutImagePath(wantedKey);
     }
-}
-
-// renderTutBox — creates (if needed) and positions the floating text box,
-//   filling it with the translated title and body text for this step.
-// renderTutBox — creates (if needed) and positions the floating text box,
-//   filling it with the translated title and body text for this step.
-function renderTutBox(step) {
-    const area = document.getElementById('tut-demo-area');
-    let box = document.getElementById('tut-text-box');
-
-    if (!box) {
-        box = document.createElement('div');
-        box.id = 'tut-text-box';
-        box.className = 'tut-text-box';
-        area.appendChild(box);
-    }
-
-    // Reset to the "ideal" anchored position before measuring, so we don't
-    // compound leftover offsets from a previous step's clamp.
-    box.style.transform = 'translate(-50%, -50%)';
-    box.style.top = step.box.top;
-    box.style.left = step.box.left;
-    box.innerHTML = `
-        <div class="tut-box-title">${t(step.titleKey)}</div>
-        <div class="tut-box-text">${t(step.textKey)}</div>`;
-
-    // Wait a frame so the box has real dimensions, then pull it back
-    // inside the visible area if it's overflowing (small screens).
-    requestAnimationFrame(() => clampTutBoxPosition());
 }
 
 // clampTutBoxPosition — nudges #tut-text-box (via an extra transform offset)
@@ -250,6 +164,33 @@ function clampTutBoxPosition() {
     }
 }
 
+// renderTutBox — creates (if needed) and positions the floating text box,
+//   filling it with the translated title and body text for this step.
+function renderTutBox(step) {
+    const area = document.getElementById('tut-demo-area');
+    let box = document.getElementById('tut-text-box');
+
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'tut-text-box';
+        box.className = 'tut-text-box';
+        area.appendChild(box);
+    }
+
+    // Reset to the "ideal" anchored position before measuring, so we don't
+    // compound leftover offsets from a previous step's clamp.
+    box.style.transform = 'translate(-50%, -50%)';
+    box.style.top = step.box.top;
+    box.style.left = step.box.left;
+    box.innerHTML = `
+        <div class="tut-box-title">${t(step.titleKey)}</div>
+        <div class="tut-box-text">${t(step.textKey)}</div>`;
+
+    // Wait a frame so the box has real dimensions, then pull it back
+    // inside the visible area if it's overflowing (small screens).
+    requestAnimationFrame(() => clampTutBoxPosition());
+}
+
 // renderTutArrow — draws (or clears) the golden dashed arrow from the
 //   text box's anchor point to the step's target coordinate.
 function renderTutArrow(step) {
@@ -279,23 +220,37 @@ function renderTutArrow(step) {
               stroke-dasharray="6,4" marker-end="url(#tut-arrowhead)"/>`;
 }
 
+// renderTutStep — orchestrates rendering the current step: swaps the
+//   background image if needed, then (re)draws the text box and arrow.
+function renderTutStep() {
+    const step = TUTORIAL_STEPS[tutStep];
+    updateStepCounter();
+    updateNextButton();
+
+    ensureTutDemoSkeleton(step);
+    renderTutBox(step);
+    renderTutArrow(step);
+}
+
 
 
 
 //------------------------------------------------------------------------
-//---------------------------NAVIGATION-----------------------------------
+//---------------------------NAVIGATION-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// initTutorialClickHandler — clicking anywhere on the demo area (but not
-//   on the text box itself, so its text remains selectable) advances to
-//   the next step, same as pressing NEXT.
-function initTutorialClickHandler() {
-    const area = document.getElementById('tut-demo-area');
-    area.onclick = (e) => {
-        if (e.target.closest('#tut-text-box')) return;
-        advanceTutStep();
-    };
+// finishTutorial — marks the tutorial as completed, persists the save,
+//   and navigates to the level select screen.
+function finishTutorial() {
+    STATE.tutorialDone = true;
+    save();
+    if (_tutorialReplayFromTitle) {
+        _tutorialReplayFromTitle = false;
+        showTitle();
+        return;
+    }
+    showSetup();
 }
 
 // advanceTutStep — moves to the next step, or finishes the tutorial when
@@ -318,15 +273,49 @@ function prevTutStep() {
     }
 }
 
-// finishTutorial — marks the tutorial as completed, persists the save,
-//   and navigates to the level select screen.
-function finishTutorial() {
-    STATE.tutorialDone = true;
-    save();
-    if (_tutorialReplayFromTitle) {
-        _tutorialReplayFromTitle = false;
-        showTitle();
+// initTutorialClickHandler — clicking anywhere on the demo area (but not
+//   on the text box itself, so its text remains selectable) advances to
+//   the next step, same as pressing NEXT.
+function initTutorialClickHandler() {
+    const area = document.getElementById('tut-demo-area');
+    area.onclick = (e) => {
+        if (e.target.closest('#tut-text-box')) return;
+        advanceTutStep();
+    };
+}
+
+
+
+
+//------------------------------------------------------------------------
+//------------------------ENTRY POINTS--------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// showTutorialScreen — switches to the tutorial screen and shows the first step.
+function showTutorialScreen() {
+    tutStep = 0;
+    tutCurrentImageKey = null;
+    switchScreen('screen-tutorial');
+    initTutorialClickHandler();
+    renderTutStep();
+}
+
+// showTutorial — called from the title screen.
+//   Skips the tutorial and goes straight to setup if already completed.
+function showTutorial() {
+    if (STATE.tutorialDone) {
+        showSetup();
         return;
     }
-    showSetup();
+    screenHistory.push('screen-title');
+    showTutorialScreen();
+}
+
+// replayTutorialFromTitle — rewatch the tutorial even though
+// STATE.tutorialDone is already true (showTutorial() would otherwise skip it).
+function replayTutorialFromTitle() {
+    _tutorialReplayFromTitle = true;
+    screenHistory.push('screen-title');
+    showTutorialScreen();
 }

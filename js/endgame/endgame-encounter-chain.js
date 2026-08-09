@@ -488,7 +488,7 @@ function _egHideChainCountdownOverlay() {
 function _egChainCleanup() {
     _egCancelChainCountdown();
     ALL.forEach(level => {
-        if (level.isChainedPuzzle) {
+        if (level.isChainedPuzzle && level !== cur) {   // <-- don't strip the level about to be retried
             delete level.isMonsterLevel;
             delete level.isChainedPuzzle;
         }

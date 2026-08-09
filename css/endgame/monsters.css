@@ -131,7 +131,7 @@
 }
 
 .eg-flash-damage {
-    animation: eg-damage-shake 0.3s ease-out;
+    animation: eg-damage-shake 1s ease-out;
 }
 
 @keyframes eg-death {
@@ -149,7 +149,7 @@
 }
 
 .eg-flash-kill {
-    animation: eg-death 0.3s forwards;
+    animation: eg-death 0.8s forwards;
     pointer-events: none;
 }
 
@@ -215,7 +215,7 @@
     font-weight: bold;
     font-size: 18px;
     pointer-events: none; /* Let clicks pass through the number */
-    animation: damage-float 0.6s ease-out forwards;
+    animation: damage-float 1.5s ease-out forwards;
     z-index: 100;
     text-shadow: 1px 1px 2px black;
 }
