@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------
-//-------------------TIMER VARIABLES--------------------------------------
+//-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -69,6 +69,38 @@ function updTimer() {
 
     // Notify the passive skill tracker every tick (no-op when unavailable).
     if (typeof PassiveTracker !== 'undefined') PassiveTracker.onTimerTick();
+}
+
+
+
+
+//------------------------------------------------------------------------
+//-------------------TIMER INTERVAL CONTROL---------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Shared low-level teardown used by both stopTimer() and pauseTimer() —
+// they behave identically, just called from different semantic contexts.
+function _clearTimerInterval() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+
+// Cancels the active countdown interval. Safe to call even when no
+// interval is running. Called on level end, navigation away, and at the
+// start of startTimer() to prevent duplicate intervals.
+function stopTimer() {
+    _clearTimerInterval();
+}
+
+
+// Pauses the countdown without resetting timerSecs. The timer can be
+// resumed with resumeTimer().
+function pauseTimer() {
+    _clearTimerInterval();
 }
 
 
@@ -206,53 +238,49 @@ function _tickTimedStasis() {
 }
 
 
-// Searches for the first row in the solution grid that has fewer than
-// 2 correctly filled cells. Returns the row index, or -1 if none found.
-function _findSparseRow(sol, rows, cols) {
-    for (let r = 0; r < rows; r++) {
-        const filled = sol[r].filter((v, c) => v === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])).length;
-        const total = sol[r].filter(v => v === 1).length;
-        if (filled < 2 && filled < total) return r;
-    }
-    return -1;
-}
-
-
-// Searches for the first column in the solution grid that has fewer than
-// 2 correctly filled cells. Returns the col index, or -1 if none found.
-function _findSparseCol(sol, rows, cols) {
-    for (let c = 0; c < cols; c++) {
-        const filled = sol.filter((row, r) => row[c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])).length;
-        const total = sol.filter(row => row[c] === 1).length;
-        if (filled < 2 && filled < total) return c;
-    }
-    return -1;
-}
-
-
-// Reveals all unfilled solution cells in the given row and refreshes
-// their display and clue highlights.
-function _revealSparseRow(sol, sparseRow, cols) {
-    for (let c = 0; c < cols; c++) {
-        if (sol[sparseRow][c] === 1 && userGrid[sparseRow][c] !== 1 && !revealedGrid[sparseRow][c]) {
-            revealedGrid[sparseRow][c] = true;
-            userGrid[sparseRow][c] = 1;
-            renderCell(sparseRow, c);
-            updClues(sparseRow, c);
+// Returns { filled, total } for one row (isRow = true) or column
+// (isRow = false) of the solution grid at the given index: `total` is how
+// many solution cells are meant to be filled in that line, `filled` is how
+// many of those are already correctly filled/revealed by the player.
+// `otherCount` is the length of the line (cols for a row, rows for a col).
+function _getLineFillStats(sol, index, isRow, otherCount) {
+    let filled = 0;
+    let total = 0;
+    for (let i = 0; i < otherCount; i++) {
+        const r = isRow ? index : i;
+        const c = isRow ? i : index;
+        if (sol[r][c] === 1) {
+            total++;
+            if (userGrid[r][c] === 1 || revealedGrid[r][c]) filled++;
         }
     }
+    return { filled, total };
 }
 
 
-// Reveals all unfilled solution cells in the given column and refreshes
-// their display and clue highlights.
-function _revealSparseCol(sol, sparseCol, rows) {
-    for (let r = 0; r < rows; r++) {
-        if (sol[r][sparseCol] === 1 && userGrid[r][sparseCol] !== 1 && !revealedGrid[r][sparseCol]) {
-            revealedGrid[r][sparseCol] = true;
-            userGrid[r][sparseCol] = 1;
-            renderCell(r, sparseCol);
-            updClues(r, sparseCol);
+// Searches for the first row (isRow = true) or column (isRow = false) in
+// the solution grid that has fewer than 2 correctly filled cells. Returns
+// the line index, or -1 if none found.
+function _findSparseLine(sol, lineCount, otherCount, isRow) {
+    for (let i = 0; i < lineCount; i++) {
+        const { filled, total } = _getLineFillStats(sol, i, isRow, otherCount);
+        if (filled < 2 && filled < total) return i;
+    }
+    return -1;
+}
+
+
+// Reveals all unfilled solution cells in the given row (isRow = true) or
+// column (isRow = false) and refreshes their display and clue highlights.
+function _revealSparseLine(sol, index, otherCount, isRow) {
+    for (let i = 0; i < otherCount; i++) {
+        const r = isRow ? index : i;
+        const c = isRow ? i : index;
+        if (sol[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c]) {
+            revealedGrid[r][c] = true;
+            userGrid[r][c] = 1;
+            renderCell(r, c);
+            updClues(r, c);
         }
     }
 }
@@ -268,11 +296,11 @@ function _triggerLawOfLargeNumbers() {
     const rows = sol.length;
     const cols = sol[0].length;
 
-    const sparseRow = _findSparseRow(sol, rows, cols);
-    const sparseCol = _findSparseCol(sol, rows, cols);
+    const sparseRow = _findSparseLine(sol, rows, cols, true);
+    const sparseCol = _findSparseLine(sol, cols, rows, false);
 
-    if (sparseRow >= 0) _revealSparseRow(sol, sparseRow, cols);
-    if (sparseCol >= 0) _revealSparseCol(sol, sparseCol, rows);
+    if (sparseRow >= 0) _revealSparseLine(sol, sparseRow, cols, true);
+    if (sparseCol >= 0) _revealSparseLine(sol, sparseCol, rows, false);
 
     if (sparseRow < 0 && sparseCol < 0) return; // nothing was revealed
 
@@ -367,37 +395,9 @@ function _checkTimerExpired() {
 
 
 //------------------------------------------------------------------------
-//-------------------TIMER CONTROL FUNCTIONS------------------------------
+//-------------------MAIN ENTRY POINTS-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-
-// Cancels the active countdown interval. Safe to call even when no
-// interval is running. Called on level end, navigation away, and at the
-// start of startTimer() to prevent duplicate intervals.
-function stopTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-}
-
-
-// Pauses the countdown without resetting timerSecs. The timer can be
-// resumed with resumeTimer().
-function pauseTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-}
-
-
-// Resumes a paused countdown. Does nothing if the game is already over
-// or a timer interval is already running.
-function resumeTimer() {
-    if (!dead && !timerInterval) startTimer();
-}
-
 
 // Starts the 1-second countdown loop. Always stops any existing interval
 // first to prevent duplicates (important when replaying a level).
@@ -425,4 +425,11 @@ function startTimer() {
         _tickEmergencyScan();
         _checkTimerExpired();
     }, 1000);
+}
+
+
+// Resumes a paused countdown. Does nothing if the game is already over
+// or a timer interval is already running.
+function resumeTimer() {
+    if (!dead && !timerInterval) startTimer();
 }
