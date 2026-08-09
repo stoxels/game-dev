@@ -5476,7 +5476,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 1.8, max: 2.5, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1.1, max: 1.7, weight: 200, ilvl: 62 },
                 { tier: 3, min: 0.5, max: 1.0, weight: 460, ilvl: 38 },
-                { tier: 4, min: 0.2, max: 0.4, weight: 1000, ilvl: 12 }
+                { tier: 4, min: 0.2, max: 0.4, weight: 1000, ilvl: 1 }
             ]
         },
 
@@ -5492,7 +5492,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 28, max1: 40, min2: 75, max2: 105, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 17, max1: 27, min2: 48, max2: 74, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 8, max1: 16, min2: 24, max2: 47, weight: 520, ilvl: 35 },
-                { tier: 4, min1: 3, max1: 7, min2: 10, max2: 23, weight: 1050, ilvl: 8 }
+                { tier: 4, min1: 3, max1: 7, min2: 10, max2: 23, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -5508,7 +5508,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 55, max: 75, weight: 90, ilvl: 82 },
                 { tier: 2, min: 35, max: 54, weight: 220, ilvl: 62 },
                 { tier: 3, min: 18, max: 34, weight: 500, ilvl: 38 },
-                { tier: 4, min: 6, max: 17, weight: 1050, ilvl: 12 }
+                { tier: 4, min: 6, max: 17, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -5528,7 +5528,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 28, max1: 42, min2: 78, max2: 108, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 17, max1: 27, min2: 50, max2: 77, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 8, max1: 16, min2: 26, max2: 49, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 3, max1: 7, min2: 11, max2: 25, weight: 1000, ilvl: 10 }
+                { tier: 4, min1: 3, max1: 7, min2: 11, max2: 25, weight: 1000, ilvl: 1 }
             ]
         },
         cold_damage: {
@@ -5538,7 +5538,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 24, max1: 38, min2: 70, max2: 98, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 14, max1: 23, min2: 44, max2: 69, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 7, max1: 13, min2: 22, max2: 43, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 6, min2: 9, max2: 21, weight: 1000, ilvl: 10 }
+                { tier: 4, min1: 2, max1: 6, min2: 9, max2: 21, weight: 1000, ilvl: 1 }
             ]
         },
         lightning_damage: {
@@ -5549,7 +5549,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 7, max1: 18, min2: 85, max2: 128, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 4, max1: 12, min2: 54, max2: 84, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 2, max1: 7, min2: 28, max2: 53, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 4, min2: 12, max2: 27, weight: 1000, ilvl: 10 }
+                { tier: 4, min1: 1, max1: 4, min2: 12, max2: 27, weight: 1000, ilvl: 1 }
             ]
         },
         shadow_damage: {
@@ -5561,7 +5561,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 20, max1: 32, min2: 56, max2: 82, weight: 75, ilvl: 82 },
                 { tier: 2, min1: 12, max1: 19, min2: 36, max2: 55, weight: 170, ilvl: 62 },
                 { tier: 3, min1: 6, max1: 11, min2: 18, max2: 35, weight: 370, ilvl: 38 },
-                { tier: 4, min1: 2, max1: 5, min2: 7, max2: 17, weight: 800, ilvl: 12 }
+                { tier: 4, min1: 2, max1: 5, min2: 7, max2: 17, weight: 800, ilvl: 1 }
             ]
         },
 
@@ -5579,7 +5579,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 8, max: 12, weight: 90, ilvl: 80 },
                 { tier: 2, min: 5, max: 7, weight: 220, ilvl: 60 },
                 { tier: 3, min: 3, max: 4, weight: 520, ilvl: 35 },
-                { tier: 4, min: 1, max: 2, weight: 1050, ilvl: 10 }
+                { tier: 4, min: 1, max: 2, weight: 1050, ilvl: 1 }
             ]
         },
         crit_multiplier: {
@@ -5589,7 +5589,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 55, max: 75, weight: 70, ilvl: 82 },
                 { tier: 2, min: 35, max: 54, weight: 175, ilvl: 62 },
                 { tier: 3, min: 18, max: 34, weight: 400, ilvl: 40 },
-                { tier: 4, min: 6, max: 17, weight: 900, ilvl: 15 }
+                { tier: 4, min: 6, max: 17, weight: 900, ilvl: 1 }
             ]
         },
 
@@ -5600,7 +5600,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 1 }
             ]
         }
     },
@@ -5676,7 +5676,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 2.5, max: 4.0, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1.5, max: 2.4, weight: 200, ilvl: 60 },
                 { tier: 3, min: 0.8, max: 1.4, weight: 480, ilvl: 35 },
-                { tier: 4, min: 0.3, max: 0.7, weight: 1000, ilvl: 10 }
+                { tier: 4, min: 0.3, max: 0.7, weight: 1000, ilvl: 1 }
             ]
         },
 
@@ -5695,7 +5695,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 28, max: 40, weight: 100, ilvl: 80 },
                 { tier: 2, min: 18, max: 27, weight: 250, ilvl: 58 },
                 { tier: 3, min: 9, max: 17, weight: 550, ilvl: 32 },
-                { tier: 4, min: 3, max: 8, weight: 1100, ilvl: 8 }
+                { tier: 4, min: 3, max: 8, weight: 1100, ilvl: 1 }
             ]
         },
         chance_to_freeze: {
@@ -5705,7 +5705,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 24, max: 35, weight: 100, ilvl: 80 },
                 { tier: 2, min: 15, max: 23, weight: 250, ilvl: 58 },
                 { tier: 3, min: 7, max: 14, weight: 550, ilvl: 32 },
-                { tier: 4, min: 2, max: 6, weight: 1100, ilvl: 8 }
+                { tier: 4, min: 2, max: 6, weight: 1100, ilvl: 1 }
             ]
         },
         chance_to_shock: {
@@ -5715,7 +5715,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 28, max: 40, weight: 100, ilvl: 80 },
                 { tier: 2, min: 18, max: 27, weight: 250, ilvl: 58 },
                 { tier: 3, min: 9, max: 17, weight: 550, ilvl: 32 },
-                { tier: 4, min: 3, max: 8, weight: 1100, ilvl: 8 }
+                { tier: 4, min: 3, max: 8, weight: 1100, ilvl: 1 }
             ]
         },
         chance_to_blind: {
@@ -5725,7 +5725,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 30, max: 45, weight: 110, ilvl: 78 },
                 { tier: 2, min: 19, max: 29, weight: 270, ilvl: 55 },
                 { tier: 3, min: 10, max: 18, weight: 580, ilvl: 30 },
-                { tier: 4, min: 3, max: 9, weight: 1150, ilvl: 8 }
+                { tier: 4, min: 3, max: 9, weight: 1150, ilvl: 1 }
             ]
         },
         chance_to_convert: {
@@ -5736,7 +5736,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 45, ilvl: 84 },
                 { tier: 2, min: 7, max: 11, weight: 120, ilvl: 65 },
-                { tier: 3, min: 2, max: 6, weight: 320, ilvl: 15 }
+                { tier: 3, min: 2, max: 6, weight: 320, ilvl: 1 }
             ]
         },
 
@@ -5756,7 +5756,7 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min: 35, max: 50, weight: 75, ilvl: 84 },
                 { tier: 2, min: 22, max: 34, weight: 190, ilvl: 64 },
                 { tier: 3, min: 10, max: 21, weight: 440, ilvl: 40 },
-                { tier: 4, min: 3, max: 9, weight: 950, ilvl: 15 }
+                { tier: 4, min: 3, max: 9, weight: 950, ilvl: 1 }
             ]
         },
 
@@ -5766,7 +5766,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 1 }
             ]
         },
         focus: {
@@ -5774,7 +5774,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 1 }
             ]
         }
     }
@@ -6319,7 +6319,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 14, max1: 22, min2: 38, max2: 56, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 8, max1: 13, min2: 24, max2: 37, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 4, max1: 7, min2: 12, max2: 23, weight: 520, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 11, weight: 1050, ilvl: 8 }
+                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 11, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -6331,7 +6331,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min: 40, max: 55, weight: 90, ilvl: 82 },
                 { tier: 2, min: 25, max: 39, weight: 220, ilvl: 62 },
                 { tier: 3, min: 12, max: 24, weight: 500, ilvl: 38 },
-                { tier: 4, min: 4, max: 11, weight: 1050, ilvl: 12 }
+                { tier: 4, min: 4, max: 11, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -6346,7 +6346,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 15, max1: 24, min2: 42, max2: 60, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 9, max1: 14, min2: 26, max2: 41, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 4, max1: 8, min2: 13, max2: 25, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 12, weight: 1000, ilvl: 10 }
+                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 12, weight: 1000, ilvl: 1 }
             ]
         },
         cold_damage: {
@@ -6356,7 +6356,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 13, max1: 20, min2: 36, max2: 52, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 8, max1: 12, min2: 22, max2: 35, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 4, max1: 7, min2: 11, max2: 21, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 4, max2: 10, weight: 1000, ilvl: 10 }
+                { tier: 4, min1: 1, max1: 3, min2: 4, max2: 10, weight: 1000, ilvl: 1 }
             ]
         },
         lightning_damage: {
@@ -6366,7 +6366,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 4, max1: 10, min2: 46, max2: 70, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 2, max1: 6, min2: 28, max2: 45, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 1, max1: 4, min2: 14, max2: 27, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 2, min2: 5, max2: 13, weight: 1000, ilvl: 10 }
+                { tier: 4, min1: 1, max1: 2, min2: 5, max2: 13, weight: 1000, ilvl: 1 }
             ]
         },
         shadow_damage: {
@@ -6376,7 +6376,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 11, max1: 17, min2: 30, max2: 46, weight: 75, ilvl: 82 },
                 { tier: 2, min1: 6, max1: 10, min2: 18, max2: 29, weight: 170, ilvl: 62 },
                 { tier: 3, min1: 3, max1: 5, min2: 9, max2: 17, weight: 370, ilvl: 38 },
-                { tier: 4, min1: 1, max1: 2, min2: 3, max2: 8, weight: 800, ilvl: 12 }
+                { tier: 4, min1: 1, max1: 2, min2: 3, max2: 8, weight: 800, ilvl: 1 }
             ]
         },
 
@@ -6391,7 +6391,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min: 6, max: 9, weight: 90, ilvl: 80 },
                 { tier: 2, min: 4, max: 5, weight: 220, ilvl: 60 },
                 { tier: 3, min: 2, max: 3, weight: 520, ilvl: 35 },
-                { tier: 4, min: 1, max: 1, weight: 1050, ilvl: 10 }
+                { tier: 4, min: 1, max: 1, weight: 1050, ilvl: 1 }
             ]
         },
         crit_multiplier: {
@@ -6401,7 +6401,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min: 45, max: 62, weight: 70, ilvl: 82 },
                 { tier: 2, min: 28, max: 44, weight: 175, ilvl: 62 },
                 { tier: 3, min: 14, max: 27, weight: 400, ilvl: 40 },
-                { tier: 4, min: 5, max: 13, weight: 900, ilvl: 15 }
+                { tier: 4, min: 5, max: 13, weight: 900, ilvl: 1 }
             ]
         },
 
@@ -6420,7 +6420,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min: 28, max: 40, weight: 75, ilvl: 84 },
                 { tier: 2, min: 17, max: 27, weight: 190, ilvl: 64 },
                 { tier: 3, min: 8, max: 16, weight: 440, ilvl: 40 },
-                { tier: 4, min: 2, max: 7, weight: 960, ilvl: 14 }
+                { tier: 4, min: 2, max: 7, weight: 960, ilvl: 1 }
             ]
         },
 
@@ -6431,7 +6431,7 @@ const EG_MOD_TABLE_RANGED = {
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 1 }
             ]
         }
     },
@@ -6529,7 +6529,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min: 13, max: 20, weight: 100, ilvl: 80 },
                 { tier: 2, min: 8, max: 12, weight: 250, ilvl: 58 },
                 { tier: 3, min: 4, max: 7, weight: 550, ilvl: 32 },
-                { tier: 4, min: 1, max: 3, weight: 1100, ilvl: 8 }
+                { tier: 4, min: 1, max: 3, weight: 1100, ilvl: 1 }
             ]
         },
         chance_to_shock: {
@@ -6539,7 +6539,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min: 16, max: 24, weight: 100, ilvl: 80 },
                 { tier: 2, min: 10, max: 15, weight: 250, ilvl: 58 },
                 { tier: 3, min: 5, max: 9, weight: 550, ilvl: 32 },
-                { tier: 4, min: 2, max: 4, weight: 1100, ilvl: 8 }
+                { tier: 4, min: 2, max: 4, weight: 1100, ilvl: 1 }
             ]
         },
         chance_to_blind: {
@@ -6549,7 +6549,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min: 18, max: 27, weight: 110, ilvl: 78 },
                 { tier: 2, min: 11, max: 17, weight: 270, ilvl: 55 },
                 { tier: 3, min: 5, max: 10, weight: 580, ilvl: 30 },
-                { tier: 4, min: 2, max: 4, weight: 1150, ilvl: 8 }
+                { tier: 4, min: 2, max: 4, weight: 1150, ilvl: 1 }
             ]
         },
         chance_to_convert: {
@@ -6558,7 +6558,7 @@ const EG_MOD_TABLE_RANGED = {
             tiers: [
                 { tier: 1, min: 7, max: 11, weight: 45, ilvl: 84 },
                 { tier: 2, min: 4, max: 6, weight: 120, ilvl: 65 },
-                { tier: 3, min: 1, max: 3, weight: 320, ilvl: 15 }
+                { tier: 3, min: 1, max: 3, weight: 320, ilvl: 1 }
             ]
         },
 
@@ -6576,7 +6576,7 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min: 45, max: 65, weight: 75, ilvl: 84 },
                 { tier: 2, min: 28, max: 44, weight: 190, ilvl: 64 },
                 { tier: 3, min: 14, max: 27, weight: 440, ilvl: 40 },
-                { tier: 4, min: 5, max: 13, weight: 960, ilvl: 15 }
+                { tier: 4, min: 5, max: 13, weight: 960, ilvl: 1 }
             ]
         },
 
@@ -6586,7 +6586,7 @@ const EG_MOD_TABLE_RANGED = {
             label: '+# to Allowed Mistake Count',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 1 }
             ]
         },
         focus: {
@@ -6594,7 +6594,7 @@ const EG_MOD_TABLE_RANGED = {
             label: 'Mistakes consume #% less Time',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 1 }
             ]
         }
     }
