@@ -1,9 +1,11 @@
-
 //------------------------------------------------------------------------
 //---------------------TRANSLATIONS STRINGS TABLE ------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Pure data table — no logic here. `T[lang][key]` is looked up by
+// translations.js. Keep en/de key sets in sync: a key missing (or
+// misspelled) in one locale will silently fall back to nothing at runtime.
 
 const T = {
     en: {
@@ -50,7 +52,7 @@ const T = {
         tut_s8p: 'Completing Ascension - Levels allows you to select one out of three possible classes. Each class has a passive ability and two active abilities, which can heavily alter the way you approach a Stoxel and help in case you get stuck. Abilities can be upgraded by playing more Ascension - Levels.',
 
         tut_s9h: 'CONVERGENCE, INFERENCE & PROBABILITY TREE',
-        tut_9p: 'Completing Convergence - Levels grants Convergence Points, which can be spent on the Probability Tree to customize the way you play the game. Completing Inference - Objectives rewards additional Convergence Points.',
+        tut_s9p: 'Completing Convergence - Levels grants Convergence Points, which can be spent on the Probability Tree to customize the way you play the game. Completing Inference - Objectives rewards additional Convergence Points.',
 
         // Setup screen
         setup_title: 'GAME SETUP',
@@ -69,6 +71,10 @@ const T = {
         mod_desc_tt: '50% less time',
         mod_desc_hc: 'Game Over after one mistake',
         mod_desc_im: 'No Items',
+        mod_cl: 'CLASSLESS',
+        mod_tl: 'TREELESS',
+        mod_desc_cl: 'No Class Abilities',
+        mod_desc_tl: 'No Tree Effects',
 
         // In-game HUD
         score_lbl: 'SCORE',
@@ -95,6 +101,8 @@ const T = {
         // Codes screen
         codes_title: 'MOODLE CODES',
         no_codes: 'No codes unlocked yet.\nEarn points to unlock achievement codes!',
+        codes_req_score: 'Required Score:',
+        codes_req_ach: 'Required Achievement Milestones:',
 
         // Password / Moodle code modal
         pw_title: '🔑 NEW CODE UNLOCKED!',
@@ -111,7 +119,10 @@ const T = {
         ls_tip_harder: 'Try {diff} difficulty to reach a higher score!',
         ls_tip_mods: 'Add {mods} modifier for bonus score!',
         ls_tip_mods_plural: 'Add {mods} modifiers for bonus score!',
+        ls_tip_optimize: 'Completed on Hard with all Modifiers, but you can still gain more Score by completing the level faster!',
         ls_hs_best: 'BEST',
+        ls_to_next: 'to next code',
+        ls_all_codes: 'All codes unlocked!',
 
         // In-game HUD
         lvl_prefix: 'LEVEL',
@@ -137,7 +148,8 @@ const T = {
         item_cursed_time_bad: '💀 CURSED! −4 minutes!',
         item_cursed_time_good: '💀 Lucky! +5 minutes!',
         item_time_added: '+{n}s added!',
-        item_freeze_msg: 'Timer frozen 30s!',
+        item_freeze_msg: '❄️ TIME FREEZE!',
+        item_freeze_ended: '❄️ Freeze ended',
         item_shield_msg: 'Shield active!',
         item_cursed_locked: '☠️ Cursed items unlock after {n} more min',
         item_discarded: 'Item discarded',
@@ -236,15 +248,13 @@ const T = {
         tut2_s11_title: 'Classes',
         tut2_s11_text: 'Complete Ascension - Levels in order to unlock a class. Classes have abilities that can be used to help you solve puzzles!',
 
+        // Reserved tutorial steps — currently unused (empty title/text)
         tut2_s12_title: '',
         tut2_s12_text: '',
-
         tut2_s13_title: '',
         tut2_s13_text: '',
-
         tut2_s14_title: '',
         tut2_s14_text: '',
-
         tut2_s15_title: '',
         tut2_s15_text: '',
 
@@ -257,54 +267,12 @@ const T = {
         mg_not_a_number: '⚠ Please enter a numeric value.',
         mg_new_q: '🔄 TRY A DIFFERENT QUESTION',
         mg_footer: 'Solve it once and this level stays unlocked permanently.',
+        mg_placeholder: 'your answer',
 
-        ls_to_next: 'to next code',
-        ls_all_codes: 'All codes unlocked!',
-
-        reset_close: '✕ CLOSE',
-        reset_title: 'RESET ALL PROGRESS',
-        reset_body: 'This will permanently erase:<br><strong style="color:var(--accent2)">· All completed levels<br>· All highscores<br>· All bonus claims<br>· All inventory items<br>· All Moodle codes<br>· Your selected class <br>· Your completed Inference tasks <br>· Your collected Convergence Points<br><br>This will NOT reset your collected achievements.</strong><br><br>Your current playthrough will be gone. This cannot be undone.',
-        reset_confirm: '🗑 YES, RESET EVERYTHING',
-        reset_cancel: 'CANCEL',
-
-        item_freeze_msg: '❄️ TIME FREEZE!',
-        item_freeze_ended: '❄️ Freeze ended',
-
-
-        btn_inference: 'INFERENCE',
-
-        mod_cl: 'CLASSLESS',
-        mod_tl: 'TREELESS',
-        mod_desc_cl: 'No Class Abilities',
-        mod_desc_tl: 'No Tree Effects',
-
-        setup_controls: 'CONTROLS',
-        axis_lock_label: '🔒 AXIS LOCK — Lock mouse drag direction to current row or column',
-
-
-        btn_settings_close: '✕ CLOSE',
-
-        // Settings Modal
-        settings_title: 'SETTINGS',
-        settings_audio: 'AUDIO',
-        settings_bgm: 'Background Music',
-        settings_sfx: 'Sound Effects',
-        settings_controls: 'CONTROLS',
-        settings_axis_lock: 'Axis Lock',
-        settings_axis_lock_hint: 'Lock drag to starting row or column',
-        settings_qmark: 'Question Mark',
-        settings_qmark_hint: 'Right Click a X - marked cell to add a yellow ?',
-        stt_on: 'ON',
-        stt_off: 'OFF',
-
-        game_paused: 'GAME PAUSED',
-        game_paused_hint: 'Press Esc to continue',
-
-        // Math Gate Units
+        // Math gate units (used to label numeric answers)
         elements: 'elements',
         events: 'events',
         outcomes: 'outcomes',
-
         subsets: "Subsets",
         elementary_events: "Elementary Events",
         cards: "Cards",
@@ -315,25 +283,12 @@ const T = {
         terms: "Terms",
         paths: "Paths",
 
-        mg_placeholder: 'your answer',
-
-        codes_req_score: 'Required Score:',
-        codes_req_ach: 'Required Achievement Milestones:',
-        ls_tip_optimize: 'Completed on Hard with all Modifiers, but you can still gain more Score by completing the level faster!',
-
-        convergence: 'Convergence',
-        convergence_desc_1: 'You have reached a milestone and earned 1 Convergence Point.',
-        convergence_open_tree: '🌿 Open Probability Tree',
-        convergence_next_level: '▶ Next Level',
-        convergence_level_Select: '☰ Select Level',
-
-        settings_touchpad: 'Touchpad Mode',
-        settings_touchpad_hint: 'Adds an in-game button to swap left-click between Fill and Mark',
-        touchpad_btn_fill: '🖊️ FILL',
-        touchpad_btn_mark: '✕ MARK',
-
-        tree: 'TREE',
-
+        // Reset confirmation modal
+        reset_close: '✕ CLOSE',
+        reset_title: 'RESET ALL PROGRESS',
+        reset_body: 'This will permanently erase:<br><strong style="color:var(--accent2)">· All completed levels<br>· All highscores<br>· All bonus claims<br>· All inventory items<br>· All Moodle codes<br>· Your selected class <br>· Your completed Inference tasks <br>· Your collected Convergence Points<br><br>This will NOT reset your collected achievements.</strong><br><br>Your current playthrough will be gone. This cannot be undone.',
+        reset_confirm: '🗑 YES, RESET EVERYTHING',
+        reset_cancel: 'CANCEL',
         reset_item_levels: 'All completed levels',
         reset_item_highscores: 'All highscores',
         reset_item_bonus: 'All bonus claims',
@@ -345,8 +300,40 @@ const T = {
         reset_note_1: 'This will NOT reset your collected achievements.',
         reset_note_2: 'Your current playthrough will be gone. This cannot be undone.',
 
+        btn_inference: 'INFERENCE',
+        tree: 'TREE',
 
+        setup_controls: 'CONTROLS',
+        axis_lock_label: '🔒 AXIS LOCK — Lock mouse drag direction to current row or column',
 
+        btn_settings_close: '✕ CLOSE',
+
+        // Settings modal
+        settings_title: 'SETTINGS',
+        settings_audio: 'AUDIO',
+        settings_bgm: 'Background Music',
+        settings_sfx: 'Sound Effects',
+        settings_controls: 'CONTROLS',
+        settings_axis_lock: 'Axis Lock',
+        settings_axis_lock_hint: 'Lock drag to starting row or column',
+        settings_qmark: 'Question Mark',
+        settings_qmark_hint: 'Right Click a X - marked cell to add a yellow ?',
+        stt_on: 'ON',
+        stt_off: 'OFF',
+        settings_touchpad: 'Touchpad Mode',
+        settings_touchpad_hint: 'Adds an in-game button to swap left-click between Fill and Mark',
+        touchpad_btn_fill: '🖊️ FILL',
+        touchpad_btn_mark: '✕ MARK',
+
+        game_paused: 'GAME PAUSED',
+        game_paused_hint: 'Press Esc to continue',
+
+        // Convergence modal
+        convergence: 'Convergence',
+        convergence_desc_1: 'You have reached a milestone and earned 1 Convergence Point.',
+        convergence_open_tree: '🌿 Open Probability Tree',
+        convergence_next_level: '▶ Next Level',
+        convergence_level_select: '☰ Select Level',
     },
 
     de: {
@@ -362,7 +349,7 @@ const T = {
         btn_settings: '⚙️ EINSTELLUNGEN',
         btn_achievements: '🏅 Erfolge',
 
-        // Reset:
+        // Reset
         toast_reset: '🗑 Fortschritt zurückgesetzt. Neuer Start!',
 
         // Tutorial modal
@@ -394,9 +381,6 @@ const T = {
         tut_s9h: 'KONVERGENZ, INFERENZ & WAHRSCHEINLICHKEITSBAUM',
         tut_s9p: 'Nach dem Beenden eines Konvergenz - Levels erhältst du Konvergenzpunkte, die im Wahrscheinlichkeitsbaum ausgegeben werden können, um deine Spielweise anzupassen. Das Abschließen von Inferenz - Zielen gibt zusätzliche Konvergenzpunkte.',
 
-
-
-
         // Setup screen
         setup_title: 'SPIELEINRICHTUNG',
         setup_diff: 'SCHWIERIGKEIT',
@@ -414,6 +398,10 @@ const T = {
         mod_desc_tt: '50% weniger Zeit pro Level',
         mod_desc_hc: 'Game Over nach einem Fehler',
         mod_desc_im: 'Keine Gegenstände',
+        mod_cl: 'KLASSENLOS',
+        mod_tl: 'BAUMLOS',
+        mod_desc_cl: 'Keine Klassenfähigkeiten',
+        mod_desc_tl: 'Keine Baum-Effekte',
 
         // In-game HUD
         score_lbl: 'PUNKTE',
@@ -440,6 +428,8 @@ const T = {
         // Codes screen
         codes_title: 'MOODLE CODES',
         no_codes: 'Noch keine Codes freigeschaltet.\nSammle Punkte, um Achievement-Codes freizuschalten!',
+        codes_req_score: 'Benötigte Punkte:',
+        codes_req_ach: 'Benötigte Erfolgsmeilensteine:',
 
         // Password / Moodle code modal
         pw_title: '🔑 NEUER CODE FREIGESCHALTET!',
@@ -456,7 +446,10 @@ const T = {
         ls_tip_harder: 'Löse dieses Puzzle in der {diff} Schwierigkeit für mehr Punkte!',
         ls_tip_mods: 'Füge {mods} Modifikator für mehr Punkte hinzu!',
         ls_tip_mods_plural: 'Füge {mods} Modifikatoren für mehr Punkte hinzu!',
+        ls_tip_optimize: 'Auf Schwer mit allen Modifikatoren geschafft, aber wenn du das Level schneller schaffst kannst du noch mehr Punkte bekommen!',
         ls_hs_best: 'REKORD',
+        ls_to_next: 'bis Code',
+        ls_all_codes: 'Alle Codes freigeschaltet!',
 
         // In-game HUD
         lvl_prefix: 'Level',
@@ -482,7 +475,8 @@ const T = {
         item_cursed_time_bad: '💀 VERFLUCHT! −4 Minuten!',
         item_cursed_time_good: '💀 Glück! +5 Minuten!',
         item_time_added: '+{n}s hinzugefügt!',
-        item_freeze_msg: 'Timer eingefroren 30s!',
+        item_freeze_msg: '❄️ ZEITFRIEREN!',
+        item_freeze_ended: '❄️ Zeitfrieren vorbei!',
         item_shield_msg: 'Schild aktiv!',
         item_cursed_locked: '☠️ Verfluchte Items entsperren nach {n} weiteren Min.',
         item_discarded: 'Item verworfen',
@@ -581,28 +575,15 @@ const T = {
         tut2_s11_title: 'Klassen',
         tut2_s11_text: 'Schließe Aufstiegs - Level ab um eine Klasse zu wählen. Klassen haben Fähigkeiten die dir helfen können Puzzles zu lösen!',
 
+        // Reserved tutorial steps — currently unused (empty title/text)
         tut2_s12_title: '',
         tut2_s12_text: '',
-
         tut2_s13_title: '',
         tut2_s13_text: '',
-
         tut2_s14_title: '',
         tut2_s14_text: '',
-
         tut2_s15_title: '',
         tut2_s15_text: '',
-
-
-
-
-
-
-
-
-
-
-
 
         // Math gate modal
         mg_gate_badge: 'WAHRSCHEINLICHKEITSTOR',
@@ -613,49 +594,9 @@ const T = {
         mg_not_a_number: '⚠ Bitte gib einen numerischen Wert ein.',
         mg_new_q: '🔄 ANDERE AUFGABE VERSUCHEN',
         mg_footer: 'Löse es einmal und das Level bleibt dauerhaft freigeschaltet.',
+        mg_placeholder: 'Deine Antwort',
 
-        ls_to_next: 'bis Code',
-        ls_all_codes: 'Alle Codes freigeschaltet!',
-
-        reset_close: '✕ SCHLIESSEN',
-        reset_title: 'RESETTE DEINEN FORTSCHRITT',
-        reset_body: 'Folgendes wird dauerhaft gelöscht:<br><strong style="color:var(--accent2)">· Alle abgeschlossenen Level<br>· Alle Highscores<br>· Alle Bonus-Erfolge<br>· Alle Inventar-Gegenstände<br>· Alle Moodle-Codes<br>· Deine ausgewählte Klasse<br>· Deine abgeschlossenen Inferenz-Aufgaben<br>· Deine gesammelten Konvergenz-Punkte</strong><br><br>Dein aktueller Spielstand geht verloren. Dies kann nicht rückgängig gemacht werden.',
-        reset_confirm: '🗑 JA, ALLES LÖSCHEN',
-        reset_cancel: 'ABBRECHEN',
-
-        item_freeze_msg: '❄️ ZEITFRIEREN!',
-        item_freeze_ended: '❄️ Zeitfrieren vorbei!',
-
-        btn_inference: 'INFERENZ',
-        tree: 'BAUM',
-
-        mod_cl: 'KLASSENLOS',
-        mod_tl: 'BAUMLOS',
-        mod_desc_cl: 'Keine Klassenfähigkeiten',
-        mod_desc_tl: 'Keine Baum-Effekte',
-
-        setup_controls: 'STEUERUNG',
-        axis_lock_label: '🔒 ACHSENSPERRE — Maus-Zug-Richtung auf aktuelle Zeile oder Spalte beschränken',
-
-        btn_settings_close: '✕ SCHLIESSEN',
-
-        // Settings Modal
-        settings_title: 'EINSTELLUNGEN',
-        settings_audio: 'AUDIO',
-        settings_bgm: 'Hintergrundmusik',
-        settings_sfx: 'Soundeffekte',
-        settings_controls: 'STEUERUNG',
-        settings_axis_lock: 'Achsensperre',
-        settings_axis_lock_hint: 'Ziehen auf die Startzeile oder Startspalte beschränken',
-        settings_qmark: 'Fragezeichen',
-        settings_qmark_hint: 'Rechtsklick auf ein mit ✕ markiertes Feld fügt ein gelbes ? hinzu',
-        stt_on: 'AN',
-        stt_off: 'AUS',
-
-        game_paused: 'SPIEL PAUSIERT',
-        game_paused_hint: 'Esc zum Fortfahren',
-
-        // Math Gate Units
+        // Math gate units
         elements: 'Elemente',
         events: 'Ereignisse',
         outcomes: 'Ergebnisse',
@@ -669,24 +610,12 @@ const T = {
         terms: 'Terme',
         paths: 'Pfade',
 
-        mg_placeholder: 'Deine Antwort',
-
-        codes_req_score: 'Benötigte Punkte:',
-        codes_req_ach: 'Benötigte Erfolgsmeilensteine:',
-        ls_tip_optimize: 'Auf Schwer mit allen Modifikatoren geschafft, aber wenn du das Level schneller schaffst kannst du noch mehr Punkte bekommen!',
-
-        convergence: 'Konvergenz',
-        convergence_desc_1: 'Du hast einen Meilenstein erreicht und 1 Konvergenzpunkt erhalten.',
-        convergence_open_tree: '🌿 Wahrscheinlichkeitsbaum öffnen',
-        convergence_next_level: '▶ Nächstes Level',
-        convergence_level_select: '☰ Level wählen',
-
-        settings_touchpad: 'Touchpad-Modus',
-        settings_touchpad_hint: 'Fügt einen Button hinzu, der Linksklick zwischen Füllen und Markieren umschaltet',
-        touchpad_btn_fill: '🖊️ FÜLLEN',
-        touchpad_btn_mark: '✕ MARKIEREN',
-
-
+        // Reset confirmation modal
+        reset_close: '✕ SCHLIESSEN',
+        reset_title: 'RESETTE DEINEN FORTSCHRITT',
+        reset_body: 'Folgendes wird dauerhaft gelöscht:<br><strong style="color:var(--accent2)">· Alle abgeschlossenen Level<br>· Alle Highscores<br>· Alle Bonus-Erfolge<br>· Alle Inventar-Gegenstände<br>· Alle Moodle-Codes<br>· Deine ausgewählte Klasse<br>· Deine abgeschlossenen Inferenz-Aufgaben<br>· Deine gesammelten Konvergenz-Punkte</strong><br><br>Dein aktueller Spielstand geht verloren. Dies kann nicht rückgängig gemacht werden.',
+        reset_confirm: '🗑 JA, ALLES LÖSCHEN',
+        reset_cancel: 'ABBRECHEN',
         reset_item_levels: 'Alle abgeschlossenen Level',
         reset_item_highscores: 'Alle Highscores',
         reset_item_bonus: 'Alle Bonus-Erfolge',
@@ -698,21 +627,39 @@ const T = {
         reset_note_1: 'Dies wird deine gesammelten Erfolge NICHT zurücksetzen.',
         reset_note_2: 'Dein aktueller Spielstand geht verloren. Dies kann nicht rückgängig gemacht werden.',
 
+        btn_inference: 'INFERENZ',
+        tree: 'BAUM',
+
+        setup_controls: 'STEUERUNG',
+        axis_lock_label: '🔒 ACHSENSPERRE — Maus-Zug-Richtung auf aktuelle Zeile oder Spalte beschränken',
+
+        btn_settings_close: '✕ SCHLIESSEN',
+
+        // Settings modal
+        settings_title: 'EINSTELLUNGEN',
+        settings_audio: 'AUDIO',
+        settings_bgm: 'Hintergrundmusik',
+        settings_sfx: 'Soundeffekte',
+        settings_controls: 'STEUERUNG',
+        settings_axis_lock: 'Achsensperre',
+        settings_axis_lock_hint: 'Ziehen auf die Startzeile oder Startspalte beschränken',
+        settings_qmark: 'Fragezeichen',
+        settings_qmark_hint: 'Rechtsklick auf ein mit ✕ markiertes Feld fügt ein gelbes ? hinzu',
+        stt_on: 'AN',
+        stt_off: 'AUS',
+        settings_touchpad: 'Touchpad-Modus',
+        settings_touchpad_hint: 'Fügt einen Button hinzu, der Linksklick zwischen Füllen und Markieren umschaltet',
+        touchpad_btn_fill: '🖊️ FÜLLEN',
+        touchpad_btn_mark: '✕ MARKIEREN',
+
+        game_paused: 'SPIEL PAUSIERT',
+        game_paused_hint: 'Esc zum Fortfahren',
+
+        // Convergence modal
+        convergence: 'Konvergenz',
+        convergence_desc_1: 'Du hast einen Meilenstein erreicht und 1 Konvergenzpunkt erhalten.',
+        convergence_open_tree: '🌿 Wahrscheinlichkeitsbaum öffnen',
+        convergence_next_level: '▶ Nächstes Level',
+        convergence_level_select: '☰ Level wählen',
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

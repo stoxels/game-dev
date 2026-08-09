@@ -1,5 +1,6 @@
 //------------------------------------------------------------------------
-//------------------------LEVEL RUNTIME STATE-----------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Variables that describe what is happening in the current level.
 // These are reset at the start of each level (see startLevel() in screens.js).
@@ -111,6 +112,15 @@ let playerCurrentHP = 100;
 let screenHistory = [];
 
 
+// --- Save slot system ---
+
+// Number of save slots offered on the save-select screen.
+const SAVE_SLOT_COUNT = 20;
+
+// localStorage key used to remember which slot is currently active.
+const ACTIVE_SLOT_KEY = 'stoxels_active_slot';
+
+
 //------------------------------------------------------------------------
 //------------------------GAME PERSISTENCE--------------------------------
 //------------------------------------------------------------------------
@@ -119,6 +129,13 @@ let screenHistory = [];
 // Every screen that reads scores, inventory, or completion status reads from here.
 //------------------------------------------------------------------------
 
+
+// _makeEgGrid — builds an empty rows x cols grid (filled with null) for the
+// endgame hub's inventory/stash storage. Shared by buildFreshState() and
+// migrateOldSave() so the grid-building logic only lives in one place.
+function _makeEgGrid(rows, cols) {
+    return Array.from({ length: rows }, () => Array(cols).fill(null));
+}
 
 // buildFreshState — returns a default STATE object for a brand-new save.
 //                  Defines every field and its starting value in one place.
@@ -169,20 +186,24 @@ function buildFreshState() {
 
         // endgame hub
         egEquipped: {},
-        egInventory: Array.from({ length: typeof EG_INV_ROWS !== 'undefined' ? EG_INV_ROWS : 5 }, () => Array(typeof EG_INV_COLS !== 'undefined' ? EG_INV_COLS : 10).fill(null)),
-        egMapStash: Array.from({ length: typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 2 }, () => Array(typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10).fill(null)),
-        egCurrencyStash: Array.from({ length: typeof EG_CURRENCY_ROWS !== 'undefined' ? EG_CURRENCY_ROWS : 2 }, () => Array(typeof EG_CURRENCY_COLS !== 'undefined' ? EG_CURRENCY_COLS : 10).fill(null)),
+        egInventory: _makeEgGrid(
+            typeof EG_INV_ROWS !== 'undefined' ? EG_INV_ROWS : 5,
+            typeof EG_INV_COLS !== 'undefined' ? EG_INV_COLS : 10
+        ),
+        egMapStash: _makeEgGrid(
+            typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 2,
+            typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10
+        ),
+        egCurrencyStash: _makeEgGrid(
+            typeof EG_CURRENCY_ROWS !== 'undefined' ? EG_CURRENCY_ROWS : 2,
+            typeof EG_CURRENCY_COLS !== 'undefined' ? EG_CURRENCY_COLS : 10
+        ),
         egMapSlotItem: null,
     };
 }
 
-
-// migrateOldSave — fills in any fields that are missing from an older save.
-//                  Called before returning a loaded save so legacy data
-//                  never causes undefined-access errors elsewhere.
-function migrateOldSave(s) {
-
-    // Core fields
+// _migrateCoreFields — fills in top-level fields missing from an older save.
+function _migrateCoreFields(s) {
     if (!s.bonusDone) s.bonusDone = [];
     if (s.tutorialDone === undefined) s.tutorialDone = false;
     if (!s.mathGatePassed) s.mathGatePassed = [];
@@ -191,8 +212,10 @@ function migrateOldSave(s) {
     if (!s.levelMistakes) s.levelMistakes = {};
     if (!s.achStats) s.achStats = {};
     if (!s.convergenceDone) s.convergenceDone = [];
+}
 
-    // Class fields
+// _migrateClassFields — fills in class-progression fields missing from an older save.
+function _migrateClassFields(s) {
     if (s.playerClass === undefined) s.playerClass = null;
     if (!s.classPassiveLevel) s.classPassiveLevel = 1;
     if (!s.classActiveLevel) s.classActiveLevel = 1;
@@ -202,32 +225,61 @@ function migrateOldSave(s) {
     if (!s.classWorldsCompleted) s.classWorldsCompleted = [];
     // Older saves stored classActiveChoice as a number; replace with the string default.
     if (!s.classActiveChoice || typeof s.classActiveChoice === 'number') s.classActiveChoice = 'active1';
+}
 
-    // Ascendency fields
+// _migrateAscendencyFields — fills in ascendency-progression fields missing from an older save.
+function _migrateAscendencyFields(s) {
     if (s.playerAscendency === undefined) s.playerAscendency = null;
     if (!s.ascendencySkill1Level) s.ascendencySkill1Level = 1;
     if (!s.ascendencySkill2Level) s.ascendencySkill2Level = 1;
     if (!s.ascendencyWorldsCompleted) s.ascendencyWorldsCompleted = [];
+}
 
-    // Passive tree — stored as a plain array in JSON, needs to become a Set at runtime.
+// _migratePassiveTreeFields — fills in passive-tree fields missing from an older save.
+//                            passiveTreeAllocated is stored as a plain array in JSON,
+//                            so it needs to become a Set at runtime.
+function _migratePassiveTreeFields(s) {
     if (!s.passiveTreePoints) s.passiveTreePoints = 0;
     if (!s.passiveTreeAllocated || !Array.isArray(s.passiveTreeAllocated)) {
         s.passiveTreeAllocated = new Set();
     } else {
         s.passiveTreeAllocated = new Set(s.passiveTreeAllocated);
     }
+}
 
-    //endgame 
+// _migrateEndgameFields — fills in endgame hub fields missing from an older save.
+function _migrateEndgameFields(s) {
     if (!s.egEquipped) s.egEquipped = {};
-    if (!s.egInventory) s.egInventory = Array.from({ length: typeof EG_INV_ROWS !== 'undefined' ? EG_INV_ROWS : 5 }, () => Array(typeof EG_INV_COLS !== 'undefined' ? EG_INV_COLS : 10).fill(null));
-    if (!s.egMapStash) s.egMapStash = Array.from({ length: typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 2 }, () => Array(typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10).fill(null));
-    if (!s.egCurrencyStash) s.egCurrencyStash = Array.from({ length: typeof EG_CURRENCY_ROWS !== 'undefined' ? EG_CURRENCY_ROWS : 2 }, () => Array(typeof EG_CURRENCY_COLS !== 'undefined' ? EG_CURRENCY_COLS : 10).fill(null));
+    if (!s.egInventory) {
+        s.egInventory = _makeEgGrid(
+            typeof EG_INV_ROWS !== 'undefined' ? EG_INV_ROWS : 5,
+            typeof EG_INV_COLS !== 'undefined' ? EG_INV_COLS : 10
+        );
+    }
+    if (!s.egMapStash) {
+        s.egMapStash = _makeEgGrid(
+            typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 2,
+            typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10
+        );
+    }
+    if (!s.egCurrencyStash) {
+        s.egCurrencyStash = _makeEgGrid(
+            typeof EG_CURRENCY_ROWS !== 'undefined' ? EG_CURRENCY_ROWS : 2,
+            typeof EG_CURRENCY_COLS !== 'undefined' ? EG_CURRENCY_COLS : 10
+        );
+    }
     if (s.egMapSlotItem === undefined) s.egMapSlotItem = null;
+}
 
-
-
-
-    // Quest fields
+// migrateOldSave — fills in any fields that are missing from an older save.
+//                  Called before returning a loaded save so legacy data
+//                  never causes undefined-access errors elsewhere.
+function migrateOldSave(s) {
+    _migrateCoreFields(s);
+    _migrateClassFields(s);
+    _migrateAscendencyFields(s);
+    _migratePassiveTreeFields(s);
+    _migrateEndgameFields(s);
     migrateQuestState(s);
 }
 
@@ -235,13 +287,12 @@ function migrateOldSave(s) {
 //------------------------------------------------------------------------
 //------------------------SAVE SLOT SYSTEM---------------------------------
 //------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
-const SAVE_SLOT_COUNT = 20;
-const ACTIVE_SLOT_KEY = 'stoxels_active_slot';
-
-// Slot 1 reuses the ORIGINAL 'stoxels' key on purpose — this is what makes
-// existing players' progress show up automatically as "Slot 1" with no
-// migration step required. Slots 2-20 get their own dedicated keys.
+// _slotKey — returns the localStorage key for a given slot number.
+//           Slot 1 reuses the ORIGINAL 'stoxels' key on purpose — this is what makes
+//           existing players' progress show up automatically as "Slot 1" with no
+//           migration step required. Slots 2-20 get their own dedicated keys.
 function _slotKey(slotNum) {
     return slotNum === 1 ? 'stoxels' : `stoxels_slot_${slotNum}`;
 }
@@ -253,6 +304,7 @@ function getActiveSlot() {
     return (s >= 1 && s <= SAVE_SLOT_COUNT) ? s : null;
 }
 
+// Persists which slot is currently active.
 function setActiveSlot(slotNum) {
     localStorage.setItem(ACTIVE_SLOT_KEY, String(slotNum));
 }
@@ -279,6 +331,17 @@ function getSlotSummary(slotNum) {
         playerClass: raw.playerClass || null,
         tutorialDone: !!raw.tutorialDone,
     };
+}
+
+// save — serialises STATE into the currently active slot (defaults to
+// Slot 1 if nothing has been explicitly chosen yet, matching old behaviour).
+function save() {
+    const slot = getActiveSlot() || 1;
+    const toSave = { ...STATE };
+    if (STATE.passiveTreeAllocated instanceof Set) {
+        toSave.passiveTreeAllocated = [...STATE.passiveTreeAllocated];
+    }
+    localStorage.setItem(_slotKey(slot), JSON.stringify(toSave));
 }
 
 // Loads (or freshly creates) the STATE for a given slot, marks it active,
@@ -328,18 +391,10 @@ function initState() {
 }
 
 // STATE — the single source of truth for all persistent progress.
+// Declared here (rather than in the CONSTANTS & STATE section) because its
+// initial value depends on initState(), which in turn depends on
+// buildFreshState()/migrateOldSave() — all defined earlier in this file.
 let STATE = initState();
-
-// save — serialises STATE into the currently active slot (defaults to
-// Slot 1 if nothing has been explicitly chosen yet, matching old behaviour).
-function save() {
-    const slot = getActiveSlot() || 1;
-    const toSave = { ...STATE };
-    if (STATE.passiveTreeAllocated instanceof Set) {
-        toSave.passiveTreeAllocated = [...STATE.passiveTreeAllocated];
-    }
-    localStorage.setItem(_slotKey(slot), JSON.stringify(toSave));
-}
 
 
 //------------------------------------------------------------------------

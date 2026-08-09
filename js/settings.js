@@ -1,7 +1,5 @@
-﻿
-
-//------------------------------------------------------------------------
-//-------------------CONSTANTS & DEFAULTS---------------------------------
+﻿//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -36,8 +34,14 @@ const SLIDER_CONFIGS = [
     { key: 'sfxVolume', sliderId: 'sld-sfx', valueId: 'val-sfx' },
 ];
 
-// The live settings object — read by other modules throughout the game
+// The live settings object — read by other modules throughout the game.
+// Relies on function hoisting: loadSettings() is defined further down in
+// this file but is available here because `function` declarations are
+// hoisted before any top-level code runs.
 let SETTINGS = loadSettings();
+
+// Debounce handle for the SFX volume-slider preview sound.
+let _sfxPreviewTimeout = null;
 
 
 //------------------------------------------------------------------------
@@ -99,7 +103,7 @@ function applySettings() {
 
 
 //------------------------------------------------------------------------
-//-------------------MODAL HELPER FUNCTIONS-------------------------------
+//-------------------MODAL HELPER FUNCTIONS---------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -134,7 +138,7 @@ function loadSettingsUI() {
 
 
 //------------------------------------------------------------------------
-//-------------------MODAL EVENT LISTENERS--------------------------------
+//-------------------MODAL EVENT LISTENERS----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -153,8 +157,6 @@ function initToggleControl(btnId, settingsKey, applyOnChange = true) {
 
 // Wires up a single volume slider: converts its 0–100 integer value
 // to a 0–1 float, updates the live label, then saves and applies.
-let _sfxPreviewTimeout = null;
-
 function initSliderControl(sliderId, valueId, settingsKey) {
     document.getElementById(sliderId)?.addEventListener('input', e => {
         SETTINGS[settingsKey] = parseInt(e.target.value) / 100;
