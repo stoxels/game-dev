@@ -52,6 +52,60 @@ const EG_TEST_MAPS = [
         egTimeLimit: 600,     // 10 min baseline, in seconds
         egMaxMistakes: 5,
     },
+
+
+    {
+        id: 'training_grounds2',
+        tier: 2,
+        icon: '🌱',
+        name: 'Training Grounds 2',
+        desc: '---',
+        monsterLevel: 10,
+        maxMonsters: 5,
+        totalMonsters: 30,
+        hasBoss: false,
+        requiredPuzzles: 3,
+        requiredQuestions: 0,
+        puzzlePool: { minCells: 10, maxCells: 150 },
+        egTimeLimit: 900,     // 10 min baseline, in seconds
+        egMaxMistakes: 5,
+    },
+
+    {
+        id: 'training_grounds3',
+        tier: 3,
+        icon: '🌱',
+        name: 'Training Grounds 3',
+        desc: '---',
+        monsterLevel: 15,
+        maxMonsters: 5,
+        totalMonsters: 30,
+        hasBoss: false,
+        requiredPuzzles: 3,
+        requiredQuestions: 0,
+        puzzlePool: { minCells: 10, maxCells: 150 },
+        egTimeLimit: 900,     // 10 min baseline, in seconds
+        egMaxMistakes: 5,
+    },
+
+    {
+        id: 'training_grounds4',
+        tier: 4,
+        icon: '🌱',
+        name: 'Training Grounds 4',
+        desc: '---',
+        monsterLevel: 20,
+        maxMonsters: 5,
+        totalMonsters: 30,
+        hasBoss: false,
+        requiredPuzzles: 3,
+        requiredQuestions: 0,
+        puzzlePool: { minCells: 10, maxCells: 150 },
+        egTimeLimit: 900,     // 10 min baseline, in seconds
+        egMaxMistakes: 5,
+    },
+
+
     {
         id: 'frequency_foothills',
         tier: 3,
