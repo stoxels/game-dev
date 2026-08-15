@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------
-//----------------------------CONSTANTS-----------------------------------
+//----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -26,12 +26,6 @@ const ARROW_SCROLL_STEP = 40;
 // bottom edge of the available vertical space.
 const SCALE_BREATHING_ROOM = 0.97;
 
-
-//------------------------------------------------------------------------
-//----------------------------STATE VARIABLES-----------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
 // The zoom level currently applied to the puzzle scaler element.
 let currentZoom = 1;
 
@@ -51,9 +45,30 @@ let manualZoomActive = false;
 let mouseZone = 'none';
 
 
+//------------------------------------------------------------------------
+//----------------------------DOM ELEMENT HELPERS--------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Looks up the puzzle scaler element. Centralized so the id string only
+// lives in one place.
+function _getScaler() {
+    return document.getElementById('puzzle-scaler');
+}
+
+// Looks up the puzzle scaler's wrapper element (the scroll/zoom container).
+function _getWrap() {
+    return document.getElementById('puzzle-scaler-wrap');
+}
+
+// Looks up the inventory's scrollable list element.
+function _getInvList() {
+    return document.getElementById('inv-list');
+}
+
 
 //------------------------------------------------------------------------
-//----------------------------ZOOM HELPERS--------------------------------
+//----------------------------ZOOM HELPERS----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -61,17 +76,17 @@ let mouseZone = 'none';
 // clears the wrapper's forced dimensions so the browser can report the
 // scaler's true natural (unscaled) pixel size via offsetWidth/Height.
 //
-// Why clear the wrapper? applyZoom() sets wrap.style.height and minWidth to
+// Why clear the wrapper? _applyZoom() sets wrap.style.height and minWidth to
 // the post-scale pixel values. If those are left in place while we measure,
 // the browser constrains the scaler's reported size to fit inside those stale
 // dimensions — which means each resize event measures a progressively smaller
 // "natural" size and calculates a progressively smaller scale. This was the
 // cause of the F12 devtools-open/close shrink bug.
 //
-// The wrapper dimensions are restored immediately by the applyZoom() call
+// The wrapper dimensions are restored immediately by the _applyZoom() call
 // that always follows this function in scalePuzzle().
-function measureNaturalSize(scaler) {
-    const wrap = document.getElementById('puzzle-scaler-wrap');
+function _measureNaturalSize(scaler) {
+    const wrap = _getWrap();
     if (wrap) {
         wrap.style.height = '';
         wrap.style.minWidth = '';
@@ -101,7 +116,7 @@ function measureNaturalSize(scaler) {
 // so the puzzle always fits the real remaining space, regardless of
 // inventory content or window size.
 // Returns the available width and height as an object.
-function calcAvailableSpace() {
+function _calcAvailableSpace() {
     const metaBar = document.querySelector('.game-meta');
     // NOTE: the inventory bar's real id/class is #inv-panel (see inventory.css).
     // '.inv-strip' never matches anything, so this used to silently return
@@ -124,9 +139,9 @@ function calcAvailableSpace() {
 // By explicitly setting the wrapper's height and minWidth to the post-scale
 // dimensions, we force the page to scroll properly when the player has
 // zoomed in beyond the viewport bounds.
-function applyZoom() {
-    const scaler = document.getElementById('puzzle-scaler');
-    const wrap = document.getElementById('puzzle-scaler-wrap');
+function _applyZoom() {
+    const scaler = _getScaler();
+    const wrap = _getWrap();
     if (!scaler || !wrap) return;
 
     scaler.style.transform = `scale(${currentZoom})`;
@@ -142,7 +157,7 @@ function applyZoom() {
 
 
 //------------------------------------------------------------------------
-//----------------------------PUZZLE SCALER-------------------------------
+//----------------------------PUZZLE SCALER---------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -155,7 +170,7 @@ function resetZoom() {
     currentZoom = 1;
     baselineZoom = 1;
 
-    const wrap = document.getElementById('puzzle-scaler-wrap');
+    const wrap = _getWrap();
     if (wrap) {
         wrap.style.height = '';
         wrap.style.minWidth = '';
@@ -169,16 +184,16 @@ function resetZoom() {
 //      viewport width and the remaining height, capped at SCALE_MAX.
 //   3. Only updates currentZoom if the player hasn't manually zoomed —
 //      this preserves the player's chosen zoom across resize events.
-//   4. Calls applyZoom() to write the transform and fix wrapper dimensions.
+//   4. Calls _applyZoom() to write the transform and fix wrapper dimensions.
 //
 // Called by: buildGrid() after DOM paint, the resize listener in main.js,
-// and implicitly when Ctrl+Wheel resets zoom via applyZoom() directly.
+// and implicitly when Ctrl+Wheel resets zoom via _applyZoom() directly.
 function scalePuzzle() {
-    const scaler = document.getElementById('puzzle-scaler');
+    const scaler = _getScaler();
     if (!scaler) return;
 
-    const natural = measureNaturalSize(scaler);
-    const avail = calcAvailableSpace();
+    const natural = _measureNaturalSize(scaler);
+    const avail = _calcAvailableSpace();
     const autoScale = Math.min(avail.w / natural.w, avail.h / natural.h, SCALE_MAX);
 
     // Only override zoom if the player hasn't manually set one.
@@ -187,12 +202,12 @@ function scalePuzzle() {
         baselineZoom = autoScale;
     }
 
-    applyZoom();
+    _applyZoom();
 }
 
 
 //------------------------------------------------------------------------
-//----------------------------MOUSE WHEEL ZOOM----------------------------
+//----------------------------MOUSE WHEEL ZOOM------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -200,7 +215,7 @@ function scalePuzzle() {
 // Adjusts currentZoom by ZOOM_SPEED per scroll tick, clamps it to the
 // allowed range, and marks manualZoomActive so scalePuzzle() stops
 // overriding the player's chosen zoom level.
-function onCtrlWheelZoom(e) {
+function _onCtrlWheelZoom(e) {
     if (!e.ctrlKey) return;
 
     const wrap = e.target.closest('#puzzle-scaler-wrap');
@@ -217,18 +232,15 @@ function onCtrlWheelZoom(e) {
     }
 
     currentZoom = Math.max(ZOOM_MANUAL_MIN, Math.min(currentZoom, ZOOM_MANUAL_MAX));
-    applyZoom();
+    _applyZoom();
 }
 
 // passive:false is required here to allow e.preventDefault() inside the handler.
-document.addEventListener('wheel', onCtrlWheelZoom, { passive: false });
-
-
-
+document.addEventListener('wheel', _onCtrlWheelZoom, { passive: false });
 
 
 //------------------------------------------------------------------------
-//----------------------------ARROW KEY SCROLL ROUTING-------------------
+//----------------------------ARROW KEY SCROLL ROUTING-----------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -237,9 +249,9 @@ document.addEventListener('wheel', onCtrlWheelZoom, { passive: false });
 // This way the player can scroll either panel without clicking into it first.
 
 // Updates mouseZone based on which element the cursor is hovering over.
-function onMouseMoveUpdateZone(e) {
-    const puzzleWrap = document.getElementById('puzzle-scaler-wrap');
-    const invList = document.getElementById('inv-list');
+function _onMouseMoveUpdateZone(e) {
+    const puzzleWrap = _getWrap();
+    const invList = _getInvList();
 
     if (puzzleWrap && puzzleWrap.matches(':hover')) {
         mouseZone = 'puzzle';
@@ -251,12 +263,12 @@ function onMouseMoveUpdateZone(e) {
 }
 
 // Scrolls the active zone left or right when an arrow key is pressed.
-function onArrowKeyScroll(e) {
+function _onArrowKeyScroll(e) {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
 
     const dir = e.key === 'ArrowRight' ? 1 : -1;
-    const puzzleWrap = document.getElementById('puzzle-scaler-wrap');
-    const invList = document.getElementById('inv-list');
+    const puzzleWrap = _getWrap();
+    const invList = _getInvList();
 
     if (mouseZone === 'puzzle' && puzzleWrap) {
         e.preventDefault();
@@ -268,16 +280,15 @@ function onArrowKeyScroll(e) {
 }
 
 // Registers the mouse-move zone tracker and the arrow-key scroll handler.
-function initArrowKeyScrollRouting() {
-    document.addEventListener('mousemove', onMouseMoveUpdateZone, { passive: true });
-    document.addEventListener('keydown', onArrowKeyScroll);
+function _initArrowKeyScrollRouting() {
+    document.addEventListener('mousemove', _onMouseMoveUpdateZone, { passive: true });
+    document.addEventListener('keydown', _onArrowKeyScroll);
 }
 
 
 //------------------------------------------------------------------------
-//----------------------------INIT----------------------------------------
+//----------------------------INIT-------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-
-initArrowKeyScrollRouting();
+_initArrowKeyScrollRouting();

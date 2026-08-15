@@ -7,7 +7,7 @@
 // there and delete this file. Just ensure the selectors listed here are
 // present before showQuestLog() is called.
 //
-// Sections in this file (in order):
+// CSS sections inside the injected stylesheet (in order):
 //   1. ANIMATIONS
 //   2. MODAL CONTAINERS
 //   3. LEDGER SUMMARY STRIP
@@ -19,9 +19,16 @@
 //   9. QUEST REWARDS & CLAIM BUTTON
 //  10. TOAST NOTIFICATION
 
+//------------------------------------------------------------------------
+//-------------------STYLE INJECTION (MAIN ENTRY POINT)-------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Builds and appends the <style> tag holding all Ledger/Quest CSS.
+// Guarded by the 'quest-styles' id so re-including this script (or
+// loading it twice) never double-injects the stylesheet.
 (function _injectQuestStyles() {
 
-    // Guard: only inject once, even if this script is loaded multiple times
     if (document.getElementById('quest-styles')) return;
 
     const style = document.createElement('style');

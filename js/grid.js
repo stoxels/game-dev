@@ -1,4 +1,22 @@
 ﻿//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Toggle to move row clues from left side to right side of the grid
+let _rowCluesOnRight = false;
+
+// Column-width bookkeeping so the <colgroup> can be rebuilt to match
+// whichever side the clue cells currently live on. Set inside buildGrid().
+let _clueColCount = 0;   // how many narrow (clue/corner) columns exist
+let _puzzleColCount = 0; // how many wide (puzzle) columns exist
+let _clueColWidth = 0;   // px width of a clue/corner column
+let _puzzleColWidth = 0; // px width of a puzzle column
+
+
+
+
+//------------------------------------------------------------------------
 //----------------------CLUE CALCULATION----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -35,6 +53,22 @@ function clues(line) {
 }
 
 
+// _computeRowClues — returns the clue array for every row of the solution.
+//   Shared by buildGrid() and updClues() so the run-length pass over the
+//   solution isn't duplicated in both places.
+function _computeRowClues(sol) {
+    return sol.map(row => clues(row));
+}
+
+
+// _computeColClues — returns the clue array for every column of the solution.
+//   Mirrors _computeRowClues() but transposes each column into a line first.
+function _computeColClues(sol) {
+    const cols = sol[0].length;
+    return Array.from({ length: cols }, (_, c) => clues(sol.map(r => r[c])));
+}
+
+
 
 
 //------------------------------------------------------------------------
@@ -67,6 +101,15 @@ function _calcFontSize(maxDim) {
 }
 
 
+// _calcClueColWidth — returns the px width of a clue/corner column for a
+//   given font size. Shared by the colgroup sizing, row-clue cell
+//   positioning, and the row-clue side-toggle rebuild, so the "+7" padding
+//   constant only lives in one place.
+function _calcClueColWidth(fontSize) {
+    return fontSize + 7;
+}
+
+
 
 
 //------------------------------------------------------------------------
@@ -89,7 +132,7 @@ function _buildColgroup(maxRowWidth, cols, cellSize, fontSize, isAdjMatrix) {
 
     if (!isAdjMatrix) {
         // Row-clue columns are narrower than puzzle columns
-        html += Array(maxRowWidth).fill(`<col style="width:${fontSize + 7}px">`).join('');
+        html += Array(maxRowWidth).fill(`<col style="width:${_calcClueColWidth(fontSize)}px">`).join('');
     }
 
     html += Array(cols).fill(`<col style="width:${cellSize}px">`).join('');
@@ -143,7 +186,7 @@ function _buildColClueHeaderRows(colClues, maxColDepth, maxRowWidth, cols, fontS
 //   padLeft  — number of empty corner cells to the left of this cell
 //   value    — the clue number to display
 //   fontSize — px font size
-//   colWidth — px width of each row-clue column (fontSize + 7)
+//   colWidth — px width of each row-clue column (see _calcClueColWidth)
 function _buildRowClueCell(row, clueIdx, padLeft, value, fontSize, colWidth) {
     const leftPx = (padLeft + clueIdx) * colWidth;
     return `<td class="rct rct-${row}" id="rct-${row}-${clueIdx}"` +
@@ -186,7 +229,7 @@ function _buildPuzzleCell(row, col, totalRows, totalCols, cellSize) {
 function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjMatrix) {
     const rows = sol.length;
     const cols = sol[0].length;
-    const colWidth = fontSize + 7; // width of each row-clue sticky column
+    const colWidth = _calcClueColWidth(fontSize); // width of each row-clue sticky column
     let html = '';
 
     for (let row = 0; row < rows; row++) {
@@ -219,16 +262,18 @@ function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjM
     return html;
 }
 
-// Toggle to move row clues from left side to right side of the grid
-let _rowCluesOnRight = false;
 
-// Column-width bookkeeping so the <colgroup> can be rebuilt to match
-// whichever side the clue cells currently live on. Set inside buildGrid().
-let _clueColCount = 0;   // how many narrow (clue/corner) columns exist
-let _puzzleColCount = 0; // how many wide (puzzle) columns exist
-let _clueColWidth = 0;   // px width of a clue/corner column
-let _puzzleColWidth = 0; // px width of a puzzle column
 
+
+//------------------------------------------------------------------------
+//--------------------ROW CLUE SIDE TOGGLE---------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+
+// _buildRowClueToggle — creates (or re-creates) the "CLUES ▶" button that
+//   lets the player flip row clues to the right side of the grid. Called
+//   once per buildGrid() so it always attaches to the current puzzle wrap.
 function _buildRowClueToggle() {
     const existing = document.getElementById('row-clue-toggle-btn');
     if (existing) existing.remove();
@@ -259,6 +304,10 @@ function _buildRowClueToggle() {
     wrap.appendChild(btn);
 }
 
+
+// _toggleRowCluesSide — flips row-clue cells between the left and right
+//   side of the puzzle table by rebuilding the <colgroup> and physically
+//   moving the existing <td> elements within each row (no HTML regen).
 function _toggleRowCluesSide() {
     _rowCluesOnRight = !_rowCluesOnRight;
     const btn = document.getElementById('row-clue-toggle-btn');
@@ -301,6 +350,96 @@ function _toggleRowCluesSide() {
 }
 
 
+
+
+//------------------------------------------------------------------------
+//-------------------ADJACENCY MATRIX OVERLAY-----------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+
+// Adjacency matrix mode (skill 302) shows Minesweeper-style neighbour
+// counts on each empty cell — the number of surrounding solution cells
+// that haven't been correctly filled yet.  Row/column clue headers are
+// hidden in this mode (see buildGrid / _buildColgroup).
+//
+// NOTE: this section is placed before CELL RENDERER HELPERS because
+// _refreshAdjacencyNeighbours() (in that section) calls
+// _adjacencyMatrixUpdateOverlay() defined here.
+
+
+// _adjacencyMatrixCount — returns how many of the 8 surrounding cells are
+//   unfilled solution cells (sol === 1 but not yet player-filled or revealed).
+//
+//   row, col — the cell whose neighbours to count
+function _adjacencyMatrixCount(row, col) {
+    if (!cur) return 0;
+
+    const sol = cur.grid;
+    const rows = sol.length;
+    const cols = sol[0].length;
+    let count = 0;
+
+    for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue; // skip the cell itself
+            const r = row + dr;
+            const c = col + dc;
+            if (r < 0 || r >= rows || c < 0 || c >= cols) continue; // out of bounds
+            if (sol[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c]) count++;
+        }
+    }
+
+    return count;
+}
+
+
+// _adjacencyMatrixUpdateOverlay — writes (or removes) the neighbour-count
+//   span inside a single cell.  Only visible on unfilled, non-wrong cells.
+//   A count of 0 shows as blank, matching Minesweeper convention.
+//
+//   row, col — the cell to update
+function _adjacencyMatrixUpdateOverlay(row, col) {
+    const el = document.getElementById(`g-${row}-${col}`);
+    if (!el) return;
+
+    // Remove any existing count overlay before potentially re-adding
+    const existingOverlay = el.querySelector('.adj-count');
+    if (existingOverlay) existingOverlay.remove();
+
+    // Overlays only appear on cells the player hasn't resolved yet
+    const isFilled = userGrid[row][col] === 1 || revealedGrid[row][col];
+    if (isFilled || wrongGrid[row][col]) return;
+
+    const count = _adjacencyMatrixCount(row, col);
+    if (count === 0) return; // show blank for 0, like Minesweeper
+
+    const countSpan = document.createElement('span');
+    countSpan.className = `adj-count adj-count-${count}`;
+    countSpan.textContent = count;
+    el.appendChild(countSpan);
+}
+
+
+// _adjacencyMatrixRefreshAll — refreshes adjacency overlays for every cell
+//   on the board.  Called at level start (after the grid DOM is ready) and
+//   after any bulk reveal that changes many cells at once.
+function _adjacencyMatrixRefreshAll() {
+    if (!ptHasSkill('adjacency_matrix') || !cur) return;
+
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            _adjacencyMatrixUpdateOverlay(r, c);
+        }
+    }
+}
+
+
+
+
 //------------------------------------------------------------------------
 //--------------------MAIN GRID BUILDER FUNCTION--------------------------
 //------------------------------------------------------------------------
@@ -325,8 +464,8 @@ function buildGrid() {
     const fontSize = _calcFontSize(maxDim);
 
     // Compute clue arrays for every row and column
-    const rowClues = sol.map(row => clues(row));
-    const colClues = Array.from({ length: cols }, (_, c) => clues(sol.map(r => r[c])));
+    const rowClues = _computeRowClues(sol);
+    const colClues = _computeColClues(sol);
 
     // Depth = how many rows/columns the clue headers need
     const maxColDepth = Math.max(...colClues.map(c => c.length));
@@ -338,7 +477,7 @@ function buildGrid() {
     // the <colgroup> correctly when clues move sides.
     _clueColCount = maxRowWidth;
     _puzzleColCount = cols;
-    _clueColWidth = fontSize + 7;
+    _clueColWidth = _calcClueColWidth(fontSize);
     _puzzleColWidth = cellSize;
 
     // Assemble full table HTML
@@ -365,7 +504,7 @@ function buildGrid() {
 
 
 //------------------------------------------------------------------------
-//--------------------SOLVED CLUE FLAG HELPERS----------------------------
+//-------------------SOLVED CLUE FLAG HELPERS----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -638,8 +777,6 @@ function _tryAutoMarkAdjacentLine(adjacentIndices, getCandidates) {
 }
 
 
-
-
 // _handleResidualAnalysis — when a row/col is completed, rolls a chance
 //   to auto-mark exactly one wrong empty cell in an adjacent row/col.
 //   Chance scales with unlocked nodes (25% base + 5% + 10% = max 40%).
@@ -739,7 +876,7 @@ function updClues(row, col, isInitial = false) {
 
     // --- Row clue state ---
     const rowDone = _isRowSolved(sol, row);
-    const rowClues = sol.map(r => clues(r));
+    const rowClues = _computeRowClues(sol);
     const rowFlags = getSolvedClueFlags(rowClues[row], userGrid[row], sol[row]);
 
     _applyRowClueState(row, rowDone, rowClues, rowFlags);
@@ -750,7 +887,7 @@ function updClues(row, col, isInitial = false) {
 
     // --- Column clue state ---
     const colDone = _isColSolved(sol, col);
-    const colClues = Array.from({ length: cols }, (_, c) => clues(sol.map(r => r[c])));
+    const colClues = _computeColClues(sol);
     const colUserLine = userGrid.map(r => r[col]);
     const colSolLine = sol.map(r => r[col]);
     const colFlags = getSolvedClueFlags(colClues[col], colUserLine, colSolLine);
@@ -942,87 +1079,3 @@ window.addEventListener('resize', () => {
     const ov = document.getElementById('ov-win');
     if (ov && ov.classList.contains('show')) buildReveal();
 });
-
-
-
-
-//------------------------------------------------------------------------
-//-------------------ADJACENCY MATRIX OVERLAY-----------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-
-// Adjacency matrix mode (skill 302) shows Minesweeper-style neighbour
-// counts on each empty cell — the number of surrounding solution cells
-// that haven't been correctly filled yet.  Row/column clue headers are
-// hidden in this mode (see buildGrid / _buildColgroup).
-
-
-// _adjacencyMatrixCount — returns how many of the 8 surrounding cells are
-//   unfilled solution cells (sol === 1 but not yet player-filled or revealed).
-//
-//   row, col — the cell whose neighbours to count
-function _adjacencyMatrixCount(row, col) {
-    if (!cur) return 0;
-
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-    let count = 0;
-
-    for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-            if (dr === 0 && dc === 0) continue; // skip the cell itself
-            const r = row + dr;
-            const c = col + dc;
-            if (r < 0 || r >= rows || c < 0 || c >= cols) continue; // out of bounds
-            if (sol[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c]) count++;
-        }
-    }
-
-    return count;
-}
-
-
-// _adjacencyMatrixUpdateOverlay — writes (or removes) the neighbour-count
-//   span inside a single cell.  Only visible on unfilled, non-wrong cells.
-//   A count of 0 shows as blank, matching Minesweeper convention.
-//
-//   row, col — the cell to update
-function _adjacencyMatrixUpdateOverlay(row, col) {
-    const el = document.getElementById(`g-${row}-${col}`);
-    if (!el) return;
-
-    // Remove any existing count overlay before potentially re-adding
-    const existingOverlay = el.querySelector('.adj-count');
-    if (existingOverlay) existingOverlay.remove();
-
-    // Overlays only appear on cells the player hasn't resolved yet
-    const isFilled = userGrid[row][col] === 1 || revealedGrid[row][col];
-    if (isFilled || wrongGrid[row][col]) return;
-
-    const count = _adjacencyMatrixCount(row, col);
-    if (count === 0) return; // show blank for 0, like Minesweeper
-
-    const countSpan = document.createElement('span');
-    countSpan.className = `adj-count adj-count-${count}`;
-    countSpan.textContent = count;
-    el.appendChild(countSpan);
-}
-
-
-// _adjacencyMatrixRefreshAll — refreshes adjacency overlays for every cell
-//   on the board.  Called at level start (after the grid DOM is ready) and
-//   after any bulk reveal that changes many cells at once.
-function _adjacencyMatrixRefreshAll() {
-    if (!ptHasSkill('adjacency_matrix') || !cur) return;
-
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
-
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            _adjacencyMatrixUpdateOverlay(r, c);
-        }
-    }
-}

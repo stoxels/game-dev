@@ -12,7 +12,7 @@
 //
 //
 // FILE STRUCTURE (top to bottom):
-//   - Constants
+//   - Constants & state
 //   - DOM builder helpers  (generic utilities used everywhere)
 //   - Shared layout helpers (puzzle rect, overlay, particles)
 //   - Reveal effects
@@ -25,11 +25,10 @@
 // ============================================================
 
 
-// ============================================================
-// ----------------------- CONSTANTS --------------------------
-// ============================================================
-
-
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Shared z-index tiers so overlapping effects stack predictably.
 const FX_Z = {
@@ -74,9 +73,10 @@ const PEARL_VARIANTS = {
 };
 
 
-// ============================================================
-// ----------------- DOM BUILDER HELPERS ----------------------
-// ============================================================
+//------------------------------------------------------------------------
+//-------------------DOM BUILDER HELPERS------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 // Low-level helpers that create and style individual DOM nodes.
 // These keep the effect functions readable by removing repeated
 // boilerplate for positioning and inline CSS.
@@ -131,12 +131,30 @@ function _fxMakeRing(container, cx, cy, className, ringSize, delayMs, animationN
 }
 
 
-// ============================================================
-// ---------------- SHARED LAYOUT HELPERS ---------------------
-// ============================================================
+//------------------------------------------------------------------------
+//-------------------SHARED LAYOUT HELPERS----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 // Higher-level helpers that deal with puzzle geometry and
 // common overlay/particle patterns used by many effects.
 // ============================================================
+
+// Returns the current puzzle grid's corner cell elements ({first, last}),
+// i.e. #g-0-0 and #g-{lastRow}-{lastCol}, or null if the grid/cells
+// aren't currently available. Shared by every helper that needs to know
+// where the grid sits on screen (rect calc, shield-border tracking, etc).
+function _fxGetGridCorners() {
+    const sol = cur?.grid;
+    if (!sol || !sol.length) return null;
+
+    const rows = sol.length;
+    const cols = sol[0].length;
+    const first = document.getElementById('g-0-0');
+    const last = document.getElementById(`g-${rows - 1}-${cols - 1}`);
+    if (!first || !last) return null;
+
+    return { first, last };
+}
 
 // Returns the bounding rect of the puzzle grid in the
 // coordinate space of the puzzle-scaler element (logical px).
@@ -148,14 +166,9 @@ function _fxGetPuzzleRect() {
         wrap.style.position = 'relative';
     }
 
-    const sol = cur?.grid;
-    if (!sol || !sol.length) return null;
-
-    const rows = sol.length;
-    const cols = sol[0].length;
-    const first = document.getElementById('g-0-0');
-    const last = document.getElementById(`g-${rows - 1}-${cols - 1}`);
-    if (!first || !last) return null;
+    const corners = _fxGetGridCorners();
+    if (!corners) return null;
+    const { first, last } = corners;
 
     const zoom = currentZoom || 1;
     const wRect = wrap.getBoundingClientRect();
@@ -235,9 +248,10 @@ function _fxSpawnParticles(opts) {
 }
 
 
-// ============================================================
-// ------------------- REVEAL ITEM EFFECTS --------------------
-// ============================================================
+//------------------------------------------------------------------------
+//-------------------REVEAL ITEM EFFECTS------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Helper: places a centered glow div inside the overlay.
 function _fxCandleGlow(overlay, cx, cy) {
@@ -342,9 +356,10 @@ function _fxScanner() {
 }
 
 
-// ============================================================
-// ----------------- MARK-WRONG ITEM EFFECTS ------------------
-// ============================================================
+//------------------------------------------------------------------------
+//-------------------MARK-WRONG ITEM EFFECTS--------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Helper: creates one horizontal eraser streak at a given vertical position.
 function _fxMakeEraserStreak(container, r, yFraction, delaySeconds) {
@@ -520,9 +535,10 @@ function _fxErrorGem() {
 }
 
 
-// ============================================================
-// ------------------- ADD-TIME ITEM EFFECTS ------------------
-// ============================================================
+//------------------------------------------------------------------------
+//-------------------ADD-TIME ITEM EFFECTS-----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Helper: creates the large hourglass icon with spin animation.
 function _fxMakeHourglassIcon(wrap, cx, cy) {
@@ -717,10 +733,10 @@ function _fxChronobolt() {
 }
 
 
-// ============================================================
-// ------------------- UTILITY ITEM EFFECTS -------------------
-// ============================================================
-
+//------------------------------------------------------------------------
+//-------------------UTILITY ITEM EFFECTS------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // _fxShieldBorderAdd — places a persistent glowing border around the puzzle grid.
 // Uses position:fixed with screen-space coords so it is unaffected by the
@@ -746,13 +762,9 @@ function _fxShieldBorderAdd() {
 
     // Positions the border to match the grid's current screen rect.
     function _repositionShieldBorder() {
-        const sol = cur?.grid;
-        if (!sol || !sol.length) return;
-        const rows = sol.length;
-        const cols = sol[0].length;
-        const first = document.getElementById('g-0-0');
-        const last = document.getElementById(`g-${rows - 1}-${cols - 1}`);
-        if (!first || !last) return;
+        const corners = _fxGetGridCorners();
+        if (!corners) return;
+        const { first, last } = corners;
 
         const fRect = first.getBoundingClientRect();
         const lRect = last.getBoundingClientRect();
@@ -792,8 +804,6 @@ function _fxShieldBorderRemove() {
     setTimeout(() => border.remove(), 380);
 }
 
-
-
 // Helper: spawns the shield overlay div covering the whole grid area.
 function _fxMakeShieldOverlay(wrap, r) {
     const shield = document.createElement('div');
@@ -831,7 +841,6 @@ function _fxShield() {
 
     Audio_Manager.playSFX('shield');
 }
-
 
 // 🛡️💥 Shield Break — Spawns shattering particles at the exact cell location
 function playShieldBreakEffect(row, col) {
@@ -879,10 +888,6 @@ function playShieldBreakEffect(row, col) {
 
     _fxShieldBorderRemove();
 }
-
-
-
-
 
 // ❄️ Freeze — icy blizzard creeps in from the edges.
 // Delegates to the shared blizzard system defined in class.js.
@@ -1111,9 +1116,10 @@ function _fxArtifact() {
 }
 
 
-// ============================================================
-// ------------------- CURSED ITEM EFFECTS --------------------
-// ============================================================
+//------------------------------------------------------------------------
+//-------------------CURSED ITEM EFFECTS-------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Helper: creates the sickly green tint rect over the grid.
 function _fxMakeCursedTint(container, r) {
@@ -1344,9 +1350,10 @@ function _fxChaosGrid() {
 }
 
 
-// ============================================================
-// ----------- KEYSTONE / PEARL EFFECTS -----------------------
-// ============================================================
+//------------------------------------------------------------------------
+//-------------------KEYSTONE / PEARL EFFECTS---------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Helper: spawns the stacked iridescent rings for pearl effects.
 // `color` is a CSS hex color; ring border + glow inherit it.
@@ -1479,21 +1486,10 @@ function _fxShadowSeal() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-// ============================================================
-// ------------------- ENTRY POINT ----------------------------
-// ============================================================
+//------------------------------------------------------------------------
+//-------------------ENTRY POINT----------------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 // Called from useItem() in inventory.js immediately after the
 // item's game logic fires.  Maps a defId string to the correct
 // visual effect function.  All _fx functions above are helpers

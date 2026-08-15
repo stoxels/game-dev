@@ -56,6 +56,26 @@ function isEndgameLevel() {
     return cur.isEndgameSandbox || cur.isMonsterLevel;
 }
 
+// Endgame: discards any pickup, loot drop, or currency drop sitting on a
+// cell. Shared by the real-mistake path and the wrong-fill path in
+// applyCell(), both of which need to invalidate a cell's drop the same way.
+function _egDiscardAllDrops(row, col) {
+    if (!isEndgameLevel()) return;
+    if (typeof _egDiscardPickup === 'function') _egDiscardPickup(row, col);
+    if (typeof _egDiscardLootDrop === 'function') _egDiscardLootDrop(row, col);
+    if (typeof _egDiscardCurrencyDrop === 'function') _egDiscardCurrencyDrop(row, col);
+}
+
+// Endgame: claims any pickup, loot drop, or currency drop sitting on a
+// cell. Shared by the correct-fill path and the right-click-mark path in
+// applyCell(), both of which claim drops on an empty-solution cell.
+function _egCheckAllClaims(row, col) {
+    if (!isEndgameLevel()) return;
+    if (typeof _egCheckPickupClaim === 'function') _egCheckPickupClaim(row, col);
+    if (typeof _egCheckLootClaim === 'function') _egCheckLootClaim(row, col);
+    if (typeof _egCheckCurrencyDropClaim === 'function') _egCheckCurrencyDropClaim(row, col);
+}
+
 
 //------------------------------------------------------------------------
 //------------------SPECIAL INTERCEPT HELPERS-----------------------------
@@ -239,25 +259,15 @@ function tryAbsorbMistake(row, col) {
 // costs the player. Run them in order inside applyRealMistake().
 //------------------------------------------------------------------------
 
-// Visually mark the cell wrong, play the error sound, and deduct time.
+// Visually mark the cell wrong, play the error sound, deduct time, and
+// discard any endgame drop the mistake invalidates.
 function markCellWrongAndPenalize(row, col) {
     wrongGrid[row][col] = true;
     renderCell(row, col);
     Audio_Manager.playSFX('cellWrong');
     applyPenalty(row, col);
 
-    // Endgame: wrong fill discards any pickup sitting on this cell
-    if (isEndgameLevel() && typeof _egDiscardPickup === 'function') {
-        _egDiscardPickup(row, col);
-    }
-
-    if (isEndgameLevel() && typeof _egDiscardLootDrop === 'function') {
-        _egDiscardLootDrop(row, col);
-    }
-
-    if (isEndgameLevel() && typeof _egDiscardCurrencyDrop === 'function') {
-        _egDiscardCurrencyDrop(row, col);
-    }
+    _egDiscardAllDrops(row, col);
 }
 
 // Reset consecutive-fill streaks and notify passive systems.
@@ -340,7 +350,7 @@ function applyRealMistake(row, col) {
 }
 
 // Full wrong-fill flow: first try absorption, then apply real consequences.
-// Returns true if the caller (ac) should stop processing this cell.
+// Returns true if the caller (applyCell) should stop processing this cell.
 function handleWrongFill(row, col) {
     // Try to absorb the mistake with a shield, freeze, class passive, or CI window
     if (tryAbsorbMistake(row, col)) return true;
@@ -580,9 +590,7 @@ function handleCorrectFill(row, col) {
 
     // Endgame hooks
     if (isEndgameLevel()) {
-        if (typeof _egCheckPickupClaim === 'function') _egCheckPickupClaim(row, col);
-        if (typeof _egCheckLootClaim === 'function') _egCheckLootClaim(row, col);
-        if (typeof _egCheckCurrencyDropClaim === 'function') _egCheckCurrencyDropClaim(row, col);
+        _egCheckAllClaims(row, col);
         if (typeof _egOnCorrectCell === 'function') _egOnCorrectCell(row, col);
     }
 
@@ -630,17 +638,7 @@ function applyCell(row, col) {
         // Try to absorb or apply the mistake; stop processing if game-over triggered
         if (handleWrongFill(row, col)) {
             // Whether absorbed or penalised, a wrong click on an endgame pickup discards it
-            if (isEndgameLevel() && typeof _egDiscardPickup === 'function') {
-                _egDiscardPickup(row, col);
-            }
-
-            if (isEndgameLevel() && typeof _egDiscardLootDrop === 'function') {
-                _egDiscardLootDrop(row, col);
-            }
-
-            if (isEndgameLevel() && typeof _egDiscardCurrencyDrop === 'function') {
-                _egDiscardCurrencyDrop(row, col);
-            }
+            _egDiscardAllDrops(row, col);
             return;
         }
 
@@ -671,22 +669,9 @@ function applyCell(row, col) {
         handleCorrectFill(row, col);
     }
 
-    // Endgame: correct right-click mark on an empty-solution cell claims a pickup
-    if (isEndgameLevel() && typeof _egCheckPickupClaim === 'function'
-        && pval === 2 && cur.grid[row][col] === 0) {
-        _egCheckPickupClaim(row, col);
-    }
-
-    // Endgame: correct right-click mark on an empty-solution cell claims a loot drop
-    if (isEndgameLevel() && typeof _egCheckLootClaim === 'function'
-        && pval === 2 && cur.grid[row][col] === 0) {
-        _egCheckLootClaim(row, col);
-    }
-
-    // Endgame: correct right-click mark on an empty-solution cell claims a currency drop
-    if (isEndgameLevel() && typeof _egCheckCurrencyDropClaim === 'function'
-        && pval === 2 && cur.grid[row][col] === 0) {
-        _egCheckCurrencyDropClaim(row, col);
+    // Endgame: correct right-click mark on an empty-solution cell claims any drop there
+    if (pval === 2 && cur.grid[row][col] === 0) {
+        _egCheckAllClaims(row, col);
     }
 
     // Refresh display and check for puzzle completion

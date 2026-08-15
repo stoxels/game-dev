@@ -6,7 +6,7 @@
 
 
 //------------------------------------------------------------------------
-//-------------------STATE VARIABLES--------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -24,64 +24,35 @@ let hoverCol = -1;
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Adds the highlight class to all row-clue cells that belong to this row.
-function _highlightRowClue(row) {
+// Turns the row-clue highlight on/off for every clue cell that belongs to this row.
+function _setRowClueHighlight(row, on) {
     document.querySelectorAll(`.rct-${row}`)
-        .forEach(el => el.classList.add('hov-row'));
+        .forEach(el => el.classList.toggle('hov-row', on));
 }
 
-// Adds the highlight class to all column-header cells that belong to this column.
-// (A column can have multiple stacked header cells for multi-number clues.)
-function _highlightColClue(col) {
+// Turns the column-header highlight on/off for every header cell that belongs
+// to this column. (A column can have multiple stacked header cells for
+// multi-number clues.)
+function _setColClueHighlight(col, on) {
     document.querySelectorAll(`.cch-${col}`)
-        .forEach(el => el.classList.add('hov-col'));
+        .forEach(el => el.classList.toggle('hov-col', on));
 }
 
-// Adds the row-tint class to every grid cell in the given row.
-function _highlightRowCells(row) {
+// Turns the row-tint on/off for every grid cell in the given row.
+function _setRowCellsHighlight(row, on) {
     const cols = cur.grid[0].length;
     for (let c = 0; c < cols; c++) {
         const cell = document.getElementById(`g-${row}-${c}`);
-        if (cell) cell.classList.add('hov-r');
+        if (cell) cell.classList.toggle('hov-r', on);
     }
 }
 
-// Adds the column-tint class to every grid cell in the given column.
-function _highlightColCells(col) {
+// Turns the column-tint on/off for every grid cell in the given column.
+function _setColCellsHighlight(col, on) {
     const rows = cur.grid.length;
     for (let r = 0; r < rows; r++) {
         const cell = document.getElementById(`g-${r}-${col}`);
-        if (cell) cell.classList.add('hov-c');
-    }
-}
-
-// Removes the highlight class from all row-clue cells that belong to this row.
-function _clearRowClue(row) {
-    document.querySelectorAll(`.rct-${row}`)
-        .forEach(el => el.classList.remove('hov-row'));
-}
-
-// Removes the highlight class from all column-header cells that belong to this column.
-function _clearColClue(col) {
-    document.querySelectorAll(`.cch-${col}`)
-        .forEach(el => el.classList.remove('hov-col'));
-}
-
-// Removes the row-tint class from every grid cell in the given row.
-function _clearRowCells(row) {
-    const cols = cur.grid[0].length;
-    for (let c = 0; c < cols; c++) {
-        const cell = document.getElementById(`g-${row}-${c}`);
-        if (cell) cell.classList.remove('hov-r');
-    }
-}
-
-// Removes the column-tint class from every grid cell in the given column.
-function _clearColCells(col) {
-    const rows = cur.grid.length;
-    for (let r = 0; r < rows; r++) {
-        const cell = document.getElementById(`g-${r}-${col}`);
-        if (cell) cell.classList.remove('hov-c');
+        if (cell) cell.classList.toggle('hov-c', on);
     }
 }
 
@@ -96,10 +67,10 @@ function _clearColCells(col) {
 //   along both axes.
 function applyHover(row, col) {
     if (!cur) return;
-    _highlightRowClue(row);
-    _highlightColClue(col);
-    _highlightRowCells(row);
-    _highlightColCells(col);
+    _setRowClueHighlight(row, true);
+    _setColClueHighlight(col, true);
+    _setRowCellsHighlight(row, true);
+    _setColCellsHighlight(col, true);
 }
 
 // clearHover — removes the crosshair highlight from the row and column
@@ -107,10 +78,10 @@ function applyHover(row, col) {
 //   Early-exits if nothing is currently hovered or there is no active puzzle.
 function clearHover() {
     if (hoverRow < 0 || !cur) return;
-    _clearRowClue(hoverRow);
-    _clearColClue(hoverCol);
-    _clearRowCells(hoverRow);
-    _clearColCells(hoverCol);
+    _setRowClueHighlight(hoverRow, false);
+    _setColClueHighlight(hoverCol, false);
+    _setRowCellsHighlight(hoverRow, false);
+    _setColCellsHighlight(hoverCol, false);
 }
 
 

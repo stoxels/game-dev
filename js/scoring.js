@@ -197,6 +197,23 @@ function fireAchievements({ gi, rows, cols, elapsed, pts, ptsAwarded, prevBest, 
 
 
 //------------------------------------------------------------------------
+//-------------------ITEM REWARD HELPERS-----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Wraps reward content in the standard item-reward card markup shared by
+// bonus rewards, lucky drops, and the ascension codex reward.
+function _buildItemRewardCard(defId, def, labelHtml) {
+    const rc = rarityColors(def.rarity);
+    return `
+        <div class="item-reward" data-reward-defid="${defId}"
+             style="border-color:${rc.border};color:${rc.color};cursor:default;">
+            ${labelHtml}
+        </div>`;
+}
+
+
+//------------------------------------------------------------------------
 //-------------------CONVERGENCE REWARD-----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -246,13 +263,9 @@ function applyAscensionReward(irz) {
     });
     save();
 
-    const rc = rarityColors(codexDef.rarity);
-    irz.innerHTML = `
-        <div class="item-reward" data-reward-defid="${defId}"
-             style="border-color:${rc.border};color:${rc.color};cursor:default;">
-            🌟 ${LANG === 'de' ? 'Aufstiegsbonus' : 'Ascension Reward'}:
-            ${codexDef.icon} <strong>${itemName(codexDef)}</strong>
-        </div>`;
+    const label = `🌟 ${LANG === 'de' ? 'Aufstiegsbonus' : 'Ascension Reward'}:
+            ${codexDef.icon} <strong>${itemName(codexDef)}</strong>`;
+    irz.innerHTML = _buildItemRewardCard(defId, codexDef, label);
 }
 
 // Dispatcher for convergence and ascension one-time rewards.
@@ -310,12 +323,8 @@ function grantLuckyDropItem() {
 
     STATE.inventory.push({ defId, uid: Date.now() + Math.random().toString(36).slice(2) });
 
-    const rc = rarityColors(def.rarity);
-    return `
-        <div class="item-reward" data-reward-defid="${defId}"
-             style="border-color:${rc.border};color:${rc.color};cursor:default;">
-            ${t('ov_lucky_drop')} ${def.icon} <strong>${itemName(def)}</strong>
-        </div>`;
+    const label = `${t('ov_lucky_drop')} ${def.icon} <strong>${itemName(def)}</strong>`;
+    return _buildItemRewardCard(defId, def, label);
 }
 
 // Attempts to trigger lucky drops for this level completion.
@@ -424,12 +433,8 @@ function grantBonusItem() {
     STATE.inventory.push({ defId, uid: Date.now() + Math.random().toString(36).slice(2) });
     save();
 
-    const rc = rarityColors(def.rarity);
-    return `
-        <div class="item-reward" data-reward-defid="${defId}"
-             style="border-color:${rc.border};color:${rc.color};cursor:default;">
-            ${t('ov_item_earned')}: ${def.icon} <strong>${itemName(def)}</strong>
-        </div>`;
+    const label = `${t('ov_item_earned')}: ${def.icon} <strong>${itemName(def)}</strong>`;
+    return _buildItemRewardCard(defId, def, label);
 }
 
 // Returns the HTML for the "bonus already claimed" notice shown on repeat clears.

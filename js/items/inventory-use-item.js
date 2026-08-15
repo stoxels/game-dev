@@ -190,23 +190,27 @@ function shuffle(arr) {
 
 
 //------------------------------------------------------------------------
-//-------------------TARGETED REVEAL BIAS HELPER--------------------------
+//-------------------BIAS SELECTION HELPERS--------------------------------
 //------------------------------------------------------------------------
-// Used by revealTiles to optionally bias the reveal candidate list toward
-// the least-filled unsolved row or column when the Targeted Reveal passive
-// nodes are invested.
+// Shared plumbing for revealTiles' Targeted Reveal bias and markWrongTiles'
+// Dense Marker bias. Both features pick a "best" row/col (least-filled for
+// Targeted Reveal, most-filled for Dense Marker) and narrow the candidate
+// list to that row/col when their passive chance procs.
 //------------------------------------------------------------------------
 
-// Returns the index of the unsolved row with the fewest correctly-filled
-// cells.  Returns -1 when every row is already complete.
-function _findLeastFilledUnsolvedRow(sol, rows, cols) {
+// Returns the index of the incomplete row that best matches the fill
+// criterion. Pass wantMax=false for the least-filled row (Targeted Reveal),
+// wantMax=true for the most-filled row (Dense Marker). Returns -1 when no
+// incomplete row exists.
+function _findUnsolvedRowByFill(sol, rows, wantMax) {
     let bestRow = -1;
-    let bestFilled = Infinity;
+    let bestFilled = wantMax ? -1 : Infinity;
 
     for (let r = 0; r < rows; r++) {
         const filled = sol[r].filter((v, c) => v === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])).length;
         const total = sol[r].filter(v => v === 1).length;
-        if (filled < total && filled < bestFilled) {
+        if (filled >= total) continue;
+        if (wantMax ? filled > bestFilled : filled < bestFilled) {
             bestFilled = filled;
             bestRow = r;
         }
@@ -214,16 +218,17 @@ function _findLeastFilledUnsolvedRow(sol, rows, cols) {
     return bestRow;
 }
 
-// Returns the index of the unsolved column with the fewest correctly-
-// filled cells.  Returns -1 when every column is already complete.
-function _findLeastFilledUnsolvedCol(sol, rows, cols) {
+// Column counterpart of _findUnsolvedRowByFill — see that function for the
+// wantMax semantics.
+function _findUnsolvedColByFill(sol, cols, wantMax) {
     let bestCol = -1;
-    let bestFilled = Infinity;
+    let bestFilled = wantMax ? -1 : Infinity;
 
     for (let c = 0; c < cols; c++) {
         const filled = sol.filter((row, r) => row[c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])).length;
         const total = sol.filter(row => row[c] === 1).length;
-        if (filled < total && filled < bestFilled) {
+        if (filled >= total) continue;
+        if (wantMax ? filled > bestFilled : filled < bestFilled) {
             bestFilled = filled;
             bestCol = c;
         }
@@ -231,10 +236,20 @@ function _findLeastFilledUnsolvedCol(sol, rows, cols) {
     return bestCol;
 }
 
+// Narrows `cands` to cells in the given best row/col and shows `toastMsg`
+// when that narrowing actually finds matches. Falls back to the original
+// (unbiased) candidate list otherwise.
+function _filterCandidatesByBias(cands, bestRow, bestCol, toastMsg) {
+    const biased = cands.filter(([r, c]) => r === bestRow || c === bestCol);
+    if (biased.length > 0) {
+        showToast(toastMsg);
+        return biased;
+    }
+    return cands;
+}
+
 // Attempts to narrow `cands` to cells in the least-filled unsolved row or
 // column based on the cumulative Targeted Reveal passive chance.
-// Returns the (possibly unchanged) candidate list and shows a toast when
-// the bias fires.
 function _applyTargetedRevealBias(cands, sol, rows, cols) {
     const chance = (ptHasSkill('targeted_reveal_1') ? 0.20 : 0)
         + (ptHasSkill('targeted_reveal_2') ? 0.20 : 0)
@@ -242,15 +257,23 @@ function _applyTargetedRevealBias(cands, sol, rows, cols) {
 
     if (chance <= 0 || Math.random() >= chance || cands.length === 0) return cands;
 
-    const bestRow = _findLeastFilledUnsolvedRow(sol, rows, cols);
-    const bestCol = _findLeastFilledUnsolvedCol(sol, rows, cols);
+    const bestRow = _findUnsolvedRowByFill(sol, rows, false);
+    const bestCol = _findUnsolvedColByFill(sol, cols, false);
+    return _filterCandidatesByBias(cands, bestRow, bestCol, 'Biased Reveal!');
+}
 
-    const biased = cands.filter(([r, c]) => r === bestRow || c === bestCol);
-    if (biased.length > 0) {
-        showToast('Biased Reveal!');
-        return biased;
-    }
-    return cands;
+// Attempts to narrow `cands` to cells in the densest unsolved row or
+// column based on the Dense Marker passive chance.
+function _applyDenseMarkerBias(cands, sol, rows, cols) {
+    const chance = (ptHasSkill('dense_marker_1') ? 0.20 : 0)
+        + (ptHasSkill('dense_marker_2') ? 0.20 : 0)
+        + (ptHasSkill('dense_marker_3') ? 0.30 : 0);
+
+    if (chance <= 0 || Math.random() >= chance || cands.length === 0) return cands;
+
+    const bestRow = _findUnsolvedRowByFill(sol, rows, true);
+    const bestCol = _findUnsolvedColByFill(sol, cols, true);
+    return _filterCandidatesByBias(cands, bestRow, bestCol, 'Biased Mark!');
 }
 
 
@@ -305,73 +328,6 @@ function revealTiles(count) {
     checkWin();
 
     return revealedCoords; // Return the gathered coordinates
-}
-
-
-
-
-//------------------------------------------------------------------------
-//-------------------DENSE MARKER BIAS HELPER-----------------------------
-//------------------------------------------------------------------------
-// Used by markWrongTiles to optionally bias the mark candidate list toward
-// the row or column with the most already-filled correct cells, so marks
-// cluster near almost-complete lines.
-//------------------------------------------------------------------------
-
-// Returns the index of the incomplete row with the most correctly-filled
-// cells.  Returns -1 when no incomplete rows exist.
-function _findDensestUnsolvedRow(sol, rows, cols) {
-    let bestRow = -1;
-    let bestFilled = -1;
-
-    for (let r = 0; r < rows; r++) {
-        const filled = sol[r].filter((v, c) => v === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])).length;
-        const total = sol[r].filter(v => v === 1).length;
-        if (filled < total && filled > bestFilled) {
-            bestFilled = filled;
-            bestRow = r;
-        }
-    }
-    return bestRow;
-}
-
-// Returns the index of the incomplete column with the most correctly-
-// filled cells.  Returns -1 when no incomplete columns exist.
-function _findDensestUnsolvedCol(sol, rows, cols) {
-    let bestCol = -1;
-    let bestFilled = -1;
-
-    for (let c = 0; c < cols; c++) {
-        const filled = sol.filter((row, r) => row[c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])).length;
-        const total = sol.filter(row => row[c] === 1).length;
-        if (filled < total && filled > bestFilled) {
-            bestFilled = filled;
-            bestCol = c;
-        }
-    }
-    return bestCol;
-}
-
-// Attempts to narrow `cands` to cells in the densest unsolved row or
-// column based on the Dense Marker passive chance.
-// Returns the (possibly unchanged) candidate list and shows a toast when
-// the bias fires.
-function _applyDenseMarkerBias(cands, sol, rows, cols) {
-    const chance = (ptHasSkill('dense_marker_1') ? 0.20 : 0)
-        + (ptHasSkill('dense_marker_2') ? 0.20 : 0)
-        + (ptHasSkill('dense_marker_3') ? 0.30 : 0);
-
-    if (chance <= 0 || Math.random() >= chance || cands.length === 0) return cands;
-
-    const bestRow = _findDensestUnsolvedRow(sol, rows, cols);
-    const bestCol = _findDensestUnsolvedCol(sol, rows, cols);
-
-    const biased = cands.filter(([r, c]) => r === bestRow || c === bestCol);
-    if (biased.length > 0) {
-        showToast('Biased Mark!');
-        return biased;
-    }
-    return cands;
 }
 
 
@@ -823,6 +779,28 @@ function _applyColErasureDownside(eraseCount, preFilledSet) {
     return unsolveColsExcluding(eraseCount, preFilledSet);
 }
 
+// Convenience wrapper combining duration scaling + blackout application.
+// Used by cursed items whose downside is a clue blackout (cursedTime,
+// cursedShield, cursedRowCol) so each handler doesn't repeat the pair.
+function _resolveCursedBlackoutDownside(baseMs, blackoutRows, blackoutCols) {
+    const dur = _cursedDownsideDuration(baseMs);
+    _applyBlackoutDownside(dur, blackoutRows, blackoutCols);
+}
+
+// Convenience wrapper combining count scaling + row-erasure application.
+// Used by cursedRowSolve. Returns the number of rows erased.
+function _resolveCursedRowErasureDownside(baseCount, preFilledSet) {
+    const eraseCount = _cursedDownsideCount(baseCount);
+    return _applyRowErasureDownside(eraseCount, preFilledSet);
+}
+
+// Convenience wrapper combining count scaling + col-erasure application.
+// Used by cursedColSolve. Returns the number of columns erased.
+function _resolveCursedColErasureDownside(baseCount, preFilledSet) {
+    const eraseCount = _cursedDownsideCount(baseCount);
+    return _applyColErasureDownside(eraseCount, preFilledSet);
+}
+
 
 
 
@@ -1173,8 +1151,7 @@ function _useCursedTime(id, def) {
     updTimer();
     playItemEffect(id);
 
-    const dur = _cursedDownsideDuration(30000);
-    _applyBlackoutDownside(dur, true, true); // black out both rows and cols
+    _resolveCursedBlackoutDownside(30000, true, true); // black out both rows and cols
 
     return `💀 ${t('item_cursed_time_both')}`;
 }
@@ -1187,8 +1164,7 @@ function _useCursedShield(id, def) {
     revealTiles(2);
     playItemEffect(id);
 
-    const dur = _cursedDownsideDuration(30000);
-    _applyBlackoutDownside(dur, true, false); // black out rows only
+    _resolveCursedBlackoutDownside(30000, true, false); // black out rows only
 
     return `👁️ ${t('item_cursed_shield_both')}`;
 }
@@ -1199,8 +1175,7 @@ function _useCursedRowSolve(id, def) {
 
     const preFilledRows = _getPreFilledRows();
     const revealed = solveRows(3);
-    const eraseCount = _cursedDownsideCount(1);
-    const erased = _applyRowErasureDownside(eraseCount, preFilledRows);
+    const erased = _resolveCursedRowErasureDownside(1, preFilledRows);
 
     playItemEffect(id);
     if (revealed > 0) checkWin();
@@ -1213,8 +1188,7 @@ function _useCursedColSolve(id, def) {
 
     const preFilledCols = _getPreFilledCols();
     const revealed = solveCols(3);
-    const eraseCount = _cursedDownsideCount(1);
-    const erased = _applyColErasureDownside(eraseCount, preFilledCols);
+    const erased = _resolveCursedColErasureDownside(1, preFilledCols);
 
     playItemEffect(id);
     if (revealed > 0) checkWin();
@@ -1228,8 +1202,7 @@ function _useCursedRowCol(id, def) {
     const rowsRevealed = solveRows(4);
     const colsRevealed = solveCols(4);
 
-    const dur = _cursedDownsideDuration(45000);
-    _applyBlackoutDownside(dur, false, true); // black out cols only
+    _resolveCursedBlackoutDownside(45000, false, true); // black out cols only
 
     playItemEffect(id);
     checkWin();

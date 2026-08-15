@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------
-//----------------------------CONSTANTS-----------------------------------
+//----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -15,14 +15,6 @@ const INV_SLOT_GROUPS = [
     { label: 'Cursed', slots: ['cursedReveal', 'cursedTime', 'cursedShield', 'cursedRowSolve', 'cursedColSolve', 'cursedRowCol'] },
     { label: 'Special', slots: ['pearlOfHaste', 'pearlOfSwiftness', 'grandPearl', 'theWitch', 'goldenClock', 'shadowSeal'] },
 ];
-
-
-
-
-//------------------------------------------------------------------------
-//----------------------------TOOLTIP STATE-------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // Cached reference to the shared tooltip element — created once on first use.
 let _invTooltipEl = null;
@@ -64,17 +56,28 @@ function _positionTooltip(tip, anchor) {
     tip.style.top = top + 'px';
 }
 
-// Shows a tooltip with full item details (name, rarity, description, stack count, hint).
-// Used when hovering an inventory slot.
-function _showSlotTooltip(def, count, anchorEl) {
-    const tip = _ensureTooltip();
+// Builds the tooltip's inner HTML for an item. When `count` is provided, includes
+// rarity, stack count, and the interaction hint (slot tooltips); when omitted,
+// returns just the name and description (simple reward-item tooltips).
+function _buildTooltipHtml(def, count) {
     const rc = rarityColors(def.rarity);
-    tip.innerHTML = `
-        <div class="inv-tip-name"   style="color:${rc.color}">${def.icon} ${itemName(def)}</div>
-        <div class="inv-tip-rarity" style="color:${rc.color}">${def.rarity.toUpperCase()}</div>
-        <div class="inv-tip-desc">${itemDesc(def)}</div>
-        <div class="inv-tip-stack">Stack: <b>${count}</b></div>
-        <div class="inv-tip-hint">Left-click: Use &nbsp;|&nbsp; Right-click: Reshuffle &nbsp;|&nbsp; Alt+click: Discard</div>`;
+    const nameLine = `<div class="inv-tip-name" style="color:${rc.color}">${def.icon} ${itemName(def)}</div>`;
+    const descLine = `<div class="inv-tip-desc">${itemDesc(def)}</div>`;
+
+    if (count === undefined) return nameLine + descLine;
+
+    const rarityLine = `<div class="inv-tip-rarity" style="color:${rc.color}">${def.rarity.toUpperCase()}</div>`;
+    const stackLine = `<div class="inv-tip-stack">Stack: <b>${count}</b></div>`;
+    const hintLine = `<div class="inv-tip-hint">Left-click: Use &nbsp;|&nbsp; Right-click: Reshuffle &nbsp;|&nbsp; Alt+click: Discard</div>`;
+    return nameLine + rarityLine + descLine + stackLine + hintLine;
+}
+
+// Shows the shared tooltip for an item, anchored to the given element.
+// Pass `count` for full slot tooltips (adds rarity/stack/hint); omit it for
+// simple item tooltips (name + description only).
+function _showTooltip(def, anchorEl, count) {
+    const tip = _ensureTooltip();
+    tip.innerHTML = _buildTooltipHtml(def, count);
     tip.classList.add('visible');
     _positionTooltip(tip, anchorEl);
 }
@@ -92,16 +95,21 @@ function _hideSlotTooltip() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Finds the first inventory item matching the given defId, or undefined if none exists.
+function _findInventoryItemByDefId(defId) {
+    return STATE.inventory.find(i => i.defId === defId);
+}
+
 // Uses the first inventory item that matches the given defId.
 function _useOneByDefId(defId) {
-    const item = STATE.inventory.find(i => i.defId === defId);
+    const item = _findInventoryItemByDefId(defId);
     if (!item) return;
     useItem(item.uid);
 }
 
 // Sends the first matching item into the reshuffle pile (right-click action).
 function _reshuffleOneByDefId(defId) {
-    const item = STATE.inventory.find(i => i.defId === defId);
+    const item = _findInventoryItemByDefId(defId);
     if (!item) return;
     reshuffleRightClickItem(item.uid);
 }
@@ -170,7 +178,7 @@ function _buildInvSlot(defId) {
 
     if (!isLocked) _attachSlotInteractionHandlers(el, defId, isEmpty);
 
-    el.addEventListener('mouseenter', () => _showSlotTooltip(def, count, el));
+    el.addEventListener('mouseenter', () => _showTooltip(def, el, count));
     el.addEventListener('mouseleave', _hideSlotTooltip);
 
     return el;
@@ -292,15 +300,6 @@ function attachItemTooltip(el, defId) {
     const def = ITEM_DEFS[defId];
     if (!def || !el) return;
 
-    el.addEventListener('mouseenter', () => {
-        const tip = _ensureTooltip();
-        const rc = rarityColors(def.rarity);
-        tip.innerHTML = `
-            <div class="inv-tip-name" style="color:${rc.color}">${def.icon} ${itemName(def)}</div>
-            <div class="inv-tip-desc">${itemDesc(def)}</div>`;
-        tip.classList.add('visible');
-        _positionTooltip(tip, el);
-    });
-
+    el.addEventListener('mouseenter', () => _showTooltip(def, el));
     el.addEventListener('mouseleave', _hideSlotTooltip);
 }

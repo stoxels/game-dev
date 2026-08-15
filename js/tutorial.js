@@ -79,6 +79,38 @@ function _tutImagePath(imageFile) {
 
 
 //------------------------------------------------------------------------
+//---------------------------DOM HELPERS------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Small getElementById wrappers for the handful of elements touched by
+// several render functions below — avoids re-querying the same node
+// repeatedly across a single render pass.
+
+// _getTutDemoArea — the container that holds the background image, arrow
+//   svg, and floating text box.
+function _getTutDemoArea() {
+    return document.getElementById('tut-demo-area');
+}
+
+// _getTutBgImg — the tutorial background <img>, or null if not yet created.
+function _getTutBgImg() {
+    return document.getElementById('tut-bg-img');
+}
+
+// _getTutArrowSvg — the arrow <svg> overlay, or null if not yet created.
+function _getTutArrowSvg() {
+    return document.getElementById('tut-arrow-svg');
+}
+
+// _getTutTextBox — the floating instruction box, or null if not yet created.
+function _getTutTextBox() {
+    return document.getElementById('tut-text-box');
+}
+
+
+
+
+//------------------------------------------------------------------------
 //-------------------------STEP UI UPDATERS---------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -113,10 +145,10 @@ function updateNextButton() {
 //   image key actually changes (so repeated steps on the same screenshot
 //   don't flicker/reload the image).
 function ensureTutDemoSkeleton(step) {
-    const area = document.getElementById('tut-demo-area');
+    const area = _getTutDemoArea();
     const wantedKey = step.image || tutCurrentImageKey || 'step1.jpeg';
 
-    const existingImg = document.getElementById('tut-bg-img');
+    const existingImg = _getTutBgImg();
 
     if (!existingImg) {
         area.innerHTML = `
@@ -136,8 +168,8 @@ function ensureTutDemoSkeleton(step) {
 //   so it never overflows outside #tut-demo-area, e.g. on narrow/short
 //   screens where the box is bigger relative to the canvas.
 function clampTutBoxPosition() {
-    const area = document.getElementById('tut-demo-area');
-    const box = document.getElementById('tut-text-box');
+    const area = _getTutDemoArea();
+    const box = _getTutTextBox();
     if (!area || !box) return;
 
     const areaRect = area.getBoundingClientRect();
@@ -167,8 +199,8 @@ function clampTutBoxPosition() {
 // renderTutBox — creates (if needed) and positions the floating text box,
 //   filling it with the translated title and body text for this step.
 function renderTutBox(step) {
-    const area = document.getElementById('tut-demo-area');
-    let box = document.getElementById('tut-text-box');
+    const area = _getTutDemoArea();
+    let box = _getTutTextBox();
 
     if (!box) {
         box = document.createElement('div');
@@ -194,13 +226,13 @@ function renderTutBox(step) {
 // renderTutArrow — draws (or clears) the golden dashed arrow from the
 //   text box's anchor point to the step's target coordinate.
 function renderTutArrow(step) {
-    const svg = document.getElementById('tut-arrow-svg');
+    const svg = _getTutArrowSvg();
     if (!svg) return;
     svg.innerHTML = '';
 
     if (!step.arrowTo) return;
 
-    const area = document.getElementById('tut-demo-area');
+    const area = _getTutDemoArea();
     const rect = area.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
 
@@ -277,7 +309,7 @@ function prevTutStep() {
 //   on the text box itself, so its text remains selectable) advances to
 //   the next step, same as pressing NEXT.
 function initTutorialClickHandler() {
-    const area = document.getElementById('tut-demo-area');
+    const area = _getTutDemoArea();
     area.onclick = (e) => {
         if (e.target.closest('#tut-text-box')) return;
         advanceTutStep();

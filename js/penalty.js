@@ -4,11 +4,11 @@
 // time deduction with modifier stacking, HUD feedback, and game-over check.
 
 //------------------------------------------------------------------------
-//-------------------CONSTANTS--------------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-const PEN_FLASH_DURATION_MS = 350;   // Duration of the red screen flash in milliseconds
+const PEN_FLASH_DURATION_MS = 350;    // Duration of the red screen flash in milliseconds
 const PEN_INFO_CLEAR_DELAY_MS = 3000; // How long the penalty label stays visible in the HUD
 
 
@@ -204,10 +204,17 @@ function _updatePenaltyInfoHUD(effectivePen) {
     pi._t = setTimeout(() => pi.textContent = '', PEN_INFO_CLEAR_DELAY_MS);
 }
 
-// Updates the mistake counter element in the HUD with the current mistake count.
+// Updates the mistake counter element in the HUD with the current mistake count,
+// and keeps the endgame "Mistakes Left" objectives row in sync (checking the
+// map's mistake limit immediately, with no tick-loop delay).
 function _updateMistakeCounterHUD() {
     const mc = document.getElementById('mistake-counter');
     if (mc) mc.textContent = `${LANG === 'de' ? 'Fehler' : 'Mistakes'}: ${mistakeCount}`;
+
+    if (typeof _egIsActive === 'function' && _egIsActive()) {
+        if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
+        if (typeof _egCheckMistakeLimit === 'function') _egCheckMistakeLimit();
+    }
 }
 
 // Triggers the brief red screen flash that gives tactile feedback on a mistake.
@@ -234,7 +241,7 @@ function applyPenalty(row, col) {
     // --- Break any active Black Swan streak before applying the penalty ---
     _interruptBlackSwanIfActive();
 
-    // --- Stochastic Resonance: 20% chance to convert the mistake into a free reveal ---
+    // --- Stochastic Resonance: 25% chance to convert the mistake into a free reveal ---
     if (_tryProcStochasticResonance(row, col)) return;
 
     // --- Register the mistake and fire dependent systems ---
@@ -271,24 +278,6 @@ function applyPenalty(row, col) {
     // --- End the game if the timer expired from this penalty ---
     _checkTimerExpiry();
 
-    _updateMistakeCounterHUD()
-}
-
-
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Updates the mistake counter element in the HUD with the current mistake count.
-function _updateMistakeCounterHUD() {
-    const mc = document.getElementById('mistake-counter');
-    if (mc) mc.textContent = `${LANG === 'de' ? 'Fehler' : 'Mistakes'}: ${mistakeCount}`;
-
-    // Endgame integration: keep the "Mistakes Left" objectives row in sync,
-    // and check the map's mistake limit immediately (no tick-loop delay).
-    if (typeof _egIsActive === 'function' && _egIsActive()) {
-        if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
-        if (typeof _egCheckMistakeLimit === 'function') _egCheckMistakeLimit();
-    }
+    // NOTE: kept as-is from the original — see "Possible bugs spotted" below.
+    _updateMistakeCounterHUD();
 }
