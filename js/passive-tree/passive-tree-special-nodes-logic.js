@@ -863,6 +863,7 @@ function _randomWalkRevealCell(r, c) {
 function _randomWalkMarkEmpty(r, c) {
     userGrid[r][c] = 2; // Mark as wrong without counting as a player mistake
     renderCell(r, c);
+    systemMarkedGrid[r][c] = true;
     updClues(r, c);
     showToast(`🚶 ${LANG === 'de' ? 'Zufällige Wanderung: Leeres Feld markiert!' : 'Random Walk: Empty cell marked!'}`);
     checkWin();

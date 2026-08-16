@@ -24,6 +24,11 @@ let wrongGrid = [];
 // Shown in green, counts as correct, and cannot be un-filled.
 let revealedGrid = [];
 
+// Tracks cells marked (✕) by an item, skill, or class ability rather than
+// the player's own right-click, so they can be styled differently.
+let systemMarkedGrid = [];
+
+
 
 // --- Level tracking ---
 

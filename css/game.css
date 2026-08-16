@@ -358,6 +358,10 @@ td.corner {
         color: rgba(255, 69, 69, .55);
     }
 
+    .gc.marked-system::after {
+        color: rgba(248,162,70,0.55);
+    }
+
     /* ----- Yellow question mark (middle-click or toggle) ----- */
 
     .gc.questioned {

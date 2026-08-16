@@ -757,6 +757,7 @@ function _tryAutoMarkAdjacentLine(adjacentIndices, getCandidates) {
 
         const [r, c] = candidates[Math.floor(Math.random() * candidates.length)];
         userGrid[r][c] = 2; // mark as cross
+        systemMarkedGrid[r][c] = true;
         renderCell(r, c);
 
         // Toast Alert & FX Trigger
@@ -934,7 +935,7 @@ function updClues(row, col, isInitial = false) {
 //
 //   Returns true if the cell was in the DoF reverted set before clearing.
 function _clearCellClasses(el, row, col) {
-    el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned', 'cell-lucky');
+    el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned', 'cell-lucky', 'marked-system');
     el.classList.remove('dof-reverted');
     return !!(window._dofRevertedCells && window._dofRevertedCells.has(`${row}-${col}`));
 }
@@ -1004,8 +1005,10 @@ function renderCell(row, col) {
     // Priority 3–5: normal player-controlled states
     const cellState = userGrid[row][col];
     if (cellState === 1) el.classList.add('filled');
-    else if (cellState === 2) el.classList.add('marked');
-    else if (cellState === 3) el.classList.add('questioned');
+    else if (cellState === 2) {
+        el.classList.add('marked');
+        if (systemMarkedGrid[row][col]) el.classList.add('marked-system');
+    } else if (cellState === 3) el.classList.add('questioned');
 
     // Priority 6: subtle shimmer hint on empty lucky tiles
     if (cellState === 0 && luckyTiles && luckyTiles.has(`${row}-${col}`)) {

@@ -620,6 +620,14 @@ function applyCell(row, col) {
     // These can completely redirect or consume the click.
     if (checkSpecialIntercepts(row, col)) return;
 
+    // Cells that are already correctly filled (revealed by an item/skill,
+    // or filled earlier) get skipped by the guard below as a no-op — but
+    // they should still count toward the drag-stroke counter as we pass
+    // over them.
+    if (painting && pval === 1 && userGrid[row][col] === 1) {
+        updateDragStrokeCounter(row, col);
+    }
+
     // --- Cell guards ---
     // Silently ignore clicks that would be no-ops.
     if (checkCellGuards(row, col)) return;
@@ -663,6 +671,7 @@ function applyCell(row, col) {
 
     // Write the new value into the player grid
     userGrid[row][col] = pval;
+    if (pval !== 2) systemMarkedGrid[row][col] = false;
 
     // Extra logic that only applies to a correct left-click fill
     if (pval === 1 && cur.grid[row][col] === 1) {

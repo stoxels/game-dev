@@ -40,6 +40,7 @@ function _resolveCell(r, c, sol) {
     } else {
         if (userGrid[r][c] === 0) {
             userGrid[r][c] = 2;
+            systemMarkedGrid[r][c] = true;
             renderCell(r, c);
             return `g-${r}-${c}`;
         }

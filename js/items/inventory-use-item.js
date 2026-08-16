@@ -371,6 +371,7 @@ function markWrongTiles(count) {
     const markedCoords = [];
     shuffle(cands).slice(0, count).forEach(([r, c]) => {
         userGrid[r][c] = 2;
+        systemMarkedGrid[r][c] = true;
         renderCell(r, c);
         affected.push(`g-${r}-${c}`);
         markedCoords.push([r, c]);
@@ -1358,6 +1359,7 @@ function _useShadowSeal(id, def) {
     const affected = [];
     cands.slice(0, markCount).forEach(([r, c]) => {
         userGrid[r][c] = 2;
+        systemMarkedGrid[r][c] = true;
         renderCell(r, c);
         affected.push(`g-${r}-${c}`);
     });

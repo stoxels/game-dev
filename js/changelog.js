@@ -30,6 +30,8 @@ const CHANGELOG_DATA = [
                     "Adjusting the sound effect volume now plays a random sound effect so the adjustment is instantly noticeable",
                     "Alot of internal code has been refactored and improved.",
                     "Quiz and Excercise buttons have been vertically repositionioed.",
+                    "The Drag Counter now counts cells that are item or skill revealed aswell.",
+                    "Red Cross Marks created by passives, abilities, items and other effects are now visually distinct from manually placed cross marks",
                     
                 ],
 

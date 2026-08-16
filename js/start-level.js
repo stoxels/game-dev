@@ -47,6 +47,7 @@ function _initGrids() {
     userGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
     wrongGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
     revealedGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
+    systemMarkedGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
 }
 
 
