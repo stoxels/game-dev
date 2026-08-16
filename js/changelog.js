@@ -47,6 +47,7 @@ const CHANGELOG_DATA = [
                     "Potentially fixed a bug that made using The Witch item not consume the item and not count towards associated achievements.",
                     "Fixed a bug that made the 'Select Levels' button in the Convergence Modal launch the next Level instead of bringing the player back to the Level Selection screen.",
                     "Fixed a bug that made the Skip Button remain on the screen after answering a quiz or excercise question.",
+                    "Fixed a bug that made sprites keep walking after selecting a level or when returning from a puzzle back to the level selection screen using the Levels button.",
                 ],
 
             },

@@ -1150,6 +1150,10 @@ function _wdContinueWalkFromNode(fromNodeKey, targetLevelIdx, onArrived) {
 
     const finish = () => {
         _wdWalking = false;
+        const sprite = _wdGetSprite();
+        if (sprite) sprite.classList.remove('walking');
+        if (typeof _stopAvatarWalkAnimation === 'function') _stopAvatarWalkAnimation();
+
         _wdCurrentLevelIdx = targetLevelIdx;
         _wdPersistSpritePos(wi, targetLevelIdx);
         _wdRefreshPaths(wi);
