@@ -36,6 +36,46 @@ const ASCENDENCY_LIST = {
     probabilist: ['bayesian', 'random_walker'],
 };
 
+// Flat cooldown reduction (seconds) granted by class-specific passives,
+// keyed by class → slot → [skillId, seconds]. Drives _getClassCooldownReduction
+// below instead of one hand-written function per class.
+const CLASS_COOLDOWN_REDUCTIONS = {
+    statistician: {
+        // active1 = Data Strike, active2 = Diagonal Strike
+        active1: [
+            ['advanced_data_strike', 30],
+            ['swift_strike', 15],
+            ['accelerated_computation', 15],
+        ],
+        active2: [
+            ['quick_strike', 15],
+            ['accelerated_striking', 15],
+        ],
+    },
+    mathmagician: {
+        // active1 = Arcane Reveal, active2 = Absolute Zero
+        active1: [
+            ['rapid_revelation', 15],
+            ['accelerated_revelation', 15],
+        ],
+        active2: [
+            ['hastened_zero', 15],
+            ['accelerated_zero', 15],
+        ],
+    },
+    probabilist: {
+        // active1 = Precision Mark, active2 = Field Scan
+        active1: [
+            ['swift_marking', 15],
+            ['accelerated_marking', 15],
+        ],
+        active2: [
+            ['swift_scan', 15],
+            ['accelerated_scan', 15],
+        ],
+    },
+};
+
 
 //------------------------------------------------------------------------
 //----------------------STATE HELPERS ------------------------------------
@@ -145,67 +185,16 @@ function _getGlobalCooldownReduction() {
     return reduction;
 }
 
-// Returns the flat cooldown reduction from passives specific to the Statistician class.
-// Passive reductions per slot:
-//   active1 (Data Strike):     advanced_data_strike −30s, swift_strike −15s, accelerated_computation −15s
-//   active2 (Diagonal Strike): quick_strike −15s, accelerated_striking −15s
-function _getStatisticianCooldownReduction(slot) {
-    let reduction = 0;
-    if (slot === 'active1') {
-        if (ptHasSkill('advanced_data_strike')) reduction += 30;
-        if (ptHasSkill('swift_strike')) reduction += 15;
-        if (ptHasSkill('accelerated_computation')) reduction += 15;
-    }
-    if (slot === 'active2') {
-        if (ptHasSkill('quick_strike')) reduction += 15;
-        if (ptHasSkill('accelerated_striking')) reduction += 15;
-    }
-    return reduction;
-}
-
-// Returns the flat cooldown reduction from passives specific to the Mathmagician class.
-// Passive reductions per slot:
-//   active1 (Arcane Reveal): rapid_revelation −15s, accelerated_revelation −15s
-//   active2 (Absolute Zero): hastened_zero −15s, accelerated_zero −15s
-function _getMathmagicianCooldownReduction(slot) {
-    let reduction = 0;
-    if (slot === 'active1') {
-        if (ptHasSkill('rapid_revelation')) reduction += 15;
-        if (ptHasSkill('accelerated_revelation')) reduction += 15;
-    }
-    if (slot === 'active2') {
-        if (ptHasSkill('hastened_zero')) reduction += 15;
-        if (ptHasSkill('accelerated_zero')) reduction += 15;
-    }
-    return reduction;
-}
-
-// Returns the flat cooldown reduction from passives specific to the Probabilist class.
-// Passive reductions per slot:
-//   active1 (Precision Mark): swift_marking −15s, accelerated_marking −15s
-//   active2 (Field Scan):     swift_scan −15s, accelerated_scan −15s
-function _getProbabilistCooldownReduction(slot) {
-    let reduction = 0;
-    if (slot === 'active1') {
-        if (ptHasSkill('swift_marking')) reduction += 15;
-        if (ptHasSkill('accelerated_marking')) reduction += 15;
-    }
-    if (slot === 'active2') {
-        if (ptHasSkill('swift_scan')) reduction += 15;
-        if (ptHasSkill('accelerated_scan')) reduction += 15;
-    }
-    return reduction;
-}
-
-// Returns the flat cooldown reduction from class-specific passives for the current class and slot.
-// Routes to the correct per-class helper. Returns 0 for unknown classes.
+// Returns the flat cooldown reduction from passives specific to the current
+// class and slot, looked up from CLASS_COOLDOWN_REDUCTIONS above.
+// Returns 0 for unknown classes/slots or slots with no listed passives.
 function _getClassCooldownReduction(slot) {
-    switch (STATE.playerClass) {
-        case 'statistician': return _getStatisticianCooldownReduction(slot);
-        case 'mathmagician': return _getMathmagicianCooldownReduction(slot);
-        case 'probabilist': return _getProbabilistCooldownReduction(slot);
-        default: return 0;
-    }
+    const slotEntries = CLASS_COOLDOWN_REDUCTIONS[STATE.playerClass]?.[slot];
+    if (!slotEntries) return 0;
+    return slotEntries.reduce(
+        (total, [skillId, seconds]) => total + (ptHasSkill(skillId) ? seconds : 0),
+        0
+    );
 }
 
 

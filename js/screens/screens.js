@@ -82,7 +82,7 @@ function _wireConvergenceModalButtons(modal, proceed) {
     // Tree button opens the passive tree; navigation continues from there.
     treeBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { hideResultOverlays(); showPassiveTree(); });
     nextBtn.onclick = _buildConvergenceButtonHandler(proceed);
-    levelsBtn.onclick = _buildConvergenceButtonHandler(proceed);
+    levelsBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { goToLevelSelect(); });
 }
 
 // If a convergence point is pending, interrupts navigation to show the

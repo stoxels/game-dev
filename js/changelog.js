@@ -10,14 +10,14 @@ const CHANGELOG_DATA = [
 
     {
         version: "v0.27 BETA",
-        date: "08.08.2026",
+        date: "16.08.2026",
         changes: [
             {
                 category: "New Features",
                 items: [
                     "Settings Modal has been fully remade.",
-                    "There are now up to 20 individual Save - Slots. Each one can be reset individually and progress is based per Save - Slot.",
-                    "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text. Not all questions have an explaination yet.",
+                    "There are now up to 20 individual Save - Slots. Each one can be reset individually and progress is based per Save - Slot. Character portraits in each save slot shows the chosen character and class combination.",
+                    "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text.",
                     "Endgame Test Hub has been created",
                 ],
 
@@ -37,7 +37,7 @@ const CHANGELOG_DATA = [
                 items: [
                     "Fixed some typos",
                     "Potentially fixed a bug that made using The Witch item not consume the item and not count towards associated achievements.",
-
+                    "Fixed a bug that made the 'Select Levels' button in the Convergence Modal launch the next Level instead of bringing the player back to the Level Selection screen.",
                 ],
 
             },

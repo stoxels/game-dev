@@ -1,14 +1,14 @@
 ﻿// class-abilities.js
 // Handles all class passive and active ability logic:
 //   - Shared grid/cell helpers used across multiple abilities
-//   - Active ability arming, instant firing, and cell-click execution
 //   - Dispatch routing to per-class and per-ascendency ability functions
+//   - Active ability arming, instant firing, and cell-click execution
 //   - Class passive setup at level start
 //   - Passive reactions to correct fills and mistakes during play
 
 
 //------------------------------------------------------------------------
-//---------------------------MODULE STATE---------------------------------
+//---------------------------CONSTANTS & STATE-----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -165,6 +165,139 @@ function _showAbilityArmToast(slot) {
         ? (activeData.descCursorDE || activeData.descCursorEn)
         : activeData.descCursorEn;
     showToast(`🎯 ${msg}`);
+}
+
+
+
+
+//------------------------------------------------------------------------
+//------------------ABILITY DISPATCH (BASE CLASSES)-----------------------
+//------------------------------------------------------------------------
+// Routes an ability call to the correct implementation function and tracks
+// the matching achievement stat. Split by active slot to keep each switch
+// focused on a single set of abilities. Placed ahead of the instant-fire
+// and cell-click execution sections below, since both call into this.
+//------------------------------------------------------------------------
+
+
+// _dispatchBaseActive1 — dispatches the active1 ability for base classes.
+function _dispatchBaseActive1(playerClass, row, col, effect) {
+    switch (playerClass) {
+        case 'mathmagician':
+            _executeArcaneReveal(row, col, effect.radius, effect.maxReveals);
+            trackAchStat('skillArcaneRevealUsed');
+            break;
+        case 'statistician':
+            _executeDataStrike(effect.solveCount, effect.revealCap || 5);
+            trackAchStat('skillDataStrikeUsed');
+            break;
+        case 'probabilist':
+            _executePrecisionMark(row, col, effect.extraLines || 0);
+            trackAchStat('skillPrecisionMarkUsed');
+            break;
+    }
+}
+
+
+// _dispatchBaseActive2 — dispatches the active2 ability for base classes.
+function _dispatchBaseActive2(playerClass, row, col, effect) {
+    switch (playerClass) {
+        case 'mathmagician':
+            _executeArcaneFreeze(effect.freezeDuration);
+            trackAchStat('skillAbsoluteZeroUsed');
+            break;
+        case 'statistician':
+            _executeDiagonalStrike(row, col, effect.diagonals);
+            trackAchStat('skillDiagonalStrikeUsed');
+            break;
+        case 'probabilist':
+            _executeFieldScan(row, col, effect.scanSize, effect.scanDuration);
+            trackAchStat('skillFieldScanUsed');
+            break;
+    }
+}
+
+
+// _dispatchBaseAbility — top-level router for base class active abilities.
+//   Calls the correct active1 or active2 dispatcher, then logs the quest stat.
+function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
+    if (activeKey === 'active1') {
+        _dispatchBaseActive1(playerClass, row, col, effect);
+    } else {
+        _dispatchBaseActive2(playerClass, row, col, effect);
+    }
+    updateQuestStats('classAbilityUsed', {});
+}
+
+
+
+
+//------------------------------------------------------------------------
+//------------------ABILITY DISPATCH (ASCENDENCIES)-----------------------
+//------------------------------------------------------------------------
+// Routes an ascendency ability call to the correct implementation and
+// tracks the achievement stat. One case per ascendency for readability.
+//------------------------------------------------------------------------
+
+
+// _dispatchAscendencyAbility — routes to the correct ascendency skill implementation.
+//   hudSlot 'active3' → ascendency active1 (skill 1); 'active4' → ascendency active2 (skill 2).
+function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
+    const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
+
+    updateQuestStats('classAbilityUsed', {});
+
+    switch (ascendency) {
+        case 'outlier':
+            if (ascSlot === 'active1') {
+                _executeTailRisk(effect.secondsPerCell, effect.maxCells);
+            } else {
+                _executeBlackSwan(effect.duration);
+            }
+            break;
+
+        case 'actuary':
+            if (ascSlot === 'active1') {
+                _executeRegressionToPrior(effect.correctCount, effect.recoverPct);
+            } else {
+                _executeSignificanceThreshold(effect.protectCount, effect.bonusReveal);
+            }
+            break;
+
+        case 'recursionist':
+            if (ascSlot === 'active1') {
+                _executeResidual(row, col, effect);
+            } else {
+                _executeDegreesOfFreedom(row, col, effect);
+            }
+            break;
+
+        case 'markovian':
+            if (ascSlot === 'active1') {
+                _executeStateRollback(effect.windowSeconds, effect.rewindSeconds, effect.clearOldMistakes);
+            } else {
+                _executeTransitionMatrix(effect.duration, effect.cascadeChance, effect.maxDepth);
+            }
+            break;
+
+        case 'bayesian':
+            if (ascSlot === 'active1') {
+                _executeBayesTraps(effect.trapCount, effect.availableTraps);
+            } else {
+                _executeTypeIShield(effect.seedCount, effect.bonusReveal);
+            }
+            break;
+
+        case 'random_walker':
+            if (ascSlot === 'active1') {
+                _executeBrownianMotion(row, col, effect.paths, effect.rank);
+            } else {
+                _executeSummonDrifter(effect.duration, effect.interval, effect.smartTarget, effect.finalHowl);
+            }
+            break;
+    }
+
+    trackAchStat('skillAscendencyUsed');
 }
 
 
@@ -390,138 +523,6 @@ function executeActiveAbility(row, col) {
     }
 
     buildClassHUD();
-}
-
-
-
-
-//------------------------------------------------------------------------
-//------------------ABILITY DISPATCH (BASE CLASSES)-----------------------
-//------------------------------------------------------------------------
-// Routes an ability call to the correct implementation function and tracks
-// the matching achievement stat. Split by active slot to keep each switch
-// focused on a single set of abilities.
-//------------------------------------------------------------------------
-
-
-// _dispatchBaseActive1 — dispatches the active1 ability for base classes.
-function _dispatchBaseActive1(playerClass, row, col, effect) {
-    switch (playerClass) {
-        case 'mathmagician':
-            _executeArcaneReveal(row, col, effect.radius, effect.maxReveals);
-            trackAchStat('skillArcaneRevealUsed');
-            break;
-        case 'statistician':
-            _executeDataStrike(effect.solveCount, effect.revealCap || 5);
-            trackAchStat('skillDataStrikeUsed');
-            break;
-        case 'probabilist':
-            _executePrecisionMark(row, col, effect.extraLines || 0);
-            trackAchStat('skillPrecisionMarkUsed');
-            break;
-    }
-}
-
-
-// _dispatchBaseActive2 — dispatches the active2 ability for base classes.
-function _dispatchBaseActive2(playerClass, row, col, effect) {
-    switch (playerClass) {
-        case 'mathmagician':
-            _executeArcaneFreeze(effect.freezeDuration);
-            trackAchStat('skillAbsoluteZeroUsed');
-            break;
-        case 'statistician':
-            _executeDiagonalStrike(row, col, effect.diagonals);
-            trackAchStat('skillDiagonalStrikeUsed');
-            break;
-        case 'probabilist':
-            _executeFieldScan(row, col, effect.scanSize, effect.scanDuration);
-            trackAchStat('skillFieldScanUsed');
-            break;
-    }
-}
-
-
-// _dispatchBaseAbility — top-level router for base class active abilities.
-//   Calls the correct active1 or active2 dispatcher, then logs the quest stat.
-function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
-    if (activeKey === 'active1') {
-        _dispatchBaseActive1(playerClass, row, col, effect);
-    } else {
-        _dispatchBaseActive2(playerClass, row, col, effect);
-    }
-    updateQuestStats('classAbilityUsed', {});
-}
-
-
-
-
-//------------------------------------------------------------------------
-//------------------ABILITY DISPATCH (ASCENDENCIES)-----------------------
-//------------------------------------------------------------------------
-// Routes an ascendency ability call to the correct implementation and
-// tracks the achievement stat. One case per ascendency for readability.
-//------------------------------------------------------------------------
-
-
-// _dispatchAscendencyAbility — routes to the correct ascendency skill implementation.
-//   hudSlot 'active3' → ascendency active1 (skill 1); 'active4' → ascendency active2 (skill 2).
-function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
-    const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
-
-    updateQuestStats('classAbilityUsed', {});
-
-    switch (ascendency) {
-        case 'outlier':
-            if (ascSlot === 'active1') {
-                _executeTailRisk(effect.secondsPerCell, effect.maxCells);
-            } else {
-                _executeBlackSwan(effect.duration);
-            }
-            break;
-
-        case 'actuary':
-            if (ascSlot === 'active1') {
-                _executeRegressionToPrior(effect.correctCount, effect.recoverPct);
-            } else {
-                _executeSignificanceThreshold(effect.protectCount, effect.bonusReveal);
-            }
-            break;
-
-        case 'recursionist':
-            if (ascSlot === 'active1') {
-                _executeResidual(row, col, effect);
-            } else {
-                _executeDegreesOfFreedom(row, col, effect);
-            }
-            break;
-
-        case 'markovian':
-            if (ascSlot === 'active1') {
-                _executeStateRollback(effect.windowSeconds, effect.rewindSeconds, effect.clearOldMistakes);
-            } else {
-                _executeTransitionMatrix(effect.duration, effect.cascadeChance, effect.maxDepth);
-            }
-            break;
-
-        case 'bayesian':
-            if (ascSlot === 'active1') {
-                _executeBayesTraps(effect.trapCount, effect.availableTraps);
-            } else {
-                _executeTypeIShield(effect.seedCount, effect.bonusReveal);
-            }
-            break;
-
-        case 'random_walker':
-            if (ascSlot === 'active1') {
-                _executeBrownianMotion(row, col, effect.paths, effect.rank);
-            } else {
-                _executeSummonDrifter(effect.duration, effect.interval, effect.smartTarget, effect.finalHowl);
-            }
-            break;
-    }
-
-    trackAchStat('skillAscendencyUsed');
 }
 
 

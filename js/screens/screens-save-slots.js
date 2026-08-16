@@ -27,10 +27,21 @@ const CHAR_PORTRAIT_SRC = {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Looks up the portrait image for a saved character id, case-insensitively.
-function getCharPortraitSrc(character) {
-    if (!character) return '';
-    return CHAR_PORTRAIT_SRC[character.toLowerCase()] || '';
+
+
+// Looks up the portrait image for a saved character, factoring in class/ascendency.
+function getCharPortraitSrc(summary) {
+    if (!summary || !summary.playerCharacter) return '';
+
+    const char = summary.playerCharacter;
+
+    // Ascendency takes priority over base class, just like _getPlayerCharacterImage
+    const classKey = summary.playerAscendency
+        ? summary.playerAscendency
+        : (summary.playerClass ? summary.playerClass : 'noclass');
+
+    const charCap = char.charAt(0).toUpperCase() + char.slice(1);
+    return `images/sprites/${charCap}_${classKey}.png`;
 }
 
 // Builds the inner markup for a save-slot card, empty or filled.
@@ -40,7 +51,9 @@ function _buildSlotCardHtml(slotNum, summary) {
                 <div class="ssc-empty">+ NEW GAME</div>`;
     }
 
-    const portraitSrc = getCharPortraitSrc(summary.playerCharacter);
+    // UPDATE HERE: Pass the full summary object instead of just the character ID
+    const portraitSrc = getCharPortraitSrc(summary);
+
     const portraitHtml = portraitSrc
         ? `<img class="ssc-portrait" src="${portraitSrc}" alt="${summary.playerCharacter}">`
         : '';
@@ -51,6 +64,8 @@ function _buildSlotCardHtml(slotNum, summary) {
              <div class="ssc-levels">${summary.levelsDone} STOXELS DONE</div>
              <button class="ssc-delete-btn" data-slot="${slotNum}" title="Delete save">❌</button>`;
 }
+
+
 
 // Wires up click-to-select and delete-button behavior on a slot card.
 function _attachSlotCardListeners(card, slotNum) {
@@ -121,6 +136,8 @@ function showSaveSlotSelect(onSlotChosen) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+/*
+
 // Swaps the reset modal's copy to reference a single save slot.
 // Strips any data-t attributes on the elements it touches so a later
 // translation re-render doesn't overwrite this slot-specific text; the
@@ -142,6 +159,33 @@ function _setResetModalTextForSlot(slotNum) {
     const confirmBtn = modal.querySelector('#btn-confirm-reset');
     if (confirmBtn) { confirmBtn.removeAttribute('data-t'); confirmBtn.textContent = 'YES, DELETE THIS SAVE'; }
 }
+
+*/
+
+// Swaps the reset modal's copy to reference a single save slot.
+// Strips any data-t attributes on the elements it touches so a later
+// translation re-render doesn't overwrite this slot-specific text; the
+// original wording is restored by _restoreResetModalTextForFullReset()
+// whenever the modal is opened for the title-screen "reset everything" flow.
+function _setResetModalTextForSlot(slotNum) {
+    const modal = document.getElementById('reset-modal');
+    if (!modal) return;
+
+    const title = modal.querySelector('.reset-title');
+    if (title) { title.removeAttribute('data-t'); title.textContent = `DELETE SAVE - SLOT ${slotNum}`; }
+
+    // Target by class and DOM structure instead of [data-t="..."]
+    const note1 = modal.querySelector('.reset-note-text span:first-child');
+    if (note1) { note1.removeAttribute('data-t'); note1.textContent = `This will permanently erase Save Slot ${slotNum}.`; }
+
+    // Target by class and DOM structure instead of [data-t="..."]
+    const note2 = modal.querySelector('.reset-note-text span:last-child');
+    if (note2) { note2.removeAttribute('data-t'); note2.textContent = 'This cannot be undone.'; }
+
+    const confirmBtn = modal.querySelector('#btn-confirm-reset');
+    if (confirmBtn) { confirmBtn.removeAttribute('data-t'); confirmBtn.textContent = 'YES, DELETE THIS SAVE'; }
+}
+
 
 // Reuses the shared #reset-modal (styled via reset-game.css) instead of a
 // one-off modal, so per-slot deletion looks identical to the title-screen
