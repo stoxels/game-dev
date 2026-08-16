@@ -19,6 +19,10 @@ let mbtn = 0;
 let dragStartRow = -1;
 let dragStartCol = -1;
 
+// Cells already counted toward the current stroke's displayed number,
+// so re-dragging back over the same cell doesn't double/triple count it.
+let dragCountedCells = new Set();
+
 // The axis the drag is locked to once the player moves: 'row', 'col', or null (undecided)
 let dragAxis = null;
 
@@ -482,28 +486,25 @@ function handleLuckyTileClaim(row, col) {
 // Helpers that fire after a verified correct left-click fill.
 //------------------------------------------------------------------------
 
-// Increments the drag stroke counter and notifies the drag-counter overlay
-// (only when actively painting in a left-click drag).
+// Shows the size of the contiguous correctly-filled run passing through
+// (row, col) along the current drag axis. Recomputed fresh on every call,
+// so it's naturally correct regardless of drag direction, revisits, or
+// how many of the cells were already filled before this stroke.
 function updateDragStrokeCounter(row, col) {
     if (!painting || pval !== 1) return;
-    dragStrokeCount++;
 
-    if (!dragPrefillApplied) {
-        const movedOff = (row !== dragStartRow || col !== dragStartCol);
-        if (movedOff) {
-            // Direction is now known — lock in the correct axis's prefill count.
-            const axis = (row === dragStartRow) ? 'row'
-                : (col === dragStartCol) ? 'col'
-                    : 'row'; // diagonal fallback, mirrors _isDragCellAllowed
-            dragPrefillOffset = (axis === 'row') ? dragPrefillRow : dragPrefillCol;
-            dragPrefillApplied = true;
-        } else {
-            // Still on the start cell — best guess before we know direction.
-            dragPrefillOffset = Math.max(dragPrefillRow, dragPrefillCol);
-        }
+    // Figure out which axis to measure along.
+    let axis = dragAxis;
+    if (!axis) {
+        // Still on the start cell / direction not known yet — pick whichever
+        // axis has the longer existing run as a best guess.
+        const rowRun = _countAdjacentPrefillRun(row, col, 'row');
+        const colRun = _countAdjacentPrefillRun(row, col, 'col');
+        axis = rowRun >= colRun ? 'row' : 'col';
     }
 
-    const displayCount = dragStrokeCount + dragPrefillOffset;
+    const displayCount = _countAdjacentPrefillRun(row, col, axis) + 1; // +1 for the cell itself
+
     if (displayCount > 1) {
         dragCounterApply(row, col, displayCount);
     }
@@ -729,6 +730,7 @@ function cellDown(e, row, col) {
     dragStartCol = col;
     dragAxis = null;
     dragStrokeCount = 0;
+    dragCountedCells = new Set();
 
     // snapshot how many correct cells already sit adjacent to the
     // start cell along each axis, so the counter can pick up from there.
@@ -769,6 +771,7 @@ function stopPainting() {
     dragStartCol = -1;
     dragAxis = null;
     dragStrokeCount = 0;
+    dragCountedCells = new Set();
     dragPrefillRow = 0;
     dragPrefillCol = 0;
     dragPrefillApplied = false;
