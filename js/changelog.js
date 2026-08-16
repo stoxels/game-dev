@@ -50,6 +50,7 @@ const CHANGELOG_DATA = [
                     "Fixed a bug that made the Skip Button remain on the screen after answering a quiz or excercise question.",
                     "Fixed a bug that made sprites keep walking after selecting a level or when returning from a puzzle back to the level selection screen using the Levels button.",
                     "Fixed a bug that made the shield effect around the grid not properly reposition when clicking the Clues button to move row clue numbers to the other side",
+                    "Fixed a bug that showed an incorrect amount of cells to be revealed by Data Strike from the Statistician class in the Data Strike Modal panel.",
                 ],
 
             },

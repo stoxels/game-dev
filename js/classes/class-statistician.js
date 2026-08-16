@@ -446,15 +446,31 @@ function _playDiagonalSlashEffect(row, col, diagonalCount) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+//
+//   count : number of lines that will be solved (shown in the prompt text)
 // _dataStrikeOverlayHTML — builds and returns the inner HTML string for the
 //   Data Strike row/column choice modal.
 //
-//   count : number of lines that will be solved (shown in the prompt text)
-function _dataStrikeOverlayHTML(count) {
+//   count : preview number of lines that will be solved
+//   cap   : preview max cells revealed per line
+function _dataStrikeOverlayHTML(count, cap) {
     const title = LANG === 'de' ? 'DATENHIEB' : 'DATA STRIKE';
-    const prompt = LANG === 'de'
-        ? `Wähle: ${count} zufällige Zeile(n) oder Spalte(n) sofort lösen?`
-        : `Choose: solve ${count} random row(s) or column(s)?`;
+
+    const lineWordEn = _pluralLabel(count, 'row', 'row(s)', '', '');
+    const cellWordEn = _pluralLabel(cap, 'cell', 'cells', '', '');
+    const lineWordDe = _pluralLabel(count, 'Zeile oder Spalte', 'Zeile(n) oder Spalte(n)', 'Zeile oder Spalte', 'Zeile(n) oder Spalte(n)');
+    const cellWordDe = _pluralLabel(cap, 'Zelle', 'Zellen', 'Zelle', 'Zellen');
+
+    let prompt = LANG === 'de'
+        ? `Wähle: bis zu ${cap} ${cellWordDe} in ${count} zufälliger ${lineWordDe} aufdecken?`
+        : `Choose: reveal up to ${cap} ${cellWordEn} in ${count} random row(s) or column(s)?`;
+
+    if (_dataStrikeHasRandomBonusChance()) {
+        prompt += LANG === 'de'
+            ? ' (Chance auf mehr!)'
+            : ' (chance for more!)';
+    }
+
     const rowLabel = LANG === 'de' ? 'ZEILEN' : 'ROWS';
     const colLabel = LANG === 'de' ? 'SPALTEN' : 'COLS';
     const cancelLabel = LANG === 'de' ? 'ABBRECHEN' : 'CANCEL';
@@ -476,12 +492,15 @@ function _dataStrikeOverlayHTML(count) {
 
 // _dataStrikeShowOverlay — creates the modal backdrop, injects the choice HTML,
 //   and appends it to the document body.
-function _dataStrikeShowOverlay(count) {
+//
+//   count : preview number of lines
+//   cap   : preview reveal cap per line
+function _dataStrikeShowOverlay(count, cap) {
     const overlay = document.createElement('div');
     overlay.id = 'data-strike-overlay';
     overlay.className = 'modal-bg show';
     overlay.style.cssText = 'z-index:3000;';
-    overlay.innerHTML = _dataStrikeOverlayHTML(count);
+    overlay.innerHTML = _dataStrikeOverlayHTML(count, cap);
     document.body.appendChild(overlay);
 }
 
@@ -544,6 +563,38 @@ function _dataStrikeRollExtraLines(count) {
     return count;
 }
 
+
+// _dataStrikePreviewCount — non-mutating preview of the deterministic part of
+//   god_of_statistics count scaling, used to show an accurate number in the
+//   modal BEFORE the player commits. Does not touch window._dataStrikeUsesThisLevel.
+//   The random 25% bonus-line rolls are intentionally NOT previewed here.
+function _dataStrikePreviewCount(baseCount) {
+    let count = baseCount;
+    if (ptHasSkill('god_of_statistics')) {
+        const uses = window._dataStrikeUsesThisLevel || 0;
+        if (uses > 0) count += uses;
+    }
+    return count;
+}
+
+// _dataStrikePreviewCap — non-mutating preview of the deterministic reveal-cap
+//   bonuses (monte_carlo, correlation_matrix), used to show an accurate cap in
+//   the modal BEFORE the player commits.
+function _dataStrikePreviewCap(baseCap) {
+    let cap = baseCap || DATA_STRIKE_DEFAULT_REVEAL_CAP;
+    if (ptHasSkill('monte_carlo')) cap += 1;
+    if (ptHasSkill('correlation_matrix')) cap += 1;
+    return cap;
+}
+
+// _dataStrikeHasRandomBonusChance — true if a 25%+ roll for extra lines could
+//   fire this activation. Used only to decide whether to show a "chance for
+//   more" hint in the modal text.
+function _dataStrikeHasRandomBonusChance() {
+    return ptHasSkill('advanced_data_strike') || ptHasSkill('god_of_statistics');
+}
+
+
 // _dataStrikeCalculateFinalCount — applies all passive scaling to the raw solve
 //   count stored at ability activation. Updates the level-use counter.
 //
@@ -583,13 +634,20 @@ function _dataStrikeCalculateRevealCap() {
 // _executeDataStrike — entry point for the Data Strike active ability.
 //   Opens the row/column choice modal and stores the pending solve count and
 //   reveal cap so _dataStrikeResolve can read them after the player chooses.
+//   The modal itself is shown with PREVIEW numbers (deterministic passives
+//   applied, random bonus rolls not applied) so the text matches what will
+//   actually happen as closely as possible without spoiling RNG.
 //
 //   count     : base number of lines to solve
 //   revealCap : base max cells to reveal per line
 function _executeDataStrike(count, revealCap) {
     window._dataStrikePendingCount = count;
     window._dataStrikeRevealCap = revealCap || DATA_STRIKE_DEFAULT_REVEAL_CAP;
-    _dataStrikeShowOverlay(count);
+
+    const previewCount = _dataStrikePreviewCount(count);
+    const previewCap = _dataStrikePreviewCap(window._dataStrikeRevealCap);
+
+    _dataStrikeShowOverlay(previewCount, previewCap);
 }
 
 // _dataStrikeResolve — called by the modal's ROWS or COLS button.
