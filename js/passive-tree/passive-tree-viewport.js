@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------
-//----------------------------STATE VARIABLES-----------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -39,44 +39,7 @@ const PT_LAST_NODE_OFFSET_X = 500;
 
 
 //------------------------------------------------------------------------
-//------------------------------TRANSFORM---------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Writes the current (_pt_tx, _pt_ty, _pt_scale) state onto the world
-// element and keeps the zoom-bar UI in sync.
-function _ptApplyTransform() {
-    if (_pt_world) {
-        _pt_world.style.transform =
-            `translate(${_pt_tx}px, ${_pt_ty}px) scale(${_pt_scale})`;
-    }
-    _ptSyncZoomBar();
-}
-
-
-
-//------------------------------------------------------------------------
-//--------------------------------ZOOM BAR--------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Reads the current _pt_scale and pushes the matching value to both the
-// range-slider and the human-readable percentage label.
-function _ptSyncZoomBar() {
-    const bar = document.getElementById('pt-zoom-bar');
-    if (!bar) return;
-
-    const pct = (_pt_scale - PT_ZOOM_MIN) / (PT_ZOOM_MAX - PT_ZOOM_MIN);
-    bar.value = Math.round(pct * 100);
-
-    const label = document.getElementById('pt-zoom-label');
-    if (label) label.textContent = Math.round(_pt_scale * 100) + '%';
-}
-
-
-
-//------------------------------------------------------------------------
-//------------------------------FIT TO VIEW-------------------------------
+//-------------------TRANSFORM HELPERS--------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -95,6 +58,35 @@ function _ptZoomToward(newScale, pivotX, pivotY) {
     _pt_scale = newScale;
 }
 
+// Reads the current _pt_scale and pushes the matching value to both the
+// range-slider and the human-readable percentage label.
+function _ptSyncZoomBar() {
+    const bar = document.getElementById('pt-zoom-bar');
+    if (!bar) return;
+
+    const pct = (_pt_scale - PT_ZOOM_MIN) / (PT_ZOOM_MAX - PT_ZOOM_MIN);
+    bar.value = Math.round(pct * 100);
+
+    const label = document.getElementById('pt-zoom-label');
+    if (label) label.textContent = Math.round(_pt_scale * 100) + '%';
+}
+
+// Writes the current (_pt_tx, _pt_ty, _pt_scale) state onto the world
+// element and keeps the zoom-bar UI in sync.
+function _ptApplyTransform() {
+    if (_pt_world) {
+        _pt_world.style.transform =
+            `translate(${_pt_tx}px, ${_pt_ty}px) scale(${_pt_scale})`;
+    }
+    _ptSyncZoomBar();
+}
+
+
+
+//------------------------------------------------------------------------
+//-------------------CAMERA & NODE POSITIONING------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Computes the pixel position of a node inside the world div,
 // matching the offsetX/offsetY used by _ptDrawNodes and _ptDrawConnections.
@@ -118,6 +110,8 @@ function _ptCenterOnNode(skill, bounds) {
     _ptApplyTransform();
 }
 
+// Fits the whole tree into the container on first load, then re-centers
+// on the last picked node (if any) so returning players land where they left off.
 function _ptFitToView(bounds) {
     const treeW = bounds.maxX - bounds.minX + PT_PADDING * 2 + PT_NODE_RADIUS * 2;
     const treeH = bounds.maxY - bounds.minY + PT_PADDING * 2 + PT_NODE_RADIUS * 2;
@@ -135,7 +129,7 @@ function _ptFitToView(bounds) {
 
     const lastId = (typeof STATE !== 'undefined') && STATE.passiveTreeLastNode;
     if (lastId && _pt_skillMap[lastId]) {
-        _ptCenterOnNode(_pt_skillMap[lastId], bounds);  // <-- now passes bounds
+        _ptCenterOnNode(_pt_skillMap[lastId], bounds);
     } else {
         _ptApplyTransform();
     }
@@ -144,7 +138,7 @@ function _ptFitToView(bounds) {
 
 
 //------------------------------------------------------------------------
-//---------------------------INPUT HANDLERS-------------------------------
+//-------------------INPUT HANDLERS-----------------------------------------
 //------------------------------------------------------------------------
 // Individual handler functions are defined here, above _ptBindEvents,
 // so the binding function stays clean and readable.
@@ -200,6 +194,13 @@ function _ptOnMouseUp() {
 
 // ---- Touch drag + pinch-zoom --------------------------------------------
 
+// Returns the pixel distance between two Touch objects.
+function _ptTouchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+}
+
 // Handles the start of a one-finger pan or a two-finger pinch.
 function _ptOnTouchStart(e) {
     if (e.touches.length === 1) {
@@ -243,13 +244,6 @@ function _ptOnTouchEnd() {
     _pt_lastPinchDist = null;
 }
 
-// Returns the pixel distance between two Touch objects.
-function _ptTouchDistance(touches) {
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.hypot(dx, dy);
-}
-
 // ---- Zoom-bar slider ----------------------------------------------------
 
 // Prevents the mousedown from bubbling up to the container's pan handler.
@@ -273,7 +267,7 @@ function _ptOnZoomBarInput(zoomBar) {
 
 
 //------------------------------------------------------------------------
-//------------------------------EVENT BINDING-----------------------------
+//-------------------EVENT BINDING-------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 

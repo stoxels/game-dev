@@ -29,6 +29,23 @@ const DIAG_STRIKE_DEFAULT_MARK_CAP = 3;
 
 
 //------------------------------------------------------------------------
+//-------------------TEXT HELPERS------------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _pluralLabel — picks the correct singular/plural word for a count, in the
+//   current LANG. Used by every ability toast that reports "N things".
+//
+//   count                  : the number to check for singular vs plural
+//   enSingular / enPlural  : English forms
+//   deSingular / dePlural  : German forms
+function _pluralLabel(count, enSingular, enPlural, deSingular, dePlural) {
+    if (LANG === 'de') return count === 1 ? deSingular : dePlural;
+    return count === 1 ? enSingular : enPlural;
+}
+
+
+//------------------------------------------------------------------------
 //-------------------SHARED LINE SOLVE HELPERS----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -117,630 +134,6 @@ function _solveLinesCapped(type, count, cap) {
     picked.forEach(lineEntry => _revealCappedCells(lineEntry, type, cap));
 
     return picked.length;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DATA STRIKE — MODAL HELPERS--------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _dataStrikeOverlayHTML — builds and returns the inner HTML string for the
-//   Data Strike row/column choice modal.
-//
-//   count : number of lines that will be solved (shown in the prompt text)
-function _dataStrikeOverlayHTML(count) {
-    const title = LANG === 'de' ? 'DATENHIEB' : 'DATA STRIKE';
-    const prompt = LANG === 'de'
-        ? `Wähle: ${count} zufällige Zeile(n) oder Spalte(n) sofort lösen?`
-        : `Choose: solve ${count} random row(s) or column(s)?`;
-    const rowLabel = LANG === 'de' ? 'ZEILEN' : 'ROWS';
-    const colLabel = LANG === 'de' ? 'SPALTEN' : 'COLS';
-    const cancelLabel = LANG === 'de' ? 'ABBRECHEN' : 'CANCEL';
-
-    return `
-        <div class="ds-panel">
-            <div class="ds-icon"></div>
-            <div class="ds-title-plaque">
-                <span class="ds-title-text">${title}</span>
-            </div>
-            <div class="ds-prompt">${prompt}</div>
-            <div class="ds-btn-row">
-                <button class="ds-btn ds-btn-rows" onclick="_dataStrikeResolve('rows')">${rowLabel}</button>
-                <button class="ds-btn ds-btn-cols" onclick="_dataStrikeResolve('cols')">${colLabel}</button>
-            </div>
-            <button class="ds-cancel-btn" onclick="_dataStrikeCancel()">${cancelLabel}</button>
-        </div>`;
-}
-
-// _dataStrikeShowOverlay — creates the modal backdrop, injects the choice HTML,
-//   and appends it to the document body.
-function _dataStrikeShowOverlay(count) {
-    const overlay = document.createElement('div');
-    overlay.id = 'data-strike-overlay';
-    overlay.className = 'modal-bg show';
-    overlay.style.cssText = 'z-index:3000;';
-    overlay.innerHTML = _dataStrikeOverlayHTML(count);
-    document.body.appendChild(overlay);
-}
-
-// _dataStrikeRemoveOverlay — plays the Data Strike SFX and removes the modal from the DOM.
-function _dataStrikeRemoveOverlay() {
-    Audio_Manager.playSFX('dataStrike');
-    const overlay = document.getElementById('data-strike-overlay');
-    if (overlay) overlay.remove();
-}
-
-// _dataStrikeRefundCooldown — cancels any running cooldown interval for active1
-//   and resets its remaining time to 0. Called when the player cancels Data Strike
-//   so they are not penalised for opening the modal.
-function _dataStrikeRefundCooldown() {
-    const cd = cooldownState['active1'];
-    if (cd.interval) {
-        clearInterval(cd.interval);
-        cd.interval = null;
-    }
-    cd.remaining = 0;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DATA STRIKE — PASSIVE SCALING------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _dataStrikeApplyGodScaling — if god_of_statistics is active, each Data Strike
-//   beyond the first this level grants +1 extra line to solve. Increments the
-//   use counter for subsequent calls.
-//
-//   count : current base solve count
-//   Returns the adjusted count.
-function _dataStrikeApplyGodScaling(count) {
-    if (!ptHasSkill('god_of_statistics')) return count;
-
-    const uses = window._dataStrikeUsesThisLevel || 0;
-    if (uses > 0) count += uses;
-
-    return count;
-}
-
-// _dataStrikeRollExtraLines — rolls independent 25% chances for bonus lines to solve.
-//   advanced_data_strike gives 1 roll; god_of_statistics gives 2 additional rolls.
-//   Plays the divine proc visual on each roll attempt (regardless of outcome).
-//
-//   count : current solve count before extra rolls
-//   Returns the final solve count after all rolls.
-function _dataStrikeRollExtraLines(count) {
-    let extraChances = 0;
-    if (ptHasSkill('advanced_data_strike')) extraChances += 1;
-    if (ptHasSkill('god_of_statistics')) extraChances += 2; // god = effective 50% via two 25% rolls
-
-    for (let i = 0; i < extraChances; i++) {
-        if (Math.random() < 0.25) count++;
-        _playDivineProcEffect();
-    }
-
-    return count;
-}
-
-// _dataStrikeCalculateFinalCount — applies all passive scaling to the raw solve
-//   count stored at ability activation. Updates the level-use counter.
-//
-//   Returns the final number of lines to solve.
-function _dataStrikeCalculateFinalCount() {
-    let count = window._dataStrikePendingCount || 1;
-    window._dataStrikePendingCount = null;
-
-    count = _dataStrikeApplyGodScaling(count);
-
-    // Increment use counter AFTER applying god scaling (scaling reads the old value)
-    window._dataStrikeUsesThisLevel = (window._dataStrikeUsesThisLevel || 0) + 1;
-
-    count = _dataStrikeRollExtraLines(count);
-
-    return count;
-}
-
-// _dataStrikeCalculateRevealCap — computes the final per-line reveal cap by
-//   applying passive bonuses on top of the base cap stored at ability activation.
-//
-//   Returns the final cap and clears the stored value.
-function _dataStrikeCalculateRevealCap() {
-    let cap = window._dataStrikeRevealCap || DATA_STRIKE_DEFAULT_REVEAL_CAP;
-    if (ptHasSkill('monte_carlo')) cap += 1;
-    if (ptHasSkill('correlation_matrix')) cap += 1;
-    window._dataStrikeRevealCap = null;
-    return cap;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DATA STRIKE — MAIN FUNCTIONS------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _executeDataStrike — entry point for the Data Strike active ability.
-//   Opens the row/column choice modal and stores the pending solve count and
-//   reveal cap so _dataStrikeResolve can read them after the player chooses.
-//
-//   count     : base number of lines to solve
-//   revealCap : base max cells to reveal per line
-function _executeDataStrike(count, revealCap) {
-    window._dataStrikePendingCount = count;
-    window._dataStrikeRevealCap = revealCap || DATA_STRIKE_DEFAULT_REVEAL_CAP;
-    _dataStrikeShowOverlay(count);
-}
-
-// _dataStrikeResolve — called by the modal's ROWS or COLS button.
-//   Applies all passive scaling, solves the chosen line type, plays effects,
-//   and checks for a win.
-//
-//   type : 'rows' | 'cols'
-function _dataStrikeResolve(type) {
-    _dataStrikeRemoveOverlay();
-
-    const count = _dataStrikeCalculateFinalCount();
-    const cap = _dataStrikeCalculateRevealCap();
-    const solved = _solveLinesCapped(type, count, cap);
-
-    // Play horizontal slashes for row strikes, vertical for column strikes
-    _playSlashEffect(type === 'cols');
-
-    if (solved > 0) {
-        // Determine singular/plural labels based on language and count
-        let label;
-        if (type === 'rows') {
-            label = (LANG === 'de')
-                ? (solved === 1 ? 'Zeile' : 'Zeilen')
-                : (solved === 1 ? 'row' : 'rows');
-        } else {
-            label = (LANG === 'de')
-                ? (solved === 1 ? 'Spalte' : 'Spalten')
-                : (solved === 1 ? 'column' : 'columns');
-        }
-
-        const msg = LANG === 'de'
-            ? `⚔️ ${solved} ${label} gelöst!`
-            : `⚔️ ${solved} ${label} solved!`;
-
-        showToast(msg);
-        checkWin();
-    }
-}
-
-// _dataStrikeCancel — called by the modal's CANCEL button.
-//   Closes the modal, restores ability state, and refunds the cooldown so the
-//   player is not penalised for changing their mind.
-function _dataStrikeCancel() {
-    _dataStrikeRemoveOverlay();
-    window._dataStrikePendingCount = null;
-
-    _setAbilityMode(false);
-    STATE.classActiveChoice = 'active1';
-
-    _dataStrikeRefundCooldown();
-    buildClassHUD();
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DIAGONAL STRIKE — CELL WALK HELPERS-----------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _diagStrikeGetCellResolver — returns the correct cell-resolve function based
-//   on whether the diagonally_wrong passive is active.
-//   _resolveCell    : handles both reveals and wrong-marks (diagonally_wrong)
-//   _revealFilledCell : only reveals filled cells (default)
-function _diagStrikeGetCellResolver() {
-    return ptHasSkill('diagonally_wrong') ? _resolveCell : _revealFilledCell;
-}
-
-// _diagStrikeWalkDirections — walks a single set of direction pairs from the
-//   origin cell and collects resolved cell IDs into `affected`.
-//
-//   originR / originC : starting cell coordinates
-//   dirPairs          : array of [dr, dc] direction vectors to walk
-//   rows / cols       : grid bounds
-//   sol               : solution grid
-//   affected          : output array — resolved cell IDs are pushed here
-//   maxSteps          : how far to walk before stopping
-function _diagStrikeWalkDirections(originR, originC, dirPairs, rows, cols, sol, affected, maxSteps) {
-    const resolver = _diagStrikeGetCellResolver();
-
-    dirPairs.forEach(([dr, dc]) => {
-        let r = originR + dr;
-        let c = originC + dc;
-        let steps = 0;
-
-        while (r >= 0 && r < rows && c >= 0 && c < cols && steps < maxSteps) {
-            const id = resolver(r, c, sol);
-            if (id) affected.push(id);
-            r += dr;
-            c += dc;
-            steps++;
-        }
-    });
-}
-
-// _diagStrikeWalkDiagonals — resolves cells along diagonal directions from the
-//   origin cell, stopping after DIAG_STRIKE_MAX_STEPS steps per direction.
-//
-//   diagonalCount >= 1 : main diagonal only (↘ ↖)
-//   diagonalCount >= 2 : both diagonals    (↘ ↖ ↙ ↗)
-function _diagStrikeWalkDiagonals(originR, originC, diagonalCount, rows, cols, sol, affected) {
-    const allDirPairs = [
-        [[1, 1], [-1, -1]],   // main diagonal ↘ ↖
-        [[1, -1], [-1, 1]],   // anti-diagonal ↙ ↗
-    ];
-
-    // Flatten the direction pairs we need based on diagonalCount
-    const activePairs = allDirPairs
-        .slice(0, Math.min(diagonalCount, 2))
-        .flat();
-
-    _diagStrikeWalkDirections(originR, originC, activePairs, rows, cols, sol, affected, DIAG_STRIKE_MAX_STEPS);
-}
-
-// _diagStrikeProcessOriginCell — resolves the cell the player originally clicked.
-function _diagStrikeProcessOriginCell(row, col, sol, affected) {
-    const resolver = _diagStrikeGetCellResolver();
-    const id = resolver(row, col, sol);
-    if (id) affected.push(id);
-}
-
-// _diagStrikeProcessFullRow — resolves every cell in `row` (used for rank-3 / diagonalCount >= 4).
-function _diagStrikeProcessFullRow(row, cols, sol, affected) {
-    const resolver = _diagStrikeGetCellResolver();
-    for (let c = 0; c < cols; c++) {
-        const id = resolver(row, c, sol);
-        if (id) affected.push(id);
-    }
-}
-
-// _diagStrikeProcessFullCol — resolves every cell in `col` (used for rank-3 / diagonalCount >= 4).
-function _diagStrikeProcessFullCol(col, rows, sol, affected) {
-    const resolver = _diagStrikeGetCellResolver();
-    for (let r = 0; r < rows; r++) {
-        const id = resolver(r, col, sol);
-        if (id) affected.push(id);
-    }
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DIAGONAL STRIKE — CAP HELPERS-----------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _diagStrikeCalculateCaps — computes reveal and mark caps from the base values
-//   plus any active passive bonuses.
-//
-//   baseRevealCap : raw reveal cap from the ability definition
-//   Returns { revealCap, markCap }
-function _diagStrikeCalculateCaps(baseRevealCap) {
-    let revealCap = baseRevealCap || DIAG_STRIKE_DEFAULT_REVEAL_CAP;
-    let markCap = DIAG_STRIKE_DEFAULT_MARK_CAP;
-
-    // Each of these passives adds +1 to both caps
-    if (ptHasSkill('random_diagonal')) { revealCap += 1; markCap += 1; }
-    if (ptHasSkill('diagonal_witch')) { revealCap += 1; markCap += 1; }
-
-    // god_of_statistics adds +2 to both caps
-    if (ptHasSkill('god_of_statistics')) { revealCap += 2; markCap += 2; }
-
-    return { revealCap, markCap };
-}
-
-// _diagStrikeUnrevealExcess — given a list of revealed cell IDs, un-reveals any
-//   cells beyond `cap`, keeping the rest random (not always the first found).
-//
-//   revealedIds : array of cell ID strings for cells that were revealed
-//   cap         : maximum number of reveals to keep
-//   Returns the array of kept cell IDs (length <= cap).
-function _diagStrikeUnrevealExcess(revealedIds, cap) {
-    if (revealedIds.length <= cap) return revealedIds;
-
-    const shuffled = [...revealedIds].sort(() => Math.random() - 0.5);
-
-    shuffled.slice(cap).forEach(id => {
-        const [, r, c] = id.split('-').map(Number);
-        revealedGrid[r][c] = false;
-        userGrid[r][c] = 0;
-        renderCell(r, c);
-        updClues(r, c);
-    });
-
-    return shuffled.slice(0, cap);
-}
-
-// _diagStrikeUnmarkExcess — un-marks empty cells beyond `cap` in the mark list.
-//
-//   markedIds : array of cell ID strings for cells that were marked
-//   cap       : maximum number of marks to keep
-//   affected  : the combined affected array — excess marked IDs are spliced out
-//   Returns nothing; mutates `affected` directly.
-function _diagStrikeUnmarkExcess(markedIds, cap, affected) {
-    if (markedIds.length <= cap) return;
-
-    const shuffled = [...markedIds].sort(() => Math.random() - 0.5);
-
-    shuffled.slice(cap).forEach(id => {
-        const [, r, c] = id.split('-').map(Number);
-        if (userGrid[r][c] === 2) {
-            userGrid[r][c] = 0;
-            renderCell(r, c);
-            questStat_classMarkUsed(1);
-        }
-        const idx = affected.indexOf(id);
-        if (idx !== -1) affected.splice(idx, 1);
-    });
-}
-
-// _diagStrikeRebuildAffected — after capping reveals, rebuilds the `affected`
-//   array so it contains only kept reveals + any marks (no excess reveals).
-//
-//   affected    : the array to rebuild (mutated in place)
-//   keptReveals : Set of kept reveal cell IDs
-//   markedIds   : Set of marked cell IDs
-function _diagStrikeRebuildAffected(affected, keptReveals, markedIds) {
-    affected.length = 0;
-    keptReveals.forEach(id => affected.push(id));
-    markedIds.forEach(id => affected.push(id));
-}
-
-// _diagStrikeApplyCaps — applies both reveal and mark caps to the `affected`
-//   array in place. Also triggers the diagonally_wrong wrong-cell marking pass
-//   if that passive is active.
-//
-//   affected   : array of all resolved cell IDs (mutated in place)
-//   sol        : solution grid
-//   revealCap  : max reveals to keep
-//   markCap    : max marks to keep
-function _diagStrikeApplyCaps(affected, sol, revealCap, markCap) {
-    // --- Reveal cap ---
-    const revealedIds = _filterRevealedIds(affected, sol);
-    if (revealedIds.length > revealCap) {
-        const keptReveals = new Set(_diagStrikeUnrevealExcess(revealedIds, revealCap));
-        const markedIds = new Set(_filterMarkedIds(affected, sol));
-        _diagStrikeRebuildAffected(affected, keptReveals, markedIds);
-    }
-
-    // --- Mark cap (diagonally_wrong only) ---
-    if (ptHasSkill('diagonally_wrong')) {
-        const markedIds = _filterMarkedIds(affected, sol);
-        _diagStrikeUnmarkExcess(markedIds, markCap, affected);
-        // Now apply the wrong-mark pass on whatever cells remain
-        _diagStrikeMarkWrong(affected, sol);
-    }
-}
-
-// _diagStrikeMarkWrong — marks cells that the player incorrectly filled
-//   (user placed a tile where the solution is empty) along the strike path.
-//   Used exclusively by the diagonally_wrong passive.
-//
-//   affected : array of cell IDs along the strike path
-//   sol      : solution grid
-function _diagStrikeMarkWrong(affected, sol) {
-    affected.forEach(id => {
-        const [, r, c] = id.split('-').map(Number);
-        if (sol[r][c] === 0 && userGrid[r][c] === 1) {
-            userGrid[r][c] = 3; // wrong-mark state
-            renderCell(r, c);
-            trackAchStat('tilesMarkedWrong', 1);
-        }
-    });
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DIAGONAL STRIKE — BONUS REPEAT (god_of_statistics)--
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _diagStrikeBonusExecute — performs a full Diagonal Strike on the given target
-//   cell, applying caps and all effects. Used by the bonus repeat proc.
-//
-//   targetR / targetC : coordinates of the randomly chosen bonus target
-//   diagonalCount     : rank of the strike (controls which directions are walked)
-//   revealCap         : reveal cap inherited from the triggering strike
-//   markCap           : mark cap inherited from the triggering strike
-//   rows / cols       : grid dimensions
-//   sol               : solution grid
-function _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealCap, markCap, rows, cols, sol) {
-    const bonusAffected = [];
-
-    _diagStrikeWalkDiagonals(targetR, targetC, diagonalCount, rows, cols, sol, bonusAffected);
-    _diagStrikeProcessOriginCell(targetR, targetC, sol, bonusAffected);
-
-    if (diagonalCount >= 4) {
-        _diagStrikeProcessFullRow(targetR, cols, sol, bonusAffected);
-        _diagStrikeProcessFullCol(targetC, rows, sol, bonusAffected);
-    }
-
-    _diagStrikeApplyCaps(bonusAffected, sol, revealCap, markCap);
-
-    // Play effects centred on the new random target cell
-    Audio_Manager.playSFX('diagonalStrike');
-    _playDiagonalSlashEffect(targetR, targetC, diagonalCount);
-    _applyCellEffect(bonusAffected, 'reveal');
-
-    if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
-
-    const bonusRevealed = _filterRevealedIds(bonusAffected, sol).length;
-
-    const label = (LANG === 'de')
-        ? (bonusRevealed === 1 ? 'Zelle' : 'Zellen')
-        : (bonusRevealed === 1 ? 'cell' : 'cells');
-
-    const msg = (LANG === 'de')
-        ? `⚔️ Bonus-Schlag! ${bonusRevealed} ${label} mehr!`
-        : `⚔️ Bonus Strike! ${bonusRevealed} more ${label}!`;
-
-    showToast(msg);
-
-    questStat_classRevealUsed(bonusRevealed);
-    updateQuestStats('classAbilityUsedThisLevel', {});
-
-    checkWin();
-}
-
-// _diagStrikeBonusRepeat — fired by god_of_statistics (50% chance after a strike).
-//   Picks a random unrevealed filled cell and fires a full Diagonal Strike on it
-//   after a short delay so the animations do not overlap.
-//
-//   diagonalCount : rank of the strike (passed through from the triggering call)
-//   revealCap     : reveal cap to use for the bonus strike
-//   markCap       : mark cap to use for the bonus strike
-//   rows / cols   : grid dimensions
-//   sol           : solution grid
-function _diagStrikeBonusRepeat(diagonalCount, revealCap, markCap, rows, cols, sol) {
-    // Gather all cells that are filled but not yet revealed
-    const candidates = [];
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (sol[r][c] === 1 && !revealedGrid[r][c]) candidates.push([r, c]);
-        }
-    }
-    if (!candidates.length) return;
-
-    // Pick the target immediately so grid state cannot change before the delay resolves
-    const [targetR, targetC] = candidates[Math.floor(Math.random() * candidates.length)];
-
-    setTimeout(() => {
-        _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealCap, markCap, rows, cols, sol);
-    }, 1000);
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DIAGONAL STRIKE — MAIN FUNCTION---------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _executeDiagonalStrike — entry point for the Diagonal Strike active ability.
-//   Resolves cells along diagonal directions through the clicked (row, col) cell,
-//   applies passive scaling caps, plays visual effects, and checks for a win.
-//
-//   row           : clicked cell row index
-//   col           : clicked cell column index
-//   diagonalCount : rank of the strike (1 = one diagonal, 2 = both, 4 = both + H/V)
-//   revealCap     : base max cells to reveal (passive bonuses are added on top)
-//
-//   Passive nodes respected:
-//     diagonally_wrong   — also marks wrongly-filled cells along the path
-//     random_diagonal    — +1 to both reveal and mark caps
-//     diagonal_witch     — +1 to both reveal and mark caps
-//     god_of_statistics  — +2 to both caps, 50% chance to fire a bonus repeat
-function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
-    Audio_Manager.playSFX('diagonalStrike');
-
-    if (!cur) return;
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-
-    // --- Collect all cells touched by the strike ---
-    const affected = [];
-    _diagStrikeWalkDiagonals(row, col, diagonalCount, rows, cols, sol, affected);
-    _diagStrikeProcessOriginCell(row, col, sol, affected);
-
-    if (diagonalCount >= 4) {
-        _diagStrikeProcessFullRow(row, cols, sol, affected);
-        _diagStrikeProcessFullCol(col, rows, sol, affected);
-    }
-
-    // --- Apply passive-scaled caps to reveals and marks ---
-    const { revealCap: finalRevealCap, markCap: finalMarkCap } = _diagStrikeCalculateCaps(revealCap);
-    _diagStrikeApplyCaps(affected, sol, finalRevealCap, finalMarkCap);
-
-    // --- Play effects and resolve feedback ---
-    _playDiagonalSlashEffect(row, col, diagonalCount);
-    _applyCellEffect(affected, 'reveal');
-    if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
-
-    const diagRevealed = _filterRevealedIds(affected, sol).length;
-
-    if (diagRevealed > 0) {
-        trackAchStat('tilesRevealed', diagRevealed);
-
-        const label = (LANG === 'de')
-            ? (diagRevealed === 1 ? 'Zelle' : 'Zellen')
-            : (diagRevealed === 1 ? 'cell' : 'cells');
-
-        const msg = (LANG === 'de')
-            ? `⚔️ Diagonal-Schlag! ${diagRevealed} ${label} aufgedeckt.`
-            : `⚔️ Diagonal Strike! ${diagRevealed} ${label} revealed.`;
-
-        showToast(msg);
-    }
-
-    // --- god_of_statistics: 50% chance to fire a bonus repeat strike ---
-    if (ptHasSkill('god_of_statistics') && Math.random() < 0.50) {
-        Audio_Manager.playSFX('diagonalStrikeRepeat');
-        _playDivineProcEffect();
-        _diagStrikeBonusRepeat(diagonalCount, finalRevealCap, finalMarkCap, rows, cols, sol);
-    }
-
-    questStat_classRevealUsed(diagRevealed);
-    updateQuestStats('classAbilityUsedThisLevel', {});
-
-    checkWin();
-}
-
-
-//------------------------------------------------------------------------
-//-------------------MOMENTUM — MAIN FUNCTION-----------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _statisticianTriggerMomentum — awards bonus time when the Momentum passive
-//   fires (triggered externally after a correct-fill streak).
-//
-//   bonusSeconds : base time to add before passive scaling
-//
-//   Passive nodes respected:
-//     chain_reaction     — +1s flat bonus
-//     precise_momentum   — +2s flat bonus
-//     exponential_growth — each prior Momentum this level adds +1s
-//     god_of_statistics  — doubles the total bonus after all flat additions
-function _statisticianTriggerMomentum(bonusSeconds) {
-    correctFillStreak = 0;
-
-    let bonus = bonusSeconds;
-    if (ptHasSkill('chain_reaction')) bonus += 1;
-    if (ptHasSkill('precise_momentum')) bonus += 2;
-
-    // exponential_growth: each prior Momentum trigger this level adds +1s
-    if (ptHasSkill('exponential_growth')) {
-        bonus += (window._momentumThisLevel || 0);
-    }
-
-    // god_of_statistics doubles the total bonus (applied last)
-    if (ptHasSkill('god_of_statistics')) bonus *= 2;
-
-    timerSecs = Math.min(timerSecs + bonus, 3600);
-    updTimer();
-
-    const label = (LANG === 'de')
-        ? (bonus === 1 ? 'Sekunde' : 'Sekunden')
-        : (bonus === 1 ? 'second' : 'seconds');
-
-    const msg = (LANG === 'de')
-        ? `⚔️ Momentum! +${bonus} ${label}`
-        : `⚔️ Momentum! +${bonus} ${label}`;
-
-    showToast(msg);
-
-    trackAchStat('timeAdded', bonus);
-    trackAchStat('momentumTriggered');
-    updateQuestStats('momentumTriggered', {});
-
-    window._momentumThisLevel = (window._momentumThisLevel || 0) + 1;
-    if (window._momentumThisLevel === 10) trackAchStat('statistician3MomentumOneLevel');
-
-    Audio_Manager.playSFX('momentum');
-    updateMomentumBar(0, 15); // reset momentum bar after it fires
 }
 
 
@@ -1045,4 +438,622 @@ function _playDiagonalSlashEffect(row, col, diagonalCount) {
     }
 
     setTimeout(() => container.remove(), 1200);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DATA STRIKE — MODAL HELPERS--------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _dataStrikeOverlayHTML — builds and returns the inner HTML string for the
+//   Data Strike row/column choice modal.
+//
+//   count : number of lines that will be solved (shown in the prompt text)
+function _dataStrikeOverlayHTML(count) {
+    const title = LANG === 'de' ? 'DATENHIEB' : 'DATA STRIKE';
+    const prompt = LANG === 'de'
+        ? `Wähle: ${count} zufällige Zeile(n) oder Spalte(n) sofort lösen?`
+        : `Choose: solve ${count} random row(s) or column(s)?`;
+    const rowLabel = LANG === 'de' ? 'ZEILEN' : 'ROWS';
+    const colLabel = LANG === 'de' ? 'SPALTEN' : 'COLS';
+    const cancelLabel = LANG === 'de' ? 'ABBRECHEN' : 'CANCEL';
+
+    return `
+        <div class="ds-panel">
+            <div class="ds-icon"></div>
+            <div class="ds-title-plaque">
+                <span class="ds-title-text">${title}</span>
+            </div>
+            <div class="ds-prompt">${prompt}</div>
+            <div class="ds-btn-row">
+                <button class="ds-btn ds-btn-rows" onclick="_dataStrikeResolve('rows')">${rowLabel}</button>
+                <button class="ds-btn ds-btn-cols" onclick="_dataStrikeResolve('cols')">${colLabel}</button>
+            </div>
+            <button class="ds-cancel-btn" onclick="_dataStrikeCancel()">${cancelLabel}</button>
+        </div>`;
+}
+
+// _dataStrikeShowOverlay — creates the modal backdrop, injects the choice HTML,
+//   and appends it to the document body.
+function _dataStrikeShowOverlay(count) {
+    const overlay = document.createElement('div');
+    overlay.id = 'data-strike-overlay';
+    overlay.className = 'modal-bg show';
+    overlay.style.cssText = 'z-index:3000;';
+    overlay.innerHTML = _dataStrikeOverlayHTML(count);
+    document.body.appendChild(overlay);
+}
+
+// _dataStrikeRemoveOverlay — plays the Data Strike SFX and removes the modal from the DOM.
+function _dataStrikeRemoveOverlay() {
+    Audio_Manager.playSFX('dataStrike');
+    const overlay = document.getElementById('data-strike-overlay');
+    if (overlay) overlay.remove();
+}
+
+// _dataStrikeRefundCooldown — cancels any running cooldown interval for active1
+//   and resets its remaining time to 0. Called when the player cancels Data Strike
+//   so they are not penalised for opening the modal.
+function _dataStrikeRefundCooldown() {
+    const cd = cooldownState['active1'];
+    if (cd.interval) {
+        clearInterval(cd.interval);
+        cd.interval = null;
+    }
+    cd.remaining = 0;
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DATA STRIKE — PASSIVE SCALING------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _dataStrikeApplyGodScaling — if god_of_statistics is active, each Data Strike
+//   beyond the first this level grants +1 extra line to solve. Increments the
+//   use counter for subsequent calls.
+//
+//   count : current base solve count
+//   Returns the adjusted count.
+function _dataStrikeApplyGodScaling(count) {
+    if (!ptHasSkill('god_of_statistics')) return count;
+
+    const uses = window._dataStrikeUsesThisLevel || 0;
+    if (uses > 0) count += uses;
+
+    return count;
+}
+
+// _dataStrikeRollExtraLines — rolls independent 25% chances for bonus lines to solve.
+//   advanced_data_strike gives 1 roll; god_of_statistics gives 2 additional rolls.
+//   Plays the divine proc visual on each roll attempt (regardless of outcome).
+//
+//   count : current solve count before extra rolls
+//   Returns the final solve count after all rolls.
+function _dataStrikeRollExtraLines(count) {
+    let extraChances = 0;
+    if (ptHasSkill('advanced_data_strike')) extraChances += 1;
+    if (ptHasSkill('god_of_statistics')) extraChances += 2; // god = effective 50% via two 25% rolls
+
+    for (let i = 0; i < extraChances; i++) {
+        if (Math.random() < 0.25) count++;
+        _playDivineProcEffect();
+    }
+
+    return count;
+}
+
+// _dataStrikeCalculateFinalCount — applies all passive scaling to the raw solve
+//   count stored at ability activation. Updates the level-use counter.
+//
+//   Returns the final number of lines to solve.
+function _dataStrikeCalculateFinalCount() {
+    let count = window._dataStrikePendingCount || 1;
+    window._dataStrikePendingCount = null;
+
+    count = _dataStrikeApplyGodScaling(count);
+
+    // Increment use counter AFTER applying god scaling (scaling reads the old value)
+    window._dataStrikeUsesThisLevel = (window._dataStrikeUsesThisLevel || 0) + 1;
+
+    count = _dataStrikeRollExtraLines(count);
+
+    return count;
+}
+
+// _dataStrikeCalculateRevealCap — computes the final per-line reveal cap by
+//   applying passive bonuses on top of the base cap stored at ability activation.
+//
+//   Returns the final cap and clears the stored value.
+function _dataStrikeCalculateRevealCap() {
+    let cap = window._dataStrikeRevealCap || DATA_STRIKE_DEFAULT_REVEAL_CAP;
+    if (ptHasSkill('monte_carlo')) cap += 1;
+    if (ptHasSkill('correlation_matrix')) cap += 1;
+    window._dataStrikeRevealCap = null;
+    return cap;
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DATA STRIKE — MAIN FUNCTIONS------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _executeDataStrike — entry point for the Data Strike active ability.
+//   Opens the row/column choice modal and stores the pending solve count and
+//   reveal cap so _dataStrikeResolve can read them after the player chooses.
+//
+//   count     : base number of lines to solve
+//   revealCap : base max cells to reveal per line
+function _executeDataStrike(count, revealCap) {
+    window._dataStrikePendingCount = count;
+    window._dataStrikeRevealCap = revealCap || DATA_STRIKE_DEFAULT_REVEAL_CAP;
+    _dataStrikeShowOverlay(count);
+}
+
+// _dataStrikeResolve — called by the modal's ROWS or COLS button.
+//   Applies all passive scaling, solves the chosen line type, plays effects,
+//   and checks for a win.
+//
+//   type : 'rows' | 'cols'
+function _dataStrikeResolve(type) {
+    _dataStrikeRemoveOverlay();
+
+    const count = _dataStrikeCalculateFinalCount();
+    const cap = _dataStrikeCalculateRevealCap();
+    const solved = _solveLinesCapped(type, count, cap);
+
+    // Play horizontal slashes for row strikes, vertical for column strikes
+    _playSlashEffect(type === 'cols');
+
+    if (solved > 0) {
+        // Determine singular/plural label based on line type and count
+        const label = type === 'rows'
+            ? _pluralLabel(solved, 'row', 'rows', 'Zeile', 'Zeilen')
+            : _pluralLabel(solved, 'column', 'columns', 'Spalte', 'Spalten');
+
+        const msg = LANG === 'de'
+            ? `⚔️ ${solved} ${label} gelöst!`
+            : `⚔️ ${solved} ${label} solved!`;
+
+        showToast(msg);
+        checkWin();
+    }
+}
+
+// _dataStrikeCancel — called by the modal's CANCEL button.
+//   Closes the modal, restores ability state, and refunds the cooldown so the
+//   player is not penalised for changing their mind.
+function _dataStrikeCancel() {
+    _dataStrikeRemoveOverlay();
+    window._dataStrikePendingCount = null;
+
+    _setAbilityMode(false);
+    STATE.classActiveChoice = 'active1';
+
+    _dataStrikeRefundCooldown();
+    buildClassHUD();
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DIAGONAL STRIKE — CELL WALK HELPERS-----------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _diagStrikeGetCellResolver — returns the correct cell-resolve function based
+//   on whether the diagonally_wrong passive is active.
+//   _resolveCell    : handles both reveals and wrong-marks (diagonally_wrong)
+//   _revealFilledCell : only reveals filled cells (default)
+function _diagStrikeGetCellResolver() {
+    return ptHasSkill('diagonally_wrong') ? _resolveCell : _revealFilledCell;
+}
+
+// _diagStrikeWalkDirections — walks a single set of direction pairs from the
+//   origin cell and collects resolved cell IDs into `affected`.
+//
+//   originR / originC : starting cell coordinates
+//   dirPairs          : array of [dr, dc] direction vectors to walk
+//   rows / cols       : grid bounds
+//   sol               : solution grid
+//   affected          : output array — resolved cell IDs are pushed here
+//   maxSteps          : how far to walk before stopping
+function _diagStrikeWalkDirections(originR, originC, dirPairs, rows, cols, sol, affected, maxSteps) {
+    const resolver = _diagStrikeGetCellResolver();
+
+    dirPairs.forEach(([dr, dc]) => {
+        let r = originR + dr;
+        let c = originC + dc;
+        let steps = 0;
+
+        while (r >= 0 && r < rows && c >= 0 && c < cols && steps < maxSteps) {
+            const id = resolver(r, c, sol);
+            if (id) affected.push(id);
+            r += dr;
+            c += dc;
+            steps++;
+        }
+    });
+}
+
+// _diagStrikeWalkDiagonals — resolves cells along diagonal directions from the
+//   origin cell, stopping after DIAG_STRIKE_MAX_STEPS steps per direction.
+//
+//   diagonalCount >= 1 : main diagonal only (↘ ↖)
+//   diagonalCount >= 2 : both diagonals    (↘ ↖ ↙ ↗)
+function _diagStrikeWalkDiagonals(originR, originC, diagonalCount, rows, cols, sol, affected) {
+    const allDirPairs = [
+        [[1, 1], [-1, -1]],   // main diagonal ↘ ↖
+        [[1, -1], [-1, 1]],   // anti-diagonal ↙ ↗
+    ];
+
+    // Flatten the direction pairs we need based on diagonalCount
+    const activePairs = allDirPairs
+        .slice(0, Math.min(diagonalCount, 2))
+        .flat();
+
+    _diagStrikeWalkDirections(originR, originC, activePairs, rows, cols, sol, affected, DIAG_STRIKE_MAX_STEPS);
+}
+
+// _diagStrikeProcessOriginCell — resolves the cell the player originally clicked.
+function _diagStrikeProcessOriginCell(row, col, sol, affected) {
+    const resolver = _diagStrikeGetCellResolver();
+    const id = resolver(row, col, sol);
+    if (id) affected.push(id);
+}
+
+// _diagStrikeProcessFullRow — resolves every cell in `row` (used for rank-3 / diagonalCount >= 4).
+function _diagStrikeProcessFullRow(row, cols, sol, affected) {
+    const resolver = _diagStrikeGetCellResolver();
+    for (let c = 0; c < cols; c++) {
+        const id = resolver(row, c, sol);
+        if (id) affected.push(id);
+    }
+}
+
+// _diagStrikeProcessFullCol — resolves every cell in `col` (used for rank-3 / diagonalCount >= 4).
+function _diagStrikeProcessFullCol(col, rows, sol, affected) {
+    const resolver = _diagStrikeGetCellResolver();
+    for (let r = 0; r < rows; r++) {
+        const id = resolver(r, col, sol);
+        if (id) affected.push(id);
+    }
+}
+
+// _diagStrikeCollectAffected — walks the diagonals from the origin cell, resolves
+//   the origin cell itself, and (for rank 3 / diagonalCount >= 4) resolves the
+//   full row and column through the origin. Shared by the main strike and the
+//   god_of_statistics bonus repeat, which both need the identical cell set.
+//
+//   originR / originC : cell the strike is centred on
+//   diagonalCount      : rank of the strike (controls which directions are walked)
+//   rows / cols        : grid dimensions
+//   sol                : solution grid
+//
+//   Returns the array of resolved cell IDs.
+function _diagStrikeCollectAffected(originR, originC, diagonalCount, rows, cols, sol) {
+    const affected = [];
+
+    _diagStrikeWalkDiagonals(originR, originC, diagonalCount, rows, cols, sol, affected);
+    _diagStrikeProcessOriginCell(originR, originC, sol, affected);
+
+    if (diagonalCount >= 4) {
+        _diagStrikeProcessFullRow(originR, cols, sol, affected);
+        _diagStrikeProcessFullCol(originC, rows, sol, affected);
+    }
+
+    return affected;
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DIAGONAL STRIKE — CAP HELPERS-----------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _diagStrikeCalculateCaps — computes reveal and mark caps from the base values
+//   plus any active passive bonuses.
+//
+//   baseRevealCap : raw reveal cap from the ability definition
+//   Returns { revealCap, markCap }
+function _diagStrikeCalculateCaps(baseRevealCap) {
+    let revealCap = baseRevealCap || DIAG_STRIKE_DEFAULT_REVEAL_CAP;
+    let markCap = DIAG_STRIKE_DEFAULT_MARK_CAP;
+
+    // Each of these passives adds +1 to both caps
+    if (ptHasSkill('random_diagonal')) { revealCap += 1; markCap += 1; }
+    if (ptHasSkill('diagonal_witch')) { revealCap += 1; markCap += 1; }
+
+    // god_of_statistics adds +2 to both caps
+    if (ptHasSkill('god_of_statistics')) { revealCap += 2; markCap += 2; }
+
+    return { revealCap, markCap };
+}
+
+// _diagStrikeUnrevealExcess — given a list of revealed cell IDs, un-reveals any
+//   cells beyond `cap`, keeping the rest random (not always the first found).
+//
+//   revealedIds : array of cell ID strings for cells that were revealed
+//   cap         : maximum number of reveals to keep
+//   Returns the array of kept cell IDs (length <= cap).
+function _diagStrikeUnrevealExcess(revealedIds, cap) {
+    if (revealedIds.length <= cap) return revealedIds;
+
+    const shuffled = [...revealedIds].sort(() => Math.random() - 0.5);
+
+    shuffled.slice(cap).forEach(id => {
+        const [, r, c] = id.split('-').map(Number);
+        revealedGrid[r][c] = false;
+        userGrid[r][c] = 0;
+        renderCell(r, c);
+        updClues(r, c);
+    });
+
+    return shuffled.slice(0, cap);
+}
+
+// _diagStrikeUnmarkExcess — un-marks empty cells beyond `cap` in the mark list.
+//
+//   markedIds : array of cell ID strings for cells that were marked
+//   cap       : maximum number of marks to keep
+//   affected  : the combined affected array — excess marked IDs are spliced out
+//   Returns nothing; mutates `affected` directly.
+function _diagStrikeUnmarkExcess(markedIds, cap, affected) {
+    if (markedIds.length <= cap) return;
+
+    const shuffled = [...markedIds].sort(() => Math.random() - 0.5);
+
+    shuffled.slice(cap).forEach(id => {
+        const [, r, c] = id.split('-').map(Number);
+        if (userGrid[r][c] === 2) {
+            userGrid[r][c] = 0;
+            renderCell(r, c);
+            questStat_classMarkUsed(1);
+        }
+        const idx = affected.indexOf(id);
+        if (idx !== -1) affected.splice(idx, 1);
+    });
+}
+
+// _diagStrikeRebuildAffected — after capping reveals, rebuilds the `affected`
+//   array so it contains only kept reveals + any marks (no excess reveals).
+//
+//   affected    : the array to rebuild (mutated in place)
+//   keptReveals : Set of kept reveal cell IDs
+//   markedIds   : Set of marked cell IDs
+function _diagStrikeRebuildAffected(affected, keptReveals, markedIds) {
+    affected.length = 0;
+    keptReveals.forEach(id => affected.push(id));
+    markedIds.forEach(id => affected.push(id));
+}
+
+// _diagStrikeApplyCaps — applies both reveal and mark caps to the `affected`
+//   array in place. Also triggers the diagonally_wrong wrong-cell marking pass
+//   if that passive is active.
+//
+//   affected   : array of all resolved cell IDs (mutated in place)
+//   sol        : solution grid
+//   revealCap  : max reveals to keep
+//   markCap    : max marks to keep
+function _diagStrikeApplyCaps(affected, sol, revealCap, markCap) {
+    // --- Reveal cap ---
+    const revealedIds = _filterRevealedIds(affected, sol);
+    if (revealedIds.length > revealCap) {
+        const keptReveals = new Set(_diagStrikeUnrevealExcess(revealedIds, revealCap));
+        const markedIds = new Set(_filterMarkedIds(affected, sol));
+        _diagStrikeRebuildAffected(affected, keptReveals, markedIds);
+    }
+
+    // --- Mark cap (diagonally_wrong only) ---
+    if (ptHasSkill('diagonally_wrong')) {
+        const markedIds = _filterMarkedIds(affected, sol);
+        _diagStrikeUnmarkExcess(markedIds, markCap, affected);
+        // Now apply the wrong-mark pass on whatever cells remain
+        _diagStrikeMarkWrong(affected, sol);
+    }
+}
+
+// _diagStrikeMarkWrong — marks cells that the player incorrectly filled
+//   (user placed a tile where the solution is empty) along the strike path.
+//   Used exclusively by the diagonally_wrong passive.
+//
+//   affected : array of cell IDs along the strike path
+//   sol      : solution grid
+function _diagStrikeMarkWrong(affected, sol) {
+    affected.forEach(id => {
+        const [, r, c] = id.split('-').map(Number);
+        if (sol[r][c] === 0 && userGrid[r][c] === 1) {
+            userGrid[r][c] = 3; // wrong-mark state
+            renderCell(r, c);
+            trackAchStat('tilesMarkedWrong', 1);
+        }
+    });
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DIAGONAL STRIKE — BONUS REPEAT (god_of_statistics)--
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _diagStrikeBonusExecute — performs a full Diagonal Strike on the given target
+//   cell, applying caps and all effects. Used by the bonus repeat proc.
+//
+//   targetR / targetC : coordinates of the randomly chosen bonus target
+//   diagonalCount     : rank of the strike (controls which directions are walked)
+//   revealCap         : reveal cap inherited from the triggering strike
+//   markCap           : mark cap inherited from the triggering strike
+//   rows / cols       : grid dimensions
+//   sol               : solution grid
+function _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealCap, markCap, rows, cols, sol) {
+    const bonusAffected = _diagStrikeCollectAffected(targetR, targetC, diagonalCount, rows, cols, sol);
+
+    _diagStrikeApplyCaps(bonusAffected, sol, revealCap, markCap);
+
+    // Play effects centred on the new random target cell
+    Audio_Manager.playSFX('diagonalStrike');
+    _playDiagonalSlashEffect(targetR, targetC, diagonalCount);
+    _applyCellEffect(bonusAffected, 'reveal');
+
+    if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
+
+    const bonusRevealed = _filterRevealedIds(bonusAffected, sol).length;
+
+    const label = _pluralLabel(bonusRevealed, 'cell', 'cells', 'Zelle', 'Zellen');
+
+    const msg = (LANG === 'de')
+        ? `⚔️ Bonus-Schlag! ${bonusRevealed} ${label} mehr!`
+        : `⚔️ Bonus Strike! ${bonusRevealed} more ${label}!`;
+
+    showToast(msg);
+
+    questStat_classRevealUsed(bonusRevealed);
+    updateQuestStats('classAbilityUsedThisLevel', {});
+
+    checkWin();
+}
+
+// _diagStrikeBonusRepeat — fired by god_of_statistics (50% chance after a strike).
+//   Picks a random unrevealed filled cell and fires a full Diagonal Strike on it
+//   after a short delay so the animations do not overlap.
+//
+//   diagonalCount : rank of the strike (passed through from the triggering call)
+//   revealCap     : reveal cap to use for the bonus strike
+//   markCap       : mark cap to use for the bonus strike
+//   rows / cols   : grid dimensions
+//   sol           : solution grid
+function _diagStrikeBonusRepeat(diagonalCount, revealCap, markCap, rows, cols, sol) {
+    // Gather all cells that are filled but not yet revealed
+    const candidates = [];
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (sol[r][c] === 1 && !revealedGrid[r][c]) candidates.push([r, c]);
+        }
+    }
+    if (!candidates.length) return;
+
+    // Pick the target immediately so grid state cannot change before the delay resolves
+    const [targetR, targetC] = candidates[Math.floor(Math.random() * candidates.length)];
+
+    setTimeout(() => {
+        _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealCap, markCap, rows, cols, sol);
+    }, 1000);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DIAGONAL STRIKE — MAIN FUNCTION---------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _executeDiagonalStrike — entry point for the Diagonal Strike active ability.
+//   Resolves cells along diagonal directions through the clicked (row, col) cell,
+//   applies passive scaling caps, plays visual effects, and checks for a win.
+//
+//   row           : clicked cell row index
+//   col           : clicked cell column index
+//   diagonalCount : rank of the strike (1 = one diagonal, 2 = both, 4 = both + H/V)
+//   revealCap     : base max cells to reveal (passive bonuses are added on top)
+//
+//   Passive nodes respected:
+//     diagonally_wrong   — also marks wrongly-filled cells along the path
+//     random_diagonal    — +1 to both reveal and mark caps
+//     diagonal_witch     — +1 to both reveal and mark caps
+//     god_of_statistics  — +2 to both caps, 50% chance to fire a bonus repeat
+function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
+    Audio_Manager.playSFX('diagonalStrike');
+
+    if (!cur) return;
+    const sol = cur.grid;
+    const rows = sol.length;
+    const cols = sol[0].length;
+
+    // --- Collect all cells touched by the strike ---
+    const affected = _diagStrikeCollectAffected(row, col, diagonalCount, rows, cols, sol);
+
+    // --- Apply passive-scaled caps to reveals and marks ---
+    const { revealCap: finalRevealCap, markCap: finalMarkCap } = _diagStrikeCalculateCaps(revealCap);
+    _diagStrikeApplyCaps(affected, sol, finalRevealCap, finalMarkCap);
+
+    // --- Play effects and resolve feedback ---
+    _playDiagonalSlashEffect(row, col, diagonalCount);
+    _applyCellEffect(affected, 'reveal');
+    if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
+
+    const diagRevealed = _filterRevealedIds(affected, sol).length;
+
+    if (diagRevealed > 0) {
+        trackAchStat('tilesRevealed', diagRevealed);
+
+        const label = _pluralLabel(diagRevealed, 'cell', 'cells', 'Zelle', 'Zellen');
+
+        const msg = (LANG === 'de')
+            ? `⚔️ Diagonal-Schlag! ${diagRevealed} ${label} aufgedeckt.`
+            : `⚔️ Diagonal Strike! ${diagRevealed} ${label} revealed.`;
+
+        showToast(msg);
+    }
+
+    // --- god_of_statistics: 50% chance to fire a bonus repeat strike ---
+    if (ptHasSkill('god_of_statistics') && Math.random() < 0.50) {
+        Audio_Manager.playSFX('diagonalStrikeRepeat');
+        _playDivineProcEffect();
+        _diagStrikeBonusRepeat(diagonalCount, finalRevealCap, finalMarkCap, rows, cols, sol);
+    }
+
+    questStat_classRevealUsed(diagRevealed);
+    updateQuestStats('classAbilityUsedThisLevel', {});
+
+    checkWin();
+}
+
+
+//------------------------------------------------------------------------
+//-------------------MOMENTUM — MAIN FUNCTION-----------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _statisticianTriggerMomentum — awards bonus time when the Momentum passive
+//   fires (triggered externally after a correct-fill streak).
+//
+//   bonusSeconds : base time to add before passive scaling
+//
+//   Passive nodes respected:
+//     chain_reaction     — +1s flat bonus
+//     precise_momentum   — +2s flat bonus
+//     exponential_growth — each prior Momentum this level adds +1s
+//     god_of_statistics  — doubles the total bonus after all flat additions
+function _statisticianTriggerMomentum(bonusSeconds) {
+    correctFillStreak = 0;
+
+    let bonus = bonusSeconds;
+    if (ptHasSkill('chain_reaction')) bonus += 1;
+    if (ptHasSkill('precise_momentum')) bonus += 2;
+
+    // exponential_growth: each prior Momentum trigger this level adds +1s
+    if (ptHasSkill('exponential_growth')) {
+        bonus += (window._momentumThisLevel || 0);
+    }
+
+    // god_of_statistics doubles the total bonus (applied last)
+    if (ptHasSkill('god_of_statistics')) bonus *= 2;
+
+    timerSecs = Math.min(timerSecs + bonus, 3600);
+    updTimer();
+
+    const label = _pluralLabel(bonus, 'second', 'seconds', 'Sekunde', 'Sekunden');
+    const msg = `⚔️ Momentum! +${bonus} ${label}`;
+
+    showToast(msg);
+
+    trackAchStat('timeAdded', bonus);
+    trackAchStat('momentumTriggered');
+    updateQuestStats('momentumTriggered', {});
+
+    window._momentumThisLevel = (window._momentumThisLevel || 0) + 1;
+    if (window._momentumThisLevel === 10) trackAchStat('statistician3MomentumOneLevel');
+
+    Audio_Manager.playSFX('momentum');
+    updateMomentumBar(0, 15); // reset momentum bar after it fires
 }

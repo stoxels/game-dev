@@ -6,7 +6,7 @@
 
 
 //------------------------------------------------------------------------
-//-------------------SHARED REFERENCES & LANGUAGE------------------------
+//---------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -16,19 +16,6 @@ let _pt_skills = [];   // layout skill objects
 let _pt_conns = [];   // connection objects
 let _pt_skillMap = {};   // id → layout skill object
 let _pt_adjacency = {};   // id → Set of adjacent node ids
-
-// Returns the active UI language: 'de' or 'en'
-function _ptLang() {
-    return (typeof LANG !== 'undefined' && LANG === 'de') ? 'de' : 'en';
-}
-
-
-
-
-//------------------------------------------------------------------------
-//------------------ACHIEVEMENT TRACKING CONSTANTS------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // All statKeys that belong to each of the three main class branches.
 // Defined at module level so they are not recreated on every node click.
@@ -136,6 +123,19 @@ const PT_CLUSTER_CHECKS = [
 
 
 //------------------------------------------------------------------------
+//-------------------------LANGUAGE HELPER---------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Returns the active UI language: 'de' or 'en'
+function _ptLang() {
+    return (typeof LANG !== 'undefined' && LANG === 'de') ? 'de' : 'en';
+}
+
+
+
+
+//------------------------------------------------------------------------
 //---------------------------STATE ACCESSORS------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -208,8 +208,8 @@ function _ptBuildAdjacency() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// BFS from `startId` through nodes present in `availableSet`.
-// Returns a Set of all node IDs reachable from `startId`.
+// Traverses from `startId` through nodes present in `availableSet`, visiting
+// every reachable node exactly once. Returns a Set of all reached node IDs.
 // Used by the deallocation check to verify connectivity is not broken.
 function _ptBfsReachable(startId, availableSet) {
     const visited = new Set();
@@ -278,7 +278,7 @@ function _ptIsAllocated(id) {
 
 // A node can be DE-ALLOCATED when:
 //   – it IS currently allocated
-//   – removing it would NOT strand any other allocated node (BFS from Start)
+//   – removing it would NOT strand any other allocated node (traversal from Start)
 function _ptIsDeallocatable(id) {
     const alloc = _ptAllocated();
     if (!alloc.has(id)) return false;

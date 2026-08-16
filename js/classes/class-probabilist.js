@@ -12,6 +12,73 @@
 
 
 //------------------------------------------------------------------------
+//------------------------CONSTANTS & STATE--------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Charged arrow timing — deliberately much slower than the small marking
+// arrows fired by _firePrecisionArrow, so it reads as a "wind-up" shot.
+const PM_CHARGED_ARROW_SPEED_PX_S = 160;
+const PM_CHARGED_ARROW_MIN_DURATION_S = 0.7;
+const PM_CHARGED_ARROW_MAX_DURATION_S = 1.6;
+const PM_CHARGED_TRAIL_INTERVAL_MS = 45;
+
+// Field Scan charge bolt: sprite → timer
+const FIELD_SCAN_CHARGE_SPEED_PX_S = 260;
+const FIELD_SCAN_CHARGE_MIN_DURATION_S = 0.5;
+const FIELD_SCAN_CHARGE_MAX_DURATION_S = 1.1;
+const FIELD_SCAN_CHARGE_TRAIL_INTERVAL_MS = 40;
+
+// Field Scan drop-arrows: timer → each target cell
+const FIELD_SCAN_DROP_SPEED_PX_S = 700;
+const FIELD_SCAN_DROP_MIN_DURATION_S = 0.35;
+const FIELD_SCAN_DROP_MAX_DURATION_S = 0.65;
+
+// Module state for the live Field Scan boundary preview shown while armed.
+let _fieldScanPreviewEl = null;
+let _fieldScanPreviewKey = null; // last-rendered region, to skip redundant rebuilds
+
+// Note: window._pmMomentumActive / _pmMomentumSet / _pmMomentumTimeout are
+// dynamic globals used to communicate the momentum_of_certainty bonus
+// window to other files. They're intentionally left undefined until
+// _precisionMarkStartMomentumWindow first runs (see PRECISION MARK — LOGIC
+// below) rather than hoisted here, since they're runtime-triggered state,
+// not fixed constants.
+
+
+//------------------------------------------------------------------------
+//------------------------SHARED HELPERS-----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Shuffles an array in-place using Fisher-Yates. Used by Precision Mark
+// (randomly picking which cells in a line get marked when markCap is hit)
+// and by Field Scan's god_of_probabilities perk (randomly picking which
+// filled cells to permanently keep).
+function _shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+// Returns the on-screen centre of the player's avatar sprite, used as the
+// launch point for VFX that originate from the player. Checks the simple
+// (puzzle-level) avatar first, then the full (monster-level) avatar. Falls
+// back to bottom-centre of the viewport if neither is currently rendered.
+// Shared between Precision Mark's charged arrow and Field Scan's charge bolt.
+function _pmGetSpriteOrigin() {
+    const el = document.getElementById('avatar-sprite-img-simple')
+        || document.getElementById('avatar-sprite-img');
+    if (el) {
+        const rect = el.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }
+    return { x: window.innerWidth / 2, y: window.innerHeight - 40 };
+}
+
+
+//------------------------------------------------------------------------
 //------------------------PRECISION MARK — LOGIC--------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -39,15 +106,6 @@ function _precisionMarkBuildTargets(row, col, extraLines, rows, cols) {
         if (col + i < cols) targetCols.add(col + i);
     }
     return { targetRows, targetCols };
-}
-
-// Shuffles an array in-place using Fisher-Yates (used when randomly selecting
-// which cells in a line get marked when the markCap is reached).
-function _shuffleArray(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
 }
 
 // _precisionMarkSelectLine — selects up to `markCap - affected.length` empty,
@@ -193,58 +251,11 @@ function _precisionMarkBonusLine(rows, cols, sol, affected) {
     showToast(`🎯 ${LANG === 'de' ? 'Bonus-Linie markiert!' : 'Bonus line marked!'}`);
 }
 
-// Main entry point for the Precision Mark ability.
-// Marks empty cells in the target row/col and adjacent lines, then fires VFX.
-function _executePrecisionMark(row, col, extraLines) {
-    if (!cur) return;
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-
-    const markCap = _precisionMarkComputeMarkCap();
-    const { targetRows, targetCols } = _precisionMarkBuildTargets(row, col, extraLines, rows, cols);
-    const affected = _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap);
-
-    _playPrecisionMarkEffect(row, col, affected);
-    // (the _applyCellEffect(affected, 'mark') call that used to be here is gone —
-    // it now fires per-cell, at impact, inside _precisionMarkCommitMark)
-    showToast(`🎯 ${affected.length} ${LANG === 'de' ? 'Zellen markiert!' : 'cells marked!'}`);
-
-    Audio_Manager.playSFX('precisionMark');
-    trackAchStat('tilesMarkedWrong', affected.length);
-
-    if (ptHasSkill('momentum_of_certainty')) {
-        const momentumCells = _precisionMarkCollectMomentumCells(targetRows, targetCols, rows, cols, sol);
-        if (momentumCells.length > 0) _precisionMarkStartMomentumWindow(momentumCells);
-    }
-}
-
 
 //------------------------------------------------------------------------
 //--------------------PRECISION MARK — VFX--------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-
-// Charged arrow timing — deliberately much slower than the small marking
-// arrows fired by _firePrecisionArrow, so it reads as a "wind-up" shot.
-const PM_CHARGED_ARROW_SPEED_PX_S = 160;
-const PM_CHARGED_ARROW_MIN_DURATION_S = 0.7;
-const PM_CHARGED_ARROW_MAX_DURATION_S = 1.6;
-const PM_CHARGED_TRAIL_INTERVAL_MS = 45;
-
-// _pmGetSpriteOrigin — returns the on-screen centre of the player's avatar
-// sprite, used as the launch point for the charged arrow. Checks the simple
-// (puzzle-level) avatar first, then the full (monster-level) avatar. Falls
-// back to bottom-centre of the viewport if neither is currently rendered.
-function _pmGetSpriteOrigin() {
-    const el = document.getElementById('avatar-sprite-img-simple')
-        || document.getElementById('avatar-sprite-img');
-    if (el) {
-        const rect = el.getBoundingClientRect();
-        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-    }
-    return { x: window.innerWidth / 2, y: window.innerHeight - 40 };
-}
 
 // _pmChargedArrowTrailTick — spawns one fading comet-trail particle at the
 // charged arrow's current on-screen position. Called on an interval while
@@ -262,6 +273,23 @@ function _pmChargedArrowTrailTick(arrowEl) {
     `;
     document.body.appendChild(spark);
     setTimeout(() => spark.remove(), 520);
+}
+
+// _playChargedArrowImpact — bigger impact burst played when the charged
+// arrow lands on the clicked cell (distinct from _playArrowImpact, which is
+// the smaller burst used for the marking arrows).
+function _playChargedArrowImpact(x, y) {
+    const ring = document.createElement('div');
+    ring.className = 'pm-charged-impact-ring';
+    ring.style.cssText = `left: ${x}px; top: ${y}px;`;
+    document.body.appendChild(ring);
+    setTimeout(() => ring.remove(), 640);
+
+    const flash = document.createElement('div');
+    flash.className = 'pm-charged-impact-flash';
+    flash.style.cssText = `left: ${x}px; top: ${y}px;`;
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 480);
 }
 
 // _pmFireChargedArrow — animates the special charged arrow flying from
@@ -307,100 +335,6 @@ function _pmFireChargedArrow(sx, sy, tx, ty, onArrival) {
     }, duration * 1000 + 30);
 }
 
-// _playChargedArrowImpact — bigger impact burst played when the charged
-// arrow lands on the clicked cell (distinct from _playArrowImpact, which is
-// the smaller burst used for the marking arrows).
-function _playChargedArrowImpact(x, y) {
-    const ring = document.createElement('div');
-    ring.className = 'pm-charged-impact-ring';
-    ring.style.cssText = `left: ${x}px; top: ${y}px;`;
-    document.body.appendChild(ring);
-    setTimeout(() => ring.remove(), 640);
-
-    const flash = document.createElement('div');
-    flash.className = 'pm-charged-impact-flash';
-    flash.style.cssText = `left: ${x}px; top: ${y}px;`;
-    document.body.appendChild(flash);
-    setTimeout(() => flash.remove(), 480);
-}
-
-
-
-
-// _precisionMarkFireArrowsAtTargets — fires a small green marking arrow at
-// every target cell, originating from (originX, originY) — the point where
-// the charged arrow just landed. Each cell's ✕ is committed exactly when
-// its own arrow lands, so the mark and the VFX stay in sync.
-function _precisionMarkFireArrowsAtTargets(ids, originX, originY) {
-    ids.forEach((id, i) => {
-        const targetEl = document.getElementById(id);
-        if (!targetEl) return;
-
-        setTimeout(() => {
-            const targetRect = targetEl.getBoundingClientRect();
-            const tx = targetRect.left + targetRect.width / 2;
-            const ty = targetRect.top + targetRect.height / 2;
-            _firePrecisionArrow(originX, originY, tx, ty, () => _precisionMarkCommitMark(id));
-        }, i * 70);
-    });
-}
-
-// _playPrecisionMarkEffect — fires the full Precision Mark VFX sequence:
-// a slow charged arrow flies from the player's sprite to the clicked cell,
-// and once it lands, the green marking arrows fan out from that cell to
-// every cell the ability just marked.
-function _playPrecisionMarkEffect(clickRow, clickCol, affectedIds) {
-    const clickEl = document.getElementById(`g-${clickRow}-${clickCol}`);
-    if (!clickEl) return;
-
-    const clickRect = clickEl.getBoundingClientRect();
-    const tx = clickRect.left + clickRect.width / 2;
-    const ty = clickRect.top + clickRect.height / 2;
-    const origin = _pmGetSpriteOrigin();
-
-    _pmFireChargedArrow(origin.x, origin.y, tx, ty, () => {
-        if (affectedIds.length) _precisionMarkFireArrowsAtTargets(affectedIds, tx, ty);
-    });
-}
-
-// Creates an arrow element and animates it flying from (sx, sy) to (tx, ty).
-// Speed is ~420px/s, clamped between 0.18s and 0.7s flight time.
-function _firePrecisionArrow(sx, sy, tx, ty, onImpact) {
-    const dx = tx - sx, dy = ty - sy;
-    const dist = Math.hypot(dx, dy);
-    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-    const duration = Math.min(Math.max(dist / 420, 0.18), 0.7);
-
-    const arrow = document.createElement('div');
-    arrow.className = 'pm-arrow';
-    arrow.textContent = '➤';
-    arrow.style.cssText = `
-        position: fixed;
-        left: ${sx}px;
-        top: ${sy}px;
-        transform: translate(-50%, -50%) rotate(${angle}deg);
-        font-size: 16px;
-        color: #00ff88;
-        text-shadow: 0 0 8px #00ff88, 0 0 16px #00cc66;
-        z-index: 9001;
-        pointer-events: none;
-        transition: left ${duration}s linear, top ${duration}s linear;
-        will-change: left, top;
-    `;
-    document.body.appendChild(arrow);
-
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-        arrow.style.left = `${tx}px`;
-        arrow.style.top = `${ty}px`;
-    }));
-
-    setTimeout(() => {
-        arrow.remove();
-        if (onImpact) onImpact();
-        _playArrowImpact(tx, ty);
-    }, duration * 1000 + 30);
-}
-
 // Plays a green ripple ring and radial flash at the arrow impact point.
 function _playArrowImpact(x, y) {
     // Expanding ring
@@ -441,6 +375,80 @@ function _playArrowImpact(x, y) {
     setTimeout(() => flash.remove(), 420);
 }
 
+// Creates an arrow element and animates it flying from (sx, sy) to (tx, ty).
+// Speed is ~420px/s, clamped between 0.18s and 0.7s flight time.
+function _firePrecisionArrow(sx, sy, tx, ty, onImpact) {
+    const dx = tx - sx, dy = ty - sy;
+    const dist = Math.hypot(dx, dy);
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    const duration = Math.min(Math.max(dist / 420, 0.18), 0.7);
+
+    const arrow = document.createElement('div');
+    arrow.className = 'pm-arrow';
+    arrow.textContent = '➤';
+    arrow.style.cssText = `
+        position: fixed;
+        left: ${sx}px;
+        top: ${sy}px;
+        transform: translate(-50%, -50%) rotate(${angle}deg);
+        font-size: 16px;
+        color: #00ff88;
+        text-shadow: 0 0 8px #00ff88, 0 0 16px #00cc66;
+        z-index: 9001;
+        pointer-events: none;
+        transition: left ${duration}s linear, top ${duration}s linear;
+        will-change: left, top;
+    `;
+    document.body.appendChild(arrow);
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        arrow.style.left = `${tx}px`;
+        arrow.style.top = `${ty}px`;
+    }));
+
+    setTimeout(() => {
+        arrow.remove();
+        if (onImpact) onImpact();
+        _playArrowImpact(tx, ty);
+    }, duration * 1000 + 30);
+}
+
+// _precisionMarkFireArrowsAtTargets — fires a small green marking arrow at
+// every target cell, originating from (originX, originY) — the point where
+// the charged arrow just landed. Each cell's ✕ is committed exactly when
+// its own arrow lands, so the mark and the VFX stay in sync.
+function _precisionMarkFireArrowsAtTargets(ids, originX, originY) {
+    ids.forEach((id, i) => {
+        const targetEl = document.getElementById(id);
+        if (!targetEl) return;
+
+        setTimeout(() => {
+            const targetRect = targetEl.getBoundingClientRect();
+            const tx = targetRect.left + targetRect.width / 2;
+            const ty = targetRect.top + targetRect.height / 2;
+            _firePrecisionArrow(originX, originY, tx, ty, () => _precisionMarkCommitMark(id));
+        }, i * 70);
+    });
+}
+
+// _playPrecisionMarkEffect — fires the full Precision Mark VFX sequence:
+// a slow charged arrow flies from the player's sprite to the clicked cell,
+// and once it lands, the green marking arrows fan out from that cell to
+// every cell the ability just marked.
+function _playPrecisionMarkEffect(clickRow, clickCol, affectedIds) {
+    const clickEl = document.getElementById(`g-${clickRow}-${clickCol}`);
+    if (!clickEl) return;
+
+    const clickRect = clickEl.getBoundingClientRect();
+    const tx = clickRect.left + clickRect.width / 2;
+    const ty = clickRect.top + clickRect.height / 2;
+    const origin = _pmGetSpriteOrigin();
+
+    _pmFireChargedArrow(origin.x, origin.y, tx, ty, () => {
+        if (affectedIds.length) _precisionMarkFireArrowsAtTargets(affectedIds, tx, ty);
+    });
+}
+
 
 //------------------------------------------------------------------------
 //------------------------FIELD SCAN — LOGIC------------------------------
@@ -458,48 +466,6 @@ function _fieldScanComputeEffectiveParams(scanSize, durationMs) {
     if (ptHasSkill('photographic_memory')) effectiveDuration += 1000;
     return { effectiveSize, effectiveDuration };
 }
-
-// Picks a random top-left corner so the scan region stays fully within grid bounds.
-
-/*
-function _fieldScanPickOrigin(scanSize, rows, cols) {
-    const maxRow = Math.max(0, rows - scanSize);
-    const maxCol = Math.max(0, cols - scanSize);
-    return {
-        startRow: Math.floor(Math.random() * (maxRow + 1)),
-        startCol: Math.floor(Math.random() * (maxCol + 1)),
-    };
-}
-
-*/
-
-// Temporarily reveals all unrevealed cells in the scan region by adding CSS classes.
-// Returns the DOM elements and their previous state for later restoration.
-
-/*
-function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
-    const scanned = [];
-    const prevStates = [];
-
-    for (let r = startRow; r < Math.min(startRow + scanSize, rows); r++) {
-        for (let c = startCol; c < Math.min(startCol + scanSize, cols); c++) {
-            if (userGrid[r][c] === 1 || revealedGrid[r][c]) continue;
-
-            const el = document.getElementById(`g-${r}-${c}`);
-            if (!el) continue;
-
-            prevStates.push({ r, c });
-            el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
-            el.classList.add(sol[r][c] === 1 ? 'filled' : 'marked', 'scan-reveal');
-            scanned.push(el);
-            questStat_fieldScanCellRevealed(1);
-        }
-    }
-
-    return { scanned, prevStates };
-}
-
-*/
 
 // Tracks the achievement for scanning 20 or more correct (filled) cells at once.
 function _fieldScanCheckBigScanAchievement(prevStates, sol) {
@@ -558,30 +524,6 @@ function _fieldScanRestore(scanned, prevStates) {
     _fieldScanFadeOutCells(scanned);
     showToast('🎯 Scan faded');
     buildClassHUD();
-}
-
-// Main entry point for the Field Scan ability.
-// Temporarily reveals a random grid region and schedules its restoration.
-// _executeFieldScan — main entry point for the (now targeted) Field Scan
-// ability. Centers a scanSize x scanSize region on the clicked cell, then
-// plays the "charge → split → rain down" VFX. The scan itself (beam sweep +
-// temporary reveal) only actually triggers once every split arrow has landed.
-function _executeFieldScan(row, col, scanSize, durationMs) {
-    if (!cur) return;
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-
-    const { effectiveSize, effectiveDuration } = _fieldScanComputeEffectiveParams(scanSize, durationMs);
-    const { startRow, startCol } = _fieldScanComputeOrigin(row, col, effectiveSize, rows, cols);
-    const targets = _fieldScanComputeTargets(startRow, startCol, effectiveSize, rows, cols, sol);
-
-    if (targets.length === 0) {
-        showToast(LANG === 'de' ? '🎯 Nichts zu scannen!' : '🎯 Nothing to scan!');
-        return;
-    }
-
-    _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, effectiveSize, effectiveDuration);
 }
 
 // _fieldScanComputeOrigin — centers a scanSize x scanSize region on the
@@ -805,12 +747,6 @@ function _scanBeamScheduleRowFlashes(startRow, endRow, startCol, endCol, duratio
     }
 }
 
-
-
-// Module state for the live Field Scan boundary preview shown while armed.
-let _fieldScanPreviewEl = null;
-let _fieldScanPreviewKey = null; // last-rendered region, to skip redundant rebuilds
-
 // _fieldScanGetEffectiveSizeForPreview — returns the current effective scan
 // size (after passive bonuses) for whatever rank Field Scan is at. Kept
 // separate from _fieldScanComputeEffectiveParams since the preview doesn't
@@ -846,6 +782,17 @@ function _fieldScanBuildPreviewEl(wrap) {
     wrap.appendChild(el);
     _fieldScanPreviewEl = el;
     return el;
+}
+
+// _fieldScanClearPreview — removes the live preview outline. Called when
+// Field Scan is disarmed (cancelled, executed, or the player switches to a
+// different ability/slot) and whenever the cursor leaves the grid while armed.
+function _fieldScanClearPreview() {
+    _fieldScanPreviewKey = null;
+    if (_fieldScanPreviewEl) {
+        _fieldScanPreviewEl.remove();
+        _fieldScanPreviewEl = null;
+    }
 }
 
 // _fieldScanUpdatePreview — called on every mousemove while any ability is
@@ -887,21 +834,6 @@ function _fieldScanUpdatePreview(clientX, clientY) {
     el.style.height = `${bounds.regionHeight}px`;
 }
 
-// _fieldScanClearPreview — removes the live preview outline. Called when
-// Field Scan is disarmed (cancelled, executed, or the player switches to a
-// different ability/slot) and whenever the cursor leaves the grid while armed.
-function _fieldScanClearPreview() {
-    _fieldScanPreviewKey = null;
-    if (_fieldScanPreviewEl) {
-        _fieldScanPreviewEl.remove();
-        _fieldScanPreviewEl = null;
-    }
-}
-
-
-
-
-
 // Plays the full Field Scan visual effect:
 // a sweeping green beam across the scan region with a border outline, countdown bar,
 // per-row cell flashes, and a clean fade-out at the end.
@@ -938,18 +870,6 @@ function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
     }, durationMs + 100);
 }
 
-
-// Field Scan charge bolt: sprite → timer
-const FIELD_SCAN_CHARGE_SPEED_PX_S = 260;
-const FIELD_SCAN_CHARGE_MIN_DURATION_S = 0.5;
-const FIELD_SCAN_CHARGE_MAX_DURATION_S = 1.1;
-const FIELD_SCAN_CHARGE_TRAIL_INTERVAL_MS = 40;
-
-// Field Scan drop-arrows: timer → each target cell
-const FIELD_SCAN_DROP_SPEED_PX_S = 700;
-const FIELD_SCAN_DROP_MIN_DURATION_S = 0.35;
-const FIELD_SCAN_DROP_MAX_DURATION_S = 0.65;
-
 // _fieldScanGetTimerPos — returns the on-screen centre of the level timer
 // element, used as the "split point" for the rain-down VFX. Falls back to
 // top-centre of the viewport if the timer can't be found.
@@ -962,16 +882,30 @@ function _fieldScanGetTimerPos() {
     return { x: window.innerWidth / 2, y: 60 };
 }
 
-// _fieldScanPlayTargetedVFX — full sequence: charge bolt sprite → timer,
-// split into one drop-arrow per target cell, rain down, then (once every
-// arrow has landed) the existing beam-sweep effect fires.
-function _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, scanSize, durationMs) {
-    const timerPos = _fieldScanGetTimerPos();
-    const origin = _pmGetSpriteOrigin(); // shared sprite-origin helper, added for Precision Mark
+// _fieldScanChargeTrailTick — spawns one fading square "data pixel" behind
+// the charge bolt while it's in flight.
+function _fieldScanChargeTrailTick(boltEl) {
+    const rect = boltEl.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
 
-    _fieldScanFireChargeArrow(origin.x, origin.y, timerPos.x, timerPos.y, () => {
-        _fieldScanSplitAndRain(targets, sol, timerPos, startRow, startCol, scanSize, durationMs);
-    });
+    const px = document.createElement('div');
+    px.className = 'fs-charge-trail';
+    px.style.cssText = `left: ${cx}px; top: ${cy}px;`;
+    document.body.appendChild(px);
+    setTimeout(() => px.remove(), 420);
+}
+
+// _fieldScanPlaySplitBurst — brief radial burst at the timer when the
+// charge bolt arrives and splits into the rain-down arrows.
+function _fieldScanPlaySplitBurst(x, y) {
+    const burst = document.createElement('div');
+    burst.className = 'fs-split-burst';
+    burst.style.cssText = `left: ${x}px; top: ${y}px;`;
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 500);
+
+    Audio_Manager.playSFX('fieldScan');
 }
 
 // _fieldScanFireChargeArrow — animates the charge bolt flying from the
@@ -1016,61 +950,13 @@ function _fieldScanFireChargeArrow(sx, sy, tx, ty, onArrival) {
     }, duration * 1000 + 30);
 }
 
-// _fieldScanChargeTrailTick — spawns one fading square "data pixel" behind
-// the charge bolt while it's in flight.
-function _fieldScanChargeTrailTick(boltEl) {
-    const rect = boltEl.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-
-    const px = document.createElement('div');
-    px.className = 'fs-charge-trail';
-    px.style.cssText = `left: ${cx}px; top: ${cy}px;`;
-    document.body.appendChild(px);
-    setTimeout(() => px.remove(), 420);
-}
-
-// _fieldScanPlaySplitBurst — brief radial burst at the timer when the
-// charge bolt arrives and splits into the rain-down arrows.
-function _fieldScanPlaySplitBurst(x, y) {
-    const burst = document.createElement('div');
-    burst.className = 'fs-split-burst';
-    burst.style.cssText = `left: ${x}px; top: ${y}px;`;
-    document.body.appendChild(burst);
-    setTimeout(() => burst.remove(), 500);
-
-    Audio_Manager.playSFX('fieldScan');
-}
-
-// _fieldScanSplitAndRain — fires one drop-arrow per target cell, all
-// originating from the timer position. Staggered (with a little jitter)
-// for a natural "rain" feel. Once every drop-arrow has landed, the existing
-// beam-sweep scan effect plays and the restore timer is scheduled.
-function _fieldScanSplitAndRain(targets, sol, timerPos, startRow, startCol, scanSize, durationMs) {
-    const scanned = [];
-    const prevStates = [];
-    let landed = 0;
-
-    targets.forEach(({ r, c }, i) => {
-        setTimeout(() => {
-            const cellEl = document.getElementById(`g-${r}-${c}`);
-            if (!cellEl) { landed++; return; }
-
-            const rect = cellEl.getBoundingClientRect();
-            const tx = rect.left + rect.width / 2;
-            const ty = rect.top + rect.height / 2;
-
-            _fieldScanFireDropArrow(timerPos.x, timerPos.y, tx, ty, () => {
-                const el = _fieldScanCommitCell(r, c, sol);
-                if (el) { scanned.push(el); prevStates.push({ r, c }); }
-
-                landed++;
-                if (landed === targets.length) {
-                    _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs);
-                }
-            });
-        }, i * 45 + Math.random() * 30);
-    });
+// _fieldScanPlayLandPing — tiny flash where a drop-arrow lands.
+function _fieldScanPlayLandPing(x, y) {
+    const ping = document.createElement('div');
+    ping.className = 'fs-land-ping';
+    ping.style.cssText = `left: ${x}px; top: ${y}px;`;
+    document.body.appendChild(ping);
+    setTimeout(() => ping.remove(), 380);
 }
 
 // _fieldScanFireDropArrow — animates one small drop-arrow falling from the
@@ -1110,15 +996,6 @@ function _fieldScanFireDropArrow(sx, sy, tx, ty, onLand) {
     }, duration * 1000 + 20);
 }
 
-// _fieldScanPlayLandPing — tiny flash where a drop-arrow lands.
-function _fieldScanPlayLandPing(x, y) {
-    const ping = document.createElement('div');
-    ping.className = 'fs-land-ping';
-    ping.style.cssText = `left: ${x}px; top: ${y}px;`;
-    document.body.appendChild(ping);
-    setTimeout(() => ping.remove(), 380);
-}
-
 // _fieldScanFinishLanding — runs once every drop-arrow has landed: plays the
 // existing beam-sweep VFX, shows the toast/achievement, and schedules the
 // restore exactly as the old (instant) version did — just delayed until the
@@ -1131,16 +1008,103 @@ function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, s
     setTimeout(() => _fieldScanRestore(scanned, prevStates), durationMs);
 }
 
+// _fieldScanSplitAndRain — fires one drop-arrow per target cell, all
+// originating from the timer position. Staggered (with a little jitter)
+// for a natural "rain" feel. Once every drop-arrow has landed, the existing
+// beam-sweep scan effect plays and the restore timer is scheduled.
+function _fieldScanSplitAndRain(targets, sol, timerPos, startRow, startCol, scanSize, durationMs) {
+    const scanned = [];
+    const prevStates = [];
+    let landed = 0;
+
+    targets.forEach(({ r, c }, i) => {
+        setTimeout(() => {
+            const cellEl = document.getElementById(`g-${r}-${c}`);
+            if (!cellEl) { landed++; return; }
+
+            const rect = cellEl.getBoundingClientRect();
+            const tx = rect.left + rect.width / 2;
+            const ty = rect.top + rect.height / 2;
+
+            _fieldScanFireDropArrow(timerPos.x, timerPos.y, tx, ty, () => {
+                const el = _fieldScanCommitCell(r, c, sol);
+                if (el) { scanned.push(el); prevStates.push({ r, c }); }
+
+                landed++;
+                if (landed === targets.length) {
+                    _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs);
+                }
+            });
+        }, i * 45 + Math.random() * 30);
+    });
+}
+
+// _fieldScanPlayTargetedVFX — full sequence: charge bolt sprite → timer,
+// split into one drop-arrow per target cell, rain down, then (once every
+// arrow has landed) the existing beam-sweep effect fires.
+function _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, scanSize, durationMs) {
+    const timerPos = _fieldScanGetTimerPos();
+    const origin = _pmGetSpriteOrigin(); // shared sprite-origin helper
+
+    _fieldScanFireChargeArrow(origin.x, origin.y, timerPos.x, timerPos.y, () => {
+        _fieldScanSplitAndRain(targets, sol, timerPos, startRow, startCol, scanSize, durationMs);
+    });
+}
 
 
 //------------------------------------------------------------------------
-//----------------LEGACY SCAN BEAM (kept for reference)-------------------
+//----------------LEGACY / REFERENCE CODE (kept for reference)------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
+
+// The following are earlier, simpler implementations superseded by the
+// targeted/staggered VFX above. Kept commented out for reference only —
+// not called anywhere.
+
+// Picks a random top-left corner so the scan region stays fully within grid bounds.
+// Superseded by _fieldScanComputeOrigin, which centers the region on the
+// clicked cell instead of picking a random one.
+/*
+function _fieldScanPickOrigin(scanSize, rows, cols) {
+    const maxRow = Math.max(0, rows - scanSize);
+    const maxCol = Math.max(0, cols - scanSize);
+    return {
+        startRow: Math.floor(Math.random() * (maxRow + 1)),
+        startCol: Math.floor(Math.random() * (maxCol + 1)),
+    };
+}
+*/
+
+// Temporarily reveals all unrevealed cells in the scan region by adding CSS classes.
+// Returns the DOM elements and their previous state for later restoration.
+// Superseded by _fieldScanComputeTargets + _fieldScanCommitCell, which stage
+// the same mutation per-cell in sync with the drop-arrow VFX.
+/*
+function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
+    const scanned = [];
+    const prevStates = [];
+
+    for (let r = startRow; r < Math.min(startRow + scanSize, rows); r++) {
+        for (let c = startCol; c < Math.min(startCol + scanSize, cols); c++) {
+            if (userGrid[r][c] === 1 || revealedGrid[r][c]) continue;
+
+            const el = document.getElementById(`g-${r}-${c}`);
+            if (!el) continue;
+
+            prevStates.push({ r, c });
+            el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
+            el.classList.add(sol[r][c] === 1 ? 'filled' : 'marked', 'scan-reveal');
+            scanned.push(el);
+            questStat_fieldScanCellRevealed(1);
+        }
+    }
+
+    return { scanned, prevStates };
+}
+*/
 
 // Old simpler scan beam — a single glowing band that sweeps top-to-bottom.
 // Kept here in case it is useful for other scan-like effects in the future.
-
 /*
 function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
     const wrap = document.getElementById('puzzle-scaler');
@@ -1270,6 +1234,15 @@ function _bayesianInsightDrawChain(cellX, cellY, cbX, cbY, duration) {
     setTimeout(() => chain.remove(), (duration + 0.25) * 1000);
 }
 
+// Plays a purple ripple ring where the X mark arrives at the crossbow.
+function _playBayesianImpact(x, y) {
+    const ring = document.createElement('div');
+    ring.className = 'bi-impact';
+    ring.style.cssText = `left: ${x}px; top: ${y}px;`;
+    document.body.appendChild(ring);
+    setTimeout(() => ring.remove(), 480);
+}
+
 // Spawns an X mark at the cell and animates it flying toward the crossbow.
 // On arrival, removes itself and plays the impact effect.
 function _bayesianInsightFireXMark(cellX, cellY, cbX, cbY, duration) {
@@ -1304,15 +1277,6 @@ function _fireBayesianChainPull(cellX, cellY, cbX, cbY) {
 
     _bayesianInsightDrawChain(cellX, cellY, cbX, cbY, duration);
     _bayesianInsightFireXMark(cellX, cellY, cbX, cbY, duration);
-}
-
-// Plays a purple ripple ring where the X mark arrives at the crossbow.
-function _playBayesianImpact(x, y) {
-    const ring = document.createElement('div');
-    ring.className = 'bi-impact';
-    ring.style.cssText = `left: ${x}px; top: ${y}px;`;
-    document.body.appendChild(ring);
-    setTimeout(() => ring.remove(), 480);
 }
 
 // Schedules the crossbow elements to disappear after all chain-pull animations finish.
@@ -1379,54 +1343,6 @@ function _bayesianRevealSpawnTrailParticles(sx, sy) {
         document.body.appendChild(trail);
         setTimeout(() => trail.remove(), 600);
     }
-}
-
-// Creates and animates a golden orb descending from above the viewport
-// to the target cell position.
-function _bayesianRevealDropOrb(sx, sy, tx, ty, duration) {
-    const orb = document.createElement('div');
-    orb.className = 'bi-reveal-orb';
-    orb.style.cssText = `
-        position: fixed;
-        left: ${sx}px;
-        top: ${sy}px;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        background: radial-gradient(circle, #fff8c0 0%, #ffd700 45%, #f39c12 100%);
-        box-shadow: 0 0 10px 4px rgba(255, 215, 0, 0.8), 0 0 22px 8px rgba(255, 165, 0, 0.4);
-        z-index: 9200;
-        pointer-events: none;
-        transition: left ${duration}s cubic-bezier(0.4, 0, 0.6, 1),
-                    top  ${duration}s cubic-bezier(0.4, 0, 1, 1);
-        will-change: left, top;
-    `;
-    document.body.appendChild(orb);
-
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-        orb.style.left = `${tx}px`;
-        orb.style.top = `${ty}px`;
-    }));
-
-    setTimeout(() => {
-        orb.remove();
-        _playBayesianRevealImpact(tx, ty);
-    }, duration * 1000 + 30);
-}
-
-// Plays the Bayesian Reveal VFX: a golden orb drops from above the viewport
-// and lands on the revealed cell, followed by a warm golden burst.
-function _playBayesianRevealEffect(cellEl) {
-    const rect = cellEl.getBoundingClientRect();
-    const tx = rect.left + rect.width / 2;
-    const ty = rect.top + rect.height / 2;
-    const sx = tx;
-    const sy = -32; // start above the visible viewport
-    const duration = Math.min(Math.max(Math.abs(ty - sy) / 600, 0.35), 0.9);
-
-    _bayesianRevealSpawnTrailParticles(sx, sy);
-    _bayesianRevealDropOrb(sx, sy, tx, ty, duration);
 }
 
 // Injects a per-spark keyframe animation if it hasn't been added yet.
@@ -1515,4 +1431,106 @@ function _playBayesianRevealImpact(x, y) {
     setTimeout(() => flash.remove(), 480);
 
     _bayesianRevealImpactSparks(x, y);
+}
+
+// Creates and animates a golden orb descending from above the viewport
+// to the target cell position.
+function _bayesianRevealDropOrb(sx, sy, tx, ty, duration) {
+    const orb = document.createElement('div');
+    orb.className = 'bi-reveal-orb';
+    orb.style.cssText = `
+        position: fixed;
+        left: ${sx}px;
+        top: ${sy}px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, #fff8c0 0%, #ffd700 45%, #f39c12 100%);
+        box-shadow: 0 0 10px 4px rgba(255, 215, 0, 0.8), 0 0 22px 8px rgba(255, 165, 0, 0.4);
+        z-index: 9200;
+        pointer-events: none;
+        transition: left ${duration}s cubic-bezier(0.4, 0, 0.6, 1),
+                    top  ${duration}s cubic-bezier(0.4, 0, 1, 1);
+        will-change: left, top;
+    `;
+    document.body.appendChild(orb);
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        orb.style.left = `${tx}px`;
+        orb.style.top = `${ty}px`;
+    }));
+
+    setTimeout(() => {
+        orb.remove();
+        _playBayesianRevealImpact(tx, ty);
+    }, duration * 1000 + 30);
+}
+
+// Plays the Bayesian Reveal VFX: a golden orb drops from above the viewport
+// and lands on the revealed cell, followed by a warm golden burst.
+function _playBayesianRevealEffect(cellEl) {
+    const rect = cellEl.getBoundingClientRect();
+    const tx = rect.left + rect.width / 2;
+    const ty = rect.top + rect.height / 2;
+    const sx = tx;
+    const sy = -32; // start above the visible viewport
+    const duration = Math.min(Math.max(Math.abs(ty - sy) / 600, 0.35), 0.9);
+
+    _bayesianRevealSpawnTrailParticles(sx, sy);
+    _bayesianRevealDropOrb(sx, sy, tx, ty, duration);
+}
+
+
+//------------------------------------------------------------------------
+//------------------------MAIN ENTRY POINTS--------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Main entry point for the Precision Mark ability.
+// Marks empty cells in the target row/col and adjacent lines, then fires VFX.
+function _executePrecisionMark(row, col, extraLines) {
+    if (!cur) return;
+    const sol = cur.grid;
+    const rows = sol.length;
+    const cols = sol[0].length;
+
+    const markCap = _precisionMarkComputeMarkCap();
+    const { targetRows, targetCols } = _precisionMarkBuildTargets(row, col, extraLines, rows, cols);
+    const affected = _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap);
+
+    _playPrecisionMarkEffect(row, col, affected);
+    // (the _applyCellEffect(affected, 'mark') call that used to be here is gone —
+    // it now fires per-cell, at impact, inside _precisionMarkCommitMark)
+    showToast(`🎯 ${affected.length} ${LANG === 'de' ? 'Zellen markiert!' : 'cells marked!'}`);
+
+    Audio_Manager.playSFX('precisionMark');
+    trackAchStat('tilesMarkedWrong', affected.length);
+
+    if (ptHasSkill('momentum_of_certainty')) {
+        const momentumCells = _precisionMarkCollectMomentumCells(targetRows, targetCols, rows, cols, sol);
+        if (momentumCells.length > 0) _precisionMarkStartMomentumWindow(momentumCells);
+    }
+}
+
+// _executeFieldScan — main entry point for the (now targeted) Field Scan
+// ability. Centers a scanSize x scanSize region on the clicked cell, then
+// plays the "charge → split → rain down" VFX. The scan itself (beam sweep +
+// temporary reveal) only actually triggers once every split arrow has landed.
+function _executeFieldScan(row, col, scanSize, durationMs) {
+    if (!cur) return;
+    const sol = cur.grid;
+    const rows = sol.length;
+    const cols = sol[0].length;
+
+    const { effectiveSize, effectiveDuration } = _fieldScanComputeEffectiveParams(scanSize, durationMs);
+    const { startRow, startCol } = _fieldScanComputeOrigin(row, col, effectiveSize, rows, cols);
+    const targets = _fieldScanComputeTargets(startRow, startCol, effectiveSize, rows, cols, sol);
+
+    if (targets.length === 0) {
+        showToast(LANG === 'de' ? '🎯 Nichts zu scannen!' : '🎯 Nothing to scan!');
+        return;
+    }
+
+    _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, effectiveSize, effectiveDuration);
 }

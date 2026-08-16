@@ -55,7 +55,7 @@ function _randomFrom(array) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — HELPERS------------------------------
+//-------------------ARCANE REVEAL — CANDIDATE SELECTION------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ function _arcaneReveal_buildCandidatePools(row, col, radius, rows, cols, sol) {
 
 // Collects and returns the final list of cell IDs to be affected by Arcane Reveal.
 // Correct cells are shuffled and capped at maxReveals; incorrect cells are added in full.
-function _arcaneRevealCollectCells(row, col, radius, rows, cols, sol, maxReveals) {
+function _arcaneReveal_collectCells(row, col, radius, rows, cols, sol, maxReveals) {
     const { correctCandidates, incorrectCandidates } =
         _arcaneReveal_buildCandidatePools(row, col, radius, rows, cols, sol);
 
@@ -114,79 +114,6 @@ function _arcaneRevealCollectCells(row, col, radius, rows, cols, sol, maxReveals
     });
 
     return affected;
-}
-
-// Handles all post-burst logic for a single revealed cell:
-// visual reveal, sparkles, passive adjacency refresh, stats, and win check.
-function _arcaneReveal_onBalloonBurst(id) {
-    _applyCellEffect([id], 'reveal');
-    _spawnArcaneSparkles([id]);
-
-    if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
-
-    updateQuestStats('tilesRevealed', { count: 1 });
-    trackAchStat('tilesRevealed', 1);
-    questStat_classRevealUsed(1);
-    updateQuestStats('classAbilityUsedThisLevel', {});
-
-    checkWin();
-}
-
-// Staggered loop — spawns one balloon per revealed cell with ARCANE_REVEAL_STAGGER_DELAY_MS
-// between each. Each balloon fires _arcaneReveal_onBalloonBurst when it bursts.
-function _arcaneReveal_staggeredRevealLoop(revealedIds) {
-    revealedIds.forEach((id, index) => {
-        setTimeout(() => {
-            const [, r, c] = id.split('-').map(Number);
-            _spawnArcaneBalloon(r, c, () => _arcaneReveal_onBalloonBurst(id));
-        }, index * ARCANE_REVEAL_STAGGER_DELAY_MS);
-    });
-}
-
-// Applies arcane_exposure passive: marks all incorrect cells in the affected list.
-// Only runs when the arcane_exposure passive node is active.
-function _arcaneReveal_applyExposureMarks(markedIds) {
-    if (markedIds.length === 0) return;
-
-    markedIds.forEach(id => {
-        const [, r, c] = id.split('-').map(Number);
-        if (userGrid[r][c] === 0) {
-            userGrid[r][c] = 2;
-            renderCell(r, c);
-            questStat_classMarkUsed(1);
-        }
-    });
-
-    _applyCellEffect(markedIds, 'mark');
-}
-
-
-//------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — MAIN FUNCTION-----------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _executeArcaneReveal — main entry point for the Arcane Reveal ability.
-// Reveals up to maxReveals correct cells within radius steps of (row, col),
-// including diagonals. Passive nodes can extend radius and reveal cap.
-function _executeArcaneReveal(row, col, radius, maxReveals = 4) {
-    if (!cur) return;
-
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-
-    const effectiveMaxReveals = _arcaneReveal_calcMaxReveals(maxReveals);
-    const effectiveRadius = _arcaneReveal_calcRadius(radius);
-
-    const affected = _arcaneRevealCollectCells(row, col, effectiveRadius, rows, cols, sol, effectiveMaxReveals);
-    const revealedIds = _filterRevealedIds(affected, sol);
-    const markedIds = ptHasSkill('arcane_exposure') ? _filterMarkedIds(affected, sol) : [];
-
-    _arcaneReveal_staggeredRevealLoop(revealedIds);
-    _arcaneReveal_applyExposureMarks(markedIds);
-
-    Audio_Manager.playSFX('arcaneReveal');
 }
 
 
@@ -339,6 +266,85 @@ function _spawnArcaneSparkles(cellIds) {
 
 
 //------------------------------------------------------------------------
+//-------------------ARCANE REVEAL — ORCHESTRATION------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Handles all post-burst logic for a single revealed cell:
+// visual reveal, sparkles, passive adjacency refresh, stats, and win check.
+function _arcaneReveal_onBalloonBurst(id) {
+    _applyCellEffect([id], 'reveal');
+    _spawnArcaneSparkles([id]);
+
+    if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
+
+    updateQuestStats('tilesRevealed', { count: 1 });
+    trackAchStat('tilesRevealed', 1);
+    questStat_classRevealUsed(1);
+    updateQuestStats('classAbilityUsedThisLevel', {});
+
+    checkWin();
+}
+
+// Staggered loop — spawns one balloon per revealed cell with ARCANE_REVEAL_STAGGER_DELAY_MS
+// between each. Each balloon fires _arcaneReveal_onBalloonBurst when it bursts.
+function _arcaneReveal_staggeredRevealLoop(revealedIds) {
+    revealedIds.forEach((id, index) => {
+        setTimeout(() => {
+            const [, r, c] = id.split('-').map(Number);
+            _spawnArcaneBalloon(r, c, () => _arcaneReveal_onBalloonBurst(id));
+        }, index * ARCANE_REVEAL_STAGGER_DELAY_MS);
+    });
+}
+
+// Applies arcane_exposure passive: marks all incorrect cells in the affected list.
+// Only runs when the arcane_exposure passive node is active.
+function _arcaneReveal_applyExposureMarks(markedIds) {
+    if (markedIds.length === 0) return;
+
+    markedIds.forEach(id => {
+        const [, r, c] = id.split('-').map(Number);
+        if (userGrid[r][c] === 0) {
+            userGrid[r][c] = 2;
+            renderCell(r, c);
+            questStat_classMarkUsed(1);
+        }
+    });
+
+    _applyCellEffect(markedIds, 'mark');
+}
+
+
+//------------------------------------------------------------------------
+//-------------------ARCANE REVEAL — MAIN FUNCTION-----------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _executeArcaneReveal — main entry point for the Arcane Reveal ability.
+// Reveals up to maxReveals correct cells within radius steps of (row, col),
+// including diagonals. Passive nodes can extend radius and reveal cap.
+function _executeArcaneReveal(row, col, radius, maxReveals = 4) {
+    if (!cur) return;
+
+    const sol = cur.grid;
+    const rows = sol.length;
+    const cols = sol[0].length;
+
+    const effectiveMaxReveals = _arcaneReveal_calcMaxReveals(maxReveals);
+    const effectiveRadius = _arcaneReveal_calcRadius(radius);
+
+    const affected = _arcaneReveal_collectCells(row, col, effectiveRadius, rows, cols, sol, effectiveMaxReveals);
+    const revealedIds = _filterRevealedIds(affected, sol);
+    const markedIds = ptHasSkill('arcane_exposure') ? _filterMarkedIds(affected, sol) : [];
+
+    _arcaneReveal_staggeredRevealLoop(revealedIds);
+    _arcaneReveal_applyExposureMarks(markedIds);
+
+    Audio_Manager.playSFX('arcaneReveal');
+}
+
+
+//------------------------------------------------------------------------
 //-------------------ABSOLUTE ZERO — HELPERS------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -383,7 +389,7 @@ function _arcaneFreeze_removeFrozenFloor() {
 
 // Starts the freeze countdown ticker, updating the timer display every second.
 // Returns the interval handle so it can be cleared when the freeze ends.
-function _arcaneFreezeStartCountdown(totalSecs) {
+function _arcaneFreeze_startCountdown(totalSecs) {
     let remaining = totalSecs;
     const interval = setInterval(() => {
         remaining--;
@@ -395,7 +401,7 @@ function _arcaneFreezeStartCountdown(totalSecs) {
 }
 
 // Restores normal game timer state and cleans up all freeze visuals.
-function _arcaneFreezeEnd(tick) {
+function _arcaneFreeze_end(tick) {
     timerFrozen = false;
     window._freezeActive = false;
 
@@ -404,38 +410,6 @@ function _arcaneFreezeEnd(tick) {
     buildClassHUD();
 
     _arcaneFreeze_removeFrozenFloor();
-}
-
-
-//------------------------------------------------------------------------
-//-------------------ABSOLUTE ZERO — MAIN FUNCTION-----------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// _executeArcaneFreeze — main entry point for the Absolute Zero ability.
-// Freezes the game timer for durationMs (modified by passives).
-// While frozen, wrong fills cost zero time (window._freezeActive flag).
-function _executeArcaneFreeze(durationMs) {
-    const effectiveDuration = _arcaneFreeze_calcDuration(durationMs);
-
-    // Set freeze state flags
-    timerFrozen = true;
-    window._freezeActive = true;
-    window._freezeCorrFills = 0; // Tracks correct fills during freeze (for frozen_resilience passive)
-
-    _arcaneFreeze_spawnFrozenFloor();
-    _startBlizzardEffect(effectiveDuration);
-    updTimer();
-
-    const secs = Math.ceil(effectiveDuration / 1000);
-    showToast(`🔮 Absolute Zero! ${secs}s!`);
-    Audio_Manager.playSFX('absoluteZero');
-
-    // Track clutch freezes (used when timer is critically low)
-    if (timerSecs <= 10) trackAchStat('freezeClutches');
-
-    const tick = _arcaneFreezeStartCountdown(secs);
-    setTimeout(() => _arcaneFreezeEnd(tick), effectiveDuration);
 }
 
 
@@ -506,4 +480,36 @@ function _startBlizzardEffect(durationMs) {
 
     _blizzard_startSpawnLoop(overlay, durationMs);
     _blizzard_scheduleFadeOut(overlay, tint, durationMs);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------ABSOLUTE ZERO — MAIN FUNCTION------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _executeArcaneFreeze — main entry point for the Absolute Zero ability.
+// Freezes the game timer for durationMs (modified by passives).
+// While frozen, wrong fills cost zero time (window._freezeActive flag).
+function _executeArcaneFreeze(durationMs) {
+    const effectiveDuration = _arcaneFreeze_calcDuration(durationMs);
+
+    // Set freeze state flags
+    timerFrozen = true;
+    window._freezeActive = true;
+    window._freezeCorrFills = 0; // Tracks correct fills during freeze (for frozen_resilience passive)
+
+    _arcaneFreeze_spawnFrozenFloor();
+    _startBlizzardEffect(effectiveDuration);
+    updTimer();
+
+    const secs = Math.ceil(effectiveDuration / 1000);
+    showToast(`🔮 Absolute Zero! ${secs}s!`);
+    Audio_Manager.playSFX('absoluteZero');
+
+    // Track clutch freezes (used when timer is critically low)
+    if (timerSecs <= 10) trackAchStat('freezeClutches');
+
+    const tick = _arcaneFreeze_startCountdown(secs);
+    setTimeout(() => _arcaneFreeze_end(tick), effectiveDuration);
 }

@@ -1,13 +1,19 @@
 ﻿//------------------------------------------------------------------------
-//----------------------------CONSTANTS-----------------------------------
+//----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Persistence key kept separate from the main save so achievement progress
 // survives new playthroughs and save-file resets.
 const ACH_SAVE_KEY = 'stoxels_ach';
- 
- 
+
+// ACH_STATE — live achievement state; all other functions read and write
+//   directly through this reference. Assigned at the bottom of the
+//   PERSISTENCE section below (needs initAchState() to be defined first),
+//   but declared here alongside the rest of the module state.
+let ACH_STATE;
+
+
 
 //------------------------------------------------------------------------
 //----------------------------PERSISTENCE---------------------------------
@@ -44,9 +50,8 @@ function initAchState() {
     return saved ? migrateAchState(saved) : { stats: {}, unlocked: [] };
 }
 
-// ACH_STATE — live achievement state; initialised once on startup.
-//   All other functions read and write directly through this reference.
-let ACH_STATE = initAchState();
+// Initialise live state once on startup.
+ACH_STATE = initAchState();
 
 
 

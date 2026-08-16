@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------
-//-------------------CONSTANTS & CONFIGURATION----------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -34,6 +34,12 @@ const PT_COL_START = '#ffd700';
 const PT_CONN_LOCKED = 'rgba(80,70,110,0.3)';
 const PT_CONN_UNLOCKED = 'rgba(160,130,80,0.45)';
 const PT_CONN_ALLOCATED = 'rgba(109,191,64,0.7)';
+
+// Tracks which screen — and, if applicable, which world — to return to
+// after closing the Probability Tree. Kept up to date by showWorldDetail(),
+// showMapView(), and toggleMapView()'s classic-view branch.
+let _ptReturnScreen = 'screen-levels';
+let _ptReturnWorldIndex = null;
 
 
 //------------------------------------------------------------------------
@@ -145,12 +151,8 @@ function buildPassiveTreeScreen() {
     PT.reload();
 }
 
-// Tracks which screen — and, if applicable, which world — to return to
-// after closing the Probability Tree. Kept up to date by showWorldDetail(),
-// showMapView(), and toggleMapView()'s classic-view branch.
-let _ptReturnScreen = 'screen-levels';
-let _ptReturnWorldIndex = null;
-
+// Opens the Probability Tree screen, remembering the current screen
+// (via _ptReturnScreen / _ptReturnWorldIndex) so ptGoBack() can restore it.
 function showPassiveTree() {
     buildPassiveTreeScreen();
     screenHistory.push(_ptReturnScreen);
@@ -202,58 +204,48 @@ function _ptGrantItem(defId) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Each helper below handles the gear-node bonus drops for one class.
-// Called by _ptApplyLevelCompleteRewards based on STATE.playerClass.
+// Shared roll for a single gear-node bonus drop: if the player has the
+// given skill and the chance hits, grants the item and shows a toast.
+// Used by the per-class reward helpers below to avoid repeating the
+// hasSkill/random/grant/toast pattern for every gear node.
+function _ptRollGearReward(skillStatKey, chance, itemDefId, deMsg, enMsg) {
+    if (!ptHasSkill(skillStatKey) || Math.random() >= chance) return;
+
+    _ptGrantItem(itemDefId);
+    showToast(LANG === 'de' ? deMsg : enMsg);
+}
 
 // Statistician gear drops — base gear: 33% magnifier, improved: 33% error gem
 function _ptApplyStatisticianRewards() {
-    if (ptHasSkill('gear_of_the_statistician') && Math.random() < 0.33) {
-        _ptGrantItem('reveal2');
-        showToast(LANG === 'de'
-            ? '🔍 Statistiker Bonus: Lupe erhalten!'
-            : '🔍 Statistician Bonus: Magnifier received!');
-    }
+    _ptRollGearReward('gear_of_the_statistician', 0.33, 'reveal2',
+        '🔍 Statistiker Bonus: Lupe erhalten!',
+        '🔍 Statistician Bonus: Magnifier received!');
 
-    if (ptHasSkill('improved_gear_of_the_statistician') && Math.random() < 0.33) {
-        _ptGrantItem('markWrong8');
-        showToast(LANG === 'de'
-            ? '💎 Statistiker Bonus: Fehlerstein erhalten!'
-            : '💎 Statistician Bonus: Error Gem received!');
-    }
+    _ptRollGearReward('improved_gear_of_the_statistician', 0.33, 'markWrong8',
+        '💎 Statistiker Bonus: Fehlerstein erhalten!',
+        '💎 Statistician Bonus: Error Gem received!');
 }
 
 // Mathmagician gear drops — base gear: 25% professor, improved: 15% chronobolt
 function _ptApplyMathmagicianRewards() {
-    if (ptHasSkill('gear_of_the_mathmagician') && Math.random() < 0.25) {
-        _ptGrantItem('mistakeEraser4');
-        showToast(LANG === 'de'
-            ? '📚 Mathematgier Bonus: Professor erhalten!'
-            : '📚 Mathmagician Bonus: Professor received!');
-    }
+    _ptRollGearReward('gear_of_the_mathmagician', 0.25, 'mistakeEraser4',
+        '📚 Mathematgier Bonus: Professor erhalten!',
+        '📚 Mathmagician Bonus: Professor received!');
 
-    if (ptHasSkill('improved_gear_of_the_mathmagician') && Math.random() < 0.15) {
-        _ptGrantItem('addTime900');
-        showToast(LANG === 'de'
-            ? '⚡ Mathemagier Bonus: Chronoblitz erhalten!'
-            : '⚡ Mathmagician Bonus: Chronobolt received!');
-    }
+    _ptRollGearReward('improved_gear_of_the_mathmagician', 0.15, 'addTime900',
+        '⚡ Mathemagier Bonus: Chronoblitz erhalten!',
+        '⚡ Mathmagician Bonus: Chronobolt received!');
 }
 
 // Probabilist gear drops — base gear: 25% sweeper, improved: 15% error magnet
 function _ptApplyProbabilistRewards() {
-    if (ptHasSkill('gear_of_the_probabilist') && Math.random() < 0.25) {
-        _ptGrantItem('markWrong4');
-        showToast(LANG === 'de'
-            ? '🧹 Probabilist Bonus: Besen erhalten!'
-            : '🧹 Probabilist Bonus: Sweeper received!');
-    }
+    _ptRollGearReward('gear_of_the_probabilist', 0.25, 'markWrong4',
+        '🧹 Probabilist Bonus: Besen erhalten!',
+        '🧹 Probabilist Bonus: Sweeper received!');
 
-    if (ptHasSkill('improved_gear_of_the_probabilist') && Math.random() < 0.15) {
-        _ptGrantItem('markWrong6');
-        showToast(LANG === 'de'
-            ? '🧲 Probabilist Bonus: Fehlermagnet erhalten!'
-            : '🧲 Probabilist Bonus: Error Magnet received!');
-    }
+    _ptRollGearReward('improved_gear_of_the_probabilist', 0.15, 'markWrong6',
+        '🧲 Probabilist Bonus: Fehlermagnet erhalten!',
+        '🧲 Probabilist Bonus: Error Magnet received!');
 }
 
 

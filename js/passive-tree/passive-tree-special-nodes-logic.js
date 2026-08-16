@@ -1,6 +1,6 @@
-﻿//========================================================================
-//================ passive-tree-special-nodes-logic.js ===================
-//========================================================================
+﻿//------------------------------------------------------------------------
+//----------------- passive-tree-special-nodes-logic.js ------------------
+//------------------------------------------------------------------------
 // Implementations for passive tree special nodes:
 //   Nodes 270–272  : Poisson Process
 //   Nodes 282–284  : Binomial Burst
@@ -34,11 +34,11 @@
 //                             resetOverfittingTracker()
 //   grid.js (updClues)      → _sparsePriorOnLineComplete(), _entropyDrainUpdateProgress(),
 //                             _signalToNoiseCheckRestore()
-//========================================================================
+//------------------------------------------------------------------------
 
 
 //------------------------------------------------------------------------
-//---------------------- GLOBAL STATE VARIABLES --------------------------
+//-------------------------- CONSTANTS & STATE ----------------------------
 //------------------------------------------------------------------------
 
 // --- Bayesian Update (nodes 282–284 shared bonus pool) ---
@@ -47,35 +47,164 @@ window._bayesianBonus = window._bayesianBonus || 0; // Accumulated extra trigger
 // --- Binomial Burst (nodes 282–284) ---
 window._binomialBurstFills = 0; // Correct-fill counter; triggers at every 10th fill
 
+// --- Sparse Prior (node 290) — per-level Set, initialized in reset ---
+window._sparsePriorRevealedLines = new Set(); // Keys like "r3" or "c7" to avoid double-reveals
+
 // --- Ergodic Field (node 291) ---
+const ERGODIC_FIELD_INTERVAL_MS = 3 * 60 * 1000; // Time between solution flashes
+const ERGODIC_FIELD_FLASH_MS = 1000;             // How long the flash stays on screen
 window._ergodicFieldNext = null; // Timestamp for next solution flash
 
 // --- Entropy Drain (node 293) ---
+const ENTROPY_DRAIN_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes before a stalled line reverts
 window._entropyDrainTimestamps = {}; // "r-{row}" / "c-{col}" → timestamp of last progress
 
 // --- Random Walk (node 294) ---
+const RANDOM_WALK_INTERVAL_MS = 30 * 1000; // Time between auto-actions
+const RANDOM_WALK_MAX_MISTAKES = 2;         // Level is lost at this many mistakes
 window._randomWalkNext = null; // Timestamp for next random cell action
 
 // --- Frequentist's Burden (node 295) ---
+const FREQUENTIST_FILLS_PER_REVEAL = 5; // One clue revealed per this many correct fills
 window._frequentistsFills = 0;    // Correct-fill counter; reveals a clue every 5 fills
 window._frequentistsBurdenActive = false;
 
 // --- Signal to Noise (node 296) ---
+const SIGNAL_NOISE_CORRUPT_RATIO = 0.15; // Fraction of clue spans to falsify
+const SIGNAL_NOISE_RESTORE_RATIO = 0.75; // Board completion % to trigger restore
 window._signalToNoiseActive = false;
 window._signalToNoiseFakeClues = []; // Array of { spanId, originalVal, fakeVal }
 
 // --- Degrees of Freedom (node 298) ---
+const DOF_FLASH_INTERVAL_MS = 30 * 1000; // Time between brief reveals
+const DOF_FLASH_DURATION_MS = 5 * 1000;  // How long clues stay visible during flash
 window._degreesOfFreedomChoice = null; // 'row' | 'col' — player's chosen hidden clue axis
 window._degreesOfFreedomNext = null; // Timestamp for next brief clue reveal
 
+// --- Overfitting (node 299) — local var, not on window ---
+const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which the penalty kicks in
+let _lastOverfittingPhase = 'free'; // Tracks phase transitions to prevent toast spam
+
 // --- The Oracle (node 300) ---
+const ORACLE_MIN_CELL_COUNT = 200; // Minimum grid size to activate
+const ORACLE_FLASH_DURATION_MS = 3000;
 window._oracleActive = false; // True for the entire level after Oracle fires; blocks all auto-actions
 
-// --- Sparse Prior (node 290) — per-level Set, initialized in reset ---
-window._sparsePriorRevealedLines = new Set(); // Keys like "r3" or "c7" to avoid double-reveals
 
-// --- Overfitting (node 299) — local var, not on window ---
-let _lastOverfittingPhase = 'free'; // Tracks phase transitions to prevent toast spam
+//------------------------------------------------------------------------
+//----------------- SHARED: GRID COMPLETION HELPERS ----------------------
+//------------------------------------------------------------------------
+// Utility functions used by multiple keystones to measure board progress.
+//------------------------------------------------------------------------
+
+// Returns the total number of filled solution cells (value === 1).
+function _countTotalSolutionCells(sol) {
+    return sol.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
+}
+
+// Returns the number of solution cells the player has already filled or that are revealed.
+function _countFilledSolutionCells(sol) {
+    const rows = sol.length, cols = sol[0].length;
+    let filled = 0;
+    for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++)
+            if (sol[r][c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c]))
+                filled++;
+    return filled;
+}
+
+// Returns completion ratio 0.0–1.0 for the current puzzle.
+function _getBoardCompletionRatio() {
+    if (!cur) return 0;
+    const sol = cur.grid;
+    const total = _countTotalSolutionCells(sol);
+    if (total === 0) return 1;
+    return _countFilledSolutionCells(sol) / total;
+}
+
+
+//------------------------------------------------------------------------
+//---------------------- SHARED: CLUE VISIBILITY -------------------------
+//------------------------------------------------------------------------
+// Utility functions for hiding / revealing the row and column clue labels.
+//------------------------------------------------------------------------
+
+// Adds or removes the blackout class on every element matching a selector.
+function _setClueBlackout(selector, hidden) {
+    document.querySelectorAll(selector).forEach(el => el.classList.toggle('clue-blackout', hidden));
+}
+
+// Hides all row and column clue elements using the blackout class.
+function _hideAllClues() {
+    _setClueBlackout('.rct, .cch', true);
+}
+
+// Reveals all row and column clue elements by removing the blackout class.
+function _revealAllClues() {
+    _setClueBlackout('.rct, .cch', false);
+}
+
+// Hides clues for a single row index.
+function _hideRowClues(rowIndex) {
+    _setClueBlackout(`.rct-${rowIndex}`, true);
+}
+
+// Reveals clues for a single row index.
+function _revealRowClues(rowIndex) {
+    _setClueBlackout(`.rct-${rowIndex}`, false);
+}
+
+// Hides clues for a single column index.
+function _hideColClues(colIndex) {
+    _setClueBlackout(`.cch-${colIndex}`, true);
+}
+
+// Reveals clues for a single column index.
+function _revealColClues(colIndex) {
+    _setClueBlackout(`.cch-${colIndex}`, false);
+}
+
+
+//------------------------------------------------------------------------
+//--------------------- SHARED: BOARD FLASH HELPERS -----------------------
+//------------------------------------------------------------------------
+// Shared visual helper for keystones that briefly flash the solution
+// directly onto the board (Ergodic Field, The Oracle).
+//------------------------------------------------------------------------
+
+// Swaps a cell's state classes for the "scan reveal" flash animation.
+function _applyScanRevealClasses(el, isSolutionCell) {
+    el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
+    if (isSolutionCell) el.classList.add('filled', 'scan-reveal');
+}
+
+
+//------------------------------------------------------------------------
+//------------------ SHARED: AUTO-ACTION GUARD ---------------------------
+//------------------------------------------------------------------------
+// Most auto-reveal / auto-mark nodes are disabled when Ergodic Field or
+// The Oracle is active. Call this guard at the top of each such node.
+//------------------------------------------------------------------------
+
+// Returns true if auto-reveals and auto-marks are currently blocked.
+function _autoActionsBlocked() {
+    return ptHasSkill('keystone_ergodic_field') || window._oracleActive;
+}
+
+
+//------------------------------------------------------------------------
+//---------- UTILITY: INTERQUARTILE VISION DURATION ---------------------
+//------------------------------------------------------------------------
+// Returns the total reveal duration in ms based on how many IQV tiers are active.
+// Tier 1: 2000ms base, Tier 2: +1000ms, Tier 3: +1000ms (max 4000ms).
+//------------------------------------------------------------------------
+function _interquartileVisionDuration() {
+    let dur = 0;
+    if (ptHasSkill('interquartile_vision_1')) dur = 2000;
+    if (ptHasSkill('interquartile_vision_2')) dur += 1000;
+    if (ptHasSkill('interquartile_vision_3')) dur += 1000;
+    return dur;
+}
 
 
 //------------------------------------------------------------------------
@@ -120,88 +249,6 @@ function _bayesianRoll(baseChance) {
     const triggered = Math.random() < totalChance;
     if (triggered) _resetBayesianBonus();
     return triggered;
-}
-
-
-//------------------------------------------------------------------------
-//----------------- SHARED: GRID COMPLETION HELPERS ----------------------
-//------------------------------------------------------------------------
-// Utility functions used by multiple keystones to measure board progress.
-//------------------------------------------------------------------------
-
-// Returns the total number of filled solution cells (value === 1).
-function _countTotalSolutionCells(sol) {
-    return sol.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
-}
-
-// Returns the number of solution cells the player has already filled or that are revealed.
-function _countFilledSolutionCells(sol) {
-    const rows = sol.length, cols = sol[0].length;
-    let filled = 0;
-    for (let r = 0; r < rows; r++)
-        for (let c = 0; c < cols; c++)
-            if (sol[r][c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c]))
-                filled++;
-    return filled;
-}
-
-// Returns completion ratio 0.0–1.0 for the current puzzle.
-function _getBoardCompletionRatio() {
-    if (!cur) return 0;
-    const sol = cur.grid;
-    const total = _countTotalSolutionCells(sol);
-    if (total === 0) return 1;
-    return _countFilledSolutionCells(sol) / total;
-}
-
-
-//------------------------------------------------------------------------
-//---------------------- SHARED: CLUE VISIBILITY -------------------------
-//------------------------------------------------------------------------
-// Utility functions for hiding / revealing the row and column clue labels.
-//------------------------------------------------------------------------
-
-// Hides all row and column clue elements using the blackout class.
-function _hideAllClues() {
-    document.querySelectorAll('.rct, .cch').forEach(el => el.classList.add('clue-blackout'));
-}
-
-// Reveals all row and column clue elements by removing the blackout class.
-function _revealAllClues() {
-    document.querySelectorAll('.rct, .cch').forEach(el => el.classList.remove('clue-blackout'));
-}
-
-// Hides clues for a single row index.
-function _hideRowClues(rowIndex) {
-    document.querySelectorAll(`.rct-${rowIndex}`).forEach(el => el.classList.add('clue-blackout'));
-}
-
-// Reveals clues for a single row index.
-function _revealRowClues(rowIndex) {
-    document.querySelectorAll(`.rct-${rowIndex}`).forEach(el => el.classList.remove('clue-blackout'));
-}
-
-// Hides clues for a single column index.
-function _hideColClues(colIndex) {
-    document.querySelectorAll(`.cch-${colIndex}`).forEach(el => el.classList.add('clue-blackout'));
-}
-
-// Reveals clues for a single column index.
-function _revealColClues(colIndex) {
-    document.querySelectorAll(`.cch-${colIndex}`).forEach(el => el.classList.remove('clue-blackout'));
-}
-
-
-//------------------------------------------------------------------------
-//------------------ SHARED: AUTO-ACTION GUARD ---------------------------
-//------------------------------------------------------------------------
-// Most auto-reveal / auto-mark nodes are disabled when Ergodic Field or
-// The Oracle is active. Call this guard at the top of each such node.
-//------------------------------------------------------------------------
-
-// Returns true if auto-reveals and auto-marks are currently blocked.
-function _autoActionsBlocked() {
-    return ptHasSkill('keystone_ergodic_field') || window._oracleActive;
 }
 
 
@@ -452,19 +499,23 @@ function _findDensestCol(sol) {
     return bestCol;
 }
 
+// Reveals a single solution cell if it isn't already filled/revealed.
+// Returns true if the cell's state actually changed.
+function _revealSolutionCell(sol, r, c) {
+    if (sol[r][c] !== 1 || userGrid[r][c] === 1 || revealedGrid[r][c]) return false;
+    revealedGrid[r][c] = true;
+    userGrid[r][c] = 1;
+    renderCell(r, c);
+    updClues(r, c, true);
+    return true;
+}
+
 // Reveals all unfilled solution cells along a single row. Returns IDs of affected elements.
 function _revealRow(sol, rowIndex) {
     const affected = [];
     const cols = sol[0].length;
-    for (let c = 0; c < cols; c++) {
-        if (sol[rowIndex][c] === 1 && userGrid[rowIndex][c] !== 1 && !revealedGrid[rowIndex][c]) {
-            revealedGrid[rowIndex][c] = true;
-            userGrid[rowIndex][c] = 1;
-            renderCell(rowIndex, c);
-            updClues(rowIndex, c, true);
-            affected.push(`g-${rowIndex}-${c}`);
-        }
-    }
+    for (let c = 0; c < cols; c++)
+        if (_revealSolutionCell(sol, rowIndex, c)) affected.push(`g-${rowIndex}-${c}`);
     return affected;
 }
 
@@ -472,15 +523,8 @@ function _revealRow(sol, rowIndex) {
 function _revealCol(sol, colIndex) {
     const affected = [];
     const rows = sol.length;
-    for (let r = 0; r < rows; r++) {
-        if (sol[r][colIndex] === 1 && userGrid[r][colIndex] !== 1 && !revealedGrid[r][colIndex]) {
-            revealedGrid[r][colIndex] = true;
-            userGrid[r][colIndex] = 1;
-            renderCell(r, colIndex);
-            updClues(r, colIndex, true);
-            affected.push(`g-${r}-${colIndex}`);
-        }
-    }
+    for (let r = 0; r < rows; r++)
+        if (_revealSolutionCell(sol, r, colIndex)) affected.push(`g-${r}-${colIndex}`);
     return affected;
 }
 
@@ -615,8 +659,7 @@ function _ergodicFieldGetFlashCells(sol) {
             if (userGrid[r][c] === 1 || revealedGrid[r][c]) continue;
             const el = document.getElementById(`g-${r}-${c}`);
             if (!el) continue;
-            el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
-            if (sol[r][c] === 1) el.classList.add('filled', 'scan-reveal');
+            _applyScanRevealClasses(el, sol[r][c] === 1);
             cells.push(el);
         }
     }
@@ -636,7 +679,7 @@ function _ergodicFieldRestoreBoard(flashedCells, sol) {
 // Called from: start-level.js
 function _ergodicFieldInit() {
     if (!ptHasSkill('keystone_ergodic_field')) return;
-    window._ergodicFieldNext = Date.now() + 3 * 60 * 1000;
+    window._ergodicFieldNext = Date.now() + ERGODIC_FIELD_INTERVAL_MS;
 }
 
 // Main tick — fires the solution flash if enough time has elapsed.
@@ -646,15 +689,15 @@ function _ergodicFieldTick() {
     if (!window._ergodicFieldNext || Date.now() < window._ergodicFieldNext) return;
     if (!cur) return;
 
-    window._ergodicFieldNext = Date.now() + 3 * 60 * 1000;
+    window._ergodicFieldNext = Date.now() + ERGODIC_FIELD_INTERVAL_MS;
 
     const sol = cur.grid;
     const flashedCells = _ergodicFieldGetFlashCells(sol);
 
     showToast(`🌊 ${LANG === 'de' ? 'Ergodisches Feld!' : 'Ergodic Field!'}`);
 
-    // Restore board to its true state after 1 second
-    setTimeout(() => _ergodicFieldRestoreBoard(flashedCells, sol), 1000);
+    // Restore board to its true state after the flash duration
+    setTimeout(() => _ergodicFieldRestoreBoard(flashedCells, sol), ERGODIC_FIELD_FLASH_MS);
 }
 
 
@@ -669,8 +712,6 @@ function _ergodicFieldTick() {
 //              grid.js (updClues) → _entropyDrainUpdateProgress()
 //              timer.js setInterval → _entropyDrainTick()
 //------------------------------------------------------------------------
-
-const ENTROPY_DRAIN_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
 
 // Checks whether a row has any progress but is not yet complete.
 function _entropyRowIsStalled(sol, rowIndex) {
@@ -728,6 +769,22 @@ function _entropyDrainUpdateProgress(row, col) {
     window._entropyDrainTimestamps[`c-${col}`] = now;
 }
 
+// Checks a single row/col timer entry: refreshes its timestamp if no longer
+// stalled, or reverts the line once the stall exceeds the timeout.
+function _entropyDrainProcessLine(key, isStalled, revert, now) {
+    const ts = window._entropyDrainTimestamps[key];
+    if (!ts) return;
+
+    if (!isStalled()) {
+        window._entropyDrainTimestamps[key] = now;
+        return;
+    }
+    if (now - ts >= ENTROPY_DRAIN_TIMEOUT_MS) {
+        window._entropyDrainTimestamps[key] = now;
+        revert();
+    }
+}
+
 // Main tick — reverts any stalled lines that have exceeded the timeout.
 // Called from: timer.js setInterval
 function _entropyDrainTick() {
@@ -739,33 +796,10 @@ function _entropyDrainTick() {
     const now = Date.now();
 
     for (let r = 0; r < rows; r++) {
-        const key = `r-${r}`;
-        const ts = window._entropyDrainTimestamps[key];
-        if (!ts) continue;
-
-        if (!_entropyRowIsStalled(sol, r)) {
-            window._entropyDrainTimestamps[key] = now;
-            continue;
-        }
-        if (now - ts >= ENTROPY_DRAIN_TIMEOUT_MS) {
-            window._entropyDrainTimestamps[key] = now;
-            _entropyDrainRevertRow(r, cols);
-        }
+        _entropyDrainProcessLine(`r-${r}`, () => _entropyRowIsStalled(sol, r), () => _entropyDrainRevertRow(r, cols), now);
     }
-
     for (let c = 0; c < cols; c++) {
-        const key = `c-${c}`;
-        const ts = window._entropyDrainTimestamps[key];
-        if (!ts) continue;
-
-        if (!_entropyColIsStalled(sol, c)) {
-            window._entropyDrainTimestamps[key] = now;
-            continue;
-        }
-        if (now - ts >= ENTROPY_DRAIN_TIMEOUT_MS) {
-            window._entropyDrainTimestamps[key] = now;
-            _entropyDrainRevertCol(c, rows);
-        }
+        _entropyDrainProcessLine(`c-${c}`, () => _entropyColIsStalled(sol, c), () => _entropyDrainRevertCol(c, rows), now);
     }
 }
 
@@ -781,9 +815,6 @@ function _entropyDrainTick() {
 // Called from: start-level.js → _randomWalkInit()
 //              timer.js setInterval → _randomWalkTick()
 //------------------------------------------------------------------------
-
-const RANDOM_WALK_INTERVAL_MS = 30 * 1000; // 30 seconds between actions
-const RANDOM_WALK_MAX_MISTAKES = 2;          // Level is lost at this many mistakes
 
 // Triggers the level-failed overlay with a Random Walk specific message.
 function _randomWalkFail() {
@@ -890,8 +921,6 @@ function _randomWalkTick() {
 //              mouse-button-handlers.js → _frequentistsBurdenOnCorrectFill()
 //------------------------------------------------------------------------
 
-const FREQUENTIST_FILLS_PER_REVEAL = 5; // One clue revealed per this many correct fills
-
 // Collects all row/col indices that still have at least one blacked-out clue element.
 function _frequentistGetHiddenLines() {
     if (!cur) return [];
@@ -956,9 +985,6 @@ function _frequentistsBurdenOnCorrectFill() {
 // Called from: start-level.js → _applySignalToNoise()
 //              grid.js / checkWin → _signalToNoiseCheckRestore()
 //------------------------------------------------------------------------
-
-const SIGNAL_NOISE_CORRUPT_RATIO = 0.15; // Fraction of clue spans to falsify
-const SIGNAL_NOISE_RESTORE_RATIO = 0.75; // Board completion % to trigger restore
 
 // Collects every clue number span across all rows and columns.
 function _signalToNoiseCollectAllSpans(sol) {
@@ -1045,9 +1071,6 @@ function _signalToNoiseCheckRestore() {
 //              timer.js setInterval → _degreesOfFreedomTick()
 //------------------------------------------------------------------------
 
-const DOF_FLASH_INTERVAL_MS = 30 * 1000; // Time between brief reveals
-const DOF_FLASH_DURATION_MS = 5 * 1000;  // How long clues stay visible during flash
-
 // Builds and appends the axis-selection modal to the page.
 function _dofShowModal() {
     const modal = document.createElement('div');
@@ -1075,15 +1098,10 @@ function _dofRemoveModal() {
     if (modal) modal.remove();
 }
 
-// Hides the clues for the chosen axis across all rows or columns.
+// Hides the clues for the chosen axis across the whole board.
 function _dofHideChosenAxis(type) {
     if (!cur) return;
-    const rows = cur.grid.length, cols = cur.grid[0].length;
-    if (type === 'row') {
-        for (let r = 0; r < rows; r++) _hideRowClues(r);
-    } else {
-        for (let c = 0; c < cols; c++) _hideColClues(c);
-    }
+    _setClueBlackout(type === 'row' ? '[class*="rct-"]' : '[class*="cch-"]', true);
 }
 
 // Called when the player clicks one of the modal buttons.
@@ -1145,8 +1163,6 @@ function _degreesOfFreedomTick() {
 //              start-level.js → resetOverfittingTracker()
 //------------------------------------------------------------------------
 
-const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which the penalty kicks in
-
 // Calculates the current phase without side effects.
 function _overfittingCalculatePhase() {
     if (!cur) return 'off';
@@ -1198,9 +1214,6 @@ function resetOverfittingTracker() {
 // Called from: start-level.js → _applyTheOracle()
 //------------------------------------------------------------------------
 
-const ORACLE_MIN_CELL_COUNT = 200; // Minimum grid size to activate
-const ORACLE_FLASH_DURATION_MS = 3000;
-
 // Lights up all solution cells with the scan-reveal animation class.
 function _oracleFlashSolution(sol) {
     const rows = sol.length, cols = sol[0].length;
@@ -1208,8 +1221,7 @@ function _oracleFlashSolution(sol) {
         for (let c = 0; c < cols; c++) {
             const el = document.getElementById(`g-${r}-${c}`);
             if (!el) continue;
-            el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
-            if (sol[r][c] === 1) el.classList.add('filled', 'scan-reveal');
+            _applyScanRevealClasses(el, sol[r][c] === 1);
         }
     }
 }
@@ -1244,21 +1256,6 @@ function _applyTheOracle() {
         : 'Oracle! 👁️👁️👁️'}`, 5000);
 
     setTimeout(() => _oracleHideSolution(sol), ORACLE_FLASH_DURATION_MS);
-}
-
-
-//------------------------------------------------------------------------
-//---------- UTILITY: INTERQUARTILE VISION DURATION ---------------------
-//------------------------------------------------------------------------
-// Returns the total reveal duration in ms based on how many IQV tiers are active.
-// Tier 1: 2000ms base, Tier 2: +1000ms, Tier 3: +1000ms (max 4000ms).
-//------------------------------------------------------------------------
-function _interquartileVisionDuration() {
-    let dur = 0;
-    if (ptHasSkill('interquartile_vision_1')) dur = 2000;
-    if (ptHasSkill('interquartile_vision_2')) dur += 1000;
-    if (ptHasSkill('interquartile_vision_3')) dur += 1000;
-    return dur;
 }
 
 

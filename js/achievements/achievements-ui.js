@@ -46,6 +46,30 @@ function _pickLang(obj, prefix, lang) {
 
 
 //------------------------------------------------------------------------
+//-------------------------TIER STATE HELPERS------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _isTierUnlocked — returns true if the given tier index of a def has been earned.
+//   Single source of truth for tier-unlocked checks; used by both the
+//   counters and the card renderers below.
+function _isTierUnlocked(def, tierIndex) {
+    return ACH_STATE.unlocked.includes(`${def.id}__${tierIndex}`);
+}
+
+// _getHighestUnlockedTierIndex — returns the index of the highest earned tier,
+//   or -1 if no tier has been unlocked yet.
+function _getHighestUnlockedTierIndex(def) {
+    let highest = -1;
+    def.tiers.forEach((_, ti) => {
+        if (_isTierUnlocked(def, ti)) highest = ti;
+    });
+    return highest;
+}
+
+
+
+//------------------------------------------------------------------------
 //----------------------------TOAST QUEUE---------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -101,7 +125,7 @@ function _dismissAchToast(el) {
 }
 
 // _showAchToast — renders and animates a single achievement toast.
-//   Visible for ~10 s, then fades out over 0.5 s.
+//   Visible for ~5 s, then fades out over 0.5 s.
 function _showAchToast(def, tier) {
     _achToastBusy = true;
     document.getElementById('ach-toast')?.remove(); // safety: remove any leftover
@@ -129,9 +153,14 @@ function showAchievementToast(def, tier) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// _countCategoryTiers — total tier count across all defs in one category.
+function _countCategoryTiers(defs) {
+    return defs.reduce((sum, def) => sum + def.tiers.length, 0);
+}
+
 // _countTotalTiers — total number of tier entries across every achievement definition.
 function _countTotalTiers() {
-    return ACHIEVEMENT_DEFS.reduce((sum, def) => sum + def.tiers.length, 0);
+    return _countCategoryTiers(ACHIEVEMENT_DEFS);
 }
 
 // _countTotalAchievements — total number of achievement definitions (tiers ignored).
@@ -142,21 +171,14 @@ function _countTotalAchievements() {
 // _countFullyUnlockedAchievements — number of defs where every tier has been earned.
 function _countFullyUnlockedAchievements() {
     return ACHIEVEMENT_DEFS.filter(def =>
-        def.tiers.every((_, ti) => ACH_STATE.unlocked.includes(`${def.id}__${ti}`))
+        def.tiers.every((_, ti) => _isTierUnlocked(def, ti))
     ).length;
-}
-
-// _countCategoryTiers — total tier count across all defs in one category.
-function _countCategoryTiers(defs) {
-    return defs.reduce((sum, def) => sum + def.tiers.length, 0);
 }
 
 // _countCategoryUnlocked — total unlocked tier count across all defs in one category.
 function _countCategoryUnlocked(defs) {
     return defs.reduce((sum, def) =>
-        sum + def.tiers.filter((_, ti) =>
-            ACH_STATE.unlocked.includes(`${def.id}__${ti}`)
-        ).length
+        sum + def.tiers.filter((_, ti) => _isTierUnlocked(def, ti)).length
         , 0);
 }
 
@@ -184,21 +206,6 @@ function _groupDefsByCategory() {
 //------------------ACHIEVEMENT SCREEN — CARD HELPERS---------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-
-// _isTierUnlocked — returns true if the given tier index of a def has been earned.
-function _isTierUnlocked(def, tierIndex) {
-    return ACH_STATE.unlocked.includes(`${def.id}__${tierIndex}`);
-}
-
-// _getHighestUnlockedTierIndex — returns the index of the highest earned tier,
-//   or -1 if no tier has been unlocked yet.
-function _getHighestUnlockedTierIndex(def) {
-    let highest = -1;
-    def.tiers.forEach((_, ti) => {
-        if (_isTierUnlocked(def, ti)) highest = ti;
-    });
-    return highest;
-}
 
 // _getCardClass — returns the CSS class string for a card based on its earned state.
 function _getCardClass(highestUnlocked, isComplete) {

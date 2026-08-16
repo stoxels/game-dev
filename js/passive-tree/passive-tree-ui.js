@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------
-//----------------------------DOM REFERENCES------------------------------
+//----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -16,6 +16,24 @@ let _pt_tooltip = null;  // floating tooltip <div> that lives in document.body
 // used by style helpers and search to avoid repeated DOM queries.
 let _pt_nodeEls = {};   // skill id  →  node <div>
 let _pt_connEls = {};   // conn id   →  SVG <line>
+
+// NOTE: _pt_mouseDownTime and _pt_eventsBound are also part of this module's
+// state but are declared in the canvas pan/zoom handler file, not here.
+
+
+
+
+//------------------------------------------------------------------------
+//-------------------------LOCALIZATION HELPER-----------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Picks between an English and German string based on the current language
+// code. Centralises the `lang === 'de' ? de : en` pattern used all over
+// the tooltip, search bar, and empty-state copy.
+function _ptPickLang(lang, en, de) {
+    return lang === 'de' ? de : en;
+}
 
 
 
@@ -179,14 +197,14 @@ function _ptRefreshAllStyles() {
 
 // Builds the localised display name for a node.
 function _ptTooltipResolveName(skill, def, lang) {
-    if (def) return lang === 'de' ? (def.nameDe || def.nameEn) : def.nameEn;
+    if (def) return _ptPickLang(lang, def.nameEn, def.nameDe || def.nameEn);
     return skill ? skill.name : `Skill ${skill?.id}`;
 }
 
 // Builds the localised description string (newlines → <br>).
 function _ptTooltipResolveDesc(def, lang) {
     if (!def) return '';
-    const raw = lang === 'de' ? (def.descDe || def.descEn) : def.descEn;
+    const raw = _ptPickLang(lang, def.descEn, def.descDe || def.descEn);
     return raw ? raw.replace(/\n/g, '<br>') : '';
 }
 
@@ -196,21 +214,23 @@ function _ptTooltipBuildStatusHtml(id, state, lang) {
     if (state === 'allocated') {
         const canRemove = _ptIsDeallocatable(id);
         const color = canRemove ? '#6dbf40' : '#888';
-        const textDe = canRemove ? '✓ Aktiv — Klicken zum Entfernen' : '✓ Aktiv — Kann nicht entfernt werden';
-        const textEn = canRemove ? '✓ Active — Click to remove' : '✓ Active — Cannot be removed';
-        return `<div style="margin-top:7px;font-size:11px;color:${color};">${lang === 'de' ? textDe : textEn}</div>`;
+        const text = canRemove
+            ? _ptPickLang(lang, '✓ Active — Click to remove', '✓ Aktiv — Klicken zum Entfernen')
+            : _ptPickLang(lang, '✓ Active — Cannot be removed', '✓ Aktiv — Kann nicht entfernt werden');
+        return `<div style="margin-top:7px;font-size:11px;color:${color};">${text}</div>`;
     }
 
     if (state === 'unlockable') {
         const noPoints = _ptPoints() < 1;
         const color = noPoints ? '#c08030' : '#b89a50';
-        const textDe = noPoints ? '⚠ Keine Punkte verfügbar' : '▶ Klicken zum Freischalten';
-        const textEn = noPoints ? '⚠ No points available' : '▶ Click to unlock';
-        return `<div style="margin-top:7px;font-size:11px;color:${color};">${lang === 'de' ? textDe : textEn}</div>`;
+        const text = noPoints
+            ? _ptPickLang(lang, '⚠ No points available', '⚠ Keine Punkte verfügbar')
+            : _ptPickLang(lang, '▶ Click to unlock', '▶ Klicken zum Freischalten');
+        return `<div style="margin-top:7px;font-size:11px;color:${color};">${text}</div>`;
     }
 
     // locked
-    const lockedText = lang === 'de' ? '🔒 Gesperrt' : '🔒 Locked';
+    const lockedText = _ptPickLang(lang, '🔒 Locked', '🔒 Gesperrt');
     return `<div style="margin-top:7px;font-size:11px;color:#555;">${lockedText}</div>`;
 }
 
@@ -307,7 +327,7 @@ function _ptHideTooltip() {
 
 
 //------------------------------------------------------------------------
-//-------------------------BOUNDING BOX-----------------------------------
+//-------------------BOUNDING BOX & LAYOUT HELPERS-------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -328,6 +348,16 @@ function _ptGetBounds() {
     });
 
     return { minX, minY, maxX, maxY };
+}
+
+// Converts skill-space bounds into the pixel offset needed to translate
+// node/connection coordinates into the padded world <div>. Shared by
+// _ptDrawConnections and _ptDrawNodes so both always agree on placement.
+function _ptComputeOffsets(bounds) {
+    return {
+        offsetX: PT_PADDING + PT_NODE_RADIUS - bounds.minX,
+        offsetY: PT_PADDING + PT_NODE_RADIUS - bounds.minY,
+    };
 }
 
 
@@ -362,8 +392,7 @@ function _ptDrawConnection(conn, offsetX, offsetY) {
 
 // Iterates over all connections and draws each one.
 function _ptDrawConnections(bounds) {
-    const offsetX = PT_PADDING + PT_NODE_RADIUS - bounds.minX;
-    const offsetY = PT_PADDING + PT_NODE_RADIUS - bounds.minY;
+    const { offsetX, offsetY } = _ptComputeOffsets(bounds);
     _pt_conns.forEach(conn => _ptDrawConnection(conn, offsetX, offsetY));
 }
 
@@ -528,6 +557,7 @@ function _ptBindNodeEvents(node, skill, isKeystone) {
 
     // Record the timestamp on mousedown so the click handler can distinguish
     // a genuine click from the end of a canvas pan gesture.
+    // (_pt_mouseDownTime is declared in the canvas pan-handling file.)
     node.addEventListener('mousedown', () => {
         _pt_mouseDownTime = Date.now();
     });
@@ -580,159 +610,8 @@ function _ptDrawNode(skill, offsetX, offsetY) {
 
 // Iterates over all skills and draws each one.
 function _ptDrawNodes(bounds) {
-    const offsetX = PT_PADDING + PT_NODE_RADIUS - bounds.minX;
-    const offsetY = PT_PADDING + PT_NODE_RADIUS - bounds.minY;
+    const { offsetX, offsetY } = _ptComputeOffsets(bounds);
     _pt_skills.forEach(skill => _ptDrawNode(skill, offsetX, offsetY));
-}
-
-
-
-
-//------------------------------------------------------------------------
-//-----------------------------RENDERER-----------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Resets all module-level DOM state so a clean render can begin.
-// The old container element is cloned (without event listeners) and swapped
-// back into the DOM so that listeners added by _ptBindEvents() do not pile up.
-function _ptResetRenderState() {
-    const old = document.getElementById('pt-canvas');
-    if (!old) { console.error('[PassiveTree] #pt-canvas not found'); return null; }
-
-    _pt_container = old.cloneNode(false);
-    old.parentNode.replaceChild(_pt_container, old);
-
-    _pt_nodeEls = {};
-    _pt_connEls = {};
-    _pt_eventsBound = false;
-
-    // Remove any leftover tooltip from a previous render
-    if (_pt_tooltip) { _pt_tooltip.remove(); _pt_tooltip = null; }
-
-    _pt_container.innerHTML = '';
-    _pt_container.style.cssText += `
-        position: relative;
-        overflow: hidden;
-        cursor: grab;
-        user-select: none;
-    `;
-
-    return _pt_container;
-}
-
-// Renders an error / empty state when the skill list failed to load.
-function _ptRenderEmptyState() {
-    const msg = _ptLang() === 'de'
-        ? 'BAUM KONNTE NICHT GELADEN WERDEN'
-        : 'TREE COULD NOT BE LOADED';
-
-    _pt_container.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;
-            justify-content:center;height:100%;gap:18px;opacity:0.55;">
-            <div style="font-family:var(--PX,monospace);font-size:13px;
-                color:var(--accent2,#aaa);letter-spacing:2px;text-align:center;">
-                ${msg}
-            </div>
-        </div>`;
-}
-
-// Creates the world <div> that is panned/zoomed via CSS transform.
-function _ptCreateWorldDiv(worldW, worldH) {
-    const world = document.createElement('div');
-    world.id = 'pt-world';
-    world.style.cssText = `
-        position: absolute;
-        top: 0; left: 0;
-        width:  ${worldW}px;
-        height: ${worldH}px;
-        transform-origin: 0 0;
-        will-change: transform;
-    `;
-    return world;
-}
-
-// Creates the SVG overlay that all connection <line> elements live in.
-function _ptCreateSvgOverlay(worldW, worldH) {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.style.cssText = `
-        position: absolute;
-        top: 0; left: 0;
-        width:  ${worldW}px;
-        height: ${worldH}px;
-        overflow: visible;
-        pointer-events: none;
-    `;
-    svg.setAttribute('width', worldW);
-    svg.setAttribute('height', worldH);
-    return svg;
-}
-
-// Creates the <div> layer that node elements are placed into.
-function _ptCreateNodesLayer(worldW, worldH) {
-    const layer = document.createElement('div');
-    layer.style.cssText = `
-        position: absolute;
-        top: 0; left: 0;
-        width:  ${worldW}px;
-        height: ${worldH}px;
-    `;
-    return layer;
-}
-
-// Injects search bar DOM children into the pre-existing #pt-search-wrap
-// placeholder element in the topbar.  Only runs when the wrap is empty, so
-// re-renders do not duplicate the search input.
-function _ptInjectSearchBar() {
-    const existingWrap = document.getElementById('pt-search-wrap');
-    if (!existingWrap || existingWrap.hasChildNodes()) return;
-
-    const searchBar = _ptCreateSearchBar();
-    // Move children rather than replacing the element so external CSS rules
-    // targeting #pt-search-wrap continue to apply.
-    while (searchBar.firstChild) {
-        existingWrap.appendChild(searchBar.firstChild);
-    }
-    existingWrap.style.cssText = searchBar.style.cssText;
-}
-
-// Main render entry point.  Tears down any existing tree and rebuilds it
-// from scratch using the current _pt_skills / _pt_conns data.
-function _ptRender() {
-    if (!_ptResetRenderState()) return;
-
-    // Nothing to show — display a friendly error message instead
-    if (!_pt_skills.length) {
-        _ptRenderEmptyState();
-        return;
-    }
-
-    _ptBuildAdjacency();
-
-    // Guarantee the start node is always allocated on (re)load
-    const allocOnLoad = _ptAllocated();
-    if (!allocOnLoad.has(PT_START_ID)) allocOnLoad.add(PT_START_ID);
-
-    // Size the world to fit all node positions plus padding
-    const bounds = _ptGetBounds();
-    const worldW = bounds.maxX - bounds.minX + (PT_PADDING + PT_NODE_RADIUS) * 2;
-    const worldH = bounds.maxY - bounds.minY + (PT_PADDING + PT_NODE_RADIUS) * 2;
-
-    // Build the layer stack: world → svg + nodesLayer
-    _pt_world = _ptCreateWorldDiv(worldW, worldH);
-    _pt_svg = _ptCreateSvgOverlay(worldW, worldH);
-    _pt_nodesLayer = _ptCreateNodesLayer(worldW, worldH);
-
-    _pt_world.appendChild(_pt_svg);
-    _pt_world.appendChild(_pt_nodesLayer);
-    _pt_container.appendChild(_pt_world);
-
-    _ptDrawConnections(bounds);
-    _ptDrawNodes(bounds);
-    _ptRefreshAllStyles();
-    _ptFitToView(bounds);
-    _ptBindEvents();
-    _ptInjectSearchBar();
 }
 
 
@@ -847,7 +726,7 @@ function _ptCreateSearchBar() {
     const input = document.createElement('input');
     input.id = 'pt-search-input';
     input.type = 'text';
-    input.placeholder = _ptLang() === 'de' ? 'Knoten suchen…' : 'Search nodes…';
+    input.placeholder = _ptPickLang(_ptLang(), 'Search nodes…', 'Knoten suchen…');
     input.style.cssText = `
         background: transparent;
         border: none;
@@ -896,4 +775,152 @@ function _ptCreateSearchBar() {
     wrap.appendChild(input);
     wrap.appendChild(clearBtn);
     return wrap;
+}
+
+
+
+
+//------------------------------------------------------------------------
+//-----------------------------RENDERER-----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Resets all module-level DOM state so a clean render can begin.
+// The old container element is cloned (without event listeners) and swapped
+// back into the DOM so that listeners added by _ptBindEvents() do not pile up.
+function _ptResetRenderState() {
+    const old = document.getElementById('pt-canvas');
+    if (!old) { console.error('[PassiveTree] #pt-canvas not found'); return null; }
+
+    _pt_container = old.cloneNode(false);
+    old.parentNode.replaceChild(_pt_container, old);
+
+    _pt_nodeEls = {};
+    _pt_connEls = {};
+    _pt_eventsBound = false;  // declared in the canvas pan-handling file
+
+    // Remove any leftover tooltip from a previous render
+    if (_pt_tooltip) { _pt_tooltip.remove(); _pt_tooltip = null; }
+
+    _pt_container.innerHTML = '';
+    _pt_container.style.cssText += `
+        position: relative;
+        overflow: hidden;
+        cursor: grab;
+        user-select: none;
+    `;
+
+    return _pt_container;
+}
+
+// Renders an error / empty state when the skill list failed to load.
+function _ptRenderEmptyState() {
+    const msg = _ptPickLang(_ptLang(), 'TREE COULD NOT BE LOADED', 'BAUM KONNTE NICHT GELADEN WERDEN');
+
+    _pt_container.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;
+            justify-content:center;height:100%;gap:18px;opacity:0.55;">
+            <div style="font-family:var(--PX,monospace);font-size:13px;
+                color:var(--accent2,#aaa);letter-spacing:2px;text-align:center;">
+                ${msg}
+            </div>
+        </div>`;
+}
+
+// Creates the world <div> that is panned/zoomed via CSS transform.
+function _ptCreateWorldDiv(worldW, worldH) {
+    const world = document.createElement('div');
+    world.id = 'pt-world';
+    world.style.cssText = `
+        position: absolute;
+        top: 0; left: 0;
+        width:  ${worldW}px;
+        height: ${worldH}px;
+        transform-origin: 0 0;
+        will-change: transform;
+    `;
+    return world;
+}
+
+// Creates the SVG overlay that all connection <line> elements live in.
+function _ptCreateSvgOverlay(worldW, worldH) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.style.cssText = `
+        position: absolute;
+        top: 0; left: 0;
+        width:  ${worldW}px;
+        height: ${worldH}px;
+        overflow: visible;
+        pointer-events: none;
+    `;
+    svg.setAttribute('width', worldW);
+    svg.setAttribute('height', worldH);
+    return svg;
+}
+
+// Creates the <div> layer that node elements are placed into.
+function _ptCreateNodesLayer(worldW, worldH) {
+    const layer = document.createElement('div');
+    layer.style.cssText = `
+        position: absolute;
+        top: 0; left: 0;
+        width:  ${worldW}px;
+        height: ${worldH}px;
+    `;
+    return layer;
+}
+
+// Injects search bar DOM children into the pre-existing #pt-search-wrap
+// placeholder element in the topbar.  Only runs when the wrap is empty, so
+// re-renders do not duplicate the search input.
+function _ptInjectSearchBar() {
+    const existingWrap = document.getElementById('pt-search-wrap');
+    if (!existingWrap || existingWrap.hasChildNodes()) return;
+
+    const searchBar = _ptCreateSearchBar();
+    // Move children rather than replacing the element so external CSS rules
+    // targeting #pt-search-wrap continue to apply.
+    while (searchBar.firstChild) {
+        existingWrap.appendChild(searchBar.firstChild);
+    }
+    existingWrap.style.cssText = searchBar.style.cssText;
+}
+
+// Main render entry point.  Tears down any existing tree and rebuilds it
+// from scratch using the current _pt_skills / _pt_conns data.
+function _ptRender() {
+    if (!_ptResetRenderState()) return;
+
+    // Nothing to show — display a friendly error message instead
+    if (!_pt_skills.length) {
+        _ptRenderEmptyState();
+        return;
+    }
+
+    _ptBuildAdjacency();
+
+    // Guarantee the start node is always allocated on (re)load
+    const allocOnLoad = _ptAllocated();
+    if (!allocOnLoad.has(PT_START_ID)) allocOnLoad.add(PT_START_ID);
+
+    // Size the world to fit all node positions plus padding
+    const bounds = _ptGetBounds();
+    const worldW = bounds.maxX - bounds.minX + (PT_PADDING + PT_NODE_RADIUS) * 2;
+    const worldH = bounds.maxY - bounds.minY + (PT_PADDING + PT_NODE_RADIUS) * 2;
+
+    // Build the layer stack: world → svg + nodesLayer
+    _pt_world = _ptCreateWorldDiv(worldW, worldH);
+    _pt_svg = _ptCreateSvgOverlay(worldW, worldH);
+    _pt_nodesLayer = _ptCreateNodesLayer(worldW, worldH);
+
+    _pt_world.appendChild(_pt_svg);
+    _pt_world.appendChild(_pt_nodesLayer);
+    _pt_container.appendChild(_pt_world);
+
+    _ptDrawConnections(bounds);
+    _ptDrawNodes(bounds);
+    _ptRefreshAllStyles();
+    _ptFitToView(bounds);
+    _ptBindEvents();
+    _ptInjectSearchBar();
 }
