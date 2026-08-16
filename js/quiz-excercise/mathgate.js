@@ -276,6 +276,7 @@ function mgResetModalInputState() {
 
     document.getElementById('mg-why-btn').style.display = 'none';
     document.getElementById('mg-explain').style.display = 'none';
+    document.getElementById('mg-continue-btn').style.display = 'none';
 }
 
 // Injects the character portrait medallion into the modal box, styled with
@@ -435,6 +436,13 @@ function mgRefreshTutorButton() {
     }
 }
 
+// called by the mg-continue-btn click.
+function mgContinueToLevel() {
+    const gi = pendingGateGi;
+    hideMathGate();
+    startLevel(gi);
+}
+
 // Handles the outcome where the tutor successfully solves the question.
 // Marks the gate as passed, disables the submit button, then launches
 // the level after a short celebration delay.
@@ -450,7 +458,8 @@ function mgHandleTutorSuccess() {
     mgMarkGatePassed(gi);
     questStat_tutorAnsweredCorrect();
 
-    setTimeout(() => { hideMathGate(); startLevel(gi); }, 1200);
+    _mgRefreshWhyButton();
+    document.getElementById('mg-continue-btn').style.display = 'inline-block'; // was: setTimeout(...)
 }
 
 // Handles the outcome where the tutor fails to solve the question.
@@ -622,13 +631,14 @@ function mgHandleCorrectAnswer() {
 
     const isFirstPass = !isMathGatePassed(gi);
     if (isFirstPass) {
-        mgGrantGateReward(gi);  // also shows feedback
+        mgGrantGateReward(gi);
     } else {
         showMgFeedback(t('mg_correct'), true);
     }
 
     mgMarkGatePassed(gi);
     document.getElementById('mg-submit-btn').disabled = true;
+    document.getElementById('mg-tutor-btn').style.display = 'none';
 
     trackAchStat('questionsCorrect');
     updateQuestStats('questionCorrect', { source: 'gate' });
@@ -639,11 +649,7 @@ function mgHandleCorrectAnswer() {
     if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
 
     _mgRefreshWhyButton();
-
-    setTimeout(() => {
-        hideMathGate();
-        startLevel(gi);
-    }, 1500);
+    document.getElementById('mg-continue-btn').style.display = 'inline-block'; 
 }
 
 
@@ -700,7 +706,6 @@ function mgHandleWrongAnswer() {
     if (gateAttempts >= MG_NEW_QUESTION_THRESHOLD) mgShowNewQuestionButton();
 
     Audio_Manager.playSFX('quizWrong');
-    _mgRefreshWhyButton();
 }
 
 

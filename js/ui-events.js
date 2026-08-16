@@ -389,6 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('mg-submit-btn', () => submitMathGate());
     onClick('mg-tutor-btn', () => mgUseTutor());
     onClick('mg-new-q-btn', () => mgNewQuestion());
+    onClick('mg-continue-btn', () => mgContinueToLevel());
 
     // Allow the player to submit their math gate answer by pressing Enter,
     // in addition to clicking the submit button.

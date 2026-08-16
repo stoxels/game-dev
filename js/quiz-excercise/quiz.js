@@ -400,16 +400,14 @@ function _quizRollMcBonusItemReward() {
 // the overlay controls to reflect the answered state.
 function _resolveQuizAnswer(correct) {
     quizAnsweredCorrectly = correct;
-
+    document.getElementById('quiz-tutor-btn').style.display = 'none';
     const resEl = document.getElementById('quiz-result');
     const isInterstitial = typeof window._egInterstitialDone === 'function';
     const quizAlreadyClaimed = STATE.bonusDone.includes(cur.gIdx);
-
     if (correct) {
         Audio_Manager.playSFX('quizCorrect');
         trackAchStat('questionsCorrect');
         updateQuestStats('questionCorrect', { source: 'quiz' });
-
         // Count toward map objectives
         if (isInterstitial) {
             if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
@@ -428,9 +426,8 @@ function _resolveQuizAnswer(correct) {
         resEl.textContent = t('quiz_wrong');
         Audio_Manager.playSFX('quizWrong');
     }
-
     document.getElementById('quiz-continue').style.display = 'flex';
-    document.getElementById('btn-skip-quiz').style.display = correct ? 'none' : 'flex';
+    document.getElementById('btn-skip-quiz').style.display = 'none';
     _quizRefreshWhyButton();
 }
 

@@ -100,9 +100,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 0;
-    /* No background — the panel image provides the dark board */
+    justify-content: flex-start; /* was: space-between */
+    gap: 1.5%;
+    padding-bottom: 14%; /* reserve room so content doesn't sit under the footer */
 }
 
 
@@ -345,6 +345,10 @@
    ============================================================ */
 
 .qr-footer {
+    position: absolute; /* now independent of content height above it */
+    left: 50%;
+    bottom: -27%;
+    transform: translateX(-50%);
     display: flex;
     gap: 3%;
     justify-content: center;
@@ -499,4 +503,6 @@
     margin: 0 auto 4px;
     flex-shrink: 0;
     display: none;
+    max-height: 18%;
+    overflow-y: auto;
 }

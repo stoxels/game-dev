@@ -29,6 +29,8 @@ const CHANGELOG_DATA = [
                     "If you have enough Score to unlock a new Code but insufficient Achievement Points, then previously a Modal Popup occured after every single solved Stoxel. This now only happens after Game Setup and before Level Selection, so once per play session.",
                     "Adjusting the sound effect volume now plays a random sound effect so the adjustment is instantly noticeable",
                     "Alot of internal code has been refactored and improved.",
+                    "Quiz and Excercise buttons have been vertically repositionioed.",
+                    
                 ],
 
             },
@@ -38,6 +40,7 @@ const CHANGELOG_DATA = [
                     "Fixed some typos",
                     "Potentially fixed a bug that made using The Witch item not consume the item and not count towards associated achievements.",
                     "Fixed a bug that made the 'Select Levels' button in the Convergence Modal launch the next Level instead of bringing the player back to the Level Selection screen.",
+                    "Fixed a bug that made the Skip Button remain on the screen after answering a quiz or excercise question.",
                 ],
 
             },
