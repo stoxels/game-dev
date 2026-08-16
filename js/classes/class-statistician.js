@@ -1051,6 +1051,12 @@ function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
             : `⚔️ Diagonal Strike! ${diagRevealed} ${label} revealed.`;
 
         showToast(msg);
+    } else {
+        const msg = (LANG === 'de')
+            ? `⚔️ Diagonal-Schlag! Nichts Neues gefunden.`
+            : `⚔️ Diagonal Strike! Nothing new found.`;
+
+        showToast(msg);
     }
 
     // --- god_of_statistics: 50% chance to fire a bonus repeat strike ---

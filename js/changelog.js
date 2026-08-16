@@ -35,6 +35,7 @@ const CHANGELOG_DATA = [
                     "Alot of internal code has been refactored and improved.",
                     "Quiz and Excercise buttons have been vertically repositionioed.",
                     "The Drag Counter now counts cells that are item or skill revealed aswell.",
+                    "Diagonal Strike now also shows a message when no correct cell has been revealed.",
 
 
                     
