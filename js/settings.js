@@ -13,8 +13,10 @@ const SETTINGS_DEFAULTS = {
     sfxEnabled: true,
     sfxVolume: 0.7,   // 0–1 float, mapped to 0–100% in the UI
     axisLock: true,
+    protectMarkedCells: true,
     questionMark: false,
     touchpadModeEnabled: false,
+
 };
 
 // Describes every toggle control in the settings modal.
@@ -23,6 +25,7 @@ const TOGGLE_CONFIGS = [
     { key: 'bgmEnabled', btnId: 'stt-bgm' },
     { key: 'sfxEnabled', btnId: 'stt-sfx' },
     { key: 'axisLock', btnId: 'stt-axis' },
+    { key: 'protectMarkedCells', btnId: 'stt-protectmarks' },
     { key: 'questionMark', btnId: 'stt-qmark' },
     { key: 'touchpadModeEnabled', btnId: 'stt-touchpad' },
 ];
@@ -182,8 +185,10 @@ function initSettingsControls() {
     initToggleControl('stt-bgm', 'bgmEnabled');
     initToggleControl('stt-sfx', 'sfxEnabled');
     initToggleControl('stt-axis', 'axisLock');
+    initToggleControl('stt-protectmarks', 'protectMarkedCells', false);
     initToggleControl('stt-qmark', 'questionMark', false);
     initToggleControl('stt-touchpad', 'touchpadModeEnabled');
+
 
     // Volume sliders
     initSliderControl('sld-bgm', 'val-bgm', 'bgmVolume');

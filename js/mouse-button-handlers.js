@@ -171,11 +171,26 @@ function isEraseOnRevealedCell(row, col) {
     return revealedGrid[row][col] && pval === 0;
 }
 
+// No-op: cannot erase a cell that was revealed by an item.
+function isEraseOnRevealedCell(row, col) {
+    return revealedGrid[row][col] && pval === 0;
+}
+
+// No-op: with "Protect Marked Cells" enabled, a fill stroke (single click
+// or drag-paint) cannot paint over a cell currently marked with ✕ — whether
+// the player marked it themselves or it was marked by an item, passive, or
+// ability effect (both share userGrid state 2; systemMarkedGrid only affects
+// styling, not this check).
+function isPaintingOverMarkedCell(row, col) {
+    return SETTINGS.protectMarkedCells && pval === 1 && userGrid[row][col] === 2;
+}
+
 // Runs all cell guards. Returns true if the click should be ignored.
 function checkCellGuards(row, col) {
     if (isCellAlreadyDesiredValue(row, col)) return true;
     if (isRightClickOnCorrectCell(row, col)) return true;
     if (isEraseOnRevealedCell(row, col)) return true;
+    if (isPaintingOverMarkedCell(row, col)) return true;   
     return false;
 }
 

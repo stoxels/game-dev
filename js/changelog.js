@@ -32,6 +32,7 @@ const CHANGELOG_DATA = [
                     "Quiz and Excercise buttons have been vertically repositionioed.",
                     "The Drag Counter now counts cells that are item or skill revealed aswell.",
                     "Red Cross Marks created by passives, abilities, items and other effects are now visually distinct from manually placed cross marks",
+                    "Added a new Setting option: You can now disable left-click behaviour on cells that have been marked as incorrect (by a manual right click or by items, passives and abilities).",
                     
                 ],
 
