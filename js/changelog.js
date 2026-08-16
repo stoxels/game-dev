@@ -48,6 +48,7 @@ const CHANGELOG_DATA = [
                     "Fixed a bug that made the 'Select Levels' button in the Convergence Modal launch the next Level instead of bringing the player back to the Level Selection screen.",
                     "Fixed a bug that made the Skip Button remain on the screen after answering a quiz or excercise question.",
                     "Fixed a bug that made sprites keep walking after selecting a level or when returning from a puzzle back to the level selection screen using the Levels button.",
+                    "Fixed a bug that made the shield effect around the grid not properly reposition when clicking the Clues button to move row clue numbers to the other side",
                 ],
 
             },

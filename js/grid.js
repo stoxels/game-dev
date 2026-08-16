@@ -347,6 +347,10 @@ function _toggleRowCluesSide() {
         });
         if (btn) btn.textContent = 'CLUES ▶';
     }
+
+    // Keep the shield border (if active) aligned with the grid's new position
+    const border = document.getElementById('fx-shield-border');
+    if (border?._reposition) border._reposition();
 }
 
 
