@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run once on load to register all close buttons present in the HTML.
     bindModalCloseButtons();
 
+    onClick('btn-pause-settings', () => { loadSettingsUI(); showModal('settings-modal'); });
 
     //------------------------------------------------------------------------
     //-------------------TITLE SCREEN-----------------------------------------

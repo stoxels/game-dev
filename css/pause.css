@@ -26,3 +26,26 @@
     color: rgba(255, 255, 255, 0.45);
     letter-spacing: 0.1em;
 }
+
+/* Settings button on the pause overlay */
+#btn-pause-settings {
+    margin-top: 8px;
+    padding: 10px 22px;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+}
+
+    #btn-pause-settings:hover {
+        background: rgba(255, 255, 255, 0.18);
+    }
+
+/* Make sure the settings modal renders ABOVE the pause overlay
+   when opened from the pause screen (pause overlay is z-index 9999) */
+#settings-modal.show {
+    z-index: 10000;
+}
