@@ -12,14 +12,31 @@ function switchScreen(id) {
 
 
 //------------------------------------------------------------------------
+//-------------------MODAL HELPER FUNCTIONS-------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Shows a modal overlay by its element ID
+function showModal(id) {
+    document.getElementById(id).classList.add('show');
+}
+
+// Hides a modal overlay by its element ID
+function hideModal(id) {
+    document.getElementById(id).classList.remove('show');
+}
+
+
+
+//------------------------------------------------------------------------
 //------------------------OVERLAY UTILITIES-------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Hides both the win and lose result overlays.
 function hideResultOverlays() {
-    document.getElementById('ov-win').classList.remove('show');
-    document.getElementById('ov-lose').classList.remove('show');
+    hideModal('ov-win');
+    hideModal('ov-lose');
 }
 
 
@@ -40,8 +57,7 @@ function showConvergenceModal() {
 
 // Hides the convergence modal.
 function hideConvergenceModal() {
-    const modal = document.getElementById('convergence-modal');
-    if (modal) modal.classList.remove('show');
+    hideModal('convergence-modal');
 }
 
 // Builds a button handler that closes the convergence modal,
@@ -117,7 +133,7 @@ function showSetup() {
     screenHistory.push('screen-title');
     updDiffDesc();
     updModDesc();
-    _updateSetupScreenCharacter();   
+    _updateSetupScreenCharacter();
     switchScreen('screen-setup');
 }
 
@@ -154,6 +170,12 @@ function launchAdventureMode() {
     if (typeof showAdventureMode === 'function') {
         showAdventureMode();
     }
+}
+
+// Launches the endgame test hub (see endgame-screens.js).
+function launchEndgameTestMode() {
+    screenHistory.push('screen-mode-select');
+    if (typeof showEndgameTestHub === 'function') showEndgameTestHub();
 }
 
 // Closes any overlays and active quiz, then navigates to the level select screen.
@@ -254,26 +276,4 @@ function replayLevel() {
     const proceed = () => startLevel(currentIndex);
 
     _maybeShowConvergenceModal(_buildPostConvergenceCallback(proceed));
-}
-
-//------------------------------------------------------------------------
-//-------------------MODAL HELPER FUNCTIONS-------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Shows a modal overlay by its element ID
-function showModal(id) {
-    document.getElementById(id).classList.add('show');
-}
-
-// Hides a modal overlay by its element ID
-function hideModal(id) {
-    document.getElementById(id).classList.remove('show');
-}
-
-
-
-function launchEndgameTestMode() {
-    screenHistory.push('screen-mode-select');
-    if (typeof showEndgameTestHub === 'function') showEndgameTestHub();
 }

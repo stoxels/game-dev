@@ -8,7 +8,7 @@
 
 
 //------------------------------------------------------------------------
-//-------------------MODULE-LEVEL STATE-----------------------------------
+//-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
 
 // The active question object while the quiz overlay is open.
@@ -17,6 +17,15 @@ let currentQuizQuestion = null;
 
 // Timer handle for the (currently disabled) auto-finish countdown.
 let _quizAutoFinishTimer = null;
+
+// How many recently-shown questions to avoid repeating, per world.
+const QUIZ_RECENT_HISTORY_SIZE = 10;
+
+// Tracks the last N raw question objects shown per world: { [world]: [raw, raw, ...] }
+const _quizRecentQuestions = {};
+
+// Inventory item ids for every Tutor tier, in priority order (lowest tier first).
+const TUTOR_ITEM_IDS2 = ['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll'];
 
 
 //------------------------------------------------------------------------
@@ -76,7 +85,7 @@ function _quizCalcTutorNoConsumeChance() {
 
 
 //------------------------------------------------------------------------
-//-------------------QUESTION POOL HELPERS--------------------------------
+//-------------------QUESTION POOL & SELECTION-----------------------------
 //------------------------------------------------------------------------
 
 // Builds a flat pool from the world-specific MC pool (BONUS_QUIZ_POOLS)
@@ -107,8 +116,8 @@ function _quizBuildInputQuestion(raw) {
         unit: raw.unit || '',
         hintEn: raw.hintEn || '',
         hintDE: raw.hintDE || '',
-        explain: raw.explain || '',       
-        explainDE: raw.explainDE || '',   
+        explain: raw.explain || '',
+        explainDE: raw.explainDE || '',
     };
 }
 
@@ -125,22 +134,10 @@ function _quizBuildMcQuestion(raw) {
         type: 'mc',
         q,
         opts: optsWithFlag,
-        explain: raw.explain || '',      
-        explainDE: raw.explainDE || '',  
+        explain: raw.explain || '',
+        explainDE: raw.explainDE || '',
     };
 }
-
-
-//------------------------------------------------------------------------
-//-------------------QUESTION SELECTION-----------------------------------
-//------------------------------------------------------------------------
-
-
-// How many recently-shown questions to avoid repeating, per world.
-const QUIZ_RECENT_HISTORY_SIZE = 10;
-
-// Tracks the last N raw question objects shown per world: { [world]: [raw, raw, ...] }
-const _quizRecentQuestions = {};
 
 // Records a raw question object as "recently shown" for its world.
 function _quizRecordShownQuestion(worldNum, rawQuestion) {
@@ -151,6 +148,8 @@ function _quizRecordShownQuestion(worldNum, rawQuestion) {
     }
 }
 
+// Picks a random question for the given world, avoiding recent repeats
+// where possible. Returns a normalised question object (MC or input).
 function getQuizQuestion(worldNum) {
     const pool = _quizBuildQuestionPool(worldNum);
 
@@ -190,32 +189,6 @@ function _quizResetOverlay() {
     document.getElementById('quiz-opts').innerHTML = '';
 }
 
-// Sets up the numeric-input row for an input-type question.
-function _quizShowInputRow(q) {
-    const inputRow = document.getElementById('quiz-input-row');
-    const inputEl = document.getElementById('quiz-input');
-    const unitEl = document.getElementById('quiz-input-unit');
-    const hintBox = document.getElementById('quiz-input-hint');
-    const submitBtn = document.getElementById('quiz-input-submit');
-
-    inputRow.style.display = 'flex';
-    inputEl.value = '';
-    inputEl.disabled = false;
-
-    unitEl.textContent = q.unit ? t(q.unit.toLowerCase()) : '';
-    unitEl.style.display = q.unit ? 'inline' : 'none';
-
-    hintBox.style.display = 'none';
-    hintBox.textContent = '';
-
-    // Allow submitting with the Enter key
-    inputEl.onkeydown = e => { if (e.key === 'Enter') answerQuizInput(); };
-
-    submitBtn.style.display = 'inline-block';
-    submitBtn.disabled = false;
-    submitBtn.onclick = answerQuizInput;
-}
-
 // Hides the numeric-input row (used when rendering an MC question).
 function _quizHideInputRow() {
     const inputRow = document.getElementById('quiz-input-row');
@@ -225,20 +198,6 @@ function _quizHideInputRow() {
 
     hintBox.style.display = 'none';
     hintBox.textContent = '';
-}
-
-// Builds the MC option buttons and appends them to the options container.
-function _quizRenderMcOptions(q) {
-    const optsEl = document.getElementById('quiz-opts');
-
-    q.opts.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-opt';
-        btn.textContent = opt.text;
-        if (opt.isCorrect) btn.dataset.isCorrect = '1';
-        btn.onclick = () => answerQuiz(opt.isCorrect, optsEl, btn);
-        optsEl.appendChild(btn);
-    });
 }
 
 // Called after the MC buttons have been rendered.
@@ -281,24 +240,6 @@ function _quizTryEliminateWrongAnswer() {
     wrongBtns.slice(0, toRemove).forEach(_quizEliminateButton);
 }
 
-
-
-
-// Shows/hides the "Tell me why" button depending on whether the current
-// question has an explanation available.
-function _quizRefreshWhyButton() {
-    const btn = document.getElementById('quiz-why-btn');
-    const box = document.getElementById('quiz-explain');
-    if (!btn) return;
-
-    box.style.display = 'none';
-    box.textContent = '';
-
-    const hasExplain = currentQuizQuestion && (currentQuizQuestion.explain || currentQuizQuestion.explainDE);
-    btn.style.display = hasExplain ? 'inline-block' : 'none';
-    btn.onclick = quizToggleExplain;
-}
-
 // Toggles the explanation text box open/closed.
 function quizToggleExplain() {
     if (!currentQuizQuestion) return;
@@ -316,165 +257,19 @@ function quizToggleExplain() {
     questStat_primerHintShown && questStat_primerHintShown(); // optional: reuse existing stat, or drop this line
 }
 
+// Shows/hides the "Tell me why" button depending on whether the current
+// question has an explanation available.
+function _quizRefreshWhyButton() {
+    const btn = document.getElementById('quiz-why-btn');
+    const box = document.getElementById('quiz-explain');
+    if (!btn) return;
 
+    box.style.display = 'none';
+    box.textContent = '';
 
-
-
-//------------------------------------------------------------------------
-//-------------------SHOW QUIZ (MAIN ENTRY POINT)-------------------------
-//------------------------------------------------------------------------
-
-function _quizInjectPortrait(overlayEl) {
-    // Remove stale portrait if it exists
-    const old = overlayEl.querySelector('.qr-portrait-wrap');
-    if (old) old.remove();
-
-    const imgSrc = (typeof _getPlayerCharacterImage === 'function')
-        ? _getPlayerCharacterImage()
-        : '';
-    if (!imgSrc) return;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'qr-portrait-wrap';
-    wrap.innerHTML = `
-        <div class="qr-portrait-medallion">
-            <img src="${imgSrc}" alt="character">
-        </div>
-        <div class="qr-portrait-ledge"></div>
-    `;
-
-    // The quiz-overlay is position:fixed; we need a relative inner container.
-    // Insert the portrait as the very first child so it sits above the content.
-    const inner = overlayEl.querySelector('.quiz-title');
-    if (inner) overlayEl.insertBefore(wrap, inner);
-    else overlayEl.prepend(wrap);
-
-    // Drive crack/accent colour from character
-    const charColors = {
-        stox: { accent: '#4fc3f7', glow: 'rgba(79,195,247,0.55)', crack: '#b06cff', crackGlow: 'rgba(176,108,255,0.6)' },
-        trix: { accent: '#ce93d8', glow: 'rgba(206,147,216,0.55)', crack: '#ce93d8', crackGlow: 'rgba(206,147,216,0.5)' },
-        syla: { accent: '#66bb6a', glow: 'rgba(102,187,106,0.55)', crack: '#26c6a6', crackGlow: 'rgba(38,198,166,0.5)' },
-    };
-    const c = charColors[STATE?.playerCharacter] || charColors.stox;
-    overlayEl.style.setProperty('--qr-accent', c.accent);
-    overlayEl.style.setProperty('--qr-accent-glow', c.glow);
-    const frame = overlayEl.querySelector('.qr-frame');
-    if (frame) {
-        frame.style.setProperty('--qr-crack', c.crack);
-        frame.style.setProperty('--qr-crack-glow', c.crackGlow);
-    }
-}
-
-
-// Opens the quiz overlay for the given world, drawing a random question
-// and setting up the correct input mode (MC or numeric input).
-// Called externally when the player triggers a quiz checkpoint.
-function showQuiz(worldNum) {
-    const q = getQuizQuestion(worldNum);
-    currentQuizQuestion = q;
-
-    document.getElementById('quiz-q').textContent = q.q;
-
-    _quizResetOverlay();
-
-    document.getElementById('quiz-why-btn').style.display = 'none';  
-    document.getElementById('quiz-explain').style.display = 'none';
-
-    if (q.type === 'input') {
-        _quizShowInputRow(q);
-        // Delay focus slightly so the overlay transition has time to complete
-        setTimeout(() => {
-            const inputEl = document.getElementById('quiz-input');
-            if (inputEl) inputEl.focus();
-        }, 120);
-    } else {
-        _quizHideInputRow();
-        _quizRenderMcOptions(q);
-        _quizTryEliminateWrongAnswer();
-    }
-
-    const overlayEl = document.getElementById('quiz-overlay');
-    overlayEl.classList.add('show');
-
-    // Inject character portrait
-    const portraitEl = document.getElementById('quiz-portrait');
-    if (portraitEl && typeof _getPlayerCharacterImage === 'function') {
-        portraitEl.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="">`;
-    }
-    _quizRefreshTutorButton();
-}
-
-
-//------------------------------------------------------------------------
-//-------------------ANSWER HANDLING--------------------------------------
-//------------------------------------------------------------------------
-// Two separate entry points: one for MC clicks, one for input submission.
-// Both resolve to _resolveQuizAnswer() once correctness is determined.
-//------------------------------------------------------------------------
-
-// Locks all MC buttons after the player's click, highlights the correct
-// answer (and the wrong click in red if applicable), then resolves.
-// Called directly from each MC option button's onclick handler.
-function answerQuiz(correct, optsEl, clickedBtn) {
-    // Lock all buttons immediately to prevent double-clicks
-    Array.from(optsEl.children).forEach(btn => btn.onclick = null);
-
-    // Reveal correct answer; also flag the wrong button the player clicked
-    Array.from(optsEl.children).forEach(btn => {
-        if (btn.dataset.isCorrect === '1') {
-            btn.classList.add('correct');
-        } else if (btn === clickedBtn && !correct) {
-            btn.classList.add('wrong');
-        }
-    });
-
-    _resolveQuizAnswer(correct);
-}
-
-// Reads and validates the numeric input, shows a hint on a wrong answer,
-// then resolves. Called from the submit button and the Enter-key handler.
-function answerQuizInput() {
-    if (!currentQuizQuestion || currentQuizQuestion.type !== 'input') return;
-
-    const inputEl = document.getElementById('quiz-input');
-    const resEl = document.getElementById('quiz-result');
-
-    // Normalise decimal separator so both '.' and ',' are accepted
-    const sanitised = (inputEl.value || '').trim().replace(',', '.');
-    const entered = parseFloat(sanitised);
-
-    if (isNaN(entered)) {
-        resEl.className = 'quiz-result bad';
-        resEl.textContent = LANG === 'de'
-            ? '⚠ Bitte eine Zahl eingeben.'
-            : '⚠ Please enter a number.';
-        return;
-    }
-
-    // Lock the input controls immediately
-    inputEl.disabled = true;
-    document.getElementById('quiz-input-submit').disabled = true;
-
-    const correct = Math.abs(entered - currentQuizQuestion.answer) <= currentQuizQuestion.tolerance;
-
-    if (!correct) {
-        _quizShowInputHint();
-    }
-
-    _resolveQuizAnswer(correct);
-}
-
-// Shows the localised hint text below the input field after a wrong answer.
-function _quizShowInputHint() {
-    const hint = (LANG === 'de' && currentQuizQuestion.hintDE)
-        ? currentQuizQuestion.hintDE
-        : currentQuizQuestion.hintEn;
-
-    if (!hint) return;
-
-    const hintBox = document.getElementById('quiz-input-hint');
-    hintBox.textContent = '💡 ' + hint;
-    hintBox.style.display = 'block';
+    const hasExplain = currentQuizQuestion && (currentQuizQuestion.explain || currentQuizQuestion.explainDE);
+    btn.style.display = hasExplain ? 'inline-block' : 'none';
+    btn.onclick = quizToggleExplain;
 }
 
 
@@ -641,58 +436,124 @@ function _resolveQuizAnswer(correct) {
 
 
 //------------------------------------------------------------------------
-//-------------------QUIZ LIFECYCLE---------------------------------------
+//-------------------ANSWER HANDLING--------------------------------------
+//------------------------------------------------------------------------
+// Two separate entry points: one for MC clicks, one for input submission.
+// Both resolve to _resolveQuizAnswer() once correctness is determined.
 //------------------------------------------------------------------------
 
-// Closes the overlay, runs post-quiz world checks, saves, and shows
-// the win overlay. Called from the "CONTINUE" button and (if re-enabled)
-// the auto-finish timer.
-function finishQuiz() {
-    // Endgame interstitial mode — hand control back to the chain, no win overlay.
-    if (typeof window._egInterstitialDone === 'function') {
-        const cb = window._egInterstitialDone;
-        closeQuiz();
-        cb();
-        return;
-    }
-    closeQuiz();
-    checkWorldCodes();
-    checkWorldCompletion();
-    save();
-    setTimeout(() => {
-        document.getElementById('ov-win').classList.add('show');
-        requestAnimationFrame(() => buildReveal());
-    }, 300);
+// Shows the localised hint text below the input field after a wrong answer.
+function _quizShowInputHint() {
+    const hint = (LANG === 'de' && currentQuizQuestion.hintDE)
+        ? currentQuizQuestion.hintDE
+        : currentQuizQuestion.hintEn;
+
+    if (!hint) return;
+
+    const hintBox = document.getElementById('quiz-input-hint');
+    hintBox.textContent = '💡 ' + hint;
+    hintBox.style.display = 'block';
 }
 
-// Called when the player clicks "SKIP" or presses Escape.
-// No points or items are awarded; shows the win overlay immediately.
-function skipQuiz() {
-    // Endgame interstitial mode — hand control back to the chain, no win overlay.
-    if (typeof window._egInterstitialDone === 'function') {
-        const cb = window._egInterstitialDone;
-        closeQuiz();
-        cb();
-        return;
-    }
-    closeQuiz();
-    setTimeout(() => {
-        document.getElementById('ov-win').classList.add('show');
-        requestAnimationFrame(() => buildReveal());
-    }, 300);
+// Locks all MC buttons after the player's click, highlights the correct
+// answer (and the wrong click in red if applicable), then resolves.
+// Called directly from each MC option button's onclick handler.
+function answerQuiz(correct, optsEl, clickedBtn) {
+    // Lock all buttons immediately to prevent double-clicks
+    Array.from(optsEl.children).forEach(btn => btn.onclick = null);
+
+    // Reveal correct answer; also flag the wrong button the player clicked
+    Array.from(optsEl.children).forEach(btn => {
+        if (btn.dataset.isCorrect === '1') {
+            btn.classList.add('correct');
+        } else if (btn === clickedBtn && !correct) {
+            btn.classList.add('wrong');
+        }
+    });
+
+    _resolveQuizAnswer(correct);
 }
 
-// Hides the quiz overlay and clears all active state.
-// Called by finishQuiz(), skipQuiz(), and the Escape handler in main.js.
-function closeQuiz() {
-    document.getElementById('quiz-overlay').classList.remove('show');
-    currentQuizQuestion = null;
+// Reads and validates the numeric input, shows a hint on a wrong answer,
+// then resolves. Called from the submit button and the Enter-key handler.
+function answerQuizInput() {
+    if (!currentQuizQuestion || currentQuizQuestion.type !== 'input') return;
 
-    // Cancel the auto-finish timer if the player clicked Continue manually
-    if (_quizAutoFinishTimer) {
-        clearTimeout(_quizAutoFinishTimer);
-        _quizAutoFinishTimer = null;
+    const inputEl = document.getElementById('quiz-input');
+    const resEl = document.getElementById('quiz-result');
+
+    // Normalise decimal separator so both '.' and ',' are accepted
+    const sanitised = (inputEl.value || '').trim().replace(',', '.');
+    const entered = parseFloat(sanitised);
+
+    if (isNaN(entered)) {
+        resEl.className = 'quiz-result bad';
+        resEl.textContent = LANG === 'de'
+            ? '⚠ Bitte eine Zahl eingeben.'
+            : '⚠ Please enter a number.';
+        return;
     }
+
+    // Lock the input controls immediately
+    inputEl.disabled = true;
+    document.getElementById('quiz-input-submit').disabled = true;
+
+    const correct = Math.abs(entered - currentQuizQuestion.answer) <= currentQuizQuestion.tolerance;
+
+    if (!correct) {
+        _quizShowInputHint();
+    }
+
+    _resolveQuizAnswer(correct);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------QUESTION RENDERING HELPERS----------------------------
+//------------------------------------------------------------------------
+// Wire the overlay's option buttons / input row to the answer handlers
+// above. Kept separate from OVERLAY DOM HELPERS since they depend on
+// answerQuiz() / answerQuizInput().
+//------------------------------------------------------------------------
+
+// Builds the MC option buttons and appends them to the options container.
+function _quizRenderMcOptions(q) {
+    const optsEl = document.getElementById('quiz-opts');
+
+    q.opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt';
+        btn.textContent = opt.text;
+        if (opt.isCorrect) btn.dataset.isCorrect = '1';
+        btn.onclick = () => answerQuiz(opt.isCorrect, optsEl, btn);
+        optsEl.appendChild(btn);
+    });
+}
+
+// Sets up the numeric-input row for an input-type question.
+function _quizShowInputRow(q) {
+    const inputRow = document.getElementById('quiz-input-row');
+    const inputEl = document.getElementById('quiz-input');
+    const unitEl = document.getElementById('quiz-input-unit');
+    const hintBox = document.getElementById('quiz-input-hint');
+    const submitBtn = document.getElementById('quiz-input-submit');
+
+    inputRow.style.display = 'flex';
+    inputEl.value = '';
+    inputEl.disabled = false;
+
+    unitEl.textContent = q.unit ? t(q.unit.toLowerCase()) : '';
+    unitEl.style.display = q.unit ? 'inline' : 'none';
+
+    hintBox.style.display = 'none';
+    hintBox.textContent = '';
+
+    // Allow submitting with the Enter key
+    inputEl.onkeydown = e => { if (e.key === 'Enter') answerQuizInput(); };
+
+    submitBtn.style.display = 'inline-block';
+    submitBtn.disabled = false;
+    submitBtn.onclick = answerQuizInput;
 }
 
 
@@ -707,25 +568,14 @@ function closeQuiz() {
 // Returns the first available Tutor item from inventory, checking all
 // tiers in priority order (lowest tier first).
 function _quizGetTutorItem() {
-    const TUTOR_TIER_ORDER = [
-        'mistakeEraser',
-        'mistakeEraser4',
-        'mistakeEraser6',
-        'mistakeEraserAll',
-    ];
-    return TUTOR_TIER_ORDER
+    return TUTOR_ITEM_IDS2
         .flatMap(id => STATE.inventory.filter(i => i.defId === id))
         .find(Boolean) ?? null;
 }
 
 // Counts all Tutor items across every tier in the player's inventory.
 function _quizCountTutorItems() {
-    return STATE.inventory.filter(i =>
-        i.defId === 'mistakeEraser' ||
-        i.defId === 'mistakeEraser4' ||
-        i.defId === 'mistakeEraser6' ||
-        i.defId === 'mistakeEraserAll'
-    ).length;
+    return STATE.inventory.filter(i => TUTOR_ITEM_IDS2.includes(i.defId)).length;
 }
 
 // Removes the given Tutor item from inventory and persists the change.
@@ -826,4 +676,149 @@ function quizUseTutor() {
     } else {
         _quizHandleTutorFail(resEl);
     }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------SHOW QUIZ (MAIN ENTRY POINT)-------------------------
+//------------------------------------------------------------------------
+
+// Injects the character-portrait medallion into the quiz overlay and
+// drives its accent/crack colours from the active character.
+// NOTE: not currently called anywhere in this file — see summary.
+function _quizInjectPortrait(overlayEl) {
+    // Remove stale portrait if it exists
+    const old = overlayEl.querySelector('.qr-portrait-wrap');
+    if (old) old.remove();
+
+    const imgSrc = (typeof _getPlayerCharacterImage === 'function')
+        ? _getPlayerCharacterImage()
+        : '';
+    if (!imgSrc) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'qr-portrait-wrap';
+    wrap.innerHTML = `
+        <div class="qr-portrait-medallion">
+            <img src="${imgSrc}" alt="character">
+        </div>
+        <div class="qr-portrait-ledge"></div>
+    `;
+
+    // The quiz-overlay is position:fixed; we need a relative inner container.
+    // Insert the portrait as the very first child so it sits above the content.
+    const inner = overlayEl.querySelector('.quiz-title');
+    if (inner) overlayEl.insertBefore(wrap, inner);
+    else overlayEl.prepend(wrap);
+
+    // Drive crack/accent colour from character
+    const charColors = {
+        stox: { accent: '#4fc3f7', glow: 'rgba(79,195,247,0.55)', crack: '#b06cff', crackGlow: 'rgba(176,108,255,0.6)' },
+        trix: { accent: '#ce93d8', glow: 'rgba(206,147,216,0.55)', crack: '#ce93d8', crackGlow: 'rgba(206,147,216,0.5)' },
+        syla: { accent: '#66bb6a', glow: 'rgba(102,187,106,0.55)', crack: '#26c6a6', crackGlow: 'rgba(38,198,166,0.5)' },
+    };
+    const c = charColors[STATE?.playerCharacter] || charColors.stox;
+    overlayEl.style.setProperty('--qr-accent', c.accent);
+    overlayEl.style.setProperty('--qr-accent-glow', c.glow);
+    const frame = overlayEl.querySelector('.qr-frame');
+    if (frame) {
+        frame.style.setProperty('--qr-crack', c.crack);
+        frame.style.setProperty('--qr-crack-glow', c.crackGlow);
+    }
+}
+
+// Opens the quiz overlay for the given world, drawing a random question
+// and setting up the correct input mode (MC or numeric input).
+// Called externally when the player triggers a quiz checkpoint.
+function showQuiz(worldNum) {
+    const q = getQuizQuestion(worldNum);
+    currentQuizQuestion = q;
+
+    document.getElementById('quiz-q').textContent = q.q;
+
+    _quizResetOverlay();
+
+    document.getElementById('quiz-why-btn').style.display = 'none';
+    document.getElementById('quiz-explain').style.display = 'none';
+
+    if (q.type === 'input') {
+        _quizShowInputRow(q);
+        // Delay focus slightly so the overlay transition has time to complete
+        setTimeout(() => {
+            const inputEl = document.getElementById('quiz-input');
+            if (inputEl) inputEl.focus();
+        }, 120);
+    } else {
+        _quizHideInputRow();
+        _quizRenderMcOptions(q);
+        _quizTryEliminateWrongAnswer();
+    }
+
+    const overlayEl = document.getElementById('quiz-overlay');
+    overlayEl.classList.add('show');
+
+    // Inject character portrait
+    const portraitEl = document.getElementById('quiz-portrait');
+    if (portraitEl && typeof _getPlayerCharacterImage === 'function') {
+        portraitEl.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="">`;
+    }
+    _quizRefreshTutorButton();
+}
+
+
+//------------------------------------------------------------------------
+//-------------------QUIZ LIFECYCLE---------------------------------------
+//------------------------------------------------------------------------
+
+// Hides the quiz overlay and clears all active state.
+// Called by finishQuiz(), skipQuiz(), and the Escape handler in main.js.
+function closeQuiz() {
+    document.getElementById('quiz-overlay').classList.remove('show');
+    currentQuizQuestion = null;
+
+    // Cancel the auto-finish timer if the player clicked Continue manually
+    if (_quizAutoFinishTimer) {
+        clearTimeout(_quizAutoFinishTimer);
+        _quizAutoFinishTimer = null;
+    }
+}
+
+// Shows the win overlay after a short delay. Shared by finishQuiz() and
+// skipQuiz() for the non-interstitial exit path.
+function _quizShowWinOverlay() {
+    setTimeout(() => {
+        document.getElementById('ov-win').classList.add('show');
+        requestAnimationFrame(() => buildReveal());
+    }, 300);
+}
+
+// If an endgame interstitial is active, closes the quiz and hands control
+// back to the interstitial chain instead of showing the win overlay.
+// Returns true if the interstitial path was taken (caller should stop).
+function _quizHandleInterstitialExit() {
+    if (typeof window._egInterstitialDone !== 'function') return false;
+    const cb = window._egInterstitialDone;
+    closeQuiz();
+    cb();
+    return true;
+}
+
+// Closes the overlay, runs post-quiz world checks, saves, and shows
+// the win overlay. Called from the "CONTINUE" button and (if re-enabled)
+// the auto-finish timer.
+function finishQuiz() {
+    if (_quizHandleInterstitialExit()) return;
+    closeQuiz();
+    checkWorldCodes();
+    checkWorldCompletion();
+    save();
+    _quizShowWinOverlay();
+}
+
+// Called when the player clicks "SKIP" or presses Escape.
+// No points or items are awarded; shows the win overlay immediately.
+function skipQuiz() {
+    if (_quizHandleInterstitialExit()) return;
+    closeQuiz();
+    _quizShowWinOverlay();
 }

@@ -1,24 +1,7 @@
 ﻿//------------------------------------------------------------------------
-//------------------------SAVE SLOT SELECT SCREEN--------------------------
+//-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
-
-// Shows the save-slot select screen. `onSlotChosen` runs once the player
-// picks (or creates) a slot — this is where you resume the normal
-// intro/tutorial/character-select flow.
-function showSaveSlotSelect(onSlotChosen) {
-    window._pendingSaveSlotCallback = onSlotChosen;
-    renderSaveSlotScreen();
-    screenHistory.push('screen-title');
-    switchScreen('screen-save-slots');
-}
-
-function renderSaveSlotScreen() {
-    const grid = document.getElementById('save-slots-grid');
-    grid.innerHTML = '';
-    for (let i = 1; i <= SAVE_SLOT_COUNT; i++) {
-        grid.appendChild(buildSaveSlotCard(i));
-    }
-}
+//------------------------------------------------------------------------
 
 // Maps a saved playerCharacter id to its portrait image, mirroring whatever
 // mapping is used to populate #setup-char-portrait on the Game Setup screen.
@@ -31,30 +14,46 @@ const CHAR_PORTRAIT_SRC = {
     syla: 'images/sprites/Syla_noclass.png',
 };
 
+// window._pendingSaveSlotCallback — callback to resume the normal
+// intro/tutorial/character-select flow once a slot is chosen. Set in
+// showSaveSlotSelect(), consumed and cleared in onSaveSlotChosen().
+//
+// window._pendingResetSlot — slot number awaiting delete confirmation. Set
+// in showDeleteSlotConfirm(), read by confirmReset() in ui-reset.js to
+// decide whether to wipe just this slot or perform a full reset.
+
+//------------------------------------------------------------------------
+//-------------------PORTRAIT / CARD HELPERS-------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Looks up the portrait image for a saved character id, case-insensitively.
 function getCharPortraitSrc(character) {
     if (!character) return '';
     return CHAR_PORTRAIT_SRC[character.toLowerCase()] || '';
 }
 
-function buildSaveSlotCard(slotNum) {
-    const summary = getSlotSummary(slotNum);
-    const card = document.createElement('div');
-    card.className = 'save-slot-card' + (summary.empty ? ' empty' : '');
+// Builds the inner markup for a save-slot card, empty or filled.
+function _buildSlotCardHtml(slotNum, summary) {
+    if (summary.empty) {
+        return `<div class="ssc-num">SLOT ${slotNum}</div>
+                <div class="ssc-empty">+ NEW GAME</div>`;
+    }
 
     const portraitSrc = getCharPortraitSrc(summary.playerCharacter);
     const portraitHtml = portraitSrc
         ? `<img class="ssc-portrait" src="${portraitSrc}" alt="${summary.playerCharacter}">`
         : '';
 
-    card.innerHTML = summary.empty
-        ? `<div class="ssc-num">SLOT ${slotNum}</div>
-           <div class="ssc-empty">+ NEW GAME</div>`
-        : `<div class="ssc-num">SLOT ${slotNum}</div>
-           ${portraitHtml}
-           <div class="ssc-score">SCORE: ${summary.totalScore}</div>
-           <div class="ssc-levels">${summary.levelsDone} STOXELS DONE</div>
-           <button class="ssc-delete-btn" data-slot="${slotNum}" title="Delete save">❌</button>`;
+    return `<div class="ssc-num">SLOT ${slotNum}</div>
+             ${portraitHtml}
+             <div class="ssc-score">SCORE: ${summary.totalScore}</div>
+             <div class="ssc-levels">${summary.levelsDone} STOXELS DONE</div>
+             <button class="ssc-delete-btn" data-slot="${slotNum}" title="Delete save">❌</button>`;
+}
 
+// Wires up click-to-select and delete-button behavior on a slot card.
+function _attachSlotCardListeners(card, slotNum) {
     card.addEventListener('click', (e) => {
         if (e.target.classList.contains('ssc-delete-btn')) return;
         onSaveSlotChosen(slotNum);
@@ -67,10 +66,15 @@ function buildSaveSlotCard(slotNum) {
             showDeleteSlotConfirm(slotNum);
         });
     }
-
-    return card;
 }
 
+//------------------------------------------------------------------------
+//-------------------SLOT ACTIONS------------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Loads the chosen slot's save data and resumes whatever flow was waiting
+// on a slot pick (set up by showSaveSlotSelect).
 function onSaveSlotChosen(slotNum) {
     loadStateFromSlot(slotNum);
     const cb = window._pendingSaveSlotCallback;
@@ -79,19 +83,43 @@ function onSaveSlotChosen(slotNum) {
 }
 
 //------------------------------------------------------------------------
-//------------------------DELETE SLOT CONFIRM------------------------------
+//-------------------SAVE SLOT SELECT SCREEN--------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Reuses the shared #reset-modal (styled via reset-game.css) instead of a
-// one-off modal, so per-slot deletion looks identical to the title-screen
-// "reset everything" flow. Text is swapped to reference this specific slot;
-// confirmReset() (ui-reset.js) checks window._pendingResetSlot to decide
-// whether to wipe just this slot or perform a full reset.
-function showDeleteSlotConfirm(slotNum) {
-    window._pendingResetSlot = slotNum;
-    _setResetModalTextForSlot(slotNum);
-    showModal('reset-modal');
+// Builds a single save-slot card element, populated from its saved summary.
+function buildSaveSlotCard(slotNum) {
+    const summary = getSlotSummary(slotNum);
+    const card = document.createElement('div');
+    card.className = 'save-slot-card' + (summary.empty ? ' empty' : '');
+    card.innerHTML = _buildSlotCardHtml(slotNum, summary);
+    _attachSlotCardListeners(card, slotNum);
+    return card;
 }
+
+// Rebuilds the save-slot grid from current save data.
+function renderSaveSlotScreen() {
+    const grid = document.getElementById('save-slots-grid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= SAVE_SLOT_COUNT; i++) {
+        grid.appendChild(buildSaveSlotCard(i));
+    }
+}
+
+// Shows the save-slot select screen. `onSlotChosen` runs once the player
+// picks (or creates) a slot — this is where you resume the normal
+// intro/tutorial/character-select flow.
+function showSaveSlotSelect(onSlotChosen) {
+    window._pendingSaveSlotCallback = onSlotChosen;
+    renderSaveSlotScreen();
+    screenHistory.push('screen-title');
+    switchScreen('screen-save-slots');
+}
+
+//------------------------------------------------------------------------
+//-------------------DELETE SLOT CONFIRM------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
 // Swaps the reset modal's copy to reference a single save slot.
 // Strips any data-t attributes on the elements it touches so a later
@@ -113,6 +141,17 @@ function _setResetModalTextForSlot(slotNum) {
 
     const confirmBtn = modal.querySelector('#btn-confirm-reset');
     if (confirmBtn) { confirmBtn.removeAttribute('data-t'); confirmBtn.textContent = 'YES, DELETE THIS SAVE'; }
+}
+
+// Reuses the shared #reset-modal (styled via reset-game.css) instead of a
+// one-off modal, so per-slot deletion looks identical to the title-screen
+// "reset everything" flow. Text is swapped to reference this specific slot;
+// confirmReset() (ui-reset.js) checks window._pendingResetSlot to decide
+// whether to wipe just this slot or perform a full reset.
+function showDeleteSlotConfirm(slotNum) {
+    window._pendingResetSlot = slotNum;
+    _setResetModalTextForSlot(slotNum);
+    showModal('reset-modal');
 }
 
 // Restores the modal's original "reset everything" copy. Called whenever

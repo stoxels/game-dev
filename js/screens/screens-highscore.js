@@ -71,18 +71,13 @@ function getHSSortedEntries() {
 
 
 
-
-
-
-
-
 //------------------------------------------------------------------------
 //-------------------TABLE ROW HELPERS------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Returns the CSS color variable for a given difficulty string.
-// Falls back to the neutral row text color if the difficulty is unknown.
+// Falls back to the neutral row text color if the difficulty is unknown/unset.
 function getDiffColor(diff) {
     return DIFF_COLOR_MAP[diff] || 'var(--hs-row-text)';
 }
@@ -136,7 +131,7 @@ function getDiffLabel(diff) {
 // hs — the highscore object (has .score, .diff, .mods)
 function buildHSTableRow({ lv, hs }) {
     const diffLabel = getDiffLabel(hs.diff);
-    const diffColor = hs.diff ? getDiffColor(hs.diff) : 'var(--hs-row-text)';
+    const diffColor = getDiffColor(hs.diff);
     const modsHTML = formatModsString(hs.mods);
 
     return `<tr>
@@ -189,38 +184,14 @@ function buildHSTableSection(entries) {
 
 
 //------------------------------------------------------------------------
-//-------------------FULL HIGHSCORE SCREEN BUILD--------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Assembles the complete inner HTML for the highscore screen body.
-// Total score and code progress bars live on the Codes screen instead.
-
-function buildHSBodyHTML(entries) {
-    return buildHSTableSection(entries);
-}
-
-
-
-// Gathers all data and renders the full highscore screen into #hs-body.
-
-function buildHS() {
-    const body = document.getElementById('hs-body');
-    const entries = getHSSortedEntries();
-
-    body.innerHTML = buildHSBodyHTML(entries);
-    _initHSScrollMover();
-}
-
-
-
-//------------------------------------------------------------------------
 //-------------------SCROLL-MOVER SYNC (visual only)----------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Slides the stone scroll-mover thumb up/down inside its track to match
 // how far the player has scrolled through #hs-body. Pure decoration —
 // does not affect scrolling itself, layout, or any game state.
+// Placed here (above the screen builder) since buildHS() depends on
+// _initHSScrollMover() below.
 
 // Moves the scroll-mover thumb to match the current scroll position of #hs-body.
 function _updateHSScrollMoverPosition() {
@@ -261,6 +232,31 @@ function _initHSScrollMover() {
     // Set correct initial position (e.g. resets to top on rebuild).
     _updateHSScrollMoverPosition();
 }
+
+
+
+
+//------------------------------------------------------------------------
+//-------------------FULL HIGHSCORE SCREEN BUILD--------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Assembles the complete inner HTML for the highscore screen body.
+// Total score and code progress bars live on the Codes screen instead.
+function buildHSBodyHTML(entries) {
+    return buildHSTableSection(entries);
+}
+
+// Gathers all data and renders the full highscore screen into #hs-body.
+function buildHS() {
+    const body = document.getElementById('hs-body');
+    const entries = getHSSortedEntries();
+
+    body.innerHTML = buildHSBodyHTML(entries);
+    _initHSScrollMover();
+}
+
+
 
 
 //------------------------------------------------------------------------

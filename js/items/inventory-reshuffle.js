@@ -41,16 +41,6 @@ function removeItemFromInventory(uid) {
     return def;
 }
 
-// Checks if the reshuffle goal has been reached after an increment.
-// If so, resets the counter and opens the reward modal after a short delay
-// so the discard toast has time to render before the modal appears.
-function checkReshuffleGoalReached() {
-    if (reshuffleCount < RESHUFFLE_GOAL) return;
-    reshuffleCount = 0;
-    updateReshuffleCounter();
-    setTimeout(() => openReshuffleModal(), 300);
-}
-
 
 
 
@@ -142,6 +132,16 @@ function openReshuffleModal() {
     const modal = buildReshuffleModalElement(picks);
     document.body.appendChild(modal);
     attachReshuffleCardHandlers(modal);
+}
+
+// Checks if the reshuffle goal has been reached after an increment.
+// If so, resets the counter and opens the reward modal after a short delay
+// so the discard toast has time to render before the modal appears.
+function checkReshuffleGoalReached() {
+    if (reshuffleCount < RESHUFFLE_GOAL) return;
+    reshuffleCount = 0;
+    updateReshuffleCounter();
+    setTimeout(() => openReshuffleModal(), 300);
 }
 
 

@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------
-//----------------------------CONSTANTS-----------------------------------
+//------------------------------CONSTANTS & STATE--------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -14,6 +14,9 @@ const MG_HINT_BASE_THRESHOLD = 5;
 
 // Number of wrong attempts before the "try a different question" button appears.
 const MG_NEW_QUESTION_THRESHOLD = 5;
+
+// How many recently-shown questions to avoid repeating, per world.
+const MG_RECENT_HISTORY_SIZE = 10;
 
 // All levels locked behind the Probability Gate, expressed as { world, level }
 // pairs using 1-based indices. buildMathGateSet() converts these to gi values
@@ -32,7 +35,7 @@ const MATH_GATE_LEVELS = [
     { world: 4, level: 7 },
     { world: 4, level: 9 },
     { world: 4, level: 12 },
-    { world: 4, level: 17}, 
+    { world: 4, level: 17 },
     { world: 5, level: 1 },
     { world: 5, level: 4 },
     { world: 5, level: 8 },
@@ -60,26 +63,20 @@ const MATH_GATE_LEVELS = [
     { world: 9, level: 7 },
     { world: 9, level: 9 },
     { world: 9, level: 11 },
-    { world: 9, level: 13 }, 
+    { world: 9, level: 13 },
     { world: 9, level: 16 },
     { world: 10, level: 1 },
     { world: 10, level: 4 },
     { world: 10, level: 6 },
     { world: 10, level: 9 },
     { world: 10, level: 11 },
-    { world: 11, level: 1 }, 
+    { world: 11, level: 1 },
     { world: 11, level: 4 },
     { world: 11, level: 6 },
     { world: 11, level: 8 },
     { world: 11, level: 10 },
 
 ];
-
-
-//------------------------------------------------------------------------
-//--------------------------------STATE-----------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
 
 // The gi that is waiting to be launched after a correct answer.
 let pendingGateGi = null;
@@ -97,6 +94,9 @@ let mgIsSubmitting = false;
 // The runtime Set of gated gi values, built once on load from MATH_GATE_LEVELS.
 // Re-run buildMathGateSet() if world data changes at runtime.
 let MATH_GATE_GI = buildMathGateSet();
+
+// Tracks the last N question objects shown per world: { [world]: [q, q, ...] }
+const _mgRecentQuestions = {};
 
 
 //------------------------------------------------------------------------
@@ -153,26 +153,7 @@ function worldOfGi(gi) {
 
 
 //------------------------------------------------------------------------
-//---------------------GATE ENTRY POINT-----------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-
-// Called by startLevel() before launching any level.
-// If the level is not gated, or the gate is already passed, launches immediately.
-// Otherwise stores the pending gi and opens the math gate modal.
-function tryStartGatedLevel(gi, launchFn) {
-    if (!isGatedLevel(gi) || isMathGatePassed(gi)) {
-        launchFn();
-        return;
-    }
-    pendingGateGi = gi;
-    showMathGate(gi, launchFn);
-}
-
-
-//------------------------------------------------------------------------
-//---------------QUESTION SELECTION & LOCALIZATION------------------------
+//---------------------QUESTION SELECTION & LOCALIZATION------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -183,13 +164,6 @@ function mgGetQuestionPool(gi) {
     const world = worldOfGi(gi);
     return MATH_GATE_POOLS[world] || MATH_GATE_POOLS[1];
 }
-
-
-// How many recently-shown questions to avoid repeating, per world.
-const MG_RECENT_HISTORY_SIZE = 10;
-
-// Tracks the last N question objects shown per world: { [world]: [q, q, ...] }
-const _mgRecentQuestions = {};
 
 // Records a question as "recently shown" for its world, trimming to the window size.
 function _mgRecordShownQuestion(world, question) {
@@ -214,6 +188,8 @@ function mgPickRandomQuestion(pool, world) {
     return picked;
 }
 
+// Returns a random question guaranteed to differ from the one currently shown
+// (unless the pool only has one question, in which case it can repeat).
 function mgPickDifferentQuestion(pool, world) {
     let newQuestion;
     do {
@@ -221,8 +197,6 @@ function mgPickDifferentQuestion(pool, world) {
     } while (newQuestion === currentGateQuestion && pool.length > 1);
     return newQuestion;
 }
-
-
 
 // Returns the localized question text, falling back to English if no
 // German translation exists.
@@ -257,20 +231,112 @@ function mgIsAnswerCorrect(entered, question) {
 }
 
 
+//------------------------------------------------------------------------
+//----------------------------MODAL DOM HELPERS----------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
-// Shows/hides the "Tell me why" button depending on whether the current
-// gate question has an explanation available.
-function _mgRefreshWhyButton() {
-    const btn = document.getElementById('mg-why-btn');
-    const box = document.getElementById('mg-explain');
-    if (!btn) return;
 
-    box.style.display = 'none';
-    box.textContent = '';
+// Writes the world badge text into the modal header element.
+function mgPopulateWorldBadge(world) {
 
-    const hasExplain = currentGateQuestion && (currentGateQuestion.explain || currentGateQuestion.explainDE);
-    btn.style.display = hasExplain ? 'inline-block' : 'none';
-    btn.onclick = mgToggleExplain;
+}
+
+// Writes the current question's localized text into the modal question element.
+function mgPopulateQuestion(question) {
+    document.getElementById('mg-question').textContent = mgGetLocalizedQuestion(question);
+}
+
+// Updates the unit label displayed next to the answer input.
+// Hides the label entirely if the question has no unit.
+function mgSetUnitLabel(question) {
+    const unitEl = document.getElementById('mg-unit');
+    const unitText = question.unit ? t(question.unit) : '';
+    unitEl.textContent = unitText;
+    unitEl.style.display = question.unit ? 'inline' : 'none';
+}
+
+// Resets all interactive input area elements back to their initial state.
+// Called both when opening the modal and when loading a replacement question.
+function mgResetModalInputState() {
+    const inputEl = document.getElementById('mg-answer-input');
+    if (inputEl) {
+        inputEl.value = '';
+        inputEl.placeholder = t('mg_placeholder'); // re-set so translation stays current
+    }
+
+    const feedbackEl = document.getElementById('mg-feedback');
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'mg-feedback';
+
+    document.getElementById('mg-hint-box').style.display = 'none';
+    document.getElementById('mg-hint-text').textContent = '';
+    document.getElementById('mg-new-q-btn').style.display = 'none';
+    document.getElementById('mg-submit-btn').disabled = false;
+
+    document.getElementById('mg-why-btn').style.display = 'none';
+    document.getElementById('mg-explain').style.display = 'none';
+}
+
+// Injects the character portrait medallion into the modal box, styled with
+// a character-specific accent color. Rebuilds the portrait element from
+// scratch each time so it can be safely called on every modal open.
+function _mgInjectPortrait() {
+    const modalEl = document.getElementById('mg-modal');
+    if (!modalEl) return;
+
+    const old = modalEl.querySelector('.qr-portrait-wrap');
+    if (old) old.remove();
+
+    const imgSrc = (typeof _getPlayerCharacterImage === 'function')
+        ? _getPlayerCharacterImage()
+        : '';
+    if (!imgSrc) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'qr-portrait-wrap';
+    wrap.innerHTML = `
+        <div class="qr-portrait-medallion">
+            <img src="${imgSrc}" alt="character">
+        </div>
+        <div class="qr-portrait-ledge"></div>
+    `;
+
+    const box = modalEl.querySelector('.modal-box');
+    if (box) {
+        box.style.position = 'relative'; // needed for absolute portrait
+        box.prepend(wrap);
+    }
+
+    // Character-based accent
+    const charColors = {
+        stox: { accent: '#4fc3f7', glow: 'rgba(79,195,247,0.55)', crack: '#b06cff', crackGlow: 'rgba(176,108,255,0.6)' },
+        trix: { accent: '#ce93d8', glow: 'rgba(206,147,216,0.55)', crack: '#ce93d8', crackGlow: 'rgba(206,147,216,0.5)' },
+        syla: { accent: '#66bb6a', glow: 'rgba(102,187,106,0.55)', crack: '#26c6a6', crackGlow: 'rgba(38,198,166,0.5)' },
+    };
+    const c = charColors[STATE?.playerCharacter] || charColors.stox;
+    if (box) {
+        box.style.setProperty('--qr-accent', c.accent);
+        box.style.setProperty('--qr-accent-glow', c.glow);
+        box.style.setProperty('--qr-crack', c.crack);
+        box.style.setProperty('--qr-crack-glow', c.crackGlow);
+    }
+}
+
+// Fills the small '#mg-portrait' element (distinct from _mgInjectPortrait's
+// medallion) with the player's character image, if available.
+function _mgPopulateModalPortrait() {
+    const mgPortrait = document.getElementById('mg-portrait');
+    if (mgPortrait && typeof _getPlayerCharacterImage === 'function') {
+        mgPortrait.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="">`;
+    }
+}
+
+// Updates the feedback element with a success (green) or error (red) style.
+function showMgFeedback(msg, ok) {
+    const el = document.getElementById('mg-feedback');
+    el.textContent = msg;
+    el.className = 'mg-feedback ' + (ok ? 'mg-ok' : 'mg-bad');
 }
 
 // Toggles the explanation text box open/closed.
@@ -288,6 +354,188 @@ function mgToggleExplain() {
     box.textContent = '💡 ' + text;
     box.style.display = 'block';
 }
+
+// Shows/hides the "Tell me why" button depending on whether the current
+// gate question has an explanation available.
+function _mgRefreshWhyButton() {
+    const btn = document.getElementById('mg-why-btn');
+    const box = document.getElementById('mg-explain');
+    if (!btn) return;
+
+    box.style.display = 'none';
+    box.textContent = '';
+
+    const hasExplain = currentGateQuestion && (currentGateQuestion.explain || currentGateQuestion.explainDE);
+    btn.style.display = hasExplain ? 'inline-block' : 'none';
+    btn.onclick = mgToggleExplain;
+}
+
+// Closes the math gate modal and clears all module-level state.
+function hideMathGate() {
+    hideModal('mg-modal');
+    currentGateQuestion = null;
+    pendingGateGi = null;
+}
+
+
+//------------------------------------------------------------------------
+//--------------------TUTOR FEATURE (PASSIVE TREE)------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+
+// Returns the base success chance for the tutor, increased by passive skill nodes.
+function mgCalcTutorChance() {
+    let chance = 0.10;
+    if (PT.hasSkill('stochastics_tutor')) chance += 0.10;
+    if (PT.hasSkill('statistics_tutor')) chance += 0.10;
+    if (PT.hasSkill('maths_tutor')) chance += 0.10;
+    if (PT.hasSkill('professor_tutor')) chance += 0.20;
+    if (_charIs('trix')) chance += 0.10;
+    return chance;
+}
+
+// Returns the chance that the tutor item is NOT consumed after being used.
+// A roll >= this value means the item is preserved.
+function mgCalcNoConsumeChance() {
+    let chance = 0;
+    if (PT.hasSkill('careful_study')) chance += 0.10;
+    if (PT.hasSkill('efficient_tutoring')) chance += 0.15;
+    if (PT.hasSkill('endless_instructions')) chance += 0.20;
+    if (PT.hasSkill('professor_tutor')) chance += 0.20;
+    return chance;
+}
+
+// Removes the given tutor item from the player's inventory, then saves
+// state and rebuilds the inventory panel.
+function mgConsumeTutorItem(tutorItem) {
+    STATE.inventory = STATE.inventory.filter(i => i.uid !== tutorItem.uid);
+    save();
+    buildInventoryPanel();
+}
+
+// Refreshes the visibility and label of the Tutor button.
+// The button is only shown when the player has both the passive skill
+// unlocked AND at least one tutor item in their inventory.
+// Called whenever the modal opens or a new question is loaded.
+function mgRefreshTutorButton() {
+    const btn = document.getElementById('mg-tutor-btn');
+    if (!btn) return;
+
+    const canUseTutor = PT.hasSkill('tutor_enable') || _charIs('trix');
+    const tutorCount = STATE.inventory.filter(i => TUTOR_ITEM_IDS_2.includes(i.defId)).length;
+
+    if (canUseTutor && tutorCount > 0) {
+        btn.style.display = 'inline-block';
+        btn.textContent = LANG === 'de'
+            ? `🎓 Tutor um Hilfe bitten (${tutorCount})`
+            : `🎓 Ask Tutor for Help (${tutorCount})`;
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
+// Handles the outcome where the tutor successfully solves the question.
+// Marks the gate as passed, disables the submit button, then launches
+// the level after a short celebration delay.
+function mgHandleTutorSuccess() {
+    const gi = pendingGateGi;
+    const msg = LANG === 'de' ? '🎓 Tutor hat die Frage gelöst!' : '🎓 Tutor solved it!';
+
+    Audio_Manager.playSFX('tutorSuccess');
+    showMgFeedback(msg, true);
+    document.getElementById('mg-tutor-btn').style.display = 'none';
+    document.getElementById('mg-submit-btn').disabled = true;
+
+    mgMarkGatePassed(gi);
+    questStat_tutorAnsweredCorrect();
+
+    setTimeout(() => { hideMathGate(); startLevel(gi); }, 1200);
+}
+
+// Handles the outcome where the tutor fails to solve the question.
+// Shows failure feedback and hides the tutor button for this attempt.
+function mgHandleTutorFailure() {
+    const msg = LANG === 'de'
+        ? '🎓 Tutor konnte die Frage nicht lösen…'
+        : '🎓 Tutor couldn\'t solve it…';
+
+    Audio_Manager.playSFX('tutorFail');
+    showMgFeedback(msg, false);
+    document.getElementById('mg-tutor-btn').style.display = 'none';
+}
+
+// Entry point for the Tutor button click.
+// Finds the best available tutor item (lowest tier first), rolls for
+// consumption and success, then delegates to the success or failure handler.
+function mgUseTutor() {
+    if (!currentGateQuestion) return;
+
+    // Find the lowest-tier tutor item the player currently owns.
+    const tutorItem = TUTOR_ITEM_IDS_2
+        .flatMap(id => STATE.inventory.filter(i => i.defId === id))
+        .find(Boolean);
+    if (!tutorItem) return;
+
+    const tutorChance = mgCalcTutorChance();
+    const noConsumeChance = mgCalcNoConsumeChance();
+
+    // Consume the item unless the no-consume roll saves it.
+    const isConsumed = Math.random() >= noConsumeChance;
+    if (isConsumed) mgConsumeTutorItem(tutorItem);
+
+    if (Math.random() < tutorChance) {
+        mgHandleTutorSuccess();
+    } else {
+        mgHandleTutorFailure();
+    }
+}
+
+
+//------------------------------------------------------------------------
+//---------------------GATE ENTRY POINT-----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+
+// Opens the math gate modal for the given gi.
+// Picks a random question from the appropriate world pool, populates all
+// modal elements, then opens the modal and focuses the answer input.
+function showMathGate(gi, launchFn) {
+    const pool = mgGetQuestionPool(gi);
+    currentGateQuestion = mgPickRandomQuestion(pool, worldOfGi(gi));
+    gateAttempts = 0;
+
+    // Store gi on the modal so the submit handler knows which level to launch.
+    document.getElementById('mg-modal').dataset.launchGi = gi;
+
+    //mgPopulateWorldBadge(worldOfGi(gi));
+    mgPopulateQuestion(currentGateQuestion);
+    mgResetModalInputState();
+    mgSetUnitLabel(currentGateQuestion);
+    showModal('mg-modal');
+    _mgPopulateModalPortrait();
+    mgRefreshTutorButton();
+
+    // Delay focus slightly to let the modal open animation complete.
+    setTimeout(() => {
+        const inputEl = document.getElementById('mg-answer-input');
+        if (inputEl) inputEl.focus();
+    }, 120);
+}
+
+// Called by startLevel() before launching any level.
+// If the level is not gated, or the gate is already passed, launches immediately.
+// Otherwise stores the pending gi and opens the math gate modal.
+function tryStartGatedLevel(gi, launchFn) {
+    if (!isGatedLevel(gi) || isMathGatePassed(gi)) {
+        launchFn();
+        return;
+    }
+    pendingGateGi = gi;
+    showMathGate(gi, launchFn);
+}
+
 
 //------------------------------------------------------------------------
 //----------------------------------REWARDS-------------------------------
@@ -457,145 +705,10 @@ function mgHandleWrongAnswer() {
 
 
 //------------------------------------------------------------------------
-//----------------------MODAL DOM HELPERS---------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-
-// Writes the world badge text into the modal header element.
-function mgPopulateWorldBadge(world) {
-
-}
-
-// Writes the current question's localized text into the modal question element.
-function mgPopulateQuestion(question) {
-    document.getElementById('mg-question').textContent = mgGetLocalizedQuestion(question);
-}
-
-// Updates the unit label displayed next to the answer input.
-// Hides the label entirely if the question has no unit.
-function mgSetUnitLabel(question) {
-    const unitEl = document.getElementById('mg-unit');
-    const unitText = question.unit ? t(question.unit) : '';
-    unitEl.textContent = unitText;
-    unitEl.style.display = question.unit ? 'inline' : 'none';
-}
-
-// Resets all interactive input area elements back to their initial state.
-// Called both when opening the modal and when loading a replacement question.
-function mgResetModalInputState() {
-    const inputEl = document.getElementById('mg-answer-input');
-    if (inputEl) {
-        inputEl.value = '';
-        inputEl.placeholder = t('mg_placeholder'); // re-set so translation stays current
-    }
-
-    const feedbackEl = document.getElementById('mg-feedback');
-    feedbackEl.textContent = '';
-    feedbackEl.className = 'mg-feedback';
-
-    document.getElementById('mg-hint-box').style.display = 'none';
-    document.getElementById('mg-hint-text').textContent = '';
-    document.getElementById('mg-new-q-btn').style.display = 'none';
-    document.getElementById('mg-submit-btn').disabled = false;
-
-    document.getElementById('mg-why-btn').style.display = 'none';   
-    document.getElementById('mg-explain').style.display = 'none';
-}
-
-function _mgInjectPortrait() {
-    const modalEl = document.getElementById('mg-modal');
-    if (!modalEl) return;
-
-    const old = modalEl.querySelector('.qr-portrait-wrap');
-    if (old) old.remove();
-
-    const imgSrc = (typeof _getPlayerCharacterImage === 'function')
-        ? _getPlayerCharacterImage()
-        : '';
-    if (!imgSrc) return;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'qr-portrait-wrap';
-    wrap.innerHTML = `
-        <div class="qr-portrait-medallion">
-            <img src="${imgSrc}" alt="character">
-        </div>
-        <div class="qr-portrait-ledge"></div>
-    `;
-
-    const box = modalEl.querySelector('.modal-box');
-    if (box) {
-        box.style.position = 'relative'; // needed for absolute portrait
-        box.prepend(wrap);
-    }
-
-    // Character-based accent
-    const charColors = {
-        stox: { accent: '#4fc3f7', glow: 'rgba(79,195,247,0.55)', crack: '#b06cff', crackGlow: 'rgba(176,108,255,0.6)' },
-        trix: { accent: '#ce93d8', glow: 'rgba(206,147,216,0.55)', crack: '#ce93d8', crackGlow: 'rgba(206,147,216,0.5)' },
-        syla: { accent: '#66bb6a', glow: 'rgba(102,187,106,0.55)', crack: '#26c6a6', crackGlow: 'rgba(38,198,166,0.5)' },
-    };
-    const c = charColors[STATE?.playerCharacter] || charColors.stox;
-    if (box) {
-        box.style.setProperty('--qr-accent', c.accent);
-        box.style.setProperty('--qr-accent-glow', c.glow);
-        box.style.setProperty('--qr-crack', c.crack);
-        box.style.setProperty('--qr-crack-glow', c.crackGlow);
-    }
-}
-
-
-// Opens the math gate modal for the given gi.
-// Picks a random question from the appropriate world pool, populates all
-// modal elements, then opens the modal and focuses the answer input.
-function showMathGate(gi, launchFn) {
-    const pool = mgGetQuestionPool(gi);
-    currentGateQuestion = mgPickRandomQuestion(pool, worldOfGi(gi));
-    gateAttempts = 0;
-
-    // Store gi on the modal so the submit handler knows which level to launch.
-    document.getElementById('mg-modal').dataset.launchGi = gi;
-
-    //mgPopulateWorldBadge(worldOfGi(gi));
-    mgPopulateQuestion(currentGateQuestion);
-    mgResetModalInputState();
-    mgSetUnitLabel(currentGateQuestion);
-    showModal('mg-modal');
-    // Inject character portrait
-    const mgPortrait = document.getElementById('mg-portrait');
-    if (mgPortrait && typeof _getPlayerCharacterImage === 'function') {
-        mgPortrait.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="">`;
-    }
-    mgRefreshTutorButton();
-
-    // Delay focus slightly to let the modal open animation complete.
-    setTimeout(() => {
-        const inputEl = document.getElementById('mg-answer-input');
-        if (inputEl) inputEl.focus();
-    }, 120);
-}
-
-// Closes the math gate modal and clears all module-level state.
-function hideMathGate() {
-    hideModal('mg-modal');
-    currentGateQuestion = null;
-    pendingGateGi = null;
-}
-
-
-//------------------------------------------------------------------------
 //---------------------SUBMIT & NEW QUESTION------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-
-// Updates the feedback element with a success (green) or error (red) style.
-function showMgFeedback(msg, ok) {
-    const el = document.getElementById('mg-feedback');
-    el.textContent = msg;
-    el.className = 'mg-feedback ' + (ok ? 'mg-ok' : 'mg-bad');
-}
 
 // Called when the player submits an answer (via button click or Enter key).
 // Guards against double-firing, validates the input, then delegates to the
@@ -649,117 +762,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-
-//------------------------------------------------------------------------
-//--------------------TUTOR FEATURE (PASSIVE TREE)------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-
-// Returns the base success chance for the tutor, increased by passive skill nodes.
-function mgCalcTutorChance() {
-    let chance = 0.10;
-    if (PT.hasSkill('stochastics_tutor')) chance += 0.10;
-    if (PT.hasSkill('statistics_tutor')) chance += 0.10;
-    if (PT.hasSkill('maths_tutor')) chance += 0.10;
-    if (PT.hasSkill('professor_tutor')) chance += 0.20;
-    if (_charIs('trix')) chance += 0.10;
-    return chance;
-}
-
-// Returns the chance that the tutor item is NOT consumed after being used.
-// A roll >= this value means the item is preserved.
-function mgCalcNoConsumeChance() {
-    let chance = 0;
-    if (PT.hasSkill('careful_study')) chance += 0.10;
-    if (PT.hasSkill('efficient_tutoring')) chance += 0.15;
-    if (PT.hasSkill('endless_instructions')) chance += 0.20;
-    if (PT.hasSkill('professor_tutor')) chance += 0.20;
-    return chance;
-}
-
-// Removes the given tutor item from the player's inventory, then saves
-// state and rebuilds the inventory panel.
-function mgConsumeTutorItem(tutorItem) {
-    STATE.inventory = STATE.inventory.filter(i => i.uid !== tutorItem.uid);
-    save();
-    buildInventoryPanel();
-}
-
-// Handles the outcome where the tutor successfully solves the question.
-// Marks the gate as passed, disables the submit button, then launches
-// the level after a short celebration delay.
-function mgHandleTutorSuccess() {
-    const gi = pendingGateGi;
-    const msg = LANG === 'de' ? '🎓 Tutor hat die Frage gelöst!' : '🎓 Tutor solved it!';
-
-    Audio_Manager.playSFX('tutorSuccess');
-    showMgFeedback(msg, true);
-    document.getElementById('mg-tutor-btn').style.display = 'none';
-    document.getElementById('mg-submit-btn').disabled = true;
-
-    mgMarkGatePassed(gi);
-    questStat_tutorAnsweredCorrect();
-
-    setTimeout(() => { hideMathGate(); startLevel(gi); }, 1200);
-}
-
-// Handles the outcome where the tutor fails to solve the question.
-// Shows failure feedback and hides the tutor button for this attempt.
-function mgHandleTutorFailure() {
-    const msg = LANG === 'de'
-        ? '🎓 Tutor konnte die Frage nicht lösen…'
-        : '🎓 Tutor couldn\'t solve it…';
-
-    Audio_Manager.playSFX('tutorFail');
-    showMgFeedback(msg, false);
-    document.getElementById('mg-tutor-btn').style.display = 'none';
-}
-
-// Refreshes the visibility and label of the Tutor button.
-// The button is only shown when the player has both the passive skill
-// unlocked AND at least one tutor item in their inventory.
-// Called whenever the modal opens or a new question is loaded.
-function mgRefreshTutorButton() {
-    const btn = document.getElementById('mg-tutor-btn');
-    if (!btn) return;
-
-    const canUseTutor = PT.hasSkill('tutor_enable') || _charIs('trix');
-    const tutorCount = STATE.inventory.filter(i => TUTOR_ITEM_IDS_2.includes(i.defId)).length;
-
-    if (canUseTutor && tutorCount > 0) {
-        btn.style.display = 'inline-block';
-        btn.textContent = LANG === 'de'
-            ? `🎓 Tutor um Hilfe bitten (${tutorCount})`
-            : `🎓 Ask Tutor for Help (${tutorCount})`;
-    } else {
-        btn.style.display = 'none';
-    }
-}
-
-// Entry point for the Tutor button click.
-// Finds the best available tutor item (lowest tier first), rolls for
-// consumption and success, then delegates to the success or failure handler.
-function mgUseTutor() {
-    if (!currentGateQuestion) return;
-
-    // Find the lowest-tier tutor item the player currently owns.
-    const tutorItem = TUTOR_ITEM_IDS_2
-        .flatMap(id => STATE.inventory.filter(i => i.defId === id))
-        .find(Boolean);
-    if (!tutorItem) return;
-
-    const tutorChance = mgCalcTutorChance();
-    const noConsumeChance = mgCalcNoConsumeChance();
-
-    // Consume the item unless the no-consume roll saves it.
-    const isConsumed = Math.random() >= noConsumeChance;
-    if (isConsumed) mgConsumeTutorItem(tutorItem);
-
-    if (Math.random() < tutorChance) {
-        mgHandleTutorSuccess();
-    } else {
-        mgHandleTutorFailure();
-    }
-}

@@ -36,7 +36,6 @@ const MAP_IMAGE_ASPECT = 1376 / 768;
 // (calibrated for a ~1000px wide canvas).
 const WALK_SPEED_PX_PER_SEC = 60;
 
-
 // Minimum duration for a single waypoint-to-waypoint step, in milliseconds.
 // Prevents imperceptibly fast micro-steps on very short segments.
 const WALK_STEP_MIN_MS = 80;
@@ -45,8 +44,6 @@ const WALK_STEP_MIN_MS = 80;
 // speed stays constant regardless of actual window/canvas size.
 const WALK_REF_WIDTH = 1000;
 const WALK_REF_HEIGHT = WALK_REF_WIDTH / MAP_IMAGE_ASPECT;
-
-
 
 // The home base position (Cartographer's Outpost).
 // Coordinates are percentages of the background IMAGE (not the canvas element).
@@ -235,7 +232,6 @@ const ROAD_SEGMENTS = [
         ]
     },
 
-
     {
         n1: 'fork67',
         n2: 6, // World 7: Stochapolis
@@ -342,10 +338,6 @@ const ROAD_SEGMENTS = [
             { x: 37.5, y: 39.9 }  // ← Automatically added World 12 position
         ]
     },
-
-
-
-
 ];
 
 
@@ -490,7 +482,6 @@ function _isWorldAccessible(wi) {
     return true; // TEMP: all worlds unlocked for waypoint tuning
 }
 
-
 /**
  * Returns true if every level in the given world has been completed at least once.
  */
@@ -535,9 +526,8 @@ function _getWorldHealingTier(wi) {
 }
 
 
-
 //------------------------------------------------------------------------
-//-------------------ROUTE FINDING (BFS)---------------------------------
+//-------------------ROUTE FINDING (BFS)-----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -575,7 +565,16 @@ function _buildRoadGraph() {
     return adj;
 }
 
-
+/**
+ * Flattens a BFS segment-path into an ordered array of {x, y} waypoints,
+ * plus a list of "markers" — indices into the waypoint array that land
+ * exactly on a real graph node (used to detect mid-walk redirects).
+ * Duplicate junction coordinates at segment boundaries are de-duplicated
+ * to prevent stuttering.
+ *
+ * @param {Array<{ segment: object, reversed: boolean }>} routeSegments
+ * @returns {{ points: Array<{x,y}>, markers: Array<{index:number, key:string}> }}
+ */
 function _routeSegmentsToWaypointsWithMarkers(routeSegments) {
     const points = [];
     const markers = []; // { index, key } — index into `points` that sits on a real graph node
@@ -601,6 +600,16 @@ function _routeSegmentsToWaypointsWithMarkers(routeSegments) {
     return { points, markers };
 }
 
+/**
+ * Uses BFS to find the shortest path through the road graph from fromNode
+ * to toNode and returns it as an ordered waypoint array with node markers
+ * (see _routeSegmentsToWaypointsWithMarkers). Falls back to a straight
+ * two-point path if no route is found in the graph.
+ *
+ * @param {string|number|null} fromNode - Starting node ('home', world index, or junction)
+ * @param {string|number|null} toNode   - Destination node
+ * @returns {{ points: Array<{x,y}>, markers: Array<{index:number, key:string}> }}
+ */
 function _findWalkPathWithMarkers(fromNode, toNode) {
     const adj = _buildRoadGraph();
     const startKey = _nodeToKey(fromNode);
@@ -632,9 +641,12 @@ function _findWalkPathWithMarkers(fromNode, toNode) {
     };
 }
 
-
-
-
+// --- Legacy pre-marker pathing helpers -------------------------------
+// NOTE: _routeSegmentsToWaypoints() and _findWalkPath() below appear to
+// have been superseded by the "WithMarkers" versions above (needed for
+// mid-walk redirects) and are not called anywhere else in this file.
+// Kept as-is per refactor instructions — see "Suspected dead code" in the
+// refactor summary before removing, since other files may still call them.
 
 /**
  * Flattens a BFS segment-path into an ordered array of {x, y} waypoints
@@ -715,7 +727,7 @@ function _findWalkPath(fromNode, toNode) {
 
 
 //------------------------------------------------------------------------
-//-------------------WALKING ANIMATION------------------------------------
+//-------------------WALKING ANIMATION-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -734,8 +746,6 @@ function _easeInOut(t) {
  *
  * @param {{ x: number, y: number }} startPos - Start position (image %)
  * @param {{ x: number, y: number }} endPos   - End position (image %)
- * @param {number} canvasW - Canvas width in pixels
- * @param {number} canvasH - Canvas height in pixels
  * @returns {number} Duration in milliseconds
  */
 function _calcStepDurationMs(startPos, endPos) {
@@ -799,11 +809,33 @@ function _animateWalkStep(sprite, startPos, endPos, durationMs, onStepComplete) 
 }
 
 /**
- * Walks the sprite along a waypoint path, step by step.
- * Calls onComplete when the last waypoint is reached.
+ * Saves the sprite's new world position to STATE and persists it.
+ * Pass null for worldIdx to represent the home outpost.
+ *
+ * @param {number|null} worldIdx
+ */
+function _saveSpritePosition(worldIdx) {
+    if (STATE) {
+        STATE.mapSpriteWorldIndex = worldIdx;
+        if (typeof save === 'function') save();
+    }
+}
+
+// NOTE: _walkAlongPath() and _continueWalkFromNode() are mutually
+// recursive (a redirect mid-walk hands off from one to the other), so one
+// of them necessarily has to forward-reference the other despite the
+// "helpers above callers" convention. Function hoisting makes this safe
+// at runtime.
+
+/**
+ * Walks the sprite along a waypoint path, step by step. If a redirect was
+ * queued mid-walk (see _walkSpriteTo), it's applied as soon as the sprite
+ * reaches the next real road node rather than mid-segment, so it never
+ * leaves the roads. Calls onComplete when the last waypoint is reached.
  *
  * @param {HTMLElement} sprite     - The sprite element
  * @param {Array<{ x, y }>} points - Ordered waypoints (image %)
+ * @param {Array<{index,key}>} markers - Node markers for redirect detection
  * @param {number}      segIdx     - Current waypoint index (recursive)
  * @param {Function}    onComplete - Called after the final step
  */
@@ -832,6 +864,16 @@ function _walkAlongPath(sprite, points, markers, segIdx, onComplete) {
     });
 }
 
+/**
+ * Finds a route from fromNodeKey to target and walks the sprite along it,
+ * updating STATE and firing onArrived on completion. Used both for a fresh
+ * walk and to resume after a mid-walk redirect.
+ *
+ * @param {HTMLElement} sprite
+ * @param {string|number|null} fromNodeKey
+ * @param {string|number} target
+ * @param {Function|null} onArrived
+ */
 function _continueWalkFromNode(sprite, fromNodeKey, target, onArrived) {
     const walkingBar = document.getElementById('mv-walking-bar');
     const { points, markers } = _findWalkPathWithMarkers(fromNodeKey, target);
@@ -853,21 +895,9 @@ function _continueWalkFromNode(sprite, fromNodeKey, target, onArrived) {
 }
 
 /**
- * Saves the sprite's new world position to STATE and persists it.
- * Pass null for worldIdx to represent the home outpost.
- *
- * @param {number|null} worldIdx
- */
-function _saveSpritePosition(worldIdx) {
-    if (STATE) {
-        STATE.mapSpriteWorldIndex = worldIdx;
-        if (typeof save === 'function') save();
-    }
-}
-
-/**
  * Starts a walk animation that moves the sprite to a destination world node.
- * Calls onArrived when the sprite reaches the destination.
+ * If a walk is already in progress, queues this as a redirect instead of
+ * starting a second animation. Calls onArrived when the sprite arrives.
  *
  * @param {number}   targetWorldIdx - Destination world index
  * @param {Function} onArrived      - Callback fired on arrival
@@ -888,23 +918,9 @@ function _walkSpriteTo(targetWorldIdx, onArrived) {
     _continueWalkFromNode(sprite, _mvCurrentWorldIdx, targetWorldIdx, onArrived);
 }
 
-
-
-
-
-/**
- * Called when the sprite finishes walking to a world node.
- * Cleans up walk state and fires the onArrived callback.
- *
- * @param {HTMLElement}  sprite
- * @param {HTMLElement|null} walkingBar
- * @param {number}       targetWorldIdx
- * @param {Function}     onArrived
- */
-
-
 /**
  * Starts a walk animation that returns the sprite to the home outpost.
+ * If a walk is already in progress, queues the return as a redirect.
  */
 function _walkSpriteToHome() {
     const sprite = document.getElementById('mv-sprite');
@@ -922,17 +938,9 @@ function _walkSpriteToHome() {
     _continueWalkFromNode(sprite, _mvCurrentWorldIdx, 'home', null);
 }
 
-/**
- * Called when the sprite finishes walking back to the home outpost.
- * Cleans up walk state and updates position tracking.
- *
- * @param {HTMLElement} sprite
- */
-
-
 
 //------------------------------------------------------------------------
-//-------------------SPRITE BUILDER--------------------------------------
+//-------------------SPRITE BUILDER----------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -978,7 +986,7 @@ function _placeSprite(sprite, worldIdx) {
 
 
 //------------------------------------------------------------------------
-//-------------------TOOLTIP----------------------------------------------
+//-------------------TOOLTIP------------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1071,7 +1079,7 @@ function _hideWorldTooltip() {
 
 
 //------------------------------------------------------------------------
-//-------------------ENTER BUTTON-----------------------------------------
+//-------------------ENTER BUTTON-------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1167,7 +1175,7 @@ function _showEnterButton(wi) {
 
 
 //------------------------------------------------------------------------
-//-------------------WORLD NODE BUILDER----------------------------------
+//-------------------WORLD NODE BUILDER-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1185,7 +1193,6 @@ function _getWorldNodeIcon(wi, isDone, isLocked) {
     if (isLocked) return '🔒';
     return wi + 1;              // Display 1-based world number for unlocked worlds
 }
-
 
 /**
  * Builds the healing-effect HTML for a world node, layered behind the ring.
@@ -1214,7 +1221,6 @@ function _buildWorldHealingEffectHtml(tier) {
 
     return html;
 }
-
 
 /**
  * Applies the correct CSS state class (done / locked / available) to a world node.
@@ -1287,7 +1293,7 @@ function _buildWorldNode(pos, wi) {
 
 
 //------------------------------------------------------------------------
-//-------------------WORLD NODE CLICK------------------------------------
+//-------------------WORLD NODE CLICK---------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1303,7 +1309,7 @@ function _onWorldNodeClick(wi) {
 
 
 //------------------------------------------------------------------------
-//-------------------PATH DRAWING-----------------------------------------
+//-------------------PATH DRAWING-------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1323,6 +1329,10 @@ function _waypointsToSVGPoints(waypoints, canvas, svgW, svgH) {
         return `${x / 100 * svgW} ${y / 100 * svgH}`;
     }).join(' ');
 }
+
+// NOTE: _drawAllPaths() is not called anywhere in this file — _buildPathsSVG()
+// below (its only caller in the original code) currently short-circuits and
+// returns null before drawing anything. Kept as-is; see refactor summary.
 
 /**
  * Clears and redraws all road segments as SVG polylines.
@@ -1349,19 +1359,18 @@ function _drawAllPaths(svg, w, h) {
 
 
 //------------------------------------------------------------------------
-//-------------------MAP CANVAS BUILDER----------------------------------
+//-------------------MAP CANVAS BUILDER-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 /**
  * Creates and returns the SVG layer used for drawing road paths.
- * The SVG's viewBox is updated once the canvas has layout dimensions.
+ * Path lines are currently disabled — no longer drawing the SVG road overlay.
  *
  * @param {HTMLElement} canvas - Parent canvas element
- * @returns {SVGElement}
+ * @returns {SVGElement|null}
  */
 function _buildPathsSVG(canvas) {
-    // Path lines disabled — no longer drawing the SVG road overlay
     return null;
 }
 
@@ -1415,6 +1424,8 @@ function _appendWorldNodes(canvas) {
 /**
  * Attaches a temporary dev-helper click listener that logs canvas coordinates
  * to the console in waypoint format. Remove when no longer needed.
+ * NOTE: the console.log call is currently commented out, so this listener
+ * has no observable effect — see refactor summary.
  *
  * @param {HTMLElement} canvas
  */
@@ -1450,18 +1461,6 @@ function _attachWaypointDebugLogger(canvas) {
 }
 
 /**
- * Sets up a ResizeObserver that repositions all map elements whenever
- * the canvas element changes size (e.g. window resize or layout change).
- *
- * @param {HTMLElement} canvas
- */
-function _attachResizeObserver(canvas) {
-    if (window._mvResizeObserver) window._mvResizeObserver.disconnect();
-    window._mvResizeObserver = new ResizeObserver(() => _repositionAllMapElements());
-    window._mvResizeObserver.observe(canvas);
-}
-
-/**
  * Repositions all map elements (nodes, home marker, sprite, paths) after
  * a canvas resize. Called by the ResizeObserver.
  */
@@ -1490,6 +1489,18 @@ function _repositionAllMapElements() {
     // Reposition the sprite
     const sprite = document.getElementById('mv-sprite');
     if (sprite) _placeSprite(sprite, _mvCurrentWorldIdx);
+}
+
+/**
+ * Sets up a ResizeObserver that repositions all map elements whenever
+ * the canvas element changes size (e.g. window resize or layout change).
+ *
+ * @param {HTMLElement} canvas
+ */
+function _attachResizeObserver(canvas) {
+    if (window._mvResizeObserver) window._mvResizeObserver.disconnect();
+    window._mvResizeObserver = new ResizeObserver(() => _repositionAllMapElements());
+    window._mvResizeObserver.observe(canvas);
 }
 
 /**
@@ -1526,7 +1537,7 @@ function _buildMapCanvas() {
 
 
 //------------------------------------------------------------------------
-//-------------------TOP BAR----------------------------------------------
+//-------------------TOP BAR------------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1554,7 +1565,7 @@ function _renderTopBarMods() {
 function _renderTopBarScore() {
     const scoreEl = document.getElementById('mv-ls-score');
     if (scoreEl) {
-        scoreEl.textContent =  (STATE ? STATE.totalScore : 0);
+        scoreEl.textContent = (STATE ? STATE.totalScore : 0);
     }
 }
 
@@ -1627,7 +1638,7 @@ function _buildMapViewTopBar() {
 
 
 //------------------------------------------------------------------------
-//-------------------LAYOUT TOGGLE----------------------------------------
+//-------------------LAYOUT TOGGLE-------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1652,6 +1663,8 @@ function _updateToggleButtonLabels() {
 /**
  * Toggles between the classic level-select list view and the map view.
  * Persists the preference in STATE.mapViewEnabled and saves.
+ * NOTE: calls showMapView(), which is defined below in the "Entry Point"
+ * section — see refactor summary for why this forward-reference is kept.
  */
 function toggleMapView() {
     if (!STATE) return;
@@ -1663,7 +1676,7 @@ function toggleMapView() {
         showMapView();
     } else {
         _ptReturnScreen = 'screen-levels';
-        _ptReturnWorldIndex = null;   
+        _ptReturnWorldIndex = null;
         switchScreen('screen-levels');
         if (typeof renderLevelSelect === 'function') renderLevelSelect();
     }
@@ -1686,7 +1699,7 @@ function initMapViewToggle() {
 
 
 //------------------------------------------------------------------------
-//-------------------ENTRY POINT------------------------------------------
+//-------------------ENTRY POINT---------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1701,7 +1714,7 @@ function showMapView() {
     _mvPendingRedirect = null;
 
     _ptReturnScreen = 'screen-map-view';
-    _ptReturnWorldIndex = null;   
+    _ptReturnWorldIndex = null;
 
     _updateToggleButtonLabels();
     _buildMapViewTopBar();
