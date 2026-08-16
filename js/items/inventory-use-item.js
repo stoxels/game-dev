@@ -97,6 +97,74 @@ function _trackWitchImmuneCursedUse() {
 // applyCursedColBlackout    — ALL col clues, configurable duration
 //------------------------------------------------------------------------
 
+
+// Tracks the active countdown badge per axis so overlapping cursed
+// effects (e.g. two row-blackouts back to back) don't leak old badges.
+let _blackoutCountdownState = { row: null, col: null };
+
+// Removes and clears the countdown badge for the given axis ('row'|'col').
+function _clearBlackoutCountdown(type) {
+    const state = _blackoutCountdownState[type];
+    if (!state) return;
+    clearInterval(state.intervalId);
+    state.el.remove();
+    _blackoutCountdownState[type] = null;
+}
+
+// Repositions the badge centered over the row-clue strip or the
+// column-clue header block, based on the puzzle grid's current rect.
+function _positionBlackoutCountdown(type, el) {
+    const r = _fxGetPuzzleRect();
+    if (!r) return;
+
+    if (type === 'row') {
+        const onRight = typeof _rowCluesOnRight !== 'undefined' && _rowCluesOnRight;
+        const clueWidth = (_clueColWidth || 24) * (_clueColCount || 1);
+        const cx = onRight ? r.right + clueWidth / 2 : r.left - clueWidth / 2;
+        el.style.left = `${cx}px`;
+        el.style.top = `${r.top + r.height / 2}px`;
+    } else {
+        const firstHeader = document.querySelector('.cch');
+        let headerTop = r.top - 20;
+        if (firstHeader) {
+            const wrapRect = r.wrap.getBoundingClientRect();
+            const hRect = firstHeader.getBoundingClientRect();
+            const zoom = currentZoom || 1;
+            headerTop = (hRect.top - wrapRect.top) / zoom;
+        }
+        el.style.left = `${r.left + r.width / 2}px`;
+        el.style.top = `${(headerTop + r.top) / 2}px`;
+    }
+}
+
+// Creates (or restarts) a ticking countdown badge over the row-clue
+// strip or column-clue header for durationMs, then removes itself.
+function _startBlackoutCountdown(type, durationMs) {
+    const wrap = document.getElementById('puzzle-scaler');
+    if (!wrap) return;
+
+    _clearBlackoutCountdown(type);
+
+    const el = document.createElement('div');
+    el.className = `blackout-countdown blackout-countdown-${type}`;
+    wrap.appendChild(el);
+
+    let remaining = Math.ceil(durationMs / 1000);
+    el.textContent = remaining;
+    _positionBlackoutCountdown(type, el);
+
+    const intervalId = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) { _clearBlackoutCountdown(type); return; }
+        el.textContent = remaining;
+        _positionBlackoutCountdown(type, el);
+    }, 1000);
+
+    _blackoutCountdownState[type] = { el, intervalId };
+}
+
+
+
 // Selects roughly half the rows and half the cols at random and blacks
 // them out for a random duration between 30 and 60 seconds.
 function applyCursedBlackout() {
@@ -128,6 +196,9 @@ function applyCursedBlackout() {
             .forEach(el => el.classList.add('clue-blackout'));
     });
 
+    if (affectedRows.length) _startBlackoutCountdown('row', durationMs);
+    if (affectedCols.length) _startBlackoutCountdown('col', durationMs);
+
     setTimeout(() => {
         document.querySelectorAll('.clue-blackout')
             .forEach(el => el.classList.remove('clue-blackout'));
@@ -146,6 +217,8 @@ function applyCursedRowBlackout(durationMs = 30000) {
             .forEach(el => el.classList.add('clue-blackout'));
     }
 
+    _startBlackoutCountdown('row', durationMs);
+
     setTimeout(() => {
         document.querySelectorAll('.clue-blackout')
             .forEach(el => el.classList.remove('clue-blackout'));
@@ -162,6 +235,8 @@ function applyCursedColBlackout(durationMs) {
         document.querySelectorAll(`.cch-${c}`)
             .forEach(el => el.classList.add('clue-blackout'));
     }
+
+    _startBlackoutCountdown('col', durationMs);
 
     setTimeout(() => {
         document.querySelectorAll('.clue-blackout')

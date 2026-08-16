@@ -232,6 +232,9 @@ document.addEventListener('DOMContentLoaded', () => {
         safeCall('_bayesTrapsCleanup', false);
         safeCall('_endBlackSwan', false);
         safeCall('_fxShieldBorderRemove');
+
+        _clearBlackoutCountdown('row');
+        _clearBlackoutCountdown('col');
     }
 
     /**

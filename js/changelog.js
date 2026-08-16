@@ -22,6 +22,7 @@ const CHANGELOG_DATA = [
                     "Added a new Setting option: You can now disable left-click behaviour on cells that have been marked as incorrect (by a manual right click or by items, passives and abilities).",
                     "Red Cross Marks created by passives, abilities, items and other effects are now visually distinct from manually placed cross marks",
                     "Settings can now be opened and adjusted during the Pause screen (Escape during a Puzzle Screen)",
+                    "Added countdown timers for row and column clue number blackout durations after using cursed items.",
                 ],
 
             },

@@ -484,6 +484,27 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         border-radius: 2px;
     }
 
+
+.blackout-countdown {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 340;
+    font-family: var(--PX);
+    color: #ff5555;
+    text-shadow: 0 0 6px rgba(255,0,0,0.7), 0 0 2px #000;
+    font-size: 15px;
+    line-height: 1;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,85,85,0.6);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* ----- Lucky tile shimmer ----- */
 
 /* The lucky cell needs relative + overflow:hidden to clip the shimmer streak */
