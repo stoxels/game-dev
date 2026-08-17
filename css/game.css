@@ -307,8 +307,93 @@ td.corner {
     opacity: 0.45;
 }
 
+/*small effect on row and col clue numbers if that specific row or col has been fully solved*/
+/* Base solved state — fires once, on a single host cell per row/col */
+/*small effect on row and col clue numbers if that specific row or col has been fully solved*/
+/* Persistent glow wash — applied to every cell in the box. Plain, non-
+   animated background so it never fights the hover highlight cascade
+   (an animated property, even after finishing with forwards, permanently
+   outranks a normal declaration on that property — that was the bug). */
+.rct.clue-line-solved,
+.cch.clue-line-solved {
+    background: rgba(102, 252, 241, 0.12);
+}
 
+/* One-time explosion — plays on a single host cell only, via pseudo-
+   elements exclusively. Nothing here ever touches the cell's own
+   `background`, so hover keeps working normally on that cell too. */
+.clue-line-solved-fx {
+    position: relative;
+    animation: clue-solve-scale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
 
+    .clue-line-solved-fx::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 4px;
+        border: 2px solid #66fcf1;
+        pointer-events: none;
+        z-index: 10;
+        animation: clue-shockwave 0.45s ease-out forwards;
+    }
+
+    .clue-line-solved-fx::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 11;
+        animation: clue-particle-burst 0.5s ease-out forwards;
+    }
+
+/* Cell scale-pop — transform only, never background, so it can't shadow
+   the hover rule the way the old version did. */
+@keyframes clue-solve-scale {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.18);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Expanding outer ring animation */
+@keyframes clue-shockwave {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+        box-shadow: 0 0 12px rgba(102, 252, 241, 0.9);
+    }
+
+    100% {
+        transform: scale(1.4);
+        opacity: 0;
+        box-shadow: 0 0 24px rgba(102, 252, 241, 0);
+    }
+}
+
+/* Particle explosion animation using box-shadow points */
+@keyframes clue-particle-burst {
+    0% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 #66fcf1, 0 0 0 0 #ffffff, 0 0 0 0 #66fcf1, 0 0 0 0 #ffffff, 0 0 0 0 #66fcf1, 0 0 0 0 #ffffff, 0 0 0 0 #66fcf1, 0 0 0 0 #ffffff;
+    }
+
+    100% {
+        opacity: 0;
+        box-shadow: -28px -20px 0 1px rgba(102, 252, 241, 0), 28px -20px 0 1px rgba(255, 255, 255, 0), -28px 20px 0 1px rgba(255, 255, 255, 0), 28px 20px 0 1px rgba(102, 252, 241, 0), 0px -32px 0 1px rgba(102, 252, 241, 0), 0px 32px 0 1px rgba(255, 255, 255, 0), -34px 0px 0 1px rgba(255, 255, 255, 0), 34px 0px 0 1px rgba(102, 252, 241, 0);
+    }
+}
 
 /*
     ------------------------------------------------------------------------

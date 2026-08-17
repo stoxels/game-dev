@@ -23,6 +23,7 @@ const CHANGELOG_DATA = [
                     "Red Cross Marks created by passives, abilities, items and other effects are now visually distinct from manually placed cross marks",
                     "Settings can now be opened and adjusted during the Pause screen (Escape during a Puzzle Screen)",
                     "Added countdown timers for row and column clue number blackout durations after using cursed items.",
+                    "Added a small visual effect when a row or column has been fully solved.",
                 ],
 
             },
@@ -37,6 +38,8 @@ const CHANGELOG_DATA = [
                     "The Drag Counter now counts cells that are item or skill revealed aswell.",
                     "Diagonal Strike now also shows a message when no correct cell has been revealed.",
                     "When opening a probability gate modal after completing a previous level, closing the probability gate modal now automatically returns you to the level selection screen instead of just closing the modal.",
+                    "Rows and Columns with 0 correctly filled cells are now automatically marked as fully completed when a level loads instead of requiring an incorrect mark in that specific Row or Column to count as fully completed.",
+                    
 
 
                     

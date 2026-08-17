@@ -497,6 +497,10 @@ function buildGrid() {
 
     document.getElementById('ptable').innerHTML = html;
 
+    if (!isAdjMatrix) {
+        _markZeroClueLinesSolved(rowClues, colClues);   
+    }
+
     _rowCluesOnRight = false;      // reset side on each new level
     _buildRowClueToggle();         // add the toggle button
 
@@ -636,8 +640,9 @@ function getSolvedClueFlags(clueNums, userRow, solRow) {
 
 
 // _applyRowClueState — updates the strikethrough CSS class on every clue
-//   number span for the given row.  A span gets 'clue-done' when the
-//   whole row is complete OR when that individual run is already matched.
+//   number span for the given row, and (when the row just became fully
+//   solved) plays the explosion effect exactly once on a single "host"
+//   cell sized via CSS vars to visually cover the whole clue-number box.
 //
 //   row        — row index
 //   rowDone    — whether the entire row is fully solved
@@ -648,11 +653,24 @@ function _applyRowClueState(row, rowDone, rowClues, rowFlags) {
         const span = document.getElementById(`rn-${row}-${i}`);
         if (span) span.classList.toggle('clue-done', rowDone || rowFlags[i]);
     });
+
+    // Glow wash on every cell in the box (tiles seamlessly, no overflow needed)
+    const cells = [...document.querySelectorAll(`.rct-${row}`)];
+    cells.forEach(td => td.classList.toggle('clue-line-solved', rowDone));
+
+    // Ring + particle burst fire once, on the middle cell only
+    cells.forEach(td => td.classList.remove('clue-line-solved-fx'));
+    if (rowDone && cells.length) {
+        const hostIdx = Math.floor((cells.length - 1) / 2);
+        cells[hostIdx].classList.add('clue-line-solved-fx');
+    }
 }
 
 
 // _applyColClueState — updates the strikethrough CSS class on every clue
-//   number span for the given column.  Mirrors _applyRowClueState for cols.
+//   number span for the given column, and (when the column just became
+//   fully solved) plays the explosion effect exactly once on a single
+//   "host" cell sized via CSS vars to cover the whole clue-number box.
 //
 //   col      — column index
 //   colDone  — whether the entire column is fully solved
@@ -661,6 +679,17 @@ function _applyColClueState(col, colDone, colFlags) {
     document.querySelectorAll(`[id^="cn-${col}-"]`).forEach((span, i) => {
         span.classList.toggle('clue-done', colDone || colFlags[i]);
     });
+
+    const cells = [...document.querySelectorAll(`.cch-${col}`)]
+        .filter(td => td.querySelector('.ccinner'));
+
+    cells.forEach(td => td.classList.toggle('clue-line-solved', colDone));
+
+    cells.forEach(td => td.classList.remove('clue-line-solved-fx'));
+    if (colDone && cells.length) {
+        const hostIdx = Math.floor((cells.length - 1) / 2);
+        cells[hostIdx].classList.add('clue-line-solved-fx');
+    }
 }
 
 
@@ -691,6 +720,29 @@ function _isColSolved(sol, col) {
     });
 }
 
+
+
+// _markZeroClueLinesSolved — rows/cols whose clue is [0] have no solution
+//   cells at all, so the player never fills a cell in that line and
+//   updClues() never runs for it. Mark those lines solved immediately
+//   after the grid is built, reusing the same state-apply helpers so
+//   both clue-done (strikethrough) and clue-line-solved (highlight) fire.
+//
+//   rowClues — clue arrays for all rows (from buildGrid)
+//   colClues — clue arrays for all cols (from buildGrid)
+function _markZeroClueLinesSolved(rowClues, colClues) {
+    rowClues.forEach((clue, row) => {
+        if (clue.length === 1 && clue[0] === 0) {
+            _applyRowClueState(row, true, rowClues, [true]);
+        }
+    });
+
+    colClues.forEach((clue, col) => {
+        if (clue.length === 1 && clue[0] === 0) {
+            _applyColClueState(col, true, [true]);
+        }
+    });
+}
 
 
 
