@@ -1807,3 +1807,39 @@
         animation: none !important;
     }
 }
+
+
+.mv-char-tooltip-traits {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mv-char-tooltip-trait {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.mv-char-tooltip-trait-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.mv-char-tooltip-trait-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.mv-char-tooltip-trait-name {
+    font-size: 11px;
+    font-weight: bold;
+    color: #f0d090;
+}
+
+.mv-char-tooltip-trait-desc {
+    font-size: 10px;
+    color: #d8d8d8;
+    line-height: 1.3;
+}
