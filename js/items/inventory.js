@@ -5,12 +5,11 @@
 
 const RARITY_TIERS = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'cursed', 'artifact'];
 const HOARDER_THRESHOLD = 10;
-const TOAST_DISPLAY_DURATION_MS = 2500;
-const TOAST_FADE_OUT_DURATION_MS = 300;
 
-const toastQueue = [];
-let isToastShowing = false;
-let currentToastMsg = null;
+const TOAST_DISPLAY_DURATION_MS = 8000;
+const TOAST_MAX_VISIBLE = 6; // oldest gets force-removed beyond this
+
+const activeToasts = []; // { msg, el, removing, timeoutId }
 
 
 //------------------------------------------------------------------------
@@ -63,74 +62,62 @@ function checkInventoryAchievements() {
 
 
 //------------------------------------------------------------------------
-//-------------------TOAST NOTIFICATION HELPERS---------------------------
+//-------------------TOAST STACK SYSTEM------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Determines whether a given message should be suppressed to avoid duplicates.
-// Suppresses if the same message is currently on screen, or is already last in queue.
+// Suppresses a message if it's already visible in the stack.
 function _isToastDuplicate(msg) {
-    if (isToastShowing && currentToastMsg === msg) return true;
-    if (toastQueue.length > 0 && toastQueue[toastQueue.length - 1] === msg) return true;
-    return false;
+    return activeToasts.some(t => t.msg === msg);
 }
 
-// Hides the toast element and schedules the next message in the queue
-function _onToastHidden() {
-    setTimeout(_processToastQueue, TOAST_FADE_OUT_DURATION_MS);
+// Removes a single toast: plays its fade-out, then deletes the element
+// and its entry once the animation finishes.
+function _removeToast(entry) {
+    if (entry.removing) return;
+    entry.removing = true;
+    clearTimeout(entry.timeoutId);
+
+    entry.el.classList.add('toast-out');
+    entry.el.addEventListener('animationend', () => {
+        entry.el.remove();
+        const idx = activeToasts.indexOf(entry);
+        if (idx !== -1) activeToasts.splice(idx, 1);
+    }, { once: true });
 }
 
-// Displays the next message from the queue, then hides it after the display duration
-function _showNextToast(msg) {
-    currentToastMsg = msg;
-
-    const el = document.getElementById('item-toast');
-    el.textContent = msg;
-    el.classList.add('show');
-
-    setTimeout(() => {
-        el.classList.remove('show');
-        _onToastHidden();
-    }, TOAST_DISPLAY_DURATION_MS);
-}
-
-
-//------------------------------------------------------------------------
-//-------------------TOAST NOTIFICATION SYSTEM---------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Pulls the next message off the queue and displays it.
-// If the queue is empty, marks the toast system as idle.
-function _processToastQueue() {
-    if (toastQueue.length === 0) {
-        isToastShowing = false;
-        currentToastMsg = null;
-        return;
-    }
-
-    isToastShowing = true;
-    _showNextToast(toastQueue.shift());
-}
-
-// Queues a toast notification message. Duplicate messages are suppressed.
-// If no toast is currently showing, begins processing immediately.
+// Adds a new message to the bottom of the stack. It fades in independently
+// and fades out on its own timer, without affecting other visible messages.
 function showToast(msg) {
     if (_isToastDuplicate(msg)) return;
 
-    toastQueue.push(msg);
+    const container = document.getElementById('toast-stack');
+    if (!container) return;
 
-    if (!isToastShowing) {
-        _processToastQueue();
+    const el = document.createElement('div');
+    el.className = 'toast-msg';
+    el.textContent = msg;
+    container.appendChild(el);
+
+    const entry = { msg, el, removing: false, timeoutId: null };
+    activeToasts.push(entry);
+
+    // Cap how many messages can pile up — trim the oldest first.
+    if (activeToasts.length > TOAST_MAX_VISIBLE) {
+        _removeToast(activeToasts[0]);
     }
+
+    entry.timeoutId = setTimeout(() => _removeToast(entry), TOAST_DISPLAY_DURATION_MS);
 }
 
-// Clears all pending and active toasts. Called on level reset or scene transitions.
+// Clears every visible/pending toast immediately. Called on level reset or scene transitions.
 function resetToastQueue() {
-    toastQueue.length = 0;
-    isToastShowing = false;
-    currentToastMsg = null;
+    activeToasts.forEach(t => {
+        clearTimeout(t.timeoutId);
+        t.el.remove();
+    });
+    activeToasts.length = 0;
 
-    const el = document.getElementById('item-toast');
-    if (el) el.classList.remove('show');
+    const container = document.getElementById('toast-stack');
+    if (container) container.innerHTML = '';
 }

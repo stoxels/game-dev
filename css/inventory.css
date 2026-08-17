@@ -418,44 +418,58 @@
 
 
 /* -----------------------------------------------------------------------
-   8. TOAST NOTIFICATION
+   8. TOAST STACK
    -----------------------------------------------------------------------
-   A brief feedback message that slides up from the bottom after an item
-   is used. Shown by adding the .show class; hidden by removing it.
-   The old toast-in keyframe is kept commented out for reference.
+   A vertical stack of short-lived text messages, bottom-left, sitting
+   just above the inventory panel. New messages append at the bottom
+   and push older ones upward, each fading out independently.
    ----------------------------------------------------------------------- */
 
-/* Toast box — invisible by default */
-.item-use-toast {
+.toast-stack {
     position: fixed;
-    left: 50%;
-    bottom: 25px;
-    transform: translate(-50%);
+    left: clamp(10px, 2vw, 20px);
+    bottom: calc(var(--inv-panel-h) + 14px);
     z-index: 900;
-    font-family: var(--PX);
-    font-size: 25px;
-    color: var(--bg);
-    background: var(--purple);
-    padding: 9px 18px;
-    display: none;
-    animation: toast-pop-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-width: 340px;
+    pointer-events: none; /* never blocks clicks */
 }
 
-    /* Adding .show makes the toast visible */
-    .item-use-toast.show {
-        display: block;
+.toast-msg {
+    font-family: var(--PX);
+    font-size: 12px;
+    color: #fff;
+    line-height: 1.3;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    animation: toast-fade-in 0.18s ease-out forwards;
+}
+
+    .toast-msg.toast-out {
+        animation: toast-fade-out 0.5s ease-in forwards;
     }
 
-/* Snappy pop-in from slightly below */
-@keyframes toast-pop-up {
+@keyframes toast-fade-in {
     from {
         opacity: 0;
-        transform: translate(-50%, 15px);
+        transform: translateY(4px);
     }
 
     to {
         opacity: 1;
-        transform: translate(-50%, 0);
+        transform: translateY(0);
+    }
+}
+
+@keyframes toast-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
     }
 }
 

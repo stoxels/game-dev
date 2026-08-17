@@ -24,6 +24,7 @@ const CHANGELOG_DATA = [
                     "Settings can now be opened and adjusted during the Pause screen (Escape during a Puzzle Screen)",
                     "Added countdown timers for row and column clue number blackout durations after using cursed items.",
                     "Added a small visual effect when a row or column has been fully solved.",
+                    "The Message Queue Toast System has been fully remade.",
                 ],
 
             },
