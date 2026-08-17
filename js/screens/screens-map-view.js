@@ -1010,12 +1010,13 @@ function _ensureTooltipElement() {
 /**
  * Builds the inner HTML content for the world tooltip.
  *
- * @param {number}  wi       - World index
- * @param {boolean} isDone   - Whether the world is completed
- * @param {boolean} isLocked - Whether the world is locked
+ * @param {number}  wi          - World index
+ * @param {boolean} isDone      - Whether the world is completed
+ * @param {boolean} isLocked    - Whether the world is locked
+ * @param {number}  healingTier - 0–3 completion tier (see _getWorldHealingTier)
  * @returns {string} HTML string
  */
-function _buildTooltipContent(wi, isDone, isLocked) {
+function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
     const label = _getWorldLabel(wi);
     let statusText;
 
@@ -1039,7 +1040,36 @@ function _buildTooltipContent(wi, isDone, isLocked) {
         }
     }
 
-    return `<div class="mv-tooltip-title">${label}</div><div class="mv-tooltip-sub">${statusText}</div>`;
+    const remainingHtml = (isDone && wi !== 13)
+        ? `<div class="mv-tooltip-remaining">${_buildRemainingWorkText(healingTier)}</div>`
+        : '';
+
+    return `<div class="mv-tooltip-title">${label}</div><div class="mv-tooltip-sub">${statusText}</div>${remainingHtml}`;
+}
+
+/**
+ * Returns a hint string describing what's left to fully complete a world,
+ * based on its healing tier (0–3). Only called for worlds where every
+ * level has been cleared at least once (tier >= 1).
+ *
+ * @param {number} healingTier
+ * @returns {string}
+ */
+function _buildRemainingWorkText(healingTier) {
+    if (healingTier === 1) {
+        return LANG === 'de'
+            ? '🎯 Bonusziele noch offen'
+            : '🎯 Bonus objectives remaining';
+    }
+    if (healingTier === 2) {
+        return LANG === 'de'
+            ? '👑 Hard + alle Modifikatoren für vollen Abschluss'
+            : '👑 Clear on Hard with all modifiers for full completion';
+    }
+    // tier 3 — fully maxed out
+    return LANG === 'de'
+        ? '✨ Vollständig gemeistert!'
+        : '✨ Fully mastered!';
 }
 
 /**
@@ -1049,10 +1079,11 @@ function _buildTooltipContent(wi, isDone, isLocked) {
  * @param {number}  wi
  * @param {boolean} isDone
  * @param {boolean} isLocked
+ * @param {number}  healingTier
  */
-function _showWorldTooltip(e, wi, isDone, isLocked) {
+function _showWorldTooltip(e, wi, isDone, isLocked, healingTier) {
     const tip = _ensureTooltipElement();
-    tip.innerHTML = _buildTooltipContent(wi, isDone, isLocked);
+    tip.innerHTML = _buildTooltipContent(wi, isDone, isLocked, healingTier);
     tip.classList.add('show');
     _trackTooltipToMouse(e);
 }
@@ -1244,9 +1275,10 @@ function _applyWorldNodeStateClass(node, isDone, isLocked, healingTier) {
  * @param {number}  wi
  * @param {boolean} isDone
  * @param {boolean} isLocked
+ * @param {number}  healingTier
  */
-function _attachNodeTooltipEvents(node, wi, isDone, isLocked) {
-    node.addEventListener('mouseenter', (e) => _showWorldTooltip(e, wi, isDone, isLocked));
+function _attachNodeTooltipEvents(node, wi, isDone, isLocked, healingTier) {
+    node.addEventListener('mouseenter', (e) => _showWorldTooltip(e, wi, isDone, isLocked, healingTier));
     node.addEventListener('mousemove', (e) => _trackTooltipToMouse(e));
     node.addEventListener('mouseleave', () => _hideWorldTooltip());
 }
@@ -1286,7 +1318,7 @@ function _buildWorldNode(pos, wi) {
         node.addEventListener('click', () => _onWorldNodeClick(wi));
     }
 
-    _attachNodeTooltipEvents(node, wi, isDone, isLocked);
+    _attachNodeTooltipEvents(node, wi, isDone, isLocked, healingTier);
 
     return node;
 }
