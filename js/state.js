@@ -168,6 +168,8 @@ function buildFreshState() {
         classWorldsCompleted: [],
         classActiveChoice: 'active1',
 
+        classHudHintUses: 0,   // how many times player has activated via slot 1/2
+
         // Ascendency progression
         playerAscendency: null,
         ascendencySkill1Level: 1,
@@ -230,6 +232,7 @@ function _migrateClassFields(s) {
     if (!s.classWorldsCompleted) s.classWorldsCompleted = [];
     // Older saves stored classActiveChoice as a number; replace with the string default.
     if (!s.classActiveChoice || typeof s.classActiveChoice === 'number') s.classActiveChoice = 'active1';
+    if (s.classHudHintUses === undefined) s.classHudHintUses = 0;
 }
 
 // _migrateAscendencyFields — fills in ascendency-progression fields missing from an older save.

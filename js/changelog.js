@@ -26,6 +26,7 @@ const CHANGELOG_DATA = [
                     "Added a small visual effect when a row or column has been fully solved.",
                     "The Message Queue Toast System has been fully remade.",
                     "The chosen Character now appears in the Level Selection Topbar row. Mouse - overing the character shows the character traits.",
+                    "After selecting a class for the first time there are now two visual hints that tell the player to use keyboard buttons 1 and 2 to activate spells.",
                 ],
 
             },
@@ -43,6 +44,7 @@ const CHANGELOG_DATA = [
                     "Rows and Columns with 0 correctly filled cells are now automatically marked as fully completed when a level loads instead of requiring an incorrect mark in that specific Row or Column to count as fully completed.",
                     "Mouse-Overing a world number label will now show you what you can still do in this world in order to receive more Score.",
                     "The old Level Selection Screen has been removed.",
+                    "The color of item, spell and passive correctly revealed cells has been slightly adjusted.",
                     
 
 

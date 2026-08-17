@@ -19,6 +19,9 @@ const HUD_COLOR_ACTIVE = '#3498db';
 // Maximum number of shield pip icons to display at once
 const HUD_SHIELD_PIP_MAX = 5;
 
+// Number of times the player must activate via slot 1/2 before the hint arrows
+// are dismissed for good.
+const CLASS_HUD_HINT_MAX_USES = 3;
 
 
 
@@ -299,10 +302,40 @@ function _buildSkillBtnHTML(hudSlot, displayIdx, accentColor, extraClasses) {
         </button>`;
 }
 
+// Returns true if the "press 1/2" hint arrows should still render.
+function _shouldShowActivationHint() {
+    return (STATE.classHudHintUses || 0) < CLASS_HUD_HINT_MAX_USES;
+}
+
+// Builds the bouncing yellow arrow + key label shown near HUD slot 1/2.
+// Slot 1's hint sits above the button (arrow pointing down into it).
+// Slot 2's hint sits below the button (arrow pointing up into it) so the
+// two labels don't collide when the HUD is narrow.
+function _buildHintArrowHTML(key) {
+    if (!_shouldShowActivationHint()) return '';
+    const label = key === 'active1' ? '1' : '2';
+    const pressWord = LANG === 'de' ? 'Drücke' : 'Press';
+    const text = `${pressWord} ${label}`;
+
+    if (key === 'active1') {
+        return `<div class="chud-hint-arrow chud-hint-arrow--above">
+            <span class="chud-hint-label">${text}</span>▼
+        </div>`;
+    }
+    return `<div class="chud-hint-arrow chud-hint-arrow--below">
+        ▲<span class="chud-hint-label">${text}</span>
+    </div>`;
+}
+
+
+
 // Renders a compact active skill button for a base class slot (active1 / active2).
 function renderCompactActiveBtn(def, key) {
     const idx = key === 'active1' ? '1' : '2';
-    return _buildSkillBtnHTML(key, idx, HUD_COLOR_ACTIVE, '');
+    const btn = _buildSkillBtnHTML(key, idx, HUD_COLOR_ACTIVE, '');
+    const hint = _buildHintArrowHTML(key);
+    if (!hint) return btn;
+    return `<div class="chud-skill-btn-wrap">${hint}${btn}</div>`;
 }
 
 // Renders a compact active skill button for an ascendency slot (active3 / active4).
@@ -644,6 +677,59 @@ function injectCompactHUDStyles(def) {
             text-align: center;
             line-height: 1;
         }
+        .chud-skill-btn-wrap {
+            position: relative;
+            display: inline-flex;
+        }
+
+    .chud-hint-arrow {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #f1c40f;
+        font-family: var(--PX, monospace);
+        font-size: 14px;
+        line-height: 1;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 601;
+        text-shadow: 0 0 4px rgba(241,196,15,0.8);
+    }
+
+    .chud-hint-arrow--above {
+        bottom: 100%;
+        margin-bottom: 2px;
+        animation: chud-hint-bounce-up 1s infinite;
+    }
+
+    .chud-hint-arrow--below {
+        top: 100%;
+        margin-top: 2px;
+        animation: chud-hint-bounce-down 1s infinite;
+    }
+
+    .chud-hint-label {
+        font-size: 9px;
+        margin: 2px 0;
+        background: rgba(0,0,0,0.65);
+        padding: 1px 4px;
+        border-radius: 3px;
+    }
+
+    @keyframes chud-hint-bounce-up {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-4px); }
+    }
+
+    @keyframes chud-hint-bounce-down {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(4px); }
+    }
+
+
     `;
     document.head.appendChild(s);
 }

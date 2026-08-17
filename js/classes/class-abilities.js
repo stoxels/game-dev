@@ -392,6 +392,17 @@ function _fireInstantAbility(slot) {
 
 
 
+// Advances the "press 1/2" HUD hint counter. Only counts activations of the base
+// class slots (1/2), since that's what the arrows point at. Once it reaches
+// CLASS_HUD_HINT_MAX_USES the arrows stop rendering on the next HUD rebuild.
+function _trackActivationHintProgress(slot) {
+    if (slot !== 'active1' && slot !== 'active2') return;
+    if ((STATE.classHudHintUses || 0) >= CLASS_HUD_HINT_MAX_USES) return;
+
+    STATE.classHudHintUses = (STATE.classHudHintUses || 0) + 1;
+    save();
+}
+
 
 //------------------------------------------------------------------------
 //------------------ACTIVE ABILITY TOGGLE (ENTRY POINT)------------------
@@ -424,6 +435,7 @@ function toggleActiveAbility(slot) {
     }
 
     STATE.classActiveChoice = newSlot;
+    _trackActivationHintProgress(newSlot);
 
     if (_isInstantAbility(newSlot)) {
         _fireInstantAbility(newSlot);

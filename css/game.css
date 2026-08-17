@@ -540,7 +540,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
 
 /* Tinted background applied to cells revealed by a skill or item */
 .gc.revealed {
-    background: var(--cell-revealed-bg);
+    background: #34b1ab;
     border-color: var(--cell-revealed-border);
 }
 
