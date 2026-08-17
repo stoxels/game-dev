@@ -25,6 +25,7 @@ const CHANGELOG_DATA = [
                     "Added countdown timers for row and column clue number blackout durations after using cursed items.",
                     "Added a small visual effect when a row or column has been fully solved.",
                     "The Message Queue Toast System has been fully remade.",
+                    "The chosen Character now appears in the Level Selection Topbar row. Mouse - overing the character shows the character traits.",
                 ],
 
             },
@@ -41,6 +42,7 @@ const CHANGELOG_DATA = [
                     "When opening a probability gate modal after completing a previous level, closing the probability gate modal now automatically returns you to the level selection screen instead of just closing the modal.",
                     "Rows and Columns with 0 correctly filled cells are now automatically marked as fully completed when a level loads instead of requiring an incorrect mark in that specific Row or Column to count as fully completed.",
                     "Mouse-Overing a world number label will now show you what you can still do in this world in order to receive more Score.",
+                    "The old Level Selection Screen has been removed.",
                     
 
 

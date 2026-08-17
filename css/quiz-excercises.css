@@ -44,7 +44,7 @@
     position: relative;
     width: min(1500px, 100vw);
     aspect-ratio: 16 / 9;
-    background: url('../images/quiz/quiz-panel-background.png') center / 100% 100% no-repeat;
+    background: url('../images/quiz/quiz-panel-background.png') center / 125% 100% no-repeat;
     /* No other border or shadow — the image IS the frame */
 }
 
@@ -347,7 +347,7 @@
 .qr-footer {
     position: absolute; /* now independent of content height above it */
     left: 50%;
-    bottom: -27%;
+    bottom: -16%;
     transform: translateX(-50%);
     display: flex;
     gap: 3%;
@@ -362,7 +362,7 @@
     position: relative;
     height: auto;
     aspect-ratio: 604 / 376;
-    background: url('../images/quiz/skip-button.png') center / 100% 100% no-repeat;
+    background: url('../images/quiz/skip-button.png') center / 100% 75% no-repeat;
     border: none;
     cursor: pointer;
     font-family: var(--PX);

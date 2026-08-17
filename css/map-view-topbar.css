@@ -99,37 +99,35 @@
 
 
 /* ---------------------------------------------------------
-   3. LIST VIEW TOGGLE BUTTON
+   3. CHARACTER SPRITE PORTRAIT
    --------------------------------------------------------- */
 
-#screen-map-view #btn-toggle-map-view-mv {
-    font-family: var(--PX, monospace);
-    font-size: clamp(8px, 1vw, 11px);
-    letter-spacing: 1px;
-    color: #f5e9c8;
-    background: url('../images/Level_Select_Topbar/list-square.png') center / 100% 100% no-repeat;
-    height: auto;
-    width: clamp(56px, 8vw, 100px);
-    aspect-ratio: 1.6 / 1;
-    box-sizing: border-box;
-    border: none;
+#screen-map-view .mv-char-portrait-wrap {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    padding-bottom: clamp(5px, 1.2vw, 10px);
-    text-shadow: 1px 1px 2px #000;
-    white-space: nowrap;
+    width: clamp(56px, 8vw, 100px);
+    height: clamp(56px, 8vw, 100px);
+    box-sizing: border-box;
+    border-radius: 8px;
+    cursor: help;
     flex-shrink: 1;
-    cursor: auto;
+    overflow: hidden;
+    transition: filter 0.15s, border-color 0.15s;
 }
 
-    #screen-map-view #btn-toggle-map-view-mv:hover {
-        filter: brightness(1.25);
+    #screen-map-view .mv-char-portrait-wrap:hover {
+        filter: brightness(1.2);
+        border-color: #c8a84b;
     }
 
-    #screen-map-view #btn-toggle-map-view-mv:active {
-        transform: translateY(1px);
-    }
+#screen-map-view .mv-char-portrait-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
 
 /* ---------------------------------------------------------
    4. COMBINED SCORE + DIFFICULTY RIBBON (single scroll)
@@ -338,5 +336,10 @@
     #screen-map-view #mv-class-status {
         font-size: 7px;
         padding: 2px 5px;
+    }
+
+    #screen-map-view .mv-char-portrait-wrap {
+        width: clamp(44px, 16vw, 70px);
+        height: clamp(44px, 16vw, 70px);
     }
 }

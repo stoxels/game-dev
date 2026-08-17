@@ -1664,7 +1664,10 @@ function _buildMapViewTopBar() {
     _renderTopBarQuestBadge();
     _wireTopBarButtons();
 
-    // Inject the character portrait into the top bar (defined externally)
+    // Character portrait (replaces the old List-view toggle button) —
+    // hovering it shows the character's traits tooltip.
+    if (typeof renderMapViewCharacterPortrait === 'function') renderMapViewCharacterPortrait();
+
     if (typeof renderLSCharacterAvatar === 'function') renderLSCharacterAvatar();
 }
 
@@ -1684,12 +1687,11 @@ function _updateToggleButtonLabels() {
         ? (LANG === 'de' ? 'LISTE' : 'LIST')
         : (LANG === 'de' ? 'KARTE' : 'MAP');
 
-    ['btn-toggle-map-view', 'btn-toggle-map-view-mv'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (!btn) return;
+    const btn = document.getElementById('btn-toggle-map-view');
+    if (btn) {
         btn.textContent = label;
         btn.classList.toggle('active-view', !!isMap);
-    });
+    }
 }
 
 /**
@@ -1722,11 +1724,8 @@ function toggleMapView() {
  */
 function initMapViewToggle() {
     _updateToggleButtonLabels();
-
-    ['btn-toggle-map-view', 'btn-toggle-map-view-mv'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) btn.addEventListener('click', toggleMapView);
-    });
+    const btn = document.getElementById('btn-toggle-map-view');
+    if (btn) btn.addEventListener('click', toggleMapView);
 }
 
 

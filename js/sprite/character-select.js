@@ -273,3 +273,69 @@ function renderLSCharacterAvatar() {
     // Sync sprite to current class/ascendency
     if (typeof _updateLSAvatarImage === 'function') _updateLSAvatarImage();
 }
+
+
+
+//------------------------------------------------------------------------
+//-------------------MAP VIEW CHARACTER PORTRAIT + TOOLTIP----------------
+//------------------------------------------------------------------------
+// Renders the selected character's sprite in the map-view top bar
+// (replaces the old "LIST" toggle button). Hovering shows the same
+// tooltip used for world nodes (see screens-map-view.js), populated
+// with this character's traits instead.
+
+function _buildCharacterTooltipContent(char) {
+    const lang = typeof LANG !== 'undefined' ? LANG : 'en';
+    const charName = lang === 'de' ? char.nameDE : char.name;
+    const tagline = lang === 'de' ? char.taglineDE : char.tagline;
+
+    const traitsHtml = (char.traits || []).map(tr => {
+        const trName = lang === 'de' ? tr.nameDE : tr.nameEn;
+        const trDesc = lang === 'de' ? tr.descDE : tr.descEn;
+        return `
+            <div class="mv-char-tooltip-trait">
+                <span class="mv-char-tooltip-trait-icon">${tr.icon}</span>
+                <span class="mv-char-tooltip-trait-text">
+                    <span class="mv-char-tooltip-trait-name">${trName}</span>
+                    <span class="mv-char-tooltip-trait-desc">${trDesc}</span>
+                </span>
+            </div>`;
+    }).join('');
+
+    return `
+        <div class="mv-tooltip-title">${charName}</div>
+        <div class="mv-tooltip-sub">${tagline}</div>
+        <div class="mv-char-tooltip-traits">${traitsHtml}</div>
+    `;
+}
+
+function _showCharacterTooltip(e, char) {
+    if (typeof _ensureTooltipElement !== 'function') return;
+    const tip = _ensureTooltipElement();
+    tip.innerHTML = _buildCharacterTooltipContent(char);
+    tip.classList.add('show');
+    if (typeof _trackTooltipToMouse === 'function') _trackTooltipToMouse(e);
+}
+
+function _hideCharacterTooltip() {
+    if (typeof _hideWorldTooltip === 'function') _hideWorldTooltip();
+}
+
+// renderMapViewCharacterPortrait — injects the chosen character's sprite
+// into #mv-char-portrait-wrap (index.html). Safe to call repeatedly.
+function renderMapViewCharacterPortrait() {
+    const wrap = document.getElementById('mv-char-portrait-wrap');
+    if (!wrap) return;
+
+    if (!STATE.playerCharacter || !CHARACTERS[STATE.playerCharacter]) {
+        wrap.innerHTML = '';
+        return;
+    }
+
+    const char = CHARACTERS[STATE.playerCharacter];
+    wrap.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="${char.name}" class="mv-char-portrait-img" draggable="false">`;
+
+    wrap.onmouseenter = (e) => _showCharacterTooltip(e, char);
+    wrap.onmousemove = (e) => { if (typeof _trackTooltipToMouse === 'function') _trackTooltipToMouse(e); };
+    wrap.onmouseleave = () => _hideCharacterTooltip();
+}
