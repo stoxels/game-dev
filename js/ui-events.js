@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('btn-mg-close', () => hideMathGate());
+    onClick('btn-mg-close', () => mgCloseToLevelSelect());
     onClick('mg-submit-btn', () => submitMathGate());
     onClick('mg-tutor-btn', () => mgUseTutor());
     onClick('mg-new-q-btn', () => mgNewQuestion());

@@ -36,6 +36,7 @@ const CHANGELOG_DATA = [
                     "Quiz and Excercise buttons have been vertically repositionioed.",
                     "The Drag Counter now counts cells that are item or skill revealed aswell.",
                     "Diagonal Strike now also shows a message when no correct cell has been revealed.",
+                    "When opening a probability gate modal after completing a previous level, closing the probability gate modal now automatically returns you to the level selection screen instead of just closing the modal.",
 
 
                     

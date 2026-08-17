@@ -371,11 +371,22 @@ function _mgRefreshWhyButton() {
     btn.onclick = mgToggleExplain;
 }
 
+
+
 // Closes the math gate modal and clears all module-level state.
 function hideMathGate() {
     hideModal('mg-modal');
     currentGateQuestion = null;
     pendingGateGi = null;
+}
+
+
+// Closes the math gate modal and returns the player to level select.
+// Used by the modal's ✕ CLOSE button so declining the gate doesn't strand
+// the player on whatever screen was behind the modal.
+function mgCloseToLevelSelect() {
+    hideMathGate();
+    goToLevelSelect();
 }
 
 
