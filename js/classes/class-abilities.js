@@ -565,6 +565,7 @@ function _resetClassLevelState() {
     window._typeIShieldedCells = new Set();
     window._typeIBonusReveal = false;
     window._bayesTrapProtectedLines = new Set();
+    _varianceShield_removeBubble();
 
     updateMomentumBar(0, 15);
 
@@ -580,6 +581,7 @@ function _applyMathmagicianPassive(effect) {
     if (ptHasSkill('reinforced_shield')) freeMistakes += 1;
     if (ptHasSkill('fortified_shield')) freeMistakes += 1;
     window._classFreeMistakes = freeMistakes;
+    _varianceShield_updateVisibility();
 }
 
 
@@ -717,6 +719,9 @@ function _applyMathmagicianShieldAbsorb() {
     Audio_Manager.playSFX('varianceShield');
     trackAchStat('mistakesAbsorbed');
 
+    _varianceShield_playCometImpact();   
+    _varianceShield_updateVisibility(); 
+
     // Each passive node has its own independent chance to grant bonus time
     let bonus = 0;
     if (ptHasSkill('calculated_error') && Math.random() < 0.50) bonus += 120;
@@ -807,6 +812,8 @@ function _handleMathmagicianFreezeBonus() {
         window._freezeCorrFills = (window._freezeCorrFills || 0) + 1;
         if (window._freezeCorrFills % 5 === 0) {
             window._classFreeMistakes = (window._classFreeMistakes || 0) + 1;
+
+            _varianceShield_updateVisibility(); 
 
             const label = (LANG === 'de') ? 'Schild' : 'shield';
             const msg = (LANG === 'de')

@@ -45,6 +45,8 @@ const CHANGELOG_DATA = [
                     "Mouse-Overing a world number label will now show you what you can still do in this world in order to receive more Score.",
                     "The old Level Selection Screen has been removed.",
                     "The color of item, spell and passive correctly revealed cells has been slightly adjusted.",
+                    "The Demon Eye Item is now applying the grid shield border effect",
+                    "Mathmagician: Added a new visual for the Variance Shield passive effect.",
                     
 
 
@@ -62,6 +64,7 @@ const CHANGELOG_DATA = [
                     "Fixed a bug that made sprites keep walking after selecting a level or when returning from a puzzle back to the level selection screen using the Levels button.",
                     "Fixed a bug that made the shield effect around the grid not properly reposition when clicking the Clues button to move row clue numbers to the other side",
                     "Fixed a bug that showed an incorrect amount of cells to be revealed by Data Strike from the Statistician class in the Data Strike Modal panel.",
+                    "Fixed a bug that made row and col blackout effects not last for the full duration if multiple of the same blackout effects occured onto the same axis while a blackout efect was already going on."
                 ],
 
             },

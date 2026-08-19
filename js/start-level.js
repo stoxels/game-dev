@@ -127,6 +127,8 @@ function _cleanupPreviousLevel() {
     // (defined in start-level-passives.js, loaded before this file)
     _hideCompletionGlimpseBar();
 
+    if (typeof _varianceShield_removeBubble === 'function') _varianceShield_removeBubble();
+
     // Only reset HP if this is a fresh start, not a chained puzzle transition
     const isChainTransition = !!window._egSuppressEncounterStop;
     if (!isChainTransition) _resetPlayerHP();

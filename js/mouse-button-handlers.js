@@ -230,13 +230,29 @@ function tryAbsorbWithShield(row, col) {
 
 // Class passive (e.g. Mathmagician): penalty multiplier of 0 means fully absorbed.
 function tryAbsorbWithClassPassive(row, col) {
+    // Suppress any shield-visibility sync (e.g. inside getClassPenaltyMultiplier)
+    // from hiding the bubble before we know this was absorbed, and before the
+    // meteor VFX gets a chance to play.
+    window._vsSuppressAutoHide = true;
+
     const penMult = getClassPenaltyMultiplier();
-    if (penMult !== 0) return false;
+
+    if (penMult !== 0) {
+        window._vsSuppressAutoHide = false;
+        return false;
+    }
 
     wrongGrid[row][col] = true;
     renderCell(row, col);
     absorbedMistakes++;
     showToast(t('pen_shield'));
+
+    if (typeof _varianceShield_absorbMistake === 'function') {
+        _varianceShield_absorbMistake(); // clears the suppress flag itself once the meteor resolves
+    } else {
+        window._vsSuppressAutoHide = false;
+    }
+
     return true;
 }
 

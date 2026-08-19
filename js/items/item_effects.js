@@ -1209,6 +1209,7 @@ function _fxMakeEyeScanLines(container, r) {
 }
 
 // 👁️ Cursed Shield — demonic eye opens, then rows black out.
+// 👁️ Cursed Shield — demonic eye opens, then rows black out.
 function _fxCursedShield() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -1219,6 +1220,8 @@ function _fxCursedShield() {
 
     _fxMakeEyeScanLines(overlay, r);
     _fxMakeIcon(r.wrap, '👁️', cx, cy, 80, 'animation:fx-eye-open 1.3s ease-out forwards;', 1800);
+
+    _fxShieldBorderAdd();
 
     Audio_Manager.playSFX('demon_eye');
 }

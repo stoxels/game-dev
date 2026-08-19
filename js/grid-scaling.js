@@ -153,6 +153,10 @@ function _applyZoom() {
     // since it uses position:fixed and getBoundingClientRect screen coords.
     const border = document.getElementById('fx-shield-border');
     if (border?._reposition) border._reposition();
+
+    // keep the variance shield bubble in sync with the new zoom immediately
+    const vsBubble = document.getElementById('variance-shield-bubble');
+    if (vsBubble?._reposition) vsBubble._reposition();
 }
 
 

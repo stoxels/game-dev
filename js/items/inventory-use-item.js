@@ -102,6 +102,21 @@ function _trackWitchImmuneCursedUse() {
 // effects (e.g. two row-blackouts back to back) don't leak old badges.
 let _blackoutCountdownState = { row: null, col: null };
 
+// Tracks the pending "remove blackout class" timeout per axis, so a
+// refreshed blackout (e.g. using Chaos Grid twice in a row) cancels the
+// old removal instead of letting it fire early.
+let _blackoutRemovalTimeout = { row: null, col: null };
+
+// Clears any pending removal timeout for the given axis without touching
+// the DOM classes themselves (those get reapplied/extended by the new call).
+function _clearBlackoutRemoval(type) {
+    if (_blackoutRemovalTimeout[type]) {
+        clearTimeout(_blackoutRemovalTimeout[type]);
+        _blackoutRemovalTimeout[type] = null;
+    }
+}
+
+
 // Removes and clears the countdown badge for the given axis ('row'|'col').
 function _clearBlackoutCountdown(type) {
     const state = _blackoutCountdownState[type];
@@ -172,42 +187,42 @@ function applyCursedBlackout() {
 
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
-    const durationMs = (30 + Math.floor(Math.random() * 31)) * 1000; // 30–60 s
+    const durationMs = (30 + Math.floor(Math.random() * 31)) * 1000;
 
-    // Pick approximately half the rows to black out
     const affectedRows = [];
-    for (let r = 0; r < rows; r++) {
-        if (Math.random() < 0.5) affectedRows.push(r);
-    }
+    for (let r = 0; r < rows; r++) if (Math.random() < 0.5) affectedRows.push(r);
 
-    // Pick approximately half the columns to black out
     const affectedCols = [];
-    for (let c = 0; c < cols; c++) {
-        if (Math.random() < 0.5) affectedCols.push(c);
-    }
+    for (let c = 0; c < cols; c++) if (Math.random() < 0.5) affectedCols.push(c);
 
     affectedRows.forEach(r => {
-        document.querySelectorAll(`.rct-${r}`)
-            .forEach(el => el.classList.add('clue-blackout'));
+        document.querySelectorAll(`.rct-${r}`).forEach(el => el.classList.add('clue-blackout'));
     });
-
     affectedCols.forEach(c => {
-        document.querySelectorAll(`.cch-${c}`)
-            .forEach(el => el.classList.add('clue-blackout'));
+        document.querySelectorAll(`.cch-${c}`).forEach(el => el.classList.add('clue-blackout'));
     });
 
-    if (affectedRows.length) _startBlackoutCountdown('row', durationMs);
-    if (affectedCols.length) _startBlackoutCountdown('col', durationMs);
+    if (affectedRows.length) {
+        _startBlackoutCountdown('row', durationMs);
+        _clearBlackoutRemoval('row');
+        _blackoutRemovalTimeout.row = setTimeout(() => {
+            document.querySelectorAll('[class*="rct-"].clue-blackout')
+                .forEach(el => el.classList.remove('clue-blackout'));
+            _blackoutRemovalTimeout.row = null;
+        }, durationMs);
+    }
 
-    setTimeout(() => {
-        document.querySelectorAll('.clue-blackout')
-            .forEach(el => el.classList.remove('clue-blackout'));
-    }, durationMs);
+    if (affectedCols.length) {
+        _startBlackoutCountdown('col', durationMs);
+        _clearBlackoutRemoval('col');
+        _blackoutRemovalTimeout.col = setTimeout(() => {
+            document.querySelectorAll('[class*="cch-"].clue-blackout')
+                .forEach(el => el.classList.remove('clue-blackout'));
+            _blackoutRemovalTimeout.col = null;
+        }, durationMs);
+    }
 }
 
-// Blacks out ALL row clues for durationMs milliseconds.
-// Default: 30 000 ms (30 s).  Used as the downside for cursedShield and
-// cursedTime.
 function applyCursedRowBlackout(durationMs = 30000) {
     if (!cur) return;
 
@@ -219,14 +234,14 @@ function applyCursedRowBlackout(durationMs = 30000) {
 
     _startBlackoutCountdown('row', durationMs);
 
-    setTimeout(() => {
-        document.querySelectorAll('.clue-blackout')
+    _clearBlackoutRemoval('row');
+    _blackoutRemovalTimeout.row = setTimeout(() => {
+        document.querySelectorAll('[class*="rct-"].clue-blackout')
             .forEach(el => el.classList.remove('clue-blackout'));
+        _blackoutRemovalTimeout.row = null;
     }, durationMs);
 }
 
-// Blacks out ALL column clues for durationMs milliseconds.
-// Used as the downside for cursedRowCol.
 function applyCursedColBlackout(durationMs) {
     if (!cur) return;
 
@@ -238,9 +253,11 @@ function applyCursedColBlackout(durationMs) {
 
     _startBlackoutCountdown('col', durationMs);
 
-    setTimeout(() => {
-        document.querySelectorAll('.clue-blackout')
+    _clearBlackoutRemoval('col');
+    _blackoutRemovalTimeout.col = setTimeout(() => {
+        document.querySelectorAll('[class*="cch-"].clue-blackout')
             .forEach(el => el.classList.remove('clue-blackout'));
+        _blackoutRemovalTimeout.col = null;
     }, durationMs);
 }
 

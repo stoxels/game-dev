@@ -351,6 +351,10 @@ function _toggleRowCluesSide() {
     // Keep the shield border (if active) aligned with the grid's new position
     const border = document.getElementById('fx-shield-border');
     if (border?._reposition) border._reposition();
+
+    // Keep the variance shield bubble (Mathmagician passive) aligned too
+    const vsBubble = document.getElementById('variance-shield-bubble');
+    if (vsBubble?._reposition) vsBubble._reposition();
 }
 
 

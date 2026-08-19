@@ -233,6 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
         safeCall('_endBlackSwan', false);
         safeCall('_fxShieldBorderRemove');
 
+        safeCall('_varianceShield_removeBubble');
+
         _clearBlackoutCountdown('row');
         _clearBlackoutCountdown('col');
     }
