@@ -236,6 +236,15 @@ function _updateModTags() {
     mt.innerHTML += `<span class="mod-tag diff">${t('diff_' + curDiff)}</span>`;
 }
 
+
+// Writes the mistake counter text in the one canonical format, so every
+// caller (HUD refresh, mistake eraser, golden clock) stays in sync.
+function _setMistakeCounterText(suffix = '') {
+    const mc = document.getElementById('mistake-counter');
+    if (mc) mc.textContent = `${LANG === 'de' ? 'Fehler' : 'Mistakes'}: ${mistakeCount}${suffix}`;
+}
+
+
 // Updates all HUD elements: level id, hint text, score display, penalty info,
 // mistake counter, bonus sidebar, and modifier tags.
 function _updateHUD() {
@@ -244,8 +253,7 @@ function _updateHUD() {
     document.getElementById('sc-disp').textContent = STATE.totalScore;
     document.getElementById('pen-info').textContent = '';
 
-    const mc = document.getElementById('mistake-counter');
-    if (mc) mc.textContent = `${LANG === 'de' ? 'Fehler' : 'Mistakes'}: ${mistakeCount}`;
+    _setMistakeCounterText();
 
     _updateBonusSidebar();
     _updateModTags();

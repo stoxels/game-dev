@@ -49,3 +49,28 @@
 #settings-modal.show {
     z-index: 10000;
 }
+
+
+
+.pause-level-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.bonus-inline {
+    justify-content: center;
+}
+
+.gtb-score-wrap {
+    text-align: center;
+    margin-top: 4px;
+}
+
+.pause-btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}

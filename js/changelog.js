@@ -27,6 +27,7 @@ const CHANGELOG_DATA = [
                     "The Message Queue Toast System has been fully remade.",
                     "The chosen Character now appears in the Level Selection Topbar row. Mouse - overing the character shows the character traits.",
                     "After selecting a class for the first time there are now two visual hints that tell the player to use keyboard buttons 1 and 2 to activate spells.",
+                    "Alot of the information from the puzzle game top bar rows have been moved to the pause screen to make more space for the actual grid puzzle.",
                 ],
 
             },
@@ -64,7 +65,8 @@ const CHANGELOG_DATA = [
                     "Fixed a bug that made sprites keep walking after selecting a level or when returning from a puzzle back to the level selection screen using the Levels button.",
                     "Fixed a bug that made the shield effect around the grid not properly reposition when clicking the Clues button to move row clue numbers to the other side",
                     "Fixed a bug that showed an incorrect amount of cells to be revealed by Data Strike from the Statistician class in the Data Strike Modal panel.",
-                    "Fixed a bug that made row and col blackout effects not last for the full duration if multiple of the same blackout effects occured onto the same axis while a blackout efect was already going on."
+                    "Fixed a bug that made row and col blackout effects not last for the full duration if multiple of the same blackout effects occured onto the same axis while a blackout efect was already going on.",
+                    "Fixed a bug that caused using Tutor items to remove the mistake string from the mistake counter. ",
                 ],
 
             },

@@ -39,49 +39,22 @@
     ------------------------------------------------------------------------
 */
 
-/* Full-width bar that holds puzzle name, timer and score.
-   CSS Grid with named areas is used instead of flex + absolute
-   positioning: it reserves real space for the clock column no matter
-   how wide/narrow the bar gets, and — because grid-area placement is
-   independent of source order — it doesn't require any change to the
-   HTML markup (the clock element can stay wherever it already is in
-   the DOM). This replaces the old title-screen-style overlap bug. */
 .game-meta {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    grid-template-areas: "left clock right";
+    display: flex;
     align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 2vw, 24px);
     width: 100%;
     padding: clamp(4px, 1vw, 6px) clamp(6px, 1.5vw, 10px);
     box-sizing: border-box;
     flex-shrink: 0;
-    position: relative;
-    min-height: clamp(56px, 9vw, 80px);
-    column-gap: clamp(6px, 1.5vw, 16px);
-    row-gap: 4px;
+    min-height: clamp(40px, 6vw, 56px);
 }
 
-/* Left column: puzzle name, mod tags, bonus hint */
-.game-meta-rows-left {
-    grid-area: left;
-    min-width: 0; /* allow the column to actually shrink below content size */
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    z-index: 1;
-}
-
-/* Right column: score display and action buttons */
 .game-meta-right {
-    grid-area: right;
-    min-width: 0;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
     gap: clamp(6px, 1.2vw, 10px);
-    z-index: 1;
 }
 
 /* ----- Narrow-screen breakpoint -----
@@ -851,4 +824,73 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
 .char-speech-bubble-text {
     position: relative;
     z-index: 2;
+}
+
+
+
+
+
+
+
+
+.game-hud-corner {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 6px 12px;
+}
+
+    .game-hud-corner .game-meta-clock {
+        position: static;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .game-hud-corner .timer-icon {
+        font-size: clamp(13px, 1.8vw, 18px);
+        line-height: 1;
+    }
+
+    .game-hud-corner .timer-val {
+        font-family: var(--PX);
+        font-size: clamp(15px, 2.4vw, 24px);
+        color: var(--accent);
+        line-height: 1;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        background: black;
+    }
+
+    .game-hud-corner .gtb-pen {
+        position: static;
+        transform: none;
+        font-size: clamp(9px, 1.1vw, 13px);
+        white-space: nowrap;
+    }
+
+    .game-hud-corner .gtb-mistakes {
+        font-family: var(--PX);
+        font-size: clamp(11px, 1.4vw, 14px);
+        color: var(--red);
+        white-space: nowrap;
+    }
+
+    .game-hud-corner .touchpad-mode-btn {
+        padding: 4px 8px;
+        font-size: clamp(10px, 1.3vw, 13px);
+    }
+
+@media (max-width: 480px) {
+    .game-hud-corner {
+        top: 6px;
+        left: 6px;
+        gap: 8px;
+        padding: 4px 8px;
+    }
 }

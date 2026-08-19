@@ -1181,8 +1181,7 @@ function _useMistakeEraser(id, def) {
         }
     }
 
-    const mcEl = document.getElementById('mistake-counter');
-    if (mcEl) mcEl.textContent = `✗ ${mistakeCount}`;
+    _setMistakeCounterText();
 
     return removed > 0
         ? `${def.icon} ${t('item_mistake_erased').replace('{n}', removed)}`
@@ -1411,8 +1410,7 @@ function _useGoldenClock(id, def) {
     playItemEffect(id);
 
     // Update the mistake display so the player immediately sees the limit
-    const mcEl = document.getElementById('mistake-counter');
-    if (mcEl) mcEl.textContent = `✗ ${mistakeCount} 🕰️`;
+    _setMistakeCounterText(' 🕰️');
 
     return `${def.icon} ${LANG === 'de' ? 'Timer angehalten! Noch 3 Fehler erlaubt.' : 'Timer halted! 3 mistakes remaining.'}`;
 }

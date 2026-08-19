@@ -601,48 +601,25 @@
     <div id="screen-game" class="screen">
         <div class="game-main">
 
-            <!-- TOP META BAR -->
-            <div class="game-meta">
-
-                <div class="game-meta-rows-left">
-                    <div class="game-meta-row1">
-                        <div class="puzzle-hint" id="top-hint"></div>
-                        <div class="mod-tags-row" id="mod-tags"></div>
-                    </div>
-                    <div class="game-meta-row2">
-                        <span class="gtb-lvl" id="top-id">1-1</span>
-                        <span class="gtb-mistakes" id="mistake-counter">✗ 0</span>
-                        <button class="touchpad-mode-btn hidden" id="btn-touchpad-mode" data-t="touchpad_btn_fill">
-                            🖊️ FILL
-                        </button>
-                    </div>
-                    <div class="game-meta-row3">
-                        <div class="bonus-inline" id="bonus-sidebar">
-                            <span class="bonus-sidebar-label">🎯 BONUS</span>
-                            <span class="bonus-sidebar-hint" id="bonus-sidebar-hint"></span>
-                        </div>
-                    </div>
-                    <div class="game-meta-row4">
-                        <div class="completion-glimpse-bar hidden" id="completion-glimpse-bar">
-                            <span class="completion-glimpse-label">📋</span>
-                            <span class="completion-glimpse-text" id="completion-glimpse-text"></span>
-                        </div>
-                    </div>
-                </div>
-
+            <!-- CORNER HUD: clock, mistakes, fill — floats over the top-left corner,
+             out of normal document flow, so it never reserves vertical space
+             above the puzzle grid. -->
+            <div class="game-hud-corner" id="game-hud-corner">
                 <div class="game-meta-clock">
                     <span class="timer-icon">⏱</span>
                     <span class="timer-val" id="timer-val">30:00</span>
                     <span class="gtb-pen" id="pen-info"></span>
                 </div>
+                <span class="gtb-mistakes" id="mistake-counter">✗ 0</span>
+                <button class="touchpad-mode-btn hidden" id="btn-touchpad-mode" data-t="touchpad_btn_fill">
+                    🖊️ FILL
+                </button>
+            </div>
 
-                <div class="game-meta-right">
-                    <div class="gtb-score-wrap">
-                        <span class="gtb-score-val" id="sc-disp">0</span>
-                        <span class="gtb-score-lbl" data-t="score_lbl">SCORE</span>
-                    </div>
-                    <button class="gtb-btn" id="btn-go-levels" data-t="btn_levels">◀ LEVELS</button>
-                </div>
+            <!-- Kept separate, still in normal flow above the grid -->
+            <div class="completion-glimpse-bar hidden" id="completion-glimpse-bar">
+                <span class="completion-glimpse-label">📋</span>
+                <span class="completion-glimpse-text" id="completion-glimpse-text"></span>
             </div>
             <div id="eg-monster-wrapper" class="eg-hidden">
                 <div id="eg-monster-panel" class="eg-spawn-zone"></div>
@@ -952,8 +929,29 @@
 
     <div id="pause-overlay">
         <div id="pause-label" data-t="game_paused">PAUSED</div>
+
+        <div class="pause-level-info">
+            <span class="gtb-lvl" id="top-id">1-1</span>
+            <div class="puzzle-hint" id="top-hint"></div>
+            <div class="mod-tags-row" id="mod-tags"></div>
+        </div>
+
+        <div class="bonus-inline" id="bonus-sidebar">
+            <span class="bonus-sidebar-label">🎯 BONUS</span>
+            <span class="bonus-sidebar-hint" id="bonus-sidebar-hint"></span>
+        </div>
+
+        <div class="gtb-score-wrap">
+            <span class="gtb-score-val" id="sc-disp">0</span>
+            <span class="gtb-score-lbl" data-t="score_lbl">SCORE</span>
+        </div>
+
         <div id="pause-hint" data-t="game_paused_hint">Press Esc to continue</div>
-        <button id="btn-pause-settings" data-t="btn_settings">⚙ SETTINGS</button>
+
+        <div class="pause-btn-row">
+            <button id="btn-pause-settings" data-t="btn_settings">⚙ SETTINGS</button>
+            <button class="gtb-btn" id="btn-go-levels" data-t="btn_levels">◀ LEVELS</button>
+        </div>
     </div>
 
 
