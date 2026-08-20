@@ -47,11 +47,23 @@ const CHANGELOG_DATA = [
                     "The old Level Selection Screen has been removed.",
                     "The color of item, spell and passive correctly revealed cells has been slightly adjusted.",
                     "The Demon Eye Item is now applying the grid shield border effect",
+                    "Milestone Rewards from Quests now get automatically added to your inventory without needing to claim them from the Inference screen.",
+                  
+                    
+                ],
+
+            },
+
+            {
+                category: "Class Changes",
+                items: [
+
                     "Mathmagician: Added a new visual for the Variance Shield passive effect.",
-                    
+                    "Mathmagician: Arcane Reveal now properly shows the whole affected area on the targeting reticle.",
+                    "Mathmagician: Arcane Reveal visual has been fully remade.",
 
 
-                    
+
                 ],
 
             },

@@ -723,21 +723,14 @@ function _questStats_onAscendencyChosen() {
 //-------------------MILESTONE COMPLETION CHECK-------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-// Scans all milestones after every stat update and fires toast notifications
-// for any that have just become complete for the first time.
 
-// Checks every milestone and shows a toast for any that are newly complete
-// (threshold met AND not yet in STATE.questsNotified). Called at the end of
-// every updateQuestStats() invocation.
+
 function _questStats_checkNewlyCompleted() {
-    if (!STATE.questsNotified) STATE.questsNotified = [];
-
     for (const msId in _MILESTONE_MAP) {
-        const { milestone, category } = _MILESTONE_MAP[msId];
+        const { milestone } = _MILESTONE_MAP[msId];
 
-        if (!STATE.questsNotified.includes(msId) && _milestone_isComplete(milestone)) {
-            STATE.questsNotified.push(msId);
-            showQuestToast(milestone, category);
+        if (!_milestone_isClaimed(milestone) && _milestone_isComplete(milestone)) {
+            claimQuest(msId);
         }
     }
 }

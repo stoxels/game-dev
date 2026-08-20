@@ -115,6 +115,7 @@ function _arMoveTo(x, y) {
 function _arOnMouseMove(e) {
     _arMoveTo(e.clientX, e.clientY);
     if (typeof _fieldScanUpdatePreview === 'function') _fieldScanUpdatePreview(e.clientX, e.clientY);
+    if (typeof _arcaneReveal_updatePreview === 'function') _arcaneReveal_updatePreview(e.clientX, e.clientY);
 }
 
 
@@ -157,6 +158,12 @@ function activateTargetingReticle(armed) {
         if (_arLastX > -9999 && typeof _fieldScanUpdatePreview === 'function') {
             _fieldScanUpdatePreview(_arLastX, _arLastY);
         }
+
+        // Arcane Reveal gets the same treatment: a live radius-square preview,
+        // see _arcaneReveal_updatePreview in class-mathmagician.js.
+        if (_arLastX > -9999 && typeof _arcaneReveal_updatePreview === 'function') {
+            _arcaneReveal_updatePreview(_arLastX, _arLastY);
+        }
     } else {
         _arReticleEl.classList.remove('show');
         document.body.classList.remove('ability-armed');
@@ -166,5 +173,6 @@ function activateTargetingReticle(armed) {
         }
 
         if (typeof _fieldScanClearPreview === 'function') _fieldScanClearPreview();
+        if (typeof _arcaneReveal_clearPreview === 'function') _arcaneReveal_clearPreview();
     }
 }

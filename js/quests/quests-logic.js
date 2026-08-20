@@ -262,19 +262,21 @@ function _banner_buildElement(ms, cat, rewardParts) {
     const banner = document.createElement('div');
     banner.id = 'quest-claim-banner';
 
+    // quests-logic.js — inside _banner_buildElement()
+
     banner.innerHTML = `
-        <div class="qcb-inner">
-            <span class="qcb-icon">${cat.icon}</span>
-            <div class="qcb-text">
-                <div class="qcb-title">✓ ${de ? 'Belohnung erhalten!' : 'Reward Claimed!'}</div>
-                <div class="qcb-sub">
-                    ${de ? cat.titleDE : cat.titleEn}: <em>${de ? ms.labelDE : ms.labelEn}</em>
-                </div>
-                <div class="qcb-rewards">${rewardParts.join('&nbsp;&nbsp;')}</div>
+    <div class="qcb-inner">
+        <span class="qcb-icon">${cat.icon}</span>
+        <div class="qcb-text">
+            <div class="qcb-title">⭐ ${de ? 'Meilenstein erreicht!' : 'Milestone Reached!'}</div>
+            <div class="qcb-sub">
+                ${de ? cat.titleDE : cat.titleEn}: <em>${de ? ms.labelDE : ms.labelEn}</em>
             </div>
-            <button class="qcb-close"
-                    onclick="document.getElementById('quest-claim-banner')?.remove()">✕</button>
-        </div>`;
+            <div class="qcb-rewards">${rewardParts.join('&nbsp;&nbsp;')}</div>
+        </div>
+        <button class="qcb-close"
+                onclick="document.getElementById('quest-claim-banner')?.remove()">✕</button>
+    </div>`;
 
     return banner;
 }
@@ -481,4 +483,6 @@ function claimQuest(milestoneId) {
     _showClaimBanner(ms, cat);
     _refreshQuestBadge();
     renderQuestLog();
+
+    if (typeof buildInventoryPanel === 'function') buildInventoryPanel();
 }
