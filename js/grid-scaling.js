@@ -39,6 +39,14 @@ let baselineZoom = 1;
 // on resize events or grid rebuilds.
 let manualZoomActive = false;
 
+// Cached natural (unscaled) puzzle dimensions from the last scalePuzzle()
+// call. Reused by manual zoom so we never have to re-measure — measuring
+// is destructive (temporarily resets transform/wrapper sizing) and was
+// previously being called a second time in _onCtrlWheelZoom without ever
+// restoring what it clobbered.
+let _lastNaturalW = 0;
+let _lastNaturalH = 0;
+
 // Tracks which UI zone the mouse is currently hovering over.
 // Used by the arrow-key scroll router to decide which element to scroll.
 // Possible values: 'puzzle' | 'inventory' | 'none'
@@ -179,7 +187,36 @@ function resetZoom() {
         wrap.style.height = '';
         wrap.style.minWidth = '';
     }
+
+    const container = document.querySelector('.puzzle-and-sidebar');
+    if (container) container.style.marginTop = '0px'; 
 }
+
+
+// How strongly to pull the puzzle toward vertical center when there's
+// leftover space. 0 = stay pinned top, 1 = fully centered.
+const VERTICAL_CENTER_FACTOR = 0.6;
+
+// Nudges .puzzle-and-sidebar down (via margin-top) when the scaled puzzle
+// is shorter than the available vertical space, so it sits closer to
+// center instead of always hugging the top. Does nothing (stays at 0)
+// once the puzzle is tall enough to need the full available height —
+// this naturally accounts for row count AND the tallest column-clue
+// stack, because both are already baked into natural.h via
+// _measureNaturalSize() (cell rows + column clue header rows).
+function _applyVerticalCentering(scaledHeight) {
+    const container = document.querySelector('.puzzle-and-sidebar');
+    if (!container) return;
+
+    const avail = _calcAvailableSpace();
+    const leftover = avail.h - scaledHeight;
+
+    container.style.marginTop = leftover > 0
+        ? `${Math.floor(leftover * VERTICAL_CENTER_FACTOR)}px`
+        : '0px';
+}
+
+
 
 // Calculates and applies the best-fit scale for the current puzzle grid
 // relative to the viewport.
@@ -197,16 +234,19 @@ function scalePuzzle() {
     if (!scaler) return;
 
     const natural = _measureNaturalSize(scaler);
+    _lastNaturalW = natural.w;
+    _lastNaturalH = natural.h;
+
     const avail = _calcAvailableSpace();
     const autoScale = Math.min(avail.w / natural.w, avail.h / natural.h, SCALE_MAX);
 
-    // Only override zoom if the player hasn't manually set one.
     if (!manualZoomActive) {
         currentZoom = autoScale;
         baselineZoom = autoScale;
     }
 
     _applyZoom();
+    _applyVerticalCentering(natural.h * currentZoom);
 }
 
 
@@ -225,18 +265,18 @@ function _onCtrlWheelZoom(e) {
     const wrap = e.target.closest('#puzzle-scaler-wrap');
     if (!wrap) return;
 
-    e.preventDefault(); // Block the browser's own Ctrl+Wheel page-zoom.
-
+    e.preventDefault();
     manualZoomActive = true;
 
     if (e.deltaY < 0) {
-        currentZoom += ZOOM_SPEED; // Scroll up = zoom in.
+        currentZoom += ZOOM_SPEED;
     } else {
-        currentZoom -= ZOOM_SPEED; // Scroll down = zoom out.
+        currentZoom -= ZOOM_SPEED;
     }
 
     currentZoom = Math.max(ZOOM_MANUAL_MIN, Math.min(currentZoom, ZOOM_MANUAL_MAX));
     _applyZoom();
+    _applyVerticalCentering(_lastNaturalH * currentZoom);
 }
 
 // passive:false is required here to allow e.preventDefault() inside the handler.

@@ -348,7 +348,7 @@ function _executeArcaneReveal(row, col, radius, maxReveals = 4) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-const VARIANCE_SHIELD_DOME_PADDING_PX = 40; // how far the dome bulges past the actual grid edges
+const VARIANCE_SHIELD_DOME_PADDING_PX = 5; // how far the dome bulges past the actual grid edges
 
 // Tracks the pending DOM-removal timeout so a reactivated dome can cancel
 // a stale removal scheduled from a previous fade-out.
