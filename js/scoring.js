@@ -560,6 +560,10 @@ function checkWin() {
     dead = true;
     stopTimer();
 
+    if (typeof _arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
+        _arcaneFreeze_clearAllFrostAndStalagmites();     
+    }
+
     // Gather level context
     const sol = cur.grid;
     const rows = sol.length;

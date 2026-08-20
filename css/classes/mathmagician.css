@@ -427,6 +427,119 @@
 }
 
 
+/* ── Absolute Zero: Persistent Frost Crust on correctly-filled tiles ── */
+.frost-tile-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 6;
+    border-radius: 2px;
+    background: linear-gradient(160deg, rgba(220, 245, 255, 0.55) 0%, rgba(150, 215, 255, 0.35) 55%, rgba(90, 180, 235, 0.25) 100%);
+    box-shadow: inset 0 0 6px 1px rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transform: scale(0.6);
+    animation: frost-tile-form 0.35s ease-out forwards;
+}
+
+    .frost-tile-overlay::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(115deg, rgba(255,255,255,0.25) 0px, rgba(255,255,255,0.25) 2px, transparent 2px, transparent 6px);
+        mix-blend-mode: overlay;
+        opacity: 0.6;
+    }
+
+@keyframes frost-tile-form {
+    0% {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.frost-tile-overlay.thawing {
+    animation: frost-tile-melt 0.7s ease-in forwards;
+}
+
+@keyframes frost-tile-melt {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.15) translateY(3px);
+        filter: blur(1.5px);
+    }
+}
+
+
+/* ── Absolute Zero: Stalagmite on a mistake made during the freeze ── */
+.stalagmite-tile-overlay {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 85%;
+    height: 130%;
+    transform: translateX(-50%) scale(0.3);
+    transform-origin: bottom center;
+    pointer-events: none;
+    z-index: 7;
+    background: linear-gradient(180deg, rgba(235, 250, 255, 0.95) 0%, rgba(150, 215, 255, 0.9) 45%, rgba(60, 150, 220, 0.95) 100%);
+    clip-path: polygon(50% 0%, 68% 22%, 60% 40%, 78% 55%, 62% 68%, 72% 85%, 50% 100%, 28% 85%, 38% 68%, 22% 55%, 40% 40%, 32% 22%);
+    box-shadow: 0 0 10px 2px rgba(140, 210, 255, 0.6);
+    filter: drop-shadow(0 -2px 4px rgba(255,255,255,0.5));
+    opacity: 0;
+    animation: stalagmite-grow 0.4s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+
+@keyframes stalagmite-grow {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.2, 0.1);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.1, 1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1, 1);
+    }
+}
+
+.stalagmite-tile-overlay.thawing {
+    animation: stalagmite-melt 0.7s ease-in forwards;
+}
+
+@keyframes stalagmite-melt {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1, 1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.85, 0.15) translateY(20%);
+    }
+}
+
+
+
 /*
     ------------------------------------------------------------------------
     -------------------ABSOLUTE ZERO: BLIZZARD OVERLAY----------------------

@@ -31,6 +31,8 @@ const ARCANE_REVEAL_FIELD_SYMBOL_COUNT = 10; // Floating equation fragments duri
 const ABSOLUTE_ZERO_FROST_BONUS_MS = 500;   // Duration bonus per frost passive node
 const ABSOLUTE_ZERO_FADE_OUT_MS = 800;   // How long the blizzard overlay fades out
 const ABSOLUTE_ZERO_FLOOR_CLEANUP_MS = 500;   // How long before frozen floor is removed after CSS transition
+const ABSOLUTE_ZERO_STALAGMITE_GROW_MS = 400;  // grow-in time for a mistake stalagmite
+const ABSOLUTE_ZERO_THAW_MS = 700;             // melt-away time when frost/stalagmite clears
 
 // Blizzard Effect
 const BLIZZARD_FLAKE_COUNT = 60;
@@ -1033,6 +1035,9 @@ function _arcaneFreeze_end(tick) {
     buildClassHUD();
 
     _arcaneFreeze_removeFrozenFloor();
+    // Frost tiles are intentionally left in place — they now persist for
+    // the rest of the level, just like stalagmites, and only clear via
+    // _arcaneFreeze_clearAllFrostAndStalagmites() on win/lose/leave.
 }
 
 
@@ -1106,6 +1111,129 @@ function _startBlizzardEffect(durationMs) {
 }
 
 
+
+
+//------------------------------------------------------------------------
+//-------------------ABSOLUTE ZERO — FROZEN TILE VFX----------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Persistent per-cell ice: a light frost crust on cells correctly filled
+// while Absolute Zero is active, and a large stalagmite on cells where a
+// mistake was absorbed by the freeze. Both persist until the freeze ends
+// naturally (thaw animation, see _arcaneFreeze_thawAllFrostAndStalagmites)
+// or the level ends outright — win, defeat, or leaving via LEVELS
+// (instant removal, see _arcaneFreeze_clearAllFrostAndStalagmites).
+
+// Tracks which cells currently carry each overlay type, so cleanup never
+// depends on querying the live grid DOM (cells may already be gone by the
+// time cleanup runs, e.g. mid screen-transition).
+function _arcaneFreeze_resetTileTrackers() {
+    window._frostedTileCells = new Set();     // "row-col" keys with persistent frost
+    window._stalagmiteTileCells = new Set();  // "row-col" keys with a stalagmite
+}
+
+// Adds a light, persistent frost crust to a correctly-filled cell.
+// Called from handleCorrectFill() (mouse-button-handlers.js) whenever a
+// correct fill lands while window._freezeActive is true.
+function _arcaneFreeze_applyPersistentFrost(row, col) {
+    const key = `${row}-${col}`;
+    if (!window._frostedTileCells) window._frostedTileCells = new Set();
+    if (window._frostedTileCells.has(key)) return; // already frosted
+
+    const el = document.getElementById(`g-${row}-${col}`);
+    if (!el) return;
+
+    if (!el.style.position || el.style.position === 'static') {
+        el.style.position = 'relative';
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'frost-tile-overlay';
+    el.appendChild(overlay);
+
+    window._frostedTileCells.add(key);
+}
+
+// Spawns a large icy stalagmite on a cell where a mistake was absorbed by
+// the freeze. Called from tryAbsorbWithFreeze() (mouse-button-handlers.js).
+function _arcaneFreeze_spawnStalagmite(row, col) {
+    const key = `${row}-${col}`;
+    if (!window._stalagmiteTileCells) window._stalagmiteTileCells = new Set();
+    if (window._stalagmiteTileCells.has(key)) return; // already has one
+
+    const el = document.getElementById(`g-${row}-${col}`);
+    if (!el) return;
+
+    if (!el.style.position || el.style.position === 'static') {
+        el.style.position = 'relative';
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'stalagmite-tile-overlay';
+    el.appendChild(overlay);
+
+    window._stalagmiteTileCells.add(key);
+}
+
+// Plays the melt-away transition on every persistently-frosted cell, then
+// removes the frost overlays once the animation finishes. Used when
+// Absolute Zero expires naturally (see _arcaneFreeze_end).
+// NOTE: stalagmites are intentionally NOT cleared here — they persist
+// until their specific wrong mark is cleared (see
+// _arcaneFreeze_clearStalagmiteIfWrongMarkGone) or the level ends outright
+// (see _arcaneFreeze_clearAllFrostAndStalagmites).
+function _arcaneFreeze_thawFrost() {
+    const frostCells = window._frostedTileCells || new Set();
+
+    frostCells.forEach(key => {
+        const [r, c] = key.split('-').map(Number);
+        const el = document.getElementById(`g-${r}-${c}`);
+        const overlay = el?.querySelector('.frost-tile-overlay');
+        overlay?.classList.add('thawing');
+    });
+
+    setTimeout(() => {
+        frostCells.forEach(key => {
+            const [r, c] = key.split('-').map(Number);
+            document.getElementById(`g-${r}-${c}`)?.querySelector('.frost-tile-overlay')?.remove();
+        });
+        window._frostedTileCells = new Set();
+    }, ABSOLUTE_ZERO_THAW_MS);
+}
+
+// Absolute Zero: if a cell's stalagmite (from a mistake made during a
+// freeze) is still present but the wrong mark itself has since been
+// cleared by some other system (mistake eraser item, undo, etc.), thaw
+// and remove just that one stalagmite. Called from renderCell() in
+// grid.js on every render, so it works no matter what cleared the mark.
+function _arcaneFreeze_clearStalagmiteIfWrongMarkGone(row, col) {
+    if (!window._stalagmiteTileCells) return;
+    const key = `${row}-${col}`;
+    if (!window._stalagmiteTileCells.has(key)) return;
+    if (wrongGrid[row][col]) return; // still wrong — keep the stalagmite
+
+    const el = document.getElementById(`g-${row}-${col}`);
+    const overlay = el?.querySelector('.stalagmite-tile-overlay');
+    if (overlay) {
+        overlay.classList.add('thawing');
+        setTimeout(() => overlay.remove(), ABSOLUTE_ZERO_THAW_MS);
+    }
+    window._stalagmiteTileCells.delete(key);
+}
+
+// Instantly strips every frost/stalagmite overlay with no animation.
+// Called whenever the level ends outright — win, defeat, or the player
+// leaving through the LEVELS button — so nothing lingers into the next
+// level or the overlay screens.
+function _arcaneFreeze_clearAllFrostAndStalagmites() {
+    document.querySelectorAll('.frost-tile-overlay, .stalagmite-tile-overlay')
+        .forEach(el => el.remove());
+    _arcaneFreeze_resetTileTrackers();
+}
+
+
+
+
 //------------------------------------------------------------------------
 //-------------------ABSOLUTE ZERO — MAIN FUNCTION------------------------
 //------------------------------------------------------------------------
@@ -1121,6 +1249,8 @@ function _executeArcaneFreeze(durationMs) {
     timerFrozen = true;
     window._freezeActive = true;
     window._freezeCorrFills = 0; // Tracks correct fills during freeze (for frozen_resilience passive)
+
+    _arcaneFreeze_resetTileTrackers(); 
 
     _arcaneFreeze_spawnFrozenFloor();
     _startBlizzardEffect(effectiveDuration);

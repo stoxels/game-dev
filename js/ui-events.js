@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
         safeCall('_fxShieldBorderRemove');
 
         safeCall('_varianceShield_removeBubble');
+        safeCall('_arcaneFreeze_clearAllFrostAndStalagmites');
 
         _clearBlackoutCountdown('row');
         _clearBlackoutCountdown('col');

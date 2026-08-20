@@ -174,6 +174,9 @@ function _checkTimerExpiry() {
     if (timerSecs <= 0) {
         dead = true;
         stopTimer();
+        if (typeof _arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
+            _arcaneFreeze_clearAllFrostAndStalagmites();     
+        }
         timesUp();
     }
 }

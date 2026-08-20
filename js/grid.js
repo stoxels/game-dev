@@ -1056,6 +1056,13 @@ function renderCell(row, col) {
         return;
     }
 
+    // Absolute Zero: this cell's wrong mark may have just been cleared —
+    // if it was carrying a stalagmite, thaw it now instead of waiting
+    // for the freeze to end.
+    if (typeof _arcaneFreeze_clearStalagmiteIfWrongMarkGone === 'function') {
+        _arcaneFreeze_clearStalagmiteIfWrongMarkGone(row, col);
+    }
+
     // Priority 2: item-revealed cell (permanent green fill)
     if (revealedGrid[row][col]) {
         el.classList.add('filled', 'revealed');

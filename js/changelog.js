@@ -61,6 +61,7 @@ const CHANGELOG_DATA = [
                     "Mathmagician: Added a new visual for the Variance Shield passive effect.",
                     "Mathmagician: Arcane Reveal now properly shows the whole affected area on the targeting reticle.",
                     "Mathmagician: Arcane Reveal visual has been fully remade.",
+                    "Mathmagician: Absolute Zero has received visual grid effects.",
 
 
 

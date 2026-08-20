@@ -208,6 +208,9 @@ function tryAbsorbWithFreeze(row, col) {
     wrongGrid[row][col] = true;
     renderCell(row, col);
     showToast('❄️ Frozen! No penalty.');
+    if (typeof _arcaneFreeze_spawnStalagmite === 'function') {
+        _arcaneFreeze_spawnStalagmite(row, col);     // ← add this line
+    }
     return true;
 }
 
@@ -350,6 +353,9 @@ function checkGoldenClockAfterMistake() {
         dead = true;
         stopTimer();
         window._lastFailedGi = cur.gIdx;
+        if (typeof _arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
+            _arcaneFreeze_clearAllFrostAndStalagmites();   
+        }
         document.getElementById('lose-title').textContent = t('ov_lose');
         document.getElementById('lose-sub').textContent =
             LANG === 'de' ? 'Goldene Uhr: Fehlerlimit erreicht!' : 'Golden Clock: mistake limit reached!';
@@ -367,6 +373,9 @@ function checkHardcoreAfterMistake() {
     dead = true;
     stopTimer();
     window._lastFailedGi = cur.gIdx;    // bounceback achievement needs this
+    if (typeof _arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
+        _arcaneFreeze_clearAllFrostAndStalagmites();    
+    }
     document.getElementById('lose-title').textContent = t('hc_fail_title');
     document.getElementById('lose-sub').textContent = t('hc_fail_sub');
     document.getElementById('ov-lose').classList.add('show');
@@ -619,6 +628,12 @@ function checkStreakBonus() {
 function handleCorrectFill(row, col) {
     if (STATE.questStats) STATE.questStats._ql_hasManuallyFilledCell = true;
     Audio_Manager.playSFX('cellFill');
+
+    // Absolute Zero: leave a persistent frost crust on tiles correctly
+    // filled while the freeze is active
+    if (window._freezeActive && typeof _arcaneFreeze_applyPersistentFrost === 'function') {
+        _arcaneFreeze_applyPersistentFrost(row, col);
+    }
 
     // Endgame hooks
     if (isEndgameLevel()) {
