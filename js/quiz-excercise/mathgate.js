@@ -573,6 +573,7 @@ function mgAddItemToInventory(defId) {
     });
     save();
     buildInventoryPanel();
+    showItemGainPopup(defId);
 }
 
 // Awards a lucky item to the player for passing a gate for the first time.

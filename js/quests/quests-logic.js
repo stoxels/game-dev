@@ -164,15 +164,17 @@ function _reward_grantOneItem(defId) {
     // '__random__' is resolved at grant-time via pickRandomItem().
     // pickRandomItem() may return null if the Apex Collector passive consumed the pool.
     const resolvedId = defId === '__random__' ? pickRandomItem() : defId;
-    if (!resolvedId) return;
+    if (!resolvedId) return null;
 
     const def = ITEM_DEFS[resolvedId];
-    if (!def) return;
+    if (!def) return null;
 
     STATE.inventory.push({
         uid: _reward_generateItemUid(),
         defId: resolvedId,
     });
+
+    return resolvedId;
 }
 
 /**
@@ -187,6 +189,7 @@ function _reward_grantPassivePoints(amount) {
  * Grants all rewards defined on a milestone: passive-tree points and/or items.
  * Also triggers the reward SFX.
  * @param {Object} ms - The milestone whose rewards should be granted
+ * @returns {string[]} defIds of every item actually granted (resolved, non-null)
  */
 function _reward_grantAll(ms) {
     Audio_Manager.playSFX('questRewardClaimed');
@@ -194,9 +197,16 @@ function _reward_grantAll(ms) {
     if (ms.reward.ptPoints) {
         _reward_grantPassivePoints(ms.reward.ptPoints);
     }
+
+    const grantedIds = [];
     if (ms.reward.items) {
-        ms.reward.items.forEach(defId => _reward_grantOneItem(defId));
+        ms.reward.items.forEach(defId => {
+            const resolvedId = _reward_grantOneItem(defId);
+            if (resolvedId) grantedIds.push(resolvedId);
+        });
     }
+
+    return grantedIds;
 }
 
 
@@ -476,7 +486,7 @@ function claimQuest(milestoneId) {
     if (_milestone_isClaimed(ms) || !_milestone_isComplete(ms)) return;
 
     _claim_recordClaim(ms);
-    _reward_grantAll(ms);
+    const grantedIds = _reward_grantAll(ms);
 
     save();
     _trackInferenceAchievements(ms, cat);
@@ -485,4 +495,7 @@ function claimQuest(milestoneId) {
     renderQuestLog();
 
     if (typeof buildInventoryPanel === 'function') buildInventoryPanel();
+    if (typeof showItemGainPopup === 'function') {
+        grantedIds.forEach(defId => showItemGainPopup(defId));
+    }
 }

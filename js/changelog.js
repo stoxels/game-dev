@@ -53,6 +53,7 @@ const CHANGELOG_DATA = [
                     "There is now a message when Sylas Nature's Aid passive trait triggers.",
                     "Mistakes that were absorbed by a Shield Item now show the corresponding grid cell as a mistake cell.",
                     "Updated the default Class Hud and Character Sprite position. This only affects fresh gameplay sessions. Class Hud and Character Sprites can still be manually repositioned.",
+                    "Added a visual indicator for item gains during a puzzle screen.",
                   
                     
                 ],

@@ -263,6 +263,9 @@ function applyAscensionReward(irz) {
     });
     save();
 
+    buildInventoryPanel();
+    showItemGainPopup(defId);
+
     const label = `🌟 ${LANG === 'de' ? 'Aufstiegsbonus' : 'Ascension Reward'}:
             ${codexDef.icon} <strong>${itemName(codexDef)}</strong>`;
     irz.innerHTML = _buildItemRewardCard(defId, codexDef, label);
@@ -322,6 +325,9 @@ function grantLuckyDropItem() {
     if (!def) return '';
 
     STATE.inventory.push({ defId, uid: Date.now() + Math.random().toString(36).slice(2) });
+
+    buildInventoryPanel();
+    showItemGainPopup(defId);
 
     const label = `${t('ov_lucky_drop')} ${def.icon} <strong>${itemName(def)}</strong>`;
     return _buildItemRewardCard(defId, def, label);
@@ -432,6 +438,9 @@ function grantBonusItem() {
 
     STATE.inventory.push({ defId, uid: Date.now() + Math.random().toString(36).slice(2) });
     save();
+
+    buildInventoryPanel();
+    showItemGainPopup(defId);
 
     const label = `${t('ov_item_earned')}: ${def.icon} <strong>${itemName(def)}</strong>`;
     return _buildItemRewardCard(defId, def, label);

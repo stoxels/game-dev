@@ -305,6 +305,7 @@ function _quizAddItemToInventory(defId) {
     });
     save();
     buildInventoryPanel();
+    showItemGainPopup(defId);
 }
 
 // Handles the "already claimed" correct-answer path:

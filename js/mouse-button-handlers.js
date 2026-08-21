@@ -425,6 +425,7 @@ function claimLuckyTileItems() {
 
     const def = ITEM_DEFS[newItem.defId];
     let toastMsg = `🍀 Lucky Tile! You found: ${def.icon} ${itemName(def)}`;
+    const grantedIds = [newItem.defId];
 
     // generous_fortune (192-194): each node adds a stacking bonus-item chance
     const bonusChance = (ptHasSkill('generous_fortune_1') ? 0.10 : 0)
@@ -440,9 +441,10 @@ function claimLuckyTileItems() {
         STATE.inventory.push(bonusItem);
         const bonusDef = ITEM_DEFS[bonusItem.defId];
         toastMsg += ` + ${bonusDef.icon} ${itemName(bonusDef)}`;
+        grantedIds.push(bonusItem.defId);
     }
 
-    return toastMsg;
+    return { toastMsg, grantedIds };
 }
 
 // Applies the keystone_variance_collapse downside: claiming a lucky tile
@@ -509,11 +511,12 @@ function handleLuckyTileClaim(row, col) {
     Audio_Manager.playSFX('luckyTileActivate');
     luckyTiles.delete(`${row}-${col}`);
 
-    let toastMsg = claimLuckyTileItems();
+    let { toastMsg, grantedIds } = claimLuckyTileItems();
     toastMsg = applyVarianceCollapsePenalty(toastMsg);
 
     save();
     buildInventoryPanel();
+    grantedIds.forEach(defId => showItemGainPopup(defId));
     showToast(toastMsg, 3500);
 
     applyCovarianceShiftReveal(row, col);
