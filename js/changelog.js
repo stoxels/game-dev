@@ -83,6 +83,7 @@ const CHANGELOG_DATA = [
                     "Fixed a bug that showed an incorrect amount of cells to be revealed by Data Strike from the Statistician class in the Data Strike Modal panel.",
                     "Fixed a bug that made row and col blackout effects not last for the full duration if multiple of the same blackout effects occured onto the same axis while a blackout efect was already going on.",
                     "Fixed a bug that caused using Tutor items to remove the mistake string from the mistake counter. ",
+                    "Fixed a bug that caused the Mathmagician's Variance Shield ability to count absorbed mistakes twice in the win overlay screen.",
                 ],
 
             },

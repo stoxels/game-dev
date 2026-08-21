@@ -247,7 +247,6 @@ function tryAbsorbWithClassPassive(row, col) {
 
     wrongGrid[row][col] = true;
     renderCell(row, col);
-    absorbedMistakes++;
     showToast(t('pen_shield'));
 
     if (typeof _varianceShield_absorbMistake === 'function') {
