@@ -131,7 +131,9 @@ function _tailRiskRefundCooldown() {
 
 // Deducts totalCost seconds from the timer (floors at 0)
 function _tailRiskApplyTimeCost(totalCost) {
+    const before = timerSecs;
     timerSecs = Math.max(0, timerSecs - totalCost);
+    _trackTimerDelta(before, timerSecs);
     updTimer();
 }
 

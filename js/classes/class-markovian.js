@@ -245,6 +245,9 @@ function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
         return;
     }
 
+    const mistakesBefore = mistakeCount;   // 
+    const timerBefore = timerSecs;         // 
+
     // ── Rank 3: collect mistakes to forgive ──────────────────────
     const preExistingWrong = clearOldMistakes
         ? _rollback_collectPreExistingMistakes(best)
@@ -267,6 +270,10 @@ function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
     // Restore the timer to what it was at the snapshot moment, then add
     // the rank bonus on top. Cap at 1 hour.
     timerSecs = Math.min(best.timerSecs + rewindSeconds, 3600);
+    _trackTimerDelta(timerBefore, timerSecs); 
+
+    const mistakesForgiven = Math.max(0, mistakesBefore - mistakeCount);
+    if (mistakesForgiven > 0) _levelMistakesErased += mistakesForgiven; 
 
     // ── Refresh all UI that depends on grid state ────────────────
     _rollback_refreshDisplay();

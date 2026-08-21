@@ -553,7 +553,9 @@ function _buildPickedData(picked, recoverPct) {
 // Adds recovered seconds to the game timer (capped at 3600s)
 function _applyTimeRecovery(totalRecovered) {
     if (totalRecovered <= 0) return;
+    const before = timerSecs;
     timerSecs = Math.min(timerSecs + totalRecovered, 3600);
+    _trackTimerDelta(before, timerSecs);
     updTimer();
 }
 

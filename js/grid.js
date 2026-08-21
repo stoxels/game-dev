@@ -786,6 +786,7 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
     if (rowDone && !window._regressionRewardedLines.has(`r${row}`)) {
         window._regressionRewardedLines.add(`r${row}`);
         timerSecs += bonus;
+        _levelTimeAdded += bonus;
         updTimer();
         showToast(`📉 ${LANG === 'de' ? `+${bonus}s (Regressions-Belohnung)` : `+${bonus}s (Regression Reward)`}`);
     }
@@ -793,6 +794,7 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
     if (colDone && !window._regressionRewardedLines.has(`c${col}`)) {
         window._regressionRewardedLines.add(`c${col}`);
         timerSecs += bonus;
+        _levelTimeAdded += bonus;
         updTimer();
         showToast(`📉 ${LANG === 'de' ? `+${bonus}s (Regressions-Belohnung)` : `+${bonus}s (Regression Reward)`}`);
     }

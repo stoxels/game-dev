@@ -1103,7 +1103,9 @@ function _statisticianTriggerMomentum(bonusSeconds) {
     // god_of_statistics doubles the total bonus (applied last)
     if (ptHasSkill('god_of_statistics')) bonus *= 2;
 
+    const before = timerSecs;
     timerSecs = Math.min(timerSecs + bonus, 3600);
+    _trackTimerDelta(before, timerSecs);
     updTimer();
 
     const label = _pluralLabel(bonus, 'second', 'seconds', 'Sekunde', 'Sekunden');

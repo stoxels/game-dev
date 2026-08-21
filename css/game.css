@@ -1128,3 +1128,15 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         width: 7vw;
     }
 }
+
+
+.game-hud-corner .timer-val {
+    font-family: var(--PX);
+    font-size: clamp(15px, 2.4vw, 24px);
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    pointer-events: auto;
+    cursor: help;
+}

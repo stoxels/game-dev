@@ -452,6 +452,7 @@ function claimLuckyTileItems() {
 function applyVarianceCollapsePenalty(toastMsg) {
     if (!ptHasSkill('keystone_variance_collapse')) return toastMsg;
     timerSecs = Math.max(0, timerSecs - 600);
+    _levelTimeLost += 600;
     updTimer();
     return toastMsg + ` ${LANG === 'de' ? '(−10 Min!)' : '(−10 min!)'}`;
 }
@@ -623,6 +624,7 @@ function checkStreakBonus() {
         if (ptHasSkill('streak_bonus_3')) bonus += 10;
 
         timerSecs += bonus;
+        _levelTimeAdded += bonus;
         updTimer();
         showToast(`🔥 ${LANG === 'de' ? `Serienbonus! +${bonus}s` : `Streak Bonus! +${bonus}s`}`);
         PassiveTracker.onStreakBonusTrigger();

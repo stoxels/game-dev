@@ -30,6 +30,7 @@ const CHANGELOG_DATA = [
                     "Alot of the information from the puzzle game top bar rows have been moved to the pause screen to make more space for the actual grid puzzle. The actual puzzle topbar has been redesigned to be in the top left corner now. The puzzle is now always much more centered onto the screen, regardless of grid size.",
                     "There is now a new vertical bar to apply a higher or lower Zoom level during puzzling. The same functionality was available with ctrl + mousewheel but now it is also clickable during a puzzle.",
                     "Added new visual indicators when the timer drops below 15 minutes, 10 minutes and 5 minutes.",
+                    "Mouse Overing the Timer, the Mistake Counter, the Level Name, the Inventory or the Close button now show appropriate informative tooltips.",
                 ],
 
             },
@@ -54,6 +55,7 @@ const CHANGELOG_DATA = [
                     "Mistakes that were absorbed by a Shield Item now show the corresponding grid cell as a mistake cell.",
                     "Updated the default Class Hud and Character Sprite position. This only affects fresh gameplay sessions. Class Hud and Character Sprites can still be manually repositioned.",
                     "Added a visual indicator for item gains during a puzzle screen.",
+                    "Item Reshuffling now only requires 3 items (down from 5)",
                   
                     
                 ],

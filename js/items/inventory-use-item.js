@@ -1088,7 +1088,6 @@ function _useMarkWrong(id, def) {
 
 // addTime30 / addTime60 / addTime180 — adds seconds to the timer.
 function _useAddTime(id, def) {
-    // Gambler's Ruin keystone disables all bonus time from non-cursed sources
     if (ptHasSkill('keystone_gamblers_ruin')) {
         return `${def.icon} ${LANG === 'de' ? 'Blockiert durch Ruin des Spielers!' : "Blocked by Gambler's Ruin!"}`;
     }
@@ -1096,17 +1095,20 @@ function _useAddTime(id, def) {
     const baseSecs = parseInt(id.replace('addTime', '')) || 30;
     const secs = _calcAddTimeSecs(baseSecs);
 
-    // Countdown Crisis keystone inverts the effect — time is subtracted
     if (ptHasSkill('keystone_countdown_crisis')) {
         questStat_timerItemUsed();
+        const before = timerSecs;
         timerSecs = Math.max(0, timerSecs - secs);
+        _trackTimerDelta(before, timerSecs);
         updTimer();
         playItemEffect(id);
         return `${def.icon} ${LANG === 'de' ? `−${secs}s (Countdown-Krise!)` : `−${secs}s (Countdown Crisis!)`}`;
     }
 
     questStat_timerItemUsed();
+    const before = timerSecs;
     timerSecs += secs;
+    _trackTimerDelta(before, timerSecs);
     updTimer();
     playItemEffect(id);
     return `${def.icon} ${t('item_time_added').replace('{n}', secs)}`;
@@ -1155,7 +1157,7 @@ function _useShield(id, def) {
 function _useMistakeEraser(id, def) {
     if (mistakeCount === 0) {
         showToast(LANG === 'de' ? 'Keine Fehler zum Entfernen!' : 'No mistakes to erase!');
-        return null; // Return null to signal no effect/no consumption
+        return null;
     }
 
     const isEraseAll = id === 'mistakeEraserAll';
@@ -1166,17 +1168,19 @@ function _useMistakeEraser(id, def) {
     mistakeCount = Math.max(0, mistakeCount - reduceBy);
     playItemEffect(id);
     const removed = before - mistakeCount;
+    _levelMistakesErased += removed;
 
     if (removed > 0) questStat_mistakesRemoved(removed);
 
-    // Passive: Time Well Spent — bonus time per mistake removed
     if (removed > 0 && !ptHasSkill('keystone_gamblers_ruin')) {
         let bonusSecs = 0;
         if (ptHasSkill('time_well_spent_1')) bonusSecs = 30;
         if (ptHasSkill('time_well_spent_2')) bonusSecs = 60;
         if (ptHasSkill('time_well_spent_3')) bonusSecs = 90;
         if (bonusSecs > 0) {
+            const before2 = timerSecs;
             timerSecs += bonusSecs * removed;
+            _trackTimerDelta(before2, timerSecs);
             updTimer();
         }
     }
@@ -1239,12 +1243,13 @@ function _useFreeze(id, def) {
 function _useCursedTime(id, def) {
     _trackWitchImmuneCursedUse();
 
+    const before = timerSecs;
     timerSecs += 1200;
+    _trackTimerDelta(before, timerSecs);
     updTimer();
     playItemEffect(id);
 
-    _resolveCursedBlackoutDownside(30000, true, true); // black out both rows and cols
-
+    _resolveCursedBlackoutDownside(30000, true, true);
     return `💀 ${t('item_cursed_time_both')}`;
 }
 
@@ -1388,7 +1393,9 @@ function _useGrandPearl(id, def) {
 // theWitch — pays −10 min upfront in exchange for 60 s of full cursed
 // immunity (makes subsequent cursed items downside-free for that window).
 function _useTheWitch(id, def) {
+    const before = timerSecs;
     timerSecs = Math.max(0, timerSecs - 600);
+    _trackTimerDelta(before, timerSecs);
     updTimer();
 
     window._cursedImmune = true;
@@ -1422,8 +1429,9 @@ function _useShadowSeal(id, def) {
     if (!cur) return '';
 
     // 1. Hard-set the timer to exactly 5 minutes
+    const before = timerSecs;
     timerSecs = 300;
-    updTimer();
+    _trackTimerDelta(before, timerSecs);
 
     // 2. Permanently hide all row and column clues for this level
     window._shadowSealActive = true;

@@ -110,16 +110,25 @@ function _tryProcStandardDeviation(mistakeRow, mistakeCol) {
 //-------------------PENALTY CALCULATION HELPERS--------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-
-// Returns the base penalty seconds for the current mistake, taken from
-// the difficulty config. Clamps to the last entry once past the defined list.
-function _getBasePenaltySeconds() {
+// Returns the penalty (seconds) for the Nth mistake (1-based), taken from
+// the difficulty config. Clamps to the last entry once past the defined
+// list, and never goes below index 0 — guards against being called before
+// any mistake has happened yet (e.g. the mistakes tooltip previewing the
+// "next" penalty).
+function _getPenaltySecondsAtCount(count) {
     const pens = DIFF_CFG[curDiff].pens;
-    let idx = mistakeCount - 1;
+    let idx = count - 1;
     if (_charIs('stox')) {
         idx = Math.floor(idx * 0.7);
     }
+    idx = Math.max(0, idx);
     return pens[Math.min(idx, pens.length - 1)];
+}
+
+// Returns the base penalty seconds for the current (just-made) mistake.
+// Called from applyPenalty() after mistakeCount has already been incremented.
+function _getBasePenaltySeconds() {
+    return _getPenaltySecondsAtCount(mistakeCount);
 }
 
 // keystone_asymptotic_mastery (node 266):
@@ -157,7 +166,10 @@ function _calcEffectivePenalty(penMult) {
 function _applyTimeDeduction(row, col, effectivePen) {
     timerSecs = Math.max(0, timerSecs - effectivePen);
     updTimer();
-    if (effectivePen > 0) actuaryLogMistake(row, col, effectivePen);
+    if (effectivePen > 0) {
+        actuaryLogMistake(row, col, effectivePen);
+        _levelTimeLost += effectivePen;
+    }
 }
 
 // Flags the penalty_clutch achievement condition:

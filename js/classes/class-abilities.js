@@ -732,7 +732,9 @@ function _applyMathmagicianShieldAbsorb() {
     if (ptHasSkill('god_of_math') && bonus > 0) bonus *= 2;
 
     if (bonus > 0) {
+        const before = timerSecs;
         timerSecs = Math.min(timerSecs + bonus, 3600);
+        _trackTimerDelta(before, timerSecs);
         updTimer();
 
         const label = (LANG === 'de')
@@ -844,8 +846,9 @@ function _handlePrecisionMarkMomentum(row, col) {
     if (!window._pmMomentumSet.has(id)) return;
 
     window._pmMomentumSet.delete(id);
+    const before = timerSecs;
     timerSecs = Math.min(timerSecs + 20, 3600);
-    updTimer();
+    _trackTimerDelta(before, timerSecs);
     showToast(LANG === 'de' ? '🎯 Schwung der Gewissheit! +20 s!' : '🎯 Momentum of Certainty! +20 s!');
     trackAchStat('timeAdded', 20);
 

@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------
 
 let reshuffleCount = 0;             // tracks discarded items toward the reshuffle goal
-const RESHUFFLE_GOAL = 5;           // discards needed to trigger the reshuffle reward modal
+const RESHUFFLE_GOAL = 3;           // discards needed to trigger the reshuffle reward modal
 const RESHUFFLE_PICK_COUNT = 3;     // how many item choices are offered in the modal
 const RESHUFFLE_MAX_ATTEMPTS = 50;  // max loop iterations when picking distinct reward items
 

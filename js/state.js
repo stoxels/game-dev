@@ -46,6 +46,18 @@ let mistakeCount = 0;
 // but are tracked separately for achievements.
 let absorbedMistakes = 0;
 
+
+// --- Tooltip trackers (reset each level) ---
+
+// Total seconds added to the timer this level (passive bonuses, streaks, items).
+let _levelTimeAdded = 0;
+
+// Total seconds lost to mistakes this level (penalties + variance collapse etc).
+let _levelTimeLost = 0;
+
+// How many mistakes have been erased/removed this level via Mistake Eraser items.
+let _levelMistakesErased = 0;
+
 // How many items the player has used this level; used for achievements.
 let itemsUsedThisLevel = 0;
 

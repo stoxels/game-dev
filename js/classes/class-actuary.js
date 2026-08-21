@@ -111,7 +111,9 @@ function _executeRegressionToPrior(correctCount, recoverPct) {
 
     // Apply the recovered time (cap at 1 hour).
     if (recoveredSecs > 0) {
+        const before = timerSecs;
         timerSecs = Math.min(timerSecs + recoveredSecs, 3600);
+        _trackTimerDelta(before, timerSecs);
         updTimer();
     }
 

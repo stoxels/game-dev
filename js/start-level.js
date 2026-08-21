@@ -63,6 +63,9 @@ function _resetGameplayFlags() {
     _gamePaused = false;
     if (!isChainTransition) mistakeCount = 0;
     if (!isChainTransition) absorbedMistakes = 0;
+    if (!isChainTransition) _levelTimeAdded = 0;
+    if (!isChainTransition) _levelTimeLost = 0;
+    if (!isChainTransition) _levelMistakesErased = 0;
     levelStartTime = Date.now();
     itemsUsedThisLevel = 0;
     dead = false;
@@ -209,11 +212,16 @@ function _initTimer() {
     window._timetrialTimeCut = curMods.timetrial ? (fullBaseTimer - base) : 0;
 
     timerSecs = base;
-    timerSecs += _applyExtendedSessionBonus();
-    timerSecs += _applyExpectedValueBonus();
+
+    const extSessionBonus = _applyExtendedSessionBonus();
+    const expValueBonus = _applyExpectedValueBonus();
+    timerSecs += extSessionBonus;
+    timerSecs += expValueBonus;
+    _levelTimeAdded += extSessionBonus + expValueBonus;
 
     if (ptHasSkill('keystone_dead_reckoning') && !ptHasSkill('keystone_gamblers_ruin')) {
         timerSecs += 600;
+        _levelTimeAdded += 600;
     }
 }
 

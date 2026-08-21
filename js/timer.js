@@ -11,7 +11,21 @@ let timerSecs = 0;
 // clearInterval() in stopTimer() / pauseTimer().
 let timerInterval = null;
 
+//------------------------------------------------------------------------
+//-------------------LEVEL TIMER STAT TRACKING-----------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
+// Records how timerSecs actually changed between two points, adding the
+// difference to the appropriate level-total tracker (see state.js).
+// Uses the real before/after delta (not the raw amount an effect "tried"
+// to add/subtract) so totals stay accurate even when clamped by
+// Math.min(...,3600) or Math.max(0,...).
+function _trackTimerDelta(beforeSecs, afterSecs) {
+    const delta = afterSecs - beforeSecs;
+    if (delta > 0) _levelTimeAdded += delta;
+    else if (delta < 0) _levelTimeLost += -delta;
+}
 
 
 //------------------------------------------------------------------------
