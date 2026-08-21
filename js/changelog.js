@@ -29,6 +29,7 @@ const CHANGELOG_DATA = [
                     "After selecting a class for the first time there are now two visual hints that tell the player to use keyboard buttons 1 and 2 to activate spells.",
                     "Alot of the information from the puzzle game top bar rows have been moved to the pause screen to make more space for the actual grid puzzle. The actual puzzle topbar has been redesigned to be in the top left corner now. The puzzle is now always much more centered onto the screen, regardless of grid size.",
                     "There is now a new vertical bar to apply a higher or lower Zoom level during puzzling. The same functionality was available with ctrl + mousewheel but now it is also clickable during a puzzle.",
+                    "Added new visual indicators when the timer drops below 15 minutes, 10 minutes and 5 minutes.",
                 ],
 
             },

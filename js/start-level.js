@@ -129,6 +129,11 @@ function _cleanupPreviousLevel() {
 
     if (typeof _varianceShield_removeBubble === 'function') _varianceShield_removeBubble();
 
+    // Clear any low-time vignette tier left over from the previous level,
+    // so a fresh level with a full timer doesn't flash red for a frame.
+    document.getElementById('low-time-vignette')
+        ?.classList.remove('ltv-tier1', 'ltv-tier2', 'ltv-tier3');
+
     // Only reset HP if this is a fresh start, not a chained puzzle transition
     const isChainTransition = !!window._egSuppressEncounterStop;
     if (!isChainTransition) _resetPlayerHP();

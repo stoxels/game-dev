@@ -1029,3 +1029,102 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         height: 22px;
     }
 }
+
+
+
+
+
+
+/*
+    ------------------------------------------------------------------------
+    ----------------------------LOW-TIME VIGNETTE---------------------------
+    ------------------------------------------------------------------------
+    ------------------------------------------------------------------------
+*/
+
+/* Full-screen wrapper — sits above the puzzle, below modals/overlays */
+.low-time-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: none;
+}
+
+/* Each edge is a gradient bar that fades inward from screen edge to transparent */
+.ltv-edge {
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background-repeat: no-repeat;
+}
+
+.ltv-top {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 14vh;
+    background: linear-gradient(to bottom, rgba(200, 20, 20, 0.55), rgba(200, 20, 20, 0));
+}
+
+.ltv-bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 14vh;
+    background: linear-gradient(to top, rgba(200, 20, 20, 0.55), rgba(200, 20, 20, 0));
+}
+
+.ltv-left {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 10vw;
+    background: linear-gradient(to right, rgba(200, 20, 20, 0.55), rgba(200, 20, 20, 0));
+}
+
+.ltv-right {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 10vw;
+    background: linear-gradient(to left, rgba(200, 20, 20, 0.55), rgba(200, 20, 20, 0));
+}
+
+/* ----- Tier 1: ≤ 10 minutes — subtle, static ----- */
+.low-time-vignette.ltv-tier1 .ltv-edge {
+    opacity: 0.35;
+}
+
+/* ----- Tier 2: ≤ 5 minutes — stronger, slow pulse ----- */
+.low-time-vignette.ltv-tier2 .ltv-edge {
+    opacity: 0.6;
+    animation: ltv-pulse 2.2s ease-in-out infinite;
+}
+
+/* ----- Tier 3: ≤ 2 minutes — strongest, fast urgent pulse ----- */
+.low-time-vignette.ltv-tier3 .ltv-edge {
+    opacity: 0.85;
+    animation: ltv-pulse 1s ease-in-out infinite;
+}
+
+@keyframes ltv-pulse {
+    0%, 100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 640px) {
+    .ltv-top,
+    .ltv-bottom {
+        height: 10vh;
+    }
+
+    .ltv-left,
+    .ltv-right {
+        width: 7vw;
+    }
+}

@@ -41,6 +41,42 @@ function _getTimerUrgencyClass(secs) {
 }
 
 
+//------------------------------------------------------------------------
+//-------------------LOW-TIME VIGNETTE------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Returns the vignette tier class for the current timerSecs, or '' when
+// above all thresholds. Mirrors _getTimerUrgencyClass()'s breakpoints but
+// drives the full-screen edge effect instead of just the clock text.
+//   'ltv-tier3' — ≤ 120s  (strongest)
+//   'ltv-tier2' — ≤ 300s
+//   'ltv-tier1' — ≤ 600s
+//   ''          — > 600s
+function _getLowTimeVignetteTier(secs) {
+    if (secs <= 300) return 'ltv-tier3';
+    if (secs <= 600) return 'ltv-tier2';
+    if (secs <= 900) return 'ltv-tier1';
+    return '';
+}
+
+// Applies (or clears) the correct tier class on the vignette element.
+// Suppressed while the timer is frozen or Golden Clock has paused the
+// countdown, since the remaining time isn't actually draining right now.
+function _applyLowTimeVignette() {
+    const el = document.getElementById('low-time-vignette');
+    if (!el) return;
+
+    el.classList.remove('ltv-tier1', 'ltv-tier2', 'ltv-tier3');
+
+    if (timerFrozen || window._goldenClockActive) return;
+
+    const tier = _getLowTimeVignetteTier(timerSecs);
+    if (tier) el.classList.add(tier);
+}
+
+
+
 // Applies the correct colour / animation class to the #timer-val element.
 // When the timer is frozen by the Freeze item or a class skill the element
 // gets an icy-blue inline colour that overrides the CSS classes.
@@ -66,9 +102,12 @@ function updTimer() {
     const el = document.getElementById('timer-val');
     el.textContent = _formatTimerDisplay(timerSecs);
     _applyTimerDisplayState(el);
+    _applyLowTimeVignette();
 
     // Notify the passive skill tracker every tick (no-op when unavailable).
     if (typeof PassiveTracker !== 'undefined') PassiveTracker.onTimerTick();
+
+   
 }
 
 
