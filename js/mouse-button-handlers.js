@@ -219,6 +219,9 @@ function tryAbsorbWithShield(row, col) {
     if (!shieldActive) return false;
     if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
 
+    wrongGrid[row][col] = true;
+    renderCell(row, col);
+
     absorbedMistakes++;
     if ((window._shieldExtraCharges || 0) > 0) {
         window._shieldExtraCharges--;

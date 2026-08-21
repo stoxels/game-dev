@@ -51,6 +51,8 @@ const CHANGELOG_DATA = [
                     "The Demon Eye Item is now applying the grid shield border effect",
                     "Milestone Rewards from Quests now get automatically added to your inventory without needing to claim them from the Inference screen.",
                     "There is now a message when Sylas Nature's Aid passive trait triggers.",
+                    "Mistakes that were absorbed by a Shield Item now show the corresponding grid cell as a mistake cell.",
+                    "Updated the default Class Hud and Character Sprite position. This only affects fresh gameplay sessions. Class Hud and Character Sprites can still be manually repositioned.",
                   
                     
                 ],

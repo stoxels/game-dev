@@ -569,7 +569,7 @@ function injectCompactHUDStyles(def) {
     s.textContent = `
         #class-hud-panel {
             position: fixed;
-            top: 60px;
+            top: 150px;
             left: 12px;
             z-index: 600;
             display: flex;

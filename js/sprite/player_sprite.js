@@ -85,8 +85,8 @@ function _renderPlayerAvatarSimple() {
     wrapper.id = 'player-avatar-simple';
     wrapper.style.cssText = `
         position: fixed;
-        top: 80px;
-        left: 12px;
+        top: 15px;
+        left: 250px;
         z-index: 500;
         display: flex;
         flex-direction: column;
@@ -427,8 +427,8 @@ function _renderPlayerAvatar() {
 
         avatar.style.cssText = `
             position: fixed;
-            bottom: 120px;
-            left: 12px;
+            top: 15px;
+            left: 250px;
             z-index: 1000;
             display: flex;
             flex-direction: column;
