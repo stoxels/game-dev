@@ -257,6 +257,12 @@ function _updateHUD() {
 
     _updateBonusSidebar();
     _updateModTags();
+
+    // Corner HUD (right): level number + name, mirrors top-id/top-hint above
+    const nameEl = document.getElementById('hud-level-name');
+    if (nameEl) {
+        nameEl.textContent = `${lvText(cur, 'hint')}`;
+    }
 }
 
 

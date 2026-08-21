@@ -113,7 +113,6 @@
         color: var(--accent);
         line-height: 1;
         letter-spacing: 2px;
-        background: black;
         white-space: nowrap;
     }
 
@@ -864,7 +863,6 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         line-height: 1;
         letter-spacing: 1px;
         white-space: nowrap;
-        background: black;
     }
 
     .game-hud-corner .gtb-pen {
@@ -892,5 +890,142 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         left: 6px;
         gap: 8px;
         padding: 4px 8px;
+    }
+}
+
+
+
+
+
+/*
+    ------------------------------------------------------------------------
+    ----------------------------CORNER HUD: RIGHT SIDE-----------------------
+    ------------------------------------------------------------------------
+    ------------------------------------------------------------------------
+*/
+
+.game-hud-corner-right {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 6px 12px;
+}
+
+    .game-hud-corner-right .hud-level-name {
+        font-family: var(--PX);
+        font-size: clamp(11px, 1.5vw, 15px);
+        color: mediumturquoise;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        text-align: right;
+        padding: 2px 6px;
+    }
+
+/* Vertical zoom control — buttons top/bottom, fill bar in between */
+.zoom-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.zoom-btn {
+    font-family: var(--PX);
+    font-size: 13px;
+    line-height: 1;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--accent2);
+    cursor: pointer;
+    padding: 0;
+    transition: all .12s;
+}
+
+    .zoom-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .zoom-btn:active {
+        transform: scale(0.92);
+    }
+
+/* Track the fill bar climbs — bottom = min zoom, top = max zoom */
+.zoom-track {
+    position: relative;
+    width: 6px;
+    height: 90px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.zoom-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 50%; /* overwritten inline by JS */
+    background: var(--accent);
+    transition: height .1s linear;
+}
+
+@media (max-width: 480px) {
+    .game-hud-corner-right {
+        top: 6px;
+        right: 6px;
+        gap: 6px;
+        padding: 4px 8px;
+    }
+
+    .zoom-track {
+        height: 70px;
+    }
+}
+
+
+/* Compact "return to levels" button — same stone/X visual as the
+   settings modal's close button (.settings-box .modal-close), just
+   smaller and living in the gameplay corner HUD instead of a modal. */
+.hud-corner-btn {
+    width: 26px;
+    height: 26px;
+    background-image: url('../images/Settings/settings_close_button.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform .12s, filter .12s;
+    position: fixed;
+    top: 0%;
+    right: 0%;
+}
+
+    .hud-corner-btn:hover {
+        filter: brightness(1.2);
+        transform: scale(1.06);
+    }
+
+    .hud-corner-btn:active {
+        transform: scale(0.94);
+    }
+
+@media (max-width: 480px) {
+    .hud-corner-btn {
+        width: 22px;
+        height: 22px;
     }
 }

@@ -558,6 +558,7 @@ function _applySylaForestAffinity() {
     if (!cur || !cur.isForestLevel) return;
     const revealedCoords = revealTiles(1);
     Audio_Manager.playSFX('syla_nature');
+    showToast('Syla Bonus Reveal!');
 
     // Pass those coordinates directly into the flower animation!
     triggerSylaFlowerEffect(revealedCoords);

@@ -222,6 +222,10 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
+    onClick('btn-zoom-in', () => zoomInBtn());
+    onClick('btn-zoom-out', () => zoomOutBtn());
+
+
     /**
      * Cleans up any active game systems that may be running in the background.
      * Called whenever the player exits the current level mid-session, to prevent
@@ -316,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     onClick('btn-go-levels', onGoToLevelsFromGame);
+    onClick('btn-hud-levels', onGoToLevelsFromGame);
 
     // Puzzle table — suppresses the right-click context menu (would interfere
     // with game input) and resets hover state when the cursor leaves the grid.

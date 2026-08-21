@@ -165,8 +165,43 @@ function _applyZoom() {
     // keep the variance shield bubble in sync with the new zoom immediately
     const vsBubble = document.getElementById('variance-shield-bubble');
     if (vsBubble?._reposition) vsBubble._reposition();
+
+    _updateZoomBarUI();
 }
 
+
+
+// _updateZoomBarUI — syncs the vertical zoom-bar fill height to currentZoom,
+// mapped between the manual zoom bounds. Called from every path that can
+// change currentZoom (auto-fit scale, wheel zoom, +/- buttons) so the bar
+// never drifts out of sync with the actual puzzle scale.
+function _updateZoomBarUI() {
+    const fill = document.getElementById('zoom-fill');
+    if (!fill) return;
+
+    const pct = (currentZoom - ZOOM_MANUAL_MIN) / (ZOOM_MANUAL_MAX - ZOOM_MANUAL_MIN);
+    const clampedPct = Math.max(0, Math.min(1, pct));
+    fill.style.height = `${clampedPct * 100}%`;
+}
+
+// _adjustZoom — shared clamp+apply step for any manual zoom input
+// (Ctrl+Wheel or the +/- buttons). Marks manualZoomActive so scalePuzzle()
+// stops overriding the player's chosen zoom level on resize/rebuild.
+function _adjustZoom(delta) {
+    manualZoomActive = true;
+    currentZoom = Math.max(ZOOM_MANUAL_MIN, Math.min(currentZoom + delta, ZOOM_MANUAL_MAX));
+    _applyZoom();
+    _applyVerticalCentering(_lastNaturalH * currentZoom);
+}
+
+// zoomInBtn / zoomOutBtn — public entry points wired to the zoom-bar buttons.
+function zoomInBtn() {
+    _adjustZoom(ZOOM_SPEED);
+}
+
+function zoomOutBtn() {
+    _adjustZoom(-ZOOM_SPEED);
+}
 
 //------------------------------------------------------------------------
 //----------------------------PUZZLE SCALER---------------------------------
@@ -266,17 +301,7 @@ function _onCtrlWheelZoom(e) {
     if (!wrap) return;
 
     e.preventDefault();
-    manualZoomActive = true;
-
-    if (e.deltaY < 0) {
-        currentZoom += ZOOM_SPEED;
-    } else {
-        currentZoom -= ZOOM_SPEED;
-    }
-
-    currentZoom = Math.max(ZOOM_MANUAL_MIN, Math.min(currentZoom, ZOOM_MANUAL_MAX));
-    _applyZoom();
-    _applyVerticalCentering(_lastNaturalH * currentZoom);
+    _adjustZoom(e.deltaY < 0 ? ZOOM_SPEED : -ZOOM_SPEED);
 }
 
 // passive:false is required here to allow e.preventDefault() inside the handler.
