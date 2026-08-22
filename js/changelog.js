@@ -17,8 +17,8 @@ const CHANGELOG_DATA = [
                 items: [
                     "Settings Modal has been fully remade.",
                     "There are now up to 20 individual Save - Slots. Each one can be reset individually and progress is based per Save - Slot. Character portraits in each save slot shows the chosen character and class combination.",
+                    "There is a detailed lifetime summary of interesting stats for the specific save slot.",
                     "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text.",
-                    "Endgame Test Hub has been created",
                     "Added a new Setting option: You can now disable left-click behaviour on cells that have been marked as incorrect (by a manual right click or by items, passives and abilities).",
                     "Red Cross Marks created by passives, abilities, items and other effects are now visually distinct from manually placed cross marks",
                     "Settings can now be opened and adjusted during the Pause screen (Escape during a Puzzle Screen)",
@@ -31,6 +31,7 @@ const CHANGELOG_DATA = [
                     "There is now a new vertical bar to apply a higher or lower Zoom level during puzzling. The same functionality was available with ctrl + mousewheel but now it is also clickable during a puzzle.",
                     "Added new visual indicators when the timer drops below 15 minutes, 10 minutes and 5 minutes.",
                     "Mouse Overing the Timer, the Mistake Counter, the Level Name, the Inventory or the Close button now show appropriate informative tooltips.",
+                    "A Prototype for the Endgame has been developed and is now accessable through the Endgame Test Hub. This will be expanded in the future.",
                 ],
 
             },

@@ -417,6 +417,7 @@ function revealTiles(count) {
     _applyCellEffect(affected, 'reveal');
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
     trackAchStat('tilesRevealed', affected.length);
+    if (affected.length > 0) _incDirect('lifetimeTilesRevealed', affected.length); 
     checkWin();
 
     return revealedCoords; // Return the gathered coordinates
@@ -551,7 +552,7 @@ function solveRows(count) {
             }
         }
     });
-
+    _incDirect('lifetimeTilesRevealed', affected.length);
     _applyCellEffect(affected, 'reveal');
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
     return Math.min(count, unsolved.length);
@@ -585,7 +586,7 @@ function solveCols(count) {
             }
         }
     });
-
+    _incDirect('lifetimeTilesRevealed', affected.length);
     _applyCellEffect(affected, 'reveal');
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
     return Math.min(count, unsolved.length);

@@ -527,6 +527,8 @@ function executeActiveAbility(row, col) {
     if (!activeAbilityMode || !STATE.playerClass || dead) return;
     if (isClassless()) { _setAbilityMode(false); return; }
 
+    trackAchStat('classAbilitiesUsedTotal'); 
+
     const activeKey = STATE.classActiveChoice || 'active1';
 
     if (activeKey === 'active3' || activeKey === 'active4') {
@@ -676,6 +678,7 @@ function _bayesianRevealOneCell() {
     renderCell(r, c);
     updClues(r, c);
     trackAchStat('tilesRevealed', 1);
+    _incDirect('lifetimeTilesRevealed', 1);
 
     if (typeof _playBayesianRevealEffect === 'function') {
         const cellEl = document.getElementById(`g-${r}-${c}`);

@@ -170,6 +170,9 @@ function buildFreshState() {
         primerPending: false,
         playerCharacter: null,
 
+        // Lifetime tracking (for save-slot tooltip)
+        totalTimePlayedSecs: 0,
+
         // Class progression
         playerClass: null,
         classPassiveLevel: 1,
@@ -231,6 +234,8 @@ function _migrateCoreFields(s) {
     if (!s.levelMistakes) s.levelMistakes = {};
     if (!s.achStats) s.achStats = {};
     if (!s.convergenceDone) s.convergenceDone = [];
+
+    if (s.totalTimePlayedSecs === undefined) s.totalTimePlayedSecs = 0;
 }
 
 // _migrateClassFields — fills in class-progression fields missing from an older save.
@@ -350,6 +355,26 @@ function getSlotSummary(slotNum) {
         playerCharacter: raw.playerCharacter || null,
         playerClass: raw.playerClass || null,
         tutorialDone: !!raw.tutorialDone,
+        // --- Extended stats for the save-slot tooltip ---
+        // NOTE: sourced from raw.questStats (per-slot), NOT raw.achStats
+        // (achStats is a cross-slot/global store and is never populated
+        // per-slot — see achievements.js, which persists to ACH_SAVE_KEY).
+        bonusDone: raw.bonusDone || [],
+        levelHS: raw.levelHS || {},
+        classPassiveLevel: raw.classPassiveLevel || 1,
+        classActive1Level: raw.classActive1Level || 1,
+        classActive2Level: raw.classActive2Level || 1,
+        ascendencySkill1Level: raw.ascendencySkill1Level || 1,
+        ascendencySkill2Level: raw.ascendencySkill2Level || 1,
+        questsClaimedCount: (raw.questsClaimed || []).length,
+        totalTimePlayedSecs: raw.totalTimePlayedSecs || 0,
+
+        lifetimeTilesRevealed: (raw.questStats && raw.questStats.lifetimeTilesRevealed) || 0,
+        lifetimeTilesFilled: (raw.questStats && raw.questStats.lifetimeTilesFilled) || 0,
+        lifetimeMistakesMade: (raw.questStats && raw.questStats.lifetimeMistakesMade) || 0,
+        itemsUsedTotal: (raw.questStats && raw.questStats.itemsUsedTotal) || 0,
+        classAbilitiesUsed: (raw.questStats && raw.questStats.classAbilitiesUsed) || 0,
+        passivePointsObtained: (raw.questStats && raw.questStats.lifetimePassivePointsObtained) || 0,
     };
 }
 

@@ -183,6 +183,7 @@ function _reward_grantOneItem(defId) {
  */
 function _reward_grantPassivePoints(amount) {
     STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + amount;
+    _incDirect('lifetimePassivePointsObtained', amount);
 }
 
 /**

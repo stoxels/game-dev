@@ -636,6 +636,9 @@ function handleCorrectFill(row, col) {
     if (STATE.questStats) STATE.questStats._ql_hasManuallyFilledCell = true;
     Audio_Manager.playSFX('cellFill');
 
+    trackAchStat('tilesFilled');
+    _incDirect('lifetimeTilesFilled');
+
     // Absolute Zero: leave a persistent frost crust on tiles correctly
     // filled while the freeze is active
     if (window._freezeActive && typeof _arcaneFreeze_applyPersistentFrost === 'function') {

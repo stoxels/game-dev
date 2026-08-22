@@ -245,6 +245,15 @@ function _initProceduralSystems() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Accumulates total seconds played across the whole save (persisted the
+// next time save() runs elsewhere — win, item use, etc.). Only ticks while
+// a level is actually running (guarded by the same dead/timerFrozen check
+// as the rest of the tick loop).
+function _tickPlaytimeTracker() {
+    STATE.totalTimePlayedSecs = (STATE.totalTimePlayedSecs || 0) + 1;
+}
+
+
 // Advances all passive skill systems that need a per-second nudge.
 function _tickPassiveSkills() {
     _poissonProcessTick();
@@ -469,6 +478,7 @@ function startTimer() {
         _tickTimedStasis();
         _tickLawOfLargeNumbers();
         _tickCountdown();
+        _tickPlaytimeTracker();
 
         updTimer();
 

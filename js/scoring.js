@@ -236,6 +236,7 @@ function applyConvergenceReward(gi) {
     const isFirstEver = STATE.convergenceDone.length === 0;
     STATE.convergenceDone.push(gi);
     STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + 1;
+    _incDirect('lifetimePassivePointsObtained', 1);
     save();
     window._pendingConvergenceModal = true;
 

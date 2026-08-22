@@ -186,3 +186,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
+
+//------------------------------------------------------------------------
+//----------------------------SAVE SLOT TOOLTIP----------------------------
+//------------------------------------------------------------------------
+
+function _fmtPlaytime(totalSecs) {
+    const h = Math.floor(totalSecs / 3600);
+    const m = Math.floor((totalSecs % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+const _SAVE_SLOT_ALL_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
+
+// Counts levels whose recorded highscore was set on Hard difficulty
+// with every optional modifier active.
+function _countHardAllModsClears(levelHS) {
+    return Object.values(levelHS || {}).filter(hs =>
+        hs && hs.diff === 'hard' && _SAVE_SLOT_ALL_MODS.every(m => hs.mods && hs.mods[m])
+    ).length;
+}
+
+function _pctOf(part, total) {
+    if (!total) return '0%';
+    return `${Math.round((part / total) * 100)}%`;
+}
+
+// Builds the lifetime-stats tooltip for a save-slot card.
+// `summary` comes from getSlotSummary() in state.js.
+function _buildSaveSlotTooltipHTML(summary) {
+    const totalLevels = (typeof ALL !== 'undefined' && ALL.length) ? ALL.length : 0;
+
+    const upgradesAchieved =
+        (summary.classPassiveLevel - 1) +
+        (summary.classActive1Level - 1) +
+        (summary.classActive2Level - 1) +
+        (summary.ascendencySkill1Level - 1) +
+        (summary.ascendencySkill2Level - 1);
+
+    const pctLevels = _pctOf(summary.levelsDone, totalLevels);
+    const pctBonus = _pctOf(summary.bonusDone.length, totalLevels);
+    const pctHardAllMods = _pctOf(_countHardAllModsClears(summary.levelHS), totalLevels);
+
+    let html = `<strong>💾 Slot ${summary.slot} — Lifetime Stats</strong>`;
+    html += `<br>🟩 Cells revealed: <b>${summary.lifetimeTilesRevealed}</b>`;
+    html += `<br>🟦 Cells filled manually: <b>${summary.lifetimeTilesFilled}</b>`;
+    html += `<br>✗ Mistakes made: <b>${summary.lifetimeMistakesMade}</b>`;
+    html += `<br>🎒 Items used: <b>${summary.itemsUsedTotal}</b>`;
+    html += `<br>⚔️ Class abilities used: <b>${summary.classAbilitiesUsed}</b>`;
+    html += `<br>🌿 Passive points obtained: <b>${summary.passivePointsObtained}</b>`;
+    html += `<br>📋 Inference tasks completed: <b>${summary.questsClaimedCount}</b>`;
+    html += `<br>⬆️ Class upgrades achieved: <b>${upgradesAchieved}</b>`;
+    html += `<br>⏱ Total time played: <b>${_fmtPlaytime(summary.totalTimePlayedSecs)}</b>`;
+    html += `<br><br><span style="opacity:.7">Completion:</span>`;
+    html += `<br>&nbsp;&nbsp;Levels cleared: <b>${pctLevels}</b>`;
+    html += `<br>&nbsp;&nbsp;Bonus objectives: <b>${pctBonus}</b>`;
+    html += `<br>&nbsp;&nbsp;Hard + all modifiers: <b>${pctHardAllMods}</b>`;
+    return html;
+}

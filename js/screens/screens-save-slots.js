@@ -81,6 +81,14 @@ function _attachSlotCardListeners(card, slotNum) {
             showDeleteSlotConfirm(slotNum);
         });
     }
+
+    // Hover tooltip: lifetime stats for this save slot (skip empty slots)
+    const summary = getSlotSummary(slotNum);
+    if (!summary.empty && typeof showGameTooltip === 'function') {
+        card.addEventListener('mouseenter', (e) => showGameTooltip(_buildSaveSlotTooltipHTML(summary), e));
+        card.addEventListener('mousemove', moveGameTooltip);
+        card.addEventListener('mouseleave', hideGameTooltip);
+    }
 }
 
 //------------------------------------------------------------------------

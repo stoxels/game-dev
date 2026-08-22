@@ -261,6 +261,7 @@ function applyPenalty(row, col) {
 
     // --- Register the mistake and fire dependent systems ---
     mistakeCount++;
+    _incDirect('lifetimeMistakesMade');
     _onMistakeBayesianUpdate();
     _gamblersRuinOnMistake();
     trackAchStat('mistakesMade');
