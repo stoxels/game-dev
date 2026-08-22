@@ -166,6 +166,16 @@ function _buildLevelNameTooltipHTML() {
         html += `<br>Best mistake count: <b>${STATE.levelMistakes[gi]}</b>`;
     }
 
+    if (ptHasSkill('grid_awareness')) {
+        const tierLabels = { small: 'Small', medium: 'Medium', large: 'Large', massive: 'Massive' };
+        const tier = _getGridSizeTier(cur.grid.length, cur.grid[0].length);
+        html += `<br>Grid class: <b>${tierLabels[tier]}</b>`;
+    }
+
+    const { isAscension, isConvergence } = _getLevelSpecialStatus(cur);
+    if (isAscension) html += `<br><span style="color:#c080ff">⬆ Ascension Level</span>`;
+    if (isConvergence) html += `<br><span style="color:#6dbf40">◆ Convergence Level</span>`;
+
     return html;
 }
 

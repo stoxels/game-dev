@@ -275,6 +275,8 @@ function _updateHUD() {
     const nameEl = document.getElementById('hud-level-name');
     if (nameEl) {
         nameEl.textContent = `${lvText(cur, 'hint')}`;
+        const { isAscension, isConvergence } = _getLevelSpecialStatus(cur);
+        nameEl.style.color = isAscension ? '#c080ff' : isConvergence ? '#6dbf40' : '';
     }
 }
 

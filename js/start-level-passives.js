@@ -65,6 +65,18 @@ function _applyOutlierDetectionHighlights() {
     }, 200);
 }
 
+
+// Classifies a grid by cell count into one of the game's four size tiers.
+// Small: <100 | Medium: 100–199 | Large: 200–399 | Massive: 400+
+function _getGridSizeTier(rows, cols) {
+    const cellCount = rows * cols;
+    if (cellCount >= 400) return 'massive';
+    if (cellCount >= 200) return 'large';
+    if (cellCount >= 100) return 'medium';
+    return 'small';
+}
+
+
 // Picks a handful of wrong (empty-solution) cells as lucky tiles for this level.
 // Right-clicking a lucky tile to mark ✕ awards a free random item (once per level).
 // The number of tiles scales with grid size and passive nodes.
@@ -74,9 +86,9 @@ function _initLuckyTiles() {
 
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
-    const cellCount = rows * cols;
-    const isLarge = cellCount >= 200 && cellCount <= 399;
-    const isMassive = cellCount >= 400;
+    const tier = _getGridSizeTier(rows, cols);
+    const isLarge = tier === 'large';
+    const isMassive = tier === 'massive';
     const isLargeOrMassive = isLarge || isMassive;
 
     let tileCount = _calcLuckyTileCount(isLarge, isMassive, isLargeOrMassive);

@@ -542,6 +542,21 @@ function checkIsLargeAdjMatrix() {
 }
 
 
+
+
+
+function _getLevelSpecialStatus(level) {
+    const worldData = WORLDS[level.world - 1];
+    const isAscension = level.li === worldData.data.length;
+    const isConvergence = isConvergenceLevel(worldData, isAscension);
+    return { isAscension, isConvergence };
+}
+
+
+
+
+
+
 //------------------------------------------------------------------------
 //-------------------CHECK WIN (MAIN ENTRY POINT)-------------------------
 //------------------------------------------------------------------------
@@ -580,7 +595,7 @@ function checkWin() {
     const cols = sol[0].length;
     const gi = cur.gIdx;
     const worldData = WORLDS[cur.world - 1];
-    const isAscensionLevel = cur.li === worldData.data.length;
+    const isAscensionLevel = _getLevelSpecialStatus(cur.li);    
     const isFirstClear = !STATE.done.includes(gi);
 
     if (isFirstClear) STATE.done.push(gi);
