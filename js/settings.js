@@ -9,6 +9,7 @@ const SETTINGS_KEY = 'stoxels_settings';
 // Default values — used as fallback for any missing or corrupt saved data
 const SETTINGS_DEFAULTS = {
     bgmEnabled: true,
+    randomBgmEnabled: false,
     bgmVolume: 0.4,   // 0–1 float, mapped to 0–100% in the UI
     sfxEnabled: true,
     sfxVolume: 0.7,   // 0–1 float, mapped to 0–100% in the UI
@@ -23,6 +24,7 @@ const SETTINGS_DEFAULTS = {
 // Each entry maps a settings key to its button element ID.
 const TOGGLE_CONFIGS = [
     { key: 'bgmEnabled', btnId: 'stt-bgm' },
+    { key: 'randomBgmEnabled', btnId: 'stt-randombgm' },
     { key: 'sfxEnabled', btnId: 'stt-sfx' },
     { key: 'axisLock', btnId: 'stt-axis' },
     { key: 'protectMarkedCells', btnId: 'stt-protectmarks' },
@@ -82,6 +84,7 @@ function applyAudioSettings() {
     Audio_Manager.setBGMVolume(SETTINGS.bgmVolume);
     Audio_Manager.toggleSFX(SETTINGS.sfxEnabled);
     Audio_Manager.setSFXVolume(SETTINGS.sfxVolume);
+    Audio_Manager.toggleRandomBGM(SETTINGS.randomBgmEnabled);
 }
 
 // Pushes gameplay settings to the relevant game-state variables.
@@ -183,6 +186,7 @@ function initSliderControl(sliderId, valueId, settingsKey) {
 function initSettingsControls() {
     // Toggles — questionMark is visual-only so it skips applySettings
     initToggleControl('stt-bgm', 'bgmEnabled');
+    initToggleControl('stt-randombgm', 'randomBgmEnabled');
     initToggleControl('stt-sfx', 'sfxEnabled');
     initToggleControl('stt-axis', 'axisLock');
     initToggleControl('stt-protectmarks', 'protectMarkedCells', false);

@@ -222,7 +222,7 @@ function _slashEffectGetGridBounds(wrap, sol, zoom) {
     const cols = sol[0].length;
     const firstCell = document.getElementById('g-0-0');
     const lastCell = document.getElementById(`g-${rows - 1}-${cols - 1}`);
-    if (!firstCell || !lastCell) return null;
+    if (!firstCell || !lastCell) { console.warn('slash bounds: missing corner cell', firstCell, lastCell); return null; }
 
     const wrapRect = wrap.getBoundingClientRect();
     const gridTop = (firstCell.getBoundingClientRect().top - wrapRect.top) / zoom;
@@ -297,14 +297,16 @@ function _playSlashEffect(vertical = false) {
     const sol = cur?.grid;
     if (!sol) return;
 
-    const zoom = currentZoom || 1;
-    const bounds = _slashEffectGetGridBounds(wrap, sol, zoom);
-    if (!bounds) return;
+    requestAnimationFrame(() => {
+        const zoom = currentZoom || 1;
+        const bounds = _slashEffectGetGridBounds(wrap, sol, zoom);
+        if (!bounds) return;
 
-    const SLASH_COUNT = 3;
-    for (let i = 0; i < SLASH_COUNT; i++) {
-        _slashEffectSpawnSlash(wrap, vertical, bounds, i, SLASH_COUNT);
-    }
+        const SLASH_COUNT = 3;
+        for (let i = 0; i < SLASH_COUNT; i++) {
+            _slashEffectSpawnSlash(wrap, vertical, bounds, i, SLASH_COUNT);
+        }
+    });
 }
 
 
@@ -323,7 +325,13 @@ function _playSlashEffect(vertical = false) {
 //   Returns { cx, cy } or null if the cell element is not found.
 function _diagSlashGetCenterPoint(wrap, row, col, zoom) {
     const cellEl = document.getElementById(`g-${row}-${col}`);
-    if (!cellEl) return null;
+    if (!cellEl) {
+        console.warn('cellEl is missing');
+        return null;
+    }
+
+
+
 
     const wrapRect = wrap.getBoundingClientRect();
     const cellRect = cellEl.getBoundingClientRect();
@@ -347,7 +355,9 @@ function _diagSlashGetDiagLength(wrap, sol, zoom) {
     const cols = sol[0].length;
     const firstCell = document.getElementById('g-0-0');
     const lastCell = document.getElementById(`g-${rows - 1}-${cols - 1}`);
-    if (!firstCell || !lastCell) return null;
+    if (!firstCell || !lastCell) {
+        console.warn('slash bounds: missing corner cell', firstCell, lastCell); return null;
+    }
 
     const gridW = (lastCell.getBoundingClientRect().right - firstCell.getBoundingClientRect().left) / zoom;
     const gridH = (lastCell.getBoundingClientRect().bottom - firstCell.getBoundingClientRect().top) / zoom;
@@ -405,39 +415,35 @@ function _playDiagonalSlashEffect(row, col, diagonalCount) {
     const sol = cur?.grid;
     if (!sol) return;
 
-    const zoom = currentZoom || 1;
-    const center = _diagSlashGetCenterPoint(wrap, row, col, zoom);
-    if (!center) return;
+    requestAnimationFrame(() => {
+        const zoom = currentZoom || 1;
+        const center = _diagSlashGetCenterPoint(wrap, row, col, zoom);
+        if (!center) return;
 
-    const diagLen = _diagSlashGetDiagLength(wrap, sol, zoom);
-    if (!diagLen) return;
+        const diagLen = _diagSlashGetDiagLength(wrap, sol, zoom);
+        if (!diagLen) return;
 
-    const { cx, cy } = center;
+        const { cx, cy } = center;
 
-    // Overlay container — clips children so bars don't render outside the scaler
-    const container = document.createElement('div');
-    container.style.cssText = `
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        z-index: 300;
-        overflow: hidden;
-    `;
-    wrap.appendChild(container);
+        const container = document.createElement('div');
+        container.style.cssText = `
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 300;
+            overflow: hidden;
+        `;
+        wrap.appendChild(container);
 
-    // Rank 1 → main diagonal ↘ (135°)
-    _diagSlashMakeBar(container, cx, cy, diagLen, 135, 0);
+        _diagSlashMakeBar(container, cx, cy, diagLen, 135, 0);
+        if (diagonalCount >= 2) _diagSlashMakeBar(container, cx, cy, diagLen, 45, 0.1);
+        if (diagonalCount >= 4) {
+            _diagSlashMakeBar(container, cx, cy, diagLen, 0, 0.05);
+            _diagSlashMakeBar(container, cx, cy, diagLen, 90, 0.15);
+        }
 
-    // Rank 2 → add anti-diagonal ↙ (45°)
-    if (diagonalCount >= 2) _diagSlashMakeBar(container, cx, cy, diagLen, 45, 0.1);
-
-    // Rank 3 → also horizontal (0°) and vertical (90°)
-    if (diagonalCount >= 4) {
-        _diagSlashMakeBar(container, cx, cy, diagLen, 0, 0.05);
-        _diagSlashMakeBar(container, cx, cy, diagLen, 90, 0.15);
-    }
-
-    setTimeout(() => container.remove(), 1200);
+        setTimeout(() => container.remove(), 1200);
+    });
 }
 
 
@@ -1209,7 +1215,7 @@ function _diagStrikeUpdatePreview(clientX, clientY) {
     const diagonalCount = _diagStrikeGetEffectiveDiagonalsForPreview();
 
     const key = `${hovered.r}-${hovered.c}-${diagonalCount}`;
-    if (key === _diagStrikePreviewKey) return; // unchanged since last move — skip rebuild
+    if (key === _diagStrikePreviewKey) return;
     _diagStrikePreviewKey = key;
 
     const wrap = document.getElementById('puzzle-scaler');
@@ -1217,7 +1223,10 @@ function _diagStrikeUpdatePreview(clientX, clientY) {
     if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
 
     _diagStrikeRemovePreviewEls();
-    _diagStrikeBuildPreviewBars(wrap, hovered.r, hovered.c, diagonalCount);
+
+    requestAnimationFrame(() => {
+        _diagStrikeBuildPreviewBars(wrap, hovered.r, hovered.c, diagonalCount);
+    });
 }
 
 

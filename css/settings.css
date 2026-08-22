@@ -391,3 +391,12 @@
         border-color: var(--red, #c0392b);
         color: #fff;
     }
+
+
+/* Invisible spacer elements — reuse the slider/value box sizes so a
+   toggle-only row (e.g. Random Music) lines up with rows that do have
+   a slider, without duplicating their clamp() math here. */
+.settings-spacer {
+    visibility: hidden;
+    pointer-events: none;
+}

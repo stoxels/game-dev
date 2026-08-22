@@ -30,6 +30,8 @@ const Audio_Manager = (() => {
     let sfxEnabled = true;
     let bgmLocked = false;   // true while a story beat/cutscene owns BGM
 
+    let randomBgmEnabled = false;   // true when "random BGM" setting is on
+
     // Currently playing BGM track
     let currentBGM = null;      // active HTMLAudioElement
     let currentBGMSrc = '';     // file path of the active track (used for same-track guard)
@@ -77,6 +79,12 @@ const Audio_Manager = (() => {
         }
     }
 
+    function _syncRandomBGMFromSettings() {
+        if (typeof SETTINGS !== 'undefined') {
+            randomBgmEnabled = SETTINGS.randomBgmEnabled;
+        }
+    }
+
     // Returns true if the given src is already playing as the active BGM track.
     function _isBGMAlreadyPlaying(src) {
         return currentBGMSrc === src && currentBGM && !currentBGM.paused;
@@ -84,9 +92,9 @@ const Audio_Manager = (() => {
 
     // Creates a new looping Audio element for the given src,
     // sets its volume, and stores it as the active BGM track.
-    function _createBGMAudioElement(src) {
+    function _createBGMAudioElement(src, loop = true) {
         const audio = new Audio(src);
-        audio.loop = true;
+        audio.loop = loop;
         audio.volume = BGM_VOLUME;
         currentBGM = audio;
         currentBGMSrc = src;
@@ -178,24 +186,26 @@ const Audio_Manager = (() => {
     // If BGM is disabled in SETTINGS or internally, the call is ignored.
     function playBGM(trackKey) {
         _syncBGMEnabledFromSettings();
+        _syncRandomBGMFromSettings();
         if (!bgmEnabled) return;
         if (bgmLocked) return;
 
         const src = BGM_TRACKS[trackKey];
         if (!src) return;
 
-        _lastBGMKey = trackKey;
+        _lastBGMKey = trackKey; // always remember the "real" level track
+
+        if (randomBgmEnabled) {
+            _playRandomBGMTrack();
+            return;
+        }
 
         if (_isBGMAlreadyPlaying(src)) return;
 
-        // Clean up any stale resume listeners before switching tracks
         _cancelPendingResumeListeners();
         stopBGM();
 
-        const audio = _createBGMAudioElement(src);
-
-        // Browser autoplay policy may block play() — register a fallback
-        // that retries on the next user interaction if needed.
+        const audio = _createBGMAudioElement(src, true);
         audio.play().catch(() => {
             _registerAutoplayResumeListeners(audio);
         });
@@ -209,6 +219,41 @@ const Audio_Manager = (() => {
         if (keys.length === 0) return;
         const randomKey = keys[Math.floor(Math.random() * keys.length)];
         playBGM(randomKey);
+    }
+
+
+    // Picks a random track (excluding special tracks), plays it without looping,
+    // and wires an 'ended' listener so the next random track auto-chains.
+    function _playRandomBGMTrack() {
+        const keys = _getAllBGMKeys(true);
+        if (keys.length === 0) return;
+
+        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+        const src = BGM_TRACKS[randomKey];
+        if (!src) return;
+
+        _cancelPendingResumeListeners();
+        stopBGM(0);
+
+        const audio = _createBGMAudioElement(src, false);
+        audio.addEventListener('ended', _onRandomTrackEnded);
+        audio.play().catch(() => {
+            _registerAutoplayResumeListeners(audio);
+        });
+    }
+
+    // Fires when a random track finishes. Chains into another random track,
+    // unless random mode or BGM got turned off in the meantime.
+    function _onRandomTrackEnded() {
+        if (!randomBgmEnabled || !bgmEnabled) return;
+        _playRandomBGMTrack();
+    }
+
+    // Called by settings.js whenever the "random BGM" toggle changes.
+    // Immediately switches the currently playing track to match the new mode.
+    function toggleRandomBGM(enabled) {
+        randomBgmEnabled = enabled;
+        if (_lastBGMKey) playBGM(_lastBGMKey);
     }
 
 
@@ -324,6 +369,7 @@ const Audio_Manager = (() => {
         trackForLevel,
         lockBGM,
         unlockBGM,
+        toggleRandomBGM,
 
         get lastBGMKey() { return _lastBGMKey; },
 

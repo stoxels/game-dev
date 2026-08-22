@@ -10,21 +10,22 @@ const CHANGELOG_DATA = [
 
     {
         version: "v0.27 BETA",
-        date: "19.08.2026",
+        date: "22.08.2026",
         changes: [
             {
                 category: "New Features",
                 items: [
                     "Settings Modal has been fully remade.",
-                    "There are now up to 20 individual Save - Slots. Each one can be reset individually and progress is based per Save - Slot. Character portraits in each save slot shows the chosen character and class combination.",
-                    "There is a detailed lifetime summary of interesting stats for the specific save slot.",
-                    "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text.",
-                    "Added a new Setting option: You can now disable left-click behaviour on cells that have been marked as incorrect (by a manual right click or by items, passives and abilities).",
-                    "Red Cross Marks created by passives, abilities, items and other effects are now visually distinct from manually placed cross marks",
                     "Settings can now be opened and adjusted during the Pause screen (Escape during a Puzzle Screen)",
+                    "Added a new Setting option for playing Random Background Music instead of the pre-assigned Track.",
+                    "Added a new Setting option: You can now disable left-click behaviour on cells that have been marked as incorrect (by a manual right click or by items, passives and abilities).",
+                    "There are now up to 20 individual Save - Slots. Each one can be reset individually and progress is based per Save - Slot. Character portraits in each save slot shows the chosen character and class combination.",
+                    "Each Save - Slot shows a lifetime summary of interesting stats for that specific playthrough.",
+                    "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text.",
+                    "The Message Queue Toast System has been fully remade.",
+                    "Red Cross Marks created by passives, abilities, items and other effects are now visually distinct from manually placed cross marks",
                     "Added countdown timers for row and column clue number blackout durations after using cursed items.",
                     "Added a small visual effect when a row or column has been fully solved.",
-                    "The Message Queue Toast System has been fully remade.",
                     "The chosen Character now appears in the Level Selection Topbar row. Mouse - overing the character shows the character traits.",
                     "After selecting a class for the first time there are now two visual hints that tell the player to use keyboard buttons 1 and 2 to activate spells.",
                     "Alot of the information from the puzzle game top bar rows have been moved to the pause screen to make more space for the actual grid puzzle. The actual puzzle topbar has been redesigned to be in the top left corner now. The puzzle is now always much more centered onto the screen, regardless of grid size.",
@@ -32,6 +33,7 @@ const CHANGELOG_DATA = [
                     "Added new visual indicators when the timer drops below 15 minutes, 10 minutes and 5 minutes.",
                     "Mouse Overing the Timer, the Mistake Counter, the Level Name, the Inventory or the Close button now show appropriate informative tooltips.",
                     "A Prototype for the Endgame has been developed and is now accessable through the Endgame Test Hub. This will be expanded on in the future.",
+
                 ],
 
             },
