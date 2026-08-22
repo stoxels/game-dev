@@ -99,6 +99,17 @@ function hideGameTooltip() {
 //----------------------------CONTENT BUILDERS-----------------------------
 //------------------------------------------------------------------------
 
+// Formats a whole number of seconds as "Xm Ys" (e.g. 125 -> "2m 5s").
+// Falls back to "0s" for 0/negative input.
+function _fmtSecsAsMinSec(totalSecs) {
+    const safeSecs = Math.max(0, Math.round(totalSecs));
+    const m = Math.floor(safeSecs / 60);
+    const s = safeSecs % 60;
+    if (m <= 0) return `${s}s`;
+    return `${m}m ${s}s`;
+}
+
+
 // 1. Mistakes
 function _buildMistakesTooltipHTML() {
     const base = typeof _getPenaltySecondsAtCount === 'function'
@@ -115,7 +126,7 @@ function _buildMistakesTooltipHTML() {
     if (typeof _levelMistakesErased !== 'undefined' && _levelMistakesErased > 0) {
         html += `<br>Erased by items: <b>${_levelMistakesErased}</b>`;
     }
-    html += `<br>Next mistake costs: <b>−${nextPenalty}s</b>`;
+    html += `<br>Next mistake costs: <b>−${_fmtSecsAsMinSec(nextPenalty)}</b>`;
     if (reduction > 0) {
         html += `<br><span style="opacity:.6;font-size:.85em">(−${reduction}s from completed lines)</span>`;
     }
@@ -126,8 +137,8 @@ function _buildMistakesTooltipHTML() {
 // 2. Timer
 function _buildTimerTooltipHTML() {
     let html = `<strong style="color:var(--accent,#66fcf1)">⏱ Timer</strong>`;
-    html += `<br>Time added this level: <b>+${_levelTimeAdded || 0}s</b>`;
-    html += `<br>Time lost to mistakes: <b>−${_levelTimeLost || 0}s</b>`;
+    html += `<br>Time added this level: <b>+${_fmtSecsAsMinSec(_levelTimeAdded || 0)}</b>`;
+    html += `<br>Time lost to mistakes: <b>−${_fmtSecsAsMinSec(_levelTimeLost || 0)}</b>`;
     html += `<br><span style="opacity:.55;font-size:.85em">Includes passive bonuses, items & penalties.</span>`;
     return html;
 }

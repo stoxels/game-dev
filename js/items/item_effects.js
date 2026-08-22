@@ -156,6 +156,45 @@ function _fxGetGridCorners() {
     return { first, last };
 }
 
+
+// _fxGetPuzzleRectForWrap — like _fxGetPuzzleRect(), but returns coordinates
+// relative to #puzzle-scaler-wrap instead of #puzzle-scaler, WITHOUT dividing
+// by currentZoom. Use this for any overlay that is attached to the wrap
+// itself (which is never transformed) rather than to #puzzle-scaler (which
+// has the zoom transform applied).
+//
+// Dividing by currentZoom is only valid for elements living *inside* the
+// scaled element (#puzzle-scaler) — for anything living in the unscaled
+// wrap, that division introduces zoom-dependent drift that blows up at
+// high zoom levels (this was the cause of the fx-shield-border /
+// variance-shield-bubble mispositioning bug).
+function _fxGetPuzzleRectForWrap() {
+    const wrap = document.getElementById('puzzle-scaler-wrap');
+    if (!wrap) return null;
+    if (!wrap.style.position || wrap.style.position === 'static') {
+        wrap.style.position = 'relative';
+    }
+
+    const corners = _fxGetGridCorners();
+    if (!corners) return null;
+    const { first, last } = corners;
+
+    const wRect = wrap.getBoundingClientRect();
+    const fRect = first.getBoundingClientRect();
+    const lRect = last.getBoundingClientRect();
+
+    return {
+        wrap,
+        top: fRect.top - wRect.top,
+        left: fRect.left - wRect.left,
+        bottom: lRect.bottom - wRect.top,
+        right: lRect.right - wRect.left,
+        width: lRect.right - fRect.left,
+        height: lRect.bottom - fRect.top,
+    };
+}
+
+
 // Returns the bounding rect of the puzzle grid in the
 // coordinate space of the puzzle-scaler element (logical px).
 // Returns null when the grid elements can't be found.
@@ -747,8 +786,20 @@ function _fxShieldBorderAdd() {
 
     const border = document.createElement('div');
     border.id = 'fx-shield-border';
+
+    // Attach to the WRAP, not the scaler — the wrap is never transformed,
+    // so we can position this with plain rect deltas and never touch
+    // currentZoom. (Previously attached to #puzzle-scaler and divided by
+    // currentZoom in _repositionShieldBorder — that's what caused the
+    // huge bogus `left` value at high zoom.)
+    const wrap = document.getElementById('puzzle-scaler-wrap');
+    if (!wrap) return;
+    if (!wrap.style.position || wrap.style.position === 'static') {
+        wrap.style.position = 'relative';
+    }
+
     border.style.cssText = `
-        position:fixed;
+        position:absolute;
         pointer-events:none;
         z-index:${FX_Z.above};
         border-radius:4px;
@@ -758,33 +809,27 @@ function _fxShieldBorderAdd() {
             0 0 28px 8px rgba(255,215,0,0.3);
         animation:fx-shield-border-pulse 1.8s ease-in-out infinite;
     `;
-    document.body.appendChild(border);
+    wrap.appendChild(border);
 
-    // Positions the border to match the grid's current screen rect.
+    // Positions the border to match the grid's bounds, in wrap-relative
+    // (unscaled) coordinates — no zoom division required.
     function _repositionShieldBorder() {
-        const corners = _fxGetGridCorners();
-        if (!corners) return;
-        const { first, last } = corners;
+        const r = _fxGetPuzzleRectForWrap();
+        if (!r) return;
 
-        const fRect = first.getBoundingClientRect();
-        const lRect = last.getBoundingClientRect();
-
-        border.style.left = fRect.left + 'px';
-        border.style.top = fRect.top + 'px';
-        border.style.width = (lRect.right - fRect.left) + 'px';
-        border.style.height = (lRect.bottom - fRect.top) + 'px';
+        border.style.left = r.left + 'px';
+        border.style.top = r.top + 'px';
+        border.style.width = r.width + 'px';
+        border.style.height = r.height + 'px';
     }
 
     _repositionShieldBorder();
 
-    // Re-position on scroll or resize so the fixed border tracks the grid.
-    const wrap = document.getElementById('puzzle-scaler-wrap');
     border._reposition = _repositionShieldBorder;
-    if (wrap) wrap.addEventListener('scroll', _repositionShieldBorder, { passive: true });
     window.addEventListener('resize', _repositionShieldBorder, { passive: true });
 
-    // Also reposition on every zoom (Ctrl+Wheel fires a wheel event on wrap).
-    if (wrap) wrap.addEventListener('wheel', _repositionShieldBorder, { passive: true });
+    // Ctrl+Wheel zoom fires a wheel event on the wrap — reposition then too.
+    wrap.addEventListener('wheel', _repositionShieldBorder, { passive: true });
 }
 
 // Removes the shield border with a short fade-out.
@@ -792,12 +837,10 @@ function _fxShieldBorderRemove() {
     const border = document.getElementById('fx-shield-border');
     if (!border) return;
 
-    // Clean up tracking listeners
-    const wrap = document.getElementById('puzzle-scaler-wrap');
     if (border._reposition) {
-        if (wrap) wrap.removeEventListener('scroll', border._reposition);
-        if (wrap) wrap.removeEventListener('wheel', border._reposition);
         window.removeEventListener('resize', border._reposition);
+        const wrap = document.getElementById('puzzle-scaler-wrap');
+        if (wrap) wrap.removeEventListener('wheel', border._reposition);
     }
 
     border.style.animation = 'fx-shield-border-shatter 0.35s ease-out forwards';

@@ -157,14 +157,22 @@ function _applyZoom() {
     wrap.style.height = (scaler.offsetHeight * currentZoom) + 'px';
     wrap.style.minWidth = (scaler.offsetWidth * currentZoom) + 'px';
 
-    // Reposition the shield border (if active) after every zoom change,
-    // since it uses position:fixed and getBoundingClientRect screen coords.
-    const border = document.getElementById('fx-shield-border');
-    if (border?._reposition) border._reposition();
+    // Reposition the shield border / variance shield dome AFTER the browser
+    // has actually settled the new transform, instead of reading
+    // getBoundingClientRect() in the same synchronous tick that just set
+    // style.transform. Doing it synchronously can occasionally measure
+    // stale geometry from the previous zoom level — worse the bigger the
+    // jump between zoom levels, which is exactly why this only shows up
+    // once you zoom in "very much" (e.g. several fast +clicks in a row).
+    // buildGrid() in grid.js works around the same class of issue with its
+    // own double rAF before the first scalePuzzle() call.
+    requestAnimationFrame(() => {
+        const border = document.getElementById('fx-shield-border');
+        if (border?._reposition) border._reposition();
 
-    // keep the variance shield bubble in sync with the new zoom immediately
-    const vsBubble = document.getElementById('variance-shield-bubble');
-    if (vsBubble?._reposition) vsBubble._reposition();
+        const vsBubble = document.getElementById('variance-shield-bubble');
+        if (vsBubble?._reposition) vsBubble._reposition();
+    });
 
     _updateZoomBarUI();
 }

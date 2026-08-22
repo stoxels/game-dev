@@ -702,31 +702,21 @@ let _varianceShieldRemovalTimer = null;
 
 function _varianceShield_reposition() {
     const bubble = document.getElementById('variance-shield-bubble');
-    const scaler = document.getElementById('puzzle-scaler');
-    if (!bubble || !scaler) return;
+    // Use the wrap-relative rect helper (item_effects.js) instead of manual
+    // zoom-divided math — the bubble now lives in #puzzle-scaler-wrap
+    // (unscaled), so no currentZoom division should ever be applied here.
+    // This mirrors the fix for #fx-shield-border, which had the exact same
+    // bug: dividing by currentZoom at high zoom levels produced wildly
+    // incorrect `left` values.
+    const r = typeof _fxGetPuzzleRectForWrap === 'function' ? _fxGetPuzzleRectForWrap() : null;
+    if (!bubble || !r) return;
 
-    const corners = typeof _fxGetGridCorners === 'function' ? _fxGetGridCorners() : null;
-    if (!corners) return;
-    const { first, last } = corners;
-
-    // Get bounding rects relative to the viewport
-    const fRect = first.getBoundingClientRect();
-    const lRect = last.getBoundingClientRect();
-    const scalerRect = scaler.getBoundingClientRect();
-    const zoom = currentZoom || 1;
-
-    // Calculate dimensions relative to the unscaled puzzle-scaler container
     const pad = VARIANCE_SHIELD_DOME_PADDING_PX;
 
-    const left = ((fRect.left - scalerRect.left) / zoom) - pad;
-    const top = ((fRect.top - scalerRect.top) / zoom) - pad;
-    const width = ((lRect.right - fRect.left) / zoom) + (pad * 2);
-    const height = ((lRect.bottom - fRect.top) / zoom) + (pad * 2);
-
-    bubble.style.left = `${left}px`;
-    bubble.style.top = `${top}px`;
-    bubble.style.width = `${width}px`;
-    bubble.style.height = `${height}px`;
+    bubble.style.left = `${r.left - pad}px`;
+    bubble.style.top = `${r.top - pad}px`;
+    bubble.style.width = `${r.width + pad * 2}px`;
+    bubble.style.height = `${r.height + pad * 2}px`;
 }
 
 // Creates (or re-uses) the dome element, attaches it to <body> as a
@@ -752,15 +742,15 @@ function _varianceShield_spawnBubble() {
             <div class="vs-bubble-inner-ring"></div>
             <div class="vs-bubble-rim"></div>
         `;
-        // Attach to the scaler (not document.body) so the left/top offsets
-        // computed in _varianceShield_reposition() — which are relative to
-        // puzzle-scaler — actually land in the right coordinate space.
-        const scalerEl = document.getElementById('puzzle-scaler');
-        if (scalerEl) {
-            if (!scalerEl.style.position || scalerEl.style.position === 'static') {
-                scalerEl.style.position = 'relative';
+        // Attach to the WRAP (unscaled), not the scaler — see
+        // _varianceShield_reposition() for why. Coordinates written there
+        // are now wrap-relative and must NOT be divided by currentZoom.
+        const wrapEl = document.getElementById('puzzle-scaler-wrap');
+        if (wrapEl) {
+            if (!wrapEl.style.position || wrapEl.style.position === 'static') {
+                wrapEl.style.position = 'relative';
             }
-            scalerEl.appendChild(bubble);
+            wrapEl.appendChild(bubble);
         } else {
             document.body.appendChild(bubble); // fallback, shouldn't normally hit
         }
@@ -771,16 +761,6 @@ function _varianceShield_spawnBubble() {
             wrap.addEventListener('scroll', _varianceShield_reposition, { passive: true });
         }
     }
-
-    // Defer to next frame: at level start this can be called while
-    // #screen-game is still display:none (class passives apply before
-    // _navigateToGameScreen() switches the screen), which makes every
-    // getBoundingClientRect() on the grid return zeroes. Waiting a frame
-    // guarantees the screen switch has already happened.
-
-
-    //requestAnimationFrame(_varianceShield_reposition);
-    //requestAnimationFrame(() => bubble.classList.add('active'));
 
     setTimeout(() => {
         if (bubble._reposition) bubble._reposition();
