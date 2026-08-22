@@ -375,6 +375,7 @@ function getSlotSummary(slotNum) {
         itemsUsedTotal: (raw.questStats && raw.questStats.itemsUsedTotal) || 0,
         classAbilitiesUsed: (raw.questStats && raw.questStats.classAbilitiesUsed) || 0,
         passivePointsObtained: (raw.questStats && raw.questStats.lifetimePassivePointsObtained) || 0,
+        questionsCorrect: (raw.questStats && raw.questStats.questionsCorrect) || 0,
     };
 }
 

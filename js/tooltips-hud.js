@@ -234,6 +234,7 @@ function _buildSaveSlotTooltipHTML(summary) {
     html += `<br>🟩 Cells revealed: <b>${summary.lifetimeTilesRevealed}</b>`;
     html += `<br>🟦 Cells filled manually: <b>${summary.lifetimeTilesFilled}</b>`;
     html += `<br>✗ Mistakes made: <b>${summary.lifetimeMistakesMade}</b>`;
+    html += `<br>🧠 Questions answered correctly: <b>${summary.questionsCorrect}</b>`;
     html += `<br>🎒 Items used: <b>${summary.itemsUsedTotal}</b>`;
     html += `<br>⚔️ Class abilities used: <b>${summary.classAbilitiesUsed}</b>`;
     html += `<br>🌿 Passive points obtained: <b>${summary.passivePointsObtained}</b>`;
