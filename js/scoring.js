@@ -595,7 +595,7 @@ function checkWin() {
     const cols = sol[0].length;
     const gi = cur.gIdx;
     const worldData = WORLDS[cur.world - 1];
-    const isAscensionLevel = _getLevelSpecialStatus(cur.li);    
+    const isAscensionLevel = _getLevelSpecialStatus(cur).isAscension;   
     const isFirstClear = !STATE.done.includes(gi);
 
     if (isFirstClear) STATE.done.push(gi);

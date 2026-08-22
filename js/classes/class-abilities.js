@@ -569,6 +569,7 @@ function _resetClassLevelState() {
     window._typeIBonusReveal = false;
     window._bayesTrapProtectedLines = new Set();
     _varianceShield_removeBubble();
+    _momentumClearParticlesImmediate();
 
     updateMomentumBar(0, 15);
 
@@ -863,18 +864,20 @@ function _handlePrecisionMarkMomentum(row, col) {
     }
 }
 
-
 // _handleStatisticianStreak — advances or triggers the Statistician fill streak.
 //   Black Swan mode bypasses the streak counter and fires momentum on every fill.
-function _handleStatisticianStreak(effect) {
+function _handleStatisticianStreak(effect, row, col) {
     if (window._blackSwanActive) {
         // Black Swan: momentum on every correct fill, no streak required
+        _momentumSpawnParticle(row, col);
         _statisticianTriggerMomentum(effect.bonusSeconds);
         updateMomentumBar(correctFillStreak, effect.streakForBonus);
         return;
     }
 
     correctFillStreak++;
+    _momentumSpawnParticle(row, col);
+
     if (correctFillStreak >= effect.streakForBonus) {
         _statisticianTriggerMomentum(effect.bonusSeconds);
         // Streak was reset to 0 inside _statisticianTriggerMomentum
@@ -893,7 +896,7 @@ function onCorrectFill(row, col) {
 
     // Statistician streak logic only applies to the Statistician class
     if (STATE.playerClass !== 'statistician' || isClassless()) return;
-    _handleStatisticianStreak(_getPassiveEffect());
+    _handleStatisticianStreak(_getPassiveEffect(), row, col);
 }
 
 
@@ -916,10 +919,13 @@ function _getStatisticianStreakReduction(hasLFM, hasMNM) {
 }
 
 
+
 // onMistake — called on any wrong fill (from input.js).
 //   Resets or reduces the Statistician fill streak depending on passive tree nodes.
 function onMistake() {
     if (STATE.playerClass === 'statistician' && !isClassless()) {
+        _momentumParticlesOnMistake();
+
         const effect = _getPassiveEffect();
         const threshold = effect.streakForBonus || 15;
         const hasLFM = ptHasSkill('learning_from_mistakes');

@@ -1242,6 +1242,7 @@ function _diagStrikeUpdatePreview(clientX, clientY) {
 //     god_of_statistics  — doubles the total bonus after all flat additions
 function _statisticianTriggerMomentum(bonusSeconds) {
     correctFillStreak = 0;
+    _momentumCollideParticles();
 
     let bonus = bonusSeconds;
     if (ptHasSkill('chain_reaction')) bonus += 1;
@@ -1274,4 +1275,240 @@ function _statisticianTriggerMomentum(bonusSeconds) {
 
     Audio_Manager.playSFX('momentum');
     updateMomentumBar(0, 15); // reset momentum bar after it fires
+}
+
+//------------------------------------------------------------------------
+//-------------------MOMENTUM — PARTICLE ACCELERATOR EFFECT--------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Visualises the Momentum streak as small particles that spawn from each
+// correctly-filled cell and merge into a loop that travels around the
+// grid's border (not the center) — kept out of the way of the puzzle
+// itself, similar to how the Variance Shield dome (class-mathmagician.js,
+// _varianceShield_reposition / _fxGetGridCorners) wraps the grid edges.
+// On the streak reaching its cap, all particles fly to the center of the
+// grid and collide, spawning a shockwave. On a mistake, particles freeze
+// and fade out instead.
+
+// How far outside the grid's actual edge the particle loop travels.
+const MOMENTUM_ORBIT_PADDING_PX = 22;
+
+let _momentumParticles = [];   // { el, startX, startY, dist, speed, progress }
+let _momentumRafId = null;
+
+// _momentumGetContainer — returns (creating if needed) the overlay that
+// holds all momentum particles, positioned over the puzzle grid.
+function _momentumGetContainer() {
+    const wrap = document.getElementById('puzzle-scaler');
+    if (!wrap) return null;
+    if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
+
+    let container = document.getElementById('momentum-particle-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'momentum-particle-container';
+        container.style.cssText = `
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 280;
+            overflow: visible;
+        `;
+        wrap.appendChild(container);
+    }
+    return container;
+}
+
+// _momentumGetBorderRect — returns the padded rectangle (relative to
+// #puzzle-scaler, zoom-adjusted) that particles travel around, plus its
+// perimeter length. Uses the same corner-cell approach as the Variance
+// Shield dome (_varianceShield_reposition in class-mathmagician.js) so the
+// loop hugs the grid border consistently regardless of zoom.
+function _momentumGetBorderRect() {
+    const wrap = document.getElementById('puzzle-scaler');
+    const sol = cur?.grid;
+    if (!wrap || !sol) return null;
+
+    const zoom = currentZoom || 1;
+    const bounds = _slashEffectGetGridBounds(wrap, sol, zoom);
+    if (!bounds) return null;
+
+    const pad = MOMENTUM_ORBIT_PADDING_PX;
+    const x0 = bounds.gridLeft - pad;
+    const y0 = bounds.gridTop - pad;
+    const w = bounds.gridW + pad * 2;
+    const h = bounds.gridH + pad * 2;
+
+    return { x0, y0, w, h, perimeter: 2 * (w + h) };
+}
+
+// _momentumPointAtDistance — walks clockwise from the top-left corner of
+// `rect` by `dist` pixels (wrapping around the perimeter) and returns the
+// {x, y} point landed on: top edge → right edge → bottom edge → left edge.
+function _momentumPointAtDistance(rect, dist) {
+    const { x0, y0, w, h, perimeter } = rect;
+    let d = ((dist % perimeter) + perimeter) % perimeter; // normalise into [0, perimeter)
+
+    if (d <= w) return { x: x0 + d, y: y0 };
+    d -= w;
+    if (d <= h) return { x: x0 + w, y: y0 + d };
+    d -= h;
+    if (d <= w) return { x: x0 + w - d, y: y0 + h };
+    d -= w;
+    return { x: x0, y: y0 + h - d };
+}
+
+// _momentumStartLoop — starts the shared requestAnimationFrame loop that
+// advances every active particle. Stops itself once no particles remain.
+function _momentumStartLoop() {
+    const tick = () => {
+        _momentumUpdateParticles();
+        _momentumRafId = _momentumParticles.length > 0 ? requestAnimationFrame(tick) : null;
+    };
+    _momentumRafId = requestAnimationFrame(tick);
+}
+
+// _momentumUpdateParticles — advances each particle's position along the
+// border loop, easing in from its spawn cell until it merges onto the path.
+function _momentumUpdateParticles() {
+    const rect = _momentumGetBorderRect();
+    if (!rect) return;
+
+    _momentumParticles.forEach(p => {
+        p.dist += p.speed;
+        p.progress = Math.min(1, p.progress + 0.045);
+
+        const target = _momentumPointAtDistance(rect, p.dist);
+        const x = p.startX + (target.x - p.startX) * p.progress;
+        const y = p.startY + (target.y - p.startY) * p.progress;
+
+        p.el.style.transform = `translate(${x}px, ${y}px)`;
+    });
+}
+
+// _momentumSpawnParticle — spawns one particle at the given cell (or grid
+// center if no cell is given) and hands it off to the border-loop. One
+// call per correct fill; the number of live particles mirrors the
+// momentum streak counter shown on the HUD.
+//
+//   row / col : the cell that was just correctly filled (optional)
+function _momentumSpawnParticle(row, col) {
+    if (STATE.playerClass !== 'statistician' || isClassless()) return;
+
+    const wrap = document.getElementById('puzzle-scaler');
+    const container = _momentumGetContainer();
+    const sol = cur?.grid;
+    const rect = _momentumGetBorderRect();
+    if (!wrap || !container || !sol || !rect) return;
+
+    const zoom = currentZoom || 1;
+    let startX = rect.x0 + rect.w / 2;
+    let startY = rect.y0 + rect.h / 2;
+
+    if (row != null && col != null) {
+        const cellEl = document.getElementById(`g-${row}-${col}`);
+        if (cellEl) {
+            const wrapRect = wrap.getBoundingClientRect();
+            const cellRect = cellEl.getBoundingClientRect();
+            startX = (cellRect.left + cellRect.width / 2 - wrapRect.left) / zoom;
+            startY = (cellRect.top + cellRect.height / 2 - wrapRect.top) / zoom;
+        }
+    }
+
+    const el = document.createElement('div');
+    el.className = 'momentum-particle';
+    container.appendChild(el);
+
+    _momentumParticles.push({
+        el,
+        startX,
+        startY,
+        dist: Math.random() * rect.perimeter,
+        speed: (1.6 + Math.random() * 1.4) * (Math.random() < 0.5 ? 1 : -1),
+        progress: 0,
+    });
+
+    if (!_momentumRafId) _momentumStartLoop();
+}
+
+// _momentumParticlesOnMistake — freezes and fades out all live particles.
+// Called whenever the Statistician makes a mistake, since the streak (and
+// its visual buildup) is broken.
+function _momentumParticlesOnMistake() {
+    if (!_momentumParticles.length) return;
+
+    const particles = _momentumParticles;
+    _momentumParticles = []; // detach from the border loop immediately
+
+    particles.forEach(p => {
+        const current = p.el.style.transform || '';
+        p.el.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+        p.el.style.transform = `${current} scale(0.15)`;
+        p.el.style.opacity = '0';
+        setTimeout(() => p.el.remove(), 320);
+    });
+}
+
+// _momentumSpawnShockwave — spawns the expanding ring + flash at the grid
+// center after all particles have collided.
+function _momentumSpawnShockwave(cx, cy) {
+    const container = _momentumGetContainer();
+    if (!container) return;
+
+    const wave = document.createElement('div');
+    wave.className = 'momentum-shockwave';
+    wave.style.left = cx + 'px';
+    wave.style.top = cy + 'px';
+    container.appendChild(wave);
+
+    const flash = document.createElement('div');
+    flash.className = 'momentum-flash';
+    flash.style.left = cx + 'px';
+    flash.style.top = cy + 'px';
+    container.appendChild(flash);
+
+    setTimeout(() => { wave.remove(); flash.remove(); }, 700);
+}
+
+// _momentumCollideParticles — fires when the Momentum streak reaches its
+// cap. Sends every live particle flying in from the border loop to the
+// grid center, then spawns the collision shockwave once they arrive.
+function _momentumCollideParticles() {
+    if (!_momentumParticles.length) return;
+
+    const rect = _momentumGetBorderRect();
+
+    const particles = _momentumParticles;
+    _momentumParticles = []; // detach from the border loop immediately
+
+    if (!rect) {
+        particles.forEach(p => p.el.remove());
+        return;
+    }
+
+    const cx = rect.x0 + rect.w / 2;
+    const cy = rect.y0 + rect.h / 2;
+
+    particles.forEach(p => {
+        p.el.style.transition = `transform ${0.28 + Math.random() * 0.1}s cubic-bezier(.3,.6,.35,1), opacity 0.3s ease-in ${0.15 + Math.random() * 0.1}s`;
+        void p.el.offsetWidth; // force reflow so the transition starts from the current position
+        p.el.style.transform = `translate(${cx}px, ${cy}px) scale(0.3)`;
+        p.el.style.opacity = '0';
+    });
+
+    setTimeout(() => {
+        particles.forEach(p => p.el.remove());
+        _momentumSpawnShockwave(cx, cy);
+    }, 380);
+}
+
+// _momentumClearParticlesImmediate — instantly removes all particles with
+// no animation. Called on level start / class reset.
+function _momentumClearParticlesImmediate() {
+    _momentumParticles.forEach(p => p.el.remove());
+    _momentumParticles = [];
+    if (_momentumRafId) {
+        cancelAnimationFrame(_momentumRafId);
+        _momentumRafId = null;
+    }
 }

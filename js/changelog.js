@@ -73,6 +73,7 @@ const CHANGELOG_DATA = [
                     "Mathmagician: Arcane Reveal visual has been fully remade.",
                     "Mathmagician: Absolute Zero has received visual grid effects.",
                     "Statistician: Diagonal Strike now properly shows the whole diagonal on the targeting reticle.",
+                    "Statistician: Added a new visual effect for the Momentum passive effect.",
 
 
 
