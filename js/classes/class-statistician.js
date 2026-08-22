@@ -1299,7 +1299,7 @@ let _momentumRafId = null;
 // _momentumGetContainer — returns (creating if needed) the overlay that
 // holds all momentum particles, positioned over the puzzle grid.
 function _momentumGetContainer() {
-    const wrap = document.getElementById('puzzle-scaler');
+    const wrap = document.getElementById('puzzle-scaler-wrap'); // was 'puzzle-scaler'
     if (!wrap) return null;
     if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
 
@@ -1325,21 +1325,17 @@ function _momentumGetContainer() {
 // Shield dome (_varianceShield_reposition in class-mathmagician.js) so the
 // loop hugs the grid border consistently regardless of zoom.
 function _momentumGetBorderRect() {
-    const wrap = document.getElementById('puzzle-scaler');
-    const sol = cur?.grid;
-    if (!wrap || !sol) return null;
-
-    const zoom = currentZoom || 1;
-    const bounds = _slashEffectGetGridBounds(wrap, sol, zoom);
-    if (!bounds) return null;
+    const r = typeof _fxGetPuzzleRectForWrap === 'function' ? _fxGetPuzzleRectForWrap() : null;
+    if (!r) return null;
 
     const pad = MOMENTUM_ORBIT_PADDING_PX;
-    const x0 = bounds.gridLeft - pad;
-    const y0 = bounds.gridTop - pad;
-    const w = bounds.gridW + pad * 2;
-    const h = bounds.gridH + pad * 2;
-
-    return { x0, y0, w, h, perimeter: 2 * (w + h) };
+    return {
+        x0: r.left - pad,
+        y0: r.top - pad,
+        w: r.width + pad * 2,
+        h: r.height + pad * 2,
+        perimeter: 2 * (r.width + pad * 2 + r.height + pad * 2),
+    };
 }
 
 // _momentumPointAtDistance — walks clockwise from the top-left corner of
@@ -1395,7 +1391,7 @@ function _momentumUpdateParticles() {
 function _momentumSpawnParticle(row, col) {
     if (STATE.playerClass !== 'statistician' || isClassless()) return;
 
-    const wrap = document.getElementById('puzzle-scaler');
+    const wrap = document.getElementById('puzzle-scaler-wrap'); // was 'puzzle-scaler'
     const container = _momentumGetContainer();
     const sol = cur?.grid;
     const rect = _momentumGetBorderRect();
@@ -1410,8 +1406,8 @@ function _momentumSpawnParticle(row, col) {
         if (cellEl) {
             const wrapRect = wrap.getBoundingClientRect();
             const cellRect = cellEl.getBoundingClientRect();
-            startX = (cellRect.left + cellRect.width / 2 - wrapRect.left) / zoom;
-            startY = (cellRect.top + cellRect.height / 2 - wrapRect.top) / zoom;
+            startX = cellRect.left + cellRect.width / 2 - wrapRect.left; // no / zoom
+            startY = cellRect.top + cellRect.height / 2 - wrapRect.top;  // no / zoom
         }
     }
 

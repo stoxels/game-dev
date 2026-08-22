@@ -94,6 +94,7 @@ const CHANGELOG_DATA = [
                     "Fixed a bug that caused using Tutor items to remove the mistake string from the mistake counter. ",
                     "Fixed a bug that caused the Mathmagician's Variance Shield ability to count absorbed mistakes twice in the win overlay screen.",
                     "Fixed a bug that made grid border effects on high zoom levels.",
+                    "Fixed a bug that made the Character Sprite walk 20 pixels too much to the right of the actual World 4 node.",
                 ],
 
             },

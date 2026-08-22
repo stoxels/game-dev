@@ -151,7 +151,7 @@ const ROAD_SEGMENTS = [
             { x: 43.9, y: 68.1 },
             { x: 45.4, y: 67.2 },
             { x: 48.5, y: 66.8 },
-            { x: 49.2, y: 66.4 }, // ← Automatically added World 4 position
+            { x: 42.8, y: 63.1 }, // ← Automatically added World 4 position
         ]
     },
 
@@ -159,7 +159,7 @@ const ROAD_SEGMENTS = [
         n1: 3,
         n2: 'fork45',
         waypoints: [
-            { x: 49.2, y: 66.4 }, // ← Automatically added World 4 starting point
+            { x: 42.8, y: 63.1 }, // ← Automatically added World 4 starting point
             { x: 52.3, y: 64.9 },
             { x: 54.7, y: 63.8 },
             { x: 57.7, y: 61.6 },
