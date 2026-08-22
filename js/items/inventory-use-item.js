@@ -1423,6 +1423,15 @@ function _useGoldenClock(id, def) {
     return `${def.icon} ${LANG === 'de' ? 'Timer angehalten! Noch 3 Fehler erlaubt.' : 'Timer halted! 3 mistakes remaining.'}`;
 }
 
+
+function _useChronoFracture(id, def) {
+    window._chronoFractureActive = true;
+    _trackWitchImmuneCursedUse()
+    playItemEffect(id);
+    return `${def.icon} ${LANG === 'de' ? 'Timer x4 schneller, Cooldowns x2 schneller' : 'Timer x4 faster, Cooldowns x2 faster'}`;
+}
+
+
 // shadowSeal — sets the timer to exactly 5 min, permanently hides all
 // clues for the rest of the level, and mass-marks 75 % of empty cells.
 function _useShadowSeal(id, def) {
@@ -1517,6 +1526,7 @@ const ITEM_EFFECT_HANDLERS = {
     theWitch: _useTheWitch,
     goldenClock: _useGoldenClock,
     shadowSeal: _useShadowSeal,
+    chronoFracture: _useChronoFracture,
 };
 
 // Routes an item id to the correct handler, trying prefix matches first.

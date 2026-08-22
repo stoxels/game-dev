@@ -3,6 +3,36 @@
 // + content builders + wiring for: mistakes, timer, levels-back button,
 // level name, and inventory label.
 
+
+// _wireHoverByRect — tooltip trigger based on manual bounding-box hit
+// testing instead of native hover events. Needed for elements that must
+// stay pointer-events:none (so they never block clicks on whatever sits
+// beneath them, e.g. the puzzle grid under the fixed corner HUD) but
+// still need a working hover tooltip.
+function _wireHoverByRect(el, builder) {
+    if (!el) return;
+    let isOver = false;
+
+    document.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const inside = e.clientX >= rect.left && e.clientX <= rect.right &&
+            e.clientY >= rect.top && e.clientY <= rect.bottom;
+
+        if (inside) {
+            if (!isOver) {
+                isOver = true;
+                showGameTooltip(builder(), e);
+            } else {
+                moveGameTooltip(e);
+            }
+        } else if (isOver) {
+            isOver = false;
+            hideGameTooltip();
+        }
+    });
+}
+
+
 //------------------------------------------------------------------------
 //----------------------------TOOLTIP ENGINE-------------------------------
 //------------------------------------------------------------------------
@@ -163,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     wire('mistake-counter', _buildMistakesTooltipHTML);
     wire('timer-val', _buildTimerTooltipHTML);
     wire('btn-hud-levels', _buildLevelsButtonTooltipHTML);
-    wire('hud-level-name', _buildLevelNameTooltipHTML);
+    _wireHoverByRect(document.getElementById('hud-level-name'), _buildLevelNameTooltipHTML);
 
     // Inventory label is re-created every buildInventoryPanel() call,
     // so use delegated mouseover/mouseout on the static #inv-panel wrapper.

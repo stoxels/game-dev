@@ -222,6 +222,13 @@ const ITEM_DEFS = {
         rarity: 'cursed', weight: 2
     },
 
+    chronoFracture: {
+        id: 'chronoFracture', icon: '⏰',
+        nameEn: 'Chronofracture', nameDE: '...',
+        descEn: 'Class ability cooldowns tick twice as fast for the rest of the level, but the timer drains 4x as fast.',
+        rarity: 'cursed', weight: 3
+    },
+
 
     // ----------------------------------------------------------------------------------------
 

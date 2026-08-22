@@ -914,6 +914,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     align-items: flex-end;
     gap: 8px;
     padding: 6px 12px;
+    pointer-events: none;
 }
 
     .game-hud-corner-right .hud-level-name {
@@ -924,6 +925,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         white-space: nowrap;
         text-align: right;
         padding: 2px 6px;
+        pointer-events: none;
     }
 
 /* Vertical zoom control — buttons top/bottom, fill bar in between */
@@ -995,6 +997,8 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
 }
 
 
+
+
 /* Compact "return to levels" button — same stone/X visual as the
    settings modal's close button (.settings-box .modal-close), just
    smaller and living in the gameplay corner HUD instead of a modal. */
@@ -1030,7 +1034,10 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     }
 }
 
-
+.game-hud-corner-right .hud-corner-btn,
+.game-hud-corner-right .zoom-bar {
+    pointer-events: auto; /* re-enable clicks on the actual interactive controls */
+}
 
 
 

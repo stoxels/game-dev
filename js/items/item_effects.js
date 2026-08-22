@@ -1448,6 +1448,20 @@ function _fxGoldenClock() {
     Audio_Manager.playSFX('golden_clock');
 }
 
+
+function _fxChronoFracture() {
+    const r = _fxGetPuzzleRect();
+    if (!r) return;
+
+    // Reuse the standard clock visual, then layer a gold tint on top
+    _fxClock();
+
+    const overlay = _fxOverlay(r.wrap, 2000, `z-index:${FX_Z.base - 1};`);
+    _fxMakeGoldTintFill(overlay, r);
+
+    Audio_Manager.playSFX('golden_clock');
+}
+
 // Helper: creates the dark void veil that briefly obscures the grid.
 function _fxMakeShadowVeil(container, r) {
     const veil = document.createElement('div');
@@ -1549,4 +1563,6 @@ function playItemEffect(defId) {
     if (defId === 'theWitch') return _fxTheWitch();
     if (defId === 'goldenClock') return _fxGoldenClock();
     if (defId === 'shadowSeal') return _fxShadowSeal();
+
+    if (defId === 'chronoFracture') return _fxChronoFracture();
 }

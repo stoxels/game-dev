@@ -561,6 +561,7 @@ function _resetClassLevelState() {
     window._veiled_cursedUsed = false;
     window._goldenClockActive = false;
     window._goldenClockMistakesLeft = null;
+    window._chronoFractureActive = false;
     window._cursedImmune = false;
     window._shieldExtraCharges = 0;
     window._bayesTrapsState = null;

@@ -1073,6 +1073,158 @@ function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
 }
 
 
+
+
+//------------------------------------------------------------------------
+//-------------------DIAGONAL STRIKE — AREA PREVIEW (while armed)--------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Live preview of the diagonal(s) shown while Diagonal Strike is armed,
+// mirroring Field Scan's boundary preview (_fieldScanUpdatePreview in
+// class-probabilist.js) and Arcane Reveal's radius preview
+// (_arcaneReveal_updatePreview in class-mathmagician.js). Unlike those
+// single-rectangle previews, Diagonal Strike needs 1, 2, or 4 static line
+// bars depending on rank — so we keep an array of preview elements rather
+// than a single outline element.
+
+// Module state for the live preview lines.
+let _diagStrikePreviewEls = [];
+let _diagStrikePreviewKey = null; // last-rendered "row-col-diagonalCount", to skip redundant rebuilds
+
+// _diagStrikeGetEffectiveDiagonalsForPreview — returns the diagonalCount
+// for whatever rank Diagonal Strike is currently at. Kept separate from
+// the main execute path since the preview fires before the ability itself
+// (and thus before row/col are known). No passive scaling applies to
+// diagonalCount itself (only revealCap/markCap get passive bonuses), so
+// this is just a straight level lookup.
+function _diagStrikeGetEffectiveDiagonalsForPreview() {
+    const def = CLASS_DEFS?.statistician;
+    if (!def) return 1;
+    const level = STATE.classActive2Level || 1;
+    const actData = def.active2.levels[level - 1];
+    if (!actData) return 1;
+    return actData.effect.diagonals || 1;
+}
+
+// _diagStrikeGetHoveredCell — resolves which grid cell is under the given
+// viewport coordinates, or null if the cursor isn't over the grid at all.
+function _diagStrikeGetHoveredCell(clientX, clientY) {
+    const el = document.elementFromPoint(clientX, clientY);
+    const cellEl = el?.closest('[id^="g-"]');
+    if (!cellEl) return null;
+    const m = cellEl.id.match(/^g-(\d+)-(\d+)$/);
+    if (!m) return null;
+    return { r: parseInt(m[1], 10), c: parseInt(m[2], 10) };
+}
+
+// _diagStrikeRemovePreviewEls — removes any currently-rendered preview
+// elements without touching _diagStrikePreviewKey (used internally when
+// rebuilding for a new hovered cell/rank).
+function _diagStrikeRemovePreviewEls() {
+    _diagStrikePreviewEls.forEach(el => el.remove());
+    _diagStrikePreviewEls = [];
+}
+
+// _diagStrikeClearPreview — removes the live preview lines and resets the
+// dedupe key. Called when Diagonal Strike is disarmed (cancelled, executed,
+// or the player switches to a different ability/slot) and whenever the
+// cursor leaves the grid while armed.
+function _diagStrikeClearPreview() {
+    _diagStrikePreviewKey = null;
+    _diagStrikeRemovePreviewEls();
+}
+
+// _diagStrikePreviewMakeBar — creates a single static (non-animated)
+// preview line inside `container`, rotated to `deg` degrees. Reuses the
+// same centre point / length geometry as the real animated slash bars
+// (_diagSlashMakeBar), just without the fade-in/out animation, since this
+// one needs to persist for as long as the cell stays hovered.
+function _diagStrikePreviewMakeBar(container, cx, cy, diagLen, deg) {
+    const bar = document.createElement('div');
+    bar.className = 'diag-strike-preview-line';
+    bar.style.cssText = `
+        width: 5px;
+        height: ${diagLen}px;
+        left: ${cx - 2.5}px;
+        top: ${cy - diagLen / 2}px;
+        transform: rotate(${deg}deg);
+    `;
+    container.appendChild(bar);
+    return bar;
+}
+
+// _diagStrikeBuildPreviewBars — builds the preview line(s) anchored to the
+// hovered cell. Direction count mirrors _playDiagonalSlashEffect exactly:
+//   diagonalCount >= 1 : main diagonal only (135°)
+//   diagonalCount >= 2 : + anti-diagonal (45°)
+//   diagonalCount >= 4 : + horizontal (0°) and vertical (90°)
+function _diagStrikeBuildPreviewBars(wrap, row, col, diagonalCount) {
+    const sol = cur?.grid;
+    if (!sol) return;
+
+    const zoom = currentZoom || 1;
+    const center = _diagSlashGetCenterPoint(wrap, row, col, zoom);
+    if (!center) return;
+
+    const diagLen = _diagSlashGetDiagLength(wrap, sol, zoom);
+    if (!diagLen) return;
+
+    const { cx, cy } = center;
+
+    const container = document.createElement('div');
+    container.className = 'diag-strike-preview-container';
+    container.style.cssText = `
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 299;
+        overflow: hidden;
+    `;
+    wrap.appendChild(container);
+    _diagStrikePreviewEls.push(container);
+
+    _diagStrikePreviewMakeBar(container, cx, cy, diagLen, 135);
+    if (diagonalCount >= 2) _diagStrikePreviewMakeBar(container, cx, cy, diagLen, 45);
+    if (diagonalCount >= 4) {
+        _diagStrikePreviewMakeBar(container, cx, cy, diagLen, 0);
+        _diagStrikePreviewMakeBar(container, cx, cy, diagLen, 90);
+    }
+}
+
+// _diagStrikeUpdatePreview — called on every mousemove while any ability
+// is armed (see targeting-reticle.js). No-ops unless Diagonal Strike
+// specifically is the one armed. Rebuilds the preview line(s) to match
+// whichever cell is currently hovered and the current rank's diagonal
+// count, skipping the rebuild if neither has changed since the last move.
+function _diagStrikeUpdatePreview(clientX, clientY) {
+    const isArmed = activeAbilityMode
+        && STATE.playerClass === 'statistician'
+        && STATE.classActiveChoice === 'active2';
+
+    if (!isArmed || !cur) { _diagStrikeClearPreview(); return; }
+
+    const hovered = _diagStrikeGetHoveredCell(clientX, clientY);
+    if (!hovered) { _diagStrikeClearPreview(); return; }
+
+    const diagonalCount = _diagStrikeGetEffectiveDiagonalsForPreview();
+
+    const key = `${hovered.r}-${hovered.c}-${diagonalCount}`;
+    if (key === _diagStrikePreviewKey) return; // unchanged since last move — skip rebuild
+    _diagStrikePreviewKey = key;
+
+    const wrap = document.getElementById('puzzle-scaler');
+    if (!wrap) return;
+    if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
+
+    _diagStrikeRemovePreviewEls();
+    _diagStrikeBuildPreviewBars(wrap, hovered.r, hovered.c, diagonalCount);
+}
+
+
+
+
+
+
 //------------------------------------------------------------------------
 //-------------------MOMENTUM — MAIN FUNCTION-----------------------------
 //------------------------------------------------------------------------

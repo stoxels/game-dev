@@ -31,7 +31,7 @@ const CHANGELOG_DATA = [
                     "There is now a new vertical bar to apply a higher or lower Zoom level during puzzling. The same functionality was available with ctrl + mousewheel but now it is also clickable during a puzzle.",
                     "Added new visual indicators when the timer drops below 15 minutes, 10 minutes and 5 minutes.",
                     "Mouse Overing the Timer, the Mistake Counter, the Level Name, the Inventory or the Close button now show appropriate informative tooltips.",
-                    "A Prototype for the Endgame has been developed and is now accessable through the Endgame Test Hub. This will be expanded in the future.",
+                    "A Prototype for the Endgame has been developed and is now accessable through the Endgame Test Hub. This will be expanded on in the future.",
                 ],
 
             },
@@ -57,6 +57,7 @@ const CHANGELOG_DATA = [
                     "Updated the default Class Hud and Character Sprite position. This only affects fresh gameplay sessions. Class Hud and Character Sprites can still be manually repositioned.",
                     "Added a visual indicator for item gains during a puzzle screen.",
                     "Item Reshuffling now only requires 3 items (down from 5)",
+                    "There is now a new Toast message when items have been added to your inventory from a quest milestone completion.",
                   
                     
                 ],
@@ -71,6 +72,7 @@ const CHANGELOG_DATA = [
                     "Mathmagician: Arcane Reveal now properly shows the whole affected area on the targeting reticle.",
                     "Mathmagician: Arcane Reveal visual has been fully remade.",
                     "Mathmagician: Absolute Zero has received visual grid effects.",
+                    "Statistician: Diagonal Strike now properly shows the whole diagonal on the targeting reticle.",
 
 
 

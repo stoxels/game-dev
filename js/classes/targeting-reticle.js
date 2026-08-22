@@ -116,6 +116,7 @@ function _arOnMouseMove(e) {
     _arMoveTo(e.clientX, e.clientY);
     if (typeof _fieldScanUpdatePreview === 'function') _fieldScanUpdatePreview(e.clientX, e.clientY);
     if (typeof _arcaneReveal_updatePreview === 'function') _arcaneReveal_updatePreview(e.clientX, e.clientY);
+    if (typeof _diagStrikeUpdatePreview === 'function') _diagStrikeUpdatePreview(e.clientX, e.clientY);
 }
 
 
@@ -164,6 +165,12 @@ function activateTargetingReticle(armed) {
         if (_arLastX > -9999 && typeof _arcaneReveal_updatePreview === 'function') {
             _arcaneReveal_updatePreview(_arLastX, _arLastY);
         }
+
+        // Diagonal Strike gets a live diagonal-line preview (1/2/4 bars
+        // depending on rank), see _diagStrikeUpdatePreview in class-statistician.js.
+        if (_arLastX > -9999 && typeof _diagStrikeUpdatePreview === 'function') {
+            _diagStrikeUpdatePreview(_arLastX, _arLastY);
+        }
     } else {
         _arReticleEl.classList.remove('show');
         document.body.classList.remove('ability-armed');
@@ -174,5 +181,6 @@ function activateTargetingReticle(armed) {
 
         if (typeof _fieldScanClearPreview === 'function') _fieldScanClearPreview();
         if (typeof _arcaneReveal_clearPreview === 'function') _arcaneReveal_clearPreview();
+        if (typeof _diagStrikeClearPreview === 'function') _diagStrikeClearPreview();
     }
 }

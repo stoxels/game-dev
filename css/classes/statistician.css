@@ -125,6 +125,24 @@
 }
 
 
+/*
+    ------------------------------------------------------------------------
+    -------------------DIAGONAL STRIKE: LIVE TARGETING PREVIEW--------------
+    ------------------------------------------------------------------------
+*/
+
+/* Static (non-animated) preview line shown while Diagonal Strike is armed
+   and the cursor hovers a grid cell. Dashed so it reads clearly as a
+   "preview" rather than the real slash effect. Position/rotation set
+   inline by JS to match the hovered cell. */
+.diag-strike-preview-line {
+    position: absolute;
+    background: repeating-linear-gradient( 180deg, #e74c3c 0px, #e74c3c 8px, transparent 8px, transparent 16px );
+    opacity: 0.55;
+    box-shadow: 0 0 8px 2px rgba(231, 76, 60, 0.4);
+    border-radius: 3px;
+    transform-origin: center center;
+}
 
 
 

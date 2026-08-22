@@ -311,7 +311,9 @@ function _tickSlotCooldown(slot) {
     // If the game is paused or the player is dead, skip the tick
     if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
     if (typeof dead !== 'undefined' && dead) return;
-    cooldownState[slot].remaining--;
+    const decrement = window._chronoFractureActive ? 2 : 1;
+    cooldownState[slot].remaining -= decrement;
+
     if (cooldownState[slot].remaining <= 0) {
         _onSlotCooldownExpired(slot);
     } else {

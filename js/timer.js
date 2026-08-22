@@ -402,6 +402,8 @@ function _tickCountdown() {
 
     // Black Swan speedforce: timer drains at 10× normal speed.
     if (window._blackSwanActive) timerSecs -= 9;
+
+    if (window._chronoFractureActive) timerSecs -= 3;
 }
 
 

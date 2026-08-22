@@ -236,6 +236,22 @@ function _banner_resolveItemLabel(defId, de) {
         : '🎁 Item';
 }
 
+
+/**
+ * Builds a localized "item added to inventory" toast message for a single
+ * granted item defId, e.g. "🎁 Added: 🗡️ Iron Sword". Falls back to a
+ * generic label if the def can't be resolved.
+ * @param {string} defId - Resolved item defId (already resolved, not '__random__')
+ * @returns {string}
+ */
+function _questItemGrantToastMsg(defId) {
+    const de = LANG === 'de';
+    const def = ITEM_DEFS[defId];
+    const label = def ? `${def.icon} ${de ? def.nameDE : def.nameEn}` : '🎁 Item';
+    const prefix = de ? 'Erhalten' : 'Added';
+    return `🎒 ${prefix}: ${label}`;
+}
+
 /**
  * Builds the localised reward-parts array shown inside the claim banner.
  * Each entry is a short human-readable string, e.g. "🌳 +1 Convergence Point".
@@ -498,5 +514,8 @@ function claimQuest(milestoneId) {
     if (typeof buildInventoryPanel === 'function') buildInventoryPanel();
     if (typeof showItemGainPopup === 'function') {
         grantedIds.forEach(defId => showItemGainPopup(defId));
+    }
+    if (typeof showToast === 'function') {
+        grantedIds.forEach(defId => showToast(_questItemGrantToastMsg(defId)));
     }
 }
