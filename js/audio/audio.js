@@ -31,6 +31,7 @@ const Audio_Manager = (() => {
     let bgmLocked = false;   // true while a story beat/cutscene owns BGM
 
     let randomBgmEnabled = false;   // true when "random BGM" setting is on
+    let _randomTrackActive = false;   // true while a random-chain track is the one currently playing
 
     // Currently playing BGM track
     let currentBGM = null;      // active HTMLAudioElement
@@ -163,6 +164,7 @@ const Audio_Manager = (() => {
         const dying = currentBGM;
         currentBGM = null;
         currentBGMSrc = '';
+        _randomTrackActive = false; 
 
         if (fadeMs <= 0) {
             dying.pause();
@@ -196,6 +198,12 @@ const Audio_Manager = (() => {
         _lastBGMKey = trackKey; // always remember the "real" level track
 
         if (randomBgmEnabled) {
+            // Already mid-chain — don't interrupt it. playBGM() just means
+            // "make sure appropriate music is playing"; when random mode is
+            // on, a currently-playing random track already satisfies that,
+            // no matter what triggered this call (level start, next-level,
+            // or anything else).
+            if (_randomTrackActive && currentBGM && !currentBGM.paused) return;
             _playRandomBGMTrack();
             return;
         }
@@ -236,6 +244,7 @@ const Audio_Manager = (() => {
         stopBGM(0);
 
         const audio = _createBGMAudioElement(src, false);
+        _randomTrackActive = true; 
         audio.addEventListener('ended', _onRandomTrackEnded);
         audio.play().catch(() => {
             _registerAutoplayResumeListeners(audio);
