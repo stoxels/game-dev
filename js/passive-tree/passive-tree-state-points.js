@@ -435,6 +435,32 @@ function _ptHandleAllocation(id, alloc) {
     _ptTrackAllocationAchievements(id, alloc);
 }
 
+// Full respec: de-allocates every node except the permanent Start node and
+// refunds one Convergence Point per removed node. Called by the "Refund All"
+// topbar button after the player confirms the action.
+function _ptRefundAllPoints() {
+    const alloc = _ptAllocated();
+
+    // Collect refundable nodes (everything except Start), bail if tree is empty
+    const refundable = [...alloc].filter(id => id !== PT_START_ID);
+    if (!refundable.length) return;
+
+    refundable.forEach(id => alloc.delete(id));
+
+    if (typeof STATE !== 'undefined') {
+        STATE.passiveTreePoints = _ptPoints() + refundable.length;
+    }
+    save();
+    _ptRefreshAllStyles();
+    _ptRefreshPointsDisplay();
+
+    if (typeof trackAchStat === 'function') {
+        for (let i = 0; i < refundable.length; i++) {
+            trackAchStat('treeNodesDeallocated');
+        }
+    }
+}
+
 // Entry point called when the player clicks any passive tree node.
 // Routes to deallocation or allocation depending on the node's current state.
 function _ptOnNodeClick(id) {

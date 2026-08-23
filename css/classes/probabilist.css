@@ -72,111 +72,128 @@
 
 
 
-/* ── Bayesian Insight: Crossbow pull animation ── */
-.bayesian-crossbow {
+/* ── Bayesian Insight: Demon-eye beam animation ── */
+.bayesian-eye {
     position: fixed;
-    font-size: 28px;
+    font-size: 64px;
     z-index: 9100;
     pointer-events: none;
-    filter: drop-shadow(0 0 6px #bb8fce) drop-shadow(0 0 12px #8e44ad);
-    animation: crossbow-appear 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+    filter: drop-shadow(0 0 8px #c39bd3) drop-shadow(0 0 18px #8e44ad) drop-shadow(0 0 32px #6c3483);
+    animation: bayesian-eye-open 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
     transform-origin: center;
 }
 
-@keyframes crossbow-appear {
+@keyframes bayesian-eye-open {
     0% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.2);
+        transform: translate(-50%, -50%) scale(0.2, 0.05);
     }
 
-    70% {
+    55% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1.15);
+        transform: translate(-50%, -50%) scale(1.15, 1.25);
+    }
+
+    75% {
+        transform: translate(-50%, -50%) scale(0.95, 0.9);
     }
 
     100% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: translate(-50%, -50%) scale(1, 1);
     }
 }
 
-@keyframes crossbow-disappear {
+@keyframes bayesian-eye-close {
     0% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: translate(-50%, -50%) scale(1, 1);
     }
 
     100% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.2);
+        transform: translate(-50%, -50%) scale(1, 0.05);
     }
 }
 
-/* The X mark that gets yanked out of the cell */
-.bi-x-mark {
+/* The glowing eye-beam fired from an eye onto a cell */
+.bi-beam {
     position: fixed;
-    font-size: 14px;
-    font-weight: bold;
-    color: #bb8fce;
-    text-shadow: 0 0 8px #8e44ad, 0 0 16px #6c3483;
-    z-index: 9101;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-    animation: bi-x-fly linear forwards;
-}
-
-@keyframes bi-x-fly {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.3);
-    }
-
-    15% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.2);
-    }
-
-    85% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.5);
-    }
-}
-
-/* The chain/rope that connects crossbow to cell */
-.bi-chain {
-    position: fixed;
-    height: 4px;
+    height: 10px;
     z-index: 9099;
     pointer-events: none;
     transform-origin: left center;
-    background: linear-gradient(90deg, rgba(39,174,96,0.9), rgba(150,255,200,0.7), rgba(39,174,96,0.9));
-    box-shadow: 0 0 6px rgba(39,174,96,0.6);
-    animation: chain-fade linear forwards;
+    border-radius: 5px;
+    background: linear-gradient(90deg,
+        rgba(216,191,255,0.95),
+        rgba(187,143,206,0.85),
+        rgba(155,89,182,0.7));
+    box-shadow: 0 0 8px rgba(187,143,206,0.9), 0 0 20px rgba(142,68,173,0.7);
+    clip-path: inset(0 100% 0 0);
+    animation: bi-beam-fire linear forwards;
 }
 
-@keyframes chain-fade {
+@keyframes bi-beam-fire {
     0% {
+        clip-path: inset(0 100% 0 0);
         opacity: 0;
     }
 
-    20% {
-        opacity: 0.8;
+    10% {
+        opacity: 1;
     }
 
-    80% {
-        opacity: 0.6;
+    60% {
+        clip-path: inset(0 0 0 0);
+        opacity: 1;
+    }
+
+    100% {
+        clip-path: inset(0 0 0 0);
+        opacity: 0;
+    }
+}
+
+/* The X mark stamped onto the cell on beam impact */
+.bi-x-stamp {
+    position: fixed;
+    font-size: 26px;
+    font-weight: bold;
+    color: #e8b7ff;
+    text-shadow: 0 0 8px #c39bd3, 0 0 18px #8e44ad, 0 0 30px #6c3483;
+    z-index: 9101;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation:
+        bi-x-stamp-in 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) forwards,
+        bi-x-stamp-out 0.4s ease-in 1s forwards;
+}
+
+@keyframes bi-x-stamp-in {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2.2) rotate(20deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+}
+
+@keyframes bi-x-stamp-out {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
     }
 
     100% {
         opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6);
     }
 }
 
-/* Small impact flash when X mark lands at the crossbow */
+/* Small impact flash when the eye-beam hits the cell */
 .bi-impact {
     position: fixed;
     width: 0;

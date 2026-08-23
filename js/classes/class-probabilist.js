@@ -7,7 +7,7 @@
 // Abilities covered:
 //   - Precision Mark  : marks empty cells in target rows/cols, fires arrow VFX
 //   - Field Scan      : temporarily reveals a region of the grid with a beam sweep VFX
-//   - Bayesian Insight: auto-marks cells with a crossbow-pull VFX
+//   - Bayesian Insight: auto-marks cells with a demon-eye beam VFX
 //   - Bayesian Reveal : permanently reveals a cell with a golden-orb descend VFX
 
 
@@ -1242,65 +1242,63 @@ function _executeFieldScanLegacy(row, col, scanSize, durationMs) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Spawns the given number of crossbow emojis spread evenly along the bottom
-// of the screen. Returns an array of { el, x, y } objects.
-function _bayesianInsightSpawnCrossbows(count) {
+// Spawns the given number of large demon-eye emojis above the grid.
+// Returns an array of { el, x, y } objects.
+function _bayesianInsightSpawnEyes(count) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const crossbows = [];
+    const eyes = [];
 
     for (let i = 0; i < count; i++) {
-        const xPos = vw * (0.2 + (i / Math.max(count - 1, 1)) * 0.6);
-        const yPos = vh - 32;
+        const xPos = vw * (count === 1 ? 0.5 : (0.28 + (i / (count - 1)) * 0.44));
+        const yPos = vh * 0.09;
 
-        const cb = document.createElement('div');
-        cb.className = 'bayesian-crossbow';
-        cb.textContent = '🏹';
-        // Rotated -90° so the bow faces upward toward the grid
-        cb.style.cssText = `
+        const eye = document.createElement('div');
+        eye.className = 'bayesian-eye';
+        eye.textContent = '👁️';
+        eye.style.cssText = `
             left: ${xPos}px;
             top: ${yPos}px;
-            transform: translate(-50%, -50%) rotate(-90deg);
-            animation-delay: ${i * 60}ms;
+            animation-delay: ${i * 120}ms;
         `;
-        document.body.appendChild(cb);
-        crossbows.push({ el: cb, x: xPos, y: yPos });
+        document.body.appendChild(eye);
+        eyes.push({ el: eye, x: xPos, y: yPos });
     }
 
-    return crossbows;
+    return eyes;
 }
 
-// Finds the nearest crossbow to a given (cellX, cellY) screen position.
-function _bayesianInsightFindNearestCrossbow(crossbows, cellX, cellY) {
-    let nearest = crossbows[0], nearestDist = Infinity;
-    crossbows.forEach(cb => {
-        const d = Math.hypot(cb.x - cellX, cb.y - cellY);
-        if (d < nearestDist) { nearestDist = d; nearest = cb; }
+// Finds the nearest eye to a given (cellX, cellY) screen position.
+function _bayesianInsightFindNearestEye(eyes, cellX, cellY) {
+    let nearest = eyes[0], nearestDist = Infinity;
+    eyes.forEach(eye => {
+        const d = Math.hypot(eye.x - cellX, eye.y - cellY);
+        if (d < nearestDist) { nearestDist = d; nearest = eye; }
     });
     return nearest;
 }
 
-// Draws a chain line from (cellX, cellY) toward a crossbow at (cbX, cbY).
-function _bayesianInsightDrawChain(cellX, cellY, cbX, cbY, duration) {
-    const dx = cbX - cellX;
-    const dy = cbY - cellY;
+// Draws a glowing eye-beam from an eye at (eyeX, eyeY) onto a cell at (cellX, cellY).
+function _bayesianInsightDrawBeam(eyeX, eyeY, cellX, cellY, duration) {
+    const dx = cellX - eyeX;
+    const dy = cellY - eyeY;
     const dist = Math.hypot(dx, dy);
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
-    const chain = document.createElement('div');
-    chain.className = 'bi-chain';
-    chain.style.cssText = `
-        left: ${cellX}px;
-        top: ${cellY}px;
+    const beam = document.createElement('div');
+    beam.className = 'bi-beam';
+    beam.style.cssText = `
+        left: ${eyeX}px;
+        top: ${eyeY}px;
         width: ${dist}px;
         transform: rotate(${angle}deg);
-        animation-duration: ${duration + 0.2}s;
+        animation-duration: ${duration}s;
     `;
-    document.body.appendChild(chain);
-    setTimeout(() => chain.remove(), (duration + 0.25) * 1000);
+    document.body.appendChild(beam);
+    setTimeout(() => beam.remove(), duration * 1000 + 250);
 }
 
-// Plays a purple ripple ring where the X mark arrives at the crossbow.
+// Plays a purple ripple ring where the eye-beam hits the cell.
 function _playBayesianImpact(x, y) {
     const ring = document.createElement('div');
     ring.className = 'bi-impact';
@@ -1309,60 +1307,47 @@ function _playBayesianImpact(x, y) {
     setTimeout(() => ring.remove(), 480);
 }
 
-// Spawns an X mark at the cell and animates it flying toward the crossbow.
-// On arrival, removes itself and plays the impact effect.
-function _bayesianInsightFireXMark(cellX, cellY, cbX, cbY, duration) {
+// Stamps a glowing X mark onto the cell where the eye-beam lands.
+function _bayesianInsightStampXMark(x, y) {
     const xMark = document.createElement('div');
-    xMark.className = 'bi-x-mark';
+    xMark.className = 'bi-x-stamp';
     xMark.textContent = '✕';
-    xMark.style.cssText = `
-        left: ${cellX}px;
-        top: ${cellY}px;
-        transition: left ${duration}s linear, top ${duration}s linear;
-        animation-duration: ${duration + 0.15}s;
-        will-change: left, top;
-    `;
+    xMark.style.cssText = `left: ${x}px; top: ${y}px;`;
     document.body.appendChild(xMark);
-
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-        xMark.style.left = `${cbX}px`;
-        xMark.style.top = `${cbY}px`;
-    }));
-
-    setTimeout(() => {
-        xMark.remove();
-        _playBayesianImpact(cbX, cbY);
-    }, duration * 1000 + 30);
+    setTimeout(() => xMark.remove(), 1500);
 }
 
-// Fires the full chain-pull animation: draws the chain, then flies the X mark
-// from the cell position to the crossbow position.
-function _fireBayesianChainPull(cellX, cellY, cbX, cbY) {
-    const dist = Math.hypot(cbX - cellX, cbY - cellY);
-    const duration = Math.min(Math.max(dist / 180, 0.45), 1.4);
+// Fires the full eye-beam animation: draws the beam from the eye onto the cell,
+// then stamps the X mark on impact.
+function _fireBayesianEyeBeam(eyeX, eyeY, cellX, cellY) {
+    const dist = Math.hypot(cellX - eyeX, cellY - eyeY);
+    const duration = Math.min(Math.max(dist / 900, 0.15), 0.45);
 
-    _bayesianInsightDrawChain(cellX, cellY, cbX, cbY, duration);
-    _bayesianInsightFireXMark(cellX, cellY, cbX, cbY, duration);
+    _bayesianInsightDrawBeam(eyeX, eyeY, cellX, cellY, duration);
+    setTimeout(() => {
+        _playBayesianImpact(cellX, cellY);
+        _bayesianInsightStampXMark(cellX, cellY);
+    }, duration * 1000);
 }
 
-// Schedules the crossbow elements to disappear after all chain-pull animations finish.
-function _bayesianInsightScheduleCrossbowRemoval(crossbows, cellCount) {
-    const totalDur = 80 + cellCount * 55 + 900;
+// Schedules the eye elements to disappear after all beam animations finish.
+function _bayesianInsightScheduleEyeRemoval(eyes, cellCount) {
+    const totalDur = 500 + 80 + cellCount * 55 + 900;
     setTimeout(() => {
-        crossbows.forEach(cb => {
-            cb.el.style.animation = 'crossbow-disappear 0.3s ease-in forwards';
-            setTimeout(() => cb.el.remove(), 320);
+        eyes.forEach(eye => {
+            eye.el.style.animation = 'bayesian-eye-close 0.3s ease-in forwards';
+            setTimeout(() => eye.el.remove(), 320);
         });
     }, totalDur);
 }
 
-// Plays the Bayesian Insight VFX: spawns crossbows along the bottom of the screen
-// and fires chain-pull animations toward each auto-marked cell.
+// Plays the Bayesian Insight VFX: spawns large demon eyes above the grid that
+// fire eye-beams onto each auto-marked cell to stamp it with an X.
 function _playBayesianInsightAnimation(markedCellIds) {
     if (!markedCellIds || !markedCellIds.length) return;
 
-    const crossbowCount = Math.min(3, markedCellIds.length);
-    const crossbows = _bayesianInsightSpawnCrossbows(crossbowCount);
+    const eyeCount = Math.min(2, markedCellIds.length);
+    const eyes = _bayesianInsightSpawnEyes(eyeCount);
 
     markedCellIds.forEach((id, idx) => {
         const cellEl = document.getElementById(id);
@@ -1371,12 +1356,12 @@ function _playBayesianInsightAnimation(markedCellIds) {
         const rect = cellEl.getBoundingClientRect();
         const cellX = rect.left + rect.width / 2;
         const cellY = rect.top + rect.height / 2;
-        const nearest = _bayesianInsightFindNearestCrossbow(crossbows, cellX, cellY);
+        const nearest = _bayesianInsightFindNearestEye(eyes, cellX, cellY);
 
-        setTimeout(() => _fireBayesianChainPull(cellX, cellY, nearest.x, nearest.y), 80 + idx * 55);
+        setTimeout(() => _fireBayesianEyeBeam(nearest.x, nearest.y, cellX, cellY), 500 + idx * 55);
     });
 
-    _bayesianInsightScheduleCrossbowRemoval(crossbows, markedCellIds.length);
+    _bayesianInsightScheduleEyeRemoval(eyes, markedCellIds.length);
 }
 
 

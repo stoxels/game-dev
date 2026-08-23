@@ -10,28 +10,6 @@
 const CHANGELOG_DATA = [
 
     {
-        version: "v0.28 BETA",
-        date: "23.08.2026",
-        changes: [
-            {
-                category: "cl_cat_nf",
-                items: [
-                    "cl_28_1", "cl_28_2", "cl_28_3", "cl_28_4", "cl_28_5",
-                ],
-
-            },
-            {
-                category: "cl_cat_bf",
-                items: [
-                    "cl_28_6", "cl_28_7",
-                ],
-
-            },
-
-        ],
-
-    },
-    {
         version: "v0.27 BETA",
         date: "22.08.2026",
         changes: [
@@ -42,6 +20,9 @@ const CHANGELOG_DATA = [
                     "cl_27_6", "cl_27_7", "cl_27_8", "cl_27_9", "cl_27_10",
                     "cl_27_11", "cl_27_12", "cl_27_13", "cl_27_14", "cl_27_15",
                     "cl_27_16", "cl_27_17", "cl_27_18",
+                    "cl_27_63", "cl_27_64",
+                    "cl_27_66", "cl_27_67", "cl_27_68", "cl_27_69", "cl_27_70",
+                    "cl_27_74",
                 ],
 
             },
@@ -60,6 +41,7 @@ const CHANGELOG_DATA = [
                 category: "cl_cat_cc",
                 items: [
                     "cl_27_39", "cl_27_40", "cl_27_41", "cl_27_42", "cl_27_43", "cl_27_44",
+                    "cl_27_71",
                 ],
 
             },
@@ -70,6 +52,8 @@ const CHANGELOG_DATA = [
                     "cl_27_50", "cl_27_51", "cl_27_52", "cl_27_53", "cl_27_54",
                     "cl_27_55", "cl_27_56", "cl_27_57", "cl_27_58", "cl_27_59",
                     "cl_27_60", "cl_27_61", "cl_27_62",
+                    "cl_27_65",
+                    "cl_27_72", "cl_27_73", "cl_27_75",
                 ],
 
             },

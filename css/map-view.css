@@ -404,6 +404,24 @@
     opacity: 0.4;
 }
 
+/* Syla nature-affinity badge (top-right corner of forest level nodes) */
+.wd-syla-badge {
+    position: absolute;
+    top: -9px;
+    right: -11px;
+    font-size: 15px;
+    line-height: 1;
+    z-index: 6;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px rgba(102, 187, 106, 0.9));
+    animation: wd-syla-badge-float 3s ease-in-out infinite;
+}
+
+@keyframes wd-syla-badge-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-2px) scale(1.1); }
+}
+
 .wd-node-label {
     font-family: var(--PX, monospace);
     font-size: 9px;
@@ -1622,6 +1640,10 @@
 
     .wd-tip-bonus.done {
         color: #6fcf6f;
+    }
+
+    .wd-tip-bonus.syla {
+        color: #8fe0a0;
     }
 
 .wd-tip-max {

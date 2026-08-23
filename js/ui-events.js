@@ -431,6 +431,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onClick('btn-pt-back', () => ptGoBack());
 
+    /**
+     * Shows an "are you sure?" confirmation modal for the passive tree's
+     * "Refund All" button, warning that all allocated nodes will be
+     * de-allocated. Builds the modal DOM once and reuses it afterwards.
+     *
+     * @param {Function} onConfirm - Called if the player confirms the respec
+     */
+    function showPtRefundConfirm(onConfirm) {
+        let modal = document.getElementById('pt-refund-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'pt-refund-modal';
+            modal.className = 'modal-bg';
+            modal.innerHTML = `
+            <div class="modal-box">
+                <div class="modal-title">${t('pt_refund_all_title')}</div>
+                <div class="modal-section">
+                    <p class="reset-body-text">
+                        ${t('pt_refund_all_body')}
+                    </p>
+                </div>
+                <div class="modal-actions">
+                    <button class="title-btn back-btn btn-danger" id="pt-refund-confirm">${t('pt_refund_all_confirm')}</button>
+                    <button class="title-btn back-btn" id="pt-refund-cancel">${t('pt_refund_all_cancel')}</button>
+                </div>
+            </div>`;
+            document.body.appendChild(modal);
+        }
+
+        modal.classList.add('show');
+
+        document.getElementById('pt-refund-confirm').onclick = () => {
+            modal.classList.remove('show');
+            onConfirm();
+        };
+        document.getElementById('pt-refund-cancel').onclick = () => {
+            modal.classList.remove('show');
+        };
+    }
+
+    onClick('btn-pt-refund-all', () => showPtRefundConfirm(() => _ptRefundAllPoints()));
+
 
     //------------------------------------------------------------------------
     //-------------------CHANGELOG--------------------------------------------

@@ -698,9 +698,13 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     animation: glimpse-fadein 0.4s ease;
 }
 
-    /* Hidden state — toggled by JS when there is no text to show */
+    /* Hidden state — toggled by JS when there is no text to show.
+       Uses visibility instead of display:none so the bar keeps reserving
+       its vertical space; otherwise the grid would jump upwards when the
+       glimpse timer expires. */
     .completion-glimpse-bar.hidden {
-        display: none;
+        visibility: hidden;
+        animation: none;
     }
 
 /* Icon/emoji prefix before the flavour text */

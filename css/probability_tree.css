@@ -90,12 +90,18 @@
     transform: translateX(-50%);
 }
 
-/* -- Points counter (pushed to the far right by margin-left: auto) -- */
+/* -- Points counter (sits at the far right, after the Refund All button) -- */
 .pt-points {
-    margin-left: auto;
+    margin-left: 14px;
     font-family: var(--PX);
     font-size: 13px;
     color: var(--yellow);
+}
+
+/* -- Refund All button — pushed to the right edge via auto margin, so it
+   sits between the centred search field and the points counter -- */
+#btn-pt-refund-all {
+    margin-left: auto;
 }
 
 

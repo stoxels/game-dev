@@ -930,6 +930,10 @@ function _wdBuildLevelNode(wi, li, pos) {
     const isMaxCleared = _wdIsMaxCleared(gi);
     const icon = isMaxCleared ? '👑' : _wdGetNodeIcon(li, isDone, isLocked, isLastInWorld, isConvergence);
 
+    // Syla — Nature's Aid: forest levels get a nature badge so the player
+    // knows her vegetation bonus will trigger in this level.
+    const isSylaForest = _charIs('syla') && !!(world && world.data[li] && world.data[li].isForestLevel);
+
     // Create the element and apply positioning / state classes
     const node = document.createElement('div');
     node.className = 'wd-level-node';
@@ -948,6 +952,7 @@ function _wdBuildLevelNode(wi, li, pos) {
     } else {
         node.innerHTML = _wdBuildPlainNodeHtml(icon, stoxelHtml);
     }
+    if (isSylaForest) node.insertAdjacentHTML('beforeend', '<div class="wd-syla-badge">🌿</div>');
 
     // Wire up interaction
     if (!isLocked) {
@@ -1635,6 +1640,11 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
         ? `<div class="wd-tip-max">👑 ${t('scr_max_cleared')}</div>`
         : '';
 
+    // Syla — Nature's Aid note on forest levels
+    const sylaLine = (_charIs('syla') && levelData && levelData.isForestLevel)
+        ? `<div class="wd-tip-bonus syla">🌿 ${t('scr_syla_forest_tip')}</div>`
+        : '';
+
     tip.innerHTML = `
         <div class="wd-tip-header">
             <span class="mv-tooltip-title">${typeLabel}${wi + 1}-${li + 1}${hint ? ' · ' + hint : ''}</span>
@@ -1645,6 +1655,7 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
         ${stars ? `<div class="wd-tip-stars">${stars}</div>` : ''}
         ${modTagsHtml}
         ${bonusHtml}
+        ${sylaLine}
     `;
     tip.classList.add('show');
     _wdMoveTooltip(e);

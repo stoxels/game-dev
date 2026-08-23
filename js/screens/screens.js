@@ -184,6 +184,10 @@ function goToLevelSelect() {
     hideResultOverlays();
     closeQuiz();
 
+    // Clear any leftover character sprite from a finished (ascension) level
+    if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
+    if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
+
     const _goToCorrectLevelView = () => {
         // NEW: route back to the endgame test hub if this run was launched from there
         if (window._egIsTestRun) {
