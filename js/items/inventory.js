@@ -107,7 +107,10 @@ function showToast(msg) {
         _removeToast(activeToasts[0]);
     }
 
-    entry.timeoutId = setTimeout(() => _removeToast(entry), TOAST_DISPLAY_DURATION_MS);
+    entry.timeoutId = setTimeout(
+        () => _removeToast(entry),
+        (typeof SETTINGS !== 'undefined' ? SETTINGS.toastDuration : TOAST_DISPLAY_DURATION_MS / 1000) * 1000
+    );
 }
 
 // Clears every visible/pending toast immediately. Called on level reset or scene transitions.

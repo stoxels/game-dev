@@ -128,6 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function onLanguageButtonClick(selectedBtn) {
         setLang(selectedBtn.dataset.lang);
+        // Persist the choice so the language survives page reloads
+        SETTINGS.lang = selectedBtn.dataset.lang;
+        saveSettings(SETTINGS);
         document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
         selectedBtn.classList.add('active');
     }

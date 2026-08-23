@@ -27,6 +27,15 @@ let _nextBearRevealSoundTime = 0;
 // Active bear movement intervals — stored so they can be killed on level end
 window._bearIntervals = window._bearIntervals || [];
 
+// Live agent-state objects for every currently walking bear
+// (path, progress, interval, HUD card). Used by the mistake penalty to
+// shorten walks instead of removing the bears outright.
+window._activeBearAgents = window._activeBearAgents || [];
+
+// Remaining-time holders for walker HUD cards, keyed by card unique ID,
+// so external systems (e.g. the mistake penalty) can adjust displayed time.
+window._walkerHudState = window._walkerHudState || {};
+
 // Active HUD timer intervals — each entry is { id, loopId }
 window._walkerHudTimers = window._walkerHudTimers || [];
 
@@ -152,6 +161,7 @@ function _removeBearElement(bearEl) {
 }
 
 // Starts the step-by-step interval loop that moves a bear along its pre-built path.
+// Registers the walk in window._activeBearAgents so mistakes can shorten it.
 // Cleans up the HUD indicator and bear element when the path ends.
 function _startBearAnimation(path, icon, stepDurationMs, bearName) {
     if (!path || path.length === 0) return;
@@ -160,29 +170,48 @@ function _startBearAnimation(path, icon, stepDurationMs, bearName) {
     const totalSec = Math.ceil((path.length * stepDurationMs) / 1000);
     const hudUid = _spawnWalkerHudIndicator(icon, bearName, totalSec);
 
+    const state = {
+        path,
+        step: 0,          // index of the next cell to move onto
+        stepDurationMs,
+        interval: null,
+        hudUid,
+        bearEl,
+        finished: false,
+    };
+
     // Place bear and reveal the starting cell immediately
     _agentSnapToCellCenter(bearEl, path[0].r, path[0].c);
     _revealCellForAgent(path[0].r, path[0].c);
 
-    let step = 0;
-    const interval = setInterval(() => {
-        step++;
+    state.interval = setInterval(() => {
+        state.step++;
 
-        if (step >= path.length) {
+        if (state.step >= state.path.length) {
             // Path complete — clean up interval, HUD card, and bear visual
-            clearInterval(interval);
-            window._bearIntervals = window._bearIntervals.filter(id => id !== interval);
-            _removeWalkerHudIndicator(hudUid);
-            _removeBearElement(bearEl);
+            _finishBearAgent(state);
             return;
         }
 
-        const target = path[step];
+        const target = state.path[state.step];
         _agentSnapToCellCenter(bearEl, target.r, target.c);
         _revealCellForAgent(target.r, target.c);
     }, stepDurationMs);
 
-    window._bearIntervals.push(interval);
+    window._activeBearAgents.push(state);
+}
+
+// Tears down one bear agent: kills its interval and removes the HUD card
+// and bear visual. Safe to call multiple times (guarded via finished flag).
+function _finishBearAgent(state) {
+    if (state.finished) return;
+    state.finished = true;
+
+    if (state.interval) clearInterval(state.interval);
+    window._activeBearAgents = window._activeBearAgents.filter(s => s !== state);
+
+    _removeWalkerHudIndicator(state.hudUid);
+    _removeBearElement(state.bearEl);
 }
 
 
@@ -653,29 +682,43 @@ function _createHudCard(uniqueId, icon, label, initialSeconds) {
 }
 
 // Starts the 1-second tick interval that updates a HUD card's displayed timer.
+// The remaining time lives in a holder object inside window._walkerHudState
+// (keyed by card ID) so the mistake penalty can shave seconds off it.
 // For the drifter card (isDrifter=true) it reads the global remaining time
 // instead of counting down independently, so it stays in sync with feed bonuses.
 function _startHudCardTicker(uniqueId, initialSeconds, isDrifter) {
-    let timeRemaining = initialSeconds;
+    const holder = { timeRemaining: initialSeconds };
+    window._walkerHudState[uniqueId] = holder;
 
     const tickerInterval = setInterval(() => {
         if (isDrifter) {
-            timeRemaining = Math.max(0, Math.floor(window._drifterTimeRemainingSeconds));
+            holder.timeRemaining = Math.max(0, Math.floor(window._drifterTimeRemainingSeconds));
         } else {
-            timeRemaining--;
+            holder.timeRemaining--;
         }
 
         const timerEl = document.getElementById(`${uniqueId}-timer`);
-        if (timerEl) timerEl.textContent = `${timeRemaining}s`;
+        if (timerEl) timerEl.textContent = `${holder.timeRemaining}s`;
 
         // Non-drifter cards self-remove when they reach zero
-        if (timeRemaining <= 0 && !isDrifter) {
+        if (holder.timeRemaining <= 0 && !isDrifter) {
             clearInterval(tickerInterval);
             _removeWalkerHudIndicator(uniqueId);
         }
     }, 1000);
 
     return tickerInterval;
+}
+
+// Reduces a HUD card's displayed remaining time (and its backing holder)
+// by the given number of seconds. Used when a mistake shortens a walk.
+function _reduceWalkerHudTimer(uniqueId, secondsLost) {
+    const holder = window._walkerHudState[uniqueId];
+    if (!holder) return;
+
+    holder.timeRemaining = Math.max(0, holder.timeRemaining - secondsLost);
+    const timerEl = document.getElementById(`${uniqueId}-timer`);
+    if (timerEl) timerEl.textContent = `${holder.timeRemaining}s`;
 }
 
 
@@ -718,7 +761,49 @@ function _removeWalkerHudIndicator(id) {
         clearInterval(match.loopId);
         window._walkerHudTimers = window._walkerHudTimers.filter(t => t.id !== id);
     }
+
+    delete window._walkerHudState[id];
 }
+
+
+//------------------------------------------------------------------------
+//--------------------MISTAKE PENALTY------------------------------------
+//------------------------------------------------------------------------
+
+// Public — called on every real (unabsorbed) player mistake. Instead of
+// fleeing outright, active walkers lose remaining time:
+//   Browney / Wiener lose 20 seconds of walk each,
+//   Drifter loses 5 seconds of roaming time.
+window.penalizeRandomWalkersOnMistake = function () {
+    const BEAR_TIME_LOSS_S = 20;
+    const DRIFTER_TIME_LOSS_S = 5;
+
+    // Bears — cut upcoming path steps worth ~20 s from each active walk
+    (window._activeBearAgents || []).slice().forEach(state => {
+        const remainingSteps = state.path.length - state.step - 1; // steps after the current one
+        const stepsToCut = Math.ceil((BEAR_TIME_LOSS_S * 1000) / state.stepDurationMs);
+
+        if (remainingSteps <= stepsToCut) {
+            // Not enough walk left to survive the penalty — heads home early
+            _finishBearAgent(state);
+            return;
+        }
+
+        state.path.splice(state.step + 1, stepsToCut);
+        _reduceWalkerHudTimer(state.hudUid, BEAR_TIME_LOSS_S);
+    });
+
+    // Drifter — shave 5 s off its remaining roaming time. If that drains
+    // the timer completely, its own countdown triggers the explosion.
+    if (window._drifterActive) {
+        window._drifterTimeRemainingSeconds = Math.max(0, window._drifterTimeRemainingSeconds - DRIFTER_TIME_LOSS_S);
+
+        const timerTextEl = document.getElementById('drifter-timer-text');
+        if (timerTextEl) {
+            timerTextEl.innerText = `${Math.max(0, Math.floor(window._drifterTimeRemainingSeconds))}s`;
+        }
+    }
+};
 
 
 //------------------------------------------------------------------------
@@ -728,7 +813,11 @@ function _removeWalkerHudIndicator(id) {
 // Called at the end of every level to stop all active walker agents,
 // kill their timers, and wipe their DOM elements from the screen.
 window.clearActiveRandomWalkers = function () {
-    // Kill all bear movement intervals
+    // Tear down all walking bears (interval + HUD card + visual)
+    (window._activeBearAgents || []).slice().forEach(_finishBearAgent);
+    window._activeBearAgents = [];
+
+    // Legacy interval list kept for safety — should already be empty
     if (window._bearIntervals?.length > 0) {
         window._bearIntervals.forEach(id => clearInterval(id));
         window._bearIntervals = [];

@@ -276,6 +276,21 @@
         filter: brightness(1.25);
     }
 
+/* Golden frame + glow when there are unspent Convergence Points.
+   Uses outline/box-shadow because the stone-block background sets
+   border: none !important. */
+#screen-map-view #mv-btn-passive-tree.unspent-points {
+    outline: 2px solid #ffd700;
+    outline-offset: -3px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.85);
+}
+
+/* Yellow unspent point count next to the button label */
+#screen-map-view #ptb-point-count-mv {
+    color: #ffd700;
+    font-weight: bold;
+}
+
 /* Notification badge ("!" dot on Inference button) */
 #screen-map-view #mv-quest-log-badge {
     background: var(--red, #e74c3c);

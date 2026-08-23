@@ -212,7 +212,7 @@ function _dispatchBaseActive2(playerClass, row, col, effect) {
             trackAchStat('skillDiagonalStrikeUsed');
             break;
         case 'probabilist':
-            _executeFieldScan(row, col, effect.scanSize, effect.scanDuration);
+            _executeFieldScan(row, col, effect.scanSize, effect.scanDuration, true);
             trackAchStat('skillFieldScanUsed');
             break;
     }

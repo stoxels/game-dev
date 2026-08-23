@@ -33,6 +33,10 @@ const Audio_Manager = (() => {
     let randomBgmEnabled = false;   // true when "random BGM" setting is on
     let _randomTrackActive = false;   // true while a random-chain track is the one currently playing
 
+    // True while the window is unfocused and the "mute when unfocused"
+    // setting is active. Pauses BGM and suppresses SFX until restored.
+    let focusMuted = false;
+
     // Currently playing BGM track
     let currentBGM = null;      // active HTMLAudioElement
     let currentBGMSrc = '';     // file path of the active track (used for same-track guard)
@@ -197,6 +201,9 @@ const Audio_Manager = (() => {
 
         _lastBGMKey = trackKey; // always remember the "real" level track
 
+        // While focus-muted, only queue the track — it starts on unmute
+        if (focusMuted) return;
+
         if (randomBgmEnabled) {
             // Already mid-chain — don't interrupt it. playBGM() just means
             // "make sure appropriate music is playing"; when random mode is
@@ -275,7 +282,7 @@ const Audio_Manager = (() => {
     // Clones the preloaded Audio object so the same sound can overlap itself.
     // The played instance is stored in _sfxInstances so it can be stopped early.
     function playSFX(key) {
-        if (!sfxEnabled) return;
+        if (!sfxEnabled || focusMuted) return;
 
         const src = SFX[key];
         if (!src) return;
@@ -359,6 +366,23 @@ const Audio_Manager = (() => {
         bgmLocked = true;
     }
 
+    // Pauses/resumes all audio for the "mute when unfocused" setting.
+    // Muting pauses the current track (it resumes where it left off);
+    // unmuting restarts the paused track, or the last requested one if
+    // a new track was queued while muted.
+    function setFocusMuted(muted) {
+        focusMuted = muted;
+        if (muted) {
+            if (currentBGM && !currentBGM.paused) currentBGM.pause();
+        } else {
+            if (currentBGM && currentBGM.paused && bgmEnabled) {
+                currentBGM.play().catch(() => { });
+            } else if (_lastBGMKey) {
+                playBGM(_lastBGMKey);
+            }
+        }
+    }
+
     // Releases the BGM lock set by lockBGM().
     function unlockBGM() {
         bgmLocked = false;
@@ -379,6 +403,7 @@ const Audio_Manager = (() => {
         lockBGM,
         unlockBGM,
         toggleRandomBGM,
+        setFocusMuted,
 
         get lastBGMKey() { return _lastBGMKey; },
 

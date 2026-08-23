@@ -6,6 +6,9 @@
 // Toggle to move row clues from left side to right side of the grid
 let _rowCluesOnRight = false;
 
+// Toggle to move column clues from top to bottom of the grid
+let _colCluesOnBottom = false;
+
 // Column-width bookkeeping so the <colgroup> can be rebuilt to match
 // whichever side the clue cells currently live on. Set inside buildGrid().
 let _clueColCount = 0;   // how many narrow (clue/corner) columns exist
@@ -271,24 +274,23 @@ function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjM
 //------------------------------------------------------------------------
 
 
-// _buildRowClueToggle — creates (or re-creates) the "CLUES ▶" button that
-//   lets the player flip row clues to the right side of the grid. Called
-//   once per buildGrid() so it always attaches to the current puzzle wrap.
+// _buildRowClueToggle — creates (or re-creates) the clue placement buttons
+//   below the puzzle wrap:
+//     "CLUES ▶/◀" — flips row clues between the left and right side of the grid
+//     "CLUES ▼/▲" — moves column clues between the top and bottom of the grid
+//   Both carry a mouse-over tooltip describing which way they currently move
+//   the clue numbers. Called once per buildGrid() so it always attaches to the
+//   current puzzle wrap.
 function _buildRowClueToggle() {
-    const existing = document.getElementById('row-clue-toggle-btn');
-    if (existing) existing.remove();
+    document.getElementById('row-clue-toggle-btn')?.remove();
+    document.getElementById('col-clue-toggle-btn')?.remove();
 
     const wrap = document.getElementById('puzzle-scaler-wrap');
     if (!wrap) return;
 
-    const btn = document.createElement('button');
-    btn.id = 'row-clue-toggle-btn';
-    btn.textContent = t('cg_clues_btn_right');
-    btn.title = t('cg_clues_title');
-    btn.style.cssText = `
+    const baseCss = `
         position: absolute;
         bottom: -28px;
-        left: 50%;
         transform: translateX(-50%);
         z-index: 50;
         font-family: var(--PX);
@@ -300,8 +302,24 @@ function _buildRowClueToggle() {
         cursor: pointer;
         letter-spacing: 1px;
     `;
-    btn.onclick = _toggleRowCluesSide;
-    wrap.appendChild(btn);
+
+    // Row clues button — sits just left of centre below the grid
+    const rowBtn = document.createElement('button');
+    rowBtn.id = 'row-clue-toggle-btn';
+    rowBtn.textContent = t('cg_clues_btn_right');
+    rowBtn.title = t('cg_clues_title_right');
+    rowBtn.style.cssText = `${baseCss} left: calc(50% - 65px);`;
+    rowBtn.onclick = _toggleRowCluesSide;
+    wrap.appendChild(rowBtn);
+
+    // Column clues button — sits just right of centre below the grid
+    const colBtn = document.createElement('button');
+    colBtn.id = 'col-clue-toggle-btn';
+    colBtn.textContent = t('cg_clues_btn_down');
+    colBtn.title = t('cg_clues_col_title_bottom');
+    colBtn.style.cssText = `${baseCss} left: calc(50% + 65px);`;
+    colBtn.onclick = _toggleColCluesSide;
+    wrap.appendChild(colBtn);
 }
 
 
@@ -336,7 +354,10 @@ function _toggleRowCluesSide() {
             rcts.forEach(td => tr.removeChild(td));
             rcts.reverse().forEach(td => tr.appendChild(td));
         });
-        if (btn) btn.textContent = t('cg_clues_btn_left');
+        if (btn) {
+            btn.textContent = t('cg_clues_btn_left');
+            btn.title = t('cg_clues_title_left');
+        }
     } else {
         // Move them back to the start of their row
         table.querySelectorAll('tr').forEach(tr => {
@@ -345,7 +366,51 @@ function _toggleRowCluesSide() {
             rcts.forEach(td => tr.removeChild(td));
             rcts.forEach(td => tr.insertBefore(td, tr.firstChild));
         });
-        if (btn) btn.textContent = t('cg_clues_btn_right');
+        if (btn) {
+            btn.textContent = t('cg_clues_btn_right');
+            btn.title = t('cg_clues_title_right');
+        }
+    }
+
+    // Keep the shield border (if active) aligned with the grid's new position
+    const border = document.getElementById('fx-shield-border');
+    if (border?._reposition) border._reposition();
+
+    // Keep the variance shield bubble (Mathmagician passive) aligned too
+    const vsBubble = document.getElementById('variance-shield-bubble');
+    if (vsBubble?._reposition) vsBubble._reposition();
+}
+
+
+// _toggleColCluesSide — moves the column-clue header rows between the top
+//   and the bottom of the puzzle table by physically relocating those <tr>
+//   elements within the <tbody> (no HTML regen). Also keeps the tooltip and
+//   button label in sync with the current placement.
+function _toggleColCluesSide() {
+    _colCluesOnBottom = !_colCluesOnBottom;
+    const btn = document.getElementById('col-clue-toggle-btn');
+
+    const table = document.querySelector('table.ptable');
+    if (!table) return;
+
+    const tbody = table.querySelector('tbody');
+    const headerRows = [...tbody.querySelectorAll('tr')].filter(tr => tr.querySelector('td.cch'));
+    if (!headerRows.length) return;
+
+    if (_colCluesOnBottom) {
+        // Move the column-clue header rows below all puzzle rows (order kept)
+        headerRows.forEach(tr => tbody.appendChild(tr));
+        if (btn) {
+            btn.textContent = t('cg_clues_btn_up');
+            btn.title = t('cg_clues_col_title_top');
+        }
+    } else {
+        // Move them back above the puzzle rows (reverse so order is restored)
+        headerRows.reverse().forEach(tr => tbody.insertBefore(tr, tbody.firstChild));
+        if (btn) {
+            btn.textContent = t('cg_clues_btn_down');
+            btn.title = t('cg_clues_col_title_bottom');
+        }
     }
 
     // Keep the shield border (if active) aligned with the grid's new position
@@ -506,7 +571,8 @@ function buildGrid() {
     }
 
     _rowCluesOnRight = false;      // reset side on each new level
-    _buildRowClueToggle();         // add the toggle button
+    _colCluesOnBottom = false;     // reset column clue placement on each new level
+    _buildRowClueToggle();         // add the toggle buttons
 
     // Defer scale pass until after the browser has laid out the new DOM
     requestAnimationFrame(() => requestAnimationFrame(scalePuzzle));

@@ -152,19 +152,33 @@ function renderLSClassStatus() {
 }
 
 
-// Updates the Probability Tree button label and highlight color based on available points.
-// Turns yellow when the player has unspent points to spend.
+// Updates the Probability Tree button highlight based on available points.
+// Shows a golden border and a yellow point count to the right of the label
+// when the player has unspent points to spend.
 function renderLSPassiveTreeButton() {
     const treePoints = STATE.passiveTreePoints || 0;
     const ptBtn = document.getElementById('btn-go-passive-tree');
     if (!ptBtn) return;
 
-    const label = `🌿 ${t('scr_probability_tree')}`;
-    ptBtn.textContent = label + (treePoints > 0 ? ` (${treePoints})` : '');
+    const hasPoints = treePoints > 0;
+    const golden = '#ffd700';
 
-    const color = treePoints > 0 ? 'var(--yellow)' : 'var(--green)';
-    ptBtn.style.borderColor = color;
-    ptBtn.style.color = color;
+    // Golden glowing border when there are unspent points
+    ptBtn.style.border = hasPoints ? `2px solid ${golden}` : '';
+    ptBtn.style.boxShadow = hasPoints ? `0 0 8px ${golden}88` : '';
+
+    // Yellow point count appended to the right of the label.
+    // Appended as a sibling of the translated label span so the i18n
+    // re-render can never wipe it.
+    let countEl = document.getElementById('ptb-point-count');
+    if (!countEl) {
+        countEl = document.createElement('span');
+        countEl.id = 'ptb-point-count';
+        ptBtn.appendChild(countEl);
+    }
+    countEl.textContent = hasPoints ? ` (${treePoints})` : '';
+    countEl.style.color = hasPoints ? golden : 'inherit';
+    countEl.style.fontWeight = hasPoints ? 'bold' : 'normal';
 }
 
 

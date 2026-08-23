@@ -83,7 +83,8 @@ function _applyLowTimeVignette() {
 
     el.classList.remove('ltv-tier1', 'ltv-tier2', 'ltv-tier3');
 
-    if (timerFrozen || window._goldenClockActive) return;
+    // Setting disabled, or timer frozen / Golden Clock active — no vignette
+    if (!SETTINGS.lowTimeVignette || timerFrozen || window._goldenClockActive) return;
 
     const tier = _getLowTimeVignetteTier(timerSecs);
     if (tier) el.classList.add(tier);

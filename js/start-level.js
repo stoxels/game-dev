@@ -412,6 +412,14 @@ function _doStartLevel(gi) {
         setTimeout(() => triggerBanter('level_start'), 600);
     }
 
+    // Remind the player about unspent Convergence Points (delayed so it
+    // appears after the toast queue reset and screen transition).
+    if ((STATE.passiveTreePoints || 0) > 0 && typeof showToast === 'function') {
+        setTimeout(() => {
+            showToast(`🌿 ${t('toast_unspent_convergence').replace('{n}', STATE.passiveTreePoints)}`);
+        }, 900);
+    }
+
     // 7. Additional passive systems that run after screen transition
     PassiveTracker.init();
     _applySparsePrior();

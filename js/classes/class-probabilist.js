@@ -506,7 +506,10 @@ function _fieldScanCheckBigScanAchievement(prevStates, sol) {
 
 // Handles the god_of_probabilities skill perk during scan restore:
 // permanently reveals up to 3 random filled cells from the scan region.
-function _fieldScanRestoreGodOfProbabilities(prevStates) {
+// When keepAllCrosses is set (rain-of-arrows cast of the actual class
+// ability only), every cell the scan showed as ✕ (solution-empty) is also
+// permanently committed as a system cross mark.
+function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses = false) {
     const filledInScan = prevStates.filter(({ r, c }) =>
         cur.grid[r][c] === 1 && !revealedGrid[r][c] && userGrid[r][c] !== 1
     );
@@ -520,6 +523,19 @@ function _fieldScanRestoreGodOfProbabilities(prevStates) {
         questStat_classRevealUsed(1);
         updateQuestStats('classAbilityUsedThisLevel', {});
     });
+
+    if (keepAllCrosses) {
+        prevStates.forEach(({ r, c }) => {
+            if (cur.grid[r][c] !== 0) return;                 // filled cells are handled above
+            if (userGrid[r][c] === 2 || wrongGrid[r][c]) return; // already marked / penalised
+
+            userGrid[r][c] = 2;
+            systemMarkedGrid[r][c] = true;
+            renderCell(r, c);
+            questStat_classMarkUsed(1);
+            trackAchStat('tilesMarkedWrong', 1);
+        });
+    }
 
     _playDivineProcEffect();
 }
@@ -543,10 +559,11 @@ function _fieldScanFadeOutCells(scanned) {
 }
 
 // Restores all scanned cells to their real state after the scan timer expires.
-// If god_of_probabilities is active, permanently keeps up to 3 filled cells first.
-function _fieldScanRestore(scanned, prevStates) {
+// If god_of_probabilities is active, permanently keeps up to 3 filled cells first
+// (plus, on rain-of-arrows casts of the actual class ability, every ✕ mark shown).
+function _fieldScanRestore(scanned, prevStates, isClassAbility = false) {
     if (ptHasSkill('god_of_probabilities')) {
-        _fieldScanRestoreGodOfProbabilities(prevStates);
+        _fieldScanRestoreGodOfProbabilities(prevStates, isClassAbility);
     }
 
     // Re-render all cells (correctly handles both kept and restored cells)
@@ -1044,19 +1061,19 @@ function _fieldScanFireDropArrow(sx, sy, tx, ty, onLand) {
 // existing beam-sweep VFX, shows the toast/achievement, and schedules the
 // restore exactly as the old (instant) version did — just delayed until the
 // rain-down has actually finished.
-function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs) {
+function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
     _playScanBeamEffect(startRow, startCol, scanSize, durationMs);
     showToast(`🎯 ${t('cls_field_scan')}`);
     _fieldScanCheckBigScanAchievement(prevStates, sol);
 
-    setTimeout(() => _fieldScanRestore(scanned, prevStates), durationMs);
+    setTimeout(() => _fieldScanRestore(scanned, prevStates, isClassAbility), durationMs);
 }
 
 // _fieldScanSplitAndRain — fires one drop-arrow per target cell, all
 // originating from the rain origin above the grid. Staggered (with a little
 // jitter) for a natural "rain" feel. Once every drop-arrow has landed, the
 // existing beam-sweep scan effect plays and the restore timer is scheduled.
-function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanSize, durationMs) {
+function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
     const scanned = [];
     const prevStates = [];
     let landed = 0;
@@ -1076,7 +1093,7 @@ function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanS
 
                 landed++;
                 if (landed === targets.length) {
-                    _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs);
+                    _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs, isClassAbility);
                 }
             });
         }, i * 45 + Math.random() * 30);
@@ -1087,12 +1104,12 @@ function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanS
 // origin (a point centred above the grid), split into one drop-arrow per
 // target cell, rain down, then (once every arrow has landed) the existing
 // beam-sweep effect fires.
-function _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, scanSize, durationMs) {
+function _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
     const rainPos = _fieldScanGetRainOrigin();
     const origin = _pmGetSpriteOrigin(); // shared sprite-origin helper
 
     _fieldScanFireChargeArrow(origin.x, origin.y, rainPos.x, rainPos.y, () => {
-        _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanSize, durationMs);
+        _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanSize, durationMs, isClassAbility);
     });
 }
 
@@ -1568,7 +1585,10 @@ function _executePrecisionMark(row, col, extraLines) {
 // ability. Centers a scanSize x scanSize region on the clicked cell, then
 // plays the "charge → split → rain down" VFX. The scan itself (beam sweep +
 // temporary reveal) only actually triggers once every split arrow has landed.
-function _executeFieldScan(row, col, scanSize, durationMs) {
+// isClassAbility is true only for a real cast of the class ability (not the
+// emergency_scan or Interquartile Vision passive scans) — god_of_probabilities
+// uses it to also keep every ✕ mark shown by such a cast.
+function _executeFieldScan(row, col, scanSize, durationMs, isClassAbility = false) {
     if (!cur) return;
     const sol = cur.grid;
     const rows = sol.length;
@@ -1583,5 +1603,5 @@ function _executeFieldScan(row, col, scanSize, durationMs) {
         return;
     }
 
-    _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, effectiveSize, effectiveDuration);
+    _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, effectiveSize, effectiveDuration, isClassAbility);
 }

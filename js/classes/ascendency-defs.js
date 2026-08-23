@@ -390,20 +390,20 @@ const ASCENDENCY_DEFS = {
             levels: [
                 {
                     level: 1,
-                    descEn: 'Browney walks through the grid every 5 seconds and reveals all correct cells along his path. Doing a mistake will make Browney return back to his cave. Cooldown: 10 minutes. ',
-                    descDE: 'Browney wandert durch das Puzzle alle 5 Sekunden und enthüllt alle richtigen Zellen entlang seines Pfades. Fehler sorgen dafür, dass Browney zu seiner Höhle zurückkehrt. Abklingzeit: 10 Minuten.',
+                    descEn: 'Browney walks through the grid every 5 seconds and reveals all correct cells along his path. Doing a mistake cuts Browney\'s walk short by 20 seconds. Cooldown: 10 minutes. ',
+                    descDE: 'Browney wandert durch das Puzzle alle 5 Sekunden und enthüllt alle richtigen Zellen entlang seines Pfades. Ein Fehler verkürzt Browneys Wanderung um 20 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { paths: 1, rank: 1 }
                 },
                 {
                     level: 2,
-                    descEn: 'Browney walks through the grid every 4 seconds and reveals all correct cells along his path. Doing a mistake will make Browney return back to his cave. Cooldown: 10 minutes. ',
-                    descDE: 'Browney wandert durch das Puzzle alle 4 Sekunden und enthüllt alle richtigen Zellen entlang seines Pfades. Fehler sorgen dafür, dass Browney zu seiner Höhle zurückkehrt. Abklingzeit: 10 Minuten.',
+                    descEn: 'Browney walks through the grid every 4 seconds and reveals all correct cells along his path. Doing a mistake cuts Browney\'s walk short by 20 seconds. Cooldown: 10 minutes. ',
+                    descDE: 'Browney wandert durch das Puzzle alle 4 Sekunden und enthüllt alle richtigen Zellen entlang seines Pfades. Ein Fehler verkürzt Browneys Wanderung um 20 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { paths: 1, rank: 2 }
                 },
                 {
                     level: 3,
-                    descEn: 'Browney and his brother Wiener walk through the grid every 3 seconds and reveal all correct cells along their paths. Doing a mistake will make Browney and Wiener return to their cave. Cooldown: 10 minutes.',
-                    descDE: 'Browney und sein Bruder Wiener wandern alle 3 Sekunden durch das Puzzle und enthüllen alle richtigen Zellen entlang ihrer Pfade. Fehler sorgen dafür, dass Browney und Wiener zu ihrer Höhle zurückkehren. Abklingzeit: 10 Minuten.',
+                    descEn: 'Browney and his brother Wiener walk through the grid every 3 seconds and reveal all correct cells along their paths. Doing a mistake cuts each of their walks short by 20 seconds. Cooldown: 10 minutes.',
+                    descDE: 'Browney und sein Bruder Wiener wandern alle 3 Sekunden durch das Puzzle und enthüllen alle richtigen Zellen entlang ihrer Pfade. Ein Fehler verkürzt die Wanderung von Browney und Wiener jeweils um 20 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { paths: 2, rank: 3 }
                 },
             ]
@@ -418,20 +418,20 @@ const ASCENDENCY_DEFS = {
             levels: [
                 {
                     level: 1,
-                    descEn: 'Drifter lasts for 15 seconds. He will walk through the grid and periodically reveal or mark cells. Manually revealing correct cells will feed Drifter and increase his duration. When the timer runs out Drifter will leave behind a present for you. Mistakes will make him leave without present. Cooldown: 10 minutes.',
-                    descDE: 'Drifter bleibt für 15 Sekunden. Er läuft durch das Gitter und deckt Zellen auf oder markiert sie. Manuelles Aufdecken von richtigen Zellen füttert Drifter und verlängert die Dauer. Wenn die Zeit abläuft wird Drifter ein Geschenk hinterlassen. Fehler führen dazu, dass er ohne Geschenk geht. Abklingzeit: 10 Minuten.',
+                    descEn: 'Drifter lasts for 15 seconds. He will walk through the grid and periodically reveal or mark cells. Manually revealing correct cells will feed Drifter and increase his duration. When the timer runs out Drifter will leave behind a present for you. Mistakes reduce his remaining time by 5 seconds. Cooldown: 10 minutes.',
+                    descDE: 'Drifter bleibt für 15 Sekunden. Er läuft durch das Gitter und deckt Zellen auf oder markiert sie. Manuelles Aufdecken von richtigen Zellen füttert Drifter und verlängert die Dauer. Wenn die Zeit abläuft wird Drifter ein Geschenk hinterlassen. Fehler reduzieren seine verbleibende Zeit um 5 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { duration: 15000, interval: 10000, smartTarget: false, finalHowl: true }
                 },
                 {
                     level: 2,
-                    descEn: 'Drifter lasts for 20 seconds. He will walk through the grid and periodically reveal or mark cells. Manually revealing correct cells will feed Drifter and increase his duration. When the timer runs out Drifter will leave behind a present for you. Mistakes will make him leave without present. Cooldown: 10 minutes.',
-                    descDE: 'Drifter bleibt für 20 Sekunden. Er läuft durch das Gitter und deckt Zellen auf oder markiert sie. Manuelles Aufdecken von richtigen Zellen füttert Drifter und verlängert die Dauer. Wenn die Zeit abläuft wird Drifter ein Geschenk hinterlassen. Fehler führen dazu, dass er ohne Geschenk geht. Abklingzeit: 10 Minuten.',
+                    descEn: 'Drifter lasts for 20 seconds. He will walk through the grid and periodically reveal or mark cells. Manually revealing correct cells will feed Drifter and increase his duration. When the timer runs out Drifter will leave behind a present for you. Mistakes reduce his remaining time by 5 seconds. Cooldown: 10 minutes.',
+                    descDE: 'Drifter bleibt für 20 Sekunden. Er läuft durch das Gitter und deckt Zellen auf oder markiert sie. Manuelles Aufdecken von richtigen Zellen füttert Drifter und verlängert die Dauer. Wenn die Zeit abläuft wird Drifter ein Geschenk hinterlassen. Fehler reduzieren seine verbleibende Zeit um 5 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { duration: 20000, interval: 10000, smartTarget: true, finalHowl: true }
                 },
                 {
                     level: 3,
-                    descEn: 'Drifter lasts for 25 seconds. He will walk through the grid and periodically reveal or mark cells. Manually revealing correct cells will feed Drifter and increase his duration. When the timer runs out Drifter will leave behind a present for you. Mistakes will make him leave without present. Cooldown: 10 minutes.',
-                    descDE: 'Drifter bleibt für 25 Sekunden. Er läuft durch das Gitter und deckt Zellen auf oder markiert sie. Manuelles Aufdecken von richtigen Zellen füttert Drifter und verlängert die Dauer. Wenn die Zeit abläuft wird Drifter ein Geschenk hinterlassen. Fehler führen dazu, dass er ohne Geschenk geht. Abklingzeit: 10 Minuten.',
+                    descEn: 'Drifter lasts for 25 seconds. He will walk through the grid and periodically reveal or mark cells. Manually revealing correct cells will feed Drifter and increase his duration. When the timer runs out Drifter will leave behind a present for you. Mistakes reduce his remaining time by 5 seconds. Cooldown: 10 minutes.',
+                    descDE: 'Drifter bleibt für 25 Sekunden. Er läuft durch das Gitter und deckt Zellen auf oder markiert sie. Manuelles Aufdecken von richtigen Zellen füttert Drifter und verlängert die Dauer. Wenn die Zeit abläuft wird Drifter ein Geschenk hinterlassen. Fehler reduzieren seine verbleibende Zeit um 5 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { duration: 25000, interval: 10000, smartTarget: true, finalHowl: true }
                 },
             ]

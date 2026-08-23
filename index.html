@@ -425,8 +425,12 @@
             <button class="modal-close" data-modal-close="settings-modal" data-t="btn_settings_close">✕ CLOSE</button>
             <div class="modal-title" data-t="settings_title">⚙ SETTINGS</div>
 
+            <!-- SCROLL PANEL: all categories stack in one column; the
+                 panel scrolls when the options exceed the window -->
+            <div class="settings-scroll">
+
             <!-- AUDIO -->
-            <div class="settings-section">
+            <div class="settings-section sec-audio">
                 <div class="settings-section-title" data-t="settings_audio">AUDIO</div>
 
                 <div class="settings-row">
@@ -469,10 +473,59 @@
                         <span class="settings-val" id="val-sfx">70%</span>
                     </div>
                 </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_mute_focus">Mute When Unfocused</span>
+                        <span class="settings-hint" data-t="settings_mute_focus_hint">Mutes music and sounds when the game window loses focus</span>
+                    </label>
+                    <div class="settings-controls">
+                        <button class="settings-toggle" id="stt-mutefocus">
+                            <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                            <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                        </button>
+                        <input type="range" class="settings-slider settings-spacer" tabindex="-1" aria-hidden="true" disabled>
+                        <span class="settings-val settings-spacer" aria-hidden="true">&nbsp;</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- CONTROLS -->
-            <div class="settings-section">
+            <!-- VISUALS -->
+            <div class="settings-section sec-visuals">
+                <div class="settings-section-title" data-t="settings_visuals">VISUALS</div>
+
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_ltv">Low-Time Vignette</span>
+                        <span class="settings-hint" data-t="settings_ltv_hint">Red screen edge glow while the timer is running low</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-ltv">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_penflash">Penalty Flash</span>
+                        <span class="settings-hint" data-t="settings_penflash_hint">Brief red screen flash when making a mistake</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-penflash">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_toast_dur">Notification Duration</span>
+                        <span class="settings-hint" data-t="settings_toast_dur_hint">How long on-screen info messages stay visible</span>
+                    </label>
+                    <div class="settings-controls">
+                        <input type="range" class="settings-slider" id="sld-toast"
+                               min="2" max="15" value="8" step="1">
+                        <span class="settings-val" id="val-toast">8s</span>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section sec-controls">
                 <div class="settings-section-title" data-t="settings_controls">CONTROLS</div>
 
                 <div class="settings-row">
@@ -515,7 +568,19 @@
                         <span class="tgl-off-txt" data-t="stt_off">OFF</span>
                     </button>
                 </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_invert">Invert Mouse Buttons</span>
+                        <span class="settings-hint" data-t="settings_invert_hint">Left click marks, right click fills</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-invert">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
             </div>
+
+            </div><!-- /.settings-scroll -->
 
         </div>
     </div>

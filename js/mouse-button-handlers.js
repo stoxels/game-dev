@@ -319,9 +319,10 @@ function breakFillStreaksOnMistake() {
 
     if (typeof PassiveTracker !== 'undefined') PassiveTracker.onMistake();
 
-    // Animals flee instantly on any real mistake
-    if (typeof clearActiveRandomWalkers === 'function') {
-        clearActiveRandomWalkers();
+    // Animals no longer flee outright on a real mistake — instead they lose
+    // remaining time (Browney/Wiener −20 s each, Drifter −5 s)
+    if (typeof penalizeRandomWalkersOnMistake === 'function') {
+        penalizeRandomWalkersOnMistake();
     }
 
 
@@ -802,9 +803,14 @@ function cellDown(e, row, col) {
 
     // Touchpad Mode: swap which physical button means "fill" vs "mark".
     // effectiveBtn is what we treat the click AS, regardless of the real button pressed.
-    const effectiveBtn = (touchpadMarkModeActive && mbtn === 0) ? 2
-        : (touchpadMarkModeActive && mbtn === 2) ? 0
-            : mbtn;
+    // "Invert Mouse Buttons" setting swaps fill/mark the same way, permanently.
+    let btn = mbtn;
+    if (SETTINGS.invertMouseButtons && (btn === 0 || btn === 2)) {
+        btn = (btn === 0) ? 2 : 0;
+    }
+    const effectiveBtn = (touchpadMarkModeActive && btn === 0) ? 2
+        : (touchpadMarkModeActive && btn === 2) ? 0
+            : btn;
 
     if (effectiveBtn === 0) {
         pval = 1;

@@ -963,8 +963,8 @@
             "y": 504,
             "nameEn": "God of Probabilities",
             "nameDe": "Gott der Wahrscheinlichkeiten",
-            "descEn": "Precision Shot can mark two additional incorrect cells.\nBayesian Insight reveals 1 additional random correct filled cell at the start of each level.\n3 filled cells during a field scan from Rain of Arrows are still filled after the field scan.",
-            "descDe": "Präzisionsschuss kann zwei weitere falsche Zellen markieren.\nBayesianische Intuition enthüllt zu Beginn jedes Levels eine weitere zufällige korrekte gefüllte Zelle.\n3 ausgefüllte Zellen, die durch den Feldscan von Pfeilregen aufgedeckt werden, sind auch nach dem Feldscan ausgefüllt.",
+            "descEn": "Precision Shot can mark two additional incorrect cells.\nBayesian Insight reveals 1 additional random correct filled cell at the start of each level.\n3 filled cells and every ✕ mark shown during a field scan from Rain of Arrows remain after the field scan ends.",
+            "descDe": "Präzisionsschuss kann zwei weitere falsche Zellen markieren.\nBayesianische Intuition enthüllt zu Beginn jedes Levels eine weitere zufällige korrekte gefüllte Zelle.\n3 ausgefüllte Zellen und jedes ✕, das der Feldscan von Pfeilregen zeigt, bleiben auch nach dem Feldscan bestehen.",
             "icon": "✨",
             "statKey": "god_of_probabilities"
         },

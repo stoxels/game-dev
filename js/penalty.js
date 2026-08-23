@@ -242,7 +242,9 @@ function _updateMistakeCounterHUD() {
 }
 
 // Triggers the brief red screen flash that gives tactile feedback on a mistake.
+// Skipped entirely when the penalty-flash setting is disabled.
 function _triggerPenaltyFlash() {
+    if (!SETTINGS.penaltyFlash) return;
     const fl = document.getElementById('pen-flash');
     fl.classList.add('show');
     setTimeout(() => fl.classList.remove('show'), PEN_FLASH_DURATION_MS);

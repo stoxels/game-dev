@@ -354,6 +354,7 @@ function getSlotSummary(slotNum) {
         levelsDone: (raw.done || []).length,
         playerCharacter: raw.playerCharacter || null,
         playerClass: raw.playerClass || null,
+        playerAscendency: raw.playerAscendency || null,
         tutorialDone: !!raw.tutorialDone,
         // --- Extended stats for the save-slot tooltip ---
         // NOTE: sourced from raw.questStats (per-slot), NOT raw.achStats

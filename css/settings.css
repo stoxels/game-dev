@@ -10,7 +10,7 @@
 .modal-box.settings-box {
     position: relative;
     width: 92%;
-    max-width: 50%;
+    max-width: 64%;
     aspect-ratio: 611 / 409;
     background-image: url('../images/Settings/settings_background.png');
     background-size: 100% 100%;
@@ -21,6 +21,11 @@
     padding: clamp(70px, 9vw, 100px) clamp(36px, 5vw, 60px) clamp(30px, 4vw, 50px);
     box-sizing: border-box;
     overflow: visible; /* let plaque + close button hang over the frame edge */
+
+    /* Flex column so .settings-scroll can fill the remaining inner height
+       (title plaque + close button are absolutely positioned, out of flow). */
+    display: flex;
+    flex-direction: column;
 }
 
 /* -----------------------------------------------------------------------
@@ -75,7 +80,49 @@
     }
 
 /* -----------------------------------------------------------------------
-   SECTION — one logical group (AUDIO / CONTROLS)
+   SCROLL PANEL — all setting categories stack in ONE column (reverted
+   from the 2x2 grid). The panel fills the remaining inner height of the
+   frame and scrolls vertically whenever the options exceed it.
+   ----------------------------------------------------------------------- */
+.settings-scroll {
+    /* SCROLL AREA HEIGHT ← adjust here.
+       Lower the max-height so the panel ends higher above the bottom
+       frame border; raise it if you have unused parchment space.
+       (You can also shift the whole panel's bottom edge via the box's
+       padding-bottom further up in this file.) */
+    --scroll-h-max: 560px;
+
+    flex: 0 1 auto;          /* base size = height below, may shrink on small windows */
+    min-height: 0;           /* required so flex children can shrink + scroll */
+    height: clamp(300px, 60vh, var(--scroll-h-max));
+    max-height: 100%;        /* never poke past the frame's inner area */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: clamp(4px, 0.8vw, 10px); /* keep text clear of the scrollbar */
+
+    /* Firefox */
+    scrollbar-width: thin;
+    /*scrollbar-color: rgba(44, 26, 12, 0.45) rgba(44, 26, 12, 0.15);*/
+}
+
+/* WebKit (Chrome/Edge/Safari) — parchment-toned scrollbar */
+.settings-scroll::-webkit-scrollbar {
+    width: clamp(6px, 0.7vw, 10px);
+}
+.settings-scroll::-webkit-scrollbar-track {
+    background: rgba(44, 26, 12, 0.15);
+    border-radius: 6px;
+}
+.settings-scroll::-webkit-scrollbar-thumb {
+    background: rgba(44, 26, 12, 0.45);
+    border-radius: 6px;
+}
+
+/* -----------------------------------------------------------------------
+   SECTION — one logical group (AUDIO / VISUALS / CONTROLS)
+   Targeted via explicit sec-* classes (NOT nth-of-type) so adding,
+   removing, or reordering categories never re-routes icons/styles
+   to the wrong section.
    ----------------------------------------------------------------------- */
 .settings-section {
     margin-bottom: clamp(16px, 2.4vw, 26px);
@@ -104,36 +151,37 @@
     border-bottom: 2px solid rgba(44, 26, 12, 0.35);
 }
 
-/* ---- AUDIO title text — nudge independently here ----
-   Uses the same nth-of-type(2) targeting as the instrument icon below,
-   so this ONLY affects the "AUDIO" heading. */
-.settings-section:nth-of-type(2) .settings-section-title {
+/* ---- AUDIO title text — nudge independently here ---- */
+.settings-section.sec-audio .settings-section-title {
     padding-left: clamp(60px, 8vw, 60px); /* ← move "AUDIO" text left/right (larger = further right) */
     top: 0px; /* ← move "AUDIO" text up/down */
 }
 
-/* ---- CONTROLS title text — nudge independently here ----
-   Uses the same nth-of-type(3) targeting as the compass icon below,
-   so this ONLY affects the "CONTROLS" heading. */
-.settings-section:nth-of-type(3) .settings-section-title {
-    padding-left: clamp(60px, 8vw, 90px); /* ← move "CONTROLS" text left/right (larger = further right) */
+/* ---- VISUALS title text — no icon asset yet, so no left clearance
+   needed. When an icon is added, give it a ::before rule like AUDIO's
+   below and bump this padding-left to clear it. ---- */
+.settings-section.sec-visuals .settings-section-title {
+    padding-left: clamp(60px, 8vw, 60px);
+    top: 0px;
+}
+
+/* ---- CONTROLS title text — nudge independently here ---- */
+.settings-section.sec-controls .settings-section-title {
+    padding-left: clamp(60px, 8vw, 60px); /* ← move "CONTROLS" text left/right (larger = further right).
+                                             Keep the max identical to AUDIO/VISUALS so the
+                                             headings stay left-aligned with each other. */
     top: 0px; /* ← move "CONTROLS" text up/down */
 }
 
-/* Icon before the AUDIO title — lute/gears asset.
-   nth-of-type() counts ALL sibling <div>s inside .settings-box, not
-   just .settings-section ones. The actual div order is:
-     1. .modal-title   (div #1)
-     2. .settings-section (AUDIO)    → div #2
-     3. .settings-section (CONTROLS) → div #3 */
-.settings-section:nth-of-type(2) .settings-section-title::before {
+/* Icon before the AUDIO title — lute/gears asset. */
+.settings-section.sec-audio .settings-section-title::before {
     content: '';
     position: absolute;
     top: -30px; /* ← move icon up/down, independent of layout */
     left: -60px; /* ← move icon left/right, independent of layout */
     width: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
     height: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
-    background-image: url('../images/Settings/settings_instrument.png');
+    /*background-image: url('../images/Settings/settings_instrument.png');*/
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -142,14 +190,14 @@
 }
 
 /* Icon before the CONTROLS title — compass asset. */
-.settings-section:nth-of-type(3) .settings-section-title::before {
+.settings-section.sec-controls .settings-section-title::before {
     content: '';
     position: absolute;
     top: -185%;
-    left: -5%;
+    left: -60px;
     width: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
     height: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
-    background-image: url('../images/Settings/settings_compass.png');
+    /*background-image: url('../images/Settings/settings_compass.png');*/
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -260,17 +308,25 @@
         left: 0px;
     }
 
-/* ---- AUDIO toggle text only — nudge here, doesn't touch CONTROLS ---- */
-.settings-section:nth-of-type(2) .settings-toggle .tgl-on-txt,
-.settings-section:nth-of-type(2) .settings-toggle .tgl-off-txt {
+/* ---- AUDIO toggle text only — nudge here, doesn't touch other sections ---- */
+.settings-section.sec-audio .settings-toggle .tgl-on-txt,
+.settings-section.sec-audio .settings-toggle .tgl-off-txt {
     top: 5%;
     left: 0%;
     margin: 15%;
 }
 
-/* ---- CONTROLS toggle text only — nudge here, doesn't touch AUDIO ---- */
-.settings-section:nth-of-type(3) .settings-toggle .tgl-on-txt,
-.settings-section:nth-of-type(3) .settings-toggle .tgl-off-txt {
+/* ---- VISUALS toggle text only — same centering as CONTROLS ---- */
+.settings-section.sec-visuals .settings-toggle .tgl-on-txt,
+.settings-section.sec-visuals .settings-toggle .tgl-off-txt {
+    top: 5%; /* ← move VISUALS on/off text up/down (px, not %) */
+    left: 0%; /* ← move VISUALS on/off text left/right (px, not %) */
+    margin: 15%;
+}
+
+/* ---- CONTROLS toggle text only — nudge here, doesn't touch other sections ---- */
+.settings-section.sec-controls .settings-toggle .tgl-on-txt,
+.settings-section.sec-controls .settings-toggle .tgl-off-txt {
     top: 5%; /* ← move CONTROLS on/off text up/down (px, not %) */
     left: 0%; /* ← move CONTROLS on/off text left/right (px, not %) */
     margin:15%;

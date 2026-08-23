@@ -223,9 +223,8 @@ function initTitleDecoration() {
 // independent side-effecting calls (language setup, settings, listener
 // registration, initial DOM build) rather than function declarations.
 
-// Set the active language for all UI text.
-// Change 'en' here to support other locales in the future.
-setLang('en');
+// Set the active language from the persisted settings (falls back to 'en').
+setLang(SETTINGS.lang || 'en');
 
 // Wire up settings modal controls and apply any saved user preferences
 // (volume levels, axis-lock toggle, etc.) on startup.

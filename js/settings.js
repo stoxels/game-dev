@@ -17,7 +17,12 @@ const SETTINGS_DEFAULTS = {
     protectMarkedCells: true,
     questionMark: false,
     touchpadModeEnabled: false,
-
+    muteOnFocusLoss: false,     // mute all audio when the window loses focus
+    lowTimeVignette: true,      // red screen edge glow while time is running out
+    penaltyFlash: true,         // brief red screen flash on a mistake
+    toastDuration: 8,           // seconds an on-screen notification stays visible
+    invertMouseButtons: false,  // swap fill (left-click) and mark (right-click)
+    lang: 'en',                 // persisted interface language
 };
 
 // Describes every toggle control in the settings modal.
@@ -26,18 +31,44 @@ const TOGGLE_CONFIGS = [
     { key: 'bgmEnabled', btnId: 'stt-bgm' },
     { key: 'randomBgmEnabled', btnId: 'stt-randombgm' },
     { key: 'sfxEnabled', btnId: 'stt-sfx' },
+    { key: 'muteOnFocusLoss', btnId: 'stt-mutefocus' },
     { key: 'axisLock', btnId: 'stt-axis' },
     { key: 'protectMarkedCells', btnId: 'stt-protectmarks' },
     { key: 'questionMark', btnId: 'stt-qmark' },
     { key: 'touchpadModeEnabled', btnId: 'stt-touchpad' },
+    { key: 'invertMouseButtons', btnId: 'stt-invert' },
+    { key: 'lowTimeVignette', btnId: 'stt-ltv' },
+    { key: 'penaltyFlash', btnId: 'stt-penflash' },
 ];
 
-// Describes every volume slider control in the settings modal.
+// Describes every slider control in the settings modal.
 // Each entry maps a settings key to its slider and display-value element IDs.
+// mode: 'percent' (default) stores a 0–1 float and shows a % label;
+//       'seconds' stores the raw slider value and shows an "Ns" label.
 const SLIDER_CONFIGS = [
     { key: 'bgmVolume', sliderId: 'sld-bgm', valueId: 'val-bgm' },
     { key: 'sfxVolume', sliderId: 'sld-sfx', valueId: 'val-sfx' },
+    { key: 'toastDuration', sliderId: 'sld-toast', valueId: 'val-toast', mode: 'seconds' },
 ];
+
+// Returns the value transforms for a slider config:
+//   toStored — converts the raw 0–100 slider integer to the stored settings value
+//   toRaw    — converts the stored settings value back to the slider integer
+//   label    — formats the stored value for the on-screen text
+function _sliderTransforms(cfg) {
+    if (cfg.mode === 'seconds') {
+        return {
+            toStored: raw => parseInt(raw),
+            toRaw: stored => Math.round(stored),
+            label: stored => `${Math.round(stored)}s`,
+        };
+    }
+    return {
+        toStored: raw => parseInt(raw) / 100,
+        toRaw: stored => Math.round(stored * 100),
+        label: stored => `${Math.round(stored * 100)}%`,
+    };
+}
 
 // The live settings object — read by other modules throughout the game.
 // Relies on function hoisting: loadSettings() is defined further down in
@@ -87,6 +118,18 @@ function applyAudioSettings() {
     Audio_Manager.toggleRandomBGM(SETTINGS.randomBgmEnabled);
 }
 
+// Registers the window focus/blur listeners used by the "mute when
+// unfocused" setting. Called once during init; the handlers re-read
+// SETTINGS each time so they always follow the current toggle state.
+function _initFocusMuteListeners() {
+    window.addEventListener('blur', () => {
+        if (SETTINGS.muteOnFocusLoss) Audio_Manager.setFocusMuted(true);
+    });
+    window.addEventListener('focus', () => {
+        if (SETTINGS.muteOnFocusLoss) Audio_Manager.setFocusMuted(false);
+    });
+}
+
 // Pushes gameplay settings to the relevant game-state variables.
 // Called from applySettings whenever gameplay-related values change.
 function applyGameplaySettings() {
@@ -121,14 +164,14 @@ function setToggleUI(btnId, isEnabled) {
     btn.classList.toggle('settings-toggle-off', !isEnabled);
 }
 
-// Updates a single slider and its displayed percentage value.
-// volume is a 0–1 float; the slider and label both show 0–100.
-function setSliderUI(sliderId, valueId, volume) {
-    const pct = Math.round(volume * 100);
-    const slider = document.getElementById(sliderId);
-    const label = document.getElementById(valueId);
-    if (slider) slider.value = pct;
-    if (label) label.textContent = pct + '%';
+// Updates a single slider and its displayed value.
+// cfg: the matching SLIDER_CONFIGS entry (determines value scaling/label).
+function setSliderUI(cfg) {
+    const { toRaw, label } = _sliderTransforms(cfg);
+    const slider = document.getElementById(cfg.sliderId);
+    const labelEl = document.getElementById(cfg.valueId);
+    if (slider) slider.value = toRaw(SETTINGS[cfg.key]);
+    if (labelEl) labelEl.textContent = label(SETTINGS[cfg.key]);
 }
 
 // Reads current SETTINGS and refreshes all modal controls to match.
@@ -137,8 +180,8 @@ function loadSettingsUI() {
     for (const { key, btnId } of TOGGLE_CONFIGS) {
         setToggleUI(btnId, SETTINGS[key]);
     }
-    for (const { key, sliderId, valueId } of SLIDER_CONFIGS) {
-        setSliderUI(sliderId, valueId, SETTINGS[key]);
+    for (const cfg of SLIDER_CONFIGS) {
+        setSliderUI(cfg);
     }
 }
 
@@ -161,18 +204,19 @@ function initToggleControl(btnId, settingsKey, applyOnChange = true) {
     });
 }
 
-// Wires up a single volume slider: converts its 0–100 integer value
-// to a 0–1 float, updates the live label, then saves and applies.
-function initSliderControl(sliderId, valueId, settingsKey) {
-    document.getElementById(sliderId)?.addEventListener('input', e => {
-        SETTINGS[settingsKey] = parseInt(e.target.value) / 100;
-        const label = document.getElementById(valueId);
-        if (label) label.textContent = e.target.value + '%';
+// Wires up a single slider: converts its raw value to the stored form
+// (see SLIDER_CONFIGS mode), updates the live label, then saves and applies.
+function initSliderControl(cfg) {
+    document.getElementById(cfg.sliderId)?.addEventListener('input', e => {
+        const { toStored, label } = _sliderTransforms(cfg);
+        SETTINGS[cfg.key] = toStored(e.target.value);
+        const labelEl = document.getElementById(cfg.valueId);
+        if (labelEl) labelEl.textContent = label(SETTINGS[cfg.key]);
         saveSettings(SETTINGS);
         applySettings();
 
         // Preview the new volume with a random SFX (debounced while dragging)
-        if (settingsKey === 'sfxVolume') {
+        if (cfg.key === 'sfxVolume') {
             clearTimeout(_sfxPreviewTimeout);
             _sfxPreviewTimeout = setTimeout(() => {
                 Audio_Manager.playRandomSFX();
@@ -188,13 +232,21 @@ function initSettingsControls() {
     initToggleControl('stt-bgm', 'bgmEnabled');
     initToggleControl('stt-randombgm', 'randomBgmEnabled');
     initToggleControl('stt-sfx', 'sfxEnabled');
+    initToggleControl('stt-mutefocus', 'muteOnFocusLoss');
     initToggleControl('stt-axis', 'axisLock');
     initToggleControl('stt-protectmarks', 'protectMarkedCells', false);
     initToggleControl('stt-qmark', 'questionMark', false);
     initToggleControl('stt-touchpad', 'touchpadModeEnabled');
+    initToggleControl('stt-invert', 'invertMouseButtons', false);
+    initToggleControl('stt-ltv', 'lowTimeVignette', false);
+    initToggleControl('stt-penflash', 'penaltyFlash', false);
 
 
-    // Volume sliders
-    initSliderControl('sld-bgm', 'val-bgm', 'bgmVolume');
-    initSliderControl('sld-sfx', 'val-sfx', 'sfxVolume');
+    // Sliders (volume + toast duration)
+    for (const cfg of SLIDER_CONFIGS) {
+        initSliderControl(cfg);
+    }
+
+    // Window focus listeners for the mute-when-unfocused setting
+    _initFocusMuteListeners();
 }

@@ -1630,6 +1630,32 @@ function _renderTopBarQuestBadge() {
 }
 
 /**
+ * Highlights the Probability Tree button when there are unspent
+ * Convergence Points: golden glow frame + yellow point count.
+ */
+function _renderTopBarTreePoints() {
+    const treeBtn = document.getElementById('mv-btn-passive-tree');
+    if (!treeBtn) return;
+
+    const points = (STATE && STATE.passiveTreePoints) || 0;
+    const hasPoints = points > 0;
+
+    // Class-based styling (the stone-block image sets border: none !important,
+    // so a golden frame is applied via outline/box-shadow in CSS)
+    treeBtn.classList.toggle('unspent-points', hasPoints);
+
+    // Yellow point count appended next to the translated label —
+    // appended as a sibling so i18n re-renders cannot wipe it
+    let countEl = document.getElementById('ptb-point-count-mv');
+    if (!countEl) {
+        countEl = document.createElement('span');
+        countEl.id = 'ptb-point-count-mv';
+        treeBtn.appendChild(countEl);
+    }
+    countEl.textContent = hasPoints ? ` (${points})` : '';
+}
+
+/**
  * Wires up the navigation buttons in the map view top bar.
  * Using .onclick assignment is intentional — it's safe to call multiple times
  * without accumulating duplicate event listeners.
@@ -1654,6 +1680,7 @@ function _buildMapViewTopBar() {
     _renderTopBarNextCode();
     _renderTopBarClassStatus();
     _renderTopBarQuestBadge();
+    _renderTopBarTreePoints();
     _wireTopBarButtons();
 
     // Character portrait (replaces the old List-view toggle button) —
