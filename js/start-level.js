@@ -100,6 +100,7 @@ function _resetLevelTrackers() {
     window._hadPenaltyClutch = false;
     window._maxInventoryTrackedThisLevel = false;
     window._collectorTrackedThisLevel = false;
+    window._threeItemsTrackedThisLevel = false;
 }
 
 // Resets player HP to full, based on base HP plus any gear health bonus.

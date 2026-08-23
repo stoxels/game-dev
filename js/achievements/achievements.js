@@ -72,10 +72,16 @@ function trackAchStat(stat, amount = 1) {
 
 // setAchStat — force-sets a stat to an exact value instead of incrementing.
 //   Used for boolean flags (e.g. world-complete) and derived counts.
+//   The write is monotonic (never lowers an existing value): several callers
+//   recompute stats from the currently active save slot / tree allocation,
+//   but achievement progress is global and must survive slot switches.
 function setAchStat(stat, value) {
-    ACH_STATE.stats[stat] = value;
-    saveAchState();
-    checkAchievements();
+    const prev = ACH_STATE.stats[stat] || 0;
+    ACH_STATE.stats[stat] = Math.max(prev, value);
+    if (ACH_STATE.stats[stat] !== prev) {
+        saveAchState();
+        checkAchievements();
+    }
 }
 
 
@@ -143,9 +149,11 @@ function checkAchievements() {
 // They are all called in sequence by onLevelCompleteAch().
 
 // trackBaseCompletionStats — core completion counters that apply to every level.
+// NOTE: cellsFilled is tracked per manual fill in handleCorrectFill()
+// (mouse-button-handlers.js) so that item/skill-revealed cells are excluded
+// here. ctx.cellsFilled is still used by trackGridStats() for the dense-grid check.
 function trackBaseCompletionStats(ctx) {
     trackAchStat('levelsCompleted');
-    trackAchStat('cellsFilled', ctx.cellsFilled || 0);
 
     // tilesMarked = correct crosses still on the board at the moment of victory
     if (ctx.tilesMarked !== undefined) trackAchStat('tilesMarked', ctx.tilesMarked);
@@ -192,7 +200,7 @@ function trackClassStats(ctx) {
     if (ctx.playerAscendency === 'recursionist') trackAchStat('levelsAsRecursionist');
     if (ctx.playerAscendency === 'markovian') trackAchStat('levelsAsMarkovian');
     if (ctx.playerAscendency === 'bayesian') trackAchStat('levelsAsBayesian');
-    if (ctx.playerAscendency === 'random_walker') trackAchStat('levelsAsRandomWalker');
+    if (ctx.playerAscendency === 'random_walker') trackAchStat('levelsAsRandom_walker');
 
     // Mathmagician special: absorb 5+ mistakes in a single level
     if (ctx.playerClass === 'mathmagician' && ctx.absorbedThisLevel >= 5) {

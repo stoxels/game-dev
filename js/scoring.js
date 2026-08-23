@@ -473,6 +473,9 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel) {
     if (bonusMet && !bonusAlreadyDone && !isQuizBonus) {
         STATE.bonusDone.push(gi);
         save();
+        // Re-check world aggregates — claiming this bonus may have completed
+        // the "all bonuses in a world" achievement set.
+        if (typeof checkWorldCompleteAch === 'function') checkWorldCompleteAch();
     }
 
     // Item drops are suppressed in ironman mode and for quiz bonus levels

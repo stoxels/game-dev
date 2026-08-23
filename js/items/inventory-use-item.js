@@ -1602,8 +1602,11 @@ function _trackItemAchievements(id, def) {
     }
     if (id === 'cursedTime') trackAchStat('timeAdded', 1200);
 
-    // Multi-item-use achievement
-    if (itemsUsedThisLevel >= 3) trackAchStat('threeItemsOneLevelCount');
+    // Multi-item-use achievement (counts once per level, not once per use)
+    if (itemsUsedThisLevel >= 3 && !window._threeItemsTrackedThisLevel) {
+        window._threeItemsTrackedThisLevel = true;
+        trackAchStat('threeItemsOneLevelCount');
+    }
 
     // Cursed items used on a first-attempt level
     if (def.rarity === 'cursed' && !STATE.done.includes(cur.gIdx)) {

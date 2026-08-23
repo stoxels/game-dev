@@ -358,6 +358,9 @@ function _quizHandleFirstCorrectReward(resEl) {
 
     // Mark bonus as claimed regardless of Ironman mode or item availability
     STATE.bonusDone.push(cur.gIdx);
+    // Re-check world aggregates — claiming this bonus may have completed
+    // the "all bonuses in a world" achievement set.
+    if (typeof checkWorldCompleteAch === 'function') checkWorldCompleteAch();
 
     let rewardItemName = null;
 
