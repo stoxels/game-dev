@@ -31,7 +31,7 @@ function _penaltyIsShieldAbsorbed(penMult) {
 function _interruptBlackSwanIfActive() {
     if (!window._blackSwanActive) return;
     _endBlackSwan(false);
-    showToast(LANG === 'de' ? '📉 SPEEDFORCE abgebrochen!' : '📉 SPEEDFORCE broken!');
+    showToast(t('cg_speedforce_broken'));
 }
 
 
@@ -54,7 +54,7 @@ function _tryProcStochasticResonance(row, col) {
             playStochasticResonanceEffect(row, col, revealed[0].row, revealed[0].col);
         }
         Audio_Manager.playSFX('stochastic_resonance');
-        showToast(`〰️ ${LANG === 'de' ? 'Stochastische Resonanz! Zelle enthüllt.' : 'Stochastic Resonance! Cell revealed.'}`);
+        showToast(`〰️ ${t('cg_stoch_resonance')}`);
         return true; // penalty absorbed — no mistakeCount increment, no time loss
     }
     window._stochasticLastFired = false;
@@ -95,12 +95,9 @@ function _tryProcStandardDeviation(mistakeRow, mistakeCol) {
     });
 
     Audio_Manager.playSFX('standard_deviation');
-    const feedbackLabel = (LANG === 'de') ? 'Fehler-Feedback!' : 'Error Feedback!';
-    const isPlural = revealCount > 1;
-
-    const revealLabel = (LANG === 'de')
-        ? (isPlural ? `${revealCount} Zellen enthüllt.` : `${revealCount} Zelle enthüllt.`)
-        : (isPlural ? `${revealCount} cells revealed.` : `${revealCount} cell revealed.`);
+    const feedbackLabel = t('cg_error_feedback');
+    const revealLabel = t(revealCount > 1 ? 'cg_cells_revealed_pl' : 'cg_cells_revealed_one')
+        .replace('{n}', revealCount);
 
     showToast(`📏 ${feedbackLabel} ${revealLabel}`);
 }
@@ -236,7 +233,7 @@ function _updatePenaltyInfoHUD(effectivePen) {
 // map's mistake limit immediately, with no tick-loop delay).
 function _updateMistakeCounterHUD() {
     const mc = document.getElementById('mistake-counter');
-    if (mc) mc.textContent = `${LANG === 'de' ? 'Fehler' : 'Mistakes'}: ${mistakeCount}`;
+    if (mc) mc.textContent = `${t('cg_mistakes_lbl')}: ${mistakeCount}`;
 
     if (typeof _egIsActive === 'function' && _egIsActive()) {
         if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();

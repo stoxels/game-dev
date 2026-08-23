@@ -67,9 +67,9 @@
             <img class="title-logo-img" src="images/Title_Screen/STOXELS.png" alt="STOXELS">
 
             <!-- Subtitle + version replace the old <p class="title-tag"> and title-version span -->
-            <div class="title-subtitle">CARTOGRAPHERS OF CHANCE</div>
+            <div class="title-subtitle" data-t="scr_cartographers_tagline">CARTOGRAPHERS OF CHANCE</div>
             <div class="title-version-line">v0.27 BETA</div>
-            <div class="title-ai-disclosure" style="position: absolute; bottom: 0; right: 0;">This game contains AI-generated art, sound, music, and code.</div>
+            <div class="title-ai-disclosure" style="position: absolute; bottom: 0; right: 0;" data-t="scr_ai_disclosure">This game contains AI-generated art, sound, music, and code.</div>
             <div class="title-lang-overlay">
                 <button class="lang-btn active" data-lang="en">EN</button>
                 <button class="lang-btn" data-lang="de">DE</button>
@@ -94,7 +94,8 @@
             </button>
 
             <button class="title-overlay-btn block-general" id="btn-changelog"
-                    style="--bx: 30%; --by: 55%;">
+                    style="--bx: 30%; --by: 55%;"
+                    data-t="scr_btn_changelog">
                 📝 CHANGELOG
             </button>
 
@@ -139,7 +140,7 @@
     <!-- HOW TO PLAY MODAL -->
     <div id="tut-modal" class="modal-bg">
         <div class="modal-box">
-            <button class="modal-close" data-modal-close="tut-modal">✕ CLOSE</button>
+            <button class="modal-close" data-modal-close="tut-modal" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title" data-t="tut_title">▸ HOW TO PLAY STOXELS</div>
             <div class="modal-section">
                 <h3 data-t="tut_s1h">WHAT IS A NONOGRAM?</h3>
@@ -184,8 +185,8 @@
     <!-- SAVE SLOT SELECT SCREEN -->
     <div id="screen-save-slots" class="screen">
         <div class="ss-topbar">
-            <button class="back-btn" id="btn-save-slots-back">◀ BACK</button>
-            <span class="ss-title">SELECT SAVE FILE</span>
+            <button class="back-btn" id="btn-save-slots-back" data-t="btn_back">◀ BACK</button>
+            <span class="ss-title" data-t="scr_save_file_title">SELECT SAVE FILE</span>
         </div>
         <div class="ss-grid" id="save-slots-grid"></div>
     </div>
@@ -286,23 +287,23 @@
     <!-- TEMP: DEV MODE SELECT SCREEN — remove once Adventure Mode replaces the world map -->
     <div id="screen-mode-select" class="screen">
         <div class="dms-wrap">
-            <div class="dms-title">SELECT MODE</div>
+            <div class="dms-title" data-t="scr_select_mode">SELECT MODE</div>
             <div class="dms-sub"></div>
 
             <div class="dms-options">
                 <button class="dms-card" id="btn-mode-existing">
-                    <div class="dms-card-title">🗺️ Regular Game</div>
-                    <div class="dms-card-desc">Launches the regular world-map implementation.</div>
+                    <div class="dms-card-title" data-t="scr_mode_regular">🗺️ Regular Game</div>
+                    <div class="dms-card-desc" data-t="scr_mode_regular_desc">Launches the regular world-map implementation.</div>
                 </button>
 
                 <button class="dms-card" id="btn-mode-adventure">
-                    <div class="dms-card-title">⚔️ Adventure Mode (Dev)</div>
-                    <div class="dms-card-desc">In development</div>
+                    <div class="dms-card-title" data-t="scr_mode_adventure">⚔️ Adventure Mode (Dev)</div>
+                    <div class="dms-card-desc" data-t="scr_mode_adventure_desc">In development</div>
                 </button>
 
                 <button class="dms-card" id="btn-mode-endgame-test">
-                    <div class="dms-card-title">🧪 Endgame Test</div>
-                    <div class="dms-card-desc">Endgame Map System Test.</div>
+                    <div class="dms-card-title" data-t="scr_mode_endgame_test">🧪 Endgame Test</div>
+                    <div class="dms-card-desc" data-t="scr_mode_endgame_test_desc">Endgame Map System Test.</div>
                 </button>
             </div>
         </div>
@@ -311,8 +312,8 @@
     <!-- ADVENTURE MODE SANDBOX (stub) -->
     <div id="screen-adventure" class="screen">
         <div class="adv-topbar">
-            <button class="back-btn" id="btn-adventure-back">◀ BACK</button>
-            <span class="adv-title">ADVENTURE MODE — SANDBOX</span>
+            <button class="back-btn" id="btn-adventure-back" data-t="btn_back">◀ BACK</button>
+            <span class="adv-title" data-t="scr_adventure_sandbox_title">ADVENTURE MODE — SANDBOX</span>
         </div>
         <div id="adv-canvas-wrap" class="adv-canvas-wrap"></div>
     </div>
@@ -443,8 +444,8 @@
 
                 <div class="settings-row">
                     <label class="settings-label">
-                        <span data-t="settings_randombgm">Random Music</span>
-                        <span class="settings-hint" data-t="settings_randombgm_hint">Plays a random track instead of the level's assigned music</span>
+                        <span data-t="scr_random_bgm">Random Music</span>
+                        <span class="settings-hint" data-t="scr_random_bgm_hint">Plays a random track instead of the level's assigned music</span>
                     </label>
                     <div class="settings-controls">
                         <button class="settings-toggle" id="stt-randombgm">
@@ -486,8 +487,8 @@
                 </div>
                 <div class="settings-row">
                     <label class="settings-label">
-                        <span data-t="settings_protectmarks">Protect Marked Cells</span>
-                        <span class="settings-hint" data-t="settings_protectmarks_hint">Prevents filling over a cell marked with ✕</span>
+                        <span data-t="scr_protect_marks">Protect Marked Cells</span>
+                        <span class="settings-hint" data-t="scr_protect_marks_hint">Prevents filling over a cell marked with ✕</span>
                     </label>
                     <button class="settings-toggle" id="stt-protectmarks">
                         <span class="tgl-on-txt" data-t="stt_on">ON</span>
@@ -522,8 +523,8 @@
     <!-- CHANGELOG MODAL-->
     <div id="changelog-modal" class="modal-bg">
         <div class="modal-box changelog-box">
-            <button class="modal-close" data-modal-close="changelog-modal">✕ CLOSE</button>
-            <div class="modal-title">📝 CHANGELOG (English Only)</div>
+            <button class="modal-close" data-modal-close="changelog-modal" data-t="reset_close">✕ CLOSE</button>
+            <div class="modal-title" data-t="scr_changelog_title">📝 CHANGELOG (English Only)</div>
 
             <div id="changelog-content" class="changelog-scroll-area"></div>
         </div>
@@ -532,8 +533,8 @@
     <!-- REPLAY GALLERY MODAL -->
     <div id="replay-modal" class="modal-bg">
         <div class="modal-box">
-            <button class="modal-close" data-modal-close="replay-modal">✕ CLOSE</button>
-            <div class="modal-title">🔁 REPLAY GALLERY</div>
+            <button class="modal-close" data-modal-close="replay-modal" data-t="reset_close">✕ CLOSE</button>
+            <div class="modal-title" data-t="scr_replay_gallery">🔁 REPLAY GALLERY</div>
             <div id="replay-content" class="changelog-scroll-area"></div>
         </div>
     </div>
@@ -552,13 +553,13 @@
             <div class="ls-topbar-row1">
                 <button class="back-btn" id="btn-levels-back">◀ <span data-t="btn_setup">SETUP</span></button>
                 <span class="ls-title" data-t="ls_title">SELECT LEVEL</span>
-                <button id="btn-toggle-map-view" class="btn-toggle-view">🗺️ MAP VIEW</button>
+                <button id="btn-toggle-map-view" class="btn-toggle-view" data-t="scr_btn_map">🗺️ MAP VIEW</button>
                 <div class="ls-topbar-right">
                     <span class="ls-class-status" id="ls-class-status"></span>
                     <button class="gtb-btn gtb-btn-inference" id="btn-quest-log">
                         📋 <span data-t="btn_inference">INFERENCE</span> <span id="quest-log-badge" class="quest-badge" style="display:none;">!</span>
                     </button>
-                    <button class="gtb-btn" id="btn-go-passive-tree">🌿 PROBABILITY TREE</button>
+                    <button class="gtb-btn" id="btn-go-passive-tree">🌿 <span data-t="scr_probability_tree">PROBABILITY TREE</span></button>
                 </div>
             </div>
             <div class="ls-topbar-row2">
@@ -590,7 +591,7 @@
             </div>
         </div>
 
-        <div id="mv-walking-bar" class="mv-walking-bar">
+        <div id="mv-walking-bar" class="mv-walking-bar" data-t="scr_travelling">
             🚶 Travelling...
         </div>
 
@@ -600,7 +601,7 @@
 
     <div id="screen-world-detail" class="screen">
         <div class="wd-topbar" style="display: flex; gap: 15px; align-items: center; padding: 10px; background: rgba(0,0,0,0.1);">
-            <button id="btn-wd-back" class="btn-back" onclick="wdGoBackToMap()">← BACK TO OVERWORLD</button>
+            <button id="btn-wd-back" class="btn-back" onclick="wdGoBackToMap()" data-t="scr_back_to_overworld">← BACK TO OVERWORLD</button>
         </div>
 
         <div id="wd-canvas-wrap" class="wd-canvas-wrap" style="position: relative; width: 100%; height: calc(100vh - 60px); overflow: hidden;">
@@ -709,10 +710,10 @@
 
             <!-- column headers, each using the stone header bar as its background -->
             <div class="hs-col-headers" id="hs-col-headers">
-                <span class="hs-col-header hs-col-level">LEVEL</span>
-                <span class="hs-col-header hs-col-score">BEST SCORE</span>
-                <span class="hs-col-header hs-col-diff">DIFFICULTY</span>
-                <span class="hs-col-header hs-col-mods">MODIFIERS</span>
+                <span class="hs-col-header hs-col-level" data-t="hs_level">LEVEL</span>
+                <span class="hs-col-header hs-col-score" data-t="hs_best">BEST SCORE</span>
+                <span class="hs-col-header hs-col-diff" data-t="hs_diff">DIFFICULTY</span>
+                <span class="hs-col-header hs-col-mods" data-t="hs_mods">MODIFIERS</span>
             </div>
 
             <!-- scrollable list itself -->
@@ -791,7 +792,7 @@
                                autocomplete="off" spellcheck="false" />
                     </div>
                     <span class="qr-unit" id="quiz-input-unit" style="display:none;"></span>
-                    <button class="qr-submit-btn" id="quiz-input-submit">CHECK</button>
+                    <button class="qr-submit-btn" id="quiz-input-submit" data-t="mg_submit">CHECK</button>
                 </div>
 
                 <div class="qr-hint" id="quiz-input-hint"></div>
@@ -802,8 +803,8 @@
                 <div class="qr-reward-zone" id="item-reward-zone"></div>
 
                 <div class="qr-footer">
-                    <button class="qr-btn qr-btn--why" id="quiz-why-btn" style="display:none;">💡 Tell me why</button>
-                    <button class="qr-btn qr-btn--tutor" id="quiz-tutor-btn" style="display:none;">🎓 TUTOR</button>
+                    <button class="qr-btn qr-btn--why" id="quiz-why-btn" style="display:none;" data-t="scr_tell_me_why">💡 Tell me why</button>
+                    <button class="qr-btn qr-btn--tutor" id="quiz-tutor-btn" style="display:none;" data-t="scr_tutor">🎓 TUTOR</button>
                     <button class="qr-btn qr-btn--continue" id="quiz-continue" style="display:none;" data-t="quiz_continue">CONTINUE ▶</button>
                     <button class="qr-btn qr-btn--skip" id="btn-skip-quiz" data-t="quiz_skip">SKIP</button>
                 </div>
@@ -816,7 +817,7 @@
     <!-- CODE MODAL -->
     <div id="pw-modal" class="modal-bg">
         <div class="modal-box pw-box">
-            <button class="modal-close" data-modal-close="pw-modal">✕ CLOSE</button>
+            <button class="modal-close" data-modal-close="pw-modal" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title" data-t="pw_title">🔑 NEW CODE UNLOCKED!</div>
             <div id="pw-content"></div>
         </div>
@@ -880,11 +881,11 @@
                 <div class="qr-explain" id="mg-explain" style="display:none;"></div>
 
                 <div class="qr-footer">
-                    <button class="qr-btn qr-btn--why" id="mg-why-btn" style="display:none;">💡 Tell me why</button>
-                    <button class="qr-btn qr-btn--tutor" id="mg-tutor-btn" style="display:none;">🎓 TUTOR</button>
+                    <button class="qr-btn qr-btn--why" id="mg-why-btn" style="display:none;" data-t="scr_tell_me_why">💡 Tell me why</button>
+                    <button class="qr-btn qr-btn--tutor" id="mg-tutor-btn" style="display:none;" data-t="scr_tutor">🎓 TUTOR</button>
                     <button class="qr-btn qr-btn--newq" id="mg-new-q-btn" style="display:none;" data-t="mg_new_q">🔄 NEW Q</button>
-                    <button class="qr-btn qr-btn--continue" id="mg-continue-btn" style="display:none;">CONTINUE ▶</button>
-                    <button class="qr-btn qr-btn--skip" id="btn-mg-close">✕ CLOSE</button>
+                    <button class="qr-btn qr-btn--continue" id="mg-continue-btn" style="display:none;" data-t="quiz_continue">CONTINUE ▶</button>
+                    <button class="qr-btn qr-btn--skip" id="btn-mg-close" data-t="reset_close">✕ CLOSE</button>
                 </div>
 
             </div>
@@ -901,9 +902,9 @@
     <!-- ACHIEVEMENTS SCREEN -->
     <div id="screen-achievements" class="screen">
         <div class="ach-topbar">
-            <button class="gtb-btn" id="btn-ach-back">MENU</button>
-            <div class="ach-title">ACHIEVEMENTS</div>
-            <button class="gtb-btn btn-danger" id="btn-reset-achievements">RESET ALL ACHIEVEMENTS</button>
+            <button class="gtb-btn" id="btn-ach-back" data-t="btn_menu">MENU</button>
+            <div class="ach-title" data-t="scr_achievements">ACHIEVEMENTS</div>
+            <button class="gtb-btn btn-danger" id="btn-reset-achievements" data-t="scr_reset_all_achievements">RESET ALL ACHIEVEMENTS</button>
         </div>
         <div class="ach-body" id="ach-body"></div>
     </div>
@@ -913,7 +914,7 @@
     <div class="screen" id="screen-passive-tree">
         <div class="pt-topbar">
             <button class="gtb-btn" id="btn-pt-back">← BACK</button>
-            <span class="pt-title">🌿 <span data-t="pt_title">PROBABILITY TREE</span></span>
+            <span class="pt-title">🌿 <span data-t="scr_probability_tree">PROBABILITY TREE</span></span>
             <div id="pt-search-wrap"></div>
             <div id="pt-zoom-wrap">
                 <span id="pt-zoom-label">110%</span>
@@ -948,17 +949,17 @@
     <!-- ACHIEVEMENT RESET CONFIRM MODAL -->
     <div id="ach-reset-modal" class="modal-bg">
         <div class="modal-box modal-box-danger">
-            <button class="modal-close" onclick="hideAchResetModal()">✕ CLOSE</button>
-            <div class="modal-title text-red">⚠ RESET ACHIEVEMENTS</div>
+            <button class="modal-close" onclick="hideAchResetModal()" data-t="reset_close">✕ CLOSE</button>
+            <div class="modal-title text-red" data-t="scr_reset_ach_title">⚠ RESET ACHIEVEMENTS</div>
             <div class="modal-section">
-                <p class="reset-body-text">
+                <p class="reset-body-text" data-t="scr_reset_ach_body">
                     This will permanently erase all achievement progress and unlocked tiers.<br><br>
                     <strong class="text-accent2">This cannot be undone.</strong>
                 </p>
             </div>
             <div class="modal-actions">
-                <button class="title-btn back-btn" onclick="hideAchResetModal(); _doResetAchievements();">🗑 YES, RESET ACHIEVEMENTS</button>
-                <button class="title-btn back-btn" onclick="hideAchResetModal()">CANCEL</button>
+                <button class="title-btn back-btn" onclick="hideAchResetModal(); _doResetAchievements();" data-t="scr_reset_ach_confirm">🗑 YES, RESET ACHIEVEMENTS</button>
+                <button class="title-btn back-btn" onclick="hideAchResetModal()" data-t="reset_cancel">CANCEL</button>
             </div>
         </div>
     </div>
@@ -974,7 +975,7 @@
         </div>
 
         <div class="bonus-inline" id="bonus-sidebar">
-            <span class="bonus-sidebar-label">🎯 BONUS</span>
+            <span class="bonus-sidebar-label" data-t="scr_bonus_label">🎯 BONUS</span>
             <span class="bonus-sidebar-hint" id="bonus-sidebar-hint"></span>
         </div>
 

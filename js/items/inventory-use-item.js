@@ -351,7 +351,7 @@ function _applyTargetedRevealBias(cands, sol, rows, cols) {
 
     const bestRow = _findUnsolvedRowByFill(sol, rows, false);
     const bestCol = _findUnsolvedColByFill(sol, cols, false);
-    return _filterCandidatesByBias(cands, bestRow, bestCol, 'Biased Reveal!');
+    return _filterCandidatesByBias(cands, bestRow, bestCol, t('itm_biased_reveal'));
 }
 
 // Attempts to narrow `cands` to cells in the densest unsolved row or
@@ -365,7 +365,7 @@ function _applyDenseMarkerBias(cands, sol, rows, cols) {
 
     const bestRow = _findUnsolvedRowByFill(sol, rows, true);
     const bestCol = _findUnsolvedColByFill(sol, cols, true);
-    return _filterCandidatesByBias(cands, bestRow, bestCol, 'Biased Mark!');
+    return _filterCandidatesByBias(cands, bestRow, bestCol, t('itm_biased_mark'));
 }
 
 
@@ -757,12 +757,12 @@ function _cursedDownsideDuration(baseMs) {
     if (ptHasSkill('keystone_veil_of_purity')) {
         if (!window._veiled_cursedUsed) {
             window._veiled_cursedUsed = true;
-            showToast('Veil of Purity: Downside prevented!');
+            showToast(t('itm_veil_prevented'));
             questStat_curseBlocked();
             return 0;
         }
         // Veil is now broken — curse is doubled as punishment
-        showToast('Veil of Purity broken! Curse amplified!');
+        showToast(t('itm_veil_broken'));
         return Math.round(baseMs * 2);
     }
 
@@ -799,7 +799,7 @@ function _cursedDownsideCount(baseCount) {
             return 0;
         }
         // Veil broken — double the erase count
-        showToast('Veil of Purity broken! Curse amplified!');
+        showToast(t('itm_veil_broken'));
         return Math.round(baseCount * 2);
     }
 
@@ -836,7 +836,7 @@ function _applyBlackoutDownside(dur, blackoutRows, blackoutCols) {
     if (dur <= 0) return;
 
     if (_blackoutWardBlocks()) {
-        showToast(`🌑 ${LANG === 'de' ? 'Verdunklungs-Schutz! Hinweise geschützt.' : 'Blackout Ward! Clues protected.'}`);
+        showToast(t('itm_blackout_ward'));
         return;
     }
 
@@ -853,7 +853,7 @@ function _applyRowErasureDownside(eraseCount, preFilledSet) {
     if (eraseCount <= 0) return 0;
 
     if (_removalWardBlocks()) {
-        showToast(`🔒 ${LANG === 'de' ? 'Entfernungsschutz! Zeilen behalten.' : 'Removal Ward! Rows kept.'}`);
+        showToast(t('itm_removal_ward_rows'));
         return 0;
     }
 
@@ -866,7 +866,7 @@ function _applyColErasureDownside(eraseCount, preFilledSet) {
     if (eraseCount <= 0) return 0;
 
     if (_removalWardBlocks()) {
-        showToast(`🔒 ${LANG === 'de' ? 'Entfernungsschutz! Spalten behalten.' : 'Removal Ward! Columns kept.'}`);
+        showToast(t('itm_removal_ward_cols'));
         return 0;
     }
 
@@ -1076,7 +1076,7 @@ function _useArtifactComplete(id, def) {
 function _useMarkWrong(id, def) {
     // Blinding Truth keystone blocks all mark-wrong items entirely
     if (ptHasSkill('keystone_blinding_truth')) {
-        return `${def.icon} ${LANG === 'de' ? 'Blockiert durch Blendende Wahrheit!' : 'Blocked by Blinding Truth!'}`;
+        return `${def.icon} ${t('itm_blocked_blinding_truth')}`;
     }
 
     const baseCount = parseInt(id.replace('markWrong', '')) || 2;
@@ -1090,7 +1090,7 @@ function _useMarkWrong(id, def) {
 // addTime30 / addTime60 / addTime180 — adds seconds to the timer.
 function _useAddTime(id, def) {
     if (ptHasSkill('keystone_gamblers_ruin')) {
-        return `${def.icon} ${LANG === 'de' ? 'Blockiert durch Ruin des Spielers!' : "Blocked by Gambler's Ruin!"}`;
+        return `${def.icon} ${t('itm_blocked_gamblers_ruin')}`;
     }
 
     const baseSecs = parseInt(id.replace('addTime', '')) || 30;
@@ -1106,7 +1106,7 @@ function _useAddTime(id, def) {
         _trackTimerDelta(before, timerSecs);
         updTimer();
         playItemEffect(id);
-        return `${def.icon} ${LANG === 'de' ? `−${secs}s (Countdown-Krise!)` : `−${secs}s (Countdown Crisis!)`}`;
+        return `${def.icon} ${t('itm_countdown_crisis').replace('{n}', secs)}`;
     }
 
     questStat_timerItemUsed();
@@ -1123,13 +1123,13 @@ function _useAddTime(id, def) {
 function _useShield(id, def) {
     // Several keystones block shield items entirely
     if (ptHasSkill('keystone_iron_doctrine')) {
-        return `${def.icon} ${LANG === 'de' ? 'Blockiert durch Eiserne Doktrin!' : 'Blocked by Iron Doctrine!'}`;
+        return `${def.icon} ${t('itm_blocked_iron_doctrine')}`;
     }
     if (ptHasSkill('keystone_null_hypothesis')) {
-        return `${def.icon} ${LANG === 'de' ? 'Blockiert durch Nullhypothese!' : 'Blocked by Null Hypothesis!'}`;
+        return `${def.icon} ${t('itm_blocked_null_hypothesis')}`;
     }
     if (ptHasSkill('keystone_asymptotic_mastery')) {
-        return `${def.icon} ${LANG === 'de' ? 'Blockiert durch Asymptotische Meisterschaft!' : 'Blocked by Asymptotic Mastery!'}`;
+        return `${def.icon} ${t('itm_blocked_asymptotic_mastery')}`;
     }
 
     shieldActive = true;
@@ -1148,7 +1148,7 @@ function _useShield(id, def) {
     if (cursedImmunitySecs > 0) {
         window._cursedImmune = true;
         setTimeout(() => { window._cursedImmune = false; }, cursedImmunitySecs * 1000);
-        showToast('Warded against curses!');
+        showToast(t('itm_cursed_warded'));
     }
 
     playItemEffect(id);
@@ -1160,7 +1160,7 @@ function _useShield(id, def) {
 // the Time Well Spent passive.
 function _useMistakeEraser(id, def) {
     if (mistakeCount === 0) {
-        showToast(LANG === 'de' ? 'Keine Fehler zum Entfernen!' : 'No mistakes to erase!');
+        showToast(t('item_mistake_erased_none'));
         return null;
     }
 
@@ -1324,7 +1324,7 @@ function _useCursedReveal(id, def) {
     const downsideMult = _cursedDownsideDuration(1000) / 1000;
     if (downsideMult <= 0) {
         playItemEffect(id);
-        return `☠️ ${LANG === 'de' ? 'Enthüllt 6 Zellen (Markierungen geschützt)!' : '6 cells revealed (marks protected)!'}`;
+        return `☠️ ${t('itm_cursed_reveal_protected')}`;
     }
 
     // Downside: clear every wrong mark the player has placed
@@ -1369,27 +1369,27 @@ function _resetCooldownSlot(slot) {
 
 // pearlOfHaste — resets the cooldown of active skill slot 1.
 function _usePearlOfHaste(id, def) {
-    if (!STATE.playerClass) return `${def.icon} No class equipped!`;
+    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active1');
     playItemEffect(id);
-    return `${def.icon} ${LANG === 'de' ? 'Abklingzeit 1 auf 1s reduziert!' : 'Skill 1 cooldown set to 1s!'}`;
+    return `${def.icon} ${t('itm_cooldown_s1')}`;
 }
 
 // pearlOfSwiftness — resets the cooldown of active skill slot 2.
 function _usePearlOfSwiftness(id, def) {
-    if (!STATE.playerClass) return `${def.icon} No class equipped!`;
+    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active2');
     playItemEffect(id);
-    return `${def.icon} ${LANG === 'de' ? 'Abklingzeit 2 auf 1s reduziert!' : 'Skill 2 cooldown set to 1s!'}`;
+    return `${def.icon} ${t('itm_cooldown_s2')}`;
 }
 
 // grandPearl — resets the cooldowns of both active skill slots.
 function _useGrandPearl(id, def) {
-    if (!STATE.playerClass) return `${def.icon} No class equipped!`;
+    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active1');
     _resetCooldownSlot('active2');
     playItemEffect(id);
-    return `${def.icon} ${LANG === 'de' ? 'Beide Abklingzeiten auf 1s reduziert!' : 'Both skill cooldowns set to 1s!'}`;
+    return `${def.icon} ${t('itm_cooldown_both')}`;
 }
 
 
@@ -1409,11 +1409,11 @@ function _useTheWitch(id, def) {
 
     window._cursedImmune = true;
     playItemEffect(id);
-    showToast(`🧙 ${LANG === 'de' ? 'Verfluchter Schutz für 60s! −10 Min.' : 'Cursed immunity 60s! −10 min.'}`);
+    showToast(`🧙 ${t('itm_witch_immunity')}`);
 
     setTimeout(() => {
         window._cursedImmune = false;
-        showToast(`🧙 ${LANG === 'de' ? 'Hexenschutz endet.' : 'Witch immunity faded.'}`);
+        showToast(`🧙 ${t('itm_witch_faded')}`);
     }, 60000);
 
     return ''; // toast was already shown above
@@ -1428,7 +1428,7 @@ function _useGoldenClock(id, def) {
     // Update the mistake display so the player immediately sees the limit
     _setMistakeCounterText(' 🕰️');
 
-    return `${def.icon} ${LANG === 'de' ? 'Timer angehalten! Noch 3 Fehler erlaubt.' : 'Timer halted! 3 mistakes remaining.'}`;
+    return `${def.icon} ${t('itm_golden_clock_active')}`;
 }
 
 
@@ -1436,7 +1436,7 @@ function _useChronoFracture(id, def) {
     window._chronoFractureActive = true;
     _trackWitchImmuneCursedUse()
     playItemEffect(id);
-    return `${def.icon} ${LANG === 'de' ? 'Timer x4 schneller, Cooldowns x2 schneller' : 'Timer x4 faster, Cooldowns x2 faster'}`;
+    return `${def.icon} ${t('itm_chronofracture_active')}`;
 }
 
 
@@ -1482,9 +1482,7 @@ function _useShadowSeal(id, def) {
     _applyCellEffect(affected, 'mark');
 
     playItemEffect(id);
-    return `${def.icon} ${LANG === 'de'
-        ? `Schattensiegel! Hinweise versteckt, ${markCount} Felder markiert.`
-        : `Shadow Seal! Clues hidden, ${markCount} tiles marked.`}`;
+    return `${def.icon} ${t('itm_shadow_seal_used').replace('{n}', markCount)}`;
 }
 
 
@@ -1660,7 +1658,7 @@ function _consumeItem(idx, def, msg) {
         _trackItemAchievements(def.id, def);
         updateQuestStats('itemUsed', { defId: def.id, rarity: def.rarity });
         save();
-        if (msg) showToast(msg + (LANG === 'de' ? ' ♻ Nicht verbraucht!' : ' ♻ Not consumed!'));
+        if (msg) showToast(msg + t('itm_not_consumed'));
         buildInventoryPanel();
         return;
     }

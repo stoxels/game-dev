@@ -119,9 +119,9 @@ function getPrimerQuestion() {
 // Returns the progress label string shown above the streak dots.
 // e.g. "Question 2 of 5 — On correct answer: +1 row & +1 column pre-solved"
 function _primerBuildProgressLabel(streak) {
-    return LANG === 'de'
-        ? `Frage ${streak + 1} von ${PRIMER_MAX} — Bei richtiger Antwort: +1 Zeile & +1 Spalte vorgelöst`
-        : `Question ${streak + 1} of ${PRIMER_MAX} — On correct answer: +1 row & +1 column pre-solved`;
+    return t('itm_primer_progress_full')
+        .replace('{n}', streak + 1)
+        .replace('{m}', PRIMER_MAX);
 }
 
 // Returns HTML for the row of coloured dots showing current streak progress.
@@ -134,14 +134,8 @@ function _primerBuildStreakDots(streak) {
 
 // Returns HTML for the footer hint text at the bottom of the modal.
 function _primerBuildFooterText(streak) {
-    if (streak === 0) {
-        return LANG === 'de'
-            ? 'Richtig: nächste Frage erscheint. Bis zu 5 Zeilen + 5 Spalten möglich!'
-            : 'Correct: next question appears. Up to 5 rows + 5 columns possible!';
-    }
-    return LANG === 'de'
-        ? `Bisher richtig: ${streak} — weiter für mehr Vorsprung!`
-        : `Correct so far: ${streak} — keep going for more headstart!`;
+    if (streak === 0) return t('itm_primer_footer_full_start');
+    return t('itm_primer_footer_full_streak').replace('{n}', streak);
 }
 
 // Returns HTML for the answer area: multiple-choice option container or
@@ -158,10 +152,10 @@ function _primerBuildAnswerHtml(question) {
     return `
         <div class="mg-answer-row" style="margin-top:14px;">
             <input type="text" id="primer-input" class="mg-input"
-                placeholder="${LANG === 'de' ? 'deine Antwort' : 'your answer'}" autocomplete="off" />
+                placeholder="${t('mg_placeholder')}" autocomplete="off" />
             ${unitLabel}
             <button class="mg-submit-btn" onclick="submitPrimerAnswer()">
-                ${LANG === 'de' ? 'PRÜFEN ▶' : 'CHECK ▶'}
+                ${t('mg_submit')}
             </button>
         </div>`;
 }
@@ -172,27 +166,27 @@ function _primerBuildModalHtml(question, streak) {
         `<span class="qr-primer-dot ${i < streak ? 'filled' : ''}"></span>`
     ).join('');
 
-    const progressLabel = LANG === 'de'
-        ? `Frage ${streak + 1} von ${PRIMER_MAX}`
-        : `Question ${streak + 1} of ${PRIMER_MAX}`;
+    const progressLabel = t('itm_primer_progress')
+        .replace('{n}', streak + 1)
+        .replace('{m}', PRIMER_MAX);
 
     const footerText = streak === 0
-        ? (LANG === 'de' ? 'Bis zu 5 Zeilen + 5 Spalten möglich!' : 'Up to 5 rows + 5 columns possible!')
-        : (LANG === 'de' ? `Bisher richtig: ${streak}` : `Correct so far: ${streak}`);
+        ? t('itm_primer_footer_start')
+        : t('itm_primer_footer_streak').replace('{n}', streak);
 
-    const title = LANG === 'de' ? 'PFADFINDER-KOMPASS' : "SCOUT'S PRIMER";
-    const skipLabel = LANG === 'de' ? 'ÜBERSPRINGEN' : 'SKIP';
+    const title = t('itm_primer_title');
+    const skipLabel = t('itm_primer_skip');
 
     const answerHtml = question.isMultiChoice
         ? `<div class="qr-opts" id="primer-opts"></div>`
         : `<div class="qr-input-row">
                <div class="qr-input-wrap">
                    <input type="text" id="primer-input" class="qr-input"
-                       placeholder="${LANG === 'de' ? 'deine Antwort' : 'your answer'}"
-                       autocomplete="off" />
-               </div>
-               ${question.unit ? `<span class="qr-unit">${question.unit}</span>` : ''}
-               <button class="qr-submit-btn" onclick="submitPrimerAnswer()">CHECK</button>
+                        placeholder="${t('mg_placeholder')}"
+                        autocomplete="off" />
+                </div>
+                ${question.unit ? `<span class="qr-unit">${question.unit}</span>` : ''}
+                <button class="qr-submit-btn" onclick="submitPrimerAnswer()">${t('mg_submit')}</button>
            </div>`;
 
     return `
@@ -216,7 +210,7 @@ function _primerBuildModalHtml(question, streak) {
 
                 <div class="qr-footer">
                     <button class="qr-btn qr-btn--tutor" id="primer-tutor-btn" onclick="primerUseTutor()" style="display:none;">
-                        🎓 TUTOR
+                        ${t('itm_tutor_btn')}
                     </button>
                     <button class="qr-btn qr-btn--skip" id="primer-skip-btn" onclick="skipPrimer()">
                         ${skipLabel}
@@ -371,7 +365,7 @@ function submitPrimerAnswer() {
 
     if (isNaN(entered)) {
         fb.className = 'mg-feedback mg-bad';
-        fb.textContent = LANG === 'de' ? '⚠ Bitte eine Zahl eingeben.' : '⚠ Please enter a number.';
+        fb.textContent = t('mg_not_a_number');
         return;
     }
 
@@ -409,18 +403,18 @@ function _primerHandleCorrectAnswer(fb, newStreak) {
 
     if (newStreak >= PRIMER_MAX) {
         // All questions answered correctly — maximum headstart
-        fb.textContent = LANG === 'de'
-            ? `✓ Perfekt! ${newStreak}/${PRIMER_MAX} richtig — maximaler Vorsprung!`
-            : `✓ Perfect! ${newStreak}/${PRIMER_MAX} correct — maximum headstart!`;
+        fb.textContent = t('itm_primer_perfect')
+            .replace('{n}', newStreak)
+            .replace('{m}', PRIMER_MAX);
         setTimeout(() => {
             closePrimerModal();
             setTimeout(() => applyPerfectPrimerReveal(), 50);
         }, 1000);
     } else {
         // More questions remain in the chain
-        fb.textContent = LANG === 'de'
-            ? `✓ Richtig! ${newStreak}/${PRIMER_MAX} — nächste Frage…`
-            : `✓ Correct! ${newStreak}/${PRIMER_MAX} — next question…`;
+        fb.textContent = t('itm_primer_correct_next')
+            .replace('{n}', newStreak)
+            .replace('{m}', PRIMER_MAX);
         setTimeout(() => {
             closePrimerModal();
             showPrimerModal(newStreak); // open next question with updated streak
@@ -435,17 +429,13 @@ function _primerHandleWrongAnswer(fb) {
     Audio_Manager.playSFX('quizWrong');
 
     if (primerStreak > 0) {
-        fb.textContent = LANG === 'de'
-            ? `✗ Falsch. Vorsprung für ${primerStreak} richtige Antwort(en) wird angewendet…`
-            : `✗ Wrong. Applying headstart for ${primerStreak} correct answer(s)…`;
+        fb.textContent = t('itm_primer_wrong_partial').replace('{n}', primerStreak);
         setTimeout(() => {
             closePrimerModal();
             applyPrimerHeadstart(primerStreak);
         }, 1800);
     } else {
-        fb.textContent = LANG === 'de'
-            ? '✗ Falsch. Kein Vorsprung — viel Erfolg!'
-            : '✗ Wrong. No headstart — good luck!';
+        fb.textContent = t('itm_primer_wrong_none');
         setTimeout(closePrimerModal, 1800);
     }
 }
@@ -697,9 +687,9 @@ function applyPrimerHeadstart(count) {
 
     // 4. Toast + win check after all animations complete
     setTimeout(() => {
-        const msg = LANG === 'de'
-            ? `📜 ${totalRows} Zeile(n) + ${totalCols} Spalte(n) vorgelöst!`
-            : `📜 ${totalRows} row(s) + ${totalCols} column(s) pre-solved!`;
+        const msg = t('itm_primer_headstart_applied')
+            .replace('{r}', totalRows)
+            .replace('{c}', totalCols);
         showToast(msg);
         questStat_primerRowsColsRevealed(rowIdxs.length, colIdxs.length);
         checkWin();
@@ -782,9 +772,9 @@ function applyPerfectPrimerReveal() {
     boardEl.classList.add('primer-perfect-glow');
     setTimeout(() => boardEl.classList.remove('primer-perfect-glow'), 2800);
 
-    const msg = LANG === 'de'
-        ? `📜 MEISTER-KARTOGRAFIE: ${totalRows} Zeilen & ${totalCols} Spalten werden kartografiert!`
-        : `📜 MASTER CARTOGRAPHY: Mapping ${totalRows} rows & ${totalCols} columns!`;
+    const msg = t('itm_primer_master_cartography')
+        .replace('{r}', totalRows)
+        .replace('{c}', totalCols);
     showToast(msg);
 
     // 3. Schedule gold cell flares
@@ -880,7 +870,7 @@ function _primerHandleTutorSuccess(fb) {
     questStat_tutorAnsweredCorrect();
     Audio_Manager.playSFX('tutorSuccess');
     fb.className = 'mg-feedback mg-ok';
-    fb.textContent = LANG === 'de' ? '🎓 Tutor hat die Frage gelöst!' : '🎓 Tutor solved it!';
+    fb.textContent = t('itm_tutor_success');
 
     if (primerQuestion.isMultiChoice) {
         _primerTutorLockMultiChoice();
@@ -896,9 +886,7 @@ function _primerHandleTutorSuccess(fb) {
 function _primerHandleTutorFailure(fb) {
     Audio_Manager.playSFX('tutorFail');
     fb.className = 'mg-feedback mg-bad';
-    fb.textContent = LANG === 'de'
-        ? '🎓 Tutor konnte die Frage nicht lösen…'
-        : "🎓 Tutor couldn't solve it…";
+    fb.textContent = t('itm_tutor_fail');
 }
 
 // Shows or hides the Tutor button based on whether the player has the
@@ -912,9 +900,7 @@ function _primerRefreshTutorButton() {
 
     if (canUseTutor && tutorCount > 0) {
         btn.style.display = 'inline-block';
-        btn.textContent = LANG === 'de'
-            ? `🎓 Tutor um Hilfe bitten (${tutorCount})`
-            : `🎓 Ask Tutor for Help (${tutorCount})`;
+        btn.textContent = t('itm_ask_tutor').replace('{n}', tutorCount);
     } else {
         btn.style.display = 'none';
     }

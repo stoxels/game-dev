@@ -59,11 +59,11 @@ function _tailRiskGetCandidateCells() {
 
 // Builds the localised HTML string for the Tail Risk modal overlay
 function _tailRiskBuildOverlayHTML(secondsPerCell, maxCells) {
-    const title = LANG === 'de' ? 'UNENDLICHER HUNGER' : 'INFINITE HUNGER';
-    const prompt = LANG === 'de' ? `Wie viele Zellen willst du enthüllen? (Kosten: ${secondsPerCell}s pro Zelle)` : `How many cells to reveal? (Cost: ${secondsPerCell}s per cell)`;
-    const costLabel = LANG === 'de' ? 'Kosten' : 'Cost';
-    const confirmLabel = LANG === 'de' ? 'OPFERN' : 'SACRIFICE';
-    const cancelLabel = LANG === 'de' ? 'ABBRECHEN' : 'CANCEL';
+    const title = t('cls_ih_title');
+    const prompt = t('cls_ih_prompt').replace('{n}', secondsPerCell);
+    const costLabel = t('cls_cost');
+    const confirmLabel = t('cls_sacrifice');
+    const cancelLabel = t('cls_cancel');
 
     return `
         <div class="ih-canvas">
@@ -166,7 +166,9 @@ function _tailRiskPostReveal(revealedCount, affectedIds, totalCost) {
     }
 
     trackAchStat('tilesRevealed', revealedCount);
-    showToast(`📈 Tail Risk: ${revealedCount} ${LANG === 'de' ? 'Zellen enthüllt' : 'cells revealed'} (-${totalCost}s)`);
+    showToast(t('cls_tail_risk_resolved')
+        .replace('{r}', revealedCount)
+        .replace('{c}', totalCost));
 
     Audio_Manager.playSFX('tailRiskResolve');
 
@@ -210,7 +212,7 @@ function _tailRiskCancel(refund = false) {
     _tailRiskRefundCooldown();
     buildClassHUD();
 
-    if (!refund) showToast(LANG === 'de' ? '📈 Abgebrochen.' : '📈 Cancelled.');
+    if (!refund) showToast(`📈 ${t('cls_cancelled')}`);
 }
 
 // Called when the player confirms the Tail Risk sacrifice.
@@ -242,7 +244,7 @@ function _executeTailRisk(secondsPerCell, maxCells) {
     const candidates = _tailRiskGetCandidateCells();
 
     if (candidates.length === 0) {
-        showToast(LANG === 'de' ? '📈 Keine Zellen zum Enthüllen!' : '📈 No cells to reveal!');
+        showToast(t('cls_tail_risk_none'));
         _tailRiskCancel(true); // refund cooldown — nothing to do
         return;
     }
@@ -534,7 +536,7 @@ function _endBlackSwan(natural = false) {
     if (natural) {
         // Only track and announce when the effect ran its full duration
         trackAchStat('speedforceNaturalCompletions');
-        showToast(LANG === 'de' ? '📉 VERLASSE SPEEDFORCE' : '📉 LEAVING SPEEDFORCE');
+        showToast(t('cls_speedforce_leave'));
         buildClassHUD();
     }
 
@@ -556,7 +558,7 @@ function _executeBlackSwan(durationMs) {
     Audio_Manager.stopBGM(300); // 300 ms fade-out before speedforce audio takes over
     Audio_Manager.playSFX('speedforceEnter');
     trackAchStat('skillSpeedforceUsed');
-    showToast(LANG === 'de' ? '📉 BETRETE SPEEDFORCE' : '📉 ENTERING SPEEDFORCE');
+    showToast(t('cls_speedforce_enter'));
 
     _blackSwanStartHyperspeed(durationMs);
 

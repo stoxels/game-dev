@@ -370,8 +370,8 @@ function _egCheckMistakeLimit() {
         _egStopEncounter();
         dead = true;
         stopTimer();
-        document.getElementById('lose-title').textContent = 'Map Failed';
-        document.getElementById('lose-sub').textContent = 'Too many mistakes!';
+        document.getElementById('lose-title').textContent = t('eg_map_failed');
+        document.getElementById('lose-sub').textContent = t('eg_too_many_mistakes');
         Audio_Manager.playSFX('player_defeated');
 
         document.getElementById('ov-lose').classList.add('show');
@@ -439,7 +439,7 @@ function _egApplyPlayerMissFeedback() {
     if (!hud) return;
     const label = document.createElement('div');
     label.className = 'eg-player-damage eg-player-miss';
-    label.textContent = 'MISS';
+    label.textContent = t('eg_miss');
     hud.appendChild(label);
     setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
 }
@@ -770,7 +770,7 @@ function _egPlayerTakeDamage(amount) {
 
     const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion));
     if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
-        showToast('💨 Dodged!');
+        showToast(t('eg_dodged'));
         Audio_Manager.playSFX('player_dodge_attack');
         _egApplyPlayerMissFeedback();
         _egScheduleAbsorptionRegen();
@@ -818,9 +818,12 @@ function _egShowNormalKillToast(monsterName) {
     const req = _egGetMapRequirements();
     const total = req.totalMonsters;
     if (total > 0) {
-        showToast(`⚔️ ${monsterName} defeated! (${_egChainKillCount}/${total})`);
+        showToast(t('eg_kill_toast_progress')
+            .replace('{name}', monsterName)
+            .replace('{k}', _egChainKillCount)
+            .replace('{t}', total));
     } else {
-        showToast(`⚔️ ${monsterName} defeated!`);
+        showToast(t('eg_kill_toast').replace('{name}', monsterName));
     }
 }
 
@@ -859,7 +862,7 @@ function _egHandleNormalMonsterKill(dying) {
 
 // Handles all post-kill logic for a boss monster death.
 function _egHandleBossKill(dying) {
-    showToast(`🏆 ${dying.name} defeated!`);
+    showToast(t('eg_boss_kill_toast').replace('{name}', dying.name));
     _egUpdateObjectivesHUD();
     if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(true,dying.level);
 }
@@ -889,8 +892,8 @@ function _egGameOver() {
     _egStopEncounter();
     dead = true;
     stopTimer();
-    document.getElementById('lose-title').textContent = 'Game Over';
-    document.getElementById('lose-sub').textContent = 'The monsters overwhelmed you!';
+    document.getElementById('lose-title').textContent = t('eg_game_over');
+    document.getElementById('lose-sub').textContent = t('eg_monsters_overwhelmed');
     Audio_Manager.playSFX('player_defeated');
     document.getElementById('ov-lose').classList.add('show');
 }
@@ -922,10 +925,10 @@ function _egNotifyMonsterArrival(monster) {
     if (typeof showToast !== 'function') return;
 
     if (monster.isBoss) {
-        showToast(`💀 BOSS: ${monster.name} has arrived!`);
+        showToast(t('eg_boss_arrived').replace('{name}', monster.name));
         _egBossInit(monster);
     } else {
-        showToast(`⚠️ ${monster.name} appeared!`);
+        showToast(t('eg_monster_appeared').replace('{name}', monster.name));
     }
 }
 
@@ -995,7 +998,7 @@ function _egFlashImmune(monsterId) {
 
     const label = document.createElement('div');
     label.className = 'eg-damage-number eg-immune-label';
-    label.textContent = 'IMMUNE';
+    label.textContent = t('eg_immune');
     card.appendChild(label);
     setTimeout(() => label.remove(), EG_IMMUNE_LABEL_DURATION_MS);
 }
@@ -1016,13 +1019,13 @@ function _egHpBarClass(hpPct) {
 // Builds the badge HTML for a monster's name row (level, boss phase, immune, target).
 // NOTE: _egBuildMonsterBadgesHTML is kept for any external callers.
 function _egBuildMonsterBadgesHTML(m, isTarget) {
-    let html = `<span class="eg-level-badge">Lv ${m.level}</span>`;
+    let html = `<span class="eg-level-badge">${t('eg_lv_badge').replace('{n}', m.level)}</span>`;
     if (m.isBoss && m.bossPhase)
-        html += `<span class="eg-boss-phase-badge eg-boss-phase-${m.bossPhase}">Phase ${m.bossPhase}</span>`;
+        html += `<span class="eg-boss-phase-badge eg-boss-phase-${m.bossPhase}">${t('eg_phase_badge').replace('{n}', m.bossPhase)}</span>`;
     if (m.bossImmune)
-        html += `<span class="eg-boss-immune-badge">IMMUNE</span>`;
+        html += `<span class="eg-boss-immune-badge">${t('eg_immune')}</span>`;
     if (isTarget)
-        html += `<span class="eg-target-badge">TARGET</span>`;
+        html += `<span class="eg-target-badge">${t('eg_target_badge')}</span>`;
     return html;
 }
 

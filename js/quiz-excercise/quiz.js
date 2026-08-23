@@ -382,9 +382,7 @@ function _quizHandleFirstCorrectReward(resEl) {
     // Show result message, including the item name if one was given
     resEl.className = 'quiz-result ok';
     resEl.textContent = rewardItemName
-        ? (LANG === 'de'
-            ? `✓ RICHTIG! +50 Punkte & ${rewardItemName} erhalten!`
-            : `✓ CORRECT! +50 Score & ${rewardItemName} earned!`)
+        ? t('qz_correct_item').replace('{item}', rewardItemName)
         : t('quiz_correct');
 
     save();
@@ -437,7 +435,7 @@ function _resolveQuizAnswer(correct) {
         if (isInterstitial) {
             if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
             resEl.className = 'quiz-result ok';
-            resEl.textContent = LANG === 'de' ? '✓ RICHTIG!' : '✓ CORRECT!';
+            resEl.textContent = t('qz_correct_short');
         } else {
             if (quizAlreadyClaimed) {
                 _quizHandleAlreadyClaimedReward(resEl);
@@ -510,9 +508,7 @@ function answerQuizInput() {
 
     if (isNaN(entered)) {
         resEl.className = 'quiz-result bad';
-        resEl.textContent = LANG === 'de'
-            ? '⚠ Bitte eine Zahl eingeben.'
-            : '⚠ Please enter a number.';
+        resEl.textContent = t('qz_enter_number');
         return;
     }
 
@@ -628,7 +624,7 @@ function _quizTutorLockInputQuestion() {
 // Handles the Tutor-success path: plays audio, shows feedback, reveals
 // the answer in the appropriate way, and resolves as correct.
 function _quizHandleTutorSuccess(resEl) {
-    resEl.textContent = LANG === 'de' ? '🎓 Tutor hat die Frage gelöst!' : '🎓 Tutor solved it!';
+    resEl.textContent = t('qz_tutor_solved');
     resEl.className = 'quiz-result ok';
     Audio_Manager.playSFX('tutorSuccess');
 
@@ -644,9 +640,7 @@ function _quizHandleTutorSuccess(resEl) {
 // Handles the Tutor-fail path: plays audio and shows feedback.
 // The question remains active so the player can still answer manually.
 function _quizHandleTutorFail(resEl) {
-    resEl.textContent = LANG === 'de'
-        ? '🎓 Tutor konnte die Frage nicht lösen…'
-        : '🎓 Tutor couldn\'t solve it…';
+    resEl.textContent = t('qz_tutor_failed');
     resEl.className = 'quiz-result bad';
     Audio_Manager.playSFX('tutorFail');
 }
@@ -664,9 +658,7 @@ function _quizRefreshTutorButton() {
 
     if (canUseTutor && tutorCount > 0) {
         btn.style.display = 'inline-block';
-        btn.textContent = LANG === 'de'
-            ? `🎓 Tutor um Hilfe bitten (${tutorCount})`
-            : `🎓 Ask Tutor for Help (${tutorCount})`;
+        btn.textContent = t('qz_ask_tutor').replace('{n}', tutorCount);
     } else {
         btn.style.display = 'none';
     }

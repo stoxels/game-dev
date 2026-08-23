@@ -1,17 +1,114 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //-------------------HELMET MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
 
-// T1 is the highest/best tier. 
+// T1 is the highest/best tier.
 // 'ilvl' is the minimum item level required for this tier to roll.
 // 'weight' determines how common the roll is (higher = more common).
+//
+// LOCALIZATION: every mod family carries 'label' (EN) + 'labelDe' (DE).
+// The display layer picks the right language at generation time
+// (see _egBuildRolledStats in endgame-equipment-generator.js).
+//
+// EG_MOD_NAME_WORDS provides short family words used by the rare-item
+// name builder (_egBuildItemName): [enWord, dePrefixWord, deGenitive].
+// EN keeps the previously derived display words; DE uses natural gaming
+// terms, e.g. "Feuerwiderstand-Kappe des Feuerwiderstands".
+const EG_MOD_NAME_WORDS = {
+    flat_health: ['Health', 'Leben', 'des Lebens'],
+    flat_mana: ['Mana', 'Mana', 'des Manas'],
+    heart_heal: ['Heart Heal', 'Herzheilung', 'der Herzheilung'],
+    inc_heart_heal: ['Heart Heal', 'Herzheilung', 'der Herzheilung'],
+    time_added: ['Time Added', 'Zeitzuwachs', 'des Zeitzuwachses'],
+    flat_armour: ['Armour', 'Rüstung', 'der Rüstung'],
+    inc_armour: ['Armour', 'Rüstung', 'der Rüstung'],
+    flat_evasion: ['Evasion', 'Ausweichen', 'des Ausweichens'],
+    inc_evasion: ['Evasion', 'Ausweichen', 'des Ausweichens'],
+    flat_absorption: ['Absorption', 'Absorption', 'der Absorption'],
+    inc_absorption: ['Absorption', 'Absorption', 'der Absorption'],
+    hybrid_life_armour: ['Life Armour', 'Lebensrüstung', 'der Lebensrüstung'],
+    hybrid_mana_armour: ['Mana Armour', 'Manarüstung', 'der Manarüstung'],
+    hybrid_life_evasion: ['Life Evasion', 'Lebensausweichen', 'des Lebensausweichens'],
+    hybrid_mana_evasion: ['Mana Evasion', 'Manaausweichen', 'des Manaausweichens'],
+    hybrid_life_absorption: ['Life Absorption', 'Lebensabsorption', 'der Lebensabsorption'],
+    hybrid_mana_absorption: ['Mana Absorption', 'Manaabsorption', 'der Manaabsorption'],
+    hybrid_armour_evasion: ['Armour Evasion', 'Rüstungsausweichen', 'des Rüstungsausweichens'],
+    hybrid_armour_absorption: ['Armour Absorption', 'Rüstungsabsorption', 'der Rüstungsabsorption'],
+    hybrid_evasion_absorption: ['Evasion Absorption', 'Ausweichabsorption', 'der Ausweichabsorption'],
+    hybrid_evasion_armour: ['Evasion Armour', 'Ausweichrüstung', 'der Ausweichrüstung'],
+    strength: ['Strength', 'Stärke', 'der Stärke'],
+    agility: ['Agility', 'Beweglichkeit', 'der Beweglichkeit'],
+    intelligence: ['Intelligence', 'Intelligenz', 'der Intelligenz'],
+    accuracy: ['Accuracy', 'Genauigkeit', 'der Genauigkeit'],
+    life_regen: ['Life Regen', 'Lebensregeneration', 'der Lebensregeneration'],
+    mana_regen: ['Mana Regen', 'Manaregeneration', 'der Manaregeneration'],
+    fire_resist: ['Fire Resist', 'Feuerwiderstand', 'des Feuerwiderstands'],
+    cold_resist: ['Cold Resist', 'Kältewiderstand', 'des Kältewiderstands'],
+    lightning_resist: ['Lightning Resist', 'Blitzwiderstand', 'des Blitzwiderstands'],
+    shadow_resist: ['Shadow Resist', 'Schattenwiderstand', 'des Schattenwiderstands'],
+    arcane_resistance: ['Arcane Resistance', 'Arkanwiderstand', 'des Arkanwiderstands'],
+    mistake_count: ['Mistake Count', 'Fehleranzahl', 'der Fehleranzahl'],
+    mistake_not_count: ['Mistake Not Count', 'Fehlerfreiheit', 'der Fehlerfreiheit'],
+    focus: ['Focus', 'Fokus', 'des Fokus'],
+    life_leech: ['Life Leech', 'Lebensraub', 'des Lebensraubs'],
+    absorption_on_kill: ['Absorption On Kill', 'Killabsorption', 'der Killabsorption'],
+    absorption_regen_rate: ['Absorption Regen Rate', 'Absorptionsregeneration', 'der Absorptionsregeneration'],
+    faster_absorption_regen_start: ['Faster Absorption Regen Start', 'Frühe Absorptionsregeneration', 'der frühen Absorptionsregeneration'],
+    block_chance: ['Block Chance', 'Blockchance', 'der Blockchance'],
+    spell_block_chance: ['Spell Block Chance', 'Zauberblockchance', 'der Zauberblockchance'],
+    block_recovery: ['Block Recovery', 'Blockerholung', 'der Blockerholung'],
+    chain: ['Chain', 'Kettenwirkung', 'der Kettenwirkung'],
+    chance_for_new_question: ['Chance For New Question', 'Neue Frage', 'der neuen Frage'],
+    chance_to_blind: ['Chance To Blind', 'Blendung', 'der Blendung'],
+    chance_to_convert: ['Chance To Convert', 'Umwandlung', 'der Umwandlung'],
+    chance_to_freeze: ['Chance To Freeze', 'Einfrieren', 'des Einfrierens'],
+    chance_to_ignite: ['Chance To Ignite', 'Entzünden', 'des Entzündens'],
+    chance_to_shock: ['Chance To Shock', 'Schock', 'des Schocks'],
+    channel: ['Channel', 'Kanalisieren', 'des Kanalisierens'],
+    cleave: ['Cleave', 'Flächenschlag', 'des Flächenschlags'],
+    crit_chance: ['Crit Chance', 'Kritische Trefferchance', 'der kritischen Trefferchance'],
+    crit_multiplier: ['Crit Multiplier', 'Kritischer Schaden', 'kritischen Schadens'],
+    dodge: ['Dodge', 'Ausweichkunst', 'der Ausweichkunst'],
+    echo: ['Echo', 'Nachhall', 'des Nachhalls'],
+    fate: ['Fate', 'Schicksal', 'des Schicksals'],
+    first_step: ['First Step', 'Erster Schritt', 'des ersten Schritts'],
+    flat_physical_damage: ['Physical Damage', 'Physischer Schaden', 'physischen Schadens'],
+    inc_physical_damage: ['Physical Damage', 'Physischer Schaden', 'physischen Schadens'],
+    spell_damage: ['Spell Damage', 'Zauberschaden', 'des Zauberschadens'],
+    inc_spell_damage: ['Spell Damage', 'Zauberschaden', 'des Zauberschadens'],
+    mana_on_kill: ['Mana On Kill', 'Killmana', 'des Killmanas'],
+    mana_on_mistake: ['Mana On Mistake', 'Fehlermana', 'des Fehlermanas'],
+    mana_to_damage: ['Mana To Damage', 'Manawandlung', 'der Manawandlung'],
+    multishot: ['Multishot', 'Mehrfachschuss', 'des Mehrfachschusses'],
+    overkill: ['Overkill', 'Overkill', 'des Overkills'],
+    pierce: ['Pierce', 'Durchschlag', 'des Durchschlags'],
+    precision_damage: ['Precision Damage', 'Präzisionsschaden', 'des Präzisionsschadens'],
+    precision_regen: ['Precision Regen', 'Präzisionsregeneration', 'der Präzisionsregeneration'],
+    preemptive_dodge: ['Preemptive Dodge', 'Frühes Ausweichen', 'des frühen Ausweichens'],
+    pushback: ['Pushback', 'Zurückdrängen', 'des Zurückdrängens'],
+    reveal_hint: ['Reveal Hint', 'Hinweisgabe', 'der Hinweisgabe'],
+    shield_bash: ['Shield Bash', 'Schildstoß', 'des Schildstoßes'],
+    snipe: ['Snipe', 'Scharfschuss', 'des Scharfschusses'],
+    splash_damage: ['Splash Damage', 'Flächenschaden', 'des Flächenschadens'],
+    stagger: ['Stagger', 'Wanken', 'des Wankens'],
+    warding: ['Warding', 'Abwehr', 'der Abwehr'],
+    arcane_surge: ['Arcane Surge', 'Arkanwoge', 'der Arkanwoge'],
+    cold_damage: ['Cold Damage', 'Kälteschaden', 'des Kälteschadens'],
+    fire_damage: ['Fire Damage', 'Feuerschaden', 'des Feuerschadens'],
+    lightning_damage: ['Lightning Damage', 'Blitzschaden', 'des Blitzschadens'],
+    shadow_damage: ['Shadow Damage', 'Schattenschaden', 'des Schattenschadens'],
+    life_on_kill: ['Life On Kill', 'Killleben', 'des Killlebens'],
+    spell_dodge: ['Spell Dodge', 'Zauberausweichen', 'des Zauberausweichens'],
+    attack_speed: ['Attack Speed', 'Angriffstempo', 'des Angriffstempos'],
+    grounded: ['Grounded', 'Standfestigkeit', 'der Standfestigkeit'],
+};
 
 const EG_MOD_TABLE_HEAD = {
     prefixes: {
         // --- LIFE & MANA ---
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 90, max: 109, weight: 100, ilvl: 80 },
                 { tier: 2, min: 70, max: 89, weight: 250, ilvl: 65 },
@@ -22,7 +119,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 65, max: 79, weight: 100, ilvl: 80 },
                 { tier: 2, min: 50, max: 64, weight: 250, ilvl: 65 },
@@ -33,7 +130,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 40, max: 50, weight: 200, ilvl: 75 },
                 { tier: 2, min: 25, max: 39, weight: 400, ilvl: 40 },
@@ -44,7 +141,7 @@ const EG_MOD_TABLE_HEAD = {
         // --- PUZZLE / UTILITY (Moved to Prefixes) ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -55,7 +152,7 @@ const EG_MOD_TABLE_HEAD = {
         // --- LOCAL DEFENSES (Armour, Evasion, Absorption) ---
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
@@ -65,7 +162,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -75,7 +172,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
@@ -85,7 +182,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -95,7 +192,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 80, max: 110, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -105,7 +202,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -117,7 +214,7 @@ const EG_MOD_TABLE_HEAD = {
         // --- HYBRID LIFE & MANA / DEFENSES ---
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -127,7 +224,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -137,7 +234,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -147,7 +244,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -157,7 +254,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 30, max2: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 20, max2: 29, weight: 250, ilvl: 50 },
@@ -167,7 +264,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 30, max2: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 20, max2: 29, weight: 250, ilvl: 50 },
@@ -179,7 +276,7 @@ const EG_MOD_TABLE_HEAD = {
         // --- HYBRID DEFENSES ---
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
-            label: '+# to Armour\n+@ to Evasion',
+            label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 40, max2: 65, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 25, max2: 39, weight: 250, ilvl: 55 },
@@ -189,7 +286,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
@@ -199,7 +296,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
@@ -215,7 +312,7 @@ const EG_MOD_TABLE_HEAD = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -226,7 +323,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -237,7 +334,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -250,7 +347,7 @@ const EG_MOD_TABLE_HEAD = {
         // --- OFFENSE & RECOVERY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 251, max: 400, weight: 150, ilvl: 80 },
                 { tier: 2, min: 121, max: 250, weight: 300, ilvl: 60 },
@@ -261,7 +358,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 16, max: 25, weight: 150, ilvl: 78 },
                 { tier: 2, min: 11, max: 15, weight: 300, ilvl: 55 },
@@ -272,7 +369,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -285,7 +382,7 @@ const EG_MOD_TABLE_HEAD = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -296,7 +393,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -307,7 +404,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -318,7 +415,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -330,7 +427,7 @@ const EG_MOD_TABLE_HEAD = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -338,7 +435,7 @@ const EG_MOD_TABLE_HEAD = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -364,7 +461,7 @@ const EG_MOD_TABLE_EARRING = {
         // --- LIFE & MANA ---
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 60, max: 79, weight: 100, ilvl: 80 },
                 { tier: 2, min: 45, max: 59, weight: 250, ilvl: 65 },
@@ -375,7 +472,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 45, max: 59, weight: 100, ilvl: 80 },
                 { tier: 2, min: 33, max: 44, weight: 250, ilvl: 65 },
@@ -386,7 +483,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 30, max: 40, weight: 200, ilvl: 75 },
                 { tier: 2, min: 18, max: 29, weight: 400, ilvl: 40 },
@@ -397,7 +494,7 @@ const EG_MOD_TABLE_EARRING = {
         // --- LEECH (earring-exclusive flavor) ---
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Damage dealt as Life',
+            label: 'Gain #% of Damage dealt as Life', labelDe: 'Erhalte #% des verursachten Schadens als Leben',
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
@@ -407,7 +504,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         mana_on_kill: {
             id: 'mana_on_kill',
-            label: 'Gain # Mana on Kill',
+            label: 'Gain # Mana on Kill', labelDe: 'Erhalte # Mana bei Kill',
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 100, ilvl: 78 },
                 { tier: 2, min: 7, max: 11, weight: 250, ilvl: 55 },
@@ -419,7 +516,7 @@ const EG_MOD_TABLE_EARRING = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 30, max: 40, weight: 100, ilvl: 78 },
                 { tier: 2, min: 18, max: 29, weight: 300, ilvl: 50 },
@@ -433,7 +530,7 @@ const EG_MOD_TABLE_EARRING = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 35, max: 42, weight: 200, ilvl: 80 },
                 { tier: 2, min: 27, max: 34, weight: 400, ilvl: 65 },
@@ -444,7 +541,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 35, max: 42, weight: 200, ilvl: 80 },
                 { tier: 2, min: 27, max: 34, weight: 400, ilvl: 65 },
@@ -455,7 +552,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 35, max: 42, weight: 200, ilvl: 80 },
                 { tier: 2, min: 27, max: 34, weight: 400, ilvl: 65 },
@@ -468,7 +565,7 @@ const EG_MOD_TABLE_EARRING = {
         // --- REGEN ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 11, max: 18, weight: 150, ilvl: 78 },
                 { tier: 2, min: 7, max: 10, weight: 300, ilvl: 55 },
@@ -479,7 +576,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 18, max: 26, weight: 150, ilvl: 78 },
                 { tier: 2, min: 11, max: 17, weight: 300, ilvl: 55 },
@@ -492,7 +589,7 @@ const EG_MOD_TABLE_EARRING = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 36, max: 42, weight: 250, ilvl: 80 },
                 { tier: 2, min: 27, max: 35, weight: 500, ilvl: 60 },
@@ -503,7 +600,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 36, max: 42, weight: 250, ilvl: 80 },
                 { tier: 2, min: 27, max: 35, weight: 500, ilvl: 60 },
@@ -514,7 +611,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 36, max: 42, weight: 250, ilvl: 80 },
                 { tier: 2, min: 27, max: 35, weight: 500, ilvl: 60 },
@@ -525,7 +622,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 25, max: 30, weight: 150, ilvl: 82 },
                 { tier: 2, min: 18, max: 24, weight: 300, ilvl: 65 },
@@ -537,7 +634,7 @@ const EG_MOD_TABLE_EARRING = {
         // --- ACCURACY (fits jewelry well — a steady hand) ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 151, max: 250, weight: 150, ilvl: 80 },
                 { tier: 2, min: 81, max: 150, weight: 300, ilvl: 60 },
@@ -550,7 +647,7 @@ const EG_MOD_TABLE_EARRING = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -558,7 +655,7 @@ const EG_MOD_TABLE_EARRING = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
                 { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
@@ -586,7 +683,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- LIFE & MANA POOLS ---
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 100, ilvl: 80 },
                 { tier: 2, min: 50, max: 69, weight: 250, ilvl: 65 },
@@ -597,7 +694,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 50, max: 65, weight: 100, ilvl: 80 },
                 { tier: 2, min: 36, max: 49, weight: 250, ilvl: 65 },
@@ -608,7 +705,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 35, max: 45, weight: 200, ilvl: 75 },
                 { tier: 2, min: 22, max: 34, weight: 400, ilvl: 40 },
@@ -621,7 +718,7 @@ const EG_MOD_TABLE_AMULET = {
         // Stored as [min_roll, max_roll] damage range added per hit.
         fire_damage: {
             id: 'fire_damage',
-            label: 'Adds # to @ Fire Damage',
+            label: 'Adds # to @ Fire Damage', labelDe: 'Fügt # bis @ Feuerschaden hinzu',
             tiers: [
                 { tier: 1, min1: 20, max1: 30, min2: 55, max2: 75, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 12, max1: 19, min2: 35, max2: 54, weight: 250, ilvl: 60 },
@@ -631,7 +728,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         cold_damage: {
             id: 'cold_damage',
-            label: 'Adds # to @ Cold Damage',
+            label: 'Adds # to @ Cold Damage', labelDe: 'Fügt # bis @ Kälteschaden hinzu',
             tiers: [
                 { tier: 1, min1: 18, max1: 26, min2: 50, max2: 68, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 11, max1: 17, min2: 32, max2: 49, weight: 250, ilvl: 60 },
@@ -641,7 +738,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         lightning_damage: {
             id: 'lightning_damage',
-            label: 'Adds # to @ Lightning Damage',
+            label: 'Adds # to @ Lightning Damage', labelDe: 'Fügt # bis @ Blitzschaden hinzu',
             // Lightning has a wider min/max spread — high variance, high ceiling
             tiers: [
                 { tier: 1, min1: 5, max1: 12, min2: 60, max2: 90, weight: 120, ilvl: 80 },
@@ -652,7 +749,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         shadow_damage: {
             id: 'shadow_damage',
-            label: 'Adds # to @ Shadow Damage',
+            label: 'Adds # to @ Shadow Damage', labelDe: 'Fügt # bis @ Schattenschaden hinzu',
             // Shadow is rarer and slightly lower values — it has strong status effects
             tiers: [
                 { tier: 1, min1: 15, max1: 22, min2: 40, max2: 58, weight: 80, ilvl: 82 },
@@ -665,7 +762,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- CRITICAL STRIKES ---
         crit_chance: {
             id: 'crit_chance',
-            label: '+#% Critical Strike Chance',
+            label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
                 { tier: 1, min: 6, max: 8, weight: 100, ilvl: 80 },
                 { tier: 2, min: 4, max: 5, weight: 220, ilvl: 60 },
@@ -675,7 +772,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         crit_multiplier: {
             id: 'crit_multiplier',
-            label: '+#% to Critical Strike Multiplier',
+            label: '+#% to Critical Strike Multiplier', labelDe: '+#% zum kritischen Schadensmultiplikator',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 80, ilvl: 82 },
                 { tier: 2, min: 28, max: 44, weight: 180, ilvl: 62 },
@@ -687,7 +784,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- SPELL DAMAGE ---
         spell_damage: {
             id: 'spell_damage',
-            label: '+# to Spell Damage',
+            label: '+# to Spell Damage', labelDe: '+# zu Zauberschaden',
             tiers: [
                 { tier: 1, min: 55, max: 75, weight: 100, ilvl: 80 },
                 { tier: 2, min: 35, max: 54, weight: 250, ilvl: 60 },
@@ -700,7 +797,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 35, max: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min: 22, max: 34, weight: 300, ilvl: 50 },
@@ -709,7 +806,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         mistake_not_count: {
             id: 'mistake_not_count',
-            label: '#% Chance for Mistakes to not Count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             // Amulet-exclusive — powerful puzzle utility, kept very rare
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 40, ilvl: 85 },
@@ -724,7 +821,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 38, max: 46, weight: 200, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 400, ilvl: 65 },
@@ -735,7 +832,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 38, max: 46, weight: 200, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 400, ilvl: 65 },
@@ -746,7 +843,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 38, max: 46, weight: 200, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 400, ilvl: 65 },
@@ -759,7 +856,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 13, max: 20, weight: 150, ilvl: 78 },
                 { tier: 2, min: 8, max: 12, weight: 300, ilvl: 55 },
@@ -770,7 +867,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 20, max: 30, weight: 150, ilvl: 78 },
                 { tier: 2, min: 13, max: 19, weight: 300, ilvl: 55 },
@@ -781,7 +878,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Damage dealt as Life',
+            label: 'Gain #% of Damage dealt as Life', labelDe: 'Erhalte #% des verursachten Schadens als Leben',
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
@@ -790,7 +887,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         absorption_on_kill: {
             id: 'absorption_on_kill',
-            label: 'Gain # Absorption on Kill',
+            label: 'Gain # Absorption on Kill', labelDe: 'Erhalte # Absorption bei Kill',
             tiers: [
                 { tier: 1, min: 20, max: 30, weight: 100, ilvl: 80 },
                 { tier: 2, min: 12, max: 19, weight: 250, ilvl: 58 },
@@ -802,7 +899,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -813,7 +910,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -824,7 +921,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -835,7 +932,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 26, max: 32, weight: 150, ilvl: 82 },
                 { tier: 2, min: 19, max: 25, weight: 300, ilvl: 65 },
@@ -849,7 +946,7 @@ const EG_MOD_TABLE_AMULET = {
         // Values are % chance per hit to apply the status.
         chance_to_ignite: {
             id: 'chance_to_ignite',
-            label: '#% Chance to Ignite on Hit',
+            label: '#% Chance to Ignite on Hit', labelDe: '#% Chance auf Entzünden bei Treffer',
             tiers: [
                 { tier: 1, min: 18, max: 25, weight: 100, ilvl: 80 },
                 { tier: 2, min: 10, max: 17, weight: 250, ilvl: 58 },
@@ -859,7 +956,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         chance_to_freeze: {
             id: 'chance_to_freeze',
-            label: '#% Chance to Freeze on Hit',
+            label: '#% Chance to Freeze on Hit', labelDe: '#% Chance auf Einfrieren bei Treffer',
             tiers: [
                 { tier: 1, min: 15, max: 22, weight: 100, ilvl: 80 },
                 { tier: 2, min: 8, max: 14, weight: 250, ilvl: 58 },
@@ -869,7 +966,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         chance_to_shock: {
             id: 'chance_to_shock',
-            label: '#% Chance to Shock on Hit',
+            label: '#% Chance to Shock on Hit', labelDe: '#% Chance auf Schock bei Treffer',
             tiers: [
                 { tier: 1, min: 18, max: 25, weight: 100, ilvl: 80 },
                 { tier: 2, min: 10, max: 17, weight: 250, ilvl: 58 },
@@ -879,7 +976,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         chance_to_blind: {
             id: 'chance_to_blind',
-            label: '#% Chance to Blind on Hit',
+            label: '#% Chance to Blind on Hit', labelDe: '#% Chance auf Blendung bei Treffer',
             tiers: [
                 { tier: 1, min: 20, max: 30, weight: 120, ilvl: 78 },
                 { tier: 2, min: 12, max: 19, weight: 280, ilvl: 55 },
@@ -890,7 +987,7 @@ const EG_MOD_TABLE_AMULET = {
         chance_to_convert: {
             id: 'chance_to_convert',
             // Rarest status — very powerful, shadow-locked, no T5
-            label: '#% Chance to Convert on Hit',
+            label: '#% Chance to Convert on Hit', labelDe: '#% Chance zur Umwandlung bei Treffer',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 50, ilvl: 84 },
                 { tier: 2, min: 4, max: 7, weight: 130, ilvl: 65 },
@@ -901,7 +998,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 181, max: 280, weight: 150, ilvl: 80 },
                 { tier: 2, min: 101, max: 180, weight: 300, ilvl: 60 },
@@ -914,7 +1011,7 @@ const EG_MOD_TABLE_AMULET = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -922,7 +1019,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 9, max: 14, weight: 150, ilvl: 75 },
                 { tier: 2, min: 4, max: 8, weight: 400, ilvl: 15 }
@@ -948,7 +1045,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- LIFE & MANA ---
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 90, max: 109, weight: 100, ilvl: 80 },
                 { tier: 2, min: 70, max: 89, weight: 250, ilvl: 65 },
@@ -959,7 +1056,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 65, max: 79, weight: 100, ilvl: 80 },
                 { tier: 2, min: 50, max: 64, weight: 250, ilvl: 65 },
@@ -972,7 +1069,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- LOCAL DEFENSES ---
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
@@ -982,7 +1079,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -992,7 +1089,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
@@ -1002,7 +1099,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -1012,7 +1109,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 80, max: 110, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -1022,7 +1119,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -1034,7 +1131,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- HYBRID LIFE & MANA / DEFENSES ---
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -1044,7 +1141,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -1054,7 +1151,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -1064,7 +1161,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -1074,7 +1171,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 30, max2: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 20, max2: 29, weight: 250, ilvl: 50 },
@@ -1084,7 +1181,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 30, max2: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 20, max2: 29, weight: 250, ilvl: 50 },
@@ -1096,7 +1193,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- HYBRID DEFENSES ---
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
-            label: '+# to Armour\n+@ to Evasion',
+            label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 40, max2: 65, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 25, max2: 39, weight: 250, ilvl: 55 },
@@ -1106,7 +1203,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
@@ -1116,7 +1213,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
@@ -1128,7 +1225,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -1140,7 +1237,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // "Bearing down" on enemies — pushing their charge timers back.
         pushback: {
             id: 'pushback',
-            label: 'Hits push back Monster Charge Timers by an additional # seconds',
+            label: 'Hits push back Monster Charge Timers by an additional # seconds', labelDe: 'Treffer verzögern die Ansturm-Timer von Monstern um zusätzliche # Sekunden',
             tiers: [
                 { tier: 1, min: 1.5, max: 2.0, weight: 80, ilvl: 84 },
                 { tier: 2, min: 0.8, max: 1.4, weight: 200, ilvl: 62 },
@@ -1151,7 +1248,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // Overkill damage bleeds into nearby spawn locations.
         overkill: {
             id: 'overkill',
-            label: '#% Chance for Overkill Damage to spread to a nearby Monster',
+            label: '#% Chance for Overkill Damage to spread to a nearby Monster', labelDe: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster überspringt',
             tiers: [
                 { tier: 1, min: 22, max: 30, weight: 80, ilvl: 82 },
                 { tier: 2, min: 13, max: 21, weight: 200, ilvl: 60 },
@@ -1166,7 +1263,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -1177,7 +1274,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -1188,7 +1285,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -1201,7 +1298,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 16, max: 25, weight: 150, ilvl: 78 },
                 { tier: 2, min: 11, max: 15, weight: 300, ilvl: 55 },
@@ -1212,7 +1309,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -1225,7 +1322,7 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'absorption_regen_rate',
             // How quickly absorption refills once the delay has passed.
             // Expressed as % faster regeneration.
-            label: '#% increased Absorption Regeneration Rate',
+            label: '#% increased Absorption Regeneration Rate', labelDe: '#% erhöhte Absorptionsregeneration',
             tiers: [
                 { tier: 1, min: 35, max: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min: 20, max: 34, weight: 280, ilvl: 58 },
@@ -1237,7 +1334,7 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'faster_absorption_regen_start',
             // Reduces the delay before absorption starts regenerating after a hit.
             // Expressed as seconds reduced from the 5-second base delay.
-            label: 'Absorption begins Regenerating # second(s) sooner',
+            label: 'Absorption begins Regenerating # second(s) sooner', labelDe: 'Absorption regeneriert # Sekunde(n) früher',
             tiers: [
                 { tier: 1, min: 2.0, max: 2.5, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1.0, max: 1.9, weight: 200, ilvl: 60 },
@@ -1249,7 +1346,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -1260,7 +1357,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -1271,7 +1368,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -1282,7 +1379,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -1294,7 +1391,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- BLOCK & DODGE (shoulders + chest only) ---
         block_chance: {
             id: 'block_chance',
-            label: '+#% Chance to Block Attacks',
+            label: '+#% Chance to Block Attacks', labelDe: '+#% Chance, Angriffe zu blocken',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
                 { tier: 2, min: 5, max: 7, weight: 250, ilvl: 58 },
@@ -1304,7 +1401,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         spell_block_chance: {
             id: 'spell_block_chance',
-            label: '+#% Chance to Block Spells',
+            label: '+#% Chance to Block Spells', labelDe: '+#% Chance, Zauber zu blocken',
             tiers: [
                 { tier: 1, min: 6, max: 9, weight: 80, ilvl: 82 },
                 { tier: 2, min: 4, max: 5, weight: 200, ilvl: 60 },
@@ -1315,7 +1412,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         block_recovery: {
             id: 'block_recovery',
             // Reduces the 5-second post-block window where you can't deal damage.
-            label: 'Recover from Blocks #% faster',
+            label: 'Recover from Blocks #% faster', labelDe: 'Erholung nach Blocken #% schneller',
             tiers: [
                 { tier: 1, min: 35, max: 50, weight: 100, ilvl: 80 },
                 { tier: 2, min: 20, max: 34, weight: 250, ilvl: 58 },
@@ -1325,7 +1422,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         dodge: {
             id: 'dodge',
-            label: '+#% Chance to Dodge Attacks',
+            label: '+#% Chance to Dodge Attacks', labelDe: '+#% Chance, Angriffen auszuweichen',
             tiers: [
                 { tier: 1, min: 6, max: 9, weight: 100, ilvl: 80 },
                 { tier: 2, min: 4, max: 5, weight: 250, ilvl: 58 },
@@ -1335,7 +1432,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         spell_dodge: {
             id: 'spell_dodge',
-            label: '+#% Chance to Dodge Spells',
+            label: '+#% Chance to Dodge Spells', labelDe: '+#% Chance, Zaubern auszuweichen',
             tiers: [
                 { tier: 1, min: 5, max: 7, weight: 80, ilvl: 82 },
                 { tier: 2, min: 3, max: 4, weight: 200, ilvl: 60 },
@@ -1347,7 +1444,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 251, max: 400, weight: 150, ilvl: 80 },
                 { tier: 2, min: 121, max: 250, weight: 300, ilvl: 60 },
@@ -1360,7 +1457,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -1368,7 +1465,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -1396,7 +1493,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- LIFE & MANA ---
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 80, max: 99, weight: 100, ilvl: 80 },
                 { tier: 2, min: 60, max: 79, weight: 250, ilvl: 65 },
@@ -1407,7 +1504,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 55, max: 70, weight: 100, ilvl: 80 },
                 { tier: 2, min: 40, max: 54, weight: 250, ilvl: 65 },
@@ -1421,7 +1518,7 @@ const EG_MOD_TABLE_CLOAK = {
         // Evasion is the cloak's primary stat — highest values of any slot.
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 120, max: 175, weight: 150, ilvl: 82 },
                 { tier: 2, min: 75, max: 119, weight: 300, ilvl: 60 },
@@ -1431,7 +1528,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 90, max: 115, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 89, weight: 300, ilvl: 60 },
@@ -1442,7 +1539,7 @@ const EG_MOD_TABLE_CLOAK = {
         // Armour is secondary on a cloak — slightly below helmet scale.
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 80, max: 120, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 79, weight: 300, ilvl: 60 },
@@ -1452,7 +1549,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 65, max: 85, weight: 150, ilvl: 82 },
                 { tier: 2, min: 40, max: 64, weight: 300, ilvl: 60 },
@@ -1462,7 +1559,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 65, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 40, max: 64, weight: 300, ilvl: 60 },
@@ -1472,7 +1569,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 65, max: 85, weight: 150, ilvl: 82 },
                 { tier: 2, min: 40, max: 64, weight: 300, ilvl: 60 },
@@ -1484,7 +1581,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- HYBRID LIFE & MANA / DEFENSES ---
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 50, max2: 70, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 30, max2: 49, weight: 250, ilvl: 50 },
@@ -1494,7 +1591,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 50, max2: 70, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 30, max2: 49, weight: 250, ilvl: 50 },
@@ -1504,7 +1601,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 35, max2: 55, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 20, max2: 34, weight: 250, ilvl: 50 },
@@ -1514,7 +1611,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 28, max2: 42, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 17, max2: 27, weight: 250, ilvl: 50 },
@@ -1527,7 +1624,7 @@ const EG_MOD_TABLE_CLOAK = {
         // Evasion pairs are the premium hybrid on a cloak.
         hybrid_evasion_armour: {
             id: 'hybrid_evasion_armour',
-            label: '+# to Evasion\n+@ to Armour',
+            label: '+# to Evasion\n+@ to Armour', labelDe: '+# zu Ausweichen\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 50, max1: 75, min2: 35, max2: 55, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 30, max1: 49, min2: 20, max2: 34, weight: 250, ilvl: 55 },
@@ -1537,7 +1634,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 50, max1: 75, min2: 28, max2: 42, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 30, max1: 49, min2: 17, max2: 27, weight: 250, ilvl: 55 },
@@ -1547,7 +1644,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 35, max1: 55, min2: 28, max2: 42, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 20, max1: 34, min2: 17, max2: 27, weight: 250, ilvl: 55 },
@@ -1559,7 +1656,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -1573,7 +1670,7 @@ const EG_MOD_TABLE_CLOAK = {
         // ricocheting trajectory.
         chain: {
             id: 'chain',
-            label: '#% Chance for Projectiles to Chain to an additional Monster',
+            label: '#% Chance for Projectiles to Chain to an additional Monster', labelDe: '#% Chance, dass Projektile auf ein weiteres Monster überspringen',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 70, ilvl: 84 },
                 { tier: 2, min: 15, max: 24, weight: 180, ilvl: 63 },
@@ -1585,7 +1682,7 @@ const EG_MOD_TABLE_CLOAK = {
         // spawn location. A sweeping cloak clearing a cluster.
         splash_damage: {
             id: 'splash_damage',
-            label: '#% Chance for Hits to deal Splash Damage to nearby Monsters',
+            label: '#% Chance for Hits to deal Splash Damage to nearby Monsters', labelDe: '#% Chance, dass Treffer Flächenschaden an nahen Monstern verursachen',
             tiers: [
                 { tier: 1, min: 22, max: 32, weight: 80, ilvl: 82 },
                 { tier: 2, min: 13, max: 21, weight: 200, ilvl: 60 },
@@ -1600,7 +1697,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -1611,7 +1708,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -1622,7 +1719,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -1635,7 +1732,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 16, max: 25, weight: 150, ilvl: 78 },
                 { tier: 2, min: 11, max: 15, weight: 300, ilvl: 55 },
@@ -1646,7 +1743,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -1659,7 +1756,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -1670,7 +1767,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -1681,7 +1778,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -1692,7 +1789,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -1704,7 +1801,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- CLOAK-EXCLUSIVE: DODGE (not block — cloaks slip away) ---
         dodge: {
             id: 'dodge',
-            label: '+#% Chance to Dodge Attacks',
+            label: '+#% Chance to Dodge Attacks', labelDe: '+#% Chance, Angriffen auszuweichen',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
                 { tier: 2, min: 5, max: 7, weight: 250, ilvl: 58 },
@@ -1714,7 +1811,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         spell_dodge: {
             id: 'spell_dodge',
-            label: '+#% Chance to Dodge Spells',
+            label: '+#% Chance to Dodge Spells', labelDe: '+#% Chance, Zaubern auszuweichen',
             tiers: [
                 { tier: 1, min: 6, max: 9, weight: 80, ilvl: 82 },
                 { tier: 2, min: 4, max: 5, weight: 200, ilvl: 60 },
@@ -1729,7 +1826,7 @@ const EG_MOD_TABLE_CLOAK = {
         // Multishot: the cloak conceals an extra nocked arrow or bolt.
         multishot: {
             id: 'multishot',
-            label: '+#% Chance to fire an additional Projectile',
+            label: '+#% Chance to fire an additional Projectile', labelDe: '+#% Chance auf ein zusätzliches Projektil',
             tiers: [
                 { tier: 1, min: 22, max: 32, weight: 80, ilvl: 82 },
                 { tier: 2, min: 13, max: 21, weight: 200, ilvl: 62 },
@@ -1740,7 +1837,7 @@ const EG_MOD_TABLE_CLOAK = {
         // Blind: the cloak whips shadow and dust into enemies' eyes.
         chance_to_blind: {
             id: 'chance_to_blind',
-            label: '#% Chance to Blind on Hit',
+            label: '#% Chance to Blind on Hit', labelDe: '#% Chance auf Blendung bei Treffer',
             tiers: [
                 { tier: 1, min: 22, max: 32, weight: 100, ilvl: 78 },
                 { tier: 2, min: 13, max: 21, weight: 250, ilvl: 55 },
@@ -1752,7 +1849,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 251, max: 400, weight: 150, ilvl: 80 },
                 { tier: 2, min: 121, max: 250, weight: 300, ilvl: 60 },
@@ -1765,7 +1862,7 @@ const EG_MOD_TABLE_CLOAK = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -1773,7 +1870,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -1804,7 +1901,7 @@ const EG_MOD_TABLE_CHEST = {
         // Chest has the highest life/mana flat values of any slot.
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 120, max: 150, weight: 100, ilvl: 80 },
                 { tier: 2, min: 90, max: 119, weight: 250, ilvl: 65 },
@@ -1815,7 +1912,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 85, max: 110, weight: 100, ilvl: 80 },
                 { tier: 2, min: 62, max: 84, weight: 250, ilvl: 65 },
@@ -1826,7 +1923,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 50, max: 65, weight: 200, ilvl: 75 },
                 { tier: 2, min: 32, max: 49, weight: 400, ilvl: 40 },
@@ -1838,7 +1935,7 @@ const EG_MOD_TABLE_CHEST = {
         // All three defence types get the highest flat values of any slot.
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 160, max: 220, weight: 150, ilvl: 82 },
                 { tier: 2, min: 100, max: 159, weight: 300, ilvl: 60 },
@@ -1848,7 +1945,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 90, max: 120, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 89, weight: 300, ilvl: 60 },
@@ -1858,7 +1955,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 160, max: 220, weight: 150, ilvl: 82 },
                 { tier: 2, min: 100, max: 159, weight: 300, ilvl: 60 },
@@ -1868,7 +1965,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 90, max: 120, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 89, weight: 300, ilvl: 60 },
@@ -1878,7 +1975,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 130, max: 180, weight: 150, ilvl: 82 },
                 { tier: 2, min: 80, max: 129, weight: 300, ilvl: 60 },
@@ -1888,7 +1985,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 90, max: 120, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 89, weight: 300, ilvl: 60 },
@@ -1901,7 +1998,7 @@ const EG_MOD_TABLE_CHEST = {
         // Chest hybrid values are the largest of any slot.
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 50, max1: 65, min2: 65, max2: 90, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 35, max1: 49, min2: 40, max2: 64, weight: 250, ilvl: 50 },
@@ -1911,7 +2008,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 36, max1: 48, min2: 65, max2: 90, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 24, max1: 35, min2: 40, max2: 64, weight: 250, ilvl: 50 },
@@ -1921,7 +2018,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 50, max1: 65, min2: 65, max2: 90, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 35, max1: 49, min2: 40, max2: 64, weight: 250, ilvl: 50 },
@@ -1931,7 +2028,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 36, max1: 48, min2: 65, max2: 90, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 24, max1: 35, min2: 40, max2: 64, weight: 250, ilvl: 50 },
@@ -1941,7 +2038,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 50, max1: 65, min2: 50, max2: 72, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 35, max1: 49, min2: 32, max2: 49, weight: 250, ilvl: 50 },
@@ -1951,7 +2048,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 36, max1: 48, min2: 50, max2: 72, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 24, max1: 35, min2: 32, max2: 49, weight: 250, ilvl: 50 },
@@ -1963,7 +2060,7 @@ const EG_MOD_TABLE_CHEST = {
         // --- HYBRID DEFENSES ---
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
-            label: '+# to Armour\n+@ to Evasion',
+            label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 70, max1: 100, min2: 70, max2: 100, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 42, max1: 69, min2: 42, max2: 69, weight: 250, ilvl: 55 },
@@ -1973,7 +2070,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 70, max1: 100, min2: 55, max2: 80, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 42, max1: 69, min2: 34, max2: 54, weight: 250, ilvl: 55 },
@@ -1983,7 +2080,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 70, max1: 100, min2: 55, max2: 80, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 42, max1: 69, min2: 34, max2: 54, weight: 250, ilvl: 55 },
@@ -1995,7 +2092,7 @@ const EG_MOD_TABLE_CHEST = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -2009,7 +2106,7 @@ const EG_MOD_TABLE_CHEST = {
         // more impactful than the amulet's flat spell_damage.
         inc_spell_damage: {
             id: 'inc_spell_damage',
-            label: '#% increased Spell Damage',
+            label: '#% increased Spell Damage', labelDe: '#% erhöhter Zauberschaden',
             tiers: [
                 { tier: 1, min: 35, max: 50, weight: 70, ilvl: 84 },
                 { tier: 2, min: 20, max: 34, weight: 180, ilvl: 64 },
@@ -2024,7 +2121,7 @@ const EG_MOD_TABLE_CHEST = {
         // is the biggest piece that most logically "soaks" that energy.
         absorption_on_kill: {
             id: 'absorption_on_kill',
-            label: 'Gain # Absorption on Kill',
+            label: 'Gain # Absorption on Kill', labelDe: 'Erhalte # Absorption bei Kill',
             tiers: [
                 { tier: 1, min: 35, max: 50, weight: 100, ilvl: 80 },
                 { tier: 2, min: 20, max: 34, weight: 250, ilvl: 58 },
@@ -2038,7 +2135,7 @@ const EG_MOD_TABLE_CHEST = {
         // mechanic. Slightly higher ceiling than earring/amulet.
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Damage dealt as Life',
+            label: 'Gain #% of Damage dealt as Life', labelDe: 'Erhalte #% des verursachten Schadens als Leben',
             tiers: [
                 { tier: 1, min: 2.5, max: 4, weight: 70, ilvl: 84 },
                 { tier: 2, min: 1.5, max: 2.4, weight: 180, ilvl: 62 },
@@ -2053,7 +2150,7 @@ const EG_MOD_TABLE_CHEST = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -2064,7 +2161,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -2075,7 +2172,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -2088,7 +2185,7 @@ const EG_MOD_TABLE_CHEST = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 20, max: 32, weight: 150, ilvl: 78 },
                 { tier: 2, min: 13, max: 19, weight: 300, ilvl: 55 },
@@ -2099,7 +2196,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 30, max: 45, weight: 150, ilvl: 78 },
                 { tier: 2, min: 20, max: 29, weight: 300, ilvl: 55 },
@@ -2110,7 +2207,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         mana_on_kill: {
             id: 'mana_on_kill',
-            label: 'Gain # Mana on Kill',
+            label: 'Gain # Mana on Kill', labelDe: 'Erhalte # Mana bei Kill',
             tiers: [
                 { tier: 1, min: 18, max: 28, weight: 100, ilvl: 78 },
                 { tier: 2, min: 11, max: 17, weight: 250, ilvl: 55 },
@@ -2122,7 +2219,7 @@ const EG_MOD_TABLE_CHEST = {
         // both torso pieces that most directly manage the absorption layer.
         absorption_regen_rate: {
             id: 'absorption_regen_rate',
-            label: '#% increased Absorption Regeneration Rate',
+            label: '#% increased Absorption Regeneration Rate', labelDe: '#% erhöhte Absorptionsregeneration',
             tiers: [
                 { tier: 1, min: 40, max: 58, weight: 120, ilvl: 80 },
                 { tier: 2, min: 24, max: 39, weight: 280, ilvl: 58 },
@@ -2132,7 +2229,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         faster_absorption_regen_start: {
             id: 'faster_absorption_regen_start',
-            label: 'Absorption begins Regenerating # second(s) sooner',
+            label: 'Absorption begins Regenerating # second(s) sooner', labelDe: 'Absorption regeneriert # Sekunde(n) früher',
             tiers: [
                 { tier: 1, min: 2.0, max: 3.0, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1.2, max: 1.9, weight: 200, ilvl: 60 },
@@ -2144,7 +2241,7 @@ const EG_MOD_TABLE_CHEST = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -2155,7 +2252,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -2166,7 +2263,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -2177,7 +2274,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -2191,7 +2288,7 @@ const EG_MOD_TABLE_CHEST = {
         // armour even without a dedicated shield. Slightly above shoulders.
         block_chance: {
             id: 'block_chance',
-            label: '+#% Chance to Block Attacks',
+            label: '+#% Chance to Block Attacks', labelDe: '+#% Chance, Angriffe zu blocken',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 100, ilvl: 80 },
                 { tier: 2, min: 6, max: 9, weight: 250, ilvl: 58 },
@@ -2201,7 +2298,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         spell_block_chance: {
             id: 'spell_block_chance',
-            label: '+#% Chance to Block Spells',
+            label: '+#% Chance to Block Spells', labelDe: '+#% Chance, Zauber zu blocken',
             tiers: [
                 { tier: 1, min: 7, max: 11, weight: 80, ilvl: 82 },
                 { tier: 2, min: 4, max: 6, weight: 200, ilvl: 60 },
@@ -2211,7 +2308,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         block_recovery: {
             id: 'block_recovery',
-            label: 'Recover from Blocks #% faster',
+            label: 'Recover from Blocks #% faster', labelDe: 'Erholung nach Blocken #% schneller',
             tiers: [
                 { tier: 1, min: 40, max: 60, weight: 100, ilvl: 80 },
                 { tier: 2, min: 24, max: 39, weight: 250, ilvl: 58 },
@@ -2221,7 +2318,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         dodge: {
             id: 'dodge',
-            label: '+#% Chance to Dodge Attacks',
+            label: '+#% Chance to Dodge Attacks', labelDe: '+#% Chance, Angriffen auszuweichen',
             tiers: [
                 { tier: 1, min: 6, max: 9, weight: 100, ilvl: 80 },
                 { tier: 2, min: 4, max: 5, weight: 250, ilvl: 58 },
@@ -2231,7 +2328,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         spell_dodge: {
             id: 'spell_dodge',
-            label: '+#% Chance to Dodge Spells',
+            label: '+#% Chance to Dodge Spells', labelDe: '+#% Chance, Zaubern auszuweichen',
             tiers: [
                 { tier: 1, min: 5, max: 7, weight: 80, ilvl: 82 },
                 { tier: 2, min: 3, max: 4, weight: 200, ilvl: 60 },
@@ -2243,7 +2340,7 @@ const EG_MOD_TABLE_CHEST = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 251, max: 400, weight: 150, ilvl: 80 },
                 { tier: 2, min: 121, max: 250, weight: 300, ilvl: 60 },
@@ -2262,7 +2359,7 @@ const EG_MOD_TABLE_CHEST = {
         // to (damage, regen, crit) when the item rolls this mod.
         precision_damage: {
             id: 'precision_damage',
-            label: 'Each correct cell grants a stack of Precision\n(+#% Damage per stack, lost on Mistake)',
+            label: 'Each correct cell grants a stack of Precision\n(+#% Damage per stack, lost on Mistake)', labelDe: 'Jede korrekte Zelle gewährt einen Präzisions-Stapel\n(+#% Schaden pro Stapel, geht bei einem Fehler verloren)',
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 50, ilvl: 86 },
                 { tier: 2, min: 1, max: 2, weight: 140, ilvl: 68 },
@@ -2271,7 +2368,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         precision_regen: {
             id: 'precision_regen',
-            label: 'Each correct cell grants a stack of Precision\n(+# Life Regenerated per second per stack, lost on Mistake)',
+            label: 'Each correct cell grants a stack of Precision\n(+# Life Regenerated per second per stack, lost on Mistake)', labelDe: 'Jede korrekte Zelle gewährt einen Präzisions-Stapel\n(+# Lebensregeneration pro Sekunde pro Stapel, geht bei einem Fehler verloren)',
             tiers: [
                 { tier: 1, min: 4, max: 6, weight: 60, ilvl: 84 },
                 { tier: 2, min: 2, max: 3, weight: 160, ilvl: 65 },
@@ -2282,7 +2379,7 @@ const EG_MOD_TABLE_CHEST = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -2290,7 +2387,7 @@ const EG_MOD_TABLE_CHEST = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -2319,7 +2416,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- LIFE & MANA ---
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 75, max: 95, weight: 100, ilvl: 80 },
                 { tier: 2, min: 55, max: 74, weight: 250, ilvl: 65 },
@@ -2330,7 +2427,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 55, max: 70, weight: 100, ilvl: 80 },
                 { tier: 2, min: 40, max: 54, weight: 250, ilvl: 65 },
@@ -2344,7 +2441,7 @@ const EG_MOD_TABLE_BRACERS = {
         // Smaller piece — values sit between cloak and chest.
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
@@ -2354,7 +2451,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -2364,7 +2461,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
@@ -2374,7 +2471,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -2384,7 +2481,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
@@ -2394,7 +2491,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -2406,7 +2503,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- HYBRID LIFE / DEFENSE ---
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 32, max1: 42, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 31, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -2416,7 +2513,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 32, max1: 42, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 31, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -2426,7 +2523,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 32, max1: 42, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 31, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -2436,7 +2533,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 22, max1: 30, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 21, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -2446,7 +2543,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 22, max1: 30, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 21, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -2456,7 +2553,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 22, max1: 30, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 21, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -2468,7 +2565,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- HYBRID DEFENSES ---
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
-            label: '+# to Armour\n+@ to Evasion',
+            label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 42, max2: 65, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 24, max2: 41, weight: 250, ilvl: 55 },
@@ -2478,7 +2575,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
@@ -2488,7 +2585,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
@@ -2504,7 +2601,7 @@ const EG_MOD_TABLE_BRACERS = {
         // physical you already have, making it very powerful late game.
         flat_physical_damage: {
             id: 'flat_physical_damage',
-            label: 'Adds # to @ Physical Damage',
+            label: 'Adds # to @ Physical Damage', labelDe: 'Fügt # bis @ physischen Schaden hinzu',
             tiers: [
                 { tier: 1, min1: 18, max1: 26, min2: 48, max2: 68, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 11, max1: 17, min2: 30, max2: 47, weight: 250, ilvl: 60 },
@@ -2514,7 +2611,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         inc_physical_damage: {
             id: 'inc_physical_damage',
-            label: '#% increased Physical Damage',
+            label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
             tiers: [
                 { tier: 1, min: 40, max: 55, weight: 90, ilvl: 82 },
                 { tier: 2, min: 25, max: 39, weight: 220, ilvl: 62 },
@@ -2530,7 +2627,7 @@ const EG_MOD_TABLE_BRACERS = {
         // path that costs prefix budget on two pieces.
         crit_chance: {
             id: 'crit_chance',
-            label: '+#% Critical Strike Chance',
+            label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
                 { tier: 1, min: 5, max: 7, weight: 100, ilvl: 80 },
                 { tier: 2, min: 3, max: 4, weight: 240, ilvl: 60 },
@@ -2540,7 +2637,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         crit_multiplier: {
             id: 'crit_multiplier',
-            label: '+#% to Critical Strike Multiplier',
+            label: '+#% to Critical Strike Multiplier', labelDe: '+#% zum kritischen Schadensmultiplikator',
             tiers: [
                 { tier: 1, min: 40, max: 55, weight: 80, ilvl: 82 },
                 { tier: 2, min: 24, max: 39, weight: 190, ilvl: 62 },
@@ -2552,7 +2649,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -2566,7 +2663,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -2577,7 +2674,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -2588,7 +2685,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -2601,7 +2698,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 16, max: 25, weight: 150, ilvl: 78 },
                 { tier: 2, min: 11, max: 15, weight: 300, ilvl: 55 },
@@ -2612,7 +2709,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -2626,7 +2723,7 @@ const EG_MOD_TABLE_BRACERS = {
         // this is a smaller piece and a suffix slot.
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Damage dealt as Life',
+            label: 'Gain #% of Damage dealt as Life', labelDe: 'Erhalte #% des verursachten Schadens als Leben',
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 90, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 220, ilvl: 60 },
@@ -2637,7 +2734,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -2648,7 +2745,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -2659,7 +2756,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -2670,7 +2767,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -2686,7 +2783,7 @@ const EG_MOD_TABLE_BRACERS = {
         // not raw physical contact), and blind lives on cloaks/amulets.
         chance_to_ignite: {
             id: 'chance_to_ignite',
-            label: '#% Chance to Ignite on Hit',
+            label: '#% Chance to Ignite on Hit', labelDe: '#% Chance auf Entzünden bei Treffer',
             tiers: [
                 { tier: 1, min: 20, max: 28, weight: 110, ilvl: 80 },
                 { tier: 2, min: 12, max: 19, weight: 270, ilvl: 58 },
@@ -2696,7 +2793,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         chance_to_freeze: {
             id: 'chance_to_freeze',
-            label: '#% Chance to Freeze on Hit',
+            label: '#% Chance to Freeze on Hit', labelDe: '#% Chance auf Einfrieren bei Treffer',
             tiers: [
                 { tier: 1, min: 17, max: 24, weight: 110, ilvl: 80 },
                 { tier: 2, min: 10, max: 16, weight: 270, ilvl: 58 },
@@ -2706,7 +2803,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         chance_to_shock: {
             id: 'chance_to_shock',
-            label: '#% Chance to Shock on Hit',
+            label: '#% Chance to Shock on Hit', labelDe: '#% Chance auf Schock bei Treffer',
             tiers: [
                 { tier: 1, min: 20, max: 28, weight: 110, ilvl: 80 },
                 { tier: 2, min: 12, max: 19, weight: 270, ilvl: 58 },
@@ -2718,7 +2815,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 251, max: 400, weight: 150, ilvl: 80 },
                 { tier: 2, min: 121, max: 250, weight: 300, ilvl: 60 },
@@ -2731,7 +2828,7 @@ const EG_MOD_TABLE_BRACERS = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -2739,7 +2836,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -2787,7 +2884,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- LIFE & MANA ---
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 75, max: 95, weight: 100, ilvl: 80 },
                 { tier: 2, min: 55, max: 74, weight: 250, ilvl: 65 },
@@ -2798,7 +2895,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 55, max: 70, weight: 100, ilvl: 80 },
                 { tier: 2, min: 40, max: 54, weight: 250, ilvl: 65 },
@@ -2812,7 +2909,7 @@ const EG_MOD_TABLE_GLOVES = {
         // Bracer-scale values — modest, not a primary defence slot.
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
@@ -2822,7 +2919,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -2832,7 +2929,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
@@ -2842,7 +2939,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -2852,7 +2949,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
@@ -2862,7 +2959,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -2874,7 +2971,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- HYBRID LIFE / DEFENSE ---
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 32, max1: 42, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 31, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -2884,7 +2981,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 32, max1: 42, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 31, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -2894,7 +2991,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 32, max1: 42, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 31, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -2904,7 +3001,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 22, max1: 30, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 21, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -2914,7 +3011,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 22, max1: 30, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 21, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -2924,7 +3021,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 22, max1: 30, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 21, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -2936,7 +3033,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- HYBRID DEFENSES ---
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
-            label: '+# to Armour\n+@ to Evasion',
+            label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 42, max2: 65, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 24, max2: 41, weight: 250, ilvl: 55 },
@@ -2946,7 +3043,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
@@ -2956,7 +3053,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
@@ -2974,7 +3071,7 @@ const EG_MOD_TABLE_GLOVES = {
         // lower to preserve balance across both pieces.
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Damage dealt as Life',
+            label: 'Gain #% of Damage dealt as Life', labelDe: 'Erhalte #% des verursachten Schadens als Leben',
             tiers: [
                 { tier: 1, min: 1.8, max: 2.8, weight: 90, ilvl: 82 },
                 { tier: 2, min: 1.0, max: 1.7, weight: 220, ilvl: 60 },
@@ -2990,7 +3087,7 @@ const EG_MOD_TABLE_GLOVES = {
         // Values are on par with cloak's suffix version.
         multishot: {
             id: 'multishot',
-            label: '+#% Chance to fire an additional Projectile',
+            label: '+#% Chance to fire an additional Projectile', labelDe: '+#% Chance auf ein zusätzliches Projektil',
             tiers: [
                 { tier: 1, min: 22, max: 32, weight: 80, ilvl: 82 },
                 { tier: 2, min: 13, max: 21, weight: 200, ilvl: 62 },
@@ -3002,7 +3099,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -3017,7 +3114,7 @@ const EG_MOD_TABLE_GLOVES = {
         // the puzzle directly.
         chance_for_new_question: {
             id: 'chance_for_new_question',
-            label: '#% Chance to receive a new Question after failing one',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
                 { tier: 1, min: 30, max: 40, weight: 60, ilvl: 84 },
                 { tier: 2, min: 18, max: 29, weight: 160, ilvl: 65 },
@@ -3032,7 +3129,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -3043,7 +3140,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -3054,7 +3151,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -3067,7 +3164,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 16, max: 25, weight: 150, ilvl: 78 },
                 { tier: 2, min: 11, max: 15, weight: 300, ilvl: 55 },
@@ -3078,7 +3175,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -3096,7 +3193,7 @@ const EG_MOD_TABLE_GLOVES = {
         // than earring, on par with chest.
         mana_on_kill: {
             id: 'mana_on_kill',
-            label: 'Gain # Mana on Kill',
+            label: 'Gain # Mana on Kill', labelDe: 'Erhalte # Mana bei Kill',
             tiers: [
                 { tier: 1, min: 18, max: 28, weight: 100, ilvl: 78 },
                 { tier: 2, min: 11, max: 17, weight: 250, ilvl: 55 },
@@ -3112,7 +3209,7 @@ const EG_MOD_TABLE_GLOVES = {
         // Values match chest-suffix scale since the same logic applies.
         absorption_on_kill: {
             id: 'absorption_on_kill',
-            label: 'Gain # Absorption on Kill',
+            label: 'Gain # Absorption on Kill', labelDe: 'Erhalte # Absorption bei Kill',
             tiers: [
                 { tier: 1, min: 35, max: 50, weight: 100, ilvl: 80 },
                 { tier: 2, min: 20, max: 34, weight: 250, ilvl: 58 },
@@ -3129,7 +3226,7 @@ const EG_MOD_TABLE_GLOVES = {
         // for accuracy-focused builds. Values identical to helmet/bracers.
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 251, max: 400, weight: 130, ilvl: 80 },
                 { tier: 2, min: 121, max: 250, weight: 260, ilvl: 60 },
@@ -3142,7 +3239,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3153,7 +3250,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3164,7 +3261,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3175,7 +3272,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -3193,7 +3290,7 @@ const EG_MOD_TABLE_GLOVES = {
         // and capped at 3 tiers.
         reveal_hint: {
             id: 'reveal_hint',
-            label: '#% Chance to reveal a Hint on Exercise Questions',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 50, ilvl: 84 },
                 { tier: 2, min: 14, max: 24, weight: 140, ilvl: 65 },
@@ -3204,7 +3301,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -3212,7 +3309,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -3247,7 +3344,7 @@ const EG_MOD_TABLE_BELT = {
         // Belt has the highest flat life of any non-chest slot.
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 100, max: 125, weight: 100, ilvl: 80 },
                 { tier: 2, min: 75, max: 99, weight: 250, ilvl: 65 },
@@ -3258,7 +3355,7 @@ const EG_MOD_TABLE_BELT = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 65, max: 82, weight: 100, ilvl: 80 },
                 { tier: 2, min: 48, max: 64, weight: 250, ilvl: 65 },
@@ -3273,7 +3370,7 @@ const EG_MOD_TABLE_BELT = {
         // "flask slot" equivalent — it defines how well you recover.
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 55, max: 70, weight: 150, ilvl: 75 },
                 { tier: 2, min: 38, max: 54, weight: 320, ilvl: 50 },
@@ -3289,7 +3386,7 @@ const EG_MOD_TABLE_BELT = {
         // and a high flat heart_heal prefix, costing the full prefix budget.
         inc_heart_heal: {
             id: 'inc_heart_heal',
-            label: '#% increased healing received from Hearts',
+            label: '#% increased healing received from Hearts', labelDe: '#% erhöhte Heilung durch Herzen',
             tiers: [
                 { tier: 1, min: 40, max: 55, weight: 70, ilvl: 84 },
                 { tier: 2, min: 25, max: 39, weight: 180, ilvl: 65 },
@@ -3302,7 +3399,7 @@ const EG_MOD_TABLE_BELT = {
         // Modest values — bracers/gloves scale.
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
@@ -3312,7 +3409,7 @@ const EG_MOD_TABLE_BELT = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -3322,7 +3419,7 @@ const EG_MOD_TABLE_BELT = {
         },
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
@@ -3332,7 +3429,7 @@ const EG_MOD_TABLE_BELT = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -3342,7 +3439,7 @@ const EG_MOD_TABLE_BELT = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
@@ -3352,7 +3449,7 @@ const EG_MOD_TABLE_BELT = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -3364,7 +3461,7 @@ const EG_MOD_TABLE_BELT = {
         // --- HYBRID LIFE / DEFENSE ---
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 40, max1: 52, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 28, max1: 39, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -3374,7 +3471,7 @@ const EG_MOD_TABLE_BELT = {
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 40, max1: 52, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 28, max1: 39, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -3384,7 +3481,7 @@ const EG_MOD_TABLE_BELT = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 40, max1: 52, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 28, max1: 39, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -3394,7 +3491,7 @@ const EG_MOD_TABLE_BELT = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 28, max1: 38, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 27, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -3404,7 +3501,7 @@ const EG_MOD_TABLE_BELT = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 28, max1: 38, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 27, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -3414,7 +3511,7 @@ const EG_MOD_TABLE_BELT = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 28, max1: 38, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 27, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -3426,7 +3523,7 @@ const EG_MOD_TABLE_BELT = {
         // --- HYBRID DEFENSES ---
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
-            label: '+# to Armour\n+@ to Evasion',
+            label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 42, max2: 65, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 24, max2: 41, weight: 250, ilvl: 55 },
@@ -3436,7 +3533,7 @@ const EG_MOD_TABLE_BELT = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
@@ -3446,7 +3543,7 @@ const EG_MOD_TABLE_BELT = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
@@ -3458,7 +3555,7 @@ const EG_MOD_TABLE_BELT = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -3475,7 +3572,7 @@ const EG_MOD_TABLE_BELT = {
         // here than agility or intelligence.
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 160, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 320, ilvl: 65 },
@@ -3486,7 +3583,7 @@ const EG_MOD_TABLE_BELT = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -3497,7 +3594,7 @@ const EG_MOD_TABLE_BELT = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -3512,7 +3609,7 @@ const EG_MOD_TABLE_BELT = {
         // armour slot. The belt "sustains" the body passively.
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 20, max: 30, weight: 120, ilvl: 78 },
                 { tier: 2, min: 13, max: 19, weight: 250, ilvl: 55 },
@@ -3523,7 +3620,7 @@ const EG_MOD_TABLE_BELT = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -3540,7 +3637,7 @@ const EG_MOD_TABLE_BELT = {
         // Higher ceiling than mana_on_kill since life is more scarce.
         life_on_kill: {
             id: 'life_on_kill',
-            label: 'Gain # Life on Kill',
+            label: 'Gain # Life on Kill', labelDe: 'Erhalte # Leben bei Kill',
             tiers: [
                 { tier: 1, min: 30, max: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min: 18, max: 29, weight: 250, ilvl: 55 },
@@ -3552,7 +3649,7 @@ const EG_MOD_TABLE_BELT = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3563,7 +3660,7 @@ const EG_MOD_TABLE_BELT = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3574,7 +3671,7 @@ const EG_MOD_TABLE_BELT = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3585,7 +3682,7 @@ const EG_MOD_TABLE_BELT = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -3597,7 +3694,7 @@ const EG_MOD_TABLE_BELT = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -3605,7 +3702,7 @@ const EG_MOD_TABLE_BELT = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -3650,7 +3747,7 @@ const EG_MOD_TABLE_PANTS = {
         // Belt-adjacent flat life — a large lower-body piece.
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 95, max: 120, weight: 100, ilvl: 80 },
                 { tier: 2, min: 70, max: 94, weight: 250, ilvl: 65 },
@@ -3661,7 +3758,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 62, max: 80, weight: 100, ilvl: 80 },
                 { tier: 2, min: 46, max: 61, weight: 250, ilvl: 65 },
@@ -3672,7 +3769,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 45, max: 58, weight: 200, ilvl: 75 },
                 { tier: 2, min: 28, max: 44, weight: 400, ilvl: 40 },
@@ -3686,7 +3783,7 @@ const EG_MOD_TABLE_PANTS = {
         // below the cloak's dedicated evasion numbers.
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 100, max: 145, weight: 150, ilvl: 82 },
                 { tier: 2, min: 62, max: 99, weight: 300, ilvl: 60 },
@@ -3696,7 +3793,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 75, max: 95, weight: 150, ilvl: 82 },
                 { tier: 2, min: 48, max: 74, weight: 300, ilvl: 60 },
@@ -3706,7 +3803,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
@@ -3716,7 +3813,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -3726,7 +3823,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
@@ -3736,7 +3833,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -3748,7 +3845,7 @@ const EG_MOD_TABLE_PANTS = {
         // --- HYBRID LIFE / DEFENSE ---
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 38, max1: 50, min2: 45, max2: 65, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 26, max1: 37, min2: 28, max2: 44, weight: 250, ilvl: 50 },
@@ -3758,7 +3855,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 26, max1: 36, min2: 45, max2: 65, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 17, max1: 25, min2: 28, max2: 44, weight: 250, ilvl: 50 },
@@ -3768,7 +3865,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 38, max1: 50, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 26, max1: 37, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -3778,7 +3875,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 26, max1: 36, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 17, max1: 25, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -3788,7 +3885,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 38, max1: 50, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 26, max1: 37, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -3798,7 +3895,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 26, max1: 36, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 17, max1: 25, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -3811,7 +3908,7 @@ const EG_MOD_TABLE_PANTS = {
         // Evasion pairs are the premium hybrid — pants' primary stat.
         hybrid_evasion_armour: {
             id: 'hybrid_evasion_armour',
-            label: '+# to Evasion\n+@ to Armour',
+            label: '+# to Evasion\n+@ to Armour', labelDe: '+# zu Ausweichen\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 48, max1: 72, min2: 38, max2: 58, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 28, max1: 47, min2: 22, max2: 37, weight: 250, ilvl: 55 },
@@ -3821,7 +3918,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 48, max1: 72, min2: 28, max2: 44, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 28, max1: 47, min2: 16, max2: 27, weight: 250, ilvl: 55 },
@@ -3831,7 +3928,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 38, max1: 58, min2: 28, max2: 44, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 22, max1: 37, min2: 16, max2: 27, weight: 250, ilvl: 55 },
@@ -3843,7 +3940,7 @@ const EG_MOD_TABLE_PANTS = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -3860,7 +3957,7 @@ const EG_MOD_TABLE_PANTS = {
         // window, useful for buying reaction time rather than raw delay.
         stagger: {
             id: 'stagger',
-            label: '#% Chance to Stagger a Monster on Hit\n(Pauses their Charge Timer for 1 second)',
+            label: '#% Chance to Stagger a Monster on Hit\n(Pauses their Charge Timer for 1 second)', labelDe: '#% Chance, ein Monster bei Treffer ins Wanken zu bringen\n(pausiert dessen Ansturm-Timer für 1 Sekunde)',
             tiers: [
                 { tier: 1, min: 22, max: 30, weight: 80, ilvl: 84 },
                 { tier: 2, min: 13, max: 21, weight: 200, ilvl: 63 },
@@ -3877,7 +3974,7 @@ const EG_MOD_TABLE_PANTS = {
         // Rolls with better weight than strength or intelligence here.
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 160, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 320, ilvl: 65 },
@@ -3888,7 +3985,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -3899,7 +3996,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -3912,7 +4009,7 @@ const EG_MOD_TABLE_PANTS = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 18, max: 28, weight: 150, ilvl: 78 },
                 { tier: 2, min: 12, max: 17, weight: 300, ilvl: 55 },
@@ -3923,7 +4020,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -3940,7 +4037,7 @@ const EG_MOD_TABLE_PANTS = {
         // numbers are still higher. Dodge values match cloak's suffix tier.
         dodge: {
             id: 'dodge',
-            label: '+#% Chance to Dodge Attacks',
+            label: '+#% Chance to Dodge Attacks', labelDe: '+#% Chance, Angriffen auszuweichen',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
                 { tier: 2, min: 5, max: 7, weight: 250, ilvl: 58 },
@@ -3950,7 +4047,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         spell_dodge: {
             id: 'spell_dodge',
-            label: '+#% Chance to Dodge Spells',
+            label: '+#% Chance to Dodge Spells', labelDe: '+#% Chance, Zaubern auszuweichen',
             tiers: [
                 { tier: 1, min: 6, max: 9, weight: 80, ilvl: 82 },
                 { tier: 2, min: 4, max: 5, weight: 200, ilvl: 60 },
@@ -3962,7 +4059,7 @@ const EG_MOD_TABLE_PANTS = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3973,7 +4070,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3984,7 +4081,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -3995,7 +4092,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -4007,7 +4104,7 @@ const EG_MOD_TABLE_PANTS = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 251, max: 400, weight: 150, ilvl: 80 },
                 { tier: 2, min: 121, max: 250, weight: 300, ilvl: 60 },
@@ -4026,7 +4123,7 @@ const EG_MOD_TABLE_PANTS = {
         // Kept as a chance rather than guaranteed to preserve tension.
         preemptive_dodge: {
             id: 'preemptive_dodge',
-            label: '#% Chance to automatically Dodge the first Attack from each Monster',
+            label: '#% Chance to automatically Dodge the first Attack from each Monster', labelDe: '#% Chance, dem ersten Angriff jedes Monsters automatisch auszuweichen',
             tiers: [
                 { tier: 1, min: 35, max: 50, weight: 70, ilvl: 84 },
                 { tier: 2, min: 20, max: 34, weight: 180, ilvl: 65 },
@@ -4038,7 +4135,7 @@ const EG_MOD_TABLE_PANTS = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -4046,7 +4143,7 @@ const EG_MOD_TABLE_PANTS = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -4092,7 +4189,7 @@ const EG_MOD_TABLE_BOOTS = {
         // Slightly below pants scale — boots are a smaller piece.
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 85, max: 108, weight: 100, ilvl: 80 },
                 { tier: 2, min: 62, max: 84, weight: 250, ilvl: 65 },
@@ -4103,7 +4200,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 55, max: 72, weight: 100, ilvl: 80 },
                 { tier: 2, min: 40, max: 54, weight: 250, ilvl: 65 },
@@ -4114,7 +4211,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 38, max: 52, weight: 200, ilvl: 75 },
                 { tier: 2, min: 24, max: 37, weight: 400, ilvl: 40 },
@@ -4128,7 +4225,7 @@ const EG_MOD_TABLE_BOOTS = {
         // below chest/shoulders.
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 95, max: 138, weight: 150, ilvl: 82 },
                 { tier: 2, min: 58, max: 94, weight: 300, ilvl: 60 },
@@ -4138,7 +4235,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 75, max: 95, weight: 150, ilvl: 82 },
                 { tier: 2, min: 48, max: 74, weight: 300, ilvl: 60 },
@@ -4148,7 +4245,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
@@ -4158,7 +4255,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -4168,7 +4265,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
@@ -4178,7 +4275,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
                 { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
@@ -4191,7 +4288,7 @@ const EG_MOD_TABLE_BOOTS = {
         // Armour pairs are the premium hybrid on boots.
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 34, max1: 45, min2: 42, max2: 62, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 33, min2: 24, max2: 41, weight: 250, ilvl: 50 },
@@ -4201,7 +4298,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 23, max1: 32, min2: 42, max2: 62, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 22, min2: 24, max2: 41, weight: 250, ilvl: 50 },
@@ -4211,7 +4308,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 34, max1: 45, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 33, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -4221,7 +4318,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 23, max1: 32, min2: 38, max2: 58, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 22, min2: 22, max2: 37, weight: 250, ilvl: 50 },
@@ -4231,7 +4328,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 34, max1: 45, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 22, max1: 33, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -4241,7 +4338,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 23, max1: 32, min2: 28, max2: 44, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 15, max1: 22, min2: 16, max2: 27, weight: 250, ilvl: 50 },
@@ -4254,7 +4351,7 @@ const EG_MOD_TABLE_BOOTS = {
         // Armour pairs are premium here — boots' primary stat.
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
-            label: '+# to Armour\n+@ to Evasion',
+            label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 48, max1: 72, min2: 38, max2: 58, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 28, max1: 47, min2: 22, max2: 37, weight: 250, ilvl: 55 },
@@ -4264,7 +4361,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 48, max1: 72, min2: 28, max2: 44, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 28, max1: 47, min2: 16, max2: 27, weight: 250, ilvl: 55 },
@@ -4274,7 +4371,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 38, max1: 58, min2: 28, max2: 44, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 22, max1: 37, min2: 16, max2: 27, weight: 250, ilvl: 55 },
@@ -4286,7 +4383,7 @@ const EG_MOD_TABLE_BOOTS = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -4304,7 +4401,7 @@ const EG_MOD_TABLE_BOOTS = {
         // charges, so even a moderate reduction has real value.
         grounded: {
             id: 'grounded',
-            label: '#% Chance to reduce incoming Charge damage by @%',
+            label: '#% Chance to reduce incoming Charge damage by @%', labelDe: '#% Chance, eingehenden Ansturm-Schaden um @% zu verringern',
             tiers: [
                 { tier: 1, min: 35, max: 50, min2: 40, max2: 55, weight: 80, ilvl: 84 },
                 { tier: 2, min: 22, max: 34, min2: 26, max2: 39, weight: 200, ilvl: 63 },
@@ -4320,7 +4417,7 @@ const EG_MOD_TABLE_BOOTS = {
         // Strength is primary for boots — solid, planted, heavy footwear.
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 160, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 320, ilvl: 65 },
@@ -4331,7 +4428,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -4342,7 +4439,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -4355,7 +4452,7 @@ const EG_MOD_TABLE_BOOTS = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 16, max: 25, weight: 150, ilvl: 78 },
                 { tier: 2, min: 11, max: 15, weight: 300, ilvl: 55 },
@@ -4366,7 +4463,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -4379,7 +4476,7 @@ const EG_MOD_TABLE_BOOTS = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -4390,7 +4487,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -4401,7 +4498,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -4412,7 +4509,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -4424,7 +4521,7 @@ const EG_MOD_TABLE_BOOTS = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 251, max: 400, weight: 150, ilvl: 80 },
                 { tier: 2, min: 121, max: 250, weight: 300, ilvl: 60 },
@@ -4444,7 +4541,7 @@ const EG_MOD_TABLE_BOOTS = {
         // for a full charge-disruption build.
         first_step: {
             id: 'first_step',
-            label: 'Monsters do not Charge for the first # seconds of each Map',
+            label: 'Monsters do not Charge for the first # seconds of each Map', labelDe: 'Monster führen in den ersten # Sekunden jeder Karte keinen Ansturm durch',
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 70, ilvl: 84 },
                 { tier: 2, min: 7, max: 11, weight: 180, ilvl: 65 },
@@ -4456,7 +4553,7 @@ const EG_MOD_TABLE_BOOTS = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -4464,7 +4561,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -4511,7 +4608,7 @@ const EG_MOD_TABLE_RING = {
         // Between earring and amulet scale.
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 65, max: 84, weight: 100, ilvl: 80 },
                 { tier: 2, min: 48, max: 64, weight: 250, ilvl: 65 },
@@ -4522,7 +4619,7 @@ const EG_MOD_TABLE_RING = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 48, max: 62, weight: 100, ilvl: 80 },
                 { tier: 2, min: 34, max: 47, weight: 250, ilvl: 65 },
@@ -4533,7 +4630,7 @@ const EG_MOD_TABLE_RING = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 32, max: 42, weight: 200, ilvl: 75 },
                 { tier: 2, min: 20, max: 31, weight: 400, ilvl: 40 },
@@ -4545,7 +4642,7 @@ const EG_MOD_TABLE_RING = {
         // Rings channel life back through skin contact on every hit.
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Damage dealt as Life',
+            label: 'Gain #% of Damage dealt as Life', labelDe: 'Erhalte #% des verursachten Schadens als Leben',
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
@@ -4558,7 +4655,7 @@ const EG_MOD_TABLE_RING = {
         // they're a secondary jewelry slot, but two rings can stack.
         fire_damage: {
             id: 'fire_damage',
-            label: 'Adds # to @ Fire Damage',
+            label: 'Adds # to @ Fire Damage', labelDe: 'Fügt # bis @ Feuerschaden hinzu',
             tiers: [
                 { tier: 1, min1: 14, max1: 22, min2: 40, max2: 58, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 8, max1: 13, min2: 25, max2: 39, weight: 250, ilvl: 60 },
@@ -4568,7 +4665,7 @@ const EG_MOD_TABLE_RING = {
         },
         cold_damage: {
             id: 'cold_damage',
-            label: 'Adds # to @ Cold Damage',
+            label: 'Adds # to @ Cold Damage', labelDe: 'Fügt # bis @ Kälteschaden hinzu',
             tiers: [
                 { tier: 1, min1: 12, max1: 20, min2: 36, max2: 52, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 7, max1: 11, min2: 22, max2: 35, weight: 250, ilvl: 60 },
@@ -4578,7 +4675,7 @@ const EG_MOD_TABLE_RING = {
         },
         lightning_damage: {
             id: 'lightning_damage',
-            label: 'Adds # to @ Lightning Damage',
+            label: 'Adds # to @ Lightning Damage', labelDe: 'Fügt # bis @ Blitzschaden hinzu',
             tiers: [
                 { tier: 1, min1: 3, max1: 9, min2: 44, max2: 68, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 2, max1: 6, min2: 28, max2: 43, weight: 250, ilvl: 60 },
@@ -4588,7 +4685,7 @@ const EG_MOD_TABLE_RING = {
         },
         shadow_damage: {
             id: 'shadow_damage',
-            label: 'Adds # to @ Shadow Damage',
+            label: 'Adds # to @ Shadow Damage', labelDe: 'Fügt # bis @ Schattenschaden hinzu',
             tiers: [
                 { tier: 1, min1: 10, max1: 16, min2: 28, max2: 44, weight: 80, ilvl: 82 },
                 { tier: 2, min1: 6, max1: 9, min2: 17, max2: 27, weight: 180, ilvl: 62 },
@@ -4600,7 +4697,7 @@ const EG_MOD_TABLE_RING = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
                 { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
@@ -4618,7 +4715,7 @@ const EG_MOD_TABLE_RING = {
         // fire independently per mistake.
         mana_on_mistake: {
             id: 'mana_on_mistake',
-            label: 'Gain # Mana when you make a Mistake',
+            label: 'Gain # Mana when you make a Mistake', labelDe: 'Erhalte # Mana, wenn du einen Fehler machst',
             tiers: [
                 { tier: 1, min: 40, max: 58, weight: 80, ilvl: 82 },
                 { tier: 2, min: 24, max: 39, weight: 200, ilvl: 62 },
@@ -4633,7 +4730,7 @@ const EG_MOD_TABLE_RING = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -4644,7 +4741,7 @@ const EG_MOD_TABLE_RING = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -4655,7 +4752,7 @@ const EG_MOD_TABLE_RING = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -4668,7 +4765,7 @@ const EG_MOD_TABLE_RING = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 12, max: 19, weight: 150, ilvl: 78 },
                 { tier: 2, min: 8, max: 11, weight: 300, ilvl: 55 },
@@ -4679,7 +4776,7 @@ const EG_MOD_TABLE_RING = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 20, max: 28, weight: 150, ilvl: 78 },
                 { tier: 2, min: 12, max: 19, weight: 300, ilvl: 55 },
@@ -4690,7 +4787,7 @@ const EG_MOD_TABLE_RING = {
         },
         mana_on_kill: {
             id: 'mana_on_kill',
-            label: 'Gain # Mana on Kill',
+            label: 'Gain # Mana on Kill', labelDe: 'Erhalte # Mana bei Kill',
             tiers: [
                 { tier: 1, min: 14, max: 22, weight: 100, ilvl: 78 },
                 { tier: 2, min: 8, max: 13, weight: 250, ilvl: 55 },
@@ -4700,7 +4797,7 @@ const EG_MOD_TABLE_RING = {
         },
         absorption_on_kill: {
             id: 'absorption_on_kill',
-            label: 'Gain # Absorption on Kill',
+            label: 'Gain # Absorption on Kill', labelDe: 'Erhalte # Absorption bei Kill',
             tiers: [
                 { tier: 1, min: 18, max: 28, weight: 100, ilvl: 80 },
                 { tier: 2, min: 10, max: 17, weight: 250, ilvl: 58 },
@@ -4712,7 +4809,7 @@ const EG_MOD_TABLE_RING = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -4723,7 +4820,7 @@ const EG_MOD_TABLE_RING = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -4734,7 +4831,7 @@ const EG_MOD_TABLE_RING = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -4745,7 +4842,7 @@ const EG_MOD_TABLE_RING = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 26, max: 32, weight: 150, ilvl: 82 },
                 { tier: 2, min: 19, max: 25, weight: 300, ilvl: 65 },
@@ -4757,7 +4854,7 @@ const EG_MOD_TABLE_RING = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 151, max: 250, weight: 150, ilvl: 80 },
                 { tier: 2, min: 81, max: 150, weight: 300, ilvl: 60 },
@@ -4770,7 +4867,7 @@ const EG_MOD_TABLE_RING = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -4778,7 +4875,7 @@ const EG_MOD_TABLE_RING = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
                 { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
@@ -4795,7 +4892,7 @@ const EG_MOD_TABLE_RING = {
         // The # value is the echo damage as a % of the original hit.
         echo: {
             id: 'echo',
-            label: '#% Chance for Hits to Echo for @% of their Damage',
+            label: '#% Chance for Hits to Echo for @% of their Damage', labelDe: '#% Chance, dass Treffer mit @% ihres Schadens nachhallen',
             tiers: [
                 { tier: 1, min: 25, max: 35, min2: 35, max2: 50, weight: 60, ilvl: 85 },
                 { tier: 2, min: 16, max: 24, min2: 22, max2: 34, weight: 160, ilvl: 66 },
@@ -4837,7 +4934,7 @@ const EG_MOD_TABLE_ARCANE = {
         // --- MANA (primary resource for this slot) ---
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 55, max: 72, weight: 100, ilvl: 80 },
                 { tier: 2, min: 38, max: 54, weight: 250, ilvl: 65 },
@@ -4848,7 +4945,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 60, max: 78, weight: 100, ilvl: 80 },
                 { tier: 2, min: 44, max: 59, weight: 250, ilvl: 65 },
@@ -4862,7 +4959,7 @@ const EG_MOD_TABLE_ARCANE = {
         // The sigil amplifies class ability power directly.
         spell_damage: {
             id: 'spell_damage',
-            label: '+# to Spell Damage',
+            label: '+# to Spell Damage', labelDe: '+# zu Zauberschaden',
             tiers: [
                 { tier: 1, min: 60, max: 80, weight: 100, ilvl: 80 },
                 { tier: 2, min: 38, max: 59, weight: 250, ilvl: 60 },
@@ -4873,7 +4970,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         inc_spell_damage: {
             id: 'inc_spell_damage',
-            label: '#% increased Spell Damage',
+            label: '#% increased Spell Damage', labelDe: '#% erhöhter Zauberschaden',
             tiers: [
                 { tier: 1, min: 30, max: 44, weight: 80, ilvl: 82 },
                 { tier: 2, min: 18, max: 29, weight: 200, ilvl: 62 },
@@ -4887,7 +4984,7 @@ const EG_MOD_TABLE_ARCANE = {
         // values since the arcane slot is more utility than raw offense.
         fire_damage: {
             id: 'fire_damage',
-            label: 'Adds # to @ Fire Damage',
+            label: 'Adds # to @ Fire Damage', labelDe: 'Fügt # bis @ Feuerschaden hinzu',
             tiers: [
                 { tier: 1, min1: 16, max1: 24, min2: 44, max2: 62, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 10, max1: 15, min2: 28, max2: 43, weight: 240, ilvl: 60 },
@@ -4897,7 +4994,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         cold_damage: {
             id: 'cold_damage',
-            label: 'Adds # to @ Cold Damage',
+            label: 'Adds # to @ Cold Damage', labelDe: 'Fügt # bis @ Kälteschaden hinzu',
             tiers: [
                 { tier: 1, min1: 14, max1: 22, min2: 40, max2: 56, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 8, max1: 13, min2: 25, max2: 39, weight: 240, ilvl: 60 },
@@ -4907,7 +5004,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         lightning_damage: {
             id: 'lightning_damage',
-            label: 'Adds # to @ Lightning Damage',
+            label: 'Adds # to @ Lightning Damage', labelDe: 'Fügt # bis @ Blitzschaden hinzu',
             tiers: [
                 { tier: 1, min1: 4, max1: 10, min2: 48, max2: 74, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 2, max1: 7, min2: 30, max2: 47, weight: 240, ilvl: 60 },
@@ -4917,7 +5014,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         shadow_damage: {
             id: 'shadow_damage',
-            label: 'Adds # to @ Shadow Damage',
+            label: 'Adds # to @ Shadow Damage', labelDe: 'Fügt # bis @ Schattenschaden hinzu',
             tiers: [
                 { tier: 1, min1: 12, max1: 18, min2: 32, max2: 50, weight: 75, ilvl: 82 },
                 { tier: 2, min1: 7, max1: 11, min2: 20, max2: 31, weight: 170, ilvl: 62 },
@@ -4929,7 +5026,7 @@ const EG_MOD_TABLE_ARCANE = {
         // --- CRITICAL STRIKES ---
         crit_chance: {
             id: 'crit_chance',
-            label: '+#% Critical Strike Chance',
+            label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
                 { tier: 1, min: 5, max: 7, weight: 100, ilvl: 80 },
                 { tier: 2, min: 3, max: 4, weight: 220, ilvl: 60 },
@@ -4939,7 +5036,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         crit_multiplier: {
             id: 'crit_multiplier',
-            label: '+#% to Critical Strike Multiplier',
+            label: '+#% to Critical Strike Multiplier', labelDe: '+#% zum kritischen Schadensmultiplikator',
             tiers: [
                 { tier: 1, min: 40, max: 55, weight: 80, ilvl: 82 },
                 { tier: 2, min: 24, max: 39, weight: 190, ilvl: 62 },
@@ -4951,7 +5048,7 @@ const EG_MOD_TABLE_ARCANE = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
                 { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
@@ -4969,7 +5066,7 @@ const EG_MOD_TABLE_ARCANE = {
         // for builds that thrive on long mistake-free runs.
         arcane_surge: {
             id: 'arcane_surge',
-            label: 'After # consecutive correct cells, gain @ Mana',
+            label: 'After # consecutive correct cells, gain @ Mana', labelDe: 'Nach # aufeinanderfolgenden korrekten Zellen erhältst du @ Mana',
             tiers: [
                 { tier: 1, min: 5, max: 5, min2: 80, max2: 110, weight: 70, ilvl: 84 },
                 { tier: 2, min: 7, max: 7, min2: 55, max2: 79, weight: 180, ilvl: 65 },
@@ -4987,7 +5084,7 @@ const EG_MOD_TABLE_ARCANE = {
         // and recharges as mana refills. The # value is the conversion %.
         mana_to_damage: {
             id: 'mana_to_damage',
-            label: '#% of current Mana added as Damage on next Hit\n(that Mana is then consumed)',
+            label: '#% of current Mana added as Damage on next Hit\n(that Mana is then consumed)', labelDe: '#% des aktuellen Manas werden dem nächsten Treffer als Schaden hinzugefügt\n(dieses Mana wird danach verbraucht)',
             tiers: [
                 { tier: 1, min: 18, max: 25, weight: 70, ilvl: 84 },
                 { tier: 2, min: 11, max: 17, weight: 180, ilvl: 65 },
@@ -5002,7 +5099,7 @@ const EG_MOD_TABLE_ARCANE = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -5013,7 +5110,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -5024,7 +5121,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -5037,7 +5134,7 @@ const EG_MOD_TABLE_ARCANE = {
         // --- REGEN & RECOVERY ---
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 22, max: 32, weight: 130, ilvl: 78 },
                 { tier: 2, min: 14, max: 21, weight: 270, ilvl: 55 },
@@ -5048,7 +5145,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 12, max: 19, weight: 150, ilvl: 78 },
                 { tier: 2, min: 8, max: 11, weight: 300, ilvl: 55 },
@@ -5059,7 +5156,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Damage dealt as Life',
+            label: 'Gain #% of Damage dealt as Life', labelDe: 'Erhalte #% des verursachten Schadens als Leben',
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
@@ -5070,7 +5167,7 @@ const EG_MOD_TABLE_ARCANE = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -5081,7 +5178,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -5092,7 +5189,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 38, max: 44, weight: 250, ilvl: 80 },
                 { tier: 2, min: 29, max: 37, weight: 500, ilvl: 60 },
@@ -5103,7 +5200,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 26, max: 32, weight: 150, ilvl: 82 },
                 { tier: 2, min: 19, max: 25, weight: 300, ilvl: 65 },
@@ -5115,7 +5212,7 @@ const EG_MOD_TABLE_ARCANE = {
         // --- ACCURACY ---
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 151, max: 250, weight: 150, ilvl: 80 },
                 { tier: 2, min: 81, max: 150, weight: 300, ilvl: 60 },
@@ -5128,7 +5225,7 @@ const EG_MOD_TABLE_ARCANE = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -5136,7 +5233,7 @@ const EG_MOD_TABLE_ARCANE = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
                 { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
@@ -5185,7 +5282,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // --- LIFE (primary for a protective charm) ---
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 70, max: 90, weight: 100, ilvl: 80 },
                 { tier: 2, min: 50, max: 69, weight: 250, ilvl: 65 },
@@ -5196,7 +5293,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 50, max: 64, weight: 100, ilvl: 80 },
                 { tier: 2, min: 35, max: 49, weight: 250, ilvl: 65 },
@@ -5207,7 +5304,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 34, max: 46, weight: 200, ilvl: 75 },
                 { tier: 2, min: 21, max: 33, weight: 400, ilvl: 40 },
@@ -5224,7 +5321,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // The # value is the flat damage reduced per hit per element.
         arcane_resistance: {
             id: 'arcane_resistance',
-            label: 'Reduce all Elemental Damage taken by #',
+            label: 'Reduce all Elemental Damage taken by #', labelDe: 'Verringert allen erlittenen Elementarschaden um #',
             tiers: [
                 { tier: 1, min: 18, max: 25, weight: 70, ilvl: 84 },
                 { tier: 2, min: 11, max: 17, weight: 180, ilvl: 65 },
@@ -5242,7 +5339,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // The # value is the health you're left with after the ward fires.
         warding: {
             id: 'warding',
-            label: 'Once per Map, survive a killing blow with # Health remaining',
+            label: 'Once per Map, survive a killing blow with # Health remaining', labelDe: 'Einmal pro Karte überlebst du einen tödlichen Treffer mit # Restleben',
             tiers: [
                 { tier: 1, min: 80, max: 120, weight: 30, ilvl: 88 },
                 { tier: 2, min: 40, max: 79, weight: 90, ilvl: 72 },
@@ -5254,7 +5351,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
                 { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
@@ -5263,7 +5360,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         mistake_not_count: {
             id: 'mistake_not_count',
-            label: '#% Chance for Mistakes to not Count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 40, ilvl: 85 },
                 { tier: 2, min: 6, max: 11, weight: 120, ilvl: 65 },
@@ -5277,7 +5374,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // --- ATTRIBUTES ---
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -5288,7 +5385,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -5299,7 +5396,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 36, max: 44, weight: 200, ilvl: 80 },
                 { tier: 2, min: 28, max: 35, weight: 400, ilvl: 65 },
@@ -5312,7 +5409,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 14, max: 22, weight: 130, ilvl: 78 },
                 { tier: 2, min: 9, max: 13, weight: 270, ilvl: 55 },
@@ -5323,7 +5420,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 20, max: 28, weight: 150, ilvl: 78 },
                 { tier: 2, min: 12, max: 19, weight: 300, ilvl: 55 },
@@ -5334,7 +5431,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         absorption_on_kill: {
             id: 'absorption_on_kill',
-            label: 'Gain # Absorption on Kill',
+            label: 'Gain # Absorption on Kill', labelDe: 'Erhalte # Absorption bei Kill',
             tiers: [
                 { tier: 1, min: 18, max: 28, weight: 100, ilvl: 80 },
                 { tier: 2, min: 10, max: 17, weight: 250, ilvl: 58 },
@@ -5349,7 +5446,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // resistance is this slot's primary defensive identity.
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 40, max: 46, weight: 220, ilvl: 80 },
                 { tier: 2, min: 30, max: 39, weight: 440, ilvl: 60 },
@@ -5360,7 +5457,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 40, max: 46, weight: 220, ilvl: 80 },
                 { tier: 2, min: 30, max: 39, weight: 440, ilvl: 60 },
@@ -5371,7 +5468,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 40, max: 46, weight: 220, ilvl: 80 },
                 { tier: 2, min: 30, max: 39, weight: 440, ilvl: 60 },
@@ -5382,7 +5479,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 28, max: 34, weight: 130, ilvl: 82 },
                 { tier: 2, min: 20, max: 27, weight: 270, ilvl: 65 },
@@ -5400,7 +5497,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // Pairs with warding for the ultimate survival-focused talisman.
         fate: {
             id: 'fate',
-            label: '#% Chance to negate any incoming Hit',
+            label: '#% Chance to negate any incoming Hit', labelDe: '#% Chance, einen beliebigen eingehenden Treffer zu negieren',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 60, ilvl: 86 },
                 { tier: 2, min: 4, max: 7, weight: 160, ilvl: 68 },
@@ -5412,7 +5509,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -5420,7 +5517,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
                 { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
@@ -5471,7 +5568,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // for budget — you can't have everything.
         attack_speed: {
             id: 'attack_speed',
-            label: 'Melee Strikes occur #s more often',
+            label: 'Melee Strikes occur #s more often', labelDe: 'Nahkampfschläge erfolgen #s häufiger',
             tiers: [
                 { tier: 1, min: 1.8, max: 2.5, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1.1, max: 1.7, weight: 200, ilvl: 62 },
@@ -5487,7 +5584,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // than cell reveals.
         flat_physical_damage: {
             id: 'flat_physical_damage',
-            label: 'Adds # to @ Physical Damage to Melee Strikes',
+            label: 'Adds # to @ Physical Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ physischen Schaden hinzu',
             tiers: [
                 { tier: 1, min1: 28, max1: 40, min2: 75, max2: 105, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 17, max1: 27, min2: 48, max2: 74, weight: 250, ilvl: 60 },
@@ -5503,7 +5600,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // and elemental damage for prefix slots creates meaningful choices.
         inc_physical_damage: {
             id: 'inc_physical_damage',
-            label: '#% increased Physical Damage',
+            label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
             tiers: [
                 { tier: 1, min: 55, max: 75, weight: 90, ilvl: 82 },
                 { tier: 2, min: 35, max: 54, weight: 220, ilvl: 62 },
@@ -5523,7 +5620,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // and inc_physical.
         fire_damage: {
             id: 'fire_damage',
-            label: 'Adds # to @ Fire Damage to Melee Strikes',
+            label: 'Adds # to @ Fire Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Feuerschaden hinzu',
             tiers: [
                 { tier: 1, min1: 28, max1: 42, min2: 78, max2: 108, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 17, max1: 27, min2: 50, max2: 77, weight: 250, ilvl: 60 },
@@ -5533,7 +5630,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         cold_damage: {
             id: 'cold_damage',
-            label: 'Adds # to @ Cold Damage to Melee Strikes',
+            label: 'Adds # to @ Cold Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Kälteschaden hinzu',
             tiers: [
                 { tier: 1, min1: 24, max1: 38, min2: 70, max2: 98, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 14, max1: 23, min2: 44, max2: 69, weight: 250, ilvl: 60 },
@@ -5543,7 +5640,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         lightning_damage: {
             id: 'lightning_damage',
-            label: 'Adds # to @ Lightning Damage to Melee Strikes',
+            label: 'Adds # to @ Lightning Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Blitzschaden hinzu',
             // Lightning has a wide spread — high variance, high ceiling.
             tiers: [
                 { tier: 1, min1: 7, max1: 18, min2: 85, max2: 128, weight: 110, ilvl: 80 },
@@ -5554,7 +5651,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         shadow_damage: {
             id: 'shadow_damage',
-            label: 'Adds # to @ Shadow Damage to Melee Strikes',
+            label: 'Adds # to @ Shadow Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Schattenschaden hinzu',
             // Shadow is rarer — lower weight, slightly lower values,
             // but its status effect (convert) is the most powerful.
             tiers: [
@@ -5574,7 +5671,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // physical/elemental damage and attack_speed.
         crit_chance: {
             id: 'crit_chance',
-            label: '+#% Critical Strike Chance',
+            label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 90, ilvl: 80 },
                 { tier: 2, min: 5, max: 7, weight: 220, ilvl: 60 },
@@ -5584,7 +5681,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         crit_multiplier: {
             id: 'crit_multiplier',
-            label: '+#% to Critical Strike Multiplier',
+            label: '+#% to Critical Strike Multiplier', labelDe: '+#% zum kritischen Schadensmultiplikator',
             tiers: [
                 { tier: 1, min: 55, max: 75, weight: 70, ilvl: 82 },
                 { tier: 2, min: 35, max: 54, weight: 175, ilvl: 62 },
@@ -5596,7 +5693,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -5612,7 +5709,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // Better weight than agility or intelligence on this slot.
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 160, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 320, ilvl: 65 },
@@ -5623,7 +5720,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -5634,7 +5731,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -5653,7 +5750,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // or accept occasional misses.
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 301, max: 450, weight: 120, ilvl: 80 },
                 { tier: 2, min: 151, max: 300, weight: 240, ilvl: 60 },
@@ -5671,7 +5768,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // chest's prefix version since that is a larger slot.
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Melee Strike Damage as Life',
+            label: 'Gain #% of Melee Strike Damage as Life', labelDe: 'Erhalte #% des Nahkampfschadens als Leben',
             tiers: [
                 { tier: 1, min: 2.5, max: 4.0, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1.5, max: 2.4, weight: 200, ilvl: 60 },
@@ -5690,7 +5787,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // primary melee tool and can be built toward any elemental path.
         chance_to_ignite: {
             id: 'chance_to_ignite',
-            label: '#% Chance to Ignite on Melee Strike',
+            label: '#% Chance to Ignite on Melee Strike', labelDe: '#% Chance auf Entzünden bei Nahkampfschlag',
             tiers: [
                 { tier: 1, min: 28, max: 40, weight: 100, ilvl: 80 },
                 { tier: 2, min: 18, max: 27, weight: 250, ilvl: 58 },
@@ -5700,7 +5797,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         chance_to_freeze: {
             id: 'chance_to_freeze',
-            label: '#% Chance to Freeze on Melee Strike',
+            label: '#% Chance to Freeze on Melee Strike', labelDe: '#% Chance auf Einfrieren bei Nahkampfschlag',
             tiers: [
                 { tier: 1, min: 24, max: 35, weight: 100, ilvl: 80 },
                 { tier: 2, min: 15, max: 23, weight: 250, ilvl: 58 },
@@ -5710,7 +5807,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         chance_to_shock: {
             id: 'chance_to_shock',
-            label: '#% Chance to Shock on Melee Strike',
+            label: '#% Chance to Shock on Melee Strike', labelDe: '#% Chance auf Schock bei Nahkampfschlag',
             tiers: [
                 { tier: 1, min: 28, max: 40, weight: 100, ilvl: 80 },
                 { tier: 2, min: 18, max: 27, weight: 250, ilvl: 58 },
@@ -5720,7 +5817,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         chance_to_blind: {
             id: 'chance_to_blind',
-            label: '#% Chance to Blind on Melee Strike',
+            label: '#% Chance to Blind on Melee Strike', labelDe: '#% Chance auf Blendung bei Nahkampfschlag',
             tiers: [
                 { tier: 1, min: 30, max: 45, weight: 110, ilvl: 78 },
                 { tier: 2, min: 19, max: 29, weight: 270, ilvl: 55 },
@@ -5732,7 +5829,7 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'chance_to_convert',
             // Shadow-locked, rarest status — only the most powerful
             // shadow weapon can compel a monster to turn on its allies.
-            label: '#% Chance to Convert on Melee Strike',
+            label: '#% Chance to Convert on Melee Strike', labelDe: '#% Chance zur Umwandlung bei Nahkampfschlag',
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 45, ilvl: 84 },
                 { tier: 2, min: 7, max: 11, weight: 120, ilvl: 65 },
@@ -5751,7 +5848,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // build-defining mechanic for dense spawn locations.
         cleave: {
             id: 'cleave',
-            label: '#% Chance for Melee Strikes to hit all Monsters\nin the target\'s Spawn Location',
+            label: '#% Chance for Melee Strikes to hit all Monsters\nin the target\'s Spawn Location', labelDe: '#% Chance, dass Nahkampfschläge alle Monster\nam Spawnpunkt des Ziels treffen',
             tiers: [
                 { tier: 1, min: 35, max: 50, weight: 75, ilvl: 84 },
                 { tier: 2, min: 22, max: 34, weight: 190, ilvl: 64 },
@@ -5763,7 +5860,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 1 }
@@ -5771,7 +5868,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 1 }
@@ -5818,7 +5915,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // Shoulders scale — a large protective piece warrants solid pools.
         flat_health: {
             id: 'flat_health',
-            label: '+# to Maximum Health',
+            label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
             tiers: [
                 { tier: 1, min: 90, max: 109, weight: 100, ilvl: 80 },
                 { tier: 2, min: 70, max: 89, weight: 250, ilvl: 65 },
@@ -5829,7 +5926,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         flat_mana: {
             id: 'flat_mana',
-            label: '+# to Maximum Mana',
+            label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
             tiers: [
                 { tier: 1, min: 65, max: 79, weight: 100, ilvl: 80 },
                 { tier: 2, min: 50, max: 64, weight: 250, ilvl: 65 },
@@ -5840,7 +5937,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         heart_heal: {
             id: 'heart_heal',
-            label: 'Hearts heal for an additional # Health',
+            label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
             tiers: [
                 { tier: 1, min: 45, max: 58, weight: 200, ilvl: 75 },
                 { tier: 2, min: 28, max: 44, weight: 400, ilvl: 40 },
@@ -5855,7 +5952,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // defensive contribution.
         flat_armour: {
             id: 'flat_armour',
-            label: '+# to Armour',
+            label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
                 { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
@@ -5865,7 +5962,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         inc_armour: {
             id: 'inc_armour',
-            label: '#% increased Armour',
+            label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -5875,7 +5972,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         flat_evasion: {
             id: 'flat_evasion',
-            label: '+# to Evasion',
+            label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
                 { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
                 { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
@@ -5885,7 +5982,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         inc_evasion: {
             id: 'inc_evasion',
-            label: '#% increased Evasion',
+            label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -5895,7 +5992,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         flat_absorption: {
             id: 'flat_absorption',
-            label: '+# to Absorption',
+            label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
                 { tier: 1, min: 80, max: 110, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -5905,7 +6002,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         inc_absorption: {
             id: 'inc_absorption',
-            label: '#% increased Absorption',
+            label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
                 { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
@@ -5917,7 +6014,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // --- HYBRID LIFE / DEFENSE ---
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
-            label: '+# to Maximum Health\n+@ to Armour',
+            label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -5927,7 +6024,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
-            label: '+# to Maximum Health\n+@ to Evasion',
+            label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -5937,7 +6034,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
-            label: '+# to Maximum Health\n+@ to Absorption',
+            label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 35, max1: 45, min2: 30, max2: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 25, max1: 34, min2: 20, max2: 29, weight: 250, ilvl: 50 },
@@ -5947,7 +6044,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
-            label: '+# to Maximum Mana\n+@ to Armour',
+            label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -5957,7 +6054,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
-            label: '+# to Maximum Mana\n+@ to Evasion',
+            label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
@@ -5967,7 +6064,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
-            label: '+# to Maximum Mana\n+@ to Absorption',
+            label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 25, max1: 35, min2: 30, max2: 45, weight: 100, ilvl: 78 },
                 { tier: 2, min1: 18, max1: 24, min2: 20, max2: 29, weight: 250, ilvl: 50 },
@@ -5979,7 +6076,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // --- HYBRID DEFENCES ---
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
-            label: '+# to Armour\n+@ to Evasion',
+            label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 40, max2: 65, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 25, max2: 39, weight: 250, ilvl: 55 },
@@ -5989,7 +6086,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
-            label: '+# to Armour\n+@ to Absorption',
+            label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
@@ -5999,7 +6096,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
-            label: '+# to Evasion\n+@ to Absorption',
+            label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
                 { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
@@ -6016,7 +6113,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // and % version exist so builds can choose synergy or ceiling.
         spell_damage: {
             id: 'spell_damage',
-            label: '+# to Spell Damage',
+            label: '+# to Spell Damage', labelDe: '+# zu Zauberschaden',
             tiers: [
                 { tier: 1, min: 60, max: 80, weight: 100, ilvl: 80 },
                 { tier: 2, min: 38, max: 59, weight: 250, ilvl: 60 },
@@ -6027,7 +6124,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         inc_spell_damage: {
             id: 'inc_spell_damage',
-            label: '#% increased Spell Damage',
+            label: '#% increased Spell Damage', labelDe: '#% erhöhter Zauberschaden',
             tiers: [
                 { tier: 1, min: 35, max: 50, weight: 80, ilvl: 82 },
                 { tier: 2, min: 20, max: 34, weight: 200, ilvl: 62 },
@@ -6050,7 +6147,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // redundant, and competing for prefix budget differently.
         channel: {
             id: 'channel',
-            label: 'Each consecutive correct cell charges Channel\n(+# Damage per stack, releases at @ stacks or on next Hit)',
+            label: 'Each consecutive correct cell charges Channel\n(+# Damage per stack, releases at @ stacks or on next Hit)', labelDe: 'Jede korrekte Zelle lädt das Kanalisieren auf\n(+# Schaden pro Stapel, Auslösung bei @ Stapeln oder beim nächsten Treffer)',
             tiers: [
                 { tier: 1, min: 12, max: 18, min2: 8, max2: 8, weight: 65, ilvl: 84 },
                 { tier: 2, min: 7, max: 11, min2: 10, max2: 10, weight: 170, ilvl: 65 },
@@ -6062,7 +6159,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -6079,7 +6176,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // Both roll at standard weights — either build path is valid.
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -6090,7 +6187,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -6101,7 +6198,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -6114,7 +6211,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // --- REGEN & RECOVERY ---
         life_regen: {
             id: 'life_regen',
-            label: 'Regenerate # Life per second',
+            label: 'Regenerate # Life per second', labelDe: 'Regeneriere # Leben pro Sekunde',
             tiers: [
                 { tier: 1, min: 16, max: 25, weight: 150, ilvl: 78 },
                 { tier: 2, min: 11, max: 15, weight: 300, ilvl: 55 },
@@ -6125,7 +6222,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         mana_regen: {
             id: 'mana_regen',
-            label: 'Regenerate # Mana every 5 seconds',
+            label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
             tiers: [
                 { tier: 1, min: 25, max: 35, weight: 150, ilvl: 78 },
                 { tier: 2, min: 16, max: 24, weight: 300, ilvl: 55 },
@@ -6138,7 +6235,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // absorption layer. Better weights than shoulders/chest.
         absorption_regen_rate: {
             id: 'absorption_regen_rate',
-            label: '#% increased Absorption Regeneration Rate',
+            label: '#% increased Absorption Regeneration Rate', labelDe: '#% erhöhte Absorptionsregeneration',
             tiers: [
                 { tier: 1, min: 40, max: 58, weight: 110, ilvl: 80 },
                 { tier: 2, min: 24, max: 39, weight: 260, ilvl: 58 },
@@ -6148,7 +6245,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         faster_absorption_regen_start: {
             id: 'faster_absorption_regen_start',
-            label: 'Absorption begins Regenerating # second(s) sooner',
+            label: 'Absorption begins Regenerating # second(s) sooner', labelDe: 'Absorption regeneriert # Sekunde(n) früher',
             tiers: [
                 { tier: 1, min: 2.5, max: 3.0, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1.5, max: 2.4, weight: 200, ilvl: 60 },
@@ -6160,7 +6257,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // --- RESISTANCES ---
         fire_resist: {
             id: 'fire_resist',
-            label: '+#% to Fire Resistance',
+            label: '+#% to Fire Resistance', labelDe: '+#% Feuerwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -6171,7 +6268,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         cold_resist: {
             id: 'cold_resist',
-            label: '+#% to Cold Resistance',
+            label: '+#% to Cold Resistance', labelDe: '+#% Kältewiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -6182,7 +6279,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         lightning_resist: {
             id: 'lightning_resist',
-            label: '+#% to Lightning Resistance',
+            label: '+#% to Lightning Resistance', labelDe: '+#% Blitzwiderstand',
             tiers: [
                 { tier: 1, min: 42, max: 48, weight: 250, ilvl: 80 },
                 { tier: 2, min: 36, max: 41, weight: 500, ilvl: 60 },
@@ -6193,7 +6290,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         shadow_resist: {
             id: 'shadow_resist',
-            label: '+#% to Shadow Resistance',
+            label: '+#% to Shadow Resistance', labelDe: '+#% Schattenwiderstand',
             tiers: [
                 { tier: 1, min: 31, max: 35, weight: 150, ilvl: 82 },
                 { tier: 2, min: 26, max: 30, weight: 300, ilvl: 65 },
@@ -6210,7 +6307,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // this slot.
         block_chance: {
             id: 'block_chance',
-            label: '+#% Chance to Block Attacks',
+            label: '+#% Chance to Block Attacks', labelDe: '+#% Chance, Angriffe zu blocken',
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
                 { tier: 2, min: 8, max: 11, weight: 250, ilvl: 58 },
@@ -6220,7 +6317,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         spell_block_chance: {
             id: 'spell_block_chance',
-            label: '+#% Chance to Block Spells',
+            label: '+#% Chance to Block Spells', labelDe: '+#% Chance, Zauber zu blocken',
             tiers: [
                 { tier: 1, min: 9, max: 13, weight: 80, ilvl: 82 },
                 { tier: 2, min: 5, max: 8, weight: 200, ilvl: 60 },
@@ -6233,7 +6330,7 @@ const EG_MOD_TABLE_WEAPON2 = {
             // Reduces the window after a block where you cannot deal damage.
             // Higher ceiling than shoulders/chest — the shield is the
             // dedicated block piece and should have the best recovery too.
-            label: 'Recover from Blocks #% faster',
+            label: 'Recover from Blocks #% faster', labelDe: 'Erholung nach Blocken #% schneller',
             tiers: [
                 { tier: 1, min: 45, max: 65, weight: 100, ilvl: 80 },
                 { tier: 2, min: 28, max: 44, weight: 250, ilvl: 58 },
@@ -6243,7 +6340,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         dodge: {
             id: 'dodge',
-            label: '+#% Chance to Dodge Attacks',
+            label: '+#% Chance to Dodge Attacks', labelDe: '+#% Chance, Angriffen auszuweichen',
             tiers: [
                 { tier: 1, min: 6, max: 9, weight: 100, ilvl: 80 },
                 { tier: 2, min: 4, max: 5, weight: 250, ilvl: 58 },
@@ -6253,7 +6350,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         spell_dodge: {
             id: 'spell_dodge',
-            label: '+#% Chance to Dodge Spells',
+            label: '+#% Chance to Dodge Spells', labelDe: '+#% Chance, Zaubern auszuweichen',
             tiers: [
                 { tier: 1, min: 5, max: 7, weight: 80, ilvl: 82 },
                 { tier: 2, min: 3, max: 4, weight: 200, ilvl: 60 },
@@ -6274,7 +6371,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // protection and aggressive counter-play.
         shield_bash: {
             id: 'shield_bash',
-            label: '#% Chance to deal @ Physical Damage when Blocking',
+            label: '#% Chance to deal @ Physical Damage when Blocking', labelDe: '#% Chance, beim Blocken @ physischen Schaden zu verursachen',
             tiers: [
                 { tier: 1, min: 35, max: 50, min2: 80, max2: 120, weight: 75, ilvl: 84 },
                 { tier: 2, min: 22, max: 34, min2: 48, max2: 79, weight: 190, ilvl: 64 },
@@ -6286,7 +6383,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
@@ -6294,7 +6391,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
@@ -6314,7 +6411,7 @@ const EG_MOD_TABLE_RANGED = {
         // every correct cell reveal — high frequency compensates.
         flat_physical_damage: {
             id: 'flat_physical_damage',
-            label: 'Adds # to @ Physical Damage to Projectiles',
+            label: 'Adds # to @ Physical Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ physischen Schaden hinzu',
             tiers: [
                 { tier: 1, min1: 14, max1: 22, min2: 38, max2: 56, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 8, max1: 13, min2: 24, max2: 37, weight: 250, ilvl: 60 },
@@ -6326,7 +6423,7 @@ const EG_MOD_TABLE_RANGED = {
         // --- % INCREASED PHYSICAL DAMAGE ---
         inc_physical_damage: {
             id: 'inc_physical_damage',
-            label: '#% increased Physical Damage',
+            label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
             tiers: [
                 { tier: 1, min: 40, max: 55, weight: 90, ilvl: 82 },
                 { tier: 2, min: 25, max: 39, weight: 220, ilvl: 62 },
@@ -6341,7 +6438,7 @@ const EG_MOD_TABLE_RANGED = {
         // — a prefix slot competes with physical damage and crit.
         fire_damage: {
             id: 'fire_damage',
-            label: 'Adds # to @ Fire Damage to Projectiles',
+            label: 'Adds # to @ Fire Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Feuerschaden hinzu',
             tiers: [
                 { tier: 1, min1: 15, max1: 24, min2: 42, max2: 60, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 9, max1: 14, min2: 26, max2: 41, weight: 250, ilvl: 60 },
@@ -6351,7 +6448,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         cold_damage: {
             id: 'cold_damage',
-            label: 'Adds # to @ Cold Damage to Projectiles',
+            label: 'Adds # to @ Cold Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Kälteschaden hinzu',
             tiers: [
                 { tier: 1, min1: 13, max1: 20, min2: 36, max2: 52, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 8, max1: 12, min2: 22, max2: 35, weight: 250, ilvl: 60 },
@@ -6361,7 +6458,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         lightning_damage: {
             id: 'lightning_damage',
-            label: 'Adds # to @ Lightning Damage to Projectiles',
+            label: 'Adds # to @ Lightning Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Blitzschaden hinzu',
             tiers: [
                 { tier: 1, min1: 4, max1: 10, min2: 46, max2: 70, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 2, max1: 6, min2: 28, max2: 45, weight: 250, ilvl: 60 },
@@ -6371,7 +6468,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         shadow_damage: {
             id: 'shadow_damage',
-            label: 'Adds # to @ Shadow Damage to Projectiles',
+            label: 'Adds # to @ Shadow Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Schattenschaden hinzu',
             tiers: [
                 { tier: 1, min1: 11, max1: 17, min2: 30, max2: 46, weight: 75, ilvl: 82 },
                 { tier: 2, min1: 6, max1: 10, min2: 18, max2: 29, weight: 170, ilvl: 62 },
@@ -6386,7 +6483,7 @@ const EG_MOD_TABLE_RANGED = {
         // ceiling since ranged already benefits from sheer frequency.
         crit_chance: {
             id: 'crit_chance',
-            label: '+#% Critical Strike Chance',
+            label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
                 { tier: 1, min: 6, max: 9, weight: 90, ilvl: 80 },
                 { tier: 2, min: 4, max: 5, weight: 220, ilvl: 60 },
@@ -6396,7 +6493,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         crit_multiplier: {
             id: 'crit_multiplier',
-            label: '+#% to Critical Strike Multiplier',
+            label: '+#% to Critical Strike Multiplier', labelDe: '+#% zum kritischen Schadensmultiplikator',
             tiers: [
                 { tier: 1, min: 45, max: 62, weight: 70, ilvl: 82 },
                 { tier: 2, min: 28, max: 44, weight: 175, ilvl: 62 },
@@ -6415,7 +6512,7 @@ const EG_MOD_TABLE_RANGED = {
         // budget.
         pierce: {
             id: 'pierce',
-            label: '#% Chance for Projectiles to Pierce through\ntheir target and hit another Monster',
+            label: '#% Chance for Projectiles to Pierce through\ntheir target and hit another Monster', labelDe: '#% Chance, dass Projektile ihr Ziel durchbohren und\nein weiteres Monster treffen',
             tiers: [
                 { tier: 1, min: 28, max: 40, weight: 75, ilvl: 84 },
                 { tier: 2, min: 17, max: 27, weight: 190, ilvl: 64 },
@@ -6427,7 +6524,7 @@ const EG_MOD_TABLE_RANGED = {
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
-            label: '+# Seconds to Map Timer',
+            label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
                 { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
                 { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
@@ -6443,7 +6540,7 @@ const EG_MOD_TABLE_RANGED = {
         // quick draw. Rolls with better weight than strength or intelligence.
         agility: {
             id: 'agility',
-            label: '+# to Agility',
+            label: '+# to Agility', labelDe: '+# zu Beweglichkeit',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 160, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 320, ilvl: 65 },
@@ -6454,7 +6551,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         strength: {
             id: 'strength',
-            label: '+# to Strength',
+            label: '+# to Strength', labelDe: '+# zu Stärke',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -6465,7 +6562,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         intelligence: {
             id: 'intelligence',
-            label: '+# to Intelligence',
+            label: '+# to Intelligence', labelDe: '+# zu Intelligenz',
             tiers: [
                 { tier: 1, min: 43, max: 50, weight: 200, ilvl: 80 },
                 { tier: 2, min: 35, max: 42, weight: 400, ilvl: 65 },
@@ -6481,7 +6578,7 @@ const EG_MOD_TABLE_RANGED = {
         // every reveal count. Better weights than bracers/armour slots.
         accuracy: {
             id: 'accuracy',
-            label: '+# to Accuracy',
+            label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',
             tiers: [
                 { tier: 1, min: 301, max: 450, weight: 130, ilvl: 80 },
                 { tier: 2, min: 151, max: 300, weight: 260, ilvl: 60 },
@@ -6498,7 +6595,7 @@ const EG_MOD_TABLE_RANGED = {
         // than compensate for the smaller per-hit %.
         life_leech: {
             id: 'life_leech',
-            label: 'Gain #% of Projectile Damage as Life',
+            label: 'Gain #% of Projectile Damage as Life', labelDe: 'Erhalte #% des Projektilschadens als Leben',
             tiers: [
                 { tier: 1, min: 1.5, max: 2.5, weight: 80, ilvl: 82 },
                 { tier: 2, min: 0.8, max: 1.4, weight: 200, ilvl: 60 },
@@ -6514,7 +6611,7 @@ const EG_MOD_TABLE_RANGED = {
         // procs-per-map as the melee weapon's higher-per-hit values.
         chance_to_ignite: {
             id: 'chance_to_ignite',
-            label: '#% Chance to Ignite on Projectile Hit',
+            label: '#% Chance to Ignite on Projectile Hit', labelDe: '#% Chance auf Entzünden bei Projekiltreffer',
             tiers: [
                 { tier: 1, min: 16, max: 24, weight: 100, ilvl: 80 },
                 { tier: 2, min: 10, max: 15, weight: 250, ilvl: 58 },
@@ -6524,7 +6621,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         chance_to_freeze: {
             id: 'chance_to_freeze',
-            label: '#% Chance to Freeze on Projectile Hit',
+            label: '#% Chance to Freeze on Projectile Hit', labelDe: '#% Chance auf Einfrieren bei Projekiltreffer',
             tiers: [
                 { tier: 1, min: 13, max: 20, weight: 100, ilvl: 80 },
                 { tier: 2, min: 8, max: 12, weight: 250, ilvl: 58 },
@@ -6534,7 +6631,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         chance_to_shock: {
             id: 'chance_to_shock',
-            label: '#% Chance to Shock on Projectile Hit',
+            label: '#% Chance to Shock on Projectile Hit', labelDe: '#% Chance auf Schock bei Projekiltreffer',
             tiers: [
                 { tier: 1, min: 16, max: 24, weight: 100, ilvl: 80 },
                 { tier: 2, min: 10, max: 15, weight: 250, ilvl: 58 },
@@ -6544,7 +6641,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         chance_to_blind: {
             id: 'chance_to_blind',
-            label: '#% Chance to Blind on Projectile Hit',
+            label: '#% Chance to Blind on Projectile Hit', labelDe: '#% Chance auf Blendung bei Projekiltreffer',
             tiers: [
                 { tier: 1, min: 18, max: 27, weight: 110, ilvl: 78 },
                 { tier: 2, min: 11, max: 17, weight: 270, ilvl: 55 },
@@ -6554,7 +6651,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         chance_to_convert: {
             id: 'chance_to_convert',
-            label: '#% Chance to Convert on Projectile Hit',
+            label: '#% Chance to Convert on Projectile Hit', labelDe: '#% Chance zur Umwandlung bei Projekiltreffer',
             tiers: [
                 { tier: 1, min: 7, max: 11, weight: 45, ilvl: 84 },
                 { tier: 2, min: 4, max: 6, weight: 120, ilvl: 65 },
@@ -6571,7 +6668,7 @@ const EG_MOD_TABLE_RANGED = {
         // The # value is the % bonus damage on a Snipe.
         snipe: {
             id: 'snipe',
-            label: 'Projectiles deal #% more Damage against Monsters\nthat are alone in their Spawn Location (Snipe)',
+            label: 'Projectiles deal #% more Damage against Monsters\nthat are alone in their Spawn Location (Snipe)', labelDe: 'Projektile verursachen #% mehr Schaden gegen Monster,\ndie allein an ihrem Spawnpunkt stehen (Scharfschuss)',
             tiers: [
                 { tier: 1, min: 45, max: 65, weight: 75, ilvl: 84 },
                 { tier: 2, min: 28, max: 44, weight: 190, ilvl: 64 },
@@ -6583,7 +6680,7 @@ const EG_MOD_TABLE_RANGED = {
         // --- PUZZLE / UTILITY ---
         mistake_count: {
             id: 'mistake_count',
-            label: '+# to Allowed Mistake Count',
+            label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
                 { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
                 { tier: 2, min: 1, max: 1, weight: 100, ilvl: 1 }
@@ -6591,7 +6688,7 @@ const EG_MOD_TABLE_RANGED = {
         },
         focus: {
             id: 'focus',
-            label: 'Mistakes consume #% less Time',
+            label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
                 { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
                 { tier: 2, min: 5, max: 9, weight: 400, ilvl: 1 }

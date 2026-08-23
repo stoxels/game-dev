@@ -85,7 +85,7 @@ function _executeResidual(row, col, effect) {
 
     // Check if the clicked cell is actually a marked mistake
     if (!wrongGrid[row][col]) {
-        showToast('💀 Residual Totem can only be planted on a mistake cell!');
+        showToast(t('cls_totem_mistake_only'));
         _refundCooldown('active3'); // Assuming active3 is the slot for this skill
         return;
     }
@@ -134,7 +134,9 @@ function _generateTotemId() {
 */
 function _spawnResidualTotem(id, row, col, radius, charges, fireIntervalSecs) {
     _residualTotemAddDOM(id, row, col, charges);
-    showToast(`💀 Residual Totem planted! ${charges} charges, fires in 3s then every ${fireIntervalSecs}s.`);
+    showToast(t('cls_totem_planted')
+        .replace('{c}', charges)
+        .replace('{f}', fireIntervalSecs));
     Audio_Manager.playSFX('residualSummon');
 
     const totem = { id, row, col, radius, charges, fireIntervalSecs, timeout: null };
@@ -172,11 +174,10 @@ function _findTotemById(id) {
 
 // Displays the appropriate toast after a totem shot
 function _showTotemShotToast(fired, chargesLeft) {
-    const chargeLabel = `(${chargesLeft} charge${chargesLeft !== 1 ? 's' : ''} left)`;
     if (fired) {
-        showToast(`💀 Residual Beam! 1 cell revealed. ${chargeLabel}`);
+        showToast(t('cls_totem_beam_hit').replace('{n}', chargesLeft));
     } else {
-        showToast(`💀 Residual Beam! No cells in range. ${chargeLabel}`);
+        showToast(t('cls_totem_beam_miss').replace('{n}', chargesLeft));
     }
 }
 
@@ -360,7 +361,7 @@ function _residualTotemUpdateDOM(id, row, col, charges) {
     if (badge) badge.textContent = charges;
 
     const el = document.getElementById(`g-${row}-${col}`);
-    if (el) el.setAttribute('title', `💀 Residual Totem (${charges} charges)`);
+    if (el) el.setAttribute('title', t('cls_totem_tooltip').replace('{n}', charges));
 }
 
 // Strips the totem overlay from the cell — only removes the class if no
@@ -398,7 +399,7 @@ function _executeDegreesOfFreedom(row, col, effect) {
 
     const mistakes = _getMistakeCells();
     if (mistakes.length === 0) {
-        showToast('💀 No mistake cells to correct!');
+        showToast(t('cls_dof_none'));
         _refundCooldown('active4');
         return;
     }
@@ -437,8 +438,7 @@ function _dofHighlightMistakeCells(mistakes) {
 
 // Shows the initial instruction toast for Degrees of Freedom
 function _dofShowSelectionToast(correctCount) {
-    const maxStr = correctCount === 1 ? '1 mistake cell' : `up to ${correctCount} mistake cells`;
-    showToast(`💀 Degrees of Freedom — click ${maxStr} to correct. Esc to cancel.`);
+    showToast(t('cls_dof_select').replace('{n}', correctCount));
 }
 
 // Registers the Escape key listener that cancels the selection session
@@ -491,7 +491,10 @@ function _dofSelectCell(row, col, session) {
 
     const remaining = session.correctCount - session.picked.length;
     if (remaining > 0) {
-        showToast(`💀 Selected ${session.picked.length}/${session.correctCount}. Click ${remaining} more — or Esc to cancel.`);
+        showToast(t('cls_dof_progress')
+            .replace('{a}', session.picked.length)
+            .replace('{b}', session.correctCount)
+            .replace('{r}', remaining));
     }
 }
 
@@ -513,7 +516,7 @@ function _confirmDegreesOfFreedom() {
     _cleanupDofSession();
 
     if (picked.length === 0) {
-        showToast('💀 No cells selected.');
+        showToast(t('cls_dof_none_selected'));
         return;
     }
 
@@ -527,7 +530,10 @@ function _confirmDegreesOfFreedom() {
     Audio_Manager.playSFX('arcaneReveal');
     Audio_Manager.playSFX('dofBurn');
 
-    showToast(`💀 Degrees of Freedom! ${picked.length} cell(s) corrected. +${totalRecovered}s recovered (${recoverPctLabel}%).`);
+    showToast(t('cls_dof_confirm')
+        .replace('{n}', picked.length)
+        .replace('{s}', totalRecovered)
+        .replace('{p}', recoverPctLabel));
 
     if (totalRecovered >= 300) trackAchStat('doftimerecovered');
 
@@ -574,7 +580,7 @@ function _dofPlayFireAnimations(pickedData) {
 function _cancelDegreesOfFreedom(silent) {
     _cleanupDofSession();
     if (!silent) {
-        showToast('💀 Degrees of Freedom cancelled.');
+        showToast(t('cls_dof_cancelled'));
         _refundCooldown('active4');
     }
 }

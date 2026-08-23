@@ -125,7 +125,7 @@ function _ptShowLoadingPlaceholder(lang) {
         <div style="display:flex;align-items:center;justify-content:center;
             height:100%;font-family:var(--PX,monospace);font-size:12px;
             color:var(--accent2,#aaa);letter-spacing:2px;opacity:0.6;">
-            ${lang === 'de' ? 'LADE BAUM…' : 'LOADING TREE…'}
+            ${t('pt_loading')}
         </div>`;
 }
 
@@ -134,9 +134,7 @@ function _ptUpdatePointsDisplay(lang, points) {
     const pointsEl = document.getElementById('pt-points');
     if (!pointsEl) return;
 
-    pointsEl.textContent = lang === 'de'
-        ? `Verfügbare Punkte: ${points}`
-        : `Available points: ${points}`;
+    pointsEl.textContent = t('pt_points_available').replace('{n}', points);
 }
 
 // buildPassiveTreeScreen — entry point called by the UI.
@@ -208,44 +206,38 @@ function _ptGrantItem(defId) {
 // given skill and the chance hits, grants the item and shows a toast.
 // Used by the per-class reward helpers below to avoid repeating the
 // hasSkill/random/grant/toast pattern for every gear node.
-function _ptRollGearReward(skillStatKey, chance, itemDefId, deMsg, enMsg) {
+function _ptRollGearReward(skillStatKey, chance, itemDefId, msgKey) {
     if (!ptHasSkill(skillStatKey) || Math.random() >= chance) return;
 
     _ptGrantItem(itemDefId);
-    showToast(LANG === 'de' ? deMsg : enMsg);
+    showToast(t(msgKey));
 }
 
 // Statistician gear drops — base gear: 33% magnifier, improved: 33% error gem
 function _ptApplyStatisticianRewards() {
     _ptRollGearReward('gear_of_the_statistician', 0.33, 'reveal2',
-        '🔍 Statistiker Bonus: Lupe erhalten!',
-        '🔍 Statistician Bonus: Magnifier received!');
+        'pt_gear_statistician_magnifier');
 
     _ptRollGearReward('improved_gear_of_the_statistician', 0.33, 'markWrong8',
-        '💎 Statistiker Bonus: Fehlerstein erhalten!',
-        '💎 Statistician Bonus: Error Gem received!');
+        'pt_gear_statistician_errorgem');
 }
 
 // Mathmagician gear drops — base gear: 25% professor, improved: 15% chronobolt
 function _ptApplyMathmagicianRewards() {
     _ptRollGearReward('gear_of_the_mathmagician', 0.25, 'mistakeEraser4',
-        '📚 Mathematgier Bonus: Professor erhalten!',
-        '📚 Mathmagician Bonus: Professor received!');
+        'pt_gear_mathmagician_professor');
 
     _ptRollGearReward('improved_gear_of_the_mathmagician', 0.15, 'addTime900',
-        '⚡ Mathemagier Bonus: Chronoblitz erhalten!',
-        '⚡ Mathmagician Bonus: Chronobolt received!');
+        'pt_gear_mathmagician_chronobolt');
 }
 
 // Probabilist gear drops — base gear: 25% sweeper, improved: 15% error magnet
 function _ptApplyProbabilistRewards() {
     _ptRollGearReward('gear_of_the_probabilist', 0.25, 'markWrong4',
-        '🧹 Probabilist Bonus: Besen erhalten!',
-        '🧹 Probabilist Bonus: Sweeper received!');
+        'pt_gear_probabilist_sweeper');
 
     _ptRollGearReward('improved_gear_of_the_probabilist', 0.15, 'markWrong6',
-        '🧲 Probabilist Bonus: Fehlermagnet erhalten!',
-        '🧲 Probabilist Bonus: Error Magnet received!');
+        'pt_gear_probabilist_errormagnet');
 }
 
 

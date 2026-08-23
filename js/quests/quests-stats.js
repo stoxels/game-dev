@@ -573,6 +573,16 @@ function _questStats_trackComboQuests(payload) {
         }
     }
 
+    // Ability Harvest — commit the per-level ability reveal/mark counters to
+    // their persistent global totals. Without this the abilityRevealsTotal /
+    // abilityMarksTotal milestones could never be completed.
+    if ((qs._ql_abilityRevealsThisLevel || 0) > 0) {
+        _inc('abilityRevealsTotal', qs._ql_abilityRevealsThisLevel);
+    }
+    if ((qs._ql_abilityMarksThisLevel || 0) > 0) {
+        _inc('abilityMarksTotal', qs._ql_abilityMarksThisLevel);
+    }
+
     // Quest 7: Erase 10+ filled rows/cols via cursed items
     // Global counter tracked in questStat_rowsErased; milestones read totalRowsErased.
 

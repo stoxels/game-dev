@@ -198,7 +198,7 @@ function _ptRefreshAllStyles() {
 // Builds the localised display name for a node.
 function _ptTooltipResolveName(skill, def, lang) {
     if (def) return _ptPickLang(lang, def.nameEn, def.nameDe || def.nameEn);
-    return skill ? skill.name : `Skill ${skill?.id}`;
+    return skill ? skill.name : t('pt_skill_fallback').replace('{n}', skill?.id);
 }
 
 // Builds the localised description string (newlines → <br>).
@@ -215,8 +215,8 @@ function _ptTooltipBuildStatusHtml(id, state, lang) {
         const canRemove = _ptIsDeallocatable(id);
         const color = canRemove ? '#6dbf40' : '#888';
         const text = canRemove
-            ? _ptPickLang(lang, '✓ Active — Click to remove', '✓ Aktiv — Klicken zum Entfernen')
-            : _ptPickLang(lang, '✓ Active — Cannot be removed', '✓ Aktiv — Kann nicht entfernt werden');
+            ? t('pt_tooltip_active_removable')
+            : t('pt_tooltip_active_not_removable');
         return `<div style="margin-top:7px;font-size:11px;color:${color};">${text}</div>`;
     }
 
@@ -224,13 +224,13 @@ function _ptTooltipBuildStatusHtml(id, state, lang) {
         const noPoints = _ptPoints() < 1;
         const color = noPoints ? '#c08030' : '#b89a50';
         const text = noPoints
-            ? _ptPickLang(lang, '⚠ No points available', '⚠ Keine Punkte verfügbar')
-            : _ptPickLang(lang, '▶ Click to unlock', '▶ Klicken zum Freischalten');
+            ? t('pt_tooltip_no_points')
+            : t('pt_tooltip_click_unlock');
         return `<div style="margin-top:7px;font-size:11px;color:${color};">${text}</div>`;
     }
 
     // locked
-    const lockedText = _ptPickLang(lang, '🔒 Locked', '🔒 Gesperrt');
+    const lockedText = t('pt_tooltip_locked');
     return `<div style="margin-top:7px;font-size:11px;color:#555;">${lockedText}</div>`;
 }
 
@@ -726,7 +726,7 @@ function _ptCreateSearchBar() {
     const input = document.createElement('input');
     input.id = 'pt-search-input';
     input.type = 'text';
-    input.placeholder = _ptPickLang(_ptLang(), 'Search nodes…', 'Knoten suchen…');
+    input.placeholder = t('pt_search_placeholder');
     input.style.cssText = `
         background: transparent;
         border: none;
@@ -815,7 +815,7 @@ function _ptResetRenderState() {
 
 // Renders an error / empty state when the skill list failed to load.
 function _ptRenderEmptyState() {
-    const msg = _ptPickLang(_ptLang(), 'TREE COULD NOT BE LOADED', 'BAUM KONNTE NICHT GELADEN WERDEN');
+    const msg = t('pt_tree_load_failed');
 
     _pt_container.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:center;

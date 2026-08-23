@@ -291,7 +291,7 @@ function _tickTimedStasis() {
     const freezeDur = _calcTimedStasisDuration();
     timerFrozen = true;
     updTimer();
-    showToast(`⏸️ ${LANG === 'de' ? 'Zeitstase!' : 'Timed Stasis!'}`);
+    showToast(`⏸️ ${t('cg_timed_stasis')}`);
     if (typeof playStasisOverlayEffect === 'function') playStasisOverlayEffect(freezeDur);
 
     setTimeout(() => {
@@ -381,10 +381,10 @@ function _triggerLawOfLargeNumbers() {
     if (_getBayesianBonus() > 0 && Math.random() < _getBayesianBonus()) {
         _resetBayesianBonus();
         revealTiles(1);
-        showToast(`🔃 ${LANG === 'de' ? 'Bayessche Verstärkung!' : 'Bayesian Boost!'}`);
+        showToast(`🔃 ${t('cg_bayesian_boost')}`);
     }
 
-    showToast(`📉 ${LANG === 'de' ? 'Gesetz der Großen Zahlen!' : 'Law of Large Numbers!'}`);
+    showToast(`📉 ${t('cg_lln')}`);
     checkWin();
 }
 

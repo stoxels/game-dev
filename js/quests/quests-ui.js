@@ -237,14 +237,13 @@ function _ledger_computeSummaryData() {
  * @returns {string} HTML string
  */
 function _ledger_buildSummaryStrip() {
-    const de = LANG === 'de';
     const { totalMs, claimedMs, claimableMs, ptFromLedger, ptTotal } = _ledger_computeSummaryData();
 
     const claimableStat = claimableMs > 0
         ? `<div class="ledg-stat is-claimable">
                <span class="ledg-stat-icon claimable"></span>
                <span>
-                   <span class="ledg-stat-label">${de ? 'Einlösbar' : 'Claimable'}</span>
+                   <span class="ledg-stat-label">${t('qa_claimable')}</span>
                    <span class="ledg-stat-value"><strong>${claimableMs}</strong></span>
                </span>
            </div>`
@@ -255,14 +254,14 @@ function _ledger_buildSummaryStrip() {
             <div class="ledg-stat">
                 <span class="ledg-stat-icon cp"></span>
                 <span>
-                    <span class="ledg-stat-label">${de ? 'Konvergenzpunkte' : 'Convergence Points'}</span>
+                    <span class="ledg-stat-label">${t('qa_convergence_points')}</span>
                     <span class="ledg-stat-value">${ptFromLedger} / ${ptTotal}</span>
                 </span>
             </div>
             <div class="ledg-stat">
                 <span class="ledg-stat-icon claimed"></span>
                 <span>
-                    <span class="ledg-stat-label">${de ? 'Meilensteine abgeholt' : 'Milestones Claimed'}</span>
+                    <span class="ledg-stat-label">${t('qa_milestones_claimed')}</span>
                     <span class="ledg-stat-value">${claimedMs} / ${totalMs}</span>
                 </span>
             </div>
@@ -309,7 +308,7 @@ function _ledger_buildCategoryCard(cat) {
                          style="width:${barPct}%"></div>
                 </div>
                 <div class="ledger-card-sub">
-                    ${claimedMs} / ${totalMs} ${de ? 'abgeholt' : 'claimed'}
+                    ${claimedMs} / ${totalMs} ${t('qa_claimed_short')}
                 </div>
             </div>
         </div>`;
@@ -360,12 +359,12 @@ function _ledger_renderGridView(modal) {
     modal.innerHTML = `
     <div class="modal-box ledger-modal-box">
         <button class="modal-close">
-            ✕ ${de ? 'SCHLIESSEN' : 'CLOSE'}
+            ✕ ${t('qa_close')}
         </button>
         <div class="ledg-corner-seal"></div>
 
         <div class="ledg-header-plaque">
-            <div class="ledg-header-title">${de ? 'INFERENZ' : 'INFERENCE'}</div>
+            <div class="ledg-header-title">${t('btn_inference')}</div>
         </div>
 
         ${_ledger_buildSummaryStrip()}
@@ -394,7 +393,6 @@ function _ledger_renderGridView(modal) {
  * @returns {{ rowClass: string, statusText: string, claimable: boolean, claimed: boolean }}
  */
 function _ledger_getMilestoneDisplayState(ms) {
-    const de = LANG === 'de';
     const claimed = _milestone_isClaimed(ms);
     const complete = _milestone_isComplete(ms);
     const claimable = complete && !claimed;
@@ -403,9 +401,9 @@ function _ledger_getMilestoneDisplayState(ms) {
         : claimable ? 'quest-row quest-claimable'
             : 'quest-row quest-active';
 
-    const statusText = claimed ? (de ? '✓ Abgeholt' : '✓ Claimed')
-        : claimable ? (de ? '⭐ Jetzt abholen!' : '⭐ Claim now!')
-            : (de ? 'In Bearbeitung…' : 'In progress…');
+    const statusText = claimed ? t('qa_status_claimed')
+        : claimable ? t('qa_status_claim_now')
+            : t('qa_status_in_progress');
 
     return { rowClass, statusText, claimable, claimed };
 }
@@ -438,16 +436,15 @@ function _ledger_buildRewardChips(reward) {
     const chips = [];
 
     if (reward.ptPoints) {
-        const label = de ? 'Konvergenzpunkt' : 'Convergence Point';
         chips.push(
-            `<span class="quest-reward-pt">🌳 +${reward.ptPoints} ${label}</span>`
+            `<span class="quest-reward-pt">🌳 +${reward.ptPoints} ${t('qa_convergence_point')}</span>`
         );
     }
 
     if (reward.items) {
         reward.items.forEach(defId => {
             chips.push(defId === '__random__'
-                ? `<span class="quest-reward-item">🎁 ${de ? 'Zufälliges Item' : 'Random Item'}</span>`
+                ? `<span class="quest-reward-item">🎁 ${t('qa_random_item')}</span>`
                 : _ledger_buildItemChip(defId, de)
             );
         });
@@ -465,16 +462,14 @@ function _ledger_buildRewardChips(reward) {
  * @returns {string} HTML string
  */
 function _ledger_buildClaimButton(ms, claimable, claimed) {
-    const de = LANG === 'de';
-
     if (claimable) {
         return `<button class="quest-claim-btn" onclick="claimQuest('${ms.id}')">
-                    🎁 ${de ? 'ABHOLEN' : 'CLAIM'}
+                    🎁 ${t('qa_btn_claim')}
                 </button>`;
     }
     if (claimed) {
         return `<button class="quest-claim-btn quest-claimed-btn" disabled>
-                    ✓ ${de ? 'ABGEHOLT' : 'CLAIMED'}
+                    ✓ ${t('qa_btn_claimed')}
                 </button>`;
     }
     return '';
@@ -528,7 +523,7 @@ function _ledger_renderDetailView(modal) {
     modal.innerHTML = `
     <div class="modal-box quest-log-box">
         <button class="modal-close">
-            ✕ ${de ? 'SCHLIESSEN' : 'CLOSE'}
+            ✕ ${t('qa_close')}
         </button>
 
         <div class="ledg-detail-header">
@@ -654,8 +649,8 @@ function _buildQuestToastElement(milestone, category) {
 
     const catTitle = de ? category.titleDE : category.titleEn;
     const msLabel = de ? milestone.labelDE : milestone.labelEn;
-    const headerText = de ? 'Meilenstein erreicht!' : 'Milestone Reached!';
-    const rewardText = de ? 'Hol dir deine Belohnung im Inferenz System ab!' : 'Collect your Reward from the Inference system!';
+    const headerText = t('qa_milestone_reached');
+    const rewardText = t('qa_toast_collect_reward');
 
     const el = document.createElement('div');
     el.id = 'quest-toast';

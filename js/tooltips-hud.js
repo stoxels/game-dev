@@ -118,34 +118,34 @@ function _buildMistakesTooltipHTML() {
     const reduction = typeof _getAsymptoticMasteryReduction === 'function' ? _getAsymptoticMasteryReduction() : 0;
     const nextPenalty = Math.max(0, base - reduction);
 
-    let html = `<strong style="color:#ff5555">✗ Mistakes</strong>`;
-    html += `<br>Total this level: <b>${mistakeCount}</b>`;
+    let html = `<strong style="color:#ff5555">${t('cg_tt_mistakes')}</strong>`;
+    html += `<br>${t('cg_tt_total_level')} <b>${mistakeCount}</b>`;
     if (typeof absorbedMistakes !== 'undefined' && absorbedMistakes > 0) {
-        html += `<br>Absorbed (no penalty): <b>${absorbedMistakes}</b>`;
+        html += `<br>${t('cg_tt_absorbed')} <b>${absorbedMistakes}</b>`;
     }
     if (typeof _levelMistakesErased !== 'undefined' && _levelMistakesErased > 0) {
-        html += `<br>Erased by items: <b>${_levelMistakesErased}</b>`;
+        html += `<br>${t('cg_tt_erased')} <b>${_levelMistakesErased}</b>`;
     }
-    html += `<br>Next mistake costs: <b>−${_fmtSecsAsMinSec(nextPenalty)}</b>`;
+    html += `<br>${t('cg_tt_next_cost')} <b>−${_fmtSecsAsMinSec(nextPenalty)}</b>`;
     if (reduction > 0) {
-        html += `<br><span style="opacity:.6;font-size:.85em">(−${reduction}s from completed lines)</span>`;
+        html += `<br><span style="opacity:.6;font-size:.85em">${t('cg_tt_reduction').replace('{n}', reduction)}</span>`;
     }
-    html += `<br><span style="opacity:.55;font-size:.85em">Class effects may change this further.</span>`;
+    html += `<br><span style="opacity:.55;font-size:.85em">${t('cg_tt_class_note')}</span>`;
     return html;
 }
 
 // 2. Timer
 function _buildTimerTooltipHTML() {
-    let html = `<strong style="color:var(--accent,#66fcf1)">⏱ Timer</strong>`;
-    html += `<br>Time added this level: <b>+${_fmtSecsAsMinSec(_levelTimeAdded || 0)}</b>`;
-    html += `<br>Time lost to mistakes: <b>−${_fmtSecsAsMinSec(_levelTimeLost || 0)}</b>`;
-    html += `<br><span style="opacity:.55;font-size:.85em">Includes passive bonuses, items & penalties.</span>`;
+    let html = `<strong style="color:var(--accent,#66fcf1)">${t('cg_tt_timer')}</strong>`;
+    html += `<br>${t('cg_tt_time_added')} <b>+${_fmtSecsAsMinSec(_levelTimeAdded || 0)}</b>`;
+    html += `<br>${t('cg_tt_time_lost')} <b>−${_fmtSecsAsMinSec(_levelTimeLost || 0)}</b>`;
+    html += `<br><span style="opacity:.55;font-size:.85em">${t('cg_tt_includes')}</span>`;
     return html;
 }
 
 // 3. Levels/back button
 function _buildLevelsButtonTooltipHTML() {
-    return `Return to Level Selection`;
+    return t('cg_return_levels');
 }
 
 // 4. Level name
@@ -159,42 +159,42 @@ function _buildLevelNameTooltipHTML() {
     const bonusHintText = lvText(cur, 'bonusHint') || '';
 
     let html = `<strong>${t('lvl_prefix')} ${cur.world}-${cur.li}</strong>`;
-    html += `<br>🎯 Bonus: ${bonusHintText}`;
-    html += `<br>Bonus claimed: <b style="color:${bonusDone ? '#2ecc71' : '#e74c3c'}">${bonusDone ? 'Yes' : 'No'}</b>`;
+    html += `<br>${t('cg_tt_bonus').replace('{x}', bonusHintText)}`;
+    html += `<br>${t('cg_tt_bonus_claimed')} <b style="color:${bonusDone ? '#2ecc71' : '#e74c3c'}">${bonusDone ? t('cg_yes') : t('cg_no')}</b>`;
 
     if (hs) {
         const mods = Object.keys(hs.mods || {}).filter(m => hs.mods[m]);
-        html += `<br>Best clear difficulty: <b>${t('diff_' + hs.diff)}</b>`;
-        html += `<br>Best score: <b>${hs.score}</b>`;
+        html += `<br>${t('cg_tt_best_diff')} <b>${t('diff_' + hs.diff)}</b>`;
+        html += `<br>${t('cg_tt_best_score')} <b>${hs.score}</b>`;
         if (mods.length) {
-            html += `<br>Modifiers used: <b>${mods.map(m => t('mod_' + _MOD_SHORT[m])).join(', ')}</b>`;
+            html += `<br>${t('cg_tt_mods_used')} <b>${mods.map(m => t('mod_' + _MOD_SHORT[m])).join(', ')}</b>`;
         }
     } else {
-        html += `<br><span style="opacity:.6">Not cleared yet.</span>`;
+        html += `<br><span style="opacity:.6">${t('cg_tt_not_cleared')}</span>`;
     }
 
     if (STATE.levelMistakes && STATE.levelMistakes[gi] !== undefined) {
-        html += `<br>Best mistake count: <b>${STATE.levelMistakes[gi]}</b>`;
+        html += `<br>${t('cg_tt_best_mistakes')} <b>${STATE.levelMistakes[gi]}</b>`;
     }
 
     if (ptHasSkill('grid_awareness')) {
-        const tierLabels = { small: 'Small', medium: 'Medium', large: 'Large', massive: 'Massive' };
+        const tierLabels = { small: 'cg_grid_small', medium: 'cg_grid_medium', large: 'cg_grid_large', massive: 'cg_grid_massive' };
         const tier = _getGridSizeTier(cur.grid.length, cur.grid[0].length);
-        html += `<br>Grid class: <b>${tierLabels[tier]}</b>`;
+        html += `<br>${t('cg_tt_grid_class')} <b>${t(tierLabels[tier])}</b>`;
     }
 
     const { isAscension, isConvergence } = _getLevelSpecialStatus(cur);
-    if (isAscension) html += `<br><span style="color:#c080ff">⬆ Ascension Level</span>`;
-    if (isConvergence) html += `<br><span style="color:#6dbf40">◆ Convergence Level</span>`;
+    if (isAscension) html += `<br><span style="color:#c080ff">${t('cg_ascension_lvl')}</span>`;
+    if (isConvergence) html += `<br><span style="color:#6dbf40">${t('cg_convergence_lvl')}</span>`;
 
     return html;
 }
 
 // 5. Inventory label
 function _buildInventoryLabelTooltipHTML() {
-    return `<strong>🎒 Inventory</strong>`
-        + `<br>Right-click an item to send it to the reshuffle pile.`
-        + `<br>Every <b>${typeof RESHUFFLE_GOAL !== 'undefined' ? RESHUFFLE_GOAL : 3}</b> items reshuffled grants a reward pick!`;
+    return `<strong>${t('inv_title')}</strong>`
+        + `<br>${t('cg_inv_reshuffle_hint')}`
+        + `<br>${t('cg_inv_reward_pick').replace('{n}', typeof RESHUFFLE_GOAL !== 'undefined' ? RESHUFFLE_GOAL : 3)}`;
 }
 
 
@@ -281,20 +281,20 @@ function _buildSaveSlotTooltipHTML(summary) {
     const pctBonus = _pctOf(summary.bonusDone.length, totalLevels);
     const pctHardAllMods = _pctOf(_countHardAllModsClears(summary.levelHS), totalLevels);
 
-    let html = `<strong>💾 Slot ${summary.slot} — Lifetime Stats</strong>`;
-    html += `<br>🟩 Cells revealed: <b>${summary.lifetimeTilesRevealed}</b>`;
-    html += `<br>🟦 Cells filled manually: <b>${summary.lifetimeTilesFilled}</b>`;
-    html += `<br>✗ Mistakes made: <b>${summary.lifetimeMistakesMade}</b>`;
-    html += `<br>🧠 Questions answered correctly: <b>${summary.questionsCorrect}</b>`;
-    html += `<br>🎒 Items used: <b>${summary.itemsUsedTotal}</b>`;
-    html += `<br>⚔️ Class abilities used: <b>${summary.classAbilitiesUsed}</b>`;
-    html += `<br>🌿 Passive points obtained: <b>${summary.passivePointsObtained}</b>`;
-    html += `<br>📋 Inference tasks completed: <b>${summary.questsClaimedCount}</b>`;
-    html += `<br>⬆️ Class upgrades achieved: <b>${upgradesAchieved}</b>`;
-    html += `<br>⏱ Total time played: <b>${_fmtPlaytime(summary.totalTimePlayedSecs)}</b>`;
-    html += `<br><br><span style="opacity:.7">Completion:</span>`;
-    html += `<br>&nbsp;&nbsp;Levels cleared: <b>${pctLevels}</b>`;
-    html += `<br>&nbsp;&nbsp;Bonus objectives: <b>${pctBonus}</b>`;
-    html += `<br>&nbsp;&nbsp;Hard + all modifiers: <b>${pctHardAllMods}</b>`;
+    let html = `<strong>${t('cg_slot_stats').replace('{n}', summary.slot)}</strong>`;
+    html += `<br>${t('cg_stat_revealed')} <b>${summary.lifetimeTilesRevealed}</b>`;
+    html += `<br>${t('cg_stat_filled')} <b>${summary.lifetimeTilesFilled}</b>`;
+    html += `<br>${t('cg_stat_mistakes')} <b>${summary.lifetimeMistakesMade}</b>`;
+    html += `<br>${t('cg_stat_questions')} <b>${summary.questionsCorrect}</b>`;
+    html += `<br>${t('cg_stat_items_used')} <b>${summary.itemsUsedTotal}</b>`;
+    html += `<br>${t('cg_stat_abilities')} <b>${summary.classAbilitiesUsed}</b>`;
+    html += `<br>${t('cg_stat_passive_pts')} <b>${summary.passivePointsObtained}</b>`;
+    html += `<br>${t('cg_stat_inference')} <b>${summary.questsClaimedCount}</b>`;
+    html += `<br>${t('cg_stat_upgrades')} <b>${upgradesAchieved}</b>`;
+    html += `<br>${t('cg_stat_playtime')} <b>${_fmtPlaytime(summary.totalTimePlayedSecs)}</b>`;
+    html += `<br><br><span style="opacity:.7">${t('cg_completion')}</span>`;
+    html += `<br>&nbsp;&nbsp;${t('cg_comp_levels')} <b>${pctLevels}</b>`;
+    html += `<br>&nbsp;&nbsp;${t('cg_comp_bonus')} <b>${pctBonus}</b>`;
+    html += `<br>&nbsp;&nbsp;${t('cg_comp_hard_mods')} <b>${pctHardAllMods}</b>`;
     return html;
 }

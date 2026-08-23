@@ -298,9 +298,7 @@ function _poissonProcessTick() {
     let count = 1 + _poissonCheckBayesianExtra();
 
     markWrongTiles(count);
-    showToast(`⚗️ ${LANG === 'de'
-        ? `Poisson-Prozess! ${count} Zelle(n) markiert.`
-        : `Poisson Process! ${count} cell(s) marked.`}`);
+    showToast(t('pt_toast_poisson_marked').replace('{n}', count));
     Audio_Manager.playSFX('poisson_process');
 }
 
@@ -456,7 +454,7 @@ function _binomialBurstOnCorrectFill(row, col) {
     if (!_bayesianRoll(chance)) return;
 
     const markedCells = markWrongTiles(1);
-    showToast(`💢 ${LANG === 'de' ? 'Binomialer Ausbruch!' : 'Binomial Burst!'}`);
+    showToast(`💢 ${t('pt_toast_binomial')}`);
     Audio_Manager.playSFX('binomial_burst');
     PassiveTracker.onBinomialTrigger();
 
@@ -695,7 +693,7 @@ function _ergodicFieldTick() {
     const sol = cur.grid;
     const flashedCells = _ergodicFieldGetFlashCells(sol);
 
-    showToast(`🌊 ${LANG === 'de' ? 'Ergodisches Feld!' : 'Ergodic Field!'}`);
+    showToast(`🌊 ${t('pt_toast_ergodic')}`);
 
     // Restore board to its true state after the flash duration
     setTimeout(() => _ergodicFieldRestoreBoard(flashedCells, sol), ERGODIC_FIELD_FLASH_MS);
@@ -741,7 +739,7 @@ function _entropyDrainRevertRow(rowIndex, cols) {
     if (typeof _applyCellEffect === 'function' && drainedIds.length > 0) {
         _applyCellEffect(drainedIds, 'erase');
     }
-    showToast(`🌡️ ${LANG === 'de' ? `Entropie-Abbau: Zeile ${rowIndex + 1} zurückgesetzt!` : `Entropy Drain: Row ${rowIndex + 1} reverted!`}`);
+    showToast(`🌡️ ${t('pt_toast_entropy_row').replace('{n}', rowIndex + 1)}`);
 }
 
 // Clears reveals and marks from a column and re-renders it.
@@ -757,7 +755,7 @@ function _entropyDrainRevertCol(colIndex, rows) {
     if (typeof _applyCellEffect === 'function' && drainedIds.length > 0) {
         _applyCellEffect(drainedIds, 'erase');
     }
-    showToast(`🌡️ ${LANG === 'de' ? `Entropie-Abbau: Spalte ${colIndex + 1} zurückgesetzt!` : `Entropy Drain: Column ${colIndex + 1} reverted!`}`);
+    showToast(`🌡️ ${t('pt_toast_entropy_col').replace('{n}', colIndex + 1)}`);
 }
 
 // Stamps all row and column timestamps to "now" at level start.
@@ -835,10 +833,7 @@ function _randomWalkFail() {
     stopTimer();
     window._lastFailedGi = cur.gIdx;
     document.getElementById('lose-title').textContent = t('ov_lose');
-    document.getElementById('lose-sub').textContent =
-        LANG === 'de'
-            ? 'Zufällige Wanderung: 2 Fehler — Level verloren!'
-            : 'Random Walk: 2 mistakes — level lost!';
+    document.getElementById('lose-sub').textContent = t('pt_rw_fail_sub');
     document.getElementById('ov-lose').classList.add('show');
 }
 
@@ -868,7 +863,7 @@ function _randomWalkRevealCell(r, c) {
     }
 
     updClues(r, c);
-    showToast(`🚶 ${LANG === 'de' ? 'Zufällige Wanderung: Zelle enthüllt!' : 'Random Walk: Cell revealed!'}`);
+    showToast(`🚶 ${t('pt_rw_revealed')}`);
     checkWin();
 }
 
@@ -880,7 +875,7 @@ function _randomWalkMarkEmpty(r, c) {
     systemMarkedGrid[r][c] = true;
     if (typeof _applyCellEffect === 'function') _applyCellEffect([`g-${r}-${c}`], 'mark');
     updClues(r, c);
-    showToast(`🚶 ${LANG === 'de' ? 'Zufällige Wanderung: Leeres Feld markiert!' : 'Random Walk: Empty cell marked!'}`);
+    showToast(`🚶 ${t('pt_rw_marked')}`);
     checkWin();
 }
 
@@ -958,10 +953,10 @@ function _frequentistGetHiddenLines() {
 function _frequentistRevealLine(line) {
     if (line.type === 'row') {
         _revealRowClues(line.idx);
-        showToast(`📜 ${LANG === 'de' ? `Frequentist: Zeile ${line.idx + 1} enthüllt!` : `Frequentist: Row ${line.idx + 1} revealed!`}`);
+        showToast(`📜 ${t('pt_freq_row').replace('{n}', line.idx + 1)}`);
     } else {
         _revealColClues(line.idx);
-        showToast(`📜 ${LANG === 'de' ? `Frequentist: Spalte ${line.idx + 1} enthüllt!` : `Frequentist: Column ${line.idx + 1} revealed!`}`);
+        showToast(`📜 ${t('pt_freq_col').replace('{n}', line.idx + 1)}`);
     }
 }
 
@@ -1057,7 +1052,7 @@ function _applySignalToNoise() {
     // Shuffle in-place then slice to pick the target spans
     allSpans.sort(() => Math.random() - 0.5).slice(0, corruptCount).forEach(_signalToNoiseCorruptSpan);
 
-    showToast(`📡 ${LANG === 'de' ? '15% der Hinweise sind verfälscht!' : '15% of clues are falsified!'}`);
+    showToast(`📡 ${t('pt_stn_corrupt')}`);
 }
 
 // Checks completion ratio and restores all fake clues once 75% is reached.
@@ -1073,7 +1068,7 @@ function _signalToNoiseCheckRestore() {
     window._signalToNoiseFakeClues.forEach(_signalToNoiseRestoreSpan);
     window._signalToNoiseFakeClues = [];
 
-    showToast(`📡 ${LANG === 'de' ? 'Alle Hinweise wiederhergestellt!' : 'All clues restored!'}`);
+    showToast(`📡 ${t('pt_stn_restored')}`);
 }
 
 
@@ -1094,15 +1089,13 @@ function _dofShowModal() {
     modal.id = 'dof-modal';
     modal.innerHTML = `
         <div class="modal-box" style="text-align:center;max-width:340px">
-            <h3>🎛️ ${LANG === 'de' ? 'Freiheitsgrade' : 'Degrees of Freedom'}</h3>
-            <p style="margin:10px 0">${LANG === 'de'
-            ? 'Welche Hinweise sollen verborgen werden?'
-            : 'Which clues should be hidden?'}</p>
+            <h3>🎛️ ${t('pt_dof_title')}</h3>
+            <p style="margin:10px 0">${t('pt_dof_question')}</p>
             <button onclick="_dofChoose('row')" style="margin:6px;padding:8px 18px">
-                ${LANG === 'de' ? '🔲 Zeilenhinweise' : '🔲 Row Clues'}
+                ${t('pt_dof_btn_rows')}
             </button>
             <button onclick="_dofChoose('col')" style="margin:6px;padding:8px 18px">
-                ${LANG === 'de' ? '🔲 Spaltenhinweise' : '🔲 Column Clues'}
+                ${t('pt_dof_btn_cols')}
             </button>
         </div>`;
     document.body.appendChild(modal);
@@ -1129,9 +1122,7 @@ function _dofChoose(type) {
 
     _dofHideChosenAxis(type);
 
-    const label = LANG === 'de'
-        ? `${type === 'row' ? 'Zeilen' : 'Spalten'}hinweise verborgen!`
-        : `${type === 'row' ? 'Row' : 'Column'} clues hidden!`;
+    const label = type === 'row' ? t('pt_dof_hidden_row') : t('pt_dof_hidden_col');
     showToast(`🎛️ ${label}`);
 }
 
@@ -1164,7 +1155,7 @@ function _degreesOfFreedomTick() {
     const elements = document.querySelectorAll(selector);
 
     _dofFlashElements(elements);
-    showToast(`🎛️ ${LANG === 'de' ? 'Hinweise kurz sichtbar!' : 'Clues briefly visible!'}`);
+    showToast(`🎛️ ${t('pt_dof_flash')}`);
 }
 
 
@@ -1197,9 +1188,7 @@ function _overfittingGetPhase() {
 
     if (_lastOverfittingPhase === 'free' && currentPhase !== 'free') {
         _lastOverfittingPhase = 'hard';
-        showToast(`📉 ${LANG === 'de'
-            ? 'Überanpassung!'
-            : 'Overfitting!'}`);
+        showToast(`📉 ${t('pt_toast_overfitting')}`);
         Audio_Manager.playSFX('overfitting_alert');
     }
 
@@ -1270,9 +1259,7 @@ function _applyTheOracle() {
     _oracleFlashSolution(sol);
     _hideAllClues(); // Clues are permanently hidden for the rest of the level
 
-    showToast(`👁️👁️👁️ ${LANG === 'de'
-        ? 'Orakel! 👁️👁️👁️'
-        : 'Oracle! 👁️👁️👁️'}`, 5000);
+    showToast(`👁️👁️👁️ ${t('pt_toast_oracle')} 👁️👁️👁️`, 5000);
 
     setTimeout(() => _oracleHideSolution(sol), ORACLE_FLASH_DURATION_MS);
 }

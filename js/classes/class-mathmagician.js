@@ -1237,7 +1237,7 @@ function _executeArcaneFreeze(durationMs) {
     updTimer();
 
     const secs = Math.ceil(effectiveDuration / 1000);
-    showToast(`🔮 Absolute Zero! ${secs}s!`);
+    showToast(t('cls_absolute_zero').replace('{n}', secs));
     Audio_Manager.playSFX('absoluteZero');
 
     // Track clutch freezes (used when timer is critically low)

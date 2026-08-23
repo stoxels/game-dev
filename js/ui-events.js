@@ -34,7 +34,7 @@ function renderReplayModal() {
         btn.className = 'title-btn back-btn';
         btn.style.display = 'block';
         btn.style.margin = '8px auto';
-        btn.textContent = '▶ Tutorial';
+        btn.textContent = `▶ ${t('scr_replay_tutorial')}`;
         btn.addEventListener('click', () => {
             hideModal('replay-modal');
             replayTutorialFromTitle();
@@ -43,7 +43,7 @@ function renderReplayModal() {
     }
 
     if (entries.length === 0 && !STATE.tutorialDone) {
-        container.innerHTML = '<p style="text-align:center;opacity:.7;">Nothing unlocked to replay yet.</p>';
+        container.innerHTML = `<p style="text-align:center;opacity:.7;">${t('scr_nothing_to_replay')}</p>`;
     }
 }
 
@@ -260,20 +260,15 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.className = 'modal-bg';
             modal.innerHTML = `
             <div class="modal-box modal-box-danger">
-                <div class="modal-title text-red">⚠ LEAVE MAP?</div>
+                <div class="modal-title text-red">${t('scr_leave_map')}</div>
                 <div class="modal-section">
                     <p class="reset-body-text">
-                        Are you sure you want to leave this Map?<br><br>
-                        <strong class="text-accent2">
-                            · All items collected on this run will be lost<br>
-                            · Your Map entry item will be consumed<br>
-                            · Progress towards objectives will be lost
-                        </strong>
+                        ${t('scr_leave_map_body')}
                     </p>
                 </div>
                 <div class="modal-actions">
-                    <button class="title-btn btn-danger" id="eg-forfeit-confirm">🚪 YES, LEAVE MAP</button>
-                    <button class="title-btn sec" id="eg-forfeit-cancel">STAY IN MAP</button>
+                    <button class="title-btn btn-danger" id="eg-forfeit-confirm">${t('scr_leave_map_confirm')}</button>
+                    <button class="title-btn sec" id="eg-forfeit-cancel">${t('scr_stay_in_map')}</button>
                 </div>
             </div>`;
             document.body.appendChild(modal);

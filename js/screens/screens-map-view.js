@@ -1023,20 +1023,18 @@ function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
     if (wi === 13) {
         // Nexus has special unlock text
         statusText = isLocked
-            ? (LANG === 'de' ? '🔒 Schließe alle Welten ab' : '🔒 Clear all Worlds to unlock')
-            : (LANG === 'de' ? '🌌 Betrete den Nexus' : '🌌 Enter the Nexus');
+            ? t('scr_nexus_tooltip_locked')
+            : t('scr_enter_nexus_short');
     } else {
         const worldData = WORLDS && WORLDS[wi];
         const levelCount = worldData ? worldData.data.length : '?';
 
         if (isDone) {
-            statusText = LANG === 'de'
-                ? `✓ Abgeschlossen · ${levelCount} Level`
-                : `✓ Complete · ${levelCount} levels`;
+            statusText = t('scr_world_done').replace('{n}', levelCount);
         } else if (isLocked) {
-            statusText = LANG === 'de' ? '🔒 Gesperrt' : '🔒 Locked';
+            statusText = t('scr_locked');
         } else {
-            statusText = LANG === 'de' ? `${levelCount} Level` : `${levelCount} levels`;
+            statusText = t('scr_level_count').replace('{n}', levelCount);
         }
     }
 
@@ -1057,19 +1055,13 @@ function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
  */
 function _buildRemainingWorkText(healingTier) {
     if (healingTier === 1) {
-        return LANG === 'de'
-            ? '🎯 Bonusziele noch offen'
-            : '🎯 Bonus objectives remaining';
+        return t('scr_bonus_remaining');
     }
     if (healingTier === 2) {
-        return LANG === 'de'
-            ? '👑 Hard + alle Modifikatoren für vollen Abschluss'
-            : '👑 Clear on Hard with all modifiers for full completion';
+        return t('scr_hard_mods_remaining');
     }
     // tier 3 — fully maxed out
-    return LANG === 'de'
-        ? '✨ Vollständig gemeistert!'
-        : '✨ Fully mastered!';
+    return t('scr_fully_mastered');
 }
 
 /**
@@ -1125,7 +1117,7 @@ function _hideWorldTooltip() {
 function _buildEnterButton(wi) {
     const pos = MAP_WORLD_POSITIONS[wi];
     const label = _getWorldLabel(wi);
-    const btnText = LANG === 'de' ? `▶ ${label} betreten` : `▶ Enter ${label}`;
+    const btnText = t('scr_enter_world').replace('{world}', label);
 
     const canvas = document.getElementById('mv-canvas');
     const { x, y } = _imgPctToCanvasPct(pos.x, pos.y, canvas);
@@ -1683,9 +1675,7 @@ function _buildMapViewTopBar() {
  */
 function _updateToggleButtonLabels() {
     const isMap = STATE && STATE.mapViewEnabled;
-    const label = isMap
-        ? (LANG === 'de' ? 'LISTE' : 'LIST')
-        : (LANG === 'de' ? 'KARTE' : 'MAP');
+    const label = isMap ? t('scr_btn_list') : t('scr_btn_map');
 
     const btn = document.getElementById('btn-toggle-map-view');
     if (btn) {

@@ -210,9 +210,9 @@ function _executeBrownianMotion(row, col, paths, rank) {
     const path2 = paths > 1 ? _buildBearPath(startR2, rows, cols) : null;
 
     if (paths === 1) {
-        showToast(`🐻 Browney unleashed!`);
+        showToast(t('cls_browney_unleashed'));
     } else {
-        showToast(`🐻 Browney & Wiener unleashed!`);
+        showToast(t('cls_browney_wiener_unleashed'));
         trackAchStat('skillBrowneyWienerSummon');
     }
 
@@ -339,7 +339,7 @@ function _drifterPlayLevelUpEffects(newLevel) {
     const lvlEl = document.getElementById('drifter-lvl-text');
     if (lvlEl) lvlEl.innerText = `Lv.${newLevel}`;
 
-    showToast(`🐶 Drifter Level Up!`);
+    showToast(t('cls_drifter_levelup'));
     Audio_Manager.playSFX('drifterLevelUp');
     trackAchStat('drifterLevelUps');
 }
@@ -456,7 +456,7 @@ function _drifterPoopExplosion(el, r, c, rows, cols) {
 
     const iconEl = _drifterPrepareExplosionVisual(el);
     const fuseEl = _drifterCreateFuseElement(el, iconEl, 3);
-    const hudUid = _spawnWalkerHudIndicator("💥", "Fuse Countdown", 3);
+    const hudUid = _spawnWalkerHudIndicator("💥", t('cls_fuse_countdown'), 3);
 
     Audio_Manager.playSFX('drifterPoop');
 
@@ -477,7 +477,7 @@ function _drifterPoopExplosion(el, r, c, rows, cols) {
         const radius = window._drifterCharges;
         const cellsRevealed = _drifterExplodeCells(r, c, radius, rows, cols);
 
-        showToast(`💩 Kaboom!`);
+        showToast(t('cls_kaboom'));
         Audio_Manager.playSFX('drifterExplosion');
         _drifterPlayExplosionAnimation(el);
 
@@ -566,7 +566,7 @@ function _executeSummonDrifter(duration, interval, smartTarget) {
         c: Math.floor(Math.random() * cols),
     };
 
-    showToast(`🐶 Drifter is roaming!`);
+    showToast(t('cls_drifter_roaming'));
     Audio_Manager.playSFX('drifterSummon');
     trackAchStat('skillSummonDrifter');
 

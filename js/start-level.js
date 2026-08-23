@@ -255,7 +255,7 @@ function _updateModTags() {
 // caller (HUD refresh, mistake eraser, golden clock) stays in sync.
 function _setMistakeCounterText(suffix = '') {
     const mc = document.getElementById('mistake-counter');
-    if (mc) mc.textContent = `${LANG === 'de' ? 'Fehler' : 'Mistakes'}: ${mistakeCount}${suffix}`;
+    if (mc) mc.textContent = `${t('cg_mistakes_lbl')}: ${mistakeCount}${suffix}`;
 }
 
 

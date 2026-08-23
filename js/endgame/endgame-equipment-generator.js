@@ -180,12 +180,15 @@ function _egIsHybrid(tier) {
 //                  lines are separated by '\n' in the label string
 
 function _egBuildRolledStats(family, tier) {
+    // Pick affix wording for the active language (falls back to EN).
+    const label = (LANG === 'de' && family.labelDe) ? family.labelDe : family.label;
+
     if (_egIsHybrid(tier)) {
-        const lines = family.label.split('\n');
+        const lines = label.split('\n');
         const val1 = _egRollInt(tier.min1, tier.max1);
         const val2 = _egRollInt(tier.min2, tier.max2);
         return [
-            { key: family.id + '_1', label: (lines[0] || family.label).replace('#', val1).replace('@', val1), value: val1 },
+            { key: family.id + '_1', label: (lines[0] || label).replace('#', val1).replace('@', val1), value: val1 },
             { key: family.id + '_2', label: (lines[1] || '').replace('#', val2).replace('@', val2), value: val2 },
         ];
     }
@@ -193,7 +196,7 @@ function _egBuildRolledStats(family, tier) {
     // Single-stat mod
     const val = _egRollInt(tier.min, tier.max);
     return [
-        { key: family.id, label: family.label.replace('#', val), value: val },
+        { key: family.id, label: label.replace('#', val), value: val },
     ];
 }
 
@@ -306,13 +309,28 @@ function _egRollMods(prefixCount, suffixCount, modTable, itemLevel) {
 // Because your mod entries have no separate display name we derive a short
 // descriptor from the familyId by converting underscores to spaces and
 // title-casing, e.g. "flat_health" → "Health", "fire_resist" → "Fire Resist".
+// EG_MOD_NAME_WORDS (endgame-mod-tables.js) provides localized words:
+//   [enWord, dePrefixWord, deGenitiveSuffix]
+
+function _egModNameEntry(familyId) {
+    return (typeof EG_MOD_NAME_WORDS !== 'undefined') ? EG_MOD_NAME_WORDS[familyId] : null;
+}
 
 function _egModDisplayWord(familyId) {
+    const entry = _egModNameEntry(familyId);
+    if (entry) return LANG === 'de' ? entry[1] : entry[0];
     return familyId
         .split('_')
         .filter(w => !['flat', 'inc', 'hybrid'].includes(w))   // strip generic prefixes
         .map(w => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ');
+}
+
+// Suffix connector for composed names: EN "of X", DE genitive "des/der X".
+function _egModSuffixWord(familyId) {
+    const entry = _egModNameEntry(familyId);
+    if (!entry) return 'of ' + _egModDisplayWord(familyId);
+    return LANG === 'de' ? entry[2] : 'of ' + entry[0];
 }
 
 function _egBuildItemName(baseName, rarity, mods) {
@@ -322,7 +340,7 @@ function _egBuildItemName(baseName, rarity, mods) {
     const suffixes = mods.filter(m => m.type === 'suffix');
 
     const pre = prefixes.length > 0 ? _egModDisplayWord(prefixes[0].familyId) + ' ' : '';
-    const suf = suffixes.length > 0 ? ' of ' + _egModDisplayWord(suffixes[0].familyId) : '';
+    const suf = suffixes.length > 0 ? ' ' + _egModSuffixWord(suffixes[0].familyId) : '';
     return `${pre}${baseName}${suf}`.trim();
 }
 
@@ -354,14 +372,15 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
         : [];
 
     // ── 6. Build display name ────────────────────────────────────────
-    const name = _egBuildItemName(base.name, rarity, mods);
+    const baseName = (LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
+    const name = _egBuildItemName(baseName, rarity, mods);
 
     // ── 7. Assemble item object ──────────────────────────────────────
     return {
         id: `${base.id}_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
         baseId: base.id,
         name,
-        baseName: base.name, 
+        baseName,
         icon: EG_SLOT_ICONS[base.slotType] || '📦',
 
         category: 'equip',

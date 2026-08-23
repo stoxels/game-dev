@@ -29,66 +29,66 @@ const EG_MAX_CONCURRENT_MONSTERS = 4;
 const EG_MONSTER_DEFS = {
     // TIER 1 — Weak / fast
     slime: {
-        id: 'slime', name: 'Probability Slime', emoji: '🟢',
+        id: 'slime', name: t('eg_mon_slime'), emoji: '🟢',
         baseHP: 30, baseDamage: 5, chargeMax: 10, attackType: 'melee' // Melee only
     },
     ghost: {
-        id: 'ghost', name: 'Variance Ghost', emoji: '👻',
+        id: 'ghost', name: t('eg_mon_ghost'), emoji: '👻',
         baseHP: 50, baseDamage: 1, chargeMax: 6 // Defaults to ranged
     },
     bat: {
-        id: 'bat', name: 'Outlier Bat', emoji: '🦇',
+        id: 'bat', name: t('eg_mon_bat'), emoji: '🦇',
         baseHP: 25, baseDamage: 3, chargeMax: 5, attackType: 'melee' // Melee only
     },
     rat: {
-        id: 'rat', name: 'Sample Rat', emoji: '🐀',
+        id: 'rat', name: t('eg_mon_rat'), emoji: '🐀',
         baseHP: 20, baseDamage: 2, chargeMax: 4, attackType: 'melee'
     },
 
     // TIER 2 — Medium / balanced
     crab: {
-        id: 'crab', name: 'Correlation Crab', emoji: '🦀',
+        id: 'crab', name: t('eg_mon_crab'), emoji: '🦀',
         baseHP: 65, baseDamage: 7, chargeMax: 12, attackType: 'melee'
     },
     snake: {
-        id: 'snake', name: 'Regression Snake', emoji: '🐍',
+        id: 'snake', name: t('eg_mon_snake'), emoji: '🐍',
         baseHP: 55, baseDamage: 9, chargeMax: 14, attackType: 'both' // Uses random mix!
     },
     skull: {
-        id: 'skull', name: 'Null Hypothesis Skull', emoji: '💀',
+        id: 'skull', name: t('eg_mon_skull'), emoji: '💀',
         baseHP: 70, baseDamage: 6, chargeMax: 9
     },
 
     // TIER 3 — Tanky / hard-hitting
     golem: {
-        id: 'golem', name: 'Sigma Golem', emoji: '🗿',
+        id: 'golem', name: t('eg_mon_golem'), emoji: '🗿',
         baseHP: 80, baseDamage: 10, chargeMax: 20, attackType: 'melee'
     },
     dragon: {
-        id: 'dragon', name: 'Bayes Dragon', emoji: '🐉',
+        id: 'dragon', name: t('eg_mon_dragon'), emoji: '🐉',
         baseHP: 120, baseDamage: 14, chargeMax: 18, attackType: 'both' // Uses random mix!
     },
     demon: {
-        id: 'demon', name: 'P-Value Demon', emoji: '😈',
+        id: 'demon', name: t('eg_mon_demon'), emoji: '😈',
         baseHP: 100, baseDamage: 18, chargeMax: 22
     },
     golem_iron: {
-        id: 'golem_iron', name: 'Iron Golem', emoji: '🤖',
+        id: 'golem_iron', name: t('eg_mon_golem_iron'), emoji: '🤖',
         baseHP: 150, baseDamage: 8, chargeMax: 16, attackType: 'melee'
     },
     werewolf: {
-        id: 'werewolf', name: 'Stochastic Wolf', emoji: '🐺',
+        id: 'werewolf', name: t('eg_mon_werewolf'), emoji: '🐺',
         baseHP: 90, baseDamage: 12, chargeMax: 11, attackType: 'both' // Uses random mix!
     },
     ogre: {
-        id: 'ogre', name: 'Chi-Square Ogre', emoji: '👹',
+        id: 'ogre', name: t('eg_mon_ogre'), emoji: '👹',
         baseHP: 110, baseDamage: 16, chargeMax: 25, attackType: 'melee'
     },
 
     // TIER 1 — Weak / fast
     beetle: {
         id: 'beetle',
-        name: 'Bootstrap Beetle',
+        name: t('eg_mon_beetle'),
         emoji: '🪲',
         baseHP: 35,
         baseDamage: 4,
@@ -98,7 +98,7 @@ const EG_MONSTER_DEFS = {
 
     bee: {
         id: 'bee',
-        name: 'Confidence Bee',
+        name: t('eg_mon_bee'),
         emoji: '🐝',
         baseHP: 22,
         baseDamage: 5,
@@ -108,7 +108,7 @@ const EG_MONSTER_DEFS = {
 
     spider: {
         id: 'spider',
-        name: 'Network Spider',
+        name: t('eg_mon_spider'),
         emoji: '🕷️',
         baseHP: 28,
         baseDamage: 6,
@@ -118,7 +118,7 @@ const EG_MONSTER_DEFS = {
 
     mosquito: {
         id: 'mosquito',
-        name: 'Bias Mosquito',
+        name: t('eg_mon_mosquito'),
         emoji: '🦟',
         baseHP: 18,
         baseDamage: 4,
@@ -129,7 +129,7 @@ const EG_MONSTER_DEFS = {
     // TIER 2 — Medium / balanced
     scorpion: {
         id: 'scorpion',
-        name: 'Confidence Scorpion',
+        name: t('eg_mon_scorpion'),
         emoji: '🦂',
         baseHP: 75,
         baseDamage: 8,
@@ -139,7 +139,7 @@ const EG_MONSTER_DEFS = {
 
     eye: {
         id: 'eye',
-        name: 'Observer Eye',
+        name: t('eg_mon_eye'),
         emoji: '👁️',
         baseHP: 60,
         baseDamage: 10,
@@ -149,7 +149,7 @@ const EG_MONSTER_DEFS = {
 
     troll: {
         id: 'troll',
-        name: 'Sampling Troll',
+        name: t('eg_mon_troll'),
         emoji: '🧌',
         baseHP: 85,
         baseDamage: 9,
@@ -159,7 +159,7 @@ const EG_MONSTER_DEFS = {
 
     crystal: {
         id: 'crystal',
-        name: 'Covariance Crystal',
+        name: t('eg_mon_crystal'),
         emoji: '💎',
         baseHP: 70,
         baseDamage: 7,
@@ -169,7 +169,7 @@ const EG_MONSTER_DEFS = {
 
     crocodile: {
         id: 'crocodile',
-        name: 'Lag Crocodile',
+        name: t('eg_mon_crocodile'),
         emoji: '🐊',
         baseHP: 80,
         baseDamage: 11,
@@ -180,7 +180,7 @@ const EG_MONSTER_DEFS = {
     // TIER 3 — Tanky / hard-hitting
     brain: {
         id: 'brain',
-        name: 'Neural Overmind',
+        name: t('eg_mon_brain'),
         emoji: '🧠',
         baseHP: 130,
         baseDamage: 15,
@@ -190,7 +190,7 @@ const EG_MONSTER_DEFS = {
 
     oni: {
         id: 'oni',
-        name: 'Significance Oni',
+        name: t('eg_mon_oni'),
         emoji: '👹',
         baseHP: 140,
         baseDamage: 17,
@@ -200,7 +200,7 @@ const EG_MONSTER_DEFS = {
 
     alien: {
         id: 'alien',
-        name: 'Quantum Anomaly',
+        name: t('eg_mon_alien'),
         emoji: '👾',
         baseHP: 110,
         baseDamage: 20,
@@ -210,7 +210,7 @@ const EG_MONSTER_DEFS = {
 
     rhino: {
         id: 'rhino',
-        name: 'Standard Deviation Rhino',
+        name: t('eg_mon_rhino'),
         emoji: '🦏',
         baseHP: 160,
         baseDamage: 14,
@@ -220,7 +220,7 @@ const EG_MONSTER_DEFS = {
 
     skull_lord: {
         id: 'skull_lord',
-        name: 'Entropy Lich',
+        name: t('eg_mon_skull_lord'),
         emoji: '☠️',
         baseHP: 125,
         baseDamage: 22,
@@ -230,7 +230,7 @@ const EG_MONSTER_DEFS = {
 
     bison: {
         id: 'bison',
-        name: 'Distribution Bison',
+        name: t('eg_mon_bison'),
         emoji: '🦬',
         baseHP: 170,
         baseDamage: 13,
@@ -242,7 +242,7 @@ const EG_MONSTER_DEFS = {
 
     ant: {
         id: 'ant',
-        name: 'Worker Ant',
+        name: t('eg_mon_ant'),
         emoji: '🐜',
         baseHP: 24,
         baseDamage: 3,
@@ -252,7 +252,7 @@ const EG_MONSTER_DEFS = {
 
     ladybug: {
         id: 'ladybug',
-        name: 'Lucky Ladybug',
+        name: t('eg_mon_ladybug'),
         emoji: '🐞',
         baseHP: 26,
         baseDamage: 4,
@@ -262,7 +262,7 @@ const EG_MONSTER_DEFS = {
 
     owl: {
         id: 'owl',
-        name: 'Inference Owl',
+        name: t('eg_mon_owl'),
         emoji: '🦉',
         baseHP: 32,
         baseDamage: 5,
@@ -272,7 +272,7 @@ const EG_MONSTER_DEFS = {
 
     frog: {
         id: 'frog',
-        name: 'Jumping Mean Frog',
+        name: t('eg_mon_frog'),
         emoji: '🐸',
         baseHP: 30,
         baseDamage: 4,
@@ -282,7 +282,7 @@ const EG_MONSTER_DEFS = {
 
     moth: {
         id: 'moth',
-        name: 'Chaos Moth',
+        name: t('eg_mon_moth'),
         emoji: '🦋',
         baseHP: 20,
         baseDamage: 6,
@@ -294,7 +294,7 @@ const EG_MONSTER_DEFS = {
 
     gorilla: {
         id: 'gorilla',
-        name: 'Cluster Gorilla',
+        name: t('eg_mon_gorilla'),
         emoji: '🦍',
         baseHP: 95,
         baseDamage: 10,
@@ -304,7 +304,7 @@ const EG_MONSTER_DEFS = {
 
     lion: {
         id: 'lion',
-        name: 'Maximum Likelihood Lion',
+        name: t('eg_mon_lion'),
         emoji: '🦁',
         baseHP: 80,
         baseDamage: 12,
@@ -314,7 +314,7 @@ const EG_MONSTER_DEFS = {
 
     tiger: {
         id: 'tiger',
-        name: 'Gradient Tiger',
+        name: t('eg_mon_tiger'),
         emoji: '🐅',
         baseHP: 75,
         baseDamage: 13,
@@ -324,7 +324,7 @@ const EG_MONSTER_DEFS = {
 
     wizard: {
         id: 'wizard',
-        name: 'Data Wizard',
+        name: t('eg_mon_wizard'),
         emoji: '🧙',
         baseHP: 70,
         baseDamage: 11,
@@ -334,7 +334,7 @@ const EG_MONSTER_DEFS = {
 
     genie: {
         id: 'genie',
-        name: 'Expectation Djinn',
+        name: t('eg_mon_genie'),
         emoji: '🧞',
         baseHP: 85,
         baseDamage: 9,
@@ -344,7 +344,7 @@ const EG_MONSTER_DEFS = {
 
     pumpkin: {
         id: 'pumpkin',
-        name: 'Jack of Samples',
+        name: t('eg_mon_pumpkin'),
         emoji: '🎃',
         baseHP: 90,
         baseDamage: 8,
@@ -356,7 +356,7 @@ const EG_MONSTER_DEFS = {
 
     vampire: {
         id: 'vampire',
-        name: 'Overfit Vampire',
+        name: t('eg_mon_vampire'),
         emoji: '🧛',
         baseHP: 130,
         baseDamage: 18,
@@ -366,7 +366,7 @@ const EG_MONSTER_DEFS = {
 
     zombie: {
         id: 'zombie',
-        name: 'Dead Data Walker',
+        name: t('eg_mon_zombie'),
         emoji: '🧟',
         baseHP: 180,
         baseDamage: 12,
@@ -376,7 +376,7 @@ const EG_MONSTER_DEFS = {
 
     unicorn: {
         id: 'unicorn',
-        name: 'Rare Event Unicorn',
+        name: t('eg_mon_unicorn'),
         emoji: '🦄',
         baseHP: 120,
         baseDamage: 17,
@@ -386,7 +386,7 @@ const EG_MONSTER_DEFS = {
 
     ufo: {
         id: 'ufo',
-        name: 'Unknown Variable',
+        name: t('eg_mon_ufo'),
         emoji: '🛸',
         baseHP: 140,
         baseDamage: 19,
@@ -396,7 +396,7 @@ const EG_MONSTER_DEFS = {
 
     volcano: {
         id: 'volcano',
-        name: 'Volatility Titan',
+        name: t('eg_mon_volcano'),
         emoji: '🌋',
         baseHP: 200,
         baseDamage: 15,
@@ -406,7 +406,7 @@ const EG_MONSTER_DEFS = {
 
     cyclone: {
         id: 'cyclone',
-        name: 'Random Walk Cyclone',
+        name: t('eg_mon_cyclone'),
         emoji: '🌪️',
         baseHP: 125,
         baseDamage: 21,
@@ -416,7 +416,7 @@ const EG_MONSTER_DEFS = {
 
     meteor: {
         id: 'meteor',
-        name: 'Black Swan Meteor',
+        name: t('eg_mon_meteor'),
         emoji: '☄️',
         baseHP: 160,
         baseDamage: 24,
@@ -426,7 +426,7 @@ const EG_MONSTER_DEFS = {
 
     moon: {
         id: 'moon',
-        name: 'Lunar Predictor',
+        name: t('eg_mon_moon'),
         emoji: '🌙',
         baseHP: 145,
         baseDamage: 18,
@@ -436,7 +436,7 @@ const EG_MONSTER_DEFS = {
 
     starspawn: {
         id: 'starspawn',
-        name: 'Cosmic Outlier',
+        name: t('eg_mon_starspawn'),
         emoji: '⭐',
         baseHP: 170,
         baseDamage: 22,

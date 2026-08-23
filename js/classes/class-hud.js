@@ -42,7 +42,7 @@ function getLocalDesc(data) {
 
 // Returns the localised word for "Rank" used in tooltips.
 function _getRankWord() {
-    return LANG === 'de' ? 'Rang' : 'Rank';
+    return t('cls_rank');
 }
 
 
@@ -314,8 +314,7 @@ function _shouldShowActivationHint() {
 function _buildHintArrowHTML(key) {
     if (!_shouldShowActivationHint()) return '';
     const label = key === 'active1' ? '1' : '2';
-    const pressWord = LANG === 'de' ? 'Drücke' : 'Press';
-    const text = `${pressWord} ${label}`;
+    const text = `${t('cls_press')} ${label}`;
 
     if (key === 'active1') {
         return `<div class="chud-hint-arrow chud-hint-arrow--above">
@@ -360,7 +359,7 @@ function renderAscendencyButtons() {
     if (!asc) return '';
 
     return `
-        <span class="chud-asc-sep" title="${t(asc.nameEn, asc.nameDE)}">${asc.icon}</span>
+        <span class="chud-asc-sep" title="${_clsGetLocalizedName(asc)}">${asc.icon}</span>
         ${renderCompactAscBtn(asc, 'active3', 'active1')}
         ${renderCompactAscBtn(asc, 'active4', 'active2')}`;
 }
@@ -381,7 +380,7 @@ function _renderShieldPips(stacks) {
     for (let i = 0; i < maxShow; i++) {
         pips += `<span class="chud-shield-pip"></span>`;
     }
-    return `<span class="chud-shield-pips" title="Variance Shield: ${stacks} stack(s)">${pips}</span>`;
+    return `<span class="chud-shield-pips" title="${t('cls_shield_pips_title').replace('{n}', stacks)}">${pips}</span>`;
 }
 
 

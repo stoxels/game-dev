@@ -125,15 +125,17 @@ const REGION_BEAT_TRIGGER_LEVEL = {
 // 12 Bayesian Bay, 13 Expectation Plateau.
 // ---------------------------------------------------------------------------
 
-// Converts an array of [text, startMs] pairs into the { text, start }
-// caption objects the engine expects. This is the ONLY place caption
-// timing is decided — startMs is exactly when that line appears on screen,
-// in milliseconds from the start of the whole clip sequence. Set every
-// number by hand per line, per region. Caption timing is independent of
-// per-clip audio — a caption line does not need to "belong" to any
-// particular clip.
+// Converts an array of [translationKey, startMs] pairs into the
+// { textKey, start } caption objects the engine expects. The key is resolved
+// to the active language's text via t() at DISPLAY time (see renderVideo in
+// storyline-engine.js) — so a mid-session language switch is picked up on the
+// next playback. This is the ONLY place caption timing is decided — startMs is
+// exactly when that line appears on screen, in milliseconds from the start of
+// the whole clip sequence. Set every number by hand per line, per region.
+// Caption timing is independent of per-clip audio — a caption line does not
+// need to "belong" to any particular clip.
 function _captions(entries) {
-    return entries.map(([text, start]) => ({ text, start }));
+    return entries.map(([key, start]) => ({ textKey: key, start }));
 }
 
 // Builds a standard 5-clip sequence for a region, using the region's number
@@ -173,11 +175,11 @@ STORY_BEATS.region_1 = {
     video: {
         clips: _regionClips(1),
         captions: _captions([
-            ["Probability Peaks rise at the edge of the known world, their slopes reshaping themselves with every roll of unseen dice.", 0],
-            ["The mountains here shift based on probability distributions — paths that existed yesterday may simply not exist today, worn away by chance itself.", 8000],
-            ["This is where the First Cartographers proved that apparent randomness conceals a hidden structure, a grammar written into the stone.", 16000],
-            ["They built their earliest survey posts on these slopes, mapping which paths reappeared often enough to trust, and which vanished for good.", 24000],
-            ["Three centuries later, the peaks still test every traveller who climbs them - a first lesson in reading order inside apparent chaos.", 32000]
+            ['st_r1_c1', 0],
+            ['st_r1_c2', 8000],
+            ['st_r1_c3', 16000],
+            ['st_r1_c4', 24000],
+            ['st_r1_c5', 32000]
         ]),
     }
 };
@@ -186,11 +188,11 @@ STORY_BEATS.region_2 = {
     video: {
         clips: _regionClips(2),
         captions: _captions([
-            ["Distribution Den carves itself out of bell curves — its cave walls rising and falling exactly the way a normal distribution rises and falls.", 0],
-            ["Stalactites here follow power laws, and the underground rivers run in strict Poisson processes, arriving at intervals only mathematics could explain.", 8000],
-            ["This is where the Substrate sits closest to the surface, where the mathematical foundations of reality are, quite literally, visible in the rock.", 16000],
-            ["The Collapse struck the Den at a structural level — bell curves missing their tails, power laws that quietly reverse themselves mid-slope.", 24000],
-            ["The cave system is now physically unstable, because its geology was built on the mathematics, and the mathematics underneath it all is broken.", 32000]
+            ['st_r2_c1', 0],
+            ['st_r2_c2', 8000],
+            ['st_r2_c3', 16000],
+            ['st_r2_c4', 24000],
+            ['st_r2_c5', 32000]
         ]),
     }
 };
@@ -199,11 +201,11 @@ STORY_BEATS.region_3 = {
     video: {
         clips: _regionClips(3),
         captions: _captions([
-            ["Sampling Savanna stretches out as a living dataset, where migrations, growth, and weather once followed statistical laws clean enough to watch unfold.", 0],
-            ["This was the First Cartographers' primary field site — a place where they could simply sit and observe probability working in real time.", 8000],
-            ["The Collapse introduced sampling bias here. The data still flows across the grasslands, but it is wrong in ways not immediately obvious.", 16000],
-            ["Herds now migrate along routes that look random, until you notice every route quietly favours the same false conclusion, over and over.", 24000],
-            ["Something is contaminating the sample at its source — and whatever it is, the contamination keeps spreading further with every passing season.", 32000]
+            ['st_r3_c1', 0],
+            ['st_r3_c2', 8000],
+            ['st_r3_c3', 16000],
+            ['st_r3_c4', 24000],
+            ['st_r3_c5', 32000]
         ]),
     }
 };
@@ -212,11 +214,11 @@ STORY_BEATS.region_4 = {
     video: {
         clips: _regionClips(4),
         captions: _captions([
-            ["The Vortex of Possibilities is not a region the First Cartographers ever built — it is the Variance Collapse itself, made visible at last.", 0],
-            ["This is the place where the corruption first entered the Substrate, and it has been spinning, unbroken, for three hundred years since.", 8000],
-            ["It pulls probability fields in from every surrounding region, dragging their structure into its spiral and churning it down into raw noise.", 16000],
-            ["Most Cartographers who study it assume the Vortex is where the Collapse began — the wound at the very centre of everything.", 24000],
-            ["They are wrong. The Vortex is only where the wound became visible, not where the first cut was actually made.", 32000]
+            ['st_r4_c1', 0],
+            ['st_r4_c2', 8000],
+            ['st_r4_c3', 16000],
+            ['st_r4_c4', 24000],
+            ['st_r4_c5', 32000]
         ]),
     }
 };
@@ -225,11 +227,11 @@ STORY_BEATS.region_5 = {
     video: {
         clips: _regionClips(5),
         captions: _captions([
-            ["Regression Rift twists correlation into causation — here, if two things happen together often enough, they simply begin to cause one another.", 0],
-            ["The landscape folds back on itself as a result. Rivers run uphill toward their own sources, chasing a cause that was never really there.", 8000],
-            ["The flora grows in feedback loops, reinforcing its own patterns again and again until the reinforcement collapses the whole structure at once.", 16000],
-            ["Colonists once settled these folded valleys, believing the strange loops made the land more fertile, more predictable, more worth staying for.", 24000],
-            ["This region was someone's home, once — before the folding accelerated, and staying here stopped being a choice anyone could safely make.", 32000]
+            ['st_r5_c1', 0],
+            ['st_r5_c2', 8000],
+            ['st_r5_c3', 16000],
+            ['st_r5_c4', 24000],
+            ['st_r5_c5', 32000]
         ]),
     }
 };
@@ -241,11 +243,11 @@ STORY_BEATS.region_6 = {
     video: {
         clips: _regionClips(6),
         captions: _captions([
-            ["Frequency Forest grows in Fibonacci spirals, its animals moving through Markov chains, its weather repeating the same cycle, day after day.", 0],
-            ["The First Cartographers once called this repetition beautiful. The Collapse made it compulsive — patterns that cannot stop even as the data changes.", 8000],
-            ["At the forest's centre something is forcing the repetition, because certainty feels safer than randomness to whatever is doing the forcing.", 16000],
-            ["Every region before this one read as damage — wounds an accident left behind three centuries ago, healing badly, but healing by accident.", 24000],
-            ["This does not read as an accident. Something in this forest is still deciding things, actively, and far more recently than three hundred years.", 32000]
+            ['st_r6_c1', 0],
+            ['st_r6_c2', 8000],
+            ['st_r6_c3', 16000],
+            ['st_r6_c4', 24000],
+            ['st_r6_c5', 32000]
         ]),
     }
 };
@@ -254,11 +256,11 @@ STORY_BEATS.region_7 = {
     video: {
         clips: _regionClips(7),
         captions: _captions([
-            ["Stochapolis was built by a civilisation convinced that precise enough machines could eliminate probability altogether, reducing every outcome down to pure certainty.", 0],
-            ["They called it Total Determination, and spent centuries raising this city of gears and calculators to finally achieve it, once and for all.", 8000],
-            ["The Variance Collapse destroyed the project and destroyed its builders. The machines kept running anyway — clattering through infinite loops, producing nothing.", 16000],
-            ["But the machines are not entirely empty now. Something has moved into the gears, into the endless calculations, and made itself at home.", 24000],
-            ["It did not arrive by accident. It recognised the city's old ambition — eliminate variance, achieve certainty — as an ambition of its own.", 32000]
+            ['st_r7_c1', 0],
+            ['st_r7_c2', 8000],
+            ['st_r7_c3', 16000],
+            ['st_r7_c4', 24000],
+            ['st_r7_c5', 32000]
         ]),
     }
 };
@@ -267,11 +269,11 @@ STORY_BEATS.region_8 = {
     video: {
         clips: _regionClips(8),
         captions: _captions([
-            ["In the Hypothesis Hinterlands, the Substrate's conceptual layer has collapsed straight into the physical one — abstract theories now walk around as living things.", 0],
-            ["True hypotheses turn out stable here, almost tame. False hypotheses have become predators — aggressive, territorial, dangerous precisely because they don't know they're wrong.", 8000],
-            ["The number of possible wrong answers vastly outnumbers the right ones, so the Hinterlands teem with more predators than any other region.", 16000],
-            ["One false hypothesis moves differently than the rest — calmer, more organised, refusing to attack at random the way a wrong answer should.", 24000],
-            ["It attacks like something that already knows exactly what it wants to be right about, and has decided you are in its way.", 32000]
+            ['st_r8_c1', 0],
+            ['st_r8_c2', 8000],
+            ['st_r8_c3', 16000],
+            ['st_r8_c4', 24000],
+            ['st_r8_c5', 32000]
         ]),
     }
 };
@@ -280,11 +282,11 @@ STORY_BEATS.region_9 = {
     video: {
         clips: _regionClips(9),
         captions: _captions([
-            ["Every event that happens anywhere in the world eventually leaves a trace, and every one of those traces flows down through Data Delta.", 0],
-            ["The First Cartographers built processing stations along its banks to read the world's information in something close to real time.", 8000],
-            ["The Collapse corrupted these streams. Signal and noise now flow mixed together, in proportions that make meaningful extraction almost impossible to manage.", 16000],
-            ["Almost impossible. One fragment survives the noise anyway — coordinates, and a name, half-formed and flickering inside the corrupted signal: V _ R U N.", 24000],
-            ["It is not enough to read completely. But it is enough, finally, to know exactly where to go looking next.", 32000]
+            ['st_r9_c1', 0],
+            ['st_r9_c2', 8000],
+            ['st_r9_c3', 16000],
+            ['st_r9_c4', 24000],
+            ['st_r9_c5', 32000]
         ]),
     }
 };
@@ -295,11 +297,11 @@ STORY_BEATS.region_10 = {
     video: {
         clips: _regionClips(10),
         captions: _captions([
-            ["Parameter Plains carries this world's fundamental constants — θ, μ, σ — physically inscribed across its soil. They are not decoration. They are load-bearing.", 0],
-            ["These are the values the Substrate uses to generate probability fields everywhere, and someone is rewriting them, one parameter at a time.", 8000],
-            ["The trajectory, if completed, ends at a single point: zero variance everywhere, every distribution in the world collapsed down to one certain outcome.", 16000],
-            ["His name was Verun — a First Cartographer who proved suffering is guaranteed in any universe ruled by probability, and decided probability was the cause.", 24000],
-            ["He called it The Final Null and seeded corrupted parameters into the Apex. He never lived to see it finish, but it very nearly has.", 32000]
+            ['st_r10_c1', 0],
+            ['st_r10_c2', 8000],
+            ['st_r10_c3', 16000],
+            ['st_r10_c4', 24000],
+            ['st_r10_c5', 32000]
         ]),
     }
 };
@@ -308,11 +310,11 @@ STORY_BEATS.region_11 = {
     video: {
         clips: _regionClips(11),
         captions: _captions([
-            ["Entire statistical concepts have been erased from existence in the Null Hypothesis Void — things that should exist here simply do not.", 0],
-            ["It is dark not because light is absent, but because the very concept of light's presence has been removed from local probability space.", 8000],
-            ["This is also where its influence runs strongest — and here, for the first time, it sends no creature, only a voice.", 16000],
-            ["\"You have been solving the Collapse as though it were an accident. It was not. Every Stoxel you've cleared undoes centuries of careful work.\"", 24000],
-            ["\"In a universe ruled by probability, suffering isn't possible — it's guaranteed. I am not this story's villain. I only finished reading it.\"", 32000]
+            ['st_r11_c1', 0],
+            ['st_r11_c2', 8000],
+            ['st_r11_c3', 16000],
+            ['st_r11_c4', 24000],
+            ['st_r11_c5', 32000]
         ]),
     }
 };
@@ -321,11 +323,11 @@ STORY_BEATS.region_12 = {
     video: {
         clips: _regionClips(12),
         captions: _captions([
-            ["Bayesian Bay's tides once ran on Bayesian updating — the sea changing based on what it observed, not on what physics dictated.", 0],
-            ["It was, once, a body of water that learned. The Collapse did not make it more chaotic. It made it too certain instead.", 8000],
-            ["The Bay locked onto a single prior and simply stopped updating, no longer responding to any new information the world tries to hand it.", 16000],
-            ["It is frozen now in a belief three centuries out of date — and you know things now you didn't know five regions back.", 24000],
-            ["About Verun. About the Null. About a Guild that refused to update its beliefs too. The Bay isn't another wound — it's a preview.", 32000]
+            ['st_r12_c1', 0],
+            ['st_r12_c2', 8000],
+            ['st_r12_c3', 16000],
+            ['st_r12_c4', 24000],
+            ['st_r12_c5', 32000]
         ]),
     }
 };
@@ -334,11 +336,11 @@ STORY_BEATS.region_13 = {
     video: {
         clips: _regionClips(13),
         captions: _captions([
-            ["The First Cartographers made their greatest breakthrough on Expectation Plateau — the formalisation of expected value, carved into bedrock in letters thirty metres high.", 0],
-            ["It proves that even in a universe ruled by probability, outcomes balance — that the average of enough chances bends toward something survivable.", 8000],
-            ["It is, quite literally, the mathematical argument against everything the Null said in the Void — and someone has been defacing it.", 16000],
-            ["Not randomly. Systematically. Certain symbols altered so the proof turns incorrect, so the plateau agrees with the Null instead of refuting it.", 24000],
-            ["This was not the Collapse. Someone is finishing what Verun started — one last edit on the one proof that says he might be wrong.", 32000]
+            ['st_r13_c1', 0],
+            ['st_r13_c2', 8000],
+            ['st_r13_c3', 16000],
+            ['st_r13_c4', 24000],
+            ['st_r13_c5', 32000]
         ]),
     }
 };

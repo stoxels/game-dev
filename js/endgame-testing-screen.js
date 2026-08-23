@@ -690,7 +690,7 @@ function _egLaunchTestMap(mapId) {
 
     const gi = _egtPickSeedGi(mapDef);
     if (gi === null) {
-        showToast(`⚠️ No eligible puzzles found for "${mapDef.name}". Loosen its puzzlePool criteria.`);
+        showToast(t('egt_no_puzzles').replace('{name}', mapDef.name));
         return;
     }
 
@@ -722,25 +722,25 @@ function _egLaunchTestMap(mapId) {
 
 function _egtBuildMapCardHTML(mapDef) {
     const bossLine = mapDef.hasBoss
-        ? `<div class="egt-map-stat">💀 Boss${mapDef.maxBosses > 1 ? ` ×${mapDef.maxBosses}` : ''}</div>`
+        ? `<div class="egt-map-stat">💀 ${t('egt_boss')}${mapDef.maxBosses > 1 ? ` ×${mapDef.maxBosses}` : ''}</div>`
         : '';
     const questionLine = mapDef.requiredQuestions
-        ? `<div class="egt-map-stat">❓ ${mapDef.requiredQuestions} questions</div>`
+        ? `<div class="egt-map-stat">❓ ${t('egt_questions').replace('{n}', mapDef.requiredQuestions)}</div>`
         : '';
 
     return `
 <div class="egt-map-card" onclick="_egLaunchTestMap('${mapDef.id}')">
-    <div class="egt-map-tier">TIER ${mapDef.tier}</div>
+    <div class="egt-map-tier">${t('egt_tier').replace('{n}', mapDef.tier)}</div>
     <div class="egt-map-icon">${mapDef.icon}</div>
     <div class="egt-map-name">${mapDef.name}</div>
     <div class="egt-map-stats">
-        <div class="egt-map-stat">⚔️ Lv ${mapDef.monsterLevel} · ${mapDef.totalMonsters} kills</div>
+        <div class="egt-map-stat">⚔️ ${t('egt_kills').replace('{lv}', mapDef.monsterLevel).replace('{kills}', mapDef.totalMonsters)}</div>
         ${bossLine}
-        <div class="egt-map-stat">🧩 ${mapDef.requiredPuzzles} puzzles</div>
+        <div class="egt-map-stat">🧩 ${t('egt_puzzles').replace('{n}', mapDef.requiredPuzzles)}</div>
         ${questionLine}
     </div>
     <div class="egt-map-desc">${mapDef.desc}</div>
-    <button class="title-btn egt-enter-btn">▶ RUN MAP</button>
+    <button class="title-btn egt-enter-btn">${t('egt_run_map')}</button>
 </div>`;
 }
 
@@ -748,10 +748,10 @@ function _egtBuildFullScreenHTML() {
     return `
 <div class="egt-hub-layout">
     <div class="egt-topbar">
-        <button class="title-btn back-btn" onclick="goToPreviousScreen()">◀ BACK</button>
-        <span class="egt-topbar-title">🧪 ENDGAME TEST MAPS</span>
+        <button class="title-btn back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
+        <span class="egt-topbar-title">${t('egt_title')}</span>
         <button class="title-btn sec" onclick="window._egHubReturnScreen='screen-endgame-test-hub'; showEndgameHub();">
-            🌌 Stash / Equip
+            ${t('egt_stash_equip')}
         </button>
     </div>
     <div class="egt-map-grid" id="egt-map-grid">

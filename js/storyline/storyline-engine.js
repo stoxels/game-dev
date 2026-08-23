@@ -659,7 +659,7 @@ const StorylineRenderer = (() => {
         const hint = document.createElement('div');
         hint.style.cssText = STYLES.hint;
         const isLast = pageIndex === pages.length - 1;
-        hint.textContent = isLast ? 'click to continue' : 'click for next';
+        hint.textContent = isLast ? t('st_hint_continue') : t('st_hint_next');
         overlay.appendChild(hint);
 
         if (hintTimeout) clearTimeout(hintTimeout);
@@ -728,14 +728,14 @@ const StorylineRenderer = (() => {
         // "Click for next" hint
         const hint = document.createElement('div');
         hint.style.cssText = STYLES.hint;
-        hint.textContent = 'click for next';
+        hint.textContent = t('st_hint_next');
         overlay.appendChild(hint);
         slideImgEls.hint = hint;
 
         // Skip button
         const skipBtn = document.createElement('button');
         skipBtn.style.cssText = STYLES.skipBtn;
-        skipBtn.textContent = 'skip';
+        skipBtn.textContent = t('st_skip');
         skipBtn.addEventListener('click', (e) => {
             e.stopPropagation(); // don't also advance the slide
             close();
@@ -779,7 +779,7 @@ const StorylineRenderer = (() => {
         const textP = slideImgEls.textP;
         textP.style.color = 'rgba(0, 0, 0, 0)';
         setTimeout(() => {
-            textP.textContent = slide.text || '';
+            textP.textContent = slide.textKey ? t(slide.textKey) : (slide.text || '');
             requestAnimationFrame(() => {
                 textP.style.color = 'rgba(0, 0, 0, 0.95)';
             });
@@ -790,7 +790,7 @@ const StorylineRenderer = (() => {
 
         // Hint text + style
         const isLast = index === slides.length - 1;
-        slideImgEls.hint.textContent = isLast ? 'click to continue' : 'click for next';
+        slideImgEls.hint.textContent = isLast ? t('st_hint_continue') : t('st_hint_next');
         slideImgEls.hint.style.color = 'rgba(255, 255, 255, 0)';
         if (hintTimeout) clearTimeout(hintTimeout);
         hintTimeout = setTimeout(() => {
@@ -898,7 +898,7 @@ const StorylineRenderer = (() => {
         // are driven by audio playback, not click-through)
         const skipBtn = document.createElement('button');
         skipBtn.style.cssText = STYLES.skipBtn;
-        skipBtn.textContent = 'skip';
+        skipBtn.textContent = t('st_skip');
         skipBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             close();
@@ -1080,7 +1080,14 @@ const StorylineRenderer = (() => {
     // beat doesn't hang forever waiting on a play() promise that never resolves.
     function startSong(song) {
         songImages = (song.images || []).slice().sort((a, b) => a.time - b.time);
-        songLines = (song.lines || []).slice().sort((a, b) => {
+        // Lyric lines arrive as bilingual data entries { section, en, de, s, e }
+        // and are resolved to timed words for the ACTIVE language here — so a
+        // mid-session language switch is picked up on the next playback.
+        const useDe = (typeof LANG !== 'undefined' && LANG === 'de');
+        songLines = (song.lines || []).map(l => ({
+            section: l.section,
+            words: _wordsFromLine(useDe && l.de ? l.de : l.en, l.s, l.e),
+        })).sort((a, b) => {
             const at = a.words[0] ? a.words[0].time : 0;
             const bt = b.words[0] ? b.words[0].time : 0;
             return at - bt;
@@ -1178,7 +1185,7 @@ const StorylineRenderer = (() => {
         videoCaptionLineEls = videoCaptions.map(line => {
             const p = document.createElement('p');
             p.style.cssText = STYLES.videoCaptionLine;
-            p.textContent = line.text;
+            p.textContent = line.textKey ? t(line.textKey) : (line.text || '');
             captionBox.appendChild(p);
             return p;
         });
@@ -1275,7 +1282,7 @@ const StorylineRenderer = (() => {
         } else {
             videoSeqComplete = true;
             if (videoSkipBtnEl) {
-                videoSkipBtnEl.textContent = 'continue';
+                videoSkipBtnEl.textContent = t('st_continue');
                 videoSkipBtnEl.style.borderColor = 'rgba(255, 255, 255, 0.9)';
             }
         }

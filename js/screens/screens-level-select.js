@@ -126,9 +126,7 @@ function applyClassStatusActiveStyle(classEl, def, asc) {
 
 // Resets the class status element to its empty/no-class state.
 function applyClassStatusEmptyStyle(classEl) {
-    classEl.textContent = LANG === 'de'
-        ? 'Keine Klasse'
-        : 'No Class';
+    classEl.textContent = t('scr_no_class');
     classEl.style.border = '';
     classEl.style.padding = '';
     classEl.style.color = '';
@@ -161,7 +159,7 @@ function renderLSPassiveTreeButton() {
     const ptBtn = document.getElementById('btn-go-passive-tree');
     if (!ptBtn) return;
 
-    const label = LANG === 'de' ? '🌿 Wahrscheinlichkeitsbaum' : '🌿 Probability Tree';
+    const label = `🌿 ${t('scr_probability_tree')}`;
     ptBtn.textContent = label + (treePoints > 0 ? ` (${treePoints})` : '');
 
     const color = treePoints > 0 ? 'var(--yellow)' : 'var(--green)';
@@ -369,7 +367,7 @@ function buildGridSizeStr(p, w) {
 // Only shown when the world has more than one level.
 function buildAscensionBadge(isLastInWorld, w) {
     if (!isLastInWorld || w.data.length <= 1) return '';
-    return `<div class="lc-ascension-badge">${LANG === 'de' ? '⚗️ AUFSTIEG' : '⚗️ ASCENSION'}</div>`;
+    return `<div class="lc-ascension-badge">${t('scr_ascension_badge')}</div>`;
 }
 
 // Returns the CONVERGENCE badge HTML, with a checkmark if the reward is already claimed.
@@ -377,10 +375,9 @@ function buildConvergenceBadge(isConvergenceLevel, gi) {
     if (!isConvergenceLevel) return '';
 
     const claimed = STATE.convergenceDone && STATE.convergenceDone.includes(gi);
-    const labelDE = claimed ? '🌿 KONVERGENZ ✓' : '🌿 KONVERGENZ';
-    const labelEN = claimed ? '🌿 CONVERGENCE ✓' : '🌿 CONVERGENCE';
+    const label = t(claimed ? 'scr_convergence_claimed' : 'scr_convergence_badge');
 
-    return `<div class="lc-convergence-badge">${LANG === 'de' ? labelDE : labelEN}</div>`;
+    return `<div class="lc-convergence-badge">${label}</div>`;
 }
 
 // Assembles the full inner HTML for a level card.
@@ -476,8 +473,8 @@ function buildEndgameHubCard(w, wi, tip) {
 
     hubCard.innerHTML = `
         <div class="eg-hub-card-icon">🌌</div>
-        <div class="eg-hub-card-title">${LANG === 'de' ? 'NEXUS DER WELTEN' : 'NEXUS OF WORLDS'}</div>
-        <div class="eg-hub-card-sub">${LANG === 'de' ? 'ENDGAME' : 'ENDGAME'}</div>
+        <div class="eg-hub-card-title">${t('scr_nexus_of_worlds')}</div>
+        <div class="eg-hub-card-sub">ENDGAME</div>
     `;
 
     // Tooltip and Routing events
@@ -497,14 +494,12 @@ function buildEndgameHubCard(w, wi, tip) {
         });
 
         hubCard.addEventListener('mouseenter', () => {
-            tip.textContent = LANG === 'de' ? '🌌 Betrete den Nexus der Welten' : '🌌 Enter the Nexus of Worlds';
+            tip.textContent = t('scr_enter_nexus');
             tip.classList.add('show');
         });
     } else {
         hubCard.addEventListener('mouseenter', () => {
-            tip.textContent = LANG === 'de'
-                ? '🔒 Löse die Puzzle in allen Welten um den Nexus freizuschalten.'
-                : '🔒 Clear all Worlds to unlock the Nexus.';
+            tip.textContent = t('scr_nexus_locked');
             tip.classList.add('show');
         });
     }

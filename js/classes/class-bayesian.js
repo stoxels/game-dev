@@ -41,26 +41,20 @@ function _bayesTrapTypeInfo(type) {
         reveal: {
             icon: '🪤',
             color: '#27ae60',
-            label: LANG === 'de' ? 'Enthüllungsfalle' : 'Reveal Trap',
-            hint: LANG === 'de'
-                ? 'Enthüllt korrekte Zellen im Radius 1'
-                : 'Reveals correct cells in radius 1',
+            label: t('cls_trap_reveal'),
+            hint: t('cls_trap_reveal_hint'),
         },
         elimination: {
             icon: '💣',
             color: '#e74c3c',
-            label: LANG === 'de' ? 'Eliminierungsfalle' : 'Elimination Trap',
-            hint: LANG === 'de'
-                ? 'Markiert falsche leere Zellen horizontal und vertikal bis zu 5 Zellen entfernt'
-                : 'Marks wrong empty cells horizontally and vertically up to 5 cells away',
+            label: t('cls_trap_elimination'),
+            hint: t('cls_trap_elim_hint'),
         },
         protection: {
             icon: '🔰',
             color: '#f39c12',
-            label: LANG === 'de' ? 'Schutzfalle' : 'Protection Trap',
-            hint: LANG === 'de'
-                ? 'Schützt die gesamte Zeile & Spalte vor Fehlern'
-                : 'Protects the entire row & column from mistakes',
+            label: t('cls_trap_protection'),
+            hint: t('cls_trap_protect_hint'),
         },
     };
     return defs[type] || { icon: '❓', color: '#aaa', label: type, hint: '' };
@@ -82,7 +76,7 @@ function _buildQueuedTrapsHTML(trapsQueue) {
         return `<span style="color:${info.color}">${info.icon} ${info.label}</span>`;
     }).join('  ');
 
-    const label = LANG === 'de' ? 'Bereits gewählt' : 'Already chosen';
+    const label = t('cls_already_chosen');
 
     return `<div style="font-family:var(--PX);font-size:9px;color:#aaa;
                         margin-bottom:10px;line-height:1.8;">
@@ -109,12 +103,12 @@ function _buildTrapTypeButtonsHTML(availableTraps) {
 
 // Assembles the full inner HTML for the trap selection overlay modal.
 function _buildSelectOverlayHTML(state) {
-    const title = LANG === 'de' ? 'BAYES-FALLEN' : 'BAYES TRAPS';
+    const title = t('cls_bayes_traps_title');
     const selected = state.trapsQueue.length;
-    const prompt = LANG === 'de'
-        ? `Wähle einen Typ für Falle ${selected + 1} von ${state.trapCount}:`
-        : `Choose a type for trap ${selected + 1} of ${state.trapCount}:`;
-    const cancelLabel = LANG === 'de' ? 'ABBRECHEN' : 'CANCEL';
+    const prompt = t('cls_trap_prompt')
+        .replace('{a}', selected + 1)
+        .replace('{b}', state.trapCount);
+    const cancelLabel = t('cls_cancel');
 
     const trapBtns = _buildTrapTypeButtonsHTML(state.availableTraps);
     const queuedHTML = _buildQueuedTrapsHTML(state.trapsQueue);
@@ -239,9 +233,10 @@ function _bayesTrapsStartPlacementPhase() {
     _bayesTrapsCreateCursorFollower();
 
     const firstTrap = _bayesTrapTypeInfo(state.trapsQueue[0].type);
-    showToast(LANG === 'de'
-        ? `🧪 Platziere Falle 1/${state.trapCount}: ${firstTrap.icon} ${firstTrap.label} — ${BAYES_FUSE_SECONDS}s Zündschnur!`
-        : `🧪 Place trap 1/${state.trapCount}: ${firstTrap.icon} ${firstTrap.label} — ${BAYES_FUSE_SECONDS}s fuse!`);
+    showToast(t('cls_trap_place_first')
+        .replace('{b}', state.trapCount)
+        .replace('{l}', `${firstTrap.icon} ${firstTrap.label}`)
+        .replace('{f}', BAYES_FUSE_SECONDS));
 }
 
 // Called from Mousebutton_Handlers.js when the player clicks a grid cell during placement.
@@ -267,16 +262,15 @@ function _bayesTrapPlacementClick(row, col) {
     if (state.currentTrapIdx >= state.trapCount) {
         // All traps placed — remove the hand follower but keep the fuse ticking on the grid
         document.getElementById('bayes-trap-cursor-follower')?.remove();
-        showToast(LANG === 'de'
-            ? `🧪 Alle ${state.placedCount} Falle(n) platziert! Warten auf Detonation...`
-            : `🧪 All ${state.placedCount} trap(s) placed! Waiting for detonation...`);
+        showToast(t('cls_traps_placed').replace('{n}', state.placedCount));
         trackAchStat('bayesTrapsAllPlaced');
     } else {
         // Prompt for the next trap in the queue
         const nextInfo = _bayesTrapTypeInfo(state.trapsQueue[state.currentTrapIdx].type);
-        showToast(LANG === 'de'
-            ? `🧪 Falle ${state.currentTrapIdx + 1}/${state.trapCount}: ${nextInfo.icon} ${nextInfo.label}`
-            : `🧪 Trap ${state.currentTrapIdx + 1}/${state.trapCount}: ${nextInfo.icon} ${nextInfo.label}`);
+        showToast(t('cls_trap_next')
+            .replace('{a}', state.currentTrapIdx + 1)
+            .replace('{b}', state.trapCount)
+            .replace('{l}', `${nextInfo.icon} ${nextInfo.label}`));
         _bayesTrapsUpdateCursorFollower();
     }
 
@@ -304,7 +298,7 @@ function _bayesTrapsFirePlacedTraps(trapsQueue) {
 function _bayesTrapsApplyUnplacedPenalty(trapsQueue) {
     const unplaced = trapsQueue.filter(t => !t.placed).length;
     if (unplaced === 0) {
-        showToast(LANG === 'de' ? '🧪 💥 Alle Fallen explodiert!' : '🧪 💥 All traps detonated!');
+        showToast(t('cls_traps_detonated'));
         return 0;
     }
 
@@ -312,9 +306,9 @@ function _bayesTrapsApplyUnplacedPenalty(trapsQueue) {
     timerSecs = Math.max(0, timerSecs - penalty);
     updTimer();
 
-    showToast(LANG === 'de'
-        ? `🧪 💥 ${unplaced} Falle(n) in der Hand explodiert! -${penalty}s`
-        : `🧪 💥 ${unplaced} trap(s) detonated in hand! -${penalty}s`);
+    showToast(t('cls_traps_inhand')
+        .replace('{n}', unplaced)
+        .replace('{p}', penalty));
 
     // Brief red flash on the penalty display
     const flashEl = document.getElementById('pen-flash');
@@ -374,7 +368,7 @@ function _bayesTrapsCancel() {
         const cd = cooldownState['active3'];
         if (cd?.interval) { clearInterval(cd.interval); cd.interval = null; }
         if (cd) cd.remaining = 0;
-        showToast(LANG === 'de' ? '🧪 Abgebrochen.' : '🧪 Cancelled.');
+        showToast(`🧪 ${t('cls_cancelled')}`);
     }
 
     _bayesTrapsCleanup(true);
@@ -642,9 +636,8 @@ function _bayesTrapProtectionIntercept(row, col) {
     const [type, idxStr] = matchKey.split(':');
     _bayesTrapRemoveProtectionVisual(type, parseInt(idxStr, 10));
 
-    showToast(`🛡️ ${LANG === 'de'
-        ? `Schutzfalle ausgelöst! Fehler blockiert in ${type === 'row' ? 'Zeile' : 'Spalte'} ${parseInt(idxStr, 10) + 1}`
-        : `Protection Trap triggered! Mistake blocked in ${type} ${parseInt(idxStr, 10) + 1}`}`);
+    const lineWord = (type === 'row' ? t('cls_row_word') : t('cls_col_word')) + ' ' + (parseInt(idxStr, 10) + 1);
+    showToast(t('cls_protect_triggered').replace('{line}', lineWord));
 
     if (window.Audio_Manager) Audio_Manager.playSFX('varianceShield');
     return true;
@@ -980,7 +973,7 @@ function _executeTypeIShield(seedCount, bonusReveal) {
     const eligible = _typeIGetEligibleCells();
 
     if (eligible.length === 0) {
-        showToast(LANG === 'de' ? '🛡️ Keine Zellen zum Beschildern!' : '🛡️ No cells available to shield!');
+        showToast(t('cls_typei_none'));
         _setAbilityMode(false);
         const cd = cooldownState['active4'];
         if (cd?.interval) { clearInterval(cd.interval); cd.interval = null; }
@@ -993,12 +986,12 @@ function _executeTypeIShield(seedCount, bonusReveal) {
     _typeISeedShieldedCells(toSeed);
 
     const bonusNote = bonusReveal
-        ? (LANG === 'de' ? ' (+Enthüllung bei Auslösung)' : ' (+reveal on trigger)')
+        ? t('cls_typei_bonus_note')
         : '';
 
-    showToast(`🛡️ ${LANG === 'de'
-        ? `Fehler 1. Art Schild: ${toSeed.length} Zelle(n) beschildert${bonusNote}`
-        : `Type I Error Shield: ${toSeed.length} cell(s) shielded${bonusNote}`}`);
+    showToast(t('cls_typei_seeded')
+        .replace('{n}', toSeed.length)
+        .replace('{bonus}', bonusNote));
 
     Audio_Manager.playSFX('type1errorShieldHide');
     buildClassHUD();
@@ -1022,9 +1015,7 @@ function _typeIShieldIntercept(row, col) {
 
     _typeIShowShieldBreakEffect(row, col);
 
-    showToast(LANG === 'de'
-        ? '🧪 Fehler 1. Art - Schutz ausgelöst!'
-        : 'Type I Error - Shield triggered!');
+    showToast(t('cls_typei_triggered'));
 
     Audio_Manager.playSFX('type1errorShieldBreak');
     trackAchStat('type1Intercepts');
@@ -1103,9 +1094,7 @@ function _typeIBonusRevealCell(row, col) {
     trackAchStat('tilesRevealed', 1);
     _applyCellEffect([`g-${r}-${c}`], 'reveal');
 
-    showToast(LANG === 'de'
-        ? '🛡️ Typ-I-Bonus: 1 korrekte Zelle enthüllt!'
-        : 'Type I bonus: 1 correct cell revealed!');
+    showToast(t('cls_typei_bonus'));
 
     questStat_classRevealUsed(1);
     updateQuestStats('classAbilityUsedThisLevel', {});

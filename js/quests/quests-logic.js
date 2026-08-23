@@ -41,19 +41,15 @@ const KEYSTONE_CATEGORY_IDS = new Set([
     'signal_noise_master',
     'oracle_vision',
     'degrees_of_freedom_master',
-    'random_walk_master',
     'entropy_drain_master',
     'overfitting_gambler',
     'countdown_crisis_master',
     'sparse_prior_master',
-    'dead_reckoning_master',
+    'dead_reckoning_navigator',
     'frequentists_burden_master',
     'adjacency_matrix_master',
     'minesweeper_mind',
-    'ergodic_field_master',
-    'gamblers_ruin_master',
-    'asymptotic_master',
-    'stochastic_resonance_master',
+    'gamblers_fortune',
     'random_walk_survivor',
 ]);
 
@@ -233,7 +229,7 @@ function _banner_resolveItemLabel(defId, de) {
     const def = resolvedId ? ITEM_DEFS[resolvedId] : null;
     return def
         ? `${def.icon} ${de ? def.nameDE : def.nameEn}`
-        : '🎁 Item';
+        : t('qa_item_fallback');
 }
 
 
@@ -247,9 +243,8 @@ function _banner_resolveItemLabel(defId, de) {
 function _questItemGrantToastMsg(defId) {
     const de = LANG === 'de';
     const def = ITEM_DEFS[defId];
-    const label = def ? `${def.icon} ${de ? def.nameDE : def.nameEn}` : '🎁 Item';
-    const prefix = de ? 'Erhalten' : 'Added';
-    return `🎒 ${prefix}: ${label}`;
+    const label = def ? `${def.icon} ${de ? def.nameDE : def.nameEn}` : t('qa_item_fallback');
+    return `🎒 ${t('qa_added_prefix')}: ${label}`;
 }
 
 /**
@@ -263,8 +258,7 @@ function _banner_buildRewardParts(ms) {
     const parts = [];
 
     if (ms.reward.ptPoints) {
-        const label = de ? 'Konvergenzpunkt' : 'Convergence Point';
-        parts.push(`🌳 +${ms.reward.ptPoints} ${label}`);
+        parts.push(`🌳 +${ms.reward.ptPoints} ${t('qa_convergence_point')}`);
     }
 
     if (ms.reward.items) {
@@ -295,7 +289,7 @@ function _banner_buildElement(ms, cat, rewardParts) {
     <div class="qcb-inner">
         <span class="qcb-icon">${cat.icon}</span>
         <div class="qcb-text">
-            <div class="qcb-title">⭐ ${de ? 'Meilenstein erreicht!' : 'Milestone Reached!'}</div>
+            <div class="qcb-title">⭐ ${t('qa_milestone_reached')}</div>
             <div class="qcb-sub">
                 ${de ? cat.titleDE : cat.titleEn}: <em>${de ? ms.labelDE : ms.labelEn}</em>
             </div>

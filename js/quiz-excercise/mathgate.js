@@ -439,9 +439,7 @@ function mgRefreshTutorButton() {
 
     if (canUseTutor && tutorCount > 0) {
         btn.style.display = 'inline-block';
-        btn.textContent = LANG === 'de'
-            ? `🎓 Tutor um Hilfe bitten (${tutorCount})`
-            : `🎓 Ask Tutor for Help (${tutorCount})`;
+        btn.textContent = t('qz_ask_tutor').replace('{n}', tutorCount);
     } else {
         btn.style.display = 'none';
     }
@@ -459,7 +457,7 @@ function mgContinueToLevel() {
 // the level after a short celebration delay.
 function mgHandleTutorSuccess() {
     const gi = pendingGateGi;
-    const msg = LANG === 'de' ? '🎓 Tutor hat die Frage gelöst!' : '🎓 Tutor solved it!';
+    const msg = t('qz_tutor_solved');
 
     Audio_Manager.playSFX('tutorSuccess');
     showMgFeedback(msg, true);
@@ -476,9 +474,7 @@ function mgHandleTutorSuccess() {
 // Handles the outcome where the tutor fails to solve the question.
 // Shows failure feedback and hides the tutor button for this attempt.
 function mgHandleTutorFailure() {
-    const msg = LANG === 'de'
-        ? '🎓 Tutor konnte die Frage nicht lösen…'
-        : '🎓 Tutor couldn\'t solve it…';
+    const msg = t('qz_tutor_failed');
 
     Audio_Manager.playSFX('tutorFail');
     showMgFeedback(msg, false);
@@ -589,7 +585,7 @@ function mgGrantGateReward(gi) {
     const itemName = LANG === 'de' ? def.nameDE : def.nameEn;
     showMgFeedback(`${t('mg_correct')} + ${def.icon} ${itemName}!`, true);
 
-    setTimeout(() => showToast('Probability Gate passed, Item reward received!'), 1000);
+    setTimeout(() => showToast(t('qz_gate_passed_toast')), 1000);
 
     // Attach the tooltip after the DOM has had a chance to update.
     setTimeout(() => {

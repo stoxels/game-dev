@@ -154,16 +154,16 @@ function _egBuildEquipColHTML(col) {
 function _egBuildCharPanelHTML() {
     return `
 <div class="eg-panel eg-panel-char">
-    <div class="eg-panel-label">CHARACTER</div>
+    <div class="eg-panel-label">${t('eg_char_label')}</div>
     <div class="eg-char-panel eg-char-panel-no-model">
         <div class="eg-equip-col eg-equip-left" id="eg-equip-left">
             ${_egBuildEquipColHTML('left')}
         </div>
         <div class="eg-char-stats-panel" id="eg-char-stats-panel">
-            <div class="eg-stats-header">STATS</div>
+            <div class="eg-stats-header">${t('eg_stats_label')}</div>
             <div class="eg-stats-list" id="eg-stats-list">
                 <div class="eg-stat-row eg-stat-placeholder">
-                    <span class="eg-stat-name">— no stats yet —</span>
+                    <span class="eg-stat-name">${t('eg_no_stats_yet')}</span>
                 </div>
             </div>
         </div>
@@ -186,9 +186,9 @@ function _egBuildCharPanelHTML() {
 function _egBuildTooltipPanelHTML() {
     return `
 <div class="eg-panel eg-panel-tooltip">
-    <div class="eg-panel-label">ITEM TOOLTIP</div>
+    <div class="eg-panel-label">${t('eg_item_tooltip_label')}</div>
     <div class="eg-tooltip-panel-body" id="eg-tooltip-panel-body">
-        <span class="eg-tooltip-empty">Hover over an item to inspect it</span>
+        <span class="eg-tooltip-empty">${t('eg_tooltip_hover_hint')}</span>
     </div>
 </div>`;
 }
@@ -226,7 +226,7 @@ function _egBuildCurrencyGridHTML() {
 function _egBuildCurrencyStripHTML() {
     return `
 <div class="eg-currency-strip">
-    <div class="eg-panel-label">RUNES &amp; ORBS</div>
+    <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
     <div class="eg-currency-row" id="eg-currency-grid"
          style="grid-template-columns: repeat(${EG_CURRENCY_COLS}, 1fr);">
         ${_egBuildCurrencyGridHTML()}
@@ -271,7 +271,7 @@ function _egBuildMapOrbSlotHTML() {
      ondrop="egDropOnMap(event)"
      ondragleave="egDragLeave(event)">
     <div class="eg-map-slot-inner" id="eg-map-slot-inner">
-        <span class="eg-map-slot-empty-text">INSERT MAP</span>
+        <span class="eg-map-slot-empty-text">${t('eg_insert_map')}</span>
     </div>
 </div>`;
 }
@@ -285,7 +285,7 @@ function _egBuildMapDeviceHTML() {
         ${_egBuildMapOrbSlotHTML()}
     </div>
     <button class="eg-activate-btn" id="eg-activate-btn" disabled onclick="egActivateMap()">
-        ▶ ACTIVATE MAP
+        ${t('eg_activate_map')}
     </button>
 </div>`;
 }
@@ -323,10 +323,10 @@ function _egBuildMapStashGridHTML() {
 function _egBuildMapPanelHTML() {
     return `
 <div class="eg-panel eg-panel-map">
-    <div class="eg-panel-label">PROBABILITY GATE</div>
+    <div class="eg-panel-label">${t('mg_gate_badge')}</div>
     ${_egBuildMapDeviceHTML()}
     <div class="eg-map-stash-section">
-        <div class="eg-panel-label">MAPS</div>
+        <div class="eg-panel-label">${t('eg_maps_label')}</div>
         <div class="eg-map-stash-grid" id="eg-map-stash-grid">
             ${_egBuildMapStashGridHTML()}
         </div>
@@ -367,7 +367,7 @@ function _egBuildInventoryGridHTML() {
 function _egBuildStashPanelHTML() {
     return `
 <div class="eg-panel eg-panel-inv">
-    <div class="eg-panel-label">STASH</div>
+    <div class="eg-panel-label">${t('eg_stash_label')}</div>
     <div class="eg-inv-grid" id="eg-inv-grid" style="grid-template-columns: repeat(${EG_INV_COLS}, 1fr);">
         ${_egBuildInventoryGridHTML()}
     </div>
@@ -383,8 +383,8 @@ function _egBuildStashPanelHTML() {
 function _egBuildTopbarHTML() {
     return `
 <div class="eg-topbar">
-    <button class="eg-back-btn" onclick="safeGoToLevelSelect()">◀ BACK</button>
-    <span class="eg-topbar-title">🌌 NEXUS OF WORLDS</span>
+    <button class="eg-back-btn" onclick="safeGoToLevelSelect()">${t('btn_back')}</button>
+    <span class="eg-topbar-title">${t('eg_nexus_title')}</span>
 </div>`;
 }
 
@@ -526,7 +526,7 @@ function _egRenderMapSlot() {
 
     inner.innerHTML = _egMapSlotItem
         ? _egBuildItemChipHTML(_egMapSlotItem, 'large')
-        : '<span class="eg-map-slot-empty-text">INSERT MAP</span>';
+        : `<span class="eg-map-slot-empty-text">${t('eg_insert_map')}</span>`;
 
     _egRenderMapDeviceButton();
 }
@@ -550,7 +550,7 @@ function _egRenderStatsList() {
     if (lines.length === 0) {
         el.innerHTML = `
 <div class="eg-stat-row eg-stat-placeholder">
-    <span class="eg-stat-name">— no stats yet —</span>
+    <span class="eg-stat-name">${t('eg_no_stats_yet')}</span>
 </div>`;
         return;
     }
@@ -596,23 +596,42 @@ function _egBuildTooltipBodyHTML(item) {
 
     const rarity = item.rarity || 'common';
     const rc = RARITY_COLOR_MAP[rarity] || RARITY_COLOR_MAP.common;
-    const rarityLabel = rarity.charAt(0).toUpperCase() + rarity.slice(1);
+
+    const EG_TT_RARITY_KEYS = {
+        common: 'rar_common', uncommon: 'rar_uncommon', rare: 'rar_rare',
+        epic: 'eg_rar_epic', legendary: 'rar_legendary', cursed: 'rar_cursed',
+        artifact: 'eg_rar_artifact',
+    };
+    const EG_TT_SLOT_KEYS = {
+        head: 'eg_slot_head', shoulders: 'eg_slot_shoulders', cloak: 'eg_slot_cloak',
+        chest: 'eg_slot_chest', bracers: 'eg_slot_bracers', gloves: 'eg_slot_gloves',
+        belt: 'eg_slot_belt', pants: 'eg_slot_pants', boots: 'eg_slot_boots',
+        amulet: 'eg_slot_amulet', earring: 'eg_slot_earring', ring: 'eg_slot_ring',
+        arcane: 'eg_slot_arcane', talisman: 'eg_slot_talisman', weapon: 'eg_slot_weapon',
+        ranged: 'eg_slot_ranged',
+    };
+
+    const rarityLabel = EG_TT_RARITY_KEYS[rarity]
+        ? t(EG_TT_RARITY_KEYS[rarity])
+        : rarity.charAt(0).toUpperCase() + rarity.slice(1);
     const slotLabel = item.slotType
-        ? item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1)
+        ? (EG_TT_SLOT_KEYS[item.slotType]
+            ? t(EG_TT_SLOT_KEYS[item.slotType])
+            : item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1))
         : '';
 
     // ── Implicit defenses ────────────────────────────────────────────
     const implicitLines = [];
     const def = item.defenses || {};
-    if ((def.armour || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">Armour: <span class="eg-tt-val">${def.armour}</span></div>`);
-    if ((def.evasion || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">Evasion: <span class="eg-tt-val">${def.evasion}</span></div>`);
-    if ((def.absorption || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">Absorption: <span class="eg-tt-val">${def.absorption}</span></div>`);
+    if ((def.armour || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_armour')}: <span class="eg-tt-val">${def.armour}</span></div>`);
+    if ((def.evasion || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_evasion')}: <span class="eg-tt-val">${def.evasion}</span></div>`);
+    if ((def.absorption || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_absorption')}: <span class="eg-tt-val">${def.absorption}</span></div>`);
     if (item.damage) {
-        implicitLines.push(`<div class="eg-tt-implicit">Damage: <span class="eg-tt-val">${item.damage.min}–${item.damage.max}</span></div>`);
-        implicitLines.push(`<div class="eg-tt-implicit">Attacks/sec: <span class="eg-tt-val">${item.attacksPerSecond}</span></div>`);
+        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_damage')}: <span class="eg-tt-val">${item.damage.min}–${item.damage.max}</span></div>`);
+        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attacks_sec')}: <span class="eg-tt-val">${item.attacksPerSecond}</span></div>`);
     }
     if (item.blockChance) {
-        implicitLines.push(`<div class="eg-tt-implicit">Block Chance: <span class="eg-tt-val">${item.blockChance}%</span></div>`);
+        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_block_chance')}: <span class="eg-tt-val">${item.blockChance}%</span></div>`);
     }
     const implicitHTML = implicitLines.length
         ? `<div class="eg-tt-section">${implicitLines.join('')}</div>`
@@ -622,12 +641,12 @@ function _egBuildTooltipBodyHTML(item) {
     // ── Requirements ─────────────────────────────────────────────────
     const req = item.requirements || {};
     const reqParts = [];
-    if (req.level > 0) reqParts.push(`Level ${req.level}`);
-    if (req.str > 0) reqParts.push(`${req.str} Str`);
-    if (req.agi > 0) reqParts.push(`${req.agi} Agi`);
-    if (req.int > 0) reqParts.push(`${req.int} Int`);
+    if (req.level > 0) reqParts.push(t('eg_req_level').replace('{n}', req.level));
+    if (req.str > 0) reqParts.push(`${req.str} ${t('eg_attr_str')}`);
+    if (req.agi > 0) reqParts.push(`${req.agi} ${t('eg_attr_agi')}`);
+    if (req.int > 0) reqParts.push(`${req.int} ${t('eg_attr_int')}`);
     const reqHTML = reqParts.length
-        ? `<div class="eg-tt-section"><div class="eg-tt-req">Requires: ${reqParts.join(', ')}</div></div>`
+        ? `<div class="eg-tt-section"><div class="eg-tt-req">${t('eg_requires')} ${reqParts.join(', ')}</div></div>`
         : '';
 
     // ── Explicit mods ─────────────────────────────────────────────────
@@ -648,7 +667,7 @@ function _egBuildTooltipBodyHTML(item) {
 
     // ── Item level ────────────────────────────────────────────────────
     const ilvlHTML = item.itemLevel != null
-        ? `<div class="eg-tt-ilvl">Item Level: ${item.itemLevel}</div>`
+        ? `<div class="eg-tt-ilvl">${t('eg_item_level').replace('{n}', item.itemLevel)}</div>`
         : '';
 
     return `
@@ -676,7 +695,7 @@ function _egShowTooltip(item) {
     if (!panel) return;
     panel.innerHTML = item
         ? _egBuildTooltipBodyHTML(item)
-        : '<span class="eg-tooltip-empty">Hover over an item to inspect it</span>';
+        : `<span class="eg-tooltip-empty">${t('eg_tooltip_hover_hint')}</span>`;
 }
 
 
@@ -699,9 +718,9 @@ function egActivateMap() {
     if (!_egMapSlotItem) return;
 
     if (typeof showModal === 'function') {
-        showModal('Map Hub Warning', `Activating portal coordinates for: ${_egMapSlotItem.name}`);
+        showModal(t('eg_map_warning_title'), t('eg_map_activating').replace('{n}', _egMapSlotItem.name));
     } else {
-        alert(`🔮 Map Sequence Engaged: "${_egMapSlotItem.name}" activated! (Atlas systems standing by)`);
+        alert(t('eg_map_alert_activated').replace('{n}', _egMapSlotItem.name));
     }
 }
 
@@ -783,7 +802,7 @@ function safeGoToLevelSelect() {
         goToLevelSelect();
     } else {
         console.warn('[EG] goToLevelSelect() is not declared. Redirecting to console fallback.');
-        alert('Returning to level selection screen...');
+        alert(t('eg_returning_level_select'));
     }
 }
 
@@ -826,7 +845,7 @@ function egAddTestItems() {
 // Builds the small "destroy" button overlaid on a stash cell's item chip.
 // Row/col are baked into the onclick so the confirm flow knows which cell to clear.
 function _egBuildDeleteBtnHTML(row, col) {
-    return `<button class="eg-item-delete-btn" title="Destroy item"
+    return `<button class="eg-item-delete-btn" title="${t('eg_destroy_item_title')}"
         onclick="event.stopPropagation(); _egRequestDeleteItem(${row}, ${col});">✕</button>`;
 }
 
@@ -847,11 +866,11 @@ function _egEnsureDeleteModal() {
     modal.className = 'eg-delete-modal-bg';
     modal.innerHTML = `
 <div class="eg-delete-modal-box">
-    <div class="eg-delete-modal-title">⚠ DESTROY ITEM</div>
+    <div class="eg-delete-modal-title">${t('eg_destroy_item_confirm_title')}</div>
     <div class="eg-delete-modal-text" id="eg-delete-modal-text"></div>
     <div class="eg-delete-modal-btns">
-        <button class="eg-delete-modal-btn eg-delete-modal-confirm" onclick="_egConfirmDeleteItem()">🗑 DESTROY</button>
-        <button class="eg-delete-modal-btn eg-delete-modal-cancel" onclick="_egCancelDeleteItem()">CANCEL</button>
+        <button class="eg-delete-modal-btn eg-delete-modal-confirm" onclick="_egConfirmDeleteItem()">${t('eg_destroy_btn')}</button>
+        <button class="eg-delete-modal-btn eg-delete-modal-cancel" onclick="_egCancelDeleteItem()">${t('reset_cancel')}</button>
     </div>
 </div>`;
     document.body.appendChild(modal);
@@ -867,7 +886,7 @@ function _egRequestDeleteItem(row, col) {
 
     const textEl = document.getElementById('eg-delete-modal-text');
     if (textEl) {
-        textEl.innerHTML = `Are you sure you want to destroy <strong>${item.name || 'this item'}</strong>? This cannot be undone.`;
+        textEl.innerHTML = t('eg_destroy_confirm_text').replace('{n}', item.name || t('eg_this_item'));
     }
     document.getElementById('eg-delete-modal').classList.add('show');
 }

@@ -176,9 +176,7 @@ function _ptRefreshPointsDisplay() {
     const el = document.getElementById('pt-points');
     if (!el) return;
     const p = _ptPoints();
-    el.textContent = _ptLang() === 'de'
-        ? `Verfügbare Konvergenzpunkte: ${p}`
-        : `Available Convergence Points: ${p}`;
+    el.textContent = t('pt_convergence_available').replace('{n}', p);
 }
 
 

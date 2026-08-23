@@ -16,6 +16,30 @@ const INV_SLOT_GROUPS = [
     { label: 'Special', slots: ['pearlOfHaste', 'pearlOfSwiftness', 'grandPearl', 'theWitch', 'goldenClock', 'shadowSeal'] },
 ];
 
+// Maps inventory group labels to their translation keys.
+const INV_GROUP_LABEL_KEYS = {
+    'Reveal': 'itm_group_reveal',
+    'Mark': 'itm_group_mark',
+    'Time': 'itm_group_time',
+    'Utility': 'itm_group_utility',
+    'Power': 'itm_group_power',
+    'Cursed': 'itm_group_cursed',
+    'Special': 'itm_group_special',
+};
+
+// Maps rarities that have no dedicated rar_* key in the T table.
+const RARITY_EXTRA_LABEL_KEYS = {
+    epic: 'itm_rar_epic',
+    artifact: 'itm_rar_artifact',
+};
+
+// Returns the translated display label for a rarity string.
+function _rarityLabel(rarity) {
+    return RARITY_EXTRA_LABEL_KEYS[rarity]
+        ? t(RARITY_EXTRA_LABEL_KEYS[rarity])
+        : t('rar_' + rarity);
+}
+
 // Cached reference to the shared tooltip element — created once on first use.
 let _invTooltipEl = null;
 
@@ -66,9 +90,9 @@ function _buildTooltipHtml(def, count) {
 
     if (count === undefined) return nameLine + descLine;
 
-    const rarityLine = `<div class="inv-tip-rarity" style="color:${rc.color}">${def.rarity.toUpperCase()}</div>`;
-    const stackLine = `<div class="inv-tip-stack">Stack: <b>${count}</b></div>`;
-    const hintLine = `<div class="inv-tip-hint">Left-click: Use &nbsp;|&nbsp; Right-click: Reshuffle &nbsp;|&nbsp; Alt+click: Discard</div>`;
+    const rarityLine = `<div class="inv-tip-rarity" style="color:${rc.color}">${_rarityLabel(def.rarity)}</div>`;
+    const stackLine = `<div class="inv-tip-stack">${t('itm_tip_stack').replace('{n}', count)}</div>`;
+    const hintLine = `<div class="inv-tip-hint">${t('itm_tip_hint')}</div>`;
     return nameLine + rarityLine + descLine + stackLine + hintLine;
 }
 
@@ -203,7 +227,7 @@ function _buildInvGroup(group) {
 
     const labelEl = document.createElement('div');
     labelEl.className = 'inv-group-label';
-    labelEl.textContent = group.label;
+    labelEl.textContent = INV_GROUP_LABEL_KEYS[group.label] ? t(INV_GROUP_LABEL_KEYS[group.label]) : group.label;
     groupEl.appendChild(labelEl);
 
     const slotsEl = document.createElement('div');
@@ -240,7 +264,7 @@ function buildInventoryPanel() {
     const topRow = document.createElement('div');
     topRow.className = 'inv-panel-toprow';
     topRow.innerHTML = `
-        <span class="inv-panel-label">INVENTORY</span>
+        <span class="inv-panel-label">${t('itm_panel_inventory')}</span>
         <span id="reshuffle-counter">♻ ${reshuffleCount}/${RESHUFFLE_GOAL}</span>`;
     panel.appendChild(topRow);
 

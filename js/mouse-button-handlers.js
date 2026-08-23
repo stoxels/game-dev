@@ -208,7 +208,7 @@ function tryAbsorbWithFreeze(row, col) {
     if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
     wrongGrid[row][col] = true;
     renderCell(row, col);
-    showToast('❄️ Frozen! No penalty.');
+    showToast(t('cg_frozen_no_penalty'));
     if (typeof _arcaneFreeze_spawnStalagmite === 'function') {
         _arcaneFreeze_spawnStalagmite(row, col);     // ← add this line
     }
@@ -275,7 +275,7 @@ function tryAbsorbWithConfidenceInterval(row, col) {
     renderCell(row, col);
     consecutiveCorrectFills = 0;        // CI absorption also breaks the correct-fill streak
     _streakBonusFills = 0;
-    showToast(`📐 ${LANG === 'de' ? 'Konfidenzintervall! Fehler ignoriert.' : 'Confidence Interval! Mistake ignored.'}`);
+    showToast(`📐 ${t('cg_ci_absorb')}`);
     return true;
 }
 
@@ -365,8 +365,7 @@ function checkGoldenClockAfterMistake() {
             _arcaneFreeze_clearAllFrostAndStalagmites();   
         }
         document.getElementById('lose-title').textContent = t('ov_lose');
-        document.getElementById('lose-sub').textContent =
-            LANG === 'de' ? 'Goldene Uhr: Fehlerlimit erreicht!' : 'Golden Clock: mistake limit reached!';
+        document.getElementById('lose-sub').textContent = t('cg_golden_clock_fail');
         document.getElementById('ov-lose').classList.add('show');
         return true;    // game over — caller must return
     }
@@ -430,7 +429,7 @@ function claimLuckyTileItems() {
     STATE.inventory.push(newItem);
 
     const def = ITEM_DEFS[newItem.defId];
-    let toastMsg = `🍀 Lucky Tile! You found: ${def.icon} ${itemName(def)}`;
+    let toastMsg = t('cg_lucky_tile_found').replace('{x}', `${def.icon} ${itemName(def)}`);
     const grantedIds = [newItem.defId];
 
     // generous_fortune (192-194): each node adds a stacking bonus-item chance
@@ -460,7 +459,7 @@ function applyVarianceCollapsePenalty(toastMsg) {
     timerSecs = Math.max(0, timerSecs - 600);
     _levelTimeLost += 600;
     updTimer();
-    return toastMsg + ` ${LANG === 'de' ? '(−10 Min!)' : '(−10 min!)'}`;
+    return toastMsg + ` ${t('cg_variance_collapse_note')}`;
 }
 
 // covariance_shift (261-263): after a lucky tile is claimed, reveal 1–3
@@ -610,7 +609,7 @@ function checkSampleEfficiency(row, col) {
             questStat_sampleEfficiencyReveal();
         }
 
-        showToast(`📈 ${LANG === 'de' ? 'Stichprobeneffizienz! 1 Zelle aufgedeckt.' : 'Sample Efficiency! 1 cell revealed.'}`);
+        showToast(`📈 ${t('cg_sample_efficiency')}`);
         PassiveTracker.onSampleEffTrigger();
     }
 }
@@ -633,7 +632,7 @@ function checkStreakBonus() {
         _levelTimeAdded += bonus;
         updTimer();
         if (typeof playTimeGainEffect === 'function') playTimeGainEffect(`+${bonus}s`, '#ffb830');
-        showToast(`🔥 ${LANG === 'de' ? `Serienbonus! +${bonus}s` : `Streak Bonus! +${bonus}s`}`);
+        showToast(`🔥 ${t('cg_streak_bonus').replace('{n}', bonus)}`);
         PassiveTracker.onStreakBonusTrigger();
     }
 }
@@ -870,10 +869,10 @@ function _refreshTouchpadModeButtonLabel() {
     const btn = document.getElementById('btn-touchpad-mode');
     if (!btn) return;
     if (touchpadMarkModeActive) {
-        btn.textContent = '✕ MARK';
+        btn.textContent = t('touchpad_btn_mark');
         btn.classList.add('touchpad-mode-active');
     } else {
-        btn.textContent = '🖊️ FILL';
+        btn.textContent = t('touchpad_btn_fill');
         btn.classList.remove('touchpad-mode-active');
     }
 }

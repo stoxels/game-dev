@@ -189,7 +189,7 @@ function _deadReckoningCheckUnlock() {
         });
     }
 
-    showToast(`🧭 ${LANG === 'de' ? 'Koppelnavigation: Genaue Hinweise enthüllt!' : 'Dead Reckoning: Exact clues revealed!'}`);
+    showToast(`🧭 ${t('cg_dead_reckoning')}`);
 }
 
 // keystone_dead_reckoning (264): initialises the dead reckoning mode at level start.
@@ -646,7 +646,7 @@ function _applySylaForestAffinity() {
     if (!cur || !cur.isForestLevel) return;
     const revealedCoords = revealTiles(1);
     Audio_Manager.playSFX('syla_nature');
-    showToast('Syla Bonus Reveal!');
+    showToast(t('cg_syla_bonus'));
 
     // Pass those coordinates directly into the flower animation!
     triggerSylaFlowerEffect(revealedCoords);

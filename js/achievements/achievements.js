@@ -411,5 +411,5 @@ function _doResetAchievements() {
     ACH_STATE = { stats: {}, unlocked: [] };
     saveAchState();
     buildAchievementsScreen();
-    if (typeof showToast === 'function') showToast("Achievements Cleared!");
+    if (typeof showToast === 'function') showToast(t('qa_achievements_cleared'));
 }

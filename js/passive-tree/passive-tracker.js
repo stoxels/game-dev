@@ -383,8 +383,8 @@ const PassiveTracker = (() => {
         const header = document.createElement('div');
         header.className = 'pt-tracker-header';
         header.innerHTML = `
-            <span class="pt-tracker-title">🌿 PASSIVES</span>
-            <button class="pt-tracker-collapse" title="Toggle panel">−</button>
+            <span class="pt-tracker-title">${t('pt_tracker_title')}</span>
+            <button class="pt-tracker-collapse" title="${t('pt_tracker_toggle')}">−</button>
         `;
 
         header.querySelector('.pt-tracker-collapse').addEventListener('click', () => {
@@ -566,11 +566,11 @@ const PassiveTracker = (() => {
         return {
             id: 'random_walk',
             icon: '🚶',
-            label: 'Random Walk',
+            label: t('pt_row_random_walk'),
             type: 'countdown',
             current: _state.randomWalkTimer,
             max: INTERVAL_RANDOM_WALK,
-            tooltip: 'Every 30 seconds, 1 random unfilled cell is automatically filled or marked. <span class="tip-warn">⚠ Level fails on 2 mistakes!</span>',
+            tooltip: t('pt_tip_random_walk'),
             color: '#e8a020',
         };
     }
@@ -581,11 +581,11 @@ const PassiveTracker = (() => {
         return {
             id: 'poisson',
             icon: '⚗️',
-            label: 'Poisson Process',
+            label: t('pt_row_poisson_process'),
             type: 'countdown',
             current: _state.poissonTimer,
             max: interval,
-            tooltip: `Every <b>${interval}s</b> a random incorrect empty cell is automatically marked ✕.`,
+            tooltip: t('pt_tip_poisson').replace('{n}', interval),
             color: '#66fcf1',
         };
     }
@@ -598,11 +598,11 @@ const PassiveTracker = (() => {
         return {
             id: 'timed_stasis',
             icon: '⏸️',
-            label: 'Timed Stasis',
+            label: t('pt_row_timed_stasis'),
             type: 'countdown',
             current: _state.timedStasisTimer,
             max: INTERVAL_TIMED_STASIS,
-            tooltip: `Every 10 minutes the timer pauses for <b>${duration}s</b>.`,
+            tooltip: t('pt_tip_timed_stasis').replace('{n}', duration),
             color: '#a0c8ff',
         };
     }
@@ -612,11 +612,11 @@ const PassiveTracker = (() => {
         return {
             id: 'loln',
             icon: '📉',
-            label: 'Law of Large Numbers',
+            label: t('pt_row_loln'),
             type: 'countdown',
             current: _state.lawOfLargeNumbersTimer,
             max: INTERVAL_LOLN,
-            tooltip: 'Every 5 minutes, auto-reveals 1 row and column with &lt;2 filled cells. <span class="tip-mute">Does not fire in last 15 min.</span>',
+            tooltip: t('pt_tip_loln'),
             color: '#c8a0ff',
         };
     }
@@ -632,13 +632,13 @@ const PassiveTracker = (() => {
         return {
             id: 'emerg_scan',
             icon: '🚨',
-            label: 'Emergency Scan',
+            label: t('pt_row_emergency_scan'),
             type: 'countdown',
             current: secsLeft,
             max: 300,
             tooltip: fired
-                ? 'Emergency Scan has already fired this level.'
-                : `When the timer drops to <b>5:00</b> a full-grid Field Scan runs for <b>${duration}s</b> (one-shot per level).`,
+                ? t('pt_tip_emergency_scan_done')
+                : t('pt_tip_emergency_scan').replace('{n}', duration),
             color: fired ? '#8888a0' : '#ff9060',
         };
     }
@@ -656,11 +656,11 @@ const PassiveTracker = (() => {
         return {
             id: 'binomial',
             icon: '💢',
-            label: 'Binomial Burst',
+            label: t('pt_row_binomial_burst'),
             type: 'fill_counter',
             current: _state.binomialBurstFills % 10,
             max: 10,
-            tooltip: `Every 10 correct fills: <b>${chance}%</b> chance to auto-mark 1 wrong cell.`,
+            tooltip: t('pt_tip_binomial').replace('{n}', chance),
             color: '#ff9060',
         };
     }
@@ -673,11 +673,11 @@ const PassiveTracker = (() => {
         return {
             id: 'sample_eff',
             icon: '📈',
-            label: 'Sample Efficiency',
+            label: t('pt_row_sample_efficiency'),
             type: 'fill_counter',
             current: _state.sampleEffFills,
             max: threshold,
-            tooltip: `Every <b>${threshold}</b> consecutive correct fills without a mistake: reveal 1 random correct cell. Resets on mistake.`,
+            tooltip: t('pt_tip_sample_efficiency').replace('{n}', threshold),
             color: '#6dbf40',
         };
     }
@@ -690,11 +690,11 @@ const PassiveTracker = (() => {
         return {
             id: 'streak',
             icon: '🔥',
-            label: 'Focused Momentum',
+            label: t('pt_row_focused_momentum'),
             type: 'fill_counter',
             current: _state.streakBonusFills,
             max: 15,
-            tooltip: `Every <b>15</b> consecutive correct fills without a mistake: gain <b>+${bonus}s</b>. Resets on mistake.`,
+            tooltip: t('pt_tip_focused_momentum').replace('{n}', bonus),
             color: '#ffb830',
         };
     }
@@ -704,13 +704,13 @@ const PassiveTracker = (() => {
         return {
             id: 'gamblers',
             icon: '🎰',
-            label: "Gambler's Ruin",
+            label: t('pt_row_gamblers_ruin'),
             type: 'fill_counter',
             current: _state.gamblersFills,
             max: 20,
             noReset: true,
             showCount: true,
-            tooltip: 'Each correct fill: <b>+3s</b> to timer. Each mistake: <b>−60s extra</b>. All bonus time from other sources disabled.',
+            tooltip: t('pt_tip_gamblers_ruin'),
             color: '#e8a020',
         };
     }
@@ -724,11 +724,11 @@ const PassiveTracker = (() => {
         return {
             id: 'error_feedback',
             icon: '📏',
-            label: 'Error Feedback',
+            label: t('pt_row_error_feedback'),
             type: 'fill_counter',
             current: _state.errorFeedbackMistakes % threshold,
             max: threshold,
-            tooltip: `Every <b>${threshold}</b> errors <b>${revealCount}</b> random correct tiles will get revealed.`,
+            tooltip: t('pt_tip_error_feedback').replace('{a}', threshold).replace('{b}', revealCount),
             color: '#ff6080',
         };
     }
@@ -743,12 +743,12 @@ const PassiveTracker = (() => {
         return {
             id: 'bayesian',
             icon: '🔃',
-            label: 'Bayesian Adjustment',
+            label: t('pt_row_bayesian_adjustment'),
             type: 'stacked_bonus',
             current: _state.bayesianBonus,
             max: 100,
             unit: '%',
-            tooltip: 'Each mistake stacks +5% chance on the next auto-mark or auto-reveal. Resets to 0 after it triggers.',
+            tooltip: t('pt_tip_bayesian_adjustment'),
             color: '#d4b870',
         };
     }
@@ -760,12 +760,12 @@ const PassiveTracker = (() => {
         return {
             id: 'asymptotic',
             icon: '♾️',
-            label: 'Asymptotic Mastery',
+            label: t('pt_row_asymptotic_mastery'),
             type: 'stacked_bonus',
             current: lines,
             max: null,
-            unit: ' lines',
-            tooltip: `Completed lines: <b>${lines}</b>. Mistake time cost reduced by <b>${reduction}s</b> total. Shields disabled.`,
+            unit: t('pt_unit_lines'),
+            tooltip: t('pt_tip_asymptotic_mastery').replace('{a}', lines).replace('{b}', reduction),
             color: '#ff6080',
         };
     }
@@ -785,16 +785,16 @@ const PassiveTracker = (() => {
         const isNormal = phase === 'normal';
         let tooltip;
         if (isHardMode) {
-            tooltip = '<span class="tip-warn">⚠ 50% Threshold crossed! Mistakes now cost <b>TRIPLE TIME (3×)</b>!</span>';
+            tooltip = t('pt_tip_overfitting_hard');
         } else if (isNormal) {
-            tooltip = '15% reached — mistakes cost <b>normal time</b>. At 50% completion mistakes cost <span class="tip-warn">triple time</span>.';
+            tooltip = t('pt_tip_overfitting_normal');
         } else {
-            tooltip = 'First 15% of fills are free. <span class="tip-safe">Mistake cost currently: 0s.</span>';
+            tooltip = t('pt_tip_overfitting_free');
         }
         return {
             id: 'overfitting',
             icon: '📉',
-            label: 'Overfitting',
+            label: t('pt_row_overfitting'),
             type: 'summary',
             tooltip,
             // Color flips green → amber → red as the phases advance.
@@ -816,22 +816,22 @@ const PassiveTracker = (() => {
         if (!hasMomentum) return null;
 
         const bonusParts = [];
-        if (ptHasSkill('chain_reaction')) bonusParts.push('+1s/trigger');
-        if (ptHasSkill('precise_momentum')) bonusParts.push('+2s/trigger');
-        if (ptHasSkill('exponential_growth')) bonusParts.push('+1s stack');
-        if (ptHasSkill('god_of_statistics')) bonusParts.push('×2 bonus');
+        if (ptHasSkill('chain_reaction')) bonusParts.push(t('pt_momentum_plus1'));
+        if (ptHasSkill('precise_momentum')) bonusParts.push(t('pt_momentum_plus2'));
+        if (ptHasSkill('exponential_growth')) bonusParts.push(t('pt_momentum_stack'));
+        if (ptHasSkill('god_of_statistics')) bonusParts.push(t('pt_momentum_double'));
 
         // Penalty description depends on which damage-reduction passives are active.
         const hasBoth = ptHasSkill('learning_from_mistakes') && ptHasSkill('mistakes_no_matter');
         const hasEither = ptHasSkill('learning_from_mistakes') || ptHasSkill('mistakes_no_matter');
-        const penalty = hasBoth ? '−10' : hasEither ? '−12' : 'reset';
+        const penalty = hasBoth ? '−10' : hasEither ? '−12' : t('pt_momentum_penalty_reset');
 
         return {
             id: 'momentum',
             icon: '⚡',
-            label: 'Momentum',
+            label: t('pt_row_momentum'),
             type: 'summary',
-            tooltip: `Momentum bonuses: <b>${bonusParts.join(', ')}</b>. Mistake penalty: streak <b>${penalty}</b>.`,
+            tooltip: t('pt_tip_momentum').replace('{a}', bonusParts.join(', ')).replace('{b}', penalty),
             color: '#6dbf40',
         };
     }
@@ -841,13 +841,13 @@ const PassiveTracker = (() => {
 
         const extraAbsorb = (ptHasSkill('reinforced_shield') ? 1 : 0) + (ptHasSkill('fortified_shield') ? 1 : 0);
         const parts = [];
-        if (extraAbsorb > 0) parts.push(`Shield absorbs +${extraAbsorb} extra mistakes`);
-        if (ptHasSkill('frozen_resilience')) parts.push('5 fills during Absolute Zero → +1 shield charge');
+        if (extraAbsorb > 0) parts.push(t('pt_shield_boost_absorb').replace('{n}', extraAbsorb));
+        if (ptHasSkill('frozen_resilience')) parts.push(t('pt_shield_boost_frozen'));
 
         return {
             id: 'shield_boost',
             icon: '🛡️',
-            label: 'Shield Boost',
+            label: t('pt_row_shield_boost'),
             type: 'summary',
             tooltip: parts.join('<br>'),
             color: '#a0c8ff',
@@ -868,14 +868,14 @@ const PassiveTracker = (() => {
         let reveals = ptHasSkill('confirmed_hypothesis') ? 1 : 0;
         if (ptHasSkill('god_of_probabilities')) reveals++;
 
-        const revealPart = reveals > 0 ? ` + reveals <b>${reveals}</b> correct cell(s)` : '';
+        const revealPart = reveals > 0 ? ' ' + t('pt_bayesian_insight_reveals').replace('{n}', reveals) : '';
 
         return {
             id: 'bayesian_insight',
             icon: '🧪',
-            label: 'Bayesian Insight',
+            label: t('pt_row_bayesian_insight'),
             type: 'summary',
-            tooltip: `Start of level: auto-marks <b>${marks}</b> random wrong cells${revealPart}.`,
+            tooltip: t('pt_tip_bayesian_insight').replace('{n}', marks).replace('{extra}', revealPart),
             color: '#66fcf1',
         };
     }
@@ -888,9 +888,9 @@ const PassiveTracker = (() => {
         return {
             id: 'conf_interval',
             icon: '📐',
-            label: 'Confidence Interval',
+            label: t('pt_row_confidence_interval'),
             type: 'summary',
-            tooltip: `After a mistake: next mistake within <b>${secs}s</b> is ignored. Cannot trigger back-to-back.`,
+            tooltip: t('pt_tip_confidence_interval').replace('{n}', secs),
             color: '#a0c8ff',
         };
     }
@@ -903,9 +903,9 @@ const PassiveTracker = (() => {
         return {
             id: 'pattern_momentum',
             icon: '📉',
-            label: 'Pattern Momentum',
+            label: t('pt_row_pattern_momentum'),
             type: 'summary',
-            tooltip: `Completing a full row or column: <b>+${time}s</b>.`,
+            tooltip: t('pt_tip_pattern_momentum').replace('{n}', time),
             color: '#6dbf40',
         };
     }
@@ -918,9 +918,9 @@ const PassiveTracker = (() => {
         return {
             id: 'residual',
             icon: '🔄',
-            label: 'Residual Analysis',
+            label: t('pt_row_residual_analysis'),
             type: 'summary',
-            tooltip: `Completing a row/column: <b>${chance}%</b> chance to auto-mark 1 wrong cell in an adjacent line.`,
+            tooltip: t('pt_tip_residual_analysis').replace('{n}', chance),
             color: '#66fcf1',
         };
     }
@@ -930,40 +930,40 @@ const PassiveTracker = (() => {
     function _getSummaryVeilOfPurity() {
         if (!ptHasSkill('keystone_veil_of_purity')) return null;
         return {
-            id: 'veil_purity', icon: '✨', label: 'Veil of Purity', type: 'summary',
-            tooltip: 'First cursed item each level: <b>no downside</b>. Further cursed items: <b>double downside</b>.', color: '#d4b870'
+            id: 'veil_purity', icon: '✨', label: t('pt_row_veil_of_purity'), type: 'summary',
+            tooltip: t('pt_tip_veil_of_purity'), color: '#d4b870'
         };
     }
 
     function _getSummaryBlindingTruth() {
         if (!ptHasSkill('keystone_blinding_truth')) return null;
         return {
-            id: 'blinding_truth', icon: '💡', label: 'Blinding Truth', type: 'summary',
-            tooltip: 'Reveal items <b>50% more effective</b>. Mark-wrong items <b>cannot be used</b>.', color: '#ffb830'
+            id: 'blinding_truth', icon: '💡', label: t('pt_row_blinding_truth'), type: 'summary',
+            tooltip: t('pt_tip_blinding_truth'), color: '#ffb830'
         };
     }
 
     function _getSummaryApexCollector() {
         if (!ptHasSkill('keystone_apex_collector')) return null;
         return {
-            id: 'apex_collector', icon: '🌟', label: 'Apex Collector', type: 'summary',
-            tooltip: 'Codex of Completion can drop (3%). Items <b>below Epic cannot be obtained</b> as rewards.', color: '#d4b870'
+            id: 'apex_collector', icon: '🌟', label: t('pt_row_apex_collector'), type: 'summary',
+            tooltip: t('pt_tip_apex_collector'), color: '#d4b870'
         };
     }
 
     function _getSummaryIronDoctrine() {
         if (!ptHasSkill('keystone_iron_doctrine')) return null;
         return {
-            id: 'iron_doctrine', icon: '⚔️', label: 'Iron Doctrine', type: 'summary', warn: true,
-            tooltip: 'Shields disabled. Each mistake <b>−60s extra</b>. Tutor and Timer items: <b>+300% effectiveness</b>.', color: '#ff6080'
+            id: 'iron_doctrine', icon: '⚔️', label: t('pt_row_iron_doctrine'), type: 'summary', warn: true,
+            tooltip: t('pt_tip_iron_doctrine'), color: '#ff6080'
         };
     }
 
     function _getSummaryCurseEmbrace() {
         if (!ptHasSkill('keystone_curse_embrace')) return null;
         return {
-            id: 'curse_embrace', icon: '👁️', label: 'Curse Embrace', type: 'summary',
-            tooltip: 'Immune to cursed item downsides. Reveal, Mark-wrong, Timer and Eraser items <b>50% weaker</b>.', color: '#c080ff'
+            id: 'curse_embrace', icon: '👁️', label: t('pt_row_curse_embrace'), type: 'summary',
+            tooltip: t('pt_tip_curse_embrace'), color: '#c080ff'
         };
     }
 
@@ -973,8 +973,8 @@ const PassiveTracker = (() => {
         if (ptHasSkill('interquartile_vision_2')) duration += 1;
         if (ptHasSkill('interquartile_vision_3')) duration += 1;
         return {
-            id: 'iqv', icon: '🔭', label: 'Interquartile Vision', type: 'summary',
-            tooltip: `Large grids (200+ cells): centred Field Scan at level start for <b>${duration}s</b>.`, color: '#88aaff'
+            id: 'iqv', icon: '🔭', label: t('pt_row_interquartile_vision'), type: 'summary',
+            tooltip: t('pt_tip_interquartile_vision').replace('{n}', duration), color: '#88aaff'
         };
     }
 
@@ -984,120 +984,120 @@ const PassiveTracker = (() => {
         if (ptHasSkill('covariance_shift_2')) extra += 1;
         if (ptHasSkill('covariance_shift_3')) extra += 1;
         return {
-            id: 'covariance', icon: '🔗', label: 'Covariance Shift', type: 'summary',
-            tooltip: `Revealing a Lucky Tile also reveals <b>${1 + extra}</b> random correct filled cell${extra > 0 ? 's' : ''} in the same row or column.`, color: '#66fcf1'
+            id: 'covariance', icon: '🔗', label: t('pt_row_covariance_shift'), type: 'summary',
+            tooltip: t('pt_tip_covariance_shift').replace('{n}', 1 + extra), color: '#66fcf1'
         };
     }
 
     function _getSummaryEntropyDrain() {
         if (!ptHasSkill('keystone_entropy_drain')) return null;
         return {
-            id: 'entropy_drain', icon: '🌡️', label: 'Entropy Drain', type: 'summary', warn: true,
-            tooltip: 'Rows/columns left unfinished for <b>3 minutes</b> lose all reveals and marks. Class Ability cooldowns <b>−30s</b>.', color: '#ff6080'
+            id: 'entropy_drain', icon: '🌡️', label: t('pt_row_entropy_drain'), type: 'summary', warn: true,
+            tooltip: t('pt_tip_entropy_drain'), color: '#ff6080'
         };
     }
 
     function _getSummaryCountdownCrisis() {
         if (!ptHasSkill('keystone_countdown_crisis')) return null;
         return {
-            id: 'countdown_crisis', icon: '⚡', label: 'Countdown Crisis', type: 'summary', warn: true,
-            tooltip: 'Timer items <b>reduce</b> the timer. Reveal items are <b>5× stronger</b> while timer &lt;3 min.', color: '#ff9060'
+            id: 'countdown_crisis', icon: '⚡', label: t('pt_row_countdown_crisis'), type: 'summary', warn: true,
+            tooltip: t('pt_tip_countdown_crisis'), color: '#ff9060'
         };
     }
 
     function _getSummaryStochasticResonance() {
         if (!ptHasSkill('keystone_stochastic_resonance')) return null;
         return {
-            id: 'stochastic_res', icon: '〰️', label: 'Stochastic Resonance', type: 'summary',
-            tooltip: 'Each mistake: <b>25% chance</b> to reveal 1 correct cell instead of counting as mistake. Cannot trigger twice in a row.', color: '#66fcf1'
+            id: 'stochastic_res', icon: '〰️', label: t('pt_row_stochastic_resonance'), type: 'summary',
+            tooltip: t('pt_tip_stochastic_resonance'), color: '#66fcf1'
         };
     }
 
     function _getSummaryNullHypothesis() {
         if (!ptHasSkill('keystone_null_hypothesis')) return null;
         return {
-            id: 'null_hyp', icon: '🔬', label: 'Null Hypothesis', type: 'summary', warn: true,
-            tooltip: 'Level start: all wrong cells in the sparsest row and column are auto-marked. <b>No mistake shields</b> of any kind.', color: '#ff9060'
+            id: 'null_hyp', icon: '🔬', label: t('pt_row_null_hypothesis'), type: 'summary', warn: true,
+            tooltip: t('pt_tip_null_hypothesis'), color: '#ff9060'
         };
     }
 
     function _getSummaryVarianceCollapse() {
         if (!ptHasSkill('keystone_variance_collapse')) return null;
         return {
-            id: 'variance_collapse', icon: '💥', label: 'Variance Collapse', type: 'summary', warn: true,
-            tooltip: 'Lucky Tiles appear on ALL grid sizes. Revealing one <b>−10 minutes</b> from timer.', color: '#e8a020'
+            id: 'variance_collapse', icon: '💥', label: t('pt_row_variance_collapse'), type: 'summary', warn: true,
+            tooltip: t('pt_tip_variance_collapse'), color: '#e8a020'
         };
     }
 
     function _getSummaryTheOracle() {
         if (!ptHasSkill('keystone_the_oracle')) return null;
         return {
-            id: 'oracle', icon: '👁️', label: 'The Oracle', type: 'summary', warn: true,
-            tooltip: 'Solution shown for 5s at start, then hidden. All clues hidden. Auto-reveals disabled (class abilities only). <b>Large/Massive grids only.</b>', color: '#c080ff'
+            id: 'oracle', icon: '👁️', label: t('pt_row_the_oracle'), type: 'summary', warn: true,
+            tooltip: t('pt_tip_the_oracle'), color: '#c080ff'
         };
     }
 
     function _getSummaryMaximumLikelihood() {
         if (!ptHasSkill('keystone_maximum_likelihood')) return null;
         return {
-            id: 'max_likelihood', icon: '🏔️', label: 'Maximum Likelihood', type: 'summary', warn: true,
-            tooltip: 'Level start: densest row and column auto-solved. <b>−15 minutes</b> from timer.', color: '#ff6080'
+            id: 'max_likelihood', icon: '🏔️', label: t('pt_row_maximum_likelihood'), type: 'summary', warn: true,
+            tooltip: t('pt_tip_maximum_likelihood'), color: '#ff6080'
         };
     }
 
     function _getSummarySignalToNoise() {
         if (!ptHasSkill('keystone_signal_to_noise')) return null;
         return {
-            id: 'signal_noise', icon: '📡', label: 'Signal to Noise', type: 'summary',
-            tooltip: '15% of clues randomized at start. Completing 75% of grid reveals true values. Class cooldowns −15s.', color: '#a0c8ff'
+            id: 'signal_noise', icon: '📡', label: t('pt_row_signal_to_noise'), type: 'summary',
+            tooltip: t('pt_tip_signal_to_noise'), color: '#a0c8ff'
         };
     }
 
     function _getSummaryDeadReckoning() {
         if (!ptHasSkill('keystone_dead_reckoning')) return null;
         return {
-            id: 'dead_reckoning', icon: '🧭', label: 'Dead Reckoning', type: 'summary',
-            tooltip: 'Clues shown as row/col sums instead of exact runs. <b>25% completion</b> reveals exact clues. +10 min to timer.', color: '#d4b870'
+            id: 'dead_reckoning', icon: '🧭', label: t('pt_row_dead_reckoning'), type: 'summary',
+            tooltip: t('pt_tip_dead_reckoning'), color: '#d4b870'
         };
     }
 
     function _getSummaryFrequentistsBurden() {
         if (!ptHasSkill('keystone_frequentists_burden')) return null;
         return {
-            id: 'freq_burden', icon: '📜', label: "Frequentist's Burden", type: 'summary',
-            tooltip: 'All clues hidden. Every <b>5 correct fills</b> reveals 1 random clue. Class cooldowns −15s.', color: '#c080ff'
+            id: 'freq_burden', icon: '📜', label: t('pt_row_frequentists_burden'), type: 'summary',
+            tooltip: t('pt_tip_frequentists_burden'), color: '#c080ff'
         };
     }
 
     function _getSummarySparsePrior() {
         if (!ptHasSkill('keystone_sparse_prior')) return null;
         return {
-            id: 'sparse_prior', icon: '🫥', label: 'Sparse Prior', type: 'summary',
-            tooltip: 'All clues hidden at start. Completing a row/column reveals adjacent clues.', color: '#a0c8ff'
+            id: 'sparse_prior', icon: '🫥', label: t('pt_row_sparse_prior'), type: 'summary',
+            tooltip: t('pt_tip_sparse_prior'), color: '#a0c8ff'
         };
     }
 
     function _getSummaryErgodicField() {
         if (!ptHasSkill('keystone_ergodic_field')) return null;
         return {
-            id: 'ergodic', icon: '🌊', label: 'Ergodic Field', type: 'summary', warn: true,
-            tooltip: 'All auto-reveals, marks, and field scans disabled. Every 3 min: full solution flashes for <b>1 second</b>.', color: '#66fcf1'
+            id: 'ergodic', icon: '🌊', label: t('pt_row_ergodic_field'), type: 'summary', warn: true,
+            tooltip: t('pt_tip_ergodic_field'), color: '#66fcf1'
         };
     }
 
     function _getSummaryDegreesOfFreedom() {
         if (!ptHasSkill('keystone_degrees_of_freedom')) return null;
         return {
-            id: 'dof', icon: '🎛️', label: 'Degrees of Freedom', type: 'summary',
-            tooltip: 'Either all row or all column clues are hidden. They flash visible every 30s for 5s. Class cooldowns −30s.', color: '#d4b870'
+            id: 'dof', icon: '🎛️', label: t('pt_row_degrees_of_freedom'), type: 'summary',
+            tooltip: t('pt_tip_degrees_of_freedom'), color: '#d4b870'
         };
     }
 
     function _getSummaryAdjacencyMatrix() {
         if (!ptHasSkill('adjacency_matrix')) return null;
         return {
-            id: 'adj_matrix', icon: '🔢', label: 'Adjacency Matrix', type: 'summary',
-            tooltip: 'Row/column clues hidden. Each empty cell shows count of its 8 neighbours that are solution cells.', color: '#66fcf1'
+            id: 'adj_matrix', icon: '🔢', label: t('pt_row_adjacency_matrix'), type: 'summary',
+            tooltip: t('pt_tip_adjacency_matrix'), color: '#66fcf1'
         };
     }
 

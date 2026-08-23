@@ -121,7 +121,7 @@ function _formatCooldown(secs) {
 
 // Returns the localised "Ready" label used in the minimized bar and toasts.
 function _getReadyLabel() {
-    return LANG === 'de' ? 'Bereit' : 'Ready';
+    return t('cls_ready');
 }
 
 
@@ -278,7 +278,7 @@ function _showCooldownReadyToast(slot) {
 
     const name = _getAbilityName(abilityData);
     const slotIndex = SLOT_DISPLAY_INDEX[slot] ?? slot;
-    const readyLabel = LANG === 'de' ? 'Bereit!' : 'Ready!';
+    const readyLabel = t('cls_ready_excl');
 
     showToast(`✅ [${slotIndex}] ${name} — ${readyLabel}`);
     Audio_Manager.playSFX('abilityReady');

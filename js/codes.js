@@ -169,13 +169,12 @@ function buildCodeLockedBlock(lockedEntry) {
     const title = getCodeTitle(wc);
     const remaining = Math.max(0, needed - have);
 
-    const scoreLineText = LANG === 'de'
-        ? '✓ Punktzahl erreicht'
-        : '✓ Score requirement met';
+    const scoreLineText = t('scr_score_req_met');
 
-    const achLineText = LANG === 'de'
-        ? `🔒 Noch ${remaining} Achievement${remaining === 1 ? '' : 's'} benötigt (${have} / ${needed})`
-        : `🔒 ${remaining} more achievement tier${remaining === 1 ? '' : 's'} needed (${have} / ${needed})`;
+    const achLineText = t('scr_ach_more_needed')
+        .replace('{n}', remaining)
+        .replace('{have}', have)
+        .replace('{needed}', needed);
 
     return `
         <div style="margin-bottom:14px;">
@@ -194,13 +193,9 @@ function buildCodeLockedBlock(lockedEntry) {
 function showLockedCodesModal(lockedCodes) {
     const contentEl = document.getElementById('pw-content');
 
-    const lockedTitle = LANG === 'de'
-        ? '🔒 CODE NOCH GESPERRT'
-        : '🔒 CODE STILL LOCKED';
+    const lockedTitle = t('scr_code_still_locked');
 
-    const lockedIntro = LANG === 'de'
-        ? 'Du hast genug Punkte, aber noch nicht genug Achievements freigeschaltet:'
-        : "You've earned enough score, but haven't unlocked enough achievements yet:";
+    const lockedIntro = t('scr_locked_intro');
 
     document.getElementById('pw-modal')
         .querySelector('.modal-title')
@@ -311,7 +306,7 @@ function buildCodesScreen() {
     const { total: totalAchTiers, have: unlockedAchTiers } = _getAchievementTierCounts();
 
     const menuText = (typeof t === 'function' ? t('btn_menu') : null) || 'MENU';
-    const footerMsg = (typeof t === 'function' ? t('codes_footer') : null)
+    const footerMsg = (typeof t === 'function' ? t('scr_codes_footer') : null)
         || 'Earn points to unlock these powerful achievement codes!';
 
     const rowsHTML = WORLD_CODES.map(wc =>

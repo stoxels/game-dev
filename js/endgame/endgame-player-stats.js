@@ -310,85 +310,85 @@ function _egScheduleAbsorptionRegen() {
 // (armour/evasion/absorption totals, physFlatMin/Max, elemental dmg pairs)
 // and are handled explicitly by _egBuildStatsSummaryLines() instead.
 const EG_STAT_DISPLAY_LABELS = {
-    health: { label: 'Health', suffix: '' },
-    mana: { label: 'Mana', suffix: '' },
-    strength: { label: 'Strength', suffix: '' },
-    agility: { label: 'Agility', suffix: '' },
-    intelligence: { label: 'Intelligence', suffix: '' },
+    health: { label: t('eg_stat_health'), suffix: '' },
+    mana: { label: t('eg_stat_mana'), suffix: '' },
+    strength: { label: t('eg_stat_strength'), suffix: '' },
+    agility: { label: t('eg_stat_agility'), suffix: '' },
+    intelligence: { label: t('eg_stat_intelligence'), suffix: '' },
 
-    lifeRegen: { label: 'Life Regen', suffix: '/s' },
-    manaRegen: { label: 'Mana Regen', suffix: '/5s' },
-    manaOnKill: { label: 'Mana on Kill', suffix: '' },
-    absorptionOnKill: { label: 'Absorption on Kill', suffix: '' },
-    lifeOnKill: { label: 'Life on Kill', suffix: '' },
-    manaOnMistake: { label: 'Mana on Mistake', suffix: '' },
-    heartHealFlat: { label: 'Heart Heal', suffix: '' },
-    heartHealIncPct: { label: 'Increased Heart Heal', suffix: '%' },
-    timeAdded: { label: 'Time Added', suffix: 's' },
+    lifeRegen: { label: t('eg_stat_life_regen'), suffix: '/s' },
+    manaRegen: { label: t('eg_stat_mana_regen'), suffix: '/5s' },
+    manaOnKill: { label: t('eg_stat_mana_on_kill'), suffix: '' },
+    absorptionOnKill: { label: t('eg_stat_absorption_on_kill'), suffix: '' },
+    lifeOnKill: { label: t('eg_stat_life_on_kill'), suffix: '' },
+    manaOnMistake: { label: t('eg_stat_mana_on_mistake'), suffix: '' },
+    heartHealFlat: { label: t('eg_stat_heart_heal'), suffix: '' },
+    heartHealIncPct: { label: t('eg_stat_inc_heart_heal'), suffix: '%' },
+    timeAdded: { label: t('eg_stat_time_added'), suffix: 's' },
 
-    fireResist: { label: 'Fire Resistance', suffix: '%' },
-    coldResist: { label: 'Cold Resistance', suffix: '%' },
-    lightningResist: { label: 'Lightning Resistance', suffix: '%' },
-    shadowResist: { label: 'Shadow Resistance', suffix: '%' },
-    arcaneResistFlat: { label: 'Arcane Resistance', suffix: '' },
+    fireResist: { label: t('eg_stat_fire_res'), suffix: '%' },
+    coldResist: { label: t('eg_stat_cold_res'), suffix: '%' },
+    lightningResist: { label: t('eg_stat_lightning_res'), suffix: '%' },
+    shadowResist: { label: t('eg_stat_shadow_res'), suffix: '%' },
+    arcaneResistFlat: { label: t('eg_stat_arcane_res'), suffix: '' },
 
-    accuracy: { label: 'Accuracy', suffix: '' },
-    mistakeCount: { label: 'Allowed Mistakes', suffix: '' },
-    focusPct: { label: 'Focus', suffix: '%' },
-    mistakeNotCountPct: { label: 'Mistake Ignore Chance', suffix: '%' },
-    revealHintPct: { label: 'Reveal Hint Chance', suffix: '%' },
-    chanceForNewQuestionPct: { label: 'Chance for New Question', suffix: '%' },
+    accuracy: { label: t('eg_stat_accuracy'), suffix: '' },
+    mistakeCount: { label: t('eg_stat_allowed_mistakes'), suffix: '' },
+    focusPct: { label: t('eg_stat_focus'), suffix: '%' },
+    mistakeNotCountPct: { label: t('eg_stat_mistake_ignore'), suffix: '%' },
+    revealHintPct: { label: t('eg_stat_reveal_hint'), suffix: '%' },
+    chanceForNewQuestionPct: { label: t('eg_stat_new_question'), suffix: '%' },
 
-    critChance: { label: 'Critical Strike Chance', suffix: '%' },
-    critMultiplierPct: { label: 'Critical Strike Multiplier', suffix: '%' },
+    critChance: { label: t('eg_stat_crit_chance'), suffix: '%' },
+    critMultiplierPct: { label: t('eg_stat_crit_multi'), suffix: '%' },
 
-    physIncPct: { label: 'Increased Physical Damage', suffix: '%' },
-    spellDamageFlat: { label: 'Spell Damage', suffix: '' },
-    spellDamageIncPct: { label: 'Increased Spell Damage', suffix: '%' },
+    physIncPct: { label: t('eg_stat_inc_phys_dmg'), suffix: '%' },
+    spellDamageFlat: { label: t('eg_stat_spell_damage'), suffix: '' },
+    spellDamageIncPct: { label: t('eg_stat_inc_spell_damage'), suffix: '%' },
 
-    lifeLeechPct: { label: 'Life Leech', suffix: '%' },
+    lifeLeechPct: { label: t('eg_stat_life_leech'), suffix: '%' },
 
-    blockChance: { label: 'Block Chance', suffix: '%' },
-    spellBlockChance: { label: 'Spell Block Chance', suffix: '%' },
-    blockRecoveryPct: { label: 'Block Recovery', suffix: '%' },
-    dodgeChance: { label: 'Dodge Chance', suffix: '%' },
-    spellDodgeChance: { label: 'Spell Dodge Chance', suffix: '%' },
+    blockChance: { label: t('eg_tt_block_chance'), suffix: '%' },
+    spellBlockChance: { label: t('eg_stat_spell_block_chance'), suffix: '%' },
+    blockRecoveryPct: { label: t('eg_stat_block_recovery'), suffix: '%' },
+    dodgeChance: { label: t('eg_stat_dodge_chance'), suffix: '%' },
+    spellDodgeChance: { label: t('eg_stat_spell_dodge_chance'), suffix: '%' },
 
-    ignitePct: { label: 'Chance to Ignite', suffix: '%' },
-    freezePct: { label: 'Chance to Freeze', suffix: '%' },
-    shockPct: { label: 'Chance to Shock', suffix: '%' },
-    blindPct: { label: 'Chance to Blind', suffix: '%' },
-    convertPct: { label: 'Chance to Convert', suffix: '%' },
+    ignitePct: { label: t('eg_stat_ignite'), suffix: '%' },
+    freezePct: { label: t('eg_stat_freeze'), suffix: '%' },
+    shockPct: { label: t('eg_stat_shock'), suffix: '%' },
+    blindPct: { label: t('eg_stat_blind'), suffix: '%' },
+    convertPct: { label: t('eg_stat_convert'), suffix: '%' },
 
-    attackSpeed: { label: 'Attack Speed', suffix: '' },
-    cleavePct: { label: 'Cleave Chance', suffix: '%' },
-    piercePct: { label: 'Pierce Chance', suffix: '%' },
-    snipePct: { label: 'Snipe Chance', suffix: '%' },
-    chainPct: { label: 'Chain Chance', suffix: '%' },
-    splashPct: { label: 'Splash Damage Chance', suffix: '%' },
-    multishotPct: { label: 'Multishot Chance', suffix: '%' },
-    pushbackFlat: { label: 'Pushback', suffix: 's' },
-    overkillPct: { label: 'Overkill Chance', suffix: '%' },
-    staggerPct: { label: 'Stagger Chance', suffix: '%' },
-    preemptiveDodgePct: { label: 'Preemptive Dodge Chance', suffix: '%' },
-    firstStepSeconds: { label: 'First Step', suffix: 's' },
+    attackSpeed: { label: t('eg_stat_attack_speed'), suffix: '' },
+    cleavePct: { label: t('eg_stat_cleave'), suffix: '%' },
+    piercePct: { label: t('eg_stat_pierce'), suffix: '%' },
+    snipePct: { label: t('eg_stat_snipe'), suffix: '%' },
+    chainPct: { label: t('eg_stat_chain'), suffix: '%' },
+    splashPct: { label: t('eg_stat_splash'), suffix: '%' },
+    multishotPct: { label: t('eg_stat_multishot'), suffix: '%' },
+    pushbackFlat: { label: t('eg_stat_pushback'), suffix: 's' },
+    overkillPct: { label: t('eg_stat_overkill'), suffix: '%' },
+    staggerPct: { label: t('eg_stat_stagger'), suffix: '%' },
+    preemptiveDodgePct: { label: t('eg_stat_preemptive_dodge'), suffix: '%' },
+    firstStepSeconds: { label: t('eg_stat_first_step'), suffix: 's' },
 
-    groundedChancePct: { label: 'Grounded Chance', suffix: '%' },
-    groundedReductionPct: { label: 'Grounded Reduction', suffix: '%' },
-    shieldBashChancePct: { label: 'Shield Bash Chance', suffix: '%' },
-    shieldBashDamageFlat: { label: 'Shield Bash Damage', suffix: '' },
-    channelDamagePerStack: { label: 'Channel Damage per Stack', suffix: '' },
-    channelMaxStacks: { label: 'Max Channel Stacks', suffix: '' },
-    arcaneSurgeStreak: { label: 'Arcane Surge Streak', suffix: '' },
-    arcaneSurgeMana: { label: 'Arcane Surge Mana', suffix: '' },
-    manaToDamagePct: { label: 'Mana to Damage', suffix: '%' },
-    echoChancePct: { label: 'Echo Chance', suffix: '%' },
-    echoDamagePct: { label: 'Echo Damage', suffix: '%' },
-    fatePct: { label: 'Fate', suffix: '%' },
-    wardingHP: { label: 'Warding', suffix: '' },
+    groundedChancePct: { label: t('eg_stat_grounded_chance'), suffix: '%' },
+    groundedReductionPct: { label: t('eg_stat_grounded_reduction'), suffix: '%' },
+    shieldBashChancePct: { label: t('eg_stat_shield_bash_chance'), suffix: '%' },
+    shieldBashDamageFlat: { label: t('eg_stat_shield_bash_damage'), suffix: '' },
+    channelDamagePerStack: { label: t('eg_stat_channel_damage'), suffix: '' },
+    channelMaxStacks: { label: t('eg_stat_channel_max_stacks'), suffix: '' },
+    arcaneSurgeStreak: { label: t('eg_stat_arcane_surge_streak'), suffix: '' },
+    arcaneSurgeMana: { label: t('eg_stat_arcane_surge_mana'), suffix: '' },
+    manaToDamagePct: { label: t('eg_stat_mana_to_damage'), suffix: '%' },
+    echoChancePct: { label: t('eg_stat_echo_chance'), suffix: '%' },
+    echoDamagePct: { label: t('eg_stat_echo_damage'), suffix: '%' },
+    fatePct: { label: t('eg_stat_fate'), suffix: '%' },
+    wardingHP: { label: t('eg_stat_warding'), suffix: '' },
 
-    absorptionRegenRatePct: { label: 'Absorption Regen Rate', suffix: '%' },
-    fasterAbsorptionRegenStart: { label: 'Faster Absorption Regen Start', suffix: 's' },
+    absorptionRegenRatePct: { label: t('eg_stat_absorption_regen_rate'), suffix: '%' },
+    fasterAbsorptionRegenStart: { label: t('eg_stat_faster_absorption_start'), suffix: 's' },
 };
 
 // Rounds a value for display: whole numbers stay whole, decimals get 1 digit.
@@ -405,23 +405,23 @@ function _egBuildStatsSummaryLines(stats) {
     const lines = [];
 
     // ── Derived defensive totals (flat + % increased already applied) ──
-    if (stats.health > 0) lines.push({ label: 'Health', value: `+${_egFormatStatValue(stats.health)}` });
-    if (stats.mana > 0) lines.push({ label: 'Mana', value: `+${_egFormatStatValue(stats.mana)}` });
-    if (stats.armour > 0) lines.push({ label: 'Armour', value: `${_egFormatStatValue(stats.armour)}` });
-    if (stats.evasion > 0) lines.push({ label: 'Evasion', value: `${_egFormatStatValue(stats.evasion)}` });
-    if (stats.absorption > 0) lines.push({ label: 'Absorption', value: `${_egFormatStatValue(stats.absorption)}` });
+    if (stats.health > 0) lines.push({ label: t('eg_stat_health'), value: `+${_egFormatStatValue(stats.health)}` });
+    if (stats.mana > 0) lines.push({ label: t('eg_stat_mana'), value: `+${_egFormatStatValue(stats.mana)}` });
+    if (stats.armour > 0) lines.push({ label: t('eg_tt_armour'), value: `${_egFormatStatValue(stats.armour)}` });
+    if (stats.evasion > 0) lines.push({ label: t('eg_tt_evasion'), value: `${_egFormatStatValue(stats.evasion)}` });
+    if (stats.absorption > 0) lines.push({ label: t('eg_tt_absorption'), value: `${_egFormatStatValue(stats.absorption)}` });
 
     // ── Physical damage range ────────────────────────────────────────
     if (stats.physFlatMin > 0 || stats.physFlatMax > 0) {
-        lines.push({ label: 'Physical Damage', value: `${_egFormatStatValue(stats.physFlatMin)}–${_egFormatStatValue(stats.physFlatMax)}` });
+        lines.push({ label: t('eg_stat_phys_damage'), value: `${_egFormatStatValue(stats.physFlatMin)}–${_egFormatStatValue(stats.physFlatMax)}` });
     }
 
     // ── Elemental damage ranges ──────────────────────────────────────
     const elementalPairs = [
-        ['fireDmgMin', 'fireDmgMax', 'Fire Damage'],
-        ['coldDmgMin', 'coldDmgMax', 'Cold Damage'],
-        ['lightningDmgMin', 'lightningDmgMax', 'Lightning Damage'],
-        ['shadowDmgMin', 'shadowDmgMax', 'Shadow Damage'],
+        ['fireDmgMin', 'fireDmgMax', t('eg_stat_fire_damage')],
+        ['coldDmgMin', 'coldDmgMax', t('eg_stat_cold_damage')],
+        ['lightningDmgMin', 'lightningDmgMax', t('eg_stat_lightning_damage')],
+        ['shadowDmgMin', 'shadowDmgMax', t('eg_stat_shadow_damage')],
     ];
     elementalPairs.forEach(([minKey, maxKey, label]) => {
         if (stats[minKey] > 0 || stats[maxKey] > 0) {

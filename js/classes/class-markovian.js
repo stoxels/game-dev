@@ -194,9 +194,7 @@ function _rollback_clearPreExistingMistakes(preExistingWrong) {
         questStat_mistakesRemoved(1);
     });
 
-    showToast(`⏳ ${preExistingWrong.length} ${LANG === 'de'
-        ? 'alte Fehler ebenfalls korrigiert!'
-        : 'pre-existing mistake(s) also cleared!'}`);
+    showToast(t('cls_rollback_old_cleared').replace('{n}', preExistingWrong.length));
 }
 
 // Re-renders every cell and refreshes all row/column clue indicators
@@ -216,7 +214,7 @@ function _rollback_refreshDisplay() {
 
     // Update the on-screen mistake counter.
     const mc = document.getElementById('mistake-counter');
-    if (mc) mc.textContent = `${LANG === 'de' ? 'Fehler' : 'Mistakes'}: ${mistakeCount}`;
+    if (mc) mc.textContent = `${t('cls_mistakes_word')}: ${mistakeCount}`;
 
     updTimer();
 
@@ -238,9 +236,7 @@ function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
     // ── Find the target snapshot ──────────────────────────────────
     const best = _rollback_findBestSnapshot(windowSeconds);
     if (!best) {
-        showToast(LANG === 'de'
-            ? '⏳ Keine Zustandshistorie vorhanden!'
-            : '⏳ No state history available!');
+        showToast(t('cls_rollback_none'));
         _rollbackCancel(true);
         return;
     }
@@ -264,7 +260,7 @@ function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
     // ── "Cheat Death" achievement (triggered when nearly out of time) ──
     if (timerSecs <= 10) {
         trackAchStat('rollbackSaves');
-        showToast('⏳ State Rollback: Cheat Death!');
+        showToast(t('cls_cheat_death'));
     }
 
     // Restore the timer to what it was at the snapshot moment, then add
@@ -293,9 +289,9 @@ function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
 
     _rollbackPlayVFX(rows, cols);
 
-    showToast(`⏳ ${LANG === 'de'
-        ? `Zustandsrücksetzer! ${approxSecs}s zurückgespult. +${rewindSeconds}s Zeit.`
-        : `State Rollback! Rewound ~${approxSecs}s. +${rewindSeconds}s added.`}`);
+    showToast(t('cls_rollback_done')
+        .replace('{a}', approxSecs)
+        .replace('{b}', rewindSeconds));
 
     Audio_Manager.playSFX('stateReversal');
     trackAchStat('skillRollbackUsed');
@@ -314,7 +310,7 @@ function _rollbackCancel(silent = false) {
     if (cd) cd.remaining = 0;
 
     buildClassHUD();
-    if (!silent) showToast(LANG === 'de' ? '⏳ Abgebrochen.' : '⏳ Cancelled.');
+    if (!silent) showToast(`⏳ ${t('cls_cancelled')}`);
 }
 
 
@@ -561,9 +557,9 @@ function _executeTransitionMatrix(durationMs, cascadeChance, maxDepth) {
 
     const secs = Math.ceil(durationMs / 1000);
 
-    showToast(LANG === 'de'
-        ? `⏳ Übergangsmatrix aktiviert! ${secs}s — ${Math.round(cascadeChance * 100)}% Kettenreaktion.`
-        : `⏳ Transition Matrix active! ${secs}s — ${Math.round(cascadeChance * 100)}% cascade chance.`);
+    showToast(t('cls_tm_active')
+        .replace('{s}', secs)
+        .replace('{p}', Math.round(cascadeChance * 100)));
 
     Audio_Manager.playSFX('transitionMatrix');
     trackAchStat('skillTransitionMatrixUsed');
@@ -616,7 +612,7 @@ function _clearTransitionMatrix(natural = false) {
     }
 
     if (natural) {
-        showToast(LANG === 'de' ? '⏳ Übergangsmatrix beendet.' : '⏳ Transition Matrix ended.');
+        showToast(t('cls_tm_ended'));
         buildClassHUD();
     }
 }
@@ -960,7 +956,7 @@ function _transitionMatrixCascade(row, col, depth) {
 
     _transitionMatrixCellVFX(nr, nc, row, col);
 
-    showToast(`⏳ ${LANG === 'de' ? 'Übergang! Zelle enthüllt.' : 'Transition! Cell cascaded.'}`);
+    showToast(t('cls_tm_cascade'));
 
     // Rank 3: the newly revealed cell can itself cascade after a short delay.
     if (depth > 1) {

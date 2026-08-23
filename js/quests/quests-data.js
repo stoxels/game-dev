@@ -1216,7 +1216,7 @@ const LEDGER_CATEGORIES = [
                 reward: { items: ['scoutPrimer', 'reveal4'] }
             },
             {
-                id: 'prior_5', labelEn: '10 full-puzzle Primer solves', labelDE: '5 vollständige Primer-Lösungen',
+                id: 'prior_5', labelEn: '10 full-puzzle Primer solves', labelDE: '10 vollständige Primer-Lösungen',
                 check: qs => ({ current: qs.primerFullSolves || 0, target: 10 }),
                 reward: { ptPoints: 1, items: ['scoutPrimer', 'rowSolve'] }
             },
@@ -1660,7 +1660,7 @@ const LEDGER_CATEGORIES = [
         icon: '🎲',
         titleEn: 'Monte Carlo Method', titleDE: 'Monte-Carlo-Methode',
         descEn: 'Simulate every worst case at once. Hard difficulty with all five modifiers active.',
-        descDE: 'Simuliere jeden schlimmsten Fall gleichzeitig. Schwer mit allen five Modifikatoren aktiv.',
+        descDE: 'Simuliere jeden schlimmsten Fall gleichzeitig. Schwer mit allen fünf Modifikatoren aktiv.',
         milestones: [
             {
                 id: 'mc_1', labelEn: '1 Quintuple-Modifier level', labelDE: '1 Fünffach-Modifikator-Level',
@@ -1668,12 +1668,12 @@ const LEDGER_CATEGORIES = [
                 reward: { items: ['mistakeEraser6', 'addTime600'] }
             },
             {
-                id: 'mc_2', labelEn: '5 Quintuple-Modifier levels', labelDE: '5 Fünffach-Modifikator-Level',
+                id: 'mc_2', labelEn: '10 Quintuple-Modifier levels', labelDE: '10 Fünffach-Modifikator-Level',
                 check: qs => ({ current: qs.levelsTripleModifier || 0, target: 10 }),
                 reward: { items: ['mistakeEraserAll', 'addTime900'] }
             },
             {
-                id: 'mc_3', labelEn: '15 Quintuple-Modifier levels', labelDE: '15 Fünffach-Modifikator-Level',
+                id: 'mc_3', labelEn: '30 Quintuple-Modifier levels', labelDE: '30 Fünffach-Modifikator-Level',
                 check: qs => ({ current: qs.levelsTripleModifier || 0, target: 30 }),
                 reward: { ptPoints: 1, items: ['mistakeEraserAll', 'rowSolve', 'colSolve'] }
             },

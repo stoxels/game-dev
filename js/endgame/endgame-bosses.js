@@ -162,7 +162,7 @@ function _egBossClearMechanicTimers(monster) {
 
 // Shows the phase transition toast and triggers the transition CSS animation on the card.
 function _egBossPlayTransitionFeedback(monster, newPhase) {
-    const label = EG_BOSS_PHASE_NAMES[newPhase] || `Phase ${newPhase}`;
+    const label = EG_BOSS_PHASE_NAMES[newPhase] ? t(EG_BOSS_PHASE_NAMES[newPhase]) : t('eg_phase_badge').replace('{n}', newPhase);
     showToast(`⚡ ${monster.name}: ${label}!`);
 
     const card = document.getElementById(`eg-card-${monster.id}`);

@@ -283,8 +283,8 @@ function _buildRowClueToggle() {
 
     const btn = document.createElement('button');
     btn.id = 'row-clue-toggle-btn';
-    btn.textContent = 'CLUES ▶';
-    btn.title = 'Move row clues';
+    btn.textContent = t('cg_clues_btn_right');
+    btn.title = t('cg_clues_title');
     btn.style.cssText = `
         position: absolute;
         bottom: -28px;
@@ -336,7 +336,7 @@ function _toggleRowCluesSide() {
             rcts.forEach(td => tr.removeChild(td));
             rcts.reverse().forEach(td => tr.appendChild(td));
         });
-        if (btn) btn.textContent = '◀ CLUES';
+        if (btn) btn.textContent = t('cg_clues_btn_left');
     } else {
         // Move them back to the start of their row
         table.querySelectorAll('tr').forEach(tr => {
@@ -345,7 +345,7 @@ function _toggleRowCluesSide() {
             rcts.forEach(td => tr.removeChild(td));
             rcts.forEach(td => tr.insertBefore(td, tr.firstChild));
         });
-        if (btn) btn.textContent = 'CLUES ▶';
+        if (btn) btn.textContent = t('cg_clues_btn_right');
     }
 
     // Keep the shield border (if active) aligned with the grid's new position
@@ -790,7 +790,7 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
         _levelTimeAdded += bonus;
         updTimer();
         if (typeof playTimeGainEffect === 'function') playTimeGainEffect(`+${bonus}s`, '#6dbf40');
-        showToast(`📉 ${LANG === 'de' ? `+${bonus}s (Regressions-Belohnung)` : `+${bonus}s (Regression Reward)`}`);
+        showToast(`📉 ${t('cg_regression_reward').replace('{n}', bonus)}`);
     }
 
     if (colDone && !window._regressionRewardedLines.has(`c${col}`)) {
@@ -799,7 +799,7 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
         _levelTimeAdded += bonus;
         updTimer();
         if (typeof playTimeGainEffect === 'function') playTimeGainEffect(`+${bonus}s`, '#6dbf40');
-        showToast(`📉 ${LANG === 'de' ? `+${bonus}s (Regressions-Belohnung)` : `+${bonus}s (Regression Reward)`}`);
+        showToast(`📉 ${t('cg_regression_reward').replace('{n}', bonus)}`);
     }
 }
 
@@ -826,7 +826,7 @@ function _tryAutoMarkAdjacentLine(adjacentIndices, getCandidates) {
         renderCell(r, c);
 
         // Toast Alert & FX Trigger
-        showToast(`🔬 ${LANG === 'de' ? 'Residualanalyse!' : 'Residual Analysis!'}`);
+        showToast(`🔬 ${t('cg_residual_analysis')}`);
         if (typeof playResidualAnalysisEffect === 'function') {
             playResidualAnalysisEffect(r, c);
             Audio_Manager.playSFX('residual_analysis');

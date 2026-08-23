@@ -982,7 +982,7 @@ function _wdBuildEntranceMarker(wi, cfg, canvas) {
     marker.textContent = '🛖';
     marker.style.cursor = 'pointer';
     marker.style.pointerEvents = 'auto';
-    marker.title = LANG === 'de' ? 'Zurück zum Eingang' : 'Back to entrance';
+    marker.title = t('scr_back_to_entrance');
 
     marker.addEventListener('click', () => {
         if (!_wdWalking) _wdWalkSpriteToEntrance();
@@ -1215,7 +1215,7 @@ function _wdWalkSpriteToEntrance() {
  */
 function _wdGetWorldName(wi) {
     const world = WORLDS && WORLDS[wi];
-    if (!world) return `World ${wi + 1}`;
+    if (!world) return t('scr_world_n').replace('{n}', wi + 1);
     return (LANG === 'de' && world.labelDE) ? world.labelDE : world.label;
 }
 
@@ -1224,7 +1224,7 @@ function _wdGetWorldName(wi) {
  */
 function _wdBuildTopBar(wi) {
     const titleEl = document.getElementById('wd-title-text');
-    if (titleEl) titleEl.textContent = LANG === 'de' ? 'WELTKARTE' : 'WORLD MAP';
+    if (titleEl) titleEl.textContent = t('scr_world_map');
 
     const nameEl = document.getElementById('wd-world-name');
     if (nameEl) nameEl.textContent = _wdGetWorldName(wi);
@@ -1365,7 +1365,7 @@ function _wdBuildCanvas(wi) {
 
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg) {
-        wrap.innerHTML = `<div style="color:#f5e9c8;padding:20px;font-family:monospace;">You need to complete all other worlds first!</div>`;
+        wrap.innerHTML = `<div style="color:#f5e9c8;padding:20px;font-family:monospace;">${t('scr_need_other_worlds')}</div>`;
         return;
     }
 
@@ -1404,9 +1404,7 @@ function _wdBuildCanvas(wi) {
  */
 function _wdCreateEnterButton(wi, li, cfg) {
     const pos = cfg.nodes[li];
-    const btnText = LANG === 'de'
-        ? `▶ Level ${wi + 1}-${li + 1} betreten`
-        : `▶ Enter Level ${wi + 1}-${li + 1}`;
+    const btnText = t('scr_enter_level').replace('{lvl}', `${wi + 1}-${li + 1}`);
 
     const btn = document.createElement('button');
     btn.id = 'wd-enter-btn';
@@ -1521,8 +1519,8 @@ function _wdEnsureTooltip() {
  * Returns empty string for standard nodes.
  */
 function _wdGetTooltipTypeLabel(isLastInWorld, isConvergence) {
-    if (isLastInWorld) return LANG === 'de' ? '⚗️ AUFSTIEG · ' : '⚗️ ASCENSION · ';
-    if (isConvergence) return LANG === 'de' ? '🌿 KONVERGENZ · ' : '🌿 CONVERGENCE · ';
+    if (isLastInWorld) return `${t('scr_ascension_badge')} · `;
+    if (isConvergence) return `${t('scr_convergence_badge')} · `;
     return '';
 }
 
@@ -1568,20 +1566,16 @@ function _wdBuildTooltipModTags(hs) {
  */
 function _wdGetTooltipStatusText(gi, isDone, isLocked) {
     if (_wdIsMathGated(gi)) {
-        return LANG === 'de'
-            ? '⚠️ WAHRSCHEINLICHKEITSTOR UNGELÖST'
-            : '⚠️ PROBABILITY GATE UNSOLVED';
+        return t('scr_gate_unsolved');
     }
     const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
     if (isDone && hs) {
-        return LANG === 'de'
-            ? `✓ Abgeschlossen · Bestes Ergebnis: ${hs.score}`
-            : `✓ Complete · Best score: ${hs.score}`;
+        return t('scr_level_done_best').replace('{n}', hs.score);
     }
     if (isLocked) {
-        return LANG === 'de' ? '🔒 Gesperrt' : '🔒 Locked';
+        return t('scr_locked');
     }
-    return LANG === 'de' ? 'Noch nicht abgeschlossen' : 'Not yet completed';
+    return t('scr_not_completed');
 }
 
 /**
@@ -1594,10 +1588,10 @@ function _wdBuildTooltipBonusHtml(gi, levelData, isLocked) {
 
     const bIcon = WD_BONUS_ICONS[levelData.bonusType || 'nomiss'] || '🎯';
     const bonusLabel = (LANG === 'de' && levelData.bonusHintDE) ? levelData.bonusHintDE
-        : (levelData.bonusHint || (LANG === 'de' ? 'Level abschließen' : 'Complete the level'));
+        : (levelData.bonusHint || t('ls_complete_level'));
 
     if (STATE && STATE.bonusDone && STATE.bonusDone.includes(gi)) {
-        return `<div class="wd-tip-bonus done">${bIcon} ${LANG === 'de' ? 'Bonus erledigt ✓' : 'Bonus claimed ✓'}</div>`;
+        return `<div class="wd-tip-bonus done">${bIcon} ${t('scr_bonus_claimed_tip')}</div>`;
     }
     if (!isLocked) {
         return `<div class="wd-tip-bonus">${bIcon} ${bonusLabel}</div>`;
@@ -1638,7 +1632,7 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
 
     // Max-cleared crown line
     const maxLine = isMaxCleared
-        ? `<div class="wd-tip-max">👑 ${LANG === 'de' ? 'VOLLSTÄNDIG GEMEISTERT' : 'MAX CLEARED'}</div>`
+        ? `<div class="wd-tip-max">👑 ${t('scr_max_cleared')}</div>`
         : '';
 
     tip.innerHTML = `

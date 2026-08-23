@@ -87,8 +87,8 @@ function buildReshuffleModalElement(picks) {
     modal.id = 'rshuffle-modal';
     modal.innerHTML = `
         <div id="rshuffle-box">
-            <div id="rshuffle-title">♻ Reshuffle Reward</div>
-            <div id="rshuffle-subtitle">${RESHUFFLE_GOAL} items sacrificed — choose your reward:</div>
+            <div id="rshuffle-title">♻ ${t('itm_reshuffle_title')}</div>
+            <div id="rshuffle-subtitle">${t('itm_reshuffle_subtitle').replace('{n}', RESHUFFLE_GOAL)}</div>
             <div id="rshuffle-cards">${cardsHtml}</div>
         </div>`;
 
@@ -106,7 +106,7 @@ function applyReshuffleChoice(chosenId, modal) {
 
     save();
     buildInventoryPanel();
-    showToast(`${chosenDef.icon} ${itemName(chosenDef)} added to your inventory!`);
+    showToast(`${chosenDef.icon} ${t('itm_item_added').replace('{n}', itemName(chosenDef))}`);
     modal.remove();
 }
 
@@ -165,7 +165,7 @@ function reshuffleRightClickItem(uid) {
     trackAchStat('itemsSold');
     save();
     buildInventoryPanel();          // calls updateReshuffleCounter() internally
-    showToast(`${def.icon} Tossed into the reshuffle pile… (${reshuffleCount}/${RESHUFFLE_GOAL})`);
+    showToast(`${def.icon} ${t('itm_tossed_pile').replace('{c}', reshuffleCount).replace('{g}', RESHUFFLE_GOAL)}`);
 
     checkReshuffleGoalReached();    // resets counter and opens modal if goal is met
 }

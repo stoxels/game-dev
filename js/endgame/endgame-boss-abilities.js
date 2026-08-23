@@ -62,7 +62,9 @@ const EG_BOSS_MECHANICS = {
 
 // ── Phase display names (indexed by phase number) ────────────────────────────
 // Index 0 is unused. Add entries here as you add more phases to any boss.
-const EG_BOSS_PHASE_NAMES = ['', 'Phase I', 'Phase II — ENRAGE', 'Phase III — FURY'];
+// ── Phase display names (translation keys, indexed by phase number) ──────────
+// Index 0 is unused. Add entries here as you add more phases to any boss.
+const EG_BOSS_PHASE_NAMES = ['', 'eg_phase_1', 'eg_phase_2_enrage', 'eg_phase_3_fury'];
 
 // ── Recent fill tracker capacity ─────────────────────────────────────────────
 // Used by the Prior Bomb mechanic. Increase if you want it to reach further back.
@@ -209,7 +211,7 @@ function _egDispelCorruption(row, col) {
 
     clearTimeout(_egBossCorrupted.get(key).timer);
     _egRemoveCellCorruption(key);
-    showToast('✨ Corruption dispelled!');
+    showToast(t('eg_corruption_dispelled'));
     return true;
 }
 
@@ -222,7 +224,7 @@ function _egMechCorruptCells(monster, phase) {
     const count = phase >= 2 ? 3 : 2;
     const targets = pool.sort(() => Math.random() - 0.5).slice(0, Math.min(count, pool.length));
 
-    showToast(`🧿 Null Hypothesis: Corrupted ${targets.length} cell(s)!`);
+    showToast(t('eg_mech_corrupt_cells').replace('{n}', targets.length));
     targets.forEach(([r, c]) => _egApplyCellCorruption(r, c));
 }
 
@@ -263,7 +265,7 @@ function _egMechClueBlackout(monster, phase) {
     _egBlackoutActive = true;
 
     const duration = phase >= 3 ? 12000 : 8000;
-    showToast(`🧿 Null Hypothesis: Clue Blackout! (${duration / 1000}s)`);
+    showToast(t('eg_mech_clue_blackout').replace('{n}', duration / 1000));
     _egApplyBlackout();
     setTimeout(() => _egRemoveBlackout(), duration);
 }
@@ -298,7 +300,7 @@ function _egMechProbabilityShift(monster, phase) {
     const count = phase >= 2 ? 3 : 2;
     const targets = pool.sort(() => Math.random() - 0.5).slice(0, Math.min(count, pool.length));
 
-    showToast(`🔮 Grand Prior: Probability Shift! ${targets.length} mark(s) erased!`);
+    showToast(t('eg_mech_probability_shift').replace('{n}', targets.length));
     targets.forEach(([r, c]) => {
         userGrid[r][c] = 0;
         renderCell(r, c);
@@ -350,7 +352,7 @@ function _egMechPriorBomb(monster, phase) {
     const count = phase >= 2 ? 2 : 1;
     const targets = pool.slice(0, Math.min(count, pool.length));
 
-    showToast(`🔮 Grand Prior: Prior Bomb! ${targets.length} cell(s) unfilled!`);
+    showToast(t('eg_mech_prior_bomb').replace('{n}', targets.length));
     targets.forEach(([r, c]) => _egUnfillCell(r, c));
 }
 
@@ -379,7 +381,7 @@ function _egActivateVeil() {
         parent.appendChild(veil);
     }
     veil.classList.remove('eg-hidden');
-    showToast('🔮 Grand Prior: The Veil descends…');
+    showToast(t('eg_mech_grid_veil'));
 }
 
 // Removes the veil overlay element entirely.
@@ -552,7 +554,7 @@ function _egMechVoidSurge(monster, phase) {
     label.className = 'eg-void-surge-countdown-label';
     label.textContent = Math.ceil(EG_VOID_SURGE_ACTIVE_MS / 1000);
 
-    showToast('🧿 Void Surge! Find the safe zone!');
+    showToast(t('eg_void_surge_start'));
 
     // ── 2. Active phase: full blackout, player must be in zone ───────────────
     setTimeout(() => {
@@ -575,9 +577,9 @@ function _egMechVoidSurge(monster, phase) {
                 const damage = Math.round(playerMaxHP * EG_VOID_SURGE_DAMAGE_PCT);
                 const dealt = _egPlayerTakeDamage(damage);
                 if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
-                showToast(`🧿 Void Surge hit you for ${dealt} HP!`);
+                showToast(t('eg_void_surge_hit').replace('{n}', dealt));
             } else {
-                showToast('✅ You survived the Void Surge!');
+                showToast(t('eg_void_surge_survived'));
             }
 
             // Brief resolve pause so the player sees the outcome flash

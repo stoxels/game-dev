@@ -248,7 +248,7 @@ function _precisionMarkBonusLine(rows, cols, sol, affected) {
         }
     }
 
-    showToast(`🎯 ${LANG === 'de' ? 'Bonus-Linie markiert!' : 'Bonus line marked!'}`);
+    showToast(`🎯 ${t('cls_bonus_line_marked')}`);
 }
 
 
@@ -522,7 +522,7 @@ function _fieldScanRestore(scanned, prevStates) {
     prevStates.forEach(({ r, c }) => renderCell(r, c));
 
     _fieldScanFadeOutCells(scanned);
-    showToast('🎯 Scan faded');
+    showToast(`🎯 ${t('cls_scan_faded')}`);
     buildClassHUD();
 }
 
@@ -1002,7 +1002,7 @@ function _fieldScanFireDropArrow(sx, sy, tx, ty, onLand) {
 // rain-down has actually finished.
 function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs) {
     _playScanBeamEffect(startRow, startCol, scanSize, durationMs);
-    showToast(`🎯 Field Scan!`);
+    showToast(`🎯 ${t('cls_field_scan')}`);
     _fieldScanCheckBigScanAchievement(prevStates, sol);
 
     setTimeout(() => _fieldScanRestore(scanned, prevStates), durationMs);
@@ -1502,7 +1502,7 @@ function _executePrecisionMark(row, col, extraLines) {
     _playPrecisionMarkEffect(row, col, affected);
     // (the _applyCellEffect(affected, 'mark') call that used to be here is gone —
     // it now fires per-cell, at impact, inside _precisionMarkCommitMark)
-    showToast(`🎯 ${affected.length} ${LANG === 'de' ? 'Zellen markiert!' : 'cells marked!'}`);
+    showToast(t('cls_precision_marked').replace('{n}', affected.length));
 
     Audio_Manager.playSFX('precisionMark');
     trackAchStat('tilesMarkedWrong', affected.length);
@@ -1528,7 +1528,7 @@ function _executeFieldScan(row, col, scanSize, durationMs) {
     const targets = _fieldScanComputeTargets(startRow, startCol, effectiveSize, rows, cols, sol);
 
     if (targets.length === 0) {
-        showToast(LANG === 'de' ? '🎯 Nichts zu scannen!' : '🎯 Nothing to scan!');
+        showToast(`🎯 ${t('cls_nothing_to_scan')}`);
         return;
     }
 

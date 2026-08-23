@@ -43,32 +43,32 @@ const EG_LOOT_DROP_LIFETIME_MS = 60000;
 // corresponding weight entry in EG_PICKUP_WEIGHTS. No other code needs changing.
 const EG_PICKUP_DEFS = {
     heart_small: {
-        id: 'heart_small', emoji: '💛', label: 'Small Heart', rarity: 'common',
+        id: 'heart_small', emoji: '💛', label: () => t('eg_pickup_heart_small'), rarity: 'common',
         onPickup(row, col) {
             const heal = 10;
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
-            showToast(`💛 Small Heart! +${heal} HP`);
+            showToast(t('eg_pickup_heal_small').replace('{n}', heal));
             Audio_Manager.playSFX('heart_heals');
         },
     },
     heart_medium: {
-        id: 'heart_medium', emoji: '🧡', label: 'Heart', rarity: 'uncommon',
+        id: 'heart_medium', emoji: '🧡', label: () => t('eg_pickup_heart'), rarity: 'uncommon',
         onPickup(row, col) {
             const heal = 25;
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
-            showToast(`🧡 Heart! +${heal} HP`);
+            showToast(t('eg_pickup_heal_medium').replace('{n}', heal));
             Audio_Manager.playSFX('heart_heals');
         },
     },
     heart_large: {
-        id: 'heart_large', emoji: '❤️', label: 'Large Heart', rarity: 'rare',
+        id: 'heart_large', emoji: '❤️', label: () => t('eg_pickup_heart_large'), rarity: 'rare',
         onPickup(row, col) {
             const heal = 50;
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
-            showToast(`❤️ Large Heart! +${heal} HP`);
+            showToast(t('eg_pickup_heal_large').replace('{n}', heal));
             Audio_Manager.playSFX('heart_heals');
         },
     },
@@ -439,7 +439,9 @@ function _egCheckLootClaim(row, col) {
 
     Audio_Manager.playSFX('player_equip_pickup');
 
-    showToast(`📦 Loot! ${item.icon || ''} ${item.name}`);
+    showToast(t('eg_loot_claimed')
+        .replace('{icon}', item.icon || '')
+        .replace('{name}', item.name));
     return true;
 }
 
@@ -479,7 +481,9 @@ function _egFlushRunLootToStash() {
     }
 
     if (placed > 0) {
-        showToast(`🎒 ${placed} item${placed > 1 ? 's' : ''} added to your stash!`);
+        showToast(placed === 1
+            ? t('eg_stash_added_one')
+            : t('eg_stash_added_many').replace('{n}', placed));
         // Re-render the stash grid if the hub screen is currently visible
         if (typeof _egRenderInventory === 'function') _egRenderInventory();
         if (typeof egSaveHubState === 'function') egSaveHubState();
@@ -518,7 +522,7 @@ function _egReplaceCarriedLootDrops(items) {
         _egPickupTimers.push(timer);
     });
 
-    if (items.length > 0) showToast(`📦 Unclaimed loot carried to next puzzle!`);
+    if (items.length > 0) showToast(t('eg_loot_carried'));
 }
 
 
@@ -612,7 +616,9 @@ function _egCheckCurrencyDropClaim(row, col) {
     });
 
     Audio_Manager.playSFX('player_equip_pickup');
-    if (added) showToast(`${def.icon} ${def.name} acquired!`);
+    if (added) showToast(t('eg_currency_acquired')
+        .replace('{icon}', def.icon)
+        .replace('{name}', def.name));
     return true;
 }
 

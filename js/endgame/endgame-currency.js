@@ -62,8 +62,8 @@ function _egAddOneModToItem(item, rarityForCaps) {
 const EG_CURRENCY_DEFS = {
 
     orb_transmutation: {
-        id: 'orb_transmutation', name: 'Orb of Transmutation', icon: '🔷',
-        description: 'Upgrades a common item into an uncommon item with 1-2 random modifiers.',
+        id: 'orb_transmutation', name: t('eg_orb_transmutation'), icon: '🔷',
+        description: t('eg_orb_transmutation_desc'),
         canApply(item) { return item.rarity === 'common'; },
         apply(item) {
             const { prefixCount, suffixCount } = _egRollModCounts('uncommon');
@@ -72,8 +72,8 @@ const EG_CURRENCY_DEFS = {
     },
 
     orb_alteration: {
-        id: 'orb_alteration', name: 'Orb of Alteration', icon: '🔵',
-        description: 'Rerolls the modifiers on an uncommon item.',
+        id: 'orb_alteration', name: t('eg_orb_alteration'), icon: '🔵',
+        description: t('eg_orb_alteration_desc'),
         canApply(item) { return item.rarity === 'uncommon'; },
         apply(item) {
             const { prefixCount, suffixCount } = _egRollModCounts('uncommon');
@@ -82,8 +82,8 @@ const EG_CURRENCY_DEFS = {
     },
 
     orb_augmentation: {
-        id: 'orb_augmentation', name: 'Orb of Augmentation', icon: '🔹',
-        description: 'Adds a new modifier to an uncommon item with only 1 modifier.',
+        id: 'orb_augmentation', name: t('eg_orb_augmentation'), icon: '🔹',
+        description: t('eg_orb_augmentation_desc'),
         canApply(item) { return item.rarity === 'uncommon' && (item.mods || []).length === 1; },
         apply(item) {
             const updated = _egAddOneModToItem(item, 'uncommon');
@@ -93,8 +93,8 @@ const EG_CURRENCY_DEFS = {
     },
 
     orb_regal: {
-        id: 'orb_regal', name: 'Regal Orb', icon: '🟣',
-        description: 'Upgrades an uncommon item to rare, adding a new modifier.',
+        id: 'orb_regal', name: t('eg_orb_regal'), icon: '🟣',
+        description: t('eg_orb_regal_desc'),
         canApply(item) { return item.rarity === 'uncommon'; },
         apply(item) {
             const updated = _egAddOneModToItem({ ...item, rarity: 'rare' }, 'rare');
@@ -104,8 +104,8 @@ const EG_CURRENCY_DEFS = {
     },
 
     orb_alchemy: {
-        id: 'orb_alchemy', name: 'Orb of Alchemy', icon: '🟡',
-        description: 'Upgrades a common item directly into a rare item.',
+        id: 'orb_alchemy', name: t('eg_orb_alchemy'), icon: '🟡',
+        description: t('eg_orb_alchemy_desc'),
         canApply(item) { return item.rarity === 'common'; },
         apply(item) {
             const { prefixCount, suffixCount } = _egRollModCounts('rare');
@@ -114,8 +114,8 @@ const EG_CURRENCY_DEFS = {
     },
 
     orb_chaos: {
-        id: 'orb_chaos', name: 'Chaos Orb', icon: '🟠',
-        description: 'Rerolls all modifiers on a rare item.',
+        id: 'orb_chaos', name: t('eg_orb_chaos'), icon: '🟠',
+        description: t('eg_orb_chaos_desc'),
         canApply(item) { return item.rarity === 'rare'; },
         apply(item) {
             const { prefixCount, suffixCount } = _egRollModCounts('rare');
@@ -124,8 +124,8 @@ const EG_CURRENCY_DEFS = {
     },
 
     orb_scouring: {
-        id: 'orb_scouring', name: 'Orb of Scouring', icon: '⚪',
-        description: 'Strips all modifiers from an item, returning it to common.',
+        id: 'orb_scouring', name: t('eg_orb_scouring'), icon: '⚪',
+        description: t('eg_orb_scouring_desc'),
         canApply(item) { return item.rarity !== 'common'; },
         apply(item) {
             return { ...item, rarity: 'common', mods: [], name: item.baseName || item.name };
@@ -133,8 +133,8 @@ const EG_CURRENCY_DEFS = {
     },
 
     orb_exalted: {
-        id: 'orb_exalted', name: 'Exalted Orb', icon: '🔴',
-        description: 'Adds a new modifier to a rare or epic item, upgrading it to epic.',
+        id: 'orb_exalted', name: t('eg_orb_exalted'), icon: '🔴',
+        description: t('eg_orb_exalted_desc'),
         canApply(item) {
             if (item.rarity !== 'rare' && item.rarity !== 'epic') return false;
             return (item.mods || []).length < EG_MOD_CAPS.epic.maxTotal;
@@ -203,7 +203,9 @@ function _egStartCurrencyUse(def, row, col, chipEl) {
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     if (chipEl) chipEl.classList.add('eg-currency-selected');
     document.body.classList.add('eg-currency-use-active');
-    showToast(`${def.icon} ${def.name} selected — click an item to apply, or right-click it again to cancel`);
+    showToast(t('eg_currency_selected')
+        .replace('{icon}', def.icon)
+        .replace('{name}', def.name));
 }
 
 function _egCancelCurrencyUse(silent) {
@@ -211,7 +213,7 @@ function _egCancelCurrencyUse(silent) {
     _egPendingCurrencyUse = null;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     document.body.classList.remove('eg-currency-use-active');
-    if (!silent) showToast('❌ Currency use cancelled');
+    if (!silent) showToast(t('eg_currency_cancelled'));
 }
 
 function _egApplyCurrencyToItem(item, applyFn, chipEl) {
@@ -226,7 +228,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
     }
 
     if (item.category !== 'equip' || !def.canApply(item)) {
-        showToast(`⚠️ ${def.name} cannot be used on that item.`);
+        showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
             setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
@@ -244,7 +246,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
     _egRenderCurrencyCell(sourceRow, sourceCol);
 
     _egCancelCurrencyUse(true);
-    showToast(`✨ ${def.name} applied!`);
+    showToast(t('eg_currency_applied').replace('{name}', def.name));
     if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
     egSaveHubState();
 }
@@ -269,7 +271,7 @@ document.addEventListener('contextmenu', function (e) {
 
     const def = EG_CURRENCY_DEFS[item.id];
     if (!def || typeof def.apply !== 'function') {
-        showToast('This item has no usable effect.');
+        showToast(t('eg_no_usable_effect'));
         return;
     }
 
@@ -319,7 +321,7 @@ document.addEventListener('mousedown', function (e) {
     }
 
     if (!targetItem) {
-        showToast('⚠️ No item there to apply currency to.');
+        showToast(t('eg_no_item_target'));
         _egCancelCurrencyUse(true);
         return;
     }
@@ -345,7 +347,7 @@ function _egShowTooltip(item) {
     if (!panel) return;
 
     if (!item) {
-        panel.innerHTML = '<span class="eg-tooltip-empty">Hover over an item to inspect it</span>';
+        panel.innerHTML = `<span class="eg-tooltip-empty">${t('eg_tooltip_hover_hint')}</span>`;
         return;
     }
 
@@ -356,7 +358,7 @@ function _egShowTooltip(item) {
     <div class="eg-tt-header">
         <div class="eg-tt-icon">${item.icon || '📦'}</div>
         <div class="eg-tt-name" style="color:#f5d98a;">${item.name || '???'}${countLine}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">Currency</div>
+        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')}</div>
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc">${item.description || ''}</div></div>
 </div>`;

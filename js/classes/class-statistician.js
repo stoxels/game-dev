@@ -460,26 +460,19 @@ function _playDiagonalSlashEffect(row, col, diagonalCount) {
 //   count : preview number of lines that will be solved
 //   cap   : preview max cells revealed per line
 function _dataStrikeOverlayHTML(count, cap) {
-    const title = LANG === 'de' ? 'DATENHIEB' : 'DATA STRIKE';
+    const title = t('cls_data_strike_title');
 
-    const lineWordEn = _pluralLabel(count, 'row', 'row(s)', '', '');
-    const cellWordEn = _pluralLabel(cap, 'cell', 'cells', '', '');
-    const lineWordDe = _pluralLabel(count, 'Zeile oder Spalte', 'Zeile(n) oder Spalte(n)', 'Zeile oder Spalte', 'Zeile(n) oder Spalte(n)');
-    const cellWordDe = _pluralLabel(cap, 'Zelle', 'Zellen', 'Zelle', 'Zellen');
-
-    let prompt = LANG === 'de'
-        ? `Wähle: bis zu ${cap} ${cellWordDe} in ${count} zufälliger ${lineWordDe} aufdecken?`
-        : `Choose: reveal up to ${cap} ${cellWordEn} in ${count} random row(s) or column(s)?`;
+    let prompt = t('cls_data_strike_prompt')
+        .replace('{cap}', cap)
+        .replace('{count}', count);
 
     if (_dataStrikeHasRandomBonusChance()) {
-        prompt += LANG === 'de'
-            ? ' (Chance auf mehr!)'
-            : ' (chance for more!)';
+        prompt += t('cls_chance_for_more');
     }
 
-    const rowLabel = LANG === 'de' ? 'ZEILEN' : 'ROWS';
-    const colLabel = LANG === 'de' ? 'SPALTEN' : 'COLS';
-    const cancelLabel = LANG === 'de' ? 'ABBRECHEN' : 'CANCEL';
+    const rowLabel = t('cls_rows_label');
+    const colLabel = t('cls_cols_label');
+    const cancelLabel = t('cls_cancel');
 
     return `
         <div class="ds-panel">
@@ -672,14 +665,7 @@ function _dataStrikeResolve(type) {
     _playSlashEffect(type === 'cols');
 
     if (solved > 0) {
-        // Determine singular/plural label based on line type and count
-        const label = type === 'rows'
-            ? _pluralLabel(solved, 'row', 'rows', 'Zeile', 'Zeilen')
-            : _pluralLabel(solved, 'column', 'columns', 'Spalte', 'Spalten');
-
-        const msg = LANG === 'de'
-            ? `⚔️ ${solved} ${label} gelöst!`
-            : `⚔️ ${solved} ${label} solved!`;
+        const msg = t('cls_data_strike_solved').replace('{n}', solved);
 
         showToast(msg);
         checkWin();
@@ -964,11 +950,7 @@ function _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealCap, mar
 
     const bonusRevealed = _filterRevealedIds(bonusAffected, sol).length;
 
-    const label = _pluralLabel(bonusRevealed, 'cell', 'cells', 'Zelle', 'Zellen');
-
-    const msg = (LANG === 'de')
-        ? `⚔️ Bonus-Schlag! ${bonusRevealed} ${label} mehr!`
-        : `⚔️ Bonus Strike! ${bonusRevealed} more ${label}!`;
+    const msg = t('cls_diag_bonus').replace('{n}', bonusRevealed);
 
     showToast(msg);
 
@@ -1050,19 +1032,11 @@ function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
     if (diagRevealed > 0) {
         trackAchStat('tilesRevealed', diagRevealed);
 
-        const label = _pluralLabel(diagRevealed, 'cell', 'cells', 'Zelle', 'Zellen');
-
-        const msg = (LANG === 'de')
-            ? `⚔️ Diagonal-Schlag! ${diagRevealed} ${label} aufgedeckt.`
-            : `⚔️ Diagonal Strike! ${diagRevealed} ${label} revealed.`;
+        const msg = t('cls_diag_revealed').replace('{n}', diagRevealed);
 
         showToast(msg);
     } else {
-        const msg = (LANG === 'de')
-            ? `⚔️ Diagonal-Schlag! Nichts Neues gefunden.`
-            : `⚔️ Diagonal Strike! Nothing new found.`;
-
-        showToast(msg);
+        showToast(t('cls_diag_nothing'));
     }
 
     // --- god_of_statistics: 50% chance to fire a bonus repeat strike ---
@@ -1270,8 +1244,7 @@ function _statisticianTriggerMomentum(bonusSeconds) {
     _trackTimerDelta(before, timerSecs);
     updTimer();
 
-    const label = _pluralLabel(bonus, 'second', 'seconds', 'Sekunde', 'Sekunden');
-    const msg = `⚔️ Momentum! +${bonus} ${label}`;
+    const msg = t('cls_momentum_gain').replace('{n}', bonus);
 
     showToast(msg);
 

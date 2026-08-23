@@ -30,12 +30,14 @@ const MOD_MULT = {
 // Short, plain-language warning text shown on the left-page scroll for
 // each modifier when it's toggled on. Keyed by the same .dataset.mod value
 // used everywhere else (timetrial, hardcore, ironman, classless, treeless).
-const MOD_SCROLL_TEXT = {
-    timetrial: 'A clock is ticking against you.',
-    hardcore: 'One mistake and game over.',
-    ironman: 'No retries. No mercy.',
-    classless: 'All class abilities are disabled.',
-    treeless: 'The passive tree is sealed shut.',
+// Values are i18n keys resolved through t() at render time (see updModDesc),
+// so a language switch is always reflected.
+const MOD_SCROLL_TEXT_KEYS = {
+    timetrial: 'scr_mod_scroll_tt',
+    hardcore: 'scr_mod_scroll_hc',
+    ironman: 'scr_mod_scroll_im',
+    classless: 'scr_mod_scroll_cl',
+    treeless: 'scr_mod_scroll_tl',
 };
 
 
@@ -73,12 +75,12 @@ function updModDesc() {
 
     const activeLines = Object.keys(curMods)
         .filter(m => curMods[m])
-        .map(m => MOD_SCROLL_TEXT[m])
+        .map(m => t(MOD_SCROLL_TEXT_KEYS[m]))
         .filter(Boolean);
 
     el.textContent = activeLines.length
         ? activeLines.join(' ')
-        : t('setup_no_mods');
+        : t('mod_desc_none');
 }
 
 // Toggles a modifier on/off from its button, updates the button's yellow

@@ -128,8 +128,8 @@ function updateStepCounter() {
 function updateNextButton() {
     const isLast = tutStep === TUTORIAL_STEPS.length - 1;
     document.getElementById('tut-next-btn').textContent = isLast
-        ? (LANG === 'de' ? 'FERTIG ▶' : 'START PLAYING ▶')
-        : (LANG === 'de' ? 'WEITER ▶' : 'NEXT ▶');
+        ? t('st_tut_finish')
+        : t('btn_next');
 }
 
 

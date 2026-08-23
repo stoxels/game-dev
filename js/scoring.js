@@ -267,7 +267,7 @@ function applyAscensionReward(irz) {
     buildInventoryPanel();
     showItemGainPopup(defId);
 
-    const label = `🌟 ${LANG === 'de' ? 'Aufstiegsbonus' : 'Ascension Reward'}:
+    const label = `🌟 ${t('cg_ascension_reward')}:
             ${codexDef.icon} <strong>${itemName(codexDef)}</strong>`;
     irz.innerHTML = _buildItemRewardCard(defId, codexDef, label);
 }

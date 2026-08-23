@@ -87,9 +87,7 @@ function _drainAchToastQueue() {
 function _buildToastRequirementText(def, tier, lang) {
     const baseDesc = _pickLang(def, 'desc', lang);
     const target = tier.threshold.toLocaleString();
-    return lang === 'de'
-        ? `${baseDesc} Ziel: ${target}`
-        : `${baseDesc} Target: ${target}`;
+    return `${baseDesc} ${t('qa_target')} ${target}`;
 }
 
 // _buildToastElement — creates and returns the fully populated DOM element for a toast.
@@ -105,7 +103,7 @@ function _buildToastElement(def, tier) {
         <div class="ach-toast-inner">
             <span class="ach-toast-icon">${def.icon}</span>
             <div class="ach-toast-text">
-                <div class="ach-toast-title">🏆 Achievement Unlocked!</div>
+                <div class="ach-toast-title">🏆 ${t('qa_achievement_unlocked')}</div>
                 <div class="ach-toast-name">${name}: <em>${tierLabel}</em></div>
                 <div class="ach-toast-requirement">📋 ${requirementText}</div>
             </div>
@@ -276,8 +274,8 @@ function _buildProgressBlockHtml(label, current, total, pct, extraBarClass = '')
 // _buildHeaderHtml — renders the overall progress header with two side-by-side bars:
 //   left = fully completed achievements, right = total milestone tiers unlocked.
 function _buildHeaderHtml(fullAchs, totalAchs, fullPct, unlockedTiers, totalTiers, milestonePct, lang) {
-    const achLabel = lang === 'de' ? 'Achievements abgeschlossen' : 'Achievements Completed';
-    const mileLabel = lang === 'de' ? 'Achievement Meilensteine' : 'Achievement Milestones';
+    const achLabel = t('qa_ach_completed');
+    const mileLabel = t('qa_ach_milestones');
 
     const achBlock = _buildProgressBlockHtml(achLabel, fullAchs, totalAchs, fullPct);
     const mileBlock = _buildProgressBlockHtml(mileLabel, unlockedTiers, totalTiers, milestonePct, 'ach-progress-bar-milestones');

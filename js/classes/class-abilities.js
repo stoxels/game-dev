@@ -471,13 +471,13 @@ function _handleRecursionistTotemPlacement(activeKey, asc, ascSlot, effect) {
         _setAbilityMode(false);
         const cdSeconds = getEffectiveCooldown(activeKey, asc[ascSlot].cooldownSeconds);
         startSlotCooldown(activeKey, cdSeconds);
-        showToast('💀 All active totems deployed.');
+        showToast(t('cls_totems_deployed'));
         return true; // cooldown was handled here
     }
 
     // Still room for more totems — keep selection mode open
     const remaining = maxTotemsAllowed - currentTotems;
-    showToast(`💀 Totem placed! Click another mistake cell to place another. (${remaining} left)`);
+    showToast(t('cls_totem_place_more').replace('{n}', remaining));
     return false; // caller should NOT start cooldown yet
 }
 
@@ -743,13 +743,7 @@ function _applyMathmagicianShieldAbsorb() {
         _trackTimerDelta(before, timerSecs);
         updTimer();
 
-        const label = (LANG === 'de')
-            ? (bonus === 1 ? 'Sekunde' : 'Sekunden')
-            : (bonus === 1 ? 'second' : 'seconds');
-
-        const msg = (LANG === 'de')
-            ? `🔮 Absorbiert! +${bonus} ${label}`
-            : `🔮 Absorbed! +${bonus} ${label}`;
+        const msg = t('cls_shield_absorbed_time').replace('{n}', bonus);
 
         showToast(msg);
 
@@ -777,7 +771,7 @@ function getClassPenaltyMultiplier() {
     // Breaking an active Speedforce (Black Swan) streak ends it unnaturally and applies a heavy penalty
     if (window._blackSwanActive) {
         _endBlackSwan(false);
-        showToast(LANG === 'de' ? '📉 SPEEDFORCE abgebrochen!' : '📉 SPEEDFORCE broken!');
+        showToast(t('cls_speedforce_broken'));
         return 5.0;
     }
 
@@ -832,11 +826,7 @@ function _handleMathmagicianFreezeBonus() {
 
             _varianceShield_updateVisibility(); 
 
-            const label = (LANG === 'de') ? 'Schild' : 'shield';
-            const msg = (LANG === 'de')
-                ? `🔮 Gefrorene Widerstandskraft! +1 ${label}!`
-                : `🔮 Frozen Resilience! +1 ${label}!`;
-            showToast(msg);
+            showToast(t('cls_frozen_resilience'));
 
             // Icy grid pulse so the charge gain is visible in play
             if (typeof playShieldChargePulseEffect === 'function') {
@@ -869,7 +859,7 @@ function _handlePrecisionMarkMomentum(row, col) {
     const before = timerSecs;
     timerSecs = Math.min(timerSecs + 20, 3600);
     _trackTimerDelta(before, timerSecs);
-    showToast(LANG === 'de' ? '🎯 Schwung der Gewissheit! +20 s!' : '🎯 Momentum of Certainty! +20 s!');
+    showToast(t('cls_momentum_certainty'));
     if (typeof playTimeGainEffect === 'function') playTimeGainEffect('+20s', '#ffb830');
     trackAchStat('timeAdded', 20);
 

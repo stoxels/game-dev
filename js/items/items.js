@@ -72,12 +72,12 @@ const COMMON_REFINEMENT_NODES = [
 
 // Returns the localised display name for an item definition.
 function itemName(def) {
-    return LANG === 'de' ? def.nameDE : def.nameEn;
+    return (LANG === 'de' && def.nameDE) ? def.nameDE : def.nameEn;
 }
 
 // Returns the localised description for an item definition.
 function itemDesc(def) {
-    return LANG === 'de' ? def.descDE : def.descEn;
+    return (LANG === 'de' && def.descDE) ? def.descDE : def.descEn;
 }
 
 

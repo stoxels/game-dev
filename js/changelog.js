@@ -4,99 +4,50 @@
 //------------------------------------------------------------------------
 
 // Version history shown in the Changelog modal, newest first.
-// Each version has a list of category groups (e.g. "New Features",
-// "Bug Fixes"), each holding a flat list of change-note strings.
+// Each version has a list of category groups (translation keys, e.g.
+// 'cl_cat_bf'), each holding a flat list of change-note translation keys
+// resolved via t() at render time (see _buildCategoryGroupHtml below).
 const CHANGELOG_DATA = [
 
     {
         version: "v0.27 BETA",
-        date: "22.08.2026",
+        date: "23.08.2026",
         changes: [
             {
-                category: "New Features",
+                category: "cl_cat_nf",
                 items: [
-                    "Settings Modal has been fully remade.",
-                    "Settings can now be opened and adjusted during the Pause screen (Escape during a Puzzle Screen)",
-                    "Added a new Setting option for playing Random Background Music instead of the pre-assigned Track.",
-                    "Added a new Setting option: You can now disable left-click behaviour on cells that have been marked as incorrect (by a manual right click or by items, passives and abilities).",
-                    "There are now up to 20 individual Save - Slots. Each one can be reset individually and progress is based per Save - Slot. Character portraits in each save slot shows the chosen character and class combination.",
-                    "Each Save - Slot shows a lifetime summary of interesting stats for that specific playthrough.",
-                    "Multiple Choice and Excercise Questions now show a new button after answering a question. The button will show explainatory text.",
-                    "The Message Queue Toast System has been fully remade.",
-                    "Red Cross Marks created by passives, abilities, items and other effects are now visually distinct from manually placed cross marks",
-                    "Added countdown timers for row and column clue number blackout durations after using cursed items.",
-                    "Added a small visual effect when a row or column has been fully solved.",
-                    "The chosen Character now appears in the Level Selection Topbar row. Mouse - overing the character shows the character traits.",
-                    "After selecting a class for the first time there are now two visual hints that tell the player to use keyboard buttons 1 and 2 to activate spells.",
-                    "Alot of the information from the puzzle game top bar rows have been moved to the pause screen to make more space for the actual grid puzzle. The actual puzzle topbar has been redesigned to be in the top left corner now. The puzzle is now always much more centered onto the screen, regardless of grid size.",
-                    "There is now a new vertical bar to apply a higher or lower Zoom level during puzzling. The same functionality was available with ctrl + mousewheel but now it is also clickable during a puzzle.",
-                    "Added new visual indicators when the timer drops below 15 minutes, 10 minutes and 5 minutes.",
-                    "Mouse Overing the Timer, the Mistake Counter, the Level Name, the Inventory or the Close button now show appropriate informative tooltips.",
-                    "A Prototype for the Endgame has been developed and is now accessable through the Endgame Test Hub. This will be expanded on in the future.",
-
+                    "cl_27_1", "cl_27_2", "cl_27_3", "cl_27_4", "cl_27_5",
+                    "cl_27_6", "cl_27_7", "cl_27_8", "cl_27_9", "cl_27_10",
+                    "cl_27_11", "cl_27_12", "cl_27_13", "cl_27_14", "cl_27_15",
+                    "cl_27_16", "cl_27_17", "cl_27_18",
                 ],
 
             },
             {
-                category: "General Adjustments",
+                category: "cl_cat_ga",
                 items: [
-                    "Reduced the amount of achievements required to unlock Moodle Codes 2,3,4,5.",
-                    "If you have enough Score to unlock a new Code but insufficient Achievement Points, then previously a Modal Popup occured after every single solved Stoxel. This now only happens after Game Setup and before Level Selection, so once per play session.",
-                    "Adjusting the sound effect volume now plays a random sound effect so the adjustment is instantly noticeable",
-                    "Alot of internal code has been refactored and improved.",
-                    "Quiz and Excercise buttons have been vertically repositionioed.",
-                    "The Drag Counter now counts cells that are item or skill revealed aswell.",
-                    "Diagonal Strike now also shows a message when no correct cell has been revealed.",
-                    "When opening a probability gate modal after completing a previous level, closing the probability gate modal now automatically returns you to the level selection screen instead of just closing the modal.",
-                    "Rows and Columns with 0 correctly filled cells are now automatically marked as fully completed when a level loads instead of requiring an incorrect mark in that specific Row or Column to count as fully completed.",
-                    "Mouse-Overing a world number label will now show you what you can still do in this world in order to receive more Score.",
-                    "The old Level Selection Screen has been removed.",
-                    "The color of item, spell and passive correctly revealed cells has been slightly adjusted.",
-                    "The Demon Eye Item is now applying the grid shield border effect",
-                    "Milestone Rewards from Quests now get automatically added to your inventory without needing to claim them from the Inference screen.",
-                    "There is now a message when Sylas Nature's Aid passive trait triggers.",
-                    "Mistakes that were absorbed by a Shield Item now show the corresponding grid cell as a mistake cell.",
-                    "Updated the default Class Hud and Character Sprite position. This only affects fresh gameplay sessions. Class Hud and Character Sprites can still be manually repositioned.",
-                    "Added a visual indicator for item gains during a puzzle screen.",
-                    "Item Reshuffling now only requires 3 items (down from 5)",
-                    "There is now a new Toast message when items have been added to your inventory from a quest milestone completion.",
-                  
-                    
+                    "cl_27_19", "cl_27_20", "cl_27_21", "cl_27_22", "cl_27_23",
+                    "cl_27_24", "cl_27_25", "cl_27_26", "cl_27_27", "cl_27_28",
+                    "cl_27_29", "cl_27_30", "cl_27_31", "cl_27_32", "cl_27_33",
+                    "cl_27_34", "cl_27_35", "cl_27_36", "cl_27_37", "cl_27_38",
                 ],
 
             },
 
             {
-                category: "Class Changes",
+                category: "cl_cat_cc",
                 items: [
-
-                    "Mathmagician: Added a new visual for the Variance Shield passive effect.",
-                    "Mathmagician: Arcane Reveal now properly shows the whole affected area on the targeting reticle.",
-                    "Mathmagician: Arcane Reveal visual has been fully remade.",
-                    "Mathmagician: Absolute Zero has received visual grid effects.",
-                    "Statistician: Diagonal Strike now properly shows the whole diagonal on the targeting reticle.",
-                    "Statistician: Added a new visual effect for the Momentum passive effect.",
-
-
-
+                    "cl_27_39", "cl_27_40", "cl_27_41", "cl_27_42", "cl_27_43", "cl_27_44",
                 ],
 
             },
             {
-                category: "Bug Fixes",
+                category: "cl_cat_bf",
                 items: [
-                    "Fixed some typos",
-                    "Potentially fixed a bug that made using The Witch item not consume the item and not count towards associated achievements.",
-                    "Fixed a bug that made the 'Select Levels' button in the Convergence Modal launch the next Level instead of bringing the player back to the Level Selection screen.",
-                    "Fixed a bug that made the Skip Button remain on the screen after answering a quiz or excercise question.",
-                    "Fixed a bug that made sprites keep walking after selecting a level or when returning from a puzzle back to the level selection screen using the Levels button.",
-                    "Fixed a bug that made the shield effect around the grid not properly reposition when clicking the Clues button to move row clue numbers to the other side",
-                    "Fixed a bug that showed an incorrect amount of cells to be revealed by Data Strike from the Statistician class in the Data Strike Modal panel.",
-                    "Fixed a bug that made row and col blackout effects not last for the full duration if multiple of the same blackout effects occured onto the same axis while a blackout efect was already going on.",
-                    "Fixed a bug that caused using Tutor items to remove the mistake string from the mistake counter. ",
-                    "Fixed a bug that caused the Mathmagician's Variance Shield ability to count absorbed mistakes twice in the win overlay screen.",
-                    "Fixed a bug that made grid border effects on high zoom levels.",
-                    "Fixed a bug that made the Character Sprite walk 20 pixels too much to the right of the actual World 4 node.",
+                    "cl_27_45", "cl_27_46", "cl_27_47", "cl_27_48", "cl_27_49",
+                    "cl_27_50", "cl_27_51", "cl_27_52", "cl_27_53", "cl_27_54",
+                    "cl_27_55", "cl_27_56", "cl_27_57", "cl_27_58", "cl_27_59",
+                    "cl_27_60", "cl_27_61", "cl_27_62",
                 ],
 
             },
@@ -112,46 +63,24 @@ const CHANGELOG_DATA = [
         date: "13.07.2026",
         changes: [
             {
-                category: "New Features",
+                category: "cl_cat_nf",
                 items: [
-                    "World 10 has been added.",
-                    "World 11 has been added",
-                    "Added a Replay button to the title screen to replay unlocked storyline beats and the tutorial.",
-                    "Fully remade the Data Strike row/col selection panel for the Statistician class.",
-                    "Fully remade the Infinite Hunger screen for the Outlier class.",
-
-
-
-
+                    "cl_26_1", "cl_26_2", "cl_26_3", "cl_26_4", "cl_26_5",
                 ],
 
             },
             {
-                category: "General Adjustments",
+                category: "cl_cat_ga",
                 items: [
-                    "It is now possible to dismiss Inference quest milestone popups by clicking on them.",
-                    "While a character is walking towards the target node you can now select a different node to cancel the old routing on the next waypoint arrival to walk towards the newly selected node.",
-                    "When going into the Probability Screen after a Convergence event, and then pressing the Back button in the Probability Tree screen, you will now automatically return to the detailed Map Screen of the World you were just in instead of the Overworld Screen.",
-                    "Added a Sound Effect for Sylas nature trait.",
-                    "The Loaded Dice effect of Trix does now work without having the passive tree nodes active.",
-                    "Tutorial image adjustments",
-                    "Removed some duplicated Quiz and Excercise questions.",
-                    "The same Quiz or Excercise question can now no longer appear for the next 10 questions.",
-                    "Moodle Codes Screen has been updated.",
-                    "There is now a new effect on the Overworld Map if all Levels of a specific World have been cleared. This effect is more intense if all levels are cleared and all bonus requirements are met, and even more intense if all levels are cleared, all bonus requirements are met and all levels have been cleared on Hard with all available game modifiers.",
-
+                    "cl_26_6", "cl_26_7", "cl_26_8", "cl_26_9", "cl_26_10",
+                    "cl_26_11", "cl_26_12", "cl_26_13", "cl_26_14", "cl_26_15",
                 ],
 
             },
             {
-                category: "Bug Fixes",
+                category: "cl_cat_bf",
                 items: [
-                    "Fixed a bug that made characters move faster on the world map when resizing the game window mid-walking.",
-                    "Fixed a bug that made Level 8-5 only have 5 minutes duration instead of 30 minutes.",
-                    "Fixed a bug that caused the glowing border effect around the grid applied by Shield items to remain on screen when leaving a level through the LEVELS button.",
-                    "Fixed a bug that caused the CLUES button to create an arbitrary gap between row clue numbers after they have been switched back from right to left again. Now there is no more gap and the CLUES button remains in the same position permanently.",
-                    "Fixed a bug that made the Time Trial modifier penalize the Base Score for level completion incorrectly.",
-                    "Fixed a bug that made the lose overlay reposition itself weirdly in some situations.",
+                    "cl_26_16", "cl_26_17", "cl_26_18", "cl_26_19", "cl_26_20", "cl_26_21",
                 ],
 
             },
@@ -168,31 +97,23 @@ const CHANGELOG_DATA = [
         date: "09.07.2026",
         changes: [
             {
-                category: "New Features",
+                category: "cl_cat_nf",
                 items: [
-                    "Game Reset Screen has been completely remade.",
-                    "The Win Overlay Screen has been redesigned to properly show a solved Stoxel visual.",
-
-
+                    "cl_251_1", "cl_251_2",
                 ],
 
             },
             {
-                category: "General Adjustments",
+                category: "cl_cat_ga",
                 items: [
-                    "Adjusted the way the Drag Stroke Counter works. It is now checking for correctly pre-filled correct cells, and if there are any then it starts counting the increased correctly filled counter instead of only the newly created new correct fills.",
-                    "Clarified the description of the Unshakeable trait for Stox: Mistake penalties escalate 30% more slowly for Stox. The Trait description has been updated.",
-                    "Multiple Choice question elimination chance can now exceed 100%. Values above 100% have a chance for multiple wrong answer removals.",
-                    "Syla's Trait Quick Study now requires no Probability Tree investment and stacks with Probability Tree effects properly. The Trait description has been updated.",
-                    "Optimized image loading and performance. In some cases this results in up to 75% improved load times.",
+                    "cl_251_3", "cl_251_4", "cl_251_5", "cl_251_6", "cl_251_7",
                 ],
 
             },
             {
-                category: "Bug Fixes",
+                category: "cl_cat_bf",
                 items: [
-                    "Potentially fixed a bug that cause issues image loading in the intro while having a higher than usual connection delay. Together with image load optimization this should result in a smoother Intro sequence.",
-                    "Fixed a bug that still caused console log output.",
+                    "cl_251_8", "cl_251_9",
                 ],
 
             },
@@ -209,71 +130,31 @@ const CHANGELOG_DATA = [
         date: "06.07.2026",
         changes: [
             {
-                category: "New Features",
+                category: "cl_cat_nf",
                 items: [
-                    "The Cartographers of Chance are here! You can now choose between 3 playable Characters: Stox, Trix and Syla.",
-                    "Stoxels now has gotten a storyline and intro cinematics.",
-                    "Character Avatars for Stox, Trix and Syla vary with your chosen class and class upgrades, and can be moved around on the screen, either with WASD or mouse dragging.",
-                    "Character movement on screen and maps is fully animated.",
-                    "Characters have personalities and will react to the way you interact with a Stoxel.",
-                    "Characters have unique traits that affect the way they interact with Stoxels.",
-                    "Some characters & class abilities are now animated. More animations will be added over time",
-                    "Added World 9.",
-                    "Complete Graphical overhowl of the whole game",
-                    "Title Screen has been complete remade",
-                    "New Title Screen and Level Selection music has been added",
-                    "The Tutorial has been completely remade",
-                    "Game Setup Screen has been completely remade",
-                    "Level Selection has been completely remade. The old version is still available through the List button, for now. Will be removed in the future.",
-                    "Moodle Codes Screen has been completely remade",
-                    "Highscores Screen has been completely remade",
-                    "The Inference Modal overlay has been completely remade",
-                    "Quiz, Excercise and Scout's Primer overlays have been completely remade",
-                    "Special nodes are properly marked in the new interactive Level Selection screen.",
-                    "Class Selection Screen has been completely remade.",
-                    "Base Class Spell Upgrade Screens have been completely remade.",
-                    "Ascendency Class Selection Screen has been completely remade, for all possible choices.",
-                    "Ascendency Class Spell Upgrade Screens have been completely remade, for all Ascendency Classes.",
-                    "All nodes are now visibly a Stoxel while unsolved.",
-                    "Stoxels now have background images.",
-                    "Added a new Setting: Touchpad Mode. When activated, it makes a small button appear on near the top (next to the mistake counter) that when activated, will cause leftclicks to do a X - mark and right click to do a reveal. Useful when using a touchpad and having issues doing right clicks. By default this button is disabled."
-
+                    "cl_25_1", "cl_25_2", "cl_25_3", "cl_25_4", "cl_25_5",
+                    "cl_25_6", "cl_25_7", "cl_25_8", "cl_25_9", "cl_25_10",
+                    "cl_25_11", "cl_25_12", "cl_25_13", "cl_25_14", "cl_25_15",
+                    "cl_25_16", "cl_25_17", "cl_25_18", "cl_25_19", "cl_25_20",
+                    "cl_25_21", "cl_25_22", "cl_25_23", "cl_25_24", "cl_25_25",
+                    "cl_25_26",
                 ],
             },
 
             {
-                category: "General Adjustments",
+                category: "cl_cat_ga",
                 items: [
-                    "The following Levels now have a Probability gate: 3-10, 4-12, 4-17,",
-                    "Adjusted level 4-4.",
-                    "The Clue - Scrollbar to move the row clue header to the right has been removed. Instead there is now a button that instantly moves all row clues towards the right and reverse the clue number order.",
-                    "Added a text - shadow to clue numbers so they are more visible on some backgrounds.",
-                    "The Timer now has a black background so its more visible against some backgrounds",
-                    "Inference Milestone Popups now show up for 10 seconds instead of 5 seconds.",
-                    "Browney, Drifter and Wiener will now charge the grid.",
-                    "Arcane Reveal, Diagonal Strike, Precision Mark, Field Scan and Residual Totem now have targeting crosshair effects.",
-                    "Precision Mark has been renamed to Precision Shot and received a new visual. The marked incorrect cells now only switch to marked after getting hit by projectiles.",
-                    "Field Scan has been changed from an instant ability targeting a random area to an armed ability where you can select the area to scan.",
-                    "Field Scan ability has been renamed to Rain of Arrows.",
-                    "Field Scan visual has been fully reworked.",
-                    "Field Scan cooldown increased from 3 minutes to 5 minutes.",
-                    "Field Scan Targeting Marker now also shows the full size of cells that will be revealed. The Targeting Marker targets the upper left corner of the NxN area.",
-                    "If you have reached the Score - Treshold for a new Moodle Code, but have not reached the required Achievement - Treshold yet (for Codes 2-5), then currently a Toast Message is being shown that states you need to unlock more Achievements. This Toast - Message has been changed to an actual Modal and will now correctly show up.",
-                    "Started working on Website Responsiveness such that Stoxels looks better on various screen sizes.",
-                    "Adjusted unit color on Excercise Questions.",
-                    "Class Selections now only register when pressing the Select button, instead of clicking anywhere on the class card.",
-
+                    "cl_25_27", "cl_25_28", "cl_25_29", "cl_25_30", "cl_25_31",
+                    "cl_25_32", "cl_25_33", "cl_25_34", "cl_25_35", "cl_25_36",
+                    "cl_25_37", "cl_25_38", "cl_25_39", "cl_25_40", "cl_25_41",
+                    "cl_25_42", "cl_25_43", "cl_25_44",
                 ],
             },
 
             {
-                category: "Bug Fixes",
+                category: "cl_cat_bf",
                 items: [
-                    "Fixed a bug that made the timer continue and eventually play the Game Over Sound when leaving a puzzle through the LEVELS button.",
-                    "Fixed a bug that made cells revealed or marked by abilities or items transparent for half a second.",
-                    "Fixed a bug that made the Skip button appear again after correctly answering a Quiz question",
-                    "Fixed some bugs around bonus objectives in various levels",
-
+                    "cl_25_45", "cl_25_46", "cl_25_47", "cl_25_48",
                 ],
 
 
@@ -290,78 +171,40 @@ const CHANGELOG_DATA = [
         date: "08.06.2026",
         changes: [
             {
-                category: "New Features",
+                category: "cl_cat_nf",
                 items: [
-                    "Added this Changelog. Will stay English only for now.",
-                    "Added a Passive Tracker that tracks the state of various probability tree nodes while doing a puzzle. The Passive Tracker can be minimized and moved around.",
-                    "Achievements for interactions with the Probability Tree and the Inference system have been added.",
-                    "Added Pause functionality: Pressing Escape while in a Level now pauses and unpauses the game.",
-                    "Added World 8.",
-
+                    "cl_24_1", "cl_24_2", "cl_24_3", "cl_24_4", "cl_24_5",
                 ],
             },
             {
-                category: "General Adjustments",
+                category: "cl_cat_ga",
                 items: [
-                    "Slightly adjusted the order of levels in world 1 and 4.",
-                    "Slightly adjusted the following levels: Union Bound, Exponential Distribution, Impossible Event, Algebra, Probability Tree, Quantile Function, Expectation, Discrete Expected Value, Draw without Order with Replacement, Standard Deviation, Variance Property, Transformation, Density Transform, Linearity, Convolution, Standard Normal, Poisson Limit Theorem, Geometric Expectation, Poisson Convolution, Geometric Distribution, Hypergeometric Distribution, Multivariate Normal Distribution, Variance of Dependent Sum, Correlation Bound, Bilinearity, Data Histogram with Gaussian Curve, Mean, Tschebyscheff, Central Limit Theorem  ",
-                    "Multiple Choice and Excercises now use a different font for question texts and font size has been increased. This should help with seeing math symbols more clearly.",
-                    "Updated and improved various Multiple Choice and Excercise questions.",
-                    "Added a new sound effect that occurs when a shield - item effect protects the player from a penalty.",
-                    "Using a Shield now visually protects the whole grid while it is active.",
-                    "Almost all files have gotten another round of optimization and cleanup.",
-                    "Updated the How-to-play? section.",
-                    "Tutor - Items can now no longer be used when having no mistakes",
-                    "The same question can now no longer appear more than once within the same Scouts Primer question pool.",
-                    "Alot of german text has been updated.",
-                    "Achievement Toasts now only show for 5 seconds (down from 10 seconds). They also appear much faster on the screen now.",
-                    "Progress Bars towards Moodle Codes are now shown in the Codes screen instead of the Highscore screen. These now also give information about achievement milestone progress towards unlocking Moodle Codes.",
-                    "Adjusted the Level Selection tooltip on Levels to indicate that you can get even more Score by completing the level faster when having all modifiers.",
-                    "Time Penalties for mistakes have been slightly increased to offset all of the available ways of increasing time that exist now.",
-                    "Title Screen has been modernized",
-                    "Started building the foundations for an Endgame system.",
+                    "cl_24_6", "cl_24_7", "cl_24_8", "cl_24_9", "cl_24_10",
+                    "cl_24_11", "cl_24_12", "cl_24_13", "cl_24_14", "cl_24_15",
+                    "cl_24_16", "cl_24_17", "cl_24_18", "cl_24_19", "cl_24_20",
+                    "cl_24_21", "cl_24_22",
                 ],
             },
             {
-                category: "Class Changes",
+                category: "cl_cat_cc",
                 items: [
-                    "Actuary: New sound effects added for both abilities.",
-                    "Outlier: Tail Risk ability description has been adjusted.",
-                    "Outlier: Tail Risk now shows the costs in minutes:seconds instead of only in seconds.",
-                    "Probabilist: Precision Mark Bows now only target the cells it has just marked, instead of all marked cells on the grid.",
-                    "Bayesian: Bayes Traps Fuse Timer reduced from 10 seconds down to 7 seconds.",
-                    "Random Walker: Brownian Motion and Drifter are now instant abilities.",
-                    "Random Walker: Drifter cooldown has been reduced from 10 minutes to 5 minutes.",
-                    "Random Walker: Drifter's parting gift is no longer able to walk.",
-                    "Random Walker: Drifter's remaining Timer is now additionally also shown as Countdown underneath the icon on the grid.",
-                    "Recursionist: Residual now properly requires a mistake cell to be selected.",
-                    "Recursionist: Base Radius of Residual Totem Beams has been increased by 1 for each ability rank.",
+                    "cl_24_23", "cl_24_24", "cl_24_25", "cl_24_26", "cl_24_27",
+                    "cl_24_28", "cl_24_29", "cl_24_30", "cl_24_31", "cl_24_32",
+                    "cl_24_33",
                 ],
             },
             {
-                category: "Probability Tree",
+                category: "cl_cat_pt",
                 items: [
-                    "Keystone nodes have been renamed to Keystones.",
-                    "Keystone nodes are now visually distinct on the Probability Tree.",
-                    "When opening the Tree the view is now centered on the last node you have selected.",
-                    "Added a new sound effect for the Poisson Process node.",
-                    "Binomial Burst now has a visual effect and an audio cue when it activates.",
-                    "Residual Analysis proc chance has been lowered from 25% to 10%. Other nodes can now increase the chance to 25%.",
-                    "Added a new visual and sound effect for Residual Analysis.",
-                    "Error Feedback now has a new visual and sound effect.",
-                    "Overfitting now plays an Alert sound when crossing the treshold.",
-                    "Sample Efficiency now has new visuals and sound effects",
-                    "Stochastic Resonance now has new visuals and sound effects",
+                    "cl_24_34", "cl_24_35", "cl_24_36", "cl_24_37", "cl_24_38",
+                    "cl_24_39", "cl_24_40", "cl_24_41", "cl_24_42", "cl_24_43",
+                    "cl_24_44",
                 ],
             },
             {
-                category: "Bug Fixes",
+                category: "cl_cat_bf",
                 items: [
-                    "Fixed a bug that caused Inference Milestone Popups to not play a sound effect.",
-                    "Fixed a bug that allowed casting instant abilities while a targeted ability was already armed.",
-                    "Fixed a bug that made units on input Excercises not respect the chosen language when they were picked as bonus quiz question.",
-                    "Fixed a bug that caused issues with scaling the grid.",
-                    "Fixed a bug that made the Back buttons on the Highscores and Moodle Codes tabs huge.",
+                    "cl_24_45", "cl_24_46", "cl_24_47", "cl_24_48", "cl_24_49",
                 ],
             }
         ]
@@ -375,14 +218,15 @@ const CHANGELOG_DATA = [
 //------------------------------------------------------------------------
 
 // Renders one category group (e.g. "Bug Fixes") as a labeled <ul> block.
+// Category labels and items are translation keys resolved via t().
 function _buildCategoryGroupHtml(group) {
     const items = group.items
-        .map(item => `<li>${item}</li>`)
+        .map(item => `<li>${t(item)}</li>`)
         .join("");
 
     return `
         <div class="cl-category-group">
-            <div class="cl-category-label">${group.category}</div>
+            <div class="cl-category-label">${t(group.category)}</div>
             <ul class="cl-list">${items}</ul>
         </div>`;
 }
@@ -403,11 +247,10 @@ function _buildVersionBlockHtml(update) {
         </div>`;
 }
 
-// Renders the full changelog into the DOM. No-ops if already rendered,
-// so it's safe to call every time the modal opens.
+// Renders the full changelog into the DOM. Re-renders every time so a
+// mid-session language switch is reflected on the next modal open.
 function renderChangelog() {
     const container = document.getElementById("changelog-content");
-    if (container.innerHTML !== "") return;
 
     container.innerHTML = CHANGELOG_DATA
         .map(_buildVersionBlockHtml)

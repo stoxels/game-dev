@@ -47,8 +47,8 @@ function getCharPortraitSrc(summary) {
 // Builds the inner markup for a save-slot card, empty or filled.
 function _buildSlotCardHtml(slotNum, summary) {
     if (summary.empty) {
-        return `<div class="ssc-num">SLOT ${slotNum}</div>
-                <div class="ssc-empty">+ NEW GAME</div>`;
+        return `<div class="ssc-num">${t('scr_slot_label').replace('{n}', slotNum)}</div>
+                <div class="ssc-empty">${t('scr_new_game')}</div>`;
     }
 
     // UPDATE HERE: Pass the full summary object instead of just the character ID
@@ -58,11 +58,11 @@ function _buildSlotCardHtml(slotNum, summary) {
         ? `<img class="ssc-portrait" src="${portraitSrc}" alt="${summary.playerCharacter}">`
         : '';
 
-    return `<div class="ssc-num">SLOT ${slotNum}</div>
+    return `<div class="ssc-num">${t('scr_slot_label').replace('{n}', slotNum)}</div>
              ${portraitHtml}
-             <div class="ssc-score">SCORE: ${summary.totalScore}</div>
-             <div class="ssc-levels">${summary.levelsDone} STOXELS DONE</div>
-             <button class="ssc-delete-btn" data-slot="${slotNum}" title="Delete save">❌</button>`;
+             <div class="ssc-score">${t('score_lbl')}: ${summary.totalScore}</div>
+             <div class="ssc-levels">${t('scr_stoxels_done').replace('{n}', summary.levelsDone)}</div>
+             <button class="ssc-delete-btn" data-slot="${slotNum}" title="${t('scr_delete_save')}">❌</button>`;
 }
 
 
@@ -180,18 +180,18 @@ function _setResetModalTextForSlot(slotNum) {
     if (!modal) return;
 
     const title = modal.querySelector('.reset-title');
-    if (title) { title.removeAttribute('data-t'); title.textContent = `DELETE SAVE - SLOT ${slotNum}`; }
+    if (title) { title.removeAttribute('data-t'); title.textContent = t('scr_delete_slot_title').replace('{n}', slotNum); }
 
     // Target by class and DOM structure instead of [data-t="..."]
     const note1 = modal.querySelector('.reset-note-text span:first-child');
-    if (note1) { note1.removeAttribute('data-t'); note1.textContent = `This will permanently erase Save Slot ${slotNum}.`; }
+    if (note1) { note1.removeAttribute('data-t'); note1.textContent = t('scr_delete_slot_note1').replace('{n}', slotNum); }
 
     // Target by class and DOM structure instead of [data-t="..."]
     const note2 = modal.querySelector('.reset-note-text span:last-child');
-    if (note2) { note2.removeAttribute('data-t'); note2.textContent = 'This cannot be undone.'; }
+    if (note2) { note2.removeAttribute('data-t'); note2.textContent = t('scr_cannot_undo'); }
 
     const confirmBtn = modal.querySelector('#btn-confirm-reset');
-    if (confirmBtn) { confirmBtn.removeAttribute('data-t'); confirmBtn.textContent = 'YES, DELETE THIS SAVE'; }
+    if (confirmBtn) { confirmBtn.removeAttribute('data-t'); confirmBtn.textContent = t('scr_delete_this_save'); }
 }
 
 

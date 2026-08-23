@@ -175,7 +175,7 @@ function _egCancelChainCountdown() {
 function _egLoadNextChainPuzzle() {
     const nextGi = _egFindNextChainPuzzleGi();
     if (nextGi === null) {
-        showToast('⚠️ No more puzzles available in this pool.');
+        showToast(t('eg_no_more_puzzles'));
         return;
     }
 
@@ -316,7 +316,7 @@ function _egEndMap() {
     if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
     if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
 
-    showToast('🏆 Map cleared!');
+    showToast(t('eg_map_cleared'));
     setTimeout(() => goToLevelSelect(), 2500);
 }
 
@@ -324,7 +324,7 @@ function _egEndMap() {
 // Called by the Leave Map button in the HUD.
 function _egTryLeaveMap() {
     if (!_egCanLeaveMap()) {
-        showToast('⚠️ Complete all objectives before leaving!');
+        showToast(t('eg_objectives_incomplete'));
         return;
     }
     _egEndMap();
@@ -353,7 +353,7 @@ function _egUpdateObjectivesHUD() {
     if (req.totalMonsters > 0) {
         const count = Math.min(_egChainKillCount, req.totalMonsters);
         const done = count >= req.totalMonsters;
-        rows.push(_egObjItem('⚔️', `${count}/${req.totalMonsters} Monsters`, done));
+        rows.push(_egObjItem('⚔️', t('eg_obj_monsters').replace('{k}', count).replace('{t}', req.totalMonsters), done));
     }
 
     // Mistakes Remaining (only shown if the map defines a mistake limit)
@@ -368,21 +368,21 @@ function _egUpdateObjectivesHUD() {
     if (req.hasBoss) {
         const done = _egBossDefeated();
         const count = done ? 1 : 0;
-        rows.push(_egObjItem('💀', `Boss ${count}/1`, done));
+        rows.push(_egObjItem('💀', t('eg_obj_boss').replace('{k}', count), done));
     }
 
     // Puzzles (Capped)
     if (req.requiredPuzzles > 0) {
         const count = Math.min(_egChainPuzzleSolvedCount, req.requiredPuzzles);
         const done = count >= req.requiredPuzzles;
-        rows.push(_egObjItem('🧩', `${count}/${req.requiredPuzzles} Puzzles`, done));
+        rows.push(_egObjItem('🧩', t('eg_obj_puzzles').replace('{k}', count).replace('{t}', req.requiredPuzzles), done));
     }
 
     // Questions (Capped)
     if (req.requiredQuestions > 0) {
         const count = Math.min(_egQuestionsAnswered, req.requiredQuestions);
         const done = count >= req.requiredQuestions;
-        rows.push(_egObjItem('❓', `${count}/${req.requiredQuestions} Questions`, done));
+        rows.push(_egObjItem('❓', t('eg_obj_questions').replace('{k}', count).replace('{t}', req.requiredQuestions), done));
     }
 
     // Loot acquired (Always shows, uses custom helper for tooltip)
@@ -391,11 +391,11 @@ function _egUpdateObjectivesHUD() {
     const canLeave = _egCanLeaveMap();
 
     strip.innerHTML = `
-        <div class="eg-obj-header">Objectives</div>
+        <div class="eg-obj-header">${t('eg_obj_header')}</div>
         ${rows.join('')}
         <button class="eg-leave-btn ${canLeave ? 'eg-leave-ready' : 'eg-leave-locked'}"
                 onclick="_egTryLeaveMap()">
-            ${canLeave ? '🏆 Leave Map' : '🔒 Leave Map'}
+            ${canLeave ? t('eg_leave_map') : t('eg_leave_map_locked')}
         </button>`;
 }
 
@@ -424,13 +424,13 @@ function _egBuildLootItem() {
             const color = getRarityColor(item.rarity);
 
             // Prioritize the base item name, fallback to standard name
-            const displayName = item.baseName || item.name || 'Unknown Item';
+            const displayName = item.baseName || item.name || t('eg_unknown_item');
             const icon = item.icon || '📦';
 
             // Generate the exact same tooltip frame used in your Endgame Hub
             const nestedTooltip = typeof _egBuildTooltipBodyHTML === 'function'
                 ? _egBuildTooltipBodyHTML(item)
-                : '<div style="padding: 5px;">Tooltip unavailable</div>';
+                : `<div style="padding: 5px;">${t('eg_tooltip_unavailable')}</div>`;
 
             return `
                 <div class="eg-loot-item-row" style="color: ${color};">
@@ -443,12 +443,12 @@ function _egBuildLootItem() {
 
         tooltipHTML = `<div class="eg-loot-tooltip">${itemsList}</div>`;
     } else {
-        tooltipHTML = `<div class="eg-loot-tooltip" style="color: #888;">No loot acquired yet</div>`;
+        tooltipHTML = `<div class="eg-loot-tooltip" style="color: #888;">${t('eg_no_loot_yet')}</div>`;
     }
 
     return `
         <div class="eg-obj-item eg-loot-container eg-obj-pending">
-            📦 Loot Acquired: ${count}
+            📦 ${t('eg_loot_acquired').replace('{n}', count)}
             ${tooltipHTML}
         </div>
     `;
@@ -469,7 +469,7 @@ function _egBuildMistakesItem(remaining, max) {
     } else if (remaining <= Math.max(1, Math.ceil(max * 0.3))) {
         cls = 'eg-obj-mistakes-warn';
     }
-    return `<div class="eg-obj-item ${cls}">❌ ${remaining}/${max} Mistakes Left</div>`;
+    return `<div class="eg-obj-item ${cls}">❌ ${t('eg_mistakes_left').replace('{r}', remaining).replace('{m}', max)}</div>`;
 }
 
 
@@ -492,9 +492,9 @@ function _egShowChainCountdownOverlay(secs) {
         document.body.appendChild(el);
     }
     el.innerHTML = `
-        <div style="font-size:1.1rem;color:#aaa;margin-bottom:0.4rem;letter-spacing:.1em;">PUZZLE SOLVED</div>
+        <div style="font-size:1.1rem;color:#aaa;margin-bottom:0.4rem;letter-spacing:.1em;">${t('eg_countdown_solved')}</div>
         <div id="eg-chain-countdown-num" style="font-size:4rem;font-weight:700;color:#fff;line-height:1;">${secs}</div>
-        <div style="font-size:0.9rem;color:#888;margin-top:0.5rem;">Next puzzle in…</div>`;
+        <div style="font-size:0.9rem;color:#888;margin-top:0.5rem;">${t('eg_countdown_next')}</div>`;
     el.style.display = 'flex';
 }
 

@@ -91,9 +91,7 @@ function _executeRegressionToPrior(correctCount, recoverPct) {
 
     const log = window._mistakeLog || [];
     if (log.length === 0) {
-        showToast(LANG === 'de'
-            ? '🛡️ Keine Fehler zum Korrigieren!'
-            : '🛡️ No mistakes to correct!');
+        showToast(t('cls_regression_none'));
         _regressionCancel(true);
         return;
     }
@@ -117,9 +115,9 @@ function _executeRegressionToPrior(correctCount, recoverPct) {
         updTimer();
     }
 
-    showToast(`🛡️ ${LANG === 'de'
-        ? `Regression: ${toCorrect.length} Fehler korrigiert, +${recoveredSecs}s zurück`
-        : `Regression: ${toCorrect.length} mistake(s) corrected, +${recoveredSecs}s recovered`}`);
+    showToast(t('cls_regression_done')
+        .replace('{n}', toCorrect.length)
+        .replace('{s}', recoveredSecs));
 
     if (window.Audio_Manager) {
         Audio_Manager.playSFX('varianceShield');
@@ -142,7 +140,7 @@ function _regressionCancel(noOverlayToRemove = false) {
 
     buildClassHUD();
     if (!noOverlayToRemove) {
-        showToast(LANG === 'de' ? '🛡️ Abgebrochen.' : '🛡️ Cancelled.');
+        showToast(`🛡️ ${t('cls_cancelled')}`);
     }
 }
 
@@ -163,8 +161,8 @@ function _regressionCancel(noOverlayToRemove = false) {
 // inside the line-picker modal.
 function _sigThreshBuildLineButton(type, idx) {
     const label = type === 'row'
-        ? (LANG === 'de' ? `Zeile ${idx + 1}` : `Row ${idx + 1}`)
-        : (LANG === 'de' ? `Spalte ${idx + 1}` : `Col ${idx + 1}`);
+        ? t('cls_row_n').replace('{n}', idx + 1)
+        : t('cls_col_n').replace('{n}', idx + 1);
 
     return `<button onclick="_sigThreshProtectLine('${type}', ${idx})"
         style="font-family:var(--PX); font-size:9px; background:transparent;
@@ -191,12 +189,12 @@ function _sigThreshBuildColButtons(colCount) {
 // _sigThreshBuildPickerHTML — returns the full inner HTML for the line-picker
 // modal overlay. Receives pre-built button strips to stay readable.
 function _sigThreshBuildPickerHTML(remaining, rowBtns, colBtns) {
-    const title = LANG === 'de' ? 'SIGNIFIKANZSCHWELLE' : 'SIGNIFICANCE THRESHOLD';
-    const prompt = LANG === 'de' ? `Wähle bis zu ${remaining} Zeile(n) oder Spalte(n) zum Schützen:` : `Choose up to ${remaining} row(s) or column(s) to protect:`;
-    const rowsLabel = LANG === 'de' ? 'ZEILEN' : 'ROWS';
-    const colsLabel = LANG === 'de' ? 'SPALTEN' : 'COLUMNS';
-    const doneLabel = LANG === 'de' ? 'FERTIG' : 'DONE';
-    const cancelLabel = LANG === 'de' ? 'ABBRECHEN' : 'CANCEL';
+    const title = t('cls_sig_thresh_title');
+    const prompt = t('cls_sig_thresh_prompt').replace('{n}', remaining);
+    const rowsLabel = t('cls_rows_label');
+    const colsLabel = t('cls_columns_label');
+    const doneLabel = t('cls_done');
+    const cancelLabel = t('cls_cancel');
 
     return `
         <div class="modal-box" style="text-align:center; border-left:4px solid #e67e22;
@@ -301,11 +299,9 @@ function _sigThreshDone() {
     const chosen = window._sigThreshData?.chosen?.length || 0;
     if (chosen === 0) {
         _sigThreshRefundCooldown();
-        showToast(LANG === 'de' ? '🛡️ Keine Linie ausgewählt.' : '🛡️ No line selected.');
+        showToast(`🛡️ ${t('cls_no_line_selected')}`);
     } else {
-        showToast(LANG === 'de'
-            ? `🛡️ ${chosen} Linie(n) geschützt!`
-            : `🛡️ ${chosen} line(s) protected!`);
+        showToast(t('cls_lines_protected').replace('{n}', chosen));
     }
 
     window._sigThreshData = null;
@@ -325,7 +321,7 @@ function _sigThreshCancel() {
     _sigThreshRefundCooldown();
 
     buildClassHUD();
-    showToast(LANG === 'de' ? '🛡️ Abgebrochen.' : '🛡️ Cancelled.');
+    showToast(`🛡️ ${t('cls_cancelled')}`);
 }
 
 
@@ -388,9 +384,9 @@ function _sigThreshProtectLine(type, idx) {
         _sigThreshApplyVisual(type, idx);
 
         const lineName = type === 'row'
-            ? (LANG === 'de' ? `Zeile ${idx + 1}` : `Row ${idx + 1}`)
-            : (LANG === 'de' ? `Spalte ${idx + 1}` : `Col ${idx + 1}`);
-        showToast(`🛡️ ${lineName} ${LANG === 'de' ? 'geschützt!' : 'protected!'}`);
+            ? t('cls_row_n').replace('{n}', idx + 1)
+            : t('cls_col_n').replace('{n}', idx + 1);
+        showToast(t('cls_line_protected').replace('{name}', lineName));
     }
 
     const remaining = data.protectCount - data.chosen.length;
@@ -442,9 +438,7 @@ function _sigThreshBonusRevealInLine(type, idx) {
     trackAchStat('tilesRevealed', 1);
     _applyCellEffect([`g-${r}-${c}`], 'reveal');
 
-    showToast(LANG === 'de'
-        ? '🛡️ Schwellen-Bonus: 1 Zelle enthüllt!'
-        : '🛡️ Threshold bonus: 1 cell revealed!');
+    showToast(t('cls_thresh_bonus_reveal'));
 
     questStat_classRevealUsed(1);
     updateQuestStats('classAbilityUsedThisLevel', {});
@@ -466,9 +460,8 @@ function _sigThreshConsumeShield(matchKey) {
         _sigThreshBonusRevealInLine(type, idx);
     }
 
-    showToast(LANG === 'de'
-        ? `🛡️ Schwelle ausgelöst! Fehler blockiert in ${type === 'row' ? 'Zeile' : 'Spalte'} ${idx + 1}.`
-        : `🛡️ Threshold triggered! Mistake blocked in ${type} ${idx + 1}.`);
+    const lineWord = (type === 'row' ? t('cls_row_word') : t('cls_col_word')) + ' ' + (idx + 1);
+    showToast(t('cls_thresh_triggered').replace('{line}', lineWord));
 
     if (window.Audio_Manager) Audio_Manager.playSFX('varianceShield');
 }

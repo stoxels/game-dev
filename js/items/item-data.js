@@ -224,8 +224,9 @@ const ITEM_DEFS = {
 
     chronoFracture: {
         id: 'chronoFracture', icon: '⏰',
-        nameEn: 'Chronofracture', nameDE: '...',
+        nameEn: 'Chronofracture', nameDE: 'Chronobruch',
         descEn: 'Class ability cooldowns tick twice as fast for the rest of the level, but the timer drains 4x as fast.',
+        descDE: 'Klassenfähigkeit-Cooldowns ticken doppelt so schnell für den Rest des Levels, aber der Timer läuft 4x so schnell leer.',
         rarity: 'cursed', weight: 3
     },
 
