@@ -60,6 +60,7 @@ const CHANGELOG_DATA = [
                     "Added a visual indicator for item gains during a puzzle screen.",
                     "Item Reshuffling now only requires 3 items (down from 5)",
                     "There is now a new Toast message when items have been added to your inventory from a quest milestone completion.",
+                    "Quiz Questions and Input Excercises have been updated and improved.",
                   
                     
                 ],

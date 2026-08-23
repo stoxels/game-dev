@@ -125,7 +125,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["Gleiche Wahrscheinlichkeit", "Wahrscheinlichkeit 0", "Wahrscheinlichkeit 1", "Unterschiedliche Wahrscheinlichkeiten"],
             correct: 0,
             explain: "A Laplace experiment is defined by the discrete uniform distribution, meaning every single elementary outcome is equally likely by definition.",
-            explainDE: "Ein Laplace-Experiment ist per Definition diskret gleichverteilt, d.h. jedes Elementarereignis ist per Definition gleich wahrscheinlich."
+            explainDE: "Ein Laplace-Experiment ist per Definition diskret gleichverteilt, d.h. jedes Elementarereignis ist gleich wahrscheinlich."
         },
         {
             q: "Events A and B are mutually exclusive. P(A) = 0.3. What can you say about P(A ∪ B)?",
@@ -329,8 +329,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["120", "720", "30", "1000"],
             optsDE: ["120", "720", "30", "1000"],
             correct: 0,
-            explain: "Unordered selections without replacement use the binomial coefficient: C(10,3) = 10! / (3!·7!) = 120.",
-            explainDE: "Ungeordnete Auswahlen ohne Zurücklegen verwenden den Binomialkoeffizienten: C(10,3) = 10! / (3!·7!) = 120."
+            explain: "Unordered selections without replacement use the binomial coefficient: B(10,3) = 10! / (3!·7!) = 120.",
+            explainDE: "Ungeordnete Auswahlen ohne Zurücklegen verwenden den Binomialkoeffizienten: B(10,3) = 10! / (3!·7!) = 120."
         },
     ],
 
@@ -382,7 +382,7 @@ const BONUS_QUIZ_POOLS = {
             q: "For a continuous random variable X, P(X = c) for any single value c equals:",
             qDE: "Für eine stetige Zufallsvariable X gilt P(X = c) für jeden einzelnen Wert c:",
             opts: ["0", "f(c) where f is the PDF", "F(c) where F is the CDF", "1 / range"],
-            optsDE: ["0", "f(c), wobei f die Dichte ist", "F(c), wobei F die VKF ist", "1 / Bereich"],
+            optsDE: ["0", "f(c), wobei f die Dichte ist", "F(c), wobei F die Verteilungsfunktion ist", "1 / Bereich"],
             correct: 0,
             explain: "A continuous distribution spreads probability over an uncountable continuum of values, so any single exact point carries zero probability mass.",
             explainDE: "Eine stetige Verteilung verteilt die Wahrscheinlichkeit über ein überabzählbares Kontinuum von Werten, weshalb ein einzelner exakter Punkt keine Wahrscheinlichkeitsmasse trägt."
@@ -666,8 +666,8 @@ const BONUS_QUIZ_POOLS = {
             explainDE: "Dies ist einfach die in Wahrscheinlichkeitstheorie und Statistik übliche Abkürzung für Variablen, die untereinander unabhängig sind und alle dieselbe Verteilung teilen."
         },
         {
-            q: 'For n i.i.d. random variables X₁,…,Xₙ with E[Xᵢ]=μ and Var(Xᵢ)=σ², what is Var((1/n)∑Xᵢ) where (1/n)∑Xᵢ = (1/n)ΣXᵢ?',
-            qDE: 'Für n i.i.d. Zufallsvariablen X₁,…,Xₙ mit E[Xᵢ]=μ und Var(Xᵢ)=σ²: Was ist Var((1/n)∑Xᵢ) mit (1/n)∑Xᵢ = (1/n)ΣXᵢ?',
+            q: 'For n i.i.d. random variables X₁,…,Xₙ with E[Xᵢ]=μ and Var(Xᵢ)=σ², what is Var((1/n)Σᵢ Xᵢ)?',
+            qDE: 'Für n i.i.d. Zufallsvariablen X₁,…,Xₙ mit E[Xᵢ]=μ und Var(Xᵢ)=σ²: Was ist Var((1/n)Σᵢ Xᵢ)?',
             opts: ['σ²/n', 'σ²·n', 'σ²', 'σ/n'],
             optsDE: ['σ²/n', 'σ²·n', 'σ²', 'σ/n'],
             correct: 0,
@@ -865,7 +865,7 @@ const BONUS_QUIZ_POOLS = {
         },
         {
             q: 'For the binomial coefficient we have C(n, k) = C(n, n−k). This symmetry means:',
-            qDE: 'Für den Binomialkoeffizit gilt C(n, k) = C(n, n−k). Diese Symmetrie bedeutet:',
+            qDE: 'Für den Binomialkoeffizienten gilt C(n, k) = C(n, n−k). Diese Symmetrie bedeutet:',
             opts: ['Choosing k items is equivalent to leaving out n−k items', 'C(n,k) is always even', 'k must equal n−k', 'The formula only works for k < n/2'],
             optsDE: ['k Elemente wählen ist gleichwertig dazu, n−k Elemente wegzulassen', 'C(n,k) ist immer gerade', 'k muss gleich n−k sein', 'Die Formel gilt nur für k < n/2'],
             correct: 0,
@@ -947,7 +947,7 @@ const BONUS_QUIZ_POOLS = {
             q: 'For a hypergeometric distribution with N=20, K=8, n=5, what is the expected value E[X]?',
             qDE: 'Für eine hypergeometrische Verteilung mit N=20, K=8, n=5: Wie lautet der Erwartungswert E[X]?',
             opts: ['2', '2.5', '1.6', '4'],
-            optsDE: ['2', '2.5', '1.6', '4'],
+            optsDE: ['2', '2,5', '1,6', '4'],
             correct: 0,
             explain: "For the hypergeometric distribution, E[X] = n·K/N, so with n=5, K=8, N=20 this gives 5·8/20 = 2.",
             explainDE: "Für die hypergeometrische Verteilung gilt E[X] = n·K/N, also mit n=5, K=8, N=20 ergibt das 5·8/20 = 2."
@@ -965,12 +965,12 @@ const BONUS_QUIZ_POOLS = {
         // --- Geometrische Verteilung ---
         {
             q: 'The geometric distribution models the number of trials until the first success. If p=0.25, what is E[X]?',
-            qDE: 'Die geometrische Verteilung modelliert Versuche bis zum ersten Erfolg. Bei p=0.25: Was ist E[X]?',
+            qDE: 'Die geometrische Verteilung modelliert Versuche bis zum ersten Erfolg. Bei p=0,25: Was ist E[X]?',
             opts: ['4', '0.25', '3', '2'],
-            optsDE: ['4', '0.25', '3', '2'],
+            optsDE: ['4', '0,25', '3', '2'],
             correct: 0,
             explain: "For a geometric distribution, E[X] = 1/p, so with p=0.25 the expected number of trials until the first success is 1/0.25 = 4.",
-            explainDE: "Für eine geometrische Verteilung gilt E[X] = 1/p, also ist bei p=0.25 die erwartete Anzahl an Versuchen bis zum ersten Erfolg 1/0.25 = 4."
+            explainDE: "Für eine geometrische Verteilung gilt E[X] = 1/p, also ist bei p=0,25 die erwartete Anzahl an Versuchen bis zum ersten Erfolg 1/0,25 = 4."
         },
         {
             q: 'What is the variance of a geometrically distributed random variable X with success probability p?',
@@ -1003,9 +1003,9 @@ const BONUS_QUIZ_POOLS = {
         },
         {
             q: 'In a Bernoulli sequence with n=10 and p=0.3, X counts the successes. What is Var(X)?',
-            qDE: 'In einer Bernoulli-Folge mit n=10 und p=0.3 zählt X die Erfolge. Was ist Var(X)?',
+            qDE: 'In einer Bernoulli-Folge mit n=10 und p=0,3 zählt X die Erfolge. Was ist Var(X)?',
             opts: ['2.1', '3', '0.3', '0.9'],
-            optsDE: ['2.1', '3', '0.3', '0.9'],
+            optsDE: ['2,1', '3', '0,3', '0,9'],
             correct: 0,
             explain: "The count of successes in a Bernoulli sequence follows Bin(n,p), whose variance is n·p·(1−p) = 10·0.3·0.7 = 2.1.",
             explainDE: "Die Anzahl der Erfolge in einer Bernoulli-Folge folgt Bin(n,p), deren Varianz n·p·(1−p) = 10·0,3·0,7 = 2,1 beträgt."
@@ -1032,18 +1032,18 @@ const BONUS_QUIZ_POOLS = {
         },
         {
             q: 'For a negative binomial distribution with r=3 and p=0.5, what is E[X] (number of trials until r-th success)?',
-            qDE: 'Für eine negative Binomialverteilung mit r=3 und p=0.5: Was ist E[X] (Versuche bis zum r-ten Erfolg)?',
+            qDE: 'Für eine negative Binomialverteilung mit r=3 und p=0,5: Was ist E[X] (Versuche bis zum r-ten Erfolg)?',
             opts: ['6', '3', '1.5', '9'],
-            optsDE: ['6', '3', '1.5', '9'],
+            optsDE: ['6', '3', '1,5', '9'],
             correct: 0,
             explain: "For the negative binomial distribution, E[X] = r/p, so with r=3 and p=0.5 this gives 3/0.5 = 6.",
-            explainDE: "Für die negative Binomialverteilung gilt E[X] = r/p, also ergibt sich mit r=3 und p=0.5: 3/0.5 = 6."
+            explainDE: "Für die negative Binomialverteilung gilt E[X] = r/p, also ergibt sich mit r=3 und p=0,5: 3/0,5 = 6."
         },
         {
             q: 'The geometric distribution is a special case of the negative binomial distribution with:',
             qDE: 'Die geometrische Verteilung ist ein Spezialfall der negativen Binomialverteilung mit:',
             opts: ['r = 1', 'r = 0', 'p = 0.5', 'n = 1'],
-            optsDE: ['r = 1', 'r = 0', 'p = 0.5', 'n = 1'],
+            optsDE: ['r = 1', 'r = 0', 'p = 0,5', 'n = 1'],
             correct: 0,
             explain: "Waiting for exactly one success is the geometric distribution's definition, so setting r=1 in the negative binomial recovers it exactly.",
             explainDE: "Das Warten auf genau einen Erfolg ist die Definition der geometrischen Verteilung, daher ergibt sich diese exakt, wenn man r=1 in der negativen Binomialverteilung setzt."
@@ -1092,16 +1092,16 @@ const BONUS_QUIZ_POOLS = {
             q: 'Which rule of thumb justifies approximating Bin(n,p) by Poisson(λ)?',
             qDE: 'Welche Faustregel rechtfertigt die Annäherung von Bin(n,p) durch Poisson(λ)?',
             opts: ['n large and p small, so that n·p stays moderate', 'n small and p close to 0.5', 'n and p both large', 'p > 0.1 always'],
-            optsDE: ['n groß und p klein, sodass n·p moderat bleibt', 'n klein und p nahe 0.5', 'n und p beide groß', 'p > 0.1 immer'],
+            optsDE: ['n groß und p klein, sodass n·p moderat bleibt', 'n klein und p nahe 0,5', 'n und p beide groß', 'p > 0,1 immer'],
             correct: 0,
             explain: "The approximation works well precisely when trials are numerous but individually unlikely to succeed, keeping the expected count n·p at a moderate, stable value.",
             explainDE: "Die Näherung funktioniert gut, wenn Versuche zahlreich, aber einzeln unwahrscheinlich erfolgreich sind, sodass die erwartete Anzahl n·p moderat und stabil bleibt."
         },
         {
             q: 'In n=500 trials each with p=0.004, we approximate X ~ Bin(500, 0.004) by a Poisson. What is λ?',
-            qDE: 'Bei n=500 Versuchen mit p=0.004 nähern wir X ~ Bin(500, 0.004) durch eine Poissonverteilung an. Was ist λ?',
+            qDE: 'Bei n=500 Versuchen mit p=0,004 nähern wir X ~ Bin(500, 0,004) durch eine Poissonverteilung an. Was ist λ?',
             opts: ['2', '0.004', '500', '0.5'],
-            optsDE: ['2', '0.004', '500', '0.5'],
+            optsDE: ['2', '0,004', '500', '0,5'],
             correct: 0,
             explain: "Multiplying the number of trials by the success probability gives λ = n·p = 500 · 0.004 = 2.",
             explainDE: "Die Multiplikation der Versuchsanzahl mit der Erfolgswahrscheinlichkeit ergibt λ = n·p = 500 · 0,004 = 2."
@@ -1159,7 +1159,7 @@ const BONUS_QUIZ_POOLS = {
             q: 'For X ~ Exp(2), what is Var(X)?',
             qDE: 'Für X ~ Exp(2): Was ist Var(X)?',
             opts: ['0.25', '0.5', '2', '4'],
-            optsDE: ['0.25', '0.5', '2', '4'],
+            optsDE: ['0,25', '0,5', '2', '4'],
             correct: 0,
             explain: "The variance of an exponential distribution is 1/λ², so for λ=2 this gives 1/2² = 0.25.",
             explainDE: "Die Varianz einer Exponentialverteilung beträgt 1/λ², also ergibt sich für λ=2: 1/2² = 0,25."
@@ -1179,7 +1179,7 @@ const BONUS_QUIZ_POOLS = {
             q: 'The normal distribution is symmetric around its mean. What fraction of values lies within μ ± σ (approximately)?',
             qDE: 'Die Normalverteilung ist symmetrisch um ihren Erwartungswert. Welcher Anteil liegt in μ ± σ (ca.)?',
             opts: ['68%', '95%', '99.7%', '50%'],
-            optsDE: ['68%', '95%', '99.7%', '50%'],
+            optsDE: ['68%', '95%', '99,7%', '50%'],
             correct: 0,
             explain: "This is the well-known empirical rule: roughly 68% of a normal distribution's probability mass falls within one standard deviation of the mean.",
             explainDE: "Dies ist die bekannte empirische Regel: Etwa 68% der Wahrscheinlichkeitsmasse einer Normalverteilung liegen innerhalb einer Standardabweichung um den Mittelwert."
@@ -1217,7 +1217,7 @@ const BONUS_QUIZ_POOLS = {
             q: 'P(X ≤ μ) for X ~ N(μ, σ²) equals:',
             qDE: 'P(X ≤ μ) für X ~ N(μ, σ²) beträgt:',
             opts: ['0.5', '0', '1', 'Depends on σ'],
-            optsDE: ['0.5', '0', '1', 'Hängt von σ ab'],
+            optsDE: ['0,5', '0', '1', 'Hängt von σ ab'],
             correct: 0,
             explain: "Since the normal distribution is symmetric around its mean, exactly half of its probability mass lies at or below μ.",
             explainDE: "Da die Normalverteilung symmetrisch um ihren Mittelwert ist, liegt genau die Hälfte ihrer Wahrscheinlichkeitsmasse bei oder unterhalb von μ."
@@ -1513,7 +1513,7 @@ const BONUS_QUIZ_POOLS = {
             q: "The mean vector of a sum X + Y of two random vectors equals:",
             qDE: "Der Erwartungswertvektor einer Summe X + Y zweier Zufallsvektoren ist:",
             opts: ["E[X] + E[Y] (always, regardless of dependence)", "E[X] + E[Y] only if X and Y are independent", "E[X] · E[Y]", "E[X] only if X and Y are identically distributed"],
-            optsDE: ["E[X] + E[Y] (stets, unabhängig von Abhängigkeit)", "E[X] + E[Y] nur bei Unabhängigkeit", "E[X] · E[Y]", "E[X], nur wenn X und Y identisch verteilt sind"],
+            optsDE: ["E[X] + E[Y] (stets, auch bei Abhängigkeit)", "E[X] + E[Y] nur bei Unabhängigkeit", "E[X] · E[Y]", "E[X], nur wenn X und Y identisch verteilt sind"],
             correct: 0,
             explain: "Linearity of expectation holds unconditionally, so the mean of a sum of random vectors always equals the sum of their individual means, no independence assumption required.",
             explainDE: "Die Linearität des Erwartungswerts gilt bedingungslos, daher entspricht der Mittelwert einer Summe von Zufallsvektoren stets der Summe ihrer einzelnen Mittelwerte, ohne dass Unabhängigkeit vorausgesetzt werden muss."
@@ -1591,7 +1591,7 @@ const BONUS_QUIZ_POOLS = {
             q: "Independence implies uncorrelatedness, but not vice versa. A counterexample is:",
             qDE: "Unabhängigkeit impliziert Unkorreliertheit, aber nicht umgekehrt. Ein Gegenbeispiel ist:",
             opts: ["X ~ Uniform(−1,1) and Y = X²", "X and Y both standard normal and independent", "X and Y with the same distribution", "X and Y both Ber(0.5)"],
-            optsDE: ["X ~ Gleichverteilung(−1,1) und Y = X²", "X und Y beide standardnormalverteilt und unabhängig", "X und Y mit gleicher Verteilung", "X und Y beide Ber(0.5)"],
+            optsDE: ["X ~ Gleichverteilung(−1,1) und Y = X²", "X und Y beide standardnormalverteilt und unabhängig", "X und Y mit gleicher Verteilung", "X und Y beide Ber(0,5)"],
             correct: 0,
             explain: "Here Y is completely determined by X (strongly dependent), yet by symmetry Cov(X,X²)=0, showing that zero covariance doesn't rule out a strong nonlinear relationship.",
             explainDE: "Hier ist Y vollständig durch X bestimmt (stark abhängig), doch aus Symmetriegründen gilt Cov(X,X²)=0, was zeigt, dass eine Kovarianz von null einen starken nichtlinearen Zusammenhang nicht ausschließt."
@@ -2072,7 +2072,7 @@ const BONUS_QUIZ_POOLS = {
         },
         {
             q: "We record whether each of 50 patients recovers (yes/no). What is the sample space for a single observation?",
-            qDE: "Wir erfassen, ob jeder der 50 Patienten genest (ja/nein). Was ist der Stichprobenraum für eine einzelne Beobachtung?",
+            qDE: "Wir erfassen, ob jeder der 50 Patienten sich erholt (ja/nein). Was ist der Stichprobenraum für eine einzelne Beobachtung?",
             opts: [
                 "{yes, no}",
                 "{0, 1, 2, …, 50}",
@@ -3049,12 +3049,12 @@ const BONUS_QUIZ_POOLS = {
         },
         {
             q: "If the 95% confidence interval for μ is [2.1, 4.8], a two-sided test of H₀: μ = 5 at α = 0.05:",
-            qDE: "Wenn das 95%-Konfidenzintervall für μ [2.1, 4.8] ist, ein zweiseitiger Test von H₀: μ = 5 zum Niveau α = 0.05:",
+            qDE: "Wenn das 95%-Konfidenzintervall für μ [2,1; 4,8] ist, ein zweiseitiger Test von H₀: μ = 5 zum Niveau α = 0,05:",
             opts: ["Rejects H₀, since 5 lies outside the interval", "Does not reject H₀, since 5 lies inside the interval", "Cannot be determined from the interval", "Always rejects H₀ regardless of the interval"],
             optsDE: ["Verwirft H₀, da 5 außerhalb des Intervalls liegt", "Verwirft H₀ nicht, da 5 innerhalb des Intervalls liegt", "Kann anhand des Intervalls nicht bestimmt werden", "Verwirft H₀ stets, unabhängig vom Intervall"],
             correct: 0,
             explain: "Applying the CI-test duality directly: since 5 falls outside [2.1, 4.8], the corresponding two-sided test at the same level would reject H₀: μ = 5.",
-            explainDE: "Wendet man die Dualität von KI und Test direkt an: Da 5 außerhalb von [2.1, 4.8] liegt, würde der entsprechende zweiseitige Test zum gleichen Niveau H₀: μ = 5 verwerfen."
+            explainDE: "Wendet man die Dualität von KI und Test direkt an: Da 5 außerhalb von [2,1; 4,8] liegt, würde der entsprechende zweiseitige Test zum gleichen Niveau H₀: μ = 5 verwerfen."
         },
         {
             q: "Constructing a confidence interval and performing a hypothesis test are related because both are based on:",
@@ -3491,7 +3491,7 @@ const BONUS_QUIZ_POOLS = {
             q: "If X~N(0,1), what is P(X > 0)?",
             qDE: "Wenn X~N(0,1) gilt, was ist P(X > 0)?",
             opts: ["0.5", "0.25", "0.75", "1.0"],
-            optsDE: ["0.5", "0.25", "0.75", "1.0"],
+            optsDE: ["0,5", "0,25", "0,75", "1,0"],
             correct: 0
         },
         {
@@ -3509,8 +3509,8 @@ const BONUS_QUIZ_POOLS = {
             correct: 0
         },
         {
-            q: "For the CDF F(x) = P(X ≤ x), what is lim F(x) for x->oo?",
-            qDE: "Für die Verteilungsfunktion F(x) = P(X ≤ x), was ist lim F(x) für x->oo?",
+            q: "For the CDF F(x) = P(X ≤ x), what is lim F(x) for x → ∞?",
+            qDE: "Für die Verteilungsfunktion F(x) = P(X ≤ x), was ist lim F(x) für x → ∞?",
             opts: ["1", "0", "0.5", "Undefined"],
             optsDE: ["1", "0", "0.5", "Undefiniert"],
             correct: 0

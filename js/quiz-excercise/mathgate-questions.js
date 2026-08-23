@@ -61,8 +61,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Von den sechs Seiten {1,...,6} gehören genau die geraden {2, 4, 6} zu A — das sind 3 Ergebnisse.'
         },
         {
-            q: 'A fair die is rolled. Event B = "number greater than 4". What is P(B)? Enter the numerator of the occuring fraction over 6.',
-            qDE: 'Ein fairer Würfel wird geworfen. Ereignis B = „Zahl größer als 4". Berechne P(B)? Gib den Zähler des Bruches über 6 ein.',
+            q: 'A fair die is rolled. Event B = "number greater than 4". What is P(B)? Enter the numerator of the occurring fraction over 6.',
+            qDE: 'Ein fairer Würfel wird geworfen. Ereignis B = „Zahl größer als 4". Was ist P(B)? Gib den Zähler des Bruches über 6 ein.',
             answer: 2, tolerance: 0, unit: '/ 6',
             hintEn: 'B = {5, 6}',
             hintDE: 'B = {5, 6}',
@@ -70,8 +70,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Die Zahlen größer als 4 auf einem Würfel sind 5 und 6, also enthält B genau 2 von 6 Ergebnissen.'
         },
         {
-            q: 'A card is drawn from a standard 52-card deck. Event B = "Drawn card is Heart". What is P(B)? Enter the numerator of the occuring fraction over 52.',
-            qDE: 'Eine Karte wird aus einem Standarddeck mit 52 Karten gezogen. Ereignis B = „gezogene Karte ist Herz". Berechne P(B). Gib den Zähler des Bruches über 52 ein.  ',
+            q: 'A card is drawn from a standard 52-card deck. Event B = "Drawn card is Heart". What is P(B)? Enter the numerator of the occurring fraction over 52.',
+            qDE: 'Eine Karte wird aus einem Standarddeck mit 52 Karten gezogen. Ereignis B = „gezogene Karte ist Herz". Was ist P(B)? Gib den Zähler des Bruches über 52 ein.',
             answer: 13, tolerance: 0, unit: 'cards',
             hintEn: 'A standard deck has 4 suits of 13 cards each.',
             hintDE: 'Ein Standarddeck hat 4 Farben mit je 13 Karten.',
@@ -112,8 +112,8 @@ const MATH_GATE_POOLS = {
         // ── 4. DISJUNKTE EREIGNISSE (Mutually Exclusive Events) ─────────────────
 
         {
-            q: 'P(A) = 0.3 and P(B) = 0.5. A and B are disjoint. What is P(A ∪ B)?',
-            qDE: 'P(A) = 0,3 und P(B) = 0,5. A und B sind disjunkt. Was ist P(A ∪ B)?',
+            q: 'P(A) = 0.3 and P(B) = 0.5. A and B are disjoint. What is P(A ∪ B)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,3 und P(B) = 0,5. A und B sind disjunkt. Was ist P(A ∪ B)? Runde auf 3 Nachkommastellen.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'P(A ∪ B) = P(A) + P(B) for disjoint events',
             hintDE: 'P(A ∪ B) = P(A) + P(B) für disjunkte Ereignisse',
@@ -121,8 +121,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Da sich A und B nie überschneiden, ist P(A ∩ B) = 0, also vereinfacht sich P(A ∪ B) zu P(A) + P(B) = 0,3 + 0,5 = 0,8.'
         },
         {
-            q: 'A and B are disjoint and P(A ∪ B) = 0.7. If P(A) = 0.4, what is P(B)?',
-            qDE: 'A und B sind disjunkt und P(A ∪ B) = 0,7. Falls P(A) = 0,4, was ist P(B)?',
+            q: 'A and B are disjoint and P(A ∪ B) = 0.7. If P(A) = 0.4, what is P(B)? Round to 3 decimal places.',
+            qDE: 'A und B sind disjunkt und P(A ∪ B) = 0,7. Falls P(A) = 0,4, was ist P(B)? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'P(B) = P(A ∪ B) − P(A) for disjoint events',
             hintDE: 'P(B) = P(A ∪ B) − P(A) für disjunkte Ereignisse',
@@ -172,8 +172,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Jede einzelne Seite des Würfels {1}, {2}, ..., {6} ist ein eigenes Elementarereignis, also 6 insgesamt.'
         },
         {
-            q: 'In a Laplace experiment with 8 equally likely elementary events, what is the probability of each elementary event? Enter as a decimal.',
-            qDE: 'Betrachte ein Laplace-Experiment mit 8 gleich wahrscheinlichen Elementarereignissen. Was ist die Wahrscheinlichkeit jedes Elementarereignisses? Gib als Dezimalzahl ein.',
+            q: 'In a Laplace experiment with 8 equally likely elementary events, what is the probability of each elementary event? Round to 3 decimal places.',
+            qDE: 'Betrachte ein Laplace-Experiment mit 8 gleich wahrscheinlichen Elementarereignissen. Was ist die Wahrscheinlichkeit jedes Elementarereignisses? Runde auf 3 Nachkommastellen.',
             answer: 0.125, tolerance: 0.001, unit: '',
             hintEn: 'In a Laplace experiment the probability measure is the discrete uniform distribution.',
             hintDE: 'In einem Laplace-Experiment ist das Wahrscheinlichkeitsmaß die diskrete Gleichverteilung.',
@@ -184,8 +184,8 @@ const MATH_GATE_POOLS = {
         // ── 7. SCHNITT UND VEREINIGUNG (Intersection and Union) ──────────────────
 
         {
-            q: 'P(A) = 0.5, P(B) = 0.4, P(A ∩ B) = 0.2. What is P(A ∪ B)?',
-            qDE: 'P(A) = 0,5, P(B) = 0,4, P(A ∩ B) = 0,2. Was ist P(A ∪ B)?',
+            q: 'P(A) = 0.5, P(B) = 0.4, P(A ∩ B) = 0.2. What is P(A ∪ B)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,5, P(B) = 0,4, P(A ∩ B) = 0,2. Was ist P(A ∪ B)? Runde auf 3 Nachkommastellen.',
             answer: 0.7, tolerance: 0.001, unit: '',
             hintEn: 'Inclusion-exclusion formula: P(A ∪ B) = P(A) + P(B) − P(A ∩ B).',
             hintDE: 'Siebformel: P(A ∪ B) = P(A) + P(B) − P(A ∩ B).',
@@ -193,8 +193,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Mit der Siebformel: P(A ∪ B) = 0,5 + 0,4 − 0,2 = 0,7 — die Überlappung wird einmal abgezogen, damit sie nicht doppelt gezählt wird.'
         },
         {
-            q: 'P(A ∪ B) = 0.8, P(A) = 0.5, P(B) = 0.6. What is P(A ∩ B)?',
-            qDE: 'P(A ∪ B) = 0,8, P(A) = 0,5, P(B) = 0,6. Was ist P(A ∩ B)?',
+            q: 'P(A ∪ B) = 0.8, P(A) = 0.5, P(B) = 0.6. What is P(A ∩ B)? Round to 3 decimal places.',
+            qDE: 'P(A ∪ B) = 0,8, P(A) = 0,5, P(B) = 0,6. Was ist P(A ∩ B)? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'Rearrange: P(A ∩ B) = P(A) + P(B) − P(A ∪ B).',
             hintDE: 'Umstellen: P(A ∩ B) = P(A) + P(B) − P(A ∪ B).',
@@ -214,8 +214,8 @@ const MATH_GATE_POOLS = {
         // ── 8. KOMPLEMENT (Complement) ───────────────────────────────────────────
 
         {
-            q: 'P(A) = 0.35. What is P(Aᶜ)? Enter as a decimal.',
-            qDE: 'P(A) = 0,35. Was ist P(Aᶜ)? Gib als Dezimalzahl ein.',
+            q: 'P(A) = 0.35. What is P(Aᶜ)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,35. Was ist P(Aᶜ)? Runde auf 3 Nachkommastellen.',
             answer: 0.65, tolerance: 0.001, unit: '',
             hintEn: 'P(Aᶜ) = 1 − P(A)',
             hintDE: 'P(Aᶜ) = 1 − P(A)',
@@ -223,8 +223,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'A und Aᶜ ergeben zusammen ganz Ω, ihre Wahrscheinlichkeiten summieren sich zu 1: P(Aᶜ) = 1 − 0,35 = 0,65.'
         },
         {
-            q: 'P(Aᶜ) = 0.72. What is P(A)? Enter as a decimal.',
-            qDE: 'P(Aᶜ) = 0,72. Was ist P(A)? Gib als Dezimalzahl ein.',
+            q: 'P(Aᶜ) = 0.72. What is P(A)? Round to 3 decimal places.',
+            qDE: 'P(Aᶜ) = 0,72. Was ist P(A)? Runde auf 3 Nachkommastellen.',
             answer: 0.28, tolerance: 0.001, unit: '',
             hintEn: 'P(A) = 1 − P(Aᶜ)',
             hintDE: 'P(A) = 1 − P(Aᶜ)',
@@ -241,8 +241,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Ω = {1,...,6} hat 6 Elemente, A = {1,2,3,4} enthält 4 davon, also enthält Aᶜ = {5,6} die restlichen 2.'
         },
         {
-            q: 'P(A) = 0.6. What is P(Aᶜ)?',
-            qDE: 'P(A) = 0,6. Was ist P(Aᶜ)?',
+            q: 'P(A) = 0.6. What is P(Aᶜ)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,6. Was ist P(Aᶜ)? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'The complement rule: P(Aᶜ) = 1 − P(A).',
             hintDE: 'Komplementregel: P(Aᶜ) = 1 − P(A).',
@@ -253,17 +253,17 @@ const MATH_GATE_POOLS = {
         // ── 9. DE MORGAN REGELN ──────────────────────────────────────────────────
 
         {
-            q: 'By De Morgan\'s law: (A ∪ B)ᶜ = Aᶜ __ Bᶜ. Enter 1 for ∩ or 2 for ∪.',
-            qDE: 'Nach der De-Morgan-Regel gilt: (A ∪ B)ᶜ = Aᶜ __ Bᶜ. Gib 1 für ∩ oder 2 für ∪ ein.',
-            answer: 1, tolerance: 0, unit: '',
-            hintEn: 'The complement of an union is an intersection.',
+            q: 'By De Morgan\'s law: (A ∪ B)ᶜ = Aᶜ __ Bᶜ. Enter 1 for ∪ or 2 for ∩.',
+            qDE: 'Nach der De-Morgan-Regel gilt: (A ∪ B)ᶜ = Aᶜ __ Bᶜ. Gib 1 für ∪ oder 2 für ∩ ein.',
+            answer: 2, tolerance: 0, unit: '',
+            hintEn: 'The complement of a union is an intersection.',
             hintDE: 'Das Komplement einer Vereinigung ist ein Schnitt.',
             explain: '"Not (A or B)" means neither happened, i.e. "not A AND not B" — so the union\'s complement turns into an intersection: Aᶜ ∩ Bᶜ.',
             explainDE: '„Nicht (A oder B)” bedeutet, dass keines von beiden eintrat, also „nicht A UND nicht B” — das Komplement einer Vereinigung wird so zu einem Schnitt: Aᶜ ∩ Bᶜ.'
         },
         {
-            q: 'P(Aᶜ) = 0.3, P(Bᶜ) = 0.4, P(Aᶜ ∩ Bᶜ) = 0.1. By De Morgan, what is P((A ∪ B)ᶜ)?',
-            qDE: 'P(Aᶜ) = 0,3, P(Bᶜ) = 0,4, P(Aᶜ ∩ Bᶜ) = 0,1. Was ist P((A ∪ B)ᶜ) gemäß De Morgan?',
+            q: 'P(Aᶜ) = 0.3, P(Bᶜ) = 0.4, P(Aᶜ ∩ Bᶜ) = 0.1. By De Morgan, what is P((A ∪ B)ᶜ)? Round to 3 decimal places.',
+            qDE: 'P(Aᶜ) = 0,3, P(Bᶜ) = 0,4, P(Aᶜ ∩ Bᶜ) = 0,1. Was ist P((A ∪ B)ᶜ) gemäß De Morgan? Runde auf 3 Nachkommastellen.',
             answer: 0.1, tolerance: 0.001, unit: '',
             hintEn: '(A ∪ B)ᶜ = Aᶜ ∩ Bᶜ, so P((A ∪ B)ᶜ) = P(Aᶜ ∩ Bᶜ)',
             hintDE: '(A ∪ B)ᶜ = Aᶜ ∩ Bᶜ, also P((A ∪ B)ᶜ) = P(Aᶜ ∩ Bᶜ)',
@@ -271,8 +271,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Nach De Morgan ist (A ∪ B)ᶜ genau gleich Aᶜ ∩ Bᶜ, also ist die Wahrscheinlichkeit einfach das gegebene P(Aᶜ ∩ Bᶜ) = 0,1.'
         },
         {
-            q: 'P(A ∩ B) = 0.2. By De Morgan, what is P((Aᶜ ∪ Bᶜ)ᶜ)? Enter as a decimal.',
-            qDE: 'P(A ∩ B) = 0,2. Nach De Morgan: Was ist P((Aᶜ ∪ Bᶜ)ᶜ)? Gib als Dezimalzahl ein.',
+            q: 'P(A ∩ B) = 0.2. By De Morgan, what is P((Aᶜ ∪ Bᶜ)ᶜ)? Round to 3 decimal places.',
+            qDE: 'P(A ∩ B) = 0,2. Nach De Morgan: Was ist P((Aᶜ ∪ Bᶜ)ᶜ)? Runde auf 3 Nachkommastellen.',
             answer: 0.2, tolerance: 0.001, unit: '',
             hintEn: '(Aᶜ ∪ Bᶜ)ᶜ = A ∩ B by De Morgan.',
             hintDE: '(Aᶜ ∪ Bᶜ)ᶜ = A ∩ B nach De Morgan.',
@@ -292,8 +292,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Diese Identität — Verteilen von ∩ über ∪ — ist genau das Distributivgesetz für Mengenoperationen, analog zur Multiplikation, die sich über die Addition verteilt.'
         },
         {
-            q: 'P(A ∩ B) = 0.1, P(A ∩ C) = 0.2, and (A ∩ B) and (A ∩ C) are disjoint. What is P(A ∩ (B ∪ C))?',
-            qDE: 'P(A ∩ B) = 0,1, P(A ∩ C) = 0,2, und (A ∩ B) und (A ∩ C) sind disjunkt. Was ist P(A ∩ (B ∪ C))?',
+            q: 'P(A ∩ B) = 0.1, P(A ∩ C) = 0.2, and (A ∩ B) and (A ∩ C) are disjoint. What is P(A ∩ (B ∪ C))? Round to 3 decimal places.',
+            qDE: 'P(A ∩ B) = 0,1, P(A ∩ C) = 0,2, und (A ∩ B) und (A ∩ C) sind disjunkt. Was ist P(A ∩ (B ∪ C))? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C).',
             hintDE: 'A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)',
@@ -305,7 +305,7 @@ const MATH_GATE_POOLS = {
             qDE: 'Ist A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C) wahr oder falsch? Gib 1 für wahr, 0 für falsch ein.',
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'Yes — ∪ distributes over ∩, just as ∩ distributes over ∪.',
-            hintDE: 'Ja — ∩ ist distributiv über ∩, genau wie ∩ über ∪.',
+            hintDE: 'Ja — ∪ ist distributiv über ∩, genau wie ∩ über ∪.',
             explain: 'The distributive law works in both directions: ∪ distributes over ∩ just as ∩ distributes over ∪, so this identity is true.',
             explainDE: 'Das Distributivgesetz gilt in beide Richtungen: ∪ verteilt sich über ∩ genau wie ∩ über ∪, also ist diese Identität wahr.'
         },
@@ -322,8 +322,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Ω enthält alle möglichen Ergebnisse, also tritt immer etwas aus Ω ein — die Kolmogorov-Axiome fordern P(Ω) = 1.'
         },
         {
-            q: 'Events A₁, A₂, A₃ are pairwise disjoint with P(A₁) = 0.25, P(A₂) = 0.55, P(A₃) = 0.1. What is P(A₁ ∪ A₂ ∪ A₃)?',
-            qDE: 'Ereignisse A₁, A₂, A₃ sind paarweise disjunkt mit P(A₁) = 0,25, P(A₂) = 0,55, P(A₃) = 0,1. Was ist P(A₁ ∪ A₂ ∪ A₃)?',
+            q: 'Events A₁, A₂, A₃ are pairwise disjoint with P(A₁) = 0.25, P(A₂) = 0.55, P(A₃) = 0.1. What is P(A₁ ∪ A₂ ∪ A₃)? Round to 3 decimal places.',
+            qDE: 'Ereignisse A₁, A₂, A₃ sind paarweise disjunkt mit P(A₁) = 0,25, P(A₂) = 0,55, P(A₃) = 0,1. Was ist P(A₁ ∪ A₂ ∪ A₃)? Runde auf 3 Nachkommastellen.',
             answer: 0.9, tolerance: 0.001, unit: '',
             hintEn: 'σ-additivity.',
             hintDE: 'σ-Additivität.',
@@ -331,9 +331,9 @@ const MATH_GATE_POOLS = {
             explainDE: 'Da alle drei Ereignisse paarweise disjunkt sind, erlaubt die σ-Additivität einfaches Addieren: 0,25 + 0,55 + 0,1 = 0,9.'
         },
         {
-            q: 'Which value CANNOT be a valid probability? Enter 1 for −0.1, 2 for 0, 3 for 0.5, or 4 for 1.',
-            qDE: 'Welcher Wert kann KEINE gültige Wahrscheinlichkeit sein? Gib 1 für −0,1, 2 für 0, 3 für 0,5 oder 4 für 1 ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'Which value CANNOT be a valid probability? Enter 1 for 0, 2 for −0.1, 3 for 0.5, or 4 for 1.',
+            qDE: 'Welcher Wert kann KEINE gültige Wahrscheinlichkeit sein? Gib 1 für 0, 2 für −0,1, 3 für 0,5 oder 4 für 1 ein.',
+            answer: 2, tolerance: 0, unit: '',
             hintEn: 'Probabilities must satisfy 0 ≤ P(A) ≤ 1. Negative values are impossible.',
             hintDE: 'Wahrscheinlichkeiten müssen 0 ≤ P(A) ≤ 1 erfüllen. Negative Werte sind unmöglich.',
             explain: 'Every valid probability must lie between 0 and 1, inclusive. −0.1 is negative, so it violates that rule.',
@@ -343,8 +343,8 @@ const MATH_GATE_POOLS = {
         // ── 12. RECHENREGELN FÜR DAS WAHRSCHEINLICHKEITSMASS ─────────────────────
 
         {
-            q: 'P(A) = 0.6 and P(B) = 0.5. What is the maximum possible value of P(A ∩ B)? Enter as a decimal.',
-            qDE: 'P(A) = 0,6 und P(B) = 0,5. Was ist der maximal mögliche Wert von P(A ∩ B)? Gib als Dezimalzahl ein.',
+            q: 'P(A) = 0.6 and P(B) = 0.5. What is the maximum possible value of P(A ∩ B)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,6 und P(B) = 0,5. Was ist der maximal mögliche Wert von P(A ∩ B)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'P(A ∩ B) ≤ min(P(A), P(B)).',
             hintDE: 'P(A ∩ B) ≤ min(P(A), P(B)).',
@@ -352,8 +352,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Die Überlappung A ∩ B kann nie größer sein als eines der einzelnen Ereignisse, also gilt P(A ∩ B) ≤ min(0,6, 0,5) = 0,5 maximal.'
         },
         {
-            q: 'P(A) = 0.7 and P(B) = 0.4. What is the minimum possible value of P(A ∪ B)? Enter as a decimal.',
-            qDE: 'P(A) = 0,7 und P(B) = 0.4. Was ist der minimal mögliche Wert von P(A ∪ B)? Gib als Dezimalzahl ein.',
+            q: 'P(A) = 0.7 and P(B) = 0.4. What is the minimum possible value of P(A ∪ B)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,7 und P(B) = 0,4. Was ist der minimal mögliche Wert von P(A ∪ B)? Runde auf 3 Nachkommastellen.',
             answer: 0.7, tolerance: 0.001, unit: '',
             hintEn: 'P(A ∪ B) ≥ max(P(A), P(B)).',
             hintDE: 'P(A ∪ B) ≥ max(P(A), P(B)).',
@@ -361,8 +361,8 @@ const MATH_GATE_POOLS = {
             explainDE: 'Die Vereinigung A ∪ B ist immer mindestens so groß wie das größere Einzelereignis, also gilt P(A ∪ B) ≥ max(0,7, 0,4) = 0,7 minimal.'
         },
         {
-            q: 'P(B) = 0.6 and A ⊆ B. What is the maximum possible value of P(A)? Enter as a decimal.',
-            qDE: 'P(B) = 0,6 und A ⊆ B. Was ist der maximal mögliche Wert von P(A)? Gib als Dezimalzahl ein.',
+            q: 'P(B) = 0.6 and A ⊆ B. What is the maximum possible value of P(A)? Round to 3 decimal places.',
+            qDE: 'P(B) = 0,6 und A ⊆ B. Was ist der maximal mögliche Wert von P(A)? Runde auf 3 Nachkommastellen.',
             answer: 0.6, tolerance: 0.001, unit: '',
             hintEn: 'Since A ⊆ B, P(A) ≤ P(B).',
             hintDE: 'Da A ⊆ B, gilt P(A) ≤ P(B).',
@@ -382,8 +382,8 @@ const MATH_GATE_POOLS = {
         // ── 1. BOOLESCHE UNGLEICHUNG / UNION BOUND ───────────────────────────────
 
         {
-            q: 'P(A) = 0.3 and P(B) = 0.4. Using the union bound, what is the upper bound for P(A ∪ B)? Enter as a decimal.',
-            qDE: 'P(A) = 0,3 und P(B) = 0,4. Was ist mit der Booleschen Ungleichung die obere Schranke für P(A ∪ B)? Gib als Dezimalzahl ein.',
+            q: 'P(A) = 0.3 and P(B) = 0.4. Using the union bound, what is the upper bound for P(A ∪ B)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,3 und P(B) = 0,4. Was ist mit der Booleschen Ungleichung die obere Schranke für P(A ∪ B)? Runde auf 3 Nachkommastellen.',
             answer: 0.7, tolerance: 0.001, unit: '',
             hintEn: 'Union bound: P(A ∪ B) ≤ P(A) + P(B)',
             hintDE: 'Boolesche Ungleichung: P(A ∪ B) ≤ P(A) + P(B)',
@@ -391,8 +391,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Boolesche Ungleichung addiert einfach die einzelnen Wahrscheinlichkeiten, ohne die Überschneidung abzuziehen, was 0,3 + 0,4 = 0,7 als obere Schranke ergibt."
         },
         {
-            q: 'Three events have probabilities P(A₁) = 0.2, P(A₂) = 0.3, P(A₃) = 0.25. What does the union bound give as an upper bound for P(A₁ ∪ A₂ ∪ A₃)?',
-            qDE: 'Drei Ereignisse haben Wahrscheinlichkeiten P(A₁) = 0,2, P(A₂) = 0,3, P(A₃) = 0,25. Was liefert die Boolesche Ungleichung als obere Schranke für P(A₁ ∪ A₂ ∪ A₃)?',
+            q: 'Three events have probabilities P(A₁) = 0.2, P(A₂) = 0.3, P(A₃) = 0.25. What does the union bound give as an upper bound for P(A₁ ∪ A₂ ∪ A₃)? Round to 3 decimal places.',
+            qDE: 'Drei Ereignisse haben Wahrscheinlichkeiten P(A₁) = 0,2, P(A₂) = 0,3, P(A₃) = 0,25. Was liefert die Boolesche Ungleichung als obere Schranke für P(A₁ ∪ A₂ ∪ A₃)? Runde auf 3 Nachkommastellen.',
             answer: 0.75, tolerance: 0.001, unit: '',
             hintEn: 'Union bound: P(A₁ ∪ A₂ ∪ A₃) ≤ 0.2 + 0.3 + 0.25',
             hintDE: 'Boolesche Ungleichung: P(A₁ ∪ A₂ ∪ A₃) ≤ 0,2 + 0,3 + 0,25',
@@ -412,8 +412,8 @@ const MATH_GATE_POOLS = {
         // ── 2. LAPLACE RAUM (Laplace Space) ──────────────────────────────────────
 
         {
-            q: 'A Laplace space has 20 equally likely outcomes. Event A contains 5 outcomes. What is P(A)? Enter as a decimal.',
-            qDE: 'Ein Laplace-Raum hat 20 gleich wahrscheinliche Ergebnisse. Ereignis A enthält 5 Ergebnisse. Was ist P(A)? Gib als Dezimalzahl ein.',
+            q: 'A Laplace space has 20 equally likely outcomes. Event A contains 5 outcomes. What is P(A)? Round to 3 decimal places.',
+            qDE: 'Ein Laplace-Raum hat 20 gleich wahrscheinliche Ergebnisse. Ereignis A enthält 5 Ergebnisse. Was ist P(A)? Runde auf 3 Nachkommastellen.',
             answer: 0.25, tolerance: 0.001, unit: '',
             hintEn: 'P(A) = |A| / |Ω|',
             hintDE: 'P(A) = |A| / |Ω|',
@@ -434,8 +434,8 @@ const MATH_GATE_POOLS = {
         // ── 3. DISKRETE GLEICHVERTEILUNG (Discrete Uniform Distribution) ──────────
 
         {
-            q: 'A random number is chosen uniformly from {1, 2, 3, 4, 5}. What is the probability of choosing a number ≤ 3? Enter as a decimal.',
-            qDE: 'Eine Zahl wird gleichmäßig aus {1, 2, 3, 4, 5} gezogen. Was ist die Wahrscheinlichkeit, eine Zahl ≤ 3 zu wählen? Gib als Dezimalzahl ein.',
+            q: 'A random number is chosen uniformly from {1, 2, 3, 4, 5}. What is the probability of choosing a number ≤ 3? Round to 3 decimal places.',
+            qDE: 'Eine Zahl wird gleichmäßig aus {1, 2, 3, 4, 5} gezogen. Was ist die Wahrscheinlichkeit, eine Zahl ≤ 3 zu wählen? Runde auf 3 Nachkommastellen.',
             answer: 0.6, tolerance: 0.001, unit: '',
             hintEn: '3 favourable outcomes out of 5.',
             hintDE: '3 günstige Ergebnisse von 5.',
@@ -443,8 +443,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Zahlen 1, 2 und 3 erfüllen die Bedingung ≤ 3, was 3 günstige Ergebnisse von insgesamt 5 ergibt, sodass die Wahrscheinlichkeit 3/5 = 0,6 beträgt."
         },
         {
-            q: 'On a discrete uniform distribution over {1, 2, …, 10}, what is the probability of drawing an even number? Enter as a decimal.',
-            qDE: 'Bei diskreter Gleichverteilung über {1, 2, …, 10}: Was ist die Wahrscheinlichkeit, eine gerade Zahl zu ziehen? Gib als Dezimalzahl ein.',
+            q: 'On a discrete uniform distribution over {1, 2, …, 10}, what is the probability of drawing an even number? Round to 3 decimal places.',
+            qDE: 'Bei diskreter Gleichverteilung über {1, 2, …, 10}: Was ist die Wahrscheinlichkeit, eine gerade Zahl zu ziehen? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'Even numbers: {2,4,6,8,10}.',
             hintDE: 'Gerade Zahlen: {2,4,6,8,10}.',
@@ -554,8 +554,8 @@ const MATH_GATE_POOLS = {
         // ── 7. CHANCEN / ODDS ─────────────────────────────────────────────────────
 
         {
-            q: 'P(A) = 0.8. What are the odds in favour of A? Enter the numerator x of x/y where odds = p/(1−p) as a decimal.',
-            qDE: 'P(A) = 0,8. Was sind die Chancen (Odds) für A? Gib den Wert von p/(1−p) als Dezimalzahl ein.',
+            q: 'P(A) = 0.8. What are the odds in favour of A (odds = p/(1−p))? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,8. Was sind die Chancen (Odds) für A (Odds = p/(1−p))? Runde auf 3 Nachkommastellen.',
             answer: 4.0, tolerance: 0.001, unit: '',
             hintEn: 'Odds = P(A) / P(Aᶜ)',
             hintDE: 'Odds = P(A) / P(Aᶜ)',
@@ -563,8 +563,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Odds vergleichen die Wahrscheinlichkeit, dass A eintritt, mit der, dass es nicht eintritt: Bei P(A) = 0,8 und P(Aᶜ) = 0,2 betragen die Odds 0,8/0,2 = 4,0."
         },
         {
-            q: 'The odds in favour of event A are 3 (i.e. 3:1). What is P(A)? Enter as a decimal.',
-            qDE: 'Die Odds für Ereignis A betragen 3 (also 3:1). Was ist P(A)? Gib als Dezimalzahl ein.',
+            q: 'The odds in favour of event A are 3 (i.e. 3:1). What is P(A)? Round to 3 decimal places.',
+            qDE: 'Die Odds für Ereignis A betragen 3 (also 3:1). Was ist P(A)? Runde auf 3 Nachkommastellen.',
             answer: 0.75, tolerance: 0.001, unit: '',
             hintEn: 'Odds = p/(1−p) = 3',
             hintDE: 'Odds = p/(1−p) = 3',
@@ -584,8 +584,8 @@ const MATH_GATE_POOLS = {
         // ── 8. SIEBFORMEL / INCLUSION-EXCLUSION ──────────────────────────────────
 
         {
-            q: 'P(A) = 0.5, P(B) = 0.4, P(C) = 0.3, P(A∩B) = 0.2, P(A∩C) = 0.1, P(B∩C) = 0.15, P(A∩B∩C) = 0.05. What is P(A ∪ B ∪ C)?',
-            qDE: 'P(A) = 0,5, P(B) = 0,4, P(C) = 0,3, P(A∩B) = 0,2, P(A∩C) = 0,1, P(B∩C) = 0,15, P(A∩B∩C) = 0,05. Was ist P(A ∪ B ∪ C)?',
+            q: 'P(A) = 0.5, P(B) = 0.4, P(C) = 0.3, P(A∩B) = 0.2, P(A∩C) = 0.1, P(B∩C) = 0.15, P(A∩B∩C) = 0.05. What is P(A ∪ B ∪ C)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,5, P(B) = 0,4, P(C) = 0,3, P(A∩B) = 0,2, P(A∩C) = 0,1, P(B∩C) = 0,15, P(A∩B∩C) = 0,05. Was ist P(A ∪ B ∪ C)? Runde auf 3 Nachkommastellen.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'Inclusion-exclusion formula for 3 sets.',
             hintDE: 'Siebformel für 3 Mengen.',
@@ -593,8 +593,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Addieren der Einzelwahrscheinlichkeiten, Subtrahieren der paarweisen Überschneidungen und erneute Addieren der dreifachen Überschneidung ergibt (0,5+0,4+0,3) − (0,2+0,1+0,15) + 0,05 = 1,2 − 0,45 + 0,05 = 0,8."
         },
         {
-            q: 'P(A) = 0.6, P(B) = 0.5, P(C) = 0.4, P(A∩B) = 0.3, P(A∩C) = 0.2, P(B∩C) = 0.25, P(A∩B∩C) = 0.1. What is P(A ∪ B ∪ C)?',
-            qDE: 'P(A) = 0,6, P(B) = 0,5, P(C) = 0,4, P(A∩B) = 0,3, P(A∩C) = 0,2, P(B∩C) = 0,25, P(A∩B∩C) = 0,1. Was ist P(A ∪ B ∪ C)?',
+            q: 'P(A) = 0.6, P(B) = 0.5, P(C) = 0.4, P(A∩B) = 0.3, P(A∩C) = 0.2, P(B∩C) = 0.25, P(A∩B∩C) = 0.1. What is P(A ∪ B ∪ C)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,6, P(B) = 0,5, P(C) = 0,4, P(A∩B) = 0,3, P(A∩C) = 0,2, P(B∩C) = 0,25, P(A∩B∩C) = 0,1. Was ist P(A ∪ B ∪ C)? Runde auf 3 Nachkommastellen.',
             answer: 0.85, tolerance: 0.001, unit: '',
             hintEn: 'Inclusion-exclusion formula for 3 sets.',
             hintDE: 'Siebformel für 3 Mengen.',
@@ -642,8 +642,8 @@ const MATH_GATE_POOLS = {
 
 
         {
-            q: 'P(A ∩ B) = 0.12 and P(B) = 0.4. What is P(A | B)?',
-            qDE: 'P(A ∩ B) = 0,12 und P(B) = 0,4. Was ist P(A | B)?',
+            q: 'P(A ∩ B) = 0.12 and P(B) = 0.4. What is P(A | B)? Round to 3 decimal places.',
+            qDE: 'P(A ∩ B) = 0,12 und P(B) = 0,4. Was ist P(A | B)? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'P(A|B) = P(A ∩ B) / P(B)',
             hintDE: 'P(A|B) = P(A ∩ B) / P(B)',
@@ -652,8 +652,8 @@ const MATH_GATE_POOLS = {
         },
 
         {
-            q: 'P(B | A) = 0.5, P(A) = 0.6. What is P(A ∩ B)? Enter as a decimal.',
-            qDE: 'P(B | A) = 0,5, P(A) = 0,6. Was ist P(A ∩ B)? Gib als Dezimalzahl ein.',
+            q: 'P(B | A) = 0.5, P(A) = 0.6. What is P(A ∩ B)? Round to 3 decimal places.',
+            qDE: 'P(B | A) = 0,5, P(A) = 0,6. Was ist P(A ∩ B)? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'Multiplication rule: P(A ∩ B) = P(B|A) · P(A)',
             hintDE: 'Multiplikationsregel: P(A ∩ B) = P(B|A) · P(A)',
@@ -661,8 +661,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Umstellen der Definition der bedingten Wahrscheinlichkeit ergibt direkt die Multiplikationsregel: P(A ∩ B) = P(B|A) · P(A) = 0,5 × 0,6 = 0,3."
         },
         {
-            q: 'P(A) = 0.4, P(B) = 0.5, P(A ∩ B) = 0.2. What is P(A | B)? Enter as a decimal.',
-            qDE: 'P(A) = 0,4, P(B) = 0,5, P(A ∩ B) = 0,2. Was ist P(A | B)? Gib als Dezimalzahl ein.',
+            q: 'P(A) = 0.4, P(B) = 0.5, P(A ∩ B) = 0.2. What is P(A | B)? Round to 3 decimal places.',
+            qDE: 'P(A) = 0,4, P(B) = 0,5, P(A ∩ B) = 0,2. Was ist P(A | B)? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'P(A|B) = P(A ∩ B) / P(B)',
             hintDE: 'P(A|B) = P(A ∩ B) / P(B)',
@@ -673,8 +673,8 @@ const MATH_GATE_POOLS = {
         // ── 2. SATZ VON DER TOTALEN WAHRSCHEINLICHKEIT ───────────────────────────
 
         {
-            q: 'B₁ and B₂ partition Ω. P(B₁) = 0.3, P(B₂) = 0.7, P(A|B₁) = 0.4, P(A|B₂) = 0.2. What is P(A)?',
-            qDE: 'B₁ und B₂ partitionieren Ω. P(B₁) = 0,3, P(B₂) = 0,7, P(A|B₁) = 0,4, P(A|B₂) = 0,2. Was ist P(A)?',
+            q: 'B₁ and B₂ partition Ω. P(B₁) = 0.3, P(B₂) = 0.7, P(A|B₁) = 0.4, P(A|B₂) = 0.2. What is P(A)? Round to 3 decimal places.',
+            qDE: 'B₁ und B₂ partitionieren Ω. P(B₁) = 0,3, P(B₂) = 0,7, P(A|B₁) = 0,4, P(A|B₂) = 0,2. Was ist P(A)? Runde auf 3 Nachkommastellen.',
             answer: 0.26, tolerance: 0.001, unit: '',
             hintEn: 'P(A) = P(A|B₁)·P(B₁) + P(A|B₂)·P(B₂)',
             hintDE: 'P(A) = P(A|B₁)·P(B₁) + P(A|B₂)·P(B₂)',
@@ -682,8 +682,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Da B₁ und B₂ den Stichprobenraum partitionieren, setzt sich die Gesamtwahrscheinlichkeit von A zusammen, indem jede bedingte Wahrscheinlichkeit mit der Wahrscheinlichkeit ihrer Bedingung gewichtet wird: 0,4×0,3 + 0,2×0,7 = 0,12 + 0,14 = 0,26."
         },
         {
-            q: 'Three machines produce parts: B₁ (50%), B₂ (30%), B₃ (20%). Defect rates: P(D|B₁)=0.02, P(D|B₂)=0.05, P(D|B₃)=0.03. What is P(D)? Enter as a decimal.',
-            qDE: 'Drei Maschinen produzieren Teile: B₁ (50%), B₂ (30%), B₃ (20%). Ausschussraten: P(D|B₁)=0,02, P(D|B₂)=0,05, P(D|B₃)=0,03. Was ist P(D)?',
+            q: 'Three machines produce parts: B₁ (50%), B₂ (30%), B₃ (20%). Defect rates: P(D|B₁)=0.02, P(D|B₂)=0.05, P(D|B₃)=0.03. What is P(D)? Round to 3 decimal places.',
+            qDE: 'Drei Maschinen produzieren Teile: B₁ (50%), B₂ (30%), B₃ (20%). Ausschussraten: P(D|B₁)=0,02, P(D|B₂)=0,05, P(D|B₃)=0,03. Was ist P(D)? Runde auf 3 Nachkommastellen.',
             answer: 0.031, tolerance: 0.001, unit: '',
             hintEn: 'P(D) = 0.02×0.5 + 0.05×0.3 + 0.03×0.2',
             hintDE: 'P(D) = 0,02×0,5 + 0,05×0,3 + 0,03×0,2',
@@ -691,8 +691,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Gesamtausschussrate ergibt sich, indem die Ausschussrate jeder Maschine mit ihrem Produktionsanteil gewichtet wird: 0,02×0,5 + 0,05×0,3 + 0,03×0,2 = 0,01 + 0,015 + 0,006 = 0,031."
         },
         {
-            q: 'B₁, B₂, B₃ partition Ω with P(B₁)=0.2, P(B₂)=0.5, P(B₃)=0.3. P(A|B₁)=0.6, P(A|B₂)=0.4, P(A|B₃)=0.1. What is P(A)?',
-            qDE: 'B₁, B₂, B₃ partitionieren Ω mit P(B₁)=0,2, P(B₂)=0,5, P(B₃)=0,3. P(A|B₁)=0,6, P(A|B₂)=0,4, P(A|B₃)=0,1. Was ist P(A)?',
+            q: 'B₁, B₂, B₃ partition Ω with P(B₁)=0.2, P(B₂)=0.5, P(B₃)=0.3. P(A|B₁)=0.6, P(A|B₂)=0.4, P(A|B₃)=0.1. What is P(A)? Round to 3 decimal places.',
+            qDE: 'B₁, B₂, B₃ partitionieren Ω mit P(B₁)=0,2, P(B₂)=0,5, P(B₃)=0,3. P(A|B₁)=0,6, P(A|B₂)=0,4, P(A|B₃)=0,1. Was ist P(A)? Runde auf 3 Nachkommastellen.',
             answer: 0.35, tolerance: 0.001, unit: '',
             hintEn: 'P(A) = 0.6×0.2 + 0.4×0.5 + 0.1×0.3',
             hintDE: 'P(A) = 0,6×0,2 + 0,4×0,5 + 0,1×0,3',
@@ -725,8 +725,8 @@ const MATH_GATE_POOLS = {
         // ── 4. MEHRSTUFIGE WAHRSCHEINLICHKEITSRÄUME / WAHRSCHEINLICHKEITSBAUM ────
 
         {
-            q: 'A bag has 3 red and 2 blue balls. You draw twice without replacement. What is P(red, then red)? Enter as a decimal.',
-            qDE: 'Ein Beutel enthält 3 rote und 2 blaue Bälle. Du ziehst zweimal ohne Zurücklegen. Was ist P(rot, dann rot)? Gib als Dezimalzahl ein.',
+            q: 'A bag has 3 red and 2 blue balls. You draw twice without replacement. What is P(red, then red)? Round to 3 decimal places.',
+            qDE: 'Ein Beutel enthält 3 rote und 2 blaue Bälle. Du ziehst zweimal ohne Zurücklegen. Was ist P(rot, dann rot)? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'P(R₁)=3/5, P(R₂|R₁)=2/4.',
             hintDE: 'P(R₁)=3/5, P(R₂|R₁)=2/4.'
@@ -735,8 +735,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Mit der Multiplikationsregel entlang des Baums: Der erste Zug ist rot mit Wahrscheinlichkeit 3/5, und danach verbleiben nur noch 2 rote Bälle von 4, sodass P(rot, rot) = (3/5)×(2/4) = 0,3."
         },
         {
-            q: 'In a two-stage probability tree, P(B₁)=0.6, P(B₂)=0.4. P(A|B₁)=0.3, P(A|B₂)=0.7. What is P(B₂ ∩ A)?',
-            qDE: 'In einem zweistufigen Wahrscheinlichkeitsbaum: P(B₁)=0,6, P(B₂)=0,4. P(A|B₁)=0,3, P(A|B₂)=0,7. Was ist P(B₂ ∩ A)?',
+            q: 'In a two-stage probability tree, P(B₁)=0.6, P(B₂)=0.4. P(A|B₁)=0.3, P(A|B₂)=0.7. What is P(B₂ ∩ A)? Round to 3 decimal places.',
+            qDE: 'In einem zweistufigen Wahrscheinlichkeitsbaum: P(B₁)=0,6, P(B₂)=0,4. P(A|B₁)=0,3, P(A|B₂)=0,7. Was ist P(B₂ ∩ A)? Runde auf 3 Nachkommastellen.',
             answer: 0.28, tolerance: 0.001, unit: '',
             hintEn: 'P(B₂ ∩ A) = P(A|B₂) · P(B₂)',
             hintDE: 'P(B₂ ∩ A) = P(A|B₂) · P(B₂)',
@@ -774,8 +774,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Beim Prüfen der Unabhängigkeitsbedingung: P(A)·P(B) = 0,3×0,6 = 0,18, was nicht mit dem gegebenen P(A ∩ B) = 0,2 übereinstimmt, sodass A und B nicht unabhängig sind."
         },
         {
-            q: 'A and B are independent with P(A)=0.5 and P(B)=0.4. What is P(A ∩ B)? Enter as a decimal.',
-            qDE: 'A und B sind unabhängig mit P(A)=0,5 und P(B)=0,4. Was ist P(A ∩ B)? Gib als Dezimalzahl ein.',
+            q: 'A and B are independent with P(A)=0.5 and P(B)=0.4. What is P(A ∩ B)? Round to 3 decimal places.',
+            qDE: 'A und B sind unabhängig mit P(A)=0,5 und P(B)=0,4. Was ist P(A ∩ B)? Runde auf 3 Nachkommastellen.',
             answer: 0.2, tolerance: 0.001, unit: '',
             hintEn: 'Independence: P(A ∩ B) = P(A) · P(B)',
             hintDE: 'Unabhängigkeit: P(A ∩ B) = P(A) · P(B)',
@@ -795,8 +795,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Da der Würfel fair ist, ist jede der 6 Seiten gleich wahrscheinlich, sodass genau 1 Ergebnis für X = 3 günstig ist."
         },
         {
-            q: 'X takes values {0, 1, 2} with P(X=0)=0.2, P(X=1)=0.5, P(X=2)=0.3. What is P(X ≥ 1)? Enter as a decimal.',
-            qDE: 'X nimmt Werte {0,1,2} an mit P(X=0)=0,2, P(X=1)=0,5, P(X=2)=0,3. Was ist ist P(X ≥ 1)? Gib als Dezimalzahl ein.',
+            q: 'X takes values {0, 1, 2} with P(X=0)=0.2, P(X=1)=0.5, P(X=2)=0.3. What is P(X ≥ 1)? Round to 3 decimal places.',
+            qDE: 'X nimmt Werte {0,1,2} an mit P(X=0)=0,2, P(X=1)=0,5, P(X=2)=0,3. Was ist P(X ≥ 1)? Runde auf 3 Nachkommastellen.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'P(X ≥ 1) = 1 − P(X=0)',
             hintDE: 'P(X ≥ 1) = 1 − P(X=0)',
@@ -804,8 +804,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Statt P(X=1) und P(X=2) separat zu addieren, ist es schneller, das Komplement zu nutzen: P(X ≥ 1) = 1 − P(X=0) = 1 − 0,2 = 0,8."
         },
         {
-            q: 'X takes values {1, 2, 3} with P(X=1)=0.5, P(X=2)=0.3, P(X=3)=p. What must p be? Enter as a decimal.',
-            qDE: 'X nimmt Werte {1,2,3} an mit P(X=1)=0,5, P(X=2)=0,3, P(X=3)=p. Was muss p sein? Gib als Dezimalzahl ein.',
+            q: 'X takes values {1, 2, 3} with P(X=1)=0.5, P(X=2)=0.3, P(X=3)=p. What must p be? Round to 3 decimal places.',
+            qDE: 'X nimmt Werte {1,2,3} an mit P(X=1)=0,5, P(X=2)=0,3, P(X=3)=p. Was muss p sein? Runde auf 3 Nachkommastellen.',
             answer: 0.2, tolerance: 0.001, unit: '',
             hintEn: 'All probabilities must sum to 1',
             hintDE: 'Alle Wahrscheinlichkeiten müssen 1 ergeben',
@@ -816,8 +816,8 @@ const MATH_GATE_POOLS = {
         // ── 7. VERTEILUNG VON ZUFALLSVARIABLEN (Distribution of Random Variables) ─
 
         {
-            q: 'X has distribution P(X=1)=0.3, P(X=2)=0.4, P(X=3)=0.3. What is P(X ≤ 2)? Enter as a decimal.',
-            qDE: 'X hat die Verteilung P(X=1)=0,3, P(X=2)=0,4, P(X=3)=0,3. Was ist P(X ≤ 2)? Gib als Dezimalzahl ein.',
+            q: 'X has distribution P(X=1)=0.3, P(X=2)=0.4, P(X=3)=0.3. What is P(X ≤ 2)? Round to 3 decimal places.',
+            qDE: 'X hat die Verteilung P(X=1)=0,3, P(X=2)=0,4, P(X=3)=0,3. Was ist P(X ≤ 2)? Runde auf 3 Nachkommastellen.',
             answer: 0.7, tolerance: 0.001, unit: '',
             hintEn: 'P(X ≤ 2) = P(X=1) + P(X=2).',
             hintDE: 'P(X ≤ 2) = P(X=1) + P(X=2).',
@@ -825,8 +825,8 @@ const MATH_GATE_POOLS = {
             explainDE: "P(X ≤ 2) summiert die gesamte Wahrscheinlichkeitsmasse bei den Werten 1 und 2: 0,3 + 0,4 = 0,7."
         },
         {
-            q: 'X is uniformly distributed on {1, 2, 3, 4, 5}. What is P(2 ≤ X ≤ 4)? Enter as a decimal.',
-            qDE: 'X ist gleichverteilt auf {1,2,3,4,5}. Was ist P(2 ≤ X ≤ 4)? Gib als Dezimalzahl ein.',
+            q: 'X is uniformly distributed on {1, 2, 3, 4, 5}. What is P(2 ≤ X ≤ 4)? Round to 3 decimal places.',
+            qDE: 'X ist gleichverteilt auf {1,2,3,4,5}. Was ist P(2 ≤ X ≤ 4)? Runde auf 3 Nachkommastellen.',
             answer: 0.6, tolerance: 0.001, unit: '',
             hintEn: 'Values {2,3,4}: 3 out of 5 equally likely outcomes.',
             hintDE: 'Werte {2,3,4}: 3 von 5 gleich wahrscheinlichen Ergebnissen.',
@@ -834,8 +834,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Werte 2, 3 und 4 erfüllen die Bedingung, was 3 von den 5 gleich wahrscheinlichen Ergebnissen ergibt, sodass die Wahrscheinlichkeit 3/5 = 0,6 beträgt."
         },
         {
-            q: 'X has P(X=0)=0.1, P(X=1)=0.4, P(X=2)=0.4, P(X=3)=0.1. What is P(X = 1 or X = 2)? Enter as a decimal.',
-            qDE: 'X hat P(X=0)=0,1, P(X=1)=0,4, P(X=2)=0,4, P(X=3)=0,1. Was ist P(X=1 oder X=2)? Gib als Dezimalzahl ein.',
+            q: 'X has P(X=0)=0.1, P(X=1)=0.4, P(X=2)=0.4, P(X=3)=0.1. What is P(X = 1 or X = 2)? Round to 3 decimal places.',
+            qDE: 'X hat P(X=0)=0,1, P(X=1)=0,4, P(X=2)=0,4, P(X=3)=0,1. Was ist P(X=1 oder X=2)? Runde auf 3 Nachkommastellen.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'P(X=1) + P(X=2)',
             hintDE: 'P(X=1) + P(X=2)',
@@ -846,8 +846,8 @@ const MATH_GATE_POOLS = {
         // ── 8. BERECHNUNG VON INTERVALLWAHRSCHEINLICHKEITEN ──────────────────────
 
         {
-            q: 'X is discrete with P(X=k) = 0.1 for k = 1,…,10. What is P(3 ≤ X ≤ 7)? Enter as a decimal.',
-            qDE: 'X ist diskret mit P(X=k) = 0,1 für k = 1,…,10. Was ist P(3 ≤ X ≤ 7)? Gib als Dezimalzahl ein.',
+            q: 'X is discrete with P(X=k) = 0.1 for k = 1,…,10. What is P(3 ≤ X ≤ 7)? Round to 3 decimal places.',
+            qDE: 'X ist diskret mit P(X=k) = 0,1 für k = 1,…,10. Was ist P(3 ≤ X ≤ 7)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'Values 3,4,5,6,7',
             hintDE: 'Werte 3,4,5,6,7',
@@ -855,8 +855,8 @@ const MATH_GATE_POOLS = {
             explainDE: "In diesem Bereich liegen 5 Werte (3 bis 7), jeder mit Wahrscheinlichkeit 0,1, was insgesamt 5 × 0,1 = 0,5 ergibt."
         },
         {
-            q: 'F(x) is a distribution function with F(3)=0.7 and F(1)=0.3. What is P(1 < X ≤ 3)? Enter as a decimal.',
-            qDE: 'F(x) ist eine Verteilungsfunktion mit F(3)=0,7 und F(1)=0,3. Was ist P(1 < X ≤ 3)? Gib als Dezimalzahl ein.',
+            q: 'F(x) is a distribution function with F(3)=0.7 and F(1)=0.3. What is P(1 < X ≤ 3)? Round to 3 decimal places.',
+            qDE: 'F(x) ist eine Verteilungsfunktion mit F(3)=0,7 und F(1)=0,3. Was ist P(1 < X ≤ 3)? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'P(1 < X ≤ 3) = F(3) − F(1)',
             hintDE: 'P(1 < X ≤ 3) = F(3) − F(1)',
@@ -864,8 +864,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Wahrscheinlichkeit, in ein Intervall zu fallen, ist die Differenz der Verteilungsfunktion an den Endpunkten: F(3) − F(1) = 0,7 − 0,3 = 0,4."
         },
         {
-            q: 'F(5)=0.9 and F(2)=0.5. What is P(2 < X ≤ 5)? Enter as a decimal.',
-            qDE: 'F(5)=0,9 und F(2)=0,5. Was ist P(2 < X ≤ 5)? Gib als Dezimalzahl ein.',
+            q: 'F(5)=0.9 and F(2)=0.5. What is P(2 < X ≤ 5)? Round to 3 decimal places.',
+            qDE: 'F(5)=0,9 und F(2)=0,5. Was ist P(2 < X ≤ 5)? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'P(2 < X ≤ 5) = F(5) − F(2)',
             hintDE: 'P(2 < X ≤ 5) = F(5) − F(2)',
@@ -876,8 +876,8 @@ const MATH_GATE_POOLS = {
         // ── 9. ZÄHLDICHTE (Probability Mass Function) ─────────────────────────────
 
         {
-            q: 'A discrete Random Variable X has PMF p(1)=0.2, p(2)=0.5, p(3)=0.3. What is p(2)? Enter as a decimal.',
-            qDE: 'Eine diskrete Zufallsvariable X hat die Zähldichte p(1)=0,2, p(2)=0,5, p(3)=0,3. Was ist p(2)? Gib als Dezimalzahl ein.',
+            q: 'A discrete Random Variable X has PMF p(1)=0.2, p(2)=0.5, p(3)=0.3. What is p(2)? Round to 3 decimal places.',
+            qDE: 'Eine diskrete Zufallsvariable X hat die Zähldichte p(1)=0,2, p(2)=0,5, p(3)=0,3. Was ist p(2)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'The PMF directly gives P(X=2) = p(2)',
             hintDE: 'Die Zähldichte gibt direkt P(X=2) = p(2)',
@@ -885,8 +885,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Der Wert der Zähldichte an einer Stelle ist per Definition die Wahrscheinlichkeit dieses exakten Ergebnisses, sodass p(2) einfach als 0,5 gegeben ist."
         },
         {
-            q: 'A PMF must sum to 1. If p(1)=0.3 and p(2)=0.3, and X only takes values 1, 2, 3, what is p(3)?',
-            qDE: 'Eine Zähldichte muss 1 ergeben. Wenn p(1)=0,3 und p(2)=0,3 und X nur Werte 1,2,3 annimmt, was ist p(3)?',
+            q: 'A PMF must sum to 1. If p(1)=0.3 and p(2)=0.3, and X only takes values 1, 2, 3, what is p(3)? Round to 3 decimal places.',
+            qDE: 'Eine Zähldichte muss 1 ergeben. Wenn p(1)=0,3 und p(2)=0,3 und X nur Werte 1,2,3 annimmt, was ist p(3)? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'p(3) = 1 − 0.3 − 0.3',
             hintDE: 'p(3) = 1 − 0,3 − 0,3',
@@ -894,8 +894,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Da sich die Zähldichte über alle möglichen Werte zu 1 summieren muss, ist die fehlende Wahrscheinlichkeit p(3) = 1 − 0,3 − 0,3 = 0,4."
         },
         {
-            q: 'X has PMF p(k) = c · k for k = 1, 2, 3, 4. What must c be so that all probabilities sum to 1? Enter as a decimal.',
-            qDE: 'X hat Zähldichte p(k) = c · k für k = 1,2,3,4. Welchen Wert muss c haben, damit sich alle Wahrscheinlichkeiten zu 1 addieren? Gib als Dezimalzahl ein.',
+            q: 'X has PMF p(k) = c · k for k = 1, 2, 3, 4. What must c be so that all probabilities sum to 1? Round to 3 decimal places.',
+            qDE: 'X hat Zähldichte p(k) = c · k für k = 1,2,3,4. Welchen Wert muss c haben, damit sich alle Wahrscheinlichkeiten zu 1 addieren? Runde auf 3 Nachkommastellen.',
             answer: 0.1, tolerance: 0.001, unit: '',
             hintEn: 'c(1+2+3+4) = 1',
             hintDE: 'c(1+2+3+4) = 1',
@@ -906,8 +906,8 @@ const MATH_GATE_POOLS = {
         // ── 10. VERTEILUNGSFUNKTION (Cumulative Distribution Function) ────────────
 
         {
-            q: 'X has PMF p(1)=0.2, p(2)=0.3, p(3)=0.5. What is F(2) = P(X ≤ 2)? Enter as a decimal.',
-            qDE: 'X hat Zähldichte p(1)=0,2, p(2)=0,3, p(3)=0,5. Was ist F(2) = P(X ≤ 2)? Gib als Dezimalzahl ein.',
+            q: 'X has PMF p(1)=0.2, p(2)=0.3, p(3)=0.5. What is F(2) = P(X ≤ 2)? Round to 3 decimal places.',
+            qDE: 'X hat Zähldichte p(1)=0,2, p(2)=0,3, p(3)=0,5. Was ist F(2) = P(X ≤ 2)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'F(2) = p(1) + p(2)',
             hintDE: 'F(2) = p(1) + p(2)',
@@ -924,13 +924,13 @@ const MATH_GATE_POOLS = {
             explainDE: "Wenn x gegen unendlich geht, muss die Verteilungsfunktion die gesamte Wahrscheinlichkeitsmasse der Verteilung kumulieren, die per Definition insgesamt 1 beträgt."
         },
         {
-            q: 'F(x) is a CDF. Which value is impossible for F(x)? Enter 1 for −0.2, 2 for 0, 3 for 0.7, or 4 for 1.',
-            qDE: 'F(x) ist eine Verteilungsfunktion. Welcher Wert ist unmöglich für F(x)? Gib 1 für −0,2, 2 für 0, 3 für 0,7 oder 4 für 1 ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'F(x) is a CDF. Which value is impossible for F(x)? Enter 1 for 0, 2 for −0.2, 3 for 0.7, or 4 for 1.',
+            qDE: 'F(x) ist eine Verteilungsfunktion. Welcher Wert ist unmöglich für F(x)? Gib 1 für 0, 2 für −0,2, 3 für 0,7 oder 4 für 1 ein.',
+            answer: 2, tolerance: 0, unit: '',
             hintEn: 'A CDF satisfies 0 ≤ F(x) ≤ 1 for all x',
             hintDE: 'Eine Verteilungsfunktion erfüllt 0 ≤ F(x) ≤ 1 für alle x',
-            explain: "Since a CDF is a probability and must always lie between 0 and 1, a negative value like −0.2 is impossible, unlike 0, 0.7, or 1.",
-            explainDE: "Da eine Verteilungsfunktion eine Wahrscheinlichkeit ist und stets zwischen 0 und 1 liegen muss, ist ein negativer Wert wie −0,2 unmöglich, im Gegensatz zu 0, 0,7 oder 1."
+            explain: "Since a CDF is a probability and must always lie between 0 and 1, a negative value like −0.2 is impossible, unlike 0, 0.7, or 1. The correct entry is therefore 2.",
+            explainDE: "Da eine Verteilungsfunktion eine Wahrscheinlichkeit ist und stets zwischen 0 und 1 liegen muss, ist ein negativer Wert wie −0,2 unmöglich, im Gegensatz zu 0, 0,7 oder 1. Die richtige Eingabe ist daher 2."
         },
 
 
@@ -977,8 +977,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Integrieren der Dichte über ihren gesamten Träger ergibt ∫₀¹ 2x dx = [x²]₀¹ = 1, was bestätigt, dass dies eine gültige Dichte ist, die die volle Wahrscheinlichkeit von 1 abdeckt."
         },
         {
-            q: 'X has density function f(x) = 2x for x ∈ [0,1]. What is P(0 ≤ X ≤ 0.5)? Enter as a decimal.',
-            qDE: 'X hat Dichtefunktion f(x) = 2x für x ∈ [0,1]. Was ist P(0 ≤ X ≤ 0,5)? Gib als Dezimalzahl ein.',
+            q: 'X has density function f(x) = 2x for x ∈ [0,1]. What is P(0 ≤ X ≤ 0.5)? Round to 3 decimal places.',
+            qDE: 'X hat Dichtefunktion f(x) = 2x für x ∈ [0,1]. Was ist P(0 ≤ X ≤ 0,5)? Runde auf 3 Nachkommastellen.',
             answer: 0.25, tolerance: 0.001, unit: '',
             hintEn: 'Calculate the integral.',
             hintDE: 'Berechne das Integral.',
@@ -1044,8 +1044,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei einer linearen Transformation Y = aX skaliert die Dichte mit 1/|a|: f_Y(y) = f_X(y/2)·(1/2) = 1×0,5 = 0,5."
         },
         {
-            q: 'X has density function f_X(x) = 2x for x ∈ [0,1]. Y = 3X. What is f_Y(y) for y ∈ [0,3]? Enter the coefficient c where f_Y(y) = c·y.',
-            qDE: 'X hat Dichtefunktion f_X(x) = 2x für x ∈ [0,1]. Y = 3X. Was ist f_Y(y) für y ∈ [0,3]? Gib den Koeffizienten c an, sodass f_Y(y) = c·y gilt.',
+            q: 'X has density function f_X(x) = 2x for x ∈ [0,1]. Y = 3X. What is f_Y(y) for y ∈ [0,3]? Enter the coefficient c where f_Y(y) = c·y. Round to 3 decimal places.',
+            qDE: 'X hat Dichtefunktion f_X(x) = 2x für x ∈ [0,1]. Y = 3X. Was ist f_Y(y) für y ∈ [0,3]? Gib den Koeffizienten c an, sodass f_Y(y) = c·y gilt. Runde auf 3 Nachkommastellen.',
             answer: 0.222, tolerance: 0.005, unit: '',
             hintEn: 'f_Y(y) = f_X(y/3) · (1/3)',
             hintDE: 'f_Y(y) = f_X(y/3) · (1/3)',
@@ -1065,8 +1065,8 @@ const MATH_GATE_POOLS = {
         // ── 2. UNABHÄNGIGKEIT VON ZUFALLSVARIABLEN ────────────────────────────────
 
         {
-            q: 'X and Y are independent. P(X=1)=0.4, P(Y=1)=0.5. What is P(X=1, Y=1)? Enter as a decimal.',
-            qDE: 'X und Y sind unabhängig. P(X=1)=0,4, P(Y=1)=0,5. Was ist P(X=1, Y=1)? Gib als Dezimalzahl ein.',
+            q: 'X and Y are independent. P(X=1)=0.4, P(Y=1)=0.5. What is P(X=1, Y=1)? Round to 3 decimal places.',
+            qDE: 'X und Y sind unabhängig. P(X=1)=0,4, P(Y=1)=0,5. Was ist P(X=1, Y=1)? Runde auf 3 Nachkommastellen.',
             answer: 0.2, tolerance: 0.001, unit: '',
             hintEn: 'Independence: P(X=1, Y=1) = P(X=1) · P(Y=1)',
             hintDE: 'Unabhängigkeit: P(X=1, Y=1) = P(X=1) · P(Y=1)',
@@ -1095,7 +1095,7 @@ const MATH_GATE_POOLS = {
         // ── 3. KONTINGENZTABELLE FÜR UNABHÄNGIGKEIT ──────────────────────────────
 
         {
-            q: 'We have P(X=0,Y=0)=0.12, P(X=0)=0.4, P(Y=0)=0.3. Are X,Y independent?Enter 1 for yes (independent), 0 for no (dependent).',
+            q: 'We have P(X=0,Y=0)=0.12, P(X=0)=0.4, P(Y=0)=0.3. Are X,Y independent? Enter 1 for yes (independent), 0 for no (dependent).',
             qDE: 'Wir haben P(X=0,Y=0)=0,12, P(X=0)=0,4, P(Y=0)=0,3. Sind X,Y unabhängig? Gib 1 für ja (unabhängig), 0 für nein (abhängig) ein.',
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'P(X=0)·P(Y=0) = 0.4 × 0.3 = 0.12 = P(X=0, Y=0)',
@@ -1113,8 +1113,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Produkt der Randwahrscheinlichkeiten P(X=1)·P(Y=1) = 0,5×0,5 = 0,25 stimmt nicht mit der gegebenen gemeinsamen Wahrscheinlichkeit 0,3 überein, sodass X und Y nicht unabhängig sind."
         },
         {
-            q: 'In a 2×2 contingency table, P(X=0)=0.6, P(Y=1)=0.4. If X and Y are independent, what must P(X=0, Y=1) equal? Enter as a decimal.',
-            qDE: 'In einer 2×2-Kontingenztabelle: P(X=0)=0,6, P(Y=1)=0,4. Wenn X und Y unabhängig sind, welchen Wert muss P(X=0, Y=1) haben? Gib als Dezimalzahl ein.',
+            q: 'In a 2×2 contingency table, P(X=0)=0.6, P(Y=1)=0.4. If X and Y are independent, what must P(X=0, Y=1) equal? Round to 3 decimal places.',
+            qDE: 'In einer 2×2-Kontingenztabelle: P(X=0)=0,6, P(Y=1)=0,4. Wenn X und Y unabhängig sind, welchen Wert muss P(X=0, Y=1) haben? Runde auf 3 Nachkommastellen.',
             answer: 0.24, tolerance: 0.001, unit: '',
             hintEn: 'Independence criterion: P(X=0, Y=1) = P(X=0) · P(Y=1)',
             hintDE: 'Unabhängigkeitskriterium: P(X=0, Y=1) = P(X=0) · P(Y=1)',
@@ -1134,8 +1134,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Per Definition erfordert die Unabhängigkeit diskreter Zufallsvariablen, dass die gemeinsame Zähldichte als Produkt der Rand-Zähldichten faktorisiert."
         },
         {
-            q: 'p_X(0)=0.5, p_X(1)=0.5, p_Y(0)=0.4, p_Y(1)=0.6. If independent, what is p(X=1, Y=0)? Enter as a decimal.',
-            qDE: 'p_X(0)=0,5, p_X(1)=0,5, p_Y(0)=0,4, p_Y(1)=0,6. Falls X,Y unabhängig sind, was ist dann p(X=1, Y=0)? Gib als Dezimalzahl ein.',
+            q: 'p_X(0)=0.5, p_X(1)=0.5, p_Y(0)=0.4, p_Y(1)=0.6. If independent, what is p(X=1, Y=0)? Round to 3 decimal places.',
+            qDE: 'p_X(0)=0,5, p_X(1)=0,5, p_Y(0)=0,4, p_Y(1)=0,6. Falls X,Y unabhängig sind, was ist dann p(X=1, Y=0)? Runde auf 3 Nachkommastellen.',
             answer: 0.2, tolerance: 0.001, unit: '',
             hintEn: 'p(X=1, Y=0) = p_X(1) · p_Y(0)',
             hintDE: 'p(X=1, Y=0) = p_X(1) · p_Y(0)',
@@ -1143,8 +1143,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Unter der Annahme der Unabhängigkeit ist die gemeinsame Wahrscheinlichkeit das Produkt der Randwahrscheinlichkeiten: p_X(1)·p_Y(0) = 0,5×0,4 = 0,2."
         },
         {
-            q: 'To verify independence from a contingency table with values p(0,0)=0.2, p(0,1)=0.3, p(1,0)=0.2, p(1,1)=0.3, first find p_X(0). Enter as a decimal.',
-            qDE: 'Zur Unabhängigkeitsprüfung in einer Kontingenztabelle mit p(0,0)=0,2, p(0,1)=0,3, p(1,0)=0,2, p(1,1)=0,3 bestimme zuerst p_X(0). Gib als Dezimalzahl ein.',
+            q: 'To verify independence from a contingency table with values p(0,0)=0.2, p(0,1)=0.3, p(1,0)=0.2, p(1,1)=0.3, first find p_X(0). Round to 3 decimal places.',
+            qDE: 'Zur Unabhängigkeitsprüfung in einer Kontingenztabelle mit p(0,0)=0,2, p(0,1)=0,3, p(1,0)=0,2, p(1,1)=0,3 bestimme zuerst p_X(0). Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'Marginal: p_X(0) = p(0,0) + p(0,1)',
             hintDE: 'Randverteilung: p_X(0) = p(0,0) + p(0,1)',
@@ -1155,8 +1155,8 @@ const MATH_GATE_POOLS = {
         // ── 5. STANDARDNORMALVERTEILUNG ───────────────────────────────────────────
 
         {
-            q: 'Z ~ N(0,1). What is P(Z ≤ 1.0)? Enter as a decimal.',
-            qDE: 'Z ~ N(0,1). Was ist P(Z ≤ 1,0)? Gib als Dezimalzahl ein.',
+            q: 'Z ~ N(0,1). What is P(Z ≤ 1.0)? Round to 3 decimal places.',
+            qDE: 'Z ~ N(0,1). Was ist P(Z ≤ 1,0)? Runde auf 3 Nachkommastellen.',
             answer: 0.841, tolerance: 0.001, unit: '',
             hintEn: 'Φ(z) = P(Z ≤ z) by definition. Check a quantile table.',
             hintDE: 'Φ(z) = P(Z ≤ z) per Definition. Schaue in einer Quantiltabelle nach.',
@@ -1164,8 +1164,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Dies wird direkt aus der Tabelle der Standardnormalverteilung abgelesen: Φ(1,0) ≈ 0,841."
         },
         {
-            q: 'Z ~ N(0,1). What is P(Z > 1.0)? Enter as a decimal.',
-            qDE: 'Z ~ N(0,1). Was ist P(Z > 1,0)? Gib als Dezimalzahl ein.',
+            q: 'Z ~ N(0,1). What is P(Z > 1.0)? Round to 3 decimal places.',
+            qDE: 'Z ~ N(0,1). Was ist P(Z > 1,0)? Runde auf 3 Nachkommastellen.',
             answer: 0.159, tolerance: 0.002, unit: '',
             hintEn: 'P(Z > 1) = 1 − Φ(1) = 1 − 0.841',
             hintDE: 'P(Z > 1) = 1 − Φ(1) = 1 − 0,841',
@@ -1173,8 +1173,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Mit der Komplementregel gilt P(Z > 1) = 1 − Φ(1) = 1 − 0,841 = 0,159."
         },
         {
-            q: 'Z ~ N(0,1). Using symmetry Φ(−z) = 1 − Φ(z) and Φ(1.0) ≈ 0.841. What is P(−1 ≤ Z ≤ 1)? Enter as a decimal.',
-            qDE: 'Z ~ N(0,1). Mit Φ(−z) = 1 − Φ(z) und Φ(1,0) ≈ 0,841, was ist P(−1 ≤ Z ≤ 1)? Gib als Dezimalzahl ein.',
+            q: 'Z ~ N(0,1). Using symmetry Φ(−z) = 1 − Φ(z) and Φ(1.0) ≈ 0.841. What is P(−1 ≤ Z ≤ 1)? Round to 3 decimal places.',
+            qDE: 'Z ~ N(0,1). Mit Φ(−z) = 1 − Φ(z) und Φ(1,0) ≈ 0,841, was ist P(−1 ≤ Z ≤ 1)? Runde auf 3 Nachkommastellen.',
             answer: 0.682, tolerance: 0.002, unit: '',
             hintEn: 'P(−1 ≤ Z ≤ 1) = Φ(1) − Φ(−1) = 0.841 − (1−0.841)',
             hintDE: 'P(−1 ≤ Z ≤ 1) = Φ(1) − Φ(−1) = 0,841 − (1−0,841)',
@@ -1185,8 +1185,8 @@ const MATH_GATE_POOLS = {
         // ── 6. ERWARTUNGSWERT DISKRET UND STETIG ──────────────────────────────────
 
         {
-            q: 'X has density P(X=1)=0.2, P(X=2)=0.5, P(X=3)=0.3. What is E[X]? Enter as a decimal.',
-            qDE: 'X hat Zähldichte P(X=1)=0,2, P(X=2)=0,5, P(X=3)=0,3. Was ist E[X]? Gib als Dezimalzahl ein.',
+            q: 'X has density P(X=1)=0.2, P(X=2)=0.5, P(X=3)=0.3. What is E[X]? Round to 3 decimal places.',
+            qDE: 'X hat Zähldichte P(X=1)=0,2, P(X=2)=0,5, P(X=3)=0,3. Was ist E[X]? Runde auf 3 Nachkommastellen.',
             answer: 2.1, tolerance: 0.001, unit: '',
             hintEn: 'E[X] = 1·0.2 + 2·0.5 + 3·0.3',
             hintDE: 'E[X] = 1·0,2 + 2·0,5 + 3·0,3',
@@ -1194,8 +1194,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Der Erwartungswert gewichtet jedes Ergebnis mit seiner Wahrscheinlichkeit: E[X] = 1×0,2 + 2×0,5 + 3×0,3 = 2,1."
         },
         {
-            q: 'X has density f(x) = 2x for x ∈ [0,1]. What is E[X]? Enter as a decimal.',
-            qDE: 'X hat Dichtefunktion f(x) = 2x für x ∈ [0,1]. Was ist E[X]? Gib als Dezimalzahl ein.',
+            q: 'X has density f(x) = 2x for x ∈ [0,1]. What is E[X]? Round to 3 decimal places.',
+            qDE: 'X hat Dichtefunktion f(x) = 2x für x ∈ [0,1]. Was ist E[X]? Runde auf 3 Nachkommastellen.',
             answer: 0.667, tolerance: 0.005, unit: '',
             hintEn: 'Integrate x*2x from 0 to 1',
             hintDE: 'Integriere x*2x von 0 bis 1',
@@ -1203,8 +1203,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei stetigen Variablen gilt E[X] = ∫x·f(x)dx; das Integrieren von x·2x von 0 bis 1 ergibt [2x³/3]₀¹ = 2/3 ≈ 0,667."
         },
         {
-            q: 'A fair die is rolled. What is E[X]? Enter as a decimal.',
-            qDE: 'Ein fairer Würfel wird geworfen. Was ist E[X]? Gib als Dezimalzahl ein.',
+            q: 'A fair die is rolled. What is E[X]? Round to 3 decimal places.',
+            qDE: 'Ein fairer Würfel wird geworfen. Was ist E[X]? Runde auf 3 Nachkommastellen.',
             answer: 3.5, tolerance: 0.001, unit: '',
             hintEn: 'E[X] = (1+2+3+4+5+6)/6',
             hintDE: 'E[X] = (1+2+3+4+5+6)/6',
@@ -1215,8 +1215,8 @@ const MATH_GATE_POOLS = {
         // ── 7. BERNOULLI VERTEILUNG ───────────────────────────────────────────────
 
         {
-            q: 'X ~ Ber(p) with p=0.3. What is E[X]? Enter as a decimal.',
-            qDE: 'X ~ Ber(p) mit p=0.3. Was ist E[X]? Gib als Dezimalzahl ein.',
+            q: 'X ~ Ber(p) with p=0.3. What is E[X]? Round to 3 decimal places.',
+            qDE: 'X ~ Ber(p) mit p=0,3. Was ist E[X]? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'For X ~ Ber(p): E[X] = p',
             hintDE: 'Für X ~ Ber(p): E[X] = p',
@@ -1224,8 +1224,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei einer Bernoulli-verteilten Zufallsvariable entspricht der Erwartungswert direkt der Erfolgswahrscheinlichkeit: E[X] = p = 0,3."
         },
         {
-            q: 'X ~ Ber(p) with p=0.7. What is Var(X)? Enter as a decimal.',
-            qDE: 'X ~ Ber(p=0,7) mit p=0.7. Was ist Var(X)? Gib als Dezimalzahl ein.',
+            q: 'X ~ Ber(p) with p=0.7. What is Var(X)? Round to 3 decimal places.',
+            qDE: 'X ~ Ber(p) mit p=0,7. Was ist Var(X)? Runde auf 3 Nachkommastellen.',
             answer: 0.21, tolerance: 0.001, unit: '',
             hintEn: 'Var(X) = p(1−p)',
             hintDE: 'Var(X) = p(1−p)',
@@ -1255,7 +1255,7 @@ const MATH_GATE_POOLS = {
         },
         {
             q: 'E[X]=2, E[Y]=4. What is E[3X − Y + 1]?',
-            qDE: 'E[X]=2, E[Y]=4. Was ist ist E[3X − Y + 1]? ',
+            qDE: 'E[X]=2, E[Y]=4. Was ist E[3X − Y + 1]?',
             answer: 3, tolerance: 0, unit: '',
             hintEn: 'Linearity',
             hintDE: 'Linearität',
@@ -1353,8 +1353,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Umstellen des Verschiebungssatzes ergibt E[X²] = Var(X) + (E[X])² = 7 + 9 = 16."
         },
         {
-            q: 'X ~ Ber(0.4), E[X]=0.4, E[X²]=0.4. What is Var(X)?',
-            qDE: 'X ~ Ber(0,4), E[X]=0,4, E[X²]=0,4. Was ist Var(X)?',
+            q: 'X ~ Ber(0.4), E[X]=0.4, E[X²]=0.4. What is Var(X)? Round to 3 decimal places.',
+            qDE: 'X ~ Ber(0,4), E[X]=0,4, E[X²]=0,4. Was ist Var(X)? Runde auf 3 Nachkommastellen.',
             answer: 0.24, tolerance: 0.001, unit: '',
             hintEn: 'Var(X) = E[X²] − (E[X])²',
             hintDE: 'Var(X) = E[X²] − (E[X])²',
@@ -1395,8 +1395,8 @@ const MATH_GATE_POOLS = {
         // ── 13. TRANSFORMATIONSSATZ FÜR ERWARTUNGSWERT ───────────────────────────
 
         {
-            q: 'X has density P(X=1)=0.4, P(X=2)=0.6. What is E[X²]? Enter as a decimal.',
-            qDE: 'X hat Zähldichte P(X=1)=0,4, P(X=2)=0,6. Was ist E[X²]? Gib als Dezimalzahl ein.',
+            q: 'X has density P(X=1)=0.4, P(X=2)=0.6. What is E[X²]? Round to 3 decimal places.',
+            qDE: 'X hat Zähldichte P(X=1)=0,4, P(X=2)=0,6. Was ist E[X²]? Runde auf 3 Nachkommastellen.',
             answer: 2.8, tolerance: 0.001, unit: '',
             hintEn: 'E[g(X)] = Σ g(x)·p(x). E[X²]',
             hintDE: 'E[g(X)] = Σ g(x)·p(x). E[X²]',
@@ -1404,8 +1404,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Mit dem Transformationssatz für den Erwartungswert: E[X²] = 1²×0,4 + 2²×0,6 = 0,4 + 2,4 = 2,8."
         },
         {
-            q: 'X has density P(X=0)=0.3, P(X=1)=0.5, P(X=2)=0.2. What is E[X²]? Enter as a decimal.',
-            qDE: 'X hat Zähldichte P(X=0)=0,3, P(X=1)=0,5, P(X=2)=0,2. Was ist E[X²]? Gib als Dezimalzahl ein.',
+            q: 'X has density P(X=0)=0.3, P(X=1)=0.5, P(X=2)=0.2. What is E[X²]? Round to 3 decimal places.',
+            qDE: 'X hat Zähldichte P(X=0)=0,3, P(X=1)=0,5, P(X=2)=0,2. Was ist E[X²]? Runde auf 3 Nachkommastellen.',
             answer: 1.3, tolerance: 0.001, unit: '',
             hintEn: 'E[X²] = 0²·0.3 + 1²·0.5 + 2²·0.2',
             hintDE: 'E[X²] = 0²·0,3 + 1²·0,5 + 2²·0,2',
@@ -1425,8 +1425,8 @@ const MATH_GATE_POOLS = {
         // ── 14. BINOMIALVERTEILUNG ────────────────────────────────────────────────
 
         {
-            q: 'X ~ Bin(5,0.5). What is E[X]? Enter as a decimal.',
-            qDE: 'X ~ Bin(5,0,5). Was ist E[X]? Gib als Dezimalzahl ein.',
+            q: 'X ~ Bin(5,0.5). What is E[X]? Round to 3 decimal places.',
+            qDE: 'X ~ Bin(5,0,5). Was ist E[X]? Runde auf 3 Nachkommastellen.',
             answer: 2.5, tolerance: 0.001, unit: '',
             hintEn: 'E[X] = n·p',
             hintDE: 'E[X] = n·p',
@@ -1434,8 +1434,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei einer binomialverteilten Zufallsvariable ist der Erwartungswert das Produkt aus Anzahl der Versuche und Erfolgswahrscheinlichkeit: E[X] = n·p = 5×0,5 = 2,5."
         },
         {
-            q: 'X ~ Bin(4,0.5). What is P(X=2)? Enter as a decimal.',
-            qDE: 'X ~ Bin(4,0,5). Was ist P(X=2)? Gib als Dezimalzahl ein.',
+            q: 'X ~ Bin(4,0.5). What is P(X=2)? Round to 3 decimal places.',
+            qDE: 'X ~ Bin(4,0,5). Was ist P(X=2)? Runde auf 3 Nachkommastellen.',
             answer: 0.375, tolerance: 0.002, unit: '',
             hintEn: 'P(X=2) = binomialcoefficient(4,2)·0.5²·0.5²',
             hintDE: 'P(X=2) = binomialkoeffizient(4,2)·0,5²·0,5²',
@@ -1443,8 +1443,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Mit der Zähldichte der Binomialverteilung gilt P(X=2) = C(4,2)·0,5²·0,5² = 6×0,0625 = 0,375."
         },
         {
-            q: 'X ~ Bin(10,0.3). What is Var(X)? Enter as a decimal.',
-            qDE: 'X ~ Bin(10,0,3). Was ist Var(X)? Gib als Dezimalzahl ein.',
+            q: 'X ~ Bin(10,0.3). What is Var(X)? Round to 3 decimal places.',
+            qDE: 'X ~ Bin(10,0,3). Was ist Var(X)? Runde auf 3 Nachkommastellen.',
             answer: 2.1, tolerance: 0.001, unit: '',
             hintEn: 'Var(X) = n·p·(1−p)',
             hintDE: 'Var(X) = n·p·(1−p)',
@@ -1515,7 +1515,7 @@ const MATH_GATE_POOLS = {
         // ── 17. URNENMODELL OHNE REIHENFOLGE MIT ZURÜCKLEGEN ─────────────────────
 
         {
-            q: 'An urn has 4 balls. You draw 2 with replacement, ignoring order. How many distinc unordered outcomes are possible?',
+            q: 'An urn has 4 balls. You draw 2 with replacement, ignoring order. How many distinct unordered outcomes are possible?',
             qDE: 'Eine Urne hat 4 Bälle. Du ziehst 2 mit Zurücklegen, Reihenfolge egal. Wie viele verschiedene ungeordnete Ergebnisse sind möglich?',
             answer: 10, tolerance: 0, unit: 'outcomes',
             hintEn: 'With replacement, no order: C(n+k−1, k) = C(4+2−1, 2) for the binomial coefficient C',
@@ -1550,8 +1550,8 @@ const MATH_GATE_POOLS = {
 
         // ── 1. HYPERGEOMETRISCHE VERTEILUNG ──────────────────────────────────────────
         {
-            q: 'An urn has 10 balls: 4 red, 6 blue. Draw 3 without replacement. What is P(exactly 2 red)? Enter as a decimal rounded to 4 places.',
-            qDE: 'Eine Urne hat 10 Bälle: 4 rote, 6 blaue. Ziehe 3 ohne Zurücklegen. Was ist P(genau 2 rote)? Runde auf 4 Stellen.',
+            q: 'An urn has 10 balls: 4 red, 6 blue. Draw 3 without replacement. What is P(exactly 2 red)? Round to 3 decimal places.',
+            qDE: 'Eine Urne hat 10 Bälle: 4 rote, 6 blaue. Ziehe 3 ohne Zurücklegen. P(genau 2 rote)? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'C(4,2)·C(6,1)/C(10,3) for the binomial coefficient C',
             hintDE: 'C(4,2)·C(6,1)/C(10,3) für den Binomialkoeffizient C',
@@ -1559,8 +1559,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Dies folgt der hypergeometrischen Formel: die Möglichkeiten, 2 der 4 roten Bälle mit 1 der 6 blauen zu kombinieren, geteilt durch alle Möglichkeiten, 3 aus 10 zu wählen: C(4,2)·C(6,1)/C(10,3) = 6×6/120 = 0,3."
         },
         {
-            q: 'Urn with N=8 balls, K=3 red, draw n=2 without replacement. What is E[X] where X = number of red balls drawn? Enter as a decimal.',
-            qDE: 'Urne mit N=8 Bälle, K=3 rote, ziehe n=2 ohne Zurücklegen. Was ist E[X], wobei X = Anzahl roter Bälle? Gib als Dezimalzahl ein.',
+            q: 'Urn with N=8 balls, K=3 red, draw n=2 without replacement. What is E[X] where X = number of red balls drawn? Round to 3 decimal places.',
+            qDE: 'Urne mit N=8 Bällen, K=3 rote, ziehe n=2 ohne Zurücklegen. Was ist E[X], wobei X = Anzahl roter Bälle? Runde auf 3 Nachkommastellen.',
             answer: 0.75, tolerance: 0.001, unit: '',
             hintEn: 'E[X] = n·K/N',
             hintDE: 'E[X] = n·K/N',
@@ -1570,8 +1570,8 @@ const MATH_GATE_POOLS = {
 
         // ── 2. GEOMETRISCHE VERTEILUNG ────────────────────────────────────────────────
         {
-            q: 'X ~ Ge(0.4): number of trials until first success. What is P(X=3)? Enter as a decimal.',
-            qDE: 'X ~ Geo(0,4): Anzahl Versuche bis zum ersten Erfolg. Was ist P(X=3)? Gib als Dezimalzahl ein.',
+            q: 'X ~ Ge(0.4): number of trials until first success. What is P(X=3)? Round to 3 decimal places.',
+            qDE: 'X ~ Geo(0,4): Anzahl Versuche bis zum ersten Erfolg. Was ist P(X=3)? Runde auf 3 Nachkommastellen.',
             answer: 0.144, tolerance: 0.002, unit: '',
             hintEn: 'P(X=3) = 0.6²·0.4',
             hintDE: 'P(X=3) = 0,6²·0,4',
@@ -1588,8 +1588,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei der geometrischen Verteilung ist die erwartete Anzahl an Versuchen bis zum ersten Erfolg E[X] = 1/p = 1/0,25 = 4."
         },
         {
-            q: 'X ~ Geo(0.5). What is P(X > 3)? Enter as a decimal.',
-            qDE: 'X ~ Geo(p=0,5). Was ist P(X > 3)? Gib als Dezimalzahl ein.',
+            q: 'X ~ Geo(0.5). What is P(X > 3)? Round to 3 decimal places.',
+            qDE: 'X ~ Geo(p=0,5). Was ist P(X > 3)? Runde auf 3 Nachkommastellen.',
             answer: 0.125, tolerance: 0.001, unit: '',
             hintEn: 'P(X > 3) = (1−0.5)³.',
             hintDE: 'P(X > 3) = (1−0,5)³',
@@ -1599,8 +1599,8 @@ const MATH_GATE_POOLS = {
 
         // ── 3. BERNOULLI-FOLGE ────────────────────────────────────────────────────────
         {
-            q: 'A Bernoulli sequence has p=0.3. What is the probability of the pattern S-F-S (success, failure, success) in exactly that order?',
-            qDE: 'Eine Bernoulli-Folge hat p=0,3. Was ist die Wahrscheinlichkeit des Musters E-M-E (Erfolg, Misserfolg, Erfolg) in genau dieser Reihenfolge?',
+            q: 'A Bernoulli sequence has p=0.3. What is the probability of the pattern S-F-S (success, failure, success) in exactly that order? Enter as a decimal. Round to 3 decimal places.',
+            qDE: 'Eine Bernoulli-Folge hat p=0,3. Was ist die Wahrscheinlichkeit des Musters E-M-E (Erfolg, Misserfolg, Erfolg) in genau dieser Reihenfolge? Runde auf 3 Nachkommastellen.',
             answer: 0.063, tolerance: 0.001, unit: '',
             hintEn: 'P = p·(1−p)·p',
             hintDE: 'P = p·(1−p)·p',
@@ -1608,8 +1608,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Da die Versuche in einer Bernoulli-Folge unabhängig sind, ist die Wahrscheinlichkeit eines bestimmten Musters das Produkt der Einzelwahrscheinlichkeiten: 0,3×0,7×0,3 = 0,063."
         },
         {
-            q: 'In a Bernoulli sequence with p=0.5, what is the probability of getting exactly 3 successes in 5 trials?',
-            qDE: 'In einer Bernoulli-Folge mit p=0,5: Was ist die Wahrscheinlichkeit von genau 3 Erfolgen in 5 Versuchen?',
+            q: 'In a Bernoulli sequence with p=0.5, what is the probability of getting exactly 3 successes in 5 trials? Round to 3 decimal places.',
+            qDE: 'In einer Bernoulli-Folge mit p=0,5: Was ist die Wahrscheinlichkeit von genau 3 Erfolgen in 5 Versuchen? Runde auf 3 Nachkommastellen.',
             answer: 0.3125, tolerance: 0.001, unit: '',
             hintEn: 'C(5,3)·0.5³·0.5² with C as binomial coefficient.',
             hintDE: 'C(5,3)·0,5³·0,5² mit C als Binomialkoeffizient',
@@ -1617,8 +1617,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Dies ist eine Binomialwahrscheinlichkeit: C(5,3)·p³·(1−p)² = 10×0,125×0,25 = 0,3125."
         },
         {
-            q: 'A Bernoulli sequence has p=0.2. What is the probability that the first success occurs on trial 4 or later? . Enter as a decimal.',
-            qDE: 'Eine Bernoulli-Folge hat p=0,2. Was ist P(X ≥ 4), d.h. der erste Erfolg tritt frühestens beim 4. Versuch auf? Gib als Dezimalzahl ein.',
+            q: 'A Bernoulli sequence has p=0.2. What is the probability that the first success occurs on trial 4 or later? Round to 3 decimal places.',
+            qDE: 'Eine Bernoulli-Folge hat p=0,2. Was ist P(X ≥ 4), d.h. der erste Erfolg tritt frühestens beim 4. Versuch auf? Runde auf 3 Nachkommastellen.',
             answer: 0.512, tolerance: 0.001, unit: '',
             hintEn: 'P(X ≥ 4) = (1−p)³',
             hintDE: 'P(X ≥ 4) = (1−p)³',
@@ -1628,8 +1628,8 @@ const MATH_GATE_POOLS = {
 
         // ── 4. NEGATIVE BINOMIALVERTEILUNG ───────────────────────────────────────────
         {
-            q: 'X ~ NegBin(r=2, p=0.5): number of trials until 2nd success. What is P(X=4)? Enter as a decimal.',
-            qDE: 'X ~ NegBin(r=2, p=0,5): Anzahl Versuche bis zum 2. Erfolg. Was ist P(X=4)? Gib als Dezimalzahl ein.',
+            q: 'X ~ NegBin(r=2, p=0.5): number of trials until 2nd success. What is P(X=4)? Round to 3 decimal places.',
+            qDE: 'X ~ NegBin(r=2, p=0,5): Anzahl Versuche bis zum 2. Erfolg. Was ist P(X=4)? Runde auf 3 Nachkommastellen.',
             answer: 0.1875, tolerance: 0.002, unit: '',
             hintEn: 'P(X=4) = C(3,1)·0.5²·0.5² with C as binomial coefficient',
             hintDE: 'P(X=4) = C(3,1)·0,5²·0,5² mit C als Binomialkoeffizient',
@@ -1637,8 +1637,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Zähldichte der negativen Binomialverteilung erfordert, dass der 2. Erfolg genau beim 4. Versuch eintritt, d.h. genau 1 Erfolg unter den ersten 3 Versuchen, gefolgt von einem Erfolg: P(X=4) = C(3,1)·p²·(1−p)² = 3×0,25×0,25 = 0,1875."
         },
         {
-            q: 'X ~ NegBin(r=3, p=0.4). What is E[X]? Enter as a decimal.',
-            qDE: 'X ~ NegBin(r=3, p=0,4). Was ist E[X]? Gib als Dezimalzahl ein.',
+            q: 'X ~ NegBin(r=3, p=0.4). What is E[X]? Round to 3 decimal places.',
+            qDE: 'X ~ NegBin(r=3, p=0,4). Was ist E[X]? Runde auf 3 Nachkommastellen.',
             answer: 7.5, tolerance: 0.001, unit: '',
             hintEn: 'E[X] = r/p',
             hintDE: 'E[X] = r/p',
@@ -1657,8 +1657,8 @@ const MATH_GATE_POOLS = {
 
         // ── 5. POISSONVERTEILUNG ──────────────────────────────────────────────────────
         {
-            q: 'X ~ Poi(3). What is P(X=0)? Enter as a decimal rounded to 4 places.',
-            qDE: 'X ~ Poi(3). Was ist P(X=0)? Auf 4 Stellen gerundet.',
+            q: 'X ~ Poi(3). What is P(X=0)? Round to 3 decimal places.',
+            qDE: 'X ~ Poi(3). Was ist P(X=0)? Runde auf 3 Nachkommastellen.',
             answer: 0.0498, tolerance: 0.001, unit: '',
             hintEn: 'P(X=0) = e^(−3)·3⁰/0!',
             hintDE: 'P(X=0) = e^(−3)·3⁰/0!',
@@ -1666,8 +1666,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Zähldichte der Poissonverteilung reduziert sich bei 0 auf e^(−λ): P(X=0) = e^(−3)·3⁰/0! = e^(−3) ≈ 0,0498."
         },
         {
-            q: 'X ~ Poi(2). What is P(X=2)? Enter as a decimal rounded to 4 places.',
-            qDE: 'X ~ Poi(2). Was ist P(X=2)? Auf 4 Stellen gerundet.',
+            q: 'X ~ Poi(2). What is P(X=2)? Round to 3 decimal places.',
+            qDE: 'X ~ Poi(2). Was ist P(X=2)? Runde auf 3 Nachkommastellen.',
             answer: 0.2707, tolerance: 0.002, unit: '',
             hintEn: 'P(X=2) = e^(−2)·2²/2!',
             hintDE: 'P(X=2) = e^(−2)·2²/2!',
@@ -1686,8 +1686,8 @@ const MATH_GATE_POOLS = {
 
         // ── 6. POISSON-GRENZWERTSATZ ──────────────────────────────────────────────────
         {
-            q: 'X ~ Bin(100,0.03). Approximate using Poisson. What is λ? Enter as a decimal.',
-            qDE: 'X ~ Bin(100,0,03). Approximiere durch die Poissonverteilung an. Was ist λ? Gib als Dezimalzahl ein.',
+            q: 'X ~ Bin(100,0.03). Approximate using Poisson. What is λ? Round to 3 decimal places.',
+            qDE: 'X ~ Bin(100,0,03). Approximiere durch die Poissonverteilung an. Was ist λ? Runde auf 3 Nachkommastellen.',
             answer: 3.0, tolerance: 0.001, unit: '',
             hintEn: 'λ = n·p = 100·0.03.',
             hintDE: 'λ = n·p = 100·0,03.',
@@ -1695,8 +1695,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei der Poisson-Approximation der Binomialverteilung ist der Ratenparameter λ = n·p = 100×0,03 = 3."
         },
         {
-            q: 'X ~ Bin(200,0.01). Using the Poisson approximation with λ=n·p, what is P(X=0)? Enter as a decimal rounded to 4 places.',
-            qDE: 'X ~ Bin(200,0,01). Mit der Poisson-Näherung λ=n·p: Was ist P(X=0)? Auf 4 Stellen runden.',
+            q: 'X ~ Bin(200,0.01). Using the Poisson approximation with λ=n·p, what is P(X=0)? Round to 3 decimal places.',
+            qDE: 'X ~ Bin(200,0,01). Mit der Poisson-Näherung λ=n·p: Was ist P(X=0)? Runde auf 3 Nachkommastellen.',
             answer: 0.1353, tolerance: 0.002, unit: '',
             hintEn: 'λ = 2. P(X=0).',
             hintDE: 'λ = 2. P(X=0).',
@@ -1704,8 +1704,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Mit λ = n·p = 200×0,01 = 2 ergibt die Poisson-Näherung P(X=0) = e^(−2) ≈ 0,1353."
         },
         {
-            q: 'For the Poisson limit theorem, the approximation Bin(n,p) ≈ Poi(λ) is good when n is large and p is small. If n=1000 and λ=2, what is p? Enter as a decimal.',
-            qDE: 'Für den Poisson-Grenzwertsatz gilt Bin(n,p) ≈ Poi(λ) gut, wenn n groß und p klein ist. Wenn n=1000 und λ=2, was ist p? Gib als Dezimalzahl ein.',
+            q: 'For the Poisson limit theorem, the approximation Bin(n,p) ≈ Poi(λ) is good when n is large and p is small. If n=1000 and λ=2, what is p? Round to 4 decimal places.',
+            qDE: 'Für den Poisson-Grenzwertsatz gilt Bin(n,p) ≈ Poi(λ) gut, wenn n groß und p klein ist. Wenn n=1000 und λ=2, was ist p? Runde auf 4 Nachkommastellen.',
             answer: 0.002, tolerance: 0.0001, unit: '',
             hintEn: 'p = λ/n',
             hintDE: 'p = λ/n',
@@ -1724,8 +1724,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei einer Gleichverteilung ist der Erwartungswert der Mittelpunkt des Intervalls: E[X] = (a+b)/2 = (2+8)/2 = 5."
         },
         {
-            q: 'X ~ U[0, 10]. What is P(3 ≤ X ≤ 7)? Enter as a decimal.',
-            qDE: 'X ~ U[0, 10]. Was ist P(3 ≤ X ≤ 7)? Gib als Dezimalzahl ein.',
+            q: 'X ~ U[0, 10]. What is P(3 ≤ X ≤ 7)? Round to 3 decimal places.',
+            qDE: 'X ~ U[0, 10]. Was ist P(3 ≤ X ≤ 7)? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'P(3 ≤ X ≤ 7) = (7−3)/(10−0)',
             hintDE: 'P(3 ≤ X ≤ 7) = (7−3)/(10−0)',
@@ -1734,7 +1734,7 @@ const MATH_GATE_POOLS = {
         },
         {
             q: 'X ~ U[a, b]. For a=0, b=6, what is Var(X)? Enter as a whole number.',
-            qDE: 'X ~ U[a, b].Für a=0, b=6: Was ist Var(X)? Gib eine ganze Zahl ein.',
+            qDE: 'X ~ U[a, b]. Für a=0, b=6: Was ist Var(X)? Gib eine ganze Zahl ein.',
             answer: 3, tolerance: 0, unit: '',
             hintEn: 'Var(X) = (6−0)²/12',
             hintDE: 'Var(X) = (6−0)²/12',
@@ -1753,8 +1753,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei der Exponentialverteilung ist der Erwartungswert der Kehrwert der Rate: E[X] = 1/λ = 1/0,5 = 2."
         },
         {
-            q: 'X ~ Exp(2). What is P(X ≤ 1)? Enter as a decimal rounded to 4 places.',
-            qDE: 'X ~ Exp(λ=2). Was ist P(X ≤ 1)? Auf 4 Stellen runden.',
+            q: 'X ~ Exp(2). What is P(X ≤ 1)? Round to 3 decimal places.',
+            qDE: 'X ~ Exp(λ=2). Was ist P(X ≤ 1)? Runde auf 3 Nachkommastellen.',
             answer: 0.8647, tolerance: 0.002, unit: '',
             hintEn: 'F(1) = 1 − e^(−2)',
             hintDE: 'F(1) = 1 − e^(−2)',
@@ -1763,7 +1763,7 @@ const MATH_GATE_POOLS = {
         },
         {
             q: 'X ~ Exp(3). What is Var(X)? Enter as a decimal rounded to 2 places.',
-            qDE: 'X ~ Exp(3). Was ist Var(X)? Auf 2 Stellen runden',
+            qDE: 'X ~ Exp(3). Was ist Var(X)? Auf 2 Stellen runden.',
             answer: 0.11, tolerance: 0.02, unit: '',
             hintEn: 'Var(X) = 1/λ² = 1/9.',
             hintDE: 'Var(X) = 1/λ² = 1/9.',
@@ -1783,8 +1783,8 @@ const MATH_GATE_POOLS = {
         },
 
         {
-            q: 'X ~ N(0,1). What is P(−1.96 ≤ X ≤ 1.96)? Enter as a decimal.',
-            qDE: 'X ~ N(μ=0, σ=1). Was ist P(−1,96 ≤ X ≤ 1,96)? Gib als Dezimalzahl ein.',
+            q: 'X ~ N(0,1). What is P(−1.96 ≤ X ≤ 1.96)? Round to 3 decimal places.',
+            qDE: 'X ~ N(μ=0, σ=1). Was ist P(−1,96 ≤ X ≤ 1,96)? Runde auf 3 Nachkommastellen.',
             answer: 0.95, tolerance: 0.002, unit: '',
             hintEn: 'P(−1.96 ≤ Z ≤ 1.96) = Φ(1.96) − Φ(−1.96) ',
             hintDE: 'P(−1,96 ≤ Z ≤ 1,96) = Φ(1,96) − Φ(−1,96) ',
@@ -1812,8 +1812,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei unabhängigen Zufallsvariablen addieren sich die Varianzen: Var(X+Y) = Var(X) + Var(Y) = 1 + 4 = 5."
         },
         {
-            q: 'X ~ N(10,3). What is P(X ≤ 10)? Enter as a decimal.',
-            qDE: 'X ~ N(10,3). Was ist P(X ≤ 10)? Gib als Dezimalzahl ein.',
+            q: 'X ~ N(10,3). What is P(X ≤ 10)? Round to 3 decimal places.',
+            qDE: 'X ~ N(10,3). Was ist P(X ≤ 10)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'Symmetry',
             hintDE: 'Symmetrie',
@@ -1823,8 +1823,8 @@ const MATH_GATE_POOLS = {
 
         // ── 11. ZUFALLSVEKTOREN ───────────────────────────────────────────────────────
         {
-            q: 'A random vector (X,Y) has joint density: p(0,0)=0.1, p(0,1)=0.2, p(1,0)=0.3, p(1,1)=0.4. What is P(X=1)? Enter as a decimal.',
-            qDE: 'Ein Zufallsvektor (X,Y) hat gemeinsame Zähldichte: p(0,0)=0,1, p(0,1)=0,2, p(1,0)=0,3, p(1,1)=0,4. Was ist P(X=1)? Gib als Dezimalzahl ein.',
+            q: 'A random vector (X,Y) has joint density: p(0,0)=0.1, p(0,1)=0.2, p(1,0)=0.3, p(1,1)=0.4. What is P(X=1)? Round to 3 decimal places.',
+            qDE: 'Ein Zufallsvektor (X,Y) hat gemeinsame Zähldichte: p(0,0)=0,1, p(0,1)=0,2, p(1,0)=0,3, p(1,1)=0,4. Was ist P(X=1)? Runde auf 3 Nachkommastellen.',
             answer: 0.7, tolerance: 0.001, unit: '',
             hintEn: 'P(X=1) = p(1,0) + p(1,1)',
             hintDE: 'P(X=1) = p(1,0) + p(1,1)',
@@ -1832,8 +1832,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Randwahrscheinlichkeit P(X=1) summiert die gemeinsamen Wahrscheinlichkeiten über alle Werte von Y: p(1,0) + p(1,1) = 0,3 + 0,4 = 0,7."
         },
         {
-            q: 'A random vector (X,Y) has joint density p(0,0)=0.1, p(0,1)=0.2, p(1,0)=0.3, p(1,1)=0.4. What is P(Y=1)? Enter as a decimal.',
-            qDE: 'Ein Zufallsvektor (X,Y) hat die gemeinsame Zähldichte: p(0,0)=0,1, p(0,1)=0,2, p(1,0)=0,3, p(1,1)=0,4. Was ist P(Y=1)? Gib als Dezimalzahl ein.',
+            q: 'A random vector (X,Y) has joint density p(0,0)=0.1, p(0,1)=0.2, p(1,0)=0.3, p(1,1)=0.4. What is P(Y=1)? Round to 3 decimal places.',
+            qDE: 'Ein Zufallsvektor (X,Y) hat die gemeinsame Zähldichte: p(0,0)=0,1, p(0,1)=0,2, p(1,0)=0,3, p(1,1)=0,4. Was ist P(Y=1)? Runde auf 3 Nachkommastellen.',
             answer: 0.6, tolerance: 0.001, unit: '',
             hintEn: 'P(Y=1) = p(0,1) + p(1,1)',
             hintDE: 'P(Y=1) = p(0,1) + p(1,1)',
@@ -1841,8 +1841,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Analog summiert die Randwahrscheinlichkeit P(Y=1) die gemeinsamen Wahrscheinlichkeiten über alle Werte von X: p(0,1) + p(1,1) = 0,2 + 0,4 = 0,6."
         },
         {
-            q: 'A random vector (X,Y) has joint density: p(0,0)=0.1, p(0,1)=0.2, p(1,0)=0.3, p(1,1)=0.4. What is E[X+Y]? Enter as a decimal.',
-            qDE: 'Ein Zufallsvektor (X,Y) hat die gemeinsame Zähldichte: p(0,0)=0,1, p(0,1)=0,2, p(1,0)=0,3, p(1,1)=0,4. Was ist E[X+Y]? Gib als Dezimalzahl ein.',
+            q: 'A random vector (X,Y) has joint density: p(0,0)=0.1, p(0,1)=0.2, p(1,0)=0.3, p(1,1)=0.4. What is E[X+Y]? Round to 3 decimal places.',
+            qDE: 'Ein Zufallsvektor (X,Y) hat die gemeinsame Zähldichte: p(0,0)=0,1, p(0,1)=0,2, p(1,0)=0,3, p(1,1)=0,4. Was ist E[X+Y]? Runde auf 3 Nachkommastellen.',
             answer: 1.3, tolerance: 0.001, unit: '',
             hintEn: 'E[X+Y] = 0·0.1 + 1·0.2 + 1·0.3 + 2·0.4',
             hintDE: 'E[X+Y] = 0·0,1 + 1·0,2 + 1·0,3 + 2·0,4',
@@ -1853,8 +1853,8 @@ const MATH_GATE_POOLS = {
         // ── 12. VERTEILUNG VON ZUFALLSVEKTOREN ───────────────────────────────────────
 
         {
-            q: 'Joint density f(x,y) = 2x on [0,1]². What is the marginal density f_X(x)? Enter the value for x=0.4.',
-            qDE: 'Gemeinsame Dichte f(x,y) = 2x auf [0,1]². Was ist die Randdichte f_X(x)? Gib den Wert für x=0,4 ein.',
+            q: 'Joint density f(x,y) = 2x on [0,1]². What is the marginal density f_X(x)? Enter the value for x=0.4. Round to 3 decimal places.',
+            qDE: 'Gemeinsame Dichte f(x,y) = 2x auf [0,1]². Was ist die Randdichte f_X(x)? Gib den Wert für x=0,4 ein. Runde auf 3 Nachkommastellen.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'Integrate the joint density with respect to y to receive the marginal density f_X(x).',
             hintDE: 'Integriere die gemeinsame Dichte bezüglich y um die Randdichte f_X(x) zu erhalten.',
@@ -1862,8 +1862,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Integrieren der gemeinsamen Dichte über y von 0 bis 1 ergibt f_X(x) = 2x (da der Integrand nicht von y abhängt), also f_X(0,4) = 0,8."
         },
         {
-            q: 'Joint density: p(1,1)=0.3, p(1,2)=0.2, p(2,1)=0.1, p(2,2)=0.4. What is P(X=2, Y=2)? Enter as a decimal.',
-            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,3, p(1,2)=0,2, p(2,1)=0,1, p(2,2)=0,4. Was ist P(X=2, Y=2)? Gib als Dezimalzahl ein.',
+            q: 'Joint density: p(1,1)=0.3, p(1,2)=0.2, p(2,1)=0.1, p(2,2)=0.4. What is P(X=2, Y=2)? Round to 3 decimal places.',
+            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,3, p(1,2)=0,2, p(2,1)=0,1, p(2,2)=0,4. Was ist P(X=2, Y=2)? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'P(X=2, Y=2) = p(2,2)',
             hintDE: 'P(X=2, Y=2) = p(2,2)',
@@ -1874,8 +1874,8 @@ const MATH_GATE_POOLS = {
         // ── 13. PRODUKTVERTEILUNG BEI UNABHÄNGIGKEIT ─────────────────────────────────
 
         {
-            q: 'X and Y are independent with f_X(x)=2x on [0,1] and f_Y(y)=3y² on [0,1]. What is f_{X,Y}(0.5, 0.5)?',
-            qDE: 'X und Y sind unabhängig mit f_X(x)=2x auf [0,1] und f_Y(y)=3y² auf [0,1]. Was ist f_{X,Y}(0,5; 0,5)?',
+            q: 'X and Y are independent with f_X(x)=2x on [0,1] and f_Y(y)=3y² on [0,1]. What is f_{X,Y}(0.5, 0.5)? Round to 3 decimal places.',
+            qDE: 'X und Y sind unabhängig mit f_X(x)=2x auf [0,1] und f_Y(y)=3y² auf [0,1]. Was ist f_{X,Y}(0,5; 0,5)? Runde auf 3 Nachkommastellen.',
             answer: 0.75, tolerance: 0.001, unit: '',
             hintEn: 'f_{X,Y}(0.5,0.5) = f_X(0.5)·f_Y(0.5)',
             hintDE: 'f_{X,Y}(0,5;0,5) = f_X(0,5)·f_Y(0,5)',
@@ -1883,8 +1883,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Bei unabhängigen X und Y faktorisiert die gemeinsame Dichte als f_X(x)·f_Y(y): f_X(0,5)·f_Y(0,5) = 1×0,75 = 0,75."
         },
         {
-            q: 'p_X(0)=0.4, p_X(1)=0.6, p_Y(0)=0.3, p_Y(1)=0.7. If X and Y are independent, what is p(X=1, Y=1)? Enter as a decimal.',
-            qDE: 'p_X(0)=0,4, p_X(1)=0,6, p_Y(0)=0,3, p_Y(1)=0,7. Falls X und Y unabhängig sind, was ist p(X=1, Y=1)? Gib als Dezimalzahl ein.',
+            q: 'p_X(0)=0.4, p_X(1)=0.6, p_Y(0)=0.3, p_Y(1)=0.7. If X and Y are independent, what is p(X=1, Y=1)? Round to 3 decimal places.',
+            qDE: 'p_X(0)=0,4, p_X(1)=0,6, p_Y(0)=0,3, p_Y(1)=0,7. Falls X und Y unabhängig sind, was ist p(X=1, Y=1)? Runde auf 3 Nachkommastellen.',
             answer: 0.42, tolerance: 0.001, unit: '',
             hintEn: 'p(1,1) = p_X(1)·p_Y(1)',
             hintDE: 'p(1,1) = p_X(1)·p_Y(1)',
@@ -1894,8 +1894,8 @@ const MATH_GATE_POOLS = {
 
         // ── 14. BEDINGTE ZÄHLDICHTE ───────────────────────────────────────────────────
         {
-            q: 'Joint density: p(0,0)=0.2, p(0,1)=0.3, p(1,0)=0.1, p(1,1)=0.4. What is p_{Y|X}(1|1) = P(Y=1|X=1)? Enter as a decimal.',
-            qDE: 'Gemeinsame Zähldichte: p(0,0)=0,2, p(0,1)=0,3, p(1,0)=0,1, p(1,1)=0,4. Was ist p_{Y|X}(1|1) = P(Y=1|X=1)? Gib als Dezimalzahl ein.',
+            q: 'Joint density: p(0,0)=0.2, p(0,1)=0.3, p(1,0)=0.1, p(1,1)=0.4. What is p_{Y|X}(1|1) = P(Y=1|X=1)? Round to 3 decimal places.',
+            qDE: 'Gemeinsame Zähldichte: p(0,0)=0,2, p(0,1)=0,3, p(1,0)=0,1, p(1,1)=0,4. Was ist p_{Y|X}(1|1) = P(Y=1|X=1)? Runde auf 3 Nachkommastellen.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'P(Y=1|X=1) = p(1,1)/p_X(1)',
             hintDE: 'P(Y=1|X=1) = p(1,1)/p_X(1)',
@@ -1903,8 +1903,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Zunächst bestimmt man p_X(1) = p(1,0) + p(1,1) = 0,1 + 0,4 = 0,5, dann teilt man: p(1,1)/p_X(1) = 0,4/0,5 = 0,8."
         },
         {
-            q: 'Joint density p(0,0)=0.2, p(0,1)=0.3, p(1,0)=0.1, p(1,1)=0.4. What is p_{Y|X}(0|0) = P(Y=0|X=0)? Enter as a decimal.',
-            qDE: 'Gemeinsame Zähldichte: p(0,0)=0,2, p(0,1)=0,3, p(1,0)=0,1, p(1,1)=0,4. Was ist P(Y=0|X=0)? Gib als Dezimalzahl ein.',
+            q: 'Joint density p(0,0)=0.2, p(0,1)=0.3, p(1,0)=0.1, p(1,1)=0.4. What is p_{Y|X}(0|0) = P(Y=0|X=0)? Round to 3 decimal places.',
+            qDE: 'Gemeinsame Zähldichte: p(0,0)=0,2, p(0,1)=0,3, p(1,0)=0,1, p(1,1)=0,4. Was ist P(Y=0|X=0)? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'P(Y=0|X=0) = p(0,0)/p_X(0)',
             hintDE: 'P(Y=0|X=0) = p(0,0)/p_X(0)',
@@ -1912,8 +1912,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Zunächst bestimmt man p_X(0) = p(0,0) + p(0,1) = 0,2 + 0,3 = 0,5, dann teilt man: p(0,0)/p_X(0) = 0,2/0,5 = 0,4."
         },
         {
-            q: 'Joint density: p(1,1)=0.3, p(1,2)=0.2, p(2,1)=0.1, p(2,2)=0.4. What is E[Y|X=1]? Enter as a decimal.',
-            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,3, p(1,2)=0,2, p(2,1)=0,1, p(2,2)=0,4. Was ist E[Y|X=1]? Gib als Dezimalzahl ein.',
+            q: 'Joint density: p(1,1)=0.3, p(1,2)=0.2, p(2,1)=0.1, p(2,2)=0.4. What is E[Y|X=1]? Round to 3 decimal places.',
+            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,3, p(1,2)=0,2, p(2,1)=0,1, p(2,2)=0,4. Was ist E[Y|X=1]? Runde auf 3 Nachkommastellen.',
             answer: 1.4, tolerance: 0.001, unit: '',
             hintEn: 'p_X(1)=0.5. P(Y=1|X=1)=0.3/0.5=0.6, P(Y=2|X=1)=0.2/0.5=0.4',
             hintDE: 'p_X(1)=0,5. P(Y=1|X=1)=0,3/0,5=0,6, P(Y=2|X=1)=0,2/0,5=0,4',
@@ -1928,9 +1928,9 @@ const MATH_GATE_POOLS = {
         // ── 1. SIMPSONS PARADOXON ─────────────────────────────────────────────────────
 
         {
-            q: 'Hospital A has a 90% survival rate for minor surgery and 60% for major surgery. Hospital B has 85% for minor and 55% for major. But overall Hospital B looks better. Does Simpson\'s Paradox occur when subgroup trends reverse in the aggregate? Enter 1 for yes, 0 for no.',
-            qDE: 'Krankenhaus A hat 90% Überlebensrate bei kleinen und 60% bei großen Operationen. Krankenhaus B hat 85% bzw. 55%. Trotzdem sieht B insgesamt besser aus. Tritt Simpsons Paradoxon auf, wenn sich Trendrichtungen bei Aggregation umkehren? Gib 1 für ja, 0 für nein ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'Hospital A has a 90% survival rate for minor surgery and 60% for major surgery. Hospital B has 85% for minor and 55% for major. But overall Hospital B looks better. Does Simpson\'s Paradox occur when subgroup trends reverse in the aggregate? Enter 0 for yes, 1 for no.',
+            qDE: 'Krankenhaus A hat 90% Überlebensrate bei kleinen und 60% bei großen Operationen. Krankenhaus B hat 85% bzw. 55%. Trotzdem sieht B insgesamt besser aus. Tritt Simpsons Paradoxon auf, wenn sich Trendrichtungen bei Aggregation umkehren? Gib 0 für ja, 1 für nein ein.',
+            answer: 0, tolerance: 0, unit: '',
             hintEn: 'Simpson\'s Paradox: a trend in subgroups can reverse when groups are combined due to unequal group sizes.',
             hintDE: 'Simpsons Paradoxon: Ein Trend in Untergruppen kann sich durch ungleiche Gruppengrößen bei der Aggregation umkehren.',
             explain: "This is exactly the definition of Simpson's Paradox: a trend that holds consistently within every subgroup (here, both surgery types) can reverse once the subgroups are combined, typically due to unequal group sizes.",
@@ -1946,9 +1946,9 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Gesamterfolgsrate ist einfach die Gesamtzahl der Erfolge geteilt durch die Gesamtzahl der Versuche: 70/150 ≈ 46,7%."
         },
         {
-            q: 'In a study, Treatment A beats Treatment B in both men and women separately, but loses overall. The lurking variable causing this is called a __ variable. Enter 1 for confounding, 2 for independent, 3 for random.',
-            qDE: 'In einer Studie schlägt Behandlung A die Behandlung B bei Männern und Frauen separat, verliert aber insgesamt. Die verursachende versteckte Variable heißt __ Variable. Gib 1 für Störvariable, 2 für unabhängige, 3 für zufällige ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'In a study, Treatment A beats Treatment B in both men and women separately, but loses overall. The lurking variable causing this is called a __ variable. Enter 1 for random, 2 for confounding, 3 for independent.',
+            qDE: 'In einer Studie schlägt Behandlung A die Behandlung B bei Männern und Frauen separat, verliert aber insgesamt. Die verursachende versteckte Variable heißt __ Variable. Gib 1 für zufällige, 2 für Störvariable, 3 für unabhängige ein.',
+            answer: 2, tolerance: 0, unit: '',
             hintEn: 'A confounding (lurking) variable creates Simpson\'s Paradox by being correlated with both the grouping and the outcome.',
             hintDE: 'Eine Störvariable (Confounder) erzeugt Simpsons Paradoxon, da sie mit Gruppierung und Ergebnis korreliert.',
             explain: "The hidden variable (here, sex) is correlated with both which treatment a patient tends to receive and the outcome itself, which is precisely what defines a confounding variable.",
@@ -1958,17 +1958,17 @@ const MATH_GATE_POOLS = {
         // ── 2. BEDINGTE DICHTE ────────────────────────────────────────────────────────
 
         {
-            q: 'Joint density f(x,y) = 6x for 0 ≤ x ≤ 1, 0 ≤ y ≤ x. What is f_{Y|X}(y|x) = f(x,y)/f_X(x)? Enter the value at x=0.5, y=0.3.',
-            qDE: 'Gemeinsame Dichte f(x,y) = 6x für 0 ≤ x ≤ 1, 0 ≤ y ≤ x. Was ist f_{Y|X}(y|x) = f(x,y)/f_X(x) bei x=0,5, y=0,3? Gib als Dezimalzahl ein.',
+            q: 'Joint density f(x,y) = 3x for 0 ≤ x ≤ 1, 0 ≤ y ≤ x. What is f_{Y|X}(y|x) = f(x,y)/f_X(x)? Enter the value at x=0.5, y=0.3.',
+            qDE: 'Gemeinsame Dichte f(x,y) = 3x für 0 ≤ x ≤ 1, 0 ≤ y ≤ x. Was ist f_{Y|X}(y|x) = f(x,y)/f_X(x) bei x=0,5, y=0,3? Runde auf 2 Nachkommastellen.',
             answer: 2.0, tolerance: 0.01, unit: '',
             hintEn: 'Calculate the marginal density',
             hintDE: 'Bestimme die Randdichte',
-            explain: "The marginal density is f_X(x) = ∫₀ˣ 6x dy = 6x², so f_{Y|X}(y|x) = f(x,y)/f_X(x) = 6x/6x² = 1/x; at x=0.5, this gives 1/0.5 = 2.0.",
-            explainDE: "Die Randdichte ist f_X(x) = ∫₀ˣ 6x dy = 6x², also f_{Y|X}(y|x) = f(x,y)/f_X(x) = 6x/6x² = 1/x; bei x=0,5 ergibt das 1/0,5 = 2,0."
+            explain: "The marginal density is f_X(x) = ∫₀ˣ 3x dy = 3x², so f_{Y|X}(y|x) = f(x,y)/f_X(x) = 3x/3x² = 1/x; at x=0.5, this gives 1/0.5 = 2.",
+            explainDE: "Die Randdichte ist f_X(x) = ∫₀ˣ 3x dy = 3x², also f_{Y|X}(y|x) = f(x,y)/f_X(x) = 3x/3x² = 1/x; bei x=0,5 ergibt das 1/0,5 = 2."
         },
         {
-            q: 'Joint density: p(1,1)=0.2, p(1,2)=0.3, p(2,1)=0.1, p(2,2)=0.4. What is the conditional density p_{Y|X}(2|2) = P(Y=2|X=2)? Enter as a decimal.',
-            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,2, p(1,2)=0,3, p(2,1)=0,1, p(2,2)=0,4. Was ist p_{Y|X}(2|2) = P(Y=2|X=2)? Gib als Dezimalzahl ein.',
+            q: 'Joint density: p(1,1)=0.2, p(1,2)=0.3, p(2,1)=0.1, p(2,2)=0.4. What is the conditional density p_{Y|X}(2|2) = P(Y=2|X=2)? Round to 3 decimal places.',
+            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,2, p(1,2)=0,3, p(2,1)=0,1, p(2,2)=0,4. Was ist p_{Y|X}(2|2) = P(Y=2|X=2)? Runde auf 3 Nachkommastellen.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'p_X(2) = p(2,1)+p(2,2)',
             hintDE: 'p_X(2) = p(2,1)+p(2,2)',
@@ -1976,8 +1976,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Zunächst bestimmt man p_X(2) = p(2,1)+p(2,2) = 0,1+0,4 = 0,5, dann teilt man: p(2,2)/p_X(2) = 0,4/0,5 = 0,8."
         },
         {
-            q: 'Joint density f(x,y) = 2 for 0 ≤ y ≤ x ≤ 1. The marginal f_X(x) = 2x. What is f_{Y|X}(y|x)? Enter the value at x=0.6, y=0.3.',
-            qDE: 'Gemeinsame Dichte f(x,y) = 2 für 0 ≤ y ≤ x ≤ 1. Randdichte f_X(x) = 2x. Was ist f_{Y|X}(y|x) bei x=0,6, y=0,3? Gib als Dezimalzahl ein.',
+            q: 'Joint density f(x,y) = 2 for 0 ≤ y ≤ x ≤ 1. The marginal f_X(x) = 2x. What is f_{Y|X}(y|x)? Enter the value at x=0.6, y=0.3. Round to 3 decimal places.',
+            qDE: 'Gemeinsame Dichte f(x,y) = 2 für 0 ≤ y ≤ x ≤ 1. Randdichte f_X(x) = 2x. Was ist f_{Y|X}(y|x) bei x=0,6, y=0,3? Runde auf 3 Nachkommastellen.',
             answer: 1.667, tolerance: 0.005, unit: '',
             hintEn: 'f_{Y|X}(y|x) = 2 / 2x = 1/x.',
             hintDE: 'f_{Y|X}(y|x) = 2 / 2x = 1/x.',
@@ -1991,8 +1991,8 @@ const MATH_GATE_POOLS = {
         // ── 4. BEDINGTER ERWARTUNGSWERT DISKRET ───────────────────────────────────────
 
         {
-            q: 'Joint density: p(1,1)=0.3, p(1,2)=0.2, p(2,1)=0.1, p(2,2)=0.4. What is E[Y|X=2]? Enter as a decimal.',
-            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,3, p(1,2)=0,2, p(2,1)=0,1, p(2,2)=0,4. Was ist ist E[Y|X=2]? Gib als Dezimalzahl ein.',
+            q: 'Joint density: p(1,1)=0.3, p(1,2)=0.2, p(2,1)=0.1, p(2,2)=0.4. What is E[Y|X=2]? Round to 3 decimal places.',
+            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,3, p(1,2)=0,2, p(2,1)=0,1, p(2,2)=0,4. Was ist E[Y|X=2]? Runde auf 3 Nachkommastellen.',
             answer: 1.8, tolerance: 0.001, unit: '',
             hintEn: 'p_X(2)=0.5. P(Y=1|X=2)=0.1/0.5=0.2, P(Y=2|X=2)=0.4/0.5=0.8.',
             hintDE: 'p_X(2)=0,5. P(Y=1|X=2)=0,1/0,5=0,2, P(Y=2|X=2)=0,4/0,5=0,8.',
@@ -2000,8 +2000,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Zunächst bestimmt man p_X(2) = p(2,1)+p(2,2) = 0,5, was die bedingten Wahrscheinlichkeiten P(Y=1|X=2) = 0,2 und P(Y=2|X=2) = 0,8 ergibt, sodass E[Y|X=2] = 1×0,2 + 2×0,8 = 1,8."
         },
         {
-            q: 'Joint density: p(0,0)=0.1, p(0,1)=0.4, p(1,0)=0.3, p(1,1)=0.2. What is E[Y|X=0]? Enter as a decimal.',
-            qDE: 'Gemeinsame Zähldichte: p(0,0)=0,1, p(0,1)=0,4, p(1,0)=0,3, p(1,1)=0,2. Was ist E[Y|X=0]? Gib als Dezimalzahl ein.',
+            q: 'Joint density: p(0,0)=0.1, p(0,1)=0.4, p(1,0)=0.3, p(1,1)=0.2. What is E[Y|X=0]? Round to 3 decimal places.',
+            qDE: 'Gemeinsame Zähldichte: p(0,0)=0,1, p(0,1)=0,4, p(1,0)=0,3, p(1,1)=0,2. Was ist E[Y|X=0]? Runde auf 3 Nachkommastellen.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'p_X(0)=0.5. P(Y=0|X=0)=0.2',
             hintDE: 'p_X(0)=0,5. P(Y=0|X=0)=0,2',
@@ -2021,8 +2021,8 @@ const MATH_GATE_POOLS = {
         // ── 5. BEDINGTER ERWARTUNGSWERT STETIG ────────────────────────────────────────
 
         {
-            q: 'Joint density f(x,y) = 2 for 0 ≤ y ≤ x ≤ 1. Conditional density: f_{Y|X}(y|x) = 1/x for y ∈ [0,x]. What is E[Y|X=x]? Enter the formula evaluated at x=0.6.',
-            qDE: 'Gemeinsame Dichte f(x,y) = 2 für 0 ≤ y ≤ x ≤ 1. Bedingte Dichte: f_{Y|X}(y|x) = 1/x. Was ist E[Y|X=x] ausgewertet bei x=0,6? Gib als Dezimalzahl ein.',
+            q: 'Joint density f(x,y) = 2 for 0 ≤ y ≤ x ≤ 1. Conditional density: f_{Y|X}(y|x) = 1/x for y ∈ [0,x]. What is E[Y|X=x]? Enter the formula evaluated at x=0.6. Round to 3 decimal places.',
+            qDE: 'Gemeinsame Dichte f(x,y) = 2 für 0 ≤ y ≤ x ≤ 1. Bedingte Dichte: f_{Y|X}(y|x) = 1/x. Was ist E[Y|X=x] ausgewertet bei x=0,6? Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'E[Y|X=x] = x/2',
             hintDE: 'E[Y|X=x] = x/2',
@@ -2055,8 +2055,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Der Erwartungswertvektor sammelt einfach die Erwartungswerte jeder Komponente der Reihe nach, sodass der zweite Eintrag E[Y] = 7 ist."
         },
         {
-            q: 'X has density P(X=2)=0.5, P(X=4)=0.5 and Y has density P(Y=1)=0.3, P(Y=3)=0.7. What is E[X]+E[Y]? Enter as a decimal.',
-            qDE: 'X hat P(X=2)=0,5, P(X=4)=0,5 und Y hat P(Y=1)=0,3, P(Y=3)=0,7. Was ist E[X]+E[Y]? Gib als Dezimalzahl ein.',
+            q: 'X has density P(X=2)=0.5, P(X=4)=0.5 and Y has density P(Y=1)=0.3, P(Y=3)=0.7. What is E[X]+E[Y]? Round to 3 decimal places.',
+            qDE: 'X hat P(X=2)=0,5, P(X=4)=0,5 und Y hat P(Y=1)=0,3, P(Y=3)=0,7. Was ist E[X]+E[Y]? Runde auf 3 Nachkommastellen.',
             answer: 5.4, tolerance: 0.001, unit: '',
             hintEn: 'E[X]=2·0.5+4·0.5=3. E[Y]=1·0.3+3·0.7=2.4',
             hintDE: 'E[X]=3. E[Y]=0,3+2,1=2,4',
@@ -2085,8 +2085,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Mit der Kovarianzformel: Cov(X,Y) = E[XY] − E[X]·E[Y] = 10 − 2×3 = 4."
         },
         {
-            q: 'Joint density: p(1,1)=0.5, p(2,2)=0.5. E[X]=1.5, E[Y]=1.5. What is Cov(X,Y)? Enter as a decimal.',
-            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,5, p(2,2)=0,5. E[X]=1,5, E[Y]=1,5. Was ist Cov(X,Y)? Gib als Dezimalzahl ein.',
+            q: 'Joint density: p(1,1)=0.5, p(2,2)=0.5. E[X]=1.5, E[Y]=1.5. What is Cov(X,Y)? Round to 3 decimal places.',
+            qDE: 'Gemeinsame Zähldichte: p(1,1)=0,5, p(2,2)=0,5. E[X]=1,5, E[Y]=1,5. Was ist Cov(X,Y)? Runde auf 3 Nachkommastellen.',
             answer: 0.25, tolerance: 0.001, unit: '',
             hintEn: 'E[XY]=2.5',
             hintDE: 'E[XY]=2,5',
@@ -2166,8 +2166,8 @@ const MATH_GATE_POOLS = {
         // ── 11. KORRELATION ───────────────────────────────────────────────────────────
 
         {
-            q: 'Cov(X,Y)=6, Var(X)=9, Var(Y)=16. What is the correlation coefficient ρ(X,Y)? Enter as a decimal.',
-            qDE: 'Cov(X,Y)=6, Var(X)=9, Var(Y)=16. Was ist der Korrelationskoeffizient ρ(X,Y)? Gib als Dezimalzahl ein.',
+            q: 'Cov(X,Y)=6, Var(X)=9, Var(Y)=16. What is the correlation coefficient ρ(X,Y)? Round to 3 decimal places.',
+            qDE: 'Cov(X,Y)=6, Var(X)=9, Var(Y)=16. Was ist der Korrelationskoeffizient ρ(X,Y)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'ρ = Cov(X,Y) / (σ_X · σ_Y)',
             hintDE: 'ρ = Cov(X,Y) / (σ_X · σ_Y)',
@@ -2184,8 +2184,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Ein Korrelationskoeffizient von −1 bedeutet den stärkstmöglichen linearen Zusammenhang in entgegengesetzter Richtung, d.h. X und Y sind perfekt negativ korreliert."
         },
         {
-            q: 'Cov(X,Y)=4, σ_X=2, σ_Y=4. What is ρ(X,Y)? Enter as a decimal.',
-            qDE: 'Cov(X,Y)=4, σ_X=2, σ_Y=4. Was ist ρ(X,Y)? Gib als Dezimalzahl ein.',
+            q: 'Cov(X,Y)=4, σ_X=2, σ_Y=4. What is ρ(X,Y)? Round to 3 decimal places.',
+            qDE: 'Cov(X,Y)=4, σ_X=2, σ_Y=4. Was ist ρ(X,Y)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'ρ = 4 / (2·4)',
             hintDE: 'ρ = 4 / (2·4)',
@@ -2244,8 +2244,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Umstellen der Korrelationsformel liefert direkt die Kovarianz: Cov(X,Y) = ρ·σ_X·σ_Y = 0,5×1×2 = 1."
         },
         {
-            q: '(X,Y) ~ bivariate normal. The marginal distribution of X is also normal. If μ_X=5 and σ²_X=4, what is P(X ≤ 5)? Enter as a decimal.',
-            qDE: '(X,Y) ~ bivariat normalverteilt. Die Randverteilung von X ist ebenfalls normal. Wenn μ_X=5 und σ²_X=4, was ist P(X ≤ 5)? Gib als Dezimalzahl ein.',
+            q: '(X,Y) ~ bivariate normal. The marginal distribution of X is also normal. If μ_X=5 and σ²_X=4, what is P(X ≤ 5)? Round to 3 decimal places.',
+            qDE: '(X,Y) ~ bivariat normalverteilt. Die Randverteilung von X ist ebenfalls normal. Wenn μ_X=5 und σ²_X=4, was ist P(X ≤ 5)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'P(X ≤ μ_X) = 0.5 by symmetry of the normal distribution.',
             hintDE: 'P(X ≤ μ_X) = 0,5 wegen der Symmetrie der Normalverteilung.',
@@ -2281,7 +2281,7 @@ const MATH_GATE_POOLS = {
             qDE: 'X₁, …, Xₙ sind i.i.d. mit E[Xᵢ] = 7. Was ist E[X̄ₙ]?',
             answer: 7, tolerance: 0.001, unit: '',
             hintEn: 'The expected value of the sample mean equals the expected value of each individual variable.',
-            hintDE: 'Der Erwartungswert des Stichprobenmittelwerts entspricht dem Erwartungswert jeder einzelnen Variable.',
+            hintDE: 'Der Erwartungswert des Stichprobenmittelwerts entspricht dem Erwartungswert jeder einzelnen Variablen.',
             explain: "By linearity of expectation, the expected value of the sample mean equals the expected value of each individual observation: E[X̄ₙ] = E[Xᵢ] = 7.",
             explainDE: "Durch die Linearität des Erwartungswerts entspricht der Erwartungswert des Stichprobenmittelwerts dem Erwartungswert jeder einzelnen Beobachtung: E[X̄ₙ] = E[Xᵢ] = 7."
         },
@@ -2316,8 +2316,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Mit der Tschebyscheff-Ungleichung: P(|X−μ| ≥ ε) ≤ Var(X)/ε² = 9/3² = 9/9 = 1."
         },
         {
-            q: 'X has E[X]=0 and Var(X)=4. Use Chebyshev to find an upper bound for P(|X| ≥ 4). Enter as a decimal.',
-            qDE: 'X hat E[X]=0 und Var(X)=4. Was ist die Tschebyscheff-Schranke für P(|X| ≥ 4)? Gib als Dezimalzahl ein.',
+            q: 'X has E[X]=0 and Var(X)=4. Use Chebyshev to find an upper bound for P(|X| ≥ 4). Enter as a decimal. Round to 3 decimal places.',
+            qDE: 'X hat E[X]=0 und Var(X)=4. Was ist die Tschebyscheff-Schranke für P(|X| ≥ 4)? Gib als Dezimalzahl ein. Runde auf 3 Nachkommastellen.',
             answer: 0.25, tolerance: 0.001, unit: '',
             hintEn: 'The Chebyshev bound is Var(X) / ε².',
             hintDE: 'Die Tschebyscheff-Schranke ist Var(X) / ε².',
@@ -2325,8 +2325,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Tschebyscheff-Ungleichung liefert P(|X| ≥ 4) ≤ Var(X)/ε² = 4/4² = 4/16 = 0,25."
         },
         {
-            q: 'X̄ₙ is the mean of n=100 i.i.d. variables with σ²=25 and μ=50. Use Chebyshev to bound P(|X̄ₙ−50| ≥ 1). Enter as a decimal.',
-            qDE: 'X̄ₙ ist der Mittelwert von n=100 i.i.d. Variablen mit σ²=25 und μ=50. Was ist die Tschebyscheff-Schranke für P(|X̄ₙ−50| ≥ 1)? Gib als Dezimalzahl ein.',
+            q: 'X̄ₙ is the mean of n=100 i.i.d. variables with σ²=25 and μ=50. Use Chebyshev to bound P(|X̄ₙ−50| ≥ 1). Enter as a decimal. Round to 3 decimal places.',
+            qDE: 'X̄ₙ ist der Mittelwert von n=100 i.i.d. Variablen mit σ²=25 und μ=50. Was ist die Tschebyscheff-Schranke für P(|X̄ₙ−50| ≥ 1)? Gib als Dezimalzahl ein. Runde auf 3 Nachkommastellen.',
             answer: 0.25, tolerance: 0.001, unit: '',
             hintEn: 'First find Var(X̄ₙ) = σ²/n, then apply the Chebyshev bound.',
             hintDE: 'Bestimme zunächst Var(X̄ₙ) = σ²/n und wende dann die Tschebyscheff-Ungleichung an.',
@@ -2350,7 +2350,7 @@ const MATH_GATE_POOLS = {
             qDE: 'X₁, …, Xₙ sind i.i.d. mit E[Xᵢ]=3 und Var(Xᵢ)=9. Das schwache Gesetz garantiert, dass X̄ₙ stochastisch gegen welchen Wert konvergiert?',
             answer: 3, tolerance: 0.001, unit: '',
             hintEn: 'The sample mean converges to the true expected value of each variable.',
-            hintDE: 'Der Stichprobenmittelwert konvergiert gegen den wahren Erwartungswert jeder Variable.',
+            hintDE: 'Der Stichprobenmittelwert konvergiert gegen den wahren Erwartungswert jeder Variablen.',
             explain: "The weak law of large numbers states that the sample mean converges in probability to the true expected value, which here is 3.",
             explainDE: "Das schwache Gesetz der großen Zahlen besagt, dass der Stichprobenmittelwert stochastisch gegen den wahren Erwartungswert konvergiert, hier also gegen 3."
         },
@@ -2376,9 +2376,9 @@ const MATH_GATE_POOLS = {
         // ── 4. STOCHASTISCHE KONVERGENZ ──────────────────────────────────────────
 
         {
-            q: 'Does almost sure convergence imply convergence in probability? Enter 1 for yes, 0 for no.',
-            qDE: 'Impliziert fast sichere Konvergenz die stochastische Konvergenz? Gib 1 für ja, 0 für nein ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'Does almost sure convergence imply convergence in probability? Enter 0 for yes, 1 for no.',
+            qDE: 'Impliziert fast sichere Konvergenz die stochastische Konvergenz? Gib 0 für ja, 1 für nein ein.',
+            answer: 0, tolerance: 0, unit: '',
             hintEn: 'Think about which convergence type is the stronger one.',
             hintDE: 'Überlege, welche Konvergenzart die stärkere ist.',
             explain: "Almost sure convergence is the stronger convergence concept, and it always implies convergence in probability.",
@@ -2424,8 +2424,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Fast sichere Konvergenz ist die stärkere Konvergenzart; sie impliziert stochastische Konvergenz, aber die Umkehrung gilt im Allgemeinen nicht."
         },
         {
-            q: 'You simulate X̄ₙ for i.i.d. Ber(0.4) variables. As n → ∞, X̄ₙ converges almost surely to which value?',
-            qDE: 'Sie simulieren X̄ₙ für i.i.d. Ber(0,4)-Variablen. Für n → ∞ konvergiert X̄ₙ fast sicher gegen welchen Wert?',
+            q: 'You simulate X̄ₙ for i.i.d. Ber(0.4) variables. As n → ∞, X̄ₙ converges almost surely to which value? Round to 3 decimal places.',
+            qDE: 'Sie simulieren X̄ₙ für i.i.d. Ber(0,4)-Variablen. Für n → ∞ konvergiert X̄ₙ fast sicher gegen welchen Wert? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'The sample mean converges to the true mean of the distribution.',
             hintDE: 'Der Stichprobenmittelwert konvergiert gegen den wahren Erwartungswert der Verteilung.',
@@ -2436,8 +2436,8 @@ const MATH_GATE_POOLS = {
         // ── 6. HAUPTSATZ DER STATISTIK (GLIVENKO–CANTELLI) ──────────────────────
 
         {
-            q: 'You draw n=5 i.i.d. observations: 1, 3, 3, 5, 8. What is the empirical CDF value F̂₅(3)?',
-            qDE: 'Sie ziehen n=5 i.i.d. Beobachtungen: 1, 3, 3, 5, 8. Was ist der Wert der empirischen Verteilungsfunktion F̂₅(3)?',
+            q: 'You draw n=5 i.i.d. observations: 1, 3, 3, 5, 8. What is the empirical CDF value F̂₅(3)? Round to 3 decimal places.',
+            qDE: 'Sie ziehen n=5 i.i.d. Beobachtungen: 1, 3, 3, 5, 8. Was ist der Wert der empirischen Verteilungsfunktion F̂₅(3)? Runde auf 3 Nachkommastellen.',
             answer: 0.6, tolerance: 0.001, unit: '',
             hintEn: 'Count how many observations are ≤ 3, then divide by n.',
             hintDE: 'Zähle die Beobachtungen, die ≤ 3 sind, und teile durch n.',
@@ -2445,8 +2445,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Zählen der Beobachtungen bei oder unter 3 (nämlich 1, 3 und 3) ergibt 3 von 5, sodass F̂₅(3) = 3/5 = 0,6."
         },
         {
-            q: 'You draw n=4 i.i.d. observations: 2, 5, 7, 9. What is F̂₄(5)?',
-            qDE: 'Sie ziehen n=4 i.i.d. Beobachtungen: 2, 5, 7, 9. Was ist F̂₄(5)?',
+            q: 'You draw n=4 i.i.d. observations: 2, 5, 7, 9. What is F̂₄(5)? Round to 3 decimal places.',
+            qDE: 'Sie ziehen n=4 i.i.d. Beobachtungen: 2, 5, 7, 9. Was ist F̂₄(5)? Runde auf 3 Nachkommastellen.',
             answer: 0.5, tolerance: 0.001, unit: '',
             hintEn: 'Count how many observations are ≤ 5, then divide by n.',
             hintDE: 'Zähle die Beobachtungen, die ≤ 5 sind, und teile durch n.',
@@ -2496,8 +2496,8 @@ const MATH_GATE_POOLS = {
         // ── 8. ZENTRALER GRENZWERTSATZ ───────────────────────────────────────────
 
         {
-            q: 'X₁, …, X₃₆ are i.i.d. with μ=10 and σ²=9. By the CLT, X̄₃₆ is approximately normal. What is Var(X̄₃₆)?',
-            qDE: 'X₁, …, X₃₆ sind i.i.d. mit μ=10 und σ²=9. Nach dem ZGS ist X̄₃₆ näherungsweise normalverteilt. Was ist Var(X̄₃₆)?',
+            q: 'X₁, …, X₃₆ are i.i.d. with μ=10 and σ²=9. By the CLT, X̄₃₆ is approximately normal. What is Var(X̄₃₆)? Round to 3 decimal places.',
+            qDE: 'X₁, …, X₃₆ sind i.i.d. mit μ=10 und σ²=9. Nach dem ZGS ist X̄₃₆ näherungsweise normalverteilt. Was ist Var(X̄₃₆)? Runde auf 3 Nachkommastellen.',
             answer: 0.25, tolerance: 0.001, unit: '',
             hintEn: 'Var(X̄ₙ) = σ²/n.',
             hintDE: 'Var(X̄ₙ) = σ²/n.',
@@ -2514,8 +2514,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Der zentrale Grenzwertsatz garantiert, dass die Standardisierung des Stichprobenmittelwerts i.i.d. Variablen unabhängig von der ursprünglichen Verteilung stets näherungsweise standardnormalverteilt ist."
         },
         {
-            q: 'X₁, …, X₁₀₀ are i.i.d. Ber(0.3). The Central Limit Theorem approximates X̄₁₀₀ as normal with variance σ²/n. What is σ²/n here? Enter as a decimal.',
-            qDE: 'X₁, …, X₁₀₀ sind i.i.d. Ber(0,3). Der zentrale Grenzwertsatz nähert X̄₁₀₀ durch eine Normalverteilung mit Varianz σ²/n an. Was ist σ²/n? Gib als Dezimalzahl ein.',
+            q: 'X₁, …, X₁₀₀ are i.i.d. Ber(0.3). The Central Limit Theorem approximates X̄₁₀₀ as normal with variance σ²/n. What is σ²/n here? Enter as a decimal. Round to 4 decimal places.',
+            qDE: 'X₁, …, X₁₀₀ sind i.i.d. Ber(0,3). Der zentrale Grenzwertsatz nähert X̄₁₀₀ durch eine Normalverteilung mit Varianz σ²/n an. Was ist σ²/n? Gib als Dezimalzahl ein. Runde auf 4 Nachkommastellen.',
             answer: 0.0021, tolerance: 0.0001, unit: '',
             hintEn: 'For a Bernoulli(p) variable, σ² = p·(1−p).',
             hintDE: 'Für eine Bernoulli(p)-Variable gilt σ² = p·(1−p).',
@@ -2648,9 +2648,9 @@ const MATH_GATE_POOLS = {
         // ── 4. STATISTIK UND SCHÄTZER ─────────────────────────────────────────────
 
         {
-            q: 'A statistic is a function that takes the observed data as input and produces a numerical output. It must NOT use any unknown parameters. We observe x₁=3, x₂=5, x₄=7. Is the sample mean (3+5+7)/3 a valid statistic? Enter 1 for yes, 0 for no.',
-            qDE: 'Eine Statistik ist eine Funktion, die die beobachteten Daten als Eingabe nimmt und eine numerische Ausgabe produziert. Sie darf KEINE unbekannten Parameter verwenden. Wir beobachten x₁=3, x₂=5, x₃=7. Ist der Stichprobenmittelwert (3+5+7)/3 eine gültige Statistik? Gib 1 für ja, 0 für nein ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'A statistic is a function that takes the observed data as input and produces a numerical output. It must NOT use any unknown parameters. We observe x₁=3, x₂=5, x₃=7. Is the sample mean (3+5+7)/3 a valid statistic? Enter 0 for yes, 1 for no.',
+            qDE: 'Eine Statistik ist eine Funktion, die die beobachteten Daten als Eingabe nimmt und eine numerische Ausgabe produziert. Sie darf KEINE unbekannten Parameter verwenden. Wir beobachten x₁=3, x₂=5, x₃=7. Ist der Stichprobenmittelwert (3+5+7)/3 eine gültige Statistik? Gib 0 für ja, 1 für nein ein.',
+            answer: 0, tolerance: 0, unit: '',
             hintEn: 'Check whether the formula only uses the data values themselves, without any unknown quantities.',
             hintDE: 'Prüfe, ob die Formel nur die Datenwerte selbst verwendet, ohne unbekannte Größen.',
             explain: "Since the sample mean is computed only from the observed data values, without relying on any unknown parameters, it is a valid statistic.",
@@ -2675,9 +2675,9 @@ const MATH_GATE_POOLS = {
             explainDE: "Sobald konkrete Daten in den Schätzer eingesetzt wurden, nennt man die resultierende konkrete Zahl Schätzwert, im Unterschied zum Schätzer selbst, der eine Zufallsvariable ist."
         },
         {
-            q: 'A desirable property of an estimator is that its expected value equals the true parameter value. Such an estimator is called unbiased. If the expected value of an estimator equals the true parameter, is the estimator unbiased? Enter 1 for yes, 0 for no.',
-            qDE: 'Eine wünschenswerte Eigenschaft eines Schätzers ist, dass sein Erwartungswert dem wahren Parameterwert entspricht. Ein solcher Schätzer heißt erwartungstreu. Wenn der Erwartungswert eines Schätzers dem wahren Parameter entspricht, ist der Schätzer erwartungstreu? Gib 1 für ja, 0 für nein ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'A desirable property of an estimator is that its expected value equals the true parameter value. Such an estimator is called unbiased. If the expected value of an estimator equals the true parameter, is the estimator unbiased? Enter 0 for yes, 1 for no.',
+            qDE: 'Eine wünschenswerte Eigenschaft eines Schätzers ist, dass sein Erwartungswert dem wahren Parameterwert entspricht. Ein solcher Schätzer heißt erwartungstreu. Wenn der Erwartungswert eines Schätzers dem wahren Parameter entspricht, ist der Schätzer erwartungstreu? Gib 0 für ja, 1 für nein ein.',
+            answer: 0, tolerance: 0, unit: '',
             hintEn: 'The definition of unbiasedness is exactly that the estimator is correct on average.',
             hintDE: 'Die Definition von Erwartungstreue ist genau, dass der Schätzer im Durchschnitt korrekt ist.',
             explain: "By definition, an estimator is unbiased precisely when its expected value equals the true parameter value.",
@@ -2687,8 +2687,8 @@ const MATH_GATE_POOLS = {
         // ── 5. EMPIRISCHE VERTEILUNGSFUNKTION ALS SCHÄTZER ───────────────────────
 
         {
-            q: 'The empirical distribution function assigns to each value x the fraction of observations that are less than or equal to x. We observe: 2, 5, 5, 8. What is the value of the empirical distribution function at x = 5?',
-            qDE: 'Die empirische Verteilungsfunktion weist jedem Wert x den Anteil der Beobachtungen zu, die kleiner oder gleich x sind. Wir beobachten: 2, 5, 5, 8. Was ist der Wert der empirischen Verteilungsfunktion bei x = 5?',
+            q: 'The empirical distribution function assigns to each value x the fraction of observations that are less than or equal to x. We observe: 2, 5, 5, 8. What is the value of the empirical distribution function at x = 5? Round to 3 decimal places.',
+            qDE: 'Die empirische Verteilungsfunktion weist jedem Wert x den Anteil der Beobachtungen zu, die kleiner oder gleich x sind. Wir beobachten: 2, 5, 5, 8. Was ist der Wert der empirischen Verteilungsfunktion bei x = 5? Runde auf 3 Nachkommastellen.',
             answer: 0.75, tolerance: 0.001, unit: '',
             hintEn: 'Count how many of the four observations are at most 5, then divide by the total number of observations.',
             hintDE: 'Zähle, wie viele der vier Beobachtungen höchstens 5 sind, und teile durch die Gesamtanzahl der Beobachtungen.',
@@ -2696,8 +2696,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Zählen der Beobachtungen bei oder unter 5 (nämlich 2, 5 und 5) ergibt 3 von 4, sodass die empirische Verteilungsfunktion bei x = 5 gleich 3/4 = 0,75 ist."
         },
         {
-            q: 'We observe: 1, 3, 7, 9, 10. What is the value of the empirical distribution function at x = 3?',
-            qDE: 'Wir beobachten: 1, 3, 7, 9, 10. Was ist der Wert der empirischen Verteilungsfunktion bei x = 3?',
+            q: 'We observe: 1, 3, 7, 9, 10. What is the value of the empirical distribution function at x = 3? Round to 3 decimal places.',
+            qDE: 'Wir beobachten: 1, 3, 7, 9, 10. Was ist der Wert der empirischen Verteilungsfunktion bei x = 3? Runde auf 3 Nachkommastellen.',
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'Count all observations that are less than or equal to 3 and divide by the total number.',
             hintDE: 'Zähle alle Beobachtungen, die kleiner oder gleich 3 sind, und teile durch die Gesamtanzahl.',
@@ -2705,8 +2705,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Das Zählen der Beobachtungen bei oder unter 3 (nämlich 1 und 3) ergibt 2 von 5, sodass die empirische Verteilungsfunktion bei x = 3 gleich 2/5 = 0,4 ist."
         },
         {
-            q: 'We observe: 4, 6, 6, 8. What is the value of the empirical distribution function at x = 5?',
-            qDE: 'Wir beobachten: 4, 6, 6, 8. Was ist der Wert der empirischen Verteilungsfunktion bei x = 5?',
+            q: 'We observe: 4, 6, 6, 8. What is the value of the empirical distribution function at x = 5? Round to 3 decimal places.',
+            qDE: 'Wir beobachten: 4, 6, 6, 8. Was ist der Wert der empirischen Verteilungsfunktion bei x = 5? Runde auf 3 Nachkommastellen.',
             answer: 0.25, tolerance: 0.001, unit: '',
             hintEn: 'Check which observations are less than or equal to 5.',
             hintDE: 'Prüfe, welche Beobachtungen kleiner oder gleich 5 sind.',
@@ -2753,8 +2753,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Da die Likelihood-Funktion gleich p ist und p über [0, 1] läuft, wird die Likelihood beim größtmöglichen zulässigen Wert p = 1 maximiert."
         },
         {
-            q: 'We observe n independent coin flips with k heads. The maximum likelihood estimator for the probability of heads p is k/n. We observe 3 heads in 10 flips. What is the maximum likelihood estimate? Enter as a decimal.',
-            qDE: 'Wir beobachten n unabhängige Münzwürfe mit k Kopf-Ergebnissen. Der Maximum-Likelihood-Schätzer für die Kopfwahrscheinlichkeit p ist k/n. Wir beobachten 3 Kopf in 10 Würfen. Was ist der Maximum-Likelihood-Schätzwert? Gib als Dezimalzahl ein.',
+            q: 'We observe n independent coin flips with k heads. The maximum likelihood estimator for the probability of heads p is k/n. We observe 3 heads in 10 flips. What is the maximum likelihood estimate? Enter as a decimal. Round to 3 decimal places.',
+            qDE: 'Wir beobachten n unabhängige Münzwürfe mit k Kopf-Ergebnissen. Der Maximum-Likelihood-Schätzer für die Kopfwahrscheinlichkeit p ist k/n. Wir beobachten 3 Kopf in 10 Würfen. Was ist der Maximum-Likelihood-Schätzwert? Gib als Dezimalzahl ein. Runde auf 3 Nachkommastellen.',
             answer: 0.3, tolerance: 0.001, unit: '',
             hintEn: 'Insert the observed values of k and n into the formula for the maximum likelihood estimator.',
             hintDE: 'Setze die beobachteten Werte von k und n in die Formel für den Maximum-Likelihood-Schätzer ein.',
@@ -2838,7 +2838,7 @@ const MATH_GATE_POOLS = {
         },
         {
             q: 'The biased variance estimator has E[(1/n)∑(Xᵢ−X̄)²] = ((n−1)/n)·σ². For n = 20 and σ² = 4, what is the bias? Round to 2 decimal places.',
-            qDE: 'Der verzerrte Varianzschätzer hat E[(1/n)∑(Xᵢ−X̄)²] = ((n−1)/n)·σ². Für n = 20 und σ² = 4: wie groß ist der Bias? Auf 2 Dezimalstellen runden.',
+            qDE: 'Der verzerrte Varianzschätzer hat E[(1/n)∑(Xᵢ−X̄)²] = ((n−1)/n)·σ². Für n = 20 und σ² = 4: wie groß ist der Bias? Runde auf 2 Nachkommastellen.',
             answer: -0.2, tolerance: 0.01, unit: '',
             hintEn: 'Bias = ((n−1)/n)·σ² − σ² = −σ²/n. Plug in n=20, σ²=4.',
             hintDE: 'Bias = ((n−1)/n)·σ² − σ² = −σ²/n. Setze n=20, σ²=4 ein.',
@@ -2846,9 +2846,9 @@ const MATH_GATE_POOLS = {
             explainDE: "Mit Bias = −σ²/n = −4/20 = −0,2 zeigt dieser negative Wert, dass der verzerrte Schätzer die wahre Varianz systematisch unterschätzt."
         },
         {
-            q: 'For the biased variance estimator, Bias = −σ²/n. As n → ∞, does this bias vanish (approach 0)? Enter 1 for yes, 0 for no.',
-            qDE: 'Für den verzerrten Varianzschätzer gilt Bias = −σ²/n. Verschwindet dieser Bias für n → ∞ (nähert sich 0)? Gib 1 für ja, 0 für nein ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'For the biased variance estimator, Bias = −σ²/n. As n → ∞, does this bias vanish (approach 0)? Enter 0 for yes, 1 for no.',
+            qDE: 'Für den verzerrten Varianzschätzer gilt Bias = −σ²/n. Verschwindet dieser Bias für n → ∞ (nähert sich 0)? Gib 0 für ja, 1 für nein ein.',
+            answer: 0, tolerance: 0, unit: '',
             hintEn: 'Look at what −σ²/n approaches as n becomes very large.',
             hintDE: 'Überlege, wogegen −σ²/n für sehr großes n strebt.',
             explain: "Since −σ²/n → 0 as n → ∞, the bias vanishes, making this estimator asymptotically unbiased.",
@@ -2945,18 +2945,18 @@ const MATH_GATE_POOLS = {
         // ── 5. EFFIZIENZ (BEI ERWARTUNGSTREUEN SCHÄTZERN) ─────────────────────────
 
         {
-            q: 'θ̂₁ and θ̂₂ are both unbiased for θ, with Var(θ̂₁) = 6 and Var(θ̂₂) = 9. Which estimator is more efficient? Enter 1 for θ̂₁, 2 for θ̂₂.',
-            qDE: 'θ̂₁ und θ̂₂ sind beide erwartungstreu für θ, mit Var(θ̂₁) = 6 und Var(θ̂₂) = 9. Welcher Schätzer ist effizienter? Gib 1 für θ̂₁, 2 für θ̂₂ ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'θ̂₁ and θ̂₂ are both unbiased for θ, with Var(θ̂₁) = 9 and Var(θ̂₂) = 6. Which estimator is more efficient? Enter 1 for θ̂₁, 2 for θ̂₂.',
+            qDE: 'θ̂₁ und θ̂₂ sind beide erwartungstreu für θ, mit Var(θ̂₁) = 9 und Var(θ̂₂) = 6. Welcher Schätzer ist effizienter? Gib 1 für θ̂₁, 2 für θ̂₂ ein.',
+            answer: 2, tolerance: 0, unit: '',
             hintEn: 'Among unbiased estimators, the more efficient one is the one with the smaller variance.',
             hintDE: 'Unter erwartungstreuen Schätzern ist derjenige effizienter, der die kleinere Varianz hat.',
-            explain: "Since both estimators are unbiased, efficiency is compared purely by variance, and since 6 < 9, θ̂₁ is more efficient.",
-            explainDE: "Da beide Schätzer erwartungstreu sind, wird die Effizienz allein anhand der Varianz verglichen, und da 6 < 9 ist, ist θ̂₁ effizienter."
+            explain: "Since both estimators are unbiased, efficiency is compared purely by variance, and since 6 < 9, θ̂₂ is more efficient.",
+            explainDE: "Da beide Schätzer erwartungstreu sind, wird die Effizienz allein anhand der Varianz verglichen, und da 6 < 9 ist, ist θ̂₂ effizienter."
         },
         {
-            q: 'X̄ₙ (sample mean) is unbiased for μ with Var(X̄ₙ) = σ²/n. An alternative unbiased estimator uses only the first observation X₁, with Var(X₁) = σ². For n = 4, which has smaller variance? Enter 1 for X̄ₙ, 2 for X₁.',
-            qDE: 'X̄ₙ (Stichprobenmittel) ist erwartungstreu für μ mit Var(X̄ₙ) = σ²/n. Ein alternativer erwartungstreuer Schätzer nutzt nur die erste Beobachtung X₁, mit Var(X₁) = σ². Für n = 4: welcher hat die kleinere Varianz? Gib 1 für X̄ₙ, 2 für X₁ ein.',
-            answer: 1, tolerance: 0, unit: '',
+            q: 'X̄ₙ (sample mean) is unbiased for μ with Var(X̄ₙ) = σ²/n. An alternative unbiased estimator uses only the first observation X₁, with Var(X₁) = σ². For n = 4, which has smaller variance? Enter 1 for X₁, 2 for X̄ₙ.',
+            qDE: 'X̄ₙ (Stichprobenmittel) ist erwartungstreu für μ mit Var(X̄ₙ) = σ²/n. Ein alternativer erwartungstreuer Schätzer nutzt nur die erste Beobachtung X₁, mit Var(X₁) = σ². Für n = 4: welcher hat die kleinere Varianz? Gib 1 für X₁, 2 für X̄ₙ ein.',
+            answer: 2, tolerance: 0, unit: '',
             hintEn: 'Compare σ²/4 with σ². Which fraction of σ² is smaller?',
             hintDE: 'Vergleiche σ²/4 mit σ². Welcher Anteil von σ² ist kleiner?',
             explain: "Comparing Var(X̄ₙ) = σ²/4 with Var(X₁) = σ², the former is smaller, so the sample mean is the more efficient (and more sensible) estimator.",
@@ -3091,8 +3091,8 @@ const MATH_GATE_POOLS = {
         // ── 4. KONFIDENZINTERVALL FÜR p (BINOMIAL, APPROXIMATIV) ─────────────────
 
         {
-            q: 'In a sample of n = 200, X = 40 successes are observed. What is the point estimate p̂?',
-            qDE: 'In einer Stichprobe von n = 200 werden X = 40 Erfolge beobachtet. Wie lautet der Punktschätzer p̂?',
+            q: 'In a sample of n = 200, X = 40 successes are observed. What is the point estimate p̂? Round to 3 decimal places.',
+            qDE: 'In einer Stichprobe von n = 200 werden X = 40 Erfolge beobachtet. Wie lautet der Punktschätzer p̂? Auf 3 Dezimalstellen runden.',
             answer: 0.2, tolerance: 0.001, unit: '',
             hintEn: 'p̂ = X/n = 40/200 = 0.2.',
             hintDE: 'p̂ = X/n = 40/200 = 0,2.',
@@ -3112,8 +3112,8 @@ const MATH_GATE_POOLS = {
         // ── 5. FEHLER 1./2. ART, SIGNIFIKANZNIVEAU, POWER ────────────────────────
 
         {
-            q: 'A test has significance level α = 0.05. What is the maximum allowed probability of a Type I error?',
-            qDE: 'Ein Test hat das Signifikanzniveau α = 0,05. Wie hoch ist die maximal zulässige Wahrscheinlichkeit für einen Fehler 1. Art?',
+            q: 'A test has significance level α = 0.05. What is the maximum allowed probability of a Type I error? Round to 3 decimal places.',
+            qDE: 'Ein Test hat das Signifikanzniveau α = 0,05. Wie hoch ist die maximal zulässige Wahrscheinlichkeit für einen Fehler 1. Art? Auf 3 Dezimalstellen runden.',
             answer: 0.05, tolerance: 0.001, unit: '',
             hintEn: 'By definition, α bounds the probability of a Type I error.',
             hintDE: 'Per Definition begrenzt α die Wahrscheinlichkeit eines Fehlers 1. Art.',
@@ -3121,8 +3121,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Per Definition ist das Signifikanzniveau α genau die maximal zulässige Wahrscheinlichkeit, ein wahres H₀ fälschlicherweise zu verwerfen (Fehler 1. Art), also 0,05."
         },
         {
-            q: 'The probability of a Type II error is β = 0.2. What is the power of the test?',
-            qDE: 'Die Wahrscheinlichkeit für einen Fehler 2. Art beträgt β = 0,2. Wie groß ist die Power des Tests?',
+            q: 'The probability of a Type II error is β = 0.2. What is the power of the test? Round to 3 decimal places.',
+            qDE: 'Die Wahrscheinlichkeit für einen Fehler 2. Art beträgt β = 0,2. Wie groß ist die Power des Tests? Auf 3 Dezimalstellen runden.',
             answer: 0.8, tolerance: 0.001, unit: '',
             hintEn: 'Power = 1 − β = 1 − 0.2 = 0.8.',
             hintDE: 'Power = 1 − β = 1 − 0,2 = 0,8.',
@@ -3130,8 +3130,8 @@ const MATH_GATE_POOLS = {
             explainDE: "Die Power eines Tests ist definiert als 1 − β = 1 − 0,2 = 0,8, die Wahrscheinlichkeit, ein falsches H₀ korrekt zu verwerfen."
         },
         {
-            q: 'A test has power 0.75. What is the probability β of a Type II error?',
-            qDE: 'Ein Test hat die Power 0,75. Wie groß ist die Wahrscheinlichkeit β für einen Fehler 2. Art?',
+            q: 'A test has power 0.75. What is the probability β of a Type II error? Round to 3 decimal places.',
+            qDE: 'Ein Test hat die Power 0,75. Wie groß ist die Wahrscheinlichkeit β für einen Fehler 2. Art? Auf 3 Dezimalstellen runden.',
             answer: 0.25, tolerance: 0.001, unit: '',
             hintEn: 'β = 1 − Power = 1 − 0.75 = 0.25.',
             hintDE: 'β = 1 − Power = 1 − 0,75 = 0,25.',
@@ -3151,13 +3151,13 @@ const MATH_GATE_POOLS = {
             explainDE: "Einsetzen in die Teststatistik-Formel: Z = (X̄ₙ − μ₀)/(σ/√n) = (53−50)/(6/√36) = 3/1 = 3."
         },
         {
-            q: 'A two-sided Gauß-test gives Z = 2.5. The critical value is z_{0.975} = 1.96. Is H₀ rejected? Enter 1 for yes, 0 for no.',
-            qDE: 'Ein zweiseitiger Gauß-Test ergibt Z = 2,5. Der kritische Wert ist z_{0,975} = 1,96. Wird H₀ verworfen? Gib 1 für ja, 0 für nein ein.',
-            answer: 1, tolerance: 0, unit: '',
-            hintEn: 'Reject H₀ if |Z| > z_{1−α/2}. Here |2.5| > 1.96.',
-            hintDE: 'H₀ wird verworfen, wenn |Z| > z_{1−α/2}. Hier gilt |2,5| > 1,96.',
-            explain: "Since |Z| = 2.5 exceeds the critical value 1.96, H₀ is rejected.",
-            explainDE: "Da |Z| = 2,5 den kritischen Wert 1,96 überschreitet, wird H₀ verworfen."
+            q: 'A two-sided Gauß-test gives Z = 1.2. The critical value is z_{0.975} = 1.96. Is H₀ rejected? Enter 1 for yes, 0 for no.',
+            qDE: 'Ein zweiseitiger Gauß-Test ergibt Z = 1,2. Der kritische Wert ist z_{0,975} = 1,96. Wird H₀ verworfen? Gib 1 für ja, 0 für nein ein.',
+            answer: 0, tolerance: 0, unit: '',
+            hintEn: 'Reject H₀ only if |Z| > z_{1−α/2}. Here |1.2| < 1.96, so H₀ is not rejected.',
+            hintDE: 'H₀ wird nur verworfen, wenn |Z| > z_{1−α/2}. Hier gilt |1,2| < 1,96, also wird H₀ nicht verworfen.',
+            explain: "Since |Z| = 1.2 does not exceed the critical value 1.96, H₀ is not rejected.",
+            explainDE: "Da |Z| = 1,2 den kritischen Wert 1,96 nicht überschreitet, wird H₀ nicht verworfen."
         },
         {
             q: 'A one-sided (upper-tailed) Gauß-test of H₀: μ ≤ μ₀ gives Z = 1.5. The critical value is z_{0.95} = 1.645. Is H₀ rejected? Enter 1 for yes, 0 for no.',
@@ -3273,11 +3273,11 @@ const MATH_GATE_POOLS = {
             hintDE: 'p̂ = X/n = 70/200 = 0,35.'
         },
         {
-            q: 'A two-sided asymptotic binomial test gives Z = 2.3 with critical value z_{0.975} = 1.96. Is H₀ rejected? Enter 1 for yes, 0 for no.',
-            qDE: 'Ein zweiseitiger asymptotischer Binomialtest ergibt Z = 2,3 mit kritischem Wert z_{0,975} = 1,96. Wird H₀ verworfen? Gib 1 für ja, 0 für nein ein.',
-            answer: 1, tolerance: 0, unit: '',
-            hintEn: 'Reject H₀ if |Z| > z_{1−α/2}. Here 2.3 > 1.96.',
-            hintDE: 'H₀ wird verworfen, wenn |Z| > z_{1−α/2}. Hier gilt 2,3 > 1,96.'
+            q: 'A two-sided asymptotic binomial test gives Z = 2.3 with critical value z_{0.975} = 1.96. Is H₀ rejected? Enter 0 for yes, 1 for no.',
+            qDE: 'Ein zweiseitiger asymptotischer Binomialtest ergibt Z = 2,3 mit kritischem Wert z_{0,975} = 1,96. Wird H₀ verworfen? Gib 0 für ja, 1 für nein ein.',
+            answer: 0, tolerance: 0, unit: '',
+            hintEn: 'Reject H₀ if |Z| > z_{1−α/2}. Here 2.3 > 1.96, so enter 0.',
+            hintDE: 'H₀ wird verworfen, wenn |Z| > z_{1−α/2}. Hier gilt 2,3 > 1,96, gib also 0 ein.'
         },
 
         // ── 2. VERBUNDENES DESIGN (PAIRED TEST) ─────────────────────────────────
@@ -3446,7 +3446,7 @@ const MATH_GATE_POOLS = {
         },
         {
             q: 'P(A|B) = 0.4, P(B) = 0.5, P(A) = 0.3. What is P(B|A)? Use Bayes. Round to 2 decimal places.',
-            qDE: 'P(A|B) = 0,4, P(B) = 0,5, P(A) = 0,3. Wie groß ist P(B|A)? Bayesregel. Auf 2 Dezimalstellen.',
+            qDE: 'P(A|B) = 0,4, P(B) = 0,5, P(A) = 0,3. Wie groß ist P(B|A)? Verwende die Bayesregel. Runde auf 2 Dezimalstellen.',
             answer: 0.67, tolerance: 0.01, unit: '',
             hintEn: 'P(B|A) = P(A|B)·P(B)/P(A) = (0.4 × 0.5)/0.3 = 0.2/0.3 ≈ 0.67.',
             hintDE: 'P(B|A) = P(A|B)·P(B)/P(A) = (0,4 × 0,5)/0,3 = 0,2/0,3 ≈ 0,67.'
