@@ -138,6 +138,12 @@ function _getAsymptoticMasteryReduction() {
     return (window._asymptoticLinesCompleted || 0) * 5;
 }
 
+// keystone_iron_doctrine (node 158):
+// Each mistake costs 60 extra seconds on top of the normal penalty.
+function _getIronDoctrineExtraSeconds() {
+    return ptHasSkill('keystone_iron_doctrine') ? 60 : 0;
+}
+
 // Resolves the active penalty multiplier for this mistake.
 // Overfitting node overrides the class multiplier when active;
 // otherwise the class multiplier (penMult) is used.
@@ -152,7 +158,7 @@ function _calcEffectivePenalty(penMult) {
     const base = _getBasePenaltySeconds();
     const multiplier = _resolveActivePenaltyMultiplier(penMult);
     const reduction = _getAsymptoticMasteryReduction();
-    return Math.max(0, Math.round(base * multiplier) - reduction);
+    return Math.max(0, Math.round(base * multiplier) - reduction + _getIronDoctrineExtraSeconds());
 }
 
 
@@ -163,7 +169,13 @@ function _calcEffectivePenalty(penMult) {
 
 // Deducts the effective penalty from the timer, refreshes the HUD clock,
 // and logs the mistake to the Actuary system.
+// keystone_golden_clock: while the Golden Clock is active the timer can no
+// longer decrease, so mistake deductions are skipped entirely.
 function _applyTimeDeduction(row, col, effectivePen) {
+    if (window._goldenClockActive) {
+        updTimer();
+        return;
+    }
     timerSecs = Math.max(0, timerSecs - effectivePen);
     updTimer();
     if (effectivePen > 0) {

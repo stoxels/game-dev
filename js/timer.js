@@ -292,6 +292,7 @@ function _tickTimedStasis() {
     timerFrozen = true;
     updTimer();
     showToast(`⏸️ ${LANG === 'de' ? 'Zeitstase!' : 'Timed Stasis!'}`);
+    if (typeof playStasisOverlayEffect === 'function') playStasisOverlayEffect(freezeDur);
 
     setTimeout(() => {
         timerFrozen = false;
@@ -334,7 +335,9 @@ function _findSparseLine(sol, lineCount, otherCount, isRow) {
 
 // Reveals all unfilled solution cells in the given row (isRow = true) or
 // column (isRow = false) and refreshes their display and clue highlights.
+// Returns the ids of the newly revealed cells (for the reveal VFX).
 function _revealSparseLine(sol, index, otherCount, isRow) {
+    const revealedIds = [];
     for (let i = 0; i < otherCount; i++) {
         const r = isRow ? index : i;
         const c = isRow ? i : index;
@@ -343,8 +346,10 @@ function _revealSparseLine(sol, index, otherCount, isRow) {
             userGrid[r][c] = 1;
             renderCell(r, c);
             updClues(r, c);
+            revealedIds.push(`g-${r}-${c}`);
         }
     }
+    return revealedIds;
 }
 
 
@@ -361,10 +366,16 @@ function _triggerLawOfLargeNumbers() {
     const sparseRow = _findSparseLine(sol, rows, cols, true);
     const sparseCol = _findSparseLine(sol, cols, rows, false);
 
-    if (sparseRow >= 0) _revealSparseLine(sol, sparseRow, cols, true);
-    if (sparseCol >= 0) _revealSparseLine(sol, sparseCol, rows, false);
+    const revealedIds = [];
+    if (sparseRow >= 0) revealedIds.push(..._revealSparseLine(sol, sparseRow, cols, true));
+    if (sparseCol >= 0) revealedIds.push(..._revealSparseLine(sol, sparseCol, rows, false));
 
     if (sparseRow < 0 && sparseCol < 0) return; // nothing was revealed
+
+    // Green pulse sweep over every cell the reveal touched
+    if (typeof _applyCellEffect === 'function' && revealedIds.length > 0) {
+        _applyCellEffect(revealedIds, 'reveal');
+    }
 
     // Bayesian Boost: chance for a bonus free tile after a LLN reveal.
     if (_getBayesianBonus() > 0 && Math.random() < _getBayesianBonus()) {
@@ -439,9 +450,12 @@ function _tickEmergencyScan() {
 
     window._emergencyScanFired = true;
 
-    // Cover the entire puzzle: pass the larger grid dimension as scan size.
+    // Cover the entire puzzle: centre the scan on the middle of the grid and
+    // pass the larger grid dimension as scan size.
     const fullSize = Math.max(cur.grid.length, cur.grid[0].length);
-    _executeFieldScan(fullSize, _calcEmergencyScanDuration());
+    const centerRow = Math.floor(cur.grid.length / 2);
+    const centerCol = Math.floor(cur.grid[0].length / 2);
+    _executeFieldScan(centerRow, centerCol, fullSize, _calcEmergencyScanDuration());
 }
 
 

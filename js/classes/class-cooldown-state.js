@@ -177,7 +177,7 @@ function _getAbilityName(abilityData) {
 function _getGlobalCooldownReduction() {
     let reduction = 0;
     if (ptHasSkill('celerity')) reduction += 30;
-    if (ptHasSkill('signal_to_noise')) reduction += 15;
+    if (ptHasSkill('keystone_signal_to_noise')) reduction += 15;
     if (ptHasSkill('keystone_the_oracle') && window._oracleActive === true) reduction += 30;
     if (ptHasSkill('keystone_degrees_of_freedom')) reduction += 30;
     if (ptHasSkill('keystone_entropy_drain')) reduction += 30;

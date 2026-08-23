@@ -163,7 +163,7 @@ function _buildColClueHeaderRows(colClues, maxColDepth, maxRowWidth, cols, fontS
             const num = depth >= offset ? clueList[depth - offset] : null;
             const isTopRow = (depth === 0);
 
-            html += `<td class="cch cch-${col}" ${isTopRow ? `id="cchtop-${col}"` : ''} style="height:${fontSize + 3}px">`;
+            html += `<td class="cch cch-${col}${window._shadowSealActive ? ' clue-blackout' : ''}" ${isTopRow ? `id="cchtop-${col}"` : ''} style="height:${fontSize + 3}px">`;
             if (num !== null) {
                 html += `<div class="ccinner"><span id="cn-${col}-${depth}" style="font-size:${fontSize}px">${num}</span></div>`;
             }
@@ -189,7 +189,7 @@ function _buildColClueHeaderRows(colClues, maxColDepth, maxRowWidth, cols, fontS
 //   colWidth — px width of each row-clue column (see _calcClueColWidth)
 function _buildRowClueCell(row, clueIdx, padLeft, value, fontSize, colWidth) {
     const leftPx = (padLeft + clueIdx) * colWidth;
-    return `<td class="rct rct-${row}" id="rct-${row}-${clueIdx}"` +
+    return `<td class="rct rct-${row}${window._shadowSealActive ? ' clue-blackout' : ''}" id="rct-${row}-${clueIdx}"` +
         ` style="font-size:${fontSize}px">` +
         `<div class="rcinner"><span id="rn-${row}-${clueIdx}" style="font-size:${fontSize}px">${value}</span></div>` +
         `</td>`;
@@ -766,6 +766,7 @@ function _markZeroClueLinesSolved(rowClues, colClues) {
 //   colDone    — whether the affected column is now complete
 //   sol        — 2D solution array
 function _handleRegressionReward(row, col, rowDone, colDone, sol) {
+    if (ptHasSkill('keystone_gamblers_ruin')) return; // bonus time from other sources is disabled
     if (!ptHasSkill('regression_reward_1') &&
         !ptHasSkill('regression_reward_2') &&
         !ptHasSkill('regression_reward_3')) return;
@@ -788,6 +789,7 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
         timerSecs += bonus;
         _levelTimeAdded += bonus;
         updTimer();
+        if (typeof playTimeGainEffect === 'function') playTimeGainEffect(`+${bonus}s`, '#6dbf40');
         showToast(`📉 ${LANG === 'de' ? `+${bonus}s (Regressions-Belohnung)` : `+${bonus}s (Regression Reward)`}`);
     }
 
@@ -796,6 +798,7 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
         timerSecs += bonus;
         _levelTimeAdded += bonus;
         updTimer();
+        if (typeof playTimeGainEffect === 'function') playTimeGainEffect(`+${bonus}s`, '#6dbf40');
         showToast(`📉 ${LANG === 'de' ? `+${bonus}s (Regressions-Belohnung)` : `+${bonus}s (Regression Reward)`}`);
     }
 }
@@ -997,7 +1000,7 @@ function updClues(row, col, isInitial = false) {
 //
 //   Returns true if the cell was in the DoF reverted set before clearing.
 function _clearCellClasses(el, row, col) {
-    el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned', 'cell-lucky', 'marked-system');
+    el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned', 'cell-lucky', 'marked-system', 'cell-lucky-focus');
     el.classList.remove('dof-reverted');
     return !!(window._dofRevertedCells && window._dofRevertedCells.has(`${row}-${col}`));
 }
@@ -1082,6 +1085,10 @@ function renderCell(row, col) {
     // Priority 6: subtle shimmer hint on empty lucky tiles
     if (cellState === 0 && luckyTiles && luckyTiles.has(`${row}-${col}`)) {
         el.classList.add('cell-lucky');
+        // Outlier Detection: highlighted tiles get the stronger focus outline
+        if (window._outlierHighlighted && window._outlierHighlighted.has(`${row}-${col}`)) {
+            el.classList.add('cell-lucky-focus');
+        }
     }
 
     // Adjacency matrix mode: refresh neighbour overlays after any state change

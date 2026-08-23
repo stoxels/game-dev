@@ -926,8 +926,8 @@ function _calcRevealCount(baseCount) {
     // Keystone: Curse Embrace — non-cursed items are 50% weaker
     if (ptHasSkill('keystone_curse_embrace')) count = Math.max(1, Math.floor(count * 0.5));
 
-    // Keystone: Iron Doctrine — non-cursed items at 300% effectiveness
-    if (ptHasSkill('keystone_iron_doctrine')) count = Math.ceil(count * 3);
+    // Keystone: Iron Doctrine — non-cursed items at 300% increased effectiveness (×4)
+    if (ptHasSkill('keystone_iron_doctrine')) count = Math.ceil(count * 4);
 
     return count;
 }
@@ -944,8 +944,8 @@ function _calcMarkWrongCount(baseCount) {
     // Keystone: Curse Embrace — 50% weaker
     if (ptHasSkill('keystone_curse_embrace')) count = Math.max(1, Math.floor(count * 0.5));
 
-    // Keystone: Iron Doctrine — 300% effectiveness
-    if (ptHasSkill('keystone_iron_doctrine')) count = Math.ceil(count * 3);
+    // Keystone: Iron Doctrine — 300% increased effectiveness (×4)
+    if (ptHasSkill('keystone_iron_doctrine')) count = Math.ceil(count * 4);
 
     return count;
 }
@@ -986,8 +986,8 @@ function _calcMistakeEraserCount(baseCount, isEraseAll) {
         + (ptHasSkill('scholarly_aid_2') ? 1 : 0)
         + (ptHasSkill('scholarly_aid_3') ? 1 : 0);
 
-    // Keystone: Iron Doctrine — 300% effectiveness
-    if (ptHasSkill('keystone_iron_doctrine')) count = Math.ceil(count * 3);
+    // Keystone: Iron Doctrine — 300% increased effectiveness (×4)
+    if (ptHasSkill('keystone_iron_doctrine')) count = Math.ceil(count * 4);
 
     // Keystone: Curse Embrace — 50% weaker
     if (ptHasSkill('keystone_curse_embrace')) count = Math.max(1, Math.floor(count * 0.5));
@@ -1096,7 +1096,10 @@ function _useAddTime(id, def) {
     const baseSecs = parseInt(id.replace('addTime', '')) || 30;
     const secs = _calcAddTimeSecs(baseSecs);
 
-    if (ptHasSkill('keystone_countdown_crisis')) {
+    // Countdown Crisis inverts timer items — but the Golden Clock guarantees
+    // the timer can only increase, so the inversion is suppressed while it
+    // is active.
+    if (ptHasSkill('keystone_countdown_crisis') && !window._goldenClockActive) {
         questStat_timerItemUsed();
         const before = timerSecs;
         timerSecs = Math.max(0, timerSecs - secs);
@@ -1313,8 +1316,13 @@ function _useCursedReveal(id, def) {
 
     revealTiles(6);
 
-    // When immune the marks are protected — early-out with a safe message
-    if (window._cursedImmune || ptHasSkill('keystone_curse_embrace')) {
+    // Route the downside through the shared curse helpers so Witch immunity,
+    // Curse Embrace and the first-use protection of Veil of Purity all apply
+    // here as well. A result of 0 means the downside is fully suppressed;
+    // when Veil of Purity is broken the helper also shows the amplification
+    // toast (the mark-clear itself is already maximal, so it cannot grow).
+    const downsideMult = _cursedDownsideDuration(1000) / 1000;
+    if (downsideMult <= 0) {
         playItemEffect(id);
         return `☠️ ${LANG === 'de' ? 'Enthüllt 6 Zellen (Markierungen geschützt)!' : '6 cells revealed (marks protected)!'}`;
     }

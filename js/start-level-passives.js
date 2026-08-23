@@ -44,8 +44,10 @@ function _calcLuckyTileCount(isLarge, isMassive, isLargeOrMassive) {
     return tileCount;
 }
 
-// Highlights up to 2 lucky tiles with the `cell-lucky` CSS class after the grid is rendered.
-// outlier_detection (228-229): each node reveals one additional highlighted tile.
+// Highlights up to 2 lucky tiles with the stronger `cell-lucky-focus` CSS
+// class after the grid is rendered, so the specifically highlighted tiles
+// stand out from regular lucky tiles (which only get the base shimmer).
+// outlier_detection (228-229): each node highlights one additional tile.
 // Delayed so the grid DOM exists before we touch elements.
 function _applyOutlierDetectionHighlights() {
     if (!luckyTiles.size) return;
@@ -55,12 +57,15 @@ function _applyOutlierDetectionHighlights() {
         + (ptHasSkill('outlier_detection_2') ? 1 : 0);
     const toHighlight = [...luckyTiles].slice(0, highlightCount);
 
+    // Remember the highlighted keys so re-renders keep the focus class.
+    window._outlierHighlighted = new Set(toHighlight);
+
     setTimeout(() => {
         toHighlight.forEach(key => {
             if (!luckyTiles.has(key)) return; // tile was already claimed
             const [r, c] = key.split('-').map(Number);
             const el = document.getElementById(`g-${r}-${c}`);
-            if (el) el.classList.add('cell-lucky');
+            if (el) el.classList.add('cell-lucky-focus');
         });
     }, 200);
 }
@@ -83,6 +88,7 @@ function _getGridSizeTier(rows, cols) {
 function _initLuckyTiles() {
     luckyTiles = new Set();
     luckyRewardClaimed = 0;
+    window._outlierHighlighted = new Set();
 
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
@@ -251,10 +257,12 @@ function _applyNullHypothesis() {
     }
 
     // Mark all unmarked wrong empty cells in the target row
+    const markedIds = [];
     for (let c = 0; c < cols; c++) {
         if (sol[targetRow][c] === 0 && userGrid[targetRow][c] === 0 && !wrongGrid[targetRow][c]) {
             userGrid[targetRow][c] = 2;
             renderCell(targetRow, c);
+            markedIds.push(`g-${targetRow}-${c}`);
         }
     }
 
@@ -263,7 +271,13 @@ function _applyNullHypothesis() {
         if (sol[r][targetCol] === 0 && userGrid[r][targetCol] === 0 && !wrongGrid[r][targetCol]) {
             userGrid[r][targetCol] = 2;
             renderCell(r, targetCol);
+            markedIds.push(`g-${r}-${targetCol}`);
         }
+    }
+
+    // Orange mark pulse so the auto-marks are visible at level start
+    if (typeof _applyCellEffect === 'function' && markedIds.length > 0) {
+        _applyCellEffect(markedIds, 'mark');
     }
 }
 
@@ -339,6 +353,14 @@ function _applyDensityMapping() {
     const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const lineCount = ptHasSkill('density_mapping_3') ? 2 : 1; // node 3 targets 2 lines
+    const markedIds = [];
+
+    // Marks one cell and records it for the mark-pulse VFX at the end.
+    const markCell = (r, c) => {
+        userGrid[r][c] = 2;
+        renderCell(r, c);
+        markedIds.push(`g-${r}-${c}`);
+    };
 
     // Sort rows descending by filled-cell count
     const rowsByDensity = Array.from({ length: rows }, (_, r) => r)
@@ -357,9 +379,7 @@ function _applyDensityMapping() {
             if (sol[r][c] === 0 && (userGrid[r][c] === 0 || userGrid[r][c] === 3) && !wrongGrid[r][c])
                 cands.push(c);
         if (cands.length > 0) {
-            const c = cands[Math.floor(Math.random() * cands.length)];
-            userGrid[r][c] = 2;
-            renderCell(r, c);
+            markCell(r, cands[Math.floor(Math.random() * cands.length)]);
         }
     }
 
@@ -371,10 +391,43 @@ function _applyDensityMapping() {
             if (sol[r][c] === 0 && (userGrid[r][c] === 0 || userGrid[r][c] === 3) && !wrongGrid[r][c])
                 cands.push(r);
         if (cands.length > 0) {
-            const r = cands[Math.floor(Math.random() * cands.length)];
-            userGrid[r][c] = 2;
-            renderCell(r, c);
+            markCell(cands[Math.floor(Math.random() * cands.length)], c);
         }
+    }
+
+    // density_mapping_2: one additional incorrect empty cell in the densest
+    // row or the densest column (randomly chosen, falls back to the other
+    // line type if the preferred one has no candidates left)
+    if (ptHasSkill('density_mapping_2')) {
+        const markInRow = (r) => {
+            const cands = [];
+            for (let c = 0; c < cols; c++)
+                if (sol[r][c] === 0 && (userGrid[r][c] === 0 || userGrid[r][c] === 3) && !wrongGrid[r][c])
+                    cands.push(c);
+            if (cands.length === 0) return false;
+            markCell(r, cands[Math.floor(Math.random() * cands.length)]);
+            return true;
+        };
+        const markInCol = (c) => {
+            const cands = [];
+            for (let r = 0; r < rows; r++)
+                if (sol[r][c] === 0 && (userGrid[r][c] === 0 || userGrid[r][c] === 3) && !wrongGrid[r][c])
+                    cands.push(r);
+            if (cands.length === 0) return false;
+            markCell(cands[Math.floor(Math.random() * cands.length)], c);
+            return true;
+        };
+
+        if (Math.random() < 0.5) {
+            if (!markInRow(rowsByDensity[0])) markInCol(colsByDensity[0]);
+        } else {
+            if (!markInCol(colsByDensity[0])) markInRow(rowsByDensity[0]);
+        }
+    }
+
+    // Orange mark pulse so the auto-marks are visible at level start
+    if (typeof _applyCellEffect === 'function' && markedIds.length > 0) {
+        _applyCellEffect(markedIds, 'mark');
     }
 }
 
@@ -392,6 +445,7 @@ function _applySparseRegion() {
 
     const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
+    const markedIds = [];
 
     for (let n = 0; n < nodes; n++) {
         // Find the sparsest row (fewest filled solution cells)
@@ -422,6 +476,7 @@ function _applySparseRegion() {
             cands.slice(0, 1).forEach(c => {
                 userGrid[sparsestRow][c] = 2;
                 renderCell(sparsestRow, c);
+                markedIds.push(`g-${sparsestRow}-${c}`);
             });
         } else if (sparsestCol >= 0) {
             const cands = [];
@@ -432,13 +487,21 @@ function _applySparseRegion() {
             cands.slice(0, 1).forEach(r => {
                 userGrid[r][sparsestCol] = 2;
                 renderCell(r, sparsestCol);
+                markedIds.push(`g-${r}-${sparsestCol}`);
             });
         }
     }
+
+    // Orange mark pulse so the auto-marks are visible at level start
+    if (typeof _applyCellEffect === 'function' && markedIds.length > 0) {
+        _applyCellEffect(markedIds, 'mark');
+    }
 }
 
-// marginal_distribution (246-248): reveals 1 filled cell per node (up to 3)
+// marginal_distribution (246-248): reveals 1 edge cell per node (up to 3),
 // chosen randomly from the 4 outermost edges (top/bottom row, left/right col).
+// Filled edge cells are revealed; empty edge cells are marked as incorrect,
+// matching the description ("revealed as either filled or empty").
 // Skipped if the oracle is active or keystone_ergodic_field is allocated.
 function _applyMarginalDistribution() {
     const nodes = (ptHasSkill('marginal_distribution_1') ? 1 : 0)
@@ -451,14 +514,16 @@ function _applyMarginalDistribution() {
     const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
 
-    // Collect all unrevealed filled edge cells without duplicates
+    // Collect all unrevealed/unmarked edge cells without duplicates
     const seen = new Set();
     const pool = [];
     const addEdgeCell = (r, c) => {
         const key = `${r}-${c}`;
         if (seen.has(key)) return;
         seen.add(key);
-        if (sol[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c])
+        const untouchedFilled = sol[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c];
+        const untouchedEmpty = sol[r][c] === 0 && userGrid[r][c] !== 2 && !wrongGrid[r][c];
+        if (untouchedFilled || untouchedEmpty)
             pool.push([r, c]);
     };
 
@@ -470,17 +535,28 @@ function _applyMarginalDistribution() {
     shuffle(pool);
 
     const affected = [];
+    const markedAffected = [];
     for (let n = 0; n < nodes; n++) {
         if (pool.length === 0) break;
         const [r, c] = pool.shift();
-        revealedGrid[r][c] = true;
-        userGrid[r][c] = 1;
-        renderCell(r, c);
-        updClues(r, c, true);
-        affected.push(`g-${r}-${c}`);
+        if (sol[r][c] === 1) {
+            revealedGrid[r][c] = true;
+            userGrid[r][c] = 1;
+            renderCell(r, c);
+            updClues(r, c, true);
+            affected.push(`g-${r}-${c}`);
+        } else {
+            userGrid[r][c] = 2;
+            systemMarkedGrid[r][c] = true;
+            renderCell(r, c);
+            markedAffected.push(`g-${r}-${c}`);
+        }
     }
 
     _revealCellsAndFinalize(affected);
+    if (typeof _applyCellEffect === 'function' && markedAffected.length > 0) {
+        _applyCellEffect(markedAffected, 'mark');
+    }
 }
 
 // interquartile_vision (258-259): fires a centred field scan on large grids (≥200 cells).
@@ -498,7 +574,7 @@ function _applyInterquartileVision() {
     const scanDur = _interquartileVisionDuration();
 
     setTimeout(() => {
-        if (typeof _executeFieldScan === 'function') _executeFieldScan(scanSize, scanDur);
+        if (typeof _executeFieldScan === 'function') _executeFieldScan(Math.floor(rows / 2), Math.floor(cols / 2), scanSize, scanDur);
     }, 300);
 }
 

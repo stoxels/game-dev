@@ -602,7 +602,7 @@ const PassiveTracker = (() => {
             type: 'countdown',
             current: _state.timedStasisTimer,
             max: INTERVAL_TIMED_STASIS,
-            tooltip: `Every 10 minutes the level freezes for <b>${duration}s</b>.`,
+            tooltip: `Every 10 minutes the timer pauses for <b>${duration}s</b>.`,
             color: '#a0c8ff',
         };
     }
@@ -618,6 +618,28 @@ const PassiveTracker = (() => {
             max: INTERVAL_LOLN,
             tooltip: 'Every 5 minutes, auto-reveals 1 row and column with &lt;2 filled cells. <span class="tip-mute">Does not fire in last 15 min.</span>',
             color: '#c8a0ff',
+        };
+    }
+
+    function _getRowEmergencyScan() {
+        if (!ptHasSkill('emergency_scan_1')) return null;
+        let duration = 2;
+        if (ptHasSkill('emergency_scan_2')) duration += 1;
+        if (ptHasSkill('emergency_scan_3')) duration += 2;
+        // Counts down with the level timer until the 5-minute threshold is reached.
+        const fired = !!window._emergencyScanFired;
+        const secsLeft = fired ? 0 : Math.max(0, Math.min(300, (typeof timerSecs === 'number' ? timerSecs : 300)));
+        return {
+            id: 'emerg_scan',
+            icon: '🚨',
+            label: 'Emergency Scan',
+            type: 'countdown',
+            current: secsLeft,
+            max: 300,
+            tooltip: fired
+                ? 'Emergency Scan has already fired this level.'
+                : `When the timer drops to <b>5:00</b> a full-grid Field Scan runs for <b>${duration}s</b> (one-shot per level).`,
+            color: fired ? '#8888a0' : '#ff9060',
         };
     }
 
@@ -760,16 +782,23 @@ const PassiveTracker = (() => {
         // Fetch the current phase from the game module if available.
         const phase = typeof _overfittingGetPhase === 'function' ? _overfittingGetPhase() : 'free';
         const isHardMode = phase === 'hard';
+        const isNormal = phase === 'normal';
+        let tooltip;
+        if (isHardMode) {
+            tooltip = '<span class="tip-warn">⚠ 50% Threshold crossed! Mistakes now cost <b>TRIPLE TIME (3×)</b>!</span>';
+        } else if (isNormal) {
+            tooltip = '15% reached — mistakes cost <b>normal time</b>. At 50% completion mistakes cost <span class="tip-warn">triple time</span>.';
+        } else {
+            tooltip = 'First 15% of fills are free. <span class="tip-safe">Mistake cost currently: 0s.</span>';
+        }
         return {
             id: 'overfitting',
             icon: '📉',
             label: 'Overfitting',
             type: 'summary',
-            tooltip: isHardMode
-                ? '<span class="tip-warn">⚠ 15% Threshold crossed! Mistakes now cost <b>TRIPLE TIME (3×)</b>!</span>'
-                : 'First 15% of fills are free. <span class="tip-safe">Mistake cost currently: 0s.</span>',
-            // Color flips green → red when the hard phase activates.
-            color: isHardMode ? '#ff6080' : '#6dbf40',
+            tooltip,
+            // Color flips green → amber → red as the phases advance.
+            color: isHardMode ? '#ff6080' : isNormal ? '#e8a020' : '#6dbf40',
             warn: isHardMode,
         };
     }
@@ -934,7 +963,37 @@ const PassiveTracker = (() => {
         if (!ptHasSkill('keystone_curse_embrace')) return null;
         return {
             id: 'curse_embrace', icon: '👁️', label: 'Curse Embrace', type: 'summary',
-            tooltip: 'Immune to cursed item downsides. Non-cursed items <b>50% weaker</b>.', color: '#c080ff'
+            tooltip: 'Immune to cursed item downsides. Reveal, Mark-wrong, Timer and Eraser items <b>50% weaker</b>.', color: '#c080ff'
+        };
+    }
+
+    function _getSummaryInterquartileVision() {
+        if (!ptHasSkill('interquartile_vision_1')) return null;
+        let duration = 2;
+        if (ptHasSkill('interquartile_vision_2')) duration += 1;
+        if (ptHasSkill('interquartile_vision_3')) duration += 1;
+        return {
+            id: 'iqv', icon: '🔭', label: 'Interquartile Vision', type: 'summary',
+            tooltip: `Large grids (200+ cells): centred Field Scan at level start for <b>${duration}s</b>.`, color: '#88aaff'
+        };
+    }
+
+    function _getSummaryCovarianceShift() {
+        if (!ptHasSkill('covariance_shift_1')) return null;
+        let extra = 0;
+        if (ptHasSkill('covariance_shift_2')) extra += 1;
+        if (ptHasSkill('covariance_shift_3')) extra += 1;
+        return {
+            id: 'covariance', icon: '🔗', label: 'Covariance Shift', type: 'summary',
+            tooltip: `Revealing a Lucky Tile also reveals <b>${1 + extra}</b> random correct filled cell${extra > 0 ? 's' : ''} in the same row or column.`, color: '#66fcf1'
+        };
+    }
+
+    function _getSummaryEntropyDrain() {
+        if (!ptHasSkill('keystone_entropy_drain')) return null;
+        return {
+            id: 'entropy_drain', icon: '🌡️', label: 'Entropy Drain', type: 'summary', warn: true,
+            tooltip: 'Rows/columns left unfinished for <b>3 minutes</b> lose all reveals and marks. Class Ability cooldowns <b>−30s</b>.', color: '#ff6080'
         };
     }
 
@@ -1075,6 +1134,9 @@ const PassiveTracker = (() => {
             _getSummaryErgodicField(),
             _getSummaryDegreesOfFreedom(),
             _getSummaryAdjacencyMatrix(),
+            _getSummaryInterquartileVision(),
+            _getSummaryCovarianceShift(),
+            _getSummaryEntropyDrain(),
         ].filter(Boolean);
     }
 
@@ -1092,6 +1154,7 @@ const PassiveTracker = (() => {
             _getRowPoissonProcess(),
             _getRowTimedStasis(),
             _getRowLawOfLargeNumbers(),
+            _getRowEmergencyScan(),
 
             // — Fill counters —
             _getRowBinomialBurst(),

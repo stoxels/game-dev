@@ -451,3 +451,116 @@ function playStochasticResonanceEffect(mistakeRow, mistakeCol, targetRow, target
         }, 800);
     }, 1400); // Wait for the 1.5s grow animation
 }
+
+
+//------------------------------------------------------------------------
+//-------------------REUSABLE PASSIVE PROC EFFECTS-----------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Small shared visual feedback effects for passive-tree procs that only
+// showed a toast before. All of them are purely cosmetic and fail soft
+// when their anchor elements are missing.
+
+// Injects the shared keyframes used by the reusable passive proc effects.
+// Guards with a sentinel style tag so it never runs twice.
+function _ensurePassiveFxStyles() {
+    if (document.getElementById('fx-passive-proc-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'fx-passive-proc-styles';
+    style.textContent = `
+        @keyframes fx-time-gain-rise {
+            0%   { opacity: 0; transform: translate(-50%, 0) scale(0.7); }
+            15%  { opacity: 1; transform: translate(-50%, -10px) scale(1.15); }
+            100% { opacity: 0; transform: translate(-50%, -46px) scale(1); }
+        }
+        @keyframes fx-stasis-veil {
+            0%   { opacity: 0; }
+            20%  { opacity: 1; }
+            80%  { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @keyframes fx-charge-pulse {
+            0%   { box-shadow: inset 0 0 40px rgba(120,180,255,0.0); }
+            35%  { box-shadow: inset 0 0 70px rgba(120,180,255,0.55); }
+            100% { box-shadow: inset 0 0 40px rgba(120,180,255,0.0); }
+        }
+        @keyframes fx-ci-window {
+            0%   { box-shadow: inset 0 0 50px rgba(110,220,120,0.0); }
+            20%  { box-shadow: inset 0 0 60px rgba(110,220,120,0.45); }
+            85%  { box-shadow: inset 0 0 60px rgba(110,220,120,0.45); }
+            100% { box-shadow: inset 0 0 50px rgba(110,220,120,0.0); }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Floating time text ("+30s") that rises from the timer HUD and fades.
+//   label  — text to display (e.g. "+30s")
+//   color  — CSS color of the text/glow
+function playTimeGainEffect(label, color = '#ffd700') {
+    const anchor = document.getElementById('timer-val') || document.querySelector('.timer-val');
+    if (!anchor) return;
+    _ensurePassiveFxStyles();
+
+    const rect = anchor.getBoundingClientRect();
+    const el = document.createElement('div');
+    el.textContent = label;
+    el.style.cssText = `
+        position: fixed;
+        left: ${rect.left + rect.width / 2}px;
+        top: ${rect.top}px;
+        transform: translate(-50%, 0);
+        color: ${color};
+        font-weight: 700;
+        font-size: 1.2em;
+        text-shadow: 0 0 8px ${color}, 0 0 2px #fff;
+        pointer-events: none;
+        z-index: 10000;
+        animation: fx-time-gain-rise 1.4s ease-out forwards;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+}
+
+// Full-grid frost veil that fades in and back out (Timed Stasis).
+function playStasisOverlayEffect(durationMs = 1000) {
+    const wrap = document.getElementById('puzzle-scaler');
+    if (!wrap) return;
+    _ensurePassiveFxStyles();
+
+    const overlay = _fxOverlay(wrap, durationMs + 600);
+    const veil = document.createElement('div');
+    veil.style.cssText = `
+        position: absolute; inset: 0; pointer-events: none; z-index: 998;
+        background: radial-gradient(circle at 50% 50%, rgba(160,200,255,0.10), rgba(160,200,255,0.35));
+        box-shadow: inset 0 0 60px rgba(160,200,255,0.55);
+        animation: fx-stasis-veil ${durationMs + 500}ms ease-in-out forwards;
+    `;
+    overlay.appendChild(veil);
+}
+
+// Icy blue pulse across the grid when Frozen Resilience grants a shield charge.
+function playShieldChargePulseEffect() {
+    const wrap = document.getElementById('puzzle-scaler');
+    if (!wrap) return;
+    _ensurePassiveFxStyles();
+
+    const overlay = _fxOverlay(wrap, 950);
+    const pulse = document.createElement('div');
+    pulse.style.cssText = 'position:absolute; inset:0; pointer-events:none; z-index:998;';
+    pulse.style.animation = 'fx-charge-pulse 900ms ease-out forwards';
+    overlay.appendChild(pulse);
+}
+
+// Soft green edge glow while the Confidence Interval forgiveness window is open.
+function playConfidenceIntervalEffect(durationMs = 1000) {
+    const wrap = document.getElementById('puzzle-scaler');
+    if (!wrap) return;
+    _ensurePassiveFxStyles();
+
+    const overlay = _fxOverlay(wrap, durationMs + 100);
+    const glow = document.createElement('div');
+    glow.style.cssText = 'position:absolute; inset:0; pointer-events:none; z-index:998;';
+    glow.style.animation = `fx-ci-window ${durationMs}ms ease-in-out forwards`;
+    overlay.appendChild(glow);
+}

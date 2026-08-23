@@ -205,6 +205,7 @@ function checkCellGuards(row, col) {
 // Freeze: mark wrong visually but charge no time.
 function tryAbsorbWithFreeze(row, col) {
     if (!window._freezeActive) return false;
+    if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
     wrongGrid[row][col] = true;
     renderCell(row, col);
     showToast('❄️ Frozen! No penalty.');
@@ -236,6 +237,7 @@ function tryAbsorbWithShield(row, col) {
 
 // Class passive (e.g. Mathmagician): penalty multiplier of 0 means fully absorbed.
 function tryAbsorbWithClassPassive(row, col) {
+    if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
     // Suppress any shield-visibility sync (e.g. inside getClassPenaltyMultiplier)
     // from hiding the bubble before we know this was absorbed, and before the
     // meteor VFX gets a chance to play.
@@ -333,6 +335,10 @@ function openConfidenceIntervalGraceWindow() {
         if (ptHasSkill('confidence_interval_2')) windowSecs++;
         if (ptHasSkill('confidence_interval_3')) windowSecs++;
         _confidenceIntervalActive = true;
+        // Soft green glow marks the forgiveness window while it is open
+        if (typeof playConfidenceIntervalEffect === 'function') {
+            playConfidenceIntervalEffect(windowSecs * 1000);
+        }
         setTimeout(() => { _confidenceIntervalActive = false; }, windowSecs * 1000);
     } else {
         // Reset the "just used" flag so the window can open again next mistake
@@ -626,6 +632,7 @@ function checkStreakBonus() {
         timerSecs += bonus;
         _levelTimeAdded += bonus;
         updTimer();
+        if (typeof playTimeGainEffect === 'function') playTimeGainEffect(`+${bonus}s`, '#ffb830');
         showToast(`🔥 ${LANG === 'de' ? `Serienbonus! +${bonus}s` : `Streak Bonus! +${bonus}s`}`);
         PassiveTracker.onStreakBonusTrigger();
     }

@@ -82,12 +82,13 @@ window._degreesOfFreedomChoice = null; // 'row' | 'col' — player's chosen hidd
 window._degreesOfFreedomNext = null; // Timestamp for next brief clue reveal
 
 // --- Overfitting (node 299) — local var, not on window ---
-const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which the penalty kicks in
+const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which mistakes stop being free
+const OVERFITTING_HARD_THRESHOLD = 0.50;  // Board fill % at which mistakes cost triple
 let _lastOverfittingPhase = 'free'; // Tracks phase transitions to prevent toast spam
 
 // --- The Oracle (node 300) ---
 const ORACLE_MIN_CELL_COUNT = 200; // Minimum grid size to activate
-const ORACLE_FLASH_DURATION_MS = 3000;
+const ORACLE_FLASH_DURATION_MS = 5000;
 window._oracleActive = false; // True for the entire level after Oracle fires; blocks all auto-actions
 
 
@@ -729,20 +730,32 @@ function _entropyColIsStalled(sol, colIndex) {
 
 // Clears reveals and marks from a row and re-renders it.
 function _entropyDrainRevertRow(rowIndex, cols) {
+    const drainedIds = [];
     for (let c = 0; c < cols; c++) {
         if (revealedGrid[rowIndex][c]) { revealedGrid[rowIndex][c] = false; userGrid[rowIndex][c] = 0; }
         else if (userGrid[rowIndex][c] === 2) userGrid[rowIndex][c] = 0;
         renderCell(rowIndex, c);
+        drainedIds.push(`g-${rowIndex}-${c}`);
+    }
+    // Red drain pulse across the reverted line
+    if (typeof _applyCellEffect === 'function' && drainedIds.length > 0) {
+        _applyCellEffect(drainedIds, 'erase');
     }
     showToast(`🌡️ ${LANG === 'de' ? `Entropie-Abbau: Zeile ${rowIndex + 1} zurückgesetzt!` : `Entropy Drain: Row ${rowIndex + 1} reverted!`}`);
 }
 
 // Clears reveals and marks from a column and re-renders it.
 function _entropyDrainRevertCol(colIndex, rows) {
+    const drainedIds = [];
     for (let r = 0; r < rows; r++) {
         if (revealedGrid[r][colIndex]) { revealedGrid[r][colIndex] = false; userGrid[r][colIndex] = 0; }
         else if (userGrid[r][colIndex] === 2) userGrid[r][colIndex] = 0;
         renderCell(r, colIndex);
+        drainedIds.push(`g-${r}-${colIndex}`);
+    }
+    // Red drain pulse across the reverted line
+    if (typeof _applyCellEffect === 'function' && drainedIds.length > 0) {
+        _applyCellEffect(drainedIds, 'erase');
     }
     showToast(`🌡️ ${LANG === 'de' ? `Entropie-Abbau: Spalte ${colIndex + 1} zurückgesetzt!` : `Entropy Drain: Column ${colIndex + 1} reverted!`}`);
 }
@@ -846,6 +859,7 @@ function _randomWalkRevealCell(r, c) {
     revealedGrid[r][c] = true;
     userGrid[r][c] = 1;
     renderCell(r, c);
+    if (typeof _applyCellEffect === 'function') _applyCellEffect([`g-${r}-${c}`], 'reveal');
 
     // Consume any pending Bayesian bonus as an extra mark on the side
     if (_getBayesianBonus() > 0 && Math.random() < _getBayesianBonus()) {
@@ -864,6 +878,7 @@ function _randomWalkMarkEmpty(r, c) {
     userGrid[r][c] = 2; // Mark as wrong without counting as a player mistake
     renderCell(r, c);
     systemMarkedGrid[r][c] = true;
+    if (typeof _applyCellEffect === 'function') _applyCellEffect([`g-${r}-${c}`], 'mark');
     updClues(r, c);
     showToast(`🚶 ${LANG === 'de' ? 'Zufällige Wanderung: Leeres Feld markiert!' : 'Random Walk: Empty cell marked!'}`);
     checkWin();
@@ -1157,7 +1172,8 @@ function _degreesOfFreedomTick() {
 //---------- NODE 299: KEYSTONE — OVERFITTING ---------------------------
 //------------------------------------------------------------------------
 // Before 15% board completion: mistakes are free (no time penalty).
-// After 15% board completion: mistakes cost 3× the normal time penalty.
+// Between 15% and 50% board completion: mistakes cost the normal penalty.
+// After 50% board completion: mistakes cost 3× the normal time penalty.
 // Phase transition is announced via toast exactly once.
 //
 // Called from: penalty.js → _overfittingPenaltyMultiplier()
@@ -1168,16 +1184,18 @@ function _degreesOfFreedomTick() {
 function _overfittingCalculatePhase() {
     if (!cur) return 'off';
     const ratio = _getBoardCompletionRatio();
-    return ratio < OVERFITTING_PHASE_THRESHOLD ? 'free' : 'hard';
+    if (ratio < OVERFITTING_PHASE_THRESHOLD) return 'free';
+    if (ratio < OVERFITTING_HARD_THRESHOLD) return 'normal';
+    return 'hard';
 }
 
-// Returns the current phase ('free' | 'hard' | 'off') and fires a toast on phase change.
+// Returns the current phase ('free' | 'normal' | 'hard' | 'off') and fires a toast on phase change.
 function _overfittingGetPhase() {
     if (!ptHasSkill('keystone_overfitting')) return 'off';
 
     const currentPhase = _overfittingCalculatePhase();
 
-    if (_lastOverfittingPhase === 'free' && currentPhase === 'hard') {
+    if (_lastOverfittingPhase === 'free' && currentPhase !== 'free') {
         _lastOverfittingPhase = 'hard';
         showToast(`📉 ${LANG === 'de'
             ? 'Überanpassung!'
@@ -1188,7 +1206,7 @@ function _overfittingGetPhase() {
     return currentPhase;
 }
 
-// Returns a penalty multiplier override (0 = free, 3 = triple, null = inactive).
+// Returns a penalty multiplier override (0 = free, 3 = triple, null = normal/inactive).
 // Called from: penalty.js before the normal penalty calculation.
 function _overfittingPenaltyMultiplier() {
     if (!ptHasSkill('keystone_overfitting')) return null;
@@ -1209,7 +1227,7 @@ function resetOverfittingTracker() {
 //---------- NODE 300: KEYSTONE — THE ORACLE ----------------------------
 //------------------------------------------------------------------------
 // Only activates on puzzles with 200+ cells. At level start, flashes the
-// complete solution for 3 seconds, then hides all clues permanently.
+// complete solution for 5 seconds, then hides all clues permanently.
 // For the rest of the level: no auto-reveals, no auto-marks, no clue hints.
 //
 // Called from: start-level.js → _applyTheOracle()

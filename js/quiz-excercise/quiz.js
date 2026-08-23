@@ -201,12 +201,33 @@ function _quizHideInputRow() {
 }
 
 // Called after the MC buttons have been rendered.
-// Eliminates a single wrong-answer button visually and tracks the stat.
+// Eliminates a single wrong-answer button visually (red flash + shake before
+// it fades out) and tracks the stat.
 function _quizEliminateButton(btn) {
-    btn.disabled = true;
-    btn.style.opacity = '0.35';
-    btn.style.textDecoration = 'line-through';
-    btn.onclick = null;
+    // Inject the elimination keyframes once.
+    if (!document.getElementById('quiz-eliminate-style')) {
+        const style = document.createElement('style');
+        style.id = 'quiz-eliminate-style';
+        style.textContent = `
+            @keyframes quiz-eliminate-flash {
+                0%   { background: rgba(255, 80, 80, 0.65); transform: translateX(0); }
+                20%  { transform: translateX(-5px); }
+                40%  { transform: translateX(5px); }
+                60%  { transform: translateX(-3px); }
+                80%  { transform: translateX(3px); }
+                100% { background: transparent; transform: translateX(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    btn.style.animation = 'quiz-eliminate-flash 0.6s ease-out forwards';
+    setTimeout(() => {
+        btn.disabled = true;
+        btn.style.opacity = '0.35';
+        btn.style.textDecoration = 'line-through';
+        btn.onclick = null;
+    }, 300);
     questStat_mcWrongAnswerEliminated();
 }
 

@@ -559,6 +559,7 @@ function _resetClassLevelState() {
     window._momentumThisLevel = 0;
     window._dataStrikeUsesThisLevel = 0;
     window._veiled_cursedUsed = false;
+    window._shadowSealActive = false;
     window._goldenClockActive = false;
     window._goldenClockMistakesLeft = null;
     window._chronoFractureActive = false;
@@ -752,6 +753,11 @@ function _applyMathmagicianShieldAbsorb() {
 
         showToast(msg);
 
+        // Floating "+Xs" feedback so the proc is visible beyond the toast
+        if (typeof playTimeGainEffect === 'function') {
+            playTimeGainEffect(`+${bonus}s`, ptHasSkill('calculated_error') && bonus >= 120 ? '#c080ff' : '#70e0ff');
+        }
+
 
         trackAchStat('timeAdded', bonus);
     }
@@ -775,8 +781,12 @@ function getClassPenaltyMultiplier() {
         return 5.0;
     }
 
-    // Mathmagician Variance Shield absorbs the mistake entirely
-    if (STATE.playerClass === 'mathmagician') {
+    // Mathmagician Variance Shield absorbs the mistake entirely.
+    // Null Hypothesis / Asymptotic Mastery disable shields of all kinds,
+    // so the class-passive absorption is skipped as well.
+    if (STATE.playerClass === 'mathmagician'
+        && !ptHasSkill('keystone_null_hypothesis')
+        && !ptHasSkill('keystone_asymptotic_mastery')) {
         const absorbed = _applyMathmagicianShieldAbsorb();
         if (absorbed) return 0.0;
     }
@@ -827,6 +837,11 @@ function _handleMathmagicianFreezeBonus() {
                 ? `🔮 Gefrorene Widerstandskraft! +1 ${label}!`
                 : `🔮 Frozen Resilience! +1 ${label}!`;
             showToast(msg);
+
+            // Icy grid pulse so the charge gain is visible in play
+            if (typeof playShieldChargePulseEffect === 'function') {
+                playShieldChargePulseEffect();
+            }
         }
     }
 
@@ -855,6 +870,7 @@ function _handlePrecisionMarkMomentum(row, col) {
     timerSecs = Math.min(timerSecs + 20, 3600);
     _trackTimerDelta(before, timerSecs);
     showToast(LANG === 'de' ? '🎯 Schwung der Gewissheit! +20 s!' : '🎯 Momentum of Certainty! +20 s!');
+    if (typeof playTimeGainEffect === 'function') playTimeGainEffect('+20s', '#ffb830');
     trackAchStat('timeAdded', 20);
 
     if (window._pmMomentumSet.size === 0) {
