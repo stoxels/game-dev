@@ -574,7 +574,7 @@ function _applyInterquartileVision() {
     const scanDur = _interquartileVisionDuration();
 
     setTimeout(() => {
-        if (typeof _executeFieldScan === 'function') _executeFieldScan(Math.floor(rows / 2), Math.floor(cols / 2), scanSize, scanDur);
+        if (typeof _executeFieldScanLegacy === 'function') _executeFieldScanLegacy(Math.floor(rows / 2), Math.floor(cols / 2), scanSize, scanDur);
     }, 300);
 }
 

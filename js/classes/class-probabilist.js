@@ -1122,9 +1122,9 @@ function _fieldScanPickOrigin(scanSize, rows, cols) {
 
 // Temporarily reveals all unrevealed cells in the scan region by adding CSS classes.
 // Returns the DOM elements and their previous state for later restoration.
-// Superseded by _fieldScanComputeTargets + _fieldScanCommitCell, which stage
-// the same mutation per-cell in sync with the drop-arrow VFX.
-/*
+// Superseded by _fieldScanComputeTargets + _fieldScanCommitCell for the targeted
+// ability, but still used by Interquartile Vision's whole-grid field scan
+// (via _executeFieldScanLegacy) where per-cell rain VFX would be far too slow.
 function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
     const scanned = [];
     const prevStates = [];
@@ -1146,11 +1146,10 @@ function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
 
     return { scanned, prevStates };
 }
-*/
 
 // Old simpler scan beam — a single glowing band that sweeps top-to-bottom.
-// Kept here in case it is useful for other scan-like effects in the future.
-/*
+// Kept here in case it is useful for other scan-like effects in the future,
+// currently used by _executeFieldScanLegacy (Interquartile Vision).
 function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
@@ -1213,7 +1212,29 @@ function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
     wrap.appendChild(beam);
     setTimeout(() => { beam.remove(); styleTag.remove(); }, durationMs + 150);
 }
-*/
+
+// _executeFieldScanLegacy — synchronous whole-region Field Scan used by the
+// Interquartile Vision passive node at level start. Reveals every eligible
+// cell in the region in one pass (no per-cell rain VFX), plays the legacy
+// beam sweep, then restores via the standard scan timer.
+function _executeFieldScanLegacy(row, col, scanSize, durationMs) {
+    if (!cur) return;
+    const sol = cur.grid;
+    const rows = sol.length;
+    const cols = sol[0].length;
+
+    const { effectiveSize, effectiveDuration } = _fieldScanComputeEffectiveParams(scanSize, durationMs);
+    const { startRow, startCol } = _fieldScanComputeOrigin(row, col, effectiveSize, rows, cols);
+
+    const { scanned, prevStates } = _fieldScanRevealRegion(startRow, startCol, effectiveSize, rows, cols, sol);
+    if (scanned.length === 0) return;
+
+    _playScanBeamEffect_legacy(startRow, startCol, effectiveSize, effectiveDuration);
+    showToast(`🎯 ${t('cls_field_scan')}`);
+    _fieldScanCheckBigScanAchievement(prevStates, sol);
+
+    setTimeout(() => _fieldScanRestore(scanned, prevStates), effectiveDuration);
+}
 
 
 //------------------------------------------------------------------------
