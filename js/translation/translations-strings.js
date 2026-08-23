@@ -1544,7 +1544,7 @@ Object.assign(T.en, {
     scr_btn_map: 'MAP',
     scr_cannot_undo: 'This cannot be undone.',
     scr_cartographers_tagline: 'CARTOGRAPHERS OF CHANCE',
-    scr_changelog_title: '📝 CHANGELOG (English Only)',
+    scr_changelog_title: '📝 CHANGELOG',
     scr_code_still_locked: '🔒 CODE STILL LOCKED',
     scr_codes_footer: 'Earn points to unlock these powerful achievement codes!',
     scr_convergence_badge: '🌿 CONVERGENCE',
