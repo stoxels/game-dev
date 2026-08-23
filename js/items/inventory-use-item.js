@@ -1645,8 +1645,12 @@ function _consumeItem(idx, def, msg) {
     // happened but the item's own handler already showed its toast.
     if (msg === null) return;
 
-    // Character banter: react to the item that was just used.
-    if (typeof triggerBanter === 'function') {
+    // Character banter: prefer an item-specific line for this exact item
+    // (chance-gated). Falls back internally to the generic rarity-based
+    // line when no item-specific lines exist.
+    if (typeof triggerItemBanter === 'function') {
+        triggerItemBanter(def.id, def.rarity);
+    } else if (typeof triggerBanter === 'function') {
         triggerBanter(def.rarity === 'cursed' ? 'item_used_cursed' : 'item_used_generic');
     }
 

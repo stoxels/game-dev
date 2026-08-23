@@ -23,13 +23,13 @@ const PM_CHARGED_ARROW_MIN_DURATION_S = 0.7;
 const PM_CHARGED_ARROW_MAX_DURATION_S = 1.6;
 const PM_CHARGED_TRAIL_INTERVAL_MS = 45;
 
-// Field Scan charge bolt: sprite → timer
+// Field Scan charge bolt: sprite → rain origin (above grid centre)
 const FIELD_SCAN_CHARGE_SPEED_PX_S = 260;
 const FIELD_SCAN_CHARGE_MIN_DURATION_S = 0.5;
 const FIELD_SCAN_CHARGE_MAX_DURATION_S = 1.1;
 const FIELD_SCAN_CHARGE_TRAIL_INTERVAL_MS = 40;
 
-// Field Scan drop-arrows: timer → each target cell
+// Field Scan drop-arrows: rain origin → each target cell
 const FIELD_SCAN_DROP_SPEED_PX_S = 700;
 const FIELD_SCAN_DROP_MIN_DURATION_S = 0.35;
 const FIELD_SCAN_DROP_MAX_DURATION_S = 0.65;
@@ -108,21 +108,20 @@ function _precisionMarkBuildTargets(row, col, extraLines, rows, cols) {
     return { targetRows, targetCols };
 }
 
-// _precisionMarkSelectLine — selects up to `markCap - affected.length` empty,
-// unmarked cells from a single line (row or column) for Precision Mark to
-// mark. Selection only — does NOT touch userGrid or render anything, since
-// the ✕ now only appears once that cell's marking arrow actually lands (see
+// _precisionMarkSelectLine — selects up to `maxCount` empty, unmarked cells
+// from a single line (row or column) for Precision Mark to mark. Selection
+// only — does NOT touch userGrid or render anything, since the ✕ now only
+// appears once that cell's marking arrow actually lands (see
 // _precisionMarkCommitMark). `claimed` tracks cells already picked by other
 // lines in this same call, since userGrid itself isn't updated yet to do
 // that bookkeeping for us.
-function _precisionMarkSelectLine(cells, sol, markCap, affected, claimed) {
-    const remaining = markCap - affected.length;
-    if (remaining <= 0) return;
+function _precisionMarkSelectLine(cells, sol, maxCount, affected, claimed) {
+    if (maxCount <= 0) return;
     const eligible = cells.filter(([r, c]) =>
         sol[r][c] === 0 && userGrid[r][c] === 0 && !claimed.has(`${r}-${c}`)
     );
     _shuffleArray(eligible);
-    eligible.slice(0, remaining).forEach(([r, c]) => {
+    eligible.slice(0, maxCount).forEach(([r, c]) => {
         claimed.add(`${r}-${c}`);
         affected.push(`g-${r}-${c}`);
     });
@@ -144,20 +143,52 @@ function _precisionMarkCommitMark(id) {
 // _precisionMarkApply — selects all cells Precision Mark will mark across
 // the target rows/cols. Selection only; the actual mark is committed later,
 // in sync with the VFX. Returns the list of affected cell id strings.
+// The mark cap is distributed as evenly as possible across ALL lines
+// (rows AND columns, interleaved), so both orientations reliably receive
+// marks — a naive rows-first pass could let rows consume the entire cap
+// and leave the columns empty.
 function _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap) {
     const affected = [];
     const claimed = new Set();
 
-    targetRows.forEach(r => {
-        const cells = [];
-        for (let c = 0; c < cols; c++) cells.push([r, c]);
-        _precisionMarkSelectLine(cells, sol, markCap, affected, claimed);
-    });
-    targetCols.forEach(c => {
-        const cells = [];
-        for (let r = 0; r < rows; r++) cells.push([r, c]);
-        _precisionMarkSelectLine(cells, sol, markCap, affected, claimed);
-    });
+    // Build an interleaved row/col line list (row, col, row, col, ...).
+    const rowArr = [...targetRows];
+    const colArr = [...targetCols];
+    const lines = [];
+    const maxLen = Math.max(rowArr.length, colArr.length);
+    for (let i = 0; i < maxLen; i++) {
+        if (i < rowArr.length) lines.push({ type: 'row', idx: rowArr[i] });
+        if (i < colArr.length) lines.push({ type: 'col', idx: colArr[i] });
+    }
+
+    // Round-based even distribution: each round gives every not-yet-exhausted
+    // line an equal slice of the remaining cap. Lines that run out of
+    // eligible cells drop out and their share rolls over to the rest.
+    let budgetLeft = markCap;
+    const activeIdx = new Set(lines.map((_, i) => i));
+    while (budgetLeft > 0 && activeIdx.size > 0) {
+        const perLine = Math.max(1, Math.floor(budgetLeft / activeIdx.size));
+        let tookThisRound = 0;
+
+        activeIdx.forEach(i => {
+            const line = lines[i];
+            const cells = [];
+            if (line.type === 'row') {
+                for (let c = 0; c < cols; c++) cells.push([line.idx, c]);
+            } else {
+                for (let r = 0; r < rows; r++) cells.push([r, line.idx]);
+            }
+
+            const before = affected.length;
+            _precisionMarkSelectLine(cells, sol, perLine, affected, claimed);
+            const took = affected.length - before;
+            budgetLeft -= took;
+            tookThisRound += took;
+            if (took < perLine) activeIdx.delete(i); // line exhausted its eligibles
+        });
+
+        if (tookThisRound === 0) break; // nothing left to claim anywhere
+    }
 
     questStat_classMarkUsed(affected.length);
     return affected;
@@ -870,14 +901,26 @@ function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
     }, durationMs + 100);
 }
 
-// _fieldScanGetTimerPos — returns the on-screen centre of the level timer
-// element, used as the "split point" for the rain-down VFX. Falls back to
-// top-centre of the viewport if the timer can't be found.
-function _fieldScanGetTimerPos() {
-    const el = document.getElementById('timer-val');
-    if (el) {
-        const rect = el.getBoundingClientRect();
-        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+// _fieldScanGetRainOrigin — returns the on-screen "split point" for the
+// rain-down VFX: horizontally centred on the puzzle grid and floating a
+// little above its top edge (so the arrows visibly drop down onto the scan
+// area instead of flying in from wherever the timer UI happens to sit).
+// Computed from the corner cells' bounding rects, so it stays correct under
+// zoom/scroll. Falls back to top-centre of the viewport.
+function _fieldScanGetRainOrigin() {
+    const topLeft = document.getElementById('g-0-0');
+    const rows = cur ? cur.grid.length : 0;
+    const cols = cur && cur.grid[0] ? cur.grid[0].length : 0;
+    const bottomRight = rows > 0 && cols > 0
+        ? document.getElementById(`g-${rows - 1}-${cols - 1}`)
+        : null;
+
+    if (topLeft && bottomRight) {
+        const a = topLeft.getBoundingClientRect();
+        const b = bottomRight.getBoundingClientRect();
+        const cx = (a.left + b.right) / 2;
+        const topY = Math.min(a.top, b.top);
+        return { x: cx, y: Math.max(10, topY - 40) };
     }
     return { x: window.innerWidth / 2, y: 60 };
 }
@@ -896,7 +939,7 @@ function _fieldScanChargeTrailTick(boltEl) {
     setTimeout(() => px.remove(), 420);
 }
 
-// _fieldScanPlaySplitBurst — brief radial burst at the timer when the
+// _fieldScanPlaySplitBurst — brief radial burst at the rain origin when the
 // charge bolt arrives and splits into the rain-down arrows.
 function _fieldScanPlaySplitBurst(x, y) {
     const burst = document.createElement('div');
@@ -909,7 +952,8 @@ function _fieldScanPlaySplitBurst(x, y) {
 }
 
 // _fieldScanFireChargeArrow — animates the charge bolt flying from the
-// player sprite to the timer. Visually distinct from Precision Mark's
+// player sprite to the rain origin above the grid. Visually distinct from
+// Precision Mark's
 // charged arrow: a dashed "data bolt" with a square-pixel trail instead of
 // a solid arrowhead with a round comet trail.
 function _fieldScanFireChargeArrow(sx, sy, tx, ty, onArrival) {
@@ -960,7 +1004,7 @@ function _fieldScanPlayLandPing(x, y) {
 }
 
 // _fieldScanFireDropArrow — animates one small drop-arrow falling from the
-// timer (sx, sy) onto a target cell (tx, ty), using an accelerating
+// rain origin (sx, sy) onto a target cell (tx, ty), using an accelerating
 // "gravity" ease so it reads as falling rather than flying flat. Calls
 // onLand() the instant it touches down.
 function _fieldScanFireDropArrow(sx, sy, tx, ty, onLand) {
@@ -1009,10 +1053,10 @@ function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, s
 }
 
 // _fieldScanSplitAndRain — fires one drop-arrow per target cell, all
-// originating from the timer position. Staggered (with a little jitter)
-// for a natural "rain" feel. Once every drop-arrow has landed, the existing
-// beam-sweep scan effect plays and the restore timer is scheduled.
-function _fieldScanSplitAndRain(targets, sol, timerPos, startRow, startCol, scanSize, durationMs) {
+// originating from the rain origin above the grid. Staggered (with a little
+// jitter) for a natural "rain" feel. Once every drop-arrow has landed, the
+// existing beam-sweep scan effect plays and the restore timer is scheduled.
+function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanSize, durationMs) {
     const scanned = [];
     const prevStates = [];
     let landed = 0;
@@ -1026,7 +1070,7 @@ function _fieldScanSplitAndRain(targets, sol, timerPos, startRow, startCol, scan
             const tx = rect.left + rect.width / 2;
             const ty = rect.top + rect.height / 2;
 
-            _fieldScanFireDropArrow(timerPos.x, timerPos.y, tx, ty, () => {
+            _fieldScanFireDropArrow(rainPos.x, rainPos.y, tx, ty, () => {
                 const el = _fieldScanCommitCell(r, c, sol);
                 if (el) { scanned.push(el); prevStates.push({ r, c }); }
 
@@ -1039,15 +1083,16 @@ function _fieldScanSplitAndRain(targets, sol, timerPos, startRow, startCol, scan
     });
 }
 
-// _fieldScanPlayTargetedVFX — full sequence: charge bolt sprite → timer,
-// split into one drop-arrow per target cell, rain down, then (once every
-// arrow has landed) the existing beam-sweep effect fires.
+// _fieldScanPlayTargetedVFX — full sequence: charge bolt sprite → rain
+// origin (a point centred above the grid), split into one drop-arrow per
+// target cell, rain down, then (once every arrow has landed) the existing
+// beam-sweep effect fires.
 function _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, scanSize, durationMs) {
-    const timerPos = _fieldScanGetTimerPos();
+    const rainPos = _fieldScanGetRainOrigin();
     const origin = _pmGetSpriteOrigin(); // shared sprite-origin helper
 
-    _fieldScanFireChargeArrow(origin.x, origin.y, timerPos.x, timerPos.y, () => {
-        _fieldScanSplitAndRain(targets, sol, timerPos, startRow, startCol, scanSize, durationMs);
+    _fieldScanFireChargeArrow(origin.x, origin.y, rainPos.x, rainPos.y, () => {
+        _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanSize, durationMs);
     });
 }
 

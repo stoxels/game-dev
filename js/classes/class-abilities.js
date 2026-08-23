@@ -222,6 +222,11 @@ function _dispatchBaseActive2(playerClass, row, col, effect) {
 // _dispatchBaseAbility — top-level router for base class active abilities.
 //   Calls the correct active1 or active2 dispatcher, then logs the quest stat.
 function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
+    // Character banter for this exact class + skill combination.
+    if (typeof triggerSkillBanter === 'function') {
+        triggerSkillBanter(`${playerClass}_${activeKey}`);
+    }
+
     if (activeKey === 'active1') {
         _dispatchBaseActive1(playerClass, row, col, effect);
     } else {
@@ -245,6 +250,11 @@ function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
 //   hudSlot 'active3' → ascendency active1 (skill 1); 'active4' → ascendency active2 (skill 2).
 function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
     const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
+
+    // Character banter for this exact ascendency + skill combination.
+    if (typeof triggerSkillBanter === 'function') {
+        triggerSkillBanter(`${ascendency}_${ascSlot}`);
+    }
 
     updateQuestStats('classAbilityUsed', {});
 

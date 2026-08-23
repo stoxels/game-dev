@@ -10,8 +10,30 @@
 const CHANGELOG_DATA = [
 
     {
-        version: "v0.27 BETA",
+        version: "v0.28 BETA",
         date: "23.08.2026",
+        changes: [
+            {
+                category: "cl_cat_nf",
+                items: [
+                    "cl_28_1", "cl_28_2", "cl_28_3", "cl_28_4", "cl_28_5",
+                ],
+
+            },
+            {
+                category: "cl_cat_bf",
+                items: [
+                    "cl_28_6", "cl_28_7",
+                ],
+
+            },
+
+        ],
+
+    },
+    {
+        version: "v0.27 BETA",
+        date: "22.08.2026",
         changes: [
             {
                 category: "cl_cat_nf",
