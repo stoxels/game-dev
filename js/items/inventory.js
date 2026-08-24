@@ -66,11 +66,6 @@ function checkInventoryAchievements() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Suppresses a message if it's already visible in the stack.
-function _isToastDuplicate(msg) {
-    return activeToasts.some(t => t.msg === msg);
-}
-
 // Removes a single toast: plays its fade-out, then deletes the element
 // and its entry once the animation finishes.
 function _removeToast(entry) {
@@ -86,17 +81,32 @@ function _removeToast(entry) {
     }, { once: true });
 }
 
+// Instantly discards a toast entry (no fade-out animation). Used when a new
+// message replaces an identical one that is still visible.
+function _discardToastEntry(entry) {
+    clearTimeout(entry.timeoutId);
+    entry.el.remove();
+    const idx = activeToasts.indexOf(entry);
+    if (idx !== -1) activeToasts.splice(idx, 1);
+}
+
 // Adds a new message to the bottom of the stack. It fades in independently
 // and fades out on its own timer, without affecting other visible messages.
-function showToast(msg) {
-    if (_isToastDuplicate(msg)) return;
-
+// If the same message is already visible, it is replaced so repeated uses of
+// an item always surface a fresh toast instead of being suppressed.
+// `accentColor` (optional) tints the message text — used e.g. for
+// rarity-colored loot / pickup notifications.
+function showToast(msg, accentColor) {
     const container = document.getElementById('toast-stack');
     if (!container) return;
+
+    const dup = activeToasts.find(t => t.msg === msg);
+    if (dup) _discardToastEntry(dup);
 
     const el = document.createElement('div');
     el.className = 'toast-msg';
     el.textContent = msg;
+    if (accentColor) el.style.color = accentColor;
     container.appendChild(el);
 
     const entry = { msg, el, removing: false, timeoutId: null };

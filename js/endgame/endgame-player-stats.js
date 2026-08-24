@@ -308,7 +308,7 @@ function _egScheduleAbsorptionRegen() {
 // Human-readable labels + unit suffix for each stat bucket produced by
 // _egComputePlayerStats(). Buckets not listed here are either internal/derived
 // (armour/evasion/absorption totals, physFlatMin/Max, elemental dmg pairs)
-// and are handled explicitly by _egBuildStatsSummaryLines() instead.
+// and are handled explicitly by _egBuildStatLine() instead.
 const EG_STAT_DISPLAY_LABELS = {
     health: { label: t('eg_stat_health'), suffix: '' },
     mana: { label: t('eg_stat_mana'), suffix: '' },
@@ -397,46 +397,131 @@ function _egFormatStatValue(val) {
     return Number.isInteger(rounded) ? rounded : rounded.toFixed(1);
 }
 
-// Builds a flat array of { label, value } lines for the aggregated stats
-// panel. Only non-zero stats are included so the list stays readable.
-// Derived defensive totals and damage ranges get custom combined formatting;
-// everything else is driven off EG_STAT_DISPLAY_LABELS.
-function _egBuildStatsSummaryLines(stats) {
-    const lines = [];
 
-    // ── Derived defensive totals (flat + % increased already applied) ──
-    if (stats.health > 0) lines.push({ label: t('eg_stat_health'), value: `+${_egFormatStatValue(stats.health)}` });
-    if (stats.mana > 0) lines.push({ label: t('eg_stat_mana'), value: `+${_egFormatStatValue(stats.mana)}` });
-    if (stats.armour > 0) lines.push({ label: t('eg_tt_armour'), value: `${_egFormatStatValue(stats.armour)}` });
-    if (stats.evasion > 0) lines.push({ label: t('eg_tt_evasion'), value: `${_egFormatStatValue(stats.evasion)}` });
-    if (stats.absorption > 0) lines.push({ label: t('eg_tt_absorption'), value: `${_egFormatStatValue(stats.absorption)}` });
+//------------------------------------------------------------------------
+//-------------------STAT LAYOUT (GROUPED DISPLAY)------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Defines WHERE each stat is shown on the hub equipment screen and how
+// stats are grouped into categories:
+//   offense — upper left corner block (damage, crit, projectiles, ...)
+//   defense — upper right corner block (defences, life/mana, resistances)
+//   puzzle  — center column between the paperdoll slots (mistakes/time,
+//             quiz helpers)
+// Buckets not listed in any category are silently omitted from display.
+const EG_STAT_LAYOUT = {
+    offense: [
+        { catKey: 'eg_statcat_attributes', buckets: ['strength', 'agility', 'intelligence'] },
+        { catKey: 'eg_statcat_damage', buckets: [
+            'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
+            'physIncPct', 'spellDamageFlat', 'spellDamageIncPct'] },
+        { catKey: 'eg_statcat_crit', buckets: ['critChance', 'critMultiplierPct'] },
+        { catKey: 'eg_statcat_projectiles', buckets: [
+            'accuracy', 'attackSpeed', 'multishotPct', 'splashPct', 'chainPct',
+            'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
+            'pushbackFlat'] },
+        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct'] },
+        { catKey: 'eg_statcat_arcane', buckets: [
+            'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
+            'channelMaxStacks', 'arcaneSurgeStreak', 'arcaneSurgeMana',
+            'manaToDamagePct', 'fatePct'] },
+    ],
+    defense: [
+        { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption'] },
+        { catKey: 'eg_statcat_life_mana', buckets: [
+            'health', 'mana', 'lifeRegen', 'manaRegen', 'lifeLeechPct',
+            'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
+            'heartHealFlat', 'heartHealIncPct', 'wardingHP'] },
+        { catKey: 'eg_statcat_block_dodge', buckets: [
+            'blockChance', 'spellBlockChance', 'blockRecoveryPct',
+            'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct'] },
+        { catKey: 'eg_statcat_resistances', buckets: [
+            'fireResist', 'coldResist', 'lightningResist', 'shadowResist',
+            'arcaneResistFlat'] },
+        { catKey: 'eg_statcat_recovery', buckets: [
+            'absorptionRegenRatePct', 'fasterAbsorptionRegenStart',
+            'groundedChancePct', 'groundedReductionPct',
+            'shieldBashChancePct', 'shieldBashDamageFlat'] },
+    ],
+    puzzle: [
+        { catKey: 'eg_statcat_mistakes_time', buckets: [
+            'mistakeCount', 'mistakeNotCountPct', 'focusPct', 'timeAdded',
+            'firstStepSeconds'] },
+        { catKey: 'eg_statcat_quiz', buckets: ['revealHintPct', 'chanceForNewQuestionPct'] },
+    ],
+};
 
-    // ── Physical damage range ────────────────────────────────────────
-    if (stats.physFlatMin > 0 || stats.physFlatMax > 0) {
-        lines.push({ label: t('eg_stat_phys_damage'), value: `${_egFormatStatValue(stats.physFlatMin)}–${_egFormatStatValue(stats.physFlatMax)}` });
+// Builds a single display line for a stat bucket. Handles the derived /
+// combined pseudo-buckets (armour/evasion/absorption totals and the damage
+// ranges) explicitly; everything else falls through to EG_STAT_DISPLAY_LABELS.
+// Returns null when the stat's aggregated value is zero.
+function _egBuildStatLine(bucket, stats) {
+    let line = null;
+
+    switch (bucket) {
+        // Derived defensive totals (flat + % increased already applied)
+        case 'armour':
+            if (stats.armour > 0) line = { label: t('eg_tt_armour'), value: `${_egFormatStatValue(stats.armour)}` };
+            break;
+        case 'evasion':
+            if (stats.evasion > 0) line = { label: t('eg_tt_evasion'), value: `${_egFormatStatValue(stats.evasion)}` };
+            break;
+        case 'absorption':
+            if (stats.absorption > 0) line = { label: t('eg_tt_absorption'), value: `${_egFormatStatValue(stats.absorption)}` };
+            break;
+
+        // Physical + elemental damage ranges
+        case 'physRange':
+            if (stats.physFlatMin > 0 || stats.physFlatMax > 0) {
+                line = { label: t('eg_stat_phys_damage'), value: `${_egFormatStatValue(stats.physFlatMin)}–${_egFormatStatValue(stats.physFlatMax)}` };
+            }
+            break;
+        case 'fireRange': case 'coldRange': case 'lightningRange': case 'shadowRange': {
+            const pairMap = {
+                fireRange: ['fireDmgMin', 'fireDmgMax'],
+                coldRange: ['coldDmgMin', 'coldDmgMax'],
+                lightningRange: ['lightningDmgMin', 'lightningDmgMax'],
+                shadowRange: ['shadowDmgMin', 'shadowDmgMax'],
+            };
+            const [minKey, maxKey] = pairMap[bucket];
+            if (stats[minKey] > 0 || stats[maxKey] > 0) {
+                const labelKey = { fireRange: 'eg_stat_fire_damage', coldRange: 'eg_stat_cold_damage', lightningRange: 'eg_stat_lightning_damage', shadowRange: 'eg_stat_shadow_damage' }[bucket];
+                line = { label: t(labelKey), value: `${_egFormatStatValue(stats[minKey])}–${_egFormatStatValue(stats[maxKey])}` };
+            }
+            break;
+        }
+
+        default: {
+            const meta = EG_STAT_DISPLAY_LABELS[bucket];
+            if (!meta) return null;
+            const val = stats[bucket];
+            if (!val || val === 0) return null;
+            line = { label: meta.label, value: `+${_egFormatStatValue(val)}${meta.suffix}` };
+        }
     }
 
-    // ── Elemental damage ranges ──────────────────────────────────────
-    const elementalPairs = [
-        ['fireDmgMin', 'fireDmgMax', t('eg_stat_fire_damage')],
-        ['coldDmgMin', 'coldDmgMax', t('eg_stat_cold_damage')],
-        ['lightningDmgMin', 'lightningDmgMax', t('eg_stat_lightning_damage')],
-        ['shadowDmgMin', 'shadowDmgMax', t('eg_stat_shadow_damage')],
-    ];
-    elementalPairs.forEach(([minKey, maxKey, label]) => {
-        if (stats[minKey] > 0 || stats[maxKey] > 0) {
-            lines.push({ label, value: `${_egFormatStatValue(stats[minKey])}–${_egFormatStatValue(stats[maxKey])}` });
-        }
+    if (!line) return null;
+    line.bucket = bucket;
+    line.descKey = `eg_statdesc_${bucket}`;
+    return line;
+}
+
+// Aggregates all non-zero stats into the three screen regions defined by
+// EG_STAT_LAYOUT. Returns { offense: [...], defense: [...], puzzle: [...] }
+// where each side is an array of { title, lines: [{ label, value, descKey }] }.
+function _egBuildGroupedStats(stats) {
+    const out = { offense: [], defense: [], puzzle: [] };
+
+    Object.entries(EG_STAT_LAYOUT).forEach(([side, categories]) => {
+        categories.forEach(cat => {
+            const lines = cat.buckets
+                .map(b => _egBuildStatLine(b, stats))
+                .filter(Boolean);
+            if (lines.length > 0) out[side].push({ title: t(cat.catKey), lines });
+        });
     });
 
-    // ── Everything else ──────────────────────────────────────────────
-    Object.entries(EG_STAT_DISPLAY_LABELS).forEach(([bucket, meta]) => {
-        const val = stats[bucket];
-        if (!val || val === 0) return;
-        lines.push({ label: meta.label, value: `+${_egFormatStatValue(val)}${meta.suffix}` });
-    });
-
-    return lines;
+    return out;
 }
 
 

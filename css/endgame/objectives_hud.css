@@ -25,8 +25,12 @@
         display: none !important;
     }
 
-/* Section label at the top */
+/* Section label at the top — doubles as the drag handle */
 .eg-obj-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
     font-size: 0.8em; /* Increased from 0.62em */
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -35,6 +39,53 @@
     margin-bottom: 8px;
     padding-bottom: 6px;
     border-bottom: 1px solid #4a5568; /* Brighter border */
+}
+
+/* Title text inside the header (drag handle area) */
+.eg-obj-title {
+    flex: 1;
+    cursor: grab;
+    user-select: none;
+}
+
+#eg-objectives-strip.eg-dragging .eg-obj-title {
+    cursor: grabbing;
+}
+
+/* Small square minimize button, styled like the passive tracker's toggle */
+.eg-obj-collapse {
+    background: none;
+    border: 1px solid #4a5568;
+    color: #a0aec0;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background 0.12s, color 0.12s;
+}
+
+    .eg-obj-collapse:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+    }
+
+/* Body wrapper holding all rows + leave button — hidden when minimized */
+.eg-obj-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#eg-objectives-strip.eg-collapsed {
+    opacity: 0.75;
 }
 
 /* Individual objective row */

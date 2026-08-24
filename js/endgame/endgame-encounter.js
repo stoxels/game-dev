@@ -75,8 +75,16 @@ function _egRollMonsterLevel(baseLevel) {
 }
 
 // Returns the resolved base level for the current encounter (falls back to 1).
+// Chained-puzzle levels reuse regular puzzle defs that carry no monsterLevel
+// of their own — in that case respect the original map def's monster level
+// so monsters keep spawning at the map's intended level across the chain.
 function _egGetEncounterBaseLevel() {
-    return (cur.monsterLevel != null && cur.monsterLevel > 0) ? cur.monsterLevel : 1;
+    if (cur && cur.monsterLevel != null && cur.monsterLevel > 0) return cur.monsterLevel;
+    if (typeof _egMapDef !== 'undefined' && _egMapDef
+        && _egMapDef.monsterLevel != null && _egMapDef.monsterLevel > 0) {
+        return _egMapDef.monsterLevel;
+    }
+    return 1;
 }
 
 // Builds a fixed monster list from cur.monsters, levelling each entry.
@@ -370,12 +378,88 @@ function _egCheckMistakeLimit() {
         _egStopEncounter();
         dead = true;
         stopTimer();
-        document.getElementById('lose-title').textContent = t('eg_map_failed');
-        document.getElementById('lose-sub').textContent = t('eg_too_many_mistakes');
-        Audio_Manager.playSFX('player_defeated');
-
-        document.getElementById('ov-lose').classList.add('show');
+        _egShowMapFailedOverlay('eg_map_failed', 'eg_too_many_mistakes');
     }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------MAP FAILED OVERLAY-----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Navigates back to the Endgame Test Hub after a map failure.
+// Performs the same cleanup as the standard leave-level handlers.
+function _egReturnToTestHubFromDefeat() {
+    const ov = document.getElementById('ov-lose');
+    if (ov) ov.classList.remove('show', 'eg-map-failed');
+
+    if (typeof _egStopEncounter === 'function') _egStopEncounter();
+
+    // Best-effort cleanup of level-scoped systems (mirrors cleanupActiveGameSystems)
+    ['clearActiveRandomWalkers', '_bayesTrapsCleanup', '_endBlackSwan',
+     '_fxShieldBorderRemove', '_varianceShield_removeBubble',
+     '_arcaneFreeze_clearAllFrostAndStalagmites'].forEach(fnName => {
+        if (typeof window[fnName] === 'function') {
+            try { window[fnName](); } catch (_) { /* ignore */ }
+        }
+    });
+    if (typeof _clearBlackoutCountdown === 'function') {
+        _clearBlackoutCountdown('row');
+        _clearBlackoutCountdown('col');
+    }
+
+    if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
+    if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
+
+    if (typeof showEndgameTestHub === 'function') showEndgameTestHub();
+}
+
+// Lazily injects the "return to Nexus" button into the lose overlay and
+// wires an observer that swaps it in place of Retry/Levels whenever the
+// overlay opens with the eg-map-failed class. Regular (non-endgame) defeats
+// keep their default buttons automatically.
+function _egEnsureLoseOverlayEndgameUI() {
+    const ov = document.getElementById('ov-lose');
+    if (!ov || ov.dataset.egFailUiBound) return;
+    ov.dataset.egFailUiBound = '1';
+
+    const btns = ov.querySelector('.ov-btns');
+    const retry = document.getElementById('btn-lose-retry');
+    const levels = document.getElementById('btn-lose-levels');
+
+    let egBtn = document.getElementById('btn-lose-endgame-return');
+    if (!egBtn) {
+        egBtn = document.createElement('button');
+        egBtn.id = 'btn-lose-endgame-return';
+        egBtn.className = 'ob p';
+        egBtn.style.display = 'none';
+        egBtn.textContent = t('eg_return_to_test_hub');
+        egBtn.addEventListener('click', _egReturnToTestHubFromDefeat);
+        btns.appendChild(egBtn);
+    }
+
+    new MutationObserver(() => {
+        if (!ov.classList.contains('show')) return;
+        const failed = ov.classList.contains('eg-map-failed');
+        retry.style.display = failed ? 'none' : '';
+        levels.style.display = failed ? 'none' : '';
+        egBtn.style.display = failed ? '' : 'none';
+    }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+}
+
+// Shows the lose overlay in "map failed" mode: no Retry / Levels — only a
+// single button that returns the player to the Endgame Test Hub.
+function _egShowMapFailedOverlay(titleKey, subKey) {
+    _egEnsureLoseOverlayEndgameUI();
+
+    document.getElementById('lose-title').textContent = t(titleKey);
+    document.getElementById('lose-sub').textContent = t(subKey);
+    Audio_Manager.playSFX('player_defeated');
+
+    const ov = document.getElementById('ov-lose');
+    ov.classList.add('eg-map-failed');
+    ov.classList.add('show');
 }
 
 
@@ -545,11 +629,13 @@ function _egOnCorrectCell(row, col) {
 // Launches a projectile from the clicked cell toward the targeted monster card.
 // If the target card is not visible (e.g. not yet rendered), damage is applied
 // instantly so no hits are silently lost.
-function _egAnimatePlayerProjectile(damage, targetId, row, col) {
-    // Try to get the cell element first, fall back to the HUD if missing
-    let sourceEl = (row !== undefined && col !== undefined)
-        ? document.getElementById(`g-${row}-${col}`)
-        : null;
+function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride) {
+    // Explicit source element first (reveal-triggered shots), then the cell
+    // element, falling back to the HUD if missing
+    let sourceEl = sourceElOverride
+        || ((row !== undefined && col !== undefined)
+            ? document.getElementById(`g-${row}-${col}`)
+            : null);
 
     if (!sourceEl) {
         sourceEl = document.getElementById('class-hud-drag-handle');
@@ -566,10 +652,11 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col) {
     const start = _egGetElementCentre(sourceEl);
     const end = _egGetElementCentre(targetCard);
     const projDef = _egGetProjectileDef();
+    const orient = { rotate: projDef.rotate !== false, rotOffset: projDef.rotOffset || 0 };
 
     _egFireProjectile(projDef.emoji, projDef.cssClass, start, end, projDef.duration, projDef.easing, () => {
         _egDamageTargetById(targetId, damage);
-    });
+    }, orient);
 }
 
 
@@ -711,6 +798,35 @@ function _egSelectTarget(monsterId) {
     _egRenderPanel();
 }
 
+// Cycles the target through the live monster list (Shift = reverse).
+// Wraps around at both ends; no-op when no monsters are on the field.
+function _egCycleTarget(reverse) {
+    if (!_egIsActive() || _egMonsters.length === 0) return;
+
+    const idx = _egMonsters.findIndex(m => m.id === _egTargetId);
+    const step = reverse ? -1 : 1;
+    const nextIdx = idx === -1
+        ? 0
+        : (idx + step + _egMonsters.length) % _egMonsters.length;
+
+    _egSelectTarget(_egMonsters[nextIdx].id);
+}
+
+// Tab targeting: registered once at load. Only active during an encounter.
+function _initEgTargetHotkeys() {
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab') return;
+        const tag = document.activeElement?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        if (!STATE.playerClass || isClassless()) return;
+
+        e.preventDefault();
+        _egCycleTarget(e.shiftKey);
+    });
+}
+
+_initEgTargetHotkeys();
+
 // Convenience wrapper — damages the currently selected target.
 // Kept for any legacy callers that don't pass an explicit id.
 function _egDamageTarget(amount) {
@@ -813,20 +929,6 @@ function _egUpdateTargetAfterKill() {
     }
 }
 
-// Shows the kill toast, depending on whether the total monster count is known.
-function _egShowNormalKillToast(monsterName) {
-    const req = _egGetMapRequirements();
-    const total = req.totalMonsters;
-    if (total > 0) {
-        showToast(t('eg_kill_toast_progress')
-            .replace('{name}', monsterName)
-            .replace('{k}', _egChainKillCount)
-            .replace('{t}', total));
-    } else {
-        showToast(t('eg_kill_toast').replace('{name}', monsterName));
-    }
-}
-
 // Checks whether the boss kill threshold has been crossed and schedules the boss spawn.
 // Only fires once per encounter (_egBossSpawned guards against duplicates).
 function _egCheckAndTriggerBossSpawn() {
@@ -846,7 +948,6 @@ function _egCheckAndTriggerBossSpawn() {
 function _egHandleNormalMonsterKill(dying) {
     _egChainKillCount++;
 
-    _egShowNormalKillToast(dying.name);
     _egUpdateObjectivesHUD();
     _egCheckAndTriggerBossSpawn();
 
@@ -857,14 +958,15 @@ function _egHandleNormalMonsterKill(dying) {
     if (!totalReached) _egScheduleRespawn();
 
     if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(false, dying.level);
+    if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);
     if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
 }
 
 // Handles all post-kill logic for a boss monster death.
 function _egHandleBossKill(dying) {
-    showToast(t('eg_boss_kill_toast').replace('{name}', dying.name));
     _egUpdateObjectivesHUD();
     if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(true,dying.level);
+    if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
 }
 
 // Removes a monster from the encounter after its death animation fires.
@@ -892,10 +994,7 @@ function _egGameOver() {
     _egStopEncounter();
     dead = true;
     stopTimer();
-    document.getElementById('lose-title').textContent = t('eg_game_over');
-    document.getElementById('lose-sub').textContent = t('eg_monsters_overwhelmed');
-    Audio_Manager.playSFX('player_defeated');
-    document.getElementById('ov-lose').classList.add('show');
+    _egShowMapFailedOverlay('eg_game_over', 'eg_monsters_overwhelmed');
 }
 
 
@@ -920,15 +1019,11 @@ function _egBuildMonsterOrBoss(defId, level) {
     return monster;
 }
 
-// Shows the appropriate arrival toast and initialises boss logic if needed.
+// Initialises boss logic on arrival. Spawn toasts were removed —
+// the monster cards themselves signal that something appeared.
 function _egNotifyMonsterArrival(monster) {
-    if (typeof showToast !== 'function') return;
-
     if (monster.isBoss) {
-        showToast(t('eg_boss_arrived').replace('{name}', monster.name));
         _egBossInit(monster);
-    } else {
-        showToast(t('eg_monster_appeared').replace('{name}', monster.name));
     }
 }
 
@@ -1057,6 +1152,7 @@ function _egBuildMonsterCardHTML(m) {
 
         <!-- Emoji icon with level badge and hover tooltip -->
         <div class="eg-emoji-wrapper ${isTarget ? 'eg-compact-targeted' : ''}">
+            ${isTarget ? '<span class="eg-target-arrow">▼</span>' : ''}
             <span class="eg-monster-emoji-compact">${m.emoji}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
 

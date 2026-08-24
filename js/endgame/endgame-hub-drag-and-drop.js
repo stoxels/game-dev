@@ -232,6 +232,9 @@ function _dndPickUp(e, chip) {
 
     e.preventDefault();
 
+    // The origin chip is about to be removed — close any open hover tooltip.
+    _egClearTooltip();
+
     _dnd = {
         active: true,
         item: resolved.item,
@@ -495,6 +498,9 @@ function _dndHandleRightClick(e) {
 
     e.preventDefault(); // suppress the browser context menu
 
+    // The chip may move or vanish (quick-equip/unequip) — close its tooltip.
+    _egClearTooltip();
+
     const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
     const equipSlot = chip.closest('.eg-equip-slot');
 
@@ -517,8 +523,9 @@ function _dndBuildCurrencyChipHTML(item) {
         ? `<span class="eg-stack-badge">${item.count >= 1000 ? Math.floor(item.count / 1000) + 'k' : item.count}</span>`
         : '';
     return `
-<div class="eg-item-chip ${rarityClass}" title="${item.name || ''}" draggable="true"
-     onmouseenter="_egShowTooltip(${itemJson})"
+<div class="eg-item-chip ${rarityClass}" draggable="true"
+     onmouseenter="_egShowTooltip(${itemJson}, event)"
+     onmousemove="_egMoveTooltip(event)"
      onmouseleave="_egClearTooltip()">
     <span class="eg-item-chip-icon">${item.icon || '📦'}</span>${badge}
 </div>`;

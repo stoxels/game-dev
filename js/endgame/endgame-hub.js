@@ -3,11 +3,13 @@
 //------------------------------------------------------------------------
 // Handles the Endgame Hub UI:
 //   - Character panel with paperdoll equipment slots and stats
-//   - Tooltip panel (center column, shows hovered item details)
-//   - Map Device panel (right column: orb slot + map stash below)
 //   - Currency strip (Runes & Orbs row)
-//   - Full-width equipment stash (bottom panel)
+//   - Full-width equipment stash (below the currency strip)
+//   - Floating item tooltip on mouseover (+ Alt-hold compare tooltip
+//     against the equipped item in the matching paperdoll slot)
 //   - Drag-and-drop is handled in endgame-hub-drag-and-drop.js
+//   - The Probability Gate (map device + map stash) lives on its own
+//     screen — see endgame-gate.js
 //------------------------------------------------------------------------
 
 
@@ -100,9 +102,9 @@ function _egBuildItemChipHTML(item, size = 'normal') {
     return `
 <div class="eg-item-chip ${rarityClass} ${sizeClass}"
      id="${chipId}"
-     title="${(item.name || '').replace(/"/g, '&quot;')}"
      draggable="true"
-     onmouseenter="_egShowTooltipFromChip('${chipId}')"
+     onmouseenter="_egShowTooltipFromChip('${chipId}', event)"
+     onmousemove="_egMoveTooltip(event)"
      onmouseleave="_egClearTooltip()">
     <span class="eg-item-chip-icon">${item.icon || '📦'}</span>
     <span class="eg-item-chip-name">${item.name || '???'}</span>
@@ -111,11 +113,10 @@ function _egBuildItemChipHTML(item, size = 'normal') {
 
 
 
-function _egShowTooltipFromChip(chipId) {
+function _egShowTooltipFromChip(chipId, e) {
     const item = _egChipRegistry.get(chipId);
     if (item) {
-        console.log('[tooltip] item:', JSON.stringify(item));
-        _egShowTooltip(item);
+        _egShowTooltip(item, e);
     }
 }
 
@@ -150,45 +151,34 @@ function _egBuildEquipColHTML(col) {
         .join('');
 }
 
-// Assembles the full character panel: left slots, center stats, right slots, weapon row.
+// Assembles the full character panel: offense stats (upper left), left slots,
+// center puzzle stats, right slots, defense stats (upper right), weapon row.
 function _egBuildCharPanelHTML() {
     return `
 <div class="eg-panel eg-panel-char">
     <div class="eg-panel-label">${t('eg_char_label')}</div>
     <div class="eg-char-panel eg-char-panel-no-model">
+        <div class="eg-stat-block" id="eg-stats-offense">
+            <div class="eg-stats-header">${t('eg_stats_offense_label')}</div>
+            <div class="eg-stats-list" id="eg-offense-stats-list"></div>
+        </div>
         <div class="eg-equip-col eg-equip-left" id="eg-equip-left">
             ${_egBuildEquipColHTML('left')}
         </div>
         <div class="eg-char-stats-panel" id="eg-char-stats-panel">
             <div class="eg-stats-header">${t('eg_stats_label')}</div>
-            <div class="eg-stats-list" id="eg-stats-list">
-                <div class="eg-stat-row eg-stat-placeholder">
-                    <span class="eg-stat-name">${t('eg_no_stats_yet')}</span>
-                </div>
-            </div>
+            <div class="eg-stats-list" id="eg-stats-list"></div>
         </div>
         <div class="eg-equip-col eg-equip-right" id="eg-equip-right">
             ${_egBuildEquipColHTML('right')}
         </div>
+        <div class="eg-stat-block" id="eg-stats-defense">
+            <div class="eg-stats-header">${t('eg_stats_defense_label')}</div>
+            <div class="eg-stats-list" id="eg-defense-stats-list"></div>
+        </div>
     </div>
     <div class="eg-equip-bottom-row" id="eg-equip-bottom">
         ${_egBuildEquipColHTML('bottom')}
-    </div>
-</div>`;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------HTML HELPERS: TOOLTIP PANEL--------------------------
-//------------------------------------------------------------------------
-
-// Builds the center tooltip panel (initially shows placeholder text).
-function _egBuildTooltipPanelHTML() {
-    return `
-<div class="eg-panel eg-panel-tooltip">
-    <div class="eg-panel-label">${t('eg_item_tooltip_label')}</div>
-    <div class="eg-tooltip-panel-body" id="eg-tooltip-panel-body">
-        <span class="eg-tooltip-empty">${t('eg_tooltip_hover_hint')}</span>
     </div>
 </div>`;
 }
@@ -230,106 +220,6 @@ function _egBuildCurrencyStripHTML() {
     <div class="eg-currency-row" id="eg-currency-grid"
          style="grid-template-columns: repeat(${EG_CURRENCY_COLS}, 1fr);">
         ${_egBuildCurrencyGridHTML()}
-    </div>
-</div>`;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------HTML HELPERS: MAP DEVICE-----------------------------
-//------------------------------------------------------------------------
-
-// Builds the decorative orb-ring with cardinal rune markers (pure visual).
-function _egBuildMapOrbRingHTML() {
-    return `
-<div class="eg-map-orb-ring">
-    <div class="eg-map-orb-rune eg-rune-top">✦</div>
-    <div class="eg-map-orb-rune eg-rune-right">✦</div>
-    <div class="eg-map-orb-rune eg-rune-bottom">✦</div>
-    <div class="eg-map-orb-rune eg-rune-left">✦</div>
-</div>`;
-}
-
-// Builds the four coloured sockets shown beneath the map device frame (pure visual).
-function _egBuildMapSocketRowHTML() {
-    return `
-<div class="eg-map-socket-row">
-    <div class="eg-map-socket eg-socket-red"></div>
-    <div class="eg-map-socket eg-socket-green"></div>
-    <div class="eg-map-socket eg-socket-blue"></div>
-    <div class="eg-map-socket eg-socket-white"></div>
-</div>`;
-}
-
-// Builds the central orb drop slot where the player inserts a map.
-function _egBuildMapOrbSlotHTML() {
-    return `
-<div class="eg-map-slot"
-     id="eg-map-slot"
-     data-eg-dropzone="map"
-     ondragover="egDragOver(event)"
-     ondrop="egDropOnMap(event)"
-     ondragleave="egDragLeave(event)">
-    <div class="eg-map-slot-inner" id="eg-map-slot-inner">
-        <span class="eg-map-slot-empty-text">${t('eg_insert_map')}</span>
-    </div>
-</div>`;
-}
-
-// Assembles the complete map device block: orb frame, drop slot, activate button.
-function _egBuildMapDeviceHTML() {
-    return `
-<div class="eg-map-device">
-    <div class="eg-map-device-frame">
-        ${_egBuildMapOrbRingHTML()}
-        ${_egBuildMapOrbSlotHTML()}
-    </div>
-    <button class="eg-activate-btn" id="eg-activate-btn" disabled onclick="egActivateMap()">
-        ${t('eg_activate_map')}
-    </button>
-</div>`;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------HTML HELPERS: MAP STASH------------------------------
-//------------------------------------------------------------------------
-
-// Builds a single map stash cell div (drop target).
-function _egBuildMapStashCellHTML(row, col) {
-    return `
-<div class="eg-inv-cell eg-map-stash-cell"
-     id="eg-map-stash-cell-${row}-${col}"
-     data-row="${row}" data-col="${col}"
-     data-eg-dropzone="mapstash"
-     ondragover="egDragOver(event)"
-     ondrop="egDropOnMapStash(event, ${row}, ${col})"
-     ondragleave="egDragLeave(event)">
-</div>`;
-}
-
-// Builds the full map stash grid by iterating over all rows and columns.
-function _egBuildMapStashGridHTML() {
-    let html = '';
-    for (let r = 0; r < EG_MAP_STASH_ROWS; r++) {
-        for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
-            html += _egBuildMapStashCellHTML(r, c);
-        }
-    }
-    return html;
-}
-
-// Assembles the right-side panel: map device on top, map stash grid below.
-function _egBuildMapPanelHTML() {
-    return `
-<div class="eg-panel eg-panel-map">
-    <div class="eg-panel-label">${t('mg_gate_badge')}</div>
-    ${_egBuildMapDeviceHTML()}
-    <div class="eg-map-stash-section">
-        <div class="eg-panel-label">${t('eg_maps_label')}</div>
-        <div class="eg-map-stash-grid" id="eg-map-stash-grid">
-            ${_egBuildMapStashGridHTML()}
-        </div>
     </div>
 </div>`;
 }
@@ -383,22 +273,22 @@ function _egBuildStashPanelHTML() {
 function _egBuildTopbarHTML() {
     return `
 <div class="eg-topbar">
-    <button class="eg-back-btn" onclick="safeGoToLevelSelect()">${t('btn_back')}</button>
+    <button class="eg-back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('eg_nexus_title')}</span>
 </div>`;
 }
 
 // Assembles the complete hub screen layout:
-// topbar → three-column body (char | tooltip | map) → currency strip → stash.
+// topbar → character panel → runes & orbs strip → stash.
+// The item tooltip is a floating mouseover tooltip (no dedicated panel),
+// and the probability gate / map device lives on its own screen.
 function _egBuildFullScreenHTML() {
     return `
 <div class="eg-hub-layout">
     ${_egBuildTopbarHTML()}
     <div class="eg-body">
-        <div class="eg-body-top">
+        <div class="eg-char-wrap">
             ${_egBuildCharPanelHTML()}
-            ${_egBuildTooltipPanelHTML()}
-            ${_egBuildMapPanelHTML()}
         </div>
         ${_egBuildCurrencyStripHTML()}
         ${_egBuildStashPanelHTML()}
@@ -413,7 +303,10 @@ function _egBuildFullScreenHTML() {
 
 // Re-renders a single equipment slot from current state.
 // Shows the equipped item chip, or the slot's placeholder icon if empty.
+// The whole slot cell is tinted with the item's rarity color (same scheme
+// as the main stash cells).
 function _egRenderEquipSlot(slotId) {
+    const slotEl = document.getElementById(`eg-equip-slot-${slotId}`);
     const el = document.getElementById(`eg-equip-item-${slotId}`);
     if (!el) return;
     const slot = EG_EQUIP_SLOTS.find(s => s.id === slotId);
@@ -422,6 +315,17 @@ function _egRenderEquipSlot(slotId) {
     el.innerHTML = item
         ? _egBuildItemChipHTML(item)
         : `<span class="eg-equip-slot-placeholder">${slot ? slot.icon : '◻'}</span>`;
+
+    if (slotEl) {
+        if (item) {
+            const fill = EG_RARITY_CELL_FILL[item.rarity] || EG_RARITY_CELL_FILL.common;
+            slotEl.style.background = fill;
+            slotEl.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
+        } else {
+            slotEl.style.background = '';
+            slotEl.style.borderColor = '';
+        }
+    }
 }
 
 // Re-renders all paperdoll equipment slots.
@@ -434,6 +338,19 @@ function _egRenderEquipSlots() {
 //-------------------RENDER: MAIN STASH-----------------------------------
 //------------------------------------------------------------------------
 
+// Full-cell rarity tint used by the main stash — each occupied cell is
+// filled with its item's rarity color (instead of only a chip glow).
+const EG_RARITY_CELL_FILL = {
+    common: 'rgba(122, 122, 122, 0.40)',
+    uncommon: 'rgba(46, 204, 113, 0.35)',
+    rare: 'rgba(52, 152, 219, 0.40)',
+    epic: 'rgba(155, 89, 182, 0.45)',
+    legendary: 'rgba(243, 156, 18, 0.45)',
+    cursed: 'rgba(231, 76, 60, 0.40)',
+    artifact: 'rgba(241, 196, 15, 0.40)',
+    currency: 'rgba(181, 146, 72, 0.35)',
+};
+
 // Re-renders a single cell in the main stash grid.
 function _egRenderInventoryCell(row, col) {
     const cell = document.getElementById(`eg-inv-cell-${row}-${col}`);
@@ -442,6 +359,16 @@ function _egRenderInventoryCell(row, col) {
     cell.innerHTML = item
         ? _egBuildItemChipHTML(item) + _egBuildDeleteBtnHTML(row, col)   // ← delete btn added
         : '';
+
+    // Fill the whole cell with the item's rarity color; reset when empty.
+    if (item) {
+        const fill = EG_RARITY_CELL_FILL[item.rarity] || EG_RARITY_CELL_FILL.common;
+        cell.style.background = fill;
+        cell.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
+    } else {
+        cell.style.background = '';
+        cell.style.borderColor = '';
+    }
 }
 
 // Re-renders the entire main stash grid.
@@ -486,50 +413,12 @@ function _egRenderCurrencyStash() {
 
 
 //------------------------------------------------------------------------
-//-------------------RENDER: MAP STASH------------------------------------
+//-------------------RENDER: MAP STASH / MAP DEVICE-----------------------
 //------------------------------------------------------------------------
-
-// Re-renders a single cell in the map stash grid.
-function _egRenderMapStashCell(row, col) {
-    const cell = document.getElementById(`eg-map-stash-cell-${row}-${col}`);
-    if (!cell) return;
-    const item = _egMapStash[row][col];
-    cell.innerHTML = item ? _egBuildItemChipHTML(item) : '';
-}
-
-// Re-renders the entire map stash grid.
-function _egRenderMapStash() {
-    for (let r = 0; r < EG_MAP_STASH_ROWS; r++) {
-        for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
-            _egRenderMapStashCell(r, c);
-        }
-    }
-}
-
-
-//------------------------------------------------------------------------
-//-------------------RENDER: MAP DEVICE-----------------------------------
-//------------------------------------------------------------------------
-
-// Updates the activate button enabled/disabled state based on whether a map is loaded.
-function _egRenderMapDeviceButton() {
-    const btn = document.getElementById('eg-activate-btn');
-    if (!btn) return;
-    btn.disabled = !_egMapSlotItem;
-}
-
-// Re-renders the map device orb slot: shows the loaded map chip, or the empty prompt.
-// Also refreshes the activate button state.
-function _egRenderMapSlot() {
-    const inner = document.getElementById('eg-map-slot-inner');
-    if (!inner) return;
-
-    inner.innerHTML = _egMapSlotItem
-        ? _egBuildItemChipHTML(_egMapSlotItem, 'large')
-        : `<span class="eg-map-slot-empty-text">${t('eg_insert_map')}</span>`;
-
-    _egRenderMapDeviceButton();
-}
+// Moved to endgame-gate.js — the map stash and map device live on the
+// separate Probability Gate screen. _egRenderAll() still calls
+// _egRenderMapSlot() / _egRenderMapStash(); they no-op while the gate
+// screen is not in the DOM.
 
 
 //------------------------------------------------------------------------
@@ -537,29 +426,83 @@ function _egRenderMapSlot() {
 //------------------------------------------------------------------------
 
 
-// Re-renders the aggregated stats list in the character panel's center
-// column. Reads live gear via _egComputePlayerStats() / _egBuildStatsSummaryLines()
-// (endgame-player-stats.js) so it always reflects whatever is currently equipped.
+// Re-renders the three aggregated stat regions of the character panel:
+//   offense — upper left corner block, defense — upper right corner block,
+//   puzzle  — center column between the paperdoll slots.
+// Reads live gear via _egComputePlayerStats() / _egBuildGroupedStats()
+// (endgame-player-stats.js) so it always reflects whatever is equipped.
 function _egRenderStatsList() {
-    const el = document.getElementById('eg-stats-list');
-    if (!el) return;
-
     const stats = _egComputePlayerStats();
-    const lines = _egBuildStatsSummaryLines(stats);
+    const groups = _egBuildGroupedStats(stats);
 
-    if (lines.length === 0) {
-        el.innerHTML = `
+    const emptyHTML = `
 <div class="eg-stat-row eg-stat-placeholder">
     <span class="eg-stat-name">${t('eg_no_stats_yet')}</span>
 </div>`;
-        return;
+
+    function renderSide(listId, categories) {
+        const el = document.getElementById(listId);
+        if (!el) return;
+        if (!categories.length) {
+            el.innerHTML = emptyHTML;
+            return;
+        }
+        el.innerHTML = categories.map(cat => `
+<div class="eg-stats-category">
+    <div class="eg-stats-category-title">${cat.title}</div>
+    ${cat.lines.map(line => `
+    <div class="eg-stat-row" data-desc-key="${line.descKey}" data-desc-label="${line.label}">
+        <span class="eg-stat-name">${line.label}</span>
+        <span class="eg-stat-value">${line.value}</span>
+    </div>`).join('')}
+</div>`).join('');
     }
 
-    el.innerHTML = lines.map(line => `
-<div class="eg-stat-row">
-    <span class="eg-stat-name">${line.label}</span>
-    <span class="eg-stat-value">${line.value}</span>
-</div>`).join('');
+    renderSide('eg-offense-stats-list', groups.offense);
+    renderSide('eg-defense-stats-list', groups.defense);
+    renderSide('eg-stats-list', groups.puzzle);
+    _egBindStatTooltips();
+}
+
+
+// Builds the hover tooltip body for a single stat row: stat name as the
+// title plus its mechanic description. Uses the shared game tooltip engine
+// from tooltips-hud.js, so the visual style matches every other tooltip.
+function _egBuildStatDescTooltipHTML(descKey, label) {
+    let html = `<strong style="color:var(--accent,#66fcf1)">${label}</strong>`;
+    if (descKey) {
+        const desc = t(descKey);
+        // t() falls back to the raw key when a translation is missing
+        if (desc && desc !== descKey) {
+            html += `<br><span style="opacity:.75;font-size:.9em">${desc}</span>`;
+        }
+    }
+    return html;
+}
+
+// Wires delegated mouseover tooltips onto the three stat list containers
+// (delegation survives frequent innerHTML re-renders; the dataset guard
+// makes repeated calls after each _egRenderStatsList() a no-op).
+function _egBindStatTooltips() {
+    ['eg-offense-stats-list', 'eg-stats-list', 'eg-defense-stats-list'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el || el.dataset.statTipBound) return;
+        el.dataset.statTipBound = '1';
+
+        el.addEventListener('mouseover', e => {
+            const row = e.target.closest ? e.target.closest('.eg-stat-row') : null;
+            if (row && !row.classList.contains('eg-stat-placeholder')) {
+                showGameTooltip(_egBuildStatDescTooltipHTML(row.dataset.descKey, row.dataset.descLabel), e);
+            }
+        });
+        el.addEventListener('mousemove', e => {
+            if (e.target.closest && e.target.closest('.eg-stat-row')) moveGameTooltip(e);
+        });
+        el.addEventListener('mouseout', e => {
+            const row = e.target.closest ? e.target.closest('.eg-stat-row') : null;
+            if (row && !(e.relatedTarget && row.contains(e.relatedTarget))) hideGameTooltip();
+        });
+    });
 }
 
 
@@ -686,16 +629,29 @@ function _egBuildTooltipBodyHTML(item) {
 
 
 
-// Updates the center tooltip panel with the hovered item's data.
-// Pass null (or call _egClearTooltip) to reset to the placeholder message.
+// Shows the floating mouseover tooltip for the hovered item.
+// Uses the shared game tooltip engine from tooltips-hud.js
+// (showGameTooltip / moveGameTooltip / hideGameTooltip).
+// While Alt is held, a second tooltip is shown to the right of the main
+// one, displaying the currently equipped item in the matching paperdoll
+// slot so both can be compared side by side.
 
-function _egShowTooltip(item) {
+function _egShowTooltip(item, e) {
     _egTooltipItem = item;
-    const panel = document.getElementById('eg-tooltip-panel-body');
-    if (!panel) return;
-    panel.innerHTML = item
-        ? _egBuildTooltipBodyHTML(item)
-        : `<span class="eg-tooltip-empty">${t('eg_tooltip_hover_hint')}</span>`;
+    const tip = document.getElementById('ghud-floating-tip');
+    if (!item) {
+        if (tip) tip.classList.remove('eg-wide-tip');
+        hideGameTooltip();
+        _egHideCompareTooltip();
+        return;
+    }
+    showGameTooltip(_egBuildTooltipBodyHTML(item), e || {
+        clientX: _egLastMouse.x,
+        clientY: _egLastMouse.y,
+    });
+    // Equipment stat blocks need more room than the shared default width.
+    if (tip) tip.classList.add('eg-wide-tip');
+    _egUpdateCompareTooltip();
 }
 
 
@@ -706,23 +662,166 @@ function _egClearTooltip() {
 }
 
 
-
-
-//------------------------------------------------------------------------
-//-------------------MAP ACTIVATION PIPELINE------------------------------
-//------------------------------------------------------------------------
-
-// Triggers the map run sequence using whatever map is loaded in the device slot.
-// Uses the global showModal() if available, otherwise falls back to alert().
-function egActivateMap() {
-    if (!_egMapSlotItem) return;
-
-    if (typeof showModal === 'function') {
-        showModal(t('eg_map_warning_title'), t('eg_map_activating').replace('{n}', _egMapSlotItem.name));
-    } else {
-        alert(t('eg_map_alert_activated').replace('{n}', _egMapSlotItem.name));
-    }
+// Moves the main tooltip (and the compare tooltip with it) while the
+// cursor glides over the hovered item chip.
+function _egMoveTooltip(e) {
+    moveGameTooltip(e);
+    _egPositionCompareTooltip();
 }
+
+
+// ── Alt-hold compare tooltip ────────────────────────────────────────────
+
+// True while the Alt key is held down.
+let _egAltDown = false;
+
+// Last known cursor position — fallback anchor when no event is available.
+let _egLastMouse = { x: 0, y: 0 };
+
+document.addEventListener('mousemove', e => {
+    _egLastMouse.x = e.clientX;
+    _egLastMouse.y = e.clientY;
+});
+
+// True while the endgame hub or gate screen is the active screen.
+// Used to scope the Alt-key browser-menu suppression to the item UIs.
+function _egIsItemScreenActive() {
+    const hub = document.getElementById('screen-endgame-hub');
+    const gate = document.getElementById('screen-endgame-gate');
+    return (hub && hub.classList.contains('active'))
+        || (gate && gate.classList.contains('active'));
+}
+
+window.addEventListener('keydown', e => {
+    if (e.key === 'Alt') {
+        // Suppress the browser's default Alt behaviour (Firefox/Chrome
+        // focus the menu bar, which shifts the layout mid-comparison).
+        if (_egIsItemScreenActive()) e.preventDefault();
+        if (!_egAltDown) {
+            _egAltDown = true;
+            _egUpdateCompareTooltip();
+        }
+    }
+});
+
+window.addEventListener('keyup', e => {
+    if (e.key === 'Alt') {
+        // Firefox triggers the menu bar on Alt *release* — block that too.
+        if (_egIsItemScreenActive()) e.preventDefault();
+        _egAltDown = false;
+        _egUpdateCompareTooltip();
+    }
+});
+
+// Alt state is unreliable after alt-tabbing away — reset on blur.
+window.addEventListener('blur', () => {
+    _egAltDown = false;
+    _egUpdateCompareTooltip();
+});
+
+
+// Resolves the equipped item to compare against the hovered item.
+// Only equipment items have a matching paperdoll slot; for multi-slot
+// types (rings, earrings, weapons) the first occupied slot wins.
+// Returns null when there is nothing meaningful to compare.
+function _egGetCompareItem(item) {
+    if (!item || item.category !== 'equip' || !item.slotType) return null;
+    if (typeof EG_SLOT_ACCEPTS === 'undefined') return null;
+    const ids = Object.keys(EG_SLOT_ACCEPTS)
+        .filter(id => EG_SLOT_ACCEPTS[id] === item.slotType);
+    for (const id of ids) {
+        if (_egEquipped[id]) return _egEquipped[id];
+    }
+    return null;
+}
+
+
+// Shows or hides the compare tooltip based on the current hover target
+// and Alt key state. Only shown while Alt is held AND the hovered item
+// is not itself the equipped one being compared.
+function _egUpdateCompareTooltip() {
+    const compareItem = (_egAltDown && _egTooltipItem)
+        ? _egGetCompareItem(_egTooltipItem)
+        : null;
+
+    // Don't "compare" an equipped item with itself.
+    if (compareItem === _egTooltipItem) {
+        _egHideCompareTooltip();
+        return;
+    }
+
+    if (compareItem) _egShowCompareTooltip(compareItem);
+    else _egHideCompareTooltip();
+}
+
+
+// Lazily creates the compare tooltip element (visual twin of the main
+// game tooltip, but with a yellow accent edge to tell them apart).
+function _egGetCompareTip() {
+    let tip = document.getElementById('eg-compare-tip');
+    if (!tip) {
+        tip = document.createElement('div');
+        tip.id = 'eg-compare-tip';
+        tip.style.cssText = `
+            position: fixed;
+            z-index: 9999;
+            background: #12121e;
+            border: 1px solid var(--accent, #5555aa);
+            border-left: 3px solid var(--yellow, #c8a84b);
+            color: var(--accent2, #ccc);
+            font-family: var(--PX, monospace);
+            font-size: 11px;
+            line-height: 1.6;
+            padding: 8px 12px;
+            max-width: 380px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .12s;
+            white-space: normal;
+        `;
+        document.body.appendChild(tip);
+    }
+    return tip;
+}
+
+
+function _egShowCompareTooltip(item) {
+    const tip = _egGetCompareTip();
+    tip.innerHTML = `
+<div class="eg-compare-label">${t('eg_tt_currently_equipped')}</div>
+${_egBuildTooltipBodyHTML(item)}`;
+    tip.style.opacity = '1';
+    _egPositionCompareTooltip();
+}
+
+
+function _egHideCompareTooltip() {
+    const tip = document.getElementById('eg-compare-tip');
+    if (tip) tip.style.opacity = '0';
+}
+
+
+// Places the compare tooltip to the right of the main tooltip
+// (flips to the left side when there is not enough room).
+function _egPositionCompareTooltip() {
+    const main = document.getElementById('ghud-floating-tip');
+    const cmp = document.getElementById('eg-compare-tip');
+    if (!main || !cmp || cmp.style.opacity !== '1') return;
+
+    let x = main.offsetLeft + main.offsetWidth + 8;
+    if (x + cmp.offsetWidth > window.innerWidth - 8) {
+        x = Math.max(8, main.offsetLeft - cmp.offsetWidth - 8);
+    }
+    cmp.style.left = x + 'px';
+    // Keep the compare tooltip fully on screen vertically as well.
+    const clampedTop = Math.max(8, Math.min(
+        main.offsetTop,
+        window.innerHeight - cmp.offsetHeight - 8
+    ));
+    cmp.style.top = clampedTop + 'px';
+}
+
+
 
 
 //------------------------------------------------------------------------
@@ -793,6 +892,17 @@ function showEndgameHub() {
     _egLoadHubState();
     _egRenderAll();
     _egClearTooltip();
+}
+
+// Navigates back from the hub. Returns to the endgame test screen when
+// the hub was opened from there, otherwise goes to the level select screen.
+function safeGoBackFromHub() {
+    if (window._egHubReturnScreen === 'screen-endgame-test-hub') {
+        window._egHubReturnScreen = null;
+        showEndgameTestHub();
+        return;
+    }
+    safeGoToLevelSelect();
 }
 
 // Navigates back to the level select screen.

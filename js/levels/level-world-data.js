@@ -2315,7 +2315,7 @@ const W10 = [
         hintDE: "Konfidenzintervall",
         reveal: "Typical notation for a confidence interval",
         revealDE: "Typische Notation eines Konfidenzintervalls",
-        timer: 300,
+        timer: 1800,
         bonusHint: "Finish without mistakes",
         bonusHintDE: "Beende das Level ohne Fehler zu machen",
         bonusType: "nomiss",

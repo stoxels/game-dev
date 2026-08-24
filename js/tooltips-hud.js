@@ -69,6 +69,10 @@ function _calcGameTooltipPos(e, w, h) {
     let y = e.clientY + 14;
     if (x + w > window.innerWidth - 8) x = e.clientX - w - 10;
     if (y + h > window.innerHeight - 8) y = e.clientY - h - 10;
+    // Hard-clamp so the tooltip can never leave the viewport, even when it
+    // is taller/wider than the free space around the cursor.
+    x = Math.max(8, Math.min(x, window.innerWidth - w - 8));
+    y = Math.max(8, Math.min(y, window.innerHeight - h - 8));
     return { x, y };
 }
 

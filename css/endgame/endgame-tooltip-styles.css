@@ -12,8 +12,14 @@
     color: #c8c8c8;
     font-size: 0.82rem;
     line-height: 1.45;
-    min-width: 220px;
-    max-width: 320px;
+    min-width: 250px;
+    max-width: 360px;
+}
+
+/* The shared game tooltip engine caps its floating tip at a narrower
+   default — lift that cap while an endgame equipment tooltip is shown. */
+#ghud-floating-tip.eg-wide-tip {
+    max-width: 380px;
 }
 
 /* Header block */

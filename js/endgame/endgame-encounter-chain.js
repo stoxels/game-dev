@@ -186,8 +186,11 @@ function _egLoadNextChainPuzzle() {
     // Snapshot loot still on the grid before buildGrid() destroys the overlays
     const carriedLoot = Array.from(_egLootDrops.values());
 
-    const carriedCurrency = Array.from(_egCurrencyDrops.values());   
-    _egCurrencyDrops.clear();                                        
+    const carriedCurrency = Array.from(_egCurrencyDrops.values());
+    _egCurrencyDrops.clear();
+
+    const carriedItems = Array.from(_egItemDrops.values());
+    _egItemDrops.clear();                                      
 
     // Clear the stale map entries — overlays are already gone after buildGrid()
     _egLootDrops.clear();
@@ -216,6 +219,10 @@ function _egLoadNextChainPuzzle() {
 
     if (carriedCurrency.length > 0) {                                 // ← add
         setTimeout(() => _egReplaceCarriedCurrencyDrops(carriedCurrency), 400); // ← add
+    }
+
+    if (carriedItems.length > 0) {
+        setTimeout(() => _egReplaceCarriedItemDrops(carriedItems), 400);
     }
 }
 
@@ -356,13 +363,8 @@ function _egUpdateObjectivesHUD() {
         rows.push(_egObjItem('⚔️', t('eg_obj_monsters').replace('{k}', count).replace('{t}', req.totalMonsters), done));
     }
 
-    // Mistakes Remaining (only shown if the map defines a mistake limit)
-    const maxMistakes = _egGetMaxAllowedMistakes();
-    if (maxMistakes != null) {
-        const used = typeof mistakeCount !== 'undefined' ? mistakeCount : 0;
-        const remaining = Math.max(0, maxMistakes - used);
-        rows.push(_egBuildMistakesItem(remaining, maxMistakes));
-    }
+    // Mistakes: no longer shown here — the mistake counter in the top-left
+    // corner of the puzzle screen displays "x / y" for maps with a limit.
 
     // Boss (Simplified format)
     if (req.hasBoss) {
@@ -391,12 +393,128 @@ function _egUpdateObjectivesHUD() {
     const canLeave = _egCanLeaveMap();
 
     strip.innerHTML = `
-        <div class="eg-obj-header">${t('eg_obj_header')}</div>
-        ${rows.join('')}
-        <button class="eg-leave-btn ${canLeave ? 'eg-leave-ready' : 'eg-leave-locked'}"
-                onclick="_egTryLeaveMap()">
-            ${canLeave ? t('eg_leave_map') : t('eg_leave_map_locked')}
-        </button>`;
+        <div class="eg-obj-header">
+            <span class="eg-obj-title">${t('eg_obj_header')}</span>
+            <button class="eg-obj-collapse">−</button>
+        </div>
+        <div class="eg-obj-body">
+            ${rows.join('')}
+            <button class="eg-leave-btn ${canLeave ? 'eg-leave-ready' : 'eg-leave-locked'}"
+                    onclick="_egTryLeaveMap()">
+                ${canLeave ? t('eg_leave_map') : t('eg_leave_map_locked')}
+            </button>
+        </div>`;
+
+    _egBindObjectivesStripBehaviour(strip);
+}
+
+//------------------------------------------------------------------------
+//-------------------OBJECTIVES HUD: DRAG + MINIMIZE----------------------
+//------------------------------------------------------------------------
+
+// localStorage key for the objectives tracker's position and collapsed state.
+const EG_OBJ_STRIP_STORAGE_KEY = 'eg_objectives_strip_state';
+
+// Restores a saved { x, y, collapsed } state, clamped to the viewport.
+function _egLoadObjectivesStripState() {
+    try {
+        const raw = localStorage.getItem(EG_OBJ_STRIP_STORAGE_KEY);
+        if (!raw) return null;
+        const s = JSON.parse(raw);
+        if (typeof s.x !== 'number' || typeof s.y !== 'number') return null;
+        return {
+            x: Math.max(0, Math.min(s.x, window.innerWidth - 120)),
+            y: Math.max(0, Math.min(s.y, window.innerHeight - 60)),
+            collapsed: !!s.collapsed,
+        };
+    } catch (_) {
+        return null;
+    }
+}
+
+// Persists the tracker's current position and minimized state.
+function _egSaveObjectivesStripState(strip) {
+    const rect = strip.getBoundingClientRect();
+    try {
+        localStorage.setItem(EG_OBJ_STRIP_STORAGE_KEY, JSON.stringify({
+            x: rect.left,
+            y: rect.top,
+            collapsed: strip.classList.contains('eg-collapsed'),
+        }));
+    } catch (_) { /* storage unavailable — silently ignore */ }
+}
+
+// Applies the saved position / collapsed state once per page load.
+// The default CSS keeps the panel docked left-center until a saved
+// position overrides it.
+function _egApplySavedObjectivesStripState(strip) {
+    const saved = _egLoadObjectivesStripState();
+    if (!saved) return;
+
+    strip.style.left = saved.x + 'px';
+    strip.style.top = saved.y + 'px';
+    strip.style.transform = 'none';
+
+    if (saved.collapsed) {
+        strip.classList.add('eg-collapsed');
+        const body = strip.querySelector('.eg-obj-body');
+        const btn = strip.querySelector('.eg-obj-collapse');
+        if (body) body.style.display = 'none';
+        if (btn) btn.textContent = '+';
+    }
+}
+
+// Wires the drag handle and the minimize button onto the strip.
+// Bound once — the guard survives the frequent innerHTML re-renders.
+function _egBindObjectivesStripBehaviour(strip) {
+    if (!strip.dataset.behaviourBound) {
+        strip.dataset.behaviourBound = '1';
+        _egApplySavedObjectivesStripState(strip);
+
+        // Minimize / restore toggle.
+        strip.addEventListener('click', e => {
+            const btn = e.target.closest('.eg-obj-collapse');
+            if (!btn) return;
+            const body = strip.querySelector('.eg-obj-body');
+            const collapsed = strip.classList.toggle('eg-collapsed');
+            body.style.display = collapsed ? 'none' : '';
+            btn.textContent = collapsed ? '+' : '−';
+            _egSaveObjectivesStripState(strip);
+        });
+
+        // Dragging by the header title.
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        strip.addEventListener('mousedown', e => {
+            if (!e.target.closest('.eg-obj-title')) return;
+            isDragging = true;
+            const rect = strip.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            strip.classList.add('eg-dragging');
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            const x = Math.max(0, Math.min(e.clientX - offsetX,
+                window.innerWidth - strip.offsetWidth));
+            const y = Math.max(0, Math.min(e.clientY - offsetY,
+                window.innerHeight - strip.offsetHeight));
+            strip.style.left = x + 'px';
+            strip.style.top = y + 'px';
+            strip.style.transform = 'none';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            strip.classList.remove('eg-dragging');
+            _egSaveObjectivesStripState(strip);
+        });
+    }
 }
 
 // Helper to build the Loot row with a hover tooltip
@@ -457,19 +575,6 @@ function _egBuildLootItem() {
 function _egObjItem(icon, label, done) {
     const prefix = icon ? `${icon} ` : '';
     return `<div class="eg-obj-item ${done ? 'eg-obj-done' : 'eg-obj-pending'}">${prefix}${label}</div>`;
-}
-
-
-// Builds the "Mistakes Remaining" row. Colour shifts as the buffer shrinks:
-// plenty left = neutral, low = warning, zero = danger.
-function _egBuildMistakesItem(remaining, max) {
-    let cls = 'eg-obj-mistakes-ok';
-    if (remaining <= 0) {
-        cls = 'eg-obj-mistakes-danger';
-    } else if (remaining <= Math.max(1, Math.ceil(max * 0.3))) {
-        cls = 'eg-obj-mistakes-warn';
-    }
-    return `<div class="eg-obj-item ${cls}">❌ ${t('eg_mistakes_left').replace('{r}', remaining).replace('{m}', max)}</div>`;
 }
 
 

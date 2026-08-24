@@ -172,6 +172,12 @@ function _applyZoom() {
 
         const vsBubble = document.getElementById('variance-shield-bubble');
         if (vsBubble?._reposition) vsBubble._reposition();
+
+        // Keep Random Walker agents (bears / drifter) and their path
+        // preview overlay locked onto the grid at the new zoom level.
+        if (typeof window._repositionRandomWalkerAgents === 'function') {
+            window._repositionRandomWalkerAgents();
+        }
     });
 
     _updateZoomBarUI();

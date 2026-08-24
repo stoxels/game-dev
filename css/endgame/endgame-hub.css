@@ -3,11 +3,11 @@
 ENDGAME HUB SCREEN STYLESHEET
 ========================================================================
 Layout Architecture:
-  TOP ROW:
-    - LEFT:   Character Equipment Panel (paperdoll armory)
-    - RIGHT:  Map Device Panel
-  BOTTOM:
-    - STASH:  Full-width item grid (wider, more slots)
+  - Character Equipment Panel (paperdoll armory, centered, compact)
+  - Runes & Orbs currency strip
+  - STASH: Full-width item grid below
+  The Probability Gate (map device + map stash) lives on its own screen
+  (screen-endgame-gate, see endgame-gate.css rules at the bottom).
 ========================================================================
 */
 
@@ -73,7 +73,7 @@ Layout Architecture:
     margin-left: auto;
 }
 
-/* ── BODY: two-column top row + stash bottom ── */
+/* ── BODY: compact character panel + currency strip + stash ── */
 .eg-body {
     flex: 1;
     display: flex;
@@ -82,13 +82,19 @@ Layout Architecture:
     min-height: 0;
 }
 
-.eg-body-top {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    flex: 1;
-    min-height: 0;
+/* Centers and constrains the character panel so the hub reads as a
+   compact screen rather than a full-width sheet. */
+.eg-char-wrap {
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
     overflow: hidden;
     border-bottom: 1px solid var(--border);
+}
+
+.eg-char-wrap .eg-panel-char {
+    width: min(1140px, 100%);
+    border-right: none;
 }
 
 /* ── SHARED PANEL BASE ── */
@@ -122,9 +128,11 @@ Layout Architecture:
 }
 
 /* Character panel*/
+/* Grid columns: offense stats | left slots | center puzzle stats | right
+   slots | defense stats — offense/defense fill the former empty corners. */
 .eg-char-panel.eg-char-panel-no-model {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto auto 1fr auto auto;
     gap: 8px;
     padding: 8px;
     align-items: start;
@@ -628,8 +636,16 @@ Layout Architecture:
     border-color: rgba(163,53,238,0.4) !important;
 }
 
-/* ── WORLD 13 LEVEL CARD (level select) ── */
-.level-card.endgame-hub-card {
+/* Stash cells are fully filled with the rarity color — suppress the
+   old per-icon rarity glow inside the main stash grid */
+#eg-inv-grid .eg-item-chip.eg-rarity-uncommon .eg-item-chip-icon,
+#eg-inv-grid .eg-item-chip.eg-rarity-rare .eg-item-chip-icon,
+#eg-inv-grid .eg-item-chip.eg-rarity-legendary .eg-item-chip-icon,
+#eg-inv-grid .eg-item-chip.eg-rarity-currency .eg-item-chip-icon {
+    filter: none !important;
+}
+
+/* ── WORLD 13 LEVEL CARD (level select) ── */.level-card.endgame-hub-card {
     background: var(--surface);
     border: 1px solid var(--accent);
     box-shadow: 0 0 10px rgba(102,252,241,0.1);
@@ -719,31 +735,8 @@ Layout Architecture:
 
 
 
-/* ── CENTER PANEL: TOOLTIP ── */
-.eg-panel-tooltip {
-    align-items: stretch;
-    overflow: hidden;
-}
-
-.eg-tooltip-panel-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 16px 12px;
-    gap: 6px;
-    overflow-y: auto;
-}
-
-.eg-tooltip-empty {
-    font-family: var(--PX);
-    font-size: 7px;
-    color: var(--setup-opt-inactive);
-    letter-spacing: 2px;
-    text-align: center;
-    margin-top: 40px;
-}
+/* ── (TOOLTIP PANEL REMOVED — items now use the floating mouseover
+       tooltip from tooltips-hud.js; see endgame-hub.js) ── */
 
 .eg-tooltip-item {
     display: flex;
@@ -867,6 +860,46 @@ Layout Architecture:
     border-right: 1px solid var(--border);
 }
 
+/* ── OFFENSE / DEFENSE STAT CORNER BLOCKS ── */
+.eg-stat-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 250px;
+    min-width: 0;
+    padding: 4px 6px;
+    overflow-y: auto;
+    align-self: stretch;
+}
+
+#eg-stats-offense {
+    border-right: 1px solid var(--border);
+}
+
+#eg-stats-defense {
+    border-left: 1px solid var(--border);
+}
+
+.eg-stats-category {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 6px;
+}
+
+.eg-stats-category-title {
+    font-family: var(--PX);
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    opacity: 0.85;
+    text-align: left;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+    user-select: none;
+}
+
 .eg-stats-header {
     font-family: var(--PX);
     font-size: 7px;
@@ -893,6 +926,11 @@ Layout Architecture:
     align-items: center;
     gap: 8px;
     padding: 2px 4px;
+    cursor: help;
+}
+
+.eg-stat-row:not(.eg-stat-placeholder):hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .eg-stat-name {
@@ -921,3 +959,29 @@ Layout Architecture:
         text-align: center;
         opacity: 0.5;
     }
+
+/* ── ALT COMPARE TOOLTIP LABEL ── */
+.eg-compare-label {
+    font-family: var(--PX);
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    user-select: none;
+}
+
+/* ── PROBABILITY GATE SCREEN (screen-endgame-gate) ── */
+.eg-gate-body {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.eg-gate-body .eg-panel-map {
+    width: min(900px, 100%);
+    border-right: none;
+}

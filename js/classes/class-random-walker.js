@@ -32,8 +32,9 @@ window._bearIntervals = window._bearIntervals || [];
 // shorten walks instead of removing the bears outright.
 window._activeBearAgents = window._activeBearAgents || [];
 
-// Remaining-time holders for walker HUD cards, keyed by card unique ID,
-// so external systems (e.g. the mistake penalty) can adjust displayed time.
+// Remaining-time holders for walker HUD cards, keyed by card unique ID
+// (drifter / fuse countdown cards). Bear timers now live directly on their
+// agent state and are shown above the bear on the grid instead.
 window._walkerHudState = window._walkerHudState || {};
 
 // Active HUD timer intervals — each entry is { id, loopId }
@@ -135,21 +136,32 @@ function _buildBearPath(startR, rows, cols) {
 //------------------------------------------------------------------------
 
 // Creates the floating bear DOM element and sets its initial CSS.
+// Layout: remaining-time number on top, bear emoji below.
 function _createBearElement(icon, stepDurationMs) {
     const el = document.createElement('div');
     el.className = 'random-walker-agent bear-agent';
-    el.textContent = icon;
     el.style.cssText = `
         position: fixed;
-        font-size: 28px;
         z-index: 1000;
         pointer-events: none;
         transition: left ${stepDurationMs}ms linear, top ${stepDurationMs}ms linear;
         transform: translate(-50%, -50%);
-        text-shadow: 0 4px 10px rgba(0,0,0,0.6);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    `;
+    el.innerHTML = `
+        <div class="bear-timer-text" style="font-size:13px;color:#f1c40f;font-family:monospace;font-weight:bold;margin-bottom:2px;text-shadow:0 2px 4px rgba(0,0,0,0.9);"></div>
+        <div class="bear-icon" style="font-size:28px;text-shadow:0 4px 10px rgba(0,0,0,0.6);">${icon}</div>
     `;
     document.body.appendChild(el);
     return el;
+}
+
+// Updates the remaining-time number shown above the bear's head.
+function _updateBearTimerLabel(state) {
+    const el = state.bearEl?.querySelector('.bear-timer-text');
+    if (el) el.textContent = `${Math.max(0, state.remainingSeconds)}s`;
 }
 
 // Plays the bear's fade-out animation, then removes it from the DOM.
@@ -162,33 +174,36 @@ function _removeBearElement(bearEl) {
 
 // Starts the step-by-step interval loop that moves a bear along its pre-built path.
 // Registers the walk in window._activeBearAgents so mistakes can shorten it.
-// Cleans up the HUD indicator and bear element when the path ends.
-function _startBearAnimation(path, icon, stepDurationMs, bearName) {
+// Draws the dashed path preview overlay and cleans up everything when the
+// path ends. pathColor tints the dashed line (yellow Browney / grey Wiener).
+function _startBearAnimation(path, icon, stepDurationMs, bearName, pathColor) {
     if (!path || path.length === 0) return;
 
     const bearEl = _createBearElement(icon, stepDurationMs);
     const totalSec = Math.ceil((path.length * stepDurationMs) / 1000);
-    const hudUid = _spawnWalkerHudIndicator(icon, bearName, totalSec);
 
     const state = {
         path,
         step: 0,          // index of the next cell to move onto
         stepDurationMs,
         interval: null,
-        hudUid,
+        timerInterval: null,
+        remainingSeconds: totalSec,
         bearEl,
+        pathColor,
         finished: false,
     };
 
     // Place bear and reveal the starting cell immediately
     _agentSnapToCellCenter(bearEl, path[0].r, path[0].c);
     _revealCellForAgent(path[0].r, path[0].c);
+    _updateBearTimerLabel(state);
 
     state.interval = setInterval(() => {
         state.step++;
 
         if (state.step >= state.path.length) {
-            // Path complete — clean up interval, HUD card, and bear visual
+            // Path complete — clean up interval, timer label, and bear visual
             _finishBearAgent(state);
             return;
         }
@@ -198,20 +213,29 @@ function _startBearAnimation(path, icon, stepDurationMs, bearName) {
         _revealCellForAgent(target.r, target.c);
     }, stepDurationMs);
 
+    // 1-second tick for the remaining-time number above the bear's head.
+    // Mistakes subtract directly from remainingSeconds (see penalty below).
+    state.timerInterval = setInterval(() => {
+        state.remainingSeconds--;
+        _updateBearTimerLabel(state);
+    }, 1000);
+
     window._activeBearAgents.push(state);
+    _redrawBearPathOverlays();
 }
 
-// Tears down one bear agent: kills its interval and removes the HUD card
-// and bear visual. Safe to call multiple times (guarded via finished flag).
+// Tears down one bear agent: kills its intervals and removes the bear visual.
+// Safe to call multiple times (guarded via finished flag).
 function _finishBearAgent(state) {
     if (state.finished) return;
     state.finished = true;
 
     if (state.interval) clearInterval(state.interval);
+    if (state.timerInterval) clearInterval(state.timerInterval);
     window._activeBearAgents = window._activeBearAgents.filter(s => s !== state);
 
-    _removeWalkerHudIndicator(state.hudUid);
     _removeBearElement(state.bearEl);
+    _redrawBearPathOverlays();
 }
 
 
@@ -256,14 +280,14 @@ function _executeBrownianMotion(row, col, paths, rank) {
             'avatar-companion-brownian',
             path1[0].r, path1[0].c,
             () => {
-                _startBearAnimation(path1, "🐻", stepDurationMs, "Browney");
-                if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener");
+                _startBearAnimation(path1, "🐻", stepDurationMs, "Browney", "#f1c40f");
+                if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener", "#95a5a6");
             },
             null
         );
     } else {
-        _startBearAnimation(path1, "🐻", stepDurationMs, "Browney");
-        if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener");
+        _startBearAnimation(path1, "🐻", stepDurationMs, "Browney", "#f1c40f");
+        if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener", "#95a5a6");
     }
 
     return true;
@@ -334,6 +358,7 @@ function _createDrifterElement(intervalMs) {
 // Safe to call even if no drifter is currently active.
 function _drifterClear() {
     window._drifterActive = false;
+    window._drifterCurrPos = null;
     if (window._drifterInterval) { clearTimeout(window._drifterInterval); window._drifterInterval = null; }
     if (window._drifterTimer) { clearInterval(window._drifterTimer); window._drifterTimer = null; }
     if (window._drifterFuseInterval) { clearInterval(window._drifterFuseInterval); window._drifterFuseInterval = null; }
@@ -594,6 +619,7 @@ function _executeSummonDrifter(duration, interval, smartTarget) {
         r: Math.floor(Math.random() * rows),
         c: Math.floor(Math.random() * cols),
     };
+    window._drifterCurrPos = currPos; // kept for resize/zoom re-snapping
 
     showToast(t('cls_drifter_roaming'));
     Audio_Manager.playSFX('drifterSummon');
@@ -710,17 +736,6 @@ function _startHudCardTicker(uniqueId, initialSeconds, isDrifter) {
     return tickerInterval;
 }
 
-// Reduces a HUD card's displayed remaining time (and its backing holder)
-// by the given number of seconds. Used when a mistake shortens a walk.
-function _reduceWalkerHudTimer(uniqueId, secondsLost) {
-    const holder = window._walkerHudState[uniqueId];
-    if (!holder) return;
-
-    holder.timeRemaining = Math.max(0, holder.timeRemaining - secondsLost);
-    const timerEl = document.getElementById(`${uniqueId}-timer`);
-    if (timerEl) timerEl.textContent = `${holder.timeRemaining}s`;
-}
-
 
 //------------------------------------------------------------------------
 //--------------------HUD TIMER PANEL — MAIN FUNCTIONS------------------
@@ -767,6 +782,195 @@ function _removeWalkerHudIndicator(id) {
 
 
 //------------------------------------------------------------------------
+//--------------------BEAR PATH PREVIEW OVERLAY--------------------------
+//------------------------------------------------------------------------
+
+// Dashed SVG overlay drawn over the grid showing the path each active bear
+// will still walk (yellow = Browney, grey = Wiener). On a mistake the cut-off
+// tail segment flashes red, wiggles vertically, then fades out.
+
+// Returns the viewport-space bounding box of the puzzle grid cells.
+function _getGridCellBounds() {
+    if (!cur) return null;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
+    const first = document.getElementById('g-0-0');
+    const last = document.getElementById(`g-${rows - 1}-${cols - 1}`);
+    if (!first || !last) return null;
+
+    const a = first.getBoundingClientRect();
+    const b = last.getBoundingClientRect();
+    return { left: a.left, top: a.top, right: b.right, bottom: b.bottom };
+}
+
+// Returns the viewport-space center of a grid cell (or null off-grid).
+function _getCellCenterPx(r, c) {
+    const cellEl = document.getElementById(`g-${r}-${c}`);
+    if (!cellEl) return null;
+    const rect = cellEl.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+}
+
+// Creates (once) and returns the fixed-position SVG overlay element.
+function _ensureBearPathOverlaySvg() {
+    let svg = document.getElementById('bear-path-overlay-svg');
+    if (!svg) {
+        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.id = 'bear-path-overlay-svg';
+        svg.style.cssText = `
+            position: fixed;
+            z-index: 999;
+            pointer-events: none;
+            overflow: visible;
+        `;
+        document.body.appendChild(svg);
+    }
+    return svg;
+}
+
+// Sizes and positions the SVG so its local coordinates match viewport pixels
+// inside the grid bounds. Returns the SVG or null when the grid is gone.
+function _positionBearPathOverlaySvg() {
+    const svg = _ensureBearPathOverlaySvg();
+    const bounds = _getGridCellBounds();
+    if (!bounds) {
+        svg.style.display = 'none';
+        return null;
+    }
+
+    const w = bounds.right - bounds.left;
+    const h = bounds.bottom - bounds.top;
+
+    Object.assign(svg.style, {
+        display: 'block',
+        left: `${bounds.left}px`,
+        top: `${bounds.top}px`,
+        width: `${w}px`,
+        height: `${h}px`,
+    });
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    return svg;
+}
+
+// Converts path steps to SVG-local polyline points.
+function _pathStepsToPoints(steps) {
+    const bounds = _getGridCellBounds();
+    if (!bounds) return '';
+
+    return steps
+        .map(s => _getCellCenterPx(s.r, s.c))
+        .filter(p => p)
+        .map(p => `${(p.x - bounds.left).toFixed(1)},${(p.y - bounds.top).toFixed(1)}`)
+        .join(' ');
+}
+
+// Redraws the dashed preview line for every currently walking bear.
+// Called on ability cast, after each mistake cut, and whenever the grid
+// moves (window resize / zoom / clue-side toggles).
+function _redrawBearPathOverlays() {
+    const svg = _positionBearPathOverlaySvg();
+    if (!svg) return;
+
+    const active = (window._activeBearAgents || []).filter(s => !s.finished);
+    if (active.length === 0) {
+        svg.style.display = 'none';
+        return;
+    }
+
+    // Only remove the live preview lines — the temporary red "cut" animations
+    // are separate groups that must survive redraws.
+    svg.querySelectorAll('polyline[data-role="bear-path"]').forEach(p => p.remove());
+
+    active.forEach(state => {
+        const remaining = state.path.slice(Math.max(0, state.step));
+        if (remaining.length < 2) return;
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        line.setAttribute('data-role', 'bear-path');
+        line.setAttribute('points', _pathStepsToPoints(remaining));
+        line.setAttribute('fill', 'none');
+        line.setAttribute('stroke', state.pathColor || '#f1c40f');
+        line.setAttribute('stroke-width', '3');
+        line.setAttribute('stroke-dasharray', '7 7');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('stroke-linejoin', 'round');
+        line.setAttribute('opacity', '0.85');
+
+        svg.appendChild(line);
+    });
+}
+
+// Plays the "this part of the path is now gone" animation for a mistake:
+// the removed tail is redrawn in red, wiggles up/down for ~0.5 s, then
+// fades out and removes itself.
+function _playPathCutAnimation(lostSteps, baseColor) {
+    const svg = _positionBearPathOverlaySvg();
+    if (!svg || !lostSteps || lostSteps.length < 2) return;
+
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('data-role', 'bear-path-cut');
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    line.setAttribute('points', _pathStepsToPoints(lostSteps));
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke', '#e74c3c');
+    line.setAttribute('stroke-width', '3');
+    line.setAttribute('stroke-dasharray', '7 7');
+    line.setAttribute('stroke-linecap', 'round');
+    line.setAttribute('stroke-linejoin', 'round');
+
+    group.appendChild(line);
+    svg.appendChild(group);
+
+    // Wiggle ~0.5 s, then fade; total lifetime 1.1 s
+    group.style.animation = 'bearPathCutWiggle 0.25s linear 2, bearPathCutFadeOut 0.6s ease 0.5s forwards';
+    setTimeout(() => group.remove(), 1100);
+}
+
+// Public reposition hook — snaps all agents instantly back onto their current
+// grid cell (no glide across a resized layout) and redraws the path overlays.
+// Wired to window resize, puzzle zoom and clue-side toggles.
+window._repositionRandomWalkerAgents = function () {
+    (window._activeBearAgents || []).forEach(state => {
+        if (state.finished || !state.bearEl) return;
+        const pos = state.path[Math.min(state.step, state.path.length - 1)];
+        state.bearEl.style.transition = 'none';
+        _agentSnapToCellCenter(state.bearEl, pos.r, pos.c);
+        void state.bearEl.offsetWidth; // force reflow so the jump is instant
+        requestAnimationFrame(() => {
+            state.bearEl.style.transition =
+                `left ${state.stepDurationMs}ms linear, top ${state.stepDurationMs}ms linear`;
+        });
+    });
+
+    if (window._drifterActive && window._drifterCurrPos) {
+        const drifterEl = document.getElementById('drifter-agent');
+        if (drifterEl) {
+            drifterEl.style.transition = 'none';
+            _drifterSnapToCell(drifterEl, window._drifterCurrPos.r, window._drifterCurrPos.c);
+            void drifterEl.offsetWidth;
+            requestAnimationFrame(() => {
+                drifterEl.style.transition =
+                    `left ${window._drifterCurrentInterval}ms linear, top ${window._drifterCurrentInterval}ms linear`;
+            });
+        }
+    }
+
+    _redrawBearPathOverlays();
+};
+
+window.addEventListener('resize', () => {
+    // Only react while walkers are actually on the grid — avoids spawning
+    // the overlay SVG on menu screens.
+    if ((window._activeBearAgents || []).length > 0 || window._drifterActive) {
+        window._repositionRandomWalkerAgents();
+    }
+}, { passive: true });
+
+
+//------------------------------------------------------------------------
 //--------------------MISTAKE PENALTY------------------------------------
 //------------------------------------------------------------------------
 
@@ -778,19 +982,30 @@ window.penalizeRandomWalkersOnMistake = function () {
     const BEAR_TIME_LOSS_S = 20;
     const DRIFTER_TIME_LOSS_S = 5;
 
-    // Bears — cut upcoming path steps worth ~20 s from each active walk
+    // Bears — chop steps worth ~20 s off the END of each active walk, so
+    // the bear simply stops earlier instead of skipping cells mid-path.
+    // The removed tail flashes red on the path preview, then fades out.
     (window._activeBearAgents || []).slice().forEach(state => {
         const remainingSteps = state.path.length - state.step - 1; // steps after the current one
         const stepsToCut = Math.ceil((BEAR_TIME_LOSS_S * 1000) / state.stepDurationMs);
 
         if (remainingSteps <= stepsToCut) {
-            // Not enough walk left to survive the penalty — heads home early
+            // Not enough walk left to survive the penalty — the entire
+            // remaining tail is lost and the bear heads home early.
+            // Finish first, then animate: the cut animation re-shows the
+            // overlay even when this was the last active bear.
+            const lostTail = state.path.slice(state.step + 1);
             _finishBearAgent(state);
+            if (lostTail.length > 1) _playPathCutAnimation(lostTail, state.pathColor);
             return;
         }
 
-        state.path.splice(state.step + 1, stepsToCut);
-        _reduceWalkerHudTimer(state.hudUid, BEAR_TIME_LOSS_S);
+        const lostTail = state.path.splice(state.path.length - stepsToCut, stepsToCut);
+        _playPathCutAnimation(lostTail, state.pathColor);
+
+        state.remainingSeconds = Math.max(0, state.remainingSeconds - BEAR_TIME_LOSS_S);
+        _updateBearTimerLabel(state);
+        _redrawBearPathOverlays();
     });
 
     // Drifter — shave 5 s off its remaining roaming time. If that drains
@@ -832,7 +1047,8 @@ window.clearActiveRandomWalkers = function () {
     // Shut down drifter (including any active fuse countdown)
     _drifterClear();
 
-    // Remove all agent visuals and the HUD panel from the DOM
+    // Remove all agent visuals, the path preview overlay and the HUD panel
     document.querySelectorAll('.random-walker-agent').forEach(el => el.remove());
+    document.getElementById('bear-path-overlay-svg')?.remove();
     document.getElementById('walker-hud-panel')?.remove();
 };

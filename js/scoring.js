@@ -505,6 +505,15 @@ function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusM
     buildTimeColumn(elapsed);
     renderBonusBadge(bonusMet);
     renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel);
+
+    // Ascension levels always route back to the overworld: hide Next/Retry
+    // and promote the Levels button to the primary action.
+    const nextBtn = document.getElementById('btn-next-lvl');
+    const retryBtn = document.getElementById('btn-win-retry');
+    const levelsBtn = document.getElementById('btn-win-levels');
+    if (nextBtn) nextBtn.style.display = isAscensionLevel ? 'none' : '';
+    if (retryBtn) retryBtn.style.display = isAscensionLevel ? 'none' : '';
+    if (levelsBtn) levelsBtn.className = isAscensionLevel ? 'ob p' : 'ob s';
 }
 
 

@@ -1095,6 +1095,8 @@ function _useAddTime(id, def) {
 
     const baseSecs = parseInt(id.replace('addTime', '')) || 30;
     const secs = _calcAddTimeSecs(baseSecs);
+    // Toast shows minutes instead of seconds (e.g. 90s -> 1.5min)
+    const mins = Math.round((secs / 60) * 10) / 10;
 
     // Countdown Crisis inverts timer items — but the Golden Clock guarantees
     // the timer can only increase, so the inversion is suppressed while it
@@ -1106,7 +1108,7 @@ function _useAddTime(id, def) {
         _trackTimerDelta(before, timerSecs);
         updTimer();
         playItemEffect(id);
-        return `${def.icon} ${t('itm_countdown_crisis').replace('{n}', secs)}`;
+        return `${def.icon} ${t('itm_countdown_crisis').replace('{n}', mins)}`;
     }
 
     questStat_timerItemUsed();
@@ -1115,7 +1117,7 @@ function _useAddTime(id, def) {
     _trackTimerDelta(before, timerSecs);
     updTimer();
     playItemEffect(id);
-    return `${def.icon} ${t('item_time_added').replace('{n}', secs)}`;
+    return `${def.icon} ${t('item_time_added').replace('{n}', mins)}`;
 }
 
 // shield — activates the damage shield, optionally adding extra charges
@@ -1189,7 +1191,14 @@ function _useMistakeEraser(id, def) {
         }
     }
 
-    _setMistakeCounterText();
+    // Full HUD sync: refreshes the top-left mistake counter (including the
+    // "x / y" format on endgame maps), the objectives strip, and re-checks
+    // the map's mistake limit so erased mistakes restore the budget.
+    if (typeof _updateMistakeCounterHUD === 'function') {
+        _updateMistakeCounterHUD();
+    } else {
+        _setMistakeCounterText();
+    }
 
     return removed > 0
         ? `${def.icon} ${t('item_mistake_erased').replace('{n}', removed)}`

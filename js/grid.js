@@ -281,6 +281,16 @@ function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjM
 //   Both carry a mouse-over tooltip describing which way they currently move
 //   the clue numbers. Called once per buildGrid() so it always attaches to the
 //   current puzzle wrap.
+
+// _wireClueBtnTooltip — attaches the shared game tooltip (tooltips-hud.js)
+//   to a clue toggle button. The button's current tip text lives in its
+//   data-tip attribute so the toggle handlers can update it in place.
+function _wireClueBtnTooltip(btn) {
+    btn.addEventListener('mouseenter', (e) => showGameTooltip(btn.dataset.tip, e));
+    btn.addEventListener('mousemove', moveGameTooltip);
+    btn.addEventListener('mouseleave', hideGameTooltip);
+}
+
 function _buildRowClueToggle() {
     document.getElementById('row-clue-toggle-btn')?.remove();
     document.getElementById('col-clue-toggle-btn')?.remove();
@@ -307,18 +317,20 @@ function _buildRowClueToggle() {
     const rowBtn = document.createElement('button');
     rowBtn.id = 'row-clue-toggle-btn';
     rowBtn.textContent = t('cg_clues_btn_right');
-    rowBtn.title = t('cg_clues_title_right');
+    rowBtn.dataset.tip = t('cg_clues_title_right');
     rowBtn.style.cssText = `${baseCss} left: calc(50% - 65px);`;
     rowBtn.onclick = _toggleRowCluesSide;
+    _wireClueBtnTooltip(rowBtn);
     wrap.appendChild(rowBtn);
 
     // Column clues button — sits just right of centre below the grid
     const colBtn = document.createElement('button');
     colBtn.id = 'col-clue-toggle-btn';
     colBtn.textContent = t('cg_clues_btn_down');
-    colBtn.title = t('cg_clues_col_title_bottom');
+    colBtn.dataset.tip = t('cg_clues_col_title_bottom');
     colBtn.style.cssText = `${baseCss} left: calc(50% + 65px);`;
     colBtn.onclick = _toggleColCluesSide;
+    _wireClueBtnTooltip(colBtn);
     wrap.appendChild(colBtn);
 }
 
@@ -356,7 +368,7 @@ function _toggleRowCluesSide() {
         });
         if (btn) {
             btn.textContent = t('cg_clues_btn_left');
-            btn.title = t('cg_clues_title_left');
+            btn.dataset.tip = t('cg_clues_title_left');
         }
     } else {
         // Move them back to the start of their row
@@ -368,7 +380,7 @@ function _toggleRowCluesSide() {
         });
         if (btn) {
             btn.textContent = t('cg_clues_btn_right');
-            btn.title = t('cg_clues_title_right');
+            btn.dataset.tip = t('cg_clues_title_right');
         }
     }
 
@@ -379,6 +391,11 @@ function _toggleRowCluesSide() {
     // Keep the variance shield bubble (Mathmagician passive) aligned too
     const vsBubble = document.getElementById('variance-shield-bubble');
     if (vsBubble?._reposition) vsBubble._reposition();
+
+    // Keep Random Walker agents (bears / drifter) and their path overlay aligned
+    if (typeof window._repositionRandomWalkerAgents === 'function') {
+        window._repositionRandomWalkerAgents();
+    }
 }
 
 
@@ -402,14 +419,14 @@ function _toggleColCluesSide() {
         headerRows.forEach(tr => tbody.appendChild(tr));
         if (btn) {
             btn.textContent = t('cg_clues_btn_up');
-            btn.title = t('cg_clues_col_title_top');
+            btn.dataset.tip = t('cg_clues_col_title_top');
         }
     } else {
         // Move them back above the puzzle rows (reverse so order is restored)
         headerRows.reverse().forEach(tr => tbody.insertBefore(tr, tbody.firstChild));
         if (btn) {
             btn.textContent = t('cg_clues_btn_down');
-            btn.title = t('cg_clues_col_title_bottom');
+            btn.dataset.tip = t('cg_clues_col_title_bottom');
         }
     }
 
@@ -420,6 +437,11 @@ function _toggleColCluesSide() {
     // Keep the variance shield bubble (Mathmagician passive) aligned too
     const vsBubble = document.getElementById('variance-shield-bubble');
     if (vsBubble?._reposition) vsBubble._reposition();
+
+    // Keep Random Walker agents (bears / drifter) and their path overlay aligned
+    if (typeof window._repositionRandomWalkerAgents === 'function') {
+        window._repositionRandomWalkerAgents();
+    }
 }
 
 
@@ -1137,6 +1159,11 @@ function renderCell(row, col) {
     // Priority 2: item-revealed cell (permanent green fill)
     if (revealedGrid[row][col]) {
         el.classList.add('filled', 'revealed');
+        // Revealed cells can't be filled manually — auto-claim any drop
+        // (loot / currency / item / heart pickup) sitting on this cell.
+        if (typeof _egAutoClaimDropsOnReveal === 'function') {
+            _egAutoClaimDropsOnReveal(row, col);
+        }
         return;
     }
 

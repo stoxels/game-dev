@@ -750,9 +750,14 @@ function _egtBuildFullScreenHTML() {
     <div class="egt-topbar">
         <button class="title-btn back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
         <span class="egt-topbar-title">${t('egt_title')}</span>
-        <button class="title-btn sec" onclick="window._egHubReturnScreen='screen-endgame-test-hub'; showEndgameHub();">
-            ${t('egt_stash_equip')}
-        </button>
+        <div style="display:flex; gap:10px;">
+            <button class="title-btn sec" onclick="window._egHubReturnScreen='screen-endgame-test-hub'; showEndgameHub();">
+                ${t('egt_stash_equip')}
+            </button>
+            <button class="title-btn sec" onclick="showEndgameGate();">
+                ${t('egt_probability_gate')}
+            </button>
+        </div>
     </div>
     <div class="egt-map-grid" id="egt-map-grid">
         ${EG_TEST_MAPS.map(_egtBuildMapCardHTML).join('')}
@@ -804,7 +809,29 @@ function _egtEnsureStyles() {
         .egt-map-stat { font-size: 10px; opacity: 0.85; }
         .egt-map-desc { font-size: 9px; opacity: 0.6; line-height: 1.4; flex-grow: 1; }
         .egt-enter-btn { margin-top: 8px; font-size: 10px; padding: 6px; }
-    `;
+        .egt-topbar .title-btn {
+            font-family: var(--PX, monospace);
+            font-size: 10px;
+            letter-spacing: 1px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.25)), var(--surface, #1a1a2e);
+            border: 1px solid var(--border2, #444);
+            color: var(--accent2, #ccc);
+            padding: 8px 16px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.12s;
+        }
+        .egt-topbar .title-btn:hover {
+            border-color: var(--accent, #c8a84b);
+            color: var(--accent, #c8a84b);
+            background: linear-gradient(180deg, rgba(200,168,75,0.12), rgba(0,0,0,0.25)), var(--surface, #1a1a2e);
+            box-shadow: 0 0 10px rgba(200, 168, 75, 0.25);
+        }
+        .egt-topbar .title-btn:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+     `;
     document.head.appendChild(style);
 }
 

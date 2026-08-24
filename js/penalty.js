@@ -228,12 +228,16 @@ function _updatePenaltyInfoHUD(effectivePen) {
     pi._t = setTimeout(() => pi.textContent = '', PEN_INFO_CLEAR_DELAY_MS);
 }
 
-// Updates the mistake counter element in the HUD with the current mistake count,
-// and keeps the endgame "Mistakes Left" objectives row in sync (checking the
-// map's mistake limit immediately, with no tick-loop delay).
+// Updates the mistake counter element in the HUD (delegates the text format
+// to _setMistakeCounterText, which appends "/ max" on endgame maps with a
+// mistake limit), and keeps the endgame objectives + limit check in sync.
 function _updateMistakeCounterHUD() {
-    const mc = document.getElementById('mistake-counter');
-    if (mc) mc.textContent = `${t('cg_mistakes_lbl')}: ${mistakeCount}`;
+    if (typeof _setMistakeCounterText === 'function') {
+        _setMistakeCounterText();
+    } else {
+        const mc = document.getElementById('mistake-counter');
+        if (mc) mc.textContent = `${t('cg_mistakes_lbl')}: ${mistakeCount}`;
+    }
 
     if (typeof _egIsActive === 'function' && _egIsActive()) {
         if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();

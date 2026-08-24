@@ -133,6 +133,12 @@ function _applyCellEffect(cellIds, type) {
     if (!cellIds.length) return;
     _ensureCellEffectCSS();
 
+    // Programmatic reveals (items, passives, class abilities) feed the
+    // endgame projectile system — guarded, so it is a no-op outside endgame.
+    if (type === 'reveal' && typeof _egOnProgrammaticReveal === 'function') {
+        _egOnProgrammaticReveal(cellIds);
+    }
+
     const cls = `cell-fx-${type}`;
     const duration = CELL_FX_DURATION[type] || 1800;
 

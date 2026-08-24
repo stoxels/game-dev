@@ -62,6 +62,10 @@ let _egPlayerCurrentCharge = 0;
 // Active currency drops on the grid: key "row-col" → currency def object
 let _egCurrencyDrops = new Map();
 
+// Active regular-item drops on the grid: key "row-col" → { defId }
+// Claimed items go straight into the player's persistent STATE.inventory.
+let _egItemDrops = new Map();
+
 
 
 

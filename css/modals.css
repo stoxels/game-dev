@@ -331,7 +331,7 @@
 
 /* Text content inside the hint panel */
 .mg-hint-text {
-    font-family: var(--PX);
+    font-family: "STIX Two Math", "Cambria Math", "DejaVu Sans", var(--F), monospace;
     font-size: 15px;
     color: #c8b0e8;
     line-height: 1.6;

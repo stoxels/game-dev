@@ -1008,6 +1008,65 @@ function _ensureTooltipElement() {
 }
 
 /**
+ * Builds the "solved / unsolved stoxels" progress line for a world.
+ *
+ * @param {number} wi - World index
+ * @returns {string} Localised progress text (or '' if world data is missing)
+ */
+function _getWorldStoxelProgressText(wi) {
+    const worldData = WORLDS && WORLDS[wi];
+    if (!worldData || typeof WORLD_START_GI === 'undefined') return '';
+
+    const start = WORLD_START_GI[wi];
+    const total = worldData.data.length;
+    let solved = 0;
+    for (let li = 0; li < total; li++) {
+        if (STATE.done.includes(start + li)) solved++;
+    }
+    return t('scr_world_stoxels')
+        .replace('{solved}', solved)
+        .replace('{total}', total)
+        .replace('{unsolved}', total - solved);
+}
+
+/**
+ * Counts how many of the world's two convergence points the player has
+ * claimed (first clears of the 33% and 66% milestone levels).
+ *
+ * @param {number} wi - World index
+ * @returns {string} Localised "x/2" convergence text (or '' if unavailable)
+ */
+function _getWorldConvergenceText(wi) {
+    const worldData = WORLDS && WORLDS[wi];
+    if (!worldData || typeof WORLD_START_GI === 'undefined'
+        || typeof isLevelConvergence !== 'function') return '';
+
+    const start = WORLD_START_GI[wi];
+    let claimed = 0;
+    worldData.data.forEach((_, li) => {
+        const gi = start + li;
+        const isLastInWorld = li === worldData.data.length - 1;
+        if (isLevelConvergence(li, worldData, isLastInWorld)
+            && STATE.convergenceDone && STATE.convergenceDone.includes(gi)) {
+            claimed++;
+        }
+    });
+    return t('scr_world_convergence').replace('{n}', claimed);
+}
+
+/**
+ * Returns a line stating whether the class upgrade earned from completing
+ * this world has already been obtained/applied.
+ *
+ * @param {number} wi - World index
+ * @returns {string} Localised status text
+ */
+function _getWorldClassUpgradeText(wi) {
+    const obtained = STATE.classWorldsCompleted && STATE.classWorldsCompleted.includes(wi);
+    return obtained ? t('scr_world_class_upgrade_done') : t('scr_world_class_upgrade_missing');
+}
+
+/**
  * Builds the inner HTML content for the world tooltip.
  *
  * @param {number}  wi          - World index
@@ -1038,11 +1097,19 @@ function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
         }
     }
 
+    // Detailed per-world progress: stoxels solved/unsolved, convergence
+    // points and class upgrade status (regular worlds only).
+    const progressHtml = (wi !== 13)
+        ? `<div class="mv-tooltip-sub">${_getWorldStoxelProgressText(wi)}</div>` +
+          `<div class="mv-tooltip-sub">${_getWorldConvergenceText(wi)}</div>` +
+          `<div class="mv-tooltip-sub">${_getWorldClassUpgradeText(wi)}</div>`
+        : '';
+
     const remainingHtml = (isDone && wi !== 13)
         ? `<div class="mv-tooltip-remaining">${_buildRemainingWorkText(healingTier)}</div>`
         : '';
 
-    return `<div class="mv-tooltip-title">${label}</div><div class="mv-tooltip-sub">${statusText}</div>${remainingHtml}`;
+    return `<div class="mv-tooltip-title">${label}</div><div class="mv-tooltip-sub">${statusText}</div>${progressHtml}${remainingHtml}`;
 }
 
 /**

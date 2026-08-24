@@ -891,3 +891,19 @@
         border-color: var(--accent2);
         color: var(--accent2);
     }
+
+/* ------------------------------------------------------------------
+   Random Walker — Brownian Motion path preview overlay.
+   On a mistake the red cut-off tail segment wiggles up/down (~0.5 s)
+   and then fades out to show that this part of the path is gone.
+------------------------------------------------------------------ */
+@keyframes bearPathCutWiggle {
+    0%, 100% { transform: translateY(0); }
+    25%      { transform: translateY(-6px); }
+    75%      { transform: translateY(6px); }
+}
+
+@keyframes bearPathCutFadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}

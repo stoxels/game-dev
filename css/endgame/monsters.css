@@ -2,7 +2,12 @@
 
 
 #eg-monster-wrapper {
+    position: absolute; /* out of flow — monster spawns never push or offset the puzzle grid */
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
+    max-width: 900px;
     z-index: 200;
     display: flex;
     justify-content: center;
@@ -294,10 +299,29 @@
     filter: drop-shadow(0 0 4px #aad4f5);
 }
 
+.eg-proj-dizzy {
+    filter: drop-shadow(0 0 6px #b388ff);
+}
 
+.eg-proj-scroll {
+    filter: drop-shadow(0 0 4px #ffd54f);
+}
 
+.eg-proj-infinity {
+    filter: drop-shadow(0 0 6px #64ffda);
+}
 
+.eg-proj-chain {
+    filter: drop-shadow(0 0 4px #90a4ae);
+}
 
+.eg-proj-brain {
+    filter: drop-shadow(0 0 4px #ff8a80);
+}
+
+.eg-proj-dice {
+    filter: drop-shadow(0 0 4px #fff176);
+}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    ADDITIONS to monsters.css
@@ -818,6 +842,30 @@
 .eg-compact-targeted {
     border-color: #00f2fe;
     box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+    animation: eg-target-pulse 1s ease-in-out infinite;
+}
+
+@keyframes eg-target-pulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(0, 242, 254, 0.5); }
+    50%      { box-shadow: 0 0 14px rgba(0, 242, 254, 0.95); }
+}
+
+/* Bouncing arrow marker above the currently targeted monster */
+.eg-target-arrow {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #00f2fe;
+    font-size: 13px;
+    text-shadow: 0 0 6px rgba(0, 242, 254, 0.9);
+    animation: eg-target-bounce 1s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes eg-target-bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(3px); }
 }
 
 /* Level overlay positioned subtly toward the bottom-left */

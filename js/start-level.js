@@ -253,9 +253,20 @@ function _updateModTags() {
 
 // Writes the mistake counter text in the one canonical format, so every
 // caller (HUD refresh, mistake eraser, golden clock) stays in sync.
+// On endgame maps with a mistake limit the format is "x / y" (done / allowed);
+// regular campaign levels only ever show the raw count.
 function _setMistakeCounterText(suffix = '') {
     const mc = document.getElementById('mistake-counter');
-    if (mc) mc.textContent = `${t('cg_mistakes_lbl')}: ${mistakeCount}${suffix}`;
+    if (!mc) return;
+
+    let maxMistakes = null;
+    if (typeof _egIsActive === 'function' && typeof _egGetMaxAllowedMistakes === 'function' && _egIsActive()) {
+        maxMistakes = _egGetMaxAllowedMistakes();
+    }
+
+    mc.textContent = (maxMistakes != null)
+        ? `${t('cg_mistakes_lbl')}: ${mistakeCount} / ${maxMistakes}${suffix}`
+        : `${t('cg_mistakes_lbl')}: ${mistakeCount}${suffix}`;
 }
 
 
@@ -315,7 +326,10 @@ function _startSystems() {
 
 // Resets class cooldown, applies passive class effects, and rebuilds the class HUD panel.
 function _initClassSystems() {
-    resetActiveCooldown();
+    // Chained endgame puzzles continue the encounter — keep ability cooldowns running
+    if (!(cur && cur.isChainedPuzzle)) {
+        resetActiveCooldown();
+    }
     applyClassPassiveOnLevelStart();
     buildClassHUD();
 }

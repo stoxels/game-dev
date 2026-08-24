@@ -328,7 +328,7 @@
    ============================================================ */
 
 .qr-hint {
-    font-family: var(--PX);
+    font-family: "STIX Two Math", "Cambria Math", "DejaVu Sans", var(--F), monospace;
     font-size: clamp(15px, 1.0vw, 20px);
     color: #c8a8e8;
     text-align: center;

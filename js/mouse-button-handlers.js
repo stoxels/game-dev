@@ -68,6 +68,7 @@ function _egDiscardAllDrops(row, col) {
     if (typeof _egDiscardPickup === 'function') _egDiscardPickup(row, col);
     if (typeof _egDiscardLootDrop === 'function') _egDiscardLootDrop(row, col);
     if (typeof _egDiscardCurrencyDrop === 'function') _egDiscardCurrencyDrop(row, col);
+    if (typeof _egDiscardItemDrop === 'function') _egDiscardItemDrop(row, col);
 }
 
 // Endgame: claims any pickup, loot drop, or currency drop sitting on a
@@ -78,6 +79,7 @@ function _egCheckAllClaims(row, col) {
     if (typeof _egCheckPickupClaim === 'function') _egCheckPickupClaim(row, col);
     if (typeof _egCheckLootClaim === 'function') _egCheckLootClaim(row, col);
     if (typeof _egCheckCurrencyDropClaim === 'function') _egCheckCurrencyDropClaim(row, col);
+    if (typeof _egCheckItemDropClaim === 'function') _egCheckItemDropClaim(row, col);
 }
 
 
@@ -354,8 +356,13 @@ function checkGoldenClockAfterMistake() {
 
     window._goldenClockMistakesLeft = (window._goldenClockMistakesLeft || 0) - 1;
 
-    const mcEl = document.getElementById('mistake-counter');
-    if (mcEl) mcEl.textContent = `✗ ${mistakeCount} 🕰️${window._goldenClockMistakesLeft}`;
+    // Canonical counter format (keeps the "x / y" endgame layout) + clock suffix
+    if (typeof _setMistakeCounterText === 'function') {
+        _setMistakeCounterText(` 🕰️${window._goldenClockMistakesLeft}`);
+    } else {
+        const mcEl = document.getElementById('mistake-counter');
+        if (mcEl) mcEl.textContent = `✗ ${mistakeCount} 🕰️${window._goldenClockMistakesLeft}`;
+    }
 
     if (window._goldenClockMistakesLeft <= 0) {
         window._goldenClockActive = false;
@@ -731,6 +738,7 @@ function applyCell(row, col) {
         _egDiscardPickup(row, col);
         _egDiscardLootDrop(row, col);
         if (typeof _egDiscardCurrencyDrop === 'function') _egDiscardCurrencyDrop(row, col);
+        if (typeof _egDiscardItemDrop === 'function') _egDiscardItemDrop(row, col);
     }
 
     // Write the new value into the player grid

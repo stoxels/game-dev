@@ -119,8 +119,8 @@ function _revealCappedCells(lineEntry, type, cap) {
 //   count : how many lines to solve
 //   cap   : max cells revealed per line
 //
-//   Returns the number of lines that were actually solved (may be < count if
-//   fewer unsolved lines exist).
+//   Returns the total number of cells that were actually revealed (may be <
+//   count * cap if fewer unsolved lines/cells exist).
 function _solveLinesCapped(type, count, cap) {
     if (!cur) return 0;
 
@@ -131,9 +131,14 @@ function _solveLinesCapped(type, count, cap) {
     const candidates = _collectUnsolvedLines(type, sol, rows, cols);
     const picked = candidates.slice(0, count);
 
-    picked.forEach(lineEntry => _revealCappedCells(lineEntry, type, cap));
+    let revealed = 0;
 
-    return picked.length;
+    picked.forEach(lineEntry => {
+        revealed += Math.min(cap, lineEntry.unrevealed.length);
+        _revealCappedCells(lineEntry, type, cap);
+    });
+
+    return revealed;
 }
 
 
@@ -464,7 +469,9 @@ function _dataStrikeOverlayHTML(count, cap) {
 
     let prompt = t('cls_data_strike_prompt')
         .replace('{cap}', cap)
-        .replace('{count}', count);
+        .replace('{count}', count)
+        .replace('{cword}', _pluralLabel(cap, 'cell', 'cells', 'Zelle', 'Zellen'))
+        .replace('{lword}', _pluralLabel(count, 'random row/column', 'random rows/columns', 'zufälliger Zeile/Spalte', 'zufälligen Zeilen/Spalten'));
 
     if (_dataStrikeHasRandomBonusChance()) {
         prompt += t('cls_chance_for_more');
@@ -659,13 +666,15 @@ function _dataStrikeResolve(type) {
 
     const count = _dataStrikeCalculateFinalCount();
     const cap = _dataStrikeCalculateRevealCap();
-    const solved = _solveLinesCapped(type, count, cap);
+    const revealed = _solveLinesCapped(type, count, cap);
 
     // Play horizontal slashes for row strikes, vertical for column strikes
     _playSlashEffect(type === 'cols');
 
-    if (solved > 0) {
-        const msg = t('cls_data_strike_solved').replace('{n}', solved);
+    if (revealed > 0) {
+        const msg = t('cls_data_strike_solved')
+            .replace('{n}', revealed)
+            .replace('{word}', _pluralLabel(revealed, 'cell', 'cells', 'Zelle', 'Zellen'));
 
         showToast(msg);
         checkWin();
@@ -950,7 +959,9 @@ function _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealCap, mar
 
     const bonusRevealed = _filterRevealedIds(bonusAffected, sol).length;
 
-    const msg = t('cls_diag_bonus').replace('{n}', bonusRevealed);
+    const msg = t('cls_diag_bonus')
+        .replace('{n}', bonusRevealed)
+        .replace('{word}', _pluralLabel(bonusRevealed, 'cell', 'cells', 'Zelle', 'Zellen'));
 
     showToast(msg);
 
@@ -1032,7 +1043,9 @@ function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
     if (diagRevealed > 0) {
         trackAchStat('tilesRevealed', diagRevealed);
 
-        const msg = t('cls_diag_revealed').replace('{n}', diagRevealed);
+        const msg = t('cls_diag_revealed')
+            .replace('{n}', diagRevealed)
+            .replace('{word}', _pluralLabel(diagRevealed, 'cell', 'cells', 'Zelle', 'Zellen'));
 
         showToast(msg);
     } else {

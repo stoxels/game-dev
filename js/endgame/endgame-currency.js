@@ -340,20 +340,22 @@ document.addEventListener('keydown', function (e) {
 //------------------------------------------------------------------------
 // Overrides _egShowTooltip from endgame-hub.js: currency items get a
 // simple description tooltip; equipment still uses the full stat block.
+// Renders into the floating game tooltip (tooltips-hud.js) instead of
+// the old tooltip panel.
 
-function _egShowTooltip(item) {
+function _egShowTooltip(item, e) {
     _egTooltipItem = item;
-    const panel = document.getElementById('eg-tooltip-panel-body');
-    if (!panel) return;
 
     if (!item) {
-        panel.innerHTML = `<span class="eg-tooltip-empty">${t('eg_tooltip_hover_hint')}</span>`;
+        hideGameTooltip();
+        _egHideCompareTooltip();
         return;
     }
 
+    let html;
     if (item.category === 'currency') {
         const countLine = item.count > 1 ? ` <span class="eg-tooltip-count">×${item.count}</span>` : '';
-        panel.innerHTML = `
+        html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
         <div class="eg-tt-icon">${item.icon || '📦'}</div>
@@ -362,10 +364,15 @@ function _egShowTooltip(item) {
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc">${item.description || ''}</div></div>
 </div>`;
-        return;
+    } else {
+        html = _egBuildTooltipBodyHTML(item);
     }
 
-    panel.innerHTML = _egBuildTooltipBodyHTML(item);
+    showGameTooltip(html, e || {
+        clientX: _egLastMouse.x,
+        clientY: _egLastMouse.y,
+    });
+    _egUpdateCompareTooltip();
 }
 
 
