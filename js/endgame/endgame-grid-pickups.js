@@ -20,6 +20,10 @@ const EG_LOOT_DROP_CHANCE_BOSS = 1.00;  // bosses always drop
 // Intentionally longer than heart pickups — no rush to grab loot.
 const EG_LOOT_DROP_LIFETIME_MS = 60000;
 
+// Seconds removed from a randomly chosen ability slot's cooldown when the
+// Arcane Surge pickup is claimed.
+const EG_COOLDOWN_SURGE_REDUCTION_SECS = 30;
+
 // Hard cap: never place a loot drop if it would push pending loot +
 // items already in the stash beyond this free-slot budget.
 // Checked via _egStashHasFreeSlot() at drop time.
@@ -72,6 +76,67 @@ const EG_PICKUP_DEFS = {
             Audio_Manager.playSFX('heart_heals');
         },
     },
+    // Erases one mistake from the current mistake counter. Somewhat rare.
+    mistake_eraser: {
+        id: 'mistake_eraser', emoji: '🧽', label: () => t('eg_pickup_mistake_eraser'), rarity: 'rare',
+        onPickup(row, col) {
+            if (mistakeCount > 0) {
+                mistakeCount--;
+                _levelMistakesErased++;
+                if (typeof questStat_mistakesRemoved === 'function') questStat_mistakesRemoved(1);
+
+                // Full HUD sync: refreshes the top-left mistake counter
+                // (including "x / y" on endgame maps), the objectives strip,
+                // and re-checks the map's mistake limit so the budget is restored.
+                if (typeof _updateMistakeCounterHUD === 'function') {
+                    _updateMistakeCounterHUD();
+                } else if (typeof _setMistakeCounterText === 'function') {
+                    _setMistakeCounterText();
+                }
+                showToast(t('eg_pickup_mistake_erased'), _egRarityToastColor(this.rarity));
+            } else {
+                showToast(t('eg_pickup_mistake_none'), _egRarityToastColor(this.rarity));
+            }
+        },
+    },
+    // Reduces the cooldown of one random ability slot (1-4) by a flat amount.
+    // A bit more common than the Mistake Eraser.
+    cooldown_surge: {
+        id: 'cooldown_surge', emoji: '⚡', label: () => t('eg_pickup_cooldown_surge'), rarity: 'uncommon',
+        onPickup(row, col) {
+            const slot = ALL_SLOTS[Math.floor(Math.random() * ALL_SLOTS.length)];
+            const state = cooldownState[slot];
+            const slotIndex = SLOT_DISPLAY_INDEX[slot] ?? slot;
+            const abilityData = (typeof _getAbilityData === 'function') ? _getAbilityData(slot) : null;
+            const displayName = `[${slotIndex}] ${abilityData ? _getAbilityName(abilityData) : ''}`.trim();
+
+            if (!state || state.remaining <= 0) {
+                showToast(t('eg_pickup_cooldown_none').replace('{name}', displayName),
+                    _egRarityToastColor(this.rarity));
+                return;
+            }
+
+            const before = state.remaining;
+            state.remaining = Math.max(0, state.remaining - EG_COOLDOWN_SURGE_REDUCTION_SECS);
+
+            if (state.remaining === 0) {
+                clearInterval(state.interval);
+                state.interval = null;
+                buildClassHUD();
+            } else if (typeof _patchCooldownButton === 'function') {
+                _patchCooldownButton(slot);
+            }
+
+            showToast(t('eg_pickup_cooldown_reduced')
+                .replace('{name}', displayName)
+                .replace('{n}', before - state.remaining),
+                _egRarityToastColor(this.rarity));
+
+            if (state.remaining === 0 && typeof _showCooldownReadyToast === 'function') {
+                _showCooldownReadyToast(slot);
+            }
+        },
+    },
     // Future pickup types go here:
     // item_pickup: {
     //     id: 'item_pickup', emoji: '📦', label: 'Item', rarity: 'uncommon',
@@ -85,6 +150,8 @@ const EG_PICKUP_WEIGHTS = [
     { id: 'heart_small', weight: 60 },
     { id: 'heart_medium', weight: 30 },
     { id: 'heart_large', weight: 10 },
+    { id: 'cooldown_surge', weight: 8 },   // ~7% — a bit more common than eraser
+    { id: 'mistake_eraser', weight: 5 },   // ~4% — somewhat rare
 ];
 
 

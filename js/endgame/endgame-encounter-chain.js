@@ -312,11 +312,47 @@ function _egFindNextChainPuzzleGi() {
 //-------------------ENCOUNTER CHAIN: MAP END (voluntary)----------------
 //------------------------------------------------------------------------
 
+// Chance-based bonus equipment loot when completing a map.
+// The chance scales with puzzles solved and questions answered this run:
+//   chance = puzzles * 5% + questions * 3%  (capped at 90%)
+const EG_BONUS_LOOT_CHANCE_PER_PUZZLE = 0.05;
+const EG_BONUS_LOOT_CHANCE_PER_QUESTION = 0.03;
+const EG_BONUS_LOOT_CHANCE_MAX = 0.9;
+
+// Returns the current bonus-loot drop chance (0–1) for this run.
+function _egGetBonusLootChance() {
+    return Math.min(EG_BONUS_LOOT_CHANCE_MAX,
+        _egChainPuzzleSolvedCount * EG_BONUS_LOOT_CHANCE_PER_PUZZLE +
+        _egQuestionsAnswered * EG_BONUS_LOOT_CHANCE_PER_QUESTION);
+}
+
+// Rolls for one bonus equipment item on map completion. On success the item
+// is pushed into _egRunLoot so it flows through the normal flush-to-stash
+// and leave-map summary paths. Must be called BEFORE _egShowLeaveMapTransition()
+// so the summary screen includes it, and before _egChainCleanup wipes _egRunLoot.
+function _egRollBonusMapLoot() {
+    if (Math.random() > _egGetBonusLootChance()) return;
+    if (typeof _egGenerateEquipmentDrop !== 'function') return;
+
+    const baseLevel = (_egMapDef && _egMapDef.monsterLevel) ? _egMapDef.monsterLevel : 1;
+    const item = _egGenerateEquipmentDrop(baseLevel);
+    if (!item) return;
+
+    _egRunLoot.push(item);
+    showToast(t('eg_bonus_loot')
+        .replace('{icon}', item.icon || '')
+        .replace('{name}', item.name), _egRarityToastColor(item.rarity));
+}
+
 // Called only by the Leave Map button after _egCanLeaveMap() returns true.
 // Called only by the Leave Map button after _egCanLeaveMap() returns true.
 function _egEndMap() {
     if (!_egEncounterActive) return;
     _egCancelChainCountdown();
+
+    // Roll for completion bonus loot first — it must land in _egRunLoot
+    // before the transition overlay renders its summary.
+    _egRollBonusMapLoot();
 
     // Show the overlay FIRST — it sits above the puzzle grid with normal
     // pointer-events, so it blocks every further click the instant this
@@ -698,15 +734,17 @@ function _egBuildCurrencyTooltipHTML(entry) {
 // Wires loot/currency chips to the global floating tooltip engine
 // (tooltips-hud.js). The engine renders into a position:fixed element on
 // document.body, so tooltips are never clipped by the panel's overflow-y.
-function _egWireLeaveMapSummaryTooltips(panel) {
+// Reads the passed-in loot/currency snapshots instead of the live arrays,
+// because _egChainCleanup wipes them right after this overlay opens.
+function _egWireLeaveMapSummaryTooltips(panel, loot, currency) {
     const buildFor = (chip) => {
         if ('lootIdx' in chip.dataset) {
-            const item = _egRunLoot[+chip.dataset.lootIdx];
+            const item = loot[+chip.dataset.lootIdx];
             return (item && typeof _egBuildTooltipBodyHTML === 'function')
                 ? _egBuildTooltipBodyHTML(item) : '';
         }
         if ('currencyIdx' in chip.dataset) {
-            const entry = _egRunCurrency[+chip.dataset.currencyIdx];
+            const entry = currency[+chip.dataset.currencyIdx];
             return entry ? _egBuildCurrencyTooltipHTML(entry) : '';
         }
         return '';
@@ -754,6 +792,14 @@ function _egShowLeaveMapTransition() {
         </div>`;
     el.classList.add('show');
 
+    // Snapshot the run data now — _egStopEncounter() (called by _egEndMap
+    // right after this) wipes _egRunLoot/_egRunCurrency via _egChainCleanup.
+    _egWireLeaveMapSummaryTooltips(
+        el.querySelector('.eg-leave-map-panel') || el,
+        [..._egRunLoot],
+        [..._egRunCurrency]
+    );
+
     document.getElementById('btn-eg-leave-map-return').onclick = () => {
         _egHideLeaveMapTransition();
         showEndgameHub();
@@ -763,6 +809,7 @@ function _egShowLeaveMapTransition() {
 function _egHideLeaveMapTransition() {
     const el = document.getElementById('eg-leave-map-transition');
     if (el) el.classList.remove('show');
+    if (typeof hideGameTooltip === 'function') hideGameTooltip();
 }
 
 // Injects the overlay's CSS once — same pattern as _egInjectCurrencyStyles
