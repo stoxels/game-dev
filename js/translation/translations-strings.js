@@ -240,7 +240,7 @@ const T = {
         tut2_s8_text: 'Items you have earned are shown here. <strong>Click an item to use it</strong> during a level.<br><br>Items include:<br>• 🔦 <em>Reveal</em> — shows correct tiles in green<br>• 🛡️ <em>Shield</em> — absorbs your next mistake<br>• ⏳ <em>+Time</em> — adds seconds to the clock<br>• ☠️ <em>Cursed</em> — powerful but risky, locked for 3 min<br><br><strong>Ironman</strong> mode disables all items for a score bonus.',
 
         tut2_s9_title: 'Probability Tree',
-        tut2_s9_text: 'While adventuring through the world of Stoxels you will earn points to spend on the Probability Tree. You can obtain up to 66 points in total and can refund points at any time. Points can only be spend or refundded on adjacent nodes.',
+        tut2_s9_text: 'While adventuring through the world of Stoxels you will earn points to spend on the Probability Tree. You can obtain up to 66 points in total and can refund points at any time. Points can only be spent or refunded on adjacent nodes.',
 
         tut2_s10_title: 'Inference',
         tut2_s10_text: 'Complete Inference - Tasks to earn items and collect more points for the Probability Tree!',
