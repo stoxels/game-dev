@@ -37,7 +37,7 @@ const T = {
         tut_s3p: '<strong style="color:var(--green)">Easy</strong> — low time penalties for mistakes, 50% less Score<br><strong style="color:var(--yellow)">Normal</strong> — standard time penalties for mistakes<br><strong style="color:var(--red)">Hard</strong> — heavy time penalties for mistakes, 50% more score',
 
         tut_s4h: 'GAME MODIFIERS',
-        tut_s4p: '<strong style="color:var(--orange)">Time Trial</strong> — 50% less time per level, but 20% more Score <br> < strong style="color:var(--red)" > Hardcore</strong> — one mistake fails the level, but 30% more Score<br>< strong style = "color:var(--purple)" > Ironman</strong> — items cannot be used, but 15 % more Score < br > <strong style="color:var(--accent)">Classless</strong> — Class Abilities cannot be used, but 20 % more Score < br > <strong style="color:var(--green)">Treeless</strong> — Probability Tree nodes have no effect, but 25 % more Score < br > Modifiers can be combined with each other.',
+        tut_s4p: '<strong style="color:var(--orange)">Time Trial</strong> — 50% less time per level, but 20% more Score<br><strong style="color:var(--red)">Hardcore</strong> — one mistake fails the level, but 30% more Score<br><strong style="color:var(--purple)">Ironman</strong> — items cannot be used, but 15% more Score<br><strong style="color:var(--accent)">Classless</strong> — Class Abilities cannot be used, but 20% more Score<br><strong style="color:var(--green)">Treeless</strong> — Probability Tree nodes have no effect, but 25% more Score<br>Modifiers can be combined with each other.',
 
         tut_s5h: 'ITEMS & INVENTORY',
         tut_s5p: 'Complete a level\'s bonus objective to earn a random item. Cursed items are powerful but also have a negative effect.',
