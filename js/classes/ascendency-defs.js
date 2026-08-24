@@ -165,27 +165,27 @@ const ASCENDENCY_DEFS = {
         active1: {
             nameEn: 'Residual',
             nameDE: 'Residual',
-            descCursorEn: 'Select a mistake cell to plant a Residual Totem - it fires a revealing beam every 20s to cells around it.',
-            descCursorDE: 'Klicke eine Fehlerzelle, um einen Residual-Totem zu setzen - es feuert alle 20s einen Enthüllungs-Strahl auf Zellen um sich herum.',
+            descCursorEn: 'Select a mistake cell to summon a roaming skeleton - it walks up and down its column and fires revealing beams at adjacent correct cells.',
+            descCursorDE: 'Klicke eine Fehlerzelle, um ein wanderndes Skelett zu beschwören - es läuft in seiner Spalte auf und ab und feuert Enthüllungs-Strahlen auf angrenzende korrekte Zellen.',
             cooldownSeconds: 120,
             levels: [
                 {
                     level: 1,
-                    descEn: 'Plant a Residual Totem on a mistake cell. It fires a Revealing Beam every 20s to unfilled correct cells around it with radius 2. 3 Beam Charges. Max. 1 Totem. Cooldown: 2 minutes.',
-                    descDE: 'Setze ein Residual-Totem auf eine Fehlerzelle. Es feuert einen Enthüllungs-Strahl alle 20s auf ungefüllte Zellen um sich herum mit Radius 2 ab. 3 Ladungen. Max. 1 Totem. Abklingzeit: 2 Minuten.',
-                    effect: { beamRadius: 2, charges: 3, fires: 20, maxTotems: 1 }
+                    descEn: 'Summon a skeleton on a mistake cell. For 20s it roams up and down its column, firing beams every 10s at adjacent unfilled correct cells. If it crosses another mistake, it can leap 2 columns away — spawning an additional skeleton (20s). Max. 2 skeletons. Cooldown: 2 minutes.',
+                    descDE: 'Beschwöre ein Skelett auf einer Fehlerzelle. 20s lang wandert es in seiner Spalte auf und ab und feuert alle 10s Strahlen auf angrenzende ungefüllte korrekte Zellen. Kreuzt es einen weiteren Fehler, springt es 2 Spalten weiter — und beschwört ein zusätzliches Skelett (20s). Max. 2 Skelette. Abklingzeit: 2 Minuten.',
+                    effect: { durationSecs: 20, fires: 10, maxSkeletons: 2 }
                 },
                 {
                     level: 2,
-                    descEn: 'Plant a Residual Totem on a mistake cell. It fires a Revealing Beam every 15s to unfilled correct cells around it with radius 3. 4 Beam Charges. Max. 2 Totems. Cooldown: 2 minutes.',
-                    descDE: 'Setze ein Residual-Totem auf eine Fehlerzelle. Es feuert einen Enthüllungs-Strahl alle 15s auf ungefüllte Zellen um sich herum mit Radius 3 ab. 4 Ladungen. Max. 2 Totems. Abklingzeit: 2 Minuten.',
-                    effect: { beamRadius: 3, charges: 3, fires: 15, maxTotems: 2 }
+                    descEn: 'Summon a skeleton on a mistake cell. For 30s it roams up and down its column, firing beams every 7s at adjacent unfilled correct cells. If it crosses another mistake, it can leap 2 columns away — spawning an additional skeleton (20s). Max. 3 skeletons. Cooldown: 2 minutes.',
+                    descDE: 'Beschwöre ein Skelett auf einer Fehlerzelle. 30s lang wandert es in seiner Spalte auf und ab und feuert alle 7s Strahlen auf angrenzende ungefüllte korrekte Zellen. Kreuzt es einen weiteren Fehler, springt es 2 Spalten weiter — und beschwört ein zusätzliches Skelett (20s). Max. 3 Skelette. Abklingzeit: 2 Minuten.',
+                    effect: { durationSecs: 30, fires: 7, maxSkeletons: 3 }
                 },
                 {
                     level: 3,
-                    descEn: 'Plant a Residual Totem on a mistake cell. It fires a Revealing Beam every 10s to unfilled correct cells around it with radius 4. 6 Beam Charges. Max. 3 Totems. Cooldown: 2 minutes.',
-                    descDE: 'Setze ein Residual-Totem auf eine Fehlerzelle. Es feuert einen Enthüllungs-Strahl alle 10s auf ungefüllte Zellen um sich herum mit Radius 4 ab. 6 Ladungen. Max. 3 Totems. Abklingzeit: 2 Minuten.',
-                    effect: { beamRadius: 4, charges: 5, fires: 10, maxTotems: 3 }
+                    descEn: 'Summon a skeleton on a mistake cell. For 40s it roams up and down its column, firing beams every 5s at adjacent unfilled correct cells. If it crosses another mistake, it can leap 2 columns away — spawning an additional skeleton (20s). Max. 4 skeletons. Cooldown: 2 minutes.',
+                    descDE: 'Beschwöre ein Skelett auf einer Fehlerzelle. 40s lang wandert es in seiner Spalte auf und ab und feuert alle 5s Strahlen auf angrenzende ungefüllte korrekte Zellen. Kreuzt es einen weiteren Fehler, springt es 2 Spalten weiter — und beschwört ein zusätzliches Skelett (20s). Max. 4 Skelette. Abklingzeit: 2 Minuten.',
+                    effect: { durationSecs: 40, fires: 5, maxSkeletons: 4 }
                 },
             ]
         },
@@ -193,27 +193,27 @@ const ASCENDENCY_DEFS = {
         active2: {
             nameEn: 'Degrees of Freedom',
             nameDE: 'Freiheitsgrade',
-            descCursorEn: 'Select mistake cells to correct them and recover the paid time penalties.',
-            descCursorDE: 'Wähle Fehlerzellen aus, um sie zu korrigieren und die gezahlten Zeitstrafen zurückzuerhalten.',
-            cooldownSeconds: 180,
+            descCursorEn: 'Raise a zombie that wanders the grid permanently, haunts a free cell and challenges you to fill or mark it correctly.',
+            descCursorDE: 'Erwecke einen Zombie, der dauerhaft über das Gitter wandert, eine freie Zelle heimsucht und dich herausfordert, sie korrekt zu füllen oder zu markieren.',
+            cooldownSeconds: 1800,
             levels: [
                 {
                     level: 1,
-                    descEn: 'Select 1 mistake cell to correct. Recover 50% of the time penalty paid. Cooldown: 3 minutes.',
-                    descDE: 'Wähle 1 Fehlerzelle aus. Erhalte 50% der gezahlten Zeitstrafe zurück. Abklingzeit: 3 Minuten.',
-                    effect: { correctCount: 1, recoverPct: 0.5 }
+                    descEn: 'Raise a zombie on a random free cell. It wanders the grid for the rest of the level and occasionally haunts a free cell: after 5s of standing, a 10s countdown starts — make the correct click (fill or ✕) on that cell and the zombie curses a nearby incorrect cell into a mistake cell (no penalty, aids Residual skeleton jumps). If the countdown expires, the zombie fills the cell itself — on a truly incorrect cell this counts as a real mistake. The zombie stays until the level ends. Cooldown: 30 minutes.',
+                    descDE: 'Erwecke einen Zombie auf einer zufälligen freien Zelle. Er wandert für den Rest des Levels über das Gitter und heimsucht gelegentlich eine freie Zelle: Nach 5s Stehen beginnt ein 10s-Countdown — klicke die Zelle korrekt (füllen oder ✕) und der Zombie verflucht eine angrenzende falsche Zelle in eine Fehlerzelle (keine Strafe, hilft den Residual-Skelett-Sprüngen). Läuft der Countdown ab, füllt der Zombie die Zelle selbst — bei einer wirklich falschen Zelle zählt dies als echter Fehler. Der Zombie bleibt bis zum Levelende. Abklingzeit: 30 Minuten.',
+                    effect: {}
                 },
                 {
                     level: 2,
-                    descEn: 'Select up to 2 mistake cells to correct. Recover 75% of time penalties paid. Cooldown: 3 minutes.',
-                    descDE: 'Wähle bis zu 2 Fehlerzellen aus. Erhalte 75% der gezahlten Zeitstrafen zurück. Abklingzeit: 3 Minuten.',
-                    effect: { correctCount: 2, recoverPct: 0.5 }
+                    descEn: 'Raise a zombie on a random free cell. It wanders the grid for the rest of the level and occasionally haunts a free cell: after 5s of standing, a 10s countdown starts — make the correct click (fill or ✕) on that cell and the zombie curses a nearby incorrect cell into a mistake cell (no penalty, aids Residual skeleton jumps). If the countdown expires, the zombie fills the cell itself — on a truly incorrect cell this counts as a real mistake. The zombie stays until the level ends. Cooldown: 30 minutes.',
+                    descDE: 'Erwecke einen Zombie auf einer zufälligen freien Zelle. Er wandert für den Rest des Levels über das Gitter und heimsucht gelegentlich eine freie Zelle: Nach 5s Stehen beginnt ein 10s-Countdown — klicke die Zelle korrekt (füllen oder ✕) und der Zombie verflucht eine angrenzende falsche Zelle in eine Fehlerzelle (keine Strafe, hilft den Residual-Skelett-Sprüngen). Läuft der Countdown ab, füllt der Zombie die Zelle selbst — bei einer wirklich falschen Zelle zählt dies als echter Fehler. Der Zombie bleibt bis zum Levelende. Abklingzeit: 30 Minuten.',
+                    effect: {}
                 },
                 {
                     level: 3,
-                    descEn: 'Select up to 3 mistake cells to correct. Recover 100% of time penalties paid. Cooldown: 3 minutes.',
-                    descDE: 'Wähle bis zu 3 Fehlerzellen aus. Erhalte 100% der gezahlten Zeitstrafen zurück. Abklingzeit: 3 Minuten.',
-                    effect: { correctCount: 3, recoverPct: 1.0 }
+                    descEn: 'Raise a zombie on a random free cell. It wanders the grid for the rest of the level and occasionally haunts a free cell: after 5s of standing, a 10s countdown starts — make the correct click (fill or ✕) on that cell and the zombie curses a nearby incorrect cell into a mistake cell (no penalty, aids Residual skeleton jumps). If the countdown expires, the zombie fills the cell itself — on a truly incorrect cell this counts as a real mistake. The zombie stays until the level ends. Cooldown: 30 minutes.',
+                    descDE: 'Erwecke einen Zombie auf einer zufälligen freien Zelle. Er wandert für den Rest des Levels über das Gitter und heimsucht gelegentlich eine freie Zelle: Nach 5s Stehen beginnt ein 10s-Countdown — klicke die Zelle korrekt (füllen oder ✕) und der Zombie verflucht eine angrenzende falsche Zelle in eine Fehlerzelle (keine Strafe, hilft den Residual-Skelett-Sprüngen). Läuft der Countdown ab, füllt der Zombie die Zelle selbst — bei einer wirklich falschen Zelle zählt dies als echter Fehler. Der Zombie bleibt bis zum Levelende. Abklingzeit: 30 Minuten.',
+                    effect: {}
                 },
             ]
         },

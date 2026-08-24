@@ -242,6 +242,88 @@ function _fxOverlay(wrap, durationMs, extraStyle = '') {
     return el;
 }
 
+// Injects the keyframes used by the freeze countdown overlay (once).
+function _ensureFreezeCountdownStyles() {
+    if (document.getElementById('fx-freeze-countdown-style')) return;
+    const style = document.createElement('style');
+    style.id = 'fx-freeze-countdown-style';
+    style.textContent = `
+        @keyframes fx-freeze-pop {
+            0%   { transform: scale(1.8); opacity: 0; }
+            25%  { transform: scale(1);   opacity: 1; }
+            100% { transform: scale(0.94); opacity: 0.85; }
+        }
+        @keyframes fx-freeze-fadeout {
+            from { opacity: 1; }
+            to   { opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Big icy-blue countdown displayed over the centre of the puzzle grid
+// while a time-freeze effect is running (Absolute Zero, Time Freeze item,
+// Timed Stasis passive).  Shows "❄️ Ns" and pops once per second until the
+// freeze expires, then fades out.
+function playFreezeCountdownOverlay(durationMs) {
+    const wrap = document.getElementById('puzzle-scaler');
+    if (!wrap) return;
+    _ensureFreezeCountdownStyles();
+
+    // Replace any countdown still running from a previous freeze.
+    const stale = document.getElementById('fx-freeze-countdown');
+    if (stale) stale.remove();
+
+    if (!wrap.style.position || wrap.style.position === 'static') {
+        wrap.style.position = 'relative';
+    }
+
+    const rect = _fxGetPuzzleRect();
+    const size = rect ? Math.min(rect.width, rect.height) : Math.min(wrap.clientWidth, wrap.clientHeight);
+
+    let remaining = Math.max(1, Math.ceil(durationMs / 1000));
+
+    const el = document.createElement('div');
+    el.id = 'fx-freeze-countdown';
+    el.style.cssText = `
+        position: absolute;
+        left: ${rect ? rect.left + rect.width / 2 : wrap.clientWidth / 2}px;
+        top: ${rect ? rect.top + rect.height / 2 : wrap.clientHeight / 2}px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: ${FX_Z.high};
+        font-size: ${Math.max(40, size * 0.22)}px;
+        font-weight: 900;
+        color: #9fdcff;
+        text-shadow: 0 0 18px #4aa8ff, 0 0 42px #2a7de1, 0 2px 6px rgba(0,0,60,0.6);
+        -webkit-text-stroke: 2px rgba(10,40,90,0.55);
+    `;
+
+    const renderTick = () => {
+        const span = document.createElement('span');
+        span.textContent = `❄️ ${remaining}s`;
+        span.style.cssText = 'display:inline-block; animation: fx-freeze-pop 0.95s ease-out forwards;';
+        el.replaceChildren(span);
+    };
+    renderTick();
+    wrap.appendChild(el);
+
+    const tick = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(tick);
+            return;
+        }
+        renderTick();
+    }, 1000);
+
+    setTimeout(() => {
+        clearInterval(tick);
+        el.style.animation = 'fx-freeze-fadeout 0.35s ease-out forwards';
+        setTimeout(() => el.remove(), 380);
+    }, durationMs);
+}
+
 // Generic particle spawner.  Staggered timers spread particles
 // over the effect duration so they don't all appear at once.
 //

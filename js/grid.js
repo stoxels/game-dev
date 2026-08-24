@@ -396,6 +396,16 @@ function _toggleRowCluesSide() {
     if (typeof window._repositionRandomWalkerAgents === 'function') {
         window._repositionRandomWalkerAgents();
     }
+
+    // Keep Residual skeletons aligned with the grid's new position
+    if (typeof window._repositionResidualSkeletons === 'function') {
+        window._repositionResidualSkeletons();
+    }
+
+    // Keep the DoF zombie aligned with the grid's new position
+    if (typeof window._repositionDoFZombie === 'function') {
+        window._repositionDoFZombie();
+    }
 }
 
 
@@ -441,6 +451,16 @@ function _toggleColCluesSide() {
     // Keep Random Walker agents (bears / drifter) and their path overlay aligned
     if (typeof window._repositionRandomWalkerAgents === 'function') {
         window._repositionRandomWalkerAgents();
+    }
+
+    // Keep Residual skeletons aligned with the grid's new position
+    if (typeof window._repositionResidualSkeletons === 'function') {
+        window._repositionResidualSkeletons();
+    }
+
+    // Keep the DoF zombie aligned with the grid's new position
+    if (typeof window._repositionDoFZombie === 'function') {
+        window._repositionDoFZombie();
     }
 }
 

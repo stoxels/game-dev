@@ -1106,8 +1106,9 @@ function _useAddTime(id, def) {
         const before = timerSecs;
         timerSecs = Math.max(0, timerSecs - secs);
         _trackTimerDelta(before, timerSecs);
-        updTimer();
-        playItemEffect(id);
+    updTimer();
+    playItemEffect(id);
+    if (typeof playFreezeCountdownOverlay === 'function') playFreezeCountdownOverlay(FREEZE_DURATION_MS);
         return `${def.icon} ${t('itm_countdown_crisis').replace('{n}', mins)}`;
     }
 

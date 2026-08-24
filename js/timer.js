@@ -294,6 +294,7 @@ function _tickTimedStasis() {
     updTimer();
     showToast(`⏸️ ${t('cg_timed_stasis')}`);
     if (typeof playStasisOverlayEffect === 'function') playStasisOverlayEffect(freezeDur);
+    if (typeof playFreezeCountdownOverlay === 'function') playFreezeCountdownOverlay(freezeDur);
 
     setTimeout(() => {
         timerFrozen = false;

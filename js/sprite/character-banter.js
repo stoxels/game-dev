@@ -899,8 +899,8 @@ const _BANTER_SKILL_LINES = {
             { en: "The totem iterates. Self-correcting systems, as designed.", de: "Das Totem iteriert. Selbstkorrigierende Systeme, wie entworfen." },
         ],
         recursionist_active2: [
-            { en: "Degrees of Freedom applied. Mistakes corrected, penalties refunded.", de: "Freiheitsgrade angewandt. Fehler korrigiert, Strafen erstattet." },
-            { en: "Every error contains its own correction. Executing that principle now.", de: "Jeder Fehler enthält seine eigene Korrektur. Ich führe dieses Prinzip gerade aus." },
+            { en: "Degrees of Freedom applied. The zombie is loose. Mind its hunger.", de: "Freiheitsgrade angewandt. Der Zombie ist unterwegs. Achte auf seinen Hunger." },
+            { en: "Every error contains its own correction. The zombie will find them.", de: "Jeder Fehler enth\u00e4lt seine eigene Korrektur. Der Zombie wird sie finden." },
         ],
         markovian_active1: [
             { en: "State Rollback executed. Reverting to a previous configuration.", de: "State Rollback ausgeführt. Rückkehr zu einer früheren Konfiguration." },
@@ -975,7 +975,7 @@ const _BANTER_SKILL_LINES = {
         ],
         recursionist_active2: [
             { en: "Degrees of Freedom! Freedom is my favorite thing. After me.", de: "Freiheitsgrade! Freiheit ist mein Lieblingsding. Direkt nach mir." },
-            { en: "More freedom, fewer mistakes, more Trix wins. Perfect system.", de: "Mehr Freiheit, weniger Fehler, mehr Trix-Siege. Perfektes System." },
+            { en: "The zombie works for me. Technically for you. Mostly for me.", de: "Der Zombie arbeitet für mich. Technisch für dich. Hauptsächlich für mich." },
         ],
         markovian_active1: [
             { en: "Rewind button for people who deserve second chances. Me.", de: "Rückgängig-Knopf für Leute, die zweite Chancen verdienen. Mir." },
@@ -1049,8 +1049,8 @@ const _BANTER_SKILL_LINES = {
             { en: "It hums softly while it works! What a patient totem!", de: "Es summt leise bei der Arbeit! Was für ein geduldiges Totem!" },
         ],
         recursionist_active2: [
-            { en: "Oopsies unwound like tangled yarn! All soft again!", de: "Hoppla entwirrt wie verworrenes Garn! Wieder ganz weich!" },
-            { en: "We can try again nicely! Yay for second tries!", de: "Wir dürfen's nochmal nett versuchen! Juhu für zweite Versuche!" },
+            { en: "Zombie friend shambles around! Click its cell real fast, okay?", de: "Zombie-Freund schlurft herum! Klick seine Zelle ganz schnell, okay?" },
+            { en: "If you're too slow, zombie helps! Zombie-help is a little bitey!", de: "Wenn du zu langsam bist, hilft der Zombie! Zombie-Hilfe ist ein bisschen bissig!" },
         ],
         markovian_active1: [
             { en: "Turn around, turn around, let's try again nicely!", de: "Dreh dich um, dreh dich um, versuchen wir's nochmal nett!" },

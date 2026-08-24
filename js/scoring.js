@@ -594,6 +594,7 @@ function checkWin() {
 
     // Stop any active visual effects and freeze the game state
     if (typeof clearActiveRandomWalkers === "function") clearActiveRandomWalkers();
+    if (typeof resetRecursionistState === "function") resetRecursionistState(); // removes the DoF zombie + Residual skeletons
     dead = true;
     stopTimer();
 

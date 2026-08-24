@@ -178,6 +178,16 @@ function _applyZoom() {
         if (typeof window._repositionRandomWalkerAgents === 'function') {
             window._repositionRandomWalkerAgents();
         }
+
+        // Keep Residual skeletons locked onto the grid at the new zoom level.
+        if (typeof window._repositionResidualSkeletons === 'function') {
+            window._repositionResidualSkeletons();
+        }
+
+        // Keep the DoF zombie locked onto the grid at the new zoom level.
+        if (typeof window._repositionDoFZombie === 'function') {
+            window._repositionDoFZombie();
+        }
     });
 
     _updateZoomBarUI();

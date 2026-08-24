@@ -485,31 +485,8 @@ function toggleActiveAbility(slot) {
 //------------------------------------------------------------------------
 
 
-// _handleRecursionistTotemPlacement — special post-fire logic for the Recursionist
-//   Residual skill. Cooldown is deferred until all totem slots are filled.
-//   Returns true if the caller should skip the normal cooldown start.
-function _handleRecursionistTotemPlacement(activeKey, asc, ascSlot, effect) {
-    const maxTotemsAllowed = effect.maxTotems || 1;
-    const currentTotems = (window._residualTotems || []).length;
-
-    if (currentTotems >= maxTotemsAllowed) {
-        // All slots filled — close selection mode and start cooldown
-        _setAbilityMode(false);
-        const cdSeconds = getEffectiveCooldown(activeKey, asc[ascSlot].cooldownSeconds);
-        startSlotCooldown(activeKey, cdSeconds);
-        showToast(t('cls_totems_deployed'));
-        return true; // cooldown was handled here
-    }
-
-    // Still room for more totems — keep selection mode open
-    const remaining = maxTotemsAllowed - currentTotems;
-    showToast(t('cls_totem_place_more').replace('{n}', remaining));
-    return false; // caller should NOT start cooldown yet
-}
-
-
 // _executeAscendencySkillOnCell — fires a targeted ascendency ability on the clicked cell
-//   and handles post-fire cooldown logic, including the Recursionist special case.
+//   and handles post-fire cooldown logic.
 function _executeAscendencySkillOnCell(activeKey, row, col) {
     const slotData = _getAscendencySlotData(activeKey);
     if (!slotData) return;
@@ -519,13 +496,7 @@ function _executeAscendencySkillOnCell(activeKey, row, col) {
 
     _dispatchAscendencyAbility(activeKey, STATE.playerAscendency, row, col, effect);
 
-    // Recursionist Residual: cooldown is deferred until the totem cap is reached
-    if (STATE.playerAscendency === 'recursionist' && ascSlot === 'active1') {
-        _handleRecursionistTotemPlacement(activeKey, asc, ascSlot, effect);
-        return;
-    }
-
-    // All other targeted ascendency skills: end arm mode and start cooldown immediately
+    // End arm mode and start cooldown immediately
     _setAbilityMode(false);
     const cdSeconds = getEffectiveCooldown(activeKey, asc[ascSlot].cooldownSeconds);
     startSlotCooldown(activeKey, cdSeconds);

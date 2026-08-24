@@ -1234,6 +1234,7 @@ function _executeArcaneFreeze(durationMs) {
 
     _arcaneFreeze_spawnFrozenFloor();
     _startBlizzardEffect(effectiveDuration);
+    if (typeof playFreezeCountdownOverlay === 'function') playFreezeCountdownOverlay(effectiveDuration);
     updTimer();
 
     const secs = Math.ceil(effectiveDuration / 1000);

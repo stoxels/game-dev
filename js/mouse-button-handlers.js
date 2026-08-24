@@ -119,21 +119,12 @@ function checkActiveAbilityIntercept(row, col) {
     return false;
 }
 
-// If a Degrees of Freedom session is active, route the click there.
-function checkDegreesOfFreedomIntercept(row, col) {
-    if (window._dofSession && _dofHandleClick(row, col)) {
-        return true;
-    }
-    return false;
-}
-
 // Runs all special intercepts in priority order.
 // Returns true if any intercept consumed the click.
 function checkSpecialIntercepts(row, col) {
     if (checkBossCorruptionIntercept(row, col)) return true;
     if (checkBayesianTrapIntercept(row, col)) return true;
     if (checkActiveAbilityIntercept(row, col)) return true;
-    if (checkDegreesOfFreedomIntercept(row, col)) return true;
     return false;
 }
 
