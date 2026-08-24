@@ -313,18 +313,26 @@ function _egFindNextChainPuzzleGi() {
 //------------------------------------------------------------------------
 
 // Called only by the Leave Map button after _egCanLeaveMap() returns true.
+// Called only by the Leave Map button after _egCanLeaveMap() returns true.
 function _egEndMap() {
     if (!_egEncounterActive) return;
     _egCancelChainCountdown();
+
+    // Show the overlay FIRST — it sits above the puzzle grid with normal
+    // pointer-events, so it blocks every further click the instant this
+    // runs, before any of the cleanup below happens.
+    _egShowLeaveMapTransition();
+
     _egFlushRunLootToStash();
     egSaveHubState();
     _egStopEncounter();
 
+    // Stop the puzzle timer too — otherwise it keeps running behind the
+    // overlay and could trigger a time's-up loss while reading the summary.
+    if (typeof stopTimer === 'function') stopTimer();
+
     if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
     if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
-
-    showToast(t('eg_map_cleared'));
-    setTimeout(() => goToLevelSelect(), 2500);
 }
 
 
@@ -636,9 +644,221 @@ function _egChainCleanup() {
     _egPuzzleCompleteFired = false;
 
     _egRunLoot = [];
+    _egRunCurrency = [];
     // _egLootDrops is cleared by _egStopPickupSpawner via _egStopLootDrops
 
     // Hide the objectives strip
     const strip = document.getElementById('eg-objectives-strip');
     if (strip) strip.classList.add('eg-hidden');
+}
+
+
+
+//------------------------------------------------------------------------
+//-------------------LEAVE MAP TRANSITION SCREEN--------------------------
+//------------------------------------------------------------------------
+
+// Builds the two summary rows (equipment loot + currency). Reads
+// _egRunLoot / _egRunCurrency — must be called BEFORE _egStopEncounter()
+// (which clears both via _egChainCleanup) so there's still data to show.
+function _egBuildLeaveMapSummaryHTML() {
+    const lootHTML = _egRunLoot.map((item, i) => `
+        <div class="eg-leave-summary-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
+            ${item.icon || '📦'}
+        </div>`).join('');
+
+    const currencyHTML = _egRunCurrency.map((entry, i) => `
+        <div class="eg-leave-summary-chip eg-rarity-currency" data-currency-idx="${i}">
+            ${entry.icon || '💰'}
+            ${entry.count > 1 ? `<span class="eg-leave-summary-count">×${entry.count}</span>` : ''}
+        </div>`).join('');
+
+    return `
+        <div class="eg-leave-summary-section">
+            <div class="eg-leave-summary-title">${t('eg_loot_acquired').replace('{n}', _egRunLoot.length)}</div>
+            <div class="eg-leave-summary-row">${lootHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        </div>
+        <div class="eg-leave-summary-section">
+            <div class="eg-leave-summary-title">${t('eg_runes_orbs')}</div>
+            <div class="eg-leave-summary-row">${currencyHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        </div>`;
+}
+
+// Builds the hover tooltip body for a currency entry (equipment items go
+// through _egBuildTooltipBodyHTML instead).
+function _egBuildCurrencyTooltipHTML(entry) {
+    return `<div class="eg-tt-frame" style="--tt-border:#b59248;">
+        <div class="eg-tt-header">
+            <div class="eg-tt-icon">${entry.icon || '💰'}</div>
+            <div class="eg-tt-name" style="color:#f5d98a;">${entry.name}</div>
+        </div>
+    </div>`;
+}
+
+// Wires loot/currency chips to the global floating tooltip engine
+// (tooltips-hud.js). The engine renders into a position:fixed element on
+// document.body, so tooltips are never clipped by the panel's overflow-y.
+function _egWireLeaveMapSummaryTooltips(panel) {
+    const buildFor = (chip) => {
+        if ('lootIdx' in chip.dataset) {
+            const item = _egRunLoot[+chip.dataset.lootIdx];
+            return (item && typeof _egBuildTooltipBodyHTML === 'function')
+                ? _egBuildTooltipBodyHTML(item) : '';
+        }
+        if ('currencyIdx' in chip.dataset) {
+            const entry = _egRunCurrency[+chip.dataset.currencyIdx];
+            return entry ? _egBuildCurrencyTooltipHTML(entry) : '';
+        }
+        return '';
+    };
+
+    // Lift the tooltip above this overlay (overlay z-index 10000 > tip 9999)
+    const ensureAboveOverlay = () => { getGameTooltip().style.zIndex = '10001'; };
+
+    panel.addEventListener('mouseover', (e) => {
+        const chip = e.target.closest('.eg-leave-summary-chip');
+        if (!chip) return;
+        const html = buildFor(chip);
+        if (!html) return;
+        ensureAboveOverlay();
+        showGameTooltip(html, e);
+    });
+    panel.addEventListener('mousemove', (e) => {
+        if (e.target.closest('.eg-leave-summary-chip')) moveGameTooltip(e);
+    });
+    panel.addEventListener('mouseout', (e) => {
+        if (e.target.closest('.eg-leave-summary-chip')) hideGameTooltip();
+    });
+}
+
+// Full-screen blocking overlay. Unlike _egShowChainCountdownOverlay (which
+// deliberately uses pointer-events:none so clicks pass through), this one
+// keeps normal pointer-events so it swallows every click — that's what
+// actually fixes the "puzzle still clickable for 1-2s" issue.
+function _egShowLeaveMapTransition() {
+    _egInjectLeaveMapTransitionStyles();
+
+    let el = document.getElementById('eg-leave-map-transition');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'eg-leave-map-transition';
+        el.className = 'eg-leave-map-transition';
+        document.body.appendChild(el);
+    }
+
+    el.innerHTML = `
+        <div class="eg-leave-map-panel">
+            <div class="eg-leave-map-title">${t('eg_map_cleared')}</div>
+            ${_egBuildLeaveMapSummaryHTML()}
+            <button class="eg-leave-map-return-btn" id="btn-eg-leave-map-return">${t('eg_return_to_nexus')}</button>
+        </div>`;
+    el.classList.add('show');
+
+    document.getElementById('btn-eg-leave-map-return').onclick = () => {
+        _egHideLeaveMapTransition();
+        showEndgameHub();
+    };
+}
+
+function _egHideLeaveMapTransition() {
+    const el = document.getElementById('eg-leave-map-transition');
+    if (el) el.classList.remove('show');
+}
+
+// Injects the overlay's CSS once — same pattern as _egInjectCurrencyStyles
+// / _dndInjectStyles, so nothing needs to be added to your .css files.
+function _egInjectLeaveMapTransitionStyles() {
+    if (document.getElementById('eg-leave-map-transition-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'eg-leave-map-transition-styles';
+    style.textContent = `
+        .eg-leave-map-transition {
+            display: none;
+            position: fixed; inset: 0;
+            z-index: 10000;
+            background: rgba(5,5,15,0.92);
+            align-items: center; justify-content: center;
+        }
+        .eg-leave-map-transition.show { display: flex; }
+        .eg-leave-map-panel {
+            background: #14141f;
+            border: 2px solid #5555aa;
+            border-radius: 10px;
+            padding: 24px 32px;
+            max-width: 640px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+        }
+        .eg-leave-map-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+            letter-spacing: .05em;
+        }
+        .eg-leave-summary-section { margin-bottom: 18px; }
+        .eg-leave-summary-title {
+            font-size: 0.85rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        .eg-leave-summary-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 40px;
+        }
+        .eg-leave-summary-empty { color: #666; font-size: 0.85rem; font-style: italic; }
+        .eg-leave-summary-chip {
+            position: relative;
+            width: 42px; height: 42px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            font-size: 1.3rem;
+        }
+        .eg-leave-summary-chip.eg-rarity-uncommon { border-color: #2ecc71; }
+        .eg-leave-summary-chip.eg-rarity-rare { border-color: #3498db; }
+        .eg-leave-summary-chip.eg-rarity-epic { border-color: #9b59b6; }
+        .eg-leave-summary-chip.eg-rarity-legendary { border-color: #f39c12; }
+        .eg-leave-summary-chip.eg-rarity-cursed { border-color: #e74c3c; }
+        .eg-leave-summary-chip.eg-rarity-artifact { border-color: #f1c40f; }
+        .eg-leave-summary-chip.eg-rarity-currency { border-color: #b59248; }
+        .eg-leave-summary-count {
+            position: absolute; bottom: 1px; right: 2px;
+            font-size: 0.6rem; font-weight: 700; color: #f0e6c0;
+            text-shadow: 0 0 3px #000, 0 0 6px #000;
+            pointer-events: none;
+        }
+        .eg-leave-summary-tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 6px;
+            z-index: 10001;
+            white-space: normal;
+        }
+        .eg-leave-summary-chip:hover .eg-leave-summary-tooltip { display: block; }
+        .eg-leave-map-return-btn {
+            margin-top: 8px;
+            padding: 10px 24px;
+            font-weight: 700;
+            letter-spacing: .05em;
+            background: #5555aa;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .eg-leave-map-return-btn:hover { background: #6c6cc9; }
+    `;
+    document.head.appendChild(style);
 }

@@ -314,7 +314,15 @@ document.addEventListener('mousedown', function (e) {
     } else if (equipSlot) {
         const slotId = equipSlot.dataset.slotId;
         targetItem = _egEquipped[slotId] || null;
-        applyFn = (newItem) => { _egEquipped[slotId] = newItem; _egRenderEquipSlot(slotId); };
+        applyFn = (newItem) => {
+            _egEquipped[slotId] = newItem;
+            _egRenderEquipSlot(slotId);
+            // Rerolled mods change the attribute totals, which can flip the
+            // requirement-blocked (red) state of other items — refresh both
+            // the stash and all paperdoll slots.
+            _egRenderInventory();
+            _egRenderEquipSlots();
+        };
     } else {
         _egCancelCurrencyUse();
         return;

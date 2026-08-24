@@ -66,6 +66,11 @@ let _egCurrencyDrops = new Map();
 // Claimed items go straight into the player's persistent STATE.inventory.
 let _egItemDrops = new Map();
 
+// Per-run currency tracker — currency picked up during the current map run,
+// aggregated by currency id, shown in the leave-map transition summary.
+// Cleared by _egChainCleanup() alongside _egRunLoot.
+let _egRunCurrency = [];
+
 
 
 

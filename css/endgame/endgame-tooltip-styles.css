@@ -85,6 +85,19 @@
     font-size: 0.77rem;
 }
 
+/* Individual requirement part the player does not currently meet */
+.eg-tt-req .eg-tt-req-unmet {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+/* "Missing: X Agi" line under unmet requirements */
+.eg-tt-req-missing {
+    color: #e74c3c;
+    font-size: 0.77rem;
+    margin-top: 2px;
+}
+
 /* Explicit mod lines */
 .eg-tt-mods-section {
     /* no extra border — inherits .eg-tt-section */

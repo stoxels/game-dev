@@ -164,7 +164,12 @@ function _egComputePlayerStats() {
         armourFlat: 0, armourIncPct: 0,
         evasionFlat: 0, evasionIncPct: 0,
         absorptionFlat: 0, absorptionIncPct: 0,
-        strength: 0, agility: 0, intelligence: 0,
+        // Attributes start from the character's base pool (endgame-requirements.js)
+        // so the stats panel, derived side-effects and requirement checks all
+        // agree on the same totals.
+        strength: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.str : 0,
+        agility: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.agi : 0,
+        intelligence: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.int : 0,
         lifeRegen: 0, manaRegen: 0,
         fireResist: 0, coldResist: 0, lightningResist: 0, shadowResist: 0, arcaneResistFlat: 0,
         accuracy: 0, mistakeCount: 0, focusPct: 0, mistakeNotCountPct: 0,
@@ -496,7 +501,10 @@ function _egBuildStatLine(bucket, stats) {
             if (!meta) return null;
             const val = stats[bucket];
             if (!val || val === 0) return null;
-            line = { label: meta.label, value: `+${_egFormatStatValue(val)}${meta.suffix}` };
+            // Attributes are absolute totals (base + gear), not bonuses —
+            // no "+" prefix so the number matches requirement checks.
+            const isAttribute = bucket === 'strength' || bucket === 'agility' || bucket === 'intelligence';
+            line = { label: meta.label, value: `${isAttribute ? '' : '+'}${_egFormatStatValue(val)}${meta.suffix}` };
         }
     }
 

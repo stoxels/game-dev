@@ -96,11 +96,14 @@ let _egTooltipItem = null;
 function _egBuildItemChipHTML(item, size = 'normal') {
     const rarityClass = item.rarity ? `eg-rarity-${item.rarity}` : '';
     const sizeClass = size === 'large' ? 'eg-item-chip-large' : '';
+    // Items whose stat requirements cannot currently be met get a red flag
+    // (see _egIsItemBlocked in endgame-requirements.js).
+    const blockedClass = _egIsItemBlocked(item) ? 'eg-req-blocked' : '';
     const chipId = `egchip-${++_egChipCounter}`;
     _egChipRegistry.set(chipId, item);
 
     return `
-<div class="eg-item-chip ${rarityClass} ${sizeClass}"
+<div class="eg-item-chip ${rarityClass} ${sizeClass} ${blockedClass}"
      id="${chipId}"
      draggable="true"
      onmouseenter="_egShowTooltipFromChip('${chipId}', event)"
@@ -318,7 +321,7 @@ function _egRenderEquipSlot(slotId) {
 
     if (slotEl) {
         if (item) {
-            const fill = EG_RARITY_CELL_FILL[item.rarity] || EG_RARITY_CELL_FILL.common;
+            const fill = _egGetCellFill(item);
             slotEl.style.background = fill;
             slotEl.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
         } else {
@@ -340,6 +343,7 @@ function _egRenderEquipSlots() {
 
 // Full-cell rarity tint used by the main stash — each occupied cell is
 // filled with its item's rarity color (instead of only a chip glow).
+// Items with unmet stat requirements override the rarity tint with red.
 const EG_RARITY_CELL_FILL = {
     common: 'rgba(122, 122, 122, 0.40)',
     uncommon: 'rgba(46, 204, 113, 0.35)',
@@ -350,6 +354,14 @@ const EG_RARITY_CELL_FILL = {
     artifact: 'rgba(241, 196, 15, 0.40)',
     currency: 'rgba(181, 146, 72, 0.35)',
 };
+const EG_REQ_BLOCKED_FILL = 'rgba(231, 76, 60, 0.45)';
+
+// Cell fill color for an item: red when its requirements cannot currently
+// be met, otherwise its rarity color.
+function _egGetCellFill(item) {
+    if (item && _egIsItemBlocked(item)) return EG_REQ_BLOCKED_FILL;
+    return EG_RARITY_CELL_FILL[item && item.rarity] || EG_RARITY_CELL_FILL.common;
+}
 
 // Re-renders a single cell in the main stash grid.
 function _egRenderInventoryCell(row, col) {
@@ -360,9 +372,10 @@ function _egRenderInventoryCell(row, col) {
         ? _egBuildItemChipHTML(item) + _egBuildDeleteBtnHTML(row, col)   // ← delete btn added
         : '';
 
-    // Fill the whole cell with the item's rarity color; reset when empty.
+    // Fill the whole cell with the item's rarity color (red when its stat
+    // requirements cannot currently be met); reset when empty.
     if (item) {
-        const fill = EG_RARITY_CELL_FILL[item.rarity] || EG_RARITY_CELL_FILL.common;
+        const fill = _egGetCellFill(item);
         cell.style.background = fill;
         cell.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
     } else {
@@ -582,14 +595,37 @@ function _egBuildTooltipBodyHTML(item) {
 
 
     // ── Requirements ─────────────────────────────────────────────────
+    // Each requirement part is compared against the player's current total
+    // attributes (base + equipped gear). Unmet parts turn red and a
+    // "Missing:" line lists the exact deficits. Self-carrying is not
+    // previewed here (the item's own bonuses are not counted) — equip-time
+    // validation in endgame-requirements.js handles that.
     const req = item.requirements || {};
+    const curAttrs = _egComputeLoadoutAttributes(_egGetAllEquippedItems());
     const reqParts = [];
-    if (req.level > 0) reqParts.push(t('eg_req_level').replace('{n}', req.level));
-    if (req.str > 0) reqParts.push(`${req.str} ${t('eg_attr_str')}`);
-    if (req.agi > 0) reqParts.push(`${req.agi} ${t('eg_attr_agi')}`);
-    if (req.int > 0) reqParts.push(`${req.int} ${t('eg_attr_int')}`);
+    const missingParts = [];
+    if ((req.level || 0) > 0) {
+        const met = EG_PLAYER_BASE_ATTRIBUTES.level == null
+            || EG_PLAYER_BASE_ATTRIBUTES.level >= req.level;
+        const label = t('eg_req_level').replace('{n}', req.level);
+        reqParts.push(met ? label : `<span class="eg-tt-req-unmet">${label}</span>`);
+        if (!met) missingParts.push(label);
+    }
+    [['str', 'eg_attr_str', 'str'], ['agi', 'eg_attr_agi', 'agi'], ['int', 'eg_attr_int', 'int']]
+        .forEach(([reqKey, labelKey, attrKey]) => {
+            if ((req[reqKey] || 0) <= 0) return;
+            const have = curAttrs[attrKey];
+            const label = `${req[reqKey]} ${t(labelKey)}`;
+            reqParts.push(have >= req[reqKey]
+                ? label
+                : `<span class="eg-tt-req-unmet">${label}</span>`);
+            if (have < req[reqKey]) missingParts.push(`${req[reqKey] - have} ${t(labelKey)}`);
+        });
+    const missingHTML = missingParts.length
+        ? `<div class="eg-tt-req-missing">${t('eg_req_missing')} ${missingParts.join(', ')}</div>`
+        : '';
     const reqHTML = reqParts.length
-        ? `<div class="eg-tt-section"><div class="eg-tt-req">${t('eg_requires')} ${reqParts.join(', ')}</div></div>`
+        ? `<div class="eg-tt-section"><div class="eg-tt-req">${t('eg_requires')} ${reqParts.join(', ')}${missingHTML}</div></div>`
         : '';
 
     // ── Explicit mods ─────────────────────────────────────────────────

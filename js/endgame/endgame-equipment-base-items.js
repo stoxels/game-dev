@@ -20,7 +20,8 @@
 //
 // REQUIREMENTS: Level, Str, Agi, Int. Values are set per base type.
 // Items without a requirement for a stat have that stat set to 0.
-// A future system will compare these against actual player stats.
+// Enforced on every equip/unequip path by endgame-requirements.js
+// (self-carrying allowed — attribute totals include gear bonuses).
 //
 // ENTRY POINT:
 //   _egGenerateEquipmentDrop(monsterLevel = 1)

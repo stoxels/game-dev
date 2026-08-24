@@ -627,6 +627,15 @@ function _egSpawnCurrencyDrop(def) {
     _egPickupTimers.push(timer);
 }
 
+// Tracks a claimed currency drop for the leave-map summary screen.
+// Aggregates by currency id so stacks show one chip with a count.
+function _egTrackRunCurrency(def) {
+    const existing = _egRunCurrency.find(e => e.id === def.id);
+    if (existing) existing.count++;
+    else _egRunCurrency.push({ id: def.id, name: def.name, icon: def.icon, count: 1 });
+}
+
+
 // Called on correct-cell-fill (mirrors _egCheckLootClaim). Adds the orb
 // to the currency stash via egAddCurrency() and returns true if claimed.
 function _egCheckCurrencyDropClaim(row, col) {
@@ -646,6 +655,8 @@ function _egCheckCurrencyDropClaim(row, col) {
         category: 'currency',
         description: def.description,
     });
+
+    _egTrackRunCurrency(def);
 
     Audio_Manager.playSFX('player_equip_pickup');
     if (added) showToast(t('eg_currency_acquired')

@@ -743,7 +743,12 @@ function applyCell(row, col) {
 
     // Write the new value into the player grid
     userGrid[row][col] = pval;
-    if (pval !== 2) systemMarkedGrid[row][col] = false;
+    // Any mark written through this function is the player's own input,
+    // so always clear a possibly-stale system-mark flag here. Some effects
+    // (e.g. state rollback, boss mark-wipes) reset cells to empty without
+    // clearing it, which would otherwise make a fresh manual ✕ render
+    // with the 'marked-system' ability styling.
+    systemMarkedGrid[row][col] = false;
 
     // Extra logic that only applies to a correct left-click fill
     if (pval === 1 && cur.grid[row][col] === 1) {

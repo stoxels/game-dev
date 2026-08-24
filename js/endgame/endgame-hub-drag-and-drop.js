@@ -10,6 +10,7 @@
 //   - Slot-type validation (items only fit their matching paperdoll slot)
 //   - Currency stack merging (same currency id dropped on same id → merge counts)
 //   - Right-click quick-equip (stash → char slot) and quick-unequip (char slot → stash)
+//   - Stat requirement gating on every equip/unequip path (endgame-requirements.js)
 //   - Escape key to cancel a drag and return the item to its origin
 //   - CSS style injection for drag visuals (dragover highlight, reject flash, ghost)
 //
@@ -312,10 +313,14 @@ function _dndShowRejectFlash(el) {
 }
 
 // Finalises a completed drop: saves hub state, resets drag session, updates count label.
+// Re-renders stash + paperdoll because the new loadout can change which
+// items are flagged as requirement-blocked (red cells).
 function _dndFinalizeDrop() {
     egSaveHubState();
     _dndReset();
     _egUpdateInvCount();
+    _egRenderInventory();
+    _egRenderEquipSlots();
     _egRenderStatsList();
 }
 
@@ -369,8 +374,36 @@ function _dndDrop(e) {
 
     } else if (invCell && _dndZoneAccepts('inv')) {
         const r = +invCell.dataset.row, c = +invCell.dataset.col;
-        _dndDropOnCell(_egInventory, _egRenderInventoryCell, r, c);
-        dropped = true;
+        let blocked = false;
+        if (_dnd.sourceZone === 'equip') {
+            // Unequipping by dragging a paperdoll item into the stash. If the
+            // target cell is occupied, the displaced stash item will be
+            // swapped INTO the vacated paperdoll slot — so the simulated final
+            // loadout must include it. Checks both stat requirements
+            // (endgame-requirements.js) and the slot type of the swapped-in item.
+            const displaced = _egInventory[r][c];
+            if (displaced && EG_SLOT_ACCEPTS[_dnd.sourceSlot] !== displaced.slotType) {
+                blocked = true;
+            } else {
+                const gate = _egSimulateAndCheck(sim => {
+                    delete sim[_dnd.sourceSlot];
+                    if (displaced) sim[_dnd.sourceSlot] = displaced;
+                });
+                if (!gate.ok) {
+                    _egShowRequirementsToast('unequip', gate.missing, _dnd.item.name);
+                    blocked = true;
+                }
+            }
+            if (blocked) {
+                invCell.classList.add('eg-slot-reject');
+                setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
+                // generic return-to-source below restores the carried item
+            }
+        }
+        if (!blocked) {
+            _dndDropOnCell(_egInventory, _egRenderInventoryCell, r, c);
+            dropped = true;
+        }
     }
 
     if (!dropped) _dndReturnToSource();
@@ -398,12 +431,20 @@ function _dndDropOnCurrencyCell(currencyCell) {
 }
 
 // Handles dropping onto a paperdoll char equip slot.
-// Validates the item's slotType against what the target slot accepts.
-// Shows a reject flash and returns to source if the types do not match.
+// Validates the item's slotType against what the target slot accepts, then
+// checks stat requirements against the simulated final loadout (see
+// endgame-requirements.js). Shows a reject flash and returns to source when
+// either check fails.
 // Returns true when the drop was accepted.
 function _dndDropOnEquipSlot(equipSlotEl) {
     const slotId = equipSlotEl.dataset.slotId;
     if (!slotId || !_dndSlotAcceptsItem(slotId)) {
+        _dndShowRejectFlash(equipSlotEl);
+        return false;
+    }
+    const gate = _egCanEquipInSlot(_dnd.item, slotId);
+    if (!gate.ok) {
+        _egShowRequirementsToast('equip', gate.missing, _dnd.item.name);
         _dndShowRejectFlash(equipSlotEl);
         return false;
     }
@@ -443,7 +484,9 @@ function _dndFirstFreeInvCell() {
 }
 
 // Right-click on a stash item → instantly equip it to the best matching slot.
-// The displaced item (if any) is placed back into the source stash cell.
+// Stat requirements are checked against the simulated final loadout first
+// (see endgame-requirements.js). The displaced item (if any) is placed back
+// into the source stash cell.
 function _dndQuickEquipFromStash(invCell) {
     const r = +invCell.dataset.row, c = +invCell.dataset.col;
     const item = _egInventory[r][c];
@@ -452,22 +495,42 @@ function _dndQuickEquipFromStash(invCell) {
     const slotId = _dndFindTargetSlot(item);
     if (!slotId) return; // no matching paperdoll slot exists for this item type
 
+    const gate = _egCanEquipInSlot(item, slotId);
+    if (!gate.ok) {
+        _egShowRequirementsToast('equip', gate.missing, item.name);
+        invCell.classList.add('eg-slot-reject');
+        setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
+        return;
+    }
+
     const displaced = _egEquipped[slotId] || null;
     _egEquipped[slotId] = item;
     _egInventory[r][c] = displaced; // displaced may be null — that's fine
     _egRenderEquipSlot(slotId);
     _egRenderInventoryCell(r, c);
+    _egRenderInventory();      // blocked-state flags may change loadout-wide
+    _egRenderEquipSlots();
     _egUpdateInvCount();
     _egRenderStatsList();
     egSaveHubState();
 }
 
 // Right-click on a paperdoll slot item → send it to the first free stash cell.
-// If the stash is full a reject flash is shown on the stash grid instead.
+// Blocked when removing the item would break other equipped items' stat
+// requirements (see endgame-requirements.js). If the stash is full a reject
+// flash is shown on the stash grid instead.
 function _dndQuickUnequipToStash(equipSlotEl) {
     const slotId = equipSlotEl.dataset.slotId;
     const item = _egEquipped[slotId] || null;
     if (!item) return;
+
+    const gate = _egCheckUnequipSlot(slotId);
+    if (!gate.ok) {
+        _egShowRequirementsToast('unequip', gate.missing, item.name);
+        equipSlotEl.classList.add('eg-slot-reject');
+        setTimeout(() => equipSlotEl.classList.remove('eg-slot-reject'), 600);
+        return;
+    }
 
     const free = _dndFirstFreeInvCell();
     if (!free) {
@@ -484,6 +547,8 @@ function _dndQuickUnequipToStash(equipSlotEl) {
     _egInventory[free.r][free.c] = item;
     _egRenderEquipSlot(slotId);
     _egRenderInventoryCell(free.r, free.c);
+    _egRenderInventory();      // blocked-state flags may change loadout-wide
+    _egRenderEquipSlots();
     _egUpdateInvCount();
     _egRenderStatsList();
     egSaveHubState();
@@ -735,6 +800,11 @@ function _dndInjectStyles() {
         .eg-dnd-ghost.eg-rarity-legendary { box-shadow: 0 0 18px rgba(230,168,23,0.7)  !important; }
         .eg-dnd-ghost.eg-rarity-rare      { box-shadow: 0 0 12px rgba(91,156,246,0.6)  !important; }
         .eg-dnd-ghost.eg-rarity-uncommon  { box-shadow: 0 0 10px rgba(76,175,80,0.55)  !important; }
+
+        /* Requirement-blocked items: red glow + slightly desaturated icon */
+        .eg-item-chip.eg-req-blocked .eg-item-chip-icon {
+            filter: grayscale(0.35) drop-shadow(0 0 4px rgba(231,76,60,0.9));
+        }
     `;
     document.head.appendChild(style);
 }
