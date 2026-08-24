@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
 //-------------------------------ACTUARY CLASS----------------------------
 //------------------------------------------------------------------------
@@ -24,15 +24,22 @@ const SIG_THRESH_PICKER_ID = 'sig-thresh-picker';
 // Duration (ms) of the holy-explosion animation on a reverted cell.
 const REGRESSION_EXPLOSION_MS = 800;
 
+// Delay (ms) before chained reveal targets are actually revealed.
+const REGRESSION_CHAIN_REVEAL_DELAY = 300;
+
+// Total lifetime (ms) of the holy golden chain visual before it fades out.
+const REGRESSION_CHAIN_LIFETIME_MS = 1000;
+
 // Global state for the Actuary's two active abilities.
 // These are intentionally on `window` so other files can
 // read them without importing this module.
 //
 //   window._mistakeLog            — Array<{r,c,penaltySecs}>  rolling mistake history
 //   window._dofRevertedCells      — Set<string>               cells cleared by Regression
-//   window._sigThreshData         — { protectCount, bonusReveal, chosen[] } | null
-//   window._sigThreshBonusReveal  — boolean  rank-3 bonus flag
-//   window._sigThresholdProtected — Set<string>               currently active shields
+//   window._regressionPendingReveals — Set<string> | null     reveal targets reserved during a Regression cast
+//   window._sigThreshArmed        — boolean  Significance Threshold armed (next mistake triggers it)
+//   window._sigThreshLines        — Array<string> | null     rank line config applied on trigger ('row','col','diagonals')
+//   window._sigThresholdProtected — Set<string>               currently active shield line keys
 
 
 //------------------------------------------------------------------------
@@ -84,9 +91,119 @@ function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
     return Math.round(penaltySecs * recoverPct);
 }
 
+// _regressionChainRevealCells — picks up to `count` random, still hidden correct
+// cells on the grid, draws a holy golden chain from the corrected mistake cell
+// to each of them and reveals them once the chain has "arrived".
+// Returns how many cells were actually revealed.
+function _regressionChainRevealCells(fromRow, fromCol, count) {
+    if (!cur || count <= 0) return 0;
+
+    const sol = cur.grid;
+    const rows = sol.length;
+    const cols = sol[0].length;
+    const pending = window._regressionPendingReveals || new Set();
+
+    // Collect every still-hidden correct cell (excluding already reserved ones).
+    const candidates = [];
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const key = `${r}-${c}`;
+            if (sol[r][c] === 1 && !revealedGrid[r][c] && userGrid[r][c] !== 1 && !pending.has(key)) {
+                candidates.push({ r, c });
+            }
+        }
+    }
+    if (candidates.length === 0) return 0;
+
+    // Shuffle and take up to `count` targets.
+    for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    const targets = candidates.slice(0, count);
+
+    const fromEl = document.getElementById(`g-${fromRow}-${fromCol}`);
+
+    targets.forEach(({ r, c }) => {
+        pending.add(`${r}-${c}`);
+        const toEl = document.getElementById(`g-${r}-${c}`);
+        if (fromEl && toEl) _regressionDrawChain(fromEl, toEl);
+    });
+
+    // Apply the reveals after a short travel delay.
+    setTimeout(() => {
+        targets.forEach(({ r, c }) => {
+            revealedGrid[r][c] = true;
+            userGrid[r][c] = 1;
+            renderCell(r, c);
+            updClues(r, c);
+            trackAchStat('tilesRevealed', 1);
+            _applyCellEffect([`g-${r}-${c}`], 'reveal');
+        });
+        if (targets.length > 0 && window.Audio_Manager) {
+            Audio_Manager.playSFX('arcaneReveal');
+        }
+        questStat_classRevealUsed(targets.length);
+        updateQuestStats('classAbilityUsedThisLevel', {});
+        checkWin();
+    }, REGRESSION_CHAIN_REVEAL_DELAY);
+
+    return targets.length;
+}
+
+// _regressionDrawChain — builds a positioned SVG containing a golden chain
+// (marching link pattern with holy glow) between two cell elements.
+function _regressionDrawChain(fromEl, toEl) {
+    const fr = fromEl.getBoundingClientRect();
+    const tr = toEl.getBoundingClientRect();
+
+    const x1 = fr.left + fr.width / 2;
+    const y1 = fr.top + fr.height / 2;
+    const x2 = tr.left + tr.width / 2;
+    const y2 = tr.top + tr.height / 2;
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.style.cssText = `
+        position: fixed; top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        pointer-events: none; z-index: 9000; overflow: visible;
+    `;
+
+    const makeLine = (width, color, glow) => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+        line.setAttribute('stroke', color);
+        line.setAttribute('stroke-width', width);
+        line.setAttribute('stroke-linecap', 'round');
+        line.classList.add('regression-chain-link');
+        if (glow) line.style.filter = 'drop-shadow(0 0 5px #ffd700)';
+        svg.appendChild(line);
+        return line;
+    };
+
+    // Outer golden chain links + inner bright core for the holy look.
+    makeLine(9, '#ffd700', true);
+    makeLine(4, '#fffbe6', false);
+
+    // Anchor nodes at both ends of the chain.
+    [ [x1, y1], [x2, y2] ].forEach(([x, y]) => {
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+        dot.setAttribute('r', 5);
+        dot.setAttribute('fill', '#ffd700');
+        dot.style.filter = 'drop-shadow(0 0 6px #ffd700)';
+        svg.appendChild(dot);
+    });
+
+    document.body.appendChild(svg);
+    setTimeout(() => _fadeOutElement(svg, 1, 0.05), REGRESSION_CHAIN_LIFETIME_MS);
+}
+
 // _executeRegressionToPrior — main handler for the Regression To Prior ability.
-// Reverts up to `correctCount` recent mistakes and recovers a fraction of lost time.
-function _executeRegressionToPrior(correctCount, recoverPct) {
+// Reverts up to `correctCount` recent mistakes, recovers a fraction of lost time
+// and reveals `revealCount` correct cells per corrected mistake (holy chain).
+function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
     if (!cur) return;
 
     const log = window._mistakeLog || [];
@@ -98,14 +215,23 @@ function _executeRegressionToPrior(correctCount, recoverPct) {
 
     trackAchStat('skillRegressionPriorUsed');
 
+    // Temporarily reserved reveal targets so multiple mistakes never pick the same cell.
+    window._regressionPendingReveals = new Set();
+
     // Pull up to correctCount entries from the end of the log.
     const toCorrect = log.splice(-correctCount, correctCount);
 
     // Revert each cell and accumulate recovered time.
     let recoveredSecs = 0;
+    let revealedTotal = 0;
     toCorrect.forEach(({ r, c, penaltySecs }) => {
         recoveredSecs += _regressionRevertCell(r, c, penaltySecs, recoverPct);
+        if (revealCount > 0) {
+            revealedTotal += _regressionChainRevealCells(r, c, revealCount);
+        }
     });
+
+    window._regressionPendingReveals = null;
 
     // Apply the recovered time (cap at 1 hour).
     if (recoveredSecs > 0) {
@@ -148,255 +274,116 @@ function _regressionCancel(noOverlayToRemove = false) {
 //------------------------------------------------------------------------
 //------------------ACTIVE 2: SIGNIFICANCE THRESHOLD---------------------
 //------------------------------------------------------------------------
-// Lets the player shield up to N rows/columns. Any wrong fill in a shielded
-// line auto-marks the cell instead of counting as a mistake (consuming that
-// shield charge). Rank 3 also reveals one correct cell in the triggered line.
+// When activated the ability ARMS itself. The next mistake the player makes
+// is prevented (auto-marked ✕) and shield lines are applied through that
+// cell: rank 1 → row, rank 2 → row + column, rank 3 → row + column + both
+// diagonals. Each applied line blocks exactly one further mistake.
+// Shielded cells show a golden border instead of a shield emoji.
+
+// Line keys stored in window._sigThresholdProtected:
+//   'row:i'    — row i
+//   'col:j'    — column j
+//   'diagA:k'  — diagonal where r - c === k   (↘)
+//   'diagB:k'  — diagonal where r + c === k   (↗)
 
 
 //------------------------------------------------------------------------
-//--------SIGNIFICANCE THRESHOLD — MODAL HTML BUILDERS-------------------
+//--------SIGNIFICANCE THRESHOLD — LINE HELPERS--------------------------
 //------------------------------------------------------------------------
 
-// _sigThreshBuildLineButton — returns HTML for a single row/col button
-// inside the line-picker modal.
-function _sigThreshBuildLineButton(type, idx) {
-    const label = type === 'row'
-        ? t('cls_row_n').replace('{n}', idx + 1)
-        : t('cls_col_n').replace('{n}', idx + 1);
-
-    return `<button onclick="_sigThreshProtectLine('${type}', ${idx})"
-        style="font-family:var(--PX); font-size:9px; background:transparent;
-               border:1px solid #e67e22; color:#e67e22; padding:4px 10px;
-               cursor:pointer; letter-spacing:1px; margin:2px;">
-        ${label}
-    </button>`;
+// _sigThreshDiagKeys — returns both diagonal keys crossing cell (row, col).
+function _sigThreshDiagKeys(row, col) {
+    return [`diagA:${row - col}`, `diagB:${row + col}`];
 }
 
-// _sigThreshBuildRowButtons — builds the full row-button strip for the modal.
-function _sigThreshBuildRowButtons(rowCount) {
-    let html = '';
-    for (let r = 0; r < rowCount; r++) html += _sigThreshBuildLineButton('row', r);
-    return html;
-}
-
-// _sigThreshBuildColButtons — builds the full column-button strip for the modal.
-function _sigThreshBuildColButtons(colCount) {
-    let html = '';
-    for (let c = 0; c < colCount; c++) html += _sigThreshBuildLineButton('col', c);
-    return html;
-}
-
-// _sigThreshBuildPickerHTML — returns the full inner HTML for the line-picker
-// modal overlay. Receives pre-built button strips to stay readable.
-function _sigThreshBuildPickerHTML(remaining, rowBtns, colBtns) {
-    const title = t('cls_sig_thresh_title');
-    const prompt = t('cls_sig_thresh_prompt').replace('{n}', remaining);
-    const rowsLabel = t('cls_rows_label');
-    const colsLabel = t('cls_columns_label');
-    const doneLabel = t('cls_done');
-    const cancelLabel = t('cls_cancel');
-
-    return `
-        <div class="modal-box" style="text-align:center; border-left:4px solid #e67e22;
-             max-width:480px; max-height:80vh; overflow-y:auto;">
-
-            <div style="font-family:var(--PX); font-size:13px; color:#e67e22;
-                        letter-spacing:2px; margin-bottom:12px;">
-                🛡️ ${title}
-            </div>
-
-            <div style="font-family:var(--PX); font-size:10px; color:var(--accent2);
-                        margin-bottom:14px; line-height:1.8;">
-                ${prompt}
-            </div>
-
-            <div style="margin-bottom:10px;">
-                <div style="font-family:var(--PX); font-size:9px; color:#aaa;
-                            margin-bottom:6px; letter-spacing:1px;">
-                    ${rowsLabel}
-                </div>
-                <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:4px;">
-                    ${rowBtns}
-                </div>
-            </div>
-
-            <div style="margin-bottom:14px;">
-                <div style="font-family:var(--PX); font-size:9px; color:#aaa;
-                            margin-bottom:6px; letter-spacing:1px;">
-                    ${colsLabel}
-                </div>
-                <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:4px;">
-                    ${colBtns}
-                </div>
-            </div>
-
-            <div id="sig-thresh-chosen-display"
-                 style="font-family:var(--PX); font-size:9px; color:#27ae60;
-                        min-height:16px; margin-bottom:10px;"></div>
-
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <button onclick="_sigThreshDone()"
-                    style="font-family:var(--PX); font-size:9px; background:transparent;
-                           border:1px solid #27ae60; color:#27ae60; padding:5px 14px;
-                           cursor:pointer; letter-spacing:1px;">
-                    ${doneLabel}
-                </button>
-                <button onclick="_sigThreshCancel()"
-                    style="font-family:var(--PX); font-size:9px; background:transparent;
-                           border:1px solid #444; color:#555; padding:5px 14px;
-                           cursor:pointer; letter-spacing:1px;">
-                    ${cancelLabel}
-                </button>
-            </div>
-        </div>`;
-}
-
-
-//------------------------------------------------------------------------
-//--------SIGNIFICANCE THRESHOLD — MODAL LIFECYCLE-----------------------
-//------------------------------------------------------------------------
-
-// _sigThreshShowLinePicker — creates and displays the line-picker modal,
-// showing all available rows and columns as clickable buttons.
-function _sigThreshShowLinePicker(protectCount) {
-    if (!cur) return;
-
-    // Remove any previously open picker before (re-)opening.
-    document.getElementById(SIG_THRESH_PICKER_ID)?.remove();
-
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
-    const remaining = protectCount - (window._sigThreshData?.chosen?.length || 0);
-
-    const rowBtns = _sigThreshBuildRowButtons(rows);
-    const colBtns = _sigThreshBuildColButtons(cols);
-
-    const overlay = document.createElement('div');
-    overlay.id = SIG_THRESH_PICKER_ID;
-    overlay.className = 'modal-bg show';
-    overlay.style.cssText = 'z-index:3000;';
-    overlay.innerHTML = _sigThreshBuildPickerHTML(remaining, rowBtns, colBtns);
-
-    document.body.appendChild(overlay);
-}
-
-// _sigThreshRefundCooldown — clears the active cooldown for Significance
-// Threshold. Called when the player cancels or confirms without picking.
-function _sigThreshRefundCooldown() {
-    const cd = cooldownState[ACTUARY_CD_SIG_THRESHOLD];
-    if (cd?.interval) { clearInterval(cd.interval); cd.interval = null; }
-    if (cd) cd.remaining = 0;
-}
-
-// _sigThreshDone — finalises the line-picker session (either all charges
-// used or the player clicked DONE). If no lines were chosen the cooldown
-// is refunded.
-function _sigThreshDone() {
-    document.getElementById(SIG_THRESH_PICKER_ID)?.remove();
-
-    _setAbilityMode(false);
-
-    const chosen = window._sigThreshData?.chosen?.length || 0;
-    if (chosen === 0) {
-        _sigThreshRefundCooldown();
-        showToast(`🛡️ ${t('cls_no_line_selected')}`);
-    } else {
-        showToast(t('cls_lines_protected').replace('{n}', chosen));
-    }
-
-    window._sigThreshData = null;
-    buildClassHUD();
-}
-
-// _sigThreshCancel — player explicitly cancelled; refunds cooldown and
-// clears all ability state.
-function _sigThreshCancel() {
-    document.getElementById(SIG_THRESH_PICKER_ID)?.remove();
-
-    window._sigThreshData = null;
-
-    _setAbilityMode(false);
-    STATE.classActiveChoice = ACTUARY_CD_SIG_THRESHOLD;
-
-    _sigThreshRefundCooldown();
-
-    buildClassHUD();
-    showToast(`🛡️ ${t('cls_cancelled')}`);
-}
-
-
-//------------------------------------------------------------------------
-//--------SIGNIFICANCE THRESHOLD — LINE PROTECTION LOGIC-----------------
-//------------------------------------------------------------------------
-
-// _sigThreshApplyVisual — adds the shield highlight CSS class to every
-// cell in the specified row or column.
-function _sigThreshApplyVisual(type, idx) {
+// _sigThreshIterateLine — calls cb(r, c) for every grid cell on the given
+// line key ('row:i', 'col:j', 'diagA:k' or 'diagB:k').
+function _sigThreshIterateLine(key, cb) {
     if (!cur) return;
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
+    const [type, idxStr] = key.split(':');
+    const idx = parseInt(idxStr, 10);
 
     if (type === 'row') {
+        if (idx < 0 || idx >= rows) return;
+        for (let c = 0; c < cols; c++) cb(idx, c);
+    } else if (type === 'col') {
+        if (idx < 0 || idx >= cols) return;
+        for (let r = 0; r < rows; r++) cb(r, idx);
+    } else if (type === 'diagA') {
+        // r - c === idx  →  r = c + idx
         for (let c = 0; c < cols; c++) {
-            document.getElementById(`g-${idx}-${c}`)?.classList.add(SIG_THRESH_PROTECTED_CLASS);
+            const r = c + idx;
+            if (r >= 0 && r < rows) cb(r, c);
         }
-    } else {
-        for (let r = 0; r < rows; r++) {
-            document.getElementById(`g-${r}-${idx}`)?.classList.add(SIG_THRESH_PROTECTED_CLASS);
+    } else if (type === 'diagB') {
+        // r + c === idx
+        for (let c = 0; c < cols; c++) {
+            const r = idx - c;
+            if (r >= 0 && r < rows) cb(r, c);
         }
     }
 }
 
-// _sigThreshRemoveVisual — removes the shield highlight from every cell
-// in the specified row or column (called when a shield charge is consumed).
-function _sigThreshRemoveVisual(type, idx) {
-    if (!cur) return;
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
-
-    if (type === 'row') {
-        for (let c = 0; c < cols; c++) {
-            document.getElementById(`g-${idx}-${c}`)?.classList.remove(SIG_THRESH_PROTECTED_CLASS);
-        }
-    } else {
-        for (let r = 0; r < rows; r++) {
-            document.getElementById(`g-${r}-${idx}`)?.classList.remove(SIG_THRESH_PROTECTED_CLASS);
-        }
-    }
+// _sigThreshApplyVisual — adds the golden-border shield class to every cell
+// on the given line key.
+function _sigThreshApplyVisual(key) {
+    _sigThreshIterateLine(key, (r, c) => {
+        document.getElementById(`g-${r}-${c}`)?.classList.add(SIG_THRESH_PROTECTED_CLASS);
+    });
 }
 
-// _sigThreshProtectLine — registers a row or column as protected after the
-// player selects it in the picker. Reopens the picker if charges remain,
-// or finalises if all charges have been used.
-function _sigThreshProtectLine(type, idx) {
-    document.getElementById(SIG_THRESH_PICKER_ID)?.remove();
+// _sigThreshRemoveVisual — removes the golden-border shield class from every
+// cell on the given line key (called when the shield charge is consumed).
+function _sigThreshRemoveVisual(key) {
+    _sigThreshIterateLine(key, (r, c) => {
+        document.getElementById(`g-${r}-${c}`)?.classList.remove(SIG_THRESH_PROTECTED_CLASS);
+    });
+}
 
-    const data = window._sigThreshData;
-    if (!data) return;
+// _sigThreshLineName — human-readable name for a line key (for toasts).
+function _sigThreshLineName(key) {
+    const [type, idxStr] = key.split(':');
+    const n = parseInt(idxStr, 10) + 1;
+    if (type === 'row') return `${t('cls_row_word')} ${n}`;
+    if (type === 'col') return `${t('cls_col_word')} ${n}`;
+    return t('cls_diag_word');
+}
 
-    const key = `${type}:${idx}`;
+
+//------------------------------------------------------------------------
+//--------SIGNIFICANCE THRESHOLD — ARMING & SHIELD APPLICATION------------
+//------------------------------------------------------------------------
+
+// _sigThreshApplyShieldsAt — registers every shield line (per rank config)
+// that passes through cell (row, col) and applies its visuals.
+function _sigThreshApplyShieldsAt(row, col, lines) {
     if (!window._sigThresholdProtected) window._sigThresholdProtected = new Set();
 
-    // Only add if this line hasn't already been chosen this session.
-    if (!window._sigThresholdProtected.has(key)) {
+    const keys = [];
+    if (lines.includes('row')) keys.push(`row:${row}`);
+    if (lines.includes('col')) keys.push(`col:${col}`);
+    if (lines.includes('diagonals')) keys.push(..._sigThreshDiagKeys(row, col));
+
+    keys.forEach(key => {
+        if (window._sigThresholdProtected.has(key)) return;
         window._sigThresholdProtected.add(key);
-        data.chosen.push(key);
-        _sigThreshApplyVisual(type, idx);
+        _sigThreshApplyVisual(key);
+        showToast(t('cls_line_protected').replace('{name}', _sigThreshLineName(key)));
+    });
+}
 
-        const lineName = type === 'row'
-            ? t('cls_row_n').replace('{n}', idx + 1)
-            : t('cls_col_n').replace('{n}', idx + 1);
-        showToast(t('cls_line_protected').replace('{name}', lineName));
-    }
+// _sigThreshConsumeShield — consumes a matching shield charge for the given
+// key and removes its visual.
+function _sigThreshConsumeShield(matchKey) {
+    window._sigThresholdProtected.delete(matchKey);
+    _sigThreshRemoveVisual(matchKey);
+    Audio_Manager.playSFX('actuary_shield_pop');
 
-    const remaining = data.protectCount - data.chosen.length;
-    if (remaining <= 0) {
-        // All charges used — close out.
-        _sigThreshDone();
-    } else {
-        // Reopen the picker so the player can choose more lines.
-        _sigThreshShowLinePicker(data.protectCount);
-    }
+    showToast(t('cls_thresh_triggered').replace('{line}', _sigThreshLineName(matchKey)));
+
+    if (window.Audio_Manager) Audio_Manager.playSFX('varianceShield');
 }
 
 
@@ -404,84 +391,50 @@ function _sigThreshProtectLine(type, idx) {
 //--------SIGNIFICANCE THRESHOLD — SHIELD INTERCEPTION-------------------
 //------------------------------------------------------------------------
 
-// _sigThreshBonusRevealInLine — rank 3 bonus: reveals one random unrevealed
-// filled cell in the row or column that just triggered its shield.
-function _sigThreshBonusRevealInLine(type, idx) {
-    if (!cur) return;
-
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-
-    // Collect candidate cells: correct, not yet revealed, not already filled by player.
-    const candidates = [];
-    if (type === 'row') {
-        for (let c = 0; c < cols; c++) {
-            if (sol[idx][c] === 1 && !revealedGrid[idx][c] && userGrid[idx][c] !== 1)
-                candidates.push([idx, c]);
-        }
-    } else {
-        for (let r = 0; r < rows; r++) {
-            if (sol[r][idx] === 1 && !revealedGrid[r][idx] && userGrid[r][idx] !== 1)
-                candidates.push([r, idx]);
-        }
-    }
-
-    if (!candidates.length) return;
-
-    const [r, c] = candidates[Math.floor(Math.random() * candidates.length)];
-    revealedGrid[r][c] = true;
-    userGrid[r][c] = 1;
-
-    renderCell(r, c);
-    updClues(r, c);
-    trackAchStat('tilesRevealed', 1);
-    _applyCellEffect([`g-${r}-${c}`], 'reveal');
-
-    showToast(t('cls_thresh_bonus_reveal'));
-
-    questStat_classRevealUsed(1);
-    updateQuestStats('classAbilityUsedThisLevel', {});
-    checkWin();
-}
-
-// _sigThreshConsumeShield — consumes a matching shield charge for the given
-// key, removes its visual, and fires the rank-3 bonus reveal if active.
-function _sigThreshConsumeShield(matchKey) {
-    window._sigThresholdProtected.delete(matchKey);
-
-    const [type, idxStr] = matchKey.split(':');
-    const idx = parseInt(idxStr, 10);
-
-    _sigThreshRemoveVisual(type, idx);
-    Audio_Manager.playSFX('actuary_shield_pop');
-
-    if (window._sigThreshBonusReveal) {
-        _sigThreshBonusRevealInLine(type, idx);
-    }
-
-    const lineWord = (type === 'row' ? t('cls_row_word') : t('cls_col_word')) + ' ' + (idx + 1);
-    showToast(t('cls_thresh_triggered').replace('{line}', lineWord));
-
-    if (window.Audio_Manager) Audio_Manager.playSFX('varianceShield');
-}
-
-// _sigThresholdIntercept — called BEFORE a wrong fill is committed in game.js.
-// Returns true if a shield intercepted the mistake (caller must bail out early).
-// Returns false if no shield applies and the fill should be treated normally.
+// _sigThresholdIntercept — called BEFORE a wrong fill is committed in the
+// input handler. Returns true if a shield intercepted the mistake (caller
+// must bail out early). Returns false otherwise.
 //
 // Usage in the input handler:
 //   if (_sigThresholdIntercept(row, col)) return;
 //
 function _sigThresholdIntercept(row, col) {
     const protected_ = window._sigThresholdProtected;
+
+    // --- Armed trigger: the first mistake after activation is always free,
+    // --- and its line(s) become protected.
+    if (window._sigThreshArmed) {
+        window._sigThreshArmed = false;
+
+        // Prevent the mistake — auto-mark the cell as ✕ (value 2).
+        if (userGrid[row][col] === 0) {
+            userGrid[row][col] = 2;
+            questStat_classMarkUsed(1);
+            renderCell(row, col);
+            trackAchStat('tilesMarkedWrong', 1);
+        }
+
+        Audio_Manager.playSFX('actuary_shield_pop');
+        _sigThreshApplyShieldsAt(row, col, window._sigThreshLines || ['row']);
+        window._sigThreshLines = null;
+
+        if (window.Audio_Manager) Audio_Manager.playSFX('varianceShield');
+        buildClassHUD();
+
+        return true;
+    }
+
     if (!protected_ || protected_.size === 0) return false;
 
     const rowKey = `row:${row}`;
     const colKey = `col:${col}`;
+    const diagKeys = _sigThreshDiagKeys(row, col);
+
     const matchKey = protected_.has(rowKey) ? rowKey
         : protected_.has(colKey) ? colKey
-            : null;
+            : protected_.has(diagKeys[0]) ? diagKeys[0]
+                : protected_.has(diagKeys[1]) ? diagKeys[1]
+                    : null;
 
     if (!matchKey) return false;
 
@@ -504,21 +457,21 @@ function _sigThresholdIntercept(row, col) {
 //------------------------------------------------------------------------
 
 // _executeSignificanceThreshold — main handler for the Significance Threshold
-// ability. Opens the line-picker modal immediately so the player can choose
-// which rows/columns to shield before returning to the grid.
-function _executeSignificanceThreshold(protectCount, bonusReveal) {
+// ability. Arms the shield: nothing happens until the player's next mistake,
+// which is then blocked and turns into protection for its surrounding lines.
+function _executeSignificanceThreshold(lines) {
     if (!cur) return;
 
-    window._sigThreshData = { protectCount, bonusReveal, chosen: [] };
-    window._sigThreshBonusReveal = bonusReveal;
+    window._sigThreshArmed = true;
+    window._sigThreshLines = Array.isArray(lines) && lines.length > 0 ? lines : ['row'];
 
     trackAchStat('skillSignificanceTreshold');
 
-    _sigThreshShowLinePicker(protectCount);
+    showToast(t('cls_sig_armed'));
 
     Audio_Manager.playSFX('holySpell');
+    buildClassHUD();
 }
-
 
 //------------------------------------------------------------------------
 //---------------------SHARED COOLDOWN UTILITY----------------------------

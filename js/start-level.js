@@ -96,7 +96,8 @@ function _resetLevelTrackers() {
     window._sigThresholdProtected = new Set();
     window._dofRevertedCells = new Set();
     window._regressionRewardedLines = new Set();
-    window._sigThreshBonusReveal = false;
+    window._sigThreshArmed = false;
+    window._sigThreshLines = null;
     window._hadPenaltyClutch = false;
     window._maxInventoryTrackedThisLevel = false;
     window._collectorTrackedThisLevel = false;

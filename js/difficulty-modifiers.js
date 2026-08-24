@@ -52,11 +52,12 @@ function updDiffDesc() {
 }
 
 // Sets curDiff from the clicked button, updates button highlighting and
-// the description ribbon.
+// the description ribbon. Highlighting is applied to ALL [data-diff]
+// buttons on the page (setup screen + retry modal) so duplicates stay
+// in sync.
 function selDiff(btn) {
     curDiff = btn.dataset.diff;
-    document.querySelectorAll('[data-diff]').forEach(b => b.classList.remove('sel'));
-    btn.classList.add('sel');
+    syncDiffModButtons();
     updDiffDesc();
 }
 
@@ -83,13 +84,23 @@ function updModDesc() {
         : t('mod_desc_none');
 }
 
-// Toggles a modifier on/off from its button, updates the button's yellow
-// highlight state and refreshes the active-modifiers description.
+// Toggles a modifier on/off from its button, updates the yellow highlight
+// state of every matching [data-mod] button (setup screen + retry modal)
+// and refreshes the active-modifiers description.
 function togMod(btn) {
     const m = btn.dataset.mod;
     curMods[m] = !curMods[m];
-    btn.classList.toggle('sel-yellow', curMods[m]);
+    syncDiffModButtons();
     updModDesc();
+}
+
+// Refreshes the .sel / .sel-yellow highlighting of every difficulty and
+// modifier button on the page from the current curDiff / curMods state.
+function syncDiffModButtons() {
+    document.querySelectorAll('[data-diff]').forEach(b =>
+        b.classList.toggle('sel', b.dataset.diff === curDiff));
+    document.querySelectorAll('[data-mod]').forEach(b =>
+        b.classList.toggle('sel-yellow', !!curMods[b.dataset.mod]));
 }
 
 
@@ -119,3 +130,73 @@ function isClassless() { return !!curMods.classless; }
 
 // Returns true when passive tree nodes should be treated as unallocated.
 function isTreeless() { return !!curMods.treeless; }
+
+
+//------------------------------------------------------------------------
+//----------RETRY WITH OTHER DIFFICULTY / MODIFIERS-----------------------
+//------------------------------------------------------------------------
+
+// Snapshot of the player's original difficulty/modifiers while a
+// "retry with other settings" run (started from the win overlay) is in
+// flight. null = no such run is currently active.
+let _retrySetupOriginal = null;
+
+// True while the player is replaying a level with settings that differ
+// from their standing setup and haven't yet decided whether to keep them.
+function retrySetupIsActive() {
+    return _retrySetupOriginal !== null;
+}
+
+// Opens the "retry with new settings" modal from the win overlay.
+// Snapshots the current setup once, so it can be restored later if the
+// player chooses to revert after finishing/failing the retried level.
+function openRetrySetupModal() {
+    if (!retrySetupIsActive()) {
+        _retrySetupOriginal = { diff: curDiff, mods: { ...curMods } };
+    }
+    syncDiffModButtons();
+    showModal('retry-setup-modal');
+}
+
+// Dismisses the setup modal WITHOUT starting the retry. Drops the
+// snapshot and undoes any difficulty/modifier selections the player may
+// have previewed inside the modal, so their standing setup is untouched.
+function cancelRetrySetupModal() {
+    const orig = _retrySetupOriginal;
+    _retrySetupOriginal = null;
+    hideModal('retry-setup-modal');
+
+    if (orig) {
+        curDiff = orig.diff;
+        Object.keys(curMods).forEach(m => { curMods[m] = !!orig.mods[m]; });
+        syncDiffModButtons();
+        updDiffDesc();
+        updModDesc();
+    }
+}
+
+// Marks a retry-with-new-settings run as started. Called right before
+// replayLevel() so the end-of-level prompt knows to appear afterwards.
+function beginRetrySetupRun() {
+    if (!retrySetupIsActive()) {
+        _retrySetupOriginal = { diff: curDiff, mods: { ...curMods } };
+    }
+}
+
+// Resolves the keep-or-revert choice shown after completing or failing a
+// retried level. keep = true leaves the newly selected difficulty/modifiers
+// in place; keep = false restores the snapshot taken when the run started
+// and refreshes every settings-dependent UI element.
+function retrySetupResolve(keep) {
+    hideModal('retry-keep-modal');
+    const orig = _retrySetupOriginal;
+    _retrySetupOriginal = null;
+
+    if (orig && !keep) {
+        curDiff = orig.diff;
+        Object.keys(curMods).forEach(m => { curMods[m] = !!orig.mods[m]; });
+        syncDiffModButtons();
+        updDiffDesc();
+        updModDesc();
+    }
+}

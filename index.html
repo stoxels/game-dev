@@ -604,6 +604,67 @@
         </div>
     </div>
 
+    <!-- RETRY WITH OTHER DIFFICULTY / MODIFIERS MODAL (opened from win overlay) -->
+    <div id="retry-setup-modal" class="modal-bg">
+        <div class="modal-box retry-setup-box">
+            <button class="modal-close" id="btn-retry-setup-cancel" data-t="reset_close">✕ CLOSE</button>
+            <div class="modal-title" data-t="retry_setup_title">⟳ RETRY WITH NEW SETTINGS</div>
+            <p class="retry-setup-hint" data-t="retry_setup_hint"></p>
+
+            <div class="retry-setup-section-label" data-t="setup_diff">DIFFICULTY</div>
+            <div class="retry-setup-diff-row">
+                <button class="setup-opt-diff" data-diff="easy" data-t="diff_easy">EASY</button>
+                <button class="setup-opt-diff" data-diff="normal" data-t="diff_normal">NORMAL</button>
+                <button class="setup-opt-diff" data-diff="hard" data-t="diff_hard">HARD</button>
+            </div>
+
+            <div class="retry-setup-section-label" data-t="setup_mod">OPTIONAL MODIFIERS</div>
+            <div class="retry-setup-mods-row">
+                <button class="setup-opt-mod mod-timetrial" data-mod="timetrial">
+                    <span class="mod-icon mod-icon-timetrial"></span>
+                    <span class="mod-title mod-title-orange" data-t="mod_tt">TIME TRIAL</span>
+                    <span class="mod-score-tag">+SCORE (20%)</span>
+                </button>
+                <button class="setup-opt-mod mod-hardcore" data-mod="hardcore">
+                    <span class="mod-icon mod-icon-hardcore"></span>
+                    <span class="mod-title mod-title-red" data-t="mod_hc">HARDCORE</span>
+                    <span class="mod-score-tag">+SCORE (30%)</span>
+                </button>
+                <button class="setup-opt-mod mod-ironman" data-mod="ironman">
+                    <span class="mod-icon mod-icon-ironman"></span>
+                    <span class="mod-title mod-title-purple" data-t="mod_im">IRONMAN</span>
+                    <span class="mod-score-tag">+SCORE (15%)</span>
+                </button>
+                <button class="setup-opt-mod mod-classless" data-mod="classless">
+                    <span class="mod-icon mod-icon-classless"></span>
+                    <span class="mod-title mod-title-cyan" data-t="mod_cl">CLASSLESS</span>
+                    <span class="mod-score-tag">+SCORE (20%)</span>
+                </button>
+                <button class="setup-opt-mod mod-treeless" data-mod="treeless">
+                    <span class="mod-icon mod-icon-treeless"></span>
+                    <span class="mod-title mod-title-green" data-t="mod_tl">TREELESS</span>
+                    <span class="mod-score-tag">+SCORE (25%)</span>
+                </button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="retry-start-btn" id="btn-retry-setup-start" data-t="retry_setup_start">▶ START RETRY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KEEP OR REVERT PROMPT — shown after completing/failing a retried level -->
+    <div id="retry-keep-modal" class="modal-bg">
+        <div class="modal-box modal-box-danger">
+            <div class="modal-title" data-t="retry_keep_title">KEEP THE NEW SETTINGS?</div>
+            <p class="reset-body-text" data-t="retry_keep_text"></p>
+            <div class="modal-actions">
+                <button class="retry-keep-btn" id="btn-retry-keep" data-t="btn_retry_keep">KEEP NEW SETTINGS</button>
+                <button class="retry-revert-btn" id="btn-retry-revert" data-t="btn_retry_revert">REVERT TO PREVIOUS</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- CHARACTER SELECT SCREEN -->
     <div id="screen-character-select" class="screen">
@@ -814,9 +875,10 @@
             <div class="bonus-list" id="bonus-list"></div>
             <div id="item-reward-zone"></div>
 
-            <div class="ov-btns">
-                <button class="ob p" id="btn-next-lvl" data-t="btn_next">NEXT ▶</button>
+            <div class="ov-btns ov-btns-2col">
                 <button class="ob s" id="btn-win-retry" data-t="btn_retry">RETRY</button>
+                <button class="ob y" id="btn-win-retry-setup" data-t="btn_retry_setup">⟳ RETRY (NEW SETUP)</button>
+                <button class="ob p" id="btn-next-lvl" data-t="btn_next">NEXT ▶</button>
                 <button class="ob s" id="btn-win-levels" data-t="btn_levels">LEVELS</button>
             </div>
         </div>
@@ -1055,6 +1117,7 @@
         <div class="pause-btn-row">
             <button id="btn-pause-settings" data-t="btn_settings">⚙ SETTINGS</button>
             <button class="gtb-btn" id="btn-go-levels" data-t="btn_levels">◀ LEVELS</button>
+            <button class="gtb-btn" id="btn-go-nexus" data-t="eg_return_to_nexus" style="display:none;">🌌 RETURN TO NEXUS</button>
         </div>
     </div>
 

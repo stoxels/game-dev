@@ -270,8 +270,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </p>
                 </div>
                 <div class="modal-actions">
-                    <button class="title-btn btn-danger" id="eg-forfeit-confirm">${t('scr_leave_map_confirm')}</button>
-                    <button class="title-btn sec" id="eg-forfeit-cancel">${t('scr_stay_in_map')}</button>
+                    <button class="title-btn back-btn btn-danger" id="eg-forfeit-confirm">${t('scr_leave_map_confirm')}</button>
+                    <button class="title-btn back-btn" id="eg-forfeit-cancel">${t('scr_stay_in_map')}</button>
                 </div>
             </div>`;
             document.body.appendChild(modal);
@@ -320,6 +320,35 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-go-levels', onGoToLevelsFromGame);
     onClick('btn-hud-levels', onGoToLevelsFromGame);
 
+    /**
+     * Handles the "return to nexus" button press from inside an endgame map.
+     * Mirrors onGoToLevelsFromGame() but navigates back to the endgame hub
+     * (Nexus of Worlds) instead of the level select screen.
+     */
+    function onReturnToNexusFromGame() {
+        if (cur && cur.isMonsterLevel && typeof _egIsActive === 'function' && _egIsActive()) {
+            showEgForfeitConfirm(() => {
+                unpauseGame();
+                cleanupActiveGameSystems();
+                stopTimer();
+                if (typeof _egStopEncounter === 'function') _egStopEncounter();
+                safeCall('_hidePlayerAvatarSimple');
+                safeCall('_hidePlayerAvatar');
+                showEndgameHub();
+            });
+            return;
+        }
+
+        unpauseGame();
+        cleanupActiveGameSystems();
+        stopTimer();
+        safeCall('_hidePlayerAvatarSimple');
+        safeCall('_hidePlayerAvatar');
+        showEndgameHub();
+    }
+
+    onClick('btn-go-nexus', onReturnToNexusFromGame);
+
     // Puzzle table — suppresses the right-click context menu (would interfere
     // with game input) and resets hover state when the cursor leaves the grid.
     if (puzzleTable) {
@@ -365,8 +394,54 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-win-levels', onGoToLevelsFromOverlay);
     onClick('btn-win-retry', onRetryLevelFromOverlay);
 
+    // "Retry with other difficulty/modifier" — opens the settings modal;
+    // the actual replay only starts once the player hits START RETRY.
+    onClick('btn-win-retry-setup', openRetrySetupModal);
+
     onClick('btn-lose-levels', onGoToLevelsFromOverlay);
     onClick('btn-lose-retry', onRetryLevelFromOverlay);
+
+
+    //------------------------------------------------------------------------
+    //-------------------RETRY WITH OTHER DIFFICULTY / MODIFIERS--------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+
+    /**
+     * Starts the retried level with the difficulty/modifiers the player
+     * just picked in #retry-setup-modal. Mirrors onRetryLevelFromOverlay's
+     * cleanup, then replays the current level via the standard path.
+     */
+    function onStartRetryWithSetup() {
+        beginRetrySetupRun();
+        hideModal('retry-setup-modal');
+        cleanupActiveGameSystems();
+        safeCall('_hidePlayerAvatarSimple');
+        safeCall('_hidePlayerAvatar');
+        replayLevel();
+    }
+
+    onClick('btn-retry-setup-start', onStartRetryWithSetup);
+    onClick('btn-retry-setup-cancel', cancelRetrySetupModal);
+    onClick('btn-retry-keep', () => retrySetupResolve(true));
+    onClick('btn-retry-revert', () => retrySetupResolve(false));
+
+    /**
+     * Shows the keep-or-revert prompt whenever a result overlay (win or
+     * lose) becomes visible during an active retry-with-other-settings run.
+     * A single MutationObserver on both overlays covers every code path
+     * that can end a level (scoring, timer expiry, hardcore fail, quiz flow).
+     */
+    const _retryResultObserver = new MutationObserver(() => {
+        if (!retrySetupIsActive()) return;
+        const winShown = document.getElementById('ov-win').classList.contains('show');
+        const loseShown = document.getElementById('ov-lose').classList.contains('show');
+        if (winShown || loseShown) showModal('retry-keep-modal');
+    });
+    _retryResultObserver.observe(document.getElementById('ov-win'),
+        { attributes: true, attributeFilter: ['class'] });
+    _retryResultObserver.observe(document.getElementById('ov-lose'),
+        { attributes: true, attributeFilter: ['class'] });
 
 
     //------------------------------------------------------------------------

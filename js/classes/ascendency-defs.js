@@ -94,27 +94,27 @@ const ASCENDENCY_DEFS = {
         active1: {
             nameEn: 'Regression to Prior',
             nameDE: 'Regression zum Prior',
-            descCursorEn: 'Correct your most recent mistakes and recover lost time.',
-            descCursorDE: 'Korrigiere deine letzten Fehler und erhalte verlorene Zeit zurück.',
+            descCursorEn: 'Correct your most recent mistakes and recover lost time. Every corrected mistake reveals correct cells.',
+            descCursorDE: 'Korrigiere deine letzten Fehler und erhalte verlorene Zeit zurück. Jeder korrigierte Fehler enthüllt korrekte Zellen.',
             cooldownSeconds: 120,
             levels: [
                 {
                     level: 1,
-                    descEn: 'Correct the most recent mistake. Recover 50% of the lost time. Cooldown: 2 minutes.',
-                    descDE: 'Korrigiere den letzten Fehler. Erhalte 50% der verlorenen Zeit zurück. Abklingzeit: 2 Minuten.',
-                    effect: { correctCount: 1, recoverPct: 0.5 }
+                    descEn: 'Correct the most recent mistake. Every corrected mistake reveals 1 correct cell. Recover 50% of the lost time. Cooldown: 2 minutes.',
+                    descDE: 'Korrigiere den letzten Fehler. Jeder korrigierte Fehler enthüllt 1 korrekte Zelle. Erhalte 50% der verlorenen Zeit zurück. Abklingzeit: 2 Minuten.',
+                    effect: { correctCount: 1, recoverPct: 0.5, revealCount: 1 }
                 },
                 {
                     level: 2,
-                    descEn: 'Correct the two most recent mistakes. Recover 50% of the lost time. Cooldown: 2 minutes.',
-                    descDE: 'Korrigiere die letzten zwei Fehler. Erhalte 50% der verlorenen Zeit zurück. Abklingzeit: 2 Minuten.',
-                    effect: { correctCount: 2, recoverPct: 0.5 }
+                    descEn: 'Correct the two most recent mistakes. Every corrected mistake reveals 2 correct cells. Recover 50% of the lost time. Cooldown: 2 minutes.',
+                    descDE: 'Korrigiere die letzten zwei Fehler. Jeder korrigierte Fehler enthüllt 2 korrekte Zellen. Erhalte 50% der verlorenen Zeit zurück. Abklingzeit: 2 Minuten.',
+                    effect: { correctCount: 2, recoverPct: 0.5, revealCount: 2 }
                 },
                 {
                     level: 3,
-                    descEn: 'Correct the three most recent mistakes. Recover 100% of the lost time. Cooldown: 2 minutes.',
-                    descDE: 'Korrigiere die letzten drei Fehler. Erhalte 100% der verlorenen Zeit zurück. Abklingzeit: 2 Minuten.',
-                    effect: { correctCount: 3, recoverPct: 1.0 }
+                    descEn: 'Correct the three most recent mistakes. Every corrected mistake reveals 3 correct cells. Recover 100% of the lost time. Cooldown: 2 minutes.',
+                    descDE: 'Korrigiere die letzten drei Fehler. Jeder korrigierte Fehler enthüllt 3 korrekte Zellen. Erhalte 100% der verlorenen Zeit zurück. Abklingzeit: 2 Minuten.',
+                    effect: { correctCount: 3, recoverPct: 1.0, revealCount: 3 }
                 },
             ]
         },
@@ -122,27 +122,27 @@ const ASCENDENCY_DEFS = {
         active2: {
             nameEn: 'Significance Threshold',
             nameDE: 'Signifikanzschwelle',
-            descCursorEn: 'Select a row or column to protect. Mistakes in affected cells will cause no penalties.',
-            descCursorDE: 'Wähle eine Zeile oder Spalte zum Beschützen aus. Fehler in den betroffenen Zellen verursachen keine Strafen.',
+            descCursorEn: 'Arm the holy shield: your next mistake is prevented and its line becomes protected.',
+            descCursorDE: 'Aktiviere den heiligen Schild: Dein nächster Fehler wird verhindert und dessen Linie wird geschützt.',
             cooldownSeconds: 180,
             levels: [
                 {
                     level: 1,
-                    descEn: 'Select a row or column to protect. Mistakes in affected cells will cause no penalties. Cooldown: 4 minutes.',
-                    descDE: 'Wähle eine Zeile oder Spalte zum Beschützen aus. Fehler in den betroffenden Zellen verursachen keine Strafen. Abklingzeit: 3 Minuten.',
-                    effect: { protectCount: 1, bonusReveal: false }
+                    descEn: 'Activate to arm the shield. Your next mistake is prevented, and the entire row of that cell becomes protected, blocking one further mistake. Cooldown: 4 minutes.',
+                    descDE: 'Aktiviere den Schild. Dein nächster Fehler wird verhindert und die gesamte Zeile dieser Zelle wird geschützt und blockiert einen weiteren Fehler. Abklingzeit: 4 Minuten.',
+                    effect: { lines: ['row'] }
                 },
                 {
                     level: 2,
-                    descEn: 'Select two rows or columns to protect. Mistakes in affected cells will cause no penalties. Cooldown: 4 minutes.',
-                    descDE: 'Wähle zwei Zeilen oder Spalten zum Beschützen aus. Fehler in den betroffenen Zellen verursachen keine Strafen. Abklingzeit: 3 Minuten.',
-                    effect: { protectCount: 2, bonusReveal: false }
+                    descEn: 'Activate to arm the shield. Your next mistake is prevented, and the entire row and column of that cell become protected, each blocking one further mistake. Cooldown: 4 minutes.',
+                    descDE: 'Aktiviere den Schild. Dein nächster Fehler wird verhindert und die gesamte Zeile sowie Spalte dieser Zelle werden geschützt und blockieren jeweils einen weiteren Fehler. Abklingzeit: 4 Minuten.',
+                    effect: { lines: ['row', 'col'] }
                 },
                 {
                     level: 3,
-                    descEn: 'Select up to 3 rows or columns to protect. When triggered, also reveals 1 random correct cell in that line. Cooldown: 4 minutes.',
-                    descDE: 'Wähle bis zu 3 Zeilen oder Spalten zum Beschützen aus. Bei Auslösung wird auch 1 zufällige korrekte Zelle in dieser Linie enthüllt. Abklingzeit: 3 Minuten.',
-                    effect: { protectCount: 3, bonusReveal: true }
+                    descEn: 'Activate to arm the shield. Your next mistake is prevented, and the entire row, column and both diagonals of that cell become protected, each blocking one further mistake. Cooldown: 4 minutes.',
+                    descDE: 'Aktiviere den Schild. Dein nächster Fehler wird verhindert und die gesamte Zeile, Spalte sowie beide Diagonalen dieser Zelle werden geschützt und blockieren jeweils einen weiteren Fehler. Abklingzeit: 4 Minuten.',
+                    effect: { lines: ['row', 'col', 'diagonals'] }
                 },
             ]
         },

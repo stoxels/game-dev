@@ -57,12 +57,23 @@ const DECO_PANELS = [
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// On endgame maps the pause menu offers "Return to Nexus" instead of "Levels".
+function _updatePauseMenuReturnButtons() {
+    const onEndgameMap = typeof cur !== 'undefined' && cur &&
+        (cur.isMonsterLevel || cur.isEndgameSandbox);
+    const levelsBtn = document.getElementById('btn-go-levels');
+    const nexusBtn = document.getElementById('btn-go-nexus');
+    if (levelsBtn) levelsBtn.style.display = onEndgameMap ? 'none' : '';
+    if (nexusBtn) nexusBtn.style.display = onEndgameMap ? '' : 'none';
+}
+
 // Shows the pause overlay and stops the timer.
 // Guards against pausing when the level is already finished (dead).
 function pauseGame() {
     if (_gamePaused || dead) return;
     _gamePaused = true;
     pauseTimer(); // defined in timer.js
+    _updatePauseMenuReturnButtons();
     document.getElementById('pause-overlay').classList.add('show');
 }
 

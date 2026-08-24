@@ -428,3 +428,131 @@
     NOTE: The action button row (.modal-actions) for danger modals
     is defined in Section 1f above — it is shared with all modals.
 */
+
+
+
+/*
+    ------------------------------------------------------------------------
+    --------------------- 5. RETRY SETUP MODAL -----------------------------
+    ---- "Retry with other difficulty / modifiers" dialog opened from the --
+    ---- win overlay, plus the keep-or-revert prompt shown after the -------
+    ---- retried level ends. Reuses .setup-opt-diff / .setup-opt-mod -------
+    ---- button classes from setup-screen.css, scaled down for the modal. ---
+    ------------------------------------------------------------------------
+*/
+
+/* --- 5a. BOX OVERRIDE --- */
+.retry-setup-box {
+    max-width: 800px;
+    border-left-color: var(--yellow);
+}
+
+/* --- 5b. HINT TEXT under the title --- */
+.retry-setup-hint {
+    font-size: 13px;
+    color: var(--modal-body-text);
+    line-height: 1.7;
+    margin-bottom: 14px;
+}
+
+/* --- 5c. SECTION LABELS (Difficulty / Modifiers) --- */
+.retry-setup-section-label {
+    font-family: var(--PX);
+    font-size: 9px;
+    color: var(--yellow);
+    letter-spacing: 1px;
+    margin: 14px 0 8px;
+}
+
+/* --- 5d. DIFFICULTY BUTTON ROW --- */
+.retry-setup-diff-row {
+    display: flex;
+    gap: 8px;
+}
+
+    /* Compact variant of the setup-screen stone buttons */
+    .retry-setup-diff-row .setup-opt-diff {
+        min-height: clamp(26px, 3vw, 40px);
+        padding: clamp(4px, 0.8vw, 8px) clamp(8px, 1.2vw, 12px);
+    }
+
+/* --- 5e. MODIFIER TOMBSTONE ROW --- */
+.retry-setup-mods-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+    /* Scaled-down tombstones so all five fit inside the modal box */
+    .retry-setup-mods-row .setup-opt-mod {
+        width: clamp(72px, 7vw, 104px);
+        height: clamp(60px, 6vw, 92px);
+        margin: 0;
+        padding: 4px 4px 8px;
+        gap: 2px;
+    }
+
+    .retry-setup-mods-row .setup-opt-mod .mod-icon {
+        display: none; /* icons would crowd the compact tombstones */
+    }
+
+    .retry-setup-mods-row .setup-opt-mod .mod-title {
+        font-size: clamp(9px, 1vw, 13px);
+    }
+
+    .retry-setup-mods-row .setup-opt-mod .mod-score-tag {
+        font-size: clamp(6px, 0.7vw, 9px);
+    }
+
+/* --- 5f. ACTION BUTTONS --- */
+.retry-start-btn {
+    background: transparent;
+    border: 1px solid var(--yellow);
+    color: var(--yellow);
+    font-family: var(--PX);
+    font-size: 12px;
+    padding: 10px 18px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: background 0.15s, color 0.15s;
+}
+
+    .retry-start-btn:hover {
+        background: var(--yellow);
+        color: #000;
+    }
+
+.retry-keep-btn {
+    background: transparent;
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: var(--PX);
+    font-size: 12px;
+    padding: 10px 18px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: background 0.15s, color 0.15s;
+}
+
+    .retry-keep-btn:hover {
+        background: var(--green);
+        color: #000;
+    }
+
+.retry-revert-btn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: #888;
+    font-family: var(--PX);
+    font-size: 12px;
+    padding: 10px 18px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+    .retry-revert-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+    }

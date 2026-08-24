@@ -80,13 +80,13 @@
     text-align: center;
 }
 
-/* Generic line — used inside .ov-col blocks (score / time columns) */
+/* Generic line ï¿½ used inside .ov-col blocks (score / time columns) */
 .ov-sub-line {
     font-size: clamp(11px, 1.8vw, 20px);
     line-height: 1.6;
 }
 
-/* EN / DE level reveal / solve flavour text (legacy — superseded by .ov-reveal-quote) */
+/* EN / DE level reveal / solve flavour text (legacy ï¿½ superseded by .ov-reveal-quote) */
 .ov-sub-reveal {
     color: var(--accent2);
     font-style: italic;
@@ -106,13 +106,13 @@
     font-size: clamp(11px, 1.8vw, 20px);
 }
 
-/* Mistake counter — grey when mistakes were made */
+/* Mistake counter ï¿½ grey when mistakes were made */
 .ov-sub-miss {
     color: #c0c0c0;
     font-size: clamp(11px, 1.8vw, 20px);
 }
 
-/* Mistake counter — green when zero mistakes */
+/* Mistake counter ï¿½ green when zero mistakes */
 .ov-sub-miss-ok {
     color: var(--green);
     font-size: clamp(11px, 1.8vw, 20px);
@@ -138,7 +138,7 @@
     min-height: 0;
 }
 
-    /* Filled cell — accent colour with glow */
+    /* Filled cell ï¿½ accent colour with glow */
     .ov-reveal-cell.f {
         background: var(--accent);
         box-shadow: 0 0 6px var(--accent);
@@ -171,6 +171,15 @@
     justify-content: center;
 }
 
+/* 2x2 grid variant (win overlay): row 1 = Retry / Retry (New Setup),
+   row 2 = Next / Levels. Buttons auto-place in DOM order. */
+.ov-btns-2col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    gap: clamp(8px, 2vw, 15px);
+    justify-content: center;
+}
+
 /* Shared base style for all overlay buttons */
 .ob {
     font-family: var(--PX);
@@ -183,7 +192,7 @@
     white-space: nowrap;
 }
 
-    /* Primary action (e.g. Next Level) — accent colour */
+    /* Primary action (e.g. Next Level) ï¿½ accent colour */
     .ob.p {
         border: 1px solid var(--accent);
         color: var(--accent);
@@ -194,7 +203,7 @@
             color: var(--bg);
         }
 
-    /* Secondary action (e.g. Level Select) — muted */
+    /* Secondary action (e.g. Level Select) ï¿½ muted */
     .ob.s {
         border: 1px solid var(--border2);
         color: var(--ov-sub);
@@ -226,7 +235,7 @@
     margin: 4px 0;
 }
 
-/* Individual badge — green if earned, muted if missed */
+/* Individual badge ï¿½ green if earned, muted if missed */
 .bonus-badge {
     font-family: var(--PX);
     font-size: clamp(9px, 1.4vw, 12px);
@@ -470,7 +479,7 @@
 
 /*
     ------------------------------------------------------------------------
-    ---------------------RESPONSIVE — NARROW SCREENS------------------------
+    ---------------------RESPONSIVE ï¿½ NARROW SCREENS------------------------
     ------------------------------------------------------------------------
     Same breakpoint used across title-screen.css / setup-screen.css / etc.
     Below this width the two-column stats block no longer has room to
@@ -501,7 +510,8 @@
         gap: 2px;
     }
 
-    .ov-btns {
+    .ov-btns,
+    .ov-btns-2col {
         gap: 8px;
     }
 

@@ -204,6 +204,35 @@ const StorylineRenderer = (() => {
             pointer-events: all;
             transition: border-color 300ms ease, color 300ms ease;
         `,
+        // -- Music volume control shown bottom-left during song beats.
+        // Mirrors the skip button's visual language so the two read as a
+        // matching pair of floating controls. --
+        songVolumeWrap: `
+            position: absolute;
+            bottom: clamp(10px, 3.2vh, 28px);
+            left: clamp(10px, 3.6vw, 36px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: clamp(11px, 1.4vw, 15px);
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.75);
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            padding: clamp(4px, 1vh, 6px) clamp(8px, 1.6vw, 12px);
+            pointer-events: all;
+        `,
+        songVolumeSlider: `
+            width: clamp(90px, 12vw, 170px);
+            accent-color: #e8c56a;
+            cursor: pointer;
+        `,
+        songVolumeValue: `
+            min-width: 4ch;
+            text-align: right;
+        `,
         pageIndicator: `
             position: absolute;
             top: clamp(10px, 3.2vh, 28px);
@@ -906,6 +935,65 @@ const StorylineRenderer = (() => {
         overlay.appendChild(skipBtn);
         songImgEls.skipBtn = skipBtn;
 
+        // Music volume slider (bottom-left of the screen). Live-syncs with
+        // the global Background Music setting (SETTINGS.bgmVolume), so any
+        // change here is instantly reflected in the settings modal — and
+        // the slider opens pre-set to whatever the player had configured.
+        const volWrap = document.createElement('div');
+        volWrap.style.cssText = STYLES.songVolumeWrap;
+
+        const volLabel = document.createElement('span');
+        volLabel.textContent = '🎵 ' + t('settings_bgm');
+
+        const volSlider = document.createElement('input');
+        volSlider.type = 'range';
+        volSlider.min = '0';
+        volSlider.max = '100';
+        volSlider.step = '5';
+        volSlider.style.cssText = STYLES.songVolumeSlider;
+
+        const volValue = document.createElement('span');
+        volValue.style.cssText = STYLES.songVolumeValue;
+
+        volWrap.appendChild(volLabel);
+        volWrap.appendChild(volSlider);
+        volWrap.appendChild(volValue);
+        overlay.appendChild(volWrap);
+        songImgEls.volSlider = volSlider;
+        songImgEls.volValue = volValue;
+
+        // Keep pointer events on the control from bubbling into any
+        // overlay-level click handlers.
+        ['click', 'pointerdown', 'input', 'keydown'].forEach(ev =>
+            volWrap.addEventListener(ev, e => e.stopPropagation()));
+
+        const _renderVolumeUI = () => {
+            const v = _getIntroSongBaseVolume();
+            volSlider.value = String(Math.round(v * 100));
+            volValue.textContent = Math.round(v * 100) + '%';
+        };
+        _renderVolumeUI();
+
+        volSlider.addEventListener('input', () => {
+            const v = Math.max(0, Math.min(1, parseInt(volSlider.value, 10) / 100));
+
+            // Persist as the new Background Music volume
+            if (typeof SETTINGS !== 'undefined') {
+                SETTINGS.bgmVolume = v;
+                if (typeof saveSettings === 'function') saveSettings(SETTINGS);
+            }
+
+            // Apply immediately to the playing intro song …
+            if (songAudioEl) songAudioEl.volume = v;
+            // … and to every other BGM consumer via the audio manager
+            if (typeof Audio_Manager !== 'undefined') Audio_Manager.setBGMVolume(v);
+
+            // Keep the settings modal's own slider/label in sync
+            if (typeof loadSettingsUI === 'function') loadSettingsUI();
+
+            volValue.textContent = Math.round(v * 100) + '%';
+        });
+
         // Show the first image immediately (don't wait for the RAF loop's
         // first tick) so there's no blank flash at time 0.
         if (songImages.length > 0) {
@@ -1075,6 +1163,16 @@ const StorylineRenderer = (() => {
         songRafId = requestAnimationFrame(_songSyncTick);
     }
 
+    // Returns the saved Background Music volume (SETTINGS.bgmVolume),
+    // clamped to [0, 1]. Used as the intro song's starting volume so the
+    // on-screen slider and the settings modal always agree.
+    function _getIntroSongBaseVolume() {
+        if (typeof SETTINGS !== 'undefined' && typeof SETTINGS.bgmVolume === 'number') {
+            return Math.max(0, Math.min(1, SETTINGS.bgmVolume));
+        }
+        return 1.0;
+    }
+
     // Starts a song beat: plays the audio and kicks off the sync loop.
     // Falls back to a timer-driven close if autoplay is blocked, so the
     // beat doesn't hang forever waiting on a play() promise that never resolves.
@@ -1102,7 +1200,9 @@ const StorylineRenderer = (() => {
         renderSong(song);
 
         songAudioEl = new Audio(song.audio);
-        songAudioEl.volume = 1.0;
+        // Follow the player's saved Background Music volume (adjustable
+        // live via the on-screen slider rendered by renderSong)
+        songAudioEl.volume = _getIntroSongBaseVolume();
 
         songAudioEl.addEventListener('ended', close);
 

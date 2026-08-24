@@ -269,9 +269,9 @@ function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
 
         case 'actuary':
             if (ascSlot === 'active1') {
-                _executeRegressionToPrior(effect.correctCount, effect.recoverPct);
+                _executeRegressionToPrior(effect.correctCount, effect.recoverPct, effect.revealCount);
             } else {
-                _executeSignificanceThreshold(effect.protectCount, effect.bonusReveal);
+                _executeSignificanceThreshold(effect.lines);
             }
             break;
 
@@ -353,6 +353,21 @@ function _isInstantAbility(slot) {
     // active4 instants for specific ascendencies
     if (slot !== 'active4') return false;
     return STATE.playerAscendency === 'outlier' || STATE.playerAscendency === 'recursionist';
+}
+
+
+// _canFireInstantAbility — extra usability gate for instant abilities that
+// only make sense under certain conditions. Returns false (with a toast)
+// when the ability must not fire, e.g. Regression to Prior with an empty
+// mistake log. Prevents wasting the cooldown on a no-op.
+function _canFireInstantAbility(slot) {
+    if (STATE.playerAscendency === 'actuary' && slot === 'active3') {
+        if (!(window._mistakeLog && window._mistakeLog.length > 0)) {
+            showToast(t('cls_regression_none'));
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -448,6 +463,7 @@ function toggleActiveAbility(slot) {
     _trackActivationHintProgress(newSlot);
 
     if (_isInstantAbility(newSlot)) {
+        if (!_canFireInstantAbility(newSlot)) return;
         _fireInstantAbility(newSlot);
         return;
     }

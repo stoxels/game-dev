@@ -102,7 +102,25 @@
 
 
 
-/*Significance Treshold ability*/
+/* ---------------------------------------------------
+   ACTUARY: HOLY GOLDEN CHAIN (REGRESSION TO PRIOR)
+--------------------------------------------------- */
+
+/* Marching link pattern so the chain looks like it is made of golden links */
+.regression-chain-link {
+    stroke-dasharray: 12 7;
+    animation: regressionChainMarch 0.45s linear infinite;
+}
+
+@keyframes regressionChainMarch {
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: -19;
+    }
+}
 
 
 
@@ -110,32 +128,35 @@
    ACTUARY: SIGNIFICANCE THRESHOLD SHIELD
 --------------------------------------------------- */
 
-/* The base background tint for protected cells */
+/* ---------------------------------------------------
+   ACTUARY: SIGNIFICANCE THRESHOLD SHIELD
+--------------------------------------------------- */
+
+/* Shielded cells show a golden border instead of an emoji overlay */
 .sig-thresh-protected {
     position: relative !important;
-    animation: shieldPulse 2s infinite ease-in-out;
+    animation: sigShieldPulse 2s infinite ease-in-out;
 }
 
-    /* Creates the "big border" effect using an inner shadow. 
-   Because the shadow is on the inside of every cell, 
-   they visually chain together to look like a thick rail.
-*/
     .sig-thresh-protected::after {
-        content: '🛡️'; /* Inject the emoji here */
+        content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        box-shadow: inset 0 0 8px rgba(230, 126, 34, 0.8);
+        box-shadow: inset 0 0 0 2px #ffd700, 0 0 6px rgba(255, 215, 0, 0.55);
         pointer-events: none; /* Still lets you click through to the cell */
         z-index: 5;
-        /* Center the emoji perfectly inside the cell */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        /* Style the emoji */
-        font-size: clamp(10px, 2vmin, 40px); /* clamp(Minimum Size, Preferred Responsive Size, Maximum Size) */
-        opacity: 0.6; /* Slightly transparent so it isn't too distracting */
     }
+
+@keyframes sigShieldPulse {
+    0%, 100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.35);
+    }
+}
 

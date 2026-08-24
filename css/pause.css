@@ -50,6 +50,12 @@
     z-index: 10000;
 }
 
+/* Make sure the leave-map confirm modal renders ABOVE the pause overlay
+   when opened via the pause screen (pause overlay is z-index 9999) */
+#eg-forfeit-modal.show {
+    z-index: 10000;
+}
+
 
 
 .pause-level-info {

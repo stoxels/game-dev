@@ -100,15 +100,6 @@ function checkBossCorruptionIntercept(row, col) {
     return false;
 }
 
-// If the Significance Threshold skill is armed, route the click there instead.
-function checkSigThresholdIntercept(row, col) {
-    if (window._sigThreshArmed && (pval === 1 || mbtn === 0)) {
-        _sigThreshPickFromCell(row, col);
-        return true;
-    }
-    return false;
-}
-
 // If a Bayesian trap is waiting for placement, route the click there.
 function checkBayesianTrapIntercept(row, col) {
     if (typeof _bayesTrapPlacementClick === 'function' && _bayesTrapPlacementClick(row, col)) {
@@ -140,7 +131,6 @@ function checkDegreesOfFreedomIntercept(row, col) {
 // Returns true if any intercept consumed the click.
 function checkSpecialIntercepts(row, col) {
     if (checkBossCorruptionIntercept(row, col)) return true;
-    if (checkSigThresholdIntercept(row, col)) return true;
     if (checkBayesianTrapIntercept(row, col)) return true;
     if (checkActiveAbilityIntercept(row, col)) return true;
     if (checkDegreesOfFreedomIntercept(row, col)) return true;
