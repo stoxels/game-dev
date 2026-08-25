@@ -444,7 +444,7 @@ function _dndDropOnEquipSlot(equipSlotEl) {
     }
     const gate = _egCanEquipInSlot(_dnd.item, slotId);
     if (!gate.ok) {
-        _egShowRequirementsToast('equip', gate.missing, _dnd.item.name);
+        _egShowRequirementsToast('equip', gate.missing, _dnd.item);
         _dndShowRejectFlash(equipSlotEl);
         return false;
     }
@@ -507,7 +507,7 @@ function _dndQuickEquipFromStash(invCell) {
 
     const gate = _egCanEquipInSlot(item, slotId);
     if (!gate.ok) {
-        _egShowRequirementsToast('equip', gate.missing, item.name);
+        _egShowRequirementsToast('equip', gate.missing, item);
         invCell.classList.add('eg-slot-reject');
         setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
         return;

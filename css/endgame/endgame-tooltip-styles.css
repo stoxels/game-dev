@@ -98,6 +98,13 @@
     margin-top: 2px;
 }
 
+/* Warning shown when equipping would displace an item whose bonuses other
+   equipped gear relies on (requirement chain-break) */
+.eg-tt-swap-warning {
+    color: #f39c12;
+    font-size: 0.77rem;
+}
+
 /* Explicit mod lines */
 .eg-tt-mods-section {
     /* no extra border — inherits .eg-tt-section */

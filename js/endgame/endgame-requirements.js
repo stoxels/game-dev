@@ -197,13 +197,26 @@ function _egGetUnmetRequirementsText(missing) {
 }
 
 // Shows the standard rejection feedback: red toast explaining what is missing.
-// `context` is 'equip' or 'unequip'; `itemName` personalizes unequip messages.
-function _egShowRequirementsToast(context, missing, itemName) {
+// `context` is 'equip' or 'unequip'; `item` is the item object (or its name)
+// being equipped/unequipped. For equips blocked by a chain-break (the swap
+// displaces an item whose bonuses other gear relies on) a dedicated message
+// explains that instead of the generic "missing" one.
+function _egShowRequirementsToast(context, missing, item) {
     if (typeof showToast !== 'function') return;
+    const itemName = (item && item.name) || item || '?';
     const list = _egGetUnmetRequirementsText(missing);
-    const msg = context === 'unequip'
-        ? t('eg_cannot_unequip').replace('{name}', itemName || '?').replace('{list}', list)
-        : t('eg_cannot_equip').replace('{name}', itemName || '?').replace('{list}', list);
+    let msg;
+    const chain = context === 'equip' ? _egGetSwapChainBreak(item) : null;
+    if (chain) {
+        msg = t('eg_cannot_equip_chainbreak')
+            .replace('{name}', itemName)
+            .replace('{equipped}', chain.occupant.name || '?')
+            .replace('{list}', list);
+    } else {
+        msg = context === 'unequip'
+            ? t('eg_cannot_unequip').replace('{name}', itemName).replace('{list}', list)
+            : t('eg_cannot_equip').replace('{name}', itemName).replace('{list}', list);
+    }
     showToast(msg, '#e74c3c');
 }
 
@@ -226,6 +239,35 @@ function _egPreviewEquipAttributes(item) {
     const sim = equipped.filter(i => i !== _egEquipped[target]);
     return _egComputeLoadoutAttributes(sim.concat(item));
 }
+
+// Explains WHY a stash item is blocked even though its own requirements are
+// met after the swap: equipping it displaces the current occupant of the
+// target slot, and that occupant may be carrying attribute bonuses that
+// OTHER equipped items rely on ("chain-break"). Returns null unless the item
+// is blocked purely for that reason:
+//   { occupant, broken: [{ item, stat, need, have }] }
+function _egGetSwapChainBreak(item) {
+    if (!item || item.category !== 'equip' || !item.requirements) return null;
+    if (typeof _egEquipped === 'undefined') return null;
+
+    const equippedList = Object.values(_egEquipped).filter(Boolean);
+    if (equippedList.includes(item)) return null;
+
+    const target = (typeof _dndFindTargetSlot === 'function') ? _dndFindTargetSlot(item) : null;
+    if (!target) return null;
+
+    const gate = _egCanEquipInSlot(item, target);
+    if (gate.ok) return null;
+    // If the new item itself misses a requirement, the regular
+    // "Missing:" display already covers it — not a chain-break.
+    if ((gate.missing || []).some(u => u.item === item)) return null;
+
+    const broken = (gate.missing || []).filter(u => u.item !== item && equippedList.includes(u.item));
+    const occupant = _egEquipped[target];
+    if (!broken.length || !occupant) return null;
+    return { occupant, broken };
+}
+
 
 // True when the item should be flagged red as "unwearable" in the UI.
 //   - Equipped items: red while the item itself currently violates its

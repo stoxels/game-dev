@@ -627,6 +627,17 @@ function _egBuildTooltipBodyHTML(item) {
         ? `<div class="eg-tt-section"><div class="eg-tt-req">${t('eg_requires')} ${reqParts.join(', ')}${missingHTML}</div></div>`
         : '';
 
+    // ── Chain-break warning ──────────────────────────────────────────
+    // Shown when the item's own requirements are all met but equipping it
+    // would displace an item whose attribute bonuses other equipped items
+    // rely on (e.g. a +13 Int ring keeping a 45 Int chest satisfied).
+    const chain = _egGetSwapChainBreak(item);
+    const chainHTML = chain
+        ? `<div class="eg-tt-section"><div class="eg-tt-swap-warning">${t('eg_swap_breaks_warning')
+            .replace('{equipped}', chain.occupant.name || '?')
+            .replace('{list}', _egGetUnmetRequirementsText(chain.broken))}</div></div>`
+        : '';
+
     // ── Explicit mods ─────────────────────────────────────────────────
     const mods = Array.isArray(item.mods) ? item.mods : [];
     let modsHTML = '';
@@ -657,6 +668,7 @@ function _egBuildTooltipBodyHTML(item) {
     </div>
     ${implicitHTML}
     ${reqHTML}
+    ${chainHTML}
     ${modsHTML}
     ${ilvlHTML}
 </div>`;
