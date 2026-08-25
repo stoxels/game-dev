@@ -59,6 +59,21 @@ function _egAddOneModToItem(item, rarityForCaps) {
     return { ...item, mods: [...existing, newMod] };
 }
 
+// Re-rolls the numeric VALUES of every modifier within its existing tier
+// (Divine Orb semantics). Families, tiers and rarity are kept untouched.
+function _egRerollItemModValues(item, modTable) {
+    if (!modTable) return item;
+    const mods = (item.mods || []).map(mod => {
+        const section = mod.type === 'prefix' ? modTable.prefixes : modTable.suffixes;
+        const family = section && (section[mod.familyId]
+            || Object.values(section).find(f => f.id === mod.familyId));
+        const tierObj = family && family.tiers.find(tr => tr.tier === mod.tier);
+        if (!family || !tierObj) return mod; // unknown family/tier — keep as-is
+        return { ...mod, rolledStats: _egBuildRolledStats(family, tierObj) };
+    });
+    return { ...item, mods };
+}
+
 const EG_CURRENCY_DEFS = {
 
     orb_transmutation: {
@@ -146,6 +161,16 @@ const EG_CURRENCY_DEFS = {
         },
     },
 
+    // Re-rolls the values of all modifiers within their current tiers.
+    orb_divine: {
+        id: 'orb_divine', name: t('eg_orb_divine'), icon: '🌟',
+        description: t('eg_orb_divine_desc'),
+        canApply(item) { return (item.mods || []).length > 0; },
+        apply(item) {
+            return _egRerollItemModValues(item, _egGetModTable(item));
+        },
+    },
+
     // Common -> Epic directly ("alchemy for epic").
     orb_ascension: {
         id: 'orb_ascension', name: t('eg_orb_ascension'), icon: '🔮',
@@ -200,9 +225,10 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_augmentation', weight: 300 },
     { id: 'orb_alteration', weight: 260 },
     { id: 'orb_scouring', weight: 200 },
-    { id: 'orb_alchemy', weight: 120 },
+    { id: 'orb_alchemy', weight: 220 },
     { id: 'orb_regal', weight: 90 },
     { id: 'orb_chaos', weight: 55 },
+    { id: 'orb_divine', weight: 35 },
     // Epic-tier orbs — deliberately much more common than before so that
     // endgame crafting is actually reachable through normal play.
     { id: 'orb_elevation', weight: 45 },
@@ -269,7 +295,24 @@ function _egCancelCurrencyUse(silent) {
     if (!silent) showToast(t('eg_currency_cancelled'));
 }
 
-function _egApplyCurrencyToItem(item, applyFn, chipEl) {
+// Keeps use-mode active after an application (shift-click chaining, like
+// PoE). The currency cell may have been re-rendered by the application,
+// so the chip element is re-acquired from the DOM.
+function _egRefreshCurrencyUseHighlight() {
+    if (!_egPendingCurrencyUse) return;
+    const { sourceRow, sourceCol } = _egPendingCurrencyUse;
+    document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
+    const chip = document.querySelector(
+        `.eg-currency-cell[data-row="${sourceRow}"][data-col="${sourceCol}"] .eg-item-chip`);
+    if (chip) {
+        chip.classList.add('eg-currency-selected');
+        document.body.classList.add('eg-currency-use-active');
+    } else {
+        _egCancelCurrencyUse(true);
+    }
+}
+
+function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     if (!_egPendingCurrencyUse) return;
     const { sourceRow, sourceCol, defId } = _egPendingCurrencyUse;
     const def = EG_CURRENCY_DEFS[defId];
@@ -353,6 +396,14 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
         if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
         _egRenderCurrencyCell(sourceRow, sourceCol);
 
+        // Shift-click chaining: keep the mirror selected while stacks remain.
+        if (keepActive && stack.count > 0) {
+            _egRefreshCurrencyUseHighlight();
+            showToast(t('eg_mirror_created').replace('{name}', copy.name));
+            egSaveHubState();
+            return;
+        }
+
         _egCancelCurrencyUse(true);
         showToast(t('eg_mirror_created').replace('{name}', copy.name));
         egSaveHubState();
@@ -366,6 +417,16 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
     stack.count = (stack.count || 1) - 1;
     if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
     _egRenderCurrencyCell(sourceRow, sourceCol);
+
+    // Shift-click chaining: keep the orb selected so further shift-clicks
+    // re-use it on the next target until the stack runs out.
+    if (keepActive && stack.count > 0) {
+        _egRefreshCurrencyUseHighlight();
+        showToast(t('eg_currency_applied').replace('{name}', def.name));
+        if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
+        egSaveHubState();
+        return;
+    }
 
     _egCancelCurrencyUse(true);
     showToast(t('eg_currency_applied').replace('{name}', def.name));
@@ -473,7 +534,7 @@ document.addEventListener('mousedown', function (e) {
         return;
     }
 
-    _egApplyCurrencyToItem(targetItem, applyFn, chip);
+    _egApplyCurrencyToItem(targetItem, applyFn, chip, e.shiftKey);
 }, true);
 
 // Escape cancels a pending currency use too.

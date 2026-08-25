@@ -20,6 +20,9 @@ const EG_LOOT_DROP_CHANCE_BOSS = 1.00;  // bosses always drop
 // Intentionally longer than heart pickups — no rush to grab loot.
 const EG_LOOT_DROP_LIFETIME_MS = 60000;
 
+// Hard cap: how many currency orbs may sit on the board at the same time.
+const EG_CURRENCY_DROP_MAX_ON_BOARD = 4;
+
 // Seconds removed from a randomly chosen ability slot's cooldown when the
 // Arcane Surge pickup is claimed.
 const EG_COOLDOWN_SURGE_REDUCTION_SECS = 30;
@@ -677,11 +680,11 @@ function _egAnimateCurrencyDropClaim(row, col, def) {
 // adding the orb straight to the stash.
 function _egSpawnCurrencyDrop(def) {
     if (!_egIsActive() || !def) return;
-    if (_egCurrencyDrops.size >= 1) return; // one currency drop on board at a time
+    if (_egCurrencyDrops.size >= EG_CURRENCY_DROP_MAX_ON_BOARD) return;
 
     const pool = _egBuildPickupEligiblePool();
     const filtered = pool.filter(([r, c]) =>
-        !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`)
+        !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`) && !_egCurrencyDrops.has(`${r}-${c}`)
     );
     if (filtered.length === 0) return;
 
@@ -763,11 +766,11 @@ function _egReplaceCarriedCurrencyDrops(defs) {
     if (!defs || defs.length === 0) return;
 
     defs.forEach(def => {
-        if (_egCurrencyDrops.size >= 1) return;
+        if (_egCurrencyDrops.size >= EG_CURRENCY_DROP_MAX_ON_BOARD) return;
 
         const pool = _egBuildPickupEligiblePool();
         const filtered = pool.filter(([r, c]) =>
-            !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`)
+            !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`) && !_egCurrencyDrops.has(`${r}-${c}`)
         );
         if (filtered.length === 0) return;
 

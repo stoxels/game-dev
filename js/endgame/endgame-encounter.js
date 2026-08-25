@@ -751,13 +751,9 @@ function _egTrackRecentFill(row, col) {
 // projectile anchored on the stroke's first cell. The shot is released with
 // the combined damage when the player stops painting (_egReleaseChargedShot).
 function _egOnCorrectCell(row, col) {
+    // Block recovery does NOT stop the charge from accumulating during a
+    // drag reveal — it only prevents firing at release (_egReleaseChargedShot).
     if (!_egIsActive()) return;
-
-    // Still recovering from a recent block — attacks are disabled
-    if (Date.now() < _egPlayerBlockLockoutUntil) {
-        _egApplyPlayerBlockLockoutFeedback();
-        return;
-    }
 
     if (row !== undefined && col !== undefined) _egTrackRecentFill(row, col);
 
@@ -894,8 +890,11 @@ function _egReleaseChargedShot() {
     if (!_egIsActive()) return;
     if (stacks <= 0 || !damage) return;
 
-    // Still recovering from a recent block — the charge fizzles
-    if (Date.now() < _egPlayerBlockLockoutUntil) return;
+    // Still recovering from a recent block at release — the charge fizzles
+    if (Date.now() < _egPlayerBlockLockoutUntil) {
+        _egApplyPlayerBlockLockoutFeedback();
+        return;
+    }
 
     const sourceEl = (row >= 0 && col >= 0)
         ? document.getElementById(`g-${row}-${col}`)

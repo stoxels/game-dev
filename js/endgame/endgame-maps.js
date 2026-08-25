@@ -512,6 +512,14 @@ const EG_MAP_CURRENCY_RULES = {
             return _egRerollMapMods(map, 'epic', prefixCount, suffixCount);
         },
     },
+    // Re-rolls the values of all map modifiers within their current tiers.
+    orb_divine: {
+        canApply(map) { return (map.mods || []).length > 0; },
+        apply(map) {
+            const updated = _egRerollItemModValues(map, EG_MAP_MOD_TABLES);
+            return _egWithImplicits(updated);
+        },
+    },
     mirror_of_kalandra: {
         canApply() { return true; },
     },
