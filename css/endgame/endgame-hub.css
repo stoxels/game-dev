@@ -1043,9 +1043,105 @@ Layout Architecture:
     justify-content: center;
     overflow: hidden;
     min-height: 0;
+    padding: 10px 16px 14px;
+    box-sizing: border-box;
 }
 
 .eg-gate-body .eg-panel-map {
-    width: min(900px, 100%);
+    width: min(1500px, 100%);
     border-right: none;
+}
+
+/* ── GATE SCREEN SCALE-UP ──
+   The gate screen is much emptier than the hub, so everything is
+   rendered larger: device, cells, chips and labels. All overrides are
+   scoped to #screen-endgame-gate so the hub layout is untouched. */
+
+/* Panel labels */
+#screen-endgame-gate .eg-panel-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    padding: 10px 14px 4px;
+}
+
+/* Map device */
+#screen-endgame-gate .eg-map-device {
+    gap: 18px;
+    padding: 18px 16px 22px;
+}
+
+#screen-endgame-gate .eg-map-device-frame {
+    width: 200px;
+    height: 200px;
+}
+
+#screen-endgame-gate .eg-map-slot {
+    width: 156px;
+    height: 156px;
+}
+
+#screen-endgame-gate .eg-map-slot-empty-text {
+    font-size: 9px;
+}
+
+#screen-endgame-gate .eg-map-orb-rune {
+    font-size: 14px;
+}
+
+#screen-endgame-gate .eg-activate-btn {
+    font-size: 11px;
+    padding: 12px 24px;
+    max-width: 280px;
+    letter-spacing: 3px;
+}
+
+/* Runes & orbs strip */
+#screen-endgame-gate .eg-currency-strip {
+    margin: 0 12px;
+}
+
+#screen-endgame-gate .eg-currency-row {
+    gap: 4px;
+    padding: 4px 12px 10px;
+}
+
+#screen-endgame-gate .eg-currency-cell {
+    height: 38px !important;
+}
+
+/* Map stash grid */
+#screen-endgame-gate .eg-map-stash-section {
+    margin: 0 12px;
+}
+
+#screen-endgame-gate .eg-map-stash-grid {
+    gap: 4px;
+    padding: 6px 12px 12px;
+}
+
+#screen-endgame-gate .eg-map-stash-cell {
+    min-height: 56px;
+}
+
+/* Item chips inside gate cells: bigger icons and readable text */
+#screen-endgame-gate .eg-inv-cell .eg-item-chip-icon {
+    font-size: 26px;
+}
+
+#screen-endgame-gate .eg-inv-cell .eg-item-chip-name {
+    font-size: 8px;
+}
+
+#screen-endgame-gate .eg-inv-cell .eg-item-ilvl {
+    font-size: 9px;
+}
+
+/* Map loaded in the device slot uses the large chip variant already;
+   scale it up a bit more to match the bigger slot */
+#screen-endgame-gate .eg-map-slot .eg-item-chip-large .eg-item-chip-icon {
+    font-size: 40px;
+}
+
+#screen-endgame-gate .eg-map-slot .eg-item-chip-large .eg-item-chip-name {
+    font-size: 9px;
 }
