@@ -306,13 +306,69 @@ function _egGetMapRewardBonuses(map) {
 //------------------------------------------------------------------------
 //-------------------MAP IMPLICITS-----------------------------------------
 //------------------------------------------------------------------------
-// Maps carry four implicit values derived from their tier and shaped by
+// Maps carry five implicit values derived from their tier and shaped by
 // specific mods. They are baked into the item at generation/reroll time so
 // the tooltip always shows exactly what the run will demand:
 //   puzzles          — required puzzles to solve
 //   questions        — quiz questions to answer correctly
 //   mistakes         — allowed mistake count
 //   durationSeconds  — total map time limit
+//   sizeMix          — puzzle count per grid-size bucket
+//                      (small / medium / large / massive)
+
+// Grid-size buckets (same thresholds as _gridSizeBucket in quests-stats.js).
+// Used by the run launcher to filter story puzzles and to steer the
+// generated-puzzle sizes.
+const EG_GRID_SIZE_BUCKETS = {
+    small:   [1, 99],
+    medium:  [100, 199],
+    large:   [200, 399],
+    massive: [400, Infinity],
+};
+
+// Derives how many of the map's puzzles fall into each grid-size bucket.
+// Higher tiers shift weight toward large/massive grids; a "% larger Puzzle
+// Grids" mod (largerPct) pushes the mix further up. The counts always sum
+// to the tier's base puzzle count.
+function _egRollMapSizeMix(tier, largerPct) {
+    const t = Math.max(1, tier || 1);
+    const total = Math.min(12, 3 + Math.floor(t / 3));
+
+    let weights = {
+        small:   Math.max(0.05, 0.50 - t * 0.04),
+        medium:  0.32,
+        large:   Math.min(0.35, 0.10 + t * 0.02),
+        massive: Math.min(0.25, Math.max(0, (t - 4) * 0.025)),
+    };
+
+    // The larger-grids mod drains weight out of small/medium and feeds
+    // it into large/massive.
+    const bonus = Math.max(0, largerPct || 0) / 100;
+    if (bonus > 0) {
+        const drainS = weights.small * Math.min(0.9, bonus);
+        const drainM = weights.medium * Math.min(0.6, bonus * 0.8);
+        weights.small -= drainS;
+        weights.medium -= drainM;
+        weights.large += (drainS + drainM) * 0.65;
+        weights.massive += (drainS + drainM) * 0.35;
+    }
+
+    // Largest-remainder apportionment → integer counts summing to `total`
+    const buckets = Object.keys(weights);
+    const raw = {};
+    let assigned = 0;
+    buckets.forEach(b => {
+        raw[b] = weights[b] * total;
+        const fl = Math.floor(raw[b]);
+        weights[b] = fl;
+        assigned += fl;
+    });
+    const remainder = total - assigned;
+    buckets.sort((a, b2) => (raw[b2] % 1) - (raw[a] % 1));
+    for (let i = 0; i < remainder; i++) weights[buckets[i % buckets.length]]++;
+
+    return weights;
+}
 
 function _egRollMapImplicits(map) {
     const tier = Math.max(1, map.mapTier || 1);
@@ -320,6 +376,7 @@ function _egRollMapImplicits(map) {
     let questions = Math.min(8, Math.floor(tier / 2));
     let mistakes = 10;
     let duration = 900 + tier * 60;
+    let largerPct = 0;
 
     (Array.isArray(map.mods) ? map.mods : []).forEach(mod => {
         const val = (Array.isArray(mod.rolledStats) && mod.rolledStats.length > 0)
@@ -337,10 +394,15 @@ function _egRollMapImplicits(map) {
             case 'map_less_time':
                 duration = Math.max(300, duration - val);
                 break;
+            case 'map_puzzle_cells':
+                largerPct = val;
+                break;
         }
     });
 
-    return { puzzles, questions, mistakes, durationSeconds: duration };
+    const sizeMix = _egRollMapSizeMix(tier, largerPct);
+
+    return { puzzles, questions, mistakes, durationSeconds: duration, sizeMix };
 }
 
 // Returns the map with freshly computed implicits (used after every roll).
@@ -420,6 +482,16 @@ function _egAddOneModToMap(map, rarityForCaps) {
     };
 
     return _egWithImplicits({ ...map, mods: [...existing, newMod] });
+}
+
+// Removes ONE random modifier from a map (Annulment semantics).
+function _egRemoveOneModFromMap(map) {
+    const existing = map.mods || [];
+    if (existing.length === 0) return map;
+    const index = Math.floor(Math.random() * existing.length);
+    const mods = existing.filter((_, i) => i !== index);
+    const name = _egBuildItemName(map.baseName || map.name, map.rarity, mods);
+    return _egWithImplicits({ ...map, mods, name });
 }
 
 
@@ -510,6 +582,21 @@ const EG_MAP_CURRENCY_RULES = {
         apply(map) {
             const { prefixCount, suffixCount } = _egRollModCounts('epic');
             return _egRerollMapMods(map, 'epic', prefixCount, suffixCount);
+        },
+    },
+    orb_chance: {
+        canApply(map) { return map.rarity === 'common'; },
+        apply(map) {
+            const roll = Math.random();
+            const rarity = roll < 0.60 ? 'uncommon' : (roll < 0.90 ? 'rare' : 'epic');
+            const { prefixCount, suffixCount } = _egRollModCounts(rarity);
+            return _egRerollMapMods(map, rarity, prefixCount, suffixCount);
+        },
+    },
+    orb_annulment: {
+        canApply(map) { return (map.mods || []).length > 0; },
+        apply(map) {
+            return _egRemoveOneModFromMap(map);
         },
     },
     // Re-rolls the values of all map modifiers within their current tiers.
@@ -740,6 +827,14 @@ function _egBuildMapTooltipBodyHTML(item) {
         t('eg_map_monster_level_tt').replace('{n}', item.monsterLevel ?? item.itemLevel ?? 1),
     ];
 
+    if (imp.sizeMix) {
+        implicitLines.push(t('eg_map_implicit_sizemix')
+            .replace('{s}', imp.sizeMix.small || 0)
+            .replace('{m}', imp.sizeMix.medium || 0)
+            .replace('{l}', imp.sizeMix.large || 0)
+            .replace('{x}', imp.sizeMix.massive || 0));
+    }
+
     // ── Reward bonuses (from mods) ───────────────────────────────────
     const rw = _egGetMapRewardBonuses(item);
     const rewardLines = [];
@@ -757,6 +852,8 @@ function _egBuildMapTooltipBodyHTML(item) {
     <div class="eg-tt-header">
         <div class="eg-tt-icon">${item.icon || '🗺️'}</div>
         <div class="eg-tt-name" style="color:${rc.color};">${item.name || '???'}</div>
+        ${(item.baseName && item.baseName !== item.name)
+            ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
         <div class="eg-tt-rarity-line" style="color:${rc.border};">${t('eg_maps_label')} · ${t('eg_map_tier_tt').replace('{n}', item.mapTier ?? 1)}</div>
     </div>
     <div class="eg-tt-section">

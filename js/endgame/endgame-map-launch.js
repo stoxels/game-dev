@@ -173,11 +173,34 @@ function _egMapLootRarityWeightMult() {
 //-------------------RUN BASELINE + MOD APPLICATION-----------------------
 //------------------------------------------------------------------------
 
+// Expands a size mix { small, medium, large, massive } into an ordered
+// queue of bucket names: small puzzles come first, massive ones close out
+// the run. If mods raised the required puzzle count above the mix total,
+// random buckets top the queue up.
+function _egBuildSizeQueue(sizeMix, targetLen) {
+    const buckets = ['small', 'medium', 'large', 'massive'];
+    const queue = [];
+    buckets.forEach(b => {
+        for (let i = 0; i < (sizeMix && sizeMix[b] ? sizeMix[b] : 0); i++) queue.push(b);
+    });
+    while (queue.length < targetLen) {
+        queue.push(buckets[Math.floor(Math.random() * buckets.length)]);
+    }
+    return queue;
+}
+
 // Derives the baseline run parameters purely from the map's tier, mirroring
 // the progression of the test-map hub (EG_TEST_MAPS). The rolled map mods
 // are applied on top by _egApplyModsToBaseline().
 function _egRollMapRunBaseline(map) {
     const tier = Math.max(1, map.mapTier || 1);
+    const imp = (map && map.implicits) ? map.implicits : null;
+
+    // Size mix: baked implicit on newer maps, otherwise derive from tier.
+    const sizeMix = (imp && imp.sizeMix)
+        ? imp.sizeMix
+        : ((typeof _egRollMapSizeMix === 'function') ? _egRollMapSizeMix(tier, 0) : null);
+
     const base = {
         monsterLevel: map.monsterLevel || map.itemLevel || 1,
         maxMonsters: 6,
@@ -186,20 +209,30 @@ function _egRollMapRunBaseline(map) {
         maxBosses: 1,
         requiredPuzzles: Math.min(12, 3 + Math.floor(tier / 3)),
         requiredQuestions: 0,
-        puzzlePool: {},
+        // Device runs pull from BOTH pools: story levels AND freshly
+        // generated puzzles (symbols / random structures). When a size
+        // mix exists, each chain step consumes the next grid-size bucket.
+        puzzlePool: {
+            generated: true,          // fallback when no size queue exists
+            genMode: 'mixed',         // 'symbol' | 'random' | 'mixed'
+            genTier: tier,
+            sizeQueue: [],
+        },
         egTimeLimit: 900 + tier * 60,
         egMaxMistakes: 10,
     };
 
     // Newer maps carry pre-computed implicits — use them verbatim so the
     // run matches exactly what the tooltip promised.
-    if (map && map.implicits) {
-        const imp = map.implicits;
+    if (imp) {
         if (imp.puzzles != null) base.requiredPuzzles = Math.max(1, Math.min(20, imp.puzzles));
         if (imp.questions != null) base.requiredQuestions = Math.max(0, Math.min(20, imp.questions));
         if (imp.mistakes != null) base.egMaxMistakes = Math.max(3, imp.mistakes);
         if (imp.durationSeconds != null) base.egTimeLimit = Math.max(300, imp.durationSeconds);
     }
+
+    base.puzzlePool.sizeQueue = _egBuildSizeQueue(sizeMix, base.requiredPuzzles);
+
     return base;
 }
 
@@ -261,7 +294,16 @@ function _egApplyModsToBaseline(base, map) {
 // Picks a random eligible story puzzle (gi) to seed the run.
 // Reuses the test-hub picker when available (same exclusion rules), otherwise
 // falls back to building a chain pool directly.
+// Picks the seed puzzle (gi) that starts a map run. Reuses the shared
+// bucketed picker so the FIRST puzzle of the run already honours the map's
+// size mix and the story/generated source mix. Falls back to the test-hub
+// picker / plain story pool when the shared picker is unavailable or fails.
 function _egPickMapRunSeedGi(baseline) {
+    if (typeof _egPickMapRunPuzzleGi === 'function') {
+        const gi = _egPickMapRunPuzzleGi(baseline.puzzlePool || {});
+        if (gi !== null) return gi;
+    }
+
     if (typeof _egtPickSeedGi === 'function') {
         return _egtPickSeedGi(baseline);
     }
@@ -339,6 +381,10 @@ function _egLaunchMapFromDevice(mapItem) {
     // Tells goToLevelSelect() (screens.js) to route back to the Probability
     // Gate instead of the normal world/level-select screen when the run ends.
     window._egIsMapDeviceRun = true;
+
+    // Bind the endgame lose-overlay UI (no Retry — only "Return to the Nexus")
+    // up front so every defeat path inside the map is covered.
+    if (typeof _egEnsureLoseOverlayEndgameUI === 'function') _egEnsureLoseOverlayEndgameUI();
 
     showToast((typeof t === 'function') ? t('eg_map_activating').replace('{n}', mapItem.name)
                                         : `Activating ${mapItem.name}...`);

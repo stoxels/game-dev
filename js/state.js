@@ -233,6 +233,10 @@ function buildFreshState() {
             typeof EG_CURRENCY_ROWS !== 'undefined' ? EG_CURRENCY_ROWS : 2,
             typeof EG_CURRENCY_COLS !== 'undefined' ? EG_CURRENCY_COLS : 10
         ),
+        egEssenceStash: _makeEgGrid(
+            typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 6,
+            typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8
+        ),
         egMapSlotItem: null,
     };
 }
@@ -308,6 +312,12 @@ function _migrateEndgameFields(s) {
         s.egCurrencyStash = _makeEgGrid(
             typeof EG_CURRENCY_ROWS !== 'undefined' ? EG_CURRENCY_ROWS : 2,
             typeof EG_CURRENCY_COLS !== 'undefined' ? EG_CURRENCY_COLS : 10
+        );
+    }
+    if (!s.egEssenceStash) {
+        s.egEssenceStash = _makeEgGrid(
+            typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 6,
+            typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8
         );
     }
     if (s.egMapSlotItem === undefined) s.egMapSlotItem = null;

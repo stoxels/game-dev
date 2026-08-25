@@ -457,9 +457,13 @@ function _egEnsureLoseOverlayEndgameUI() {
         btns.appendChild(egBtn);
     }
 
+    // Endgame mode whenever the map-failed class is present OR any other
+    // defeat path (timer expiry, hardcore fail, golden clock, random walk,
+    // ...) opens this overlay while an endgame map is still active.
     new MutationObserver(() => {
         if (!ov.classList.contains('show')) return;
-        const failed = ov.classList.contains('eg-map-failed');
+        const failed = ov.classList.contains('eg-map-failed') ||
+            (typeof _egIsActive === 'function' && _egIsActive());
         retry.style.display = failed ? 'none' : '';
         levels.style.display = failed ? 'none' : '';
         egBtn.style.display = failed ? '' : 'none';
@@ -1169,6 +1173,7 @@ function _egDamageTargetById(monsterId, amount, elements) {
     _egApplyHitToMonster(target, amount);
     _egShowDamageNumber(target.id, amount);
     _egFlashDamageCard(target.id);
+    _egSpawnHitBurst(target.id, elements);
 
     // Check for boss phase transition before checking death
     if (target.isBoss) _egBossCheckPhase(target);
@@ -1316,6 +1321,7 @@ function _egHandleNormalMonsterKill(dying) {
     if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(false, dying.level);
     if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);
     if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
+    if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false);
     if (typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level);
 }
 
@@ -1324,6 +1330,7 @@ function _egHandleBossKill(dying) {
     _egUpdateObjectivesHUD();
     if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(true,dying.level);
     if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
+    if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
     if (typeof _egTryDropMap === 'function') _egTryDropMap(true, dying.level);
 }
 
@@ -1466,6 +1473,64 @@ function _egFlashImmune(monsterId) {
     label.textContent = t('eg_immune');
     card.appendChild(label);
     setTimeout(() => label.remove(), EG_IMMUNE_LABEL_DURATION_MS);
+}
+
+// Particle colour per damage element (falls back to white for physical).
+const EG_HIT_ELEMENT_COLORS = {
+    physical: '#ffffff',
+    fire: '#ff6b35',
+    cold: '#4fc3f7',
+    lightning: '#ffe066',
+    shadow: '#b06bff'
+};
+
+const EG_HIT_BURST_SPARK_COUNT = 14;
+const EG_HIT_BURST_DURATION_MS = 750;
+
+// Spawns a short spark burst + expanding shockwave ring at the monster's
+// card centre when damage lands. Both melee strikes and projectiles funnel
+// through _egDamageTargetById, so this fires for every player hit.
+// `elements` optionally maps each element to its share of the hit; the
+// dominant element picks the burst colour.
+function _egSpawnHitBurst(monsterId, elements) {
+    const card = document.getElementById(`eg-card-${monsterId}`);
+    if (!card) return;
+
+    let color = EG_HIT_ELEMENT_COLORS.physical;
+    if (elements) {
+        let best = null;
+        Object.keys(elements).forEach(el => {
+            if (EG_HIT_ELEMENT_COLORS[el] && (!best || elements[el] > elements[best])) best = el;
+        });
+        if (best) color = EG_HIT_ELEMENT_COLORS[best];
+    }
+
+    const rect = card.getBoundingClientRect();
+    const burst = document.createElement('div');
+    burst.className = 'eg-hit-burst';
+    burst.style.left = `${rect.left + rect.width / 2}px`;
+    burst.style.top = `${rect.top + rect.height / 2}px`;
+
+    // Expanding shockwave ring
+    const ring = document.createElement('div');
+    ring.className = 'eg-hit-ring';
+    ring.style.setProperty('--eg-hit-color', color);
+    burst.appendChild(ring);
+
+    // Outward-flying sparks in a ring with slight random jitter
+    for (let i = 0; i < EG_HIT_BURST_SPARK_COUNT; i++) {
+        const spark = document.createElement('div');
+        spark.className = 'eg-hit-spark';
+        const angle = (Math.PI * 2 * i) / EG_HIT_BURST_SPARK_COUNT + Math.random() * 0.5;
+        const dist = 40 + Math.random() * 30;
+        spark.style.setProperty('--eg-hit-color', color);
+        spark.style.setProperty('--spark-dx', `${(Math.cos(angle) * dist).toFixed(1)}px`);
+        spark.style.setProperty('--spark-dy', `${(Math.sin(angle) * dist).toFixed(1)}px`);
+        burst.appendChild(spark);
+    }
+
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), EG_HIT_BURST_DURATION_MS);
 }
 
 

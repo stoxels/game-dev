@@ -319,6 +319,7 @@ function _egBuildChainPool(criteria) {
 
     let pool = ALL.filter(level =>
         !level.isEndgameSandbox &&
+        !level.isGeneratedPuzzle &&  // generated levels are launched directly
         !level.requiredKills &&
         !level.totalMonsters &&      // also exclude other map-starter levels
         _egPuzzlePassesCriteria(level, criteria)
@@ -339,22 +340,93 @@ function _egPickFromPool(pool, recentWindow) {
     return picked.gIdx;
 }
 
+function _egTrackChainRecentGi(gi, recentWindow) {
+    _egChainRecentGis.push(gi);
+    if (_egChainRecentGis.length > (recentWindow || 8)) {
+        _egChainRecentGis.shift();
+    }
+}
+
+// Picks from the story pool honouring the given criteria; relaxes pure
+// size filters when nothing qualifies so the chain never stalls.
+function _egPickStoryChainPuzzleGi(criteria) {
+    let pool = _egBuildChainPool(criteria);
+
+    if (pool.length === 0 && (criteria.minCells != null || criteria.maxCells != null)) {
+        pool = _egBuildChainPool({ ...criteria, minCells: null, maxCells: null });
+    }
+
+    if (pool.length === 0) return null;
+    return _egPickFromPool(pool, criteria.recentWindow);
+}
+
+// Picks one puzzle for a map run, mixing BOTH sources:
+//   story levels (filtered by the current criteria) and freshly generated
+//   puzzles (symbols / random structures). When the map carries a size
+//   mix queue, each pull consumes the next grid-size bucket — small
+//   puzzles come first, massive ones close out the run.
+function _egPickMapRunPuzzleGi(criteria) {
+    const canGenerate = typeof _egCreateGeneratedLevel === 'function';
+    const generate = opts => {
+        if (!canGenerate) return null;
+        return _egCreateGeneratedLevel(opts);
+    };
+
+    // ── Bucketed pull (maps with a sizeMix implicit) ────────────────
+    const queue = Array.isArray(criteria.sizeQueue) ? criteria.sizeQueue : [];
+    if (queue.length > 0) {
+        const bucket = queue.shift();   // consumed — shrinks as the run progresses
+        const range = (typeof EG_GRID_SIZE_BUCKETS !== 'undefined')
+            ? EG_GRID_SIZE_BUCKETS[bucket] : null;
+
+        // Story criteria clone constrained to this bucket's cell window
+        const bucketCriteria = { ...criteria };
+        if (range) {
+            bucketCriteria.minCells = Math.max(criteria.minCells || 0, range[0]);
+            bucketCriteria.maxCells = range[1] === Infinity ? null : range[1];
+        }
+
+        // Coin flip which source leads; the other one is the fallback.
+        const genFirst = Math.random() < 0.5;
+
+        if (genFirst) {
+            const gi = generate({ mode: criteria.genMode, tier: criteria.genTier, minCells: bucketCriteria.minCells, bucket });
+            if (gi !== null) { _egTrackChainRecentGi(gi, criteria.recentWindow); return gi; }
+        }
+
+        const storyGi = _egPickStoryChainPuzzleGi(bucketCriteria);
+        if (storyGi !== null) return storyGi;
+
+        if (!genFirst) {
+            const gi = generate({ mode: criteria.genMode, tier: criteria.genTier, minCells: bucketCriteria.minCells, bucket });
+            if (gi !== null) { _egTrackChainRecentGi(gi, criteria.recentWindow); return gi; }
+        }
+
+        // Neither source had this bucket — take any puzzle instead.
+        console.warn('EG chain: size bucket unsatisfiable, using any puzzle:', bucket);
+        return _egPickStoryChainPuzzleGi(criteria);
+    }
+
+    // ── Legacy pull (no size mix): old behaviour ────────────────────
+    if (criteria.generated) {
+        const gi = generate({
+            mode: criteria.genMode,
+            tier: criteria.genTier,
+            minCells: criteria.minCells,
+        });
+        if (gi !== null) { _egTrackChainRecentGi(gi, criteria.recentWindow); return gi; }
+        console.warn('EG chain: puzzle generation failed, falling back to story pool');
+    }
+
+    return _egPickStoryChainPuzzleGi(criteria);
+}
+
 function _egFindNextChainPuzzleGi() {
     const activeDef = _egMapDef || cur;
     const criteria = (activeDef.puzzlePool && typeof activeDef.puzzlePool === 'object')
         ? activeDef.puzzlePool : {};
-    let pool = _egBuildChainPool(criteria);
 
-    // A map's "% larger Puzzle Grids" mod can floor the cell count so high
-    // that no story puzzle qualifies — relax the size filter as a fallback
-    // so the chain never stalls.
-    if (pool.length === 0 && (criteria.minCells != null || criteria.maxCells != null)) {
-        const relaxed = { ...criteria, minCells: null, maxCells: null };
-        pool = _egBuildChainPool(relaxed);
-    }
-
-    if (pool.length === 0) { console.warn('EG chain: no puzzles matched criteria', criteria); return null; }
-    return _egPickFromPool(pool, criteria.recentWindow);
+    return _egPickMapRunPuzzleGi(criteria);
 }
 
 

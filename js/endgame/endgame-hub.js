@@ -319,6 +319,7 @@ function _egBuildHubInfoTooltipHTML() {
         ${line('eg_hub_info_quickmove')}
         ${line('eg_hub_info_sell')}
         ${line('eg_hub_info_currency')}
+        ${line('eg_hub_info_essence')}
         ${line('eg_hub_info_destroy')}
     </div>
 </div>`;
@@ -341,7 +342,8 @@ function _egHideHubInfoTooltip() {
 }
 
 // Assembles the complete hub screen layout:
-// topbar → character panel → runes & orbs strip → stash.
+// topbar → character panel (left) + essence tab (right) → runes & orbs
+// strip → stash.
 // The item tooltip is a floating mouseover tooltip (no dedicated panel),
 // and the probability gate / map device lives on its own screen.
 function _egBuildFullScreenHTML() {
@@ -349,8 +351,13 @@ function _egBuildFullScreenHTML() {
 <div class="eg-hub-layout">
     ${_egBuildTopbarHTML()}
     <div class="eg-body">
-        <div class="eg-char-wrap">
-            ${_egBuildCharPanelHTML()}
+        <div class="eg-upper-row">
+            <div class="eg-char-wrap">
+                ${_egBuildCharPanelHTML()}
+            </div>
+            <div class="eg-essence-col">
+                ${typeof _egBuildEssenceTabHTML === 'function' ? _egBuildEssenceTabHTML() : ''}
+            </div>
         </div>
         ${_egBuildCurrencyStripHTML()}
         ${_egBuildStashPanelHTML()}
@@ -585,6 +592,7 @@ function _egRenderAll() {
     _egRenderInventory();
     _egRenderMapSlot();
     _egRenderCurrencyStash();
+    _egRenderEssenceStash();
     _egRenderMapStash();
     _egUpdateInvCount();
     _egRenderStatsList();
@@ -744,7 +752,9 @@ function _egBuildTooltipBodyHTML(item) {
 <div class="eg-tt-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
         <div class="eg-tt-icon">${item.icon || '📦'}</div>
-        <div class="eg-tt-name" style="color:${rc.color};">${item.baseName || item.name || '???'}</div>
+        <div class="eg-tt-name" style="color:${rc.color};">${item.name || item.baseName || '???'}</div>
+        ${(item.baseName && item.baseName !== item.name)
+            ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
         <div class="eg-tt-rarity-line" style="color:${rc.color};">${rarityLabel} ${slotLabel}</div>
     </div>
     ${implicitHTML}
@@ -963,6 +973,7 @@ function egSaveHubState() {
     STATE.egInventory = _egInventory;
     STATE.egMapStash = _egMapStash;
     STATE.egCurrencyStash = _egCurrencyStash;
+    STATE.egEssenceStash = _egEssenceStash;
     STATE.egMapSlotItem = _egMapSlotItem;
     save();
 }
@@ -974,6 +985,26 @@ function _egLoadHubState() {
     _egInventory = STATE.egInventory || Array.from({ length: EG_INV_ROWS }, () => Array(EG_INV_COLS).fill(null));
     _egMapStash = STATE.egMapStash || Array.from({ length: EG_MAP_STASH_ROWS }, () => Array(EG_MAP_STASH_COLS).fill(null));
     _egCurrencyStash = STATE.egCurrencyStash || Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
+    // EG_ESSENCE_ROWS/COLS are defined in endgame-essences.js which loads
+    // after this file — guard so first-load initialisation never throws.
+    // The stash is always normalised to the CURRENT grid dimensions: saves
+    // created with an older (smaller) essence tab would otherwise leave
+    // rows/cols undefined and crash the essence renderer.
+    {
+        const essR = typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 6;
+        const essC = typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8;
+        const freshEssGrid = Array.from({ length: essR }, () => Array(essC).fill(null));
+        const savedEssGrid = STATE.egEssenceStash;
+        if (Array.isArray(savedEssGrid)) {
+            for (let r = 0; r < Math.min(essR, savedEssGrid.length); r++) {
+                if (!Array.isArray(savedEssGrid[r])) continue;
+                for (let c = 0; c < Math.min(essC, savedEssGrid[r].length); c++) {
+                    freshEssGrid[r][c] = savedEssGrid[r][c] || null;
+                }
+            }
+        }
+        _egEssenceStash = freshEssGrid;
+    }
     _egMapSlotItem = STATE.egMapSlotItem || null;
 }
 

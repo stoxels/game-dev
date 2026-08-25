@@ -119,7 +119,7 @@ Layout Architecture:
         box-shadow: 0 0 8px rgba(200, 168, 75, 0.4);
     }
 
-/* ── BODY: compact character panel + currency strip + stash ── */
+/* ── BODY: character panel + essence tab row, currency strip + stash ── */
 .eg-body {
     flex: 1;
     display: flex;
@@ -127,6 +127,57 @@ Layout Architecture:
     overflow: hidden;
     min-height: 0;
 }
+
+/* Upper row: character sheet, with the essence tab floating on the right.
+   The essence tab is absolutely positioned so it does NOT take part in the
+   flex layout — the character wrap fills the full row and keeps the sheet
+   centered across the whole body width. */
+.eg-upper-row {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    overflow: visible;
+    min-height: 0;
+}
+
+    .eg-upper-row .eg-char-wrap {
+        flex: 1;
+        min-width: 0;
+    }
+
+/* ── RIGHT COLUMN: ESSENCE TAB ── */
+.eg-essence-col {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    width: clamp(190px, 20vw, 280px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.35);
+}
+
+.eg-panel-essence {
+    flex: 1;
+    overflow-y: auto;
+    border-right: none;
+}
+
+.eg-essence-grid {
+    display: grid;
+    gap: 2px;
+    padding: 4px;
+    align-content: start;
+}
+
+    .eg-essence-grid .eg-inv-cell {
+        min-height: 22px;
+    }
 
 /* Centers and constrains the character panel so the hub reads as a
    compact screen rather than a full-width sheet. */

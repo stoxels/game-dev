@@ -1338,3 +1338,70 @@ body.eg-cursor-shocked .gc {
     from { opacity: 0.45; }
     to   { opacity: 0.9; }
 }
+
+/* ── Hit burst on creature impact (melee + projectiles) ──────────────── */
+.eg-hit-burst {
+    position: fixed;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 500;
+}
+
+.eg-hit-ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    border: 3px solid var(--eg-hit-color, #ffffff);
+    opacity: 0.9;
+    animation: eg-hit-ring-expand 0.55s ease-out forwards;
+}
+
+@keyframes eg-hit-ring-expand {
+    0% {
+        transform: scale(0.4);
+        opacity: 0.95;
+    }
+
+    70% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(5);
+        opacity: 0;
+    }
+}
+
+.eg-hit-spark {
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--eg-hit-color, #ffffff);
+    box-shadow: 0 0 10px var(--eg-hit-color, #ffffff);
+    animation: eg-hit-spark-fly 0.65s ease-out forwards;
+}
+
+@keyframes eg-hit-spark-fly {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    60% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translate(var(--spark-dx, 24px), var(--spark-dy, 0px)) scale(0.2);
+        opacity: 0;
+    }
+}
+}

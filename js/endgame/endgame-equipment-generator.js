@@ -350,14 +350,155 @@ function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defenses) {
 //-------------------ITEM NAME BUILDER------------------------------------
 //------------------------------------------------------------------------
 // common   → base name only
-// uncommon → first mod label word prepended or appended
-// rare/epic → "(first prefix label-word) BaseName (first suffix label-word)"
+// uncommon → proper-language affix naming (see below)
+// rare/epic→ random two-word name from EG_RARE_NAME_WORDS_* (PoE-style);
+//            the base type stays visible via .baseName on the item
 //
-// Because your mod entries have no separate display name we derive a short
-// descriptor from the familyId by converting underscores to spaces and
-// title-casing, e.g. "flat_health" → "Health", "fire_resist" → "Fire Resist".
-// EG_MOD_NAME_WORDS (endgame-mod-tables.js) provides localized words:
-//   [enWord, dePrefixWord, deGenitiveSuffix]
+// Uncommon items use EG_MOD_NAME_WORDS (endgame-mod-tables.js), which
+// provides grammatical name parts per mod family:
+//   [enAdjective, enOfPhrase, deGenitive]
+// EN: adjective before the noun + "of ..." after it
+//     e.g. "Healthy Leather Cap of Vitality"
+// DE: genitive post-position instead of inflected adjectives
+//     e.g. "Lederkappe des Lebens und der Rüstung"
+
+function _egModNameEntry(familyId) {
+    return (typeof EG_MOD_NAME_WORDS !== 'undefined') ? EG_MOD_NAME_WORDS[familyId] : null;
+}
+
+// Fallback when a family has no dictionary entry: title-case the familyId,
+// stripping generic segments ("flat_hybrid_map").
+function _egModFallbackWord(familyId) {
+    return familyId
+        .split('_')
+        .filter(w => !['flat', 'inc', 'hybrid', 'map'].includes(w))
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+}
+
+// EN adjective for the prefix position, e.g. "Healthy".
+function _egModAdjective(familyId) {
+    const entry = _egModNameEntry(familyId);
+    return entry ? entry[0] : _egModFallbackWord(familyId);
+}
+
+// EN "of ..." phrase for the suffix position, e.g. "of Vitality".
+function _egModOfPhrase(familyId) {
+    const entry = _egModNameEntry(familyId);
+    return entry ? entry[1] : 'of ' + _egModFallbackWord(familyId);
+}
+
+// DE genitive post-position phrase, e.g. "des Lebens" / "der Rüstung".
+function _egModDeGenitive(familyId) {
+    const entry = _egModNameEntry(familyId);
+    return entry ? entry[2] : 'des ' + _egModFallbackWord(familyId);
+}
+
+function _egBuildItemName(baseName, rarity, mods) {
+    if (rarity === 'common' || mods.length === 0) return baseName;
+
+    // rare/epic: PoE-style random two-word name ("Doom Bane").
+    if (rarity === 'rare' || rarity === 'epic') return _egPickRareItemName();
+
+    const prefixes = mods.filter(m => m.type === 'prefix');
+    const suffixes = mods.filter(m => m.type === 'suffix');
+    const pre = prefixes.length > 0 ? prefixes[0].familyId : null;
+    const suf = suffixes.length > 0 ? suffixes[0].familyId : null;
+    if (!pre && !suf) return baseName;
+
+    if (LANG === 'de') {
+        // German puts descriptors after the noun: "Lederkappe des Lebens".
+        // With both affixes they are joined: "... des Lebens und des Feuers".
+        const parts = [];
+        if (pre) parts.push(_egModDeGenitive(pre));
+        if (suf) parts.push(_egModDeGenitive(suf));
+        return `${baseName} ${parts.join(' und ')}`;
+    }
+
+    const preStr = pre ? _egModAdjective(pre) + ' ' : '';
+    const sufStr = suf ? ' ' + _egModOfPhrase(suf) : '';
+    return `${preStr}${baseName}${sufStr}`.trim();
+}
+
+
+//------------------------------------------------------------------------
+//-------------------RARE NAME DICTIONARIES-------------------------------
+//------------------------------------------------------------------------
+// PoE-style random names for rare/epic items: a word from the FIRST pool
+// combined with a word from the SECOND pool, e.g. "Doom Bane".
+// Each entry is [englishWord, germanWord]. The base type is still shown
+// separately via .baseName, exactly like PoE handles rare names.
+
+const EG_RARE_NAME_WORDS_FIRST = [
+    ['Blood', 'Blut'],
+    ['Storm', 'Sturm'],
+    ['Ash', 'Asche'],
+    ['Frost', 'Frost'],
+    ['Doom', 'Verderben'],
+    ['Grim', 'Grimm'],
+    ['Shadow', 'Schatten'],
+    ['Ember', 'Glut'],
+    ['Thorn', 'Dorn'],
+    ['Raven', 'Rabe'],
+    ['Wolf', 'Wolf'],
+    ['Iron', 'Eisen'],
+    ['Bone', 'Knochen'],
+    ['Mist', 'Nebel'],
+    ['Sun', 'Sonne'],
+    ['Moon', 'Mond'],
+    ['Serpent', 'Schlange'],
+    ['Veil', 'Schleier'],
+    ['Hollow', 'Hohl'],
+    ['Sorrow', 'Kummer'],
+    ['Wrath', 'Zorn'],
+    ['Gloom', 'Düster'],
+    ['Pyre', 'Scheiterhaufen'],
+    ['Wraith', 'Geist'],
+    ['Dread', 'Schrecken'],
+    ['Onyx', 'Onyx'],
+    ['Crimson', 'Purpur'],
+    ['Pale', 'Blass'],
+    ['Silent', 'Still'],
+];
+const EG_RARE_NAME_WORDS_SECOND = [
+    ['Bane', 'Fluch'],
+    ['Song', 'Lied'],
+    ['Grip', 'Griff'],
+    ['Brand', 'Mal'],
+    ['Coil', 'Ring'],
+    ['Charm', 'Charm'],
+    ['Whisper', 'Geflüster'],
+    ['Howl', 'Heulen'],
+    ['Seal', 'Siegel'],
+    ['Crown', 'Krone'],
+    ['Heart', 'Herz'],
+    ['Edge', 'Klinge'],
+    ['Call', 'Ruf'],
+    ['Spark', 'Funke'],
+    ['Shroud', 'Leichentuch'],
+    ['Mark', 'Zeichen'],
+    ['Knot', 'Knoten'],
+    ['Wail', 'Klage'],
+    ['Vow', 'Gelübde'],
+    ['Sigil', 'Sigill'],
+    ['Echo', 'Echo'],
+    ['Tide', 'Flut'],
+    ['Veil', 'Vorhang'],
+    ['Bloom', 'Blüte'],
+    ['Spire', 'Turm'],
+    ['Shard', 'Scherbe'],
+    ['Omen', 'Omen'],
+    ['Wake', 'Wogen'],
+    ['Gaze', 'Blick'],
+    ['Maw', 'Rachen'],
+];
+
+function _egPickRareItemName() {
+    const first = EG_RARE_NAME_WORDS_FIRST[Math.floor(Math.random() * EG_RARE_NAME_WORDS_FIRST.length)];
+    const second = EG_RARE_NAME_WORDS_SECOND[Math.floor(Math.random() * EG_RARE_NAME_WORDS_SECOND.length)];
+    return (LANG === 'de') ? `${first[1]} ${second[1]}` : `${first[0]} ${second[0]}`;
+}
+
 
 function _egModNameEntry(familyId) {
     return (typeof EG_MOD_NAME_WORDS !== 'undefined') ? EG_MOD_NAME_WORDS[familyId] : null;
@@ -382,6 +523,9 @@ function _egModSuffixWord(familyId) {
 
 function _egBuildItemName(baseName, rarity, mods) {
     if (rarity === 'common' || mods.length === 0) return baseName;
+
+    // rare/epic: PoE-style random two-word name ("Doom Bane").
+    if (rarity === 'rare' || rarity === 'epic') return _egPickRareItemName();
 
     const prefixes = mods.filter(m => m.type === 'prefix');
     const suffixes = mods.filter(m => m.type === 'suffix');
@@ -428,7 +572,7 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
         baseId: base.id,
         name,
         baseName,
-        icon: EG_SLOT_ICONS[base.slotType] || '📦',
+        icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
 
         category: 'equip',
         slotType: base.slotType,

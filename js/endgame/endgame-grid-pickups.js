@@ -724,13 +724,24 @@ function _egCheckCurrencyDropClaim(row, col) {
     _egRemoveCurrencyDropOverlay(key);
     _egAnimateCurrencyDropClaim(row, col, def);
 
-    const added = egAddCurrency(def.id, 1, {
-        name: def.name,
-        icon: def.icon,
-        rarity: 'currency',
-        category: 'currency',
-        description: def.description,
-    });
+    // Essences are claimed through the same drop pipeline but stack in the
+    // essence tab instead of the runes & orbs strip.
+    const isEssence = def.category === 'essence';
+    const added = isEssence
+        ? egAddEssence(def.id, 1, {
+            name: def.name,
+            icon: def.icon,
+            rarity: 'essence',
+            category: 'essence',
+            description: def.description,
+        })
+        : egAddCurrency(def.id, 1, {
+            name: def.name,
+            icon: def.icon,
+            rarity: 'currency',
+            category: 'currency',
+            description: def.description,
+        });
 
     _egTrackRunCurrency(def);
 

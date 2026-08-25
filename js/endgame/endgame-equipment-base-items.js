@@ -37,7 +37,9 @@
 //------------------------------------------------------------------------
 //-------------------ICONS PER SLOT---------------------------------------
 //------------------------------------------------------------------------
-// Maps each slotType to the emoji used on the grid overlay and in the stash.
+// Maps each slotType to the default emoji used on the grid overlay and in
+// the stash. Individual base types can override this via an `icon` field
+// (e.g. axes get 🪓 instead of the generic sword).
 const EG_SLOT_ICONS = {
     head: '👑',
     earring: '💎',
@@ -243,6 +245,98 @@ const EG_BASE_TYPES_HEAD = [
         requirements: { level: 21, str: 0, agi: 58, int: 58 },
         defenses: { armour: 0, evasion: 108, absorption: 82 },
     },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'helm_str_6', name: 'Ornate Greathelm', nameDe: 'Verzierter Großhelm',
+        archetype: 'strength', slotType: 'head',
+        minLevel: 40,
+        requirements: { level: 40, str: 152, agi: 0, int: 0 },
+        defenses: { armour: 360, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'helm_str_7', name: 'Bulwark Helm', nameDe: 'Bollwerkhelm',
+        archetype: 'strength', slotType: 'head',
+        minLevel: 62,
+        requirements: { level: 62, str: 238, agi: 0, int: 0 },
+        defenses: { armour: 600, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'helm_str_8', name: 'Titan Casque', nameDe: 'Titanenkask',
+        archetype: 'strength', slotType: 'head',
+        minLevel: 88,
+        requirements: { level: 88, str: 338, agi: 0, int: 0 },
+        defenses: { armour: 1000, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'helm_agi_6', name: 'Shadowsewn Hood', nameDe: 'Schattengewirkte Kapuze',
+        archetype: 'agility', slotType: 'head',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 152, int: 0 },
+        defenses: { armour: 0, evasion: 395, absorption: 0 },
+    },
+    {
+        id: 'helm_agi_7', name: 'Windrunner Cowl', nameDe: 'Windläuferkapuze',
+        archetype: 'agility', slotType: 'head',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 238, int: 0 },
+        defenses: { armour: 0, evasion: 660, absorption: 0 },
+    },
+    {
+        id: 'helm_agi_8', name: 'Nightveil Crown', nameDe: 'Nachtschleierkrone',
+        archetype: 'agility', slotType: 'head',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 338, int: 0 },
+        defenses: { armour: 0, evasion: 1100, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'helm_int_6', name: 'Runic Diadem', nameDe: 'Runendiadem',
+        archetype: 'intellect', slotType: 'head',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 152 },
+        defenses: { armour: 0, evasion: 0, absorption: 310 },
+    },
+    {
+        id: 'helm_int_7', name: 'Prophet\'s Circlet', nameDe: 'Reif des Propheten',
+        archetype: 'intellect', slotType: 'head',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 238 },
+        defenses: { armour: 0, evasion: 0, absorption: 520 },
+    },
+    {
+        id: 'helm_int_8', name: 'Archmage Crown', nameDe: 'Erzmagierkrone',
+        archetype: 'intellect', slotType: 'head',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 338 },
+        defenses: { armour: 0, evasion: 0, absorption: 860 },
+    },
+
+    // ── Endgame: Hybrids ──────────────────────────────────────────────
+    {
+        id: 'helm_sa_4', name: 'Raider Warhelm', nameDe: 'Plünderer-Kriegshelm',
+        archetype: 'str_agi', slotType: 'head',
+        minLevel: 60,
+        requirements: { level: 60, str: 166, agi: 166, int: 0 },
+        defenses: { armour: 420, evasion: 420, absorption: 0 },
+    },
+    {
+        id: 'helm_si_4', name: 'Sanctified Helm', nameDe: 'Geweihter Helm',
+        archetype: 'str_int', slotType: 'head',
+        minLevel: 60,
+        requirements: { level: 60, str: 166, agi: 0, int: 166 },
+        defenses: { armour: 400, evasion: 0, absorption: 305 },
+    },
+    {
+        id: 'helm_ai_4', name: 'Aether Hood', nameDe: 'Ätherkapuze',
+        archetype: 'agi_int', slotType: 'head',
+        minLevel: 60,
+        requirements: { level: 60, str: 0, agi: 166, int: 166 },
+        defenses: { armour: 0, evasion: 400, absorption: 305 },
+    },
 ];
 
 
@@ -285,6 +379,20 @@ const EG_BASE_TYPES_EARRING = [
         archetype: 'any', slotType: 'earring',
         minLevel: 30,
         requirements: { level: 30, str: 0, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'earring_6', name: 'Obsidian Stud', nameDe: 'Obsidian-Ohrstecker',
+        archetype: 'any', slotType: 'earring',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'earring_7', name: 'Starlight Hoop', nameDe: 'Sternenlicht-Creole',
+        archetype: 'any', slotType: 'earring',
+        minLevel: 80,
+        requirements: { level: 80, str: 0, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
     },
 ];
@@ -475,6 +583,98 @@ const EG_BASE_TYPES_CHEST = [
         requirements: { level: 24, str: 0, agi: 68, int: 68 },
         defenses: { armour: 0, evasion: 206, absorption: 160 },
     },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'chest_str_6', name: 'Bastion Cuirass', nameDe: 'Bastionkürass',
+        archetype: 'strength', slotType: 'chest',
+        minLevel: 40,
+        requirements: { level: 40, str: 155, agi: 0, int: 0 },
+        defenses: { armour: 700, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'chest_str_7', name: 'Adamant Plate', nameDe: 'Adamantplatte',
+        archetype: 'strength', slotType: 'chest',
+        minLevel: 62,
+        requirements: { level: 62, str: 240, agi: 0, int: 0 },
+        defenses: { armour: 1150, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'chest_str_8', name: 'Colossus Plate', nameDe: 'Kolossplatte',
+        archetype: 'strength', slotType: 'chest',
+        minLevel: 88,
+        requirements: { level: 88, str: 340, agi: 0, int: 0 },
+        defenses: { armour: 1900, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'chest_agi_6', name: 'Nightstalker Leather', nameDe: 'Nachtpirscherlederung',
+        archetype: 'agility', slotType: 'chest',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 155, int: 0 },
+        defenses: { armour: 0, evasion: 780, absorption: 0 },
+    },
+    {
+        id: 'chest_agi_7', name: 'Spectral Jerkin', nameDe: 'Spektralwams',
+        archetype: 'agility', slotType: 'chest',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 240, int: 0 },
+        defenses: { armour: 0, evasion: 1290, absorption: 0 },
+    },
+    {
+        id: 'chest_agi_8', name: 'Voidstalker Garb', nameDe: 'Leerenpirschergewand',
+        archetype: 'agility', slotType: 'chest',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 340, int: 0 },
+        defenses: { armour: 0, evasion: 2100, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'chest_int_6', name: 'Etherweave Robe', nameDe: 'Äthergewebe-Robe',
+        archetype: 'intellect', slotType: 'chest',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 155 },
+        defenses: { armour: 0, evasion: 0, absorption: 640 },
+    },
+    {
+        id: 'chest_int_7', name: 'Celestial Vestment', nameDe: 'Himmelsornat',
+        archetype: 'intellect', slotType: 'chest',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 240 },
+        defenses: { armour: 0, evasion: 0, absorption: 1060 },
+    },
+    {
+        id: 'chest_int_8', name: 'Voidcloth Regalia', nameDe: 'Leerenstoff-Insignien',
+        archetype: 'intellect', slotType: 'chest',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 340 },
+        defenses: { armour: 0, evasion: 0, absorption: 1740 },
+    },
+
+    // ── Endgame: Hybrids ──────────────────────────────────────────────
+    {
+        id: 'chest_sa_4', name: 'Warlord Harness', nameDe: 'Kriegsfürstenharnisch',
+        archetype: 'str_agi', slotType: 'chest',
+        minLevel: 60,
+        requirements: { level: 60, str: 170, agi: 170, int: 0 },
+        defenses: { armour: 800, evasion: 800, absorption: 0 },
+    },
+    {
+        id: 'chest_si_4', name: 'Consecrated Mail', nameDe: 'Geweihter Kettenpanzer',
+        archetype: 'str_int', slotType: 'chest',
+        minLevel: 60,
+        requirements: { level: 60, str: 170, agi: 0, int: 170 },
+        defenses: { armour: 730, evasion: 0, absorption: 570 },
+    },
+    {
+        id: 'chest_ai_4', name: 'Whisperweave Silk', nameDe: 'Flüsterseide',
+        archetype: 'agi_int', slotType: 'chest',
+        minLevel: 60,
+        requirements: { level: 60, str: 0, agi: 170, int: 170 },
+        defenses: { armour: 0, evasion: 730, absorption: 570 },
+    },
 ];
 
 
@@ -619,6 +819,98 @@ const EG_BASE_TYPES_GLOVES = [
         minLevel: 18,
         requirements: { level: 18, str: 0, agi: 38, int: 38 },
         defenses: { armour: 0, evasion: 52, absorption: 42 },
+    },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'gloves_str_5', name: 'Fanged Gauntlets', nameDe: 'Reißzahn-Panzerhandschuhe',
+        archetype: 'strength', slotType: 'gloves',
+        minLevel: 40,
+        requirements: { level: 40, str: 128, agi: 0, int: 0 },
+        defenses: { armour: 230, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'gloves_str_6', name: 'Siege Gauntlets', nameDe: 'Belagerungs-Panzerhandschuhe',
+        archetype: 'strength', slotType: 'gloves',
+        minLevel: 62,
+        requirements: { level: 62, str: 200, agi: 0, int: 0 },
+        defenses: { armour: 380, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'gloves_str_7', name: 'Titan Grips', nameDe: 'Titangriffe',
+        archetype: 'strength', slotType: 'gloves',
+        minLevel: 88,
+        requirements: { level: 88, str: 285, agi: 0, int: 0 },
+        defenses: { armour: 620, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'gloves_agi_5', name: 'Silkshadow Gloves', nameDe: 'Seidenschattenhandschuhe',
+        archetype: 'agility', slotType: 'gloves',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 128, int: 0 },
+        defenses: { armour: 0, evasion: 250, absorption: 0 },
+    },
+    {
+        id: 'gloves_agi_6', name: 'Windstrike Gloves', nameDe: 'Windhieb-Handschuhe',
+        archetype: 'agility', slotType: 'gloves',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 200, int: 0 },
+        defenses: { armour: 0, evasion: 415, absorption: 0 },
+    },
+    {
+        id: 'gloves_agi_7', name: 'Umbral Grips', nameDe: 'Schattengriffe',
+        archetype: 'agility', slotType: 'gloves',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 285, int: 0 },
+        defenses: { armour: 0, evasion: 680, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'gloves_int_5', name: 'Runebound Mitts', nameDe: 'Runengebundene Fäustlinge',
+        archetype: 'intellect', slotType: 'gloves',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 128 },
+        defenses: { armour: 0, evasion: 0, absorption: 185 },
+    },
+    {
+        id: 'gloves_int_6', name: 'Astral Wraps', nameDe: 'Astralwickel',
+        archetype: 'intellect', slotType: 'gloves',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 200 },
+        defenses: { armour: 0, evasion: 0, absorption: 305 },
+    },
+    {
+        id: 'gloves_int_7', name: 'Voidtouched Mitts', nameDe: 'Leerenberührte Fäustlinge',
+        archetype: 'intellect', slotType: 'gloves',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 285 },
+        defenses: { armour: 0, evasion: 0, absorption: 500 },
+    },
+
+    // ── Endgame: Hybrids ──────────────────────────────────────────────
+    {
+        id: 'gloves_sa_3', name: 'Skirmisher Grips', nameDe: 'Plänklergriffe',
+        archetype: 'str_agi', slotType: 'gloves',
+        minLevel: 60,
+        requirements: { level: 60, str: 127, agi: 127, int: 0 },
+        defenses: { armour: 220, evasion: 220, absorption: 0 },
+    },
+    {
+        id: 'gloves_si_3', name: 'Zealot Mittens', nameDe: 'Eiferer-Fäustlinge',
+        archetype: 'str_int', slotType: 'gloves',
+        minLevel: 60,
+        requirements: { level: 60, str: 127, agi: 0, int: 127 },
+        defenses: { armour: 185, evasion: 0, absorption: 150 },
+    },
+    {
+        id: 'gloves_ai_3', name: 'Mystic Grips', nameDe: 'Mystische Griffe',
+        archetype: 'agi_int', slotType: 'gloves',
+        minLevel: 60,
+        requirements: { level: 60, str: 0, agi: 127, int: 127 },
+        defenses: { armour: 0, evasion: 185, absorption: 150 },
     },
 ];
 
@@ -765,6 +1057,98 @@ const EG_BASE_TYPES_BOOTS = [
         requirements: { level: 19, str: 0, agi: 40, int: 40 },
         defenses: { armour: 0, evasion: 62, absorption: 48 },
     },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'boots_str_5', name: 'Juggernaut Sabatons', nameDe: 'Kolossfußschienen',
+        archetype: 'strength', slotType: 'boots',
+        minLevel: 40,
+        requirements: { level: 40, str: 125, agi: 0, int: 0 },
+        defenses: { armour: 240, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'boots_str_6', name: 'Bastion Greaves', nameDe: 'Bastionsbeinschienen',
+        archetype: 'strength', slotType: 'boots',
+        minLevel: 62,
+        requirements: { level: 62, str: 195, agi: 0, int: 0 },
+        defenses: { armour: 400, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'boots_str_7', name: 'Titan Treads', nameDe: 'Titanenschritte',
+        archetype: 'strength', slotType: 'boots',
+        minLevel: 88,
+        requirements: { level: 88, str: 278, agi: 0, int: 0 },
+        defenses: { armour: 660, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'boots_agi_5', name: 'Gale Striders', nameDe: 'Sturmstreiter-Schuhe',
+        archetype: 'agility', slotType: 'boots',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 125, int: 0 },
+        defenses: { armour: 0, evasion: 260, absorption: 0 },
+    },
+    {
+        id: 'boots_agi_6', name: 'Panther Treads', nameDe: 'Panterschritte',
+        archetype: 'agility', slotType: 'boots',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 195, int: 0 },
+        defenses: { armour: 0, evasion: 430, absorption: 0 },
+    },
+    {
+        id: 'boots_agi_7', name: 'Nightstalker Boots', nameDe: 'Nachtpirscherstiefel',
+        archetype: 'agility', slotType: 'boots',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 278, int: 0 },
+        defenses: { armour: 0, evasion: 710, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'boots_int_5', name: 'Aetherwalk Slippers', nameDe: 'Ätherwandler-Pantoffeln',
+        archetype: 'intellect', slotType: 'boots',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 125 },
+        defenses: { armour: 0, evasion: 0, absorption: 190 },
+    },
+    {
+        id: 'boots_int_6', name: 'Starcaller Boots', nameDe: 'Sternenruferstiefel',
+        archetype: 'intellect', slotType: 'boots',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 195 },
+        defenses: { armour: 0, evasion: 0, absorption: 315 },
+    },
+    {
+        id: 'boots_int_7', name: 'Voidwalker Treads', nameDe: 'Leerenwandlerschritte',
+        archetype: 'intellect', slotType: 'boots',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 278 },
+        defenses: { armour: 0, evasion: 0, absorption: 520 },
+    },
+
+    // ── Endgame: Hybrids ──────────────────────────────────────────────
+    {
+        id: 'boots_sa_3', name: 'Skirmisher Boots', nameDe: 'Plänklerstiefel',
+        archetype: 'str_agi', slotType: 'boots',
+        minLevel: 60,
+        requirements: { level: 60, str: 127, agi: 127, int: 0 },
+        defenses: { armour: 220, evasion: 220, absorption: 0 },
+    },
+    {
+        id: 'boots_si_3', name: 'Templar Greaves', nameDe: 'Templerbeinschienen',
+        archetype: 'str_int', slotType: 'boots',
+        minLevel: 60,
+        requirements: { level: 60, str: 127, agi: 0, int: 127 },
+        defenses: { armour: 185, evasion: 0, absorption: 145 },
+    },
+    {
+        id: 'boots_ai_3', name: 'Nomad Wraps', nameDe: 'Nomadenwickel',
+        archetype: 'agi_int', slotType: 'boots',
+        minLevel: 60,
+        requirements: { level: 60, str: 0, agi: 127, int: 127 },
+        defenses: { armour: 0, evasion: 185, absorption: 145 },
+    },
 ];
 
 
@@ -910,6 +1294,98 @@ const EG_BASE_TYPES_BELT = [
         requirements: { level: 22, str: 0, agi: 44, int: 44 },
         defenses: { armour: 0, evasion: 40, absorption: 32 },
     },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'belt_str_5', name: 'Warlord Girdle', nameDe: 'Kriegsfürstengürtel',
+        archetype: 'strength', slotType: 'belt',
+        minLevel: 40,
+        requirements: { level: 40, str: 118, agi: 0, int: 0 },
+        defenses: { armour: 178, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'belt_str_6', name: 'Fortress Waistguard', nameDe: 'Festungshüftschutz',
+        archetype: 'strength', slotType: 'belt',
+        minLevel: 62,
+        requirements: { level: 62, str: 182, agi: 0, int: 0 },
+        defenses: { armour: 295, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'belt_str_7', name: 'Titan Girdle', nameDe: 'Titanengürtel',
+        archetype: 'strength', slotType: 'belt',
+        minLevel: 88,
+        requirements: { level: 88, str: 260, agi: 0, int: 0 },
+        defenses: { armour: 485, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'belt_agi_5', name: 'Serpent Sash', nameDe: 'Schlangenscharpe',
+        archetype: 'agility', slotType: 'belt',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 118, int: 0 },
+        defenses: { armour: 0, evasion: 198, absorption: 0 },
+    },
+    {
+        id: 'belt_agi_6', name: 'Zephyr Cord', nameDe: 'Zephyrschnur',
+        archetype: 'agility', slotType: 'belt',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 182, int: 0 },
+        defenses: { armour: 0, evasion: 330, absorption: 0 },
+    },
+    {
+        id: 'belt_agi_7', name: 'Umbral Sash', nameDe: 'Umbrascharpe',
+        archetype: 'agility', slotType: 'belt',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 260, int: 0 },
+        defenses: { armour: 0, evasion: 540, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'belt_int_5', name: 'Sigil Cinch', nameDe: 'Sigillen-Kordel',
+        archetype: 'intellect', slotType: 'belt',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 118 },
+        defenses: { armour: 0, evasion: 0, absorption: 143 },
+    },
+    {
+        id: 'belt_int_6', name: 'Comet Cord', nameDe: 'Kometenschnur',
+        archetype: 'intellect', slotType: 'belt',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 182 },
+        defenses: { armour: 0, evasion: 0, absorption: 238 },
+    },
+    {
+        id: 'belt_int_7', name: 'Voidbind Sash', nameDe: 'Leerenbandscharpe',
+        archetype: 'intellect', slotType: 'belt',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 260 },
+        defenses: { armour: 0, evasion: 0, absorption: 390 },
+    },
+
+    // ── Endgame: Hybrids ──────────────────────────────────────────────
+    {
+        id: 'belt_sa_3', name: 'Warmonger Belt', nameDe: 'Kriegstreiber-Gürtel',
+        archetype: 'str_agi', slotType: 'belt',
+        minLevel: 60,
+        requirements: { level: 60, str: 120, agi: 120, int: 0 },
+        defenses: { armour: 142, evasion: 142, absorption: 0 },
+    },
+    {
+        id: 'belt_si_3', name: 'Inquisitor Belt', nameDe: 'Inquisitorgürtel',
+        archetype: 'str_int', slotType: 'belt',
+        minLevel: 60,
+        requirements: { level: 60, str: 120, agi: 0, int: 120 },
+        defenses: { armour: 119, evasion: 0, absorption: 95 },
+    },
+    {
+        id: 'belt_ai_3', name: 'Oracle Cord', nameDe: 'Orakelschnur',
+        archetype: 'agi_int', slotType: 'belt',
+        minLevel: 60,
+        requirements: { level: 60, str: 0, agi: 120, int: 120 },
+        defenses: { armour: 0, evasion: 119, absorption: 95 },
+    },
 ];
 
 
@@ -925,7 +1401,7 @@ const EG_BASE_TYPES_WEAPON = [
     // ── One-Handed Melee (slotType: weapon) ───────────────────────────
     {
         id: 'wpn_1h_1', name: 'Rusted Sword', nameDe: 'Rostiges Schwert',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
         minLevel: 1,
         requirements: { level: 1, str: 14, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -933,7 +1409,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_1h_2', name: 'Hand Axe', nameDe: 'Handaxt',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'weapon', icon: '🪓',
         minLevel: 4,
         requirements: { level: 4, str: 28, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -941,7 +1417,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_1h_3', name: 'War Sword', nameDe: 'Kriegsschwert',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
         minLevel: 10,
         requirements: { level: 10, str: 50, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -949,7 +1425,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_1h_4', name: 'Gladius', nameDe: 'Gladius',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
         minLevel: 19,
         requirements: { level: 19, str: 76, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -957,7 +1433,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_1h_5', name: 'Eternal Sword', nameDe: 'Ewiges Schwert',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
         minLevel: 29,
         requirements: { level: 29, str: 110, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -967,7 +1443,7 @@ const EG_BASE_TYPES_WEAPON = [
     // ── Agility Melee (fast, lower damage) ────────────────────────────
     {
         id: 'wpn_agi_1', name: 'Worn Dagger', nameDe: 'Abgenutzter Dolch',
-        archetype: 'agility', slotType: 'weapon',
+        archetype: 'agility', slotType: 'weapon', icon: '🗡️',
         minLevel: 1,
         requirements: { level: 1, str: 0, agi: 14, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -975,7 +1451,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_agi_2', name: 'Baselard', nameDe: 'Baselard',
-        archetype: 'agility', slotType: 'weapon',
+        archetype: 'agility', slotType: 'weapon', icon: '🗡️',
         minLevel: 5,
         requirements: { level: 5, str: 0, agi: 28, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -983,7 +1459,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_agi_3', name: 'Rapier', nameDe: 'Rapier',
-        archetype: 'agility', slotType: 'weapon',
+        archetype: 'agility', slotType: 'weapon', icon: '🗡️',
         minLevel: 12,
         requirements: { level: 12, str: 0, agi: 52, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -991,7 +1467,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_agi_4', name: 'Stiletto', nameDe: 'Stiletto',
-        archetype: 'agility', slotType: 'weapon',
+        archetype: 'agility', slotType: 'weapon', icon: '🗡️',
         minLevel: 22,
         requirements: { level: 22, str: 0, agi: 80, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -1001,7 +1477,7 @@ const EG_BASE_TYPES_WEAPON = [
     // ── Intellect (Wands / Staves) ────────────────────────────────────
     {
         id: 'wpn_int_1', name: 'Carved Wand', nameDe: 'Geschnitzter Zauberstab',
-        archetype: 'intellect', slotType: 'weapon',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
         minLevel: 1,
         requirements: { level: 1, str: 0, agi: 0, int: 14 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -1009,7 +1485,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_int_2', name: 'Gnarled Staff', nameDe: 'Knorriger Stab',
-        archetype: 'intellect', slotType: 'weapon',
+        archetype: 'intellect', slotType: 'weapon', icon: '🦯',
         minLevel: 5,
         requirements: { level: 5, str: 0, agi: 0, int: 28 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -1017,7 +1493,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_int_3', name: 'Bronze Sceptre', nameDe: 'Bronzepter',
-        archetype: 'intellect', slotType: 'weapon',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
         minLevel: 12,
         requirements: { level: 12, str: 0, agi: 0, int: 52 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -1025,7 +1501,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_int_4', name: 'Elder Staff', nameDe: 'Stab der Ältesten',
-        archetype: 'intellect', slotType: 'weapon',
+        archetype: 'intellect', slotType: 'weapon', icon: '🦯',
         minLevel: 22,
         requirements: { level: 22, str: 0, agi: 0, int: 80 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -1035,7 +1511,7 @@ const EG_BASE_TYPES_WEAPON = [
     // ── Two-Handed (high damage, slow) ────────────────────────────────
     {
         id: 'wpn_2h_1', name: 'Greatsword', nameDe: 'Zweihänder',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
         minLevel: 6,
         requirements: { level: 6, str: 36, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -1043,7 +1519,7 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_2h_2', name: 'Great Maul', nameDe: 'Kriegshammer',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'weapon', icon: '🔨',
         minLevel: 15,
         requirements: { level: 15, str: 64, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
@@ -1051,11 +1527,107 @@ const EG_BASE_TYPES_WEAPON = [
     },
     {
         id: 'wpn_2h_3', name: 'Great Axe', nameDe: 'Kriegsaxt',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'weapon', icon: '🪓',
         minLevel: 26,
         requirements: { level: 26, str: 102, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
         damage: { min: 98, max: 220 }, attacksPerSecond: 0.8,
+    },
+
+    // ── Endgame: One-Handed Melee ─────────────────────────────────────
+    {
+        id: 'wpn_1h_6', name: 'Blade of Ruin', nameDe: 'Klinge des Verderbens',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
+        minLevel: 40,
+        requirements: { level: 40, str: 152, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 150, max: 305 }, attacksPerSecond: 1.2,
+    },
+    {
+        id: 'wpn_1h_7', name: 'Kingslayer', nameDe: 'Königsmörder',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
+        minLevel: 62,
+        requirements: { level: 62, str: 235, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 232, max: 470 }, attacksPerSecond: 1.15,
+    },
+    {
+        id: 'wpn_1h_8', name: 'Godforged Blade', nameDe: 'Gottgeschmiedete Klinge',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
+        minLevel: 88,
+        requirements: { level: 88, str: 335, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 355, max: 720 }, attacksPerSecond: 1.1,
+    },
+
+    // ── Endgame: Agility Melee ────────────────────────────────────────
+    {
+        id: 'wpn_agi_5', name: 'Misericorde', nameDe: 'Misericorde',
+        archetype: 'agility', slotType: 'weapon', icon: '🗡️',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 146, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 72, max: 140 }, attacksPerSecond: 1.7,
+    },
+    {
+        id: 'wpn_agi_6', name: 'Nightfang', nameDe: 'Nachtreißzahn',
+        archetype: 'agility', slotType: 'weapon', icon: '🗡️',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 226, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 112, max: 215 }, attacksPerSecond: 1.65,
+    },
+    {
+        id: 'wpn_agi_7', name: 'Heartseeker', nameDe: 'Herzenssucher',
+        archetype: 'agility', slotType: 'weapon', icon: '🗡️',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 322, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 172, max: 330 }, attacksPerSecond: 1.6,
+    },
+
+    // ── Endgame: Wands / Staves ───────────────────────────────────────
+    {
+        id: 'wpn_int_5', name: 'Archon Wand', nameDe: 'Arkonszauberstab',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 146 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 95, max: 190 }, attacksPerSecond: 1.2,
+    },
+    {
+        id: 'wpn_int_6', name: 'Void Sceptre', nameDe: 'Leerenzepter',
+        archetype: 'intellect', slotType: 'weapon', icon: '🪄',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 226 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 148, max: 295 }, attacksPerSecond: 1.15,
+    },
+    {
+        id: 'wpn_int_7', name: 'Staff of Eternity', nameDe: 'Stab der Ewigkeit',
+        archetype: 'intellect', slotType: 'weapon', icon: '🦯',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 322 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 228, max: 455 }, attacksPerSecond: 1.1,
+    },
+
+    // ── Endgame: Two-Handed ───────────────────────────────────────────
+    {
+        id: 'wpn_2h_4', name: 'Executioner Greatsword', nameDe: 'Henkerszweihänder',
+        archetype: 'strength', slotType: 'weapon', icon: '⚔️',
+        minLevel: 50,
+        requirements: { level: 50, str: 196, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 175, max: 390 }, attacksPerSecond: 0.8,
+    },
+    {
+        id: 'wpn_2h_5', name: 'Worldsplitter', nameDe: 'Weltenspalter',
+        archetype: 'strength', slotType: 'weapon', icon: '🪓',
+        minLevel: 85,
+        requirements: { level: 85, str: 334, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 320, max: 720 }, attacksPerSecond: 0.75,
     },
 ];
 
@@ -1132,6 +1704,58 @@ const EG_BASE_TYPES_SHIELD = [
         defenses: { armour: 0, evasion: 0, absorption: 156 },
         blockChance: 26,
     },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'shield_str_5', name: 'Bastion Shield', nameDe: 'Bastionsschild',
+        archetype: 'strength', slotType: 'shield',
+        minLevel: 40,
+        requirements: { level: 40, str: 138, agi: 0, int: 0 },
+        defenses: { armour: 330, evasion: 0, absorption: 0 },
+        blockChance: 32,
+    },
+    {
+        id: 'shield_str_6', name: 'Citadel Tower Shield', nameDe: 'Zitadellenturmschild',
+        archetype: 'strength', slotType: 'shield',
+        minLevel: 62,
+        requirements: { level: 62, str: 214, agi: 0, int: 0 },
+        defenses: { armour: 550, evasion: 0, absorption: 0 },
+        blockChance: 34,
+    },
+    {
+        id: 'shield_str_7', name: 'Immovable Aegis', nameDe: 'Unbewegliche Ägis',
+        archetype: 'strength', slotType: 'shield',
+        minLevel: 88,
+        requirements: { level: 88, str: 303, agi: 0, int: 0 },
+        defenses: { armour: 900, evasion: 0, absorption: 0 },
+        blockChance: 36,
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'shield_int_5', name: 'Runic Spirit Shield', nameDe: 'Runen-Geisterschild',
+        archetype: 'intellect', slotType: 'shield',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 138 },
+        defenses: { armour: 0, evasion: 0, absorption: 270 },
+        blockChance: 28,
+    },
+    {
+        id: 'shield_int_6', name: 'Astral Ward', nameDe: 'Astralschild',
+        archetype: 'intellect', slotType: 'shield',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 214 },
+        defenses: { armour: 0, evasion: 0, absorption: 450 },
+        blockChance: 30,
+    },
+    {
+        id: 'shield_int_7', name: 'Eternity Sphere', nameDe: 'Kugel der Ewigkeit',
+        archetype: 'intellect', slotType: 'shield',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 303 },
+        defenses: { armour: 0, evasion: 0, absorption: 740 },
+        blockChance: 32,
+    },
 ];
 
 
@@ -1178,6 +1802,30 @@ const EG_BASE_TYPES_RANGED = [
         requirements: { level: 30, str: 0, agi: 104, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
         damage: { min: 96, max: 194 }, attacksPerSecond: 1.4,
+    },
+    {
+        id: 'ranged_6', name: 'Hunter\'s Greatbow', nameDe: 'Großbogen des Jägers',
+        archetype: 'agility', slotType: 'ranged',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 139, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 150, max: 300 }, attacksPerSecond: 1.4,
+    },
+    {
+        id: 'ranged_7', name: 'Storm Bow', nameDe: 'Sturmbogen',
+        archetype: 'agility', slotType: 'ranged',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 216, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 232, max: 465 }, attacksPerSecond: 1.35,
+    },
+    {
+        id: 'ranged_8', name: 'Celestial Longbow', nameDe: 'Himmelslangbogen',
+        archetype: 'agility', slotType: 'ranged',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 306, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+        damage: { min: 355, max: 710 }, attacksPerSecond: 1.3,
     },
 ];
 
@@ -1235,6 +1883,27 @@ const EG_BASE_TYPES_RING = [
         requirements: { level: 27, str: 0, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
     },
+    {
+        id: 'ring_8', name: 'Ruby Ring', nameDe: 'Rubinring',
+        archetype: 'strength', slotType: 'ring',
+        minLevel: 45,
+        requirements: { level: 45, str: 120, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'ring_9', name: 'Emerald Ring', nameDe: 'Smaragdring',
+        archetype: 'agility', slotType: 'ring',
+        minLevel: 60,
+        requirements: { level: 60, str: 0, agi: 160, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'ring_10', name: 'Voidstone Ring', nameDe: 'Leerensteinring',
+        archetype: 'any', slotType: 'ring',
+        minLevel: 90,
+        requirements: { level: 90, str: 0, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
 ];
 
 
@@ -1282,6 +1951,27 @@ const EG_BASE_TYPES_AMULET = [
         archetype: 'any', slotType: 'amulet',
         minLevel: 30,
         requirements: { level: 30, str: 0, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'amulet_7', name: 'Opal Amulet', nameDe: 'Opal-Amulett',
+        archetype: 'any', slotType: 'amulet',
+        minLevel: 45,
+        requirements: { level: 45, str: 0, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'amulet_8', name: 'Phoenix Amulet', nameDe: 'Phönix-Amulett',
+        archetype: 'strength', slotType: 'amulet',
+        minLevel: 60,
+        requirements: { level: 60, str: 160, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'amulet_9', name: 'Eclipse Amulet', nameDe: 'Finsternis-Amulett',
+        archetype: 'any', slotType: 'amulet',
+        minLevel: 90,
+        requirements: { level: 90, str: 0, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
     },
 ];
@@ -1381,6 +2071,75 @@ const EG_BASE_TYPES_PANTS = [
         requirements: { level: 26, str: 0, agi: 0, int: 100 },
         defenses: { armour: 0, evasion: 0, absorption: 260 },
     },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'pants_str_5', name: 'Warlord Legplates', nameDe: 'Kriegsfürstenbeinplatten',
+        archetype: 'strength', slotType: 'pants',
+        minLevel: 40,
+        requirements: { level: 40, str: 155, agi: 0, int: 0 },
+        defenses: { armour: 540, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'pants_str_6', name: 'Adamant Chausses', nameDe: 'Adamantbeinlinge',
+        archetype: 'strength', slotType: 'pants',
+        minLevel: 62,
+        requirements: { level: 62, str: 240, agi: 0, int: 0 },
+        defenses: { armour: 900, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'pants_str_7', name: 'Colossus Legguards', nameDe: 'Kolossbeinschutz',
+        archetype: 'strength', slotType: 'pants',
+        minLevel: 88,
+        requirements: { level: 88, str: 340, agi: 0, int: 0 },
+        defenses: { armour: 1480, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'pants_agi_5', name: 'Nightstalker Leggings', nameDe: 'Nachtpirscherleggings',
+        archetype: 'agility', slotType: 'pants',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 155, int: 0 },
+        defenses: { armour: 0, evasion: 590, absorption: 0 },
+    },
+    {
+        id: 'pants_agi_6', name: 'Spectral Legwraps', nameDe: 'Spektralbeinwickel',
+        archetype: 'agility', slotType: 'pants',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 240, int: 0 },
+        defenses: { armour: 0, evasion: 985, absorption: 0 },
+    },
+    {
+        id: 'pants_agi_7', name: 'Voidstalker Trousers', nameDe: 'Leerenpirscherhose',
+        archetype: 'agility', slotType: 'pants',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 340, int: 0 },
+        defenses: { armour: 0, evasion: 1620, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'pants_int_5', name: 'Etherweave Skirt', nameDe: 'Äthergewebe-Rock',
+        archetype: 'intellect', slotType: 'pants',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 155 },
+        defenses: { armour: 0, evasion: 0, absorption: 450 },
+    },
+    {
+        id: 'pants_int_6', name: 'Celestial Pantaloons', nameDe: 'Himmelspluderhose',
+        archetype: 'intellect', slotType: 'pants',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 240 },
+        defenses: { armour: 0, evasion: 0, absorption: 750 },
+    },
+    {
+        id: 'pants_int_7', name: 'Voidcloth Robes', nameDe: 'Leerenstoffroben',
+        archetype: 'intellect', slotType: 'pants',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 340 },
+        defenses: { armour: 0, evasion: 0, absorption: 1230 },
+    },
 ];
 
 //------------------------------------------------------------------------
@@ -1429,6 +2188,54 @@ const EG_BASE_TYPES_SHOULDERS = [
         requirements: { level: 16, str: 0, agi: 0, int: 65 },
         defenses: { armour: 0, evasion: 0, absorption: 90 },
     },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'shoulders_str_3', name: 'Fortress Pauldrons', nameDe: 'Festungspauldrons',
+        archetype: 'strength', slotType: 'shoulders',
+        minLevel: 44,
+        requirements: { level: 44, str: 179, agi: 0, int: 0 },
+        defenses: { armour: 300, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'shoulders_str_4', name: 'Titan Pauldrons', nameDe: 'Titanenpauldrons',
+        archetype: 'strength', slotType: 'shoulders',
+        minLevel: 80,
+        requirements: { level: 80, str: 325, agi: 0, int: 0 },
+        defenses: { armour: 560, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'shoulders_agi_3', name: 'Stormwing Epaulets', nameDe: 'Sturmflügel-Epauletten',
+        archetype: 'agility', slotType: 'shoulders',
+        minLevel: 44,
+        requirements: { level: 44, str: 0, agi: 179, int: 0 },
+        defenses: { armour: 0, evasion: 340, absorption: 0 },
+    },
+    {
+        id: 'shoulders_agi_4', name: 'Nightlord Epaulets', nameDe: 'Nachtfürsten-Epauletten',
+        archetype: 'agility', slotType: 'shoulders',
+        minLevel: 80,
+        requirements: { level: 80, str: 0, agi: 325, int: 0 },
+        defenses: { armour: 0, evasion: 640, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'shoulders_int_3', name: 'Astral Shawl', nameDe: 'Astralschultertuch',
+        archetype: 'intellect', slotType: 'shoulders',
+        minLevel: 44,
+        requirements: { level: 44, str: 0, agi: 0, int: 179 },
+        defenses: { armour: 0, evasion: 0, absorption: 245 },
+    },
+    {
+        id: 'shoulders_int_4', name: 'Starweave Shoulderguards', nameDe: 'Sterngewebe-Schulterschutz',
+        archetype: 'intellect', slotType: 'shoulders',
+        minLevel: 80,
+        requirements: { level: 80, str: 0, agi: 0, int: 325 },
+        defenses: { armour: 0, evasion: 0, absorption: 460 },
+    },
 ];
 
 //------------------------------------------------------------------------
@@ -1469,6 +2276,70 @@ const EG_BASE_TYPES_CLOAK = [
         minLevel: 17,
         requirements: { level: 17, str: 0, agi: 45, int: 45 },
         defenses: { armour: 0, evasion: 70, absorption: 55 },
+    },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'cloak_str_2', name: 'Warlord Cape', nameDe: 'Kriegsfürstenumhang',
+        archetype: 'strength', slotType: 'cloak',
+        minLevel: 44,
+        requirements: { level: 44, str: 135, agi: 0, int: 0 },
+        defenses: { armour: 150, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'cloak_str_3', name: 'Dragonscale Cape', nameDe: 'Drachenschuppenumhang',
+        archetype: 'strength', slotType: 'cloak',
+        minLevel: 80,
+        requirements: { level: 80, str: 245, agi: 0, int: 0 },
+        defenses: { armour: 290, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'cloak_agi_2', name: 'Phantom Cloak', nameDe: 'Phantomumhang',
+        archetype: 'agility', slotType: 'cloak',
+        minLevel: 44,
+        requirements: { level: 44, str: 0, agi: 135, int: 0 },
+        defenses: { armour: 0, evasion: 168, absorption: 0 },
+    },
+    {
+        id: 'cloak_agi_3', name: 'Nightwind Mantle', nameDe: 'Nachtwindmantel',
+        archetype: 'agility', slotType: 'cloak',
+        minLevel: 80,
+        requirements: { level: 80, str: 0, agi: 245, int: 0 },
+        defenses: { armour: 0, evasion: 325, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'cloak_int_2', name: 'Runed Drape', nameDe: 'Runendraperie',
+        archetype: 'intellect', slotType: 'cloak',
+        minLevel: 44,
+        requirements: { level: 44, str: 0, agi: 0, int: 135 },
+        defenses: { armour: 0, evasion: 0, absorption: 132 },
+    },
+    {
+        id: 'cloak_int_3', name: 'Cosmic Drape', nameDe: 'Kosmische Draperie',
+        archetype: 'intellect', slotType: 'cloak',
+        minLevel: 80,
+        requirements: { level: 80, str: 0, agi: 0, int: 245 },
+        defenses: { armour: 0, evasion: 0, absorption: 255 },
+    },
+
+    // ── Endgame: Hybrids ──────────────────────────────────────────────
+    {
+        id: 'cloak_any_3', name: 'Champion Wrap', nameDe: 'Championwickeltuch',
+        archetype: 'str_agi', slotType: 'cloak',
+        minLevel: 60,
+        requirements: { level: 60, str: 159, agi: 159, int: 0 },
+        defenses: { armour: 260, evasion: 260, absorption: 0 },
+    },
+    {
+        id: 'cloak_any_4', name: 'Aurora Cloak', nameDe: 'Auroraumhang',
+        archetype: 'agi_int', slotType: 'cloak',
+        minLevel: 60,
+        requirements: { level: 60, str: 0, agi: 159, int: 159 },
+        defenses: { armour: 0, evasion: 260, absorption: 205 },
     },
 ];
 
@@ -1518,6 +2389,54 @@ const EG_BASE_TYPES_BRACERS = [
         requirements: { level: 20, str: 0, agi: 0, int: 70 },
         defenses: { armour: 0, evasion: 0, absorption: 65 },
     },
+
+    // ── Endgame: Strength ─────────────────────────────────────────────
+    {
+        id: 'bracers_str_3', name: 'Warforge Vambraces', nameDe: 'Kriegsschmiede-Unterarmschienen',
+        archetype: 'strength', slotType: 'bracers',
+        minLevel: 44,
+        requirements: { level: 44, str: 154, agi: 0, int: 0 },
+        defenses: { armour: 185, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'bracers_str_4', name: 'Colossus Vambraces', nameDe: 'Kolossunterarmschienen',
+        archetype: 'strength', slotType: 'bracers',
+        minLevel: 80,
+        requirements: { level: 80, str: 280, agi: 0, int: 0 },
+        defenses: { armour: 350, evasion: 0, absorption: 0 },
+    },
+
+    // ── Endgame: Agility ──────────────────────────────────────────────
+    {
+        id: 'bracers_agi_3', name: 'Serpent Bindings', nameDe: 'Schlangenbindungen',
+        archetype: 'agility', slotType: 'bracers',
+        minLevel: 44,
+        requirements: { level: 44, str: 0, agi: 154, int: 0 },
+        defenses: { armour: 0, evasion: 205, absorption: 0 },
+    },
+    {
+        id: 'bracers_agi_4', name: 'Nightshade Bindings', nameDe: 'Nachtschattenbindungen',
+        archetype: 'agility', slotType: 'bracers',
+        minLevel: 80,
+        requirements: { level: 80, str: 0, agi: 280, int: 0 },
+        defenses: { armour: 0, evasion: 390, absorption: 0 },
+    },
+
+    // ── Endgame: Intellect ────────────────────────────────────────────
+    {
+        id: 'bracers_int_3', name: 'Astral Bracer', nameDe: 'Astral-Armschiene',
+        archetype: 'intellect', slotType: 'bracers',
+        minLevel: 44,
+        requirements: { level: 44, str: 0, agi: 0, int: 154 },
+        defenses: { armour: 0, evasion: 0, absorption: 140 },
+    },
+    {
+        id: 'bracers_int_4', name: 'Cosmic Wristbands', nameDe: 'Kosmische Handgelenkbänder',
+        archetype: 'intellect', slotType: 'bracers',
+        minLevel: 80,
+        requirements: { level: 80, str: 0, agi: 0, int: 280 },
+        defenses: { armour: 0, evasion: 0, absorption: 265 },
+    },
 ];
 
 
@@ -1551,6 +2470,20 @@ const EG_BASE_TYPES_TALISMAN = [
         archetype: 'any', slotType: 'talisman',
         minLevel: 31,
         requirements: { level: 31, str: 0, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'talisman_5', name: 'Serpent Talisman', nameDe: 'Schlangentalisman',
+        archetype: 'any', slotType: 'talisman',
+        minLevel: 45,
+        requirements: { level: 45, str: 0, agi: 0, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 0 },
+    },
+    {
+        id: 'talisman_6', name: 'Idol of Ages', nameDe: 'Götze der Zeitalter',
+        archetype: 'any', slotType: 'talisman',
+        minLevel: 90,
+        requirements: { level: 90, str: 0, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
     },
 ];
@@ -1588,6 +2521,27 @@ const EG_BASE_TYPES_ARCANE = [
         minLevel: 28,
         requirements: { level: 28, str: 0, agi: 0, int: 110 },
         defenses: { armour: 0, evasion: 0, absorption: 180 },
+    },
+    {
+        id: 'arcane_5', name: 'Astrolabe', nameDe: 'Astrolabium',
+        archetype: 'intellect', slotType: 'arcane',
+        minLevel: 40,
+        requirements: { level: 40, str: 0, agi: 0, int: 157 },
+        defenses: { armour: 0, evasion: 0, absorption: 315 },
+    },
+    {
+        id: 'arcane_6', name: 'Astral Orb', nameDe: 'Astralkugel',
+        archetype: 'intellect', slotType: 'arcane',
+        minLevel: 62,
+        requirements: { level: 62, str: 0, agi: 0, int: 244 },
+        defenses: { armour: 0, evasion: 0, absorption: 520 },
+    },
+    {
+        id: 'arcane_7', name: 'Eye of the Void', nameDe: 'Auge der Leere',
+        archetype: 'intellect', slotType: 'arcane',
+        minLevel: 88,
+        requirements: { level: 88, str: 0, agi: 0, int: 347 },
+        defenses: { armour: 0, evasion: 0, absorption: 860 },
     },
 ];
 
@@ -1659,7 +2613,7 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
         id: `${base.id}_${Date.now()}`,
         baseId: base.id,
         name: baseName,
-        icon: EG_SLOT_ICONS[base.slotType] || '📦',
+        icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
         // Classification
         category: 'equip',
         slotType: base.slotType,

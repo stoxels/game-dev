@@ -74,6 +74,17 @@ function _egRerollItemModValues(item, modTable) {
     return { ...item, mods };
 }
 
+// Removes ONE random modifier from an item (Annulment semantics).
+// Rarity is kept untouched, even if fewer mods than the cap remain.
+function _egRemoveOneModFromItem(item) {
+    const existing = item.mods || [];
+    if (existing.length === 0) return item;
+    const index = Math.floor(Math.random() * existing.length);
+    const mods = existing.filter((_, i) => i !== index);
+    const name = _egBuildItemName(item.baseName || item.name, item.rarity, mods);
+    return { ...item, mods, name };
+}
+
 const EG_CURRENCY_DEFS = {
 
     orb_transmutation: {
@@ -204,6 +215,29 @@ const EG_CURRENCY_DEFS = {
         },
     },
 
+    // Common -> random rarity (uncommon/rare/epic), like PoE's Chance Orb.
+    orb_chance: {
+        id: 'orb_chance', name: t('eg_orb_chance'), icon: '🎲',
+        description: t('eg_orb_chance_desc'),
+        canApply(item) { return item.rarity === 'common'; },
+        apply(item) {
+            const roll = Math.random();
+            const rarity = roll < 0.60 ? 'uncommon' : (roll < 0.90 ? 'rare' : 'epic');
+            const { prefixCount, suffixCount } = _egRollModCounts(rarity);
+            return _egRerollItemMods(item, rarity, prefixCount, suffixCount);
+        },
+    },
+
+    // Removes ONE random modifier (rarity is kept).
+    orb_annulment: {
+        id: 'orb_annulment', name: t('eg_orb_annulment'), icon: '✂️',
+        description: t('eg_orb_annulment_desc'),
+        canApply(item) { return (item.mods || []).length > 0; },
+        apply(item) {
+            return _egRemoveOneModFromItem(item);
+        },
+    },
+
     // Creates a copy of an item in the next free inventory slot.
     // The copy is a fully independent item that can be modified further
     // with any other currency.
@@ -226,6 +260,8 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_alteration', weight: 260 },
     { id: 'orb_scouring', weight: 200 },
     { id: 'orb_alchemy', weight: 220 },
+    { id: 'orb_chance', weight: 110 },
+    { id: 'orb_annulment', weight: 40 },
     { id: 'orb_regal', weight: 90 },
     { id: 'orb_chaos', weight: 55 },
     { id: 'orb_divine', weight: 35 },
@@ -493,7 +529,7 @@ document.addEventListener('mousedown', function (e) {
     e.preventDefault();
     e.stopImmediatePropagation();
 
-    const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
+    const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell):not(.eg-essence-cell)');
     const equipSlot = chip.closest('.eg-equip-slot');
     // Map targets: map stash cells and the map device slot (gate screen).
     const mapStashCell = chip.closest('.eg-map-stash-cell');
@@ -561,14 +597,14 @@ function _egShowTooltip(item, e) {
     }
 
     let html;
-    if (item.category === 'currency') {
+    if (item.category === 'currency' || item.category === 'essence') {
         const countLine = item.count > 1 ? ` <span class="eg-tooltip-count">×${item.count}</span>` : '';
         html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
         <div class="eg-tt-icon">${item.icon || '📦'}</div>
         <div class="eg-tt-name" style="color:#f5d98a;">${item.name || '???'}${countLine}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')}</div>
+        <div class="eg-tt-rarity-line" style="color:#b59248;">${item.category === 'essence' ? t('eg_rarity_essence') : t('eg_rarity_currency')}</div>
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc">${item.description || ''}</div></div>
 </div>`;

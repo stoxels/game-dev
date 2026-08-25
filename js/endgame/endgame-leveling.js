@@ -6,7 +6,8 @@
 //     Path-of-Exile-style multiplier: full XP only while the monster is
 //     within a safe level range of the character; beyond that range
 //     (too high OR too low) XP falls off exponentially.
-//   - Each level grants +1 attribute point spendable on Strength /
+//   - Each level grants attrPointsPerLevel (currently 5) attribute points
+//     spendable on Strength /
 //     Agility / Intelligence via the attribute window (✦ button in the
 //     Nexus topbar or the level chip on the character panel).
 //   - Attribute points can be refunded. A refund is verified against the
@@ -80,6 +81,9 @@ const EG_LEVELING_CONFIG = {
     // is still >= hintPoorMultiplier count as "Average XP", anything weaker
     // counts as "Poor XP".
     hintPoorMultiplier: 0.25,
+
+    // Attribute points granted per level gained.
+    attrPointsPerLevel: 5,
 };
 
 // Pristine copy of the base attribute pool from endgame-requirements.js,
@@ -250,7 +254,7 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
         && STATE.playerXP >= _egGetXpForNextLevel(_egGetPlayerLevel())) {
         STATE.playerXP -= _egGetXpForNextLevel(_egGetPlayerLevel());
         STATE.playerLevel++;
-        STATE.egAttrPoints = (STATE.egAttrPoints || 0) + 1;
+        STATE.egAttrPoints = (STATE.egAttrPoints || 0) + c.attrPointsPerLevel;
         levelsGained++;
     }
     if (_egGetPlayerLevel() >= c.maxLevel) STATE.playerXP = 0;

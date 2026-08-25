@@ -33,6 +33,7 @@ const EG_ZONE_CATEGORIES = {
     equip: new Set(['equip']),     // main stash + paperdoll char slots
     map: new Set(['map']),       // map device orb slot + map stash
     currency: new Set(['currency']), // runes & orbs strip
+    essence: new Set(['essence']),   // essence tab grid
 };
 
 // Maps each paperdoll slot id to the item slotType it accepts.
@@ -107,6 +108,8 @@ function _dndZoneAccepts(targetZone) {
     if (itemCat === 'map') return targetZone === 'map' || targetZone === 'mapstash';
     // Currency may only go to the currency stash.
     if (itemCat === 'currency') return targetZone === 'currency';
+    // Essences may only go to the essence tab grid.
+    if (itemCat === 'essence') return targetZone === 'essence';
     return false;
 }
 
@@ -177,6 +180,7 @@ function _dndDestroyGhost() {
 // because they share the eg-inv-cell class.
 function _dndResolvePickupZone(chip) {
     const currencyCell = chip.closest('.eg-currency-cell');
+    const essenceCell = chip.closest('.eg-essence-cell');
     const mapStashCell = chip.closest('.eg-map-stash-cell');
     const equipSlot = chip.closest('.eg-equip-slot');
     const mapSlot = chip.closest('#eg-map-slot');
@@ -188,6 +192,14 @@ function _dndResolvePickupZone(chip) {
             sourceZone: 'currency', sourceRow: r, sourceCol: c, sourceSlot: null,
             item: _egCurrencyStash[r][c],
             clearFn: () => { _egCurrencyStash[r][c] = null; _egRenderCurrencyCell(r, c); }
+        };
+    }
+    if (essenceCell) {
+        const r = +essenceCell.dataset.row, c = +essenceCell.dataset.col;
+        return {
+            sourceZone: 'essence', sourceRow: r, sourceCol: c, sourceSlot: null,
+            item: _egEssenceStash[r][c],
+            clearFn: () => { _egEssenceStash[r][c] = null; _egRenderEssenceCell(r, c); }
         };
     }
     if (mapStashCell) {
@@ -301,6 +313,7 @@ function _dndReturnDisplacedToSource(item) {
     else if (sourceZone === 'equip') { _egEquipped[sourceSlot] = item; _egRenderEquipSlot(sourceSlot); }
     else if (sourceZone === 'map') { _egMapSlotItem = item; _egRenderMapSlot(); }
     else if (sourceZone === 'currency') { _egCurrencyStash[sourceRow][sourceCol] = item; _egRenderCurrencyCell(sourceRow, sourceCol); }
+    else if (sourceZone === 'essence') { _egEssenceStash[sourceRow][sourceCol] = item; _egRenderEssenceCell(sourceRow, sourceCol); }
     else if (sourceZone === 'mapstash') { _egMapStash[sourceRow][sourceCol] = item; _egRenderMapStashCell(sourceRow, sourceCol); }
     else _dndPlaceInFirstFreeSlot(item, _egInventory, _egRenderInventoryCell, EG_INV_ROWS, EG_INV_COLS);
 }
@@ -350,9 +363,11 @@ function _dndDrop(e) {
     }
 
     // Resolve the closest droppable container for each zone type.
-    // Pure inv-cells must exclude the more specific currency and map-stash sub-classes.
-    const invCell = target.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
+    // Pure inv-cells must exclude the more specific currency, essence and
+    // map-stash sub-classes.
+    const invCell = target.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell):not(.eg-essence-cell)');
     const currencyCell = target.closest('.eg-currency-cell');
+    const essenceCell = target.closest('.eg-essence-cell');
     const mapStashCell = target.closest('.eg-map-stash-cell');
     const equipSlotEl = target.closest('.eg-equip-slot');
     const mapSlotEl = target.closest('#eg-map-slot');
@@ -361,6 +376,9 @@ function _dndDrop(e) {
 
     if (currencyCell && _dndZoneAccepts('currency')) {
         dropped = _dndDropOnCurrencyCell(currencyCell);
+
+    } else if (essenceCell && _dndZoneAccepts('essence')) {
+        dropped = _dndDropOnEssenceCell(essenceCell);
 
     } else if (mapStashCell && _dndZoneAccepts('mapstash')) {
         const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
@@ -431,6 +449,26 @@ function _dndDropOnCurrencyCell(currencyCell) {
     } else {
         // Different type or empty cell — normal swap.
         _dndDropOnCell(_egCurrencyStash, _egRenderCurrencyCell, r, c);
+    }
+    return true;
+}
+
+// Handles dropping onto an essence tab cell.
+// If the target already holds the same essence type, the stacks are merged.
+// Otherwise a normal swap is performed.
+// Returns true when the drop was accepted.
+function _dndDropOnEssenceCell(essenceCell) {
+    const r = +essenceCell.dataset.row, c = +essenceCell.dataset.col;
+    const existing = _egEssenceStash[r][c];
+
+    if (existing && existing.id === _dnd.item.id) {
+        // Same essence — merge stack counts. Source cell was already cleared in pick-up.
+        existing.count = (existing.count || 1) + (_dnd.item.count || 1);
+        _egEssenceStash[r][c] = existing;
+        _egRenderEssenceCell(r, c);
+    } else {
+        // Different type or empty cell — normal swap.
+        _dndDropOnCell(_egEssenceStash, _egRenderEssenceCell, r, c);
     }
     return true;
 }
@@ -583,7 +621,7 @@ function _dndHandleRightClick(e) {
     // The chip may move or vanish (quick-equip/unequip) — close its tooltip.
     _egClearTooltip();
 
-    const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
+    const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell):not(.eg-essence-cell)');
     const equipSlot = chip.closest('.eg-equip-slot');
     const mapStashCell = chip.closest('.eg-map-stash-cell');
     const mapSlot = chip.closest('#eg-map-slot');
@@ -795,6 +833,7 @@ function _dndInjectStyles() {
         /* Highlight drop targets while a drag is hovering */
         .eg-inv-cell.eg-dragover,
         .eg-currency-cell.eg-dragover,
+        .eg-essence-cell.eg-dragover,
         .eg-map-stash-cell.eg-dragover,
         .eg-equip-slot.eg-dragover,
         #eg-map-slot.eg-dragover {
