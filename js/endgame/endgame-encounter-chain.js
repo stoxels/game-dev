@@ -344,6 +344,23 @@ function _egRollBonusMapLoot() {
         .replace('{name}', item.name), _egRarityToastColor(item.rarity));
 }
 
+// Shows/hides the bonus-loot chance label under the FILL button in the
+// top-left corner HUD and refreshes its percentage text.
+function _egUpdateBonusLootHUD() {
+    const el = document.getElementById('eg-bonus-loot-chance');
+    if (!el) return;
+
+    if (!_egIsActive()) {
+        el.classList.add('hidden');
+        return;
+    }
+
+    const pct = Math.round(_egGetBonusLootChance() * 100);
+    const val = document.getElementById('eg-bonus-loot-chance-val');
+    if (val) val.textContent = t('eg_bonus_chance').replace('{p}', pct);
+    el.classList.remove('hidden');
+}
+
 // Called only by the Leave Map button after _egCanLeaveMap() returns true.
 // Called only by the Leave Map button after _egCanLeaveMap() returns true.
 function _egEndMap() {
@@ -392,10 +409,12 @@ function _egUpdateObjectivesHUD() {
 
     if (!_egIsActive()) {
         strip.classList.add('eg-hidden');
+        _egUpdateBonusLootHUD();
         return;
     }
 
     strip.classList.remove('eg-hidden');
+    _egUpdateBonusLootHUD();
 
     const req = _egGetMapRequirements();
     const rows = [];
@@ -686,6 +705,9 @@ function _egChainCleanup() {
     // Hide the objectives strip
     const strip = document.getElementById('eg-objectives-strip');
     if (strip) strip.classList.add('eg-hidden');
+
+    // Hide the bonus-loot chance label in the corner HUD
+    _egUpdateBonusLootHUD();
 }
 
 

@@ -278,7 +278,38 @@ function _egBuildTopbarHTML() {
 <div class="eg-topbar">
     <button class="eg-back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('eg_nexus_title')}</span>
+    <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
+         onmouseenter="_egShowHubInfoTooltip(event)"
+         onmousemove="moveGameTooltip(event)"
+         onmouseleave="hideGameTooltip()">?</button>
 </div>`;
+}
+
+
+// Builds the tooltip body shown when hovering the "?" info button in the
+// top-right of the Nexus of Worlds screen. Uses the shared game tooltip
+// engine (tooltips-hud.js) — not the browser title tooltip.
+function _egBuildHubInfoTooltipHTML() {
+    const line = (key) => `<div class="eg-tt-mod">${t(key)}</div>`;
+    return `
+<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon">❓</div>
+        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_hub_info_title')}</div>
+    </div>
+    <div class="eg-tt-section">
+        ${line('eg_hub_info_dragdrop')}
+        ${line('eg_hub_info_compare')}
+        ${line('eg_hub_info_quickmove')}
+        ${line('eg_hub_info_sell')}
+        ${line('eg_hub_info_currency')}
+        ${line('eg_hub_info_destroy')}
+    </div>
+</div>`;
+}
+
+function _egShowHubInfoTooltip(e) {
+    showGameTooltip(_egBuildHubInfoTooltipHTML(), e);
 }
 
 // Assembles the complete hub screen layout:

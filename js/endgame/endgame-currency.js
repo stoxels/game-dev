@@ -145,6 +145,39 @@ const EG_CURRENCY_DEFS = {
             return { ...updated, rarity: 'epic', name };
         },
     },
+
+    // Common -> Epic directly ("alchemy for epic").
+    orb_ascension: {
+        id: 'orb_ascension', name: t('eg_orb_ascension'), icon: '🔮',
+        description: t('eg_orb_ascension_desc'),
+        canApply(item) { return item.rarity === 'common'; },
+        apply(item) {
+            const { prefixCount, suffixCount } = _egRollModCounts('epic');
+            return _egRerollItemMods(item, 'epic', prefixCount, suffixCount);
+        },
+    },
+
+    // Rare -> Epic directly.
+    orb_elevation: {
+        id: 'orb_elevation', name: t('eg_orb_elevation'), icon: '✨',
+        description: t('eg_orb_elevation_desc'),
+        canApply(item) { return item.rarity === 'rare'; },
+        apply(item) {
+            const { prefixCount, suffixCount } = _egRollModCounts('epic');
+            return _egRerollItemMods(item, 'epic', prefixCount, suffixCount);
+        },
+    },
+
+    // Full stat reroll on an already-epic item ("chaos for epic").
+    orb_cataclysm: {
+        id: 'orb_cataclysm', name: t('eg_orb_cataclysm'), icon: '💥',
+        description: t('eg_orb_cataclysm_desc'),
+        canApply(item) { return item.rarity === 'epic'; },
+        apply(item) {
+            const { prefixCount, suffixCount } = _egRollModCounts('epic');
+            return _egRerollItemMods(item, 'epic', prefixCount, suffixCount);
+        },
+    },
 };
 
 
@@ -160,6 +193,9 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_alchemy', weight: 80 },
     { id: 'orb_regal', weight: 60 },
     { id: 'orb_chaos', weight: 30 },
+    { id: 'orb_elevation', weight: 15 },
+    { id: 'orb_cataclysm', weight: 8 },
+    { id: 'orb_ascension', weight: 5 },
     { id: 'orb_exalted', weight: 5 },
 ];
 

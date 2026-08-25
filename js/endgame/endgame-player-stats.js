@@ -279,7 +279,7 @@ function _egGetElementalDamageBonus(stats) {
 //-------------------ABSORPTION SHIELD REGEN-------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-// Absorption is a secondary HP layer. It starts regenerating 5s after the
+// Absorption is a secondary HP layer. It starts regenerating 10s after the
 // last hit, refilling gradually until it's back to the equipped max.
 
 function _egCancelAbsorptionRegen() {
@@ -298,7 +298,7 @@ function _egScheduleAbsorptionRegen() {
             const step = Math.max(1, Math.round(max * 0.08));
             _egPlayerAbsorptionCurrent = Math.min(max, _egPlayerAbsorptionCurrent + step);
         }, 200);
-    }, 5000);
+    }, 10000);
 }
 
 

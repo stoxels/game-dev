@@ -888,6 +888,24 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         font-size: clamp(10px, 1.3vw, 13px);
     }
 
+    .game-hud-corner .eg-bonus-loot-chance {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: var(--PX);
+        font-size: clamp(9px, 1.2vw, 12px);
+        color: var(--accent);
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        padding: 2px 6px;
+        white-space: nowrap;
+    }
+
+    .game-hud-corner .eg-bonus-loot-chance.hidden {
+        display: none;
+    }
+
 @media (max-width: 480px) {
     .game-hud-corner {
         top: 6px;

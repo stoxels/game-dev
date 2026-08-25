@@ -73,6 +73,30 @@ Layout Architecture:
     margin-left: auto;
 }
 
+/* ── TOP BAR INFO BUTTON — "?" in the top-right corner ── */
+.eg-info-btn {
+    margin-left: auto;
+    width: 24px;
+    height: 24px;
+    line-height: 22px;
+    text-align: center;
+    padding: 0;
+    font-family: var(--PX);
+    font-size: 12px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 50%;
+    color: var(--accent2);
+    cursor: help;
+    transition: all 0.12s;
+}
+
+    .eg-info-btn:hover {
+        border-color: var(--yellow, #c8a84b);
+        color: var(--yellow, #c8a84b);
+        box-shadow: 0 0 8px rgba(200, 168, 75, 0.4);
+    }
+
 /* ── BODY: compact character panel + currency strip + stash ── */
 .eg-body {
     flex: 1;
