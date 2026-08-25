@@ -748,16 +748,8 @@ function _egtBuildFullScreenHTML() {
     return `
 <div class="egt-hub-layout">
     <div class="egt-topbar">
-        <button class="title-btn back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
+        <button class="title-btn back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
         <span class="egt-topbar-title">${t('egt_title')}</span>
-        <div style="display:flex; gap:10px;">
-            <button class="title-btn sec" onclick="window._egHubReturnScreen='screen-endgame-test-hub'; showEndgameHub();">
-                ${t('egt_stash_equip')}
-            </button>
-            <button class="title-btn sec" onclick="showEndgameGate();">
-                ${t('egt_probability_gate')}
-            </button>
-        </div>
     </div>
     <div class="egt-map-grid" id="egt-map-grid">
         ${EG_TEST_MAPS.map(_egtBuildMapCardHTML).join('')}

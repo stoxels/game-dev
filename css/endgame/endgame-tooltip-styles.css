@@ -79,6 +79,12 @@
     margin-left: 8px;
 }
 
+/* Defense value already includes the item's local "% increased" mods —
+   tinted gold to distinguish it from the plain base value */
+.eg-tt-val.eg-tt-val-modified {
+    color: #ffcf70;
+}
+
 /* Requirements line */
 .eg-tt-req {
     color: #888;
@@ -120,6 +126,15 @@
     margin-top: 6px;
     font-size: 0.73rem;
     color: #666;
+    text-align: right;
+}
+
+/* Mirrored-copy marker */
+.eg-tt-mirrored {
+    margin-top: 4px;
+    font-size: 0.73rem;
+    font-style: italic;
+    color: #b59248;
     text-align: right;
 }
 

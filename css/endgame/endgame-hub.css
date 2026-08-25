@@ -600,6 +600,7 @@ Layout Architecture:
 
 /* ── ITEM CHIPS ── */
 .eg-item-chip {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -614,6 +615,23 @@ Layout Architecture:
     transition: border-color 0.1s;
     text-align: center;
     box-sizing: border-box;
+}
+
+/* Item level badge — small number in the slot's top-left corner */
+.eg-item-chip .eg-item-ilvl {
+    position: absolute;
+    top: 0;
+    left: 1px;
+    font-family: var(--PX);
+    font-size: 6px;
+    line-height: 1;
+    color: #cfcfcf;
+    text-shadow: 0 0 2px #000, 0 0 2px #000, 1px 1px 0 #000;
+    pointer-events: none;
+}
+
+.eg-item-chip-large .eg-item-ilvl {
+    font-size: 9px;
 }
 
     .eg-item-chip:active {

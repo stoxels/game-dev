@@ -302,7 +302,16 @@ function applyPenalty(row, col) {
     _tryProcStandardDeviation(row, col);
 
     // --- Calculate and apply the time penalty ---
-    const effectivePen = _calcEffectivePenalty(penMult);
+    let effectivePen = _calcEffectivePenalty(penMult);
+
+    // Endgame ailment: wrong clicks on LAVA cells burn twice as hard —
+    // count as a second mistake AND double the time loss.
+    if (typeof _egIsLavaCell === 'function' && _egIsLavaCell(row, col)) {
+        mistakeCount++;
+        effectivePen *= 2;
+        showToast('🌋 Lava! The mistake counts twice!');
+    }
+
     const timerBefore = timerSecs;
 
     _applyTimeDeduction(row, col, effectivePen);

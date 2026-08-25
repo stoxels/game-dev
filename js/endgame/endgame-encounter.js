@@ -281,6 +281,7 @@ function _egResetEncounterState() {
     _egMonsterSpawnCounter = 0;
     _egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption;
     _egCancelAbsorptionRegen();
+    if (typeof _egAilmentsReset === 'function') _egAilmentsReset();
     if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
 }
 
@@ -327,6 +328,7 @@ function _egStopEncounter() {
     _egStopTickLoop();
     _egCancelSpawnTimers();
     _egStopPickupSpawner();
+    if (typeof _egAilmentsCleanup === 'function') _egAilmentsCleanup();
     _egBossCleanupAll();
     _egCancelAbsorptionRegen();
     if (typeof _egChainCleanup === 'function') _egChainCleanup();
@@ -342,7 +344,9 @@ function _egStopEncounter() {
 // Advances a single monster's charge bar by one tick (0.1s at 10Hz).
 // Fires the monster's attack when the charge bar fills completely.
 function _egTickMonster(m) {
-    m.currentCharge += 0.1;
+    // Ailments: frozen monsters don't charge, chilled ones charge at 50%
+    const chargeMult = (typeof _egGetMonsterChargeMultiplier === 'function') ? _egGetMonsterChargeMultiplier(m) : 1;
+    m.currentCharge += 0.1 * chargeMult;
     if (m.currentCharge >= m.chargeMax) {
         m.currentCharge = 0;
         _egFireMonsterAttack(m);
@@ -351,7 +355,11 @@ function _egTickMonster(m) {
 
 // Advances the player's charge bar. Fires the player attack when full.
 function _egTickPlayer() {
-    _egPlayerCurrentCharge += 0.1; // Ticks at 10Hz[cite: 1]
+    // Ailments: frozen stops the auto-attack bar entirely (movement
+    // prevention will hook into the same ailment once movement exists),
+    // chilled slows it to half speed.
+    const chargeMult = (typeof _egGetPlayerChargeMultiplier === 'function') ? _egGetPlayerChargeMultiplier() : 1;
+    _egPlayerCurrentCharge += 0.1 * chargeMult; // Ticks at 10Hz[cite: 1]
 
     if (_egPlayerCurrentCharge >= EG_PLAYER_CHARGE_MAX) {
         _egPlayerCurrentCharge = 0; // Reset charge
@@ -398,9 +406,9 @@ function _egCheckMistakeLimit() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Navigates back to the Endgame Test Hub after a map failure.
+// Navigates back to the Nexus of Worlds screen after a map failure.
 // Performs the same cleanup as the standard leave-level handlers.
-function _egReturnToTestHubFromDefeat() {
+function _egReturnToNexusFromDefeat() {
     const ov = document.getElementById('ov-lose');
     if (ov) ov.classList.remove('show', 'eg-map-failed');
 
@@ -422,7 +430,7 @@ function _egReturnToTestHubFromDefeat() {
     if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
     if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
 
-    if (typeof showEndgameTestHub === 'function') showEndgameTestHub();
+    if (typeof showEndgameNexus === 'function') showEndgameNexus();
 }
 
 // Lazily injects the "return to Nexus" button into the lose overlay and
@@ -445,7 +453,7 @@ function _egEnsureLoseOverlayEndgameUI() {
         egBtn.className = 'ob p';
         egBtn.style.display = 'none';
         egBtn.textContent = t('eg_return_to_test_hub');
-        egBtn.addEventListener('click', _egReturnToTestHubFromDefeat);
+        egBtn.addEventListener('click', _egReturnToNexusFromDefeat);
         btns.appendChild(egBtn);
     }
 
@@ -483,10 +491,12 @@ function _egTickLoop() {
     _egCheckMistakeLimit(); 
 
     _egBossTick();
+    if (typeof _egTickAilments === 'function') _egTickAilments();
     _egMonsters.forEach(_egTickMonster);
 
     // Player mechanics
     _egTickPlayer();
+    if (typeof _egRefreshPlayerStatusIcons === 'function') _egRefreshPlayerStatusIcons();
     _renderPlayerAvatar();
     //_renderPlayerCharge();
 
@@ -517,8 +527,11 @@ function _egResolveAttackType(monster) {
 }
 
 // Fires the monster's attack: flashes the card and dispatches the correct animation.
+// Small chance the attack instead flies to the CENTRE OF THE GRID and inflicts
+// a puzzle ailment based on the monster's element (see endgame-ailments.js).
 function _egFireMonsterAttack(monster) {
     _egFlashMonsterAttackCard(monster);
+    if (typeof _egMaybePuzzleAttack === 'function' && _egMaybePuzzleAttack(monster)) return;
     const attackType = _egResolveAttackType(monster);
     if (attackType === 'melee') {
         _egAnimateMonsterMelee(monster);
@@ -561,6 +574,52 @@ function _egApplyPlayerBlockLockoutFeedback() {
     setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
 }
 
+// ── Lose-control overlay (WoW "lose of control" style) ──────────────────
+// Center-screen icon + live countdown shown while the player cannot attack
+// because of a recent block. Purely visual: pointer-events none.
+
+// Interval handle driving the countdown text update.
+let _egBlockLockoutOverlayTimer = null;
+
+// Shows (or refreshs) the centered lockout overlay for `durationMs`.
+function _egShowBlockLockoutOverlay(durationMs) {
+    let overlay = document.getElementById('eg-block-lockout-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'eg-block-lockout-overlay';
+        overlay.innerHTML = `
+            <div class="eg-lockout-icon">🛡️</div>
+            <div class="eg-lockout-countdown" id="eg-lockout-countdown">0.0</div>
+            <div class="eg-lockout-label">${t('eg_block_lockout')}</div>`;
+        document.body.appendChild(overlay);
+    }
+
+    const countdownEl = document.getElementById('eg-lockout-countdown');
+    if (countdownEl) countdownEl.textContent = (durationMs / 1000).toFixed(1);
+
+    // Restart the update loop so an overlapping block extends cleanly.
+    if (_egBlockLockoutOverlayTimer) clearInterval(_egBlockLockoutOverlayTimer);
+    _egBlockLockoutOverlayTimer = setInterval(() => {
+        const remaining = _egPlayerBlockLockoutUntil - Date.now();
+        if (remaining <= 0 || !_egIsActive()) {
+            _egHideBlockLockoutOverlay();
+            return;
+        }
+        const el = document.getElementById('eg-lockout-countdown');
+        if (el) el.textContent = (remaining / 1000).toFixed(1);
+    }, 100);
+}
+
+// Removes the lockout overlay and stops its countdown loop.
+function _egHideBlockLockoutOverlay() {
+    if (_egBlockLockoutOverlayTimer) {
+        clearInterval(_egBlockLockoutOverlayTimer);
+        _egBlockLockoutOverlayTimer = null;
+    }
+    const overlay = document.getElementById('eg-block-lockout-overlay');
+    if (overlay) overlay.remove();
+}
+
 // Applies hit feedback to the player HUD: floating damage number + squish + red glow.
 function _egApplyPlayerHitFeedback(damageValue) {
     const hud = document.getElementById('player-avatar-wrapper');
@@ -583,15 +642,33 @@ function _egApplyPlayerHitFeedback(damageValue) {
 
 // Launches a projectile from the monster's card to the player HUD.
 // Damage and feedback are applied when the projectile arrives.
+// While the player is POLYMORPHED, the projectile is confused and flies at
+// another monster instead (friendly fire). With no other monster alive the
+// attack lands on the player as usual.
 function _egAnimateMonsterProjectile(monster) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
     const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
 
+    // Polymorph: redirect at another monster
+    let polymorphVictim = null;
+    if (typeof _egIsPolymorphActive === 'function' && _egIsPolymorphActive()
+        && typeof _egGetPolymorphVictim === 'function') {
+        polymorphVictim = _egGetPolymorphVictim(monster.id);
+    }
+
     const start = _egGetElementCentre(sourceCard);
-    const end = _egGetElementCentre(targetHud);
+    const end = polymorphVictim
+        ? _egGetElementCentre(document.getElementById(`eg-card-${polymorphVictim.id}`) || targetHud)
+        : _egGetElementCentre(targetHud);
 
     _egFireProjectile(monster.emoji, 'eg-proj-monster', start, end, EG_MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
+        if (polymorphVictim) {
+            // Confused attack hits the other monster — no player mitigation
+            showToast(`🌀 ${monster.name || 'The monster'} hit ${polymorphVictim.name} instead!`);
+            _egDamageTargetById(polymorphVictim.id, monster.damageValue);
+            return;
+        }
         const dealt = _egPlayerTakeDamage(monster.damageValue, false, monster.element);
         if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
     });
@@ -599,21 +676,44 @@ function _egAnimateMonsterProjectile(monster) {
 
 // Triggers damage and hit feedback at the melee impact moment.
 // Only fires if the encounter is still active and the monster is still alive.
+// While POLYMORPHED the confused swing lands on another monster instead.
 function _egApplyMeleeImpact(monster) {
     if (!_egIsActive() || !_egMonsters.some(m => m.id === monster.id)) return;
+
+    if (typeof _egIsPolymorphActive === 'function' && _egIsPolymorphActive()
+        && typeof _egGetPolymorphVictim === 'function') {
+        const victim = _egGetPolymorphVictim(monster.id);
+        if (victim) {
+            showToast(`🌀 ${monster.name || 'The monster'} struck ${victim.name} instead!`);
+            _egDamageTargetById(victim.id, monster.damageValue);
+            return;
+        }
+    }
+
     const dealt = _egPlayerTakeDamage(monster.damageValue, false, monster.element);
     if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
 }
 
 // Physically lunges the monster card toward the player HUD and snaps back.
 // Damage triggers at the animation midpoint (impact apex).
+// While POLYMORPHED the lunge visually chases the confused-attack victim.
 function _egAnimateMonsterMelee(monster) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
     const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
 
+    // Polymorph: lunge toward the victim monster instead of the player
+    let polymorphVictim = null;
+    if (typeof _egIsPolymorphActive === 'function' && _egIsPolymorphActive()
+        && typeof _egGetPolymorphVictim === 'function') {
+        polymorphVictim = _egGetPolymorphVictim(monster.id);
+    }
+    const meleeTargetEl = polymorphVictim
+        ? (document.getElementById(`eg-card-${polymorphVictim.id}`) || targetHud)
+        : targetHud;
+
     const start = _egGetElementCentre(sourceCard);
-    const end = _egGetElementCentre(targetHud);
+    const end = _egGetElementCentre(meleeTargetEl);
     const dx = end.x - start.x;
     const dy = end.y - start.y;
 
@@ -791,6 +891,26 @@ function _egReleaseChargedShot() {
         : null;
     const targetIdAtFire = _egTargetId; // snapshot — do not use _egTargetId in the callback
     const startScale = 1.5 + Math.min(stacks, EG_DRAG_CHARGE_MAX_VISUAL_STACKS) * EG_DRAG_CHARGE_SCALE_PER_STACK;
+
+    // POLYMORPH: the charged reveal shot is confused and hits the PLAYER
+    // themself instead of the monster. Auto-attacks keep working normally.
+    if (typeof _egIsPolymorphActive === 'function' && _egIsPolymorphActive()) {
+        const hud = document.getElementById('player-avatar-wrapper');
+        const start = sourceEl ? _egGetElementCentre(sourceEl) : null;
+        if (hud && typeof _egFireProjectile === 'function' && start) {
+            const end = _egGetElementCentre(hud);
+            _egFireProjectile('🌀', 'eg-proj-player', start, end, EG_MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
+                const dealt = _egPlayerTakeDamage(damage, false, null);
+                if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
+            });
+            return;
+        }
+        // No visual path available — apply the self-hit instantly
+        const dealt = _egPlayerTakeDamage(damage, false, null);
+        if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
+        return;
+    }
+
     _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements);
 }
 
@@ -1001,6 +1121,15 @@ function _egDamageTargetById(monsterId, amount, elements) {
     // the physical portion passes through untouched.
     amount = _egApplyTargetResistances(amount, target, elements);
 
+    // Ailments: shocked monsters take amplified damage; elemental hits can
+    // ignite / chill / freeze / shock the monster (gear ailment chances).
+    if (typeof _egApplyAilmentShockAmpOnMonster === 'function') {
+        amount = _egApplyAilmentShockAmpOnMonster(target, amount);
+    }
+    if (typeof _egRollPlayerHitAilments === 'function') {
+        _egRollPlayerHitAilments(target, amount, elements);
+    }
+
     _egApplyHitToMonster(target, amount);
     _egShowDamageNumber(target.id, amount);
     _egFlashDamageCard(target.id);
@@ -1042,7 +1171,13 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null) {
     // Block roll: attacks use block chance, spells use spell block chance.
     // A successful block fully negates the hit, but locks out player
     // attacks for a short window (reduced by block recovery).
-    const blockChance = Math.min(75, isSpell ? stats.spellBlockChance : stats.blockChance);
+    // Blocking requires an actual shield in the off-hand — block chance
+    // from mods/passives on other slots does nothing without one.
+    const hasShieldEquipped = _egGetAllEquippedItems()
+        .some(item => item.slotType === 'shield');
+    const blockChance = hasShieldEquipped
+        ? Math.min(75, isSpell ? stats.spellBlockChance : stats.blockChance)
+        : 0;
     if (blockChance > 0 && Math.random() * 100 < blockChance) {
         showToast(t('eg_blocked'));
         Audio_Manager.playSFX('player_dodge_attack');
@@ -1060,13 +1195,18 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null) {
         }
 
         const recoveryFactor = Math.max(0, 1 - Math.min(100, stats.blockRecoveryPct) / 100);
-        _egPlayerBlockLockoutUntil = Date.now() + EG_BLOCK_LOCKOUT_BASE_MS * recoveryFactor;
+        const lockoutDuration = EG_BLOCK_LOCKOUT_BASE_MS * recoveryFactor;
+        _egPlayerBlockLockoutUntil = Date.now() + lockoutDuration;
+        _egShowBlockLockoutOverlay(lockoutDuration);
         return 0;
     }
 
     // Elemental resistances (fire/cold/lightning/shadow % + flat Arcane
     // Resistance) mitigate elemental hits before armour and absorption.
     if (element) amount = _egCalcPlayerResistanceReduction(amount, stats, element);
+
+    // Ailments: a shocked player takes amplified damage from all hits.
+    if (typeof _egApplyPlayerShockAmp === 'function') amount = _egApplyPlayerShockAmp(amount);
 
     let mitigated = _egCalcArmourMitigation(amount, stats.armour);
 
@@ -1085,6 +1225,11 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null) {
     playerCurrentHP = Math.max(0, playerCurrentHP - mitigated);
     _renderPlayerHealth();
     if (playerCurrentHP <= 0) _egGameOver();
+
+    // Ailments: elemental hits can ignite / chill / shock / shadow-burn the
+    // player (rolled from the monster's attack element).
+    if (typeof _egRollMonsterHitAilment === 'function') _egRollMonsterHitAilment(element, mitigated);
+
     return mitigated;
 }
 
@@ -1337,6 +1482,9 @@ function _egBuildMonsterCardHTML(m) {
             </div>
         </div>
 
+        <!-- Elemental ailment icons (ignite/chill/frozen/shocked/shadowburn) -->
+        <div class="eg-status-strip" id="eg-status-${m.id}"></div>
+
         <!-- Emoji icon with level badge and hover tooltip -->
         <div class="eg-emoji-wrapper ${isTarget ? 'eg-compact-targeted' : ''}">
             ${isTarget ? '<span class="eg-target-arrow">▼</span>' : ''}
@@ -1368,6 +1516,9 @@ function _egUpdateMonsterBars(m) {
     if (hpBar) { hpBar.style.width = hpPct + '%'; hpBar.className = `eg-hp-bar ${_egHpBarClass(hpPct)}`; }
     if (chargeBar) chargeBar.style.width = chargePct + '%';
     if (hpLabel) hpLabel.textContent = `${m.currentHP} / ${m.maxHP} HP`;
+
+    // Elemental ailment icon strip (only rebuilds when statuses change)
+    if (typeof _egRenderMonsterStatusStrip === 'function') _egRenderMonsterStatusStrip(m);
 }
 
 // High-frequency bar update (10Hz). Only touches bar widths and HP text —

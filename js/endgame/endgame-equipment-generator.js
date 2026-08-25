@@ -58,6 +58,43 @@ const EG_SLOT_MOD_TABLE_MAP = {
 
 
 //------------------------------------------------------------------------
+//-------------------LOCAL DEFENSE MOD RESTRICTION------------------------
+//------------------------------------------------------------------------
+// Local defense mods (armour / evasion / absorption) may only roll on base
+// items that actually HAVE the stat — a "30% increased Armour" mod on an
+// evasion-only base would be meaningless. Hybrid families count as local
+// for every defense stat they touch, so hybrid_armour_evasion requires the
+// base to have BOTH armour and evasion.
+const EG_LOCAL_DEFENSE_FAMILY_STATS = {
+    flat_armour: ['armour'],
+    inc_armour: ['armour'],
+    flat_evasion: ['evasion'],
+    inc_evasion: ['evasion'],
+    flat_absorption: ['absorption'],
+    inc_absorption: ['absorption'],
+    hybrid_life_armour: ['armour'],
+    hybrid_mana_armour: ['armour'],
+    hybrid_life_evasion: ['evasion'],
+    hybrid_mana_evasion: ['evasion'],
+    hybrid_life_absorption: ['absorption'],
+    hybrid_mana_absorption: ['absorption'],
+    hybrid_armour_evasion: ['armour', 'evasion'],
+    hybrid_evasion_armour: ['armour', 'evasion'],
+    hybrid_armour_absorption: ['armour', 'absorption'],
+    hybrid_evasion_absorption: ['evasion', 'absorption'],
+};
+
+// Returns true when `familyId` is allowed to roll on a base with `defenses`.
+// Families not listed here are always allowed.
+function _egFamilyAllowedOnBase(familyId, defenses) {
+    const needed = EG_LOCAL_DEFENSE_FAMILY_STATS[familyId];
+    if (!needed) return true;
+    if (!defenses) return false;
+    return needed.every(stat => (defenses[stat] || 0) > 0);
+}
+
+
+//------------------------------------------------------------------------
 //-------------------MOD TABLE ACCESSOR-----------------------------------
 //------------------------------------------------------------------------
 // Returns the correct mod table object for a given base item.
@@ -186,9 +223,12 @@ function _egBuildRolledStats(family, tier) {
         const lines = label.split('\n');
         const val1 = _egRollInt(tier.min1, tier.max1);
         const val2 = _egRollInt(tier.min2, tier.max2);
+        // NOTE: '#' must resolve to val1 and '@' to val2 on EVERY line.
+        // Single-line hybrid labels ("Adds # to @ Fire Damage") carry both
+        // placeholders on one line; two-line hybrids carry one each.
         return [
-            { key: family.id + '_1', label: (lines[0] || label).replace('#', val1).replace('@', val1), value: val1 },
-            { key: family.id + '_2', label: (lines[1] || '').replace('#', val2).replace('@', val2), value: val2 },
+            { key: family.id + '_1', label: (lines[0] || label).replace('#', val1).replace('@', val2), value: val1 },
+            { key: family.id + '_2', label: (lines[1] || '').replace('#', val1).replace('@', val2), value: val2 },
         ];
     }
 
@@ -206,10 +246,11 @@ function _egBuildRolledStats(family, tier) {
 // Builds the pool of (familyId → { family, eligibleTiers }) entries
 // that are available for this roll, excluding families already chosen.
 
-function _egBuildModPool(modSection, itemLevel, chosenFamilyIds) {
+function _egBuildModPool(modSection, itemLevel, chosenFamilyIds, defenses) {
     const pool = [];
     for (const [familyId, family] of Object.entries(modSection)) {
         if (chosenFamilyIds.has(familyId)) continue;           // no duplicate families
+        if (!_egFamilyAllowedOnBase(familyId, defenses)) continue; // local defense mods need the base stat
         const tiers = _egEligibleTiers(family, itemLevel);
         if (tiers.length === 0) continue;                      // none eligible at this ilvl
         pool.push({ familyId, family, tiers });
@@ -252,14 +293,14 @@ function _egPickModFromPool(pool) {
 // Rolls prefixCount prefixes and suffixCount suffixes from the slot's mod table.
 // Returns an array of resolved mod objects ready to attach to the item.
 
-function _egRollMods(prefixCount, suffixCount, modTable, itemLevel) {
+function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defenses) {
     const chosen = [];
     const chosenFamilyIds = new Set();
 
     // ── Prefixes ──────────────────────────────────────────────────────
     const prefixSection = modTable.prefixes || {};
     for (let i = 0; i < prefixCount; i++) {
-        const pool = _egBuildModPool(prefixSection, itemLevel, chosenFamilyIds);
+        const pool = _egBuildModPool(prefixSection, itemLevel, chosenFamilyIds, defenses);
         const entry = _egPickModFromPool(pool);
         if (!entry) break;
 
@@ -278,7 +319,7 @@ function _egRollMods(prefixCount, suffixCount, modTable, itemLevel) {
     // ── Suffixes ──────────────────────────────────────────────────────
     const suffixSection = modTable.suffixes || {};
     for (let i = 0; i < suffixCount; i++) {
-        const pool = _egBuildModPool(suffixSection, itemLevel, chosenFamilyIds);
+        const pool = _egBuildModPool(suffixSection, itemLevel, chosenFamilyIds, defenses);
         const entry = _egPickModFromPool(pool);
         if (!entry) break;
 
@@ -367,7 +408,7 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
 
     // ── 5. Roll mods (skip if no table or common) ────────────────────
     const mods = (modTable && (prefixCount + suffixCount) > 0)
-        ? _egRollMods(prefixCount, suffixCount, modTable, monsterLevel)
+        ? _egRollMods(prefixCount, suffixCount, modTable, monsterLevel, base.defenses)
         : [];
 
     // ── 6. Build display name ────────────────────────────────────────

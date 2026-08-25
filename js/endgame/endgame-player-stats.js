@@ -29,39 +29,23 @@ const EG_PLAYER_STATS = {
 // to the stat bucket it feeds. Hybrid mods produce keys `${familyId}_1` / `${familyId}_2`;
 // single-stat mods just use `familyId` directly.
 const EG_STAT_KEY_MAP = {
+    // NOTE: flat_armour / inc_armour / flat_evasion / inc_evasion /
+    // flat_absorption / inc_absorption (and the defense halves of the hybrid
+    // families) are LOCAL modifiers — they only affect the base value of the
+    // item they roll on. They are handled by _egGetItemEffectiveDefenses()
+    // below and intentionally absent from this map.
     flat_health: { bucket: 'health', mode: 'add' },
     flat_mana: { bucket: 'mana', mode: 'add' },
     heart_heal: { bucket: 'heartHealFlat', mode: 'add' },
     inc_heart_heal: { bucket: 'heartHealIncPct', mode: 'add' },
     time_added: { bucket: 'timeAdded', mode: 'add' },
 
-    flat_armour: { bucket: 'armourFlat', mode: 'add' },
-    inc_armour: { bucket: 'armourIncPct', mode: 'add' },
-    flat_evasion: { bucket: 'evasionFlat', mode: 'add' },
-    inc_evasion: { bucket: 'evasionIncPct', mode: 'add' },
-    flat_absorption: { bucket: 'absorptionFlat', mode: 'add' },
-    inc_absorption: { bucket: 'absorptionIncPct', mode: 'add' },
-
     hybrid_life_armour_1: { bucket: 'health', mode: 'add' },
-    hybrid_life_armour_2: { bucket: 'armourFlat', mode: 'add' },
     hybrid_mana_armour_1: { bucket: 'mana', mode: 'add' },
-    hybrid_mana_armour_2: { bucket: 'armourFlat', mode: 'add' },
     hybrid_life_evasion_1: { bucket: 'health', mode: 'add' },
-    hybrid_life_evasion_2: { bucket: 'evasionFlat', mode: 'add' },
     hybrid_mana_evasion_1: { bucket: 'mana', mode: 'add' },
-    hybrid_mana_evasion_2: { bucket: 'evasionFlat', mode: 'add' },
     hybrid_life_absorption_1: { bucket: 'health', mode: 'add' },
-    hybrid_life_absorption_2: { bucket: 'absorptionFlat', mode: 'add' },
     hybrid_mana_absorption_1: { bucket: 'mana', mode: 'add' },
-    hybrid_mana_absorption_2: { bucket: 'absorptionFlat', mode: 'add' },
-    hybrid_armour_evasion_1: { bucket: 'armourFlat', mode: 'add' },
-    hybrid_armour_evasion_2: { bucket: 'evasionFlat', mode: 'add' },
-    hybrid_evasion_armour_1: { bucket: 'evasionFlat', mode: 'add' },
-    hybrid_evasion_armour_2: { bucket: 'armourFlat', mode: 'add' },
-    hybrid_armour_absorption_1: { bucket: 'armourFlat', mode: 'add' },
-    hybrid_armour_absorption_2: { bucket: 'absorptionFlat', mode: 'add' },
-    hybrid_evasion_absorption_1: { bucket: 'evasionFlat', mode: 'add' },
-    hybrid_evasion_absorption_2: { bucket: 'absorptionFlat', mode: 'add' },
 
     strength: { bucket: 'strength', mode: 'add' },
     agility: { bucket: 'agility', mode: 'add' },
@@ -156,6 +140,75 @@ function _egGetAllEquippedItems() {
     return Object.values(_egEquipped).filter(Boolean);
 }
 
+//------------------------------------------------------------------------
+//-------------------LOCAL ITEM DEFENSES----------------------------------
+//------------------------------------------------------------------------
+// Flat and "% increased" armour / evasion / absorption mods are LOCAL in the
+// Path of Exile sense: they only modify the base defense values of the very
+// item they rolled on, not the character-wide totals.
+//
+// Effective item value = round((base + localFlat) * (1 + localIncPct / 100)).
+const EG_LOCAL_DEFENSE_FLAT_KEYS = {
+    flat_armour: 'armour',
+    flat_evasion: 'evasion',
+    flat_absorption: 'absorption',
+    // Defense halves of hybrid families (key suffix _2 / _1 per stat order)
+    hybrid_life_armour_2: 'armour',   hybrid_mana_armour_2: 'armour',
+    hybrid_life_evasion_2: 'evasion', hybrid_mana_evasion_2: 'evasion',
+    hybrid_life_absorption_2: 'absorption', hybrid_mana_absorption_2: 'absorption',
+    hybrid_armour_evasion_1: 'armour', hybrid_armour_evasion_2: 'evasion',
+    hybrid_evasion_armour_1: 'evasion', hybrid_evasion_armour_2: 'armour',
+    hybrid_armour_absorption_1: 'armour', hybrid_armour_absorption_2: 'absorption',
+    hybrid_evasion_absorption_1: 'evasion', hybrid_evasion_absorption_2: 'absorption',
+};
+
+const EG_LOCAL_DEFENSE_INC_KEYS = {
+    inc_armour: 'armour',
+    inc_evasion: 'evasion',
+    inc_absorption: 'absorption',
+};
+
+// Computes an item's effective (local-modified) defenses.
+// Returns { armour, evasion, absorption, modded: { armour, evasion, absorption } }
+// where modded.<stat> is true when local mods altered that value — used by
+// the tooltip to highlight already-increased values.
+function _egGetItemEffectiveDefenses(item) {
+    const base = item.defenses || {};
+    const out = {
+        armour: base.armour || 0,
+        evasion: base.evasion || 0,
+        absorption: base.absorption || 0,
+    };
+    const inc = { armour: 0, evasion: 0, absorption: 0 };
+    const modded = { armour: false, evasion: false, absorption: false };
+
+    (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
+        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
+            if (stat.value == null) return;
+            const val = Number(stat.value) || 0;
+            if (val === 0) return;
+            const flatStat = EG_LOCAL_DEFENSE_FLAT_KEYS[stat.key];
+            if (flatStat && out[flatStat] > 0) {
+                out[flatStat] += val;
+                modded[flatStat] = true;
+                return;
+            }
+            const incStat = EG_LOCAL_DEFENSE_INC_KEYS[stat.key];
+            if (incStat && out[incStat] > 0) {
+                inc[incStat] += val;
+                modded[incStat] = true;
+            }
+        });
+    });
+
+    ['armour', 'evasion', 'absorption'].forEach(stat => {
+        out[stat] = Math.round(out[stat] * (1 + inc[stat] / 100));
+    });
+
+    out.modded = modded;
+    return out;
+}
+
 // Aggregates every equipped item's implicit defenses + rolled mods into one
 // stats object. Recomputed on demand (cheap — ~19 slots, ≤6 mods each) so it
 // never goes stale after an equip/unequip.
@@ -198,9 +251,12 @@ function _egComputePlayerStats() {
 
     _egGetAllEquippedItems().forEach(item => {
         if (item.defenses) {
-            s.armourFlat += item.defenses.armour || 0;
-            s.evasionFlat += item.defenses.evasion || 0;
-            s.absorptionFlat += item.defenses.absorption || 0;
+            // Use the LOCAL-modified values (base + flat, scaled by the
+            // item's own "% increased" mods) — see _egGetItemEffectiveDefenses.
+            const eff = _egGetItemEffectiveDefenses(item);
+            s.armourFlat += eff.armour;
+            s.evasionFlat += eff.evasion;
+            s.absorptionFlat += eff.absorption;
         }
 
         // Shields carry an implicit base block chance on the base type

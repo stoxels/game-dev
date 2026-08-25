@@ -12,6 +12,13 @@ let _egBossSpawned = false;
 let _egMonsterSpawnCounter = 0;
 let _egPuzzleCompleteFired = false;
 
+// Bonus-loot gains accumulated since the last chain transition screen.
+// Consumed (and reset) by _egBuildChainBonusGainHTML so the countdown
+// overlay shows exactly what the player earned from the previous puzzle
+// and quiz.
+let _egPendingPuzzleBonusGain = 0;
+let _egPendingQuestionBonusGain = 0;
+
 
 //------------------------------------------------------------------------
 //-------------------REQUIREMENTS HELPERS---------------------------------
@@ -49,6 +56,7 @@ function _egCanLeaveMap() {
 function _egOnQuestionAnswered() {
     if (!_egIsActive()) return;
     _egQuestionsAnswered++;
+    _egPendingQuestionBonusGain += EG_BONUS_LOOT_CHANCE_PER_QUESTION;
     _egUpdateObjectivesHUD();
 }
 
@@ -65,6 +73,7 @@ function _egOnPuzzleComplete() {
     Audio_Manager.playSFX('win');
 
     _egChainPuzzleSolvedCount++;
+    _egPendingPuzzleBonusGain += EG_BONUS_LOOT_CHANCE_PER_PUZZLE;
     _egUpdateObjectivesHUD();
 
     // Always automatically chain to the next puzzle, the player needs to manually leave the chain
@@ -333,6 +342,9 @@ function _egGetBonusLootChance() {
 function _egRollBonusMapLoot() {
     if (Math.random() > _egGetBonusLootChance()) return;
     if (typeof _egGenerateEquipmentDrop !== 'function') return;
+    // Don't roll (or promise) an item when the stash can't hold it —
+    // _egFlushRunLootToStash would silently drop it otherwise.
+    if (typeof _egStashHasFreeSlot === 'function' && !_egStashHasFreeSlot()) return;
 
     const baseLevel = (_egMapDef && _egMapDef.monsterLevel) ? _egMapDef.monsterLevel : 1;
     const item = _egGenerateEquipmentDrop(baseLevel);
@@ -342,6 +354,30 @@ function _egRollBonusMapLoot() {
     showToast(t('eg_bonus_loot')
         .replace('{icon}', item.icon || '')
         .replace('{name}', item.name), _egRarityToastColor(item.rarity));
+}
+
+// Builds the hover-tooltip body for the bonus-loot chance label in the
+// corner HUD: explains what bonus loot is and shows the current chance.
+function _egBuildBonusLootTooltipHTML() {
+    const pct = Math.round(_egGetBonusLootChance() * 100);
+    const pPuzzle = Math.round(EG_BONUS_LOOT_CHANCE_PER_PUZZLE * 100);
+    const pQuiz = Math.round(EG_BONUS_LOOT_CHANCE_PER_QUESTION * 100);
+
+    let html = `<strong style="color:#f5d98a">${t('eg_bonus_chance_title')}</strong>`;
+    html += `<br>${t('eg_bonus_loot_tooltip')
+        .replace('{p}', pPuzzle).replace('{q}', pQuiz)}`;
+    html += `<br>${t('eg_bonus_current').replace('{p}', pct)}`;
+    return html;
+}
+
+// Wires hover tooltip onto the static #eg-bonus-loot-chance element
+// (same pattern as the mistake-counter / timer tooltips in tooltips-hud.js).
+function _egBindBonusLootHUDTooltip(el) {
+    if (!el || el.dataset.bonusTooltipBound) return;
+    el.dataset.bonusTooltipBound = '1';
+    el.addEventListener('mouseenter', (e) => showGameTooltip(_egBuildBonusLootTooltipHTML(), e));
+    el.addEventListener('mousemove', moveGameTooltip);
+    el.addEventListener('mouseleave', hideGameTooltip);
 }
 
 // Shows/hides the bonus-loot chance label under the FILL button in the
@@ -358,7 +394,36 @@ function _egUpdateBonusLootHUD() {
     const pct = Math.round(_egGetBonusLootChance() * 100);
     const val = document.getElementById('eg-bonus-loot-chance-val');
     if (val) val.textContent = t('eg_bonus_chance').replace('{p}', pct);
+    _egBindBonusLootHUDTooltip(el);
     el.classList.remove('hidden');
+}
+
+// Builds the "bonus loot gained from the last puzzle/quiz" line shown in
+// the chain countdown transition. Returns '' when nothing was gained, so
+// the overlay stays clean on the first transition of a run.
+function _egBuildChainBonusGainHTML() {
+    const puzzleGain = Math.round(_egPendingPuzzleBonusGain * 100);
+    const quizGain = Math.round(_egPendingQuestionBonusGain * 100);
+
+    // Consume the pending gains — they describe only the previous segment.
+    _egPendingPuzzleBonusGain = 0;
+    _egPendingQuestionBonusGain = 0;
+
+    if (puzzleGain <= 0 && quizGain <= 0) return '';
+
+    const parts = [];
+    if (puzzleGain > 0) parts.push(`<span style="color:#7fd67f">+${puzzleGain}%</span> ${t('eg_bonus_src_puzzle')}`);
+    if (quizGain > 0) parts.push(`<span style="color:#7fb8ff">+${quizGain}%</span> ${t('eg_bonus_src_quiz')}`);
+
+    const total = Math.round(_egGetBonusLootChance() * 100);
+    return `
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;padding:6px 14px;
+                    background:rgba(245,217,138,0.08);border:1px solid rgba(245,217,138,0.35);border-radius:6px;">
+            <span>🎁</span>
+            <span style="font-size:0.85rem;color:#f5d98a;">${t('eg_bonus_chance_title')}</span>
+            <span style="font-size:0.85rem;color:#ccc;">${parts.join('<span style="opacity:.5">·</span>')}</span>
+            <span style="font-size:0.85rem;color:#fff;font-weight:700;">${t('eg_bonus_total').replace('{p}', total)}</span>
+        </div>`;
 }
 
 // Called only by the Leave Map button after _egCanLeaveMap() returns true.
@@ -660,6 +725,7 @@ function _egShowChainCountdownOverlay(secs) {
         document.body.appendChild(el);
     }
     el.innerHTML = `
+        ${_egBuildChainBonusGainHTML()}
         <div style="font-size:1.1rem;color:#aaa;margin-bottom:0.4rem;letter-spacing:.1em;">${t('eg_countdown_solved')}</div>
         <div id="eg-chain-countdown-num" style="font-size:4rem;font-weight:700;color:#fff;line-height:1;">${secs}</div>
         <div style="font-size:0.9rem;color:#888;margin-top:0.5rem;">${t('eg_countdown_next')}</div>`;
@@ -692,6 +758,8 @@ function _egChainCleanup() {
     _egChainKillCount = 0;
     _egChainPuzzleSolvedCount = 0;
     _egQuestionsAnswered = 0;
+    _egPendingPuzzleBonusGain = 0;
+    _egPendingQuestionBonusGain = 0;
     _egChainCurrentGi = null;
     _egChainRecentGis = [];
     _egBossSpawned = false;
@@ -824,7 +892,7 @@ function _egShowLeaveMapTransition() {
 
     document.getElementById('btn-eg-leave-map-return').onclick = () => {
         _egHideLeaveMapTransition();
-        showEndgameHub();
+        showEndgameNexus();
     };
 }
 

@@ -127,7 +127,7 @@ function _egBuildGatePanelHTML() {
 function _egBuildGateTopbarHTML() {
     return `
 <div class="eg-topbar">
-    <button class="eg-back-btn" onclick="showEndgameTestHub()">${t('btn_back')}</button>
+    <button class="eg-back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('mg_gate_badge')}</span>
 </div>`;
 }

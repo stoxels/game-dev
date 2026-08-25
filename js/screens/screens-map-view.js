@@ -1212,8 +1212,8 @@ function _buildEnterButton(wi) {
 
     btn.addEventListener('click', () => {
         btn.remove();
-        if (wi === 13 && typeof showEndgameHub === 'function') {
-            showEndgameHub();
+        if (wi === 13 && typeof showEndgameNexus === 'function') {
+            showEndgameNexus();
         } else if (typeof showWorldDetail === 'function') {
             showWorldDetail(wi);
         }

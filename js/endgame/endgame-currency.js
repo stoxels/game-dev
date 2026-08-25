@@ -20,7 +20,7 @@
 // Rerolls an item's mods entirely at the given rarity/counts.
 function _egRerollItemMods(item, rarity, prefixCount, suffixCount) {
     const modTable = _egGetModTable(item);
-    const mods = modTable ? _egRollMods(prefixCount, suffixCount, modTable, item.itemLevel || 1) : [];
+    const mods = modTable ? _egRollMods(prefixCount, suffixCount, modTable, item.itemLevel || 1, item.defenses) : [];
     const name = _egBuildItemName(item.baseName || item.name, rarity, mods);
     return { ...item, rarity, mods, name };
 }
@@ -44,7 +44,7 @@ function _egAddOneModToItem(item, rarityForCaps) {
     if (sections.length === 0) return item;
 
     const chosen = sections[Math.floor(Math.random() * sections.length)];
-    const pool = _egBuildModPool(chosen.pool, item.itemLevel || 1, chosenFamilyIds);
+    const pool = _egBuildModPool(chosen.pool, item.itemLevel || 1, chosenFamilyIds, item.defenses);
     const entry = _egPickModFromPool(pool);
     if (!entry) return item;
 
@@ -178,6 +178,16 @@ const EG_CURRENCY_DEFS = {
             return _egRerollItemMods(item, 'epic', prefixCount, suffixCount);
         },
     },
+
+    // Creates a copy of an item in the next free inventory slot.
+    // The copy is a fully independent item that can be modified further
+    // with any other currency.
+    mirror_of_kalandra: {
+        id: 'mirror_of_kalandra', name: t('eg_orb_mirror'), icon: '🪞',
+        description: t('eg_orb_mirror_desc'),
+        isMirror: true,
+        canApply(item) { return item.category === 'equip'; },
+    },
 };
 
 
@@ -187,16 +197,20 @@ const EG_CURRENCY_DEFS = {
 
 const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_transmutation', weight: 400 },
-    { id: 'orb_augmentation', weight: 250 },
-    { id: 'orb_alteration', weight: 200 },
-    { id: 'orb_scouring', weight: 150 },
-    { id: 'orb_alchemy', weight: 80 },
-    { id: 'orb_regal', weight: 60 },
-    { id: 'orb_chaos', weight: 30 },
-    { id: 'orb_elevation', weight: 15 },
-    { id: 'orb_cataclysm', weight: 8 },
-    { id: 'orb_ascension', weight: 5 },
-    { id: 'orb_exalted', weight: 5 },
+    { id: 'orb_augmentation', weight: 300 },
+    { id: 'orb_alteration', weight: 260 },
+    { id: 'orb_scouring', weight: 200 },
+    { id: 'orb_alchemy', weight: 120 },
+    { id: 'orb_regal', weight: 90 },
+    { id: 'orb_chaos', weight: 55 },
+    // Epic-tier orbs — deliberately much more common than before so that
+    // endgame crafting is actually reachable through normal play.
+    { id: 'orb_elevation', weight: 45 },
+    { id: 'orb_cataclysm', weight: 30 },
+    { id: 'orb_ascension', weight: 22 },
+    { id: 'orb_exalted', weight: 22 },
+    // Mirror stays genuinely rare, but shows up over a long session.
+    { id: 'mirror_of_kalandra', weight: 5 },
 ];
 
 const EG_CURRENCY_DROP_CHANCE_NORMAL = 0.25; // 25% per normal kill
@@ -273,6 +287,40 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
         return;
     }
 
+    // Mirror: instead of modifying the target, create an independent copy
+    // in the next free inventory slot. The copy keeps the original untouched
+    // and can itself be modified further with any currency.
+    if (def.isMirror) {
+        let freeR = -1, freeC = -1;
+        outer:
+        for (let r = 0; r < EG_INV_ROWS; r++) {
+            for (let c = 0; c < EG_INV_COLS; c++) {
+                if (!_egInventory[r][c]) { freeR = r; freeC = c; break outer; }
+            }
+        }
+        if (freeR === -1) {
+            showToast(t('eg_inventory_full'));
+            _egCancelCurrencyUse(true);
+            return;
+        }
+
+        const copy = JSON.parse(JSON.stringify(item));
+        copy.mirrored = true;
+        _egInventory[freeR][freeC] = copy;
+        _egRenderInventoryCell(freeR, freeC);
+        if (typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
+
+        // Consume one mirror from the stack.
+        stack.count = (stack.count || 1) - 1;
+        if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
+        _egRenderCurrencyCell(sourceRow, sourceCol);
+
+        _egCancelCurrencyUse(true);
+        showToast(t('eg_mirror_created').replace('{name}', copy.name));
+        egSaveHubState();
+        return;
+    }
+
     const newItem = def.apply(item);
     applyFn(newItem);
 
@@ -305,8 +353,10 @@ document.addEventListener('contextmenu', function (e) {
     const item = _egCurrencyStash[r][c];
     if (!item) return;
 
+    if (!item.category) return; // empty cell
+
     const def = EG_CURRENCY_DEFS[item.id];
-    if (!def || typeof def.apply !== 'function') {
+    if (!def || (typeof def.apply !== 'function' && !def.isMirror)) {
         showToast(t('eg_no_usable_effect'));
         return;
     }

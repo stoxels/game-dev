@@ -26,7 +26,7 @@
 // Each shard maps 1:1 to its parent orb. name/description are resolved
 // through t() so translations stay in translations-strings.js.
 
-const EG_SHARD_STACK_MAX = 20;
+const EG_SHARD_STACK_MAX = 10;
 
 const EG_SHARD_DEFS = {
     shard_transmutation: {

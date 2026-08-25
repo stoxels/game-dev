@@ -99,6 +99,10 @@ function _egBuildItemChipHTML(item, size = 'normal') {
     // Items whose stat requirements cannot currently be met get a red flag
     // (see _egIsItemBlocked in endgame-requirements.js).
     const blockedClass = _egIsItemBlocked(item) ? 'eg-req-blocked' : '';
+    // Equipment items show their item level in the top-left corner of the slot.
+    const ilvlBadge = (item.category === 'equip' && item.itemLevel != null)
+        ? `<span class="eg-item-ilvl">${item.itemLevel}</span>`
+        : '';
     const chipId = `egchip-${++_egChipCounter}`;
     _egChipRegistry.set(chipId, item);
 
@@ -109,6 +113,7 @@ function _egBuildItemChipHTML(item, size = 'normal') {
      onmouseenter="_egShowTooltipFromChip('${chipId}', event)"
      onmousemove="_egMoveTooltip(event)"
      onmouseleave="_egClearTooltip()">
+    ${ilvlBadge}
     <span class="eg-item-chip-icon">${item.icon || '📦'}</span>
     <span class="eg-item-chip-name">${item.name || '???'}</span>
 </div>`;
@@ -278,7 +283,7 @@ function _egBuildTopbarHTML() {
     return `
 <div class="eg-topbar">
     <button class="eg-back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
-    <span class="eg-topbar-title">${t('eg_nexus_title')}</span>
+    <span class="eg-topbar-title">${t('eg_char_sheet_title')}</span>
     <button class="eg-level-btn" id="eg-level-btn"
          onclick="_egOpenAttributeWindow()"
          onmouseenter="_egShowLevelBtnTooltip(event)"
@@ -287,7 +292,7 @@ function _egBuildTopbarHTML() {
     <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
          onmouseenter="_egShowHubInfoTooltip(event)"
          onmousemove="moveGameTooltip(event)"
-         onmouseleave="hideGameTooltip()">?</button>
+         onmouseleave="_egHideHubInfoTooltip()">?</button>
 </div>`;
 }
 
@@ -316,6 +321,18 @@ function _egBuildHubInfoTooltipHTML() {
 
 function _egShowHubInfoTooltip(e) {
     showGameTooltip(_egBuildHubInfoTooltipHTML(), e);
+    // The controls list needs more width than the shared default —
+    // without this the tooltip becomes very narrow and very tall.
+    const tip = document.getElementById('ghud-floating-tip');
+    if (tip) tip.classList.add('eg-wide-tip');
+}
+
+// Hides the hub info tooltip AND drops the widened-tip class again so
+// other tooltips on the shared engine keep their default width.
+function _egHideHubInfoTooltip() {
+    const tip = document.getElementById('ghud-floating-tip');
+    if (tip) tip.classList.remove('eg-wide-tip');
+    hideGameTooltip();
 }
 
 // Assembles the complete hub screen layout:
@@ -616,11 +633,27 @@ function _egBuildTooltipBodyHTML(item) {
         : '';
 
     // ── Implicit defenses ────────────────────────────────────────────
+    // Values shown are the LOCAL-modified totals (base + local flat, scaled
+    // by the item's own "% increased" mods). Values altered by local mods
+    // get the .eg-tt-val-modified highlight so the player can tell them
+    // apart from the untouched base value.
     const implicitLines = [];
     const def = item.defenses || {};
-    if ((def.armour || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_armour')}: <span class="eg-tt-val">${def.armour}</span></div>`);
-    if ((def.evasion || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_evasion')}: <span class="eg-tt-val">${def.evasion}</span></div>`);
-    if ((def.absorption || 0) > 0) implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_absorption')}: <span class="eg-tt-val">${def.absorption}</span></div>`);
+    let eff = null;
+    try { eff = _egGetItemEffectiveDefenses(item); } catch (e) { eff = null; }
+    const defVal = (stat) => {
+        if (eff) return { v: eff[stat], m: eff.modded && eff.modded[stat] };
+        return { v: def[stat] || 0, m: false };
+    };
+    const defLine = (labelKey, stat) => {
+        const { v, m } = defVal(stat);
+        if ((v || 0) <= 0) return;
+        const valCls = m ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
+        implicitLines.push(`<div class="eg-tt-implicit">${t(labelKey)}: <span class="${valCls}">${v}</span></div>`);
+    };
+    defLine('eg_tt_armour', 'armour');
+    defLine('eg_tt_evasion', 'evasion');
+    defLine('eg_tt_absorption', 'absorption');
     if (item.damage) {
         implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_damage')}: <span class="eg-tt-val">${item.damage.min}–${item.damage.max}</span></div>`);
         implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attacks_sec')}: <span class="eg-tt-val">${item.attacksPerSecond}</span></div>`);
@@ -698,6 +731,10 @@ function _egBuildTooltipBodyHTML(item) {
         ? `<div class="eg-tt-ilvl">${t('eg_item_level').replace('{n}', item.itemLevel)}</div>`
         : '';
 
+    const mirroredHTML = item.mirrored
+        ? `<div class="eg-tt-mirrored">🪞 ${t('eg_tt_mirrored')}</div>`
+        : '';
+
     return `
 <div class="eg-tt-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
@@ -710,6 +747,7 @@ function _egBuildTooltipBodyHTML(item) {
     ${chainHTML}
     ${modsHTML}
     ${ilvlHTML}
+    ${mirroredHTML}
 </div>`;
 }
 
@@ -980,26 +1018,11 @@ function showEndgameHub() {
     _egClearTooltip();
 }
 
-// Navigates back from the hub. Returns to the endgame test screen when
-// the hub was opened from there, otherwise goes to the level select screen.
+// Navigates back from the character sheet & inventory screen.
+// The Nexus of Worlds screen is the parent of all endgame screens,
+// so the back button always returns there.
 function safeGoBackFromHub() {
-    if (window._egHubReturnScreen === 'screen-endgame-test-hub') {
-        window._egHubReturnScreen = null;
-        showEndgameTestHub();
-        return;
-    }
-    safeGoToLevelSelect();
-}
-
-// Navigates back to the level select screen.
-// Falls back to a console warning if goToLevelSelect() is not yet declared.
-function safeGoToLevelSelect() {
-    if (typeof goToLevelSelect === 'function') {
-        goToLevelSelect();
-    } else {
-        console.warn('[EG] goToLevelSelect() is not declared. Redirecting to console fallback.');
-        alert(t('eg_returning_level_select'));
-    }
+    showEndgameNexus();
 }
 
 

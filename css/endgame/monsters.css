@@ -245,6 +245,51 @@
     text-shadow: 1px 1px 2px black;
 }
 
+/* ── Lose-control overlay (block recovery) ─────────────────────────── */
+/* WoW-style centered "you cannot attack" indicator with countdown.    */
+#eg-block-lockout-overlay {
+    position: fixed;
+    /* Compact bar sitting in the gap between the puzzle grid and
+       the inventory strip at the bottom of the screen */
+    bottom: calc(var(--inv-panel-h, 75px) + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9000;
+    pointer-events: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: rgba(10, 10, 14, 0.82);
+    border: 1px solid rgba(255, 71, 87, 0.85);
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.45), inset 0 0 8px rgba(255, 71, 87, 0.2);
+    font-family: var(--PX, monospace);
+}
+
+#eg-block-lockout-overlay .eg-lockout-icon {
+    font-size: 16px;
+    line-height: 1;
+    filter: grayscale(0.4) drop-shadow(0 0 4px rgba(255, 71, 87, 0.7));
+}
+
+#eg-block-lockout-overlay .eg-lockout-countdown {
+    font-size: 15px;
+    font-weight: bold;
+    color: #ff6b7d;
+    text-shadow: 1px 1px 2px black;
+    min-width: 30px;
+    text-align: right;
+}
+
+#eg-block-lockout-overlay .eg-lockout-label {
+    font-size: 10px;
+    color: #c8c8c8;
+    opacity: 0.85;
+    white-space: nowrap;
+}
+
 /* Specific colors */
 .eg-damage-number {
     position: absolute;
@@ -1023,4 +1068,142 @@
 .player-charge-bar-color {
     background: #4ade80; /* A distinct green/cyan to differentiate from monster's purple charge */
     transition: width 0.1s linear; /* Smooth 100ms ticking[cite: 2] */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   ELEMENTAL AILMENTS (endgame-ailments.js)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Status icon strips (player avatar + monster cards) ──────────────── */
+.eg-status-strip {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    flex-wrap: wrap;
+    min-height: 0;
+}
+
+.eg-player-status-strip {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    pointer-events: none;
+}
+
+.eg-status-icon {
+    font-size: 10px;
+    line-height: 1;
+    padding: 2px 3px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    animation: eg-status-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes eg-status-pulse {
+    from { opacity: 0.75; transform: scale(0.95); }
+    to   { opacity: 1;    transform: scale(1); }
+}
+
+.st-ignite     { border-color: #f97316; box-shadow: 0 0 6px rgba(249,115,22,0.8); }
+.st-chill      { border-color: #67e8f9; box-shadow: 0 0 6px rgba(103,232,249,0.8); }
+.st-frozen     { border-color: #93c5fd; box-shadow: 0 0 6px rgba(147,197,253,0.9); }
+.st-shocked    { border-color: #fde047; box-shadow: 0 0 6px rgba(253,224,71,0.8); }
+.st-shadowburn { border-color: #a78bfa; box-shadow: 0 0 6px rgba(167,139,250,0.8); }
+.st-polymorph { border-color: #e879f9; box-shadow: 0 0 6px rgba(232,121,249,0.8); }
+
+/* Purple DoT numbers for ailment ticks on the player HUD */
+.eg-dot-damage {
+    color: #c084fc !important;
+}
+
+/* ── Puzzle: lava cells ──────────────────────────────────────────────── */
+.eg-lava-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    background: rgba(234, 88, 12, 0.35);
+    border: 2px solid #ea580c;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 6;
+    animation: eg-lava-pulse 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes eg-lava-pulse {
+    from { background: rgba(234,88,12,0.25); border-color: #ea580c; }
+    to   { background: rgba(234,88,12,0.55); border-color: #fdba74; }
+}
+
+/* ── Puzzle: ice cells ───────────────────────────────────────────────── */
+.eg-ice-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    background: rgba(103, 232, 249, 0.28);
+    border: 2px solid #22d3ee;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 6;
+    animation: eg-ice-shimmer 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes eg-ice-shimmer {
+    from { background: rgba(103,232,249,0.18); border-color: #22d3ee; }
+    to   { background: rgba(165,243,252,0.45); border-color: #cffafe; }
+}
+
+/* ── Puzzle: shocked cursor (lightning) ──────────────────────────────── */
+body.eg-cursor-shocked,
+body.eg-cursor-shocked .gc {
+    cursor: crosshair;
+}
+
+#eg-cursor-sparks {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 99999;
+    filter: drop-shadow(0 0 5px rgba(253, 224, 71, 0.95));
+    animation: eg-spark-flicker 0.25s steps(2) infinite;
+}
+
+@keyframes eg-spark-flicker {
+    0%   { opacity: 0.55; transform: translate(-50%, -50%) rotate(-12deg) scale(0.9); }
+    100% { opacity: 1;    transform: translate(-50%, -50%) rotate(14deg) scale(1.15); }
+}
+
+/* ── Puzzle: shadow clue-line blackout ───────────────────────────────── */
+.eg-shadow-clue-blackout {
+    color: transparent !important;
+    text-shadow: none !important;
+    position: relative;
+}
+
+.eg-shadow-clue-blackout::after {
+    content: '?';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #7c3aed;
+    text-shadow: 0 0 6px rgba(124, 58, 237, 0.9);
+    animation: eg-shadow-flicker 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes eg-shadow-flicker {
+    from { opacity: 0.45; }
+    to   { opacity: 0.9; }
 }

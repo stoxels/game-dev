@@ -172,10 +172,10 @@ function launchAdventureMode() {
     }
 }
 
-// Launches the endgame test hub (see endgame-screens.js).
+// Launches the endgame Nexus of Worlds screen (see endgame-nexus.js).
 function launchEndgameTestMode() {
     screenHistory.push('screen-mode-select');
-    if (typeof showEndgameTestHub === 'function') showEndgameTestHub();
+    if (typeof showEndgameNexus === 'function') showEndgameNexus();
 }
 
 // Closes any overlays and active quiz, then navigates to the level select screen.

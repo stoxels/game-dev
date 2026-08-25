@@ -57,6 +57,7 @@ let touchpadMarkModeActive = false;
 // Returns true if the current level is an endgame sandbox or monster level.
 // Used to guard all _eg* hook calls throughout this file.
 function isEndgameLevel() {
+    if (!cur) return false;
     return cur.isEndgameSandbox || cur.isMonsterLevel;
 }
 
@@ -119,12 +120,22 @@ function checkActiveAbilityIntercept(row, col) {
     return false;
 }
 
+// Elemental ailment puzzle effects (endgame): clicks on icy cells may slip
+// onto a random adjacent cell. See endgame-ailments.js.
+function checkElementalAilmentIntercept(row, col) {
+    if (typeof _egPuzzleIceRedirect === 'function' && _egPuzzleIceRedirect(row, col)) {
+        return true;
+    }
+    return false;
+}
+
 // Runs all special intercepts in priority order.
 // Returns true if any intercept consumed the click.
 function checkSpecialIntercepts(row, col) {
     if (checkBossCorruptionIntercept(row, col)) return true;
     if (checkBayesianTrapIntercept(row, col)) return true;
     if (checkActiveAbilityIntercept(row, col)) return true;
+    if (checkElementalAilmentIntercept(row, col)) return true;
     return false;
 }
 
@@ -644,6 +655,8 @@ function handleCorrectFill(row, col) {
     if (isEndgameLevel()) {
         _egCheckAllClaims(row, col);
         if (typeof _egOnCorrectCell === 'function') _egOnCorrectCell(row, col);
+        // Shocked-cursor ailment: reveals may strip ✕ marks from neighbours
+        if (typeof _egOnCorrectCellPuzzleFX === 'function') _egOnCorrectCellPuzzleFX(row, col);
     }
 
     updateDragStrokeCounter(row, col);

@@ -322,8 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Handles the "return to nexus" button press from inside an endgame map.
-     * Mirrors onGoToLevelsFromGame() but navigates back to the endgame hub
-     * (Nexus of Worlds) instead of the level select screen.
+     * Mirrors onGoToLevelsFromGame() but navigates back to the Nexus of
+     * Worlds screen (the parent of all endgame screens) instead of the
+     * level select screen.
      */
     function onReturnToNexusFromGame() {
         if (cur && cur.isMonsterLevel && typeof _egIsActive === 'function' && _egIsActive()) {
@@ -334,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof _egStopEncounter === 'function') _egStopEncounter();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
-                showEndgameHub();
+                showEndgameNexus();
             });
             return;
         }
@@ -344,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stopTimer();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
-        showEndgameHub();
+        showEndgameNexus();
     }
 
     onClick('btn-go-nexus', onReturnToNexusFromGame);
