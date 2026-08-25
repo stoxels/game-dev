@@ -839,6 +839,11 @@ function stopPainting() {
     dragPrefillApplied = false;
     dragPrefillOffset = 0;
     dragCounterClear();
+
+    // Endgame: release the charged projectile accumulated while drag-painting
+    if (isEndgameLevel() && typeof _egReleaseChargedShot === 'function') {
+        _egReleaseChargedShot();
+    }
 }
 
 //------------------------------------------------------------------------

@@ -187,6 +187,26 @@
     text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
 }
 
+/* Charging projectile: stacks up while the player drag-paints.
+   Anchored over the stroke's start cell via left/top (set in JS) and pulled
+   back by half its size so growth stays centred on the cell. */
+.eg-proj-charging {
+    z-index: 10001;
+    transform: translate(-50%, -50%);
+    animation: eg-charge-pulse 0.6s ease-in-out infinite;
+}
+
+@keyframes eg-charge-pulse {
+    0%, 100% {
+        filter: brightness(1);
+        text-shadow: 0 0 10px rgba(255, 200, 60, 0.8);
+    }
+    50% {
+        filter: brightness(1.8);
+        text-shadow: 0 0 22px rgba(255, 220, 100, 1);
+    }
+}
+
 @keyframes eg-attack-pulse {
     0% {
         transform: scale(1);

@@ -3,6 +3,10 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Per-element breakdown of the most recent _egCalcPlayerDamage() roll.
+// Consumed by impact handlers to apply monster resistances per element.
+let _egLastHitElements = null;
+
 function _egCalcPlayerDamage() {
     const stats = _egComputePlayerStats();
 
@@ -11,7 +15,11 @@ function _egCalcPlayerDamage() {
     dmg *= (1 + stats.physIncPct / 100);
 
     // Elemental damage adds after the physical multiplier — it isn't scaled by inc_physical_damage.
-    dmg += _egGetElementalDamageBonus(stats);
+    // The per-element breakdown is kept in _egLastHitElements so the impact
+    // site can apply the target monster's elemental resistances.
+    const elements = _egRollElementalBreakdown(stats);
+    _egLastHitElements = elements;
+    dmg += elements.fire + elements.cold + elements.lightning + elements.shadow;
 
     const critMult = _egRollCrit(stats);
     dmg *= critMult;
@@ -29,4 +37,83 @@ function _egCalcPlayerDamage() {
     }
 
     return dmg;
+}
+
+
+//------------------------------------------------------------------------
+//-------------------ELEMENTAL DAMAGE & RESISTANCES-----------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Resistances (player and monster side) never reduce more than this share.
+const EG_RESIST_CAP_PCT = 75;
+
+const EG_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
+
+// Per-element flat damage roll for one hit. Returns { fire, cold, lightning, shadow }.
+function _egRollElementalBreakdown(stats) {
+    const roll = (min, max) => (min > 0 || max > 0) ? min + Math.random() * (max - min) : 0;
+    return {
+        fire: roll(stats.fireDmgMin, stats.fireDmgMax),
+        cold: roll(stats.coldDmgMin, stats.coldDmgMax),
+        lightning: roll(stats.lightningDmgMin, stats.lightningDmgMax),
+        shadow: roll(stats.shadowDmgMin, stats.shadowDmgMax),
+    };
+}
+
+// Total flat elemental damage bonus of one hit (sum of the breakdown).
+function _egGetElementalDamageBonus(stats) {
+    const e = _egRollElementalBreakdown(stats);
+    return e.fire + e.cold + e.lightning + e.shadow;
+}
+
+// Returns an element breakdown scaled by `factor` (used when only a % of the
+// original hit is dealt, e.g. reveal projectiles).
+function _egScaleElements(elements, factor) {
+    if (!elements) return null;
+    const out = {};
+    EG_ELEMENTS.forEach(el => { out[el] = (elements[el] || 0) * factor; });
+    return out;
+}
+
+// Applies the target monster's elemental resistances to an incoming hit.
+// `elements` maps each element to the raw elemental damage carried by the hit
+// (proportional to `amount`); everything else counts as physical and passes
+// through unmitigated. Returns the post-resistance total.
+function _egApplyTargetResistances(amount, target, elements) {
+    if (!target || !target.resistances || !elements) return amount;
+
+    // Scale the stored breakdown to the actual hit size in case the caller
+    // applied multipliers after the roll (crit, reveal %, charged stacks).
+    const elemTotal = EG_ELEMENTS.reduce((sum, el) => sum + (elements[el] || 0), 0);
+    if (elemTotal <= 0 || elemTotal > amount) return amount;
+
+    const factor = elemTotal / amount;
+    let mitigated = 0;
+    EG_ELEMENTS.forEach(el => {
+        const part = (elements[el] || 0) * factor;
+        if (part <= 0) return;
+        const resPct = Math.min(EG_RESIST_CAP_PCT, Math.max(0, target.resistances[el] || 0));
+        mitigated += part * (1 - resPct / 100);
+    });
+
+    const physical = amount - elemTotal;
+    return Math.max(1, Math.round(physical + mitigated));
+}
+
+// Reduces an elemental monster hit by the player's matching resistance %
+// plus the flat Arcane Resistance (which applies to ALL elemental damage).
+// Non-elemental hits pass through untouched. Returns the reduced amount.
+function _egCalcPlayerResistanceReduction(amount, stats, element) {
+    if (!element || amount <= 0) return amount;
+    const resMap = {
+        fire: stats.fireResist,
+        cold: stats.coldResist,
+        lightning: stats.lightningResist,
+        shadow: stats.shadowResist,
+    };
+    const resPct = Math.min(EG_RESIST_CAP_PCT, Math.max(0, resMap[element] || 0));
+    let reduced = amount * (1 - resPct / 100);
+    reduced = Math.max(0, reduced - Math.max(0, stats.arcaneResistFlat || 0));
+    return reduced;
 }

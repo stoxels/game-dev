@@ -215,6 +215,11 @@ function buildFreshState() {
         achStats: {},
 
         // endgame hub
+        // Character leveling & attribute points (see endgame-leveling.js)
+        playerLevel: 1,
+        playerXP: 0,
+        egAttrPoints: 0,
+        egAttrAllocated: { str: 0, agi: 0, int: 0 },
         egEquipped: {},
         egInventory: _makeEgGrid(
             typeof EG_INV_ROWS !== 'undefined' ? EG_INV_ROWS : 5,
@@ -282,6 +287,10 @@ function _migratePassiveTreeFields(s) {
 
 // _migrateEndgameFields — fills in endgame hub fields missing from an older save.
 function _migrateEndgameFields(s) {
+    if (!s.playerLevel) s.playerLevel = 1;
+    if (!s.playerXP) s.playerXP = 0;
+    if (!s.egAttrPoints) s.egAttrPoints = 0;
+    if (!s.egAttrAllocated) s.egAttrAllocated = { str: 0, agi: 0, int: 0 };
     if (!s.egEquipped) s.egEquipped = {};
     if (!s.egInventory) {
         s.egInventory = _makeEgGrid(
@@ -411,6 +420,8 @@ function loadStateFromSlot(slotNum) {
     }
     setActiveSlot(slotNum);
     STATE = raw;
+    // Re-sync endgame leveling (player level / attribute points) to the newly loaded save.
+    if (typeof _egLoadLevelingState === 'function') _egLoadLevelingState();
     save();
     return STATE;
 }

@@ -65,6 +65,28 @@ Layout Architecture:
     letter-spacing: 2px;
 }
 
+/* ── TOP BAR LEVEL BUTTON — opens the character/attribute window ── */
+.eg-level-btn {
+    margin-left: auto;
+    position: relative;
+    font-family: var(--PX);
+    font-size: 9px;
+    background: transparent;
+    border: 1px solid var(--yellow, #c8a84b);
+    color: var(--yellow, #c8a84b);
+    padding: 7px 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.12s;
+    white-space: nowrap;
+}
+
+    .eg-level-btn:hover {
+        border-color: #f5d98a;
+        color: #f5d98a;
+        box-shadow: 0 0 8px rgba(200, 168, 75, 0.4);
+    }
+
 .eg-topbar-sub {
     font-family: var(--PX);
     font-size: 8px;

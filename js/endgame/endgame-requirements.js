@@ -16,10 +16,10 @@
 //   - GRANDFATHER RULE: moves are only blocked when they increase the total
 //     number of violated requirements. Loadouts built before enforcement
 //     existed can always be dismantled/fixed instead of locking the player in.
-//   - Player level: no leveling system exists yet (endgame-leveling.js is
-//     empty), so EG_PLAYER_BASE_ATTRIBUTES.level is null and level
-//     requirements are skipped. Set that value (or wire a real source)
-//     and level checks start enforcing automatically.
+//   - Player level: wired to the leveling system (endgame-leveling.js),
+//     which keeps EG_PLAYER_BASE_ATTRIBUTES synced to STATE.playerLevel
+//     and the allocated attribute points — level requirements therefore
+//     enforce automatically.
 //
 // Dependencies (must be loaded before this file):
 //   endgame-player-stats.js — EG_STAT_KEY_MAP, _egGetAllEquippedItems()

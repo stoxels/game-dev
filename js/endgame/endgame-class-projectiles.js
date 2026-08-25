@@ -71,7 +71,9 @@ function _egGetElementCentre(el) {
 // onArrive() is called when the animation completes (i.e. on impact).
 // Optional orient = { rotate: bool, rotOffset: deg } points the emoji along
 // the flight vector instead of keeping its upright resting orientation.
-function _egFireProjectile(emoji, cssClass, start, end, duration, easing, onArrive, orient) {
+// Optional startScale overrides the launch size (used by charged shots that
+// grow while stacking).
+function _egFireProjectile(emoji, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
     const proj = document.createElement('div');
     proj.className = `eg-projectile ${cssClass}`;
     proj.textContent = emoji;
@@ -85,8 +87,9 @@ function _egFireProjectile(emoji, cssClass, start, end, duration, easing, onArri
         rot = `rotate(${flightAngle + (orient.rotOffset || 0)}deg) `;
     }
 
+    const scaleStart = startScale || 1.5;
     const anim = proj.animate([
-        { transform: `translate(${start.x}px, ${start.y}px) ${rot}scale(1.5)` },
+        { transform: `translate(${start.x}px, ${start.y}px) ${rot}scale(${scaleStart})` },
         { transform: `translate(${end.x}px,   ${end.y}px)   ${rot}scale(0.5)` },
     ], { duration, easing });
 
@@ -106,10 +109,13 @@ function _egOnProgrammaticReveal(cellIds) {
         if (!sourceEl) return;
         setTimeout(() => {
             if (!_egIsActive()) return;
-            const damage = Math.max(1, Math.round(
-                _egCalcPlayerDamage() * _egGetRevealProjectileDamagePct() / 100));
+            const revealPct = _egGetRevealProjectileDamagePct() / 100;
+            const rolled = _egCalcPlayerDamage();
+            const damage = Math.max(1, Math.round(rolled * revealPct));
+            // Keep the per-element share so monster resistances still apply
+            const elements = _egScaleElements(_egLastHitElements, revealPct);
             const targetIdAtFire = _egTargetId; // snapshot — do not use _egTargetId in the callback
-            _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl);
+            _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, undefined, elements);
         }, i * EG_REVEAL_PROJECTILE_STAGGER_MS);
     });
 }

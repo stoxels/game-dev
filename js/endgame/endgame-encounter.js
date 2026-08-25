@@ -281,6 +281,7 @@ function _egResetEncounterState() {
     _egMonsterSpawnCounter = 0;
     _egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption;
     _egCancelAbsorptionRegen();
+    if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
 }
 
 // Starts the combat tick loop at 10Hz.
@@ -322,6 +323,7 @@ function _egStopEncounter() {
     _egMonsters = [];
     _egTargetId = null;
 
+    if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
     _egStopTickLoop();
     _egCancelSpawnTimers();
     _egStopPickupSpawner();
@@ -590,7 +592,7 @@ function _egAnimateMonsterProjectile(monster) {
     const end = _egGetElementCentre(targetHud);
 
     _egFireProjectile(monster.emoji, 'eg-proj-monster', start, end, EG_MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
-        const dealt = _egPlayerTakeDamage(monster.damageValue);
+        const dealt = _egPlayerTakeDamage(monster.damageValue, false, monster.element);
         if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
     });
 }
@@ -599,7 +601,7 @@ function _egAnimateMonsterProjectile(monster) {
 // Only fires if the encounter is still active and the monster is still alive.
 function _egApplyMeleeImpact(monster) {
     if (!_egIsActive() || !_egMonsters.some(m => m.id === monster.id)) return;
-    const dealt = _egPlayerTakeDamage(monster.damageValue);
+    const dealt = _egPlayerTakeDamage(monster.damageValue, false, monster.element);
     if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
 }
 
@@ -644,8 +646,10 @@ function _egTrackRecentFill(row, col) {
 }
 
 // Entry point called from mouse-button-handlers.js on every correct cell fill.
-// Snapshots the target ID before the animation runs so mid-flight target
-// changes don't redirect the projectile.
+// Charged shot system: instead of firing one projectile per painted cell, each
+// correct fill rolls its damage and stacks it into a single charging
+// projectile anchored on the stroke's first cell. The shot is released with
+// the combined damage when the player stops painting (_egReleaseChargedShot).
 function _egOnCorrectCell(row, col) {
     if (!_egIsActive()) return;
 
@@ -658,15 +662,27 @@ function _egOnCorrectCell(row, col) {
     if (row !== undefined && col !== undefined) _egTrackRecentFill(row, col);
 
     const damage = _egCalcPlayerDamage();
-    const targetIdAtFire = _egTargetId; // snapshot — do not use _egTargetId in the callback
-    _egAnimatePlayerProjectile(damage, targetIdAtFire, row, col);
+    EG_ELEMENTS.forEach(el => {
+        _egDragChargeElements[el] += _egLastHitElements ? (_egLastHitElements[el] || 0) : 0;
+    });
+
+    // Anchor the charging projectile on the stroke's first painted cell
+    if (_egDragChargeStacks === 0 && row !== undefined && col !== undefined) {
+        _egDragChargeRow = row;
+        _egDragChargeCol = col;
+    }
+    _egDragChargeDamage += damage;
+    _egDragChargeStacks++;
+    _egUpdateChargedProjectileVisual();
 }
 
 
 // Launches a projectile from the clicked cell toward the targeted monster card.
 // If the target card is not visible (e.g. not yet rendered), damage is applied
 // instantly so no hits are silently lost.
-function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride) {
+// `elements` optionally carries the per-element damage share of `amount` so
+// monster resistances can be applied at impact.
+function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride, startScale, elements) {
     // Explicit source element first (reveal-triggered shots), then the cell
     // element, falling back to the HUD if missing
     let sourceEl = sourceElOverride
@@ -682,7 +698,7 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
 
     if (!sourceEl || !targetCard) {
         // No visual target — apply damage instantly without animation
-        if (damage != null) _egDamageTargetById(targetId, damage);
+        if (damage != null) _egDamageTargetById(targetId, damage, elements);
         return;
     }
 
@@ -692,8 +708,90 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
     const orient = { rotate: projDef.rotate !== false, rotOffset: projDef.rotOffset || 0 };
 
     _egFireProjectile(projDef.emoji, projDef.cssClass, start, end, projDef.duration, projDef.easing, () => {
-        _egDamageTargetById(targetId, damage);
-    }, orient);
+        _egDamageTargetById(targetId, damage, elements);
+    }, orient, startScale);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DRAG-PAINT CHARGED SHOT------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Visual growth of the charging projectile per stacked cell.
+const EG_DRAG_CHARGE_BASE_SIZE_PX = 28;      // matches .eg-projectile font-size
+const EG_DRAG_CHARGE_SIZE_PER_STACK_PX = 7;
+const EG_DRAG_CHARGE_MAX_VISUAL_STACKS = 12; // size cap for the charging visual
+const EG_DRAG_CHARGE_SCALE_PER_STACK = 0.18; // extra launch scale on release
+
+// Creates or refreshes the charging projectile div anchored over the stroke's
+// first painted cell. Grows with every stacked cell and pulses while charging.
+function _egUpdateChargedProjectileVisual() {
+    if (!_egIsActive() || _egDragChargeStacks <= 0) return;
+
+    let proj = document.getElementById('eg-charging-projectile');
+    if (!proj) {
+        proj = document.createElement('div');
+        proj.id = 'eg-charging-projectile';
+        document.body.appendChild(proj);
+    }
+
+    const projDef = _egGetProjectileDef();
+    proj.className = `eg-projectile eg-proj-charging ${projDef.cssClass}`;
+    proj.textContent = projDef.emoji;
+
+    const stacksForVisual = Math.min(_egDragChargeStacks, EG_DRAG_CHARGE_MAX_VISUAL_STACKS);
+    proj.style.fontSize = `${EG_DRAG_CHARGE_BASE_SIZE_PX + stacksForVisual * EG_DRAG_CHARGE_SIZE_PER_STACK_PX}px`;
+
+    // Anchor on the stroke's start cell; fall back to the HUD handle
+    const anchor = ((_egDragChargeRow >= 0 && _egDragChargeCol >= 0)
+        && document.getElementById(`g-${_egDragChargeRow}-${_egDragChargeCol}`))
+        || document.getElementById('class-hud-drag-handle');
+    if (anchor) {
+        const c = _egGetElementCentre(anchor);
+        proj.style.left = `${c.x}px`;
+        proj.style.top = `${c.y}px`;
+    }
+}
+
+// Removes the charging projectile div and resets all stroke charge state.
+function _egClearChargedProjectileVisual() {
+    const proj = document.getElementById('eg-charging-projectile');
+    if (proj) proj.remove();
+    _egDragChargeDamage = 0;
+    EG_ELEMENTS.forEach(el => { _egDragChargeElements[el] = 0; });
+    _egDragChargeStacks = 0;
+    _egDragChargeRow = -1;
+    _egDragChargeCol = -1;
+}
+
+// Called from stopPainting(): releases the accumulated stroke as one combined-
+// damage projectile toward the currently targeted monster. The target ID is
+// snapshotted at release so mid-flight retargets don't redirect the shot.
+// The projectile launches from the stroke's first cell with a launch scale
+// that grows with the number of stacked cells.
+function _egReleaseChargedShot() {
+    const stacks = _egDragChargeStacks;
+    const damage = _egDragChargeDamage;
+    const row = _egDragChargeRow;
+    const col = _egDragChargeCol;
+    // Snapshot the elemental share before clearing — needed so the target's
+    // resistances can be applied per element at impact time.
+    const elements = Object.assign({}, _egDragChargeElements);
+    _egClearChargedProjectileVisual();
+
+    if (!_egIsActive()) return;
+    if (stacks <= 0 || !damage) return;
+
+    // Still recovering from a recent block — the charge fizzles
+    if (Date.now() < _egPlayerBlockLockoutUntil) return;
+
+    const sourceEl = (row >= 0 && col >= 0)
+        ? document.getElementById(`g-${row}-${col}`)
+        : null;
+    const targetIdAtFire = _egTargetId; // snapshot — do not use _egTargetId in the callback
+    const startScale = 1.5 + Math.min(stacks, EG_DRAG_CHARGE_MAX_VISUAL_STACKS) * EG_DRAG_CHARGE_SCALE_PER_STACK;
+    _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements);
 }
 
 
@@ -883,9 +981,11 @@ function _egApplyHitToMonster(target, amount) {
 }
 
 // Applies incoming player damage to a specific monster by id.
-// Handles boss immunity, stat changes, phase transitions, and kill detection.
+// Handles boss immunity, elemental resistances, stat changes, phase
+// transitions, and kill detection.
 // Called by the projectile onfinish callback so the impact matches visually.
-function _egDamageTargetById(monsterId, amount) {
+// `elements` optionally maps each element to the elemental share of `amount`.
+function _egDamageTargetById(monsterId, amount, elements) {
     if (!_egIsActive()) return;
 
     const target = _egMonsters.find(m => m.id === monsterId);
@@ -896,6 +996,10 @@ function _egDamageTargetById(monsterId, amount) {
         _egFlashImmune(target.id);
         return;
     }
+
+    // Elemental resistances reduce only the elemental share of the hit;
+    // the physical portion passes through untouched.
+    amount = _egApplyTargetResistances(amount, target, elements);
 
     _egApplyHitToMonster(target, amount);
     _egShowDamageNumber(target.id, amount);
@@ -913,12 +1017,15 @@ function _egDamageTargetById(monsterId, amount) {
 }
 
 
-// Applies incoming monster damage to the player, after dodge/block/armour/
-// absorption mitigation. Returns the actual HP lost (0 if dodged/blocked/
-// fully absorbed) so callers can show an accurate floating number.
+// Applies incoming monster damage to the player, after dodge/block/resist/
+// armour/absorption mitigation. Returns the actual HP lost (0 if dodged/
+// blocked/fully absorbed) so callers can show an accurate floating number.
 // `isSpell` routes the hit through spell block instead of attack block
 // (boss abilities pass true; regular monster attacks use the default).
-function _egPlayerTakeDamage(amount, isSpell = false) {
+// `element` is the damage type of the attack ('fire'|'cold'|'lightning'|
+// 'shadow'); elemental hits are reduced by the matching resistance % plus
+// flat Arcane Resistance. Physical hits (no element) ignore resistances.
+function _egPlayerTakeDamage(amount, isSpell = false, element = null) {
     if (!_egIsActive()) return 0;
 
     const stats = _egComputePlayerStats();
@@ -956,6 +1063,10 @@ function _egPlayerTakeDamage(amount, isSpell = false) {
         _egPlayerBlockLockoutUntil = Date.now() + EG_BLOCK_LOCKOUT_BASE_MS * recoveryFactor;
         return 0;
     }
+
+    // Elemental resistances (fire/cold/lightning/shadow % + flat Arcane
+    // Resistance) mitigate elemental hits before armour and absorption.
+    if (element) amount = _egCalcPlayerResistanceReduction(amount, stats, element);
 
     let mitigated = _egCalcArmourMitigation(amount, stats.armour);
 
@@ -1051,6 +1162,11 @@ function _egKillMonster(monsterId) {
         && typeof _egComputePlayerStats === 'function'
         && playerMaxMana > 0) {
         gainMana(_egComputePlayerStats().manaOnKill || 0);
+    }
+
+    // Experience (endgame-leveling.js) — scaled by the monster's level
+    if (dying && typeof _egGrantMonsterXP === 'function') {
+        _egGrantMonsterXP(dying.level, !!dying.isBoss);
     }
 
     setTimeout(() => _egRenderPanel(), EG_PANEL_RERENDER_DELAY_MS);

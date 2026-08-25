@@ -35,6 +35,7 @@ function confirmFullReset() {
     wipeSaveData();
     resetAllBeats();
     STATE = buildFreshState();
+    if (typeof _egLoadLevelingState === 'function') _egLoadLevelingState(); // re-sync endgame leveling
     save(); // writes the blank state back into the active slot
     showTitle();
     showToast(t('toast_reset'));

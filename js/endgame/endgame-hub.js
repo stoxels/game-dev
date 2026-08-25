@@ -159,7 +159,7 @@ function _egBuildEquipColHTML(col) {
 function _egBuildCharPanelHTML() {
     return `
 <div class="eg-panel eg-panel-char">
-    <div class="eg-panel-label">${t('eg_char_label')}</div>
+    <div class="eg-panel-label eg-char-label-row"><span>${t('eg_char_label')}</span><span id="eg-char-level-inline"></span></div>
     <div class="eg-char-panel eg-char-panel-no-model">
         <div class="eg-stat-block" id="eg-stats-offense">
             <div class="eg-stats-header">${t('eg_stats_offense_label')}</div>
@@ -272,12 +272,18 @@ function _egBuildStashPanelHTML() {
 //-------------------HTML ASSEMBLY: FULL SCREEN---------------------------
 //------------------------------------------------------------------------
 
-// Builds the top navigation bar with back button and hub title.
+// Builds the top navigation bar with back button, level/attribute window
+// button and hub title.
 function _egBuildTopbarHTML() {
     return `
 <div class="eg-topbar">
     <button class="eg-back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('eg_nexus_title')}</span>
+    <button class="eg-level-btn" id="eg-level-btn"
+         onclick="_egOpenAttributeWindow()"
+         onmouseenter="_egShowLevelBtnTooltip(event)"
+         onmousemove="moveGameTooltip(event)"
+         onmouseleave="hideGameTooltip()">✦ ${t('eg_lvl_button_label')}<span class="eg-level-badge" id="eg-level-badge"></span></button>
     <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
          onmouseenter="_egShowHubInfoTooltip(event)"
          onmousemove="moveGameTooltip(event)"
@@ -559,7 +565,8 @@ function _egRenderAll() {
     _egRenderCurrencyStash();
     _egRenderMapStash();
     _egUpdateInvCount();
-    _egRenderStatsList();   
+    _egRenderStatsList();
+    if (typeof _egRenderLevelHUD === 'function') _egRenderLevelHUD();
 }
 
 

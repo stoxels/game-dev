@@ -28,11 +28,13 @@ const EG_BOSS_DEFS = {
     // BOSSES — spawned only via cur.hasBoss / cur.bosses
     boss_null: {
         id: 'boss_null', name: 'The Null', emoji: '🧿',
-        baseHP: 600, baseDamage: 20, chargeMax: 15
+        baseHP: 600, baseDamage: 20, chargeMax: 15,
+        element: 'shadow', resistances: { fire: 15, cold: 15, lightning: 15, shadow: 30 }
     },
     boss_bayes: {
         id: 'boss_bayes', name: 'Bayes', emoji: '🔮',
         baseHP: 800, baseDamage: 15, chargeMax: 12,
+        element: 'lightning', resistances: { fire: 15, cold: 15, lightning: 30, shadow: 15 }
     },
 };
 
@@ -69,6 +71,8 @@ function _egBuildBoss(defOrId, level = 1) {
         chargeMax: def.chargeMax,
         currentCharge: 0,
         damageValue: damage,
+        element: def.element || null,
+        resistances: def.resistances || null
     };
 }
 

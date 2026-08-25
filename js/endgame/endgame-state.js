@@ -40,6 +40,16 @@ let _egVoidSurgePollInterval = null; // handle for the HUD-position poll during 
 // Circular buffer of [row, col] for recently correctly-filled cells.
 let _egRecentFills = [];
 
+// ── Drag-paint charged shot state ────────────────────────────────────────────
+// While the player drag-paints, every correct fill stacks its rolled damage
+// into a single charging projectile. It is released as one combined-damage
+// shot when the player stops painting (stopPainting).
+let _egDragChargeDamage = 0;   // accumulated damage of the current stroke
+let _egDragChargeElements = { fire: 0, cold: 0, lightning: 0, shadow: 0 }; // accumulated per-element share of _egDragChargeDamage
+let _egDragChargeStacks = 0;   // number of painted cells in the current stroke
+let _egDragChargeRow = -1;     // stroke start cell — launch origin of the shot
+let _egDragChargeCol = -1;
+
 // Snapshot of the original map-level def, captured at _egStartEncounter.
 // Used to read boss/requiredKills config after cur has been replaced by chained puzzles.
 let _egMapDef = null;
