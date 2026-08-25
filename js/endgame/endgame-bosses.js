@@ -9,6 +9,14 @@
 const EG_BOSS_LEVEL_HP_SCALE = 0.15; // +15% HP per level above 1
 const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
 
+// ── Soft enrage ──────────────────────────────────────────────────────────────
+// If a boss fight drags on too long, the boss starts stacking damage buffs.
+// Prevents bosses from being trivialised by pure attrition/turtling.
+const EG_BOSS_SOFT_ENRAGE_DELAY_MS = 150000;   // grace period before stacks begin (2.5 min)
+const EG_BOSS_SOFT_ENRAGE_INTERVAL_MS = 30000; // a new stack every 30s after the delay
+const EG_BOSS_SOFT_ENRAGE_DMG_STEP = 0.08;     // +8% damage per stack
+const EG_BOSS_SOFT_ENRAGE_MAX_STACKS = 10;     // hard cap: +80% damage
+
 
 
 
@@ -28,13 +36,23 @@ const EG_BOSS_DEFS = {
     // BOSSES — spawned only via cur.hasBoss / cur.bosses
     boss_null: {
         id: 'boss_null', name: 'The Null', emoji: '🧿',
-        baseHP: 600, baseDamage: 20, chargeMax: 15,
+        baseHP: 900, baseDamage: 26, chargeMax: 15,
         element: 'shadow', resistances: { fire: 15, cold: 15, lightning: 15, shadow: 30 }
     },
     boss_bayes: {
         id: 'boss_bayes', name: 'Bayes', emoji: '🔮',
-        baseHP: 800, baseDamage: 15, chargeMax: 12,
+        baseHP: 1100, baseDamage: 20, chargeMax: 12,
         element: 'lightning', resistances: { fire: 15, cold: 15, lightning: 30, shadow: 15 }
+    },
+    boss_entropy: {
+        id: 'boss_entropy', name: 'Entropy', emoji: '♾️',
+        baseHP: 1000, baseDamage: 22, chargeMax: 13,
+        element: 'cold', resistances: { fire: 15, cold: 30, lightning: 15, shadow: 15 }
+    },
+    boss_laplace: {
+        id: 'boss_laplace', name: "Laplace's Demon", emoji: '👁️',
+        baseHP: 950, baseDamage: 24, chargeMax: 11,
+        element: 'fire', resistances: { fire: 30, cold: 15, lightning: 15, shadow: 15 }
     },
 };
 
@@ -63,6 +81,7 @@ function _egBuildBoss(defOrId, level = 1) {
 
     const monster = {
         id: `${def.id}_${++_egMonsterSpawnCounter}`,
+        baseId: def.id, // unsuffixed def id — used for EG_BOSS_MECHANICS lookups
         name: def.name,
         emoji: def.emoji,
         level: lvl,
@@ -90,22 +109,68 @@ function _egBuildBoss(defOrId, level = 1) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Hook called from _egTickLoop every 10Hz.
-// Currently a no-op — exists as an extension point for future per-tick boss logic.
+// Returns the current soft-enrage damage multiplier for a boss (1.0 if none).
+function _egBossEnrageMultiplier(monster) {
+    return 1 + EG_BOSS_SOFT_ENRAGE_DMG_STEP * (monster.enrageStacks || 0);
+}
+
+// Recomputes a boss's damageValue from its base damage, phase multiplier and
+// soft-enrage stacks. Called on phase transitions and enrage stack ticks.
+function _egBossRecalcDamage(monster) {
+    const phaseData = monster.bossDef.phases[monster.bossPhase - 1];
+    monster.damageValue = Math.round(
+        monster.bossBaseDamage * phaseData.damageMultiplier * _egBossEnrageMultiplier(monster)
+    );
+}
+
+// Per-tick boss logic, called from _egTickLoop every 100ms.
+// Handles the soft-enrage damage stacking for all live bosses.
 function _egBossTick() {
-    // Nothing needed here yet.
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+
+    const now = Date.now();
+    let anyNewlyEnraged = false;
+    _egMonsters.forEach(m => {
+        if (!m.isBoss || !m.bossDef) return;
+
+        if (!m.bossSpawnTime) m.bossSpawnTime = now;
+        const elapsed = now - m.bossSpawnTime - EG_BOSS_SOFT_ENRAGE_DELAY_MS;
+        if (elapsed < 0) return;
+
+        const targetStacks = Math.min(
+            EG_BOSS_SOFT_ENRAGE_MAX_STACKS,
+            1 + Math.floor(elapsed / EG_BOSS_SOFT_ENRAGE_INTERVAL_MS)
+        );
+        if (targetStacks > (m.enrageStacks || 0)) {
+            m.enrageStacks = targetStacks;
+            _egBossRecalcDamage(m);
+            anyNewlyEnraged = true;
+
+            const card = document.getElementById(`eg-card-${m.id}`);
+            const wrapper = card ? card.querySelector('.eg-emoji-wrapper') : null;
+            if (wrapper) wrapper.classList.add('eg-boss-enraged');
+        }
+    });
+
+    if (anyNewlyEnraged && typeof showToast === 'function') {
+        showToast(t('eg_boss_soft_enrage'));
+    }
 }
 
 // Attaches boss runtime state to a newly spawned boss monster object
 // and kicks off its phase 1 mechanics.
 function _egBossInit(monster) {
-    const def = EG_BOSS_MECHANICS[monster.id];
+    // Runtime monster ids are suffixed (e.g. "boss_null_7") — look the
+    // mechanics entry up via the unsuffixed base id.
+    const def = EG_BOSS_MECHANICS[monster.baseId || monster.id];
     if (!def) return; // not all bosses need special mechanics
 
     monster.bossPhase = 1;
     monster.bossImmune = false;
     monster.bossDef = def;
     monster.bossBaseDamage = monster.damageValue; // store base so phases can scale it
+    monster.bossSpawnTime = Date.now();
+    monster.enrageStacks = 0;
 
     _egBossTimers[monster.id] = [];
     _egBossScheduleMechanics(monster, 1);
@@ -120,8 +185,11 @@ function _egBossCleanup(monsterId) {
         delete _egBossTimers[monsterId];
     }
     _egClearAllCorruptedCells();
+    _egClearAllFrozenCells();
     _egRemoveVeil();
     _egRemoveBlackout();
+    _egRemoveClueSwap();
+    _egRemoveGridInvert();
     _egVoidSurgeTeardown();
 }
 
@@ -167,7 +235,7 @@ function _egBossApplyPhaseStats(monster, newPhase) {
         monster.chargeMax = Math.max(3, Math.ceil(monster.chargeMax / (1 + spdPct / 100)));
     }
 
-    monster.damageValue = Math.round(monster.bossBaseDamage * phaseData.damageMultiplier);
+    _egBossRecalcDamage(monster);
 }
 
 // Cancels existing mechanic timers for a boss so they can be rescheduled

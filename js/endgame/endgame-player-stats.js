@@ -293,6 +293,13 @@ function _egComputePlayerStats() {
     s.mana += s.intelligence * 2;
     s.spellDamageFlat += s.intelligence;
 
+    // Level-up bonus: every level beyond 1 grants a permanent
+    // +5 maximum Life and +2 maximum Mana.
+    const lvlForBonus = (typeof _egGetPlayerLevel === 'function')
+        ? Math.max(1, Number(_egGetPlayerLevel()) || 1) : 1;
+    s.health += (lvlForBonus - 1) * 5;
+    s.mana += (lvlForBonus - 1) * 2;
+
     s.armour = Math.round(s.armourFlat * (1 + s.armourIncPct / 100));
     s.evasion = Math.round(s.evasionFlat * (1 + s.evasionIncPct / 100));
     s.absorption = Math.round(s.absorptionFlat * (1 + s.absorptionIncPct / 100));

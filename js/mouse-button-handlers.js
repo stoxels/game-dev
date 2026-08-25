@@ -95,9 +95,14 @@ function _egCheckAllClaims(row, col) {
 
 // If the cell is boss-corrupted, dispel it instead of filling.
 // The player must click again afterward to actually fill.
+// Frozen cells simply reject the click until they thaw.
 function checkBossCorruptionIntercept(row, col) {
     if (typeof _egIsCellCorrupted === 'function' && _egIsCellCorrupted(row, col)) {
         _egDispelCorruption(row, col);
+        return true;
+    }
+    if (typeof _egIsCellFrozen === 'function' && _egIsCellFrozen(row, col)) {
+        showToast(t('eg_cell_frozen'));
         return true;
     }
     return false;

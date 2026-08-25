@@ -21,6 +21,7 @@ let _egPickupSpawnTimer = null;      // recurring spawn-attempt timer
 // ── Boss state ───────────────────────────────────────────────────────────────
 let _egBossTimers = {};      // monsterId → array of mechanic timer handles
 let _egBossCorrupted = new Map(); // key:"row-col" → { timer } for Corrupt Cells
+let _egBossFrozen = new Map();    // key:"row-col" → { timer } for Frozen Cells
 
 // ── Loot drop state ──────────────────────────────────────────────────────────
 // Active loot drops on the grid: key "row-col" → item object
@@ -32,6 +33,10 @@ let _egRunLoot = [];
 
 let _egVeilActive = false;   // true while the Grid Veil overlay is showing
 let _egBlackoutActive = false;  // true while the Clue Blackout is active
+
+let _egClueSwapRestoreTimer = null;  // pending restore for the Clue Swap mechanic
+let _egActiveClueSwap = null;        // [rowA, rowB] while a Clue Swap is active
+let _egGridInvertTimer = null;       // pending removal of the Inversion Field filter
 
 let _egVoidSurgeActive = false;  // true while a Void Surge safe-zone is on screen
 let _egVoidSurgePollInterval = null; // handle for the HUD-position poll during Void Surge

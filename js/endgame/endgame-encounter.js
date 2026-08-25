@@ -965,6 +965,32 @@ function _egApplyPlayerMeleeImpact(targetId) {
 
     // Uses the existing damage application logic[cite: 1]
     _egDamageTargetById(targetId, EG_PLAYER_MELEE_DAMAGE);
+
+    _egTryCleaveHit(targetId);
+}
+
+// Cleave gear modifier (main weapon suffix): rolls against cleavePct and,
+// on success, hits every OTHER monster sharing the target's spawn location
+// for the same melee damage, with a dedicated flash animation and sound.
+function _egTryCleaveHit(targetId) {
+    const stats = _egComputePlayerStats();
+    const cleavePct = stats.cleavePct || 0;
+    if (cleavePct <= 0 || Math.random() * 100 >= cleavePct) return;
+
+    const target = _egMonsters.find(m => m.id === targetId);
+    if (!target) return;
+
+    // "Same spawn location" = monsters rendered into the same zone panel
+    const sideTargets = _egMonsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId);
+    if (!sideTargets.length) return;
+
+    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('cleave');
+
+    sideTargets.forEach(m => {
+        const card = document.getElementById(`eg-card-${m.id}`);
+        if (card) _egRestartFlashClass(card, 'eg-flash-cleave');
+        _egDamageTargetById(m.id, EG_PLAYER_MELEE_DAMAGE);
+    });
 }
 
 // Physically lunges the class HUD toward the targeted monster and snaps back.
@@ -1481,9 +1507,10 @@ function _egCalcBarPercentages(m) {
 function _egBuildMonsterCardHTML(m) {
     const { hpPct, chargePct } = _egCalcBarPercentages(m);
     const isTarget = (m.id === _egTargetId);
+    const bossCls = m.isBoss ? ' eg-boss-card' : '';
 
     return `
-    <div class="eg-monster-card-compact" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')">
+    <div class="eg-monster-card-compact${bossCls}" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')">
 
         <!-- Bars stacked top-to-bottom: Charge bar then HP bar above the icon -->
         <div class="eg-compact-bars">
@@ -1499,9 +1526,10 @@ function _egBuildMonsterCardHTML(m) {
         <div class="eg-status-strip" id="eg-status-${m.id}"></div>
 
         <!-- Emoji icon with level badge and hover tooltip -->
-        <div class="eg-emoji-wrapper ${isTarget ? 'eg-compact-targeted' : ''}">
+        <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${(m.enrageStacks || 0) > 0 ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
             ${isTarget ? '<span class="eg-target-arrow">▼</span>' : ''}
-            <span class="eg-monster-emoji-compact">${m.emoji}</span>
+            ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
+            <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${m.emoji}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
 
             <div class="eg-monster-compact-tooltip">

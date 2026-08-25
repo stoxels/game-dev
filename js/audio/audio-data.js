@@ -440,5 +440,8 @@ const SFX = {
     player_equip_pickup: 'audio/sfx_player_equip_pickup.mp3',
     player_equip_not_pickup: 'audio/sfx_player_equip_not_pickup.mp3',
     player_defeated: 'audio/sfx_player_defeated.mp3',
+    // Placeholder: reuses the diagonal strike sound until a dedicated
+    // cleave sweep sound is added to audio/
+    cleave: 'audio/sfx_diagonal_strike.mp3',
 
 };

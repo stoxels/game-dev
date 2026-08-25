@@ -31,31 +31,72 @@ const EG_BOSS_MECHANICS = {
         phases: [
             { threshold: 1.00, chargeMax: 15, damageMultiplier: 1.0 }, // Phase 1
             { threshold: 0.66, chargeMax: 10, damageMultiplier: 1.4 }, // Phase 2
-            { threshold: 0.33, chargeMax: 6, damageMultiplier: 2.0 }, // Phase 3 — ENRAGE
+            { threshold: 0.33, chargeMax: 6, damageMultiplier: 2.2 }, // Phase 3 — ENRAGE
         ],
         immunityDuration: 2500,
         mechanics: [
             { name: 'corrupt_cells', intervalBase: 12000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
             { name: 'clue_blackout', intervalBase: 22000, intervalVariance: 6000, handler: '_egMechClueBlackout' },
+            { name: 'clue_swap', intervalBase: 26000, intervalVariance: 6000, handler: '_egMechClueSwap' },
             { name: 'void_surge', intervalBase: 30000, intervalVariance: 8000, handler: '_egMechVoidSurge' },
         ],
     },
 
     // boss_bayes — "The Grand Prior"
     // Phase 1 (100% → 50%): normal + Probability Shift + Prior Bomb
-    // Phase 2 (  50% →  0%): immune window, Grid Veil activates, all mechanics intensify
+    // Phase 2 ( 50% → 25%): immune window, Grid Veil activates, all mechanics intensify
+    // Phase 3 ( 25% →  0%): final desperation — very fast charge, Deep Freeze joins in
     boss_bayes: {
         phases: [
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.0 }, // Phase 1
             { threshold: 0.50, chargeMax: 8, damageMultiplier: 1.6 }, // Phase 2 — VEIL
+            { threshold: 0.25, chargeMax: 6, damageMultiplier: 2.0 }, // Phase 3 — DESPERATION
         ],
         immunityDuration: 3000,
         mechanics: [
             { name: 'probability_shift', intervalBase: 14000, intervalVariance: 4000, handler: '_egMechProbabilityShift' },
             { name: 'prior_bomb', intervalBase: 18000, intervalVariance: 5000, handler: '_egMechPriorBomb' },
+            { name: 'frozen_cells', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechFrozenCells' },
             // grid_veil fires once on phase 2 activation; intervalBase is set
             // absurdly high so it never self-reschedules after that first trigger.
             { name: 'grid_veil', intervalBase: 999999999, intervalVariance: 0, handler: '_egMechGridVeil', phase2Only: true },
+        ],
+    },
+
+    // boss_entropy — "The Second Law"
+    // Phase 1 (100% → 60%): Inversion Field + Probability Shift
+    // Phase 2 ( 60% → 30%): immune window, Deep Freeze joins the rotation
+    // Phase 3 ( 30% →  0%): heat death — everything at maximum frequency
+    boss_entropy: {
+        phases: [
+            { threshold: 1.00, chargeMax: 13, damageMultiplier: 1.0 }, // Phase 1
+            { threshold: 0.60, chargeMax: 9, damageMultiplier: 1.5 }, // Phase 2
+            { threshold: 0.30, chargeMax: 6, damageMultiplier: 2.1 }, // Phase 3 — HEAT DEATH
+        ],
+        immunityDuration: 2500,
+        mechanics: [
+            { name: 'grid_invert', intervalBase: 16000, intervalVariance: 4000, handler: '_egMechGridInvert' },
+            { name: 'probability_shift', intervalBase: 22000, intervalVariance: 6000, handler: '_egMechProbabilityShift' },
+            { name: 'frozen_cells', intervalBase: 18000, intervalVariance: 5000, handler: '_egMechFrozenCells', phase2Only: true },
+        ],
+    },
+
+    // boss_laplace — "Laplace's Demon"
+    // He already knows every possible future — so he rearranges yours.
+    // Phase 1 (100% → 55%): Clue Swap + Prior Bomb
+    // Phase 2 ( 55% → 25%): immune window, Inversion Field joins
+    // Phase 3 ( 25% →  0%): total determinism — rapid-fire everything
+    boss_laplace: {
+        phases: [
+            { threshold: 1.00, chargeMax: 11, damageMultiplier: 1.0 }, // Phase 1
+            { threshold: 0.55, chargeMax: 8, damageMultiplier: 1.5 }, // Phase 2
+            { threshold: 0.25, chargeMax: 5, damageMultiplier: 2.2 }, // Phase 3 — DETERMINISM
+        ],
+        immunityDuration: 2500,
+        mechanics: [
+            { name: 'clue_swap', intervalBase: 14000, intervalVariance: 4000, handler: '_egMechClueSwap' },
+            { name: 'prior_bomb', intervalBase: 17000, intervalVariance: 5000, handler: '_egMechPriorBomb' },
+            { name: 'grid_invert', intervalBase: 24000, intervalVariance: 6000, handler: '_egMechGridInvert', phase2Only: true },
         ],
     },
 };
@@ -72,6 +113,9 @@ const EG_RECENT_FILLS_CAPACITY = 20;
 
 // ── Corrupt cell expiry time ─────────────────────────────────────────────────
 const EG_CORRUPT_CELL_LIFETIME_MS = 15000; // ms before corruption auto-expires
+
+// ── Frozen cell thaw time ────────────────────────────────────────────────────
+const EG_FROZEN_CELL_LIFETIME_MS = 9000; // ms before frozen cells thaw on their own
 
 
 
@@ -401,6 +445,177 @@ function _egRemoveVeil() {
 function _egMechGridVeil(monster, phase) {
     if (_egVeilActive) return;
     _egActivateVeil();
+}
+
+
+//------------------------------------------------------------------------
+//-------------------BOSS MECHANIC: CLUE SWAP-----------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Swaps the clue numbers of two random rows. The puzzle stays solvable —
+// the player has to notice the swap and mentally un-swap the rows.
+// The clues revert to their correct positions after a phase-scaled duration.
+
+// Restores the two swapped row-clue spans. Defers while a Clue Blackout is
+// active so the blackout's own text snapshot/restore isn't fought over.
+function _egRestoreClueSwap(a, b) {
+    if (_egBlackoutActive) {
+        // Blackout in progress — retry shortly until it clears.
+        _egClueSwapRestoreTimer = setTimeout(() => _egRestoreClueSwap(a, b), 2000);
+        return;
+    }
+    const elA = document.getElementById(`rn-${a}`);
+    const elB = document.getElementById(`rn-${b}`);
+    if (!elA || !elB) return; // grid was rebuilt; nothing to restore
+    const tmp = elA.textContent;
+    elA.textContent = elB.textContent;
+    elB.textContent = tmp;
+}
+
+// Boss mechanic handler — scrambles two random row clues.
+function _egMechClueSwap(monster, phase) {
+    const rows = (cur && cur.grid) ? cur.grid.length : 0;
+    if (rows < 2) return;
+
+    let a = Math.floor(Math.random() * rows);
+    let b = Math.floor(Math.random() * rows);
+    while (b === a) b = Math.floor(Math.random() * rows);
+
+    const elA = document.getElementById(`rn-${a}`);
+    const elB = document.getElementById(`rn-${b}`);
+    if (!elA || !elB || _egBlackoutActive) return; // don't stack with blackout
+
+    const tmp = elA.textContent;
+    elA.textContent = elB.textContent;
+    elB.textContent = tmp;
+
+    const duration = phase >= 3 ? 12000 : 8000;
+    showToast(t('eg_mech_clue_swap').replace('{n}', duration / 1000));
+
+    clearTimeout(_egClueSwapRestoreTimer);
+    _egActiveClueSwap = [a, b];
+    _egClueSwapRestoreTimer = setTimeout(() => {
+        _egRestoreClueSwap(a, b);
+        _egActiveClueSwap = null;
+    }, duration);
+}
+
+// Full cleanup — undoes an active swap immediately if one is pending.
+// Called from _egBossCleanup on boss death / encounter stop.
+function _egRemoveClueSwap() {
+    clearTimeout(_egClueSwapRestoreTimer);
+    _egClueSwapRestoreTimer = null;
+    if (_egActiveClueSwap) {
+        _egRestoreClueSwap(_egActiveClueSwap[0], _egActiveClueSwap[1]);
+        _egActiveClueSwap = null;
+    }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------BOSS MECHANIC: FROZEN CELLS--------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Freezes 2–3 correct unfilled cells under a ❄ overlay for several seconds.
+// Frozen cells cannot be filled until they thaw (auto-expires — no dispel).
+
+// Returns all grid cells that are valid freeze targets (correct + unfilled).
+function _egBuildFreezableCellPool() {
+    if (!cur || !cur.grid) return [];
+    const sol = cur.grid;
+    const rows = sol.length;
+    const cols = sol[0].length;
+    const pool = [];
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (sol[r][c] !== 1) continue;         // only freeze correct cells
+            if (userGrid[r][c] === 1 || revealedGrid[r][c]) continue; // already filled
+            if (_egBossFrozen.has(`${r}-${c}`)) continue; // already frozen
+            if (_egBossCorrupted.has(`${r}-${c}`)) continue; // already corrupted
+            pool.push([r, c]);
+        }
+    }
+    return pool;
+}
+
+// Places the ❄ freeze overlay on a cell and registers its thaw timer.
+function _egApplyCellFreeze(r, c) {
+    const key = `${r}-${c}`;
+    const el = document.getElementById(`g-${r}-${c}`);
+    if (!el) return;
+
+    const overlay = document.createElement('span');
+    overlay.className = 'eg-freeze-overlay';
+    overlay.id = `eg-freeze-${r}-${c}`;
+    overlay.textContent = '❄️';
+    el.appendChild(overlay);
+
+    const thawTimer = setTimeout(() => _egRemoveCellFreeze(key), EG_FROZEN_CELL_LIFETIME_MS);
+    _egBossFrozen.set(key, { timer: thawTimer });
+}
+
+// Removes the freeze overlay from the DOM and clears its state entry.
+function _egRemoveCellFreeze(key) {
+    const span = document.getElementById(`eg-freeze-${key}`);
+    if (span) span.remove();
+    _egBossFrozen.delete(key);
+}
+
+// Removes all currently frozen cells. Called on boss death / encounter stop.
+function _egClearAllFrozenCells() {
+    _egBossFrozen.forEach((data, key) => {
+        clearTimeout(data.timer);
+        _egRemoveCellFreeze(key);
+    });
+    _egBossFrozen.clear();
+}
+
+// Returns true if the cell at (row, col) is currently frozen.
+// Called from mouse-button-handlers.js before allowing a cell fill.
+function _egIsCellFrozen(row, col) {
+    return _egBossFrozen.has(`${row}-${col}`);
+}
+
+// Boss mechanic handler — freezes 2 (phase 1) or 3 (phase 2+) cells.
+function _egMechFrozenCells(monster, phase) {
+    const pool = _egBuildFreezableCellPool();
+    if (pool.length === 0) return;
+
+    const count = phase >= 2 ? 3 : 2;
+    const targets = pool.sort(() => Math.random() - 0.5).slice(0, Math.min(count, pool.length));
+
+    showToast(t('eg_mech_frozen_cells').replace('{n}', targets.length));
+    targets.forEach(([r, c]) => _egApplyCellFreeze(r, c));
+}
+
+
+//------------------------------------------------------------------------
+//-------------------BOSS MECHANIC: GRID INVERT---------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Flips the puzzle grid's colours with a CSS invert filter for a few seconds.
+// Purely visual disorientation — the puzzle remains fully playable.
+
+// Removes the invert filter from the puzzle table and clears its timer.
+function _egRemoveGridInvert() {
+    clearTimeout(_egGridInvertTimer);
+    _egGridInvertTimer = null;
+    const tbl = document.getElementById('ptable');
+    if (tbl) tbl.classList.remove('eg-grid-invert');
+}
+
+// Boss mechanic handler — applies the Inversion Field for a phase-scaled duration.
+function _egMechGridInvert(monster, phase) {
+    if (_egGridInvertTimer) return; // already active
+    const tbl = document.getElementById('ptable');
+    if (!tbl) return;
+
+    tbl.classList.add('eg-grid-invert');
+
+    const duration = phase >= 3 ? 9000 : 6000;
+    showToast(t('eg_mech_grid_invert').replace('{n}', duration / 1000));
+    _egGridInvertTimer = setTimeout(_egRemoveGridInvert, duration);
 }
 
 

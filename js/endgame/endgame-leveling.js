@@ -259,6 +259,20 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
     _egRenderLevelHUD();
 
     if (levelsGained > 0) {
+        // Level-up bonus: +5 max Life and +2 max Mana per level gained,
+        // with the newly granted amounts restored to the current pools.
+        if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
+            const lifeMult = (typeof _egMapPlayerLifeMult === 'function')
+                ? _egMapPlayerLifeMult() : 1;
+            const lifeGain = Math.round(levelsGained * 5 * lifeMult);
+            playerMaxHP = Math.max(1, playerMaxHP + lifeGain);
+            playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + lifeGain);
+        }
+        if (typeof gainMana === 'function'
+            && typeof playerMaxMana !== 'undefined' && playerMaxMana > 0) {
+            gainMana(levelsGained * 2);
+        }
+
         _egPlayLevelUpEffect(_egGetPlayerLevel());
         if (typeof showToast === 'function') {
             showToast(t('eg_lvl_levelup_toast').replace('{n}', _egGetPlayerLevel()), '#f5b642');
