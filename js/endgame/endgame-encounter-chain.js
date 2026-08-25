@@ -11,6 +11,7 @@ let _egChainCountdownTimer = null;
 let _egBossSpawned = false;
 let _egMonsterSpawnCounter = 0;
 let _egPuzzleCompleteFired = false;
+let _egMapClearedShown = false;     // ensures the MAP CLEARED banner fires once per map
 
 // Bonus-loot gains accumulated since the last chain transition screen.
 // Consumed (and reset) by _egBuildChainBonusGainHTML so the countdown
@@ -200,6 +201,10 @@ function _egLoadNextChainPuzzle() {
 
     const carriedItems = Array.from(_egItemDrops.values());
     _egItemDrops.clear();                                      
+
+    // Unclaimed map drops are banked straight into the gate map stash
+    // instead of being carried across puzzles.
+    if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
 
     // Clear the stale map entries — overlays are already gone after buildGrid()
     _egLootDrops.clear();
@@ -442,6 +447,7 @@ function _egEndMap() {
     _egShowLeaveMapTransition();
 
     _egFlushRunLootToStash();
+    if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
     egSaveHubState();
     _egStopEncounter();
 
@@ -520,6 +526,14 @@ function _egUpdateObjectivesHUD() {
 
     const canLeave = _egCanLeaveMap();
 
+    // First time all objectives are complete: big green banner over the grid
+    // + a toast message. Fires only once per map.
+    if (canLeave && !_egMapClearedShown) {
+        _egMapClearedShown = true;
+        _egShowMapClearedBanner();
+        showToast(t('eg_map_cleared_toast'), '#4ade80');
+    }
+
     strip.innerHTML = `
         <div class="eg-obj-header">
             <span class="eg-obj-title">${t('eg_obj_header')}</span>
@@ -534,6 +548,31 @@ function _egUpdateObjectivesHUD() {
         </div>`;
 
     _egBindObjectivesStripBehaviour(strip);
+}
+
+// Shows a big green "MAP CLEARED" text centered over the puzzle grid for
+// 3 seconds. Purely cosmetic — pointer-events are disabled via CSS.
+function _egShowMapClearedBanner() {
+    const old = document.getElementById('eg-map-cleared-banner');
+    if (old) old.remove();
+
+    const el = document.createElement('div');
+    el.id = 'eg-map-cleared-banner';
+    el.textContent = t('eg_map_cleared');
+    document.body.appendChild(el);
+
+    // Center the banner over the puzzle grid (fallback: screen center)
+    const board = document.getElementById('ptable');
+    if (board) {
+        const r = board.getBoundingClientRect();
+        el.style.left = (r.left + r.width / 2) + 'px';
+        el.style.top = (r.top + r.height / 2) + 'px';
+    } else {
+        el.style.left = '50%';
+        el.style.top = '50%';
+    }
+
+    setTimeout(() => el.remove(), 3000);
 }
 
 //------------------------------------------------------------------------
@@ -765,6 +804,11 @@ function _egChainCleanup() {
     _egBossSpawned = false;
     _egMonsterSpawnCounter = 0;
     _egPuzzleCompleteFired = false;
+    _egMapClearedShown = false;
+
+    // Remove a MAP CLEARED banner if one is still on screen
+    const banner = document.getElementById('eg-map-cleared-banner');
+    if (banner) banner.remove();
 
     _egRunLoot = [];
     _egRunCurrency = [];

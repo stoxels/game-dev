@@ -277,7 +277,14 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
         return;
     }
 
-    if (item.category !== 'equip' || !def.canApply(item)) {
+    // Maps use the dedicated map rules (EG_MAP_CURRENCY_RULES in
+    // endgame-maps.js) so orbs roll from the MAP modifier tables.
+    const isMap = item.category === 'map';
+    const mapRule = isMap && typeof EG_MAP_CURRENCY_RULES !== 'undefined'
+        ? EG_MAP_CURRENCY_RULES[defId]
+        : null;
+
+    if (isMap && !mapRule) {
         showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
@@ -287,28 +294,56 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
         return;
     }
 
-    // Mirror: instead of modifying the target, create an independent copy
-    // in the next free inventory slot. The copy keeps the original untouched
-    // and can itself be modified further with any currency.
-    if (def.isMirror) {
+    // Non-mirror map orbs must satisfy the map rule's own rarity gate.
+    if (isMap && defId !== 'mirror_of_kalandra' && !mapRule.canApply(item)) {
+        showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
+        if (chipEl) {
+            chipEl.classList.add('eg-slot-reject');
+            setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
+        }
+        _egCancelCurrencyUse(true);
+        return;
+    }
+
+    if (!isMap && (item.category !== 'equip' || !def.canApply(item))) {
+        showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
+        if (chipEl) {
+            chipEl.classList.add('eg-slot-reject');
+            setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
+        }
+        _egCancelCurrencyUse(true);
+        return;
+    }
+
+    // Mirror: instead of modifying the target, create an independent copy.
+    // Equipment copies go to the main inventory; map copies go to the
+    // Probability Gate map stash. The copy keeps the original untouched and
+    // can itself be modified further with any other currency.
+    if ((isMap && defId === 'mirror_of_kalandra') || (!isMap && def.isMirror)) {
+        const copyToMapStash = isMap;
+        const rows = copyToMapStash ? EG_MAP_STASH_ROWS : EG_INV_ROWS;
+        const cols = copyToMapStash ? EG_MAP_STASH_COLS : EG_INV_COLS;
+        const grid = copyToMapStash ? _egMapStash : _egInventory;
+
         let freeR = -1, freeC = -1;
         outer:
-        for (let r = 0; r < EG_INV_ROWS; r++) {
-            for (let c = 0; c < EG_INV_COLS; c++) {
-                if (!_egInventory[r][c]) { freeR = r; freeC = c; break outer; }
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                if (!grid[r][c]) { freeR = r; freeC = c; break outer; }
             }
         }
         if (freeR === -1) {
-            showToast(t('eg_inventory_full'));
+            showToast(copyToMapStash ? t('eg_map_stash_full') : t('eg_inventory_full'));
             _egCancelCurrencyUse(true);
             return;
         }
 
         const copy = JSON.parse(JSON.stringify(item));
         copy.mirrored = true;
-        _egInventory[freeR][freeC] = copy;
-        _egRenderInventoryCell(freeR, freeC);
-        if (typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
+        grid[freeR][freeC] = copy;
+        if (copyToMapStash) _egRenderMapStashCell(freeR, freeC);
+        else _egRenderInventoryCell(freeR, freeC);
+        if (!copyToMapStash && typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
 
         // Consume one mirror from the stack.
         stack.count = (stack.count || 1) - 1;
@@ -321,7 +356,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
         return;
     }
 
-    const newItem = def.apply(item);
+    const newItem = isMap ? mapRule.apply(item) : def.apply(item);
     applyFn(newItem);
 
     // Consume one orb from the stack.
@@ -341,7 +376,8 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl) {
 // from also processing the click.
 document.addEventListener('contextmenu', function (e) {
     const chip = e.target.closest('.eg-item-chip');
-    if (!chip || !chip.closest('#screen-endgame-hub')) return;
+    // Active on both the hub and the Probability Gate screens (shared state).
+    if (!chip || (typeof _dndChipScreenEl === 'function' ? !_dndChipScreenEl(chip) : !chip.closest('#screen-endgame-hub'))) return;
 
     const currencyCell = chip.closest('.eg-currency-cell');
     if (!currencyCell) return; // not currency — let the normal handler deal with it
@@ -376,7 +412,11 @@ document.addEventListener('mousedown', function (e) {
     if (e.button !== 0) return;
 
     const chip = e.target.closest('.eg-item-chip');
-    if (!chip || !chip.closest('#screen-endgame-hub')) {
+    // Active on both the hub and the Probability Gate screens (shared state).
+    const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
+        ? !!_dndChipScreenEl(chip)
+        : !!chip.closest('#screen-endgame-hub'));
+    if (!onManagedScreen) {
         _egCancelCurrencyUse();
         return;
     }
@@ -391,9 +431,19 @@ document.addEventListener('mousedown', function (e) {
 
     const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
     const equipSlot = chip.closest('.eg-equip-slot');
+    // Map targets: map stash cells and the map device slot (gate screen).
+    const mapStashCell = chip.closest('.eg-map-stash-cell');
+    const mapSlotEl = chip.closest('#eg-map-slot');
 
     let targetItem = null, applyFn = null;
-    if (invCell) {
+    if (mapStashCell) {
+        const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
+        targetItem = _egMapStash[r][c];
+        applyFn = (newItem) => { _egMapStash[r][c] = newItem; _egRenderMapStashCell(r, c); };
+    } else if (mapSlotEl) {
+        targetItem = _egMapSlotItem;
+        applyFn = (newItem) => { _egMapSlotItem = newItem; _egRenderMapSlot(); };
+    } else if (invCell) {
         const r = +invCell.dataset.row, c = +invCell.dataset.col;
         targetItem = _egInventory[r][c];
         applyFn = (newItem) => { _egInventory[r][c] = newItem; _egRenderInventoryCell(r, c); };
@@ -458,6 +508,10 @@ function _egShowTooltip(item, e) {
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc">${item.description || ''}</div></div>
 </div>`;
+    } else if (item.category === 'map' && typeof _egBuildMapTooltipBodyHTML === 'function') {
+        // Maps get their own tooltip with mods grouped by
+        // monster / player / puzzle categories (endgame-maps.js).
+        html = _egBuildMapTooltipBodyHTML(item);
     } else {
         html = _egBuildTooltipBodyHTML(item);
     }

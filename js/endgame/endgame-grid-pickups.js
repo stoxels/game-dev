@@ -518,6 +518,7 @@ function _egAutoClaimDropsOnReveal(row, col) {
     else if (_egLootDrops.has(key)) _egCheckLootClaim(row, col);
     else if (_egCurrencyDrops.has(key)) _egCheckCurrencyDropClaim(row, col);
     else if (_egItemDrops.has(key)) _egCheckItemDropClaim(row, col);
+    else if (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key)) _egCheckMapDropClaim(row, col);
 }
 
 // Called when the player correctly claims the cell that holds a loot drop.

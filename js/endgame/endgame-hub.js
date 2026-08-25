@@ -103,6 +103,10 @@ function _egBuildItemChipHTML(item, size = 'normal') {
     const ilvlBadge = (item.category === 'equip' && item.itemLevel != null)
         ? `<span class="eg-item-ilvl">${item.itemLevel}</span>`
         : '';
+    // Map items show their map tier instead.
+    const mapTierBadge = (item.category === 'map' && item.mapTier != null)
+        ? `<span class="eg-item-ilvl eg-map-tier-badge">${item.mapTier}</span>`
+        : '';
     const chipId = `egchip-${++_egChipCounter}`;
     _egChipRegistry.set(chipId, item);
 
@@ -114,6 +118,7 @@ function _egBuildItemChipHTML(item, size = 'normal') {
      onmousemove="_egMoveTooltip(event)"
      onmouseleave="_egClearTooltip()">
     ${ilvlBadge}
+    ${mapTierBadge}
     <span class="eg-item-chip-icon">${item.icon || '📦'}</span>
     <span class="eg-item-chip-name">${item.name || '???'}</span>
 </div>`;

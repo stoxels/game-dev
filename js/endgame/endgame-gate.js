@@ -103,17 +103,66 @@ function _egBuildMapStashGridHTML() {
     return html;
 }
 
-// Assembles the gate panel: map device on top, map stash grid below.
+// Assembles the gate panel: map device on top, then the runes & orbs row
+// (synchronized with the hub's currency strip — same _egCurrencyStash data),
+// and the map stash grid below.
 function _egBuildGatePanelHTML() {
     return `
 <div class="eg-panel eg-panel-map">
     <div class="eg-panel-label">${t('mg_gate_badge')}</div>
     ${_egBuildMapDeviceHTML()}
+    <div class="eg-gate-currency-section">
+        ${_egBuildGateCurrencyStripHTML()}
+    </div>
     <div class="eg-map-stash-section">
         <div class="eg-panel-label">${t('eg_maps_label')}</div>
         <div class="eg-map-stash-grid" id="eg-map-stash-grid">
             ${_egBuildMapStashGridHTML()}
         </div>
+    </div>
+</div>`;
+}
+
+
+//------------------------------------------------------------------------
+//-------------------HTML HELPERS: RUNES & ORBS ROW-----------------------
+//------------------------------------------------------------------------
+// The gate screen has its OWN cell ids (eg-gate-currency-cell-*) because the
+// hub screen's cells (eg-currency-cell-*) may coexist in the DOM. Both grids
+// read from and write to the SAME _egCurrencyStash, so amounts stay in sync;
+// _egRenderCurrencyCell() in endgame-hub-drag-and-drop.js updates both.
+
+// Builds a single runes & orbs cell for the gate screen.
+function _egBuildGateCurrencyCellHTML(row, col) {
+    return `
+<div class="eg-inv-cell eg-currency-cell"
+     id="eg-gate-currency-cell-${row}-${col}"
+     data-row="${row}" data-col="${col}"
+     data-eg-dropzone="currency">
+</div>`;
+}
+
+// Builds the full gate-side runes & orbs grid.
+function _egBuildGateCurrencyGridHTML() {
+    let html = '';
+    for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
+        for (let c = 0; c < EG_CURRENCY_COLS; c++) {
+            html += _egBuildGateCurrencyCellHTML(r, c);
+        }
+    }
+    return html;
+}
+
+// Assembles the gate-side currency strip panel: label + currency cell grid.
+// Uses the shared eg-currency-strip / eg-currency-row classes so it is
+// visually identical to the hub's runes & orbs row.
+function _egBuildGateCurrencyStripHTML() {
+    return `
+<div class="eg-currency-strip">
+    <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
+    <div class="eg-currency-row" id="eg-gate-currency-grid"
+         style="grid-template-columns: repeat(${EG_CURRENCY_COLS}, 1fr);">
+        ${_egBuildGateCurrencyGridHTML()}
     </div>
 </div>`;
 }
@@ -216,7 +265,10 @@ function egActivateMap() {
 //------------------------------------------------------------------------
 
 // Creates and injects the gate screen DOM element on first call.
+// Also ensures the hub screen exists so its delegated DnD/currency
+// listeners (_egBindDragEvents) are active for the gate as well.
 function _egCreateGateScreen() {
+    if (typeof ensureEndgameHubScreen === 'function') ensureEndgameHubScreen();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-gate';
     screen.className = 'screen';
@@ -246,5 +298,6 @@ function showEndgameGate() {
     _egLoadHubState();
     _egRenderMapSlot();
     _egRenderMapStash();
+    _egRenderCurrencyStash();
     _egClearTooltip();
 }

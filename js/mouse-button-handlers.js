@@ -70,6 +70,7 @@ function _egDiscardAllDrops(row, col) {
     if (typeof _egDiscardLootDrop === 'function') _egDiscardLootDrop(row, col);
     if (typeof _egDiscardCurrencyDrop === 'function') _egDiscardCurrencyDrop(row, col);
     if (typeof _egDiscardItemDrop === 'function') _egDiscardItemDrop(row, col);
+    if (typeof _egDiscardMapDrop === 'function') _egDiscardMapDrop(row, col);
 }
 
 // Endgame: claims any pickup, loot drop, or currency drop sitting on a
@@ -81,6 +82,7 @@ function _egCheckAllClaims(row, col) {
     if (typeof _egCheckLootClaim === 'function') _egCheckLootClaim(row, col);
     if (typeof _egCheckCurrencyDropClaim === 'function') _egCheckCurrencyDropClaim(row, col);
     if (typeof _egCheckItemDropClaim === 'function') _egCheckItemDropClaim(row, col);
+    if (typeof _egCheckMapDropClaim === 'function') _egCheckMapDropClaim(row, col);
 }
 
 

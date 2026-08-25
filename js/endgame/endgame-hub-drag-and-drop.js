@@ -316,6 +316,8 @@ function _dndShowRejectFlash(el) {
 // Finalises a completed drop: saves hub state, resets drag session, updates count label.
 // Re-renders stash + paperdoll because the new loadout can change which
 // items are flagged as requirement-blocked (red cells).
+// Also re-renders the map device slot and map stash — those elements live on
+// the Probability Gate screen and no-op when that screen is not in the DOM.
 function _dndFinalizeDrop() {
     egSaveHubState();
     _dndReset();
@@ -323,6 +325,8 @@ function _dndFinalizeDrop() {
     _egRenderInventory();
     _egRenderEquipSlots();
     _egRenderStatsList();
+    _egRenderMapSlot();
+    _egRenderMapStash();
 }
 
 
@@ -566,11 +570,13 @@ function _dndQuickUnequipToStash(equipSlotEl) {
 }
 
 // Contextmenu handler — dispatches to quick-equip or quick-unequip based on
-// which zone the right-clicked chip belongs to.
+// which zone the right-clicked chip belongs to. On the Probability Gate
+// screen, maps are quick-moved between the map stash and the map device slot.
 function _dndHandleRightClick(e) {
     const chip = e.target.closest('.eg-item-chip');
     if (!chip) return;
-    if (!chip.closest('#screen-endgame-hub')) return;
+    const screenEl = _dndChipScreenEl(chip);
+    if (!screenEl) return;
 
     e.preventDefault(); // suppress the browser context menu
 
@@ -579,9 +585,50 @@ function _dndHandleRightClick(e) {
 
     const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
     const equipSlot = chip.closest('.eg-equip-slot');
+    const mapStashCell = chip.closest('.eg-map-stash-cell');
+    const mapSlot = chip.closest('#eg-map-slot');
 
     if (invCell) _dndQuickEquipFromStash(invCell);
     else if (equipSlot) _dndQuickUnequipToStash(equipSlot);
+    else if (mapStashCell) _dndQuickLoadMapToDevice(mapStashCell);
+    else if (mapSlot) _dndQuickUnloadMapFromDevice();
+}
+
+
+// Right-click on a map in the gate map stash → swap it into the map device
+// slot. The displaced device map (if any) returns to the source cell.
+function _dndQuickLoadMapToDevice(mapStashCell) {
+    if (typeof _egMapStash === 'undefined') return;
+    const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
+    const map = _egMapStash[r][c];
+    if (!map || map.category !== 'map') return;
+
+    const displaced = _egMapSlotItem || null;
+    _egMapSlotItem = map;
+    _egMapStash[r][c] = displaced; // may be null — that's fine
+    _egRenderMapSlot();
+    _egRenderMapStashCell(r, c);
+    egSaveHubState();
+}
+
+// Right-click on a map in the map device slot → return it to the first free
+// map stash cell (or back into the slot when the stash is full).
+function _dndQuickUnloadMapFromDevice() {
+    if (typeof _egMapSlotItem === 'undefined' || !_egMapSlotItem) return;
+    const map = _egMapSlotItem;
+
+    for (let r = 0; r < EG_MAP_STASH_ROWS; r++) {
+        for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
+            if (!_egMapStash[r][c]) {
+                _egMapStash[r][c] = map;
+                _egMapSlotItem = null;
+                _egRenderMapSlot();
+                _egRenderMapStashCell(r, c);
+                egSaveHubState();
+                return;
+            }
+        }
+    }
 }
 
 
@@ -609,12 +656,19 @@ function _dndBuildCurrencyChipHTML(item) {
 
 // Overrides the base _egRenderCurrencyCell from endgame-hub.js.
 // Uses _dndBuildCurrencyChipHTML so stacked currency shows the count badge.
+// Renders BOTH twin grids — the hub's runes & orbs row (eg-currency-cell-*)
+// and the Probability Gate's runes & orbs row (eg-gate-currency-cell-*) —
+// because both read from the same _egCurrencyStash. Whichever screen is
+// visible updates; hidden cells no-op. This keeps amounts perfectly in sync
+// between hub and gate screens.
 // This file loads after endgame-hub.js, so this definition takes precedence.
 function _egRenderCurrencyCell(row, col) {
-    const cell = document.getElementById(`eg-currency-cell-${row}-${col}`);
-    if (!cell) return;
     const item = _egCurrencyStash[row][col];
-    cell.innerHTML = item ? _dndBuildCurrencyChipHTML(item) : '';
+    const chipHTML = item ? _dndBuildCurrencyChipHTML(item) : '';
+    const hubCell = document.getElementById(`eg-currency-cell-${row}-${col}`);
+    if (hubCell) hubCell.innerHTML = chipHTML;
+    const gateCell = document.getElementById(`eg-gate-currency-cell-${row}-${col}`);
+    if (gateCell) gateCell.innerHTML = chipHTML;
 }
 
 
@@ -825,15 +879,23 @@ function _dndInjectStyles() {
 //-------------------EVENT BINDING----------------------------------------
 //------------------------------------------------------------------------
 
+// Returns the managed screen element (#screen-endgame-hub or
+// #screen-endgame-gate) that contains the given chip, or null. The DnD and
+// currency systems operate on both screens — they share the same state.
+function _dndChipScreenEl(chip) {
+    if (!chip || typeof chip.closest !== 'function') return null;
+    return chip.closest('#screen-endgame-hub') || chip.closest('#screen-endgame-gate');
+}
+
 // Binds the four global listeners that power the custom DnD system.
 // Uses capture-phase mousedown so it fires before any chip's own handlers.
 // Mousemove and mouseup are on window so the ghost and drop work even if
 // the pointer leaves the hub container during a fast drag.
 function _dndBindListeners() {
-    // Pick-up: left-click on any item chip inside the hub screen.
+    // Pick-up: left-click on any item chip inside the hub or gate screen.
     document.addEventListener('mousedown', e => {
         const chip = e.target.closest('.eg-item-chip');
-        if (!chip || !chip.closest('#screen-endgame-hub')) return;
+        if (!chip || !_dndChipScreenEl(chip)) return;
         _dndPickUp(e, chip);
     }, true);
 
