@@ -231,6 +231,18 @@ function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
         }
     });
 
+    // Corrected mistakes no longer count against the player: decrement the
+    // mistake counter and track them as erased (same as the Mistake Eraser item).
+    if (toCorrect.length > 0) {
+        mistakeCount = Math.max(0, mistakeCount - toCorrect.length);
+        _levelMistakesErased += toCorrect.length;
+        if (typeof _updateMistakeCounterHUD === 'function') {
+            _updateMistakeCounterHUD();
+        } else {
+            _setMistakeCounterText();
+        }
+    }
+
     window._regressionPendingReveals = null;
 
     // Apply the recovered time (cap at 1 hour).

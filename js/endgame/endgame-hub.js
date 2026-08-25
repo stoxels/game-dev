@@ -595,13 +595,12 @@ function _egBuildTooltipBodyHTML(item) {
 
 
     // ── Requirements ─────────────────────────────────────────────────
-    // Each requirement part is compared against the player's current total
-    // attributes (base + equipped gear). Unmet parts turn red and a
-    // "Missing:" line lists the exact deficits. Self-carrying is not
-    // previewed here (the item's own bonuses are not counted) — equip-time
-    // validation in endgame-requirements.js handles that.
+    // Each requirement part is compared against the attribute totals as the
+    // equip gate will see them after the swap (displaced occupant removed,
+    // item's own bonuses included — self-carrying). This keeps the tooltip
+    // consistent with what _egCanEquipInSlot will actually accept.
     const req = item.requirements || {};
-    const curAttrs = _egComputeLoadoutAttributes(_egGetAllEquippedItems());
+    const curAttrs = _egPreviewEquipAttributes(item);
     const reqParts = [];
     const missingParts = [];
     if ((req.level || 0) > 0) {

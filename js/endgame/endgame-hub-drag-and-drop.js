@@ -461,15 +461,25 @@ function _dndDropOnEquipSlot(equipSlotEl) {
 //------------------------------------------------------------------------
 
 // Finds the first paperdoll slot that matches the item's slotType.
-// Prefers an empty slot; falls back to the first candidate when all are occupied.
+// Prefers an empty slot; when all matching slots are occupied it prefers the
+// first slot whose requirement gate would accept the swap (multi-slot types
+// like rings can differ per slot — one swap may break chain dependencies the
+// other doesn't). Falls back to the first candidate so callers still get a
+// sensible slot for error feedback.
 // Returns the slot id string, or null when no matching slot exists.
 function _dndFindTargetSlot(item) {
     const candidates = Object.entries(EG_SLOT_ACCEPTS)
         .filter(([, accepts]) => accepts === item.slotType)
         .map(([slotId]) => slotId);
+    if (candidates.length === 0) return null;
 
     const emptySlot = candidates.find(id => !_egEquipped[id]);
-    return emptySlot || candidates[0] || null;
+    if (emptySlot) return emptySlot;
+
+    const fitting = (typeof _egCanEquipInSlot === 'function')
+        ? candidates.find(id => _egCanEquipInSlot(item, id).ok)
+        : null;
+    return fitting || candidates[0];
 }
 
 // Finds the first empty cell in the main equipment stash.

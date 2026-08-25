@@ -212,6 +212,21 @@ function _egShowRequirementsToast(context, missing, itemName) {
 //-------------------WEARABILITY DISPLAY HELPER---------------------------
 //------------------------------------------------------------------------
 
+// Attribute totals as the equip gate would see them after equipping `item`.
+//   - Equipped item: unchanged live loadout.
+//   - Stash item: the occupant of the target slot is already removed and the
+//     item's own bonuses are included (self-carrying) — matching exactly what
+//     _egCanEquipInSlot will validate, so tooltips never show "requirements
+//     met" for an equip that the gate would reject (or vice versa).
+function _egPreviewEquipAttributes(item) {
+    const equipped = _egGetAllEquippedItems();
+    if (equipped.includes(item)) return _egComputeLoadoutAttributes(equipped);
+    const target = (typeof _dndFindTargetSlot === 'function') ? _dndFindTargetSlot(item) : null;
+    if (!target) return _egComputeLoadoutAttributes(equipped);
+    const sim = equipped.filter(i => i !== _egEquipped[target]);
+    return _egComputeLoadoutAttributes(sim.concat(item));
+}
+
 // True when the item should be flagged red as "unwearable" in the UI.
 //   - Equipped items: red while the item itself currently violates its
 //     requirements against the live loadout.
