@@ -54,6 +54,7 @@ const EG_SLOT_ICONS = {
     arcane: '🔮',
     talisman: '🪬',
     weapon: '⚔️',
+    shield: '🛡️',
     ranged: '🏹',
 };
 
@@ -1067,7 +1068,7 @@ const EG_BASE_TYPES_SHIELD = [
     // ── Strength ──────────────────────────────────────────────────────
     {
         id: 'shield_str_1', name: 'Crude Sample Buckler', nameDe: 'Grober Stichprobenfaustschild',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'shield',
         minLevel: 1,
         requirements: { level: 1, str: 12, agi: 0, int: 0 },
         defenses: { armour: 12, evasion: 0, absorption: 0 },
@@ -1075,7 +1076,7 @@ const EG_BASE_TYPES_SHIELD = [
     },
     {
         id: 'shield_str_2', name: 'Estimator War Shield', nameDe: 'Schätzer-Kriegsschild',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'shield',
         minLevel: 8,
         requirements: { level: 8, str: 32, agi: 0, int: 0 },
         defenses: { armour: 40, evasion: 0, absorption: 0 },
@@ -1083,7 +1084,7 @@ const EG_BASE_TYPES_SHIELD = [
     },
     {
         id: 'shield_str_3', name: 'Moment Generating Bulwark', nameDe: 'Momentenerzeugendes Bollwerk',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'shield',
         minLevel: 18,
         requirements: { level: 18, str: 60, agi: 0, int: 0 },
         defenses: { armour: 96, evasion: 0, absorption: 0 },
@@ -1091,7 +1092,7 @@ const EG_BASE_TYPES_SHIELD = [
     },
     {
         id: 'shield_str_4', name: 'Empirical Fortress Shield', nameDe: 'Empirischer Festungsschild',
-        archetype: 'strength', slotType: 'weapon',
+        archetype: 'strength', slotType: 'shield',
         minLevel: 28,
         requirements: { level: 28, str: 96, agi: 0, int: 0 },
         defenses: { armour: 190, evasion: 0, absorption: 0 },
@@ -1101,7 +1102,7 @@ const EG_BASE_TYPES_SHIELD = [
     // ── Intellect (Absorption) ────────────────────────────────────────
     {
         id: 'shield_int_1', name: 'Probability Field Targe', nameDe: 'Wahrscheinlichkeitsfeld-Tartsche',
-        archetype: 'intellect', slotType: 'weapon',
+        archetype: 'intellect', slotType: 'shield',
         minLevel: 1,
         requirements: { level: 1, str: 0, agi: 0, int: 12 },
         defenses: { armour: 0, evasion: 0, absorption: 10 },
@@ -1109,7 +1110,7 @@ const EG_BASE_TYPES_SHIELD = [
     },
     {
         id: 'shield_int_2', name: 'Posterior Ward', nameDe: 'Wacht des Posteriors',
-        archetype: 'intellect', slotType: 'weapon',
+        archetype: 'intellect', slotType: 'shield',
         minLevel: 8,
         requirements: { level: 8, str: 0, agi: 0, int: 32 },
         defenses: { armour: 0, evasion: 0, absorption: 34 },
@@ -1117,7 +1118,7 @@ const EG_BASE_TYPES_SHIELD = [
     },
     {
         id: 'shield_int_3', name: 'Gaussian Resonance Aegis', nameDe: 'Gaußresonanz-Ägis',
-        archetype: 'intellect', slotType: 'weapon',
+        archetype: 'intellect', slotType: 'shield',
         minLevel: 18,
         requirements: { level: 18, str: 0, agi: 0, int: 60 },
         defenses: { armour: 0, evasion: 0, absorption: 80 },
@@ -1125,7 +1126,7 @@ const EG_BASE_TYPES_SHIELD = [
     },
     {
         id: 'shield_int_4', name: 'Null-Set Arcane Bastion', nameDe: 'Nullmengen-Arkanbastion',
-        archetype: 'intellect', slotType: 'weapon',
+        archetype: 'intellect', slotType: 'shield',
         minLevel: 28,
         requirements: { level: 28, str: 0, agi: 0, int: 96 },
         defenses: { armour: 0, evasion: 0, absorption: 156 },

@@ -36,7 +36,8 @@ const EG_ZONE_CATEGORIES = {
 };
 
 // Maps each paperdoll slot id to the item slotType it accepts.
-// Multi-slot types (rings, earrings, weapons) share the same slotType value.
+// Multi-slot types (rings, earrings) share the same slotType value.
+// weapon1 only takes melee weapons; weapon2 is shield-exclusive.
 const EG_SLOT_ACCEPTS = {
     head: 'head',
     shoulders: 'shoulders',
@@ -55,7 +56,7 @@ const EG_SLOT_ACCEPTS = {
     arcane: 'arcane',
     talisman: 'talisman',
     weapon1: 'weapon',
-    weapon2: 'weapon',
+    weapon2: 'shield',
     ranged: 'ranged',
 };
 

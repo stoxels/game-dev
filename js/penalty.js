@@ -282,6 +282,13 @@ function applyPenalty(row, col) {
     trackAchStat('mistakesMade');
     if (typeof onMistake === 'function') onMistake();
 
+    // Mana on mistake (gear stat)
+    if (typeof gainMana === 'function'
+        && typeof _egComputePlayerStats === 'function'
+        && playerMaxMana > 0) {
+        gainMana(_egComputePlayerStats().manaOnMistake || 0);
+    }
+
     // --- Character banter: react to this mistake (and to mistake streaks) ---
     if (typeof triggerBanter === 'function') {
         if (mistakeCount > 0 && mistakeCount % 3 === 0) {

@@ -47,6 +47,7 @@ const CLASS_DEFS = {
             descCursorEn: 'Select a cell to reveal a limited amount of correct neighhbours.',
             descCursorDE: 'Wähle eine Zelle, um eine begrenzte Anzahl korrekter Nachbarn zu enthüllen.',
             cooldownSeconds: 300,
+            manaCost: 50,
             levels: [
                 {
                     level: 1,
@@ -75,6 +76,7 @@ const CLASS_DEFS = {
             descCursorEn: 'Click a cell to freeze time and click without causing mistakes',
             descCursorDE: 'Klicke eine Zelle zum Einfrieren der Zeit und klicke danach schnell ohne Fehler zu verursachen',
             cooldownSeconds: 300,
+            manaCost: 50,
             levels: [
                 {
                     level: 1,
@@ -141,6 +143,7 @@ const CLASS_DEFS = {
             descCursorEn: 'Click a cell to make your choice between row or column.',
             descCursorDE: 'Klicke auf eine Zelle um deine Wahl zwischen Zeile oder Spalte zu treffen.',
             cooldownSeconds: 300,
+            manaCost: 50,
             levels: [
                 {
                     level: 1,
@@ -169,6 +172,7 @@ const CLASS_DEFS = {
             descCursorEn: 'Select a cell to strike.',
             descCursorDE: 'Wähle eine Zelle zum Zuschlagen aus.',
             cooldownSeconds: 180,
+            manaCost: 30,
             levels: [
                 {
                     level: 1,
@@ -235,6 +239,7 @@ const CLASS_DEFS = {
             descCursorEn: 'Click a cell to mark up to 5 wrong cells in its row and column with ✕',
             descCursorDE: 'Klicke eine Zelle, um bis zu 5 falsche Zellen in Zeile und Spalte mit ✕ zu markieren',
             cooldownSeconds: 300,
+            manaCost: 50,
             levels: [
                 {
                     level: 1,
@@ -263,6 +268,7 @@ const CLASS_DEFS = {
             descCursorEn: 'Click a cell to scan that area',
             descCursorDE: 'Klicke eine Zelle an, um diesen Bereich zu scannen',
             cooldownSeconds: 300,
+            manaCost: 50,
             levels: [
                 {
                     level: 1,

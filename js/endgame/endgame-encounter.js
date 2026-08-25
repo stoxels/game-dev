@@ -44,6 +44,14 @@ const EG_MELEE_ANIM_DURATION_MS = 500;
 // Ranged monster projectile travel duration (ms).
 const EG_MONSTER_PROJ_DURATION_MS = 400;
 
+// Base window after a successful block during which the player cannot
+// attack (ms). Reduced by the blockRecoveryPct stat.
+const EG_BLOCK_LOCKOUT_BASE_MS = 5000;
+
+// Timestamp (Date.now()) until which the player cannot attack due to a
+// recent block. 0 when not locked out.
+let _egPlayerBlockLockoutUntil = 0;
+
 EG_INITIAL_SPAWN_STAGGER_BASE_MS = 500
 EG_INITIAL_SPAWN_STAGGER_STEP_MS = 200
 
@@ -528,6 +536,29 @@ function _egApplyPlayerMissFeedback() {
     setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
 }
 
+// Floating "Blocked!" label on the player HUD after a successful block.
+function _egApplyPlayerBlockFeedback() {
+    const hud = document.getElementById('player-avatar-wrapper');
+    if (!hud) return;
+    const label = document.createElement('div');
+    label.className = 'eg-player-damage eg-player-miss';
+    label.textContent = t('eg_blocked');
+    hud.appendChild(label);
+    setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
+}
+
+// Floating "recovering" label when the player tries to attack while still
+// locked out from a recent block.
+function _egApplyPlayerBlockLockoutFeedback() {
+    const hud = document.getElementById('player-avatar-wrapper');
+    if (!hud) return;
+    const label = document.createElement('div');
+    label.className = 'eg-player-damage eg-player-miss';
+    label.textContent = t('eg_block_lockout');
+    hud.appendChild(label);
+    setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
+}
+
 // Applies hit feedback to the player HUD: floating damage number + squish + red glow.
 function _egApplyPlayerHitFeedback(damageValue) {
     const hud = document.getElementById('player-avatar-wrapper');
@@ -617,6 +648,12 @@ function _egTrackRecentFill(row, col) {
 // changes don't redirect the projectile.
 function _egOnCorrectCell(row, col) {
     if (!_egIsActive()) return;
+
+    // Still recovering from a recent block — attacks are disabled
+    if (Date.now() < _egPlayerBlockLockoutUntil) {
+        _egApplyPlayerBlockLockoutFeedback();
+        return;
+    }
 
     if (row !== undefined && col !== undefined) _egTrackRecentFill(row, col);
 
@@ -876,10 +913,12 @@ function _egDamageTargetById(monsterId, amount) {
 }
 
 
-// Applies incoming monster damage to the player, after dodge/armour/absorption
-// mitigation. Returns the actual HP lost (0 if dodged/fully absorbed) so
-// callers can show an accurate floating number.
-function _egPlayerTakeDamage(amount) {
+// Applies incoming monster damage to the player, after dodge/block/armour/
+// absorption mitigation. Returns the actual HP lost (0 if dodged/blocked/
+// fully absorbed) so callers can show an accurate floating number.
+// `isSpell` routes the hit through spell block instead of attack block
+// (boss abilities pass true; regular monster attacks use the default).
+function _egPlayerTakeDamage(amount, isSpell = false) {
     if (!_egIsActive()) return 0;
 
     const stats = _egComputePlayerStats();
@@ -890,6 +929,31 @@ function _egPlayerTakeDamage(amount) {
         Audio_Manager.playSFX('player_dodge_attack');
         _egApplyPlayerMissFeedback();
         _egScheduleAbsorptionRegen();
+        return 0;
+    }
+
+    // Block roll: attacks use block chance, spells use spell block chance.
+    // A successful block fully negates the hit, but locks out player
+    // attacks for a short window (reduced by block recovery).
+    const blockChance = Math.min(75, isSpell ? stats.spellBlockChance : stats.blockChance);
+    if (blockChance > 0 && Math.random() * 100 < blockChance) {
+        showToast(t('eg_blocked'));
+        Audio_Manager.playSFX('player_dodge_attack');
+        _egApplyPlayerBlockFeedback();
+        _egScheduleAbsorptionRegen();
+
+        // Shield bash retaliation: chance to slam the current target for
+        // flat physical damage when blocking an attack.
+        if (!isSpell
+            && stats.shieldBashChancePct > 0
+            && stats.shieldBashDamageFlat > 0
+            && Math.random() * 100 < stats.shieldBashChancePct) {
+            const target = _egGetTarget();
+            if (target) _egDamageTargetById(target.id, Math.round(stats.shieldBashDamageFlat));
+        }
+
+        const recoveryFactor = Math.max(0, 1 - Math.min(100, stats.blockRecoveryPct) / 100);
+        _egPlayerBlockLockoutUntil = Date.now() + EG_BLOCK_LOCKOUT_BASE_MS * recoveryFactor;
         return 0;
     }
 
@@ -981,6 +1045,13 @@ function _egKillMonster(monsterId) {
 
     if (dying && !dying.isBoss) _egHandleNormalMonsterKill(dying);
     if (dying && dying.isBoss) _egHandleBossKill(dying);
+
+    // Mana on kill (gear stat)
+    if (typeof gainMana === 'function'
+        && typeof _egComputePlayerStats === 'function'
+        && playerMaxMana > 0) {
+        gainMana(_egComputePlayerStats().manaOnKill || 0);
+    }
 
     setTimeout(() => _egRenderPanel(), EG_PANEL_RERENDER_DELAY_MS);
 }

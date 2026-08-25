@@ -122,6 +122,14 @@ let playerMaxHP = 100;
 let playerCurrentHP = 100;
 
 
+// --- Player Mana ---
+// Base values are overwritten at level start using EG_PLAYER_STATS.baseMana
+// plus the aggregated mana bonus from gear and attributes. Kept at 0 here so
+// no mana bar shows before any level loads.
+let playerMaxMana = 0;
+let playerCurrentMana = 0;
+
+
 // --- Navigation history ---
 
 // A stack of screen IDs representing the player's navigation path.

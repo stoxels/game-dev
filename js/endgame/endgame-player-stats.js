@@ -13,6 +13,7 @@
 
 const EG_PLAYER_STATS = {
     baseHP: 100, // Starting HP for all monster levels
+    baseMana: 60, // Starting mana pool before gear and attribute bonuses
     baseDamage: 10, // Damage dealt per correct cell fill
     chargePushback: 1.5, // Seconds removed from a monster's charge bar on hit
 };
@@ -200,6 +201,11 @@ function _egComputePlayerStats() {
             s.armourFlat += item.defenses.armour || 0;
             s.evasionFlat += item.defenses.evasion || 0;
             s.absorptionFlat += item.defenses.absorption || 0;
+        }
+
+        // Shields carry an implicit base block chance on the base type
+        if (item.blockChance) {
+            s.blockChance += item.blockChance;
         }
 
         // NEW — weapon's own base damage range feeds into the same physical damage buckets as gear mods

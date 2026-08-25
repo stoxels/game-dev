@@ -575,7 +575,7 @@ function _egMechVoidSurge(monster, phase) {
 
             if (!survived) {
                 const damage = Math.round(playerMaxHP * EG_VOID_SURGE_DAMAGE_PCT);
-                const dealt = _egPlayerTakeDamage(damage);
+                const dealt = _egPlayerTakeDamage(damage, true);
                 if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
                 showToast(t('eg_void_surge_hit').replace('{n}', dealt));
             } else {

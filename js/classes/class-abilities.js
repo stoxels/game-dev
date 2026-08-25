@@ -380,6 +380,9 @@ function _fireInstantBaseAbility(slot) {
     const actData = _getActiveAbilityData(def, slot);
     const effect = actData.effect;
 
+    // Pay the mana cost — abort without firing if it can't be covered.
+    if (!spendMana(_getAbilityManaCost(slot))) return;
+
     // Row/col are 0,0 — instant abilities ignore position.
     _dispatchBaseAbility(slot, STATE.playerClass, 0, 0, effect);
 
@@ -396,6 +399,9 @@ function _fireInstantAscendencyAbility(slot) {
 
     const { asc, ascSlot, actData } = slotData;
     const effect = actData.effect;
+
+    // Pay the mana cost — abort without firing if it can't be covered.
+    if (!spendMana(_getAbilityManaCost(slot))) return;
 
     // Row/col are 0,0 — instant abilities ignore position.
     _dispatchAscendencyAbility(slot, STATE.playerAscendency, 0, 0, effect);
@@ -454,6 +460,12 @@ function toggleActiveAbility(slot) {
         return;
     }
 
+    // Mana gate: the ability must be payable before it can be armed or fired.
+    if (!_abilityCanAfford(newSlot)) {
+        showToast(t('cls_no_mana'));
+        return;
+    }
+
     // Disallow activating or switching to another ability if one is already armed
     if (activeAbilityMode && STATE.classActiveChoice !== newSlot) {
         return;
@@ -494,6 +506,9 @@ function _executeAscendencySkillOnCell(activeKey, row, col) {
     const { asc, ascSlot, actData } = slotData;
     const effect = actData.effect;
 
+    // Pay the mana cost — abort without firing if it can't be covered.
+    if (!spendMana(_getAbilityManaCost(activeKey))) return;
+
     _dispatchAscendencyAbility(activeKey, STATE.playerAscendency, row, col, effect);
 
     // End arm mode and start cooldown immediately
@@ -510,6 +525,12 @@ function _executeBaseSkillOnCell(activeKey, row, col) {
     const def = CLASS_DEFS[STATE.playerClass];
     const actData = _getActiveAbilityData(def, activeKey);
     const effect = actData.effect;
+
+    // Pay the mana cost — abort without firing if it can't be covered.
+    if (!spendMana(_getAbilityManaCost(activeKey))) {
+        showToast(t('cls_no_mana'));
+        return;
+    }
 
     _dispatchBaseAbility(activeKey, STATE.playerClass, row, col, effect);
 

@@ -34,9 +34,8 @@ const EG_MOD_CAPS = {
 // Maps every slotType value (from endgame-equipment-base-items.js) to its
 // mod table.  weapon1/weapon2/ranged share separate tables because melee,
 // off-hand, and ranged have different mod pools.
-// NOTE: slotType 'weapon' covers both weapon1 and weapon2 slots; we map
-// 'weapon' → WEAPON1 by default.  If you distinguish them by baseId prefix
-// you can extend _egGetModTable() below.
+// NOTE: melee weapons use slotType 'weapon' (→ WEAPON1), shields use
+// slotType 'shield' (→ SHIELD, a defensive-only derivative of WEAPON2).
 const EG_SLOT_MOD_TABLE_MAP = {
     head: () => EG_MOD_TABLE_HEAD,
     earring: () => EG_MOD_TABLE_EARRING,
@@ -52,7 +51,8 @@ const EG_SLOT_MOD_TABLE_MAP = {
     ring: () => EG_MOD_TABLE_RING,
     arcane: () => EG_MOD_TABLE_ARCANE,
     talisman: () => EG_MOD_TABLE_TALISMAN,
-    weapon: () => EG_MOD_TABLE_WEAPON1,   // melee + shields
+    weapon: () => EG_MOD_TABLE_WEAPON1,   // main-hand melee weapons
+    shield: () => EG_MOD_TABLE_SHIELD,    // shields (off-hand only)
     ranged: () => EG_MOD_TABLE_RANGED,
 };
 
@@ -61,7 +61,6 @@ const EG_SLOT_MOD_TABLE_MAP = {
 //-------------------MOD TABLE ACCESSOR-----------------------------------
 //------------------------------------------------------------------------
 // Returns the correct mod table object for a given base item.
-// Extend the weapon branch here if you want shields to use WEAPON2.
 
 function _egGetModTable(base) {
     const getter = EG_SLOT_MOD_TABLE_MAP[base.slotType];

@@ -28,6 +28,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Make a deal with the Infinite Hunger. Sacrifice your time for reveals. Every second counts. ',
             descCursorDE: 'Mache einen Handel mit dem Unendlichen Hunger. Opfere deine Zeit für Enthüllungen. Jede Sekunde zählt.',
             cooldownSeconds: 240,
+            manaCost: 40,
             levels: [
                 {
                     level: 1,
@@ -56,6 +57,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Enter the SPEEDFORCE: Every correct fill triggers a Momentum bonus. Time passes ten times as quickly.',
             descCursorDE: 'Betrete die SPEEDFORCE: Jede korrekte Füllung löst einen Momentum-Bonus aus. Die Zeit vergeht zehn mal so schnell.',
             cooldownSeconds: 120,
+            manaCost: 20,
             levels: [
                 {
                     level: 1,
@@ -97,6 +99,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Correct your most recent mistakes and recover lost time. Every corrected mistake reveals correct cells.',
             descCursorDE: 'Korrigiere deine letzten Fehler und erhalte verlorene Zeit zurück. Jeder korrigierte Fehler enthüllt korrekte Zellen.',
             cooldownSeconds: 120,
+            manaCost: 20,
             levels: [
                 {
                     level: 1,
@@ -125,6 +128,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Arm the holy shield: your next mistake is prevented and its line becomes protected.',
             descCursorDE: 'Aktiviere den heiligen Schild: Dein nächster Fehler wird verhindert und dessen Linie wird geschützt.',
             cooldownSeconds: 180,
+            manaCost: 30,
             levels: [
                 {
                     level: 1,
@@ -168,6 +172,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Select a mistake cell to summon a roaming skeleton - it walks up and down its column and fires revealing beams at adjacent correct cells.',
             descCursorDE: 'Klicke eine Fehlerzelle, um ein wanderndes Skelett zu beschwören - es läuft in seiner Spalte auf und ab und feuert Enthüllungs-Strahlen auf angrenzende korrekte Zellen.',
             cooldownSeconds: 120,
+            manaCost: 20,
             levels: [
                 {
                     level: 1,
@@ -196,6 +201,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Raise a zombie that wanders the grid permanently, haunts a free cell and challenges you to fill or mark it correctly.',
             descCursorDE: 'Erwecke einen Zombie, der dauerhaft über das Gitter wandert, eine freie Zelle heimsucht und dich herausfordert, sie korrekt zu füllen oder zu markieren.',
             cooldownSeconds: 1800,
+            manaCost: 100,
             levels: [
                 {
                     level: 1,
@@ -237,6 +243,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Roll back the puzzle to a previous state, undoing fills, marks and mistakes, and rewinding the timer.',
             descCursorDE: 'Setze das Rätsel auf einen früheren Zustand zurück, wobei Füllungen, Markierungen und Fehler rückgängig gemacht werden, und spule die Zeit zurück.',
             cooldownSeconds: 420,
+            manaCost: 70,
             levels: [
                 {
                     level: 1,
@@ -265,6 +272,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Enter Transition Mode - each correct fill may cascade to a neighbouring cell.',
             descCursorDE: 'Betrete Übergangsmodus - jede korrekte Füllung kann auf eine benachbarte Zelle übertragen werden.',
             cooldownSeconds: 300,
+            manaCost: 50,
             levels: [
                 {
                     level: 1,
@@ -308,6 +316,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Choose and arm a specialized trap. Place it before the fuse expires or it detonates in your hands, reducing remaining time.',
             descCursorDE: 'Wähle und aktiviere eine spezialisierte Falle. Platziere sie vor Ablauf der Zündschnur, sonst explodiert sie in deinen Händen und reduziert die verbleibende Zeit.',
             cooldownSeconds: 240,
+            manaCost: 40,
             levels: [
                 {
                     level: 1,
@@ -345,6 +354,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Seeds random empty cells with invisible shields - incorrectly revealing a shielded cell will protect you from the mistake.',
             descCursorDE: 'Versieht zufällige leere Zellen mit unsichtbaren Schilden, die dich vor Fehlern schützen werden.',
             cooldownSeconds: 180,
+            manaCost: 30,
             levels: [
                 {
                     level: 1,
@@ -387,6 +397,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Calls Browney, your loyal companion, who walks through the grid following a Brownian Motion path.',
             descCursorDE: 'Ruft Browney, deinen treuen Begleiter, der durch das Puzzle wandert. Browney folgt dem Pfad einer Brownschen Bewegung.',
             cooldownSeconds: 600,
+            manaCost: 100,
             levels: [
                 {
                     level: 1,
@@ -415,6 +426,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Calls Drifter, your loyal companion. Drifter will walk through the grid and can be fed to increase his speed and duration.',
             descCursorDE: 'Ruft Drifter, deinen treuen Begleiter, um sich durch das Puzzle zu bewegen. Drifter kann gefüttert werden, um seine Geschwindigkeit und Dauer zu erhöhen.',
             cooldownSeconds: 300,
+            manaCost: 50,
             levels: [
                 {
                     level: 1,

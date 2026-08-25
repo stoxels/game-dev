@@ -139,9 +139,12 @@ function _cleanupPreviousLevel() {
     document.getElementById('low-time-vignette')
         ?.classList.remove('ltv-tier1', 'ltv-tier2', 'ltv-tier3');
 
-    // Only reset HP if this is a fresh start, not a chained puzzle transition
+    // Only reset HP/mana if this is a fresh start, not a chained puzzle transition
     const isChainTransition = !!window._egSuppressEncounterStop;
-    if (!isChainTransition) _resetPlayerHP();
+    if (!isChainTransition) {
+        _resetPlayerHP();
+        if (typeof _resetPlayerMana === 'function') _resetPlayerMana();
+    }
 }
 
 // Full level state reset — runs all three reset helpers in order.

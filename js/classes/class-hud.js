@@ -90,6 +90,13 @@ function _buildTooltipCooldownLine(cooldownSeconds) {
     return `<span style="opacity:.55;font-size:.85em">⏱ CD: ${cdStr}</span>`;
 }
 
+// Builds the mana-cost footer line used inside skill tooltips.
+// e.g. "✦ 50 Mana" — omitted entirely for abilities without a cost.
+function _buildTooltipManaLine(manaCost) {
+    if (!manaCost) return '';
+    return ` <span style="color:#7fb3ff;font-size:.85em">✦ ${manaCost} ${t('cls_mana')}</span>`;
+}
+
 
 
 
@@ -217,7 +224,7 @@ function _buildActiveTooltipHTML(def, key) {
     return `<strong style="color:${HUD_COLOR_ACTIVE}">${getLocalName(skill)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
-        + `<br>${_buildTooltipCooldownLine(def[key].cooldownSeconds || 0)}`;
+        + `<br>${_buildTooltipCooldownLine(def[key].cooldownSeconds || 0)}${_buildTooltipManaLine(def[key].manaCost)}`;
 }
 
 // Routes to the correct tooltip builder based on the skill slot key.
@@ -241,7 +248,7 @@ function buildAscendencySkillTooltip(hudSlot) {
     return `<strong style="color:#f1c40f">${getLocalName(skill)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
-        + `<br>${_buildTooltipCooldownLine(skill.cooldownSeconds || 0)}`;
+        + `<br>${_buildTooltipCooldownLine(skill.cooldownSeconds || 0)}${_buildTooltipManaLine(skill.manaCost)}`;
 }
 
 
@@ -259,12 +266,16 @@ function _getSkillBtnState(hudSlot, accentColor) {
     const isOnCD = cdRemaining > 0;
     const isArmed = activeAbilityMode && STATE.classActiveChoice === hudSlot;
 
+    // Unaffordable abilities are disabled until the pool refills.
+    const canAfford = (typeof _abilityCanAfford === 'function') ? _abilityCanAfford(hudSlot) : true;
+    const noMana = !canAfford && !isOnCD;
+
     const btnColor = isArmed ? '#e74c3c' : isOnCD ? '#555' : accentColor;
-    const cursor = isOnCD ? 'not-allowed' : 'pointer';
-    const clickAttr = isOnCD ? '' : `onclick="toggleActiveAbility('${hudSlot}')"`;
+    const cursor = (isOnCD || noMana) ? 'not-allowed' : 'pointer';
+    const clickAttr = (isOnCD || noMana) ? '' : `onclick="toggleActiveAbility('${hudSlot}')"`;
     const armedRing = isArmed ? `outline: 2px solid #e74c3c; outline-offset: 2px;` : '';
 
-    return { cdRemaining, isOnCD, isArmed, btnColor, cursor, clickAttr, armedRing };
+    return { cdRemaining, isOnCD, isArmed, noMana, btnColor, cursor, clickAttr, armedRing };
 }
 
 // Builds the inner label element for a skill button:
@@ -280,11 +291,11 @@ function _buildSkillBtnLabel(isOnCD, isArmed, cdRemaining) {
 // Builds the full HTML string for a single skill button (used for both base
 // class and ascendency slots). Extra CSS classes can be passed in extraClasses.
 function _buildSkillBtnHTML(hudSlot, displayIdx, accentColor, extraClasses) {
-    const { cdRemaining, isOnCD, isArmed, btnColor, cursor, clickAttr, armedRing }
+    const { cdRemaining, isOnCD, isArmed, noMana, btnColor, cursor, clickAttr, armedRing }
         = _getSkillBtnState(hudSlot, accentColor);
 
     const label = _buildSkillBtnLabel(isOnCD, isArmed, cdRemaining);
-    const stateClasses = `${isArmed ? 'armed' : ''} ${isOnCD ? 'on-cd' : ''}`.trim();
+    const stateClasses = `${isArmed ? 'armed' : ''} ${isOnCD ? 'on-cd' : ''} ${noMana ? 'no-mana' : ''}`.trim();
     const allClasses = ['chud-skill-btn', extraClasses, stateClasses]
         .filter(Boolean).join(' ');
 
@@ -480,7 +491,15 @@ function renderCompactHUD(def) {
         ? '<div id="chud-momentum-bar-wrap"><div id="chud-momentum-bar"></div><span id="chud-momentum-count"></span></div>'
         : '';
 
+    // The mana bar sits above the drag handle and shows the current mana pool.
+    const manaBar = `
+        <div id="chud-mana-bar-wrap">
+            <div id="chud-mana-fill"></div>
+            <span id="chud-mana-text"></span>
+        </div>`;
+
     return `
+        ${manaBar}
         <div id="class-hud-drag-handle" ${shieldAttr}>
             <span class="chud-grip">⠿</span>
             <span class="chud-icon-sm"
@@ -541,6 +560,9 @@ function buildClassHUD() {
     panel.style.display = 'flex';
     panel.innerHTML = renderCompactHUD(def);
 
+    // Patch the mana bar with the current pool values after the rebuild.
+    if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
+
     _updatePanelShieldAttribute(panel);
     injectCompactHUDStyles(def);
     makeClassHUDDraggable();
@@ -590,6 +612,42 @@ function injectCompactHUDStyles(def) {
             white-space: nowrap;
         }
 
+        #chud-mana-bar-wrap {
+            position: relative;
+            width: 100%;
+            min-width: 120px;
+            height: 14px;
+            margin-bottom: 3px;
+            background: rgba(10,10,20,0.88);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+        }
+
+        #chud-mana-fill {
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 100%;
+            background: linear-gradient(180deg, #6ea8ff, #2c5aa0);
+            transition: width .25s ease;
+        }
+
+        #chud-mana-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--PX, monospace);
+            font-size: 9px;
+            color: #dce8ff;
+            text-shadow: 0 1px 2px rgba(0,0,0,.85);
+            letter-spacing: .04em;
+            line-height: 1;
+            pointer-events: none;
+        }
+
         #class-hud-drag-handle:active { cursor: grabbing; }
 
         .chud-grip {
@@ -631,6 +689,15 @@ function injectCompactHUDStyles(def) {
 
         .chud-skill-btn.on-cd {
             opacity: .65;
+        }
+
+        .chud-skill-btn.no-mana {
+            opacity: .45;
+        }
+
+        .chud-skill-btn.no-mana .chud-btn-ready {
+            color: #7fb3ff;
+            font-weight: bold;
         }
 
         .chud-btn-idx {

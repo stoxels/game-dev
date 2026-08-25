@@ -595,6 +595,7 @@ function _egBuildTooltipBodyHTML(item) {
         belt: 'eg_slot_belt', pants: 'eg_slot_pants', boots: 'eg_slot_boots',
         amulet: 'eg_slot_amulet', earring: 'eg_slot_earring', ring: 'eg_slot_ring',
         arcane: 'eg_slot_arcane', talisman: 'eg_slot_talisman', weapon: 'eg_slot_weapon',
+        shield: 'eg_slot_shield',
         ranged: 'eg_slot_ranged',
     };
 

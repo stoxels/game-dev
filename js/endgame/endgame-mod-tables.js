@@ -5893,6 +5893,11 @@ const EG_MOD_TABLE_WEAPON1 = {
 //   offence: when the player blocks, there is a % chance the shield
 //   slams back for damage. Absorption regen mods are strong here —
 //   the shield is the front line of that layer.
+//   Shields use EG_MOD_TABLE_SHIELD below — a defensive-only copy of
+//   this table. The offhand-identity offensive mods (spell_damage,
+//   inc_spell_damage, channel) are stripped from it since shields are
+//   purely protective pieces; those mods remain reserved for actual
+//   offhand items (focus, orb, tome) once those exist.
 //
 // OFFHAND identity:
 //   An offhand item (focus, orb, tome, etc.) leans into spell damage,
@@ -6399,6 +6404,26 @@ const EG_MOD_TABLE_WEAPON2 = {
         }
     }
 };
+
+//------------------------------------------------------------------------
+//-------------------SHIELD MODIFIER TABLE--------------------------------
+//------------------------------------------------------------------------
+// Defensive-only derivative of EG_MOD_TABLE_WEAPON2. Shields must not
+// roll offensive stats (spell damage / channel are offhand-item identity,
+// attack mods live on WEAPON1), so those families are stripped here while
+// everything else — local defences, block & dodge suffixes, shield_bash,
+// attributes, regen and utility — carries over unchanged.
+
+const EG_MOD_TABLE_SHIELD = (() => {
+    const offensivePrefixIds = ['spell_damage', 'inc_spell_damage', 'channel'];
+    return {
+        prefixes: Object.fromEntries(
+            Object.entries(EG_MOD_TABLE_WEAPON2.prefixes)
+                .filter(([id]) => !offensivePrefixIds.includes(id))
+        ),
+        suffixes: { ...EG_MOD_TABLE_WEAPON2.suffixes },
+    };
+})();
 
 // In: endgame-mod-tables.js
 // Replace the empty EG_MOD_TABLE_RANGED at the bottom of the file
