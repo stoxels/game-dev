@@ -81,6 +81,16 @@ let _egItemDrops = new Map();
 // Cleared by _egChainCleanup() alongside _egRunLoot.
 let _egRunCurrency = [];
 
+// Per-run regular-item tracker — ITEM_DEFS items claimed during the current
+// map run ({ defId, icon, name, rarity }), shown in the leave-map transition
+// summary. Cleared by _egChainCleanup() alongside _egRunLoot.
+let _egRunItems = [];
+
+// Per-run map-drop tracker — map items (🗺️) claimed during the current map
+// run, shown in the leave-map transition summary. Cleared by
+// _egChainCleanup() alongside _egRunLoot.
+let _egRunMaps = [];
+
 
 
 

@@ -533,7 +533,7 @@ function _egBuildMonster(defOrId, level = 1) {
     const maxHP = Math.round(def.baseHP * hpScale);
     const damage = Math.round(def.baseDamage * dmgScale);
 
-    return {
+    const monster = {
         id: `${def.id}_${++_egMonsterSpawnCounter}`,
         name: def.name,
         emoji: def.emoji,
@@ -547,4 +547,9 @@ function _egBuildMonster(defOrId, level = 1) {
         element: def.element || null,
         resistances: def.resistances || null
     };
+
+    // Active map run: apply the rolled monster-strengthening mods.
+    if (typeof _egApplyMapModsToMonster === 'function') _egApplyMapModsToMonster(monster);
+
+    return monster;
 }

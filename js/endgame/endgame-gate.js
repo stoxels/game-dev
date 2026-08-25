@@ -248,10 +248,18 @@ function _egRenderMapStash() {
 //------------------------------------------------------------------------
 
 // Triggers the map run sequence using whatever map is loaded in the device slot.
-// Uses the global showModal() if available, otherwise falls back to alert().
+// Delegates to _egLaunchMapFromDevice() (endgame-map-launch.js), which consumes
+// the map, applies its rolled modifiers and launches the encounter chain.
 function egActivateMap() {
     if (!_egMapSlotItem) return;
+    if (_egChainTransitioning) return;
 
+    if (typeof _egLaunchMapFromDevice === 'function') {
+        _egLaunchMapFromDevice(_egMapSlotItem);
+        return;
+    }
+
+    // Fallback when the launch module isn't loaded: behave like before.
     if (typeof showModal === 'function') {
         showModal(t('eg_map_warning_title'), t('eg_map_activating').replace('{n}', _egMapSlotItem.name));
     } else {

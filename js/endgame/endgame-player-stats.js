@@ -297,6 +297,16 @@ function _egComputePlayerStats() {
     s.evasion = Math.round(s.evasionFlat * (1 + s.evasionIncPct / 100));
     s.absorption = Math.round(s.absorptionFlat * (1 + s.absorptionIncPct / 100));
 
+    // Active map run: apply the "% reduced Armour, Evasion and Absorption" mod.
+    if (typeof _egMapPlayerDefenceMult === 'function') {
+        const defMult = _egMapPlayerDefenceMult();
+        if (defMult < 1) {
+            s.armour = Math.round(s.armour * defMult);
+            s.evasion = Math.round(s.evasion * defMult);
+            s.absorption = Math.round(s.absorption * defMult);
+        }
+    }
+
     return s;
 }
 

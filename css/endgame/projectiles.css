@@ -1,0 +1,446 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CODE-DRAWN CLASS PROJECTILES (endgame)
+   ═══════════════════════════════════════════════════════════════════════════
+   Every player projectile is built from nested divs (see the build() functions
+   in js/endgame/endgame-class-projectiles.js). All shapes are drawn pointing
+   RIGHT (+x) inside a 44x28 px box — the flight code rotates the whole box
+   onto the atan2 flight vector, so projectiles always aim at their target.
+
+   Layout contract per shape:
+     .eg-projectile.eg-built  → 44x28 root, centred on its position point
+     .egp                     → absolute inset:0 canvas for the shape parts
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Root sizing / centering ─────────────────────────────────────────────── */
+.eg-projectile.eg-built {
+    font-size: 0;
+    text-shadow: none;
+    width: 44px;
+    height: 28px;
+}
+
+.eg-projectile.eg-built:not(.eg-proj-charging) {
+    margin-left: -22px; /* centre the fixed-size box on its position point */
+    margin-top: -14px;
+}
+
+.egp {
+    position: absolute;
+    inset: 0;
+}
+
+/* Continuous inner tumble (outlier star / random-walker die). Applied to an
+   INNER element so the outer transform stays aimed along the flight vector. */
+.egp-spin {
+    animation: egp-spin var(--egp-spin-ms, 800ms) linear infinite;
+}
+
+@keyframes egp-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   PROBABILIST — golden hunting dart (🎯)
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-arrow { filter: drop-shadow(0 0 5px rgba(255, 224, 102, 0.9)); }
+
+.egp-arrow-shaft {
+    position: absolute;
+    left: 8px;
+    right: 13px;
+    top: 12px;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, #ffe082, #ff8f00);
+}
+
+.egp-arrow-head {
+    position: absolute;
+    left: 30px;
+    top: 8px;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 14px solid #ffca28;
+}
+
+.egp-arrow-fletch {
+    position: absolute;
+    left: 1px;
+    width: 11px;
+    height: 4px;
+    background: #ef5350;
+    clip-path: polygon(0 100%, 30% 0, 100% 0, 70% 100%);
+}
+
+.egp-arrow-fletch-top { top: 7px; }
+.egp-arrow-fletch-bot { top: 16px; transform: scaleY(-1); }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   MATHMAGICIAN — arcane firebolt (🔮)
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-fireball { filter: drop-shadow(0 0 8px rgba(255, 112, 67, 0.95)); }
+
+.egp-firebolt-tail {
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 27px;
+    height: 10px;
+    background: linear-gradient(to right, rgba(255, 112, 67, 0), #ff7043);
+    clip-path: polygon(100% 50%, 55% 0, 0 25%, 30% 50%, 0 75%, 55% 100%);
+    animation: egp-flame-flicker 180ms ease-in-out infinite alternate;
+}
+
+@keyframes egp-flame-flicker {
+    from { opacity: 0.75; }
+    to   { opacity: 1; }
+}
+
+.egp-firebolt-core {
+    position: absolute;
+    left: 23px;
+    top: 6px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fffde7 0%, #ffd54f 35%, #ff7043 75%, #d84315 100%);
+}
+
+.egp-firebolt-spark {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #ffd54f;
+    animation: egp-spark-flicker 240ms ease-in-out infinite alternate;
+}
+
+.egp-firebolt-spark-1 { left: 20px; top: 3px; }
+.egp-firebolt-spark-2 { left: 18px; top: 21px; animation-delay: 120ms; }
+
+@keyframes egp-spark-flicker {
+    from { opacity: 0.3; transform: scale(0.6); }
+    to   { opacity: 1; transform: scale(1.2); }
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   STATISTICIAN — thrown blade (⚔️)
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-sword { filter: drop-shadow(0 0 5px rgba(170, 212, 245, 0.9)); }
+
+.egp-sword-blade {
+    position: absolute;
+    left: 14px;
+    top: 11px;
+    width: 28px;
+    height: 6px;
+    background: linear-gradient(to bottom, #eceff1 0%, #b0bec5 45%, #78909c 100%);
+    clip-path: polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%, 6% 50%);
+}
+
+.egp-sword-guard {
+    position: absolute;
+    left: 11px;
+    top: 7px;
+    width: 4px;
+    height: 14px;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, #8d6e63, #5d4037);
+}
+
+.egp-sword-hilt {
+    position: absolute;
+    left: 4px;
+    top: 12px;
+    width: 8px;
+    height: 4px;
+    border-radius: 2px;
+    background: #5d4037;
+}
+
+.egp-sword-pommel {
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffe082, #f57f17);
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   OUTLIER — rogue shooting star (💫): streak + spinning star core
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-dizzy { filter: drop-shadow(0 0 6px rgba(179, 136, 255, 0.95)); }
+
+.egp-star-streak {
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 26px;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, rgba(179, 136, 255, 0), rgba(179, 136, 255, 0.95));
+}
+
+.egp-star-core {
+    position: absolute;
+    left: 23px;
+    top: 5px;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #e1bee7, #9575cd);
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   ACTUARY — served contract: paper dart with wax seal (📜→✉)
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-scroll { filter: drop-shadow(0 0 5px rgba(255, 213, 79, 0.85)); }
+
+.egp-dart-wing-under {
+    position: absolute;
+    inset: 0;
+    background: #d7c49a;
+    clip-path: polygon(2% 88%, 98% 48%, 26% 46%, 26% 56%);
+}
+
+.egp-dart-wing-over {
+    position: absolute;
+    inset: 0;
+    background: #fff8e1;
+    clip-path: polygon(2% 12%, 98% 48%, 26% 54%);
+}
+
+.egp-dart-seal {
+    position: absolute;
+    left: 24px;
+    top: 12px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #c62828;
+}
+
+.egp-dart-trail {
+    position: absolute;
+    left: 0;
+    top: 13px;
+    width: 12px;
+    height: 2px;
+    background: repeating-linear-gradient(to right, rgba(255, 248, 225, 0.8) 0 3px, transparent 3px 6px);
+    mask-image: linear-gradient(to left, black, transparent);
+    -webkit-mask-image: linear-gradient(to left, black, transparent);
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   RECURSIONIST — fractal soul shard with self-similar echoes (♾️)
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-infinity { filter: drop-shadow(0 0 6px rgba(100, 255, 218, 0.9)); }
+
+.egp-shard-body,
+.egp-shard-echo {
+    clip-path: polygon(0 50%, 32% 0, 100% 50%, 32% 100%);
+}
+
+.egp-shard-body {
+    position: absolute;
+    left: 14px;
+    top: 3px;
+    width: 30px;
+    height: 22px;
+    background: linear-gradient(135deg, #b2fff2 0%, #64ffda 40%, #00bfa5 100%);
+    animation: egp-shard-glimmer 500ms ease-in-out infinite alternate;
+}
+
+@keyframes egp-shard-glimmer {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.25); }
+}
+
+.egp-shard-echo {
+    position: absolute;
+    background: #64ffda;
+}
+
+.egp-shard-echo-1 {
+    left: 6px;
+    top: 7px;
+    width: 17px;
+    height: 14px;
+    opacity: 0.45;
+}
+
+.egp-shard-echo-2 {
+    left: 0;
+    top: 10px;
+    width: 9px;
+    height: 8px;
+    opacity: 0.2;
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   MARKOVIAN — chain shot: iron ball towing shortening links (⛓️)
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-chain { filter: drop-shadow(0 0 5px rgba(144, 164, 174, 0.9)); }
+
+.egp-chain-ball {
+    position: absolute;
+    left: 29px;
+    top: 7px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #eceff1, #90a4ae 55%, #37474f 100%);
+}
+
+.egp-chain-link {
+    position: absolute;
+    width: 11px;
+    height: 9px;
+    border: 2.5px solid #90a4ae;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.egp-chain-link-1 { left: 19px; top: 9px; }
+.egp-chain-link-2 { left: 10px; top: 12px; opacity: 0.8; }
+.egp-chain-link-3 { left: 2px;  top: 9px; opacity: 0.55; }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   BAYESIAN — alchemical vial dart with reactive charge (🧪)
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-brain { filter: drop-shadow(0 0 6px rgba(105, 240, 174, 0.9)); }
+
+.egp-vial-glass {
+    position: absolute;
+    left: 17px;
+    top: 8px;
+    width: 24px;
+    height: 12px;
+    border-radius: 6px;
+    background: rgba(220, 250, 235, 0.25);
+    border: 1.5px solid rgba(200, 255, 230, 0.85);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.egp-vial-fluid {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    margin-left: 30%; /* charge sits at the nose of the vial */
+    background: linear-gradient(to bottom, #69f0ae, #00c853);
+    border-radius: 0 6px 6px 0;
+    animation: egp-vial-bubble 400ms ease-in-out infinite alternate;
+}
+
+@keyframes egp-vial-bubble {
+    from { filter: brightness(0.95); }
+    to   { filter: brightness(1.2); }
+}
+
+.egp-vial-shine {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 60%;
+    height: 2px;
+    border-radius: 1px;
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.egp-vial-drop {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #69f0ae;
+}
+
+.egp-vial-drop-1 { left: 10px; top: 8px; opacity: 0.8; }
+.egp-vial-drop-2 { left: 3px;  top: 14px; opacity: 0.4; }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   RANDOM WALKER — tumbling pipped die (🎲): inner spin, aimed flight
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-dice { filter: drop-shadow(0 0 5px rgba(255, 241, 118, 0.85)); }
+
+.egp-die-streak {
+    position: absolute;
+    left: 2px;
+    top: 9px;
+    width: 20px;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 241, 118, 0.7));
+}
+
+.egp-die-streak::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 7px;
+    width: 14px;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 241, 118, 0.4));
+}
+
+.egp-die-body {
+    position: absolute;
+    left: 23px;
+    top: 5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #ffffff, #e0e0e0);
+    border: 1px solid #bdbdbd;
+    box-sizing: border-box;
+}
+
+.egp-pip {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #37474f;
+}
+
+.egp-pip-tl { left: 2px;  top: 2px; }
+.egp-pip-tr { right: 2px; top: 2px; }
+.egp-pip-c  { left: 6.5px; top: 6.5px; }
+.egp-pip-bl { left: 2px;  bottom: 2px; }
+.egp-pip-br { right: 2px; bottom: 2px; }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   DEFAULT — lightning bolt (⚡): classic bolt silhouette rotated to fly
+   tip-first (the vertical glyph is turned -90° inside the aimed container)
+   ════════════════════════════════════════════════════════════════════════ */
+.eg-proj-default { filter: drop-shadow(0 0 6px rgba(255, 224, 102, 0.95)); }
+
+.egp-bolt-body {
+    position: absolute;
+    left: 14px;
+    top: 0;
+    width: 16px;
+    height: 28px;
+    transform: rotate(-90deg); /* bottom-pointing glyph tip now aims +x */
+    background: linear-gradient(160deg, #fff59d, #ffd600);
+    clip-path: polygon(65% 0, 15% 58%, 48% 58%, 38% 100%, 85% 42%, 52% 42%);
+}

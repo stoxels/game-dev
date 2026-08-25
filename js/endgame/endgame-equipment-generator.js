@@ -112,9 +112,16 @@ function _egGetModTable(base) {
 //------------------------------------------------------------------------
 
 function _egRollRarity() {
-    const total = EG_ITEM_RARITY_TABLE.reduce((s, e) => s + e.weight, 0);
+    // Active map's loot rarity bonus boosts non-common weights during runs.
+    const rarMult = (typeof _egMapLootRarityWeightMult === 'function')
+        ? _egMapLootRarityWeightMult() : 1;
+    const weighted = EG_ITEM_RARITY_TABLE.map(e => ({
+        rarity: e.rarity,
+        weight: e.rarity === 'common' ? e.weight : e.weight * rarMult,
+    }));
+    const total = weighted.reduce((s, e) => s + e.weight, 0);
     let roll = Math.random() * total;
-    for (const entry of EG_ITEM_RARITY_TABLE) {
+    for (const entry of weighted) {
         roll -= entry.weight;
         if (roll <= 0) return entry.rarity;
     }

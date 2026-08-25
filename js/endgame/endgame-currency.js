@@ -230,7 +230,10 @@ function _egRollCurrencyDef() {
 // Called on monster death (see endgame-encounter.js edit below).
 // Orbs now land on the grid and must be picked up, just like equipment loot.
 function _egTryDropCurrency(isBoss) {
-    const chance = isBoss ? EG_CURRENCY_DROP_CHANCE_BOSS : EG_CURRENCY_DROP_CHANCE_NORMAL;
+    const baseChance = isBoss ? EG_CURRENCY_DROP_CHANCE_BOSS : EG_CURRENCY_DROP_CHANCE_NORMAL;
+    // Active map's loot quantity bonus scales the drop chance up.
+    const qtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
+    const chance = Math.min(1, baseChance * qtyMult);
     if (Math.random() > chance) return;
 
     const def = _egRollCurrencyDef();

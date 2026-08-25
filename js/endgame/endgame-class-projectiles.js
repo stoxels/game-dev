@@ -5,24 +5,162 @@
 
 
 
-// Class projectile visuals
-// Maps playerClass to the visual appearance of the outgoing player projectile.
-// _default is used when the player's class is null or unrecognised.
+// Class projectile visuals — drawn entirely in code (nested DOM + CSS, see
+// css/endgame/projectiles.css). No emojis: every shape is built pointing
+// RIGHT (+x) inside a 44x28 px box so it can always be rotated exactly along
+// the flight vector toward the targeted creature.
 //
-// rotOffset: extra degrees added on top of the flight angle so the emoji's
-// tip lines up with its direction of travel (tweak per platform rendering).
-// rotate: false marks symmetric/amorphous emojis that should not spin.
+// Each def:
+//   cssClass  — root element class (carries the glow filter / colour theme)
+//   duration  — flight time in ms
+//   easing    — Web Animations easing for the flight
+//   rotOffset — extra degrees on top of the flight angle (shapes are drawn
+//               tip-right, so this is normally 0)
+//   spin      — optional ms for a continuous inner tumble while flying
+//               (outer transform stays aimed at the target)
+//   build(el) — populates the projectile root with the shape's DOM
 const EG_CLASS_PROJECTILES = {
-    probabilist:   { emoji: '➤',  cssClass: 'eg-proj-arrow',    duration: 1000, easing: 'linear',   rotOffset: 0 },
-    mathmagician:  { emoji: '🔥', cssClass: 'eg-proj-fireball', duration: 1000, easing: 'ease-in',  rotOffset: 90 },
-    statistician:  { emoji: '🗡️', cssClass: 'eg-proj-sword',    duration: 1000, easing: 'ease-out', rotOffset: -135 },
-    outlier:       { emoji: '💫', cssClass: 'eg-proj-dizzy',    duration: 1000, easing: 'linear',   rotate: false },
-    actuary:       { emoji: '📜', cssClass: 'eg-proj-scroll',   duration: 1000, easing: 'ease-out', rotate: false },
-    recursionist:  { emoji: '♾️', cssClass: 'eg-proj-infinity', duration: 1000, easing: 'linear',   rotate: false },
-    markovian:     { emoji: '⛓️', cssClass: 'eg-proj-chain',    duration: 1000, easing: 'ease-in',  rotate: false },
-    bayesian:      { emoji: '🧠', cssClass: 'eg-proj-brain',    duration: 1000, easing: 'ease-in',  rotate: false },
-    random_walker: { emoji: '🎲', cssClass: 'eg-proj-dice',     duration: 1000, easing: 'linear',   rotate: false },
-    _default:      { emoji: '⚡', cssClass: 'eg-proj-default',  duration: 400,  easing: 'ease-in',  rotate: false },
+    // 🎯 Probabilist — golden hunting dart: needle shaft, steel tip, fletching
+    probabilist: {
+        cssClass: 'eg-proj-arrow', duration: 900, easing: 'linear', rotOffset: 0,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-arrow">' +
+                    '<div class="egp-arrow-fletch egp-arrow-fletch-top"></div>' +
+                    '<div class="egp-arrow-fletch egp-arrow-fletch-bot"></div>' +
+                    '<div class="egp-arrow-shaft"></div>' +
+                    '<div class="egp-arrow-head"></div>' +
+                '</div>';
+        },
+    },
+
+    // 🔮 Mathmagician — arcane firebolt: white-hot core with a comet tail
+    mathmagician: {
+        cssClass: 'eg-proj-fireball', duration: 1000, easing: 'ease-in', rotOffset: 0,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-firebolt">' +
+                    '<div class="egp-firebolt-tail"></div>' +
+                    '<div class="egp-firebolt-core"></div>' +
+                    '<div class="egp-firebolt-spark egp-firebolt-spark-1"></div>' +
+                    '<div class="egp-firebolt-spark egp-firebolt-spark-2"></div>' +
+                '</div>';
+        },
+    },
+
+    // ⚔️ Statistician — thrown blade: full sword silhouette, tip forward
+    statistician: {
+        cssClass: 'eg-proj-sword', duration: 800, easing: 'ease-out', rotOffset: 0,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-sword">' +
+                    '<div class="egp-sword-pommel"></div>' +
+                    '<div class="egp-sword-hilt"></div>' +
+                    '<div class="egp-sword-guard"></div>' +
+                    '<div class="egp-sword-blade"></div>' +
+                '</div>';
+        },
+    },
+
+    // 📈 Outlier — rogue shooting star: spinning star with a violet streak.
+    // The outer body stays aimed at the target; only the star tumbles.
+    outlier: {
+        cssClass: 'eg-proj-dizzy', duration: 1000, easing: 'linear', rotOffset: 0, spin: 700,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-star">' +
+                    '<div class="egp-star-streak"></div>' +
+                    '<div class="egp-star-core egp-spin"></div>' +
+                '</div>';
+        },
+    },
+
+    // 🛡️ Actuary — served contract: a paper dart (the claim, filed at the enemy)
+    actuary: {
+        cssClass: 'eg-proj-scroll', duration: 1000, easing: 'ease-out', rotOffset: 0,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-dart">' +
+                    '<div class="egp-dart-wing egp-dart-wing-under"></div>' +
+                    '<div class="egp-dart-wing egp-dart-wing-over"></div>' +
+                    '<div class="egp-dart-seal"></div>' +
+                    '<div class="egp-dart-trail"></div>' +
+                '</div>';
+        },
+    },
+
+    // 💀 Recursionist — fractal shard: a kite-shaped soul shard with smaller
+    // self-similar echoes trailing behind it (recursion made visible)
+    recursionist: {
+        cssClass: 'eg-proj-infinity', duration: 1000, easing: 'linear', rotOffset: 0,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-shard">' +
+                    '<div class="egp-shard-echo egp-shard-echo-2"></div>' +
+                    '<div class="egp-shard-echo egp-shard-echo-1"></div>' +
+                    '<div class="egp-shard-body"></div>' +
+                '</div>';
+        },
+    },
+
+    // ⏳ Markovian — chain shot: heavy iron ball towing a short link chain
+    markovian: {
+        cssClass: 'eg-proj-chain', duration: 1100, easing: 'ease-in', rotOffset: 0,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-chain">' +
+                    '<div class="egp-chain-link egp-chain-link-3"></div>' +
+                    '<div class="egp-chain-link egp-chain-link-2"></div>' +
+                    '<div class="egp-chain-link egp-chain-link-1"></div>' +
+                    '<div class="egp-chain-ball"></div>' +
+                '</div>';
+        },
+    },
+
+    // 🧪 Bayesian — alchemical vial: glass capsule dart, reactive green charge
+    bayesian: {
+        cssClass: 'eg-proj-brain', duration: 1000, easing: 'ease-in', rotOffset: 0,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-vial">' +
+                    '<div class="egp-vial-drop egp-vial-drop-2"></div>' +
+                    '<div class="egp-vial-drop egp-vial-drop-1"></div>' +
+                    '<div class="egp-vial-glass">' +
+                        '<div class="egp-vial-fluid"></div>' +
+                        '<div class="egp-vial-shine"></div>' +
+                    '</div>' +
+                '</div>';
+        },
+    },
+
+    // 🐻 Random Walker — tumbling die: pipped cube that rolls as it flies;
+    // the tumble is an inner animation so the flight vector stays true
+    random_walker: {
+        cssClass: 'eg-proj-dice', duration: 1000, easing: 'linear', rotOffset: 0, spin: 850,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-die">' +
+                    '<div class="egp-die-streak"></div>' +
+                    '<div class="egp-die-body egp-spin">' +
+                        '<div class="egp-pip egp-pip-tl"></div>' +
+                        '<div class="egp-pip egp-pip-tr"></div>' +
+                        '<div class="egp-pip egp-pip-c"></div>' +
+                        '<div class="egp-pip egp-pip-bl"></div>' +
+                        '<div class="egp-pip egp-pip-br"></div>' +
+                    '</div>' +
+                '</div>';
+        },
+    },
+
+    _default: {
+        cssClass: 'eg-proj-default', duration: 400, easing: 'ease-in', rotOffset: 0,
+        build(root) {
+            root.innerHTML =
+                '<div class="egp egp-bolt">' +
+                    '<div class="egp-bolt-body"></div>' +
+                '</div>';
+        },
+    },
 };
 
 // Reveal-triggered projectiles: item / passive / class-ability reveals during
@@ -67,29 +205,54 @@ function _egGetElementCentre(el) {
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
-// Creates, animates, and auto-removes a projectile div travelling from start to end.
+// Creates, animates, and auto-removes a projectile div travelling start → end.
 // onArrive() is called when the animation completes (i.e. on impact).
-// Optional orient = { rotate: bool, rotOffset: deg } points the emoji along
-// the flight vector instead of keeping its upright resting orientation.
+//
+// `visual` is either:
+//   - a string (emoji) → legacy path used by monster attacks & polymorph
+//   - a projectile def object with build() → code-drawn player projectile
+//
+// Orientation: EVERY projectile is rotated onto the flight vector
+// atan2(dy, dx) so it always points at its target. Emoji callers may pass
+// orient = { rotate:false } to opt out; code-built shapes are drawn
+// tip-right and therefore aim correctly at rotOffset = 0.
+//
 // Optional startScale overrides the launch size (used by charged shots that
-// grow while stacking).
-function _egFireProjectile(emoji, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
+// grow while stacking). It is applied as a uniform scale in the flight
+// keyframes, so it works identically for emoji and code-built visuals.
+function _egFireProjectile(visual, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
     const proj = document.createElement('div');
     proj.className = `eg-projectile ${cssClass}`;
-    proj.textContent = emoji;
     proj.style.left = '0px';
     proj.style.top = '0px';
+
+    let rotate = !(orient && orient.rotate === false);
+    let rotOffset = (orient && orient.rotOffset) || 0;
+
+    if (typeof visual === 'string') {
+        // Legacy emoji visual (monster attacks, polymorph confusion)
+        proj.textContent = visual;
+    } else if (visual && typeof visual.build === 'function') {
+        // Code-built visual: drawn pointing right (+x), so it aims along the
+        // flight vector with no offset unless the def says otherwise.
+        proj.classList.add('eg-built');
+        visual.build(proj);
+        rotate = visual.rotate !== false;
+        rotOffset = visual.rotOffset || 0;
+        if (visual.spin) proj.style.setProperty('--egp-spin-ms', `${visual.spin}ms`);
+    }
+
     document.body.appendChild(proj);
 
     let rot = '';
-    if (orient && orient.rotate) {
+    if (rotate) {
         const flightAngle = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
-        rot = `rotate(${flightAngle + (orient.rotOffset || 0)}deg) `;
+        rot = `rotate(${flightAngle + rotOffset}deg) `;
     }
 
-    const scaleStart = startScale || 1.5;
+    const emojiScaleStart = startScale || 1.5;
     const anim = proj.animate([
-        { transform: `translate(${start.x}px, ${start.y}px) ${rot}scale(${scaleStart})` },
+        { transform: `translate(${start.x}px, ${start.y}px) ${rot}scale(${emojiScaleStart})` },
         { transform: `translate(${end.x}px,   ${end.y}px)   ${rot}scale(0.5)` },
     ], { duration, easing });
 

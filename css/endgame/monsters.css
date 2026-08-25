@@ -192,7 +192,9 @@
    back by half its size so growth stays centred on the cell. */
 .eg-proj-charging {
     z-index: 10001;
-    transform: translate(-50%, -50%);
+    /* --egp-charge-scale grows with stacked cells (set in JS); emoji visuals
+       keep growing via font-size instead */
+    transform: translate(-50%, -50%) scale(var(--egp-charge-scale, 1));
     animation: eg-charge-pulse 0.6s ease-in-out infinite;
 }
 
@@ -439,17 +441,37 @@
     filter: drop-shadow(0 0 3px rgba(255,255,255,0.6));
 }
 
-/* Rarity glow variants */
+/* Rarity glow variants — colors match the game's rarity palette */
 .eg-pickup-rarity-common {
-    filter: drop-shadow(0 0 2px rgba(200,200,200,0.7));
+    filter: drop-shadow(0 0 2px rgba(176,176,176,0.7));
 }
 
 .eg-pickup-rarity-uncommon {
-    filter: drop-shadow(0 0 4px rgba(30,180,255,0.8));
+    filter: drop-shadow(0 0 4px rgba(46,204,113,0.8));
 }
 
 .eg-pickup-rarity-rare {
-    filter: drop-shadow(0 0 6px rgba(255,80,200,0.9));
+    filter: drop-shadow(0 0 6px rgba(52,152,219,0.9));
+}
+
+.eg-pickup-rarity-epic {
+    filter: drop-shadow(0 0 7px rgba(155,89,182,0.95));
+}
+
+.eg-pickup-rarity-legendary {
+    filter: drop-shadow(0 0 8px rgba(245,182,66,1));
+}
+
+.eg-pickup-rarity-cursed {
+    filter: drop-shadow(0 0 7px rgba(231,76,60,0.95));
+}
+
+.eg-pickup-rarity-artifact {
+    filter: drop-shadow(0 0 8px rgba(241,196,15,1));
+}
+
+.eg-pickup-rarity-currency {
+    filter: drop-shadow(0 0 5px rgba(181,146,72,0.9));
 }
 
 @keyframes eg-pickup-pulse {

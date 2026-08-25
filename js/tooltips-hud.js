@@ -191,6 +191,32 @@ function _buildLevelNameTooltipHTML() {
     if (isAscension) html += `<br><span style="color:#c080ff">${t('cg_ascension_lvl')}</span>`;
     if (isConvergence) html += `<br><span style="color:#6dbf40">${t('cg_convergence_lvl')}</span>`;
 
+    // Active map device run: show the activated map's tier and modifiers.
+    // Mod lines reuse the rolled (already localized) stat labels, grouped by
+    // their affects category with the same colors as the map item tooltip:
+    // monster → orange, player → red, puzzle → blue.
+    if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem
+        && typeof _egMapModAffects === 'function') {
+        const map = _egActiveMapItem;
+        const tierLine = t('eg_map_tier_tt').replace('{n}', map.mapTier ?? 1);
+        html += `<br><br><strong style="color:#c8a84b">🗺️ ${map.name}</strong>`;
+        html += `<br><span style="color:#c8a84b;opacity:.85">${tierLine}</span>`;
+
+        const colors = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
+        let hasMods = false;
+        (map.mods || []).forEach(mod => {
+            const color = colors[_egMapModAffects(mod.familyId)] || '#e67e22';
+            (mod.rolledStats || []).forEach(stat => {
+                if (!stat.label) return;
+                hasMods = true;
+                html += `<br><span style="color:${color}">${stat.label}</span>`;
+            });
+        });
+        if (!hasMods && typeof t === 'function') {
+            html += `<br><span style="opacity:.6">${t('eg_map_unmodified')}</span>`;
+        }
+    }
+
     return html;
 }
 

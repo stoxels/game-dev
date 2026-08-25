@@ -805,11 +805,13 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
     const start = _egGetElementCentre(sourceEl);
     const end = _egGetElementCentre(targetCard);
     const projDef = _egGetProjectileDef();
-    const orient = { rotate: projDef.rotate !== false, rotOffset: projDef.rotOffset || 0 };
 
-    _egFireProjectile(projDef.emoji, projDef.cssClass, start, end, projDef.duration, projDef.easing, () => {
+    // Pass the whole def: code-built visuals orient themselves onto the
+    // flight vector inside _egFireProjectile (they're drawn tip-forward),
+    // so every shot always points at the targeted creature.
+    _egFireProjectile(projDef, projDef.cssClass, start, end, projDef.duration, projDef.easing, () => {
         _egDamageTargetById(targetId, damage, elements);
-    }, orient, startScale);
+    }, null, startScale);
 }
 
 
@@ -838,10 +840,19 @@ function _egUpdateChargedProjectileVisual() {
 
     const projDef = _egGetProjectileDef();
     proj.className = `eg-projectile eg-proj-charging ${projDef.cssClass}`;
-    proj.textContent = projDef.emoji;
+    if (typeof projDef.build === 'function') {
+        proj.classList.add('eg-built');
+        projDef.build(proj);
+    } else {
+        proj.textContent = projDef.emoji;
+    }
 
     const stacksForVisual = Math.min(_egDragChargeStacks, EG_DRAG_CHARGE_MAX_VISUAL_STACKS);
-    proj.style.fontSize = `${EG_DRAG_CHARGE_BASE_SIZE_PX + stacksForVisual * EG_DRAG_CHARGE_SIZE_PER_STACK_PX}px`;
+    const sizePx = EG_DRAG_CHARGE_BASE_SIZE_PX + stacksForVisual * EG_DRAG_CHARGE_SIZE_PER_STACK_PX;
+    // Emoji visuals grow via font-size; code-built shapes via a scale var
+    // (the .egp box has fixed pixel dimensions).
+    proj.style.fontSize = `${sizePx}px`;
+    proj.style.setProperty('--egp-charge-scale', (sizePx / EG_DRAG_CHARGE_BASE_SIZE_PX).toFixed(3));
 
     // Anchor on the stroke's start cell; fall back to the HUD handle
     const anchor = ((_egDragChargeRow >= 0 && _egDragChargeCol >= 0)

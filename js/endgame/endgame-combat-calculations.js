@@ -23,6 +23,10 @@ function _egCalcPlayerDamage() {
 
     const critMult = _egRollCrit(stats);
     dmg *= critMult;
+
+    // Active map run: apply the "% reduced player Damage" map mod.
+    if (typeof _egMapPlayerDamageMult === 'function') dmg *= _egMapPlayerDamageMult();
+
     dmg = Math.max(1, Math.round(dmg));
 
     if (critMult > 1 && typeof showToast === 'function') showToast('💥 Critical Hit!');

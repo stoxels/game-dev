@@ -248,6 +248,108 @@ function _egMapModAffects(familyId) {
 
 
 //------------------------------------------------------------------------
+//-------------------MAP MOD REWARD BONUSES-------------------------------
+//------------------------------------------------------------------------
+// Every mod family grants run-wide reward bonuses on top of its danger:
+//   xp       — % more experience from kills
+//   quantity — % higher chance for loot/currency/item drops
+//   rarity   — % weight boost for non-common rarities when items drop
+// Values are indexed by (tier - 1); T1 = strongest roll. More dangerous
+// maps are therefore always strictly more rewarding, PoE-style.
+
+const EG_MAP_MOD_REWARDS = {
+    // ── Monster-strengthening ────────────────────────────────────
+    map_monster_life:        { xp: [10, 7, 4, 2], quantity: [8, 6, 3, 2], rarity: [6, 4, 3, 1] },
+    map_monster_damage:      { xp: [10, 7, 4, 2], quantity: [8, 6, 3, 2], rarity: [6, 4, 3, 1] },
+    map_monster_speed:       { xp: [9, 6, 4, 2],  quantity: [7, 5, 3, 1], rarity: [5, 4, 2, 1] },
+    map_extra_monsters:      { xp: [14, 9, 4],    quantity: [12, 8, 4],   rarity: [8, 5, 2] },
+    map_monster_resistances: { xp: [10, 7, 4, 2], quantity: [8, 6, 3, 2], rarity: [6, 4, 3, 1] },
+    map_boss_chance:         { xp: [15, 10, 5],   quantity: [12, 8, 4],   rarity: [12, 8, 4] },
+
+    // ── Player-weakening ─────────────────────────────────────────
+    map_player_life:         { xp: [11, 8, 5, 2], quantity: [9, 6, 4, 2], rarity: [7, 5, 3, 1] },
+    map_player_damage:       { xp: [11, 8, 5, 2], quantity: [9, 6, 4, 2], rarity: [7, 5, 3, 1] },
+    map_player_defences:     { xp: [10, 7, 4, 2], quantity: [8, 6, 3, 2], rarity: [6, 4, 3, 1] },
+    map_fewer_mistakes:      { xp: [12, 6],       quantity: [10, 5],      rarity: [8, 4] },
+    map_less_time:           { xp: [10, 7, 3],    quantity: [9, 6, 2],    rarity: [7, 4, 2] },
+    map_mana_penalty:        { xp: [9, 6, 3],     quantity: [7, 5, 2],    rarity: [5, 3, 2] },
+
+    // ── Puzzle behaviour ─────────────────────────────────────────
+    map_puzzle_cells:        { xp: [9, 6, 3],     quantity: [7, 5, 2],    rarity: [5, 3, 2] },
+    map_required_puzzles:    { xp: [16, 8],       quantity: [14, 7],      rarity: [10, 5] },
+    map_extra_questions:     { xp: [14, 9, 5],    quantity: [12, 7, 4],   rarity: [9, 5, 3] },
+    map_blackout_storm:      { xp: [11, 8, 4, 2], quantity: [9, 6, 3, 2], rarity: [7, 5, 2, 1] },
+};
+
+// Resolves the reward triple of one mod at a given tier.
+function _egGetMapModRewards(familyId, tier) {
+    const r = EG_MAP_MOD_REWARDS[familyId];
+    if (!r) return { xp: 0, quantity: 0, rarity: 0 };
+    const idx = Math.max(0, Math.min(r.xp.length - 1, (tier || 1) - 1));
+    return { xp: r.xp[idx] || 0, quantity: r.quantity[idx] || 0, rarity: r.rarity[idx] || 0 };
+}
+
+// Sums the reward bonuses of all mods on a map → { xp, quantity, rarity }.
+function _egGetMapRewardBonuses(map) {
+    const total = { xp: 0, quantity: 0, rarity: 0 };
+    if (!map || !Array.isArray(map.mods)) return total;
+    map.mods.forEach(mod => {
+        const rw = _egGetMapModRewards(mod.familyId, mod.tier);
+        total.xp += rw.xp;
+        total.quantity += rw.quantity;
+        total.rarity += rw.rarity;
+    });
+    return total;
+}
+
+
+//------------------------------------------------------------------------
+//-------------------MAP IMPLICITS-----------------------------------------
+//------------------------------------------------------------------------
+// Maps carry four implicit values derived from their tier and shaped by
+// specific mods. They are baked into the item at generation/reroll time so
+// the tooltip always shows exactly what the run will demand:
+//   puzzles          — required puzzles to solve
+//   questions        — quiz questions to answer correctly
+//   mistakes         — allowed mistake count
+//   durationSeconds  — total map time limit
+
+function _egRollMapImplicits(map) {
+    const tier = Math.max(1, map.mapTier || 1);
+    let puzzles = Math.min(12, 3 + Math.floor(tier / 3));
+    let questions = Math.min(8, Math.floor(tier / 2));
+    let mistakes = 10;
+    let duration = 900 + tier * 60;
+
+    (Array.isArray(map.mods) ? map.mods : []).forEach(mod => {
+        const val = (Array.isArray(mod.rolledStats) && mod.rolledStats.length > 0)
+            ? (Number(mod.rolledStats[0].value) || 0) : 0;
+        switch (mod.familyId) {
+            case 'map_required_puzzles':
+                puzzles = Math.min(20, puzzles + val);
+                break;
+            case 'map_extra_questions':
+                questions = Math.min(20, questions + val);
+                break;
+            case 'map_fewer_mistakes':
+                mistakes = Math.max(3, mistakes - val);
+                break;
+            case 'map_less_time':
+                duration = Math.max(300, duration - val);
+                break;
+        }
+    });
+
+    return { puzzles, questions, mistakes, durationSeconds: duration };
+}
+
+// Returns the map with freshly computed implicits (used after every roll).
+function _egWithImplicits(map) {
+    return { ...map, implicits: _egRollMapImplicits(map) };
+}
+
+
+//------------------------------------------------------------------------
 //-------------------MAP GENERATOR-----------------------------------------
 //------------------------------------------------------------------------
 
@@ -266,7 +368,7 @@ function _egGenerateMapDrop(monsterLevel = 1) {
     const baseName = _egPickMapBaseName(mapTier);
     const name = _egBuildItemName(baseName, rarity, mods);
 
-    return {
+    return _egWithImplicits({
         id: `map_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
         baseId: 'atlas_map',
         name,
@@ -281,14 +383,14 @@ function _egGenerateMapDrop(monsterLevel = 1) {
         itemLevel: monsterLevel,
         monsterLevel,
         mods,
-    };
+    });
 }
 
 // Rerolls ALL mods of a map at the given rarity/counts (orb support).
 function _egRerollMapMods(map, rarity, prefixCount, suffixCount) {
     const mods = _egRollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, map.itemLevel || map.monsterLevel || 1, null);
     const name = _egBuildItemName(map.baseName || map.name, rarity, mods);
-    return { ...map, rarity, mods, name };
+    return _egWithImplicits({ ...map, rarity, mods, name });
 }
 
 // Adds ONE new mod (prefix or suffix, whichever has room) to a map.
@@ -317,7 +419,7 @@ function _egAddOneModToMap(map, rarityForCaps) {
         rolledStats: _egBuildRolledStats(entry.family, tier),
     };
 
-    return { ...map, mods: [...existing, newMod] };
+    return _egWithImplicits({ ...map, mods: [...existing, newMod] });
 }
 
 
@@ -375,7 +477,7 @@ const EG_MAP_CURRENCY_RULES = {
     orb_scouring: {
         canApply(map) { return map.rarity !== 'common'; },
         apply(map) {
-            return { ...map, rarity: 'common', mods: [], name: map.baseName || map.name };
+            return _egWithImplicits({ ...map, rarity: 'common', mods: [], name: map.baseName || map.name });
         },
     },
     orb_exalted: {
@@ -478,10 +580,11 @@ function _egSpawnMapDrop(map) {
     _egMapDrops.set(key, map);
 
     // Overlay visual — reuses the loot overlay styling with a map tint class.
+    // Glow class follows the map's own rarity color.
     const el = document.getElementById(`g-${r}-${c}`);
     if (el) {
         const span = document.createElement('span');
-        span.className = 'eg-pickup-overlay eg-pickup-rarity-uncommon eg-loot-overlay eg-mapdrop-overlay';
+        span.className = `eg-pickup-overlay eg-pickup-rarity-${map.rarity || 'common'} eg-loot-overlay eg-mapdrop-overlay`;
         span.id = `eg-mapdrop-${r}-${c}`;
         span.textContent = map.icon || '🗺️';
         el.appendChild(span);
@@ -540,6 +643,9 @@ function _egCheckMapDropClaim(row, col) {
     _egAnimateMapDropClaim(row, col, map);
 
     _egAddMapToMapStash(map);
+
+    // Track for the leave-map summary screen (mirrors _egTrackRunCurrency)
+    if (typeof _egRunMaps !== 'undefined') _egRunMaps.push(map);
 
     Audio_Manager.playSFX('player_equip_pickup');
     showToast(t('eg_map_claimed')
@@ -615,6 +721,29 @@ function _egBuildMapTooltipBodyHTML(item) {
         ? `<div class="eg-tt-section"><div class="eg-tt-desc">${t('eg_map_unmodified')}</div></div>`
         : '';
 
+    // ── Implicit values ──────────────────────────────────────────────
+    const imp = item.implicits || _egRollMapImplicits(item);
+    const fmtDuration = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    const implicitLines = [
+        t('eg_map_implicit_puzzles').replace('{n}', imp.puzzles),
+        t('eg_map_implicit_questions').replace('{n}', imp.questions),
+        t('eg_map_implicit_mistakes').replace('{n}', imp.mistakes),
+        t('eg_map_implicit_duration').replace('{time}', fmtDuration(imp.durationSeconds)),
+        t('eg_map_monster_level_tt').replace('{n}', item.monsterLevel ?? item.itemLevel ?? 1),
+    ];
+
+    // ── Reward bonuses (from mods) ───────────────────────────────────
+    const rw = _egGetMapRewardBonuses(item);
+    const rewardLines = [];
+    if (rw.xp > 0) rewardLines.push(t('eg_map_reward_xp').replace('{n}', rw.xp));
+    if (rw.quantity > 0) rewardLines.push(t('eg_map_reward_quantity').replace('{n}', rw.quantity));
+    if (rw.rarity > 0) rewardLines.push(t('eg_map_reward_rarity').replace('{n}', rw.rarity));
+    const rewardsHTML = rewardLines.length === 0 ? '' : `
+    <div class="eg-tt-section">
+        <div class="eg-tt-group-title" style="color:#f5d98a;">${t('eg_map_reward_title')}</div>
+        ${rewardLines.map(l => `<div class="eg-tt-mod" style="color:#f5d98a;">${l}</div>`).join('')}
+    </div>`;
+
     return `
 <div class="eg-tt-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
@@ -623,8 +752,10 @@ function _egBuildMapTooltipBodyHTML(item) {
         <div class="eg-tt-rarity-line" style="color:${rc.border};">${t('eg_maps_label')} · ${t('eg_map_tier_tt').replace('{n}', item.mapTier ?? 1)}</div>
     </div>
     <div class="eg-tt-section">
-        <div class="eg-tt-implicit">${t('eg_map_monster_level_tt').replace('{n}', item.monsterLevel ?? item.itemLevel ?? 1)}</div>
+        <div class="eg-tt-group-title" style="color:#f5d98a;">${t('eg_map_implicits_title')}</div>
+        ${implicitLines.map(l => `<div class="eg-tt-implicit">${l}</div>`).join('')}
     </div>
+    ${rewardsHTML}
     ${sectionHTML('eg_map_mods_monster', groups.monster, '#e67e22')}
     ${sectionHTML('eg_map_mods_player', groups.player, '#e74c3c')}
     ${sectionHTML('eg_map_mods_puzzle', groups.puzzle, '#5b9cf6')}

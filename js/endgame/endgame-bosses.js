@@ -61,7 +61,7 @@ function _egBuildBoss(defOrId, level = 1) {
     const maxHP = Math.round(def.baseHP * hpScale);
     const damage = Math.round(def.baseDamage * dmgScale);
 
-    return {
+    const monster = {
         id: `${def.id}_${++_egMonsterSpawnCounter}`,
         name: def.name,
         emoji: def.emoji,
@@ -74,6 +74,11 @@ function _egBuildBoss(defOrId, level = 1) {
         element: def.element || null,
         resistances: def.resistances || null
     };
+
+    // Active map run: apply the rolled monster-strengthening mods.
+    if (typeof _egApplyMapModsToMonster === 'function') _egApplyMapModsToMonster(monster);
+
+    return monster;
 }
 
 
@@ -153,6 +158,15 @@ function _egBossApplyPhaseStats(monster, newPhase) {
     monster.bossPhase = newPhase;
     monster.bossImmune = true;
     monster.chargeMax = phaseData.chargeMax;
+
+    // Active map run: re-apply the attack-speed mod, the raw phase value
+    // just overwrote it.
+    const spdPct = (typeof _egGetActiveMapModValue === 'function')
+        ? _egGetActiveMapModValue('map_monster_speed') : 0;
+    if (spdPct > 0 && monster.chargeMax > 0) {
+        monster.chargeMax = Math.max(3, Math.ceil(monster.chargeMax / (1 + spdPct / 100)));
+    }
+
     monster.damageValue = Math.round(monster.bossBaseDamage * phaseData.damageMultiplier);
 }
 

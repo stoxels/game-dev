@@ -105,11 +105,14 @@ function _resetLevelTrackers() {
 }
 
 // Resets player HP to full, based on base HP plus any gear health bonus.
+// Reduced by the active map's "% reduced maximum Life" mod during device runs.
 function _resetPlayerHP() {
     const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
     const gearHealthBonus = (typeof _egComputePlayerStats === 'function')
         ? _egComputePlayerStats().health : 0;
-    playerMaxHP = baseHP + gearHealthBonus;
+    let maxHP = baseHP + gearHealthBonus;
+    if (typeof _egMapPlayerLifeMult === 'function') maxHP = Math.round(maxHP * _egMapPlayerLifeMult());
+    playerMaxHP = Math.max(1, maxHP);
     playerCurrentHP = playerMaxHP;
 }
 

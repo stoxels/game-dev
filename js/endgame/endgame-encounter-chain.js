@@ -20,6 +20,10 @@ let _egMapClearedShown = false;     // ensures the MAP CLEARED banner fires once
 let _egPendingPuzzleBonusGain = 0;
 let _egPendingQuestionBonusGain = 0;
 
+// Accumulated bonus-loot chance for the current run (0–1). Grows with every
+// solved puzzle (scaled by grid size) and every correctly answered question.
+let _egBonusLootChance = 0;
+
 
 //------------------------------------------------------------------------
 //-------------------REQUIREMENTS HELPERS---------------------------------
@@ -57,7 +61,11 @@ function _egCanLeaveMap() {
 function _egOnQuestionAnswered() {
     if (!_egIsActive()) return;
     _egQuestionsAnswered++;
-    _egPendingQuestionBonusGain += EG_BONUS_LOOT_CHANCE_PER_QUESTION;
+    const gain = EG_BONUS_LOOT_CHANCE_PER_QUESTION[
+        Math.min(_egQuestionsAnswered - 1, EG_BONUS_LOOT_CHANCE_PER_QUESTION.length - 1)
+    ];
+    _egBonusLootChance = Math.min(EG_BONUS_LOOT_CHANCE_MAX, _egBonusLootChance + gain);
+    _egPendingQuestionBonusGain += gain;
     _egUpdateObjectivesHUD();
 }
 
@@ -74,7 +82,9 @@ function _egOnPuzzleComplete() {
     Audio_Manager.playSFX('win');
 
     _egChainPuzzleSolvedCount++;
-    _egPendingPuzzleBonusGain += EG_BONUS_LOOT_CHANCE_PER_PUZZLE;
+    const gain = _egGetPuzzleBonusLootGain();
+    _egBonusLootChance = Math.min(EG_BONUS_LOOT_CHANCE_MAX, _egBonusLootChance + gain);
+    _egPendingPuzzleBonusGain += gain;
     _egUpdateObjectivesHUD();
 
     // Always automatically chain to the next puzzle, the player needs to manually leave the chain
@@ -147,8 +157,14 @@ function _egPickInterstitialWorldNum() {
 //------------------------------------------------------------------------
 
 function _egStartChainCountdown() {
-    // Show an interstitial question first, then begin the 3-2-1 countdown.
-    _egShowInterstitialQuestion(() => {
+    // Show the interstitial question(s) first, then begin the 3-2-1 countdown.
+    // The active map's "+# additional Quiz Questions per Puzzle" mod raises
+    // how many questions must be answered between two puzzles.
+    const totalQuestions = (typeof _egMapQuestionsPerInterstitial === 'function')
+        ? _egMapQuestionsPerInterstitial() : 1;
+    let remaining = Math.max(1, totalQuestions);
+
+    const onAllAnswered = () => {
         _egChainTransitioning = true;
         _egShowChainCountdownOverlay(3);
 
@@ -165,7 +181,18 @@ function _egStartChainCountdown() {
                 _egLoadNextChainPuzzle();
             }
         }, 1000);
-    });
+    };
+
+    const nextQuestion = () => {
+        remaining--;
+        if (remaining > 0) {
+            _egShowInterstitialQuestion(nextQuestion);
+            return;
+        }
+        onAllAnswered();
+    };
+
+    _egShowInterstitialQuestion(nextQuestion);
 }
 
 function _egCancelChainCountdown() {
@@ -316,7 +343,16 @@ function _egFindNextChainPuzzleGi() {
     const activeDef = _egMapDef || cur;
     const criteria = (activeDef.puzzlePool && typeof activeDef.puzzlePool === 'object')
         ? activeDef.puzzlePool : {};
-    const pool = _egBuildChainPool(criteria);
+    let pool = _egBuildChainPool(criteria);
+
+    // A map's "% larger Puzzle Grids" mod can floor the cell count so high
+    // that no story puzzle qualifies — relax the size filter as a fallback
+    // so the chain never stalls.
+    if (pool.length === 0 && (criteria.minCells != null || criteria.maxCells != null)) {
+        const relaxed = { ...criteria, minCells: null, maxCells: null };
+        pool = _egBuildChainPool(relaxed);
+    }
+
     if (pool.length === 0) { console.warn('EG chain: no puzzles matched criteria', criteria); return null; }
     return _egPickFromPool(pool, criteria.recentWindow);
 }
@@ -327,17 +363,34 @@ function _egFindNextChainPuzzleGi() {
 //------------------------------------------------------------------------
 
 // Chance-based bonus equipment loot when completing a map.
-// The chance scales with puzzles solved and questions answered this run:
-//   chance = puzzles * 5% + questions * 3%  (capped at 90%)
-const EG_BONUS_LOOT_CHANCE_PER_PUZZLE = 0.05;
-const EG_BONUS_LOOT_CHANCE_PER_QUESTION = 0.03;
-const EG_BONUS_LOOT_CHANCE_MAX = 0.9;
+// The chance scales with the grid size of each solved puzzle and with
+// correct quiz answers this run:
+//   puzzles: small +10%, normal +25%, large +50%, massive +75%
+//   quiz:    +33% / +33% / +34% for the first three correct answers
+const EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE = {
+    small: 0.10,
+    medium: 0.25,
+    large: 0.50,
+    massive: 0.75,
+};
+const EG_BONUS_LOOT_CHANCE_PER_QUESTION = [0.33, 0.33, 0.34];
+const EG_BONUS_LOOT_CHANCE_MAX = 1.0;
+
+// Returns the bonus-loot gain (0–1) for solving a puzzle, based on how many
+// cells the puzzle's grid has (same buckets as _gridSizeBucket in quests-stats.js).
+function _egGetPuzzleBonusLootGain() {
+    const rows = cur ? cur.grid.length : 0;
+    const cols = cur && cur.grid[0] ? cur.grid[0].length : 0;
+    const cells = rows * cols;
+    if (cells >= 400) return EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE.massive;
+    if (cells >= 200) return EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE.large;
+    if (cells >= 100) return EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE.medium;
+    return EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE.small;
+}
 
 // Returns the current bonus-loot drop chance (0–1) for this run.
 function _egGetBonusLootChance() {
-    return Math.min(EG_BONUS_LOOT_CHANCE_MAX,
-        _egChainPuzzleSolvedCount * EG_BONUS_LOOT_CHANCE_PER_PUZZLE +
-        _egQuestionsAnswered * EG_BONUS_LOOT_CHANCE_PER_QUESTION);
+    return Math.min(EG_BONUS_LOOT_CHANCE_MAX, _egBonusLootChance);
 }
 
 // Rolls for one bonus equipment item on map completion. On success the item
@@ -365,12 +418,9 @@ function _egRollBonusMapLoot() {
 // corner HUD: explains what bonus loot is and shows the current chance.
 function _egBuildBonusLootTooltipHTML() {
     const pct = Math.round(_egGetBonusLootChance() * 100);
-    const pPuzzle = Math.round(EG_BONUS_LOOT_CHANCE_PER_PUZZLE * 100);
-    const pQuiz = Math.round(EG_BONUS_LOOT_CHANCE_PER_QUESTION * 100);
 
     let html = `<strong style="color:#f5d98a">${t('eg_bonus_chance_title')}</strong>`;
-    html += `<br>${t('eg_bonus_loot_tooltip')
-        .replace('{p}', pPuzzle).replace('{q}', pQuiz)}`;
+    html += `<br>${t('eg_bonus_loot_tooltip')}`;
     html += `<br>${t('eg_bonus_current').replace('{p}', pct)}`;
     return html;
 }
@@ -794,9 +844,15 @@ function _egChainCleanup() {
             delete level.isChainedPuzzle;
         }
     });
+
+    // End of a device-map run: restore the seed level and drop the map's
+    // runtime modifiers.
+    if (typeof _egCleanupMapRunSeedLevel === 'function') _egCleanupMapRunSeedLevel();
+
     _egChainKillCount = 0;
     _egChainPuzzleSolvedCount = 0;
     _egQuestionsAnswered = 0;
+    _egBonusLootChance = 0;
     _egPendingPuzzleBonusGain = 0;
     _egPendingQuestionBonusGain = 0;
     _egChainCurrentGi = null;
@@ -812,6 +868,8 @@ function _egChainCleanup() {
 
     _egRunLoot = [];
     _egRunCurrency = [];
+    _egRunItems = [];
+    _egRunMaps = [];
     // _egLootDrops is cleared by _egStopPickupSpawner via _egStopLootDrops
 
     // Hide the objectives strip
@@ -828,16 +886,26 @@ function _egChainCleanup() {
 //-------------------LEAVE MAP TRANSITION SCREEN--------------------------
 //------------------------------------------------------------------------
 
-// Builds the two summary rows (equipment loot + currency). Reads
-// _egRunLoot / _egRunCurrency — must be called BEFORE _egStopEncounter()
-// (which clears both via _egChainCleanup) so there's still data to show.
-function _egBuildLeaveMapSummaryHTML() {
-    const lootHTML = _egRunLoot.map((item, i) => `
-        <div class="eg-leave-summary-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
+// Builds the summary rows (equipment loot + regular items + maps + currency).
+// Reads the passed-in snapshots — must be called while _egRunLoot /
+// _egRunItems / _egRunMaps / _egRunCurrency still hold the run's data.
+function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency) {
+    const lootHTML = loot.map((item, i) => `
+        <div class="eg-leave-summary-chip eg-loot-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
             ${item.icon || '📦'}
         </div>`).join('');
 
-    const currencyHTML = _egRunCurrency.map((entry, i) => `
+    const itemsHTML = items.map((item, i) => `
+        <div class="eg-leave-summary-chip eg-item-pickup-chip eg-rarity-${_egLeaveRarityClass(item.rarity)}" data-item-idx="${i}">
+            ${item.icon || '📦'}
+        </div>`).join('');
+
+    const mapsHTML = maps.map((map, i) => `
+        <div class="eg-leave-summary-chip eg-map-pickup-chip eg-rarity-${_egLeaveRarityClass(map.rarity)}" data-map-idx="${i}">
+            ${map.icon || '🗺️'}
+        </div>`).join('');
+
+    const currencyHTML = currency.map((entry, i) => `
         <div class="eg-leave-summary-chip eg-rarity-currency" data-currency-idx="${i}">
             ${entry.icon || '💰'}
             ${entry.count > 1 ? `<span class="eg-leave-summary-count">×${entry.count}</span>` : ''}
@@ -845,8 +913,17 @@ function _egBuildLeaveMapSummaryHTML() {
 
     return `
         <div class="eg-leave-summary-section">
-            <div class="eg-leave-summary-title">${t('eg_loot_acquired').replace('{n}', _egRunLoot.length)}</div>
+            <div class="eg-leave-summary-title">${t('eg_loot_acquired').replace('{n}', loot.length)}</div>
             <div class="eg-leave-summary-row">${lootHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+            <div class="eg-leave-summary-hint">${t('eg_leave_sell_hint')}</div>
+        </div>
+        <div class="eg-leave-summary-section">
+            <div class="eg-leave-summary-title">${t('eg_items_acquired').replace('{n}', items.length)}</div>
+            <div class="eg-leave-summary-row">${itemsHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        </div>
+        <div class="eg-leave-summary-section">
+            <div class="eg-leave-summary-title">${t('eg_maps_acquired').replace('{n}', maps.length)}</div>
+            <div class="eg-leave-summary-row">${mapsHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
         </div>
         <div class="eg-leave-summary-section">
             <div class="eg-leave-summary-title">${t('eg_runes_orbs')}</div>
@@ -854,31 +931,125 @@ function _egBuildLeaveMapSummaryHTML() {
         </div>`;
 }
 
-// Builds the hover tooltip body for a currency entry (equipment items go
-// through _egBuildTooltipBodyHTML instead).
+// Clamps a rarity string to one that has a border/glow CSS class on the
+// summary chips (regular ITEM_DEFS items only use a subset of rarities).
+function _egLeaveRarityClass(rarity) {
+    return ['common', 'uncommon', 'rare', 'epic', 'legendary', 'cursed', 'artifact']
+        .includes(rarity) ? rarity : 'common';
+}
+
+// Builds the hover tooltip body for a currency / shard entry shown in the
+// runes &amp; orbs row — icon, name, rarity line and description, matching
+// the hub's currency tooltip frame.
 function _egBuildCurrencyTooltipHTML(entry) {
+    const countLine = entry.count > 1 ? ` <span class="eg-tooltip-count">×${entry.count}</span>` : '';
     return `<div class="eg-tt-frame" style="--tt-border:#b59248;">
         <div class="eg-tt-header">
             <div class="eg-tt-icon">${entry.icon || '💰'}</div>
-            <div class="eg-tt-name" style="color:#f5d98a;">${entry.name}</div>
+            <div class="eg-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
+            <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')}</div>
+        </div>
+        <div class="eg-tt-section"><div class="eg-tt-desc">${entry.description || ''}</div></div>
+    </div>`;
+}
+
+// Builds a compact tooltip body for regular items (ITEM_DEFS pickups).
+function _egBuildLeaveItemTooltipHTML(item) {
+    const rc = {
+        common: '#b0b0b0', uncommon: '#2ecc71', rare: '#3498db',
+        epic: '#9b59b6', legendary: '#f5b642', cursed: '#e74c3c', artifact: '#f1c40f',
+    }[_egLeaveRarityClass(item.rarity)] || '#b0b0b0';
+    return `<div class="eg-tt-frame" style="--tt-border:${rc};">
+        <div class="eg-tt-header">
+            <div class="eg-tt-icon">${item.icon || '📦'}</div>
+            <div class="eg-tt-name" style="color:${rc};">${item.name || '???'}</div>
         </div>
     </div>`;
 }
 
-// Wires loot/currency chips to the global floating tooltip engine
-// (tooltips-hud.js). The engine renders into a position:fixed element on
-// document.body, so tooltips are never clipped by the panel's overflow-y.
-// Reads the passed-in loot/currency snapshots instead of the live arrays,
-// because _egChainCleanup wipes them right after this overlay opens.
-function _egWireLeaveMapSummaryTooltips(panel, loot, currency) {
+// Ctrl + left-click on an equipment chip inside the leave-map overlay sells
+// the item instantly: it is removed from the run loot (and from the stash if
+// the flush already placed it there) and grants one rolled orb shard, which
+// appears both in the overlay's runes &amp; orbs row and in the real currency
+// stash. Returns true when the item was sold.
+function _egSellRunLootChip(item, state) {
+    if (!item) return false;
+
+    // Remove from the live run loot so _egFlushRunLootToStash skips it.
+    const liveIdx = Array.isArray(_egRunLoot) ? _egRunLoot.indexOf(item) : -1;
+    if (liveIdx !== -1) _egRunLoot.splice(liveIdx, 1);
+
+    // If the flush already ran, remove the item from the stash by identity.
+    let removedFromStash = false;
+    for (let r = 0; r < EG_INV_ROWS && !removedFromStash; r++) {
+        for (let c = 0; c < EG_INV_COLS && !removedFromStash; c++) {
+            if (_egInventory[r][c] === item) {
+                _egInventory[r][c] = null;
+                if (typeof _egRenderInventoryCell === 'function') _egRenderInventoryCell(r, c);
+                removedFromStash = true;
+            }
+        }
+    }
+    if (removedFromStash && typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
+
+    // Roll and grant the shard (goes straight into the currency stash).
+    const shardDef = _egRollShardForItem(item);
+    const granted = egAddShard(shardDef.id, 1);
+
+    // Mirror the gain into the overlay's currency list (aggregated by id).
+    const existing = state.currency.find(e => e.id === shardDef.id);
+    if (existing) existing.count = (existing.count || 1) + 1;
+    else state.currency.push({
+        id: shardDef.id,
+        name: shardDef.name,
+        icon: shardDef.icon,
+        description: shardDef.description,
+        count: 1,
+    });
+
+    // Remove the sold item from the overlay's loot snapshot.
+    const idx = state.loot.indexOf(item);
+    if (idx !== -1) state.loot.splice(idx, 1);
+
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('player_equip_pickup');
+    }
+    showToast(t('eg_sell_item_sold')
+        .replace('{name}', item.name || '???')
+        .replace('{icon}', shardDef.icon)
+        .replace('{shard}', shardDef.name));
+
+    // Persist the sale immediately — egSaveHubState() already ran in
+    // _egEndMap before the player had a chance to interact with this overlay.
+    if (typeof egSaveHubState === 'function') egSaveHubState();
+
+    if (!granted) showToast(t('eg_map_stash_full'));
+    return true;
+}
+
+// Wires loot / item / currency chips to the global floating tooltip engine
+// (tooltips-hud.js) plus the ctrl+click sell interaction for loot chips.
+// The engine renders into a position:fixed element on document.body, so
+// tooltips are never clipped by the panel's overflow-y. Listeners live on
+// the panel (delegation), so re-rendering the summary rows is safe.
+function _egWireLeaveMapSummaryTooltips(panel, state) {
     const buildFor = (chip) => {
         if ('lootIdx' in chip.dataset) {
-            const item = loot[+chip.dataset.lootIdx];
+            const item = state.loot[+chip.dataset.lootIdx];
             return (item && typeof _egBuildTooltipBodyHTML === 'function')
                 ? _egBuildTooltipBodyHTML(item) : '';
         }
+        if ('itemIdx' in chip.dataset) {
+            const item = state.items[+chip.dataset.itemIdx];
+            return item ? _egBuildLeaveItemTooltipHTML(item) : '';
+        }
+        if ('mapIdx' in chip.dataset) {
+            const map = state.maps[+chip.dataset.mapIdx];
+            return (map && typeof _egBuildMapTooltipBodyHTML === 'function')
+                ? _egBuildMapTooltipBodyHTML(map) : '';
+        }
         if ('currencyIdx' in chip.dataset) {
-            const entry = currency[+chip.dataset.currencyIdx];
+            const entry = state.currency[+chip.dataset.currencyIdx];
             return entry ? _egBuildCurrencyTooltipHTML(entry) : '';
         }
         return '';
@@ -901,6 +1072,21 @@ function _egWireLeaveMapSummaryTooltips(panel, loot, currency) {
     panel.addEventListener('mouseout', (e) => {
         if (e.target.closest('.eg-leave-summary-chip')) hideGameTooltip();
     });
+
+    // Ctrl + left-click on an equipment loot chip → instant sell.
+    panel.addEventListener('mousedown', (e) => {
+        if (!e.ctrlKey || e.button !== 0) return;
+        const chip = e.target.closest('.eg-loot-chip');
+        if (!chip) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const item = state.loot[+chip.dataset.lootIdx];
+        if (!item) return;
+        _egSellRunLootChip(item, state);
+        hideGameTooltip();
+        state.render();
+    });
 }
 
 // Full-screen blocking overlay. Unlike _egShowChainCountdownOverlay (which
@@ -921,18 +1107,31 @@ function _egShowLeaveMapTransition() {
     el.innerHTML = `
         <div class="eg-leave-map-panel">
             <div class="eg-leave-map-title">${t('eg_map_cleared')}</div>
-            ${_egBuildLeaveMapSummaryHTML()}
+            <div id="eg-leave-summary-container"></div>
             <button class="eg-leave-map-return-btn" id="btn-eg-leave-map-return">${t('eg_return_to_nexus')}</button>
         </div>`;
     el.classList.add('show');
 
     // Snapshot the run data now — _egStopEncounter() (called by _egEndMap
     // right after this) wipes _egRunLoot/_egRunCurrency via _egChainCleanup.
-    _egWireLeaveMapSummaryTooltips(
-        el.querySelector('.eg-leave-map-panel') || el,
-        [..._egRunLoot],
-        [..._egRunCurrency]
-    );
+    const state = {
+        loot: [..._egRunLoot],
+        items: [..._egRunItems],
+        maps: [..._egRunMaps],
+        currency: [..._egRunCurrency],
+    };
+
+    const panel = el.querySelector('.eg-leave-map-panel') || el;
+    const container = document.getElementById('eg-leave-summary-container');
+    const render = () => {
+        if (container) {
+            container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency);
+        }
+    };
+    state.render = render;
+    render();
+
+    _egWireLeaveMapSummaryTooltips(panel, state);
 
     document.getElementById('btn-eg-leave-map-return').onclick = () => {
         _egHideLeaveMapTransition();
@@ -995,6 +1194,14 @@ function _egInjectLeaveMapTransitionStyles() {
             min-height: 40px;
         }
         .eg-leave-summary-empty { color: #666; font-size: 0.85rem; font-style: italic; }
+        .eg-leave-summary-hint {
+            font-size: 0.72rem;
+            color: #777;
+            text-align: left;
+            margin-top: 6px;
+        }
+        .eg-loot-chip { cursor: pointer; }
+        .eg-loot-chip:hover { filter: brightness(1.4); }
         .eg-leave-summary-chip {
             position: relative;
             width: 42px; height: 42px;

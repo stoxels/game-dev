@@ -75,6 +75,11 @@ const EG_LEVELING_CONFIG = {
     safeRangeAbove: 3,
     penaltyExponent: 6,
     minMultiplier: 0.01,
+
+    // XP-tier hint shown in the attribute window: monsters whose multiplier
+    // is still >= hintPoorMultiplier count as "Average XP", anything weaker
+    // counts as "Poor XP".
+    hintPoorMultiplier: 0.25,
 };
 
 // Pristine copy of the base attribute pool from endgame-requirements.js,
@@ -163,6 +168,61 @@ function _egCalcXpMultiplier(playerLevel, monsterLevel) {
     return Math.max(c.minMultiplier, Math.min(1, mult));
 }
 
+// Inverts the XP multiplier curve around hintPoorMultiplier to split monster
+// levels into "optimal" (100% band), "average" (>= hintPoorMultiplier) and
+// "poor" (below it) ranges for the attribute-window hint.
+function _egGetXpTierRanges(playerLevel) {
+    const c = EG_LEVELING_CONFIG;
+    if (playerLevel >= c.maxLevel) return null;
+
+    const lowSafe = c.safeRangeBelowBase + Math.floor(playerLevel / c.safeRangeBelowLevelsPer);
+    const highSafe = c.safeRangeAbove;
+    const r = Math.pow(c.hintPoorMultiplier, 1 / c.penaltyExponent);
+    const refBelow = Math.max(0, playerLevel - lowSafe);
+
+    // Lowest monster level below the band still yielding >= hintPoorMultiplier.
+    const avgBelowMin = Math.max(1, Math.ceil(r * (refBelow + 5) - 5));
+    // Highest monster level above the band still yielding >= hintPoorMultiplier.
+    const avgAboveMax = Math.min(c.maxLevel,
+        Math.floor(highSafe - 5 + (playerLevel + 5) / r));
+
+    return {
+        optimalMin: Math.max(1, playerLevel - lowSafe),
+        optimalMax: Math.min(c.maxLevel, playerLevel + highSafe),
+        belowPoorMax: avgBelowMin - 1,
+        belowAvgMin: avgBelowMin,
+        aboveAvgMax: avgAboveMax,
+    };
+}
+
+// Builds the "which monster levels give which XP" rows for the window body.
+// Returns '' at max level (no more XP to earn).
+function _egBuildXpTiersHTML() {
+    const c = EG_LEVELING_CONFIG;
+    const r = _egGetXpTierRanges(_egGetPlayerLevel());
+    if (!r) return '';
+
+    const fmtRange = (a, b) => t('eg_lvl_range').replace('{a}', a).replace('{b}', b);
+
+    const rows = [`<div class="eg-xp-tier"><span class="eg-xp-tier-label opt">${t('eg_lvl_tier_optimal')}</span><span>${fmtRange(r.optimalMin, r.optimalMax)}</span></div>`];
+
+    const avgParts = [];
+    if (r.belowAvgMin <= r.optimalMin - 1) avgParts.push(fmtRange(r.belowAvgMin, r.optimalMin - 1));
+    if (r.aboveAvgMax >= r.optimalMax + 1) avgParts.push(fmtRange(r.optimalMax + 1, r.aboveAvgMax));
+    if (avgParts.length) {
+        rows.push(`<div class="eg-xp-tier"><span class="eg-xp-tier-label avg">${t('eg_lvl_tier_average')}</span><span>${avgParts.join(' · ')}</span></div>`);
+    }
+
+    const poorParts = [];
+    if (r.belowPoorMax >= 1) poorParts.push(t('eg_lvl_range_below').replace('{n}', r.belowPoorMax));
+    if (r.aboveAvgMax < c.maxLevel && r.optimalMax < c.maxLevel) poorParts.push(t('eg_lvl_range_above').replace('{n}', r.aboveAvgMax + 1));
+    if (poorParts.length) {
+        rows.push(`<div class="eg-xp-tier"><span class="eg-xp-tier-label poor">${t('eg_lvl_tier_poor')}</span><span>${poorParts.join(' · ')}</span></div>`);
+    }
+
+    return rows.join('');
+}
+
 // Awards XP for killing one monster of `monsterLevel`, handles multi-level
 // ups (+1 attribute point each), plays the level-up effect and persists.
 function _egGrantMonsterXP(monsterLevel, isBoss) {
@@ -179,7 +239,9 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
     const c = EG_LEVELING_CONFIG;
     let xp = c.xpPerKillBase + c.xpPerKillGrowth * Math.pow(mLvl, c.xpPerKillExp);
     if (isBoss) xp *= c.bossXpMultiplier;
-    xp = Math.max(1, Math.round(xp * _egCalcXpMultiplier(playerLevel, mLvl)));
+    // Active map's "% more Experience" reward bonus (neutral outside runs).
+    const mapXpMult = (typeof _egMapXpMult === 'function') ? _egMapXpMult() : 1;
+    xp = Math.max(1, Math.round(xp * _egCalcXpMultiplier(playerLevel, mLvl) * mapXpMult));
 
     STATE.playerXP = _egGetPlayerXP() + xp;
 
@@ -509,6 +571,8 @@ function _egRenderAttrWindow() {
         ? t('eg_lvl_points_available').replace('{n}', pts)
         : t('eg_lvl_no_points')}</div>
 <div class="eg-attr-rows">${rowsHTML}</div>
+${(() => { const tiers = _egBuildXpTiersHTML(); return tiers
+    ? `<div class="eg-attr-xp-tiers">${tiers}</div>` : ''; })()}
 <div class="eg-attr-hint">${t('eg_lvl_hint')}</div>
 <div class="eg-delete-modal-btns">
     <button class="eg-delete-modal-btn eg-delete-modal-cancel"
@@ -650,6 +714,21 @@ function _egInjectLevelingStyles() {
 .eg-attr-btn-remove:not(:disabled):hover { background: #c8a84b; color: #1a1408; }
 .eg-attr-btn:disabled { opacity: .3; cursor: not-allowed; }
 .eg-attr-hint { font-size: 10px; opacity: .55; text-align: center; margin-bottom: 12px; }
+.eg-attr-xp-tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 6px;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+}
+.eg-xp-tier { display: flex; justify-content: space-between; gap: 10px; font-size: 10px; opacity: .85; }
+.eg-xp-tier-label { font-weight: 700; white-space: nowrap; }
+.eg-xp-tier-label.opt { color: #2ecc71; }
+.eg-xp-tier-label.avg { color: #f5d98a; }
+.eg-xp-tier-label.poor { color: #e06c55; }
 
 /* ── Level-up effect ── */
 .eg-levelup-fx {

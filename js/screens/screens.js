@@ -189,7 +189,16 @@ function goToLevelSelect() {
     if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
 
     const _goToCorrectLevelView = () => {
-        // NEW: route back to the endgame test hub if this run was launched from there
+        // Route back to the Probability Gate if this run was launched from the map device
+        if (window._egIsMapDeviceRun) {
+            window._egIsMapDeviceRun = false;
+            if (typeof showEndgameGate === 'function') {
+                showEndgameGate();
+                return;
+            }
+        }
+
+        // Route back to the endgame test hub if this run was launched from there
         if (window._egIsTestRun) {
             window._egIsTestRun = false;
             if (typeof showEndgameTestHub === 'function') {

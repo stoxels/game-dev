@@ -62,9 +62,11 @@ function _abilityCanAfford(hudSlot) {
 
 
 // Adds mana to the pool (clamped to max) and refreshes the bar.
+// Reduced by the active map's "% reduced Mana gained" mod during device runs.
 // Returns the amount actually gained.
 function gainMana(amount) {
     if (!amount || amount <= 0) return 0;
+    if (typeof _egMapManaGainMult === 'function') amount *= _egMapManaGainMult();
     const max = _getPlayerMaxMana();
     if (max <= 0) return 0;
     const before = playerCurrentMana;

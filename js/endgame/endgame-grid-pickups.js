@@ -431,11 +431,13 @@ function _egStashHasFreeSlot() {
 
 // Injects the loot overlay span into the cell's DOM element.
 // Re-uses the pickup overlay class but adds a dedicated loot modifier class.
+// The glow class is chosen from the item's own rarity so the drop shines
+// in its rarity color.
 function _egRenderLootOverlay(row, col, item) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-pickup-rarity-uncommon eg-loot-overlay`;
+    span.className = `eg-pickup-overlay eg-pickup-rarity-${item.rarity || 'common'} eg-loot-overlay`;
     span.id = `eg-loot-${row}-${col}`;
     span.textContent = item.icon || '📦';
     el.appendChild(span);
@@ -470,7 +472,10 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     // Stash full? Skip entirely so we never exceed capacity.
     if (!_egStashHasFreeSlot()) return;
 
-    const dropChance = isBoss ? EG_LOOT_DROP_CHANCE_BOSS : EG_LOOT_DROP_CHANCE_NORMAL;
+    const baseChance = isBoss ? EG_LOOT_DROP_CHANCE_BOSS : EG_LOOT_DROP_CHANCE_NORMAL;
+    // Active map's loot quantity bonus scales the drop chance up.
+    const qtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
+    const dropChance = Math.min(1, baseChance * qtyMult);
     if (Math.random() > dropChance) return;
 
     // Don't place a second loot drop if one is already on the board.
@@ -643,7 +648,7 @@ function _egRenderCurrencyDropOverlay(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-pickup-rarity-rare eg-currency-drop-overlay`;
+    span.className = `eg-pickup-overlay eg-pickup-rarity-currency eg-currency-drop-overlay`;
     span.id = `eg-currency-drop-${row}-${col}`;
     span.textContent = def.icon || '💰';
     el.appendChild(span);
@@ -801,11 +806,10 @@ const EG_ITEM_DROP_CHANCE_BOSS = 0.25;  // 25% per boss kill
 const EG_ITEM_DROP_MAX_ON_BOARD = 1;
 
 // Maps an ITEM_DEFS rarity to one of the overlay glow classes that exist
-// in CSS (common / uncommon / rare). Everything rare+ glows blue.
+// in CSS. Falls back to common for unknown values.
 function _egItemDropRarityClass(rarity) {
-    if (rarity === 'common') return 'common';
-    if (rarity === 'uncommon') return 'uncommon';
-    return 'rare';
+    return ['common', 'uncommon', 'rare', 'epic', 'legendary', 'cursed', 'artifact']
+        .includes(rarity) ? rarity : 'common';
 }
 
 function _egRenderItemDropOverlay(row, col, drop) {
@@ -845,7 +849,9 @@ function _egAnimateItemDropClaim(row, col, drop) {
 function _egSpawnItemDrop(isBoss = false) {
     if (!_egIsActive()) return;
 
-    const dropChance = isBoss ? EG_ITEM_DROP_CHANCE_BOSS : EG_ITEM_DROP_CHANCE_NORMAL;
+    const baseItemChance = isBoss ? EG_ITEM_DROP_CHANCE_BOSS : EG_ITEM_DROP_CHANCE_NORMAL;
+    const itemQtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
+    const dropChance = Math.min(1, baseItemChance * itemQtyMult);
     if (Math.random() > dropChance) return;
 
     // One regular-item drop on the board at a time.
@@ -899,6 +905,14 @@ function _egCheckItemDropClaim(row, col) {
     });
     save();
     buildInventoryPanel();
+
+    // Track for the leave-map summary screen (mirrors _egTrackRunCurrency)
+    _egRunItems.push({
+        defId: drop.defId,
+        icon: (def && def.icon) || '📦',
+        name: def ? itemName(def) : '???',
+        rarity: (def && def.rarity) || 'common',
+    });
 
     Audio_Manager.playSFX('player_equip_pickup');
     showToast(t('eg_item_claimed')
