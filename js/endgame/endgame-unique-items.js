@@ -5556,7 +5556,15 @@ const EG_UNIQUE_ITEMS = [
 function _egUniqueStatLabel(stat) {
     const template = (LANG === 'de') ? (stat.de || stat.en) : (stat.en || stat.de);
     const val = Number(stat.value) || 0;
-    return String(template).replace('#', val >= 0 ? `+${val}` : `${val}`);
+    const str = String(template);
+    const signed = val >= 0 ? `+${val}` : `${val}`;
+    // Templates historically use '+#' / '-#' while the helper also adds a
+    // sign — replacing only '#' would produce "++2" / "--30" (e.g. Pebble
+    // of Patience). Handle signed placeholders first.
+    if (str.includes('+#') || str.includes('-#')) {
+        return str.replace('+#', signed).replace('-#', signed);
+    }
+    return str.replace('#', signed);
 }
 
 // Builds the full item object for a unique definition.

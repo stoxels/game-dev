@@ -1002,7 +1002,7 @@ img.eg-art-img {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    width: 250px;
+    width: 320px;
     min-width: 0;
     padding: 4px 6px;
     overflow-y: auto;
