@@ -230,12 +230,23 @@ function _egRenderMapSlot() {
 //------------------------------------------------------------------------
 
 // Re-renders a single cell in the map stash grid.
+// The whole cell is tinted with the contained map's rarity color
+// (same scheme as the hub's main stash and equipment slots).
 // No-ops while the gate screen is not in the DOM.
 function _egRenderMapStashCell(row, col) {
     const cell = document.getElementById(`eg-map-stash-cell-${row}-${col}`);
     if (!cell) return;
     const item = _egMapStash[row][col];
     cell.innerHTML = item ? _egBuildItemChipHTML(item) : '';
+
+    if (item && typeof _egGetCellFill === 'function') {
+        const fill = _egGetCellFill(item);
+        cell.style.background = fill;
+        cell.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
+    } else {
+        cell.style.background = '';
+        cell.style.borderColor = '';
+    }
 }
 
 // Re-renders the entire map stash grid.

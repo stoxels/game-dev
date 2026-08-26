@@ -155,7 +155,55 @@ function _buildLevelsButtonTooltipHTML() {
 // 4. Level name
 const _MOD_SHORT = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
 
+// Builds the mod lines of an active map-device run map, grouped by their
+// affects category with the same colors as the map item tooltip:
+// monster → orange, player → red, puzzle → blue.
+function _buildActiveMapModsHTML(map) {
+    const colors = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
+    let html = '';
+    let hasMods = false;
+    (map.mods || []).forEach(mod => {
+        const color = colors[_egMapModAffects(mod.familyId)] || '#e67e22';
+        (mod.rolledStats || []).forEach(stat => {
+            if (!stat.label) return;
+            hasMods = true;
+            html += `<br><span style="color:${color}">${stat.label}</span>`;
+        });
+    });
+    if (!hasMods && typeof t === 'function') {
+        html += `<br><span style="opacity:.6">${t('eg_map_unmodified')}</span>`;
+    }
+    return html;
+}
+
+// Map-only tooltip shown while a map-device run is active and the corner
+// HUD displays the launched map's name instead of the seed level's hint.
+// Contains ONLY the map identity (rarity-colored) + its rolled modifiers
+// + the reward bonuses (xp / quantity / rarity) the run grants.
+function _buildMapRunTooltipHTML() {
+    const map = (typeof _egActiveMapItem !== 'undefined') ? _egActiveMapItem : null;
+    if (!map) return '';
+    const rc = (typeof rarityColors === 'function') ? rarityColors(map.rarity) : null;
+    let html = `<strong style="color:${rc ? rc.color : '#c8a84b'}">🗺️ ${map.name}</strong>`;
+    html += _buildActiveMapModsHTML(map);
+
+    const rw = (typeof _egGetMapRewardBonuses === 'function') ? _egGetMapRewardBonuses(map) : null;
+    if (rw) {
+        if (rw.xp > 0) html += `<br><span style="color:#f5d98a">${t('eg_map_reward_xp').replace('{n}', rw.xp)}</span>`;
+        if (rw.quantity > 0) html += `<br><span style="color:#f5d98a">${t('eg_map_reward_quantity').replace('{n}', rw.quantity)}</span>`;
+        if (rw.rarity > 0) html += `<br><span style="color:#f5d98a">${t('eg_map_reward_rarity').replace('{n}', rw.rarity)}</span>`;
+    }
+    return html;
+}
+
 function _buildLevelNameTooltipHTML() {
+    // Endgame map-device run: the corner HUD shows the map's name, so the
+    // tooltip shows ONLY the map identity + its rolled launch modifiers.
+    if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem
+        && typeof _egMapModAffects === 'function') {
+        return _buildMapRunTooltipHTML();
+    }
+
     if (!cur) return '';
     const gi = cur.gIdx;
     const hs = STATE.levelHS[gi];
@@ -190,32 +238,6 @@ function _buildLevelNameTooltipHTML() {
     const { isAscension, isConvergence } = _getLevelSpecialStatus(cur);
     if (isAscension) html += `<br><span style="color:#c080ff">${t('cg_ascension_lvl')}</span>`;
     if (isConvergence) html += `<br><span style="color:#6dbf40">${t('cg_convergence_lvl')}</span>`;
-
-    // Active map device run: show the activated map's tier and modifiers.
-    // Mod lines reuse the rolled (already localized) stat labels, grouped by
-    // their affects category with the same colors as the map item tooltip:
-    // monster → orange, player → red, puzzle → blue.
-    if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem
-        && typeof _egMapModAffects === 'function') {
-        const map = _egActiveMapItem;
-        const tierLine = t('eg_map_tier_tt').replace('{n}', map.mapTier ?? 1);
-        html += `<br><br><strong style="color:#c8a84b">🗺️ ${map.name}</strong>`;
-        html += `<br><span style="color:#c8a84b;opacity:.85">${tierLine}</span>`;
-
-        const colors = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
-        let hasMods = false;
-        (map.mods || []).forEach(mod => {
-            const color = colors[_egMapModAffects(mod.familyId)] || '#e67e22';
-            (mod.rolledStats || []).forEach(stat => {
-                if (!stat.label) return;
-                hasMods = true;
-                html += `<br><span style="color:${color}">${stat.label}</span>`;
-            });
-        });
-        if (!hasMods && typeof t === 'function') {
-            html += `<br><span style="opacity:.6">${t('eg_map_unmodified')}</span>`;
-        }
-    }
 
     return html;
 }

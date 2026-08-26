@@ -770,6 +770,10 @@ function _egBuildTooltipBodyHTML(item) {
         ? `<div class="eg-tt-mirrored">🪞 ${t('eg_tt_mirrored')}</div>`
         : '';
 
+    const bonusLootHTML = item.isBonusLoot
+        ? `<div class="eg-tt-mirrored" style="color:#f5d98a;">🎁 ${t('eg_bonus_chance_title')}</div>`
+        : '';
+
     return `
 <div class="eg-tt-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
@@ -785,6 +789,7 @@ function _egBuildTooltipBodyHTML(item) {
     ${modsHTML}
     ${ilvlHTML}
     ${mirroredHTML}
+    ${bonusLootHTML}
 </div>`;
 }
 

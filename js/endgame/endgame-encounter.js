@@ -589,17 +589,22 @@ function _egApplyPlayerBlockLockoutFeedback() {
 // Interval handle driving the countdown text update.
 let _egBlockLockoutOverlayTimer = null;
 
-// Shows (or refreshs) the centered lockout overlay for `durationMs`.
+// Shows (or refreshs) the lockout chip in the player status bar for `durationMs`.
 function _egShowBlockLockoutOverlay(durationMs) {
-    let overlay = document.getElementById('eg-block-lockout-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'eg-block-lockout-overlay';
-        overlay.innerHTML = `
+    const bar = (typeof _egEnsurePlayerStatusBar === 'function')
+        ? _egEnsurePlayerStatusBar()
+        : document.body;
+
+    let chip = document.getElementById('eg-block-lockout-overlay');
+    if (!chip) {
+        chip = document.createElement('div');
+        chip.id = 'eg-block-lockout-overlay';
+        chip.className = 'eg-status-chip eg-status-chip-lockout';
+        chip.innerHTML = `
             <div class="eg-lockout-icon">🛡️</div>
             <div class="eg-lockout-countdown" id="eg-lockout-countdown">0.0</div>
             <div class="eg-lockout-label">${t('eg_block_lockout')}</div>`;
-        document.body.appendChild(overlay);
+        bar.appendChild(chip);
     }
 
     const countdownEl = document.getElementById('eg-lockout-countdown');
@@ -618,14 +623,14 @@ function _egShowBlockLockoutOverlay(durationMs) {
     }, 100);
 }
 
-// Removes the lockout overlay and stops its countdown loop.
+// Removes the lockout chip and stops its countdown loop.
 function _egHideBlockLockoutOverlay() {
     if (_egBlockLockoutOverlayTimer) {
         clearInterval(_egBlockLockoutOverlayTimer);
         _egBlockLockoutOverlayTimer = null;
     }
-    const overlay = document.getElementById('eg-block-lockout-overlay');
-    if (overlay) overlay.remove();
+    const chip = document.getElementById('eg-block-lockout-overlay');
+    if (chip) chip.remove();
 }
 
 // Applies hit feedback to the player HUD: floating damage number + squish + red glow.

@@ -17,8 +17,25 @@
 
 const MANA_REGEN_INTERVAL_MS = 5000; // Matches "Mana regenerated every 5 seconds"
 
+// Scales flat ability mana costs up as the pool grows from gear so late-game
+// costs stay meaningful. Below the baseline the def's manaCost is charged as
+// defined; every DIVISOR points of max mana beyond the baseline adds +100%
+// to all ability costs (e.g. ~900 max mana -> 3x base cost).
+// Baseline is the day-one effective pool: 60 base mana + 20 Int x 2.
+const MANA_COST_SCALE_BASELINE = 100;
+const MANA_COST_SCALE_DIVISOR = 400;
+
 // Lazily created handle for the passive regen tick (null until first use).
 let _manaRegenInterval = null;
+
+
+// Applies the gear-aware cost multiplier to a def's flat manaCost.
+function _scaleAbilityManaCost(cost) {
+    if (!cost || cost <= 0) return 0;
+    const maxMana = _getPlayerMaxMana();
+    const mult = 1 + Math.max(0, maxMana - MANA_COST_SCALE_BASELINE) / MANA_COST_SCALE_DIVISOR;
+    return Math.round(cost * mult);
+}
 
 
 // Returns the player's current maximum mana: base pool + gear/attribute bonus.
@@ -37,7 +54,7 @@ function _getAbilityManaCost(hudSlot) {
 
     if (hudSlot === 'active1' || hudSlot === 'active2') {
         const def = (typeof CLASS_DEFS !== 'undefined') ? CLASS_DEFS[STATE.playerClass] : null;
-        return (def && def[hudSlot] && def[hudSlot].manaCost) || 0;
+        return _scaleAbilityManaCost((def && def[hudSlot] && def[hudSlot].manaCost) || 0);
     }
 
     // Ascendency slots (active3 / active4)
@@ -45,7 +62,7 @@ function _getAbilityManaCost(hudSlot) {
     const slotData = _getAscendencySlotData(hudSlot);
     if (!slotData) return 0;
     const skill = slotData.asc[slotData.ascSlot];
-    return (skill && skill.manaCost) || 0;
+    return _scaleAbilityManaCost((skill && skill.manaCost) || 0);
 }
 
 

@@ -290,13 +290,40 @@ function _egAtlasPersist() {
     else if (typeof save === 'function') save();
 }
 
+// Resolves the atlas node a completed map run belongs to. Prefers the
+// stamped `atlasNodeId`; legacy maps (created before the atlas system)
+// have none, so fall back to a name match against the region list and
+// finally to any region of the map's tier. Returns null only when the
+// map item itself is unusable.
+function _egAtlasResolveNodeForMap(mapItem) {
+    if (!mapItem) return null;
+    if (mapItem.atlasNodeId) {
+        const stamped = egAtlasNodeById(mapItem.atlasNodeId);
+        if (stamped) return stamped;
+    }
+    const name = mapItem.baseName || '';
+    if (name) {
+        const byName = EG_ATLAS_NODES.find(n =>
+            n.name === name || n.nameDe === name ||
+            n.name.startsWith(name) || name.startsWith(n.name) ||
+            n.nameDe.startsWith(name) || name.startsWith(n.nameDe));
+        // Legacy band names covered several tiers (e.g. tiers 1-4); only
+        // trust the match when the tier also lines up.
+        if (byName && (mapItem.mapTier == null || byName.tier === mapItem.mapTier)) return byName;
+    }
+    if (mapItem.mapTier != null) {
+        const pickedId = egAtlasPickNodeIdForTier(mapItem.mapTier);
+        return pickedId ? egAtlasNodeById(pickedId) : null;
+    }
+    return null;
+}
+
 // Marks the atlas node belonging to a successfully completed map run as
 // cleared and unlocks its connected regions. Called from _egEndMap()
 // (endgame-encounter-chain.js) while _egActiveMapItem is still set.
 // Returns { node, firstClear, newlyUnlocked } or null when there was nothing to record.
 function _egAtlasOnMapCompleted(mapItem) {
-    if (!mapItem || !mapItem.atlasNodeId) return null;
-    const node = egAtlasNodeById(mapItem.atlasNodeId);
+    const node = _egAtlasResolveNodeForMap(mapItem);
     if (!node) return null;
 
     if (typeof STATE === 'undefined') return null;

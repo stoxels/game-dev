@@ -650,17 +650,42 @@ function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null) {
 // While a device run is active with a known atlas region, dropped maps are
 // restricted to the active node's own tier plus its connected tiers
 // (PoE-style: you find your own tier and directly adjacent regions).
+// The tier is rolled directly from the allowed set — deriving it from the
+// monster level via ceil(level/4) could never produce the lower connected
+// tier and made higher tiers vanishingly rare.
+// The share of drops from connected tiers scales with the active node's
+// tier: low-tier maps find neighbouring regions far more often so early
+// players unlock the atlas (and climb tiers) quickly, while high-tier runs
+// stay focused on their own tier.
+const EG_MAP_CONNECTED_TIER_DROP_CHANCE_MAX = 0.60; // share at tier 1
+const EG_MAP_CONNECTED_TIER_DROP_CHANCE_MIN = 0.20; // share at tier 16
+
+function _egConnectedTierDropChance(activeTier) {
+    const t = Math.max(1, Math.min(EG_ATLAS_MAX_TIER, Math.round(activeTier || 1)));
+    const f = (t - 1) / (EG_ATLAS_MAX_TIER - 1);
+    return EG_MAP_CONNECTED_TIER_DROP_CHANCE_MAX
+        - f * (EG_MAP_CONNECTED_TIER_DROP_CHANCE_MAX - EG_MAP_CONNECTED_TIER_DROP_CHANCE_MIN);
+}
+
 function _egResolveAtlasDropTier(monsterLevel) {
     if (typeof _egActiveMapItem === 'undefined' || !_egActiveMapItem || !_egActiveMapItem.atlasNodeId) return null;
     if (typeof egAtlasAllowedDropTiers !== 'function') return null;
 
+    const activeNode = typeof egAtlasNodeById === 'function' ? egAtlasNodeById(_egActiveMapItem.atlasNodeId) : null;
     const allowed = egAtlasAllowedDropTiers(_egActiveMapItem.atlasNodeId);
-    if (!allowed || allowed.length === 0) return null;
+    if (!allowed || allowed.length === 0 || !activeNode) return null;
 
-    const rolled = _egRollMapTier(monsterLevel);
-    return allowed.includes(rolled)
-        ? rolled
-        : allowed[Math.floor(Math.random() * allowed.length)];
+    const others = allowed.filter(t2 => t2 !== activeNode.tier);
+    if (others.length === 0) return activeNode.tier;
+    // Low-tier runs favour the next-HIGHER connected tier so drops push the
+    // player up the atlas instead of back down into cleared content.
+    let pool = others;
+    if (activeNode.tier < EG_ATLAS_MAX_TIER) {
+        const higher = others.filter(t2 => t2 > activeNode.tier);
+        if (higher.length > 0 && Math.random() < 0.7) pool = higher;
+    }
+    if (Math.random() >= _egConnectedTierDropChance(activeNode.tier)) return activeNode.tier;
+    return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // Rerolls ALL mods of a map at the given rarity/counts (orb support).
@@ -894,12 +919,9 @@ function _egSpawnMapDrop(map) {
     const pool = typeof _egBuildPickupEligiblePool === 'function'
         ? _egBuildPickupEligiblePool()
         : [];
-    const filtered = pool.filter(([r, c]) =>
-        !_egPickups.has(`${r}-${c}`) &&
-        !_egLootDrops.has(`${r}-${c}`) &&
-        !_egCurrencyDrops.has(`${r}-${c}`) &&
-        !_egItemDrops.has(`${r}-${c}`)
-    );
+    const filtered = typeof _egCellHasAnyDrop === 'function'
+        ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
+        : pool;
     if (filtered.length === 0) return;
 
     const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];

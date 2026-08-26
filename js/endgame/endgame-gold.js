@@ -143,13 +143,9 @@ function _egSpawnGoldDrop(amount) {
     const pool = typeof _egBuildPickupEligiblePool === 'function'
         ? _egBuildPickupEligiblePool()
         : [];
-    const filtered = pool.filter(([r, c]) =>
-        !_egPickups.has(`${r}-${c}`) &&
-        !_egLootDrops.has(`${r}-${c}`) &&
-        !_egCurrencyDrops.has(`${r}-${c}`) &&
-        !_egItemDrops.has(`${r}-${c}`) &&
-        !(typeof _egMapDrops !== 'undefined' && _egMapDrops.has(`${r}-${c}`))
-    );
+    const filtered = typeof _egCellHasAnyDrop === 'function'
+        ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
+        : pool;
     if (filtered.length === 0) return;
 
     const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
@@ -223,13 +219,9 @@ function _egReplaceCarriedGoldDrops(drops) {
         const pool = typeof _egBuildPickupEligiblePool === 'function'
             ? _egBuildPickupEligiblePool()
             : [];
-        const filtered = pool.filter(([r, c]) =>
-            !_egPickups.has(`${r}-${c}`) &&
-            !_egLootDrops.has(`${r}-${c}`) &&
-            !_egCurrencyDrops.has(`${r}-${c}`) &&
-            !_egItemDrops.has(`${r}-${c}`) &&
-            !(typeof _egMapDrops !== 'undefined' && _egMapDrops.has(`${r}-${c}`))
-        );
+        const filtered = typeof _egCellHasAnyDrop === 'function'
+            ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
+            : pool;
         if (filtered.length === 0) return;
 
         const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];

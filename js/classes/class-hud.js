@@ -224,7 +224,7 @@ function _buildActiveTooltipHTML(def, key) {
     return `<strong style="color:${HUD_COLOR_ACTIVE}">${getLocalName(skill)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
-        + `<br>${_buildTooltipCooldownLine(def[key].cooldownSeconds || 0)}${_buildTooltipManaLine(def[key].manaCost)}`;
+        + `<br>${_buildTooltipCooldownLine(def[key].cooldownSeconds || 0)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(key) : def[key].manaCost)}`;
 }
 
 // Routes to the correct tooltip builder based on the skill slot key.
@@ -248,7 +248,7 @@ function buildAscendencySkillTooltip(hudSlot) {
     return `<strong style="color:#f1c40f">${getLocalName(skill)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
-        + `<br>${_buildTooltipCooldownLine(skill.cooldownSeconds || 0)}${_buildTooltipManaLine(skill.manaCost)}`;
+        + `<br>${_buildTooltipCooldownLine(skill.cooldownSeconds || 0)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(hudSlot) : skill.manaCost)}`;
 }
 
 

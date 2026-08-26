@@ -506,6 +506,10 @@ function _egRollBonusMapLoot() {
     const item = _egGenerateEquipmentDrop(baseLevel);
     if (!item) return;
 
+    // Flag the drop so the leave-map summary can visually mark it (🎁 badge
+    // on the chip + "Bonus Loot" line in its tooltip) as the bonus item.
+    item.isBonusLoot = true;
+
     _egRunLoot.push(item);
     showToast(t('eg_bonus_loot')
         .replace('{icon}', item.icon || '')
@@ -1040,6 +1044,7 @@ function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency) {
     const lootHTML = loot.map((item, i) => `
         <div class="eg-leave-summary-chip eg-loot-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
             ${EG_ART.html('item', item.baseId, item.icon || '📦')}
+            ${item.isBonusLoot ? '<span class="eg-leave-summary-bonus">🎁</span>' : ''}
         </div>`).join('');
 
     const itemsHTML = items.map((item, i) => `
@@ -1382,9 +1387,29 @@ function _egShowLeaveMapTransition(atlasResult) {
     _egWireLeaveMapSummaryTooltips(panel, state);
 
     document.getElementById('btn-eg-leave-map-return').onclick = () => {
+        _egClearBonusLootFlags();
         _egHideLeaveMapTransition();
         showEndgameNexus();
     };
+}
+
+// Strips the temporary isBonusLoot marker (🎁 badge + tooltip line) from
+// every inventory and equipped item — called once the player leaves the
+// map completion screen so the hub character sheet shows clean tooltips.
+function _egClearBonusLootFlags() {
+    if (typeof _egInventory !== 'undefined' && Array.isArray(_egInventory)) {
+        for (const row of _egInventory) {
+            for (const item of row) {
+                if (item && item.isBonusLoot) delete item.isBonusLoot;
+            }
+        }
+    }
+    if (typeof _egEquipped === 'object' && _egEquipped) {
+        for (const slotId of Object.keys(_egEquipped)) {
+            const item = _egEquipped[slotId];
+            if (item && item.isBonusLoot) delete item.isBonusLoot;
+        }
+    }
 }
 
 function _egHideLeaveMapTransition() {
@@ -1482,6 +1507,17 @@ function _egInjectLeaveMapTransitionStyles() {
             position: absolute; bottom: 1px; right: 2px;
             font-size: 0.6rem; font-weight: 700; color: #f0e6c0;
             text-shadow: 0 0 3px #000, 0 0 6px #000;
+            pointer-events: none;
+        }
+        .eg-leave-summary-bonus {
+            position: absolute; top: -7px; right: -7px;
+            width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65rem; line-height: 1;
+            background: #2a2413;
+            border: 1px solid #f5d98a;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(245, 217, 138, 0.55);
             pointer-events: none;
         }
         .eg-leave-summary-tooltip {

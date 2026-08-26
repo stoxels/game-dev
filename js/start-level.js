@@ -293,12 +293,24 @@ function _updateHUD() {
     _updateBonusSidebar();
     _updateModTags();
 
-    // Corner HUD (right): level number + name, mirrors top-id/top-hint above
+    // Corner HUD (right): level number + name, mirrors top-id/top-hint above.
+    // During an endgame map-device run (_egActiveMapItem) we show the active
+    // MAP's name instead of the seed story level's hint — mousing over it
+    // opens a tooltip with the map's rolled modifiers.
     const nameEl = document.getElementById('hud-level-name');
     if (nameEl) {
-        nameEl.textContent = `${lvText(cur, 'hint')}`;
-        const { isAscension, isConvergence } = _getLevelSpecialStatus(cur);
-        nameEl.style.color = isAscension ? '#c080ff' : isConvergence ? '#6dbf40' : '';
+        const egMap = (typeof _egActiveMapItem !== 'undefined') ? _egActiveMapItem : null;
+        if (egMap) {
+            // Endgame map run: show ONLY the map's name, colored by the
+            // rarity the map had when it was launched from the device.
+            nameEl.textContent = egMap.name;
+            nameEl.style.color = (typeof rarityColors === 'function')
+                ? rarityColors(egMap.rarity).color : '';
+        } else {
+            nameEl.textContent = `${lvText(cur, 'hint')}`;
+            const { isAscension, isConvergence } = _getLevelSpecialStatus(cur);
+            nameEl.style.color = isAscension ? '#c080ff' : isConvergence ? '#6dbf40' : '';
+        }
     }
 }
 

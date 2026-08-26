@@ -225,6 +225,20 @@ function _egBuildPickupEligiblePool() {
     return pool;
 }
 
+// Returns true when ANY drop type (heart pickup, loot, currency, item,
+// map or gold) currently occupies the cell at (row, col). Used by every
+// spawner so two different drops can never stack on the same cell —
+// stacked overlays would leave a stuck visual behind after a claim.
+function _egCellHasAnyDrop(row, col) {
+    const key = `${row}-${col}`;
+    return _egPickups.has(key)
+        || _egLootDrops.has(key)
+        || _egCurrencyDrops.has(key)
+        || _egItemDrops.has(key)
+        || (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key))
+        || (typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(key));
+}
+
 // Injects the pickup emoji overlay span into the cell's DOM element.
 function _egRenderPickupOverlay(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
@@ -404,9 +418,10 @@ function _egSpawnPickup() {
     if (_egPickups.size >= EG_PICKUP_MAX_ON_BOARD) return;
 
     const pool = _egBuildPickupEligiblePool();
-    if (pool.length === 0) return;
+    const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
+    if (filtered.length === 0) return;
 
-    const [r, c] = pool[Math.floor(Math.random() * pool.length)];
+    const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
     const def = _egPickRandomPickup();
     const key = `${r}-${c}`;
 
@@ -563,8 +578,8 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     if (_egLootDrops.size >= 1) return;
 
     const pool = _egBuildPickupEligiblePool();
-    // Also exclude cells that already have a heart pickup.
-    const filtered = pool.filter(([r, c]) => !_egPickups.has(`${r}-${c}`));
+    // Exclude every cell that already hosts any other drop type.
+    const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
     if (filtered.length === 0) return;
 
     const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
@@ -600,13 +615,15 @@ function _egAutoClaimDropsOnReveal(row, col) {
     if (!_egIsActive()) return;
     const key = `${row}-${col}`;
 
-    // Cells host at most one drop type — first match wins.
+    // Claim every drop type present (not else-if) — spawn guards now keep
+    // drops from stacking, but this stays defensive so a stacked legacy
+    // state can never leave a stuck overlay behind.
     if (_egPickups.has(key)) _egCheckPickupClaim(row, col);
-    else if (_egLootDrops.has(key)) _egCheckLootClaim(row, col);
-    else if (_egCurrencyDrops.has(key)) _egCheckCurrencyDropClaim(row, col);
-    else if (_egItemDrops.has(key)) _egCheckItemDropClaim(row, col);
-    else if (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key)) _egCheckMapDropClaim(row, col);
-    else if (typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(key)) _egCheckGoldDropClaim(row, col);
+    if (_egLootDrops.has(key)) _egCheckLootClaim(row, col);
+    if (_egCurrencyDrops.has(key)) _egCheckCurrencyDropClaim(row, col);
+    if (_egItemDrops.has(key)) _egCheckItemDropClaim(row, col);
+    if (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key)) _egCheckMapDropClaim(row, col);
+    if (typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(key)) _egCheckGoldDropClaim(row, col);
 }
 
 // Called when the player correctly claims the cell that holds a loot drop.
@@ -627,9 +644,12 @@ function _egCheckLootClaim(row, col) {
 
     Audio_Manager.playSFX('player_equip_pickup');
 
+    const nameSuffix = (item.category === 'equip' && Number.isFinite(item.itemLevel))
+        ? ` [${item.itemLevel}]`
+        : '';
     showToast(t('eg_loot_claimed')
         .replace('{icon}', item.icon || '')
-        .replace('{name}', item.name), _egRarityToastColor(item.rarity));
+        .replace('{name}', item.name + nameSuffix), _egRarityToastColor(item.rarity));
     return true;
 }
 
@@ -692,9 +712,7 @@ function _egReplaceCarriedLootDrops(items) {
         if (_egLootDrops.size >= 1) return;
 
         const pool = _egBuildPickupEligiblePool();
-        const filtered = pool.filter(([r, c]) => !_egPickups.has(`${r}-${c}`)
-            && !_egCurrencyDrops.has(`${r}-${c}`) && !_egItemDrops.has(`${r}-${c}`)
-            && !(typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(`${r}-${c}`)));
+        const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
         if (filtered.length === 0) return;
 
         const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
@@ -766,9 +784,7 @@ function _egSpawnCurrencyDrop(def) {
     if (_egCurrencyDrops.size >= EG_CURRENCY_DROP_MAX_ON_BOARD) return;
 
     const pool = _egBuildPickupEligiblePool();
-    const filtered = pool.filter(([r, c]) =>
-        !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`) && !_egCurrencyDrops.has(`${r}-${c}`)
-    );
+    const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
     if (filtered.length === 0) return;
 
     const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
@@ -864,11 +880,7 @@ function _egReplaceCarriedCurrencyDrops(defs) {
         if (_egCurrencyDrops.size >= EG_CURRENCY_DROP_MAX_ON_BOARD) return;
 
         const pool = _egBuildPickupEligiblePool();
-        const filtered = pool.filter(([r, c]) =>
-            !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`) && !_egCurrencyDrops.has(`${r}-${c}`)
-            && !_egItemDrops.has(`${r}-${c}`)
-            && !(typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(`${r}-${c}`))
-        );
+        const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
         if (filtered.length === 0) return;
 
         const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
@@ -959,10 +971,7 @@ function _egSpawnItemDrop(isBoss = false) {
     if (_egItemDrops.size >= EG_ITEM_DROP_MAX_ON_BOARD) return;
 
     const pool = _egBuildPickupEligiblePool();
-    const filtered = pool.filter(([r, c]) =>
-        !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`)
-        && !_egCurrencyDrops.has(`${r}-${c}`)
-    );
+    const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
     if (filtered.length === 0) return;
 
     // Pick a random item from the same weighted pool used for lucky tiles.
@@ -1053,11 +1062,7 @@ function _egReplaceCarriedItemDrops(drops) {
         if (_egItemDrops.size >= EG_ITEM_DROP_MAX_ON_BOARD) return;
 
         const pool = _egBuildPickupEligiblePool();
-        const filtered = pool.filter(([r, c]) =>
-            !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`)
-            && !_egCurrencyDrops.has(`${r}-${c}`)
-            && !(typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(`${r}-${c}`))
-        );
+        const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
         if (filtered.length === 0) return;
 
         const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];

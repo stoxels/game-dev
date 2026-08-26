@@ -363,6 +363,12 @@ function _egPickMapRunSeedGi(baseline) {
 // Strips all stamped run fields off the seed level. Called from
 // _egChainCleanup() so the story level returns to its pristine state.
 function _egCleanupMapRunSeedLevel() {
+    // Launch guard: _egChainCleanup also fires from _egStopEncounter during
+    // the launch's own startLevel() call (_cleanupPreviousLevel). Wiping the
+    // runtime state there would kill ALL live map mods (hazards, monster
+    // buffs, player penalties, rewards) before the first encounter begins.
+    if (window._egMapDeviceLaunching) return;
+
     const seedGi = window._egMapRunSeedGi;
     window._egMapRunSeedGi = null;
     _egActiveMapItem = null;
@@ -429,8 +435,16 @@ function _egLaunchMapFromDevice(mapItem) {
     // up front so every defeat path inside the map is covered.
     if (typeof _egEnsureLoseOverlayEndgameUI === 'function') _egEnsureLoseOverlayEndgameUI();
 
-    showToast((typeof t === 'function') ? t('eg_map_activating').replace('{n}', mapItem.name)
-                                        : `Activating ${mapItem.name}...`);
+    // Guard flag: startLevel() synchronously runs _cleanupPreviousLevel →
+    // _egStopEncounter → _egChainCleanup, which must NOT clear the runtime
+    // mod state during this very launch (see _egCleanupMapRunSeedLevel).
+    window._egMapDeviceLaunching = true;
+    try {
+        showToast((typeof t === 'function') ? t('eg_map_activating').replace('{n}', mapItem.name)
+                                            : `Activating ${mapItem.name}...`);
 
-    startLevel(gi);
+        startLevel(gi);
+    } finally {
+        window._egMapDeviceLaunching = false;
+    }
 }

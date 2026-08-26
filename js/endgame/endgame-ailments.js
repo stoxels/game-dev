@@ -48,7 +48,7 @@ const EG_PUZZLE_ATTACK_CHANCE_PCT = 5;        // monster attack → grid instead
 const EG_PUZZLE_EFFECT_DURATION_MS = 10000;
 const EG_PUZZLE_HAZARD_CELLS = 6;             // lava / ice patch size
 const EG_ICE_SLIP_CHANCE = 0.4;               // click slips to a neighbour
-const EG_SHOCK_MARK_STRIP_CHANCE = 0.35;      // per reveal, strips nearby ✕
+const EG_SHOCK_MARK_STRIP_CHANCE = 0.35;      // per reveal, strips a random ✕ anywhere
 
 const EG_AILMENT_ICONS = {
     ignite: '🔥',
@@ -75,6 +75,10 @@ let _egIceRedirectDepth = 0;
 // Shocked-cursor follower node + listener handles
 let _egSparkFollowerEl = null;
 let _egSparkMoveHandler = null;
+let _egSparkSpawnTimer = null;
+let _egSparkLastX = 0;
+let _egSparkLastY = 0;
+const EG_SPARK_GLYPHS = ['⚡', '✦', '✧', '＊'];
 
 
 //------------------------------------------------------------------------
@@ -122,7 +126,90 @@ function _egApplyPlayerAilment(key, dps) {
     })[key];
     if (!durationS) return;
     _egApplyStatusToMap(_egPlayerStatuses, key, durationS, dps);
+    _egStartPlayerStatusBarTicker();
     showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph — the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------PLAYER STATUS BAR (above inventory)------------------
+//------------------------------------------------------------------------
+// Shared bar above the inventory strip. Shows a chip per active player
+// ailment (icon + live countdown); the block-recovery chip is appended by
+// endgame-encounter.js into the same bar.
+//------------------------------------------------------------------------
+
+// 100 ms ticker that refreshes ailment chip countdowns.
+let _egPlayerStatusBarTicker = null;
+
+// Creates (or returns) the shared player status bar container.
+function _egEnsurePlayerStatusBar() {
+    let bar = document.getElementById('eg-player-status-bar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'eg-player-status-bar';
+        document.body.appendChild(bar);
+    }
+    return bar;
+}
+
+function _egStartPlayerStatusBarTicker() {
+    if (_egPlayerStatusBarTicker) return;
+    _egPlayerStatusBarTicker = setInterval(_egRenderPlayerAilmentChips, 100);
+    _egRenderPlayerAilmentChips();
+}
+
+// Syncs the ailment chips with _egPlayerStatuses; stops itself when empty.
+function _egRenderPlayerAilmentChips() {
+    if (!_egIsActive()) { _egStopPlayerStatusBarTicker(); return; }
+
+    const bar = document.getElementById('eg-player-status-bar');
+    if (!bar) {
+        if (!Object.keys(_egPlayerStatuses).length) { _egStopPlayerStatusBarTicker(); return; }
+        _egEnsurePlayerStatusBar();
+        return;
+    }
+
+    const now = Date.now();
+    let anyActive = false;
+    for (const key of Object.keys(_egPlayerStatuses)) {
+        const st = _egPlayerStatuses[key];
+        const remainingMs = st.until - now;
+        let chip = document.getElementById(`eg-status-ail-${key}`);
+
+        if (remainingMs <= 0) {
+            if (chip) chip.remove();
+            continue;
+        }
+        anyActive = true;
+
+        if (!chip) {
+            chip = document.createElement('div');
+            chip.id = `eg-status-ail-${key}`;
+            chip.className = `eg-status-chip eg-status-chip-${key}`;
+            chip.title = key === 'shadowburn' ? 'Shadow Burn'
+                : key.charAt(0).toUpperCase() + key.slice(1);
+            chip.innerHTML = `
+                <div class="eg-lockout-icon">${EG_AILMENT_ICONS[key] || ''}</div>
+                <div class="eg-lockout-countdown"></div>`;
+            bar.appendChild(chip);
+        }
+        const cd = chip.querySelector('.eg-lockout-countdown');
+        if (cd) cd.textContent = `${Math.ceil(remainingMs / 1000)}`;
+    }
+
+    if (!anyActive && !document.getElementById('eg-block-lockout-overlay')) {
+        _egStopPlayerStatusBarTicker();
+    }
+}
+
+function _egStopPlayerStatusBarTicker() {
+    if (_egPlayerStatusBarTicker) {
+        clearInterval(_egPlayerStatusBarTicker);
+        _egPlayerStatusBarTicker = null;
+    }
+    const bar = document.getElementById('eg-player-status-bar');
+    if (bar) bar.remove();
 }
 
 // True while the player is polymorphed: monsters attack each other and the
@@ -589,7 +676,8 @@ function _egPuzzleIceRedirect(row, col) {
 //-------------------PUZZLE: SHOCKED CURSOR (lightning)------------------
 //------------------------------------------------------------------------
 // Lightning sparks orbit the mouse cursor. While active, every revealed
-// (correctly filled) cell has a chance to strip ✕ marks from adjacent cells.
+// (correctly filled) cell has a chance to strip a random ✕ mark anywhere on
+// the grid, regardless of its distance from the revealed cell.
 //------------------------------------------------------------------------
 
 function _egPuzzleShockedCursor() {
@@ -606,39 +694,92 @@ function _egStartShockedCursor() {
     _egSparkFollowerEl.id = 'eg-cursor-sparks';
     _egSparkFollowerEl.textContent = '⚡';
     document.body.appendChild(_egSparkFollowerEl);
+    _egSparkLastX = window.innerWidth / 2;
+    _egSparkLastY = window.innerHeight / 2;
     _egSparkMoveHandler = (e) => {
+        _egSparkLastX = e.clientX;
+        _egSparkLastY = e.clientY;
         _egSparkFollowerEl.style.left = `${e.clientX}px`;
         _egSparkFollowerEl.style.top = `${e.clientY}px`;
     };
     document.addEventListener('mousemove', _egSparkMoveHandler);
+    // Continuous lightning sparks crackling around the cursor
+    _egSparkSpawnTimer = setInterval(() => {
+        if (!_egSparkFollowerEl) return;
+        const count = 2 + Math.floor(Math.random() * 3); // 2–4 sparks per tick
+        for (let i = 0; i < count; i++) _egSpawnCursorSpark();
+    }, 110);
+}
+
+function _egSpawnCursorSpark(x = _egSparkLastX, y = _egSparkLastY) {
+    const spark = document.createElement('div');
+    spark.className = 'eg-spark-particle';
+    spark.textContent = EG_SPARK_GLYPHS[Math.floor(Math.random() * EG_SPARK_GLYPHS.length)];
+    // Start at a small random offset so sparks ring the target point
+    const ang = Math.random() * Math.PI * 2;
+    const startR = 4 + Math.random() * 10;
+    const dx = Math.cos(ang) * (14 + Math.random() * 26);
+    const dy = Math.sin(ang) * (14 + Math.random() * 26) - 6; // slight upward bias
+    spark.style.left = `${x + Math.cos(ang) * startR}px`;
+    spark.style.top = `${y + Math.sin(ang) * startR}px`;
+    spark.style.fontSize = `${(9 + Math.random() * 8).toFixed(1)}px`;
+    const life = 0.35 + Math.random() * 0.3;
+    spark.style.setProperty('--eg-spark-life', `${life.toFixed(2)}s`);
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), life * 1000 + 60);
+}
+
+// Lightning-zap burst on a ✕ mark that was just stripped by the shocked cursor.
+function _egSpawnCrossZapFX(row, col) {
+    const cell = document.getElementById(`g-${row}-${col}`);
+    if (!cell) return;
+    const rect = cell.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    // Big electric ✕ flashing over the cell, then burning away
+    const fx = document.createElement('div');
+    fx.className = 'eg-cross-zap';
+    fx.textContent = '✕';
+    fx.style.left = `${cx}px`;
+    fx.style.top = `${cy}px`;
+    fx.style.fontSize = `${Math.max(rect.width, rect.height) * 0.85}px`;
+    document.body.appendChild(fx);
+    setTimeout(() => fx.remove(), 700);
+
+    // Sparks scattering from the zapped mark
+    for (let i = 0; i < 5; i++) _egSpawnCursorSpark(cx, cy);
 }
 
 function _egStopShockedCursor() {
     document.body.classList.remove('eg-cursor-shocked');
+    if (_egSparkSpawnTimer) { clearInterval(_egSparkSpawnTimer); _egSparkSpawnTimer = null; }
     if (_egSparkFollowerEl) { _egSparkFollowerEl.remove(); _egSparkFollowerEl = null; }
     if (_egSparkMoveHandler) { document.removeEventListener('mousemove', _egSparkMoveHandler); _egSparkMoveHandler = null; }
 }
 
-// Called from handleCorrectFill — strips nearby ✕ marks while the cursor is shocked.
+// Called from handleCorrectFill — while the cursor is shocked, each reveal has
+// a chance to strip a random ✕ mark anywhere on the grid (distance irrelevant).
 function _egOnCorrectCellPuzzleFX(row, col) {
     if (!_egIsActive()) return;
     if (!_egPuzzleEffects.some(e => e.type === 'shockcursor')) return;
     if (Math.random() >= EG_SHOCK_MARK_STRIP_CHANCE) return;
 
-    let stripped = 0;
-    for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-            if (dr === 0 && dc === 0) continue;
-            const r = row + dr, c = col + dc;
-            if (r < 0 || c < 0 || r >= cur.grid.length || c >= cur.grid[0].length) continue;
-            if (userGrid[r][c] !== 2) continue;
-            userGrid[r][c] = 0;
-            systemMarkedGrid[r][c] = false;
-            renderCell(r, c);
-            stripped++;
+    // Collect all currently ✕-marked cells, regardless of distance from reveal
+    const marked = [];
+    for (let r = 0; r < cur.grid.length; r++) {
+        for (let c = 0; c < cur.grid[0].length; c++) {
+            if (userGrid[r][c] === 2) marked.push([r, c]);
         }
     }
-    if (stripped > 0) showToast(`⚡ Sparks scattered ${stripped} of your ✕ mark${stripped > 1 ? 's' : ''}!`);
+    if (!marked.length) return;
+
+    const [r, c] = marked[Math.floor(Math.random() * marked.length)];
+    userGrid[r][c] = 0;
+    systemMarkedGrid[r][c] = false;
+    renderCell(r, c);
+    _egSpawnCrossZapFX(r, c);
+    showToast('⚡ A spark zapped one of your ✕ marks!');
 }
 
 
@@ -693,6 +834,8 @@ function _egAilmentsReset() {
     _egClearAllPuzzleEffects();
     _egIceRedirectDepth = 0;
     _egStopShockedCursor();
+    _egStopPlayerStatusBarTicker();
+    if (typeof _egHideBlockLockoutOverlay === 'function') _egHideBlockLockoutOverlay();
     const strip = document.getElementById('eg-player-status-strip');
     if (strip) strip.remove();
 }
@@ -702,6 +845,8 @@ function _egAilmentsCleanup() {
     _egPlayerStatuses = {};
     _egClearAllPuzzleEffects();
     _egStopShockedCursor();
+    _egStopPlayerStatusBarTicker();
+    if (typeof _egHideBlockLockoutOverlay === 'function') _egHideBlockLockoutOverlay();
     const strip = document.getElementById('eg-player-status-strip');
     if (strip) strip.remove();
 }

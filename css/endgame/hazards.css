@@ -207,10 +207,10 @@
     height: 110px;
     will-change: transform;
     background:
-        radial-gradient(closest-side at 25% 60%, rgba(12, 10, 24, 0.95), transparent 100%),
-        radial-gradient(closest-side at 50% 40%, rgba(18, 14, 34, 0.95), transparent 100%),
-        radial-gradient(closest-side at 74% 58%, rgba(12, 10, 24, 0.95), transparent 100%),
-        radial-gradient(closest-side at 92% 66%, rgba(15, 12, 28, 0.9), transparent 100%);
+        radial-gradient(closest-side at 25% 60%, rgba(5, 4, 12, 0.98) 0%, rgba(5, 4, 12, 0.92) 60%, transparent 100%),
+        radial-gradient(closest-side at 50% 40%, rgba(9, 7, 20, 0.98) 0%, rgba(9, 7, 20, 0.92) 60%, transparent 100%),
+        radial-gradient(closest-side at 74% 58%, rgba(5, 4, 12, 0.98) 0%, rgba(5, 4, 12, 0.92) 60%, transparent 100%),
+        radial-gradient(closest-side at 92% 66%, rgba(7, 5, 16, 0.95) 0%, rgba(7, 5, 16, 0.88) 60%, transparent 100%);
     filter: blur(6px);
 }
 

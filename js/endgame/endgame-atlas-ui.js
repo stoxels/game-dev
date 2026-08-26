@@ -144,7 +144,7 @@ function _egAtlasBuildHeaderHTML() {
             .replace('{c}', prog.completed)
             .replace('{n}', prog.total)}
         <span class="ega-header-highest">
-            ${t('eg_atlas_highest_tier').replace('{n}', Math.max(1, prog.highestTier))}
+            ${t('eg_atlas_highest_tier').replace('{n}', prog.highestTier)}
         </span>
     </span>
     <span class="ega-legend">

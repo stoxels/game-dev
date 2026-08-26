@@ -501,8 +501,8 @@ function _egHzInitDarkness(intensity) {
     try {
         shadowResist = Math.max(0, _egComputePlayerStats().shadowResist || 0);
     } catch (e) { /* stats unavailable → ignore */ }
-    const opacity = Math.max(0.35,
-        Math.min(0.85, 0.45 + intensity * 0.004 - (shadowResist / 100) * 0.15));
+    const opacity = Math.max(0.55,
+        Math.min(0.95, 0.7 + intensity * 0.004 - (shadowResist / 100) * 0.15));
 
     const count = Math.min(5, 2 + Math.round(intensity / 33));
 

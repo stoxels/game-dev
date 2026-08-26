@@ -57,7 +57,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Enter the SPEEDFORCE: Every correct fill triggers a Momentum bonus. Time passes ten times as quickly.',
             descCursorDE: 'Betrete die SPEEDFORCE: Jede korrekte Füllung löst einen Momentum-Bonus aus. Die Zeit vergeht zehn mal so schnell.',
             cooldownSeconds: 120,
-            manaCost: 20,
+            manaCost: 25,
             levels: [
                 {
                     level: 1,
@@ -99,7 +99,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Correct your most recent mistakes and recover lost time. Every corrected mistake reveals correct cells.',
             descCursorDE: 'Korrigiere deine letzten Fehler und erhalte verlorene Zeit zurück. Jeder korrigierte Fehler enthüllt korrekte Zellen.',
             cooldownSeconds: 120,
-            manaCost: 20,
+            manaCost: 45,
             levels: [
                 {
                     level: 1,
@@ -128,7 +128,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Arm the holy shield: your next mistake is prevented and its line becomes protected.',
             descCursorDE: 'Aktiviere den heiligen Schild: Dein nächster Fehler wird verhindert und dessen Linie wird geschützt.',
             cooldownSeconds: 180,
-            manaCost: 30,
+            manaCost: 35,
             levels: [
                 {
                     level: 1,
@@ -172,7 +172,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Select a mistake cell to summon a roaming skeleton - it walks up and down its column and fires revealing beams at adjacent correct cells.',
             descCursorDE: 'Klicke eine Fehlerzelle, um ein wanderndes Skelett zu beschwören - es läuft in seiner Spalte auf und ab und feuert Enthüllungs-Strahlen auf angrenzende korrekte Zellen.',
             cooldownSeconds: 120,
-            manaCost: 20,
+            manaCost: 30,
             levels: [
                 {
                     level: 1,
@@ -354,7 +354,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Seeds random empty cells with invisible shields - incorrectly revealing a shielded cell will protect you from the mistake.',
             descCursorDE: 'Versieht zufällige leere Zellen mit unsichtbaren Schilden, die dich vor Fehlern schützen werden.',
             cooldownSeconds: 180,
-            manaCost: 30,
+            manaCost: 35,
             levels: [
                 {
                     level: 1,
@@ -426,7 +426,7 @@ const ASCENDENCY_DEFS = {
             descCursorEn: 'Calls Drifter, your loyal companion. Drifter will walk through the grid and can be fed to increase his speed and duration.',
             descCursorDE: 'Ruft Drifter, deinen treuen Begleiter, um sich durch das Puzzle zu bewegen. Drifter kann gefüttert werden, um seine Geschwindigkeit und Dauer zu erhöhen.',
             cooldownSeconds: 300,
-            manaCost: 50,
+            manaCost: 45,
             levels: [
                 {
                     level: 1,

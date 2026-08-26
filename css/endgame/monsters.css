@@ -3,15 +3,14 @@
 
 #eg-monster-wrapper {
     position: absolute; /* out of flow — monster spawns never push or offset the puzzle grid */
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
+    bottom: calc(var(--inv-panel-h) + 30px); /* sits directly above the inventory bar */
+    right: 20px;
+    width: auto;
     max-width: 900px;
     z-index: 200;
     display: flex;
-    justify-content: center;
-    padding: 6px 12px 0;
+    justify-content: flex-end;
+    padding: 0 12px;
     box-sizing: border-box;
     pointer-events: none;
     min-height: 130px; /* tall enough for one full card */
@@ -274,9 +273,9 @@
     text-shadow: 1px 1px 2px black;
 }
 
-/* ── Lose-control overlay (block recovery) ─────────────────────────── */
-/* WoW-style centered "you cannot attack" indicator with countdown.    */
-#eg-block-lockout-overlay {
+/* ── Player status bar (above inventory) ───────────────────────────── */
+/* Shared row of status chips: block recovery + active player ailments. */
+#eg-player-status-bar {
     position: fixed;
     /* Compact bar sitting in the gap between the puzzle grid and
        the inventory strip at the bottom of the screen */
@@ -289,6 +288,14 @@
     flex-direction: row;
     align-items: center;
     gap: 6px;
+}
+
+/* One status chip (block lockout / ailment) inside the bar */
+#eg-player-status-bar .eg-status-chip {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
     padding: 3px 10px;
     background: rgba(10, 10, 14, 0.82);
     border: 1px solid rgba(255, 71, 87, 0.85);
@@ -297,13 +304,42 @@
     font-family: var(--PX, monospace);
 }
 
-#eg-block-lockout-overlay .eg-lockout-icon {
+#eg-player-status-bar .eg-status-chip-lockout {
+    /* uses the default red border/shadow */
+}
+
+#eg-player-status-bar .eg-status-chip-ignite {
+    border-color: rgba(255, 120, 40, 0.85);
+    box-shadow: 0 0 10px rgba(255, 120, 40, 0.45), inset 0 0 8px rgba(255, 120, 40, 0.2);
+}
+#eg-player-status-bar .eg-status-chip-chill,
+#eg-player-status-bar .eg-status-chip-frozen {
+    border-color: rgba(96, 200, 255, 0.85);
+    box-shadow: 0 0 10px rgba(96, 200, 255, 0.45), inset 0 0 8px rgba(96, 200, 255, 0.2);
+}
+#eg-player-status-bar .eg-status-chip-shocked {
+    border-color: rgba(253, 224, 71, 0.85);
+    box-shadow: 0 0 10px rgba(253, 224, 71, 0.5), inset 0 0 8px rgba(253, 224, 71, 0.25);
+}
+#eg-player-status-bar .eg-status-chip-shadowburn {
+    border-color: rgba(148, 51, 199, 0.85);
+    box-shadow: 0 0 10px rgba(148, 51, 199, 0.5), inset 0 0 8px rgba(148, 51, 199, 0.25);
+}
+#eg-player-status-bar .eg-status-chip-polymorph {
+    border-color: rgba(74, 222, 128, 0.85);
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.45), inset 0 0 8px rgba(74, 222, 128, 0.2);
+}
+
+#eg-player-status-bar .eg-lockout-icon {
     font-size: 16px;
     line-height: 1;
     filter: grayscale(0.4) drop-shadow(0 0 4px rgba(255, 71, 87, 0.7));
 }
 
-#eg-block-lockout-overlay .eg-lockout-countdown {
+#eg-player-status-bar .eg-status-chip-shocked .eg-lockout-icon { animation: eg-spark-flicker 0.3s steps(2) infinite; }
+#eg-player-status-bar .eg-status-chip-ignite .eg-lockout-icon  { animation: eg-spark-flicker 0.6s steps(2) infinite; }
+
+#eg-player-status-bar .eg-lockout-countdown {
     font-size: 15px;
     font-weight: bold;
     color: #ff6b7d;
@@ -312,7 +348,7 @@
     text-align: right;
 }
 
-#eg-block-lockout-overlay .eg-lockout-label {
+#eg-player-status-bar .eg-lockout-label {
     font-size: 10px;
     color: #c8c8c8;
     opacity: 0.85;
@@ -1304,16 +1340,67 @@ body.eg-cursor-shocked .gc {
     top: 0;
     left: 0;
     transform: translate(-50%, -50%);
-    font-size: 18px;
+    font-size: 34px;
     pointer-events: none;
     z-index: 99999;
-    filter: drop-shadow(0 0 5px rgba(253, 224, 71, 0.95));
-    animation: eg-spark-flicker 0.25s steps(2) infinite;
+    filter:
+        drop-shadow(0 0 6px rgba(253, 224, 71, 1))
+        drop-shadow(0 0 14px rgba(250, 204, 21, 0.9))
+        drop-shadow(0 0 28px rgba(59, 130, 246, 0.7));
+    animation: eg-spark-flicker 0.12s steps(2) infinite;
 }
 
 @keyframes eg-spark-flicker {
-    0%   { opacity: 0.55; transform: translate(-50%, -50%) rotate(-12deg) scale(0.9); }
-    100% { opacity: 1;    transform: translate(-50%, -50%) rotate(14deg) scale(1.15); }
+    0%   { opacity: 0.65; transform: translate(-50%, -50%) rotate(-18deg) scale(0.85); }
+    100% { opacity: 1;    transform: translate(-50%, -50%) rotate(20deg) scale(1.3); }
+}
+
+/* Flying lightning sparks crackling outward from the shocked cursor */
+.eg-spark-particle {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 99998;
+    color: #fde047;
+    filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.95)) drop-shadow(0 0 9px rgba(96, 165, 250, 0.8));
+    animation: eg-spark-fly var(--eg-spark-life, 0.5s) ease-out forwards;
+}
+
+@keyframes eg-spark-fly {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--eg-spark-dx, 20px)), calc(-50% + var(--eg-spark-dy, -10px))) rotate(160deg) scale(0.25);
+    }
+}
+
+/* Electric ✕ burst on a cross mark stripped by the shocked cursor */
+.eg-cross-zap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 99998;
+    font-weight: bold;
+    line-height: 1;
+    color: #fef08a;
+    filter:
+        drop-shadow(0 0 5px rgba(253, 224, 71, 1))
+        drop-shadow(0 0 12px rgba(96, 165, 250, 0.9));
+    animation: eg-cross-zap-burst 0.65s ease-out forwards;
+}
+
+@keyframes eg-cross-zap-burst {
+    0%   { opacity: 1; transform: translate(-50%, -50%) rotate(-15deg) scale(0.4); }
+    30%  { opacity: 1; transform: translate(-50%, -50%) rotate(10deg)  scale(1.3); }
+    60%  { opacity: 0.9; transform: translate(-50%, -50%) rotate(-8deg) scale(1.6); }
+    100% { opacity: 0; transform: translate(-50%, -50%) rotate(40deg)  scale(2.2); }
 }
 
 /* ── Puzzle: shadow clue-line blackout ───────────────────────────────── */
