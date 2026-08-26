@@ -272,6 +272,20 @@ function _egScheduleMonsterSpawns(spawnList) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Duration of the gear "stagger" charge-timer pause (pants mod).
+const EG_STAGGER_DURATION_MS = 1000;
+
+// Encounter start timestamp + first_step grace window (boots mod, seconds).
+// Monsters do not advance their charge bars while the grace window is active.
+let _egEncounterStartAt = 0;
+let _egFirstStepSeconds = 0;
+
+// Seconds remaining of the first_step grace window (0 when expired/inactive).
+function _egFirstStepRemainingS() {
+    if (_egFirstStepSeconds <= 0) return 0;
+    return Math.max(0, _egFirstStepSeconds - (Date.now() - _egEncounterStartAt) / 1000);
+}
+
 // Resets all encounter state variables to their initial values.
 function _egResetEncounterState() {
     _egEncounterActive = true;
@@ -284,6 +298,13 @@ function _egResetEncounterState() {
     if (typeof _egAilmentsReset === 'function') _egAilmentsReset();
     if (typeof _egHazardsReset === 'function') _egHazardsReset();
     if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
+
+    // Gear: first_step — snapshot the charge-free opening window for this map
+    _egEncounterStartAt = Date.now();
+    _egFirstStepSeconds = _egComputePlayerStats().firstStepSeconds || 0;
+    if (_egFirstStepSeconds > 0) {
+        showToast(t('eg_first_step').replace('{n}', _egFormatStatValue(_egFirstStepSeconds)));
+    }
 }
 
 // Starts the combat tick loop at 10Hz.
@@ -346,6 +367,10 @@ function _egStopEncounter() {
 // Advances a single monster's charge bar by one tick (0.1s at 10Hz).
 // Fires the monster's attack when the charge bar fills completely.
 function _egTickMonster(m) {
+    // Gear: stagger — the charge timer is paused for a short window after a hit
+    if (m.staggeredUntil && Date.now() < m.staggeredUntil) return;
+    // Gear: first_step — monsters don't charge during the map's opening window
+    if (_egFirstStepRemainingS() > 0) return;
     // Ailments: frozen monsters don't charge, chilled ones charge at 50%
     const chargeMult = (typeof _egGetMonsterChargeMultiplier === 'function') ? _egGetMonsterChargeMultiplier(m) : 1;
     m.currentCharge += 0.1 * chargeMult;
@@ -682,6 +707,8 @@ function _egAnimateMonsterProjectile(monster) {
             _egDamageTargetById(polymorphVictim.id, monster.damageValue);
             return;
         }
+        // Gear: preemptive_dodge — auto-dodge each monster's opening attack
+        if (_egRollPreemptiveDodge(monster)) return;
         const dealt = _egPlayerTakeDamage(monster.damageValue, false, monster.element);
         if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
     });
@@ -703,8 +730,30 @@ function _egApplyMeleeImpact(monster) {
         }
     }
 
+    // Gear: preemptive_dodge — auto-dodge each monster's opening attack
+    if (_egRollPreemptiveDodge(monster)) return;
+
     const dealt = _egPlayerTakeDamage(monster.damageValue, false, monster.element);
     if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
+}
+
+// Gear: preemptive_dodge (boots suffix) — the first attack each monster
+// directs at the player this encounter has a chance to be automatically
+// dodged. Resets per-monster, not per-map.
+function _egRollPreemptiveDodge(monster) {
+    if (!monster) return false;
+    const isFirstAttack = !monster.hasStruckPlayer;
+    monster.hasStruckPlayer = true;
+    if (!isFirstAttack) return false;
+
+    const stats = _egComputePlayerStats();
+    const pct = stats.preemptiveDodgePct || 0;
+    if (pct <= 0 || Math.random() * 100 >= pct) return false;
+
+    showToast(t('eg_dodged'));
+    Audio_Manager.playSFX('player_dodge_attack');
+    _egApplyPlayerMissFeedback();
+    return true;
 }
 
 // Physically lunges the monster card toward the player HUD and snaps back.
@@ -809,7 +858,7 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
 
     if (!sourceEl || !targetCard) {
         // No visual target — apply damage instantly without animation
-        if (damage != null) _egDamageTargetById(targetId, damage, elements);
+        if (damage != null) _egResolveProjectileImpact(damage, targetId, elements);
         return;
     }
 
@@ -821,8 +870,68 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
     // flight vector inside _egFireProjectile (they're drawn tip-forward),
     // so every shot always points at the targeted creature.
     _egFireProjectile(projDef, projDef.cssClass, start, end, projDef.duration, projDef.easing, () => {
-        _egDamageTargetById(targetId, damage, elements);
+        _egResolveProjectileImpact(damage, targetId, elements);
     }, null, startScale);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------PROJECTILE IMPACT GEAR PROCS-------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Ranged-channel gear modifiers that resolve when a projectile lands:
+//   snipe   — bonus damage vs monsters alone in their spawn location
+//   splash  — chance to hit every other monster in the target's zone
+//   chain   — chance to bounce to one monster in a DIFFERENT spawn location
+//   pierce  — chance to punch through and hit one additional monster anywhere
+function _egResolveProjectileImpact(damage, targetId, elements) {
+    const target = _egMonsters.find(m => m.id === targetId);
+    let finalDamage = damage;
+
+    // Snipe: isolated target (no zone-mates) takes amplified projectile damage
+    if (target) {
+        const snipePct = _egComputePlayerStats().snipePct || 0;
+        const isIsolated = !_egMonsters.some(m => m.id !== targetId && m.zoneId === target.zoneId);
+        if (snipePct > 0 && isIsolated) {
+            finalDamage = Math.round(finalDamage * (1 + snipePct / 100));
+            _egShowStatusLabel(targetId, t('eg_snipe'));
+        }
+    }
+
+    _egDamageTargetById(targetId, finalDamage, elements);
+
+    if (!target) return;
+
+    // Splash: hits all OTHER monsters sharing the target's spawn location
+    const splashPct = _egComputePlayerStats().splashPct || 0;
+    if (splashPct > 0 && Math.random() * 100 < splashPct) {
+        _egMonsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId).forEach(m => {
+            const card = document.getElementById(`eg-card-${m.id}`);
+            if (card) _egRestartFlashClass(card, 'eg-flash-damage');
+            _egDamageTargetById(m.id, finalDamage, elements);
+        });
+    }
+
+    // Chain: bounces to one additional monster in a different spawn location
+    const chainPct = _egComputePlayerStats().chainPct || 0;
+    if (chainPct > 0 && Math.random() * 100 < chainPct) {
+        const others = _egMonsters.filter(m => m.id !== targetId && m.zoneId !== target.zoneId);
+        if (others.length) {
+            const victim = others[Math.floor(Math.random() * others.length)];
+            _egDamageTargetById(victim.id, finalDamage, elements);
+        }
+    }
+
+    // Pierce: punches through to one additional monster anywhere on the field
+    // (does not chain further — only one extra target per shot)
+    const piercePct = _egComputePlayerStats().piercePct || 0;
+    if (piercePct > 0 && Math.random() * 100 < piercePct) {
+        const others = _egMonsters.filter(m => m.id !== targetId);
+        if (others.length) {
+            const victim = others[Math.floor(Math.random() * others.length)];
+            _egDamageTargetById(victim.id, finalDamage, elements);
+        }
+    }
 }
 
 
@@ -958,6 +1067,24 @@ function _egReleaseChargedShot() {
     }
 
     _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements);
+    _egTryMultishot(damage, targetIdAtFire, elements, sourceEl);
+}
+
+// Gear: multishot (cloak/gloves) — rolls against multishotPct and, on
+// success, looses one extra projectile with the same damage at another
+// living monster (falls back to the primary target when it's the only one).
+function _egTryMultishot(damage, primaryTargetId, elements, sourceEl) {
+    const stats = _egComputePlayerStats();
+    const multishotPct = stats.multishotPct || 0;
+    if (multishotPct <= 0 || Math.random() * 100 >= multishotPct) return;
+
+    const others = _egMonsters.filter(m => m.id !== primaryTargetId);
+    const targetId = others.length
+        ? others[Math.floor(Math.random() * others.length)].id
+        : primaryTargetId;
+    if (!targetId) return;
+
+    _egAnimatePlayerProjectile(Math.round(damage), targetId, undefined, undefined, sourceEl, 1.2, elements);
 }
 
 
@@ -1189,9 +1316,29 @@ function _egDamageTarget(amount) {
 //------------------------------------------------------------------------
 
 // Applies stat changes when a hit lands: reduces HP and pushes back charge.
+// Gear: pushback adds extra seconds on top of the base charge pushback;
+// gear: stagger rolls a chance to pause the charge timer entirely for 1s.
 function _egApplyHitToMonster(target, amount) {
+    const stats = _egComputePlayerStats();
     target.currentHP = Math.max(0, target.currentHP - amount);
-    target.currentCharge = Math.max(0, target.currentCharge - EG_PLAYER_STATS.chargePushback);
+    const totalPushback = EG_PLAYER_STATS.chargePushback + (stats.pushbackFlat || 0);
+    target.currentCharge = Math.max(0, target.currentCharge - totalPushback);
+
+    if (stats.staggerPct > 0 && Math.random() * 100 < stats.staggerPct) {
+        target.staggeredUntil = Date.now() + EG_STAGGER_DURATION_MS;
+        _egShowStatusLabel(target.id, t('eg_staggered'));
+    }
+}
+
+// Appends a short floating status label (stagger/snipe/...) to a monster card.
+function _egShowStatusLabel(monsterId, text) {
+    const card = document.getElementById(`eg-card-${monsterId}`);
+    if (!card) return;
+    const label = document.createElement('div');
+    label.className = 'eg-damage-number';
+    label.textContent = text;
+    card.appendChild(label);
+    setTimeout(() => label.remove(), EG_DAMAGE_NUMBER_DURATION_MS);
 }
 
 // Applies incoming player damage to a specific monster by id.
@@ -1233,11 +1380,30 @@ function _egDamageTargetById(monsterId, amount, elements) {
     if (target.isBoss) _egBossCheckPhase(target);
 
     if (target.currentHP <= 0) {
+        // Gear: overkill — chance for excess damage to bleed into another monster
+        _egTryOverkillSpread(target, amount);
         _egKillMonster(target.id);
         return;
     }
 
     _egUpdateBars();
+}
+
+// Gear: overkill (shoulders suffix) — on a killing blow, rolls against
+// overkillPct and, on success, deals the surplus damage (amount beyond the
+// victim's remaining HP) to a random other living monster.
+function _egTryOverkillSpread(dyingTarget, appliedDamage) {
+    const stats = _egComputePlayerStats();
+    const overkillPct = stats.overkillPct || 0;
+    if (overkillPct <= 0 || Math.random() * 100 >= overkillPct) return;
+
+    const overkill = Math.round(appliedDamage - dyingTarget.currentHP); // currentHP clamped at 0
+    if (overkill <= 0) return;
+
+    const others = _egMonsters.filter(m => m.id !== dyingTarget.id);
+    if (!others.length) return;
+    const victim = others[Math.floor(Math.random() * others.length)];
+    _egDamageTargetById(victim.id, overkill);
 }
 
 

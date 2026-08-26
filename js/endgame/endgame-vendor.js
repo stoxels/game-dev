@@ -26,6 +26,16 @@
 // Price of one vendor-bought Tier 1 map, in gold (0 = free).
 const EG_VENDOR_T1_MAP_PRICE = 0;
 
+// Base types given away for free in the Base Items tab — basic level 1
+// starter gear (melee weapon, ranged weapon, armour chest + pants) so new
+// players can gear up without gold.
+const EG_VENDOR_FREE_BASE_IDS = new Set([
+    'wpn_1h_1',    // Rusted Sword (level 1 melee)
+    'ranged_1',    // Shortbow (level 1 ranged)
+    'chest_str_1', // Plate Vest (level 1 chest, pure armour)
+    'pants_str_1', // Rusted Greaves (level 1 pants, armour)
+]);
+
 // Prices per currency orb id (gold). Missing ids fall back to the default.
 const EG_VENDOR_CURRENCY_PRICES = {
     orb_transmutation: 15,
@@ -182,8 +192,10 @@ function _egvSwitchTab(tabId) {
 function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraClass = '', blockedReason = '' }) {
     const blockedCls = blockedReason ? ' egv-card-blocked' : '';
     const blockedTitle = blockedReason ? ` title="${blockedReason.replace(/"/g, '&quot;')}"` : '';
+    // Free offers (price 0) never show a gold deficit.
+    const isFree = price <= 0;
     // Dim the card + show the deficit while the player cannot afford it.
-    const cannotAfford = egGetGold() < price;
+    const cannotAfford = !isFree && egGetGold() < price;
     const affordCls = cannotAfford ? ' egv-card-cannot-afford' : '';
     const affordLine = cannotAfford
         ? `<div class="egv-price-missing">${t('eg_vendor_missing_gold').replace('{n}', (price - egGetGold()).toLocaleString())}</div>`
@@ -200,7 +212,7 @@ function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraC
     </div>
     <div class="egv-card-bottom">
         <div>
-            <div class="egv-offer-price">🪙 ${price.toLocaleString()}</div>
+            <div class="egv-offer-price">${isFree ? `🪙 ${t('eg_vendor_free')}` : `🪙 ${price.toLocaleString()}`}</div>
             ${affordLine}
         </div>
         <button class="title-btn egv-buy-btn" onclick="${buyCall}">${t('eg_vendor_buy')}</button>
@@ -544,12 +556,13 @@ function _egvBuildBaseListHTML() {
     const cards = bases.map(base => {
         const name = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
         const missing = _egvGetMissingRequirements(base);
+        const price = EG_VENDOR_FREE_BASE_IDS.has(base.id) ? 0 : _egvBaseItemPrice(base);
         return _egvBuildCardHTML({
             icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
             title: name,
             subtitle: `${t(`eg_slot_${base.slotType}`)} · ${t('eg_item_level').replace('{n}', base.minLevel)}`,
             desc: _egvBuildReqSummaryText(base),
-            price: _egvBaseItemPrice(base),
+            price,
             buyCall: `_egvBuyBaseItem('${base.id}')`,
             blockedReason: missing.length
                 ? t('eg_vendor_cannot_equip').replace('{list}', missing.join(', '))
@@ -564,7 +577,7 @@ function _egvBuildBaseListHTML() {
 function _egvBuyBaseItem(baseId) {
     const base = EG_ALL_BASE_TYPES.find(b => b.id === baseId);
     if (!base) return;
-    const price = _egvBaseItemPrice(base);
+    const price = EG_VENDOR_FREE_BASE_IDS.has(baseId) ? 0 : _egvBaseItemPrice(base);
 
     if (!_egvPurchase(price, () => {
         if (!_egStashHasFreeSlot()) return false;
