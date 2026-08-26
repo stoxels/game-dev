@@ -133,17 +133,11 @@ const EG_FROZEN_CELL_LIFETIME_MS = 9000; // ms before frozen cells thaw on their
 
 // Returns the delay (ms) for the next trigger of a mechanic at the given phase.
 // Higher phases reduce the interval by 20% per phase above 1, capped at 5s minimum.
-// The active map's "Null Hypothesis mechanics strike #% more often" mod
-// (blackout storm) speeds up all mechanic intervals on top of that.
 function _egCalcMechanicInterval(mech, phase) {
     const speedFactor = 1 - (phase - 1) * 0.20;
     const rawInterval = mech.intervalBase
         + (Math.random() * mech.intervalVariance - mech.intervalVariance / 2);
-    let interval = rawInterval * speedFactor;
-    if (typeof _egMapBossMechanicSpeedFactor === 'function') {
-        interval *= _egMapBossMechanicSpeedFactor();
-    }
-    return Math.max(5000, interval);
+    return Math.max(5000, rawInterval * speedFactor);
 }
 
 // Schedules a single mechanic for the given boss at the given phase.

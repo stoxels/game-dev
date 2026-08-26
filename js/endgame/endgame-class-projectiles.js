@@ -261,18 +261,29 @@ function _egFireProjectile(visual, cssClass, start, end, duration, easing, onArr
 
 // Entry point for programmatic reveals (items, passives, class abilities).
 // Fired from _applyCellEffect(..., 'reveal') so every non-manual reveal path
-// is covered. Each revealed cell launches one reduced-damage projectile at
-// the current target; no-op while no endgame encounter is running.
-function _egOnProgrammaticReveal(cellIds) {
+// is covered. `source` distinguishes 'item' reveals from 'ability' reveals
+// (default) so the matching map damage penalty can be applied. Each revealed
+// cell launches one reduced-damage projectile at the current target; no-op
+// while no endgame encounter is running.
+function _egOnProgrammaticReveal(cellIds, source) {
     if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
     if (!Array.isArray(cellIds) || !cellIds.length) return;
+
+    // Active map run: "Reveals from Items/Abilities deal #% less Damage".
+    const isItemSource = source === 'item';
+    let revealModMult = 1;
+    if (isItemSource && typeof _egMapItemRevealMult === 'function') {
+        revealModMult = _egMapItemRevealMult();
+    } else if (!isItemSource && typeof _egMapAbilityRevealMult === 'function') {
+        revealModMult = _egMapAbilityRevealMult();
+    }
 
     cellIds.slice(0, EG_REVEAL_PROJECTILE_MAX).forEach((id, i) => {
         const sourceEl = document.getElementById(id);
         if (!sourceEl) return;
         setTimeout(() => {
             if (!_egIsActive()) return;
-            const revealPct = _egGetRevealProjectileDamagePct() / 100;
+            const revealPct = (_egGetRevealProjectileDamagePct() / 100) * revealModMult;
             const rolled = _egCalcPlayerDamage();
             const damage = Math.max(1, Math.round(rolled * revealPct));
             // Keep the per-element share so monster resistances still apply

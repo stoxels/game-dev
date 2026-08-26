@@ -6,7 +6,8 @@
 
 // Boss level scaling 
 // Applied per level above 1. 
-const EG_BOSS_LEVEL_HP_SCALE = 0.15; // +15% HP per level above 1
+const EG_BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1 — retuned after the
+                                     // global gear-damage buff (~x2) so boss stays a real fight
 const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
 
 // ── Soft enrage ──────────────────────────────────────────────────────────────

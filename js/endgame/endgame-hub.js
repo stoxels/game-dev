@@ -687,7 +687,11 @@ function _egBuildTooltipBodyHTML(item) {
         } else {
             rangeLine('eg_stat_phys_damage', item.damage.min, item.damage.max, false);
         }
-        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attack_interval')}: <span class="eg-tt-val">${item.attackIntervalSeconds}s</span></div>`);
+        // Only the melee weapon slot has an auto-strike interval — ranged
+        // weapons scale the input-driven projectile channel instead.
+        if (item.slotType === 'weapon') {
+            implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attack_interval')}: <span class="eg-tt-val">${item.attackIntervalSeconds}s</span></div>`);
+        }
     }
     if (item.blockChance) {
         implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_block_chance')}: <span class="eg-tt-val">${item.blockChance}%</span></div>`);

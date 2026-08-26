@@ -44,6 +44,64 @@ function _egCalcPlayerDamage() {
 }
 
 
+// Per-element breakdown of the most recent _egCalcPlayerMeleeDamage() roll.
+// Passed to _egDamageTargetById so melee hits get the same resistance /
+// ailment / hit-burst treatment as projectiles.
+let _egLastMeleeElements = null;
+
+// Melee auto-strike channel — fully independent from projectiles:
+// rolls the equipped weapon's base damage range plus its "… to Melee
+// Strikes" mods and unscoped sources (bracers/rings/amulet), scaled by
+// % increased physical damage and crit. Falls back to the flat base
+// punch when no weapon damage exists. Projectiles use
+// _egCalcPlayerDamage() instead (see _egComputePlayerStats for routing).
+function _egCalcPlayerMeleeDamage() {
+    const stats = _egComputePlayerStats();
+
+    let dmg;
+    if (stats.meleePhysMax > 0) {
+        dmg = stats.meleePhysMin + (stats.meleePhysMax - stats.meleePhysMin) * Math.random();
+        dmg *= (1 + stats.meleePhysIncPct / 100);
+    } else {
+        // Unarmed / no weapon damage — flat fallback strike
+        dmg = EG_PLAYER_MELEE_DAMAGE;
+    }
+
+    // Elemental damage adds after the physical multiplier, mirroring the
+    // projectile channel.
+    const rollEl = (min, max) => (min > 0 || max > 0) ? min + Math.random() * (max - min) : 0;
+    const elements = {
+        fire: rollEl(stats.meleeFireMin, stats.meleeFireMax),
+        cold: rollEl(stats.meleeColdMin, stats.meleeColdMax),
+        lightning: rollEl(stats.meleeLightningMin, stats.meleeLightningMax),
+        shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax),
+    };
+    _egLastMeleeElements = elements;
+    dmg += elements.fire + elements.cold + elements.lightning + elements.shadow;
+
+    const critMult = _egRollCrit(stats);
+    dmg *= critMult;
+
+    // Active map run: apply the "% reduced Melee Attack Damage" map mod.
+    if (typeof _egMapPlayerMeleeMult === 'function') dmg *= _egMapPlayerMeleeMult();
+
+    dmg = Math.max(1, Math.round(dmg));
+
+    if (critMult > 1 && typeof showToast === 'function') showToast('💥 Critical Hit!');
+
+    // Life leech — heal the player for a % of the damage about to be dealt.
+    if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
+        const heal = Math.round(dmg * (stats.lifeLeechPct / 100));
+        if (heal > 0) {
+            playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
+            if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+        }
+    }
+
+    return dmg;
+}
+
+
 //------------------------------------------------------------------------
 //-------------------ELEMENTAL DAMAGE & RESISTANCES-----------------------
 //------------------------------------------------------------------------

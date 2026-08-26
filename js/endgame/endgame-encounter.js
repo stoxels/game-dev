@@ -282,6 +282,7 @@ function _egResetEncounterState() {
     _egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption;
     _egCancelAbsorptionRegen();
     if (typeof _egAilmentsReset === 'function') _egAilmentsReset();
+    if (typeof _egHazardsReset === 'function') _egHazardsReset();
     if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
 }
 
@@ -329,6 +330,7 @@ function _egStopEncounter() {
     _egCancelSpawnTimers();
     _egStopPickupSpawner();
     if (typeof _egAilmentsCleanup === 'function') _egAilmentsCleanup();
+    if (typeof _egHazardsCleanup === 'function') _egHazardsCleanup();
     _egBossCleanupAll();
     _egCancelAbsorptionRegen();
     if (typeof _egChainCleanup === 'function') _egChainCleanup();
@@ -497,6 +499,7 @@ function _egTickLoop() {
 
     _egBossTick();
     if (typeof _egTickAilments === 'function') _egTickAilments();
+    if (typeof _egHazardsTick === 'function') _egHazardsTick();
     _egMonsters.forEach(_egTickMonster);
 
     // Player mechanics
@@ -762,7 +765,9 @@ function _egOnCorrectCell(row, col) {
 
     if (row !== undefined && col !== undefined) _egTrackRecentFill(row, col);
 
-    const damage = _egCalcPlayerDamage();
+    // Projectile map mod: "% reduced Projectile Damage" scales correct-fill shots.
+    const projMult = (typeof _egMapPlayerProjectileMult === 'function') ? _egMapPlayerProjectileMult() : 1;
+    const damage = Math.max(1, Math.round(_egCalcPlayerDamage() * projMult));
     EG_ELEMENTS.forEach(el => {
         _egDragChargeElements[el] += _egLastHitElements ? (_egLastHitElements[el] || 0) : 0;
     });
@@ -864,6 +869,27 @@ function _egUpdateChargedProjectileVisual() {
         proj.style.left = `${c.x}px`;
         proj.style.top = `${c.y}px`;
     }
+
+    _egAimChargingProjectile(anchor);
+}
+
+// Rotates the charging projectile so its tip points at the currently targeted
+// monster card (same atan2 flight vector the released shot will follow).
+// No-op when there is no live charge visual or no anchor.
+function _egAimChargingProjectile(anchor) {
+    const proj = document.getElementById('eg-charging-projectile');
+    if (!proj || !anchor) return;
+
+    let rot = '';
+    const targetCard = _egTargetId ? document.getElementById(`eg-card-${_egTargetId}`) : null;
+    if (targetCard) {
+        const c = _egGetElementCentre(anchor);
+        const t = _egGetElementCentre(targetCard);
+        const angle = Math.atan2(t.y - c.y, t.x - c.x) * 180 / Math.PI;
+        rot = ` rotate(${angle.toFixed(2)}deg)`;
+    }
+    proj.style.transform =
+        `translate(-50%, -50%)${rot} scale(var(--egp-charge-scale, 1))`;
 }
 
 // Removes the charging projectile div and resets all stroke charge state.
@@ -963,20 +989,34 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col) {
 // player charges the monster
 
 
-// Applies the default melee damage at the moment of impact.
+// Current melee auto-attack damage: rolls the dedicated melee channel
+// (weapon base range + melee-scoped mods — see _egCalcPlayerMeleeDamage).
+// The active map's "% reduced Melee Attack Damage" mod is applied inside.
+function _egCurrentMeleeDamage() {
+    return (typeof _egCalcPlayerMeleeDamage === 'function')
+        ? _egCalcPlayerMeleeDamage()
+        : EG_PLAYER_MELEE_DAMAGE;
+}
+
+// Applies a full melee strike at the moment of impact. The damage (and its
+// elemental breakdown) is rolled ONCE per swing so cleaved side targets
+// take the same hit as the primary target.
 function _egApplyPlayerMeleeImpact(targetId) {
     if (!_egIsActive() || !_egMonsters.some(m => m.id === targetId)) return;
 
-    // Uses the existing damage application logic[cite: 1]
-    _egDamageTargetById(targetId, EG_PLAYER_MELEE_DAMAGE);
+    const dmg = _egCurrentMeleeDamage();
+    const elements = _egLastMeleeElements;
 
-    _egTryCleaveHit(targetId);
+    // Uses the existing damage application logic[cite: 1]
+    _egDamageTargetById(targetId, dmg, elements);
+
+    _egTryCleaveHit(targetId, dmg, elements);
 }
 
 // Cleave gear modifier (main weapon suffix): rolls against cleavePct and,
 // on success, hits every OTHER monster sharing the target's spawn location
 // for the same melee damage, with a dedicated flash animation and sound.
-function _egTryCleaveHit(targetId) {
+function _egTryCleaveHit(targetId, dmg = _egCurrentMeleeDamage(), elements = _egLastMeleeElements) {
     const stats = _egComputePlayerStats();
     const cleavePct = stats.cleavePct || 0;
     if (cleavePct <= 0 || Math.random() * 100 >= cleavePct) return;
@@ -993,7 +1033,7 @@ function _egTryCleaveHit(targetId) {
     sideTargets.forEach(m => {
         const card = document.getElementById(`eg-card-${m.id}`);
         if (card) _egRestartFlashClass(card, 'eg-flash-cleave');
-        _egDamageTargetById(m.id, EG_PLAYER_MELEE_DAMAGE);
+        _egDamageTargetById(m.id, dmg, elements);
     });
 }
 
@@ -1006,7 +1046,7 @@ function _egAnimatePlayerMelee(targetId) {
     const sprite = document.getElementById('avatar-sprite-img');
 
     if (!avatarWrapper || !targetCard) {
-        _egDamageTargetById(targetId, EG_PLAYER_MELEE_DAMAGE);
+        _egDamageTargetById(targetId, _egCurrentMeleeDamage(), _egLastMeleeElements);
         return;
     }
 
@@ -1092,6 +1132,14 @@ function _egSelectTarget(monsterId) {
     if (!_egIsActive()) return;
     _egTargetId = monsterId;
     _egRenderPanel();
+
+    // Keep the charging projectile aimed at the new target mid-stroke
+    if (_egDragChargeStacks > 0) {
+        const anchor = ((_egDragChargeRow >= 0 && _egDragChargeCol >= 0)
+            && document.getElementById(`g-${_egDragChargeRow}-${_egDragChargeCol}`))
+            || document.getElementById('class-hud-drag-handle');
+        _egAimChargingProjectile(anchor);
+    }
 }
 
 // Cycles the target through the live monster list (Shift = reverse).

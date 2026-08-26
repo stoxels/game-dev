@@ -169,8 +169,11 @@ function _calcBaseTime() {
     let baseTimer;
 
     if (cur.isMonsterLevel && cur.egTimeLimit != null) {
-        const gearBonus = (typeof _egComputePlayerStats === 'function')
+        let gearBonus = (typeof _egComputePlayerStats === 'function')
             ? (_egComputePlayerStats().timeAdded || 0) : 0;
+        // Active map run: "% less Time gained from Item and Ability effects"
+        // also scales the time_added bonus from equipped gear (an item effect).
+        if (typeof _egMapTimeGainMult === 'function') gearBonus = Math.round(gearBonus * _egMapTimeGainMult());
         baseTimer = cur.egTimeLimit + gearBonus;
     } else {
         baseTimer = cur.timer || cfg.timerStart;

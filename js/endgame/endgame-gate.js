@@ -383,7 +383,8 @@ function _egInjectMapModsOverlayStyles() {
     const style = document.createElement('style');
     style.id = 'eg-map-mods-overlay-styles';
     style.textContent = `
-.eg-topbar-right { display:flex; gap:8px; }
+.eg-topbar-right { display:flex; gap:8px; margin-left:auto; }
+.eg-topbar-right .eg-level-btn { margin-left:0; }
 .eg-mm-overlay-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
                     z-index:10000; align-items:center; justify-content:center; }
 .eg-mm-overlay-bg.show { display:flex; }

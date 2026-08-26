@@ -75,6 +75,42 @@ function _egMapManaGainMult() {
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
+// "#% reduced Melee Attack Damage" → multiplier below 1.
+function _egMapPlayerMeleeMult() {
+    const v = _egGetActiveMapModValue('map_melee_damage');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "#% reduced Projectile Damage" → multiplier below 1.
+function _egMapPlayerProjectileMult() {
+    const v = _egGetActiveMapModValue('map_projectile_damage');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "Reveals from Items deal #% less Damage" → multiplier below 1.
+function _egMapItemRevealMult() {
+    const v = _egGetActiveMapModValue('map_item_reveal_damage');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "Reveals from Abilities deal #% less Damage" → multiplier below 1.
+function _egMapAbilityRevealMult() {
+    const v = _egGetActiveMapModValue('map_ability_reveal_damage');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "#% reduced Spell Damage" → multiplier below 1.
+function _egMapSpellDamageMult() {
+    const v = _egGetActiveMapModValue('map_spell_damage');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "#% less Time gained from Item and Ability effects" → multiplier below 1.
+function _egMapTimeGainMult() {
+    const v = _egGetActiveMapModValue('map_less_time_gained');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
 
 //------------------------------------------------------------------------
 //-------------------MONSTER MOD APPLICATION------------------------------
@@ -118,13 +154,6 @@ function _egApplyMapModsToMonster(monster) {
     }
 
     return monster;
-}
-
-// "Null Hypothesis mechanics strike #% more often" → boss mechanic interval
-// speed factor (below 1). Applied inside _egCalcMechanicInterval().
-function _egMapBossMechanicSpeedFactor() {
-    const v = _egGetActiveMapModValue('map_blackout_storm');
-    return v > 0 ? Math.max(0.25, 1 - v / 100) : 1;
 }
 
 
@@ -270,15 +299,21 @@ function _egApplyModsToBaseline(base, map) {
                 break;
 
             case 'map_fewer_mistakes':
-                if (!hasImplicits) base.egMaxMistakes = Math.max(3, base.egMaxMistakes - val);
+                // Percentage-based; remaining mistakes are rounded DOWN so
+                // the penalty never rounds in the player's favour.
+                if (!hasImplicits) {
+                    base.egMaxMistakes = Math.max(3, Math.floor(base.egMaxMistakes * (1 - val / 100)));
+                }
                 break;
 
             case 'map_less_time':
-                if (!hasImplicits) base.egTimeLimit = Math.max(300, base.egTimeLimit - val);
+                if (!hasImplicits) {
+                    base.egTimeLimit = Math.max(300, Math.round(base.egTimeLimit * (1 - val / 100)));
+                }
                 break;
 
             // map_extra_questions is consumed per-interstitial via
-            // _egMapQuestionsPerInterstitial(); monster/player/storm mods are
+            // _egMapQuestionsPerInterstitial(); monster/player mods are
             // consumed live through their helper functions.
         }
     });

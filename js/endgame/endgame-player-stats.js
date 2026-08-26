@@ -134,6 +134,24 @@ const EG_STAT_KEY_MAP = {
     warding: { bucket: 'wardingHP', mode: 'max' },
 };
 
+// Shared-bucket → melee-channel counterpart for damage mods. Mods carrying
+// these keys are routed per source slot: weapon items feed ONLY their melee
+// counterpart, ranged items feed only the shared (projectile) bucket, and
+// every other slot feeds both channels.
+const EG_MELEE_BUCKET_MAP = {
+    physFlatMin: 'meleePhysMin',
+    physFlatMax: 'meleePhysMax',
+    physIncPct: 'meleePhysIncPct',
+    fireDmgMin: 'meleeFireMin',
+    fireDmgMax: 'meleeFireMax',
+    coldDmgMin: 'meleeColdMin',
+    coldDmgMax: 'meleeColdMax',
+    lightningDmgMin: 'meleeLightningMin',
+    lightningDmgMax: 'meleeLightningMax',
+    shadowDmgMin: 'meleeShadowMin',
+    shadowDmgMax: 'meleeShadowMax',
+};
+
 // Returns every non-empty equipped item as a flat array.
 function _egGetAllEquippedItems() {
     if (typeof _egEquipped === 'undefined') return [];
@@ -309,6 +327,14 @@ function _egComputePlayerStats() {
         physFlatMin: 0, physFlatMax: 0, physIncPct: 0,
         fireDmgMin: 0, fireDmgMax: 0, coldDmgMin: 0, coldDmgMax: 0,
         lightningDmgMin: 0, lightningDmgMax: 0, shadowDmgMin: 0, shadowDmgMax: 0,
+        // Melee-only damage channel — fed exclusively by the weapon slot's
+        // base damage range and its "… to Melee Strikes" mods. Projectiles
+        // (cell reveals / class abilities) read the shared buckets above;
+        // unscoped slots (bracers/rings/amulet) feed BOTH channels.
+        meleePhysMin: 0, meleePhysMax: 0, meleePhysIncPct: 0,
+        meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
+        meleeLightningMin: 0, meleeLightningMax: 0,
+        meleeShadowMin: 0, meleeShadowMax: 0,
         spellDamageFlat: 0, spellDamageIncPct: 0,
         lifeLeechPct: 0,
         blockChance: 0, spellBlockChance: 0, blockRecoveryPct: 0,
@@ -341,19 +367,39 @@ function _egComputePlayerStats() {
             s.blockChance += item.blockChance;
         }
 
-        // NEW — weapon's own base damage range feeds into the same physical damage buckets as gear mods
+        // Damage routing per slot type: the ranged weapon's base range
+        // feeds the projectile channel, the melee weapon's feeds the melee
+        // channel. Other slots have no base damage.
         if (item.damage) {
-            s.physFlatMin += item.damage.min || 0;
-            s.physFlatMax += item.damage.max || 0;
+            const min = item.damage.min || 0;
+            const max = item.damage.max || 0;
+            if (item.slotType === 'ranged') {
+                s.physFlatMin += min;
+                s.physFlatMax += max;
+            } else if (item.slotType === 'weapon') {
+                s.meleePhysMin += min;
+                s.meleePhysMax += max;
+            }
         }
         (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
             (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
                 const entry = EG_STAT_KEY_MAP[stat.key];
                 if (!entry || stat.value == null) return;
                 const val = Number(stat.value) || 0;
-                if (entry.mode === 'max') s[entry.bucket] = Math.max(s[entry.bucket], val);
-                else if (entry.mode === 'min') s[entry.bucket] = Math.min(s[entry.bucket], val);
-                else s[entry.bucket] += val;
+                // Damage mods are scoped by their source slot ("… to Melee
+                // Strikes" vs "… to Projectiles"); unscoped slots apply to
+                // both channels.
+                const meleeBucket = EG_MELEE_BUCKET_MAP[entry.bucket];
+                if (meleeBucket) {
+                    if (item.slotType !== 'ranged') s[meleeBucket] += val;
+                    if (item.slotType !== 'weapon') s[entry.bucket] += val;
+                } else if (entry.mode === 'max') {
+                    s[entry.bucket] = Math.max(s[entry.bucket], val);
+                } else if (entry.mode === 'min') {
+                    s[entry.bucket] = Math.min(s[entry.bucket], val);
+                } else {
+                    s[entry.bucket] += val;
+                }
             });
         });
     });
@@ -369,6 +415,16 @@ function _egComputePlayerStats() {
     s.evasionFlat += s.agility;
     s.mana += s.intelligence * 2;
     s.spellDamageFlat += s.intelligence;
+
+    // Active map run: apply the "% reduced Spell Damage" mod to the fully
+    // aggregated spell damage buckets (feeds reveal-projectile scaling).
+    if (typeof _egMapSpellDamageMult === 'function') {
+        const spMult = _egMapSpellDamageMult();
+        if (spMult < 1) {
+            s.spellDamageFlat = Math.round(s.spellDamageFlat * spMult);
+            s.spellDamageIncPct = Math.round((s.spellDamageIncPct || 0) * spMult);
+        }
+    }
 
     // Level-up bonus: every level beyond 1 grants a permanent
     // +5 maximum Life and +2 maximum Mana.
@@ -407,15 +463,15 @@ function _egComputePlayerStats() {
 function _egGetPlayerAttackInterval() {
     const defBase = EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
     let base = defBase;
-    const weapons = _egGetAllEquippedItems().filter(it =>
-        it.slotType === 'weapon' || it.slotType === 'ranged');
-    if (weapons.length) {
-        const w = weapons[0];
-        if (w.attackIntervalSeconds != null) {
-            base = Number(w.attackIntervalSeconds) || defBase;
-        } else if (w.attacksPerSecond != null) {
+    // Only the melee weapon slot defines the auto-strike interval — ranged
+    // weapons scale the input-driven projectile channel instead.
+    const weapon = _egGetAllEquippedItems().find(it => it.slotType === 'weapon');
+    if (weapon) {
+        if (weapon.attackIntervalSeconds != null) {
+            base = Number(weapon.attackIntervalSeconds) || defBase;
+        } else if (weapon.attacksPerSecond != null) {
             // Legacy saves predate the rename — derive interval from aps
-            base = defBase / (Number(w.attacksPerSecond) || 1);
+            base = defBase / (Number(weapon.attacksPerSecond) || 1);
         }
     }
     const reduction = _egComputePlayerStats().attackSpeed || 0;
@@ -605,8 +661,13 @@ const EG_STAT_LAYOUT = {
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct'] },
         { catKey: 'eg_statcat_crit', buckets: ['critChance', 'critMultiplierPct'] },
+        // Melee auto-strike channel — independent from the projectile
+        // channel above; fed only by the weapon slot (see _egComputePlayerStats)
+        { catKey: 'eg_statcat_melee', buckets: [
+            'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
+            'meleeLightningRange', 'meleeShadowRange'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
-            'accuracy', 'attackSpeed', 'multishotPct', 'splashPct', 'chainPct',
+            'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
         { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct'] },
@@ -659,18 +720,30 @@ function _egBuildStatLine(bucket, stats) {
             if (stats.absorption > 0) line = { label: t('eg_tt_absorption'), value: `${_egFormatStatValue(stats.absorption)}` };
             break;
 
-        // Physical + elemental damage ranges
+        // Physical + elemental damage ranges (projectile channel)
         case 'physRange':
             if (stats.physFlatMin > 0 || stats.physFlatMax > 0) {
                 line = { label: t('eg_stat_phys_damage'), value: `${_egFormatStatValue(stats.physFlatMin)}–${_egFormatStatValue(stats.physFlatMax)}` };
             }
             break;
+        // Melee-only damage ranges — same labels, grouped under the
+        // "Melee Strikes" category so the two channels stay distinct
+        case 'meleePhysRange':
+            if (stats.meleePhysMin > 0 || stats.meleePhysMax > 0) {
+                line = { label: t('eg_stat_phys_damage'), value: `${_egFormatStatValue(stats.meleePhysMin)}–${_egFormatStatValue(stats.meleePhysMax)}` };
+            }
+            break;
+        case 'meleeFireRange': case 'meleeColdRange': case 'meleeLightningRange': case 'meleeShadowRange':
         case 'fireRange': case 'coldRange': case 'lightningRange': case 'shadowRange': {
             const pairMap = {
                 fireRange: ['fireDmgMin', 'fireDmgMax'],
                 coldRange: ['coldDmgMin', 'coldDmgMax'],
                 lightningRange: ['lightningDmgMin', 'lightningDmgMax'],
                 shadowRange: ['shadowDmgMin', 'shadowDmgMax'],
+                meleeFireRange: ['meleeFireMin', 'meleeFireMax'],
+                meleeColdRange: ['meleeColdMin', 'meleeColdMax'],
+                meleeLightningRange: ['meleeLightningMin', 'meleeLightningMax'],
+                meleeShadowRange: ['meleeShadowMin', 'meleeShadowMax'],
             };
             const [minKey, maxKey] = pairMap[bucket];
             if (stats[minKey] > 0 || stats[maxKey] > 0) {

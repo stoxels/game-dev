@@ -756,6 +756,8 @@ function _applyMathmagicianShieldAbsorb() {
     if (ptHasSkill('god_of_math') && bonus > 0) bonus *= 2;
 
     if (bonus > 0) {
+        // Active map run: "% less Time gained from Item and Ability effects"
+        if (typeof _egMapTimeGainMult === 'function') bonus = Math.round(bonus * _egMapTimeGainMult());
         const before = timerSecs;
         timerSecs = Math.min(timerSecs + bonus, 3600);
         _trackTimerDelta(before, timerSecs);

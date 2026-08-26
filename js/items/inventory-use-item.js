@@ -378,7 +378,7 @@ function _applyDenseMarkerBias(cands, sol, rows, cols) {
 // passive biasing.  Blocked by keystone_ergodic_field and the Oracle.
 //------------------------------------------------------------------------
 
-function revealTiles(count) {
+function revealTiles(count, source) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-reveals
     if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) return;
 
@@ -414,7 +414,7 @@ function revealTiles(count) {
         revealedCoords.push({ row: r, col: c });
     });
 
-    _applyCellEffect(affected, 'reveal');
+    _applyCellEffect(affected, 'reveal', source);
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
     trackAchStat('tilesRevealed', affected.length);
     if (affected.length > 0) _incDirect('lifetimeTilesRevealed', affected.length); 
@@ -526,7 +526,7 @@ function _eraseFilledCellsInCol(c, sol, rows) {
 // Fully reveals `count` random unsolved rows.
 // Returns the number of rows actually revealed (may be less than count if
 // fewer unsolved rows exist).
-function solveRows(count) {
+function solveRows(count, source) {
     const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
@@ -553,14 +553,14 @@ function solveRows(count) {
         }
     });
     _incDirect('lifetimeTilesRevealed', affected.length);
-    _applyCellEffect(affected, 'reveal');
+    _applyCellEffect(affected, 'reveal', source);
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
     return Math.min(count, unsolved.length);
 }
 
 // Fully reveals `count` random unsolved columns.
 // Returns the number of columns actually revealed.
-function solveCols(count) {
+function solveCols(count, source) {
     const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
@@ -587,7 +587,7 @@ function solveCols(count) {
         }
     });
     _incDirect('lifetimeTilesRevealed', affected.length);
-    _applyCellEffect(affected, 'reveal');
+    _applyCellEffect(affected, 'reveal', source);
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
     return Math.min(count, unsolved.length);
 }
@@ -970,7 +970,10 @@ function _calcAddTimeSecs(baseSecs) {
     // Keystone: Curse Embrace — 50% weaker
     if (ptHasSkill('keystone_curse_embrace')) multiplier *= 0.5;
 
-    return Math.round(baseSecs * multiplier);
+    // Active map run: "% less Time gained from Item and Ability effects"
+    const mapTimeMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
+
+    return Math.round(baseSecs * multiplier * mapTimeMult);
 }
 
 // Returns the final mistake-reduction count for a mistakeEraser item.
@@ -1015,7 +1018,7 @@ function _useReveal(id, def) {
     const baseCount = parseInt(id.replace('reveal', '')) || 1;
     const finalCount = _calcRevealCount(baseCount);
 
-    revealTiles(finalCount);
+    revealTiles(finalCount, 'item');
     playItemEffect(id);
 
     const msgKey = finalCount > 1 ? 'item_revealed_pl' : 'item_revealed';
@@ -1024,7 +1027,7 @@ function _useReveal(id, def) {
 
 // rowSolve — fully reveals one random unsolved row.
 function _useRowSolve(id, def) {
-    const n = solveRows(1);
+    const n = solveRows(1, 'item');
     playItemEffect(id);
     if (n > 0) checkWin();
     return n > 0
@@ -1034,7 +1037,7 @@ function _useRowSolve(id, def) {
 
 // colSolve — fully reveals one random unsolved column.
 function _useColSolve(id, def) {
-    const n = solveCols(1);
+    const n = solveCols(1, 'item');
     playItemEffect(id);
     if (n > 0) checkWin();
     return n > 0
@@ -1257,8 +1260,9 @@ function _useFreeze(id, def) {
 function _useCursedTime(id, def) {
     _trackWitchImmuneCursedUse();
 
+    const mapTimeMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
     const before = timerSecs;
-    timerSecs += 1200;
+    timerSecs += Math.round(1200 * mapTimeMult);
     _trackTimerDelta(before, timerSecs);
     updTimer();
     playItemEffect(id);
@@ -1272,7 +1276,7 @@ function _useCursedShield(id, def) {
     _trackWitchImmuneCursedUse();
 
     shieldActive = true;
-    revealTiles(2);
+    revealTiles(2, 'item');
     playItemEffect(id);
 
     _resolveCursedBlackoutDownside(30000, true, false); // black out rows only
@@ -1285,7 +1289,7 @@ function _useCursedRowSolve(id, def) {
     _trackWitchImmuneCursedUse();
 
     const preFilledRows = _getPreFilledRows();
-    const revealed = solveRows(3);
+    const revealed = solveRows(3, 'item');
     const erased = _resolveCursedRowErasureDownside(1, preFilledRows);
 
     playItemEffect(id);
@@ -1298,7 +1302,7 @@ function _useCursedColSolve(id, def) {
     _trackWitchImmuneCursedUse();
 
     const preFilledCols = _getPreFilledCols();
-    const revealed = solveCols(3);
+    const revealed = solveCols(3, 'item');
     const erased = _resolveCursedColErasureDownside(1, preFilledCols);
 
     playItemEffect(id);
@@ -1310,8 +1314,8 @@ function _useCursedColSolve(id, def) {
 function _useCursedRowCol(id, def) {
     _trackWitchImmuneCursedUse();
 
-    const rowsRevealed = solveRows(4);
-    const colsRevealed = solveCols(4);
+    const rowsRevealed = solveRows(4, 'item');
+    const colsRevealed = solveCols(4, 'item');
 
     _resolveCursedBlackoutDownside(45000, false, true); // black out cols only
 
@@ -1324,7 +1328,7 @@ function _useCursedRowCol(id, def) {
 function _useCursedReveal(id, def) {
     _trackWitchImmuneCursedUse();
 
-    revealTiles(6);
+    revealTiles(6, 'item');
 
     // Route the downside through the shared curse helpers so Witch immunity,
     // Curse Embrace and the first-use protection of Veil of Purity all apply

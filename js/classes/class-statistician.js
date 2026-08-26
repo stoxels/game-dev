@@ -1252,6 +1252,9 @@ function _statisticianTriggerMomentum(bonusSeconds) {
     // god_of_statistics doubles the total bonus (applied last)
     if (ptHasSkill('god_of_statistics')) bonus *= 2;
 
+    // Active map run: "% less Time gained from Item and Ability effects"
+    if (typeof _egMapTimeGainMult === 'function') bonus = Math.round(bonus * _egMapTimeGainMult());
+
     const before = timerSecs;
     timerSecs = Math.min(timerSecs + bonus, 3600);
     _trackTimerDelta(before, timerSecs);

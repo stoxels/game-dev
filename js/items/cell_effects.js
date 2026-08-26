@@ -129,14 +129,14 @@ function _ensureCellEffectCSS() {
 // then strips the class once the animation finishes.
 // Forces a DOM reflow before re-adding the class so rapid
 // reuse on the same cell always restarts the animation cleanly.
-function _applyCellEffect(cellIds, type) {
+function _applyCellEffect(cellIds, type, source) {
     if (!cellIds.length) return;
     _ensureCellEffectCSS();
 
     // Programmatic reveals (items, passives, class abilities) feed the
     // endgame projectile system — guarded, so it is a no-op outside endgame.
     if (type === 'reveal' && typeof _egOnProgrammaticReveal === 'function') {
-        _egOnProgrammaticReveal(cellIds);
+        _egOnProgrammaticReveal(cellIds, source);
     }
 
     const cls = `cell-fx-${type}`;

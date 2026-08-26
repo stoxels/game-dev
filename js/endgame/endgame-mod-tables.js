@@ -133,16 +133,26 @@ const EG_MOD_NAME_WORDS = {
     map_player_life: ['Fragile', 'of Frailty', 'der Gebrechlichkeit'],
     map_player_damage: ['Weary', 'of Weakness', 'der Schwäche'],
     map_player_defences: ['Exposed', 'of Exposure', 'der Schutzlosigkeit'],
+    map_melee_damage: ['Dulled', 'of Dulling', 'der Abstumpfung'],
+    map_projectile_damage: ['Windless', 'of Headwinds', 'der Gegenwinde'],
     map_puzzle_cells: ['Sprawling', 'of Labyrinths', 'der Labyrinthe'],
     map_required_puzzles: ['Demanding', 'of Trials', 'der Prüfungen'],
+    map_hazard_lava: ['Molten', 'of Magma', 'des Magmas'],
+    map_hazard_blizzard: ['Freezing', 'of Blizzards', 'des Schneesturms'],
     // Suffixes
     map_monster_resistances: ['Warded', 'of Barriers', 'der Widerstände'],
     map_boss_chance: ['Tyrannical', 'of Tyrants', 'der Tyrannen'],
     map_fewer_mistakes: ['Merciless', 'of Severity', 'der Gnadenlosigkeit'],
     map_less_time: ['Hurried', 'of Haste', 'der Hast'],
+    map_item_reveal_damage: ['Obscured', 'of Obscurity', 'der Dunkelheit'],
+    map_ability_reveal_damage: ['Muted', 'of Silence', 'der Stille'],
+    map_spell_damage: ['Nullified', 'of Nullification', 'der Nullifikation'],
+    map_less_time_gained: ['Stalled', 'of Stagnation', 'der Stagnation'],
     map_mana_penalty: ['Draining', 'of Drain', 'des Entzugs'],
     map_extra_questions: ['Quizzing', 'of Inquisition', 'der Inquisition'],
-    map_blackout_storm: ['Blackened', 'of Blackouts', 'der Finsternis'],
+    map_hazard_lightning: ['Stormy', 'of Tempests', 'der Stürme'],
+    map_hazard_darkness: ['Shadowed', 'of Darkness', 'der Finsternis'],
+    map_hazard_arcane: ['Warped', 'of Arcane Storms', 'der Arkanstürme'],
 };
 
 const EG_MOD_TABLE_HEAD = {
@@ -762,20 +772,20 @@ const EG_MOD_TABLE_AMULET = {
             id: 'fire_damage',
             label: 'Adds # to @ Fire Damage', labelDe: 'Fügt # bis @ Feuerschaden hinzu',
             tiers: [
-                { tier: 1, min1: 20, max1: 30, min2: 55, max2: 75, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 12, max1: 19, min2: 35, max2: 54, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 6, max1: 11, min2: 18, max2: 34, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 5, min2: 8, max2: 17, weight: 1000, ilvl: 10 }
+                { tier: 1, min1: 40, max1: 60, min2: 110, max2: 150, weight: 120, ilvl: 80 },
+                { tier: 2, min1: 24, max1: 38, min2: 70, max2: 108, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 12, max1: 22, min2: 36, max2: 68, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 4, max1: 10, min2: 16, max2: 34, weight: 1000, ilvl: 10 }
             ]
         },
         cold_damage: {
             id: 'cold_damage',
             label: 'Adds # to @ Cold Damage', labelDe: 'Fügt # bis @ Kälteschaden hinzu',
             tiers: [
-                { tier: 1, min1: 18, max1: 26, min2: 50, max2: 68, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 11, max1: 17, min2: 32, max2: 49, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 5, max1: 10, min2: 16, max2: 31, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 4, min2: 7, max2: 15, weight: 1000, ilvl: 10 }
+                { tier: 1, min1: 36, max1: 52, min2: 100, max2: 136, weight: 120, ilvl: 80 },
+                { tier: 2, min1: 22, max1: 34, min2: 64, max2: 98, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 10, max1: 20, min2: 32, max2: 62, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 4, max1: 8, min2: 14, max2: 30, weight: 1000, ilvl: 10 }
             ]
         },
         lightning_damage: {
@@ -783,10 +793,10 @@ const EG_MOD_TABLE_AMULET = {
             label: 'Adds # to @ Lightning Damage', labelDe: 'Fügt # bis @ Blitzschaden hinzu',
             // Lightning has a wider min/max spread — high variance, high ceiling
             tiers: [
-                { tier: 1, min1: 5, max1: 12, min2: 60, max2: 90, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 3, max1: 8, min2: 38, max2: 59, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 1, max1: 5, min2: 20, max2: 37, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 9, max2: 19, weight: 1000, ilvl: 10 }
+                { tier: 1, min1: 10, max1: 24, min2: 120, max2: 180, weight: 120, ilvl: 80 },
+                { tier: 2, min1: 6, max1: 16, min2: 76, max2: 118, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 2, max1: 10, min2: 40, max2: 74, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 6, min2: 18, max2: 38, weight: 1000, ilvl: 10 }
             ]
         },
         shadow_damage: {
@@ -794,10 +804,10 @@ const EG_MOD_TABLE_AMULET = {
             label: 'Adds # to @ Shadow Damage', labelDe: 'Fügt # bis @ Schattenschaden hinzu',
             // Shadow is rarer and slightly lower values — it has strong status effects
             tiers: [
-                { tier: 1, min1: 15, max1: 22, min2: 40, max2: 58, weight: 80, ilvl: 82 },
-                { tier: 2, min1: 9, max1: 14, min2: 25, max2: 39, weight: 180, ilvl: 62 },
-                { tier: 3, min1: 4, max1: 8, min2: 12, max2: 24, weight: 380, ilvl: 38 },
-                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 11, weight: 800, ilvl: 12 }
+                { tier: 1, min1: 30, max1: 44, min2: 80, max2: 116, weight: 80, ilvl: 82 },
+                { tier: 2, min1: 18, max1: 28, min2: 50, max2: 78, weight: 180, ilvl: 62 },
+                { tier: 3, min1: 8, max1: 16, min2: 24, max2: 48, weight: 380, ilvl: 38 },
+                { tier: 4, min1: 2, max1: 6, min2: 10, max2: 22, weight: 800, ilvl: 12 }
             ]
         },
 
@@ -806,10 +816,10 @@ const EG_MOD_TABLE_AMULET = {
             id: 'crit_chance',
             label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
-                { tier: 1, min: 6, max: 8, weight: 100, ilvl: 80 },
-                { tier: 2, min: 4, max: 5, weight: 220, ilvl: 60 },
-                { tier: 3, min: 2, max: 3, weight: 500, ilvl: 35 },
-                { tier: 4, min: 1, max: 1, weight: 1000, ilvl: 10 }
+                { tier: 1, min: 9, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 8, weight: 220, ilvl: 60 },
+                { tier: 3, min: 3, max: 5, weight: 500, ilvl: 35 },
+                { tier: 4, min: 2, max: 2, weight: 1000, ilvl: 10 }
             ]
         },
         crit_multiplier: {
@@ -2645,20 +2655,20 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'flat_physical_damage',
             label: 'Adds # to @ Physical Damage', labelDe: 'Fügt # bis @ physischen Schaden hinzu',
             tiers: [
-                { tier: 1, min1: 18, max1: 26, min2: 48, max2: 68, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 11, max1: 17, min2: 30, max2: 47, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 5, max1: 10, min2: 15, max2: 29, weight: 520, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 4, min2: 6, max2: 14, weight: 1050, ilvl: 8 }
+                { tier: 1, min1: 36, max1: 52, min2: 96, max2: 136, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 22, max1: 34, min2: 60, max2: 94, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 10, max1: 20, min2: 30, max2: 58, weight: 520, ilvl: 35 },
+                { tier: 4, min1: 4, max1: 8, min2: 12, max2: 28, weight: 1050, ilvl: 8 }
             ]
         },
         inc_physical_damage: {
             id: 'inc_physical_damage',
             label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
             tiers: [
-                { tier: 1, min: 40, max: 55, weight: 90, ilvl: 82 },
-                { tier: 2, min: 25, max: 39, weight: 220, ilvl: 62 },
-                { tier: 3, min: 12, max: 24, weight: 500, ilvl: 38 },
-                { tier: 4, min: 4, max: 11, weight: 1050, ilvl: 12 }
+                { tier: 1, min: 64, max: 88, weight: 90, ilvl: 82 },
+                { tier: 2, min: 40, max: 62, weight: 220, ilvl: 62 },
+                { tier: 3, min: 19, max: 38, weight: 500, ilvl: 38 },
+                { tier: 4, min: 6, max: 18, weight: 1050, ilvl: 12 }
             ]
         },
 
@@ -2671,10 +2681,10 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'crit_chance',
             label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
-                { tier: 1, min: 5, max: 7, weight: 100, ilvl: 80 },
-                { tier: 2, min: 3, max: 4, weight: 240, ilvl: 60 },
-                { tier: 3, min: 2, max: 2, weight: 560, ilvl: 35 },
-                { tier: 4, min: 1, max: 1, weight: 1100, ilvl: 10 }
+                { tier: 1, min: 8, max: 11, weight: 100, ilvl: 80 },
+                { tier: 2, min: 5, max: 6, weight: 240, ilvl: 60 },
+                { tier: 3, min: 3, max: 3, weight: 560, ilvl: 35 },
+                { tier: 4, min: 2, max: 2, weight: 1100, ilvl: 10 }
             ]
         },
         crit_multiplier: {
@@ -4699,40 +4709,40 @@ const EG_MOD_TABLE_RING = {
             id: 'fire_damage',
             label: 'Adds # to @ Fire Damage', labelDe: 'Fügt # bis @ Feuerschaden hinzu',
             tiers: [
-                { tier: 1, min1: 14, max1: 22, min2: 40, max2: 58, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 8, max1: 13, min2: 25, max2: 39, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 4, max1: 7, min2: 12, max2: 24, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 11, weight: 1000, ilvl: 10 }
+                { tier: 1, min1: 28, max1: 44, min2: 80, max2: 116, weight: 120, ilvl: 80 },
+                { tier: 2, min1: 16, max1: 26, min2: 50, max2: 78, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 8, max1: 14, min2: 24, max2: 48, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 6, min2: 10, max2: 22, weight: 1000, ilvl: 10 }
             ]
         },
         cold_damage: {
             id: 'cold_damage',
             label: 'Adds # to @ Cold Damage', labelDe: 'Fügt # bis @ Kälteschaden hinzu',
             tiers: [
-                { tier: 1, min1: 12, max1: 20, min2: 36, max2: 52, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 7, max1: 11, min2: 22, max2: 35, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 3, max1: 6, min2: 11, max2: 21, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 2, min2: 4, max2: 10, weight: 1000, ilvl: 10 }
+                { tier: 1, min1: 24, max1: 40, min2: 72, max2: 104, weight: 120, ilvl: 80 },
+                { tier: 2, min1: 14, max1: 22, min2: 44, max2: 70, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 6, max1: 12, min2: 22, max2: 42, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 4, min2: 8, max2: 20, weight: 1000, ilvl: 10 }
             ]
         },
         lightning_damage: {
             id: 'lightning_damage',
             label: 'Adds # to @ Lightning Damage', labelDe: 'Fügt # bis @ Blitzschaden hinzu',
             tiers: [
-                { tier: 1, min1: 3, max1: 9, min2: 44, max2: 68, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 2, max1: 6, min2: 28, max2: 43, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 1, max1: 4, min2: 14, max2: 27, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 2, min2: 6, max2: 13, weight: 1000, ilvl: 10 }
+                { tier: 1, min1: 6, max1: 18, min2: 88, max2: 136, weight: 120, ilvl: 80 },
+                { tier: 2, min1: 4, max1: 12, min2: 56, max2: 86, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 2, max1: 8, min2: 28, max2: 54, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 4, min2: 12, max2: 26, weight: 1000, ilvl: 10 }
             ]
         },
         shadow_damage: {
             id: 'shadow_damage',
             label: 'Adds # to @ Shadow Damage', labelDe: 'Fügt # bis @ Schattenschaden hinzu',
             tiers: [
-                { tier: 1, min1: 10, max1: 16, min2: 28, max2: 44, weight: 80, ilvl: 82 },
-                { tier: 2, min1: 6, max1: 9, min2: 17, max2: 27, weight: 180, ilvl: 62 },
-                { tier: 3, min1: 3, max1: 5, min2: 8, max2: 16, weight: 380, ilvl: 38 },
-                { tier: 4, min1: 1, max1: 2, min2: 3, max2: 7, weight: 800, ilvl: 12 }
+                { tier: 1, min1: 20, max1: 32, min2: 56, max2: 88, weight: 80, ilvl: 82 },
+                { tier: 2, min1: 12, max1: 18, min2: 34, max2: 54, weight: 180, ilvl: 62 },
+                { tier: 3, min1: 6, max1: 10, min2: 16, max2: 32, weight: 380, ilvl: 38 },
+                { tier: 4, min1: 2, max1: 4, min2: 6, max2: 14, weight: 800, ilvl: 12 }
             ]
         },
 
@@ -5028,40 +5038,40 @@ const EG_MOD_TABLE_ARCANE = {
             id: 'fire_damage',
             label: 'Adds # to @ Fire Damage', labelDe: 'Fügt # bis @ Feuerschaden hinzu',
             tiers: [
-                { tier: 1, min1: 16, max1: 24, min2: 44, max2: 62, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 10, max1: 15, min2: 28, max2: 43, weight: 240, ilvl: 60 },
-                { tier: 3, min1: 5, max1: 9, min2: 14, max2: 27, weight: 490, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 4, min2: 6, max2: 13, weight: 980, ilvl: 10 }
+                { tier: 1, min1: 32, max1: 48, min2: 88, max2: 124, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 20, max1: 30, min2: 56, max2: 86, weight: 240, ilvl: 60 },
+                { tier: 3, min1: 10, max1: 18, min2: 28, max2: 54, weight: 490, ilvl: 35 },
+                { tier: 4, min1: 4, max1: 8, min2: 12, max2: 26, weight: 980, ilvl: 10 }
             ]
         },
         cold_damage: {
             id: 'cold_damage',
             label: 'Adds # to @ Cold Damage', labelDe: 'Fügt # bis @ Kälteschaden hinzu',
             tiers: [
-                { tier: 1, min1: 14, max1: 22, min2: 40, max2: 56, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 8, max1: 13, min2: 25, max2: 39, weight: 240, ilvl: 60 },
-                { tier: 3, min1: 4, max1: 7, min2: 12, max2: 24, weight: 490, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 11, weight: 980, ilvl: 10 }
+                { tier: 1, min1: 28, max1: 44, min2: 80, max2: 112, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 16, max1: 26, min2: 50, max2: 78, weight: 240, ilvl: 60 },
+                { tier: 3, min1: 8, max1: 14, min2: 24, max2: 48, weight: 490, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 6, min2: 10, max2: 22, weight: 980, ilvl: 10 }
             ]
         },
         lightning_damage: {
             id: 'lightning_damage',
             label: 'Adds # to @ Lightning Damage', labelDe: 'Fügt # bis @ Blitzschaden hinzu',
             tiers: [
-                { tier: 1, min1: 4, max1: 10, min2: 48, max2: 74, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 2, max1: 7, min2: 30, max2: 47, weight: 240, ilvl: 60 },
-                { tier: 3, min1: 1, max1: 4, min2: 15, max2: 29, weight: 490, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 2, min2: 6, max2: 14, weight: 980, ilvl: 10 }
+                { tier: 1, min1: 8, max1: 20, min2: 96, max2: 148, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 4, max1: 14, min2: 60, max2: 94, weight: 240, ilvl: 60 },
+                { tier: 3, min1: 2, max1: 8, min2: 30, max2: 58, weight: 490, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 4, min2: 12, max2: 28, weight: 980, ilvl: 10 }
             ]
         },
         shadow_damage: {
             id: 'shadow_damage',
             label: 'Adds # to @ Shadow Damage', labelDe: 'Fügt # bis @ Schattenschaden hinzu',
             tiers: [
-                { tier: 1, min1: 12, max1: 18, min2: 32, max2: 50, weight: 75, ilvl: 82 },
-                { tier: 2, min1: 7, max1: 11, min2: 20, max2: 31, weight: 170, ilvl: 62 },
-                { tier: 3, min1: 3, max1: 6, min2: 9, max2: 19, weight: 360, ilvl: 38 },
-                { tier: 4, min1: 1, max1: 2, min2: 3, max2: 8, weight: 780, ilvl: 12 }
+                { tier: 1, min1: 24, max1: 36, min2: 64, max2: 100, weight: 75, ilvl: 82 },
+                { tier: 2, min1: 14, max1: 22, min2: 40, max2: 62, weight: 170, ilvl: 62 },
+                { tier: 3, min1: 6, max1: 12, min2: 18, max2: 38, weight: 360, ilvl: 38 },
+                { tier: 4, min1: 2, max1: 4, min2: 6, max2: 16, weight: 780, ilvl: 12 }
             ]
         },
 
@@ -5070,10 +5080,10 @@ const EG_MOD_TABLE_ARCANE = {
             id: 'crit_chance',
             label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
-                { tier: 1, min: 5, max: 7, weight: 100, ilvl: 80 },
-                { tier: 2, min: 3, max: 4, weight: 220, ilvl: 60 },
-                { tier: 3, min: 2, max: 2, weight: 500, ilvl: 35 },
-                { tier: 4, min: 1, max: 1, weight: 1000, ilvl: 10 }
+                { tier: 1, min: 8, max: 11, weight: 100, ilvl: 80 },
+                { tier: 2, min: 5, max: 6, weight: 220, ilvl: 60 },
+                { tier: 3, min: 3, max: 3, weight: 500, ilvl: 35 },
+                { tier: 4, min: 2, max: 2, weight: 1000, ilvl: 10 }
             ]
         },
         crit_multiplier: {
@@ -5628,10 +5638,10 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'flat_physical_damage',
             label: 'Adds # to @ Physical Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ physischen Schaden hinzu',
             tiers: [
-                { tier: 1, min1: 28, max1: 40, min2: 75, max2: 105, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 17, max1: 27, min2: 48, max2: 74, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 8, max1: 16, min2: 24, max2: 47, weight: 520, ilvl: 35 },
-                { tier: 4, min1: 3, max1: 7, min2: 10, max2: 23, weight: 1050, ilvl: 1 }
+                { tier: 1, min1: 56, max1: 80, min2: 150, max2: 210, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 34, max1: 54, min2: 96, max2: 148, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 16, max1: 32, min2: 48, max2: 94, weight: 520, ilvl: 35 },
+                { tier: 4, min1: 6, max1: 14, min2: 20, max2: 46, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -5644,10 +5654,10 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'inc_physical_damage',
             label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
             tiers: [
-                { tier: 1, min: 55, max: 75, weight: 90, ilvl: 82 },
-                { tier: 2, min: 35, max: 54, weight: 220, ilvl: 62 },
-                { tier: 3, min: 18, max: 34, weight: 500, ilvl: 38 },
-                { tier: 4, min: 6, max: 17, weight: 1050, ilvl: 1 }
+                { tier: 1, min: 88, max: 120, weight: 90, ilvl: 82 },
+                { tier: 2, min: 56, max: 86, weight: 220, ilvl: 62 },
+                { tier: 3, min: 29, max: 54, weight: 500, ilvl: 38 },
+                { tier: 4, min: 10, max: 27, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -5664,20 +5674,20 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'fire_damage',
             label: 'Adds # to @ Fire Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Feuerschaden hinzu',
             tiers: [
-                { tier: 1, min1: 28, max1: 42, min2: 78, max2: 108, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 17, max1: 27, min2: 50, max2: 77, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 8, max1: 16, min2: 26, max2: 49, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 3, max1: 7, min2: 11, max2: 25, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 56, max1: 84, min2: 156, max2: 216, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 34, max1: 54, min2: 100, max2: 154, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 16, max1: 32, min2: 52, max2: 98, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 6, max1: 14, min2: 22, max2: 50, weight: 1000, ilvl: 1 }
             ]
         },
         cold_damage: {
             id: 'cold_damage',
             label: 'Adds # to @ Cold Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Kälteschaden hinzu',
             tiers: [
-                { tier: 1, min1: 24, max1: 38, min2: 70, max2: 98, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 14, max1: 23, min2: 44, max2: 69, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 7, max1: 13, min2: 22, max2: 43, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 6, min2: 9, max2: 21, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 76, min2: 140, max2: 196, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 28, max1: 46, min2: 88, max2: 138, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 14, max1: 26, min2: 44, max2: 86, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 4, max1: 12, min2: 18, max2: 42, weight: 1000, ilvl: 1 }
             ]
         },
         lightning_damage: {
@@ -5685,10 +5695,10 @@ const EG_MOD_TABLE_WEAPON1 = {
             label: 'Adds # to @ Lightning Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Blitzschaden hinzu',
             // Lightning has a wide spread — high variance, high ceiling.
             tiers: [
-                { tier: 1, min1: 7, max1: 18, min2: 85, max2: 128, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 4, max1: 12, min2: 54, max2: 84, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 2, max1: 7, min2: 28, max2: 53, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 4, min2: 12, max2: 27, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 14, max1: 36, min2: 170, max2: 256, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 8, max1: 24, min2: 108, max2: 168, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 4, max1: 14, min2: 56, max2: 106, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 8, min2: 24, max2: 54, weight: 1000, ilvl: 1 }
             ]
         },
         shadow_damage: {
@@ -5697,10 +5707,10 @@ const EG_MOD_TABLE_WEAPON1 = {
             // Shadow is rarer — lower weight, slightly lower values,
             // but its status effect (convert) is the most powerful.
             tiers: [
-                { tier: 1, min1: 20, max1: 32, min2: 56, max2: 82, weight: 75, ilvl: 82 },
-                { tier: 2, min1: 12, max1: 19, min2: 36, max2: 55, weight: 170, ilvl: 62 },
-                { tier: 3, min1: 6, max1: 11, min2: 18, max2: 35, weight: 370, ilvl: 38 },
-                { tier: 4, min1: 2, max1: 5, min2: 7, max2: 17, weight: 800, ilvl: 1 }
+                { tier: 1, min1: 40, max1: 64, min2: 112, max2: 164, weight: 75, ilvl: 82 },
+                { tier: 2, min1: 24, max1: 38, min2: 72, max2: 110, weight: 170, ilvl: 62 },
+                { tier: 3, min1: 12, max1: 22, min2: 36, max2: 70, weight: 370, ilvl: 38 },
+                { tier: 4, min1: 4, max1: 10, min2: 14, max2: 34, weight: 800, ilvl: 1 }
             ]
         },
 
@@ -5715,10 +5725,10 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'crit_chance',
             label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 90, ilvl: 80 },
-                { tier: 2, min: 5, max: 7, weight: 220, ilvl: 60 },
-                { tier: 3, min: 3, max: 4, weight: 520, ilvl: 35 },
-                { tier: 4, min: 1, max: 2, weight: 1050, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 80 },
+                { tier: 2, min: 8, max: 11, weight: 220, ilvl: 60 },
+                { tier: 3, min: 5, max: 6, weight: 520, ilvl: 35 },
+                { tier: 4, min: 2, max: 3, weight: 1050, ilvl: 1 }
             ]
         },
         crit_multiplier: {
@@ -6480,10 +6490,10 @@ const EG_MOD_TABLE_RANGED = {
             id: 'flat_physical_damage',
             label: 'Adds # to @ Physical Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ physischen Schaden hinzu',
             tiers: [
-                { tier: 1, min1: 14, max1: 22, min2: 38, max2: 56, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 8, max1: 13, min2: 24, max2: 37, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 4, max1: 7, min2: 12, max2: 23, weight: 520, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 11, weight: 1050, ilvl: 1 }
+                { tier: 1, min1: 28, max1: 44, min2: 76, max2: 112, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 16, max1: 26, min2: 48, max2: 74, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 8, max1: 14, min2: 24, max2: 46, weight: 520, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 6, min2: 10, max2: 22, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -6492,10 +6502,10 @@ const EG_MOD_TABLE_RANGED = {
             id: 'inc_physical_damage',
             label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
             tiers: [
-                { tier: 1, min: 40, max: 55, weight: 90, ilvl: 82 },
-                { tier: 2, min: 25, max: 39, weight: 220, ilvl: 62 },
-                { tier: 3, min: 12, max: 24, weight: 500, ilvl: 38 },
-                { tier: 4, min: 4, max: 11, weight: 1050, ilvl: 1 }
+                { tier: 1, min: 64, max: 88, weight: 90, ilvl: 82 },
+                { tier: 2, min: 40, max: 62, weight: 220, ilvl: 62 },
+                { tier: 3, min: 19, max: 38, weight: 500, ilvl: 38 },
+                { tier: 4, min: 6, max: 18, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -6507,40 +6517,40 @@ const EG_MOD_TABLE_RANGED = {
             id: 'fire_damage',
             label: 'Adds # to @ Fire Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Feuerschaden hinzu',
             tiers: [
-                { tier: 1, min1: 15, max1: 24, min2: 42, max2: 60, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 9, max1: 14, min2: 26, max2: 41, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 4, max1: 8, min2: 13, max2: 25, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 12, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 48, min2: 84, max2: 120, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 18, max1: 28, min2: 52, max2: 82, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 8, max1: 16, min2: 26, max2: 50, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 6, min2: 10, max2: 24, weight: 1000, ilvl: 1 }
             ]
         },
         cold_damage: {
             id: 'cold_damage',
             label: 'Adds # to @ Cold Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Kälteschaden hinzu',
             tiers: [
-                { tier: 1, min1: 13, max1: 20, min2: 36, max2: 52, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 8, max1: 12, min2: 22, max2: 35, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 4, max1: 7, min2: 11, max2: 21, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 3, min2: 4, max2: 10, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 26, max1: 40, min2: 72, max2: 104, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 16, max1: 24, min2: 44, max2: 70, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 8, max1: 16, min2: 22, max2: 42, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 6, min2: 8, max2: 20, weight: 1000, ilvl: 1 }
             ]
         },
         lightning_damage: {
             id: 'lightning_damage',
             label: 'Adds # to @ Lightning Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Blitzschaden hinzu',
             tiers: [
-                { tier: 1, min1: 4, max1: 10, min2: 46, max2: 70, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 2, max1: 6, min2: 28, max2: 45, weight: 250, ilvl: 60 },
-                { tier: 3, min1: 1, max1: 4, min2: 14, max2: 27, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 1, max1: 2, min2: 5, max2: 13, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 8, max1: 20, min2: 92, max2: 140, weight: 110, ilvl: 80 },
+                { tier: 2, min1: 4, max1: 12, min2: 56, max2: 90, weight: 250, ilvl: 60 },
+                { tier: 3, min1: 2, max1: 8, min2: 28, max2: 54, weight: 500, ilvl: 35 },
+                { tier: 4, min1: 2, max1: 4, min2: 10, max2: 26, weight: 1000, ilvl: 1 }
             ]
         },
         shadow_damage: {
             id: 'shadow_damage',
             label: 'Adds # to @ Shadow Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Schattenschaden hinzu',
             tiers: [
-                { tier: 1, min1: 11, max1: 17, min2: 30, max2: 46, weight: 75, ilvl: 82 },
-                { tier: 2, min1: 6, max1: 10, min2: 18, max2: 29, weight: 170, ilvl: 62 },
-                { tier: 3, min1: 3, max1: 5, min2: 9, max2: 17, weight: 370, ilvl: 38 },
-                { tier: 4, min1: 1, max1: 2, min2: 3, max2: 8, weight: 800, ilvl: 1 }
+                { tier: 1, min1: 22, max1: 34, min2: 60, max2: 92, weight: 75, ilvl: 82 },
+                { tier: 2, min1: 12, max1: 20, min2: 36, max2: 58, weight: 170, ilvl: 62 },
+                { tier: 3, min1: 6, max1: 10, min2: 18, max2: 34, weight: 370, ilvl: 38 },
+                { tier: 4, min1: 2, max1: 4, min2: 6, max2: 16, weight: 800, ilvl: 1 }
             ]
         },
 
@@ -6552,10 +6562,10 @@ const EG_MOD_TABLE_RANGED = {
             id: 'crit_chance',
             label: '+#% Critical Strike Chance', labelDe: '+#% kritische Trefferchance',
             tiers: [
-                { tier: 1, min: 6, max: 9, weight: 90, ilvl: 80 },
-                { tier: 2, min: 4, max: 5, weight: 220, ilvl: 60 },
-                { tier: 3, min: 2, max: 3, weight: 520, ilvl: 35 },
-                { tier: 4, min: 1, max: 1, weight: 1050, ilvl: 1 }
+                { tier: 1, min: 9, max: 14, weight: 90, ilvl: 80 },
+                { tier: 2, min: 6, max: 8, weight: 220, ilvl: 60 },
+                { tier: 3, min: 3, max: 5, weight: 520, ilvl: 35 },
+                { tier: 4, min: 2, max: 2, weight: 1050, ilvl: 1 }
             ]
         },
         crit_multiplier: {

@@ -1769,7 +1769,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 1,
         requirements: { level: 1, str: 0, agi: 14, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 4, max: 11 }, attackIntervalSeconds: 5.6,
+        damage: { min: 4, max: 11 },
     },
     {
         id: 'ranged_2', name: 'Longbow', nameDe: 'Langbogen',
@@ -1777,7 +1777,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 5,
         requirements: { level: 5, str: 0, agi: 26, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 12, max: 28 }, attackIntervalSeconds: 6.3,
+        damage: { min: 12, max: 28 },
     },
     {
         id: 'ranged_3', name: 'Recurve Bow', nameDe: 'Reflexbogen',
@@ -1785,7 +1785,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 11,
         requirements: { level: 11, str: 0, agi: 46, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 28, max: 60 }, attackIntervalSeconds: 6.3,
+        damage: { min: 28, max: 60 },
     },
     {
         id: 'ranged_4', name: 'Composite Bow', nameDe: 'Kompositbogen',
@@ -1793,7 +1793,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 20,
         requirements: { level: 20, str: 0, agi: 72, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 52, max: 106 }, attackIntervalSeconds: 6.7,
+        damage: { min: 52, max: 106 },
     },
     {
         id: 'ranged_5', name: 'War Bow', nameDe: 'Kriegsbogen',
@@ -1801,7 +1801,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 30,
         requirements: { level: 30, str: 0, agi: 104, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 96, max: 194 }, attackIntervalSeconds: 7.1,
+        damage: { min: 96, max: 194 },
     },
     {
         id: 'ranged_6', name: 'Hunter\'s Greatbow', nameDe: 'Großbogen des Jägers',
@@ -1809,7 +1809,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 40,
         requirements: { level: 40, str: 0, agi: 139, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 150, max: 300 }, attackIntervalSeconds: 7.1,
+        damage: { min: 150, max: 300 },
     },
     {
         id: 'ranged_7', name: 'Storm Bow', nameDe: 'Sturmbogen',
@@ -1817,7 +1817,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 62,
         requirements: { level: 62, str: 0, agi: 216, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 232, max: 465 }, attackIntervalSeconds: 7.4,
+        damage: { min: 232, max: 465 },
     },
     {
         id: 'ranged_8', name: 'Celestial Longbow', nameDe: 'Himmelslangbogen',
@@ -1825,7 +1825,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 88,
         requirements: { level: 88, str: 0, agi: 306, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 355, max: 710 }, attackIntervalSeconds: 7.7,
+        damage: { min: 355, max: 710 },
     },
 ];
 

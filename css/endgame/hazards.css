@@ -1,0 +1,293 @@
+/* Endgame Map Elemental Hazards — visual styles
+   (see js/endgame/endgame-hazards.js)
+   Everything here is pointer-events: none — hazards never block clicks. */
+
+#eg-hazards-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+
+/* ======================================================================
+   = LAVA POOLS
+   ====================================================================== */
+
+.eg-hz-lava {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 48% 52% 55% 45% / 50% 46% 54% 50%;
+    background:
+        radial-gradient(circle at 32% 34%, #ffe9a8 0%, #ffb347 18%, #ff6a00 45%, #d83800 72%, #7a1600 100%);
+    box-shadow:
+        0 0 22px 8px rgba(255, 106, 0, 0.55),
+        inset 0 0 26px rgba(60, 0, 0, 0.65);
+    animation: eg-hz-lava-wobble 3.2s ease-in-out infinite alternate;
+}
+
+.eg-hz-lava::before,
+.eg-hz-lava::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffd76b 0%, #ff8c1a 60%, transparent 100%);
+    opacity: 0.85;
+    animation: eg-hz-lava-bubble 2.4s ease-in infinite;
+}
+
+.eg-hz-lava::before {
+    width: 18%;
+    height: 14%;
+    left: 24%;
+    top: 30%;
+}
+
+.eg-hz-lava::after {
+    width: 12%;
+    height: 10%;
+    left: 62%;
+    top: 58%;
+    animation-delay: -1.3s;
+}
+
+@keyframes eg-hz-lava-wobble {
+    0%   { border-radius: 48% 52% 55% 45% / 50% 46% 54% 50%; filter: brightness(1); }
+    50%  { border-radius: 53% 47% 44% 56% / 46% 55% 45% 54%; }
+    100% { border-radius: 45% 55% 51% 49% / 55% 48% 52% 45%; filter: brightness(1.15); }
+}
+
+@keyframes eg-hz-lava-bubble {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+    50%      { transform: translateY(-8px) scale(1.35); opacity: 0.95; }
+}
+
+
+/* ======================================================================
+   = LIGHTNING STORM
+   ====================================================================== */
+
+.eg-hz-lightning-warning {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    margin-left: -80px;
+    margin-top: -80px;
+    border-radius: 50%;
+    border: 3px dashed rgba(255, 230, 107, 0.9);
+    background: radial-gradient(circle, rgba(255, 230, 107, 0.28) 0%, rgba(255, 230, 107, 0.05) 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    animation: eg-hz-lightning-pulse 1s ease-in-out infinite;
+}
+
+.eg-hz-lightning-warning::after {
+    content: '\26A1';
+    filter: drop-shadow(0 0 6px rgba(255, 230, 107, 0.9));
+}
+
+@keyframes eg-hz-lightning-pulse {
+    0%, 100% { transform: scale(0.75); opacity: 0.55; }
+    50%      { transform: scale(1.05); opacity: 1; }
+}
+
+/* Impact flash replaces the warning ring */
+.eg-hz-lightning-bolt {
+    animation: eg-hz-lightning-strike 0.35s ease-out forwards !important;
+    border: none;
+    background:
+        linear-gradient(to bottom,
+            transparent 0%,
+            rgba(255, 255, 255, 0.95) 42%,
+            rgba(255, 240, 150, 0.95) 50%,
+            rgba(255, 255, 255, 0.95) 58%,
+            transparent 100%),
+        radial-gradient(circle, rgba(255, 255, 220, 0.9) 0%, transparent 65%);
+    clip-path: polygon(38% 0%, 68% 0%, 52% 40%, 74% 40%, 40% 100%, 50% 55%, 28% 55%);
+    box-shadow: 0 0 40px 16px rgba(255, 230, 107, 0.8);
+}
+
+@keyframes eg-hz-lightning-strike {
+    0%   { transform: scaleY(0.3); opacity: 0; }
+    20%  { transform: scaleY(1);   opacity: 1; }
+    70%  { transform: scaleY(1);   opacity: 0.9; }
+    100% { transform: scaleY(1);   opacity: 0; }
+}
+
+
+/* ======================================================================
+   = BLIZZARD
+   ====================================================================== */
+
+.eg-hz-blizzard {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+        rgba(190, 220, 245, 0.16) 0%,
+        rgba(210, 232, 250, 0.10) 50%,
+        rgba(190, 220, 245, 0.16) 100%);
+    box-shadow: inset 0 0 120px rgba(180, 215, 245, 0.5);
+}
+
+.eg-hz-snowflake {
+    position: absolute;
+    top: -4%;
+    color: #eef7ff;
+    text-shadow: 0 0 4px rgba(200, 230, 255, 0.9);
+    animation: eg-hz-snow-fall linear infinite;
+}
+
+@keyframes eg-hz-snow-fall {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); }
+    50%  { transform: translateY(55vh) translateX(3vw) rotate(180deg); }
+    100% { transform: translateY(112vh) translateX(-2vw) rotate(360deg); }
+}
+
+.eg-hz-icicle {
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+        #dff2ff 0%, #a8d8f5 35%, #7ab8e8 70%, #4a90cf 100%);
+    clip-path: polygon(0% 0%, 100% 0%, 78% 30%, 88% 55%, 62% 62%, 52% 100%, 38% 64%, 14% 58%, 24% 28%);
+    filter: drop-shadow(0 0 6px rgba(140, 200, 245, 0.8));
+}
+
+.eg-hz-icicle-hang {
+    animation: eg-hz-icicle-glint 2.6s ease-in-out infinite;
+}
+
+@keyframes eg-hz-icicle-glint {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(140, 200, 245, 0.6)) brightness(1); }
+    50%      { filter: drop-shadow(0 0 10px rgba(170, 220, 255, 0.95)) brightness(1.18); }
+}
+
+.eg-hz-icicle-shake {
+    animation: eg-hz-icicle-shake-anim 0.09s linear infinite;
+}
+
+@keyframes eg-hz-icicle-shake-anim {
+    0%, 100% { margin-left: 0; }
+    25%      { margin-left: -3px; }
+    75%      { margin-left: 3px; }
+}
+
+.eg-hz-icicle-fall {
+    /* Falling is driven by JS transform; a slight sway sells the motion. */
+    animation: eg-hz-icicle-sway 0.5s linear infinite alternate;
+}
+
+@keyframes eg-hz-icicle-sway {
+    from { rotate: -4deg; }
+    to   { rotate: 4deg; }
+}
+
+
+/* ======================================================================
+   = DARKNESS CLOUDS
+   ====================================================================== */
+
+.eg-hz-darkness-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.eg-hz-cloud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 110px;
+    will-change: transform;
+    background:
+        radial-gradient(closest-side at 25% 60%, rgba(12, 10, 24, 0.95), transparent 100%),
+        radial-gradient(closest-side at 50% 40%, rgba(18, 14, 34, 0.95), transparent 100%),
+        radial-gradient(closest-side at 74% 58%, rgba(12, 10, 24, 0.95), transparent 100%),
+        radial-gradient(closest-side at 92% 66%, rgba(15, 12, 28, 0.9), transparent 100%);
+    filter: blur(6px);
+}
+
+/* Faint purple sheen so clouds read as "arcane darkness", not dead pixels */
+.eg-hz-cloud::after {
+    content: '';
+    position: absolute;
+    inset: 12% 8%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side at 50% 45%,
+        rgba(90, 70, 140, 0.18), transparent 100%);
+}
+
+
+/* ======================================================================
+   = ARCANE STORM
+   ====================================================================== */
+
+.eg-hz-arcane-orb {
+    position: absolute;
+    right: -45px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 38%,
+        #ffffff 0%, #d9a7ff 28%, #9b30ff 60%, #4b0a82 100%);
+    box-shadow:
+        0 0 18px 6px rgba(155, 48, 255, 0.7),
+        0 0 46px 14px rgba(120, 20, 220, 0.4);
+    animation: eg-hz-arcane-orb-flicker 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes eg-hz-arcane-orb-flicker {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.25); }
+}
+
+.eg-hz-arcane-beam {
+    position: absolute;
+    left: 0;
+    border-radius: 8px;
+    background: linear-gradient(to bottom,
+        rgba(199, 125, 255, 0.15) 0%,
+        rgba(230, 180, 255, 0.85) 30%,
+        #ffffff 50%,
+        rgba(230, 180, 255, 0.85) 70%,
+        rgba(199, 125, 255, 0.15) 100%);
+    box-shadow:
+        0 0 26px 10px rgba(155, 48, 255, 0.65),
+        0 0 70px 24px rgba(120, 20, 220, 0.35);
+    animation: eg-hz-arcane-beam-throb 0.12s linear infinite alternate;
+}
+
+@keyframes eg-hz-arcane-beam-throb {
+    from { filter: brightness(0.92); }
+    to   { filter: brightness(1.15); }
+}
+
+
+/* ======================================================================
+   = SHARED — floating hazard damage label on the player avatar
+   ====================================================================== */
+
+.eg-hz-hit-text {
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    transform: translateX(-50%);
+    font-weight: bold;
+    font-size: 17px;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 1px 2px #000;
+    pointer-events: none;
+    z-index: 1010;
+    animation: eg-hz-hit-float 0.9s ease-out forwards;
+}
+
+@keyframes eg-hz-hit-float {
+    0%   { transform: translate(-50%, 0); opacity: 1; }
+    100% { transform: translate(-50%, -34px); opacity: 0; }
+}
