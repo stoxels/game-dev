@@ -382,7 +382,8 @@ function _egGetItemEffectiveAttackInterval(item) {
         ? EG_PLAYER_MIN_ATTACK_INTERVAL : 2;
     return {
         base,
-        interval: Math.max(minInterval, base - reduction),
+        // Round away float subtraction noise (e.g. 5.6 - 0.2 = 5.4000000000000004)
+        interval: Math.round(Math.max(minInterval, base - reduction) * 100) / 100,
         modded: reduction > 0,
     };
 }
@@ -584,16 +585,17 @@ function _egGetPlayerAttackIntervalBreakdown() {
             base = Number(weapon.attackIntervalSeconds) || defBase;
         } else if (weapon.attacksPerSecond != null) {
             // Legacy saves predate the rename — derive interval from aps
-            base = defBase / (Number(weapon.attacksPerSecond) || 1);
+            base = Math.round((defBase / (Number(weapon.attacksPerSecond) || 1)) * 100) / 100;
         }
     }
     const reduction = _egComputePlayerStats().attackSpeed || 0;
-    let interval = Math.max(EG_PLAYER_MIN_ATTACK_INTERVAL, base - reduction);
+    let interval = Math.round(Math.max(EG_PLAYER_MIN_ATTACK_INTERVAL, base - reduction) * 100) / 100;
 
     // Active map run: Temporal Chains — you act #% slower.
     if (typeof _egMapActionSlowMult === 'function') {
         interval *= _egMapActionSlowMult();
     }
+    interval = Math.round(interval * 10000) / 10000;
 
     return { base, reduction, interval };
 }
@@ -921,10 +923,8 @@ function _egBuildStatLine(bucket, stats) {
         // "Melee Strikes" category).
         case 'attackInterval': {
             if (typeof _egGetPlayerAttackIntervalBreakdown !== 'function') return null;
-            const { base, reduction, interval } = _egGetPlayerAttackIntervalBreakdown();
-            const value = reduction > 0 && base - reduction >= EG_PLAYER_MIN_ATTACK_INTERVAL
-                ? `${_egFormatStatValue(interval)}s (${_egFormatStatValue(base)}s − ${_egFormatStatValue(reduction)}s)`
-                : `${_egFormatStatValue(interval)}s`;
+            const { interval } = _egGetPlayerAttackIntervalBreakdown();
+            const value = `${_egFormatStatValue(interval)}s`;
             line = { label: t('eg_stat_attack_interval'), value };
             break;
         }

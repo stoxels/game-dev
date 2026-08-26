@@ -899,7 +899,7 @@ function _egGetMapRewardBonuses(map) {
 //------------------------------------------------------------------------
 //-------------------MAP COMPLETION REWARD--------------------------------
 //------------------------------------------------------------------------
-// Every map rolls a random completion reward: 4–10 copies of one
+// Every map rolls a random completion reward: 2–10 copies of one
 // higher-grade orb or essence (orbs of transmutation / augmentation are
 // excluded — too low level). The roll is baked in with the implicits so it
 // is fixed per map item and shown in its tooltip. Higher tiers unlock the
@@ -935,10 +935,13 @@ function _egGetCompletionRewardDef(id) {
     return EG_CURRENCY_DEFS[id] || EG_ESSENCE_DEFS[id] || null;
 }
 
-// Rolls the completion reward for a map of the given tier → { id, count }
-// with count between 4 and 10 (inclusive).
-function _egRollMapCompletionReward(mapTier) {
-    const tier = Math.max(1, mapTier || 1);
+// Rolls the completion reward for a map → { id, count }. The count scales
+// with map difficulty: higher tiers and more/higher-tier modifiers yield
+// bigger payouts (≈2–3 for an easy low-tier map with few mods, up to 8–10
+// for a fully modded max-tier map).
+function _egRollMapCompletionReward(map) {
+    const tier = Math.max(1, Math.min(EG_ATLAS_MAX_TIER, map.mapTier || 1));
+    const mods = Array.isArray(map.mods) ? map.mods : [];
     const pool = EG_MAP_COMPLETION_REWARD_POOL.filter(e => !e.minTier || tier >= e.minTier);
     const total = pool.reduce((s, e) => s + e.weight, 0);
     let roll = Math.random() * total;
@@ -947,7 +950,15 @@ function _egRollMapCompletionReward(mapTier) {
         roll -= entry.weight;
         if (roll <= 0) { picked = entry; break; }
     }
-    return { id: picked.id, count: 4 + Math.floor(Math.random() * 7) };
+    // Difficulty fraction: ~70% from atlas tier, ~30% from modifier load
+    // (each mod counts its tier, capped so a full modded map saturates).
+    const tierFrac = (tier - 1) / (EG_ATLAS_MAX_TIER - 1);
+    const modLoad = mods.reduce((s, m) => s + ((Number(m && m.tier) || 1)), 0);
+    const modFrac = Math.min(1, modLoad / 12);
+    const difficulty = tierFrac * 0.7 + modFrac * 0.3;
+    // 2 at zero difficulty up to 9, plus ±0/1 jitter → final range 2..10
+    const count = Math.max(2, Math.min(10, Math.round(2 + difficulty * 7 + Math.random())));
+    return { id: picked.id, count };
 }
 
 
@@ -1052,7 +1063,7 @@ function _egRollMapImplicits(map) {
 
     return {
         puzzles, questions, mistakes, durationSeconds: duration, sizeMix,
-        completionReward: _egRollMapCompletionReward(tier),
+        completionReward: _egRollMapCompletionReward(map),
     };
 }
 

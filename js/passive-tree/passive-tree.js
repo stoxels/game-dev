@@ -151,7 +151,10 @@ function buildPassiveTreeScreen() {
 
 // Opens the Probability Tree screen, remembering the current screen
 // (via _ptReturnScreen / _ptReturnWorldIndex) so ptGoBack() can restore it.
-function showPassiveTree() {
+// An optional returnScreen argument (e.g. 'screen-endgame-hub') overrides
+// the return target — used when the tree is opened from the endgame hub.
+function showPassiveTree(returnScreen) {
+    if (typeof returnScreen === 'string') _ptReturnScreen = returnScreen;
     buildPassiveTreeScreen();
     screenHistory.push(_ptReturnScreen);
     switchScreen('screen-passive-tree');
@@ -168,6 +171,8 @@ function ptGoBack() {
         showWorldDetail(_ptReturnWorldIndex);
     } else if (_ptReturnScreen === 'screen-map-view') {
         showMapView();
+    } else if (_ptReturnScreen === 'screen-endgame-hub' && typeof showEndgameHub === 'function') {
+        showEndgameHub();
     } else {
         switchScreen(_ptReturnScreen);
         if (typeof renderLevelSelect === 'function') renderLevelSelect();

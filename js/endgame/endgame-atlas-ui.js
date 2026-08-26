@@ -29,6 +29,10 @@ const EG_ATLAS_PAD_Y = 46;
 const EG_ATLAS_NODE_W = 112;
 const EG_ATLAS_NODE_H = 78;
 
+// Name of the global function the BACK button calls — set by
+// showEndgameAtlas(backFn). Defaults to the Probability Gate.
+let _egAtlasBackFn = 'showEndgameGate';
+
 let _egAtlasSelectedNodeId = null;
 
 
@@ -200,7 +204,7 @@ function _egAtlasBuildFullScreenHTML() {
     return `
 <div class="ega-layout">
     <div class="eg-topbar">
-        <button class="eg-back-btn" onclick="showEndgameGate()">${t('btn_back')}</button>
+        <button class="eg-back-btn" onclick="${_egAtlasBackFn}()">${t('btn_back')}</button>
         <span class="eg-topbar-title">${t('eg_atlas_title')}</span>
     </div>
     ${_egAtlasBuildHeaderHTML()}
@@ -382,7 +386,12 @@ function ensureEndgameAtlasScreen() {
 }
 
 // Entry point — opens the Atlas of Worlds screen.
-function showEndgameAtlas() {
+// An optional backFn argument (name of a global function, e.g.
+// 'showEndgameHub') overrides where the BACK button returns to — used
+// when the atlas is opened from the endgame hub character sheet.
+function showEndgameAtlas(backFn) {
+    if (typeof backFn === 'string') _egAtlasBackFn = backFn;
+    else _egAtlasBackFn = 'showEndgameGate';
     ensureEndgameAtlasScreen();
 
     if (typeof switchScreen === 'function') {

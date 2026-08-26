@@ -294,6 +294,12 @@ function _egBuildTopbarHTML() {
          onmouseenter="_egShowLevelBtnTooltip(event)"
          onmousemove="moveGameTooltip(event)"
          onmouseleave="hideGameTooltip()">✦ ${t('eg_lvl_button_label')}<span class="eg-level-badge" id="eg-level-badge"></span></button>
+    <button class="eg-level-btn"
+         onclick="showPassiveTree('screen-endgame-hub')">🌿 ${t('scr_probability_tree')}</button>
+    <button class="eg-level-btn"
+         onclick="showEndgameAtlas('showEndgameHub')">🗺 ${t('eg_atlas_title')}</button>
+    <button class="eg-level-btn"
+         onclick="showEndgameGate('showEndgameHub')">🎲 ${t('mg_gate_badge')}</button>
     <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
          onmouseenter="_egShowHubInfoTooltip(event)"
          onmousemove="moveGameTooltip(event)"

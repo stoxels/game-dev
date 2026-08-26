@@ -526,6 +526,7 @@ function _egBuildChainPool(criteria) {
         !level.isGeneratedPuzzle &&  // generated levels are launched directly
         !level.requiredKills &&
         !level.totalMonsters &&      // also exclude other map-starter levels
+        !(typeof isGatedLevel === 'function' && isGatedLevel(level.gIdx)) &&  // math gates are campaign-only
         _egPuzzlePassesCriteria(level, criteria)
     );
 
@@ -694,7 +695,7 @@ function _egRollBonusMapLoot() {
         .replace('{name}', item.name), _egRarityToastColor(item.rarity));
 }
 
-// Grants the active map's rolled completion reward (4–10× one higher-grade
+// Grants the active map's rolled completion reward (2–10× one higher-grade
 // orb or essence). Adds it to the real currency/essence stash AND to
 // _egRunCurrency so it shows up in the runes & orbs section of the
 // leave-map transition screen. Must run BEFORE _egShowLeaveMapTransition()
