@@ -292,16 +292,48 @@ function _egMapModsCategoryLabel(affects) {
     return t(keys[affects] || 'eg_mm_cat_monster');
 }
 
+// Fallback stat line for mods whose rolledStats carry no readable label
+// (e.g. maps persisted by older versions): rebuilds it from the family table.
+function _egMapModFallbackStatLabel(mod) {
+    if (!mod) return '';
+    const section = mod.type === 'prefix'
+        ? EG_MAP_MOD_TABLES.prefixes : EG_MAP_MOD_TABLES.suffixes;
+    const family = section && (section[mod.familyId]
+        || Object.values(section).find(f => f.id === mod.familyId));
+    if (!family) return '';
+
+    const label = (LANG === 'de' && family.labelDe) ? family.labelDe : family.label;
+    const value = _egGetActiveMapModValueFor(mod);
+    return value > 0 ? label.replace('#', value) : label;
+}
+
+// Best-effort rolled-value lookup for an arbitrary mod object.
+function _egGetActiveMapModValueFor(mod) {
+    if (Array.isArray(mod.rolledStats)) {
+        for (const stat of mod.rolledStats) {
+            const v = Number(typeof stat === 'number' ? stat : stat && stat.value);
+            if (v > 0) return v;
+        }
+    }
+    return Number(mod.value) || 0;
+}
+
 // Builds one modifier entry card.
 function _egBuildMapModEntryHTML(mod) {
     const affects = (typeof _egMapModAffects === 'function') ? _egMapModAffects(mod.familyId) : 'monster';
     const color = EG_MM_CATEGORY_COLORS[affects] || EG_MM_CATEGORY_COLORS.monster;
     const rewards = _egGetMapModRewards(mod.familyId, mod.tier);
 
-    const statLines = (mod.rolledStats || [])
-        .filter(stat => stat.label)
+    let statLines = (mod.rolledStats || [])
+        .filter(stat => stat && stat.label)
         .map(stat => `<div class="eg-mm-stat" style="color:${color}">${stat.label}</div>`)
         .join('');
+    if (!statLines) {
+        const fallback = _egMapModFallbackStatLabel(mod);
+        if (fallback) {
+            statLines = `<div class="eg-mm-stat" style="color:${color}">${fallback}</div>`;
+        }
+    }
 
     return `
 <div class="eg-mm-entry" style="border-left-color:${color}">

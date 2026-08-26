@@ -1372,6 +1372,7 @@ function _egHandleNormalMonsterKill(dying) {
     if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
     if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false);
     if (typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level);
+    if (typeof _egTryDropGold === 'function') _egTryDropGold(false, dying.level);
 }
 
 // Handles all post-kill logic for a boss monster death.
@@ -1381,6 +1382,7 @@ function _egHandleBossKill(dying) {
     if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
     if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
     if (typeof _egTryDropMap === 'function') _egTryDropMap(true, dying.level);
+    if (typeof _egTryDropGold === 'function') _egTryDropGold(true, dying.level);
 }
 
 // Removes a monster from the encounter after its death animation fires.

@@ -788,7 +788,6 @@ function egAddCurrency(id, amount = 1, def = null) {
             if (cell && cell.id === id) {
                 cell.count = (cell.count || 1) + amount;
                 _egRenderCurrencyCell(r, c);
-                console.log(`[DND] ${id} × ${amount} added → total ${cell.count}`);
                 return true;
             }
         }
@@ -806,7 +805,6 @@ function egAddCurrency(id, amount = 1, def = null) {
             if (!_egCurrencyStash[r][c]) {
                 _egCurrencyStash[r][c] = { ...def, id, count: amount };
                 _egRenderCurrencyCell(r, c);
-                console.log(`[DND] New stack: ${id} × ${amount}`);
                 return true;
             }
         }

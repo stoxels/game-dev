@@ -32,11 +32,19 @@ let _egActiveMapItem = null;
 
 // Returns the first rolled value for a map mod family on the active map,
 // or 0 when the mod is not present / no run is active.
+// Tolerates legacy/persisted mod shapes: falls back to a numeric
+// rolledStats entry or a flat `mod.value` field.
 function _egGetActiveMapModValue(familyId) {
     if (!_egActiveMapItem || !Array.isArray(_egActiveMapItem.mods)) return 0;
     const mod = _egActiveMapItem.mods.find(m => m.familyId === familyId);
-    if (!mod || !Array.isArray(mod.rolledStats) || mod.rolledStats.length === 0) return 0;
-    return Number(mod.rolledStats[0].value) || 0;
+    if (!mod) return 0;
+    if (Array.isArray(mod.rolledStats)) {
+        for (const stat of mod.rolledStats) {
+            const v = Number(typeof stat === 'number' ? stat : stat && stat.value);
+            if (v > 0) return v;
+        }
+    }
+    return Number(mod.value) || 0;
 }
 
 // True when the active map has the given mod family.

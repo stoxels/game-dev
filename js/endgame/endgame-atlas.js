@@ -293,7 +293,7 @@ function _egAtlasPersist() {
 // Marks the atlas node belonging to a successfully completed map run as
 // cleared and unlocks its connected regions. Called from _egEndMap()
 // (endgame-encounter-chain.js) while _egActiveMapItem is still set.
-// Returns the completed node or null when there was nothing to record.
+// Returns { node, firstClear, newlyUnlocked } or null when there was nothing to record.
 function _egAtlasOnMapCompleted(mapItem) {
     if (!mapItem || !mapItem.atlasNodeId) return null;
     const node = egAtlasNodeById(mapItem.atlasNodeId);
@@ -308,14 +308,15 @@ function _egAtlasOnMapCompleted(mapItem) {
 
     STATE.egAtlasCompleted[node.id] = true;
 
+    // Freshly reached regions (cap the spam on dense rows).
+    const newlyUnlocked = node.links
+        .filter(l => !wasUnlocked[l] && egAtlasIsUnlocked(l))
+        .slice(0, 3);
+
     if (firstClear) {
         showToast(t('eg_atlas_completed_toast')
             .replace('{n}', egAtlasNodeName(node)), '#f5d98a');
 
-        // Announce freshly reached regions (cap the spam on dense rows).
-        const newlyUnlocked = node.links
-            .filter(l => !wasUnlocked[l] && egAtlasIsUnlocked(l))
-            .slice(0, 3);
         newlyUnlocked.forEach(l => {
             showToast(t('eg_atlas_unlocked_toast')
                 .replace('{n}', `${egAtlasNodeName(egAtlasNodeById(l))} (${t('eg_map_tier_tt').replace('{n}', egAtlasNodeById(l).tier)})`), '#7fd67f');
@@ -323,5 +324,5 @@ function _egAtlasOnMapCompleted(mapItem) {
     }
 
     _egAtlasPersist();
-    return node;
+    return { node, firstClear, newlyUnlocked };
 }

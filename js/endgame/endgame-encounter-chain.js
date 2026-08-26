@@ -227,7 +227,11 @@ function _egLoadNextChainPuzzle() {
     _egCurrencyDrops.clear();
 
     const carriedItems = Array.from(_egItemDrops.values());
-    _egItemDrops.clear();                                      
+    _egItemDrops.clear();
+
+    const carriedGold = (typeof _egGoldDrops !== 'undefined')
+        ? Array.from(_egGoldDrops.values()) : [];
+    if (typeof _egGoldDrops !== 'undefined') _egGoldDrops.clear();
 
     // Unclaimed map drops are banked straight into the gate map stash
     // instead of being carried across puzzles.
@@ -235,6 +239,24 @@ function _egLoadNextChainPuzzle() {
 
     // Clear the stale map entries — overlays are already gone after buildGrid()
     _egLootDrops.clear();
+
+    // Discard instant-effect pickups (hearts, mistake eraser, cooldown surge).
+    // They apply to the current map only and are never carried across puzzles.
+    // Without this they linger as ghost entries in _egPickups (encounter stop
+    // is suppressed during transitions), blocking new pickup spawns via
+    // EG_PICKUP_MAX_ON_BOARD and polluting the eligibility filters below.
+    _egPickups.forEach((def, key) => _egRemovePickupOverlay(key));
+    _egPickups.clear();
+
+    // Cancel every pending drop-expiry timer from the old grid. The carried
+    // loot/currency/item/gold drops keep their ORIGINAL timers otherwise, and
+    // since re-placement reuses the same item objects, a stale timer whose key
+    // collides with the new cell would delete the freshly placed drop early.
+    _egPickupTimers.forEach(t => clearTimeout(t));
+    _egPickupTimers = [];
+    // NOTE: _egPickupSpawnTimer is intentionally NOT cleared — the spawner's
+    // recursive loop must survive the transition (_egStartEncounter is
+    // suppressed for chained puzzles, so nothing would restart it).
 
     const savedMonsters = _egMonsters.slice();
     const savedTargetId = _egTargetId;
@@ -264,6 +286,10 @@ function _egLoadNextChainPuzzle() {
 
     if (carriedItems.length > 0) {
         setTimeout(() => _egReplaceCarriedItemDrops(carriedItems), 400);
+    }
+
+    if (carriedGold.length > 0 && typeof _egReplaceCarriedGoldDrops === 'function') {
+        setTimeout(() => _egReplaceCarriedGoldDrops(carriedGold), 400);
     }
 }
 
@@ -607,13 +633,16 @@ function _egEndMap() {
 
     // Atlas: mark this run's region as cleared and unlock its connected
     // regions (see endgame-atlas.js). Must run before _egChainCleanup
-    // clears _egActiveMapItem.
-    if (typeof _egAtlasOnMapCompleted === 'function') _egAtlasOnMapCompleted(_egActiveMapItem);
+    // clears _egActiveMapItem. The result tells the win screen whether
+    // this was the very first clear of this atlas region.
+    const atlasResult = (typeof _egAtlasOnMapCompleted === 'function')
+        ? _egAtlasOnMapCompleted(_egActiveMapItem)
+        : null;
 
     // Show the overlay FIRST — it sits above the puzzle grid with normal
     // pointer-events, so it blocks every further click the instant this
     // runs, before any of the cleanup below happens.
-    _egShowLeaveMapTransition();
+    _egShowLeaveMapTransition(atlasResult);
 
     _egFlushRunLootToStash();
     if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
@@ -1299,7 +1328,7 @@ function _egWireLeaveMapSummaryTooltips(panel, state) {
 // deliberately uses pointer-events:none so clicks pass through), this one
 // keeps normal pointer-events so it swallows every click — that's what
 // actually fixes the "puzzle still clickable for 1-2s" issue.
-function _egShowLeaveMapTransition() {
+function _egShowLeaveMapTransition(atlasResult) {
     _egInjectLeaveMapTransitionStyles();
 
     let el = document.getElementById('eg-leave-map-transition');
@@ -1310,9 +1339,22 @@ function _egShowLeaveMapTransition() {
         document.body.appendChild(el);
     }
 
+    // Gold badge when this run cleared the region on the Atlas of Worlds
+    // for the very first time.
+    const isFirstClear = !!(atlasResult && atlasResult.firstClear && atlasResult.node);
+    let firstClearHTML = '';
+    if (isFirstClear) {
+        const node = atlasResult.node;
+        const tierLabel = t('eg_map_tier_tt').replace('{n}', node.tier);
+        firstClearHTML = `<div class="eg-leave-map-first-clear">✨ ${t('eg_atlas_first_clear')
+            .replace('{n}', egAtlasNodeName(node))
+            .replace('{t}', tierLabel)}</div>`;
+    }
+
     el.innerHTML = `
         <div class="eg-leave-map-panel">
             <div class="eg-leave-map-title">${t('eg_map_cleared')}</div>
+            ${firstClearHTML}
             <div id="eg-leave-summary-container"></div>
             <button class="eg-leave-map-return-btn" id="btn-eg-leave-map-return">${t('eg_return_to_nexus')}</button>
         </div>`;
@@ -1383,6 +1425,18 @@ function _egInjectLeaveMapTransitionStyles() {
             color: #fff;
             margin-bottom: 16px;
             letter-spacing: .05em;
+        }
+        .eg-leave-map-first-clear {
+            margin: -8px auto 16px auto;
+            padding: 6px 14px;
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f5d98a;
+            background: rgba(245, 217, 138, 0.08);
+            border: 1px solid rgba(245, 217, 138, 0.55);
+            border-radius: 999px;
+            text-shadow: 0 0 6px rgba(245, 217, 138, 0.4);
         }
         .eg-leave-summary-section { margin-bottom: 18px; }
         .eg-leave-summary-title {

@@ -926,6 +926,9 @@ function _egSpawnMapDrop(map) {
         }
     }, EG_LOOT_DROP_LIFETIME_MS);
     if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
+    if (typeof _egStartDropExpireCountdown === 'function') {
+        _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+    }
 }
 
 function _egRemoveMapDropOverlay(key) {
@@ -978,7 +981,8 @@ function _egCheckMapDropClaim(row, col) {
     Audio_Manager.playSFX('player_equip_pickup');
     showToast(t('eg_map_claimed')
         .replace('{icon}', map.icon || '')
-        .replace('{name}', map.name), _egRarityToastColor(map.rarity));
+        .replace('{name}', map.name)
+        .replace('{tier}', map.mapTier != null ? map.mapTier : '?'), _egRarityToastColor(map.rarity));
     egSaveHubState();
     return true;
 }

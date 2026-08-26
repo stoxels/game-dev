@@ -20,6 +20,10 @@ const EG_LOOT_DROP_CHANCE_BOSS = 1.00;  // bosses always drop
 // Intentionally longer than heart pickups — no rush to grab loot.
 const EG_LOOT_DROP_LIFETIME_MS = 60000;
 
+// How long (ms) before a drop expires its countdown timer appears above it.
+// Applies to every grid drop type: hearts, equipment, currency, items, maps.
+const EG_DROP_EXPIRE_WARNING_MS = 7000;
+
 // Hard cap: how many currency orbs may sit on the board at the same time.
 const EG_CURRENCY_DROP_MAX_ON_BOARD = 4;
 
@@ -257,6 +261,7 @@ function _egAnimatePickupClaim(row, col, def) {
 // Schedules the auto-expiry timer for a placed pickup.
 // Removes both the state entry and the DOM overlay when it fires.
 function _egSchedulePickupExpiry(key, def) {
+    const [r, c] = key.split('-').map(Number);
     const timer = setTimeout(() => {
         // Only remove if this exact def is still sitting on the key
         // (prevents a race where the pickup was already claimed).
@@ -266,6 +271,78 @@ function _egSchedulePickupExpiry(key, def) {
         }
     }, EG_PICKUP_LIFETIME_MS);
     _egPickupTimers.push(timer);
+
+    _egStartDropExpireCountdown(`eg-pickup-${r}-${c}`, EG_PICKUP_LIFETIME_MS);
+}
+
+// Shows a live countdown above a drop overlay during its final
+// EG_DROP_EXPIRE_WARNING_MS milliseconds, so the player knows the drop is
+// about to vanish. The badge lives INSIDE the overlay span, so removing the
+// overlay (claim / discard / expiry) removes the countdown with it; the
+// polling interval self-terminates once the overlay is gone.
+// Call right after scheduling any drop's expiry timeout.
+function _egStartDropExpireCountdown(overlayId, lifetimeMs) {
+    if (_egExpireCountdownStylesInjected()) _egInjectExpireCountdownStyles();
+    const startedAt = Date.now();
+    let interval = null;
+
+    const tick = () => {
+        const overlay = document.getElementById(overlayId);
+        if (!overlay) {
+            if (interval) { clearInterval(interval); interval = null; }
+            return;
+        }
+        const remaining = lifetimeMs - (Date.now() - startedAt);
+        if (remaining <= 0) return;
+
+        let badge = overlay.querySelector('.eg-drop-expire-timer');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'eg-drop-expire-timer';
+            overlay.appendChild(badge);
+        }
+        badge.textContent = Math.ceil(remaining / 1000);
+    };
+
+    setTimeout(() => {
+        tick();
+        interval = setInterval(tick, 250);
+    }, Math.max(0, lifetimeMs - EG_DROP_EXPIRE_WARNING_MS));
+}
+
+function _egExpireCountdownStylesInjected() {
+    return !document.getElementById('eg-drop-expire-timer-styles');
+}
+
+function _egInjectExpireCountdownStyles() {
+    const style = document.createElement('style');
+    style.id = 'eg-drop-expire-timer-styles';
+    style.textContent = `
+        .eg-drop-expire-timer {
+            position: absolute;
+            top: -1.4em;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+            font-weight: bold;
+            font-family: var(--PX, monospace);
+            color: #ff5a5a;
+            text-shadow: 0 0 3px #000, 0 0 6px rgba(255,90,90,0.8);
+            background: rgba(15, 10, 5, 0.75);
+            border: 1px solid rgba(255, 90, 90, 0.6);
+            border-radius: 4px;
+            padding: 0 3px;
+            line-height: 1.3;
+            white-space: nowrap;
+            pointer-events: none;
+            animation: eg-expire-tick-pulse 1s ease-in-out infinite;
+        }
+        @keyframes eg-expire-tick-pulse {
+            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+            50%      { opacity: 0.55; transform: translateX(-50%) scale(0.92); }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 
@@ -359,6 +436,7 @@ function _egStopPickupSpawner() {
     if (typeof _egStopLootDrops === 'function') _egStopLootDrops();
     if (typeof _egStopCurrencyDrops === 'function') _egStopCurrencyDrops();
     if (typeof _egStopItemDrops === 'function') _egStopItemDrops();
+    if (typeof _egStopGoldDrops === 'function') _egStopGoldDrops();
 }
 
 
@@ -510,6 +588,7 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
         }
     }, EG_LOOT_DROP_LIFETIME_MS);
     _egPickupTimers.push(timer); // reuse existing timer array so stop() cleans up
+    _egStartDropExpireCountdown(`eg-loot-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
 }
 
 // Called from renderCell whenever a cell becomes visually revealed
@@ -527,6 +606,7 @@ function _egAutoClaimDropsOnReveal(row, col) {
     else if (_egCurrencyDrops.has(key)) _egCheckCurrencyDropClaim(row, col);
     else if (_egItemDrops.has(key)) _egCheckItemDropClaim(row, col);
     else if (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key)) _egCheckMapDropClaim(row, col);
+    else if (typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(key)) _egCheckGoldDropClaim(row, col);
 }
 
 // Called when the player correctly claims the cell that holds a loot drop.
@@ -612,7 +692,9 @@ function _egReplaceCarriedLootDrops(items) {
         if (_egLootDrops.size >= 1) return;
 
         const pool = _egBuildPickupEligiblePool();
-        const filtered = pool.filter(([r, c]) => !_egPickups.has(`${r}-${c}`));
+        const filtered = pool.filter(([r, c]) => !_egPickups.has(`${r}-${c}`)
+            && !_egCurrencyDrops.has(`${r}-${c}`) && !_egItemDrops.has(`${r}-${c}`)
+            && !(typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(`${r}-${c}`)));
         if (filtered.length === 0) return;
 
         const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
@@ -628,6 +710,7 @@ function _egReplaceCarriedLootDrops(items) {
             }
         }, EG_LOOT_DROP_LIFETIME_MS);
         _egPickupTimers.push(timer);
+        _egStartDropExpireCountdown(`eg-loot-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
     });
 
     if (items.length > 0) showToast(t('eg_loot_carried'));
@@ -701,6 +784,7 @@ function _egSpawnCurrencyDrop(def) {
         }
     }, EG_LOOT_DROP_LIFETIME_MS);
     _egPickupTimers.push(timer);
+    _egStartDropExpireCountdown(`eg-currency-drop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
 }
 
 // Tracks a claimed currency drop for the leave-map summary screen.
@@ -782,6 +866,8 @@ function _egReplaceCarriedCurrencyDrops(defs) {
         const pool = _egBuildPickupEligiblePool();
         const filtered = pool.filter(([r, c]) =>
             !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`) && !_egCurrencyDrops.has(`${r}-${c}`)
+            && !_egItemDrops.has(`${r}-${c}`)
+            && !(typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(`${r}-${c}`))
         );
         if (filtered.length === 0) return;
 
@@ -798,6 +884,7 @@ function _egReplaceCarriedCurrencyDrops(defs) {
             }
         }, EG_LOOT_DROP_LIFETIME_MS);
         _egPickupTimers.push(timer);
+        _egStartDropExpireCountdown(`eg-currency-drop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
     });
 }
 
@@ -897,6 +984,7 @@ function _egSpawnItemDrop(isBoss = false) {
         }
     }, EG_LOOT_DROP_LIFETIME_MS);
     _egPickupTimers.push(timer);
+    _egStartDropExpireCountdown(`eg-item-drop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
 }
 
 // Called on correct action on the cell holding a regular-item drop.
@@ -968,6 +1056,7 @@ function _egReplaceCarriedItemDrops(drops) {
         const filtered = pool.filter(([r, c]) =>
             !_egPickups.has(`${r}-${c}`) && !_egLootDrops.has(`${r}-${c}`)
             && !_egCurrencyDrops.has(`${r}-${c}`)
+            && !(typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(`${r}-${c}`))
         );
         if (filtered.length === 0) return;
 
@@ -984,5 +1073,6 @@ function _egReplaceCarriedItemDrops(drops) {
             }
         }, EG_LOOT_DROP_LIFETIME_MS);
         _egPickupTimers.push(timer);
+        _egStartDropExpireCountdown(`eg-item-drop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
     });
 }

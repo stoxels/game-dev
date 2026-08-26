@@ -518,12 +518,17 @@ function _egHzInitDarkness(intensity) {
         el.style.opacity = opacity.toFixed(2);
         el.style.setProperty('--hz-cloud-scale', scale.toFixed(2));
         darkLayer.appendChild(el);
-        clouds.push({
+        const cloud = {
             x: _egHzRand(-100, window.innerWidth),
             y: _egHzRand(0, Math.max(1, window.innerHeight - 160)),
             vx: (i % 2 === 0 ? 1 : -1) * _egHzRand(6, 14), // gentle drift
             el,
-        });
+        };
+        // Place immediately so clouds never flash at the top-left corner
+        // before the first tick positions them.
+        el.style.transform =
+            `translate(${Math.round(cloud.x)}px, ${Math.round(cloud.y)}px) scale(var(--hz-cloud-scale, 1))`;
+        clouds.push(cloud);
     }
     document.body.appendChild(darkLayer);
     _egHzDarkness = { clouds, layer: darkLayer };

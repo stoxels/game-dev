@@ -66,7 +66,12 @@ const EG_ART = (function () {
     }
 
     // One fetch for the whole game — replaces hundreds of probe requests.
-    fetch(MANIFEST_URL)
+    // Skipped entirely on file:// — fetch() is blocked by CORS there and the
+    // lazy probe fallback below handles local dev without console noise.
+    const _manifestFetch = (location.protocol === 'file:')
+        ? Promise.reject(new Error('file protocol'))
+        : fetch(MANIFEST_URL);
+    _manifestFetch
         .then(function (res) {
             if (!res.ok) throw new Error('manifest http ' + res.status);
             return res.json();

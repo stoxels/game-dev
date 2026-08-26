@@ -5,7 +5,7 @@
 //========================================================================
 //=  Central hub screen for the endgame system. Reached from the mode    =
 //=  select screen ("Endgame Test") and from all "Return to Nexus"       =
-//=  flows. Contains exactly three doors:                                =
+//=  flows. Contains the following doors:                                =
 //=                                                                      =
 //=    1. Endgame Test Maps        -> showEndgameTestHub()               =
 //=       (endgame-testing-screen.js)                                    =
@@ -13,6 +13,9 @@
 //=       (endgame-hub.js)                                               =
 //=    3. Probability Gate         -> showEndgameGate()                  =
 //=       (endgame-gate.js)                                              =
+//=    4. Atlas of Worlds          -> showEndgameAtlas()                 =
+//=    5. Map Vendor               -> showEndgameVendor()                =
+//=       (endgame-vendor.js)                                            =
 //=                                                                      =
 //=  All three child screens navigate BACK to this screen, so the Nexus  =
 //=  is the single anchor of the endgame screen cluster.                 =
@@ -55,6 +58,7 @@ function _egnBuildFullScreenHTML() {
         ${_egnBuildDoorHTML('🧙', 'eg_char_sheet_title', 'showEndgameHub()')}
         ${_egnBuildDoorHTML('🎲', 'mg_gate_badge', 'showEndgameGate()')}
         ${_egnBuildDoorHTML('🗺️', 'eg_atlas_title', 'showEndgameAtlas()')}
+        ${_egnBuildDoorHTML('💰', 'eg_vendor_title', 'showEndgameVendor()')}
     </div>
 </div>`;
 }

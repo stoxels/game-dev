@@ -71,6 +71,7 @@ function _egDiscardAllDrops(row, col) {
     if (typeof _egDiscardCurrencyDrop === 'function') _egDiscardCurrencyDrop(row, col);
     if (typeof _egDiscardItemDrop === 'function') _egDiscardItemDrop(row, col);
     if (typeof _egDiscardMapDrop === 'function') _egDiscardMapDrop(row, col);
+    if (typeof _egDiscardGoldDrop === 'function') _egDiscardGoldDrop(row, col);
 }
 
 // Endgame: claims any pickup, loot drop, or currency drop sitting on a
@@ -83,6 +84,7 @@ function _egCheckAllClaims(row, col) {
     if (typeof _egCheckCurrencyDropClaim === 'function') _egCheckCurrencyDropClaim(row, col);
     if (typeof _egCheckItemDropClaim === 'function') _egCheckItemDropClaim(row, col);
     if (typeof _egCheckMapDropClaim === 'function') _egCheckMapDropClaim(row, col);
+    if (typeof _egCheckGoldDropClaim === 'function') _egCheckGoldDropClaim(row, col);
 }
 
 
@@ -733,13 +735,9 @@ function applyCell(row, col) {
 
     Audio_Manager.playSFX('cellMark');
 
-    // Endgame: right-click mark on a correct cell discards a pickup heart
-    if (isEndgameLevel() && typeof _egDiscardPickup === 'function'
-        && pval === 2 && cur.grid[row][col] === 1) {
-        _egDiscardPickup(row, col);
-        _egDiscardLootDrop(row, col);
-        if (typeof _egDiscardCurrencyDrop === 'function') _egDiscardCurrencyDrop(row, col);
-        if (typeof _egDiscardItemDrop === 'function') _egDiscardItemDrop(row, col);
+    // Endgame: right-click mark on a correct cell discards any drop sitting there
+    if (isEndgameLevel() && pval === 2 && cur.grid[row][col] === 1) {
+        _egDiscardAllDrops(row, col);
     }
 
     // Write the new value into the player grid
