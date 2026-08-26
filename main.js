@@ -58,6 +58,7 @@ const DECO_PANELS = [
 //------------------------------------------------------------------------
 
 // On endgame maps the pause menu offers "Return to Nexus" instead of "Levels".
+// Returns whether the current level is an endgame map.
 function _updatePauseMenuReturnButtons() {
     const onEndgameMap = typeof cur !== 'undefined' && cur &&
         (cur.isMonsterLevel || cur.isEndgameSandbox);
@@ -65,6 +66,7 @@ function _updatePauseMenuReturnButtons() {
     const nexusBtn = document.getElementById('btn-go-nexus');
     if (levelsBtn) levelsBtn.style.display = onEndgameMap ? 'none' : '';
     if (nexusBtn) nexusBtn.style.display = onEndgameMap ? '' : 'none';
+    return onEndgameMap;
 }
 
 // Shows the pause overlay and stops the timer.
@@ -73,7 +75,13 @@ function pauseGame() {
     if (_gamePaused || dead) return;
     _gamePaused = true;
     pauseTimer(); // defined in timer.js
-    _updatePauseMenuReturnButtons();
+    const onEndgameMap = _updatePauseMenuReturnButtons();
+    // Endgame variant: hide level number / score / hint / bonus, show the
+    // run's collected loot (with hover tooltips) instead.
+    document.getElementById('pause-overlay').classList.toggle('eg-pause', onEndgameMap);
+    if (onEndgameMap && typeof _egRenderPauseLootSummary === 'function') {
+        _egRenderPauseLootSummary();
+    }
     document.getElementById('pause-overlay').classList.add('show');
 }
 

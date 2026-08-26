@@ -90,10 +90,14 @@ function _buildTooltipCooldownLine(cooldownSeconds) {
     return `<span style="opacity:.55;font-size:.85em">⏱ CD: ${cdStr}</span>`;
 }
 
-// Builds the mana-cost footer line used inside skill tooltips.
+// Builds the cost footer line used inside skill tooltips.
 // e.g. "✦ 50 Mana" — omitted entirely for abilities without a cost.
+// Under Blood Magic the cost is paid from life instead: "✚ 50 Life".
 function _buildTooltipManaLine(manaCost) {
     if (!manaCost) return '';
+    if (typeof _bloodMagicActive === 'function' && _bloodMagicActive()) {
+        return ` <span style="color:#e05555;font-size:.85em">✚ ${manaCost} ${t('cls_life')}</span>`;
+    }
     return ` <span style="color:#7fb3ff;font-size:.85em">✦ ${manaCost} ${t('cls_mana')}</span>`;
 }
 

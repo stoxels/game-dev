@@ -380,8 +380,8 @@ function _fireInstantBaseAbility(slot) {
     const actData = _getActiveAbilityData(def, slot);
     const effect = actData.effect;
 
-    // Pay the mana cost — abort without firing if it can't be covered.
-    if (!spendMana(_getAbilityManaCost(slot))) return;
+    // Pay the cost (life under Blood Magic) — abort without firing if it can't be covered.
+    if (!payAbilityCost(_getAbilityManaCost(slot))) return;
 
     // Row/col are 0,0 — instant abilities ignore position.
     _dispatchBaseAbility(slot, STATE.playerClass, 0, 0, effect);
@@ -400,8 +400,8 @@ function _fireInstantAscendencyAbility(slot) {
     const { asc, ascSlot, actData } = slotData;
     const effect = actData.effect;
 
-    // Pay the mana cost — abort without firing if it can't be covered.
-    if (!spendMana(_getAbilityManaCost(slot))) return;
+    // Pay the cost (life under Blood Magic) — abort without firing if it can't be covered.
+    if (!payAbilityCost(_getAbilityManaCost(slot))) return;
 
     // Row/col are 0,0 — instant abilities ignore position.
     _dispatchAscendencyAbility(slot, STATE.playerAscendency, 0, 0, effect);
@@ -460,9 +460,10 @@ function toggleActiveAbility(slot) {
         return;
     }
 
-    // Mana gate: the ability must be payable before it can be armed or fired.
+    // Affordability gate: the ability must be payable before it can be armed
+    // or fired. Under Blood Magic the cost comes from life instead of mana.
     if (!_abilityCanAfford(newSlot)) {
-        showToast(t('cls_no_mana'));
+        showToast(t(_bloodMagicActive() ? 'cls_no_life' : 'cls_no_mana'));
         return;
     }
 
@@ -506,8 +507,8 @@ function _executeAscendencySkillOnCell(activeKey, row, col) {
     const { asc, ascSlot, actData } = slotData;
     const effect = actData.effect;
 
-    // Pay the mana cost — abort without firing if it can't be covered.
-    if (!spendMana(_getAbilityManaCost(activeKey))) return;
+    // Pay the cost (life under Blood Magic) — abort without firing if it can't be covered.
+    if (!payAbilityCost(_getAbilityManaCost(activeKey))) return;
 
     _dispatchAscendencyAbility(activeKey, STATE.playerAscendency, row, col, effect);
 
@@ -526,9 +527,9 @@ function _executeBaseSkillOnCell(activeKey, row, col) {
     const actData = _getActiveAbilityData(def, activeKey);
     const effect = actData.effect;
 
-    // Pay the mana cost — abort without firing if it can't be covered.
-    if (!spendMana(_getAbilityManaCost(activeKey))) {
-        showToast(t('cls_no_mana'));
+    // Pay the cost (life under Blood Magic) — abort without firing if it can't be covered.
+    if (!payAbilityCost(_getAbilityManaCost(activeKey))) {
+        showToast(t(_bloodMagicActive() ? 'cls_no_life' : 'cls_no_mana'));
         return;
     }
 

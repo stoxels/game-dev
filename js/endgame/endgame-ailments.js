@@ -101,6 +101,8 @@ function _egApplyStatusToMap(statusMap, key, durationS, dps) {
 // Applies an ailment to a monster (or refreshes an existing one).
 function _egApplyMonsterAilment(monster, key, dps) {
     if (!monster) return;
+    // Active map run: monsters may avoid ailments entirely (PoE purity).
+    if ((monster.avoidAilmentPct || 0) > 0 && Math.random() * 100 < monster.avoidAilmentPct) return;
     if (!monster.statuses) monster.statuses = {};
     const durationS = ({
         ignite: EG_AIL_IGNITE_DURATION_S,
@@ -125,7 +127,13 @@ function _egApplyPlayerAilment(key, dps) {
         polymorph: EG_AIL_POLYMORPH_DURATION_S,
     })[key];
     if (!durationS) return;
-    _egApplyStatusToMap(_egPlayerStatuses, key, durationS, dps);
+    // Active map run: "Ailments on you last #% longer".
+    let scaled = durationS;
+    if (typeof _egGetActiveMapModValue === 'function') {
+        const longerPct = _egGetActiveMapModValue('map_longer_ailments');
+        if (longerPct > 0) scaled = durationS * (1 + Math.min(100, longerPct) / 100);
+    }
+    _egApplyStatusToMap(_egPlayerStatuses, key, scaled, dps);
     _egStartPlayerStatusBarTicker();
     showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph — the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
 }
@@ -235,6 +243,10 @@ function _egPlayerHasAilment(key) {
 function _egGetPlayerChargeMultiplier() {
     if (!_egIsActive()) return 1;
     if (_egPlayerHasAilment('frozen')) return 0;
+    // Active map run: a permanent icy aura chills the player.
+    if (typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_chilling_aura')) {
+        return EG_AIL_CHARGE_SLOW_MULT;
+    }
     if (_egPlayerHasAilment('chill')) return EG_AIL_CHARGE_SLOW_MULT;
     return 1;
 }
@@ -299,7 +311,11 @@ function _egRollPlayerHitAilments(target, amount, elements) {
 
 function _egRollMonsterHitAilment(element, dealt) {
     if (!_egIsActive() || !element || !(dealt > 0)) return;
-    if (Math.random() * 100 >= EG_MONSTER_AILMENT_CHANCE_PCT) return;
+    // Active map run: "Monster Hits have +#% chance to inflict Ailments".
+    const ailChance = EG_MONSTER_AILMENT_CHANCE_PCT +
+        ((typeof _egGetActiveMapModValue === 'function')
+            ? _egGetActiveMapModValue('map_monster_ailments') : 0);
+    if (Math.random() * 100 >= ailChance) return;
 
     switch (element) {
         case 'fire':
@@ -307,6 +323,11 @@ function _egRollMonsterHitAilment(element, dealt) {
             break;
         case 'cold':
             _egApplyPlayerAilment('chill');
+            // Active map run: monster cold hits may freeze the player.
+            if (typeof _egGetActiveMapModValue === 'function'
+                && Math.random() * 100 < _egGetActiveMapModValue('map_freezing_hits')) {
+                _egApplyPlayerAilment('frozen');
+            }
             break;
         case 'lightning':
             _egApplyPlayerAilment('shocked');
@@ -332,6 +353,12 @@ function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
     if (typeof dead !== 'undefined' && dead) return;
 
     let amount = rawAmount;
+
+    // Active map run: "#% increased Damage over Time taken".
+    if (typeof _egGetActiveMapModValue === 'function') {
+        const dotPct = _egGetActiveMapModValue('map_increased_dot');
+        if (dotPct > 0) amount *= (1 + dotPct / 100);
+    }
 
     if (!ignoreShield && _egPlayerAbsorptionCurrent > 0) {
         const absorbed = Math.min(_egPlayerAbsorptionCurrent, amount);
@@ -493,7 +520,11 @@ function _egRefreshPlayerStatusIcons() {
 function _egMaybePuzzleAttack(monster) {
     if (!_egIsActive()) return false;
     if (!monster || !monster.element) return false;
-    if (Math.random() * 100 >= EG_PUZZLE_ATTACK_CHANCE_PCT) return false;
+    // Active map run: "Monster Attacks have +#% chance to strike the Puzzle".
+    const aggroChance = EG_PUZZLE_ATTACK_CHANCE_PCT +
+        ((typeof _egGetActiveMapModValue === 'function')
+            ? _egGetActiveMapModValue('map_monster_puzzle_aggro') : 0);
+    if (Math.random() * 100 >= aggroChance) return false;
 
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
     const grid = document.getElementById('ptable');

@@ -71,34 +71,31 @@ function _bayesTrapTypeInfo(type) {
 function _buildQueuedTrapsHTML(trapsQueue) {
     if (trapsQueue.length === 0) return '';
 
-    const queuedLabels = trapsQueue.map(t => {
+    const chips = trapsQueue.map(t => {
         const info = _bayesTrapTypeInfo(t.type);
-        return `<span style="color:${info.color}">${info.icon} ${info.label}</span>`;
-    }).join('  ');
+        return `<span class="bayes-queued-chip" style="color:${info.color};
+                     border:1px solid ${info.color}55;">${info.icon} ${info.label}</span>`;
+    }).join('');
 
     const label = t('cls_already_chosen');
 
-    return `<div style="font-family:var(--PX);font-size:9px;color:#aaa;
-                        margin-bottom:10px;line-height:1.8;">
-                ${label}: ${queuedLabels}
+    return `<div class="bayes-queued">
+                <div class="bayes-queued-label">${label}</div>
+                ${chips}
             </div>`;
 }
 
 // Builds one selection button per available trap type.
 function _buildTrapTypeButtonsHTML(availableTraps) {
-    return availableTraps.map(type => {
+    return `<div class="bayes-trap-list">` + availableTraps.map(type => {
         const info = _bayesTrapTypeInfo(type);
         return `
             <button onclick="_bayesTrapsSelectType('${type}')"
-                style="font-family:var(--PX); font-size:9px; background:transparent;
-                       border:1px solid ${info.color}; color:${info.color};
-                       padding:8px 14px; cursor:pointer; letter-spacing:1px;
-                       margin:4px; border-radius:4px; display:block; width:90%;
-                       text-align:left; line-height:1.6;">
-                ${info.icon} <strong>${info.label}</strong><br>
-                <span style="opacity:.7; font-size:8px;">${info.hint}</span>
+                class="bayes-trap-btn" style="--trap-color:${info.color};">
+                ${info.icon} <span class="bayes-trap-btn-name">${info.label}</span>
+                <span class="bayes-trap-btn-hint">${info.hint}</span>
             </button>`;
-    }).join('');
+    }).join('') + `</div>`;
 }
 
 // Assembles the full inner HTML for the trap selection overlay modal.
@@ -114,28 +111,12 @@ function _buildSelectOverlayHTML(state) {
     const queuedHTML = _buildQueuedTrapsHTML(state.trapsQueue);
 
     return `
-        <div class="modal-box" style="text-align:center; border-left:4px solid #27ae60;
-             max-width:380px; max-height:80vh; overflow-y:auto;">
-            <div style="font-family:var(--PX);font-size:13px;color:#27ae60;
-                        letter-spacing:2px;margin-bottom:6px;">
-                🧪 ${title}
-            </div>
-            <div style="font-family:var(--PX);font-size:10px;color:var(--accent2);
-                        margin-bottom:12px;line-height:1.8;">
-                ${prompt}
-            </div>
+        <div class="modal-box bayes-modal">
+            <div class="bayes-modal-title">🧪 ${title}</div>
+            <div class="bayes-modal-prompt">${prompt}</div>
             ${queuedHTML}
-            <div style="display:flex;flex-direction:column;align-items:center;">
-                ${trapBtns}
-            </div>
-            <div style="margin-top:14px;">
-                <button onclick="_bayesTrapsCancel()"
-                    style="font-family:var(--PX);font-size:9px;background:transparent;
-                           border:1px solid #444;color:#555;padding:5px 14px;
-                           cursor:pointer;letter-spacing:1px;">
-                    ${cancelLabel}
-                </button>
-            </div>
+            ${trapBtns}
+            <button onclick="_bayesTrapsCancel()" class="bayes-modal-cancel">${cancelLabel}</button>
         </div>`;
 }
 

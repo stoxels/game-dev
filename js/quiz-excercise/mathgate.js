@@ -262,6 +262,7 @@ function mgResetModalInputState() {
     const inputEl = document.getElementById('mg-answer-input');
     if (inputEl) {
         inputEl.value = '';
+        inputEl.disabled = false;
         inputEl.placeholder = t('mg_placeholder'); // re-set so translation stays current
     }
 
@@ -463,6 +464,7 @@ function mgHandleTutorSuccess() {
     showMgFeedback(msg, true);
     document.getElementById('mg-tutor-btn').style.display = 'none';
     document.getElementById('mg-submit-btn').disabled = true;
+    document.getElementById('mg-answer-input').disabled = true; // prevent re-submission via Enter key
 
     mgMarkGatePassed(gi);
     questStat_tutorAnsweredCorrect();
@@ -646,6 +648,7 @@ function mgHandleCorrectAnswer() {
 
     mgMarkGatePassed(gi);
     document.getElementById('mg-submit-btn').disabled = true;
+    document.getElementById('mg-answer-input').disabled = true; // prevent re-submission via Enter key
     document.getElementById('mg-tutor-btn').style.display = 'none';
 
     trackAchStat('questionsCorrect');
@@ -655,6 +658,10 @@ function mgHandleCorrectAnswer() {
     Audio_Manager.playSFX('quizCorrect');
 
     if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
+
+    // Endgame reward: roll a temporary damage buff / life heal / mana restore
+    if (typeof _egIsActive === 'function' && _egIsActive()
+        && typeof _egApplyQuizRewardBuff === 'function') _egApplyQuizRewardBuff();
 
     _mgRefreshWhyButton();
     document.getElementById('mg-continue-btn').style.display = 'inline-block'; 

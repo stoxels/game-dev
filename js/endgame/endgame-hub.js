@@ -547,8 +547,9 @@ function _egRenderStatsList() {
 
 
 // Builds the hover tooltip body for a single stat row: stat name as the
-// title plus its mechanic description. Uses the shared game tooltip engine
-// from tooltips-hud.js, so the visual style matches every other tooltip.
+// title plus its mechanic description. For armour and evasion the live
+// combat values (damage reduction / dodge chance) are appended, using the
+// exact formulas from endgame-player-stats.js.
 function _egBuildStatDescTooltipHTML(descKey, label) {
     let html = `<strong style="color:var(--accent,#66fcf1)">${label}</strong>`;
     if (descKey) {
@@ -556,6 +557,36 @@ function _egBuildStatDescTooltipHTML(descKey, label) {
         // t() falls back to the raw key when a translation is missing
         if (desc && desc !== descKey) {
             html += `<br><span style="opacity:.75;font-size:.9em">${desc}</span>`;
+        }
+        const stats = _egComputePlayerStats();
+        // Armour/evasion live values are measured against a representative
+        // monster: the current target's level, else the encounter's base
+        // level — same convention as the accuracy tooltip below.
+        const hasLevelCtx = typeof _egGetTarget === 'function' && typeof _egGetEncounterBaseLevel === 'function';
+        const refMonsterLevel = hasLevelCtx
+            ? ((_egGetTarget() && _egGetTarget().level) || _egGetEncounterBaseLevel() || 1)
+            : 1;
+        if (descKey === 'eg_statdesc_armour') {
+            // Representative raw hit size at the reference level (matches the
+            // average monster base damage scaled by the per-level damage curve).
+            const refDamage = Math.round(12 * (1 + 0.12 * (refMonsterLevel - 1)));
+            const reductionPct = _egCalcArmourReductionPct(stats.armour, refDamage) * 100;
+            html += `<br><span style="color:var(--accent,#66fcf1)">${t('eg_statdesc_armour_value').replace('{p}', reductionPct.toFixed(1))}</span>`;
+        } else if (descKey === 'eg_statdesc_evasion') {
+            const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, refMonsterLevel));
+            html += `<br><span style="color:var(--accent,#66fcf1)">${t('eg_statdesc_evasion_value').replace('{p}', dodgeChance.toFixed(1))}</span>`;
+        } else if (descKey === 'eg_statdesc_accuracy'
+            && typeof _egGetTarget === 'function' && typeof _egGetEncounterBaseLevel === 'function') {
+            // Live miss chance for melee strikes AND projectiles, measured
+            // against the current target's level (falls back to the
+            // encounter's base level when nothing is targeted).
+            const target = _egGetTarget();
+            const monsterLevel = (target && target.level) || _egGetEncounterBaseLevel() || 1;
+            const missPct = _egCalcAccuracyMissChance(stats.accuracy, monsterLevel);
+            const label = t('eg_statdesc_accuracy_value')
+                .replace('{p}', missPct.toFixed(1))
+                .replace('{n}', monsterLevel);
+            html += `<br><span style="color:var(--accent,#66fcf1)">${label}</span>`;
         }
     }
     return html;
@@ -638,9 +669,11 @@ function _egBuildTooltipBodyHTML(item) {
         ranged: 'eg_slot_ranged',
     };
 
-    const rarityLabel = EG_TT_RARITY_KEYS[rarity]
-        ? t(EG_TT_RARITY_KEYS[rarity])
-        : rarity.charAt(0).toUpperCase() + rarity.slice(1);
+    const rarityLabel = item.isUnique
+        ? t('rar_unique')
+        : EG_TT_RARITY_KEYS[rarity]
+            ? t(EG_TT_RARITY_KEYS[rarity])
+            : rarity.charAt(0).toUpperCase() + rarity.slice(1);
     const slotLabel = item.slotType
         ? (EG_TT_SLOT_KEYS[item.slotType]
             ? t(EG_TT_SLOT_KEYS[item.slotType])
@@ -690,7 +723,11 @@ function _egBuildTooltipBodyHTML(item) {
         // Only the melee weapon slot has an auto-strike interval — ranged
         // weapons scale the input-driven projectile channel instead.
         if (item.slotType === 'weapon') {
-            implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attack_interval')}: <span class="eg-tt-val">${item.attackIntervalSeconds}s</span></div>`);
+            let atkEff = null;
+            try { atkEff = _egGetItemEffectiveAttackInterval(item); } catch (e) { atkEff = null; }
+            const interval = (atkEff && atkEff.interval != null) ? atkEff.interval : item.attackIntervalSeconds;
+            const valCls = (atkEff && atkEff.modded) ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
+            implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attack_interval')}: <span class="${valCls}">${interval}s</span></div>`);
         }
     }
     if (item.blockChance) {
@@ -749,17 +786,25 @@ function _egBuildTooltipBodyHTML(item) {
     const mods = Array.isArray(item.mods) ? item.mods : [];
     let modsHTML = '';
     if (mods.length > 0) {
-        const lines = [];
-        for (const mod of mods) {
-            if (!Array.isArray(mod.rolledStats)) continue;
-            for (const stat of mod.rolledStats) {
-                if (stat.label) lines.push(`<div class="eg-tt-mod">${stat.label}</div>`);
-            }
-        }
+        // Mods sharing the same stat (e.g. flat Health + the Health half of
+        // a hybrid roll) are merged into one combined line per stat.
+        const mergedLines = _egBuildMergedModLines(mods);
+        const lines = mergedLines.map(entry => {
+            // Unique downsides render in warning red instead of mod blue.
+            const cls = entry.downside ? 'eg-tt-mod eg-tt-mod-downside' : 'eg-tt-mod';
+            return `<div class="${cls}">${entry.label}</div>`;
+        });
         if (lines.length) {
             modsHTML = `<div class="eg-tt-section eg-tt-mods-section">${lines.join('')}</div>`;
         }
     }
+
+    // ── Unique flavor text ────────────────────────────────────────────
+    const flavorHTML = item.isUnique
+        ? `<div class="eg-tt-section"><div class="eg-tt-flavor">${LANG === 'de'
+            ? (item.flavorDe || item.flavorEn || '')
+            : (item.flavorEn || item.flavorDe || '')}</div></div>`
+        : '';
 
     // ── Item level ────────────────────────────────────────────────────
     const ilvlHTML = item.itemLevel != null
@@ -787,6 +832,7 @@ function _egBuildTooltipBodyHTML(item) {
     ${reqHTML}
     ${chainHTML}
     ${modsHTML}
+    ${flavorHTML}
     ${ilvlHTML}
     ${mirroredHTML}
     ${bonusLootHTML}

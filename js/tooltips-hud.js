@@ -162,12 +162,19 @@ function _buildActiveMapModsHTML(map) {
     const colors = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
     let html = '';
     let hasMods = false;
+    // Mods sharing the same stat are merged into one combined line, kept
+    // grouped by their affects category (and thus color).
+    const byColor = new Map();
     (map.mods || []).forEach(mod => {
-        const color = colors[_egMapModAffects(mod.familyId)] || '#e67e22';
-        (mod.rolledStats || []).forEach(stat => {
-            if (!stat.label) return;
+        const key = _egMapModAffects(mod.familyId) || 'monster';
+        if (!byColor.has(key)) byColor.set(key, []);
+        byColor.get(key).push(mod);
+    });
+    byColor.forEach((mods, key) => {
+        const color = colors[key] || '#e67e22';
+        _egBuildMergedModLines(mods).forEach(entry => {
             hasMods = true;
-            html += `<br><span style="color:${color}">${stat.label}</span>`;
+            html += `<br><span style="color:${color}">${entry.label}</span>`;
         });
     });
     if (!hasMods && typeof t === 'function') {

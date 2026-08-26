@@ -435,6 +435,9 @@ const SFX = {
     player_dodge_attack: 'audio/sfx/endgame/sfx_player_dodge_attack.mp3',
     heart_heals: 'audio/sfx/endgame/sfx_heart_heals.mp3',
     heart_destroyed: 'audio/sfx/endgame/sfx_heart_destroyed.mp3',
+    // Placeholder: reuses the heart heal sound until a dedicated mana
+    // pickup sound is added to audio/
+    mana_pickup: 'audio/sfx/endgame/sfx_heart_heals.mp3',
     player_equip_pickup: 'audio/sfx/endgame/sfx_player_equip_pickup.mp3',
     player_equip_not_pickup: 'audio/sfx/endgame/sfx_player_equip_not_pickup.mp3',
     player_defeated: 'audio/sfx/endgame/sfx_player_defeated.mp3',

@@ -447,6 +447,11 @@ function showPrimerResult(correct) {
     const skipBtn = document.getElementById('primer-skip-btn');
     if (skipBtn) skipBtn.style.display = 'none';
 
+    // Lock the numeric input immediately so repeated Enter presses
+    // cannot re-submit the same (correct) answer and farm rewards.
+    const inp = document.getElementById('primer-input');
+    if (inp) inp.disabled = true;
+
     if (correct) {
         _primerHandleCorrectAnswer(fb, primerStreak + 1);
     } else {

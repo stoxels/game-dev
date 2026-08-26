@@ -698,7 +698,11 @@ function _egLaunchTestMap(mapId) {
     level.isMonsterLevel = true;
     level.isTestMapSeed = true;   // cleaned up automatically by _egChainCleanup()
     level.monsterLevel = mapDef.monsterLevel;
-    level.maxMonsters = mapDef.maxMonsters;
+    // Low tiers ramp gently (3/3/4/5 enemies for tiers 1-4), full cap of 6
+    // from tier 5 onwards. Higher tiers keep their map-defined cap.
+    const egtTier = Math.max(1, mapDef.tier || 1);
+    const egtLowCap = [3, 3, 4, 5][Math.min(egtTier - 1, 3)] || 6;
+    level.maxMonsters = Math.min(mapDef.maxMonsters, egtTier <= 4 ? egtLowCap : mapDef.maxMonsters);
     level.totalMonsters = mapDef.totalMonsters;
     level.hasBoss = mapDef.hasBoss;
     if (mapDef.maxBosses) level.maxBosses = mapDef.maxBosses;

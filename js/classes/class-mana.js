@@ -30,16 +30,33 @@ let _manaRegenInterval = null;
 
 
 // Applies the gear-aware cost multiplier to a def's flat manaCost.
+// Active map runs can further inflate costs ("% more Mana" mod) — the
+// tooltip display and payAbilityCost() both go through here, so they
+// always agree.
 function _scaleAbilityManaCost(cost) {
     if (!cost || cost <= 0) return 0;
     const maxMana = _getPlayerMaxMana();
     const mult = 1 + Math.max(0, maxMana - MANA_COST_SCALE_BASELINE) / MANA_COST_SCALE_DIVISOR;
-    return Math.round(cost * mult);
+    let scaled = cost * mult;
+    if (typeof _egGetActiveMapModValue === 'function') {
+        const costPct = _egGetActiveMapModValue('map_mana_costs');
+        if (costPct > 0) scaled *= (1 + costPct / 100);
+    }
+    return Math.round(scaled);
+}
+
+
+// Mana is an endgame-only mechanic: in story/campaign levels the pool stays
+// empty, the HUD bar hides itself and every ability cost resolves to zero.
+function _manaEnabled() {
+    return (typeof isEndgameLevel === 'function') && isEndgameLevel();
 }
 
 
 // Returns the player's current maximum mana: base pool + gear/attribute bonus.
+// Zero while mana is disabled (storymode), which disables the whole system.
 function _getPlayerMaxMana() {
+    if (!_manaEnabled()) return 0;
     const base = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseMana : 0;
     const gearBonus = (typeof _egComputePlayerStats === 'function')
         ? _egComputePlayerStats().mana : 0;
@@ -50,7 +67,7 @@ function _getPlayerMaxMana() {
 // Returns the mana cost of the ability in the given HUD slot, or 0 when the
 // slot has no cost defined (e.g. legacy defs or missing data).
 function _getAbilityManaCost(hudSlot) {
-    if (!STATE.playerClass) return 0;
+    if (!STATE.playerClass || !_manaEnabled()) return 0;
 
     if (hudSlot === 'active1' || hudSlot === 'active2') {
         const def = (typeof CLASS_DEFS !== 'undefined') ? CLASS_DEFS[STATE.playerClass] : null;
@@ -72,9 +89,47 @@ function canAffordMana(cost) {
 }
 
 
-// Returns true if the ability in the given HUD slot can be paid for right now.
+// True while a map with the Blood Magic mod is active: ability costs are
+// paid from the life pool instead of mana.
+function _bloodMagicActive() {
+    return (typeof _egMapHasBloodMagic === 'function') && _egMapHasBloodMagic();
+}
+
+
+// Returns true if the current life pool covers the given cost without
+// killing the player (casting down to 1 HP is allowed, never to 0).
+function canAffordLifeCost(cost) {
+    if (!cost || cost <= 0) return true;
+    return playerCurrentHP > cost;
+}
+
+
+// Returns true if the ability in the given HUD slot can be paid for right now
+// (life under Blood Magic, otherwise mana).
 function _abilityCanAfford(hudSlot) {
-    return canAffordMana(_getAbilityManaCost(hudSlot));
+    const cost = _getAbilityManaCost(hudSlot);
+    if (_bloodMagicActive()) return canAffordLifeCost(cost);
+    return canAffordMana(cost);
+}
+
+
+// True when every HUD skill slot can currently be paid for. Slots without
+// an ability/cost resolve to affordable, so this reflects the worst case.
+function _allSlotsAffordable() {
+    if (typeof STATE === 'undefined' || !STATE.playerClass) return true;
+    return ['active1', 'active2', 'active3', 'active4'].every(
+        (s) => (typeof _abilityCanAfford === 'function') ? _abilityCanAfford(s) : true
+    );
+}
+
+// Rebuilds the class HUD when a pool change flipped any ability between
+// affordable and unaffordable, so disabled buttons re-enable (or newly
+// unaffordable ones get locked) instead of waiting for an unrelated rebuild.
+function _refreshHUDIfAffordabilityChanged(wasAffordable) {
+    if (wasAffordable !== _allSlotsAffordable()
+        && typeof buildClassHUD === 'function') {
+        buildClassHUD();
+    }
 }
 
 
@@ -86,9 +141,11 @@ function gainMana(amount) {
     if (typeof _egMapManaGainMult === 'function') amount *= _egMapManaGainMult();
     const max = _getPlayerMaxMana();
     if (max <= 0) return 0;
+    const wasAffordable = _allSlotsAffordable();
     const before = playerCurrentMana;
     playerCurrentMana = Math.min(max, playerCurrentMana + amount);
     updateClassHUDManaBar();
+    _refreshHUDIfAffordabilityChanged(wasAffordable);
     return playerCurrentMana - before;
 }
 
@@ -98,9 +155,28 @@ function gainMana(amount) {
 function spendMana(cost) {
     if (!cost || cost <= 0) return true;
     if (!canAffordMana(cost)) return false;
+    const wasAffordable = _allSlotsAffordable();
     playerCurrentMana -= cost;
     updateClassHUDManaBar();
+    _refreshHUDIfAffordabilityChanged(wasAffordable);
     return true;
+}
+
+
+// Pays an active ability's cost: from the life pool under Blood Magic
+// (refreshing the HP display), otherwise from mana. Used exclusively by the
+// ability cast paths — gear effects like mana-to-damage keep using spendMana()
+// so they stay mana-based even on Blood Magic maps.
+// Returns false (pools untouched) when the cost can't be covered.
+function payAbilityCost(cost) {
+    if (!cost || cost <= 0) return true;
+    if (_bloodMagicActive()) {
+        if (!canAffordLifeCost(cost)) return false;
+        playerCurrentHP -= cost;
+        if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+        return true;
+    }
+    return spendMana(cost);
 }
 
 
@@ -141,8 +217,10 @@ function _ensureManaRegenLoop() {
 // bonus. Called at level start alongside _resetPlayerHP(). Chain puzzle
 // transitions deliberately keep both pools topped up as they were.
 function _resetPlayerMana() {
+    const wasAffordable = _allSlotsAffordable();
     playerMaxMana = _getPlayerMaxMana();
     playerCurrentMana = playerMaxMana;
     _ensureManaRegenLoop();
     setTimeout(updateClassHUDManaBar, 0);
+    _refreshHUDIfAffordabilityChanged(wasAffordable);
 }

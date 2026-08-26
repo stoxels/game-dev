@@ -41,6 +41,13 @@ let _egGridInvertTimer = null;       // pending removal of the Inversion Field f
 let _egVoidSurgeActive = false;  // true while a Void Surge safe-zone is on screen
 let _egVoidSurgePollInterval = null; // handle for the HUD-position poll during Void Surge
 
+// ── Generic screen-blast engine state ────────────────────────────────────────
+// Shared by all dodge-style boss mechanics (Void Surge, Heat Death Bloom,
+// Rewrite Fate, Prior Collapse). Each active blast registers itself in the
+// map so boss death / encounter stop can tear every variant down at once.
+let _egBlastSeq = 0;             // monotonically increasing blast id counter
+const _egActiveBlasts = new Map(); // blast id → { timers:[], poll:null }
+
 // ── Prior Bomb fill tracker ──────────────────────────────────────────────────
 // Circular buffer of [row, col] for recently correctly-filled cells.
 let _egRecentFills = [];
@@ -75,6 +82,16 @@ const EG_PLAYER_MELEE_ANIM_DURATION_MS = 500; // Matches monster melee duration
 let _egPlayerAbsorptionCurrent = 0;
 let _egPlayerAbsorptionRegenDelayTimer = null;
 let _egPlayerAbsorptionRegenInterval = null;
+
+// ── Gear proc state ──────────────────────────────────────────────────────
+// Warding (talisman): the once-per-map killing-blow save is consumed on use
+// and only refreshes when a new map run begins.
+let _egWardingUsedThisMap = false;
+// Channel (offhand): stacks gained per consecutive correct cell, consumed by
+// the next player hit or released automatically at the max-stack cap.
+let _egChannelStacks = 0;
+// Arcane Surge (arcane sigil): consecutive correct cells without a mistake.
+let _egArcaneSurgeStreak = 0;
 
 // --- NEW STATE VARIABLE ---
 let _egPlayerCurrentCharge = 0;

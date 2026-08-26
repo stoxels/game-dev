@@ -83,6 +83,50 @@ const EG_PICKUP_DEFS = {
             Audio_Manager.playSFX('heart_heals');
         },
     },
+    // Mana orbs — endgame only (mana system is gated to isEndgameLevel()).
+    // gainMana() clamps to max mana, applies the map's "% reduced Mana
+    // gained" mod and refreshes the HUD bar; it returns the amount actually
+    // gained so the toast stays honest when the pool is nearly full.
+    mana_small: {
+        id: 'mana_small', emoji: '💧', label: () => t('eg_pickup_mana_small'), rarity: 'common',
+        onPickup(row, col) {
+            const gained = gainMana(20);
+            if (gained > 0) {
+                showToast(t('eg_pickup_mana_gain_small').replace('{n}', gained),
+                    _egRarityToastColor(this.rarity));
+                Audio_Manager.playSFX('mana_pickup');
+            } else {
+                showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
+            }
+        },
+    },
+    mana_medium: {
+        id: 'mana_medium', emoji: '🔵', label: () => t('eg_pickup_mana_medium'), rarity: 'uncommon',
+        onPickup(row, col) {
+            const gained = gainMana(50);
+            if (gained > 0) {
+                showToast(t('eg_pickup_mana_gain_medium').replace('{n}', gained),
+                    _egRarityToastColor(this.rarity));
+                Audio_Manager.playSFX('mana_pickup');
+            } else {
+                showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
+            }
+        },
+    },
+    mana_full: {
+        id: 'mana_full', emoji: '🔮', label: () => t('eg_pickup_mana_full_orb'), rarity: 'rare',
+        onPickup(row, col) {
+            const before = playerCurrentMana;
+            const gained = gainMana(_getPlayerMaxMana());
+            if (gained > 0) {
+                showToast(t('eg_pickup_mana_gain_full').replace('{n}', playerCurrentMana - before),
+                    _egRarityToastColor(this.rarity));
+                Audio_Manager.playSFX('mana_pickup');
+            } else {
+                showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
+            }
+        },
+    },
     // Erases one mistake from the current mistake counter. Somewhat rare.
     mistake_eraser: {
         id: 'mistake_eraser', emoji: '🧽', label: () => t('eg_pickup_mistake_eraser'), rarity: 'rare',
@@ -157,6 +201,9 @@ const EG_PICKUP_WEIGHTS = [
     { id: 'heart_small', weight: 60 },
     { id: 'heart_medium', weight: 30 },
     { id: 'heart_large', weight: 10 },
+    { id: 'mana_small', weight: 25 },      // ~17% — mana counterpart to hearts
+    { id: 'mana_medium', weight: 12 },
+    { id: 'mana_full', weight: 4 },        // full restore — rarest pickup
     { id: 'cooldown_surge', weight: 8 },   // ~7% — a bit more common than eraser
     { id: 'mistake_eraser', weight: 5 },   // ~4% — somewhat rare
 ];
@@ -415,6 +462,12 @@ function _egSpawnPickup() {
     const req = _egGetMapRequirements();
     if (req.totalMonsters > 0 && _egChainKillCount >= req.totalMonsters) return;
 
+    // Active map run: "#% fewer Pickups appear on the Grid".
+    if (typeof _egGetActiveMapModValue === 'function') {
+        const scarcity = _egGetActiveMapModValue('map_fewer_pickups');
+        if (scarcity > 0 && Math.random() * 100 < scarcity) return;
+    }
+
     if (_egPickups.size >= EG_PICKUP_MAX_ON_BOARD) return;
 
     const pool = _egBuildPickupEligiblePool();
@@ -533,7 +586,9 @@ function _egRenderLootOverlay(row, col, item) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-pickup-rarity-${item.rarity || 'common'} eg-loot-overlay`;
+    // Uniques get an extra class for their signature golden ray/sparkle look.
+    const uniqueCls = item.isUnique ? ' eg-unique-drop' : '';
+    span.className = `eg-pickup-overlay eg-pickup-rarity-${item.rarity || 'common'} eg-loot-overlay${uniqueCls}`;
     span.id = `eg-loot-${row}-${col}`;
     EG_ART.fillElement(span, 'item', item.baseId, item.icon || '📦');
     el.appendChild(span);
@@ -588,7 +643,11 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     // Generate the item that will drop (uses the equipment generator if available,
     // otherwise falls back to a simple placeholder object).
     let item;
-    if (typeof _egGenerateEquipmentDrop === 'function') {
+    // Uniques first — a small golden-tier chance replaces the regular roll.
+    if (typeof _egTryGenerateUniqueDrop === 'function') {
+        item = _egTryGenerateUniqueDrop(monsterLevel);
+    }
+    if (!item && typeof _egGenerateEquipmentDrop === 'function') {
         item = _egGenerateEquipmentDrop(monsterLevel);
     }
 
@@ -604,6 +663,87 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     }, EG_LOOT_DROP_LIFETIME_MS);
     _egPickupTimers.push(timer); // reuse existing timer array so stop() cleans up
     _egStartDropExpireCountdown(`eg-loot-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+}
+
+// ── Loot explosion ───────────────────────────────────────────────────────────
+// Boss-clear reward: scatters MANY items onto the grid at once, bypassing
+// the normal one-drop-at-a-time cap. Items cascade in with a short stagger
+// so it reads as an explosion rather than a silent bulk placement.
+
+const EG_LOOT_EXPLOSION_EQUIPMENT = 5;      // equipment pieces
+const EG_LOOT_EXPLOSION_STAGGER_MS = 150;   // cascade delay between drops
+
+// Places a single loot item on a free cell — no chance roll, no board cap.
+// Used by the loot explosion. Returns true when the item was placed.
+function _egPlaceLootDropForce(item) {
+    const pool = _egBuildPickupEligiblePool();
+    const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
+    if (filtered.length === 0) return false;
+
+    const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
+    const key = `${r}-${c}`;
+
+    _egLootDrops.set(key, item);
+    _egRenderLootOverlay(r, c, item);
+
+    const timer = setTimeout(() => {
+        if (_egLootDrops.get(key) === item) {
+            _egLootDrops.delete(key);
+            _egRemoveLootOverlay(key);
+        }
+    }, EG_LOOT_DROP_LIFETIME_MS);
+    _egPickupTimers.push(timer);
+    _egStartDropExpireCountdown(`eg-loot-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+    return true;
+}
+
+// Called when the final map boss dies. Rains equipment plus currency, gold,
+// essence and a usable item onto the grid in a staggered cascade.
+function _egSpawnLootExplosion(monsterLevel = 1) {
+    if (!_egIsActive()) return;
+
+    const tryScheduleOne = () => {
+        // Respect stash capacity — never generate items that couldn't be stored.
+        if (!_egStashHasFreeSlot()) return false;
+
+        let item = null;
+        if (typeof _egTryGenerateUniqueDrop === 'function') {
+            item = _egTryGenerateUniqueDrop(monsterLevel);
+        }
+        if (!item && typeof _egGenerateEquipmentDrop === 'function') {
+            item = _egGenerateEquipmentDrop(monsterLevel);
+        }
+        if (!item) return false;
+
+        return _egPlaceLootDropForce(item);
+    };
+
+    // Cascade the equipment drops in one by one.
+    for (let i = 0; i < EG_LOOT_EXPLOSION_EQUIPMENT; i++) {
+        setTimeout(() => {
+            if (!_egIsActive()) return;
+            if (!tryScheduleOne()) return;
+            if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+                Audio_Manager.playSFX('player_equip_pickup');
+            }
+        }, i * EG_LOOT_EXPLOSION_STAGGER_MS);
+    }
+
+    // Side drops ride the same wave (their own board caps keep things sane).
+    setTimeout(() => {
+        if (!_egIsActive()) return;
+        for (let i = 0; i < 2; i++) {
+            if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(true);
+        }
+        for (let i = 0; i < 2; i++) {
+            if (typeof _egTryDropGold === 'function') _egTryDropGold(true, monsterLevel);
+        }
+        if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
+        if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
+        if (typeof _egTryDropMap === 'function') _egTryDropMap(true, monsterLevel);
+    }, EG_LOOT_EXPLOSION_STAGGER_MS);
+
+    showToast(t('eg_loot_explosion'), '#f5d98a');
 }
 
 // Called from renderCell whenever a cell becomes visually revealed
@@ -648,7 +788,7 @@ function _egCheckLootClaim(row, col) {
         ? ` [${item.itemLevel}]`
         : '';
     showToast(t('eg_loot_claimed')
-        .replace('{icon}', item.icon || '')
+        .replace('{icon}', item.isUnique ? '✨' : (item.icon || ''))
         .replace('{name}', item.name + nameSuffix), _egRarityToastColor(item.rarity));
     return true;
 }

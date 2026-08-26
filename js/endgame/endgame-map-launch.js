@@ -30,6 +30,18 @@
 // The map item currently driving an active device run (null outside runs).
 let _egActiveMapItem = null;
 
+// Hard on-screen enemy cap for tier 1 maps — keeps early runs readable
+// for new players regardless of rolled +monster modifiers.
+const EG_TIER1_MAX_MONSTERS = 3;
+
+// Per-tier steps added to the on-screen enemy cap below tier 5:
+// tier 1 = 3, tier 2 = 3, tier 3 = 4, tier 4 = 5, tier 5+ = 6.
+const EG_LOW_TIER_MONSTER_STEPS = [0, 0, 1, 2];
+
+// Percent chance that a tier 2+ device map rolls a boss at all. Bosses are
+// optional from tier 2 onwards — never guaranteed, never on tier 1.
+const EG_MAP_BASE_BOSS_CHANCE = 50;
+
 // Returns the first rolled value for a map mod family on the active map,
 // or 0 when the mod is not present / no run is active.
 // Tolerates legacy/persisted mod shapes: falls back to a numeric
@@ -50,6 +62,12 @@ function _egGetActiveMapModValue(familyId) {
 // True when the active map has the given mod family.
 function _egHasActiveMapMod(familyId) {
     return _egGetActiveMapModValue(familyId) > 0;
+}
+
+// Blood Magic: class abilities pay their cost from the life pool instead of
+// mana while a map with this mod is active.
+function _egMapHasBloodMagic() {
+    return _egHasActiveMapMod('map_blood_magic');
 }
 
 
@@ -119,6 +137,106 @@ function _egMapTimeGainMult() {
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
+// "Elemental Weakness — #% reduced all Resistances" → multiplier below 1.
+function _egMapResistMult() {
+    const v = _egGetActiveMapModValue('map_elem_weakness');
+    return v > 0 ? Math.max(0.25, 1 - v / 100) : 1;
+}
+
+// "Vulnerability — you take #% increased Damage" → amplifier above 1.
+function _egMapDamageTakenAmpMult() {
+    const v = _egGetActiveMapModValue('map_vulnerability');
+    return v > 0 ? 1 + v / 100 : 1;
+}
+
+// "#% less Life gained from Kills" → multiplier below 1.
+function _egMapKillRecoveryMult() {
+    const v = _egGetActiveMapModValue('map_reduced_recovery');
+    return v > 0 ? Math.max(0.05, 1 - v / 100) : 1;
+}
+
+// "#% reduced Evasion" → multiplier below 1.
+function _egMapEvasionMult() {
+    const v = _egGetActiveMapModValue('map_reduced_evasion');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "#% reduced maximum Absorption" → multiplier below 1.
+function _egMapAbsorptionMult() {
+    const v = _egGetActiveMapModValue('map_reduced_absorption');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "#% reduced Block Chance" → multiplier below 1.
+function _egMapBlockMult() {
+    const v = _egGetActiveMapModValue('map_reduced_block');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "Temporal Chains — you act #% slower" → attack-interval stretch above 1.
+function _egMapActionSlowMult() {
+    const v = _egGetActiveMapModValue('map_temporal_chains');
+    return v > 0 ? 1 + v / 100 : 1;
+}
+
+// Monster crit mod: rolls per monster hit; returns a damage multiplier
+// (2 on a crit roll, otherwise 1).
+function _egRollMonsterCritMult(monster) {
+    if (!monster || !(monster.critChancePct > 0)) return 1;
+    return (Math.random() * 100 < monster.critChancePct) ? 2 : 1;
+}
+
+// Quiz penalty: an incorrectly answered interstitial question burns a share
+// of maximum Life. Called from quiz.js (_resolveQuizAnswer) during map runs.
+function _egOnQuizWrongAnswer() {
+    if (!_egIsActive()) return;
+    const v = _egGetActiveMapModValue('map_quiz_damage');
+    if (!(v > 0)) return;
+    const maxHP = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+    const dealt = _egPlayerTakeDamage(Math.max(1, Math.round(maxHP * v / 100)), true);
+    showToast(`❌ ${(typeof t === 'function' ? t('eg_mm_toast_quiz_wrong') : 'Incorrect Answer!')} (-${dealt})`);
+}
+
+// "#% reduced Accuracy" → multiplier below 1.
+function _egMapAccuracyMult() {
+    const v = _egGetActiveMapModValue('map_reduced_accuracy');
+    return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
+}
+
+// "#% less Attack Speed" → multiplier below 1.
+function _egMapAttackSpeedMult() {
+    const v = _egGetActiveMapModValue('map_reduced_attack_speed');
+    return v > 0 ? Math.max(0.2, 1 - v / 100) : 1;
+}
+
+// Called after a monster successfully hits the player. Applies the per-hit
+// escalation mods: snowball damage growth and Map-time leech.
+function _egApplyMonsterHitMods(monster) {
+    if (!monster || !_egActiveMapItem) return;
+
+    // Snowball: monsters gain #% damage each time they hit you (capped at
+    // triple their post-mod base so long fights stay winnable).
+    const snowPct = monster.snowballPct || 0;
+    if (snowPct > 0 && monster.damageValue > 0) {
+        if (monster.snowballBaseDamage == null) monster.snowballBaseDamage = monster.damageValue;
+        const grown = Math.round(monster.damageValue * (1 + snowPct / 100));
+        monster.damageValue = Math.min(
+            Math.round(monster.snowballBaseDamage * 3), grown);
+        if (monster.bossBaseDamage != null) {
+            monster.bossBaseDamage = Math.min(
+                Math.round(monster.snowballBaseDamage * 3),
+                Math.round(monster.bossBaseDamage * (1 + snowPct / 100)));
+        }
+    }
+
+    // Time leech: drain seconds from the global level timer.
+    const leechS = _egGetActiveMapModValue('map_time_leech');
+    if (leechS > 0 && typeof timerSecs !== 'undefined') {
+        timerSecs = Math.max(0, timerSecs - leechS);
+        showToast(`⏳ -${leechS}s ${t('eg_mm_toast_time_leech') || ''}`.trim());
+    }
+}
+
 
 //------------------------------------------------------------------------
 //-------------------MONSTER MOD APPLICATION------------------------------
@@ -133,6 +251,14 @@ function _egApplyMapModsToMonster(monster) {
     const lifePct = _egGetActiveMapModValue('map_monster_life');
     if (lifePct > 0 && monster.maxHP > 0) {
         const maxHP = Math.round(monster.maxHP * (1 + lifePct / 100));
+        monster.currentHP += maxHP - monster.maxHP;
+        monster.maxHP = maxHP;
+    }
+
+    // Bosses-only extra life pool.
+    const bossLifePct = _egGetActiveMapModValue('map_boss_life');
+    if (bossLifePct > 0 && monster.isBoss && monster.maxHP > 0) {
+        const maxHP = Math.round(monster.maxHP * (1 + bossLifePct / 100));
         monster.currentHP += maxHP - monster.maxHP;
         monster.maxHP = maxHP;
     }
@@ -160,6 +286,46 @@ function _egApplyMapModsToMonster(monster) {
             monster.resistances[el] = Math.min(75, (monster.resistances[el] || 0) + resPct);
         });
     }
+
+    // PoE-style behaviour mods — read live by the encounter/ailment systems.
+    const critPct = _egGetActiveMapModValue('map_monster_crit');
+    if (critPct > 0) monster.critChancePct = critPct;
+
+    const avoidPct = _egGetActiveMapModValue('map_monster_avoid_ailments');
+    if (avoidPct > 0) monster.avoidAilmentPct = avoidPct;
+
+    const regenPct = _egGetActiveMapModValue('map_monster_regen');
+    if (regenPct > 0) {
+        monster.regenPctMaxLife = regenPct;
+        monster.regenAcc = 0;
+    }
+
+    const explodePct = _egGetActiveMapModValue('map_monster_explosions');
+    if (explodePct > 0) monster.explodeOnDeathPct = explodePct;
+
+    // Ambush: monsters spawn with part of their attack bar pre-charged.
+    const ambushPct = _egGetActiveMapModValue('map_monster_ambush');
+    if (ambushPct > 0 && monster.chargeMax > 0) {
+        monster.currentCharge = Math.min(
+            monster.chargeMax - 1,
+            Math.round(monster.chargeMax * Math.min(95, ambushPct + 5) / 100));
+    }
+
+    // PoE-style escalation mods — read live by the encounter systems.
+    const etherealPct = _egGetActiveMapModValue('map_monster_ethereal');
+    if (etherealPct > 0) monster.etherealPct = etherealPct;
+
+    const snowPct = _egGetActiveMapModValue('map_monster_snowball');
+    if (snowPct > 0) {
+        monster.snowballPct = snowPct;
+        monster.snowballBaseDamage = monster.damageValue;
+    }
+
+    const secondWindPct = _egGetActiveMapModValue('map_monster_second_wind');
+    if (secondWindPct > 0 && !monster.isBoss) monster.secondWindPct = secondWindPct;
+
+    const desperationPct = _egGetActiveMapModValue('map_monster_desperation');
+    if (desperationPct > 0) monster.desperationPct = desperationPct;
 
     return monster;
 }
@@ -240,9 +406,15 @@ function _egRollMapRunBaseline(map) {
 
     const base = {
         monsterLevel: map.monsterLevel || map.itemLevel || 1,
-        maxMonsters: 6,
+        // Beginner-friendly on-screen enemy cap: 3 at tier 1, ramping up
+        // to the full cap of 6 from tier 5 onwards. Tier 1 stays hard-capped
+        // even when +monster mods are rolled.
+        maxMonsters: Math.min(6, EG_TIER1_MAX_MONSTERS +
+            (EG_LOW_TIER_MONSTER_STEPS[Math.min(tier - 1, EG_LOW_TIER_MONSTER_STEPS.length - 1)] || 0)),
         totalMonsters: Math.min(120, 15 + tier * 8),
-        hasBoss: true,
+        // Bosses are too much for tier 1 beginners. From tier 2 onwards a
+        // boss MAY appear (chance-based roll), but is never guaranteed.
+        hasBoss: tier >= 2 && Math.random() * 100 < EG_MAP_BASE_BOSS_CHANCE,
         maxBosses: 1,
         requiredPuzzles: Math.min(12, 3 + Math.floor(tier / 3)),
         requiredQuestions: 0,
@@ -279,6 +451,7 @@ function _egRollMapRunBaseline(map) {
 function _egApplyModsToBaseline(base, map) {
     const mods = Array.isArray(map.mods) ? map.mods : [];
     const hasImplicits = !!(map && map.implicits);
+    const tier = Math.max(1, (map && map.mapTier) || 1);
 
     mods.forEach(mod => {
         const val = (Array.isArray(mod.rolledStats) && mod.rolledStats.length > 0)
@@ -289,11 +462,16 @@ function _egApplyModsToBaseline(base, map) {
             case 'map_extra_monsters':
                 base.totalMonsters += val;
                 base.maxMonsters = Math.min(12, base.maxMonsters + (val >= 3 ? 2 : 1));
+                if (tier <= 1) base.maxMonsters = EG_TIER1_MAX_MONSTERS;
                 break;
 
             case 'map_boss_chance':
-                // Roll once at activation: success adds one extra boss.
-                if (Math.random() * 100 < val) base.maxBosses = Math.min(2, base.maxBosses + 1);
+                // Roll once at activation: success guarantees a boss (bosses
+                // are chance-based from tier 2) and may add one extra.
+                if (Math.random() * 100 < val) {
+                    base.hasBoss = true;
+                    base.maxBosses = Math.min(2, base.maxBosses + 1);
+                }
                 break;
 
             case 'map_required_puzzles':
@@ -430,6 +608,10 @@ function _egLaunchMapFromDevice(mapItem) {
     // Tells goToLevelSelect() (screens.js) to route back to the Probability
     // Gate instead of the normal world/level-select screen when the run ends.
     window._egIsMapDeviceRun = true;
+
+    // Gear: warding — its once-per-map killing-blow save refreshes at the
+    // start of every device-map run.
+    _egWardingUsedThisMap = false;
 
     // Bind the endgame lose-overlay UI (no Retry — only "Return to the Nexus")
     // up front so every defeat path inside the map is covered.

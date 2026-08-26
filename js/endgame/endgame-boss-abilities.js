@@ -35,10 +35,10 @@ const EG_BOSS_MECHANICS = {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'corrupt_cells', intervalBase: 12000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
-            { name: 'clue_blackout', intervalBase: 22000, intervalVariance: 6000, handler: '_egMechClueBlackout' },
-            { name: 'clue_swap', intervalBase: 26000, intervalVariance: 6000, handler: '_egMechClueSwap' },
-            { name: 'void_surge', intervalBase: 30000, intervalVariance: 8000, handler: '_egMechVoidSurge' },
+            { name: 'corrupt_cells', intervalBase: 10000, intervalVariance: 3000, handler: '_egMechCorruptCells' },
+            { name: 'clue_blackout', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechClueBlackout' },
+            { name: 'clue_swap', intervalBase: 24000, intervalVariance: 5000, handler: '_egMechClueSwap' },
+            { name: 'void_surge', intervalBase: 26000, intervalVariance: 6000, handler: '_egMechVoidSurge' },
         ],
     },
 
@@ -54,9 +54,10 @@ const EG_BOSS_MECHANICS = {
         ],
         immunityDuration: 3000,
         mechanics: [
-            { name: 'probability_shift', intervalBase: 14000, intervalVariance: 4000, handler: '_egMechProbabilityShift' },
-            { name: 'prior_bomb', intervalBase: 18000, intervalVariance: 5000, handler: '_egMechPriorBomb' },
-            { name: 'frozen_cells', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechFrozenCells' },
+            { name: 'probability_shift', intervalBase: 12000, intervalVariance: 3000, handler: '_egMechProbabilityShift' },
+            { name: 'prior_bomb', intervalBase: 16000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
+            { name: 'frozen_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechFrozenCells' },
+            { name: 'prior_collapse', intervalBase: 24000, intervalVariance: 6000, handler: '_egMechPriorCollapse', phase2Only: true },
             // grid_veil fires once on phase 2 activation; intervalBase is set
             // absurdly high so it never self-reschedules after that first trigger.
             { name: 'grid_veil', intervalBase: 999999999, intervalVariance: 0, handler: '_egMechGridVeil', phase2Only: true },
@@ -75,9 +76,10 @@ const EG_BOSS_MECHANICS = {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'grid_invert', intervalBase: 16000, intervalVariance: 4000, handler: '_egMechGridInvert' },
-            { name: 'probability_shift', intervalBase: 22000, intervalVariance: 6000, handler: '_egMechProbabilityShift' },
-            { name: 'frozen_cells', intervalBase: 18000, intervalVariance: 5000, handler: '_egMechFrozenCells', phase2Only: true },
+            { name: 'grid_invert', intervalBase: 14000, intervalVariance: 3000, handler: '_egMechGridInvert' },
+            { name: 'probability_shift', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechProbabilityShift' },
+            { name: 'frozen_cells', intervalBase: 16000, intervalVariance: 4000, handler: '_egMechFrozenCells', phase2Only: true },
+            { name: 'heat_bloom', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechHeatBloom', phase2Only: true },
         ],
     },
 
@@ -94,9 +96,10 @@ const EG_BOSS_MECHANICS = {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'clue_swap', intervalBase: 14000, intervalVariance: 4000, handler: '_egMechClueSwap' },
-            { name: 'prior_bomb', intervalBase: 17000, intervalVariance: 5000, handler: '_egMechPriorBomb' },
-            { name: 'grid_invert', intervalBase: 24000, intervalVariance: 6000, handler: '_egMechGridInvert', phase2Only: true },
+            { name: 'clue_swap', intervalBase: 12000, intervalVariance: 3000, handler: '_egMechClueSwap' },
+            { name: 'prior_bomb', intervalBase: 15000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
+            { name: 'grid_invert', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechGridInvert', phase2Only: true },
+            { name: 'fate_rewrite', intervalBase: 24000, intervalVariance: 5000, handler: '_egMechFateRewrite', phase2Only: true },
         ],
     },
 };
@@ -810,6 +813,353 @@ function _egMechVoidSurge(monster, phase) {
 
 // ── Cleanup hook ──────────────────────────────────────────────────────────────
 // Called from _egBossCleanup so a surge in progress is always torn down on boss death.
-// Wire this into _egBossCleanup in endgame-bosses.js by adding:
-//   _egVoidSurgeTeardown();
-// at the end of that function (see instructions below).
+
+
+//------------------------------------------------------------------------
+//-------------------GENERIC SCREEN-BLAST ENGINE--------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Shared engine for every dodge-style boss mechanic (Void Surge, Heat Death
+// Bloom, Rewrite Fate, Prior Collapse). The screen darkens, one or more safe
+// zones appear, and the player must drag their class HUD into the real zone
+// before the window closes. Failing costs a PERCENTAGE of max HP — never an
+// instant kill from full health.
+//
+// Every variant is heavily telegraphed:
+//   warning phase first, fake zones collapse visibly, relocation targets are
+//   previewed as dashed ghost circles from the very start.
+//
+// opts = {
+//   toastKey        — translation key shown when the blast begins
+//   accent          — CSS colour for the real zone's glow
+//   warnMs          — telegraph duration before the blast hits   (default 1500)
+//   activeMs        — window the player has to reach the zone    (default 5000)
+//   damagePct       — % of max HP lost on failure                (default 0.30)
+//   zones           — [{ x, y, radius }] candidate safe zones
+//   realIndex       — which zone is real                         (default 0)
+//   ghost           — { x, y } preview of the relocation target (Rewrite Fate)
+//   relocateAtMs    — ms into the ACTIVE phase when the zone jumps (with ghost)
+//   shrinkToRadius  — lerp the real radius down to this over activeMs (Heat Bloom)
+//   revealFakeAtActive — collapse non-real zones when the blast hits (Prior Collapse)
+// }
+
+const EG_BLAST_WARN_MS = 1500;
+const EG_BLAST_ACTIVE_MS = 5000;
+const EG_BLAST_DAMAGE_PCT = 0.30;
+
+// Picks a screen position for a zone, biased away from edges so the circle
+// is always fully visible and reachable.
+function _egBlastPickPos(radius) {
+    const margin = radius + 40;
+    const x = margin + Math.random() * Math.max(1, window.innerWidth - margin * 2);
+    const y = margin + Math.random() * Math.max(1, window.innerHeight - margin * 2);
+    return { x, y };
+}
+
+// Returns true if the centre of the class HUD is inside the given zone.
+function _egBlastHudInZone(zone) {
+    const hud = document.getElementById('class-hud-drag-handle');
+    if (!hud) return false;
+    const rect = hud.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = cx - zone.x;
+    const dy = cy - zone.y;
+    return Math.sqrt(dx * dx + dy * dy) <= zone.radius;
+}
+
+// DOM helpers — each blast gets uniquely suffixed elements.
+function _egBlastGetOverlay(id) {
+    let el = document.getElementById(`eg-blast-overlay-${id}`);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = `eg-blast-overlay-${id}`;
+        document.body.appendChild(el);
+    }
+    return el;
+}
+
+function _egBlastPositionCircle(el, zone) {
+    el.style.left = zone.x + 'px';
+    el.style.top = zone.y + 'px';
+    el.style.width = (zone.radius * 2) + 'px';
+    el.style.height = (zone.radius * 2) + 'px';
+    el.style.marginLeft = (-zone.radius) + 'px';
+    el.style.marginTop = (-zone.radius) + 'px';
+}
+
+function _egBlastGetCircle(id, idx, zone) {
+    let el = document.getElementById(`eg-blast-circle-${id}-${idx}`);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = `eg-blast-circle-${id}-${idx}`;
+        document.body.appendChild(el);
+    }
+    _egBlastPositionCircle(el, zone);
+    return el;
+}
+
+function _egBlastGetCountdownLabel(id, zone) {
+    let el = document.getElementById(`eg-blast-countdown-${id}`);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = `eg-blast-countdown-${id}`;
+        document.body.appendChild(el);
+    }
+    // Mirror the real circle's position so the number sits centred inside it
+    el.style.left = zone.x + 'px';
+    el.style.top = zone.y + 'px';
+    return el;
+}
+
+function _egBlastGetGhost(id, pos, radius) {
+    let el = document.getElementById(`eg-blast-ghost-${id}`);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = `eg-blast-ghost-${id}`;
+        document.body.appendChild(el);
+    }
+    _egBlastPositionCircle(el, { x: pos.x, y: pos.y, radius });
+    return el;
+}
+
+// Removes every element and timer belonging to one blast.
+function _egBlastTeardown(id) {
+    const state = _egActiveBlasts.get(id);
+    if (state) {
+        state.timers.forEach(t => { clearTimeout(t); clearInterval(t); });
+        if (state.poll) clearInterval(state.poll);
+        _egActiveBlasts.delete(id);
+    }
+    [
+        `eg-blast-overlay-${id}`, `eg-blast-countdown-${id}`, `eg-blast-ghost-${id}`,
+        `eg-blast-circle-${id}-0`, `eg-blast-circle-${id}-1`, `eg-blast-circle-${id}-2`,
+    ].forEach(elId => { const el = document.getElementById(elId); if (el) el.remove(); });
+}
+
+// Tears down ALL active blasts. Called from _egBossCleanup on boss death /
+// encounter stop so no overlay can outlive its boss.
+function _egBlastTeardownAll() {
+    Array.from(_egActiveBlasts.keys()).forEach(id => _egBlastTeardown(id));
+}
+
+// Runs one full blast sequence with the given options (see block comment).
+function _egRunScreenBlast(opts) {
+    // Never stack two blasts — the last thing the player needs is two
+    // overlapping blackout screens fighting over the same dodge.
+    if (_egActiveBlasts.size > 0) return;
+
+    const id = ++_egBlastSeq;
+    const state = { timers: [], poll: null };
+    _egActiveBlasts.set(id, state);
+
+    const warnMs = opts.warnMs != null ? opts.warnMs : EG_BLAST_WARN_MS;
+    const activeMs = opts.activeMs != null ? opts.activeMs : EG_BLAST_ACTIVE_MS;
+    const damagePct = opts.damagePct != null ? opts.damagePct : EG_BLAST_DAMAGE_PCT;
+    const realIndex = opts.realIndex != null ? opts.realIndex : 0;
+    const accent = opts.accent || '#ffd93c';
+
+    const zones = opts.zones.map(z => ({ ...z }));
+    let real = zones[realIndex];
+    const startRadius = real.radius;
+
+    const schedule = (fn, ms) => {
+        const t = setTimeout(fn, ms);
+        state.timers.push(t);
+    };
+
+    // ── Warning phase: red tint fades in, all candidate zones appear ────────
+    const overlay = _egBlastGetOverlay(id);
+    overlay.className = 'eg-blast-overlay eg-blast-warning';
+    if (opts.accent) overlay.style.setProperty('--blast-accent', accent);
+
+    zones.forEach((z, i) => {
+        const circle = _egBlastGetCircle(id, i, z);
+        circle.className = 'eg-blast-circle' + (i === realIndex ? '' : ' eg-blast-fake');
+        // Prior Collapse tell: the REAL zone sparkles throughout the warning
+        // so the choice is always readable — never a coin flip.
+        if (opts.revealFakeAtActive && i === realIndex) circle.classList.add('eg-blast-true');
+        circle.style.setProperty('--blast-accent', accent);
+    });
+
+    if (opts.ghost) {
+        const ghost = _egBlastGetGhost(id, opts.ghost, startRadius);
+        ghost.className = 'eg-blast-ghost';
+        ghost.style.setProperty('--blast-accent', accent);
+    }
+
+    const label = _egBlastGetCountdownLabel(id, real);
+    label.className = 'eg-blast-countdown';
+    label.style.setProperty('--blast-accent', accent);
+    label.textContent = Math.ceil(activeMs / 1000);
+
+    if (opts.toastKey && typeof showToast === 'function') showToast(t(opts.toastKey));
+
+    // ── Active phase: blackout, countdown starts ────────────────────────────
+    schedule(() => {
+        overlay.className = 'eg-blast-overlay eg-blast-active';
+
+        // Prior Collapse: the fake zones visibly collapse the instant the
+        // blast hits — by then the player has had the whole warning to note
+        // which zone carried the tell.
+        if (opts.revealFakeAtActive) {
+            zones.forEach((z, i) => {
+                if (i === realIndex) return;
+                const c = document.getElementById(`eg-blast-circle-${id}-${i}`);
+                if (c) {
+                    c.classList.add('eg-blast-collapsed');
+                    schedule(() => c.remove(), 500);
+                }
+            });
+        }
+
+        const startedAt = Date.now();
+
+        // Rewrite Fate: mid-window jump to the pre-shown ghost position.
+        if (opts.relocateAtMs != null && opts.ghost) {
+            schedule(() => {
+                real = { x: opts.ghost.x, y: opts.ghost.y, radius: real.radius };
+                const circle = _egBlastGetCircle(id, realIndex, real);
+                circle.classList.add('eg-blast-jump');
+                schedule(() => circle.classList.remove('eg-blast-jump'), 400);
+                label.style.left = real.x + 'px';
+                label.style.top = real.y + 'px';
+                const ghostEl = document.getElementById(`eg-blast-ghost-${id}`);
+                if (ghostEl) ghostEl.remove();
+            }, opts.relocateAtMs);
+        }
+
+        // 100ms poll: in-zone glow, shrinking radius, countdown text.
+        state.poll = setInterval(() => {
+            const progress = Math.min(1, (Date.now() - startedAt) / activeMs);
+
+            // Heat Death Bloom: the zone collapses as time runs out.
+            if (opts.shrinkToRadius != null) {
+                real.radius = Math.round(startRadius + (opts.shrinkToRadius - startRadius) * progress);
+                _egBlastPositionCircle(_egBlastGetCircle(id, realIndex, real), real);
+            }
+
+            const remaining = Math.max(0, Math.ceil((activeMs - (Date.now() - startedAt)) / 1000));
+            const lbl = document.getElementById(`eg-blast-countdown-${id}`);
+            if (lbl) lbl.textContent = remaining;
+
+            const circle = document.getElementById(`eg-blast-circle-${id}-${realIndex}`);
+            if (circle && !circle.classList.contains('eg-blast-collapsed')) {
+                circle.classList.toggle('eg-blast-safe', _egBlastHudInZone(real));
+            }
+        }, 100);
+
+        // ── Resolve: check position, apply damage, tear down ────────────────
+        schedule(() => {
+            if (state.poll) { clearInterval(state.poll); state.poll = null; }
+
+            const survived = _egBlastHudInZone(real);
+            const circle = document.getElementById(`eg-blast-circle-${id}-${realIndex}`);
+            if (circle) circle.classList.add(survived ? 'eg-blast-survived' : 'eg-blast-hit');
+
+            if (!survived) {
+                // Percentage of max HP — survivable even at full health, but it
+                // stings enough that ignoring the mechanic loses fights.
+                const damage = Math.round(playerMaxHP * damagePct);
+                const dealt = typeof _egPlayerTakeDamage === 'function'
+                    ? _egPlayerTakeDamage(damage, true) : 0;
+                if (dealt > 0 && typeof _egApplyPlayerHitFeedback === 'function') {
+                    _egApplyPlayerHitFeedback(dealt);
+                }
+                showToast(t('eg_blast_hit').replace('{n}', dealt), '#f87171');
+            } else {
+                showToast(t('eg_blast_dodged'), '#4ade80');
+            }
+
+            // Brief resolve pause so the outcome flash is readable
+            schedule(() => _egBlastTeardown(id), 500);
+        }, activeMs);
+    }, warnMs);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------BOSS MECHANIC: HEAT DEATH BLOOM----------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Entropy, phase 2+. Like a Void Surge, but the safe zone continuously
+// shrinks while the clock runs — hesitation shrinks your refuge.
+
+function _egMechHeatBloom(monster, phase) {
+    const radius = 110;
+
+    _egRunScreenBlast({
+        toastKey: 'eg_mech_heat_bloom',
+        accent: '#ff8c3c',
+        activeMs: phase >= 3 ? 4200 : 5000,
+        damagePct: 0.30,
+        zones: [_egBlastPickPos(radius)].map(p => ({ ...p, radius })),
+        shrinkToRadius: 55,
+    });
+}
+
+
+//------------------------------------------------------------------------
+//-------------------BOSS MECHANIC: REWRITE FATE--------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Laplace, phase 2+. He already knows where you'll be standing — so the
+// safe zone jumps to a SECOND position mid-window. Fair play: the
+// destination is previewed as a dashed ghost circle from the very start.
+
+function _egMechFateRewrite(monster, phase) {
+    const radius = 90;
+    const activeMs = phase >= 3 ? 4500 : 5500;
+
+    const first = _egBlastPickPos(radius);
+    // Destination on the opposite half of the screen — forces real movement.
+    const second = {
+        x: Math.max(radius + 40, Math.min(window.innerWidth - radius - 40,
+            window.innerWidth - first.x)),
+        y: Math.max(radius + 40, Math.min(window.innerHeight - radius - 40,
+            window.innerHeight - first.y)),
+    };
+
+    _egRunScreenBlast({
+        toastKey: 'eg_mech_fate_rewrite',
+        accent: '#c39bd3',
+        activeMs,
+        damagePct: 0.32,
+        zones: [{ ...first, radius }],
+        ghost: second,
+        relocateAtMs: Math.round(activeMs * 0.55),
+    });
+}
+
+
+//------------------------------------------------------------------------
+//-------------------BOSS MECHANIC: PRIOR COLLAPSE-------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Bayes, phase 2+. Two safe zones appear — only ONE carries the glowing ✨
+// tell and is real; the other collapses the moment the blast hits.
+// Picking the wrong circle means eating the hit.
+
+function _egMechPriorCollapse(monster, phase) {
+    const radius = 95;
+    const a = _egBlastPickPos(radius);
+
+    // Keep the decoy a fair distance away so the choice reads clearly.
+    let b = _egBlastPickPos(radius);
+    let guard = 0;
+    while (Math.hypot(b.x - a.x, b.y - a.y) < radius * 4 && guard++ < 20) {
+        b = _egBlastPickPos(radius);
+    }
+
+    const realIsFirst = Math.random() < 0.5;
+
+    _egRunScreenBlast({
+        toastKey: 'eg_mech_prior_collapse',
+        accent: '#7fd67f',
+        activeMs: 5000,
+        damagePct: 0.30,
+        zones: [{ ...a, radius }, { ...b, radius }],
+        realIndex: realIsFirst ? 0 : 1,
+        revealFakeAtActive: true,
+    });
+}

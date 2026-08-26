@@ -1667,8 +1667,17 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
 function _wdMoveTooltip(e) {
     const tip = _wdGetTooltipEl();
     if (!tip) return;
-    tip.style.left = (e.clientX + 14) + 'px';
-    tip.style.top = Math.min(e.clientY + 14, window.innerHeight - 80) + 'px';
+    const rect = tip.getBoundingClientRect();
+    let x = e.clientX + 14;
+    let y = e.clientY + 14;
+    if (x + rect.width > window.innerWidth - 8) {
+        x = Math.max(8, e.clientX - rect.width - 12);
+    }
+    if (y + rect.height > window.innerHeight - 8) {
+        y = Math.max(8, window.innerHeight - rect.height - 8);
+    }
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
 }
 
 /**

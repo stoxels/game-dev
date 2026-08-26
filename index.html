@@ -1100,30 +1100,39 @@
 
 
     <div id="pause-overlay">
-        <div id="pause-label" data-t="game_paused">PAUSED</div>
+        <div class="pause-panel">
+            <div id="pause-label" data-t="game_paused">PAUSED</div>
 
-        <div class="pause-level-info">
-            <span class="gtb-lvl" id="top-id">1-1</span>
-            <div class="puzzle-hint" id="top-hint"></div>
+            <div class="pause-stats-row">
+                <div class="pause-stat">
+                    <span class="pause-stat-label">LEVEL</span>
+                    <span class="gtb-lvl" id="top-id">1-1</span>
+                </div>
+                <div class="pause-stat-divider"></div>
+                <div class="pause-stat">
+                    <span class="pause-stat-label">SCORE</span>
+                    <span class="pause-stat-value" id="sc-disp">0</span>
+                </div>
+            </div>
+
+            <div class="pause-section" id="top-hint"></div>
+
             <div class="mod-tags-row" id="mod-tags"></div>
-        </div>
 
-        <div class="bonus-inline" id="bonus-sidebar">
-            <span class="bonus-sidebar-label" data-t="scr_bonus_label">🎯 BONUS</span>
-            <span class="bonus-sidebar-hint" id="bonus-sidebar-hint"></span>
-        </div>
+            <div class="pause-loot-summary" id="pause-loot-summary"></div>
 
-        <div class="gtb-score-wrap">
-            <span class="gtb-score-val" id="sc-disp">0</span>
-            <span class="gtb-score-lbl" data-t="score_lbl">SCORE</span>
-        </div>
+            <div class="pause-bonus" id="bonus-sidebar">
+                <span class="pause-bonus-label" data-t="scr_bonus_label">🎯 BONUS</span>
+                <span class="pause-bonus-text" id="bonus-sidebar-hint"></span>
+            </div>
 
-        <div id="pause-hint" data-t="game_paused_hint">Press Esc to continue</div>
+            <div class="pause-actions">
+                <button id="btn-pause-settings" data-t="btn_settings">⚙ SETTINGS</button>
+                <button class="gtb-btn" id="btn-go-levels" data-t="btn_levels">◀ LEVELS</button>
+                <button class="gtb-btn" id="btn-go-nexus" data-t="eg_return_to_nexus" style="display:none;">🌌 RETURN TO NEXUS</button>
+            </div>
 
-        <div class="pause-btn-row">
-            <button id="btn-pause-settings" data-t="btn_settings">⚙ SETTINGS</button>
-            <button class="gtb-btn" id="btn-go-levels" data-t="btn_levels">◀ LEVELS</button>
-            <button class="gtb-btn" id="btn-go-nexus" data-t="eg_return_to_nexus" style="display:none;">🌌 RETURN TO NEXUS</button>
+            <div id="pause-hint" data-t="game_paused_hint">Press Esc to continue</div>
         </div>
     </div>
 
@@ -1204,6 +1213,7 @@
     <script src="js/passive-tree/passive-tree.js"></script>
     <script src="js/passive-tree/passive-tracker.js"></script>
     <script src="js/passive-tree/passive-effects.js"></script>
+    <script src="js/passive-tree/passive-tree-expansion.js"></script>
     <script src="js/sprite/character-select.js"></script>
     <script src="js/ui-events.js"></script>
     <script src="js/tooltips-hud.js"></script>
@@ -1219,6 +1229,7 @@
     <script src="js/endgame/endgame-grid-pickups.js"></script>
     <script src="js/endgame/endgame-encounter.js"></script>
     <script src="js/endgame/endgame-encounter-chain.js"></script>
+    <script src="js/endgame/endgame-quiz-buffs.js"></script>
     <script src="js/endgame/endgame-ailments.js"></script>
     <script src="js/endgame/endgame-ui.js"></script>
     <script src="js/endgame/endgame-screens.js"></script>
@@ -1227,6 +1238,7 @@
     <script src="js/endgame/endgame-equipment-base-items.js"></script>
     <script src="js/endgame/endgame-art.js"></script>
     <script src="js/endgame/endgame-equipment-generator.js"></script>
+    <script src="js/endgame/endgame-unique-items.js"></script>
     <script src="js/endgame/endgame-equipment-tooltip.js"></script>
     <script src="js/endgame/endgame-leveling.js"></script>
     <script src="js/endgame/endgame-hub.js"></script>

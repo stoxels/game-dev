@@ -27,6 +27,9 @@ function _egCalcPlayerDamage() {
     // Active map run: apply the "% reduced player Damage" map mod.
     if (typeof _egMapPlayerDamageMult === 'function') dmg *= _egMapPlayerDamageMult();
 
+    // Temporary quiz reward buff: +10% damage for a short window.
+    if (typeof _egQuizDamageBuffMult === 'function') dmg *= _egQuizDamageBuffMult();
+
     dmg = Math.max(1, Math.round(dmg));
 
     if (critMult > 1 && typeof showToast === 'function') showToast('💥 Critical Hit!');
@@ -84,6 +87,9 @@ function _egCalcPlayerMeleeDamage() {
 
     // Active map run: apply the "% reduced Melee Attack Damage" map mod.
     if (typeof _egMapPlayerMeleeMult === 'function') dmg *= _egMapPlayerMeleeMult();
+
+    // Temporary quiz reward buff: +10% damage for a short window.
+    if (typeof _egQuizDamageBuffMult === 'function') dmg *= _egQuizDamageBuffMult();
 
     dmg = Math.max(1, Math.round(dmg));
 
@@ -168,11 +174,13 @@ function _egApplyTargetResistances(amount, target, elements) {
 // Non-elemental hits pass through untouched. Returns the reduced amount.
 function _egCalcPlayerResistanceReduction(amount, stats, element) {
     if (!element || amount <= 0) return amount;
+    // Active map run: Elemental Weakness — #% reduced all Resistances.
+    const resistMult = (typeof _egMapResistMult === 'function') ? _egMapResistMult() : 1;
     const resMap = {
-        fire: stats.fireResist,
-        cold: stats.coldResist,
-        lightning: stats.lightningResist,
-        shadow: stats.shadowResist,
+        fire: (stats.fireResist || 0) * resistMult,
+        cold: (stats.coldResist || 0) * resistMult,
+        lightning: (stats.lightningResist || 0) * resistMult,
+        shadow: (stats.shadowResist || 0) * resistMult,
     };
     const resPct = Math.min(EG_RESIST_CAP_PCT, Math.max(0, resMap[element] || 0));
     let reduced = amount * (1 - resPct / 100);

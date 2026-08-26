@@ -70,6 +70,10 @@ const PT_OUTER_RIM_KEYS = new Set([
     'keystone_frequentists_burden', 'keystone_ergodic_field', 'keystone_sparse_prior',
     'confidence_interval_1', 'confidence_interval_2', 'confidence_interval_3',
     'adjacency_matrix',
+    // Expansion nodes on the far west and east rims
+    'keystone_zero_variance', 'keystone_perpetual_frost', 'keystone_butterfly_effect',
+    'limit_theorem', 'asymptotic_freedom', 'measure_zero',
+    'keystone_axiom_of_choice', 'final_theorem',
 ]);
 
 // Each entry is [keysArray, achievementStatName].

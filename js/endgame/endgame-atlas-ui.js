@@ -164,7 +164,7 @@ function _egAtlasBuildDetailsHTML() {
 
     const status = _egAtlasNodeStatus(node);
     const color = _egAtlasStatusColor(status);
-    const monsterLevel = node.tier * 4;
+    const monsterLevel = _egMapTierMonsterLevel(node.tier);
 
     const connections = node.links
         .map(id => egAtlasNodeById(id))
@@ -259,7 +259,7 @@ function _egAtlasShowNodeTooltip(nodeId, event) {
     const html = `
 <strong style="color:${color};">${egAtlasNodeName(node)}</strong><br>
 <span style="color:#ccc;">${t('eg_map_tier_tt').replace('{n}', node.tier)}
- · ${t('eg_map_monster_level_tt').replace('{n}', node.tier * 4)}</span><br>
+ · ${t('eg_map_monster_level_tt').replace('{n}', _egMapTierMonsterLevel(node.tier))}</span><br>
 <span style="color:${color};">${_egAtlasStatusLabel(status)}</span>`;
 
     showGameTooltip(html, event);

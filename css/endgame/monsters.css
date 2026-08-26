@@ -273,6 +273,114 @@
     text-shadow: 1px 1px 2px black;
 }
 
+/* ── Quiz reward: WeakAuras-style barrier wings ────────────────────── */
+/* Two glowing red arc segments flanking the character sprite while the
+   quiz damage buff is active. Anchored to the avatar wrapper; the sprite
+   image is the wrapper's last child, so bottom-aligned wings hug it. */
+.eg-quiz-shield-wing {
+    position: absolute;
+    bottom: 4px;
+    width: 26px;
+    height: 72px;
+    pointer-events: none;
+    z-index: 5;
+    border: 3px solid transparent;
+    animation: eg-quiz-shield-in 0.35s ease-out, eg-quiz-shield-pulse 1.6s ease-in-out 0.35s infinite alternate;
+}
+
+.eg-quiz-shield-left {
+    left: -22px;
+    border-right: none;
+    border-radius: 40px 0 0 40px;
+    border-left-color: #ff5533;
+    border-top-color: rgba(255, 85, 51, 0.55);
+    border-bottom-color: rgba(255, 85, 51, 0.55);
+    background: linear-gradient(to left, transparent, rgba(255, 85, 51, 0.30));
+    filter: drop-shadow(0 0 7px rgba(255, 85, 51, 0.8));
+}
+
+.eg-quiz-shield-right {
+    right: -22px;
+    border-left: none;
+    border-radius: 0 40px 40px 0;
+    border-right-color: #ff5533;
+    border-top-color: rgba(255, 85, 51, 0.55);
+    border-bottom-color: rgba(255, 85, 51, 0.55);
+    background: linear-gradient(to right, transparent, rgba(255, 85, 51, 0.30));
+    filter: drop-shadow(0 0 7px rgba(255, 85, 51, 0.8));
+}
+
+/* Fade-in on apply … */
+@keyframes eg-quiz-shield-in {
+    from {
+        opacity: 0;
+        transform: scaleX(0.4);
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+}
+
+/* … soft pulse while active … */
+@keyframes eg-quiz-shield-pulse {
+    from {
+        opacity: 0.65;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* … and fade-out when the buff expires */
+.eg-quiz-shield-out {
+    animation: eg-quiz-shield-fade-out 0.4s ease-in forwards !important;
+}
+
+@keyframes eg-quiz-shield-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        transform: scaleX(0.4);
+    }
+}
+
+/* ── Quiz reward buff label (floats above the player HUD) ─────────── */
+.eg-quiz-buff-label {
+    left: 50%;
+    top: -6px;
+    margin-left: -40px;
+    width: 80px;
+    text-align: center;
+    font-size: 16px;
+    color: var(--eg-hit-color, #ffffff);
+    /* Above the quiz overlay (z-index 450) so the reward FX stays visible
+       while the result message is still showing */
+    z-index: 520;
+    animation: eg-quiz-buff-float 0.9s ease-out forwards;
+}
+
+@keyframes eg-quiz-buff-float {
+    0% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-38px);
+        opacity: 0;
+    }
+}
+
 /* ── Player status bar (above inventory) ───────────────────────────── */
 /* Shared row of status chips: block recovery + active player ailments. */
 #eg-player-status-bar {
@@ -535,6 +643,90 @@
 
 .eg-pickup-rarity-currency {
     filter: drop-shadow(0 0 5px rgba(181,146,72,0.9));
+}
+
+
+/* ── Unique drop overlay (golden tier) ───────────────────────────────────── */
+/*
+   Uniques replace the gentle rarity pulse with a rotating golden ray
+   halo (::before) plus a twinkling sparkle (::after). The base class's
+   drop-shadow filter creates a stacking context, so the negative z-index
+   halo stays behind the item sprite but above the grid cell.
+*/
+.eg-loot-overlay.eg-unique-drop {
+    animation: eg-unique-pulse 1.6s ease-in-out infinite;
+    filter:
+        drop-shadow(0 0 4px rgba(255,215,120,1))
+        drop-shadow(0 0 10px rgba(245,182,66,0.95))
+        drop-shadow(0 0 18px rgba(243,156,18,0.7));
+    z-index: 6;
+}
+
+.eg-loot-overlay.eg-unique-drop::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 220%;
+    height: 220%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        rgba(245,182,66,0.00) 0deg,
+        rgba(245,182,66,0.65) 12deg,
+        rgba(255,236,180,0.90) 18deg,
+        rgba(245,182,66,0.65) 24deg,
+        rgba(245,182,66,0.00) 36deg,
+        rgba(245,182,66,0.00) 90deg,
+        rgba(245,182,66,0.55) 102deg,
+        rgba(255,236,180,0.85) 108deg,
+        rgba(245,182,66,0.55) 114deg,
+        rgba(245,182,66,0.00) 126deg,
+        rgba(245,182,66,0.00) 180deg,
+        rgba(245,182,66,0.65) 192deg,
+        rgba(255,236,180,0.90) 198deg,
+        rgba(245,182,66,0.65) 204deg,
+        rgba(245,182,66,0.00) 216deg,
+        rgba(245,182,66,0.00) 270deg,
+        rgba(245,182,66,0.55) 282deg,
+        rgba(255,236,180,0.85) 288deg,
+        rgba(245,182,66,0.55) 294deg,
+        rgba(245,182,66,0.00) 306deg
+    );
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 62%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 62%);
+    animation: eg-unique-spin 3.2s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.eg-loot-overlay.eg-unique-drop::after {
+    content: '✦';
+    position: absolute;
+    top: -22%;
+    right: -26%;
+    font-size: 0.75em;
+    color: #ffe9ad;
+    text-shadow: 0 0 5px #f5b642, 0 0 10px rgba(243,156,18,0.8);
+    animation: eg-unique-sparkle 1.3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes eg-unique-spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes eg-unique-pulse {
+    0%   { transform: translate(-50%, -50%) scale(1); }
+    50%  { transform: translate(-50%, -50%) scale(1.22); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes eg-unique-sparkle {
+    0%, 100% { opacity: 0.15; transform: scale(0.6) rotate(0deg); }
+    50%      { opacity: 1;    transform: scale(1.15) rotate(25deg); }
 }
 
 @keyframes eg-pickup-pulse {
@@ -945,6 +1137,156 @@
     z-index: 9002;
     font-variant-numeric: tabular-nums;
     /* position is set to match the circle, so JS sets left/top via the circle element */
+}
+
+
+/* ── Generic screen-blast engine ──────────────────────────────────────────
+   Shared by Heat Death Bloom / Rewrite Fate / Prior Collapse. Accent colour
+   per mechanic comes in via the --blast-accent custom property. */
+
+.eg-blast-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9000;
+    transition: background 0.4s ease;
+}
+
+    .eg-blast-overlay.eg-blast-warning {
+        background: rgba(100, 20, 0, 0.35);
+        animation: eg-blast-warning-pulse 0.5s ease-in-out infinite alternate;
+    }
+
+@keyframes eg-blast-warning-pulse {
+    from { background: rgba(100, 20, 0, 0.25); }
+    to   { background: rgba(150, 30, 0, 0.45); }
+}
+
+    .eg-blast-overlay.eg-blast-active {
+        background: rgba(8, 2, 16, 0.82);
+        animation: none;
+    }
+
+/* Safe-zone circle — accent colour driven by --blast-accent */
+.eg-blast-circle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9001;
+    border: 3px solid var(--blast-accent, #ffd93c);
+    background: rgba(255, 220, 60, 0.08);
+    background: color-mix(in srgb, var(--blast-accent, #ffd93c) 8%, transparent);
+    box-shadow: 0 0 20px var(--blast-accent, #ffd93c),
+                inset 0 0 20px var(--blast-accent, #ffd93c);
+    animation: eg-blast-breathe 1s ease-in-out infinite alternate;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+@keyframes eg-blast-breathe {
+    from {
+        box-shadow: 0 0 14px var(--blast-accent, #ffd93c);
+        border-color: var(--blast-accent, #ffd93c);
+    }
+
+    to {
+        box-shadow: 0 0 34px var(--blast-accent, #ffd93c);
+        border-color: #ffffff;
+    }
+}
+
+/* Decoy zone (Prior Collapse) — dimmer, desaturated during the warning */
+.eg-blast-circle.eg-blast-fake {
+    opacity: 0.55;
+    filter: saturate(0.4) grayscale(0.35);
+}
+
+/* The real zone's tell during a Prior Collapse warning */
+.eg-blast-circle.eg-blast-true::after {
+    content: '✨';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    animation: eg-blast-sparkle 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes eg-blast-sparkle {
+    from { transform: scale(0.85); opacity: 0.6; }
+    to   { transform: scale(1.15); opacity: 1; }
+}
+
+/* Fake zone collapsing at blast impact */
+.eg-blast-circle.eg-blast-collapsed {
+    transition: transform 0.45s ease-in, opacity 0.45s ease-in;
+    transform: scale(0.05);
+    opacity: 0;
+}
+
+/* Zone jump flash (Rewrite Fate) */
+.eg-blast-circle.eg-blast-jump {
+    animation: none;
+    box-shadow: 0 0 60px #ffffff, inset 0 0 40px #ffffff;
+}
+
+/* HUD inside → green glow */
+.eg-blast-circle.eg-blast-safe {
+    border-color: rgba(80, 255, 120, 1.0) !important;
+    background: rgba(80, 255, 120, 0.12);
+    box-shadow: 0 0 30px rgba(80, 255, 120, 0.7), inset 0 0 20px rgba(80, 255, 120, 0.2);
+    animation: none;
+}
+
+/* Resolve flashes */
+.eg-blast-circle.eg-blast-survived {
+    border-color: #4ade80 !important;
+    background: rgba(74, 222, 128, 0.25);
+    box-shadow: 0 0 50px rgba(74, 222, 128, 0.9);
+    animation: none;
+}
+
+.eg-blast-circle.eg-blast-hit {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.25);
+    box-shadow: 0 0 50px rgba(239, 68, 68, 0.9);
+    animation: none;
+}
+
+/* Dashed ghost preview of the relocation target (Rewrite Fate) */
+.eg-blast-ghost {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9001;
+    border: 3px dashed var(--blast-accent, #ffd93c);
+    background: transparent;
+    opacity: 0.7;
+    animation: eg-blast-ghost-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes eg-blast-ghost-pulse {
+    from { opacity: 0.35; }
+    to   { opacity: 0.85; }
+}
+
+/* Countdown number inside the real zone */
+.eg-blast-countdown {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--blast-accent, #ffd93c);
+    text-shadow: 0 0 10px var(--blast-accent, #ffd93c), 0 2px 4px rgba(0,0,0,0.9);
+    pointer-events: none;
+    z-index: 9002;
+    font-variant-numeric: tabular-nums;
+    width: 60px;
+    height: 60px;
+    margin-left: -30px;
+    margin-top: -30px;
 }
 
 

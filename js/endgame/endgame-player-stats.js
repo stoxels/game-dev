@@ -152,6 +152,60 @@ const EG_MELEE_BUCKET_MAP = {
     shadowDmgMax: 'meleeShadowMax',
 };
 
+//------------------------------------------------------------------------
+//-------------------MERGED STAT DISPLAY----------------------------------
+//------------------------------------------------------------------------
+// Mods that feed the same stat (e.g. a flat Health roll plus the Health
+// half of a hybrid life+armour roll) are shown as ONE combined line
+// instead of separate ones. Lines are grouped by their localized label
+// template (label with all numeric values blanked out); the group's
+// values are summed per placeholder position and re-inserted into the
+// first-seen template, keeping the original line order. Lines without a
+// numeric value and downside mods are never merged with normal mods.
+// Returns [{ label: string, downside: bool }] for tooltip rendering.
+function _egBuildMergedModLines(mods) {
+    const NUM_RE = /-?\d[\d.,]*/g;
+    const groups = [];
+    const byKey = new Map();
+    (Array.isArray(mods) ? mods : []).forEach(mod => {
+        if (!Array.isArray(mod.rolledStats)) return;
+        mod.rolledStats.forEach(stat => {
+            if (!stat || !stat.label) return;
+            const downside = !!mod.isDownside;
+            const matches = stat.label.match(NUM_RE);
+            // Lines without any numeric value can't be meaningfully merged.
+            if (!matches || matches.length === 0) {
+                groups.push({ label: stat.label, downside });
+                return;
+            }
+            const key = (downside ? 'down' : 'norm') + '|' +
+                stat.label.replace(NUM_RE, '\u0000');
+            let g = byKey.get(key);
+            if (!g) {
+                g = { template: stat.label, slots: matches.map(() => []), count: 0, downside };
+                byKey.set(key, g);
+                groups.push(g);
+            }
+            matches.forEach((raw, i) => {
+                const v = parseFloat(String(raw).replace(',', '.'));
+                if (!isNaN(v) && g.slots[i]) g.slots[i].push(v);
+            });
+            g.count++;
+        });
+    });
+
+    return groups.map(g => {
+        if (g.count <= 1) return { label: g.template, downside: g.downside };
+        let idx = 0;
+        const label = g.template.replace(NUM_RE, () => {
+            const vals = g.slots[idx++] || [];
+            const sum = vals.reduce((a, b) => a + b, 0);
+            return String(Math.round(sum * 100) / 100);
+        });
+        return { label, downside: g.downside };
+    });
+}
+
 // Returns every non-empty equipped item as a flat array.
 function _egGetAllEquippedItems() {
     if (typeof _egEquipped === 'undefined') return [];
@@ -304,6 +358,35 @@ function _egGetItemEffectiveDamage(item) {
     return out;
 }
 
+//------------------------------------------------------------------------
+//-------------------LOCAL ITEM ATTACK INTERVAL---------------------------
+//------------------------------------------------------------------------
+// The weapon's "Attacks every Xs" implicit is reduced by its own rolled
+// "Melee Strikes occur #s more often" mod (attack_speed) — LOCAL in the
+// same display sense as the damage ranges above. Clamped to
+// EG_PLAYER_MIN_ATTACK_INTERVAL so it matches the combat interval in
+// _egGetPlayerAttackIntervalBreakdown().
+function _egGetItemEffectiveAttackInterval(item) {
+    const base = Number(item.attackIntervalSeconds);
+    if (!isFinite(base)) return { base: null, interval: null, modded: false };
+
+    let reduction = 0;
+    (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
+        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
+            if (stat.key !== 'attack_speed' || stat.value == null) return;
+            reduction += Number(stat.value) || 0;
+        });
+    });
+
+    const minInterval = (typeof EG_PLAYER_MIN_ATTACK_INTERVAL !== 'undefined')
+        ? EG_PLAYER_MIN_ATTACK_INTERVAL : 2;
+    return {
+        base,
+        interval: Math.max(minInterval, base - reduction),
+        modded: reduction > 0,
+    };
+}
+
 // Aggregates every equipped item's implicit defenses + rolled mods into one
 // stats object. Recomputed on demand (cheap — ~19 slots, ≤6 mods each) so it
 // never goes stale after an equip/unequip.
@@ -447,6 +530,33 @@ function _egComputePlayerStats() {
         }
     }
 
+    // Active map run: single-defence reductions.
+    if (typeof _egMapEvasionMult === 'function') {
+        const evMult = _egMapEvasionMult();
+        if (evMult < 1) s.evasion = Math.round(s.evasion * evMult);
+    }
+    if (typeof _egMapAbsorptionMult === 'function') {
+        const abMult = _egMapAbsorptionMult();
+        if (abMult < 1) s.absorption = Math.round(s.absorption * abMult);
+    }
+    if (typeof _egMapBlockMult === 'function') {
+        const blMult = _egMapBlockMult();
+        if (blMult < 1) {
+            s.blockChance = Math.round((s.blockChance || 0) * blMult * 10) / 10;
+            s.spellBlockChance = Math.round((s.spellBlockChance || 0) * blMult * 10) / 10;
+        }
+    }
+
+    // Active map run: single-offence reductions.
+    if (typeof _egMapAccuracyMult === 'function') {
+        const accMult = _egMapAccuracyMult();
+        if (accMult < 1) s.accuracy = Math.round((s.accuracy || 0) * accMult);
+    }
+    if (typeof _egMapAttackSpeedMult === 'function') {
+        const asMult = _egMapAttackSpeedMult();
+        if (asMult < 1) s.attackSpeed = Math.round((s.attackSpeed || 0) * asMult * 100) / 100;
+    }
+
     return s;
 }
 
@@ -460,7 +570,10 @@ function _egComputePlayerStats() {
 // attackIntervalSeconds implicit ("Attacks every Xs"); the summed
 // attack_speed mod values ("Melee Strikes occur #s more often") are then
 // subtracted, clamped to a minimum so strikes can't be spammed.
-function _egGetPlayerAttackInterval() {
+// Full breakdown for display: { base, reduction, interval } where interval
+// is the effective strike time (base minus summed attack_speed mods,
+// clamped to EG_PLAYER_MIN_ATTACK_INTERVAL).
+function _egGetPlayerAttackIntervalBreakdown() {
     const defBase = EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
     let base = defBase;
     // Only the melee weapon slot defines the auto-strike interval — ranged
@@ -475,7 +588,18 @@ function _egGetPlayerAttackInterval() {
         }
     }
     const reduction = _egComputePlayerStats().attackSpeed || 0;
-    return Math.max(EG_PLAYER_MIN_ATTACK_INTERVAL, base - reduction);
+    let interval = Math.max(EG_PLAYER_MIN_ATTACK_INTERVAL, base - reduction);
+
+    // Active map run: Temporal Chains — you act #% slower.
+    if (typeof _egMapActionSlowMult === 'function') {
+        interval *= _egMapActionSlowMult();
+    }
+
+    return { base, reduction, interval };
+}
+
+function _egGetPlayerAttackInterval() {
+    return _egGetPlayerAttackIntervalBreakdown().interval;
 }
 
 
@@ -484,17 +608,71 @@ function _egGetPlayerAttackInterval() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Flat % damage reduction from armour, diminishing returns, capped at 75%.
+// Armour mitigation is damage-relative (PoE-style): the same armour value
+// mitigates many small hits strongly but large hits weakly, so it never
+// trivially caps once gear values grow and stays relevant at every level.
+const EG_ARMOUR_DAMAGE_FACTOR = 10;   // reduction% = armour / (armour + factor * rawDamage)
+const EG_ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
+
+// Returns armour's % reduction (0..EG_ARMOUR_MAX_REDUCTION) against a hit of
+// the given raw size. Used by both the combat path and stat tooltips so the
+// displayed value always matches what combat actually rolls.
+function _egCalcArmourReductionPct(armour, rawDamage) {
+    const armourVal = Math.max(0, Number(armour) || 0);
+    const dmg = Math.max(1, Number(rawDamage) || 1);
+    return Math.min(EG_ARMOUR_MAX_REDUCTION, armourVal / (armourVal + EG_ARMOUR_DAMAGE_FACTOR * dmg));
+}
+
 function _egCalcArmourMitigation(rawDamage, armour) {
-    if (!armour) return rawDamage;
-    const reductionPct = Math.min(0.75, armour / (armour + 100));
+    const reductionPct = _egCalcArmourReductionPct(armour, rawDamage);
     return rawDamage * (1 - reductionPct);
 }
 
-// Converts evasion into a % chance to fully dodge an incoming hit, capped at 75%.
-function _egCalcEvasionDodgeChance(evasion) {
+// Converts evasion into a % chance to fully dodge an incoming hit, capped at
+// 75%. The benchmark constant scales with the ATTACKER's level (PoE-style):
+// higher-level monsters are harder to dodge, so evasion keeps requiring
+// upgrades instead of permanently sitting at the cap once gear values grow.
+const EG_EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
+const EG_EVASION_LEVEL_GROWTH = 1.045; // per-level growth of the evasion benchmark
+const EG_EVASION_DODGE_CAP_PCT = 75;
+
+function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
     if (!evasion) return 0;
-    return Math.min(75, (evasion / (evasion + 200)) * 100);
+    const lvl = Math.max(1, Number(monsterLevel) || 1);
+    const k = EG_EVASION_DODGE_K * Math.pow(EG_EVASION_LEVEL_GROWTH, lvl - 1);
+    return Math.min(EG_EVASION_DODGE_CAP_PCT, (evasion / (evasion + k)) * 100);
+}
+
+// Accuracy vs monster level → % chance for the player's attacks to miss.
+// Miss chance scales linearly with the target's level and inversely with
+// accuracy, clamped to a floor (never perfectly accurate) and a ceiling
+// (attacks always have a chance to land). Applied identically to melee
+// strikes and projectiles — see _egRollPlayerMiss in endgame-encounter.js.
+//
+// Every character additionally gains INNATE accuracy with their own level
+// (PoE-style level scaling), so a fresh, under-geared character is not
+// punished by the raw formula: at parity (player level ≈ monster level)
+// even a naked character lands most hits, while accuracy investment from
+// gear lets you comfortably fight content ABOVE your level. Fighting
+// higher-level monsters without that investment still gets shaky.
+const EG_ACCURACY_MISS_SCALE = 150;   // miss% = scale * monsterLevel / effectiveAccuracy
+const EG_ACCURACY_MISS_MIN_PCT = 5;   // never perfectly reliable
+const EG_ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
+const EG_ACCURACY_INNATE_BASE = 30;       // innate accuracy at player level 1
+const EG_ACCURACY_INNATE_PER_LEVEL = 15;  // extra innate accuracy per player level
+
+function _egGetInnateAccuracy() {
+    const lvl = (typeof _egGetPlayerLevel === 'function')
+        ? Math.max(1, Number(_egGetPlayerLevel()) || 1) : 1;
+    return EG_ACCURACY_INNATE_BASE + EG_ACCURACY_INNATE_PER_LEVEL * (lvl - 1);
+}
+
+function _egCalcAccuracyMissChance(accuracy, monsterLevel) {
+    const lvl = Math.max(1, Number(monsterLevel) || 1);
+    const acc = Math.max(0, Number(accuracy) || 0) + _egGetInnateAccuracy();
+    if (acc <= 0) return EG_ACCURACY_MISS_MAX_PCT;
+    const raw = (EG_ACCURACY_MISS_SCALE * lvl) / acc;
+    return Math.max(EG_ACCURACY_MISS_MIN_PCT, Math.min(EG_ACCURACY_MISS_MAX_PCT, raw));
 }
 
 // Rolls a crit for the current hit. Returns the damage multiplier (1 = no crit).
@@ -519,8 +697,16 @@ function _egGetElementalDamageBonus(stats) {
 //-------------------ABSORPTION SHIELD REGEN-------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-// Absorption is a secondary HP layer. It starts regenerating 10s after the
-// last hit, refilling gradually until it's back to the equipped max.
+// Absorption is a secondary HP layer. It starts regenerating after a delay
+// since the last hit, refilling gradually until it's back to the equipped max.
+// Gear: faster_absorption_regen_start shortens the delay (seconds),
+// gear: absorption_regen_rate increases the refill speed (%).
+
+// Base delay before regeneration starts (reduced by fasterAbsorptionRegenStart).
+const EG_ABSORPTION_REGEN_BASE_DELAY_MS = 10000;
+
+// Base share of max Absorption restored per regen tick (scaled by absorptionRegenRatePct).
+const EG_ABSORPTION_REGEN_BASE_STEP_PCT = 0.08;
 
 function _egCancelAbsorptionRegen() {
     if (_egPlayerAbsorptionRegenDelayTimer) { clearTimeout(_egPlayerAbsorptionRegenDelayTimer); _egPlayerAbsorptionRegenDelayTimer = null; }
@@ -530,15 +716,25 @@ function _egCancelAbsorptionRegen() {
 // Called on every hit taken — interrupts any in-progress regen and restarts the delay.
 function _egScheduleAbsorptionRegen() {
     _egCancelAbsorptionRegen();
+
+    const stats = _egComputePlayerStats();
+    let delayMs = Math.max(0, EG_ABSORPTION_REGEN_BASE_DELAY_MS - (stats.fasterAbsorptionRegenStart || 0) * 1000);
+    // Active map run: Absorption recharges #% slower.
+    if (typeof _egGetActiveMapModValue === 'function') {
+        const slowPct = _egGetActiveMapModValue('map_slower_absorption');
+        if (slowPct > 0) delayMs = Math.round(delayMs * (1 + slowPct / 100));
+    }
+    const rateMult = 1 + Math.min(100, stats.absorptionRegenRatePct || 0) / 100;
+
     _egPlayerAbsorptionRegenDelayTimer = setTimeout(() => {
         _egPlayerAbsorptionRegenInterval = setInterval(() => {
             if (!_egIsActive()) { _egCancelAbsorptionRegen(); return; }
             const max = _egComputePlayerStats().absorption;
             if (_egPlayerAbsorptionCurrent >= max) { _egCancelAbsorptionRegen(); return; }
-            const step = Math.max(1, Math.round(max * 0.08));
+            const step = Math.max(1, Math.round(max * EG_ABSORPTION_REGEN_BASE_STEP_PCT * rateMult));
             _egPlayerAbsorptionCurrent = Math.min(max, _egPlayerAbsorptionCurrent + step);
         }, 200);
-    }, 10000);
+    }, delayMs);
 }
 
 
@@ -664,7 +860,7 @@ const EG_STAT_LAYOUT = {
         // Melee auto-strike channel — independent from the projectile
         // channel above; fed only by the weapon slot (see _egComputePlayerStats)
         { catKey: 'eg_statcat_melee', buckets: [
-            'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
+            'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
             'meleeLightningRange', 'meleeShadowRange'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
@@ -719,6 +915,19 @@ function _egBuildStatLine(bucket, stats) {
         case 'absorption':
             if (stats.absorption > 0) line = { label: t('eg_tt_absorption'), value: `${_egFormatStatValue(stats.absorption)}` };
             break;
+
+        // Effective melee strike interval: weapon base minus the summed
+        // attack_speed mods from gear (always present — shown first in the
+        // "Melee Strikes" category).
+        case 'attackInterval': {
+            if (typeof _egGetPlayerAttackIntervalBreakdown !== 'function') return null;
+            const { base, reduction, interval } = _egGetPlayerAttackIntervalBreakdown();
+            const value = reduction > 0 && base - reduction >= EG_PLAYER_MIN_ATTACK_INTERVAL
+                ? `${_egFormatStatValue(interval)}s (${_egFormatStatValue(base)}s − ${_egFormatStatValue(reduction)}s)`
+                : `${_egFormatStatValue(interval)}s`;
+            line = { label: t('eg_stat_attack_interval'), value };
+            break;
+        }
 
         // Physical + elemental damage ranges (projectile channel)
         case 'physRange':

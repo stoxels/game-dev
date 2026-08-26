@@ -144,11 +144,8 @@ function _renderPlayerAvatarSimple() {
 function _removePlayerAvatarSimple() {
     const simple = document.getElementById('player-avatar-simple');
     if (simple) simple.remove();
-    // Clean up WASD listener
-    if (window._avatarWASDHandler) {
-        document.removeEventListener('keydown', window._avatarWASDHandler);
-        window._avatarWASDHandler = null;
-    }
+    // Clean up WASD listeners
+    _removeSimpleAvatarWasdListeners();
     if (typeof hideCharacterBanter === 'function') hideCharacterBanter();
 }
 
@@ -206,36 +203,106 @@ function _initSimpleAvatarDrag(wrapper) {
 //-------------------WASD MOVEMENT----------------------------------------
 //------------------------------------------------------------------------
 
-function _initSimpleAvatarWASD(wrapper) {
-    // Remove any previous listener
-    if (window._avatarWASDHandler) {
-        document.removeEventListener('keydown', window._avatarWASDHandler);
+// --- Shared held-key movement -------------------------------------------
+// The old handlers moved the sprite once per physical keydown event, so the
+// OS key-repeat delay (~500 ms) had to elapse before continuous movement
+// started. Instead we track which keys are currently held and move the
+// sprite every animation frame, so it reacts instantly and smoothly.
+
+const AVATAR_WASD_KEYS = new Set(['w', 'a', 's', 'd']);
+const AVATAR_MOVE_SPEED_PX_PER_SEC = 320;
+
+const _avatarMoveState = {
+    held: new Set(),
+    elId: null,
+    rafId: null,
+    lastTs: 0,
+};
+
+function _avatarMoveUiBlocked() {
+    const tag = document.activeElement ? document.activeElement.tagName : null;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show');
+}
+
+function _avatarMoveTick(ts) {
+    _avatarMoveState.rafId = null;
+    if (!_avatarMoveState.held.size || !_avatarMoveState.elId) return;
+
+    const el = document.getElementById(_avatarMoveState.elId);
+    if (!el) return;
+
+    const dt = Math.min((ts - _avatarMoveState.lastTs) / 1000, 0.05);
+    _avatarMoveState.lastTs = ts;
+
+    if (!_avatarMoveUiBlocked()) {
+        let dx = 0;
+        let dy = 0;
+        if (_avatarMoveState.held.has('w')) dy -= 1;
+        if (_avatarMoveState.held.has('s')) dy += 1;
+        if (_avatarMoveState.held.has('a')) dx -= 1;
+        if (_avatarMoveState.held.has('d')) dx += 1;
+
+        if (dx || dy) {
+            const dist = AVATAR_MOVE_SPEED_PX_PER_SEC * dt;
+            const norm = Math.hypot(dx, dy);   // keeps diagonal speed equal
+            const left = parseInt(el.style.left) || 12;
+            const top = parseInt(el.style.top) ||
+                (el.id === 'player-avatar-wrapper' ? window.innerHeight - 220 : 80);
+            _setAvatarPos(el, left + (dx / norm) * dist, top + (dy / norm) * dist);
+        }
     }
 
-    const STEP = 16; // pixels per keypress
+    _avatarMoveState.rafId = requestAnimationFrame(_avatarMoveTick);
+}
 
-    window._avatarWASDHandler = (e) => {
-        // Don't steal input when typing in a field or a modal is open
-        const tag = document.activeElement?.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-        if (document.querySelector('.modal-bg.show')) return;
-
-        const el = document.getElementById('player-avatar-simple');
-        if (!el) return;
-
-        const left = parseInt(el.style.left) || 12;
-        const top = parseInt(el.style.top) || 80;
-
-        switch (e.key) {
-            case 'w': case 'W': _setAvatarPos(el, left, top - STEP); break;
-            case 's': case 'S': _setAvatarPos(el, left, top + STEP); break;
-            case 'a': case 'A': _setAvatarPos(el, left - STEP, top); break;
-            case 'd': case 'D': _setAvatarPos(el, left + STEP, top); break;
-            default: return;
+function _makeAvatarWasdHandlers(elId) {
+    const onKeyDown = (e) => {
+        if (_avatarMoveUiBlocked()) return;
+        const k = (e.key || '').toLowerCase();
+        if (!AVATAR_WASD_KEYS.has(k)) return;
+        e.preventDefault();
+        if (_avatarMoveState.held.has(k)) return;   // ignore OS auto-repeat events
+        _avatarMoveState.held.add(k);
+        _avatarMoveState.elId = elId;
+        if (!_avatarMoveState.rafId) {
+            _avatarMoveState.lastTs = performance.now();
+            _avatarMoveState.rafId = requestAnimationFrame(_avatarMoveTick);
         }
     };
+    const onKeyUp = (e) => {
+        _avatarMoveState.held.delete((e.key || '').toLowerCase());
+    };
+    const onBlur = () => _avatarMoveState.held.clear();
+    return { onKeyDown, onKeyUp, onBlur };
+}
 
-    document.addEventListener('keydown', window._avatarWASDHandler);
+function _removeSimpleAvatarWasdListeners() {
+    if (window._avatarWASDHandler) {
+        document.removeEventListener('keydown', window._avatarWASDHandler);
+        window._avatarWASDHandler = null;
+    }
+    if (window._avatarWASDKeyUpHandler) {
+        document.removeEventListener('keyup', window._avatarWASDKeyUpHandler);
+        window._avatarWASDKeyUpHandler = null;
+    }
+    if (window._avatarWASDBlurHandler) {
+        window.removeEventListener('blur', window._avatarWASDBlurHandler);
+        window._avatarWASDBlurHandler = null;
+    }
+}
+
+function _initSimpleAvatarWASD(wrapper) {
+    // Remove any previous listeners
+    _removeSimpleAvatarWasdListeners();
+
+    const h = _makeAvatarWasdHandlers('player-avatar-simple');
+    window._avatarWASDHandler = h.onKeyDown;
+    window._avatarWASDKeyUpHandler = h.onKeyUp;
+    window._avatarWASDBlurHandler = h.onBlur;
+
+    document.addEventListener('keydown', h.onKeyDown);
+    document.addEventListener('keyup', h.onKeyUp);
+    window.addEventListener('blur', h.onBlur);
 }
 
 // Returns true when the random_walker companions should be shown.
@@ -544,34 +611,32 @@ function _initFullAvatarDrag(wrapper) {
     });
 }
 
-function _initFullAvatarWASD(wrapper) {
+function _removeFullAvatarWasdListeners() {
     if (window._avatarFullWASDHandler) {
         document.removeEventListener('keydown', window._avatarFullWASDHandler);
+        window._avatarFullWASDHandler = null;
     }
+    if (window._avatarFullWASDKeyUpHandler) {
+        document.removeEventListener('keyup', window._avatarFullWASDKeyUpHandler);
+        window._avatarFullWASDKeyUpHandler = null;
+    }
+    if (window._avatarFullWASDBlurHandler) {
+        window.removeEventListener('blur', window._avatarFullWASDBlurHandler);
+        window._avatarFullWASDBlurHandler = null;
+    }
+}
 
-    const STEP = 16;
+function _initFullAvatarWASD(wrapper) {
+    _removeFullAvatarWasdListeners();
 
-    window._avatarFullWASDHandler = (e) => {
-        const tag = document.activeElement?.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-        if (document.querySelector('.modal-bg.show')) return;
+    const h = _makeAvatarWasdHandlers('player-avatar-wrapper');
+    window._avatarFullWASDHandler = h.onKeyDown;
+    window._avatarFullWASDKeyUpHandler = h.onKeyUp;
+    window._avatarFullWASDBlurHandler = h.onBlur;
 
-        const el = document.getElementById('player-avatar-wrapper');
-        if (!el) return;
-
-        const left = parseInt(el.style.left) || 12;
-        const top = parseInt(el.style.top) || (window.innerHeight - 220);
-
-        switch (e.key) {
-            case 'w': case 'W': _setAvatarPos(el, left, top - STEP); break;
-            case 's': case 'S': _setAvatarPos(el, left, top + STEP); break;
-            case 'a': case 'A': _setAvatarPos(el, left - STEP, top); break;
-            case 'd': case 'D': _setAvatarPos(el, left + STEP, top); break;
-            default: return;
-        }
-    };
-
-    document.addEventListener('keydown', window._avatarFullWASDHandler);
+    document.addEventListener('keydown', h.onKeyDown);
+    document.addEventListener('keyup', h.onKeyUp);
+    window.addEventListener('blur', h.onBlur);
 }
 
 

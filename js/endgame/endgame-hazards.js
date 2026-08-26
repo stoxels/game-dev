@@ -2,11 +2,17 @@
 //-------------------ENDGAME MAP ELEMENTAL HAZARDS------------------------
 //------------------------------------------------------------------------
 // Screen-space environmental hazards driven by map modifier families:
-//   map_hazard_lava      — drifting lava pools around the puzzle grid
+//   map_hazard_lava      — drifting lava balls around the puzzle grid
 //   map_hazard_lightning — telegraphed lightning strikes (shock on hit)
 //   map_hazard_blizzard  — snow overlay + falling icicles (chill on hit)
 //   map_hazard_darkness  — drifting dark clouds obscuring parts of the UI
 //   map_hazard_arcane    — charged arcane beams sweeping right → left
+//   map_hazard_meteor    — telegraphed meteor volleys (ignite on hit)
+//   map_hazard_volatile  — wisps that hunt the player and detonate (shadow burn)
+//   map_hazard_frostnova — freezing novas erupting near the player (chill/freeze)
+//   map_hazard_firewall  — telegraphed fire walls sweeping top → bottom (ignite)
+//   map_hazard_cyclone   — fast-drifting cyclones with continuous wind damage
+//   map_hazard_delirium  — periodic delirium mist that may polymorph the player
 //
 // Hazards ONLY affect the player — monsters never interact with them.
 // All damage flows through _egPlayerTakeDamage(amount, true, element) so
@@ -32,8 +38,8 @@ const EG_HZ_LAVA_BASE_DMG_PCT = 2;        // % of playerMaxHP per lava tick
 const EG_HZ_LAVA_TICK_MS = 600;           // damage tick rate while standing in lava
 const EG_HZ_LAVA_MIN_R = 55;              // pool radius range (px)
 const EG_HZ_LAVA_MAX_R = 85;
-const EG_HZ_LAVA_SPEED_MIN = 8;           // drift speed range (px/s)
-const EG_HZ_LAVA_SPEED_MAX = 20;
+const EG_HZ_LAVA_SPEED_MIN = 20;          // drift speed range (px/s)
+const EG_HZ_LAVA_SPEED_MAX = 48;
 
 const EG_HZ_LIGHTNING_BASE_DMG_PCT = 8;   // % of playerMaxHP per strike
 const EG_HZ_LIGHTNING_WARNING_MS = 5000;  // telegraph time before impact
@@ -56,6 +62,57 @@ const EG_HZ_ARCANE_POLYMORPH_CHANCE_PCT = 40;
 const EG_HZ_ARCANE_INTERVAL_MIN_MS = 13000;
 const EG_HZ_ARCANE_INTERVAL_MAX_MS = 18000;
 
+const EG_HZ_METEOR_BASE_DMG_PCT = 6;       // % of playerMaxHP per meteor impact
+const EG_HZ_METEOR_WARNING_MS = 1400;      // telegraph time per meteor
+const EG_HZ_METEOR_FALL_MS = 420;          // descent duration once fired
+const EG_HZ_METEOR_RADIUS = 70;            // impact radius (px)
+const EG_HZ_METEOR_VOLLEY_MIN = 3;
+const EG_HZ_METEOR_VOLLEY_MAX = 6;
+const EG_HZ_METEOR_IGNITE_CHANCE_PCT = 40;
+const EG_HZ_METEOR_INTERVAL_MIN_MS = 7000;
+const EG_HZ_METEOR_INTERVAL_MAX_MS = 11000;
+
+const EG_HZ_VOLATILE_BASE_DMG_PCT = 9;     // % of playerMaxHP per detonation
+const EG_HZ_VOLATILE_SPEED_MIN = 26;       // homing speed range (px/s)
+const EG_HZ_VOLATILE_SPEED_MAX = 60;
+const EG_HZ_VOLATILE_TRIGGER_R = 90;       // starts fusing when this close
+const EG_HZ_VOLATILE_FUSE_MS = 1100;       // flashing fuse before detonation
+const EG_HZ_VOLATILE_BLAST_R = 110;        // detonation radius (px)
+const EG_HZ_VOLATILE_LIFETIME_MS = 16000;  // fuses anyway so it can't stall
+const EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT = 60;
+const EG_HZ_VOLATILE_RESPAWN_MIN_MS = 4000;
+const EG_HZ_VOLATILE_RESPAWN_MAX_MS = 8000;
+
+const EG_HZ_FROSTNOVA_BASE_DMG_PCT = 7;    // % of playerMaxHP per nova hit
+const EG_HZ_FROSTNOVA_EXPAND_MS = 1600;    // ring expansion duration
+const EG_HZ_FROSTNOVA_MAX_R = 170;         // final ring radius (px)
+const EG_HZ_FROSTNOVA_BAND = 26;           // damaging band thickness (px)
+const EG_HZ_FROSTNOVA_FREEZE_CHANCE_PCT = 30;
+const EG_HZ_FROSTNOVA_INTERVAL_MIN_MS = 6000;
+const EG_HZ_FROSTNOVA_INTERVAL_MAX_MS = 10000;
+
+const EG_HZ_FIREWALL_BASE_DMG_PCT = 8;     // % of playerMaxHP per wall hit
+const EG_HZ_FIREWALL_HEIGHT = 150;         // flame wave thickness (px)
+const EG_HZ_FIREWALL_WARNING_MS = 1300;    // telegraph before ignition
+const EG_HZ_FIREWALL_SWEEP_MS = 2600;      // top → bottom sweep duration
+const EG_HZ_FIREWALL_IGNITE_CHANCE_PCT = 50;
+const EG_HZ_FIREWALL_INTERVAL_MIN_MS = 8000;
+const EG_HZ_FIREWALL_INTERVAL_MAX_MS = 12000;
+
+const EG_HZ_CYCLONE_BASE_DMG_PCT = 1.6;    // % of playerMaxHP per wind tick
+const EG_HZ_CYCLONE_TICK_MS = 500;         // damage tick rate inside a cyclone
+const EG_HZ_CYCLONE_R_MIN = 40;            // funnel radius range (px)
+const EG_HZ_CYCLONE_R_MAX = 62;
+const EG_HZ_CYCLONE_SPEED_MIN = 90;        // drift speed range (px/s)
+const EG_HZ_CYCLONE_SPEED_MAX = 170;
+
+const EG_HZ_DELIRIUM_INTERVAL_MIN_MS = 18000;
+const EG_HZ_DELIRIUM_INTERVAL_MAX_MS = 26000;
+const EG_HZ_DELIRIUM_FADE_IN_MS = 2500;
+const EG_HZ_DELIRIUM_HOLD_MS = 4000;
+const EG_HZ_DELIRIUM_FADE_OUT_MS = 2000;
+const EG_HZ_DELIRIUM_POLYMORPH_CHANCE_PCT = 45;
+
 const EG_HZ_LAYER_Z = 850;                // below player avatar (z:1000)
 
 
@@ -71,6 +128,12 @@ let _egHzLightning = null;  // { pending: [{x,y,t,el}], nextIn }
 let _egHzBlizzard = null;   // { icicles: [], spawnIn, maxIcicles }
 let _egHzDarkness = null;   // { clouds: [] }
 let _egHzArcane = null;     // { charge: null | {...}, beam: null | {...}, nextIn }
+let _egHzMeteor = null;     // { pending: [{x,y,t,warnEl,state,el,y}], nextIn, intervalScale, dmgMult }
+let _egHzVolatile = null;   // { wisps: [], respawnIn, maxWisps, dmgMult }
+let _egHzFrostNova = null;  // { novas: [], nextIn, intervalScale, dmgMult }
+let _egHzFirewall = null;   // { pending: [{t,y,el,hitDone}], nextIn, intervalScale, dmgMult }
+let _egHzCyclone = null;    // { vortices: [{x,y,r,vx,vy,dmgAcc,el}], dmgMult }
+let _egHzDelirium = null;   // { phase, nextIn, t, el, rolled }
 
 
 //------------------------------------------------------------------------
@@ -190,6 +253,12 @@ function _egHazardsReset() {
     const blizzardI = _egHzIntensity('map_hazard_blizzard');
     const darknessI = _egHzIntensity('map_hazard_darkness');
     const arcaneI = _egHzIntensity('map_hazard_arcane');
+    const meteorI = _egHzIntensity('map_hazard_meteor');
+    const volatileI = _egHzIntensity('map_hazard_volatile');
+    const frostNovaI = _egHzIntensity('map_hazard_frostnova');
+    const firewallI = _egHzIntensity('map_hazard_firewall');
+    const cycloneI = _egHzIntensity('map_hazard_cyclone');
+    const deliriumI = _egHzIntensity('map_hazard_delirium');
 
     const active = [];
     if (lavaI > 0) active.push('🌋');
@@ -197,6 +266,12 @@ function _egHazardsReset() {
     if (blizzardI > 0) active.push('❄️');
     if (darknessI > 0) active.push('🌑');
     if (arcaneI > 0) active.push('🔮');
+    if (meteorI > 0) active.push('☄️');
+    if (volatileI > 0) active.push('👻');
+    if (frostNovaI > 0) active.push('🧊');
+    if (firewallI > 0) active.push('🔥');
+    if (cycloneI > 0) active.push('🌪️');
+    if (deliriumI > 0) active.push('🌫️');
     if (active.length === 0) return;
 
     _egHzLayer = document.createElement('div');
@@ -209,6 +284,12 @@ function _egHazardsReset() {
     if (blizzardI > 0) _egHzInitBlizzard(blizzardI);
     if (darknessI > 0) _egHzInitDarkness(darknessI);
     if (arcaneI > 0) _egHzInitArcane(arcaneI);
+    if (meteorI > 0) _egHzInitMeteor(meteorI);
+    if (volatileI > 0) _egHzInitVolatile(volatileI);
+    if (frostNovaI > 0) _egHzInitFrostNova(frostNovaI);
+    if (firewallI > 0) _egHzInitFirewall(firewallI);
+    if (cycloneI > 0) _egHzInitCyclone(cycloneI);
+    if (deliriumI > 0) _egHzInitDelirium(deliriumI);
 
     _egHzActive = true;
     showToast(`☠️ Elemental Hazards active: ${active.join(' ')}`);
@@ -222,12 +303,20 @@ function _egHazardsCleanup() {
     _egHzBlizzard = null;
     _egHzDarkness = null;
     _egHzArcane = null;
+    _egHzMeteor = null;
+    _egHzVolatile = null;
+    _egHzFrostNova = null;
+    _egHzFirewall = null;
+    _egHzCyclone = null;
+    _egHzDelirium = null;
     if (_egHzLayer) {
         _egHzLayer.remove();
         _egHzLayer = null;
     }
     // Darkness clouds live outside the main layer (higher z-index).
     document.querySelectorAll('.eg-hz-darkness-layer').forEach(el => el.remove());
+    // Delirium mist likewise covers the whole screen from body level.
+    document.querySelectorAll('.eg-hz-delirium').forEach(el => el.remove());
 }
 
 // Per-tick driver — called at 10Hz from _egTickLoop.
@@ -241,15 +330,23 @@ function _egHazardsTick() {
     if (_egHzBlizzard) _egHzTickBlizzard(dtMs);
     if (_egHzDarkness) _egHzTickDarkness(dtMs);
     if (_egHzArcane) _egHzTickArcane(dtMs);
+    if (_egHzMeteor) _egHzTickMeteor(dtMs);
+    if (_egHzVolatile) _egHzTickVolatile(dtMs);
+    if (_egHzFrostNova) _egHzTickFrostNova(dtMs);
+    if (_egHzFirewall) _egHzTickFirewall(dtMs);
+    if (_egHzCyclone) _egHzTickCyclone(dtMs);
+    if (_egHzDelirium) _egHzTickDelirium(dtMs);
 }
 
 
 //------------------------------------------------------------------------
-//-------------------LAVA POOLS------------------------------------------
+//-------------------LAVA BALLS-------------------------------------------
 //------------------------------------------------------------------------
 
 function _egHzInitLava(intensity) {
-    const count = Math.min(5, 2 + Math.round(intensity / 34));
+    // ~8 balls at low intensity (tier 3), scaling up to a cap of 14 at high
+    // intensity (tier 1):  25 → 7 | 45 → 8 | 50 → 9 | 75 → 10 | 80 → 11 | 100 → 12
+    const count = Math.min(14, 5 + Math.round(intensity / 16));
     const pools = [];
     for (let i = 0; i < count; i++) {
         const r = _egHzRand(EG_HZ_LAVA_MIN_R, EG_HZ_LAVA_MAX_R);
@@ -651,4 +748,547 @@ function _egHzFireArcaneBeam() {
         speed: (window.innerWidth + 100) / (EG_HZ_ARCANE_BEAM_TRAVEL_MS / 1000),
         hitDone: false,
     };
+}
+
+
+//------------------------------------------------------------------------
+//-------------------METEOR BARRAGE---------------------------------------
+//------------------------------------------------------------------------
+// PoE-style meteor volleys: every interval a salvo of meteors telegraphs
+// impact circles, then slams down from above. Fire damage, may ignite.
+
+function _egHzInitMeteor(intensity) {
+    _egHzMeteor = {
+        pending: [],
+        nextIn: _egHzRand(3000, 6000),
+        intervalScale: 1 - Math.min(0.45, intensity / 220),
+        dmgMult: _egHzMult(intensity),
+    };
+}
+
+function _egHzSpawnMeteor(delayMs) {
+    const pos = _egHzPointOutsideGrid(EG_HZ_METEOR_RADIUS * 0.6);
+    const el = document.createElement('div');
+    el.className = 'eg-hz-meteor-warning';
+    el.style.left = pos.x + 'px';
+    el.style.top = pos.y + 'px';
+    _egHzLayer.appendChild(el);
+    _egHzMeteor.pending.push({
+        x: pos.x, ty: pos.y,
+        t: EG_HZ_METEOR_WARNING_MS + delayMs,
+        warnEl: el,
+        state: 'warn',
+        fallEl: null,
+        fallDist: 0,
+        y: 0,
+    });
+}
+
+function _egHzTickMeteor(dtMs) {
+    const st = _egHzMeteor;
+
+    st.nextIn -= dtMs;
+    if (st.nextIn <= 0) {
+        st.nextIn = _egHzRand(
+            EG_HZ_METEOR_INTERVAL_MIN_MS,
+            EG_HZ_METEOR_INTERVAL_MAX_MS
+        ) * st.intervalScale;
+
+        // One salvo: several meteors with slightly staggered impacts.
+        const count = EG_HZ_METEOR_VOLLEY_MIN +
+            Math.floor(Math.random() * (EG_HZ_METEOR_VOLLEY_MAX - EG_HZ_METEOR_VOLLEY_MIN + 1));
+        for (let i = 0; i < count; i++) _egHzSpawnMeteor(i * 160);
+    }
+
+    const dtS = dtMs / 1000;
+    const pr = _egHzPlayerRect();
+
+    for (let i = st.pending.length - 1; i >= 0; i--) {
+        const m = st.pending[i];
+
+        if (m.state === 'warn') {
+            if (!m.warnEl.isConnected) { st.pending.splice(i, 1); continue; }
+            m.t -= dtMs;
+            if (m.t <= 0) {
+                m.state = 'fall';
+                // Start well above the screen, fall down onto the telegraph.
+                m.fallDist = window.innerHeight * 0.6;
+                m.y = m.ty - m.fallDist;
+                const size = 46;
+                const fallEl = document.createElement('div');
+                fallEl.className = 'eg-hz-meteor-fall';
+                fallEl.style.width = size + 'px';
+                fallEl.style.height = size + 'px';
+                fallEl.style.left = (m.x - size / 2) + 'px';
+                fallEl.style.top = (m.y - size / 2) + 'px';
+                _egHzLayer.appendChild(fallEl);
+                m.fallEl = fallEl;
+            }
+        } else {
+            // Falling phase — descend towards the target, then detonate.
+            if (!m.fallEl || !m.fallEl.isConnected) { st.pending.splice(i, 1); continue; }
+            m.y += (m.fallDist / (EG_HZ_METEOR_FALL_MS / 1000)) * dtS;
+            m.fallEl.style.top = (m.y - 23) + 'px';
+
+            if (m.y >= m.ty) {
+                // Impact: flash ring, remove warning + meteor.
+                m.fallEl.remove();
+                if (m.warnEl && m.warnEl.isConnected) {
+                    m.warnEl.classList.add('eg-hz-meteor-impact');
+                    const impactEl = m.warnEl;
+                    setTimeout(() => impactEl.remove(), 350);
+                }
+                st.pending.splice(i, 1);
+
+                if (pr) {
+                    const cx = pr.left + pr.width / 2;
+                    const cy = pr.top + pr.height / 2;
+                    const dx = cx - m.x, dy = cy - m.y;
+                    if (dx * dx + dy * dy <= Math.pow(EG_HZ_METEOR_RADIUS, 2)) {
+                        const dealt = _egHzDamage(
+                            EG_HZ_METEOR_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
+                        );
+                        if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
+                            && Math.random() * 100 < EG_HZ_METEOR_IGNITE_CHANCE_PCT) {
+                            _egApplyPlayerAilment('ignite',
+                                Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------VOLATILE WISPS---------------------------------------
+//------------------------------------------------------------------------
+// PoE-style Volatiles: unstable wisps spawn off-screen-ish and slowly home
+// in on the player. When close (or after a lifetime) they flash briefly,
+// then detonate — shadow damage in a blast radius, may inflict Shadow Burn.
+
+function _egHzInitVolatile(intensity) {
+    const maxWisps = Math.min(6, 1 + Math.round(intensity / 22));
+    _egHzVolatile = {
+        wisps: [],
+        respawnIn: 0,
+        maxWisps,
+        speedScale: Math.max(0.65, 1 - intensity / 300),
+        dmgMult: _egHzMult(intensity),
+    };
+    // Stagger the initial wave so wisps don't all arrive simultaneously.
+    for (let i = 0; i < maxWisps; i++) {
+        const wisp = {
+            x: -200, y: -200,
+            speed: _egHzRand(EG_HZ_VOLATILE_SPEED_MIN, EG_HZ_VOLATILE_SPEED_MAX),
+            state: 'delay',
+            t: 800 + i * _egHzRand(1500, 3500),
+            life: EG_HZ_VOLATILE_LIFETIME_MS,
+            el: null,
+        };
+        wisp.speed /= _egHzVolatile.speedScale;
+        _egHzVolatile.wisps.push(wisp);
+    }
+}
+
+function _egHzActivateVolatileWisp(wisp) {
+    const pos = _egHzPointOutsideGrid(40);
+    wisp.x = pos.x;
+    wisp.y = pos.y;
+    wisp.life = EG_HZ_VOLATILE_LIFETIME_MS;
+    wisp.state = 'hunt';
+    const el = document.createElement('div');
+    el.className = 'eg-hz-volatile';
+    _egHzLayer.appendChild(el);
+    wisp.el = el;
+}
+
+function _egHzDetonateVolatile(wisp) {
+    const st = _egHzVolatile;
+    wisp.state = 'dead';
+    if (wisp.el) {
+        wisp.el.classList.add('eg-hz-volatile-blast');
+        const el = wisp.el;
+        setTimeout(() => el.remove(), 400);
+        wisp.el = null;
+    }
+
+    const pr = _egHzPlayerRect();
+    if (pr) {
+        const cx = pr.left + pr.width / 2;
+        const cy = pr.top + pr.height / 2;
+        const dx = cx - wisp.x, dy = cy - wisp.y;
+        if (dx * dx + dy * dy <= Math.pow(EG_HZ_VOLATILE_BLAST_R, 2)) {
+            const dealt = _egHzDamage(
+                EG_HZ_VOLATILE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#b39ddb'
+            );
+            if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
+                && Math.random() * 100 < EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT) {
+                _egApplyPlayerAilment('shadowburn',
+                    Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_SHADOWBURN_DMG_SHARE));
+            }
+        }
+    }
+
+    // Queue a replacement so the pressure never runs dry.
+    if (!(st.respawnIn > 0)) {
+        st.respawnIn = _egHzRand(
+            EG_HZ_VOLATILE_RESPAWN_MIN_MS, EG_HZ_VOLATILE_RESPAWN_MAX_MS);
+    }
+}
+
+function _egHzTickVolatile(dtMs) {
+    const st = _egHzVolatile;
+    const dtS = dtMs / 1000;
+    const pr = _egHzPlayerRect();
+
+    // Respawn timer for detonated wisps.
+    if (st.respawnIn > 0) {
+        st.respawnIn -= dtMs;
+        if (st.respawnIn <= 0) {
+            st.respawnIn = 0;
+            const idle = st.wisps.find(w => w.state === 'dead');
+            if (idle) _egHzActivateVolatileWisp(idle);
+            else st.respawnIn = _egHzRand(1000, 2500);
+        }
+    }
+
+    st.wisps.forEach(w => {
+        if (w.state === 'dead') return;
+
+        if (w.state === 'delay') {
+            w.t -= dtMs;
+            if (w.t <= 0) _egHzActivateVolatileWisp(w);
+            return;
+        }
+
+        if (!w.el || !w.el.isConnected) { w.state = 'dead'; return; }
+
+        if (w.state === 'hunt') {
+            w.life -= dtMs;
+            if (pr) {
+                const cx = pr.left + pr.width / 2;
+                const cy = pr.top + pr.height / 2;
+                const dx = cx - w.x, dy = cy - w.y;
+                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                if (dist <= EG_HZ_VOLATILE_TRIGGER_R || w.life <= 0) {
+                    w.state = 'fuse';
+                    w.t = EG_HZ_VOLATILE_FUSE_MS;
+                    w.el.classList.add('eg-hz-volatile-fuse');
+                    return;
+                }
+                w.x += (dx / dist) * w.speed * dtS;
+                w.y += (dy / dist) * w.speed * dtS;
+            } else {
+                // Player rect unavailable — drift gently instead of stalling.
+                w.x += w.speed * 0.2 * dtS;
+            }
+            w.el.style.transform =
+                `translate(${Math.round(w.x)}px, ${Math.round(w.y)}px)`;
+        } else if (w.state === 'fuse') {
+            w.t -= dtMs;
+            if (w.t <= 0) _egHzDetonateVolatile(w);
+        }
+    });
+}
+
+
+//------------------------------------------------------------------------
+//-------------------FROST NOVAS------------------------------------------
+//------------------------------------------------------------------------
+// PoE-style freezing novas: a frosty core erupts near the player and the
+// expanding ring damages anything it passes through once (chill + freeze
+// chance). Cold Resistance mitigates; dodging out of the ring radius works.
+
+function _egHzInitFrostNova(intensity) {
+    _egHzFrostNova = {
+        novas: [],
+        nextIn: _egHzRand(2500, 5000),
+        intervalScale: 1 - Math.min(0.45, intensity / 220),
+        dmgMult: _egHzMult(intensity),
+    };
+}
+
+function _egHzSpawnFrostNova() {
+    // Erupt close to the player so the expanding ring must be reacted to.
+    let x = window.innerWidth * 0.5;
+    let y = window.innerHeight * 0.5;
+    const pr = _egHzPlayerRect();
+    if (pr) {
+        x = pr.left + pr.width / 2 + _egHzRand(-240, 240);
+        y = pr.top + pr.height / 2 + _egHzRand(-240, 240);
+    }
+    x = Math.max(20, Math.min(window.innerWidth - 20, x));
+    y = Math.max(20, Math.min(window.innerHeight - 20, y));
+
+    const el = document.createElement('div');
+    el.className = 'eg-hz-frostnova';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    _egHzLayer.appendChild(el);
+
+    _egHzFrostNova.novas.push({ x, y, t: EG_HZ_FROSTNOVA_EXPAND_MS, r: 0, el, hitDone: false });
+}
+
+function _egHzTickFrostNova(dtMs) {
+    const st = _egHzFrostNova;
+    const dtS = dtMs / 1000;
+
+    st.nextIn -= dtMs;
+    if (st.nextIn <= 0) {
+        st.nextIn = _egHzRand(
+            EG_HZ_FROSTNOVA_INTERVAL_MIN_MS,
+            EG_HZ_FROSTNOVA_INTERVAL_MAX_MS
+        ) * st.intervalScale;
+        _egHzSpawnFrostNova();
+    }
+
+    const pr = _egHzPlayerRect();
+
+    for (let i = st.novas.length - 1; i >= 0; i--) {
+        const nova = st.novas[i];
+        if (!nova.el.isConnected) { st.novas.splice(i, 1); continue; }
+
+        nova.t -= dtMs;
+        nova.r = EG_HZ_FROSTNOVA_MAX_R *
+            Math.min(1, 1 - nova.t / EG_HZ_FROSTNOVA_EXPAND_MS);
+
+        const size = nova.r * 2;
+        nova.el.style.width = size + 'px';
+        nova.el.style.height = size + 'px';
+        nova.el.style.marginLeft = (-nova.r) + 'px';
+        nova.el.style.marginTop = (-nova.r) + 'px';
+
+        // The ring band damages the player exactly once as it sweeps past.
+        if (pr && !nova.hitDone) {
+            const cx = pr.left + pr.width / 2;
+            const cy = pr.top + pr.height / 2;
+            const dist = Math.sqrt(Math.pow(cx - nova.x, 2) + Math.pow(cy - nova.y, 2));
+            if (dist <= nova.r + EG_HZ_FROSTNOVA_BAND &&
+                dist >= nova.r - EG_HZ_FROSTNOVA_BAND) {
+                nova.hitDone = true;
+                const dealt = _egHzDamage(
+                    EG_HZ_FROSTNOVA_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff'
+                );
+                if (dealt > 0 && typeof _egApplyPlayerAilment === 'function') {
+                    _egApplyPlayerAilment('chill');
+                    if (Math.random() * 100 < EG_HZ_FROSTNOVA_FREEZE_CHANCE_PCT) {
+                        _egApplyPlayerAilment('frozen');
+                    }
+                }
+            }
+        }
+
+        if (nova.t <= 0) {
+            nova.el.remove();
+            st.novas.splice(i, 1);
+        }
+    }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------FIRE WALLS-------------------------------------------
+//------------------------------------------------------------------------
+// Telegraphed vertical walls of fire that sweep from the top of the screen
+// to the bottom. Fire damage on contact, may ignite.
+
+function _egHzInitFirewall(intensity) {
+    _egHzFirewall = {
+        pending: [],
+        nextIn: _egHzRand(3500, 6500),
+        intervalScale: 1 - Math.min(0.45, intensity / 220),
+        dmgMult: _egHzMult(intensity),
+    };
+}
+
+function _egHzTickFirewall(dtMs) {
+    const st = _egHzFirewall;
+    const dtS = dtMs / 1000;
+
+    st.nextIn -= dtMs;
+    if (st.nextIn <= 0) {
+        st.nextIn = _egHzRand(
+            EG_HZ_FIREWALL_INTERVAL_MIN_MS,
+            EG_HZ_FIREWALL_INTERVAL_MAX_MS
+        ) * st.intervalScale;
+
+        // Telegraph: a glowing strip along the top edge announces the wave.
+        const warn = document.createElement('div');
+        warn.className = 'eg-hz-firewall-warning';
+        _egHzLayer.appendChild(warn);
+        setTimeout(() => warn.remove(), EG_HZ_FIREWALL_WARNING_MS);
+
+        const el = document.createElement('div');
+        el.className = 'eg-hz-firewall';
+        el.style.height = EG_HZ_FIREWALL_HEIGHT + 'px';
+        el.style.transform = `translateY(${-EG_HZ_FIREWALL_HEIGHT}px)`;
+        el.style.display = 'none';
+        _egHzLayer.appendChild(el);
+        st.pending.push({
+            t: EG_HZ_FIREWALL_WARNING_MS,
+            y: -EG_HZ_FIREWALL_HEIGHT,
+            el, hitDone: false,
+        });
+    }
+
+    const pr = _egHzPlayerRect();
+
+    for (let i = st.pending.length - 1; i >= 0; i--) {
+        const w = st.pending[i];
+        if (!w.el.isConnected) { st.pending.splice(i, 1); continue; }
+
+        if (w.t > 0) {
+            w.t -= dtMs;
+            if (w.t <= 0) w.el.style.display = 'block';
+            continue;
+        }
+
+        // Sweeping phase — the wave descends and burns what it passes once.
+        const totalDist = window.innerHeight + EG_HZ_FIREWALL_HEIGHT;
+        w.y += (totalDist / (EG_HZ_FIREWALL_SWEEP_MS / 1000)) * dtS;
+        w.el.style.transform = `translateY(${Math.round(w.y)}px)`;
+
+        if (!w.hitDone && pr && pr.bottom > w.y && pr.top < w.y + EG_HZ_FIREWALL_HEIGHT) {
+            w.hitDone = true;
+            const dealt = _egHzDamage(
+                EG_HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
+            );
+            if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
+                && Math.random() * 100 < EG_HZ_FIREWALL_IGNITE_CHANCE_PCT) {
+                _egApplyPlayerAilment('ignite',
+                    Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
+            }
+        }
+
+        if (w.y >= window.innerHeight) {
+            w.el.remove();
+            st.pending.splice(i, 1);
+        }
+    }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------CYCLONES---------------------------------------------
+//------------------------------------------------------------------------
+// Fast wind vortices that race across the whole screen (grid included),
+// damaging the player continuously while they stand inside one.
+
+function _egHzInitCyclone(intensity) {
+    const count = Math.min(5, 2 + Math.round(intensity / 33));
+    const vortices = [];
+    for (let i = 0; i < count; i++) {
+        const r = _egHzRand(EG_HZ_CYCLONE_R_MIN, EG_HZ_CYCLONE_R_MAX);
+        const speed = _egHzRand(EG_HZ_CYCLONE_SPEED_MIN, EG_HZ_CYCLONE_SPEED_MAX)
+            * (1 + intensity / 200);
+        const angle = Math.random() * Math.PI * 2;
+
+        const el = document.createElement('div');
+        el.className = 'eg-hz-cyclone';
+        const size = r * 2;
+        el.style.width = size + 'px';
+        el.style.height = size * 1.6 + 'px';
+        _egHzLayer.appendChild(el);
+
+        vortices.push({
+            x: _egHzRand(r, window.innerWidth - r),
+            y: _egHzRand(r, window.innerHeight - r),
+            r,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            dmgAcc: 0, el,
+        });
+    }
+    _egHzCyclone = { vortices, dmgMult: _egHzMult(intensity) };
+}
+
+function _egHzTickCyclone(dtMs) {
+    const st = _egHzCyclone;
+    const dtS = dtMs / 1000;
+    const pr = _egHzPlayerRect();
+
+    st.vortices.forEach(v => {
+        if (!v.el.isConnected) return;
+
+        let nx = v.x + v.vx * dtS;
+        let ny = v.y + v.vy * dtS;
+        if (nx < v.r || nx > window.innerWidth - v.r) { v.vx *= -1; nx = v.x; }
+        if (ny < v.r || ny > window.innerHeight - v.r) { v.vy *= -1; ny = v.y; }
+        v.x = nx; v.y = ny;
+        v.el.style.transform =
+            `translate(${Math.round(v.x - v.r)}px, ${Math.round(v.y - v.r * 1.6)}px) rotate(${(v.x + v.y) % 360}deg)`;
+
+        // Continuous cold damage while the player stands in the funnel.
+        v.dmgAcc += dtMs;
+        if (v.dmgAcc >= EG_HZ_CYCLONE_TICK_MS) {
+            v.dmgAcc = 0;
+            if (pr) {
+                const cx = pr.left + pr.width / 2;
+                const cy = pr.top + pr.height / 2;
+                const dx = cx - v.x, dy = cy - v.y;
+                if (dx * dx + dy * dy <= Math.pow(v.r * 0.9, 2)) {
+                    _egHzDamage(EG_HZ_CYCLONE_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff');
+                }
+            }
+        }
+    });
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DELIRIUM MIST----------------------------------------
+//------------------------------------------------------------------------
+// PoE Delirium: a purple mist periodically floods the screen. While it holds,
+// there is one chance roll to polymorph the player into chaos.
+
+function _egHzInitDelirium(intensity) {
+    _egHzDelirium = {
+        phase: 'idle',
+        nextIn: _egHzRand(8000, 14000),
+        t: 0,
+        el: null,
+        rolled: false,
+        polyChance: Math.min(80, EG_HZ_DELIRIUM_POLYMORPH_CHANCE_PCT * _egHzMult(intensity)),
+    };
+}
+
+function _egHzTickDelirium(dtMs) {
+    const st = _egHzDelirium;
+
+    if (st.phase === 'idle') {
+        st.nextIn -= dtMs;
+        if (st.nextIn <= 0) {
+            const mist = document.createElement('div');
+            mist.className = 'eg-hz-delirium';
+            mist.style.animationDuration =
+                `${EG_HZ_DELIRIUM_FADE_IN_MS}ms, ${EG_HZ_DELIRIUM_FADE_OUT_MS}ms`;
+            mist.style.animationDelay = `0ms, ${EG_HZ_DELIRIUM_FADE_IN_MS + EG_HZ_DELIRIUM_HOLD_MS}ms`;
+            document.body.appendChild(mist);
+            st.el = mist;
+            st.phase = 'mist';
+            st.t = EG_HZ_DELIRIUM_FADE_IN_MS + EG_HZ_DELIRIUM_HOLD_MS;
+            st.rolled = false;
+        }
+        return;
+    }
+
+    // Mist phase
+    st.t -= dtMs;
+    if (!st.rolled && st.t <= EG_HZ_DELIRIUM_HOLD_MS) {
+        st.rolled = true;
+        if (typeof _egApplyPlayerAilment === 'function'
+            && Math.random() * 100 < st.polyChance) {
+            _egApplyPlayerAilment('polymorph');
+        }
+    }
+    if (st.t <= 0) {
+        if (st.el) { st.el.remove(); st.el = null; }
+        st.phase = 'idle';
+        st.nextIn = _egHzRand(
+            EG_HZ_DELIRIUM_INTERVAL_MIN_MS,
+            EG_HZ_DELIRIUM_INTERVAL_MAX_MS
+        );
+    }
 }

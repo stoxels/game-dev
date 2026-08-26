@@ -163,6 +163,20 @@
     padding: 1px 0;
 }
 
+/* Downside mod lines on unique items — shown in warning red */
+.eg-tt-mod.eg-tt-mod-downside {
+    color: #e74c3c;
+}
+
+/* Flavor text at the bottom of unique item tooltips */
+.eg-tt-flavor {
+    margin-top: 6px;
+    font-style: italic;
+    font-size: 0.75rem;
+    color: #d9b96c;
+    text-align: center;
+}
+
 /* Item level footer */
 .eg-tt-ilvl {
     margin-top: 6px;

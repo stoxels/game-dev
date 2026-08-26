@@ -7,18 +7,29 @@
     z-index: 250;
     display: flex;
     flex-direction: column;
-    gap: 2px; /* Added slight gap so larger text breathes */
-    /* Brighter background for better readability */
-    background: rgba(40, 48, 60, 0.95);
-    border: 1px solid #4a5568;
-    border-left: none;
-    border-radius: 0 8px 8px 0;
-    padding: 10px 12px 10px 8px; /* Slightly more padding */
-    /* Increased width to accommodate larger text */
-    min-width: 170px;
-    max-width: 220px;
+    gap: 2px;
+    background: linear-gradient(160deg, rgba(35, 43, 57, 0.97), rgba(23, 28, 38, 0.97));
+    border: 1px solid rgba(122, 138, 168, 0.4);
+    border-radius: 10px;
+    padding: 10px 10px 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    min-width: 185px;
+    max-width: 240px;
     pointer-events: auto;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
+}
+
+/* Accent stripe along the panel's left edge */
+#eg-objectives-strip::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #4ade80, #38bdf8 60%, #818cf8);
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.35);
 }
 
     #eg-objectives-strip.eg-hidden {
@@ -31,14 +42,15 @@
     align-items: center;
     justify-content: space-between;
     gap: 6px;
-    font-size: 0.8em; /* Increased from 0.62em */
+    font-size: 0.8em;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #e2e8f0; /* Brighter text */
+    color: #f1f5f9;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
     margin-bottom: 8px;
     padding-bottom: 6px;
-    border-bottom: 1px solid #4a5568; /* Brighter border */
+    border-bottom: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 /* Title text inside the header (drag handle area) */
@@ -81,32 +93,84 @@
 .eg-obj-body {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
 }
 
 #eg-objectives-strip.eg-collapsed {
     opacity: 0.75;
 }
 
-/* Individual objective row */
+/* Individual objective row: icon badge + label */
 .eg-obj-item {
-    font-size: 0.9em; /* Increased from 0.72em */
-    padding: 6px 8px; /* Increased padding */
-    border-radius: 4px;
-    color: #f7fafc; /* Much brighter text */
-    white-space: nowrap;
-    line-height: 1.4;
-    transition: color 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.9em;
+    padding: 5px 8px;
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+    color: #f7fafc;
+    line-height: 1.35;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+/* Label can wrap inside the panel instead of overflowing its border */
+.eg-obj-label {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.eg-obj-icon {
+    flex-shrink: 0;
+    font-size: 1.05em;
+    line-height: 1;
 }
 
 .eg-obj-done {
-    color: #4ade80;
-    background: rgba(74, 222, 128, 0.12); /* Slightly more visible background */
+    color: #86efac;
+    background: linear-gradient(90deg, rgba(74, 222, 128, 0.16), rgba(74, 222, 128, 0.03));
+    border-left-color: rgba(74, 222, 128, 0.55);
 }
 
+    .eg-obj-done::after {
+        content: '✓';
+        margin-left: auto;
+        padding-left: 6px;
+        font-weight: 700;
+        color: #4ade80;
+        text-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
+        flex-shrink: 0;
+    }
+
+    .eg-obj-done .eg-obj-icon {
+        filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.45));
+    }
+
 .eg-obj-pending {
-    color: #cbd5e1; /* Lighter pending text */
-    background: transparent;
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.04);
+    border-left-color: rgba(148, 163, 184, 0.25);
+}
+
+    .eg-obj-pending .eg-obj-icon {
+        filter: grayscale(0.65);
+        opacity: 0.85;
+    }
+
+/* Boss row while the arena is still sealed */
+.eg-obj-boss-locked {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.06);
+}
+
+    .eg-obj-boss-locked .eg-obj-icon {
+        animation: eg-boss-lock-breathe 2.4s ease-in-out infinite;
+    }
+
+@keyframes eg-boss-lock-breathe {
+    0%, 100% { filter: grayscale(1); opacity: 0.6; }
+    50%      { filter: grayscale(0.4); opacity: 0.95; }
 }
 
 /* --- LOOT TOOLTIP STYLES --- */
@@ -166,16 +230,18 @@
 }
 
 .eg-leave-locked {
-    background: #2d3748; /* Brighter locked state */
+    background: #2d3748;
     color: #a0aec0;
     cursor: not-allowed;
     border-color: #4a5568;
+    opacity: 0.85;
 }
 
 .eg-leave-ready {
-    background: #0d2b1a;
+    background: linear-gradient(180deg, #0f3320, #0d2b1a);
     color: #4ade80;
     border-color: #2d7a4f;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
     .eg-leave-ready:hover {
@@ -184,6 +250,41 @@
         transform: translateY(-1px);
         border-color: #4ade80;
     }
+
+/* Enter Boss Arena button — appears in the tracker once every other
+   objective is done. Red/danger styling to signal the final challenge. */
+.eg-enter-boss-btn {
+    margin-top: 10px;
+    font-size: 0.8em;
+    font-weight: 700;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #7a2d2d;
+    background: #2b0d0d;
+    color: #f87171;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s,
+                box-shadow 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    animation: eg-enter-boss-pulse 1.6s ease-in-out infinite;
+}
+
+    .eg-enter-boss-btn:hover {
+        background: #7a2d2d;
+        color: #fff;
+        transform: translateY(-1px);
+        border-color: #f87171;
+        animation-play-state: paused;
+    }
+
+@keyframes eg-enter-boss-pulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0.0); }
+    50%      { box-shadow: 0 0 10px rgba(248, 113, 113, 0.55); }
+}
 
 
 /* --- INDIVIDUAL LOOT ITEM ROWS --- */

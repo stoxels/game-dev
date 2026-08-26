@@ -294,13 +294,305 @@ const EG_GEN_SYMBOLS = [
     { ch: '⚗', en: 'Alembic',      de: 'Retorte' },
     { ch: '⚕', en: 'Staff Asclepius', de: 'Äskulapstab' },
     { ch: '⚛', en: 'Atom',         de: 'Atom' },
-    { ch: '⚛', en: 'Atom',         de: 'Atom' },
 
     // Time & misc
     { ch: '⏳', en: 'Hourglass Flowing', de: 'Sanduhr (laufend)' },
     { ch: '⚐', en: 'Flag Outline', de: 'Flagge (Umriss)' },
     { ch: '⌘', en: 'Command Key',  de: 'Befehlstaste' },
     { ch: '⌀', en: 'Diameter',     de: 'Durchmesser' },
+
+    // Chess — remaining pieces
+    { ch: '♚', en: 'Black King',   de: 'Schwarzer König' },
+    { ch: '♜', en: 'Black Rook',   de: 'Schwarzer Turm' },
+    { ch: '♝', en: 'Black Bishop', de: 'Schwarzer Läufer' },
+
+    // Crosses & faith
+    { ch: '✝', en: 'Latin Cross',  de: 'Lateinisches Kreuz' },
+    { ch: '☩', en: 'Cross of Jerusalem', de: 'Jerusalemer Kreuz' },
+    { ch: '☨', en: 'Cross of Lorraine',  de: 'Lothringer Kreuz' },
+    { ch: '☦', en: 'Orthodox Cross',     de: 'Orthodoxes Kreuz' },
+    { ch: '☧', en: 'Chi Rho',      de: 'Chi-Rho' },
+    { ch: '⛨', en: 'Shield Cross', de: 'Schild mit Kreuz' },
+    { ch: '✡', en: 'Star of David', de: 'Davidsstern' },
+
+    // Astrological aspects & lunar nodes
+    { ch: '☊', en: 'Ascending Node', de: 'Aufsteigender Knoten' },
+    { ch: '☋', en: 'Descending Node', de: 'Absteigender Knoten' },
+    { ch: '☌', en: 'Conjunction',  de: 'Konjunktion' },
+    { ch: '☍', en: 'Opposition',   de: 'Opposition' },
+    { ch: '⚹', en: 'Sextile',      de: 'Sextil' },
+    { ch: '⚻', en: 'Quincunx',     de: 'Quincunx' },
+    { ch: '☽', en: 'First Quarter Moon', de: 'Zunehmender Mond' },
+
+    // Stars, sparkles & asterisks
+    { ch: '✴', en: 'Eight-Pointed Black Star', de: 'Achtstrahlstern (gefüllt)' },
+    { ch: '✳', en: 'Eight-Spoked Asterisk', de: 'Achtstrahl-Asterisk' },
+    { ch: '❉', en: 'Balloon Asterisk', de: 'Ballon-Asterisk' },
+    { ch: '❋', en: 'Heavy Teardrop Asterisk', de: 'Tropfen-Asterisk (dick)' },
+    { ch: '❇', en: 'Sparkle',      de: 'Funkeln' },
+    { ch: '❈', en: 'Heavy Sparkle', de: 'Funkeln (dick)' },
+    { ch: '✻', en: 'Teardrop Asterisk', de: 'Tropfen-Asterisk' },
+
+    // Divided circles
+    { ch: '◑', en: 'Half Circle Right', de: 'Halbkreis (rechts)' },
+    { ch: '◒', en: 'Half Circle Bottom', de: 'Halbkreis (unten)' },
+    { ch: '◔', en: 'Circle Upper Quarter', de: 'Kreis (Viertel oben)' },
+    { ch: '◕', en: 'Circle Half Black', de: 'Kreis (halb gefüllt)' },
+
+    // Squares & corner triangles
+    { ch: '▣', en: 'Square With Core', de: 'Quadrat mit Kern' },
+    { ch: '▦', en: 'Grid Square',  de: 'Rasterquadrat' },
+    { ch: '▩', en: 'Shaded Square', de: 'Schraffiertes Quadrat' },
+    { ch: '▤', en: 'Lined Square', de: 'Quadrat (Linien)' },
+    { ch: '◺', en: 'Lower Left Triangle', de: 'Dreieck unten links' },
+    { ch: '◹', en: 'Upper Right Triangle', de: 'Dreieck oben rechts' },
+    { ch: '◸', en: 'Upper Left Triangle', de: 'Dreieck oben links' },
+    { ch: '◿', en: 'Lower Right Triangle', de: 'Dreieck unten rechts' },
+
+    // Elder Futhark runes — bold strokes, ideal nonogram material
+    { ch: 'ᚠ', en: 'Rune Fehu',    de: 'Rune Fehu' },
+    { ch: 'ᚢ', en: 'Rune Uruz',    de: 'Rune Uruz' },
+    { ch: 'ᚦ', en: 'Rune Thurisaz', de: 'Rune Thurisaz' },
+    { ch: 'ᚨ', en: 'Rune Ansuz',   de: 'Rune Ansuz' },
+    { ch: 'ᚱ', en: 'Rune Raidho',  de: 'Rune Raidho' },
+    { ch: 'ᛉ', en: 'Rune Algiz',   de: 'Rune Algiz' },
+    { ch: 'ᛞ', en: 'Rune Dagaz',   de: 'Rune Dagaz' },
+    { ch: 'ᛟ', en: 'Rune Othala',  de: 'Rune Othala' },
+
+    // Braille patterns — chunky dot grids
+    { ch: '⣿', en: 'Full Braille Pattern', de: 'Braille-Muster (voll)' },
+    { ch: '⠿', en: 'Six-Dot Braille', de: 'Braille (sechs Punkte)' },
+
+    // I Ching hexagrams — blocky stacked bars
+    { ch: '䷀', en: 'Hexagram Creation', de: 'Hexagramm Schöpfung' },
+    { ch: '䷾', en: 'Hexagram Completion', de: 'Hexagramm Vollendung' },
+
+    // Everyday objects & signals
+    { ch: '✌', en: 'Victory Hand', de: 'Victory-Zeichen' },
+    { ch: '☎', en: 'Telephone Sign', de: 'Telefonzeichen' },
+    { ch: '⚔', en: 'Crossed Swords', de: 'Gekreuzte Schwerter' },
+    { ch: '⏦', en: 'AC Sine Wave', de: 'Sinuswelle' },
+
+    // Crosses — outlined & shadowed variants
+    { ch: '✙', en: 'Outlined Greek Cross', de: 'Kreuz (umrissen)' },
+    { ch: '✛', en: 'Heavy Open Cross', de: 'Dickes offenes Kreuz' },
+    { ch: '✞', en: 'Shadowed Latin Cross', de: 'Kreuz mit Schatten' },
+    { ch: '✟', en: 'Outlined Latin Cross', de: 'Lateinisches Kreuz (Umriss)' },
+
+    // Snowflakes
+    { ch: '❅', en: 'Snowflake Variant', de: 'Schneeflocke (Variante)' },
+    { ch: '❆', en: 'Tight Snowflake', de: 'Schneeflocke (dicht)' },
+
+    // Card suits — outline versions
+    { ch: '♤', en: 'Spades Outline', de: 'Pik (Umriss)' },
+    { ch: '♡', en: 'Hearts Outline', de: 'Herz (Umriss)' },
+    { ch: '♧', en: 'Clubs Outline', de: 'Kreuz-Symbol (Umriss)' },
+    { ch: '♢', en: 'Diamonds Outline', de: 'Karo (Umriss)' },
+    { ch: '♙', en: 'White Pawn', de: 'Weißer Bauer' },
+
+    // Hearts extra
+    { ch: '❥', en: 'Rotated Heart', de: 'Gedrehtes Herz' },
+    { ch: '❣', en: 'Heart Exclamation', de: 'Herz-Ausrufezeichen' },
+
+    // Alchemy — classical elements
+    { ch: '🜁', en: 'Alchemy Air',   de: 'Alchemie Luft' },
+    { ch: '🜂', en: 'Alchemy Fire',  de: 'Alchemie Feuer' },
+    { ch: '🜃', en: 'Alchemy Water', de: 'Alchemie Wasser' },
+    { ch: '🜄', en: 'Alchemy Earth', de: 'Alchemie Erde' },
+
+    // Technical & keyboard
+    { ch: '⏚', en: 'Earth Ground', de: 'Erdung' },
+    { ch: '⎓', en: 'Direct Current', de: 'Gleichstrom' },
+    { ch: '⏏', en: 'Eject',        de: 'Auswerfen' },
+    { ch: '⎋', en: 'Escape Key',   de: 'Escape-Taste' },
+    { ch: '⌫', en: 'Backspace',    de: 'Löschen-Taste' },
+    { ch: '⏎', en: 'Return Key',   de: 'Enter-Taste' },
+    { ch: '⏻', en: 'Power Symbol', de: 'Ein-/Aus-Schalter' },
+
+    // Target & nested shapes
+    { ch: '◎', en: 'Bullseye',     de: 'Zielscheibe' },
+    { ch: '◉', en: 'Fisheye',      de: 'Fischauge' },
+    { ch: '◈', en: 'Diamond With Core', de: 'Raute mit Kern' },
+    { ch: '▥', en: 'Patterned Square', de: 'Quadrat (Muster)' },
+    { ch: '▧', en: 'Hatched Square', de: 'Quadrat (Schraffur)' },
+
+    // Runes — more Elder Futhark
+    { ch: 'ᚲ', en: 'Rune Kenaz',   de: 'Rune Kenaz' },
+    { ch: 'ᚹ', en: 'Rune Wunjo',   de: 'Rune Wunjo' },
+    { ch: 'ᛒ', en: 'Rune Berkano', de: 'Rune Berkano' },
+
+    // Astrology — Ophiuchus & asteroids
+    { ch: '⛎', en: 'Ophiuchus',   de: 'Schlangenträger' },
+    { ch: '⚳', en: 'Pallas',       de: 'Pallas' },
+    { ch: '⚴', en: 'Juno',         de: 'Juno' },
+    { ch: '⚷', en: 'Chiron',       de: 'Chiron' },
+
+    // Hands — filled pointers
+    { ch: '☛', en: 'Pointing Right Black', de: 'Zeigende Hand rechts (schwarz)' },
+    { ch: '☟', en: 'Pointing Down', de: 'Zeigende Hand unten' },
+    { ch: '☚', en: 'Pointing Left Black', de: 'Zeigende Hand links (schwarz)' },
+
+    // Typography marks
+    { ch: '‽', en: 'Interrobang',  de: 'Interrobang' },
+    { ch: '⁂', en: 'Asterism',     de: 'Asterismus' },
+    { ch: '※', en: 'Reference Mark', de: 'Verweiszeichen' },
+    { ch: '⚭', en: 'Wedding Rings', de: 'Eheringe' },
+    { ch: '☬', en: 'Khanda',       de: 'Khanda' },
+    { ch: '𝄞', en: 'Treble Clef',  de: 'Violinschlüssel' },
+
+    // Weather & misc objects
+    { ch: '☇', en: 'Lightning Streak', de: 'Blitzstrahl' },
+    { ch: '☔', en: 'Rain Umbrella', de: 'Regenschirm (Regen)' },
+    { ch: '⚚', en: 'Staff of Hermes', de: 'Hermesstab' },
+    { ch: '➔', en: 'Wide Right Arrow', de: 'Pfeil nach rechts (dick)' },
+
+    // Planets, astrology & zodiac — leftovers
+    { ch: '⚶', en: 'Vesta',        de: 'Vesta' },
+
+    // Weather & sky
+    { ch: '⛅', en: 'Sun Behind Cloud', de: 'Sonne hinter Wolke' },
+    { ch: '⛄', en: 'Snowman Without Snow', de: 'Schneemann (ohne Schnee)' },
+
+    // Writing & marks
+    { ch: '✒', en: 'Black Nib',    de: 'Schreibfeder' },
+    { ch: '✔', en: 'Check Mark',   de: 'Häkchen' },
+    { ch: '✘', en: 'Heavy Ballot X', de: 'Dickes X' },
+    { ch: '✱', en: 'Heavy Asterisk', de: 'Sternchen (dick)' },
+    { ch: '✵', en: 'Pinwheel Star', de: 'Windradstern' },
+    { ch: '№', en: 'Numero Sign',  de: 'Nummer' },
+    { ch: '℮', en: 'Estimated Sign', de: 'e-Zeichen' },
+    { ch: '⁜', en: 'Double Cross', de: 'Doppelkreuz (Verweis)' },
+
+    // Arrows
+    { ch: '⇐', en: 'Double Left Arrow', de: 'Doppelpfeil links' },
+    { ch: '↩', en: 'Hook Left Arrow', de: 'Abgebogener Pfeil links' },
+    { ch: '↪', en: 'Hook Right Arrow', de: 'Abgebogener Pfeil rechts' },
+    { ch: '➜', en: 'Round-Tipped Arrow', de: 'Pfeil (rund, dick)' },
+
+    // Music
+    { ch: '𝄐', en: 'Fermata',      de: 'Fermate' },
+    { ch: '🀄', en: 'Mahjong Red Dragon', de: 'Mahjong Drache' },
+
+    // Geometry — rectangles & triangles
+    { ch: '▭', en: 'Rectangle',    de: 'Rechteck' },
+    { ch: '◫', en: 'Vertical Rectangle', de: 'Rechteck (senkrecht)' },
+    { ch: '⬒', en: 'Square Top Half', de: 'Quadrat (oben gefüllt)' },
+    { ch: '⬓', en: 'Square Bottom Half', de: 'Quadrat (unten gefüllt)' },
+    { ch: '▰', en: 'Parallelogram', de: 'Parallelogramm' },
+    { ch: '◬', en: 'Triangle in Triangle', de: 'Dreieck im Dreieck' },
+    { ch: '◭', en: 'Left-Half Triangle', de: 'Dreieck (halb gefüllt)' },
+    { ch: '⏢', en: 'Trapezoid',    de: 'Trapez' },
+    { ch: '⏣', en: 'Benzene Ring', de: 'Benzolring' },
+    { ch: '⌗', en: 'Viewdata Square', de: 'Gitterquadrat' },
+
+    // Runes — final Elder Futhark
+    { ch: 'ᛗ', en: 'Rune Mannaz',  de: 'Rune Mannaz' },
+    { ch: 'ᛜ', en: 'Rune Ingwaz',  de: 'Rune Ingwaz' },
+    { ch: 'ᛏ', en: 'Rune Tiwaz',   de: 'Rune Tiwaz' },
+    { ch: 'ᛋ', en: 'Rune Sowilo',  de: 'Rune Sowilo' },
+
+    // Alchemy — compounds
+    { ch: '🜍', en: 'Alchemy Sulfur', de: 'Alchemie Schwefel' },
+    { ch: '🜔', en: 'Alchemy Salt', de: 'Alchemie Salz' },
+
+    // Keyboard & system
+    { ch: '⎌', en: 'Undo Symbol',  de: 'Rückgängig' },
+    { ch: '⌦', en: 'Delete Key',   de: 'Entfernen-Taste' },
+    { ch: '⎀', en: 'Insertion Symbol', de: 'Einfügemarke' },
+    { ch: '⎚', en: 'Clear Screen', de: 'Bildschirm löschen' },
+    { ch: '⌨', en: 'Keyboard',     de: 'Tastatur' },
+    { ch: '⎙', en: 'Print Screen', de: 'Bildschirm drucken' },
+
+    // Culture & everyday
+    { ch: '⛩', en: 'Shinto Shrine', de: 'Shinto-Schrein' },
+    { ch: '⛓', en: 'Chains',       de: 'Ketten' },
+    { ch: '☏', en: 'White Telephone', de: 'Telefon (Umriss)' },
+    { ch: '✇', en: 'Tape Head',    de: 'Tonbandkopf' },
+    { ch: '☺', en: 'Smile Outline', de: 'Smiley (Umriss)' },
+    { ch: '☻', en: 'Black Smiley', de: 'Smiley (schwarz)' },
+
+    // Flowers & asterisks — final
+    { ch: '☙', en: 'Reversed Floral Heart', de: 'Blütenherz (gespiegelt)' },
+    { ch: '❃', en: 'Chevron Snowflake', de: 'Schneeflocke (Winkel)' },
+    { ch: '✽', en: 'Heavy Teardrop Asterisk', de: 'Tropfen-Asterisk' },
+
+    // Currency
+    { ch: '¤', en: 'Currency Sign', de: 'Währungssymbol' },
+    { ch: '₿', en: 'Bitcoin',      de: 'Bitcoin' },
+
+    // Katakana — bold blocky strokes, excellent nonogram material
+    { ch: 'ロ', en: 'Katakana Ro', de: 'Katakana Ro' },
+    { ch: 'コ', en: 'Katakana Ko', de: 'Katakana Ko' },
+    { ch: 'ニ', en: 'Katakana Ni', de: 'Katakana Ni' },
+    { ch: 'ホ', en: 'Katakana Ho', de: 'Katakana Ho' },
+    { ch: 'リ', en: 'Katakana Ri', de: 'Katakana Ri' },
+    { ch: 'ヘ', en: 'Katakana He', de: 'Katakana He' },
+    { ch: 'マ', en: 'Katakana Ma', de: 'Katakana Ma' },
+    { ch: 'モ', en: 'Katakana Mo', de: 'Katakana Mo' },
+
+    // Simple kanji — iconic pictographs
+    { ch: '日', en: 'Kanji Sun',     de: 'Zeichen Sonne' },
+    { ch: '月', en: 'Kanji Moon',    de: 'Zeichen Mond' },
+    { ch: '山', en: 'Kanji Mountain', de: 'Zeichen Berg' },
+    { ch: '田', en: 'Kanji Rice Field', de: 'Zeichen Reisfeld' },
+    { ch: '王', en: 'Kanji King',    de: 'Zeichen König' },
+    { ch: '中', en: 'Kanji Middle',  de: 'Zeichen Mitte' },
+    { ch: '川', en: 'Kanji River',   de: 'Zeichen Fluss' },
+    { ch: '十', en: 'Kanji Ten',     de: 'Zeichen Zehn' },
+
+    // Hangul jamo — geometric letter blocks
+    { ch: 'ㅁ', en: 'Hangul Mieum', de: 'Hangul Mieum' },
+    { ch: 'ㅅ', en: 'Hangul Siots', de: 'Hangul Siot' },
+    { ch: 'ㅈ', en: 'Hangul Jieut', de: 'Hangul Jieut' },
+    { ch: 'ㅌ', en: 'Hangul Tieut', de: 'Hangul Tieut' },
+
+    // Cyrillic capitals — striking symmetric forms
+    { ch: 'Ж', en: 'Cyrillic Zhe', de: 'Kyrillisch Sche' },
+    { ch: 'Ф', en: 'Cyrillic Ef',  de: 'Kyrillisch Ef' },
+    { ch: 'Ц', en: 'Cyrillic Tse', de: 'Kyrillisch Ze' },
+    { ch: 'Ш', en: 'Cyrillic Sha', de: 'Kyrillisch Scha' },
+    { ch: 'Я', en: 'Cyrillic Ya',  de: 'Kyrillisch Ja' },
+
+    // Semitic & Indic scripts
+    { ch: 'א', en: 'Hebrew Alef',  de: 'Hebräisch Alef' },
+    { ch: 'ש', en: 'Hebrew Shin',  de: 'Hebräisch Schin' },
+    { ch: '۞', en: 'Rub El Hizb',  de: 'Rub-el-Hizb' },
+    { ch: 'ॐ', en: 'Om Sign',      de: 'Om-Zeichen' },
+
+    // Glagolitic — ancient Slavic letters
+    { ch: 'Ⰰ', en: 'Glagolitic Az',   de: 'Glagolitisch Az' },
+    { ch: 'Ⱄ', en: 'Glagolitic Slovo', de: 'Glagolitisch Slovo' },
+    { ch: 'Ⱌ', en: 'Glagolitic Yest', de: 'Glagolitisch Yest' },
+
+    // Divination marks
+    { ch: '𝌀', en: 'Divination Monogram', de: 'Divinationsmonogramm' },
+
+    // Music & chemistry extras
+    { ch: '𝄆', en: 'Repeat Sign', de: 'Wiederholungszeichen' },
+    { ch: '⌬', en: 'Benzene Ring Variant', de: 'Benzolring (Variante)' },
+
+    // Geometry — striped circle, quarter circles, quadrant squares
+    { ch: '◍', en: 'Striped Circle', de: 'Kreis (gestreift)' },
+    { ch: '◲', en: 'Circle Lower Left Quarter', de: 'Kreis (Viertel unten links)' },
+    { ch: '◳', en: 'Circle Lower Right Quarter', de: 'Kreis (Viertel unten rechts)' },
+    { ch: '▚', en: 'Quadrant Pattern', de: 'Quadrantenmuster' },
+    { ch: '▞', en: 'Quadrant Pattern Diagonal', de: 'Quadrantenmuster (diagonal)' },
+
+    // Runes — remaining Elder Futhark
+    { ch: 'ᚷ', en: 'Rune Gebo',    de: 'Rune Gebo' },
+    { ch: 'ᛇ', en: 'Rune Eihwaz',  de: 'Rune Eihwaz' },
+    { ch: 'ᛈ', en: 'Rune Perthro', de: 'Rune Perthro' },
+    { ch: 'ᛚ', en: 'Rune Laguz',   de: 'Rune Laguz' },
+
+    // Games — more mahjong & cards
+    { ch: '🀅', en: 'Mahjong Green Dragon', de: 'Mahjong grüner Drache' },
+    { ch: '🀆', en: 'Mahjong White Dragon', de: 'Mahjong weißer Drache' },
+    { ch: '🂠', en: 'Playing Card Back', de: 'Kartenrückseite' },
+
+    // Misc distinct marks
+    { ch: '⛬', en: 'Historic Site', de: 'Historische Stätte' },
+    { ch: '⚿', en: 'Key in Square', de: 'Schlüssel im Quadrat' },
+    { ch: '〰', en: 'Wavy Dash',   de: 'Wellenlinie' },
 ];
 
 // Grid sizes the generator can draw into. Higher map tiers bias toward the
@@ -313,6 +605,15 @@ const EG_GEN_SIZES = [
     { rows: 10, cols: 15 },  //  150 cells → medium
     { rows: 15, cols: 15 },  //  225 cells → large
     { rows: 15, cols: 20 },  //  300 cells → large
+    { rows: 12, cols: 20 },  //  240 cells → large
+    { rows: 10, cols: 25 },  //  250 cells → large
+    { rows: 14, cols: 20 },  //  280 cells → large
+    { rows: 12, cols: 25 },  //  300 cells → large
+    { rows: 10, cols: 30 },  //  300 cells → large (wide format)
+    { rows: 14, cols: 25 },  //  350 cells → large
+    { rows: 12, cols: 30 },  //  360 cells → large (wide format)
+    { rows: 15, cols: 25 },  //  375 cells → large
+    { rows: 15, cols: 30 },  //  450 cells → massive (wide format)
     { rows: 20, cols: 20 },  //  400 cells → massive
     { rows: 20, cols: 25 },  //  500 cells → massive
 ];
@@ -526,9 +827,11 @@ function _egGenerateRandomStructure(rows, cols) {
 
 // Picks a grid size: honours the minCells floor from map mods and, when a
 // size bucket is requested, only draws sizes inside that bucket's range.
+// maxRows / maxCols (optional) hard-cap the dimensions — used by boss
+// arenas to keep the fight on a small board.
 // Biases toward bigger grids as the map tier climbs. Falls back to the
-// closest eligible size when no size sits inside the bucket window.
-function _egPickGeneratedSize(tier, minCells, bucket) {
+// closest eligible size when no size sits inside the window.
+function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols) {
     let lo = minCells || 0;
     let hi = Infinity;
     if (bucket && EG_GEN_BUCKETS[bucket]) {
@@ -536,16 +839,22 @@ function _egPickGeneratedSize(tier, minCells, bucket) {
         hi = EG_GEN_BUCKETS[bucket][1];
     }
 
+    const fits = s => {
+        if (maxRows != null && s.rows > maxRows) return false;
+        if (maxCols != null && s.cols > maxCols) return false;
+        return true;
+    };
+
     let list = EG_GEN_SIZES.filter(s => {
         const cells = s.rows * s.cols;
-        return cells >= lo && cells <= hi;
+        return cells >= lo && cells <= hi && fits(s);
     });
 
     // Nothing inside the window (e.g. tiny bucket + high minCells floor):
     // use the smallest size that still satisfies the floor.
     if (!list.length) {
         const above = EG_GEN_SIZES
-            .filter(s => s.rows * s.cols >= lo)
+            .filter(s => s.rows * s.cols >= lo && fits(s))
             .sort((a, b) => (a.rows * a.cols) - (b.rows * b.cols));
         list = above.length ? [above[0]] : [EG_GEN_SIZES[EG_GEN_SIZES.length - 1]];
     }
@@ -586,7 +895,7 @@ function _egCreateGeneratedLevel(opts) {
     let effMode = mode;
     if (mode === 'mixed') effMode = Math.random() < 0.7 ? 'symbol' : 'random';
 
-    const size = _egPickGeneratedSize(tier, opts.minCells, opts.bucket);
+    const size = _egPickGeneratedSize(tier, opts.minCells, opts.bucket, opts.maxRows, opts.maxCols);
 
     let grid = null;
     let symbolMeta = null;

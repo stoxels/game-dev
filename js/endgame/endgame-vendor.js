@@ -34,6 +34,10 @@ const EG_VENDOR_FREE_BASE_IDS = new Set([
     'ranged_1',    // Shortbow (level 1 ranged)
     'chest_str_1', // Plate Vest (level 1 chest, pure armour)
     'pants_str_1', // Rusted Greaves (level 1 pants, armour)
+    'chest_agi_1', // Tattered Doublet (level 1 chest, evasion)
+    'pants_agi_1', // Worn Britches (level 1 pants, evasion)
+    'chest_int_1', // Simple Robe (level 1 chest, absorption)
+    'pants_int_1', // Silk Pantaloons (level 1 pants, absorption)
 ]);
 
 // Prices per currency orb id (gold). Missing ids fall back to the default.
@@ -90,6 +94,7 @@ function _egvBaseItemPrice(base) {
 
 let _egvActiveTab = 'maps';
 let _egvBaseFilterSlot = 'all';
+let _egvBaseFilterOffer = 'all'; // 'all' | 'free'
 let _egvBaseSortMode = 'slot'; // 'slot' | 'ilvl'
 
 const EG_VENDOR_TABS = [
@@ -189,7 +194,7 @@ function _egvSwitchTab(tabId) {
 //-------------------SHARED CARD HELPERS------------------------------------
 //------------------------------------------------------------------------
 
-function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraClass = '', blockedReason = '' }) {
+function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraClass = '', blockedReason = '', extraAttrs = '' }) {
     const blockedCls = blockedReason ? ' egv-card-blocked' : '';
     const blockedTitle = blockedReason ? ` title="${blockedReason.replace(/"/g, '&quot;')}"` : '';
     // Free offers (price 0) never show a gold deficit.
@@ -201,7 +206,7 @@ function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraC
         ? `<div class="egv-price-missing">${t('eg_vendor_missing_gold').replace('{n}', (price - egGetGold()).toLocaleString())}</div>`
         : '';
     return `
-<div class="egv-card${blockedCls}${affordCls} ${extraClass}"${blockedTitle}>
+<div class="egv-card${blockedCls}${affordCls} ${extraClass}"${blockedTitle}${extraAttrs}>
     <div class="egv-card-top">
         <div class="egv-card-icon">${icon}</div>
         <div class="egv-card-info">
@@ -284,9 +289,10 @@ function _egvRefreshMapsTabDynamic() {
     }
 }
 
-// Buys one freshly-rolled Tier 1 map. The map is generated like any other
-// drop (rarity + mods rolled from the T1 tables) and placed in the first
-// free Probability Gate map stash slot.
+// Buys one freshly-rolled Tier 1 map. Free starter maps are always forced
+// to Normal rarity (no rolled mods) so a fresh character gets a clean
+// baseline run; paid maps are generated like any other drop. The map is
+// placed in the first free Probability Gate map stash slot.
 function _egvBuyTierOneMap() {
     if (EG_VENDOR_T1_MAP_PRICE > 0 && !egSpendGold(EG_VENDOR_T1_MAP_PRICE)) {
         showToast(t('eg_vendor_no_gold').replace('{n}', EG_VENDOR_T1_MAP_PRICE - egGetGold()));
@@ -305,7 +311,10 @@ function _egvBuyTierOneMap() {
     }
 
     // Tier 1 ≈ monster level 4 (same mapping as _egGenerateMapDrop).
-    const map = _egGenerateMapDrop(4, 1);
+    // The free starter map always launches modifier-free.
+    const map = EG_VENDOR_T1_MAP_PRICE > 0
+        ? _egGenerateMapDrop(4, 1)
+        : _egGenerateMapDrop(4, 1, { forceNormal: true });
     _egAddMapToMapStash(map);
     egSaveHubState();
 
@@ -492,6 +501,11 @@ function _egvSetBaseFilter(value) {
     _egvRenderBaseListOnly();
 }
 
+function _egvSetBaseOfferFilter(value) {
+    _egvBaseFilterOffer = value;
+    _egvRenderBaseListOnly();
+}
+
 function _egvSetBaseSort(value) {
     _egvBaseSortMode = value;
     _egvRenderBaseListOnly();
@@ -499,6 +513,7 @@ function _egvSetBaseSort(value) {
 
 // Re-renders only the base item list + filter controls (keeps focus/state).
 function _egvRenderBaseListOnly() {
+    _egvHideBaseTooltip(); // hovered card may be replaced by the re-render
     const listEl = document.getElementById('egv-base-list');
     if (listEl) listEl.innerHTML = _egvBuildBaseListHTML();
     _egvRefreshGoldDisplay();
@@ -510,6 +525,10 @@ function _egvGetFilteredSortedBases() {
 
     if (_egvBaseFilterSlot !== 'all') {
         bases = bases.filter(b => b.slotType === _egvBaseFilterSlot);
+    }
+
+    if (_egvBaseFilterOffer === 'free') {
+        bases = bases.filter(b => EG_VENDOR_FREE_BASE_IDS.has(b.id));
     }
 
     if (_egvBaseSortMode === 'ilvl') {
@@ -541,6 +560,13 @@ function _egvBuildBaseTabHTML() {
         <select onchange="_egvSetBaseFilter(this.value)">${_egvBuildBaseFilterOptionsHTML()}</select>
     </label>
     <label class="egv-base-control-label">
+        <span>${t('eg_vendor_filter_offer')}</span>
+        <select onchange="_egvSetBaseOfferFilter(this.value)">
+            <option value="all"${_egvBaseFilterOffer === 'all' ? ' selected' : ''}>${t('eg_vendor_filter_offer_all')}</option>
+            <option value="free"${_egvBaseFilterOffer === 'free' ? ' selected' : ''}>${t('eg_vendor_filter_free')}</option>
+        </select>
+    </label>
+    <label class="egv-base-control-label">
         <span>${t('eg_vendor_sort_by')}</span>
         <select onchange="_egvSetBaseSort(this.value)">
             <option value="slot"${_egvBaseSortMode === 'slot' ? ' selected' : ''}>${t('eg_vendor_sort_slot')}</option>
@@ -564,12 +590,47 @@ function _egvBuildBaseListHTML() {
             desc: _egvBuildReqSummaryText(base),
             price,
             buyCall: `_egvBuyBaseItem('${base.id}')`,
+            extraAttrs: ` onmouseenter="_egvShowBaseTooltip('${base.id}', event)" onmouseleave="_egvHideBaseTooltip()"`,
             blockedReason: missing.length
                 ? t('eg_vendor_cannot_equip').replace('{list}', missing.join(', '))
                 : '',
         });
     }).join('');
     return `<div class="egv-cards egv-cards-base">${cards}</div>`;
+}
+
+// Builds a preview/purchase item object from an equipment base type —
+// used both for vendor purchases and for the mouseover stat tooltip.
+function _egvBuildBaseItemFromBase(base) {
+    const baseName = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
+    return {
+        id: `${base.id}_preview`,
+        baseId: base.id,
+        name: baseName,
+        icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
+        category: 'equip',
+        slotType: base.slotType,
+        archetype: base.archetype,
+        rarity: 'common',
+        itemLevel: base.minLevel,
+        requirements: { ...base.requirements },
+        defenses: { ...base.defenses },
+        ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
+        ...(base.blockChance ? { blockChance: base.blockChance } : {}),
+    };
+}
+
+// Shows the shared floating equipment tooltip (from endgame-hub.js) for a
+// base type card. Holding Alt also compares against the equipped item.
+function _egvShowBaseTooltip(baseId, e) {
+    if (typeof _egShowTooltip !== 'function') return;
+    const base = EG_ALL_BASE_TYPES.find(b => b.id === baseId);
+    if (!base) return;
+    _egShowTooltip(_egvBuildBaseItemFromBase(base), e);
+}
+
+function _egvHideBaseTooltip() {
+    if (typeof _egClearTooltip === 'function') _egClearTooltip();
 }
 
 // Buys a specific equipment base type as a fresh common (white) item at its
@@ -582,22 +643,10 @@ function _egvBuyBaseItem(baseId) {
     if (!_egvPurchase(price, () => {
         if (!_egStashHasFreeSlot()) return false;
 
-        const baseName = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
-        const item = {
-            id: `${base.id}_${Date.now()}`,
-            baseId: base.id,
-            name: baseName,
-            icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
-            category: 'equip',
-            slotType: base.slotType,
-            archetype: base.archetype,
-            rarity: 'common',
-            itemLevel: base.minLevel,
-            requirements: { ...base.requirements },
-            defenses: { ...base.defenses },
-            ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
-            ...(base.blockChance ? { blockChance: base.blockChance } : {}),
-        };
+        const item = _egvBuildBaseItemFromBase(base);
+        item.id = `${base.id}_${Date.now()}`;
+        // Free starter gear sells for nothing — prevents a buy-free/sell-shard loop.
+        if (price === 0) item.noSellValue = true;
 
         for (let r = 0; r < EG_INV_ROWS; r++) {
             for (let c = 0; c < EG_INV_COLS; c++) {
@@ -616,6 +665,7 @@ function _egvBuyBaseItem(baseId) {
         .replace('{icon}', base.icon || EG_SLOT_ICONS[base.slotType] || '📦')
         .replace('{name}', name));
     _egvRenderTabContent();
+    _egvHideBaseTooltip(); // card re-render may swallow the mouseleave event
 }
 
 

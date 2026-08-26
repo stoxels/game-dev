@@ -106,8 +106,9 @@ function _egApplyEssenceCraft(item, def) {
     chosenFamilyIds.add(guaranteed.familyId);
     if (guaranteed.type === 'prefix') preCount++; else sufCount++;
 
-    // 1-3 additional random modifiers, clamped to the rare mod caps
-    let extra = 1 + Math.floor(Math.random() * 3); // 1..3
+    // 2-3 additional random modifiers, clamped to the rare mod caps
+    // (rare items must always end up with at least 3 modifiers)
+    let extra = 2 + Math.floor(Math.random() * 2); // 2..3
     const maxExtra = Math.min(
         cap.maxTotal - mods.length,
         (cap.maxPre - preCount) + (cap.maxSuf - sufCount)
@@ -431,8 +432,9 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     }
 
     // Essences work on ANY equipment item regardless of rarity — but not on
-    // maps or other non-equip items.
-    if (!item || item.category !== 'equip') {
+    // maps or other non-equip items. Uniques are fixed by design and can
+    // never be re-rolled.
+    if (!item || item.category !== 'equip' || item.isUnique) {
         showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');

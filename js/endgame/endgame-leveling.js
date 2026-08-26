@@ -60,6 +60,13 @@ const EG_LEVELING_CONFIG = {
     xpExp: 1.75,
     xpLinear: 60,
 
+    // Early-game catch-up discount: below earlyXpDiscountLevels the XP
+    // requirement is scaled down, fading linearly to zero so the curve
+    // joins the base formula exactly at that level. Helps a fresh
+    // character start snowballing without touching monster difficulty.
+    earlyXpDiscountLevels: 5,
+    earlyXpDiscountFactor: 0.5,
+
     // Base XP per kill: xpPerKillBase + xpPerKillGrowth * mLevel^xpPerKillExp.
     xpPerKillBase: 18,
     xpPerKillGrowth: 12,
@@ -127,7 +134,14 @@ function _egGetAllocatedAttributes() {
 // XP required to advance FROM `level` to `level + 1`.
 function _egGetXpForNextLevel(level) {
     const c = EG_LEVELING_CONFIG;
-    return Math.floor(c.xpBase * Math.pow(level, c.xpExp) + c.xpLinear * level);
+    let xp = c.xpBase * Math.pow(level, c.xpExp) + c.xpLinear * level;
+    if (level <= c.earlyXpDiscountLevels) {
+        // Discount fades linearly: full factor at level 1, none at
+        // earlyXpDiscountLevels, so the curve stays continuous.
+        const fade = (level - 1) / c.earlyXpDiscountLevels;
+        xp *= 1 - c.earlyXpDiscountFactor * (1 - fade);
+    }
+    return Math.floor(xp);
 }
 
 // Pushes the live player level / allocated attributes into the shared base
@@ -278,10 +292,53 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
         }
 
         _egPlayLevelUpEffect(_egGetPlayerLevel());
+        _egPlayLevelUpReward();
         if (typeof showToast === 'function') {
             showToast(t('eg_lvl_levelup_toast').replace('{n}', _egGetPlayerLevel()), '#f5b642');
         }
         if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
+    }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------LEVEL-UP REWARD (ENDGAME)----------------------------
+//------------------------------------------------------------------------
+
+// Instant reward for levelling up during an active endgame encounter:
+//   - Life and mana are completely refilled.
+//   - 3 waves of projectiles (0.5 s apart) launch at EVERY monster on
+//     screen, each hitting with correct-reveal projectile damage.
+const EG_LEVELUP_REWARD_WAVES = 3;
+const EG_LEVELUP_REWARD_WAVE_DELAY_MS = 500;
+
+function _egPlayLevelUpReward() {
+    if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
+
+    // Full life & mana restore (after the +max bonuses were applied).
+    if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
+        playerCurrentHP = playerMaxHP;
+        if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    }
+    if (typeof _resetPlayerMana === 'function') _resetPlayerMana();
+
+    // Snapshot the monsters on screen now; each wave skips ones that died
+    // in the meantime. Damage matches a correct-reveal projectile hit.
+    if (typeof _egMonsters === 'undefined' || !_egMonsters.length) return;
+    const targetIds = _egMonsters.map(m => m.id);
+    const revealPct = _egGetRevealProjectileDamagePct() / 100;
+
+    for (let wave = 0; wave < EG_LEVELUP_REWARD_WAVES; wave++) {
+        setTimeout(() => {
+            if (!_egIsActive()) return;
+            targetIds.forEach(id => {
+                if (!_egMonsters.some(m => m.id === id)) return;
+                const rolled = _egCalcPlayerDamage();
+                const damage = Math.max(1, Math.round(rolled * revealPct));
+                const elements = _egScaleElements(_egLastHitElements, revealPct);
+                _egAnimatePlayerProjectile(damage, id, undefined, undefined, undefined, undefined, elements);
+            });
+        }, wave * EG_LEVELUP_REWARD_WAVE_DELAY_MS);
     }
 }
 
@@ -510,11 +567,19 @@ function _egOpenAttributeWindow() {
     _egEnsureAttrModal();
     _egRenderAttrWindow();
     document.getElementById('eg-attr-modal').classList.add('show');
+    // Lift the shared tooltip above this modal (modal z-index 10000 > tip 9999)
+    // so the attribute-row descriptions stay visible.
+    if (typeof getGameTooltip === 'function') getGameTooltip().style.zIndex = '10001';
 }
 
 function _egCloseAttributeWindow() {
     const modal = document.getElementById('eg-attr-modal');
     if (modal) modal.classList.remove('show');
+
+    // Allocated/refunded points may have changed which items are
+    // requirement-blocked, so refresh the inventory + equip renders.
+    if (typeof _egRenderInventory === 'function') _egRenderInventory();
+    if (typeof _egRenderEquipSlots === 'function') _egRenderEquipSlots();
 }
 
 // Rebuilds the window body from current state. Called on every open and
@@ -562,7 +627,10 @@ function _egRenderAttrWindow() {
         return `
 <div class="eg-attr-row">
     <span class="eg-attr-row-icon">${a.icon}</span>
-    <div class="eg-attr-row-info">
+    <div class="eg-attr-row-info"
+         onmouseenter="if (typeof showGameTooltip === 'function' && typeof _egBuildStatDescTooltipHTML === 'function') showGameTooltip(_egBuildStatDescTooltipHTML('${a.nameKey.replace('eg_stat_', 'eg_statdesc_')}', this.querySelector('.eg-attr-row-name').textContent), event)"
+         onmousemove="if (typeof moveGameTooltip === 'function') moveGameTooltip(event)"
+         onmouseleave="if (typeof hideGameTooltip === 'function') hideGameTooltip()">
         <div class="eg-attr-row-name">${t(a.nameKey)}</div>
         <div class="eg-attr-row-detail">${baseTotal}${(gearBonus[a.key] || 0) > 0
             ? ` <small>+ ${t('eg_lvl_gear_bonus').replace('{n}', gearBonus[a.key])}</small>` : ''}</div>
@@ -594,7 +662,7 @@ ${(() => { const tiers = _egBuildXpTiersHTML(); return tiers
 <div class="eg-attr-hint">${t('eg_lvl_hint')}</div>
 <div class="eg-delete-modal-btns">
     <button class="eg-delete-modal-btn eg-delete-modal-cancel"
-         onclick="_egCloseAttributeWindow()">${t('reset_cancel')}</button>
+         onclick="_egCloseAttributeWindow()">${t('eg_lvl_close')}</button>
 </div>`;
 }
 

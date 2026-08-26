@@ -15,7 +15,8 @@ const EG_MONSTER_ZONES = [
 // Default monster count per wave if cur.maxMonsters is not set.
 const EG_DEFAULT_MONSTER_CAP = 3;
 
-// How long the boss spawn delay is after the kill threshold is reached (ms).
+// Delay before a boss materialises after entering an arena / after the
+// previous arena boss died (ms).
 const EG_BOSS_SPAWN_DELAY_MS = 1500;
 
 // Delay range for respawn timer (ms). A random value in [min, min+variance] is used.
@@ -77,9 +78,17 @@ function _egIsPuzzleSolved() {
 //------------------------------------------------------------------------
 
 // Returns the base level for a monster, applying a small ±2 random variance.
-// Variance keeps a wave from feeling perfectly uniform.
+// Variance keeps a wave from feeling perfectly uniform. Below
+// EG_EARLY_VARIANCE_FREE_LEVEL the variance only rolls downward, so the
+// lowest map tiers never throw monsters above their base level at fresh
+// characters that lack the gear to snowball yet.
+const EG_EARLY_VARIANCE_FREE_LEVEL = 8;
+
 function _egRollMonsterLevel(baseLevel) {
-    return Math.max(1, baseLevel + Math.floor(Math.random() * 5) - 2);
+    const down = -Math.floor(Math.random() * 3);
+    const upMax = baseLevel >= EG_EARLY_VARIANCE_FREE_LEVEL ? 2 : 0;
+    const up = Math.floor(Math.random() * (upMax + 1));
+    return Math.max(1, baseLevel + up + down);
 }
 
 // Returns the resolved base level for the current encounter (falls back to 1).
@@ -163,7 +172,7 @@ function _egBuildBossSpawnList(baseLevel) {
 }
 
 // Like _egBuildBossSpawnList but reads from an explicit mapDef object instead of cur.
-// Used by _egSpawnChainBoss so it always reads from the original map def.
+// Used by _egEnterBossArena so it always reads from the original map def.
 function _egBuildBossSpawnListFromDef(mapDef, baseLevel) {
     if (!mapDef) return [];
     const hasBossFlag = mapDef.hasBoss;
@@ -176,9 +185,10 @@ function _egBuildBossSpawnListFromDef(mapDef, baseLevel) {
     return _egBuildRandomBossList(baseLevel);
 }
 
-// Returns the full ordered spawn list for this encounter: normal monsters first.
-// NOTE: Bosses are intentionally withheld from the initial wave.
-//       They spawn later via _egSpawnChainBoss at the 50% kill threshold.
+// Returns the full ordered spawn list for this encounter: normal monsters only.
+// NOTE: Bosses never spawn inside regular puzzles. On boss maps they are
+//       fought in dedicated boss-arena puzzles at the end of the run
+//       (see _egEnterBossArena in endgame-encounter-chain.js).
 function _egBuildSpawnList() {
     const baseLevel = _egGetEncounterBaseLevel();
     return _egBuildNormalSpawnList(baseLevel);
@@ -191,13 +201,16 @@ function _egBuildSpawnList() {
 //------------------------------------------------------------------------
 
 // Returns true if a respawn should be suppressed right now.
-// Checks encounter state, kill totals, boss presence, and concurrent cap.
+// Checks encounter state, kill totals, boss phase, and concurrent cap.
 function _egShouldSuppressRespawn() {
     if (!_egIsActive()) return true;
 
     const req = _egGetMapRequirements();
     const total = req.totalMonsters;
     if (total > 0 && _egChainKillCount >= total) return true;
+
+    // Boss arena chain: no regular monsters interfere with the duel
+    if (typeof _egBossPhaseActive !== 'undefined' && _egBossPhaseActive) return true;
 
     // Suppress if a boss is already on the field
     if (_egMonsters.some(m => m.isBoss)) return true;
@@ -275,6 +288,9 @@ function _egScheduleMonsterSpawns(spawnList) {
 // Duration of the gear "stagger" charge-timer pause (pants mod).
 const EG_STAGGER_DURATION_MS = 1000;
 
+// Tick interval for the gear lifeRegen heal (life_regen mod, HP per second).
+const EG_LIFE_REGEN_INTERVAL_MS = 1000;
+
 // Encounter start timestamp + first_step grace window (boots mod, seconds).
 // Monsters do not advance their charge bars while the grace window is active.
 let _egEncounterStartAt = 0;
@@ -298,6 +314,14 @@ function _egResetEncounterState() {
     if (typeof _egAilmentsReset === 'function') _egAilmentsReset();
     if (typeof _egHazardsReset === 'function') _egHazardsReset();
     if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
+
+    // Gear: channel / arcane surge streaks restart with each encounter
+    _egChannelStacks = 0;
+    _egArcaneSurgeStreak = 0;
+    // Gear: warding — "once per map". Standalone monster levels are their own
+    // map, so refresh here; device-map runs refresh only at launch
+    // (_egLaunchMapFromDevice) so the save persists across chained puzzles.
+    if (!window._egIsMapDeviceRun) _egWardingUsedThisMap = false;
 
     // Gear: first_step — snapshot the charge-free opening window for this map
     _egEncounterStartAt = Date.now();
@@ -367,6 +391,41 @@ function _egStopEncounter() {
 // Advances a single monster's charge bar by one tick (0.1s at 10Hz).
 // Fires the monster's attack when the charge bar fills completely.
 function _egTickMonster(m) {
+    // Active map run: monster regeneration — heals #% of max life per second.
+    if (m.regenPctMaxLife > 0 && m.maxHP > 0 && m.currentHP > 0
+        && m.currentHP < m.maxHP) {
+        m.regenAcc = (m.regenAcc || 0) + 0.1;
+        if (m.regenAcc >= 1) {
+            const heal = Math.max(1, Math.round(m.maxHP * m.regenPctMaxLife / 100));
+            m.currentHP = Math.min(m.maxHP, m.currentHP + heal);
+            m.regenAcc = 0;
+        }
+    }
+
+    // Active map run: bosses enrage below 30% life — one-time damage boost.
+    if (m.isBoss && !m.enraged && m.maxHP > 0 && m.damageValue > 0
+        && m.currentHP > 0 && m.currentHP <= m.maxHP * 0.3) {
+        const enragePct = (typeof _egGetActiveMapModValue === 'function')
+            ? _egGetActiveMapModValue('map_boss_enrage') : 0;
+        if (enragePct > 0) {
+            m.enraged = true;
+            m.damageValue = Math.round(m.damageValue * (1 + enragePct / 100));
+            if (m.bossBaseDamage != null) {
+                m.bossBaseDamage = Math.round(m.bossBaseDamage * (1 + enragePct / 100));
+            }
+            showToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
+        }
+    }
+
+    // Active map run: wounded desperation — non-boss monsters below 25%
+    // life fight harder (one-time damage boost).
+    if (!m.isBoss && !m.desperationTriggered && m.desperationPct > 0
+        && m.maxHP > 0 && m.damageValue > 0
+        && m.currentHP > 0 && m.currentHP <= m.maxHP * 0.25) {
+        m.desperationTriggered = true;
+        m.damageValue = Math.round(m.damageValue * (1 + m.desperationPct / 100));
+    }
+
     // Gear: stagger — the charge timer is paused for a short window after a hit
     if (m.staggeredUntil && Date.now() < m.staggeredUntil) return;
     // Gear: first_step — monsters don't charge during the map's opening window
@@ -421,10 +480,8 @@ function _egCheckMistakeLimit() {
     const max = _egGetMaxAllowedMistakes();
     if (max == null) return;
     if (typeof mistakeCount !== 'undefined' && mistakeCount > max) {
-        _egStopEncounter();
-        dead = true;
-        stopTimer();
-        _egShowMapFailedOverlay('eg_map_failed', 'eg_too_many_mistakes');
+        // Central defeat handler — the player keeps the loot collected so far.
+        _egEndMapDefeated(t('eg_map_failed'), t('eg_too_many_mistakes'));
     }
 }
 
@@ -434,84 +491,48 @@ function _egCheckMistakeLimit() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Navigates back to the Nexus of Worlds screen after a map failure.
-// Performs the same cleanup as the standard leave-level handlers.
-function _egReturnToNexusFromDefeat() {
-    const ov = document.getElementById('ov-lose');
-    if (ov) ov.classList.remove('show', 'eg-map-failed');
-
-    if (typeof _egStopEncounter === 'function') _egStopEncounter();
-
-    // Best-effort cleanup of level-scoped systems (mirrors cleanupActiveGameSystems)
-    ['clearActiveRandomWalkers', '_bayesTrapsCleanup', '_endBlackSwan',
-     '_fxShieldBorderRemove', '_varianceShield_removeBubble',
-     '_arcaneFreeze_clearAllFrostAndStalagmites'].forEach(fnName => {
-        if (typeof window[fnName] === 'function') {
-            try { window[fnName](); } catch (_) { /* ignore */ }
-        }
-    });
-    if (typeof _clearBlackoutCountdown === 'function') {
-        _clearBlackoutCountdown('row');
-        _clearBlackoutCountdown('col');
-    }
-
-    if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
-    if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
-
-    if (typeof showEndgameNexus === 'function') showEndgameNexus();
-}
-
-// Lazily injects the "return to Nexus" button into the lose overlay and
-// wires an observer that swaps it in place of Retry/Levels whenever the
-// overlay opens with the eg-map-failed class. Regular (non-endgame) defeats
-// keep their default buttons automatically.
+// Intercepts every defeat path that opens the generic lose overlay while an
+// endgame map is still running (timer expiry, hardcore fail, golden clock,
+// random walkers, ...): instead of Retry/Levels the player gets the map-lost
+// screen (see _egEndMapDefeated in endgame-encounter-chain.js), which keeps
+// everything collected during the run. Endgame-specific deaths (mistake
+// limit reached, HP zero) call _egEndMapDefeated directly.
 function _egEnsureLoseOverlayEndgameUI() {
     const ov = document.getElementById('ov-lose');
     if (!ov || ov.dataset.egFailUiBound) return;
     ov.dataset.egFailUiBound = '1';
 
-    const btns = ov.querySelector('.ov-btns');
-    const retry = document.getElementById('btn-lose-retry');
-    const levels = document.getElementById('btn-lose-levels');
-
-    let egBtn = document.getElementById('btn-lose-endgame-return');
-    if (!egBtn) {
-        egBtn = document.createElement('button');
-        egBtn.id = 'btn-lose-endgame-return';
-        egBtn.className = 'ob p';
-        egBtn.style.display = 'none';
-        egBtn.textContent = t('eg_return_to_test_hub');
-        egBtn.addEventListener('click', _egReturnToNexusFromDefeat);
-        btns.appendChild(egBtn);
-    }
-
-    // Endgame mode whenever the map-failed class is present OR any other
-    // defeat path (timer expiry, hardcore fail, golden clock, random walk,
-    // ...) opens this overlay while an endgame map is still active.
     new MutationObserver(() => {
         if (!ov.classList.contains('show')) return;
-        const failed = ov.classList.contains('eg-map-failed') ||
-            (typeof _egIsActive === 'function' && _egIsActive());
-        retry.style.display = failed ? 'none' : '';
-        levels.style.display = failed ? 'none' : '';
-        egBtn.style.display = failed ? '' : 'none';
+        if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
+
+        const titleEl = document.getElementById('lose-title');
+        const subEl = document.getElementById('lose-sub');
+        _egEndMapDefeated(
+            titleEl ? titleEl.textContent : null,
+            subEl ? subEl.textContent : null
+        );
     }).observe(ov, { attributes: true, attributeFilter: ['class'] });
 }
 
-// Shows the lose overlay in "map failed" mode: no Retry / Levels — only a
-// single button that returns the player to the Endgame Test Hub.
-function _egShowMapFailedOverlay(titleKey, subKey) {
-    _egEnsureLoseOverlayEndgameUI();
 
-    document.getElementById('lose-title').textContent = t(titleKey);
-    document.getElementById('lose-sub').textContent = t(subKey);
-    Audio_Manager.playSFX('player_defeated');
+// Gear: lifeRegen — heals the player for lifeRegen HP once per second
+// while an encounter is running. No-ops at full HP or when dead.
+let _egLastLifeRegenAt = 0;
+function _egTickLifeRegen() {
+    const now = Date.now();
+    if (now - _egLastLifeRegenAt < EG_LIFE_REGEN_INTERVAL_MS) return;
+    _egLastLifeRegenAt = now;
 
-    const ov = document.getElementById('ov-lose');
-    ov.classList.add('eg-map-failed');
-    ov.classList.add('show');
+    const regen = _egComputePlayerStats().lifeRegen || 0;
+    if (regen <= 0 || playerCurrentHP <= 0 || playerCurrentHP >= playerMaxHP) return;
+
+    // Active map run: No Life Regeneration — gear regen is disabled.
+    if (typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration')) return;
+
+    playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + regen);
+    if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
 }
-
 
 // Runs at 10Hz. Advances every monster's charge bar and fires their attack
 // when the bar fills. Also calls _egBossTick for per-tick boss logic.
@@ -526,6 +547,9 @@ function _egTickLoop() {
     if (typeof _egTickAilments === 'function') _egTickAilments();
     if (typeof _egHazardsTick === 'function') _egHazardsTick();
     _egMonsters.forEach(_egTickMonster);
+
+    // Gear: lifeRegen — heals the player once per second
+    _egTickLifeRegen();
 
     // Player mechanics
     _egTickPlayer();
@@ -709,8 +733,14 @@ function _egAnimateMonsterProjectile(monster) {
         }
         // Gear: preemptive_dodge — auto-dodge each monster's opening attack
         if (_egRollPreemptiveDodge(monster)) return;
-        const dealt = _egPlayerTakeDamage(monster.damageValue, false, monster.element);
-        if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
+        // Map mod: monsters may deal double damage (crit)
+        const critDmg = monster.damageValue * (typeof _egRollMonsterCritMult === 'function'
+            ? _egRollMonsterCritMult(monster) : 1);
+        const dealt = _egPlayerTakeDamage(critDmg, false, monster.element, monster.level);
+        if (dealt > 0) {
+            _egApplyPlayerHitFeedback(dealt);
+            if (typeof _egApplyMonsterHitMods === 'function') _egApplyMonsterHitMods(monster);
+        }
     });
 }
 
@@ -733,8 +763,18 @@ function _egApplyMeleeImpact(monster) {
     // Gear: preemptive_dodge — auto-dodge each monster's opening attack
     if (_egRollPreemptiveDodge(monster)) return;
 
-    const dealt = _egPlayerTakeDamage(monster.damageValue, false, monster.element);
-    if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
+    // Gear: grounded — chance to brace against the charge and reduce its damage
+    let chargeDamage = _egApplyGroundedReduction(monster.damageValue);
+
+    // Map mod: monsters may deal double damage (crit)
+    chargeDamage *= (typeof _egRollMonsterCritMult === 'function')
+        ? _egRollMonsterCritMult(monster) : 1;
+
+    const dealt = _egPlayerTakeDamage(chargeDamage, false, monster.element, monster.level);
+    if (dealt > 0) {
+        _egApplyPlayerHitFeedback(dealt);
+        if (typeof _egApplyMonsterHitMods === 'function') _egApplyMonsterHitMods(monster);
+    }
 }
 
 // Gear: preemptive_dodge (boots suffix) — the first attack each monster
@@ -834,6 +874,132 @@ function _egOnCorrectCell(row, col) {
     _egDragChargeDamage += damage;
     _egDragChargeStacks++;
     _egUpdateChargedProjectileVisual();
+
+    // Gear: arcane surge streak + channel stacks grow per correct cell
+    _egTickCorrectCellGearProcs();
+}
+
+
+//------------------------------------------------------------------------
+//-------------------ARCANE GEAR PROCS (correct cells)--------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Correct-fill driven gear modifiers:
+//   arcane_surge — after # consecutive correct cells without a mistake the
+//                  sigil grants a burst of mana; the streak resets on any
+//                  real mistake (_egOnMistake).
+//   channel      — each consecutive correct cell adds a stack worth flat
+//                  bonus damage; released on the next player hit or
+//                  automatically when the max-stack cap is reached.
+
+// Delay before an echo's second instance lands (see _egTryEchoHit).
+const EG_ECHO_DELAY_MS = 450;
+
+// Called from breakFillStreaksOnMistake() (mouse-button-handlers.js) on any
+// real (unabsorbed) mistake — breaks both correct-cell streak mechanics.
+function _egOnMistake() {
+    _egArcaneSurgeStreak = 0;
+    _egChannelStacks = 0;
+
+    // Active map run: mistakes burn a share of maximum Life.
+    if (typeof _egIsActive === 'function' && _egIsActive()
+        && typeof _egGetActiveMapModValue === 'function') {
+        const pct = _egGetActiveMapModValue('map_mistake_damage');
+        if (pct > 0) {
+            const maxHP = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+            const dealt = _egPlayerTakeDamage(Math.max(1, Math.round(maxHP * pct / 100)), true);
+            if (dealt > 0) showToast(`✖️ ${t('eg_mm_toast_mistake_pain') || 'Painful mistake!'} (-${dealt})`);
+        }
+    }
+}
+
+// Advances the per-correct-cell gear streaks. Called from _egOnCorrectCell.
+function _egTickCorrectCellGearProcs() {
+    const stats = _egComputePlayerStats();
+
+    // Arcane Surge: mana burst at the required streak length
+    if (stats.arcaneSurgeStreak > 0 && stats.arcaneSurgeMana > 0) {
+        _egArcaneSurgeStreak++;
+        if (_egArcaneSurgeStreak >= stats.arcaneSurgeStreak) {
+            _egArcaneSurgeStreak = 0;
+            const gained = gainMana(stats.arcaneSurgeMana);
+            if (gained > 0) showToast(t('eg_arcane_surge').replace('{n}', Math.round(gained)));
+        }
+    }
+
+    // Channel: gain a stack, auto-releasing once the cap is reached
+    if (stats.channelDamagePerStack > 0 && stats.channelMaxStacks > 0) {
+        _egChannelStacks++;
+        if (_egChannelStacks >= stats.channelMaxStacks) _egReleaseChannelAtMax();
+    }
+}
+
+// Auto-release: dumps all accumulated channel stacks onto the current target.
+function _egReleaseChannelAtMax() {
+    const stats = _egComputePlayerStats();
+    const dmg = Math.round(_egChannelStacks * stats.channelDamagePerStack);
+    _egChannelStacks = 0;
+    const target = typeof _egGetTarget === 'function' ? _egGetTarget() : null;
+    if (target && dmg > 0) {
+        _egShowStatusLabel(target.id, t('eg_channel'));
+        _egDamageTargetById(target.id, dmg);
+    }
+}
+
+// Consumes the on-hit gear bonuses (channel stacks + mana-to-damage) and
+// returns their combined flat damage. Called once per player hit — from
+// _egResolveProjectileImpact (projectile channel) and
+// _egApplyPlayerMeleeImpact (melee channel).
+function _egConsumeOnHitGearBonus() {
+    const stats = _egComputePlayerStats();
+    let bonus = 0;
+
+    // Channel: spend accumulated stacks
+    if (_egChannelStacks > 0 && stats.channelDamagePerStack > 0) {
+        bonus += _egChannelStacks * stats.channelDamagePerStack;
+        _egChannelStacks = 0;
+    }
+
+    // Mana to Damage: convert a % of CURRENT mana into flat bonus damage,
+    // consuming that mana.
+    const pct = Math.min(100, stats.manaToDamagePct || 0);
+    if (pct > 0 && playerCurrentMana > 0 && typeof spendMana === 'function') {
+        const converted = Math.floor(playerCurrentMana * pct / 100);
+        if (converted > 0 && spendMana(converted)) bonus += converted;
+    }
+
+    return Math.round(bonus);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------DEFENSIVE GEAR PROCS---------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Gear: fate (talisman suffix) — pure-luck chance to negate ANY incoming hit
+// entirely, including spells and charge attacks. Returns true when negated.
+function _egRollFateNegation(stats) {
+    const pct = stats.fatePct || 0;
+    if (pct <= 0 || Math.random() * 100 >= pct) return false;
+    showToast(t('eg_fate'));
+    Audio_Manager.playSFX('player_dodge_attack');
+    _egApplyPlayerMissFeedback();
+    _egScheduleAbsorptionRegen();
+    return true;
+}
+
+// Gear: grounded (boots prefix) — on a monster CHARGE hit, rolls against
+// groundedChancePct and reduces the hit by groundedReductionPct on proc.
+// Ranged (projectile) attacks are not charges and pass through untouched.
+function _egApplyGroundedReduction(rawDamage) {
+    const stats = _egComputePlayerStats();
+    const chance = stats.groundedChancePct || 0;
+    const reduction = Math.min(100, stats.groundedReductionPct || 0);
+    if (chance <= 0 || reduction <= 0) return rawDamage;
+    if (Math.random() * 100 >= chance) return rawDamage;
+    showToast(t('eg_grounded'));
+    return rawDamage * (1 - reduction / 100);
 }
 
 
@@ -886,7 +1052,12 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
 //   pierce  — chance to punch through and hit one additional monster anywhere
 function _egResolveProjectileImpact(damage, targetId, elements) {
     const target = _egMonsters.find(m => m.id === targetId);
-    let finalDamage = damage;
+
+    // Accuracy: projectiles can miss (no snipe/splash/chain/pierce on a miss)
+    if (_egRollPlayerMiss(targetId)) return;
+
+    // Gear: channel stacks + mana-to-damage are consumed by this hit
+    let finalDamage = damage + _egConsumeOnHitGearBonus();
 
     // Snipe: isolated target (no zone-mates) takes amplified projectile damage
     if (target) {
@@ -1130,17 +1301,57 @@ function _egCurrentMeleeDamage() {
         : EG_PLAYER_MELEE_DAMAGE;
 }
 
+// Accuracy check for player attacks (melee strikes AND projectiles alike).
+// Rolls against the target's level using _egCalcAccuracyMissChance; on a
+// miss shows a floating MISS label over the monster card and returns true
+// so the caller can abort the hit. Gear procs (cleave/splash/chain/…) are
+// part of the same attack and are skipped alongside it.
+function _egRollPlayerMiss(targetId) {
+    const target = _egMonsters.find(m => m.id === targetId);
+    if (!target) return false;
+
+    const stats = _egComputePlayerStats();
+    const missPct = _egCalcAccuracyMissChance(stats.accuracy, target.level);
+    if (Math.random() * 100 >= missPct) return false;
+
+    _egShowStatusLabel(targetId, t('eg_miss'));
+    return true;
+}
+
 // Applies a full melee strike at the moment of impact. The damage (and its
 // elemental breakdown) is rolled ONCE per swing so cleaved side targets
 // take the same hit as the primary target.
 function _egApplyPlayerMeleeImpact(targetId) {
     if (!_egIsActive() || !_egMonsters.some(m => m.id === targetId)) return;
 
-    const dmg = _egCurrentMeleeDamage();
+    // Accuracy: the swing can whiff entirely (no gear procs on a miss)
+    if (_egRollPlayerMiss(targetId)) return;
+
+    // Map mod: ethereal monsters evade melee strikes.
+    const meleeTarget = _egMonsters.find(m => m.id === targetId);
+    if (meleeTarget && (meleeTarget.etherealPct || 0) > 0
+        && Math.random() * 100 < meleeTarget.etherealPct) {
+        _egShowStatusLabel(targetId, t('eg_dodged'));
+        return;
+    }
+
+    // Gear: channel stacks + mana-to-damage are consumed by this hit
+    const dmg = _egCurrentMeleeDamage() + _egConsumeOnHitGearBonus();
     const elements = _egLastMeleeElements;
 
     // Uses the existing damage application logic[cite: 1]
     _egDamageTargetById(targetId, dmg, elements);
+
+    // Active map run: monsters reflect #% of melee damage back at you.
+    if (typeof _egGetActiveMapModValue === 'function') {
+        const reflectPct = _egGetActiveMapModValue('map_reflect_melee');
+        const reflectTarget = _egMonsters.find(m => m.id === targetId);
+        if (reflectPct > 0 && reflectTarget) {
+            const reflected = Math.max(1, Math.round(dmg * reflectPct / 100));
+            showToast(`🪞 ${t('eg_mm_toast_reflect') || 'Reflected!'} (-${reflected})`);
+            _egPlayerTakeDamage(reflected, false, null);
+        }
+    }
 
     _egTryCleaveHit(targetId, dmg, elements);
 }
@@ -1346,7 +1557,9 @@ function _egShowStatusLabel(monsterId, text) {
 // transitions, and kill detection.
 // Called by the projectile onfinish callback so the impact matches visually.
 // `elements` optionally maps each element to the elemental share of `amount`.
-function _egDamageTargetById(monsterId, amount, elements) {
+// `opts.isEcho` marks the delayed echo instance so echoes can't chain into
+// further echoes (they still trigger on-hit effects like leech/ailments).
+function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (!_egIsActive()) return;
 
     const target = _egMonsters.find(m => m.id === monsterId);
@@ -1375,6 +1588,10 @@ function _egDamageTargetById(monsterId, amount, elements) {
     _egShowDamageNumber(target.id, amount);
     _egFlashDamageCard(target.id);
     _egSpawnHitBurst(target.id, elements);
+
+    // Gear: echo (rings) — chance for the hit to repeat as a delayed
+    // second instance of echoDamagePct of its damage
+    if (!(opts && opts.isEcho)) _egTryEchoHit(target.id, amount, elements);
 
     // Check for boss phase transition before checking death
     if (target.isBoss) _egBossCheckPhase(target);
@@ -1406,6 +1623,26 @@ function _egTryOverkillSpread(dyingTarget, appliedDamage) {
     _egDamageTargetById(victim.id, overkill);
 }
 
+// Gear: echo (ring suffix) — rolls against echoChancePct and schedules a
+// delayed second hit worth echoDamagePct of the original applied damage.
+// Echo instances are flagged so they cannot chain into further echoes.
+function _egTryEchoHit(targetId, appliedAmount, elements) {
+    const stats = _egComputePlayerStats();
+    const chance = stats.echoChancePct || 0;
+    const dmgPct = stats.echoDamagePct || 0;
+    if (chance <= 0 || dmgPct <= 0) return;
+    if (!appliedAmount || appliedAmount <= 0) return;
+    if (Math.random() * 100 >= chance) return;
+
+    setTimeout(() => {
+        if (!_egIsActive()) return;
+        const target = _egMonsters.find(m => m.id === targetId);
+        if (!target) return;
+        _egShowStatusLabel(targetId, t('eg_echo'));
+        _egDamageTargetById(targetId, Math.max(1, Math.round(appliedAmount * dmgPct / 100)), elements, { isEcho: true });
+    }, EG_ECHO_DELAY_MS);
+}
+
 
 // Applies incoming monster damage to the player, after dodge/block/resist/
 // armour/absorption mitigation. Returns the actual HP lost (0 if dodged/
@@ -1415,18 +1652,32 @@ function _egTryOverkillSpread(dyingTarget, appliedDamage) {
 // `element` is the damage type of the attack ('fire'|'cold'|'lightning'|
 // 'shadow'); elemental hits are reduced by the matching resistance % plus
 // flat Arcane Resistance. Physical hits (no element) ignore resistances.
-function _egPlayerTakeDamage(amount, isSpell = false, element = null) {
+// `attackerLevel` feeds the level-scaled evasion benchmark; falls back to the
+// current target's level, then the encounter's base level.
+function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null) {
     if (!_egIsActive()) return 0;
 
     const stats = _egComputePlayerStats();
 
-    const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion));
-    if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
-        showToast(t('eg_dodged'));
-        Audio_Manager.playSFX('player_dodge_attack');
-        _egApplyPlayerMissFeedback();
-        _egScheduleAbsorptionRegen();
-        return 0;
+    // Gear: fate — pure-luck chance to negate ANY incoming hit entirely
+    // (attacks, spells and charge hits alike), before all other mitigation.
+    if (_egRollFateNegation(stats)) return 0;
+
+    // Evasion only applies to physical attacks (melee strikes and monster
+    // projectiles) — spells and environmental hazards cannot be dodged.
+    if (!isSpell) {
+        const attackerLvl = Number(attackerLevel)
+            || (_egGetTarget() && _egGetTarget().level)
+            || _egGetEncounterBaseLevel()
+            || _egGetPlayerLevel();
+        const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, attackerLvl));
+        if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
+            showToast(t('eg_dodged'));
+            Audio_Manager.playSFX('player_dodge_attack');
+            _egApplyPlayerMissFeedback();
+            _egScheduleAbsorptionRegen();
+            return 0;
+        }
     }
 
     // Block roll: attacks use block chance, spells use spell block chance.
@@ -1456,7 +1707,12 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null) {
         }
 
         const recoveryFactor = Math.max(0, 1 - Math.min(100, stats.blockRecoveryPct) / 100);
-        const lockoutDuration = EG_BLOCK_LOCKOUT_BASE_MS * recoveryFactor;
+        let lockoutDuration = EG_BLOCK_LOCKOUT_BASE_MS * recoveryFactor;
+        // Active map run: block lockouts last #% longer.
+        if (typeof _egGetActiveMapModValue === 'function') {
+            const lockoutPct = _egGetActiveMapModValue('map_longer_lockout');
+            if (lockoutPct > 0) lockoutDuration *= (1 + lockoutPct / 100);
+        }
         _egPlayerBlockLockoutUntil = Date.now() + lockoutDuration;
         _egShowBlockLockoutOverlay(lockoutDuration);
         return 0;
@@ -1469,7 +1725,17 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null) {
     // Ailments: a shocked player takes amplified damage from all hits.
     if (typeof _egApplyPlayerShockAmp === 'function') amount = _egApplyPlayerShockAmp(amount);
 
-    let mitigated = _egCalcArmourMitigation(amount, stats.armour);
+    // Active map run: Vulnerability — you take #% increased damage.
+    if (typeof _egMapDamageTakenAmpMult === 'function') amount *= _egMapDamageTakenAmpMult();
+
+    // Active map run: Armour Pierce — monster hits ignore #% of your armour.
+    let effectiveArmour = stats.armour;
+    if (!isSpell && typeof _egGetActiveMapModValue === 'function') {
+        const pierce = _egGetActiveMapModValue('map_armour_pierce');
+        if (pierce > 0) effectiveArmour = Math.max(0, Math.round(stats.armour * (1 - Math.min(90, pierce) / 100)));
+    }
+
+    let mitigated = _egCalcArmourMitigation(amount, effectiveArmour);
 
     if (_egPlayerAbsorptionCurrent > 0) {
         const absorbed = Math.min(_egPlayerAbsorptionCurrent, mitigated);
@@ -1484,6 +1750,19 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null) {
     if (mitigated <= 0) return 0;
 
     playerCurrentHP = Math.max(0, playerCurrentHP - mitigated);
+
+    // Gear: warding — once per map, a killing blow instead leaves the player
+    // at wardingHP health and the ward shatters.
+    if (playerCurrentHP <= 0 && !_egWardingUsedThisMap) {
+        const wardHP = Math.round(stats.wardingHP || 0);
+        if (wardHP > 0) {
+            _egWardingUsedThisMap = true;
+            playerCurrentHP = wardHP;
+            showToast(t('eg_warding'));
+            Audio_Manager.playSFX('player_shield_damage_taken');
+        }
+    }
+
     _renderPlayerHealth();
     if (playerCurrentHP <= 0) _egGameOver();
 
@@ -1510,27 +1789,11 @@ function _egUpdateTargetAfterKill() {
     }
 }
 
-// Checks whether the boss kill threshold has been crossed and schedules the boss spawn.
-// Only fires once per encounter (_egBossSpawned guards against duplicates).
-function _egCheckAndTriggerBossSpawn() {
-    const req = _egGetMapRequirements();
-    const total = req.totalMonsters;
-    const bossThreshold = total > 0 ? Math.floor(total / 2) : 0;
-
-    if (req.hasBoss && !_egBossSpawned && bossThreshold > 0 && _egChainKillCount >= bossThreshold) {
-        _egBossSpawned = true;
-        setTimeout(() => {
-            if (_egIsActive()) _egSpawnChainBoss();
-        }, EG_BOSS_SPAWN_DELAY_MS);
-    }
-}
-
 // Handles all post-kill logic for a normal (non-boss) monster death.
 function _egHandleNormalMonsterKill(dying) {
     _egChainKillCount++;
 
     _egUpdateObjectivesHUD();
-    _egCheckAndTriggerBossSpawn();
 
     // Keep spawning regular monsters until the total kill count is reached
     const req = _egGetMapRequirements();
@@ -1547,7 +1810,20 @@ function _egHandleNormalMonsterKill(dying) {
 }
 
 // Handles all post-kill logic for a boss monster death.
+// During the boss arena chain this advances the chain: more bosses left →
+// roll into the next arena; last boss dead → loot party + Complete Map.
 function _egHandleBossKill(dying) {
+    if (typeof _egBossPhaseActive !== 'undefined' && _egBossPhaseActive) {
+        _egBossKilledCount++;
+
+        const allDead = typeof _egBossDefeated === 'function' && _egBossDefeated();
+        if (allDead) {
+            if (typeof _egOnAllBossesDead === 'function') _egOnAllBossesDead();
+        } else if (typeof _egScheduleArenaAdvance === 'function') {
+            _egScheduleArenaAdvance();
+        }
+    }
+
     _egUpdateObjectivesHUD();
     if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(true,dying.level);
     if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
@@ -1560,6 +1836,30 @@ function _egHandleBossKill(dying) {
 // Delegates to the appropriate normal or boss kill handler.
 function _egKillMonster(monsterId) {
     const dying = _egMonsters.find(m => m.id === monsterId);
+
+    // Active map run: Second Wind — the monster rises back up once instead.
+    if (dying && dying.secondWindPct > 0 && !dying.secondWindUsed
+        && typeof _egIsActive === 'function' && _egIsActive()) {
+        dying.secondWindUsed = true;
+        if (Math.random() * 100 < dying.secondWindPct) {
+            dying.currentHP = Math.max(1, Math.round((dying.maxHP || 1) * 0.25));
+            dying.currentCharge = 0;
+            showToast(`✨ ${dying.name || ''} ${t('eg_mm_toast_second_wind') || 'rises again!'}`.trim());
+            return;
+        }
+    }
+
+    // Active map run: exploding monsters — deal #% of their own maximum
+    // life as damage to the player on death (dodgeable / blockable).
+    if (dying && dying.explodeOnDeathPct > 0 && typeof _egIsActive === 'function' && _egIsActive()) {
+        const blast = Math.max(1, Math.round((dying.maxHP || 0) * dying.explodeOnDeathPct / 100));
+        if (blast > 0) {
+            showToast(`💥 ${dying.name || ''} ${t('eg_mm_toast_explode') || 'explodes!'} (-${blast})`);
+            _egPlayerTakeDamage(blast, false, dying.element, dying.level);
+            if (typeof dead !== 'undefined' && dead) return;
+        }
+    }
+
     _egBossCleanup(monsterId);
     _egFlashKillCard(monsterId);
     _egMonsters = _egMonsters.filter(m => m.id !== monsterId);
@@ -1569,11 +1869,31 @@ function _egKillMonster(monsterId) {
     if (dying && !dying.isBoss) _egHandleNormalMonsterKill(dying);
     if (dying && dying.isBoss) _egHandleBossKill(dying);
 
-    // Mana on kill (gear stat)
-    if (typeof gainMana === 'function'
-        && typeof _egComputePlayerStats === 'function'
-        && playerMaxMana > 0) {
-        gainMana(_egComputePlayerStats().manaOnKill || 0);
+    // On-kill gear stats: mana, life and absorption on kill
+    if (typeof _egComputePlayerStats === 'function') {
+        const killStats = _egComputePlayerStats();
+
+        if (typeof gainMana === 'function' && playerMaxMana > 0 && (killStats.manaOnKill || 0) > 0) {
+            gainMana(killStats.manaOnKill);
+        }
+
+        if ((killStats.lifeOnKill || 0) > 0 && playerCurrentHP > 0 && playerCurrentHP < playerMaxHP) {
+            // Active map run: "#% less Life gained from Kills".
+            const recoveryMult = (typeof _egMapKillRecoveryMult === 'function')
+                ? _egMapKillRecoveryMult() : 1;
+            const lifeGain = Math.round(killStats.lifeOnKill * recoveryMult);
+            if (lifeGain > 0) {
+                playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + lifeGain);
+                if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+            }
+        }
+
+        if ((killStats.absorptionOnKill || 0) > 0 && typeof _egIsActive === 'function' && _egIsActive()) {
+            const maxAbsorption = killStats.absorption;
+            if (_egPlayerAbsorptionCurrent < maxAbsorption) {
+                _egPlayerAbsorptionCurrent = Math.min(maxAbsorption, _egPlayerAbsorptionCurrent + killStats.absorptionOnKill);
+            }
+        }
     }
 
     // Experience (endgame-leveling.js) — scaled by the monster's level
@@ -1590,10 +1910,8 @@ function _egOnAllMonstersDead() { }
 
 // Triggers the game-over sequence when the player's HP reaches zero.
 function _egGameOver() {
-    _egStopEncounter();
-    dead = true;
-    stopTimer();
-    _egShowMapFailedOverlay('eg_game_over', 'eg_monsters_overwhelmed');
+    // Central defeat handler — the player keeps the loot collected so far.
+    _egEndMapDefeated(t('eg_game_over'), t('eg_monsters_overwhelmed'));
 }
 
 

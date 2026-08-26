@@ -1155,8 +1155,17 @@ function _showWorldTooltip(e, wi, isDone, isLocked, healingTier) {
 function _trackTooltipToMouse(e) {
     const tip = document.getElementById('mv-tooltip');
     if (!tip) return;
-    tip.style.left = (e.clientX + 14) + 'px';
-    tip.style.top = Math.min(e.clientY + 14, window.innerHeight - 80) + 'px';
+    const rect = tip.getBoundingClientRect();
+    let x = e.clientX + 14;
+    let y = e.clientY + 14;
+    if (x + rect.width > window.innerWidth - 8) {
+        x = Math.max(8, e.clientX - rect.width - 12);
+    }
+    if (y + rect.height > window.innerHeight - 8) {
+        y = Math.max(8, window.innerHeight - rect.height - 8);
+    }
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
 }
 
 /**

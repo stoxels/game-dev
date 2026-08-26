@@ -320,6 +320,9 @@ function breakFillStreaksOnMistake() {
     consecutiveCorrectFills = 0;    // sample_efficiency skill: streak reset
     _streakBonusFills = 0;          // streak_bonus skill: streak reset
 
+    // Endgame gear: arcane surge streak + channel stacks break on a mistake
+    if (typeof _egOnMistake === 'function') _egOnMistake();
+
     if (typeof PassiveTracker !== 'undefined') PassiveTracker.onMistake();
 
     // Animals no longer flee outright on a real mistake — instead they lose

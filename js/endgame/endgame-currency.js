@@ -152,7 +152,7 @@ const EG_CURRENCY_DEFS = {
     orb_scouring: {
         id: 'orb_scouring', name: t('eg_orb_scouring'), icon: '⚪',
         description: t('eg_orb_scouring_desc'),
-        canApply(item) { return item.rarity !== 'common'; },
+        canApply(item) { return item.rarity !== 'common' && !item.isUnique; },
         apply(item) {
             return { ...item, rarity: 'common', mods: [], name: item.baseName || item.name };
         },
@@ -176,7 +176,7 @@ const EG_CURRENCY_DEFS = {
     orb_divine: {
         id: 'orb_divine', name: t('eg_orb_divine'), icon: '🌟',
         description: t('eg_orb_divine_desc'),
-        canApply(item) { return (item.mods || []).length > 0; },
+        canApply(item) { return (item.mods || []).length > 0 && !item.isUnique; },
         apply(item) {
             return _egRerollItemModValues(item, _egGetModTable(item));
         },
@@ -232,7 +232,7 @@ const EG_CURRENCY_DEFS = {
     orb_annulment: {
         id: 'orb_annulment', name: t('eg_orb_annulment'), icon: '✂️',
         description: t('eg_orb_annulment_desc'),
-        canApply(item) { return (item.mods || []).length > 0; },
+        canApply(item) { return (item.mods || []).length > 0 && !item.isUnique; },
         apply(item) {
             return _egRemoveOneModFromItem(item);
         },
@@ -255,7 +255,7 @@ const EG_CURRENCY_DEFS = {
         id: 'mirror_of_kalandra', name: t('eg_orb_mirror'), icon: '🪞',
         description: t('eg_orb_mirror_desc'),
         isMirror: true,
-        canApply(item) { return item.category === 'equip'; },
+        canApply(item) { return item.category === 'equip' && !item.isUnique; },
     },
 };
 

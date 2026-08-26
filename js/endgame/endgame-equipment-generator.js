@@ -8,8 +8,8 @@
 // RARITY LADDER:
 //   common   (white)  — 0 mods
 //   uncommon (green)  — 1–2 mods  (max 1 prefix, max 1 suffix)
-//   rare     (blue)   — 1–4 mods  (max 3 prefix, max 3 suffix)
-//   epic     (purple) — 1–6 mods  (max 3 prefix, max 3 suffix)
+//   rare     (blue)   — 3–4 mods  (max 3 prefix, max 3 suffix)
+//   epic     (purple) — 5–6 mods  (max 3 prefix, max 3 suffix)
 //------------------------------------------------------------------------
 
 
@@ -25,10 +25,10 @@ const EG_ITEM_RARITY_TABLE = [
 ];
 
 const EG_MOD_CAPS = {
-    common: { maxPre: 0, maxSuf: 0, maxTotal: 0 },
-    uncommon: { maxPre: 1, maxSuf: 1, maxTotal: 2 },
-    rare: { maxPre: 3, maxSuf: 3, maxTotal: 4 },
-    epic: { maxPre: 3, maxSuf: 3, maxTotal: 6 },
+    common: { maxPre: 0, maxSuf: 0, maxTotal: 0, minTotal: 0 },
+    uncommon: { maxPre: 1, maxSuf: 1, maxTotal: 2, minTotal: 1 },
+    rare: { maxPre: 3, maxSuf: 3, maxTotal: 4, minTotal: 3 },
+    epic: { maxPre: 3, maxSuf: 3, maxTotal: 6, minTotal: 5 },
 };
 
 // Maps every slotType value (from endgame-equipment-base-items.js) to its
@@ -145,8 +145,11 @@ function _egRollModCounts(rarity) {
         return { prefixCount: 1, suffixCount: 1 };
     }
 
-    // rare / epic: roll a total count in [1, maxTotal], then distribute
-    const total = 1 + Math.floor(Math.random() * cap.maxTotal);
+    // rare / epic: roll a total count in [minTotal, maxTotal], then distribute
+    // (rare always has at least 3 mods, epic at least 5)
+    const minTotal = cap.minTotal != null ? cap.minTotal : 1;
+    const span = Math.max(1, cap.maxTotal - minTotal + 1);
+    const total = minTotal + Math.floor(Math.random() * span);
     let prefixCount = 0;
     let suffixCount = 0;
     for (let i = 0; i < total; i++) {

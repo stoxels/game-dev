@@ -434,6 +434,8 @@ function _resolveQuizAnswer(correct) {
         // Count toward map objectives
         if (isInterstitial) {
             if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
+            // Endgame reward: roll a temporary damage buff / life heal / mana restore
+            if (typeof _egApplyQuizRewardBuff === 'function') _egApplyQuizRewardBuff();
             resEl.className = 'quiz-result ok';
             resEl.textContent = t('qz_correct_short');
         } else {
@@ -448,6 +450,10 @@ function _resolveQuizAnswer(correct) {
         resEl.className = 'quiz-result bad';
         resEl.textContent = t('quiz_wrong');
         Audio_Manager.playSFX('quizWrong');
+        // Map mod: incorrect answers burn a share of maximum Life.
+        if (isInterstitial && typeof _egOnQuizWrongAnswer === 'function') {
+            _egOnQuizWrongAnswer();
+        }
     }
     document.getElementById('quiz-continue').style.display = 'flex';
     document.getElementById('btn-skip-quiz').style.display = 'none';

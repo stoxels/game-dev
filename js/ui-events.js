@@ -301,6 +301,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 unpauseGame();
                 cleanupActiveGameSystems();
                 stopTimer();
+                // Keep the run's collected loot even on a forfeit — the
+                // consumed map is penalty enough (mirrors _egEndMapDefeated).
+                if (typeof _egFlushRunLootToStash === 'function') _egFlushRunLootToStash();
+                if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
+                if (typeof egSaveHubState === 'function') egSaveHubState();
                 if (typeof _egStopEncounter === 'function') _egStopEncounter();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
@@ -332,6 +337,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 unpauseGame();
                 cleanupActiveGameSystems();
                 stopTimer();
+                // Keep the run's collected loot even on a forfeit — the
+                // consumed map is penalty enough (mirrors _egEndMapDefeated).
+                if (typeof _egFlushRunLootToStash === 'function') _egFlushRunLootToStash();
+                if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
+                if (typeof egSaveHubState === 'function') egSaveHubState();
                 if (typeof _egStopEncounter === 'function') _egStopEncounter();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');

@@ -192,6 +192,7 @@ function _egBossCleanup(monsterId) {
     _egRemoveClueSwap();
     _egRemoveGridInvert();
     _egVoidSurgeTeardown();
+    if (typeof _egBlastTeardownAll === 'function') _egBlastTeardownAll();
 }
 
 // Cleans up all tracked bosses at once. Called on encounter stop.

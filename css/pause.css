@@ -4,33 +4,150 @@
     inset: 0;
     z-index: 9999;
     background: rgba(0, 0, 0, 0.92);
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
 }
 
-    #pause-overlay.show {
-        display: flex;
-    }
+#pause-overlay.show {
+    display: flex;
+}
+
+/* Centered card holding everything */
+.pause-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(520px, 90vw);
+    padding: 28px 32px 20px;
+    background: rgba(10, 12, 24, 0.85);
+    border: 1px solid var(--border2);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
 
 #pause-label {
-    font-size: 3rem;
+    font-size: 2.4rem;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.25em;
     color: #fff;
+    text-indent: 0.25em; /* visually centers letterspaced text */
+    margin-bottom: 18px;
 }
 
-#pause-hint {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.45);
-    letter-spacing: 0.1em;
+/* Level / score row */
+.pause-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    width: 100%;
+    margin-bottom: 16px;
 }
 
-/* Settings button on the pause overlay */
-#btn-pause-settings {
-    margin-top: 8px;
-    padding: 10px 22px;
+.pause-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.pause-stat-label {
+    font-family: var(--PX);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--setup-opt-inactive);
+}
+
+.pause-stat .gtb-lvl {
+    font-family: var(--PX);
+    font-size: 26px;
+    color: var(--yellow);
+}
+
+.pause-stat-value {
+    font-family: var(--PX);
+    font-size: 26px;
+    color: var(--yellow);
+}
+
+.pause-stat-divider {
+    width: 1px;
+    height: 34px;
+    background: var(--border2);
+}
+
+/* Puzzle hint inside the panel */
+#pause-overlay .pause-section,
+#pause-overlay #top-hint {
+    font-size: clamp(14px, 1.6vw, 18px);
+    color: var(--puzzle-hint-text);
+    font-style: italic;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+/* Modifier tags */
+#pause-overlay .mod-tags-row {
+    margin-bottom: 14px;
+}
+
+/* Endgame variant: no level number / score / hint / bonus.
+   Instead the collected run loot is shown (chips with hover tooltips),
+   mirroring the win/lose map completion summary. */
+#pause-overlay.eg-pause .pause-stats-row,
+#pause-overlay.eg-pause #top-hint,
+#pause-overlay.eg-pause #bonus-sidebar {
+    display: none;
+}
+
+#pause-loot-summary {
+    display: none;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 16px;
+}
+
+#pause-overlay.eg-pause #pause-loot-summary {
+    display: block;
+}
+
+/* Bonus objective strip */
+.pause-bonus {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border-left: 3px solid var(--orange);
+    margin-bottom: 20px;
+}
+
+.pause-bonus-label {
+    font-family: var(--PX);
+    font-size: 13px;
+    color: var(--orange);
+    letter-spacing: 1px;
+}
+
+.pause-bonus-text {
+    font-size: clamp(12px, 1.4vw, 14px);
+    color: var(--accent2);
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* Buttons */
+.pause-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+#pause-overlay #btn-pause-settings {
+    padding: 9px 22px;
     font-size: 0.95rem;
     letter-spacing: 0.05em;
     background: rgba(255, 255, 255, 0.08);
@@ -38,11 +155,37 @@
     border-radius: 6px;
     color: #fff;
     cursor: pointer;
+    transition: background .12s;
 }
 
-    #btn-pause-settings:hover {
-        background: rgba(255, 255, 255, 0.18);
-    }
+#pause-overlay #btn-pause-settings:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+#pause-overlay .gtb-btn {
+    font-family: var(--PX);
+    font-size: 15px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--accent2);
+    padding: 7px 13px;
+    cursor: pointer;
+    transition: all .12s;
+    white-space: nowrap;
+}
+
+#pause-overlay .gtb-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Esc hint pinned at the bottom of the panel */
+#pause-hint {
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.1em;
+}
 
 /* Make sure the settings modal renders ABOVE the pause overlay
    when opened from the pause screen (pause overlay is z-index 9999) */
@@ -54,29 +197,4 @@
    when opened via the pause screen (pause overlay is z-index 9999) */
 #eg-forfeit-modal.show {
     z-index: 10000;
-}
-
-
-
-.pause-level-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-}
-
-.bonus-inline {
-    justify-content: center;
-}
-
-.gtb-score-wrap {
-    text-align: center;
-    margin-top: 4px;
-}
-
-.pause-btn-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 10px;
 }

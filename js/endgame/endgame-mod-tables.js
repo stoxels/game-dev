@@ -135,13 +135,39 @@ const EG_MOD_NAME_WORDS = {
     map_player_defences: ['Exposed', 'of Exposure', 'der Schutzlosigkeit'],
     map_melee_damage: ['Dulled', 'of Dulling', 'der Abstumpfung'],
     map_projectile_damage: ['Windless', 'of Headwinds', 'der Gegenwinde'],
+    map_elem_weakness: ['Unwarded', 'of Susceptibility', 'der Anfälligkeit'],
+    map_temporal_chains: ['Sluggish', 'of Temporal Chains', 'der Zeitketten'],
+    map_vulnerability: ['Defenseless', 'of Vulnerability', 'der Verwundbarkeit'],
+    map_no_regeneration: ['Withering', 'of Withering', 'des Welkens'],
+    map_reduced_recovery: ['Anemic', 'of Anaemia', 'der Blutarmut'],
+    map_mistake_damage: ['Punishing', 'of Retribution', 'der Vergeltung'],
+    map_reduced_evasion: ['Blinded', 'of Blindness', 'der Blindheit'],
+    map_reduced_absorption: ['Depleted', 'of Depletion', 'der Erschöpfung'],
     map_puzzle_cells: ['Sprawling', 'of Labyrinths', 'der Labyrinthe'],
     map_required_puzzles: ['Demanding', 'of Trials', 'der Prüfungen'],
     map_hazard_lava: ['Molten', 'of Magma', 'des Magmas'],
     map_hazard_blizzard: ['Freezing', 'of Blizzards', 'des Schneesturms'],
+    map_hazard_meteor: ['Blazing', 'of Meteors', 'der Meteore'],
+    map_hazard_firewall: ['Scorching', 'of Fire Walls', 'der Feuerwände'],
+    map_hazard_cyclone: ['Turbulent', 'of Cyclones', 'der Zyklone'],
+    map_reduced_accuracy: ['Shaky', 'of Tremors', 'des Zitterns'],
+    map_reduced_attack_speed: ['Lumbering', 'of Sloth', 'der Trägheit'],
+    map_chilling_aura: ['Glacial', 'of Glaciers', 'der Gletscher'],
+    map_longer_lockout: ['Hampering', 'of Iron Manacles', 'der Eisenfesseln'],
+    map_slower_absorption: ['Sapping', 'of Siphoning', 'des Abzapfens'],
     // Suffixes
     map_monster_resistances: ['Warded', 'of Barriers', 'der Widerstände'],
     map_boss_chance: ['Tyrannical', 'of Tyrants', 'der Tyrannen'],
+    map_monster_crit: ['Brutal', 'of Brutality', 'der Brutalität'],
+    map_monster_avoid_ailments: ['Purified', 'of Purity', 'der Reinheit'],
+    map_monster_regen: ['Rejuvenating', 'of Regrowth', 'des Nachwachsens'],
+    map_monster_explosions: ['Detonating', 'of Detonation', 'der Detonation'],
+    map_monster_ailments: ['Afflicting', 'of Affliction', 'des Leidens'],
+    map_monster_puzzle_aggro: ['Taunting', 'of Taunting', 'der Verspottung'],
+    map_reflect_melee: ['Mirrored', 'of Reflection', 'der Spiegelung'],
+    map_boss_enrage: ['Enraging', 'of Enragement', 'der Raserei'],
+    map_armour_pierce: ['Piercing', 'of Piercing', 'des Durchdringens'],
+    map_monster_ambush: ['Ambushing', 'of Ambushes', 'der Hinterhalte'],
     map_fewer_mistakes: ['Merciless', 'of Severity', 'der Gnadenlosigkeit'],
     map_less_time: ['Hurried', 'of Haste', 'der Hast'],
     map_item_reveal_damage: ['Obscured', 'of Obscurity', 'der Dunkelheit'],
@@ -150,9 +176,26 @@ const EG_MOD_NAME_WORDS = {
     map_less_time_gained: ['Stalled', 'of Stagnation', 'der Stagnation'],
     map_mana_penalty: ['Draining', 'of Drain', 'des Entzugs'],
     map_extra_questions: ['Quizzing', 'of Inquisition', 'der Inquisition'],
+    map_longer_ailments: ['Lingering', 'of Persistence', 'der Hartnäckigkeit'],
+    map_increased_dot: ['Corrosive', 'of Corrosion', 'der Korrosion'],
+    map_freezing_hits: ['Numbing', 'of Numbness', 'der Betäubung'],
+    map_mana_costs: ['Thirsty', 'of Thirst', 'des Durstes'],
+    map_hazard_delirium: ['Delirious', 'of Delirium', 'des Deliriums'],
+    map_monster_ethereal: ['Phasing', 'of Phasing', 'der Phasenverschiebung'],
+    map_boss_life: ['Colossal', 'of Titans', 'der Titanen'],
+    map_monster_snowball: ['Escalating', 'of Escalation', 'der Eskalation'],
+    map_monster_second_wind: ['Undying', 'of Rebirth', 'der Wiedergeburt'],
+    map_monster_desperation: ['Cornered', 'of Desperation', 'der Verzweiflung'],
+    map_time_leech: ['Thieving', 'of Time Theft', 'des Zeitdiebstahls'],
+    map_fewer_pickups: ['Barren', 'of Scarcity', 'der Knappheit'],
+    map_blood_pact: ['Pacted', 'of Blood Pacts', 'des Blutpakts'],
+    map_quiz_damage: ['Testing', 'of Examinations', 'der Examinationen'],
+    map_reduced_block: ['Staved', 'of Splintering', 'des Zersplitterns'],
     map_hazard_lightning: ['Stormy', 'of Tempests', 'der Stürme'],
     map_hazard_darkness: ['Shadowed', 'of Darkness', 'der Finsternis'],
     map_hazard_arcane: ['Warped', 'of Arcane Storms', 'der Arkanstürme'],
+    map_hazard_volatile: ['Unstable', 'of Volatiles', 'der Instabilität'],
+    map_hazard_frostnova: ['Shivering', 'of Frost Novas', 'der Frostnovas'],
 };
 
 const EG_MOD_TABLE_HEAD = {
@@ -1385,7 +1428,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         faster_absorption_regen_start: {
             id: 'faster_absorption_regen_start',
             // Reduces the delay before absorption starts regenerating after a hit.
-            // Expressed as seconds reduced from the 5-second base delay.
+            // Expressed as seconds reduced from the 10-second base delay.
             label: 'Absorption begins Regenerating # second(s) sooner', labelDe: 'Absorption regeneriert # Sekunde(n) früher',
             tiers: [
                 { tier: 1, min: 2.0, max: 2.5, weight: 80, ilvl: 82 },
@@ -5638,8 +5681,8 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'flat_physical_damage',
             label: 'Adds # to @ Physical Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ physischen Schaden hinzu',
             tiers: [
-                { tier: 1, min1: 56, max1: 80, min2: 150, max2: 210, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 34, max1: 54, min2: 96, max2: 148, weight: 250, ilvl: 60 },
+                { tier: 1, min1: 56, max1: 80, min2: 150, max2: 210, weight: 170, ilvl: 80 },
+                { tier: 2, min1: 34, max1: 54, min2: 96, max2: 148, weight: 380, ilvl: 60 },
                 { tier: 3, min1: 16, max1: 32, min2: 48, max2: 94, weight: 520, ilvl: 35 },
                 { tier: 4, min1: 6, max1: 14, min2: 20, max2: 46, weight: 1050, ilvl: 1 }
             ]
@@ -5654,8 +5697,8 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'inc_physical_damage',
             label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
             tiers: [
-                { tier: 1, min: 88, max: 120, weight: 90, ilvl: 82 },
-                { tier: 2, min: 56, max: 86, weight: 220, ilvl: 62 },
+                { tier: 1, min: 88, max: 120, weight: 140, ilvl: 82 },
+                { tier: 2, min: 56, max: 86, weight: 330, ilvl: 62 },
                 { tier: 3, min: 29, max: 54, weight: 500, ilvl: 38 },
                 { tier: 4, min: 10, max: 27, weight: 1050, ilvl: 1 }
             ]
@@ -5674,8 +5717,8 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'fire_damage',
             label: 'Adds # to @ Fire Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Feuerschaden hinzu',
             tiers: [
-                { tier: 1, min1: 56, max1: 84, min2: 156, max2: 216, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 34, max1: 54, min2: 100, max2: 154, weight: 250, ilvl: 60 },
+                { tier: 1, min1: 56, max1: 84, min2: 156, max2: 216, weight: 170, ilvl: 80 },
+                { tier: 2, min1: 34, max1: 54, min2: 100, max2: 154, weight: 380, ilvl: 60 },
                 { tier: 3, min1: 16, max1: 32, min2: 52, max2: 98, weight: 500, ilvl: 35 },
                 { tier: 4, min1: 6, max1: 14, min2: 22, max2: 50, weight: 1000, ilvl: 1 }
             ]
@@ -5684,8 +5727,8 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'cold_damage',
             label: 'Adds # to @ Cold Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Kälteschaden hinzu',
             tiers: [
-                { tier: 1, min1: 48, max1: 76, min2: 140, max2: 196, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 28, max1: 46, min2: 88, max2: 138, weight: 250, ilvl: 60 },
+                { tier: 1, min1: 48, max1: 76, min2: 140, max2: 196, weight: 170, ilvl: 80 },
+                { tier: 2, min1: 28, max1: 46, min2: 88, max2: 138, weight: 380, ilvl: 60 },
                 { tier: 3, min1: 14, max1: 26, min2: 44, max2: 86, weight: 500, ilvl: 35 },
                 { tier: 4, min1: 4, max1: 12, min2: 18, max2: 42, weight: 1000, ilvl: 1 }
             ]
@@ -5695,8 +5738,8 @@ const EG_MOD_TABLE_WEAPON1 = {
             label: 'Adds # to @ Lightning Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Blitzschaden hinzu',
             // Lightning has a wide spread — high variance, high ceiling.
             tiers: [
-                { tier: 1, min1: 14, max1: 36, min2: 170, max2: 256, weight: 110, ilvl: 80 },
-                { tier: 2, min1: 8, max1: 24, min2: 108, max2: 168, weight: 250, ilvl: 60 },
+                { tier: 1, min1: 14, max1: 36, min2: 170, max2: 256, weight: 160, ilvl: 80 },
+                { tier: 2, min1: 8, max1: 24, min2: 108, max2: 168, weight: 370, ilvl: 60 },
                 { tier: 3, min1: 4, max1: 14, min2: 56, max2: 106, weight: 500, ilvl: 35 },
                 { tier: 4, min1: 2, max1: 8, min2: 24, max2: 54, weight: 1000, ilvl: 1 }
             ]
@@ -5707,8 +5750,8 @@ const EG_MOD_TABLE_WEAPON1 = {
             // Shadow is rarer — lower weight, slightly lower values,
             // but its status effect (convert) is the most powerful.
             tiers: [
-                { tier: 1, min1: 40, max1: 64, min2: 112, max2: 164, weight: 75, ilvl: 82 },
-                { tier: 2, min1: 24, max1: 38, min2: 72, max2: 110, weight: 170, ilvl: 62 },
+                { tier: 1, min1: 40, max1: 64, min2: 112, max2: 164, weight: 115, ilvl: 82 },
+                { tier: 2, min1: 24, max1: 38, min2: 72, max2: 110, weight: 260, ilvl: 62 },
                 { tier: 3, min1: 12, max1: 22, min2: 36, max2: 70, weight: 370, ilvl: 38 },
                 { tier: 4, min1: 4, max1: 10, min2: 14, max2: 34, weight: 800, ilvl: 1 }
             ]

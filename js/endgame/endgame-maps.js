@@ -31,9 +31,41 @@ const EG_MAP_DROP_CHANCE_BOSS = 0.40;    // bosses drop maps often
 // Highest possible map tier (cap for tier upgrades via the Orb of Horizons).
 const EG_MAX_MAP_TIER = 16;
 
-// Map tier is derived from the monster level of the killing blow context.
+// PoE-style convex monster-level curve per map tier.
+// Early tiers climb fast (quick leveling through the low tiers), late
+// tiers stretch out. Tier 16 sits at monster level 90 so a character can
+// keep earning meaningful XP all the way to the level-100 cap (the XP
+// safe band at pl 100 still reaches monster level ~91, so T16 stays
+// near-full XP even for end-of-campaign characters).
+// Tiers beyond EG_MAX_MAP_TIER only exist on the test screen; they extend
+// gently and clamp at EG_ENDGAME_MONSTER_LEVEL_CAP.
+const EG_MAP_TIER_MONSTER_LEVELS = [
+    /* T1 */ 3, /* T2 */ 6, /* T3 */ 10, /* T4 */ 14,
+    /* T5 */ 19, /* T6 */ 24, /* T7 */ 30, /* T8 */ 36,
+    /* T9 */ 43, /* T10 */ 50, /* T11 */ 57, /* T12 */ 64,
+    /* T13 */ 71, /* T14 */ 78, /* T15 */ 84, /* T16 */ 90,
+];
+const EG_ENDGAME_MONSTER_LEVEL_CAP = 95;
+
+// Monster level for a given map tier (curve lookup + gentle extension).
+function _egMapTierMonsterLevel(tier) {
+    const t = Math.max(1, Math.round(tier || 1));
+    if (t <= EG_MAP_TIER_MONSTER_LEVELS.length) {
+        return EG_MAP_TIER_MONSTER_LEVELS[t - 1];
+    }
+    const topTier = EG_MAP_TIER_MONSTER_LEVELS.length;
+    const topLevel = EG_MAP_TIER_MONSTER_LEVELS[topTier - 1];
+    return Math.min(EG_ENDGAME_MONSTER_LEVEL_CAP, topLevel + (t - topTier));
+}
+
+// Map tier is derived from the monster level of the killing blow context:
+// the lowest tier whose curve value covers the monster level.
 function _egRollMapTier(monsterLevel) {
-    return Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.ceil((monsterLevel || 1) / 4)));
+    const mLvl = Math.max(1, Math.round(monsterLevel || 1));
+    for (let t = 0; t < EG_MAP_TIER_MONSTER_LEVELS.length; t++) {
+        if (mLvl <= EG_MAP_TIER_MONSTER_LEVELS[t]) return t + 1;
+    }
+    return EG_MAX_MAP_TIER;
 }
 
 // Map base names grouped by tier band. The band containing the rolled tier
@@ -169,6 +201,159 @@ const EG_MAP_MOD_TABLES = {
             ],
         },
 
+        // ── Curses & Defences-down (PoE-style) ───────────────────────
+        map_elem_weakness: {
+            id: 'map_elem_weakness', affects: 'player',
+            label: 'Elemental Weakness — #% reduced all Resistances', labelDe: 'Elementarschwäche – #% reduziert alle Widerstände',
+            tiers: [
+                { tier: 1, min: 40, max: 50, weight: 90, ilvl: 52 },
+                { tier: 2, min: 25, max: 39, weight: 310, ilvl: 26 },
+                { tier: 3, min: 10, max: 24, weight: 760, ilvl: 1 },
+            ],
+        },
+        map_temporal_chains: {
+            id: 'map_temporal_chains', affects: 'player',
+            label: 'Temporal Chains — you act #% slower', labelDe: 'Zeitketten – du handelst #% langsamer',
+            tiers: [
+                { tier: 1, min: 30, max: 38, weight: 85, ilvl: 54 },
+                { tier: 2, min: 18, max: 28, weight: 300, ilvl: 28 },
+                { tier: 3, min: 8, max: 16, weight: 720, ilvl: 1 },
+            ],
+        },
+        map_vulnerability: {
+            id: 'map_vulnerability', affects: 'player',
+            label: 'Vulnerability — you take #% increased Damage', labelDe: 'Verwundbarkeit – du erleidest #% erhöhten Schaden',
+            tiers: [
+                { tier: 1, min: 35, max: 45, weight: 90, ilvl: 50 },
+                { tier: 2, min: 20, max: 34, weight: 310, ilvl: 24 },
+                { tier: 3, min: 8, max: 18, weight: 750, ilvl: 1 },
+            ],
+        },
+        map_no_regeneration: {
+            id: 'map_no_regeneration', affects: 'player',
+            label: 'No Life Regeneration', labelDe: 'Keine Lebensregeneration',
+            tiers: [
+                { tier: 1, min: 1, max: 1, weight: 120, ilvl: 40 },
+            ],
+        },
+        map_reduced_recovery: {
+            id: 'map_reduced_recovery', affects: 'player',
+            label: '#% less Life gained from Kills', labelDe: '#% weniger Leben durch Kills',
+            tiers: [
+                { tier: 1, min: 60, max: 75, weight: 95, ilvl: 48 },
+                { tier: 2, min: 35, max: 59, weight: 320, ilvl: 22 },
+                { tier: 3, min: 15, max: 34, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_mistake_damage: {
+            id: 'map_mistake_damage', affects: 'player',
+            label: 'Making a Mistake deals #% of maximum Life as Damage', labelDe: 'Fehler verursachen #% des maximalen Lebens als Schaden',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 46 },
+                { tier: 2, min: 4, max: 7, weight: 330, ilvl: 20 },
+                { tier: 3, min: 2, max: 3, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_reduced_evasion: {
+            id: 'map_reduced_evasion', affects: 'player',
+            label: '#% reduced Evasion', labelDe: '#% reduzierte Ausweichen',
+            tiers: [
+                { tier: 1, min: 45, max: 55, weight: 95, ilvl: 46 },
+                { tier: 2, min: 25, max: 44, weight: 320, ilvl: 20 },
+                { tier: 3, min: 10, max: 24, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_reduced_absorption: {
+            id: 'map_reduced_absorption', affects: 'player',
+            label: '#% reduced maximum Absorption', labelDe: '#% reduzierte maximale Absorption',
+            tiers: [
+                { tier: 1, min: 45, max: 55, weight: 95, ilvl: 46 },
+                { tier: 2, min: 25, max: 44, weight: 320, ilvl: 20 },
+                { tier: 3, min: 10, max: 24, weight: 780, ilvl: 1 },
+            ],
+        },
+
+        // ── Offence & sustain curses ─────────────────────────────────
+        map_reduced_accuracy: {
+            id: 'map_reduced_accuracy', affects: 'player',
+            label: '#% reduced Accuracy', labelDe: '#% reduzierte Genauigkeit',
+            tiers: [
+                { tier: 1, min: 35, max: 45, weight: 95, ilvl: 44 },
+                { tier: 2, min: 20, max: 34, weight: 320, ilvl: 18 },
+                { tier: 3, min: 8, max: 18, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_reduced_attack_speed: {
+            id: 'map_reduced_attack_speed', affects: 'player',
+            label: '#% less Attack Speed', labelDe: '#% weniger Angriffsgeschwindigkeit',
+            tiers: [
+                { tier: 1, min: 25, max: 33, weight: 90, ilvl: 50 },
+                { tier: 2, min: 14, max: 24, weight: 310, ilvl: 24 },
+                { tier: 3, min: 6, max: 12, weight: 770, ilvl: 1 },
+            ],
+        },
+        map_chilling_aura: {
+            id: 'map_chilling_aura', affects: 'player',
+            label: 'An icy Aura permanently Chills you', labelDe: 'Eine eisige Aura kühlt dich dauerhaft',
+            tiers: [
+                { tier: 1, min: 1, max: 1, weight: 110, ilvl: 46 },
+            ],
+        },
+        map_longer_lockout: {
+            id: 'map_longer_lockout', affects: 'player',
+            label: 'Block Lockouts last #% longer', labelDe: 'Blockaussperrungen dauern #% länger',
+            tiers: [
+                { tier: 1, min: 45, max: 55, weight: 95, ilvl: 42 },
+                { tier: 2, min: 25, max: 44, weight: 320, ilvl: 16 },
+                { tier: 3, min: 10, max: 24, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_slower_absorption: {
+            id: 'map_slower_absorption', affects: 'player',
+            label: 'Absorption recharges #% slower', labelDe: 'Absorption lädt #% langsamer wieder auf',
+            tiers: [
+                { tier: 1, min: 50, max: 65, weight: 95, ilvl: 40 },
+                { tier: 2, min: 30, max: 49, weight: 320, ilvl: 14 },
+                { tier: 3, min: 12, max: 29, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_longer_ailments: {
+            id: 'map_longer_ailments', affects: 'player',
+            label: 'Ailments on you last #% longer', labelDe: 'Zustände auf dir dauern #% länger',
+            tiers: [
+                { tier: 1, min: 40, max: 50, weight: 95, ilvl: 46 },
+                { tier: 2, min: 25, max: 39, weight: 320, ilvl: 20 },
+                { tier: 3, min: 10, max: 24, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_increased_dot: {
+            id: 'map_increased_dot', affects: 'player',
+            label: '#% increased Damage over Time taken', labelDe: '#% erhöhter erlittener Schaden über Zeit',
+            tiers: [
+                { tier: 1, min: 35, max: 45, weight: 95, ilvl: 42 },
+                { tier: 2, min: 20, max: 34, weight: 320, ilvl: 16 },
+                { tier: 3, min: 8, max: 18, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_freezing_hits: {
+            id: 'map_freezing_hits', affects: 'player',
+            label: 'Monster Cold Hits have a #% chance to Freeze you', labelDe: 'Kältetreffer von Monstern haben #% Chance dich einzufrieren',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 90, ilvl: 44 },
+                { tier: 2, min: 12, max: 24, weight: 310, ilvl: 18 },
+                { tier: 3, min: 5, max: 11, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_mana_costs: {
+            id: 'map_mana_costs', affects: 'player',
+            label: 'Class Abilities cost #% more Mana', labelDe: 'Klassenfähigkeiten kosten +#% mehr Mana',
+            tiers: [
+                { tier: 1, min: 40, max: 55, weight: 95, ilvl: 38 },
+                { tier: 2, min: 25, max: 39, weight: 320, ilvl: 12 },
+                { tier: 3, min: 10, max: 24, weight: 800, ilvl: 1 },
+            ],
+        },
+
         // ── Puzzle behaviour ─────────────────────────────────────────
         map_puzzle_cells: {
             id: 'map_puzzle_cells', affects: 'puzzle',
@@ -194,7 +379,7 @@ const EG_MAP_MOD_TABLES = {
         // player resistance — see endgame-hazards.js.
         map_hazard_lava: {
             id: 'map_hazard_lava', affects: 'player',
-            label: 'Lava Pools surround the Puzzle (#% intensity)', labelDe: 'Lavabecken umgeben das Rätsel (#% Intensität)',
+            label: 'Lava Balls surround the Puzzle (#% intensity)', labelDe: 'Lavakugeln umgeben das Rätsel (#% Intensität)',
             tiers: [
                 { tier: 1, min: 80, max: 100, weight: 90, ilvl: 60 },
                 { tier: 2, min: 50, max: 75, weight: 300, ilvl: 30 },
@@ -208,6 +393,24 @@ const EG_MAP_MOD_TABLES = {
                 { tier: 1, min: 80, max: 100, weight: 90, ilvl: 60 },
                 { tier: 2, min: 50, max: 75, weight: 300, ilvl: 30 },
                 { tier: 3, min: 25, max: 45, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_hazard_firewall: {
+            id: 'map_hazard_firewall', affects: 'player',
+            label: 'Fire Walls sweep across the Map (#% intensity)', labelDe: 'Feuerwände fegen über die Karte (#% Intensität)',
+            tiers: [
+                { tier: 1, min: 80, max: 100, weight: 85, ilvl: 60 },
+                { tier: 2, min: 50, max: 75, weight: 290, ilvl: 30 },
+                { tier: 3, min: 25, max: 45, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_hazard_meteor: {
+            id: 'map_hazard_meteor', affects: 'player',
+            label: 'Meteor Barrages bombard the Map (#% intensity)', labelDe: 'Meteorsalven bombardieren die Karte (#% Intensität)',
+            tiers: [
+                { tier: 1, min: 80, max: 100, weight: 85, ilvl: 62 },
+                { tier: 2, min: 50, max: 75, weight: 290, ilvl: 32 },
+                { tier: 3, min: 25, max: 45, weight: 780, ilvl: 1 },
             ],
         },
     },
@@ -232,6 +435,145 @@ const EG_MAP_MOD_TABLES = {
                 { tier: 1, min: 42, max: 50, weight: 110, ilvl: 50 },
                 { tier: 2, min: 25, max: 41, weight: 340, ilvl: 22 },
                 { tier: 3, min: 8, max: 24, weight: 800, ilvl: 1 },
+            ],
+        },
+
+        // ── Monster behaviour (PoE-style) ─────────────────────────────
+        map_monster_crit: {
+            id: 'map_monster_crit', affects: 'monster',
+            label: 'Monsters have +#% chance to deal Double Damage', labelDe: 'Monster haben +#% Chance auf doppelten Schaden',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 90, ilvl: 52 },
+                { tier: 2, min: 12, max: 24, weight: 310, ilvl: 26 },
+                { tier: 3, min: 4, max: 10, weight: 760, ilvl: 1 },
+            ],
+        },
+        map_monster_avoid_ailments: {
+            id: 'map_monster_avoid_ailments', affects: 'monster',
+            label: 'Monsters have +#% chance to Avoid Ailments', labelDe: 'Monster haben +#% Chance, Zustände zu vermeiden',
+            tiers: [
+                { tier: 1, min: 50, max: 60, weight: 95, ilvl: 46 },
+                { tier: 2, min: 30, max: 49, weight: 320, ilvl: 20 },
+                { tier: 3, min: 12, max: 29, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_monster_regen: {
+            id: 'map_monster_regen', affects: 'monster',
+            label: 'Monsters regenerate #% of their Life per second', labelDe: 'Monster regenerieren #% ihres Lebens pro Sekunde',
+            tiers: [
+                { tier: 1, min: 6, max: 9, weight: 95, ilvl: 50 },
+                { tier: 2, min: 3, max: 5, weight: 320, ilvl: 24 },
+                { tier: 3, min: 1, max: 2, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_monster_explosions: {
+            id: 'map_monster_explosions', affects: 'monster',
+            label: 'Monsters explode on death, dealing #% of their Life as damage', labelDe: 'Monster explodieren beim Tod und verursachen #% ihres Lebens als Schaden',
+            tiers: [
+                { tier: 1, min: 20, max: 30, weight: 90, ilvl: 54 },
+                { tier: 2, min: 10, max: 19, weight: 310, ilvl: 28 },
+                { tier: 3, min: 4, max: 9, weight: 760, ilvl: 1 },
+            ],
+        },
+        map_monster_ailments: {
+            id: 'map_monster_ailments', affects: 'monster',
+            label: 'Monster Hits have +#% chance to inflict Ailments', labelDe: 'Monsterangriffe haben +#% Chance auf Zustände',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 95, ilvl: 48 },
+                { tier: 2, min: 15, max: 29, weight: 320, ilvl: 22 },
+                { tier: 3, min: 5, max: 14, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_monster_puzzle_aggro: {
+            id: 'map_monster_puzzle_aggro', affects: 'monster',
+            label: 'Monster Attacks have +#% chance to strike the Puzzle', labelDe: 'Monsterangriffe treffen +#% häufiger das Rätsel',
+            tiers: [
+                { tier: 1, min: 15, max: 20, weight: 95, ilvl: 44 },
+                { tier: 2, min: 8, max: 14, weight: 320, ilvl: 18 },
+                { tier: 3, min: 3, max: 7, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_reflect_melee: {
+            id: 'map_reflect_melee', affects: 'monster',
+            label: 'Monsters reflect #% of Melee Damage dealt to them', labelDe: 'Monster reflektieren #% des erlittenen Nahkampfschadens',
+            tiers: [
+                { tier: 1, min: 20, max: 30, weight: 85, ilvl: 56 },
+                { tier: 2, min: 10, max: 19, weight: 300, ilvl: 30 },
+                { tier: 3, min: 4, max: 9, weight: 750, ilvl: 1 },
+            ],
+        },
+        map_boss_enrage: {
+            id: 'map_boss_enrage', affects: 'monster',
+            label: 'Bosses Enrage below 30% Life, dealing #% more Damage', labelDe: 'Bosse fallen unter 30% Leben in Raserei und verursachen #% mehr Schaden',
+            tiers: [
+                { tier: 1, min: 50, max: 70, weight: 90, ilvl: 50 },
+                { tier: 2, min: 30, max: 49, weight: 320, ilvl: 24 },
+                { tier: 3, min: 15, max: 29, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_armour_pierce: {
+            id: 'map_armour_pierce', affects: 'monster',
+            label: 'Monster Hits pierce #% of your Armour', labelDe: 'Monsterangriffe durchdringen #% deiner Rüstung',
+            tiers: [
+                { tier: 1, min: 40, max: 55, weight: 95, ilvl: 48 },
+                { tier: 2, min: 20, max: 39, weight: 320, ilvl: 22 },
+                { tier: 3, min: 8, max: 19, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_monster_ambush: {
+            id: 'map_monster_ambush', affects: 'monster',
+            label: 'Monsters start with a #% charged Attack Bar', labelDe: 'Monster starten mit #% geladener Angriffsleiste',
+            tiers: [
+                { tier: 1, min: 40, max: 55, weight: 90, ilvl: 50 },
+                { tier: 2, min: 20, max: 39, weight: 320, ilvl: 24 },
+                { tier: 3, min: 8, max: 19, weight: 780, ilvl: 1 },
+            ],
+        },
+
+        // ── Monster escalation ────────────────────────────────────────
+        map_monster_ethereal: {
+            id: 'map_monster_ethereal', affects: 'monster',
+            label: 'Monsters have #% chance to evade your Melee Attacks', labelDe: 'Monster haben #% Chance Nahkampfangriffen auszuweichen',
+            tiers: [
+                { tier: 1, min: 15, max: 22, weight: 95, ilvl: 48 },
+                { tier: 2, min: 8, max: 14, weight: 320, ilvl: 22 },
+                { tier: 3, min: 3, max: 7, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_boss_life: {
+            id: 'map_boss_life', affects: 'monster',
+            label: 'Bosses have +% increased Life', labelDe: 'Bosse haben +% mehr Leben',
+            tiers: [
+                { tier: 1, min: 45, max: 60, weight: 95, ilvl: 46 },
+                { tier: 2, min: 25, max: 44, weight: 320, ilvl: 20 },
+                { tier: 3, min: 10, max: 24, weight: 790, ilvl: 1 },
+            ],
+        },
+        map_monster_snowball: {
+            id: 'map_monster_snowball', affects: 'monster',
+            label: 'Monsters gain #% Damage each time they hit you', labelDe: 'Monster erhalten +% Schaden, jedes Mal wenn sie dich treffen',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 50 },
+                { tier: 2, min: 6, max: 11, weight: 310, ilvl: 24 },
+                { tier: 3, min: 2, max: 5, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_monster_second_wind: {
+            id: 'map_monster_second_wind', affects: 'monster',
+            label: 'Non-Boss Monsters have a #% chance to resurrect at 25% Life', labelDe: 'Nicht-Boss-Monster haben #% Chance, mit 25% Leben wieder aufzuerstehen',
+            tiers: [
+                { tier: 1, min: 40, max: 55, weight: 90, ilvl: 52 },
+                { tier: 2, min: 25, max: 39, weight: 310, ilvl: 26 },
+                { tier: 3, min: 10, max: 24, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_monster_desperation: {
+            id: 'map_monster_desperation', affects: 'monster',
+            label: 'Wounded Monsters below 25% Life deal #% more Damage', labelDe: 'Verwundete Monster unter 25% Leben verursachen +% mehr Schaden',
+            tiers: [
+                { tier: 1, min: 35, max: 50, weight: 95, ilvl: 42 },
+                { tier: 2, min: 20, max: 34, weight: 320, ilvl: 16 },
+                { tier: 3, min: 8, max: 19, weight: 800, ilvl: 1 },
             ],
         },
 
@@ -301,6 +643,60 @@ const EG_MAP_MOD_TABLES = {
                 { tier: 3, min: 5, max: 11, weight: 780, ilvl: 1 },
             ],
         },
+        map_blood_magic: {
+            id: 'map_blood_magic', affects: 'player',
+            label: 'Blood Magic — Class Abilities cost Life instead of Mana', labelDe: 'Blutmagie – Klassenfähigkeiten kosten Leben statt Mana',
+            tiers: [
+                { tier: 1, min: 1, max: 1, weight: 90, ilvl: 30 },
+            ],
+        },
+        map_quiz_damage: {
+            id: 'map_quiz_damage', affects: 'player',
+            label: 'Incorrect Answers deal #% of maximum Life as Damage', labelDe: 'Falsche Antworten verursachen #% des maximalen Lebens als Schaden',
+            tiers: [
+                { tier: 1, min: 10, max: 15, weight: 100, ilvl: 44 },
+                { tier: 2, min: 5, max: 9, weight: 330, ilvl: 18 },
+                { tier: 3, min: 2, max: 4, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_reduced_block: {
+            id: 'map_reduced_block', affects: 'player',
+            label: '#% reduced Block Chance', labelDe: '#% reduzierte Blockchance',
+            tiers: [
+                { tier: 1, min: 40, max: 50, weight: 95, ilvl: 46 },
+                { tier: 2, min: 20, max: 39, weight: 320, ilvl: 20 },
+                { tier: 3, min: 8, max: 19, weight: 780, ilvl: 1 },
+            ],
+        },
+
+        // ── Run economy ───────────────────────────────────────────────
+        map_time_leech: {
+            id: 'map_time_leech', affects: 'player',
+            label: 'Monster Hits drain # seconds of Map Time', labelDe: 'Monsterangriffe entziehen # Sekunden Kartenzeit',
+            tiers: [
+                { tier: 1, min: 3, max: 5, weight: 90, ilvl: 48 },
+                { tier: 2, min: 2, max: 2, weight: 320, ilvl: 22 },
+                { tier: 3, min: 1, max: 1, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_fewer_pickups: {
+            id: 'map_fewer_pickups', affects: 'player',
+            label: '#% fewer Pickups appear on the Grid', labelDe: '#% weniger Aufsammelbares erscheint auf dem Gitter',
+            tiers: [
+                { tier: 1, min: 35, max: 50, weight: 95, ilvl: 36 },
+                { tier: 2, min: 20, max: 34, weight: 320, ilvl: 10 },
+                { tier: 3, min: 8, max: 19, weight: 800, ilvl: 1 },
+            ],
+        },
+        map_blood_pact: {
+            id: 'map_blood_pact', affects: 'player',
+            label: 'Blood Pact — each solved Puzzle drains #% of maximum Life', labelDe: 'Blutpakt – jedes gelöste Rätsel entzieht #% des maximalen Lebens',
+            tiers: [
+                { tier: 1, min: 6, max: 10, weight: 90, ilvl: 50 },
+                { tier: 2, min: 3, max: 5, weight: 320, ilvl: 24 },
+                { tier: 3, min: 1, max: 2, weight: 790, ilvl: 1 },
+            ],
+        },
 
         // ── Puzzle behaviour ─────────────────────────────────────────
         map_extra_questions: {
@@ -341,6 +737,42 @@ const EG_MAP_MOD_TABLES = {
                 { tier: 3, min: 25, max: 45, weight: 780, ilvl: 1 },
             ],
         },
+        map_hazard_volatile: {
+            id: 'map_hazard_volatile', affects: 'player',
+            label: 'Volatile Wisps hunt you down (#% intensity)', labelDe: 'Flüchtige Irrlichter jagen dich (#% Intensität)',
+            tiers: [
+                { tier: 1, min: 80, max: 100, weight: 85, ilvl: 64 },
+                { tier: 2, min: 50, max: 75, weight: 280, ilvl: 34 },
+                { tier: 3, min: 25, max: 45, weight: 760, ilvl: 1 },
+            ],
+        },
+        map_hazard_frostnova: {
+            id: 'map_hazard_frostnova', affects: 'player',
+            label: 'Frost Novas erupt around you (#% intensity)', labelDe: 'Frostnovas brechen um dich herum hervor (#% Intensität)',
+            tiers: [
+                { tier: 1, min: 80, max: 100, weight: 85, ilvl: 58 },
+                { tier: 2, min: 50, max: 75, weight: 290, ilvl: 30 },
+                { tier: 3, min: 25, max: 45, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_hazard_cyclone: {
+            id: 'map_hazard_cyclone', affects: 'player',
+            label: 'Cyclones race across the Map (#% intensity)', labelDe: 'Zyklone rasen über die Karte (#% Intensität)',
+            tiers: [
+                { tier: 1, min: 80, max: 100, weight: 85, ilvl: 58 },
+                { tier: 2, min: 50, max: 75, weight: 290, ilvl: 28 },
+                { tier: 3, min: 25, max: 45, weight: 780, ilvl: 1 },
+            ],
+        },
+        map_hazard_delirium: {
+            id: 'map_hazard_delirium', affects: 'player',
+            label: 'Delirium Mist spreads periodically (#% intensity)', labelDe: 'Delirium-Nebel breitet sich periodisch aus (#% Intensität)',
+            tiers: [
+                { tier: 1, min: 80, max: 100, weight: 80, ilvl: 64 },
+                { tier: 2, min: 50, max: 75, weight: 280, ilvl: 34 },
+                { tier: 3, min: 25, max: 45, weight: 760, ilvl: 1 },
+            ],
+        },
     },
 };
 
@@ -368,7 +800,25 @@ const EG_MAP_MOD_REWARDS = {
     map_monster_speed:       { xp: [13, 9, 5, 3],  quantity: [10, 7, 4, 2], rarity: [7, 5, 3, 1] },
     map_extra_monsters:      { xp: [20, 14, 9],    quantity: [16, 11, 7],   rarity: [11, 7, 4] },
     map_monster_resistances: { xp: [14, 10, 6, 3], quantity: [11, 8, 4, 2], rarity: [8, 5, 3, 1] },
-    map_boss_chance:         { xp: [20, 14, 8],    quantity: [16, 11, 6],   rarity: [15, 10, 5] },
+    map_monster_crit:         { xp: [20, 14, 9],   quantity: [16, 11, 7],   rarity: [13, 9, 5] },
+    map_monster_avoid_ailments: { xp: [15, 10, 6], quantity: [12, 8, 4],    rarity: [9, 5, 2] },
+    map_monster_regen:        { xp: [18, 12, 7],   quantity: [14, 9, 5],    rarity: [11, 7, 3] },
+    map_monster_explosions:   { xp: [22, 15, 10],  quantity: [17, 12, 7],   rarity: [14, 9, 4] },
+    map_monster_ailments:     { xp: [17, 11, 7],   quantity: [13, 9, 5],    rarity: [10, 6, 3] },
+    map_monster_puzzle_aggro: { xp: [16, 11, 6],   quantity: [12, 8, 4],    rarity: [9, 5, 2] },
+    map_reflect_melee:        { xp: [23, 16, 10],  quantity: [18, 12, 8],   rarity: [15, 10, 5] },
+    map_boss_chance:          { xp: [20, 14, 8],   quantity: [16, 11, 6],   rarity: [15, 10, 5] },
+    map_boss_enrage:          { xp: [19, 13, 8],   quantity: [15, 10, 6],   rarity: [12, 8, 4] },
+    map_armour_pierce:        { xp: [17, 12, 7],   quantity: [13, 9, 5],    rarity: [10, 6, 3] },
+    map_monster_ambush:       { xp: [18, 12, 8],   quantity: [14, 9, 5],    rarity: [11, 7, 3] },
+    map_monster_ethereal:     { xp: [16, 11, 7],   quantity: [12, 8, 5],    rarity: [9, 6, 3] },
+    map_boss_life:            { xp: [19, 13, 8],   quantity: [15, 10, 6],   rarity: [12, 8, 4] },
+    map_monster_snowball:     { xp: [20, 14, 9],   quantity: [16, 11, 7],   rarity: [13, 8, 4] },
+    map_monster_second_wind:  { xp: [21, 14, 9],   quantity: [16, 11, 7],   rarity: [13, 8, 4] },
+    map_monster_desperation:  { xp: [15, 10, 6],   quantity: [11, 7, 4],    rarity: [8, 5, 2] },
+    map_hazard_firewall:      { xp: [24, 17, 11],  quantity: [19, 13, 8],   rarity: [16, 11, 6] },
+    map_hazard_cyclone:       { xp: [23, 16, 10],  quantity: [18, 12, 8],   rarity: [15, 10, 5] },
+    map_hazard_delirium:      { xp: [26, 18, 12],  quantity: [21, 14, 9],   rarity: [18, 12, 7] },
 
     // ── Player-weakening ─────────────────────────────────────────
     map_player_life:         { xp: [16, 11, 6, 3], quantity: [12, 9, 5, 2], rarity: [9, 6, 3, 1] },
@@ -383,6 +833,29 @@ const EG_MAP_MOD_REWARDS = {
     map_spell_damage:        { xp: [13, 9, 5],     quantity: [10, 7, 4],    rarity: [7, 4, 2] },
     map_less_time_gained:    { xp: [13, 9, 5],     quantity: [10, 7, 4],    rarity: [7, 4, 2] },
     map_mana_penalty:        { xp: [13, 8, 4],     quantity: [10, 6, 3],    rarity: [7, 4, 2] },
+    map_blood_magic:         { xp: [16],           quantity: [13],          rarity: [9] },
+    map_elem_weakness:       { xp: [20, 14, 9],    quantity: [16, 11, 7],   rarity: [13, 9, 5] },
+    map_temporal_chains:     { xp: [22, 15, 10],   quantity: [18, 12, 7],   rarity: [15, 10, 5] },
+    map_vulnerability:       { xp: [21, 15, 9],    quantity: [17, 12, 7],   rarity: [14, 9, 5] },
+    map_no_regeneration:     { xp: [18],           quantity: [14],          rarity: [11] },
+    map_reduced_recovery:    { xp: [15, 10, 6],    quantity: [12, 8, 5],    rarity: [9, 6, 3] },
+    map_mistake_damage:      { xp: [19, 13, 8],    quantity: [15, 10, 6],   rarity: [12, 8, 4] },
+    map_reduced_evasion:     { xp: [14, 9, 5],     quantity: [11, 7, 4],    rarity: [8, 5, 2] },
+    map_reduced_absorption:  { xp: [14, 9, 5],     quantity: [11, 7, 4],    rarity: [8, 5, 2] },
+    map_quiz_damage:         { xp: [16, 11, 6],    quantity: [12, 8, 4],    rarity: [10, 6, 3] },
+    map_reduced_block:       { xp: [14, 9, 5],     quantity: [11, 7, 4],    rarity: [8, 5, 2] },
+    map_reduced_accuracy:    { xp: [13, 9, 5],     quantity: [10, 6, 3],    rarity: [7, 4, 2] },
+    map_reduced_attack_speed: { xp: [18, 12, 7],   quantity: [14, 9, 5],    rarity: [11, 7, 3] },
+    map_chilling_aura:       { xp: [19],           quantity: [15],          rarity: [12] },
+    map_longer_lockout:      { xp: [14, 9, 5],     quantity: [11, 7, 4],    rarity: [8, 5, 2] },
+    map_slower_absorption:   { xp: [15, 10, 6],    quantity: [12, 8, 4],    rarity: [9, 5, 2] },
+    map_longer_ailments:     { xp: [17, 11, 7],    quantity: [13, 9, 5],    rarity: [10, 6, 3] },
+    map_increased_dot:       { xp: [16, 11, 6],    quantity: [12, 8, 4],    rarity: [9, 5, 2] },
+    map_freezing_hits:       { xp: [18, 12, 8],    quantity: [14, 9, 5],    rarity: [11, 7, 3] },
+    map_mana_costs:          { xp: [15, 10, 6],    quantity: [12, 8, 4],    rarity: [9, 5, 2] },
+    map_time_leech:          { xp: [22, 15, 10],   quantity: [17, 12, 7],   rarity: [13, 9, 4] },
+    map_fewer_pickups:       { xp: [14, 9, 5],     quantity: [11, 7, 4],    rarity: [8, 4, 2] },
+    map_blood_pact:          { xp: [24, 16, 10],   quantity: [19, 12, 8],   rarity: [16, 10, 6] },
 
     // ── Puzzle behaviour ─────────────────────────────────────────
     map_puzzle_cells:        { xp: [12, 8, 4],     quantity: [9, 6, 3],     rarity: [7, 4, 2] },
@@ -396,6 +869,9 @@ const EG_MAP_MOD_REWARDS = {
     map_hazard_blizzard:     { xp: [22, 15, 10],   quantity: [17, 12, 7],   rarity: [14, 10, 5] },
     map_hazard_darkness:     { xp: [18, 12, 7],    quantity: [14, 9, 5],    rarity: [11, 7, 4] },
     map_hazard_arcane:       { xp: [26, 18, 12],   quantity: [21, 14, 9],   rarity: [18, 12, 7] },
+    map_hazard_meteor:       { xp: [24, 17, 11],   quantity: [19, 13, 8],   rarity: [16, 11, 6] },
+    map_hazard_volatile:     { xp: [25, 17, 12],   quantity: [20, 14, 8],   rarity: [16, 11, 6] },
+    map_hazard_frostnova:    { xp: [23, 16, 10],   quantity: [18, 12, 7],   rarity: [14, 10, 5] },
 };
 
 // Resolves the reward triple of one mod at a given tier.
@@ -594,19 +1070,49 @@ function _egWithImplicits(map) {
 // rollers as equipment so maps behave identically (max 3 pre + 3 suf = 6 mods).
 // `tierOverride` (optional) forces the map tier — used by the atlas-aware
 // drop logic so maps found during a run match the active node's graph.
-// Every generated map is stamped with an `atlasNodeId` (see endgame-atlas.js)
-// so completing it can mark that region on the Atlas of Worlds.
-function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null) {
+// `opts.forceNormal` skips the rarity/mod rolls entirely and produces a
+// plain Normal (white) map with no modifiers — used for the vendor's free
+// starter map so a fresh character always gets an unmodified baseline run.
+function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) {
     monsterLevel = Math.max(1, Math.round(monsterLevel || 1));
 
     // Atlas override: keep item level / mod rolls consistent with the
-    // forced tier (tier N ≈ monster level N*4, inverse of _egRollMapTier).
+    // forced tier (tier N ≈ curve level, inverse of _egRollMapTier).
     let mapTier;
     if (tierOverride != null) {
         mapTier = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tierOverride)));
-        monsterLevel = mapTier * 4;
+        monsterLevel = _egMapTierMonsterLevel(mapTier);
     } else {
         mapTier = _egRollMapTier(monsterLevel);
+    }
+
+    if (opts && opts.forceNormal) {
+        let normalName = null;
+        let atlasNodeId = null;
+        if (typeof egAtlasPickNodeIdForTier === 'function') {
+            atlasNodeId = egAtlasPickNodeIdForTier(mapTier);
+            const node = atlasNodeId ? egAtlasNodeById(atlasNodeId) : null;
+            if (node) normalName = egAtlasNodeName(node);
+        }
+        if (!normalName) normalName = _egPickMapBaseName(mapTier);
+        const name = _egBuildItemName(normalName, 'common', []);
+        return _egWithImplicits({
+            id: `map_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
+            baseId: 'atlas_map',
+            name,
+            baseName: normalName,
+            icon: '🗺️',
+
+            category: 'map',
+            type: 'map',
+            rarity: 'common',
+
+            mapTier,
+            atlasNodeId,
+            itemLevel: monsterLevel,
+            monsterLevel,
+            mods: [],
+        });
     }
 
     const rarity = _egRollRarity();
@@ -862,7 +1368,16 @@ const EG_MAP_CURRENCY_RULES = {
             }
             if (!baseName) baseName = _egPickMapBaseName(newTier);
             const name = _egBuildItemName(baseName, map.rarity, map.mods || []);
-            return _egWithImplicits({ ...map, mapTier: newTier, atlasNodeId, baseName, name });
+            // Re-derive item/monster level so drops and mod rolls inside the
+            // upgraded map match the new tier's curve value.
+            const newLevel = _egMapTierMonsterLevel(newTier);
+            return _egWithImplicits({
+                ...map,
+                mapTier: newTier,
+                monsterLevel: newLevel,
+                itemLevel: newLevel,
+                atlasNodeId, baseName, name,
+            });
         },
     },
     mirror_of_kalandra: {
@@ -1055,11 +1570,16 @@ function _egBuildMapTooltipBodyHTML(item) {
     const rc = RARITY_COLOR_MAP[rarity] || RARITY_COLOR_MAP.common;
 
     const groups = { monster: [], player: [], puzzle: [] };
+    const groupMods = { monster: [], player: [], puzzle: [] };
     (item.mods || []).forEach(mod => {
         const affects = _egMapModAffects(mod.familyId);
-        (mod.rolledStats || []).forEach(stat => {
-            if (stat.label) groups[affects].push(stat.label);
-        });
+        if (!groupMods[affects]) groupMods[affects] = [];
+        groupMods[affects].push(mod);
+    });
+    Object.keys(groupMods).forEach(affects => {
+        // Mods sharing the same stat are merged into one combined line.
+        groups[affects] = _egBuildMergedModLines(groupMods[affects])
+            .map(entry => entry.label);
     });
 
     const sectionHTML = (titleKey, lines, color) => {

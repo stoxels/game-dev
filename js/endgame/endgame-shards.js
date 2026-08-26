@@ -219,6 +219,22 @@ function _egSellStashItem(row, col) {
     const item = _egInventory[row][col];
     if (!item) return false;
 
+    // Free starter gear has no sell value: it is destroyed without
+    // granting a shard (blocks the free-buy → sell-for-shard exploit).
+    if (item.noSellValue) {
+        _egInventory[row][col] = null;
+        _egRenderInventoryCell(row, col);
+        _egUpdateInvCount();
+        _egClearTooltip();
+        egSaveHubState();
+
+        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+            Audio_Manager.playSFX('player_equip_pickup');
+        }
+        showToast(t('eg_sell_item_no_value').replace('{name}', item.name || '???'));
+        return true;
+    }
+
     const shardDef = _egRollShardForItem(item);
     if (!egAddShard(shardDef.id, 1)) {
         // Could not grant the shard (runes & orbs strip full) — keep the item.
