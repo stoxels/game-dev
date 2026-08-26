@@ -65,6 +65,17 @@ Layout Architecture:
     letter-spacing: 2px;
 }
 
+/* ── TOP BAR RIGHT BUTTON GROUP ── */
+.eg-topbar-right {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+    .eg-topbar-right .eg-level-btn {
+        margin-left: 0;
+    }
+
 /* ── TOP BAR LEVEL BUTTON — opens the character/attribute window ── */
 .eg-level-btn {
     margin-left: auto;
