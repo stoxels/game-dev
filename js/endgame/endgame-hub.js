@@ -327,17 +327,19 @@ function _egBuildHubInfoTooltipHTML() {
 
 function _egShowHubInfoTooltip(e) {
     showGameTooltip(_egBuildHubInfoTooltipHTML(), e);
-    // The controls list needs more width than the shared default —
+    // The controls list needs much more width than the shared default —
     // without this the tooltip becomes very narrow and very tall.
+    // eg-controls-tip is exclusive to this tooltip; the engine's inline
+    // max-width only yields to it via the !important rule in CSS.
     const tip = document.getElementById('ghud-floating-tip');
-    if (tip) tip.classList.add('eg-wide-tip');
+    if (tip) tip.classList.add('eg-wide-tip', 'eg-controls-tip');
 }
 
-// Hides the hub info tooltip AND drops the widened-tip class again so
+// Hides the hub info tooltip AND drops the widened-tip classes again so
 // other tooltips on the shared engine keep their default width.
 function _egHideHubInfoTooltip() {
     const tip = document.getElementById('ghud-floating-tip');
-    if (tip) tip.classList.remove('eg-wide-tip');
+    if (tip) tip.classList.remove('eg-wide-tip', 'eg-controls-tip');
     hideGameTooltip();
 }
 
@@ -779,7 +781,7 @@ function _egShowTooltip(item, e) {
     _egTooltipItem = item;
     const tip = document.getElementById('ghud-floating-tip');
     if (!item) {
-        if (tip) tip.classList.remove('eg-wide-tip');
+        if (tip) tip.classList.remove('eg-wide-tip', 'eg-controls-tip');
         hideGameTooltip();
         _egHideCompareTooltip();
         return;
@@ -789,7 +791,11 @@ function _egShowTooltip(item, e) {
         clientY: _egLastMouse.y,
     });
     // Equipment stat blocks need more room than the shared default width.
-    if (tip) tip.classList.add('eg-wide-tip');
+    // Drop the hub-info exclusive class in case it ever lingered.
+    if (tip) {
+        tip.classList.remove('eg-controls-tip');
+        tip.classList.add('eg-wide-tip');
+    }
     _egUpdateCompareTooltip();
 }
 

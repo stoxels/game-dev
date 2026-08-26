@@ -22,6 +22,34 @@
     max-width: 380px;
 }
 
+/* Dedicated extra-wide mode for the hub "?" controls tooltip ONLY.
+   The shared engine sets max-width as an INLINE style, so this rule
+   needs !important to win — other tooltips are unaffected because
+   the class is only applied while the info tooltip is open. */
+#ghud-floating-tip.eg-controls-tip {
+    max-width: 640px !important;
+}
+
+    /* Lift the PoE frame's own 360px cap inside the controls tooltip */
+    #ghud-floating-tip.eg-controls-tip .eg-tt-frame {
+        max-width: none;
+    }
+
+/* Map item tooltips — widened purely via content detection (:has), so
+   EVERY call site that renders a map tooltip gets the extra width
+   automatically, with no class add/remove juggling and no leak into
+   other tooltips (the width only applies while a map frame is present).
+   The !important is needed because the shared engine sets max-width as
+   an INLINE style, which beats any normal CSS rule. */
+#ghud-floating-tip:has(.eg-map-frame) {
+    max-width: 620px !important;
+}
+
+    /* Lift the PoE frame's own 360px cap inside map tooltips */
+    #ghud-floating-tip .eg-map-frame {
+        max-width: none;
+    }
+
 /* Header block */
 .eg-tt-header {
     display: flex;

@@ -848,7 +848,7 @@ function _egBuildMapTooltipBodyHTML(item) {
     </div>`;
 
     return `
-<div class="eg-tt-frame" style="--tt-border:${rc.border};">
+<div class="eg-tt-frame eg-map-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
         <div class="eg-tt-icon">${item.icon || '🗺️'}</div>
         <div class="eg-tt-name" style="color:${rc.color};">${item.name || '???'}</div>

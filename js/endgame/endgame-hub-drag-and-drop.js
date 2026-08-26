@@ -865,14 +865,15 @@ function _dndInjectStyles() {
             transition: filter 0.1s, transform 0.1s;
             line-height: 1;
         }
-        .eg-item-chip:hover  { filter: brightness(1.25) drop-shadow(0 0 4px rgba(200,200,255,0.6)); transform: scale(1.15); }
-        .eg-item-chip:active { cursor: grabbing; transform: scale(0.95); }
+        .eg-item-chip:hover  { filter: brightness(1.25) drop-shadow(0 0 4px rgba(200,200,255,0.6)); }
+        .eg-item-chip:hover .eg-item-chip-icon { transform: scale(1.15); }
+        .eg-item-chip:active { cursor: grabbing; }
 
         /* Name label hidden — tooltip panel carries that information */
         .eg-item-chip-name { display: none; }
 
         /* Emoji sized large enough to fill the cell */
-        .eg-item-chip-icon { font-size: 1.45rem; line-height: 1; user-select: none; }
+        .eg-item-chip-icon { font-size: 1.45rem; line-height: 1; user-select: none; transition: transform 0.1s; }
 
         /* Rarity tints via drop-shadow on the emoji itself */
         .eg-item-chip.eg-rarity-uncommon  .eg-item-chip-icon { filter: drop-shadow(0 0 3px #4caf50); }
