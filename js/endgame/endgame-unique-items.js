@@ -1472,7 +1472,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
         ],
         downsides: [
-            { key: 'time_added', value: -20, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -120, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
         ],
         flavorEn: 'Small stones begin small avalanches. Eventually.',
         flavorDe: 'Kleine Steine starten kleine Lawinen. Irgendwann.',

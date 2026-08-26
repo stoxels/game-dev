@@ -1375,6 +1375,7 @@ Object.assign(T.en, {
     eg_map_reward_rarity: '+{n}% Rarity of Items found',
     eg_map_reward_title: 'Rewards',
     eg_map_reward_xp: '+{n}% Experience gained',
+    eg_map_reward_map_drops: '+{n}% increased Map Drops',
     eg_map_stash_full: '⚠️ Map stash full!',
     eg_map_tier_tt: 'Map Tier {n}',
     eg_map_unmodified: 'Unmodified',
@@ -3111,6 +3112,7 @@ Object.assign(T.de, {
     eg_map_reward_rarity: '+{n}% Seltenheit der gefundenen Gegenstände',
     eg_map_reward_title: 'Belohnungen',
     eg_map_reward_xp: '+{n}% erhaltene Erfahrung',
+    eg_map_reward_map_drops: '+{n}% erhöhte Kartendrops',
     eg_map_stash_full: '⚠️ Kartenlager voll!',
     eg_map_tier_tt: 'Karten-Stufe {n}',
     eg_map_unmodified: 'Unverändert',
@@ -4201,6 +4203,8 @@ Object.assign(T.en, {
     eg_atlas_completed_toast: '🏆 Atlas: "{n}" completed!',
     eg_atlas_unlocked_toast: '🗺️ Atlas: "{n}" is now available!',
     eg_atlas_first_clear: 'FIRST CLEAR — Atlas Region: {n} ({t})',
+    eg_map_atlas_completed: '✔ Completed on Atlas',
+    eg_map_atlas_not_completed: '○ Not yet completed on Atlas',
 });
 
 Object.assign(T.de, {
@@ -4217,4 +4221,6 @@ Object.assign(T.de, {
     eg_atlas_completed_toast: '🏆 Atlas: „{n}“ abgeschlossen!',
     eg_atlas_unlocked_toast: '🗺️ Atlas: „{n}“ ist jetzt verfügbar!',
     eg_atlas_first_clear: 'ERSTABSCHLUSS — Atlas-Region: {n} ({t})',
+    eg_map_atlas_completed: '✔ Im Atlas abgeschlossen',
+    eg_map_atlas_not_completed: '○ Noch nicht im Atlas abgeschlossen',
 });

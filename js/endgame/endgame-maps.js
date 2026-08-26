@@ -25,8 +25,8 @@
 //-------------------CONFIGURATION----------------------------------------
 //------------------------------------------------------------------------
 
-const EG_MAP_DROP_CHANCE_NORMAL = 0.05;  // 5% per normal monster kill
-const EG_MAP_DROP_CHANCE_BOSS = 0.40;    // bosses drop maps often
+const EG_MAP_DROP_CHANCE_NORMAL = 0.05;  // 5% per normal monster kill (scaled by Quantity bonus while on a map)
+const EG_MAP_DROP_CHANCE_BOSS = 0.40;    // 40% per boss kill (also scaled by Quantity; boss always drops at least one map)
 
 // Highest possible map tier (cap for tier upgrades via the Orb of Horizons).
 const EG_MAX_MAP_TIER = 16;
@@ -1429,9 +1429,37 @@ function _egAddMapToMapStash(item) {
 }
 
 // Called by the kill handlers in endgame-encounter.js.
+// PoE-style sustain: while running a map the drop chance is multiplied by the
+// active map's Quantity bonus (EG_MAP_MOD_REWARDS.quantity). Harder maps
+// (more / higher-tier mods) therefore sustain maps much better.
 function _egTryDropMap(isBoss, monsterLevel) {
-    const chance = isBoss ? EG_MAP_DROP_CHANCE_BOSS : EG_MAP_DROP_CHANCE_NORMAL;
-    if (!isBoss && Math.random() > chance) return;
+    // Resolve Quantity multiplier from the active device map, if any.
+    let qtyMult = 1;
+    if (typeof _egMapLootQuantityMult === 'function') {
+        qtyMult = _egMapLootQuantityMult();
+    } else if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem
+        && typeof _egGetMapRewardBonuses === 'function') {
+        const rw = _egGetMapRewardBonuses(_egActiveMapItem);
+        qtyMult = 1 + (rw.quantity || 0) / 100;
+    }
+
+    if (isBoss) {
+        // Bosses always drop at least one map. When running a difficult map
+        // (high Quantity) they have a bonus chance for a second map.
+        const map = _egGenerateMapDrop(monsterLevel, _egResolveAtlasDropTier(monsterLevel));
+        if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);
+        if (qtyMult > 1) {
+            const extraChance = Math.min(0.35, (qtyMult - 1) * 0.30);
+            if (Math.random() < extraChance) {
+                const extra = _egGenerateMapDrop(monsterLevel, _egResolveAtlasDropTier(monsterLevel));
+                if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(extra);
+            }
+        }
+        return;
+    }
+
+    const baseChance = Math.min(1, EG_MAP_DROP_CHANCE_NORMAL * qtyMult);
+    if (Math.random() > baseChance) return;
 
     const map = _egGenerateMapDrop(monsterLevel, _egResolveAtlasDropTier(monsterLevel));
     if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);
@@ -1639,12 +1667,41 @@ function _egBuildMapTooltipBodyHTML(item) {
     }
     if (rw.xp > 0) rewardLines.push(t('eg_map_reward_xp').replace('{n}', rw.xp));
     if (rw.quantity > 0) rewardLines.push(t('eg_map_reward_quantity').replace('{n}', rw.quantity));
+    if (rw.quantity > 0) {
+        const mapDropLabel = (typeof t === 'function' && t('eg_map_reward_map_drops') !== 'eg_map_reward_map_drops')
+            ? t('eg_map_reward_map_drops').replace('{n}', rw.quantity)
+            : `+${rw.quantity}% increased Map Drops`;
+        rewardLines.push(mapDropLabel);
+    }
     if (rw.rarity > 0) rewardLines.push(t('eg_map_reward_rarity').replace('{n}', rw.rarity));
     const rewardsHTML = rewardLines.length === 0 ? '' : `
     <div class="eg-tt-section">
         <div class="eg-tt-group-title" style="color:#f5d98a;">${t('eg_map_reward_title')}</div>
         ${rewardLines.map(l => `<div class="eg-tt-mod" style="color:#f5d98a;">${l}</div>`).join('')}
     </div>`;
+
+    // ── Atlas completion status ────────────────────────────────────────
+    let atlasStatusHTML = '';
+    try {
+        let atlasNode = null;
+        if (item.atlasNodeId && typeof egAtlasNodeById === 'function') {
+            atlasNode = egAtlasNodeById(item.atlasNodeId);
+        }
+        if (!atlasNode && typeof _egAtlasResolveNodeForMap === 'function') {
+            atlasNode = _egAtlasResolveNodeForMap(item);
+        }
+        if (atlasNode && typeof egAtlasIsCompleted === 'function') {
+            const completed = egAtlasIsCompleted(atlasNode.id);
+            const color = completed ? '#f5d98a' : '#aaa';
+            const label = completed ? t('eg_map_atlas_completed') : t('eg_map_atlas_not_completed');
+            const regionName = (typeof egAtlasNodeName === 'function') ? egAtlasNodeName(atlasNode) : atlasNode.name;
+            atlasStatusHTML = `
+    <div class="eg-tt-section" style="border-left:2px solid ${color}; padding-left:8px;">
+        <div class="eg-tt-mod" style="color:${color}; font-weight:700;">${label}</div>
+        <div class="eg-tt-desc" style="color:#ccc; font-size:0.85em;">${regionName} · ${t('eg_map_tier_tt').replace('{n}', atlasNode.tier)}</div>
+    </div>`;
+        }
+    } catch (e) { /* ignore tooltip atlas errors */ }
 
     return `
 <div class="eg-tt-frame eg-map-frame" style="--tt-border:${rc.border};">
@@ -1655,6 +1712,7 @@ function _egBuildMapTooltipBodyHTML(item) {
             ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
         <div class="eg-tt-rarity-line" style="color:${rc.border};">${t('eg_maps_label')} · ${t('eg_map_tier_tt').replace('{n}', item.mapTier ?? 1)}</div>
     </div>
+    ${atlasStatusHTML}
     <div class="eg-tt-section">
         <div class="eg-tt-group-title" style="color:#f5d98a;">${t('eg_map_implicits_title')}</div>
         ${implicitLines.map(l => `<div class="eg-tt-implicit">${l}</div>`).join('')}

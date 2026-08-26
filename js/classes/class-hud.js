@@ -502,6 +502,26 @@ function renderCompactHUD(def) {
             <span id="chud-mana-text"></span>
         </div>`;
 
+    // Button layout: single row (1×2) for base class, 2×2 grid once an
+    // ascendency is active so 1/2 and 3/4 sit in two rows.
+    let buttonsHTML = '';
+    if (STATE.playerAscendency && ASCENDENCY_DEFS[STATE.playerAscendency]) {
+        const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
+        buttonsHTML = `
+            <div class="chud-btn-grid chud-btn-grid--asc">
+                ${renderCompactActiveBtn(def, 'active1')}
+                ${renderCompactActiveBtn(def, 'active2')}
+                ${renderCompactAscBtn(asc, 'active3', 'active1')}
+                ${renderCompactAscBtn(asc, 'active4', 'active2')}
+            </div>`;
+    } else {
+        buttonsHTML = `
+            <div class="chud-btn-grid">
+                ${renderCompactActiveBtn(def, 'active1')}
+                ${renderCompactActiveBtn(def, 'active2')}
+            </div>`;
+    }
+
     return `
         ${manaBar}
         <div id="class-hud-drag-handle" ${shieldAttr}>
@@ -513,9 +533,7 @@ function renderCompactHUD(def) {
                   onmouseleave="hideHUDTooltip()">
                 ${def.icon}
             </span>
-            ${renderCompactActiveBtn(def, 'active1')}
-            ${renderCompactActiveBtn(def, 'active2')}
-            ${STATE.playerAscendency ? renderAscendencyButtons() : ''}
+            ${buttonsHTML}
             ${shieldPips}
         </div>
         ${momentumBar}`;
@@ -750,6 +768,19 @@ function injectCompactHUDStyles(def) {
         .chud-skill-btn-wrap {
             position: relative;
             display: inline-flex;
+        }
+
+        .chud-btn-grid {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chud-btn-grid--asc {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto auto;
+            gap: 4px;
         }
 
     .chud-hint-arrow {

@@ -198,6 +198,12 @@ function _buildMapRunTooltipHTML() {
     if (rw) {
         if (rw.xp > 0) html += `<br><span style="color:#f5d98a">${t('eg_map_reward_xp').replace('{n}', rw.xp)}</span>`;
         if (rw.quantity > 0) html += `<br><span style="color:#f5d98a">${t('eg_map_reward_quantity').replace('{n}', rw.quantity)}</span>`;
+        if (rw.quantity > 0) {
+            const mdLabel = (t('eg_map_reward_map_drops') !== 'eg_map_reward_map_drops')
+                ? t('eg_map_reward_map_drops').replace('{n}', rw.quantity)
+                : `+${rw.quantity}% increased Map Drops`;
+            html += `<br><span style="color:#f5d98a">${mdLabel}</span>`;
+        }
         if (rw.rarity > 0) html += `<br><span style="color:#f5d98a">${t('eg_map_reward_rarity').replace('{n}', rw.rarity)}</span>`;
     }
     return html;
