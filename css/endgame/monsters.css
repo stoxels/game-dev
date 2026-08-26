@@ -235,6 +235,21 @@
     }
 }
 
+/* Charged overkill ricochet: smaller projectile that carries surplus damage
+   from an overkilling drag-paint shot to the next monster. Slightly more
+   transparent and with a tighter glow so it reads as a secondary shard. */
+.eg-proj-ricochet {
+    opacity: 0.88;
+    filter: brightness(1.25) drop-shadow(0 0 4px rgba(255, 220, 100, 0.9));
+}
+
+.eg-proj-ricochet.eg-built {
+    /* built visuals are 44x28 fixed; extra shrink via the flight scale
+       (EG_CHARGED_RICOCHET_SCALE) already makes it smaller — this just
+       softens the glow for the secondary shot */
+    filter: brightness(1.15) drop-shadow(0 0 4px rgba(255, 220, 100, 0.8));
+}
+
 @keyframes eg-attack-pulse {
     0% {
         transform: scale(1);

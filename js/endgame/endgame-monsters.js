@@ -522,7 +522,9 @@ function _egBuildMonster(defOrId, level = 1) {
 
     // FIX: If it's not a standard monster, check if it's a boss and route to the boss factory
     if (!def && typeof defOrId === 'string' && typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS[defOrId]) {
-        return _egBuildBoss(defOrId, level);
+        const boss = _egBuildBoss(defOrId, level);
+        if (boss) boss.isBoss = true;
+        return boss;
     }
 
     if (!def) { console.warn('Unknown monster id:', defOrId); return null; }

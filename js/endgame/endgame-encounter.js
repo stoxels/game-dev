@@ -1008,7 +1008,8 @@ function _egApplyGroundedReduction(rawDamage) {
 // instantly so no hits are silently lost.
 // `elements` optionally carries the per-element damage share of `amount` so
 // monster resistances can be applied at impact.
-function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride, startScale, elements) {
+// `opts.isCharged` marks a drag-paint charged shot so overkill can ricochet.
+function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride, startScale, elements, opts) {
     // Explicit source element first (reveal-triggered shots), then the cell
     // element, falling back to the HUD if missing
     let sourceEl = sourceElOverride
@@ -1024,7 +1025,7 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
 
     if (!sourceEl || !targetCard) {
         // No visual target — apply damage instantly without animation
-        if (damage != null) _egResolveProjectileImpact(damage, targetId, elements);
+        if (damage != null) _egResolveProjectileImpact(damage, targetId, elements, opts);
         return;
     }
 
@@ -1036,7 +1037,7 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
     // flight vector inside _egFireProjectile (they're drawn tip-forward),
     // so every shot always points at the targeted creature.
     _egFireProjectile(projDef, projDef.cssClass, start, end, projDef.duration, projDef.easing, () => {
-        _egResolveProjectileImpact(damage, targetId, elements);
+        _egResolveProjectileImpact(damage, targetId, elements, opts);
     }, null, startScale);
 }
 
@@ -1050,7 +1051,7 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
 //   splash  — chance to hit every other monster in the target's zone
 //   chain   — chance to bounce to one monster in a DIFFERENT spawn location
 //   pierce  — chance to punch through and hit one additional monster anywhere
-function _egResolveProjectileImpact(damage, targetId, elements) {
+function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     const target = _egMonsters.find(m => m.id === targetId);
 
     // Accuracy: projectiles can miss (no snipe/splash/chain/pierce on a miss)
@@ -1069,7 +1070,15 @@ function _egResolveProjectileImpact(damage, targetId, elements) {
         }
     }
 
-    _egDamageTargetById(targetId, finalDamage, elements);
+    const damageOpts = Object.assign({}, opts);
+    // Preserve charged flag and proportional element share for overkill calc
+    if (elements && damage !== finalDamage && damage > 0) {
+        // Scale elements to match the post-bonus finalDamage for resistance
+        // handling inside _egDamageTargetById (it rescales internally, so
+        // we keep the same shape but note the ratio for ricochet later).
+        damageOpts._chargedElementsFactor = finalDamage / damage;
+    }
+    _egDamageTargetById(targetId, finalDamage, elements, damageOpts);
 
     if (!target) return;
 
@@ -1237,7 +1246,7 @@ function _egReleaseChargedShot() {
         return;
     }
 
-    _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements);
+    _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements, { isCharged: true, isChargedStacks: stacks });
     _egTryMultishot(damage, targetIdAtFire, elements, sourceEl);
 }
 
@@ -1559,6 +1568,8 @@ function _egShowStatusLabel(monsterId, text) {
 // `elements` optionally maps each element to the elemental share of `amount`.
 // `opts.isEcho` marks the delayed echo instance so echoes can't chain into
 // further echoes (they still trigger on-hit effects like leech/ailments).
+// `opts.isCharged` marks a drag-paint charged shot (or its ricochet chain)
+// so overkill always ricochets as a smaller projectile.
 function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (!_egIsActive()) return;
 
@@ -1570,6 +1581,8 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
         _egFlashImmune(target.id);
         return;
     }
+
+    const hpBefore = target.currentHP;
 
     // Elemental resistances reduce only the elemental share of the hit;
     // the physical portion passes through untouched.
@@ -1597,8 +1610,15 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (target.isBoss) _egBossCheckPhase(target);
 
     if (target.currentHP <= 0) {
-        // Gear: overkill — chance for excess damage to bleed into another monster
-        _egTryOverkillSpread(target, amount);
+        // Charged overkill ricochet — always fires a smaller projectile
+        // carrying the surplus damage to the next monster (chainable).
+        const isChargedHit = !!(opts && opts.isCharged);
+        if (isChargedHit) {
+            _egTryChargedOverkillRicochet(target, amount, hpBefore, elements, opts);
+        } else {
+            // Gear: overkill — chance for excess damage to bleed into another monster
+            _egTryOverkillSpread(target, amount, hpBefore);
+        }
         _egKillMonster(target.id);
         return;
     }
@@ -1609,18 +1629,63 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
 // Gear: overkill (shoulders suffix) — on a killing blow, rolls against
 // overkillPct and, on success, deals the surplus damage (amount beyond the
 // victim's remaining HP) to a random other living monster.
-function _egTryOverkillSpread(dyingTarget, appliedDamage) {
+function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore) {
     const stats = _egComputePlayerStats();
     const overkillPct = stats.overkillPct || 0;
     if (overkillPct <= 0 || Math.random() * 100 >= overkillPct) return;
 
-    const overkill = Math.round(appliedDamage - dyingTarget.currentHP); // currentHP clamped at 0
+    const overkill = (hpBefore != null)
+        ? Math.round(appliedDamage - hpBefore)
+        : Math.round(appliedDamage - dyingTarget.currentHP); // fallback: currentHP clamped at 0
     if (overkill <= 0) return;
 
-    const others = _egMonsters.filter(m => m.id !== dyingTarget.id);
+    const others = _egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
     if (!others.length) return;
     const victim = others[Math.floor(Math.random() * others.length)];
     _egDamageTargetById(victim.id, overkill);
+}
+
+// Drag-paint charged overkill ricochet — when a charged projectile overkills
+// its target, a smaller projectile flies from the dying monster to the next
+// living monster dealing the exact overkill amount. Chains if that hit also
+// overkills (always triggers, no gear check required).
+const EG_CHARGED_RICOCHET_SCALE = 0.62;   // smaller than the main charged shot
+const EG_CHARGED_RICOCHET_DURATION_MS = 350;
+
+function _egTryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefore, elements, opts) {
+    const overkill = Math.round(appliedDamage - (hpBefore != null ? hpBefore : 0));
+    if (overkill <= 0) return;
+
+    const others = _egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
+    if (!others.length) return;
+    const victim = others[Math.floor(Math.random() * others.length)];
+
+    // Scale element share proportionally so resistances still apply correctly
+    let ricochetElements = null;
+    if (elements && appliedDamage > 0) {
+        const factor = overkill / appliedDamage;
+        ricochetElements = _egScaleElements(elements, factor);
+        // If finalDamage had bonus, elements were for the pre-bonus damage;
+        // factor above already approximates; true scaled share is fine for visuals/resist.
+    }
+
+    const sourceCard = document.getElementById(`eg-card-${dyingTarget.id}`);
+    const targetCard = document.getElementById(`eg-card-${victim.id}`);
+    if (sourceCard && targetCard) {
+        const start = _egGetElementCentre(sourceCard);
+        const end = _egGetElementCentre(targetCard);
+        const projDef = _egGetProjectileDef();
+        // Build a smaller visual copy of the class projectile
+        const cssExtra = 'eg-proj-ricochet';
+        _egFireProjectile(projDef, `${projDef.cssClass} ${cssExtra}`, start, end, EG_CHARGED_RICOCHET_DURATION_MS, 'linear', () => {
+            const olabel = t('eg_overkill');
+            _egShowStatusLabel(victim.id, olabel !== 'eg_overkill' ? olabel : 'Overkill!');
+            _egDamageTargetById(victim.id, overkill, ricochetElements, { isCharged: true, isRicochet: true });
+        }, null, EG_CHARGED_RICOCHET_SCALE);
+    } else {
+        // No visual path available — apply damage instantly so it is not lost
+        _egDamageTargetById(victim.id, overkill, ricochetElements, { isCharged: true, isRicochet: true });
+    }
 }
 
 // Gear: echo (ring suffix) — rolls against echoChancePct and schedules a
@@ -1932,6 +1997,10 @@ function _egBuildMonsterOrBoss(defId, level) {
     if (!monster) {
         monster = _egBuildBoss(defId, level);
         if (monster) monster.isBoss = true;
+    } else if (typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS[defId]) {
+        monster.isBoss = true;
+    } else if (monster.baseId && typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS[monster.baseId]) {
+        monster.isBoss = true;
     }
     return monster;
 }

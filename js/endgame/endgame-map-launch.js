@@ -439,12 +439,17 @@ function _egRollMapRunBaseline(map) {
     };
 
     // Newer maps carry pre-computed implicits — use them verbatim so the
-    // run matches exactly what the tooltip promised.
+    // run matches exactly what the tooltip promised (including boss status).
     if (imp) {
         if (imp.puzzles != null) base.requiredPuzzles = Math.max(1, Math.min(20, imp.puzzles));
         if (imp.questions != null) base.requiredQuestions = Math.max(0, Math.min(20, imp.questions));
         if (imp.mistakes != null) base.egMaxMistakes = Math.max(3, imp.mistakes);
         if (imp.durationSeconds != null) base.egTimeLimit = Math.max(300, imp.durationSeconds);
+        if (imp.hasBoss != null) base.hasBoss = !!imp.hasBoss;
+        if (imp.maxBosses != null) base.maxBosses = Math.max(0, Math.min(2, imp.maxBosses));
+        // Ensure consistency: if hasBoss is false, maxBosses must be 0.
+        if (!base.hasBoss) base.maxBosses = 0;
+        else if (base.maxBosses < 1) base.maxBosses = 1;
     }
 
     base.puzzlePool.sizeQueue = _egBuildSizeQueue(sizeMix, base.requiredPuzzles);
@@ -458,6 +463,7 @@ function _egRollMapRunBaseline(map) {
 function _egApplyModsToBaseline(base, map) {
     const mods = Array.isArray(map.mods) ? map.mods : [];
     const hasImplicits = !!(map && map.implicits);
+    const imp = (map && map.implicits) ? map.implicits : null;
     const tier = Math.max(1, (map && map.mapTier) || 1);
 
     mods.forEach(mod => {
@@ -476,6 +482,10 @@ function _egApplyModsToBaseline(base, map) {
                 break;
 
             case 'map_boss_chance':
+                // For maps with baked implicits the boss chance is already
+                // resolved during generation ( _egRollMapBossStatus ); skip the
+                // live roll so the run matches the tooltip.
+                if (hasImplicits && imp && imp.hasBoss != null) break;
                 // Roll once at activation: success guarantees a boss (bosses
                 // are chance-based from tier 2) and may add one extra.
                 if (Math.random() * 100 < val) {

@@ -92,7 +92,8 @@ function _egBuildBoss(defOrId, level = 1) {
         currentCharge: 0,
         damageValue: damage,
         element: def.element || null,
-        resistances: def.resistances || null
+        resistances: def.resistances || null,
+        isBoss: true
     };
 
     // Active map run: apply the rolled monster-strengthening mods.

@@ -192,6 +192,18 @@ function _buildMapRunTooltipHTML() {
     if (!map) return '';
     const rc = (typeof rarityColors === 'function') ? rarityColors(map.rarity) : null;
     let html = `<strong style="color:${rc ? rc.color : '#c8a84b'}">🗺️ ${map.name}</strong>`;
+    // Boss status for the active map (baked into implicits, matches the run).
+    const imp = map.implicits || null;
+    if (imp && imp.hasBoss != null) {
+        if (imp.hasBoss && (imp.maxBosses || 0) > 0) {
+            const bossLabel = imp.maxBosses > 1 ? t('eg_map_boss_count').replace('{n}', imp.maxBosses) : t('eg_map_has_boss');
+            html += `<br><span style="color:#e74c3c;font-weight:700;">${bossLabel}</span>`;
+        } else {
+            html += `<br><span style="color:#888;">${t('eg_map_no_boss')}</span>`;
+        }
+    } else if ((map.mapTier || 1) < 2) {
+        html += `<br><span style="color:#888;">${t('eg_map_no_boss')}</span>`;
+    }
     html += _buildActiveMapModsHTML(map);
 
     const rw = (typeof _egGetMapRewardBonuses === 'function') ? _egGetMapRewardBonuses(map) : null;

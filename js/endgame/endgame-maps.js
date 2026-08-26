@@ -1029,6 +1029,31 @@ function _egRollMapSizeMix(tier, largerPct) {
     return weights;
 }
 
+// Determines whether a rolled map contains a boss encounter. The result is
+// deterministic per map item (baked into implicits) so the tooltip can state
+// definitively if the map has a boss or not.
+// Tier 1 maps never have a boss. Tier 2+ maps have a 50% base chance, and
+// the `map_boss_chance` modifier can guarantee a boss and/or add an extra.
+function _egRollMapBossStatus(map) {
+    const tier = Math.max(1, map.mapTier || 1);
+    if (tier < 2) return { hasBoss: false, maxBosses: 0 };
+    const baseChance = (typeof EG_MAP_BASE_BOSS_CHANCE !== 'undefined') ? EG_MAP_BASE_BOSS_CHANCE : 50;
+    let hasBoss = Math.random() * 100 < baseChance;
+    let maxBosses = 1;
+    const mods = Array.isArray(map.mods) ? map.mods : [];
+    for (const mod of mods) {
+        if (mod.familyId !== 'map_boss_chance') continue;
+        const val = (Array.isArray(mod.rolledStats) && mod.rolledStats.length > 0)
+            ? (Number(mod.rolledStats[0].value) || 0) : 0;
+        if (val > 0 && Math.random() * 100 < val) {
+            hasBoss = true;
+            maxBosses = Math.min(2, maxBosses + 1);
+        }
+    }
+    if (!hasBoss) maxBosses = 0;
+    return { hasBoss, maxBosses };
+}
+
 function _egRollMapImplicits(map) {
     const tier = Math.max(1, map.mapTier || 1);
     let puzzles = Math.min(12, 3 + Math.floor(tier / 3));
@@ -1061,9 +1086,13 @@ function _egRollMapImplicits(map) {
 
     const sizeMix = _egRollMapSizeMix(tier, largerPct);
 
+    const bossStatus = _egRollMapBossStatus(map);
+
     return {
         puzzles, questions, mistakes, durationSeconds: duration, sizeMix,
         completionReward: _egRollMapCompletionReward(map),
+        hasBoss: bossStatus.hasBoss,
+        maxBosses: bossStatus.maxBosses,
     };
 }
 
@@ -1653,6 +1682,29 @@ function _egBuildMapTooltipBodyHTML(item) {
             .replace('{x}', imp.sizeMix.massive || 0));
     }
 
+    // ── Boss encounter line (baked into implicits) ───────────────────────
+    const bossHas = imp.hasBoss;
+    const bossCount = imp.maxBosses || 0;
+    if (bossHas && bossCount > 0) {
+        const bossLabel = bossCount > 1
+            ? t('eg_map_boss_count').replace('{n}', bossCount)
+            : t('eg_map_has_boss');
+        implicitLines.push(`<span style="color:#e74c3c;font-weight:700;">${bossLabel}</span>`);
+    } else if (bossHas === false) {
+        implicitLines.push(`<span style="color:#888;">${t('eg_map_no_boss')}</span>`);
+    } else {
+        // Legacy map without boss implicits: fall back to tier heuristic
+        const legacyHasBoss = (item.mapTier || 1) >= 2;
+        // Without baked status we show the probabilistic hint rather than a definitive Yes.
+        if (!legacyHasBoss) {
+            implicitLines.push(`<span style="color:#888;">${t('eg_map_no_boss')}</span>`);
+        } else {
+            // For legacy maps tier 2+ we cannot know definitively; show that a boss *may* appear.
+            // Prefer the definitive label if the global base chance is available.
+            implicitLines.push(`<span style="color:#e74c3c;font-weight:700;">${t('eg_map_has_boss')}</span><span style="color:#888; font-size:0.85em;"> (${(typeof EG_MAP_BASE_BOSS_CHANCE !== 'undefined' ? EG_MAP_BASE_BOSS_CHANCE : 50)}%)</span>`);
+        }
+    }
+
     // ── Reward bonuses (from mods) + completion reward ───────────────
     const rw = _egGetMapRewardBonuses(item);
     const rewardLines = [];
@@ -1749,4 +1801,72 @@ function _egBuildMapTooltipBodyHTML(item) {
         .eg-item-ilvl.eg-map-tier-badge { color: #f5d98a; }
     `;
     document.head.appendChild(style);
+})();
+
+//------------------------------------------------------------------------
+//-------------------LEGACY MAP BOSS HEALING-------------------------------
+//------------------------------------------------------------------------
+// Older saves stored maps without `implicits.hasBoss`. Patch them so every
+// persisted map gets a deterministic boss status and the tooltip / run
+// stays consistent without re-rolling on each launch.
+function _egHealMapBossImplicits(map) {
+    if (!map || typeof map !== 'object') return map;
+    if (!map.implicits || typeof map.implicits !== 'object') {
+        map.implicits = _egRollMapImplicits(map);
+        return map;
+    }
+    if (map.implicits.hasBoss == null) {
+        const bossStatus = _egRollMapBossStatus(map);
+        map.implicits.hasBoss = bossStatus.hasBoss;
+        map.implicits.maxBosses = bossStatus.maxBosses;
+    }
+    return map;
+}
+
+function _egMigrateMapBossImplicits() {
+    try {
+        if (typeof _egMapStash !== 'undefined' && Array.isArray(_egMapStash)) {
+            for (let r = 0; r < _egMapStash.length; r++) {
+                if (!Array.isArray(_egMapStash[r])) continue;
+                for (let c = 0; c < _egMapStash[r].length; c++) {
+                    const it = _egMapStash[r][c];
+                    if (it && it.category === 'map') _egHealMapBossImplicits(it);
+                }
+            }
+        }
+        if (typeof _egMapSlotItem !== 'undefined' && _egMapSlotItem && _egMapSlotItem.category === 'map') {
+            _egHealMapBossImplicits(_egMapSlotItem);
+        }
+        // Also patch the hub state's saved copy so next save is clean.
+        if (typeof STATE !== 'undefined' && STATE) {
+            const stash = STATE.egMapStash;
+            if (Array.isArray(stash)) {
+                stash.forEach(row => {
+                    if (!Array.isArray(row)) return;
+                    row.forEach(it => { if (it && it.category === 'map') _egHealMapBossImplicits(it); });
+                });
+            }
+            if (STATE.egMapSlotItem && STATE.egMapSlotItem.category === 'map') {
+                _egHealMapBossImplicits(STATE.egMapSlotItem);
+            }
+        }
+    } catch (e) { /* ignore migration errors */ }
+}
+_egMigrateMapBossImplicits();
+// Wrap future loads so slot switches also heal.
+(function _egPatchHubLoadForBoss() {
+    try {
+        if (typeof _egLoadHubState === 'function' && !_egLoadHubState._bossPatched) {
+            const orig = _egLoadHubState;
+            const patched = function() {
+                const ret = orig.apply(this, arguments);
+                try { _egMigrateMapBossImplicits(); } catch (e) {}
+                return ret;
+            };
+            patched._bossPatched = true;
+            // Preserve the patched flag on the original for idempotency checks
+            orig._bossPatched = true;
+            _egLoadHubState = patched;
+        }
+    } catch (e) { /* ignore */ }
 })();

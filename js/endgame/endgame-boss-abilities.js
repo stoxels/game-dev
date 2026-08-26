@@ -650,16 +650,20 @@ function _egVoidSurgePickSafePos() {
 
 
 // ── HUD overlap check ─────────────────────────────────────────────────────────
-// Returns true if the centre of the class HUD is within the safe-zone circle.
+// Returns true if any part of the HUD overlaps the safe-zone circle.
+// Uses closest-point check with tolerance so the visual glow counts as inside.
 function _egVoidSurgeHudInZone(safePos) {
-    const hud = document.getElementById('class-hud-drag-handle');
+    const hud = document.getElementById('class-hud-drag-handle')
+        || document.getElementById('class-hud-panel');
     if (!hud) return false;
     const rect = hud.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = cx - safePos.x;
-    const dy = cy - safePos.y;
-    return Math.sqrt(dx * dx + dy * dy) <= EG_VOID_SURGE_SAFE_RADIUS;
+    if (rect.width === 0 && rect.height === 0) return false;
+    const closestX = Math.max(rect.left, Math.min(safePos.x, rect.right));
+    const closestY = Math.max(rect.top, Math.min(safePos.y, rect.bottom));
+    const dx = closestX - safePos.x;
+    const dy = closestY - safePos.y;
+    const tolerance = 8;
+    return Math.sqrt(dx * dx + dy * dy) <= EG_VOID_SURGE_SAFE_RADIUS + tolerance;
 }
 
 
@@ -856,16 +860,24 @@ function _egBlastPickPos(radius) {
     return { x, y };
 }
 
-// Returns true if the centre of the class HUD is inside the given zone.
+// Returns true if any part of the HUD overlaps the safe zone.
+// Previously checked only the handle's centre — that felt unfair because the
+// handle is wide and the circle's glow extends beyond the logical radius.
+// Checking the closest point on the HUD rect with a small tolerance matches
+// the player's visual expectation of "being inside".
 function _egBlastHudInZone(zone) {
-    const hud = document.getElementById('class-hud-drag-handle');
+    const hud = document.getElementById('class-hud-drag-handle')
+        || document.getElementById('class-hud-panel');
     if (!hud) return false;
     const rect = hud.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = cx - zone.x;
-    const dy = cy - zone.y;
-    return Math.sqrt(dx * dx + dy * dy) <= zone.radius;
+    // If element is hidden (0 size) fall back to centre check on panel
+    if (rect.width === 0 && rect.height === 0) return false;
+    const closestX = Math.max(rect.left, Math.min(zone.x, rect.right));
+    const closestY = Math.max(rect.top, Math.min(zone.y, rect.bottom));
+    const dx = closestX - zone.x;
+    const dy = closestY - zone.y;
+    const tolerance = 8; // visual border + glow forgiveness
+    return Math.sqrt(dx * dx + dy * dy) <= zone.radius + tolerance;
 }
 
 // DOM helpers — each blast gets uniquely suffixed elements.
@@ -1052,6 +1064,12 @@ function _egRunScreenBlast(opts) {
         // ── Resolve: check position, apply damage, tear down ────────────────
         schedule(() => {
             if (state.poll) { clearInterval(state.poll); state.poll = null; }
+            // Ensure the logical radius matches the intended final size at resolve
+            // so the last poll's 100ms quantization doesn't cause a visual/logical mismatch.
+            if (opts.shrinkToRadius != null) {
+                real.radius = opts.shrinkToRadius;
+                _egBlastPositionCircle(_egBlastGetCircle(id, realIndex, real), real);
+            }
 
             const survived = _egBlastHudInZone(real);
             const circle = document.getElementById(`eg-blast-circle-${id}-${realIndex}`);
@@ -1094,7 +1112,7 @@ function _egMechHeatBloom(monster, phase) {
         activeMs: phase >= 3 ? 4200 : 5000,
         damagePct: 0.30,
         zones: [_egBlastPickPos(radius)].map(p => ({ ...p, radius })),
-        shrinkToRadius: 55,
+        shrinkToRadius: 70,
     });
 }
 
