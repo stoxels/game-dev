@@ -437,15 +437,6 @@
         if (done) toast('∅ Measure Zero');
     });
 
-    // Open Bazaar (353): instant inventory unlock ----------------------------------
-
-    ON_START.push(() => {
-        if (has('keystone_open_bazaar') && typeof buildInventoryPanel === 'function') {
-            try { buildInventoryPanel(); } catch (e) { /* panel not present yet */ }
-            toast('🏪 Open Bazaar: inventory unlocked');
-        }
-    });
-
     //--------------------------------------------------------------------------
     //------------------------------FILL HOOKS----------------------------------
     //--------------------------------------------------------------------------
@@ -738,7 +729,11 @@
     });
 
     ON_ITEM_USE.push(() => {   // Open Bazaar keystone (353)
-        if (has('keystone_open_bazaar')) revealTiles(1);
+        if (has('keystone_open_bazaar')) {
+            revealTiles(2);
+            addSecs(5);
+            toast('🏪 Open Bazaar: 2 reveals, +5s');
+        }
     });
 
     //--------------------------------------------------------------------------
