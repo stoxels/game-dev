@@ -352,7 +352,13 @@ function _egvBuyCurrency(id) {
     const def = EG_CURRENCY_DEFS[id];
     if (!def) return;
     const price = _egvCurrencyPrice(id);
-    if (!_egvPurchase(price, () => egAddCurrency(id, 1, { ...def }))) return;
+    if (!_egvPurchase(price, () => egAddCurrency(id, 1, {
+        name: def.name,
+        icon: def.icon,
+        rarity: 'currency',
+        category: 'currency',
+        description: def.description,
+    }))) return;
 
     showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', def.icon)
@@ -386,7 +392,13 @@ function _egvBuyEssence(id) {
     const def = EG_ESSENCE_DEFS[id];
     if (!def) return;
     const price = _egvEssencePrice(id);
-    if (!_egvPurchase(price, () => egAddEssence(id, 1, { ...def }))) return;
+    if (!_egvPurchase(price, () => egAddEssence(id, 1, {
+        name: def.name,
+        icon: def.icon,
+        rarity: 'essence',
+        category: 'essence',
+        description: def.description,
+    }))) return;
 
     showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', def.icon)

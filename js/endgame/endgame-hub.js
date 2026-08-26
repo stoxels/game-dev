@@ -1061,6 +1061,35 @@ function egSaveHubState() {
     save();
 }
 
+// Heals a stashed currency/shard item that was persisted without its
+// full fields (legacy saves, vendor/drop race during save). Fills missing
+// name/icon/description/category/rarity from the canonical defs so tooltips
+// and right-click use-mode keep working.
+function _egHealCurrencyItem(item) {
+    if (!item || !item.id) return item;
+    const def = (typeof EG_CURRENCY_DEFS !== 'undefined' && EG_CURRENCY_DEFS[item.id])
+        || (typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[item.id])
+        || null;
+    if (!def) return item;
+    if (!item.name) item.name = def.name;
+    if (!item.icon) item.icon = def.icon;
+    if (!item.description) item.description = def.description;
+    if (!item.category) item.category = def.category || 'currency';
+    if (!item.rarity) item.rarity = def.rarity || 'currency';
+    return item;
+}
+function _egHealEssenceItem(item) {
+    if (!item || !item.id) return item;
+    const def = (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[item.id]) || null;
+    if (!def) return item;
+    if (!item.name) item.name = def.name;
+    if (!item.icon) item.icon = def.icon;
+    if (!item.description) item.description = def.description;
+    if (!item.category) item.category = def.category || 'essence';
+    if (!item.rarity) item.rarity = def.rarity || 'essence';
+    return item;
+}
+
 // Reads hub state from the global STATE object into local variables.
 // Missing entries are initialised to their default empty structures.
 function _egLoadHubState() {
@@ -1068,6 +1097,21 @@ function _egLoadHubState() {
     _egInventory = STATE.egInventory || Array.from({ length: EG_INV_ROWS }, () => Array(EG_INV_COLS).fill(null));
     _egMapStash = STATE.egMapStash || Array.from({ length: EG_MAP_STASH_ROWS }, () => Array(EG_MAP_STASH_COLS).fill(null));
     _egCurrencyStash = STATE.egCurrencyStash || Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
+    // Heal legacy currency/shard cells that were saved without description/category.
+    if (Array.isArray(_egCurrencyStash)) {
+        for (let r = 0; r < _egCurrencyStash.length; r++) {
+            if (!Array.isArray(_egCurrencyStash[r])) continue;
+            for (let c = 0; c < _egCurrencyStash[r].length; c++) {
+                const it = _egCurrencyStash[r][c];
+                if (it) {
+                    _egHealCurrencyItem(it);
+                    // Also handle essences that were mistakenly stored in currency strip
+                    // (very old saves) — let essence heal attempt as fallback.
+                    _egHealEssenceItem(it);
+                }
+            }
+        }
+    }
     // EG_ESSENCE_ROWS/COLS are defined in endgame-essences.js which loads
     // after this file — guard so first-load initialisation never throws.
     // The stash is always normalised to the CURRENT grid dimensions: saves
@@ -1089,6 +1133,16 @@ function _egLoadHubState() {
         _egEssenceStash = freshEssGrid;
     }
     _egMapSlotItem = STATE.egMapSlotItem || null;
+    // Heal legacy essence cells too (description/category missing from old saves).
+    if (Array.isArray(_egEssenceStash)) {
+        for (let r = 0; r < _egEssenceStash.length; r++) {
+            if (!Array.isArray(_egEssenceStash[r])) continue;
+            for (let c = 0; c < _egEssenceStash[r].length; c++) {
+                const it = _egEssenceStash[r][c];
+                if (it) _egHealEssenceItem(it);
+            }
+        }
+    }
 }
 
 // Call this immideatly so the player does NOT have to open the hub first to re-load his item state.

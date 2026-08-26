@@ -499,9 +499,27 @@ document.addEventListener('contextmenu', function (e) {
     const item = _egCurrencyStash[r][c];
     if (!item) return;
 
-    if (!item.category) return; // empty cell
+    // Heal legacy items saved without category/description so right-click
+    // still enters use-mode (previous saves stored only {id,count}).
+    if (item && typeof _egHealCurrencyItem === 'function') _egHealCurrencyItem(item);
+    else if (item && !item.category && EG_CURRENCY_DEFS[item.id]) {
+        const _def = EG_CURRENCY_DEFS[item.id];
+        if (!item.description) item.description = _def.description;
+        if (!item.category) item.category = 'currency';
+        if (!item.rarity) item.rarity = 'currency';
+        if (!item.name) item.name = _def.name;
+        if (!item.icon) item.icon = _def.icon;
+    }
+    // Also try shard heal (shards also live in the currency strip)
+    if (item && typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[item.id] && !item.category) {
+        const _sdef = EG_SHARD_DEFS[item.id];
+        if (!item.description) item.description = _sdef.description;
+        if (!item.category) item.category = 'currency';
+    }
 
-    const def = EG_CURRENCY_DEFS[item.id];
+    if (!item.category) return; // empty cell / unknown type
+
+    const def = EG_CURRENCY_DEFS[item.id] || (typeof EG_SHARD_DEFS !== 'undefined' ? EG_SHARD_DEFS[item.id] : null);
     if (!def || (typeof def.apply !== 'function' && !def.isMirror)) {
         showToast(t('eg_no_usable_effect'));
         return;
@@ -606,17 +624,44 @@ function _egShowTooltip(item, e) {
         return;
     }
 
+    // Heal legacy currency/shard items that lack category/description before rendering.
+    if (item && item.id && (!item.category || !item.description)) {
+        const isShard = typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[item.id];
+        const cdef = (typeof EG_CURRENCY_DEFS !== 'undefined' && EG_CURRENCY_DEFS[item.id]) || (isShard ? EG_SHARD_DEFS[item.id] : null);
+        const edef = (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[item.id]) || null;
+        const d = cdef || edef;
+        if (d) {
+            if (!item.category) item.category = d.category || (edef ? 'essence' : 'currency');
+            if (!item.description) item.description = d.description || '';
+            if (!item.name) item.name = d.name || item.name;
+            if (!item.icon) item.icon = d.icon || item.icon;
+            if (!item.rarity) item.rarity = d.rarity || item.category;
+        }
+    }
+
     let html;
-    if (item.category === 'currency' || item.category === 'essence') {
+    const isCurrencyLike = item.category === 'currency' || item.category === 'essence'
+        || (typeof EG_CURRENCY_DEFS !== 'undefined' && EG_CURRENCY_DEFS[item.id])
+        || (typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[item.id])
+        || (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[item.id]);
+    if (isCurrencyLike) {
+        // Resolve display fields from the canonical def when still missing (orb of chance legacy case).
+        const defForTT = (typeof EG_CURRENCY_DEFS !== 'undefined' && EG_CURRENCY_DEFS[item.id])
+            || (typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[item.id])
+            || (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[item.id]) || {};
+        const ttName = item.name || defForTT.name || '???';
+        const ttIcon = item.icon || defForTT.icon || '📦';
+        const ttDesc = item.description || defForTT.description || '';
+        const isEssenceTT = item.category === 'essence' || (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[item.id]);
         const countLine = item.count > 1 ? ` <span class="eg-tooltip-count">×${item.count}</span>` : '';
         html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon">${item.icon || '📦'}</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${item.name || '???'}${countLine}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${item.category === 'essence' ? t('eg_rarity_essence') : t('eg_rarity_currency')}</div>
+        <div class="eg-tt-icon">${ttIcon}</div>
+        <div class="eg-tt-name" style="color:#f5d98a;">${ttName}${countLine}</div>
+        <div class="eg-tt-rarity-line" style="color:#b59248;">${isEssenceTT ? t('eg_rarity_essence') : t('eg_rarity_currency')}</div>
     </div>
-    <div class="eg-tt-section"><div class="eg-tt-desc">${item.description || ''}</div></div>
+    <div class="eg-tt-section"><div class="eg-tt-desc">${ttDesc}</div></div>
 </div>`;
     } else if (item.category === 'map' && typeof _egBuildMapTooltipBodyHTML === 'function') {
         // Maps get their own tooltip with mods grouped by
@@ -637,6 +682,32 @@ function _egShowTooltip(item, e) {
 //------------------------------------------------------------------------
 //-------------------CSS INJECTION-----------------------------------------
 //------------------------------------------------------------------------
+
+// Heal any legacy currency/shard items already in memory (saved before description/category was persisted).
+(function _egHealExistingCurrencyStash() {
+    try {
+        if (typeof _egCurrencyStash !== 'undefined' && Array.isArray(_egCurrencyStash)) {
+            for (let r = 0; r < _egCurrencyStash.length; r++) {
+                if (!Array.isArray(_egCurrencyStash[r])) continue;
+                for (let c = 0; c < _egCurrencyStash[r].length; c++) {
+                    const it = _egCurrencyStash[r][c];
+                    if (!it) continue;
+                    if (typeof _egHealCurrencyItem === 'function') _egHealCurrencyItem(it);
+                    else if (!it.description || !it.category) {
+                        const d = EG_CURRENCY_DEFS[it.id] || (typeof EG_SHARD_DEFS !== 'undefined' ? EG_SHARD_DEFS[it.id] : null);
+                        if (d) {
+                            if (!it.description) it.description = d.description;
+                            if (!it.category) it.category = d.category || 'currency';
+                            if (!it.rarity) it.rarity = d.rarity || 'currency';
+                            if (!it.name) it.name = d.name;
+                            if (!it.icon) it.icon = d.icon;
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) { /* ignore */ }
+})();
 
 (function _egInjectCurrencyStyles() {
     if (document.getElementById('eg-currency-styles')) return;
