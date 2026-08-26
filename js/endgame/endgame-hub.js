@@ -581,18 +581,29 @@ function _egBuildStatDescTooltipHTML(descKey, label) {
         } else if (descKey === 'eg_statdesc_evasion') {
             const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, refMonsterLevel));
             html += `<br><span style="color:var(--accent,#66fcf1)">${t('eg_statdesc_evasion_value').replace('{p}', dodgeChance.toFixed(1))}</span>`;
-        } else if (descKey === 'eg_statdesc_accuracy'
-            && typeof _egGetTarget === 'function' && typeof _egGetEncounterBaseLevel === 'function') {
-            // Live miss chance for melee strikes AND projectiles, measured
-            // against the current target's level (falls back to the
-            // encounter's base level when nothing is targeted).
-            const target = _egGetTarget();
-            const monsterLevel = (target && target.level) || _egGetEncounterBaseLevel() || 1;
-            const missPct = _egCalcAccuracyMissChance(stats.accuracy, monsterLevel);
-            const label = t('eg_statdesc_accuracy_value')
-                .replace('{p}', missPct.toFixed(1))
-                .replace('{n}', monsterLevel);
-            html += `<br><span style="color:var(--accent,#66fcf1)">${label}</span>`;
+        } else if (descKey === 'eg_statdesc_accuracy') {
+            // Miss chance scaled to the character's own level and the next
+            // three monster levels (e.g. at player level 12 -> 12/13/14/15).
+            // Falls back to level 1 when the leveling system is unavailable.
+            const playerLevel = (typeof _egGetPlayerLevel === 'function')
+                ? Math.max(1, Number(_egGetPlayerLevel()) || 1) : 1;
+            const maxLvl = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.maxLevel)
+                ? EG_LEVELING_CONFIG.maxLevel : 100;
+            const levels = [];
+            for (let d = 0; d < 4; d++) {
+                const lvl = playerLevel + d;
+                if (lvl > maxLvl) break;
+                levels.push(lvl);
+            }
+            if (!levels.length) levels.push(playerLevel);
+            const lines = levels.map(lvl => {
+                const missPct = (typeof _egCalcAccuracyMissChance === 'function')
+                    ? _egCalcAccuracyMissChance(stats.accuracy, lvl) : 0;
+                return t('eg_statdesc_accuracy_value')
+                    .replace('{p}', missPct.toFixed(1))
+                    .replace('{n}', lvl);
+            });
+            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
         }
     }
     return html;

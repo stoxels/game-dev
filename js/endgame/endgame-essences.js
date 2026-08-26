@@ -234,6 +234,19 @@ const EG_ESSENCE_DEFS = {
             'arcane_resistance', 'shadow_resist',
         ],
     },
+
+    essence_puzzle: {
+        id: 'essence_puzzle',
+        name: t('eg_essence_puzzle'),
+        icon: '🧩',
+        description: t('eg_essence_puzzle_desc'),
+        category: 'essence',
+        rarity: 'essence',
+        guaranteedFamilies: [
+            'time_added', 'mistake_count', 'mistake_not_count', 'focus',
+            'reveal_hint', 'chance_for_new_question',
+        ],
+    },
 };
 
 
@@ -305,6 +318,8 @@ function _egEssenceFamilyDisplayName(familyId) {
         cold_damage: 'Kälteschaden', lightning_damage: 'Blitzschaden', shadow_damage: 'Schattenschaden', fire_resist: 'Feuerwiderstand',
         cold_resist: 'Kältewiderstand', lightning_resist: 'Blitzwiderstand', arcane_resistance: 'Arkanwiderstand',
         shadow_resist: 'Schattenwiderstand',
+        time_added: 'Zusätzliche Zeit', mistake_count: 'Erlaubte Fehler', mistake_not_count: 'Fehlerfreiheit', focus: 'Fokus',
+        reveal_hint: 'Hinweischance', chance_for_new_question: 'Neue Frage',
     };
     if (typeof LANG !== 'undefined' && LANG === 'de' && deMap[familyId]) return deMap[familyId];
     const enMap = {
@@ -321,6 +336,8 @@ function _egEssenceFamilyDisplayName(familyId) {
         cold_damage: 'Cold Damage', lightning_damage: 'Lightning Damage', shadow_damage: 'Shadow Damage', fire_resist: 'Fire Resistance',
         cold_resist: 'Cold Resistance', lightning_resist: 'Lightning Resistance', arcane_resistance: 'Arcane Resistance',
         shadow_resist: 'Shadow Resistance',
+        time_added: 'Time Added', mistake_count: 'Allowed Mistakes', mistake_not_count: 'Uncounted Mistakes', focus: 'Focus',
+        reveal_hint: 'Hint Chance', chance_for_new_question: 'New Question Chance',
     };
     if (enMap[familyId]) return enMap[familyId];
     // Generic title-case fallback with "+" for hybrids
@@ -404,6 +421,7 @@ const EG_ESSENCE_DROP_TABLE = [
     { id: 'essence_might', weight: 80 },
     { id: 'essence_sorcery', weight: 80 },
     { id: 'essence_elements', weight: 65 },
+    { id: 'essence_puzzle', weight: 90 },
 ];
 
 const EG_ESSENCE_DROP_CHANCE_NORMAL = 0.06; // 6% per normal kill

@@ -42,6 +42,11 @@ const EG_LOW_TIER_MONSTER_STEPS = [0, 0, 1, 2];
 // optional from tier 2 onwards — never guaranteed, never on tier 1.
 const EG_MAP_BASE_BOSS_CHANCE = 50;
 
+// Total non-boss kills required per tier — early tiers stay short so new
+// players can clear quickly. Caps: T1 ≤15, T2 ≤20.
+const EG_TIER1_MAX_TOTAL_MONSTERS = 15;
+const EG_TIER2_MAX_TOTAL_MONSTERS = 20;
+
 // Returns the first rolled value for a map mod family on the active map,
 // or 0 when the mod is not present / no run is active.
 // Tolerates legacy/persisted mod shapes: falls back to a numeric
@@ -411,7 +416,9 @@ function _egRollMapRunBaseline(map) {
         // even when +monster mods are rolled.
         maxMonsters: Math.min(6, EG_TIER1_MAX_MONSTERS +
             (EG_LOW_TIER_MONSTER_STEPS[Math.min(tier - 1, EG_LOW_TIER_MONSTER_STEPS.length - 1)] || 0)),
-        totalMonsters: Math.min(120, 15 + tier * 8),
+        totalMonsters: tier === 1 ? EG_TIER1_MAX_TOTAL_MONSTERS
+            : tier === 2 ? EG_TIER2_MAX_TOTAL_MONSTERS
+            : Math.min(120, 15 + tier * 8),
         // Bosses are too much for tier 1 beginners. From tier 2 onwards a
         // boss MAY appear (chance-based roll), but is never guaranteed.
         hasBoss: tier >= 2 && Math.random() * 100 < EG_MAP_BASE_BOSS_CHANCE,
@@ -461,6 +468,9 @@ function _egApplyModsToBaseline(base, map) {
 
             case 'map_extra_monsters':
                 base.totalMonsters += val;
+                // Keep early tiers short even with +monster mods.
+                if (tier === 1) base.totalMonsters = Math.min(EG_TIER1_MAX_TOTAL_MONSTERS, base.totalMonsters);
+                else if (tier === 2) base.totalMonsters = Math.min(EG_TIER2_MAX_TOTAL_MONSTERS, base.totalMonsters);
                 base.maxMonsters = Math.min(12, base.maxMonsters + (val >= 3 ? 2 : 1));
                 if (tier <= 1) base.maxMonsters = EG_TIER1_MAX_MONSTERS;
                 break;

@@ -2,7 +2,9 @@
 //-------------------ENDGAME MAP ELEMENTAL HAZARDS------------------------
 //------------------------------------------------------------------------
 // Screen-space environmental hazards driven by map modifier families:
-//   map_hazard_lava      — drifting lava balls around the puzzle grid
+//   map_hazard_lava      — drifting lava balls around the puzzle grid; on player collision
+//                          the ball fuses for 0.5 s then explodes for heavy fire damage
+//                          (blast radius 140 px, may ignite), despawns for 3 min, then respawns
 //   map_hazard_lightning — telegraphed lightning strikes (shock on hit)
 //   map_hazard_blizzard  — snow overlay + falling icicles (chill on hit)
 //   map_hazard_darkness  — drifting dark clouds obscuring parts of the UI
@@ -34,12 +36,17 @@
 //-------------------TUNING CONSTANTS------------------------------------
 //------------------------------------------------------------------------
 
-const EG_HZ_LAVA_BASE_DMG_PCT = 2;        // % of playerMaxHP per lava tick
-const EG_HZ_LAVA_TICK_MS = 600;           // damage tick rate while standing in lava
+const EG_HZ_LAVA_BASE_DMG_PCT = 2;        // legacy tick (kept for reference; lava now uses explosion)
+const EG_HZ_LAVA_TICK_MS = 600;           // (unused after fuse redesign, kept for compat)
 const EG_HZ_LAVA_MIN_R = 55;              // pool radius range (px)
 const EG_HZ_LAVA_MAX_R = 85;
 const EG_HZ_LAVA_SPEED_MIN = 20;          // drift speed range (px/s)
 const EG_HZ_LAVA_SPEED_MAX = 48;
+const EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT = 20; // % of playerMaxHP dealt when a lava ball explodes (heavy fire)
+const EG_HZ_LAVA_FUSE_MS = 500;           // delay between collision and detonation
+const EG_HZ_LAVA_RESPAWN_MS = 180000;     // 3 minutes until the same ball respawns (gameplay time, paused while game is paused)
+const EG_HZ_LAVA_BLAST_R = 140;           // explosion radius (px) — must evade after the 0.5s fuse
+const EG_HZ_LAVA_IGNITE_CHANCE_PCT = 55;  // chance to ignite the player if the blast hits
 
 const EG_HZ_LIGHTNING_BASE_DMG_PCT = 8;   // % of playerMaxHP per strike
 const EG_HZ_LIGHTNING_WARNING_MS = 5000;  // telegraph time before impact
@@ -159,12 +166,60 @@ function _egHzPlayerEl() {
            document.getElementById('player-avatar-simple');
 }
 
+// Tight hitbox derived from the visible sprite image, not the wrapper.
+// The wrapper (#player-avatar-wrapper 100px + HP/charge bars, or
+// #player-avatar-simple 128px) is taller than the artwork, so using its
+// center/bounds misaligns collision by ~30–40px and makes lava/volatile
+// feel "off" while blizzard walls hit the bars.
+function _egHzPlayerSpriteRect() {
+    let img = document.getElementById('avatar-sprite-img');
+    if (!img || !img.getBoundingClientRect) img = null;
+    let r = img ? img.getBoundingClientRect() : null;
+    if (!r || (!r.width && !r.height)) {
+        img = document.getElementById('avatar-sprite-img-simple');
+        r = img ? img.getBoundingClientRect() : null;
+    }
+    if (r && r.width && r.height) return r;
+    return null;
+}
+
 function _egHzPlayerRect() {
-    const el = _egHzPlayerEl();
-    if (!el) return null;
-    const r = el.getBoundingClientRect();
-    if (!r.width && !r.height) return null;
-    return r;
+    // Primary: tight box around the sprite image with insets for
+    // transparent padding (cape/shoulders/feet). Fallback: wrapper rect
+    // with top cropped where HP/charge bars live.
+    let r = _egHzPlayerSpriteRect();
+    let base = r;
+    if (!base) {
+        const el = _egHzPlayerEl();
+        if (!el) return null;
+        const wr = el.getBoundingClientRect();
+        if (!wr.width && !wr.height) return null;
+        // Estimate sprite area: bottom ~62% of wrapper (bars ~38% on top)
+        const barH = wr.height * 0.38;
+        base = {
+            left: wr.left, right: wr.right,
+            top: wr.top + barH, bottom: wr.bottom,
+            width: wr.width, height: wr.height - barH
+        };
+    }
+    // Inset so transparent edges don't count. Keep at least ~56x56 hitbox.
+    const insetX = Math.min(16, base.width * 0.18);
+    const insetY = Math.min(12, base.height * 0.14);
+    const insetB = Math.min(8, base.height * 0.08);
+    const left = base.left + insetX;
+    const right = base.right - insetX;
+    const top = base.top + insetY;
+    const bottom = base.bottom - insetB;
+    if (right <= left || bottom <= top) return base;
+    return {
+        left, right, top, bottom,
+        width: right - left, height: bottom - top
+    };
+}
+
+// Alias used at call-sites for clarity — identical to _egHzPlayerRect().
+function _egHzPlayerHitbox() {
+    return _egHzPlayerRect();
 }
 
 // Bounding box of the puzzle grid INCLUDING row/col clue number cells —
@@ -194,6 +249,60 @@ function _egHzCircleRectOverlap(x, y, r, rect) {
     const cy = Math.max(rect.top, Math.min(y, rect.bottom));
     const dx = x - cx, dy = y - cy;
     return dx * dx + dy * dy < r * r;
+}
+
+function _egHzRectInsideCircle(rect, cx, cy, r) {
+    if (!rect) return false;
+    const r2 = r * r;
+    const corners = [
+        [rect.left, rect.top], [rect.right, rect.top],
+        [rect.left, rect.bottom], [rect.right, rect.bottom]
+    ];
+    for (let i = 0; i < 4; i++) {
+        const dx = corners[i][0] - cx, dy = corners[i][1] - cy;
+        if (dx * dx + dy * dy > r2) return false;
+    }
+    return true;
+}
+
+function _egHzRingRectOverlap(x, y, radius, band, rect) {
+    if (!rect) return false;
+    const outer = radius + band;
+    if (!_egHzCircleRectOverlap(x, y, outer, rect)) return false;
+    const inner = Math.max(0, radius - band);
+    if (inner <= 0) return true;
+    // If rect is fully inside the hole, no hit.
+    if (_egHzRectInsideCircle(rect, x, y, inner)) return false;
+    // Otherwise outer hits but not fully inside hole => band overlaps rect.
+    // For thin bands, also accept case where rect straddles inner edge
+    // even if outer check passed but inner disc still overlaps.
+    return true;
+}
+
+function _egHzSweptCircleRectOverlap(x0, y0, x1, y1, r, rect) {
+    if (!rect) return false;
+    if (_egHzCircleRectOverlap(x0, y0, r, rect)) return true;
+    if (_egHzCircleRectOverlap(x1, y1, r, rect)) return true;
+    // Sample midpoint and check expanded rect fallback — cheap 3-point
+    // check catches most tunneling without segment math.
+    const mx = (x0 + x1) * 0.5, my = (y0 + y1) * 0.5;
+    if (_egHzCircleRectOverlap(mx, my, r, rect)) return true;
+    // For long sweeps (icicles 140px, arcane 240px per 100ms tick)
+    // also test bounding box of the sweep expanded by radius.
+    if (Math.hypot(x1 - x0, y1 - y0) > r) {
+        const sx0 = Math.min(x0, x1) - r, sx1 = Math.max(x0, x1) + r;
+        const sy0 = Math.min(y0, y1) - r, sy1 = Math.max(y0, y1) + r;
+        const sweep = { left: sx0, right: sx1, top: sy0, bottom: sy1 };
+        if (_egHzRectsOverlap(sweep, rect)) {
+            // Sweep box overlaps — do denser sampling along segment
+            for (let t = 0.25; t < 1; t += 0.25) {
+                const sx = x0 + (x1 - x0) * t;
+                const sy = y0 + (y1 - y0) * t;
+                if (_egHzCircleRectOverlap(sx, sy, r, rect)) return true;
+            }
+        }
+    }
+    return false;
 }
 
 // Samples a random viewport point that lies OUTSIDE the puzzle-grid rect
@@ -343,31 +452,114 @@ function _egHazardsTick() {
 //-------------------LAVA BALLS-------------------------------------------
 //------------------------------------------------------------------------
 
+function _egHzCreateLavaPool() {
+    const r = _egHzRand(EG_HZ_LAVA_MIN_R, EG_HZ_LAVA_MAX_R);
+    const pos = _egHzPointOutsideGrid(r + 24);
+    const speed = _egHzRand(EG_HZ_LAVA_SPEED_MIN, EG_HZ_LAVA_SPEED_MAX);
+    const angle = Math.random() * Math.PI * 2;
+    const el = document.createElement('div');
+    el.className = 'eg-hz-lava';
+    const size = r * 2;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.animationDelay = (-Math.random() * 3) + 's';
+    if (_egHzLayer) _egHzLayer.appendChild(el);
+    el.style.transform = `translate(${Math.round(pos.x - r)}px, ${Math.round(pos.y - r)}px)`;
+    return {
+        x: pos.x, y: pos.y, r,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        el,
+        state: 'active', // 'active' | 'fusing' | 'respawning'
+        fuseT: 0,
+        respawnIn: 0,
+    };
+}
+
+function _egHzTriggerLavaFuse(pool) {
+    if (!pool || pool.state !== 'active') return;
+    pool.state = 'fusing';
+    pool.fuseT = EG_HZ_LAVA_FUSE_MS;
+    if (pool.el) pool.el.classList.add('eg-hz-lava-fuse');
+}
+
+function _egHzDetonateLava(pool) {
+    if (!pool) return;
+    const bx = pool.x;
+    const by = pool.y;
+    const br = pool.r;
+    // Visual explosion: remove the lava ball element and spawn a dedicated blast copy
+    // at the exact world position (left/top based) so the scale animation does not
+    // fight the translate() used for drift positioning.
+    if (pool.el) {
+        try { pool.el.remove(); } catch (e) {}
+        pool.el = null;
+    }
+    if (_egHzLayer) {
+        // Fiery core that puffs up and fades
+        const boom = document.createElement('div');
+        boom.className = 'eg-hz-lava eg-hz-lava-blast';
+        const size = br * 2;
+        boom.style.width = size + 'px';
+        boom.style.height = size + 'px';
+        boom.style.left = (bx - br) + 'px';
+        boom.style.top = (by - br) + 'px';
+        // blast elements are positioned via left/top, not translate()
+        boom.style.transform = 'none';
+        _egHzLayer.appendChild(boom);
+        setTimeout(() => boom.remove(), 500);
+
+        // Expanding ring so the 140 px blast radius is readable
+        const ring = document.createElement('div');
+        ring.className = 'eg-hz-lava-explosion';
+        const d = EG_HZ_LAVA_BLAST_R * 2;
+        ring.style.width = d + 'px';
+        ring.style.height = d + 'px';
+        ring.style.left = (bx - EG_HZ_LAVA_BLAST_R) + 'px';
+        ring.style.top = (by - EG_HZ_LAVA_BLAST_R) + 'px';
+        _egHzLayer.appendChild(ring);
+        setTimeout(() => ring.remove(), 550);
+    }
+
+    // Heavy fire damage if the player is still inside the blast radius at detonation time
+    // Uses tight hitbox vs blast disc so footing/edges respect the sprite.
+    const pr = _egHzPlayerHitbox();
+    if (pr && _egHzCircleRectOverlap(bx, by, EG_HZ_LAVA_BLAST_R, pr)) {
+            const dealt = _egHzDamage(EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT * _egHzLava.dmgMult, 'fire', '#ff6b4a');
+            if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
+                && Math.random() * 100 < EG_HZ_LAVA_IGNITE_CHANCE_PCT) {
+                _egApplyPlayerAilment('ignite',
+                    Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
+            }
+        }
+
+    // Despawn for 3 minutes (gameplay time)
+    pool.state = 'respawning';
+    pool.respawnIn = EG_HZ_LAVA_RESPAWN_MS;
+    pool.fuseT = 0;
+}
+
+function _egHzRespawnLavaPool(pool) {
+    const fresh = _egHzCreateLavaPool();
+    // Reuse the same object identity so the pools array stays stable
+    pool.x = fresh.x; pool.y = fresh.y; pool.r = fresh.r;
+    pool.vx = fresh.vx; pool.vy = fresh.vy;
+    // fresh already appended its element; steal it
+    pool.el = fresh.el;
+    // fresh's element is already in the DOM — no extra append needed
+    pool.state = 'active';
+    pool.fuseT = 0;
+    pool.respawnIn = 0;
+    // Ensure blast/fuse classes are clean (fresh element is clean by construction)
+}
+
 function _egHzInitLava(intensity) {
     // ~8 balls at low intensity (tier 3), scaling up to a cap of 14 at high
     // intensity (tier 1):  25 → 7 | 45 → 8 | 50 → 9 | 75 → 10 | 80 → 11 | 100 → 12
     const count = Math.min(14, 5 + Math.round(intensity / 16));
     const pools = [];
     for (let i = 0; i < count; i++) {
-        const r = _egHzRand(EG_HZ_LAVA_MIN_R, EG_HZ_LAVA_MAX_R);
-        const pos = _egHzPointOutsideGrid(r + 24);
-        const speed = _egHzRand(EG_HZ_LAVA_SPEED_MIN, EG_HZ_LAVA_SPEED_MAX);
-        const angle = Math.random() * Math.PI * 2;
-
-        const el = document.createElement('div');
-        el.className = 'eg-hz-lava';
-        const size = r * 2;
-        el.style.width = size + 'px';
-        el.style.height = size + 'px';
-        el.style.animationDelay = (-Math.random() * 3) + 's';
-        _egHzLayer.appendChild(el);
-
-        pools.push({
-            x: pos.x, y: pos.y, r,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            el, dmgAcc: 0,
-        });
+        pools.push(_egHzCreateLavaPool());
     }
     _egHzLava = { pools, dmgMult: _egHzMult(intensity), intensity };
 }
@@ -375,10 +567,27 @@ function _egHzInitLava(intensity) {
 function _egHzTickLava(dtMs) {
     const dtS = dtMs / 1000;
     const grid = _egHzGridRect(10);
-    const pr = _egHzPlayerRect();
+    const pr = _egHzPlayerHitbox();
 
     _egHzLava.pools.forEach(p => {
-        if (!p.el.isConnected) return;
+        // ── Respawning (despawned) ──────────────────────────────────
+        if (p.state === 'respawning') {
+            p.respawnIn -= dtMs;
+            if (p.respawnIn <= 0) {
+                _egHzRespawnLavaPool(p);
+            }
+            return;
+        }
+
+        // ── Fusing (about to explode) — frozen in place ─────────────
+        if (p.state === 'fusing') {
+            p.fuseT -= dtMs;
+            if (p.fuseT <= 0) _egHzDetonateLava(p);
+            return;
+        }
+
+        // ── Active: slow drift + collision detection ────────────────
+        if (!p.el || !p.el.isConnected) return;
 
         // Slow drift; bounce off viewport edges and steer around the grid.
         let nx = p.x + p.vx * dtS;
@@ -395,18 +604,10 @@ function _egHzTickLava(dtMs) {
         p.x = nx; p.y = ny;
         p.el.style.transform = `translate(${Math.round(p.x - p.r)}px, ${Math.round(p.y - p.r)}px)`;
 
-        // Fire damage while the player stands inside the pool.
-        p.dmgAcc += dtMs;
-        if (p.dmgAcc >= EG_HZ_LAVA_TICK_MS) {
-            p.dmgAcc = 0;
-            if (pr) {
-                const cx = pr.left + pr.width / 2;
-                const cy = pr.top + pr.height / 2;
-                const dx = cx - p.x, dy = cy - p.y;
-                if (dx * dx + dy * dy <= Math.pow(p.r * 0.95, 2)) {
-                    _egHzDamage(EG_HZ_LAVA_BASE_DMG_PCT * _egHzLava.dmgMult, 'fire', '#ff6b4a');
-                }
-            }
+        // Collision → start 0.5 s fuse, then heavy fire explosion
+        // Tight sprite hitbox vs lava disc (r * 0.88 keeps leniency for shoulders)
+        if (pr && _egHzCircleRectOverlap(p.x, p.y, p.r * 0.88, pr)) {
+            _egHzTriggerLavaFuse(p);
         }
     });
 }
@@ -457,18 +658,13 @@ function _egHzTickLightning(dtMs) {
         setTimeout(() => warnEl.remove(), 350);
         st.pending.splice(i, 1);
 
-        const pr = _egHzPlayerRect();
-        if (pr) {
-            const cx = pr.left + pr.width / 2;
-            const cy = pr.top + pr.height / 2;
-            const dx = cx - strike.x, dy = cy - strike.y;
-            if (dx * dx + dy * dy <= Math.pow(EG_HZ_LIGHTNING_RADIUS, 2)) {
-                const dealt = _egHzDamage(
-                    EG_HZ_LIGHTNING_BASE_DMG_PCT * st.dmgMult, 'lightning', '#ffe66b'
-                );
-                if (dealt > 0 && typeof _egApplyPlayerAilment === 'function') {
-                    _egApplyPlayerAilment('shocked');
-                }
+        const pr = _egHzPlayerHitbox();
+        if (pr && _egHzCircleRectOverlap(strike.x, strike.y, EG_HZ_LIGHTNING_RADIUS, pr)) {
+            const dealt = _egHzDamage(
+                EG_HZ_LIGHTNING_BASE_DMG_PCT * st.dmgMult, 'lightning', '#ffe66b'
+            );
+            if (dealt > 0 && typeof _egApplyPlayerAilment === 'function') {
+                _egApplyPlayerAilment('shocked');
             }
         }
     }
@@ -538,7 +734,7 @@ function _egHzTickBlizzard(dtMs) {
     }
 
     const dtS = dtMs / 1000;
-    const pr = _egHzPlayerRect();
+    const pr = _egHzPlayerHitbox();
 
     for (let i = st.icicles.length - 1; i >= 0; i--) {
         const ic = st.icicles[i];
@@ -560,15 +756,17 @@ function _egHzTickBlizzard(dtMs) {
                 ic.el.classList.add('eg-hz-icicle-fall');
             }
         } else {
+            const prevY = ic.y;
             ic.y += EG_HZ_ICICLE_FALL_SPEED * dtS;
             ic.el.style.transform = `translateY(${Math.round(ic.y)}px)`;
 
             if (pr && !ic.hitDone) {
-                const icRect = {
+                // Swept rect so 140px/tick tunneling can't skip the sprite
+                const swept = {
                     left: ic.x, right: ic.x + ic.w,
-                    top: ic.y, bottom: ic.y + ic.h,
+                    top: Math.min(prevY, ic.y), bottom: Math.max(prevY + ic.h, ic.y + ic.h),
                 };
-                if (_egHzRectsOverlap(icRect, pr)) {
+                if (_egHzRectsOverlap(swept, pr)) {
                     ic.hitDone = true;
                     const dealt = _egHzDamage(
                         EG_HZ_ICICLE_BASE_DMG_PCT * st.dmgMult, 'cold', '#8fd8ff'
@@ -698,13 +896,16 @@ function _egHzTickArcane(dtMs) {
     // ── Beam sweep phase ──────────────────────────────────────────────
     if (st.beam) {
         const b = st.beam;
+        const prevX = b.x;
         b.x -= b.speed * (dtMs / 1000);
         b.el.style.transform = `translateX(${Math.round(b.x)}px)`;
 
-        const pr = _egHzPlayerRect();
+        const pr = _egHzPlayerHitbox();
         if (pr && !b.hitDone) {
-            const beamRight = b.x + b.w;
-            if (beamRight >= pr.left && b.x <= pr.right) {
+            // Swept horizontal interval so 240px/tick doesn't tunnel over 70px hitbox
+            const sweptLeft = Math.min(b.x, prevX);
+            const sweptRight = Math.max(b.x + b.w, prevX + b.w);
+            if (sweptRight >= pr.left && sweptLeft <= pr.right) {
                 const bandTop = b.y - EG_HZ_ARCANE_BEAM_HEIGHT / 2;
                 const bandBottom = b.y + EG_HZ_ARCANE_BEAM_HEIGHT / 2;
                 if (pr.bottom > bandTop && pr.top < bandBottom) {
@@ -801,7 +1002,7 @@ function _egHzTickMeteor(dtMs) {
     }
 
     const dtS = dtMs / 1000;
-    const pr = _egHzPlayerRect();
+    const pr = _egHzPlayerHitbox();
 
     for (let i = st.pending.length - 1; i >= 0; i--) {
         const m = st.pending[i];
@@ -840,19 +1041,14 @@ function _egHzTickMeteor(dtMs) {
                 }
                 st.pending.splice(i, 1);
 
-                if (pr) {
-                    const cx = pr.left + pr.width / 2;
-                    const cy = pr.top + pr.height / 2;
-                    const dx = cx - m.x, dy = cy - m.y;
-                    if (dx * dx + dy * dy <= Math.pow(EG_HZ_METEOR_RADIUS, 2)) {
-                        const dealt = _egHzDamage(
-                            EG_HZ_METEOR_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
-                        );
-                        if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-                            && Math.random() * 100 < EG_HZ_METEOR_IGNITE_CHANCE_PCT) {
-                            _egApplyPlayerAilment('ignite',
-                                Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
-                        }
+                if (pr && _egHzCircleRectOverlap(m.x, m.y, EG_HZ_METEOR_RADIUS, pr)) {
+                    const dealt = _egHzDamage(
+                        EG_HZ_METEOR_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
+                    );
+                    if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
+                        && Math.random() * 100 < EG_HZ_METEOR_IGNITE_CHANCE_PCT) {
+                        _egApplyPlayerAilment('ignite',
+                            Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
                     }
                 }
             }
@@ -914,20 +1110,15 @@ function _egHzDetonateVolatile(wisp) {
         wisp.el = null;
     }
 
-    const pr = _egHzPlayerRect();
-    if (pr) {
-        const cx = pr.left + pr.width / 2;
-        const cy = pr.top + pr.height / 2;
-        const dx = cx - wisp.x, dy = cy - wisp.y;
-        if (dx * dx + dy * dy <= Math.pow(EG_HZ_VOLATILE_BLAST_R, 2)) {
-            const dealt = _egHzDamage(
-                EG_HZ_VOLATILE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#b39ddb'
-            );
-            if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-                && Math.random() * 100 < EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT) {
-                _egApplyPlayerAilment('shadowburn',
-                    Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_SHADOWBURN_DMG_SHARE));
-            }
+    const pr = _egHzPlayerHitbox();
+    if (pr && _egHzCircleRectOverlap(wisp.x, wisp.y, EG_HZ_VOLATILE_BLAST_R, pr)) {
+        const dealt = _egHzDamage(
+            EG_HZ_VOLATILE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#b39ddb'
+        );
+        if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
+            && Math.random() * 100 < EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT) {
+            _egApplyPlayerAilment('shadowburn',
+                Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_SHADOWBURN_DMG_SHARE));
         }
     }
 
@@ -941,7 +1132,7 @@ function _egHzDetonateVolatile(wisp) {
 function _egHzTickVolatile(dtMs) {
     const st = _egHzVolatile;
     const dtS = dtMs / 1000;
-    const pr = _egHzPlayerRect();
+    const pr = _egHzPlayerHitbox();
 
     // Respawn timer for detonated wisps.
     if (st.respawnIn > 0) {
@@ -968,11 +1159,12 @@ function _egHzTickVolatile(dtMs) {
         if (w.state === 'hunt') {
             w.life -= dtMs;
             if (pr) {
+                // Use hitbox center for homing; trigger when wisp disc overlaps trigger radius vs hitbox
                 const cx = pr.left + pr.width / 2;
                 const cy = pr.top + pr.height / 2;
                 const dx = cx - w.x, dy = cy - w.y;
                 const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-                if (dist <= EG_HZ_VOLATILE_TRIGGER_R || w.life <= 0) {
+                if (_egHzCircleRectOverlap(w.x, w.y, EG_HZ_VOLATILE_TRIGGER_R, pr) || w.life <= 0) {
                     w.state = 'fuse';
                     w.t = EG_HZ_VOLATILE_FUSE_MS;
                     w.el.classList.add('eg-hz-volatile-fuse');
@@ -1014,7 +1206,7 @@ function _egHzSpawnFrostNova() {
     // Erupt close to the player so the expanding ring must be reacted to.
     let x = window.innerWidth * 0.5;
     let y = window.innerHeight * 0.5;
-    const pr = _egHzPlayerRect();
+    const pr = _egHzPlayerHitbox();
     if (pr) {
         x = pr.left + pr.width / 2 + _egHzRand(-240, 240);
         y = pr.top + pr.height / 2 + _egHzRand(-240, 240);
@@ -1044,12 +1236,13 @@ function _egHzTickFrostNova(dtMs) {
         _egHzSpawnFrostNova();
     }
 
-    const pr = _egHzPlayerRect();
+    const pr = _egHzPlayerHitbox();
 
     for (let i = st.novas.length - 1; i >= 0; i--) {
         const nova = st.novas[i];
         if (!nova.el.isConnected) { st.novas.splice(i, 1); continue; }
 
+        nova.prevR = nova.r;
         nova.t -= dtMs;
         nova.r = EG_HZ_FROSTNOVA_MAX_R *
             Math.min(1, 1 - nova.t / EG_HZ_FROSTNOVA_EXPAND_MS);
@@ -1061,12 +1254,12 @@ function _egHzTickFrostNova(dtMs) {
         nova.el.style.marginTop = (-nova.r) + 'px';
 
         // The ring band damages the player exactly once as it sweeps past.
+        // Swept so 10px/tick + 26px band can't be missed; tight hitbox vs ring.
         if (pr && !nova.hitDone) {
-            const cx = pr.left + pr.width / 2;
-            const cy = pr.top + pr.height / 2;
-            const dist = Math.sqrt(Math.pow(cx - nova.x, 2) + Math.pow(cy - nova.y, 2));
-            if (dist <= nova.r + EG_HZ_FROSTNOVA_BAND &&
-                dist >= nova.r - EG_HZ_FROSTNOVA_BAND) {
+            const prevR = (typeof nova.prevR === 'number') ? nova.prevR : nova.r;
+            const hitNow = _egHzRingRectOverlap(nova.x, nova.y, nova.r, EG_HZ_FROSTNOVA_BAND, pr);
+            const hitPrev = _egHzRingRectOverlap(nova.x, nova.y, prevR, EG_HZ_FROSTNOVA_BAND, pr);
+            if (hitNow || hitPrev) {
                 nova.hitDone = true;
                 const dealt = _egHzDamage(
                     EG_HZ_FROSTNOVA_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff'
@@ -1133,7 +1326,7 @@ function _egHzTickFirewall(dtMs) {
         });
     }
 
-    const pr = _egHzPlayerRect();
+    const pr = _egHzPlayerHitbox();
 
     for (let i = st.pending.length - 1; i >= 0; i--) {
         const w = st.pending[i];
@@ -1146,11 +1339,15 @@ function _egHzTickFirewall(dtMs) {
         }
 
         // Sweeping phase — the wave descends and burns what it passes once.
+        const prevY = w.y;
         const totalDist = window.innerHeight + EG_HZ_FIREWALL_HEIGHT;
         w.y += (totalDist / (EG_HZ_FIREWALL_SWEEP_MS / 1000)) * dtS;
         w.el.style.transform = `translateY(${Math.round(w.y)}px)`;
 
-        if (!w.hitDone && pr && pr.bottom > w.y && pr.top < w.y + EG_HZ_FIREWALL_HEIGHT) {
+        // Swept so 34px/tick can't skip ~56px hitbox
+        const wallTop = Math.min(prevY, w.y);
+        const wallBottom = Math.max(prevY + EG_HZ_FIREWALL_HEIGHT, w.y + EG_HZ_FIREWALL_HEIGHT);
+        if (!w.hitDone && pr && pr.bottom > wallTop && pr.top < wallBottom) {
             w.hitDone = true;
             const dealt = _egHzDamage(
                 EG_HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
@@ -1207,11 +1404,12 @@ function _egHzInitCyclone(intensity) {
 function _egHzTickCyclone(dtMs) {
     const st = _egHzCyclone;
     const dtS = dtMs / 1000;
-    const pr = _egHzPlayerRect();
+    const pr = _egHzPlayerHitbox();
 
     st.vortices.forEach(v => {
         if (!v.el.isConnected) return;
 
+        const prevX = v.x, prevY = v.y;
         let nx = v.x + v.vx * dtS;
         let ny = v.y + v.vy * dtS;
         if (nx < v.r || nx > window.innerWidth - v.r) { v.vx *= -1; nx = v.x; }
@@ -1224,13 +1422,8 @@ function _egHzTickCyclone(dtMs) {
         v.dmgAcc += dtMs;
         if (v.dmgAcc >= EG_HZ_CYCLONE_TICK_MS) {
             v.dmgAcc = 0;
-            if (pr) {
-                const cx = pr.left + pr.width / 2;
-                const cy = pr.top + pr.height / 2;
-                const dx = cx - v.x, dy = cy - v.y;
-                if (dx * dx + dy * dy <= Math.pow(v.r * 0.9, 2)) {
-                    _egHzDamage(EG_HZ_CYCLONE_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff');
-                }
+            if (pr && _egHzSweptCircleRectOverlap(prevX, prevY, v.x, v.y, v.r * 0.9, pr)) {
+                _egHzDamage(EG_HZ_CYCLONE_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff');
             }
         }
     });

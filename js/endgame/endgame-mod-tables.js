@@ -238,9 +238,9 @@ const EG_MOD_TABLE_HEAD = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -401,7 +401,27 @@ const EG_MOD_TABLE_HEAD = {
         },
 
 
-    },
+    
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
         // --- ATTRIBUTES ---
@@ -524,19 +544,29 @@ const EG_MOD_TABLE_HEAD = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -613,12 +643,32 @@ const EG_MOD_TABLE_EARRING = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 100, ilvl: 78 },
-                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 50 },
-                { tier: 3, min: 8, max: 17, weight: 600, ilvl: 15 }
+                { tier: 1, min: 30, max: 40, weight: 350, ilvl: 78 },
+                { tier: 2, min: 18, max: 29, weight: 700, ilvl: 35 },
+                { tier: 3, min: 8, max: 17, weight: 1400, ilvl: 1 }
             ]
-        }
-    },
+        },
+    
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -744,19 +794,29 @@ const EG_MOD_TABLE_EARRING = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
-                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
+                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -894,9 +954,9 @@ const EG_MOD_TABLE_AMULET = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 35, max: 45, weight: 100, ilvl: 78 },
-                { tier: 2, min: 22, max: 34, weight: 300, ilvl: 50 },
-                { tier: 3, min: 10, max: 21, weight: 600, ilvl: 15 }
+                { tier: 1, min: 35, max: 45, weight: 350, ilvl: 78 },
+                { tier: 2, min: 22, max: 34, weight: 700, ilvl: 35 },
+                { tier: 3, min: 10, max: 21, weight: 1400, ilvl: 1 }
             ]
         },
         mistake_not_count: {
@@ -904,12 +964,23 @@ const EG_MOD_TABLE_AMULET = {
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             // Amulet-exclusive — powerful puzzle utility, kept very rare
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 40, ilvl: 85 },
-                { tier: 2, min: 6, max: 11, weight: 120, ilvl: 65 },
-                { tier: 3, min: 2, max: 5, weight: 350, ilvl: 15 }
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
             ]
-        }
-    },
+        },
+    
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -1108,19 +1179,29 @@ const EG_MOD_TABLE_AMULET = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 9, max: 14, weight: 150, ilvl: 75 },
-                { tier: 2, min: 4, max: 8, weight: 400, ilvl: 15 }
+                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+    
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -1322,9 +1403,9 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -1350,8 +1431,28 @@ const EG_MOD_TABLE_SHOULDERS = {
                 { tier: 3, min: 6, max: 12, weight: 450, ilvl: 35 },
                 { tier: 4, min: 2, max: 5, weight: 1000, ilvl: 10 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -1554,19 +1655,29 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -1753,9 +1864,9 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -1784,8 +1895,28 @@ const EG_MOD_TABLE_CLOAK = {
                 { tier: 3, min: 6, max: 12, weight: 450, ilvl: 35 },
                 { tier: 4, min: 2, max: 5, weight: 950, ilvl: 10 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -1959,19 +2090,29 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -2189,9 +2330,9 @@ const EG_MOD_TABLE_CHEST = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -2237,8 +2378,28 @@ const EG_MOD_TABLE_CHEST = {
                 { tier: 3, min: 0.8, max: 1.4, weight: 420, ilvl: 36 },
                 { tier: 4, min: 0.3, max: 0.7, weight: 950, ilvl: 10 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -2476,19 +2637,29 @@ const EG_MOD_TABLE_CHEST = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -2746,12 +2917,32 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -2925,19 +3116,29 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -3196,9 +3397,9 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -3211,13 +3412,23 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 60, ilvl: 84 },
-                { tier: 2, min: 18, max: 29, weight: 160, ilvl: 65 },
-                { tier: 3, min: 8, max: 17, weight: 380, ilvl: 40 },
-                { tier: 4, min: 2, max: 7, weight: 850, ilvl: 15 }
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -3387,9 +3598,9 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 50, ilvl: 84 },
-                { tier: 2, min: 14, max: 24, weight: 140, ilvl: 65 },
-                { tier: 3, min: 5, max: 13, weight: 360, ilvl: 15 }
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
             ]
         },
 
@@ -3398,16 +3609,16 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
         }
     }
@@ -3652,12 +3863,32 @@ const EG_MOD_TABLE_BELT = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -3791,19 +4022,29 @@ const EG_MOD_TABLE_BELT = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -4037,9 +4278,9 @@ const EG_MOD_TABLE_PANTS = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -4059,8 +4300,28 @@ const EG_MOD_TABLE_PANTS = {
                 { tier: 3, min: 6, max: 12, weight: 460, ilvl: 38 },
                 { tier: 4, min: 2, max: 5, weight: 1000, ilvl: 12 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -4232,19 +4493,29 @@ const EG_MOD_TABLE_PANTS = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 //------------------------------------------------------------------------
@@ -4480,9 +4751,9 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -4503,8 +4774,28 @@ const EG_MOD_TABLE_BOOTS = {
                 { tier: 3, min: 10, max: 21, min2: 14, max2: 25, weight: 460, ilvl: 38 },
                 { tier: 4, min: 3, max: 9, min2: 6, max2: 13, weight: 1000, ilvl: 12 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -4650,19 +4941,29 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 //------------------------------------------------------------------------
@@ -4794,9 +5095,9 @@ const EG_MOD_TABLE_RING = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
-                { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
-                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 15 }
+                { tier: 1, min: 32, max: 42, weight: 350, ilvl: 78 },
+                { tier: 2, min: 20, max: 31, weight: 700, ilvl: 35 },
+                { tier: 3, min: 9, max: 19, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -4817,8 +5118,28 @@ const EG_MOD_TABLE_RING = {
                 { tier: 3, min: 11, max: 23, weight: 460, ilvl: 38 },
                 { tier: 4, min: 3, max: 10, weight: 1000, ilvl: 12 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -4964,16 +5285,16 @@ const EG_MOD_TABLE_RING = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
-                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
+                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
             ]
         },
 
@@ -4994,8 +5315,18 @@ const EG_MOD_TABLE_RING = {
                 { tier: 3, min: 8, max: 15, min2: 12, max2: 21, weight: 380, ilvl: 42 },
                 { tier: 4, min: 2, max: 7, min2: 5, max2: 11, weight: 880, ilvl: 15 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 //------------------------------------------------------------------------
@@ -5145,9 +5476,9 @@ const EG_MOD_TABLE_ARCANE = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
-                { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
-                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 15 }
+                { tier: 1, min: 32, max: 42, weight: 350, ilvl: 78 },
+                { tier: 2, min: 20, max: 31, weight: 700, ilvl: 35 },
+                { tier: 3, min: 9, max: 19, weight: 1400, ilvl: 1 }
             ]
         },
 
@@ -5186,8 +5517,28 @@ const EG_MOD_TABLE_ARCANE = {
                 { tier: 3, min: 5, max: 10, weight: 420, ilvl: 40 },
                 { tier: 4, min: 2, max: 4, weight: 950, ilvl: 15 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -5322,19 +5673,29 @@ const EG_MOD_TABLE_ARCANE = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
-                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
+                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 
@@ -5448,21 +5809,32 @@ const EG_MOD_TABLE_TALISMAN = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 32, max: 42, weight: 100, ilvl: 78 },
-                { tier: 2, min: 20, max: 31, weight: 300, ilvl: 50 },
-                { tier: 3, min: 9, max: 19, weight: 600, ilvl: 15 }
+                { tier: 1, min: 32, max: 42, weight: 350, ilvl: 78 },
+                { tier: 2, min: 20, max: 31, weight: 700, ilvl: 35 },
+                { tier: 3, min: 9, max: 19, weight: 1400, ilvl: 1 }
             ]
         },
         mistake_not_count: {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 40, ilvl: 85 },
-                { tier: 2, min: 6, max: 11, weight: 120, ilvl: 65 },
-                { tier: 3, min: 2, max: 5, weight: 350, ilvl: 15 }
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
             ]
-        }
-    },
+        },
+
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -5606,19 +5978,29 @@ const EG_MOD_TABLE_TALISMAN = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 150, ilvl: 75 },
-                { tier: 2, min: 3, max: 7, weight: 400, ilvl: 15 }
+                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 //------------------------------------------------------------------------
@@ -5790,12 +6172,32 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -5957,19 +6359,29 @@ const EG_MOD_TABLE_WEAPON1 = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 //------------------------------------------------------------------------
@@ -6261,12 +6673,32 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 15 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -6485,19 +6917,29 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 15 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 15 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };
 
 //------------------------------------------------------------------------
@@ -6646,12 +7088,32 @@ const EG_MOD_TABLE_RANGED = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 300, ilvl: 50 },
-                { tier: 3, min: 15, max: 29, weight: 600, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
             ]
-        }
-    },
+        },
+
+        mistake_not_count: {
+            id: 'mistake_not_count',
+            label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+            ]
+        },
+        chance_for_new_question: {
+            id: 'chance_for_new_question',
+            label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+            ]
+        },
+},
 
     suffixes: {
 
@@ -6802,17 +7264,27 @@ const EG_MOD_TABLE_RANGED = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 25, ilvl: 85 },
-                { tier: 2, min: 1, max: 1, weight: 100, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 150, ilvl: 75 },
-                { tier: 2, min: 5, max: 9, weight: 400, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
             ]
-        }
-    }
+        },
+
+        reveal_hint: {
+            id: 'reveal_hint',
+            label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
+            tiers: [
+                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+            ]
+        },
+}
 };

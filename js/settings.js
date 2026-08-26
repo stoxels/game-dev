@@ -22,6 +22,7 @@ const SETTINGS_DEFAULTS = {
     penaltyFlash: true,         // brief red screen flash on a mistake
     toastDuration: 8,           // seconds an on-screen notification stays visible
     invertMouseButtons: false,  // swap fill (left-click) and mark (right-click)
+    hidePassiveTrackerInEndgame: false, // hide passive tracker during endgame maps
     lang: 'en',                 // persisted interface language
 };
 
@@ -39,6 +40,7 @@ const TOGGLE_CONFIGS = [
     { key: 'invertMouseButtons', btnId: 'stt-invert' },
     { key: 'lowTimeVignette', btnId: 'stt-ltv' },
     { key: 'penaltyFlash', btnId: 'stt-penflash' },
+    { key: 'hidePassiveTrackerInEndgame', btnId: 'stt-hidepassiveendgame' },
 ];
 
 // Describes every slider control in the settings modal.
@@ -201,6 +203,10 @@ function initToggleControl(btnId, settingsKey, applyOnChange = true) {
         saveSettings(SETTINGS);
         if (applyOnChange) applySettings();
         loadSettingsUI();
+        // Passive tracker endgame hide needs immediate visual update
+        if (settingsKey === 'hidePassiveTrackerInEndgame' && typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) {
+            PassiveTracker.refreshVisibility();
+        }
     });
 }
 
@@ -240,6 +246,7 @@ function initSettingsControls() {
     initToggleControl('stt-invert', 'invertMouseButtons', false);
     initToggleControl('stt-ltv', 'lowTimeVignette', false);
     initToggleControl('stt-penflash', 'penaltyFlash', false);
+    initToggleControl('stt-hidepassiveendgame', 'hidePassiveTrackerInEndgame', false);
 
 
     // Sliders (volume + toast duration)

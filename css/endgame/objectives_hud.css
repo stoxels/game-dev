@@ -1,349 +1,148 @@
-﻿/* ── Endgame Objectives Panel ─────────────── */
+﻿/* ── Endgame Objectives — Top-Center Single Line ─────────────── */
 #eg-objectives-strip {
     position: fixed;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 250;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    background: linear-gradient(160deg, rgba(35, 43, 57, 0.97), rgba(23, 28, 38, 0.97));
-    border: 1px solid rgba(122, 138, 168, 0.4);
-    border-radius: 10px;
-    padding: 10px 10px 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-    min-width: 185px;
-    max-width: 240px;
+    align-items: center;
+    gap: 6px;
     pointer-events: auto;
-    backdrop-filter: blur(6px);
-}
-
-/* Accent stripe along the panel's left edge */
-#eg-objectives-strip::before {
-    content: '';
-    position: absolute;
-    top: 8px;
-    bottom: 8px;
-    left: 0;
-    width: 3px;
-    border-radius: 3px;
-    background: linear-gradient(180deg, #4ade80, #38bdf8 60%, #818cf8);
-    box-shadow: 0 0 8px rgba(56, 189, 248, 0.35);
+    max-width: 92vw;
 }
 
     #eg-objectives-strip.eg-hidden {
         display: none !important;
     }
 
-/* Section label at the top — doubles as the drag handle */
-.eg-obj-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    font-size: 0.8em;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #f1f5f9;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-/* Title text inside the header (drag handle area) */
-.eg-obj-title {
-    flex: 1;
-    cursor: grab;
-    user-select: none;
-}
-
-#eg-objectives-strip.eg-dragging .eg-obj-title {
-    cursor: grabbing;
-}
-
-/* Small square minimize button, styled like the passive tracker's toggle */
-.eg-obj-collapse {
-    background: none;
-    border: 1px solid #4a5568;
-    color: #a0aec0;
-    font-family: inherit;
-    font-size: 12px;
-    line-height: 1;
-    width: 18px;
-    height: 18px;
+/* The single-line pill containing the objectives */
+.eg-obj-line {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 3px;
-    cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
-    transition: background 0.12s, color 0.12s;
+    flex-wrap: wrap;
+    gap: 14px 18px;
+    background: linear-gradient(160deg, rgba(18, 22, 34, 0.96), rgba(12, 15, 26, 0.96));
+    border: 1px solid rgba(122, 138, 168, 0.38);
+    border-radius: 999px;
+    padding: 7px 18px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+    font-size: 0.88em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #e2e8f0;
+    white-space: nowrap;
 }
 
-    .eg-obj-collapse:hover {
-        background: rgba(255, 255, 255, 0.12);
-        color: #fff;
-    }
-
-/* Body wrapper holding all rows + leave button — hidden when minimized */
-.eg-obj-body {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+.eg-obj-seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
 }
 
-#eg-objectives-strip.eg-collapsed {
-    opacity: 0.75;
+.eg-obj-seg-val {
+    color: #f1f5f9;
+    font-weight: 800;
 }
 
-/* Individual objective row: icon badge + label */
-.eg-obj-item {
+.eg-obj-seg-label {
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+/* Action buttons that appear underneath / beside the line */
+.eg-obj-actions {
     display: flex;
     align-items: center;
-    gap: 7px;
-    font-size: 0.9em;
-    padding: 5px 8px;
-    border-radius: 6px;
-    border-left: 2px solid transparent;
-    color: #f7fafc;
-    line-height: 1.35;
-    transition: color 0.2s, background 0.2s, border-color 0.2s;
+    justify-content: center;
+    gap: 8px;
 }
 
-/* Label can wrap inside the panel instead of overflowing its border */
-.eg-obj-label {
-    flex: 1;
-    min-width: 0;
-    overflow-wrap: break-word;
-}
-
-.eg-obj-icon {
-    flex-shrink: 0;
-    font-size: 1.05em;
-    line-height: 1;
-}
-
-.eg-obj-done {
-    color: #86efac;
-    background: linear-gradient(90deg, rgba(74, 222, 128, 0.16), rgba(74, 222, 128, 0.03));
-    border-left-color: rgba(74, 222, 128, 0.55);
-}
-
-    .eg-obj-done::after {
-        content: '✓';
-        margin-left: auto;
-        padding-left: 6px;
-        font-weight: 700;
-        color: #4ade80;
-        text-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
-        flex-shrink: 0;
-    }
-
-    .eg-obj-done .eg-obj-icon {
-        filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.45));
-    }
-
-.eg-obj-pending {
-    color: #cbd5e1;
-    background: rgba(255, 255, 255, 0.04);
-    border-left-color: rgba(148, 163, 184, 0.25);
-}
-
-    .eg-obj-pending .eg-obj-icon {
-        filter: grayscale(0.65);
-        opacity: 0.85;
-    }
-
-/* Boss row while the arena is still sealed */
-.eg-obj-boss-locked {
-    color: #94a3b8;
-    background: rgba(148, 163, 184, 0.06);
-}
-
-    .eg-obj-boss-locked .eg-obj-icon {
-        animation: eg-boss-lock-breathe 2.4s ease-in-out infinite;
-    }
-
-@keyframes eg-boss-lock-breathe {
-    0%, 100% { filter: grayscale(1); opacity: 0.6; }
-    50%      { filter: grayscale(0.4); opacity: 0.95; }
-}
-
-/* --- LOOT TOOLTIP STYLES --- */
-.eg-loot-container {
-    position: relative;
-    cursor: help;
-}
-
-.eg-loot-tooltip {
-    display: none;
-    position: absolute;
-    left: 100%; /* Show to the right of the panel */
-    margin-left: 8px; /* Visual spacing */
-    top: 0;
-    background: rgba(26, 32, 44, 0.98); /* Dark slate background */
+.eg-obj-action-btn {
+    font-size: 0.82em;
+    font-weight: 800;
+    padding: 7px 16px;
+    border-radius: 999px;
     border: 1px solid #4a5568;
-    padding: 8px 12px;
-    border-radius: 6px;
-    min-width: 140px;
-    z-index: 300;
-    white-space: nowrap;
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
-    font-size: 0.95em;
-    pointer-events: auto; /* Allow the mouse to interact with the list inside */
-}
-
-    /* Invisible bridge to prevent the tooltip from collapsing while the mouse travels to it */
-    .eg-loot-tooltip::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: -15px; /* Reaches back over the gap to the main panel */
-        width: 15px;
-    }
-
-/* Show the tooltip when hovering over the Loot row */
-.eg-loot-container:hover .eg-loot-tooltip {
-    display: block;
-}
-
-/* Leave Map button inside the panel */
-.eg-leave-btn {
-    margin-top: 10px;
-    font-size: 0.8em; /* Increased from 0.7em */
-    font-weight: 700;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #444;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.1s, box-shadow 0.18s;
     white-space: nowrap;
-    letter-spacing: 0.03em;
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
+    letter-spacing: 0.04em;
+    pointer-events: auto;
 }
 
-.eg-leave-locked {
-    background: #2d3748;
-    color: #a0aec0;
-    cursor: not-allowed;
-    border-color: #4a5568;
-    opacity: 0.85;
+.eg-obj-action-btn:active {
+    transform: scale(0.97);
 }
 
-.eg-leave-ready {
-    background: linear-gradient(180deg, #0f3320, #0d2b1a);
-    color: #4ade80;
-    border-color: #2d7a4f;
-    box-shadow: 0 0 10px rgba(74, 222, 128, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-    .eg-leave-ready:hover {
-        background: #2d7a4f;
-        color: #fff;
-        transform: translateY(-1px);
-        border-color: #4ade80;
-    }
-
-/* Enter Boss Arena button — appears in the tracker once every other
-   objective is done. Red/danger styling to signal the final challenge. */
-.eg-enter-boss-btn {
-    margin-top: 10px;
-    font-size: 0.8em;
-    font-weight: 700;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #7a2d2d;
-    background: #2b0d0d;
+/* Enter Boss Arena — red danger pulse */
+.eg-obj-action-boss {
+    background: linear-gradient(180deg, #3d1212, #2b0d0d);
     color: #f87171;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s,
-                box-shadow 0.2s;
-    white-space: nowrap;
-    letter-spacing: 0.03em;
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
-    animation: eg-enter-boss-pulse 1.6s ease-in-out infinite;
+    border-color: #7a2d2d;
+    box-shadow: 0 0 0 rgba(248, 113, 113, 0);
+    animation: eg-boss-btn-pulse 1.6s ease-in-out infinite;
 }
 
-    .eg-enter-boss-btn:hover {
+    .eg-obj-action-boss:hover {
         background: #7a2d2d;
         color: #fff;
-        transform: translateY(-1px);
         border-color: #f87171;
         animation-play-state: paused;
     }
 
-@keyframes eg-enter-boss-pulse {
+@keyframes eg-boss-btn-pulse {
     0%, 100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0.0); }
-    50%      { box-shadow: 0 0 10px rgba(248, 113, 113, 0.55); }
+    50%      { box-shadow: 0 0 14px rgba(248, 113, 113, 0.55); }
 }
 
-
-/* --- INDIVIDUAL LOOT ITEM ROWS --- */
-.eg-loot-item-row {
-    position: relative;
-    padding: 5px 0;
-    font-size: 0.95em;
-    cursor: help;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    align-items: center;
+/* Complete Map — green highlighted, strong pulse when ready */
+.eg-obj-action-complete {
+    background: linear-gradient(180deg, #143522, #0d2b1a);
+    color: #4ade80;
+    border-color: #2d7a4f;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    animation: eg-complete-pulse 1.4s ease-in-out infinite;
 }
 
-    .eg-loot-item-row:last-child {
-        border-bottom: none;
+    .eg-obj-action-complete:hover {
+        background: #1e6a3a;
+        color: #fff;
+        border-color: #4ade80;
+        box-shadow: 0 0 18px rgba(74, 222, 128, 0.6);
+        animation-play-state: paused;
     }
 
-.eg-loot-item-icon {
-    opacity: 0.8;
-    margin-right: 6px;
-    font-size: 1.1em;
+@keyframes eg-complete-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(74, 222, 128, 0.35), inset 0 1px 0 rgba(255,255,255,0.06); transform: scale(1); }
+    50%      { box-shadow: 0 0 22px rgba(74, 222, 128, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
 }
 
-/* --- NESTED HUB TOOLTIP --- */
-.eg-nested-tooltip {
-    display: none;
-    position: absolute;
-    left: 105%; /* Pop out to the right of the first tooltip */
-    top: -10px; /* Align slightly above the hovered item row */
-    z-index: 400;
-    pointer-events: none; /* Prevent mouse interference */
-    /* Adds a deep shadow to separate the nested tooltip from the background */
-    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.8);
-    border-radius: 6px;
-    /* Ensure the Hub's tooltip frame doesn't wrap awkwardly */
-    min-width: 200px;
-    white-space: normal;
+/* Locked Complete Map — dim, no pulse */
+.eg-obj-action-locked {
+    background: #1e293b;
+    color: #64748b;
+    border-color: #334155;
+    cursor: not-allowed;
+    opacity: 0.9;
 }
 
-/* Reveal the nested tooltip when hovering over an item row */
-.eg-loot-item-row:hover .eg-nested-tooltip {
-    display: block;
-}
-
-
-
-.eg-obj-mistakes-ok {
-    color: #cbd5e1;
-    background: transparent;
-}
-
-.eg-obj-mistakes-warn {
-    color: #fbbf24;
-    background: rgba(251, 191, 36, 0.12);
-}
-
-.eg-obj-mistakes-danger {
-    color: #f87171;
-    background: rgba(248, 113, 113, 0.16);
+/* Responsive: on very narrow screens reduce gap/padding */
+@media (max-width: 560px) {
+    .eg-obj-line {
+        gap: 10px 12px;
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+    .eg-obj-action-btn {
+        font-size: 0.76em;
+        padding: 6px 12px;
+    }
 }
 
 /* ── MAP CLEARED banner ─────────────────────

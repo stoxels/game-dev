@@ -25,8 +25,8 @@
 //-------------------CONFIGURATION----------------------------------------
 //------------------------------------------------------------------------
 
-const EG_MAP_DROP_CHANCE_NORMAL = 0.05;  // 5% per normal monster kill (scaled by Quantity bonus while on a map)
-const EG_MAP_DROP_CHANCE_BOSS = 0.40;    // 40% per boss kill (also scaled by Quantity; boss always drops at least one map)
+const EG_MAP_DROP_CHANCE_NORMAL = 0.055;  // 5.5% per normal monster kill (scaled by Quantity bonus while on a map) — buffed +10%
+const EG_MAP_DROP_CHANCE_BOSS = 0.44;    // 44% per boss kill (also scaled by Quantity; boss always drops at least one map) — buffed +10%
 
 // Highest possible map tier (cap for tier upgrades via the Orb of Horizons).
 const EG_MAX_MAP_TIER = 16;

@@ -956,7 +956,8 @@ function _egBuildStatLine(bucket, stats) {
             };
             const [minKey, maxKey] = pairMap[bucket];
             if (stats[minKey] > 0 || stats[maxKey] > 0) {
-                const labelKey = { fireRange: 'eg_stat_fire_damage', coldRange: 'eg_stat_cold_damage', lightningRange: 'eg_stat_lightning_damage', shadowRange: 'eg_stat_shadow_damage' }[bucket];
+                const base = bucket.startsWith('melee') ? bucket.charAt(5).toLowerCase() + bucket.slice(6) : bucket;
+                const labelKey = { fireRange: 'eg_stat_fire_damage', coldRange: 'eg_stat_cold_damage', lightningRange: 'eg_stat_lightning_damage', shadowRange: 'eg_stat_shadow_damage' }[base];
                 line = { label: t(labelKey), value: `${_egFormatStatValue(stats[minKey])}–${_egFormatStatValue(stats[maxKey])}` };
             }
             break;
@@ -976,7 +977,10 @@ function _egBuildStatLine(bucket, stats) {
 
     if (!line) return null;
     line.bucket = bucket;
-    line.descKey = `eg_statdesc_${bucket}`;
+    // Melee damage ranges share tooltips with their projectile counterparts
+    // (eg_statdesc_meleeFireRange does not exist — fall back to eg_statdesc_fireRange)
+    const descBucket = bucket.startsWith('melee') ? bucket.charAt(5).toLowerCase() + bucket.slice(6) : bucket;
+    line.descKey = `eg_statdesc_${descBucket}`;
     return line;
 }
 

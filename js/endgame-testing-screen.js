@@ -14,7 +14,7 @@
       1. picks a random eligible puzzle from ALL as the seed level
       2. stamps the map's parameters onto that level object
       3. calls startLevel() on it, which (via start-level.js) sees
-         isMonsterLevel === true and kicks off _egStartEncounter()
+          isMonsterLevel === true and kicks off _egStartEncounter()
       4. the existing chain system in endgame-encounter-chain.js takes it
          from there (spawns, boss threshold, puzzle chaining, loot, etc.)
 
@@ -35,7 +35,16 @@
 // puzzlePool criteria are the same shape _egBuildChainPool() already
 // understands (minCells/maxCells/minRows/maxRows/minCols/maxCols/worlds/
 // excludeWorlds) — see endgame-encounter-chain.js.
+// DISABLED: Old test maps up to level 160 — might revisit in future, but for now we
+// test the actual map device / map system instead (see endgame-gate.js +
+// endgame-map-launch.js). The legacy map definitions are kept below inside a
+// block comment for easy re-enable — just remove the block wrappers.
 const EG_TEST_MAPS = [
+    /* DISABLED LEGACY TEST MAPS BEGIN — old system up to level 160 (training_grounds → terminus_theorem)
+       Might revisit in future; for now we test the actual map device with proper map items.
+       To re-enable, remove this block-comment opener and the closer at the end
+       of the array and the maps will appear again on the Endgame Test Maps screen.
+
     {
         id: 'training_grounds',
         tier: 1,
@@ -44,7 +53,7 @@ const EG_TEST_MAPS = [
         desc: '---',
         monsterLevel: 3,
         maxMonsters: 5,
-        totalMonsters: 20,
+        totalMonsters: 15,
         hasBoss: false,
         requiredPuzzles: 3,
         requiredQuestions: 0,
@@ -651,8 +660,7 @@ const EG_TEST_MAPS = [
         egMaxMistakes: 12,
     },
 
-
-
+    DISABLED LEGACY TEST MAPS END */
 ];
 
 

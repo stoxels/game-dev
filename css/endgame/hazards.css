@@ -63,6 +63,52 @@
     50%      { transform: translateY(-8px) scale(1.35); opacity: 0.95; }
 }
 
+/* Fuse — rapid flashing/warming before detonation (0.5 s) */
+.eg-hz-lava-fuse {
+    animation: eg-hz-lava-wobble 0.22s ease-in-out infinite alternate,
+               eg-hz-lava-fuse-flash 0.12s linear infinite !important;
+    filter: brightness(1.6) saturate(1.5);
+}
+
+@keyframes eg-hz-lava-fuse-flash {
+    0%, 100% { box-shadow: 0 0 18px 6px rgba(255, 106, 0, 0.55), inset 0 0 20px rgba(60, 0, 0, 0.65); }
+    50%      { box-shadow: 0 0 34px 14px rgba(255, 220, 120, 0.95), inset 0 0 30px rgba(255, 230, 150, 0.9); }
+}
+
+/* Blast — detached fiery core that puffs up at the detonation point */
+.eg-hz-lava-blast {
+    position: absolute;
+    transform-origin: center center;
+    animation: eg-hz-lava-boom 0.5s ease-out forwards !important;
+    pointer-events: none;
+}
+
+@keyframes eg-hz-lava-boom {
+    0%   { transform: scale(1); opacity: 1; filter: brightness(1.5); }
+    35%  { transform: scale(1.45); opacity: 1; filter: brightness(2.2); }
+    100% { transform: scale(1.85); opacity: 0; filter: brightness(1); }
+}
+
+/* Expanding fire ring so the blast radius (140 px) is readable */
+.eg-hz-lava-explosion {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    border: 4px solid rgba(255, 160, 40, 0.95);
+    background: radial-gradient(circle,
+        rgba(255, 255, 220, 0.9) 0%,
+        rgba(255, 140, 0, 0.55) 38%,
+        rgba(200, 40, 0, 0.28) 62%,
+        transparent 72%);
+    box-shadow: 0 0 36px 14px rgba(255, 106, 0, 0.6);
+    animation: eg-hz-lava-ring 0.5s ease-out forwards;
+}
+
+@keyframes eg-hz-lava-ring {
+    0%   { transform: scale(0.35); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
 
 /* ======================================================================
    = LIGHTNING STORM

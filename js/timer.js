@@ -169,6 +169,22 @@ function pauseTimer() {
 // retry prompt. dead = true and stopTimer() are already called by the
 // tick loop before this function runs.
 function timesUp() {
+    // Endgame map runs must never show the generic lose overlay with a
+    // Retry button — the player keeps loot and returns via the map-failed
+    // screen (_egEndMapDefeated). Intercept timer defeats directly here
+    // instead of relying on the async MutationObserver fallback in
+    // endgame-encounter.js, which would otherwise flash the overlay first.
+    // Campaign / story mode is unaffected (guard checks _egIsActive).
+    if (typeof _egIsActive === 'function' && _egIsActive()) {
+        if (typeof _egEndMapDefeated === 'function') {
+            if (cur) window._lastFailedGi = cur.gIdx;
+            const title = (typeof t === 'function') ? t('eg_map_failed') : 'Map Failed';
+            const sub = (typeof t === 'function') ? t('ov_lose') : "TIME'S UP!";
+            const handled = _egEndMapDefeated(title, sub);
+            if (handled !== false) return;
+        }
+    }
+
     // Record the failed level for the bounceback achievement so scoring.js
     // can detect an immediate retry win on the same level.
     if (cur) window._lastFailedGi = cur.gIdx;

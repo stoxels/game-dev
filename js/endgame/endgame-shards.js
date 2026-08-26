@@ -10,8 +10,9 @@
 // that transmutes into an orb affecting epic-grade gear).
 //
 // Shards live in the runes & orbs strip like normal currency. They stack
-// up to 20; reaching 20 automatically converts the stack into the matching
-// orb (or just bumps the existing orb counter).
+// up to 10 (3 for Horizon Fragments); reaching the cap automatically
+// converts the stack into the matching orb (or just bumps the existing orb
+// counter).
 //
 // Load AFTER endgame-hub.js and endgame-hub-drag-and-drop.js (needs
 // _egInventory, _egRenderInventoryCell, egAddCurrency, egSaveHubState,
@@ -27,6 +28,7 @@
 // through t() so translations stay in translations-strings.js.
 
 const EG_SHARD_STACK_MAX = 10;
+const EG_SHARD_HORIZON_STACK_MAX = 3;
 
 const EG_SHARD_DEFS = {
     shard_transmutation: {
@@ -54,12 +56,13 @@ const EG_SHARD_DEFS = {
         description: t('eg_shard_elevation_desc'),
     },
     // Map-only sell currency: granted when a map item is sold
-    // (Ctrl + left-click). 10 fragments merge into an Orb of Horizons.
+    // (Ctrl + left-click). 3 fragments merge into an Orb of Horizons.
     shard_horizon: {
         id: 'shard_horizon', orbId: 'orb_horizons',
         icon: '🧭', orbIcon: '🌌',
         name: t('eg_shard_horizon'),
         description: t('eg_shard_horizon_desc'),
+        stackSize: EG_SHARD_HORIZON_STACK_MAX,
     },
     shard_ascension: {
         id: 'shard_ascension', orbId: 'orb_ascension',
@@ -130,12 +133,14 @@ function _egRollShardForItem(item) {
 //------------------------------------------------------------------------
 
 // Adds `amount` of a shard type to the currency stash with a stack cap of
-// EG_SHARD_STACK_MAX. Every full stack automatically converts into the
-// shard's parent orb via egAddCurrency() (which merges into an existing
-// orb stack if present). Returns true when the shard was granted.
+// EG_SHARD_STACK_MAX (3 for Horizon Fragments). Every full stack
+// automatically converts into the shard's parent orb via egAddCurrency()
+// (which merges into an existing orb stack if present). Returns true when
+// the shard was granted.
 function egAddShard(id, amount = 1, def = null) {
     const shardDef = def || EG_SHARD_DEFS[id];
     if (!shardDef) return false;
+    const stackMax = shardDef.stackSize || EG_SHARD_STACK_MAX;
 
     // Try to add to an existing stack first.
     for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
@@ -144,8 +149,8 @@ function egAddShard(id, amount = 1, def = null) {
             if (!cell || cell.id !== id) continue;
 
             cell.count = (cell.count || 0) + amount;
-            while (cell.count >= EG_SHARD_STACK_MAX) {
-                cell.count -= EG_SHARD_STACK_MAX;
+            while (cell.count >= stackMax) {
+                cell.count -= stackMax;
                 _egConvertShardsToOrb(shardDef);
             }
             if (cell.count <= 0) _egCurrencyStash[r][c] = null;
@@ -158,16 +163,29 @@ function egAddShard(id, amount = 1, def = null) {
     for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
         for (let c = 0; c < EG_CURRENCY_COLS; c++) {
             if (_egCurrencyStash[r][c]) continue;
-            _egCurrencyStash[r][c] = {
-                id,
-                name: shardDef.name,
-                icon: shardDef.icon,
-                rarity: 'currency',
-                category: 'currency',
-                description: shardDef.description,
-                count: amount,
-            };
+            let count = amount;
+            // Handle the case where the initial amount already covers one or
+            // more full stacks (e.g. Horizon 3-stack granted as amount 3 at once).
+            let orbsFromNew = 0;
+            while (count >= stackMax) {
+                count -= stackMax;
+                orbsFromNew++;
+            }
+            if (count > 0) {
+                _egCurrencyStash[r][c] = {
+                    id,
+                    name: shardDef.name,
+                    icon: shardDef.icon,
+                    rarity: 'currency',
+                    category: 'currency',
+                    description: shardDef.description,
+                    count: count,
+                };
+            } else {
+                _egCurrencyStash[r][c] = null;
+            }
             _egRenderCurrencyCell(r, c);
+            for (let i = 0; i < orbsFromNew; i++) _egConvertShardsToOrb(shardDef);
             return true;
         }
     }
@@ -202,7 +220,9 @@ function _egConvertShardsToOrb(shardDef) {
         category: 'currency',
         description: nameKey ? t(nameKey + '_desc') : '',
     });
+    const stackMax = shardDef.stackSize || EG_SHARD_STACK_MAX;
     showToast(t('eg_shards_converted')
+        .replace('{count}', String(stackMax))
         .replace('{shard}', shardDef.name)
         .replace('{icon}', shardDef.orbIcon)
         .replace('{orb}', nameKey ? t(nameKey) : shardDef.orbId));

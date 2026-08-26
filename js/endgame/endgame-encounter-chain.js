@@ -863,6 +863,19 @@ function _egTryLeaveMap() {
 //-------------------OBJECTIVES HUD---------------------------------------
 //------------------------------------------------------------------------
 
+// Helper: total bosses required for this map (for HUD display).
+function _egGetBossTotalForHUD() {
+    if (_egBossTotalCount > 0) return _egBossTotalCount;
+    const def = _egMapDef || cur;
+    if (!def) return 0;
+    if (def.bosses && def.bosses.length > 0) {
+        const cap = (def.maxBosses != null && def.maxBosses > 0) ? def.maxBosses : def.bosses.length;
+        return Math.min(def.bosses.length, cap);
+    }
+    if (def.hasBoss) return (def.maxBosses != null && def.maxBosses > 0) ? def.maxBosses : 1;
+    return 0;
+}
+
 function _egUpdateObjectivesHUD() {
     const strip = document.getElementById('eg-objectives-strip');
     if (!strip) return;
@@ -870,127 +883,82 @@ function _egUpdateObjectivesHUD() {
     if (!_egIsActive()) {
         strip.classList.add('eg-hidden');
         _egUpdateBonusLootHUD();
+        if (typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) PassiveTracker.refreshVisibility();
         return;
     }
 
     strip.classList.remove('eg-hidden');
     _egUpdateBonusLootHUD();
+    // Enforce passive tracker hide during endgame if setting enabled
+    if (typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) PassiveTracker.refreshVisibility();
 
     const req = _egGetMapRequirements();
-    const rows = [];
 
-    // Monsters (Capped)
+    // Build shrinking single-line segments — finished objectives are omitted.
+    const segs = [];
+
     if (req.totalMonsters > 0) {
         const count = Math.min(_egChainKillCount, req.totalMonsters);
-        const done = count >= req.totalMonsters;
-        rows.push(_egObjItem('⚔️', t('eg_obj_monsters').replace('{k}', count).replace('{t}', req.totalMonsters), done));
-    }
-
-    // Mistakes: no longer shown here — the mistake counter in the top-left
-    // corner of the puzzle screen displays "x / y" for maps with a limit.
-
-    // Boss: locked until all other objectives are done, then the tracker
-    // offers the Enter Boss Arena button. During the arena chain it shows
-    // live progress through the boss roster.
-    if (req.hasBoss) {
-        if (_egBossDefeated()) {
-            rows.push(_egObjItem('💀', t('eg_obj_boss_multi')
-                .replace('{k}', _egBossKilledCount).replace('{t}', _egBossTotalCount), true));
-        } else if (_egBossPhaseActive) {
-            rows.push(_egObjItem('💀', t('eg_obj_boss_multi')
-                .replace('{k}', _egBossKilledCount).replace('{t}', _egBossTotalCount), false));
-        } else {
-            rows.push(_egObjItem('💀', t('eg_obj_boss_locked'), false, 'eg-obj-boss-locked'));
+        if (count < req.totalMonsters) {
+            segs.push(`<span class="eg-obj-seg"><span class="eg-obj-seg-val">${count} / ${req.totalMonsters}</span> <span class="eg-obj-seg-label">Monsters</span></span>`);
         }
     }
-
-    // Puzzles (Capped)
     if (req.requiredPuzzles > 0) {
         const count = Math.min(_egChainPuzzleSolvedCount, req.requiredPuzzles);
-        const done = count >= req.requiredPuzzles;
-        rows.push(_egObjItem('🧩', t('eg_obj_puzzles').replace('{k}', count).replace('{t}', req.requiredPuzzles), done));
+        if (count < req.requiredPuzzles) {
+            segs.push(`<span class="eg-obj-seg"><span class="eg-obj-seg-val">${count} / ${req.requiredPuzzles}</span> <span class="eg-obj-seg-label">Puzzles</span></span>`);
+        }
     }
-
-    // Questions (Capped)
     if (req.requiredQuestions > 0) {
         const count = Math.min(_egQuestionsAnswered, req.requiredQuestions);
-        const done = count >= req.requiredQuestions;
-        rows.push(_egObjItem('❓', t('eg_obj_questions').replace('{k}', count).replace('{t}', req.requiredQuestions), done));
+        if (count < req.requiredQuestions) {
+            segs.push(`<span class="eg-obj-seg"><span class="eg-obj-seg-val">${count} / ${req.requiredQuestions}</span> <span class="eg-obj-seg-label">Questions</span></span>`);
+        }
     }
-
-    // Loot acquired (Always shows, uses custom helper for tooltip)
-    rows.push(_egBuildLootItem());
+    if (req.hasBoss && !_egBossDefeated()) {
+        const bossTotal = _egGetBossTotalForHUD();
+        const bossCount = Math.min(_egBossKilledCount, bossTotal || 1);
+        // Show boss progress even before arena entry; hide only when all bosses slain.
+        if (bossTotal > 0) {
+            segs.push(`<span class="eg-obj-seg"><span class="eg-obj-seg-val">${bossCount} / ${bossTotal}</span> <span class="eg-obj-seg-label">Bosses</span></span>`);
+        }
+    }
 
     const canLeave = _egCanLeaveMap();
     const othersDone = _egNonBossObjectivesComplete();
 
-    // Action button at the bottom of the tracker:
-    //   boss map, other objectives pending  → locked Complete Map
-    //   boss map, objectives done           → ⚔️ Enter Boss Arena
-    //   boss map, arena chain running       → battle-in-progress notice
-    //   everything dead / no boss on map    → 🏆 Complete Map
-    let actionHTML;
+    // Action button logic — top-center, only when actionable:
+    //   boss map + non-boss done + not in arena → Enter Boss Arena
+    //   all objectives done                       → Complete Map (highlighted)
+    //   otherwise                                 → no button (just the line)
+    let actionHTML = '';
     if (req.hasBoss && !_egBossDefeated()) {
-        if (_egBossPhaseActive) {
-            actionHTML = `
-                <button class="eg-leave-btn eg-leave-locked" disabled>
-                    💀 ${t('eg_boss_fight_ongoing')}
-                </button>`;
-        } else if (othersDone) {
-            actionHTML = `
-                <button class="eg-enter-boss-btn" onclick="_egEnterBossArena()">
-                    ${t('eg_enter_boss_arena')}
-                </button>`;
-        } else {
-            actionHTML = `
-                <button class="eg-leave-btn eg-leave-locked" onclick="_egTryLeaveMap()">
-                    ${t('eg_complete_map_locked')}
-                </button>`;
+        if (!_egBossPhaseActive && othersDone) {
+            actionHTML = `<button class="eg-obj-action-btn eg-obj-action-boss" onclick="_egEnterBossArena()">${t('eg_enter_boss_arena')}</button>`;
         }
-    } else {
-        actionHTML = `
-            <button class="eg-leave-btn ${canLeave ? 'eg-leave-ready' : 'eg-leave-locked'}"
-                    onclick="_egTryLeaveMap()">
-                ${canLeave ? t('eg_complete_map') : t('eg_complete_map_locked')}
-            </button>`;
+    } else if (canLeave) {
+        actionHTML = `<button class="eg-obj-action-btn eg-obj-action-complete" onclick="_egTryLeaveMap()">${t('eg_complete_map')}</button>`;
     }
 
-    // First time all objectives are complete: big green banner over the grid
-    // + a toast message. Fires only once per map.
+    // First time all objectives are complete: big green banner + toast.
     if (canLeave && !_egMapClearedShown) {
         _egMapClearedShown = true;
         _egShowMapClearedBanner();
         showToast(t('eg_map_cleared_toast'), '#4ade80');
     }
 
-    // Preserve the minimized state across innerHTML re-renders: a fresh
-    // .eg-obj-body has no inline display:none, so without this every HUD
-    // update would visually expand a collapsed tracker again. Exception:
-    // once ALL objectives are done (map can be left / boss arena entered)
-    // the tracker auto-expands one last time so the player sees it.
-    const wasCollapsed = strip.classList.contains('eg-collapsed');
+    // Render: single pill line (if any segments remain) + optional action button.
+    const lineHTML = segs.length > 0 ? `<div class="eg-obj-line">${segs.join('')}</div>` : '';
+    const actionsHTML = actionHTML ? `<div class="eg-obj-actions">${actionHTML}</div>` : '';
 
-    strip.innerHTML = `
-        <div class="eg-obj-header">
-            <span class="eg-obj-title">${t('eg_obj_header')}</span>
-            <button class="eg-obj-collapse">−</button>
-        </div>
-        <div class="eg-obj-body">
-            ${rows.join('')}
-            ${actionHTML}
-        </div>`;
-
-    if (wasCollapsed && !canLeave) {
-        const body = strip.querySelector('.eg-obj-body');
-        const btn = strip.querySelector('.eg-obj-collapse');
-        if (body) body.style.display = 'none';
-        if (btn) btn.textContent = '+';
-    } else if (wasCollapsed) {
-        strip.classList.remove('eg-collapsed');
-        _egSaveObjectivesStripState(strip);
+    // Hide strip entirely when nothing to show (no segs and no button) — avoids empty pill.
+    if (!lineHTML && !actionsHTML) {
+        strip.innerHTML = '';
+        strip.classList.add('eg-hidden');
+        return;
     }
 
-    _egBindObjectivesStripBehaviour(strip);
+    strip.innerHTML = `${lineHTML}${actionsHTML}`;
 }
 
 // Shows a big green "MAP CLEARED" text centered over the puzzle grid for
@@ -1019,177 +987,20 @@ function _egShowMapClearedBanner() {
 }
 
 //------------------------------------------------------------------------
-//-------------------OBJECTIVES HUD: DRAG + MINIMIZE----------------------
+//-------------------OBJECTIVES HUD: DRAG + MINIMIZE (deprecated)----------
 //------------------------------------------------------------------------
+// Top-center tracker is no longer draggable/collapsible — stubs kept for
+// backward compatibility so old saved state does not throw.
 
-// localStorage key for the objectives tracker's position and collapsed state.
 const EG_OBJ_STRIP_STORAGE_KEY = 'eg_objectives_strip_state';
+function _egLoadObjectivesStripState() { return null; }
+function _egSaveObjectivesStripState() {}
+function _egApplySavedObjectivesStripState() { /* no-op: fixed top-center */ }
+function _egBindObjectivesStripBehaviour() { /* no-op: no drag/collapse */ }
 
-// Restores a saved { x, y, collapsed } state, clamped to the viewport.
-function _egLoadObjectivesStripState() {
-    try {
-        const raw = localStorage.getItem(EG_OBJ_STRIP_STORAGE_KEY);
-        if (!raw) return null;
-        const s = JSON.parse(raw);
-        if (typeof s.x !== 'number' || typeof s.y !== 'number') return null;
-        return {
-            x: Math.max(0, Math.min(s.x, window.innerWidth - 120)),
-            y: Math.max(0, Math.min(s.y, window.innerHeight - 60)),
-            collapsed: !!s.collapsed,
-        };
-    } catch (_) {
-        return null;
-    }
-}
-
-// Persists the tracker's current position and minimized state.
-function _egSaveObjectivesStripState(strip) {
-    const rect = strip.getBoundingClientRect();
-    try {
-        localStorage.setItem(EG_OBJ_STRIP_STORAGE_KEY, JSON.stringify({
-            x: rect.left,
-            y: rect.top,
-            collapsed: strip.classList.contains('eg-collapsed'),
-        }));
-    } catch (_) { /* storage unavailable — silently ignore */ }
-}
-
-// Applies the saved position / collapsed state once per page load.
-// The default CSS keeps the panel docked left-center until a saved
-// position overrides it.
-function _egApplySavedObjectivesStripState(strip) {
-    const saved = _egLoadObjectivesStripState();
-    if (!saved) return;
-
-    strip.style.left = saved.x + 'px';
-    strip.style.top = saved.y + 'px';
-    strip.style.transform = 'none';
-
-    if (saved.collapsed) {
-        strip.classList.add('eg-collapsed');
-        const body = strip.querySelector('.eg-obj-body');
-        const btn = strip.querySelector('.eg-obj-collapse');
-        if (body) body.style.display = 'none';
-        if (btn) btn.textContent = '+';
-    }
-}
-
-// Wires the drag handle and the minimize button onto the strip.
-// Bound once — the guard survives the frequent innerHTML re-renders.
-function _egBindObjectivesStripBehaviour(strip) {
-    if (!strip.dataset.behaviourBound) {
-        strip.dataset.behaviourBound = '1';
-        _egApplySavedObjectivesStripState(strip);
-
-        // Minimize / restore toggle.
-        strip.addEventListener('click', e => {
-            const btn = e.target.closest('.eg-obj-collapse');
-            if (!btn) return;
-            const body = strip.querySelector('.eg-obj-body');
-            const collapsed = strip.classList.toggle('eg-collapsed');
-            body.style.display = collapsed ? 'none' : '';
-            btn.textContent = collapsed ? '+' : '−';
-            _egSaveObjectivesStripState(strip);
-        });
-
-        // Dragging by the header title.
-        let isDragging = false;
-        let offsetX = 0;
-        let offsetY = 0;
-
-        strip.addEventListener('mousedown', e => {
-            if (!e.target.closest('.eg-obj-title')) return;
-            isDragging = true;
-            const rect = strip.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-            strip.classList.add('eg-dragging');
-            e.preventDefault();
-        });
-
-        document.addEventListener('mousemove', e => {
-            if (!isDragging) return;
-            const x = Math.max(0, Math.min(e.clientX - offsetX,
-                window.innerWidth - strip.offsetWidth));
-            const y = Math.max(0, Math.min(e.clientY - offsetY,
-                window.innerHeight - strip.offsetHeight));
-            strip.style.left = x + 'px';
-            strip.style.top = y + 'px';
-            strip.style.transform = 'none';
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            strip.classList.remove('eg-dragging');
-            _egSaveObjectivesStripState(strip);
-        });
-    }
-}
-
-// Helper to build the Loot row with a hover tooltip
-// Helper to build the Loot row with a hover tooltip and nested stat tooltips
-function _egBuildLootItem() {
-    const count = _egRunLoot.length;
-    let tooltipHTML = '';
-
-    if (count > 0) {
-        // Sync rarity colors exactly with your Endgame Hub RARITY_COLOR_MAP
-        const getRarityColor = (rarity) => {
-            switch (rarity) {
-                case 'uncommon': return '#2ecc71';
-                case 'rare': return '#3498db';
-                case 'epic': return '#c39bd3';
-                case 'legendary': return '#f5b642';
-                case 'cursed': return '#e74c3c';
-                case 'artifact': return '#f1c40f';
-                case 'common':
-                default: return '#b0b0b0';
-            }
-        };
-
-        const itemsList = _egRunLoot.map(item => {
-            const color = getRarityColor(item.rarity);
-
-            // Prioritize the base item name, fallback to standard name
-            const displayName = item.baseName || item.name || t('eg_unknown_item');
-
-            // Generate the exact same tooltip frame used in your Endgame Hub
-            const nestedTooltip = typeof _egBuildTooltipBodyHTML === 'function'
-                ? _egBuildTooltipBodyHTML(item)
-                : `<div style="padding: 5px;">${t('eg_tooltip_unavailable')}</div>`;
-
-            return `
-                <div class="eg-loot-item-row" style="color: ${color};">
-                    <span class="eg-loot-item-icon">${EG_ART.html('item', item.baseId, item.icon || '📦')}</span>${displayName}
-                    <div class="eg-nested-tooltip">
-                        ${nestedTooltip}
-                    </div>
-                </div>`;
-        }).join('');
-
-        tooltipHTML = `<div class="eg-loot-tooltip">${itemsList}</div>`;
-    } else {
-        tooltipHTML = `<div class="eg-loot-tooltip" style="color: #888;">${t('eg_no_loot_yet')}</div>`;
-    }
-
-    return `
-        <div class="eg-obj-item eg-loot-container eg-obj-pending">
-            <span class="eg-obj-icon">📦</span>
-            <span class="eg-obj-label">${t('eg_loot_acquired').replace('{n}', count)}</span>
-            ${tooltipHTML}
-        </div>
-    `;
-}
-
-function _egObjItem(icon, label, done, extraClass) {
-    return `
-        <div class="eg-obj-item ${done ? 'eg-obj-done' : 'eg-obj-pending'}${extraClass ? ' ' + extraClass : ''}">
-            ${icon ? `<span class="eg-obj-icon">${icon}</span>` : ''}
-            <span class="eg-obj-label">${label}</span>
-        </div>
-    `;
-}
+// Legacy loot helpers — loot is now tracked in the escape menu; stubs kept for compatibility.
+function _egBuildLootItem() { return ''; }
+function _egObjItem() { return ''; }
 
 
 

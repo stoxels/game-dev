@@ -85,7 +85,7 @@ function _getAbilityManaCost(hudSlot) {
 
 // Returns true if the current mana pool covers the given cost.
 function canAffordMana(cost) {
-    return playerCurrentMana >= cost;
+    return Math.round(playerCurrentMana) >= cost;
 }
 
 
@@ -139,11 +139,13 @@ function _refreshHUDIfAffordabilityChanged(wasAffordable) {
 function gainMana(amount) {
     if (!amount || amount <= 0) return 0;
     if (typeof _egMapManaGainMult === 'function') amount *= _egMapManaGainMult();
+    amount = Math.round(amount);
+    if (amount <= 0) return 0;
     const max = _getPlayerMaxMana();
     if (max <= 0) return 0;
     const wasAffordable = _allSlotsAffordable();
-    const before = playerCurrentMana;
-    playerCurrentMana = Math.min(max, playerCurrentMana + amount);
+    const before = Math.round(playerCurrentMana);
+    playerCurrentMana = Math.min(max, Math.round(playerCurrentMana + amount));
     updateClassHUDManaBar();
     _refreshHUDIfAffordabilityChanged(wasAffordable);
     return playerCurrentMana - before;
@@ -156,7 +158,7 @@ function spendMana(cost) {
     if (!cost || cost <= 0) return true;
     if (!canAffordMana(cost)) return false;
     const wasAffordable = _allSlotsAffordable();
-    playerCurrentMana -= cost;
+    playerCurrentMana = Math.round(playerCurrentMana - cost);
     updateClassHUDManaBar();
     _refreshHUDIfAffordabilityChanged(wasAffordable);
     return true;
@@ -189,7 +191,7 @@ function updateClassHUDManaBar() {
     const max = _getPlayerMaxMana();
     if (max <= 0) { wrap.style.display = 'none'; return; }
 
-    const cur = Math.max(0, Math.min(playerCurrentMana, max));
+    const cur = Math.round(Math.max(0, Math.min(playerCurrentMana, max)));
     const pct = (cur / max) * 100;
     document.getElementById('chud-mana-fill').style.width = pct + '%';
     document.getElementById('chud-mana-text').innerText = `${cur} / ${max}`;

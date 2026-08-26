@@ -197,6 +197,55 @@ function _getClassCooldownReduction(slot) {
     );
 }
 
+// Maps every class/ascendency active slot to its arcane cooldown family.
+// One family per skill — mods roll on the arcane slot (EG_MOD_TABLE_ARCANE).
+const BASE_SKILL_COOLDOWN_FAMILY = {
+    mathmagician: { active1: 'cooldown_arcane_reveal', active2: 'cooldown_absolute_zero' },
+    statistician: { active1: 'cooldown_data_strike', active2: 'cooldown_diagonal_strike' },
+    probabilist: { active1: 'cooldown_precision_shot', active2: 'cooldown_rain_of_arrows' },
+};
+
+const ASCENDENCY_SKILL_COOLDOWN_FAMILY = {
+    outlier: { active1: 'cooldown_tail_risk', active2: 'cooldown_speedforce' },
+    actuary: { active1: 'cooldown_regression_to_prior', active2: 'cooldown_significance_threshold' },
+    recursionist: { active1: 'cooldown_residual', active2: 'cooldown_degrees_of_freedom' },
+    markovian: { active1: 'cooldown_state_rollback', active2: 'cooldown_transition_matrix' },
+    bayesian: { active1: 'cooldown_bayes_traps', active2: 'cooldown_type_i_error_shield' },
+    random_walker: { active1: 'cooldown_brownian_motion', active2: 'cooldown_drifter' },
+};
+
+// Returns total flat cooldown reduction (seconds) from equipped arcane items
+// for the given ability slot. Sums all mods whose familyId matches the
+// slot's skill. Handles both the arcane slot and any other slot that might
+// carry the mod (future-proof — loop all equipped items).
+function _getEquipmentCooldownReduction(slot) {
+    if (typeof _egEquipped === 'undefined' || !_egEquipped) return 0;
+
+    let familyId = null;
+    if (slot === 'active1' || slot === 'active2') {
+        const map = BASE_SKILL_COOLDOWN_FAMILY[STATE.playerClass];
+        if (map) familyId = map[slot];
+    } else if (slot === 'active3' || slot === 'active4') {
+        if (!STATE.playerAscendency) return 0;
+        const ascSlot = slot === 'active3' ? 'active1' : 'active2';
+        const map = ASCENDENCY_SKILL_COOLDOWN_FAMILY[STATE.playerAscendency];
+        if (map) familyId = map[ascSlot];
+    }
+    if (!familyId) return 0;
+
+    let total = 0;
+    for (const item of Object.values(_egEquipped)) {
+        if (!item || !Array.isArray(item.mods)) continue;
+        for (const mod of item.mods) {
+            if (mod.familyId !== familyId) continue;
+            for (const stat of (mod.rolledStats || [])) {
+                if (stat.key === familyId && stat.value != null) total += Number(stat.value) || 0;
+            }
+        }
+    }
+    return total;
+}
+
 
 
 
@@ -206,12 +255,14 @@ function _getClassCooldownReduction(slot) {
 //------------------------------------------------------------------------
 
 // Returns the final cooldown duration (in seconds) for a given slot after
-// applying all global and class-specific passive reductions.
+// applying all global, class-specific and equipment reductions.
+// Equipment mods roll on the arcane slot (one family per skill, up to 90s on T1).
 // The result is clamped to a minimum of 0 — cooldowns can't go negative.
 function getEffectiveCooldown(slot, baseSeconds) {
     const globalReduction = _getGlobalCooldownReduction();
     const classReduction = _getClassCooldownReduction(slot);
-    return Math.max(0, baseSeconds - globalReduction - classReduction);
+    const equipmentReduction = _getEquipmentCooldownReduction(slot);
+    return Math.max(0, baseSeconds - globalReduction - classReduction - equipmentReduction);
 }
 
 

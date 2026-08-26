@@ -426,10 +426,29 @@ const PassiveTracker = (() => {
         }
     }
 
+    // Returns true when the passive tracker should be hidden because the
+    // player is on an endgame map and the hide-passive setting is enabled.
+    function _shouldHideForEndgame() {
+        try {
+            if (typeof SETTINGS === 'undefined' || !SETTINGS.hidePassiveTrackerInEndgame) return false;
+            if (typeof _egIsActive === 'function' && _egIsActive()) return true;
+            if (typeof isEndgameLevel === 'function' && isEndgameLevel()) return true;
+            if (typeof cur !== 'undefined' && cur && cur.isMonsterLevel) return true;
+            return false;
+        } catch (_) { return false; }
+    }
+
     // Main panel assembly function.
     // Tears down any existing panel, gathers all active row definitions,
     // then builds header + body + rows and inserts the result into the game.
     function _buildPanel() {
+        // Hide during endgame if the setting is enabled
+        if (_shouldHideForEndgame()) {
+            const existingHide = document.getElementById('pt-tracker-panel');
+            if (existingHide) existingHide.remove();
+            _panel = null;
+            return;
+        }
         // Remove any previously built panel before rebuilding.
         const existing = document.getElementById('pt-tracker-panel');
         if (existing) existing.remove();
@@ -527,11 +546,28 @@ const PassiveTracker = (() => {
     // Refreshes every visible row with the latest values from _state.
     // Called every second from onTimerTick() and after every game event.
     function _updatePanel() {
+        if (_shouldHideForEndgame()) {
+            if (_panel) destroy();
+            return;
+        }
         if (!_panel) return;
         _getActiveRows().forEach(rowDef => {
             const rowEl = _panel.querySelector(`.pt-tracker-row[data-id="${rowDef.id}"]`);
             if (rowEl) _updateSingleRow(rowEl, rowDef);
         });
+    }
+
+    // Re-evaluates whether the panel should be visible and builds/destroys accordingly.
+    // Called when the hide-passive setting changes or when entering/leaving endgame.
+    function refreshVisibility() {
+        if (_shouldHideForEndgame()) {
+            if (_panel) destroy();
+            return;
+        }
+        // If setting disabled and we have rows but no panel, rebuild.
+        if (!_panel && _getActiveRows().length > 0) {
+            _buildPanel();
+        }
     }
 
     //------------------------------------------------------------------------
@@ -1339,6 +1375,7 @@ const PassiveTracker = (() => {
         // Lifecycle
         init,
         destroy,
+        refreshVisibility,
         // Timer heartbeat
         onTimerTick,
         // Game event hooks
