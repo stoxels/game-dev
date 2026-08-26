@@ -654,6 +654,13 @@ function _egShowTooltip(item, e) {
         const ttDesc = item.description || defForTT.description || '';
         const isEssenceTT = item.category === 'essence' || (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[item.id]);
         const countLine = item.count > 1 ? ` <span class="eg-tooltip-count">×${item.count}</span>` : '';
+        let essenceDetailHTML = '';
+        if (isEssenceTT && typeof _egBuildEssenceDetailHTML === 'function') {
+            const edef = (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[item.id]) || defForTT;
+            if (edef && edef.guaranteedFamilies) {
+                try { essenceDetailHTML = _egBuildEssenceDetailHTML(edef); } catch (e) { essenceDetailHTML = ''; }
+            }
+        }
         html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
@@ -662,6 +669,7 @@ function _egShowTooltip(item, e) {
         <div class="eg-tt-rarity-line" style="color:#b59248;">${isEssenceTT ? t('eg_rarity_essence') : t('eg_rarity_currency')}</div>
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc">${ttDesc}</div></div>
+    ${essenceDetailHTML}
 </div>`;
     } else if (item.category === 'map' && typeof _egBuildMapTooltipBodyHTML === 'function') {
         // Maps get their own tooltip with mods grouped by

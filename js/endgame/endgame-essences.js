@@ -238,6 +238,162 @@ const EG_ESSENCE_DEFS = {
 
 
 //------------------------------------------------------------------------
+//-------------------ESSENCE TOOLTIP HELPERS (PoE-STYLE)------------------
+//------------------------------------------------------------------------
+// Builds a PoE-style breakdown: for each essence, which item class gets which
+// guaranteed stat. Groups slotTypes by their first applicable guaranteed family
+// so the tooltip says e.g.:
+//   "Helm, Chest, Gloves, Boots, ...: Maximum Health"
+//   "Weapons: Physical Damage"
+// and groups slots with no specific guarantee under "Other: Random modifier".
+
+// Human-readable family display (EN/DE). Prefer the mod's own label stripped of
+// placeholders, fall back to a title-cased familyId.  Hybrid families are
+// joined with " + ".
+function _egEssenceFamilyDisplayName(familyId) {
+    // Try to resolve the family definition from any mod table to reuse its label.
+    let raw = null;
+    let rawDe = null;
+    if (typeof EG_SLOT_MOD_TABLE_MAP !== 'undefined') {
+        for (const getter of Object.values(EG_SLOT_MOD_TABLE_MAP)) {
+            let tbl = null;
+            try { tbl = getter(); } catch (e) { continue; }
+            if (!tbl) continue;
+            const f = (tbl.prefixes && tbl.prefixes[familyId]) || (tbl.suffixes && tbl.suffixes[familyId]);
+            if (f) { raw = f.label || null; rawDe = f.labelDe || null; break; }
+        }
+    }
+    const labelSrc = (typeof LANG !== 'undefined' && LANG === 'de' && rawDe) ? rawDe : raw;
+    if (labelSrc) {
+        // Elemental "Adds # to @ ..." prefixes are better shown as concise
+        // "Fire Damage" etc. — detect and fall through to familyId humanize.
+        const isAdds = labelSrc.includes('Adds #') || labelSrc.includes('Fügt') || labelSrc.includes('Adds');
+        if (!isAdds) {
+            const lines = labelSrc.split('\n');
+            const cleaned = lines.map(line => {
+                let c = line.replace(/[#@]/g, '').trim();
+                c = c.replace(/^\+\s*/, '').trim();
+                // strip leading "to " leftover from "+# to X"
+                c = c.replace(/^to\s+/i, '').trim();
+                c = c.replace(/^zu\s+/i, '').trim();
+                c = c.replace(/\s+/g, ' ').trim();
+                // also strip stray leading "to " after the plus removal for DE "zu "
+                return c;
+            }).filter(Boolean);
+            if (cleaned.length > 0) {
+                // Join hybrid lines with " + "
+                // e.g. "+# to Maximum Health\n+@ to Armour" -> "Maximum Health + Armour"
+                const joined = cleaned.join(' + ');
+                // Remove empty artefacts like "Adds to" leftover
+                if (joined && joined.toLowerCase() !== 'adds to' && joined.length > 2) return joined;
+            }
+        }
+    }
+    // Fallback: humanize the familyId itself.
+    // hybrid_life_armour -> "Life + Armour", flat_health -> "Health", inc_armour -> "Increased Armour"
+    const deMap = {
+        flat_health: 'Maximales Leben', hybrid_life_armour: 'Leben + Rüstung', hybrid_life_evasion: 'Leben + Ausweichen',
+        hybrid_life_absorption: 'Leben + Absorption', life_regen: 'Lebensregeneration', life_on_kill: 'Leben bei Kill',
+        heart_heal: 'Herzheilung', inc_physical_damage: 'Erhöhter physischer Schaden', flat_physical_damage: 'Physischer Schaden',
+        crit_multiplier: 'Kritischer Schaden', crit_chance: 'Kritische Trefferchance', precision_damage: 'Präzisionsschaden',
+        strength: 'Stärke', flat_mana: 'Maximales Mana', spell_damage: 'Zauberschaden', inc_spell_damage: 'Erhöhter Zauberschaden',
+        intelligence: 'Intelligenz', mana_regen: 'Manaregeneration', arcane_surge: 'Arkanwoge', attack_speed: 'Angriffstempo',
+        flat_evasion: 'Ausweichen', inc_evasion: 'Erhöhtes Ausweichen', dodge: 'Ausweichen', agility: 'Beweglichkeit',
+        hybrid_evasion_absorption: 'Ausweichen + Absorption', flat_armour: 'Rüstung', inc_armour: 'Erhöhte Rüstung',
+        flat_absorption: 'Absorption', inc_absorption: 'Erhöhte Absorption', hybrid_armour_evasion: 'Rüstung + Ausweichen',
+        hybrid_armour_absorption: 'Rüstung + Absorption', block_chance: 'Blockchance', fire_damage: 'Feuerschaden',
+        cold_damage: 'Kälteschaden', lightning_damage: 'Blitzschaden', shadow_damage: 'Schattenschaden', fire_resist: 'Feuerwiderstand',
+        cold_resist: 'Kältewiderstand', lightning_resist: 'Blitzwiderstand', arcane_resistance: 'Arkanwiderstand',
+        shadow_resist: 'Schattenwiderstand',
+    };
+    if (typeof LANG !== 'undefined' && LANG === 'de' && deMap[familyId]) return deMap[familyId];
+    const enMap = {
+        flat_health: 'Maximum Health', hybrid_life_armour: 'Life + Armour', hybrid_life_evasion: 'Life + Evasion',
+        hybrid_life_absorption: 'Life + Absorption', life_regen: 'Life Regeneration', life_on_kill: 'Life on Kill',
+        heart_heal: 'Heart Heal', inc_physical_damage: 'Increased Physical Damage', flat_physical_damage: 'Physical Damage',
+        crit_multiplier: 'Critical Strike Multiplier', crit_chance: 'Critical Strike Chance', precision_damage: 'Precision Damage',
+        strength: 'Strength', flat_mana: 'Maximum Mana', spell_damage: 'Spell Damage', inc_spell_damage: 'Increased Spell Damage',
+        intelligence: 'Intelligence', mana_regen: 'Mana Regeneration', arcane_surge: 'Arcane Surge', attack_speed: 'Attack Speed',
+        flat_evasion: 'Evasion', inc_evasion: 'Increased Evasion', dodge: 'Dodge', agility: 'Agility',
+        hybrid_evasion_absorption: 'Evasion + Absorption', flat_armour: 'Armour', inc_armour: 'Increased Armour',
+        flat_absorption: 'Absorption', inc_absorption: 'Increased Absorption', hybrid_armour_evasion: 'Armour + Evasion',
+        hybrid_armour_absorption: 'Armour + Absorption', block_chance: 'Block Chance', fire_damage: 'Fire Damage',
+        cold_damage: 'Cold Damage', lightning_damage: 'Lightning Damage', shadow_damage: 'Shadow Damage', fire_resist: 'Fire Resistance',
+        cold_resist: 'Cold Resistance', lightning_resist: 'Lightning Resistance', arcane_resistance: 'Arcane Resistance',
+        shadow_resist: 'Shadow Resistance',
+    };
+    if (enMap[familyId]) return enMap[familyId];
+    // Generic title-case fallback with "+" for hybrids
+    const parts = familyId.split('_').filter(p => p !== 'flat' && p !== 'inc' && p !== 'hybrid');
+    const titled = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1));
+    const prefix = familyId.startsWith('inc_') ? (LANG === 'de' ? 'Erhöhte ' : 'Increased ') : '';
+    if (familyId.startsWith('hybrid_')) return titled.join(' + ');
+    return prefix + titled.join(' ');
+}
+
+// Builds the inner HTML for the essence tooltip's "Guaranteed by item class" section.
+// Grouped by the resolved guaranteed family per slotType.
+function _egBuildEssenceDetailHTML(def) {
+    if (!def || !def.guaranteedFamilies || !def.guaranteedFamilies.length) return '';
+    if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return '';
+
+    const grouped = new Map(); // familyId -> slotType[]
+    const noneSlots = [];
+
+    for (const [slotType, getter] of Object.entries(EG_SLOT_MOD_TABLE_MAP)) {
+        let tbl = null;
+        try { tbl = getter(); } catch (e) { continue; }
+        if (!tbl) continue;
+        let found = null;
+        for (const fam of def.guaranteedFamilies) {
+            if ((tbl.prefixes && tbl.prefixes[fam]) || (tbl.suffixes && tbl.suffixes[fam])) {
+                found = fam;
+                break;
+            }
+        }
+        if (found) {
+            if (!grouped.has(found)) grouped.set(found, []);
+            grouped.get(found).push(slotType);
+        } else {
+            noneSlots.push(slotType);
+        }
+    }
+
+    const slotLabel = (slotType) => {
+        const key = 'eg_slot_' + slotType;
+        try { const tr = t(key); if (tr && tr !== key) return tr; } catch (e) {}
+        return slotType.charAt(0).toUpperCase() + slotType.slice(1);
+    };
+
+    let html = '<div class="eg-tt-section eg-tt-essence-detail">';
+    const titleKey = 'eg_essence_guaranteed_title';
+    let title = 'Guaranteed modifier by item class:';
+    try { const tr = t(titleKey); if (tr && tr !== titleKey) title = tr; } catch (e) {}
+    html += `<div class="eg-tt-essence-title">${title}</div>`;
+
+    for (const [familyId, slotTypes] of grouped.entries()) {
+        const modName = _egEssenceFamilyDisplayName(familyId);
+        const slotsStr = slotTypes.map(slotLabel).join(', ');
+        html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-slots">${slotsStr}:</span> <span class="eg-tt-essence-mod">${modName}</span></div>`;
+    }
+    if (noneSlots.length > 0) {
+        const otherLabel = (typeof LANG !== 'undefined' && LANG === 'de') ? 'Sonstige' : 'Other';
+        const randomLabel = (typeof LANG !== 'undefined' && LANG === 'de') ? 'Zufälliger Modifikator' : 'Random modifier';
+        const slotsStr = noneSlots.map(slotLabel).join(', ');
+        html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-slots">${slotsStr}:</span> <span class="eg-tt-essence-mod eg-tt-essence-random">${randomLabel}</span></div>`;
+    }
+
+    // Footnote: explain fallback & defense gating
+    const noteKey = 'eg_essence_guaranteed_note';
+    let note = 'First applicable from the essence\u2019s list is guaranteed. If none applies, a random modifier is guaranteed. Local-defense hybrids require matching base defenses.';
+    try { const tr = t(noteKey); if (tr && tr !== noteKey) note = tr; } catch (e) {}
+    html += `<div class="eg-tt-essence-note">${note}</div>`;
+    html += '</div>';
+    return html;
+}
+
+
+//------------------------------------------------------------------------
 //-------------------ESSENCE DROPS FROM MONSTERS---------------------------
 //------------------------------------------------------------------------
 
@@ -596,6 +752,15 @@ document.addEventListener('keydown', function (e) {
         .eg-item-chip.eg-rarity-essence .eg-item-chip-icon {
             filter: drop-shadow(0 0 4px #b06ae0);
         }
+        /* PoE-style essence detail in tooltip */
+        .eg-tt-essence-detail { padding-top: 6px; }
+        .eg-tt-essence-title { color: #b59248; font-weight: 700; font-size: 0.82rem; margin-bottom: 5px; letter-spacing: 0.02em; }
+        .eg-tt-essence-line { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.78rem; line-height: 1.45; padding: 3px 0; border-bottom: 1px solid rgba(181,146,72,0.08); }
+        .eg-tt-essence-line:last-of-type { border-bottom: none; }
+        .eg-tt-essence-slots { color: #9aa0b8; flex: 1 1 55%; min-width: 140px; white-space: normal; word-break: break-word; }
+        .eg-tt-essence-mod { color: #f5d98a; font-weight: 600; white-space: nowrap; flex: 0 0 auto; }
+        .eg-tt-essence-mod.eg-tt-essence-random { color: #ccc; font-style: italic; font-weight: 400; }
+        .eg-tt-essence-note { color: #7a7a8a; font-size: 0.70rem; line-height: 1.35; margin-top: 6px; font-style: italic; opacity: 0.9; }
     `;
     document.head.appendChild(style);
 })();
