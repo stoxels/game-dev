@@ -238,6 +238,16 @@ const EG_CURRENCY_DEFS = {
         },
     },
 
+    // MAP ONLY — raises a map's tier by one. Equipment can never be a
+    // target (canApply rejects non-maps); maps route through the dedicated
+    // EG_MAP_CURRENCY_RULES entry in endgame-maps.js.
+    orb_horizons: {
+        id: 'orb_horizons', name: t('eg_orb_horizons'), icon: '🌌',
+        description: t('eg_orb_horizons_desc'),
+        canApply(item) { return item.category === 'map'; },
+        apply(item) { return item; }, // unused — see EG_MAP_CURRENCY_RULES
+    },
+
     // Creates a copy of an item in the next free inventory slot.
     // The copy is a fully independent item that can be modified further
     // with any other currency.

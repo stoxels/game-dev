@@ -134,7 +134,7 @@ function _dndCreateGhost(item) {
     _dndGhost = document.createElement('div');
     _dndGhost.id = 'eg-dnd-ghost';
     _dndGhost.className = `eg-dnd-ghost eg-rarity-${item.rarity || 'common'}`;
-    _dndGhost.innerHTML = `<span class="eg-dnd-ghost-icon">${item.icon || '📦'}</span>`;
+    _dndGhost.innerHTML = `<span class="eg-dnd-ghost-icon">${EG_ART.html('item', item.baseId, item.icon || '📦')}</span>`;
     _dndGhost.style.cssText = `
         position: fixed;
         pointer-events: none;

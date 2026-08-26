@@ -23,7 +23,7 @@ const EG_EQUIP_SLOTS = [
     // Left column (top → bottom)
     { id: 'head', icon: '👑', col: 'left' },
     { id: 'earring1', icon: '💎', col: 'left' },
-    { id: 'earring2', icon: '🦪', col: 'left' },
+    { id: 'earring2', icon: '💎', col: 'left' },
     { id: 'amulet', icon: '📿', col: 'left' },
     { id: 'shoulders', icon: '🪶', col: 'left' },
     { id: 'cloak', icon: '🧥', col: 'left' },
@@ -119,7 +119,7 @@ function _egBuildItemChipHTML(item, size = 'normal') {
      onmouseleave="_egClearTooltip()">
     ${ilvlBadge}
     ${mapTierBadge}
-    <span class="eg-item-chip-icon">${item.icon || '📦'}</span>
+    <span class="eg-item-chip-icon">${EG_ART.html('item', item.baseId, item.icon || '📦')}</span>
     <span class="eg-item-chip-name">${item.name || '???'}</span>
 </div>`;
 }
@@ -647,11 +647,12 @@ function _egBuildTooltipBodyHTML(item) {
             : item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1))
         : '';
 
-    // ── Implicit defenses ────────────────────────────────────────────
-    // Values shown are the LOCAL-modified totals (base + local flat, scaled
-    // by the item's own "% increased" mods). Values altered by local mods
-    // get the .eg-tt-val-modified highlight so the player can tell them
-    // apart from the untouched base value.
+    // ── Implicit defenses & damage ───────────────────────────────────
+    // Defense and damage values shown are the LOCAL-modified totals (base +
+    // local flat, scaled by the item's own "% increased" mods — Path of
+    // Exile style). Values altered by local mods get the
+    // .eg-tt-val-modified highlight so the player can tell them apart from
+    // the untouched base value.
     const implicitLines = [];
     const def = item.defenses || {};
     let eff = null;
@@ -670,8 +671,23 @@ function _egBuildTooltipBodyHTML(item) {
     defLine('eg_tt_evasion', 'evasion');
     defLine('eg_tt_absorption', 'absorption');
     if (item.damage) {
-        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_damage')}: <span class="eg-tt-val">${item.damage.min}–${item.damage.max}</span></div>`);
-        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attacks_sec')}: <span class="eg-tt-val">${item.attacksPerSecond}</span></div>`);
+        let dmgEff = null;
+        try { dmgEff = _egGetItemEffectiveDamage(item); } catch (e) { dmgEff = null; }
+        const rangeLine = (labelKey, min, max, moddedFlag) => {
+            if ((max || 0) <= 0 && (min || 0) <= 0) return;
+            const valCls = moddedFlag ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
+            implicitLines.push(`<div class="eg-tt-implicit">${t(labelKey)}: <span class="${valCls}">${min}–${max}</span></div>`);
+        };
+        if (dmgEff) {
+            rangeLine('eg_stat_phys_damage', dmgEff.physMin, dmgEff.physMax, dmgEff.modded.phys);
+            rangeLine('eg_stat_fire_damage', dmgEff.fireMin, dmgEff.fireMax, dmgEff.modded.fire);
+            rangeLine('eg_stat_cold_damage', dmgEff.coldMin, dmgEff.coldMax, dmgEff.modded.cold);
+            rangeLine('eg_stat_lightning_damage', dmgEff.lightningMin, dmgEff.lightningMax, dmgEff.modded.lightning);
+            rangeLine('eg_stat_shadow_damage', dmgEff.shadowMin, dmgEff.shadowMax, dmgEff.modded.shadow);
+        } else {
+            rangeLine('eg_stat_phys_damage', item.damage.min, item.damage.max, false);
+        }
+        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attack_interval')}: <span class="eg-tt-val">${item.attackIntervalSeconds}s</span></div>`);
     }
     if (item.blockChance) {
         implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_block_chance')}: <span class="eg-tt-val">${item.blockChance}%</span></div>`);
@@ -753,7 +769,7 @@ function _egBuildTooltipBodyHTML(item) {
     return `
 <div class="eg-tt-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon">${item.icon || '📦'}</div>
+        <div class="eg-tt-icon">${EG_ART.html('item', item.baseId, item.icon || '📦')}</div>
         <div class="eg-tt-name" style="color:${rc.color};">${item.name || item.baseName || '???'}</div>
         ${(item.baseName && item.baseName !== item.name)
             ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}

@@ -28,9 +28,12 @@
 const EG_MAP_DROP_CHANCE_NORMAL = 0.05;  // 5% per normal monster kill
 const EG_MAP_DROP_CHANCE_BOSS = 0.40;    // bosses drop maps often
 
+// Highest possible map tier (cap for tier upgrades via the Orb of Horizons).
+const EG_MAX_MAP_TIER = 16;
+
 // Map tier is derived from the monster level of the killing blow context.
 function _egRollMapTier(monsterLevel) {
-    return Math.max(1, Math.min(16, Math.ceil((monsterLevel || 1) / 4)));
+    return Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.ceil((monsterLevel || 1) / 4)));
 }
 
 // Map base names grouped by tier band. The band containing the rolled tier
@@ -304,6 +307,61 @@ function _egGetMapRewardBonuses(map) {
 
 
 //------------------------------------------------------------------------
+//-------------------MAP COMPLETION REWARD--------------------------------
+//------------------------------------------------------------------------
+// Every map rolls a random completion reward: 4–10 copies of one
+// higher-grade orb or essence (orbs of transmutation / augmentation are
+// excluded — too low level). The roll is baked in with the implicits so it
+// is fixed per map item and shown in its tooltip. Higher tiers unlock the
+// rarer entries via `minTier`.
+
+const EG_MAP_COMPLETION_REWARD_POOL = [
+    // ── Orbs ─────────────────────────────────────────────────────
+    { id: 'orb_alteration', weight: 200 },
+    { id: 'orb_scouring',   weight: 170 },
+    { id: 'orb_alchemy',    weight: 150 },
+    { id: 'orb_chance',     weight: 120 },
+    { id: 'orb_regal',      weight: 95 },
+    { id: 'orb_chaos',      weight: 75 },
+    { id: 'orb_annulment',  weight: 45 },
+    { id: 'orb_exalted',    weight: 28 },
+    { id: 'orb_divine',     weight: 14, minTier: 4 },
+    { id: 'orb_ascension',  weight: 11, minTier: 5 },
+    { id: 'orb_elevation',  weight: 8,  minTier: 6 },
+    { id: 'orb_cataclysm',  weight: 5,  minTier: 8 },
+    { id: 'mirror_of_kalandra', weight: 1, minTier: 10 },
+
+    // ── Essences ─────────────────────────────────────────────────
+    { id: 'essence_vitality',  weight: 100 },
+    { id: 'essence_fortress',  weight: 90 },
+    { id: 'essence_swiftness', weight: 85 },
+    { id: 'essence_might',     weight: 80 },
+    { id: 'essence_sorcery',   weight: 80 },
+    { id: 'essence_elements',  weight: 65 },
+];
+
+// Resolves a completion-reward def from either currency table.
+function _egGetCompletionRewardDef(id) {
+    return EG_CURRENCY_DEFS[id] || EG_ESSENCE_DEFS[id] || null;
+}
+
+// Rolls the completion reward for a map of the given tier → { id, count }
+// with count between 4 and 10 (inclusive).
+function _egRollMapCompletionReward(mapTier) {
+    const tier = Math.max(1, mapTier || 1);
+    const pool = EG_MAP_COMPLETION_REWARD_POOL.filter(e => !e.minTier || tier >= e.minTier);
+    const total = pool.reduce((s, e) => s + e.weight, 0);
+    let roll = Math.random() * total;
+    let picked = pool[0];
+    for (const entry of pool) {
+        roll -= entry.weight;
+        if (roll <= 0) { picked = entry; break; }
+    }
+    return { id: picked.id, count: 4 + Math.floor(Math.random() * 7) };
+}
+
+
+//------------------------------------------------------------------------
 //-------------------MAP IMPLICITS-----------------------------------------
 //------------------------------------------------------------------------
 // Maps carry five implicit values derived from their tier and shaped by
@@ -402,7 +460,10 @@ function _egRollMapImplicits(map) {
 
     const sizeMix = _egRollMapSizeMix(tier, largerPct);
 
-    return { puzzles, questions, mistakes, durationSeconds: duration, sizeMix };
+    return {
+        puzzles, questions, mistakes, durationSeconds: duration, sizeMix,
+        completionReward: _egRollMapCompletionReward(tier),
+    };
 }
 
 // Returns the map with freshly computed implicits (used after every roll).
@@ -417,8 +478,22 @@ function _egWithImplicits(map) {
 
 // Rolls a full map item. Rarity and prefix/suffix counts use the exact same
 // rollers as equipment so maps behave identically (max 3 pre + 3 suf = 6 mods).
-function _egGenerateMapDrop(monsterLevel = 1) {
+// `tierOverride` (optional) forces the map tier — used by the atlas-aware
+// drop logic so maps found during a run match the active node's graph.
+// Every generated map is stamped with an `atlasNodeId` (see endgame-atlas.js)
+// so completing it can mark that region on the Atlas of Worlds.
+function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null) {
     monsterLevel = Math.max(1, Math.round(monsterLevel || 1));
+
+    // Atlas override: keep item level / mod rolls consistent with the
+    // forced tier (tier N ≈ monster level N*4, inverse of _egRollMapTier).
+    let mapTier;
+    if (tierOverride != null) {
+        mapTier = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tierOverride)));
+        monsterLevel = mapTier * 4;
+    } else {
+        mapTier = _egRollMapTier(monsterLevel);
+    }
 
     const rarity = _egRollRarity();
     const { prefixCount, suffixCount } = _egRollModCounts(rarity);
@@ -426,8 +501,17 @@ function _egGenerateMapDrop(monsterLevel = 1) {
         ? _egRollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, monsterLevel, null)
         : [];
 
-    const mapTier = _egRollMapTier(monsterLevel);
-    const baseName = _egPickMapBaseName(mapTier);
+    // Prefer a concrete atlas region for this tier; fall back to the
+    // legacy band-based name roll when the atlas module isn't loaded.
+    let baseName = null;
+    let atlasNodeId = null;
+    if (typeof egAtlasPickNodeIdForTier === 'function') {
+        atlasNodeId = egAtlasPickNodeIdForTier(mapTier);
+        const node = atlasNodeId ? egAtlasNodeById(atlasNodeId) : null;
+        if (node) baseName = egAtlasNodeName(node);
+    }
+    if (!baseName) baseName = _egPickMapBaseName(mapTier);
+
     const name = _egBuildItemName(baseName, rarity, mods);
 
     return _egWithImplicits({
@@ -442,10 +526,27 @@ function _egGenerateMapDrop(monsterLevel = 1) {
         rarity,
 
         mapTier,
+        atlasNodeId,
         itemLevel: monsterLevel,
         monsterLevel,
         mods,
     });
+}
+
+// While a device run is active with a known atlas region, dropped maps are
+// restricted to the active node's own tier plus its connected tiers
+// (PoE-style: you find your own tier and directly adjacent regions).
+function _egResolveAtlasDropTier(monsterLevel) {
+    if (typeof _egActiveMapItem === 'undefined' || !_egActiveMapItem || !_egActiveMapItem.atlasNodeId) return null;
+    if (typeof egAtlasAllowedDropTiers !== 'function') return null;
+
+    const allowed = egAtlasAllowedDropTiers(_egActiveMapItem.atlasNodeId);
+    if (!allowed || allowed.length === 0) return null;
+
+    const rolled = _egRollMapTier(monsterLevel);
+    return allowed.includes(rolled)
+        ? rolled
+        : allowed[Math.floor(Math.random() * allowed.length)];
 }
 
 // Rerolls ALL mods of a map at the given rarity/counts (orb support).
@@ -607,6 +708,24 @@ const EG_MAP_CURRENCY_RULES = {
             return _egWithImplicits(updated);
         },
     },
+    // Orb of Horizons: raises the map's tier by one (max tier 16).
+    // Atlas region, base name band and implicits are re-derived from the new tier.
+    orb_horizons: {
+        canApply(map) { return (map.mapTier || 1) < EG_MAX_MAP_TIER; },
+        apply(map) {
+            const newTier = Math.min(EG_MAX_MAP_TIER, (map.mapTier || 1) + 1);
+            let atlasNodeId = null;
+            let baseName = null;
+            if (typeof egAtlasPickNodeIdForTier === 'function') {
+                atlasNodeId = egAtlasPickNodeIdForTier(newTier);
+                const node = atlasNodeId ? egAtlasNodeById(atlasNodeId) : null;
+                if (node) baseName = egAtlasNodeName(node);
+            }
+            if (!baseName) baseName = _egPickMapBaseName(newTier);
+            const name = _egBuildItemName(baseName, map.rarity, map.mods || []);
+            return _egWithImplicits({ ...map, mapTier: newTier, atlasNodeId, baseName, name });
+        },
+    },
     mirror_of_kalandra: {
         canApply() { return true; },
     },
@@ -649,7 +768,7 @@ function _egTryDropMap(isBoss, monsterLevel) {
     const chance = isBoss ? EG_MAP_DROP_CHANCE_BOSS : EG_MAP_DROP_CHANCE_NORMAL;
     if (!isBoss && Math.random() > chance) return;
 
-    const map = _egGenerateMapDrop(monsterLevel);
+    const map = _egGenerateMapDrop(monsterLevel, _egResolveAtlasDropTier(monsterLevel));
     if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);
 }
 
@@ -835,9 +954,18 @@ function _egBuildMapTooltipBodyHTML(item) {
             .replace('{x}', imp.sizeMix.massive || 0));
     }
 
-    // ── Reward bonuses (from mods) ───────────────────────────────────
+    // ── Reward bonuses (from mods) + completion reward ───────────────
     const rw = _egGetMapRewardBonuses(item);
     const rewardLines = [];
+    if (imp.completionReward) {
+        const crDef = _egGetCompletionRewardDef(imp.completionReward.id);
+        if (crDef) {
+            rewardLines.push(t('eg_map_completion_reward')
+                .replace('{icon}', crDef.icon || '💰')
+                .replace('{n}', imp.completionReward.count)
+                .replace('{name}', crDef.name));
+        }
+    }
     if (rw.xp > 0) rewardLines.push(t('eg_map_reward_xp').replace('{n}', rw.xp));
     if (rw.quantity > 0) rewardLines.push(t('eg_map_reward_quantity').replace('{n}', rw.quantity));
     if (rw.rarity > 0) rewardLines.push(t('eg_map_reward_rarity').replace('{n}', rw.rarity));

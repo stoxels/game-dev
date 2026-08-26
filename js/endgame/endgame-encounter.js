@@ -354,6 +354,7 @@ function _egTickMonster(m) {
 }
 
 // Advances the player's charge bar. Fires the player attack when full.
+// The bar's max comes from the equipped weapon (see _egGetPlayerAttackInterval).
 function _egTickPlayer() {
     // Ailments: frozen stops the auto-attack bar entirely (movement
     // prevention will hook into the same ailment once movement exists),
@@ -361,7 +362,7 @@ function _egTickPlayer() {
     const chargeMult = (typeof _egGetPlayerChargeMultiplier === 'function') ? _egGetPlayerChargeMultiplier() : 1;
     _egPlayerCurrentCharge += 0.1 * chargeMult; // Ticks at 10Hz[cite: 1]
 
-    if (_egPlayerCurrentCharge >= EG_PLAYER_CHARGE_MAX) {
+    if (_egPlayerCurrentCharge >= _egGetPlayerAttackInterval()) {
         _egPlayerCurrentCharge = 0; // Reset charge
 
         // Only fire if there is an active target selected
@@ -375,7 +376,7 @@ function _egTickPlayer() {
 function _egUpdatePlayerChargeBar() {
     const playerChargeBar = document.getElementById('eg-player-charge-bar');
     if (playerChargeBar) {
-        const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / EG_PLAYER_CHARGE_MAX) * 100));
+        const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / _egGetPlayerAttackInterval()) * 100));
         playerChargeBar.style.width = chargePct + '%';
     }
 }
@@ -1593,7 +1594,7 @@ function _egBuildMonsterCardHTML(m) {
         <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${(m.enrageStacks || 0) > 0 ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
             ${isTarget ? '<span class="eg-target-arrow">▼</span>' : ''}
             ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
-            <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${m.emoji}</span>
+            <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
 
             <div class="eg-monster-compact-tooltip">

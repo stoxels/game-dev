@@ -583,7 +583,7 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
         requirements: { ...base.requirements },
         defenses: { ...base.defenses },
 
-        ...(base.damage ? { damage: { ...base.damage }, attacksPerSecond: base.attacksPerSecond } : {}),
+        ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
 
         mods,

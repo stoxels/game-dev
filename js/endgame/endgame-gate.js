@@ -172,12 +172,17 @@ function _egBuildGateCurrencyStripHTML() {
 //-------------------HTML ASSEMBLY: FULL SCREEN---------------------------
 //------------------------------------------------------------------------
 
-// Builds the top navigation bar with back button and gate title.
+// Builds the top navigation bar with back button, gate title and the
+// Atlas of Worlds button (opens the PoE-style map overview screen).
 function _egBuildGateTopbarHTML() {
     return `
 <div class="eg-topbar">
     <button class="eg-back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('mg_gate_badge')}</span>
+    <div class="eg-topbar-right">
+        <button class="eg-level-btn" onclick="egOpenMapModsOverlay()">🎲 ${t('eg_mm_button')}</button>
+        <button class="eg-level-btn" onclick="showEndgameAtlas()">🗺 ${t('eg_atlas_title')}</button>
+    </div>
 </div>`;
 }
 
@@ -265,6 +270,148 @@ function egActivateMap() {
     } else {
         alert(t('eg_map_alert_activated').replace('{n}', _egMapSlotItem.name));
     }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------OVERLAY: MAP MODIFIER EXPLANATIONS-------------------
+//------------------------------------------------------------------------
+// "Map Modifiers" overlay: opened from the gate topbar. Explains what every
+// modifier on the map currently inserted into the Map Device is doing:
+// rolled stat line, tier, a plain-language effect description and the
+// reward bonuses granted by that modifier.
+// Follows the create-once + .show toggle pattern of _egEnsureDeleteModal()
+// in endgame-hub.js.
+
+// Category colors — same scheme as the map tooltips (tooltips-hud.js).
+const EG_MM_CATEGORY_COLORS = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
+
+// Localized category name for a mod's `affects` tag.
+function _egMapModsCategoryLabel(affects) {
+    const keys = { monster: 'eg_mm_cat_monster', player: 'eg_mm_cat_player', puzzle: 'eg_mm_cat_puzzle' };
+    return t(keys[affects] || 'eg_mm_cat_monster');
+}
+
+// Builds one modifier entry card.
+function _egBuildMapModEntryHTML(mod) {
+    const affects = (typeof _egMapModAffects === 'function') ? _egMapModAffects(mod.familyId) : 'monster';
+    const color = EG_MM_CATEGORY_COLORS[affects] || EG_MM_CATEGORY_COLORS.monster;
+    const rewards = _egGetMapModRewards(mod.familyId, mod.tier);
+
+    const statLines = (mod.rolledStats || [])
+        .filter(stat => stat.label)
+        .map(stat => `<div class="eg-mm-stat" style="color:${color}">${stat.label}</div>`)
+        .join('');
+
+    return `
+<div class="eg-mm-entry" style="border-left-color:${color}">
+    <div class="eg-mm-entry-head">
+        <span class="eg-mm-cat-badge" style="background:${color}">${_egMapModsCategoryLabel(affects)}</span>
+        <span class="eg-mm-tier">${t('eg_mm_tier').replace('{n}', mod.tier || 1)}</span>
+    </div>
+    ${statLines}
+    <div class="eg-mm-desc">${t('eg_mm_desc_' + mod.familyId)}</div>
+    <div class="eg-mm-rewards">🎁 +${rewards.xp}% ${t('eg_mm_rw_xp')} · +${rewards.quantity}% ${t('eg_mm_rw_quantity')} · +${rewards.rarity}% ${t('eg_mm_rw_rarity')}</div>
+</div>`;
+}
+
+// Builds the full overlay content from the map currently in the device slot.
+function _egBuildMapModsOverlayContentHTML() {
+    const map = _egMapSlotItem;
+
+    if (!map) {
+        return `<div class="eg-mm-empty">${t('eg_mm_no_map')}</div>`;
+    }
+
+    let html = `
+<div class="eg-mm-map-head">
+    <div class="eg-mm-map-name">🗺️ ${map.name}</div>
+    <div class="eg-mm-map-tier">${(t('eg_map_tier_tt') || 'Tier {n}').replace('{n}', map.mapTier ?? 1)}</div>
+</div>`;
+
+    const mods = Array.isArray(map.mods) ? map.mods : [];
+    if (mods.length === 0) {
+        html += `<div class="eg-mm-empty">${t('eg_mm_unmodified')}</div>`;
+        return html;
+    }
+
+    html += mods.map(_egBuildMapModEntryHTML).join('');
+    return html;
+}
+
+// Creates the overlay DOM element once (hidden by default).
+function _egEnsureMapModsOverlay() {
+    if (document.getElementById('eg-map-mods-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'eg-map-mods-overlay';
+    overlay.className = 'eg-mm-overlay-bg';
+    overlay.innerHTML = `
+<div class="eg-mm-overlay-box">
+    <div class="eg-mm-overlay-title">${t('eg_mm_title')}</div>
+    <div class="eg-mm-overlay-body" id="eg-mm-overlay-body"></div>
+    <div class="eg-mm-overlay-btns">
+        <button class="eg-mm-close-btn" onclick="egCloseMapModsOverlay()">${t('eg_mm_close')}</button>
+    </div>
+</div>`;
+    document.body.appendChild(overlay);
+
+    // Click on the dark backdrop closes the overlay.
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) egCloseMapModsOverlay();
+    });
+
+    _egInjectMapModsOverlayStyles();
+}
+
+// Opens the overlay, refreshing its content from the current device slot.
+function egOpenMapModsOverlay() {
+    _egEnsureMapModsOverlay();
+    document.getElementById('eg-mm-overlay-body').innerHTML = _egBuildMapModsOverlayContentHTML();
+    document.getElementById('eg-map-mods-overlay').classList.add('show');
+}
+
+// Closes the overlay.
+function egCloseMapModsOverlay() {
+    const overlay = document.getElementById('eg-map-mods-overlay');
+    if (overlay) overlay.classList.remove('show');
+}
+
+// One-time CSS injection for the overlay (guard id prevents duplicates).
+function _egInjectMapModsOverlayStyles() {
+    if (document.getElementById('eg-map-mods-overlay-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'eg-map-mods-overlay-styles';
+    style.textContent = `
+.eg-topbar-right { display:flex; gap:8px; }
+.eg-mm-overlay-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+                    z-index:10000; align-items:center; justify-content:center; }
+.eg-mm-overlay-bg.show { display:flex; }
+.eg-mm-overlay-box { width:min(560px, 92vw); max-height:80vh; display:flex; flex-direction:column;
+                     background:#1a1d26; border:1px solid #c8a84b; border-radius:10px;
+                     padding:18px 20px; box-shadow:0 8px 40px rgba(0,0,0,0.6); }
+.eg-mm-overlay-title { font-size:1.2em; font-weight:bold; color:#c8a84b; text-align:center;
+                       margin-bottom:12px; letter-spacing:1px; }
+.eg-mm-overlay-body { overflow-y:auto; flex:1; padding-right:4px; }
+.eg-mm-map-head { text-align:center; margin-bottom:12px; padding-bottom:10px;
+                  border-bottom:1px solid rgba(200,168,75,0.3); }
+.eg-mm-map-name { color:#c8a84b; font-weight:bold; font-size:1.05em; }
+.eg-mm-map-tier { color:#c8a84b; opacity:.85; font-size:.85em; margin-top:2px; }
+.eg-mm-entry { background:rgba(255,255,255,0.04); border-left:3px solid #e67e22;
+               border-radius:6px; padding:10px 12px; margin-bottom:10px; }
+.eg-mm-entry-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.eg-mm-cat-badge { color:#14161d; font-size:.7em; font-weight:bold; padding:2px 8px;
+                   border-radius:10px; letter-spacing:.5px; text-transform:uppercase; }
+.eg-mm-tier { color:rgba(255,255,255,0.55); font-size:.8em; }
+.eg-mm-stat { font-weight:bold; font-size:.95em; margin-bottom:2px; }
+.eg-mm-desc { color:rgba(255,255,255,0.75); font-size:.85em; line-height:1.35; margin-top:5px; }
+.eg-mm-rewards { color:#6dbf40; font-size:.78em; margin-top:6px; }
+.eg-mm-empty { color:rgba(255,255,255,0.55); text-align:center; padding:24px 8px; font-style:italic; }
+.eg-mm-overlay-btns { text-align:center; margin-top:14px; }
+.eg-mm-close-btn { background:#c8a84b; color:#14161d; border:none; border-radius:6px;
+                   padding:8px 22px; font-weight:bold; cursor:pointer; letter-spacing:1px; }
+.eg-mm-close-btn:hover { filter:brightness(1.15); }`;
+    document.head.appendChild(style);
 }
 
 

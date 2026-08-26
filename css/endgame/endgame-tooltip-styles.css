@@ -19,7 +19,7 @@
 /* The shared game tooltip engine caps its floating tip at a narrower
    default — lift that cap while an endgame equipment tooltip is shown. */
 #ghud-floating-tip.eg-wide-tip {
-    max-width: 380px;
+    max-width: 560px;
 }
 
 /* Dedicated extra-wide mode for the hub "?" controls tooltip ONLY.
@@ -32,6 +32,20 @@
 
     /* Lift the PoE frame's own 360px cap inside the controls tooltip */
     #ghud-floating-tip.eg-controls-tip .eg-tt-frame {
+        max-width: none;
+    }
+
+/* Equipment / currency item tooltips — widened purely via content
+   detection (:has), so EVERY call site that renders an .eg-tt-frame gets
+   the extra width automatically (the engine's inline max-width would
+   otherwise crush non-hub call sites down to ~280px). Must come BEFORE
+   the map rule below so maps keep their wider 620px cap. */
+#ghud-floating-tip:has(.eg-tt-frame) {
+    max-width: 560px !important;
+}
+
+    /* Lift the PoE frame's own 360px cap inside equipment tooltips */
+    #ghud-floating-tip .eg-tt-frame {
         max-width: none;
     }
 

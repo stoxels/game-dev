@@ -535,6 +535,7 @@ function _egBuildMonster(defOrId, level = 1) {
 
     const monster = {
         id: `${def.id}_${++_egMonsterSpawnCounter}`,
+        baseId: def.id, // unsuffixed def id — used for EG_ART image lookups
         name: def.name,
         emoji: def.emoji,
         level: lvl,

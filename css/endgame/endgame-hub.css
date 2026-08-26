@@ -674,7 +674,7 @@ Layout Architecture:
     top: 0;
     left: 1px;
     font-family: var(--PX);
-    font-size: 6px;
+    font-size: 8px;
     line-height: 1;
     color: #cfcfcf;
     text-shadow: 0 0 2px #000, 0 0 2px #000, 1px 1px 0 #000;
@@ -682,7 +682,7 @@ Layout Architecture:
 }
 
 .eg-item-chip-large .eg-item-ilvl {
-    font-size: 9px;
+    font-size: 11px;
 }
 
     .eg-item-chip:active {
@@ -696,6 +696,17 @@ Layout Architecture:
 .eg-item-chip-icon {
     font-size: 13px;
     line-height: 1;
+}
+
+/* EG_ART placeholder system: real images scale like the emoji they replace */
+img.eg-art-img {
+    width: 1em;
+    height: 1em;
+    max-width: none;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
+    pointer-events: none;
 }
 
 .eg-item-chip-name {
@@ -1184,7 +1195,7 @@ Layout Architecture:
 }
 
 #screen-endgame-gate .eg-inv-cell .eg-item-ilvl {
-    font-size: 9px;
+    font-size: 11px;
 }
 
 /* Map loaded in the device slot uses the large chip variant already;

@@ -61,7 +61,12 @@ let _egMapDef = null;
 
 
 // --- PLAYER MELEE CONSTANTS ---
-const EG_PLAYER_CHARGE_MAX = 10; // Adjust for how many seconds it takes to charge
+// Base auto-strike charge time in seconds when no weapon is equipped.
+// The equipped weapon's attackIntervalSeconds defines the actual base
+// (see _egGetPlayerAttackInterval in endgame-player-stats.js); the
+// weapon's attack_speed mods then subtract seconds from it.
+const EG_PLAYER_DEFAULT_ATTACK_INTERVAL = 10;
+const EG_PLAYER_MIN_ATTACK_INTERVAL = 2; // Lower clamp so strikes can't be spammed
 const EG_PLAYER_MELEE_DAMAGE = 10; // Default flat damage
 const EG_PLAYER_MELEE_ANIM_DURATION_MS = 500; // Matches monster melee duration
 

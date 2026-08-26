@@ -53,6 +53,14 @@ const EG_SHARD_DEFS = {
         name: t('eg_shard_elevation'),
         description: t('eg_shard_elevation_desc'),
     },
+    // Map-only sell currency: granted when a map item is sold
+    // (Ctrl + left-click). 10 fragments merge into an Orb of Horizons.
+    shard_horizon: {
+        id: 'shard_horizon', orbId: 'orb_horizons',
+        icon: '🧭', orbIcon: '🌌',
+        name: t('eg_shard_horizon'),
+        description: t('eg_shard_horizon_desc'),
+    },
     shard_ascension: {
         id: 'shard_ascension', orbId: 'orb_ascension',
         icon: '💠', orbIcon: '🔮',
@@ -175,6 +183,7 @@ function _egShardOrbNameKey(orbId) {
         case 'orb_alchemy':       return 'eg_orb_alchemy';
         case 'orb_chaos':         return 'eg_orb_chaos';
         case 'orb_elevation':     return 'eg_orb_elevation';
+        case 'orb_horizons':      return 'eg_orb_horizons';
         case 'orb_ascension':     return 'eg_orb_ascension';
         case 'orb_cataclysm':     return 'eg_orb_cataclysm';
         default:                  return null;
@@ -238,27 +247,98 @@ function _egSellStashItem(row, col) {
     return true;
 }
 
+// Destroys a map item and grants exactly one Horizon Fragment (the
+// map-only sell currency). Shared by map-stash and map-device sells.
+// Returns true on success.
+function _egSellMapItem(map, sourceEl) {
+    if (!map) return false;
+
+    const shardDef = EG_SHARD_DEFS.shard_horizon;
+    if (!egAddShard(shardDef.id, 1)) {
+        // Could not grant the fragment (runes & orbs strip full) — keep the map.
+        if (sourceEl) {
+            sourceEl.classList.add('eg-slot-reject');
+            setTimeout(() => sourceEl.classList.remove('eg-slot-reject'), 600);
+        }
+        return false;
+    }
+
+    _egClearTooltip();
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('player_equip_pickup');
+    }
+    showToast(t('eg_sell_item_sold')
+        .replace('{name}', map.name || '???')
+        .replace('{icon}', shardDef.icon)
+        .replace('{shard}', shardDef.name));
+    return true;
+}
+
+// Sells the map in the given map stash cell for one Horizon Fragment.
+function _egSellMapStashItem(row, col) {
+    const map = _egMapStash[row][col];
+    if (!map) return false;
+
+    const cellEl = document.querySelector(
+        `.eg-map-stash-cell[data-row="${row}"][data-col="${col}"]`);
+    if (!_egSellMapItem(map, cellEl)) return false;
+
+    _egMapStash[row][col] = null;
+    _egRenderMapStashCell(row, col);
+    egSaveHubState();
+    return true;
+}
+
+// Sells the map currently loaded into the Probability Gate device slot
+// for one Horizon Fragment.
+function _egSellDeviceMap() {
+    const map = _egMapSlotItem;
+    if (!map) return false;
+
+    const slotEl = document.getElementById('eg-map-slot');
+    if (!_egSellMapItem(map, slotEl)) return false;
+
+    _egMapSlotItem = null;
+    _egRenderMapSlot();
+    egSaveHubState();
+    return true;
+}
+
 // Capture-phase mousedown handler — intercepts Ctrl + left-click on items
-// in the MAIN stash only (not paperdoll, map stash or runes & orbs cells).
-// Registered at script load time so it fires before the DnD pick-up
-// listener (bound later at hub-open time); stopImmediatePropagation keeps
-// the drag system from also picking the item up.
+// in the MAIN stash, on MAPS in the map stash / map device slot (gate or
+// hub screen). Equipment sells into a random orb shard; maps always sell
+// into a Horizon Fragment. Registered at script load time so it fires
+// before the DnD pick-up listener (bound later at hub-open time);
+// stopImmediatePropagation keeps the drag system from also picking the
+// item up.
 document.addEventListener('mousedown', function (e) {
     if (!e.ctrlKey || e.button !== 0) return;
 
     const chip = e.target.closest('.eg-item-chip');
-    if (!chip || !chip.closest('#screen-endgame-hub')) return;
+    const onManagedScreen = !!chip && (typeof _dndChipScreenEl === 'function'
+        ? !!_dndChipScreenEl(chip)
+        : !!chip.closest('#screen-endgame-hub'));
+    if (!onManagedScreen) return;
 
     // Don't sell while an orb "use mode" selection is active — the click
     // belongs to applying the orb.
     if (typeof _egPendingCurrencyUse !== 'undefined' && _egPendingCurrencyUse) return;
 
     const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell)');
-    if (!invCell) return;
+    const mapStashCell = chip.closest('.eg-map-stash-cell');
+    const mapSlotEl = chip.closest('#eg-map-slot');
+    if (!invCell && !mapStashCell && !mapSlotEl) return;
 
     e.preventDefault();
     e.stopImmediatePropagation();
 
-    const r = +invCell.dataset.row, c = +invCell.dataset.col;
-    _egSellStashItem(r, c);
+    if (mapSlotEl) {
+        _egSellDeviceMap();
+        return;
+    }
+    if (mapStashCell) {
+        _egSellMapStashItem(+mapStashCell.dataset.row, +mapStashCell.dataset.col);
+        return;
+    }
+    _egSellStashItem(+invCell.dataset.row, +invCell.dataset.col);
 }, true);

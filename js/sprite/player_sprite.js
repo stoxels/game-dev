@@ -506,7 +506,8 @@ function _renderPlayerAvatar() {
     }
 
     // Update charge
-    const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / EG_PLAYER_CHARGE_MAX) * 100));
+    const chargeMax = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
+    const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / chargeMax) * 100));
     document.getElementById('avatar-charge-fill').style.width = chargePct + '%';
 }
 

@@ -54,6 +54,7 @@ function _egnBuildFullScreenHTML() {
         ${_egnBuildDoorHTML('🧪', 'egt_title', 'showEndgameTestHub()')}
         ${_egnBuildDoorHTML('🧙', 'eg_char_sheet_title', 'showEndgameHub()')}
         ${_egnBuildDoorHTML('🎲', 'mg_gate_badge', 'showEndgameGate()')}
+        ${_egnBuildDoorHTML('🗺️', 'eg_atlas_title', 'showEndgameAtlas()')}
     </div>
 </div>`;
 }

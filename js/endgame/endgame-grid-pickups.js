@@ -442,7 +442,7 @@ function _egRenderLootOverlay(row, col, item) {
     const span = document.createElement('span');
     span.className = `eg-pickup-overlay eg-pickup-rarity-${item.rarity || 'common'} eg-loot-overlay`;
     span.id = `eg-loot-${row}-${col}`;
-    span.textContent = item.icon || '📦';
+    EG_ART.fillElement(span, 'item', item.baseId, item.icon || '📦');
     el.appendChild(span);
 }
 
@@ -460,7 +460,7 @@ function _egAnimateLootClaim(row, col, item) {
     const centre = _egGetElementCentre(el);
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    floater.textContent = item.icon || '📦';
+    EG_ART.fillElement(floater, 'item', item.baseId, item.icon || '📦');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
@@ -708,7 +708,7 @@ function _egSpawnCurrencyDrop(def) {
 function _egTrackRunCurrency(def) {
     const existing = _egRunCurrency.find(e => e.id === def.id);
     if (existing) existing.count++;
-    else _egRunCurrency.push({ id: def.id, name: def.name, icon: def.icon, count: 1 });
+    else _egRunCurrency.push({ id: def.id, name: def.name, icon: def.icon, description: def.description, count: 1 });
 }
 
 

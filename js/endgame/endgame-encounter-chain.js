@@ -486,6 +486,44 @@ function _egRollBonusMapLoot() {
         .replace('{name}', item.name), _egRarityToastColor(item.rarity));
 }
 
+// Grants the active map's rolled completion reward (4–10× one higher-grade
+// orb or essence). Adds it to the real currency/essence stash AND to
+// _egRunCurrency so it shows up in the runes & orbs section of the
+// leave-map transition screen. Must run BEFORE _egShowLeaveMapTransition()
+// renders the summary and before cleanup clears _egActiveMapItem /
+// _egRunCurrency.
+function _egGrantMapCompletionReward() {
+    const mapItem = (typeof _egActiveMapItem !== 'undefined') ? _egActiveMapItem : null;
+    const reward = mapItem && mapItem.implicits && mapItem.implicits.completionReward;
+    if (!reward || !reward.count) return;
+
+    const def = (typeof _egGetCompletionRewardDef === 'function')
+        ? _egGetCompletionRewardDef(reward.id) : null;
+    if (!def) return;
+
+    // Essences stack in the essence tab, orbs in the runes & orbs stash.
+    const added = def.category === 'essence'
+        ? egAddEssence(def.id, reward.count, def)
+        : egAddCurrency(def.id, reward.count, def);
+    if (!added) showToast(t('eg_map_stash_full'));
+
+    // Mirror into the transition screen's currency list (aggregated by id).
+    const existing = _egRunCurrency.find(e => e.id === def.id);
+    if (existing) existing.count += reward.count;
+    else _egRunCurrency.push({
+        id: def.id,
+        name: def.name,
+        icon: def.icon,
+        description: def.description,
+        count: reward.count,
+    });
+
+    showToast(t('eg_map_reward_granted')
+        .replace('{icon}', def.icon || '💰')
+        .replace('{n}', reward.count)
+        .replace('{name}', def.name), '#f5d98a');
+}
+
 // Builds the hover-tooltip body for the bonus-loot chance label in the
 // corner HUD: explains what bonus loot is and shows the current chance.
 function _egBuildBonusLootTooltipHTML() {
@@ -562,6 +600,15 @@ function _egEndMap() {
     // Roll for completion bonus loot first — it must land in _egRunLoot
     // before the transition overlay renders its summary.
     _egRollBonusMapLoot();
+
+    // Grant the map's rolled currency completion reward — it must land in
+    // the stash and in _egRunCurrency before the summary renders.
+    _egGrantMapCompletionReward();
+
+    // Atlas: mark this run's region as cleared and unlock its connected
+    // regions (see endgame-atlas.js). Must run before _egChainCleanup
+    // clears _egActiveMapItem.
+    if (typeof _egAtlasOnMapCompleted === 'function') _egAtlasOnMapCompleted(_egActiveMapItem);
 
     // Show the overlay FIRST — it sits above the puzzle grid with normal
     // pointer-events, so it blocks every further click the instant this
@@ -832,7 +879,6 @@ function _egBuildLootItem() {
 
             // Prioritize the base item name, fallback to standard name
             const displayName = item.baseName || item.name || t('eg_unknown_item');
-            const icon = item.icon || '📦';
 
             // Generate the exact same tooltip frame used in your Endgame Hub
             const nestedTooltip = typeof _egBuildTooltipBodyHTML === 'function'
@@ -841,7 +887,7 @@ function _egBuildLootItem() {
 
             return `
                 <div class="eg-loot-item-row" style="color: ${color};">
-                    <span class="eg-loot-item-icon">${icon}</span>${displayName}
+                    <span class="eg-loot-item-icon">${EG_ART.html('item', item.baseId, item.icon || '📦')}</span>${displayName}
                     <div class="eg-nested-tooltip">
                         ${nestedTooltip}
                     </div>
@@ -964,7 +1010,7 @@ function _egChainCleanup() {
 function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency) {
     const lootHTML = loot.map((item, i) => `
         <div class="eg-leave-summary-chip eg-loot-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
-            ${item.icon || '📦'}
+            ${EG_ART.html('item', item.baseId, item.icon || '📦')}
         </div>`).join('');
 
     const itemsHTML = items.map((item, i) => `
@@ -1026,17 +1072,38 @@ function _egBuildCurrencyTooltipHTML(entry) {
 }
 
 // Builds a compact tooltip body for regular items (ITEM_DEFS pickups).
+// Pulls the rarity label + localised description straight from ITEM_DEFS
+// so the tooltip matches the inventory's item tooltips.
 function _egBuildLeaveItemTooltipHTML(item) {
     const rc = {
         common: '#b0b0b0', uncommon: '#2ecc71', rare: '#3498db',
         epic: '#9b59b6', legendary: '#f5b642', cursed: '#e74c3c', artifact: '#f1c40f',
     }[_egLeaveRarityClass(item.rarity)] || '#b0b0b0';
+
+    const def = typeof ITEM_DEFS !== 'undefined' ? ITEM_DEFS[item.defId] : null;
+    const desc = (def && typeof itemDesc === 'function') ? itemDesc(def) : '';
+
     return `<div class="eg-tt-frame" style="--tt-border:${rc};">
         <div class="eg-tt-header">
             <div class="eg-tt-icon">${item.icon || '📦'}</div>
             <div class="eg-tt-name" style="color:${rc};">${item.name || '???'}</div>
+            <div class="eg-tt-rarity-line" style="color:${rc};">${_egLeaveRarityLabel(_egLeaveRarityClass(item.rarity))}</div>
         </div>
+        ${desc ? `<div class="eg-tt-section"><div class="eg-tt-desc">${desc}</div></div>` : ''}
     </div>`;
+}
+
+// Localised label for the rarities used by regular items — mirrors the
+// EG_TT_RARITY_KEYS mapping in _egBuildTooltipBodyHTML().
+function _egLeaveRarityLabel(rarity) {
+    const keys = {
+        common: 'rar_common', uncommon: 'rar_uncommon', rare: 'rar_rare',
+        epic: 'eg_rar_epic', legendary: 'rar_legendary', cursed: 'rar_cursed',
+        artifact: 'eg_rar_artifact',
+    };
+    return keys[rarity]
+        ? t(keys[rarity])
+        : rarity.charAt(0).toUpperCase() + rarity.slice(1);
 }
 
 // Ctrl + left-click on an equipment chip inside the leave-map overlay sells
@@ -1099,6 +1166,65 @@ function _egSellRunLootChip(item, state) {
     return true;
 }
 
+// Ctrl + left-click on a map chip inside the leave-map overlay sells the
+// map instantly: it is removed from the run maps (and from the map stash
+// if the flush already placed it there) and grants one Horizon Fragment,
+// which appears both in the overlay's runes &amp; orbs row and in the real
+// currency stash. Returns true when the map was sold.
+function _egSellRunMapChip(map, state) {
+    if (!map) return false;
+
+    // Remove from the live run maps so _egFlushRunLootToStash skips it.
+    const liveIdx = Array.isArray(_egRunMaps) ? _egRunMaps.indexOf(map) : -1;
+    if (liveIdx !== -1) _egRunMaps.splice(liveIdx, 1);
+
+    // If the flush already ran, remove the map from the map stash by identity.
+    let removedFromStash = false;
+    for (let r = 0; r < EG_MAP_STASH_ROWS && !removedFromStash; r++) {
+        for (let c = 0; c < EG_MAP_STASH_COLS && !removedFromStash; c++) {
+            if (_egMapStash[r][c] === map) {
+                _egMapStash[r][c] = null;
+                if (typeof _egRenderMapStashCell === 'function') _egRenderMapStashCell(r, c);
+                removedFromStash = true;
+            }
+        }
+    }
+
+    // Grant one Horizon Fragment (goes straight into the currency stash).
+    const shardDef = EG_SHARD_DEFS.shard_horizon;
+    const granted = egAddShard(shardDef.id, 1);
+
+    // Mirror the gain into the overlay's currency list (aggregated by id).
+    const existing = state.currency.find(e => e.id === shardDef.id);
+    if (existing) existing.count = (existing.count || 1) + 1;
+    else state.currency.push({
+        id: shardDef.id,
+        name: shardDef.name,
+        icon: shardDef.icon,
+        description: shardDef.description,
+        count: 1,
+    });
+
+    // Remove the sold map from the overlay's snapshot.
+    const idx = state.maps.indexOf(map);
+    if (idx !== -1) state.maps.splice(idx, 1);
+
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('player_equip_pickup');
+    }
+    showToast(t('eg_sell_item_sold')
+        .replace('{name}', map.name || '???')
+        .replace('{icon}', shardDef.icon)
+        .replace('{shard}', shardDef.name));
+
+    // Persist the sale immediately — egSaveHubState() already ran in
+    // _egEndMap before the player had a chance to interact with this overlay.
+    if (typeof egSaveHubState === 'function') egSaveHubState();
+
+    if (!granted) showToast(t('eg_map_stash_full'));
+    return true;
+}
+
 // Wires loot / item / currency chips to the global floating tooltip engine
 // (tooltips-hud.js) plus the ctrl+click sell interaction for loot chips.
 // The engine renders into a position:fixed element on document.body, so
@@ -1145,17 +1271,25 @@ function _egWireLeaveMapSummaryTooltips(panel, state) {
         if (e.target.closest('.eg-leave-summary-chip')) hideGameTooltip();
     });
 
-    // Ctrl + left-click on an equipment loot chip → instant sell.
+    // Ctrl + left-click on an equipment loot chip → instant sell (random
+    // orb shard). Ctrl + left-click on a map chip → instant sell for a
+    // Horizon Fragment.
     panel.addEventListener('mousedown', (e) => {
         if (!e.ctrlKey || e.button !== 0) return;
-        const chip = e.target.closest('.eg-loot-chip');
+        const chip = e.target.closest('.eg-loot-chip, .eg-map-pickup-chip');
         if (!chip) return;
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        const item = state.loot[+chip.dataset.lootIdx];
-        if (!item) return;
-        _egSellRunLootChip(item, state);
+        if ('mapIdx' in chip.dataset) {
+            const map = state.maps[+chip.dataset.mapIdx];
+            if (!map) return;
+            _egSellRunMapChip(map, state);
+        } else {
+            const item = state.loot[+chip.dataset.lootIdx];
+            if (!item) return;
+            _egSellRunLootChip(item, state);
+        }
         hideGameTooltip();
         state.render();
     });

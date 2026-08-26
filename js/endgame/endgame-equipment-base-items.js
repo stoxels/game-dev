@@ -1405,7 +1405,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 1,
         requirements: { level: 1, str: 14, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 4, max: 10 }, attacksPerSecond: 1.5,
+        damage: { min: 4, max: 10 }, attackIntervalSeconds: 6.7,
     },
     {
         id: 'wpn_1h_2', name: 'Hand Axe', nameDe: 'Handaxt',
@@ -1413,7 +1413,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 4,
         requirements: { level: 4, str: 28, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 12, max: 28 }, attacksPerSecond: 1.4,
+        damage: { min: 12, max: 28 }, attackIntervalSeconds: 7.1,
     },
     {
         id: 'wpn_1h_3', name: 'War Sword', nameDe: 'Kriegsschwert',
@@ -1421,7 +1421,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 10,
         requirements: { level: 10, str: 50, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 28, max: 58 }, attacksPerSecond: 1.3,
+        damage: { min: 28, max: 58 }, attackIntervalSeconds: 7.7,
     },
     {
         id: 'wpn_1h_4', name: 'Gladius', nameDe: 'Gladius',
@@ -1429,7 +1429,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 19,
         requirements: { level: 19, str: 76, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 52, max: 108 }, attacksPerSecond: 1.3,
+        damage: { min: 52, max: 108 }, attackIntervalSeconds: 7.7,
     },
     {
         id: 'wpn_1h_5', name: 'Eternal Sword', nameDe: 'Ewiges Schwert',
@@ -1437,7 +1437,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 29,
         requirements: { level: 29, str: 110, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 94, max: 192 }, attacksPerSecond: 1.2,
+        damage: { min: 94, max: 192 }, attackIntervalSeconds: 8.3,
     },
 
     // ── Agility Melee (fast, lower damage) ────────────────────────────
@@ -1447,7 +1447,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 1,
         requirements: { level: 1, str: 0, agi: 14, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 3, max: 8 }, attacksPerSecond: 1.8,
+        damage: { min: 3, max: 8 }, attackIntervalSeconds: 5.6,
     },
     {
         id: 'wpn_agi_2', name: 'Baselard', nameDe: 'Baselard',
@@ -1455,7 +1455,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 5,
         requirements: { level: 5, str: 0, agi: 28, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 10, max: 22 }, attacksPerSecond: 1.8,
+        damage: { min: 10, max: 22 }, attackIntervalSeconds: 5.6,
     },
     {
         id: 'wpn_agi_3', name: 'Rapier', nameDe: 'Rapier',
@@ -1463,7 +1463,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 12,
         requirements: { level: 12, str: 0, agi: 52, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 24, max: 48 }, attacksPerSecond: 1.7,
+        damage: { min: 24, max: 48 }, attackIntervalSeconds: 5.9,
     },
     {
         id: 'wpn_agi_4', name: 'Stiletto', nameDe: 'Stiletto',
@@ -1471,7 +1471,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 22,
         requirements: { level: 22, str: 0, agi: 80, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 46, max: 90 }, attacksPerSecond: 1.7,
+        damage: { min: 46, max: 90 }, attackIntervalSeconds: 5.9,
     },
 
     // ── Intellect (Wands / Staves) ────────────────────────────────────
@@ -1481,7 +1481,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 1,
         requirements: { level: 1, str: 0, agi: 0, int: 14 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 5, max: 11 }, attacksPerSecond: 1.6,
+        damage: { min: 5, max: 11 }, attackIntervalSeconds: 6.3,
     },
     {
         id: 'wpn_int_2', name: 'Gnarled Staff', nameDe: 'Knorriger Stab',
@@ -1489,7 +1489,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 5,
         requirements: { level: 5, str: 0, agi: 0, int: 28 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 14, max: 30 }, attacksPerSecond: 1.4,
+        damage: { min: 14, max: 30 }, attackIntervalSeconds: 7.1,
     },
     {
         id: 'wpn_int_3', name: 'Bronze Sceptre', nameDe: 'Bronzepter',
@@ -1497,7 +1497,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 12,
         requirements: { level: 12, str: 0, agi: 0, int: 52 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 32, max: 66 }, attacksPerSecond: 1.3,
+        damage: { min: 32, max: 66 }, attackIntervalSeconds: 7.7,
     },
     {
         id: 'wpn_int_4', name: 'Elder Staff', nameDe: 'Stab der Ältesten',
@@ -1505,7 +1505,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 22,
         requirements: { level: 22, str: 0, agi: 0, int: 80 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 60, max: 122 }, attacksPerSecond: 1.2,
+        damage: { min: 60, max: 122 }, attackIntervalSeconds: 8.3,
     },
 
     // ── Two-Handed (high damage, slow) ────────────────────────────────
@@ -1515,7 +1515,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 6,
         requirements: { level: 6, str: 36, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 18, max: 44 }, attacksPerSecond: 0.9,
+        damage: { min: 18, max: 44 }, attackIntervalSeconds: 11.1,
     },
     {
         id: 'wpn_2h_2', name: 'Great Maul', nameDe: 'Kriegshammer',
@@ -1523,7 +1523,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 15,
         requirements: { level: 15, str: 64, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 48, max: 110 }, attacksPerSecond: 0.85,
+        damage: { min: 48, max: 110 }, attackIntervalSeconds: 11.8,
     },
     {
         id: 'wpn_2h_3', name: 'Great Axe', nameDe: 'Kriegsaxt',
@@ -1531,7 +1531,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 26,
         requirements: { level: 26, str: 102, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 98, max: 220 }, attacksPerSecond: 0.8,
+        damage: { min: 98, max: 220 }, attackIntervalSeconds: 12.5,
     },
 
     // ── Endgame: One-Handed Melee ─────────────────────────────────────
@@ -1541,7 +1541,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 40,
         requirements: { level: 40, str: 152, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 150, max: 305 }, attacksPerSecond: 1.2,
+        damage: { min: 150, max: 305 }, attackIntervalSeconds: 8.3,
     },
     {
         id: 'wpn_1h_7', name: 'Kingslayer', nameDe: 'Königsmörder',
@@ -1549,7 +1549,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 62,
         requirements: { level: 62, str: 235, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 232, max: 470 }, attacksPerSecond: 1.15,
+        damage: { min: 232, max: 470 }, attackIntervalSeconds: 8.7,
     },
     {
         id: 'wpn_1h_8', name: 'Godforged Blade', nameDe: 'Gottgeschmiedete Klinge',
@@ -1557,7 +1557,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 88,
         requirements: { level: 88, str: 335, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 355, max: 720 }, attacksPerSecond: 1.1,
+        damage: { min: 355, max: 720 }, attackIntervalSeconds: 9.1,
     },
 
     // ── Endgame: Agility Melee ────────────────────────────────────────
@@ -1567,7 +1567,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 40,
         requirements: { level: 40, str: 0, agi: 146, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 72, max: 140 }, attacksPerSecond: 1.7,
+        damage: { min: 72, max: 140 }, attackIntervalSeconds: 5.9,
     },
     {
         id: 'wpn_agi_6', name: 'Nightfang', nameDe: 'Nachtreißzahn',
@@ -1575,7 +1575,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 62,
         requirements: { level: 62, str: 0, agi: 226, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 112, max: 215 }, attacksPerSecond: 1.65,
+        damage: { min: 112, max: 215 }, attackIntervalSeconds: 6.1,
     },
     {
         id: 'wpn_agi_7', name: 'Heartseeker', nameDe: 'Herzenssucher',
@@ -1583,7 +1583,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 88,
         requirements: { level: 88, str: 0, agi: 322, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 172, max: 330 }, attacksPerSecond: 1.6,
+        damage: { min: 172, max: 330 }, attackIntervalSeconds: 6.3,
     },
 
     // ── Endgame: Wands / Staves ───────────────────────────────────────
@@ -1593,7 +1593,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 40,
         requirements: { level: 40, str: 0, agi: 0, int: 146 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 95, max: 190 }, attacksPerSecond: 1.2,
+        damage: { min: 95, max: 190 }, attackIntervalSeconds: 8.3,
     },
     {
         id: 'wpn_int_6', name: 'Void Sceptre', nameDe: 'Leerenzepter',
@@ -1601,7 +1601,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 62,
         requirements: { level: 62, str: 0, agi: 0, int: 226 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 148, max: 295 }, attacksPerSecond: 1.15,
+        damage: { min: 148, max: 295 }, attackIntervalSeconds: 8.7,
     },
     {
         id: 'wpn_int_7', name: 'Staff of Eternity', nameDe: 'Stab der Ewigkeit',
@@ -1609,7 +1609,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 88,
         requirements: { level: 88, str: 0, agi: 0, int: 322 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 228, max: 455 }, attacksPerSecond: 1.1,
+        damage: { min: 228, max: 455 }, attackIntervalSeconds: 9.1,
     },
 
     // ── Endgame: Two-Handed ───────────────────────────────────────────
@@ -1619,7 +1619,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 50,
         requirements: { level: 50, str: 196, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 175, max: 390 }, attacksPerSecond: 0.8,
+        damage: { min: 175, max: 390 }, attackIntervalSeconds: 12.5,
     },
     {
         id: 'wpn_2h_5', name: 'Worldsplitter', nameDe: 'Weltenspalter',
@@ -1627,7 +1627,7 @@ const EG_BASE_TYPES_WEAPON = [
         minLevel: 85,
         requirements: { level: 85, str: 334, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 320, max: 720 }, attacksPerSecond: 0.75,
+        damage: { min: 320, max: 720 }, attackIntervalSeconds: 13.3,
     },
 ];
 
@@ -1769,7 +1769,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 1,
         requirements: { level: 1, str: 0, agi: 14, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 4, max: 11 }, attacksPerSecond: 1.8,
+        damage: { min: 4, max: 11 }, attackIntervalSeconds: 5.6,
     },
     {
         id: 'ranged_2', name: 'Longbow', nameDe: 'Langbogen',
@@ -1777,7 +1777,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 5,
         requirements: { level: 5, str: 0, agi: 26, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 12, max: 28 }, attacksPerSecond: 1.6,
+        damage: { min: 12, max: 28 }, attackIntervalSeconds: 6.3,
     },
     {
         id: 'ranged_3', name: 'Recurve Bow', nameDe: 'Reflexbogen',
@@ -1785,7 +1785,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 11,
         requirements: { level: 11, str: 0, agi: 46, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 28, max: 60 }, attacksPerSecond: 1.6,
+        damage: { min: 28, max: 60 }, attackIntervalSeconds: 6.3,
     },
     {
         id: 'ranged_4', name: 'Composite Bow', nameDe: 'Kompositbogen',
@@ -1793,7 +1793,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 20,
         requirements: { level: 20, str: 0, agi: 72, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 52, max: 106 }, attacksPerSecond: 1.5,
+        damage: { min: 52, max: 106 }, attackIntervalSeconds: 6.7,
     },
     {
         id: 'ranged_5', name: 'War Bow', nameDe: 'Kriegsbogen',
@@ -1801,7 +1801,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 30,
         requirements: { level: 30, str: 0, agi: 104, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 96, max: 194 }, attacksPerSecond: 1.4,
+        damage: { min: 96, max: 194 }, attackIntervalSeconds: 7.1,
     },
     {
         id: 'ranged_6', name: 'Hunter\'s Greatbow', nameDe: 'Großbogen des Jägers',
@@ -1809,7 +1809,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 40,
         requirements: { level: 40, str: 0, agi: 139, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 150, max: 300 }, attacksPerSecond: 1.4,
+        damage: { min: 150, max: 300 }, attackIntervalSeconds: 7.1,
     },
     {
         id: 'ranged_7', name: 'Storm Bow', nameDe: 'Sturmbogen',
@@ -1817,7 +1817,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 62,
         requirements: { level: 62, str: 0, agi: 216, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 232, max: 465 }, attacksPerSecond: 1.35,
+        damage: { min: 232, max: 465 }, attackIntervalSeconds: 7.4,
     },
     {
         id: 'ranged_8', name: 'Celestial Longbow', nameDe: 'Himmelslangbogen',
@@ -1825,7 +1825,7 @@ const EG_BASE_TYPES_RANGED = [
         minLevel: 88,
         requirements: { level: 88, str: 0, agi: 306, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 355, max: 710 }, attacksPerSecond: 1.3,
+        damage: { min: 355, max: 710 }, attackIntervalSeconds: 7.7,
     },
 ];
 
@@ -2628,7 +2628,7 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
         defenses: { ...base.defenses },
 
         // Weapons get their raw damage range attached as-is
-        ...(base.damage ? { damage: { ...base.damage }, attacksPerSecond: base.attacksPerSecond } : {}),
+        ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
     };
 

@@ -209,6 +209,83 @@ function _egGetItemEffectiveDefenses(item) {
     return out;
 }
 
+//------------------------------------------------------------------------
+//-------------------LOCAL ITEM DAMAGE------------------------------------
+//------------------------------------------------------------------------
+// Weapon damage mods are LOCAL in the Path of Exile sense (for display
+// purposes): flat added Physical / elemental damage and "% increased
+// Physical Damage" rolled on a weapon are baked into the weapon's own
+// damage ranges shown in its tooltip.
+//
+// Effective value = round((base + localFlat) * (1 + localIncPct / 100))
+// for Physical; elemental ranges are pure local flat adds (never scaled
+// by % increased Physical), matching the combat order in
+// _egCalcPlayerDamage() where elemental damage is added AFTER the
+// % increased Physical multiplier.
+const EG_LOCAL_DAMAGE_FLAT_KEYS = {
+    flat_physical_damage_1: 'physMin',
+    flat_physical_damage_2: 'physMax',
+    fire_damage_1: 'fireMin',       fire_damage_2: 'fireMax',
+    cold_damage_1: 'coldMin',       cold_damage_2: 'coldMax',
+    lightning_damage_1: 'lightningMin', lightning_damage_2: 'lightningMax',
+    shadow_damage_1: 'shadowMin',   shadow_damage_2: 'shadowMax',
+};
+
+const EG_LOCAL_DAMAGE_INC_KEYS = {
+    inc_physical_damage: 'physInc',
+};
+
+// Computes an item's effective (local-modified) damage ranges.
+// Returns { physMin, physMax, fireMin, fireMax, coldMin, coldMax,
+// lightningMin, lightningMax, shadowMin, shadowMax,
+// modded: { phys, fire, cold, lightning, shadow } } where modded.<elem>
+// is true when local mods altered that range — used by the tooltip to
+// highlight already-increased values.
+function _egGetItemEffectiveDamage(item) {
+    const base = item.damage || {};
+    const out = {
+        physMin: base.min || 0,
+        physMax: base.max || 0,
+        fireMin: 0, fireMax: 0,
+        coldMin: 0, coldMax: 0,
+        lightningMin: 0, lightningMax: 0,
+        shadowMin: 0, shadowMax: 0,
+    };
+    let physIncPct = 0;
+    const modded = { phys: false, fire: false, cold: false, lightning: false, shadow: false };
+
+    (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
+        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
+            if (stat.value == null) return;
+            const val = Number(stat.value) || 0;
+            if (val === 0) return;
+            const flatStat = EG_LOCAL_DAMAGE_FLAT_KEYS[stat.key];
+            if (flatStat) {
+                out[flatStat] += val;
+                modded[flatStat.replace(/(Min|Max)$/, '')] = true;
+                return;
+            }
+            const incKey = EG_LOCAL_DAMAGE_INC_KEYS[stat.key];
+            if (incKey && out.physMax > 0) {
+                physIncPct += val;
+                modded.phys = true;
+            }
+        });
+    });
+
+    out.physMin = Math.round(out.physMin * (1 + physIncPct / 100));
+    out.physMax = Math.round(out.physMax * (1 + physIncPct / 100));
+
+    // Safety: never let a range invert (e.g. after rounding).
+    ['fire', 'cold', 'lightning', 'shadow'].forEach(elem => {
+        if (out[elem + 'Min'] > out[elem + 'Max']) out[elem + 'Max'] = out[elem + 'Min'];
+    });
+    if (out.physMin > out.physMax) out.physMax = out.physMin;
+
+    out.modded = modded;
+    return out;
+}
+
 // Aggregates every equipped item's implicit defenses + rolled mods into one
 // stats object. Recomputed on demand (cheap — ~19 slots, ≤6 mods each) so it
 // never goes stale after an equip/unequip.
@@ -315,6 +392,34 @@ function _egComputePlayerStats() {
     }
 
     return s;
+}
+
+
+//------------------------------------------------------------------------
+//-------------------AUTO-ATTACK INTERVAL---------------------------------
+//------------------------------------------------------------------------
+
+// Base charge time (in seconds) between automatic melee strikes.
+// The equipped weapon's base type defines the interval via its
+// attackIntervalSeconds implicit ("Attacks every Xs"); the summed
+// attack_speed mod values ("Melee Strikes occur #s more often") are then
+// subtracted, clamped to a minimum so strikes can't be spammed.
+function _egGetPlayerAttackInterval() {
+    const defBase = EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
+    let base = defBase;
+    const weapons = _egGetAllEquippedItems().filter(it =>
+        it.slotType === 'weapon' || it.slotType === 'ranged');
+    if (weapons.length) {
+        const w = weapons[0];
+        if (w.attackIntervalSeconds != null) {
+            base = Number(w.attackIntervalSeconds) || defBase;
+        } else if (w.attacksPerSecond != null) {
+            // Legacy saves predate the rename — derive interval from aps
+            base = defBase / (Number(w.attacksPerSecond) || 1);
+        }
+    }
+    const reduction = _egComputePlayerStats().attackSpeed || 0;
+    return Math.max(EG_PLAYER_MIN_ATTACK_INTERVAL, base - reduction);
 }
 
 
