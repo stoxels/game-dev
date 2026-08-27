@@ -1460,37 +1460,108 @@
     margin: 0 4px;
 }
 
-/* Bars container sitting over the icon wrapper */
+/* ── Compact bars — RPG pop style (matches damage numbers / TARGET pill) ── */
 .eg-compact-bars {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    margin-bottom: 4px;
+    gap: 3px;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 4; /* above emoji frame background but strictly below TARGET pill (z 12) */
+    filter:
+        drop-shadow(0 1px 3px rgba(0,0,0,0.85))
+        drop-shadow(0 0 4px rgba(0,0,0,0.60));
 }
 
-/* Charge Bar (Top-most bar, purple, minimized) */
-.eg-charge-track-compact {
-    width: 100%;
-    height: 4px;
-    background: #111;
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-/* Life Bar (Directly below charge bar, purely red) */
+.eg-charge-track-compact,
 .eg-hp-track-compact {
     width: 100%;
-    height: 5px;
-    background: #111;
-    border-radius: 2px;
+    background: #0d0d0d;
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 3px;
     overflow: hidden;
+    position: relative;
+    box-shadow:
+        inset 0 1px 2px rgba(0,0,0,0.90),
+        inset 0 -1px 1px rgba(255,255,255,0.06),
+        0 1px 3px rgba(0,0,0,0.75);
+}
+
+.eg-charge-track-compact {
+    height: 7px;
+}
+
+.eg-hp-track-compact {
+    height: 9px;
 }
 
 .eg-hp-bar-compact {
     height: 100%;
-    background: #e63946; /* Unified clean red profile */
-    transition: width 0.15s ease-out;
+    background: linear-gradient(180deg, #ff6b6b 0%, #e63946 48%, #b91c1c 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.42),
+        0 0 6px rgba(230,57,70,0.70);
+    border-right: 1px solid rgba(255,255,255,0.55);
+    transition: width 0.15s ease-out, filter 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+/* HP colour states — keep functional readability but with RPG gradient + glow */
+.eg-hp-bar-compact.eg-hp-high {
+    background: linear-gradient(180deg, #7aff9a 0%, #22c55e 48%, #15803d 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.42), 0 0 7px rgba(34,197,94,0.75);
+}
+.eg-hp-bar-compact.eg-hp-mid {
+    background: linear-gradient(180deg, #ffd27a 0%, #f59e0b 48%, #c2410c 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.42), 0 0 7px rgba(245,158,11,0.78);
+}
+.eg-hp-bar-compact.eg-hp-low {
+    background: linear-gradient(180deg, #ff7a7a 0%, #ef4444 48%, #991b1b 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 0 9px rgba(239,68,68,0.92);
+    animation: eg-hp-low-pulse 0.85s ease-in-out infinite;
+}
+@keyframes eg-hp-low-pulse {
+    0%, 100% { filter: brightness(1); }
+    50%      { filter: brightness(1.28); }
+}
+
+/* ── Targeted card: bars pop even harder — gold border, scale, brighter glow ── */
+.eg-monster-card-compact.eg-card-targeted .eg-compact-bars {
+    transform: scale(1.06);
+    transform-origin: center bottom;
+    gap: 4px;
+    filter:
+        drop-shadow(0 2px 5px rgba(0,0,0,0.90))
+        drop-shadow(0 0 10px rgba(255,215,0,0.55));
+}
+.eg-monster-card-compact.eg-card-targeted .eg-charge-track-compact,
+.eg-monster-card-compact.eg-card-targeted .eg-hp-track-compact {
+    border-color: rgba(255,215,0,0.92);
+    border-width: 1.5px;
+    box-shadow:
+        inset 0 1px 2px rgba(0,0,0,0.88),
+        0 0 10px rgba(255,215,0,0.72),
+        0 0 18px rgba(255,140,0,0.42);
+}
+.eg-monster-card-compact.eg-card-targeted .eg-charge-track-compact { height: 8px; }
+.eg-monster-card-compact.eg-card-targeted .eg-hp-track-compact     { height: 10px; }
+.eg-monster-card-compact.eg-card-targeted .eg-hp-bar-compact,
+.eg-monster-card-compact.eg-card-targeted .eg-charge-bar {
+    filter: brightness(1.14);
+}
+.eg-monster-card-compact.eg-card-targeted .eg-hp-bar-compact.eg-hp-low {
+    animation: eg-hp-low-pulse 0.55s ease-in-out infinite;
+}
+
+/* ── Charge bar — purple base + danger shift when near full ────────────────── */
+.eg-charge-bar.eg-charge-danger {
+    background: linear-gradient(180deg, #ffb07a 0%, #ff3b30 48%, #991b1b 100%) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 0 9px rgba(255,59,48,0.92) !important;
+    animation: eg-charge-danger-pulse 0.55s ease-in-out infinite;
+}
+@keyframes eg-charge-danger-pulse {
+    0%, 100% { filter: brightness(1); }
+    50%      { filter: brightness(1.35); }
 }
 
 /* Emoji Wrap Space */
@@ -1628,10 +1699,12 @@
     }
 }
 
-/* Bouncing TARGET marker above the currently targeted monster — RPG pill style */
-.eg-target-arrow {
+/* Bouncing TARGET marker — now anchored to the CARD itself, above the bars
+   (bars are z-index 4, pill is z-index 12 so it never gets covered even when
+   the heavily-glowing targeted bars scale up). */
+.eg-monster-card-compact .eg-target-arrow {
     position: absolute;
-    top: -30px;
+    top: -28px;
     left: 50%;
     transform: translateX(-50%);
     display: inline-flex;
@@ -1660,6 +1733,11 @@
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.85));
     animation: eg-target-bounce 0.65s ease-in-out infinite;
     pointer-events: none;
+    z-index: 12;
+}
+/* Back-compat: if the pill is still rendered inside the emoji wrapper */
+.eg-emoji-wrapper .eg-target-arrow {
+    top: -30px;
     z-index: 10;
 }
 /* arrow glyph inside the pill — slightly larger */

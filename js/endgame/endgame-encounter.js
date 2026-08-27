@@ -2303,9 +2303,11 @@ function _egBuildMonsterCardHTML(m) {
     const { hpPct, chargePct } = _egCalcBarPercentages(m);
     const isTarget = (m.id === _egTargetId);
     const bossCls = m.isBoss ? ' eg-boss-card' : '';
+    const targetedCls = isTarget ? ' eg-card-targeted' : '';
 
     return `
-    <div class="eg-monster-card-compact${bossCls}" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')">
+    <div class="eg-monster-card-compact${bossCls}${targetedCls}" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')">
+        ${isTarget ? '<span class="eg-target-arrow"><span class="eg-target-arrow-icon">▼</span> TARGET <span class="eg-target-arrow-icon">▼</span></span>' : ''}
 
         <!-- Bars stacked top-to-bottom: Charge bar then HP bar above the icon -->
         <div class="eg-compact-bars">
@@ -2313,7 +2315,7 @@ function _egBuildMonsterCardHTML(m) {
                 <div class="eg-charge-bar" id="eg-charge-bar-${m.id}" style="width:${chargePct}%"></div>
             </div>
             <div class="eg-hp-track-compact">
-                <div class="eg-hp-bar-compact" id="eg-hp-bar-${m.id}" style="width:${hpPct}%"></div>
+                <div class="eg-hp-bar-compact ${_egHpBarClass(hpPct)}" id="eg-hp-bar-${m.id}" style="width:${hpPct}%"></div>
             </div>
         </div>
 
@@ -2322,7 +2324,6 @@ function _egBuildMonsterCardHTML(m) {
 
         <!-- Emoji icon with level badge and hover tooltip -->
         <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${(m.enrageStacks || 0) > 0 ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
-            ${isTarget ? '<span class="eg-target-arrow"><span class="eg-target-arrow-icon">▼</span> TARGET <span class="eg-target-arrow-icon">▼</span></span>' : ''}
             ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
             <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
@@ -2349,8 +2350,16 @@ function _egUpdateMonsterBars(m) {
     const chargeBar = document.getElementById(`eg-charge-bar-${m.id}`);
     const hpLabel = document.getElementById(`eg-hp-label-${m.id}`);
 
-    if (hpBar) { hpBar.style.width = hpPct + '%'; hpBar.className = `eg-hp-bar ${_egHpBarClass(hpPct)}`; }
-    if (chargeBar) chargeBar.style.width = chargePct + '%';
+    if (hpBar) {
+        hpBar.style.width = hpPct + '%';
+        hpBar.className = `eg-hp-bar-compact ${_egHpBarClass(hpPct)}`;
+    }
+    if (chargeBar) {
+        chargeBar.style.width = chargePct + '%';
+        // Danger glow when the attack is about to fire (>75% charged) — matches RPG pop
+        if (chargePct >= 75) chargeBar.classList.add('eg-charge-danger');
+        else chargeBar.classList.remove('eg-charge-danger');
+    }
     if (hpLabel) hpLabel.textContent = `${m.currentHP} / ${m.maxHP} HP`;
 
     // Elemental ailment icon strip (only rebuilds when statuses change)
