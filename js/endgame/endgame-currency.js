@@ -413,9 +413,9 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     // can itself be modified further with any other currency.
     if ((isMap && defId === 'mirror_of_kalandra') || (!isMap && def.isMirror)) {
         const copyToMapStash = isMap;
-        const rows = copyToMapStash ? EG_MAP_STASH_ROWS : EG_INV_ROWS;
         const cols = copyToMapStash ? EG_MAP_STASH_COLS : EG_INV_COLS;
         const grid = copyToMapStash ? _egMapStash : _egInventory;
+        const rows = copyToMapStash ? EG_MAP_STASH_ROWS : (typeof _egGetInvRows === 'function' ? _egGetInvRows() : grid.length);
 
         let freeR = -1, freeC = -1;
         outer:
@@ -424,10 +424,37 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
                 if (!grid[r][c]) { freeR = r; freeC = c; break outer; }
             }
         }
+        // Unlimited main stash: grow if needed (map stash stays capped)
         if (freeR === -1) {
-            showToast(copyToMapStash ? t('eg_map_stash_full') : t('eg_inventory_full'));
-            _egCancelCurrencyUse(true);
-            return;
+            if (copyToMapStash) {
+                showToast(t('eg_map_stash_full'));
+                _egCancelCurrencyUse(true);
+                return;
+            }
+            if (typeof _egAddItemToStash === 'function') {
+                const copy = JSON.parse(JSON.stringify(item));
+                copy.mirrored = true;
+                const pos = _egAddItemToStash(copy);
+                // consume mirror below — handled after early return path
+                // consume and update source
+                stack.count = (stack.count || 1) - 1;
+                if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
+                _egRenderCurrencyCell(sourceRow, sourceCol);
+                if (keepActive && stack.count > 0) {
+                    _egRefreshCurrencyUseHighlight();
+                    showToast(t('eg_mirror_created').replace('{name}', copy.name));
+                    egSaveHubState();
+                    return;
+                }
+                _egCancelCurrencyUse(true);
+                showToast(t('eg_mirror_created').replace('{name}', copy.name));
+                egSaveHubState();
+                return;
+            }
+            // fallback expand
+            if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(grid.length + 1);
+            else grid.push(Array(EG_INV_COLS).fill(null));
+            freeR = grid.length - 1; freeC = 0;
         }
 
         const copy = JSON.parse(JSON.stringify(item));

@@ -779,6 +779,11 @@ function updateQuestStats(event, payload = {}) {
         case 'passivePointSpent': _inc('passivePointsSpent'); break;
         case 'achievementUnlocked': _inc('achievementsUnlocked'); break;
         case 'cursedUnderImmunityUsed': _inc('_cursedUnderImmunityThisLevel'); break;
+        case 'atlasTierCompleted':
+        case 'atlasRetroCheck':
+            // Atlas tier quests read STATE.egAtlasCompleted live via _atlasTierCheck();
+            // no stat increment needed — just trigger the completion check below.
+            break;
     }
 
     _questStats_checkNewlyCompleted();

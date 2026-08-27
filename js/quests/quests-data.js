@@ -5,7 +5,29 @@ const LEDGER_GROUPS = [
     { id: 'gameplay', labelEn: 'Gameplay', labelDE: 'Spielweise' },
     { id: 'itemsclasses', labelEn: 'Items & Classes', labelDE: 'Gegenstände & Klassen' },
     { id: 'challenges', labelEn: 'Challenges', labelDE: 'Herausforderungen' },
+    { id: 'atlas', labelEn: 'Atlas', labelDE: 'Atlas' },
 ];
+
+// ─────────────────────────────────────────────────────────────
+//  ATLAS TIER HELPER — used by the 16 Atlas Completion quests (Tiers 1-16)
+//  Returns { current, target } where current = completed atlas nodes of
+//  that tier and target = total atlas nodes of that tier. Reads live from
+//  STATE.egAtlasCompleted and EG_ATLAS_NODES so no extra questStats needed.
+// ─────────────────────────────────────────────────────────────
+function _atlasTierCheck(tier) {
+    if (typeof EG_ATLAS_NODES === 'undefined' || !Array.isArray(EG_ATLAS_NODES)) {
+        return { current: 0, target: 1 };
+    }
+    const nodes = EG_ATLAS_NODES.filter(n => n.tier === tier);
+    const target = nodes.length;
+    if (target === 0) return { current: 0, target: 1 };
+    let current = 0;
+    const completed = (typeof STATE !== 'undefined' && STATE.egAtlasCompleted) ? STATE.egAtlasCompleted : {};
+    for (const n of nodes) {
+        if (completed[n.id]) current++;
+    }
+    return { current, target };
+}
 
 
 const LEDGER_CATEGORIES = [
@@ -1740,7 +1762,255 @@ const LEDGER_CATEGORIES = [
     },
 
 
+    //------------------------------------------------------------------------
+    //----------------------ATLAS TIER COMPLETION QUESTS----------------------
+    //------------------------------------------------------------------------
+    //  16 quests — one per Atlas tier (1-16). Each requires completing ALL
+    //  atlas regions of that tier. Reward: 2 Convergence Points each
+    //  (32 total when Tier 16 is done). Grouped under the dedicated
+    //  'atlas' ledger tab so they don't flood the existing categories.
+    //------------------------------------------------------------------------
 
+    {
+        id: 'atlas_tier_1',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 1: Grasslands Survey', titleDE: 'Atlas Stufe 1: Grasland-Vermessung',
+        descEn: 'Chart every region of Tier 1 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 1 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t1_complete', labelEn: 'All Tier 1 maps completed', labelDE: 'Alle Stufe-1-Karten abgeschlossen',
+                check: () => _atlasTierCheck(1),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_2',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 2: Meadows Expedition', titleDE: 'Atlas Stufe 2: Wiesen-Expedition',
+        descEn: 'Chart every region of Tier 2 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 2 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t2_complete', labelEn: 'All Tier 2 maps completed', labelDE: 'Alle Stufe-2-Karten abgeschlossen',
+                check: () => _atlasTierCheck(2),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_3',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 3: Bayou Exploration', titleDE: 'Atlas Stufe 3: Sumpf-Erkundung',
+        descEn: 'Chart every region of Tier 3 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 3 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t3_complete', labelEn: 'All Tier 3 maps completed', labelDE: 'Alle Stufe-3-Karten abgeschlossen',
+                check: () => _atlasTierCheck(3),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_4',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 4: Rift Mapping', titleDE: 'Atlas Stufe 4: Rift-Kartierung',
+        descEn: 'Chart every region of Tier 4 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 4 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t4_complete', labelEn: 'All Tier 4 maps completed', labelDE: 'Alle Stufe-4-Karten abgeschlossen',
+                check: () => _atlasTierCheck(4),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_5',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 5: Hinterlands Conquest', titleDE: 'Atlas Stufe 5: Hinterland-Eroberung',
+        descEn: 'Chart every region of Tier 5 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 5 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t5_complete', labelEn: 'All Tier 5 maps completed', labelDE: 'Alle Stufe-5-Karten abgeschlossen',
+                check: () => _atlasTierCheck(5),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_6',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 6: Quarry Delve', titleDE: 'Atlas Stufe 6: Steinbruch-Erkundung',
+        descEn: 'Chart every region of Tier 6 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 6 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t6_complete', labelEn: 'All Tier 6 maps completed', labelDE: 'Alle Stufe-6-Karten abgeschlossen',
+                check: () => _atlasTierCheck(6),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_7',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 7: Odds Outpost', titleDE: 'Atlas Stufe 7: Chancen-Außenposten',
+        descEn: 'Chart every region of Tier 7 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 7 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t7_complete', labelEn: 'All Tier 7 maps completed', labelDE: 'Alle Stufe-7-Karten abgeschlossen',
+                check: () => _atlasTierCheck(7),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_8',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 8: Moment Junction', titleDE: 'Atlas Stufe 8: Momenten-Knoten',
+        descEn: 'Chart every region of Tier 8 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 8 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t8_complete', labelEn: 'All Tier 8 maps completed', labelDE: 'Alle Stufe-8-Karten abgeschlossen',
+                check: () => _atlasTierCheck(8),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_9',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 9: Void Pocket', titleDE: 'Atlas Stufe 9: Leerenblase',
+        descEn: 'Chart every region of Tier 9 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 9 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t9_complete', labelEn: 'All Tier 9 maps completed', labelDE: 'Alle Stufe-9-Karten abgeschlossen',
+                check: () => _atlasTierCheck(9),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_10',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 10: Ergodic Expanse', titleDE: 'Atlas Stufe 10: Ergodische Weite',
+        descEn: 'Chart every region of Tier 10 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 10 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t10_complete', labelEn: 'All Tier 10 maps completed', labelDE: 'Alle Stufe-10-Karten abgeschlossen',
+                check: () => _atlasTierCheck(10),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_11',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 11: Infinite Nexus', titleDE: 'Atlas Stufe 11: Unendlicher Nexus',
+        descEn: 'Chart every region of Tier 11 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 11 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t11_complete', labelEn: 'All Tier 11 maps completed', labelDE: 'Alle Stufe-11-Karten abgeschlossen',
+                check: () => _atlasTierCheck(11),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_12',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 12: Citadel Approach', titleDE: 'Atlas Stufe 12: Zitadellen-Anmarsch',
+        descEn: 'Chart every region of Tier 12 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 12 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t12_complete', labelEn: 'All Tier 12 maps completed', labelDE: 'Alle Stufe-12-Karten abgeschlossen',
+                check: () => _atlasTierCheck(12),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_13',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 13: Core of Convergence', titleDE: 'Atlas Stufe 13: Kern der Konvergenz',
+        descEn: 'Chart every region of Tier 13 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 13 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t13_complete', labelEn: 'All Tier 13 maps completed', labelDE: 'Alle Stufe-13-Karten abgeschlossen',
+                check: () => _atlasTierCheck(13),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_14',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 14: Vortex of Possibilities', titleDE: 'Atlas Stufe 14: Wirbel der Möglichkeiten',
+        descEn: 'Chart every region of Tier 14 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 14 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t14_complete', labelEn: 'All Tier 14 maps completed', labelDE: 'Alle Stufe-14-Karten abgeschlossen',
+                check: () => _atlasTierCheck(14),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_15',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 15: The Final Theorem', titleDE: 'Atlas Stufe 15: Das Letzte Theorem',
+        descEn: 'Chart every region of Tier 15 in the Atlas of Worlds.',
+        descDE: 'Kartiere jede Region der Stufe 15 im Weltenatlas.',
+        milestones: [
+            {
+                id: 'atlas_t15_complete', labelEn: 'All Tier 15 maps completed', labelDE: 'Alle Stufe-15-Karten abgeschlossen',
+                check: () => _atlasTierCheck(15),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
+    {
+        id: 'atlas_tier_16',
+        groupId: 'atlas',
+        icon: '🗺️',
+        titleEn: 'Atlas Tier 16: Overload — Pinnacle', titleDE: 'Atlas Stufe 16: Überladung — Gipfel',
+        descEn: 'Chart the pinnacle region of Tier 16. The atlas is complete.',
+        descDE: 'Kartiere die Gipfelregion der Stufe 16. Der Atlas ist vollständig.',
+        milestones: [
+            {
+                id: 'atlas_t16_complete', labelEn: 'Pinnacle Tier 16 completed', labelDE: 'Gipfel-Stufe 16 abgeschlossen',
+                check: () => _atlasTierCheck(16),
+                reward: { ptPoints: 2 }
+            },
+        ]
+    },
 
 
 

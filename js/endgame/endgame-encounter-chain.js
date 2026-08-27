@@ -123,7 +123,33 @@ function _egOnPuzzleComplete() {
 
     // Map fully cleared (bosses included): stay on the board so the player
     // can collect the loot lying around, then leave via Complete Map.
-    if (_egCanLeaveMap()) return;
+    // FIX: if the puzzle is completed while loot is still on the board the
+    // `dead` flag set in checkWin() freezes the grid and loot becomes
+    // unpickable. Instead carry the loot to the next chained puzzle so it
+    // remains collectable — the Complete Map button stays available there.
+    // The drop may land up to a few hundred ms after the puzzle is marked
+    // solved (projectile still in flight for the last kill, or loot
+    // explosion stagger), so defer the drop check to catch late spawns.
+    // This covers both the boss-arena loot explosion and the regular
+    // non-boss case where the last monster is slain simultaneously with
+    // the final puzzle fill.
+    if (_egCanLeaveMap()) {
+        setTimeout(() => {
+            if (!_egIsActive() || !_egCanLeaveMap()) return;
+            if (document.getElementById('eg-leave-map-overlay')) return;
+            const hasPendingDrops = (_egLootDrops && _egLootDrops.size > 0)
+                || (_egCurrencyDrops && _egCurrencyDrops.size > 0)
+                || (_egItemDrops && _egItemDrops.size > 0)
+                || (typeof _egGoldDrops !== 'undefined' && _egGoldDrops.size > 0)
+                || (typeof _egMapDrops !== 'undefined' && _egMapDrops.size > 0)
+                || (_egPickups && _egPickups.size > 0);
+            const isBossFinale = _egBossPhaseActive && _egBossDefeated();
+            if (hasPendingDrops || isBossFinale) {
+                _egStartChainCountdown();
+            }
+        }, 800);
+        return;
+    }
 
     // Boss arena chain: solving an arena puzzle while a boss is still alive
     // rolls straight into the next arena — no quiz interstitial here.
@@ -740,9 +766,7 @@ function _egGetBonusLootChance() {
 function _egRollBonusMapLoot() {
     if (Math.random() > _egGetBonusLootChance()) return;
     if (typeof _egGenerateEquipmentDrop !== 'function') return;
-    // Don't roll (or promise) an item when the stash can't hold it —
-    // _egFlushRunLootToStash would silently drop it otherwise.
-    if (typeof _egStashHasFreeSlot === 'function' && !_egStashHasFreeSlot()) return;
+    // Unlimited stash: always has room — no need to gate
 
     const baseLevel = (_egMapDef && _egMapDef.monsterLevel) ? _egMapDef.monsterLevel : 1;
     const item = _egGenerateEquipmentDrop(baseLevel);
@@ -1286,7 +1310,8 @@ function _egSellRunLootChip(item, state) {
 
     // If the flush already ran, remove the item from the stash by identity.
     let removedFromStash = false;
-    for (let r = 0; r < EG_INV_ROWS && !removedFromStash; r++) {
+    const _searchRows = (typeof _egGetInvRows === 'function') ? _egGetInvRows() : _egInventory.length;
+    for (let r = 0; r < _searchRows && !removedFromStash; r++) {
         for (let c = 0; c < EG_INV_COLS && !removedFromStash; c++) {
             if (_egInventory[r][c] === item) {
                 _egInventory[r][c] = null;

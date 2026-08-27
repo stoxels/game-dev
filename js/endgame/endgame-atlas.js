@@ -351,5 +351,14 @@ function _egAtlasOnMapCompleted(mapItem) {
     }
 
     _egAtlasPersist();
+
+    // Notify the Inference quest system — atlas tier completion quests check
+    // STATE.egAtlasCompleted live via _atlasTierCheck(). Trigger a ledger
+    // evaluation so a just-completed tier auto-claims immediately (banner +
+    // 2 Convergence Points) without requiring an extra level/event.
+    if (typeof updateQuestStats === 'function') {
+        try { updateQuestStats('atlasTierCompleted', { nodeId: node.id, tier: node.tier }); } catch (e) {}
+    }
+
     return { node, firstClear, newlyUnlocked };
 }

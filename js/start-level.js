@@ -348,10 +348,12 @@ function _startSystems() {
 
 // Resets class cooldown, applies passive class effects, and rebuilds the class HUD panel.
 function _initClassSystems() {
-    // Chained endgame puzzles continue the encounter — keep ability cooldowns running
-    if (!(cur && cur.isChainedPuzzle)) {
-        resetActiveCooldown();
-    }
+    // Encounter chain (endgame): cooldowns for base + ascendency abilities
+    // (active1-4) reset between individual puzzles so each puzzle starts
+    // with abilities ready. Mana is the balancing factor and is intentionally
+    // NOT reset — see _cleanupPreviousLevel / _resetPlayerMana which keep
+    // playerCurrentMana / playerMaxMana across chain transitions.
+    resetActiveCooldown();
     applyClassPassiveOnLevelStart();
     buildClassHUD();
 }

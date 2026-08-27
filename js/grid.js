@@ -1038,28 +1038,22 @@ function _handleResidualAnalysis(row, col, rowDone, colDone, sol) {
 function updClues(row, col, isInitial = false) {
     if (!cur) return;
 
-    // Bypass all reward logic during automated start-of-level reveals
-    if (isInitial) return;
-
     const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
-    // Keystone: check if the 25% dead reckoning threshold has been reached
-    if (typeof _deadReckoningCheckUnlock === 'function') _deadReckoningCheckUnlock();
-
-    // --- Row clue state ---
+    // --- Row clue state — always updated so passive reveals at puzzle start
+    // (central_tendency, marginal_distribution, maximum_likelihood) correctly
+    // grey out / strike through clues when a row is completed by a proc'd
+    // reveal during an endgame chain transition. isInitial only suppresses
+    // reward side-effects below, not the visual clue state.
     const rowDone = _isRowSolved(sol, row);
     const rowClues = _computeRowClues(sol);
     const rowFlags = getSolvedClueFlags(rowClues[row], userGrid[row], sol[row]);
 
     _applyRowClueState(row, rowDone, rowClues, rowFlags);
 
-    if (rowDone && userGrid[row][col] === 1 && !revealedGrid[row][col]) {
-        _sparsePriorOnLineComplete(row, true);
-    }
-
-    // --- Column clue state ---
+    // --- Column clue state — same always-update guarantee as rows ---
     const colDone = _isColSolved(sol, col);
     const colClues = _computeColClues(sol);
     const colUserLine = userGrid.map(r => r[col]);
@@ -1067,6 +1061,16 @@ function updClues(row, col, isInitial = false) {
     const colFlags = getSolvedClueFlags(colClues[col], colUserLine, colSolLine);
 
     _applyColClueState(col, colDone, colFlags);
+
+    // Bypass all reward / keystone side-effects during automated start-of-level reveals
+    if (isInitial) return;
+
+    // Keystone: check if the 25% dead reckoning threshold has been reached
+    if (typeof _deadReckoningCheckUnlock === 'function') _deadReckoningCheckUnlock();
+
+    if (rowDone && userGrid[row][col] === 1 && !revealedGrid[row][col]) {
+        _sparsePriorOnLineComplete(row, true);
+    }
 
     if (colDone && userGrid[row][col] === 1 && !revealedGrid[row][col]) {
         _sparsePriorOnLineComplete(col, false);

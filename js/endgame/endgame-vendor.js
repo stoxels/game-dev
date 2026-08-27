@@ -250,22 +250,51 @@ function _egvPurchase(price, grantFn) {
 //-------------------TAB: MAPS----------------------------------------------
 //------------------------------------------------------------------------
 
+// Builds the Maps tab: one free card per tier (1..EG_MAX_MAP_TIER) so every
+// atlas tier can be tested without farming drops. Cards are free for now
+// and use the same rarity/mod rolls as regular map drops. The dedicated
+// Tier 1 starter offer stays available as the first card; buying it keeps
+// forceNormal (white, no mods) for a clean baseline run — other tiers roll
+// normally.
 function _egvBuildMapsTabHTML() {
-    return `
-<div class="egv-offer-card" id="egv-map-offer-card">
-    <div class="egv-offer-icon">🗺️</div>
-    <div class="egv-offer-name">${t('eg_vendor_offer_name')}</div>
-    <div class="egv-offer-desc">${t('eg_vendor_offer_desc')}</div>
-    <div class="egv-offer-price" id="egv-offer-price"></div>
-    <div class="egv-price-missing" id="egv-map-missing-gold" style="display:none;"></div>
-    <button class="title-btn egv-buy-btn" id="egv-buy-btn"
-            onclick="_egvBuyTierOneMap()">${t('eg_vendor_buy_btn')}</button>
-</div>`;
+    const maxTier = (typeof EG_MAX_MAP_TIER !== 'undefined') ? EG_MAX_MAP_TIER
+        : ((typeof EG_ATLAS_MAX_TIER !== 'undefined') ? EG_ATLAS_MAX_TIER : 16);
+    const cards = [];
+    for (let tier = 1; tier <= maxTier; tier++) {
+        const monsterLevel = (typeof _egMapTierMonsterLevel === 'function')
+            ? _egMapTierMonsterLevel(tier) : tier;
+        // Localised card title: replace the "1" in the Tier-1 template with the tier number.
+        let title;
+        try {
+            const tmpl = t('eg_vendor_offer_name');
+            title = tmpl.replace('1', String(tier));
+            // Fallback when translation does not contain "1"
+            if (title === tmpl && !title.includes(String(tier))) title = `Tier ${tier} Map`;
+        } catch (e) { title = `Tier ${tier} Map`; }
+        const sub = `Tier ${tier} · Monster Lv ${monsterLevel}`;
+        let desc;
+        try {
+            const dTmpl = t('eg_vendor_offer_desc');
+            desc = dTmpl.replace(/Tier 1/g, `Tier ${tier}`).replace(/Tier-1/g, `Tier-${tier}`);
+        } catch (e) { desc = `A freshly charted map of a Tier ${tier} region. Region and modifiers are revealed on purchase.`; }
+        cards.push(_egvBuildCardHTML({
+            icon: '🗺️',
+            title,
+            subtitle: sub,
+            desc,
+            price: 0,
+            buyCall: `_egvBuyTierMap(${tier})`,
+            extraClass: 'egv-map-card',
+        }));
+    }
+    return `<div class="egv-cards egv-cards-maps">${cards.join('')}</div>`;
 }
 
-// Kept for parity with the original single-map flow — refreshes the map
-// card's dynamic bits after opening the vendor.
+// Refreshes dynamic bits on the Maps tab. All tier maps are free (price 0)
+// so there is no cannot-afford state — we keep legacy single-card support
+// for save-compatibility and simply refresh the gold balance.
 function _egvRefreshMapsTabDynamic() {
+    // Legacy single-card path (pre multi-tier): keep behaviour if that DOM still exists.
     const priceEl = document.getElementById('egv-offer-price');
     if (priceEl) {
         if (EG_VENDOR_T1_MAP_PRICE > 0) {
@@ -287,34 +316,34 @@ function _egvRefreshMapsTabDynamic() {
                 .replace('{n}', (EG_VENDOR_T1_MAP_PRICE - egGetGold()).toLocaleString());
         }
     }
+    _egvRefreshGoldDisplay();
 }
 
-// Buys one freshly-rolled Tier 1 map. Free starter maps are always forced
-// to Normal rarity (no rolled mods) so a fresh character gets a clean
-// baseline run; paid maps are generated like any other drop. The map is
-// placed in the first free Probability Gate map stash slot.
-function _egvBuyTierOneMap() {
-    if (EG_VENDOR_T1_MAP_PRICE > 0 && !egSpendGold(EG_VENDOR_T1_MAP_PRICE)) {
-        showToast(t('eg_vendor_no_gold').replace('{n}', EG_VENDOR_T1_MAP_PRICE - egGetGold()));
-        Audio_Manager.playSFX('player_equip_not_pickup');
-        return;
-    }
+// Core purchase helper for any tier (free for now). Tier 1 can optionally
+// force a white map for a clean starter run; all tiers currently roll with
+// normal rarity/mod generation so testers see realistic modifiers.
+function _egvBuyTierMap(tier) {
+    const maxTier = (typeof EG_MAX_MAP_TIER !== 'undefined') ? EG_MAX_MAP_TIER
+        : ((typeof EG_ATLAS_MAX_TIER !== 'undefined') ? EG_ATLAS_MAX_TIER : 16);
+    tier = Math.max(1, Math.min(maxTier, Math.round(tier || 1)));
 
     if (typeof _egLoadHubState === 'function') _egLoadHubState();
 
     if (!_egMapStashHasFreeSlot()) {
-        // Refund so gold is never eaten by a full stash.
-        if (EG_VENDOR_T1_MAP_PRICE > 0) _egAddGold(EG_VENDOR_T1_MAP_PRICE);
         showToast(t('eg_vendor_stash_full'));
         Audio_Manager.playSFX('player_equip_not_pickup');
         return;
     }
 
-    // Tier 1 ≈ monster level 4 (same mapping as _egGenerateMapDrop).
-    // The free starter map always launches modifier-free.
-    const map = EG_VENDOR_T1_MAP_PRICE > 0
-        ? _egGenerateMapDrop(4, 1)
-        : _egGenerateMapDrop(4, 1, { forceNormal: true });
+    // All vendor maps are free (price 0) for testing — no gold spend/refund needed.
+    // Tier 1 starter remains modifier-free when the global price is 0 so a fresh
+    // character gets a pristine baseline; other tiers roll normally.
+    let map;
+    if (tier === 1 && EG_VENDOR_T1_MAP_PRICE === 0) {
+        map = _egGenerateMapDrop(4, 1, { forceNormal: true });
+    } else {
+        map = _egGenerateMapDrop(1, tier);
+    }
     _egAddMapToMapStash(map);
     egSaveHubState();
 
@@ -325,6 +354,11 @@ function _egvBuyTierOneMap() {
 
     _egvRefreshMapsTabDynamic();
     _egvRefreshGoldDisplay();
+}
+
+// Backwards-compat shim: old Maps tab and external callers used this name.
+function _egvBuyTierOneMap() {
+    return _egvBuyTierMap(1);
 }
 
 
@@ -653,14 +687,17 @@ function _egvBuyBaseItem(baseId) {
     const price = EG_VENDOR_FREE_BASE_IDS.has(baseId) ? 0 : _egvBaseItemPrice(base);
 
     if (!_egvPurchase(price, () => {
-        if (!_egStashHasFreeSlot()) return false;
-
         const item = _egvBuildBaseItemFromBase(base);
         item.id = `${base.id}_${Date.now()}`;
         // Free starter gear sells for nothing — prevents a buy-free/sell-shard loop.
         if (price === 0) item.noSellValue = true;
 
-        for (let r = 0; r < EG_INV_ROWS; r++) {
+        if (typeof _egAddItemToStash === 'function') {
+            _egAddItemToStash(item);
+            return true;
+        }
+        // fallback for load order
+        for (let r = 0; r < _egInventory.length; r++) {
             for (let c = 0; c < EG_INV_COLS; c++) {
                 if (!_egInventory[r][c]) {
                     _egInventory[r][c] = item;
@@ -669,7 +706,12 @@ function _egvBuyBaseItem(baseId) {
                 }
             }
         }
-        return false;
+        // still no slot -> expand
+        if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(_egInventory.length + 1);
+        else _egInventory.push(Array(EG_INV_COLS).fill(null));
+        _egInventory[_egInventory.length - 1][0] = item;
+        if (typeof _egRenderInventoryCell === 'function') _egRenderInventoryCell(_egInventory.length - 1, 0);
+        return true;
     })) return;
 
     const name = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;

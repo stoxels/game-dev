@@ -76,6 +76,9 @@ function _egSumAttributeBonuses(items) {
 // Total attributes available to satisfy requirements for a given set of
 // items: base attributes plus every item's attribute bonus.
 function _egComputeLoadoutAttributes(items) {
+    if (typeof _egSyncBaseAttributes === 'function') {
+        try { _egSyncBaseAttributes(); } catch (e) {}
+    }
     const bonus = _egSumAttributeBonuses(items);
     return {
         str: EG_PLAYER_BASE_ATTRIBUTES.str + bonus.str,

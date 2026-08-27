@@ -13,13 +13,29 @@ const EG_MONSTER_ZONES = [
 ];
 
 // Default monster count per wave if cur.maxMonsters is not set.
-const EG_DEFAULT_MONSTER_CAP = 3;
+// Scales with monster level so T16 feels dense: 3 at low tiers, 4 at mid, 5 at high.
+// T1 stays breezy, T3-7 ramp, T8+ feels crowded (PoE density).
+function _egGetDefaultMonsterCap(baseLevel) {
+    const lvl = Number(baseLevel) || 1;
+    if (lvl >= 60) return 5;
+    if (lvl >= 30) return 4;
+    if (lvl >= 14) return 3;
+    return 2; // T1-T2 very light
+}
+const EG_DEFAULT_MONSTER_CAP = 3; // legacy fallback — use _egGetDefaultMonsterCap() instead
 
 // Delay before a boss materialises after entering an arena / after the
 // previous arena boss died (ms).
 const EG_BOSS_SPAWN_DELAY_MS = 1500;
 
 // Delay range for respawn timer (ms). A random value in [min, min+variance] is used.
+// Shorter at high tiers so the screen never stays at 1 monster for long.
+function _egGetRespawnDelayMs(baseLevel) {
+    const lvl = Number(baseLevel) || 1;
+    if (lvl >= 60) return { min: 2200, range: 2800 }; // 2.2-5.0s at T13+
+    if (lvl >= 30) return { min: 2800, range: 3500 }; // 2.8-6.3s at T8+
+    return { min: 4000, range: 6000 }; // 4-10s at low tiers
+}
 const EG_RESPAWN_DELAY_MIN_MS = 4000;
 const EG_RESPAWN_DELAY_RANGE_MS = 6000;
 
@@ -116,21 +132,70 @@ function _egBuildFixedNormalList(baseLevel, cap) {
 
 // Builds a randomised monster list by shuffling all non-boss defs.
 // Count is random in [1, cap]. Used when the map has no explicit monster list.
+// Tier-weighted so high-level maps (T14-T16) prefer T3 hard-hitters over T1 fodder.
+function _egCategorizeMonsterTier(def) {
+    // T3: tanky / hard-hitting (high HP or high damage)
+    if ((def.baseHP || 0) >= 110 || (def.baseDamage || 0) >= 15) return 3;
+    // T2: medium
+    if ((def.baseHP || 0) >= 55 || (def.baseDamage || 0) >= 7) return 2;
+    return 1;
+}
+function _egPickWeightedMonster(allDefs, baseLevel) {
+    const lvl = Number(baseLevel) || 1;
+    // At L90: 65% T3, 25% T2, 10% T1; at L1: inverse.
+    let w1 = 1.0, w2 = 1.0, w3 = 1.0;
+    if (lvl >= 70) { w1 = 0.15; w2 = 0.6; w3 = 1.5; }
+    else if (lvl >= 40) { w1 = 0.4; w2 = 1.0; w3 = 1.1; }
+    else if (lvl >= 15) { w1 = 1.0; w2 = 1.0; w3 = 0.5; }
+    else { w1 = 1.5; w2 = 0.7; w3 = 0.2; }
+    const pool = allDefs.map(d => {
+        const tier = _egCategorizeMonsterTier(d);
+        const w = tier === 3 ? w3 : tier === 2 ? w2 : w1;
+        return { def: d, w };
+    });
+    const total = pool.reduce((s, e) => s + e.w, 0);
+    let roll = Math.random() * total;
+    for (const e of pool) {
+        roll -= e.w;
+        if (roll <= 0) return e.def;
+    }
+    return pool[pool.length - 1].def;
+}
 function _egBuildRandomNormalList(baseLevel, cap) {
     const allNonBoss = Object.values(EG_MONSTER_DEFS);
     if (allNonBoss.length === 0) return [];
 
-    const shuffled = [...allNonBoss].sort(() => Math.random() - 0.5);
-    const maxCount = Math.min(cap, shuffled.length);
-    const count = 1 + Math.floor(Math.random() * maxCount); // 1..cap
-    return shuffled.slice(0, count).map(d => ({ id: d.id, level: _egRollMonsterLevel(baseLevel) }));
+    const maxCount = Math.min(cap, allNonBoss.length);
+    // Guarantee at least 2 monsters mid/high, 3 at T13+ — avoids lonely 1-monster maps
+    let minCount = 1;
+    if (baseLevel >= 60) minCount = 3;
+    else if (baseLevel >= 30) minCount = 2;
+    else if (baseLevel >= 14) minCount = 2;
+    const clampedMin = Math.min(minCount, maxCount);
+    const span = Math.max(1, maxCount - clampedMin + 1);
+    const count = clampedMin + Math.floor(Math.random() * span); // clampedMin..cap
+    const picked = [];
+    const used = new Set();
+    for (let i = 0; i < count; i++) {
+        // Prefer unique picks but allow repeats if pool exhausted
+        let def = _egPickWeightedMonster(allNonBoss, baseLevel);
+        let attempts = 0;
+        while (used.has(def.id) && attempts < 8) {
+            def = _egPickWeightedMonster(allNonBoss, baseLevel);
+            attempts++;
+        }
+        used.add(def.id);
+        picked.push(def);
+    }
+    return picked.map(d => ({ id: d.id, level: _egRollMonsterLevel(baseLevel) }));
 }
 
 // Builds the normal (non-boss) part of the spawn list for the current encounter.
 // Delegates to fixed or random list builders depending on cur.monsters.
 // cur.maxMonsters caps the total count (0 = boss-only encounter).
 function _egBuildNormalSpawnList(baseLevel) {
-    const cap = (cur.maxMonsters != null && cur.maxMonsters >= 0) ? cur.maxMonsters : EG_DEFAULT_MONSTER_CAP;
+    const fallbackCap = (typeof _egGetDefaultMonsterCap === 'function') ? _egGetDefaultMonsterCap(baseLevel) : EG_DEFAULT_MONSTER_CAP;
+    const cap = (cur.maxMonsters != null && cur.maxMonsters >= 0) ? cur.maxMonsters : fallbackCap;
     if (cap === 0) return [];
 
     if (cur.monsters && cur.monsters.length > 0) {
@@ -235,7 +300,8 @@ function _egRespawnRandomMonster() {
 // Schedules a single replacement monster to spawn after a short random delay.
 // Called whenever a normal monster dies and the kill gate is not yet reached.
 function _egScheduleRespawn() {
-    const delay = EG_RESPAWN_DELAY_MIN_MS + Math.random() * EG_RESPAWN_DELAY_RANGE_MS;
+    const resp = (typeof _egGetRespawnDelayMs === 'function') ? _egGetRespawnDelayMs(_egGetEncounterBaseLevel()) : { min: EG_RESPAWN_DELAY_MIN_MS, range: EG_RESPAWN_DELAY_RANGE_MS };
+    const delay = resp.min + Math.random() * resp.range;
     const t = setTimeout(() => {
         if (typeof _gamePaused !== 'undefined' && _gamePaused) {
             // Paused — retry after pause without consuming the spawn slot
@@ -255,23 +321,26 @@ function _egScheduleRespawn() {
 //------------------------------------------------------------------------
 
 // Calculates a staggered delay for a single spawn entry in the initial wave.
-// The first 1-2 monsters appear almost immediately; the rest are spaced 4-10s apart.
+// The first 2-3 monsters appear almost immediately at high tiers; the rest are spaced 2-6s apart.
 function _egCalcSpawnDelay(index, immediateCount, cumulativeDelay) {
     if (index < immediateCount) {
         // Tiny stagger so the first batch doesn't all land simultaneously
         return { delay: EG_INITIAL_SPAWN_STAGGER_BASE_MS + index * EG_INITIAL_SPAWN_STAGGER_STEP_MS, cumulative: cumulativeDelay };
     }
-    const extra = EG_RESPAWN_DELAY_MIN_MS + Math.random() * EG_RESPAWN_DELAY_RANGE_MS;
+    const resp = (typeof _egGetRespawnDelayMs === 'function') ? _egGetRespawnDelayMs(_egGetEncounterBaseLevel()) : { min: EG_RESPAWN_DELAY_MIN_MS, range: EG_RESPAWN_DELAY_RANGE_MS };
+    const extra = resp.min + Math.random() * resp.range;
     const newCumulative = cumulativeDelay + extra;
     return { delay: newCumulative, cumulative: newCumulative };
 }
 
 // Queues all monsters in spawnList with staggered appearance delays.
-// The first 1-2 entries appear almost immediately; the rest ramp up gradually.
+// The first 2-3 entries appear almost immediately at high tiers; the rest ramp up gradually.
 function _egScheduleMonsterSpawns(spawnList) {
     if (spawnList.length === 0) return;
 
-    const immediateCount = Math.min(spawnList.length, 1 + Math.floor(Math.random() * 2));
+    const lvl = _egGetEncounterBaseLevel();
+    const immediateBase = lvl >= 60 ? 2 : lvl >= 30 ? 2 : 1;
+    const immediateCount = Math.min(spawnList.length, immediateBase + Math.floor(Math.random() * 2)); // 2-3 at high, 1-2 at low
     let cumulativeDelay = 0;
 
     spawnList.forEach((entry, i) => {
@@ -347,6 +416,9 @@ function _egResetEncounterState() {
     if (_egFirstStepSeconds > 0) {
         showToast(t('eg_first_step').replace('{n}', _egFormatStatValue(_egFirstStepSeconds)));
     }
+    // Hold-E pause starts released
+    if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
+    if (typeof _egSetHoldEPauseVisual === 'function') _egSetHoldEPauseVisual(false);
 }
 
 // Starts the combat tick loop at 10Hz.
@@ -405,6 +477,8 @@ function _egStopEncounter() {
     _egCancelAbsorptionRegen();
     if (typeof _egChainCleanup === 'function') _egChainCleanup();
     _egHideMonsterPanel();
+    if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
+    if (typeof _egSetHoldEPauseVisual === 'function') _egSetHoldEPauseVisual(false);
 }
 
 
@@ -467,6 +541,12 @@ function _egTickMonster(m) {
 // Advances the player's charge bar. Fires the player attack when full.
 // The bar's max comes from the equipped weapon (see _egGetPlayerAttackInterval).
 function _egTickPlayer() {
+    // Hold-E pause: while E is held during an endgame encounter, freeze the player's
+    // own auto-attack charge bar. Used to manually time melee strikes.
+    if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+        // If not in an active encounter, fall through (no effect outside endgame)
+    }
     // Ailments: frozen stops the auto-attack bar entirely (movement
     // prevention will hook into the same ailment once movement exists),
     // chilled slows it to half speed.
@@ -482,6 +562,51 @@ function _egTickPlayer() {
         }
     }
 }
+
+// ── Hold-E charge pause — freeze own auto-attack bar while E is held ───────
+function _egSetHoldEPauseVisual(isPaused) {
+    const bar = document.getElementById('avatar-charge-fill');
+    if (bar) bar.classList.toggle('eg-charge-paused', !!isPaused);
+    const alt = document.getElementById('eg-player-charge-bar');
+    if (alt) alt.classList.toggle('eg-charge-paused', !!isPaused);
+}
+
+function _initEgHoldEPauseHotkey() {
+    document.addEventListener('keydown', (e) => {
+        if (!e || !e.key || e.key.toLowerCase() !== 'e') return;
+        if (e.repeat) return;
+        const tag = document.activeElement?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        if (document.querySelector('.modal-bg.show')) return;
+        if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+        if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
+        _egHoldEPauseActive = true;
+        _egSetHoldEPauseVisual(true);
+    });
+    document.addEventListener('keyup', (e) => {
+        if (!e || !e.key || e.key.toLowerCase() !== 'e') return;
+        if (typeof _egHoldEPauseActive !== 'undefined' && !_egHoldEPauseActive) {
+            _egSetHoldEPauseVisual(false);
+            return;
+        }
+        _egHoldEPauseActive = false;
+        _egSetHoldEPauseVisual(false);
+    });
+    window.addEventListener('blur', () => {
+        if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
+            _egHoldEPauseActive = false;
+            _egSetHoldEPauseVisual(false);
+        }
+    });
+    // Also clear on encounter stop / visibility loss
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
+            _egHoldEPauseActive = false;
+            _egSetHoldEPauseVisual(false);
+        }
+    });
+}
+_initEgHoldEPauseHotkey();
 
 // Renders the visual width of the player's charge bar.
 function _egUpdatePlayerChargeBar() {
@@ -1618,10 +1743,16 @@ function _egDamageTarget(amount) {
 // Applies stat changes when a hit lands: reduces HP and pushes back charge.
 // Gear: pushback adds extra seconds on top of the base charge pushback;
 // gear: stagger rolls a chance to pause the charge timer entirely for 1s.
+// Pushback is resisted by high-level monsters (50% at L41, 80% at L90) so
+// low-level players cannot permanently stall a T11+ monster by spamming.
 function _egApplyHitToMonster(target, amount) {
     const stats = _egComputePlayerStats();
     target.currentHP = Math.max(0, target.currentHP - amount);
-    const totalPushback = EG_PLAYER_STATS.chargePushback + (stats.pushbackFlat || 0);
+    const basePushback = EG_PLAYER_STATS.chargePushback + (stats.pushbackFlat || 0);
+    const lvl = Math.max(1, Number(target.level) || 1);
+    // High-level monsters resist pushback: linear 1.5s@L1 -> 0.3s@L90
+    const resistFactor = Math.max(0.20, 1 - 0.014 * (lvl - 1)); // 0.44@L41, 0.20@L90
+    const totalPushback = basePushback * resistFactor;
     target.currentCharge = Math.max(0, target.currentCharge - totalPushback);
 
     if (stats.staggerPct > 0 && Math.random() * 100 < stats.staggerPct) {

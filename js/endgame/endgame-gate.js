@@ -105,8 +105,12 @@ function _egBuildMapStashGridHTML() {
 
 // Assembles the gate panel: map device on top, then the runes & orbs row
 // (synchronized with the hub's currency strip — same _egCurrencyStash data),
-// and the map stash grid below.
+// and the map stash grid below. The maps label carries a legend hint for the
+// gold atlas-incomplete highlight (★ = region not yet cleared on the atlas).
 function _egBuildGatePanelHTML() {
+    const atlasHint = (typeof t === 'function' && t('eg_map_atlas_not_completed') !== 'eg_map_atlas_not_completed')
+        ? t('eg_map_atlas_not_completed').replace(/^○\s*/, '★ ')
+        : '★ Not yet completed on Atlas';
     return `
 <div class="eg-panel eg-panel-map">
     <div class="eg-panel-label">${t('mg_gate_badge')}</div>
@@ -115,7 +119,10 @@ function _egBuildGatePanelHTML() {
         ${_egBuildGateCurrencyStripHTML()}
     </div>
     <div class="eg-map-stash-section">
-        <div class="eg-panel-label">${t('eg_maps_label')}</div>
+        <div class="eg-panel-label" style="display:flex; align-items:center; gap:8px;">
+            <span>${t('eg_maps_label')}</span>
+            <span class="eg-atlas-legend-hint">${atlasHint}</span>
+        </div>
         <div class="eg-map-stash-grid" id="eg-map-stash-grid">
             ${_egBuildMapStashGridHTML()}
         </div>
@@ -200,6 +207,87 @@ function _egBuildGateFullScreenHTML() {
 
 
 //------------------------------------------------------------------------
+//-------------------ATLAS HIGHLIGHT HELPERS------------------------------
+//------------------------------------------------------------------------
+
+// Resolves the atlas node for a map item (prefers stamped atlasNodeId,
+// falls back to legacy name/tier matching via _egAtlasResolveNodeForMap).
+function _egGetMapAtlasNode(map) {
+    if (!map) return null;
+    if (map.atlasNodeId && typeof egAtlasNodeById === 'function') {
+        const n = egAtlasNodeById(map.atlasNodeId);
+        if (n) return n;
+    }
+    if (typeof _egAtlasResolveNodeForMap === 'function') {
+        try { return _egAtlasResolveNodeForMap(map); } catch (e) { return null; }
+    }
+    return null;
+}
+
+// Returns true when the map's atlas region has NOT yet been completed.
+// Returns false when completed or when the node cannot be resolved.
+function _egIsMapAtlasIncomplete(map) {
+    const node = _egGetMapAtlasNode(map);
+    if (!node) return false;
+    if (typeof egAtlasIsCompleted === 'function') {
+        return !egAtlasIsCompleted(node.id);
+    }
+    return false;
+}
+
+// One-time CSS injection for the uncompleted-atlas highlight (gold pulsing border).
+function _egInjectAtlasHighlightStyles() {
+    if (document.getElementById('eg-atlas-highlight-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'eg-atlas-highlight-styles';
+    style.textContent = `
+        /* Map stash cell: map whose atlas region is not yet completed */
+        .eg-map-stash-cell.eg-map-atlas-incomplete {
+            border-color: #f5d98a !important;
+            border-width: 2px !important;
+            box-shadow: 0 0 10px rgba(245,217,138,0.65), inset 0 0 7px rgba(245,217,138,0.28) !important;
+            animation: eg-atlas-pulse 1.8s ease-in-out infinite;
+            position: relative;
+        }
+        .eg-map-stash-cell.eg-map-atlas-incomplete::after {
+            content: '★';
+            position: absolute;
+            top: 1px;
+            right: 3px;
+            font-size: 9px;
+            line-height: 1;
+            color: #f5d98a;
+            text-shadow: 0 0 4px rgba(245,217,138,0.9);
+            pointer-events: none;
+            z-index: 1;
+        }
+        @keyframes eg-atlas-pulse {
+            0%, 100% { border-color: #f5d98a; box-shadow: 0 0 8px rgba(245,217,138,0.55), inset 0 0 5px rgba(245,217,138,0.22); }
+            50% { border-color: #fff2b8; box-shadow: 0 0 14px rgba(245,217,138,0.95), inset 0 0 9px rgba(245,217,138,0.42); }
+        }
+        /* Map device slot: same highlight when the inserted map is uncompleted */
+        .eg-map-slot.eg-map-atlas-incomplete {
+            border-color: #f5d98a !important;
+            border-style: solid !important;
+            box-shadow: 0 0 16px rgba(245,217,138,0.7), inset 0 0 10px rgba(245,217,138,0.25) !important;
+            animation: eg-atlas-pulse 1.8s ease-in-out infinite;
+        }
+        /* Small legend hint under the stash label */
+        .eg-atlas-legend-hint {
+            font-family: var(--PX, monospace);
+            font-size: 7px;
+            letter-spacing: 1px;
+            color: #f5d98a;
+            opacity: 0.85;
+            margin-left: auto;
+        }
+    `;
+    document.head.appendChild(style);
+}
+_egInjectAtlasHighlightStyles();
+
+
+//------------------------------------------------------------------------
 //-------------------RENDER: MAP DEVICE-----------------------------------
 //------------------------------------------------------------------------
 
@@ -211,7 +299,7 @@ function _egRenderMapDeviceButton() {
 }
 
 // Re-renders the map device orb slot: shows the loaded map chip, or the empty prompt.
-// Also refreshes the activate button state.
+// Also refreshes the activate button state and the uncompleted-atlas border.
 // No-ops while the gate screen is not in the DOM.
 function _egRenderMapSlot() {
     const inner = document.getElementById('eg-map-slot-inner');
@@ -222,6 +310,19 @@ function _egRenderMapSlot() {
         : `<span class="eg-map-slot-empty-text">${t('eg_insert_map')}</span>`;
 
     _egRenderMapDeviceButton();
+
+    // Highlight the device slot when the inserted map is not yet completed on the atlas.
+    const slot = document.getElementById('eg-map-slot');
+    if (slot) {
+        _egInjectAtlasHighlightStyles();
+        if (_egMapSlotItem && _egIsMapAtlasIncomplete(_egMapSlotItem)) {
+            slot.classList.add('eg-map-atlas-incomplete');
+            slot.title = (typeof t === 'function') ? t('eg_map_atlas_not_completed') : 'Not yet completed on Atlas';
+        } else {
+            slot.classList.remove('eg-map-atlas-incomplete');
+            slot.removeAttribute('title');
+        }
+    }
 }
 
 
@@ -232,6 +333,8 @@ function _egRenderMapSlot() {
 // Re-renders a single cell in the map stash grid.
 // The whole cell is tinted with the contained map's rarity color
 // (same scheme as the hub's main stash and equipment slots).
+// Maps whose atlas region has not yet been completed get a special
+// gold pulsing border (eg-map-atlas-incomplete).
 // No-ops while the gate screen is not in the DOM.
 function _egRenderMapStashCell(row, col) {
     const cell = document.getElementById(`eg-map-stash-cell-${row}-${col}`);
@@ -242,10 +345,35 @@ function _egRenderMapStashCell(row, col) {
     if (item && typeof _egGetCellFill === 'function') {
         const fill = _egGetCellFill(item);
         cell.style.background = fill;
-        cell.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
+        // Atlas-incomplete highlight overrides the rarity border with gold;
+        // keep the rarity fill but use the animated gold border instead.
+        if (_egIsMapAtlasIncomplete(item)) {
+            _egInjectAtlasHighlightStyles();
+            cell.classList.add('eg-map-atlas-incomplete');
+            // Don't overwrite the gold borderColor — stash CSS uses !important
+            cell.style.borderColor = '';
+        } else {
+            cell.classList.remove('eg-map-atlas-incomplete');
+            cell.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
+        }
     } else {
         cell.style.background = '';
         cell.style.borderColor = '';
+        cell.classList.remove('eg-map-atlas-incomplete');
+        cell.removeAttribute('title');
+    }
+    if (item) {
+        // Tooltip hint: also set title for quick hover (real tooltip is the floating one)
+        if (_egIsMapAtlasIncomplete(item)) {
+            cell.title = (typeof t === 'function') ? t('eg_map_atlas_not_completed') : 'Not yet completed on Atlas';
+        } else if (cell.classList.contains('eg-map-atlas-incomplete')) {
+            cell.removeAttribute('title');
+        } else if (item && typeof _egGetMapAtlasNode === 'function') {
+            const node = _egGetMapAtlasNode(item);
+            if (node && typeof egAtlasIsCompleted === 'function' && egAtlasIsCompleted(node.id)) {
+                cell.removeAttribute('title');
+            }
+        }
     }
 }
 
@@ -466,6 +594,7 @@ function _egInjectMapModsOverlayStyles() {
 // listeners (_egBindDragEvents) are active for the gate as well.
 function _egCreateGateScreen() {
     if (typeof ensureEndgameHubScreen === 'function') ensureEndgameHubScreen();
+    _egInjectAtlasHighlightStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-gate';
     screen.className = 'screen';
@@ -493,6 +622,14 @@ function showEndgameGate(backFn) {
     if (typeof backFn === 'string') _egGateBackFn = backFn;
     else _egGateBackFn = 'showEndgameNexus';
     ensureEndgameGateScreen();
+
+    // Migrate old gate screens that were built without the atlas legend hint
+    // (added when atlas-incomplete highlighting was introduced).
+    const gateScreen = document.getElementById('screen-endgame-gate');
+    if (gateScreen && !gateScreen.querySelector('.eg-atlas-legend-hint')) {
+        gateScreen.innerHTML = _egBuildGateFullScreenHTML();
+    }
+    _egInjectAtlasHighlightStyles();
 
     // The gate screen DOM is built once — keep the back button in sync
     // with the current return target.

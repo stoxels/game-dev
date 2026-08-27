@@ -22,8 +22,10 @@
 // giving a direct incentive to stack resistances on hazard maps.
 //
 // The rolled mod value acts as the hazard INTENSITY (%): it scales damage,
-// spawn counts and frequency. All timing is driven from the encounter's
-// 10Hz tick loop (_egHazardsTick), so pausing the game freezes hazards.
+// spawn counts and frequency. Damage additionally scales with the map's
+// tier (see _egHzTierMult) so higher-tier maps stay challenging. All
+// timing is driven from the encounter's 10Hz tick loop (_egHazardsTick),
+// so pausing the game freezes hazards.
 //
 // Dependencies (loaded before this file):
 //   endgame-map-launch.js — _egGetActiveMapModValue
@@ -98,7 +100,7 @@ const EG_HZ_FROSTNOVA_FREEZE_CHANCE_PCT = 30;
 const EG_HZ_FROSTNOVA_INTERVAL_MIN_MS = 6000;
 const EG_HZ_FROSTNOVA_INTERVAL_MAX_MS = 10000;
 
-const EG_HZ_FIREWALL_BASE_DMG_PCT = 8;     // % of playerMaxHP per wall hit
+const EG_HZ_FIREWALL_BASE_DMG_PCT = 18;    // % of playerMaxHP per wall hit — significant fire wave (was 8, too low)
 const EG_HZ_FIREWALL_HEIGHT = 150;         // flame wave thickness (px)
 const EG_HZ_FIREWALL_WARNING_MS = 1300;    // telegraph before ignition
 const EG_HZ_FIREWALL_SWEEP_MS = 2600;      // top → bottom sweep duration
@@ -155,6 +157,24 @@ function _egHzIntensity(familyId) {
 // Damage multiplier from the rolled intensity value (e.g. 60 → ×1.6).
 function _egHzMult(intensity) {
     return 1 + Math.max(0, intensity) / 100;
+}
+
+// Map-tier scaling for elemental hazards: higher tiers deal significantly
+// more hazard damage so hazards stay challenging in late endgame. Tier 1
+// is 1.0×, each additional tier adds ~7% (T16 ≈ 2.05×).
+function _egHzTierMult() {
+    let tier = 1;
+    try {
+        if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem && _egActiveMapItem.mapTier != null) {
+            tier = _egActiveMapItem.mapTier;
+        }
+    } catch (e) {}
+    tier = Math.max(1, Math.min(16, Number(tier) || 1));
+    // Allow EG_MAX_MAP_TIER override if defined.
+    if (typeof EG_MAX_MAP_TIER !== 'undefined' && EG_MAX_MAP_TIER > 16) {
+        tier = Math.max(1, Math.min(EG_MAX_MAP_TIER, Number(tier) || 1));
+    }
+    return 1 + (tier - 1) * 0.07;
 }
 
 function _egHzRand(min, max) {
@@ -324,10 +344,13 @@ function _egHzPointOutsideGrid(pad) {
 
 // Applies an elemental hazard hit to the player (% of max life) through the
 // normal intake pipeline → resistances / dodge / block / shock amp apply.
+// Scales with both intensity (via caller) and map tier (here) so high-tier
+// maps remain challenging even when hazard intensity is moderate.
 function _egHzDamage(pctOfMaxHP, element, colorHex) {
     if (!_egIsActive()) return 0;
     const maxHP = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
-    const amount = Math.max(1, Math.round(maxHP * pctOfMaxHP / 100));
+    const tierMult = _egHzTierMult();
+    const amount = Math.max(1, Math.round(maxHP * pctOfMaxHP * tierMult / 100));
     const dealt = _egPlayerTakeDamage(amount, true, element);
     _egHzShowHitText(dealt, colorHex);
     return dealt;

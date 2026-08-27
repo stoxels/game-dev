@@ -613,7 +613,7 @@ function _egGetPlayerAttackInterval() {
 // Armour mitigation is damage-relative (PoE-style): the same armour value
 // mitigates many small hits strongly but large hits weakly, so it never
 // trivially caps once gear values grow and stays relevant at every level.
-const EG_ARMOUR_DAMAGE_FACTOR = 10;   // reduction% = armour / (armour + factor * rawDamage)
+const EG_ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) — was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
 const EG_ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
 
 // Returns armour's % reduction (0..EG_ARMOUR_MAX_REDUCTION) against a hit of
@@ -635,7 +635,7 @@ function _egCalcArmourMitigation(rawDamage, armour) {
 // higher-level monsters are harder to dodge, so evasion keeps requiring
 // upgrades instead of permanently sitting at the cap once gear values grow.
 const EG_EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
-const EG_EVASION_LEVEL_GROWTH = 1.045; // per-level growth of the evasion benchmark
+const EG_EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 — retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
 const EG_EVASION_DODGE_CAP_PCT = 75;
 
 function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
@@ -656,12 +656,13 @@ function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
 // punished by the raw formula: at parity (player level ≈ monster level)
 // even a naked character lands most hits, while accuracy investment from
 // gear lets you comfortably fight content ABOVE your level. Fighting
-// higher-level monsters without that investment still gets shaky.
-const EG_ACCURACY_MISS_SCALE = 150;   // miss% = scale * monsterLevel / effectiveAccuracy
+// higher-level monsters without that investment now gets noticeably shaky
+// (retuned: higher scale so gear matters for T16; innate slightly lowered).
+const EG_ACCURACY_MISS_SCALE = 185;   // miss% = scale * monsterLevel / effectiveAccuracy (was 150)
 const EG_ACCURACY_MISS_MIN_PCT = 5;   // never perfectly reliable
 const EG_ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
-const EG_ACCURACY_INNATE_BASE = 30;       // innate accuracy at player level 1
-const EG_ACCURACY_INNATE_PER_LEVEL = 15;  // extra innate accuracy per player level
+const EG_ACCURACY_INNATE_BASE = 25;       // innate accuracy at player level 1 (was 30)
+const EG_ACCURACY_INNATE_PER_LEVEL = 13;  // extra innate accuracy per player level (was 15)
 
 function _egGetInnateAccuracy() {
     const lvl = (typeof _egGetPlayerLevel === 'function')
@@ -705,10 +706,10 @@ function _egGetElementalDamageBonus(stats) {
 // gear: absorption_regen_rate increases the refill speed (%).
 
 // Base delay before regeneration starts (reduced by fasterAbsorptionRegenStart).
-const EG_ABSORPTION_REGEN_BASE_DELAY_MS = 10000;
+const EG_ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 — 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
 
 // Base share of max Absorption restored per regen tick (scaled by absorptionRegenRatePct).
-const EG_ABSORPTION_REGEN_BASE_STEP_PCT = 0.08;
+const EG_ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 — 5s to full (was 3.3s), so even after delay a full shield takes longer
 
 function _egCancelAbsorptionRegen() {
     if (_egPlayerAbsorptionRegenDelayTimer) { clearTimeout(_egPlayerAbsorptionRegenDelayTimer); _egPlayerAbsorptionRegenDelayTimer = null; }

@@ -281,9 +281,11 @@ function _dndDropOnCell(grid, renderFn, row, col) {
 }
 
 // Scans a grid for the first empty cell and places the item there.
-// Returns true on success, false when the grid is full.
+// Unlimited main stash: grows by one row if the grid is the main stash and is full.
 function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
-    for (let r = 0; r < rows; r++) {
+    // Use actual grid length for stash (may have grown beyond passed rows)
+    const actualRows = (grid === _egInventory && typeof _egGetInvRows === 'function') ? _egGetInvRows() : rows;
+    for (let r = 0; r < actualRows; r++) {
         for (let c = 0; c < cols; c++) {
             if (!grid[r][c]) {
                 grid[r][c] = item;
@@ -291,6 +293,13 @@ function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
                 return true;
             }
         }
+    }
+    // Full — only grow the unlimited main stash
+    if (grid === _egInventory && typeof _egEnsureInvRows === 'function') {
+        _egEnsureInvRows(actualRows + 1);
+        grid[actualRows][0] = item;
+        renderFn(actualRows, 0);
+        return true;
     }
     console.warn('[DND] No free slot found for displaced item:', item.name);
     return false;
@@ -309,13 +318,21 @@ function _dndReturnToSource() {
 function _dndReturnDisplacedToSource(item) {
     const { sourceZone, sourceRow, sourceCol, sourceSlot } = _dnd;
 
-    if (sourceZone === 'inv') { _egInventory[sourceRow][sourceCol] = item; _egRenderInventoryCell(sourceRow, sourceCol); }
+    if (sourceZone === 'inv') {
+        // Ensure the origin stash row still exists after expansions
+        if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(sourceRow + 1);
+        _egInventory[sourceRow][sourceCol] = item; _egRenderInventoryCell(sourceRow, sourceCol);
+    }
     else if (sourceZone === 'equip') { _egEquipped[sourceSlot] = item; _egRenderEquipSlot(sourceSlot); }
     else if (sourceZone === 'map') { _egMapSlotItem = item; _egRenderMapSlot(); }
     else if (sourceZone === 'currency') { _egCurrencyStash[sourceRow][sourceCol] = item; _egRenderCurrencyCell(sourceRow, sourceCol); }
     else if (sourceZone === 'essence') { _egEssenceStash[sourceRow][sourceCol] = item; _egRenderEssenceCell(sourceRow, sourceCol); }
     else if (sourceZone === 'mapstash') { _egMapStash[sourceRow][sourceCol] = item; _egRenderMapStashCell(sourceRow, sourceCol); }
-    else _dndPlaceInFirstFreeSlot(item, _egInventory, _egRenderInventoryCell, EG_INV_ROWS, EG_INV_COLS);
+    else {
+        // Unlimited stash: delegate to helper that grows if needed
+        if (typeof _egAddItemToStash === 'function') _egAddItemToStash(item);
+        else _dndPlaceInFirstFreeSlot(item, _egInventory, _egRenderInventoryCell, _egInventory.length, EG_INV_COLS);
+    }
 }
 
 // Briefly flashes a red reject animation on the given element,
@@ -526,14 +543,18 @@ function _dndFindTargetSlot(item) {
 }
 
 // Finds the first empty cell in the main equipment stash.
-// Returns { r, c } or null when the stash is completely full.
+// Unlimited stash: always returns a cell (expands by one row if needed).
 function _dndFirstFreeInvCell() {
-    for (let r = 0; r < EG_INV_ROWS; r++) {
+    if (typeof _egFindFreeInvCell === 'function') return _egFindFreeInvCell();
+    for (let r = 0; r < _egInventory.length; r++) {
         for (let c = 0; c < EG_INV_COLS; c++) {
             if (!_egInventory[r][c]) return { r, c };
         }
     }
-    return null;
+    // fallback expand
+    if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(_egInventory.length + 1);
+    else _egInventory.push(Array(EG_INV_COLS).fill(null));
+    return { r: _egInventory.length - 1, c: 0 };
 }
 
 // Right-click on a stash item → instantly equip it to the best matching slot.
@@ -569,9 +590,7 @@ function _dndQuickEquipFromStash(invCell) {
 }
 
 // Right-click on a paperdoll slot item → send it to the first free stash cell.
-// Blocked when removing the item would break other equipped items' stat
-// requirements (see endgame-requirements.js). If the stash is full a reject
-// flash is shown on the stash grid instead.
+// Unlimited stash: always has room (grows on demand).
 function _dndQuickUnequipToStash(equipSlotEl) {
     const slotId = equipSlotEl.dataset.slotId;
     const item = _egEquipped[slotId] || null;
@@ -586,17 +605,8 @@ function _dndQuickUnequipToStash(equipSlotEl) {
     }
 
     const free = _dndFirstFreeInvCell();
-    if (!free) {
-        // Stash is full — flash the stash grid as visual feedback.
-        const stashGrid = document.getElementById('eg-inv-grid');
-        if (stashGrid) {
-            stashGrid.classList.add('eg-slot-reject');
-            setTimeout(() => stashGrid.classList.remove('eg-slot-reject'), 600);
-        }
-        return;
-    }
-
     delete _egEquipped[slotId];
+    if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(free.r + 1);
     _egInventory[free.r][free.c] = item;
     _egRenderEquipSlot(slotId);
     _egRenderInventoryCell(free.r, free.c);
@@ -939,7 +949,20 @@ function _dndBindListeners() {
 
     // Ghost follows the mouse at all times during an active drag.
     window.addEventListener('mousemove', e => {
-        if (_dnd.active) _dndMoveGhost(e.clientX, e.clientY);
+        if (_dnd.active) {
+            _dndMoveGhost(e.clientX, e.clientY);
+            // Auto-scroll the stash when dragging near its top/bottom edge
+            const grid = document.getElementById('eg-inv-grid');
+            if (grid) {
+                const rect = grid.getBoundingClientRect();
+                const edge = 70;
+                if (e.clientY > rect.bottom - edge && e.clientY < rect.bottom + 40) {
+                    grid.scrollTop += 14;
+                } else if (e.clientY < rect.top + edge && e.clientY > rect.top - 40) {
+                    grid.scrollTop -= 14;
+                }
+            }
+        }
     });
 
     // Drop: release the mouse button anywhere on the window.

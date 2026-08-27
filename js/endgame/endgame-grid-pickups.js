@@ -569,13 +569,9 @@ function _egDiscardPickup(row, col) {
 // instead of granting immediate HP.
 //------------------------------------------------------------------------
 
-// Returns true if the main stash has at least one free slot.
-// Used to gate loot drops so the stash can never overflow.
+// Unlimited stash: always has space (grows on demand). Kept for compat — callers no longer need to gate drops.
 function _egStashHasFreeSlot() {
-    for (let r = 0; r < EG_INV_ROWS; r++)
-        for (let c = 0; c < EG_INV_COLS; c++)
-            if (!_egInventory[r][c]) return true;
-    return false;
+    return true;
 }
 
 // Injects the loot overlay span into the cell's DOM element.
@@ -620,8 +616,7 @@ function _egAnimateLootClaim(row, col, item) {
 function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     if (!_egIsActive()) return;
 
-    // Stash full? Skip entirely so we never exceed capacity.
-    if (!_egStashHasFreeSlot()) return;
+    // Unlimited stash: no longer gated — _egStashHasFreeSlot() always true
 
     const baseChance = isBoss ? EG_LOOT_DROP_CHANCE_BOSS : EG_LOOT_DROP_CHANCE_NORMAL;
     // Active map's loot quantity bonus scales the drop chance up.
@@ -703,8 +698,7 @@ function _egSpawnLootExplosion(monsterLevel = 1) {
     if (!_egIsActive()) return;
 
     const tryScheduleOne = () => {
-        // Respect stash capacity — never generate items that couldn't be stored.
-        if (!_egStashHasFreeSlot()) return false;
+        // Unlimited stash: always has room
 
         let item = null;
         if (typeof _egTryGenerateUniqueDrop === 'function') {
@@ -815,14 +809,24 @@ function _egStopLootDrops() {
 
 // Flushes all run loot into the first available stash slots.
 // Call this on successful map clear, BEFORE _egChainCleanup resets the state.
+// Unlimited stash: grows rows as needed so nothing is ever lost.
 function _egFlushRunLootToStash() {
     if (_egRunLoot.length === 0) return;
 
     let placed = 0;
-    for (let r = 0; r < EG_INV_ROWS && placed < _egRunLoot.length; r++) {
-        for (let c = 0; c < EG_INV_COLS && placed < _egRunLoot.length; c++) {
-            if (!_egInventory[r][c]) {
-                _egInventory[r][c] = _egRunLoot[placed];
+    for (const item of _egRunLoot) {
+        if (typeof _egAddItemToStash === 'function') {
+            _egAddItemToStash(item);
+            placed++;
+        } else {
+            // fallback if hub helpers not yet loaded
+            let done = false;
+            for (let r = 0; r < _egInventory.length && !done; r++) {
+                for (let c = 0; c < EG_INV_COLS && !done; c++) if (!_egInventory[r][c]) { _egInventory[r][c] = item; done = true; placed++; }
+            }
+            if (!done) {
+                _egInventory.push(Array(EG_INV_COLS).fill(null));
+                _egInventory[_egInventory.length - 1][0] = item;
                 placed++;
             }
         }
@@ -834,6 +838,7 @@ function _egFlushRunLootToStash() {
             : t('eg_stash_added_many').replace('{n}', placed));
         // Re-render the stash grid if the hub screen is currently visible
         if (typeof _egRenderInventory === 'function') _egRenderInventory();
+        if (typeof _egRebuildInventoryGrid === 'function') _egRebuildInventoryGrid();
         if (typeof egSaveHubState === 'function') egSaveHubState();
     }
 }
@@ -845,12 +850,11 @@ function _egReplaceCarriedLootDrops(items) {
     if (!items || items.length === 0) return;
 
     items.forEach(item => {
-        // Respect the same stash-full guard as a normal drop
-        if (!_egStashHasFreeSlot()) return;
+        // Unlimited stash: no cap — always re-place carried loot
 
-        // Don't place if the board is already at the loot-drop cap
-        if (_egLootDrops.size >= 1) return;
-
+        // Carry-over must preserve every pending drop — even the 5-item
+        // loot explosion. The normal "1 on board" cap only applies to
+        // fresh spawns, not to loot we are rescuing from a solved grid.
         const pool = _egBuildPickupEligiblePool();
         const filtered = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
         if (filtered.length === 0) return;

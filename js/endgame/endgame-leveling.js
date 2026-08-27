@@ -284,6 +284,7 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
     }
     if (_egGetPlayerLevel() >= c.maxLevel) STATE.playerXP = 0;
 
+    _egSyncBaseAttributes();
     egSaveLevelingState();
     _egRenderLevelHUD();
 
@@ -308,6 +309,8 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
             showToast(t('eg_lvl_levelup_toast').replace('{n}', _egGetPlayerLevel()), '#f5b642');
         }
         if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
+        if (typeof _egRenderInventory === 'function') try { _egRenderInventory(); } catch (e) {}
+        if (typeof _egRenderEquipSlots === 'function') try { _egRenderEquipSlots(); } catch (e) {}
     }
 }
 

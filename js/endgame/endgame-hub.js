@@ -47,8 +47,47 @@ const EG_EQUIP_SLOTS = [
 ];
 
 // Main equipment stash dimensions
-const EG_INV_ROWS = 5;
+const EG_INV_INITIAL_ROWS = 5;
+const EG_INV_ROWS = EG_INV_INITIAL_ROWS; // initial/minimum rows; stash grows unlimited beyond this
 const EG_INV_COLS = 24;
+
+// ── Unlimited stash helpers (must sit after EG_INV_ROWS/COLS so _egInventory exists) ──
+function _egGetInvRows() { return _egInventory ? _egInventory.length : EG_INV_INITIAL_ROWS; }
+function _egGetInvCapacity() { return _egGetInvRows() * EG_INV_COLS; }
+function _egRebuildInventoryGrid() {
+    const grid = document.getElementById('eg-inv-grid');
+    if (!grid) return;
+    const scrollTop = grid.scrollTop;
+    grid.innerHTML = _egBuildInventoryGridHTML();
+    _egRenderInventory();
+    // keep scroll position stable across rebuilds
+    grid.scrollTop = scrollTop;
+}
+function _egEnsureInvRows(minRows) {
+    if (!_egInventory) return;
+    if (_egInventory.length >= minRows) return;
+    for (let i = _egInventory.length; i < minRows; i++) _egInventory.push(Array(EG_INV_COLS).fill(null));
+    const grid = document.getElementById('eg-inv-grid');
+    if (grid && grid.children.length < minRows * EG_INV_COLS) {
+        _egRebuildInventoryGrid();
+    }
+}
+function _egExpandStashByOneRow() { _egEnsureInvRows(_egGetInvRows() + 1); }
+function _egFindFreeInvCell() {
+    for (let r = 0; r < _egInventory.length; r++) {
+        for (let c = 0; c < EG_INV_COLS; c++) if (!_egInventory[r][c]) return { r, c };
+    }
+    const r = _egInventory.length;
+    _egEnsureInvRows(r + 1);
+    return { r, c: 0 };
+}
+function _egAddItemToStash(item) {
+    const pos = _egFindFreeInvCell();
+    _egInventory[pos.r][pos.c] = item;
+    _egRenderInventoryCell(pos.r, pos.c);
+    _egUpdateInvCount();
+    return pos;
+}
 
 // Currency stash dimensions (single row strip)
 const EG_CURRENCY_COLS = 30;
@@ -258,7 +297,8 @@ function _egBuildInventoryCellHTML(row, col) {
 // Builds the full equipment stash grid by iterating over all rows and columns.
 function _egBuildInventoryGridHTML() {
     let html = '';
-    for (let r = 0; r < EG_INV_ROWS; r++) {
+    const rows = _egGetInvRows();
+    for (let r = 0; r < rows; r++) {
         for (let c = 0; c < EG_INV_COLS; c++) {
             html += _egBuildInventoryCellHTML(r, c);
         }
@@ -460,7 +500,7 @@ function _egRenderInventoryCell(row, col) {
 
 // Re-renders the entire main stash grid.
 function _egRenderInventory() {
-    for (let r = 0; r < EG_INV_ROWS; r++) {
+    for (let r = 0; r < _egGetInvRows(); r++) {
         for (let c = 0; c < EG_INV_COLS; c++) {
             _egRenderInventoryCell(r, c);
         }
@@ -473,7 +513,8 @@ function _egUpdateInvCount() {
     if (!el) return;
     let used = 0;
     _egInventory.forEach(row => row.forEach(cell => { if (cell) used++; }));
-    el.textContent = `${used} / ${EG_INV_ROWS * EG_INV_COLS}`;
+    // Unlimited stash: show used / capacity (capacity grows with rows) — keeps the familiar counter
+    el.textContent = `${used} / ${_egGetInvCapacity()}`;
 }
 
 
@@ -1105,7 +1146,23 @@ function _egHealEssenceItem(item) {
 // Missing entries are initialised to their default empty structures.
 function _egLoadHubState() {
     _egEquipped = STATE.egEquipped || {};
-    _egInventory = STATE.egInventory || Array.from({ length: EG_INV_ROWS }, () => Array(EG_INV_COLS).fill(null));
+    // Unlimited stash: keep whatever rows were saved; ensure at least the initial minimum
+    if (Array.isArray(STATE.egInventory) && STATE.egInventory.length > 0) {
+        _egInventory = STATE.egInventory;
+        // Normalise column count and guarantee minimum rows
+        if (_egInventory.length < EG_INV_INITIAL_ROWS) _egEnsureInvRows(EG_INV_INITIAL_ROWS);
+        // Ensure every row has the correct column width
+        for (let r = 0; r < _egInventory.length; r++) {
+            if (!Array.isArray(_egInventory[r])) _egInventory[r] = Array(EG_INV_COLS).fill(null);
+            else if (_egInventory[r].length < EG_INV_COLS) {
+                while (_egInventory[r].length < EG_INV_COLS) _egInventory[r].push(null);
+            } else if (_egInventory[r].length > EG_INV_COLS) {
+                _egInventory[r] = _egInventory[r].slice(0, EG_INV_COLS);
+            }
+        }
+    } else {
+        _egInventory = Array.from({ length: EG_INV_INITIAL_ROWS }, () => Array(EG_INV_COLS).fill(null));
+    }
     _egMapStash = STATE.egMapStash || Array.from({ length: EG_MAP_STASH_ROWS }, () => Array(EG_MAP_STASH_COLS).fill(null));
     _egCurrencyStash = STATE.egCurrencyStash || Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
     // Heal legacy currency/shard cells that were saved without description/category.
@@ -1231,7 +1288,8 @@ function egAddTestItems() {
     testItems.forEach((item, i) => {
         const r = Math.floor(i / EG_INV_COLS);
         const c = i % EG_INV_COLS;
-        if (r < EG_INV_ROWS) _egInventory[r][c] = item;
+        _egEnsureInvRows(r + 1);
+        _egInventory[r][c] = item;
     });
 
     _egRenderAll();

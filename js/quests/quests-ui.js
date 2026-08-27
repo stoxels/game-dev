@@ -91,6 +91,24 @@ const LEDGER_CATEGORY_ICON = {
     monte_carlo: 'images/Inference/icons/monte_carlo.png',
     zero_variance: 'images/Inference/icons/zero_variance.png',
     precision_large: 'images/Inference/icons/precision_large.png',
+
+    // Atlas Tiers 1-16
+    atlas_tier_1: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_2: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_3: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_4: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_5: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_6: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_7: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_8: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_9: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_10: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_11: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_12: 'images/Inference/icons/parameter_space.png',
+    atlas_tier_13: 'images/Inference/icons/convergence.png',
+    atlas_tier_14: 'images/Inference/icons/convergence.png',
+    atlas_tier_15: 'images/Inference/icons/convergence.png',
+    atlas_tier_16: 'images/Inference/icons/convergence.png',
 };
 
 /** Cached reference to the floating reward-tooltip element. */

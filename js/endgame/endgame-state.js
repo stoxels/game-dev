@@ -97,6 +97,9 @@ let _egArcaneSurgeStreak = 0;
 // --- NEW STATE VARIABLE ---
 let _egPlayerCurrentCharge = 0;
 
+// Hold-E pause — true while the player holds E to freeze their own auto-attack bar
+let _egHoldEPauseActive = false;
+
 // Active currency drops on the grid: key "row-col" → currency def object
 let _egCurrencyDrops = new Map();
 
