@@ -340,9 +340,7 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
     }
     // Class passives are delayed (Probabilist Bayesian Insight uses 300ms
     // setTimeout) — verify after that window and re-fire if missed. The
-    // re-fire is safe: _applyProbabilistPassive guards internally and
-    // _applyMathmagicianPassive preserves the Variance Shield across chains
-    // via _isEndgameChainShieldPreserve.
+    // re-fire is safe: _applyProbabilistPassive guards internally.
     setTimeout(() => {
         if (window._egClassPassiveAppliedForGi !== nextGi && typeof applyClassPassiveOnLevelStart === 'function') {
             // Note: applyClassPassiveOnLevelStart resets class level state;

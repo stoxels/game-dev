@@ -135,12 +135,7 @@ function _cleanupPreviousLevel() {
     // (defined in start-level-passives.js, loaded before this file)
     _hideCompletionGlimpseBar();
 
-    // Variance shield is preserved across endgame chain puzzle transitions
-    // (see _isEndgameChainShieldPreserve in class-abilities.js) — only
-    // remove it for campaign or the first puzzle of a map run.
-    const _isChainShieldPreserve = (typeof _egIsActive === 'function' && _egIsActive()
-        && (!!window._egSuppressEncounterStop || !!(cur && cur.isChainedPuzzle)));
-    if (typeof _varianceShield_removeBubble === 'function' && !_isChainShieldPreserve) _varianceShield_removeBubble();
+    if (typeof _varianceShield_removeBubble === 'function') _varianceShield_removeBubble();
 
     // Clear any low-time vignette tier left over from the previous level,
     // so a fresh level with a full timer doesn't flash red for a frame.

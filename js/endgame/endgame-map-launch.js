@@ -482,16 +482,12 @@ function _egApplyModsToBaseline(base, map) {
                 break;
 
             case 'map_boss_chance':
-                // For maps with baked implicits the boss chance is already
-                // resolved during generation ( _egRollMapBossStatus ); skip the
-                // live roll so the run matches the tooltip.
-                if (hasImplicits && imp && imp.hasBoss != null) break;
-                // Roll once at activation: success guarantees a boss (bosses
-                // are chance-based from tier 2) and may add one extra.
-                if (Math.random() * 100 < val) {
-                    base.hasBoss = true;
-                    base.maxBosses = Math.min(2, base.maxBosses + 1);
-                }
+                // Legacy: boss presence is now a pure implicit — `hasBoss` is
+                // rolled solely from tier via `_egRollMapBossStatus` and then
+                // preserved across all orb rerolls (`_egWithImplicits`). The
+                // `map_boss_chance` modifier is no longer generated and does
+                // not alter the boss roll even on legacy maps; it contributes
+                // only its reward bonuses (xp/quantity/rarity).
                 break;
 
             case 'map_required_puzzles':

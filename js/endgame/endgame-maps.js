@@ -428,15 +428,10 @@ const EG_MAP_MOD_TABLES = {
                 { tier: 4, min: 6, max: 15, weight: 1350, ilvl: 1 },
             ],
         },
-        map_boss_chance: {
-            id: 'map_boss_chance', affects: 'monster',
-            label: '+#% chance for an additional Boss', labelDe: '+#% Chance auf einen zusätzlichen Boss',
-            tiers: [
-                { tier: 1, min: 42, max: 50, weight: 110, ilvl: 50 },
-                { tier: 2, min: 25, max: 41, weight: 340, ilvl: 22 },
-                { tier: 3, min: 8, max: 24, weight: 800, ilvl: 1 },
-            ],
-        },
+        // NOTE: `map_boss_chance` was removed — boss presence is a pure implicit
+        // (see `_egRollMapBossStatus` / `_egWithImplicits`). It remains in
+        // `EG_MAP_MOD_REWARDS` for legacy maps that already rolled it, but it
+        // no longer appears on new maps so orbs cannot influence the boss roll.
 
         // ── Monster behaviour (PoE-style) ─────────────────────────────
         map_monster_crit: {
@@ -1031,26 +1026,17 @@ function _egRollMapSizeMix(tier, largerPct) {
 
 // Determines whether a rolled map contains a boss encounter. The result is
 // deterministic per map item (baked into implicits) so the tooltip can state
-// definitively if the map has a boss or not.
-// Tier 1 maps never have a boss. Tier 2+ maps have a 50% base chance, and
-// the `map_boss_chance` modifier can guarantee a boss and/or add an extra.
+// definitively if the map has a boss or not. This is a pure implicit roll
+// that must stay immutable — orbs/mods MUST NOT be able to change it, so
+// it is derived only from the map's tier (no mod influence) and is preserved
+// across all orb rerolls via `_egWithImplicits`.
+// Tier 1 maps never have a boss. Tier 2+ maps have a 50% base chance.
 function _egRollMapBossStatus(map) {
     const tier = Math.max(1, map.mapTier || 1);
     if (tier < 2) return { hasBoss: false, maxBosses: 0 };
     const baseChance = (typeof EG_MAP_BASE_BOSS_CHANCE !== 'undefined') ? EG_MAP_BASE_BOSS_CHANCE : 50;
-    let hasBoss = Math.random() * 100 < baseChance;
-    let maxBosses = 1;
-    const mods = Array.isArray(map.mods) ? map.mods : [];
-    for (const mod of mods) {
-        if (mod.familyId !== 'map_boss_chance') continue;
-        const val = (Array.isArray(mod.rolledStats) && mod.rolledStats.length > 0)
-            ? (Number(mod.rolledStats[0].value) || 0) : 0;
-        if (val > 0 && Math.random() * 100 < val) {
-            hasBoss = true;
-            maxBosses = Math.min(2, maxBosses + 1);
-        }
-    }
-    if (!hasBoss) maxBosses = 0;
+    const hasBoss = Math.random() * 100 < baseChance;
+    const maxBosses = hasBoss ? 1 : 0;
     return { hasBoss, maxBosses };
 }
 
@@ -1097,8 +1083,22 @@ function _egRollMapImplicits(map) {
 }
 
 // Returns the map with freshly computed implicits (used after every roll).
+// Boss status is an implicit that must remain immutable once created: if the
+// map already carries `implicits.hasBoss`, preserve it so orbs cannot reroll
+// whether the map has a boss (only brand-new maps without implicits roll a
+// fresh boss value).
 function _egWithImplicits(map) {
-    return { ...map, implicits: _egRollMapImplicits(map) };
+    const prevImp = map.implicits;
+    const prevHasBoss = prevImp != null ? prevImp.hasBoss : null;
+    const prevMaxBosses = prevImp != null ? prevImp.maxBosses : null;
+    const rolled = _egRollMapImplicits(map);
+    if (prevHasBoss != null) {
+        rolled.hasBoss = !!prevHasBoss;
+        rolled.maxBosses = prevMaxBosses != null ? prevMaxBosses : (prevHasBoss ? 1 : 0);
+        if (!rolled.hasBoss) rolled.maxBosses = 0;
+        else if (rolled.maxBosses < 1) rolled.maxBosses = 1;
+    }
+    return { ...map, implicits: rolled };
 }
 
 

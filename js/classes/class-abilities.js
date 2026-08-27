@@ -570,17 +570,6 @@ function executeActiveAbility(row, col) {
 //------------------------------------------------------------------------
 
 
-// Helper: true when this level start is a puzzle transition inside an active
-// endgame encounter chain. Used to preserve the Variance Shield across chain
-// puzzles instead of recharging it to max.
-function _isEndgameChainShieldPreserve() {
-    const inEndgame = typeof _egIsActive === 'function' && _egIsActive();
-    if (!inEndgame) return false;
-    if (cur && cur.isChainedPuzzle) return true;
-    if (!!window._egSuppressEncounterStop) return true;
-    return false;
-}
-
 // _resetClassLevelState — zeroes all per-level tracking flags and window globals
 //   before any class-specific passive setup runs.
 function _resetClassLevelState() {
@@ -599,11 +588,7 @@ function _resetClassLevelState() {
     window._typeIShieldedCells = new Set();
     window._typeIBonusReveal = false;
     window._bayesTrapProtectedLines = new Set();
-    // Variance shield bubble is preserved across endgame chain puzzles — only
-    // remove it for campaign / the first puzzle of a map run.
-    if (!_isEndgameChainShieldPreserve()) {
-        _varianceShield_removeBubble();
-    }
+    _varianceShield_removeBubble();
     _momentumClearParticlesImmediate();
 
     updateMomentumBar(0, 15);
@@ -615,14 +600,9 @@ function _resetClassLevelState() {
 
 // _applyMathmagicianPassive — sets up the Variance Shield free-mistake counter.
 //   Adds bonus charges from passive tree nodes reinforced_shield and fortified_shield.
-//   During an endgame encounter chain the shield persists with its remaining
-//   stacks and does NOT recharge to max on puzzle transitions (campaign
-//   levels still recharge normally).
+//   Recharges to max at the start of every puzzle, including chained puzzles
+//   inside an endgame encounter chain.
 function _applyMathmagicianPassive(effect) {
-    if (_isEndgameChainShieldPreserve() && typeof window._classFreeMistakes === 'number') {
-        _varianceShield_updateVisibility();
-        return;
-    }
     let freeMistakes = effect.freeMistakes || 0;
     if (ptHasSkill('reinforced_shield')) freeMistakes += 1;
     if (ptHasSkill('fortified_shield')) freeMistakes += 1;
