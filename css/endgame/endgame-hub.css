@@ -244,8 +244,9 @@ Layout Architecture:
     gap: 8px;
     padding: 8px;
     align-items: start;
-    overflow-y: auto;
+    overflow: visible;
     flex: 1;
+    min-height: 0;
 }
 
 .eg-equip-col {
@@ -992,12 +993,44 @@ img.eg-art-img {
     padding: 4px 6px;
     min-width: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     align-self: stretch;
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
+    max-height: 320px;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
 }
 
-/* ── OFFENSE / DEFENSE STAT CORNER BLOCKS ── */
+.eg-char-stats-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.eg-char-stats-panel::-webkit-scrollbar-thumb {
+    background: var(--border2);
+    border-radius: 3px;
+}
+
+.eg-char-stats-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.eg-char-stats-panel .eg-stats-header {
+    position: sticky;
+    top: 0;
+    background: var(--panel);
+    z-index: 1;
+}
+
+.eg-char-stats-panel .eg-stats-list {
+    overflow: visible;
+    flex: none;
+}
+
+/* ── OFFENSE / DEFENSE STAT CORNER BLOCKS ──
+   Fixed interior scroll so growing stat counts never push the stash down.
+   Each block gets its own scrollbar; header stays sticky while list scrolls. */
 .eg-stat-block {
     display: flex;
     flex-direction: column;
@@ -1006,7 +1039,38 @@ img.eg-art-img {
     min-width: 0;
     padding: 4px 6px;
     overflow-y: auto;
+    overflow-x: hidden;
     align-self: stretch;
+    max-height: 320px;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+}
+
+.eg-stat-block::-webkit-scrollbar {
+    width: 6px;
+}
+
+.eg-stat-block::-webkit-scrollbar-thumb {
+    background: var(--border2);
+    border-radius: 3px;
+}
+
+.eg-stat-block::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.eg-stat-block .eg-stats-header {
+    position: sticky;
+    top: 0;
+    background: var(--panel);
+    z-index: 1;
+}
+
+#eg-stats-offense .eg-stats-list,
+#eg-stats-defense .eg-stats-list {
+    overflow: visible;
+    flex: none;
 }
 
 #eg-stats-offense {

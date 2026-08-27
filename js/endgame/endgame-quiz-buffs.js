@@ -30,8 +30,13 @@ let _egQuizDmgBuffUntil = 0;
 // Timeout handle for the barrier visual's expiry.
 let _egQuizShieldTimer = null;
 
-// One-line summary of the reward granted by the last correct answer, shown
-// on the next chain countdown transition. Consumed once displayed.
+// Summary lines of every reward granted since the last chain countdown.
+// Each correctly answered interstitial question pushes one entry; all are
+// joined and consumed together by _egBuildChainBonusGainHTML. This fixes
+// the map_extra_questions mod (+# additional Quiz Questions per Puzzle)
+// which previously overwrote a single string and only the last reward was shown.
+let _egPendingQuizRewardLines = [];
+// Legacy alias — kept for backward compatibility / debug inspection.
 let _egPendingQuizRewardLine = '';
 
 // Returns the active damage multiplier (1 when no buff is running).
@@ -47,11 +52,24 @@ function _egResetQuizDamageBuff() {
         _egQuizShieldTimer = null;
     }
     _egRemoveQuizShieldFX(true);
+    // Also clear any pending reward lines that were never displayed
+    // (e.g. run aborted before the countdown screen).
+    _egPendingQuizRewardLines = [];
+    _egPendingQuizRewardLine = '';
 }
 
-// Returns and clears the summary line for the countdown transition screen.
+// Returns and clears the summary lines for the countdown transition screen.
+// Joins all accumulated lines with a line-break so multi-question interstitials
+// (map_extra_questions) display every reward, not just the last one.
 function _egConsumePendingQuizRewardHTML() {
-    const line = _egPendingQuizRewardLine;
+    let line = '';
+    if (_egPendingQuizRewardLines.length > 0) {
+        line = _egPendingQuizRewardLines.join('<br>');
+        _egPendingQuizRewardLines = [];
+    } else if (_egPendingQuizRewardLine) {
+        // Fallback for legacy single-string value
+        line = _egPendingQuizRewardLine;
+    }
     _egPendingQuizRewardLine = '';
     return line;
 }
@@ -190,8 +208,10 @@ function _egApplyQuizRewardBuff() {
             setTimeout(() => label.remove(), EG_QUIZ_BUFF_FX_DURATION_MS);
         }
 
-        _egPendingQuizRewardLine =
+        const dmgLine =
             `<span style="color:#ff8a70">⚔️ +10% damage</span> <span style="opacity:.6">(${EG_QUIZ_BUFF_DURATION_MS / 1000}s)</span>`;
+        _egPendingQuizRewardLines.push(dmgLine);
+        _egPendingQuizRewardLine = _egPendingQuizRewardLines.join('<br>');
     } else if (roll < 0.67) {
         // ── Life heal ────────────────────────────────────────────────────
         const heal = Math.max(1, Math.round(playerMaxHP * 0.25));
@@ -199,8 +219,10 @@ function _egApplyQuizRewardBuff() {
         if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
         if (typeof showToast === 'function') showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
         _egShowQuizBuffBurst('heal', `+${heal} HP`);
-        _egPendingQuizRewardLine =
+        const healLine =
             `<span style="color:#7fd67f">💚 +${heal} life restored</span>`;
+        _egPendingQuizRewardLines.push(healLine);
+        _egPendingQuizRewardLine = _egPendingQuizRewardLines.join('<br>');
     } else {
         // ── Mana restore ─────────────────────────────────────────────────
         const gain = Math.max(1, Math.round(_getPlayerMaxMana() * 0.25));
@@ -208,8 +230,10 @@ function _egApplyQuizRewardBuff() {
         if (gained > 0) {
             if (typeof showToast === 'function') showToast(`🔮 Scholar's Insight: restored ${gained} mana!`);
             _egShowQuizBuffBurst('mana', `+${gained} Mana`);
-            _egPendingQuizRewardLine =
+            const manaLine =
                 `<span style="color:#7fb8ff">🔮 +${gained} mana restored</span>`;
+            _egPendingQuizRewardLines.push(manaLine);
+            _egPendingQuizRewardLine = _egPendingQuizRewardLines.join('<br>');
         } else {
             // No mana pool available (e.g. Blood Magic maps) — fall back to heal
             const heal = Math.max(1, Math.round(playerMaxHP * 0.25));
@@ -217,8 +241,10 @@ function _egApplyQuizRewardBuff() {
             if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
             if (typeof showToast === 'function') showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
             _egShowQuizBuffBurst('heal', `+${heal} HP`);
-            _egPendingQuizRewardLine =
+            const fbLine =
                 `<span style="color:#7fd67f">💚 +${heal} life restored</span>`;
+            _egPendingQuizRewardLines.push(fbLine);
+            _egPendingQuizRewardLine = _egPendingQuizRewardLines.join('<br>');
         }
     }
 }

@@ -1045,7 +1045,7 @@ Defensives:
 
 
     + Block Chance and +Spell Block Chance - block completely negates the incoming damage for regular attacks or monster spells (monster abilities, spellblock)
-                                            but when the player blocks he can no longer damage monsters for the next 5 seconds. So we can introduce a +BlockRecovery stat that reduces this time
+                                            but when the player blocks he cannot block again for the next 8 seconds. So we can introduce a +BlockRecovery stat that reduces this time
                                             should be more deterministic than dodge/spell dodge
     + Dodge and +SpellDodge - chance to fully dodge and void damage from attacks or spells - similar to block but must be more random cause no block recovery downside
 

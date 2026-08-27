@@ -30,10 +30,10 @@ const EG_PANEL_RERENDER_DELAY_MS = 350;
 const EG_PLAYER_HIT_FLASH_MS = 150;
 
 // How long a floating damage number stays on screen (ms).
-const EG_DAMAGE_NUMBER_DURATION_MS = 600;
+const EG_DAMAGE_NUMBER_DURATION_MS = 1050;
 
 // How long a floating player damage number stays on screen (ms).
-const EG_PLAYER_DAMAGE_NUMBER_DURATION_MS = 1500;
+const EG_PLAYER_DAMAGE_NUMBER_DURATION_MS = 1050;
 
 // How long the immune flash and label last on the card (ms).
 const EG_IMMUNE_FLASH_DURATION_MS = 400;
@@ -46,11 +46,12 @@ const EG_MELEE_ANIM_DURATION_MS = 500;
 const EG_MONSTER_PROJ_DURATION_MS = 400;
 
 // Base window after a successful block during which the player cannot
-// attack (ms). Reduced by the blockRecoveryPct stat.
-const EG_BLOCK_LOCKOUT_BASE_MS = 5000;
+// block again (ms). Player remains free to attack — recovery only disables
+// blocking. Reduced by the blockRecoveryPct stat.
+const EG_BLOCK_LOCKOUT_BASE_MS = 8000;
 
-// Timestamp (Date.now()) until which the player cannot attack due to a
-// recent block. 0 when not locked out.
+// Timestamp (Date.now()) until which the player cannot block again due to
+// a recent block. 0 when not locked out.
 let _egPlayerBlockLockoutUntil = 0;
 
 EG_INITIAL_SPAWN_STAGGER_BASE_MS = 500
@@ -675,8 +676,8 @@ function _egApplyPlayerBlockFeedback() {
     setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
 }
 
-// Floating "recovering" label when the player tries to attack while still
-// locked out from a recent block.
+// Floating "recovering" label for block-recovery feedback (retained for
+// external callers — attacks no longer fizzle while recovering).
 function _egApplyPlayerBlockLockoutFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
@@ -688,8 +689,8 @@ function _egApplyPlayerBlockLockoutFeedback() {
 }
 
 // ── Lose-control overlay (WoW "lose of control" style) ──────────────────
-// Center-screen icon + live countdown shown while the player cannot attack
-// because of a recent block. Purely visual: pointer-events none.
+// Status chip with live countdown shown while the player cannot block
+// again because of a recent block. Purely visual: pointer-events none.
 
 // Interval handle driving the countdown text update.
 let _egBlockLockoutOverlayTimer = null;
@@ -739,21 +740,43 @@ function _egHideBlockLockoutOverlay() {
 }
 
 // Applies hit feedback to the player HUD: floating damage number + squish + red glow.
-function _egApplyPlayerHitFeedback(damageValue) {
+function _egApplyPlayerHitFeedback(damageValue, isCrit, element) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
 
-    // Floating damage label
+    // Floating damage label — crits & elemental hits get extra pop
     const dmgLabel = document.createElement('div');
-    dmgLabel.className = 'eg-player-damage';
+    let cls = 'eg-player-damage';
+    if (isCrit) cls += ' eg-dmg-crit';
+    if (element) {
+        const map = { fire: 'eg-dmg-fire', cold: 'eg-dmg-cold', lightning: 'eg-dmg-lightning', shadow: 'eg-dmg-shadow' };
+        if (map[element]) cls += ' ' + map[element];
+    }
+    dmgLabel.className = cls;
     dmgLabel.textContent = `-${damageValue}`;
+    // slight random horizontal jitter so stacked hits don't perfectly overlap
+    dmgLabel.style.marginLeft = `${(Math.random() * 18 - 9).toFixed(1)}px`;
     hud.appendChild(dmgLabel);
     setTimeout(() => dmgLabel.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
 
-    // Squish + red-glow flash
-    hud.style.transform = 'scale(0.95)';
-    hud.style.boxShadow = 'inset 0 0 15px rgba(255,0,0,0.8), 0 0 15px rgba(255,0,0,0.8)';
-    setTimeout(() => { hud.style.transform = ''; hud.style.boxShadow = ''; }, EG_PLAYER_HIT_FLASH_MS);
+    // Squish + red-glow flash — crits shake harder
+    if (isCrit) {
+        hud.style.transform = 'scale(0.92)';
+        hud.style.boxShadow = 'inset 0 0 22px rgba(255,40,40,0.95), 0 0 22px rgba(255,0,0,0.95)';
+        if (hud.animate) {
+            hud.animate([
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(-6px)' },
+                { transform: 'translateX(6px)' },
+                { transform: 'translateX(-4px)' },
+                { transform: 'translateX(0)' }
+            ], { duration: 180, easing: 'ease-out' });
+        }
+    } else {
+        hud.style.transform = 'scale(0.95)';
+        hud.style.boxShadow = 'inset 0 0 15px rgba(255,0,0,0.8), 0 0 15px rgba(255,0,0,0.8)';
+    }
+    setTimeout(() => { hud.style.transform = ''; hud.style.boxShadow = ''; }, isCrit ? 220 : EG_PLAYER_HIT_FLASH_MS);
 
     Audio_Manager.playSFX('player_damage_taken');
 }
@@ -790,11 +813,12 @@ function _egAnimateMonsterProjectile(monster) {
         // Gear: preemptive_dodge — auto-dodge each monster's opening attack
         if (_egRollPreemptiveDodge(monster)) return;
         // Map mod: monsters may deal double damage (crit)
-        const critDmg = monster.damageValue * (typeof _egRollMonsterCritMult === 'function'
-            ? _egRollMonsterCritMult(monster) : 1);
+        const monsterCritMult = (typeof _egRollMonsterCritMult === 'function' ? _egRollMonsterCritMult(monster) : 1);
+        const isMonsterCrit = monsterCritMult > 1;
+        const critDmg = monster.damageValue * monsterCritMult;
         const dealt = _egPlayerTakeDamage(critDmg, false, monster.element, monster.level);
         if (dealt > 0) {
-            _egApplyPlayerHitFeedback(dealt);
+            _egApplyPlayerHitFeedback(dealt, isMonsterCrit, monster.element);
             if (typeof _egApplyMonsterHitMods === 'function') _egApplyMonsterHitMods(monster);
         }
     });
@@ -823,12 +847,13 @@ function _egApplyMeleeImpact(monster) {
     let chargeDamage = _egApplyGroundedReduction(monster.damageValue);
 
     // Map mod: monsters may deal double damage (crit)
-    chargeDamage *= (typeof _egRollMonsterCritMult === 'function')
-        ? _egRollMonsterCritMult(monster) : 1;
+    const meleeCritMult = (typeof _egRollMonsterCritMult === 'function' ? _egRollMonsterCritMult(monster) : 1);
+    const isMeleeCrit = meleeCritMult > 1;
+    chargeDamage *= meleeCritMult;
 
     const dealt = _egPlayerTakeDamage(chargeDamage, false, monster.element, monster.level);
     if (dealt > 0) {
-        _egApplyPlayerHitFeedback(dealt);
+        _egApplyPlayerHitFeedback(dealt, isMeleeCrit, monster.element);
         if (typeof _egApplyMonsterHitMods === 'function') _egApplyMonsterHitMods(monster);
     }
 }
@@ -909,8 +934,8 @@ function _egTrackRecentFill(row, col) {
 // projectile anchored on the stroke's first cell. The shot is released with
 // the combined damage when the player stops painting (_egReleaseChargedShot).
 function _egOnCorrectCell(row, col) {
-    // Block recovery does NOT stop the charge from accumulating during a
-    // drag reveal — it only prevents firing at release (_egReleaseChargedShot).
+    // Block recovery no longer fumbles attacks — reveals always fire even
+    // while recovering (recovery only suppresses the next block).
     if (!_egIsActive()) return;
 
     if (row !== undefined && col !== undefined) _egTrackRecentFill(row, col);
@@ -921,6 +946,7 @@ function _egOnCorrectCell(row, col) {
     EG_ELEMENTS.forEach(el => {
         _egDragChargeElements[el] += _egLastHitElements ? (_egLastHitElements[el] || 0) : 0;
     });
+    if (typeof _egLastHitWasCrit !== 'undefined' && _egLastHitWasCrit) _egDragChargeWasCrit = true;
 
     // Anchor the charging projectile on the stroke's first painted cell
     if (_egDragChargeStacks === 0 && row !== undefined && col !== undefined) {
@@ -1144,7 +1170,7 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
         _egMonsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId).forEach(m => {
             const card = document.getElementById(`eg-card-${m.id}`);
             if (card) _egRestartFlashClass(card, 'eg-flash-damage');
-            _egDamageTargetById(m.id, finalDamage, elements);
+            _egDamageTargetById(m.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
         });
     }
 
@@ -1154,7 +1180,7 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
         const others = _egMonsters.filter(m => m.id !== targetId && m.zoneId !== target.zoneId);
         if (others.length) {
             const victim = others[Math.floor(Math.random() * others.length)];
-            _egDamageTargetById(victim.id, finalDamage, elements);
+            _egDamageTargetById(victim.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
         }
     }
 
@@ -1165,7 +1191,7 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
         const others = _egMonsters.filter(m => m.id !== targetId);
         if (others.length) {
             const victim = others[Math.floor(Math.random() * others.length)];
-            _egDamageTargetById(victim.id, finalDamage, elements);
+            _egDamageTargetById(victim.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
         }
     }
 }
@@ -1251,6 +1277,7 @@ function _egClearChargedProjectileVisual() {
     _egDragChargeStacks = 0;
     _egDragChargeRow = -1;
     _egDragChargeCol = -1;
+    _egDragChargeWasCrit = false;
 }
 
 // Called from stopPainting(): releases the accumulated stroke as one combined-
@@ -1266,16 +1293,11 @@ function _egReleaseChargedShot() {
     // Snapshot the elemental share before clearing — needed so the target's
     // resistances can be applied per element at impact time.
     const elements = Object.assign({}, _egDragChargeElements);
+    const wasCrit = !!_egDragChargeWasCrit;
     _egClearChargedProjectileVisual();
 
     if (!_egIsActive()) return;
     if (stacks <= 0 || !damage) return;
-
-    // Still recovering from a recent block at release — the charge fizzles
-    if (Date.now() < _egPlayerBlockLockoutUntil) {
-        _egApplyPlayerBlockLockoutFeedback();
-        return;
-    }
 
     const sourceEl = (row >= 0 && col >= 0)
         ? document.getElementById(`g-${row}-${col}`)
@@ -1302,14 +1324,14 @@ function _egReleaseChargedShot() {
         return;
     }
 
-    _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements, { isCharged: true, isChargedStacks: stacks });
-    _egTryMultishot(damage, targetIdAtFire, elements, sourceEl);
+    _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements, { isCharged: true, isChargedStacks: stacks, isCrit: wasCrit });
+    _egTryMultishot(damage, targetIdAtFire, elements, sourceEl, wasCrit);
 }
 
 // Gear: multishot (cloak/gloves) — rolls against multishotPct and, on
 // success, looses one extra projectile with the same damage at another
 // living monster (falls back to the primary target when it's the only one).
-function _egTryMultishot(damage, primaryTargetId, elements, sourceEl) {
+function _egTryMultishot(damage, primaryTargetId, elements, sourceEl, wasCrit) {
     const stats = _egComputePlayerStats();
     const multishotPct = stats.multishotPct || 0;
     if (multishotPct <= 0 || Math.random() * 100 >= multishotPct) return;
@@ -1320,7 +1342,7 @@ function _egTryMultishot(damage, primaryTargetId, elements, sourceEl) {
         : primaryTargetId;
     if (!targetId) return;
 
-    _egAnimatePlayerProjectile(Math.round(damage), targetId, undefined, undefined, sourceEl, 1.2, elements);
+    _egAnimatePlayerProjectile(Math.round(damage), targetId, undefined, undefined, sourceEl, 1.2, elements, { isCrit: !!wasCrit });
 }
 
 
@@ -1403,9 +1425,10 @@ function _egApplyPlayerMeleeImpact(targetId) {
     // Gear: channel stacks + mana-to-damage are consumed by this hit
     const dmg = _egCurrentMeleeDamage() + _egConsumeOnHitGearBonus();
     const elements = _egLastMeleeElements;
+    const wasCrit = (typeof _egLastMeleeWasCrit !== 'undefined') ? _egLastMeleeWasCrit : false;
 
     // Uses the existing damage application logic[cite: 1]
-    _egDamageTargetById(targetId, dmg, elements);
+    _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit });
 
     // Active map run: monsters reflect #% of melee damage back at you.
     if (typeof _egGetActiveMapModValue === 'function') {
@@ -1441,7 +1464,8 @@ function _egTryCleaveHit(targetId, dmg = _egCurrentMeleeDamage(), elements = _eg
     sideTargets.forEach(m => {
         const card = document.getElementById(`eg-card-${m.id}`);
         if (card) _egRestartFlashClass(card, 'eg-flash-cleave');
-        _egDamageTargetById(m.id, dmg, elements);
+        const wasCrit = (typeof _egLastMeleeWasCrit !== 'undefined') ? _egLastMeleeWasCrit : false;
+        _egDamageTargetById(m.id, dmg, elements, { isCrit: wasCrit });
     });
 }
 
@@ -1611,10 +1635,24 @@ function _egShowStatusLabel(monsterId, text) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
     const label = document.createElement('div');
-    label.className = 'eg-damage-number';
+    label.className = 'eg-damage-number eg-status-label';
     label.textContent = text;
+    // small random jitter so overlapping labels don't perfectly stack
+    label.style.marginLeft = `${(Math.random() * 10 - 5).toFixed(1)}px`;
     card.appendChild(label);
     setTimeout(() => label.remove(), EG_DAMAGE_NUMBER_DURATION_MS);
+}
+
+// Returns the dominant elemental key for visual choice, or 'physical' when none.
+function _egGetDominantElement(elements) {
+    if (!elements) return 'physical';
+    let best = 'physical';
+    let bestVal = 0;
+    EG_ELEMENTS.forEach(el => {
+        const v = elements[el] || 0;
+        if (v > bestVal) { bestVal = v; best = el; }
+    });
+    return bestVal > 0 ? best : 'physical';
 }
 
 // Applies incoming player damage to a specific monster by id.
@@ -1654,13 +1692,15 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
     }
 
     _egApplyHitToMonster(target, amount);
-    _egShowDamageNumber(target.id, amount);
+    // Pass crit + elemental info so the number can pop with the right colour/size
+    const isCrit = !!(opts && opts.isCrit);
+    _egShowDamageNumber(target.id, amount, isCrit, elements);
     _egFlashDamageCard(target.id);
-    _egSpawnHitBurst(target.id, elements);
+    _egSpawnHitBurst(target.id, elements, isCrit);
 
     // Gear: echo (rings) — chance for the hit to repeat as a delayed
     // second instance of echoDamagePct of its damage
-    if (!(opts && opts.isEcho)) _egTryEchoHit(target.id, amount, elements);
+    if (!(opts && opts.isEcho)) _egTryEchoHit(target.id, amount, elements, isCrit);
 
     // Check for boss phase transition before checking death
     if (target.isBoss) _egBossCheckPhase(target);
@@ -1673,7 +1713,7 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
             _egTryChargedOverkillRicochet(target, amount, hpBefore, elements, opts);
         } else {
             // Gear: overkill — chance for excess damage to bleed into another monster
-            _egTryOverkillSpread(target, amount, hpBefore);
+            _egTryOverkillSpread(target, amount, hpBefore, isCrit, elements);
         }
         _egKillMonster(target.id);
         return;
@@ -1685,7 +1725,7 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
 // Gear: overkill (shoulders suffix) — on a killing blow, rolls against
 // overkillPct and, on success, deals the surplus damage (amount beyond the
 // victim's remaining HP) to a random other living monster.
-function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore) {
+function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elements) {
     const stats = _egComputePlayerStats();
     const overkillPct = stats.overkillPct || 0;
     if (overkillPct <= 0 || Math.random() * 100 >= overkillPct) return;
@@ -1698,7 +1738,7 @@ function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore) {
     const others = _egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
     if (!others.length) return;
     const victim = others[Math.floor(Math.random() * others.length)];
-    _egDamageTargetById(victim.id, overkill);
+    _egDamageTargetById(victim.id, overkill, elements, { isCrit: !!isCrit });
 }
 
 // Drag-paint charged overkill ricochet — when a charged projectile overkills
@@ -1736,18 +1776,18 @@ function _egTryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefore, ele
         _egFireProjectile(projDef, `${projDef.cssClass} ${cssExtra}`, start, end, EG_CHARGED_RICOCHET_DURATION_MS, 'linear', () => {
             const olabel = t('eg_overkill');
             _egShowStatusLabel(victim.id, olabel !== 'eg_overkill' ? olabel : 'Overkill!');
-            _egDamageTargetById(victim.id, overkill, ricochetElements, { isCharged: true, isRicochet: true });
+            _egDamageTargetById(victim.id, overkill, ricochetElements, { isCharged: true, isRicochet: true, isCrit: !!(opts && opts.isCrit) });
         }, null, EG_CHARGED_RICOCHET_SCALE);
     } else {
         // No visual path available — apply damage instantly so it is not lost
-        _egDamageTargetById(victim.id, overkill, ricochetElements, { isCharged: true, isRicochet: true });
+        _egDamageTargetById(victim.id, overkill, ricochetElements, { isCharged: true, isRicochet: true, isCrit: !!(opts && opts.isCrit) });
     }
 }
 
 // Gear: echo (ring suffix) — rolls against echoChancePct and schedules a
 // delayed second hit worth echoDamagePct of the original applied damage.
 // Echo instances are flagged so they cannot chain into further echoes.
-function _egTryEchoHit(targetId, appliedAmount, elements) {
+function _egTryEchoHit(targetId, appliedAmount, elements, isCrit) {
     const stats = _egComputePlayerStats();
     const chance = stats.echoChancePct || 0;
     const dmgPct = stats.echoDamagePct || 0;
@@ -1760,7 +1800,7 @@ function _egTryEchoHit(targetId, appliedAmount, elements) {
         const target = _egMonsters.find(m => m.id === targetId);
         if (!target) return;
         _egShowStatusLabel(targetId, t('eg_echo'));
-        _egDamageTargetById(targetId, Math.max(1, Math.round(appliedAmount * dmgPct / 100)), elements, { isEcho: true });
+        _egDamageTargetById(targetId, Math.max(1, Math.round(appliedAmount * dmgPct / 100)), elements, { isEcho: true, isCrit: !!isCrit });
     }, EG_ECHO_DELAY_MS);
 }
 
@@ -1802,13 +1842,15 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     }
 
     // Block roll: attacks use block chance, spells use spell block chance.
-    // A successful block fully negates the hit, but locks out player
-    // attacks for a short window (reduced by block recovery).
+    // A successful block fully negates the hit, but locks out future
+    // blocks for a short window (reduced by block recovery). Player can
+    // still attack while recovering — only blocking is suppressed.
     // Blocking requires an actual shield in the off-hand — block chance
     // from mods/passives on other slots does nothing without one.
+    const isBlockLockedOut = Date.now() < _egPlayerBlockLockoutUntil;
     const hasShieldEquipped = _egGetAllEquippedItems()
         .some(item => item.slotType === 'shield');
-    const blockChance = hasShieldEquipped
+    const blockChance = (!isBlockLockedOut && hasShieldEquipped)
         ? Math.min(75, isSpell ? stats.spellBlockChance : stats.blockChance)
         : 0;
     if (blockChance > 0 && Math.random() * 100 < blockChance) {
@@ -2093,15 +2135,27 @@ function _egSpawnMonster(defId, level) {
 //------------------------------------------------------------------------
 
 // Appends a floating "-N" damage number to the monster's card that fades out.
-function _egShowDamageNumber(monsterId, amount) {
+// `isCrit` and `elements` drive the RPG pop: crits are bigger/gold, elemental
+// dominance tints the number and its glow (shadow/fire/cold/lightning).
+function _egShowDamageNumber(monsterId, amount, isCrit, elements) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
 
     const dmgText = document.createElement('div');
-    dmgText.className = 'eg-damage-number';
+    const domEl = (typeof _egGetDominantElement === 'function') ? _egGetDominantElement(elements) : 'physical';
+    let cls = 'eg-damage-number';
+    if (domEl && domEl !== 'physical') cls += ' eg-dmg-' + domEl;
+    else cls += ' eg-dmg-physical';
+    if (isCrit) cls += ' eg-dmg-crit';
+    else if (amount != null && amount > 0 && amount < 8) cls += ' eg-dmg-small';
+    dmgText.className = cls;
     dmgText.textContent = `-${amount}`;
+    // random horizontal jitter + tiny vertical stagger so rapid hits fan out
+    dmgText.style.marginLeft = `${(Math.random() * 18 - 9).toFixed(1)}px`;
+    dmgText.style.marginTop = `${(Math.random() * 6 - 3).toFixed(1)}px`;
     card.appendChild(dmgText);
-    setTimeout(() => dmgText.remove(), EG_DAMAGE_NUMBER_DURATION_MS);
+    // crit numbers linger a touch longer
+    setTimeout(() => dmgText.remove(), isCrit ? EG_DAMAGE_NUMBER_DURATION_MS + 180 : EG_DAMAGE_NUMBER_DURATION_MS);
 }
 
 // Removes and re-adds a CSS flash class to force the animation to restart.
@@ -2156,8 +2210,8 @@ const EG_HIT_BURST_DURATION_MS = 750;
 // card centre when damage lands. Both melee strikes and projectiles funnel
 // through _egDamageTargetById, so this fires for every player hit.
 // `elements` optionally maps each element to its share of the hit; the
-// dominant element picks the burst colour.
-function _egSpawnHitBurst(monsterId, elements) {
+// dominant element picks the burst colour. `isCrit` enlarges the burst.
+function _egSpawnHitBurst(monsterId, elements, isCrit) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
 
@@ -2182,20 +2236,32 @@ function _egSpawnHitBurst(monsterId, elements) {
     ring.style.setProperty('--eg-hit-color', color);
     burst.appendChild(ring);
 
+    if (isCrit) {
+        // Crit: bigger, brighter ring
+        ring.style.transform = 'scale(1.35)';
+        ring.style.borderWidth = '4px';
+        ring.style.filter = 'brightness(1.5)';
+    }
+
     // Outward-flying sparks in a ring with slight random jitter
-    for (let i = 0; i < EG_HIT_BURST_SPARK_COUNT; i++) {
+    const sparkCount = isCrit ? EG_HIT_BURST_SPARK_COUNT + 8 : EG_HIT_BURST_SPARK_COUNT;
+    for (let i = 0; i < sparkCount; i++) {
         const spark = document.createElement('div');
         spark.className = 'eg-hit-spark';
-        const angle = (Math.PI * 2 * i) / EG_HIT_BURST_SPARK_COUNT + Math.random() * 0.5;
-        const dist = 40 + Math.random() * 30;
+        const angle = (Math.PI * 2 * i) / sparkCount + Math.random() * 0.5;
+        const dist = isCrit ? 52 + Math.random() * 36 : 40 + Math.random() * 30;
         spark.style.setProperty('--eg-hit-color', color);
         spark.style.setProperty('--spark-dx', `${(Math.cos(angle) * dist).toFixed(1)}px`);
         spark.style.setProperty('--spark-dy', `${(Math.sin(angle) * dist).toFixed(1)}px`);
+        if (isCrit) spark.style.width = '10px';
+        if (isCrit) spark.style.height = '10px';
+        if (isCrit) spark.style.marginLeft = '-5px';
+        if (isCrit) spark.style.marginTop = '-5px';
         burst.appendChild(spark);
     }
 
     document.body.appendChild(burst);
-    setTimeout(() => burst.remove(), EG_HIT_BURST_DURATION_MS);
+    setTimeout(() => burst.remove(), isCrit ? EG_HIT_BURST_DURATION_MS + 150 : EG_HIT_BURST_DURATION_MS);
 }
 
 
@@ -2256,7 +2322,7 @@ function _egBuildMonsterCardHTML(m) {
 
         <!-- Emoji icon with level badge and hover tooltip -->
         <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${(m.enrageStacks || 0) > 0 ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
-            ${isTarget ? '<span class="eg-target-arrow">▼</span>' : ''}
+            ${isTarget ? '<span class="eg-target-arrow"><span class="eg-target-arrow-icon">▼</span> TARGET <span class="eg-target-arrow-icon">▼</span></span>' : ''}
             ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
             <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>

@@ -836,6 +836,7 @@
 
     function fireIfNewlyDone(type, idx, primed) {
         const set = type === 'row' ? S.rowsPrimed : S.colsPrimed;
+        if (!set) return;
         if (primed && set.has(idx)) return;
         set.add(idx);
         ON_LINE_DONE.forEach(fn => fn(type, idx));
@@ -955,9 +956,9 @@
         const rowDone = _isRowSolved(cur.grid, row);
         const colDone = _isColSolved(cur.grid, col);
         if (rowDone && !rowWasDone) fireIfNewlyDone('row', row, false);
-        else if (rowDone) S.rowsPrimed.add(row);
+        else if (rowDone && S.rowsPrimed) S.rowsPrimed.add(row);
         if (colDone && !colWasDone) fireIfNewlyDone('col', col, false);
-        else if (colDone) S.colsPrimed.add(col);
+        else if (colDone && S.colsPrimed) S.colsPrimed.add(col);
 
         return result;
     });

@@ -640,17 +640,26 @@
 .eg-hz-hit-text {
     position: absolute;
     left: 50%;
-    top: -6px;
+    top: -10px;
     transform: translateX(-50%);
-    font-weight: bold;
-    font-size: 17px;
-    text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 1px 2px #000;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    line-height: 1;
+    white-space: nowrap;
+    color: #ff5566;
+    text-shadow:
+        -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000,
+        -2px 0 0 #000, 2px 0 0 #000, 0 -2px 0 #000, 0 2px 0 #000,
+        0 0 10px rgba(0,0,0,0.95);
+    filter: drop-shadow(0 0 8px rgba(255,50,60,0.85)) drop-shadow(0 3px 4px rgba(0,0,0,0.8));
     pointer-events: none;
     z-index: 1010;
-    animation: eg-hz-hit-float 0.9s ease-out forwards;
+    animation: eg-hz-hit-float 0.95s cubic-bezier(0.18, 1.15, 0.32, 1) forwards;
 }
 
 @keyframes eg-hz-hit-float {
-    0%   { transform: translate(-50%, 0); opacity: 1; }
-    100% { transform: translate(-50%, -34px); opacity: 0; }
+    0%   { transform: translateX(-50%) translateY(8px) scale(0.35); opacity: 0; }
+    14%  { transform: translateX(-50%) translateY(-6px) scale(1.25); opacity: 1; filter: brightness(1.4); }
+    100% { transform: translateX(-50%) translateY(-40px) scale(0.92); opacity: 0; }
 }

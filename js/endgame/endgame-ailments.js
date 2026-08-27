@@ -440,7 +440,7 @@ function _egTickAilments() {
 
         if (dotTotal > 0) {
             m.currentHP = Math.max(0, m.currentHP - dotTotal);
-            if (typeof _egShowDamageNumber === 'function') _egShowDamageNumber(m.id, dotTotal);
+            if (typeof _egShowDamageNumber === 'function') _egShowDamageNumber(m.id, dotTotal, false, { fire: 0, cold: 0, lightning: 0, shadow: dotTotal });
             if (m.currentHP <= 0) deadIds.push(m.id);
         }
     });

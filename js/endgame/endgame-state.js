@@ -61,6 +61,7 @@ let _egDragChargeElements = { fire: 0, cold: 0, lightning: 0, shadow: 0 }; // ac
 let _egDragChargeStacks = 0;   // number of painted cells in the current stroke
 let _egDragChargeRow = -1;     // stroke start cell — launch origin of the shot
 let _egDragChargeCol = -1;
+let _egDragChargeWasCrit = false; // true if ANY cell in the current stroke rolled a crit
 
 // Snapshot of the original map-level def, captured at _egStartEncounter.
 // Used to read boss/requiredKills config after cur has been replaced by chained puzzles.

@@ -50,10 +50,37 @@
         border-color: #666;
     }
 
-/* Targeted State */
+/* Targeted State — high-visibility (legacy large cards) */
 .eg-targeted {
-    border-color: #ff3366;
-    box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+    border-color: #ffd700;
+    border-width: 3px;
+    background: linear-gradient(180deg, #2a2a22 0%, #1a1a14 100%);
+    box-shadow:
+        0 0 0 2px rgba(255, 215, 0, 0.45),
+        0 0 16px rgba(255, 215, 0, 0.95),
+        0 0 32px rgba(255, 100, 0, 0.55),
+        inset 0 0 14px rgba(255, 215, 0, 0.18);
+    transform: scale(1.02);
+    animation: eg-target-pulse-legacy 0.9s ease-in-out infinite;
+    filter: brightness(1.12);
+}
+@keyframes eg-target-pulse-legacy {
+    0%, 100% {
+        box-shadow:
+            0 0 0 2px rgba(255, 215, 0, 0.35),
+            0 0 12px rgba(255, 215, 0, 0.75),
+            0 0 24px rgba(255, 100, 0, 0.40),
+            inset 0 0 10px rgba(255, 215, 0, 0.14);
+        filter: brightness(1.08);
+    }
+    50% {
+        box-shadow:
+            0 0 0 2px rgba(255, 215, 0, 0.55),
+            0 0 20px rgba(255, 215, 0, 1),
+            0 0 40px rgba(255, 60, 0, 0.70),
+            inset 0 0 16px rgba(255, 215, 0, 0.28);
+        filter: brightness(1.22);
+    }
 }
 
 .eg-target-badge {
@@ -277,15 +304,26 @@
 
 
 
-/* Base style for all damage numbers */
+/* ── Damage numbers — RPG pop (base) ─────────────────────────────────── */
 .eg-damage-number, .eg-player-damage {
     position: absolute;
-    font-weight: bold;
-    font-size: 18px;
-    pointer-events: none; /* Let clicks pass through the number */
-    animation: damage-float 1.5s ease-out forwards;
-    z-index: 100;
-    text-shadow: 1px 1px 2px black;
+    font-family: 'Impact', 'Anton', 'Arial Black', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: 0.4px;
+    pointer-events: none;
+    z-index: 600;
+    white-space: nowrap;
+    /* heavy 8-way black outline + soft drop so it never vanishes on busy BGs */
+    color: #ffffff;
+    text-shadow:
+        -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000,
+        -2px 0 0 #000, 2px 0 0 #000, 0 -2px 0 #000, 0 2px 0 #000,
+        -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+        0 0 10px rgba(0,0,0,0.95);
+    filter: drop-shadow(0 3px 4px rgba(0,0,0,0.85));
+    will-change: transform, opacity, filter;
 }
 
 /* ── Quiz reward: WeakAuras-style barrier wings ────────────────────── */
@@ -478,33 +516,127 @@
     white-space: nowrap;
 }
 
-/* Specific colors */
+/* ── Damage number placement + animation ──────────────────────────────── */
 .eg-damage-number {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    color: #ff4757; /* Red for monster damage */
-    top: 10px;
     left: 50%;
+    top: -8px;
+    transform: translateX(-50%);
+    color: #ff4757;
+    animation: damage-float 1.05s cubic-bezier(0.18, 1.15, 0.32, 1) forwards;
 }
 
 .eg-player-damage {
-    color: #ffdd59; /* Yellow for player damage */
-    top: 50%;
-    left: 20px;
+    left: 50%;
+    top: 46%;
+    transform: translateX(-50%) translateY(-50%);
+    color: #ffdd59;
+    font-size: 26px;
+    animation: damage-float-player 1.0s cubic-bezier(0.18, 1.15, 0.32, 1) forwards;
 }
 
-/* Animation: Rise up and fade out */
-@keyframes damage-float {
-    0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+/* ── Elemental variants — vivid, PoE-style color + matching glow ───────── */
+.eg-damage-number.eg-dmg-physical { color: #ffffff; }
+.eg-damage-number.eg-dmg-fire      { color: #ff3b1f; }
+.eg-damage-number.eg-dmg-cold      { color: #6ecbff; }
+.eg-damage-number.eg-dmg-lightning { color: #ffe536; }
+.eg-damage-number.eg-dmg-shadow    { color: #c084ff; }
 
-    100% {
-        opacity: 0;
-        transform: translateY(-30px) scale(0.8);
-    }
+.eg-damage-number.eg-dmg-fire      { filter: drop-shadow(0 0 8px rgba(255,70,20,0.95)) drop-shadow(0 0 16px rgba(255,90,20,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.eg-damage-number.eg-dmg-cold      { filter: drop-shadow(0 0 8px rgba(80,180,255,0.95)) drop-shadow(0 0 16px rgba(90,200,255,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.eg-damage-number.eg-dmg-lightning { filter: drop-shadow(0 0 8px rgba(255,230,60,0.95)) drop-shadow(0 0 16px rgba(255,210,40,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.eg-damage-number.eg-dmg-shadow    { filter: drop-shadow(0 0 8px rgba(180,90,255,0.95)) drop-shadow(0 0 16px rgba(160,80,255,0.75)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+.eg-damage-number.eg-dmg-physical  { filter: drop-shadow(0 0 7px rgba(255,255,255,0.65)) drop-shadow(0 3px 4px rgba(0,0,0,0.85)); }
+
+/* ── Critical hit — bigger, gold, starburst, extra glow ───────────────── */
+.eg-damage-number.eg-dmg-crit {
+    font-size: 40px;
+    color: #ffd700;
+    letter-spacing: 0.6px;
+    -webkit-text-stroke: 0.6px #7a3b00;
+    filter:
+        drop-shadow(0 0 8px rgba(255,215,0,0.95))
+        drop-shadow(0 0 18px rgba(255,165,0,0.85))
+        drop-shadow(0 0 28px rgba(255,120,0,0.55))
+        drop-shadow(0 3px 6px rgba(0,0,0,0.9));
+    animation: damage-float-crit 1.15s cubic-bezier(0.18, 1.18, 0.30, 1) forwards;
+}
+.eg-damage-number.eg-dmg-crit.eg-dmg-fire      { color: #ff5420; }
+.eg-damage-number.eg-dmg-crit.eg-dmg-cold      { color: #9be2ff; }
+.eg-damage-number.eg-dmg-crit.eg-dmg-lightning { color: #fff34a; }
+.eg-damage-number.eg-dmg-crit.eg-dmg-shadow    { color: #d6a6ff; }
+
+/* faint “CRIT!” sub-label for critical hits */
+.eg-damage-number.eg-dmg-crit::after {
+    content: 'CRIT!';
+    position: absolute;
+    left: 50%;
+    top: -14px;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1.6px;
+    color: #ffd700;
+    -webkit-text-stroke: 0.4px #000;
+    text-shadow: 0 0 6px rgba(255,215,0,0.95), 0 1px 0 #000;
+    pointer-events: none;
+}
+
+/* ── Elemental crit icon prefix */
+.eg-dmg-crit.eg-dmg-fire::before      { content: '🔥 '; font-size: 0.55em; vertical-align: middle; }
+.eg-dmg-crit.eg-dmg-cold::before      { content: '❄ '; font-size: 0.55em; vertical-align: middle; }
+.eg-dmg-crit.eg-dmg-lightning::before { content: '⚡ '; font-size: 0.55em; vertical-align: middle; }
+.eg-dmg-crit.eg-dmg-shadow::before    { content: '💜 '; font-size: 0.5em; vertical-align: middle; }
+
+/* small physical hits get a slight shrink so crits stand out more */
+.eg-damage-number.eg-dmg-small { font-size: 22px; opacity: 0.95; }
+
+/* status labels (Staggered!, Snipe etc.) must NOT be giant */
+.eg-damage-number.eg-status-label {
+    font-size: 15px;
+    font-family: var(--PX, monospace);
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #ffcc33;
+    -webkit-text-stroke: 0;
+    filter: drop-shadow(0 0 6px rgba(255,200,60,0.75)) drop-shadow(0 2px 3px rgba(0,0,0,0.85));
+    animation: damage-float 0.85s ease-out forwards;
+}
+
+/* ── Animations — scale-pop then float up and fade ─────────────────────── */
+@keyframes damage-float {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.35); }
+    14%  { opacity: 1; transform: translateX(-50%) translateY(-10px) scale(1.28); filter: brightness(1.45); }
+    26%  { opacity: 1; transform: translateX(-50%) translateY(-12px) scale(1.0); filter: brightness(1.15); }
+    72%  { opacity: 1; transform: translateX(-50%) translateY(-24px) scale(1.0); filter: brightness(1); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-42px) scale(0.92); }
+}
+@keyframes damage-float-crit {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(14px) scale(0.22) rotate(-9deg); }
+    18%  { opacity: 1; transform: translateX(-50%) translateY(-18px) scale(1.52) rotate(3deg); filter: brightness(1.55); }
+    32%  { opacity: 1; transform: translateX(-50%) translateY(-20px) scale(1.02) rotate(-1deg); filter: brightness(1.25); }
+    70%  { opacity: 1; transform: translateX(-50%) translateY(-30px) scale(1.0) rotate(0deg); filter: brightness(1); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-52px) scale(0.85) rotate(0deg); }
+}
+@keyframes damage-float-player {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(-30%) scale(0.4); }
+    16%  { opacity: 1; transform: translateX(-50%) translateY(-50%) scale(1.35); filter: brightness(1.4); }
+    30%  { opacity: 1; transform: translateX(-50%) translateY(-50%) scale(1.0); }
+    75%  { opacity: 1; transform: translateX(-50%) translateY(-62%) scale(1.0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-82%) scale(0.9); }
+}
+/* crit player-taken hit */
+.eg-player-damage.eg-dmg-crit {
+    font-size: 34px;
+    color: #ff453a;
+    filter: drop-shadow(0 0 10px rgba(255,60,40,0.9)) drop-shadow(0 0 18px rgba(255,0,0,0.6)) drop-shadow(0 3px 6px rgba(0,0,0,0.9));
+    animation: damage-float-player-crit 1.05s cubic-bezier(0.18,1.18,0.30,1) forwards;
+}
+@keyframes damage-float-player-crit {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(-30%) scale(0.25) rotate(-7deg); }
+    18%  { opacity: 1; transform: translateX(-50%) translateY(-58%) scale(1.45) rotate(2deg); }
+    32%  { opacity: 1; transform: translateX(-50%) translateY(-60%) scale(1.0) rotate(-1deg); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-92%) scale(0.9); }
 }
 
 /* Optional: Flash effect for the monster card when hit */
@@ -1427,34 +1559,126 @@
     to   { box-shadow: 0 0 26px rgba(239, 68, 68, 0.85); }
 }
 
-/* Target Border State (Now an Electric Cyan/Blue wrapper around the emoji instead of pink/red) */
-.eg-compact-targeted {
-    border-color: #00f2fe;
-    box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
-    animation: eg-target-pulse 1s ease-in-out infinite;
+/* Target Border State — HIGH VISIBILITY (matches RPG damage-number punch) */
+.eg-emoji-wrapper.eg-compact-targeted {
+    border-color: #ffd700;
+    border-width: 3px;
+    background: #2a2a18;
+    transform: scale(1.12);
+    box-shadow:
+        0 0 0 2px rgba(255, 215, 0, 0.50),
+        0 0 16px rgba(255, 215, 0, 1),
+        0 0 32px rgba(255, 140, 0, 0.75),
+        0 0 48px rgba(255, 60, 0, 0.35),
+        inset 0 0 14px rgba(255, 215, 0, 0.30);
+    animation: eg-target-pulse 0.85s ease-in-out infinite;
+    filter: brightness(1.18);
+    z-index: 5;
+}
+/* Boss keeps golden aura + targeting — combine both */
+.eg-emoji-wrapper.eg-boss-emoji-wrapper.eg-compact-targeted {
+    border-color: #ffd700 !important;
+    animation: eg-target-pulse 0.85s ease-in-out infinite;
+    box-shadow:
+        0 0 0 3px rgba(255, 215, 0, 0.55),
+        0 0 22px rgba(255, 215, 0, 1),
+        0 0 42px rgba(255, 140, 0, 0.80),
+        inset 0 0 16px rgba(255, 215, 0, 0.32);
+}
+/* Enraged boss that is also targeted — targeting gold wins */
+.eg-emoji-wrapper.eg-boss-enraged.eg-compact-targeted {
+    border-color: #ffd700 !important;
+    animation: eg-target-pulse 0.85s ease-in-out infinite;
+}
+
+/* Expanding halo ring outside the targeted frame — impossible to miss */
+.eg-emoji-wrapper.eg-compact-targeted::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 215, 0, 0.95);
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.85), inset 0 0 10px rgba(255, 215, 0, 0.35);
+    pointer-events: none;
+    animation: eg-target-halo 1.15s ease-out infinite;
+}
+@keyframes eg-target-halo {
+    0%   { transform: scale(0.88); opacity: 0.95; }
+    100% { transform: scale(1.42); opacity: 0; }
 }
 
 @keyframes eg-target-pulse {
-    0%, 100% { box-shadow: 0 0 5px rgba(0, 242, 254, 0.5); }
-    50%      { box-shadow: 0 0 14px rgba(0, 242, 254, 0.95); }
+    0%, 100% {
+        box-shadow:
+            0 0 0 2px rgba(255, 215, 0, 0.40),
+            0 0 12px rgba(255, 215, 0, 0.85),
+            0 0 26px rgba(255, 140, 0, 0.60),
+            0 0 40px rgba(255, 60, 0, 0.25),
+            inset 0 0 10px rgba(255, 215, 0, 0.22);
+        filter: brightness(1.10);
+    }
+    50% {
+        box-shadow:
+            0 0 0 2px rgba(255, 215, 0, 0.60),
+            0 0 20px rgba(255, 215, 0, 1),
+            0 0 38px rgba(255, 140, 0, 0.90),
+            0 0 56px rgba(255, 60, 0, 0.45),
+            inset 0 0 16px rgba(255, 215, 0, 0.38);
+        filter: brightness(1.28);
+    }
 }
 
-/* Bouncing arrow marker above the currently targeted monster */
+/* Bouncing TARGET marker above the currently targeted monster — RPG pill style */
 .eg-target-arrow {
     position: absolute;
-    top: -18px;
+    top: -30px;
     left: 50%;
     transform: translateX(-50%);
-    color: #00f2fe;
-    font-size: 13px;
-    text-shadow: 0 0 6px rgba(0, 242, 254, 0.9);
-    animation: eg-target-bounce 1s ease-in-out infinite;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: linear-gradient(180deg, #ff3b30 0%, #c80000 100%);
+    color: #ffffff;
+    font-family: 'Impact', 'Anton', 'Arial Black', sans-serif;
+    font-weight: 900;
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 1.1px;
+    padding: 4px 10px 5px;
+    border-radius: 999px;
+    border: 2px solid #fff;
+    white-space: nowrap;
+    /* heavy outline + glow so it pops on any background, like the new damage numbers */
+    text-shadow:
+        -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000,
+        0 1px 2px rgba(0,0,0,0.9);
+    box-shadow:
+        0 2px 6px rgba(0,0,0,0.75),
+        0 0 10px rgba(255, 40, 40, 0.95),
+        0 0 18px rgba(255, 100, 0, 0.65);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.85));
+    animation: eg-target-bounce 0.65s ease-in-out infinite;
     pointer-events: none;
+    z-index: 10;
+}
+/* arrow glyph inside the pill — slightly larger */
+.eg-target-arrow-icon {
+    font-size: 9px;
+    line-height: 1;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.9));
 }
 
 @keyframes eg-target-bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50%      { transform: translateX(-50%) translateY(3px); }
+    0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+    50%      { transform: translateX(-50%) translateY(-5px) scale(1.06); }
+}
+/* Boss cards are twice the size — lift the pill a bit higher */
+.eg-boss-card .eg-target-arrow {
+    top: -36px;
+    font-size: 13px;
+    padding: 5px 12px;
+    letter-spacing: 1.3px;
 }
 
 /* Level overlay positioned subtly toward the bottom-left */
@@ -1639,9 +1863,10 @@
 .st-shadowburn { border-color: #a78bfa; box-shadow: 0 0 6px rgba(167,139,250,0.8); }
 .st-polymorph { border-color: #e879f9; box-shadow: 0 0 6px rgba(232,121,249,0.8); }
 
-/* Purple DoT numbers for ailment ticks on the player HUD */
+/* Purple DoT numbers for ailment ticks — keep RPG pop but tinted */
 .eg-dot-damage {
     color: #c084fc !important;
+    filter: drop-shadow(0 0 7px rgba(192,132,252,0.85)) drop-shadow(0 0 14px rgba(160,80,255,0.6)) drop-shadow(0 2px 4px rgba(0,0,0,0.85)) !important;
 }
 
 /* ── Puzzle: lava cells ──────────────────────────────────────────────── */
@@ -1847,5 +2072,4 @@ body.eg-cursor-shocked .gc {
         transform: translate(var(--spark-dx, 24px), var(--spark-dy, 0px)) scale(0.2);
         opacity: 0;
     }
-}
 }

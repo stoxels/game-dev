@@ -54,24 +54,35 @@ const EG_LEVELING_CONFIG = {
     maxLevel: 100,
 
     // XP curve: xpToLeave(level) = xpBase * level^xpExp + xpLinear * level.
-    // Tuned so early levels take a handful of kills and the curve steepens
-    // smoothly towards the level cap.
-    xpBase: 90,
-    xpExp: 1.75,
-    xpLinear: 60,
+    // Tuned under the assumption that the player clears every Tier 1 and
+    // Tier 2 atlas region exactly ONCE (4×T1 + 4×T2 = 8 maps, 140 normal
+    // kills + ~2 bosses at mLvl 3/6). That one-time sweep should bring a
+    // fresh character from 1 → ~8 (white maps) / ~9 (rare maps with +XP
+    // mods) — so T1 stays optimal through all 4 T1 maps and T2 stays
+    // optimal through the T2 sweep, without outleveling the content.
+    // Higher tiers then continue smoothly to 100.
+    xpBase: 125,
+    xpExp: 1.82,
+    xpLinear: 75,
 
     // Early-game catch-up discount: below earlyXpDiscountLevels the XP
     // requirement is scaled down, fading linearly to zero so the curve
-    // joins the base formula exactly at that level. Helps a fresh
-    // character start snowballing without touching monster difficulty.
+    // joins the base formula exactly at that level. Reduced from 0.5 to
+    // 0.28 — the old 50% discount made 1→4 take only 75+253+556 XP, so a
+    // single T1 map (15×84 XP) already gave level 4. New discount keeps
+    // early levels cheap but not trivial.
     earlyXpDiscountLevels: 5,
-    earlyXpDiscountFactor: 0.5,
+    earlyXpDiscountFactor: 0.28,
 
     // Base XP per kill: xpPerKillBase + xpPerKillGrowth * mLevel^xpPerKillExp.
-    xpPerKillBase: 18,
-    xpPerKillGrowth: 12,
+    // Lowered from 18+12×m^1.55 so a T2 kill (≈175 XP) is not 2.5× a T1
+    // kill (≈69 XP) — the old gap made the first T2 map burst 1.5-2 levels.
+    // T16 kill stays strong (~10.7k) so 90-100 grind is still ~16% slower
+    // than before, not 40%+.
+    xpPerKillBase: 15,
+    xpPerKillGrowth: 10,
     xpPerKillExp: 1.55,
-    bossXpMultiplier: 4,
+    bossXpMultiplier: 3.5,
 
     // PoE-style safe range: monsters up to
     //   (safeRangeBelowBase + floor(playerLevel / safeRangeBelowLevelsPer))

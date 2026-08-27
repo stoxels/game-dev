@@ -6,6 +6,8 @@
 // Per-element breakdown of the most recent _egCalcPlayerDamage() roll.
 // Consumed by impact handlers to apply monster resistances per element.
 let _egLastHitElements = null;
+let _egLastHitWasCrit = false;
+let _egLastHitCritMult = 1;
 
 function _egCalcPlayerDamage() {
     const stats = _egComputePlayerStats();
@@ -22,6 +24,8 @@ function _egCalcPlayerDamage() {
     dmg += elements.fire + elements.cold + elements.lightning + elements.shadow;
 
     const critMult = _egRollCrit(stats);
+    _egLastHitWasCrit = critMult > 1;
+    _egLastHitCritMult = critMult;
     dmg *= critMult;
 
     // Active map run: apply the "% reduced player Damage" map mod.
@@ -51,6 +55,8 @@ function _egCalcPlayerDamage() {
 // Passed to _egDamageTargetById so melee hits get the same resistance /
 // ailment / hit-burst treatment as projectiles.
 let _egLastMeleeElements = null;
+let _egLastMeleeWasCrit = false;
+let _egLastMeleeCritMult = 1;
 
 // Melee auto-strike channel — fully independent from projectiles:
 // rolls the equipped weapon's base damage range plus its "… to Melee
@@ -83,6 +89,8 @@ function _egCalcPlayerMeleeDamage() {
     dmg += elements.fire + elements.cold + elements.lightning + elements.shadow;
 
     const critMult = _egRollCrit(stats);
+    _egLastMeleeWasCrit = critMult > 1;
+    _egLastMeleeCritMult = critMult;
     dmg *= critMult;
 
     // Active map run: apply the "% reduced Melee Attack Damage" map mod.
