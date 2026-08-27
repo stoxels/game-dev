@@ -155,6 +155,20 @@ function _egBossScheduleSingleMechanic(monster, mech, phase) {
 
         const interval = _egCalcMechanicInterval(mech, phase);
         const t = setTimeout(() => {
+            if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+                // Game is paused — skip this tick and reschedule after pause lifts
+                const retry = setInterval(() => {
+                    if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+                    clearInterval(retry);
+                    const stillAlive = _egIsActive() && _egMonsters.find(m => m.id === monster.id);
+                    if (stillAlive && !monster.bossImmune) {
+                        const fn = window[mech.handler];
+                        if (typeof fn === 'function') fn(monster, phase);
+                    }
+                    scheduleNext();
+                }, 200);
+                return;
+            }
             const stillAlive = _egIsActive() && _egMonsters.find(m => m.id === monster.id);
             if (stillAlive && !monster.bossImmune) {
                 const fn = window[mech.handler];
@@ -168,7 +182,17 @@ function _egBossScheduleSingleMechanic(monster, mech, phase) {
 
     // Stagger the very first trigger so all mechanics don't fire simultaneously on spawn
     const initialDelay = 4000 + Math.random() * 8000;
-    const t0 = setTimeout(scheduleNext, initialDelay);
+    const t0 = setTimeout(() => {
+        if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+            const retry = setInterval(() => {
+                if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+                clearInterval(retry);
+                scheduleNext();
+            }, 200);
+            return;
+        }
+        scheduleNext();
+    }, initialDelay);
     if (_egBossTimers[monster.id]) _egBossTimers[monster.id].push(t0);
 }
 
@@ -623,7 +647,8 @@ function _egMechGridInvert(monster, phase) {
 //------------------------------------------------------------------------
 // The Null blasts the entire screen with void energy. A single circular
 // safe zone appears at a random position. The player must drag their
-// class HUD into the safe zone within 5 seconds or take 30% max-HP damage.
+// player character sprite (avatar) into the safe zone within 5 seconds
+// or take 30% max-HP damage.
 //
 // The mechanic has two phases of its own:
 //   Warning  (1.5s) — red-tinted overlay fades in, safe zone glows, countdown starts
@@ -649,21 +674,41 @@ function _egVoidSurgePickSafePos() {
 }
 
 
-// ── HUD overlap check ─────────────────────────────────────────────────────────
-// Returns true if any part of the HUD overlaps the safe-zone circle.
-// Uses closest-point check with tolerance so the visual glow counts as inside.
+// ── Player-sprite overlap check ───────────────────────────────────────────
+// Returns true if the player character sprite is inside the safe-zone circle.
+// Design intent (especially for Entropy's Heat Bloom) is that the player moves
+// their draggable avatar sprite — not the class HUD — into the circle.
+// Uses the tight sprite image rect (like hazards) with closest-point check.
 function _egVoidSurgeHudInZone(safePos) {
-    const hud = document.getElementById('class-hud-drag-handle')
-        || document.getElementById('class-hud-panel');
-    if (!hud) return false;
-    const rect = hud.getBoundingClientRect();
-    if (rect.width === 0 && rect.height === 0) return false;
+    const rect = (typeof _egBlastGetPlayerRect === 'function' && _egBlastGetPlayerRect())
+        || _egVoidSurgeGetPlayerRectFallback();
+    if (!rect || (rect.width === 0 && rect.height === 0)) return false;
     const closestX = Math.max(rect.left, Math.min(safePos.x, rect.right));
     const closestY = Math.max(rect.top, Math.min(safePos.y, rect.bottom));
     const dx = closestX - safePos.x;
     const dy = closestY - safePos.y;
     const tolerance = 8;
     return Math.sqrt(dx * dx + dy * dy) <= EG_VOID_SURGE_SAFE_RADIUS + tolerance;
+}
+
+// Fallback rect when the shared blast helper is not yet available.
+// Tries the sprite image first, then the wrapper with bar-area cropped.
+function _egVoidSurgeGetPlayerRectFallback() {
+    let img = document.getElementById('avatar-sprite-img');
+    let r = img ? img.getBoundingClientRect() : null;
+    if (!r || (!r.width && !r.height)) {
+        img = document.getElementById('avatar-sprite-img-simple');
+        r = img ? img.getBoundingClientRect() : null;
+    }
+    if (r && r.width && r.height) return r;
+    const el = document.getElementById('player-avatar-wrapper')
+        || document.getElementById('player-avatar-simple')
+        || document.getElementById('class-hud-drag-handle')
+        || document.getElementById('class-hud-panel');
+    if (!el) return null;
+    const wr = el.getBoundingClientRect();
+    if (!wr.width && !wr.height) return null;
+    return wr;
 }
 
 
@@ -825,9 +870,9 @@ function _egMechVoidSurge(monster, phase) {
 //------------------------------------------------------------------------
 // Shared engine for every dodge-style boss mechanic (Void Surge, Heat Death
 // Bloom, Rewrite Fate, Prior Collapse). The screen darkens, one or more safe
-// zones appear, and the player must drag their class HUD into the real zone
-// before the window closes. Failing costs a PERCENTAGE of max HP — never an
-// instant kill from full health.
+// zones appear, and the player must drag their player character sprite (avatar)
+// into the real zone before the window closes. Failing costs a PERCENTAGE of
+// max HP — never an instant kill from full health.
 //
 // Every variant is heavily telegraphed:
 //   warning phase first, fake zones collapse visibly, relocation targets are
@@ -860,24 +905,68 @@ function _egBlastPickPos(radius) {
     return { x, y };
 }
 
-// Returns true if any part of the HUD overlaps the safe zone.
-// Previously checked only the handle's centre — that felt unfair because the
-// handle is wide and the circle's glow extends beyond the logical radius.
-// Checking the closest point on the HUD rect with a small tolerance matches
-// the player's visual expectation of "being inside".
+// Returns true if the player character sprite is inside the safe zone.
+// Entropy's Heat Bloom (and all generic blasts) are dodge mechanics where the
+// player must move their draggable avatar sprite — not the class HUD — into
+// the circle. Uses the tight sprite image rect (hazard-style) with tolerance.
 function _egBlastHudInZone(zone) {
-    const hud = document.getElementById('class-hud-drag-handle')
-        || document.getElementById('class-hud-panel');
-    if (!hud) return false;
-    const rect = hud.getBoundingClientRect();
-    // If element is hidden (0 size) fall back to centre check on panel
-    if (rect.width === 0 && rect.height === 0) return false;
+    const rect = _egBlastGetPlayerRect();
+    if (!rect || (rect.width === 0 && rect.height === 0)) return false;
     const closestX = Math.max(rect.left, Math.min(zone.x, rect.right));
     const closestY = Math.max(rect.top, Math.min(zone.y, rect.bottom));
     const dx = closestX - zone.x;
     const dy = closestY - zone.y;
     const tolerance = 8; // visual border + glow forgiveness
     return Math.sqrt(dx * dx + dy * dy) <= zone.radius + tolerance;
+}
+
+// Tight hitbox derived from the visible avatar sprite image, not the wrapper.
+// Mirrors the hazard system's _egHzPlayerRect logic: the wrapper is taller than
+// the artwork (HP/charge bars), so using its bounds misaligns collision.
+// Falls back to HUD only if no avatar is present (non-endgame screen).
+function _egBlastGetPlayerRect() {
+    // Reuse the hazard helper if it is already loaded for exact parity
+    if (typeof _egHzPlayerRect === 'function') {
+        const hr = _egHzPlayerRect();
+        if (hr && hr.width && hr.height) return hr;
+    }
+    if (typeof _egHzPlayerSpriteRect === 'function') {
+        const sr = _egHzPlayerSpriteRect();
+        if (sr && sr.width && sr.height) return sr;
+    }
+    let img = document.getElementById('avatar-sprite-img');
+    let r = img ? img.getBoundingClientRect() : null;
+    if (!r || (!r.width && !r.height)) {
+        img = document.getElementById('avatar-sprite-img-simple');
+        r = img ? img.getBoundingClientRect() : null;
+    }
+    if (r && r.width && r.height) return r;
+    const el = document.getElementById('player-avatar-wrapper')
+        || document.getElementById('player-avatar-simple');
+    if (el) {
+        const wr = el.getBoundingClientRect();
+        if (wr.width || wr.height) {
+            // Crop the HP/charge bar area at the top for the endgame wrapper
+            if (el.id === 'player-avatar-wrapper') {
+                const barH = wr.height * 0.38;
+                const insetX = Math.min(16, wr.width * 0.18);
+                const insetY = Math.min(12, (wr.height - barH) * 0.14);
+                const left = wr.left + insetX;
+                const right = wr.right - insetX;
+                const top = wr.top + barH + insetY;
+                const bottom = wr.bottom - Math.min(8, (wr.height - barH) * 0.08);
+                if (right > left && bottom > top) {
+                    return { left, right, top, bottom, width: right - left, height: bottom - top };
+                }
+            }
+            return wr;
+        }
+    }
+    // Last resort: HUD (keeps Void Surge functional on screens without avatar)
+    const hud = document.getElementById('class-hud-drag-handle')
+        || document.getElementById('class-hud-panel');
+    if (!hud) return null;
+    return hud.getBoundingClientRect();
 }
 
 // DOM helpers — each blast gets uniquely suffixed elements.

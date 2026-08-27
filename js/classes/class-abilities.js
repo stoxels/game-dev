@@ -733,15 +733,23 @@ function _bayesianRevealOneCell() {
 
 // applyClassPassiveOnLevelStart — called at the start of each level.
 //   Resets all per-level state, then applies the class passive starting bonus.
+//   Must fire on EVERY puzzle, including chained puzzles inside a map
+//   (endgame encounter chain). See _egTransitionToChainPuzzle.
 function applyClassPassiveOnLevelStart() {
     _resetClassLevelState();
 
-    if (!STATE.playerClass || isClassless()) return;
+    if (!STATE.playerClass || isClassless()) {
+        // Still mark that class passives were considered for this Gi so the
+        // chain guarantee does not re-fire unnecessarily.
+        window._egClassPassiveAppliedForGi = cur ? cur.gIdx : null;
+        return;
+    }
 
     const effect = _getPassiveEffect();
 
     if (STATE.playerClass === 'mathmagician') _applyMathmagicianPassive(effect);
     if (STATE.playerClass === 'probabilist') _applyProbabilistPassive(effect);
+    window._egClassPassiveAppliedForGi = cur ? cur.gIdx : null;
 }
 
 

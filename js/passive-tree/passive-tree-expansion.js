@@ -132,6 +132,9 @@
         userGrid[r][c] = 1;
         renderCell(r, c);
         updClues(r, c);
+        // Endgame: fire a projectile from this auto-reveal toward the targeted monster.
+        // Queued if the encounter hasn't started yet (start-of-puzzle passives).
+        if (typeof _egOnProgrammaticReveal === 'function') _egOnProgrammaticReveal([`g-${r}-${c}`]);
         checkWin();
         return true;
     }
@@ -871,6 +874,11 @@
         try {
             ON_START.forEach(fn => { try { fn(); } catch (e) { /* keep other effects alive */ } });
         } catch (e) { /* ignore */ }
+        // Chain guarantee: ON_START must run on every chained puzzle in a map.
+        // Do not gate this patch behind _egSuppressEncounterStop — that flag
+        // preserves timer/HP across chain puzzles but reveal/mark passives
+        // (skyward_survey, entropy_observer, etc.) intentionally re-roll
+        // per puzzle. See _egTransitionToChainPuzzle hardening.
         return result;
     });
 

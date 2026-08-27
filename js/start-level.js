@@ -369,10 +369,16 @@ function _navigateToGameScreen() {
 
 // If a Scout's Primer item was activated during the previous level,
 // consumes the pending flag and opens the primer question modal now.
+// During an endgame map chain this is evaluated on EVERY puzzle start
+// (via _doStartLevel called from _egTransitionToChainPuzzle), so a
+// mid-map Primer use correctly fires on the next chain puzzle.
 function _checkPrimerPending() {
     if (!STATE.primerPending) return;
     STATE.primerPending = false;
     save();
+    // Defer primer modal until after class/PassiveTracker HUD is built so
+    // the board dimensions are stable for flare animations (already the
+    // case for campaign, and now guaranteed for chain puzzles as well).
     showPrimerModal();
 }
 
@@ -426,6 +432,12 @@ function _doStartLevel(gi) {
     }
     _applyPassiveStartEffects();
     _applySylaForestAffinity();
+    // Flag that puzzle-start passives (auto-reveal / auto-mark) have fired for this Gi.
+    // _egTransitionToChainPuzzle checks this flag after _doStartLevel to guarantee
+    // every chained puzzle in a map re-triggers passives even if a future refactor
+    // gates _applyPassiveStartEffects behind _egSuppressEncounterStop.
+    window._egPassiveAppliedForGi = cur ? cur.gIdx : gi;
+    window._egClassPassiveAppliedForGi = cur ? cur.gIdx : gi;
 
     // 5. Deferred overlay effects (needs grid DOM to exist)
     // adjacency_matrix (302): populate neighbour-count overlays after passives are applied

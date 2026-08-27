@@ -236,6 +236,11 @@ function _egRespawnRandomMonster() {
 function _egScheduleRespawn() {
     const delay = EG_RESPAWN_DELAY_MIN_MS + Math.random() * EG_RESPAWN_DELAY_RANGE_MS;
     const t = setTimeout(() => {
+        if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+            // Paused — retry after pause without consuming the spawn slot
+            _egScheduleRespawn();
+            return;
+        }
         if (_egShouldSuppressRespawn()) return;
         _egRespawnRandomMonster();
     }, delay);
@@ -273,6 +278,15 @@ function _egScheduleMonsterSpawns(spawnList) {
         cumulativeDelay = result.cumulative;
 
         const t = setTimeout(() => {
+            if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+                // Paused — delay the spawn until the game resumes
+                const retry = setInterval(() => {
+                    if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+                    clearInterval(retry);
+                    if (_egIsActive()) _egSpawnMonster(entry.id, entry.level || 1);
+                }, 200);
+                return;
+            }
             if (_egIsActive()) _egSpawnMonster(entry.id, entry.level || 1);
         }, result.delay);
         _egSpawnTimers.push(t);
@@ -307,6 +321,9 @@ function _egResetEncounterState() {
     _egEncounterActive = true;
     _egTargetId = null;
     _egMonsters = [];
+    // Do NOT clear _egPendingRevealQueue here — start-of-puzzle passives
+    // queued reveals before _egStartEncounter and would be lost. Queue is
+    // cleared on _egStopEncounter or after flushing.
     _egMapDef = cur;
     _egMonsterSpawnCounter = 0;
     _egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption;
@@ -345,6 +362,12 @@ function _egStartEncounter() {
     _egStartTickLoop();
     _egStartPickupSpawner();
     _egScheduleMonsterSpawns(_egBuildSpawnList());
+    // Flush any auto-reveals that fired before the encounter went live
+    // (start-of-puzzle passives run before _egStartEncounter in start-level.js).
+    if (typeof _egFlushPendingRevealProjectiles === 'function') {
+        // Small delay so the first monster has time to spawn and be auto-targeted.
+        setTimeout(() => _egFlushPendingRevealProjectiles(), 650);
+    }
 }
 
 // Clears all pending spawn timers and resets the timer list.
@@ -369,6 +392,7 @@ function _egStopEncounter() {
     _egEncounterActive = false;
     _egMonsters = [];
     _egTargetId = null;
+    if (typeof _egPendingRevealQueue !== 'undefined') _egPendingRevealQueue = [];
 
     if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
     _egStopTickLoop();
@@ -558,6 +582,38 @@ function _egTickLoop() {
     //_renderPlayerCharge();
 
     _egUpdateBars();
+}
+
+// ── Pause handling for endgame encounters ────────────────────────────────
+// While the game is paused (Escape) the tick loop already early-returns,
+// freezing charge bars, soft-enrage via _egBossTick, hazards and ailments.
+// Date.now()-based expiries (boss spawn time, ailments, lockouts, etc.)
+// would otherwise keep advancing wall-clock time while paused, so we shift
+// them forward by the paused duration on resume.
+let _egPauseStartedAt = 0;
+function _egOnPause() {
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+    _egPauseStartedAt = Date.now();
+}
+function _egOnResume() {
+    if (!_egPauseStartedAt) return;
+    const delta = Date.now() - _egPauseStartedAt;
+    _egPauseStartedAt = 0;
+    if (delta <= 0) return;
+    _egMonsters.forEach(m => {
+        if (m.bossSpawnTime) m.bossSpawnTime += delta;
+        if (m.staggeredUntil) m.staggeredUntil += delta;
+        if (m.statuses) Object.values(m.statuses).forEach(st => { if (st.until) st.until += delta; });
+    });
+    if (typeof _egEncounterStartAt !== 'undefined' && _egEncounterStartAt) _egEncounterStartAt += delta;
+    if (typeof _egPlayerBlockLockoutUntil !== 'undefined' && _egPlayerBlockLockoutUntil) _egPlayerBlockLockoutUntil += delta;
+    if (typeof _egLastLifeRegenAt !== 'undefined' && _egLastLifeRegenAt) _egLastLifeRegenAt += delta;
+    if (typeof _egPlayerStatuses !== 'undefined' && _egPlayerStatuses) {
+        Object.values(_egPlayerStatuses).forEach(st => { if (st.until) st.until += delta; });
+    }
+    if (typeof _egPuzzleEffects !== 'undefined' && Array.isArray(_egPuzzleEffects)) {
+        _egPuzzleEffects.forEach(e => { if (e.until) e.until += delta; });
+    }
 }
 
 

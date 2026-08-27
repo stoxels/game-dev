@@ -320,9 +320,41 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
 
     window._egSuppressEncounterStop = true;
     window._egSuppressEncounterStart = true;
+    // Clear per-puzzle passive flags before starting the next puzzle so we can
+    // detect whether _doStartLevel actually fired them.
+    window._egPassiveAppliedForGi = null;
+    window._egClassPassiveAppliedForGi = null;
     _doStartLevel(nextGi);
     window._egSuppressEncounterStop = false;
     window._egSuppressEncounterStart = false;
+
+    // Hardened guarantee: every chained puzzle must re-trigger
+    // auto-reveal / auto-mark passives, Syla's forest affinity and class
+    // passives. _doStartLevel already calls these, but if a future change
+    // gates them behind _egSuppressEncounterStop they would be missed.
+    // Re-apply only when the flag shows they did NOT fire for this Gi.
+    if (window._egPassiveAppliedForGi !== nextGi) {
+        if (typeof _applyPassiveStartEffects === 'function') _applyPassiveStartEffects();
+        if (typeof _applySylaForestAffinity === 'function') _applySylaForestAffinity();
+        window._egPassiveAppliedForGi = nextGi;
+    }
+    // Class passives are delayed (Probabilist Bayesian Insight uses 300ms
+    // setTimeout) — verify after that window and re-fire if missed. The
+    // re-fire is safe: _applyProbabilistPassive guards internally and
+    // _applyMathmagicianPassive preserves the Variance Shield across chains
+    // via _isEndgameChainShieldPreserve.
+    setTimeout(() => {
+        if (window._egClassPassiveAppliedForGi !== nextGi && typeof applyClassPassiveOnLevelStart === 'function') {
+            // Note: applyClassPassiveOnLevelStart resets class level state;
+            // calling it a second time would wipe the just-applied shield.
+            // Only re-apply the probabilist branch which is safe to repeat.
+            if (STATE.playerClass === 'probabilist' && typeof _applyProbabilistPassive === 'function') {
+                const eff = (typeof _getPassiveEffect === 'function') ? _getPassiveEffect() : { autoMarkCount: 0 };
+                if (eff && eff.autoMarkCount) _applyProbabilistPassive(eff);
+            }
+            window._egClassPassiveAppliedForGi = nextGi;
+        }
+    }, 350);
 
     _egMonsters = savedMonsters;
     _egTargetId = savedTargetId;
@@ -330,6 +362,10 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
     _egPuzzleCompleteFired = false;
 
     _egRenderPanel();
+    // Flush any start-of-puzzle reveals that were queued while the grid rebuilt
+    if (typeof _egFlushPendingRevealProjectiles === 'function') {
+        setTimeout(() => _egFlushPendingRevealProjectiles(), 150);
+    }
     _egUpdateObjectivesHUD();
 
     // Re-place carried loot after the new grid DOM is fully built
@@ -450,6 +486,15 @@ function _egScheduleArenaAdvance() {
     if (_egArenaAdvanceTimer) return;
     _egArenaAdvanceTimer = setTimeout(() => {
         _egArenaAdvanceTimer = null;
+        if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+            // Paused — retry after pause lifts instead of rolling the arena behind the overlay
+            const retry = setInterval(() => {
+                if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+                clearInterval(retry);
+                if (_egIsActive()) _egAdvanceBossArena();
+            }, 200);
+            return;
+        }
         if (_egIsActive()) _egAdvanceBossArena();
     }, EG_BOSS_SPAWN_DELAY_MS);
 }
@@ -457,6 +502,12 @@ function _egScheduleArenaAdvance() {
 // Spawns the next queued boss into the current arena with a dramatic delay.
 function _egSpawnNextArenaBoss() {
     if (!_egBossPhaseActive || !_egIsActive()) return;
+
+    // Boss arena chain: solving an arena puzzle while the boss is still alive
+    // carries the SAME boss to the next grid — do NOT spawn a duplicate
+    // (that bug made arena maps impossible to finish). Only spawn when no
+    // living boss remains (i.e. the previous boss was just slain).
+    if (_egMonsters.some(m => m.isBoss)) return;
 
     const entry = _egBossPhaseQueue[_egBossKilledCount];
     if (!entry) return;
@@ -466,6 +517,20 @@ function _egSpawnNextArenaBoss() {
 
     setTimeout(() => {
         if (!_egIsActive()) return;
+        if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+            // Game is paused — retry after pause instead of spawning behind the overlay
+            const retry = setInterval(() => {
+                if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+                clearInterval(retry);
+                if (!_egIsActive()) return;
+                if (_egMonsters.some(m => m.isBoss)) return;
+                showToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
+                _egSpawnMonster(entry.id, entry.level || 1);
+                _egUpdateObjectivesHUD();
+            }, 200);
+            return;
+        }
+        if (_egMonsters.some(m => m.isBoss)) return;
         showToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
         _egSpawnMonster(entry.id, entry.level || 1);
         _egUpdateObjectivesHUD();

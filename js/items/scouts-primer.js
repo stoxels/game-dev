@@ -528,10 +528,12 @@ function _primerCalcRevealCounts(streakCount, gridRows, gridCols) {
 // revealed; empty cells that are still blank are marked as crossed out (=2).
 // Shared by the row-wise and column-wise reveal helpers below.
 function _primerRevealCell(r, c, sol) {
+    const wasRevealed = (sol[r][c] === 1) && !revealedGrid[r][c] && userGrid[r][c] !== 1;
     if (sol[r][c] === 1) { revealedGrid[r][c] = true; userGrid[r][c] = 1; }
     else if (userGrid[r][c] === 0) { userGrid[r][c] = 2; }
     renderCell(r, c);
     updClues(r, c);
+    if (wasRevealed && typeof _egOnProgrammaticReveal === 'function') _egOnProgrammaticReveal([`g-${r}-${c}`]);
 }
 
 // Applies the headstart reveal to every cell in the given row.

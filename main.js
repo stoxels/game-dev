@@ -75,6 +75,7 @@ function pauseGame() {
     if (_gamePaused || dead) return;
     _gamePaused = true;
     pauseTimer(); // defined in timer.js
+    if (typeof _egOnPause === 'function') _egOnPause();
     const onEndgameMap = _updatePauseMenuReturnButtons();
     // Endgame variant: hide level number / score / hint / bonus, show the
     // run's collected loot (with hover tooltips) instead.
@@ -90,6 +91,7 @@ function unpauseGame() {
     if (!_gamePaused) return;
     _gamePaused = false;
     document.getElementById('pause-overlay').classList.remove('show');
+    if (typeof _egOnResume === 'function') _egOnResume();
     resumeTimer(); // defined in timer.js
 }
 
