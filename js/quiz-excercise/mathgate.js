@@ -21,6 +21,12 @@ const MG_RECENT_HISTORY_SIZE = 10;
 // All levels locked behind the Probability Gate, expressed as { world, level }
 // pairs using 1-based indices. buildMathGateSet() converts these to gi values
 // at runtime, skipping any that don't exist in the current world data.
+
+// Purposefully empty while testers are testing the game
+const MATH_GATE_LEVELS = [];
+
+/*
+
 const MATH_GATE_LEVELS = [
     { world: 1, level: 6 },
     { world: 2, level: 1 },
@@ -77,6 +83,10 @@ const MATH_GATE_LEVELS = [
     { world: 11, level: 10 },
 
 ];
+
+*/
+
+
 
 // The gi that is waiting to be launched after a correct answer.
 let pendingGateGi = null;
