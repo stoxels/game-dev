@@ -962,23 +962,51 @@ function _egBuildStatDescTooltipHTML(descKey, label) {
         const refMonsterLevel = hasLevelCtx
             ? ((_egGetTarget() && _egGetTarget().level) || _egGetEncounterBaseLevel() || 1)
             : 1;
+        // Character level for multi-level display (falls back to ref level if unavailable)
+        const playerLevel = (typeof _egGetPlayerLevel === 'function')
+            ? Math.max(1, Number(_egGetPlayerLevel()) || 1)
+            : refMonsterLevel;
+        const maxLvl = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.maxLevel)
+            ? EG_LEVELING_CONFIG.maxLevel : 100;
+
         if (descKey === 'eg_statdesc_armour') {
-            // Representative raw hit size at the reference level (matches the
-            // average monster base damage scaled by the per-level damage curve).
-            const refDamage = Math.round(12 * (1 + 0.12 * (refMonsterLevel - 1)));
-            const reductionPct = _egCalcArmourReductionPct(stats.armour, refDamage) * 100;
-            html += `<br><span style="color:var(--accent,#66fcf1)">${t('eg_statdesc_armour_value').replace('{p}', reductionPct.toFixed(1))}</span>`;
+            // Show damage reduction vs monster levels: playerLevel-1 .. playerLevel+3
+            const levels = [];
+            for (let d = -1; d <= 3; d++) {
+                const lvl = playerLevel + d;
+                if (lvl < 1) continue;
+                if (lvl > maxLvl) break;
+                levels.push(lvl);
+            }
+            if (!levels.length) levels.push(refMonsterLevel);
+            const lines = levels.map(lvl => {
+                // Representative raw hit size at this monster level
+                const refDamage = Math.round(12 * (1 + 0.12 * (lvl - 1)));
+                const reductionPct = _egCalcArmourReductionPct(stats.armour, refDamage) * 100;
+                const labelPart = t('eg_statdesc_armour_value').replace('{p}', reductionPct.toFixed(1));
+                return `${labelPart} (L${lvl})`;
+            });
+            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
         } else if (descKey === 'eg_statdesc_evasion') {
-            const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, refMonsterLevel));
-            html += `<br><span style="color:var(--accent,#66fcf1)">${t('eg_statdesc_evasion_value').replace('{p}', dodgeChance.toFixed(1))}</span>`;
+            // Show dodge chance vs monster levels: playerLevel-1 .. playerLevel+3
+            const levels = [];
+            for (let d = -1; d <= 3; d++) {
+                const lvl = playerLevel + d;
+                if (lvl < 1) continue;
+                if (lvl > maxLvl) break;
+                levels.push(lvl);
+            }
+            if (!levels.length) levels.push(refMonsterLevel);
+            const lines = levels.map(lvl => {
+                const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, lvl));
+                const labelPart = t('eg_statdesc_evasion_value').replace('{p}', dodgeChance.toFixed(1));
+                return `${labelPart} (L${lvl})`;
+            });
+            html += `<br><span style="color:var(--accent,#66fcf1)">${lines.join('<br>')}</span>`;
         } else if (descKey === 'eg_statdesc_accuracy') {
             // Miss chance scaled to the character's own level and the next
             // three monster levels (e.g. at player level 12 -> 12/13/14/15).
             // Falls back to level 1 when the leveling system is unavailable.
-            const playerLevel = (typeof _egGetPlayerLevel === 'function')
-                ? Math.max(1, Number(_egGetPlayerLevel()) || 1) : 1;
-            const maxLvl = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.maxLevel)
-                ? EG_LEVELING_CONFIG.maxLevel : 100;
             const levels = [];
             for (let d = 0; d < 4; d++) {
                 const lvl = playerLevel + d;
@@ -1197,10 +1225,13 @@ function _egBuildTooltipBodyHTML(item) {
         // Mods sharing the same stat (e.g. flat Health + the Health half of
         // a hybrid roll) are merged into one combined line per stat.
         const mergedLines = _egBuildMergedModLines(mods);
+        // Unique items use bespoke mods without tiers — hide PoE-style tier badges.
+        const hideTier = !!item.isUnique;
         const lines = mergedLines.map(entry => {
             // Unique downsides render in warning red instead of mod blue.
             const cls = entry.downside ? 'eg-tt-mod eg-tt-mod-downside' : 'eg-tt-mod';
-            return `<div class="${cls}">${entry.label}</div>`;
+            const tierSpan = (!hideTier && entry.tierLabel) ? `<span class="eg-tt-mod-tier">${entry.tierLabel}</span>` : '';
+            return `<div class="${cls}"><span class="eg-tt-mod-label">${entry.label}</span>${tierSpan}</div>`;
         });
         if (lines.length) {
             modsHTML = `<div class="eg-tt-section eg-tt-mods-section">${lines.join('')}</div>`;

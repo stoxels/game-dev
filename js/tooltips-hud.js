@@ -170,11 +170,13 @@ function _buildActiveMapModsHTML(map) {
         if (!byColor.has(key)) byColor.set(key, []);
         byColor.get(key).push(mod);
     });
+    const hideTier = !!(map && map.isUnique);
     byColor.forEach((mods, key) => {
         const color = colors[key] || '#e67e22';
         _egBuildMergedModLines(mods).forEach(entry => {
             hasMods = true;
-            html += `<br><span style="color:${color}">${entry.label}</span>`;
+            const tier = (!hideTier && entry.tierLabel) ? ` <span style="opacity:0.65; font-size:0.85em; border:1px solid rgba(255,255,255,0.18); border-radius:3px; padding:0 3px; margin-left:4px; color:${color};">${entry.tierLabel}</span>` : '';
+            html += `<br><span style="color:${color}">${entry.label}${tier}</span>`;
         });
     });
     if (!hasMods && typeof t === 'function') {

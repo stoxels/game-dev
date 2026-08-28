@@ -1627,8 +1627,8 @@ function _egDiscardMapDrop(row, col) {
     Audio_Manager.playSFX('player_equip_not_pickup');
 }
 
-// Banks any unclaimed map drops still sitting on the grid. Called on puzzle
-// transitions (chain mode) so maps never silently vanish between puzzles.
+// Banks any unclaimed map drops still sitting on the grid. Called on
+// map leave / forfeit / defeat so maps never silently vanish when the run ends.
 function _egBankUnclaimedMapDrops() {
     if (_egMapDrops.size === 0) return;
     let banked = 0;
@@ -1638,6 +1638,55 @@ function _egBankUnclaimedMapDrops() {
     _egMapDrops.clear();
     document.querySelectorAll('[id^="eg-mapdrop-"]').forEach(el => el.remove());
     if (banked > 0) egSaveHubState();
+}
+
+// Clears all active map drops from the board (called by _egStopPickupSpawner).
+function _egStopMapDrops() {
+    _egMapDrops.forEach((map, key) => _egRemoveMapDropOverlay(key));
+    _egMapDrops.clear();
+}
+
+// Carries unclaimed map drops into the next chained puzzle
+// (mirrors _egReplaceCarriedLootDrops / _egReplaceCarriedCurrencyDrops).
+function _egReplaceCarriedMapDrops(maps) {
+    if (!maps || maps.length === 0) return;
+
+    maps.forEach(map => {
+        if (_egMapDrops.size >= 1) return;
+
+        const pool = typeof _egBuildPickupEligiblePool === 'function'
+            ? _egBuildPickupEligiblePool()
+            : [];
+        const filtered = typeof _egCellHasAnyDrop === 'function'
+            ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
+            : pool;
+        if (filtered.length === 0) return;
+
+        const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
+        const key = `${r}-${c}`;
+
+        _egMapDrops.set(key, map);
+
+        const el = document.getElementById(`g-${r}-${c}`);
+        if (el) {
+            const span = document.createElement('span');
+            span.className = `eg-pickup-overlay eg-pickup-rarity-${map.rarity || 'common'} eg-loot-overlay eg-mapdrop-overlay`;
+            span.id = `eg-mapdrop-${r}-${c}`;
+            span.textContent = map.icon || '🗺️';
+            el.appendChild(span);
+        }
+
+        const timer = setTimeout(() => {
+            if (_egMapDrops.get(key) === map) {
+                _egMapDrops.delete(key);
+                _egRemoveMapDropOverlay(key);
+            }
+        }, typeof EG_LOOT_DROP_LIFETIME_MS !== 'undefined' ? EG_LOOT_DROP_LIFETIME_MS : 60000);
+        if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
+        if (typeof _egStartDropExpireCountdown === 'function') {
+            _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, typeof EG_LOOT_DROP_LIFETIME_MS !== 'undefined' ? EG_LOOT_DROP_LIFETIME_MS : 60000);
+        }
+    });
 }
 
 
@@ -1667,16 +1716,19 @@ function _egBuildMapTooltipBodyHTML(item) {
     });
     Object.keys(groupMods).forEach(affects => {
         // Mods sharing the same stat are merged into one combined line.
-        groups[affects] = _egBuildMergedModLines(groupMods[affects])
-            .map(entry => entry.label);
+        groups[affects] = _egBuildMergedModLines(groupMods[affects]);
     });
 
-    const sectionHTML = (titleKey, lines, color) => {
-        if (lines.length === 0) return '';
+    const hideTier = !!item.isUnique;
+    const sectionHTML = (titleKey, entries, color) => {
+        if (entries.length === 0) return '';
         return `
     <div class="eg-tt-section">
         <div class="eg-tt-group-title" style="color:${color};">${t(titleKey)}</div>
-        ${lines.map(l => `<div class="eg-tt-mod" style="color:${color};">${l}</div>`).join('')}
+        ${entries.map(e => {
+            const tierBadge = hideTier ? '' : `<span class="eg-tt-mod-tier">${e.tierLabel || ''}</span>`;
+            return `<div class="eg-tt-mod" style="color:${color};"><span class="eg-tt-mod-label">${e.label}</span>${tierBadge}</div>`;
+        }).join('')}
     </div>`;
     };
 

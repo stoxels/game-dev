@@ -521,6 +521,18 @@ function _egRenderLevelHUD() {
     ${ptsHtml}
 </span>`;
     }
+
+    // Keep the Probability Gate topbar level chip in sync (lives in endgame-gate.js).
+    if (typeof _egRenderGateLevelChip === 'function') {
+        try { _egRenderGateLevelChip(); } catch (e) {}
+    } else {
+        const gateChip = document.getElementById('eg-gate-level-chip');
+        if (gateChip) {
+            const ptsHtml2 = pts > 0 ? `<span class="eg-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
+            const lvlLabel2 = (typeof t === 'function') ? t('eg_lvl_short').replace('{n}', lvl) : `Lv. ${lvl}`;
+            gateChip.innerHTML = `<span class="eg-lvl-chip" style="pointer-events:none;"><span class="eg-lvl-chip-lvl">${lvlLabel2}</span><span class="eg-lvl-chip-bar"><span class="eg-lvl-chip-bar-fill" style="width:${pct}%"></span></span>${ptsHtml2}</span>`;
+        }
+    }
 }
 
 

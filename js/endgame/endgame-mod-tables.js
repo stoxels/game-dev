@@ -22,6 +22,8 @@ const EG_MOD_NAME_WORDS = {
     flat_mana: ['Lucid', 'of Lucidity', 'des Manas'],
     heart_heal: ['Restorative', 'of Restoration', 'der Herzheilung'],
     inc_heart_heal: ['Mending', 'of Mending', 'der Herzheilung'],
+    mana_heal: ['Replenishing', 'of Replenishment', 'der Manawiederherstellung'],
+    inc_mana_heal: ['Resonant', 'of Resonance', 'der Manaresonanz'],
     time_added: ['Patient', 'of Patience', 'des Zeitzuwachses'],
 
     // --- DEFENSES (flat / increased / hybrid) ---
@@ -226,6 +228,15 @@ const EG_MOD_TABLE_HEAD = {
         heart_heal: {
             id: 'heart_heal',
             label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
+            tiers: [
+                { tier: 1, min: 40, max: 50, weight: 200, ilvl: 75 },
+                { tier: 2, min: 25, max: 39, weight: 400, ilvl: 40 },
+                { tier: 3, min: 10, max: 24, weight: 800, ilvl: 10 }
+            ]
+        },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
             tiers: [
                 { tier: 1, min: 40, max: 50, weight: 200, ilvl: 75 },
                 { tier: 2, min: 25, max: 39, weight: 400, ilvl: 40 },
@@ -615,6 +626,15 @@ const EG_MOD_TABLE_EARRING = {
                 { tier: 3, min: 7, max: 17, weight: 800, ilvl: 10 }
             ]
         },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
+            tiers: [
+                { tier: 1, min: 30, max: 40, weight: 200, ilvl: 75 },
+                { tier: 2, min: 18, max: 29, weight: 400, ilvl: 40 },
+                { tier: 3, min: 7, max: 17, weight: 800, ilvl: 10 }
+            ]
+        },
 
         // --- LEECH (earring-exclusive flavor) ---
         life_leech: {
@@ -861,6 +881,15 @@ const EG_MOD_TABLE_AMULET = {
         heart_heal: {
             id: 'heart_heal',
             label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
+            tiers: [
+                { tier: 1, min: 35, max: 45, weight: 200, ilvl: 75 },
+                { tier: 2, min: 22, max: 34, weight: 400, ilvl: 40 },
+                { tier: 3, min: 9, max: 21, weight: 800, ilvl: 10 }
+            ]
+        },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
             tiers: [
                 { tier: 1, min: 35, max: 45, weight: 200, ilvl: 75 },
                 { tier: 2, min: 22, max: 34, weight: 400, ilvl: 40 },
@@ -2160,6 +2189,15 @@ const EG_MOD_TABLE_CHEST = {
         heart_heal: {
             id: 'heart_heal',
             label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
+            tiers: [
+                { tier: 1, min: 50, max: 65, weight: 200, ilvl: 75 },
+                { tier: 2, min: 32, max: 49, weight: 400, ilvl: 40 },
+                { tier: 3, min: 14, max: 31, weight: 800, ilvl: 10 }
+            ]
+        },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
             tiers: [
                 { tier: 1, min: 50, max: 65, weight: 200, ilvl: 75 },
                 { tier: 2, min: 32, max: 49, weight: 400, ilvl: 40 },
@@ -3684,6 +3722,18 @@ const EG_MOD_TABLE_BELT = {
                 { tier: 4, min: 8, max: 21, weight: 1300, ilvl: 1 }
             ]
         },
+        // --- BELT-PRIMARY: MANA HEAL (flat) ---
+        // Mirrors heart_heal — highest flat mana_heal values in the game.
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
+            tiers: [
+                { tier: 1, min: 55, max: 70, weight: 150, ilvl: 75 },
+                { tier: 2, min: 38, max: 54, weight: 320, ilvl: 50 },
+                { tier: 3, min: 22, max: 37, weight: 650, ilvl: 28 },
+                { tier: 4, min: 8, max: 21, weight: 1300, ilvl: 1 }
+            ]
+        },
 
         // --- BELT-EXCLUSIVE: INCREASED HEART HEAL (% multiplier) ---
         // A % multiplier on all heart healing received — stacks with the
@@ -3693,6 +3743,19 @@ const EG_MOD_TABLE_BELT = {
         inc_heart_heal: {
             id: 'inc_heart_heal',
             label: '#% increased healing received from Hearts', labelDe: '#% erhöhte Heilung durch Herzen',
+            tiers: [
+                { tier: 1, min: 40, max: 55, weight: 70, ilvl: 84 },
+                { tier: 2, min: 25, max: 39, weight: 180, ilvl: 65 },
+                { tier: 3, min: 12, max: 24, weight: 420, ilvl: 40 },
+                { tier: 4, min: 4, max: 11, weight: 950, ilvl: 15 }
+            ]
+        },
+        // --- BELT-EXCLUSIVE: INCREASED MANA HEAL (% multiplier) ---
+        // Mirrors inc_heart_heal — stacks with flat mana_heal on belt,
+        // helmet, chest etc. The only slot this rolls on.
+        inc_mana_heal: {
+            id: 'inc_mana_heal',
+            label: '#% increased Mana gained from Mana Orbs', labelDe: '#% erhöhte Manawiederherstellung durch Mana-Orbs',
             tiers: [
                 { tier: 1, min: 40, max: 55, weight: 70, ilvl: 84 },
                 { tier: 2, min: 25, max: 39, weight: 180, ilvl: 65 },
@@ -4106,6 +4169,15 @@ const EG_MOD_TABLE_PANTS = {
         heart_heal: {
             id: 'heart_heal',
             label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
+            tiers: [
+                { tier: 1, min: 45, max: 58, weight: 200, ilvl: 75 },
+                { tier: 2, min: 28, max: 44, weight: 400, ilvl: 40 },
+                { tier: 3, min: 12, max: 27, weight: 800, ilvl: 10 }
+            ]
+        },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
             tiers: [
                 { tier: 1, min: 45, max: 58, weight: 200, ilvl: 75 },
                 { tier: 2, min: 28, max: 44, weight: 400, ilvl: 40 },
@@ -4584,6 +4656,15 @@ const EG_MOD_TABLE_BOOTS = {
                 { tier: 3, min: 10, max: 23, weight: 800, ilvl: 10 }
             ]
         },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
+            tiers: [
+                { tier: 1, min: 38, max: 52, weight: 200, ilvl: 75 },
+                { tier: 2, min: 24, max: 37, weight: 400, ilvl: 40 },
+                { tier: 3, min: 10, max: 23, weight: 800, ilvl: 10 }
+            ]
+        },
 
         // --- LOCAL DEFENSES ---
         // Armour is the boots' primary defence — hard soles and
@@ -5027,6 +5108,15 @@ const EG_MOD_TABLE_RING = {
         heart_heal: {
             id: 'heart_heal',
             label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
+            tiers: [
+                { tier: 1, min: 32, max: 42, weight: 200, ilvl: 75 },
+                { tier: 2, min: 20, max: 31, weight: 400, ilvl: 40 },
+                { tier: 3, min: 8, max: 19, weight: 800, ilvl: 10 }
+            ]
+        },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
             tiers: [
                 { tier: 1, min: 32, max: 42, weight: 200, ilvl: 75 },
                 { tier: 2, min: 20, max: 31, weight: 400, ilvl: 40 },
@@ -5767,6 +5857,15 @@ const EG_MOD_TABLE_TALISMAN = {
                 { tier: 3, min: 9, max: 20, weight: 800, ilvl: 10 }
             ]
         },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
+            tiers: [
+                { tier: 1, min: 34, max: 46, weight: 200, ilvl: 75 },
+                { tier: 2, min: 21, max: 33, weight: 400, ilvl: 40 },
+                { tier: 3, min: 9, max: 20, weight: 800, ilvl: 10 }
+            ]
+        },
 
         // --- TALISMAN-EXCLUSIVE: ARCANE RESISTANCE ---
         // A flat reduction applied to all elemental damage types at once
@@ -6391,6 +6490,15 @@ const EG_MOD_TABLE_WEAPON2 = {
         heart_heal: {
             id: 'heart_heal',
             label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
+            tiers: [
+                { tier: 1, min: 45, max: 58, weight: 200, ilvl: 75 },
+                { tier: 2, min: 28, max: 44, weight: 400, ilvl: 40 },
+                { tier: 3, min: 12, max: 27, weight: 800, ilvl: 10 }
+            ]
+        },
+        mana_heal: {
+            id: 'mana_heal',
+            label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
             tiers: [
                 { tier: 1, min: 45, max: 58, weight: 200, ilvl: 75 },
                 { tier: 2, min: 28, max: 44, weight: 400, ilvl: 40 },

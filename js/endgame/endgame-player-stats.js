@@ -38,6 +38,8 @@ const EG_STAT_KEY_MAP = {
     flat_mana: { bucket: 'mana', mode: 'add' },
     heart_heal: { bucket: 'heartHealFlat', mode: 'add' },
     inc_heart_heal: { bucket: 'heartHealIncPct', mode: 'add' },
+    mana_heal: { bucket: 'manaHealFlat', mode: 'add' },
+    inc_mana_heal: { bucket: 'manaHealIncPct', mode: 'add' },
     time_added: { bucket: 'timeAdded', mode: 'add' },
 
     hybrid_life_armour_1: { bucket: 'health', mode: 'add' },
@@ -162,11 +164,18 @@ const EG_MELEE_BUCKET_MAP = {
 // values are summed per placeholder position and re-inserted into the
 // first-seen template, keeping the original line order. Lines without a
 // numeric value and downside mods are never merged with normal mods.
-// Returns [{ label: string, downside: bool }] for tooltip rendering.
+// Returns [{ label: string, downside: bool, tierLabel: string }] for tooltip rendering.
+// tierLabel is PoE-style affix tier badge: "P4" for prefix tier 4, "S1" for suffix tier 1,
+// and "P2+S3" when multiple mods were merged into one combined line (including hybrids).
 function _egBuildMergedModLines(mods) {
     const NUM_RE = /-?\d[\d.,]*/g;
     const groups = [];
     const byKey = new Map();
+    function _tierTag(mod) {
+        const pfx = mod.type === 'prefix' ? 'P' : (mod.type === 'suffix' ? 'S' : '');
+        const tier = mod.tier != null ? String(mod.tier) : '?';
+        return pfx ? pfx + tier : tier;
+    }
     (Array.isArray(mods) ? mods : []).forEach(mod => {
         if (!Array.isArray(mod.rolledStats)) return;
         mod.rolledStats.forEach(stat => {
@@ -175,14 +184,14 @@ function _egBuildMergedModLines(mods) {
             const matches = stat.label.match(NUM_RE);
             // Lines without any numeric value can't be meaningfully merged.
             if (!matches || matches.length === 0) {
-                groups.push({ label: stat.label, downside });
+                groups.push({ label: stat.label, downside, tierLabel: _tierTag(mod), contributions: [{ type: mod.type, tier: mod.tier }] });
                 return;
             }
             const key = (downside ? 'down' : 'norm') + '|' +
                 stat.label.replace(NUM_RE, '\u0000');
             let g = byKey.get(key);
             if (!g) {
-                g = { template: stat.label, slots: matches.map(() => []), count: 0, downside };
+                g = { template: stat.label, slots: matches.map(() => []), count: 0, downside, contributions: [] };
                 byKey.set(key, g);
                 groups.push(g);
             }
@@ -190,6 +199,7 @@ function _egBuildMergedModLines(mods) {
                 const v = parseFloat(String(raw).replace(',', '.'));
                 if (!isNaN(v) && g.slots[i]) g.slots[i].push(v);
             });
+            g.contributions.push({ type: mod.type, tier: mod.tier });
             g.count++;
         });
     });
@@ -197,15 +207,24 @@ function _egBuildMergedModLines(mods) {
     return groups.map(g => {
         // Lines without any numeric value were pushed with { label } only
         // (no template/count/slots) — return them verbatim.
-        if (g.template == null) return { label: g.label, downside: g.downside };
-        if (g.count <= 1) return { label: g.template, downside: g.downside };
-        let idx = 0;
-        const label = g.template.replace(NUM_RE, () => {
-            const vals = g.slots[idx++] || [];
-            const sum = vals.reduce((a, b) => a + b, 0);
-            return String(Math.round(sum * 100) / 100);
-        });
-        return { label, downside: g.downside };
+        if (g.template == null) return { label: g.label, downside: g.downside, tierLabel: g.tierLabel, contributions: g.contributions };
+        let label;
+        if (g.count <= 1) {
+            label = g.template;
+        } else {
+            let idx = 0;
+            label = g.template.replace(NUM_RE, () => {
+                const vals = g.slots[idx++] || [];
+                const sum = vals.reduce((a, b) => a + b, 0);
+                return String(Math.round(sum * 100) / 100);
+            });
+        }
+        const tierLabel = (g.contributions || []).map(c => {
+            const pfx = c.type === 'prefix' ? 'P' : (c.type === 'suffix' ? 'S' : '');
+            const tier = c.tier != null ? String(c.tier) : '?';
+            return pfx ? pfx + tier : tier;
+        }).join('+');
+        return { label, downside: g.downside, tierLabel, contributions: g.contributions };
     });
 }
 
@@ -435,7 +454,7 @@ function _egComputePlayerStats() {
         arcaneSurgeStreak: Infinity, arcaneSurgeMana: 0, manaToDamagePct: 0,
         echoChancePct: 0, echoDamagePct: 0, fatePct: 0, wardingHP: 0,
         manaOnKill: 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
-        heartHealFlat: 0, heartHealIncPct: 0, timeAdded: 0,
+        heartHealFlat: 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: 0, timeAdded: 0,
         absorptionRegenRatePct: 0, fasterAbsorptionRegenStart: 0,
     };
 
@@ -771,6 +790,8 @@ const EG_STAT_DISPLAY_LABELS = {
     manaOnMistake: { label: t('eg_stat_mana_on_mistake'), suffix: '' },
     heartHealFlat: { label: t('eg_stat_heart_heal'), suffix: '' },
     heartHealIncPct: { label: t('eg_stat_inc_heart_heal'), suffix: '%' },
+    manaHealFlat: { label: t('eg_stat_mana_heal'), suffix: '' },
+    manaHealIncPct: { label: t('eg_stat_inc_mana_heal'), suffix: '%' },
     timeAdded: { label: t('eg_stat_time_added'), suffix: 's' },
 
     fireResist: { label: t('eg_stat_fire_res'), suffix: '%' },
@@ -883,7 +904,7 @@ const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_life_mana', buckets: [
             'health', 'mana', 'lifeRegen', 'manaRegen', 'lifeLeechPct',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
-            'heartHealFlat', 'heartHealIncPct', 'wardingHP'] },
+            'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [
             'blockChance', 'spellBlockChance', 'blockRecoveryPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct'] },

@@ -161,11 +161,40 @@
 .eg-tt-mod {
     color: #8ab4e8;
     padding: 1px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.eg-tt-mod-label {
+    flex: 1 1 auto;
+}
+
+.eg-tt-mod-tier {
+    flex: 0 0 auto;
+    font-size: 0.70rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: #9aa0b0;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 3px;
+    padding: 0 4px;
+    line-height: 1.35;
+    margin-left: auto;
 }
 
 /* Downside mod lines on unique items — shown in warning red */
 .eg-tt-mod.eg-tt-mod-downside {
     color: #e74c3c;
+}
+
+.eg-tt-mod.eg-tt-mod-downside .eg-tt-mod-tier {
+    color: #e88a8a;
+    border-color: rgba(231,76,60,0.35);
+    background: rgba(231,76,60,0.10);
 }
 
 /* Flavor text at the bottom of unique item tooltips */

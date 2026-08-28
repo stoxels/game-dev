@@ -285,13 +285,80 @@ function _egOnGateCurrencyCellLeave() {
 //-------------------HTML ASSEMBLY: FULL SCREEN---------------------------
 //------------------------------------------------------------------------
 
-// Builds the top navigation bar with back button, gate title and the
+// One-time CSS injection for the gate level chip (topbar).
+function _egInjectGateLevelChipStyles() {
+    if (document.getElementById('eg-gate-level-chip-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'eg-gate-level-chip-styles';
+    style.textContent = `
+        .eg-gate-level-chip {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 3px 8px;
+            border: 1px solid rgba(200,168,75,0.35);
+            background: rgba(200,168,75,0.08);
+            border-radius: 6px;
+            transition: all 0.12s;
+            flex-shrink: 0;
+        }
+        .eg-gate-level-chip:hover {
+            border-color: #f5d98a;
+            background: rgba(200,168,75,0.16);
+            box-shadow: 0 0 8px rgba(200,168,75,0.28);
+        }
+        .eg-gate-level-chip .eg-lvl-chip {
+            gap: 6px;
+            font-size: 11px;
+        }
+        .eg-gate-level-chip .eg-lvl-chip-bar {
+            width: 72px;
+            height: 6px;
+        }
+        /* keep chip close to title but before the right spacer */
+        .eg-topbar .eg-gate-level-chip {
+            margin-left: 8px;
+        }
+        @media (max-width: 700px) {
+            .eg-gate-level-chip .eg-lvl-chip-bar { width: 48px; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+_egInjectGateLevelChipStyles();
+
+// Refreshes the level chip in the gate topbar. Reuses the same XP/percentage
+// logic as _egRenderLevelHUD (endgame-leveling.js) so the gate stays in sync.
+function _egRenderGateLevelChip() {
+    const el = document.getElementById('eg-gate-level-chip');
+    if (!el) return;
+    const lvl = (typeof _egGetPlayerLevel === 'function') ? _egGetPlayerLevel() : ((typeof STATE !== 'undefined' && STATE && STATE.playerLevel) || 1);
+    const pts = (typeof _egGetUnspentPoints === 'function') ? _egGetUnspentPoints() : ((typeof STATE !== 'undefined' && STATE && STATE.egAttrPoints) || 0);
+    const xp = (typeof _egGetPlayerXP === 'function') ? _egGetPlayerXP() : ((typeof STATE !== 'undefined' && STATE && STATE.playerXP) || 0);
+    const maxLvl = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.maxLevel) || 100;
+    const need = (typeof _egGetXpForNextLevel === 'function') ? _egGetXpForNextLevel(lvl) : 0;
+    const pct = lvl >= maxLvl ? 100 : (need > 0 ? Math.min(100, (xp / need) * 100) : 0);
+    const lvlLabel = (typeof t === 'function') ? t('eg_lvl_short').replace('{n}', lvl) : `Lv. ${lvl}`;
+    const ptsHtml = pts > 0 ? `<span class="eg-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
+    // inner chip is styled by the shared eg-lvl-chip rules from endgame-leveling.js
+    el.innerHTML = `<span class="eg-lvl-chip" style="pointer-events:none;"><span class="eg-lvl-chip-lvl">${lvlLabel}</span><span class="eg-lvl-chip-bar"><span class="eg-lvl-chip-bar-fill" style="width:${pct}%"></span></span>${ptsHtml}</span>`;
+    // tooltip title fallback for native hover before JS tooltip takes over
+    const tipTitle = (typeof t === 'function') ? (t('eg_lvl_button_title') || t('eg_lvl_window_title') || '') : '';
+    if (tipTitle) el.setAttribute('title', tipTitle);
+}
+
+// Builds the top navigation bar with back button, gate title, level chip and the
 // Atlas of Worlds button (opens the PoE-style map overview screen).
 function _egBuildGateTopbarHTML() {
     return `
 <div class="eg-topbar">
     <button class="eg-back-btn" onclick="${_egGateBackFn}()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('mg_gate_badge')}</span>
+    <span id="eg-gate-level-chip" class="eg-gate-level-chip"
+          onclick="if(typeof _egOpenAttributeWindow==='function')_egOpenAttributeWindow()"
+          onmouseenter="if(typeof _egShowLevelBtnTooltip==='function')_egShowLevelBtnTooltip(event)"
+          onmousemove="if(typeof moveGameTooltip==='function')moveGameTooltip(event)"
+          onmouseleave="if(typeof hideGameTooltip==='function')hideGameTooltip()"></span>
     <div class="eg-topbar-right">
         <button class="eg-level-btn" onclick="egOpenMapModsOverlay()">🎲 ${t('eg_mm_button')}</button>
         <button class="eg-level-btn" onclick="showEndgameAtlas()">🗺 ${t('eg_atlas_title')}</button>
@@ -825,11 +892,14 @@ function _egInjectMapModsOverlayStyles() {
 function _egCreateGateScreen() {
     if (typeof ensureEndgameHubScreen === 'function') ensureEndgameHubScreen();
     _egInjectAtlasHighlightStyles();
+    _egInjectGateLevelChipStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-gate';
     screen.className = 'screen';
     screen.innerHTML = _egBuildGateFullScreenHTML();
     document.body.appendChild(screen);
+    // Populate the freshly created level chip (uses current STATE values).
+    try { _egRenderGateLevelChip(); } catch (e) {}
 }
 
 // Ensures the gate screen element exists in the DOM; creates it on first call.
@@ -856,11 +926,12 @@ function showEndgameGate(backFn) {
     // Migrate old gate screens that were built before the side-by-side
     // layout (Orbs & Shards left of the gate) or before the atlas legend / tier tabs.
     const gateScreen = document.getElementById('screen-endgame-gate');
-    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs'))) {
+    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs') || !gateScreen.querySelector('#eg-gate-level-chip'))) {
         gateScreen.innerHTML = _egBuildGateFullScreenHTML();
     }
     _egInjectAtlasHighlightStyles();
     _egInjectMapStashTabStyles();
+    _egInjectGateLevelChipStyles();
 
     // The gate screen DOM is built once — keep the back button in sync
     // with the current return target.
@@ -906,5 +977,6 @@ function showEndgameGate(backFn) {
     _egRenderMapSlot();
     _egRenderMapStash();
     _egRenderCurrencyStash();
+    _egRenderGateLevelChip();
     _egClearTooltip();
 }

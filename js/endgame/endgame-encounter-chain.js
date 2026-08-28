@@ -335,9 +335,9 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
         ? Array.from(_egGoldDrops.values()) : [];
     if (typeof _egGoldDrops !== 'undefined') _egGoldDrops.clear();
 
-    // Unclaimed map drops are banked straight into the gate map stash
-    // instead of being carried across puzzles.
-    if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
+    const carriedMaps = (typeof _egMapDrops !== 'undefined')
+        ? Array.from(_egMapDrops.values()) : [];
+    if (typeof _egMapDrops !== 'undefined') _egMapDrops.clear();
 
     // Clear the stale map entries — overlays are already gone after buildGrid()
     _egLootDrops.clear();
@@ -426,6 +426,10 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
 
     if (carriedGold.length > 0 && typeof _egReplaceCarriedGoldDrops === 'function') {
         setTimeout(() => _egReplaceCarriedGoldDrops(carriedGold), 400);
+    }
+
+    if (carriedMaps.length > 0 && typeof _egReplaceCarriedMapDrops === 'function') {
+        setTimeout(() => _egReplaceCarriedMapDrops(carriedMaps), 400);
     }
 }
 

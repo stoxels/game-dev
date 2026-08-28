@@ -64,6 +64,25 @@ function _egCalcHeartHeal(baseAmount) {
     return Math.max(0, Math.round(total));
 }
 
+// Helper: computes the effective mana gain from a mana pickup after gear bonuses.
+// Mirrors _egCalcHeartHeal but for mana orbs:
+//   manaHealFlat   — flat +# added to every mana pickup (e.g. "+15 to Mana Gain")
+//   manaHealIncPct — #% increased Mana Gained (multiplier on the total)
+// Formula: effective = (base + flat) * (1 + incPct/100), rounded and clamped to >=0.
+function _egCalcManaGain(baseAmount) {
+    let flat = 0;
+    let incPct = 0;
+    if (typeof _egComputePlayerStats === 'function') {
+        try {
+            const s = _egComputePlayerStats();
+            flat = Number(s.manaHealFlat) || 0;
+            incPct = Number(s.manaHealIncPct) || 0;
+        } catch (e) { /* stats unavailable (e.g. outside endgame) — use base */ }
+    }
+    const total = (baseAmount + flat) * (1 + incPct / 100);
+    return Math.max(0, Math.round(total));
+}
+
 // Pickup definitions
 // Each entry describes one pickup type that can appear on grid tiles.
 //   id        — unique key, referenced by EG_PICKUP_WEIGHTS
@@ -112,7 +131,7 @@ const EG_PICKUP_DEFS = {
     mana_small: {
         id: 'mana_small', emoji: '💧', label: () => t('eg_pickup_mana_small'), rarity: 'common',
         onPickup(row, col) {
-            const gained = gainMana(20);
+            const gained = gainMana(_egCalcManaGain(20));
             if (gained > 0) {
                 showToast(t('eg_pickup_mana_gain_small').replace('{n}', gained),
                     _egRarityToastColor(this.rarity));
@@ -125,7 +144,7 @@ const EG_PICKUP_DEFS = {
     mana_medium: {
         id: 'mana_medium', emoji: '🔵', label: () => t('eg_pickup_mana_medium'), rarity: 'uncommon',
         onPickup(row, col) {
-            const gained = gainMana(50);
+            const gained = gainMana(_egCalcManaGain(50));
             if (gained > 0) {
                 showToast(t('eg_pickup_mana_gain_medium').replace('{n}', gained),
                     _egRarityToastColor(this.rarity));
@@ -139,7 +158,7 @@ const EG_PICKUP_DEFS = {
         id: 'mana_full', emoji: '🔮', label: () => t('eg_pickup_mana_full_orb'), rarity: 'rare',
         onPickup(row, col) {
             const before = playerCurrentMana;
-            const gained = gainMana(_getPlayerMaxMana());
+            const gained = gainMana(_egCalcManaGain(_getPlayerMaxMana()));
             if (gained > 0) {
                 showToast(t('eg_pickup_mana_gain_full').replace('{n}', playerCurrentMana - before),
                     _egRarityToastColor(this.rarity));
@@ -527,6 +546,7 @@ function _egStopPickupSpawner() {
     if (typeof _egStopCurrencyDrops === 'function') _egStopCurrencyDrops();
     if (typeof _egStopItemDrops === 'function') _egStopItemDrops();
     if (typeof _egStopGoldDrops === 'function') _egStopGoldDrops();
+    if (typeof _egStopMapDrops === 'function') _egStopMapDrops();
 }
 
 

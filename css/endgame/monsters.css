@@ -1818,7 +1818,8 @@
 
 /* Monsters on the far right: pin tooltip to the right edge of the emoji */
 #eg-panel-right .eg-monster-compact-tooltip,
-#eg-panel-top-corner .eg-monster-compact-tooltip {
+#eg-panel-top-corner .eg-monster-compact-tooltip,
+#eg-panel-bottom .eg-monster-compact-tooltip {
     left: auto;
     right: 0;
     transform: translateX(0);
@@ -1851,17 +1852,22 @@
 }
 
 #eg-panel-right {
-    top: 50%;
+    top: 38%;
     right: 20px;
     transform: translateY(-50%);
     flex-direction: column;
 }
 
 #eg-panel-bottom {
-    bottom: 100px;
-    left: 20%;
-    transform: translateX(-50%);
-    flex-direction: row; /* Stack cards horizontally on the bottom */
+    /* Relocated from bottom-left (left:20% bottom:100px) which overlapped
+       column clues when moved to bottom and row clues. Now docked on the
+       right side, vertically between the mid-right panel and the main
+       bottom-right monster wrapper — safely outside the puzzle grid. */
+    bottom: 220px;
+    right: 20px;
+    left: auto;
+    transform: none;
+    flex-direction: column; /* vertical stack like the other right-side panels */
 }
 
 #eg-panel-top-corner {
