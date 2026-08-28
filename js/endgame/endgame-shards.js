@@ -316,14 +316,22 @@ function _egSellMapItem(map, sourceEl) {
 
 // Sells the map in the given map stash cell for one Horizon Fragment.
 function _egSellMapStashItem(row, col) {
-    const map = _egMapStash[row][col];
+    const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+    let map = null;
+    try {
+        if (typeof _egGetMapTierGrid === 'function') map = _egGetMapTierGrid(activeTier)[row][col];
+        else map = _egMapStash[row][col];
+    } catch(e) { map = null; }
     if (!map) return false;
 
     const cellEl = document.querySelector(
         `.eg-map-stash-cell[data-row="${row}"][data-col="${col}"]`);
     if (!_egSellMapItem(map, cellEl)) return false;
 
-    _egMapStash[row][col] = null;
+    try {
+        if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(activeTier)[row][col] = null;
+        else _egMapStash[row][col] = null;
+    } catch(e) {}
     _egRenderMapStashCell(row, col);
     egSaveHubState();
     return true;

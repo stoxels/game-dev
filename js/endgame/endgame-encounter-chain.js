@@ -1447,17 +1447,38 @@ function _egSellRunMapChip(map, state) {
     const liveIdx = Array.isArray(_egRunMaps) ? _egRunMaps.indexOf(map) : -1;
     if (liveIdx !== -1) _egRunMaps.splice(liveIdx, 1);
 
-    // If the flush already ran, remove the map from the map stash by identity.
+    // If the flush already ran, remove the map from the map stash by identity (tiered).
     let removedFromStash = false;
-    for (let r = 0; r < EG_MAP_STASH_ROWS && !removedFromStash; r++) {
-        for (let c = 0; c < EG_MAP_STASH_COLS && !removedFromStash; c++) {
-            if (_egMapStash[r][c] === map) {
-                _egMapStash[r][c] = null;
-                if (typeof _egRenderMapStashCell === 'function') _egRenderMapStashCell(r, c);
-                removedFromStash = true;
+    try {
+        if (typeof _egIsTieredMapStash === 'function' && _egIsTieredMapStash(_egMapStash)) {
+            for (let ti = 0; ti < _egMapStash.length && !removedFromStash; ti++) {
+                const tierGrid = _egMapStash[ti];
+                for (let r = 0; r < tierGrid.length && !removedFromStash; r++) {
+                    for (let c = 0; c < EG_MAP_STASH_COLS && !removedFromStash; c++) {
+                        if (tierGrid[r][c] === map) {
+                            tierGrid[r][c] = null;
+                            // only re-render if this tier is active
+                            if (ti === (_egMapTierToIndex(map.mapTier||1)) || ti === _egMapTierToIndex(_egMapStashActiveTier||1)) {
+                                if (typeof _egRenderMapStashCell === 'function') _egRenderMapStashCell(r, c);
+                            }
+                            if (typeof _egUpdateMapStashTabCounts === 'function') _egUpdateMapStashTabCounts();
+                            removedFromStash = true;
+                        }
+                    }
+                }
+            }
+        } else {
+            for (let r = 0; r < EG_MAP_STASH_ROWS && !removedFromStash; r++) {
+                for (let c = 0; c < EG_MAP_STASH_COLS && !removedFromStash; c++) {
+                    if (_egMapStash[r][c] === map) {
+                        _egMapStash[r][c] = null;
+                        if (typeof _egRenderMapStashCell === 'function') _egRenderMapStashCell(r, c);
+                        removedFromStash = true;
+                    }
+                }
             }
         }
-    }
+    } catch(e) {}
 
     // Grant one Horizon Fragment (goes straight into the currency stash).
     const shardDef = EG_SHARD_DEFS.shard_horizon;

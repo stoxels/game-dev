@@ -330,11 +330,8 @@ function _egvBuyTierMap(tier) {
 
     if (typeof _egLoadHubState === 'function') _egLoadHubState();
 
-    if (!_egMapStashHasFreeSlot()) {
-        showToast(t('eg_vendor_stash_full'));
-        Audio_Manager.playSFX('player_equip_not_pickup');
-        return;
-    }
+    // Tiered stashes are infinite — no capacity guard needed (kept as no-op for legacy callers)
+    // if (!_egMapStashHasFreeSlot(tier)) { ... }
 
     // All vendor maps are free (price 0) for testing — no gold spend/refund needed.
     // Tier 1 starter remains modifier-free when the global price is 0 so a fresh

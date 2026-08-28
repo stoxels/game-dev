@@ -92,15 +92,79 @@ function _egBuildMapStashCellHTML(row, col) {
 </div>`;
 }
 
-// Builds the full map stash grid by iterating over all rows and columns.
-function _egBuildMapStashGridHTML() {
+// Builds the full map stash grid for a specific tier (infinite rows per tier).
+function _egBuildMapStashGridHTMLForTier(tier) {
+    const t = Math.max(1, Math.min(EG_MAP_TIER_COUNT || 16, Math.round(tier || _egMapStashActiveTier || 1)));
+    const rows = (typeof _egGetMapStashRowsForTier === 'function') ? _egGetMapStashRowsForTier(t) : EG_MAP_STASH_INITIAL_ROWS;
     let html = '';
-    for (let r = 0; r < EG_MAP_STASH_ROWS; r++) {
+    for (let r = 0; r < rows; r++) {
         for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
             html += _egBuildMapStashCellHTML(r, c);
         }
     }
     return html;
+}
+// Legacy alias — returns grid for active tier
+function _egBuildMapStashGridHTML() {
+    return _egBuildMapStashGridHTMLForTier(_egMapStashActiveTier || 1);
+}
+
+// ── Tier tab bar (16 roman numeral tabs I..XVI) ──
+function _egBuildMapStashTabsHTML() {
+    const romans = (typeof EG_MAP_TIER_ROMANS !== 'undefined' && EG_MAP_TIER_ROMANS.length === 16) ? EG_MAP_TIER_ROMANS : ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI'];
+    const active = _egMapStashActiveTier || 1;
+    let html = '<div class="eg-map-stash-tabs" id="eg-map-stash-tabs">';
+    for (let t = 1; t <= 16; t++) {
+        const cnt = _egCountMapsInTier(t);
+        const isActive = t === active ? ' eg-map-tab-active' : '';
+        html += `<button class="eg-map-tab${isActive}" data-tier="${t}" onclick="_egSwitchMapStashTier(${t})">${romans[t-1]}<span class="eg-map-tab-count">${cnt}</span></button>`;
+    }
+    html += '</div>';
+    return html;
+}
+function _egCountMapsInTier(tier) {
+    try {
+        if (typeof _egGetMapTierGrid === 'function') {
+            const grid = _egGetMapTierGrid(tier);
+            let n = 0;
+            for (let r = 0; r < grid.length; r++) for (let c = 0; c < EG_MAP_STASH_COLS; c++) if (grid[r][c]) n++;
+            return n;
+        }
+        // fallback flat
+        if (Array.isArray(_egMapStash) && _egMapStash[0] && !Array.isArray(_egMapStash[0][0])) {
+            let n=0; for(let r=0;r<_egMapStash.length;r++) for(let c=0;c<EG_MAP_STASH_COLS;c++) if(_egMapStash[r][c] && (_egMapStash[r][c].mapTier||1)===tier) n++; return n;
+        }
+    } catch(e){}
+    return 0;
+}
+function _egUpdateMapStashTabCounts() {
+    const tabs = document.getElementById('eg-map-stash-tabs');
+    if (!tabs) return;
+    for (let t = 1; t <= 16; t++) {
+        const btn = tabs.querySelector(`.eg-map-tab[data-tier="${t}"] .eg-map-tab-count`);
+        if (btn) btn.textContent = _egCountMapsInTier(t);
+    }
+}
+function _egSwitchMapStashTier(tier) {
+    const t = Math.max(1, Math.min(16, Math.round(tier || 1)));
+    _egMapStashActiveTier = t;
+    if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch(e){}
+    // update tab active state
+    const tabs = document.getElementById('eg-map-stash-tabs');
+    if (tabs) {
+        tabs.querySelectorAll('.eg-map-tab').forEach(el => {
+            const isActive = +el.dataset.tier === t;
+            el.classList.toggle('eg-map-tab-active', isActive);
+        });
+    }
+    // rebuild grid for new tier, preserving scroll at top
+    const gridEl = document.getElementById('eg-map-stash-grid');
+    if (gridEl) {
+        gridEl.scrollTop = 0;
+        gridEl.innerHTML = _egBuildMapStashGridHTMLForTier(t);
+        gridEl.style.gridTemplateColumns = `repeat(${EG_MAP_STASH_COLS}, 1fr)`;
+        _egRenderMapStashForTier(t);
+    }
 }
 
 // Assembles the gate panel: Orbs & Shards on the left, Probability Gate
@@ -130,8 +194,9 @@ function _egBuildGatePanelHTML() {
             <span>${t('eg_maps_label')}</span>
             <span class="eg-atlas-legend-hint">${atlasHint}</span>
         </div>
-        <div class="eg-map-stash-grid" id="eg-map-stash-grid">
-            ${_egBuildMapStashGridHTML()}
+        ${_egBuildMapStashTabsHTML()}
+        <div class="eg-map-stash-grid" id="eg-map-stash-grid" style="grid-template-columns: repeat(${EG_MAP_STASH_COLS}, 1fr);">
+            ${_egBuildMapStashGridHTMLForTier(_egMapStashActiveTier || 1)}
         </div>
     </div>
 </div>`;
@@ -325,10 +390,94 @@ function _egInjectAtlasHighlightStyles() {
     `;
     document.head.appendChild(style);
 }
+// Injects styles for the 16 roman-numeral tier tabs + scrollable infinite grid
+function _egInjectMapStashTabStyles() {
+    if (document.getElementById('eg-map-stash-tab-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'eg-map-stash-tab-styles';
+    style.textContent = `
+        .eg-map-stash-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 6px 8px 4px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+        }
+        .eg-map-tab {
+            font-family: var(--PX, monospace);
+            font-size: 9px;
+            letter-spacing: 1px;
+            padding: 5px 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: var(--setup-opt-inactive, #888);
+            transition: all 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            min-width: 36px;
+            justify-content: center;
+        }
+        .eg-map-tab:hover {
+            border-color: var(--accent2, #aaa);
+            color: #ddd;
+            background: rgba(255,255,255,0.08);
+        }
+        .eg-map-tab.eg-map-tab-active {
+            border-color: #c8a84b;
+            color: #f5d98a;
+            background: rgba(200,168,75,0.18);
+            box-shadow: 0 0 8px rgba(200,168,75,0.25);
+        }
+        .eg-map-tab-count {
+            font-size: 7px;
+            background: rgba(255,255,255,0.10);
+            border-radius: 8px;
+            padding: 1px 5px;
+            min-width: 10px;
+            text-align: center;
+            color: inherit;
+            opacity: 0.85;
+        }
+        .eg-map-tab.eg-map-tab-active .eg-map-tab-count {
+            background: rgba(200,168,75,0.30);
+            color: #f5d98a;
+        }
+        /* Scrollable infinite stash grid — mirrors .eg-inv-grid */
+        .eg-map-stash-section {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            border-top: 1px solid var(--border);
+            min-height: 0;
+        }
+        .eg-map-stash-grid {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+            grid-auto-rows: 56px;
+            align-content: start;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border2) transparent;
+            scrollbar-gutter: stable;
+        }
+        .eg-map-stash-grid::-webkit-scrollbar { width: 8px; }
+        .eg-map-stash-grid::-webkit-scrollbar-track { background: transparent; }
+        .eg-map-stash-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+        .eg-map-stash-grid::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+    `;
+    document.head.appendChild(style);
+}
+_egInjectMapStashTabStyles();
 _egInjectAtlasHighlightStyles();
 
 
-//------------------------------------------------------------------------
+ //------------------------------------------------------------------------
 //-------------------RENDER: MAP DEVICE-----------------------------------
 //------------------------------------------------------------------------
 
@@ -371,7 +520,7 @@ function _egRenderMapSlot() {
 //-------------------RENDER: MAP STASH------------------------------------
 //------------------------------------------------------------------------
 
-// Re-renders a single cell in the map stash grid.
+// Re-renders a single cell in the map stash grid (tier-aware, infinite).
 // The whole cell is tinted with the contained map's rarity color
 // (same scheme as the hub's main stash and equipment slots).
 // Maps whose atlas region has not yet been completed get a special
@@ -380,7 +529,12 @@ function _egRenderMapSlot() {
 function _egRenderMapStashCell(row, col) {
     const cell = document.getElementById(`eg-map-stash-cell-${row}-${col}`);
     if (!cell) return;
-    const item = _egMapStash[row][col];
+    const tier = _egMapStashActiveTier || 1;
+    let item = null;
+    try {
+        if (typeof _egGetMapTierGrid === 'function') item = _egGetMapTierGrid(tier)[row][col];
+        else if (Array.isArray(_egMapStash) && Array.isArray(_egMapStash[row])) item = _egMapStash[row][col];
+    } catch(e) { item = null; }
     cell.innerHTML = item ? _egBuildItemChipHTML(item) : '';
 
     if (item && typeof _egGetCellFill === 'function') {
@@ -416,15 +570,50 @@ function _egRenderMapStashCell(row, col) {
             }
         }
     }
+    _egUpdateMapStashTabCounts();
 }
 
-// Re-renders the entire map stash grid.
-function _egRenderMapStash() {
-    for (let r = 0; r < EG_MAP_STASH_ROWS; r++) {
+// Re-renders the entire map stash grid for a specific tier.
+function _egRenderMapStashForTier(tier) {
+    const t = tier != null ? tier : (_egMapStashActiveTier || 1);
+    const rows = (typeof _egGetMapStashRowsForTier === 'function') ? _egGetMapStashRowsForTier(t) : EG_MAP_STASH_INITIAL_ROWS;
+    for (let r = 0; r < rows; r++) {
         for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
-            _egRenderMapStashCell(r, c);
+            const cell = document.getElementById(`eg-map-stash-cell-${r}-${c}`);
+            if (!cell) continue;
+            let item = null;
+            try {
+                if (typeof _egGetMapTierGrid === 'function') item = _egGetMapTierGrid(t)[r][c];
+                else if (Array.isArray(_egMapStash) && Array.isArray(_egMapStash[r])) item = _egMapStash[r][c];
+            } catch(e) { item = null; }
+            cell.innerHTML = item ? _egBuildItemChipHTML(item) : '';
+            if (item && typeof _egGetCellFill === 'function') {
+                const fill = _egGetCellFill(item);
+                cell.style.background = fill;
+                if (_egIsMapAtlasIncomplete(item)) {
+                    _egInjectAtlasHighlightStyles();
+                    cell.classList.add('eg-map-atlas-incomplete');
+                    cell.style.borderColor = '';
+                    cell.title = (typeof t === 'function') ? t('eg_map_atlas_not_completed') : 'Not yet completed on Atlas';
+                } else {
+                    cell.classList.remove('eg-map-atlas-incomplete');
+                    cell.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
+                    cell.removeAttribute('title');
+                }
+            } else {
+                cell.style.background = '';
+                cell.style.borderColor = '';
+                cell.classList.remove('eg-map-atlas-incomplete');
+                cell.removeAttribute('title');
+            }
         }
     }
+    _egUpdateMapStashTabCounts();
+}
+
+// Re-renders the entire map stash grid (active tier).
+function _egRenderMapStash() {
+    _egRenderMapStashForTier(_egMapStashActiveTier || 1);
 }
 
 
@@ -665,12 +854,13 @@ function showEndgameGate(backFn) {
     ensureEndgameGateScreen();
 
     // Migrate old gate screens that were built before the side-by-side
-    // layout (Orbs & Shards left of the gate) or before the atlas legend.
+    // layout (Orbs & Shards left of the gate) or before the atlas legend / tier tabs.
     const gateScreen = document.getElementById('screen-endgame-gate');
-    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main'))) {
+    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs'))) {
         gateScreen.innerHTML = _egBuildGateFullScreenHTML();
     }
     _egInjectAtlasHighlightStyles();
+    _egInjectMapStashTabStyles();
 
     // The gate screen DOM is built once — keep the back button in sync
     // with the current return target.
@@ -685,6 +875,34 @@ function showEndgameGate(backFn) {
     }
 
     _egLoadHubState();
+    // Re-sync tier tabs + grid to persisted active tier (may have changed via migration)
+    try {
+        const activeTier = _egMapStashActiveTier || 1;
+        const tabsEl = document.getElementById('eg-map-stash-tabs');
+        const gridEl = document.getElementById('eg-map-stash-grid');
+        if (gridEl) {
+            // rebuild tabs if missing or stale
+            const needTabsRebuild = !tabsEl || tabsEl.querySelectorAll('.eg-map-tab').length !== 16;
+            if (needTabsRebuild) {
+                const section = document.querySelector('.eg-map-stash-section');
+                if (section) {
+                    const oldTabs = section.querySelector('.eg-map-stash-tabs');
+                    if (oldTabs) oldTabs.remove();
+                    const labelEl = section.querySelector('.eg-panel-label');
+                    if (labelEl) labelEl.insertAdjacentHTML('afterend', _egBuildMapStashTabsHTML());
+                    else section.insertAdjacentHTML('afterbegin', _egBuildMapStashTabsHTML());
+                }
+            } else {
+                // just sync active highlight
+                document.querySelectorAll('#eg-map-stash-tabs .eg-map-tab').forEach(el => {
+                    el.classList.toggle('eg-map-tab-active', +el.dataset.tier === activeTier);
+                });
+            }
+            // rebuild grid to reflect tier's current row count (handles expansion / migration)
+            gridEl.innerHTML = _egBuildMapStashGridHTMLForTier(activeTier);
+            gridEl.style.gridTemplateColumns = `repeat(${EG_MAP_STASH_COLS}, 1fr)`;
+        }
+    } catch(e) {}
     _egRenderMapSlot();
     _egRenderMapStash();
     _egRenderCurrencyStash();

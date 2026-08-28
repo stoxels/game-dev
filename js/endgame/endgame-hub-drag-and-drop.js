@@ -75,6 +75,7 @@ let _dnd = {
     sourceRow: null,   // grid row of the origin cell (null for slot-based zones)
     sourceCol: null,   // grid col of the origin cell (null for slot-based zones)
     sourceSlot: null,   // slot id of the origin char equip slot (null for grid zones)
+    sourceTier: null,  // for mapstash: the tier tab the item was picked from
 };
 
 // The floating ghost div that follows the cursor during a drag.
@@ -95,6 +96,7 @@ function _dndReset() {
         sourceRow: null,
         sourceCol: null,
         sourceSlot: null,
+        sourceTier: null,
     };
 }
 
@@ -204,10 +206,22 @@ function _dndResolvePickupZone(chip) {
     }
     if (mapStashCell) {
         const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
+        const tier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+        let item = null;
+        try {
+            if (typeof _egGetMapTierGrid === 'function') item = _egGetMapTierGrid(tier)[r][c];
+            else item = _egMapStash[r][c];
+        } catch(e) { item = null; }
         return {
-            sourceZone: 'mapstash', sourceRow: r, sourceCol: c, sourceSlot: null,
-            item: _egMapStash[r][c],
-            clearFn: () => { _egMapStash[r][c] = null; _egRenderMapStashCell(r, c); }
+            sourceZone: 'mapstash', sourceRow: r, sourceCol: c, sourceSlot: null, sourceTier: tier,
+            item: item,
+            clearFn: () => {
+                try {
+                    if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(tier)[r][c] = null;
+                    else _egMapStash[r][c] = null;
+                } catch(e) {}
+                _egRenderMapStashCell(r, c);
+            }
         };
     }
     if (mapSlot) {
@@ -256,6 +270,7 @@ function _dndPickUp(e, chip) {
         sourceRow: resolved.sourceRow,
         sourceCol: resolved.sourceCol,
         sourceSlot: resolved.sourceSlot,
+        sourceTier: resolved.sourceTier || null,
     };
 
     resolved.clearFn(); // remove item from its origin cell
@@ -316,7 +331,7 @@ function _dndReturnToSource() {
 // Used both for returning the dragged item on cancel, and for sending
 // a displaced item back when a swap happens.
 function _dndReturnDisplacedToSource(item) {
-    const { sourceZone, sourceRow, sourceCol, sourceSlot } = _dnd;
+    const { sourceZone, sourceRow, sourceCol, sourceSlot, sourceTier } = _dnd;
 
     if (sourceZone === 'inv') {
         // Ensure the origin stash row still exists after expansions
@@ -327,7 +342,21 @@ function _dndReturnDisplacedToSource(item) {
     else if (sourceZone === 'map') { _egMapSlotItem = item; _egRenderMapSlot(); }
     else if (sourceZone === 'currency') { _egCurrencyStash[sourceRow][sourceCol] = item; _egRenderCurrencyCell(sourceRow, sourceCol); }
     else if (sourceZone === 'essence') { _egEssenceStash[sourceRow][sourceCol] = item; _egRenderEssenceCell(sourceRow, sourceCol); }
-    else if (sourceZone === 'mapstash') { _egMapStash[sourceRow][sourceCol] = item; _egRenderMapStashCell(sourceRow, sourceCol); }
+    else if (sourceZone === 'mapstash') {
+        try {
+            if (sourceTier != null && typeof _egGetMapTierGrid === 'function') {
+                if (typeof _egEnsureMapTierRows === 'function') _egEnsureMapTierRows(sourceTier, sourceRow + 1);
+                _egGetMapTierGrid(sourceTier)[sourceRow][sourceCol] = item;
+            } else if (typeof _egGetMapTierGrid === 'function' && typeof _egMapStashActiveTier !== 'undefined') {
+                const t = _egMapStashActiveTier;
+                if (typeof _egEnsureMapTierRows === 'function') _egEnsureMapTierRows(t, sourceRow + 1);
+                _egGetMapTierGrid(t)[sourceRow][sourceCol] = item;
+            } else {
+                _egMapStash[sourceRow][sourceCol] = item;
+            }
+        } catch(e) { try{ _egMapStash[sourceRow][sourceCol]=item; }catch(e2){} }
+        _egRenderMapStashCell(sourceRow, sourceCol);
+    }
     else {
         // Unlimited stash: delegate to helper that grows if needed
         if (typeof _egAddItemToStash === 'function') _egAddItemToStash(item);
@@ -399,8 +428,35 @@ function _dndDrop(e) {
 
     } else if (mapStashCell && _dndZoneAccepts('mapstash')) {
         const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
-        _dndDropOnCell(_egMapStash, _egRenderMapStashCell, r, c);
-        dropped = true;
+        const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+        const dragTier = (_dnd.item && _dnd.item.mapTier != null) ? _dnd.item.mapTier : null;
+        if (dragTier != null && dragTier !== activeTier) {
+            const roman = (typeof EG_MAP_TIER_ROMANS !== 'undefined' ? EG_MAP_TIER_ROMANS[activeTier-1] : activeTier);
+            const msg = `⚠️ This stash only holds Tier ${roman} maps (Tier ${dragTier} not allowed)`;
+            if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+            else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+            mapStashCell.classList.add('eg-slot-reject');
+            setTimeout(() => mapStashCell.classList.remove('eg-slot-reject'), 600);
+            // return to source, handled below via !dropped
+        } else {
+            // tier-aware drop: write into active tier's grid, expand if needed
+            try {
+                if (typeof _egGetMapTierGrid === 'function') {
+                    const grid = _egGetMapTierGrid(activeTier);
+                    if (typeof _egEnsureMapTierRows === 'function') _egEnsureMapTierRows(activeTier, r + 1);
+                    const displaced = grid[r][c];
+                    grid[r][c] = _dnd.item;
+                    _egRenderMapStashCell(r, c);
+                    if (displaced) _dndReturnDisplacedToSource(displaced);
+                } else {
+                    _dndDropOnCell(_egMapStash, _egRenderMapStashCell, r, c);
+                }
+                dropped = true;
+            } catch(e) {
+                _dndDropOnCell(_egMapStash, _egRenderMapStashCell, r, c);
+                dropped = true;
+            }
+        }
 
     } else if (mapSlotEl && _dndZoneAccepts('map')) {
         const displaced = _egMapSlotItem;
@@ -664,26 +720,82 @@ function _dndHandleRightClick(e) {
 
 // Right-click on a map in the gate map stash → swap it into the map device
 // slot. The displaced device map (if any) returns to the source cell.
+// Tier check: only allow if displaced (if any) belongs to the active tier's stash?
+// Actually device can hold any tier, so stash->device always allowed; device->stash via swap
+// checks tier of displaced map vs active tier.
 function _dndQuickLoadMapToDevice(mapStashCell) {
     if (typeof _egMapStash === 'undefined') return;
     const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
-    const map = _egMapStash[r][c];
+    const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+    let map = null;
+    try {
+        if (typeof _egGetMapTierGrid === 'function') map = _egGetMapTierGrid(activeTier)[r][c];
+        else map = _egMapStash[r][c];
+    } catch(e) { map = null; }
     if (!map || map.category !== 'map') return;
 
     const displaced = _egMapSlotItem || null;
+    // If device holds a map and we swap it into the clicked stash cell, ensure it matches stash tier
+    if (displaced && displaced.mapTier != null && displaced.mapTier !== activeTier) {
+        // Instead of swapping into mismatched cell, try to place displaced into its own tier's free slot
+        // and just move clicked map to device
+        let targetTier = displaced.mapTier;
+        let placed = false;
+        try {
+            if (typeof _egFindFreeMapCellForTier === 'function') {
+                const pos = _egFindFreeMapCellForTier(targetTier);
+                _egGetMapTierGrid(targetTier)[pos.r][pos.c] = displaced;
+                placed = true;
+                // if target is active tier, render that cell (but it's not visible since we already switched?)
+                if (targetTier === activeTier) _egRenderMapStashCell(pos.r, pos.c);
+            }
+        } catch(e) {}
+        if (!placed) {
+            const msg = `⚠️ Cannot swap — device holds Tier ${displaced.mapTier} but stash is on Tier ${activeTier}`;
+            if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+            else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+            return;
+        }
+        // clear clicked cell
+        try { _egGetMapTierGrid(activeTier)[r][c] = null; } catch(e) {}
+        _egMapSlotItem = map;
+        _egRenderMapSlot();
+        _egRenderMapStashCell(r, c);
+        egSaveHubState();
+        return;
+    }
     _egMapSlotItem = map;
-    _egMapStash[r][c] = displaced; // may be null — that's fine
+    try {
+        if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(activeTier)[r][c] = displaced;
+        else _egMapStash[r][c] = displaced;
+    } catch(e) {}
     _egRenderMapSlot();
     _egRenderMapStashCell(r, c);
     egSaveHubState();
 }
 
 // Right-click on a map in the map device slot → return it to the first free
-// map stash cell (or back into the slot when the stash is full).
+// map stash cell of its own tier (infinite, so always succeeds — expands if needed).
 function _dndQuickUnloadMapFromDevice() {
     if (typeof _egMapSlotItem === 'undefined' || !_egMapSlotItem) return;
     const map = _egMapSlotItem;
-
+    const tier = (map.mapTier != null ? map.mapTier : (_egMapStashActiveTier||1));
+    try {
+        if (typeof _egFindFreeMapCellForTier === 'function' && typeof _egGetMapTierGrid === 'function') {
+            const pos = _egFindFreeMapCellForTier(tier);
+            _egGetMapTierGrid(tier)[pos.r][pos.c] = map;
+            _egMapSlotItem = null;
+            _egRenderMapSlot();
+            // if the map's tier is not the active tab, switch to it so the player sees it
+            if (tier !== _egMapStashActiveTier && typeof _egSwitchMapStashTier === 'function') {
+                _egSwitchMapStashTier(tier);
+            } else {
+                _egRenderMapStashCell(pos.r, pos.c);
+            }
+            egSaveHubState();
+            return;
+        }
+    } catch(e) {}
     for (let r = 0; r < EG_MAP_STASH_ROWS; r++) {
         for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
             if (!_egMapStash[r][c]) {
@@ -993,6 +1105,16 @@ function _dndBindListeners() {
                     grid.scrollTop += 14;
                 } else if (e.clientY < rect.top + edge && e.clientY > rect.top - 40) {
                     grid.scrollTop -= 14;
+                }
+            }
+            const mapGrid = document.getElementById('eg-map-stash-grid');
+            if (mapGrid) {
+                const rect2 = mapGrid.getBoundingClientRect();
+                const edge2 = 70;
+                if (e.clientY > rect2.bottom - edge2 && e.clientY < rect2.bottom + 40) {
+                    mapGrid.scrollTop += 14;
+                } else if (e.clientY < rect2.top + edge2 && e.clientY > rect2.top - 40) {
+                    mapGrid.scrollTop -= 14;
                 }
             }
         }

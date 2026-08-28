@@ -1440,15 +1440,40 @@ const _egMapDrops = new Map();          // "row-col" → map item
 let _egMapStashFullToastAt = 0;         // throttle for the stash-full toast
 
 // Returns true when the gate screen map stash has at least one free slot.
-function _egMapStashHasFreeSlot() {
-    for (let r = 0; r < EG_MAP_STASH_ROWS; r++)
-        for (let c = 0; c < EG_MAP_STASH_COLS; c++)
-            if (!_egMapStash[r][c]) return true;
-    return false;
+// Per-tier stashes are infinite (auto-expand), so this is always true.
+// Kept for legacy vendor / claim callers that guard before adding.
+function _egMapStashHasFreeSlot(tier) {
+    return true;
 }
-
-// Writes a map into the first free map stash cell. Returns true on success.
-function _egAddMapToMapStash(item) {
+// Writes a map into the first free cell of its tier's stash (infinite).
+// Returns true on success. If item has a mapTier, it routes to that tier;
+// otherwise falls back to tierOverride or the active tab.
+function _egAddMapToMapStash(item, tierOverride) {
+    if (!item) return false;
+    let tier = tierOverride != null ? tierOverride : (item.mapTier != null ? item.mapTier : (_egMapStashActiveTier || 1));
+    tier = Math.max(1, Math.min(EG_MAP_TIER_COUNT || 16, Math.round(tier)));
+    try {
+        if (typeof _egFindFreeMapCellForTier === 'function' && typeof _egGetMapTierGrid === 'function') {
+            const pos = _egFindFreeMapCellForTier(tier);
+            _egGetMapTierGrid(tier)[pos.r][pos.c] = item;
+            // if the target tier is currently visible, render that cell; otherwise just sync count
+            if (tier === (_egMapStashActiveTier || 1) && document.getElementById('eg-map-stash-grid')) {
+                // ensure grid has enough DOM rows — rebuild if needed
+                const gridLen = _egGetMapTierGrid(tier).length;
+                const domCells = document.querySelectorAll('.eg-map-stash-cell').length;
+                const needed = gridLen * EG_MAP_STASH_COLS;
+                if (domCells < needed && typeof _egRebuildMapStashGrid === 'function') {
+                    _egRebuildMapStashGrid();
+                } else {
+                    _egRenderMapStashCell(pos.r, pos.c);
+                }
+            } else if (typeof _egUpdateMapStashTabCounts === 'function') {
+                _egUpdateMapStashTabCounts();
+            }
+            return true;
+        }
+    } catch(e) {}
+    // fallback flat grid (should not happen after migration)
     for (let r = 0; r < EG_MAP_STASH_ROWS; r++) {
         for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
             if (!_egMapStash[r][c]) {
@@ -1568,15 +1593,7 @@ function _egCheckMapDropClaim(row, col) {
     const map = _egMapDrops.get(key);
     if (!map) return false;
 
-    // Map stash full? Keep the drop on the grid so the player can free up
-    // space and try again before it expires.
-    if (!_egMapStashHasFreeSlot()) {
-        if (Date.now() - _egMapStashFullToastAt > 5000) {
-            _egMapStashFullToastAt = Date.now();
-            showToast(t('eg_map_stash_full'));
-        }
-        return false;
-    }
+    // Tiered stashes are infinite — no capacity check needed.
 
     _egMapDrops.delete(key);
     _egRemoveMapDropOverlay(key);
@@ -1830,11 +1847,27 @@ function _egHealMapBossImplicits(map) {
 function _egMigrateMapBossImplicits() {
     try {
         if (typeof _egMapStash !== 'undefined' && Array.isArray(_egMapStash)) {
-            for (let r = 0; r < _egMapStash.length; r++) {
-                if (!Array.isArray(_egMapStash[r])) continue;
-                for (let c = 0; c < _egMapStash[r].length; c++) {
-                    const it = _egMapStash[r][c];
-                    if (it && it.category === 'map') _egHealMapBossImplicits(it);
+            // tiered check
+            const isTiered = (typeof _egIsTieredMapStash === 'function' && _egIsTieredMapStash(_egMapStash));
+            if (isTiered) {
+                for (let ti = 0; ti < _egMapStash.length; ti++) {
+                    const tierGrid = _egMapStash[ti];
+                    if (!Array.isArray(tierGrid)) continue;
+                    for (let r = 0; r < tierGrid.length; r++) {
+                        if (!Array.isArray(tierGrid[r])) continue;
+                        for (let c = 0; c < tierGrid[r].length; c++) {
+                            const it = tierGrid[r][c];
+                            if (it && it.category === 'map') _egHealMapBossImplicits(it);
+                        }
+                    }
+                }
+            } else {
+                for (let r = 0; r < _egMapStash.length; r++) {
+                    if (!Array.isArray(_egMapStash[r])) continue;
+                    for (let c = 0; c < _egMapStash[r].length; c++) {
+                        const it = _egMapStash[r][c];
+                        if (it && it.category === 'map') _egHealMapBossImplicits(it);
+                    }
                 }
             }
         }
@@ -1845,10 +1878,21 @@ function _egMigrateMapBossImplicits() {
         if (typeof STATE !== 'undefined' && STATE) {
             const stash = STATE.egMapStash;
             if (Array.isArray(stash)) {
-                stash.forEach(row => {
-                    if (!Array.isArray(row)) return;
-                    row.forEach(it => { if (it && it.category === 'map') _egHealMapBossImplicits(it); });
-                });
+                const isTieredS = (typeof _egIsTieredMapStash === 'function' && _egIsTieredMapStash(stash));
+                if (isTieredS) {
+                    stash.forEach(tierGrid => {
+                        if (!Array.isArray(tierGrid)) return;
+                        tierGrid.forEach(row => {
+                            if (!Array.isArray(row)) return;
+                            row.forEach(it => { if (it && it.category === 'map') _egHealMapBossImplicits(it); });
+                        });
+                    });
+                } else {
+                    stash.forEach(row => {
+                        if (!Array.isArray(row)) return;
+                        row.forEach(it => { if (it && it.category === 'map') _egHealMapBossImplicits(it); });
+                    });
+                }
             }
             if (STATE.egMapSlotItem && STATE.egMapSlotItem.category === 'map') {
                 _egHealMapBossImplicits(STATE.egMapSlotItem);

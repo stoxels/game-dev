@@ -225,10 +225,14 @@ function buildFreshState() {
             typeof EG_INV_ROWS !== 'undefined' ? EG_INV_ROWS : 5,
             typeof EG_INV_COLS !== 'undefined' ? EG_INV_COLS : 10
         ),
-        egMapStash: _makeEgGrid(
-            typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 2,
-            typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10
-        ),
+        egMapStash: (function(){
+            // Tiered 16× infinite stashes — each tier is its own grid
+            const tiers = (typeof EG_MAP_TIER_COUNT !== 'undefined' ? EG_MAP_TIER_COUNT : 16);
+            const rows = (typeof EG_MAP_STASH_INITIAL_ROWS !== 'undefined' ? EG_MAP_STASH_INITIAL_ROWS : (typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 4));
+            const cols = (typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10);
+            if (typeof _egMakeAllMapStashes === 'function') return _egMakeAllMapStashes();
+            return Array.from({ length: tiers }, () => _makeEgGrid(rows, cols));
+        })(),
         egCurrencyStash: _makeEgGrid(
             typeof EG_CURRENCY_ROWS !== 'undefined' ? EG_CURRENCY_ROWS : 2,
             typeof EG_CURRENCY_COLS !== 'undefined' ? EG_CURRENCY_COLS : 10
@@ -303,10 +307,37 @@ function _migrateEndgameFields(s) {
         );
     }
     if (!s.egMapStash) {
-        s.egMapStash = _makeEgGrid(
-            typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 2,
-            typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10
-        );
+        const tiers = (typeof EG_MAP_TIER_COUNT !== 'undefined' ? EG_MAP_TIER_COUNT : 16);
+        const rows = (typeof EG_MAP_STASH_INITIAL_ROWS !== 'undefined' ? EG_MAP_STASH_INITIAL_ROWS : (typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 4));
+        const cols = (typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10);
+        if (typeof _egMakeAllMapStashes === 'function') s.egMapStash = _egMakeAllMapStashes();
+        else s.egMapStash = Array.from({ length: tiers }, () => _makeEgGrid(rows, cols));
+    } else {
+        // Migrate legacy flat stash (single grid) → tiered 16× stashes
+        const isFlat = Array.isArray(s.egMapStash) && s.egMapStash.length > 0 && Array.isArray(s.egMapStash[0]) && s.egMapStash[0].length > 0 && !Array.isArray(s.egMapStash[0][0]);
+        const isTiered = Array.isArray(s.egMapStash) && s.egMapStash.length === 16 && Array.isArray(s.egMapStash[0]) && Array.isArray(s.egMapStash[0][0]);
+        if (isFlat && !isTiered) {
+            const flat = s.egMapStash;
+            const tiers2 = (typeof EG_MAP_TIER_COUNT !== 'undefined' ? EG_MAP_TIER_COUNT : 16);
+            const rows2 = (typeof EG_MAP_STASH_INITIAL_ROWS !== 'undefined' ? EG_MAP_STASH_INITIAL_ROWS : 4);
+            const cols2 = (typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10);
+            const tiered = Array.from({ length: tiers2 }, () => _makeEgGrid(rows2, cols2));
+            for (let r = 0; r < flat.length; r++) {
+                if (!Array.isArray(flat[r])) continue;
+                for (let c = 0; c < flat[r].length; c++) {
+                    const it = flat[r][c];
+                    if (!it) continue;
+                    const tier = (it.mapTier != null ? it.mapTier : 1);
+                    const idx = Math.max(0, Math.min(tiers2-1, (Math.round(tier)||1)-1));
+                    let placed = false;
+                    for (let rr = 0; rr < tiered[idx].length && !placed; rr++) {
+                        for (let cc = 0; cc < cols2; cc++) if (!tiered[idx][rr][cc]) { tiered[idx][rr][cc]=it; placed=true; break; }
+                    }
+                    if (!placed) { tiered[idx].push(Array(cols2).fill(null)); tiered[idx][tiered[idx].length-1][0]=it; }
+                }
+            }
+            s.egMapStash = tiered;
+        }
     }
     if (!s.egCurrencyStash) {
         s.egCurrencyStash = _makeEgGrid(
@@ -321,6 +352,7 @@ function _migrateEndgameFields(s) {
         );
     }
     if (s.egMapSlotItem === undefined) s.egMapSlotItem = null;
+    if (s.egMapStashActiveTier === undefined) s.egMapStashActiveTier = 1;
 }
 
 // migrateOldSave — fills in any fields that are missing from an older save.

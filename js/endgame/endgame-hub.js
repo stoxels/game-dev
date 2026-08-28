@@ -143,9 +143,12 @@ function _egCurrencyDefForId(id) {
     return null;
 }
 
-// Map stash dimensions
-const EG_MAP_STASH_ROWS = 4;
+// Map stash dimensions — 16 tier-filtered infinite stashes (one per map tier)
+const EG_MAP_TIER_COUNT = 16;
+const EG_MAP_TIER_ROMANS = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI'];
 const EG_MAP_STASH_COLS = 20;
+const EG_MAP_STASH_INITIAL_ROWS = 4;
+const EG_MAP_STASH_ROWS = EG_MAP_STASH_INITIAL_ROWS; // legacy alias (one tier's initial rows)
 
 const _egChipRegistry = new Map();
 let _egChipCounter = 0;
@@ -167,8 +170,74 @@ let _egMapSlotItem = null;
 // Currency stash: 2D grid of currency item objects (null = empty cell)
 let _egCurrencyStash = Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
 
-// Map stash: 2D grid of map item objects (null = empty cell)
-let _egMapStash = Array.from({ length: EG_MAP_STASH_ROWS }, () => Array(EG_MAP_STASH_COLS).fill(null));
+// Map stash: array of 16 tier-filtered stashes, each a 2D grid (rows × EG_MAP_STASH_COLS)
+// _egMapStash[tierIdx][row][col] — tierIdx 0 = Tier I, 15 = Tier XVI
+function _egMakeMapTierGrid(rows) {
+    const r = rows != null ? rows : EG_MAP_STASH_INITIAL_ROWS;
+    return Array.from({ length: r }, () => Array(EG_MAP_STASH_COLS).fill(null));
+}
+function _egMakeAllMapStashes() {
+    return Array.from({ length: EG_MAP_TIER_COUNT }, () => _egMakeMapTierGrid());
+}
+let _egMapStash = _egMakeAllMapStashes();
+// Active tier tab (1..16) shown in the Probability Gate
+let _egMapStashActiveTier = 1;
+
+function _egMapTierToIndex(tier) {
+    const t = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(tier || 1)));
+    return t - 1;
+}
+function _egGetMapTierGrid(tier) {
+    const idx = _egMapTierToIndex(tier);
+    if (!_egMapStash[idx] || !Array.isArray(_egMapStash[idx])) _egMapStash[idx] = _egMakeMapTierGrid();
+    return _egMapStash[idx];
+}
+function _egGetMapStashRowsForTier(tier) {
+    return _egGetMapTierGrid(tier).length;
+}
+function _egEnsureMapTierRows(tier, minRows) {
+    const idx = _egMapTierToIndex(tier);
+    let grid = _egGetMapTierGrid(tier);
+    if (grid.length >= minRows) return;
+    for (let i = grid.length; i < minRows; i++) grid.push(Array(EG_MAP_STASH_COLS).fill(null));
+    if (tier === _egMapStashActiveTier && typeof _egRebuildMapStashGrid === 'function') {
+        // defer if gate helpers not yet loaded
+        try { _egRebuildMapStashGrid(); } catch(e) {}
+    }
+}
+function _egRebuildMapStashGrid() {
+    const gridEl = document.getElementById('eg-map-stash-grid');
+    if (!gridEl) return;
+    if (typeof _egBuildMapStashGridHTMLForTier !== 'function' || typeof _egRenderMapStashForTier !== 'function') return;
+    const scrollTop = gridEl.scrollTop;
+    const curTier = _egMapStashActiveTier;
+    gridEl.innerHTML = _egBuildMapStashGridHTMLForTier(curTier);
+    // ensure columns reflect current constant
+    gridEl.style.gridTemplateColumns = `repeat(${EG_MAP_STASH_COLS}, 1fr)`;
+    _egRenderMapStashForTier(curTier);
+    gridEl.scrollTop = scrollTop;
+}
+function _egFindFreeMapCellForTier(tier) {
+    const grid = _egGetMapTierGrid(tier);
+    for (let r = 0; r < grid.length; r++) {
+        for (let c = 0; c < EG_MAP_STASH_COLS; c++) if (!grid[r][c]) return { r, c };
+    }
+    const r = grid.length;
+    _egEnsureMapTierRows(tier, r + 1);
+    return { r, c: 0 };
+}
+// Legacy helpers that operated on the flat grid — now tier-aware wrappers
+function _egIsLegacyFlatMapStash(stash) {
+    if (!Array.isArray(stash) || stash.length === 0) return false;
+    // Flat: stash[0][0] is null or a map object, not an array of rows
+    // Tiered: stash[0] is itself a 2D array (first element is an array)
+    return stash.length > 0 && Array.isArray(stash[0]) && stash[0].length > 0 && !Array.isArray(stash[0][0]) && (stash[0][0] === null || typeof stash[0][0] === 'object') && (stash.length !== EG_MAP_TIER_COUNT || !Array.isArray(stash[0][0]));
+}
+// Detect tiered shape: stash.length === 16 and each entry is 2D array
+function _egIsTieredMapStash(stash) {
+    if (!Array.isArray(stash) || stash.length !== EG_MAP_TIER_COUNT) return false;
+    return stash.every(tierGrid => Array.isArray(tierGrid) && tierGrid.length > 0 && Array.isArray(tierGrid[0]));
+}
 
 // Tooltip state: tracks which item is currently being previewed in the tooltip panel
 let _egTooltipItem = null;
@@ -1391,6 +1460,7 @@ function egSaveHubState() {
     STATE.egCurrencyStash = _egCurrencyStash;
     STATE.egEssenceStash = _egEssenceStash;
     STATE.egMapSlotItem = _egMapSlotItem;
+    STATE.egMapStashActiveTier = _egMapStashActiveTier;
     // Mass-sell filter (persisted alongside the stash so reconstructing the
     // hub after a reload restores the player's protection choices).
     if (_egMassSellKeep) STATE.egMassSellKeep = { ..._egMassSellKeep };
@@ -1448,7 +1518,61 @@ function _egLoadHubState() {
     } else {
         _egInventory = Array.from({ length: EG_INV_INITIAL_ROWS }, () => Array(EG_INV_COLS).fill(null));
     }
-    _egMapStash = STATE.egMapStash || Array.from({ length: EG_MAP_STASH_ROWS }, () => Array(EG_MAP_STASH_COLS).fill(null));
+    // ── Map stash: tiered 16× infinite stashes ──
+    (function _migrateMapStash() {
+        const saved = STATE.egMapStash;
+        if (_egIsTieredMapStash(saved)) {
+            _egMapStash = saved;
+            // normalise each tier: ensure correct cols and at least initial rows
+            for (let ti = 0; ti < EG_MAP_TIER_COUNT; ti++) {
+                if (!Array.isArray(_egMapStash[ti])) _egMapStash[ti] = _egMakeMapTierGrid();
+                if (_egMapStash[ti].length < EG_MAP_STASH_INITIAL_ROWS) {
+                    for (let i = _egMapStash[ti].length; i < EG_MAP_STASH_INITIAL_ROWS; i++) _egMapStash[ti].push(Array(EG_MAP_STASH_COLS).fill(null));
+                }
+                for (let r = 0; r < _egMapStash[ti].length; r++) {
+                    if (!Array.isArray(_egMapStash[ti][r])) _egMapStash[ti][r] = Array(EG_MAP_STASH_COLS).fill(null);
+                    else if (_egMapStash[ti][r].length < EG_MAP_STASH_COLS) while(_egMapStash[ti][r].length < EG_MAP_STASH_COLS) _egMapStash[ti][r].push(null);
+                    else if (_egMapStash[ti][r].length > EG_MAP_STASH_COLS) _egMapStash[ti][r] = _egMapStash[ti][r].slice(0, EG_MAP_STASH_COLS);
+                }
+            }
+            // also migrate any maps that might be in wrong tier (e.g. tier changed via Horizons)
+            // we leave them where they are — player can manually move via device
+        } else if (Array.isArray(saved) && saved.length > 0 && Array.isArray(saved[0]) && !Array.isArray(saved[0][0])) {
+            // legacy flat grid (e.g. 4×20) — distribute maps into tiered stashes by mapTier
+            _egMapStash = _egMakeAllMapStashes();
+            for (let r = 0; r < saved.length; r++) {
+                if (!Array.isArray(saved[r])) continue;
+                for (let c = 0; c < saved[r].length; c++) {
+                    const it = saved[r][c];
+                    if (!it) continue;
+                    const tier = (it.mapTier != null) ? it.mapTier : 1;
+                    const idx = _egMapTierToIndex(tier);
+                    // find first free slot in that tier (may grow)
+                    let placed = false;
+                    for (let rr = 0; rr < _egMapStash[idx].length && !placed; rr++) {
+                        for (let cc = 0; cc < EG_MAP_STASH_COLS; cc++) {
+                            if (!_egMapStash[idx][rr][cc]) { _egMapStash[idx][rr][cc] = it; placed = true; break; }
+                        }
+                    }
+                    if (!placed) {
+                        _egMapStash[idx].push(Array(EG_MAP_STASH_COLS).fill(null));
+                        _egMapStash[idx][_egMapStash[idx].length-1][0] = it;
+                    }
+                }
+            }
+            STATE.egMapStash = _egMapStash;
+            try { if (typeof save === 'function') save(); } catch(e) {}
+        } else {
+            _egMapStash = _egMakeAllMapStashes();
+        }
+        // restore active tier if persisted
+        if (STATE.egMapStashActiveTier != null) {
+            const at = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(STATE.egMapStashActiveTier)));
+            _egMapStashActiveTier = at;
+        }
+    })();
+    if (STATE.egMapStashActiveTier != null) _egMapStashActiveTier = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(STATE.egMapStashActiveTier)));
+
     // ── Currency stash migration to fixed PoE-style slots ──
     // Old saves were 1×30; new is 6×5 with fixed positions. Migrate by collecting items
     // and re-inserting them into their assigned slots (stacking counts).

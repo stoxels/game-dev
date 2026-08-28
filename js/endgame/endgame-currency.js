@@ -481,9 +481,43 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     // can itself be modified further with any other currency.
     if ((isMap && defId === 'mirror_of_kalandra') || (!isMap && def.isMirror)) {
         const copyToMapStash = isMap;
-        const cols = copyToMapStash ? EG_MAP_STASH_COLS : EG_INV_COLS;
-        const grid = copyToMapStash ? _egMapStash : _egInventory;
-        const rows = copyToMapStash ? EG_MAP_STASH_ROWS : (typeof _egGetInvRows === 'function' ? _egGetInvRows() : grid.length);
+        if (copyToMapStash) {
+            // Tiered infinite stash: place copy into its own tier
+            try {
+                const tier = (item.mapTier != null ? item.mapTier : (_egMapStashActiveTier || 1));
+                const pos = (typeof _egFindFreeMapCellForTier === 'function') ? _egFindFreeMapCellForTier(tier) : { r:0,c:0 };
+                const grid = (typeof _egGetMapTierGrid === 'function') ? _egGetMapTierGrid(tier) : _egMapStash;
+                const copy = JSON.parse(JSON.stringify(item));
+                copy.mirrored = true;
+                grid[pos.r][pos.c] = copy;
+                // render if visible tier
+                if (tier === (_egMapStashActiveTier || 1) && typeof _egRenderMapStashCell === 'function') {
+                    const domCells = document.querySelectorAll('.eg-map-stash-cell').length;
+                    const needed = grid.length * EG_MAP_STASH_COLS;
+                    if (domCells < needed && typeof _egRebuildMapStashGrid === 'function') _egRebuildMapStashGrid();
+                    else _egRenderMapStashCell(pos.r, pos.c);
+                } else if (typeof _egUpdateMapStashTabCounts === 'function') {
+                    _egUpdateMapStashTabCounts();
+                }
+                // Consume one mirror from the stack.
+                stack.count = (stack.count || 1) - 1;
+                if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
+                _egRenderCurrencyCell(sourceRow, sourceCol);
+                if (keepActive && stack.count > 0) {
+                    _egRefreshCurrencyUseHighlight();
+                    showToast(t('eg_mirror_created').replace('{name}', copy.name));
+                    egSaveHubState();
+                    return;
+                }
+                _egCancelCurrencyUse(true);
+                showToast(t('eg_mirror_created').replace('{name}', copy.name));
+                egSaveHubState();
+                return;
+            } catch(e) { /* fallback below */ }
+        }
+        const cols = EG_INV_COLS;
+        const grid = _egInventory;
+        const rows = (typeof _egGetInvRows === 'function' ? _egGetInvRows() : grid.length);
 
         let freeR = -1, freeC = -1;
         outer:
@@ -492,15 +526,8 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
                 if (!grid[r][c]) { freeR = r; freeC = c; break outer; }
             }
         }
-        // Unlimited main stash: grow if needed (map stash stays capped)
+        // Unlimited main stash: grow if needed
         if (freeR === -1) {
-            if (copyToMapStash) {
-                const msg = t('eg_map_stash_full');
-                showToast(msg);
-                if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-                _egCancelCurrencyUse(true);
-                return;
-            }
             if (typeof _egAddItemToStash === 'function') {
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.mirrored = true;
@@ -530,9 +557,8 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         const copy = JSON.parse(JSON.stringify(item));
         copy.mirrored = true;
         grid[freeR][freeC] = copy;
-        if (copyToMapStash) _egRenderMapStashCell(freeR, freeC);
-        else _egRenderInventoryCell(freeR, freeC);
-        if (!copyToMapStash && typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
+        _egRenderInventoryCell(freeR, freeC);
+        if (typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
 
         // Consume one mirror from the stack.
         stack.count = (stack.count || 1) - 1;
@@ -663,8 +689,40 @@ document.addEventListener('mousedown', function (e) {
     let targetItem = null, applyFn = null;
     if (mapStashCell) {
         const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
-        targetItem = _egMapStash[r][c];
-        applyFn = (newItem) => { _egMapStash[r][c] = newItem; _egRenderMapStashCell(r, c); };
+        const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+        try {
+            if (typeof _egGetMapTierGrid === 'function') targetItem = _egGetMapTierGrid(activeTier)[r][c];
+            else targetItem = _egMapStash[r][c];
+        } catch(e) { targetItem = null; }
+        applyFn = (newItem) => {
+            // Horizons changes tier — move item to its new tier if needed
+            const oldTier = activeTier;
+            const newTier = (newItem && newItem.mapTier != null) ? newItem.mapTier : oldTier;
+            if (newTier !== oldTier && typeof _egGetMapTierGrid === 'function') {
+                // remove from old cell, insert into new tier's free slot
+                try { _egGetMapTierGrid(oldTier)[r][c] = null; _egRenderMapStashCell(r, c); } catch(e) {}
+                try {
+                    const pos = (typeof _egFindFreeMapCellForTier === 'function') ? _egFindFreeMapCellForTier(newTier) : { r:0,c:0 };
+                    _egGetMapTierGrid(newTier)[pos.r][pos.c] = newItem;
+                    if (typeof _egUpdateMapStashTabCounts === 'function') _egUpdateMapStashTabCounts();
+                    if (newTier === (_egMapStashActiveTier || oldTier) && typeof _egRebuildMapStashGrid === 'function') {
+                        const domCells = document.querySelectorAll('.eg-map-stash-cell').length;
+                        const needed = _egGetMapTierGrid(newTier).length * EG_MAP_STASH_COLS;
+                        if (domCells < needed) _egRebuildMapStashGrid();
+                    }
+                    // auto-switch tab to the upgraded tier so player sees the result
+                    if (typeof _egSwitchMapStashTier === 'function' && newTier !== oldTier) {
+                        setTimeout(() => _egSwitchMapStashTier(newTier), 80);
+                    }
+                    return;
+                } catch(e) {}
+            }
+            try {
+                if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(activeTier)[r][c] = newItem;
+                else _egMapStash[r][c] = newItem;
+            } catch(e) {}
+            _egRenderMapStashCell(r, c);
+        };
     } else if (mapSlotEl) {
         targetItem = _egMapSlotItem;
         applyFn = (newItem) => { _egMapSlotItem = newItem; _egRenderMapSlot(); };

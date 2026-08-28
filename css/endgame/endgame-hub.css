@@ -979,12 +979,22 @@ img.eg-art-img {
 .eg-map-stash-grid {
     display: grid;
     grid-template-columns: repeat(20, 1fr);
-    gap: 2px;
-    padding: 4px 6px;
+    gap: 4px;
+    padding: 6px 12px 12px;
     overflow-y: auto;
+    overflow-x: hidden;
     flex: 1;
     align-content: start;
+    grid-auto-rows: 56px;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+    scrollbar-gutter: stable;
 }
+.eg-map-stash-grid::-webkit-scrollbar { width: 8px; }
+.eg-map-stash-grid::-webkit-scrollbar-track { background: transparent; }
+.eg-map-stash-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.eg-map-stash-grid::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
 
 .eg-map-stash-section {
     display: flex;
@@ -994,6 +1004,35 @@ img.eg-art-img {
     border-top: 1px solid var(--border);
     min-height: 0;
 }
+.eg-map-stash-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px 8px 4px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+}
+.eg-map-tab {
+    font-family: var(--PX, monospace);
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 5px 8px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--setup-opt-inactive, #888);
+    transition: all 0.12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 36px;
+    justify-content: center;
+}
+.eg-map-tab:hover { border-color: var(--accent2, #aaa); color: #ddd; background: rgba(255,255,255,0.08); }
+.eg-map-tab.eg-map-tab-active { border-color: #c8a84b; color: #f5d98a; background: rgba(200,168,75,0.18); box-shadow: 0 0 8px rgba(200,168,75,0.25); }
+.eg-map-tab-count { font-size: 7px; background: rgba(255,255,255,0.10); border-radius: 8px; padding: 1px 5px; min-width: 10px; text-align: center; color: inherit; opacity: 0.85; }
+.eg-map-tab.eg-map-tab-active .eg-map-tab-count { background: rgba(200,168,75,0.30); color: #f5d98a; }
 
 
 
