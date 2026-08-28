@@ -195,6 +195,9 @@ function _egBuildMergedModLines(mods) {
     });
 
     return groups.map(g => {
+        // Lines without any numeric value were pushed with { label } only
+        // (no template/count/slots) — return them verbatim.
+        if (g.template == null) return { label: g.label, downside: g.downside };
         if (g.count <= 1) return { label: g.template, downside: g.downside };
         let idx = 0;
         const label = g.template.replace(NUM_RE, () => {

@@ -493,6 +493,25 @@ function _doStartLevel(gi) {
         _renderPlayerHealth();
     }
 
+    // Initial map-device puzzle could already be fully solved by
+    // start-of-level passive reveals (e.g. central_tendency,
+    // probabilistic_start, Syla's affinity … stacking to cover the whole
+    // board). checkWin() was intentionally suppressed above while
+    // _egIsActive was still false — now that the encounter is live, hand
+    // the solved puzzle to the encounter chain (question modal → countdown
+    // → next puzzle) instead of leaving a dead solved grid.
+    if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel
+        && typeof _egIsActive === 'function' && _egIsActive()
+        && typeof isPuzzleSolved === 'function' && isPuzzleSolved()
+        && typeof _egOnPuzzleComplete === 'function'
+        && (typeof _egPuzzleCompleteFired === 'undefined' || !_egPuzzleCompleteFired)) {
+        if (!dead) {
+            dead = true;
+            if (typeof stopTimer === 'function') stopTimer();
+        }
+        _egOnPuzzleComplete();
+    }
+
     // 9. Background music
     Audio_Manager.playBGM(Audio_Manager.trackForLevel(cur.world, cur.li));
 }

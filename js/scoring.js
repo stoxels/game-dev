@@ -591,6 +591,18 @@ function checkWin() {
         }
     }
 
+    // Map-device run: puzzle solved by start-of-level passives BEFORE the
+    // encounter flag has flipped (initial puzzle only). The normal
+    // win/scoring path must NOT run — the puzzle belongs to the encounter
+    // chain (question modal → countdown → next puzzle). Suppress the normal
+    // overlay here; _doStartLevel() will hand off to _egOnPuzzleComplete
+    // immediately after it starts the encounter.
+    if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel
+        && typeof _egOnPuzzleComplete === 'function'
+        && typeof _egIsActive === 'function' && !_egIsActive()) {
+        return;
+    }
+
 
     // Stop any active visual effects and freeze the game state
     if (typeof clearActiveRandomWalkers === "function") clearActiveRandomWalkers();

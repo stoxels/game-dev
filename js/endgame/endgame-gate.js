@@ -103,10 +103,10 @@ function _egBuildMapStashGridHTML() {
     return html;
 }
 
-// Assembles the gate panel: map device on top, then the runes & orbs row
-// (synchronized with the hub's currency strip — same _egCurrencyStash data),
-// and the map stash grid below. The maps label carries a legend hint for the
-// gold atlas-incomplete highlight (★ = region not yet cleared on the atlas).
+// Assembles the gate panel: Orbs & Shards on the left, Probability Gate
+// centered, and the map stash grid below. The maps label carries a legend
+// hint for the gold atlas-incomplete highlight. Orbs & Shards stays in sync
+// with the hub's currency strip via the shared _egCurrencyStash.
 function _egBuildGatePanelHTML() {
     const atlasHint = (typeof t === 'function' && t('eg_map_atlas_not_completed') !== 'eg_map_atlas_not_completed')
         ? t('eg_map_atlas_not_completed').replace(/^○\s*/, '★ ')
@@ -114,9 +114,16 @@ function _egBuildGatePanelHTML() {
     return `
 <div class="eg-panel eg-panel-map">
     <div class="eg-panel-label">${t('mg_gate_badge')}</div>
-    ${_egBuildMapDeviceHTML()}
-    <div class="eg-gate-currency-section">
-        ${_egBuildGateCurrencyStripHTML()}
+    <div class="eg-gate-main">
+        <div class="eg-gate-side eg-gate-side-left">
+            <div class="eg-gate-currency-section">
+                ${_egBuildGateCurrencyStripHTML()}
+            </div>
+        </div>
+        <div class="eg-gate-center">
+            ${_egBuildMapDeviceHTML()}
+        </div>
+        <div class="eg-gate-side eg-gate-side-right" aria-hidden="true"></div>
     </div>
     <div class="eg-map-stash-section">
         <div class="eg-panel-label" style="display:flex; align-items:center; gap:8px;">
@@ -657,10 +664,10 @@ function showEndgameGate(backFn) {
     else _egGateBackFn = 'showEndgameNexus';
     ensureEndgameGateScreen();
 
-    // Migrate old gate screens that were built without the atlas legend hint
-    // (added when atlas-incomplete highlighting was introduced).
+    // Migrate old gate screens that were built before the side-by-side
+    // layout (Orbs & Shards left of the gate) or before the atlas legend.
     const gateScreen = document.getElementById('screen-endgame-gate');
-    if (gateScreen && !gateScreen.querySelector('.eg-atlas-legend-hint')) {
+    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main'))) {
         gateScreen.innerHTML = _egBuildGateFullScreenHTML();
     }
     _egInjectAtlasHighlightStyles();

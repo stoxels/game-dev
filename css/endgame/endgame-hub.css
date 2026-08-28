@@ -636,6 +636,51 @@ Layout Architecture:
         cursor: not-allowed;
     }
 
+/* ── STASH HEADER CENTER INFO (overlay, never affects layout) ──
+   The message is absolutely centered inside the stash header. It overlays
+   the empty space between the "STASH" label and the action buttons without
+   pushing any sibling or changing the header's height. Text truncates or
+   wraps inside the overlay bounds but never expands the header. */
+.eg-stash-header {
+    position: relative;
+}
+
+.eg-stash-info {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: min(560px, 52%);
+    width: max-content;
+    text-align: center;
+    font-family: var(--PX, monospace);
+    font-size: 9px;
+    line-height: 1.35;
+    letter-spacing: 0.6px;
+    color: #ff6b6b;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    z-index: 2;
+    text-shadow: 0 0 4px rgba(0,0,0,0.85), 0 0 8px rgba(0,0,0,0.65);
+    user-select: none;
+}
+
+.eg-stash-info.show {
+    opacity: 1;
+}
+
+.eg-stash-info--error { color: #ff6b6b; }
+.eg-stash-info--warn  { color: #f5d98a; }
+.eg-stash-info--info  { color: #a0a0ff; }
+.eg-stash-info--success { color: #2ecc71; }
+
 /* ── BOTTOM PANEL: STASH (full width) ── */
 .eg-panel-inv {
     overflow: hidden;
@@ -1320,6 +1365,68 @@ img.eg-art-img {
 .eg-gate-body .eg-panel-map {
     width: min(1500px, 100%);
     border-right: none;
+    align-items: stretch;
+}
+
+/* ── GATE LAYOUT: Orbs & Shards left of centered Probability Gate ── */
+.eg-gate-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+    padding: 12px 16px 8px;
+    box-sizing: border-box;
+}
+
+.eg-gate-side {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.eg-gate-side-left {
+    justify-content: flex-end;
+}
+
+.eg-gate-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    max-width: 420px;
+    min-width: 240px;
+}
+
+.eg-gate-side-right {
+    /* empty spacer — same width as left so the gate stays visually centered */
+}
+
+#screen-endgame-gate .eg-gate-currency-section {
+    width: 100%;
+}
+
+#screen-endgame-gate .eg-gate-currency-section .eg-currency-strip {
+    width: 100%;
+    margin: 0 !important;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Responsive: stack vertically on narrow viewports */
+@media (max-width: 900px) {
+    .eg-gate-main {
+        flex-direction: column;
+        align-items: center;
+    }
+    .eg-gate-side {
+        width: min(340px, 100%);
+    }
+    .eg-gate-side-right {
+        display: none;
+    }
 }
 
 /* ── GATE SCREEN SCALE-UP ──
@@ -1365,11 +1472,7 @@ img.eg-art-img {
     letter-spacing: 3px;
 }
 
-/* Runes & orbs strip */
-#screen-endgame-gate .eg-currency-strip {
-    margin: 0 12px;
-}
-
+/* Runes & orbs strip — sizing inside the left-side panel */
 #screen-endgame-gate .eg-currency-row {
     gap: 4px;
     padding: 4px 12px 10px;

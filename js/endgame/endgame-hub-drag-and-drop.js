@@ -423,6 +423,9 @@ function _dndDrop(e) {
             // (endgame-requirements.js) and the slot type of the swapped-in item.
             const displaced = _egInventory[r][c];
             if (displaced && EG_SLOT_ACCEPTS[_dnd.sourceSlot] !== displaced.slotType) {
+                const msg = `⚠️ Cannot unequip ${_dnd.item.name || '?'} — ${displaced.name || '?'} does not fit there`;
+                if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+                else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
                 blocked = true;
             } else {
                 const gate = _egSimulateAndCheck(sim => {
@@ -511,6 +514,10 @@ function _dndDropOnEssenceCell(essenceCell) {
 function _dndDropOnEquipSlot(equipSlotEl) {
     const slotId = equipSlotEl.dataset.slotId;
     if (!slotId || !_dndSlotAcceptsItem(slotId)) {
+        const name = (_dnd.item && _dnd.item.name) || '?';
+        const msg = `⚠️ ${name} cannot go into that slot`;
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+        else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
         _dndShowRejectFlash(equipSlotEl);
         return false;
     }

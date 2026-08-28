@@ -609,7 +609,9 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     // maps or other non-equip items. Uniques are fixed by design and can
     // never be re-rolled.
     if (!item || item.category !== 'equip' || item.isUnique) {
-        showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
+        const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
+        showToast(msg);
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
             setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
@@ -620,7 +622,9 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
 
     const newItem = _egApplyEssenceCraft(item, def);
     if (!newItem) {
-        showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
+        const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
+        showToast(msg);
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         _egCancelEssenceUse(true);
         return;
     }
@@ -736,7 +740,9 @@ document.addEventListener('mousedown', function (e) {
     }
 
     if (!targetItem) {
-        showToast(t('eg_no_item_target'));
+        const msg = t('eg_no_item_target');
+        showToast(msg);
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         _egCancelEssenceUse(true);
         return;
     }

@@ -598,7 +598,7 @@ function _renderPlayerAvatar() {
         if (shouldShow !== isShowing) _egSetHoldEPauseVisual(shouldShow);
         else if (shouldShow && lbl) {
             // Ensure text stays translated if language was switched while held
-            const txt = (typeof t === 'function') ? t('eg_hold_paused') : '⏸ CHARGE PAUSED — release E';
+            const txt = (typeof t === 'function') ? t('eg_hold_paused') : 'FOCUSED';
             if (txt && lbl.textContent !== txt) lbl.textContent = txt;
         }
     }

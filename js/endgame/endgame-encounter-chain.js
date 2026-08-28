@@ -154,9 +154,11 @@ function _egOnPuzzleComplete() {
 
     // Don't queue another puzzle if the Blood Pact (or any other
     // damage) just killed the player — _egEndMapDefeated already shows
-    // the map-failed overlay.
-    if (typeof dead !== 'undefined' && dead) return;
+    // the map-failed overlay. Check _egIsActive (false after defeat) and
+    // player HP — do NOT check `dead` because checkWin() sets dead=true
+    // on every solved puzzle, not just on death.
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+    if (typeof playerCurrentHP !== 'undefined' && playerCurrentHP <= 0) return;
 
     // Boss arena chain: solving an arena puzzle while a boss is still alive
     // rolls straight into the next arena — no quiz interstitial here.
@@ -167,8 +169,8 @@ function _egOnPuzzleComplete() {
 
     // Always automatically chain to the next puzzle, the player needs to manually leave the chain
     setTimeout(() => {
-        if (typeof dead !== 'undefined' && dead) return;
         if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+        if (typeof playerCurrentHP !== 'undefined' && playerCurrentHP <= 0) return;
         _egStartChainCountdown();
     }, 800);
 }
@@ -241,8 +243,8 @@ function _egPickInterstitialWorldNum() {
 //------------------------------------------------------------------------
 
 function _egStartChainCountdown() {
-    if (typeof dead !== 'undefined' && dead) return;
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+    if (typeof playerCurrentHP !== 'undefined' && playerCurrentHP <= 0) return;
     // Show the interstitial question(s) first, then begin the 3-2-1 countdown.
     // The active map's "+# additional Quiz Questions per Puzzle" mod raises
     // how many questions must be answered between two puzzles.
@@ -296,8 +298,8 @@ function _egCancelChainCountdown() {
 //------------------------------------------------------------------------
 
 function _egLoadNextChainPuzzle() {
-    if (typeof dead !== 'undefined' && dead) return;
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+    if (typeof playerCurrentHP !== 'undefined' && playerCurrentHP <= 0) return;
     const nextGi = _egFindNextChainPuzzleGi();
     if (nextGi === null) {
         showToast(t('eg_no_more_puzzles'));
@@ -310,11 +312,11 @@ function _egLoadNextChainPuzzle() {
 
 // Core chain transition: swaps the current grid for the puzzle at nextGi,
  // carrying loot / currency / items / gold across and keeping monsters,
-// pickup spawner and tick loop alive. Shared by the regular puzzle chain
-// and the boss-arena chain.
+ // pickup spawner and tick loop alive. Shared by the regular puzzle chain
+ // and the boss-arena chain.
 function _egTransitionToChainPuzzle(nextGi, isBossArena) {
-    if (typeof dead !== 'undefined' && dead) return;
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+    if (typeof playerCurrentHP !== 'undefined' && playerCurrentHP <= 0) return;
     _egChainCurrentGi = nextGi;
     ALL[nextGi].isMonsterLevel = true;
     ALL[nextGi].isChainedPuzzle = true;

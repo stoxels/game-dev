@@ -579,8 +579,8 @@ function _egSetHoldEPauseVisual(isPaused) {
                 lbl.id = 'eg-hold-pause-label';
                 hud.appendChild(lbl);
             }
-            const txt = (typeof t === 'function') ? t('eg_hold_paused') : '⏸ CHARGE PAUSED — release E';
-            lbl.textContent = txt || '⏸ CHARGE PAUSED — release E';
+            const txt = (typeof t === 'function') ? t('eg_hold_paused') : 'FOCUSED';
+            lbl.textContent = txt || 'FOCUSED';
             lbl.style.display = '';
         } else if (lbl) {
             lbl.remove();

@@ -42,6 +42,28 @@ const EG_COOLDOWN_SURGE_REDUCTION_SECS = 30;
 
 
 
+// Helper: computes the effective heart heal amount after gear bonuses.
+// Gear provides two stats that modify heart healing:
+//   heartHealFlat   — flat +# added to every heart (e.g. "+15 to Heart Heal Amount")
+//   heartHealIncPct — #% increased Heart Heal Amount (multiplier on the total)
+// Formula: effective = (base + flat) * (1 + incPct/100), rounded and clamped to >=0.
+// This matches the stat descriptions ("additional Life" + "Increases the Life granted
+// by hearts by this percentage") and makes the belt-exclusive % multiplier scale
+// both the base heart value and any flat bonuses from other slots.
+function _egCalcHeartHeal(baseAmount) {
+    let flat = 0;
+    let incPct = 0;
+    if (typeof _egComputePlayerStats === 'function') {
+        try {
+            const s = _egComputePlayerStats();
+            flat = Number(s.heartHealFlat) || 0;
+            incPct = Number(s.heartHealIncPct) || 0;
+        } catch (e) { /* stats unavailable (e.g. outside endgame) — use base */ }
+    }
+    const total = (baseAmount + flat) * (1 + incPct / 100);
+    return Math.max(0, Math.round(total));
+}
+
 // Pickup definitions
 // Each entry describes one pickup type that can appear on grid tiles.
 //   id        — unique key, referenced by EG_PICKUP_WEIGHTS
@@ -56,7 +78,7 @@ const EG_PICKUP_DEFS = {
     heart_small: {
         id: 'heart_small', emoji: '💛', label: () => t('eg_pickup_heart_small'), rarity: 'common',
         onPickup(row, col) {
-            const heal = 10;
+            const heal = _egCalcHeartHeal(10);
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
             showToast(t('eg_pickup_heal_small').replace('{n}', heal), _egRarityToastColor(this.rarity));
@@ -66,7 +88,7 @@ const EG_PICKUP_DEFS = {
     heart_medium: {
         id: 'heart_medium', emoji: '🧡', label: () => t('eg_pickup_heart'), rarity: 'uncommon',
         onPickup(row, col) {
-            const heal = 25;
+            const heal = _egCalcHeartHeal(25);
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
             showToast(t('eg_pickup_heal_medium').replace('{n}', heal), _egRarityToastColor(this.rarity));
@@ -76,7 +98,7 @@ const EG_PICKUP_DEFS = {
     heart_large: {
         id: 'heart_large', emoji: '❤️', label: () => t('eg_pickup_heart_large'), rarity: 'rare',
         onPickup(row, col) {
-            const heal = 50;
+            const heal = _egCalcHeartHeal(50);
             playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
             _renderPlayerHealth();
             showToast(t('eg_pickup_heal_large').replace('{n}', heal), _egRarityToastColor(this.rarity));

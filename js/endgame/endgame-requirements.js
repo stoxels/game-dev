@@ -204,8 +204,9 @@ function _egGetUnmetRequirementsText(missing) {
 // being equipped/unequipped. For equips blocked by a chain-break (the swap
 // displaces an item whose bonuses other gear relies on) a dedicated message
 // explains that instead of the generic "missing" one.
+// Also mirrors the message into the stash center overlay (endgame-hub.js) so
+// the player sees WHY the action was blocked without having to catch a toast.
 function _egShowRequirementsToast(context, missing, item) {
-    if (typeof showToast !== 'function') return;
     const itemName = (item && item.name) || item || '?';
     const list = _egGetUnmetRequirementsText(missing);
     let msg;
@@ -220,7 +221,8 @@ function _egShowRequirementsToast(context, missing, item) {
             ? t('eg_cannot_unequip').replace('{name}', itemName).replace('{list}', list)
             : t('eg_cannot_equip').replace('{name}', itemName).replace('{list}', list);
     }
-    showToast(msg, '#e74c3c');
+    if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+    if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
 }
 
 

@@ -56,10 +56,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'flat_mana', value: 70, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
             { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' },
-            { key: 'inc_spell_damage', value: 25, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'inc_spell_damage', value: 25, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
         ],
         downsides: [
-            { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' },
+            { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' }
         ],
         flavorEn: 'A kingdom ruled in silence fell to a single shouted word.',
         flavorDe: 'Ein im Schweigen regiertes Königreich fiel einem einzigen Schrei zum Opfer.',
@@ -77,10 +77,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_leech', value: 5, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
             { key: 'life_on_kill', value: 10, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' },
-            { key: 'heart_heal', value: 15, en: '+# to Heart Heal Amount', de: '+# Herzheilung' },
+            { key: 'heart_heal', value: 15, en: '+# to Heart Heal Amount', de: '+# Herzheilung' }
         ],
         downsides: [
-            { key: 'flat_health', value: -30, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -54, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Every thread stitched shut with something that used to bleed.',
         flavorDe: 'Jeder Faden mit etwas vernäht, das einst blutete.',
@@ -98,9 +98,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'time_added', value: 45, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'focus', value: 20, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
+            { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'chance_for_new_question', value: -25, en: '-#% Chance to receive a new Question after failing', de: '-#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'chance_for_new_question', value: -35, en: '-#% Chance to receive a new Question after failing', de: '-#% Chance auf eine neue Frage nach einer falschen Antwort' }
         ],
         flavorEn: 'He saved every second he ever wasted. They saved him back.',
         flavorDe: 'Er bewahrte jede verschwendete Sekunde auf. Sie bewahrten ihn zurück.',
@@ -117,10 +118,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 12, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 45, en: '+#% to Critical Strike Multiplier', de: '+#% Kritischer Trefferschaden' },
-            { key: 'fire_damage_1', value: 8, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
+            { key: 'fire_damage_1', value: 8, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -25, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -32, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'It does not burn the wearer. It burns everyone near enough to matter.',
         flavorDe: 'Sie verbrennt nicht die Trägerin. Sie verbrennt alle, die nah genug sind, um zu zählen.',
@@ -139,11 +140,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'block_recovery', value: 60, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
             { key: 'spell_block_chance', value: 10, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' },
-            { key: 'grounded_1', value: 25, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
+            { key: 'grounded_1', value: 25, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
-            { key: 'dodge', value: -6, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'dodge', value: -13, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'The wall held. The kingdom behind it did not.',
         flavorDe: 'Die Mauer hielt. Das Königreich dahinter nicht.',
@@ -161,10 +162,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 12, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 12, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
-            { key: 'faster_absorption_regen_start', value: 4, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 4, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
-            { key: 'flat_health', value: -45, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Lightning never strikes the same feet twice.',
         flavorDe: 'Blitz schlägt nie zweimal in dieselben Füße.',
@@ -182,9 +183,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_physical_damage', value: 55, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'life_leech', value: 4, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'accuracy', value: -30, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -48, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'It feeds whether or not you hit. It simply prefers it when you do.',
         flavorDe: 'Sie frisst, ob du trifft oder nicht. Es schmeckt nur besser, wenn du trifft.',
@@ -201,9 +203,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'multishot', value: 30, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'pierce', value: 35, en: '#% chance for Projectiles to Pierce Monsters', de: '#% Chance, dass Projektile Monster durchbohren' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'pushback', value: -1, en: '-#s Charge Pushback on hit', de: '-#s Angriffslade-Rückstoß bei Treffern' },
+            { key: 'pushback', value: -2, en: '-#s Charge Pushback on hit', de: '-#s Angriffslade-Rückstoß bei Treffern' }
         ],
         flavorEn: 'The shot arrives before the silence it broke.',
         flavorDe: 'Der Schuss kommt an, bevor die Stille ankommt, die er brach.',
@@ -221,9 +224,10 @@ const EG_UNIQUE_ITEMS = [
             { key: 'fate', value: 20, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'reveal_hint', value: 15, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
             { key: 'chance_for_new_question', value: 20, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'time_added', value: -30, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -42, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'The odds are always in your favor. Never ask whose favor.',
         flavorDe: 'Die Quoten stehen immer zu deinen Gunsten. Frage nie, wessen Gunsten.',
@@ -242,9 +246,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'warding', value: 120, en: '+# Warding', de: '+# Wardschutz' },
             { key: 'grounded_1', value: 25, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
             { key: 'absorption_on_kill', value: 6, en: '+# Absorption gained on Kill', de: '+# Absorption bei jedem Kill' },
+            { key: 'flat_health', value: 75, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'crit_chance', value: -8, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'crit_chance', value: -18, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Forged for a war that ended before sunrise. It still refuses to fall.',
         flavorDe: 'Geschmiedet für einen Krieg, der vor Sonnenaufgang endete. Es weigert sich bis heute zu fallen.',
@@ -261,11 +267,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mana_to_damage', value: 18, en: '#% of Mana converted to Damage', de: '#% des Manas in Schaden umgewandelt' },
             { key: 'echo_1', value: 15, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
-            { key: 'echo_2', value: 30, en: 'Echoes deal #% of the original damage', de: 'Echos verursachen #% des ursprünglichen Schadens' },
+            { key: 'echo_2', value: 30, en: 'Echoes deal #% of the original damage', de: 'Echos verursachen #% des ursprünglichen Schadens' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -40, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
-            { key: 'mana_regen', value: -2, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' },
+            { key: 'flat_mana', value: -56, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'mana_regen', value: -4.4, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' }
         ],
         flavorEn: 'It gave everything, and took exactly what it was owed.',
         flavorDe: 'Er gab alles und nahm genau, was ihm zustand.',
@@ -282,9 +288,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'time_added', value: 75, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'first_step', value: 3, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'flat_health', value: 47, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' },
+            { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' }
         ],
         flavorEn: 'All the time in the world — for someone who never makes mistakes.',
         flavorDe: 'Unendlich viel Zeit – für jemanden, der niemals Fehler macht.',
@@ -301,10 +309,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_blind', value: 15, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
             { key: 'chance_to_convert', value: 8, en: '#% chance to Convert Monsters on kill', de: '#% Chance, Monster bei Kills zu konvertieren' },
-            { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
         ],
         downsides: [
-            { key: 'intelligence', value: -15, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -26, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'It listens back.',
         flavorDe: 'Es hört mit.',
@@ -324,10 +332,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fate', value: 10, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'reveal_hint', value: 10, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
-            { key: 'chance_for_new_question', value: 10, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'chance_for_new_question', value: 10, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' }
         ],
         downsides: [
-            { key: 'flat_health', value: -10, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -28, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Plant it, and probability grows.',
         flavorDe: 'Pflanze sie ein, und die Wahrscheinlichkeit wächst.',
@@ -342,10 +350,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 6, str: 0, agi: 23, int: 0 },
         bonuses: [
             { key: 'splash_damage', value: 25, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
-            { key: 'multishot', value: 15, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
+            { key: 'multishot', value: 15, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' }
         ],
         downsides: [
-            { key: 'accuracy', value: -15, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -33, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Point it generally at the problem.',
         flavorDe: 'Ziele damit ungefähr auf das Problem.',
@@ -360,9 +368,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 4, str: 0, agi: 0, int: 15 },
         bonuses: [
             { key: 'chance_for_new_question', value: 30, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'flat_health', value: 22, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'intelligence', value: -8, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -18, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'It never learned to ring true — only to ring again.',
         flavorDe: 'Sie lernte nie, rein zu läuten – nur erneut zu läuten.',
@@ -378,10 +387,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 45, absorption: 0 },
         bonuses: [
             { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
-            { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
-            { key: 'flat_health', value: -15, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -33, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Every patch was sewn on somewhere far from home.',
         flavorDe: 'Jeder Flicken wurde irgendwo fern der Heimat aufgenäht.',
@@ -397,10 +406,10 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 38, max: 76 }, attackIntervalSeconds: 6.4,
         bonuses: [
             { key: 'overkill', value: 25, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
-            { key: 'life_on_kill', value: 5, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' },
+            { key: 'life_on_kill', value: 5, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' }
         ],
         downsides: [
-            { key: 'life_regen', value: -1, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -2.2, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' }
         ],
         flavorEn: 'It remembers the shop. It misses the shop.',
         flavorDe: 'Es erinnert sich an den Laden. Es vermisst den Laden.',
@@ -415,10 +424,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 10, str: 0, agi: 0, int: 38 },
         bonuses: [
             { key: 'spell_damage', value: 15, en: '+# Spell Damage', de: '+# Zauberschaden' },
-            { key: 'inc_spell_damage', value: 15, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'inc_spell_damage', value: 15, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -25, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -42, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Half the spells are illegible. The other half are better for it.',
         flavorDe: 'Die Hälfte der Zauber ist unlesbar. Die andere Hälfte ist besser so.',
@@ -434,9 +443,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 130, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'mistake_not_count', value: 15, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht gezählt werden' },
+            { key: 'flat_health', value: 21, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'time_added', value: -15, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -26, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'Built for students who learn best by failing safely.',
         flavorDe: 'Gebaut für Schüler, die am besten lernen, indem sie sicher scheitern.',
@@ -452,10 +462,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 40, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' },
-            { key: 'heart_heal', value: 10, en: '+# to Heart Heal Amount', de: '+# Herzheilung' },
+            { key: 'heart_heal', value: 10, en: '+# to Heart Heal Amount', de: '+# Herzheilung' }
         ],
         downsides: [
-            { key: 'intelligence', value: -8, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -18, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'Six calluses per finger. Do not ask how.',
         flavorDe: 'Sechs Schwiizen pro Finger. Frag nicht wie.',
@@ -470,10 +480,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 6, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'flat_health', value: 25, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
-            { key: 'mana_on_mistake', value: 5, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' },
+            { key: 'mana_on_mistake', value: 5, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' }
         ],
         downsides: [
-            { key: 'focus', value: -10, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -17, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'Previous owner: unknown. Regrets: included.',
         flavorDe: 'Vorheriger Besitzer: unbekannt. Reue: inklusive.',
@@ -493,10 +503,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'cold_damage_1', value: 10, en: 'Adds # Cold Damage to Attacks', de: 'Fügt Angriffen # Kälteschaden hinzu' },
             { key: 'cold_damage_2', value: 18, en: 'Adds # Cold Damage to Attacks', de: 'Fügt Angriffen # Kälteschaden hinzu' },
-            { key: 'chance_to_freeze', value: 12, en: '#% chance to Freeze Monsters on hit', de: '#% Chance, Monster bei Treffern einzufrieren' },
+            { key: 'chance_to_freeze', value: 12, en: '#% chance to Freeze Monsters on hit', de: '#% Chance, Monster bei Treffern einzufrieren' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -20, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -30, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
         ],
         flavorEn: 'Winter does not negotiate. It takes a finger as toll.',
         flavorDe: 'Der Winter verhandelt nicht. Er nimmt einen Finger als Maut.',
@@ -513,10 +523,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'first_step', value: 2, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
-            { key: 'lightning_damage_1', value: 6, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
+            { key: 'lightning_damage_1', value: 6, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' }
         ],
         downsides: [
-            { key: 'lightning_resist', value: -25, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' },
+            { key: 'lightning_resist', value: -32, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' }
         ],
         flavorEn: 'Each stride lands a heartbeat early.',
         flavorDe: 'Jeder Schritt landet einen Herzschlag zu früh.',
@@ -532,9 +542,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_on_kill', value: 8, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' },
             { key: 'mana_on_kill', value: 8, en: '+# Mana gained on Kill', de: '+# Mana bei jedem Kill' },
+            { key: 'flat_health', value: 33, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'life_regen', value: -2, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -4.4, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' }
         ],
         flavorEn: 'It only beats when something else stops.',
         flavorDe: 'Es schlägt nur, wenn etwas anderes aufhört.',
@@ -551,9 +562,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'grounded_1', value: 20, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
             { key: 'stagger', value: 25, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'flat_health', value: 45, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'crit_chance', value: -6, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'crit_chance', value: -13, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' }
         ],
         flavorEn: 'Mountains envy them.',
         flavorDe: 'Berge beneiden sie.',
@@ -569,9 +581,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'chance_to_blind', value: 12, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
+            { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_health', value: -25, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -55, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Worn openly. That was the warning.',
         flavorDe: 'Offen zur Schau getragen. Das war die Warnung.',
@@ -589,9 +602,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_block_chance', value: 12, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' },
             { key: 'spell_dodge', value: 8, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
+            { key: 'flat_health', value: 42, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'cleave', value: -20, en: '-#% chance to Cleave nearby Monsters', de: '-#% Chance, nahe Monster zu spalten' },
+            { key: 'cleave', value: -32, en: '-#% chance to Cleave nearby Monsters', de: '-#% Chance, nahe Monster zu spalten' }
         ],
         flavorEn: 'Hungry for hexes. Allergic to crowds.',
         flavorDe: 'Hungrig nach Flüchen. Allergisch gegen Menschenmengen.',
@@ -608,9 +622,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'intelligence', value: 15, en: '+# to Intelligence', de: '+# zu Intelligenz' },
             { key: 'reveal_hint', value: 12, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'fire_resist', value: 20, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' }
         ],
         downsides: [
-            { key: 'flat_health', value: -40, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -72, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Proof left as exercise for the wearer.',
         flavorDe: 'Der Beweis bleibt dem Träger als Übung überlassen.',
@@ -626,10 +641,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'lightning_damage_1', value: 8, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
             { key: 'lightning_damage_2', value: 14, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
-            { key: 'chance_to_shock', value: 10, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' },
+            { key: 'chance_to_shock', value: 10, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' }
         ],
         downsides: [
-            { key: 'lightning_resist', value: -20, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' },
+            { key: 'lightning_resist', value: -30, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' }
         ],
         flavorEn: 'Rub it on a cat on a dry day. Or do not.',
         flavorDe: 'Reibe ihn an einer Katze an einem trockenen Tag. Oder lieber nicht.',
@@ -645,9 +660,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'snipe', value: 30, en: '#% chance for Projectiles to Snipe (double damage)', de: '#% Chance auf Sniping (doppelter Schaden)' },
             { key: 'accuracy', value: 25, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'multishot', value: -15, en: '-#% chance to fire an additional Projectile', de: '-#% Chance auf ein zusätzliches Projektil' },
+            { key: 'multishot', value: -24, en: '-#% chance to fire an additional Projectile', de: '-#% Chance auf ein zusätzliches Projektil' }
         ],
         flavorEn: 'One shot. One breath. One everything.',
         flavorDe: 'Ein Schuss. Ein Atemzug. Ein alles.',
@@ -664,9 +680,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'attack_speed', value: 2, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
             { key: 'channel_1', value: 3, en: '+# Channel Damage per Stack', de: '+# Kanalisierungsschaden pro Stapel' },
+            { key: 'flat_health', value: 43, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'inc_heart_heal', value: -25, en: '-#% increased Heart Heal Amount', de: '-#% verringerte Herzheilung' },
+            { key: 'inc_heart_heal', value: -34, en: '-#% increased Heart Heal Amount', de: '-#% verringerte Herzheilung' }
         ],
         flavorEn: 'Discipline heals all wounds. Eventually.',
         flavorDe: 'Disziplin heilt alle Wunden. Irgendwann.',
@@ -687,9 +704,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'spell_damage', value: 60, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'inc_spell_damage', value: 40, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
             { key: 'chance_to_freeze', value: 10, en: '#% chance to Freeze Monsters on hit', de: '#% Chance, Monster bei Treffern einzufrieren' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -60, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -72, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_health', value: -45, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Cold enough that even entropy slows down to look.',
         flavorDe: 'So kalt, dass selbst die Entropie innehält, um hinzusehen.',
@@ -706,9 +725,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 60, en: '+#% to Critical Strike Multiplier', de: '+#% Kritischer Trefferschaden' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'life_leech', value: 2, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' }
         ],
         downsides: [
-            { key: 'flat_health', value: -80, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -100, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Something divine broke here. The fragments kept swinging.',
         flavorDe: 'Hier zerbrach etwas Göttliches. Die Splitter schlagen weiter zu.',
@@ -726,9 +748,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'flat_health', value: 120, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'absorption_regen_rate', value: 30, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
             { key: 'absorption_on_kill', value: 8, en: '+# Absorption gained on Kill', de: '+# Absorption bei jedem Kill' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'dodge', value: -10, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -17, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Too vast to move. It simply endures, and the sea rearranges.',
         flavorDe: 'Zu gewaltig, um sich zu bewegen. Es hält einfach stand, und das Meer ordnet sich neu.',
@@ -747,10 +771,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'cold_resist', value: 15, en: '+#% to Cold Resistance', de: '+#% Kältewiderstand' },
             { key: 'lightning_resist', value: 15, en: '+#% to Lightning Resistance', de: '+#% Blitzwiderstand' },
             { key: 'shadow_resist', value: 15, en: '+#% to Shadow Resistance', de: '+#% Schattenwiderstand' },
-            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
             { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' },
+            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Forged in the last light of a dying constellation.',
         flavorDe: 'Geschmiedet im letzten Licht eines sterbenden Sternbildes.',
@@ -767,9 +792,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_physical_damage', value: 85, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'stagger', value: 30, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'flat_health', value: 85, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -40, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -54, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'The map is not drawn to scale. Neither is this.',
         flavorDe: 'Die Karte ist nicht maßstabsgetreu. Das hier auch nicht.',
@@ -786,9 +814,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_dodge', value: 15, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
             { key: 'arcane_resistance', value: 25, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
+            { key: 'flat_health', value: 67, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'block_chance', value: -10, en: '-#% Block Chance', de: '-#% Blockchance' },
+            { key: 'block_chance', value: -17, en: '-#% Block Chance', de: '-#% Blockchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Between you and the spell: a rumor of fabric.',
         flavorDe: 'Zwischen dir und dem Zauber: ein Gerücht aus Stoff.',
@@ -805,9 +836,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'chance_to_ignite', value: 25, en: '#% chance to Ignite Monsters on hit', de: '#% Chance, Monster bei Treffern zu entzünden' },
             { key: 'fire_damage_1', value: 25, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'inc_heart_heal', value: 30, en: '#% increased Heart Heal Amount', de: '#% erhöhte Herzheilung' },
+            { key: 'flat_health', value: 75, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -30, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -39, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Ash remembers being glorious.',
         flavorDe: 'Asche erinnert sich daran, glorreich gewesen zu sein.',
@@ -824,9 +857,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'grounded_2', value: 40, en: '#% reduced effect of being Grounded', de: '#% reduzierter Effekt des Bodenstoßes' },
             { key: 'flat_health', value: 100, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'The titan is no longer with us. The hide did not notice.',
         flavorDe: 'Der Titan ist nicht mehr unter uns. Die Haut hat es nicht bemerkt.',
@@ -843,9 +879,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'first_step', value: 4, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
             { key: 'time_added', value: 40, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'preemptive_dodge', value: 20, en: '#% chance to preemptively Dodge incoming Attacks', de: '#% Chance, Angriffen präventiv auszuweichen' },
+            { key: 'flat_health', value: 97, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'life_regen', value: -3, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -7, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'You have all the time in the world. You pay for it in heartbeats.',
         flavorDe: 'Du hast alle Zeit der Welt. Bezahlt wird sie in Herzschlägen.',
@@ -861,9 +899,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fate', value: 35, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'overkill', value: 30, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'flat_health', value: 88, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 70, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'reveal_hint', value: -20, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'reveal_hint', value: -28, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Flip it. Fate has already called it.',
         flavorDe: 'Wirf sie. Das Schicksal hat längst gerufen.',
@@ -882,9 +923,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'block_recovery', value: 80, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
             { key: 'spell_block_chance', value: 15, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' },
             { key: 'warding', value: 200, en: '+# Warding', de: '+# Wardschutz' },
+            { key: 'flat_health', value: 90, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -3, en: 'Melee Strikes occur 3s slower', de: 'Nahkampfschläge erfolgen 3s langsamer' },
+            { key: 'attack_speed', value: -3.9, en: 'Melee Strikes occur 3s slower', de: 'Nahkampfschläge erfolgen 3s langsamer' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Behind this, even prayers take a number.',
         flavorDe: 'Dahinter nehmen sogar Gebete eine Nummer.',
@@ -904,10 +947,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 70, absorption: 0 },
         bonuses: [
             { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
-            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
-            { key: 'flat_health', value: -12, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -34, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'The moths ate the warmth and left the shadows.',
         flavorDe: 'Die Motten fraßen die Wärme und ließen die Schatten zurück.',
@@ -925,9 +968,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'block_recovery', value: 30, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
+            { key: 'block_chance', value: 6, en: '+#% Block Chance', de: '+#% Blockchance' }
         ],
         downsides: [
-            { key: 'flat_health', value: -20, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -44, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Every dent is a lesson. Most were learned the hard way.',
         flavorDe: 'Jede Beule ist eine Lektion. Die meisten wurden auf die harte Tour gelernt.',
@@ -943,9 +987,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'reveal_hint', value: 12, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
             { key: 'heart_heal', value: 12, en: '+# to Heart Heal Amount', de: '+# Herzheilung' },
+            { key: 'flat_health', value: 22, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'intelligence', value: -10, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -17, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'She memorized everything except how to think for herself.',
         flavorDe: 'Sie memorierte alles – außer, wie man selbst denkt.',
@@ -962,9 +1007,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_ignite', value: 15, en: '#% chance to Ignite Monsters on hit', de: '#% Chance, Monster bei Treffern zu entzünden' },
             { key: 'fire_damage_1', value: 6, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
+            { key: 'flat_health', value: 18, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -15, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -22, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
         ],
         flavorEn: 'One spark is an accident. A hundred are a hobby.',
         flavorDe: 'Ein Funke ist ein Unfall. Hundert sind ein Hobby.',
@@ -981,9 +1027,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'intelligence', value: 12, en: '+# to Intelligence', de: '+# zu Intelligenz' },
             { key: 'mana_regen', value: 2, en: '+# Mana regenerated per 5s', de: '+# Mana-Regeneration pro 5s' },
+            { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'strength', value: -10, en: '-# to Strength', de: '-# zu Stärke' },
+            { key: 'strength', value: -17, en: '-# to Strength', de: '-# zu Stärke' }
         ],
         flavorEn: 'Padded for long hours in a chair, not on a battlefield.',
         flavorDe: 'Gepolstert für lange Stunden im Stuhl, nicht auf dem Schlachtfeld.',
@@ -1000,10 +1047,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fire_damage_1', value: 8, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'fire_damage_2', value: 14, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
-            { key: 'chance_to_ignite', value: 10, en: '#% chance to Ignite Monsters on hit', de: '#% Chance, Monster bei Treffern zu entzünden' },
+            { key: 'chance_to_ignite', value: 10, en: '#% chance to Ignite Monsters on hit', de: '#% Chance, Monster bei Treffern zu entzünden' }
         ],
         downsides: [
-            { key: 'mana_regen', value: -2, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' },
+            { key: 'mana_regen', value: -4.4, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' }
         ],
         flavorEn: 'It starts fires faster than it starts arguments. Barely.',
         flavorDe: 'Es legt Brände schneller als Streitigkeiten. Knapp.',
@@ -1019,9 +1066,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 130, absorption: 0 },
         bonuses: [
             { key: 'mistake_not_count', value: 20, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht gezählt werden' },
+            { key: 'flat_health', value: 32, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'intelligence', value: 10, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'reveal_hint', value: -15, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'reveal_hint', value: -26, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' }
         ],
         flavorEn: 'It whispers: are you sure? — every single time.',
         flavorDe: 'Es flüstert: Bist du sicher? – jedes einzelne Mal.',
@@ -1038,9 +1087,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mana_on_mistake', value: 6, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' },
             { key: 'life_on_kill', value: 4, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' },
+            { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'focus', value: -12, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -20, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'Every vial solves one problem and leaks another.',
         flavorDe: 'Jedes Fläschchen löst ein Problem und leckt ein anderes.',
@@ -1057,9 +1107,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'first_step', value: 3, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
             { key: 'preemptive_dodge', value: 15, en: '#% chance to preemptively Dodge incoming Attacks', de: '#% Chance, Angriffen präventiv auszuweichen' },
+            { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'faster_absorption_regen_start', value: -4, en: '#s slower start of Absorption Regeneration', de: '#s langsamerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: -8, en: '#s slower start of Absorption Regeneration', de: '#s langsamerer Start der Absorptionsregeneration' }
         ],
         flavorEn: 'You arrive before you leave. The monsters noticed.',
         flavorDe: 'Du kommst an, bevor du gehst. Die Monster haben es bemerkt.',
@@ -1074,9 +1125,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 32, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'fate', value: 25, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
+            { key: 'flat_health', value: 42, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'reveal_hint', value: -15, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'reveal_hint', value: -26, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' }
         ],
         flavorEn: 'It was lucky for exactly one of the two of them.',
         flavorDe: 'Glück gebracht hat es genau einem von beiden.',
@@ -1092,9 +1145,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'multishot', value: 20, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'splash_damage', value: 20, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
+            { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'accuracy', value: -20, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -44, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Aiming optional. Splinters go everywhere anyway.',
         flavorDe: 'Zielen optional. Splitter fliegen ohnehin überallhin.',
@@ -1111,9 +1165,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'attack_speed', value: 2, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'flat_health', value: 47, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -60, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Conviction burns bright. And fast. And briefly.',
         flavorDe: 'Überzeugung brennt hell. Und schnell. Und kurz.',
@@ -1131,9 +1186,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'shield_bash_1', value: 20, en: '+#% chance to Bash with your Shield on Block', de: '+#% Chance auf Schildbash bei Block' },
             { key: 'shield_bash_2', value: 60, en: '+# Shield Bash Damage', de: '+# Schildbash-Schaden' },
+            { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' }
         ],
         flavorEn: 'The best answer to every question is a wall to the face.',
         flavorDe: 'Die beste Antwort auf jede Frage ist eine Wand ins Gesicht.',
@@ -1149,10 +1205,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fire_damage_1', value: 12, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'cold_damage_1', value: 12, en: 'Adds # Cold Damage to Attacks', de: 'Fügt Angriffen # Kälteschaden hinzu' },
-            { key: 'lightning_damage_1', value: 12, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
+            { key: 'lightning_damage_1', value: 12, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -40, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -56, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'White light entered. Commitment issues remained.',
         flavorDe: 'Weißes Licht trat ein. Bindungsprobleme blieben zurück.',
@@ -1167,9 +1223,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 44, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'time_added', value: 35, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
+            { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'first_step', value: -2, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: -4.4, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' }
         ],
         flavorEn: 'The seconds come from somewhere. Somewhere has teeth.',
         flavorDe: 'Die Sekunden kommen von irgendwoher. Dort drüben hat es Zähne.',
@@ -1186,9 +1244,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'absorption_on_kill', value: 10, en: '+# Absorption gained on Kill', de: '+# Absorption bei jedem Kill' },
             { key: 'absorption_regen_rate', value: 25, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
+            { key: 'flat_health', value: 46, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'inc_armour', value: 35, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'life_regen', value: -3, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -7, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' }
         ],
         flavorEn: 'Draw from it too often and you forget which layer is really you.',
         flavorDe: 'Schöpfe zu oft, und du vergisst, welche Schicht wirklich du bist.',
@@ -1205,9 +1265,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'intelligence', value: 18, en: '+# to Intelligence', de: '+# zu Intelligenz' },
             { key: 'chance_for_new_question', value: 15, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'flat_health', value: 48, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'fire_resist', value: 20, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' }
         ],
         downsides: [
-            { key: 'time_added', value: -25, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -35, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'There is always one more chapter. Always.',
         flavorDe: 'Es gibt immer noch ein Kapitel. Immer.',
@@ -1223,9 +1285,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_convert', value: 15, en: '#% chance to Convert Monsters on kill', de: '#% Chance, Monster bei Kills zu konvertieren' },
             { key: 'chance_to_blind', value: 10, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
+            { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'shadow_resist', value: -20, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'shadow_resist', value: -30, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' }
         ],
         flavorEn: 'Carved from someone who talked too much. It still does.',
         flavorDe: 'Geschnitzt aus jemandem, der zu viel geredet hat. Tut er immer noch.',
@@ -1242,9 +1306,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
             { key: 'grounded_1', value: 25, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
+            { key: 'flat_health', value: 71, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_armour', value: 90, en: '+# to Armour', de: '+# zu Rüstung' }
         ],
         downsides: [
-            { key: 'agility', value: -15, en: '-# to Agility', de: '-# zu Beweglichkeit' },
+            { key: 'agility', value: -26, en: '-# to Agility', de: '-# zu Beweglichkeit' }
         ],
         flavorEn: 'The world weighs less than it used to. You weigh more.',
         flavorDe: 'Die Welt wiegt weniger als früher. Du wiegst mehr.',
@@ -1260,9 +1326,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'echo_1', value: 20, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
             { key: 'echo_2', value: 40, en: 'Echoes deal #% of the original damage', de: 'Echos verursachen #% des ursprünglichen Schadens' },
+            { key: 'flat_health', value: 72, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -45, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -63, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Everything you say comes back. Nothing you hear is yours.',
         flavorDe: 'Alles, was du sagst, kehrt zurück. Nichts, was du hörst, ist dein.',
@@ -1280,9 +1348,10 @@ const EG_UNIQUE_ITEMS = [
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 10, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
             { key: 'arcane_resistance', value: 20, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
+            { key: 'flat_health', value: 73, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'focus', value: -15, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -26, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'Head in the clouds. Feet anywhere at all.',
         flavorDe: 'Kopf in den Wolken. Füße irgendwo.',
@@ -1298,9 +1367,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'reveal_hint', value: 20, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
             { key: 'chance_for_new_question', value: 15, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'flat_health', value: 76, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'time_added', value: -35, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -49, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'It always points the right way. Never the short way.',
         flavorDe: 'Er zeigt immer den richtigen Weg. Nie den kurzen.',
@@ -1316,9 +1388,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chain', value: 30, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
             { key: 'overkill', value: 20, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'pushback', value: -0.8, en: '-#s Charge Pushback on hit', de: '-#s Angriffslade-Rückstoß bei Treffern' },
+            { key: 'pushback', value: -1.6, en: '-#s Charge Pushback on hit', de: '-#s Angriffslade-Rückstoß bei Treffern' },
+            { key: 'flat_health', value: -45, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Fired once a year, from very far away, at something that earned it.',
         flavorDe: 'Einmal im Jahr abgefeuert, von sehr weit weg, auf etwas, das es verdient hat.',
@@ -1335,9 +1410,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'stagger', value: 20, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'grounded_1', value: 20, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
+            { key: 'flat_health', value: 66, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'life_regen', value: 4, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' }
         ],
         downsides: [
-            { key: 'life_leech', value: -3, en: '-#% of Damage Dealt Leeched as Life', de: '-#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'life_leech', value: -6, en: '-#% of Damage Dealt Leeched as Life', de: '-#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Safe inside. Unfriendly everywhere else, including accidentally.',
         flavorDe: 'Innen sicher. Überall sonst unfreundlich – auch versehentlich.',
@@ -1354,9 +1432,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_damage', value: 30, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'inc_spell_damage', value: 25, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'flat_health', value: 68, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'intelligence', value: -20, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -28, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'The runes do the thinking. You just wear them.',
         flavorDe: 'Die Runen übernehmen das Denken. Du trägst sie nur.',
@@ -1372,9 +1453,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_blind', value: 20, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
             { key: 'chance_to_convert', value: 12, en: '#% chance to Convert Monsters on kill', de: '#% Chance, Monster bei Kills zu konvertieren' },
+            { key: 'flat_health', value: 69, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'shadow_resist', value: -25, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'shadow_resist', value: -32, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'None of them are wearing their original expressions.',
         flavorDe: 'Keines trägt mehr seinen ursprünglichen Ausdruck.',
@@ -1391,9 +1475,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'strength', value: 25, en: '+# to Strength', de: '+# zu Stärke' },
             { key: 'flat_health', value: 80, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' },
+            { key: 'absorption_regen_rate', value: 15, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -60, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -72, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Quenched in magma, tempered by stubbornness.',
         flavorDe: 'In Magma gelöscht, durch Sturheit gehärtet.',
@@ -1410,9 +1497,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'stagger', value: 35, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'cleave', value: 40, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
+            { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'accuracy', value: -25, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -40, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'It announces your position to everything within a valley.',
         flavorDe: 'Es meldet deine Position an alles innerhalb eines Tals.',
@@ -1428,9 +1518,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mana_to_damage', value: 25, en: '#% of Mana converted to Damage', de: '#% des Manas in Schaden umgewandelt' },
             { key: 'mana_regen', value: 4, en: '+# Mana regenerated per 5s', de: '+# Mana-Regeneration pro 5s' },
+            { key: 'inc_spell_damage', value: 40, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -80, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -96, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'It runs perfectly. Forever. As long as you never stop feeding it.',
         flavorDe: 'Es läuft perfekt. Für immer. Solange du nie aufhörst, es zu füttern.',
@@ -1447,9 +1540,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'grounded_2', value: 50, en: '#% reduced effect of being Grounded', de: '#% reduzierter Effekt des Bodenstoßes' },
             { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' },
+            { key: 'flat_health', value: 99, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 26, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'dodge', value: -12, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -20, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'They held that hill. They intend to hold yours, too.',
         flavorDe: 'Sie hielten jenen Hügel. Sie haben vor, deinen auch zu halten.',
@@ -1469,10 +1565,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 2, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'first_step', value: 2, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
-            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
-            { key: 'time_added', value: -120, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -45, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'Small stones begin small avalanches. Eventually.',
         flavorDe: 'Kleine Steine starten kleine Lawinen. Irgendwann.',
@@ -1488,9 +1584,10 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 7, max: 15 }, attackIntervalSeconds: 5.0,
         bonuses: [
             { key: 'chance_to_ignite', value: 12, en: '#% chance to Ignite Monsters on hit', de: '#% Chance, Monster bei Treffern zu entzünden' },
+            { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -10, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -20, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
         ],
         flavorEn: 'Half torch. All temper.',
         flavorDe: 'Halbe Fackel. Ganz Laune.',
@@ -1505,10 +1602,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 5, str: 0, agi: 0, int: 19 },
         bonuses: [
             { key: 'absorption_regen_rate', value: 20, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
-            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
-            { key: 'flat_health', value: -10, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -28, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Pop it, and it forgives you. Mostly.',
         flavorDe: 'Platze sie, und sie vergibt dir. Meistens.',
@@ -1523,9 +1620,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 7, str: 27, agi: 0, int: 0 },
         bonuses: [
             { key: 'strength', value: 8, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_health', value: 20, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'agility', value: -8, en: '-# to Agility', de: '-# zu Beweglichkeit' },
+            { key: 'agility', value: -18, en: '-# to Agility', de: '-# zu Beweglichkeit' }
         ],
         flavorEn: 'Slow is smooth. Smooth is eventually strong.',
         flavorDe: 'Langsam ist geschmeidig. Geschmeidig ist irgendwann stark.',
@@ -1540,9 +1638,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 8, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'flat_health', value: 21, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -10, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -30, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Sharp edges, dull eyes.',
         flavorDe: 'Scharfe Klingen, trübe Augen.',
@@ -1557,9 +1656,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 9, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'reveal_hint', value: 15, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'flat_health', value: 22, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'fate', value: -10, en: '-#% increased Fate', de: '-#% erhöhtes Schicksal' },
+            { key: 'fate', value: -17, en: '-#% increased Fate', de: '-#% erhöhtes Schicksal' }
         ],
         flavorEn: 'Chewed through every exam. Luck ran out somewhere around question two.',
         flavorDe: 'Durch jede Prüfung gekaut. Das Glück endete etwa bei Frage zwei.',
@@ -1574,10 +1674,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 11, str: 0, agi: 42, int: 0 },
         bonuses: [
             { key: 'life_regen', value: 2, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
-            { key: 'heart_heal', value: 8, en: '+# to Heart Heal Amount', de: '+# Herzheilung' },
+            { key: 'heart_heal', value: 8, en: '+# to Heart Heal Amount', de: '+# Herzheilung' }
         ],
         downsides: [
-            { key: 'life_on_kill', value: -5, en: '-# Life gained on Kill', de: '-# Leben bei jedem Kill' },
+            { key: 'life_on_kill', value: -10, en: '-# Life gained on Kill', de: '-# Leben bei jedem Kill' }
         ],
         flavorEn: 'Healing hands, borrowed patience.',
         flavorDe: 'Heilende Hände, geliehene Geduld.',
@@ -1592,10 +1692,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 12, str: 0, agi: 0, int: 46 },
         bonuses: [
             { key: 'spell_damage', value: 10, en: '+# Spell Damage', de: '+# Zauberschaden' },
-            { key: 'chance_for_new_question', value: 12, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'chance_for_new_question', value: 12, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -20, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -44, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Every ending was rewritten by someone who hated it.',
         flavorDe: 'Jedes Ende wurde von jemandem umgeschrieben, der es hasste.',
@@ -1612,9 +1712,11 @@ const EG_UNIQUE_ITEMS = [
         blockChance: 16,
         bonuses: [
             { key: 'spell_block_chance', value: 8, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' },
+            { key: 'flat_health', value: 22, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 6, en: '+#% Block Chance', de: '+#% Blockchance' }
         ],
         downsides: [
-            { key: 'block_recovery', value: -25, en: '#% slower Block Recovery', de: '#% langsamere Blockerholung' },
+            { key: 'block_recovery', value: -34, en: '#% slower Block Recovery', de: '#% langsamere Blockerholung' }
         ],
         flavorEn: 'Bad luck reflected seven times. Badly.',
         flavorDe: 'Unglück siebenfach reflektiert. Schlecht.',
@@ -1629,9 +1731,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 16, str: 0, agi: 61, int: 0 },
         bonuses: [
             { key: 'grounded_1', value: 30, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
+            { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_evasion', value: 35, en: '+# to Evasion', de: '+# zu Ausweichen' }
         ],
         downsides: [
-            { key: 'dodge', value: -5, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -11, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'Grandma knitted them. You WILL stand your ground.',
         flavorDe: 'Oma hat sie gestrickt. Du wirst DEINEN Boden halten.',
@@ -1646,9 +1750,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 18, str: 68, agi: 0, int: 0 },
         bonuses: [
             { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'intelligence', value: 10, en: '+# to Intelligence', de: '+# zu Intelligenz' },
+            { key: 'fire_resist', value: 16, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' }
         ],
         downsides: [
-            { key: 'accuracy', value: -10, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -30, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Nothing gets in. Including your own field of vision.',
         flavorDe: 'Nichts kommt herein. Auch dein eigenes Sichtfeld nicht.',
@@ -1664,9 +1770,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mana_on_mistake', value: 5, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' },
             { key: 'mana_regen', value: 2, en: '+# Mana regenerated per 5s', de: '+# Mana-Regeneration pro 5s' },
+            { key: 'flat_health', value: 33, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'intelligence', value: -8, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -18, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'Every error is just chalk for the next attempt.',
         flavorDe: 'Jeder Fehler ist nur Kreide für den nächsten Versuch.',
@@ -1682,9 +1789,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 22, str: 0, agi: 0, int: 84 },
         bonuses: [
             { key: 'chance_to_convert', value: 12, en: '#% chance to Convert Monsters on kill', de: '#% Chance, Monster bei Kills zu konvertieren' },
+            { key: 'flat_health', value: 29, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 28, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'shadow_resist', value: -15, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'shadow_resist', value: -22, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' }
         ],
         flavorEn: 'It sheds its loyalty every season. So will you.',
         flavorDe: 'Sie häutet ihre Loyalität jede Saison. Du auch.',
@@ -1700,9 +1809,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'preemptive_dodge', value: 15, en: '#% chance to preemptively Dodge incoming Attacks', de: '#% Chance, Angriffen präventiv auszuweichen' },
             { key: 'dodge', value: 5, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'flat_evasion', value: 35, en: '+# to Evasion', de: '+# zu Ausweichen' }
         ],
         downsides: [
-            { key: 'flat_health', value: -25, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -55, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Land like a leaf. Bleed like anyone.',
         flavorDe: 'Landen wie ein Blatt. Bluten wie jeder andere.',
@@ -1718,9 +1828,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_shock', value: 15, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' },
             { key: 'lightning_damage_1', value: 10, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
+            { key: 'flat_mana', value: 22, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -15, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -22, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Caught lightning in glass. The glass has opinions now.',
         flavorDe: 'Blitz in Glas gefangen. Das Glas hat jetzt Meinungen.',
@@ -1736,9 +1847,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 360, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'cleave', value: 25, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
+            { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'inc_armour', value: 20, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'life_regen', value: -2, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -4.4, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' }
         ],
         flavorEn: 'Stained beyond washing. Worn beyond reason.',
         flavorDe: 'Über jede Wäsche hinaus befleckt. Über jede Vernunft hinaus getragen.',
@@ -1754,9 +1867,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fate', value: 20, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'reveal_hint', value: 10, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'time_added', value: -20, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -28, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'The deck never lies. It just deals slowly.',
         flavorDe: 'Das Deck lügt nie. Es mischt nur langsam.',
@@ -1772,9 +1886,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mana_regen', value: 4, en: '+# Mana regenerated per 5s', de: '+# Mana-Regeneration pro 5s' },
             { key: 'focus', value: 15, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
+            { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -1.5, en: 'Melee Strikes occur 1.5s slower', de: 'Nahkampfschläge erfolgen 1,5s langsamer' },
+            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 1.5s slower', de: 'Nahkampfschläge erfolgen 1,5s langsamer' }
         ],
         flavorEn: 'Breathe in. Breathe out. Swing tomorrow.',
         flavorDe: 'Einatmen. Ausatmen. Morgen zuschlagen.',
@@ -1790,9 +1905,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'accuracy', value: 15, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'flat_health', value: -30, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -54, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'First blood settles most arguments.',
         flavorDe: 'Erstes Blut entscheidet die meisten Streitigkeiten.',
@@ -1809,10 +1925,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_blind', value: 12, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
             { key: 'spell_dodge', value: 8, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
-            { key: 'arcane_resistance', value: 15, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
+            { key: 'arcane_resistance', value: 15, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -15, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -22, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
         ],
         flavorEn: 'It keeps the dead polite and the living nervous.',
         flavorDe: 'Es hält die Toten höflich und die Lebenden nervös.',
@@ -1828,9 +1944,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 330, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'inc_armour', value: 40, en: '#% increased Armour', de: '#% erhöhte Rüstung' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_armour', value: 60, en: '+# to Armour', de: '+# zu Rüstung' }
         ],
         downsides: [
-            { key: 'flat_health', value: -30, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -54, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Armor that argues back.',
         flavorDe: 'Rüstung, die widerspricht.',
@@ -1847,9 +1965,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_leech', value: 3, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
             { key: 'flat_health', value: 50, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'mana_regen', value: -2, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' },
+            { key: 'mana_regen', value: -4.4, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' }
         ],
         flavorEn: 'They drink deep. The soil complains.',
         flavorDe: 'Sie trinken tief. Der Boden beschwert sich.',
@@ -1865,9 +1984,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_freeze', value: 15, en: '#% chance to Freeze Monsters on hit', de: '#% Chance, Monster bei Treffern einzufrieren' },
             { key: 'cold_damage_1', value: 10, en: 'Adds # Cold Damage to Attacks', de: 'Fügt Angriffen # Kälteschaden hinzu' },
+            { key: 'flat_health', value: 48, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -1.5, en: 'Melee Strikes occur 1.5s slower', de: 'Nahkampfschläge erfolgen 1,5s langsamer' },
+            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 1.5s slower', de: 'Nahkampfschläge erfolgen 1,5s langsamer' }
         ],
         flavorEn: 'Cold patience, frozen enemies, unhurried fists.',
         flavorDe: 'Kalte Geduld, eingefrorene Feinde, ungeeilte Fäuste.',
@@ -1883,10 +2003,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fire_damage_1', value: 10, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'fire_damage_2', value: 16, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
-            { key: 'splash_damage', value: 20, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
+            { key: 'splash_damage', value: 20, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -20, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -30, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Eyebrows are temporary. Explosions are forever.',
         flavorDe: 'Augenbrauen sind temporär. Explosionen sind ewig.',
@@ -1902,9 +2022,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'intelligence', value: 14, en: '+# to Intelligence', de: '+# zu Intelligenz' },
             { key: 'mana_on_mistake', value: 8, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' },
+            { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'strength', value: -12, en: '-# to Strength', de: '-# zu Stärke' },
+            { key: 'strength', value: -20, en: '-# to Strength', de: '-# zu Stärke' }
         ],
         flavorEn: 'Failure is data. Wear the data.',
         flavorDe: 'Scheitern ist Datenmaterial. Trage die Daten.',
@@ -1920,9 +2041,11 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 82, max: 150 }, attackIntervalSeconds: 7.4,
         bonuses: [
             { key: 'life_leech', value: 5, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'life_regen', value: -3, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -7, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' }
         ],
         flavorEn: 'It prefers its meals moving. Yours will do.',
         flavorDe: 'Er bevorzugt seine Mahlzeiten beweglich. Deine genügen.',
@@ -1938,9 +2061,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 390, absorption: 0 },
         bonuses: [
             { key: 'pierce', value: 25, en: '#% chance for Projectiles to Pierce Monsters', de: '#% Chance, dass Projektile Monster durchbohren' },
+            { key: 'flat_health', value: 42, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'block_chance', value: -8, en: '-#% Block Chance', de: '-#% Blockchance' },
+            { key: 'block_chance', value: -18, en: '-#% Block Chance', de: '-#% Blockchance' }
         ],
         flavorEn: 'Cutting wind, threading shots.',
         flavorDe: 'Schneidender Wind, fädelnde Schüsse.',
@@ -1957,9 +2082,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'faster_absorption_regen_start', value: 5, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
             { key: 'absorption_regen_rate', value: 30, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
+            { key: 'flat_health', value: 43, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'life_regen', value: -2, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -4.4, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' }
         ],
         flavorEn: 'Get knocked down. Get recharged. Repeat.',
         flavorDe: 'Umgeworfen werden. Neu aufgeladen werden. Wiederholen.',
@@ -1974,9 +2100,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 44, str: 0, agi: 0, int: 167 },
         bonuses: [
             { key: 'arcane_resistance', value: 25, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
+            { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'shadow_resist', value: -15, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'shadow_resist', value: -22, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' }
         ],
         flavorEn: 'Breaks hexes. Attracts shadows. Fair trade.',
         flavorDe: 'Bricht Flüche. Zieht Schatten an. Faire Sache.',
@@ -1993,9 +2121,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'flat_health', value: 70, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'grounded_2', value: 30, en: '#% reduced effect of being Grounded', de: '#% reduzierter Effekt des Bodenstoßes' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'dodge', value: -8, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -18, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'You do not move out of the way. The way moves out of you.',
         flavorDe: 'Du weicht nicht aus. Der Weg weicht dir aus.',
@@ -2013,9 +2142,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'reveal_hint', value: 18, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
             { key: 'fate', value: 15, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
+            { key: 'flat_health', value: 47, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'intelligence', value: 15, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' },
+            { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' }
         ],
         flavorEn: 'Charts constellations perfectly. Trips over its own feet.',
         flavorDe: 'Vermisst Sternbilder perfekt. Stolpert über die eigenen Füße.',
@@ -2031,9 +2162,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_leech', value: 4, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
             { key: 'inc_physical_damage', value: 35, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'heart_heal', value: 15, en: '+# to Heart Heal Amount', de: '+# Herzheilung' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -50, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -70, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Quenched in something warm and unwilling.',
         flavorDe: 'In etwas Warmem und Willenlosem gelöscht.',
@@ -2050,9 +2183,10 @@ const EG_UNIQUE_ITEMS = [
             { key: 'lightning_damage_1', value: 14, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
             { key: 'lightning_damage_2', value: 22, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
             { key: 'chance_to_shock', value: 12, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' },
+            { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -20, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -30, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
         ],
         flavorEn: 'Shakes hands like a thundercloud settles arguments.',
         flavorDe: 'Reicht die Hand wie eine Gewitterwolke Streitigkeiten beilegt.',
@@ -2068,9 +2202,12 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 700, evasion: 0, absorption: 140 },
         bonuses: [
             { key: 'chance_to_freeze', value: 10, en: '#% chance to Freeze Monsters on hit', de: '#% Chance, Monster bei Treffern einzufrieren' },
+            { key: 'flat_health', value: 72, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'life_regen', value: 3, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
+            { key: 'inc_armour', value: 35, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' }
         ],
         flavorEn: 'Winter wears you now.',
         flavorDe: 'Der Winter trägt jetzt dich.',
@@ -2087,9 +2224,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_damage', value: 25, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'echo_1', value: 15, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'flat_health', value: -60, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -84, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Pockets open into nowhere. Everything falls in politely.',
         flavorDe: 'Taschen öffnen sich ins Nirgendwo. Alles fällt höflich hinein.',
@@ -2105,9 +2244,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'multishot', value: 25, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'chain', value: 25, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
-            { key: 'accuracy', value: -25, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -40, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Accuracy is a suggestion. Volume is a strategy.',
         flavorDe: 'Präzision ist ein Vorschlag. Menge ist eine Strategie.',
@@ -2124,9 +2265,13 @@ const EG_UNIQUE_ITEMS = [
         blockChance: 28,
         bonuses: [
             { key: 'spell_block_chance', value: 12, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' },
+            { key: 'flat_health', value: 75, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 10, en: '+#% Block Chance', de: '+#% Blockchance' },
+            { key: 'flat_armour', value: 90, en: '+# to Armour', de: '+# zu Rüstung' }
         ],
         downsides: [
-            { key: 'cleave', value: -25, en: '-#% chance to Cleave nearby Monsters', de: '-#% Chance, nahe Monster zu spalten' },
+            { key: 'cleave', value: -34, en: '-#% chance to Cleave nearby Monsters', de: '-#% Chance, nahe Monster zu spalten' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Shows monsters their own bad ideas at full brightness.',
         flavorDe: 'Zeigt Monstern ihre eigenen schlechten Ideen in voller Helligkeit.',
@@ -2143,9 +2288,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_spell_damage', value: 30, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
             { key: 'chance_to_ignite', value: 15, en: '#% chance to Ignite Monsters on hit', de: '#% Chance, Monster bei Treffern zu entzünden' },
+            { key: 'flat_health', value: 76, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -25, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -32, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Warm thoughts. Flammable conclusions.',
         flavorDe: 'Warme Gedanken. Brennbare Schlüsse.',
@@ -2161,9 +2309,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'flat_health', value: 100, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'grounded_1', value: 30, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'crit_chance', value: -8, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'crit_chance', value: -18, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Promises made of granite are hard to break. So is the waistline.',
         flavorDe: 'Aus Granit gegebene Versprechen sind schwer zu brechen. Die Taille auch.',
@@ -2179,9 +2330,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_convert', value: 18, en: '#% chance to Convert Monsters on kill', de: '#% Chance, Monster bei Kills zu konvertieren' },
             { key: 'overkill', value: 20, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'flat_health', value: 79, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'life_regen', value: -3, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -7, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Part of someone spineless. Now yours bends for them.',
         flavorDe: 'Teil eines Rücksichtslosen. Jetzt beugt sich deiner für ihn.',
@@ -2198,9 +2352,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 12, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 12, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
+            { key: 'flat_health', value: 65, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_evasion', value: 90, en: '+# to Evasion', de: '+# zu Ausweichen' }
         ],
         downsides: [
-            { key: 'focus', value: -15, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -26, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Untouchable, unless you panic.',
         flavorDe: 'Unberührbar – außer im Panikmoment.',
@@ -2217,9 +2374,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'attack_speed', value: 2.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
             { key: 'channel_2', value: 2, en: '+# maximum Channel Stacks', de: '+# maximale Kanalisierungsstapel' },
             { key: 'echo_2', value: 35, en: 'Echoes deal #% of the original damage', de: 'Echos verursachen #% des ursprünglichen Schadens' },
+            { key: 'flat_health', value: 66, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -45, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -63, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Each rune is a promise to hit things faster.',
         flavorDe: 'Jede Rune ist ein Versprechen, schneller zuzuschlagen.',
@@ -2238,9 +2397,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'fate', value: 30, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'reveal_hint', value: 15, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
             { key: 'chance_for_new_question', value: 15, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'flat_health', value: 68, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'time_added', value: -40, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -56, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'He wagered his clockwork kingdom on a coin flip. He won. Once.',
         flavorDe: 'Er setzte sein uhrwerkgetriebenes Königreich auf einen Münzwurf. Er gewann. Einmal.',
@@ -2258,9 +2419,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'absorption_on_kill', value: 12, en: '+# Absorption gained on Kill', de: '+# Absorption bei jedem Kill' },
             { key: 'absorption_regen_rate', value: 40, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
             { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'flat_health', value: 69, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'life_leech', value: -4, en: '-#% of Damage Dealt Leeched as Life', de: '-#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'life_leech', value: -8, en: '-#% of Damage Dealt Leeched as Life', de: '-#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Pressure makes diamonds. It also makes you very hard to kill.',
         flavorDe: 'Druck macht Diamanten. Er macht dich auch sehr schwer totzubekommen.',
@@ -2278,9 +2441,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_armour', value: 80, en: '#% increased Armour', de: '#% erhöhte Rüstung' },
             { key: 'block_recovery', value: 50, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
+            { key: 'flat_health', value: 71, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 10, en: '+#% Block Chance', de: '+#% Blockchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -3, en: 'Melee Strikes occur 3s slower', de: 'Nahkampfschläge erfolgen 3s langsamer' },
+            { key: 'attack_speed', value: -3.9, en: 'Melee Strikes occur 3s slower', de: 'Nahkampfschläge erfolgen 3s langsamer' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Behind this shield, patience becomes a weapon.',
         flavorDe: 'Hinter diesem Schild wird Geduld zur Waffe.',
@@ -2296,9 +2462,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_damage', value: 70, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'inc_spell_damage', value: 35, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'flat_health', value: -70, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -88, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Think hard enough, and reality flinches first.',
         flavorDe: 'Denke hart genug, und die Realität blinzelt zuerst.',
@@ -2315,9 +2484,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'life_leech', value: 3, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'flat_health', value: 85, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -35, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -47, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Fast, hungry, and utterly unconcerned with missing.',
         flavorDe: 'Schnell, hungrig und völlig unbeeindruckt vom Verfehlen.',
@@ -2334,9 +2506,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_armour', value: 60, en: '#% increased Armour', de: '#% erhöhte Rüstung' },
             { key: 'grounded_2', value: 50, en: '#% reduced effect of being Grounded', de: '#% reduzierter Effekt des Bodenstoßes' },
+            { key: 'flat_health', value: 87, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 26, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'dodge', value: -15, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -26, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'You are not wearing legs anymore. You are wearing architecture.',
         flavorDe: 'Du trägst keine Beine mehr. Du trägst Architektur.',
@@ -2352,9 +2527,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'time_added', value: 90, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'first_step', value: 4, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'flat_health', value: 91, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 70, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
             { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Time enough at last — for those who never slip.',
         flavorDe: 'Endlich genug Zeit – für diejenigen, die nie straucheln.',
@@ -2370,9 +2548,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_for_new_question', value: 30, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
             { key: 'reveal_hint', value: 15, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'flat_health', value: 94, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 85, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'time_added', value: -45, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -63, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Wrong answers are just questions you get to ask again.',
         flavorDe: 'Falsche Antworten sind nur Fragen, die du erneut stellen darfst.',
@@ -2392,9 +2573,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 3, str: 12, agi: 0, int: 0 },
         bonuses: [
             { key: 'flat_health', value: 15, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'intelligence', value: 6, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'accuracy', value: -5, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -15, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Lunch included. Dignity sold separately.',
         flavorDe: 'Mittagessen inklusive. Würde separat erhältlich.',
@@ -2409,9 +2591,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 12, str: 0, agi: 46, int: 0 },
         bonuses: [
             { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
+            { key: 'flat_health', value: 20, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'mana_regen', value: -1, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' },
+            { key: 'mana_regen', value: -2.2, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' }
         ],
         flavorEn: 'It muffles everything. Even your thoughts get quieter.',
         flavorDe: 'Sie dämpft alles. Selbst deine Gedanken werden leiser.',
@@ -2426,9 +2609,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 26, str: 0, agi: 0, int: 99 },
         bonuses: [
             { key: 'mistake_not_count', value: 12, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht gezählt werden' },
+            { key: 'flat_health', value: 33, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'intelligence', value: 10, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'time_added', value: -20, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -28, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'Forgiveness, billed by the minute.',
         flavorDe: 'Vergebung, minutengenau abgerechnet.',
@@ -2444,9 +2629,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'accuracy', value: 30, en: '+# Accuracy', de: '+# Präzision' },
             { key: 'crit_chance', value: 5, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'reveal_hint', value: -12, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'reveal_hint', value: -20, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' }
         ],
         flavorEn: 'Focus on one truth and miss every other.',
         flavorDe: 'Konzentriere dich auf eine Wahrheit und verpasse alle anderen.',
@@ -2462,9 +2648,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'warding', value: 120, en: '+# Warding', de: '+# Wardschutz' },
             { key: 'arcane_resistance', value: 20, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
+            { key: 'flat_health', value: 79, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'lightning_resist', value: -15, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' },
+            { key: 'lightning_resist', value: -22, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'The signal is divine. The interference is also divine.',
         flavorDe: 'Das Signal ist göttlich. Die Störung ist ebenfalls göttlich.',
@@ -2480,9 +2669,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 4, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'mana_on_kill', value: 3, en: '+# Mana gained on Kill', de: '+# Mana bei jedem Kill' },
+            { key: 'flat_health', value: 22, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'life_regen', value: -1, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -2.2, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' }
         ],
         flavorEn: 'Blown once, answered forever.',
         flavorDe: 'Einmal geblasen, für immer beantwortet.',
@@ -2498,9 +2688,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'heart_heal', value: 10, en: '+# to Heart Heal Amount', de: '+# Herzheilung' },
             { key: 'inc_heart_heal', value: 15, en: '#% increased Heart Heal Amount', de: '#% erhöhte Herzheilung' },
+            { key: 'flat_health', value: 21, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'intelligence', value: -8, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -18, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: "The portrait isn't you. The love might be.",
         flavorDe: 'Das Porträt bist nicht du. Die Liebe vielleicht.',
@@ -2515,9 +2706,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 24, str: 91, agi: 0, int: 0 },
         bonuses: [
             { key: 'grounded_1', value: 35, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
+            { key: 'flat_health', value: 31, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 22, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'dodge', value: -6, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -13, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'You will not be moved. You have never been moved.',
         flavorDe: 'Du wirst nicht bewegt werden. Du wurdest nie bewegt.',
@@ -2532,9 +2725,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 39, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'fate', value: 18, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'heart_heal', value: 15, en: '+# to Heart Heal Amount', de: '+# Herzheilung' }
         ],
         downsides: [
-            { key: 'flat_health', value: -35, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: "Nothing about it is lucky. Things just happen near it.",
         flavorDe: 'Nichts an ihm hat Glück. Dinge passieren nur in seiner Nähe.',
@@ -2550,9 +2745,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'echo_1', value: 18, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
             { key: 'echo_2', value: 30, en: 'Echoes deal #% of the original damage', de: 'Echos verursachen #% des ursprünglichen Schadens' },
+            { key: 'flat_health', value: 77, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'shadow_resist', value: -20, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'shadow_resist', value: -30, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Every note you sing comes back with harmonies you never wrote.',
         flavorDe: 'Jede Note, die du singst, kommt mit Harmonien zurück, die du nie geschrieben hast.',
@@ -2568,9 +2766,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 6, str: 23, agi: 0, int: 0 },
         bonuses: [
             { key: 'strength', value: 8, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_health', value: 19, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'intelligence', value: -6, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -13, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'Turns green with envy. Yours.',
         flavorDe: 'Wirft grüne Adern. Vor Neid. Deinem.',
@@ -2585,9 +2784,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 17, str: 0, agi: 65, int: 0 },
         bonuses: [
             { key: 'crit_multiplier', value: 30, en: '+#% to Critical Strike Multiplier', de: '+#% Kritischer Trefferschaden' },
+            { key: 'flat_health', value: 31, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 28, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'crit_chance', value: -6, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'crit_chance', value: -13, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' }
         ],
         flavorEn: 'Rarely drawn. Devastating when justified.',
         flavorDe: 'Selten gezogen. Verheerend, wenn berechtigt.',
@@ -2602,9 +2803,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 29, str: 0, agi: 0, int: 110 },
         bonuses: [
             { key: 'mana_on_mistake', value: 8, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' },
+            { key: 'flat_health', value: 29, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 28, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'focus', value: -12, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -20, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'Sorry takes longer than sorry should.',
         flavorDe: 'Entschuldigung dauert länger, als Entschuldigung sollte.',
@@ -2619,9 +2822,12 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 46, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'time_added', value: 50, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
+            { key: 'flat_health', value: 46, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'first_step', value: -2, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: -4.4, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' }
         ],
         flavorEn: 'The hours come in. Something else goes out.',
         flavorDe: 'Die Stunden kommen herein. Etwas anderes geht hinaus.',
@@ -2637,9 +2843,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'overkill', value: 30, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
             { key: 'cleave', value: 25, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
+            { key: 'flat_health', value: 73, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'accuracy', value: -25, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -40, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Arguments end when the shouting stops hitting something.',
         flavorDe: 'Streitigkeiten enden, wenn das Schreien aufhört, etwas zu treffen.',
@@ -2656,9 +2865,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 0, absorption: 65 },
         bonuses: [
             { key: 'absorption_on_kill', value: 4, en: '+# Absorption gained on Kill', de: '+# Absorption bei jedem Kill' },
+            { key: 'strength', value: 6, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_health', value: -15, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -33, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Belief held together with knots. It holds anyway.',
         flavorDe: 'Glaube mit Knoten zusammengehalten. Er hält trotzdem.',
@@ -2673,9 +2883,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 21, str: 0, agi: 80, int: 0 },
         bonuses: [
             { key: 'first_step', value: 2.5, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'faster_absorption_regen_start', value: -3, en: '#s slower start of Absorption Regeneration', de: '#s langsamerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: -6, en: '#s slower start of Absorption Regeneration', de: '#s langsamerer Start der Absorptionsregeneration' }
         ],
         flavorEn: 'One, two, three… now.',
         flavorDe: 'Eins, zwei, drei … jetzt.',
@@ -2691,9 +2903,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'stagger', value: 15, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -30, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -51, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Anger saved is anger doubled.',
         flavorDe: 'Aufgesparter Ärger ist doppelter Ärger.',
@@ -2709,9 +2922,13 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 0, absorption: 290 },
         bonuses: [
             { key: 'absorption_on_kill', value: 10, en: '+# Absorption gained on Kill', de: '+# Absorption bei jedem Kill' },
+            { key: 'flat_health', value: 66, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'dodge', value: -8, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -18, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Currents do not dodge. They simply are everywhere.',
         flavorDe: 'Strömungen weichen nicht aus. Sie sind einfach überall.',
@@ -2727,9 +2944,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 5, str: 19, agi: 0, int: 0 },
         bonuses: [
             { key: 'fire_resist', value: 15, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' },
+            { key: 'flat_health', value: 18, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -10, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -20, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
         ],
         flavorEn: 'Fire is fine. Everything else is suspicious.',
         flavorDe: 'Feuer ist okay. Alles andere ist verdächtig.',
@@ -2745,9 +2963,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_on_kill', value: 6, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' },
             { key: 'heart_heal', value: 8, en: '+# to Heart Heal Amount', de: '+# Herzheilung' },
+            { key: 'flat_health', value: 18, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'crit_chance', value: -5, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'crit_chance', value: -11, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' }
         ],
         flavorEn: 'Weeds pulled, things grown, patience earned.',
         flavorDe: 'Unkraut gerupft, Dinge gewachsen, Geduld verdient.',
@@ -2763,9 +2982,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'attack_speed', value: 1.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
             { key: 'life_leech', value: 2, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'accuracy', value: 28, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_health', value: -25, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -55, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Quick hands tell no tales. They end them.',
         flavorDe: 'Flinke Hände erzählen keine Geschichten. Sie beenden sie.',
@@ -2781,9 +3001,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 7, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'attack_speed', value: 1.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'flat_health', value: 43, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -30, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -51, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Wound tight, springs ready, patience unwound.',
         flavorDe: 'Aufgezogen, Federn gespannt, Geduld abgelaufen.',
@@ -2800,9 +3021,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'fire_damage_1', value: 20, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'fire_damage_2', value: 30, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'chance_to_blind', value: 10, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
+            { key: 'flat_health', value: 67, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -20, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -30, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Make a wish. Then make contact.',
         flavorDe: 'Wünsch dir was. Dann mach Kontakt.',
@@ -2819,9 +3042,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 105, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'mistake_not_count', value: 10, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht gezählt werden' },
+            { key: 'flat_health', value: 19, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'time_added', value: -12, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -20, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'Stitched from every maybe that ever mattered.',
         flavorDe: 'Genäht aus jedem Vielleicht, das je zählte.',
@@ -2837,9 +3061,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 270, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'life_regen', value: 2, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
+            { key: 'flat_health', value: 33, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'inc_armour', value: 20, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'crit_chance', value: -5, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'crit_chance', value: -11, en: '-#% to Critical Strike Chance', de: '-#% Kritische Trefferchance' }
         ],
         flavorEn: 'Nothing dramatic happens while wearing it. That is the point.',
         flavorDe: 'Nichts Dramatisches passiert darin. Das ist der Punkt.',
@@ -2855,9 +3081,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 390, evasion: 0, absorption: 160 },
         bonuses: [
             { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'flat_health', value: 41, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'life_regen', value: 3, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' }
         ],
         downsides: [
-            { key: 'lightning_resist', value: -15, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' },
+            { key: 'lightning_resist', value: -22, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' }
         ],
         flavorEn: 'The tide always comes back. So does your shield.',
         flavorDe: 'Die Gezeit kehrt immer zurück. Dein Schild auch.',
@@ -2873,9 +3101,12 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 760, evasion: 0, absorption: 100 },
         bonuses: [
             { key: 'grounded_1', value: 30, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
+            { key: 'flat_health', value: 48, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'life_regen', value: 3, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
+            { key: 'inc_armour', value: 35, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'dodge', value: -10, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -17, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'Walls do not sidestep. They get hit, and remain.',
         flavorDe: 'Mauern weichen nicht seitlich aus. Sie werden getroffen – und bleiben.',
@@ -2891,9 +3122,13 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 380, evasion: 380, absorption: 360 },
         bonuses: [
             { key: 'warding', value: 180, en: '+# Warding', de: '+# Wardschutz' },
+            { key: 'flat_health', value: 72, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'life_regen', value: 4, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
+            { key: 'inc_armour', value: 35, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'life_leech', value: -3, en: '-#% of Damage Dealt Leeched as Life', de: '-#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'life_leech', value: -6, en: '-#% of Damage Dealt Leeched as Life', de: '-#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Light without warmth. Protection without weight. Hunger without end.',
         flavorDe: 'Licht ohne Wärme. Schutz ohne Gewicht. Hunger ohne Ende.',
@@ -2909,9 +3144,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 7, str: 0, agi: 27, int: 0 },
         bonuses: [
             { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'flat_health', value: 20, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -8, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -24, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'One walks true. One walks sideways. Enemies cannot predict either.',
         flavorDe: 'Der eine geht gerade. Der andere seitwärts. Feinde können beides nicht vorhersagen.',
@@ -2926,9 +3162,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 18, str: 0, agi: 0, int: 68 },
         bonuses: [
             { key: 'mana_regen', value: 3, en: '+# Mana regenerated per 5s', de: '+# Mana-Regeneration pro 5s' },
+            { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'flat_evasion', value: 35, en: '+# to Evasion', de: '+# zu Ausweichen' }
         ],
         downsides: [
-            { key: 'flat_health', value: -20, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -44, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Worn thin by roads that promised meaning.',
         flavorDe: 'Dünn getragen von Wegen, die Sinn versprachen.',
@@ -2943,9 +3181,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 28, str: 106, agi: 0, int: 0 },
         bonuses: [
             { key: 'chance_to_freeze', value: 10, en: '#% chance to Freeze Monsters on hit', de: '#% Chance, Monster bei Treffern einzufrieren' },
+            { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -15, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -22, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Stomp twice. Apologize never.',
         flavorDe: 'Zweimal stampfen. Nie entschuldigen.',
@@ -2960,9 +3200,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 41, str: 0, agi: 156, int: 0 },
         bonuses: [
             { key: 'attack_speed', value: 2, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'flat_health', value: 41, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'first_step', value: -2, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: -4.4, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' }
         ],
         flavorEn: 'Once you start, nothing stops you. Including caution.',
         flavorDe: 'Einmal gestartet, hält dich nichts auf. Auch keine Vorsicht.',
@@ -2978,9 +3220,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'preemptive_dodge', value: 25, en: '#% chance to preemptively Dodge incoming Attacks', de: '#% Chance, Angriffen präventiv auszuweichen' },
             { key: 'spell_dodge', value: 10, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
+            { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'flat_evasion', value: 90, en: '+# to Evasion', de: '+# zu Ausweichen' }
         ],
         downsides: [
-            { key: 'flat_health', value: -70, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -88, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Walk where the ground forgot to be.',
         flavorDe: 'Gehe dorthin, wo der Boden vergaß zu sein.',
@@ -2995,9 +3240,12 @@ const EG_UNIQUE_ITEMS = [
         minLevel: 3,
         requirements: { level: 3, str: 12, agi: 0, int: 0 },
         damage: { min: 8, max: 18 }, attackIntervalSeconds: 6.0,
-        bonuses: [],
+        bonuses: [
+            { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
+        ],
         downsides: [
-            { key: 'accuracy', value: -6, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -18, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'The tree forgave nothing.',
         flavorDe: 'Der Baum hat nichts verziehen.',
@@ -3013,9 +3261,11 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 30, max: 55 }, attackIntervalSeconds: 5.4,
         bonuses: [
             { key: 'cleave', value: 15, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
+            { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'accuracy', value: 18, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'life_on_kill', value: -4, en: '-# Life gained on Kill', de: '-# Leben bei jedem Kill' },
+            { key: 'life_on_kill', value: -8, en: '-# Life gained on Kill', de: '-# Leben bei jedem Kill' }
         ],
         flavorEn: 'Everyone eats. Not everyone enjoys being served.',
         flavorDe: 'Alle essen. Nicht jeder genießt, serviert zu werden.',
@@ -3031,9 +3281,11 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 95, max: 170 }, attackIntervalSeconds: 6.6,
         bonuses: [
             { key: 'crit_multiplier', value: 40, en: '+#% to Critical Strike Multiplier', de: '+#% Kritischer Trefferschaden' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_health', value: -40, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -72, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'It kept only one promise: the sharp one.',
         flavorDe: 'Es hielt nur ein Versprechen: das scharfe.',
@@ -3049,9 +3301,12 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 240, max: 420 }, attackIntervalSeconds: 8.2,
         bonuses: [
             { key: 'stagger', value: 30, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' }
         ],
         flavorEn: 'It raises questions. Then it answers them.',
         flavorDe: 'Er stellt Fragen. Dann beantwortet er sie.',
@@ -3068,9 +3323,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'life_leech', value: 3, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'accuracy', value: 85, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -60, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -72, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'A song played one stab at a time.',
         flavorDe: 'Ein Lied, gespielt einen Stich nach dem anderen.',
@@ -3086,9 +3344,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 10, str: 0, agi: 38, int: 0 },
         bonuses: [
             { key: 'multishot', value: 12, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
+            { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'accuracy', value: -10, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -30, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Every stone remembers who threw it.',
         flavorDe: 'Jeder Stein erinnert sich, wer ihn warf.',
@@ -3103,9 +3362,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 25, str: 0, agi: 95, int: 0 },
         bonuses: [
             { key: 'splash_damage', value: 30, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
+            { key: 'accuracy', value: 28, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'pierce', value: -15, en: '-#% chance for Projectiles to Pierce Monsters', de: '-#% Chance, dass Projektile Monster durchbohren' },
+            { key: 'pierce', value: -24, en: '-#% chance for Projectiles to Pierce Monsters', de: '-#% Chance, dass Projektile Monster durchbohren' }
         ],
         flavorEn: 'Everything nearby gets some. Nothing gets through.',
         flavorDe: 'Alles in der Nähe bekommt etwas ab. Nichts kommt durch.',
@@ -3121,9 +3382,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chain', value: 30, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
             { key: 'pushback', value: 0.5, en: '+#s Charge Pushback on hit', de: '+#s Angriffslade-Rückstoß bei Treffern' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'multishot', value: -15, en: '-#% chance to fire an additional Projectile', de: '-#% Chance auf ein zusätzliches Projektil' },
+            { key: 'multishot', value: -24, en: '-#% chance to fire an additional Projectile', de: '-#% Chance auf ein zusätzliches Projektil' }
         ],
         flavorEn: 'One line in, one monster dragged out of position.',
         flavorDe: 'Eine Leine hinein, ein Monster aus der Position gezogen.',
@@ -3139,9 +3401,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'snipe', value: 35, en: '#% chance for Projectiles to Snipe (double damage)', de: '#% Chance auf Sniping (doppelter Schaden)' },
             { key: 'overkill', value: 25, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
-            { key: 'accuracy', value: -20, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -44, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Reload speed measured in constellations.',
         flavorDe: 'Nachladegeschwindigkeit in Sternbildern gemessen.',
@@ -3158,9 +3423,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 38, absorption: 0 },
         bonuses: [
             { key: 'flat_health', value: 10, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -15, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -33, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Cozy though.',
         flavorDe: 'Gemütlich trotzdem.',
@@ -3176,9 +3442,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 150, absorption: 0 },
         bonuses: [
             { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' }
         ],
         downsides: [
-            { key: 'flat_health', value: -15, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -33, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Neither wind nor deadlines stopped it. Both tried.',
         flavorDe: 'Weder Wind noch Deadlines hielten es auf. Beide versuchten es.',
@@ -3194,9 +3462,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 330, absorption: 0 },
         bonuses: [
             { key: 'spell_dodge', value: 7, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
+            { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -15, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -22, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Drawn helplessly to every bright and terrible thing.',
         flavorDe: 'Hilflos angezogen von allem Hellen und Furchtbaren.',
@@ -3212,9 +3482,12 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 480, absorption: 0 },
         bonuses: [
             { key: 'life_regen', value: 3, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
+            { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'spell_dodge', value: 8, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
+            { key: 'flat_evasion', value: 60, en: '+# to Evasion', de: '+# zu Ausweichen' }
         ],
         downsides: [
-            { key: 'dodge', value: -8, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -18, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'It grows on you. Slowly. Inevitably.',
         flavorDe: 'Es wächst an dir. Langsam. Unaufhaltsam.',
@@ -3231,9 +3504,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'shadow_resist', value: 25, en: '+#% to Shadow Resistance', de: '+#% Schattenwiderstand' },
             { key: 'chance_to_blind', value: 12, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
+            { key: 'flat_health', value: 68, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -20, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -30, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Daylight filed a complaint. It was not read.',
         flavorDe: 'Das Tageslicht reichte eine Beschwerde ein. Sie wurde nicht gelesen.',
@@ -3249,9 +3525,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 11, str: 42, agi: 0, int: 0 },
         bonuses: [
             { key: 'flat_health', value: 25, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 6, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'mana_regen', value: -2, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' },
+            { key: 'mana_regen', value: -4.4, en: '-# Mana regenerated per 5s', de: '-# Mana-Regeneration pro 5s' }
         ],
         flavorEn: 'Every creditor sends regards.',
         flavorDe: 'Jeder Gläubiger lässt grüßen.',
@@ -3267,9 +3544,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 210, evasion: 0, absorption: 130 },
         bonuses: [
             { key: 'absorption_regen_rate', value: 20, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
+            { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'lightning_resist', value: -12, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' },
+            { key: 'lightning_resist', value: -24, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' }
         ],
         flavorEn: 'Still growing. Please do not scratch.',
         flavorDe: 'Wächst noch. Bitte nicht kratzen.',
@@ -3285,9 +3564,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 350, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'grounded_1', value: 25, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
+            { key: 'flat_health', value: 47, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'agility', value: -10, en: '-# to Agility', de: '-# zu Beweglichkeit' },
+            { key: 'agility', value: -17, en: '-# to Agility', de: '-# zu Beweglichkeit' }
         ],
         flavorEn: 'Wins every debate by refusing to attend it.',
         flavorDe: 'Gewinnt jede Debatte, indem es ihr fernbleibt.',
@@ -3304,9 +3585,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'cold_damage_1', value: 12, en: 'Adds # Cold Damage to Attacks', de: 'Fügt Angriffen # Kälteschaden hinzu' },
             { key: 'cold_resist', value: 20, en: '+#% to Cold Resistance', de: '+#% Kältewiderstand' },
+            { key: 'flat_health', value: 74, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -20, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -30, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Breathes winter onto your enemies. And your campfires.',
         flavorDe: 'Atmet Winter auf deine Feinde. Und deine Lagerfeuer.',
@@ -3323,9 +3606,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 10, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_armour', value: 90, en: '+# to Armour', de: '+# zu Rüstung' }
         ],
         downsides: [
-            { key: 'flat_health', value: -60, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -84, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Fly closer. See what happens.',
         flavorDe: 'Flieg näher heran. Und sieh, was passiert.',
@@ -3342,9 +3628,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 145, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'flat_health', value: 20, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 6, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'accuracy', value: -6, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -18, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Every patch a story. Every hole a sequel.',
         flavorDe: 'Jeder Flicken eine Geschichte. Jedes Loch eine Fortsetzung.',
@@ -3358,9 +3645,13 @@ const EG_UNIQUE_ITEMS = [
         minLevel: 22,
         requirements: { level: 22, str: 84, agi: 0, int: 0 },
         defenses: { armour: 245, evasion: 0, absorption: 95 },
-        bonuses: [],
+        bonuses: [
+            { key: 'flat_health', value: 29, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'warding', value: 60, en: '+# Warding', de: '+# Wardschutz' }
+        ],
         downsides: [
-            { key: 'lightning_resist', value: -12, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' },
+            { key: 'lightning_resist', value: -24, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' }
         ],
         flavorEn: 'Waterproof. Stormproof. Nothing-proof against pride.',
         flavorDe: 'Wasserdicht. Sturmfest. Nichts fest gegen Stolz.',
@@ -3376,9 +3667,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 410, absorption: 0 },
         bonuses: [
             { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'warding', value: 100, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'flat_health', value: -35, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Style is armor. Just not the protective kind.',
         flavorDe: 'Stil ist Rüstung. Nur nicht die schützende Art.',
@@ -3394,9 +3687,13 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 860, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'inc_armour', value: 40, en: '#% increased Armour', de: '#% erhöhte Rüstung' },
+            { key: 'flat_health', value: 69, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'dodge', value: -10, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -17, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Somebody else’s skeleton finally useful.',
         flavorDe: 'Das Skelett eines anderen endlich nützlich.',
@@ -3412,9 +3709,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 12, str: 0, agi: 0, int: 46 },
         bonuses: [
             { key: 'fate', value: 12, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
+            { key: 'strength', value: 6, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_health', value: -15, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -33, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Heads you win. Tails it hurts.',
         flavorDe: 'Kopf, du gewinnst. Zahl, es tut weh.',
@@ -3429,9 +3727,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 25, str: 0, agi: 0, int: 95 },
         bonuses: [
             { key: 'chance_for_new_question', value: 15, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
+            { key: 'flat_health', value: 32, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'reveal_hint', value: -10, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'reveal_hint', value: -17, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' }
         ],
         flavorEn: 'Always ready with another line. Rarely the right one.',
         flavorDe: 'Immer bereit mit einer anderen Zeile. Selten der richtigen.',
@@ -3446,9 +3746,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 34, str: 0, agi: 129, int: 0 },
         bonuses: [
             { key: 'multishot', value: 15, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
+            { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'accuracy', value: -15, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -33, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'More arrows. Fewer answers.',
         flavorDe: 'Mehr Pfeile. Weniger Antworten.',
@@ -3464,9 +3766,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_leech', value: 4, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
             { key: 'inc_physical_damage', value: 25, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -60, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Warm to the touch. Always.',
         flavorDe: 'Immer warm bei Berührung.',
@@ -3482,9 +3786,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_block_chance', value: 12, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' },
             { key: 'arcane_resistance', value: 30, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
+            { key: 'flat_health', value: 70, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'shadow_resist', value: -20, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'shadow_resist', value: -30, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Curses arrive. They leave confused.',
         flavorDe: 'Flüche kommen an. Sie gehen verwirrt wieder.',
@@ -3500,9 +3807,10 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 7, str: 0, agi: 0, int: 27 },
         bonuses: [
             { key: 'spell_damage', value: 8, en: '+# Spell Damage', de: '+# Zauberschaden' },
+            { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -15, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -33, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Someone bit it to test authenticity. It bit back.',
         flavorDe: 'Jemand biss hinein, um die Echtheit zu prüfen. Es biss zurück.',
@@ -3517,9 +3825,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 20, str: 0, agi: 0, int: 76 },
         bonuses: [
             { key: 'reveal_hint', value: 12, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'flat_mana', value: 22, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
         ],
         downsides: [
-            { key: 'time_added', value: -15, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -26, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'Shows what could be. Charges by the second.',
         flavorDe: 'Zeigt, was sein könnte. Berechnet pro Sekunde.',
@@ -3535,10 +3845,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'lightning_damage_1', value: 14, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
             { key: 'lightning_damage_2', value: 20, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
-            { key: 'chance_to_shock', value: 10, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' },
+            { key: 'chance_to_shock', value: 10, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -15, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' },
+            { key: 'cold_resist', value: -22, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
         ],
         flavorEn: 'Whisper to it and the sky answers rudely.',
         flavorDe: 'Flüstre ihm zu, und der Himmel antwortet unhöflich.',
@@ -3554,9 +3864,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_spell_damage', value: 35, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
             { key: 'echo_1', value: 12, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'flat_health', value: -60, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -84, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Page one explains page one. Forever.',
         flavorDe: 'Seite eins erklärt Seite eins. Für immer.',
@@ -3573,9 +3886,10 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 0, absorption: 55 },
         bonuses: [
             { key: 'absorption_regen_rate', value: 15, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
+            { key: 'flat_mana', value: 12, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'flat_health', value: -10, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -28, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Retreat inside until the story blows over.',
         flavorDe: 'Sich zurückziehen, bis die Geschichte sich legt.',
@@ -3590,9 +3904,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 18, str: 0, agi: 0, int: 68 },
         bonuses: [
             { key: 'chance_to_blind', value: 10, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
+            { key: 'flat_health', value: 32, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 22, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'fate', value: -10, en: '-#% increased Fate', de: '-#% erhöhtes Schicksal' },
+            { key: 'fate', value: -17, en: '-#% increased Fate', de: '-#% erhöhtes Schicksal' }
         ],
         flavorEn: 'Rings once. Somewhere, a vase falls.',
         flavorDe: 'Läutet einmal. Irgendwo fällt eine Vase.',
@@ -3607,9 +3923,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 32, str: 0, agi: 0, int: 122 },
         bonuses: [
             { key: 'mana_on_kill', value: 8, en: '+# Mana gained on Kill', de: '+# Mana bei jedem Kill' },
+            { key: 'flat_health', value: 42, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'intelligence', value: -12, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -20, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'Everyone signs eventually. Few read first.',
         flavorDe: 'Alle unterschreiben irgendwann. Wenige lesen zuerst.',
@@ -3624,9 +3942,12 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 47, str: 0, agi: 0, int: 179 },
         bonuses: [
             { key: 'time_added', value: 30, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
+            { key: 'flat_health', value: 47, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'reveal_hint', value: 12, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' }
         ],
         downsides: [
-            { key: 'life_regen', value: -3, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' },
+            { key: 'life_regen', value: -7, en: '-# Life Regeneration per second', de: '-# Lebensregeneration pro Sekunde' }
         ],
         flavorEn: 'It lends minutes. It collects moments.',
         flavorDe: 'Es leiht Minuten. Es kassiert Momente.',
@@ -3642,9 +3963,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_convert', value: 15, en: '#% chance to Convert Monsters on kill', de: '#% Chance, Monster bei Kills zu konvertieren' },
             { key: 'chance_to_blind', value: 8, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
+            { key: 'flat_health', value: 66, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'shadow_resist', value: -20, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'shadow_resist', value: -30, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Sworn under a darkened sun. Binding either way.',
         flavorDe: 'Geschworen unter einer finsteren Sonne. Bindend in beide Richtungen.',
@@ -3660,9 +3984,12 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 8, str: 30, agi: 0, int: 0 },
         defenses: { armour: 75, evasion: 0, absorption: 0 },
         blockChance: 14,
-        bonuses: [],
+        bonuses: [
+            { key: 'flat_health', value: 21, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 6, en: '+#% Block Chance', de: '+#% Blockchance' }
+        ],
         downsides: [
-            { key: 'accuracy', value: -5, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -15, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Dinner is served.',
         flavorDe: 'Das Abendessen wird serviert.',
@@ -3679,9 +4006,11 @@ const EG_UNIQUE_ITEMS = [
         blockChance: 22,
         bonuses: [
             { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 6, en: '+#% Block Chance', de: '+#% Blockchance' },
+            { key: 'spell_block_chance', value: 6, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' }
         ],
         flavorEn: 'Knock knock. No.',
         flavorDe: 'Klopf klopf. Nein.',
@@ -3697,9 +4026,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 240, evasion: 0, absorption: 230 },
         bonuses: [
             { key: 'block_recovery', value: 40, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
+            { key: 'flat_health', value: 42, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 8, en: '+#% Block Chance', de: '+#% Blockchance' }
         ],
         downsides: [
-            { key: 'lightning_resist', value: -15, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' },
+            { key: 'lightning_resist', value: -22, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' }
         ],
         flavorEn: 'Full of small lives that resent being disturbed.',
         flavorDe: 'Voll kleiner Lebewesen, die es übelnehmen, gestört zu werden.',
@@ -3716,9 +4047,13 @@ const EG_UNIQUE_ITEMS = [
         blockChance: 30,
         bonuses: [
             { key: 'inc_armour', value: 50, en: '#% increased Armour', de: '#% erhöhte Rüstung' },
+            { key: 'flat_health', value: 67, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 10, en: '+#% Block Chance', de: '+#% Blockchance' },
+            { key: 'spell_block_chance', value: 10, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' }
         ],
         downsides: [
-            { key: 'dodge', value: -10, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -17, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Promises broke against it. It did not.',
         flavorDe: 'Versprechen zerbrachen daran. Es selbst nicht.',
@@ -3734,9 +4069,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 15, str: 0, agi: 0, int: 57 },
         bonuses: [
             { key: 'focus', value: 15, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
+            { key: 'flat_health', value: 18, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'fate', value: 12, en: '#% increased Fate', de: '#% erhöhtes Schicksal' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -20, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -44, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Each knot: something important. Which knot meant what is lost.',
         flavorDe: 'Jeder Knoten: etwas Wichtiges. Welcher was bedeutete, ist verloren.',
@@ -3752,9 +4089,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'time_added', value: 45, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'focus', value: 20, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
+            { key: 'flat_health', value: 75, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'reveal_hint', value: -15, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'reveal_hint', value: -26, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Plenty of time to think about what you did.',
         flavorDe: 'Ausreichend Zeit, um darüber nachzudenken, was du getan hast.',
@@ -3772,10 +4112,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'reveal_hint', value: 25, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
             { key: 'inc_spell_damage', value: 30, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
-            { key: 'intelligence', value: 15, en: '+# to Intelligence', de: '+# zu Intelligenz' },
+            { key: 'intelligence', value: 15, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'accuracy', value: -25, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -40, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'It whispers the answer. Just never the right one.',
         flavorDe: 'Es flüstert dir die Antwort zu. Nur nie die richtige.',
@@ -3791,10 +4131,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'attack_speed', value: 15, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
             { key: 'crit_chance', value: 10, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
-            { key: 'agility', value: 10, en: '+# to Agility', de: '+# zu Geschick' },
+            { key: 'agility', value: 10, en: '+# to Agility', de: '+# zu Geschick' }
         ],
         downsides: [
-            { key: 'flat_health', value: -50, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -70, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Thrown at graduation. It never landed.',
         flavorDe: 'Bei der Abschlussfeier geworfen. Ist nie gelandet.',
@@ -3810,9 +4150,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'warding', value: 60, en: '+# Warding', de: '+# Wardschutz' },
             { key: 'flat_health', value: 70, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'intelligence', value: 15, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'focus', value: -10, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -17, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'Airtight. So are your decisions inside it.',
         flavorDe: 'Luftdicht. Deine Entscheidungen darin auch.',
@@ -3828,9 +4169,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'focus', value: 25, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
             { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' },
+            { key: 'flat_health', value: 48, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'fire_resist', value: 20, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' }
         ],
         downsides: [
-            { key: 'chance_for_new_question', value: -15, en: '-#% chance to get a new Question', de: '-#% Chance auf eine neue Frage' },
+            { key: 'chance_for_new_question', value: -26, en: '-#% chance to get a new Question', de: '-#% Chance auf eine neue Frage' }
         ],
         flavorEn: 'You remember every question you have ever failed. All of them.',
         flavorDe: 'Du erinnerst dich an jede Frage, die du je vermasselt hast. An jede einzelne.',
@@ -3846,9 +4189,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_physical_damage', value: 45, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_health', value: 48, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -30, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -48, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Thinking is for after the fight. Preferably someone else\u2019s.',
         flavorDe: 'Nachdenken ist was für nach dem Kampf. Lieber dem von jemand anderem.',
@@ -3865,9 +4209,10 @@ const EG_UNIQUE_ITEMS = [
             { key: 'flat_mana', value: 90, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
             { key: 'mistake_count', value: 1, en: '+# Allowed Mistakes', de: '+# erlaubte Fehler' },
             { key: 'mana_regen', value: 3, en: '+# Mana every 5 Seconds', de: '+# Mana alle 5 Sekunden' },
+            { key: 'flat_health', value: 72, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'focus', value: -20, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -28, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'One mistake is fine when you spend the next minute apologizing to it.',
         flavorDe: 'Ein Fehler geht schon, wenn du die nächste Minute damit verbringst, dich bei ihm zu entschuldigen.',
@@ -3884,9 +4229,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_damage', value: 15, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'mana_regen', value: 2, en: '+# Mana every 5 Seconds', de: '+# Mana alle 5 Sekunden' },
+            { key: 'flat_mana', value: 22, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'flat_health', value: -30, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -54, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'The good ideas come at night. The headaches too.',
         flavorDe: 'Die guten Ideen kommen nachts. Die Kopfschmerzen auch.',
@@ -3901,9 +4247,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'attack_speed', value: 20, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
             { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -20, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -44, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'You swing so fast reality skips a few frames.',
         flavorDe: 'Du schlägst so schnell, dass die Realität ein paar Bilder auslässt.',
@@ -3918,9 +4265,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_blind', value: 15, en: '#% chance to Blind on hit', de: '#% Chance, bei Treffern zu blenden' },
             { key: 'focus', value: 15, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
+            { key: 'flat_health', value: 32, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'reveal_hint', value: -10, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'reveal_hint', value: -17, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' }
         ],
         flavorEn: 'You hear nothing. Neither does anyone else, ever again.',
         flavorDe: 'Du hörst nichts. Alle anderen ab jetzt auch nicht mehr.',
@@ -3935,9 +4283,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fate', value: 20, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'crit_multiplier', value: 30, en: '+#% Critical Strike Multiplier', de: '+#% Kritischer Schadensmultiplikator' },
+            { key: 'flat_health', value: 77, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'reveal_hint', value: 12, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -40, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -56, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Perfectly proportioned luck. Which is still luck.',
         flavorDe: 'Perfekt proportioniertes Glück. Was immer noch Glück ist.',
@@ -3951,9 +4302,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 36, str: 60, agi: 60, int: 60 },
         bonuses: [
             { key: 'mistake_not_count', value: 20, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht zählen' },
+            { key: 'flat_health', value: 46, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'accuracy', value: -15, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -33, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Are you sure? Are you really sure? Are you—',
         flavorDe: 'Bist du sicher? Ganz sicher? Bist du—',
@@ -3968,10 +4321,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'cold_damage_1', value: 8, en: '+# Minimum Cold Damage', de: '+# Minimaler Kälteschaden' },
             { key: 'cold_damage_2', value: 16, en: '+# Maximum Cold Damage', de: '+# Maximaler Kälteschaden' },
-            { key: 'chance_to_freeze', value: 8, en: '#% chance to Freeze', de: '#% Chance auf Einfrieren' },
+            { key: 'chance_to_freeze', value: 8, en: '#% chance to Freeze', de: '#% Chance auf Einfrieren' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -20, en: '-#% Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -30, en: '-#% Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Worn behind the ear, where the cold ideas enter.',
         flavorDe: 'Getragen hinter dem Ohr, wo die kalten Ideen eindringen.',
@@ -3988,9 +4341,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fate', value: 30, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'warding', value: 80, en: '+# Warding', de: '+# Wardschutz' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'heart_heal', value: 15, en: '+# to Heart Heal Amount', de: '+# Herzheilung' }
         ],
         downsides: [
-            { key: 'flat_health', value: -70, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -88, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Believe in the drop. You lose nothing either way.',
         flavorDe: 'Glaube an den Drop. Du verlierst so oder so nichts.',
@@ -4004,10 +4360,12 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 40, str: 152, agi: 0, int: 0 },
         bonuses: [
             { key: 'block_chance', value: 8, en: '+#% Block Chance', de: '+#% Blockchance' },
+            { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         defenses: { armour: 260, evasion: 0, absorption: 0 },
         downsides: [
-            { key: 'attack_speed', value: -10, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -13, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
         ],
         flavorEn: 'It has not moved in four hundred years. It is not about to start.',
         flavorDe: 'Es hat sich seit vierhundert Jahren nicht bewegt. Es hat auch nicht vor, damit anzufangen.',
@@ -4022,9 +4380,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_for_new_question', value: 30, en: '#% chance to get a new Question', de: '#% Chance auf eine neue Frage' },
             { key: 'mana_on_kill', value: 5, en: '+# Mana gained on Kill', de: '+# Mana bei Kill' },
+            { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'time_added', value: -20, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'time_added', value: -28, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
         ],
         flavorEn: 'But why? But why? But why?',
         flavorDe: 'Aber warum? Aber warum? Aber warum?',
@@ -4039,9 +4398,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_on_kill', value: 4, en: '+# Life gained on Kill', de: '+# Leben bei Kill' },
             { key: 'life_regen', value: 2, en: '+# Life per Second', de: '+# Leben pro Sekunde' },
+            { key: 'flat_health', value: 33, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'intelligence', value: -15, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -26, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'It holds a portrait of no one you remember.',
         flavorDe: 'Es enthält ein Porträt von niemandem, an den du dich erinnerst.',
@@ -4056,9 +4416,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_convert', value: 20, en: '#% chance to Convert', de: '#% Chance zur Bekehrung' },
             { key: 'inc_spell_damage', value: 25, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'flat_health', value: 78, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'spell_block_chance', value: -10, en: '-#% Spell Block Chance', de: '-#% Zauberblockchance' },
+            { key: 'spell_block_chance', value: -17, en: '-#% Spell Block Chance', de: '-#% Zauberblockchance' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Every problem goes in white and comes out seven different colors of worse.',
         flavorDe: 'Jedes Problem geht weiß hinein und kommt in sieben schlechteren Farben heraus.',
@@ -4073,9 +4436,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 25, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 40, en: '+#% Critical Strike Multiplier', de: '+#% Kritischer Schadensmultiplikator' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'heart_heal', value: 15, en: '+# to Heart Heal Amount', de: '+# Herzheilung' }
         ],
         downsides: [
-            { key: 'flat_health', value: -110, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -138, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Wear it loose. Breathe. Swing anyway.',
         flavorDe: 'Lass es locker sitzen. Atme. Schlage trotzdem zu.',
@@ -4093,9 +4459,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'cleave', value: 30, en: '#% chance to Cleave (hit nearby Monsters)', de: '#% Chance auf Keilschlag (nahe Monster treffen)' },
             { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_health', value: 45, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'dodge', value: -8, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -18, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'He ordered charges from the front. Once.',
         flavorDe: 'Er befahl Angriffe von vorn. Einmal.',
@@ -4110,9 +4477,12 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 320, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'flat_health', value: 60, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_armour', value: 90, en: '+# to Armour', de: '+# zu Rüstung' },
+            { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -15, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -19.5, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
         ],
         flavorEn: 'Carrying the weight of the world, plus interest.',
         flavorDe: 'Trägst das Gewicht der Welt. Zuzüglich Zinsen.',
@@ -4128,9 +4498,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'pushback', value: 0.6, en: '+#s Pushback on hit', de: '+#s Rückstoß bei Treffern' },
             { key: 'splash_damage', value: 25, en: '#% added Splash Damage', de: '#% zusätzlicher Flächenschaden' },
+            { key: 'flat_health', value: 41, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -18, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -40, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Everything bounces. Especially your aim.',
         flavorDe: 'Alles prallt ab. Vor allem deine Zielgenauigkeit.',
@@ -4145,9 +4516,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 140, absorption: 0 },
         bonuses: [
             { key: 'dodge', value: 7, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_armour', value: 35, en: '+# to Armour', de: '+# zu Rüstung' }
         ],
         downsides: [
-            { key: 'flat_health', value: -35, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Sheds one feather per dodge. It is going bald quickly.',
         flavorDe: 'Verliert eine Feder pro Ausweichmanöver. Es wird schnell kahl.',
@@ -4163,9 +4536,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'flat_mana', value: 100, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
             { key: 'inc_spell_damage', value: 30, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'flat_health', value: 65, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
             { key: 'mistake_count', value: -1, en: '-# Allowed Mistakes', de: '-# erlaubte Fehler' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Knowledge is heavy. Curiosity is heavier.',
         flavorDe: 'Wissen ist schwer. Neugier ist schwerer.',
@@ -4180,9 +4556,12 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 180, evasion: 0, absorption: 240 },
         bonuses: [
             { key: 'preemptive_dodge', value: 20, en: '#% Preemptive Dodge', de: '#% Präventives Ausweichen' },
+            { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'flat_armour', value: 60, en: '+# to Armour', de: '+# zu Rüstung' }
         ],
         downsides: [
-            { key: 'focus', value: -15, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -26, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'It dodges the hit and apologizes for the inconvenience.',
         flavorDe: 'Weicht dem Treffer aus und entschuldigt sich für die Umstände.',
@@ -4200,9 +4579,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'block_chance', value: 10, en: '+#% Block Chance', de: '+#% Blockchance' },
             { key: 'spell_block_chance', value: 10, en: '+#% Spell Block Chance', de: '+#% Zauberblockchance' },
+            { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'flat_health', value: -45, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'The king moves two squares. So do you, when it matters.',
         flavorDe: 'Der König zieht zwei Felder. Du auch, wenn es darauf ankommt.',
@@ -4218,9 +4598,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 12, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 8, en: '+#% chance to Dodge Spells', de: '+#% Zaucherausweichchance' },
+            { key: 'flat_health', value: 41, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -20, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -44, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'You fight with your eyes closed. Somehow that works.',
         flavorDe: 'Du kämpfst mit geschlossenen Augen. Irgendwie funktioniert es.',
@@ -4236,9 +4617,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'first_step', value: 1.5, en: '+#s Head Start at Map Start', de: '+#s Vorsprung beim Kartenstart' },
             { key: 'dodge', value: 5, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' }
         ],
         downsides: [
-            { key: 'flat_health', value: -40, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -72, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Certified for gliding. Landing is your problem.',
         flavorDe: 'Zertifiziert für Gleitflüge. Die Landung ist dein Problem.',
@@ -4254,9 +4636,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'cold_resist', value: 30, en: '+#% Cold Resistance', de: '+#% Kälteresistenz' },
             { key: 'focus', value: 20, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
+            { key: 'flat_health', value: 47, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'life_regen', value: -1, en: '-# Life per Second', de: '-# Leben pro Sekunde' },
+            { key: 'life_regen', value: -2.2, en: '-# Life per Second', de: '-# Leben pro Sekunde' }
         ],
         flavorEn: 'Feelings introduce rounding errors.',
         flavorDe: 'Gefühle verursachen Rundungsfehler.',
@@ -4272,9 +4656,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_blind', value: 20, en: '#% chance to Blind on hit', de: '#% Chance, bei Treffern zu blenden' },
             { key: 'warding', value: 50, en: '+# Warding', de: '+# Wardschutz' },
+            { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'spell_dodge', value: 10, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' }
         ],
         downsides: [
-            { key: 'flat_health', value: -60, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -84, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Half seen, half remembered, fully gone by the time it matters.',
         flavorDe: 'Halb gesehen, halb in Erinnerung, ganz weg, wenn es zählt.',
@@ -4290,9 +4677,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_on_kill', value: 6, en: '+# Life gained on Kill', de: '+# Leben bei Kill' },
             { key: 'cleave', value: 20, en: '#% chance to Cleave (hit nearby Monsters)', de: '#% Chance auf Keilschlag (nahe Monster treffen)' },
+            { key: 'flat_health', value: 75, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'spell_dodge', value: 10, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' }
         ],
         downsides: [
-            { key: 'dodge', value: -6, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -13, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'The legion never retreated. The legion never arrived either.',
         flavorDe: 'Die Legion ist nie zurückgewichen. Angekommen ist sie auch nie.',
@@ -4310,9 +4700,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'block_recovery', value: 35, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
             { key: 'flat_health', value: 80, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'life_regen', value: 3, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -50, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -70, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'The courage must be returned by midnight.',
         flavorDe: 'Der Mut muss um Mitternacht zurückgegeben werden.',
@@ -4328,9 +4719,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_shock', value: 18, en: '#% chance to Shock', de: '#% Chance auf Schocken' },
             { key: 'lightning_resist', value: 25, en: '+#% Lightning Resistance', de: '+#% Blitzresistenz' },
+            { key: 'flat_health', value: 32, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'spell_dodge', value: -6, en: '-#% chance to Dodge Spells', de: '-#% Zaucherausweichchance' },
+            { key: 'spell_dodge', value: -13, en: '-#% chance to Dodge Spells', de: '-#% Zaucherausweichchance' }
         ],
         flavorEn: 'It crackles when removed. Do not remove it indoors.',
         flavorDe: 'Es knistert beim Ausziehen. Zieh es nicht drinnen aus.',
@@ -4345,10 +4737,13 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 380, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'mistake_count', value: 2, en: '+# Allowed Mistakes', de: '+# erlaubte Fehler' },
+            { key: 'flat_health', value: 79, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'life_regen', value: 3, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
+            { key: 'inc_armour', value: 35, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'inc_physical_damage', value: -25, en: '#% reduced Physical Damage', de: '#% reduzierter physischer Schaden' },
-            { key: 'inc_spell_damage', value: -25, en: '#% reduced Spell Damage', de: '#% reduzierter Zauberschaden' },
+            { key: 'inc_physical_damage', value: -34, en: '#% reduced Physical Damage', de: '#% reduzierter physischer Schaden' },
+            { key: 'inc_spell_damage', value: -34, en: '#% reduced Spell Damage', de: '#% reduzierter Zauberschaden' }
         ],
         flavorEn: 'Every blessing counted. Every scar tallied twice.',
         flavorDe: 'Jede Segnung gezählt. Jede Narbe doppelt verbucht.',
@@ -4363,9 +4758,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 130, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'life_regen', value: 2, en: '+# Life per Second', de: '+# Leben pro Sekunde' },
+            { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'inc_armour', value: 20, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -30, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -51, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Posture: impeccable. Breathing: negotiable.',
         flavorDe: 'Haltung: einwandfrei. Atmung: verhandelbar.',
@@ -4382,10 +4779,10 @@ const EG_UNIQUE_ITEMS = [
             { key: 'fire_resist', value: 20, en: '+#% Fire Resistance', de: '+#% Feuerwiderstand' },
             { key: 'cold_resist', value: 20, en: '+#% Cold Resistance', de: '+#% Kälte Resistenz' },
             { key: 'lightning_resist', value: 20, en: '+#% Lightning Resistance', de: '+#% Blitzresistenz' },
-            { key: 'shadow_resist', value: 20, en: '+#% Shadow Resistance', de: '+#% Schattenresistenz' },
+            { key: 'shadow_resist', value: 20, en: '+#% Shadow Resistance', de: '+#% Schattenresistenz' }
         ],
         downsides: [
-            { key: 'spell_damage', value: -10, en: '-# Spell Damage', de: '-# Zauberschaden' },
+            { key: 'spell_damage', value: -20, en: '-# Spell Damage', de: '-# Zauberschaden' }
         ],
         flavorEn: 'Sealed against everything, including encouragement.',
         flavorDe: 'Abgedichtet gegen alles, Einschließlich Ermunterung.',
@@ -4401,9 +4798,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fate', value: 25, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'life_leech', value: 4, en: '#% of Damage Leeched as Life', de: '#% des Schadens als Leben abgesaugt' },
+            { key: 'life_regen', value: 4, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
+            { key: 'inc_armour', value: 35, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'flat_health', value: -70, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -88, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Three sevens line up somewhere. Usually not where you need them.',
         flavorDe: 'Irgendwo stehen drei Siebenen in einer Reihe. Meistens nicht dort, wo du sie brauchst.',
@@ -4419,9 +4819,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 39, str: 0, agi: 148, int: 0 },
         bonuses: [
             { key: 'attack_speed', value: 22, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
+            { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'accuracy', value: -22, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -35, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Speed is a substitute for skill. Repeatedly, if necessary.',
         flavorDe: 'Geschwindigkeit ersetzt Können. Ggf. wiederholt.',
@@ -4436,9 +4838,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zaucherausweichchance' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_health', value: -40, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -72, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Here one moment. Technically also there.',
         flavorDe: 'Einen Moment hier. Streng genommen auch dort.',
@@ -4453,9 +4856,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mana_regen', value: 4, en: '+# Mana every 5 Seconds', de: '+# Mana alle 5 Sekunden' },
             { key: 'mana_on_kill', value: 8, en: '+# Mana gained on Kill', de: '+# Mana bei Kill' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_health', value: -45, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Mana now, mana later, mana forever. Health is a sunk cost.',
         flavorDe: 'Mana jetzt, Mana später, Mana für immer. Leben sind versunkene Kosten.',
@@ -4470,9 +4876,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_physical_damage', value: 35, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'stagger', value: 15, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'flat_health', value: 29, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'focus', value: -15, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -26, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'Long division, short temper.',
         flavorDe: 'Schriftliche Division, kurzer Draht.',
@@ -4487,9 +4894,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'echo_1', value: 15, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
             { key: 'echo_2', value: 30, en: '#% increased Echo Damage', de: '#% erhöhter Echoschaden' },
+            { key: 'flat_health', value: 66, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -50, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -70, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Cast once, hit twice, apologize thrice.',
         flavorDe: 'Einmal zaubern, zweifach treffen, dreimal entschuldigen.',
@@ -4504,9 +4914,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fate', value: 15, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'life_on_kill', value: 5, en: '+# Life gained on Kill', de: '+# Leben bei Kill' },
+            { key: 'flat_health', value: 73, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'accuracy', value: -12, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -26, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'What hits them, hits you. What misses you, misses them.',
         flavorDe: 'Was sie trifft, trifft dich. Was dich verfehlt, verfehlt sie.',
@@ -4523,9 +4936,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'flat_physical_damage_1', value: 25, en: '+# Minimum Physical Damage', de: '+# Minimaler physischer Schaden' },
             { key: 'flat_physical_damage_2', value: 45, en: '+# Maximum Physical Damage', de: '+# Maximaler physischer Schaden' },
+            { key: 'flat_health', value: 46, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -10, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -13, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
         ],
         flavorEn: 'Carry the one. Then carry the monster.',
         flavorDe: 'Übertrage die Eins. Dann trag das Monster.',
@@ -4540,9 +4955,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_blind', value: 12, en: '#% chance to Blind on hit', de: '#% Chance, bei Treffern zu blenden' },
             { key: 'dodge', value: 5, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
+            { key: 'flat_health', value: 33, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -15, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -33, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Nobody expects the fluffy ones.',
         flavorDe: 'Niemand erwartet die Flauschigen.',
@@ -4557,9 +4973,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'time_added', value: 25, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'pushback', value: 0.4, en: '+#s Pushback on hit', de: '+#s Rückstoß bei Treffern' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'life_leech', value: 2, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' }
         ],
         downsides: [
-            { key: 'flat_health', value: -50, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -70, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Keeps three hours in the air at all times. Drops exactly one.',
         flavorDe: 'Hält ständig drei Stunden in der Luft. Lässt genau eine fallen.',
@@ -4574,10 +4992,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_freeze', value: 15, en: '#% chance to Freeze', de: '#% Chance auf Einfrieren' },
             { key: 'cold_damage_1', value: 12, en: '+# Minimum Cold Damage', de: '+# Minimaler Kälteschaden' },
-            { key: 'cold_damage_2', value: 24, en: '+# Maximum Cold Damage', de: '+# Maximaler Kälteschaden' },
+            { key: 'cold_damage_2', value: 24, en: '+# Maximum Cold Damage', de: '+# Maximaler Kälteschaden' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -25, en: '-#% Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -32, en: '-#% Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Handshakes are discouraged.',
         flavorDe: 'Händeschlagen wird nicht empfohlen.',
@@ -4591,9 +5009,13 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 64, str: 105, agi: 105, int: 30 },
         bonuses: [
             { key: 'fate', value: 35, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
+            { key: 'flat_health', value: 69, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'life_leech', value: 2, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
+            { key: 'fire_resist', value: 25, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' }
         ],
         downsides: [
-            { key: 'accuracy', value: -35, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -47, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Lucky punches land eventually. Statistically speaking.',
         flavorDe: 'Glückstreffer landen irgendwann. Rein statistisch.',
@@ -4609,9 +5031,11 @@ const EG_UNIQUE_ITEMS = [
             { key: 'chain', value: 25, en: '#% chance for Projectiles to Chain', de: '#% Chance, dass Projektile ketten' },
             { key: 'lightning_damage_1', value: 15, en: '+# Minimum Lightning Damage', de: '+# Minimaler Blitzschaden' },
             { key: 'lightning_damage_2', value: 30, en: '+# Maximum Lightning Damage', de: '+# Maximaler Blitzschaden' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_health', value: -55, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -77, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'The orchestra follows the baton. The lightning follows everything.',
         flavorDe: 'Das Orchester folgt dem Taktstock. Der Blitz folgt allem.',
@@ -4628,9 +5052,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'time_added', value: 35, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'focus', value: 15, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
+            { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -45, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -63, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'It steals time from whoever is not looking. That is always you.',
         flavorDe: 'Es stiehlt Zeit von allen, die nicht hinschauen. Das bist immer du.',
@@ -4645,9 +5071,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mana_on_kill', value: 10, en: '+# Mana gained on Kill', de: '+# Mana bei Kill' },
             { key: 'flat_mana', value: 40, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_health', value: -30, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -54, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'The pockets go all the way down. Do not reach in.',
         flavorDe: 'Die Taschen gehen ganz nach unten. Fass nicht hinein.',
@@ -4662,9 +5089,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'preemptive_dodge', value: 15, en: '#% Preemptive Dodge', de: '#% Präventives Ausweichen' },
             { key: 'block_recovery', value: 25, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
+            { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -8, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -10.4, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
         ],
         flavorEn: 'Formal wear for people who expect the floor to betray them.',
         flavorDe: 'Festtagskleidung für Menschen, die vom Boden Verrat erwarten.',
@@ -4679,9 +5107,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'strength', value: 18, en: '+# to Strength', de: '+# zu Stärke' },
             { key: 'flat_health', value: 60, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'warding', value: 100, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'intelligence', value: -15, en: '-# to Intelligence', de: '-# zu Intelligenz' },
+            { key: 'intelligence', value: -26, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
         flavorEn: 'Thinking hurts. Lifting does too, but honestly.',
         flavorDe: 'Nachdenken tut weh. Heben auch, aber ehrlich.',
@@ -4696,9 +5125,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_ignite', value: 25, en: '#% chance to Ignite', de: '#% Chance auf Entzünden' },
             { key: 'splash_damage', value: 30, en: '#% added Splash Damage', de: '#% zusätzlicher Flächenschaden' },
+            { key: 'flat_health', value: 67, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'cold_resist', value: -25, en: '-#% Cold Resistance', de: '-#% Kälte Resistenz' },
+            { key: 'cold_resist', value: -32, en: '-#% Cold Resistance', de: '-#% Kälte Resistenz' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Every pouch is a coin flip with a fuse.',
         flavorDe: 'Jede Tasche ist ein Münzwurf mit Zündschnur.',
@@ -4713,9 +5145,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'channel_1', value: 20, en: '+# Channel Damage per Stack', de: '+# Kanalisationsschaden pro Stapel' },
             { key: 'channel_2', value: 6, en: '+# maximum Channel Stacks', de: '+# maximale Kanalisationsstapel' },
+            { key: 'flat_health', value: 72, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -12, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -15.6, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Wait. Wait. Now.',
         flavorDe: 'Warten. Warten. Jetzt.',
@@ -4733,9 +5168,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_regen', value: 3, en: '+# Life per Second', de: '+# Leben pro Sekunde' },
             { key: 'flat_health', value: 50, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'dodge', value: -5, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -11, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'They have walked here before you. And before that, too.',
         flavorDe: 'Sie sind vor dir hierhergelaufen. Und davor auch schon.',
@@ -4751,9 +5187,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'arcane_resistance', value: 40, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
             { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'flat_health', value: 77, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'accuracy', value: -15, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -33, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'If A implies B, run anyway.',
         flavorDe: 'Wenn A B impliziert, lauf trotzdem.',
@@ -4769,9 +5208,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mistake_not_count', value: 25, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht zählen' },
             { key: 'fate', value: 10, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
+            { key: 'strength', value: 15, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'flat_health', value: -55, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -77, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Confidence is a stat if nobody checks the sheet.',
         flavorDe: 'Selbstvertrauen ist eine Statistik, solange niemand ins Tabellenblatt schaut.',
@@ -4787,10 +5227,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'flat_mana', value: 50, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
             { key: 'mana_regen', value: 3, en: '+# Mana every 5 Seconds', de: '+# Mana alle 5 Sekunden' },
-            { key: 'warding', value: 30, en: '+# Warding', de: '+# Wardschutz' },
+            { key: 'warding', value: 30, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'flat_health', value: -25, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -55, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Nine pockets. Each contains exactly one useful thing and lint.',
         flavorDe: 'Neun Taschen. In jeder ist genau etwas Nützliches und Fusseln.',
@@ -4806,9 +5246,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'focus', value: 20, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
             { key: 'life_regen', value: 2, en: '+# Life per Second', de: '+# Leben pro Sekunde' },
+            { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'crit_chance', value: -8, en: '-#% Critical Hit Chance', de: '-#% Kritische Trefferchance' },
+            { key: 'crit_chance', value: -18, en: '-#% Critical Hit Chance', de: '-#% Kritische Trefferchance' }
         ],
         flavorEn: 'Too comfortable for critical thinking.',
         flavorDe: 'Zu bequem für kritisches Denken.',
@@ -4825,10 +5266,11 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 40, evasion: 170, absorption: 0 },
         bonuses: [
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
-            { key: 'first_step', value: 1.0, en: '+#s Head Start at Map Start', de: '+#s Vorsprung beim Kartenstart' },
+            { key: 'first_step', value: 1, en: '+#s Head Start at Map Start', de: '+#s Vorsprung beim Kartenstart' },
+            { key: 'flat_health', value: 46, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -8, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -10.4, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
         ],
         flavorEn: 'Never retreat in the same direction twice.',
         flavorDe: 'Nie zweimal in dieselbe Richtung zurückweichen.',
@@ -4844,9 +5286,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'cold_resist', value: 35, en: '+#% Cold Resistance', de: '+#% Kälte Resistenz' },
             { key: 'flat_health', value: 70, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -15, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -19.5, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
         ],
         flavorEn: 'You will get there. Eventually. Definitely.',
         flavorDe: 'Du kommst an. Irgendwann. Ganz bestimmt.',
@@ -4862,9 +5305,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'absorption_regen_rate', value: 25, en: '#% increased Absorption Regeneration Rate', de: '#% erhöhte Absorptionsregenerationsrate' },
             { key: 'faster_absorption_regen_start', value: 1.5, en: '+#s sooner Absorption Regeneration', de: '+#s frühere Absorptionsregeneration' },
+            { key: 'flat_health', value: 48, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'lightning_resist', value: -20, en: '-#% Lightning Resistance', de: '-#% Blitzresistenz' },
+            { key: 'lightning_resist', value: -30, en: '-#% Lightning Resistance', de: '-#% Blitzresistenz' }
         ],
         flavorEn: 'Waterproof up to the promises made in them.',
         flavorDe: 'Wasserdicht bis zu den darin gemachten Versprechen.',
@@ -4880,9 +5325,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_ignite', value: 20, en: '#% chance to Ignite', de: '#% Chance auf Entzünden' },
             { key: 'attack_speed', value: 10, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
+            { key: 'flat_health', value: 72, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -30, en: '-#% Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -39, en: '-#% Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'You leave a trail. Occasionally it follows you back.',
         flavorDe: 'Du hinterlässt eine Spur. Gelegentlich folgt sie dir zurück.',
@@ -4898,10 +5345,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'pushback', value: 0.5, en: '+#s Pushback on hit', de: '+#s Rückstoß bei Treffern' },
             { key: 'grounded_1', value: 30, en: '#% chance to resist being Pushed back', de: '#% Chance, Rückstoß zu widerstehen' },
-            { key: 'grounded_2', value: 30, en: '#% reduced Pushback taken', de: '#% reduzierter erlittener Rückstoß' },
+            { key: 'grounded_2', value: 30, en: '#% reduced Pushback taken', de: '#% reduzierter erlittener Rückstoß' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -60, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'One small step, repeatedly, in panic.',
         flavorDe: 'Ein kleiner Schritt, wiederholt, in Panik.',
@@ -4917,9 +5364,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'warding', value: 100, en: '+# Warding', de: '+# Wardschutz' },
             { key: 'preemptive_dodge', value: 18, en: '#% Preemptive Dodge', de: '#% Präventives Ausweichen' },
+            { key: 'flat_health', value: 74, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'crit_multiplier', value: -25, en: '-#% Critical Strike Multiplier', de: '-#% Kritischer Schadensmultiplikator' },
+            { key: 'crit_multiplier', value: -35, en: '-#% Critical Strike Multiplier', de: '-#% Kritischer Schadensmultiplikator' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Nothing hurts. Nothing hits hard either.',
         flavorDe: 'Nichts tut weh. Nichts trifft auch besonders hart.',
@@ -4936,9 +5386,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'mana_on_mistake', value: 25, en: '+# Mana gained on Mistake', de: '+# Mana bei Fehler' },
             { key: 'flat_mana', value: 30, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_health', value: -35, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Every error pays out. It is rooting for your failure, loudly.',
         flavorDe: 'Jeder Fehler zahlt sich aus. Es wettet laut auf dein Scheitern.',
@@ -4954,9 +5405,10 @@ const EG_UNIQUE_ITEMS = [
             { key: 'chance_to_shock', value: 22, en: '#% chance to Shock', de: '#% Chance auf Schocken' },
             { key: 'lightning_damage_1', value: 14, en: '+# Minimum Lightning Damage', de: '+# Minimaler Blitzschaden' },
             { key: 'lightning_damage_2', value: 28, en: '+# Maximum Lightning Damage', de: '+# Maximaler Blitzschaden' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_health', value: -45, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'The shortest path between two points is through you.',
         flavorDe: 'Der kürzeste Weg zwischen zwei Punkten führt durch dich.',
@@ -4971,10 +5423,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'strength', value: 8, en: '+# to Strength', de: '+# zu Stärke' },
             { key: 'agility', value: 8, en: '+# to Agility', de: '+# zu Geschick' },
-            { key: 'intelligence', value: 8, en: '+# to Intelligence', de: '+# zu Intelligenz' },
+            { key: 'intelligence', value: 8, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'flat_health', value: -20, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -44, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'A little of everything, including regret.',
         flavorDe: 'Ein wenig von allem, Einschließlich Reue.',
@@ -4988,9 +5440,13 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 71, str: 110, agi: 110, int: 55 },
         bonuses: [
             { key: 'fate', value: 40, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
+            { key: 'accuracy', value: 85, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'fire_resist', value: 30, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' }
         ],
         downsides: [
-            { key: 'flat_health', value: -90, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -112, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Fortune favors the bold, and devours the fragile.',
         flavorDe: 'Das Glück ist dem Mutigen hold — und verschlingt die Zerbrechlichen.',
@@ -5005,9 +5461,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 15, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 50, en: '+#% Critical Strike Multiplier', de: '+#% Kritischer Schadensmultiplikator' },
+            { key: 'flat_health', value: 65, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -50, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -70, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'For double or nothing. Mostly nothing.',
         flavorDe: 'Für alles oder nichts. Meistens nichts.',
@@ -5022,9 +5481,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_block_chance', value: 12, en: '+#% Spell Block Chance', de: '+#% Zauberblockchance' },
             { key: 'arcane_resistance', value: 25, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
+            { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -12, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -26, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Ward off essays, hexes, and pop quizzes alike.',
         flavorDe: 'Wehrt Essays, Flüche und Überraschungstests gleichermaßen ab.',
@@ -5040,9 +5500,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 40, str: 0, agi: 0, int: 152 },
         bonuses: [
             { key: 'reveal_hint', value: 30, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'inc_spell_damage', value: 30, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
         ],
         downsides: [
-            { key: 'chance_for_new_question', value: -20, en: '-#% chance to get a new Question', de: '-#% Chance auf eine neue Frage' },
+            { key: 'chance_for_new_question', value: -28, en: '-#% chance to get a new Question', de: '-#% Chance auf eine neue Frage' }
         ],
         flavorEn: 'It shows you the answer. The answer is usually \u201cthe obvious one.\u201d',
         flavorDe: 'Sie zeigt dir die Antwort. Die Antwort ist meistens „die offensichtliche“.',
@@ -5057,9 +5519,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_spell_damage', value: 40, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
             { key: 'mana_regen', value: 4, en: '+# Mana every 5 Seconds', de: '+# Mana alle 5 Sekunden' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'flat_health', value: -60, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -84, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Exponential power. Exponentially fragile.',
         flavorDe: 'Exponentielle Macht. Exponentell zerbrechlich.',
@@ -5074,9 +5539,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'spell_damage', value: 20, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'flat_mana', value: 30, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
         ],
         downsides: [
-            { key: 'flat_health', value: -30, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -54, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'It is 60% sure about everything. That is the whole trick.',
         flavorDe: 'Sie ist sich zu 60 % über alles sicher. Das ist der ganze Trick.',
@@ -5091,9 +5557,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'echo_1', value: 20, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
             { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' },
+            { key: 'spell_dodge', value: 10, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -60, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -72, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_health', value: -45, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Every miracle costs double mana and half dignity.',
         flavorDe: 'Jedes Wunder kostet doppeltes Mana und die Hälfte an Würde.',
@@ -5107,9 +5576,13 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 68, str: 0, agi: 0, int: 258 },
         bonuses: [
             { key: 'chance_for_new_question', value: 45, en: '#% chance to get a new Question', de: '#% Chance auf eine neue Frage' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'inc_spell_damage', value: 40, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [
-            { key: 'focus', value: -25, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -35, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Appendix A lists every question. Appendix B lists every excuse.',
         flavorDe: 'Anhang A listet jede Frage. Anhang B listet jede Ausrede.',
@@ -5124,9 +5597,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 20, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 35, en: '+#% Critical Strike Multiplier', de: '+#% Kritischer Schadensmultiplikator' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'inc_spell_damage', value: 30, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
         ],
         downsides: [
-            { key: 'spell_dodge', value: -8, en: '-#% chance to Dodge Spells', de: '-#% Zaucherausweichchance' },
+            { key: 'spell_dodge', value: -18, en: '-#% chance to Dodge Spells', de: '-#% Zaucherausweichchance' },
+            { key: 'flat_health', value: -45, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Observation changes the outcome. Mostly into craters.',
         flavorDe: 'Beobachtung verändert das Ergebnis. Meistens in Kraterform.',
@@ -5143,9 +5619,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'fate', value: 20, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'reveal_hint', value: 15, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'flat_health', value: -50, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -70, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'The sample size is you.',
         flavorDe: 'Die Stichprobe bist du.',
@@ -5160,9 +5637,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_freeze', value: 18, en: '#% chance to Freeze', de: '#% Chance auf Einfrieren' },
             { key: 'cold_resist', value: 20, en: '+#% Cold Resistance', de: '+#% Kälte Resistenz' },
+            { key: 'flat_health', value: 41, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'fire_resist', value: -20, en: '-#% Fire Resistance', de: '-#% Feuerwiderstand' },
+            { key: 'fire_resist', value: -30, en: '-#% Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Luck preserved at exactly minus seventeen degrees.',
         flavorDe: 'Glück, konserviert bei exakt minus siebzehn Grad.',
@@ -5177,9 +5655,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'life_on_kill', value: 5, en: '+# Life gained on Kill', de: '+# Leben bei Kill' },
             { key: 'absorption_on_kill', value: 5, en: '+# Absorption gained on Kill', de: '+# Absorption bei Kill' },
+            { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'mana_regen', value: -2, en: '-# Mana every 5 Seconds', de: '-# Mana alle 5 Sekunden' },
+            { key: 'mana_regen', value: -4.4, en: '-# Mana every 5 Seconds', de: '-# Mana alle 5 Sekunden' }
         ],
         flavorEn: 'It keeps score. You are losing.',
         flavorDe: 'Es führt Buch. Du verlierst.',
@@ -5194,9 +5674,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_convert', value: 25, en: '#% chance to Convert', de: '#% Chance zur Bekehrung' },
             { key: 'inc_spell_damage', value: 15, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
+            { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
+            { key: 'fate', value: 18, en: '#% increased Fate', de: '#% erhöhtes Schicksal' }
         ],
         downsides: [
-            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -81, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'Why fight the monster when it could work for you?',
         flavorDe: 'Warum das Monster bekämpfen, wenn es für dich arbeiten könnte?',
@@ -5210,9 +5693,11 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 27, str: 50, agi: 50, int: 0 },
         bonuses: [
             { key: 'mistake_not_count', value: 30, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht zählen' },
+            { key: 'flat_health', value: 34, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'flat_mana', value: 22, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
         downsides: [
-            { key: 'accuracy', value: -25, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -40, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Like the foot, but rarer and considerably weirder.',
         flavorDe: 'Wie das Bein, nur seltener und deutlich seltsamer.',
@@ -5226,10 +5711,13 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 66, str: 90, agi: 90, int: 70 },
         bonuses: [
             { key: 'warding', value: 90, en: '+# Warding', de: '+# Wardschutz' },
-            { key: 'faster_absorption_regen_start', value: 2.0, en: '+#s sooner Absorption Regeneration', de: '+#s frühere Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 2, en: '+#s sooner Absorption Regeneration', de: '+#s frühere Absorptionsregeneration' },
+            { key: 'flat_health', value: 71, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'fate', value: 18, en: '#% increased Fate', de: '#% erhöhtes Schicksal' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -55, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -66, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
         flavorEn: 'One bead per unanswered prayer. It is a long necklace.',
         flavorDe: 'Eine Perle pro unbeantwortetem Gebet. Es ist eine lange Kette.',
@@ -5247,9 +5735,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'inc_physical_damage', value: 25, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'accuracy', value: 20, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -20, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -44, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Twelve inches of discipline. Metric on request.',
         flavorDe: 'Zöllig Disziplin. Auf Wunsch metrisch.',
@@ -5265,9 +5754,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'crit_chance', value: 20, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 60, en: '+#% Critical Strike Multiplier', de: '+#% Kritischer Schadensmultiplikator' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'flat_health', value: 78, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -25, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -40, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Precision instrument. Imprecise targets.',
         flavorDe: 'Präzisionsinstrument. Unpräzise Ziele.',
@@ -5283,9 +5775,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'stagger', value: 35, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'pushback', value: 0.5, en: '+#s Pushback on hit', de: '+#s Rückstoß bei Treffern' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
-            { key: 'focus', value: -15, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' },
+            { key: 'focus', value: -26, en: '#% increased Time Penalty from Mistakes', de: '#% erhöhte Zeitstrafe durch Fehler' }
         ],
         flavorEn: 'Every swing writes a big red X over something.',
         flavorDe: 'Jeder Hieb schreibt ein großes rotes X über irgendwas.',
@@ -5300,9 +5793,11 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 80, max: 140 }, attackIntervalSeconds: 4.5,
         bonuses: [
             { key: 'mana_on_kill', value: 8, en: '+# Mana gained on Kill', de: '+# Mana bei Kill' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -15, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -19.5, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
         ],
         flavorEn: 'Counts your kills out loud. In base twelve.',
         flavorDe: 'Zählt deine Kills laut mit. Im Zwölfersystem.',
@@ -5317,9 +5812,13 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 300, max: 520 }, attackIntervalSeconds: 7.5,
         bonuses: [
             { key: 'cleave', value: 50, en: '#% chance to Cleave (hit nearby Monsters)', de: '#% Chance auf Keilschlag (nahe Monster treffen)' },
+            { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'flat_health', value: 71, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'accuracy', value: -30, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -48, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Always exactly ninety degrees off target.',
         flavorDe: 'Immer exakt neunzig Grad am Ziel vorbei.',
@@ -5335,9 +5834,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'pierce', value: 40, en: '#% chance for Projectiles to Pierce', de: '#% Chance, dass Projektile durchdringen' },
             { key: 'attack_speed', value: 15, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
+            { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
-            { key: 'flat_health', value: -30, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -54, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Points north. Stabs wherever you tell it. Reluctantly.',
         flavorDe: 'Zeigt nach Norden. Sticht wohin du es befiehlst. Widerwillig.',
@@ -5353,9 +5853,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'overkill', value: 35, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
             { key: 'life_leech', value: 5, en: '#% of Damage Leeched as Life', de: '#% des Schadens als Leben abgesaugt' },
+            { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'accuracy', value: 85, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -60, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -72, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'Nothing survives peer review.',
         flavorDe: 'Nichts übersteht das Peer-Review.',
@@ -5372,9 +5875,10 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 12, max: 22 }, attackIntervalSeconds: 1.8,
         bonuses: [
             { key: 'crit_chance', value: 15, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
-            { key: 'accuracy', value: -10, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -30, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Zero budget. Infinite disrespect.',
         flavorDe: 'Null Budget. Unendliche Respektlosigkeit.',
@@ -5389,9 +5893,11 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 70, max: 120 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 30, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
+            { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
-            { key: 'accuracy', value: -20, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -44, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Everything you throw away comes back. Everything.',
         flavorDe: 'Alles, was du wegwirfst, kommt zurück. Alles.',
@@ -5406,9 +5912,12 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 140, max: 230 }, attackIntervalSeconds: 2.8,
         bonuses: [
             { key: 'multishot', value: 60, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'fate', value: 18, en: '#% increased Fate', de: '#% erhöhtes Schicksal' }
         ],
         downsides: [
-            { key: 'accuracy', value: -45, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -61, en: '-# Accuracy', de: '-# Präzision' }
         ],
         flavorEn: 'Sprays foam in every direction except the right one.',
         flavorDe: 'Versprüht Schaum in alle Richtungen außer der richtigen.',
@@ -5423,9 +5932,13 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 420, max: 850 }, attackIntervalSeconds: 9.5,
         bonuses: [
             { key: 'stagger', value: 40, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
+            { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
+            { key: 'fate', value: 18, en: '#% increased Fate', de: '#% erhöhtes Schicksal' }
         ],
         downsides: [
-            { key: 'accuracy', value: -35, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -47, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_health', value: -65, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
         flavorEn: 'The superior siege engine. Also the superior teaching method.',
         flavorDe: 'Die überlegene Belagerungsmaschine. Auch die überlegene Lehrmethode.',
@@ -5441,9 +5954,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chain', value: 35, en: '#% chance for Projectiles to Chain', de: '#% Chance, dass Projektile ketten' },
             { key: 'chance_to_shock', value: 20, en: '#% chance to Shock', de: '#% Chance auf Schocken' },
+            { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'flat_health', value: -60, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_health', value: -84, en: '-# to maximum Health', de: '-# zu maximalem Leben' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Fifty-two cards. All of them sharp. None of them merciful.',
         flavorDe: 'Zweiundfünfzig Karten. Alle scharf. Keine gnädig.',
@@ -5462,9 +5978,10 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'block_chance', value: 8, en: '+#% Block Chance', de: '+#% Blockchance' },
             { key: 'spell_block_chance', value: 8, en: '+#% Spell Block Chance', de: '+#% Zauberblockchance' },
+            { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -12, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -15.6, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
         ],
         flavorEn: 'Elegant against rain, arrows, and meteors alike.',
         flavorDe: 'Elegant gegen Regen, Pfeile und Meteore gleichermaßen.',
@@ -5481,9 +5998,11 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'flat_health', value: 90, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'block_recovery', value: 30, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
+            { key: 'block_chance', value: 8, en: '+#% Block Chance', de: '+#% Blockchance' },
+            { key: 'spell_block_chance', value: 8, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' }
         ],
         downsides: [
-            { key: 'flat_mana', value: -40, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'flat_mana', value: -56, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'POLICE line not included. Snack compartment added.',
         flavorDe: 'Absperrband nicht im Lieferumfang. Snackfach hinzugefügt.',
@@ -5500,9 +6019,12 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'chance_to_blind', value: 15, en: '#% chance to Blind on hit', de: '#% Chance, bei Treffern zu blenden' },
             { key: 'warding', value: 60, en: '+# Warding', de: '+# Wardschutz' },
+            { key: 'flat_health', value: 76, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 10, en: '+#% Block Chance', de: '+#% Blockchance' }
         ],
         downsides: [
-            { key: 'accuracy', value: -15, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'accuracy', value: -33, en: '-# Accuracy', de: '-# Präzision' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Monsters mostly attack their own reflection anyway.',
         flavorDe: 'Monster greifen ohnehin meistens ihr eigenes Spiegelbild an.',
@@ -5518,9 +6040,13 @@ const EG_UNIQUE_ITEMS = [
         blockChance: 30,
         bonuses: [
             { key: 'mistake_count', value: 1, en: '+# Allowed Mistakes', de: '+# erlaubte Fehler' },
+            { key: 'flat_health', value: 70, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'block_chance', value: 10, en: '+#% Block Chance', de: '+#% Blockchance' },
+            { key: 'spell_block_chance', value: 10, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -20, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: -26, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' },
+            { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Form 27-B must be filed before any monster may pass. In triplicate.',
         flavorDe: 'Formular 27-B muss eingereicht werden, bevor ein Monster passieren darf. Dreifach.',
@@ -5536,9 +6062,11 @@ const EG_UNIQUE_ITEMS = [
         blockChance: 22,
         bonuses: [
             { key: 'block_chance', value: 10, en: '+#% Block Chance', de: '+#% Blockchance' },
+            { key: 'flat_health', value: 32, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'spell_block_chance', value: 6, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' }
         ],
         downsides: [
-            { key: 'dodge', value: -6, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' },
+            { key: 'dodge', value: -13, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'Blocks most things. Drains the rest.',
         flavorDe: 'Blockt die meisten Dinge. Den Rest lässt er abtropfen.',

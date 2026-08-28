@@ -1357,10 +1357,14 @@ const EG_MAP_CURRENCY_RULES = {
         },
     },
     orb_elevation: {
-        canApply(map) { return map.rarity === 'rare'; },
+        canApply(map) {
+            if (map.rarity !== 'rare') return false;
+            return (map.mods || []).length < EG_MOD_CAPS.epic.maxTotal;
+        },
         apply(map) {
-            const { prefixCount, suffixCount } = _egRollModCounts('epic');
-            return _egRerollMapMods(map, 'epic', prefixCount, suffixCount);
+            const updated = _egAddOneModToMap({ ...map, rarity: 'epic' }, 'epic');
+            const name = _egBuildItemName(updated.baseName || updated.name, 'epic', updated.mods);
+            return { ...updated, rarity: 'epic', name };
         },
     },
     orb_cataclysm: {

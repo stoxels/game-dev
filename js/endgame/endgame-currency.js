@@ -193,14 +193,18 @@ const EG_CURRENCY_DEFS = {
         },
     },
 
-    // Rare -> Epic directly.
+    // Rare -> Epic: keeps existing modifiers and adds one new modifier.
     orb_elevation: {
         id: 'orb_elevation', name: t('eg_orb_elevation'), icon: '✨',
         description: t('eg_orb_elevation_desc'),
-        canApply(item) { return item.rarity === 'rare'; },
+        canApply(item) {
+            if (item.rarity !== 'rare') return false;
+            return (item.mods || []).length < EG_MOD_CAPS.epic.maxTotal;
+        },
         apply(item) {
-            const { prefixCount, suffixCount } = _egRollModCounts('epic');
-            return _egRerollItemMods(item, 'epic', prefixCount, suffixCount);
+            const updated = _egAddOneModToItem({ ...item, rarity: 'epic' }, 'epic');
+            const name = _egBuildItemName(updated.baseName || updated.name, 'epic', updated.mods);
+            return { ...updated, rarity: 'epic', name };
         },
     },
 
@@ -216,11 +220,25 @@ const EG_CURRENCY_DEFS = {
     },
 
     // Common -> random rarity (uncommon/rare/epic), like PoE's Chance Orb.
+    // Very rarely forges a unique of the same slot instead (Ancient Orb behaviour).
     orb_chance: {
         id: 'orb_chance', name: t('eg_orb_chance'), icon: '🎲',
         description: t('eg_orb_chance_desc'),
         canApply(item) { return item.rarity === 'common'; },
         apply(item) {
+            // ~2.5% chance to act like an Ancient Orb — eligible uniques are
+            // same slotType with required level <= source item's level.
+            const UNIQUE_CHANCE = 0.025;
+            if (Math.random() < UNIQUE_CHANCE
+                && typeof _egGetAncientOrbEligibleUniques === 'function'
+                && typeof _egBuildUniqueItem === 'function') {
+                const elig = _egGetAncientOrbEligibleUniques(item);
+                if (elig.length > 0) {
+                    const def = elig[Math.floor(Math.random() * elig.length)];
+                    const lvl = item.itemLevel || (item.requirements && item.requirements.level) || def.minLevel || 1;
+                    return _egBuildUniqueItem(def, lvl);
+                }
+            }
             const roll = Math.random();
             const rarity = roll < 0.60 ? 'uncommon' : (roll < 0.90 ? 'rare' : 'epic');
             const { prefixCount, suffixCount } = _egRollModCounts(rarity);
@@ -421,7 +439,9 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         : null;
 
     if (isMap && !mapRule) {
-        showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
+        const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
+        showToast(msg);
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
             setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
@@ -432,7 +452,9 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
 
     // Non-mirror map orbs must satisfy the map rule's own rarity gate.
     if (isMap && defId !== 'mirror_of_kalandra' && !mapRule.canApply(item)) {
-        showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
+        const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
+        showToast(msg);
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
             setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
@@ -442,7 +464,9 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     }
 
     if (!isMap && (item.category !== 'equip' || !def.canApply(item))) {
-        showToast(t('eg_currency_cannot_use').replace('{name}', def.name));
+        const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
+        showToast(msg);
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
             setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
@@ -471,7 +495,9 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         // Unlimited main stash: grow if needed (map stash stays capped)
         if (freeR === -1) {
             if (copyToMapStash) {
-                showToast(t('eg_map_stash_full'));
+                const msg = t('eg_map_stash_full');
+                showToast(msg);
+                if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
                 _egCancelCurrencyUse(true);
                 return;
             }
@@ -664,7 +690,9 @@ document.addEventListener('mousedown', function (e) {
     }
 
     if (!targetItem) {
-        showToast(t('eg_no_item_target'));
+        const msg = t('eg_no_item_target');
+        showToast(msg);
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         _egCancelCurrencyUse(true);
         return;
     }

@@ -486,11 +486,15 @@ function _egBuildInventoryGridHTML() {
 // Header now carries two stash actions: ⚙ opens the mass-sell filter modal,
 // ⚒ sells every stashed item whose rarity is NOT protected (same effect as
 // Ctrl+left-click, i.e. shards / no-value destroy).
+// The center span (#eg-stash-info) is an absolutely-positioned overlay that
+// shows transient feedback (orb failures, equip/unequip blocks, etc.) without
+// affecting layout — see endgame-hub.css .eg-stash-info.
 function _egBuildStashPanelHTML() {
     return `
 <div class="eg-panel eg-panel-inv">
     <div class="eg-panel-label eg-stash-header">
         <span>${t('eg_stash_label')}</span>
+        <div id="eg-stash-info" class="eg-stash-info" aria-live="polite"></div>
         <div class="eg-stash-actions">
             <button class="eg-stash-btn eg-stash-btn-config" onclick="_egOpenMassSellModal()"
                     title="${t('eg_mass_sell_config_title')}">⚙ ${t('eg_mass_sell_config')}</button>
@@ -502,6 +506,60 @@ function _egBuildStashPanelHTML() {
         ${_egBuildInventoryGridHTML()}
     </div>
 </div>`;
+}
+
+//------------------------------------------------------------------------
+//-------------------STASH CENTER INFO OVERLAY-----------------------------
+//------------------------------------------------------------------------
+// Transient feedback line centered in the stash header. Used to explain
+// WHY an action did not work (orb cannot apply, equip/unequip blocked by
+// stat requirements or chain-break, etc.). The element is absolutely
+// positioned so it never shifts the STASH label or action buttons.
+
+let _egStashInfoTimer = null;
+
+function _egEnsureStashInfoEl() {
+    let el = document.getElementById('eg-stash-info');
+    if (el) return el;
+    const header = document.querySelector('.eg-stash-header');
+    if (!header) return null;
+    el = document.createElement('div');
+    el.id = 'eg-stash-info';
+    el.className = 'eg-stash-info';
+    el.setAttribute('aria-live', 'polite');
+    // insert between label and actions (as 2nd child)
+    const actions = header.querySelector('.eg-stash-actions');
+    if (actions) header.insertBefore(el, actions);
+    else header.appendChild(el);
+    return el;
+}
+
+function _egShowStashInfo(message, opts = {}) {
+    const el = _egEnsureStashInfoEl();
+    if (!el || !message) return;
+    const type = opts.type || 'error';
+    const duration = opts.duration != null ? opts.duration : 4500;
+    // derive duration from toast setting when available
+    let effectiveDuration = duration;
+    try {
+        const sld = document.getElementById('sld-toast');
+        if (sld && !opts.duration) {
+            const v = parseInt(sld.value, 10);
+            if (!isNaN(v) && v >= 2 && v <= 15) effectiveDuration = v * 1000;
+        }
+    } catch (e) {}
+    el.textContent = message;
+    el.className = 'eg-stash-info show eg-stash-info--' + type;
+    if (_egStashInfoTimer) clearTimeout(_egStashInfoTimer);
+    _egStashInfoTimer = setTimeout(() => {
+        el.classList.remove('show');
+    }, effectiveDuration);
+}
+
+function _egClearStashInfo() {
+    const el = document.getElementById('eg-stash-info');
+    if (el) el.classList.remove('show');
+    if (_egStashInfoTimer) { clearTimeout(_egStashInfoTimer); _egStashInfoTimer = null; }
 }
 
 
