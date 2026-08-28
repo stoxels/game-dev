@@ -380,6 +380,8 @@ function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
     }
 
     if (amount <= 0) {
+        if (typeof dead !== 'undefined' && dead) return;
+        if (typeof _egIsActive === 'function' && !_egIsActive()) return;
         if (typeof _renderPlayerAvatar === 'function') _renderPlayerAvatar();
         return;
     }

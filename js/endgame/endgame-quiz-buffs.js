@@ -126,14 +126,30 @@ function _egResetQuizDamageBuff() {
 // Returns and clears the summary lines for the countdown transition screen.
 // Joins all accumulated lines with a line-break so multi-question interstitials
 // (map_extra_questions) display every reward, not just the last one.
+// Duplicate damage-buff lines from the same interstitial batch are coalesced
+// to the final total so two correct answers that both roll damage show only
+// a single "+20% damage (x2 stacks)" (or the final xN total later in a chain).
 function _egConsumePendingQuizRewardHTML() {
+    const _isDmgLine = l => l.includes('⚔️') && l.includes('damage');
+    const _coalesce = lines => {
+        const dmgLines = lines.filter(_isDmgLine);
+        if (dmgLines.length <= 1) return lines;
+        const lastDmg = dmgLines[dmgLines.length - 1];
+        const nonDmg = lines.filter(l => !_isDmgLine(l));
+        // Keep non-damage rewards in original order and append the final
+        // damage total at the end (chronologically last reward).
+        return [...nonDmg, lastDmg];
+    };
     let line = '';
     if (_egPendingQuizRewardLines.length > 0) {
-        line = _egPendingQuizRewardLines.join('<br>');
+        const coalesced = _coalesce(_egPendingQuizRewardLines);
+        line = coalesced.join('<br>');
         _egPendingQuizRewardLines = [];
     } else if (_egPendingQuizRewardLine) {
-        // Fallback for legacy single-string value
-        line = _egPendingQuizRewardLine;
+        // Fallback for legacy single-string value — may already contain <br>
+        const parts = _egPendingQuizRewardLine.split('<br>');
+        const coalesced = _coalesce(parts);
+        line = coalesced.join('<br>');
     }
     _egPendingQuizRewardLine = '';
     return line;
@@ -260,17 +276,19 @@ function _egGrantQuizDamageReward() {
     _egQuizDmgBuffStacks.push(Date.now() + EG_QUIZ_BUFF_DURATION_MS);
     _egPruneQuizDamageStacks();
     const stacks = _egQuizDmgBuffStacks.length;
-    const totalPct = stacks * EG_QUIZ_BUFF_DAMAGE_PER_STACK * 100;
+    const totalPct = Number((stacks * EG_QUIZ_BUFF_DAMAGE_PER_STACK * 100).toFixed(1));
+    // Strip trailing .0 so integers display as "30" not "30.0"
+    const totalPctLabel = Number.isInteger(totalPct) ? String(Math.round(totalPct)) : String(totalPct);
     const durLabel = _egFormatQuizBuffDuration(EG_QUIZ_BUFF_DURATION_MS);
     if (typeof showToast === 'function') {
-        const stackInfo = stacks > 1 ? ` (x${stacks} → +${totalPct}% total)` : '';
+        const stackInfo = stacks > 1 ? ` (x${stacks} → +${totalPctLabel}% total)` : '';
         showToast(`⚔️ Scholar's Wrath: +10% damage for ${durLabel}${stackInfo}!`);
     }
     _egAddQuizShieldFX(EG_QUIZ_BUFF_DURATION_MS);
 
     const label = document.createElement('div');
     label.className = 'eg-damage-number eg-quiz-buff-label';
-    label.textContent = stacks > 1 ? `+${totalPct}% DMG (x${stacks})` : '+10% DMG';
+    label.textContent = stacks > 1 ? `+${totalPctLabel}% DMG (x${stacks})` : '+10% DMG';
     label.style.setProperty('--eg-hit-color', EG_QUIZ_BUFF_COLORS.damage);
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud) {
@@ -280,8 +298,16 @@ function _egGrantQuizDamageReward() {
     }
 
     const dmgLine = stacks > 1
-        ? `<span style="color:#ff8a70">⚔️ +${totalPct}% damage</span> <span style="opacity:.6">(x${stacks} stacks, ${durLabel} each)</span>`
-        : `<span style="color:#ff8a70">⚔️ +10% damage</span> <span style="opacity:.6">(${durLabel})</span>`;
+        ? `<span style="color:#ff8a70">⚔️ +${totalPctLabel}% damage</span> <span style="opacity:.6">(x${stacks} stacks)</span>`
+        : `<span style="color:#ff8a70">⚔️ +10% damage</span>`;
+    // Consolidate multiple damage rewards inside the same interstitial batch:
+    // two correct answers that both roll damage should show a single final
+    // line (e.g. "+20% damage (x2 stacks)") instead of two lines
+    // "+10%" and "+20% (x2)". Later chain segments where stacks already
+    // existed similarly collapse to the final total (e.g. x4). Other reward
+    // types (heal / mana) are kept as separate lines.
+    const _isDmgLine = l => l.includes('⚔️') && l.includes('damage');
+    _egPendingQuizRewardLines = _egPendingQuizRewardLines.filter(l => !_isDmgLine(l));
     _egPendingQuizRewardLines.push(dmgLine);
     _egPendingQuizRewardLine = _egPendingQuizRewardLines.join('<br>');
 }

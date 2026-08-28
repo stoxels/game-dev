@@ -139,13 +139,19 @@ function _egBuildGatePanelHTML() {
 // read from and write to the SAME _egCurrencyStash, so amounts stay in sync;
 // _egRenderCurrencyCell() in endgame-hub-drag-and-drop.js updates both.
 
-// Builds a single runes & orbs cell for the gate screen.
+// Builds a single Orbs & Shards cell for the gate screen (PoE fixed slots).
 function _egBuildGateCurrencyCellHTML(row, col) {
     return `
 <div class="eg-inv-cell eg-currency-cell"
      id="eg-gate-currency-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
-     data-eg-dropzone="currency">
+     data-eg-dropzone="currency"
+     onmouseenter="_egOnGateCurrencyCellEnter(${row}, ${col}, event)"
+     onmousemove="_egOnGateCurrencyCellMove(event)"
+     onmouseleave="_egOnGateCurrencyCellLeave()"
+     ondragover="egDragOver(event)"
+     ondrop="egDropOnCurrency(event, ${row}, ${col})"
+     ondragleave="egDragLeave(event)">
 </div>`;
 }
 
@@ -160,9 +166,7 @@ function _egBuildGateCurrencyGridHTML() {
     return html;
 }
 
-// Assembles the gate-side currency strip panel: label + currency cell grid.
-// Uses the shared eg-currency-strip / eg-currency-row classes so it is
-// visually identical to the hub's runes & orbs row.
+// Assembles the gate-side Orbs & Shards strip panel: label + currency cell grid (PoE fixed slots).
 function _egBuildGateCurrencyStripHTML() {
     return `
 <div class="eg-currency-strip">
@@ -172,6 +176,36 @@ function _egBuildGateCurrencyStripHTML() {
         ${_egBuildGateCurrencyGridHTML()}
     </div>
 </div>`;
+}
+
+function _egOnGateCurrencyCellEnter(row, col, e) {
+    const item = _egCurrencyStash[row] && _egCurrencyStash[row][col];
+    if (item) return;
+    const assignedId = (typeof _egCurrencyIdForSlot === 'function') ? _egCurrencyIdForSlot(row, col) : null;
+    if (!assignedId) return;
+    const def = (typeof _egCurrencyDefForId === 'function') ? _egCurrencyDefForId(assignedId) : null;
+    if (!def) return;
+    const html = `
+<div class="eg-tt-frame" style="--tt-border:#b59248;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon" style="opacity:0.55;">${def.icon || '◻'}</div>
+        <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${def.name || assignedId}</div>
+        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} — ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
+    </div>
+    <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${def.description || ''}</div></div>
+</div>`;
+    if (typeof showGameTooltip === 'function') showGameTooltip(html, e);
+}
+function _egOnGateCurrencyCellMove(e) {
+    const cell = e.currentTarget || (e.target.closest && e.target.closest('.eg-currency-cell'));
+    if (!cell) return;
+    const r = +cell.dataset.row, c = +cell.dataset.col;
+    const item = _egCurrencyStash[r] && _egCurrencyStash[r][c];
+    if (item) return;
+    if ((typeof _egCurrencyIdForSlot === 'function') && _egCurrencyIdForSlot(r,c) && typeof moveGameTooltip === 'function') moveGameTooltip(e);
+}
+function _egOnGateCurrencyCellLeave() {
+    if (typeof hideGameTooltip === 'function') hideGameTooltip();
 }
 
 

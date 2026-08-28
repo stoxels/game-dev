@@ -7,17 +7,15 @@
 //=  select screen ("Endgame Test") and from all "Return to Nexus"       =
 //=  flows. Contains the following doors:                                =
 //=                                                                      =
-//=    1. Endgame Test Maps        -> showEndgameTestHub()               =
-//=       (endgame-testing-screen.js)                                    =
-//=    2. Character Sheet & Inventory -> showEndgameHub()                =
+//=    1. Character Sheet & Inventory -> showEndgameHub()                =
 //=       (endgame-hub.js)                                               =
-//=    3. Probability Gate         -> showEndgameGate()                  =
+//=    2. Probability Gate         -> showEndgameGate()                  =
 //=       (endgame-gate.js)                                              =
-//=    4. Atlas of Worlds          -> showEndgameAtlas()                 =
-//=    5. Map Vendor               -> showEndgameVendor()                =
+//=    3. Atlas of Worlds          -> showEndgameAtlas()                 =
+//=    4. Map Vendor               -> showEndgameVendor()                =
 //=       (endgame-vendor.js)                                            =
 //=                                                                      =
-//=  All three child screens navigate BACK to this screen, so the Nexus  =
+//=  All child screens navigate BACK to this screen, so the Nexus        =
 //=  is the single anchor of the endgame screen cluster.                 =
 //=                                                                      =
 //=  Public API:                                                         =
@@ -48,13 +46,12 @@ function _egnBuildDoorHTML(icon, labelKey, onclick) {
 }
 
 // Assembles the complete Nexus screen layout:
-// topbar → row with the three endgame doors.
+// topbar → row with the four endgame doors.
 function _egnBuildFullScreenHTML() {
     return `
 <div class="egn-hub-layout">
     ${_egnBuildTopbarHTML()}
     <div class="egn-doors">
-        ${_egnBuildDoorHTML('🧪', 'egt_title', 'showEndgameTestHub()')}
         ${_egnBuildDoorHTML('🧙', 'eg_char_sheet_title', 'showEndgameHub()')}
         ${_egnBuildDoorHTML('🎲', 'mg_gate_badge', 'showEndgameGate()')}
         ${_egnBuildDoorHTML('🗺️', 'eg_atlas_title', 'showEndgameAtlas()')}

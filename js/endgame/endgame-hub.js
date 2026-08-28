@@ -89,9 +89,59 @@ function _egAddItemToStash(item) {
     return pos;
 }
 
-// Currency stash dimensions (single row strip)
-const EG_CURRENCY_COLS = 30;
-const EG_CURRENCY_ROWS = 1;
+// ── Orbs & Shards currency tab (PoE-style fixed slots) ──
+// 5 cols × 6 rows = 30 cells; 17 orbs + 8 shards = 25 assigned, 5 decorative empties.
+// Layout groups common orbs top-left, rarer centre, mirror + ancient orb, shards bottom.
+const EG_CURRENCY_COLS = 5;
+const EG_CURRENCY_ROWS = 6;
+
+// Fixed assignment: currency id → {r,c}. Mirrors PoE currency tab ordering.
+const EG_CURRENCY_SLOT_MAP = {
+    // Row 0 — common transmutation / alteration line
+    'orb_transmutation': { r: 0, c: 0 },
+    'orb_alteration':    { r: 0, c: 1 },
+    'orb_augmentation':  { r: 0, c: 2 },
+    'orb_alchemy':       { r: 0, c: 3 },
+    'orb_chance':        { r: 0, c: 4 },
+    // Row 1 — mid progression
+    'orb_regal':         { r: 1, c: 0 },
+    'orb_chaos':         { r: 1, c: 1 },
+    'orb_scouring':      { r: 1, c: 2 },
+    'orb_exalted':       { r: 1, c: 3 },
+    'orb_divine':        { r: 1, c: 4 },
+    // Row 2 — higher & specialised
+    'orb_annulment':     { r: 2, c: 0 },
+    'orb_ascension':     { r: 2, c: 1 },
+    'orb_elevation':     { r: 2, c: 2 },
+    'orb_cataclysm':     { r: 2, c: 3 },
+    'orb_horizons':      { r: 2, c: 4 },
+    // Row 3 — mirror + ancient orb
+    'orb_ancient':       { r: 3, c: 0 },
+    'mirror_of_kalandra':{ r: 3, c: 2 },
+    // Row 4-5 — shards (bottom section)
+    'shard_transmutation':{ r: 4, c: 0 },
+    'shard_alchemy':     { r: 4, c: 1 },
+    'shard_chaos':       { r: 4, c: 2 },
+    'shard_elevation':   { r: 4, c: 3 },
+    'shard_ascension':   { r: 4, c: 4 },
+    'shard_cataclysm':   { r: 5, c: 1 },
+    'shard_horizon':     { r: 5, c: 3 },
+    'shard_ancient':     { r: 5, c: 0 },
+};
+// Reverse map: "r-c" → id
+const EG_CURRENCY_SLOT_REVERSE = (() => {
+    const m = {};
+    for (const [id, pos] of Object.entries(EG_CURRENCY_SLOT_MAP)) m[`${pos.r}-${pos.c}`] = id;
+    return m;
+})();
+
+function _egCurrencySlotForId(id) { return EG_CURRENCY_SLOT_MAP[id] || null; }
+function _egCurrencyIdForSlot(r, c) { return EG_CURRENCY_SLOT_REVERSE[`${r}-${c}`] || null; }
+function _egCurrencyDefForId(id) {
+    if (typeof EG_CURRENCY_DEFS !== 'undefined' && EG_CURRENCY_DEFS[id]) return EG_CURRENCY_DEFS[id];
+    if (typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[id]) return EG_SHARD_DEFS[id];
+    return null;
+}
 
 // Map stash dimensions
 const EG_MAP_STASH_ROWS = 4;
@@ -122,6 +172,76 @@ let _egMapStash = Array.from({ length: EG_MAP_STASH_ROWS }, () => Array(EG_MAP_S
 
 // Tooltip state: tracks which item is currently being previewed in the tooltip panel
 let _egTooltipItem = null;
+
+// ── Mass-sell filter state ──────────────────────────────────────────────
+// Which rarities are PROTECTED from mass sell (true = keep, false = sell).
+// Ordered low → high so the modal can simply iterate the array.
+const EG_MASS_SELL_RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'artifact', 'cursed'];
+// Extra toggle: when true, unique items (isUnique) are never sold even if
+// their underlying rarity would be sold.
+let _egMassSellKeepUnique = true;
+// Map rarity → bool; initialised in _egLoadMassSellSettings().
+let _egMassSellKeep = null;
+function _egDefaultMassSellKeep() {
+    return {
+        common: false,
+        uncommon: false,
+        rare: true,
+        epic: true,
+        legendary: true,
+        artifact: true,
+        cursed: false,
+    };
+}
+function _egNormaliseMassSellKeep(raw) {
+    const def = _egDefaultMassSellKeep();
+    if (!raw || typeof raw !== 'object') return { ...def };
+    const out = { ...def };
+    for (const r of EG_MASS_SELL_RARITIES) {
+        if (typeof raw[r] === 'boolean') out[r] = raw[r];
+    }
+    return out;
+}
+function _egLoadMassSellSettings() {
+    _egMassSellKeep = _egNormaliseMassSellKeep(STATE && STATE.egMassSellKeep);
+    if (typeof STATE !== 'undefined' && typeof STATE.egMassSellKeepUnique === 'boolean') {
+        _egMassSellKeepUnique = STATE.egMassSellKeepUnique;
+    } else {
+        _egMassSellKeepUnique = true;
+    }
+}
+function _egSaveMassSellSettings() {
+    if (typeof STATE !== 'undefined') {
+        STATE.egMassSellKeep = { ..._egMassSellKeep };
+        STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
+        if (typeof save === 'function') try { save(); } catch (e) {}
+    }
+    // also persist via the main hub save path
+    if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch (e) {}
+}
+// Returns true when the item should be KEPT (NOT sold) under the current filter.
+function _egIsProtectedFromMassSell(item) {
+    if (!item) return true;
+    if (_egMassSellKeepUnique && item.isUnique) return true;
+    const rarity = (item.rarity || 'common').toLowerCase();
+    // Unknown rarity → treat as common (i.e. sold unless keep toggled)
+    if (_egMassSellKeep && _egMassSellKeep.hasOwnProperty(rarity)) return !!_egMassSellKeep[rarity];
+    return false;
+}
+function _egMassSellCounts() {
+    let keep = 0, sell = 0;
+    if (!_egInventory) return { keep, sell };
+    for (let r = 0; r < _egInventory.length; r++) {
+        for (let c = 0; c < EG_INV_COLS; c++) {
+            const it = _egInventory[r][c];
+            if (!it) continue;
+            if (_egIsProtectedFromMassSell(it)) keep++; else sell++;
+        }
+    }
+    return { keep, sell };
+}
+// Load mass-sell defaults immediately (STATE may already hold a save).
+_egLoadMassSellSettings();
 
 
 //------------------------------------------------------------------------
@@ -241,12 +361,17 @@ function _egBuildCharPanelHTML() {
 //------------------------------------------------------------------------
 
 // Builds a single currency stash cell div (drop target).
+// Empty assigned slots get a faint icon + hover tooltip stating the assigned orb/shard name.
 function _egBuildCurrencyCellHTML(row, col) {
+    // Placeholder tooltip handled via JS hover helpers; cell carries data for empty display.
     return `
 <div class="eg-inv-cell eg-currency-cell"
      id="eg-currency-cell-${row}-${col}"
      data-row="${row}" data-col="${col}"
      data-eg-dropzone="currency"
+     onmouseenter="_egOnCurrencyCellEnter(${row}, ${col}, event)"
+     onmousemove="_egOnCurrencyCellMove(event)"
+     onmouseleave="_egOnCurrencyCellLeave()"
      ondragover="egDragOver(event)"
      ondrop="egDropOnCurrency(event, ${row}, ${col})"
      ondragleave="egDragLeave(event)">
@@ -264,7 +389,19 @@ function _egBuildCurrencyGridHTML() {
     return html;
 }
 
-// Assembles the currency strip panel: label + the currency cell grid.
+// Hub: left-side Orbs & Shards panel (PoE currency tab style)
+function _egBuildCurrencyPanelHTML() {
+    return `
+<div class="eg-currency-col">
+    <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
+    <div class="eg-currency-grid" id="eg-currency-grid"
+         style="grid-template-columns: repeat(${EG_CURRENCY_COLS}, 1fr);">
+        ${_egBuildCurrencyGridHTML()}
+    </div>
+</div>`;
+}
+
+// Gate: horizontal Orbs & Shards strip (same fixed slots, shared data)
 function _egBuildCurrencyStripHTML() {
     return `
 <div class="eg-currency-strip">
@@ -274,6 +411,45 @@ function _egBuildCurrencyStripHTML() {
         ${_egBuildCurrencyGridHTML()}
     </div>
 </div>`;
+}
+
+// Hover helpers for empty assigned slots — show placeholder name without needing an item.
+function _egOnCurrencyCellEnter(row, col, e) {
+    const cell = document.getElementById(`eg-currency-cell-${row}-${col}`);
+    const item = _egCurrencyStash[row] && _egCurrencyStash[row][col];
+    if (item) return; // occupied → chip's own onmouseenter handles tooltip
+    const assignedId = _egCurrencyIdForSlot(row, col);
+    if (!assignedId) return;
+    const def = _egCurrencyDefForId(assignedId);
+    if (!def) return;
+    // Build a minimal currency-like tooltip for the empty slot
+    const ttName = def.name || assignedId;
+    const ttIcon = def.icon || '◻';
+    const ttDesc = def.description || '';
+    // Respect LANG for shards/orbs already translated; just use def fields
+    const html = `
+<div class="eg-tt-frame" style="--tt-border:#b59248;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon" style="opacity:0.55;">${ttIcon}</div>
+        <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
+        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} — ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
+    </div>
+    <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${ttDesc}</div></div>
+</div>`;
+    if (typeof showGameTooltip === 'function') showGameTooltip(html, e);
+}
+function _egOnCurrencyCellMove(e) {
+    // Only move tooltip when hovering an empty assigned slot (occupied chips manage themselves)
+    const cell = e.currentTarget || e.target.closest && e.target.closest('.eg-currency-cell');
+    if (!cell) return;
+    const r = +cell.dataset.row, c = +cell.dataset.col;
+    const item = _egCurrencyStash[r] && _egCurrencyStash[r][c];
+    if (item) return;
+    if (_egCurrencyIdForSlot(r,c) && typeof moveGameTooltip === 'function') moveGameTooltip(e);
+}
+function _egOnCurrencyCellLeave() {
+    // Only clear if we were showing an empty-slot tooltip (occupied chip leave already handled)
+    if (typeof hideGameTooltip === 'function') hideGameTooltip();
 }
 
 
@@ -307,10 +483,21 @@ function _egBuildInventoryGridHTML() {
 }
 
 // Assembles the full-width stash panel at the bottom of the screen.
+// Header now carries two stash actions: ⚙ opens the mass-sell filter modal,
+// ⚒ sells every stashed item whose rarity is NOT protected (same effect as
+// Ctrl+left-click, i.e. shards / no-value destroy).
 function _egBuildStashPanelHTML() {
     return `
 <div class="eg-panel eg-panel-inv">
-    <div class="eg-panel-label">${t('eg_stash_label')}</div>
+    <div class="eg-panel-label eg-stash-header">
+        <span>${t('eg_stash_label')}</span>
+        <div class="eg-stash-actions">
+            <button class="eg-stash-btn eg-stash-btn-config" onclick="_egOpenMassSellModal()"
+                    title="${t('eg_mass_sell_config_title')}">⚙ ${t('eg_mass_sell_config')}</button>
+            <button class="eg-stash-btn eg-stash-btn-sell" onclick="_egRequestMassSell()"
+                    title="${t('eg_mass_sell_title')}">⚒ ${t('eg_mass_sell_btn')}</button>
+        </div>
+    </div>
     <div class="eg-inv-grid" id="eg-inv-grid" style="grid-template-columns: repeat(${EG_INV_COLS}, 1fr);">
         ${_egBuildInventoryGridHTML()}
     </div>
@@ -334,7 +521,7 @@ function _egBuildTopbarHTML() {
          onmouseenter="_egShowLevelBtnTooltip(event)"
          onmousemove="moveGameTooltip(event)"
          onmouseleave="hideGameTooltip()">✦ ${t('eg_lvl_button_label')}<span class="eg-level-badge" id="eg-level-badge"></span></button>
-    <button class="eg-level-btn"
+    <button class="eg-level-btn" id="eg-btn-passive-tree"
          onclick="showPassiveTree('screen-endgame-hub')">🌿 ${t('scr_probability_tree')}</button>
     <button class="eg-level-btn"
          onclick="showEndgameAtlas('showEndgameHub')">🗺 ${t('eg_atlas_title')}</button>
@@ -345,6 +532,24 @@ function _egBuildTopbarHTML() {
          onmousemove="moveGameTooltip(event)"
          onmouseleave="_egHideHubInfoTooltip()">?</button>
 </div>`;
+}
+
+// Updates the Probability Tree button highlight based on available points.
+// Shows a golden border/glow and a yellow point count when there are unspent
+// Convergence Points — mirrors renderLSPassiveTreeButton and _renderTopBarTreePoints.
+function _egUpdatePassiveTreeButton() {
+    const btn = document.getElementById('eg-btn-passive-tree');
+    if (!btn) return;
+    const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
+    const hasPoints = points > 0;
+    btn.classList.toggle('unspent-points', hasPoints);
+    let countEl = document.getElementById('eg-pt-point-count');
+    if (!countEl) {
+        countEl = document.createElement('span');
+        countEl.id = 'eg-pt-point-count';
+        btn.appendChild(countEl);
+    }
+    countEl.textContent = hasPoints ? ` (${points})` : '';
 }
 
 
@@ -364,6 +569,7 @@ function _egBuildHubInfoTooltipHTML() {
         ${line('eg_hub_info_compare')}
         ${line('eg_hub_info_quickmove')}
         ${line('eg_hub_info_sell')}
+        ${line('eg_hub_info_mass_sell')}
         ${line('eg_hub_info_currency')}
         ${line('eg_hub_info_essence')}
         ${line('eg_hub_info_destroy')}
@@ -390,16 +596,15 @@ function _egHideHubInfoTooltip() {
 }
 
 // Assembles the complete hub screen layout:
-// topbar → character panel (left) + essence tab (right) → runes & orbs
-// strip → stash.
-// The item tooltip is a floating mouseover tooltip (no dedicated panel),
-// and the probability gate / map device lives on its own screen.
+// topbar → [ Orbs & Shards (left) | character panel (center) | Essence (right) ] → stash.
+// The Orbs & Shards tab uses fixed PoE-style slots; the item tooltip is a floating mouseover.
 function _egBuildFullScreenHTML() {
     return `
 <div class="eg-hub-layout">
     ${_egBuildTopbarHTML()}
     <div class="eg-body">
         <div class="eg-upper-row">
+            ${_egBuildCurrencyPanelHTML()}
             <div class="eg-char-wrap">
                 ${_egBuildCharPanelHTML()}
             </div>
@@ -407,7 +612,6 @@ function _egBuildFullScreenHTML() {
                 ${typeof _egBuildEssenceTabHTML === 'function' ? _egBuildEssenceTabHTML() : ''}
             </div>
         </div>
-        ${_egBuildCurrencyStripHTML()}
         ${_egBuildStashPanelHTML()}
     </div>
 </div>`;
@@ -523,11 +727,29 @@ function _egUpdateInvCount() {
 //------------------------------------------------------------------------
 
 // Re-renders a single cell in the currency stash grid.
+// Empty assigned slots show a faint placeholder icon and dashed border.
 function _egRenderCurrencyCell(row, col) {
     const cell = document.getElementById(`eg-currency-cell-${row}-${col}`);
     if (!cell) return;
     const item = _egCurrencyStash[row][col];
-    cell.innerHTML = item ? _egBuildItemChipHTML(item) : '';
+    const assignedId = _egCurrencyIdForSlot(row, col);
+    if (item) {
+        cell.innerHTML = _egBuildItemChipHTML(item);
+        cell.classList.remove('eg-currency-assigned-empty');
+        cell.removeAttribute('data-empty-icon');
+        cell.removeAttribute('title');
+    } else if (assignedId) {
+        const def = _egCurrencyDefForId(assignedId);
+        cell.innerHTML = '';
+        cell.classList.add('eg-currency-assigned-empty');
+        if (def && def.icon) cell.setAttribute('data-empty-icon', def.icon);
+        cell.title = def ? def.name : assignedId;
+    } else {
+        cell.innerHTML = '';
+        cell.classList.remove('eg-currency-assigned-empty');
+        cell.removeAttribute('data-empty-icon');
+        cell.removeAttribute('title');
+    }
 }
 
 // Re-renders the entire currency stash grid.
@@ -688,6 +910,7 @@ function _egRenderAll() {
     _egUpdateInvCount();
     _egRenderStatsList();
     if (typeof _egRenderLevelHUD === 'function') _egRenderLevelHUD();
+    _egUpdatePassiveTreeButton();
 }
 
 
@@ -1110,6 +1333,10 @@ function egSaveHubState() {
     STATE.egCurrencyStash = _egCurrencyStash;
     STATE.egEssenceStash = _egEssenceStash;
     STATE.egMapSlotItem = _egMapSlotItem;
+    // Mass-sell filter (persisted alongside the stash so reconstructing the
+    // hub after a reload restores the player's protection choices).
+    if (_egMassSellKeep) STATE.egMassSellKeep = { ..._egMassSellKeep };
+    if (typeof _egMassSellKeepUnique !== 'undefined') STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
     save();
 }
 
@@ -1164,21 +1391,81 @@ function _egLoadHubState() {
         _egInventory = Array.from({ length: EG_INV_INITIAL_ROWS }, () => Array(EG_INV_COLS).fill(null));
     }
     _egMapStash = STATE.egMapStash || Array.from({ length: EG_MAP_STASH_ROWS }, () => Array(EG_MAP_STASH_COLS).fill(null));
-    _egCurrencyStash = STATE.egCurrencyStash || Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
-    // Heal legacy currency/shard cells that were saved without description/category.
+    // ── Currency stash migration to fixed PoE-style slots ──
+    // Old saves were 1×30; new is 6×5 with fixed positions. Migrate by collecting items
+    // and re-inserting them into their assigned slots (stacking counts).
+    (function _migrateCurrency() {
+        const saved = STATE.egCurrencyStash;
+        const needMigration = !Array.isArray(saved)
+            || saved.length !== EG_CURRENCY_ROWS
+            || (saved[0] && saved[0].length !== EG_CURRENCY_COLS);
+        if (!needMigration) {
+            _egCurrencyStash = saved;
+            return;
+        }
+        // Collect all items from old grid (flat)
+        const items = [];
+        if (Array.isArray(saved)) {
+            for (let r = 0; r < saved.length; r++) {
+                if (!Array.isArray(saved[r])) continue;
+                for (let c = 0; c < saved[r].length; c++) {
+                    const it = saved[r][c];
+                    if (it && it.id) {
+                        _egHealCurrencyItem(it);
+                        _egHealEssenceItem(it);
+                        items.push(it);
+                    }
+                }
+            }
+        }
+        // Build fresh fixed-slot grid
+        _egCurrencyStash = Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
+        // Merge stacks by id into assigned slot
+        const merged = new Map(); // id → total count
+        for (const it of items) {
+            const key = it.id;
+            const cnt = it.count || 1;
+            merged.set(key, (merged.get(key) || 0) + cnt);
+        }
+        for (const [id, total] of merged.entries()) {
+            const pos = _egCurrencySlotForId(id);
+            if (!pos) continue; // unknown / unassigned currency — drop (should not happen)
+            const def = _egCurrencyDefForId(id);
+            // Preserve first item's full object as template (with heals)
+            const template = items.find(x => x.id === id) || { id, category: 'currency', rarity: 'currency' };
+            _egCurrencyStash[pos.r][pos.c] = {
+                ...template,
+                id,
+                name: (def && def.name) || template.name,
+                icon: (def && def.icon) || template.icon,
+                description: (def && def.description) || template.description,
+                category: 'currency',
+                rarity: 'currency',
+                count: total,
+            };
+        }
+        // Persist migrated shape immediately
+        STATE.egCurrencyStash = _egCurrencyStash;
+        try { if (typeof save === 'function') save(); } catch(e) {}
+    })();
+    // Heal after migration as well
     if (Array.isArray(_egCurrencyStash)) {
         for (let r = 0; r < _egCurrencyStash.length; r++) {
-            if (!Array.isArray(_egCurrencyStash[r])) continue;
+            if (!Array.isArray(_egCurrencyStash[r])) { _egCurrencyStash[r] = Array(EG_CURRENCY_COLS).fill(null); continue; }
+            // ensure row length
+            if (_egCurrencyStash[r].length < EG_CURRENCY_COLS) while(_egCurrencyStash[r].length < EG_CURRENCY_COLS) _egCurrencyStash[r].push(null);
+            if (_egCurrencyStash[r].length > EG_CURRENCY_COLS) _egCurrencyStash[r] = _egCurrencyStash[r].slice(0, EG_CURRENCY_COLS);
             for (let c = 0; c < _egCurrencyStash[r].length; c++) {
                 const it = _egCurrencyStash[r][c];
                 if (it) {
                     _egHealCurrencyItem(it);
-                    // Also handle essences that were mistakenly stored in currency strip
-                    // (very old saves) — let essence heal attempt as fallback.
                     _egHealEssenceItem(it);
                 }
             }
         }
+    }
+    if (_egCurrencyStash.length < EG_CURRENCY_ROWS) {
+        while(_egCurrencyStash.length < EG_CURRENCY_ROWS) _egCurrencyStash.push(Array(EG_CURRENCY_COLS).fill(null));
     }
     // EG_ESSENCE_ROWS/COLS are defined in endgame-essences.js which loads
     // after this file — guard so first-load initialisation never throws.
@@ -1211,6 +1498,8 @@ function _egLoadHubState() {
             }
         }
     }
+    // Mass-sell filter — load (or default-initialise) from the persisted save.
+    _egLoadMassSellSettings();
 }
 
 // Call this immideatly so the player does NOT have to open the hub first to re-load his item state.
@@ -1232,6 +1521,7 @@ function _egCreateScreen() {
     document.body.appendChild(screen);
     _egBindDragEvents();  // defined in endgame-hub-drag-and-drop.js
     _egInjectDeleteUIStyles();
+    _egInjectMassSellStyles();
 }
 
 // Ensures the hub screen element exists in the DOM; creates it on first call.
@@ -1427,6 +1717,403 @@ function _egInjectDeleteUIStyles() {
         .eg-delete-modal-confirm:hover { background: #ff5c4d; }
         .eg-delete-modal-cancel { background: #444; color: #ddd; }
         .eg-delete-modal-cancel:hover { background: #555; }
+    `;
+    document.head.appendChild(style);
+}
+
+//------------------------------------------------------------------------
+//-------------------MASS SELL (STASH)------------------------------------
+//------------------------------------------------------------------------
+// Two buttons live in the stash header ("STASH" row):
+//   ⚙  opens the filter modal where the player marks which rarities are
+//      PROTECTED (kept). Unchecked rarities are sold.
+//   ⚒  sells every non-protected item in the stash in one go — same effect
+//      as Ctrl+Click (shard or no-value destroy), but batched with a single
+//      confirmation and a single save.
+
+// Builds / returns the shared mass-sell modal element (creates once).
+function _egEnsureMassSellModal() {
+    _egInjectMassSellStyles();
+    let modal = document.getElementById('eg-mass-sell-modal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'eg-mass-sell-modal';
+    modal.className = 'eg-mass-sell-modal-bg';
+    modal.innerHTML = `
+<div class="eg-mass-sell-box">
+    <div class="eg-mass-sell-title">${t('eg_mass_sell_modal_title')}</div>
+    <div class="eg-mass-sell-desc">${t('eg_mass_sell_modal_desc')}</div>
+    <div class="eg-mass-sell-rarities" id="eg-mass-sell-rarities"></div>
+    <label class="eg-mass-sell-unique-row">
+        <input type="checkbox" id="eg-mass-sell-keep-unique">
+        <span>${t('eg_mass_sell_keep_unique')}</span>
+    </label>
+    <div class="eg-mass-sell-preview" id="eg-mass-sell-preview"></div>
+    <div class="eg-mass-sell-btns">
+        <button class="eg-mass-sell-btn eg-mass-sell-save" onclick="_egSaveMassSellModal()">${t('eg_mass_sell_save')}</button>
+        <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCloseMassSellModal()">${t('reset_cancel')}</button>
+    </div>
+</div>
+<div class="eg-mass-sell-confirm" id="eg-mass-sell-confirm" style="display:none;">
+    <div class="eg-mass-sell-confirm-title">${t('eg_mass_sell_confirm_title')}</div>
+    <div class="eg-mass-sell-confirm-text" id="eg-mass-sell-confirm-text"></div>
+    <div class="eg-mass-sell-btns">
+        <button class="eg-mass-sell-btn eg-mass-sell-confirm" onclick="_egConfirmMassSell()">${t('eg_mass_sell_confirm_btn')}</button>
+        <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCancelMassSellConfirm()">${t('eg_mass_sell_cancel')}</button>
+    </div>
+</div>`;
+    // Clicking the dimmed backdrop closes the modal (but not clicks inside the box).
+    modal.addEventListener('click', (e) => { if (e.target === modal) _egCloseMassSellModal(); });
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function _egRarityLabel(rarity) {
+    const keys = {
+        common: 'rar_common', uncommon: 'rar_uncommon', rare: 'rar_rare',
+        epic: 'eg_rar_epic', legendary: 'rar_legendary', cursed: 'rar_cursed',
+        artifact: 'eg_rar_artifact',
+    };
+    const k = keys[rarity];
+    if (k) { const tr = t(k); if (tr && tr !== k) return tr; }
+    return rarity.charAt(0).toUpperCase() + rarity.slice(1);
+}
+
+function _egRarityColor(rarity) {
+    const map = {
+        common: '#b0b0b0', uncommon: '#2ecc71', rare: '#3498db',
+        epic: '#c39bd3', legendary: '#f5b642', cursed: '#e74c3c', artifact: '#f1c40f',
+    };
+    return map[rarity] || '#ccc';
+}
+
+function _egRenderMassSellModalContent() {
+    const wrap = document.getElementById('eg-mass-sell-rarities');
+    if (!wrap) return;
+    if (!_egMassSellKeep) _egLoadMassSellSettings();
+    const rows = EG_MASS_SELL_RARITIES.map(r => {
+        const checked = _egMassSellKeep[r] ? 'checked' : '';
+        const col = _egRarityColor(r);
+        const label = _egRarityLabel(r);
+        return `<label class="eg-mass-sell-row" style="--rar:${col};">
+            <input type="checkbox" data-rarity="${r}" ${checked}>
+            <span class="eg-mass-sell-dot"></span>
+            <span class="eg-mass-sell-rarity-name">${label}</span>
+            <span class="eg-mass-sell-keep-hint">${t('eg_mass_sell_keep_label').replace('{rarity}', label)}</span>
+        </label>`;
+    }).join('');
+    wrap.innerHTML = rows;
+    // wire preview updates
+    wrap.querySelectorAll('input[data-rarity]').forEach(cb => {
+        cb.addEventListener('change', _egUpdateMassSellPreview);
+    });
+    const uniqCb = document.getElementById('eg-mass-sell-keep-unique');
+    if (uniqCb) {
+        uniqCb.checked = !!_egMassSellKeepUnique;
+        uniqCb.onchange = _egUpdateMassSellPreview;
+    }
+    _egUpdateMassSellPreview();
+}
+
+function _egUpdateMassSellPreview() {
+    const preview = document.getElementById('eg-mass-sell-preview');
+    if (!preview) return;
+    // read current UI state (not yet saved) for live numbers
+    const tempKeep = {};
+    document.querySelectorAll('#eg-mass-sell-rarities input[data-rarity]').forEach(cb => {
+        tempKeep[cb.dataset.rarity] = cb.checked;
+    });
+    const tempKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
+    let keep = 0, sell = 0;
+    if (_egInventory) {
+        for (let r = 0; r < _egInventory.length; r++) {
+            for (let c = 0; c < EG_INV_COLS; c++) {
+                const it = _egInventory[r][c];
+                if (!it) continue;
+                const rarity = (it.rarity || 'common').toLowerCase();
+                const protectedByRarity = !!tempKeep[rarity];
+                const protectedByUnique = tempKeepUnique && it.isUnique;
+                if (protectedByRarity || protectedByUnique) keep++; else sell++;
+            }
+        }
+    }
+    preview.textContent = t('eg_mass_sell_preview')
+        .replace('{keep}', String(keep))
+        .replace('{sell}', String(sell));
+    // also stash for confirm step
+    preview.dataset.keep = String(keep);
+    preview.dataset.sell = String(sell);
+}
+
+function _egOpenMassSellModal() {
+    _egLoadMassSellSettings();
+    const modal = _egEnsureMassSellModal();
+    _egRenderMassSellModalContent();
+    // ensure filter view is visible, confirm hidden
+    const box = modal.querySelector('.eg-mass-sell-box');
+    const confirm = document.getElementById('eg-mass-sell-confirm');
+    if (box) box.style.display = '';
+    if (confirm) confirm.style.display = 'none';
+    modal.classList.add('show');
+}
+
+function _egCloseMassSellModal() {
+    const modal = document.getElementById('eg-mass-sell-modal');
+    if (modal) modal.classList.remove('show');
+}
+
+function _egSaveMassSellModal() {
+    // persist checkbox states
+    const keep = {};
+    document.querySelectorAll('#eg-mass-sell-rarities input[data-rarity]').forEach(cb => {
+        keep[cb.dataset.rarity] = cb.checked;
+    });
+    _egMassSellKeep = _egNormaliseMassSellKeep(keep);
+    _egMassSellKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
+    _egSaveMassSellSettings();
+    _egCloseMassSellModal();
+    if (typeof showToast === 'function') showToast(t('eg_mass_sell_saved'));
+}
+
+// ── Sell execution ───────────────────────────────────────────────────
+function _egRequestMassSell() {
+    _egLoadMassSellSettings();
+    const { keep, sell } = _egMassSellCounts();
+    if (sell === 0) {
+        if (typeof showToast === 'function') showToast(t('eg_mass_sell_nothing_to_sell'));
+        else alert(t('eg_mass_sell_nothing_to_sell'));
+        return;
+    }
+    const modal = _egEnsureMassSellModal();
+    // populate confirm text in the same modal (re-uses the overlay)
+    _egRenderMassSellModalContent();
+    const box = modal.querySelector('.eg-mass-sell-box');
+    const confirm = document.getElementById('eg-mass-sell-confirm');
+    const confirmText = document.getElementById('eg-mass-sell-confirm-text');
+    if (confirmText) {
+        confirmText.textContent = t('eg_mass_sell_confirm_text')
+            .replace('{n}', String(sell))
+            .replace('{k}', String(keep));
+    }
+    if (box) box.style.display = 'none';
+    if (confirm) confirm.style.display = '';
+    modal.classList.add('show');
+}
+
+function _egCancelMassSellConfirm() {
+    const modal = document.getElementById('eg-mass-sell-modal');
+    if (!modal) return;
+    const box = modal.querySelector('.eg-mass-sell-box');
+    const confirm = document.getElementById('eg-mass-sell-confirm');
+    if (box) box.style.display = '';
+    if (confirm) confirm.style.display = 'none';
+    // stay open on the filter view (user can tweak and sell again) — alternatively close:
+    // _egCloseMassSellModal();
+}
+
+function _egConfirmMassSell() {
+    const modal = document.getElementById('eg-mass-sell-modal');
+    if (modal) modal.classList.remove('show');
+    // Hide confirm sub-panel for next open
+    const box = modal && modal.querySelector('.eg-mass-sell-box');
+    const confirm = document.getElementById('eg-mass-sell-confirm');
+    if (box) box.style.display = '';
+    if (confirm) confirm.style.display = 'none';
+    _egExecuteMassSell();
+}
+
+function _egExecuteMassSell() {
+    if (!_egInventory) return;
+    _egLoadMassSellSettings();
+    // Snapshot targets first so mutation during iteration is safe.
+    const targets = [];
+    for (let r = 0; r < _egInventory.length; r++) {
+        for (let c = 0; c < EG_INV_COLS; c++) {
+            const it = _egInventory[r][c];
+            if (!it) continue;
+            if (_egIsProtectedFromMassSell(it)) continue;
+            targets.push({ r, c, item: it });
+        }
+    }
+    if (targets.length === 0) {
+        if (typeof showToast === 'function') showToast(t('eg_mass_sell_nothing_to_sell'));
+        return;
+    }
+
+    let sold = 0, noValue = 0, failed = 0;
+
+    // Re-use the per-item shard logic: noSellValue → destroy without shard,
+    // otherwise roll a shard. We batch the side-effects (single save, single
+    // render pass at the end) instead of calling _egSellStashItem per cell
+    // which would toast + save each time.
+    for (const { r, c, item } of targets) {
+        // Item may have been moved/cleared already if a previous failure left
+        // it — verify the slot still holds the same item.
+        if (_egInventory[r][c] !== item) continue;
+        if (item.noSellValue) {
+            _egInventory[r][c] = null;
+            sold++; noValue++;
+            continue;
+        }
+        // Try to grant a shard; if the shard stash is blocked the spec says
+        // to keep the item and flash — mirror _egSellStashItem behaviour.
+        // Unique items always grant an Ancient Shard.
+        let shardDef = null;
+        try {
+            if (item.isUnique && typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS.shard_ancient) {
+                shardDef = EG_SHARD_DEFS.shard_ancient;
+            } else {
+                shardDef = (typeof _egRollShardForItem === 'function') ? _egRollShardForItem(item) : null;
+            }
+        } catch (e) { shardDef = null; }
+        if (!shardDef) {
+            // shard system unavailable — treat as no-value destroy so the
+            // inventory does not get stuck
+            _egInventory[r][c] = null;
+            sold++; noValue++;
+            continue;
+        }
+        let granted = false;
+        try {
+            granted = (typeof egAddShard === 'function') ? egAddShard(shardDef.id, 1) : false;
+        } catch (e) { granted = false; }
+        if (!granted) {
+            failed++;
+            continue;
+        }
+        _egInventory[r][c] = null;
+        sold++;
+    }
+
+    if (sold > 0) {
+        _egRenderInventory();
+        _egUpdateInvCount();
+        _egClearTooltip();
+        egSaveHubState();
+        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+            try { Audio_Manager.playSFX('player_equip_pickup'); } catch (e) {}
+        }
+        if (typeof showToast === 'function') {
+            if (failed > 0) {
+                showToast(t('eg_mass_sell_done')
+                    .replace('{n}', String(sold))
+                    + ' ' + t('eg_mass_sell_failed_shard_full').replace('{n}', String(failed)));
+            } else if (noValue > 0) {
+                showToast(t('eg_mass_sell_done_no_value')
+                    .replace('{n}', String(sold))
+                    .replace('{z}', String(noValue)));
+            } else {
+                showToast(t('eg_mass_sell_done').replace('{n}', String(sold)));
+            }
+        }
+        if (failed > 0) {
+            const grid = document.getElementById('eg-inv-grid');
+            if (grid) {
+                grid.classList.add('eg-slot-reject');
+                setTimeout(() => grid.classList.remove('eg-slot-reject'), 600);
+            }
+        }
+    } else if (failed > 0) {
+        if (typeof showToast === 'function') showToast(t('eg_mass_sell_failed_shard_full').replace('{n}', String(failed)));
+        const grid = document.getElementById('eg-inv-grid');
+        if (grid) {
+            grid.classList.add('eg-slot-reject');
+            setTimeout(() => grid.classList.remove('eg-slot-reject'), 600);
+        }
+    }
+}
+
+// Global Escape handler for the mass-sell overlay (only when it is open).
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const m = document.getElementById('eg-mass-sell-modal');
+        if (m && m.classList.contains('show')) {
+            // If confirm sub-panel is visible, first step back to the filter view.
+            const confirm = document.getElementById('eg-mass-sell-confirm');
+            if (confirm && confirm.style.display !== 'none') {
+                _egCancelMassSellConfirm();
+            } else {
+                _egCloseMassSellModal();
+            }
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+});
+
+function _egInjectMassSellStyles() {
+    if (document.getElementById('eg-mass-sell-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'eg-mass-sell-styles';
+    style.textContent = `
+        .eg-stash-header {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        }
+        .eg-stash-actions { display: flex; gap: 6px; align-items: center; }
+        .eg-stash-btn {
+            font-family: var(--PX, monospace); font-size: 9px; letter-spacing: 1px;
+            padding: 5px 10px; cursor: pointer;
+            border: 1px solid var(--border2, #444); color: var(--accent2, #ccc);
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.25)), var(--surface, #1a1a2e);
+            transition: all 0.12s;
+            white-space: nowrap;
+        }
+        .eg-stash-btn:hover { color: var(--accent, #c8a84b); border-color: var(--accent, #c8a84b); }
+        .eg-stash-btn-sell { color: #f5d98a; border-color: rgba(200,168,75,0.6); }
+        .eg-stash-btn-sell:hover { box-shadow: 0 0 8px rgba(200,168,75,0.3); color: #fff; }
+        .eg-mass-sell-modal-bg {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65); z-index: 10001;
+            align-items: center; justify-content: center;
+        }
+        .eg-mass-sell-modal-bg.show { display: flex; }
+        .eg-mass-sell-box, .eg-mass-sell-confirm {
+            background: #1a1a2e; border: 1px solid var(--accent, #c8a84b);
+            border-radius: 10px; padding: 18px 20px; width: min(420px, 92vw);
+            box-shadow: 0 0 18px rgba(200,168,75,0.2);
+        }
+        .eg-mass-sell-confirm { text-align: center; }
+        .eg-mass-sell-title, .eg-mass-sell-confirm-title {
+            font-family: var(--PX, monospace); font-size: 13px; letter-spacing: 2px;
+            color: var(--accent, #c8a84b); text-align: center; margin-bottom: 8px;
+        }
+        .eg-mass-sell-desc, .eg-mass-sell-confirm-text {
+            font-family: var(--PX, monospace); font-size: 10px; line-height: 1.6;
+            color: var(--accent2, #ccc); text-align: center; margin-bottom: 12px;
+            opacity: 0.9;
+        }
+        .eg-mass-sell-rarities { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+        .eg-mass-sell-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 10px; border: 1px solid var(--border, #333);
+            background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;
+            font-family: var(--PX, monospace); font-size: 11px; color: #ddd;
+        }
+        .eg-mass-sell-row:hover { border-color: var(--rar, #888); background: rgba(255,255,255,0.06); }
+        .eg-mass-sell-row input { accent-color: var(--rar, #c8a84b); }
+        .eg-mass-sell-dot { width: 10px; height: 10px; border-radius: 2px; background: var(--rar); display:inline-block; flex-shrink:0; }
+        .eg-mass-sell-rarity-name { font-weight: 700; color: var(--rar); }
+        .eg-mass-sell-keep-hint { margin-left: auto; font-size: 9px; opacity: 0.6; letter-spacing: 1px; }
+        .eg-mass-sell-unique-row {
+            display: flex; align-items: center; gap: 8px; margin: 8px 0 4px;
+            font-family: var(--PX, monospace); font-size: 10px; color: #f1c40f; cursor: pointer;
+        }
+        .eg-mass-sell-preview {
+            font-family: var(--PX, monospace); font-size: 10px; text-align: center;
+            color: #f5d98a; letter-spacing: 1px; margin: 10px 0 12px; min-height: 14px;
+        }
+        .eg-mass-sell-btns { display: flex; gap: 10px; justify-content: center; }
+        .eg-mass-sell-btn {
+            font-family: var(--PX, monospace); font-size: 11px; letter-spacing: 1px;
+            padding: 8px 16px; cursor: pointer; border: 1px solid var(--border2, #444);
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.25)), var(--surface, #1a1a2e);
+            color: var(--accent2, #ccc); transition: all 0.12s;
+        }
+        .eg-mass-sell-btn:hover { border-color: var(--accent, #c8a84b); color: var(--accent, #c8a84b); }
+        .eg-mass-sell-btn.eg-mass-sell-save, .eg-mass-sell-btn.eg-mass-sell-confirm {
+            color: #1a1a2e; background: var(--accent, #c8a84b); border-color: var(--accent, #c8a84b); font-weight: 700;
+        }
+        .eg-mass-sell-btn.eg-mass-sell-save:hover, .eg-mass-sell-btn.eg-mass-sell-confirm:hover { filter: brightness(1.1); }
     `;
     document.head.appendChild(style);
 }

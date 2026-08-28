@@ -450,22 +450,34 @@ function _dndDrop(e) {
     _dndFinalizeDrop();
 }
 
-// Handles dropping onto a currency cell.
-// If the target already holds the same currency type, the stacks are merged.
-// Otherwise a normal swap is performed.
-// Returns true when the drop was accepted.
+// Handles dropping onto a currency cell (PoE fixed-slot tab).
+// Only the assigned currency id for that slot is accepted; otherwise reject.
+// Same-id drops merge stack counts.
 function _dndDropOnCurrencyCell(currencyCell) {
     const r = +currencyCell.dataset.row, c = +currencyCell.dataset.col;
+    const assignedId = (typeof _egCurrencyIdForSlot === 'function') ? _egCurrencyIdForSlot(r, c) : null;
+    // Unassigned decorative cells never accept drops
+    if (!assignedId) {
+        _dndShowRejectFlash(currencyCell);
+        return false;
+    }
+    if (_dnd.item.id !== assignedId) {
+        _dndShowRejectFlash(currencyCell);
+        return false;
+    }
     const existing = _egCurrencyStash[r][c];
-
     if (existing && existing.id === _dnd.item.id) {
-        // Same currency — merge stack counts. Source cell was already cleared in pick-up.
         existing.count = (existing.count || 1) + (_dnd.item.count || 1);
         _egCurrencyStash[r][c] = existing;
         _egRenderCurrencyCell(r, c);
+    } else if (!existing) {
+        _egCurrencyStash[r][c] = _dnd.item;
+        _egRenderCurrencyCell(r, c);
     } else {
-        // Different type or empty cell — normal swap.
-        _dndDropOnCell(_egCurrencyStash, _egRenderCurrencyCell, r, c);
+        // Different count object but same id — merge (should already be handled)
+        existing.count = (existing.count || 1) + (_dnd.item.count || 1);
+        _egCurrencyStash[r][c] = existing;
+        _egRenderCurrencyCell(r, c);
     }
     return true;
 }
@@ -704,19 +716,35 @@ function _dndBuildCurrencyChipHTML(item) {
 
 // Overrides the base _egRenderCurrencyCell from endgame-hub.js.
 // Uses _dndBuildCurrencyChipHTML so stacked currency shows the count badge.
-// Renders BOTH twin grids — the hub's runes & orbs row (eg-currency-cell-*)
-// and the Probability Gate's runes & orbs row (eg-gate-currency-cell-*) —
-// because both read from the same _egCurrencyStash. Whichever screen is
-// visible updates; hidden cells no-op. This keeps amounts perfectly in sync
-// between hub and gate screens.
-// This file loads after endgame-hub.js, so this definition takes precedence.
+// Renders BOTH twin grids — hub's left tab (eg-currency-cell-*) and the
+// Probability Gate's strip (eg-gate-currency-cell-*) — because both read
+// from the same _egCurrencyStash. Empty assigned slots get a dashed placeholder.
 function _egRenderCurrencyCell(row, col) {
     const item = _egCurrencyStash[row][col];
-    const chipHTML = item ? _dndBuildCurrencyChipHTML(item) : '';
-    const hubCell = document.getElementById(`eg-currency-cell-${row}-${col}`);
-    if (hubCell) hubCell.innerHTML = chipHTML;
-    const gateCell = document.getElementById(`eg-gate-currency-cell-${row}-${col}`);
-    if (gateCell) gateCell.innerHTML = chipHTML;
+    const assignedId = (typeof _egCurrencyIdForSlot === 'function') ? _egCurrencyIdForSlot(row, col) : null;
+    const def = assignedId && (typeof _egCurrencyDefForId === 'function') ? _egCurrencyDefForId(assignedId) : null;
+
+    function applyToCell(cell) {
+        if (!cell) return;
+        if (item) {
+            cell.innerHTML = _dndBuildCurrencyChipHTML(item);
+            cell.classList.remove('eg-currency-assigned-empty');
+            cell.removeAttribute('data-empty-icon');
+            cell.removeAttribute('title');
+        } else if (assignedId) {
+            cell.innerHTML = '';
+            cell.classList.add('eg-currency-assigned-empty');
+            if (def && def.icon) cell.setAttribute('data-empty-icon', def.icon);
+            cell.title = def ? def.name : assignedId;
+        } else {
+            cell.innerHTML = '';
+            cell.classList.remove('eg-currency-assigned-empty');
+            cell.removeAttribute('data-empty-icon');
+            cell.removeAttribute('title');
+        }
+    }
+    applyToCell(document.getElementById(`eg-currency-cell-${row}-${col}`));
+    applyToCell(document.getElementById(`eg-gate-currency-cell-${row}-${col}`));
 }
 
 
@@ -784,44 +812,42 @@ function _egShowTooltip(item) {
 //-------------------CURRENCY PUBLIC API----------------------------------
 //------------------------------------------------------------------------
 
-// Adds `amount` of a currency type to the currency stash.
-// Finds an existing cell with the same id and increments its count.
-// If no existing stack is found, a new stack is placed in the first free cell
-// using `def` as the item definition (required for new types).
-// Returns true on success, false if the stash is full and the type is new,
-// or if no def was provided for a new type.
+// Adds `amount` of a currency type to the currency stash (fixed PoE-style slots).
+// Each currency id has a pre-assigned slot; stacks simply increment there.
+// Returns true on success, false if the id has no assigned slot or no def for a new stack.
 function egAddCurrency(id, amount = 1, def = null) {
-    // Try to increment an existing stack first.
-    for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
-        for (let c = 0; c < EG_CURRENCY_COLS; c++) {
-            const cell = _egCurrencyStash[r][c];
-            if (cell && cell.id === id) {
-                cell.count = (cell.count || 1) + amount;
-                _egRenderCurrencyCell(r, c);
-                return true;
-            }
-        }
-    }
-
-    // No existing stack found — need a def to create one.
-    if (!def) {
-        console.warn(`[DND] egAddCurrency: no existing stack for "${id}" and no def supplied.`);
+    const pos = (typeof _egCurrencySlotForId === 'function') ? _egCurrencySlotForId(id) : null;
+    if (!pos) {
+        console.warn(`[DND] egAddCurrency: no fixed slot for "${id}".`);
         return false;
     }
-
-    // Place a new stack in the first free currency cell.
-    for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
-        for (let c = 0; c < EG_CURRENCY_COLS; c++) {
-            if (!_egCurrencyStash[r][c]) {
-                _egCurrencyStash[r][c] = { ...def, id, count: amount };
-                _egRenderCurrencyCell(r, c);
-                return true;
-            }
+    const r = pos.r, c = pos.c;
+    const existing = _egCurrencyStash[r] && _egCurrencyStash[r][c];
+    if (existing && existing.id === id) {
+        existing.count = (existing.count || 1) + amount;
+        _egRenderCurrencyCell(r, c);
+        return true;
+    }
+    if (existing && existing.id !== id) {
+        console.warn(`[DND] egAddCurrency: slot [${r},${c}] occupied by different id "${existing.id}"`);
+        return false;
+    }
+    if (!def) {
+        // Try to resolve def from registry so drops without explicit def still work
+        const resolved = (typeof _egCurrencyDefForId === 'function') ? _egCurrencyDefForId(id) : null;
+        if (resolved) def = { name: resolved.name, icon: resolved.icon, rarity: 'currency', category: 'currency', description: resolved.description };
+        else {
+            console.warn(`[DND] egAddCurrency: no def for new "${id}".`);
+            return false;
         }
     }
-
-    console.warn(`[DND] egAddCurrency: currency stash is full, could not add "${id}".`);
-    return false;
+    if (!_egCurrencyStash[r]) _egCurrencyStash[r] = Array(EG_CURRENCY_COLS).fill(null);
+    _egCurrencyStash[r][c] = { ...def, id, count: amount };
+    // Ensure fixed-slot metadata
+    if (!_egCurrencyStash[r][c].category) _egCurrencyStash[r][c].category = 'currency';
+    if (!_egCurrencyStash[r][c].rarity) _egCurrencyStash[r][c].rarity = 'currency';
+    _egRenderCurrencyCell(r, c);
+    return true;
 }
 
 

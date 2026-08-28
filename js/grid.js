@@ -1197,6 +1197,14 @@ function renderCell(row, col) {
     else if (cellState === 2) {
         el.classList.add('marked');
         if (systemMarkedGrid[row][col]) el.classList.add('marked-system');
+        // Endgame: correct mark on a wrong-solution cell auto-claims any drop
+        // sitting there. Covers ability / item / passive / proc marks so the
+        // player no longer has to erase and re-mark the same cell to pick up.
+        if (cur && cur.grid && cur.grid[row][col] === 0) {
+            if (typeof isEndgameLevel === 'function' && isEndgameLevel() && typeof _egCheckAllClaims === 'function') {
+                _egCheckAllClaims(row, col);
+            }
+        }
     } else if (cellState === 3) el.classList.add('questioned');
 
     // Priority 6: subtle shimmer hint on empty lucky tiles

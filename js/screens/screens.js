@@ -284,6 +284,11 @@ function goToNextLevel() {
 // Respects convergence modal and pending class events before transitioning.
 function replayLevel() {
     hideResultOverlays();
+    // "Restarting the game" should clear any stacked quiz damage buff —
+    // this covers the win/lose retry buttons. Chain transitions preserve
+    // the buff via _egSuppressEncounterStop, but a manual retry is a map
+    // exit and must wipe it.
+    if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
 
     const currentIndex = cur.gIdx;
     const proceed = () => startLevel(currentIndex);

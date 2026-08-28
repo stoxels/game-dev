@@ -48,6 +48,12 @@ function _charIs(id) {
 // Renders a small draggable sprite in the top-left of the game meta bar.
 // No HP or charge bars — those are monster-level only.
 function _renderPlayerAvatarSimple() {
+    if (typeof dead !== 'undefined' && dead) {
+        const _hideSimple = document.getElementById('player-avatar-simple');
+        if (_hideSimple) _hideSimple.style.display = 'none';
+        return;
+    }
+    if (typeof _egIsActive === 'function' && _egIsActive()) return; // monster levels use full avatar
     // Remove the full endgame avatar if switching from a monster level
     const full = document.getElementById('player-avatar-wrapper');
     if (full) full.remove();
@@ -484,6 +490,12 @@ function _updateSetupScreenCharacter() {
 // Creates and updates the full avatar with HP and charge bars.
 // Used for endgame / monster levels only.
 function _renderPlayerAvatar() {
+    if (typeof dead !== 'undefined' && dead) {
+        const _hideEl = document.getElementById('player-avatar-wrapper');
+        if (_hideEl) _hideEl.style.display = 'none';
+        return;
+    }
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     _removePlayerAvatarSimple();
 
     let avatar = document.getElementById('player-avatar-wrapper');
@@ -576,6 +588,20 @@ function _renderPlayerAvatar() {
     const chargeMax = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
     const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / chargeMax) * 100));
     document.getElementById('avatar-charge-fill').style.width = chargePct + '%';
+
+    // Hold-E pause — keep sprite label in sync if the avatar was recreated while E is still held
+    if (typeof _egHoldEPauseActive !== 'undefined' && typeof _egSetHoldEPauseVisual === 'function') {
+        // Avoid redundant DOM churn: _egSetHoldEPauseVisual is idempotent and cheap
+        const lbl = document.getElementById('eg-hold-pause-label');
+        const shouldShow = !!_egHoldEPauseActive;
+        const isShowing = !!lbl && lbl.parentElement === avatar;
+        if (shouldShow !== isShowing) _egSetHoldEPauseVisual(shouldShow);
+        else if (shouldShow && lbl) {
+            // Ensure text stays translated if language was switched while held
+            const txt = (typeof t === 'function') ? t('eg_hold_paused') : '⏸ CHARGE PAUSED — release E';
+            if (txt && lbl.textContent !== txt) lbl.textContent = txt;
+        }
+    }
 }
 
 function _initFullAvatarDrag(wrapper) {
@@ -646,9 +672,13 @@ function _initFullAvatarWASD(wrapper) {
 function _hidePlayerAvatarSimple() {
     const el = document.getElementById('player-avatar-simple');
     if (el) el.style.display = 'none';
+    if (typeof _stopAvatarWalkAnimation === 'function') _stopAvatarWalkAnimation();
+    // Clear any held WASD keys so the hidden sprite doesn't keep moving off-screen
+    if (typeof _avatarMoveState !== 'undefined' && _avatarMoveState.held) _avatarMoveState.held.clear();
 }
 
 function _showPlayerAvatarSimple() {
+    if (typeof dead !== 'undefined' && dead) return;
     const el = document.getElementById('player-avatar-simple');
     if (el) el.style.display = 'flex';
 }
@@ -659,9 +689,12 @@ function _showPlayerAvatarSimple() {
 function _hidePlayerAvatar() {
     const el = document.getElementById('player-avatar-wrapper');
     if (el) el.style.display = 'none';
+    if (typeof _stopAvatarWalkAnimation === 'function') _stopAvatarWalkAnimation();
+    if (typeof _avatarMoveState !== 'undefined' && _avatarMoveState.held) _avatarMoveState.held.clear();
 }
 
 function _showPlayerAvatar() {
+    if (typeof dead !== 'undefined' && dead) return;
     const el = document.getElementById('player-avatar-wrapper');
     if (el) el.style.display = 'flex';
 }

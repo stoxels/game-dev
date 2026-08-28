@@ -76,6 +76,12 @@ const EG_SHARD_DEFS = {
         name: t('eg_shard_cataclysm'),
         description: t('eg_shard_cataclysm_desc'),
     },
+    shard_ancient: {
+        id: 'shard_ancient', orbId: 'orb_ancient',
+        icon: '🪨', orbIcon: '🏺',
+        name: t('eg_shard_ancient'),
+        description: t('eg_shard_ancient_desc'),
+    },
 };
 
 
@@ -93,7 +99,7 @@ const EG_SHARD_ROLL_TABLE = [
     { id: 'shard_alchemy',       weight: 200, statScale: 0.06 },
     { id: 'shard_chaos',         weight: 90,  statScale: 0.14 },
     { id: 'shard_elevation',     weight: 45,  statScale: 0.24 },
-    { id: 'shard_ascension',     weight: 30,  statScale: 0.32 },
+    { id: 'shard_ascension',     weight: 75,  statScale: 0.32 },
     { id: 'shard_cataclysm',     weight: 15,  statScale: 0.42 },
 ];
 
@@ -132,66 +138,59 @@ function _egRollShardForItem(item) {
 //-------------------ADD SHARD TO RUNES & ORBS STRIP----------------------
 //------------------------------------------------------------------------
 
-// Adds `amount` of a shard type to the currency stash with a stack cap of
+// Adds `amount` of a shard type to its FIXED currency slot with a stack cap of
 // EG_SHARD_STACK_MAX (3 for Horizon Fragments). Every full stack
 // automatically converts into the shard's parent orb via egAddCurrency()
-// (which merges into an existing orb stack if present). Returns true when
-// the shard was granted.
+// (which merges into its own fixed orb slot). Returns true when granted.
 function egAddShard(id, amount = 1, def = null) {
     const shardDef = def || EG_SHARD_DEFS[id];
     if (!shardDef) return false;
     const stackMax = shardDef.stackSize || EG_SHARD_STACK_MAX;
-
-    // Try to add to an existing stack first.
-    for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
-        for (let c = 0; c < EG_CURRENCY_COLS; c++) {
-            const cell = _egCurrencyStash[r][c];
-            if (!cell || cell.id !== id) continue;
-
-            cell.count = (cell.count || 0) + amount;
-            while (cell.count >= stackMax) {
-                cell.count -= stackMax;
-                _egConvertShardsToOrb(shardDef);
-            }
-            if (cell.count <= 0) _egCurrencyStash[r][c] = null;
-            _egRenderCurrencyCell(r, c);
-            return true;
-        }
+    const pos = (typeof _egCurrencySlotForId === 'function') ? _egCurrencySlotForId(id) : null;
+    if (!pos) {
+        console.warn(`[Shards] No fixed slot for "${id}".`);
+        return false;
     }
-
-    // No existing stack — place a new one in the first free cell.
-    for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
-        for (let c = 0; c < EG_CURRENCY_COLS; c++) {
-            if (_egCurrencyStash[r][c]) continue;
-            let count = amount;
-            // Handle the case where the initial amount already covers one or
-            // more full stacks (e.g. Horizon 3-stack granted as amount 3 at once).
-            let orbsFromNew = 0;
-            while (count >= stackMax) {
-                count -= stackMax;
-                orbsFromNew++;
-            }
-            if (count > 0) {
-                _egCurrencyStash[r][c] = {
-                    id,
-                    name: shardDef.name,
-                    icon: shardDef.icon,
-                    rarity: 'currency',
-                    category: 'currency',
-                    description: shardDef.description,
-                    count: count,
-                };
-            } else {
-                _egCurrencyStash[r][c] = null;
-            }
-            _egRenderCurrencyCell(r, c);
-            for (let i = 0; i < orbsFromNew; i++) _egConvertShardsToOrb(shardDef);
-            return true;
+    const r = pos.r, c = pos.c;
+    if (!_egCurrencyStash[r]) _egCurrencyStash[r] = Array(EG_CURRENCY_COLS).fill(null);
+    const cell = _egCurrencyStash[r][c];
+    if (cell && cell.id === id) {
+        cell.count = (cell.count || 0) + amount;
+        while (cell.count >= stackMax) {
+            cell.count -= stackMax;
+            _egConvertShardsToOrb(shardDef);
         }
+        if (cell.count <= 0) _egCurrencyStash[r][c] = null;
+        _egRenderCurrencyCell(r, c);
+        return true;
     }
-
-    console.warn(`[Shards] Currency stash is full, could not add "${id}".`);
-    return false;
+    if (cell && cell.id !== id) {
+        console.warn(`[Shards] Slot [${r},${c}] occupied by different id "${cell.id}"`);
+        return false;
+    }
+    // Empty slot
+    let count = amount;
+    let orbsFromNew = 0;
+    while (count >= stackMax) {
+        count -= stackMax;
+        orbsFromNew++;
+    }
+    if (count > 0) {
+        _egCurrencyStash[r][c] = {
+            id,
+            name: shardDef.name,
+            icon: shardDef.icon,
+            rarity: 'currency',
+            category: 'currency',
+            description: shardDef.description,
+            count: count,
+        };
+    } else {
+        _egCurrencyStash[r][c] = null;
+    }
+    _egRenderCurrencyCell(r, c);
+    for (let i = 0; i < orbsFromNew; i++) _egConvertShardsToOrb(shardDef);
+    return true;
 }
 
 // Resolves the translation key of a shard's parent orb name.
@@ -204,6 +203,7 @@ function _egShardOrbNameKey(orbId) {
         case 'orb_horizons':      return 'eg_orb_horizons';
         case 'orb_ascension':     return 'eg_orb_ascension';
         case 'orb_cataclysm':     return 'eg_orb_cataclysm';
+        case 'orb_ancient':       return 'eg_orb_ancient';
         default:                  return null;
     }
 }
@@ -234,6 +234,7 @@ function _egConvertShardsToOrb(shardDef) {
 //------------------------------------------------------------------------
 
 // Destroys the stash item in the given cell and grants one rolled shard.
+// Selling a UNIQUE item always grants an Ancient Shard (10 → Ancient Orb).
 // No confirmation popup — the sale is instant. Returns true on success.
 function _egSellStashItem(row, col) {
     const item = _egInventory[row][col];
@@ -255,7 +256,10 @@ function _egSellStashItem(row, col) {
         return true;
     }
 
-    const shardDef = _egRollShardForItem(item);
+    // Unique items → Ancient Shard (bypasses the random roll).
+    const shardDef = (item.isUnique && EG_SHARD_DEFS.shard_ancient)
+        ? EG_SHARD_DEFS.shard_ancient
+        : _egRollShardForItem(item);
     if (!egAddShard(shardDef.id, 1)) {
         // Could not grant the shard (runes & orbs strip full) — keep the item.
         const grid = document.getElementById('eg-inv-grid');

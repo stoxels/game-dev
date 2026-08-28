@@ -257,7 +257,48 @@ const EG_CURRENCY_DEFS = {
         isMirror: true,
         canApply(item) { return item.category === 'equip' && !item.isUnique; },
     },
+
+    // Reforges an item into a random unique of the same slot whose required
+    // level is <= the source item's required level. Very rare drop + shard merge.
+    orb_ancient: {
+        id: 'orb_ancient', name: t('eg_orb_ancient'), icon: '🏺',
+        description: t('eg_orb_ancient_desc'),
+        canApply(item) {
+            if (item.category !== 'equip' || item.isUnique) return false;
+            const elig = (typeof _egGetAncientOrbEligibleUniques === 'function')
+                ? _egGetAncientOrbEligibleUniques(item) : [];
+            return elig.length > 0;
+        },
+        apply(item) {
+            const elig = (typeof _egGetAncientOrbEligibleUniques === 'function')
+                ? _egGetAncientOrbEligibleUniques(item) : [];
+            if (elig.length === 0) return item;
+            const def = elig[Math.floor(Math.random() * elig.length)];
+            const lvl = item.itemLevel || (item.requirements && item.requirements.level) || def.minLevel || 1;
+            if (typeof _egBuildUniqueItem === 'function') {
+                return _egBuildUniqueItem(def, lvl);
+            }
+            return item;
+        },
+    },
 };
+
+// Helper: eligible uniques for Ancient Orb — same slotType and required level <= source
+function _egGetAncientOrbEligibleUniques(item) {
+    if (!item || typeof EG_UNIQUE_ITEMS === 'undefined' || !Array.isArray(EG_UNIQUE_ITEMS)) return [];
+    const slot = item.slotType;
+    if (!slot) return [];
+    const srcLevel = (item.requirements && typeof item.requirements.level === 'number')
+        ? item.requirements.level
+        : (typeof item.itemLevel === 'number' ? item.itemLevel : 1);
+    return EG_UNIQUE_ITEMS.filter(u => {
+        if (u.slotType !== slot) return false;
+        const reqLevel = (u.requirements && typeof u.requirements.level === 'number')
+            ? u.requirements.level
+            : (typeof u.minLevel === 'number' ? u.minLevel : 0);
+        return reqLevel <= srcLevel;
+    });
+}
 
 
 //------------------------------------------------------------------------
@@ -277,12 +318,15 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_divine', weight: 35 },
     // Epic-tier orbs — deliberately much more common than before so that
     // endgame crafting is actually reachable through normal play.
+    // Orb of Ascension heavily buffed per player feedback (was 22).
     { id: 'orb_elevation', weight: 45 },
     { id: 'orb_cataclysm', weight: 30 },
-    { id: 'orb_ascension', weight: 22 },
+    { id: 'orb_ascension', weight: 75 },
     { id: 'orb_exalted', weight: 22 },
     // Mirror stays genuinely rare, but shows up over a long session.
     { id: 'mirror_of_kalandra', weight: 5 },
+    // Ancient Orb — very rare (rarer than exalted, near-mirror tier).
+    { id: 'orb_ancient', weight: 4 },
 ];
 
 const EG_CURRENCY_DROP_CHANCE_NORMAL = 0.25; // 25% per normal kill

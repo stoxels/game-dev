@@ -56,6 +56,7 @@ const EG_VENDOR_CURRENCY_PRICES = {
     orb_cataclysm: 160,
     orb_ascension: 200,
     orb_exalted: 220,
+    orb_ancient: 400,
     mirror_of_kalandra: 2500,
 };
 const EG_VENDOR_CURRENCY_DEFAULT_PRICE = 50;

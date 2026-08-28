@@ -11,6 +11,7 @@ let _egChainCountdownTimer = null;
 let _egMonsterSpawnCounter = 0;
 let _egPuzzleCompleteFired = false;
 let _egMapClearedShown = false;     // ensures the MAP CLEARED banner fires once per map
+let _egBossArenaAvailableShown = false; // ensures the BOSS ARENA AVAILABLE banner fires once per map
 
 // ── Boss arena phase ────────────────────────────────────────────────
 // Bosses are no longer sprinkled into regular puzzles. Once every other
@@ -151,6 +152,12 @@ function _egOnPuzzleComplete() {
         return;
     }
 
+    // Don't queue another puzzle if the Blood Pact (or any other
+    // damage) just killed the player — _egEndMapDefeated already shows
+    // the map-failed overlay.
+    if (typeof dead !== 'undefined' && dead) return;
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+
     // Boss arena chain: solving an arena puzzle while a boss is still alive
     // rolls straight into the next arena — no quiz interstitial here.
     if (_egBossPhaseActive) {
@@ -159,7 +166,11 @@ function _egOnPuzzleComplete() {
     }
 
     // Always automatically chain to the next puzzle, the player needs to manually leave the chain
-    setTimeout(() => _egStartChainCountdown(), 800);
+    setTimeout(() => {
+        if (typeof dead !== 'undefined' && dead) return;
+        if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+        _egStartChainCountdown();
+    }, 800);
 }
 
 function _egHasBoss() {
@@ -230,6 +241,8 @@ function _egPickInterstitialWorldNum() {
 //------------------------------------------------------------------------
 
 function _egStartChainCountdown() {
+    if (typeof dead !== 'undefined' && dead) return;
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     // Show the interstitial question(s) first, then begin the 3-2-1 countdown.
     // The active map's "+# additional Quiz Questions per Puzzle" mod raises
     // how many questions must be answered between two puzzles.
@@ -283,6 +296,8 @@ function _egCancelChainCountdown() {
 //------------------------------------------------------------------------
 
 function _egLoadNextChainPuzzle() {
+    if (typeof dead !== 'undefined' && dead) return;
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     const nextGi = _egFindNextChainPuzzleGi();
     if (nextGi === null) {
         showToast(t('eg_no_more_puzzles'));
@@ -294,10 +309,12 @@ function _egLoadNextChainPuzzle() {
 
 
 // Core chain transition: swaps the current grid for the puzzle at nextGi,
-// carrying loot / currency / items / gold across and keeping monsters,
+ // carrying loot / currency / items / gold across and keeping monsters,
 // pickup spawner and tick loop alive. Shared by the regular puzzle chain
 // and the boss-arena chain.
 function _egTransitionToChainPuzzle(nextGi, isBossArena) {
+    if (typeof dead !== 'undefined' && dead) return;
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     _egChainCurrentGi = nextGi;
     ALL[nextGi].isMonsterLevel = true;
     ALL[nextGi].isChainedPuzzle = true;
@@ -451,6 +468,10 @@ function _egEnterBossArena() {
     _egBossTotalCount = queue.length;
     _egBossKilledCount = 0;
     _egBossPhaseActive = true;
+
+    // Dismiss the "available" banner if still visible — arena is now entered
+    const availBanner = document.getElementById('eg-boss-arena-available-banner');
+    if (availBanner) availBanner.remove();
 
     showToast(t('eg_boss_arena_entered'), '#f5d98a');
     _egUpdateObjectivesHUD();
@@ -926,6 +947,9 @@ function _egEndMap() {
     if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
     egSaveHubState();
     _egStopEncounter();
+    // Guarantee quiz damage buff is cleared on voluntary map exit even if
+    // _egStopEncounter was suppressed (e.g. forfeit during chain transition).
+    if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
 
     // Stop the puzzle timer too — otherwise it keeps running behind the
     // overlay and could trigger a time's-up loss while reading the summary.
@@ -1027,6 +1051,13 @@ function _egUpdateObjectivesHUD() {
         actionHTML = `<button class="eg-obj-action-btn eg-obj-action-complete" onclick="_egTryLeaveMap()">${t('eg_complete_map')}</button>`;
     }
 
+    // First time boss arena becomes available (non-boss done, boss not yet defeated): banner + toast.
+    if (req.hasBoss && !_egBossDefeated() && !_egBossPhaseActive && othersDone && !_egBossArenaAvailableShown) {
+        _egBossArenaAvailableShown = true;
+        _egShowBossArenaAvailableBanner();
+        showToast(t('eg_boss_arena_available_toast'), '#f87171');
+    }
+
     // First time all objectives are complete: big green banner + toast.
     if (canLeave && !_egMapClearedShown) {
         _egMapClearedShown = true;
@@ -1060,6 +1091,31 @@ function _egShowMapClearedBanner() {
     document.body.appendChild(el);
 
     // Center the banner over the puzzle grid (fallback: screen center)
+    const board = document.getElementById('ptable');
+    if (board) {
+        const r = board.getBoundingClientRect();
+        el.style.left = (r.left + r.width / 2) + 'px';
+        el.style.top = (r.top + r.height / 2) + 'px';
+    } else {
+        el.style.left = '50%';
+        el.style.top = '50%';
+    }
+
+    setTimeout(() => el.remove(), 3000);
+}
+
+// Shows a banner centered over the puzzle grid when the boss arena
+// becomes available (all non-boss objectives done). Mirrors the MAP
+// CLEARED banner in placement/animation but uses boss-red styling.
+function _egShowBossArenaAvailableBanner() {
+    const old = document.getElementById('eg-boss-arena-available-banner');
+    if (old) old.remove();
+
+    const el = document.createElement('div');
+    el.id = 'eg-boss-arena-available-banner';
+    el.textContent = t('eg_boss_arena_available');
+    document.body.appendChild(el);
+
     const board = document.getElementById('ptable');
     if (board) {
         const r = board.getBoundingClientRect();
@@ -1158,6 +1214,7 @@ function _egChainCleanup() {
     _egMonsterSpawnCounter = 0;
     _egPuzzleCompleteFired = false;
     _egMapClearedShown = false;
+    _egBossArenaAvailableShown = false;
 
     // Boss arena phase state
     if (_egArenaAdvanceTimer) {
@@ -1169,9 +1226,11 @@ function _egChainCleanup() {
     _egBossKilledCount = 0;
     _egBossTotalCount = 0;
 
-    // Remove a MAP CLEARED banner if one is still on screen
+    // Remove banners if still on screen
     const banner = document.getElementById('eg-map-cleared-banner');
     if (banner) banner.remove();
+    const bossBanner = document.getElementById('eg-boss-arena-available-banner');
+    if (bossBanner) bossBanner.remove();
 
     _egRunLoot = [];
     _egRunCurrency = [];
@@ -1337,7 +1396,10 @@ function _egSellRunLootChip(item, state) {
     }
 
     // Roll and grant the shard (goes straight into the currency stash).
-    const shardDef = _egRollShardForItem(item);
+    // Unique items always grant an Ancient Shard.
+    const shardDef = (item.isUnique && typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS.shard_ancient)
+        ? EG_SHARD_DEFS.shard_ancient
+        : _egRollShardForItem(item);
     const granted = egAddShard(shardDef.id, 1);
 
     // Mirror the gain into the overlay's currency list (aggregated by id).
@@ -1681,10 +1743,16 @@ function _egEndMapDefeated(titleText, subText) {
 
     dead = true;
     _egStopEncounter();
+    // Guarantee quiz damage buff is cleared on map failure even if
+    // _egStopEncounter was suppressed.
+    if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
     if (typeof stopTimer === 'function') stopTimer();
 
+    if (typeof _stopAvatarWalkAnimation === 'function') _stopAvatarWalkAnimation();
     if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
     if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
+    // Ensure any lingering companion charge animation is torn down
+    document.querySelectorAll('.companion-charging').forEach(el => el.classList.remove('companion-charging'));
     return true;
 }
 

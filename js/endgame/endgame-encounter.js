@@ -569,6 +569,27 @@ function _egSetHoldEPauseVisual(isPaused) {
     if (bar) bar.classList.toggle('eg-charge-paused', !!isPaused);
     const alt = document.getElementById('eg-player-charge-bar');
     if (alt) alt.classList.toggle('eg-charge-paused', !!isPaused);
+    // Sprite feedback — show "CHARGE PAUSED" directly on the avatar while E is held
+    const hud = document.getElementById('player-avatar-wrapper');
+    if (hud) {
+        let lbl = document.getElementById('eg-hold-pause-label');
+        if (isPaused) {
+            if (!lbl) {
+                lbl = document.createElement('div');
+                lbl.id = 'eg-hold-pause-label';
+                hud.appendChild(lbl);
+            }
+            const txt = (typeof t === 'function') ? t('eg_hold_paused') : '⏸ CHARGE PAUSED — release E';
+            lbl.textContent = txt || '⏸ CHARGE PAUSED — release E';
+            lbl.style.display = '';
+        } else if (lbl) {
+            lbl.remove();
+        }
+    } else if (!isPaused) {
+        // No avatar yet — ensure stray label elsewhere is cleaned up
+        const stray = document.getElementById('eg-hold-pause-label');
+        if (stray) stray.remove();
+    }
 }
 
 function _initEgHoldEPauseHotkey() {
@@ -704,6 +725,10 @@ function _egTickLoop() {
     // Player mechanics
     _egTickPlayer();
     if (typeof _egRefreshPlayerStatusIcons === 'function') _egRefreshPlayerStatusIcons();
+    // Don't resurrect the sprite after defeat — the tick may have set
+    // dead = true mid-iteration (DoT / hazard kill).
+    if (typeof dead !== 'undefined' && dead) return;
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     _renderPlayerAvatar();
     //_renderPlayerCharge();
 

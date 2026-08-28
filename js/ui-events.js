@@ -307,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
                 if (typeof egSaveHubState === 'function') egSaveHubState();
                 if (typeof _egStopEncounter === 'function') _egStopEncounter();
+                if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
                 goToLevelSelect();
@@ -343,6 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
                 if (typeof egSaveHubState === 'function') egSaveHubState();
                 if (typeof _egStopEncounter === 'function') _egStopEncounter();
+                if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
                 showEndgameNexus();
