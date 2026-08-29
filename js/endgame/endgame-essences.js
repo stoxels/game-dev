@@ -203,7 +203,6 @@ function _egGetEssenceFilterSlotTypes() {
 function _egEssenceMatchesFilter(familyId) {
     if (_egEssenceFilterSlotType === 'all') return true;
     const result = _egEssenceCanApplyToSlotType(familyId, _egEssenceFilterSlotType);
-    console.log(`[ESS FILTER] _egEssenceMatchesFilter(${familyId}, ${_egEssenceFilterSlotType}) = ${result}`);
     return result;
 }
 
@@ -211,32 +210,26 @@ function _egEssenceMatchesFilter(familyId) {
 // (considers defense gating and ilvl eligibility, not just mod table presence)
 function _egEssenceCanApplyToSlotType(familyId, slotType) {
     if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') {
-        console.warn('[ESS FILTER] EG_SLOT_MOD_TABLE_MAP undefined');
         return false;
     }
     const getter = EG_SLOT_MOD_TABLE_MAP[slotType];
     if (!getter) {
-        console.warn(`[ESS FILTER] No getter for slotType: ${slotType}`);
         return false;
     }
     let modTable = null;
     try { modTable = getter(); } catch (e) { 
-        console.warn(`[ESS FILTER] Error getting mod table for ${slotType}:`, e);
         return false; 
     }
     if (!modTable) {
-        console.warn(`[ESS FILTER] modTable is null/undefined for ${slotType}`);
         return false;
     }
 
     const hasFamily = (modTable.prefixes && modTable.prefixes[familyId]) || (modTable.suffixes && modTable.suffixes[familyId]);
     if (!hasFamily) {
-        console.log(`[ESS FILTER] Family ${familyId} not in mod table for ${slotType}`);
         return false;
     }
 
     if (typeof EG_ALL_BASE_TYPES === 'undefined') {
-        console.warn('[ESS FILTER] EG_ALL_BASE_TYPES undefined, returning true');
         return true;
     }
 
@@ -257,7 +250,6 @@ function _egEssenceCanApplyToSlotType(familyId, slotType) {
 
 // Sets the essence filter and re-renders the essence tab
 function _egSetEssenceFilter(slotType) {
-    console.log(`[ESS FILTER] Setting filter to: ${slotType}`);
     _egEssenceFilterSlotType = slotType;
     _egRenderEssenceStash();
     // Update the dropdown to reflect the current selection

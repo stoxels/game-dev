@@ -1493,8 +1493,10 @@ function _egHzTickFirewall(dtMs) {
         const warnElsSnapshot = warningEls.slice();
         setTimeout(() => warnElsSnapshot.forEach(el => { try { el.remove(); } catch(e){} }), EG_HZ_FIREWALL_WARNING_MS);
 
+        const isGapVariant = variant === 'gapDown' || variant === 'gapUp';
         st.pending.push({
             t: EG_HZ_FIREWALL_WARNING_MS,
+            lingerT: isGapVariant ? EG_HZ_FIREWALL_WARNING_MS : 0,
             y: startY,
             dir: dir,
             totalDist: totalDist,
@@ -1514,13 +1516,58 @@ function _egHzTickFirewall(dtMs) {
         const w = st.pending[i];
         // If all wall segments have been removed externally, drop entry.
         const anyConnected = w.wallEls.some(el => el.isConnected);
-        if (!anyConnected && w.t <= 0) { st.pending.splice(i, 1); continue; }
+        if (!anyConnected && w.t <= 0 && (w.lingerT || 0) <= 0) { st.pending.splice(i, 1); continue; }
         if (w.wallEls.length === 0) { st.pending.splice(i, 1); continue; }
 
+        // Warning phase — telegraph visible, wall hidden.
         if (w.t > 0) {
             w.t -= dtMs;
             if (w.t <= 0) {
                 w.wallEls.forEach(el => { el.style.display = 'block'; });
+            }
+            continue;
+        }
+
+        // Linger phase (gap variants only) — wall visible at start edge, not sweeping yet.
+        const isGap = w.variant === 'gapDown' || w.variant === 'gapUp';
+        if (isGap && w.lingerT > 0) {
+            w.lingerT -= dtMs;
+            if (w.lingerT <= 0) {
+                // Linger done, sweep will start on next tick.
+            }
+
+            // Hit detection during linger — wall is stationary at startY.
+            const wallTop = w.y;
+            const wallBottom = w.y + EG_HZ_FIREWALL_HEIGHT;
+            const verticalOverlap = pr && pr.bottom > wallTop && pr.top < wallBottom;
+            if (!w.hitDone && verticalOverlap) {
+                let shouldHit = true;
+                if (w.variant === 'gapDown' || w.variant === 'gapUp') {
+                    const vw = window.innerWidth;
+                    const gx = Math.max(EG_HZ_FIREWALL_GAP_MARGIN,
+                        Math.min(w.gapX, vw - w.gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+                    const gapLeft = gx;
+                    const gapRight = gx + w.gapW;
+                    const inset = 6;
+                    const safeLeft = gapLeft + inset;
+                    const safeRight = gapRight - inset;
+                    if (pr.left >= safeLeft && pr.right <= safeRight) {
+                        shouldHit = false;
+                    } else {
+                        if (w.wallEls.length === 1 && w.gapW <= 0) shouldHit = true;
+                    }
+                }
+                if (shouldHit) {
+                    w.hitDone = true;
+                    const dealt = _egHzDamage(
+                        EG_HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
+                    );
+                    if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
+                        && Math.random() * 100 < EG_HZ_FIREWALL_IGNITE_CHANCE_PCT) {
+                        _egApplyPlayerAilment('ignite',
+                            Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
+                    }
+                }
             }
             continue;
         }

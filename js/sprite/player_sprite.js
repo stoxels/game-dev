@@ -177,6 +177,7 @@ function _initSimpleAvatarDrag(wrapper) {
 
     handle.addEventListener('mousedown', (e) => {
         e.preventDefault();
+        if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
         dragging = true;
         wrapper.style.cursor = 'grabbing';
 
@@ -187,6 +188,7 @@ function _initSimpleAvatarDrag(wrapper) {
 
         const onMove = (e) => {
             if (!dragging) return;
+            if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
             const dx = e.clientX - startMouseX;
             const dy = e.clientY - startMouseY;
             _setAvatarPos(wrapper, startLeft + dx, startTop + dy);
@@ -242,7 +244,9 @@ const _avatarMoveState = {
 
 function _avatarMoveUiBlocked() {
     const tag = document.activeElement ? document.activeElement.tagName : null;
-    return tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show');
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show')) return true;
+    if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return true;
+    return false;
 }
 
 function _avatarMoveTick(ts) {
@@ -628,6 +632,7 @@ function _initFullAvatarDrag(wrapper) {
 
     wrapper.addEventListener('mousedown', (e) => {
         e.preventDefault();
+        if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
         dragging = true;
         wrapper.style.cursor = 'grabbing';
 
@@ -638,6 +643,7 @@ function _initFullAvatarDrag(wrapper) {
 
         const onMove = (e) => {
             if (!dragging) return;
+            if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
             const dx = e.clientX - startMouseX;
             const dy = e.clientY - startMouseY;
             _setAvatarPos(wrapper, startLeft + dx, startTop + dy);
