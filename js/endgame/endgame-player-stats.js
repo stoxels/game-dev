@@ -1067,6 +1067,33 @@ function _egBuildStatLine(bucket, stats) {
             break;
         }
 
+        // Parry / Deflect are always shown in the defensive block (even with
+        // 0 gear) because they have meaningful baselines: 50% parry while
+        // holding E, 5% deflect on a successful projectile parry, 30%
+        // deflect damage. Use the live baseline helpers when available so the
+        // displayed total always matches combat.
+        case 'parryChancePct': {
+            const total = (typeof _egGetParryChancePct === 'function')
+                ? _egGetParryChancePct()
+                : ((typeof EG_PARRY_BASE_PCT !== 'undefined' ? EG_PARRY_BASE_PCT : 50) + (stats.parryChancePct || 0));
+            line = { label: t('eg_stat_parry'), value: `${_egFormatStatValue(total)}%` };
+            break;
+        }
+        case 'deflectChancePct': {
+            const total = (typeof _egGetDeflectChancePct === 'function')
+                ? _egGetDeflectChancePct()
+                : ((typeof EG_DEFLECT_BASE_PCT !== 'undefined' ? EG_DEFLECT_BASE_PCT : 5) + (stats.deflectChancePct || 0));
+            line = { label: t('eg_stat_deflect_chance'), value: `${_egFormatStatValue(total)}%` };
+            break;
+        }
+        case 'deflectDamagePct': {
+            const total = (typeof _egGetDeflectDamagePct === 'function')
+                ? _egGetDeflectDamagePct()
+                : ((typeof EG_DEFLECT_BASE_DMG_PCT !== 'undefined' ? EG_DEFLECT_BASE_DMG_PCT : 30) + (stats.deflectDamagePct || 0));
+            line = { label: t('eg_stat_deflect_damage'), value: `${_egFormatStatValue(total)}%` };
+            break;
+        }
+
         default: {
             const meta = EG_STAT_DISPLAY_LABELS[bucket];
             if (!meta) return null;

@@ -291,6 +291,26 @@ const EG_CURRENCY_DEFS = {
         canApply(item) { return item.category === 'equip' && !item.isUnique; },
     },
 
+    // Adds one modifier to a rare item (stays rare). Also works on an uncommon
+    // item with 1 modifier to fill its second slot — the budget Exalted for
+    // blue/green gear. Mirrors the requested "about as common as Regal" niche.
+    orb_bloom: {
+        id: 'orb_bloom', name: t('eg_orb_bloom'), icon: '🌸',
+        description: t('eg_orb_bloom_desc'),
+        canApply(item) {
+            if (item.category !== 'equip' || item.isUnique) return false;
+            if (item.rarity === 'rare') return (item.mods || []).length < EG_MOD_CAPS.rare.maxTotal;
+            if (item.rarity === 'uncommon') return (item.mods || []).length < EG_MOD_CAPS.uncommon.maxTotal;
+            return false;
+        },
+        apply(item) {
+            // stays at the same rarity — only the mod count grows
+            const updated = _egAddOneModToItem(item, item.rarity);
+            const name = _egBuildItemName(updated.baseName || updated.name, updated.rarity, updated.mods);
+            return { ...updated, name };
+        },
+    },
+
     // Reforges an item into a random unique of the same slot whose required
     // level is <= the source item's required level. Very rare drop + shard merge.
     orb_ancient: {
@@ -348,6 +368,7 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_annulment', weight: 40 },
     { id: 'orb_blessing', weight: 110 },
     { id: 'orb_regal', weight: 90 },
+    { id: 'orb_bloom', weight: 85 },
     { id: 'orb_chaos', weight: 55 },
     { id: 'orb_divine', weight: 35 },
     // Epic-tier orbs — deliberately much more common than before so that

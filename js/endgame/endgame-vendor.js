@@ -49,6 +49,7 @@ const EG_VENDOR_CURRENCY_PRICES = {
     orb_alchemy: 35,
     orb_chance: 60,
     orb_regal: 80,
+    orb_bloom: 85,
     orb_annulment: 90,
     orb_chaos: 120,
     orb_divine: 180,

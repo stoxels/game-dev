@@ -589,6 +589,8 @@ function _renderPlayerAvatar() {
     const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / chargeMax) * 100));
     document.getElementById('avatar-charge-fill').style.width = chargePct + '%';
 
+    if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
+
     // Hold-E pause — keep sprite label in sync if the avatar was recreated while E is still held
     if (typeof _egHoldEPauseActive !== 'undefined' && typeof _egSetHoldEPauseVisual === 'function') {
         // Avoid redundant DOM churn: _egSetHoldEPauseVisual is idempotent and cheap
@@ -709,4 +711,5 @@ function _renderPlayerHealth() {
     const hpPct = Math.max(0, Math.min(100, (playerCurrentHP / playerMaxHP) * 100));
     hpText.innerText = `HP: ${playerCurrentHP} / ${playerMaxHP}`;
     hpFill.style.width = hpPct + '%';
+    if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 }

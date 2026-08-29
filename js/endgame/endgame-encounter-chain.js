@@ -1221,6 +1221,7 @@ function _egChainCleanup() {
     _egPuzzleCompleteFired = false;
     _egMapClearedShown = false;
     _egBossArenaAvailableShown = false;
+    if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
 
     // Boss arena phase state
     if (_egArenaAdvanceTimer) {
@@ -1237,6 +1238,8 @@ function _egChainCleanup() {
     if (banner) banner.remove();
     const bossBanner = document.getElementById('eg-boss-arena-available-banner');
     if (bossBanner) bossBanner.remove();
+    const mistakesBanner = document.getElementById('eg-mistakes-warning-banner');
+    if (mistakesBanner) mistakesBanner.remove();
 
     _egRunLoot = [];
     _egRunCurrency = [];

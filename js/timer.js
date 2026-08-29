@@ -63,14 +63,14 @@ function _getTimerUrgencyClass(secs) {
 // Returns the vignette tier class for the current timerSecs, or '' when
 // above all thresholds. Mirrors _getTimerUrgencyClass()'s breakpoints but
 // drives the full-screen edge effect instead of just the clock text.
-//   'ltv-tier3' — ≤ 120s  (strongest)
-//   'ltv-tier2' — ≤ 300s
-//   'ltv-tier1' — ≤ 600s
+//   'ltv-tier3' — ≤ 120s  (2 min, strongest)
+//   'ltv-tier2' — ≤ 300s  (5 min)
+//   'ltv-tier1' — ≤ 600s  (10 min)
 //   ''          — > 600s
 function _getLowTimeVignetteTier(secs) {
-    if (secs <= 300) return 'ltv-tier3';
-    if (secs <= 600) return 'ltv-tier2';
-    if (secs <= 900) return 'ltv-tier1';
+    if (secs <= 120) return 'ltv-tier3';
+    if (secs <= 300) return 'ltv-tier2';
+    if (secs <= 600) return 'ltv-tier1';
     return '';
 }
 
@@ -87,6 +87,52 @@ function _applyLowTimeVignette() {
     if (!SETTINGS.lowTimeVignette || timerFrozen || window._goldenClockActive) return;
 
     const tier = _getLowTimeVignetteTier(timerSecs);
+    if (tier) el.classList.add(tier);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------LOW-HEALTH VIGNETTE----------------------------------
+//------------------------------------------------------------------------
+
+// Returns the vignette tier for the current health percentage, or '' when
+// above all thresholds. Independent from the timer vignette so both can be
+// visible simultaneously (blue for time, red for health).
+//   'lhv-tier3' — ≤ 10% HP (strongest)
+//   'lhv-tier2' — ≤ 25% HP
+//   'lhv-tier1' — ≤ 50% HP
+//   ''          — > 50% HP
+function _getLowHealthVignetteTier(pct) {
+    if (pct <= 0.10) return 'lhv-tier3';
+    if (pct <= 0.25) return 'lhv-tier2';
+    if (pct <= 0.50) return 'lhv-tier1';
+    return '';
+}
+
+// Applies (or clears) the correct tier class on the health vignette element.
+// Suppressed only by its own settings toggle — health vignette is not tied
+// to timerFrozen / Golden Clock. Uses SETTINGS.lowHealthVignette (falls back
+// to lowTimeVignette if the new key is missing from an old save).
+function _applyLowHealthVignette() {
+    const el = document.getElementById('low-health-vignette');
+    if (!el) return;
+
+    el.classList.remove('lhv-tier1', 'lhv-tier2', 'lhv-tier3');
+
+    const healthEnabled = (typeof SETTINGS.lowHealthVignette !== 'undefined')
+        ? SETTINGS.lowHealthVignette
+        : SETTINGS.lowTimeVignette;
+    if (!healthEnabled) return;
+
+    const max = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+    const curHP = (typeof playerCurrentHP !== 'undefined') ? playerCurrentHP : max;
+    if (max <= 0) return;
+
+    const pct = curHP / max;
+    // Don't show vignette when dead or at full health without threshold
+    if (pct <= 0 || pct > 0.50) return;
+
+    const tier = _getLowHealthVignetteTier(pct);
     if (tier) el.classList.add(tier);
 }
 
@@ -115,9 +161,10 @@ function _applyTimerDisplayState(el) {
 // so the display updates immediately when a mistake is made.
 function updTimer() {
     const el = document.getElementById('timer-val');
-    el.textContent = _formatTimerDisplay(timerSecs);
-    _applyTimerDisplayState(el);
+    if (el) el.textContent = _formatTimerDisplay(timerSecs);
+    if (el) _applyTimerDisplayState(el);
     _applyLowTimeVignette();
+    _applyLowHealthVignette();
 
     // Notify the passive skill tracker every tick (no-op when unavailable).
     if (typeof PassiveTracker !== 'undefined') PassiveTracker.onTimerTick();
@@ -529,4 +576,12 @@ function startTimer() {
 // or a timer interval is already running.
 function resumeTimer() {
     if (!dead && !timerInterval) startTimer();
+}
+
+// Poll health vignette independently of the 1s timer tick so damage taken
+// between ticks (monster hits, hazards) shows the red edge glow instantly.
+if (typeof window !== 'undefined' && !window._healthVignettePoll) {
+    window._healthVignettePoll = setInterval(() => {
+        if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
+    }, 250);
 }

@@ -18,7 +18,8 @@ const SETTINGS_DEFAULTS = {
     questionMark: false,
     touchpadModeEnabled: false,
     muteOnFocusLoss: false,     // mute all audio when the window loses focus
-    lowTimeVignette: true,      // red screen edge glow while time is running out
+    lowTimeVignette: true,      // blue screen edge glow while time is running out
+    lowHealthVignette: true,    // red screen edge glow while health is low
     penaltyFlash: true,         // brief red screen flash on a mistake
     toastDuration: 8,           // seconds an on-screen notification stays visible
     invertMouseButtons: false,  // swap fill (left-click) and mark (right-click)
@@ -39,6 +40,7 @@ const TOGGLE_CONFIGS = [
     { key: 'touchpadModeEnabled', btnId: 'stt-touchpad' },
     { key: 'invertMouseButtons', btnId: 'stt-invert' },
     { key: 'lowTimeVignette', btnId: 'stt-ltv' },
+    { key: 'lowHealthVignette', btnId: 'stt-lhv' },
     { key: 'penaltyFlash', btnId: 'stt-penflash' },
     { key: 'hidePassiveTrackerInEndgame', btnId: 'stt-hidepassiveendgame' },
 ];
@@ -207,6 +209,12 @@ function initToggleControl(btnId, settingsKey, applyOnChange = true) {
         if (settingsKey === 'hidePassiveTrackerInEndgame' && typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) {
             PassiveTracker.refreshVisibility();
         }
+        if (settingsKey === 'lowTimeVignette' && typeof _applyLowTimeVignette === 'function') {
+            _applyLowTimeVignette();
+        }
+        if (settingsKey === 'lowHealthVignette' && typeof _applyLowHealthVignette === 'function') {
+            _applyLowHealthVignette();
+        }
     });
 }
 
@@ -245,6 +253,7 @@ function initSettingsControls() {
     initToggleControl('stt-touchpad', 'touchpadModeEnabled');
     initToggleControl('stt-invert', 'invertMouseButtons', false);
     initToggleControl('stt-ltv', 'lowTimeVignette', false);
+    initToggleControl('stt-lhv', 'lowHealthVignette', false);
     initToggleControl('stt-penflash', 'penaltyFlash', false);
     initToggleControl('stt-hidepassiveendgame', 'hidePassiveTrackerInEndgame', false);
 

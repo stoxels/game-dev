@@ -393,6 +393,8 @@ function _egFirstStepRemainingS() {
 
 // Resets all encounter state variables to their initial values.
 function _egResetEncounterState() {
+    // Reset the low-mistakes banner state for the new puzzle/encounter
+    if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
     _egEncounterActive = true;
     _egTargetId = null;
     _egMonsters = [];
@@ -424,6 +426,10 @@ function _egResetEncounterState() {
     // Hold-E pause starts released
     if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
     if (typeof _egSetHoldEPauseVisual === 'function') _egSetHoldEPauseVisual(false);
+
+    // Initial low-mistakes check — shows the 3/2/1/0 overlay immediately
+    // if the map already starts with a tight mistake budget.
+    if (typeof _egMaybeShowMistakesWarning === 'function') _egMaybeShowMistakesWarning();
 }
 
 // Starts the combat tick loop at 10Hz.
@@ -480,6 +486,7 @@ function _egStopEncounter() {
     if (typeof _egHazardsCleanup === 'function') _egHazardsCleanup();
     _egBossCleanupAll();
     _egCancelAbsorptionRegen();
+    if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
     if (typeof _egChainCleanup === 'function') _egChainCleanup();
     _egHideMonsterPanel();
     if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
@@ -656,10 +663,99 @@ function _egGetMaxAllowedMistakes() {
 function _egCheckMistakeLimit() {
     const max = _egGetMaxAllowedMistakes();
     if (max == null) return;
+    // Low-mistakes overlay — fires when only 3/2/1/0 remain (deduped inside)
+    if (typeof _egMaybeShowMistakesWarning === 'function') _egMaybeShowMistakesWarning();
     if (typeof mistakeCount !== 'undefined' && mistakeCount > max) {
         // Central defeat handler — the player keeps the loot collected so far.
         _egEndMapDefeated(t('eg_map_failed'), t('eg_too_many_mistakes'));
     }
+}
+
+// ── Mistakes-remaining warning (center-grid overlay) ─────────────────────
+// Tracks the last remaining value so repeated HUD refreshes without a
+// count change do not re-fire the banner, and increases (eraser) do not
+// re-trigger a low-mistakes warning.
+let _egLastMistakesWarningShown = null;
+let _egLastMistakesRemaining = null;
+
+function _egGetMistakesRemaining() {
+    const max = _egGetMaxAllowedMistakes();
+    if (max == null) return null;
+    const curCount = (typeof mistakeCount !== 'undefined') ? mistakeCount : 0;
+    return max - curCount;
+}
+
+function _egShowMistakesWarningBanner(remaining) {
+    // Remove any stale banner so a rapid 3→2→1 cascade always shows the newest count
+    const old = document.getElementById('eg-mistakes-warning-banner');
+    if (old) old.remove();
+
+    const el = document.createElement('div');
+    el.id = 'eg-mistakes-warning-banner';
+    // Severity class drives color + shake for 0 remaining
+    const sev = Math.max(0, Math.min(3, remaining));
+    el.className = `eg-mw-${sev}`;
+
+    // Translation key per threshold — falls back to a plain string if missing
+    const key = `eg_mistakes_warning_${sev}`;
+    const raw = (typeof t === 'function') ? t(key) : '';
+    const fallback = remaining === 0 ? '☠️ LAST CHANCE — 0 MISTAKES LEFT!'
+        : remaining === 1 ? '⚠️ 1 MISTAKE LEFT!'
+        : `⚠️ ${remaining} MISTAKES LEFT`;
+    el.textContent = (raw && raw !== key) ? raw : fallback;
+    document.body.appendChild(el);
+
+    // Center over the puzzle grid (fallback: viewport center)
+    const board = document.getElementById('ptable');
+    if (board) {
+        const r = board.getBoundingClientRect();
+        el.style.left = (r.left + r.width / 2) + 'px';
+        el.style.top = (r.top + r.height / 2) + 'px';
+    } else {
+        el.style.left = '50%';
+        el.style.top = '50%';
+    }
+
+    // Toast counterpart — brief, color-coded by severity
+    const toastKey = `eg_mistakes_warning_toast_${sev}`;
+    const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
+    const toastFallback = el.textContent;
+    const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
+    const toastColors = { 3: '#facc15', 2: '#fb923c', 1: '#f87171', 0: '#ef4444' };
+    if (typeof showToast === 'function') showToast(toastText, toastColors[sev] || '#f87171');
+
+    setTimeout(() => el.remove(), 2500);
+}
+
+function _egMaybeShowMistakesWarning() {
+    if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
+    const remaining = _egGetMistakesRemaining();
+    if (remaining == null || remaining < 0) {
+        // No limit or already over — keep last remaining for next comparison
+        _egLastMistakesRemaining = remaining;
+        return;
+    }
+    const prev = _egLastMistakesRemaining;
+    _egLastMistakesRemaining = remaining;
+
+    if (remaining > 3) {
+        // Out of the 3/2/1/0 window — clear the dedup so re-entering can fire again
+        _egLastMistakesWarningShown = null;
+        return;
+    }
+    // Only warn when the count *decreased* into / within the window.
+    // Increases (eraser) update the tracker but do not re-fire the overlay.
+    if (prev != null && remaining >= prev) return;
+    if (remaining === _egLastMistakesWarningShown) return;
+    _egLastMistakesWarningShown = remaining;
+    _egShowMistakesWarningBanner(remaining);
+}
+
+function _egResetMistakesWarningState() {
+    _egLastMistakesWarningShown = null;
+    _egLastMistakesRemaining = null;
+    const banner = document.getElementById('eg-mistakes-warning-banner');
+    if (banner) banner.remove();
 }
 
 

@@ -82,6 +82,12 @@ const EG_SHARD_DEFS = {
         name: t('eg_shard_ancient'),
         description: t('eg_shard_ancient_desc'),
     },
+    shard_bloom: {
+        id: 'shard_bloom', orbId: 'orb_bloom',
+        icon: '🍃', orbIcon: '🌸',
+        name: t('eg_shard_bloom'),
+        description: t('eg_shard_bloom_desc'),
+    },
 };
 
 
@@ -98,6 +104,7 @@ const EG_SHARD_ROLL_TABLE = [
     { id: 'shard_transmutation', weight: 400, statScale: 0.00 },
     { id: 'shard_alchemy',       weight: 200, statScale: 0.06 },
     { id: 'shard_chaos',         weight: 90,  statScale: 0.14 },
+    { id: 'shard_bloom',         weight: 85,  statScale: 0.10 },
     { id: 'shard_elevation',     weight: 45,  statScale: 0.24 },
     { id: 'shard_ascension',     weight: 75,  statScale: 0.32 },
     { id: 'shard_cataclysm',     weight: 15,  statScale: 0.42 },
@@ -199,6 +206,7 @@ function _egShardOrbNameKey(orbId) {
         case 'orb_transmutation': return 'eg_orb_transmutation';
         case 'orb_alchemy':       return 'eg_orb_alchemy';
         case 'orb_chaos':         return 'eg_orb_chaos';
+        case 'orb_bloom':         return 'eg_orb_bloom';
         case 'orb_elevation':     return 'eg_orb_elevation';
         case 'orb_horizons':      return 'eg_orb_horizons';
         case 'orb_ascension':     return 'eg_orb_ascension';

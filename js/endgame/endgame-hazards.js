@@ -103,10 +103,16 @@ const EG_HZ_FROSTNOVA_INTERVAL_MAX_MS = 10000;
 const EG_HZ_FIREWALL_BASE_DMG_PCT = 18;    // % of playerMaxHP per wall hit — significant fire wave (was 8, too low)
 const EG_HZ_FIREWALL_HEIGHT = 150;         // flame wave thickness (px)
 const EG_HZ_FIREWALL_WARNING_MS = 1300;    // telegraph before ignition
-const EG_HZ_FIREWALL_SWEEP_MS = 2600;      // top → bottom sweep duration
+const EG_HZ_FIREWALL_SWEEP_MS = 2600;      // sweep duration (direction depends on variant)
 const EG_HZ_FIREWALL_IGNITE_CHANCE_PCT = 50;
 const EG_HZ_FIREWALL_INTERVAL_MIN_MS = 8000;
 const EG_HZ_FIREWALL_INTERVAL_MAX_MS = 12000;
+// Outplay tuning — safe-zone insets and gap geometry for firewall variations
+const EG_HZ_FIREWALL_SAFE_MIN = 90;        // minimum safe strip height at top/bottom for offset variants (px)
+const EG_HZ_FIREWALL_SAFE_MAX = 160;       // maximum safe strip height (px)
+const EG_HZ_FIREWALL_GAP_MIN_W = 180;      // minimum gap width for gap variants (px)
+const EG_HZ_FIREWALL_GAP_MAX_W = 280;      // maximum gap width (px)
+const EG_HZ_FIREWALL_GAP_MARGIN = 70;      // keep gap at least this far from screen edges (px)
 
 const EG_HZ_CYCLONE_BASE_DMG_PCT = 1.6;    // % of playerMaxHP per wind tick
 const EG_HZ_CYCLONE_TICK_MS = 500;         // damage tick rate inside a cyclone
@@ -140,7 +146,7 @@ let _egHzArcane = null;     // { charge: null | {...}, beam: null | {...}, nextI
 let _egHzMeteor = null;     // { pending: [{x,y,t,warnEl,state,el,y}], nextIn, intervalScale, dmgMult }
 let _egHzVolatile = null;   // { wisps: [], respawnIn, maxWisps, dmgMult }
 let _egHzFrostNova = null;  // { novas: [], nextIn, intervalScale, dmgMult }
-let _egHzFirewall = null;   // { pending: [{t,y,el,hitDone}], nextIn, intervalScale, dmgMult }
+let _egHzFirewall = null;   // { pending: [{t,y,dir,totalDist,endY,variant,gapX,gapW,wallEls,warningEls,hitDone}], nextIn, intervalScale, dmgMult }
 let _egHzCyclone = null;    // { vortices: [{x,y,r,vx,vy,dmgAcc,el}], dmgMult }
 let _egHzDelirium = null;   // { phase, nextIn, t, el, rolled }
 
@@ -1307,8 +1313,27 @@ function _egHzTickFrostNova(dtMs) {
 //------------------------------------------------------------------------
 //-------------------FIRE WALLS-------------------------------------------
 //------------------------------------------------------------------------
-// Telegraphed vertical walls of fire that sweep from the top of the screen
-// to the bottom. Fire damage on contact, may ignite.
+// Telegraphed horizontal flame walls. Randomly picks one of several
+// outplay-able variations each spawn so the mechanic is never an
+// unavoidable full-screen hit:
+//
+//   offsetTop  — wall starts inset from the TOP (90–160 px safe strip
+//                at the very top). Sweeps TOP → BOTTOM. Dodge by hugging
+//                the top edge.
+//   offsetBottom— wall starts inset from the BOTTOM (90–160 px safe strip
+//                at the very bottom). Sweeps BOTTOM → TOP. Dodge by
+//                hugging the bottom edge.
+//   gapDown    — full-width wall with a horizontal GAP (180–280 px) that
+//                spans the wall's thickness. Starts at the TOP, sweeps
+//                TOP → BOTTOM. Stand in the gap.
+//   gapUp      — same gap wall but mirrored: starts at the BOTTOM and
+//                sweeps BOTTOM → TOP.
+//
+// Telegraph (warning) mirrors the wall geometry so the player can read
+// the safe zone / gap position during the 1.3 s wind-up. Damage is
+// dealt once when the flame band (including swept interval) overlaps
+// the player's tight sprite hitbox; for gap variants the hit is
+// suppressed when the hitbox is fully inside the gap.
 
 function _egHzInitFirewall(intensity) {
     _egHzFirewall = {
@@ -1317,6 +1342,99 @@ function _egHzInitFirewall(intensity) {
         intervalScale: 1 - Math.min(0.45, intensity / 220),
         dmgMult: _egHzMult(intensity),
     };
+}
+
+function _egHzCreateFirewallWallEls(variant, gapX, gapW, startY) {
+    const h = EG_HZ_FIREWALL_HEIGHT;
+    const hasGap = variant === 'gapDown' || variant === 'gapUp';
+    const els = [];
+    if (!hasGap) {
+        const el = document.createElement('div');
+        el.className = 'eg-hz-firewall';
+        el.style.height = h + 'px';
+        el.style.transform = `translateY(${Math.round(startY)}px)`;
+        el.style.display = 'none';
+        if (_egHzLayer) _egHzLayer.appendChild(el);
+        els.push(el);
+    } else {
+        const vw = window.innerWidth;
+        // Clamp gap to viewport
+        const gx = Math.max(EG_HZ_FIREWALL_GAP_MARGIN,
+            Math.min(gapX, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+        const leftW = gx;
+        const rightX = gx + gapW;
+        const rightW = Math.max(0, vw - rightX);
+        const mkSeg = (left, width) => {
+            const seg = document.createElement('div');
+            seg.className = 'eg-hz-firewall eg-hz-firewall--gap-seg';
+            seg.style.height = h + 'px';
+            seg.style.left = left + 'px';
+            seg.style.right = 'auto';
+            seg.style.width = width + 'px';
+            seg.style.transform = `translateY(${Math.round(startY)}px)`;
+            seg.style.display = 'none';
+            if (_egHzLayer) _egHzLayer.appendChild(seg);
+            return seg;
+        };
+        if (leftW > 2) els.push(mkSeg(0, leftW));
+        if (rightW > 2) els.push(mkSeg(rightX, rightW));
+        // Edge case: if one side is degenerate (gap at very edge) at least one seg will exist.
+        // If both degenerate (should not happen), fallback to single full wall.
+        if (els.length === 0) {
+            const el = document.createElement('div');
+            el.className = 'eg-hz-firewall';
+            el.style.height = h + 'px';
+            el.style.transform = `translateY(${Math.round(startY)}px)`;
+            el.style.display = 'none';
+            if (_egHzLayer) _egHzLayer.appendChild(el);
+            els.push(el);
+        }
+    }
+    return els;
+}
+
+function _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
+    const h = EG_HZ_FIREWALL_HEIGHT;
+    const hasGap = variant === 'gapDown' || variant === 'gapUp';
+    const els = [];
+    if (!hasGap) {
+        const warn = document.createElement('div');
+        warn.className = 'eg-hz-firewall-warning';
+        // Position at the wall's start location so the safe strip is visible.
+        warn.style.top = Math.round(startY) + 'px';
+        warn.style.height = h + 'px';
+        if (_egHzLayer) _egHzLayer.appendChild(warn);
+        els.push(warn);
+    } else {
+        const vw = window.innerWidth;
+        const gx = Math.max(EG_HZ_FIREWALL_GAP_MARGIN,
+            Math.min(gapX, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+        const leftW = gx;
+        const rightX = gx + gapW;
+        const rightW = Math.max(0, vw - rightX);
+        const mkWarnSeg = (left, width) => {
+            const seg = document.createElement('div');
+            seg.className = 'eg-hz-firewall-warning eg-hz-firewall-warning--gap-seg';
+            seg.style.top = Math.round(startY) + 'px';
+            seg.style.height = h + 'px';
+            seg.style.left = left + 'px';
+            seg.style.right = 'auto';
+            seg.style.width = width + 'px';
+            if (_egHzLayer) _egHzLayer.appendChild(seg);
+            return seg;
+        };
+        if (leftW > 2) els.push(mkWarnSeg(0, leftW));
+        if (rightW > 2) els.push(mkWarnSeg(rightX, rightW));
+        if (els.length === 0) {
+            const warn = document.createElement('div');
+            warn.className = 'eg-hz-firewall-warning';
+            warn.style.top = Math.round(startY) + 'px';
+            warn.style.height = h + 'px';
+            if (_egHzLayer) _egHzLayer.appendChild(warn);
+            els.push(warn);
+        }
+    }
+    return els;
 }
 
 function _egHzTickFirewall(dtMs) {
@@ -1330,22 +1448,57 @@ function _egHzTickFirewall(dtMs) {
             EG_HZ_FIREWALL_INTERVAL_MAX_MS
         ) * st.intervalScale;
 
-        // Telegraph: a glowing strip along the top edge announces the wave.
-        const warn = document.createElement('div');
-        warn.className = 'eg-hz-firewall-warning';
-        _egHzLayer.appendChild(warn);
-        setTimeout(() => warn.remove(), EG_HZ_FIREWALL_WARNING_MS);
+        // ── Pick a random outplay variation ───────────────────────────
+        const variants = ['offsetTop', 'offsetBottom', 'gapDown', 'gapUp'];
+        const variant = variants[Math.floor(Math.random() * variants.length)];
+        const vh = window.innerHeight;
+        const vw = window.innerWidth;
+        const h = EG_HZ_FIREWALL_HEIGHT;
+        let startY, endY, dir, gapX = 0, gapW = 0;
 
-        const el = document.createElement('div');
-        el.className = 'eg-hz-firewall';
-        el.style.height = EG_HZ_FIREWALL_HEIGHT + 'px';
-        el.style.transform = `translateY(${-EG_HZ_FIREWALL_HEIGHT}px)`;
-        el.style.display = 'none';
-        _egHzLayer.appendChild(el);
+        if (variant === 'offsetTop') {
+            const safeTop = _egHzRand(EG_HZ_FIREWALL_SAFE_MIN, EG_HZ_FIREWALL_SAFE_MAX);
+            startY = safeTop;
+            endY = vh;
+            dir = 1;
+        } else if (variant === 'offsetBottom') {
+            const safeBottom = _egHzRand(EG_HZ_FIREWALL_SAFE_MIN, EG_HZ_FIREWALL_SAFE_MAX);
+            startY = vh - h - safeBottom;
+            endY = -h;
+            dir = -1;
+        } else if (variant === 'gapDown') {
+            gapW = _egHzRand(EG_HZ_FIREWALL_GAP_MIN_W, EG_HZ_FIREWALL_GAP_MAX_W);
+            gapX = _egHzRand(EG_HZ_FIREWALL_GAP_MARGIN, Math.max(EG_HZ_FIREWALL_GAP_MARGIN, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+            startY = -h;
+            endY = vh;
+            dir = 1;
+        } else { // gapUp
+            gapW = _egHzRand(EG_HZ_FIREWALL_GAP_MIN_W, EG_HZ_FIREWALL_GAP_MAX_W);
+            gapX = _egHzRand(EG_HZ_FIREWALL_GAP_MARGIN, Math.max(EG_HZ_FIREWALL_GAP_MARGIN, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+            startY = vh;
+            endY = -h;
+            dir = -1;
+        }
+
+        const totalDist = Math.abs(endY - startY);
+        const wallEls = _egHzCreateFirewallWallEls(variant, gapX, gapW, startY);
+        const warningEls = _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY);
+        // Remove telegraph after wind-up; wall becomes visible then.
+        const warnElsSnapshot = warningEls.slice();
+        setTimeout(() => warnElsSnapshot.forEach(el => { try { el.remove(); } catch(e){} }), EG_HZ_FIREWALL_WARNING_MS);
+
         st.pending.push({
             t: EG_HZ_FIREWALL_WARNING_MS,
-            y: -EG_HZ_FIREWALL_HEIGHT,
-            el, hitDone: false,
+            y: startY,
+            dir: dir,
+            totalDist: totalDist,
+            endY: endY,
+            variant: variant,
+            gapX: gapX,
+            gapW: gapW,
+            wallEls: wallEls,
+            warningEls: warningEls,
+            hitDone: false,
         });
     }
 
@@ -1353,37 +1506,75 @@ function _egHzTickFirewall(dtMs) {
 
     for (let i = st.pending.length - 1; i >= 0; i--) {
         const w = st.pending[i];
-        if (!w.el.isConnected) { st.pending.splice(i, 1); continue; }
+        // If all wall segments have been removed externally, drop entry.
+        const anyConnected = w.wallEls.some(el => el.isConnected);
+        if (!anyConnected && w.t <= 0) { st.pending.splice(i, 1); continue; }
+        if (w.wallEls.length === 0) { st.pending.splice(i, 1); continue; }
 
         if (w.t > 0) {
             w.t -= dtMs;
-            if (w.t <= 0) w.el.style.display = 'block';
+            if (w.t <= 0) {
+                w.wallEls.forEach(el => { el.style.display = 'block'; });
+            }
             continue;
         }
 
-        // Sweeping phase — the wave descends and burns what it passes once.
+        // Sweeping phase — the wave moves in its variant direction.
         const prevY = w.y;
-        const totalDist = window.innerHeight + EG_HZ_FIREWALL_HEIGHT;
-        w.y += (totalDist / (EG_HZ_FIREWALL_SWEEP_MS / 1000)) * dtS;
-        w.el.style.transform = `translateY(${Math.round(w.y)}px)`;
+        const speed = w.totalDist / (EG_HZ_FIREWALL_SWEEP_MS / 1000);
+        w.y += w.dir * speed * dtS;
+        w.wallEls.forEach(el => { el.style.transform = `translateY(${Math.round(w.y)}px)`; });
 
-        // Swept so 34px/tick can't skip ~56px hitbox
+        // Swept vertical interval so high speed cannot skip hitbox.
         const wallTop = Math.min(prevY, w.y);
         const wallBottom = Math.max(prevY + EG_HZ_FIREWALL_HEIGHT, w.y + EG_HZ_FIREWALL_HEIGHT);
-        if (!w.hitDone && pr && pr.bottom > wallTop && pr.top < wallBottom) {
-            w.hitDone = true;
-            const dealt = _egHzDamage(
-                EG_HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
-            );
-            if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-                && Math.random() * 100 < EG_HZ_FIREWALL_IGNITE_CHANCE_PCT) {
-                _egApplyPlayerAilment('ignite',
-                    Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
+        const verticalOverlap = pr && pr.bottom > wallTop && pr.top < wallBottom;
+
+        if (!w.hitDone && verticalOverlap) {
+            let shouldHit = true;
+            // Gap variants: player fully inside the gap is safe.
+            if (w.variant === 'gapDown' || w.variant === 'gapUp') {
+                const vw = window.innerWidth;
+                const gx = Math.max(EG_HZ_FIREWALL_GAP_MARGIN,
+                    Math.min(w.gapX, vw - w.gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+                const gapLeft = gx;
+                const gapRight = gx + w.gapW;
+                // Small forgiveness inset so touching the flame edge still burns.
+                const inset = 6;
+                const safeLeft = gapLeft + inset;
+                const safeRight = gapRight - inset;
+                // Player rect must be fully inside the inset gap to be safe.
+                if (pr.left >= safeLeft && pr.right <= safeRight) {
+                    shouldHit = false;
+                } else {
+                    // Also consider case where gap is degenerate (no segments):
+                    // if wallEls covers full width there is no safe gap — must hit.
+                    if (w.wallEls.length === 1 && w.gapW <= 0) shouldHit = true;
+                }
+            }
+            // Offset variants use pure vertical check — the top/bottom safe strip
+            // is naturally safe because the wall band never covers it.
+
+            if (shouldHit) {
+                w.hitDone = true;
+                const dealt = _egHzDamage(
+                    EG_HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
+                );
+                if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
+                    && Math.random() * 100 < EG_HZ_FIREWALL_IGNITE_CHANCE_PCT) {
+                    _egApplyPlayerAilment('ignite',
+                        Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
+                }
             }
         }
 
-        if (w.y >= window.innerHeight) {
-            w.el.remove();
+        // Remove when the wall has fully exited the screen in its direction.
+        const exited = (w.dir === 1 && w.y >= window.innerHeight) ||
+                       (w.dir === -1 && w.y <= -EG_HZ_FIREWALL_HEIGHT);
+        if (exited) {
+            w.wallEls.forEach(el => { try { el.remove(); } catch(e){} });
+            // Warning already removed via timeout, but ensure cleanup.
+            if (w.warningEls) w.warningEls.forEach(el => { try { el.remove(); } catch(e){} });
             st.pending.splice(i, 1);
         }
     }

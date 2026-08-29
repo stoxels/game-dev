@@ -498,7 +498,8 @@
    = FIRE WALLS
    ====================================================================== */
 
-/* Telegraph strip along the top edge */
+/* Telegraph strip — position/width set inline by JS per variant so the safe
+   zone / gap is readable during the 1.3s wind-up. Default is full-width at top. */
 .eg-hz-firewall-warning {
     position: absolute;
     top: 0;
@@ -510,8 +511,24 @@
         rgba(255, 110, 30, 0.35) 0%,
         rgba(255, 110, 30, 0.12) 60%,
         transparent 100%);
-    border-bottom: 3px dashed rgba(255, 140, 66, 0.9);
+    border: 3px dashed rgba(255, 140, 66, 0.9);
+    border-left: none;
+    border-right: none;
     animation: eg-hz-firewall-warn-pulse 0.5s ease-in-out infinite;
+}
+
+/* Gap variant: two separate dashed segments leaving a transparent gap. */
+.eg-hz-firewall-warning--gap-seg {
+    left: auto;
+    right: auto;
+    border-left: 3px dashed rgba(255, 140, 66, 0.9);
+    border-right: 3px dashed rgba(255, 140, 66, 0.9);
+}
+.eg-hz-firewall-warning--gap-seg:first-child {
+    border-right: none;
+}
+.eg-hz-firewall-warning--gap-seg:last-child {
+    border-left: none;
 }
 
 @keyframes eg-hz-firewall-warn-pulse {
@@ -519,7 +536,8 @@
     50%      { opacity: 1; }
 }
 
-/* The descending flame wave (height + transform driven by JS) */
+/* The flame wave (height + transform driven by JS).
+   Default is full-width; gap segments override left/width. */
 .eg-hz-firewall {
     position: absolute;
     top: 0;
@@ -541,6 +559,16 @@
         0 0 42px 18px rgba(255, 120, 20, 0.65),
         inset 0 8px 22px rgba(255, 230, 150, 0.8);
     animation: eg-hz-firewall-flare 0.16s linear infinite alternate;
+}
+
+/* Gap segments: positioned via inline left/width, no full-width right:0 */
+.eg-hz-firewall--gap-seg {
+    left: auto;
+    right: auto;
+    /* keep flame look; slight inner glow so split is visible but gap stays clear */
+    box-shadow:
+        0 0 32px 12px rgba(255, 120, 20, 0.55),
+        inset 0 8px 18px rgba(255, 230, 150, 0.75);
 }
 
 @keyframes eg-hz-firewall-flare {

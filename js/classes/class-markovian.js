@@ -364,26 +364,36 @@ function _rollbackVFX_spawnBolt(bolts, W, H) {
 }
 
 // Draws the dark screen tint and the animated grid-dot pulse layer.
+// OPTIMIZED: step 32px vs 18px (~68% fewer rects), skip near-invisible dots, thinner sweep.
 function _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade) {
     ctx.fillStyle = `rgba(10,5,30,${0.82 * fade})`;
     ctx.fillRect(0, 0, w, h);
 
-    for (let r = 0; r < h; r += 18) {
-        for (let c = 0; c < w; c += 18) {
-            const wave = Math.sin((c + r) * 0.04 - elapsed * 0.003) * 0.5 + 0.5;
-            ctx.fillStyle = `rgba(100,60,200,${wave * 0.06 * fade})`;
+    if (fade < 0.02) return;
+
+    const step = 32;
+    const t = elapsed * 0.0025;
+    // Batch dots with similar alpha would be ideal, but simple skip of low-alpha already helps.
+    for (let r = 0; r < h; r += step) {
+        for (let c = 0; c < w; c += step) {
+            const wave = Math.sin((c + r) * 0.04 - t) * 0.5 + 0.5;
+            const a = wave * 0.05 * fade;
+            if (a < 0.012) continue;
+            ctx.fillStyle = `rgba(100,60,200,${a})`;
             ctx.fillRect(c, r, 2, 2);
         }
     }
 
-    // Sweeping purple wave that scrolls left-to-right.
-    const waveX = (elapsed % 1000) / 1000 * (w + 200) - 100;
-    const wg = ctx.createLinearGradient(waveX - 70, 0, waveX + 70, 0);
-    wg.addColorStop(0, 'rgba(130,50,220,0)');
-    wg.addColorStop(0.5, `rgba(130,50,220,${0.16 * fade})`);
-    wg.addColorStop(1, 'rgba(130,50,220,0)');
-    ctx.fillStyle = wg;
-    ctx.fillRect(0, 0, w, h);
+    // Sweeping purple wave that scrolls left-to-right — only when visible.
+    if (fade > 0.15) {
+        const waveX = (elapsed % 1100) / 1100 * (w + 200) - 100;
+        const wg = ctx.createLinearGradient(waveX - 60, 0, waveX + 60, 0);
+        wg.addColorStop(0, 'rgba(130,50,220,0)');
+        wg.addColorStop(0.5, `rgba(130,50,220,${0.14 * fade})`);
+        wg.addColorStop(1, 'rgba(130,50,220,0)');
+        ctx.fillStyle = wg;
+        ctx.fillRect(0, 0, w, h);
+    }
 }
 
 // Advances and draws all live lightning bolts. Dead bolts are removed.
@@ -496,6 +506,7 @@ function _rollbackVFX_flashCells(rows, cols) {
 
 // Orchestrates the full rollback VFX: spawns the canvas overlay, runs the
 // animation loop for DURATION ms, then removes the canvas.
+// OPTIMIZED: throttled to ~30fps to halve CPU, capped bolt spawn.
 function _rollbackPlayVFX(rows, cols) {
     const DURATION = 2200;
 
@@ -506,8 +517,16 @@ function _rollbackPlayVFX(rows, cols) {
     const bolts = [];
     const particles = [];
     let animId;
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 33;
 
     function tick(now) {
+        if (now - lastFrame < FRAME_INTERVAL) {
+            animId = requestAnimationFrame(tick);
+            return;
+        }
+        lastFrame = now;
+
         const elapsed = now - startTime;
         const t = Math.min(elapsed / DURATION, 1);
         const fade = t < 0.1 ? t / 0.1 : t > 0.8 ? (1 - t) / 0.2 : 1;
@@ -518,7 +537,7 @@ function _rollbackPlayVFX(rows, cols) {
 
         _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade);
 
-        if (Math.random() < 0.4) _rollbackVFX_spawnBolt(bolts, W, H);
+        if (bolts.length < 8 && Math.random() < 0.35) _rollbackVFX_spawnBolt(bolts, W, H);
         _rollbackVFX_drawBolts(ctx, bolts, fade);
 
         _rollbackVFX_drawHourglass(ctx, w, h, t, fade, particles);
@@ -659,21 +678,24 @@ function _tmOverlay_buildNodes() {
 
 // Builds a sparse set of animated connection chains between nearby nodes.
 // maxDist controls which node pairs can be linked.
+// OPTIMIZED: cap total chains to 36, use dist² check to avoid sqrt.
 function _tmOverlay_buildChains(nodes) {
     const chains = [];
-    const maxDist = 120;
+    const maxDist = 140;
+    const maxDistSq = maxDist * maxDist;
+    const MAX_CHAINS = 36;
 
-    for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
+    for (let i = 0; i < nodes.length && chains.length < MAX_CHAINS; i++) {
+        for (let j = i + 1; j < nodes.length && chains.length < MAX_CHAINS; j++) {
             const dx = nodes[j].x - nodes[i].x;
             const dy = nodes[j].y - nodes[i].y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < maxDist && Math.random() < 0.18) {
+            const distSq = dx * dx + dy * dy;
+            if (distSq < maxDistSq && Math.random() < 0.14) {
                 chains.push({
                     a: nodes[i],
                     b: nodes[j],
                     progress: Math.random(),
-                    speed: 0.003 + Math.random() * 0.005,
+                    speed: 0.004 + Math.random() * 0.004,
                 });
             }
         }
@@ -683,93 +705,117 @@ function _tmOverlay_buildChains(nodes) {
 
 // Fills the glyphRain array with one column descriptor per screen column.
 // Called once on init; safe to call again if the window is resized.
+// OPTIMIZED: coarser columns (32px vs 22px), shorter trails, cached chars.
 function _tmOverlay_buildGlyphRain(glyphRain, canvasW, canvasH) {
-    const colCount = Math.floor(canvasW / 22);
+    const colW = 32;
+    const colCount = Math.floor(canvasW / colW);
     for (let i = glyphRain.length; i < colCount; i++) {
+        const len = 3 + Math.floor(Math.random() * 4); // 3-6 vs 4-10
+        const chars = [];
+        for (let k = 0; k < len; k++) {
+            chars.push(TM_GLYPH_CHARSET[Math.floor(Math.random() * TM_GLYPH_CHARSET.length)]);
+        }
         glyphRain.push({
-            x: i * 22 + 11,
+            x: i * colW + colW / 2,
             y: Math.random() * canvasH,
-            speed: 0.7 + Math.random() * 1.6,
-            alpha: 0.01 + Math.random() * 0.01,
-            len: 4 + Math.floor(Math.random() * 7),
+            speed: 0.6 + Math.random() * 1.1,
+            alpha: 0.045 + Math.random() * 0.045,
+            len,
+            chars,
+            // throttle char cycling to avoid random per-frame per-glyph
+            _tick: Math.floor(Math.random() * 10),
         });
     }
 }
 
 // Advances and draws every glyph rain column.
+// OPTIMIZED: fewer fillText calls, cached glyphs, no per-glyph random, reduced alpha calc.
 function _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade) {
-    ctx.font = '13px monospace';
-    glyphRain.forEach(col => {
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    for (let idx = 0; idx < glyphRain.length; idx++) {
+        const col = glyphRain[idx];
         col.y += col.speed;
-        if (col.y > h + col.len * 18) col.y = -col.len * 18;
-
-        // Trailing characters fade from bright → dim going upward.
-        for (let i = 0; i < col.len; i++) {
-            const a = (1 - i / col.len) * col.alpha * fade;
-            const green = Math.floor(80 + 100 * (1 - i / col.len));
-            ctx.fillStyle = `rgba(20,${green},60,${a})`;
-            ctx.fillText(
-                TM_GLYPH_CHARSET[Math.floor(Math.random() * TM_GLYPH_CHARSET.length)],
-                col.x,
-                col.y - i * 16
-            );
+        if (col.y > h + col.len * 14) {
+            col.y = -col.len * 14;
+            // refresh chars only on wrap, not every frame
+            for (let k = 0; k < col.len; k++) {
+                if (Math.random() < 0.35) {
+                    col.chars[k] = TM_GLYPH_CHARSET[Math.floor(Math.random() * TM_GLYPH_CHARSET.length)];
+                }
+            }
+        }
+        col._tick++;
+        // only reshuffle head char every ~6 frames
+        if ((col._tick & 7) === 0) {
+            col.chars[0] = TM_GLYPH_CHARSET[Math.floor(Math.random() * TM_GLYPH_CHARSET.length)];
         }
 
-        // Head character is notably brighter.
-        ctx.fillStyle = `rgba(120,255,160,${col.alpha * fade * 1.6})`;
-        ctx.fillText(
-            TM_GLYPH_CHARSET[Math.floor(Math.random() * TM_GLYPH_CHARSET.length)],
-            col.x,
-            col.y
-        );
-    });
+        const baseA = col.alpha * fade;
+        // Trail — use single green channel calc, avoid per-glyph floor
+        for (let i = 0; i < col.len; i++) {
+            const a = (1 - i / col.len) * baseA * 0.55;
+            if (a < 0.008) continue;
+            // simplified green ramp without Math.floor per glyph
+            ctx.fillStyle = `rgba(30,${110 + (col.len - i) * 12},70,${a})`;
+            ctx.fillText(col.chars[i] || '0', col.x, col.y - i * 14);
+        }
+        // Head — brighter, slightly larger alpha
+        ctx.fillStyle = `rgba(130,255,165,${baseA * 1.1})`;
+        ctx.fillText(col.chars[0], col.x, col.y);
+    }
 }
 
 // Advances and draws every node chain, including the travelling energy pulse.
+// OPTIMIZED: single setLineDash, solid dot instead of radial gradient.
 function _tmOverlay_drawChains(ctx, chains, fade) {
-    chains.forEach(ch => {
+    if (chains.length === 0) return;
+    const lineAlpha = 0.18 * fade;
+    ctx.strokeStyle = `rgba(30,180,100,${lineAlpha})`;
+    ctx.lineWidth = 0.7;
+    ctx.setLineDash([4, 7]);
+    for (let i = 0; i < chains.length; i++) {
+        const ch = chains[i];
         ch.progress += ch.speed;
         if (ch.progress > 1) ch.progress = 0;
-
-        const dx = ch.b.x - ch.a.x;
-        const dy = ch.b.y - ch.a.y;
-
-        // Dashed line for the static connection.
-        ctx.strokeStyle = `rgba(30,180,100,${0.22 * fade})`;
-        ctx.lineWidth = 0.7;
-        ctx.setLineDash([4, 7]);
         ctx.beginPath();
         ctx.moveTo(ch.a.x, ch.a.y);
         ctx.lineTo(ch.b.x, ch.b.y);
         ctx.stroke();
-        ctx.setLineDash([]);
+    }
+    ctx.setLineDash([]);
 
-        // Radial glow travelling along the chain.
-        const px = ch.a.x + dx * ch.progress;
-        const py = ch.a.y + dy * ch.progress;
-        const grad = ctx.createRadialGradient(px, py, 0, px, py, 10);
-        grad.addColorStop(0, `rgba(80,255,140,${0.55 * fade})`);
-        grad.addColorStop(1, 'rgba(80,255,140,0)');
-        ctx.fillStyle = grad;
+    // Travelling dots — solid fills, no gradient
+    for (let i = 0; i < chains.length; i++) {
+        const ch = chains[i];
+        const px = ch.a.x + (ch.b.x - ch.a.x) * ch.progress;
+        const py = ch.a.y + (ch.b.y - ch.a.y) * ch.progress;
+        // outer soft dot
+        ctx.fillStyle = `rgba(80,255,140,${0.18 * fade})`;
         ctx.beginPath();
-        ctx.arc(px, py, 10, 0, Math.PI * 2);
+        ctx.arc(px, py, 5.5, 0, Math.PI * 2);
         ctx.fill();
-    });
+        // inner bright core
+        ctx.fillStyle = `rgba(200,255,210,${0.55 * fade})`;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 // Draws each node as a pulsing circle; active (filled) nodes get an extra glow halo.
+// OPTIMIZED: no radial gradients, use globalAlpha + solid fills, cache pulse.
 function _tmOverlay_drawNodes(ctx, nodes, t2, fade) {
-    nodes.forEach(n => {
+    for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
         const pulse = 0.5 + 0.5 * Math.sin(t2 * 2.2 + n.pulse);
         const r = n.active ? 6 + pulse * 3 : 3.5 + pulse;
 
         if (n.active) {
-            const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, 20);
-            glow.addColorStop(0, `rgba(40,220,110,${0.15 * pulse * fade})`);
-            glow.addColorStop(1, 'rgba(40,220,110,0)');
-            ctx.fillStyle = glow;
+            // soft halo — solid fill with low alpha instead of gradient
+            ctx.fillStyle = `rgba(40,220,110,${0.09 * pulse * fade})`;
             ctx.beginPath();
-            ctx.arc(n.x, n.y, 20, 0, Math.PI * 2);
+            ctx.arc(n.x, n.y, 14, 0, Math.PI * 2);
             ctx.fill();
         }
 
@@ -784,19 +830,22 @@ function _tmOverlay_drawNodes(ctx, nodes, t2, fade) {
             ? `rgba(120,255,170,${0.75 * fade})`
             : `rgba(50,150,90,${0.25 * fade})`;
         ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
         ctx.stroke();
-    });
+    }
 }
 
 // Spawns occasional cascade particles from random nodes and advances/draws them.
+// OPTIMIZED: lower spawn rate, cap particles to 10, smaller update.
 function _tmOverlay_drawParticles(ctx, particles, nodes, fade) {
-    if (Math.random() < 0.15 && nodes.length > 0) {
+    if (particles.length < 10 && Math.random() < 0.08 && nodes.length > 0) {
         const src = nodes[Math.floor(Math.random() * nodes.length)];
         particles.push({
             x: src.x,
             y: src.y,
-            vx: (Math.random() - 0.5) * 1.2,
-            vy: (Math.random() - 0.5) * 1.2,
+            vx: (Math.random() - 0.5) * 1.0,
+            vy: (Math.random() - 0.5) * 1.0,
             life: 1,
         });
     }
@@ -805,19 +854,22 @@ function _tmOverlay_drawParticles(ctx, particles, nodes, fade) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.015;
-        p.life -= 0.02;
+        p.vy += 0.012;
+        p.life -= 0.028;
         if (p.life <= 0) { particles.splice(i, 1); continue; }
-        ctx.fillStyle = `rgba(100,255,150,${p.life * 0.65 * fade})`;
+        ctx.fillStyle = `rgba(100,255,150,${p.life * 0.55 * fade})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
         ctx.fill();
     }
 }
 
 // Builds the canvas overlay and runs the animation loop for the full
 // durationMs of the Transition Matrix session.
+// OPTIMIZED: throttled to ~30fps, reduced overdraw, DPR-aware sizing.
 function _transitionMatrixStartOverlay(durationMs) {
+    // Respect reduced-motion preference — skip heavy canvas entirely
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     document.getElementById('tm-canvas-overlay')?.remove();
 
     const cvs = document.createElement('canvas');
@@ -832,8 +884,18 @@ function _transitionMatrixStartOverlay(durationMs) {
     `;
     document.body.appendChild(cvs);
 
-    const ctx = cvs.getContext('2d');
-    const resize = () => { cvs.width = window.innerWidth; cvs.height = window.innerHeight; };
+    // Use alpha:true but desynchronized hint for lower latency; prefer low latency
+    const ctx = cvs.getContext('2d', { alpha: true });
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5); // cap DPR to 1.5 to avoid 2x pixel load
+    const resize = () => {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        cvs.width = Math.floor(w * dpr);
+        cvs.height = Math.floor(h * dpr);
+        cvs.style.width = w + 'px';
+        cvs.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
     resize();
     window.addEventListener('resize', resize);
     cvs._resizeHandler = resize;
@@ -842,8 +904,8 @@ function _transitionMatrixStartOverlay(durationMs) {
     // we set opacity:1, giving us a CSS fade-in.
     requestAnimationFrame(() => requestAnimationFrame(() => { cvs.style.opacity = '1'; }));
 
-    const W = () => cvs.width;
-    const H = () => cvs.height;
+    const W = () => cvs.width / dpr;
+    const H = () => cvs.height / dpr;
     const startTime = performance.now();
 
     const nodes = _tmOverlay_buildNodes();
@@ -853,6 +915,8 @@ function _transitionMatrixStartOverlay(durationMs) {
 
     const particles = [];
     let animId;
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 33; // ~30fps cap
 
     function tick(now) {
         const elapsed = now - startTime;
@@ -882,15 +946,24 @@ function _transitionMatrixStartOverlay(durationMs) {
             return;
         }
 
+        // FPS throttling — skip frame if too soon
+        if (now - lastFrame < FRAME_INTERVAL) {
+            animId = requestAnimationFrame(tick);
+            return;
+        }
+        lastFrame = now;
+
         const fade = t < 0.08 ? t / 0.08 : t > 0.9 ? (1 - t) / 0.1 : 1;
         const w = W();
         const h = H();
         const t2 = elapsed * 0.001; // slow time value used for node pulsing
 
+        // Clear + tint in one fill (semi-transparent dark) instead of clearRect + fillRect
         ctx.clearRect(0, 0, w, h);
-
-        ctx.fillStyle = `rgba(4,12,6,${0.22 * fade})`;
-        ctx.fillRect(0, 0, w, h);
+        if (fade > 0.01) {
+            ctx.fillStyle = `rgba(4,12,6,${0.18 * fade})`;
+            ctx.fillRect(0, 0, w, h);
+        }
 
         _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade);
         _tmOverlay_drawChains(ctx, chains, fade);
@@ -1079,14 +1152,14 @@ function _transitionMatrixCellVFX(row, col, srcRow, srcCol) {
 
     const startTime = performance.now();
     let animId;
+    const ctx = cvs.getContext('2d');
 
     function tick(now) {
         const t = Math.min((now - startTime) / DURATION, 1);
         const alpha = t < 0.15 ? t / 0.15 : 1 - ((t - 0.15) / 0.85);
 
-        // Resetting width clears the canvas each frame.
-        cvs.width = cvs.width;
-        const ctx = cvs.getContext('2d');
+        // Use clearRect instead of resetting canvas width (avoids context loss & layout thrash)
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
 
         // Head travels from source to target, arriving at t=0.55.
         const headT = Math.min(t / 0.55, 1);

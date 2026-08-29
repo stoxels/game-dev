@@ -498,9 +498,19 @@
                 <div class="settings-row">
                     <label class="settings-label">
                         <span data-t="settings_ltv">Low-Time Vignette</span>
-                        <span class="settings-hint" data-t="settings_ltv_hint">Red screen edge glow while the timer is running low</span>
+                        <span class="settings-hint" data-t="settings_ltv_hint">Blue screen edge glow while the timer is running low</span>
                     </label>
                     <button class="settings-toggle" id="stt-ltv">
+                        <span class="tgl-on-txt" data-t="stt_on">ON</span>
+                        <span class="tgl-off-txt" data-t="stt_off">OFF</span>
+                    </button>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <span data-t="settings_lhv">Low-Health Vignette</span>
+                        <span class="settings-hint" data-t="settings_lhv_hint">Red screen edge glow while health is low</span>
+                    </label>
+                    <button class="settings-toggle" id="stt-lhv">
                         <span class="tgl-on-txt" data-t="stt_on">ON</span>
                         <span class="tgl-off-txt" data-t="stt_off">OFF</span>
                     </button>
@@ -756,12 +766,20 @@
     <div id="screen-game" class="screen">
         <div class="game-main">
 
-            <!-- LOW-TIME VIGNETTE - Edge glow, escalates as timerSecs drops -->
+            <!-- LOW-TIME VIGNETTE - Blue edge glow, escalates as timerSecs drops (10/5/2 min) -->
             <div class="low-time-vignette" id="low-time-vignette">
                 <div class="ltv-edge ltv-top"></div>
                 <div class="ltv-edge ltv-bottom"></div>
                 <div class="ltv-edge ltv-left"></div>
                 <div class="ltv-edge ltv-right"></div>
+            </div>
+
+            <!-- LOW-HEALTH VIGNETTE - Red edge glow, escalates as HP drops (50/25/10%). Independent from timer vignette so both can be visible simultaneously -->
+            <div class="low-health-vignette" id="low-health-vignette">
+                <div class="lhv-edge lhv-top"></div>
+                <div class="lhv-edge lhv-bottom"></div>
+                <div class="lhv-edge lhv-left"></div>
+                <div class="lhv-edge lhv-right"></div>
             </div>
 
             <!-- CORNER HUD: clock, mistakes, fill — floats over the top-left corner,

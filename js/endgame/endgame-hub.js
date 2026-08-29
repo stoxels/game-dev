@@ -115,16 +115,18 @@ const EG_CURRENCY_SLOT_MAP = {
     'orb_elevation':     { r: 2, c: 2 },
     'orb_cataclysm':     { r: 2, c: 3 },
     'orb_horizons':      { r: 2, c: 4 },
-    // Row 3 — mirror + ancient orb + blessing
+    // Row 3 — mirror + ancient orb + blessing + bloom (rare helper, regal-tier)
     'orb_ancient':       { r: 3, c: 0 },
     'orb_blessing':      { r: 3, c: 1 },
     'mirror_of_kalandra':{ r: 3, c: 2 },
+    'orb_bloom':         { r: 3, c: 3 },
     // Row 4-5 — shards (bottom section)
     'shard_transmutation':{ r: 4, c: 0 },
     'shard_alchemy':     { r: 4, c: 1 },
     'shard_chaos':       { r: 4, c: 2 },
     'shard_elevation':   { r: 4, c: 3 },
     'shard_ascension':   { r: 4, c: 4 },
+    'shard_bloom':       { r: 5, c: 2 },
     'shard_cataclysm':   { r: 5, c: 1 },
     'shard_horizon':     { r: 5, c: 3 },
     'shard_ancient':     { r: 5, c: 0 },
