@@ -1551,6 +1551,13 @@ function _egHealEssenceItem(item) {
     if (!item.description) item.description = def.description;
     if (!item.category) item.category = def.category || 'essence';
     if (!item.rarity) item.rarity = def.rarity || 'essence';
+    // Critical for slot-type filtering: without these, _egRenderEssenceCell
+    // can't determine what the essence can be applied to, and the item
+    // silently bypasses the filter (shows up under every slot type).
+    if (!item.guaranteedFamily && def.guaranteedFamily) item.guaranteedFamily = def.guaranteedFamily;
+    if ((!item.guaranteedFamilies || !item.guaranteedFamilies.length) && def.guaranteedFamilies) {
+        item.guaranteedFamilies = def.guaranteedFamilies;
+    }
     return item;
 }
 
@@ -1712,15 +1719,89 @@ function _egLoadHubState() {
     // created with an older (smaller) essence tab would otherwise leave
     // rows/cols undefined and crash the essence renderer.
     {
-        const essR = typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 6;
+        const essR = typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 13;
         const essC = typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8;
         const freshEssGrid = Array.from({ length: essR }, () => Array(essC).fill(null));
         const savedEssGrid = STATE.egEssenceStash;
+        let needsFixedMigration = false;
         if (Array.isArray(savedEssGrid)) {
-            for (let r = 0; r < Math.min(essR, savedEssGrid.length); r++) {
-                if (!Array.isArray(savedEssGrid[r])) continue;
-                for (let c = 0; c < Math.min(essC, savedEssGrid[r].length); c++) {
-                    freshEssGrid[r][c] = savedEssGrid[r][c] || null;
+            // Detect old fixed-slot vs free-form: if any item is not in its assigned slot, migrate
+            try {
+                if (typeof _egEssenceSlotForId === 'function') {
+                    for (let r = 0; r < savedEssGrid.length; r++) {
+                        if (!Array.isArray(savedEssGrid[r])) continue;
+                        for (let c = 0; c < savedEssGrid[r].length; c++) {
+                            const it = savedEssGrid[r][c];
+                            if (!it || !it.id) continue;
+                            const pos = _egEssenceSlotForId(it.id);
+                            if (!pos || pos.r !== r || pos.c !== c) { needsFixedMigration = true; break; }
+                        }
+                        if (needsFixedMigration) break;
+                    }
+                    // also if grid size differs from current
+                    if (savedEssGrid.length !== essR || (savedEssGrid[0] && savedEssGrid[0].length !== essC)) needsFixedMigration = true;
+                }
+            } catch(e) { needsFixedMigration = false; }
+            if (needsFixedMigration && typeof _egEssenceSlotForId === 'function') {
+                // Collect all essence items and re-insert into correct fixed slots
+                const allItems = [];
+                for (let r = 0; r < savedEssGrid.length; r++) {
+                    if (!Array.isArray(savedEssGrid[r])) continue;
+                    for (let c = 0; c < savedEssGrid[r].length; c++) {
+                        const it = savedEssGrid[r][c];
+                        if (it && it.id) {
+                            if (typeof _egHealEssenceItem === 'function') _egHealEssenceItem(it);
+                            allItems.push(it);
+                        }
+                    }
+                }
+                const merged = new Map(); // id -> total count
+                const leftover = []; // items with no assigned slot
+                for (const it of allItems) {
+                    const pos = _egEssenceSlotForId(it.id);
+                    if (!pos) { leftover.push(it); continue; }
+                    const cnt = it.count || 1;
+                    merged.set(it.id, (merged.get(it.id) || 0) + cnt);
+                }
+                for (const [id, total] of merged.entries()) {
+                    const pos = _egEssenceSlotForId(id);
+                    if (!pos) continue;
+                    const def = (typeof _egEssenceDefForId === 'function') ? _egEssenceDefForId(id) : null;
+                    const src = allItems.find(x => x.id === id) || {};
+                    freshEssGrid[pos.r][pos.c] = {
+                        ...src,
+                        id,
+                        name: (def && def.name) || src.name || id,
+                        icon: (def && def.icon) || src.icon || '🧬',
+                        description: (def && def.description) || src.description || '',
+                        category: 'essence',
+                        rarity: 'essence',
+                        count: total,
+                    };
+                }
+                // Leftover unknown essences go to first decorative empty cells
+                for (const it of leftover) {
+                    let placed = false;
+                    for (let r = 0; r < essR && !placed; r++) {
+                        for (let c = 0; c < essC && !placed; c++) {
+                            if (freshEssGrid[r][c]) continue;
+                            const assigned = (typeof _egEssenceIdForSlot === 'function') ? _egEssenceIdForSlot(r,c) : null;
+                            if (assigned) continue; // reserved
+                            freshEssGrid[r][c] = it;
+                            placed = true;
+                        }
+                    }
+                    if (!placed) console.warn('[ESSENCE] leftover essence could not be placed', it.id);
+                }
+                // Persist migrated shape
+                STATE.egEssenceStash = freshEssGrid;
+                try { if (typeof save === 'function') save(); } catch(e) {}
+            } else {
+                for (let r = 0; r < Math.min(essR, savedEssGrid.length); r++) {
+                    if (!Array.isArray(savedEssGrid[r])) continue;
+                    for (let c = 0; c < Math.min(essC, savedEssGrid[r].length); c++) {
+                        freshEssGrid[r][c] = savedEssGrid[r][c] || null;
+                    }
                 }
             }
         }

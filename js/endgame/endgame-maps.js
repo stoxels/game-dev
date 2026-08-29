@@ -890,6 +890,24 @@ function _egGetMapRewardBonuses(map) {
     return total;
 }
 
+// Computes the expected gold reward range for completing a map.
+// Returns { min, max, avg } based on map tier and modifier load.
+function _egGetMapGoldRewardRange(map) {
+    const tier = Math.max(1, map.mapTier || 1);
+    const mods = Array.isArray(map.mods) ? map.mods : [];
+    const tierFrac = (tier - 1) / 15; // EG_MAX_MAP_TIER - 1
+    const modLoad = mods.reduce((s, m) => s + ((Number(m && m.tier) || 1)), 0);
+    const modFrac = Math.min(1, modLoad / 12);
+    const difficulty = tierFrac * 0.7 + modFrac * 0.3;
+    const baseGold = 50 + difficulty * 450;
+    const variance = 50; // (Math.random() - 0.5) * 100 -> ±50
+    return {
+        min: Math.max(50, Math.round(baseGold - variance)),
+        max: Math.round(baseGold + variance),
+        avg: Math.round(baseGold)
+    };
+}
+
 
 //------------------------------------------------------------------------
 //-------------------MAP COMPLETION REWARD--------------------------------
@@ -1789,6 +1807,14 @@ function _egBuildMapTooltipBodyHTML(item) {
                 .replace('{n}', imp.completionReward.count)
                 .replace('{name}', crDef.name));
         }
+    }
+    // Gold completion reward (innate, not from mods)
+    const goldRange = _egGetMapGoldRewardRange(item);
+    if (goldRange.avg > 0) {
+        rewardLines.push(t('eg_map_gold_reward_tooltip')
+            .replace('{min}', goldRange.min.toLocaleString())
+            .replace('{max}', goldRange.max.toLocaleString())
+            .replace('{avg}', goldRange.avg.toLocaleString()));
     }
     if (rw.xp > 0) rewardLines.push(t('eg_map_reward_xp').replace('{n}', rw.xp));
     if (rw.quantity > 0) rewardLines.push(t('eg_map_reward_quantity').replace('{n}', rw.quantity));

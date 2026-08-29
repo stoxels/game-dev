@@ -289,6 +289,11 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
     _egRenderLevelHUD();
 
     if (levelsGained > 0) {
+        // Reset all active ability cooldowns on level up
+        if (typeof resetActiveCooldown === 'function') {
+            resetActiveCooldown();
+        }
+
         // Level-up bonus: +5 max Life and +2 max Mana per level gained,
         // with the newly granted amounts restored to the current pools.
         if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {

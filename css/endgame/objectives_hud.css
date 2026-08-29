@@ -123,6 +123,28 @@
     50%      { box-shadow: 0 0 22px rgba(74, 222, 128, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
 }
 
+/* Trigger Question — blue accent pulse */
+.eg-obj-action-question {
+    background: linear-gradient(180deg, #11264a, #0a1a36);
+    color: #7fb8ff;
+    border-color: #2d5aa0;
+    box-shadow: 0 0 10px rgba(127, 184, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    animation: eg-question-pulse 1.5s ease-in-out infinite;
+}
+
+    .eg-obj-action-question:hover {
+        background: #1e4a8a;
+        color: #fff;
+        border-color: #7fb8ff;
+        box-shadow: 0 0 18px rgba(127, 184, 255, 0.6);
+        animation-play-state: paused;
+    }
+
+@keyframes eg-question-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(127, 184, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.06); transform: scale(1); }
+    50%      { box-shadow: 0 0 22px rgba(127, 184, 255, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
+}
+
 /* Locked Complete Map — dim, no pulse */
 .eg-obj-action-locked {
     background: #1e293b;
@@ -263,6 +285,63 @@
 }
 
 @keyframes eg-mw-shake {
+    0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
+    25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
+    75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
+}
+
+/* ── LOW HEALTH WARNING banner ─────────────────────
+   Brief overlay centered over the puzzle grid when
+   health drops below 50% / 25% / 10%. Mirrors the
+   mistakes-warning banner in placement/animation but
+   color-shifts with severity. */
+#eg-low-health-warning-banner {
+    position: fixed;
+    z-index: 400;
+    pointer-events: none;
+    font-size: clamp(1.6rem, 5vw, 3.4rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+    animation: eg-low-health-warning-pop 2.5s ease-out forwards;
+    text-align: center;
+    line-height: 1.1;
+}
+
+#eg-low-health-warning-banner.eg-lh-50 {
+    color: #facc15;
+    text-shadow:
+        0 0 14px rgba(250, 204, 21, 0.75),
+        0 0 36px rgba(250, 204, 21, 0.35),
+        0 3px 8px rgba(0, 0, 0, 0.85);
+}
+#eg-low-health-warning-banner.eg-lh-25 {
+    color: #fb923c;
+    text-shadow:
+        0 0 14px rgba(251, 146, 60, 0.8),
+        0 0 36px rgba(251, 146, 60, 0.4),
+        0 3px 8px rgba(0, 0, 0, 0.85);
+}
+#eg-low-health-warning-banner.eg-lh-10 {
+    color: #f87171;
+    text-shadow:
+        0 0 16px rgba(248, 113, 113, 0.85),
+        0 0 40px rgba(248, 113, 113, 0.45),
+        0 3px 8px rgba(0, 0, 0, 0.85);
+    animation: eg-low-health-warning-pop 2.5s ease-out forwards, eg-lh-shake 0.35s ease-in-out 0.15s 2;
+}
+
+@keyframes eg-low-health-warning-pop {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+    16%  { transform: translate(-50%, -50%) scale(1); }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes eg-lh-shake {
     0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
     25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
     75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }

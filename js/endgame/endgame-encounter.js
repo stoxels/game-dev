@@ -380,21 +380,11 @@ const EG_STAGGER_DURATION_MS = 1000;
 // Tick interval for the gear lifeRegen heal (life_regen mod, HP per second).
 const EG_LIFE_REGEN_INTERVAL_MS = 1000;
 
-// Encounter start timestamp + first_step grace window (boots mod, seconds).
-// Monsters do not advance their charge bars while the grace window is active.
-let _egEncounterStartAt = 0;
-let _egFirstStepSeconds = 0;
-
-// Seconds remaining of the first_step grace window (0 when expired/inactive).
-function _egFirstStepRemainingS() {
-    if (_egFirstStepSeconds <= 0) return 0;
-    return Math.max(0, _egFirstStepSeconds - (Date.now() - _egEncounterStartAt) / 1000);
-}
-
 // Resets all encounter state variables to their initial values.
 function _egResetEncounterState() {
     // Reset the low-mistakes banner state for the new puzzle/encounter
     if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
+    if (typeof _egResetLowHealthWarningState === 'function') _egResetLowHealthWarningState();
     _egEncounterActive = true;
     _egTargetId = null;
     _egMonsters = [];
@@ -417,12 +407,9 @@ function _egResetEncounterState() {
     // (_egLaunchMapFromDevice) so the save persists across chained puzzles.
     if (!window._egIsMapDeviceRun) _egWardingUsedThisMap = false;
 
-    // Gear: first_step — snapshot the charge-free opening window for this map
-    _egEncounterStartAt = Date.now();
-    _egFirstStepSeconds = _egComputePlayerStats().firstStepSeconds || 0;
-    if (_egFirstStepSeconds > 0) {
-        showToast(t('eg_first_step').replace('{n}', _egFormatStatValue(_egFirstStepSeconds)));
-    }
+    // First step toast flag reset
+    _egFirstStepToastShown = false;
+
     // Hold-E pause starts released
     if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
     if (typeof _egSetHoldEPauseVisual === 'function') _egSetHoldEPauseVisual(false);
@@ -487,6 +474,7 @@ function _egStopEncounter() {
     _egBossCleanupAll();
     _egCancelAbsorptionRegen();
     if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
+    if (typeof _egResetLowHealthWarningState === 'function') _egResetLowHealthWarningState();
     if (typeof _egChainCleanup === 'function') _egChainCleanup();
     _egHideMonsterPanel();
     if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
@@ -539,8 +527,8 @@ function _egTickMonster(m) {
 
     // Gear: stagger — the charge timer is paused for a short window after a hit
     if (m.staggeredUntil && Date.now() < m.staggeredUntil) return;
-    // Gear: first_step — monsters don't charge during the map's opening window
-    if (_egFirstStepRemainingS() > 0) return;
+    // Gear: first_step — monsters don't charge-up their attacks for the first X seconds after spawning
+    if (m.firstStepUntil && Date.now() < m.firstStepUntil) return;
     // Ailments: frozen monsters don't charge, chilled ones charge at 50%
     const chargeMult = (typeof _egGetMonsterChargeMultiplier === 'function') ? _egGetMonsterChargeMultiplier(m) : 1;
     m.currentCharge += 0.1 * chargeMult;
@@ -758,6 +746,85 @@ function _egResetMistakesWarningState() {
     if (banner) banner.remove();
 }
 
+//------------------------------------------------------------------------
+//-------------------LOW HEALTH WARNING-----------------------------------
+//------------------------------------------------------------------------
+
+let _egLastHealthPct = null;
+let _egLastLowHealthWarningShown = null;
+
+function _egGetHealthPct() {
+    if (typeof playerMaxHP === 'undefined' || playerMaxHP <= 0) return 1;
+    return playerCurrentHP / playerMaxHP;
+}
+
+function _egGetLowHealthWarningTier(pct) {
+    if (pct <= 0.35) return 35;
+    return null;
+}
+
+function _egShowLowHealthWarningBanner() {
+    const old = document.getElementById('eg-low-health-warning-banner');
+    if (old) old.remove();
+
+    const el = document.createElement('div');
+    el.id = 'eg-low-health-warning-banner';
+    el.className = 'eg-lh-35';
+
+    const key = 'eg_low_health_warning_35';
+    const raw = (typeof t === 'function') ? t(key) : '';
+    const fallback = '⚠️ LOW HEALTH — 35% REMAINING';
+    el.textContent = (raw && raw !== key) ? raw : fallback;
+    document.body.appendChild(el);
+
+    const board = document.getElementById('ptable');
+    if (board) {
+        const r = board.getBoundingClientRect();
+        el.style.left = (r.left + r.width / 2) + 'px';
+        el.style.top = (r.top + r.height / 2) + 'px';
+    } else {
+        el.style.left = '50%';
+        el.style.top = '50%';
+    }
+
+    const toastKey = 'eg_low_health_warning_toast_35';
+    const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
+    const toastFallback = el.textContent;
+    const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
+    if (typeof showToast === 'function') showToast(toastText, '#facc15');
+
+    setTimeout(() => el.remove(), 2500);
+}
+
+function _egMaybeShowLowHealthWarning() {
+    if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
+    if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
+    if (playerCurrentHP <= 0) return;
+
+    const pct = _egGetHealthPct();
+    const prev = _egLastHealthPct;
+    _egLastHealthPct = pct;
+
+    const tier = _egGetLowHealthWarningTier(pct);
+    if (!tier) {
+        _egLastLowHealthWarningShown = null;
+        return;
+    }
+    // Only warn when health *decreased* into / within a threshold.
+    // Healing back up does not re-fire the overlay.
+    if (prev != null && pct >= prev) return;
+    if (_egLastLowHealthWarningShown) return;
+    _egLastLowHealthWarningShown = true;
+    _egShowLowHealthWarningBanner();
+}
+
+function _egResetLowHealthWarningState() {
+    _egLastHealthPct = null;
+    _egLastLowHealthWarningShown = null;
+    const banner = document.getElementById('eg-low-health-warning-banner');
+    if (banner) banner.remove();
+}
+
 
 //------------------------------------------------------------------------
 //-------------------MAP FAILED OVERLAY-----------------------------------
@@ -815,6 +882,7 @@ function _egTickLoop() {
     if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
 
     _egCheckMistakeLimit(); 
+    _egMaybeShowLowHealthWarning();
 
     _egBossTick();
     if (typeof _egTickAilments === 'function') _egTickAilments();
@@ -1712,13 +1780,13 @@ function _egReleaseChargedShot() {
         if (hud && typeof _egFireProjectile === 'function' && start) {
             const end = _egGetElementCentre(hud);
             _egFireProjectile('🌀', 'eg-proj-player', start, end, EG_MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
-                const dealt = _egPlayerTakeDamage(damage, false, null);
+                const dealt = _egPlayerTakeDamage(damage * 0.3, false, null);
                 if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
             });
             return;
         }
         // No visual path available — apply the self-hit instantly
-        const dealt = _egPlayerTakeDamage(damage, false, null);
+        const dealt = _egPlayerTakeDamage(damage * 0.3, false, null);
         if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
         return;
     }
@@ -2401,7 +2469,6 @@ function _egHandleNormalMonsterKill(dying) {
     if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
     if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false);
     if (typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level);
-    if (typeof _egTryDropGold === 'function') _egTryDropGold(false, dying.level);
 }
 
 // Handles all post-kill logic for a boss monster death.
@@ -2424,7 +2491,6 @@ function _egHandleBossKill(dying) {
     if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
     if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
     if (typeof _egTryDropMap === 'function') _egTryDropMap(true, dying.level);
-    if (typeof _egTryDropGold === 'function') _egTryDropGold(true, dying.level);
 }
 
 // Removes a monster from the encounter after its death animation fires.
@@ -2550,6 +2616,17 @@ function _egSpawnMonster(defId, level) {
 
     const monster = _egBuildMonsterOrBoss(defId, level);
     if (!monster) return;
+
+    // Gear: first_step — per-monster charge-up grace window after spawning
+    const firstStepSec = _egComputePlayerStats().firstStepSeconds || 0;
+    if (firstStepSec > 0) {
+        monster.firstStepUntil = Date.now() + firstStepSec * 1000;
+        // Show toast once per map when first_step is active
+        if (!_egFirstStepToastShown) {
+            _egFirstStepToastShown = true;
+            showToast(t('eg_first_step').replace('{n}', _egFormatStatValue(firstStepSec)));
+        }
+    }
 
     _egAssignRandomSpawnZone(monster);
     _egMonsters.push(monster);

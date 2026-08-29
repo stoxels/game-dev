@@ -97,13 +97,10 @@ function _egRollGoldAmount(isBoss, monsterLevel) {
 }
 
 // Called by the kill handlers in endgame-encounter.js.
+    // Gold no longer drops from monsters — it's now an innate map completion reward.
+    // This function is kept as a no-op for API compatibility.
 function _egTryDropGold(isBoss, monsterLevel) {
-    const baseChance = isBoss ? EG_GOLD_DROP_CHANCE_BOSS : EG_GOLD_DROP_CHANCE_NORMAL;
-    const qtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
-    const chance = Math.min(1, baseChance * qtyMult);
-    if (!isBoss && Math.random() > chance) return;
-
-    _egSpawnGoldDrop(_egRollGoldAmount(isBoss, monsterLevel));
+    return;
 }
 
 function _egRenderGoldDropOverlay(row, col, drop) {
@@ -170,77 +167,8 @@ function _egSpawnGoldDrop(amount) {
 }
 
 // Called from _egCheckAllClaims (mouse-button-handlers.js),
-// _egAutoClaimDropsOnReveal (endgame-grid-pickups.js).
-function _egCheckGoldDropClaim(row, col) {
-    if (!_egIsActive()) return false;
-    const key = `${row}-${col}`;
-    const drop = _egGoldDrops.get(key);
-    if (!drop) return false;
-
-    _egGoldDrops.delete(key);
-    _egRemoveGoldDropOverlay(key);
-    _egAnimateGoldDropClaim(row, col, drop);
-
-    _egAddGold(drop.amount);
-
-    Audio_Manager.playSFX('player_equip_pickup');
-    showToast(t('eg_gold_acquired').replace('{n}', drop.amount));
-    return true;
-}
-
-// Called from _egDiscardAllDrops (mouse-button-handlers.js).
-function _egDiscardGoldDrop(row, col) {
-    if (!_egIsActive()) return;
-    const key = `${row}-${col}`;
-    if (!_egGoldDrops.has(key)) return;
-    const drop = _egGoldDrops.get(key);
-    _egGoldDrops.delete(key);
-    _egRemoveGoldDropOverlay(key);
-    if (typeof _egAnimatePickupDiscard === 'function') {
-        _egAnimatePickupDiscard(row, col, { emoji: '🪙' });
-    }
-    Audio_Manager.playSFX('player_equip_not_pickup');
-}
-
-// Clears all active gold drops (called by _egStopPickupSpawner).
-function _egStopGoldDrops() {
-    _egGoldDrops.forEach((drop, key) => _egRemoveGoldDropOverlay(key));
-    _egGoldDrops.clear();
-}
-
-// Carries unclaimed gold coins into the next chained puzzle
-// (mirrors _egReplaceCarriedCurrencyDrops).
-function _egReplaceCarriedGoldDrops(drops) {
-    if (!drops || drops.length === 0) return;
-
-    drops.forEach(drop => {
-        if (_egGoldDrops.size >= EG_GOLD_DROP_MAX_ON_BOARD) return;
-
-        const pool = typeof _egBuildPickupEligiblePool === 'function'
-            ? _egBuildPickupEligiblePool()
-            : [];
-        const filtered = typeof _egCellHasAnyDrop === 'function'
-            ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
-            : pool;
-        if (filtered.length === 0) return;
-
-        const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
-        const key = `${r}-${c}`;
-
-        _egGoldDrops.set(key, drop);
-        _egRenderGoldDropOverlay(r, c, drop);
-
-        const lifetimeMs = EG_LOOT_DROP_LIFETIME_MS;
-        const timer = setTimeout(() => {
-            if (_egGoldDrops.get(key) === drop) {
-                _egGoldDrops.delete(key);
-                _egRemoveGoldDropOverlay(key);
-            }
-        }, lifetimeMs);
-        if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
-
-        if (typeof _egStartDropExpireCountdown === 'function') {
-            _egStartDropExpireCountdown(`eg-gold-drop-${r}-${c}`, lifetimeMs);
-        }
-    });
-}
+// Gold no longer drops on the grid — these are kept as no-ops for API compatibility.
+function _egCheckGoldDropClaim(row, col) { return false; }
+function _egDiscardGoldDrop(row, col) {}
+function _egStopGoldDrops() { _egGoldDrops.clear(); }
+function _egReplaceCarriedGoldDrops(drops) {}

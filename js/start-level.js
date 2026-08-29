@@ -148,7 +148,7 @@ function _cleanupPreviousLevel() {
     document.getElementById('low-time-vignette')
         ?.classList.remove('ltv-tier1', 'ltv-tier2', 'ltv-tier3');
     document.getElementById('low-health-vignette')
-        ?.classList.remove('lhv-tier1', 'lhv-tier2', 'lhv-tier3');
+        ?.classList.remove('lhv-active');
     if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 
     // Only reset HP/mana if this is a fresh start, not a chained puzzle transition

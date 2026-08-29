@@ -141,7 +141,6 @@ function _egOnPuzzleComplete() {
             const hasPendingDrops = (_egLootDrops && _egLootDrops.size > 0)
                 || (_egCurrencyDrops && _egCurrencyDrops.size > 0)
                 || (_egItemDrops && _egItemDrops.size > 0)
-                || (typeof _egGoldDrops !== 'undefined' && _egGoldDrops.size > 0)
                 || (typeof _egMapDrops !== 'undefined' && _egMapDrops.size > 0)
                 || (_egPickups && _egPickups.size > 0);
             const isBossFinale = _egBossPhaseActive && _egBossDefeated();
@@ -235,6 +234,21 @@ function _egPickInterstitialWorldNum() {
 
     // Pick a random world from the candidates so questions are varied
     return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+// Triggers a bonus question immediately, without requiring the current puzzle to be completed.
+// Used when all monsters are killed but questions remain.
+function _egTriggerQuestionNow() {
+    if (!_egIsActive()) return;
+    const req = _egGetMapRequirements();
+    if (req.requiredQuestions === 0) return;
+    if (_egQuestionsAnswered >= req.requiredQuestions) return;
+    if (req.totalMonsters > 0 && _egChainKillCount < req.totalMonsters) return;
+
+    showToast(t('eg_trigger_question_toast'), '#7fb8ff');
+    _egShowInterstitialQuestion(() => {
+        _egUpdateObjectivesHUD();
+    });
 }
 
 
@@ -331,10 +345,6 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
     const carriedItems = Array.from(_egItemDrops.values());
     _egItemDrops.clear();
 
-    const carriedGold = (typeof _egGoldDrops !== 'undefined')
-        ? Array.from(_egGoldDrops.values()) : [];
-    if (typeof _egGoldDrops !== 'undefined') _egGoldDrops.clear();
-
     const carriedMaps = (typeof _egMapDrops !== 'undefined')
         ? Array.from(_egMapDrops.values()) : [];
     if (typeof _egMapDrops !== 'undefined') _egMapDrops.clear();
@@ -422,10 +432,6 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
 
     if (carriedItems.length > 0) {
         setTimeout(() => _egReplaceCarriedItemDrops(carriedItems), 400);
-    }
-
-    if (carriedGold.length > 0 && typeof _egReplaceCarriedGoldDrops === 'function') {
-        setTimeout(() => _egReplaceCarriedGoldDrops(carriedGold), 400);
     }
 
     if (carriedMaps.length > 0 && typeof _egReplaceCarriedMapDrops === 'function') {
@@ -602,7 +608,6 @@ function _egOnAllBossesDead() {
             if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(true, level);
         }
         if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(true);
-        if (typeof _egTryDropGold === 'function') _egTryDropGold(true, level);
     }
 
     showToast(t('eg_boss_all_slain'), '#4ade80');
@@ -845,6 +850,21 @@ function _egGrantMapCompletionReward() {
         .replace('{icon}', def.icon || '💰')
         .replace('{n}', reward.count)
         .replace('{name}', def.name), '#f5d98a');
+
+    // Grant innate gold reward for completing the map (on top of currency reward).
+    // Base amount scales with map tier and modifier load (difficulty).
+    const tier = Math.max(1, mapItem.mapTier || 1);
+    const mods = Array.isArray(mapItem.mods) ? mapItem.mods : [];
+    const tierFrac = (tier - 1) / 15; // EG_MAX_MAP_TIER - 1
+    const modLoad = mods.reduce((s, m) => s + ((Number(m && m.tier) || 1)), 0);
+    const modFrac = Math.min(1, modLoad / 12);
+    const difficulty = tierFrac * 0.7 + modFrac * 0.3;
+    // Base 50-500 gold depending on difficulty, plus small random variance
+    const goldAmount = Math.max(50, Math.round(50 + difficulty * 450 + (Math.random() - 0.5) * 100));
+    if (typeof egGetGold === 'function' && typeof _egAddGold === 'function') {
+        _egAddGold(goldAmount);
+        showToast(t('eg_map_gold_reward').replace('{n}', goldAmount), '#f5d98a');
+    }
 }
 
 // Builds the hover-tooltip body for the bonus-loot chance label in the
@@ -1043,10 +1063,13 @@ function _egUpdateObjectivesHUD() {
 
     const canLeave = _egCanLeaveMap();
     const othersDone = _egNonBossObjectivesComplete();
+    const monstersDone = req.totalMonsters > 0 && _egChainKillCount >= req.totalMonsters;
+    const questionsRemain = req.requiredQuestions > 0 && _egQuestionsAnswered < req.requiredQuestions;
 
     // Action button logic — top-center, only when actionable:
     //   boss map + non-boss done + not in arena → Enter Boss Arena
     //   all objectives done                       → Complete Map (highlighted)
+    //   monsters done + questions remain          → Trigger Question
     //   otherwise                                 → no button (just the line)
     let actionHTML = '';
     if (req.hasBoss && !_egBossDefeated()) {
@@ -1055,6 +1078,8 @@ function _egUpdateObjectivesHUD() {
         }
     } else if (canLeave) {
         actionHTML = `<button class="eg-obj-action-btn eg-obj-action-complete" onclick="_egTryLeaveMap()">${t('eg_complete_map')}</button>`;
+    } else if (monstersDone && questionsRemain) {
+        actionHTML = `<button class="eg-obj-action-btn eg-obj-action-question" onclick="_egTriggerQuestionNow()">${t('eg_trigger_question')}</button>`;
     }
 
     // First time boss arena becomes available (non-boss done, boss not yet defeated): banner + toast.
@@ -1222,6 +1247,7 @@ function _egChainCleanup() {
     _egMapClearedShown = false;
     _egBossArenaAvailableShown = false;
     if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
+    if (typeof _egResetLowHealthWarningState === 'function') _egResetLowHealthWarningState();
 
     // Boss arena phase state
     if (_egArenaAdvanceTimer) {
@@ -1245,6 +1271,7 @@ function _egChainCleanup() {
     _egRunCurrency = [];
     _egRunItems = [];
     _egRunMaps = [];
+    _egRunEssences = [];
     // _egLootDrops is cleared by _egStopPickupSpawner via _egStopLootDrops
 
     // Hide the objectives strip
@@ -1261,10 +1288,10 @@ function _egChainCleanup() {
 //-------------------LEAVE MAP TRANSITION SCREEN--------------------------
 //------------------------------------------------------------------------
 
-// Builds the summary rows (equipment loot + regular items + maps + currency).
+// Builds the summary rows (equipment loot + regular items + maps + currency + essences + gold).
 // Reads the passed-in snapshots — must be called while _egRunLoot /
-// _egRunItems / _egRunMaps / _egRunCurrency still hold the run's data.
-function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, includeSellHint = true) {
+// _egRunItems / _egRunMaps / _egRunCurrency / _egRunEssences still hold the run's data.
+function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, essences, gold = 0, includeSellHint = true) {
     const lootHTML = loot.map((item, i) => `
         <div class="eg-leave-summary-chip eg-loot-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
             ${EG_ART.html('item', item.baseId, item.icon || '📦')}
@@ -1287,6 +1314,18 @@ function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, includeSellHin
             ${entry.count > 1 ? `<span class="eg-leave-summary-count">×${entry.count}</span>` : ''}
         </div>`).join('');
 
+    const essencesHTML = essences.map((entry, i) => `
+        <div class="eg-leave-summary-chip eg-rarity-essence" data-essence-idx="${i}">
+            ${entry.icon || '🧬'}
+            ${entry.count > 1 ? `<span class="eg-leave-summary-count">×${entry.count}</span>` : ''}
+        </div>`).join('');
+
+    const goldHTML = gold > 0 ? `
+        <div class="eg-leave-summary-chip eg-rarity-gold" data-gold-idx="0">
+            🪙
+            <span class="eg-leave-summary-count">×${gold.toLocaleString()}</span>
+        </div>` : '';
+
     return `
         <div class="eg-leave-summary-section">
             <div class="eg-leave-summary-title">${t('eg_loot_acquired').replace('{n}', loot.length)}</div>
@@ -1304,7 +1343,16 @@ function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, includeSellHin
         <div class="eg-leave-summary-section">
             <div class="eg-leave-summary-title">${t('eg_runes_orbs')}</div>
             <div class="eg-leave-summary-row">${currencyHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
-        </div>`;
+        </div>
+        <div class="eg-leave-summary-section">
+            <div class="eg-leave-summary-title">${t('eg_essences_acquired')}</div>
+            <div class="eg-leave-summary-row">${essencesHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
+        </div>
+        ${goldHTML ? `
+        <div class="eg-leave-summary-section">
+            <div class="eg-leave-summary-title">${t('eg_gold_reward')}</div>
+            <div class="eg-leave-summary-row">${goldHTML}</div>
+        </div>` : ''}`;
 }
 
 // Clamps a rarity string to one that has a border/glow CSS class on the
@@ -1324,6 +1372,21 @@ function _egBuildCurrencyTooltipHTML(entry) {
             <div class="eg-tt-icon">${entry.icon || '💰'}</div>
             <div class="eg-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
             <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')}</div>
+        </div>
+        <div class="eg-tt-section"><div class="eg-tt-desc">${entry.description || ''}</div></div>
+    </div>`;
+}
+
+// Builds the hover tooltip body for an essence entry shown in the
+// essences row — icon, name, rarity line and description, matching
+// the hub's essence tooltip frame.
+function _egBuildEssenceTooltipHTML(entry) {
+    const countLine = entry.count > 1 ? ` <span class="eg-tooltip-count">×${entry.count}</span>` : '';
+    return `<div class="eg-tt-frame" style="--tt-border:#b59248;">
+        <div class="eg-tt-header">
+            <div class="eg-tt-icon">${entry.icon || '🧬'}</div>
+            <div class="eg-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
+            <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')}</div>
         </div>
         <div class="eg-tt-section"><div class="eg-tt-desc">${entry.description || ''}</div></div>
     </div>`;
@@ -1545,6 +1608,10 @@ function _egBuildLeaveChipTooltipHTML(chip, state) {
         const entry = state.currency[+chip.dataset.currencyIdx];
         return entry ? _egBuildCurrencyTooltipHTML(entry) : '';
     }
+    if ('essenceIdx' in chip.dataset) {
+        const entry = state.essences[+chip.dataset.essenceIdx];
+        return entry ? _egBuildEssenceTooltipHTML(entry) : '';
+    }
     return '';
 }
 
@@ -1616,9 +1683,11 @@ function _egRenderPauseLootSummary() {
         items: _egRunItems || [],
         maps: _egRunMaps || [],
         currency: _egRunCurrency || [],
+        essences: _egRunEssences || [],
+        gold: 0,
     };
 
-    container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, false);
+    container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold, false);
 
     // Read-only tooltip wiring (mouseover/mousemove/mouseout only). Assigned
     // as on* properties so repeated pauses never stack duplicate listeners.
@@ -1689,18 +1758,33 @@ function _egShowLeaveMapTransition(atlasResult, opts) {
 
     // Snapshot the run data now — _egStopEncounter() (called by _egEndMap
     // right after this) wipes _egRunLoot/_egRunCurrency via _egChainCleanup.
+    // Compute the gold reward for this map completion (win path only).
+    let goldReward = 0;
+    if (!failed && typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem) {
+        const tier = Math.max(1, _egActiveMapItem.mapTier || 1);
+        const mods = Array.isArray(_egActiveMapItem.mods) ? _egActiveMapItem.mods : [];
+        const tierFrac = (tier - 1) / 15; // EG_MAX_MAP_TIER - 1
+        const modLoad = mods.reduce((s, m) => s + ((Number(m && m.tier) || 1)), 0);
+        const modFrac = Math.min(1, modLoad / 12);
+        const difficulty = tierFrac * 0.7 + modFrac * 0.3;
+        goldReward = Math.max(50, Math.round(50 + difficulty * 450));
+    }
+
     const state = {
         loot: [..._egRunLoot],
         items: [..._egRunItems],
         maps: [..._egRunMaps],
         currency: [..._egRunCurrency],
+        essences: [..._egRunEssences],
+        gold: goldReward,
     };
 
     const panel = el.querySelector('.eg-leave-map-panel') || el;
     const container = document.getElementById('eg-leave-summary-container');
+    const includeSellHint = !failed; // Only show sell hint on successful completions
     const render = () => {
         if (container) {
-            container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency);
+            container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold, includeSellHint);
         }
     };
     state.render = render;
@@ -1888,6 +1972,8 @@ function _egInjectLeaveMapTransitionStyles() {
         .eg-leave-summary-chip.eg-rarity-cursed { border-color: #e74c3c; }
         .eg-leave-summary-chip.eg-rarity-artifact { border-color: #f1c40f; }
         .eg-leave-summary-chip.eg-rarity-currency { border-color: #b59248; }
+        .eg-leave-summary-chip.eg-rarity-essence { border-color: #b59248; }
+        .eg-leave-summary-chip.eg-rarity-gold { border-color: #f5d98a; background: rgba(245, 217, 138, 0.15); }
         .eg-leave-summary-count {
             position: absolute; bottom: 1px; right: 2px;
             font-size: 0.6rem; font-weight: 700; color: #f0e6c0;

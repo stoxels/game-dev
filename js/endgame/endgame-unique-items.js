@@ -287,7 +287,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 47, str: 0, agi: 0, int: 120 },
         bonuses: [
             { key: 'time_added', value: 75, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
-            { key: 'first_step', value: 3, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: 3, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'flat_health', value: 47, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
@@ -522,7 +522,7 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 260, absorption: 0 },
         bonuses: [
             { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
-            { key: 'first_step', value: 2, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: 2, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'lightning_damage_1', value: 6, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' }
         ],
         downsides: [
@@ -876,7 +876,7 @@ const EG_UNIQUE_ITEMS = [
         minLevel: 72,
         requirements: { level: 72, str: 0, agi: 0, int: 140 },
         bonuses: [
-            { key: 'first_step', value: 4, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: 4, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'time_added', value: 40, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'preemptive_dodge', value: 20, en: '#% chance to preemptively Dodge incoming Attacks', de: '#% Chance, Angriffen präventiv auszuweichen' },
             { key: 'flat_health', value: 97, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
@@ -1105,7 +1105,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 23, str: 0, agi: 87, int: 0 },
         defenses: { armour: 0, evasion: 210, absorption: 0 },
         bonuses: [
-            { key: 'first_step', value: 3, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: 3, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'preemptive_dodge', value: 15, en: '#% chance to preemptively Dodge incoming Attacks', de: '#% Chance, Angriffen präventiv auszuweichen' },
             { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
@@ -1227,7 +1227,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'first_step', value: -4.4, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' }
+            { key: 'first_step', value: -4.4, en: '-#s Monsters delay Charge-up after Spawning', de: '-#s Monster verzögern Angriffsladen nach Erscheinen' }
         ],
         flavorEn: 'The seconds come from somewhere. Somewhere has teeth.',
         flavorDe: 'Die Sekunden kommen von irgendwoher. Dort drüben hat es Zähne.',
@@ -1564,7 +1564,7 @@ const EG_UNIQUE_ITEMS = [
         minLevel: 2,
         requirements: { level: 2, str: 0, agi: 0, int: 0 },
         bonuses: [
-            { key: 'first_step', value: 2, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: 2, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
@@ -2526,7 +2526,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 81, str: 0, agi: 0, int: 308 },
         bonuses: [
             { key: 'time_added', value: 90, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
-            { key: 'first_step', value: 4, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: 4, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'flat_health', value: 91, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'flat_mana', value: 70, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
@@ -2827,7 +2827,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'first_step', value: -4.4, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' }
+            { key: 'first_step', value: -4.4, en: '-#s Monsters delay Charge-up after Spawning', de: '-#s Monster verzögern Angriffsladen nach Erscheinen' }
         ],
         flavorEn: 'The hours come in. Something else goes out.',
         flavorDe: 'Die Stunden kommen herein. Etwas anderes geht hinaus.',
@@ -2882,7 +2882,7 @@ const EG_UNIQUE_ITEMS = [
         minLevel: 21,
         requirements: { level: 21, str: 0, agi: 80, int: 0 },
         bonuses: [
-            { key: 'first_step', value: 2.5, en: '+#s before the first Monster acts', de: '+#s bevor das erste Monster handelt' },
+            { key: 'first_step', value: 2.5, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' }
         ],
@@ -3204,7 +3204,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
         downsides: [
-            { key: 'first_step', value: -4.4, en: '-#s before the first Monster acts', de: '-#s bevor das erste Monster handelt' }
+            { key: 'first_step', value: -4.4, en: '-#s Monsters delay Charge-up after Spawning', de: '-#s Monster verzögern Angriffsladen nach Erscheinen' }
         ],
         flavorEn: 'Once you start, nothing stops you. Including caution.',
         flavorDe: 'Einmal gestartet, hält dich nichts auf. Auch keine Vorsicht.',
@@ -4615,7 +4615,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 27, str: 0, agi: 102, int: 0 },
         defenses: { armour: 0, evasion: 130, absorption: 0 },
         bonuses: [
-            { key: 'first_step', value: 1.5, en: '+#s Head Start at Map Start', de: '+#s Vorsprung beim Kartenstart' },
+            { key: 'first_step', value: 1.5, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'dodge', value: 5, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' }
         ],
@@ -5266,7 +5266,7 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 40, evasion: 170, absorption: 0 },
         bonuses: [
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
-            { key: 'first_step', value: 1, en: '+#s Head Start at Map Start', de: '+#s Vorsprung beim Kartenstart' },
+            { key: 'first_step', value: 1, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'flat_health', value: 46, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [

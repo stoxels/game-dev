@@ -19,6 +19,7 @@
 const EG_MOD_NAME_WORDS = {
     // --- LIFE & MANA ---
     flat_health: ['Healthy', 'of Vitality', 'des Lebens'],
+    inc_health: ['Vital', 'of Vitality', 'des Lebens'],
     flat_mana: ['Lucid', 'of Lucidity', 'des Manas'],
     heart_heal: ['Restorative', 'of Restoration', 'der Herzheilung'],
     inc_heart_heal: ['Mending', 'of Mending', 'der Herzheilung'],
@@ -128,6 +129,7 @@ const EG_MOD_NAME_WORDS = {
     parry: ['Riposting', 'of Riposte', 'der Riposte'],
     deflect: ['Redirecting', 'of Redirection', 'der Umlenkung'],
     deflect_damage: ['Vengeful', 'of Vengeance', 'der Vergeltung'],
+    movement_speed: ['Swift', 'of Swiftness', 'der Schnelligkeit'],
 
     // ── MAP MODS (endgame-maps.js EG_MAP_MOD_TABLES) ─────────────────
     // Prefixes
@@ -1759,6 +1761,17 @@ const EG_MOD_TABLE_CLOAK = {
                 { tier: 5, min: 7, max: 19, weight: 2000, ilvl: 1 }
             ]
         },
+        inc_health: {
+            id: 'inc_health',
+            label: '#% increased Maximum Health', labelDe: '#% erhöhtes maximales Leben',
+            tiers: [
+                { tier: 1, min: 6, max: 9, weight: 80, ilvl: 84 },
+                { tier: 2, min: 4, max: 5, weight: 200, ilvl: 62 },
+                { tier: 3, min: 3, max: 3, weight: 450, ilvl: 38 },
+                { tier: 4, min: 2, max: 2, weight: 900, ilvl: 12 },
+                { tier: 5, min: 1, max: 1, weight: 1800, ilvl: 1 }
+            ]
+        },
         flat_mana: {
             id: 'flat_mana',
             label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
@@ -2205,6 +2218,17 @@ const EG_MOD_TABLE_CHEST = {
                 { tier: 3, min: 60, max: 89, weight: 500, ilvl: 45 },
                 { tier: 4, min: 35, max: 59, weight: 1000, ilvl: 25 },
                 { tier: 5, min: 12, max: 34, weight: 2000, ilvl: 1 }
+            ]
+        },
+        inc_health: {
+            id: 'inc_health',
+            label: '#% increased Maximum Health', labelDe: '#% erhöhtes maximales Leben',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 80, ilvl: 84 },
+                { tier: 2, min: 5, max: 7, weight: 200, ilvl: 62 },
+                { tier: 3, min: 3, max: 4, weight: 450, ilvl: 38 },
+                { tier: 4, min: 2, max: 2, weight: 900, ilvl: 12 },
+                { tier: 5, min: 1, max: 1, weight: 1800, ilvl: 1 }
             ]
         },
         flat_mana: {
@@ -4284,6 +4308,17 @@ const EG_MOD_TABLE_PANTS = {
                 { tier: 5, min: 7, max: 21, weight: 2000, ilvl: 1 }
             ]
         },
+        inc_health: {
+            id: 'inc_health',
+            label: '#% increased Maximum Health', labelDe: '#% erhöhtes maximales Leben',
+            tiers: [
+                { tier: 1, min: 7, max: 10, weight: 80, ilvl: 84 },
+                { tier: 2, min: 5, max: 6, weight: 200, ilvl: 62 },
+                { tier: 3, min: 3, max: 4, weight: 450, ilvl: 38 },
+                { tier: 4, min: 2, max: 2, weight: 900, ilvl: 12 },
+                { tier: 5, min: 1, max: 1, weight: 1800, ilvl: 1 }
+            ]
+        },
         flat_mana: {
             id: 'flat_mana',
             label: '+# to Maximum Mana', labelDe: '+# zu maximalem Mana',
@@ -4757,10 +4792,11 @@ const EG_MOD_TABLE_PANTS = {
 //              downtime), dodge (full avoidance, random), and armour
 //              (always-on reduction) — grounded only fires on charge
 //              hits specifically, but the reduction is significant.
-//   first_step — at the start of each map, monsters do not charge for
-//                the first # seconds. Your boots carry you into the
-//                fight before enemies find their footing. A powerful
-//                opener stat that rewards fast early play.
+//   first_step — when a monster spawns, it does not charge-up its
+//                attacks for the first # seconds. Your boots give you
+//                an edge against fresh spawns before they find their
+//                footing. A powerful stat that rewards aggressive
+//                play against newly arrived enemies.
 //
 // No block/dodge (those are shoulders/chest/cloak/pants), no crit,
 // no status effects (bracers), no chain/splash/multishot (cloak/gloves),
@@ -4998,10 +5034,10 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'grounded',
             label: '#% Chance to reduce incoming Charge damage by @%', labelDe: '#% Chance, eingehenden Ansturm-Schaden um @% zu verringern',
             tiers: [
-                { tier: 1, min: 35, max: 50, min2: 40, max2: 55, weight: 80, ilvl: 84 },
-                { tier: 2, min: 22, max: 34, min2: 26, max2: 39, weight: 200, ilvl: 63 },
-                { tier: 3, min: 10, max: 21, min2: 14, max2: 25, weight: 460, ilvl: 38 },
-                { tier: 4, min: 3, max: 9, min2: 6, max2: 13, weight: 1000, ilvl: 12 }
+                { tier: 1, min1: 35, max1: 50, min2: 40, max2: 55, weight: 80, ilvl: 84 },
+                { tier: 2, min1: 22, max1: 34, min2: 26, max2: 39, weight: 200, ilvl: 63 },
+                { tier: 3, min1: 10, max1: 21, min2: 14, max2: 25, weight: 460, ilvl: 38 },
+                { tier: 4, min1: 3, max1: 9, min2: 6, max2: 13, weight: 1000, ilvl: 12 }
             ]
         },
 
@@ -5148,15 +5184,15 @@ const EG_MOD_TABLE_BOOTS = {
 
         // --- BOOTS-EXCLUSIVE: FIRST STEP ---
         // Your boots carry you into the fight before enemies have found
-        // their footing. At the start of each map, monsters do not begin
-        // charging for the first # seconds — a window to deal damage
-        // freely and establish an early lead. Rewards players who engage
-        // aggressively from the opening cell. Does not stack with multiple
+        // their footing. When a monster spawns, it does not begin charging
+        // its attacks for the first # seconds — a window to deal damage
+        // freely before it finds its rhythm. Rewards players who engage
+        // aggressively against fresh spawns. Does not stack with multiple
         // boots (only one boot slot), but pairs naturally with grounded
         // for a full charge-disruption build.
         first_step: {
             id: 'first_step',
-            label: 'Monsters do not Charge for the first # seconds of each Map', labelDe: 'Monster führen in den ersten # Sekunden jeder Karte keinen Ansturm durch',
+            label: 'Monsters do not Charge-up their Attacks for the first # seconds after Spawning', labelDe: 'Monster laden ihre Angriffe in den ersten # Sekunden nach dem Erscheinen nicht auf',
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 70, ilvl: 84 },
                 { tier: 2, min: 7, max: 11, weight: 180, ilvl: 65 },
@@ -5200,6 +5236,24 @@ const EG_MOD_TABLE_BOOTS = {
                 { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
                 { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
                 { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
+            ]
+        },
+
+        // --- BOOTS-EXCLUSIVE: MOVEMENT SPEED (PoE-style) ---
+        // Flat % increased movement speed for your on-screen avatar.
+        // Affects WASD and mouse-drag travel — crucial for dodging
+        // telegraphed hazards like Fire Walls. PoE values: 10–35% in
+        // 5% steps; higher tiers are rarer. Caps at ~35% per boot
+        // (only one boot slot, so at most 35%).
+        movement_speed: {
+            id: 'movement_speed',
+            label: '#% increased Movement Speed', labelDe: '#% erhöhte Bewegungsgeschwindigkeit',
+            tiers: [
+                { tier: 1, min: 30, max: 35, weight: 80, ilvl: 80 },
+                { tier: 2, min: 25, max: 29, weight: 150, ilvl: 60 },
+                { tier: 3, min: 20, max: 24, weight: 300, ilvl: 35 },
+                { tier: 4, min: 15, max: 19, weight: 600, ilvl: 15 },
+                { tier: 5, min: 10, max: 14, weight: 1200, ilvl: 1 }
             ]
         },
 }
@@ -5626,6 +5680,17 @@ const EG_MOD_TABLE_ARCANE = {
                 { tier: 3, min: 28, max: 43, weight: 500, ilvl: 45 },
                 { tier: 4, min: 14, max: 27, weight: 1000, ilvl: 25 },
                 { tier: 5, min: 4, max: 13, weight: 2000, ilvl: 1 }
+            ]
+        },
+        inc_health: {
+            id: 'inc_health',
+            label: '#% increased Maximum Health', labelDe: '#% erhöhtes maximales Leben',
+            tiers: [
+                { tier: 1, min: 5, max: 8, weight: 80, ilvl: 84 },
+                { tier: 2, min: 3, max: 4, weight: 200, ilvl: 62 },
+                { tier: 3, min: 2, max: 3, weight: 450, ilvl: 38 },
+                { tier: 4, min: 1, max: 2, weight: 900, ilvl: 12 },
+                { tier: 5, min: 1, max: 1, weight: 1800, ilvl: 1 }
             ]
         },
 

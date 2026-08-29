@@ -541,22 +541,32 @@ function _dndDropOnCurrencyCell(currencyCell) {
     return true;
 }
 
-// Handles dropping onto an essence tab cell.
-// If the target already holds the same essence type, the stacks are merged.
-// Otherwise a normal swap is performed.
-// Returns true when the drop was accepted.
+// Handles dropping onto an essence tab cell (fixed-slot tab, like Orbs & Shards).
+// Only the assigned essence id for that slot is accepted; otherwise reject.
+// Same-id drops merge stack counts.
 function _dndDropOnEssenceCell(essenceCell) {
     const r = +essenceCell.dataset.row, c = +essenceCell.dataset.col;
+    const assignedId = (typeof _egEssenceIdForSlot === 'function') ? _egEssenceIdForSlot(r, c) : null;
+    if (!assignedId) {
+        _dndShowRejectFlash(essenceCell);
+        return false;
+    }
+    if (_dnd.item.id !== assignedId) {
+        _dndShowRejectFlash(essenceCell);
+        return false;
+    }
     const existing = _egEssenceStash[r][c];
-
     if (existing && existing.id === _dnd.item.id) {
-        // Same essence — merge stack counts. Source cell was already cleared in pick-up.
         existing.count = (existing.count || 1) + (_dnd.item.count || 1);
         _egEssenceStash[r][c] = existing;
         _egRenderEssenceCell(r, c);
+    } else if (!existing) {
+        _egEssenceStash[r][c] = _dnd.item;
+        _egRenderEssenceCell(r, c);
     } else {
-        // Different type or empty cell — normal swap.
-        _dndDropOnCell(_egEssenceStash, _egRenderEssenceCell, r, c);
+        existing.count = (existing.count || 1) + (_dnd.item.count || 1);
+        _egEssenceStash[r][c] = existing;
+        _egRenderEssenceCell(r, c);
     }
     return true;
 }

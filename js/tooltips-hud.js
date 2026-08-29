@@ -53,7 +53,7 @@ function getGameTooltip() {
             font-size: 11px;
             line-height: 1.6;
             padding: 8px 12px;
-            max-width: 280px;
+            max-width: 380px;
             pointer-events: none;
             opacity: 0;
             transition: opacity .12s;

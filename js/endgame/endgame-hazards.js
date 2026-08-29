@@ -102,14 +102,20 @@ const EG_HZ_FROSTNOVA_INTERVAL_MAX_MS = 10000;
 
 const EG_HZ_FIREWALL_BASE_DMG_PCT = 18;    // % of playerMaxHP per wall hit — significant fire wave (was 8, too low)
 const EG_HZ_FIREWALL_HEIGHT = 150;         // flame wave thickness (px)
-const EG_HZ_FIREWALL_WARNING_MS = 1300;    // telegraph before ignition
+const EG_HZ_FIREWALL_WARNING_MS = 5000;    // telegraph before ignition
 const EG_HZ_FIREWALL_SWEEP_MS = 2600;      // sweep duration (direction depends on variant)
 const EG_HZ_FIREWALL_IGNITE_CHANCE_PCT = 50;
 const EG_HZ_FIREWALL_INTERVAL_MIN_MS = 8000;
 const EG_HZ_FIREWALL_INTERVAL_MAX_MS = 12000;
 // Outplay tuning — safe-zone insets and gap geometry for firewall variations
-const EG_HZ_FIREWALL_SAFE_MIN = 90;        // minimum safe strip height at top/bottom for offset variants (px)
-const EG_HZ_FIREWALL_SAFE_MAX = 160;       // maximum safe strip height (px)
+// Top safe-zone must clear the avatar HUD (wrapper at top:4px + ~150px tall incl.
+// HP/charge bars).  Bottom safe-zone is less constrained so it stays smaller.
+const EG_HZ_FIREWALL_SAFE_MIN = 90;        // legacy generic (kept for compat)
+const EG_HZ_FIREWALL_SAFE_MAX = 160;
+const EG_HZ_FIREWALL_TOP_SAFE_MIN = 185;   // offsetTop: safe strip at very top (px)
+const EG_HZ_FIREWALL_TOP_SAFE_MAX = 260;
+const EG_HZ_FIREWALL_BOTTOM_SAFE_MIN = 90; // offsetBottom: safe strip at very bottom (px)
+const EG_HZ_FIREWALL_BOTTOM_SAFE_MAX = 165;
 const EG_HZ_FIREWALL_GAP_MIN_W = 180;      // minimum gap width for gap variants (px)
 const EG_HZ_FIREWALL_GAP_MAX_W = 280;      // maximum gap width (px)
 const EG_HZ_FIREWALL_GAP_MARGIN = 70;      // keep gap at least this far from screen edges (px)
@@ -1317,10 +1323,10 @@ function _egHzTickFrostNova(dtMs) {
 // outplay-able variations each spawn so the mechanic is never an
 // unavoidable full-screen hit:
 //
-//   offsetTop  — wall starts inset from the TOP (90–160 px safe strip
-//                at the very top). Sweeps TOP → BOTTOM. Dodge by hugging
-//                the top edge.
-//   offsetBottom— wall starts inset from the BOTTOM (90–160 px safe strip
+//   offsetTop  — wall starts inset from the TOP (185–260 px safe strip
+//                at the very top, clears the avatar+HP/charge HUD). Sweeps
+//                TOP → BOTTOM. Dodge by hugging the top edge.
+//   offsetBottom— wall starts inset from the BOTTOM (90–165 px safe strip
 //                at the very bottom). Sweeps BOTTOM → TOP. Dodge by
 //                hugging the bottom edge.
 //   gapDown    — full-width wall with a horizontal GAP (180–280 px) that
@@ -1330,7 +1336,7 @@ function _egHzTickFrostNova(dtMs) {
 //                sweeps BOTTOM → TOP.
 //
 // Telegraph (warning) mirrors the wall geometry so the player can read
-// the safe zone / gap position during the 1.3 s wind-up. Damage is
+// the safe zone / gap position during the 5 s wind-up. Damage is
 // dealt once when the flame band (including swept interval) overlaps
 // the player's tight sprite hitbox; for gap variants the hit is
 // suppressed when the hitbox is fully inside the gap.
@@ -1457,12 +1463,12 @@ function _egHzTickFirewall(dtMs) {
         let startY, endY, dir, gapX = 0, gapW = 0;
 
         if (variant === 'offsetTop') {
-            const safeTop = _egHzRand(EG_HZ_FIREWALL_SAFE_MIN, EG_HZ_FIREWALL_SAFE_MAX);
+            const safeTop = _egHzRand(EG_HZ_FIREWALL_TOP_SAFE_MIN, EG_HZ_FIREWALL_TOP_SAFE_MAX);
             startY = safeTop;
             endY = vh;
             dir = 1;
         } else if (variant === 'offsetBottom') {
-            const safeBottom = _egHzRand(EG_HZ_FIREWALL_SAFE_MIN, EG_HZ_FIREWALL_SAFE_MAX);
+            const safeBottom = _egHzRand(EG_HZ_FIREWALL_BOTTOM_SAFE_MIN, EG_HZ_FIREWALL_BOTTOM_SAFE_MAX);
             startY = vh - h - safeBottom;
             endY = -h;
             dir = -1;

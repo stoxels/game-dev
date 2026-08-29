@@ -96,16 +96,12 @@ function _applyLowTimeVignette() {
 //------------------------------------------------------------------------
 
 // Returns the vignette tier for the current health percentage, or '' when
-// above all thresholds. Independent from the timer vignette so both can be
+// above the threshold. Independent from the timer vignette so both can be
 // visible simultaneously (blue for time, red for health).
-//   'lhv-tier3' — ≤ 10% HP (strongest)
-//   'lhv-tier2' — ≤ 25% HP
-//   'lhv-tier1' — ≤ 50% HP
-//   ''          — > 50% HP
+//   'lhv-active' — ≤ 35% HP
+//   ''           — > 35% HP
 function _getLowHealthVignetteTier(pct) {
-    if (pct <= 0.10) return 'lhv-tier3';
-    if (pct <= 0.25) return 'lhv-tier2';
-    if (pct <= 0.50) return 'lhv-tier1';
+    if (pct <= 0.35) return 'lhv-active';
     return '';
 }
 
@@ -117,7 +113,7 @@ function _applyLowHealthVignette() {
     const el = document.getElementById('low-health-vignette');
     if (!el) return;
 
-    el.classList.remove('lhv-tier1', 'lhv-tier2', 'lhv-tier3');
+    el.classList.remove('lhv-active');
 
     const healthEnabled = (typeof SETTINGS.lowHealthVignette !== 'undefined')
         ? SETTINGS.lowHealthVignette
@@ -129,8 +125,8 @@ function _applyLowHealthVignette() {
     if (max <= 0) return;
 
     const pct = curHP / max;
-    // Don't show vignette when dead or at full health without threshold
-    if (pct <= 0 || pct > 0.50) return;
+    // Don't show vignette when dead
+    if (pct <= 0) return;
 
     const tier = _getLowHealthVignetteTier(pct);
     if (tier) el.classList.add(tier);

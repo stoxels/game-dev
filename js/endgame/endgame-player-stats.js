@@ -35,6 +35,7 @@ const EG_STAT_KEY_MAP = {
     // item they roll on. They are handled by _egGetItemEffectiveDefenses()
     // below and intentionally absent from this map.
     flat_health: { bucket: 'health', mode: 'add' },
+    inc_health: { bucket: 'healthIncPct', mode: 'add' },
     flat_mana: { bucket: 'mana', mode: 'add' },
     heart_heal: { bucket: 'heartHealFlat', mode: 'add' },
     inc_heart_heal: { bucket: 'heartHealIncPct', mode: 'add' },
@@ -138,6 +139,7 @@ const EG_STAT_KEY_MAP = {
     parry: { bucket: 'parryChancePct', mode: 'add' },
     deflect: { bucket: 'deflectChancePct', mode: 'add' },
     deflect_damage: { bucket: 'deflectDamagePct', mode: 'add' },
+    movement_speed: { bucket: 'movementSpeedPct', mode: 'add' },
 };
 
 // Shared-bucket → melee-channel counterpart for damage mods. Mods carrying
@@ -430,7 +432,7 @@ function _egGetItemEffectiveAttackInterval(item) {
 // never goes stale after an equip/unequip.
 function _egComputePlayerStats() {
     const s = {
-        health: 0, mana: 0,
+        health: 0, mana: 0, healthIncPct: 0,
         armourFlat: 0, armourIncPct: 0,
         evasionFlat: 0, evasionIncPct: 0,
         absorptionFlat: 0, absorptionIncPct: 0,
@@ -469,6 +471,7 @@ function _egComputePlayerStats() {
         arcaneSurgeStreak: Infinity, arcaneSurgeMana: 0, manaToDamagePct: 0,
         echoChancePct: 0, echoDamagePct: 0, fatePct: 0, wardingHP: 0,
         parryChancePct: 0, deflectChancePct: 0, deflectDamagePct: 0,
+        movementSpeedPct: 0,
         manaOnKill: 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
         heartHealFlat: 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: 0, timeAdded: 0,
         absorptionRegenRatePct: 0, fasterAbsorptionRegenStart: 0,
@@ -555,6 +558,11 @@ function _egComputePlayerStats() {
         ? Math.max(1, Number(_egGetPlayerLevel()) || 1) : 1;
     s.health += (lvlForBonus - 1) * 5;
     s.mana += (lvlForBonus - 1) * 2;
+
+    // Apply % increased Health multiplicatively with base + flat health
+    if (s.healthIncPct > 0) {
+        s.health = Math.round(s.health * (1 + s.healthIncPct / 100));
+    }
 
     s.armour = Math.round(s.armourFlat * (1 + s.armourIncPct / 100));
     s.evasion = Math.round(s.evasionFlat * (1 + s.evasionIncPct / 100));
@@ -851,6 +859,7 @@ function _egScheduleAbsorptionRegen() {
 // and are handled explicitly by _egBuildStatLine() instead.
 const EG_STAT_DISPLAY_LABELS = {
     health: { label: t('eg_stat_health'), suffix: '' },
+    healthIncPct: { label: t('eg_stat_inc_health'), suffix: '%' },
     mana: { label: t('eg_stat_mana'), suffix: '' },
     strength: { label: t('eg_stat_strength'), suffix: '' },
     agility: { label: t('eg_stat_agility'), suffix: '' },
@@ -932,6 +941,7 @@ const EG_STAT_DISPLAY_LABELS = {
     parryChancePct: { label: t('eg_stat_parry'), suffix: '%' },
     deflectChancePct: { label: t('eg_stat_deflect_chance'), suffix: '%' },
     deflectDamagePct: { label: t('eg_stat_deflect_damage'), suffix: '%' },
+    movementSpeedPct: { label: t('eg_stat_movement_speed'), suffix: '%' },
 
     absorptionRegenRatePct: { label: t('eg_stat_absorption_regen_rate'), suffix: '%' },
     fasterAbsorptionRegenStart: { label: t('eg_stat_faster_absorption_start'), suffix: 's' },
@@ -993,7 +1003,7 @@ const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_recovery', buckets: [
             'absorptionRegenRatePct', 'fasterAbsorptionRegenStart',
             'groundedChancePct', 'groundedReductionPct',
-            'shieldBashChancePct', 'shieldBashDamageFlat'] },
+            'shieldBashChancePct', 'shieldBashDamageFlat', 'movementSpeedPct'] },
     ],
     puzzle: [
         { catKey: 'eg_statcat_mistakes_time', buckets: [

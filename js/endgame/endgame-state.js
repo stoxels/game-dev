@@ -9,6 +9,9 @@ let _egTargetId = null;  // id of the monster the player is currently targeting
 let _egEncounterActive = false; // true while a monster encounter is running
 let _egTickInterval = null;  // handle for the 10Hz combat loop interval
 
+// ── First step toast flag ──────────────────────────────────────────────────────
+let _egFirstStepToastShown = false;
+
 // ── Spawn timers ─────────────────────────────────────────────────────────────
 // Kept so we can cancel staggered spawns if the encounter ends early.
 let _egSpawnTimers = [];
@@ -116,11 +119,16 @@ let _egRunCurrency = [];
 // map run ({ defId, icon, name, rarity }), shown in the leave-map transition
 // summary. Cleared by _egChainCleanup() alongside _egRunLoot.
 let _egRunItems = [];
-
 // Per-run map-drop tracker — map items (🗺️) claimed during the current map
 // run, shown in the leave-map transition summary. Cleared by
 // _egChainCleanup() alongside _egRunLoot.
 let _egRunMaps = [];
+
+// Per-run essence tracker — essences claimed during the current map run,
+// aggregated by essence id, shown in the leave-map transition summary.
+// Cleared by _egChainCleanup() alongside _egRunLoot.
+let _egRunEssences = [];
+
 
 
 

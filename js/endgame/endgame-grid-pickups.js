@@ -191,22 +191,26 @@ const EG_PICKUP_DEFS = {
             }
         },
     },
-    // Reduces the cooldown of one random ability slot (1-4) by a flat amount.
+    // Reduces the cooldown of one random ability slot (1-4) that currently has a cooldown.
     // A bit more common than the Mistake Eraser.
     cooldown_surge: {
         id: 'cooldown_surge', emoji: '⚡', label: () => t('eg_pickup_cooldown_surge'), rarity: 'uncommon',
         onPickup(row, col) {
-            const slot = ALL_SLOTS[Math.floor(Math.random() * ALL_SLOTS.length)];
+            const slotsWithCooldown = ALL_SLOTS.filter(slot => {
+                const state = cooldownState[slot];
+                return state && state.remaining > 0;
+            });
+
+            if (slotsWithCooldown.length === 0) {
+                showToast(t('eg_pickup_cooldown_none_any'), _egRarityToastColor(this.rarity));
+                return;
+            }
+
+            const slot = slotsWithCooldown[Math.floor(Math.random() * slotsWithCooldown.length)];
             const state = cooldownState[slot];
             const slotIndex = SLOT_DISPLAY_INDEX[slot] ?? slot;
             const abilityData = (typeof _getAbilityData === 'function') ? _getAbilityData(slot) : null;
             const displayName = `[${slotIndex}] ${abilityData ? _getAbilityName(abilityData) : ''}`.trim();
-
-            if (!state || state.remaining <= 0) {
-                showToast(t('eg_pickup_cooldown_none').replace('{name}', displayName),
-                    _egRarityToastColor(this.rarity));
-                return;
-            }
 
             const before = state.remaining;
             state.remaining = Math.max(0, state.remaining - EG_COOLDOWN_SURGE_REDUCTION_SECS);
@@ -314,7 +318,7 @@ function _egBuildPickupEligiblePool() {
 }
 
 // Returns true when ANY drop type (heart pickup, loot, currency, item,
-// map or gold) currently occupies the cell at (row, col). Used by every
+// map) currently occupies the cell at (row, col). Used by every
 // spawner so two different drops can never stack on the same cell —
 // stacked overlays would leave a stuck visual behind after a claim.
 function _egCellHasAnyDrop(row, col) {
@@ -323,8 +327,7 @@ function _egCellHasAnyDrop(row, col) {
         || _egLootDrops.has(key)
         || _egCurrencyDrops.has(key)
         || _egItemDrops.has(key)
-        || (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key))
-        || (typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(key));
+        || (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key));
 }
 
 // Injects the pickup emoji overlay span into the cell's DOM element.
@@ -771,9 +774,6 @@ function _egSpawnLootExplosion(monsterLevel = 1) {
         for (let i = 0; i < 2; i++) {
             if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(true);
         }
-        for (let i = 0; i < 2; i++) {
-            if (typeof _egTryDropGold === 'function') _egTryDropGold(true, monsterLevel);
-        }
         if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
         if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
         if (typeof _egTryDropMap === 'function') _egTryDropMap(true, monsterLevel);
@@ -799,7 +799,6 @@ function _egAutoClaimDropsOnReveal(row, col) {
     if (_egCurrencyDrops.has(key)) _egCheckCurrencyDropClaim(row, col);
     if (_egItemDrops.has(key)) _egCheckItemDropClaim(row, col);
     if (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key)) _egCheckMapDropClaim(row, col);
-    if (typeof _egGoldDrops !== 'undefined' && _egGoldDrops.has(key)) _egCheckGoldDropClaim(row, col);
 }
 
 // Called when the player correctly claims the cell that holds a loot drop.
@@ -997,6 +996,14 @@ function _egTrackRunCurrency(def) {
     else _egRunCurrency.push({ id: def.id, name: def.name, icon: def.icon, description: def.description, count: 1 });
 }
 
+// Tracks a claimed essence drop for the leave-map summary screen.
+// Aggregates by essence id so stacks show one chip with a count.
+function _egTrackRunEssence(def) {
+    const existing = _egRunEssences.find(e => e.id === def.id);
+    if (existing) existing.count++;
+    else _egRunEssences.push({ id: def.id, name: def.name, icon: def.icon, description: def.description, count: 1 });
+}
+
 
 // Called on correct-cell-fill (mirrors _egCheckLootClaim). Adds the orb
 // to the currency stash via egAddCurrency() and returns true if claimed.
@@ -1029,7 +1036,11 @@ function _egCheckCurrencyDropClaim(row, col) {
             description: def.description,
         });
 
-    _egTrackRunCurrency(def);
+    if (isEssence) {
+        _egTrackRunEssence(def);
+    } else {
+        _egTrackRunCurrency(def);
+    }
 
     Audio_Manager.playSFX('player_equip_pickup');
     if (added) showToast(t('eg_currency_acquired')

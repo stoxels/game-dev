@@ -1212,21 +1212,10 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     background: linear-gradient(to left, rgba(200, 20, 20, 0.55), rgba(200, 20, 20, 0));
 }
 
-/* ----- Tier 1: ≤ 50% HP — subtle, static ----- */
-.low-health-vignette.lhv-tier1 .lhv-edge {
-    opacity: 0.35;
-}
-
-/* ----- Tier 2: ≤ 25% HP — stronger, slow pulse ----- */
-.low-health-vignette.lhv-tier2 .lhv-edge {
-    opacity: 0.6;
-    animation: lhv-pulse 2.2s ease-in-out infinite;
-}
-
-/* ----- Tier 3: ≤ 10% HP — strongest, fast urgent pulse ----- */
-.low-health-vignette.lhv-tier3 .lhv-edge {
-    opacity: 0.85;
-    animation: lhv-pulse 1s ease-in-out infinite;
+/* ----- Single tier: ≤ 35% HP — pulsing warning ----- */
+.low-health-vignette.lhv-active .lhv-edge {
+    opacity: 0.7;
+    animation: lhv-pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes lhv-pulse {

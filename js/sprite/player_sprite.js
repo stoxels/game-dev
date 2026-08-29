@@ -218,6 +218,21 @@ function _initSimpleAvatarDrag(wrapper) {
 const AVATAR_WASD_KEYS = new Set(['w', 'a', 's', 'd']);
 const AVATAR_MOVE_SPEED_PX_PER_SEC = 320;
 
+// Boots movement-speed modifier (PoE-style). Reads live gear via
+// _egComputePlayerStats().movementSpeedPct which is only rolled on
+// boots (10–35%). Outside endgame or with no boots equipped this
+// stays at 1.0×.
+function _avatarGetMoveSpeed() {
+    let base = AVATAR_MOVE_SPEED_PX_PER_SEC;
+    try {
+        if (typeof _egComputePlayerStats === 'function') {
+            const pct = _egComputePlayerStats().movementSpeedPct || 0;
+            if (pct) base *= (1 + pct / 100);
+        }
+    } catch (e) {}
+    return base;
+}
+
 const _avatarMoveState = {
     held: new Set(),
     elId: null,
@@ -249,7 +264,7 @@ function _avatarMoveTick(ts) {
         if (_avatarMoveState.held.has('d')) dx += 1;
 
         if (dx || dy) {
-            const dist = AVATAR_MOVE_SPEED_PX_PER_SEC * dt;
+            const dist = _avatarGetMoveSpeed() * dt;
             const norm = Math.hypot(dx, dy);   // keeps diagonal speed equal
             const left = parseInt(el.style.left) || 12;
             const top = parseInt(el.style.top) ||
