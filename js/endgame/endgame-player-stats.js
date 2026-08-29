@@ -134,6 +134,10 @@ const EG_STAT_KEY_MAP = {
     echo_2: { bucket: 'echoDamagePct', mode: 'add' },
     fate: { bucket: 'fatePct', mode: 'add' },
     warding: { bucket: 'wardingHP', mode: 'max' },
+
+    parry: { bucket: 'parryChancePct', mode: 'add' },
+    deflect: { bucket: 'deflectChancePct', mode: 'add' },
+    deflect_damage: { bucket: 'deflectDamagePct', mode: 'add' },
 };
 
 // Shared-bucket → melee-channel counterpart for damage mods. Mods carrying
@@ -276,23 +280,28 @@ function _egGetItemEffectiveDefenses(item) {
     const inc = { armour: 0, evasion: 0, absorption: 0 };
     const modded = { armour: false, evasion: false, absorption: false };
 
+    function applyLocalDefense(stat) {
+        if (stat.value == null) return;
+        const val = Number(stat.value) || 0;
+        if (val === 0) return;
+        const flatStat = EG_LOCAL_DEFENSE_FLAT_KEYS[stat.key];
+        if (flatStat && out[flatStat] > 0) {
+            out[flatStat] += val;
+            modded[flatStat] = true;
+            return;
+        }
+        const incStat = EG_LOCAL_DEFENSE_INC_KEYS[stat.key];
+        if (incStat && out[incStat] > 0) {
+            inc[incStat] += val;
+            modded[incStat] = true;
+        }
+    }
     (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
-        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
-            if (stat.value == null) return;
-            const val = Number(stat.value) || 0;
-            if (val === 0) return;
-            const flatStat = EG_LOCAL_DEFENSE_FLAT_KEYS[stat.key];
-            if (flatStat && out[flatStat] > 0) {
-                out[flatStat] += val;
-                modded[flatStat] = true;
-                return;
-            }
-            const incStat = EG_LOCAL_DEFENSE_INC_KEYS[stat.key];
-            if (incStat && out[incStat] > 0) {
-                inc[incStat] += val;
-                modded[incStat] = true;
-            }
-        });
+        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(applyLocalDefense);
+    });
+    // Implicits also contribute to local defenses (PoE-style)
+    (Array.isArray(item.implicits) ? item.implicits : []).forEach(mod => {
+        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(applyLocalDefense);
     });
 
     ['armour', 'evasion', 'absorption'].forEach(stat => {
@@ -348,23 +357,27 @@ function _egGetItemEffectiveDamage(item) {
     let physIncPct = 0;
     const modded = { phys: false, fire: false, cold: false, lightning: false, shadow: false };
 
+    function applyDamage(stat) {
+        if (stat.value == null) return;
+        const val = Number(stat.value) || 0;
+        if (val === 0) return;
+        const flatStat = EG_LOCAL_DAMAGE_FLAT_KEYS[stat.key];
+        if (flatStat) {
+            out[flatStat] += val;
+            modded[flatStat.replace(/(Min|Max)$/, '')] = true;
+            return;
+        }
+        const incKey = EG_LOCAL_DAMAGE_INC_KEYS[stat.key];
+        if (incKey && out.physMax > 0) {
+            physIncPct += val;
+            modded.phys = true;
+        }
+    }
     (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
-        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
-            if (stat.value == null) return;
-            const val = Number(stat.value) || 0;
-            if (val === 0) return;
-            const flatStat = EG_LOCAL_DAMAGE_FLAT_KEYS[stat.key];
-            if (flatStat) {
-                out[flatStat] += val;
-                modded[flatStat.replace(/(Min|Max)$/, '')] = true;
-                return;
-            }
-            const incKey = EG_LOCAL_DAMAGE_INC_KEYS[stat.key];
-            if (incKey && out.physMax > 0) {
-                physIncPct += val;
-                modded.phys = true;
-            }
-        });
+        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(applyDamage);
+    });
+    (Array.isArray(item.implicits) ? item.implicits : []).forEach(mod => {
+        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(applyDamage);
     });
 
     out.physMin = Math.round(out.physMin * (1 + physIncPct / 100));
@@ -393,12 +406,14 @@ function _egGetItemEffectiveAttackInterval(item) {
     if (!isFinite(base)) return { base: null, interval: null, modded: false };
 
     let reduction = 0;
-    (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
+    function collectAS(mod) {
         (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
             if (stat.key !== 'attack_speed' || stat.value == null) return;
             reduction += Number(stat.value) || 0;
         });
-    });
+    }
+    (Array.isArray(item.mods) ? item.mods : []).forEach(collectAS);
+    (Array.isArray(item.implicits) ? item.implicits : []).forEach(collectAS);
 
     const minInterval = (typeof EG_PLAYER_MIN_ATTACK_INTERVAL !== 'undefined')
         ? EG_PLAYER_MIN_ATTACK_INTERVAL : 2;
@@ -453,6 +468,7 @@ function _egComputePlayerStats() {
         channelDamagePerStack: 0, channelMaxStacks: 0,
         arcaneSurgeStreak: Infinity, arcaneSurgeMana: 0, manaToDamagePct: 0,
         echoChancePct: 0, echoDamagePct: 0, fatePct: 0, wardingHP: 0,
+        parryChancePct: 0, deflectChancePct: 0, deflectDamagePct: 0,
         manaOnKill: 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
         heartHealFlat: 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: 0, timeAdded: 0,
         absorptionRegenRatePct: 0, fasterAbsorptionRegenStart: 0,
@@ -487,27 +503,28 @@ function _egComputePlayerStats() {
                 s.meleePhysMax += max;
             }
         }
-        (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
-            (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
-                const entry = EG_STAT_KEY_MAP[stat.key];
-                if (!entry || stat.value == null) return;
-                const val = Number(stat.value) || 0;
-                // Damage mods are scoped by their source slot ("… to Melee
-                // Strikes" vs "… to Projectiles"); unscoped slots apply to
-                // both channels.
-                const meleeBucket = EG_MELEE_BUCKET_MAP[entry.bucket];
-                if (meleeBucket) {
-                    if (item.slotType !== 'ranged') s[meleeBucket] += val;
-                    if (item.slotType !== 'weapon') s[entry.bucket] += val;
-                } else if (entry.mode === 'max') {
-                    s[entry.bucket] = Math.max(s[entry.bucket], val);
-                } else if (entry.mode === 'min') {
-                    s[entry.bucket] = Math.min(s[entry.bucket], val);
-                } else {
-                    s[entry.bucket] += val;
-                }
+        function applyStatsFromList(list) {
+            (Array.isArray(list) ? list : []).forEach(mod => {
+                (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
+                    const entry = EG_STAT_KEY_MAP[stat.key];
+                    if (!entry || stat.value == null) return;
+                    const val = Number(stat.value) || 0;
+                    const meleeBucket = EG_MELEE_BUCKET_MAP[entry.bucket];
+                    if (meleeBucket) {
+                        if (item.slotType !== 'ranged') s[meleeBucket] += val;
+                        if (item.slotType !== 'weapon') s[entry.bucket] += val;
+                    } else if (entry.mode === 'max') {
+                        s[entry.bucket] = Math.max(s[entry.bucket], val);
+                    } else if (entry.mode === 'min') {
+                        s[entry.bucket] = Math.min(s[entry.bucket], val);
+                    } else {
+                        s[entry.bucket] += val;
+                    }
+                });
             });
-        });
+        }
+        applyStatsFromList(item.mods);
+        applyStatsFromList(item.implicits);
     });
 
     if (s.arcaneSurgeStreak === Infinity) s.arcaneSurgeStreak = 0;
@@ -692,12 +709,69 @@ function _egGetInnateAccuracy() {
     return EG_ACCURACY_INNATE_BASE + EG_ACCURACY_INNATE_PER_LEVEL * (lvl - 1);
 }
 
-function _egCalcAccuracyMissChance(accuracy, monsterLevel) {
+// ──────────────────────────────────────────────────────────────────────────
+//  Drag-painting accuracy bonus — threshold-based reward for sustained
+//  correct drags. More stacked cells = higher bonus, so a risky long
+//  drag that finally lands feels good instead of whiffing for 0 damage.
+//  Thresholds: >5  → tier 1, >10 → tier 2, >15 → tier 3 (highest).
+//  Each tier adds flat accuracy AND a direct miss% reduction. Flat
+//  miss reduction guarantees the bonus is felt even at high innate
+//  accuracy where extra accuracy alone would be marginal.
+// ──────────────────────────────────────────────────────────────────────────
+const EG_DRAG_ACCURACY_T1 = 6;   // >5 correct
+const EG_DRAG_ACCURACY_T2 = 11;  // >10 correct
+const EG_DRAG_ACCURACY_T3 = 16;  // >15 correct
+
+const EG_DRAG_ACCURACY_BONUS_T1 = 40;
+const EG_DRAG_ACCURACY_BONUS_T2 = 85;
+const EG_DRAG_ACCURACY_BONUS_T3 = 145;
+
+const EG_DRAG_MISS_REDUCTION_T1 = 6;   // percentage points
+const EG_DRAG_MISS_REDUCTION_T2 = 12;
+const EG_DRAG_MISS_REDUCTION_T3 = 19;
+
+function _egGetDragAccuracyBonus(stacks) {
+    const n = Number(stacks) || 0;
+    if (n >= EG_DRAG_ACCURACY_T3) return EG_DRAG_ACCURACY_BONUS_T3;
+    if (n >= EG_DRAG_ACCURACY_T2) return EG_DRAG_ACCURACY_BONUS_T2;
+    if (n >= EG_DRAG_ACCURACY_T1) return EG_DRAG_ACCURACY_BONUS_T1;
+    return 0;
+}
+
+function _egGetDragMissReduction(stacks) {
+    const n = Number(stacks) || 0;
+    if (n >= EG_DRAG_ACCURACY_T3) return EG_DRAG_MISS_REDUCTION_T3;
+    if (n >= EG_DRAG_ACCURACY_T2) return EG_DRAG_MISS_REDUCTION_T2;
+    if (n >= EG_DRAG_ACCURACY_T1) return EG_DRAG_MISS_REDUCTION_T1;
+    return 0;
+}
+
+function _egGetDragTier(stacks) {
+    const n = Number(stacks) || 0;
+    if (n >= EG_DRAG_ACCURACY_T3) return 3;
+    if (n >= EG_DRAG_ACCURACY_T2) return 2;
+    if (n >= EG_DRAG_ACCURACY_T1) return 1;
+    return 0;
+}
+
+function _egGetDragTierLabelKey(stacks) {
+    const tier = _egGetDragTier(stacks);
+    if (tier === 3) return 'eg_drag_t3';
+    if (tier === 2) return 'eg_drag_t2';
+    if (tier === 1) return 'eg_drag_t1';
+    return null;
+}
+
+function _egCalcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
     const lvl = Math.max(1, Number(monsterLevel) || 1);
-    const acc = Math.max(0, Number(accuracy) || 0) + _egGetInnateAccuracy();
+    const bonus = _egGetDragAccuracyBonus(dragStacks);
+    const acc = Math.max(0, Number(accuracy) || 0) + _egGetInnateAccuracy() + bonus;
     if (acc <= 0) return EG_ACCURACY_MISS_MAX_PCT;
     const raw = (EG_ACCURACY_MISS_SCALE * lvl) / acc;
-    return Math.max(EG_ACCURACY_MISS_MIN_PCT, Math.min(EG_ACCURACY_MISS_MAX_PCT, raw));
+    let miss = Math.max(EG_ACCURACY_MISS_MIN_PCT, Math.min(EG_ACCURACY_MISS_MAX_PCT, raw));
+    const reduction = _egGetDragMissReduction(dragStacks);
+    if (reduction > 0) miss = Math.max(EG_ACCURACY_MISS_MIN_PCT, miss - reduction);
+    return miss;
 }
 
 // Rolls a crit for the current hit. Returns the damage multiplier (1 = no crit).
@@ -855,6 +929,10 @@ const EG_STAT_DISPLAY_LABELS = {
     fatePct: { label: t('eg_stat_fate'), suffix: '%' },
     wardingHP: { label: t('eg_stat_warding'), suffix: '' },
 
+    parryChancePct: { label: t('eg_stat_parry'), suffix: '%' },
+    deflectChancePct: { label: t('eg_stat_deflect_chance'), suffix: '%' },
+    deflectDamagePct: { label: t('eg_stat_deflect_damage'), suffix: '%' },
+
     absorptionRegenRatePct: { label: t('eg_stat_absorption_regen_rate'), suffix: '%' },
     fasterAbsorptionRegenStart: { label: t('eg_stat_faster_absorption_start'), suffix: 's' },
 };
@@ -907,7 +985,8 @@ const EG_STAT_LAYOUT = {
             'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [
             'blockChance', 'spellBlockChance', 'blockRecoveryPct',
-            'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct'] },
+            'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
+            'parryChancePct', 'deflectChancePct', 'deflectDamagePct'] },
         { catKey: 'eg_statcat_resistances', buckets: [
             'fireResist', 'coldResist', 'lightningResist', 'shadowResist',
             'arcaneResistFlat'] },

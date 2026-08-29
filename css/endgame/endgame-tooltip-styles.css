@@ -186,6 +186,22 @@
     margin-left: auto;
 }
 
+/* Implicit mod lines — PoE-style distinct blue with separator */
+.eg-tt-implicits-section {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.eg-tt-mod.eg-tt-mod-implicit {
+    color: #88c0ff;
+}
+.eg-tt-mod-tier-implicit {
+    color: #88c0ff;
+    border-color: rgba(136,192,255,0.35);
+    background: rgba(136,192,255,0.10);
+}
+.eg-tt-group-title {
+    font-family: var(--PX, monospace);
+}
+
 /* Downside mod lines on unique items — shown in warning red */
 .eg-tt-mod.eg-tt-mod-downside {
     color: #e74c3c;

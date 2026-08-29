@@ -54,12 +54,12 @@ const EG_PLAYER_BASE_ATTRIBUTES = {
 //-------------------ATTRIBUTE TOTALS-------------------------------------
 //------------------------------------------------------------------------
 
-// Sums the flat strength/agility/intelligence bonuses granted by mods on
+// Sums the flat strength/agility/intelligence bonuses granted by mods AND implicits on
 // the given items. Only additive attribute mods count toward requirements.
 function _egSumAttributeBonuses(items) {
     const totals = { str: 0, agi: 0, int: 0 };
-    (items || []).forEach(item => {
-        (Array.isArray(item.mods) ? item.mods : []).forEach(mod => {
+    function collect(list) {
+        (Array.isArray(list) ? list : []).forEach(mod => {
             (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
                 const entry = typeof EG_STAT_KEY_MAP !== 'undefined' ? EG_STAT_KEY_MAP[stat.key] : null;
                 if (!entry || entry.mode !== 'add' || stat.value == null) return;
@@ -69,6 +69,10 @@ function _egSumAttributeBonuses(items) {
                 else if (entry.bucket === 'intelligence') totals.int += val;
             });
         });
+    }
+    (items || []).forEach(item => {
+        collect(item.mods);
+        collect(item.implicits);
     });
     return totals;
 }

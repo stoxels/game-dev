@@ -125,6 +125,9 @@ const EG_MOD_NAME_WORDS = {
     first_step: ['Pioneering', 'of Beginnings', 'des ersten Schritts'],
     grounded: ['Anchored', 'of Grounding', 'der Standfestigkeit'],
     warding: ['Protective', 'of Warding', 'der Abwehr'],
+    parry: ['Riposting', 'of Riposte', 'der Riposte'],
+    deflect: ['Redirecting', 'of Redirection', 'der Umlenkung'],
+    deflect_damage: ['Vengeful', 'of Vengeance', 'der Vergeltung'],
 
     // ── MAP MODS (endgame-maps.js EG_MAP_MOD_TABLES) ─────────────────
     // Prefixes
@@ -249,9 +252,9 @@ const EG_MOD_TABLE_HEAD = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -260,60 +263,60 @@ const EG_MOD_TABLE_HEAD = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
-                { tier: 3, min: 25, max: 59, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 24, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 120, max: 180, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 119, weight: 525, ilvl: 60 },
+                { tier: 3, min: 30, max: 71, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 29, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
-                { tier: 3, min: 25, max: 59, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 24, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 120, max: 180, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 119, weight: 525, ilvl: 60 },
+                { tier: 3, min: 30, max: 71, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 29, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 80, max: 110, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 132, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -322,60 +325,60 @@ const EG_MOD_TABLE_HEAD = {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 30, max2: 45, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 20, max2: 29, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 36, max2: 54, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 24, max2: 35, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 30, max2: 45, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 20, max2: 29, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 10, max2: 19, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 36, max2: 54, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 24, max2: 35, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 12, max2: 23, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -384,30 +387,30 @@ const EG_MOD_TABLE_HEAD = {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 40, max2: 65, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 25, max2: 39, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 12, max2: 24, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 11, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 48, max2: 78, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 30, max2: 47, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 14, max2: 29, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 5, max2: 13, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 36, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 24, max2: 35, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 36, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 24, max2: 35, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -417,19 +420,19 @@ const EG_MOD_TABLE_HEAD = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -555,16 +558,16 @@ const EG_MOD_TABLE_HEAD = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -572,9 +575,9 @@ const EG_MOD_TABLE_HEAD = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
             ]
         },
 }
@@ -663,9 +666,9 @@ const EG_MOD_TABLE_EARRING = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 350, ilvl: 78 },
-                { tier: 2, min: 18, max: 29, weight: 700, ilvl: 35 },
-                { tier: 3, min: 8, max: 17, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 210, ilvl: 78 },
+                { tier: 2, min: 18, max: 29, weight: 420, ilvl: 35 },
+                { tier: 3, min: 8, max: 17, weight: 840, ilvl: 1 }
             ]
         },
     
@@ -673,19 +676,19 @@ const EG_MOD_TABLE_EARRING = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -814,16 +817,16 @@ const EG_MOD_TABLE_EARRING = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
-                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 8, max: 12, weight: 300, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -831,9 +834,9 @@ const EG_MOD_TABLE_EARRING = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
             ]
         },
 }
@@ -983,9 +986,9 @@ const EG_MOD_TABLE_AMULET = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 35, max: 45, weight: 350, ilvl: 78 },
-                { tier: 2, min: 22, max: 34, weight: 700, ilvl: 35 },
-                { tier: 3, min: 10, max: 21, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 35, max: 45, weight: 210, ilvl: 78 },
+                { tier: 2, min: 22, max: 34, weight: 420, ilvl: 35 },
+                { tier: 3, min: 10, max: 21, weight: 840, ilvl: 1 }
             ]
         },
         mistake_not_count: {
@@ -993,9 +996,9 @@ const EG_MOD_TABLE_AMULET = {
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             // Amulet-exclusive — powerful puzzle utility, kept very rare
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
     
@@ -1003,10 +1006,10 @@ const EG_MOD_TABLE_AMULET = {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -1208,16 +1211,16 @@ const EG_MOD_TABLE_AMULET = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
-                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 8, max: 12, weight: 300, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 720, ilvl: 1 }
             ]
         },
     
@@ -1225,9 +1228,9 @@ const EG_MOD_TABLE_AMULET = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
             ]
         },
 }
@@ -1276,60 +1279,60 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
-                { tier: 3, min: 25, max: 59, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 24, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 120, max: 180, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 119, weight: 525, ilvl: 60 },
+                { tier: 3, min: 30, max: 71, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 29, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
-                { tier: 3, min: 25, max: 59, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 24, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 120, max: 180, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 119, weight: 525, ilvl: 60 },
+                { tier: 3, min: 30, max: 71, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 29, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 80, max: 110, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 132, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -1338,60 +1341,60 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 30, max2: 45, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 20, max2: 29, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 36, max2: 54, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 24, max2: 35, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 30, max2: 45, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 20, max2: 29, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 10, max2: 19, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 36, max2: 54, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 24, max2: 35, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 12, max2: 23, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -1400,30 +1403,30 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 40, max2: 65, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 25, max2: 39, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 12, max2: 24, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 11, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 48, max2: 78, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 30, max2: 47, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 14, max2: 29, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 5, max2: 13, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 36, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 24, max2: 35, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 36, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 24, max2: 35, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -1432,9 +1435,9 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -1466,19 +1469,19 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -1684,16 +1687,16 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -1701,9 +1704,28 @@ const EG_MOD_TABLE_SHOULDERS = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
+            ]
+        },
+
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
+            ]
+        },
+        deflect: {
+            id: 'deflect',
+            label: '#% Chance to Deflect Projectiles on Parry', labelDe: '#% Chance, Projektile bei Parade umzulenken',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 4, max: 7, weight: 250, ilvl: 45 },
+                { tier: 3, min: 1, max: 3, weight: 550, ilvl: 10 }
             ]
         },
 }
@@ -1755,20 +1777,20 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 120, max: 175, weight: 150, ilvl: 82 },
-                { tier: 2, min: 75, max: 119, weight: 300, ilvl: 60 },
-                { tier: 3, min: 35, max: 74, weight: 600, ilvl: 30 },
-                { tier: 4, min: 8, max: 34, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 144, max: 210, weight: 262, ilvl: 82 },
+                { tier: 2, min: 90, max: 143, weight: 525, ilvl: 60 },
+                { tier: 3, min: 42, max: 89, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 10, max: 41, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 90, max: 115, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 89, weight: 300, ilvl: 60 },
-                { tier: 3, min: 30, max: 59, weight: 600, ilvl: 20 },
-                { tier: 4, min: 8, max: 29, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 108, max: 138, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 107, weight: 525, ilvl: 60 },
+                { tier: 3, min: 36, max: 71, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 10, max: 35, weight: 2100, ilvl: 1 }
             ]
         },
         // Armour is secondary on a cloak — slightly below helmet scale.
@@ -1776,40 +1798,40 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 80, max: 120, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 18, max: 44, weight: 600, ilvl: 30 },
-                { tier: 4, min: 4, max: 17, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 144, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 22, max: 53, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 5, max: 20, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 65, max: 85, weight: 150, ilvl: 82 },
-                { tier: 2, min: 40, max: 64, weight: 300, ilvl: 60 },
-                { tier: 3, min: 15, max: 39, weight: 600, ilvl: 20 },
-                { tier: 4, min: 4, max: 14, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 78, max: 102, weight: 262, ilvl: 82 },
+                { tier: 2, min: 48, max: 77, weight: 525, ilvl: 60 },
+                { tier: 3, min: 18, max: 47, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 5, max: 17, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 65, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 40, max: 64, weight: 300, ilvl: 60 },
-                { tier: 3, min: 18, max: 39, weight: 600, ilvl: 30 },
-                { tier: 4, min: 4, max: 17, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 78, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 48, max: 77, weight: 525, ilvl: 60 },
+                { tier: 3, min: 22, max: 47, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 5, max: 20, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 65, max: 85, weight: 150, ilvl: 82 },
-                { tier: 2, min: 40, max: 64, weight: 300, ilvl: 60 },
-                { tier: 3, min: 15, max: 39, weight: 600, ilvl: 20 },
-                { tier: 4, min: 4, max: 14, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 78, max: 102, weight: 262, ilvl: 82 },
+                { tier: 2, min: 48, max: 77, weight: 525, ilvl: 60 },
+                { tier: 3, min: 18, max: 47, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 5, max: 17, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -1818,40 +1840,40 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 50, max2: 70, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 30, max2: 49, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 15, max2: 29, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 60, max2: 84, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 36, max2: 59, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 18, max2: 35, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 50, max2: 70, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 30, max2: 49, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 15, max2: 29, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 60, max2: 84, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 36, max2: 59, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 18, max2: 35, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 35, max2: 55, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 20, max2: 34, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 4, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 42, max2: 66, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 24, max2: 41, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 5, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 28, max2: 42, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 17, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 8, max2: 16, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 3, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 34, max2: 50, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 20, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 10, max2: 19, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 4, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -1861,30 +1883,30 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'hybrid_evasion_armour',
             label: '+# to Evasion\n+@ to Armour', labelDe: '+# zu Ausweichen\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 50, max1: 75, min2: 35, max2: 55, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 30, max1: 49, min2: 20, max2: 34, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 15, max1: 29, min2: 10, max2: 19, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 5, max1: 14, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 60, max1: 90, min2: 42, max2: 66, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 36, max1: 59, min2: 24, max2: 41, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 18, max1: 35, min2: 12, max2: 23, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 6, max1: 17, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 50, max1: 75, min2: 28, max2: 42, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 30, max1: 49, min2: 17, max2: 27, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 15, max1: 29, min2: 8, max2: 16, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 5, max1: 14, min2: 3, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 60, max1: 90, min2: 34, max2: 50, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 36, max1: 59, min2: 20, max2: 32, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 18, max1: 35, min2: 10, max2: 19, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 6, max1: 17, min2: 4, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 35, max1: 55, min2: 28, max2: 42, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 20, max1: 34, min2: 17, max2: 27, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 19, min2: 8, max2: 16, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 3, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 66, min2: 34, max2: 50, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 24, max1: 41, min2: 20, max2: 32, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 23, min2: 10, max2: 19, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -1893,9 +1915,9 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -1930,19 +1952,19 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -2119,16 +2141,16 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -2136,9 +2158,19 @@ const EG_MOD_TABLE_CLOAK = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
+            ]
+        },
+
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
 }
@@ -2211,60 +2243,60 @@ const EG_MOD_TABLE_CHEST = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 160, max: 220, weight: 150, ilvl: 82 },
-                { tier: 2, min: 100, max: 159, weight: 300, ilvl: 60 },
-                { tier: 3, min: 50, max: 99, weight: 600, ilvl: 30 },
-                { tier: 4, min: 12, max: 49, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 192, max: 264, weight: 262, ilvl: 82 },
+                { tier: 2, min: 120, max: 191, weight: 525, ilvl: 60 },
+                { tier: 3, min: 60, max: 119, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 14, max: 59, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 90, max: 120, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 89, weight: 300, ilvl: 60 },
-                { tier: 3, min: 30, max: 59, weight: 600, ilvl: 20 },
-                { tier: 4, min: 8, max: 29, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 108, max: 144, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 107, weight: 525, ilvl: 60 },
+                { tier: 3, min: 36, max: 71, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 10, max: 35, weight: 2100, ilvl: 1 }
             ]
         },
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 160, max: 220, weight: 150, ilvl: 82 },
-                { tier: 2, min: 100, max: 159, weight: 300, ilvl: 60 },
-                { tier: 3, min: 50, max: 99, weight: 600, ilvl: 30 },
-                { tier: 4, min: 12, max: 49, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 192, max: 264, weight: 262, ilvl: 82 },
+                { tier: 2, min: 120, max: 191, weight: 525, ilvl: 60 },
+                { tier: 3, min: 60, max: 119, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 14, max: 59, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 90, max: 120, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 89, weight: 300, ilvl: 60 },
-                { tier: 3, min: 30, max: 59, weight: 600, ilvl: 20 },
-                { tier: 4, min: 8, max: 29, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 108, max: 144, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 107, weight: 525, ilvl: 60 },
+                { tier: 3, min: 36, max: 71, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 10, max: 35, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 130, max: 180, weight: 150, ilvl: 82 },
-                { tier: 2, min: 80, max: 129, weight: 300, ilvl: 60 },
-                { tier: 3, min: 40, max: 79, weight: 600, ilvl: 30 },
-                { tier: 4, min: 10, max: 39, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 156, max: 216, weight: 262, ilvl: 82 },
+                { tier: 2, min: 96, max: 155, weight: 525, ilvl: 60 },
+                { tier: 3, min: 48, max: 95, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 12, max: 47, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 90, max: 120, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 89, weight: 300, ilvl: 60 },
-                { tier: 3, min: 30, max: 59, weight: 600, ilvl: 20 },
-                { tier: 4, min: 8, max: 29, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 108, max: 144, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 107, weight: 525, ilvl: 60 },
+                { tier: 3, min: 36, max: 71, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 10, max: 35, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -2274,60 +2306,60 @@ const EG_MOD_TABLE_CHEST = {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 50, max1: 65, min2: 65, max2: 90, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 35, max1: 49, min2: 40, max2: 64, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 20, max1: 34, min2: 20, max2: 39, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 8, max1: 19, min2: 8, max2: 19, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 60, max1: 78, min2: 78, max2: 108, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 42, max1: 59, min2: 48, max2: 77, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 24, max1: 41, min2: 24, max2: 47, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 10, max1: 23, min2: 10, max2: 23, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 36, max1: 48, min2: 65, max2: 90, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 24, max1: 35, min2: 40, max2: 64, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 14, max1: 23, min2: 20, max2: 39, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 13, min2: 8, max2: 19, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 43, max1: 58, min2: 78, max2: 108, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 29, max1: 42, min2: 48, max2: 77, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 17, max1: 28, min2: 24, max2: 47, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 16, min2: 10, max2: 23, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 50, max1: 65, min2: 65, max2: 90, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 35, max1: 49, min2: 40, max2: 64, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 20, max1: 34, min2: 20, max2: 39, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 8, max1: 19, min2: 8, max2: 19, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 60, max1: 78, min2: 78, max2: 108, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 42, max1: 59, min2: 48, max2: 77, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 24, max1: 41, min2: 24, max2: 47, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 10, max1: 23, min2: 10, max2: 23, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 36, max1: 48, min2: 65, max2: 90, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 24, max1: 35, min2: 40, max2: 64, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 14, max1: 23, min2: 20, max2: 39, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 13, min2: 8, max2: 19, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 43, max1: 58, min2: 78, max2: 108, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 29, max1: 42, min2: 48, max2: 77, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 17, max1: 28, min2: 24, max2: 47, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 16, min2: 10, max2: 23, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 50, max1: 65, min2: 50, max2: 72, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 35, max1: 49, min2: 32, max2: 49, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 20, max1: 34, min2: 16, max2: 31, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 8, max1: 19, min2: 6, max2: 15, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 60, max1: 78, min2: 60, max2: 86, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 42, max1: 59, min2: 38, max2: 59, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 24, max1: 41, min2: 19, max2: 37, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 10, max1: 23, min2: 7, max2: 18, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 36, max1: 48, min2: 50, max2: 72, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 24, max1: 35, min2: 32, max2: 49, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 14, max1: 23, min2: 16, max2: 31, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 13, min2: 6, max2: 15, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 43, max1: 58, min2: 60, max2: 86, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 29, max1: 42, min2: 38, max2: 59, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 17, max1: 28, min2: 19, max2: 37, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 16, min2: 7, max2: 18, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -2336,30 +2368,30 @@ const EG_MOD_TABLE_CHEST = {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 70, max1: 100, min2: 70, max2: 100, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 42, max1: 69, min2: 42, max2: 69, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 20, max1: 41, min2: 20, max2: 41, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 6, max1: 19, min2: 6, max2: 19, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 84, max1: 120, min2: 84, max2: 120, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 50, max1: 83, min2: 50, max2: 83, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 24, max1: 49, min2: 24, max2: 49, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 7, max1: 23, min2: 7, max2: 23, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 70, max1: 100, min2: 55, max2: 80, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 42, max1: 69, min2: 34, max2: 54, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 20, max1: 41, min2: 16, max2: 33, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 6, max1: 19, min2: 5, max2: 15, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 84, max1: 120, min2: 66, max2: 96, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 50, max1: 83, min2: 41, max2: 65, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 24, max1: 49, min2: 19, max2: 40, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 7, max1: 23, min2: 6, max2: 18, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 70, max1: 100, min2: 55, max2: 80, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 42, max1: 69, min2: 34, max2: 54, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 20, max1: 41, min2: 16, max2: 33, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 6, max1: 19, min2: 5, max2: 15, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 84, max1: 120, min2: 66, max2: 96, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 50, max1: 83, min2: 41, max2: 65, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 24, max1: 49, min2: 19, max2: 40, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 7, max1: 23, min2: 6, max2: 18, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -2368,9 +2400,9 @@ const EG_MOD_TABLE_CHEST = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -2422,19 +2454,19 @@ const EG_MOD_TABLE_CHEST = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -2675,16 +2707,16 @@ const EG_MOD_TABLE_CHEST = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -2692,9 +2724,38 @@ const EG_MOD_TABLE_CHEST = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
+            ]
+        },
+
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
+            ]
+        },
+        deflect: {
+            id: 'deflect',
+            label: '#% Chance to Deflect Projectiles on Parry', labelDe: '#% Chance, Projektile bei Parade umzulenken',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 4, max: 7, weight: 250, ilvl: 45 },
+                { tier: 3, min: 1, max: 3, weight: 550, ilvl: 10 }
+            ]
+        },
+        deflect_damage: {
+            id: 'deflect_damage',
+            label: '#% increased Damage of Deflected Projectiles', labelDe: '#% erhöhter Schaden umgelenkter Projektile',
+            tiers: [
+                { tier: 1, min: 21, max: 30, weight: 80, ilvl: 82 },
+                { tier: 2, min: 12, max: 20, weight: 200, ilvl: 58 },
+                { tier: 3, min: 5, max: 11, weight: 500, ilvl: 30 },
+                { tier: 4, min: 2, max: 4, weight: 1000, ilvl: 10 }
             ]
         },
 }
@@ -2747,60 +2808,60 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 102, max: 150, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 101, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 102, max: 150, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 101, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 18, max: 41, weight: 600, ilvl: 30 },
-                { tier: 4, min: 4, max: 17, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 50, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 22, max: 49, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 5, max: 20, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -2809,60 +2870,60 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 32, max1: 42, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 31, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 38, max1: 50, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 37, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 32, max1: 42, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 31, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 38, max1: 50, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 37, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 32, max1: 42, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 31, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 38, max1: 50, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 37, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 22, max1: 30, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 21, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 7, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 26, max1: 36, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 25, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 8, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 22, max1: 30, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 21, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 7, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 26, max1: 36, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 25, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 8, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 22, max1: 30, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 21, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 7, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 26, max1: 36, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 25, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 8, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -2871,30 +2932,30 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 42, max2: 65, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 24, max2: 41, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 10, max2: 23, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 50, max2: 78, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 29, max2: 49, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 12, max2: 28, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 8, max2: 17, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 38, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 22, max2: 37, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 10, max2: 20, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 8, max2: 17, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 38, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 22, max2: 37, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 10, max2: 20, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -2955,9 +3016,9 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -2965,19 +3026,19 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -3154,16 +3215,16 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -3171,9 +3232,38 @@ const EG_MOD_TABLE_BRACERS = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
+            ]
+        },
+
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
+            ]
+        },
+        deflect: {
+            id: 'deflect',
+            label: '#% Chance to Deflect Projectiles on Parry', labelDe: '#% Chance, Projektile bei Parade umzulenken',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 4, max: 7, weight: 250, ilvl: 45 },
+                { tier: 3, min: 1, max: 3, weight: 550, ilvl: 10 }
+            ]
+        },
+        deflect_damage: {
+            id: 'deflect_damage',
+            label: '#% increased Damage of Deflected Projectiles', labelDe: '#% erhöhter Schaden umgelenkter Projektile',
+            tiers: [
+                { tier: 1, min: 21, max: 30, weight: 80, ilvl: 82 },
+                { tier: 2, min: 12, max: 20, weight: 200, ilvl: 58 },
+                { tier: 3, min: 5, max: 11, weight: 500, ilvl: 30 },
+                { tier: 4, min: 2, max: 4, weight: 1000, ilvl: 10 }
             ]
         },
 }
@@ -3245,60 +3335,60 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 102, max: 150, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 101, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 102, max: 150, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 101, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 18, max: 41, weight: 600, ilvl: 30 },
-                { tier: 4, min: 4, max: 17, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 50, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 22, max: 49, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 5, max: 20, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -3307,60 +3397,60 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 32, max1: 42, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 31, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 38, max1: 50, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 37, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 32, max1: 42, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 31, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 38, max1: 50, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 37, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 32, max1: 42, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 31, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 38, max1: 50, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 37, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 22, max1: 30, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 21, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 7, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 26, max1: 36, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 25, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 8, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 22, max1: 30, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 21, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 7, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 26, max1: 36, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 25, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 8, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 22, max1: 30, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 21, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 7, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 26, max1: 36, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 25, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 8, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -3369,30 +3459,30 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 42, max2: 65, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 24, max2: 41, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 10, max2: 23, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 50, max2: 78, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 29, max2: 49, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 12, max2: 28, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 8, max2: 17, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 38, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 22, max2: 37, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 10, max2: 20, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 8, max2: 17, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 38, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 22, max2: 37, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 10, max2: 20, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -3435,9 +3525,9 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -3450,10 +3540,10 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 
@@ -3461,9 +3551,9 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
 },
@@ -3636,9 +3726,9 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -3647,19 +3737,48 @@ const EG_MOD_TABLE_GLOVES = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
-        }
-    }
+        },
+    
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
+            ]
+        },
+        deflect: {
+            id: 'deflect',
+            label: '#% Chance to Deflect Projectiles on Parry', labelDe: '#% Chance, Projektile bei Parade umzulenken',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 4, max: 7, weight: 250, ilvl: 45 },
+                { tier: 3, min: 1, max: 3, weight: 550, ilvl: 10 }
+            ]
+        },
+        deflect_damage: {
+            id: 'deflect_damage',
+            label: '#% increased Damage of Deflected Projectiles', labelDe: '#% erhöhter Schaden umgelenkter Projektile',
+            tiers: [
+                { tier: 1, min: 21, max: 30, weight: 80, ilvl: 82 },
+                { tier: 2, min: 12, max: 20, weight: 200, ilvl: 58 },
+                { tier: 3, min: 5, max: 11, weight: 500, ilvl: 30 },
+                { tier: 4, min: 2, max: 4, weight: 1000, ilvl: 10 }
+            ]
+        },
+}
 };
 
 
@@ -3770,60 +3889,60 @@ const EG_MOD_TABLE_BELT = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 102, max: 150, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 101, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 102, max: 150, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 101, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 18, max: 41, weight: 600, ilvl: 30 },
-                { tier: 4, min: 4, max: 17, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 50, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 22, max: 49, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 5, max: 20, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -3832,60 +3951,60 @@ const EG_MOD_TABLE_BELT = {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 40, max1: 52, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 28, max1: 39, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 16, max1: 27, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 15, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 62, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 34, max1: 47, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 19, max1: 32, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 18, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 40, max1: 52, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 28, max1: 39, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 16, max1: 27, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 15, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 62, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 34, max1: 47, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 19, max1: 32, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 18, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 40, max1: 52, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 28, max1: 39, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 16, max1: 27, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 15, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 62, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 34, max1: 47, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 19, max1: 32, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 18, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 28, max1: 38, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 27, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 9, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 34, max1: 46, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 32, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 28, max1: 38, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 27, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 9, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 34, max1: 46, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 32, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 28, max1: 38, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 27, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 34, max1: 46, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 32, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -3894,30 +4013,30 @@ const EG_MOD_TABLE_BELT = {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 42, max2: 65, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 24, max2: 41, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 10, max2: 23, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 50, max2: 78, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 29, max2: 49, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 12, max2: 28, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 8, max2: 17, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 38, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 22, max2: 37, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 10, max2: 20, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 42, max1: 65, min2: 32, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 24, max1: 41, min2: 18, max2: 31, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 23, min2: 8, max2: 17, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 50, max1: 78, min2: 38, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 29, max1: 49, min2: 22, max2: 37, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 28, min2: 10, max2: 20, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -3926,9 +4045,9 @@ const EG_MOD_TABLE_BELT = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -3936,19 +4055,19 @@ const EG_MOD_TABLE_BELT = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -4085,16 +4204,16 @@ const EG_MOD_TABLE_BELT = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -4102,9 +4221,19 @@ const EG_MOD_TABLE_BELT = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
+            ]
+        },
+
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
 }
@@ -4193,60 +4322,60 @@ const EG_MOD_TABLE_PANTS = {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 100, max: 145, weight: 150, ilvl: 82 },
-                { tier: 2, min: 62, max: 99, weight: 300, ilvl: 60 },
-                { tier: 3, min: 28, max: 61, weight: 600, ilvl: 30 },
-                { tier: 4, min: 6, max: 27, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 120, max: 174, weight: 262, ilvl: 82 },
+                { tier: 2, min: 74, max: 119, weight: 525, ilvl: 60 },
+                { tier: 3, min: 34, max: 73, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 7, max: 32, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 75, max: 95, weight: 150, ilvl: 82 },
-                { tier: 2, min: 48, max: 74, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 47, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 90, max: 114, weight: 262, ilvl: 82 },
+                { tier: 2, min: 58, max: 89, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 56, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         flat_armour: {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 102, max: 150, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 101, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 18, max: 41, weight: 600, ilvl: 30 },
-                { tier: 4, min: 4, max: 17, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 50, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 22, max: 49, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 5, max: 20, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -4255,60 +4384,60 @@ const EG_MOD_TABLE_PANTS = {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 38, max1: 50, min2: 45, max2: 65, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 26, max1: 37, min2: 28, max2: 44, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 14, max1: 25, min2: 12, max2: 27, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 13, min2: 4, max2: 11, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 46, max1: 60, min2: 54, max2: 78, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 31, max1: 44, min2: 34, max2: 53, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 17, max1: 30, min2: 14, max2: 32, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 16, min2: 5, max2: 13, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 26, max1: 36, min2: 45, max2: 65, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 17, max1: 25, min2: 28, max2: 44, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 9, max1: 16, min2: 12, max2: 27, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 8, min2: 4, max2: 11, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 31, max1: 43, min2: 54, max2: 78, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 20, max1: 30, min2: 34, max2: 53, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 11, max1: 19, min2: 14, max2: 32, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 10, min2: 5, max2: 13, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_armour: {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 38, max1: 50, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 26, max1: 37, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 14, max1: 25, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 13, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 46, max1: 60, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 31, max1: 44, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 17, max1: 30, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 16, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 26, max1: 36, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 17, max1: 25, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 9, max1: 16, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 8, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 31, max1: 43, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 20, max1: 30, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 11, max1: 19, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 10, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 38, max1: 50, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 26, max1: 37, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 14, max1: 25, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 13, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 46, max1: 60, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 31, max1: 44, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 17, max1: 30, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 16, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 26, max1: 36, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 17, max1: 25, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 9, max1: 16, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 3, max1: 8, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 31, max1: 43, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 20, max1: 30, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 11, max1: 19, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 4, max1: 10, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -4318,30 +4447,30 @@ const EG_MOD_TABLE_PANTS = {
             id: 'hybrid_evasion_armour',
             label: '+# to Evasion\n+@ to Armour', labelDe: '+# zu Ausweichen\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 48, max1: 72, min2: 38, max2: 58, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 28, max1: 47, min2: 22, max2: 37, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 27, min2: 10, max2: 21, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 58, max1: 86, min2: 46, max2: 70, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 34, max1: 56, min2: 26, max2: 44, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 32, min2: 12, max2: 25, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 48, max1: 72, min2: 28, max2: 44, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 28, max1: 47, min2: 16, max2: 27, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 27, min2: 8, max2: 15, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 58, max1: 86, min2: 34, max2: 53, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 34, max1: 56, min2: 19, max2: 32, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 32, min2: 10, max2: 18, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 38, max1: 58, min2: 28, max2: 44, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 22, max1: 37, min2: 16, max2: 27, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 21, min2: 8, max2: 15, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 46, max1: 70, min2: 34, max2: 53, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 26, max1: 44, min2: 19, max2: 32, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 25, min2: 10, max2: 18, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -4350,9 +4479,9 @@ const EG_MOD_TABLE_PANTS = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -4378,19 +4507,19 @@ const EG_MOD_TABLE_PANTS = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -4565,16 +4694,16 @@ const EG_MOD_TABLE_PANTS = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -4582,9 +4711,28 @@ const EG_MOD_TABLE_PANTS = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
+            ]
+        },
+
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
+            ]
+        },
+        deflect: {
+            id: 'deflect',
+            label: '#% Chance to Deflect Projectiles on Parry', labelDe: '#% Chance, Projektile bei Parade umzulenken',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 4, max: 7, weight: 250, ilvl: 45 },
+                { tier: 3, min: 1, max: 3, weight: 550, ilvl: 10 }
             ]
         },
 }
@@ -4674,60 +4822,60 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 95, max: 138, weight: 150, ilvl: 82 },
-                { tier: 2, min: 58, max: 94, weight: 300, ilvl: 60 },
-                { tier: 3, min: 26, max: 57, weight: 600, ilvl: 30 },
-                { tier: 4, min: 6, max: 25, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 114, max: 166, weight: 262, ilvl: 82 },
+                { tier: 2, min: 70, max: 113, weight: 525, ilvl: 60 },
+                { tier: 3, min: 31, max: 68, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 7, max: 30, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 75, max: 95, weight: 150, ilvl: 82 },
-                { tier: 2, min: 48, max: 74, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 47, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 90, max: 114, weight: 262, ilvl: 82 },
+                { tier: 2, min: 58, max: 89, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 56, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 85, max: 125, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 84, weight: 300, ilvl: 60 },
-                { tier: 3, min: 22, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 21, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 102, max: 150, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 101, weight: 525, ilvl: 60 },
+                { tier: 3, min: 26, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 25, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 42, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 18, max: 41, weight: 600, ilvl: 30 },
-                { tier: 4, min: 4, max: 17, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 50, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 22, max: 49, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 5, max: 20, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 70, max: 90, weight: 150, ilvl: 82 },
-                { tier: 2, min: 45, max: 69, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 44, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 84, max: 108, weight: 262, ilvl: 82 },
+                { tier: 2, min: 54, max: 83, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 53, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -4737,60 +4885,60 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 34, max1: 45, min2: 42, max2: 62, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 33, min2: 24, max2: 41, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 11, max2: 23, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 10, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 41, max1: 54, min2: 50, max2: 74, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 40, min2: 29, max2: 49, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 13, max2: 28, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 12, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 23, max1: 32, min2: 42, max2: 62, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 22, min2: 24, max2: 41, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 11, max2: 23, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 2, max1: 7, min2: 3, max2: 10, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 28, max1: 38, min2: 50, max2: 74, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 26, min2: 29, max2: 49, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 13, max2: 28, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 2, max1: 8, min2: 4, max2: 12, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 34, max1: 45, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 33, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 41, max1: 54, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 40, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 23, max1: 32, min2: 38, max2: 58, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 22, min2: 22, max2: 37, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 10, max2: 21, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 2, max1: 7, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 28, max1: 38, min2: 46, max2: 70, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 26, min2: 26, max2: 44, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 12, max2: 25, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 2, max1: 8, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 34, max1: 45, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 22, max1: 33, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 12, max1: 21, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 41, max1: 54, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 26, max1: 40, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 14, max1: 25, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 13, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 23, max1: 32, min2: 28, max2: 44, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 15, max1: 22, min2: 16, max2: 27, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 8, max1: 14, min2: 8, max2: 15, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 2, max1: 7, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 28, max1: 38, min2: 34, max2: 53, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 18, max1: 26, min2: 19, max2: 32, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 10, max1: 17, min2: 10, max2: 18, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 2, max1: 8, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -4800,30 +4948,30 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 48, max1: 72, min2: 38, max2: 58, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 28, max1: 47, min2: 22, max2: 37, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 27, min2: 10, max2: 21, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 58, max1: 86, min2: 46, max2: 70, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 34, max1: 56, min2: 26, max2: 44, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 32, min2: 12, max2: 25, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 48, max1: 72, min2: 28, max2: 44, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 28, max1: 47, min2: 16, max2: 27, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 27, min2: 8, max2: 15, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 58, max1: 86, min2: 34, max2: 53, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 34, max1: 56, min2: 19, max2: 32, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 32, min2: 10, max2: 18, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 38, max1: 58, min2: 28, max2: 44, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 22, max1: 37, min2: 16, max2: 27, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 10, max1: 21, min2: 8, max2: 15, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 3, max1: 9, min2: 2, max2: 7, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 46, max1: 70, min2: 34, max2: 53, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 26, max1: 44, min2: 19, max2: 32, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 12, max1: 25, min2: 10, max2: 18, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 4, max1: 11, min2: 2, max2: 8, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -4832,9 +4980,9 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -4861,19 +5009,19 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -5022,16 +5170,16 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -5039,9 +5187,19 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
+            ]
+        },
+
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
 }
@@ -5185,9 +5343,9 @@ const EG_MOD_TABLE_RING = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 32, max: 42, weight: 350, ilvl: 78 },
-                { tier: 2, min: 20, max: 31, weight: 700, ilvl: 35 },
-                { tier: 3, min: 9, max: 19, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 32, max: 42, weight: 210, ilvl: 78 },
+                { tier: 2, min: 20, max: 31, weight: 420, ilvl: 35 },
+                { tier: 3, min: 9, max: 19, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -5214,19 +5372,19 @@ const EG_MOD_TABLE_RING = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -5375,16 +5533,16 @@ const EG_MOD_TABLE_RING = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
-                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 8, max: 12, weight: 300, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -5411,9 +5569,9 @@ const EG_MOD_TABLE_RING = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
             ]
         },
 }
@@ -5566,9 +5724,9 @@ const EG_MOD_TABLE_ARCANE = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 32, max: 42, weight: 350, ilvl: 78 },
-                { tier: 2, min: 20, max: 31, weight: 700, ilvl: 35 },
-                { tier: 3, min: 9, max: 19, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 32, max: 42, weight: 210, ilvl: 78 },
+                { tier: 2, min: 20, max: 31, weight: 420, ilvl: 35 },
+                { tier: 3, min: 9, max: 19, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -5613,19 +5771,19 @@ const EG_MOD_TABLE_ARCANE = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -5763,16 +5921,16 @@ const EG_MOD_TABLE_ARCANE = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
-                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 8, max: 12, weight: 300, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -5780,9 +5938,9 @@ const EG_MOD_TABLE_ARCANE = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
             ]
         },
 }
@@ -5908,18 +6066,18 @@ const EG_MOD_TABLE_TALISMAN = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 32, max: 42, weight: 350, ilvl: 78 },
-                { tier: 2, min: 20, max: 31, weight: 700, ilvl: 35 },
-                { tier: 3, min: 9, max: 19, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 32, max: 42, weight: 210, ilvl: 78 },
+                { tier: 2, min: 20, max: 31, weight: 420, ilvl: 35 },
+                { tier: 3, min: 9, max: 19, weight: 840, ilvl: 1 }
             ]
         },
         mistake_not_count: {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
 
@@ -5927,10 +6085,10 @@ const EG_MOD_TABLE_TALISMAN = {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -6077,16 +6235,16 @@ const EG_MOD_TABLE_TALISMAN = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 8, max: 12, weight: 500, ilvl: 65 },
-                { tier: 2, min: 3, max: 7, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 8, max: 12, weight: 300, ilvl: 65 },
+                { tier: 2, min: 3, max: 7, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -6094,9 +6252,9 @@ const EG_MOD_TABLE_TALISMAN = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
             ]
         },
 }
@@ -6515,60 +6673,60 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
             tiers: [
-                { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
-                { tier: 3, min: 25, max: 59, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 24, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 120, max: 180, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 119, weight: 525, ilvl: 60 },
+                { tier: 3, min: 30, max: 71, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 29, weight: 2100, ilvl: 1 }
             ]
         },
         inc_armour: {
             id: 'inc_armour',
             label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
             tiers: [
-                { tier: 1, min: 100, max: 150, weight: 150, ilvl: 82 },
-                { tier: 2, min: 60, max: 99, weight: 300, ilvl: 60 },
-                { tier: 3, min: 25, max: 59, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 24, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 120, max: 180, weight: 262, ilvl: 82 },
+                { tier: 2, min: 72, max: 119, weight: 525, ilvl: 60 },
+                { tier: 3, min: 30, max: 71, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 29, weight: 2100, ilvl: 1 }
             ]
         },
         inc_evasion: {
             id: 'inc_evasion',
             label: '#% increased Evasion', labelDe: '#% erhöhtes Ausweichen',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         flat_absorption: {
             id: 'flat_absorption',
             label: '+# to Absorption', labelDe: '+# zu Absorption',
             tiers: [
-                { tier: 1, min: 80, max: 110, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 30 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 132, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 30 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
         inc_absorption: {
             id: 'inc_absorption',
             label: '#% increased Absorption', labelDe: '#% erhöhte Absorption',
             tiers: [
-                { tier: 1, min: 80, max: 100, weight: 150, ilvl: 82 },
-                { tier: 2, min: 50, max: 79, weight: 300, ilvl: 60 },
-                { tier: 3, min: 20, max: 49, weight: 600, ilvl: 20 },
-                { tier: 4, min: 5, max: 19, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 96, max: 120, weight: 262, ilvl: 82 },
+                { tier: 2, min: 60, max: 95, weight: 525, ilvl: 60 },
+                { tier: 3, min: 24, max: 59, weight: 1050, ilvl: 20 },
+                { tier: 4, min: 6, max: 23, weight: 2100, ilvl: 1 }
             ]
         },
 
@@ -6577,60 +6735,60 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'hybrid_life_armour',
             label: '+# to Maximum Health\n+@ to Armour', labelDe: '+# zu maximalem Leben\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_evasion: {
             id: 'hybrid_life_evasion',
             label: '+# to Maximum Health\n+@ to Evasion', labelDe: '+# zu maximalem Leben\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_life_absorption: {
             id: 'hybrid_life_absorption',
             label: '+# to Maximum Health\n+@ to Absorption', labelDe: '+# zu maximalem Leben\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 35, max1: 45, min2: 30, max2: 45, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 25, max1: 34, min2: 20, max2: 29, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 15, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 5, max1: 14, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 42, max1: 54, min2: 36, max2: 54, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 30, max1: 41, min2: 24, max2: 35, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 18, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 6, max1: 17, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_armour: {
             id: 'hybrid_mana_armour',
             label: '+# to Maximum Mana\n+@ to Armour', labelDe: '+# zu maximalem Mana\n+@ zu Rüstung',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_evasion: {
             id: 'hybrid_mana_evasion',
             label: '+# to Maximum Mana\n+@ to Evasion', labelDe: '+# zu maximalem Mana\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 40, max2: 60, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 25, max2: 39, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 15, max2: 24, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 5, max2: 14, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 48, max2: 72, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 30, max2: 47, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 18, max2: 29, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 6, max2: 17, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_mana_absorption: {
             id: 'hybrid_mana_absorption',
             label: '+# to Maximum Mana\n+@ to Absorption', labelDe: '+# zu maximalem Mana\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 25, max1: 35, min2: 30, max2: 45, weight: 100, ilvl: 78 },
-                { tier: 2, min1: 18, max1: 24, min2: 20, max2: 29, weight: 250, ilvl: 50 },
-                { tier: 3, min1: 10, max1: 17, min2: 10, max2: 19, weight: 500, ilvl: 25 },
-                { tier: 4, min1: 4, max1: 9, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 30, max1: 42, min2: 36, max2: 54, weight: 170, ilvl: 78 },
+                { tier: 2, min1: 22, max1: 29, min2: 24, max2: 35, weight: 425, ilvl: 50 },
+                { tier: 3, min1: 12, max1: 20, min2: 12, max2: 23, weight: 850, ilvl: 25 },
+                { tier: 4, min1: 5, max1: 11, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -6639,30 +6797,30 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 40, max2: 65, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 25, max2: 39, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 12, max2: 24, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 4, max2: 11, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 48, max2: 78, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 30, max2: 47, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 14, max2: 29, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 5, max2: 13, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_armour_absorption: {
             id: 'hybrid_armour_absorption',
             label: '+# to Armour\n+@ to Absorption', labelDe: '+# zu Rüstung\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 36, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 24, max2: 35, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
         hybrid_evasion_absorption: {
             id: 'hybrid_evasion_absorption',
             label: '+# to Evasion\n+@ to Absorption', labelDe: '+# zu Ausweichen\n+@ zu Absorption',
             tiers: [
-                { tier: 1, min1: 40, max1: 65, min2: 30, max2: 50, weight: 120, ilvl: 80 },
-                { tier: 2, min1: 25, max1: 39, min2: 20, max2: 29, weight: 250, ilvl: 55 },
-                { tier: 3, min1: 12, max1: 24, min2: 10, max2: 19, weight: 500, ilvl: 30 },
-                { tier: 4, min1: 4, max1: 11, min2: 3, max2: 9, weight: 1000, ilvl: 1 }
+                { tier: 1, min1: 48, max1: 78, min2: 36, max2: 60, weight: 204, ilvl: 80 },
+                { tier: 2, min1: 30, max1: 47, min2: 24, max2: 35, weight: 425, ilvl: 55 },
+                { tier: 3, min1: 14, max1: 29, min2: 12, max2: 23, weight: 850, ilvl: 30 },
+                { tier: 4, min1: 5, max1: 13, min2: 4, max2: 11, weight: 1700, ilvl: 1 }
             ]
         },
 
@@ -6722,9 +6880,9 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'time_added',
             label: '+# Seconds to Map Timer', labelDe: '+# Sekunden zum Karten-Timer',
             tiers: [
-                { tier: 1, min: 45, max: 60, weight: 350, ilvl: 78 },
-                { tier: 2, min: 30, max: 44, weight: 700, ilvl: 35 },
-                { tier: 3, min: 15, max: 29, weight: 1400, ilvl: 1 }
+                { tier: 1, min: 45, max: 60, weight: 210, ilvl: 78 },
+                { tier: 2, min: 30, max: 44, weight: 420, ilvl: 35 },
+                { tier: 3, min: 15, max: 29, weight: 840, ilvl: 1 }
             ]
         },
 
@@ -6732,19 +6890,19 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
             tiers: [
-                { tier: 1, min: 12, max: 18, weight: 150, ilvl: 70 },
-                { tier: 2, min: 6, max: 11, weight: 400, ilvl: 40 },
-                { tier: 3, min: 2, max: 5, weight: 1000, ilvl: 1 }
+                { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
         chance_for_new_question: {
             id: 'chance_for_new_question',
             label: '#% Chance to receive a new Question after failing one', labelDe: '#% Chance, nach einer falschen Antwort eine neue Frage zu erhalten',
             tiers: [
-                { tier: 1, min: 30, max: 40, weight: 250, ilvl: 70 },
-                { tier: 2, min: 18, max: 29, weight: 500, ilvl: 40 },
-                { tier: 3, min: 8, max: 17, weight: 900, ilvl: 15 },
-                { tier: 4, min: 2, max: 7, weight: 1800, ilvl: 1 }
+                { tier: 1, min: 30, max: 40, weight: 150, ilvl: 70 },
+                { tier: 2, min: 18, max: 29, weight: 300, ilvl: 40 },
+                { tier: 3, min: 8, max: 17, weight: 540, ilvl: 15 },
+                { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
 },
@@ -6966,16 +7124,16 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'mistake_count',
             label: '+# to Allowed Mistake Count', labelDe: '+# zur erlaubten Fehleranzahl',
             tiers: [
-                { tier: 1, min: 2, max: 2, weight: 400, ilvl: 65 },
-                { tier: 2, min: 1, max: 1, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 2, max: 2, weight: 240, ilvl: 65 },
+                { tier: 2, min: 1, max: 1, weight: 720, ilvl: 1 }
             ]
         },
         focus: {
             id: 'focus',
             label: 'Mistakes consume #% less Time', labelDe: 'Fehler verbrauchen #% weniger Zeit',
             tiers: [
-                { tier: 1, min: 10, max: 15, weight: 500, ilvl: 65 },
-                { tier: 2, min: 5, max: 9, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 10, max: 15, weight: 300, ilvl: 65 },
+                { tier: 2, min: 5, max: 9, weight: 720, ilvl: 1 }
             ]
         },
 
@@ -6983,9 +7141,9 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'reveal_hint',
             label: '#% Chance to reveal a Hint on Exercise Questions', labelDe: '#% Chance, bei Übungsaufgaben einen Hinweis aufzudecken',
             tiers: [
-                { tier: 1, min: 25, max: 35, weight: 200, ilvl: 70 },
-                { tier: 2, min: 14, max: 24, weight: 500, ilvl: 40 },
-                { tier: 3, min: 5, max: 13, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
+                { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
+                { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
             ]
         },
 }
@@ -7007,7 +7165,36 @@ const EG_MOD_TABLE_SHIELD = (() => {
             Object.entries(EG_MOD_TABLE_WEAPON2.prefixes)
                 .filter(([id]) => !offensivePrefixIds.includes(id))
         ),
-        suffixes: { ...EG_MOD_TABLE_WEAPON2.suffixes },
+        suffixes: { ...EG_MOD_TABLE_WEAPON2.suffixes,
+        parry: {
+            id: 'parry',
+            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            tiers: [
+                { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+                { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+                { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
+            ]
+        },
+        deflect: {
+            id: 'deflect',
+            label: '#% Chance to Deflect Projectiles on Parry', labelDe: '#% Chance, Projektile bei Parade umzulenken',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 4, max: 7, weight: 250, ilvl: 45 },
+                { tier: 3, min: 1, max: 3, weight: 550, ilvl: 10 }
+            ]
+        },
+        deflect_damage: {
+            id: 'deflect_damage',
+            label: '#% increased Damage of Deflected Projectiles', labelDe: '#% erhöhter Schaden umgelenkter Projektile',
+            tiers: [
+                { tier: 1, min: 21, max: 30, weight: 80, ilvl: 82 },
+                { tier: 2, min: 12, max: 20, weight: 200, ilvl: 58 },
+                { tier: 3, min: 5, max: 11, weight: 500, ilvl: 30 },
+                { tier: 4, min: 2, max: 4, weight: 1000, ilvl: 10 }
+            ]
+        },
+},
     };
 })();
 

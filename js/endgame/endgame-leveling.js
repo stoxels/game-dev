@@ -305,6 +305,14 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
 
         _egPlayLevelUpEffect(_egGetPlayerLevel());
         _egPlayLevelUpReward();
+        // Absorption shield: fully replenish even when not in an active encounter
+        // (_egPlayLevelUpReward already handles the active case and early-returns otherwise).
+        if ((typeof _egIsActive !== 'function' || !_egIsActive())
+            && typeof _egComputePlayerStats === 'function'
+            && typeof _egPlayerAbsorptionCurrent !== 'undefined') {
+            _egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption || 0;
+            if (typeof _egCancelAbsorptionRegen === 'function') _egCancelAbsorptionRegen();
+        }
         if (typeof showToast === 'function') {
             showToast(t('eg_lvl_levelup_toast').replace('{n}', _egGetPlayerLevel()), '#f5b642');
         }
@@ -320,7 +328,7 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
 //------------------------------------------------------------------------
 
 // Instant reward for levelling up during an active endgame encounter:
-//   - Life and mana are completely refilled.
+//   - Life, mana and the absorption shield are completely refilled.
 //   - 3 waves of projectiles (0.5 s apart) launch at EVERY monster on
 //     screen, each hitting with correct-reveal projectile damage.
 const EG_LEVELUP_REWARD_WAVES = 3;
@@ -329,12 +337,19 @@ const EG_LEVELUP_REWARD_WAVE_DELAY_MS = 500;
 function _egPlayLevelUpReward() {
     if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
 
-    // Full life & mana restore (after the +max bonuses were applied).
+    // Full life, mana & absorption shield restore (after the +max bonuses were applied).
     if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
         playerCurrentHP = playerMaxHP;
         if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
     }
     if (typeof _resetPlayerMana === 'function') _resetPlayerMana();
+    // Fully replenish the absorption shield
+    if (typeof _egComputePlayerStats === 'function' && typeof _egPlayerAbsorptionCurrent !== 'undefined') {
+        const maxAbs = _egComputePlayerStats().absorption || 0;
+        _egPlayerAbsorptionCurrent = maxAbs;
+        if (typeof _egCancelAbsorptionRegen === 'function') _egCancelAbsorptionRegen();
+        if (typeof _renderPlayerAvatar === 'function') try { _renderPlayerAvatar(); } catch (e) {}
+    }
 
     // Snapshot the monsters on screen now; each wave skips ones that died
     // in the meantime. Damage matches a correct-reveal projectile hit.

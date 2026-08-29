@@ -115,8 +115,9 @@ const EG_CURRENCY_SLOT_MAP = {
     'orb_elevation':     { r: 2, c: 2 },
     'orb_cataclysm':     { r: 2, c: 3 },
     'orb_horizons':      { r: 2, c: 4 },
-    // Row 3 — mirror + ancient orb
+    // Row 3 — mirror + ancient orb + blessing
     'orb_ancient':       { r: 3, c: 0 },
+    'orb_blessing':      { r: 3, c: 1 },
     'mirror_of_kalandra':{ r: 3, c: 2 },
     // Row 4-5 — shards (bottom section)
     'shard_transmutation':{ r: 4, c: 0 },
@@ -327,9 +328,10 @@ function _egBuildItemChipHTML(item, size = 'normal') {
     // Items whose stat requirements cannot currently be met get a red flag
     // (see _egIsItemBlocked in endgame-requirements.js).
     const blockedClass = _egIsItemBlocked(item) ? 'eg-req-blocked' : '';
-    // Equipment items show their item level in the top-left corner of the slot.
-    const ilvlBadge = (item.category === 'equip' && item.itemLevel != null)
-        ? `<span class="eg-item-ilvl">${item.itemLevel}</span>`
+    // Equipment items show their required character level in the top-left corner of the slot.
+    const reqLevel = (item.requirements && item.requirements.level != null) ? item.requirements.level : item.itemLevel;
+    const ilvlBadge = (item.category === 'equip' && reqLevel != null)
+        ? `<span class="eg-item-ilvl">${reqLevel}</span>`
         : '';
     // Map items show their map tier instead.
     const mapTierBadge = (item.category === 'map' && item.mapTier != null)
@@ -698,6 +700,7 @@ function _egBuildHubInfoTooltipHTML() {
         ${line('eg_hub_info_sell')}
         ${line('eg_hub_info_mass_sell')}
         ${line('eg_hub_info_currency')}
+        ${line('eg_hub_info_blessing')}
         ${line('eg_hub_info_essence')}
         ${line('eg_hub_info_destroy')}
     </div>
@@ -1173,6 +1176,26 @@ function _egBuildTooltipBodyHTML(item) {
         ? `<div class="eg-tt-section">${implicitLines.join('')}</div>`
         : '';
 
+    // ── Implicit modifiers (PoE-style base implicits) ────────────────
+    // Each equipment base has 1 (sometimes 2) beneficial implicits scaled
+    // by required level. Rendered in its own blue section with an "Implicit"
+    // tag and a separator line above explicit mods, matching PoE layout.
+    let implicitsHTML = '';
+    const implicits = Array.isArray(item.implicits) ? item.implicits : [];
+    if (implicits.length > 0) {
+        const merged = (typeof _egBuildMergedModLines === 'function')
+            ? _egBuildMergedModLines(implicits)
+            : implicits.flatMap(imp => (imp.rolledStats||[]).map(s => ({ label: s.label, downside:false, tierLabel:'Implicit' })));
+        const lines = merged.map(entry => {
+            // Implicits are always beneficial — render in PoE implicit blue
+            const tierSpan = `<span class="eg-tt-mod-tier eg-tt-mod-tier-implicit">${t('eg_tt_implicit')}</span>`;
+            return `<div class="eg-tt-mod eg-tt-mod-implicit"><span class="eg-tt-mod-label">${entry.label}</span>${tierSpan}</div>`;
+        });
+        if (lines.length) {
+            implicitsHTML = `<div class="eg-tt-section eg-tt-implicits-section"><div class="eg-tt-group-title" style="color:#88c0ff; font-size:0.7rem; letter-spacing:0.08em; margin-bottom:4px;">${t('eg_tt_implicits_title')}</div>${lines.join('')}</div>`;
+        }
+    }
+
 
     // ── Requirements ─────────────────────────────────────────────────
     // Each requirement part is compared against the attribute totals as the
@@ -1268,6 +1291,7 @@ function _egBuildTooltipBodyHTML(item) {
         <div class="eg-tt-rarity-line" style="color:${rc.color};">${rarityLabel} ${slotLabel}</div>
     </div>
     ${implicitHTML}
+    ${implicitsHTML}
     ${reqHTML}
     ${chainHTML}
     ${modsHTML}
@@ -1713,6 +1737,23 @@ function _egLoadHubState() {
     }
     // Mass-sell filter — load (or default-initialise) from the persisted save.
     _egLoadMassSellSettings();
+
+    // Heal legacy equipment items that were saved before implicits existed.
+    try {
+        if (typeof _egHealItemImplicits === 'function') {
+            if (Array.isArray(_egInventory)) {
+                for (let r = 0; r < _egInventory.length; r++) {
+                    for (let c = 0; c < EG_INV_COLS; c++) {
+                        const it = _egInventory[r][c];
+                        if (it && it.category === 'equip' && !it.isUnique) _egHealItemImplicits(it);
+                    }
+                }
+            }
+            if (typeof _egEquipped === 'object' && _egEquipped) {
+                Object.values(_egEquipped).forEach(it => { if (it && !it.isUnique) _egHealItemImplicits(it); });
+            }
+        }
+    } catch (e) { /* ignore */ }
 }
 
 // Call this immideatly so the player does NOT have to open the hub first to re-load his item state.

@@ -66,6 +66,11 @@ const EG_MONSTER_PROJ_DURATION_MS = 400;
 // blocking. Reduced by the blockRecoveryPct stat.
 const EG_BLOCK_LOCKOUT_BASE_MS = 8000;
 
+// Hold-E parry baseline values (gear adds on top via parry/deflect mods)
+const EG_PARRY_BASE_PCT = 50;          // 50% baseline while holding E
+const EG_DEFLECT_BASE_PCT = 5;         // 5% chance on a successful parry to deflect
+const EG_DEFLECT_BASE_DMG_PCT = 30;    // deflected projectile deals 30% of monster's damage
+
 // Timestamp (Date.now()) until which the player cannot block again due to
 // a recent block. 0 when not locked out.
 let _egPlayerBlockLockoutUntil = 0;
@@ -579,8 +584,9 @@ function _egSetHoldEPauseVisual(isPaused) {
                 lbl.id = 'eg-hold-pause-label';
                 hud.appendChild(lbl);
             }
-            const txt = (typeof t === 'function') ? t('eg_hold_paused') : 'FOCUSED';
-            lbl.textContent = txt || 'FOCUSED';
+            const raw = (typeof t === 'function') ? (t('eg_hold_paused') || t('eg_parrying')) : '';
+            const txt = raw && raw !== 'eg_hold_paused' && raw !== 'eg_parrying' ? raw : 'PARRYING';
+            lbl.textContent = txt || 'PARRYING';
             lbl.style.display = '';
         } else if (lbl) {
             lbl.remove();
@@ -966,7 +972,7 @@ function _egAnimateMonsterProjectile(monster) {
         const monsterCritMult = (typeof _egRollMonsterCritMult === 'function' ? _egRollMonsterCritMult(monster) : 1);
         const isMonsterCrit = monsterCritMult > 1;
         const critDmg = monster.damageValue * monsterCritMult;
-        const dealt = _egPlayerTakeDamage(critDmg, false, monster.element, monster.level);
+        const dealt = _egPlayerTakeDamage(critDmg, false, monster.element, monster.level, { attacker: monster, isProjectile: true });
         if (dealt > 0) {
             _egApplyPlayerHitFeedback(dealt, isMonsterCrit, monster.element);
             if (typeof _egApplyMonsterHitMods === 'function') _egApplyMonsterHitMods(monster);
@@ -1001,7 +1007,7 @@ function _egApplyMeleeImpact(monster) {
     const isMeleeCrit = meleeCritMult > 1;
     chargeDamage *= meleeCritMult;
 
-    const dealt = _egPlayerTakeDamage(chargeDamage, false, monster.element, monster.level);
+    const dealt = _egPlayerTakeDamage(chargeDamage, false, monster.element, monster.level, { attacker: monster, isProjectile: false });
     if (dealt > 0) {
         _egApplyPlayerHitFeedback(dealt, isMeleeCrit, monster.element);
         if (typeof _egApplyMonsterHitMods === 'function') _egApplyMonsterHitMods(monster);
@@ -1234,6 +1240,92 @@ function _egApplyGroundedReduction(rawDamage) {
     return rawDamage * (1 - reduction / 100);
 }
 
+// ── Hold-E Parry & Deflect ─────────────────────────────────────────────
+// While holding E the player pauses their own charge bar and can parry
+// incoming monster projectile and charge (melee) attacks. Hazards and boss
+// spells (isSpell=true) are never parryable. Baseline 50% + gear parry.
+// On a successful projectile parry there is a 5% + gear deflect chance to
+// redirect the shot to another monster for 30% + gear deflect damage.
+function _egApplyPlayerParryFeedback() {
+    const hud = document.getElementById('player-avatar-wrapper');
+    if (!hud) return;
+    const label = document.createElement('div');
+    label.className = 'eg-player-damage eg-player-miss';
+    const txt = (typeof t === 'function') ? t('eg_parried') : 'Parried!';
+    label.textContent = (txt && txt !== 'eg_parried') ? txt : 'Parried!';
+    hud.appendChild(label);
+    setTimeout(() => label.remove(), 1050);
+}
+function _egApplyPlayerDeflectFeedback() {
+    const hud = document.getElementById('player-avatar-wrapper');
+    if (!hud) return;
+    const label = document.createElement('div');
+    label.className = 'eg-player-damage eg-player-miss';
+    const txt = (typeof t === 'function') ? t('eg_deflected') : 'Deflected!';
+    label.textContent = (txt && txt !== 'eg_deflected') ? txt : 'Deflected!';
+    hud.appendChild(label);
+    setTimeout(() => label.remove(), 1050);
+}
+function _egGetParryChancePct() {
+    const base = (typeof EG_PARRY_BASE_PCT !== 'undefined' ? EG_PARRY_BASE_PCT : 50);
+    const gear = (_egComputePlayerStats().parryChancePct || 0);
+    return base + gear;
+}
+function _egGetDeflectChancePct() {
+    const base = (typeof EG_DEFLECT_BASE_PCT !== 'undefined' ? EG_DEFLECT_BASE_PCT : 5);
+    const gear = (_egComputePlayerStats().deflectChancePct || 0);
+    return base + gear;
+}
+function _egGetDeflectDamagePct() {
+    const base = (typeof EG_DEFLECT_BASE_DMG_PCT !== 'undefined' ? EG_DEFLECT_BASE_DMG_PCT : 30);
+    const gear = (_egComputePlayerStats().deflectDamagePct || 0);
+    return base + gear;
+}
+function _egRollParry(attacker, isProjectile) {
+    // Only while holding E during an active encounter
+    if (!(typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive)) return false;
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return false;
+    // Hazards and boss spells are not parryable — they flow through isSpell=true,
+    // but we also guard here for callers that bypass takeDamage.
+    const chance = _egGetParryChancePct();
+    if (chance <= 0) return false;
+    if (Math.random() * 100 >= chance) return false;
+    showToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
+    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_dodge_attack');
+    _egApplyPlayerParryFeedback();
+    _egScheduleAbsorptionRegen();
+    return true;
+}
+function _egTryDeflectProjectile(attacker, isProjectile) {
+    if (!isProjectile) return false;
+    if (!attacker) return false;
+    const others = _egMonsters.filter(m => m.id !== attacker.id && m.currentHP > 0);
+    if (others.length === 0) return false;
+    const chance = _egGetDeflectChancePct();
+    if (chance <= 0 || Math.random() * 100 >= chance) return false;
+    const dmgPct = _egGetDeflectDamagePct();
+    const deflectDamage = Math.max(1, Math.round((attacker.damageValue || 0) * dmgPct / 100));
+    const victim = others[Math.floor(Math.random() * others.length)];
+    // Visual: fire a quick projectile from player/avatar to the victim
+    const playerEl = document.getElementById('player-avatar-wrapper') || document.getElementById('player-avatar-simple');
+    const targetCard = document.getElementById(`eg-card-${victim.id}`);
+    if (playerEl && targetCard && typeof _egFireProjectile === 'function') {
+        const start = _egGetElementCentre(playerEl);
+        const end = _egGetElementCentre(targetCard);
+        const projDef = (typeof _egGetProjectileDef === 'function') ? _egGetProjectileDef() : { emoji: '↩️', cssClass: 'eg-proj-player', duration: 300, easing: 'linear' };
+        _egFireProjectile(projDef, projDef.cssClass, start, end, 320, 'linear', () => {
+            const toastKey = (typeof t === 'function' ? t('eg_deflected') : 'Deflected!');
+            showToast(toastKey !== 'eg_deflected' ? toastKey : `↩️ Deflected to ${victim.name || 'another monster'}!`);
+            _egDamageTargetById(victim.id, deflectDamage);
+        });
+    } else {
+        _egDamageTargetById(victim.id, deflectDamage);
+        showToast((typeof t === 'function' ? t('eg_deflected') : 'Deflected!'));
+    }
+    _egApplyPlayerDeflectFeedback();
+    return true;
+}
+
 
 // Launches a projectile from the clicked cell toward the targeted monster card.
 // If the target card is not visible (e.g. not yet rendered), damage is applied
@@ -1287,7 +1379,8 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     const target = _egMonsters.find(m => m.id === targetId);
 
     // Accuracy: projectiles can miss (no snipe/splash/chain/pierce on a miss)
-    if (_egRollPlayerMiss(targetId)) return;
+    // Drag-painting bonus: longer drags reduce miss chance (threshold-based)
+    if (_egRollPlayerMiss(targetId, opts)) return;
 
     // Gear: channel stacks + mana-to-damage are consumed by this hit
     let finalDamage = damage + _egConsumeOnHitGearBonus();
@@ -1397,6 +1490,50 @@ function _egUpdateChargedProjectileVisual() {
     }
 
     _egAimChargingProjectile(anchor);
+    _egUpdateDragBonusLabel();
+}
+
+// ── Drag-painting accuracy bonus label (1-word text on the player sprite) ─
+// Shows STEADY / FOCUSED / PRECISE on the avatar while charging, tiered at
+// >5 / >10 / >15 correct. Single word, color-coded per tier, with a pop
+// animation when the tier increases.
+function _egUpdateDragBonusLabel() {
+    const avatar = document.getElementById('player-avatar-wrapper');
+    if (!avatar) { _egClearDragBonusLabel(); return; }
+
+    const tier = (typeof _egGetDragTier === 'function') ? _egGetDragTier(_egDragChargeStacks) : 0;
+    if (tier <= 0) { _egClearDragBonusLabel(); return; }
+
+    const key = (typeof _egGetDragTierLabelKey === 'function') ? _egGetDragTierLabelKey(_egDragChargeStacks) : null;
+    const text = key && typeof t === 'function' ? t(key) : (tier === 3 ? 'PRECISE' : tier === 2 ? 'FOCUSED' : 'STEADY');
+
+    let lbl = document.getElementById('eg-drag-bonus-label');
+    const isNew = !lbl;
+    if (!lbl) {
+        lbl = document.createElement('div');
+        lbl.id = 'eg-drag-bonus-label';
+        avatar.appendChild(lbl);
+    }
+    const tierClass = `eg-drag-bonus-t${tier}`;
+    if (lbl.dataset.tier !== String(tier) || isNew) {
+        lbl.className = `eg-drag-bonus ${tierClass}`;
+        // trigger pop animation on tier change
+        lbl.style.animation = 'none';
+        void lbl.offsetWidth;
+        lbl.style.animation = '';
+        lbl.dataset.tier = String(tier);
+    } else {
+        lbl.className = `eg-drag-bonus ${tierClass}`;
+    }
+    lbl.textContent = text;
+    lbl.style.display = '';
+}
+
+function _egClearDragBonusLabel() {
+    const lbl = document.getElementById('eg-drag-bonus-label');
+    if (lbl) lbl.remove();
+    const linger = document.getElementById('eg-drag-bonus-linger');
+    if (linger) linger.remove();
 }
 
 // Rotates the charging projectile so its tip points at the currently targeted
@@ -1422,6 +1559,7 @@ function _egAimChargingProjectile(anchor) {
 function _egClearChargedProjectileVisual() {
     const proj = document.getElementById('eg-charging-projectile');
     if (proj) proj.remove();
+    if (typeof _egClearDragBonusLabel === 'function') _egClearDragBonusLabel();
     _egDragChargeDamage = 0;
     EG_ELEMENTS.forEach(el => { _egDragChargeElements[el] = 0; });
     _egDragChargeStacks = 0;
@@ -1444,7 +1582,22 @@ function _egReleaseChargedShot() {
     // resistances can be applied per element at impact time.
     const elements = Object.assign({}, _egDragChargeElements);
     const wasCrit = !!_egDragChargeWasCrit;
+    const releaseTier = (typeof _egGetDragTier === 'function') ? _egGetDragTier(stacks) : 0;
+    const releaseLabelKey = (typeof _egGetDragTierLabelKey === 'function') ? _egGetDragTierLabelKey(stacks) : null;
     _egClearChargedProjectileVisual();
+    // Keep a brief lingering tier label on the avatar through the flight so
+    // the player sees that the drag bonus was applied to this shot.
+    if (releaseTier > 0) {
+        const avatar = document.getElementById('player-avatar-wrapper');
+        if (avatar) {
+            const linger = document.createElement('div');
+            linger.id = 'eg-drag-bonus-linger';
+            linger.className = `eg-drag-bonus eg-drag-bonus-t${releaseTier} eg-drag-bonus-linger`;
+            linger.textContent = releaseLabelKey && typeof t === 'function' ? t(releaseLabelKey) : (releaseTier === 3 ? 'PRECISE' : releaseTier === 2 ? 'FOCUSED' : 'STEADY');
+            avatar.appendChild(linger);
+            setTimeout(() => linger.remove(), 900);
+        }
+    }
 
     if (!_egIsActive()) return;
     if (stacks <= 0 || !damage) return;
@@ -1543,12 +1696,18 @@ function _egCurrentMeleeDamage() {
 // miss shows a floating MISS label over the monster card and returns true
 // so the caller can abort the hit. Gear procs (cleave/splash/chain/…) are
 // part of the same attack and are skipped alongside it.
-function _egRollPlayerMiss(targetId) {
+// `opts` may carry isChargedStacks for drag-painting charged shots so the
+// threshold-based accuracy bonus can be applied (flat accuracy + direct
+// miss reduction — see _egGetDragAccuracyBonus / _egGetDragMissReduction).
+function _egRollPlayerMiss(targetId, opts) {
     const target = _egMonsters.find(m => m.id === targetId);
     if (!target) return false;
 
     const stats = _egComputePlayerStats();
-    const missPct = _egCalcAccuracyMissChance(stats.accuracy, target.level);
+    const stacks = (opts && opts.isChargedStacks) ? opts.isChargedStacks : 0;
+    // Also support a plain number being passed as second arg (legacy callers)
+    const dragStacks = (typeof opts === 'number') ? opts : stacks;
+    const missPct = _egCalcAccuracyMissChance(stats.accuracy, target.level, dragStacks);
     if (Math.random() * 100 >= missPct) return false;
 
     _egShowStatusLabel(targetId, t('eg_miss'));
@@ -1971,7 +2130,7 @@ function _egTryEchoHit(targetId, appliedAmount, elements, isCrit) {
 // flat Arcane Resistance. Physical hits (no element) ignore resistances.
 // `attackerLevel` feeds the level-scaled evasion benchmark; falls back to the
 // current target's level, then the encounter's base level.
-function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null) {
+function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null, opts = null) {
     if (!_egIsActive()) return 0;
 
     const stats = _egComputePlayerStats();
@@ -1979,6 +2138,27 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     // Gear: fate — pure-luck chance to negate ANY incoming hit entirely
     // (attacks, spells and charge hits alike), before all other mitigation.
     if (_egRollFateNegation(stats)) return 0;
+
+    // Hold-E Parry — 50% + gear chance to fully negate projectile and charge
+    // attacks while E is held. Hazards and monster spells (isSpell=true) are
+    // never parryable. On a successful projectile parry there is a 5% + gear
+    // deflect chance to hit another monster for 30% + gear damage.
+    if (!isSpell && typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) {
+            const parryChance = _egGetParryChancePct();
+            if (parryChance > 0 && Math.random() * 100 < parryChance) {
+                const isProjectile = !!(opts && opts.isProjectile);
+                const attacker = opts && opts.attacker ? opts.attacker : null;
+                const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
+                showToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
+                if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_dodge_attack');
+                _egApplyPlayerParryFeedback();
+                _egScheduleAbsorptionRegen();
+                if (isProjectile && attacker) _egTryDeflectProjectile(attacker, true);
+                return 0;
+            }
+        }
+    }
 
     // Evasion only applies to physical attacks (melee strikes and monster
     // projectiles) — spells and environmental hazards cannot be dodged.

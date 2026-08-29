@@ -569,6 +569,14 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
     const baseName = (LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
     const name = _egBuildItemName(baseName, rarity, mods);
 
+    // ── 6b. Roll implicit(s) — scaled by base required level (not item level) ──
+    let implicits = [];
+    try {
+        if (typeof _egRollImplicitsForBase === 'function') {
+            implicits = _egRollImplicitsForBase(base) || [];
+        }
+    } catch (e) { implicits = []; }
+
     // ── 7. Assemble item object ──────────────────────────────────────
     return {
         id: `${base.id}_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
@@ -590,5 +598,6 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
 
         mods,
+        implicits,
     };
 }

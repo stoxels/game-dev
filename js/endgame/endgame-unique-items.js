@@ -6143,6 +6143,7 @@ function _egBuildUniqueItem(def, monsterLevel) {
         ...(def.blockChance ? { blockChance: def.blockChance } : {}),
 
         mods: [bonusMod].concat(downsideMods),
+        implicits: [],
 
         flavorEn: def.flavorEn,
         flavorDe: def.flavorDe,

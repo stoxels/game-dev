@@ -576,6 +576,12 @@ function _fieldScanRestore(scanned, prevStates, isClassAbility = false) {
     _fieldScanFadeOutCells(scanned);
     showToast(`🎯 ${t('cls_scan_faded')}`);
     buildClassHUD();
+    // The scan may have permanently revealed the last missing filled cells
+    // via god_of_probabilities (or the player may have completed the puzzle
+    // while the scan was still active). Check for win now that the board
+    // state is final — otherwise the level would appear solved but never
+    // trigger the win overlay until the next manual click.
+    if (typeof checkWin === 'function' && !dead) checkWin();
 }
 
 // _fieldScanComputeOrigin — centers a scanSize x scanSize region on the

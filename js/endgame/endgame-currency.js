@@ -256,6 +256,21 @@ const EG_CURRENCY_DEFS = {
         },
     },
 
+    // Blessing Orb — rerolls the numeric values of an item's IMPLICIT modifiers (PoE Blessed Orb).
+    // Only orb that can touch implicits; regular orbs preserve them.
+    orb_blessing: {
+        id: 'orb_blessing', name: t('eg_orb_blessing'), icon: '🙏',
+        description: t('eg_orb_blessing_desc'),
+        canApply(item) {
+            return item.category === 'equip' && !item.isUnique
+                && Array.isArray(item.implicits) && item.implicits.length > 0;
+        },
+        apply(item) {
+            if (typeof _egRerollImplicits === 'function') return _egRerollImplicits(item);
+            return item;
+        },
+    },
+
     // MAP ONLY — raises a map's tier by one. Equipment can never be a
     // target (canApply rejects non-maps); maps route through the dedicated
     // EG_MAP_CURRENCY_RULES entry in endgame-maps.js.
@@ -331,6 +346,7 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_alchemy', weight: 220 },
     { id: 'orb_chance', weight: 110 },
     { id: 'orb_annulment', weight: 40 },
+    { id: 'orb_blessing', weight: 110 },
     { id: 'orb_regal', weight: 90 },
     { id: 'orb_chaos', weight: 55 },
     { id: 'orb_divine', weight: 35 },
