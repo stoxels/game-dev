@@ -254,6 +254,14 @@ const EG_MASS_SELL_RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary'
 let _egMassSellKeepUnique = true;
 // Map rarity → bool; initialised in _egLoadMassSellSettings().
 let _egMassSellKeep = null;
+// Item level filter: keep items with itemLevel >= this value (0 = disabled)
+let _egMassSellMinItemLevel = 0;
+// Required character level filter: keep items with requirements.level >= this value (0 = disabled)
+let _egMassSellMinReqLevel = 0;
+
+// ── Item level display toggle ───────────────────────────────────────────
+// true = show item level (itemLevel), false = show required character level (requirements.level)
+let _egShowItemLevel = true;
 function _egDefaultMassSellKeep() {
     return {
         common: false,
@@ -281,11 +289,27 @@ function _egLoadMassSellSettings() {
     } else {
         _egMassSellKeepUnique = true;
     }
+    if (typeof STATE !== 'undefined' && typeof STATE.egShowItemLevel === 'boolean') {
+        _egShowItemLevel = STATE.egShowItemLevel;
+    }
+    if (typeof STATE !== 'undefined' && typeof STATE.egMassSellMinItemLevel === 'number') {
+        _egMassSellMinItemLevel = Math.max(0, Math.floor(STATE.egMassSellMinItemLevel));
+    } else {
+        _egMassSellMinItemLevel = 0;
+    }
+    if (typeof STATE !== 'undefined' && typeof STATE.egMassSellMinReqLevel === 'number') {
+        _egMassSellMinReqLevel = Math.max(0, Math.floor(STATE.egMassSellMinReqLevel));
+    } else {
+        _egMassSellMinReqLevel = 0;
+    }
 }
 function _egSaveMassSellSettings() {
     if (typeof STATE !== 'undefined') {
         STATE.egMassSellKeep = { ..._egMassSellKeep };
         STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
+        STATE.egShowItemLevel = _egShowItemLevel;
+        STATE.egMassSellMinItemLevel = _egMassSellMinItemLevel;
+        STATE.egMassSellMinReqLevel = _egMassSellMinReqLevel;
         if (typeof save === 'function') try { save(); } catch (e) {}
     }
     // also persist via the main hub save path
@@ -298,6 +322,14 @@ function _egIsProtectedFromMassSell(item) {
     const rarity = (item.rarity || 'common').toLowerCase();
     // Unknown rarity → treat as common (i.e. sold unless keep toggled)
     if (_egMassSellKeep && _egMassSellKeep.hasOwnProperty(rarity)) return !!_egMassSellKeep[rarity];
+    // Item level filter: keep items with itemLevel >= minItemLevel
+    if (_egMassSellMinItemLevel > 0 && item.itemLevel != null) {
+        if (item.itemLevel >= _egMassSellMinItemLevel) return true;
+    }
+    // Required character level filter: keep items with requirements.level >= minReqLevel
+    if (_egMassSellMinReqLevel > 0 && item.requirements && item.requirements.level != null) {
+        if (item.requirements.level >= _egMassSellMinReqLevel) return true;
+    }
     return false;
 }
 function _egMassSellCounts() {
@@ -330,10 +362,12 @@ function _egBuildItemChipHTML(item, size = 'normal') {
     // Items whose stat requirements cannot currently be met get a red flag
     // (see _egIsItemBlocked in endgame-requirements.js).
     const blockedClass = _egIsItemBlocked(item) ? 'eg-req-blocked' : '';
-    // Equipment items show their required character level in the top-left corner of the slot.
+    // Equipment items show either item level or required character level in the top-left corner of the slot.
+    const itemLevel = item.itemLevel;
     const reqLevel = (item.requirements && item.requirements.level != null) ? item.requirements.level : item.itemLevel;
-    const ilvlBadge = (item.category === 'equip' && reqLevel != null)
-        ? `<span class="eg-item-ilvl">${reqLevel}</span>`
+    const showLevel = _egShowItemLevel ? itemLevel : reqLevel;
+    const ilvlBadge = (item.category === 'equip' && showLevel != null)
+        ? `<span class="eg-item-ilvl">${showLevel}</span>`
         : '';
     // Map items show their map tier instead.
     const mapTierBadge = (item.category === 'map' && item.mapTier != null)
@@ -569,6 +603,12 @@ function _egBuildStashPanelHTML() {
         <span>${t('eg_stash_label')}</span>
         <div id="eg-stash-info" class="eg-stash-info" aria-live="polite"></div>
         <div class="eg-stash-actions">
+            <button class="eg-stash-btn eg-stash-btn-config" id="eg-toggle-ilvl-btn"
+                    onclick="_egToggleItemLevelDisplay()"
+                    onmouseenter="_egShowItemLevelToggleTooltip(event)"
+                    onmousemove="moveGameTooltip(event)"
+                    onmouseleave="hideGameTooltip()"
+                    title="${t(_egShowItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}">${_egShowItemLevel ? '🔢' : '👤'} ${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
             <button class="eg-stash-btn eg-stash-btn-config" onclick="_egOpenMassSellModal()"
                     title="${t('eg_mass_sell_config_title')}">⚙ ${t('eg_mass_sell_config')}</button>
             <button class="eg-stash-btn eg-stash-btn-sell" onclick="_egRequestMassSell()"
@@ -681,6 +721,38 @@ function _egUpdatePassiveTreeButton() {
         btn.appendChild(countEl);
     }
     countEl.textContent = hasPoints ? ` (${points})` : '';
+}
+
+// Toggles between showing item level and required character level on item chips.
+function _egToggleItemLevelDisplay() {
+    _egShowItemLevel = !_egShowItemLevel;
+    _egSaveMassSellSettings(); // persists the toggle
+    _egRebuildInventoryGrid(); // re-render stash
+    _egRenderEquipSlots(); // re-render equipped items
+    _egUpdateItemLevelToggleButton();
+}
+
+// Updates the toggle button text/icon to match current state.
+function _egUpdateItemLevelToggleButton() {
+    const btn = document.getElementById('eg-toggle-ilvl-btn');
+    if (btn) {
+        btn.innerHTML = `${_egShowItemLevel ? '🔢' : '👤'} ${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}`;
+    }
+}
+
+// Tooltip for the item level toggle button.
+function _egShowItemLevelToggleTooltip(e) {
+    const html = `
+<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon">${_egShowItemLevel ? '🔢' : '👤'}</div>
+        <div class="eg-tt-name" style="color:#f5d98a;">${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</div>
+    </div>
+    <div class="eg-tt-section">
+        <div class="eg-tt-desc">${t(_egShowItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}</div>
+    </div>
+</div>`;
+    showGameTooltip(html, e);
 }
 
 
@@ -1522,6 +1594,8 @@ function egSaveHubState() {
     // hub after a reload restores the player's protection choices).
     if (_egMassSellKeep) STATE.egMassSellKeep = { ..._egMassSellKeep };
     if (typeof _egMassSellKeepUnique !== 'undefined') STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
+    STATE.egMassSellMinItemLevel = _egMassSellMinItemLevel;
+    STATE.egMassSellMinReqLevel = _egMassSellMinReqLevel;
     save();
 }
 
@@ -1882,6 +1956,7 @@ function showEndgameHub() {
     }
 
     _egLoadHubState();
+    _egUpdateItemLevelToggleButton();
     _egRenderAll();
     _egClearTooltip();
 }
@@ -2085,6 +2160,16 @@ function _egEnsureMassSellModal() {
         <input type="checkbox" id="eg-mass-sell-keep-unique">
         <span>${t('eg_mass_sell_keep_unique')}</span>
     </label>
+    <div class="eg-mass-sell-level-filters">
+        <div class="eg-mass-sell-level-row">
+            <label for="eg-mass-sell-min-ilvl">${t('eg_mass_sell_min_ilvl')}</label>
+            <input type="number" id="eg-mass-sell-min-ilvl" min="0" max="100" step="1" value="0">
+        </div>
+        <div class="eg-mass-sell-level-row">
+            <label for="eg-mass-sell-min-reqlvl">${t('eg_mass_sell_min_reqlvl')}</label>
+            <input type="number" id="eg-mass-sell-min-reqlvl" min="0" max="100" step="1" value="0">
+        </div>
+    </div>
     <div class="eg-mass-sell-preview" id="eg-mass-sell-preview"></div>
     <div class="eg-mass-sell-btns">
         <button class="eg-mass-sell-btn eg-mass-sell-save" onclick="_egSaveMassSellModal()">${t('eg_mass_sell_save')}</button>
@@ -2149,6 +2234,17 @@ function _egRenderMassSellModalContent() {
         uniqCb.checked = !!_egMassSellKeepUnique;
         uniqCb.onchange = _egUpdateMassSellPreview;
     }
+    // Level filters
+    const minIlvlInput = document.getElementById('eg-mass-sell-min-ilvl');
+    const minReqLvlInput = document.getElementById('eg-mass-sell-min-reqlvl');
+    if (minIlvlInput) {
+        minIlvlInput.value = _egMassSellMinItemLevel || 0;
+        minIlvlInput.onchange = _egUpdateMassSellPreview;
+    }
+    if (minReqLvlInput) {
+        minReqLvlInput.value = _egMassSellMinReqLevel || 0;
+        minReqLvlInput.onchange = _egUpdateMassSellPreview;
+    }
     _egUpdateMassSellPreview();
 }
 
@@ -2161,6 +2257,8 @@ function _egUpdateMassSellPreview() {
         tempKeep[cb.dataset.rarity] = cb.checked;
     });
     const tempKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
+    const tempMinItemLevel = parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10);
+    const tempMinReqLevel = parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10);
     let keep = 0, sell = 0;
     if (_egInventory) {
         for (let r = 0; r < _egInventory.length; r++) {
@@ -2170,7 +2268,9 @@ function _egUpdateMassSellPreview() {
                 const rarity = (it.rarity || 'common').toLowerCase();
                 const protectedByRarity = !!tempKeep[rarity];
                 const protectedByUnique = tempKeepUnique && it.isUnique;
-                if (protectedByRarity || protectedByUnique) keep++; else sell++;
+                const protectedByItemLevel = tempMinItemLevel > 0 && it.itemLevel != null && it.itemLevel >= tempMinItemLevel;
+                const protectedByReqLevel = tempMinReqLevel > 0 && it.requirements && it.requirements.level != null && it.requirements.level >= tempMinReqLevel;
+                if (protectedByRarity || protectedByUnique || protectedByItemLevel || protectedByReqLevel) keep++; else sell++;
             }
         }
     }
@@ -2207,6 +2307,8 @@ function _egSaveMassSellModal() {
     });
     _egMassSellKeep = _egNormaliseMassSellKeep(keep);
     _egMassSellKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
+    _egMassSellMinItemLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10));
+    _egMassSellMinReqLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10));
     _egSaveMassSellSettings();
     _egCloseMassSellModal();
     if (typeof showToast === 'function') showToast(t('eg_mass_sell_saved'));
@@ -2434,6 +2536,26 @@ function _egInjectMassSellStyles() {
         .eg-mass-sell-unique-row {
             display: flex; align-items: center; gap: 8px; margin: 8px 0 4px;
             font-family: var(--PX, monospace); font-size: 10px; color: #f1c40f; cursor: pointer;
+        }
+        .eg-mass-sell-level-filters {
+            display: flex; flex-direction: column; gap: 8px; margin: 10px 0;
+            padding: 10px; border: 1px solid var(--border, #333);
+            background: rgba(255,255,255,0.02); border-radius: 6px;
+        }
+        .eg-mass-sell-level-row {
+            display: flex; align-items: center; gap: 8px;
+            font-family: var(--PX, monospace); font-size: 11px; color: #ddd;
+        }
+        .eg-mass-sell-level-row label {
+            min-width: 120px; opacity: 0.8;
+        }
+        .eg-mass-sell-level-row input[type="number"] {
+            width: 60px; padding: 4px 8px; font-family: var(--PX, monospace); font-size: 11px;
+            background: #111; border: 1px solid var(--border2, #444); color: #f5d98a; border-radius: 4px;
+            text-align: center;
+        }
+        .eg-mass-sell-level-row input[type="number"]:focus {
+            outline: none; border-color: var(--accent, #c8a84b); box-shadow: 0 0 4px rgba(200,168,75,0.3);
         }
         .eg-mass-sell-preview {
             font-family: var(--PX, monospace); font-size: 10px; text-align: center;

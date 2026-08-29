@@ -5612,10 +5612,10 @@ const EG_MOD_TABLE_RING = {
             id: 'echo',
             label: '#% Chance for Hits to Echo for @% of their Damage', labelDe: '#% Chance, dass Treffer mit @% ihres Schadens nachhallen',
             tiers: [
-                { tier: 1, min: 25, max: 35, min2: 35, max2: 50, weight: 60, ilvl: 85 },
-                { tier: 2, min: 16, max: 24, min2: 22, max2: 34, weight: 160, ilvl: 66 },
-                { tier: 3, min: 8, max: 15, min2: 12, max2: 21, weight: 380, ilvl: 42 },
-                { tier: 4, min: 2, max: 7, min2: 5, max2: 11, weight: 880, ilvl: 15 }
+                { tier: 1, min1: 25, max1: 35, min2: 35, max2: 50, weight: 60, ilvl: 85 },
+                { tier: 2, min1: 16, max1: 24, min2: 22, max2: 34, weight: 160, ilvl: 66 },
+                { tier: 3, min1: 8, max1: 15, min2: 12, max2: 21, weight: 380, ilvl: 42 },
+                { tier: 4, min1: 2, max1: 7, min2: 5, max2: 11, weight: 880, ilvl: 15 }
             ]
         },
 

@@ -126,8 +126,7 @@ function _allSlotsAffordable() {
 // affordable and unaffordable, so disabled buttons re-enable (or newly
 // unaffordable ones get locked) instead of waiting for an unrelated rebuild.
 function _refreshHUDIfAffordabilityChanged(wasAffordable) {
-    if (wasAffordable !== _allSlotsAffordable()
-        && typeof buildClassHUD === 'function') {
+    if (typeof buildClassHUD === 'function') {
         buildClassHUD();
     }
 }
