@@ -1473,65 +1473,72 @@ function _egHzTickFirewall(dtMs) {
 
     st.nextIn -= dtMs;
     if (st.nextIn <= 0) {
-        st.nextIn = _egHzRand(
-            EG_HZ_FIREWALL_INTERVAL_MIN_MS,
-            EG_HZ_FIREWALL_INTERVAL_MAX_MS
-        ) * st.intervalScale;
+        // Never queue a second firewall while any existing firewall is still
+        // telegraphing, lingering, or sweeping. In particular, this keeps a
+        // gap wall from overlapping an offset wall (and vice versa).
+        if (st.pending.length > 0) {
+            st.nextIn = 250;
+        } else {
+            st.nextIn = _egHzRand(
+                EG_HZ_FIREWALL_INTERVAL_MIN_MS,
+                EG_HZ_FIREWALL_INTERVAL_MAX_MS
+            ) * st.intervalScale;
 
-        // ── Pick a random outplay variation ───────────────────────────
-        const variants = ['offsetTop', 'offsetBottom', 'gapDown', 'gapUp'];
-        const variant = variants[Math.floor(Math.random() * variants.length)];
-        const vh = window.innerHeight;
-        const vw = window.innerWidth;
-        const h = EG_HZ_FIREWALL_HEIGHT;
-        let startY, endY, dir, gapX = 0, gapW = 0;
+            // ── Pick a random outplay variation ───────────────────────────
+            const variants = ['offsetTop', 'offsetBottom', 'gapDown', 'gapUp'];
+            const variant = variants[Math.floor(Math.random() * variants.length)];
+            const vh = window.innerHeight;
+            const vw = window.innerWidth;
+            const h = EG_HZ_FIREWALL_HEIGHT;
+            let startY, endY, dir, gapX = 0, gapW = 0;
 
-        if (variant === 'offsetTop') {
-            const safeTop = _egHzRand(EG_HZ_FIREWALL_TOP_SAFE_MIN, EG_HZ_FIREWALL_TOP_SAFE_MAX);
-            startY = safeTop;
-            endY = vh;
-            dir = 1;
-        } else if (variant === 'offsetBottom') {
-            const safeBottom = _egHzRand(EG_HZ_FIREWALL_BOTTOM_SAFE_MIN, EG_HZ_FIREWALL_BOTTOM_SAFE_MAX);
-            startY = vh - h - safeBottom;
-            endY = -h;
-            dir = -1;
-        } else if (variant === 'gapDown') {
-            gapW = _egHzRand(EG_HZ_FIREWALL_GAP_MIN_W, EG_HZ_FIREWALL_GAP_MAX_W);
-            gapX = _egHzRand(EG_HZ_FIREWALL_GAP_MARGIN, Math.max(EG_HZ_FIREWALL_GAP_MARGIN, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
-            startY = -h;
-            endY = vh;
-            dir = 1;
-        } else { // gapUp
-            gapW = _egHzRand(EG_HZ_FIREWALL_GAP_MIN_W, EG_HZ_FIREWALL_GAP_MAX_W);
-            gapX = _egHzRand(EG_HZ_FIREWALL_GAP_MARGIN, Math.max(EG_HZ_FIREWALL_GAP_MARGIN, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
-            startY = vh;
-            endY = -h;
-            dir = -1;
+            if (variant === 'offsetTop') {
+                const safeTop = _egHzRand(EG_HZ_FIREWALL_TOP_SAFE_MIN, EG_HZ_FIREWALL_TOP_SAFE_MAX);
+                startY = safeTop;
+                endY = vh;
+                dir = 1;
+            } else if (variant === 'offsetBottom') {
+                const safeBottom = _egHzRand(EG_HZ_FIREWALL_BOTTOM_SAFE_MIN, EG_HZ_FIREWALL_BOTTOM_SAFE_MAX);
+                startY = vh - h - safeBottom;
+                endY = -h;
+                dir = -1;
+            } else if (variant === 'gapDown') {
+                gapW = _egHzRand(EG_HZ_FIREWALL_GAP_MIN_W, EG_HZ_FIREWALL_GAP_MAX_W);
+                gapX = _egHzRand(EG_HZ_FIREWALL_GAP_MARGIN, Math.max(EG_HZ_FIREWALL_GAP_MARGIN, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+                startY = -h;
+                endY = vh;
+                dir = 1;
+            } else { // gapUp
+                gapW = _egHzRand(EG_HZ_FIREWALL_GAP_MIN_W, EG_HZ_FIREWALL_GAP_MAX_W);
+                gapX = _egHzRand(EG_HZ_FIREWALL_GAP_MARGIN, Math.max(EG_HZ_FIREWALL_GAP_MARGIN, vw - gapW - EG_HZ_FIREWALL_GAP_MARGIN));
+                startY = vh;
+                endY = -h;
+                dir = -1;
+            }
+
+            const totalDist = Math.abs(endY - startY);
+            const wallEls = _egHzCreateFirewallWallEls(variant, gapX, gapW, startY);
+            const warningEls = _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY);
+            // Remove telegraph after wind-up; wall becomes visible then.
+            const warnElsSnapshot = warningEls.slice();
+            setTimeout(() => warnElsSnapshot.forEach(el => { try { el.remove(); } catch(e){} }), EG_HZ_FIREWALL_WARNING_MS);
+
+            const isGapVariant = variant === 'gapDown' || variant === 'gapUp';
+            st.pending.push({
+                t: EG_HZ_FIREWALL_WARNING_MS,
+                lingerT: isGapVariant ? EG_HZ_FIREWALL_WARNING_MS : 0,
+                y: startY,
+                dir: dir,
+                totalDist: totalDist,
+                endY: endY,
+                variant: variant,
+                gapX: gapX,
+                gapW: gapW,
+                wallEls: wallEls,
+                warningEls: warningEls,
+                hitDone: false,
+            });
         }
-
-        const totalDist = Math.abs(endY - startY);
-        const wallEls = _egHzCreateFirewallWallEls(variant, gapX, gapW, startY);
-        const warningEls = _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY);
-        // Remove telegraph after wind-up; wall becomes visible then.
-        const warnElsSnapshot = warningEls.slice();
-        setTimeout(() => warnElsSnapshot.forEach(el => { try { el.remove(); } catch(e){} }), EG_HZ_FIREWALL_WARNING_MS);
-
-        const isGapVariant = variant === 'gapDown' || variant === 'gapUp';
-        st.pending.push({
-            t: EG_HZ_FIREWALL_WARNING_MS,
-            lingerT: isGapVariant ? EG_HZ_FIREWALL_WARNING_MS : 0,
-            y: startY,
-            dir: dir,
-            totalDist: totalDist,
-            endY: endY,
-            variant: variant,
-            gapX: gapX,
-            gapW: gapW,
-            wallEls: wallEls,
-            warningEls: warningEls,
-            hitDone: false,
-        });
     }
 
     const pr = _egHzPlayerHitbox();
@@ -1586,8 +1593,7 @@ function _egHzTickFirewall(dtMs) {
                     const dealt = _egHzDamage(
                         EG_HZ_FIREWALL_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
                     );
-                    if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-                        && Math.random() * 100 < EG_HZ_FIREWALL_IGNITE_CHANCE_PCT) {
+                    if (dealt > 0 && typeof _egApplyPlayerAilment === 'function') {
                         _egApplyPlayerAilment('ignite',
                             Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
                     }

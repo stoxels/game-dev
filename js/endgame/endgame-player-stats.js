@@ -108,6 +108,8 @@ const EG_STAT_KEY_MAP = {
     chance_to_shock: { bucket: 'shockPct', mode: 'add' },
     chance_to_blind: { bucket: 'blindPct', mode: 'add' },
     chance_to_convert: { bucket: 'convertPct', mode: 'add' },
+    ailment_duration: { bucket: 'ailmentDurationPct', mode: 'add' },
+    ailment_effect: { bucket: 'ailmentEffectPct', mode: 'add' },
 
     attack_speed: { bucket: 'attackSpeed', mode: 'add' },
     cleave: { bucket: 'cleavePct', mode: 'add' },
@@ -463,6 +465,7 @@ function _egComputePlayerStats() {
         blockChance: 0, spellBlockChance: 0, blockRecoveryPct: 0,
         dodgeChance: 0, spellDodgeChance: 0,
         ignitePct: 0, freezePct: 0, shockPct: 0, blindPct: 0, convertPct: 0,
+        ailmentDurationPct: 0, ailmentEffectPct: 0,
         attackSpeed: 0, cleavePct: 0, piercePct: 0, snipePct: 0, chainPct: 0, splashPct: 0,
         multishotPct: 0, pushbackFlat: 0, overkillPct: 0, staggerPct: 0, preemptiveDodgePct: 0,
         firstStepSeconds: 0, groundedChancePct: 0, groundedReductionPct: 0,
@@ -981,7 +984,7 @@ const EG_STAT_LAYOUT = {
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
-        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct'] },
+        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct'] },
         { catKey: 'eg_statcat_arcane', buckets: [
             'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
             'channelMaxStacks', 'arcaneSurgeStreak', 'arcaneSurgeMana',

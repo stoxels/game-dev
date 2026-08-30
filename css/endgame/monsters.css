@@ -918,6 +918,18 @@
 
 
 
+/* ── The Overfitter feedback ───────────────────────────────────────────── */
+.eg-overfitter-drift-clue {
+    color: #f0abfc !important;
+    text-shadow: 0 0 8px rgba(217, 70, 239, 0.95);
+    animation: eg-overfitter-drift 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes eg-overfitter-drift {
+    from { opacity: 0.55; transform: translateX(-1px); }
+    to   { opacity: 1; transform: translateX(1px); }
+}
+
 /* ── Boss Phase Badge ─────────────────────────────── */
 .eg-boss-phase-badge {
     font-size: 10px;
@@ -1179,6 +1191,18 @@
     }
 }
 
+
+/* Player elemental ailment feedback */
+.eg-player-ailment-overlay { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 9500; pointer-events: none; font: 900 2.2rem monospace; letter-spacing: .18em; text-shadow: 0 0 8px #000, 0 0 18px currentColor; animation: eg-ailment-pop 1.8s ease-out forwards; }
+.eg-player-ailment-ignite { color: #ff6b35; } .eg-player-ailment-chill { color: #8be9ff; } .eg-player-ailment-shocked { color: #ffe66d; } .eg-player-ailment-shadow, .eg-player-ailment-confused { color: #c084fc; }
+@keyframes eg-ailment-pop { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.7); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%,-65%) scale(1.08); } }
+.eg-player-ground { position: fixed; width: 110px; height: 42px; margin: -21px 0 0 -55px; border-radius: 50%; pointer-events: none; z-index: 850; opacity: .8; animation: eg-ground-pulse 1s ease-in-out infinite alternate; }
+.eg-player-ground-fire { width: 82px; height: 82px; margin: -41px 0 0 -41px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(255,180,40,.38), rgba(150,20,0,.22) 62%, transparent 76%); box-shadow: 0 0 18px rgba(255,69,31,.95), 0 0 42px rgba(255,120,20,.75); }
+.eg-player-ground-fire::before { content: '🔥'; font-size: 3.8rem; line-height: 1; filter: drop-shadow(0 0 7px #ff451f); animation: eg-fire-emoji-flicker .55s ease-in-out infinite alternate; }
+@keyframes eg-fire-emoji-flicker { from { transform: scale(.9) rotate(-4deg); filter: drop-shadow(0 0 5px #ff451f); } to { transform: scale(1.12) rotate(4deg); filter: drop-shadow(0 0 15px #ffd166); } }
+.eg-player-ground-shadow { width: 150px; height: 85px; margin: -42px 0 0 -75px; background: radial-gradient(ellipse, rgba(25,10,40,.92), rgba(80,25,100,.5) 55%, transparent 75%); filter: blur(2px); box-shadow: 0 0 28px #6d28d9; }
+.eg-arcane-bomb-overlay { display: block; font-size: 1.5rem; animation: eg-ground-pulse 1s infinite alternate; }
+@keyframes eg-ground-pulse { from { transform: scale(.92); opacity: .65; } to { transform: scale(1.08); opacity: 1; } }
 
 /* ── Void Surge: full-screen overlay ────────────────────────────────────── */
 #eg-void-surge-overlay {

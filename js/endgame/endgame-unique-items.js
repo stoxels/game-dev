@@ -503,7 +503,8 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'cold_damage_1', value: 10, en: 'Adds # Cold Damage to Attacks', de: 'Fügt Angriffen # Kälteschaden hinzu' },
             { key: 'cold_damage_2', value: 18, en: 'Adds # Cold Damage to Attacks', de: 'Fügt Angriffen # Kälteschaden hinzu' },
-            { key: 'chance_to_freeze', value: 12, en: '#% chance to Freeze Monsters on hit', de: '#% Chance, Monster bei Treffern einzufrieren' }
+            { key: 'chance_to_freeze', value: 12, en: '#% chance to Chill Monsters on hit', de: '#% Chance, Monster bei Treffern zu unterkühlen' },
+            { key: 'ailment_duration', value: 18, en: '#% increased Duration of Player-Applied Ailments', de: '#% längere Dauer von durch den Spieler verursachten Leiden' }
         ],
         downsides: [
             { key: 'cold_resist', value: -30, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
@@ -641,7 +642,8 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'lightning_damage_1', value: 8, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
             { key: 'lightning_damage_2', value: 14, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
-            { key: 'chance_to_shock', value: 10, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' }
+            { key: 'chance_to_shock', value: 10, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' },
+            { key: 'ailment_effect', value: 18, en: '#% increased Effect of Player-Applied Ailments', de: '#% stärkere, durch den Spieler verursachte Leiden' }
         ],
         downsides: [
             { key: 'lightning_resist', value: -30, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' }
@@ -3845,7 +3847,8 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'lightning_damage_1', value: 14, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
             { key: 'lightning_damage_2', value: 20, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
-            { key: 'chance_to_shock', value: 10, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' }
+            { key: 'chance_to_shock', value: 10, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' },
+            { key: 'ailment_effect', value: 18, en: '#% increased Effect of Player-Applied Ailments', de: '#% stärkere, durch den Spieler verursachte Leiden' }
         ],
         downsides: [
             { key: 'cold_resist', value: -22, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }

@@ -45,7 +45,7 @@ function _charIs(id) {
 //-------------------SIMPLE IN-GAME AVATAR (non-monster levels)-----------
 //------------------------------------------------------------------------
 
-// Renders a small draggable sprite in the top-left of the game meta bar.
+// Renders a small WASD-controlled sprite in the top-left of the game meta bar.
 // No HP or charge bars — those are monster-level only.
 function _renderPlayerAvatarSimple() {
     if (typeof dead !== 'undefined' && dead) {
@@ -98,7 +98,7 @@ function _renderPlayerAvatarSimple() {
         flex-direction: column;
         align-items: center;
         width: ${wrapperWidth};
-        cursor: grab;
+        cursor: default;
         user-select: none;
     `;
 
@@ -109,7 +109,7 @@ function _renderPlayerAvatarSimple() {
             font-size: 15px;
             letter-spacing: 1px;
             color: ${_getAvatarCharacterColor()};
-            cursor: grab;
+            cursor: default;
             padding: 2px 0 4px;
             font-family: monospace;
         ">${_getAvatarCharacterName()}</div>
@@ -141,7 +141,6 @@ function _renderPlayerAvatarSimple() {
     `;
 
     document.body.appendChild(wrapper);
-    _initSimpleAvatarDrag(wrapper);
     _initSimpleAvatarWASD(wrapper);
     _updateAvatarFacing(wrapper);
 }
@@ -161,49 +160,6 @@ function _updateAvatarSimpleImage() {
     if (img) img.src = _getPlayerCharacterImage();
     const imgFull = document.getElementById('avatar-sprite-img');
     if (imgFull) imgFull.src = _getPlayerCharacterImage();
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DRAG LOGIC-------------------------------------------
-//------------------------------------------------------------------------
-
-function _initSimpleAvatarDrag(wrapper) {
-    const handle = wrapper
-    if (!handle) return;
-
-    let dragging = false;
-    let startMouseX, startMouseY, startLeft, startTop;
-
-    handle.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
-        dragging = true;
-        wrapper.style.cursor = 'grabbing';
-
-        startMouseX = e.clientX;
-        startMouseY = e.clientY;
-        startLeft = parseInt(wrapper.style.left) || 12;
-        startTop = parseInt(wrapper.style.top) || 80;
-
-        const onMove = (e) => {
-            if (!dragging) return;
-            if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
-            const dx = e.clientX - startMouseX;
-            const dy = e.clientY - startMouseY;
-            _setAvatarPos(wrapper, startLeft + dx, startTop + dy);
-        };
-
-        const onUp = () => {
-            dragging = false;
-            wrapper.style.cursor = 'grab';
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
-        };
-
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
-    });
 }
 
 
@@ -246,6 +202,7 @@ function _avatarMoveUiBlocked() {
     const tag = document.activeElement ? document.activeElement.tagName : null;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show')) return true;
     if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return true;
+    if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('frozen')) return true;
     return false;
 }
 
@@ -532,7 +489,7 @@ function _renderPlayerAvatar() {
             flex-direction: column;
             align-items: center;
             width: 100px;
-            cursor: grab;
+            cursor: default;
             user-select: none;
         `;
 
@@ -575,7 +532,6 @@ function _renderPlayerAvatar() {
 
         document.body.appendChild(avatar);
 
-        _initFullAvatarDrag(avatar);
         _initFullAvatarWASD(avatar);
         _updateAvatarFacing(avatar);
     }
@@ -624,41 +580,6 @@ function _renderPlayerAvatar() {
             if (txt && lbl.textContent !== txt) lbl.textContent = txt;
         }
     }
-}
-
-function _initFullAvatarDrag(wrapper) {
-    let dragging = false;
-    let startMouseX, startMouseY, startLeft, startTop;
-
-    wrapper.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
-        dragging = true;
-        wrapper.style.cursor = 'grabbing';
-
-        startMouseX = e.clientX;
-        startMouseY = e.clientY;
-        startLeft = parseInt(wrapper.style.left) || 12;
-        startTop = parseInt(wrapper.style.top) || (window.innerHeight - 220);
-
-        const onMove = (e) => {
-            if (!dragging) return;
-            if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
-            const dx = e.clientX - startMouseX;
-            const dy = e.clientY - startMouseY;
-            _setAvatarPos(wrapper, startLeft + dx, startTop + dy);
-        };
-
-        const onUp = () => {
-            dragging = false;
-            wrapper.style.cursor = 'grab';
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
-        };
-
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
-    });
 }
 
 function _removeFullAvatarWasdListeners() {

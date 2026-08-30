@@ -1184,6 +1184,24 @@ const EG_MOD_TABLE_AMULET = {
                 { tier: 4, min: 2, max: 5, weight: 1200, ilvl: 8 }
             ]
         },
+        ailment_duration: {
+            id: 'ailment_duration',
+            label: '#% increased Duration of Player-Applied Ailments', labelDe: '#% längere Dauer von durch den Spieler verursachten Leiden',
+            tiers: [
+                { tier: 1, min: 20, max: 35, weight: 100, ilvl: 70 },
+                { tier: 2, min: 10, max: 19, weight: 300, ilvl: 30 },
+                { tier: 3, min: 4, max: 9, weight: 800, ilvl: 1 }
+            ]
+        },
+        ailment_effect: {
+            id: 'ailment_effect',
+            label: '#% increased Effect of Player-Applied Ailments', labelDe: '#% stärkere, durch den Spieler verursachte Leiden',
+            tiers: [
+                { tier: 1, min: 15, max: 25, weight: 100, ilvl: 70 },
+                { tier: 2, min: 8, max: 14, weight: 300, ilvl: 30 },
+                { tier: 3, min: 3, max: 7, weight: 800, ilvl: 1 }
+            ]
+        },
         chance_to_convert: {
             id: 'chance_to_convert',
             // Rarest status — very powerful, shadow-locked, no T5
@@ -5241,7 +5259,7 @@ const EG_MOD_TABLE_BOOTS = {
 
         // --- BOOTS-EXCLUSIVE: MOVEMENT SPEED (PoE-style) ---
         // Flat % increased movement speed for your on-screen avatar.
-        // Affects WASD and mouse-drag travel — crucial for dodging
+        // Affects WASD travel — crucial for dodging
         // telegraphed hazards like Fire Walls. PoE values: 10–35% in
         // 5% steps; higher tiers are rarer. Caps at ~35% per boot
         // (only one boot slot, so at most 35%).
@@ -6613,6 +6631,24 @@ const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 4, min: 3, max: 9, weight: 1150, ilvl: 1 }
             ]
         },
+        ailment_duration: {
+            id: 'ailment_duration',
+            label: '#% increased Duration of Player-Applied Ailments', labelDe: '#% längere Dauer von durch den Spieler verursachten Leiden',
+            tiers: [
+                { tier: 1, min: 20, max: 35, weight: 100, ilvl: 70 },
+                { tier: 2, min: 10, max: 19, weight: 300, ilvl: 30 },
+                { tier: 3, min: 4, max: 9, weight: 800, ilvl: 1 }
+            ]
+        },
+        ailment_effect: {
+            id: 'ailment_effect',
+            label: '#% increased Effect of Player-Applied Ailments', labelDe: '#% stärkere, durch den Spieler verursachte Leiden',
+            tiers: [
+                { tier: 1, min: 15, max: 25, weight: 100, ilvl: 70 },
+                { tier: 2, min: 8, max: 14, weight: 300, ilvl: 30 },
+                { tier: 3, min: 3, max: 7, weight: 800, ilvl: 1 }
+            ]
+        },
         chance_to_convert: {
             id: 'chance_to_convert',
             // Shadow-locked, rarest status — only the most powerful
@@ -7499,6 +7535,24 @@ const EG_MOD_TABLE_RANGED = {
                 { tier: 2, min: 11, max: 17, weight: 270, ilvl: 55 },
                 { tier: 3, min: 5, max: 10, weight: 580, ilvl: 30 },
                 { tier: 4, min: 2, max: 4, weight: 1150, ilvl: 1 }
+            ]
+        },
+        ailment_duration: {
+            id: 'ailment_duration',
+            label: '#% increased Duration of Player-Applied Ailments', labelDe: '#% längere Dauer von durch den Spieler verursachten Leiden',
+            tiers: [
+                { tier: 1, min: 20, max: 35, weight: 100, ilvl: 70 },
+                { tier: 2, min: 10, max: 19, weight: 300, ilvl: 30 },
+                { tier: 3, min: 4, max: 9, weight: 800, ilvl: 1 }
+            ]
+        },
+        ailment_effect: {
+            id: 'ailment_effect',
+            label: '#% increased Effect of Player-Applied Ailments', labelDe: '#% stärkere, durch den Spieler verursachte Leiden',
+            tiers: [
+                { tier: 1, min: 15, max: 25, weight: 100, ilvl: 70 },
+                { tier: 2, min: 8, max: 14, weight: 300, ilvl: 30 },
+                { tier: 3, min: 3, max: 7, weight: 800, ilvl: 1 }
             ]
         },
         chance_to_convert: {

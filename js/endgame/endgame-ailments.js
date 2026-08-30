@@ -7,11 +7,10 @@
 //   ignite      (fire)      – damage over time; on the player it drains the
 //                             absorption shield first, then HP.
 //   chill       (cold)      – attack charge bar fills at 50% speed.
-//   frozen      (cold)      – attack charge bar does not fill at all
-//                             (movement prevention hooks in here later).
+//   frozen      (cold)      – legacy player status; cold now uses chill.
 //   shocked     (lightning) – target takes +25% damage from all hits.
-//   shadowburn  (shadow)    – damage over time that IGNORES the absorption
-//                             shield and burns straight from HP.
+//   shadow      (shadow)    – cloud/blind effect; reduces hit chance while inside.
+//   shadowburn  (shadow)    – legacy damage-over-time status for compatibility.
 //
 // Puzzle side (applied when a monster shoots the grid centre instead of the
 // player — see EG_PUZZLE_ATTACK_CHANCE_PCT):
@@ -20,7 +19,7 @@
 //   lightning → shocked cursor: revealing cells may strip ✕ marks nearby
 //   shadow    → blackout: one row/column clue line is hidden for a while
 //
-// NOTE: Arcane has no ailment yet (no arcane damage element exists).
+// Arcane uses confusion: manual correct reveals can rarely hurt the player.
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
@@ -30,14 +29,20 @@
 const EG_AIL_TICK_INTERVAL_S = 1.0;     // DoT tick every second
 const EG_AIL_IGNITE_DURATION_S = 5;
 const EG_AIL_IGNITE_DMG_SHARE = 0.15;   // dps = share of the triggering hit
-const EG_AIL_CHILL_DURATION_S = 4;
+const EG_AIL_CHILL_DURATION_S = 8;
 const EG_AIL_CHARGE_SLOW_MULT = 0.5;    // chilled attack bar fills at 50%
-const EG_AIL_FROZEN_DURATION_S = 2.5;
+const EG_AIL_FROZEN_DURATION_S = 0;     // player freeze removed; retained for compatibility
 const EG_AIL_SHOCK_DURATION_S = 5;
 const EG_AIL_SHOCK_AMP_PCT = 25;        // +damage taken while shocked
 const EG_AIL_SHADOWBURN_DURATION_S = 4;
 const EG_AIL_SHADOWBURN_DMG_SHARE = 0.2;
-const EG_AIL_POLYMORPH_DURATION_S = 6;  // monsters fight each other, your own reveals hurt you
+const EG_AIL_POLYMORPH_DURATION_S = 6;  // legacy conversion status
+const EG_AIL_SHADOW_DURATION_S = 6;
+const EG_AIL_BLIND_HIT_CHANCE = 0.7;
+const EG_AIL_CONFUSION_DURATION_S = 6;
+const EG_AIL_CONFUSION_SELF_HIT_CHANCE = 0.08;
+const EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS = 1000;
+const EG_AIL_PLAYER_GROUND_DURATION_MS = 5000;
 
 const EG_MONSTER_AILMENT_CHANCE_PCT = 15;     // monster hit → player ailment
 const EG_COLD_INNATE_CHILL_CHANCE_PCT = 10;   // cold hits chill even w/o mods
@@ -56,7 +61,9 @@ const EG_AILMENT_ICONS = {
     frozen: '🧊',
     shocked: '⚡',
     shadowburn: '🌑',
+    shadow: '☁️',
     polymorph: '🌀',
+    confused: '❓',
 };
 
 //------------------------------------------------------------------------
@@ -110,7 +117,9 @@ function _egApplyMonsterAilment(monster, key, dps) {
         frozen: EG_AIL_FROZEN_DURATION_S,
         shocked: EG_AIL_SHOCK_DURATION_S,
         shadowburn: EG_AIL_SHADOWBURN_DURATION_S,
+        shadow: EG_AIL_SHADOW_DURATION_S,
         polymorph: EG_AIL_POLYMORPH_DURATION_S,
+        confused: EG_AIL_CONFUSION_DURATION_S,
     })[key];
     if (!durationS) return;
     _egApplyStatusToMap(monster.statuses, key, durationS, dps);
@@ -124,7 +133,9 @@ function _egApplyPlayerAilment(key, dps) {
         frozen: EG_AIL_FROZEN_DURATION_S,
         shocked: EG_AIL_SHOCK_DURATION_S,
         shadowburn: EG_AIL_SHADOWBURN_DURATION_S,
+        shadow: EG_AIL_SHADOW_DURATION_S,
         polymorph: EG_AIL_POLYMORPH_DURATION_S,
+        confused: EG_AIL_CONFUSION_DURATION_S,
     })[key];
     if (!durationS) return;
     // Active map run: "Ailments on you last #% longer".
@@ -133,8 +144,14 @@ function _egApplyPlayerAilment(key, dps) {
         const longerPct = _egGetActiveMapModValue('map_longer_ailments');
         if (longerPct > 0) scaled = durationS * (1 + Math.min(100, longerPct) / 100);
     }
+    const playerStats = typeof _egComputePlayerStats === 'function' ? _egComputePlayerStats() : {};
+    const durationPct = Math.max(0, playerStats.ailmentDurationPct || 0);
+    if (durationPct > 0) scaled *= 1 + durationPct / 100;
     _egApplyStatusToMap(_egPlayerStatuses, key, scaled, dps);
     _egStartPlayerStatusBarTicker();
+    _egShowPlayerAilmentOverlay(key);
+    if (key === 'ignite') _egStartPlayerFireDrops();
+    if (key === 'shadow') _egStartPlayerShadowClouds();
     showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph — the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
 }
 
@@ -266,6 +283,10 @@ function _egApplyAilmentShockAmpOnMonster(target, amount) {
 }
 
 // +shock damage-taken amplification for the PLAYER.
+function _egPlayerHitChanceMultiplier() {
+    return _egPlayerHasAilment('shadow') && _egIsPlayerInsideCloud() ? EG_AIL_BLIND_HIT_CHANCE : 1;
+}
+
 function _egApplyPlayerShockAmp(amount) {
     if (!_egIsActive()) return amount;
     if (!_egPlayerHasAilment('shocked')) return amount;
@@ -294,7 +315,7 @@ function _egRollPlayerHitAilments(target, amount, elements) {
     }
     if (coldShare > 0) {
         if (stats.freezePct > 0 && Math.random() * 100 < stats.freezePct) {
-            _egApplyMonsterAilment(target, 'frozen');
+            _egApplyMonsterAilment(target, 'chill');
         } else if (Math.random() * 100 < EG_COLD_INNATE_CHILL_CHANCE_PCT) {
             _egApplyMonsterAilment(target, 'chill');
         }
@@ -323,20 +344,15 @@ function _egRollMonsterHitAilment(element, dealt) {
             break;
         case 'cold':
             _egApplyPlayerAilment('chill');
-            // Active map run: monster cold hits may freeze the player.
-            if (typeof _egGetActiveMapModValue === 'function'
-                && Math.random() * 100 < _egGetActiveMapModValue('map_freezing_hits')) {
-                _egApplyPlayerAilment('frozen');
-            }
             break;
         case 'lightning':
             _egApplyPlayerAilment('shocked');
             break;
         case 'shadow':
-            _egApplyPlayerAilment('shadowburn', Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_SHADOWBURN_DMG_SHARE));
+            _egApplyPlayerAilment('shadow');
             break;
         case 'arcane':
-            _egApplyPlayerAilment('polymorph');
+            _egApplyPlayerAilment('confused');
             break;
     }
 }
@@ -554,7 +570,7 @@ function _egApplyPuzzleAilment(element) {
         case 'lightning': _egPuzzleShockedCursor(); break;
         case 'shadow': _egPuzzleShadowBlackout(); break;
         // Arcane has no grid hazard — the chaos curse IS the effect
-        case 'arcane': _egApplyPlayerAilment('polymorph'); break;
+        case 'arcane': _egApplyPuzzleArcaneBomb(); break;
     }
 }
 
@@ -600,6 +616,8 @@ function _egRemovePuzzleEffect(effect) {
         _egStopShockedCursor();
     } else if (effect.type === 'shadowline') {
         _egRestoreLineClues(effect.line);
+    } else if (effect.el) {
+        effect.el.remove();
     }
 }
 
@@ -824,6 +842,72 @@ function _egOnCorrectCellPuzzleFX(row, col) {
 // One random row OR column clue line goes dark ("?") for a while.
 // Scoped variant of the boss-wide Clue Blackout mechanic.
 //------------------------------------------------------------------------
+
+function _egShowPlayerAilmentOverlay(key) {
+    const text = { ignite: 'BURNING', chill: 'CHILLED', shocked: 'SHOCKED', shadow: 'BLINDED', confused: 'CONFUSED' }[key];
+    if (!text) return;
+    const old = document.getElementById('eg-player-ailment-overlay');
+    if (old) old.remove();
+    const el = document.createElement('div');
+    el.id = 'eg-player-ailment-overlay';
+    el.className = `eg-player-ailment-overlay eg-player-ailment-${key}`;
+    el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(() => { if (el.isConnected) el.remove(); }, 1800);
+}
+
+function _egGetPlayerRectForAilment() {
+    const el = document.getElementById('player-avatar-wrapper');
+    return el ? el.getBoundingClientRect() : null;
+}
+function _egIsPlayerInsideCloud() {
+    const r = _egGetPlayerRectForAilment();
+    if (!r) return false;
+    return _egPuzzleEffects.some(e => (e.type === 'playerfire' || e.type === 'playershadow') &&
+        e.x >= r.left && e.x <= r.right && e.y >= r.top && e.y <= r.bottom);
+}
+function _egDropPlayerGround(type) {
+    const r = _egGetPlayerRectForAilment();
+    if (!r) return;
+    const el = document.createElement('div');
+    el.className = `eg-player-ground eg-player-ground-${type}`;
+    el.style.left = `${r.left + r.width / 2}px`;
+    el.style.top = `${r.top + r.height / 2}px`;
+    document.body.appendChild(el);
+    const effect = { type: type === 'fire' ? 'playerfire' : 'playershadow', x: r.left + r.width / 2, y: r.top + r.height / 2, el };
+    _egPuzzleEffects.push(effect);
+    setTimeout(() => { el.remove(); _egPuzzleEffects = _egPuzzleEffects.filter(e => e !== effect); }, EG_AIL_PLAYER_GROUND_DURATION_MS);
+}
+function _egStartPlayerFireDrops() {
+    _egDropPlayerGround('fire');
+    setTimeout(() => { if (_egPlayerHasAilment('ignite')) _egStartPlayerFireDrops(); }, EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS);
+}
+function _egStartPlayerShadowClouds() {
+    _egDropPlayerGround('shadow');
+    setTimeout(() => { if (_egPlayerHasAilment('shadow')) _egStartPlayerShadowClouds(); }, EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS);
+}
+
+function _egApplyPuzzleArcaneBomb() {
+    if (!_egIsActive() || _egPuzzleEffects.some(e => e.type === 'arcanebomb')) return;
+    const pick = _egPickHazardCell(new Set());
+    if (!pick) return;
+    const cell = document.getElementById(`g-${pick.r}-${pick.c}`);
+    if (!cell) return;
+    const icon = document.createElement('span');
+    icon.className = 'eg-arcane-bomb-overlay';
+    icon.textContent = '🔮';
+    cell.appendChild(icon);
+    const bomb = { type: 'arcanebomb', row: pick.r, col: pick.c, until: Date.now() + EG_PUZZLE_EFFECT_DURATION_MS, el: icon };
+    bomb.timer = setTimeout(() => {
+        const adjacent = [[pick.r-1,pick.c-1],[pick.r-1,pick.c],[pick.r-1,pick.c+1],[pick.r,pick.c-1],[pick.r,pick.c+1],[pick.r+1,pick.c-1],[pick.r+1,pick.c],[pick.r+1,pick.c+1]];
+        const marks = adjacent.filter(([r,c]) => r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length && userGrid[r][c] === 2).length;
+        const amount = Math.max(1, marks * 8);
+        _egPlayerTakeDamage(amount, true, 'arcane');
+        _egRemovePuzzleEffect(bomb);
+    }, EG_PUZZLE_EFFECT_DURATION_MS);
+    _egPuzzleEffects.push(bomb);
+    showToast('🔮 An arcane bomb appeared — remove adjacent ✕ marks before it detonates!');
+}
 
 function _egPuzzleShadowBlackout() {
     if (_egPuzzleEffects.some(e => e.type === 'shadowline')) return;

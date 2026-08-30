@@ -55,6 +55,11 @@ const EG_BOSS_DEFS = {
         baseHP: 950, baseDamage: 24, chargeMax: 11,
         element: 'fire', resistances: { fire: 30, cold: 15, lightning: 15, shadow: 15 }
     },
+    boss_overfitter: {
+        id: 'boss_overfitter', name: 'The Overfitter', emoji: '📈',
+        baseHP: 1050, baseDamage: 23, chargeMax: 12,
+        element: 'shadow', resistances: { fire: 15, cold: 15, lightning: 15, shadow: 30 }
+    },
 };
 
 
