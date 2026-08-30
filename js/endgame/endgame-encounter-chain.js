@@ -1840,6 +1840,7 @@ function _egShowLeaveMapTransition(atlasResult, opts) {
     document.getElementById('btn-eg-leave-map-return').onclick = () => {
         _egClearBonusLootFlags();
         _egHideLeaveMapTransition();
+        window._egMapDefeatInProgress = false;
         showEndgameNexus();
     };
 }
@@ -1882,6 +1883,11 @@ function _egHideLeaveMapTransition() {
 // leave-map summary screen.
 function _egEndMapDefeated(titleText, subText) {
     if (!_egIsActive()) return false;
+
+    // Mark the generic Hardcore path as consumed before cleanup runs. This
+    // prevents any queued observer/callback from reopening ov-lose after the
+    // map-failed summary has been shown.
+    window._egMapDefeatInProgress = true;
 
     if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
 

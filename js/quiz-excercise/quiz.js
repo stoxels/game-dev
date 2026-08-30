@@ -657,14 +657,16 @@ function _quizRefreshTutorButton() {
     const btn = document.getElementById('quiz-tutor-btn');
     if (!btn) return;
 
+    // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
+    const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
     // Trix's Silver Tongue trait grants Tutor access on its own;
     // the tutor_enable node grants it for everyone else.
-    const canUseTutor = PT.hasSkill('tutor_enable') || _charIs('trix');
+    const canUseTutor = superTutorEnabled || PT.hasSkill('tutor_enable') || _charIs('trix');
     const tutorCount = _quizCountTutorItems();
 
-    if (canUseTutor && tutorCount > 0) {
+    if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
         btn.style.display = 'inline-block';
-        btn.textContent = t('qz_ask_tutor').replace('{n}', tutorCount);
+        btn.textContent = superTutorEnabled ? t('qz_super_tutor') : t('qz_ask_tutor').replace('{n}', tutorCount);
     } else {
         btn.style.display = 'none';
     }
@@ -674,11 +676,13 @@ function _quizRefreshTutorButton() {
 // Selects and (maybe) consumes an item, rolls for success, then
 // either resolves the question or leaves it active for manual answering.
 function quizUseTutor() {
-    const tutorItem = _quizGetTutorItem();
-    if (!tutorItem) return;
+    // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
+    const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
+    const tutorItem = superTutorEnabled ? null : _quizGetTutorItem();
+    if (!superTutorEnabled && !tutorItem) return;
 
-    const successChance = _quizCalcTutorSuccessChance();
-    const noConsumeChance = _quizCalcTutorNoConsumeChance();
+    const successChance = superTutorEnabled ? 1 : _quizCalcTutorSuccessChance();
+    const noConsumeChance = superTutorEnabled ? 1 : _quizCalcTutorNoConsumeChance();
 
     // Consume the item unless the no-consume roll saves it
     const isConsumed = Math.random() >= noConsumeChance;

@@ -901,6 +901,10 @@ function _egEnsureLoseOverlayEndgameUI() {
     new MutationObserver(() => {
         if (!ov.classList.contains('show')) return;
         if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
+        if (window._egMapDefeatInProgress) {
+            ov.classList.remove('show', 'eg-map-failed');
+            return;
+        }
 
         const titleEl = document.getElementById('lose-title');
         const subEl = document.getElementById('lose-sub');

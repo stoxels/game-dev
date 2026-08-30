@@ -216,6 +216,11 @@ const T = {
         quiz_wrong: '✗ Wrong answer. No bonus.',
         quiz_continue: 'CONTINUE ▶',
         quiz_skip: 'SKIP',
+        // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
+        qz_super_tutor: '🎓 SUPER TUTOR',
+        mod_super_tutor: 'SUPER TUTOR',
+        mod_super_tutor_tag: 'BETA TEST',
+        mod_desc_super_tutor: '100% correct answers; no Tutor item required. Temporary beta feature.',
 
         // Inventory strip header
         inv_strip_header: '🎒 INVENTORY - Left Click to use an item - Right Click to add to the reshuffle pile',

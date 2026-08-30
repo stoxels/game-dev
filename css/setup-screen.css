@@ -286,10 +286,36 @@
         filter: brightness(1.15);
     }
 
-    .setup-opt-mod.sel-yellow {
-        background-image: url('../images/Game_Setup/Modifier-Block-2.png');
-        color: var(--accent2);
-    }
+.setup-opt-mod.sel-yellow {
+    background-image: url('../images/Game_Setup/Modifier-Block-2.png');
+    color: var(--accent2);
+}
+
+/* BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period. */
+.setup-super-tutor-wrapper {
+    top: 45% !important;
+    right: -10% !important;
+}
+.mod-super-tutor {
+    border: 1px solid #f5c518;
+}
+.mod-super-tutor.sel-yellow {
+    color: #f5c518;
+    filter: brightness(1.2);
+}
+.mod-title-gold {
+    color: #f5c518;
+    text-shadow: 0 0 8px rgba(245,197,24,0.6);
+}
+.mod-icon-super-tutor {
+    width: 100%;
+    height: 65%;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(24px, 3vw, 50px);
+}
 
 
 /* -----------------------------------------------------------------------
@@ -477,7 +503,7 @@
 .mod-per-desc {
     display: none;
     font-size: clamp(9px, 1vw, 15px); /* CHANGED: was fixed 15px */
-    color: #2c1a0c;
+    color: black;
     text-align: center;
     line-height: 1.25;
     max-width: clamp(90px, 10vw, 150px); /* CHANGED: was fixed 150px */

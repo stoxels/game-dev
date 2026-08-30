@@ -130,6 +130,8 @@ function showTitle() {
 // Navigates to the setup screen and refreshes difficulty/mod descriptions.
 function showSetup() {
     stopTimer();
+    // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
+    if (typeof syncDiffModButtons === 'function') syncDiffModButtons();
     screenHistory.push('screen-title');
     updDiffDesc();
     updModDesc();

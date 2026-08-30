@@ -16,7 +16,8 @@ const DIFF_CFG = {
 // Currently toggled optional modifiers. Keys drive UI, scoring and gameplay
 // checks below — order here also determines score-multiplier application
 // order, so don't reorder without checking scoreMultiplier().
-let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false };
+// BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
+let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false, superTutor: false };
 
 // Score multiplier applied per active modifier (stacks multiplicatively).
 const MOD_MULT = {

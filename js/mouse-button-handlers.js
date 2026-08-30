@@ -389,6 +389,15 @@ function checkGoldenClockAfterMistake() {
 function checkHardcoreAfterMistake() {
     if (!curMods.hardcore) return false;
 
+    // Endgame maps have their own defeat summary. Do not open the generic
+    // Hardcore overlay first; its mutation observer would otherwise race
+    // with the map-failed transition and reopen the overlay on return.
+    if (typeof _egIsActive === 'function' && _egIsActive() &&
+        typeof _egEndMapDefeated === 'function') {
+        _egEndMapDefeated(t('hc_fail_title'), t('hc_fail_sub'));
+        return true;
+    }
+
     dead = true;
     stopTimer();
     window._lastFailedGi = cur.gIdx;    // bounceback achievement needs this

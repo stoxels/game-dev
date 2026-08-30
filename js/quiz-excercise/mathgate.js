@@ -445,12 +445,14 @@ function mgRefreshTutorButton() {
     const btn = document.getElementById('mg-tutor-btn');
     if (!btn) return;
 
-    const canUseTutor = PT.hasSkill('tutor_enable') || _charIs('trix');
+    // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
+    const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
+    const canUseTutor = superTutorEnabled || PT.hasSkill('tutor_enable') || _charIs('trix');
     const tutorCount = STATE.inventory.filter(i => TUTOR_ITEM_IDS_2.includes(i.defId)).length;
 
-    if (canUseTutor && tutorCount > 0) {
+    if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
         btn.style.display = 'inline-block';
-        btn.textContent = t('qz_ask_tutor').replace('{n}', tutorCount);
+        btn.textContent = superTutorEnabled ? t('qz_super_tutor') : t('qz_ask_tutor').replace('{n}', tutorCount);
     } else {
         btn.style.display = 'none';
     }
@@ -499,14 +501,16 @@ function mgHandleTutorFailure() {
 function mgUseTutor() {
     if (!currentGateQuestion) return;
 
+    // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
+    const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
     // Find the lowest-tier tutor item the player currently owns.
-    const tutorItem = TUTOR_ITEM_IDS_2
+    const tutorItem = superTutorEnabled ? null : TUTOR_ITEM_IDS_2
         .flatMap(id => STATE.inventory.filter(i => i.defId === id))
         .find(Boolean);
-    if (!tutorItem) return;
+    if (!superTutorEnabled && !tutorItem) return;
 
-    const tutorChance = mgCalcTutorChance();
-    const noConsumeChance = mgCalcNoConsumeChance();
+    const tutorChance = superTutorEnabled ? 1 : mgCalcTutorChance();
+    const noConsumeChance = superTutorEnabled ? 1 : mgCalcNoConsumeChance();
 
     // Consume the item unless the no-consume roll saves it.
     const isConsumed = Math.random() >= noConsumeChance;
