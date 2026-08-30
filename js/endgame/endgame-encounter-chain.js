@@ -202,6 +202,10 @@ function _egShowInterstitialQuestion(onDone) {
         onDone();
     };
 
+    if (typeof _egHazardsHideForQuiz === 'function') {
+        try { _egHazardsHideForQuiz(); } catch (e) {}
+    }
+
     // Don't rely on def.world — monster levels have no world property.
     // Instead build a pool from ALL worlds that have questions and pick randomly.
     const worldNum = _egPickInterstitialWorldNum();
@@ -249,6 +253,9 @@ function _egTriggerQuestionNow() {
     showToast(t('eg_trigger_question_toast'), '#7fb8ff');
     _egShowInterstitialQuestion(() => {
         _egUpdateObjectivesHUD();
+        if (typeof _egHazardsShowAfterQuiz === 'function') {
+            try { _egHazardsShowAfterQuiz(); } catch (e) {}
+        }
     });
 }
 
@@ -437,6 +444,10 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
 
     if (carriedMaps.length > 0 && typeof _egReplaceCarriedMapDrops === 'function') {
         setTimeout(() => _egReplaceCarriedMapDrops(carriedMaps), 400);
+    }
+
+    if (typeof _egHazardsShowAfterQuiz === 'function') {
+        try { _egHazardsShowAfterQuiz(); } catch (e) {}
     }
 }
 
@@ -977,6 +988,8 @@ function _egBuildChainBonusGainHTML() {
 function _egEndMap() {
     if (!_egEncounterActive) return;
     _egCancelChainCountdown();
+
+    if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
 
     // Roll for completion bonus loot first — it must land in _egRunLoot
     // before the transition overlay renders its summary.
@@ -1867,6 +1880,8 @@ function _egHideLeaveMapTransition() {
 // leave-map summary screen.
 function _egEndMapDefeated(titleText, subText) {
     if (!_egIsActive()) return false;
+
+    if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
 
     // If a generic defeat opened the lose overlay first, close it.
     const ovLose = document.getElementById('ov-lose');

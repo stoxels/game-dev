@@ -143,6 +143,7 @@ const EG_HZ_LAYER_Z = 850;                // below player avatar (z:1000)
 
 let _egHzActive = false;
 let _egHzLayer = null;
+let _egHzPausedForQuiz = false;
 
 let _egHzLava = null;       // { pools: [{x,y,r,vx,vy,el,dmgAcc}], dmgMult }
 let _egHzLightning = null;  // { pending: [{x,y,t,el}], nextIn }
@@ -436,12 +437,15 @@ function _egHazardsReset() {
     if (deliriumI > 0) _egHzInitDelirium(deliriumI);
 
     _egHzActive = true;
+    _egHzPausedForQuiz = false;
+    if (_egHzLayer) _egHzLayer.style.display = '';
     showToast(`☠️ Elemental Hazards active: ${active.join(' ')}`);
 }
 
 // Tears down every hazard DOM node and state. Safe to call anytime.
 function _egHazardsCleanup() {
     _egHzActive = false;
+    _egHzPausedForQuiz = false;
     _egHzLava = null;
     _egHzLightning = null;
     _egHzBlizzard = null;
@@ -463,9 +467,29 @@ function _egHazardsCleanup() {
     document.querySelectorAll('.eg-hz-delirium').forEach(el => el.remove());
 }
 
+// Hides all hazard visuals and pauses hazard ticks while a quiz modal
+// is visible so the question remains readable and the player is not
+// damaged by invisible hazards.
+function _egHazardsHideForQuiz() {
+    if (!_egHzActive || _egHzPausedForQuiz) return;
+    _egHzPausedForQuiz = true;
+    if (_egHzLayer) _egHzLayer.style.display = 'none';
+    document.querySelectorAll('.eg-hz-darkness-layer, .eg-hz-delirium').forEach(el => { el.style.display = 'none'; });
+}
+
+// Re-shows hazard visuals and resumes ticking when the next puzzle launches
+// (or after a standalone interstitial question is dismissed).
+function _egHazardsShowAfterQuiz() {
+    if (!_egHzPausedForQuiz) return;
+    _egHzPausedForQuiz = false;
+    if (_egHzLayer) _egHzLayer.style.display = '';
+    document.querySelectorAll('.eg-hz-darkness-layer, .eg-hz-delirium').forEach(el => { el.style.display = ''; });
+}
+
 // Per-tick driver — called at 10Hz from _egTickLoop.
 function _egHazardsTick() {
     if (!_egHzActive) return;
+    if (_egHzPausedForQuiz) return;
     if (typeof dead !== 'undefined' && dead) return;
     const dtMs = 100;
 

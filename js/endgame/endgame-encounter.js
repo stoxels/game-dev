@@ -466,6 +466,8 @@ function _egStopEncounter() {
     _egTargetId = null;
     if (typeof _egPendingRevealQueue !== 'undefined') _egPendingRevealQueue = [];
 
+    if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
+
     if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
     _egStopTickLoop();
     _egCancelSpawnTimers();

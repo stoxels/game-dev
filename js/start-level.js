@@ -128,6 +128,7 @@ function _cleanupPreviousLevel() {
 
     // Stop any active endgame encounter from the previous level
     if (typeof _egStopEncounter === 'function') _egStopEncounter();
+    if (!window._egSuppressEncounterStop && typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
     // Ensure quiz damage buff does not leak across maps when _egStopEncounter
     // was suppressed (chain transitions preserve it intentionally, but any
     // non-chain start must clear it: winning / losing / restarting a map).
