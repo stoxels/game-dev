@@ -361,10 +361,12 @@ function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
     }
 
     if (!ignoreShield && _egPlayerAbsorptionCurrent > 0) {
+        const prevAbs = _egPlayerAbsorptionCurrent;
         const absorbed = Math.min(_egPlayerAbsorptionCurrent, amount);
         _egPlayerAbsorptionCurrent -= absorbed;
         amount -= absorbed;
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('player_shield_damage_taken');
+        if (typeof _egMaybeShowAbsorptionBroken === 'function') _egMaybeShowAbsorptionBroken(prevAbs, _egPlayerAbsorptionCurrent);
     }
 
     amount = Math.round(Math.max(0, amount));

@@ -1563,13 +1563,13 @@ const EG_MOD_TABLE_SHOULDERS = {
         faster_absorption_regen_start: {
             id: 'faster_absorption_regen_start',
             // Reduces the delay before absorption starts regenerating after a hit.
-            // Expressed as seconds reduced from the 10-second base delay.
+            // Expressed as seconds reduced from the 18-second base delay.
             label: 'Absorption begins Regenerating # second(s) sooner', labelDe: 'Absorption regeneriert # Sekunde(n) früher',
             tiers: [
-                { tier: 1, min: 2.0, max: 2.5, weight: 80, ilvl: 82 },
-                { tier: 2, min: 1.0, max: 1.9, weight: 200, ilvl: 60 },
-                { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 35 },
-                { tier: 4, min: 0.1, max: 0.4, weight: 1000, ilvl: 10 }
+                { tier: 1, min: 4.0, max: 5.0, weight: 80, ilvl: 82 },
+                { tier: 2, min: 2.0, max: 3.9, weight: 200, ilvl: 60 },
+                { tier: 3, min: 1.0, max: 1.9, weight: 500, ilvl: 35 },
+                { tier: 4, min: 0.3, max: 0.9, weight: 1000, ilvl: 10 }
             ]
         },
 
@@ -2581,10 +2581,10 @@ const EG_MOD_TABLE_CHEST = {
             id: 'faster_absorption_regen_start',
             label: 'Absorption begins Regenerating # second(s) sooner', labelDe: 'Absorption regeneriert # Sekunde(n) früher',
             tiers: [
-                { tier: 1, min: 2.0, max: 3.0, weight: 80, ilvl: 82 },
-                { tier: 2, min: 1.2, max: 1.9, weight: 200, ilvl: 60 },
-                { tier: 3, min: 0.5, max: 1.1, weight: 500, ilvl: 35 },
-                { tier: 4, min: 0.1, max: 0.4, weight: 1000, ilvl: 10 }
+                { tier: 1, min: 4.0, max: 6.0, weight: 80, ilvl: 82 },
+                { tier: 2, min: 2.4, max: 3.9, weight: 200, ilvl: 60 },
+                { tier: 3, min: 1.0, max: 2.3, weight: 500, ilvl: 35 },
+                { tier: 4, min: 0.3, max: 0.9, weight: 1000, ilvl: 10 }
             ]
         },
 
@@ -4529,12 +4529,12 @@ const EG_MOD_TABLE_PANTS = {
         // window, useful for buying reaction time rather than raw delay.
         stagger: {
             id: 'stagger',
-            label: '#% Chance to Stagger a Monster on Hit\n(Pauses their Charge Timer for 1 second)', labelDe: '#% Chance, ein Monster bei Treffer ins Wanken zu bringen\n(pausiert dessen Ansturm-Timer für 1 Sekunde)',
+            label: '#% Chance to Stagger a Monster on Hit\n(Pauses their Charge Timer for 2.5 seconds)', labelDe: '#% Chance, ein Monster bei Treffer ins Wanken zu bringen\n(pausiert dessen Ansturm-Timer für 2,5 Sekunden)',
             tiers: [
-                { tier: 1, min: 22, max: 30, weight: 80, ilvl: 84 },
-                { tier: 2, min: 13, max: 21, weight: 200, ilvl: 63 },
-                { tier: 3, min: 6, max: 12, weight: 460, ilvl: 38 },
-                { tier: 4, min: 2, max: 5, weight: 1000, ilvl: 12 }
+                { tier: 1, min: 30, max: 40, weight: 80, ilvl: 84 },
+                { tier: 2, min: 20, max: 29, weight: 200, ilvl: 63 },
+                { tier: 3, min: 10, max: 19, weight: 460, ilvl: 38 },
+                { tier: 4, min: 4, max: 9, weight: 1000, ilvl: 12 }
             ]
         },
 
@@ -7051,10 +7051,10 @@ const EG_MOD_TABLE_WEAPON2 = {
             id: 'faster_absorption_regen_start',
             label: 'Absorption begins Regenerating # second(s) sooner', labelDe: 'Absorption regeneriert # Sekunde(n) früher',
             tiers: [
-                { tier: 1, min: 2.5, max: 3.0, weight: 80, ilvl: 82 },
-                { tier: 2, min: 1.5, max: 2.4, weight: 200, ilvl: 60 },
-                { tier: 3, min: 0.8, max: 1.4, weight: 480, ilvl: 35 },
-                { tier: 4, min: 0.2, max: 0.7, weight: 1000, ilvl: 10 }
+                { tier: 1, min: 5.0, max: 6.5, weight: 80, ilvl: 82 },
+                { tier: 2, min: 3.0, max: 4.9, weight: 200, ilvl: 60 },
+                { tier: 3, min: 1.6, max: 2.9, weight: 480, ilvl: 35 },
+                { tier: 4, min: 0.5, max: 1.5, weight: 1000, ilvl: 10 }
             ]
         },
 

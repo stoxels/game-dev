@@ -153,16 +153,19 @@ function _egSpawnGoldDrop(amount) {
     _egRenderGoldDropOverlay(r, c, drop);
 
     const lifetimeMs = EG_LOOT_DROP_LIFETIME_MS;
-    const timer = setTimeout(() => {
-        if (_egGoldDrops.get(key) === drop) {
-            _egGoldDrops.delete(key);
-            _egRemoveGoldDropOverlay(key);
+    if (typeof _egScheduleTrackedExpiry === 'function') {
+        _egScheduleTrackedExpiry(_egGoldDrops, key, drop, lifetimeMs, `eg-gold-drop-${r}-${c}`, _egRemoveGoldDropOverlay);
+    } else {
+        const timer = setTimeout(() => {
+            if (_egGoldDrops.get(key) === drop) {
+                _egGoldDrops.delete(key);
+                _egRemoveGoldDropOverlay(key);
+            }
+        }, lifetimeMs);
+        if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
+        if (typeof _egStartDropExpireCountdown === 'function') {
+            _egStartDropExpireCountdown(`eg-gold-drop-${r}-${c}`, lifetimeMs);
         }
-    }, lifetimeMs);
-    if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
-
-    if (typeof _egStartDropExpireCountdown === 'function') {
-        _egStartDropExpireCountdown(`eg-gold-drop-${r}-${c}`, lifetimeMs);
     }
 }
 
@@ -170,5 +173,11 @@ function _egSpawnGoldDrop(amount) {
 // Gold no longer drops on the grid — these are kept as no-ops for API compatibility.
 function _egCheckGoldDropClaim(row, col) { return false; }
 function _egDiscardGoldDrop(row, col) {}
-function _egStopGoldDrops() { _egGoldDrops.clear(); }
+function _egStopGoldDrops() {
+    if (typeof _egCancelTrackedExpiry === 'function') {
+        Array.from(_egGoldDrops.entries()).forEach(([key, drop]) => _egCancelTrackedExpiry(_egGoldDrops, key, drop));
+    }
+    _egGoldDrops.forEach((drop, key) => _egRemoveGoldDropOverlay(key));
+    _egGoldDrops.clear();
+}
 function _egReplaceCarriedGoldDrops(drops) {}

@@ -44,10 +44,10 @@
     max-width: 560px !important;
 }
 
-    /* Lift the PoE frame's own 360px cap inside equipment tooltips */
-    #ghud-floating-tip .eg-tt-frame {
-        max-width: none;
-    }
+/* Lift the PoE frame's own 360px cap inside equipment tooltips */
+#ghud-floating-tip .eg-tt-frame {
+    max-width: none;
+}
 
 /* Map item tooltips — widened purely via content detection (:has), so
    EVERY call site that renders a map tooltip gets the extra width
@@ -59,10 +59,63 @@
     max-width: 620px !important;
 }
 
-    /* Lift the PoE frame's own 360px cap inside map tooltips */
-    #ghud-floating-tip .eg-map-frame {
-        max-width: none;
-    }
+/* Lift the PoE frame's own 360px cap inside map tooltips */
+#ghud-floating-tip .eg-map-frame {
+    max-width: none;
+}
+
+/* Safety net — no descendant of the tooltip frame should ever be able to
+   push past its right edge, even a single long unbroken string with no
+   spaces to wrap on (e.g. a long guaranteed-modifier description). */
+.eg-tt-frame,
+.eg-tt-frame * {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    box-sizing: border-box;
+}
+
+/* Essence tooltip — "Guaranteed modifier" / "Works on" section.
+   These classes are built dynamically by _egBuildEssenceDetailHTML() but
+   previously had no rules at all, so long modifier descriptions (unlike
+   the short 2-3 word names most families use) had nothing forcing them
+   to stay inside the frame. */
+.eg-tt-essence-detail {
+    width: 100%;
+}
+
+.eg-tt-essence-title {
+    color: #d9b96c;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.85;
+}
+
+.eg-tt-essence-line {
+    display: block;
+    width: 100%;
+    white-space: normal;
+}
+
+.eg-tt-essence-mod {
+    display: block;
+    color: #f5d98a;
+    font-weight: 600;
+    white-space: normal;
+}
+
+.eg-tt-essence-slots {
+    display: block;
+    color: #c8c8c8;
+    white-space: normal;
+}
+
+.eg-tt-essence-note {
+    display: block;
+    font-size: 0.75rem;
+    color: #9aa0b0;
+    white-space: normal;
+}
 
 /* Header block */
 .eg-tt-header {
@@ -121,11 +174,11 @@
     margin-left: 8px;
 }
 
-/* Defense value already includes the item's local "% increased" mods —
+    /* Defense value already includes the item's local "% increased" mods —
    tinted gold to distinguish it from the plain base value */
-.eg-tt-val.eg-tt-val-modified {
-    color: #ffcf70;
-}
+    .eg-tt-val.eg-tt-val-modified {
+        color: #ffcf70;
+    }
 
 /* Requirements line */
 .eg-tt-req {
@@ -133,11 +186,11 @@
     font-size: 0.77rem;
 }
 
-/* Individual requirement part the player does not currently meet */
-.eg-tt-req .eg-tt-req-unmet {
-    color: #e74c3c;
-    font-weight: 600;
-}
+    /* Individual requirement part the player does not currently meet */
+    .eg-tt-req .eg-tt-req-unmet {
+        color: #e74c3c;
+        font-weight: 600;
+    }
 
 /* "Missing: X Agi" line under unmet requirements */
 .eg-tt-req-missing {
@@ -190,14 +243,17 @@
 .eg-tt-implicits-section {
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
+
 .eg-tt-mod.eg-tt-mod-implicit {
     color: #88c0ff;
 }
+
 .eg-tt-mod-tier-implicit {
     color: #88c0ff;
     border-color: rgba(136,192,255,0.35);
     background: rgba(136,192,255,0.10);
 }
+
 .eg-tt-group-title {
     font-family: var(--PX, monospace);
 }
@@ -207,11 +263,11 @@
     color: #e74c3c;
 }
 
-.eg-tt-mod.eg-tt-mod-downside .eg-tt-mod-tier {
-    color: #e88a8a;
-    border-color: rgba(231,76,60,0.35);
-    background: rgba(231,76,60,0.10);
-}
+    .eg-tt-mod.eg-tt-mod-downside .eg-tt-mod-tier {
+        color: #e88a8a;
+        border-color: rgba(231,76,60,0.35);
+        background: rgba(231,76,60,0.10);
+    }
 
 /* Flavor text at the bottom of unique item tooltips */
 .eg-tt-flavor {

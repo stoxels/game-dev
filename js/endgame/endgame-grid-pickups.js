@@ -42,14 +42,42 @@ const EG_COOLDOWN_SURGE_REDUCTION_SECS = 30;
 
 
 
-// Helper: computes the effective heart heal amount after gear bonuses.
+// ── Map-tier scaling for heart / mana pickups ───────────────────────────────
+// Hearts and mana orbs become more potent in higher map tiers, on top of
+// any gear bonuses. Mana scales slower than life so sustain stays balanced.
+// Tier 1 is the baseline (1.0×). Each additional tier adds a fixed %.
+//
+//   heart: +12% per tier → T16 ≈ 2.8×  (e.g. 10/25/50 → ~28/70/140 at T16)
+//   mana : + 7% per tier → T16 ≈ 2.05× (e.g. 20/50 → ~41/102 at T16, full restore unaffected)
+const EG_HEART_TIER_SCALE_PER_TIER = 0.12;
+const EG_MANA_TIER_SCALE_PER_TIER = 0.07;
+
+function _egGetPickupTier() {
+    if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem && _egActiveMapItem.mapTier != null) {
+        const cap = (typeof EG_MAX_MAP_TIER !== 'undefined') ? EG_MAX_MAP_TIER : 16;
+        const t = Math.max(1, Math.min(cap, Math.round(_egActiveMapItem.mapTier)));
+        return t;
+    }
+    return 1;
+}
+
+function _egHeartTierMult() {
+    const tier = _egGetPickupTier();
+    return 1 + EG_HEART_TIER_SCALE_PER_TIER * (tier - 1);
+}
+
+function _egManaTierMult() {
+    const tier = _egGetPickupTier();
+    return 1 + EG_MANA_TIER_SCALE_PER_TIER * (tier - 1);
+}
+
+// Helper: computes the effective heart heal amount after map-tier and gear bonuses.
+// Tier scaling is applied to the base heart value first, then gear adds on top:
+//   scaledBase = round(base * tierMult)
+//   effective  = (scaledBase + flat) * (1 + incPct/100)
 // Gear provides two stats that modify heart healing:
 //   heartHealFlat   — flat +# added to every heart (e.g. "+15 to Heart Heal Amount")
 //   heartHealIncPct — #% increased Heart Heal Amount (multiplier on the total)
-// Formula: effective = (base + flat) * (1 + incPct/100), rounded and clamped to >=0.
-// This matches the stat descriptions ("additional Life" + "Increases the Life granted
-// by hearts by this percentage") and makes the belt-exclusive % multiplier scale
-// both the base heart value and any flat bonuses from other slots.
 function _egCalcHeartHeal(baseAmount) {
     let flat = 0;
     let incPct = 0;
@@ -60,15 +88,19 @@ function _egCalcHeartHeal(baseAmount) {
             incPct = Number(s.heartHealIncPct) || 0;
         } catch (e) { /* stats unavailable (e.g. outside endgame) — use base */ }
     }
-    const total = (baseAmount + flat) * (1 + incPct / 100);
+    const tierMult = _egHeartTierMult();
+    const scaledBase = Math.round(baseAmount * tierMult);
+    const total = (scaledBase + flat) * (1 + incPct / 100);
     return Math.max(0, Math.round(total));
 }
 
-// Helper: computes the effective mana gain from a mana pickup after gear bonuses.
-// Mirrors _egCalcHeartHeal but for mana orbs:
+// Helper: computes the effective mana gain from a mana pickup after map-tier and gear bonuses.
+// Mirrors _egCalcHeartHeal but with a lower tier multiplier so mana sustain grows
+// more slowly than life sustain with map tier.
 //   manaHealFlat   — flat +# added to every mana pickup (e.g. "+15 to Mana Gain")
 //   manaHealIncPct — #% increased Mana Gained (multiplier on the total)
-// Formula: effective = (base + flat) * (1 + incPct/100), rounded and clamped to >=0.
+//   scaledBase = round(base * tierMult)  — skipped for the full-restore orb (base == maxMana)
+//   effective  = (scaledBase + flat) * (1 + incPct/100)
 function _egCalcManaGain(baseAmount) {
     let flat = 0;
     let incPct = 0;
@@ -79,7 +111,18 @@ function _egCalcManaGain(baseAmount) {
             incPct = Number(s.manaHealIncPct) || 0;
         } catch (e) { /* stats unavailable (e.g. outside endgame) — use base */ }
     }
-    const total = (baseAmount + flat) * (1 + incPct / 100);
+    let tierMult = _egManaTierMult();
+    // Full-restore orb (base == maxMana) should not be tier-scaled — it already
+    // restores the entire pool and gainMana() clamps to max anyway. Detect it
+    // so the toast reflects the true gain instead of an inflated 2× value.
+    if (typeof _getPlayerMaxMana === 'function') {
+        try {
+            const max = _getPlayerMaxMana();
+            if (max > 0 && baseAmount >= max) tierMult = 1;
+        } catch (e) { /* ignore */ }
+    }
+    const scaledBase = Math.round(baseAmount * tierMult);
+    const total = (scaledBase + flat) * (1 + incPct / 100);
     return Math.max(0, Math.round(total));
 }
 
@@ -363,21 +406,149 @@ function _egAnimatePickupClaim(row, col, def) {
     setTimeout(() => floater.remove(), 800);
 }
 
+// ── Tracked expiry helpers (pause-aware) ────────────────────────────────
+function _egScheduleTrackedExpiry(map, key, value, lifetimeMs, overlayId, removeOverlayFn) {
+    const expiresAt = Date.now() + lifetimeMs;
+    const timer = setTimeout(() => {
+        // remove tracking entry first
+        const idx = _egDropExpiryEntries.findIndex(e => e.map === map && e.key === key && e.value === value);
+        if (idx !== -1) _egDropExpiryEntries.splice(idx, 1);
+        if (map.get(key) === value) {
+            map.delete(key);
+            removeOverlayFn(key);
+        }
+    }, lifetimeMs);
+    _egPickupTimers.push(timer);
+    const entry = { map, key, value, lifetimeMs, expiresAt, timer, overlayId, removeOverlayFn, remaining: null };
+    _egDropExpiryEntries.push(entry);
+    if (overlayId) _egStartDropExpireCountdown(overlayId, lifetimeMs, expiresAt);
+    return timer;
+}
+
+function _egCancelTrackedExpiry(map, key, value) {
+    const idx = _egDropExpiryEntries.findIndex(e => e.map === map && e.key === key && e.value === value);
+    if (idx === -1) return;
+    const entry = _egDropExpiryEntries[idx];
+    if (entry.timer) {
+        clearTimeout(entry.timer);
+        // also remove from _egPickupTimers so stop() doesn't double-clear
+        const ti = _egPickupTimers.indexOf(entry.timer);
+        if (ti !== -1) _egPickupTimers.splice(ti, 1);
+    }
+    _egDropExpiryEntries.splice(idx, 1);
+    // also cancel its countdown if it was scheduled
+    if (entry.overlayId) _egCancelExpireCountdown(entry.overlayId);
+}
+
+function _egCancelExpireCountdown(overlayId) {
+    const idx = _egExpireCountdownEntries.findIndex(e => e.overlayId === overlayId);
+    if (idx === -1) return;
+    const cd = _egExpireCountdownEntries[idx];
+    if (cd.timeout) clearTimeout(cd.timeout);
+    if (cd.interval) clearInterval(cd.interval);
+    _egExpireCountdownEntries.splice(idx, 1);
+}
+
+// Pause / resume for all grid drops (pickups, loot, currency, items, gold, maps).
+// Called from _egOnPause / _egOnResume in endgame-encounter.js.
+function _egPauseGridDrops() {
+    const now = Date.now();
+    // Pause pickup spawner
+    if (_egPickupSpawnTimer && _egPickupSpawnerInfo.expiresAt) {
+        const remaining = Math.max(0, _egPickupSpawnerInfo.expiresAt - now);
+        clearTimeout(_egPickupSpawnTimer);
+        const ti = _egPickupTimers.indexOf(_egPickupSpawnTimer);
+        if (ti !== -1) _egPickupTimers.splice(ti, 1);
+        _egPickupSpawnerInfo.remaining = remaining;
+        _egPickupSpawnTimer = null;
+        _egPickupSpawnerInfo.timer = null;
+    }
+    // Pause each drop expiry timer
+    _egDropExpiryEntries.forEach(entry => {
+        if (entry.timer) {
+            clearTimeout(entry.timer);
+            const ti = _egPickupTimers.indexOf(entry.timer);
+            if (ti !== -1) _egPickupTimers.splice(ti, 1);
+            entry.remaining = Math.max(0, entry.expiresAt - now);
+            entry.timer = null;
+        }
+    });
+    // Pause countdown badges
+    _egExpireCountdownEntries.forEach(cd => {
+        if (cd.timeout) { clearTimeout(cd.timeout); cd.timeout = null; }
+        if (cd.interval) { clearInterval(cd.interval); cd.interval = null; }
+        // remaining until the warning badge should appear, and remaining until expiry
+        cd.delayRemaining = Math.max(0, cd.delayExpiresAt - now);
+        cd.expiryRemaining = Math.max(0, cd.expiresAt - now);
+    });
+}
+
+function _egResumeGridDrops() {
+    const now = Date.now();
+    // Resume pickup spawner
+    if (_egPickupSpawnerInfo.remaining != null) {
+        const remaining = _egPickupSpawnerInfo.remaining;
+        _egPickupSpawnerInfo.remaining = null;
+        _egPickupSpawnerInfo.expiresAt = now + remaining;
+        const timer = setTimeout(() => {
+            _egPickupSpawnerInfo.timer = null;
+            _egPickupSpawnerInfo.expiresAt = 0;
+            if (_egIsActive()) {
+                _egSpawnPickup();
+                _egScheduleNextPickupSpawn();
+            }
+        }, remaining);
+        _egPickupSpawnTimer = timer;
+        _egPickupSpawnerInfo.timer = timer;
+        _egPickupTimers.push(timer);
+    }
+    // Resume each drop expiry timer
+    _egDropExpiryEntries.forEach(entry => {
+        if (entry.remaining != null && entry.timer == null) {
+            const remaining = entry.remaining;
+            entry.remaining = null;
+            entry.expiresAt = now + remaining;
+            const timer = setTimeout(() => {
+                const idx = _egDropExpiryEntries.findIndex(e => e === entry);
+                if (idx !== -1) _egDropExpiryEntries.splice(idx, 1);
+                if (entry.map.get(entry.key) === entry.value) {
+                    entry.map.delete(entry.key);
+                    entry.removeOverlayFn(entry.key);
+                }
+            }, remaining);
+            entry.timer = timer;
+            _egPickupTimers.push(timer);
+        }
+    });
+    // Resume countdown badges
+    _egExpireCountdownEntries.forEach(cd => {
+        // shift startedAt / expiresAt so tick math stays correct
+        const elapsedBeforePause = cd.lifetimeMs - cd.expiryRemaining;
+        cd.startedAt = now - elapsedBeforePause;
+        cd.expiresAt = now + cd.expiryRemaining;
+        cd.delayExpiresAt = now + cd.delayRemaining;
+        const tick = cd.tick;
+        const startInterval = () => {
+            tick();
+            cd.interval = setInterval(tick, 250);
+        };
+        if (cd.delayRemaining <= 0) {
+            // warning period already started before pause — start ticking immediately
+            startInterval();
+        } else {
+            cd.timeout = setTimeout(() => {
+                cd.timeout = null;
+                startInterval();
+            }, cd.delayRemaining);
+        }
+    });
+}
+
 // Schedules the auto-expiry timer for a placed pickup.
 // Removes both the state entry and the DOM overlay when it fires.
 function _egSchedulePickupExpiry(key, def) {
     const [r, c] = key.split('-').map(Number);
-    const timer = setTimeout(() => {
-        // Only remove if this exact def is still sitting on the key
-        // (prevents a race where the pickup was already claimed).
-        if (_egPickups.get(key) === def) {
-            _egPickups.delete(key);
-            _egRemovePickupOverlay(key);
-        }
-    }, EG_PICKUP_LIFETIME_MS);
-    _egPickupTimers.push(timer);
-
-    _egStartDropExpireCountdown(`eg-pickup-${r}-${c}`, EG_PICKUP_LIFETIME_MS);
+    _egScheduleTrackedExpiry(_egPickups, key, def, EG_PICKUP_LIFETIME_MS, `eg-pickup-${r}-${c}`, _egRemovePickupOverlay);
 }
 
 // Shows a live countdown above a drop overlay during its final
@@ -386,18 +557,21 @@ function _egSchedulePickupExpiry(key, def) {
 // overlay (claim / discard / expiry) removes the countdown with it; the
 // polling interval self-terminates once the overlay is gone.
 // Call right after scheduling any drop's expiry timeout.
-function _egStartDropExpireCountdown(overlayId, lifetimeMs) {
+function _egStartDropExpireCountdown(overlayId, lifetimeMs, knownExpiresAt) {
     if (_egExpireCountdownStylesInjected()) _egInjectExpireCountdownStyles();
-    const startedAt = Date.now();
-    let interval = null;
+    const startedAt = (knownExpiresAt != null) ? (knownExpiresAt - lifetimeMs) : Date.now();
+    const expiresAt = (knownExpiresAt != null) ? knownExpiresAt : (startedAt + lifetimeMs);
+    const delay = Math.max(0, lifetimeMs - EG_DROP_EXPIRE_WARNING_MS);
+    const delayExpiresAt = startedAt + delay;
 
+    const entry = { overlayId, lifetimeMs, startedAt, expiresAt, delayExpiresAt, timeout: null, interval: null, tick: null, remaining: null, delayRemaining: null, expiryRemaining: null };
     const tick = () => {
         const overlay = document.getElementById(overlayId);
         if (!overlay) {
-            if (interval) { clearInterval(interval); interval = null; }
+            if (entry.interval) { clearInterval(entry.interval); entry.interval = null; }
             return;
         }
-        const remaining = lifetimeMs - (Date.now() - startedAt);
+        const remaining = entry.expiresAt - Date.now();
         if (remaining <= 0) return;
 
         let badge = overlay.querySelector('.eg-drop-expire-timer');
@@ -408,11 +582,14 @@ function _egStartDropExpireCountdown(overlayId, lifetimeMs) {
         }
         badge.textContent = Math.ceil(remaining / 1000);
     };
+    entry.tick = tick;
+    _egExpireCountdownEntries.push(entry);
 
-    setTimeout(() => {
+    entry.timeout = setTimeout(() => {
+        entry.timeout = null;
         tick();
-        interval = setInterval(tick, 250);
-    }, Math.max(0, lifetimeMs - EG_DROP_EXPIRE_WARNING_MS));
+        entry.interval = setInterval(tick, 250);
+    }, delay);
 }
 
 function _egExpireCountdownStylesInjected() {
@@ -492,11 +669,17 @@ function _egScheduleNextPickupSpawn() {
         + Math.random() * (EG_PICKUP_SPAWN_INTERVAL_MAX - EG_PICKUP_SPAWN_INTERVAL_MIN);
 
     _egPickupSpawnTimer = setTimeout(() => {
+        _egPickupSpawnerInfo.timer = null;
+        _egPickupSpawnerInfo.expiresAt = 0;
         if (_egIsActive()) {
             _egSpawnPickup();
             _egScheduleNextPickupSpawn();
         }
     }, delay);
+    _egPickupSpawnerInfo.timer = _egPickupSpawnTimer;
+    _egPickupSpawnerInfo.expiresAt = Date.now() + delay;
+    // keep legacy timer array in sync for bulk cleanup on stop
+    if (_egPickupTimers.indexOf(_egPickupSpawnTimer) === -1) _egPickupTimers.push(_egPickupSpawnTimer);
 }
 
 // Attempts to place one pickup on a random eligible grid tile.
@@ -539,8 +722,16 @@ function _egStopPickupSpawner() {
         clearTimeout(_egPickupSpawnTimer);
         _egPickupSpawnTimer = null;
     }
+    _egPickupSpawnerInfo.timer = null;
+    _egPickupSpawnerInfo.expiresAt = 0;
+    _egPickupSpawnerInfo.remaining = null;
     _egPickupTimers.forEach(t => clearTimeout(t));
     _egPickupTimers = [];
+    // also clear pause-aware tracking and countdowns
+    _egDropExpiryEntries.forEach(e => { if (e.timer) clearTimeout(e.timer); });
+    _egDropExpiryEntries = [];
+    _egExpireCountdownEntries.forEach(cd => { if (cd.timeout) clearTimeout(cd.timeout); if (cd.interval) clearInterval(cd.interval); });
+    _egExpireCountdownEntries = [];
 
     _egPickups.forEach((def, key) => _egRemovePickupOverlay(key));
     _egPickups.clear();
@@ -572,6 +763,7 @@ function _egCheckPickupClaim(row, col) {
     const def = _egPickups.get(key);
     if (!def) return false;
 
+    _egCancelTrackedExpiry(_egPickups, key, def);
     _egPickups.delete(key);
     _egRemovePickupOverlay(key);
     _egAnimatePickupClaim(row, col, def);
@@ -594,6 +786,7 @@ function _egDiscardPickup(row, col) {
     const key = `${row}-${col}`;
     if (!_egPickups.has(key)) return;
     const def = _egPickups.get(key);   // capture def before deleting
+    _egCancelTrackedExpiry(_egPickups, key, def);
     _egPickups.delete(key);
     _egRemovePickupOverlay(key);
     _egAnimatePickupDiscard(row, col, def); 
@@ -694,15 +887,7 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     _egLootDrops.set(key, item);
     _egRenderLootOverlay(r, c, item);
 
-    // Auto-expire after the loot lifetime
-    const timer = setTimeout(() => {
-        if (_egLootDrops.get(key) === item) {
-            _egLootDrops.delete(key);
-            _egRemoveLootOverlay(key);
-        }
-    }, EG_LOOT_DROP_LIFETIME_MS);
-    _egPickupTimers.push(timer); // reuse existing timer array so stop() cleans up
-    _egStartDropExpireCountdown(`eg-loot-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+    _egScheduleTrackedExpiry(_egLootDrops, key, item, EG_LOOT_DROP_LIFETIME_MS, `eg-loot-${r}-${c}`, _egRemoveLootOverlay);
 }
 
 // ── Loot explosion ───────────────────────────────────────────────────────────
@@ -726,14 +911,7 @@ function _egPlaceLootDropForce(item) {
     _egLootDrops.set(key, item);
     _egRenderLootOverlay(r, c, item);
 
-    const timer = setTimeout(() => {
-        if (_egLootDrops.get(key) === item) {
-            _egLootDrops.delete(key);
-            _egRemoveLootOverlay(key);
-        }
-    }, EG_LOOT_DROP_LIFETIME_MS);
-    _egPickupTimers.push(timer);
-    _egStartDropExpireCountdown(`eg-loot-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+    _egScheduleTrackedExpiry(_egLootDrops, key, item, EG_LOOT_DROP_LIFETIME_MS, `eg-loot-${r}-${c}`, _egRemoveLootOverlay);
     return true;
 }
 
@@ -810,6 +988,7 @@ function _egCheckLootClaim(row, col) {
     const item = _egLootDrops.get(key);
     if (!item) return false;
 
+    _egCancelTrackedExpiry(_egLootDrops, key, item);
     _egLootDrops.delete(key);
     _egRemoveLootOverlay(key);
     _egAnimateLootClaim(row, col, item);
@@ -835,6 +1014,7 @@ function _egDiscardLootDrop(row, col) {
     const key = `${row}-${col}`;
     if (!_egLootDrops.has(key)) return;
     const item = _egLootDrops.get(key);
+    _egCancelTrackedExpiry(_egLootDrops, key, item);
     _egLootDrops.delete(key);
     _egRemoveLootOverlay(key);
     _egAnimatePickupDiscard(row, col, { emoji: item.icon || '📦' }); // reuse broken-heart anim
@@ -844,6 +1024,7 @@ function _egDiscardLootDrop(row, col) {
 
 // Clears all active loot drops from the board (called by _egStopPickupSpawner).
 function _egStopLootDrops() {
+    Array.from(_egLootDrops.entries()).forEach(([key, item]) => _egCancelTrackedExpiry(_egLootDrops, key, item));
     _egLootDrops.forEach((item, key) => _egRemoveLootOverlay(key));
     _egLootDrops.clear();
 }
@@ -906,14 +1087,7 @@ function _egReplaceCarriedLootDrops(items) {
         _egLootDrops.set(key, item);
         _egRenderLootOverlay(r, c, item);
 
-        const timer = setTimeout(() => {
-            if (_egLootDrops.get(key) === item) {
-                _egLootDrops.delete(key);
-                _egRemoveLootOverlay(key);
-            }
-        }, EG_LOOT_DROP_LIFETIME_MS);
-        _egPickupTimers.push(timer);
-        _egStartDropExpireCountdown(`eg-loot-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+        _egScheduleTrackedExpiry(_egLootDrops, key, item, EG_LOOT_DROP_LIFETIME_MS, `eg-loot-${r}-${c}`, _egRemoveLootOverlay);
     });
 
     if (items.length > 0) showToast(t('eg_loot_carried'));
@@ -978,14 +1152,7 @@ function _egSpawnCurrencyDrop(def) {
     _egCurrencyDrops.set(key, def);
     _egRenderCurrencyDropOverlay(r, c, def);
 
-    const timer = setTimeout(() => {
-        if (_egCurrencyDrops.get(key) === def) {
-            _egCurrencyDrops.delete(key);
-            _egRemoveCurrencyDropOverlay(key);
-        }
-    }, EG_LOOT_DROP_LIFETIME_MS);
-    _egPickupTimers.push(timer);
-    _egStartDropExpireCountdown(`eg-currency-drop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+    _egScheduleTrackedExpiry(_egCurrencyDrops, key, def, EG_LOOT_DROP_LIFETIME_MS, `eg-currency-drop-${r}-${c}`, _egRemoveCurrencyDropOverlay);
 }
 
 // Tracks a claimed currency drop for the leave-map summary screen.
@@ -1013,6 +1180,7 @@ function _egCheckCurrencyDropClaim(row, col) {
     const def = _egCurrencyDrops.get(key);
     if (!def) return false;
 
+    _egCancelTrackedExpiry(_egCurrencyDrops, key, def);
     _egCurrencyDrops.delete(key);
     _egRemoveCurrencyDropOverlay(key);
     _egAnimateCurrencyDropClaim(row, col, def);
@@ -1055,6 +1223,7 @@ function _egDiscardCurrencyDrop(row, col) {
     const key = `${row}-${col}`;
     if (!_egCurrencyDrops.has(key)) return;
     const def = _egCurrencyDrops.get(key);
+    _egCancelTrackedExpiry(_egCurrencyDrops, key, def);
     _egCurrencyDrops.delete(key);
     _egRemoveCurrencyDropOverlay(key);
     _egAnimatePickupDiscard(row, col, { emoji: def.icon || '💰' });
@@ -1064,6 +1233,7 @@ function _egDiscardCurrencyDrop(row, col) {
 
 // Clears all active currency drops (called by _egStopPickupSpawner).
 function _egStopCurrencyDrops() {
+    Array.from(_egCurrencyDrops.entries()).forEach(([key, def]) => _egCancelTrackedExpiry(_egCurrencyDrops, key, def));
     _egCurrencyDrops.forEach((def, key) => _egRemoveCurrencyDropOverlay(key));
     _egCurrencyDrops.clear();
 }
@@ -1086,14 +1256,7 @@ function _egReplaceCarriedCurrencyDrops(defs) {
         _egCurrencyDrops.set(key, def);
         _egRenderCurrencyDropOverlay(r, c, def);
 
-        const timer = setTimeout(() => {
-            if (_egCurrencyDrops.get(key) === def) {
-                _egCurrencyDrops.delete(key);
-                _egRemoveCurrencyDropOverlay(key);
-            }
-        }, EG_LOOT_DROP_LIFETIME_MS);
-        _egPickupTimers.push(timer);
-        _egStartDropExpireCountdown(`eg-currency-drop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+        _egScheduleTrackedExpiry(_egCurrencyDrops, key, def, EG_LOOT_DROP_LIFETIME_MS, `eg-currency-drop-${r}-${c}`, _egRemoveCurrencyDropOverlay);
     });
 }
 
@@ -1183,14 +1346,7 @@ function _egSpawnItemDrop(isBoss = false) {
     _egItemDrops.set(key, drop);
     _egRenderItemDropOverlay(r, c, drop);
 
-    const timer = setTimeout(() => {
-        if (_egItemDrops.get(key) === drop) {
-            _egItemDrops.delete(key);
-            _egRemoveItemDropOverlay(key);
-        }
-    }, EG_LOOT_DROP_LIFETIME_MS);
-    _egPickupTimers.push(timer);
-    _egStartDropExpireCountdown(`eg-item-drop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+    _egScheduleTrackedExpiry(_egItemDrops, key, drop, EG_LOOT_DROP_LIFETIME_MS, `eg-item-drop-${r}-${c}`, _egRemoveItemDropOverlay);
 }
 
 // Called on correct action on the cell holding a regular-item drop.
@@ -1202,6 +1358,7 @@ function _egCheckItemDropClaim(row, col) {
     const drop = _egItemDrops.get(key);
     if (!drop) return false;
 
+    _egCancelTrackedExpiry(_egItemDrops, key, drop);
     _egItemDrops.delete(key);
     _egRemoveItemDropOverlay(key);
     _egAnimateItemDropClaim(row, col, drop);
@@ -1237,6 +1394,7 @@ function _egDiscardItemDrop(row, col) {
     if (!_egItemDrops.has(key)) return;
     const drop = _egItemDrops.get(key);
     const def = ITEM_DEFS[drop.defId];
+    _egCancelTrackedExpiry(_egItemDrops, key, drop);
     _egItemDrops.delete(key);
     _egRemoveItemDropOverlay(key);
     _egAnimatePickupDiscard(row, col, { emoji: (def && def.icon) || '📦' });
@@ -1246,6 +1404,7 @@ function _egDiscardItemDrop(row, col) {
 
 // Clears all active regular-item drops (called by _egStopPickupSpawner).
 function _egStopItemDrops() {
+    Array.from(_egItemDrops.entries()).forEach(([key, drop]) => _egCancelTrackedExpiry(_egItemDrops, key, drop));
     _egItemDrops.forEach((drop, key) => _egRemoveItemDropOverlay(key));
     _egItemDrops.clear();
 }
@@ -1268,13 +1427,6 @@ function _egReplaceCarriedItemDrops(drops) {
         _egItemDrops.set(key, drop);
         _egRenderItemDropOverlay(r, c, drop);
 
-        const timer = setTimeout(() => {
-            if (_egItemDrops.get(key) === drop) {
-                _egItemDrops.delete(key);
-                _egRemoveItemDropOverlay(key);
-            }
-        }, EG_LOOT_DROP_LIFETIME_MS);
-        _egPickupTimers.push(timer);
-        _egStartDropExpireCountdown(`eg-item-drop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
+        _egScheduleTrackedExpiry(_egItemDrops, key, drop, EG_LOOT_DROP_LIFETIME_MS, `eg-item-drop-${r}-${c}`, _egRemoveItemDropOverlay);
     });
 }

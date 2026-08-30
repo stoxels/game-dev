@@ -1793,7 +1793,7 @@ function _egLoadHubState() {
     // created with an older (smaller) essence tab would otherwise leave
     // rows/cols undefined and crash the essence renderer.
     {
-        const essR = typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 13;
+        const essR = typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 12;
         const essC = typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8;
         const freshEssGrid = Array.from({ length: essR }, () => Array(essC).fill(null));
         const savedEssGrid = STATE.egEssenceStash;
@@ -1831,7 +1831,9 @@ function _egLoadHubState() {
                 }
                 const merged = new Map(); // id -> total count
                 const leftover = []; // items with no assigned slot
+                const LEGACY_ESSENCE_DISCARD = new Set(['essence_vitality','essence_might','essence_sorcery','essence_swiftness','essence_fortress','essence_elements','essence_puzzle']);
                 for (const it of allItems) {
+                    if (LEGACY_ESSENCE_DISCARD.has(it.id)) continue; // drop legacy group essences — replaced by per-modifier essences
                     const pos = _egEssenceSlotForId(it.id);
                     if (!pos) { leftover.push(it); continue; }
                     const cnt = it.count || 1;

@@ -21,6 +21,11 @@ let _egPickups = new Map(); // key:"row-col" → pickupDef
 let _egPickupTimers = [];        // expiry timers, cancelled on encounter stop
 let _egPickupSpawnTimer = null;      // recurring spawn-attempt timer
 
+// ── Pickup / drop expiry tracking (pause-aware) ───────────────────────────
+let _egDropExpiryEntries = []; // { map, key, value, lifetimeMs, expiresAt, timer, overlayId, removeOverlayFn, remaining }
+let _egPickupSpawnerInfo = { timer: null, expiresAt: 0, remaining: null }; // tracks next pickup spawn timeout for pause
+let _egExpireCountdownEntries = []; // { overlayId, lifetimeMs, startedAt, expiresAt, timeout, interval, remaining, delayRemaining }
+
 // ── Boss state ───────────────────────────────────────────────────────────────
 let _egBossTimers = {};      // monsterId → array of mechanic timer handles
 let _egBossCorrupted = new Map(); // key:"row-col" → { timer } for Corrupt Cells

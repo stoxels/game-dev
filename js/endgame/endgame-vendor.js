@@ -62,14 +62,8 @@ const EG_VENDOR_CURRENCY_PRICES = {
 };
 const EG_VENDOR_CURRENCY_DEFAULT_PRICE = 50;
 
-// Prices per essence id (gold).
+// Prices per essence id (gold). All per-modifier essences share the default price.
 const EG_VENDOR_ESSENCE_PRICES = {
-    essence_vitality: 60,
-    essence_fortress: 70,
-    essence_swiftness: 75,
-    essence_might: 80,
-    essence_sorcery: 80,
-    essence_elements: 100,
 };
 const EG_VENDOR_ESSENCE_DEFAULT_PRICE = 80;
 

@@ -933,15 +933,35 @@ const EG_MAP_COMPLETION_REWARD_POOL = [
     { id: 'orb_elevation',  weight: 8,  minTier: 6 },
     { id: 'orb_cataclysm',  weight: 5,  minTier: 8 },
     { id: 'mirror_of_kalandra', weight: 1, minTier: 10 },
-
-    // ── Essences ─────────────────────────────────────────────────
-    { id: 'essence_vitality',  weight: 100 },
-    { id: 'essence_fortress',  weight: 90 },
-    { id: 'essence_swiftness', weight: 85 },
-    { id: 'essence_might',     weight: 80 },
-    { id: 'essence_sorcery',   weight: 80 },
-    { id: 'essence_elements',  weight: 65 },
 ];
+
+// Map completion essences — one entry per per-modifier essence so every targeted
+// essence family can appear as a map completion reward. Weight 5 keeps total
+// essence weight comparable to original legacy pool (≈93×5 = 465 vs old 500).
+const EG_MAP_COMPLETION_ESSENCE_POOL = (typeof _EG_ESSENCE_FAMILIES !== 'undefined'
+    ? _EG_ESSENCE_FAMILIES.map(fid => ({ id: 'essence_' + fid, weight: 5 }))
+    : []);
+
+// Combined pool used at roll time — orbs plus dynamically built essence entries.
+// Keep a static reference for backwards compat, but the live roll builds fresh
+// so new essences (e.g. essence_inc_health) automatically appear.
+const EG_MAP_COMPLETION_REWARD_POOL_STATIC = EG_MAP_COMPLETION_REWARD_POOL.slice();
+function _egGetMapCompletionRewardPool() {
+    const base = EG_MAP_COMPLETION_REWARD_POOL_STATIC.slice();
+    const existingIds = new Set(base.map(e => e.id));
+    // Prefer live _EG_ESSENCE_FAMILIES if available (maps.js loads before essences.js)
+    if (typeof _EG_ESSENCE_FAMILIES !== 'undefined' && Array.isArray(_EG_ESSENCE_FAMILIES)) {
+        for (const fid of _EG_ESSENCE_FAMILIES) {
+            const id = 'essence_' + fid;
+            if (!existingIds.has(id)) { base.push({ id, weight: 5 }); existingIds.add(id); }
+        }
+    } else {
+        for (const e of EG_MAP_COMPLETION_ESSENCE_POOL) {
+            if (!existingIds.has(e.id)) base.push(e);
+        }
+    }
+    return base;
+}
 
 // Resolves a completion-reward def from either currency table.
 function _egGetCompletionRewardDef(id) {
@@ -955,7 +975,8 @@ function _egGetCompletionRewardDef(id) {
 function _egRollMapCompletionReward(map) {
     const tier = Math.max(1, Math.min(EG_ATLAS_MAX_TIER, map.mapTier || 1));
     const mods = Array.isArray(map.mods) ? map.mods : [];
-    const pool = EG_MAP_COMPLETION_REWARD_POOL.filter(e => !e.minTier || tier >= e.minTier);
+    const livePool = (typeof _egGetMapCompletionRewardPool === 'function') ? _egGetMapCompletionRewardPool() : EG_MAP_COMPLETION_REWARD_POOL;
+    const pool = livePool.filter(e => !e.minTier || tier >= e.minTier);
     const total = pool.reduce((s, e) => s + e.weight, 0);
     let roll = Math.random() * total;
     let picked = pool[0];
@@ -1570,16 +1591,21 @@ function _egSpawnMapDrop(map) {
         el.appendChild(span);
     }
 
-    // Auto-expire after the shared loot lifetime.
-    const timer = setTimeout(() => {
-        if (_egMapDrops.get(key) === map) {
-            _egMapDrops.delete(key);
-            _egRemoveMapDropOverlay(key);
+    // Auto-expire after the shared loot lifetime (pause-aware).
+    const lifetime = EG_LOOT_DROP_LIFETIME_MS;
+    if (typeof _egScheduleTrackedExpiry === 'function') {
+        _egScheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `eg-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
+    } else {
+        const timer = setTimeout(() => {
+            if (_egMapDrops.get(key) === map) {
+                _egMapDrops.delete(key);
+                _egRemoveMapDropOverlay(key);
+            }
+        }, lifetime);
+        if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
+        if (typeof _egStartDropExpireCountdown === 'function') {
+            _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
         }
-    }, EG_LOOT_DROP_LIFETIME_MS);
-    if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
-    if (typeof _egStartDropExpireCountdown === 'function') {
-        _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, EG_LOOT_DROP_LIFETIME_MS);
     }
 }
 
@@ -1613,6 +1639,7 @@ function _egCheckMapDropClaim(row, col) {
 
     // Tiered stashes are infinite — no capacity check needed.
 
+    if (typeof _egCancelTrackedExpiry === 'function') _egCancelTrackedExpiry(_egMapDrops, key, map);
     _egMapDrops.delete(key);
     _egRemoveMapDropOverlay(key);
     _egAnimateMapDropClaim(row, col, map);
@@ -1637,6 +1664,7 @@ function _egDiscardMapDrop(row, col) {
     const key = `${row}-${col}`;
     if (!_egMapDrops.has(key)) return;
     const map = _egMapDrops.get(key);
+    if (typeof _egCancelTrackedExpiry === 'function') _egCancelTrackedExpiry(_egMapDrops, key, map);
     _egMapDrops.delete(key);
     _egRemoveMapDropOverlay(key);
     if (typeof _egAnimatePickupDiscard === 'function') {
@@ -1660,6 +1688,9 @@ function _egBankUnclaimedMapDrops() {
 
 // Clears all active map drops from the board (called by _egStopPickupSpawner).
 function _egStopMapDrops() {
+    if (typeof _egCancelTrackedExpiry === 'function') {
+        Array.from(_egMapDrops.entries()).forEach(([key, map]) => _egCancelTrackedExpiry(_egMapDrops, key, map));
+    }
     _egMapDrops.forEach((map, key) => _egRemoveMapDropOverlay(key));
     _egMapDrops.clear();
 }
@@ -1694,15 +1725,20 @@ function _egReplaceCarriedMapDrops(maps) {
             el.appendChild(span);
         }
 
-        const timer = setTimeout(() => {
-            if (_egMapDrops.get(key) === map) {
-                _egMapDrops.delete(key);
-                _egRemoveMapDropOverlay(key);
+        const lifetime = typeof EG_LOOT_DROP_LIFETIME_MS !== 'undefined' ? EG_LOOT_DROP_LIFETIME_MS : 60000;
+        if (typeof _egScheduleTrackedExpiry === 'function') {
+            _egScheduleTrackedExpiry(_egMapDrops, key, map, lifetime, `eg-mapdrop-${r}-${c}`, _egRemoveMapDropOverlay);
+        } else {
+            const timer = setTimeout(() => {
+                if (_egMapDrops.get(key) === map) {
+                    _egMapDrops.delete(key);
+                    _egRemoveMapDropOverlay(key);
+                }
+            }, lifetime);
+            if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
+            if (typeof _egStartDropExpireCountdown === 'function') {
+                _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
             }
-        }, typeof EG_LOOT_DROP_LIFETIME_MS !== 'undefined' ? EG_LOOT_DROP_LIFETIME_MS : 60000);
-        if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
-        if (typeof _egStartDropExpireCountdown === 'function') {
-            _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, typeof EG_LOOT_DROP_LIFETIME_MS !== 'undefined' ? EG_LOOT_DROP_LIFETIME_MS : 60000);
         }
     });
 }

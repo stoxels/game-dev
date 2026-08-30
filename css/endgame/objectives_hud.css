@@ -346,3 +346,42 @@
     25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
     75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
 }
+
+/* ── ABSORPTION BROKEN banner ─────────────────────
+    Brief overlay centered over the puzzle grid when
+    the absorption shield is fully depleted (0). Mirrors
+    the mistakes/low-health banners but fires only on
+    the breaking transition, not at percentage thresholds. */
+#eg-absorption-broken-banner {
+    position: fixed;
+    z-index: 400;
+    pointer-events: none;
+    font-size: clamp(1.6rem, 5vw, 3.4rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+    animation: eg-absorption-broken-pop 2.5s ease-out forwards, eg-absorption-broken-shake 0.35s ease-in-out 0.15s 2;
+    text-align: center;
+    line-height: 1.1;
+    color: #7dd3fc;
+    text-shadow:
+        0 0 16px rgba(125, 211, 252, 0.85),
+        0 0 40px rgba(125, 211, 252, 0.45),
+        0 3px 8px rgba(0, 0, 0, 0.85);
+}
+
+@keyframes eg-absorption-broken-pop {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+    16%  { transform: translate(-50%, -50%) scale(1); }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes eg-absorption-broken-shake {
+    0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
+    25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
+    75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
+}

@@ -1,4 +1,3 @@
-
 //------------------------------------------------------------------------
 //-------------------------ITEM DATA--------------------------------------
 //------------------------------------------------------------------------
@@ -108,7 +107,7 @@ const ITEM_DEFS = {
         rarity: 'common', weight: 10
     },
     addTime300: {
-        id: 'addTime300', icon: '⏱️', 
+        id: 'addTime300', icon: '⏱️',
         nameEn: 'Stopwatch', nameDE: 'Stoppuhr',
         descEn: 'Adds 5 minutes', descDE: 'Fügt 5 Min. hinzu',
         rarity: 'uncommon', weight: 8
@@ -273,7 +272,7 @@ const ITEM_DEFS = {
 
     // Golden Clock — stops timer decrease, timer items 100% more effective, max 3 more mistakes
     goldenClock: {
-        id: 'goldenClock', icon: '🕰️',
+        id: 'goldenClock', icon: '🌇',
         nameEn: 'Golden Clock', nameDE: 'Goldene Uhr',
         descEn: 'The timer can no longer decrease. Timer items are 100% more effective. However, only 3 more mistakes are allowed.',
         descDE: 'Der Timer kann nicht mehr sinken. Timer-Gegenstände sind 100% effektiver. Allerdings sind nur noch 3 weitere Fehler erlaubt.',
@@ -289,15 +288,3 @@ const ITEM_DEFS = {
         rarity: 'cursed', weight: 0
     },
 };
-
-
-
-
-
-
-
-
-
-
-
-

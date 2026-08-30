@@ -162,7 +162,7 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 12, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 12, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
-            { key: 'faster_absorption_regen_start', value: 4, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
+            { key: 'faster_absorption_regen_start', value: 8, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
             { key: 'flat_health', value: -63, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
@@ -387,7 +387,7 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 45, absorption: 0 },
         bonuses: [
             { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
-            { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
+            { key: 'faster_absorption_regen_start', value: 6, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
             { key: 'flat_health', value: -33, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
@@ -561,7 +561,7 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 290, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'grounded_1', value: 20, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
-            { key: 'stagger', value: 25, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 35, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'flat_health', value: 45, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
@@ -791,7 +791,7 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 380, max: 700 }, attackIntervalSeconds: 8.8,
         bonuses: [
             { key: 'inc_physical_damage', value: 85, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
-            { key: 'stagger', value: 30, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 40, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'flat_health', value: 85, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
@@ -947,7 +947,7 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 70, absorption: 0 },
         bonuses: [
             { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
-            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
+            { key: 'faster_absorption_regen_start', value: 5, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
             { key: 'flat_health', value: -34, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
@@ -1110,7 +1110,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'faster_absorption_regen_start', value: -8, en: '#s slower start of Absorption Regeneration', de: '#s langsamerer Start der Absorptionsregeneration' }
+            { key: 'faster_absorption_regen_start', value: -4, en: '#s slower start of Absorption Regeneration', de: '#s langsamerer Start der Absorptionsregeneration' }
         ],
         flavorEn: 'You arrive before you leave. The monsters noticed.',
         flavorDe: 'Du kommst an, bevor du gehst. Die Monster haben es bemerkt.',
@@ -1408,7 +1408,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 61, str: 232, agi: 0, int: 0 },
         defenses: { armour: 810, evasion: 0, absorption: 120 },
         bonuses: [
-            { key: 'stagger', value: 20, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 30, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'grounded_1', value: 20, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
             { key: 'flat_health', value: 66, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'life_regen', value: 4, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' }
@@ -1495,7 +1495,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 68, str: 258, agi: 0, int: 0 },
         damage: { min: 340, max: 640 }, attackIntervalSeconds: 9.5,
         bonuses: [
-            { key: 'stagger', value: 35, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 45, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'cleave', value: 40, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
             { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
@@ -1565,7 +1565,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 2, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'first_step', value: 2, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
-            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
+            { key: 'faster_absorption_regen_start', value: 5, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
             { key: 'time_added', value: -45, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' }
@@ -1602,7 +1602,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 5, str: 0, agi: 0, int: 19 },
         bonuses: [
             { key: 'absorption_regen_rate', value: 20, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
-            { key: 'faster_absorption_regen_start', value: 2, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
+            { key: 'faster_absorption_regen_start', value: 5, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' }
         ],
         downsides: [
             { key: 'flat_health', value: -28, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
@@ -2080,7 +2080,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 43, str: 0, agi: 0, int: 163 },
         defenses: { armour: 0, evasion: 0, absorption: 190 },
         bonuses: [
-            { key: 'faster_absorption_regen_start', value: 5, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 9, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
             { key: 'absorption_regen_rate', value: 30, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
             { key: 'flat_health', value: 43, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
@@ -2418,7 +2418,7 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'absorption_on_kill', value: 12, en: '+# Absorption gained on Kill', de: '+# Absorption bei jedem Kill' },
             { key: 'absorption_regen_rate', value: 40, en: '#% faster Absorption Regeneration Rate', de: '#% schnellere Absorptionsregeneration' },
-            { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 6, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
             { key: 'flat_health', value: 69, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
@@ -2887,7 +2887,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'strength', value: 10, en: '+# to Strength', de: '+# zu Stärke' }
         ],
         downsides: [
-            { key: 'faster_absorption_regen_start', value: -6, en: '#s slower start of Absorption Regeneration', de: '#s langsamerer Start der Absorptionsregeneration' }
+            { key: 'faster_absorption_regen_start', value: -3, en: '#s slower start of Absorption Regeneration', de: '#s langsamerer Start der Absorptionsregeneration' }
         ],
         flavorEn: 'One, two, three… now.',
         flavorDe: 'Eins, zwei, drei … jetzt.',
@@ -2902,7 +2902,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 40, str: 152, agi: 0, int: 0 },
         bonuses: [
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
-            { key: 'stagger', value: 15, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 25, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'flat_health', value: 40, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
@@ -3080,7 +3080,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 31, str: 0, agi: 0, int: 118 },
         defenses: { armour: 390, evasion: 0, absorption: 160 },
         bonuses: [
-            { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 6, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
             { key: 'flat_health', value: 41, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'life_regen', value: 3, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' }
         ],
@@ -3300,7 +3300,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 52, str: 198, agi: 0, int: 0 },
         damage: { min: 240, max: 420 }, attackIntervalSeconds: 8.2,
         bonuses: [
-            { key: 'stagger', value: 30, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 40, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
@@ -3441,7 +3441,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 16, str: 0, agi: 61, int: 0 },
         defenses: { armour: 0, evasion: 150, absorption: 0 },
         bonuses: [
-            { key: 'faster_absorption_regen_start', value: 3, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 6, en: '#s faster start of Absorption Regeneration', de: '#s schnellerer Start der Absorptionsregeneration' },
             { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' }
         ],
@@ -4875,7 +4875,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 29, str: 110, agi: 0, int: 0 },
         bonuses: [
             { key: 'inc_physical_damage', value: 35, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
-            { key: 'stagger', value: 15, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 25, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'flat_health', value: 29, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
@@ -5304,7 +5304,7 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 120, evasion: 100, absorption: 120 },
         bonuses: [
             { key: 'absorption_regen_rate', value: 25, en: '#% increased Absorption Regeneration Rate', de: '#% erhöhte Absorptionsregenerationsrate' },
-            { key: 'faster_absorption_regen_start', value: 1.5, en: '+#s sooner Absorption Regeneration', de: '+#s frühere Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 3.5, en: '+#s sooner Absorption Regeneration', de: '+#s frühere Absorptionsregeneration' },
             { key: 'flat_health', value: 48, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
@@ -5711,7 +5711,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 66, str: 90, agi: 90, int: 70 },
         bonuses: [
             { key: 'warding', value: 90, en: '+# Warding', de: '+# Wardschutz' },
-            { key: 'faster_absorption_regen_start', value: 2, en: '+#s sooner Absorption Regeneration', de: '+#s frühere Absorptionsregeneration' },
+            { key: 'faster_absorption_regen_start', value: 5, en: '+#s sooner Absorption Regeneration', de: '+#s frühere Absorptionsregeneration' },
             { key: 'flat_health', value: 71, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'fate', value: 18, en: '#% increased Fate', de: '#% erhöhtes Schicksal' }
         ],
@@ -5773,7 +5773,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 44, str: 168, agi: 0, int: 0 },
         damage: { min: 120, max: 200 }, attackIntervalSeconds: 5.0,
         bonuses: [
-            { key: 'stagger', value: 35, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 45, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'pushback', value: 0.5, en: '+#s Pushback on hit', de: '+#s Rückstoß bei Treffern' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
@@ -5931,7 +5931,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 70, str: 266, agi: 0, int: 0 },
         damage: { min: 420, max: 850 }, attackIntervalSeconds: 9.5,
         bonuses: [
-            { key: 'stagger', value: 40, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
+            { key: 'stagger', value: 50, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'fate', value: 18, en: '#% increased Fate', de: '#% erhöhtes Schicksal' }

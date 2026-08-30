@@ -598,6 +598,9 @@ const EG_GEN_SYMBOLS = [
 // Grid sizes the generator can draw into. Higher map tiers bias toward the
 // larger entries. minCells filters out everything below the floor set by
 // the "% larger Puzzle Grids" map mod.
+// Encounter-chain caps: 15×30 is the widest allowed, 20×20 is the max when
+// rows >15 (>15 rows && >20 cols is banned). Sizes beyond that are kept
+// out of the pool so chains stay fun.
 const EG_GEN_SIZES = [
     { rows: 5,  cols: 5 },   //   25 cells → small
     { rows: 5,  cols: 10 },  //   50 cells → small
@@ -613,9 +616,8 @@ const EG_GEN_SIZES = [
     { rows: 14, cols: 25 },  //  350 cells → large
     { rows: 12, cols: 30 },  //  360 cells → large (wide format)
     { rows: 15, cols: 25 },  //  375 cells → large
-    { rows: 15, cols: 30 },  //  450 cells → massive (wide format)
-    { rows: 20, cols: 20 },  //  400 cells → massive
-    { rows: 20, cols: 25 },  //  500 cells → massive
+    { rows: 15, cols: 30 },  //  450 cells → massive (wide format, cap)
+    { rows: 20, cols: 20 },  //  400 cells → massive (cap when tall)
 ];
 
 // Grid-size buckets (same thresholds as EG_GRID_SIZE_BUCKETS in
@@ -844,19 +846,28 @@ function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols) {
         if (maxCols != null && s.cols > maxCols) return false;
         return true;
     };
+    // Encounter-chain global caps (15×30 max, 20×20 max when tall).
+    // Keep generated puzzles inside the fun window even when the caller
+    // did not pass explicit maxRows/maxCols (e.g. regular chain buckets).
+    const chainOk = s => {
+        if (typeof _egChainPuzzleSizeAllowed === 'function') return _egChainPuzzleSizeAllowed(s.rows, s.cols);
+        if (s.rows > 20 || s.cols > 30) return false;
+        if (s.rows > 15 && s.cols > 20) return false;
+        return true;
+    };
 
     let list = EG_GEN_SIZES.filter(s => {
         const cells = s.rows * s.cols;
-        return cells >= lo && cells <= hi && fits(s);
+        return cells >= lo && cells <= hi && fits(s) && chainOk(s);
     });
 
     // Nothing inside the window (e.g. tiny bucket + high minCells floor):
     // use the smallest size that still satisfies the floor.
     if (!list.length) {
         const above = EG_GEN_SIZES
-            .filter(s => s.rows * s.cols >= lo && fits(s))
+            .filter(s => s.rows * s.cols >= lo && fits(s) && chainOk(s))
             .sort((a, b) => (a.rows * a.cols) - (b.rows * b.cols));
-        list = above.length ? [above[0]] : [EG_GEN_SIZES[EG_GEN_SIZES.length - 1]];
+        list = above.length ? [above[0]] : [EG_GEN_SIZES.filter(chainOk).slice(-1)[0] || EG_GEN_SIZES[EG_GEN_SIZES.length - 1]];
     }
 
     const weights = list.map((s, i) => 1 + i * Math.min(0.6, tier * 0.08));

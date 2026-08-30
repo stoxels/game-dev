@@ -375,7 +375,7 @@ function _egScheduleMonsterSpawns(spawnList) {
 //------------------------------------------------------------------------
 
 // Duration of the gear "stagger" charge-timer pause (pants mod).
-const EG_STAGGER_DURATION_MS = 1000;
+const EG_STAGGER_DURATION_MS = 2500;
 
 // Tick interval for the gear lifeRegen heal (life_regen mod, HP per second).
 const EG_LIFE_REGEN_INTERVAL_MS = 1000;
@@ -385,6 +385,7 @@ function _egResetEncounterState() {
     // Reset the low-mistakes banner state for the new puzzle/encounter
     if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
     if (typeof _egResetLowHealthWarningState === 'function') _egResetLowHealthWarningState();
+    if (typeof _egResetAbsorptionBrokenState === 'function') _egResetAbsorptionBrokenState();
     _egEncounterActive = true;
     _egTargetId = null;
     _egMonsters = [];
@@ -475,6 +476,7 @@ function _egStopEncounter() {
     _egCancelAbsorptionRegen();
     if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
     if (typeof _egResetLowHealthWarningState === 'function') _egResetLowHealthWarningState();
+    if (typeof _egResetAbsorptionBrokenState === 'function') _egResetAbsorptionBrokenState();
     if (typeof _egChainCleanup === 'function') _egChainCleanup();
     _egHideMonsterPanel();
     if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
@@ -825,6 +827,56 @@ function _egResetLowHealthWarningState() {
     if (banner) banner.remove();
 }
 
+//------------------------------------------------------------------------
+//-------------------ABSORPTION BROKEN WARNING----------------------------
+//------------------------------------------------------------------------
+// Only fires when the absorption shield transitions from >0 to 0 (broken),
+// not at percentage thresholds like the health warning.
+
+function _egShowAbsorptionBrokenBanner() {
+    const old = document.getElementById('eg-absorption-broken-banner');
+    if (old) old.remove();
+
+    const el = document.createElement('div');
+    el.id = 'eg-absorption-broken-banner';
+
+    const key = 'eg_absorption_broken';
+    const raw = (typeof t === 'function') ? t(key) : '';
+    const fallback = '🛡️ SHIELD BROKEN!';
+    el.textContent = (raw && raw !== key) ? raw : fallback;
+    document.body.appendChild(el);
+
+    const board = document.getElementById('ptable');
+    if (board) {
+        const r = board.getBoundingClientRect();
+        el.style.left = (r.left + r.width / 2) + 'px';
+        el.style.top = (r.top + r.height / 2) + 'px';
+    } else {
+        el.style.left = '50%';
+        el.style.top = '50%';
+    }
+
+    const toastKey = 'eg_absorption_broken_toast';
+    const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
+    const toastFallback = el.textContent;
+    const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
+    if (typeof showToast === 'function') showToast(toastText, '#7dd3fc');
+
+    setTimeout(() => el.remove(), 2500);
+}
+
+function _egMaybeShowAbsorptionBroken(prevAbsorption, nextAbsorption) {
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+    if (prevAbsorption > 0 && nextAbsorption <= 0) {
+        _egShowAbsorptionBrokenBanner();
+    }
+}
+
+function _egResetAbsorptionBrokenState() {
+    const banner = document.getElementById('eg-absorption-broken-banner');
+    if (banner) banner.remove();
+}
+
 
 //------------------------------------------------------------------------
 //-------------------MAP FAILED OVERLAY-----------------------------------
@@ -915,12 +967,20 @@ let _egPauseStartedAt = 0;
 function _egOnPause() {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     _egPauseStartedAt = Date.now();
+    if (typeof _egPauseGridDrops === 'function') {
+        try { _egPauseGridDrops(); } catch (e) {}
+    }
 }
 function _egOnResume() {
     if (!_egPauseStartedAt) return;
     const delta = Date.now() - _egPauseStartedAt;
     _egPauseStartedAt = 0;
-    if (delta <= 0) return;
+    if (delta <= 0) {
+        if (typeof _egResumeGridDrops === 'function') {
+            try { _egResumeGridDrops(); } catch (e) {}
+        }
+        return;
+    }
     _egMonsters.forEach(m => {
         if (m.bossSpawnTime) m.bossSpawnTime += delta;
         if (m.staggeredUntil) m.staggeredUntil += delta;
@@ -934,6 +994,9 @@ function _egOnResume() {
     }
     if (typeof _egPuzzleEffects !== 'undefined' && Array.isArray(_egPuzzleEffects)) {
         _egPuzzleEffects.forEach(e => { if (e.until) e.until += delta; });
+    }
+    if (typeof _egResumeGridDrops === 'function') {
+        try { _egResumeGridDrops(); } catch (e) {}
     }
 }
 
@@ -2401,10 +2464,12 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     let mitigated = _egCalcArmourMitigation(amount, effectiveArmour);
 
     if (_egPlayerAbsorptionCurrent > 0) {
+        const prevAbs = _egPlayerAbsorptionCurrent;
         const absorbed = Math.min(_egPlayerAbsorptionCurrent, mitigated);
         _egPlayerAbsorptionCurrent -= absorbed;
         mitigated -= absorbed;
         Audio_Manager.playSFX('player_shield_damage_taken');
+        if (typeof _egMaybeShowAbsorptionBroken === 'function') _egMaybeShowAbsorptionBroken(prevAbs, _egPlayerAbsorptionCurrent);
     }
 
     _egScheduleAbsorptionRegen();

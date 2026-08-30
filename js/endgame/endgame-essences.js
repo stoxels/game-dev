@@ -7,7 +7,7 @@
 // ("use mode", same interaction as currency orbs).
 //
 // Essence semantics (NEW — per-modifier v2):
-//   One essence per individual modifier family (92 total). The target
+//   One essence per individual modifier family (93 total). The target
 //   item is stripped of ALL its modifiers and re-forged into an EPIC
 //   item with exactly ONE guaranteed modifier (the essence's specific
 //   family) plus 3-5 additional random modifiers (4-6 total), rolled
@@ -36,9 +36,8 @@
 // Essence stash dimensions — fixed PoE-style tab with pre-assigned slots
 // (mirrors the Orbs & Shards currency tab). Every essence id has a
 // dedicated cell; hovering an empty cell still shows its essence tooltip.
-// 12 rows × 8 cols = 96 cells → 92 modifier essences + 4 decorative empties
-// (plus 7 legacy group-essences kept for save compat → 13 rows = 104 cells).
-const EG_ESSENCE_ROWS = 13;
+// 12 rows × 8 cols = 96 cells → 93 modifier essences + 3 decorative empties.
+const EG_ESSENCE_ROWS = 12;
 const EG_ESSENCE_COLS = 8;
 
 // Essence filter state
@@ -54,38 +53,32 @@ let _egEssenceStash = Array.from({ length: EG_ESSENCE_ROWS }, () => Array(EG_ESS
 
 // Complete list of individual modifier families — one essence per family.
 const _EG_ESSENCE_FAMILIES = [
-    'absorption_on_kill','absorption_regen_rate','accuracy','agility','arcane_resistance','arcane_surge',
-    'attack_speed','block_chance','block_recovery','chain','chance_for_new_question','chance_to_blind',
-    'chance_to_convert','chance_to_freeze','chance_to_ignite','chance_to_shock','channel','cleave',
-    'cold_damage','cold_resist','crit_chance','crit_multiplier','deflect','deflect_damage','dodge','echo',
-    'faster_absorption_regen_start','fate','fire_damage','fire_resist','first_step','flat_absorption',
-    'flat_armour','flat_evasion','flat_health','flat_mana','flat_physical_damage','focus','grounded',
-    'heart_heal','hybrid_armour_absorption','hybrid_armour_evasion','hybrid_evasion_absorption','hybrid_evasion_armour',
-    'hybrid_life_absorption','hybrid_life_armour','hybrid_life_evasion','hybrid_mana_absorption','hybrid_mana_armour',
-    'hybrid_mana_evasion','inc_absorption','inc_armour','inc_evasion','inc_heart_heal','inc_mana_heal',
-    'inc_physical_damage','inc_spell_damage','intelligence','life_leech','life_on_kill','life_regen',
-    'lightning_damage','lightning_resist','mana_heal','mana_on_kill','mana_on_mistake','mana_regen',
-    'mana_to_damage','mistake_count','mistake_not_count','movement_speed','multishot','overkill','parry',
-    'pierce','precision_damage','precision_regen','preemptive_dodge','pushback','reveal_hint','shadow_damage',
-    'shadow_resist','shield_bash','snipe','spell_block_chance','spell_damage','spell_dodge','splash_damage',
-    'stagger','strength','time_added','warding',
+    'absorption_on_kill', 'absorption_regen_rate', 'accuracy', 'agility', 'arcane_resistance', 'arcane_surge',
+    'attack_speed', 'block_chance', 'block_recovery', 'chain', 'chance_for_new_question', 'chance_to_blind',
+    'chance_to_convert', 'chance_to_freeze', 'chance_to_ignite', 'chance_to_shock', 'channel', 'cleave',
+    'cold_damage', 'cold_resist', 'crit_chance', 'crit_multiplier', 'deflect', 'deflect_damage', 'dodge', 'echo',
+    'faster_absorption_regen_start', 'fate', 'fire_damage', 'fire_resist', 'first_step', 'flat_absorption',
+    'flat_armour', 'flat_evasion', 'flat_health', 'flat_mana', 'flat_physical_damage', 'focus', 'grounded',
+    'heart_heal', 'hybrid_armour_absorption', 'hybrid_armour_evasion', 'hybrid_evasion_absorption', 'hybrid_evasion_armour',
+    'hybrid_life_absorption', 'hybrid_life_armour', 'hybrid_life_evasion', 'hybrid_mana_absorption', 'hybrid_mana_armour',
+    'hybrid_mana_evasion', 'inc_absorption', 'inc_armour', 'inc_evasion', 'inc_health', 'inc_heart_heal', 'inc_mana_heal',
+    'inc_physical_damage', 'inc_spell_damage', 'intelligence', 'life_leech', 'life_on_kill', 'life_regen',
+    'lightning_damage', 'lightning_resist', 'mana_heal', 'mana_on_kill', 'mana_on_mistake', 'mana_regen',
+    'mana_to_damage', 'mistake_count', 'mistake_not_count', 'movement_speed', 'multishot', 'overkill', 'parry',
+    'pierce', 'precision_damage', 'precision_regen', 'preemptive_dodge', 'pushback', 'reveal_hint', 'shadow_damage',
+    'shadow_resist', 'shield_bash', 'snipe', 'spell_block_chance', 'spell_damage', 'spell_dodge', 'splash_damage',
+    'stagger', 'strength', 'time_added', 'warding',
 ];
 
-// Legacy group essences kept for save compatibility (no longer drop)
-const _EG_LEGACY_ESSENCE_IDS = [
-    'essence_vitality','essence_might','essence_sorcery','essence_swiftness',
-    'essence_fortress','essence_elements','essence_puzzle',
-];
-
-// Visual variety — cycle through a set of emojis so 92 essences don't all look identical.
+// Visual variety — cycle through a set of emojis so 93 essences don't all look identical.
 // Kept intentionally diverse (hearts, elements, combat, jewelry) but deterministic.
 const _EG_ESSENCE_ICON_CYCLE = [
-    '💚','💙','❤️','🧡','💛','💜','🤍','🔴','🟠','🟡','🟢','🔵','🟣','⚪','⚫','🟤',
-    '🔥','❄️','⚡','🌑','✨','⭐','💫','🌟','💠','🔷','🔶','🌀','🧩','⚔️','🛡️','🏹',
-    '🎯','🔮','🧪','💎','👑','💍','🧥','🥋','🦾','🧤','🔗','👖','👢','📿','🪬','🧬',
-    '☄️','🌌','🌸','🏺','🙏','💀','🧠','⚙️','🔧','🪞','🍀','🎲','🎰','🃏','🀄','🧿',
-    '👁️','🫀','🗡️','🏆','🌙','☀️','🌈','🍃','🌿','🪶','🦾','🦿','🧱','🏰','⚗️','🧲',
-    '🔬','📚','🎭','🎨','🎼','🎵','🎶','🔔','📯','⚓','🧭','🗺️'
+    '💚', '💙', '❤️', '🧡', '💛', '💜', '🤍', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚪', '⚫', '🟤',
+    '🔥', '❄️', '⚡', '🌑', '✨', '⭐', '💫', '🌟', '💠', '🔷', '🔶', '🌀', '🧩', '⚔️', '🛡️', '🏹',
+    '🎯', '🔮', '🧪', '💎', '👑', '💍', '🧥', '🥋', '🦾', '🧤', '🔗', '👖', '👢', '📿', '🪬', '🧬',
+    '☄️', '🌌', '🌸', '🏺', '🙏', '💀', '🧠', '⚙️', '🔧', '🪞', '🍀', '🎲', '🎰', '🃏', '🀄', '🧿',
+    '👁️', '🫀', '🗡️', '🏆', '🌙', '☀️', '🌈', '🍃', '🌿', '🪶', '🦾', '🦿', '🧱', '🏰', '⚗️', '🧲',
+    '🔬', '📚', '🎭', '🎨', '🎼', '🎵', '🎶', '🔔', '📯', '⚓', '🧭', '🗺️'
 ];
 
 // Fixed assignment: essence id → {r,c}. Mirrors the Orbs & Shards tab.
@@ -97,12 +90,6 @@ const EG_ESSENCE_SLOT_MAP = {};
         const r = Math.floor(idx / EG_ESSENCE_COLS);
         const c = idx % EG_ESSENCE_COLS;
         EG_ESSENCE_SLOT_MAP[id] = { r, c };
-        idx++;
-    }
-    for (const legId of _EG_LEGACY_ESSENCE_IDS) {
-        const r = Math.floor(idx / EG_ESSENCE_COLS);
-        const c = idx % EG_ESSENCE_COLS;
-        EG_ESSENCE_SLOT_MAP[legId] = { r, c };
         idx++;
     }
 })();
@@ -170,7 +157,7 @@ function _egEssenceCanApplyToItem(familyId, item) {
     if (!hasFamily) return false;
     if (!_egFamilyAllowedOnBase(familyId, item.defenses)) return false;
     // also need at least one eligible tier at itemLevel
-    const sections = [modTable.prefixes||{}, modTable.suffixes||{}];
+    const sections = [modTable.prefixes || {}, modTable.suffixes || {}];
     for (const sec of sections) {
         const fam = sec[familyId];
         if (!fam) continue;
@@ -217,8 +204,8 @@ function _egEssenceCanApplyToSlotType(familyId, slotType) {
         return false;
     }
     let modTable = null;
-    try { modTable = getter(); } catch (e) { 
-        return false; 
+    try { modTable = getter(); } catch (e) {
+        return false;
     }
     if (!modTable) {
         return false;
@@ -368,8 +355,8 @@ const EG_ESSENCE_DEFS = {};
         const tNameKey = 'eg_essence_' + familyId;
         const tDescKey = 'eg_essence_' + familyId + '_desc';
         let name = null, desc = null;
-        try { const tr = t(tNameKey); if (tr && tr !== tNameKey) name = tr; } catch(e) {}
-        try { const tr = t(tDescKey); if (tr && tr !== tDescKey) desc = tr; } catch(e) {}
+        try { const tr = t(tNameKey); if (tr && tr !== tNameKey) name = tr; } catch (e) { }
+        try { const tr = t(tDescKey); if (tr && tr !== tDescKey) desc = tr; } catch (e) { }
         if (!name) {
             const disp = (typeof _egEssenceFamilyDisplayName === 'function') ? _egEssenceFamilyDisplayName(familyId) : familyId;
             name = (typeof LANG !== 'undefined' && LANG === 'de') ? ('Essenz der ' + disp) : ('Essence of ' + disp);
@@ -394,35 +381,7 @@ const EG_ESSENCE_DEFS = {};
             guaranteedFamilies: [familyId],
         };
     });
-    // Legacy group essences — kept for save compat (no longer in drop table)
-    const legacyMap = {
-        essence_vitality: { families: ['flat_health','hybrid_life_evasion','hybrid_life_armour','hybrid_life_absorption','life_regen','life_on_kill','heart_heal'], icon: '💚' },
-        essence_might: { families: ['inc_physical_damage','flat_physical_damage','crit_multiplier','crit_chance','precision_damage','strength','flat_health'], icon: '🔴' },
-        essence_sorcery: { families: ['spell_damage','inc_spell_damage','flat_mana','intelligence','mana_regen','arcane_surge'], icon: '🔮' },
-        essence_swiftness: { families: ['attack_speed','flat_evasion','inc_evasion','dodge','agility','hybrid_evasion_absorption'], icon: '🟢' },
-        essence_fortress: { families: ['flat_armour','inc_armour','flat_absorption','inc_absorption','hybrid_armour_evasion','hybrid_armour_absorption','block_chance','flat_health'], icon: '🟡' },
-        essence_elements: { families: ['fire_damage','cold_damage','lightning_damage','shadow_damage','fire_resist','cold_resist','lightning_resist','arcane_resistance','shadow_resist'], icon: '🌀' },
-        essence_puzzle: { families: ['time_added','mistake_count','mistake_not_count','focus','reveal_hint','chance_for_new_question'], icon: '🧩' },
-    };
-    for (const [legId, cfg] of Object.entries(legacyMap)) {
-        if (EG_ESSENCE_DEFS[legId]) continue;
-        let n=null,d=null;
-        try { const tr=t(legId); if(tr&&tr!==legId) n=tr; }catch(e){}
-        try { const tr=t(legId+'_desc'); if(tr&&tr!==legId+'_desc') d=tr; }catch(e){}
-        EG_ESSENCE_DEFS[legId] = {
-            id: legId,
-            name: n || legId,
-            icon: cfg.icon,
-            description: d || '',
-            category: 'essence',
-            rarity: 'essence',
-            guaranteedFamilies: cfg.families,
-        };
-    }
 })();
-
-// Keep reference for legacy t-keys (already populated above)
-// Note: egAddEssence fixed-slot logic below handles both new and legacy ids.
 
 
 //------------------------------------------------------------------------
@@ -458,7 +417,16 @@ function _egEssenceFamilyDisplayName(familyId) {
             }).filter(Boolean);
             if (cleaned.length > 0) {
                 const joined = cleaned.join(' + ');
-                if (joined && joined.toLowerCase() !== 'adds to' && joined.length > 2) return joined;
+                // Guard: a real affix label is a short title ("Precision Damage",
+                // "+# to Life"), never a full sentence. Some families' mod-table
+                // entries store a mechanic *description* instead of a label
+                // (e.g. "Each correct cell grants a stack of..."), which used to
+                // get used here verbatim and overflow the tooltip. If the cleaned
+                // text is too long or reads like a sentence, skip it and fall
+                // through to the curated short name below instead.
+                const looksLikeSentence = joined.includes('.') || joined.split(' ').length > 5;
+                if (joined && joined.toLowerCase() !== 'adds to' && joined.length > 2
+                    && joined.length <= 40 && !looksLikeSentence) return joined;
             }
         }
     }
@@ -500,6 +468,10 @@ function _egEssenceFamilyDisplayName(familyId) {
         reveal_hint: 'Hint Chance', chance_for_new_question: 'New Question Chance',
     };
     if (enMap[familyId]) return enMap[familyId];
+    if (familyId === 'inc_health') {
+        const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
+        return isDe ? 'Erhöhtes Leben' : 'Increased Health';
+    }
     // Essence-specific thematic names — more flavourful than raw mod labels
     const essenceNameMap = {
         // Life & Mana hybrids
@@ -622,13 +594,12 @@ function _egBuildEssenceDetailHTML(def) {
     if (!def) return '';
     const families = def.guaranteedFamilies || (def.guaranteedFamily ? [def.guaranteedFamily] : []);
     if (!families.length) return '';
-    // For per-modifier essences, there is exactly one family; legacy may have many — show first.
     const familyId = families[0];
     const modName = _egEssenceFamilyDisplayName(familyId);
     const slotTypes = _egEssenceCompatibleSlotTypes(familyId);
     const slotLabel = (slotType) => {
         const key = 'eg_slot_' + slotType;
-        try { const tr = t(key); if (tr && tr !== key) return tr; } catch (e) {}
+        try { const tr = t(key); if (tr && tr !== key) return tr; } catch (e) { }
         return slotType.charAt(0).toUpperCase() + slotType.slice(1);
     };
     const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
@@ -647,12 +618,6 @@ function _egBuildEssenceDetailHTML(def) {
         html += `<div class="eg-tt-essence-line"><span class="eg-tt-essence-slots" style="color:#e74c3c;">${noneStr}</span></div>`;
     }
 
-    // For legacy multi-family essences, also list the other families as fallback options
-    if (families.length > 1) {
-        const others = families.slice(1).map(fid => _egEssenceFamilyDisplayName(fid)).join(', ');
-        const otherTitle = isDe ? 'Weitere garantierte Optionen (erste zutreffende):' : 'Other guaranteed options (first applicable):';
-        html += `<div class="eg-tt-essence-note" style="margin-top:4px; opacity:0.8;">${otherTitle} ${others}</div>`;
-    }
     html += '</div>';
     return html;
 }
@@ -763,7 +728,7 @@ function _egBuildEssenceTabHTML() {
     const slotTypes = _egGetEssenceFilterSlotTypes();
     const slotLabel = (st) => {
         const key = 'eg_slot_' + st;
-        try { const tr = t(key); if (tr && tr !== key) return tr; } catch (e) {}
+        try { const tr = t(key); if (tr && tr !== key) return tr; } catch (e) { }
         return st.charAt(0).toUpperCase() + st.slice(1);
     };
     let filterOptions = `<option value="all">${t('eg_essence_filter_all') || 'All'}</option>`;
@@ -823,7 +788,7 @@ function _egOnEssenceCellMove(e) {
     const stash = (typeof _egEssenceStash !== 'undefined') ? _egEssenceStash : null;
     const item = stash && stash[r] ? stash[r][c] : null;
     if (item) return;
-    if (_egEssenceIdForSlot(r,c) && typeof moveGameTooltip === 'function') moveGameTooltip(e);
+    if (_egEssenceIdForSlot(r, c) && typeof moveGameTooltip === 'function') moveGameTooltip(e);
 }
 function _egOnEssenceCellLeave() {
     if (typeof hideGameTooltip === 'function') hideGameTooltip();
@@ -963,8 +928,8 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     if (famForCheck && !_egEssenceCanApplyToItem(famForCheck, item)) {
         const modName = _egEssenceFamilyDisplayName(famForCheck);
         const slotTypes = _egEssenceCompatibleSlotTypes(famForCheck);
-        const slotLabel = (st) => { try{ const tr=t('eg_slot_'+st); if(tr&&tr!=='eg_slot_'+st) return tr; }catch(e){} return st; };
-        const slotsStr = slotTypes.length ? slotTypes.map(slotLabel).join(', ') : (typeof LANG!=='undefined'&&LANG==='de'?'keine':'none');
+        const slotLabel = (st) => { try { const tr = t('eg_slot_' + st); if (tr && tr !== 'eg_slot_' + st) return tr; } catch (e) { } return st; };
+        const slotsStr = slotTypes.length ? slotTypes.map(slotLabel).join(', ') : (typeof LANG !== 'undefined' && LANG === 'de' ? 'keine' : 'none');
         const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
         let msg = '';
         if (isDe) {

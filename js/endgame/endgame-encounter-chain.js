@@ -31,8 +31,9 @@ let _egBossTotalCount = 0;          // bosses the map requires (queue length at 
 let _egPendingPuzzleBonusGain = 0;
 let _egPendingQuestionBonusGain = 0;
 
-// Accumulated bonus-loot chance for the current run (0–1). Grows with every
+// Accumulated bonus-loot chance for the current run (0–5). Grows with every
 // solved puzzle (scaled by grid size) and every correctly answered question.
+// Cap 5.0 = 500% → up to 5 guaranteed bonus items.
 let _egBonusLootChance = 0;
 
 
@@ -620,10 +621,28 @@ function _egOnAllBossesDead() {
 
 let _egChainRecentGis = [];
 
+// ── Encounter-chain size caps (playability) ──────────────────────────
+// 15×30 is the widest comfortable map; 20 rows is allowed only when
+// columns stay ≤20. Anything beyond those on either axis, or tall+wide
+// (>15 rows && >20 cols), is too large for a fun chain step.
+const EG_CHAIN_MAX_ROWS = 20;
+const EG_CHAIN_MAX_COLS = 30;
+const EG_CHAIN_TALL_ROW_THRESHOLD = 15;
+const EG_CHAIN_MAX_COLS_WHEN_TALL = 20;
+
+function _egChainPuzzleSizeAllowed(rows, cols) {
+    if (rows > EG_CHAIN_MAX_ROWS || cols > EG_CHAIN_MAX_COLS) return false;
+    if (rows > EG_CHAIN_TALL_ROW_THRESHOLD && cols > EG_CHAIN_MAX_COLS_WHEN_TALL) return false;
+    return true;
+}
+
 function _egPuzzlePassesCriteria(level, criteria) {
     const rows = level.grid.length;
     const cols = level.grid[0].length;
     const cells = rows * cols;
+
+    // Global encounter-chain cap: keep chains fun, never pick mega grids.
+    if (!_egChainPuzzleSizeAllowed(rows, cols)) return false;
 
     if (criteria.minCells != null && cells < criteria.minCells) return false;
     if (criteria.maxCells != null && cells > criteria.maxCells) return false;
@@ -760,11 +779,11 @@ function _egFindNextChainPuzzleGi() {
 //-------------------ENCOUNTER CHAIN: MAP END (voluntary)----------------
 //------------------------------------------------------------------------
 
-// Chance-based bonus equipment loot when completing a map.
+// Chance-based bonus equipment loot when completing a map (cap 500% = up to 5 items).
 // The chance scales with the grid size of each solved puzzle and with
 // correct quiz answers this run:
 //   puzzles: small +10%, normal +25%, large +50%, massive +75%
-//   quiz:    +33% / +33% / +34% for the first three correct answers
+//   quiz:    +33% / +33% / +34% per correct answer (repeating +34% after three)
 const EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE = {
     small: 0.10,
     medium: 0.25,
@@ -772,7 +791,7 @@ const EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE = {
     massive: 0.75,
 };
 const EG_BONUS_LOOT_CHANCE_PER_QUESTION = [0.33, 0.33, 0.34];
-const EG_BONUS_LOOT_CHANCE_MAX = 1.0;
+const EG_BONUS_LOOT_CHANCE_MAX = 5.0;
 
 // Returns the bonus-loot gain (0–1) for solving a puzzle, based on how many
 // cells the puzzle's grid has (same buckets as _gridSizeBucket in quests-stats.js).
@@ -786,32 +805,43 @@ function _egGetPuzzleBonusLootGain() {
     return EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE.small;
 }
 
-// Returns the current bonus-loot drop chance (0–1) for this run.
+// Returns the current bonus-loot drop chance (0–5) for this run.
 function _egGetBonusLootChance() {
     return Math.min(EG_BONUS_LOOT_CHANCE_MAX, _egBonusLootChance);
 }
 
-// Rolls for one bonus equipment item on map completion. On success the item
-// is pushed into _egRunLoot so it flows through the normal flush-to-stash
-// and leave-map summary paths. Must be called BEFORE _egShowLeaveMapTransition()
-// so the summary screen includes it, and before _egChainCleanup wipes _egRunLoot.
+// Rolls for up to 5 bonus equipment items on map completion (cap 500%).
+// For total chance C (0–5): floor(C) items are guaranteed, and the
+// fractional remainder is a chance for one extra item. E.g. 3.5 → 3
+// guaranteed + 50% chance for a 4th. Items are pushed into _egRunLoot so
+// they flow through the normal flush-to-stash and leave-map summary paths.
+// Must be called BEFORE _egShowLeaveMapTransition() and before cleanup.
 function _egRollBonusMapLoot() {
-    if (Math.random() > _egGetBonusLootChance()) return;
     if (typeof _egGenerateEquipmentDrop !== 'function') return;
-    // Unlimited stash: always has room — no need to gate
+    const totalChance = _egGetBonusLootChance();
+    if (totalChance <= 0) return;
+
+    const guaranteed = Math.floor(totalChance);
+    const remainder = totalChance - guaranteed;
 
     const baseLevel = (_egMapDef && _egMapDef.monsterLevel) ? _egMapDef.monsterLevel : 1;
-    const item = _egGenerateEquipmentDrop(baseLevel);
-    if (!item) return;
 
-    // Flag the drop so the leave-map summary can visually mark it (🎁 badge
-    // on the chip + "Bonus Loot" line in its tooltip) as the bonus item.
-    item.isBonusLoot = true;
+    let rolls = guaranteed;
+    if (remainder > 0 && Math.random() < remainder) rolls += 1;
 
-    _egRunLoot.push(item);
-    showToast(t('eg_bonus_loot')
-        .replace('{icon}', item.icon || '')
-        .replace('{name}', item.name), _egRarityToastColor(item.rarity));
+    for (let i = 0; i < rolls; i++) {
+        const item = _egGenerateEquipmentDrop(baseLevel);
+        if (!item) continue;
+
+        // Flag the drop so the leave-map summary can visually mark it (🎁 badge
+        // on the chip + "Bonus Loot" line in its tooltip) as the bonus item.
+        item.isBonusLoot = true;
+
+        _egRunLoot.push(item);
+        showToast(t('eg_bonus_loot')
+            .replace('{icon}', item.icon || '')
+            .replace('{name}', item.name), _egRarityToastColor(item.rarity));
+    }
 }
 
 // Grants the active map's rolled completion reward (2–10× one higher-grade
