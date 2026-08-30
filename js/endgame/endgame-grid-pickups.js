@@ -10,6 +10,11 @@ const EG_PICKUP_SPAWN_INTERVAL_MAX = 18000; // ms maximum between spawn attempts
 const EG_PICKUP_MAX_ON_BOARD = 1;     // hard cap on simultaneous pickups
 const EG_PICKUP_LIFETIME_MS = 20000; // ms before an uncollected pickup disappears
 
+// Hearts are the character's only direct emergency healing source. Do not let
+// random pickup rolls consume the pickup slot with a non-healing item while
+// the player is critically injured.
+const EG_PICKUP_CRITICAL_HP_RATIO = 0.5;
+
 // ── Monster loot drop constants ──────────────────────────────────────────────
 // Chance (0–1) that a defeated monster drops a loot item onto the grid.
 // Bosses always use EG_LOOT_DROP_CHANCE_BOSS.
@@ -702,7 +707,18 @@ function _egSpawnPickup() {
     if (filtered.length === 0) return;
 
     const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
-    const def = _egPickRandomPickup();
+    let def;
+    const hpRatio = (typeof playerMaxHP === 'number' && playerMaxHP > 0)
+        ? playerCurrentHP / playerMaxHP : 1;
+    if (hpRatio <= EG_PICKUP_CRITICAL_HP_RATIO) {
+        // While critically injured, guarantee that the next pickup attempt is
+        // a heart so bad RNG cannot leave the character without a way to heal.
+        const heartRoll = Math.random() * 100;
+        def = heartRoll < 60 ? EG_PICKUP_DEFS.heart_small
+            : (heartRoll < 90 ? EG_PICKUP_DEFS.heart_medium : EG_PICKUP_DEFS.heart_large);
+    } else {
+        def = _egPickRandomPickup();
+    }
     const key = `${r}-${c}`;
 
     _egPickups.set(key, def);

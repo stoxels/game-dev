@@ -95,6 +95,13 @@ function _egAddItemToStash(item) {
 const EG_CURRENCY_COLS = 5;
 const EG_CURRENCY_ROWS = 6;
 
+// Equipment currently offered to the crafting bench. The bench UI is opened
+// from the Orbs & Shards tab and accepts an item by drag-and-drop.
+function _egBuildCraftingBenchSlotHTML() {
+    const item = typeof _egCraftingBenchItem !== 'undefined' ? _egCraftingBenchItem : null;
+    return `<div class="eg-crafting-launcher"><button class="eg-crafting-open-btn" onclick="_egOpenCraftingBench()">⚒ CRAFTING BENCH</button><div class="eg-crafting-slot" id="eg-crafting-bench-launch-slot" data-eg-dropzone="crafting" ondragover="egDragOver(event)" ondrop="egDropOnCraftingBench(event)">${item ? _egBuildItemChipHTML(item) : 'Drop equipment here'}</div></div>`;
+}
+
 // Fixed assignment: currency id → {r,c}. Mirrors PoE currency tab ordering.
 const EG_CURRENCY_SLOT_MAP = {
     // Row 0 — common transmutation / alteration line
@@ -379,7 +386,7 @@ function _egBuildItemChipHTML(item, size = 'normal') {
     return `
 <div class="eg-item-chip ${rarityClass} ${sizeClass} ${blockedClass}"
      id="${chipId}"
-     draggable="true"
+     onmousedown="_egHandleChipMouseDown(event, '${chipId}')"
      onmouseenter="_egShowTooltipFromChip('${chipId}', event)"
      onmousemove="_egMoveTooltip(event)"
      onmouseleave="_egClearTooltip()">
@@ -397,6 +404,16 @@ function _egShowTooltipFromChip(chipId, e) {
     if (item) {
         _egShowTooltip(item, e);
     }
+}
+
+// Mouse-down handler for item chips - initiates custom drag-and-drop
+function _egHandleChipMouseDown(e, chipId) {
+    if (e.button !== 0) return; // left-click only
+    const chip = document.getElementById(chipId);
+    if (!chip) return;
+    e.preventDefault();
+    _egClearTooltip();
+    _dndPickUp(e, chip);
 }
 
 
@@ -505,6 +522,7 @@ function _egBuildCurrencyPanelHTML() {
          style="grid-template-columns: repeat(${EG_CURRENCY_COLS}, 1fr);">
         ${_egBuildCurrencyGridHTML()}
     </div>
+    ${_egBuildCraftingBenchSlotHTML()}
 </div>`;
 }
 
@@ -1130,6 +1148,15 @@ function _egBindStatTooltips() {
 }
 
 
+// Re-renders the launcher slot for the crafting bench (in the currency panel).
+function _egUpdateCraftingBenchLauncherSlot() {
+    const craftingSlot = document.getElementById('eg-crafting-bench-launch-slot');
+    if (craftingSlot) {
+        const item = typeof _egCraftingBenchItem !== 'undefined' ? _egCraftingBenchItem : null;
+        craftingSlot.innerHTML = item ? _egBuildItemChipHTML(item) : 'Drop equipment here';
+    }
+}
+
 // Triggers a full re-render of every zone in the hub.
 // Call this after any state-changing operation.
 function _egRenderAll() {
@@ -1143,6 +1170,11 @@ function _egRenderAll() {
     _egRenderStatsList();
     if (typeof _egRenderLevelHUD === 'function') _egRenderLevelHUD();
     _egUpdatePassiveTreeButton();
+    const craftingSlot = document.getElementById('eg-crafting-bench-launch-slot');
+    if (craftingSlot) {
+        const item = typeof _egCraftingBenchItem !== 'undefined' ? _egCraftingBenchItem : null;
+        craftingSlot.innerHTML = item ? _egBuildItemChipHTML(item) : 'Drop equipment here';
+    }
 }
 
 
@@ -1590,6 +1622,7 @@ function egSaveHubState() {
     STATE.egEssenceStash = _egEssenceStash;
     STATE.egMapSlotItem = _egMapSlotItem;
     STATE.egMapStashActiveTier = _egMapStashActiveTier;
+    STATE.egCraftingBenchItem = _egCraftingBenchItem;
     // Mass-sell filter (persisted alongside the stash so reconstructing the
     // hub after a reload restores the player's protection choices).
     if (_egMassSellKeep) STATE.egMassSellKeep = { ..._egMassSellKeep };
@@ -1884,6 +1917,7 @@ function _egLoadHubState() {
         _egEssenceStash = freshEssGrid;
     }
     _egMapSlotItem = STATE.egMapSlotItem || null;
+    _egCraftingBenchItem = STATE.egCraftingBenchItem || null;
     // Heal legacy essence cells too (description/category missing from old saves).
     if (Array.isArray(_egEssenceStash)) {
         for (let r = 0; r < _egEssenceStash.length; r++) {

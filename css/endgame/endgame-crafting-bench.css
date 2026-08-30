@@ -1,0 +1,42 @@
+#eg-crafting-bench-overlay { display:none; position:fixed; inset:0; z-index:700; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,.82); pointer-events:none; }
+#eg-crafting-bench-overlay.show { display:flex; }
+.eg-craft-bench-panel { width:min(900px,96vw); max-height:92vh; overflow:auto; position:relative; padding:22px; color:#e8e0cc; background:linear-gradient(145deg,#211c2a,#11131d); border:1px solid #a88945; box-shadow:0 0 35px rgba(0,0,0,.8),0 0 18px rgba(200,160,70,.2); pointer-events:auto; }
+.eg-craft-bench-panel h2 { margin:0 0 14px; text-align:center; color:#f1d27b; letter-spacing:3px; }
+.eg-craft-close { position:absolute; right:12px; top:10px; background:transparent; border:1px solid #665536; color:#d8bd74; cursor:pointer; }
+.eg-crafting-launcher { padding:7px 6px 10px; border-top:1px solid rgba(181,146,72,.25); }
+.eg-crafting-open-btn,.eg-craft-apply { width:100%; padding:7px; border:1px solid #ad8d48; color:#f4d98b; background:#292231; cursor:pointer; font-weight:bold; }
+.eg-crafting-open-btn:hover,.eg-craft-apply:not(:disabled):hover { background:#493b29; }
+.eg-crafting-slot { min-height:34px; margin-top:6px; display:flex; align-items:center; justify-content:center; border:1px dashed #806b42; color:#a89978; font-size:.75rem; text-align:center; }
+.eg-craft-drop-active { border-color:#f1d27b; background:rgba(200,160,70,.18); }
+.eg-craft-bench-item { min-height:74px; display:flex; align-items:center; justify-content:center; border:1px solid #665536; background:rgba(0,0,0,.28); }
+.eg-craft-bench-item .eg-item-chip { width:70px; height:70px; }
+.eg-craft-ilvl { padding:8px; text-align:center; color:#b6aa91; font-size:.8rem; }
+
+/* Crafted modifier capacity display */
+.eg-craft-capacity { display:flex; justify-content:space-between; padding:6px 10px; margin-bottom:8px; background:rgba(0,0,0,.2); border:1px solid #4e5368; font-size:.7rem; color:#b6aa91; }
+.eg-craft-capacity-item { display:flex; align-items:center; gap:6px; }
+.eg-craft-capacity-bar { width:80px; height:6px; background:#2a2a3a; border-radius:3px; overflow:hidden; }
+.eg-craft-capacity-fill { height:100%; background:#66c9ff; transition:width 0.2s; }
+
+.eg-craft-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:10px; max-height:52vh; overflow:auto; }
+.eg-craft-family { border:1px solid rgba(181,146,72,.3); padding:10px; background:rgba(255,255,255,.025); }
+.eg-craft-family.prefix { border-left:3px solid #66c9ff; }
+.eg-craft-family.suffix { border-left:3px solid #f1d27b; }
+.eg-craft-family-name { margin-bottom:8px; font-size:.75rem; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; }
+.eg-craft-family-name.prefix { color:#66c9ff; }
+.eg-craft-family-name.suffix { color:#f1d27b; }
+.eg-craft-tiers { display:flex; flex-wrap:wrap; gap:4px; }
+.eg-craft-tier { padding:6px 10px; border:1px solid #4e5368; background:#202435; color:#d9e1f2; text-align:left; cursor:pointer; font-size:.7rem; border-radius:3px; white-space:nowrap; min-width:120px; }
+.eg-craft-tier:hover,.eg-craft-tier.selected { border-color:#66c9ff; background:#263d50; }
+.eg-craft-tier.disabled { color:#817c78; border-color:#493f3a; background:#18181d; cursor:not-allowed; opacity:.7; }
+.eg-craft-tier .tier-label { color:#f1d27b; }
+.eg-craft-tier .tier-range { color:#a8c8e8; margin-left:6px; }
+.eg-craft-tier .eg-craft-tier-cost { display:block; margin-top:3px; color:#d8c58d; font-size:.68rem; }
+.eg-craft-tier .eg-craft-tier-cost.missing { color:#e87d70; font-weight:bold; }
+.eg-craft-empty { grid-column:1/-1; padding:25px; text-align:center; color:#a89978; }
+.eg-craft-footer { margin-top:14px; display:flex; flex-direction:column; gap:9px; }
+.eg-craft-cost { margin-right:12px; color:#d8c58d; font-size:.75rem; }
+.eg-craft-cost-missing { color:#e87d70; font-weight:bold; }
+.eg-craft-apply:disabled { opacity:.45; cursor:not-allowed; }
+.eg-craft-apply { background:#2a3a2a; border-color:#6a9c6a; }
+.eg-craft-apply:not(:disabled):hover { background:#3a4a3a; }

@@ -281,7 +281,18 @@ function _egHzCircleRectOverlap(x, y, r, rect) {
     const cx = Math.max(rect.left, Math.min(x, rect.right));
     const cy = Math.max(rect.top, Math.min(y, rect.bottom));
     const dx = x - cx, dy = y - cy;
-    return dx * dx + dy * dy < r * r;
+    return dx * dx + dy * dy <= r * r;
+}
+
+// Shared hazard hit resolution: use the same overlap rule for every circular
+// impact and apply the ailment only when the hit actually dealt damage.
+function _egHzApplyCircleHit(x, y, radius, pr, damagePct, element, color, ailment, ailmentDps) {
+    if (!pr || !_egHzCircleRectOverlap(x, y, radius, pr)) return false;
+    const dealt = _egHzDamage(damagePct, element, color);
+    if (dealt > 0 && ailment && typeof _egApplyPlayerAilment === 'function') {
+        _egApplyPlayerAilment(ailment, ailmentDps);
+    }
+    return true;
 }
 
 function _egHzRectInsideCircle(rect, cx, cy, r) {
@@ -583,14 +594,13 @@ function _egHzDetonateLava(pool) {
     // Heavy fire damage if the player is still inside the blast radius at detonation time
     // Uses tight hitbox vs blast disc so footing/edges respect the sprite.
     const pr = _egHzPlayerHitbox();
-    if (pr && _egHzCircleRectOverlap(bx, by, EG_HZ_LAVA_BLAST_R, pr)) {
-            const dealt = _egHzDamage(EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT * _egHzLava.dmgMult, 'fire', '#ff6b4a');
-            if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-                && Math.random() * 100 < EG_HZ_LAVA_IGNITE_CHANCE_PCT) {
-                _egApplyPlayerAilment('ignite',
-                    Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
-            }
-        }
+    if (_egHzApplyCircleHit(bx, by, EG_HZ_LAVA_BLAST_R, pr,
+        EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT * _egHzLava.dmgMult,
+        'fire', '#ff6b4a',
+        Math.random() * 100 < EG_HZ_LAVA_IGNITE_CHANCE_PCT ? 'ignite' : null,
+        Math.max(EG_AIL_MIN_DOT_DAMAGE, (playerMaxHP || 100) * EG_AIL_IGNITE_DMG_SHARE / 100))) {
+        // Damage and ailment application are handled consistently above.
+    }
 
     // Despawn for 3 minutes (gameplay time)
     pool.state = 'respawning';
@@ -718,14 +728,8 @@ function _egHzTickLightning(dtMs) {
         st.pending.splice(i, 1);
 
         const pr = _egHzPlayerHitbox();
-        if (pr && _egHzCircleRectOverlap(strike.x, strike.y, EG_HZ_LIGHTNING_RADIUS, pr)) {
-            const dealt = _egHzDamage(
-                EG_HZ_LIGHTNING_BASE_DMG_PCT * st.dmgMult, 'lightning', '#ffe66b'
-            );
-            if (dealt > 0 && typeof _egApplyPlayerAilment === 'function') {
-                _egApplyPlayerAilment('shocked');
-            }
-        }
+        _egHzApplyCircleHit(strike.x, strike.y, EG_HZ_LIGHTNING_RADIUS, pr,
+            EG_HZ_LIGHTNING_BASE_DMG_PCT * st.dmgMult, 'lightning', '#ffe66b', 'shocked');
     }
 }
 
@@ -885,12 +889,13 @@ function _egHzInitDarkness(intensity) {
         clouds.push(cloud);
     }
     document.body.appendChild(darkLayer);
-    _egHzDarkness = { clouds, layer: darkLayer };
+    _egHzDarkness = { clouds, layer: darkLayer, blinded: false };
 }
 
 function _egHzTickDarkness(dtMs) {
     const dtS = dtMs / 1000;
     const vw = window.innerWidth;
+    const pr = _egHzPlayerHitbox();
     _egHzDarkness.clouds.forEach(c => {
         c.x += c.vx * dtS;
         // Wrap around the screen edges so clouds keep circulating slowly.
@@ -899,6 +904,28 @@ function _egHzTickDarkness(dtMs) {
         c.el.style.transform =
             `translate(${Math.round(c.x)}px, ${Math.round(c.y)}px) scale(var(--hz-cloud-scale, 1))`;
     });
+
+    // A cloud's visual box is the same collision shape used for gameplay.
+    // Test the sprite hitbox against every cloud so standing in any part of a
+    // cloud reliably applies the blindness effect to player attacks.
+    if (pr) {
+        _egHzDarkness.blinded = _egHzDarkness.clouds.some(c => {
+            const scale = Number(c.el.style.getPropertyValue('--hz-cloud-scale')) || 1;
+            const cloudRect = {
+                left: c.x,
+                top: c.y,
+                right: c.x + 260 * scale,
+                bottom: c.y + 110 * scale,
+            };
+            return _egHzRectsOverlap(pr, cloudRect);
+        });
+    } else {
+        _egHzDarkness.blinded = false;
+    }
+}
+
+function _egIsPlayerInDarknessCloud() {
+    return !!(_egHzActive && _egHzDarkness && _egHzDarkness.blinded);
 }
 
 
@@ -1100,16 +1127,9 @@ function _egHzTickMeteor(dtMs) {
                 }
                 st.pending.splice(i, 1);
 
-                if (pr && _egHzCircleRectOverlap(m.x, m.y, EG_HZ_METEOR_RADIUS, pr)) {
-                    const dealt = _egHzDamage(
-                        EG_HZ_METEOR_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42'
-                    );
-                    if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-                        && Math.random() * 100 < EG_HZ_METEOR_IGNITE_CHANCE_PCT) {
-                        _egApplyPlayerAilment('ignite',
-                            Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
-                    }
-                }
+                _egHzApplyCircleHit(m.x, m.y, EG_HZ_METEOR_RADIUS, pr,
+                    EG_HZ_METEOR_BASE_DMG_PCT * st.dmgMult, 'fire', '#ff8c42',
+                    Math.random() * 100 < EG_HZ_METEOR_IGNITE_CHANCE_PCT ? 'ignite' : null);
             }
         }
     }
@@ -1170,16 +1190,9 @@ function _egHzDetonateVolatile(wisp) {
     }
 
     const pr = _egHzPlayerHitbox();
-    if (pr && _egHzCircleRectOverlap(wisp.x, wisp.y, EG_HZ_VOLATILE_BLAST_R, pr)) {
-        const dealt = _egHzDamage(
-            EG_HZ_VOLATILE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#b39ddb'
-        );
-        if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
-            && Math.random() * 100 < EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT) {
-            _egApplyPlayerAilment('shadowburn',
-                Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_SHADOWBURN_DMG_SHARE));
-        }
-    }
+    _egHzApplyCircleHit(wisp.x, wisp.y, EG_HZ_VOLATILE_BLAST_R, pr,
+        EG_HZ_VOLATILE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#b39ddb',
+        Math.random() * 100 < EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT ? 'shadowburn' : null);
 
     // Queue a replacement so the pressure never runs dry.
     if (!(st.respawnIn > 0)) {
@@ -1720,7 +1733,8 @@ function _egHzTickCyclone(dtMs) {
         if (v.dmgAcc >= EG_HZ_CYCLONE_TICK_MS) {
             v.dmgAcc = 0;
             if (pr && _egHzSweptCircleRectOverlap(prevX, prevY, v.x, v.y, v.r * 0.9, pr)) {
-                _egHzDamage(EG_HZ_CYCLONE_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff');
+                _egHzApplyCircleHit(v.x, v.y, v.r * 0.9, pr,
+                    EG_HZ_CYCLONE_BASE_DMG_PCT * st.dmgMult, 'cold', '#a8e6ff');
             }
         }
     });

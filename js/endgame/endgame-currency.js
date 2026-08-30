@@ -105,6 +105,12 @@ const EG_CURRENCY_DEFS = {
             const { prefixCount, suffixCount } = _egRollModCounts('uncommon');
             return _egRerollItemMods(item, 'uncommon', prefixCount, suffixCount);
         },
+        // Shift-chaining can immediately fill a one-modifier result with an
+        // Augmentation Orb instead of consuming another Alteration Orb.
+        chainFallback(item) {
+            return item.rarity === 'uncommon' && (item.mods || []).length === 1
+                ? 'orb_augmentation' : null;
+        },
     },
 
     orb_augmentation: {
@@ -132,10 +138,17 @@ const EG_CURRENCY_DEFS = {
     orb_alchemy: {
         id: 'orb_alchemy', name: t('eg_orb_alchemy'), icon: '🟡',
         description: t('eg_orb_alchemy_desc'),
-        canApply(item) { return item.rarity === 'common'; },
+        // On a rare item this consumes a Scouring Orb as part of the same
+        // action, then immediately rolls a fresh rare item.
+        canApply(item) {
+            return item.rarity === 'common' || (item.rarity === 'rare' && !item.isUnique);
+        },
         apply(item) {
             const { prefixCount, suffixCount } = _egRollModCounts('rare');
             return _egRerollItemMods(item, 'rare', prefixCount, suffixCount);
+        },
+        requiresExtraCurrency(item) {
+            return item.rarity === 'rare' && !item.isUnique ? 'orb_scouring' : null;
         },
     },
 
@@ -186,10 +199,17 @@ const EG_CURRENCY_DEFS = {
     orb_ascension: {
         id: 'orb_ascension', name: t('eg_orb_ascension'), icon: '🔮',
         description: t('eg_orb_ascension_desc'),
-        canApply(item) { return item.rarity === 'common'; },
+        // On an epic item this consumes a Scouring Orb as part of the same
+        // action, then immediately rolls a fresh epic item.
+        canApply(item) {
+            return item.rarity === 'common' || (item.rarity === 'epic' && !item.isUnique);
+        },
         apply(item) {
             const { prefixCount, suffixCount } = _egRollModCounts('epic');
             return _egRerollItemMods(item, 'epic', prefixCount, suffixCount);
+        },
+        requiresExtraCurrency(item) {
+            return item.rarity === 'epic' && !item.isUnique ? 'orb_scouring' : null;
         },
     },
 
@@ -616,8 +636,68 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         return;
     }
 
+    // Some crafting shortcuts bundle a Scouring Orb into the same click.
+    // Validate and consume the extra orb before changing the target so a
+    // failed shortcut never partially applies.
+    const extraCurrencyId = !isMap && typeof def.requiresExtraCurrency === 'function'
+        ? def.requiresExtraCurrency(item) : null;
+    let extraStack = null;
+    let extraRow = -1, extraCol = -1;
+    if (extraCurrencyId) {
+        outerExtra:
+        for (let r = 0; r < _egCurrencyStash.length; r++) {
+            for (let c = 0; c < (_egCurrencyStash[r] || []).length; c++) {
+                const candidate = _egCurrencyStash[r][c];
+                if (candidate && candidate.id === extraCurrencyId && (candidate.count || 0) > 0) {
+                    extraStack = candidate; extraRow = r; extraCol = c;
+                    break outerExtra;
+                }
+            }
+        }
+        if (!extraStack) {
+            const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
+            showToast(msg);
+            _egCancelCurrencyUse(true);
+            return;
+        }
+    }
+
     const newItem = isMap ? mapRule.apply(item) : def.apply(item);
     applyFn(newItem);
+
+    // Shift-chained Alteration results with one modifier automatically use an
+    // Augmentation Orb, if available, to complete the uncommon item.
+    const chainFallbackId = keepActive && !isMap && typeof def.chainFallback === 'function'
+        ? def.chainFallback(newItem) : null;
+    if (chainFallbackId) {
+        let fallbackStack = null;
+        let fallbackRow = -1, fallbackCol = -1;
+        outerFallback:
+        for (let r = 0; r < _egCurrencyStash.length; r++) {
+            for (let c = 0; c < (_egCurrencyStash[r] || []).length; c++) {
+                const candidate = _egCurrencyStash[r][c];
+                if (candidate && candidate.id === chainFallbackId && (candidate.count || 0) > 0) {
+                    fallbackStack = candidate; fallbackRow = r; fallbackCol = c;
+                    break outerFallback;
+                }
+            }
+        }
+        if (fallbackStack && typeof EG_CURRENCY_DEFS[chainFallbackId].apply === 'function'
+            && EG_CURRENCY_DEFS[chainFallbackId].canApply(newItem)) {
+            const completedItem = EG_CURRENCY_DEFS[chainFallbackId].apply(newItem);
+            applyFn(completedItem);
+            fallbackStack.count--;
+            if (fallbackStack.count <= 0) _egCurrencyStash[fallbackRow][fallbackCol] = null;
+            _egRenderCurrencyCell(fallbackRow, fallbackCol);
+        }
+    }
+
+    // Consume the bundled Scouring Orb, if any.
+    if (extraStack) {
+        extraStack.count--;
+        if (extraStack.count <= 0) _egCurrencyStash[extraRow][extraCol] = null;
+        _egRenderCurrencyCell(extraRow, extraCol);
+    }
 
     // Consume one orb from the stack.
     stack.count = (stack.count || 1) - 1;

@@ -5267,11 +5267,11 @@ const EG_MOD_TABLE_BOOTS = {
             id: 'movement_speed',
             label: '#% increased Movement Speed', labelDe: '#% erhöhte Bewegungsgeschwindigkeit',
             tiers: [
-                { tier: 1, min: 30, max: 35, weight: 80, ilvl: 80 },
-                { tier: 2, min: 25, max: 29, weight: 150, ilvl: 60 },
-                { tier: 3, min: 20, max: 24, weight: 300, ilvl: 35 },
-                { tier: 4, min: 15, max: 19, weight: 600, ilvl: 15 },
-                { tier: 5, min: 10, max: 14, weight: 1200, ilvl: 1 }
+                { tier: 1, min: 30, max: 35, weight: 240, ilvl: 80 },
+                { tier: 2, min: 25, max: 29, weight: 450, ilvl: 60 },
+                { tier: 3, min: 20, max: 24, weight: 900, ilvl: 35 },
+                { tier: 4, min: 15, max: 19, weight: 1800, ilvl: 15 },
+                { tier: 5, min: 10, max: 14, weight: 3600, ilvl: 1 }
             ]
         },
 }

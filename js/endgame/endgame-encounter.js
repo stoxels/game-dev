@@ -1938,6 +1938,13 @@ function _egRollPlayerMiss(targetId, opts) {
     const target = _egMonsters.find(m => m.id === targetId);
     if (!target) return false;
 
+    // Darkness clouds completely blind the player: every attack misses while
+    // the sprite hitbox overlaps a cloud, regardless of accuracy or bonuses.
+    if (typeof _egIsPlayerInDarknessCloud === 'function' && _egIsPlayerInDarknessCloud()) {
+        _egShowStatusLabel(targetId, t('eg_miss'));
+        return true;
+    }
+
     const stats = _egComputePlayerStats();
     const stacks = (opts && opts.isChargedStacks) ? opts.isChargedStacks : 0;
     // Also support a plain number being passed as second arg (legacy callers)
@@ -2272,13 +2279,12 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
     _egUpdateBars();
 }
 
-// Gear: overkill (shoulders suffix) — on a killing blow, rolls against
-// overkillPct and, on success, deals the surplus damage (amount beyond the
-// victim's remaining HP) to a random other living monster.
+// Gear: overkill — on every killing blow with excess damage, transfers the
+// surplus to a random other living monster. overkillPct increases the amount
+// transferred; it is not a chance to transfer.
 function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elements) {
     const stats = _egComputePlayerStats();
-    const overkillPct = stats.overkillPct || 0;
-    if (overkillPct <= 0 || Math.random() * 100 >= overkillPct) return;
+    const overkillPct = Math.max(0, stats.overkillPct || 0);
 
     const overkill = (hpBefore != null)
         ? Math.round(appliedDamage - hpBefore)
@@ -2288,7 +2294,8 @@ function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elem
     const others = _egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
     if (!others.length) return;
     const victim = others[Math.floor(Math.random() * others.length)];
-    _egDamageTargetById(victim.id, overkill, elements, { isCrit: !!isCrit });
+    const transferredDamage = Math.round(overkill * (1 + overkillPct / 100));
+    _egDamageTargetById(victim.id, transferredDamage, elements, { isCrit: !!isCrit });
 }
 
 // Drag-paint charged overkill ricochet — when a charged projectile overkills

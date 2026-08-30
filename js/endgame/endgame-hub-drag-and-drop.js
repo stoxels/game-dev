@@ -105,7 +105,7 @@ function _dndZoneAccepts(targetZone) {
     if (!_dnd.item) return false;
     const itemCat = _dnd.item.category;
     // Equipment may go to both the main stash and the paperdoll char slots.
-    if (itemCat === 'equip') return targetZone === 'inv' || targetZone === 'equip';
+    if (itemCat === 'equip') return targetZone === 'inv' || targetZone === 'equip' || targetZone === 'crafting';
     // Maps may go to the map device and the map stash.
     if (itemCat === 'map') return targetZone === 'map' || targetZone === 'mapstash';
     // Currency may only go to the currency stash.
@@ -186,6 +186,7 @@ function _dndResolvePickupZone(chip) {
     const mapStashCell = chip.closest('.eg-map-stash-cell');
     const equipSlot = chip.closest('.eg-equip-slot');
     const mapSlot = chip.closest('#eg-map-slot');
+    const craftingSlot = chip.closest('[data-eg-dropzone="crafting"]');
     const invCell = chip.closest('.eg-inv-cell');
 
     if (currencyCell) {
@@ -211,7 +212,7 @@ function _dndResolvePickupZone(chip) {
         try {
             if (typeof _egGetMapTierGrid === 'function') item = _egGetMapTierGrid(tier)[r][c];
             else item = _egMapStash[r][c];
-        } catch(e) { item = null; }
+        } catch (e) { item = null; }
         return {
             sourceZone: 'mapstash', sourceRow: r, sourceCol: c, sourceSlot: null, sourceTier: tier,
             item: item,
@@ -219,7 +220,7 @@ function _dndResolvePickupZone(chip) {
                 try {
                     if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(tier)[r][c] = null;
                     else _egMapStash[r][c] = null;
-                } catch(e) {}
+                } catch (e) { }
                 _egRenderMapStashCell(r, c);
             }
         };
@@ -229,6 +230,18 @@ function _dndResolvePickupZone(chip) {
             sourceZone: 'map', sourceRow: null, sourceCol: null, sourceSlot: null,
             item: _egMapSlotItem,
             clearFn: () => { _egMapSlotItem = null; _egRenderMapSlot(); }
+        };
+    }
+    if (craftingSlot && typeof _egCraftingBenchItem !== 'undefined') {
+        return {
+            sourceZone: 'crafting', sourceRow: null, sourceCol: null, sourceSlot: null,
+            item: _egCraftingBenchItem,
+            clearFn: () => {
+                _egCraftingBenchItem = null;
+                if (typeof _egRefreshCraftingBench === 'function') _egRefreshCraftingBench();
+                if (typeof _egUpdateCraftingBenchLauncherSlot === 'function') _egUpdateCraftingBenchLauncherSlot();
+                if (typeof _egCloseCraftingBench === 'function') _egCloseCraftingBench();
+            }
         };
     }
     if (equipSlot) {
@@ -342,6 +355,11 @@ function _dndReturnDisplacedToSource(item) {
     else if (sourceZone === 'map') { _egMapSlotItem = item; _egRenderMapSlot(); }
     else if (sourceZone === 'currency') { _egCurrencyStash[sourceRow][sourceCol] = item; _egRenderCurrencyCell(sourceRow, sourceCol); }
     else if (sourceZone === 'essence') { _egEssenceStash[sourceRow][sourceCol] = item; _egRenderEssenceCell(sourceRow, sourceCol); }
+    else if (sourceZone === 'crafting') {
+        _egCraftingBenchItem = item;
+        if (typeof _egRefreshCraftingBench === 'function') _egRefreshCraftingBench();
+        if (typeof _egUpdateCraftingBenchLauncherSlot === 'function') _egUpdateCraftingBenchLauncherSlot();
+    }
     else if (sourceZone === 'mapstash') {
         try {
             if (sourceTier != null && typeof _egGetMapTierGrid === 'function') {
@@ -354,7 +372,7 @@ function _dndReturnDisplacedToSource(item) {
             } else {
                 _egMapStash[sourceRow][sourceCol] = item;
             }
-        } catch(e) { try{ _egMapStash[sourceRow][sourceCol]=item; }catch(e2){} }
+        } catch (e) { try { _egMapStash[sourceRow][sourceCol] = item; } catch (e2) { } }
         _egRenderMapStashCell(sourceRow, sourceCol);
     }
     else {
@@ -395,6 +413,12 @@ function _dndFinalizeDrop() {
 
 // Resolves the drop target from the mouse position and routes to the correct
 // zone handler. If no valid target is found, the item is returned to its source.
+function egDropOnCraftingBench(event) {
+    // The global mouseup router handles custom dragging; this prevents the
+    // browser's native drop behavior from navigating the page.
+    event.preventDefault();
+}
+
 function _dndDrop(e) {
     if (!_dnd.active) return;
 
@@ -417,6 +441,7 @@ function _dndDrop(e) {
     const mapStashCell = target.closest('.eg-map-stash-cell');
     const equipSlotEl = target.closest('.eg-equip-slot');
     const mapSlotEl = target.closest('#eg-map-slot');
+    const craftingSlotEl = target.closest('[data-eg-dropzone="crafting"]');
 
     let dropped = false;
 
@@ -431,7 +456,7 @@ function _dndDrop(e) {
         const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
         const dragTier = (_dnd.item && _dnd.item.mapTier != null) ? _dnd.item.mapTier : null;
         if (dragTier != null && dragTier !== activeTier) {
-            const roman = (typeof EG_MAP_TIER_ROMANS !== 'undefined' ? EG_MAP_TIER_ROMANS[activeTier-1] : activeTier);
+            const roman = (typeof EG_MAP_TIER_ROMANS !== 'undefined' ? EG_MAP_TIER_ROMANS[activeTier - 1] : activeTier);
             const msg = `⚠️ This stash only holds Tier ${roman} maps (Tier ${dragTier} not allowed)`;
             if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
             else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
@@ -452,10 +477,24 @@ function _dndDrop(e) {
                     _dndDropOnCell(_egMapStash, _egRenderMapStashCell, r, c);
                 }
                 dropped = true;
-            } catch(e) {
+            } catch (e) {
                 _dndDropOnCell(_egMapStash, _egRenderMapStashCell, r, c);
                 dropped = true;
             }
+        }
+
+    } else if (craftingSlotEl && _dndZoneAccepts('crafting')) {
+        // Dropping onto the bench consumes the source location but keeps the
+        // same object in the bench slot. The bench chip remains draggable.
+        // If there's already an item in the bench, displace it to the stash.
+        const existingBenchItem = _egCraftingBenchItem;
+        dropped = typeof _egSetCraftingBenchItem === 'function' && _egSetCraftingBenchItem(_dnd.item);
+        if (dropped && existingBenchItem) {
+            const free = _dndFirstFreeInvCell();
+            if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(free.r + 1);
+            _egInventory[free.r][free.c] = existingBenchItem;
+            _egRenderInventoryCell(free.r, free.c);
+            _egUpdateInvCount();
         }
 
     } else if (mapSlotEl && _dndZoneAccepts('map')) {
@@ -741,7 +780,7 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
     try {
         if (typeof _egGetMapTierGrid === 'function') map = _egGetMapTierGrid(activeTier)[r][c];
         else map = _egMapStash[r][c];
-    } catch(e) { map = null; }
+    } catch (e) { map = null; }
     if (!map || map.category !== 'map') return;
 
     const displaced = _egMapSlotItem || null;
@@ -759,7 +798,7 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
                 // if target is active tier, render that cell (but it's not visible since we already switched?)
                 if (targetTier === activeTier) _egRenderMapStashCell(pos.r, pos.c);
             }
-        } catch(e) {}
+        } catch (e) { }
         if (!placed) {
             const msg = `⚠️ Cannot swap — device holds Tier ${displaced.mapTier} but stash is on Tier ${activeTier}`;
             if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
@@ -767,7 +806,7 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
             return;
         }
         // clear clicked cell
-        try { _egGetMapTierGrid(activeTier)[r][c] = null; } catch(e) {}
+        try { _egGetMapTierGrid(activeTier)[r][c] = null; } catch (e) { }
         _egMapSlotItem = map;
         _egRenderMapSlot();
         _egRenderMapStashCell(r, c);
@@ -778,7 +817,7 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
     try {
         if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(activeTier)[r][c] = displaced;
         else _egMapStash[r][c] = displaced;
-    } catch(e) {}
+    } catch (e) { }
     _egRenderMapSlot();
     _egRenderMapStashCell(r, c);
     egSaveHubState();
@@ -789,7 +828,7 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
 function _dndQuickUnloadMapFromDevice() {
     if (typeof _egMapSlotItem === 'undefined' || !_egMapSlotItem) return;
     const map = _egMapSlotItem;
-    const tier = (map.mapTier != null ? map.mapTier : (_egMapStashActiveTier||1));
+    const tier = (map.mapTier != null ? map.mapTier : (_egMapStashActiveTier || 1));
     try {
         if (typeof _egFindFreeMapCellForTier === 'function' && typeof _egGetMapTierGrid === 'function') {
             const pos = _egFindFreeMapCellForTier(tier);
@@ -805,7 +844,7 @@ function _dndQuickUnloadMapFromDevice() {
             egSaveHubState();
             return;
         }
-    } catch(e) {}
+    } catch (e) { }
     for (let r = 0; r < EG_MAP_STASH_ROWS; r++) {
         for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
             if (!_egMapStash[r][c]) {
@@ -1087,7 +1126,11 @@ function _dndInjectStyles() {
 // currency systems operate on both screens — they share the same state.
 function _dndChipScreenEl(chip) {
     if (!chip || typeof chip.closest !== 'function') return null;
-    return chip.closest('#screen-endgame-hub') || chip.closest('#screen-endgame-gate');
+    // The crafting bench overlay is appended directly to document.body (see
+    // _egEnsureCraftingBenchOverlay), so it sits outside both screen roots.
+    // Treat it as a valid drag-origin container too, or items placed in the
+    // bench slot could never be picked back up.
+    return chip.closest('#screen-endgame-hub') || chip.closest('#screen-endgame-gate') || chip.closest('#eg-crafting-bench-overlay');
 }
 
 // Binds the four global listeners that power the custom DnD system.
@@ -1150,6 +1193,17 @@ function _dndBindListeners() {
 
 
 //------------------------------------------------------------------------
+//-------------------NATIVE DRAG HELPERS----------------------------------
+//------------------------------------------------------------------------
+// The custom DnD system (mouse-based) is the primary drag mechanism.
+// Native drag events (from draggable="true" on chips) are allowed to fire
+// but are neutralised here to avoid conflicts with the custom system.
+
+function egDragOver(event) {
+    event.preventDefault();
+}
+
+//------------------------------------------------------------------------
 //-------------------INITIALISATION---------------------------------------
 //------------------------------------------------------------------------
 
@@ -1164,5 +1218,3 @@ function initEndgameHubDnD() {
 function _egBindDragEvents() {
     initEndgameHubDnD();
 }
-
-
