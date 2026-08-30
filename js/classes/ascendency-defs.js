@@ -401,20 +401,20 @@ const ASCENDENCY_DEFS = {
             levels: [
                 {
                     level: 1,
-                    descEn: 'Browney walks through the grid every 5 seconds and reveals all correct cells along his path. Doing a mistake cuts Browney\'s walk short by 20 seconds. Cooldown: 10 minutes. ',
-                    descDE: 'Browney wandert durch das Puzzle alle 5 Sekunden und enthüllt alle richtigen Zellen entlang seines Pfades. Ein Fehler verkürzt Browneys Wanderung um 20 Sekunden. Abklingzeit: 10 Minuten.',
+                    descEn: 'Browney walks through the grid every 3.5 seconds and reveals all correct cells along his path. Doing a mistake cuts Browney\'s walk short by 15 seconds. Cooldown: 10 minutes. ',
+                    descDE: 'Browney wandert durch das Puzzle alle 3,5 Sekunden und enthüllt alle richtigen Zellen entlang seines Pfades. Ein Fehler verkürzt Browneys Wanderung um 15 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { paths: 1, rank: 1 }
                 },
                 {
                     level: 2,
-                    descEn: 'Browney walks through the grid every 4 seconds and reveals all correct cells along his path. Doing a mistake cuts Browney\'s walk short by 20 seconds. Cooldown: 10 minutes. ',
-                    descDE: 'Browney wandert durch das Puzzle alle 4 Sekunden und enthüllt alle richtigen Zellen entlang seines Pfades. Ein Fehler verkürzt Browneys Wanderung um 20 Sekunden. Abklingzeit: 10 Minuten.',
+                    descEn: 'Browney walks through the grid every 2.8 seconds and reveals all correct cells along his path. Doing a mistake cuts Browney\'s walk short by 10 seconds. Cooldown: 10 minutes. ',
+                    descDE: 'Browney wandert durch das Puzzle alle 2,8 Sekunden und enthüllt alle richtigen Zellen entlang seines Pfades. Ein Fehler verkürzt Browneys Wanderung um 10 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { paths: 1, rank: 2 }
                 },
                 {
                     level: 3,
-                    descEn: 'Browney and his brother Wiener walk through the grid every 3 seconds and reveal all correct cells along their paths. Doing a mistake cuts each of their walks short by 20 seconds. Cooldown: 10 minutes.',
-                    descDE: 'Browney und sein Bruder Wiener wandern alle 3 Sekunden durch das Puzzle und enthüllen alle richtigen Zellen entlang ihrer Pfade. Ein Fehler verkürzt die Wanderung von Browney und Wiener jeweils um 20 Sekunden. Abklingzeit: 10 Minuten.',
+                    descEn: 'Browney and his brother Wiener walk through the grid every 2.1 seconds and reveal all correct cells along their paths. Doing a mistake cuts each of their walks short by 5 seconds. Cooldown: 10 minutes.',
+                    descDE: 'Browney und sein Bruder Wiener wandern alle 2,1 Sekunden durch das Puzzle und enthüllen alle richtigen Zellen entlang ihrer Pfade. Ein Fehler verkürzt die Wanderung von Browney und Wiener jeweils um 5 Sekunden. Abklingzeit: 10 Minuten.',
                     effect: { paths: 2, rank: 3 }
                 },
             ]

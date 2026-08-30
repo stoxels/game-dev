@@ -12,10 +12,18 @@
 //------------------------------------------------------------------------
 
 // Bear step durations per skill rank (milliseconds per cell move)
+// 30 % faster than the original 5000 / 4000 / 3000 values
 const BEAR_STEP_MS_BY_RANK = {
-    1: 5000,
-    2: 4000,
-    3: 3000,
+    1: 3500,
+    2: 2800,
+    3: 2100,
+};
+
+// Seconds of remaining walk lost per mistake, by Brownian Motion rank
+const BEAR_TIME_LOSS_S_BY_RANK = {
+    1: 15,
+    2: 10,
+    3: 5,
 };
 
 // Path generation safety cap — prevents infinite loops on large grids
@@ -176,7 +184,8 @@ function _removeBearElement(bearEl) {
 // Registers the walk in window._activeBearAgents so mistakes can shorten it.
 // Draws the dashed path preview overlay and cleans up everything when the
 // path ends. pathColor tints the dashed line (yellow Browney / grey Wiener).
-function _startBearAnimation(path, icon, stepDurationMs, bearName, pathColor) {
+// rank is stored on the agent so the mistake penalty can apply rank-scaled loss.
+function _startBearAnimation(path, icon, stepDurationMs, bearName, pathColor, rank) {
     if (!path || path.length === 0) return;
 
     const bearEl = _createBearElement(icon, stepDurationMs);
@@ -186,6 +195,7 @@ function _startBearAnimation(path, icon, stepDurationMs, bearName, pathColor) {
         path,
         step: 0,          // index of the next cell to move onto
         stepDurationMs,
+        rank: rank ?? 1,
         interval: null,
         timerInterval: null,
         remainingSeconds: totalSec,
@@ -280,14 +290,14 @@ function _executeBrownianMotion(row, col, paths, rank) {
             'avatar-companion-brownian',
             path1[0].r, path1[0].c,
             () => {
-                _startBearAnimation(path1, "🐻", stepDurationMs, "Browney", "#f1c40f");
-                if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener", "#95a5a6");
+                _startBearAnimation(path1, "🐻", stepDurationMs, "Browney", "#f1c40f", rank);
+                if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener", "#95a5a6", rank);
             },
             null
         );
     } else {
-        _startBearAnimation(path1, "🐻", stepDurationMs, "Browney", "#f1c40f");
-        if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener", "#95a5a6");
+        _startBearAnimation(path1, "🐻", stepDurationMs, "Browney", "#f1c40f", rank);
+        if (path2) _startBearAnimation(path2, "🐼", stepDurationMs, "Wiener", "#95a5a6", rank);
     }
 
     return true;
@@ -976,18 +986,19 @@ window.addEventListener('resize', () => {
 
 // Public — called on every real (unabsorbed) player mistake. Instead of
 // fleeing outright, active walkers lose remaining time:
-//   Browney / Wiener lose 20 seconds of walk each,
+//   Browney / Wiener lose 15s (rank 1), 10s (rank 2) or 5s (rank 3) each,
 //   Drifter loses 5 seconds of roaming time.
 window.penalizeRandomWalkersOnMistake = function () {
-    const BEAR_TIME_LOSS_S = 20;
     const DRIFTER_TIME_LOSS_S = 5;
 
-    // Bears — chop steps worth ~20 s off the END of each active walk, so
+    // Bears — chop steps worth ~N s off the END of each active walk, so
     // the bear simply stops earlier instead of skipping cells mid-path.
     // The removed tail flashes red on the path preview, then fades out.
+    // Loss is rank-scaled: 15s / 10s / 5s for rank 1 / 2 / 3.
     (window._activeBearAgents || []).slice().forEach(state => {
+        const bearLoss = BEAR_TIME_LOSS_S_BY_RANK[state.rank] ?? BEAR_TIME_LOSS_S_BY_RANK[1];
         const remainingSteps = state.path.length - state.step - 1; // steps after the current one
-        const stepsToCut = Math.ceil((BEAR_TIME_LOSS_S * 1000) / state.stepDurationMs);
+        const stepsToCut = Math.ceil((bearLoss * 1000) / state.stepDurationMs);
 
         if (remainingSteps <= stepsToCut) {
             // Not enough walk left to survive the penalty — the entire
@@ -1003,7 +1014,7 @@ window.penalizeRandomWalkersOnMistake = function () {
         const lostTail = state.path.splice(state.path.length - stepsToCut, stepsToCut);
         _playPathCutAnimation(lostTail, state.pathColor);
 
-        state.remainingSeconds = Math.max(0, state.remainingSeconds - BEAR_TIME_LOSS_S);
+        state.remainingSeconds = Math.max(0, state.remainingSeconds - bearLoss);
         _updateBearTimerLabel(state);
         _redrawBearPathOverlays();
     });
