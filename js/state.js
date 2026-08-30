@@ -247,6 +247,18 @@ function buildFreshState() {
 
 // _migrateCoreFields — fills in top-level fields missing from an older save.
 function _migrateCoreFields(s) {
+    // Older saves may contain values written while an experimental modifier
+    // was present. Keep score data numeric and never let a corrupt value turn
+    // the HUD into NaN; high scores are repaired independently below.
+    if (!Number.isFinite(Number(s.totalScore))) s.totalScore = 0;
+    else s.totalScore = Number(s.totalScore);
+    if (!s.levelHS || typeof s.levelHS !== 'object' || Array.isArray(s.levelHS)) s.levelHS = {};
+    Object.keys(s.levelHS).forEach(gi => {
+        const hs = s.levelHS[gi];
+        if (!hs || !Number.isFinite(Number(hs.score))) delete s.levelHS[gi];
+        else hs.score = Number(hs.score);
+    });
+
     if (!s.bonusDone) s.bonusDone = [];
     if (s.tutorialDone === undefined) s.tutorialDone = false;
     if (!s.mathGatePassed) s.mathGatePassed = [];

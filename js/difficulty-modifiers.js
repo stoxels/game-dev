@@ -114,11 +114,12 @@ function syncDiffModButtons() {
 // (timetrial, hardcore, ironman, classless, treeless) to keep the
 // multiplication order identical to the old explicit if-chain.
 function scoreMultiplier() {
-    let mult = DIFF_CFG[curDiff].scoreMult;
+    const diffCfg = DIFF_CFG[curDiff] || DIFF_CFG.normal;
+    let mult = Number(diffCfg.scoreMult);
     Object.keys(curMods)
-        .filter(m => curMods[m])
+        .filter(m => curMods[m] && Number.isFinite(MOD_MULT[m]))
         .forEach(m => { mult *= MOD_MULT[m]; });
-    return mult;
+    return Number.isFinite(mult) ? mult : 1;
 }
 
 

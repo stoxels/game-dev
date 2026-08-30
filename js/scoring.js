@@ -50,16 +50,21 @@ function isPuzzleSolved() {
 // Base score grows with grid size; remaining time adds a bonus;
 // each mistake deducts points. Score is floored at 10.
 function computeRawScore(rows, cols) {
-    const baseScore = 100 + (rows + cols) * 2;
+    const safeRows = Number.isFinite(Number(rows)) ? Number(rows) : 0;
+    const safeCols = Number.isFinite(Number(cols)) ? Number(cols) : 0;
+    const baseScore = 100 + (safeRows + safeCols) * 2;
 
     // Time Trial halves the starting clock, which would otherwise also halve
     // the time bonus. Add back exactly what was cut so the bonus reflects
     // the same effective time budget as normal mode.
     const normalizedSecs = timerSecs + (curMods.timetrial ? (window._timetrialTimeCut || 0) : 0);
 
-    const cappedTime = Math.min(normalizedSecs, 3600);   // cap at 1 hour to prevent abuse
+    const safeTimerSecs = Number.isFinite(Number(timerSecs)) ? Number(timerSecs) : 0;
+    const safeNormalizedSecs = Number.isFinite(Number(normalizedSecs)) ? Number(normalizedSecs) : safeTimerSecs;
+    const cappedTime = Math.min(Math.max(0, safeNormalizedSecs), 3600);   // cap at 1 hour to prevent abuse
     const timeBonus = Math.floor(cappedTime / 10);
-    const mistakePenalty = mistakeCount * 20;
+    const safeMistakes = Number.isFinite(Number(mistakeCount)) ? Number(mistakeCount) : 0;
+    const mistakePenalty = safeMistakes * 20;
     return Math.max(10, baseScore + timeBonus - mistakePenalty);
 }
 
@@ -92,12 +97,15 @@ function maybeUpdateHighScore(gi, pts) {
 function calculateScore(rows, cols) {
     const gi = cur.gIdx;
     const rawScore = computeRawScore(rows, cols);
-    const mult = scoreMultiplier();
-    const pts = Math.round(rawScore * mult);
+    const calculatedMult = scoreMultiplier();
+    const mult = Number.isFinite(Number(calculatedMult)) ? Number(calculatedMult) : 1;
+    const calculatedPts = Math.round(rawScore * mult);
+    const pts = Number.isFinite(calculatedPts) ? Math.max(0, calculatedPts) : 0;
 
     const { ptsAwarded, prevBest } = computePointsAwarded(pts, gi);
 
-    STATE.totalScore += ptsAwarded;
+    const currentTotal = Number.isFinite(Number(STATE.totalScore)) ? Number(STATE.totalScore) : 0;
+    STATE.totalScore = currentTotal + ptsAwarded;
     maybeUpdateHighScore(gi, pts);
 
     return { pts, ptsAwarded, prevBest, mult };
@@ -404,10 +412,11 @@ function buildMistakeLine() {
 }
 
 function buildScoreColumn(pts, ptsAwarded, prevBest, mult) {
+    const safeMult = Number.isFinite(Number(mult)) ? Number(mult) : 1;
     const gainNote = buildGainNote(pts, ptsAwarded, prevBest);
     document.getElementById('ov-col-score').innerHTML = `
         <div class="ov-sub-line ov-sub-pts">${pts} ${t('ov_win_pts')}</div>
-        <div class="ov-sub-line ov-sub-pts">${t('ov_win_multiplier')} ×${mult.toFixed(2)}</div>
+        <div class="ov-sub-line ov-sub-pts">${t('ov_win_multiplier')} ×${safeMult.toFixed(2)}</div>
         <div class="ov-sub-line ov-sub-pts">${gainNote}</div>`;
 }
 

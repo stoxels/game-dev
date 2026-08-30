@@ -48,6 +48,10 @@ const DIFF_TIERS = ['easy', 'normal', 'hard'];
 // All modifier keys in the order they should appear
 const ALL_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
 
+// Super Tutor is a temporary utility and never contributes to score or
+// completion-star modifier counts.
+const SCORE_MODS = new Set(ALL_MODS);
+
 // Star character constants used in getStars()
 const STAR_FILLED = '⭐';
 const STAR_EMPTY = '☆';
@@ -75,7 +79,7 @@ function buildModTagSpan(modKey, labelMap, classMap) {
 // tag into the #ls-mods element in the top bar.
 function renderLSTopBar() {
     const modEl = document.getElementById('ls-mods');
-    const active = Object.keys(curMods).filter(m => curMods[m]);
+    const active = Object.keys(curMods).filter(m => SCORE_MODS.has(m) && curMods[m]);
 
     modEl.innerHTML =
         active.map(m => buildModTagSpan(m, MOD_LABELS, MOD_CLASSES)).join(' ') +
@@ -311,7 +315,7 @@ function getStars(gi) {
     const diffIndex = DIFF_TIERS.indexOf(hs.diff || 'easy');
     const starCount = Math.max(1, diffIndex + 1); // easy=1, normal=2, hard=3
 
-    const modCount = hs.mods ? Object.values(hs.mods).filter(Boolean).length : 0;
+    const modCount = hs.mods ? Object.keys(hs.mods).filter(m => SCORE_MODS.has(m) && hs.mods[m]).length : 0;
     const modStars = STAR_MOD.repeat(modCount);
 
     return STAR_FILLED.repeat(starCount) + STAR_EMPTY.repeat(3 - starCount) + (modStars ? ' ' + modStars : '');
@@ -358,7 +362,7 @@ function buildBonusHtml(p, gi, isUnlocked) {
 function buildModTagsHtml(hs) {
     if (!hs || !hs.mods) return '';
 
-    const activeMods = Object.keys(hs.mods).filter(m => hs.mods[m]);
+    const activeMods = Object.keys(hs.mods).filter(m => SCORE_MODS.has(m) && hs.mods[m]);
     if (!activeMods.length) return '';
 
     const modTagsHtml = activeMods.map(m =>
