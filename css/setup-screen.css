@@ -297,7 +297,7 @@
     right: -10% !important;
 }
 .mod-super-tutor {
-    border: 1px solid #f5c518;
+    border: none;
 }
 .mod-super-tutor.sel-yellow {
     color: #f5c518;
