@@ -275,18 +275,33 @@ function _updateModTags() {
 // caller (HUD refresh, mistake eraser, golden clock) stays in sync.
 // On endgame maps with a mistake limit the format is "x / y" (done / allowed);
 // regular campaign levels only ever show the raw count.
+// Hardcore: always shows "x / 0" so the player sees that no mistake is allowed.
 function _setMistakeCounterText(suffix = '') {
     const mc = document.getElementById('mistake-counter');
     if (!mc) return;
 
+    const isHardcore = typeof curMods !== 'undefined' && !!curMods.hardcore;
     let maxMistakes = null;
-    if (typeof _egIsActive === 'function' && typeof _egGetMaxAllowedMistakes === 'function' && _egIsActive()) {
+    if (isHardcore) {
+        // Hardcore overrides everything — 0 allowed, both in and out of endgame.
+        // _egGetMaxAllowedMistakes already returns 0 for active maps; for
+        // campaign (no egMaxMistakes) we synthesize 0 here so the HUD still
+        // reads "Mistakes: 0 / 0".
+        if (typeof _egIsActive === 'function' && _egIsActive() && typeof _egGetMaxAllowedMistakes === 'function') {
+            maxMistakes = _egGetMaxAllowedMistakes(); // 0
+        } else {
+            maxMistakes = 0;
+        }
+    } else if (typeof _egIsActive === 'function' && typeof _egGetMaxAllowedMistakes === 'function' && _egIsActive()) {
         maxMistakes = _egGetMaxAllowedMistakes();
     }
 
     mc.textContent = (maxMistakes != null)
         ? `${t('cg_mistakes_lbl')}: ${mistakeCount} / ${maxMistakes}${suffix}`
         : `${t('cg_mistakes_lbl')}: ${mistakeCount}${suffix}`;
+
+    // Hardcore visual cue — red tint when no mistake is allowed
+    mc.classList.toggle('hc-zero', !!isHardcore && maxMistakes === 0);
 
     // Endgame: maybe show the 3/2/1/0 mistakes-remaining center overlay
     if (typeof _egMaybeShowMistakesWarning === 'function') _egMaybeShowMistakesWarning();

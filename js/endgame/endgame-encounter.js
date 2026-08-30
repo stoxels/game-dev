@@ -645,6 +645,8 @@ function _egUpdatePlayerChargeBar() {
 
 
 function _egGetMaxAllowedMistakes() {
+    // Hardcore: no mistake is allowed — overrides map limit and gear bonuses
+    if (typeof curMods !== 'undefined' && curMods.hardcore) return 0;
     const def = _egMapDef || cur;
     if (!def || def.egMaxMistakes == null) return null;
     const gearBonus = (typeof _egComputePlayerStats === 'function')

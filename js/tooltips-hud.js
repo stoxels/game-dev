@@ -122,13 +122,28 @@ function _buildMistakesTooltipHTML() {
     const reduction = typeof _getAsymptoticMasteryReduction === 'function' ? _getAsymptoticMasteryReduction() : 0;
     const nextPenalty = Math.max(0, base - reduction);
 
+    const isHardcore = typeof curMods !== 'undefined' && !!curMods.hardcore;
     let html = `<strong style="color:#ff5555">${t('cg_tt_mistakes')}</strong>`;
-    html += `<br>${t('cg_tt_total_level')} <b>${mistakeCount}</b>`;
+    if (isHardcore) {
+        html += `<br><span style="color:#ff5555;font-weight:700;">${t('hc_fail_title') || 'HARDCORE'}</span> — <span style="color:#ff7777;">${t('eg_too_many_mistakes') || '0 mistakes allowed — next mistake ends the run!'}</span>`;
+        // When hardcore is active also show the 0-limit explicitly
+        html += `<br>${t('cg_tt_total_level')} <b>${mistakeCount} / 0</b>`;
+    } else {
+        html += `<br>${t('cg_tt_total_level')} <b>${mistakeCount}</b>`;
+    }
     if (typeof absorbedMistakes !== 'undefined' && absorbedMistakes > 0) {
         html += `<br>${t('cg_tt_absorbed')} <b>${absorbedMistakes}</b>`;
     }
     if (typeof _levelMistakesErased !== 'undefined' && _levelMistakesErased > 0) {
         html += `<br>${t('cg_tt_erased')} <b>${_levelMistakesErased}</b>`;
+    }
+    // Endgame: show remaining vs max when a limit exists (hardcore already shown above)
+    if (!isHardcore && typeof _egIsActive === 'function' && _egIsActive() && typeof _egGetMaxAllowedMistakes === 'function') {
+        const max = _egGetMaxAllowedMistakes();
+        if (max != null) {
+            const remaining = Math.max(0, max - (typeof mistakeCount !== 'undefined' ? mistakeCount : 0));
+            html += `<br><span style="opacity:.7;">${t('eg_stat_allowed_mistakes') || 'Allowed'}: <b>${max}</b> — ${remaining} ${t('eg_mistakes_warning_1') ? '' : 'remaining'}</span>`;
+        }
     }
     html += `<br>${t('cg_tt_next_cost')} <b>−${_fmtSecsAsMinSec(nextPenalty)}</b>`;
     if (reduction > 0) {

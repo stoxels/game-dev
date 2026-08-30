@@ -1319,8 +1319,10 @@ function _egAnimateItemDropClaim(row, col, drop) {
 
 // Attempts to place one regular-item drop on the grid after a monster dies.
 // isBoss — pass true for the higher boss drop chance.
+// Ironman: puzzle items never spawn — only currency/equipment/maps/hearts/mana/eraser/surge do.
 function _egSpawnItemDrop(isBoss = false) {
     if (!_egIsActive()) return;
+    if (typeof curMods !== 'undefined' && curMods.ironman) return;
 
     const baseItemChance = isBoss ? EG_ITEM_DROP_CHANCE_BOSS : EG_ITEM_DROP_CHANCE_NORMAL;
     const itemQtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
@@ -1411,8 +1413,10 @@ function _egStopItemDrops() {
 
 // Carries an unclaimed regular-item drop into the next chained puzzle
 // (mirrors _egReplaceCarriedCurrencyDrops).
+// Ironman: discard carried puzzle items instead of re-placing them.
 function _egReplaceCarriedItemDrops(drops) {
     if (!drops || drops.length === 0) return;
+    if (typeof curMods !== 'undefined' && curMods.ironman) return;
 
     drops.forEach(drop => {
         if (_egItemDrops.size >= EG_ITEM_DROP_MAX_ON_BOARD) return;
