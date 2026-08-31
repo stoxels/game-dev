@@ -84,15 +84,27 @@ const EG_LEVELING_CONFIG = {
     xpPerKillExp: 1.55,
     bossXpMultiplier: 3.5,
 
+    // Late-game PoE-style exponent: beyond xpLateStart the requirement is
+    // multiplied by 1 + xpLateScale * ((lvl - start)/(max-start))^xpLatePower.
+    // This keeps 1→85 identical to before but makes 90→100 brutally steep,
+    // mirroring Path of Exile's 90+ wall (90→91 ~2×, 95 ~7×, 99 ~17× of old).
+    // Tuned so T13 at 91 needs ~3 maps/level and T16 at 99 needs ~6-7 maps.
+    xpLateStart: 85,
+    xpLatePower: 3,
+    xpLateScale: 20,
+
     // PoE-style safe range: monsters up to
     //   (safeRangeBelowBase + floor(playerLevel / safeRangeBelowLevelsPer))
     // levels BELOW the character give full XP; monsters up to
     // safeRangeAbove levels above do too. Outside the band the multiplier
     // decays as ratio^penaltyExponent (never below minMultiplier).
-    safeRangeBelowBase: 3,
+    // Narrowed vs PoE's 3+floor(lvl/16) and steepened 6→8 so farming
+    // -15 level content at 91 is ~0.28× instead of 0.41×, pushing players
+    // into T16 for efficient late XP (T16 stays ~0.92× at 99, still optimal).
+    safeRangeBelowBase: 2,
     safeRangeBelowLevelsPer: 16,
     safeRangeAbove: 3,
-    penaltyExponent: 6,
+    penaltyExponent: 8,
     minMultiplier: 0.01,
 
     // XP-tier hint shown in the attribute window: monsters whose multiplier
@@ -151,6 +163,13 @@ function _egGetXpForNextLevel(level) {
         // earlyXpDiscountLevels, so the curve stays continuous.
         const fade = (level - 1) / c.earlyXpDiscountLevels;
         xp *= 1 - c.earlyXpDiscountFactor * (1 - fade);
+    }
+    // Late-game PoE wall: steeply inflate cost beyond xpLateStart.
+    // 1→xpLateStart unchanged; 86→100 ramps to ~ (1+scale)× at cap.
+    if (c.xpLateStart != null && c.xpLateScale != null && level > c.xpLateStart) {
+        const t = (level - c.xpLateStart) / (c.maxLevel - c.xpLateStart);
+        const p = (c.xpLatePower != null) ? c.xpLatePower : 3;
+        xp *= 1 + c.xpLateScale * Math.pow(t, p);
     }
     return Math.floor(xp);
 }

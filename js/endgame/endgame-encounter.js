@@ -99,18 +99,55 @@ function _egIsPuzzleSolved() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Returns the base level for a monster, applying a small ±2 random variance.
-// Variance keeps a wave from feeling perfectly uniform. Below
-// EG_EARLY_VARIANCE_FREE_LEVEL the variance only rolls downward, so the
-// lowest map tiers never throw monsters above their base level at fresh
-// characters that lack the gear to snowball yet.
+// Returns the base level for a monster, applying tier-gap-aware variance.
+// Variance keeps a wave from feeling uniform and bridges the large gaps
+// between map tiers (e.g. T13 71 → T14 78 is +7). The pool is -down .. +up
+// where `down` is fixed and `up` scales with the distance to the next tier
+// so monsters sometimes roll close to the next tier's base level.
+// Below EG_EARLY_VARIANCE_FREE_LEVEL variance only rolls downward so fresh
+// characters never face monsters above their map's base level.
 const EG_EARLY_VARIANCE_FREE_LEVEL = 8;
+const EG_MONSTER_VARIANCE_DOWN = 2;
+const EG_MONSTER_VARIANCE_UP_MIN = 2;
+const EG_MONSTER_VARIANCE_UP_MAX = 6;
 
 function _egRollMonsterLevel(baseLevel) {
-    const down = -Math.floor(Math.random() * 3);
-    const upMax = baseLevel >= EG_EARLY_VARIANCE_FREE_LEVEL ? 2 : 0;
-    const up = Math.floor(Math.random() * (upMax + 1));
-    return Math.max(1, baseLevel + up + down);
+    const base = Math.max(1, Math.round(Number(baseLevel) || 1));
+    // Early tiers: only downward variance (protect new players).
+    if (base < EG_EARLY_VARIANCE_FREE_LEVEL) {
+        const down = -Math.floor(Math.random() * 3); // -2..0
+        return Math.max(1, base + down);
+    }
+    // Determine gap to next tier's monster level (if curve is available).
+    let gap = 0;
+    if (typeof EG_MAP_TIER_MONSTER_LEVELS !== 'undefined') {
+        // Try to infer the map tier that owns `base`.
+        let tier = 0;
+        if (typeof _egRollMapTier === 'function') {
+            try { tier = _egRollMapTier(base) || 0; } catch (e) { tier = 0; }
+        }
+        if (tier >= 1 && tier < EG_MAP_TIER_MONSTER_LEVELS.length) {
+            const nextLvl = EG_MAP_TIER_MONSTER_LEVELS[tier]; // tier is 1-indexed, next = index tier
+            gap = Math.max(0, nextLvl - base);
+        } else if (tier >= EG_MAP_TIER_MONSTER_LEVELS.length) {
+            const cap = (typeof EG_ENDGAME_MONSTER_LEVEL_CAP !== 'undefined') ? EG_ENDGAME_MONSTER_LEVEL_CAP : 95;
+            gap = Math.max(0, cap - base);
+        } else {
+            // Fallback scan when _egRollMapTier unavailable or mismatched.
+            for (let i = 0; i < EG_MAP_TIER_MONSTER_LEVELS.length - 1; i++) {
+                if (EG_MAP_TIER_MONSTER_LEVELS[i] === base) { gap = EG_MAP_TIER_MONSTER_LEVELS[i + 1] - base; break; }
+                if (EG_MAP_TIER_MONSTER_LEVELS[i] < base && base < EG_MAP_TIER_MONSTER_LEVELS[i + 1]) { gap = EG_MAP_TIER_MONSTER_LEVELS[i + 1] - base; break; }
+            }
+        }
+    }
+    const upCap = Math.max(EG_MONSTER_VARIANCE_UP_MIN,
+        Math.min(EG_MONSTER_VARIANCE_UP_MAX, Math.round(gap * 0.85) || EG_MONSTER_VARIANCE_UP_MIN));
+    const down = EG_MONSTER_VARIANCE_DOWN;
+    // Uniform -down .. +upCap → average slightly above base, so maps feel
+    // a touch harder but regularly spike toward next tier (e.g. T13 71 → 69-77).
+    const variance = -down + Math.floor(Math.random() * (down + upCap + 1));
+    const cap = (typeof EG_ENDGAME_MONSTER_LEVEL_CAP !== 'undefined') ? EG_ENDGAME_MONSTER_LEVEL_CAP : 95;
+    return Math.max(1, Math.min(cap, base + variance));
 }
 
 // Returns the resolved base level for the current encounter (falls back to 1).
