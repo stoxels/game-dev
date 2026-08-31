@@ -211,7 +211,11 @@ function _egRollInt(min, max) {
 // A mod family is hybrid when its tiers use min1/max1 + min2/max2.
 
 function _egIsHybrid(tier) {
-    return tier.min1 !== undefined;
+    // Dual-value mods are detected by the presence of a second range (min2).
+    // Historical tables used `min`/`min2` (shield_bash, arcane_surge, channel)
+    // while newer hybrids use `min1`/`min2`; treat either as hybrid so '#' and
+    // '@' placeholders both get replaced.
+    return tier.min2 !== undefined || tier.min1 !== undefined;
 }
 
 
@@ -231,10 +235,13 @@ function _egBuildRolledStats(family, tier) {
 
     if (_egIsHybrid(tier)) {
         const lines = label.split('\n');
-        const val1 = _egRollInt(tier.min1, tier.max1);
+        const lo1 = tier.min1 != null ? tier.min1 : tier.min;
+        const hi1 = tier.max1 != null ? tier.max1 : tier.max;
+        const val1 = _egRollInt(lo1, hi1);
         const val2 = _egRollInt(tier.min2, tier.max2);
         // NOTE: '#' must resolve to val1 and '@' to val2 on EVERY line.
-        // Single-line hybrid labels ("Adds # to @ Fire Damage") carry both
+        // Single-line hybrid labels ("Adds # to @ Fire Damage" or
+        // "#% Chance to deal @ Physical Damage when Blocking") carry both
         // placeholders on one line; two-line hybrids carry one each.
         return [
             { key: family.id + '_1', label: (lines[0] || label).replace('#', val1).replace('@', val2), value: val1 },

@@ -320,3 +320,29 @@ const CLASS_SPELL_ICONS = {
         active2: '🌠',   // Rain of Arrows
     },
 };
+
+//------------------------------------------------------------------------
+//-------------------ENDGAME HEARTBLOOM ABILITY---------------------------
+//------------------------------------------------------------------------
+// Universal 5th ability: spawns 3 hearts onto the grid. Endgame-only,
+// instant cast, 5-minute cooldown, ~50 mana. Rendered in the HUD's
+// third row, first column (slot active5). Not tied to a class or
+// ascendency — available to every class but gated by isEndgameLevel().
+const ENDGAME_HEARTBLOOM_DEF = {
+    id: 'heartbloom',
+    icon: '💚',
+    nameEn: 'Heartbloom',
+    nameDE: 'Herzblüte',
+    descCursorEn: 'Spawns 3 hearts on the grid',
+    descCursorDE: 'Lässt 3 Herzen auf dem Spielfeld erscheinen',
+    cooldownSeconds: 300,
+    manaCost: 50,
+    levels: [
+        {
+            level: 1,
+            descEn: 'Spawn 3 hearts onto the grid. Only usable during endgame maps. Cooldown: 5 minutes.',
+            descDE: 'Lässt 3 Herzen auf dem Spielfeld erscheinen. Nur auf Endgame-Karten nutzbar. Abklingzeit: 5 Minuten.',
+            effect: { heartCount: 3 }
+        }
+    ]
+};

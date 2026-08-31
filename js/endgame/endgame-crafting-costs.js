@@ -6,12 +6,109 @@
 // shards are not valid crafting currencies.
 //------------------------------------------------------------------------
 
-const EG_CRAFT_TIER_COSTS = {
-    1: 10,
-    2: 7,
-    3: 5,
-    4: 3,
-    5: 2,
+//------------------------------------------------------------------------
+// PoE-style tier ladder:
+//   T5 (weakest) -> common orbs (transmutation / augmentation / alteration / scouring / bloom)
+//   T4           -> common-mid (alchemy / alteration / regal)
+//   T3           -> mid (chaos / regal / alchemy)
+//   T2           -> rare (divine / exalted / elevation / ascension / cataclysm)
+//   T1 (strongest) -> very rare (exalted / divine / ancient) plus a small chaos/regal supplement
+// Amounts deliberately shrink as rarity rises: spamming T5 is cheap, T1 costs genuinely rare orbs.
+// Returning an ARRAY per tier allows PoE-like mixed costs at the top end (e.g. 1x Exalted + 2x Chaos).
+//------------------------------------------------------------------------
+
+const EG_CRAFT_TIER_LADDER = {
+    orb_transmutation: {
+        5: [{ id: 'orb_transmutation', count: 4 }],
+        4: [{ id: 'orb_augmentation', count: 3 }],
+        3: [{ id: 'orb_alchemy', count: 2 }],
+        2: [{ id: 'orb_regal', count: 1 }, { id: 'orb_alchemy', count: 1 }],
+        1: [{ id: 'orb_exalted', count: 1 }, { id: 'orb_regal', count: 2 }],
+    },
+    orb_augmentation: {
+        5: [{ id: 'orb_augmentation', count: 4 }],
+        4: [{ id: 'orb_transmutation', count: 3 }],
+        3: [{ id: 'orb_alteration', count: 2 }],
+        2: [{ id: 'orb_chaos', count: 1 }, { id: 'orb_regal', count: 1 }],
+        1: [{ id: 'orb_exalted', count: 1 }, { id: 'orb_chaos', count: 2 }],
+    },
+    orb_alteration: {
+        5: [{ id: 'orb_alteration', count: 4 }],
+        4: [{ id: 'orb_augmentation', count: 3 }],
+        3: [{ id: 'orb_alchemy', count: 2 }],
+        2: [{ id: 'orb_chaos', count: 1 }, { id: 'orb_regal', count: 1 }],
+        1: [{ id: 'orb_divine', count: 1 }, { id: 'orb_chaos', count: 2 }],
+    },
+    orb_alchemy: {
+        5: [{ id: 'orb_alchemy', count: 3 }],
+        4: [{ id: 'orb_alchemy', count: 2 }],
+        3: [{ id: 'orb_chaos', count: 2 }],
+        2: [{ id: 'orb_divine', count: 1 }, { id: 'orb_chaos', count: 1 }],
+        1: [{ id: 'orb_exalted', count: 1 }, { id: 'orb_chaos', count: 2 }],
+    },
+    orb_regal: {
+        5: [{ id: 'orb_regal', count: 2 }],
+        4: [{ id: 'orb_alchemy', count: 2 }],
+        3: [{ id: 'orb_chaos', count: 1 }, { id: 'orb_alchemy', count: 1 }],
+        2: [{ id: 'orb_divine', count: 1 }],
+        1: [{ id: 'orb_exalted', count: 1 }, { id: 'orb_divine', count: 1 }],
+    },
+    orb_chaos: {
+        5: [{ id: 'orb_alchemy', count: 2 }],
+        4: [{ id: 'orb_chaos', count: 1 }],
+        3: [{ id: 'orb_chaos', count: 2 }],
+        2: [{ id: 'orb_divine', count: 1 }, { id: 'orb_chaos', count: 1 }],
+        1: [{ id: 'orb_divine', count: 2 }],
+    },
+    orb_divine: {
+        5: [{ id: 'orb_chaos', count: 2 }],
+        4: [{ id: 'orb_chaos', count: 1 }, { id: 'orb_regal', count: 1 }],
+        3: [{ id: 'orb_divine', count: 1 }],
+        2: [{ id: 'orb_divine', count: 1 }, { id: 'orb_chaos', count: 1 }],
+        1: [{ id: 'orb_exalted', count: 1 }, { id: 'orb_divine', count: 1 }],
+    },
+    orb_exalted: {
+        5: [{ id: 'orb_regal', count: 2 }],
+        4: [{ id: 'orb_chaos', count: 2 }],
+        3: [{ id: 'orb_exalted', count: 1 }],
+        2: [{ id: 'orb_exalted', count: 1 }, { id: 'orb_chaos', count: 1 }],
+        1: [{ id: 'orb_ancient', count: 1 }, { id: 'orb_exalted', count: 1 }],
+    },
+    orb_ascension: {
+        5: [{ id: 'orb_alchemy', count: 2 }],
+        4: [{ id: 'orb_ascension', count: 1 }],
+        3: [{ id: 'orb_ascension', count: 1 }, { id: 'orb_chaos', count: 1 }],
+        2: [{ id: 'orb_exalted', count: 1 }],
+        1: [{ id: 'orb_ancient', count: 1 }],
+    },
+    orb_elevation: {
+        5: [{ id: 'orb_regal', count: 2 }],
+        4: [{ id: 'orb_elevation', count: 1 }],
+        3: [{ id: 'orb_elevation', count: 1 }, { id: 'orb_chaos', count: 1 }],
+        2: [{ id: 'orb_exalted', count: 1 }, { id: 'orb_elevation', count: 1 }],
+        1: [{ id: 'orb_ancient', count: 1 }, { id: 'orb_divine', count: 1 }],
+    },
+    orb_bloom: {
+        5: [{ id: 'orb_bloom', count: 3 }],
+        4: [{ id: 'orb_bloom', count: 2 }],
+        3: [{ id: 'orb_chaos', count: 1 }, { id: 'orb_bloom', count: 1 }],
+        2: [{ id: 'orb_divine', count: 1 }],
+        1: [{ id: 'orb_exalted', count: 1 }, { id: 'orb_bloom', count: 1 }],
+    },
+    orb_scouring: {
+        5: [{ id: 'orb_scouring', count: 3 }],
+        4: [{ id: 'orb_scouring', count: 2 }],
+        3: [{ id: 'orb_chaos', count: 1 }],
+        2: [{ id: 'orb_annulment', count: 1 }],
+        1: [{ id: 'orb_annulment', count: 1 }, { id: 'orb_chaos', count: 2 }],
+    },
+    orb_ancient: {
+        5: [{ id: 'orb_regal', count: 2 }],
+        4: [{ id: 'orb_chaos', count: 2 }],
+        3: [{ id: 'orb_exalted', count: 1 }],
+        2: [{ id: 'orb_ancient', count: 1 }, { id: 'orb_chaos', count: 1 }],
+        1: [{ id: 'orb_ancient', count: 1 }, { id: 'orb_divine', count: 1 }],
+    },
 };
 
 const EG_CRAFT_FAMILY_CURRENCIES = {
@@ -70,7 +167,26 @@ const EG_CRAFT_FAMILY_CURRENCIES = {
 };
 
 function _egCraftingBenchCostFor(familyId, tier) {
-    const currencyId = EG_CRAFT_FAMILY_CURRENCIES[familyId] || 'orb_alchemy';
-    const count = EG_CRAFT_TIER_COSTS[tier] || EG_CRAFT_TIER_COSTS[5];
-    return [{ id: currencyId, count }];
+    const baseId = EG_CRAFT_FAMILY_CURRENCIES[familyId] || 'orb_alchemy';
+    const ladder = EG_CRAFT_TIER_LADDER[baseId] || EG_CRAFT_TIER_LADDER['orb_alchemy'];
+    const entry = ladder[tier] || ladder[5] || [{ id: baseId, count: 2 }];
+    // Return a shallow copy so callers can mutate without affecting the table.
+    return entry.map(cost => ({ id: cost.id, count: cost.count }));
 }
+
+// Backwards-compat: some tooling may still read tier counts. Derive a simple
+// count map from the ladder (max count per tier) so legacy code does not break.
+const EG_CRAFT_TIER_COSTS = (() => {
+    const out = {};
+    for (let tier = 1; tier <= 5; tier++) {
+        let max = 0;
+        for (const ladder of Object.values(EG_CRAFT_TIER_LADDER)) {
+            const entry = ladder[tier];
+            if (!entry) continue;
+            const sum = entry.reduce((s, c) => s + c.count, 0);
+            if (sum > max) max = sum;
+        }
+        out[tier] = max || 2;
+    }
+    return out;
+})();

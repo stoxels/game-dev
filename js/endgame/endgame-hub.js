@@ -323,20 +323,19 @@ function _egSaveMassSellSettings() {
     if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch (e) {}
 }
 // Returns true when the item should be KEPT (NOT sold) under the current filter.
+// Protection is an OR across all active keep criteria: unique, rarity,
+// itemLevel threshold and required-level threshold. This matches the live
+// preview in _egUpdateMassSellPreview so the confirmation counts and the
+// actual sell agree.
 function _egIsProtectedFromMassSell(item) {
     if (!item) return true;
     if (_egMassSellKeepUnique && item.isUnique) return true;
     const rarity = (item.rarity || 'common').toLowerCase();
-    // Unknown rarity → treat as common (i.e. sold unless keep toggled)
-    if (_egMassSellKeep && _egMassSellKeep.hasOwnProperty(rarity)) return !!_egMassSellKeep[rarity];
-    // Item level filter: keep items with itemLevel >= minItemLevel
-    if (_egMassSellMinItemLevel > 0 && item.itemLevel != null) {
-        if (item.itemLevel >= _egMassSellMinItemLevel) return true;
-    }
-    // Required character level filter: keep items with requirements.level >= minReqLevel
-    if (_egMassSellMinReqLevel > 0 && item.requirements && item.requirements.level != null) {
-        if (item.requirements.level >= _egMassSellMinReqLevel) return true;
-    }
+    if (_egMassSellKeep && _egMassSellKeep[rarity]) return true;
+    // Item level filter: keep items with itemLevel >= minItemLevel (0 = disabled)
+    if (_egMassSellMinItemLevel > 0 && item.itemLevel != null && item.itemLevel >= _egMassSellMinItemLevel) return true;
+    // Required character level filter: keep items with requirements.level >= minReqLevel (0 = disabled)
+    if (_egMassSellMinReqLevel > 0 && item.requirements && item.requirements.level != null && item.requirements.level >= _egMassSellMinReqLevel) return true;
     return false;
 }
 function _egMassSellCounts() {
@@ -622,15 +621,18 @@ function _egBuildStashPanelHTML() {
         <div id="eg-stash-info" class="eg-stash-info" aria-live="polite"></div>
         <div class="eg-stash-actions">
             <button class="eg-stash-btn eg-stash-btn-config" id="eg-toggle-ilvl-btn"
-                    onclick="_egToggleItemLevelDisplay()"
-                    onmouseenter="_egShowItemLevelToggleTooltip(event)"
-                    onmousemove="moveGameTooltip(event)"
-                    onmouseleave="hideGameTooltip()"
-                    title="${t(_egShowItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}">${_egShowItemLevel ? '🔢' : '👤'} ${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
+                     onclick="_egToggleItemLevelDisplay()"
+                     onmouseenter="_egShowItemLevelToggleTooltip(event)"
+                     onmousemove="moveGameTooltip(event)"
+                     onmouseleave="hideGameTooltip()">${_egShowItemLevel ? '🔢' : '👤'} ${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
             <button class="eg-stash-btn eg-stash-btn-config" onclick="_egOpenMassSellModal()"
-                    title="${t('eg_mass_sell_config_title')}">⚙ ${t('eg_mass_sell_config')}</button>
+                     onmouseenter="_egShowMassSellConfigTooltip(event)"
+                     onmousemove="moveGameTooltip(event)"
+                     onmouseleave="hideGameTooltip()">⚙ ${t('eg_mass_sell_config')}</button>
             <button class="eg-stash-btn eg-stash-btn-sell" onclick="_egRequestMassSell()"
-                    title="${t('eg_mass_sell_title')}">⚒ ${t('eg_mass_sell_btn')}</button>
+                     onmouseenter="_egShowMassSellTooltip(event)"
+                     onmousemove="moveGameTooltip(event)"
+                     onmouseleave="hideGameTooltip()">⚒ ${t('eg_mass_sell_btn')}</button>
         </div>
     </div>
     <div class="eg-inv-grid" id="eg-inv-grid" style="grid-template-columns: repeat(${EG_INV_COLS}, 1fr);">
@@ -768,6 +770,36 @@ function _egShowItemLevelToggleTooltip(e) {
     </div>
     <div class="eg-tt-section">
         <div class="eg-tt-desc">${t(_egShowItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}</div>
+    </div>
+</div>`;
+    showGameTooltip(html, e);
+}
+
+// Tooltip for the mass-sell FILTER button (custom game tooltip instead of native title).
+function _egShowMassSellConfigTooltip(e) {
+    const html = `
+<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon">⚙</div>
+        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_mass_sell_config')}</div>
+    </div>
+    <div class="eg-tt-section">
+        <div class="eg-tt-desc">${t('eg_mass_sell_config_title')}</div>
+    </div>
+</div>`;
+    showGameTooltip(html, e);
+}
+
+// Tooltip for the MASS SELL button (custom game tooltip instead of native title).
+function _egShowMassSellTooltip(e) {
+    const html = `
+<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon">⚒</div>
+        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_mass_sell_btn')}</div>
+    </div>
+    <div class="eg-tt-section">
+        <div class="eg-tt-desc">${t('eg_mass_sell_title')}</div>
     </div>
 </div>`;
     showGameTooltip(html, e);
@@ -1276,7 +1308,12 @@ function _egBuildTooltipBodyHTML(item) {
         }
     }
     if (item.blockChance) {
-        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_block_chance')}: <span class="eg-tt-val">${item.blockChance}%</span></div>`);
+        let blockEff = null;
+        try { blockEff = typeof _egGetItemEffectiveBlockChance === 'function' ? _egGetItemEffectiveBlockChance(item) : null; } catch (e) { blockEff = null; }
+        const bcVal = blockEff ? blockEff.value : item.blockChance;
+        const bcModded = blockEff ? blockEff.modded : false;
+        const valCls = bcModded ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
+        implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_block_chance')}: <span class="${valCls}">${bcVal}%</span></div>`);
     }
     const implicitHTML = implicitLines.length
         ? `<div class="eg-tt-section">${implicitLines.join('')}</div>`
@@ -1945,6 +1982,32 @@ function _egLoadHubState() {
             if (typeof _egEquipped === 'object' && _egEquipped) {
                 Object.values(_egEquipped).forEach(it => { if (it && !it.isUnique) _egHealItemImplicits(it); });
             }
+        }
+    } catch (e) { /* ignore */ }
+
+    // Heal legacy uniques that were saved before base armor/damage was added.
+    // Retroactively fills missing defenses/damage/blockChance from the
+    // updated EG_UNIQUE_ITEMS definitions (or fallback). Persists if changed.
+    try {
+        if (typeof _egHealUniqueItem === 'function') {
+            let uniqueChanged = false;
+            const healGrid = (grid) => {
+                if (!Array.isArray(grid)) return;
+                for (let r = 0; r < grid.length; r++) {
+                    if (!Array.isArray(grid[r])) continue;
+                    for (let c = 0; c < grid[r].length; c++) {
+                        const it = grid[r][c];
+                        if (it && it.isUnique && _egHealUniqueItem(it)) uniqueChanged = true;
+                    }
+                }
+            };
+            healGrid(_egInventory);
+            if (typeof _egEquipped === 'object' && _egEquipped) {
+                for (const it of Object.values(_egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) uniqueChanged = true;
+            }
+            if (_egMapSlotItem && _egMapSlotItem.isUnique && _egHealUniqueItem(_egMapSlotItem)) uniqueChanged = true;
+            if (typeof _egCraftingBenchItem !== 'undefined' && _egCraftingBenchItem && _egCraftingBenchItem.isUnique && _egHealUniqueItem(_egCraftingBenchItem)) uniqueChanged = true;
+            if (uniqueChanged && typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
         }
     } catch (e) { /* ignore */ }
 }

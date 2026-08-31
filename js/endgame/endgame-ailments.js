@@ -43,6 +43,10 @@ const EG_AIL_CONFUSION_DURATION_S = 6;
 const EG_AIL_CONFUSION_SELF_HIT_CHANCE = 0.08;
 const EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS = 1000;
 const EG_AIL_PLAYER_GROUND_DURATION_MS = 5000;
+const EG_AIL_PLAYER_FIRE_GROUND_DMG_PCT = 8;   // % of playerMaxHP per second while standing in burning ground (fire resistance mitigates)
+const EG_AIL_PLAYER_FIRE_GROUND_TICK_S = 1.0;
+const EG_AIL_PLAYER_FIRE_RADIUS_PX = 41;       // matches .eg-player-ground-fire 82px circle
+const EG_AIL_PLAYER_SHADOW_RADIUS_PX = 55;     // approximate radius for shadow cloud (150x85 ellipse)
 
 const EG_MONSTER_AILMENT_CHANCE_PCT = 15;     // monster hit → player ailment
 const EG_COLD_INNATE_CHILL_CHANCE_PCT = 10;   // cold hits chill even w/o mods
@@ -86,6 +90,9 @@ let _egSparkSpawnTimer = null;
 let _egSparkLastX = 0;
 let _egSparkLastY = 0;
 const EG_SPARK_GLYPHS = ['⚡', '✦', '✧', '＊'];
+
+// Accumulator for ground-fire damage tick (10 Hz → 1 s)
+let _egGroundFireAcc = 0;
 
 
 //------------------------------------------------------------------------
@@ -440,6 +447,22 @@ function _egTickAilments() {
         }
     });
     if (playerDot > 0) _egDealPlayerDotDamage(playerDot, playerIgnoresShield);
+
+    // --- Ground-fire damage: standing in burning ground burns the player ---
+    // Uses radius-aware overlap check so edge contact counts as burning.
+    _egGroundFireAcc += deltaS;
+    if (_egGroundFireAcc >= EG_AIL_PLAYER_FIRE_GROUND_TICK_S) {
+        _egGroundFireAcc -= EG_AIL_PLAYER_FIRE_GROUND_TICK_S;
+        if (_egIsPlayerInsideFire()) {
+            const maxHP = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+            const rawAmount = Math.max(EG_AIL_MIN_DOT_DAMAGE, Math.round(maxHP * EG_AIL_PLAYER_FIRE_GROUND_DMG_PCT / 100));
+            if (typeof _egPlayerTakeDamage === 'function') {
+                _egPlayerTakeDamage(rawAmount, true, 'fire');
+            } else {
+                _egDealPlayerDotDamage(rawAmount, false);
+            }
+        }
+    }
 
     // --- Monster statuses ---
     const deadIds = [];
@@ -860,11 +883,27 @@ function _egGetPlayerRectForAilment() {
     const el = document.getElementById('player-avatar-wrapper');
     return el ? el.getBoundingClientRect() : null;
 }
+function _egCircleOverlapsRect(cx, cy, radius, rect) {
+    const closestX = Math.max(rect.left, Math.min(cx, rect.right));
+    const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
+    const dx = cx - closestX;
+    const dy = cy - closestY;
+    return dx * dx + dy * dy <= radius * radius;
+}
+function _egIsPlayerInsideFire() {
+    const r = _egGetPlayerRectForAilment();
+    if (!r) return false;
+    return _egPuzzleEffects.some(e => e.type === 'playerfire' &&
+        _egCircleOverlapsRect(e.x, e.y, EG_AIL_PLAYER_FIRE_RADIUS_PX, r));
+}
 function _egIsPlayerInsideCloud() {
     const r = _egGetPlayerRectForAilment();
     if (!r) return false;
-    return _egPuzzleEffects.some(e => (e.type === 'playerfire' || e.type === 'playershadow') &&
-        e.x >= r.left && e.x <= r.right && e.y >= r.top && e.y <= r.bottom);
+    return _egPuzzleEffects.some(e => {
+        if (e.type === 'playerfire') return _egCircleOverlapsRect(e.x, e.y, EG_AIL_PLAYER_FIRE_RADIUS_PX, r);
+        if (e.type === 'playershadow') return _egCircleOverlapsRect(e.x, e.y, EG_AIL_PLAYER_SHADOW_RADIUS_PX, r);
+        return false;
+    });
 }
 function _egDropPlayerGround(type) {
     const r = _egGetPlayerRectForAilment();
@@ -952,6 +991,7 @@ function _egAilmentsReset() {
     _egPlayerStatuses = {};
     _egClearAllPuzzleEffects();
     _egIceRedirectDepth = 0;
+    _egGroundFireAcc = 0;
     _egStopShockedCursor();
     _egStopPlayerStatusBarTicker();
     if (typeof _egHideBlockLockoutOverlay === 'function') _egHideBlockLockoutOverlay();
@@ -963,6 +1003,7 @@ function _egAilmentsReset() {
 function _egAilmentsCleanup() {
     _egPlayerStatuses = {};
     _egClearAllPuzzleEffects();
+    _egGroundFireAcc = 0;
     _egStopShockedCursor();
     _egStopPlayerStatusBarTicker();
     if (typeof _egHideBlockLockoutOverlay === 'function') _egHideBlockLockoutOverlay();

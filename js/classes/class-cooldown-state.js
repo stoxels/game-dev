@@ -9,12 +9,14 @@ let activeAbilityMode = false;
 // Per-slot independent cooldown state.
 // active1 / active2 = base class skill slots
 // active3 / active4 = ascendency skill slots
+// active5 = endgame heartbloom (spawns 3 hearts)
 // Each slot tracks its own remaining seconds and its own tick interval handle.
 let cooldownState = {
     active1: { remaining: 0, interval: null },
     active2: { remaining: 0, interval: null },
     active3: { remaining: 0, interval: null },
     active4: { remaining: 0, interval: null },
+    active5: { remaining: 0, interval: null },
 };
 
 // Lookup: slot key → display number shown in UI and toasts
@@ -23,10 +25,11 @@ const SLOT_DISPLAY_INDEX = {
     active2: '2',
     active3: '3',
     active4: '4',
+    active5: '5',
 };
 
 // All slot keys in one place so loops don't need to repeat the list
-const ALL_SLOTS = ['active1', 'active2', 'active3', 'active4'];
+const ALL_SLOTS = ['active1', 'active2', 'active3', 'active4', 'active5'];
 
 
 // Maps each base class to its two ascendency options (IDs)
@@ -151,6 +154,9 @@ function _getAscendencyAbilityData(slot) {
 
 // Returns the ability definition for any slot, routing to the correct source.
 function _getAbilityData(slot) {
+    if (slot === 'active5') {
+        return (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
+    }
     if (slot === 'active3' || slot === 'active4') {
         return _getAscendencyAbilityData(slot);
     }
@@ -219,6 +225,7 @@ const ASCENDENCY_SKILL_COOLDOWN_FAMILY = {
 // slot's skill. Handles both the arcane slot and any other slot that might
 // carry the mod (future-proof — loop all equipped items).
 function _getEquipmentCooldownReduction(slot) {
+    if (slot === 'active5') return 0;
     if (typeof _egEquipped === 'undefined' || !_egEquipped) return 0;
 
     let familyId = null;
@@ -437,9 +444,9 @@ function _abilityHotkeysBlocked() {
     return false;
 }
 
-// Handles a numeric key press (1–4) by toggling the corresponding ability slot.
+// Handles a numeric key press (1–5) by toggling the corresponding ability slot.
 function _handleAbilityKeyPress(key, e) {
-    const slotMap = { '1': 'active1', '2': 'active2', '3': 'active3', '4': 'active4' };
+    const slotMap = { '1': 'active1', '2': 'active2', '3': 'active3', '4': 'active4', '5': 'active5' };
     const slot = slotMap[key];
     if (slot) {
         e.preventDefault();
@@ -447,13 +454,13 @@ function _handleAbilityKeyPress(key, e) {
     }
 }
 
-// Sets up keyboard shortcuts for ability activation (1–4) and Escape to disarm.
+// Sets up keyboard shortcuts for ability activation (1–5) and Escape to disarm.
 // Registered once at file load time.
 function _initClassAbilityHotkeys() {
     document.addEventListener('keydown', (e) => {
         if (_abilityHotkeysBlocked()) return;
 
-        if (['1', '2', '3', '4'].includes(e.key)) {
+        if (['1', '2', '3', '4', '5'].includes(e.key)) {
             _handleAbilityKeyPress(e.key, e);
             return;
         }

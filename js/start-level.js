@@ -222,7 +222,12 @@ function _applyExpectedValueBonus() {
 // Calculates and sets timerSecs from the base time plus all passive bonuses.
 // keystone_dead_reckoning (264) grants +10 minutes (600s), also blocked by gamblers_ruin.
 function _initTimer() {
-    if (window._egSuppressEncounterStop) return; // preserve timer across chain puzzles
+    if (window._egSuppressEncounterStop) {
+        // Chain puzzle — keep low-time banner state but sync the tracker to
+        // the preserved timer so the next drain is detected correctly.
+        if (typeof _lowTimeLastSecs !== 'undefined') _lowTimeLastSecs = timerSecs;
+        return;
+    }
 
     const cfg = DIFF_CFG[curDiff];
     const fullBaseTimer = cur.timer || cfg.timerStart;
@@ -244,6 +249,10 @@ function _initTimer() {
         timerSecs += 600;
         _levelTimeAdded += 600;
     }
+    // Fresh level — reset low-time center banners (keeps _lowTimeLastSecs
+    // as null so the first updTimer can immediately surface the relevant
+    // 300/120/30 banner if the level already starts below a threshold).
+    if (typeof _resetLowTimeWarningState === 'function') _resetLowTimeWarningState();
 }
 
 

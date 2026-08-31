@@ -429,7 +429,7 @@
     position: fixed;
     left: clamp(10px, 2vw, 20px);
     bottom: calc(var(--inv-panel-h) + 14px);
-    z-index: 900;
+    z-index: 15;
     display: flex;
     flex-direction: column;
     gap: 3px;

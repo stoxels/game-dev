@@ -67,6 +67,12 @@ function _getPlayerMaxMana() {
 // Returns the mana cost of the ability in the given HUD slot, or 0 when the
 // slot has no cost defined (e.g. legacy defs or missing data).
 function _getAbilityManaCost(hudSlot) {
+    if (hudSlot === 'active5') {
+        if (!STATE.playerClass || !_manaEnabled()) return 0;
+        const def = (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
+        return _scaleAbilityManaCost((def && def.manaCost) || 0);
+    }
+
     if (!STATE.playerClass || !_manaEnabled()) return 0;
 
     if (hudSlot === 'active1' || hudSlot === 'active2') {
@@ -117,7 +123,7 @@ function _abilityCanAfford(hudSlot) {
 // an ability/cost resolve to affordable, so this reflects the worst case.
 function _allSlotsAffordable() {
     if (typeof STATE === 'undefined' || !STATE.playerClass) return true;
-    return ['active1', 'active2', 'active3', 'active4'].every(
+    return ['active1', 'active2', 'active3', 'active4', 'active5'].every(
         (s) => (typeof _abilityCanAfford === 'function') ? _abilityCanAfford(s) : true
     );
 }

@@ -17,7 +17,7 @@
 }
 
 /* Scrollable container around the puzzle table.
-   overflow-y hidden prevents an accidental vertical scrollbar. */
+    overflow-y hidden prevents an accidental vertical scrollbar. */
 .puzzle-scaler-inner,
 #puzzle-scaler-wrap {
     overflow-x: visible;
@@ -225,6 +225,9 @@ table.ptable {
 /* ----- Column clue header (numbers above each column) ----- */
 
 .cch {
+    position: relative;
+    z-index: 950;
+    pointer-events: none;
     vertical-align: bottom;
     text-align: center;
     padding: 0 1px 3px;
@@ -232,6 +235,9 @@ table.ptable {
 
 /* Inner flex container stacks the numbers top-to-bottom */
 .ccinner {
+    position: relative;
+    z-index: 951;
+    pointer-events: none;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -242,6 +248,9 @@ table.ptable {
 /* ----- Row clue header (numbers left of each row) ----- */
 
 .rct {
+    position: relative;
+    z-index: 950;
+    pointer-events: none;
     text-align: right;
     vertical-align: middle;
     padding-right: 5px;
@@ -251,6 +260,9 @@ table.ptable {
 
 /* Inner flex container lays numbers out left-to-right */
 .rcinner {
+    position: relative;
+    z-index: 951;
+    pointer-events: none;
     display: flex;
     flex-direction: row;
     gap: 3px;
@@ -260,12 +272,18 @@ table.ptable {
 
 /* Top-left corner is also sticky so it covers the row-clue column while scrolling */
 td.corner {
+    position: relative;
+    z-index: 950;
+    pointer-events: none;
     background: transparent;
 }
 
 /* Shared font style for all clue number spans */
 .ccinner span,
 .rcinner span {
+    position: relative;
+    z-index: 951;
+    pointer-events: none;
     font-family: var(--F);
     color: var(--clue-col);
     line-height: 1.25;

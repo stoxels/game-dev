@@ -325,6 +325,9 @@ function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
 // _isInstantAbility — returns true if the given slot fires immediately on button press.
 //   Instant abilities skip the arm → click flow entirely.
 function _isInstantAbility(slot) {
+    // Heartbloom (active5) is always instant — endgame-only
+    if (slot === 'active5') return true;
+
     // Base class instants
     //if (STATE.playerClass === 'probabilist' && slot === 'active2') return true; // Field Scan
     if (STATE.playerClass === 'statistician' && slot === 'active1') return true; // Data Strike
@@ -361,6 +364,31 @@ function _isInstantAbility(slot) {
 // when the ability must not fire, e.g. Regression to Prior with an empty
 // mistake log. Prevents wasting the cooldown on a no-op.
 function _canFireInstantAbility(slot) {
+    if (slot === 'active5') {
+        if (typeof isEndgameLevel === 'function' && !isEndgameLevel()) {
+            showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
+            return false;
+        }
+        // Also ensure there is at least one eligible cell — otherwise toast and abort
+        // so the cooldown isn't wasted on a no-op.
+        const pool = (typeof _egBuildPickupEligiblePool === 'function') ? _egBuildPickupEligiblePool() : null;
+        if (pool && pool.length === 0) {
+            showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
+            return false;
+        }
+        // Fallback manual check when _egBuildPickupEligiblePool not yet available
+        if (!pool && typeof cur !== 'undefined' && cur && cur.grid) {
+            let freeCount = 0;
+            for (let r = 0; r < cur.grid.length; r++)
+                for (let c = 0; c < cur.grid[0].length; c++)
+                    if (typeof _egIsCellPickupEligible === 'function' ? _egIsCellPickupEligible(r, c) : (userGrid[r][c] === 0 && !revealedGrid[r][c] && !wrongGrid[r][c])) freeCount++;
+            if (freeCount === 0) {
+                showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
+                return false;
+            }
+        }
+        return true;
+    }
     if (STATE.playerAscendency === 'actuary' && slot === 'active3') {
         if (!(window._mistakeLog && window._mistakeLog.length > 0)) {
             showToast(t('cls_regression_none'));
@@ -410,10 +438,120 @@ function _fireInstantAscendencyAbility(slot) {
     startSlotCooldown(slot, cdSeconds);
 }
 
+//------------------------------------------------------------------------
+//------------------HEARTBLOOM (ACTIVE5) EXECUTION------------------------
+//------------------------------------------------------------------------
+
+// Picks a random heart pickup def weighted like normal hearts:
+// 60% small, 30% medium, 10% large. Falls back to small if defs missing.
+function _pickRandomHeartDef() {
+    if (typeof EG_PICKUP_DEFS === 'undefined') return null;
+    const roll = Math.random() * 100;
+    if (roll < 60) return EG_PICKUP_DEFS.heart_small;
+    if (roll < 90) return EG_PICKUP_DEFS.heart_medium;
+    return EG_PICKUP_DEFS.heart_large;
+}
+
+// Spawns `count` hearts onto eligible grid cells, bypassing the normal
+// EG_PICKUP_MAX_ON_BOARD cap so all 3 appear at once. Each heart gets
+// the standard lifetime/expiry handling.
+function _spawnHeartbloomHearts(count) {
+    let spawned = 0;
+    for (let i = 0; i < count; i++) {
+        let pool = [];
+        if (typeof _egBuildPickupEligiblePool === 'function') {
+            pool = _egBuildPickupEligiblePool().filter(([r, c]) => {
+                if (typeof _egCellHasAnyDrop === 'function') return !_egCellHasAnyDrop(r, c);
+                const key = `${r}-${c}`;
+                if (typeof _egPickups !== 'undefined' && _egPickups.has(key)) return false;
+                return true;
+            });
+        } else if (typeof cur !== 'undefined' && cur && cur.grid) {
+            const rows = cur.grid.length;
+            const cols = cur.grid[0].length;
+            for (let r = 0; r < rows; r++)
+                for (let c = 0; c < cols; c++) {
+                    const key = `${r}-${c}`;
+                    const hasPickup = (typeof _egPickups !== 'undefined' && _egPickups.has(key));
+                    const hasAnyDrop = (typeof _egCellHasAnyDrop === 'function') ? _egCellHasAnyDrop(r, c) : hasPickup;
+                    if (hasAnyDrop) continue;
+                    if (typeof _egIsCellPickupEligible === 'function') {
+                        if (!_egIsCellPickupEligible(r, c)) continue;
+                    } else {
+                        if (userGrid[r][c] !== 0 || revealedGrid[r][c] || wrongGrid[r][c]) continue;
+                        if (typeof luckyTiles !== 'undefined' && luckyTiles && luckyTiles.has(key)) continue;
+                    }
+                    pool.push([r, c]);
+                }
+        }
+
+        if (pool.length === 0) break;
+        const [r, c] = pool[Math.floor(Math.random() * pool.length)];
+        const def = _pickRandomHeartDef() || (typeof EG_PICKUP_DEFS !== 'undefined' ? EG_PICKUP_DEFS.heart_small : { id: 'heart_small', emoji: '💚', rarity: 'common' });
+        if (!def) break;
+        const key = `${r}-${c}`;
+        try {
+            if (typeof _egPickups !== 'undefined') {
+                _egPickups.set(key, def);
+                if (typeof _egRenderPickupOverlay === 'function') _egRenderPickupOverlay(r, c, def);
+                const lifetime = (typeof EG_PICKUP_LIFETIME_MS !== 'undefined') ? EG_PICKUP_LIFETIME_MS : 20000;
+                if (typeof _egScheduleTrackedExpiry === 'function') {
+                    _egScheduleTrackedExpiry(_egPickups, key, def, lifetime, `eg-pickup-${r}-${c}`, (typeof _egRemovePickupOverlay === 'function') ? _egRemovePickupOverlay : () => {
+                        const span = document.getElementById(`eg-pickup-${r}-${c}`); if (span) span.remove();
+                    });
+                } else if (typeof _egSchedulePickupExpiry === 'function') {
+                    _egSchedulePickupExpiry(key, def);
+                }
+            } else {
+                // Fallback when endgame pickup system not loaded (e.g. outside endgame map)
+                // just render a simple overlay if possible
+                const el = document.getElementById(`g-${r}-${c}`);
+                if (el) {
+                    const span = document.createElement('span');
+                    span.className = 'eg-pickup-overlay';
+                    span.id = `eg-pickup-${r}-${c}`;
+                    span.textContent = def.emoji || '💚';
+                    el.appendChild(span);
+                }
+            }
+            spawned++;
+        } catch (e) { /* ignore spawn errors */ }
+    }
+    return spawned;
+}
+
+// Fires the Heartbloom ability: pays cost, spawns 3 hearts, starts 5-min cooldown.
+function _fireInstantHeartbloomAbility() {
+    const def = (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
+    if (!def) return;
+
+    // Pay the cost (life under Blood Magic) — abort without firing if it can't be covered.
+    if (!payAbilityCost(_getAbilityManaCost('active5'))) return;
+
+    const count = (def.levels[0]?.effect?.heartCount) || 3;
+    const spawned = _spawnHeartbloomHearts(count);
+
+    if (spawned > 0) {
+        if (typeof showToast === 'function') showToast(`💚 Heartbloom: ${spawned} heart${spawned > 1 ? 's' : ''} spawned!`, '#ff6b9d');
+        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('heart_heals');
+        if (typeof trackAchStat === 'function') trackAchStat('skillHeartbloomUsed');
+        if (typeof updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
+        if (typeof triggerSkillBanter === 'function') triggerSkillBanter('heartbloom');
+    } else {
+        if (typeof showToast === 'function') showToast('💚 Heartbloom: no free cells!', '#ff6b9d');
+        // Refund cost if nothing spawned? Keep cost spent as penalty for bad timing.
+    }
+
+    const cdSeconds = getEffectiveCooldown('active5', def.cooldownSeconds);
+    startSlotCooldown('active5', cdSeconds);
+}
+
 
 // _fireInstantAbility — router that fires the correct instant handler based on slot.
 function _fireInstantAbility(slot) {
-    if (slot === 'active1' || slot === 'active2') {
+    if (slot === 'active5') {
+        _fireInstantHeartbloomAbility();
+    } else if (slot === 'active1' || slot === 'active2') {
         _fireInstantBaseAbility(slot);
     } else {
         _fireInstantAscendencyAbility(slot);
@@ -442,7 +580,7 @@ function _trackActivationHintProgress(slot) {
 
 
 // toggleActiveAbility — entry point when the player presses an ability button.
-//   slot: 'active1' | 'active2' | 'active3' | 'active4'
+//   slot: 'active1' | 'active2' | 'active3' | 'active4' | 'active5'
 //   Instant abilities fire immediately. All others arm the crosshair cursor
 //   so the next grid click calls executeActiveAbility().
 function toggleActiveAbility(slot) {
@@ -450,7 +588,13 @@ function toggleActiveAbility(slot) {
     const newSlot = slot || 'active1';
     const cd = cooldownState[newSlot];
 
-    if (dead || cd.remaining > 0) return;
+    if (dead || !cd || cd.remaining > 0) return;
+
+    // Heartbloom is endgame-only — block entirely outside endgame (HUD also shows locked)
+    if (newSlot === 'active5' && typeof isEndgameLevel === 'function' && !isEndgameLevel()) {
+        showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
+        return;
+    }
 
     // Clicking the already-armed slot cancels the arm
     const isAlreadyArmed = activeAbilityMode && STATE.classActiveChoice === newSlot;

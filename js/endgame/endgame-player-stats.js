@@ -175,7 +175,83 @@ const EG_MELEE_BUCKET_MAP = {
 // Returns [{ label: string, downside: bool, tierLabel: string }] for tooltip rendering.
 // tierLabel is PoE-style affix tier badge: "P4" for prefix tier 4, "S1" for suffix tier 1,
 // and "P2+S3" when multiple mods were merged into one combined line (including hybrids).
+function _egTryHealLegacyDualMod(mod) {
+    // Legacy items rolled before the min/min2 -> min1/min2 fix stored a single
+    // rolledStat whose label still contains the '@' placeholder and no second
+    // stat was created, so the damage value was never shown and never counted
+    // toward player stats. Heal in place so the tooltip and aggregation are correct.
+    if (!mod || !Array.isArray(mod.rolledStats) || mod.rolledStats.length !== 1) return;
+    const lab = mod.rolledStats[0] && mod.rolledStats[0].label;
+    if (!lab || lab.indexOf('@') === -1) return;
+    // Find the family definition for this mod so we can roll the missing @ value
+    let family = null;
+    let tierDef = null;
+    const _egCollectModTables = () => {
+        const out = [];
+        if (typeof EG_MOD_TABLE_HEAD !== 'undefined') out.push(EG_MOD_TABLE_HEAD);
+        if (typeof EG_MOD_TABLE_EARRING !== 'undefined') out.push(EG_MOD_TABLE_EARRING);
+        if (typeof EG_MOD_TABLE_AMULET !== 'undefined') out.push(EG_MOD_TABLE_AMULET);
+        if (typeof EG_MOD_TABLE_SHOULDERS !== 'undefined') out.push(EG_MOD_TABLE_SHOULDERS);
+        if (typeof EG_MOD_TABLE_CLOAK !== 'undefined') out.push(EG_MOD_TABLE_CLOAK);
+        if (typeof EG_MOD_TABLE_CHEST !== 'undefined') out.push(EG_MOD_TABLE_CHEST);
+        if (typeof EG_MOD_TABLE_BRACERS !== 'undefined') out.push(EG_MOD_TABLE_BRACERS);
+        if (typeof EG_MOD_TABLE_GLOVES !== 'undefined') out.push(EG_MOD_TABLE_GLOVES);
+        if (typeof EG_MOD_TABLE_BELT !== 'undefined') out.push(EG_MOD_TABLE_BELT);
+        if (typeof EG_MOD_TABLE_PANTS !== 'undefined') out.push(EG_MOD_TABLE_PANTS);
+        if (typeof EG_MOD_TABLE_BOOTS !== 'undefined') out.push(EG_MOD_TABLE_BOOTS);
+        if (typeof EG_MOD_TABLE_RING !== 'undefined') out.push(EG_MOD_TABLE_RING);
+        if (typeof EG_MOD_TABLE_ARCANE !== 'undefined') out.push(EG_MOD_TABLE_ARCANE);
+        if (typeof EG_MOD_TABLE_TALISMAN !== 'undefined') out.push(EG_MOD_TABLE_TALISMAN);
+        if (typeof EG_MOD_TABLE_WEAPON1 !== 'undefined') out.push(EG_MOD_TABLE_WEAPON1);
+        if (typeof EG_MOD_TABLE_WEAPON2 !== 'undefined') out.push(EG_MOD_TABLE_WEAPON2);
+        if (typeof EG_MOD_TABLE_SHIELD !== 'undefined') out.push(EG_MOD_TABLE_SHIELD);
+        if (typeof EG_MOD_TABLE_RANGED !== 'undefined') out.push(EG_MOD_TABLE_RANGED);
+        return out;
+    };
+    for (const tbl of _egCollectModTables()) {
+        const sections = [tbl.prefixes, tbl.suffixes];
+        for (const sec of sections) {
+            if (!sec || !sec[mod.familyId]) continue;
+            family = sec[mod.familyId];
+            if (family && Array.isArray(family.tiers)) {
+                tierDef = family.tiers.find(t => t.tier === mod.tier);
+                if (tierDef) break;
+            }
+        }
+        if (tierDef) break;
+    }
+    // Fallback: if table lookup failed, try to use any attached family data or
+    // infer a range from the existing value — at least hide the placeholder.
+    if (!tierDef || tierDef.min2 == null) {
+        // No tier info — replace stray '@' with '?' to avoid showing raw placeholder
+        mod.rolledStats[0].label = lab.replace('@', '?');
+        return;
+    }
+    const val2 = (typeof _egRollInt === 'function') ? _egRollInt(tierDef.min2, tierDef.max2) : Math.floor((tierDef.min2 + tierDef.max2) / 2);
+    const val1 = mod.rolledStats[0].value;
+    // Rebuild labels from the family so multi-line families (channel) split correctly
+    if (family) {
+        const rawLabel = (typeof LANG !== 'undefined' && LANG === 'de' && family.labelDe) ? family.labelDe : family.label;
+        const lines = rawLabel.split('\n');
+        const l1 = (lines[0] || rawLabel).replace('#', String(val1)).replace('@', String(val2));
+        const l2 = (lines[1] || '').replace('#', String(val1)).replace('@', String(val2));
+        mod.rolledStats = [
+            { key: family.id + '_1', label: l1, value: val1 },
+            { key: family.id + '_2', label: l2, value: val2 },
+        ];
+    } else {
+        // Fallback — single-line replacement
+        mod.rolledStats[0].label = lab.replace('@', String(val2));
+        mod.rolledStats.push({ key: mod.familyId + '_2', label: '', value: val2 });
+    }
+}
+
 function _egBuildMergedModLines(mods) {
+    // Heal legacy dual-stat mods that were saved with a stray '@' placeholder
+    // (shield_bash / arcane_surge / channel rolled with min/min2 before fix).
+    if (Array.isArray(mods)) {
+        for (const m of mods) _egTryHealLegacyDualMod(m);
+    }
     const NUM_RE = /-?\d[\d.,]*/g;
     const groups = [];
     const byKey = new Map();
@@ -426,6 +502,38 @@ function _egGetItemEffectiveAttackInterval(item) {
         // Round away float subtraction noise (e.g. 5.6 - 0.2 = 5.4000000000000004)
         interval: Math.round(Math.max(minInterval, base - reduction) * 100) / 100,
         modded: reduction > 0,
+    };
+}
+
+//------------------------------------------------------------------------
+//-------------------LOCAL ITEM BLOCK CHANCE------------------------------
+//------------------------------------------------------------------------
+// Shields carry a flat "Chance to Block" on the base type (item.blockChance).
+// Rolled "+#% Chance to Block Attacks" suffixes are LOCAL in the PoE sense
+// for shields: they directly increase the shield's own displayed block value
+// (underneath the Armour/Evasion lines) instead of appearing only as a
+// separate global stat. The tooltip highlights the combined value when local
+// mods are present, matching the armour/evasion/damage local systems above.
+// Effective = base + sum of block_chance mods on that item.
+// Returns { value, base, added, modded } where modded signals the display
+// should use .eg-tt-val-modified.
+function _egGetItemEffectiveBlockChance(item) {
+    const base = Number(item.blockChance) || 0;
+    if (!base) return { value: 0, base: 0, added: 0, modded: false };
+    let added = 0;
+    function collectBlock(mod) {
+        (Array.isArray(mod.rolledStats) ? mod.rolledStats : []).forEach(stat => {
+            if (stat.key !== 'block_chance' || stat.value == null) return;
+            added += Number(stat.value) || 0;
+        });
+    }
+    (Array.isArray(item.mods) ? item.mods : []).forEach(collectBlock);
+    (Array.isArray(item.implicits) ? item.implicits : []).forEach(collectBlock);
+    return {
+        base,
+        added,
+        value: base + added,
+        modded: added !== 0,
     };
 }
 

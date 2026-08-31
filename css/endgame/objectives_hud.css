@@ -385,3 +385,61 @@
     25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
     75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
 }
+
+/* ── LOW TIME WARNING banner ─────────────────────
+    Brief overlay centered over the puzzle grid when
+    the timer crosses 5 min (300s), 2 min (120s) and
+    30s remaining. Works in both endgame and normal
+    levels — same placement/animation as the other
+    center-grid warning banners. */
+#eg-low-time-warning-banner {
+    position: fixed;
+    z-index: 400;
+    pointer-events: none;
+    font-size: clamp(1.6rem, 5vw, 3.4rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+    animation: eg-low-time-warning-pop 2.5s ease-out forwards;
+    text-align: center;
+    line-height: 1.1;
+}
+
+#eg-low-time-warning-banner.eg-lt-300 {
+    color: #facc15;
+    text-shadow:
+        0 0 14px rgba(250, 204, 21, 0.75),
+        0 0 36px rgba(250, 204, 21, 0.35),
+        0 3px 8px rgba(0, 0, 0, 0.85);
+}
+#eg-low-time-warning-banner.eg-lt-120 {
+    color: #fb923c;
+    text-shadow:
+        0 0 14px rgba(251, 146, 60, 0.8),
+        0 0 36px rgba(251, 146, 60, 0.4),
+        0 3px 8px rgba(0, 0, 0, 0.85);
+}
+#eg-low-time-warning-banner.eg-lt-30 {
+    color: #ef4444;
+    text-shadow:
+        0 0 18px rgba(239, 68, 68, 0.95),
+        0 0 44px rgba(239, 68, 68, 0.55),
+        0 3px 8px rgba(0, 0, 0, 0.9);
+    animation: eg-low-time-warning-pop 2.5s ease-out forwards, eg-lt-shake 0.35s ease-in-out 0.15s 2;
+}
+
+@keyframes eg-low-time-warning-pop {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    10%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+    16%  { transform: translate(-50%, -50%) scale(1); }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes eg-lt-shake {
+    0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
+    25%  { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
+    75%  { transform: translate(-50%, -50%) scale(1) translateX(5px); }
+}

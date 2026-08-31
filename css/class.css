@@ -476,7 +476,10 @@
     are kept here.
 */
 
-/* Outer panel — hidden until the player picks a class. */
+/* Outer panel — hidden until the player picks a class.
+   z-index 15 intentionally below the puzzle wrapper (z-index 50) so
+   row/col clue numbers (z-index 950 inside the puzzle's stacking context)
+   always paint above the HUD even though the puzzle uses transform:scale. */
 #class-hud-panel {
     display: none;
     flex-direction: column;
@@ -486,7 +489,7 @@
     position: fixed;
     left: 150px;
     top: 80px;
-    z-index: 200;
+    z-index: 15;
     background: transparent;
     border: none;
     font-size: 9px;

@@ -191,6 +191,11 @@ function hideHUDTooltip() {
 function handleHUDTip(e, key) {
     const def = CLASS_DEFS[STATE.playerClass];
     if (!def) return;
+    // Heartbloom (active5) uses its own tooltip builder
+    if (key === 'active5') {
+        showHUDTooltip(buildHeartbloomTooltip(), e);
+        return;
+    }
     // Ascendency slots use a different tooltip builder
     if (key === 'active3' || key === 'active4') {
         showHUDTooltip(buildAscendencySkillTooltip(key), e);
@@ -255,6 +260,22 @@ function buildAscendencySkillTooltip(hudSlot) {
         + `<br>${_buildTooltipCooldownLine(skill.cooldownSeconds || 0)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(hudSlot) : skill.manaCost)}`;
 }
 
+// Builds the tooltip HTML for the Heartbloom ability (active5 HUD slot).
+function buildHeartbloomTooltip() {
+    const def = (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
+    if (!def) return '';
+    const data = def.levels[0];
+    const manaLine = _buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost('active5') : def.manaCost);
+    const cdLine = _buildTooltipCooldownLine(def.cooldownSeconds || 0);
+    const endgameNote = (typeof isEndgameLevel === 'function' && !isEndgameLevel())
+        ? `<br><span style="color:#e74c3c;font-size:.85em">⚠ Only usable during endgame maps</span>`
+        : `<br><span style="opacity:.55;font-size:.85em">Endgame only</span>`;
+    return `<strong style="color:#ff6b9d">${getLocalName(def)}</strong>`
+        + `<br>${getLocalDesc(data)}`
+        + `<br>${cdLine}${manaLine}`
+        + endgameNote;
+}
+
 
 
 
@@ -266,7 +287,7 @@ function buildAscendencySkillTooltip(hudSlot) {
 // Determines the visual state properties (color, cursor, click handler, armed ring)
 // for a skill button based on whether it is on cooldown or currently armed.
 function _getSkillBtnState(hudSlot, accentColor) {
-    const cdRemaining = cooldownState[hudSlot].remaining;
+    const cdRemaining = (cooldownState[hudSlot] && cooldownState[hudSlot].remaining) || 0;
     const isOnCD = cdRemaining > 0;
     const isArmed = activeAbilityMode && STATE.classActiveChoice === hudSlot;
 
@@ -274,12 +295,17 @@ function _getSkillBtnState(hudSlot, accentColor) {
     const canAfford = (typeof _abilityCanAfford === 'function') ? _abilityCanAfford(hudSlot) : true;
     const noMana = !canAfford && !isOnCD;
 
-    const btnColor = isArmed ? '#e74c3c' : isOnCD ? '#555' : accentColor;
-    const cursor = (isOnCD || noMana) ? 'not-allowed' : 'pointer';
-    const clickAttr = (isOnCD || noMana) ? '' : `onclick="toggleActiveAbility('${hudSlot}')"`;
+    // Heartbloom (active5) is endgame-only — lock when not on an endgame map.
+    const isEndgameLocked = hudSlot === 'active5'
+        && typeof isEndgameLevel === 'function' && !isEndgameLevel();
+    const isLocked = isEndgameLocked && !isOnCD;
+
+    const btnColor = isArmed ? '#e74c3c' : (isOnCD || isLocked) ? '#555' : accentColor;
+    const cursor = (isOnCD || noMana || isLocked) ? 'not-allowed' : 'pointer';
+    const clickAttr = (isOnCD || noMana || isLocked) ? '' : `onclick="toggleActiveAbility('${hudSlot}')"`;
     const armedRing = isArmed ? `outline: 2px solid #e74c3c; outline-offset: 2px;` : '';
 
-    return { cdRemaining, isOnCD, isArmed, noMana, btnColor, cursor, clickAttr, armedRing };
+    return { cdRemaining, isOnCD, isArmed, noMana, isLocked, btnColor, cursor, clickAttr, armedRing };
 }
 
 // Builds the inner label element for a skill button:
@@ -295,11 +321,11 @@ function _buildSkillBtnLabel(isOnCD, isArmed, cdRemaining) {
 // Builds the full HTML string for a single skill button (used for both base
 // class and ascendency slots). Extra CSS classes can be passed in extraClasses.
 function _buildSkillBtnHTML(hudSlot, displayIdx, accentColor, extraClasses) {
-    const { cdRemaining, isOnCD, isArmed, noMana, btnColor, cursor, clickAttr, armedRing }
+    const { cdRemaining, isOnCD, isArmed, noMana, isLocked, btnColor, cursor, clickAttr, armedRing }
         = _getSkillBtnState(hudSlot, accentColor);
 
     const label = _buildSkillBtnLabel(isOnCD, isArmed, cdRemaining);
-    const stateClasses = `${isArmed ? 'armed' : ''} ${isOnCD ? 'on-cd' : ''} ${noMana ? 'no-mana' : ''}`.trim();
+    const stateClasses = `${isArmed ? 'armed' : ''} ${isOnCD ? 'on-cd' : ''} ${noMana ? 'no-mana' : ''} ${isLocked ? 'endgame-locked' : ''}`.trim();
     const allClasses = ['chud-skill-btn', extraClasses, stateClasses]
         .filter(Boolean).join(' ');
 
@@ -356,6 +382,12 @@ function renderCompactActiveBtn(def, key) {
 function renderCompactAscBtn(asc, hudSlot, ascSlot) {
     const idx = hudSlot === 'active3' ? '3' : '4';
     return _buildSkillBtnHTML(hudSlot, idx, '#f1c40f', 'chud-asc-btn');
+}
+
+// Renders the Heartbloom ability button (active5) — third row, first col.
+// Uses a distinct pink/green accent so it reads as a heart/heal ability.
+function renderHeartbloomBtn() {
+    return _buildSkillBtnHTML('active5', '5', '#ff6b9d', 'chud-heart-btn');
 }
 
 
@@ -503,22 +535,31 @@ function renderCompactHUD(def) {
         </div>`;
 
     // Button layout: single row (1×2) for base class, 2×2 grid once an
-    // ascendency is active so 1/2 and 3/4 sit in two rows.
+    // ascendency is active so 1/2 and 3/4 sit in two rows. The universal
+    // Heartbloom (active5) always occupies third row, first col (5th ability).
+    // Hidden placeholders reserve the second row when no ascendency is active
+    // so the heart stays visually in row 3 as requested.
     let buttonsHTML = '';
     if (STATE.playerAscendency && ASCENDENCY_DEFS[STATE.playerAscendency]) {
         const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
         buttonsHTML = `
-            <div class="chud-btn-grid chud-btn-grid--asc">
+            <div class="chud-btn-grid chud-btn-grid--asc chud-btn-grid--with-heart">
                 ${renderCompactActiveBtn(def, 'active1')}
                 ${renderCompactActiveBtn(def, 'active2')}
                 ${renderCompactAscBtn(asc, 'active3', 'active1')}
                 ${renderCompactAscBtn(asc, 'active4', 'active2')}
+                ${renderHeartbloomBtn()}
+                <span class="chud-btn-placeholder" style="visibility:hidden"></span>
             </div>`;
     } else {
         buttonsHTML = `
-            <div class="chud-btn-grid">
+            <div class="chud-btn-grid chud-btn-grid--with-heart">
                 ${renderCompactActiveBtn(def, 'active1')}
                 ${renderCompactActiveBtn(def, 'active2')}
+                <span class="chud-btn-placeholder" style="visibility:hidden; min-width:44px"></span>
+                <span class="chud-btn-placeholder" style="visibility:hidden; min-width:44px"></span>
+                ${renderHeartbloomBtn()}
+                <span class="chud-btn-placeholder" style="visibility:hidden"></span>
             </div>`;
     }
 
@@ -606,7 +647,12 @@ function buildClassHUD() {
 // Injects the compact HUD stylesheet into <head> once per page load.
 // Subsequent calls are no-ops (guarded by the style element ID).
 function injectCompactHUDStyles(def) {
-    if (document.getElementById('chud-compact-styles')) return;
+    const existing = document.getElementById('chud-compact-styles');
+    if (existing) {
+        // If the existing style is the old version (pre-heartbloom), replace it so the new grid/CSS takes effect
+        if (existing.textContent.includes('chud-heart-btn')) return;
+        existing.remove();
+    }
     const s = document.createElement('style');
     s.id = 'chud-compact-styles';
     s.textContent = `
@@ -614,7 +660,7 @@ function injectCompactHUDStyles(def) {
             position: fixed;
             top: 150px;
             left: 12px;
-            z-index: 600;
+            z-index: 15;
             display: flex;
             flex-direction: column;
             user-select: none;
@@ -783,6 +829,35 @@ function injectCompactHUDStyles(def) {
             gap: 4px;
         }
 
+        .chud-btn-grid--with-heart {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto auto auto;
+            gap: 4px;
+        }
+
+        .chud-btn-grid--asc.chud-btn-grid--with-heart {
+            grid-template-rows: auto auto auto;
+        }
+
+        .chud-heart-btn {
+            border-color: #ff6b9d !important;
+        }
+
+        .chud-heart-btn:hover:not(.on-cd):not(.endgame-locked) {
+            background: rgba(255,107,157,0.18) !important;
+        }
+
+        .chud-skill-btn.endgame-locked {
+            opacity: .45;
+            border-color: #555 !important;
+        }
+
+        .chud-btn-placeholder {
+            min-width: 44px;
+            min-height: 26px;
+        }
+
     .chud-hint-arrow {
         position: absolute;
         left: 50%;
@@ -796,7 +871,7 @@ function injectCompactHUDStyles(def) {
         line-height: 1;
         pointer-events: none;
         white-space: nowrap;
-        z-index: 601;
+        z-index: 16;
         text-shadow: 0 0 4px rgba(241,196,15,0.8);
     }
 

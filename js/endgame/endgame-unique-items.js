@@ -200,6 +200,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏹', slotType: 'ranged', archetype: 'agility',
         minLevel: 42,
         requirements: { level: 42, str: 0, agi: 160, int: 0 },
+        damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 30, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'pierce', value: 35, en: '#% chance for Projectiles to Pierce Monsters', de: '#% Chance, dass Projektile Monster durchbohren' },
@@ -348,6 +349,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💥', slotType: 'ranged', archetype: 'any',
         minLevel: 6,
         requirements: { level: 6, str: 0, agi: 23, int: 0 },
+        damage: { min: 12, max: 28 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'splash_damage', value: 25, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
             { key: 'multishot', value: 15, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' }
@@ -422,6 +424,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '📕', slotType: 'arcane', archetype: 'intellect',
         minLevel: 10,
         requirements: { level: 10, str: 0, agi: 0, int: 38 },
+        defenses: { armour: 0, evasion: 0, absorption: 40 },
         bonuses: [
             { key: 'spell_damage', value: 15, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'inc_spell_damage', value: 15, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
@@ -478,6 +481,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🎗️', slotType: 'belt', archetype: 'any',
         minLevel: 6,
         requirements: { level: 6, str: 0, agi: 0, int: 0 },
+        defenses: { armour: 10, evasion: 10, absorption: 0 },
         bonuses: [
             { key: 'flat_health', value: 25, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'mana_on_mistake', value: 5, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' }
@@ -579,6 +583,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🎀', slotType: 'bracers', archetype: 'agility',
         minLevel: 28,
         requirements: { level: 28, str: 0, agi: 106, int: 0 },
+        defenses: { armour: 0, evasion: 95, absorption: 0 },
         bonuses: [
             { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'chance_to_blind', value: 12, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
@@ -659,6 +664,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔭', slotType: 'ranged', archetype: 'agility',
         minLevel: 36,
         requirements: { level: 36, str: 0, agi: 137, int: 0 },
+        damage: { min: 96, max: 194 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'snipe', value: 30, en: '#% chance for Projectiles to Snipe (double damage)', de: '#% Chance auf Sniping (doppelter Schaden)' },
             { key: 'accuracy', value: 25, en: '+# Accuracy', de: '+# Präzision' },
@@ -702,6 +708,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔮', slotType: 'arcane', archetype: 'intellect',
         minLevel: 60,
         requirements: { level: 60, str: 0, agi: 0, int: 228 },
+        defenses: { armour: 0, evasion: 0, absorption: 315 },
         bonuses: [
             { key: 'spell_damage', value: 60, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'inc_spell_damage', value: 40, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
@@ -1144,6 +1151,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏹', slotType: 'ranged', archetype: 'agility',
         minLevel: 34,
         requirements: { level: 34, str: 0, agi: 129, int: 0 },
+        damage: { min: 96, max: 194 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 20, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'splash_damage', value: 20, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
@@ -1204,6 +1212,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💠', slotType: 'arcane', archetype: 'any',
         minLevel: 41,
         requirements: { level: 41, str: 0, agi: 0, int: 156 },
+        defenses: { armour: 0, evasion: 0, absorption: 315 },
         bonuses: [
             { key: 'fire_damage_1', value: 12, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'cold_damage_1', value: 12, en: 'Adds # Cold Damage to Attacks', de: 'Fügt Angriffen # Kälteschaden hinzu' },
@@ -1387,6 +1396,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏹', slotType: 'ranged', archetype: 'agility',
         minLevel: 57,
         requirements: { level: 57, str: 0, agi: 217, int: 0 },
+        damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'chain', value: 30, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
             { key: 'overkill', value: 20, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
@@ -1517,6 +1527,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '⚙️', slotType: 'arcane', archetype: 'intellect',
         minLevel: 69,
         requirements: { level: 69, str: 0, agi: 0, int: 262 },
+        defenses: { armour: 0, evasion: 0, absorption: 520 },
         bonuses: [
             { key: 'mana_to_damage', value: 25, en: '#% of Mana converted to Damage', de: '#% des Manas in Schaden umgewandelt' },
             { key: 'mana_regen', value: 4, en: '+# Mana regenerated per 5s', de: '+# Mana-Regeneration pro 5s' },
@@ -1620,6 +1631,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏋️', slotType: 'shoulders', archetype: 'strength',
         minLevel: 7,
         requirements: { level: 7, str: 27, agi: 0, int: 0 },
+        defenses: { armour: 20, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'strength', value: 8, en: '+# to Strength', de: '+# zu Stärke' },
             { key: 'flat_health', value: 20, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
@@ -1674,6 +1686,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🩹', slotType: 'gloves', archetype: 'any',
         minLevel: 11,
         requirements: { level: 11, str: 0, agi: 42, int: 0 },
+        defenses: { armour: 26, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'life_regen', value: 2, en: '+# Life Regeneration per second', de: '+# Lebensregeneration pro Sekunde' },
             { key: 'heart_heal', value: 8, en: '+# to Heart Heal Amount', de: '+# Herzheilung' }
@@ -1692,6 +1705,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '📚', slotType: 'arcane', archetype: 'intellect',
         minLevel: 12,
         requirements: { level: 12, str: 0, agi: 0, int: 46 },
+        defenses: { armour: 0, evasion: 0, absorption: 40 },
         bonuses: [
             { key: 'spell_damage', value: 10, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'chance_for_new_question', value: 12, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' }
@@ -1731,6 +1745,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🧦', slotType: 'boots', archetype: 'any',
         minLevel: 16,
         requirements: { level: 16, str: 0, agi: 61, int: 0 },
+        defenses: { armour: 70, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'grounded_1', value: 30, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
             { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -1750,6 +1765,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '⛑️', slotType: 'head', archetype: 'strength',
         minLevel: 18,
         requirements: { level: 18, str: 68, agi: 0, int: 0 },
+        defenses: { armour: 115, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'intelligence', value: 10, en: '+# to Intelligence', de: '+# zu Intelligenz' },
@@ -1769,6 +1785,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🤍', slotType: 'bracers', archetype: 'intellect',
         minLevel: 19,
         requirements: { level: 19, str: 0, agi: 0, int: 72 },
+        defenses: { armour: 0, evasion: 0, absorption: 10 },
         bonuses: [
             { key: 'mana_on_mistake', value: 5, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' },
             { key: 'mana_regen', value: 2, en: '+# Mana regenerated per 5s', de: '+# Mana-Regeneration pro 5s' },
@@ -1808,6 +1825,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🪶', slotType: 'boots', archetype: 'agility',
         minLevel: 24,
         requirements: { level: 24, str: 0, agi: 91, int: 0 },
+        defenses: { armour: 0, evasion: 76, absorption: 0 },
         bonuses: [
             { key: 'preemptive_dodge', value: 15, en: '#% chance to preemptively Dodge incoming Attacks', de: '#% Chance, Angriffen präventiv auszuweichen' },
             { key: 'dodge', value: 5, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
@@ -1827,6 +1845,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌩️', slotType: 'arcane', archetype: 'intellect',
         minLevel: 26,
         requirements: { level: 26, str: 0, agi: 0, int: 99 },
+        defenses: { armour: 0, evasion: 0, absorption: 95 },
         bonuses: [
             { key: 'chance_to_shock', value: 15, en: '#% chance to Shock Monsters on hit', de: '#% Chance, Monster bei Treffern zu schocken' },
             { key: 'lightning_damage_1', value: 10, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
@@ -1866,6 +1885,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🃏', slotType: 'arcane', archetype: 'any',
         minLevel: 37,
         requirements: { level: 37, str: 0, agi: 0, int: 141 },
+        defenses: { armour: 0, evasion: 0, absorption: 180 },
         bonuses: [
             { key: 'fate', value: 20, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'reveal_hint', value: 10, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
@@ -2002,6 +2022,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💣', slotType: 'gloves', archetype: 'any',
         minLevel: 39,
         requirements: { level: 39, str: 148, agi: 0, int: 0 },
+        defenses: { armour: 132, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'fire_damage_1', value: 10, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'fire_damage_2', value: 16, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
@@ -2021,6 +2042,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🎓', slotType: 'head', archetype: 'intellect',
         minLevel: 40,
         requirements: { level: 40, str: 0, agi: 0, int: 152 },
+        defenses: { armour: 0, evasion: 0, absorption: 310 },
         bonuses: [
             { key: 'intelligence', value: 14, en: '+# to Intelligence', de: '+# zu Intelligenz' },
             { key: 'mana_on_mistake', value: 8, en: '+# Mana gained on Mistake', de: '+# Mana bei einem Fehler' },
@@ -2181,6 +2203,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '⚡', slotType: 'gloves', archetype: 'any',
         minLevel: 50,
         requirements: { level: 50, str: 100, agi: 90, int: 0 },
+        defenses: { armour: 230, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'lightning_damage_1', value: 14, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
             { key: 'lightning_damage_2', value: 22, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
@@ -2243,6 +2266,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌪️', slotType: 'ranged', archetype: 'agility',
         minLevel: 54,
         requirements: { level: 54, str: 0, agi: 205, int: 0 },
+        damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 25, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'chain', value: 25, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
@@ -2308,6 +2332,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🗿', slotType: 'belt', archetype: 'strength',
         minLevel: 58,
         requirements: { level: 58, str: 220, agi: 0, int: 0 },
+        defenses: { armour: 265, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'flat_health', value: 100, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'grounded_1', value: 30, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' },
@@ -2372,6 +2397,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '✍️', slotType: 'bracers', archetype: 'any',
         minLevel: 61,
         requirements: { level: 61, str: 0, agi: 116, int: 116 },
+        defenses: { armour: 222, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'attack_speed', value: 2.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
             { key: 'channel_2', value: 2, en: '+# maximum Channel Stacks', de: '+# maximale Kanalisierungsstapel' },
@@ -2461,6 +2487,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💠', slotType: 'arcane', archetype: 'intellect',
         minLevel: 68,
         requirements: { level: 68, str: 0, agi: 0, int: 258 },
+        defenses: { armour: 0, evasion: 0, absorption: 520 },
         bonuses: [
             { key: 'spell_damage', value: 70, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'inc_spell_damage', value: 35, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
@@ -2573,6 +2600,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🥫', slotType: 'head', archetype: 'any',
         minLevel: 3,
         requirements: { level: 3, str: 12, agi: 0, int: 0 },
+        defenses: { armour: 15, evasion: 15, absorption: 0 },
         bonuses: [
             { key: 'flat_health', value: 15, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'intelligence', value: 6, en: '+# to Intelligence', de: '+# zu Intelligenz' }
@@ -2591,6 +2619,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔇', slotType: 'head', archetype: 'any',
         minLevel: 12,
         requirements: { level: 12, str: 0, agi: 46, int: 0 },
+        defenses: { armour: 56, evasion: 56, absorption: 0 },
         bonuses: [
             { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
             { key: 'flat_health', value: 20, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
@@ -2609,6 +2638,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💫', slotType: 'head', archetype: 'any',
         minLevel: 26,
         requirements: { level: 26, str: 0, agi: 0, int: 99 },
+        defenses: { armour: 210, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'mistake_not_count', value: 12, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht gezählt werden' },
             { key: 'flat_health', value: 33, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -2628,6 +2658,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🥽', slotType: 'head', archetype: 'agility',
         minLevel: 44,
         requirements: { level: 44, str: 0, agi: 167, int: 0 },
+        defenses: { armour: 0, evasion: 395, absorption: 0 },
         bonuses: [
             { key: 'accuracy', value: 30, en: '+# Accuracy', de: '+# Präzision' },
             { key: 'crit_chance', value: 5, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
@@ -2647,6 +2678,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '😇', slotType: 'head', archetype: 'intellect',
         minLevel: 59,
         requirements: { level: 59, str: 0, agi: 0, int: 224 },
+        defenses: { armour: 0, evasion: 0, absorption: 465 },
         bonuses: [
             { key: 'warding', value: 120, en: '+# Warding', de: '+# Wardschutz' },
             { key: 'arcane_resistance', value: 20, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
@@ -2883,6 +2915,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '👣', slotType: 'belt', archetype: 'any',
         minLevel: 21,
         requirements: { level: 21, str: 0, agi: 80, int: 0 },
+        defenses: { armour: 52, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'first_step', value: 2.5, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
             { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -2902,6 +2935,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '😡', slotType: 'belt', archetype: 'strength',
         minLevel: 40,
         requirements: { level: 40, str: 152, agi: 0, int: 0 },
+        defenses: { armour: 178, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'stagger', value: 25, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
@@ -2944,6 +2978,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🧤', slotType: 'gloves', archetype: 'any',
         minLevel: 5,
         requirements: { level: 5, str: 19, agi: 0, int: 0 },
+        defenses: { armour: 14, evasion: 14, absorption: 0 },
         bonuses: [
             { key: 'fire_resist', value: 15, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' },
             { key: 'flat_health', value: 18, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
@@ -2962,6 +2997,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌿', slotType: 'gloves', archetype: 'any',
         minLevel: 15,
         requirements: { level: 15, str: 57, agi: 0, int: 0 },
+        defenses: { armour: 26, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'life_on_kill', value: 6, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' },
             { key: 'heart_heal', value: 8, en: '+# to Heart Heal Amount', de: '+# Herzheilung' },
@@ -2981,6 +3017,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🥊', slotType: 'gloves', archetype: 'agility',
         minLevel: 27,
         requirements: { level: 27, str: 0, agi: 103, int: 0 },
+        defenses: { armour: 0, evasion: 144, absorption: 0 },
         bonuses: [
             { key: 'attack_speed', value: 1.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
             { key: 'life_leech', value: 2, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
@@ -3000,6 +3037,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '⚙️', slotType: 'gloves', archetype: 'any',
         minLevel: 43,
         requirements: { level: 43, str: 80, agi: 80, int: 0 },
+        defenses: { armour: 230, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'crit_chance', value: 7, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'attack_speed', value: 1.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
@@ -3019,6 +3057,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌠', slotType: 'gloves', archetype: 'intellect',
         minLevel: 62,
         requirements: { level: 62, str: 118, agi: 118, int: 0 },
+        defenses: { armour: 0, evasion: 0, absorption: 305 },
         bonuses: [
             { key: 'fire_damage_1', value: 20, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'fire_damage_2', value: 30, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
@@ -3144,6 +3183,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🥾', slotType: 'boots', archetype: 'any',
         minLevel: 7,
         requirements: { level: 7, str: 0, agi: 27, int: 0 },
+        defenses: { armour: 28, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'flat_health', value: 20, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
@@ -3162,6 +3202,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🦶', slotType: 'boots', archetype: 'intellect',
         minLevel: 18,
         requirements: { level: 18, str: 0, agi: 0, int: 68 },
+        defenses: { armour: 0, evasion: 0, absorption: 56 },
         bonuses: [
             { key: 'mana_regen', value: 3, en: '+# Mana regenerated per 5s', de: '+# Mana-Regeneration pro 5s' },
             { key: 'dodge', value: 6, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
@@ -3181,6 +3222,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '❄️', slotType: 'boots', archetype: 'any',
         minLevel: 28,
         requirements: { level: 28, str: 106, agi: 0, int: 0 },
+        defenses: { armour: 138, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'chance_to_freeze', value: 10, en: '#% chance to Freeze Monsters on hit', de: '#% Chance, Monster bei Treffern einzufrieren' },
             { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -3200,6 +3242,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '⛓️', slotType: 'boots', archetype: 'agility',
         minLevel: 41,
         requirements: { level: 41, str: 0, agi: 156, int: 0 },
+        defenses: { armour: 0, evasion: 260, absorption: 0 },
         bonuses: [
             { key: 'attack_speed', value: 2, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
             { key: 'flat_health', value: 41, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -3219,6 +3262,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '☁️', slotType: 'boots', archetype: 'agility',
         minLevel: 60,
         requirements: { level: 60, str: 0, agi: 228, int: 0 },
+        defenses: { armour: 0, evasion: 355, absorption: 0 },
         bonuses: [
             { key: 'preemptive_dodge', value: 25, en: '#% chance to preemptively Dodge incoming Attacks', de: '#% Chance, Angriffen präventiv auszuweichen' },
             { key: 'spell_dodge', value: 10, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
@@ -3344,6 +3388,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🎯', slotType: 'ranged', archetype: 'any',
         minLevel: 10,
         requirements: { level: 10, str: 0, agi: 38, int: 0 },
+        damage: { min: 12, max: 28 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 12, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
@@ -3362,6 +3407,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💥', slotType: 'ranged', archetype: 'agility',
         minLevel: 25,
         requirements: { level: 25, str: 0, agi: 95, int: 0 },
+        damage: { min: 52, max: 106 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'splash_damage', value: 30, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
             { key: 'accuracy', value: 28, en: '+# Accuracy', de: '+# Präzision' },
@@ -3381,6 +3427,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔱', slotType: 'ranged', archetype: 'strength',
         minLevel: 45,
         requirements: { level: 45, str: 171, agi: 0, int: 0 },
+        damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'chain', value: 30, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
             { key: 'pushback', value: 0.5, en: '+#s Charge Pushback on hit', de: '+#s Angriffslade-Rückstoß bei Treffern' },
@@ -3400,6 +3447,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌟', slotType: 'ranged', archetype: 'any',
         minLevel: 69,
         requirements: { level: 69, str: 131, agi: 131, int: 0 },
+        damage: { min: 256, max: 512 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'snipe', value: 35, en: '#% chance for Projectiles to Snipe (double damage)', de: '#% Chance auf Sniping (doppelter Schaden)' },
             { key: 'overkill', value: 25, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
@@ -3525,6 +3573,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '📜', slotType: 'shoulders', archetype: 'any',
         minLevel: 11,
         requirements: { level: 11, str: 42, agi: 0, int: 0 },
+        defenses: { armour: 20, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'flat_health', value: 25, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'strength', value: 6, en: '+# to Strength', de: '+# zu Stärke' }
@@ -3709,6 +3758,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🪙', slotType: 'bracers', archetype: 'any',
         minLevel: 12,
         requirements: { level: 12, str: 0, agi: 0, int: 46 },
+        defenses: { armour: 12, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'fate', value: 12, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'strength', value: 6, en: '+# to Strength', de: '+# zu Stärke' }
@@ -3727,6 +3777,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🎭', slotType: 'bracers', archetype: 'any',
         minLevel: 25,
         requirements: { level: 25, str: 0, agi: 0, int: 95 },
+        defenses: { armour: 85, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'chance_for_new_question', value: 15, en: '#% chance to receive a new Question after failing', de: '#% Chance auf eine neue Frage nach einer falschen Antwort' },
             { key: 'flat_health', value: 32, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -3746,6 +3797,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏹', slotType: 'bracers', archetype: 'agility',
         minLevel: 34,
         requirements: { level: 34, str: 0, agi: 129, int: 0 },
+        defenses: { armour: 0, evasion: 95, absorption: 0 },
         bonuses: [
             { key: 'multishot', value: 15, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -3765,6 +3817,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🩸', slotType: 'bracers', archetype: 'strength',
         minLevel: 50,
         requirements: { level: 50, str: 190, agi: 0, int: 0 },
+        defenses: { armour: 185, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'life_leech', value: 4, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
             { key: 'inc_physical_damage', value: 25, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
@@ -3785,6 +3838,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔃', slotType: 'bracers', archetype: 'intellect',
         minLevel: 65,
         requirements: { level: 65, str: 0, agi: 0, int: 247 },
+        defenses: { armour: 0, evasion: 0, absorption: 167 },
         bonuses: [
             { key: 'spell_block_chance', value: 12, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' },
             { key: 'arcane_resistance', value: 30, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
@@ -3807,6 +3861,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💎', slotType: 'arcane', archetype: 'intellect',
         minLevel: 7,
         requirements: { level: 7, str: 0, agi: 0, int: 27 },
+        defenses: { armour: 0, evasion: 0, absorption: 15 },
         bonuses: [
             { key: 'spell_damage', value: 8, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' }
@@ -3825,6 +3880,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏮', slotType: 'arcane', archetype: 'intellect',
         minLevel: 20,
         requirements: { level: 20, str: 0, agi: 0, int: 76 },
+        defenses: { armour: 0, evasion: 0, absorption: 95 },
         bonuses: [
             { key: 'reveal_hint', value: 12, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
             { key: 'flat_mana', value: 22, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
@@ -3844,6 +3900,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌩️', slotType: 'arcane', archetype: 'intellect',
         minLevel: 36,
         requirements: { level: 36, str: 0, agi: 0, int: 137 },
+        defenses: { armour: 0, evasion: 0, absorption: 180 },
         bonuses: [
             { key: 'lightning_damage_1', value: 14, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
             { key: 'lightning_damage_2', value: 20, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
@@ -3864,6 +3921,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '♾️', slotType: 'arcane', archetype: 'intellect',
         minLevel: 60,
         requirements: { level: 60, str: 0, agi: 0, int: 228 },
+        defenses: { armour: 0, evasion: 0, absorption: 315 },
         bonuses: [
             { key: 'inc_spell_damage', value: 35, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
             { key: 'echo_1', value: 12, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
@@ -4027,6 +4085,7 @@ const EG_UNIQUE_ITEMS = [
         minLevel: 42,
         requirements: { level: 42, str: 80, agi: 0, int: 80 },
         defenses: { armour: 240, evasion: 0, absorption: 230 },
+        blockChance: 32,
         bonuses: [
             { key: 'block_recovery', value: 40, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
             { key: 'flat_health', value: 42, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -4820,6 +4879,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌀', slotType: 'bracers', archetype: 'agility',
         minLevel: 39,
         requirements: { level: 39, str: 0, agi: 148, int: 0 },
+        defenses: { armour: 0, evasion: 95, absorption: 0 },
         bonuses: [
             { key: 'attack_speed', value: 22, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
             { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -4838,6 +4898,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🐕', slotType: 'bracers', archetype: 'any',
         minLevel: 33,
         requirements: { level: 33, str: 55, agi: 70, int: 0 },
+        defenses: { armour: 85, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 6, en: '+#% chance to Dodge Spells', de: '+#% Zaucherausweichchance' },
@@ -4856,6 +4917,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💰', slotType: 'bracers', archetype: 'intellect',
         minLevel: 56,
         requirements: { level: 56, str: 0, agi: 0, int: 212 },
+        defenses: { armour: 0, evasion: 0, absorption: 167 },
         bonuses: [
             { key: 'mana_regen', value: 4, en: '+# Mana every 5 Seconds', de: '+# Mana alle 5 Sekunden' },
             { key: 'mana_on_kill', value: 8, en: '+# Mana gained on Kill', de: '+# Mana bei Kill' },
@@ -4876,6 +4938,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '✖️', slotType: 'bracers', archetype: 'strength',
         minLevel: 29,
         requirements: { level: 29, str: 110, agi: 0, int: 0 },
+        defenses: { armour: 85, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'inc_physical_damage', value: 35, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'stagger', value: 25, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
@@ -4894,6 +4957,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🪃', slotType: 'bracers', archetype: 'intellect',
         minLevel: 61,
         requirements: { level: 61, str: 0, agi: 0, int: 232 },
+        defenses: { armour: 0, evasion: 0, absorption: 167 },
         bonuses: [
             { key: 'echo_1', value: 15, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
             { key: 'echo_2', value: 30, en: '#% increased Echo Damage', de: '#% erhöhter Echoschaden' },
@@ -4914,6 +4978,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔗', slotType: 'bracers', archetype: 'any',
         minLevel: 68,
         requirements: { level: 68, str: 110, agi: 110, int: 40 },
+        defenses: { armour: 222, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'fate', value: 15, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'life_on_kill', value: 5, en: '+# Life gained on Kill', de: '+# Leben bei Kill' },
@@ -4936,6 +5001,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '➗', slotType: 'gloves', archetype: 'strength',
         minLevel: 46,
         requirements: { level: 46, str: 175, agi: 0, int: 0 },
+        defenses: { armour: 230, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'flat_physical_damage_1', value: 25, en: '+# Minimum Physical Damage', de: '+# Minimaler physischer Schaden' },
             { key: 'flat_physical_damage_2', value: 45, en: '+# Maximum Physical Damage', de: '+# Maximaler physischer Schaden' },
@@ -4955,6 +5021,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🧤', slotType: 'gloves', archetype: 'any',
         minLevel: 19,
         requirements: { level: 19, str: 40, agi: 35, int: 0 },
+        defenses: { armour: 62, evasion: 62, absorption: 0 },
         bonuses: [
             { key: 'chance_to_blind', value: 12, en: '#% chance to Blind on hit', de: '#% Chance, bei Treffern zu blenden' },
             { key: 'dodge', value: 5, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
@@ -4973,6 +5040,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '⏳', slotType: 'gloves', archetype: 'any',
         minLevel: 53,
         requirements: { level: 53, str: 85, agi: 85, int: 30 },
+        defenses: { armour: 300, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'time_added', value: 25, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'pushback', value: 0.4, en: '+#s Pushback on hit', de: '+#s Rückstoß bei Treffern' },
@@ -4992,6 +5060,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '❄️', slotType: 'gloves', archetype: 'intellect',
         minLevel: 35,
         requirements: { level: 35, str: 0, agi: 0, int: 133 },
+        defenses: { armour: 0, evasion: 0, absorption: 106 },
         bonuses: [
             { key: 'chance_to_freeze', value: 15, en: '#% chance to Freeze', de: '#% Chance auf Einfrieren' },
             { key: 'cold_damage_1', value: 12, en: '+# Minimum Cold Damage', de: '+# Minimaler Kälteschaden' },
@@ -5010,6 +5079,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🍀', slotType: 'gloves', archetype: 'any',
         minLevel: 64,
         requirements: { level: 64, str: 105, agi: 105, int: 30 },
+        defenses: { armour: 380, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'fate', value: 35, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
             { key: 'flat_health', value: 69, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -5030,6 +5100,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🎼', slotType: 'gloves', archetype: 'intellect',
         minLevel: 58,
         requirements: { level: 58, str: 0, agi: 0, int: 220 },
+        defenses: { armour: 0, evasion: 0, absorption: 245 },
         bonuses: [
             { key: 'chain', value: 25, en: '#% chance for Projectiles to Chain', de: '#% Chance, dass Projektile ketten' },
             { key: 'lightning_damage_1', value: 15, en: '+# Minimum Lightning Damage', de: '+# Minimaler Blitzschaden' },
@@ -5052,6 +5123,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '⏱️', slotType: 'belt', archetype: 'any',
         minLevel: 50,
         requirements: { level: 50, str: 80, agi: 80, int: 30 },
+        defenses: { armour: 178, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'time_added', value: 35, en: '+#s to Puzzle Time', de: '+#s Rätselzeit' },
             { key: 'focus', value: 15, en: '#% reduced Time Penalty from Mistakes', de: '#% reduzierte Zeitstrafe durch Fehler' },
@@ -5071,6 +5143,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🕳️', slotType: 'belt', archetype: 'any',
         minLevel: 28,
         requirements: { level: 28, str: 55, agi: 50, int: 0 },
+        defenses: { armour: 102, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'mana_on_kill', value: 10, en: '+# Mana gained on Kill', de: '+# Mana bei Kill' },
             { key: 'flat_mana', value: 40, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
@@ -5089,6 +5162,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🕺', slotType: 'belt', archetype: 'any',
         minLevel: 44,
         requirements: { level: 44, str: 70, agi: 95, int: 0 },
+        defenses: { armour: 178, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'preemptive_dodge', value: 15, en: '#% Preemptive Dodge', de: '#% Präventives Ausweichen' },
             { key: 'block_recovery', value: 25, en: '#% faster Block Recovery', de: '#% schnellere Blockerholung' },
@@ -5107,6 +5181,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🪨', slotType: 'belt', archetype: 'strength',
         minLevel: 32,
         requirements: { level: 32, str: 122, agi: 0, int: 0 },
+        defenses: { armour: 102, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'strength', value: 18, en: '+# to Strength', de: '+# zu Stärke' },
             { key: 'flat_health', value: 60, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
@@ -5125,6 +5200,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💣', slotType: 'belt', archetype: 'any',
         minLevel: 62,
         requirements: { level: 62, str: 95, agi: 95, int: 45 },
+        defenses: { armour: 295, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'chance_to_ignite', value: 25, en: '#% chance to Ignite', de: '#% Chance auf Entzünden' },
             { key: 'splash_damage', value: 30, en: '#% added Splash Damage', de: '#% zusätzlicher Flächenschaden' },
@@ -5145,6 +5221,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🪢', slotType: 'belt', archetype: 'strength',
         minLevel: 67,
         requirements: { level: 67, str: 255, agi: 0, int: 0 },
+        defenses: { armour: 333, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'channel_1', value: 20, en: '+# Channel Damage per Stack', de: '+# Kanalisationsschaden pro Stapel' },
             { key: 'channel_2', value: 6, en: '+# maximum Channel Stacks', de: '+# maximale Kanalisationsstapel' },
@@ -5501,6 +5578,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔮', slotType: 'arcane', archetype: 'intellect',
         minLevel: 40,
         requirements: { level: 40, str: 0, agi: 0, int: 152 },
+        defenses: { armour: 0, evasion: 0, absorption: 315 },
         bonuses: [
             { key: 'reveal_hint', value: 30, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
             { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
@@ -5519,6 +5597,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '📈', slotType: 'arcane', archetype: 'intellect',
         minLevel: 55,
         requirements: { level: 55, str: 0, agi: 0, int: 209 },
+        defenses: { armour: 0, evasion: 0, absorption: 315 },
         bonuses: [
             { key: 'inc_spell_damage', value: 40, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
             { key: 'mana_regen', value: 4, en: '+# Mana every 5 Seconds', de: '+# Mana alle 5 Sekunden' },
@@ -5539,6 +5618,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔮', slotType: 'arcane', archetype: 'intellect',
         minLevel: 24,
         requirements: { level: 24, str: 0, agi: 0, int: 92 },
+        defenses: { armour: 0, evasion: 0, absorption: 95 },
         bonuses: [
             { key: 'spell_damage', value: 20, en: '+# Spell Damage', de: '+# Zauberschaden' },
             { key: 'flat_mana', value: 30, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
@@ -5557,6 +5637,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🪄', slotType: 'arcane', archetype: 'intellect',
         minLevel: 63,
         requirements: { level: 63, str: 0, agi: 0, int: 239 },
+        defenses: { armour: 0, evasion: 0, absorption: 520 },
         bonuses: [
             { key: 'echo_1', value: 20, en: '#% chance for Reveals to Echo', de: '#% Chance, dass Aufdeckungen echoen' },
             { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
@@ -5577,6 +5658,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '📊', slotType: 'arcane', archetype: 'intellect',
         minLevel: 68,
         requirements: { level: 68, str: 0, agi: 0, int: 258 },
+        defenses: { armour: 0, evasion: 0, absorption: 520 },
         bonuses: [
             { key: 'chance_for_new_question', value: 45, en: '#% chance to get a new Question', de: '#% Chance auf eine neue Frage' },
             { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' },
@@ -5597,6 +5679,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔬', slotType: 'arcane', archetype: 'intellect',
         minLevel: 59,
         requirements: { level: 59, str: 0, agi: 0, int: 224 },
+        defenses: { armour: 0, evasion: 0, absorption: 315 },
         bonuses: [
             { key: 'crit_chance', value: 20, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 35, en: '+#% Critical Strike Multiplier', de: '+#% Kritischer Schadensmultiplikator' },
@@ -6098,6 +6181,171 @@ function _egUniqueStatLabel(stat) {
     return str.replace('#', signed);
 }
 
+// Fallback: derive base defenses / damage from the closest base item
+// so uniques without explicit stats still have meaningful base armor / damage
+// and are not useless. This also fixes old uniques that were defined without
+// a defenses/damage field.
+function _egUniqueFallbackDefenses(def) {
+    const jewelry = new Set(['ring', 'earring', 'amulet', 'talisman']);
+    if (jewelry.has(def.slotType)) return { armour: 0, evasion: 0, absorption: 0 };
+    if (typeof EG_ALL_BASE_TYPES === 'undefined' || !Array.isArray(EG_ALL_BASE_TYPES)) return null;
+    let candidates = EG_ALL_BASE_TYPES.filter(b => b.slotType === def.slotType);
+    if (!candidates.length) return null;
+    let sameArch = candidates.filter(b => b.archetype === def.archetype);
+    let pool = sameArch.length ? sameArch : candidates;
+    let eligible = pool.filter(b => (b.minLevel || 1) <= (def.minLevel || 1));
+    if (!eligible.length) eligible = pool;
+    let best = eligible.reduce((a, b) => (b.minLevel > a.minLevel ? b : a), eligible[0]);
+    if (best && best.defenses) return { armour: best.defenses.armour || 0, evasion: best.defenses.evasion || 0, absorption: best.defenses.absorption || 0 };
+    return null;
+}
+function _egUniqueFallbackDamage(def) {
+    if (typeof EG_ALL_BASE_TYPES === 'undefined' || !Array.isArray(EG_ALL_BASE_TYPES)) return null;
+    let candidates = EG_ALL_BASE_TYPES.filter(b => b.slotType === def.slotType && b.damage);
+    if (!candidates.length) return null;
+    let sameArch = candidates.filter(b => b.archetype === def.archetype);
+    let pool = sameArch.length ? sameArch : candidates;
+    let eligible = pool.filter(b => (b.minLevel || 1) <= (def.minLevel || 1));
+    if (!eligible.length) eligible = pool;
+    let best = eligible.reduce((a, b) => (b.minLevel > a.minLevel ? b : a), eligible[0]);
+    if (!best || !best.damage) return null;
+    const out = { damage: { min: best.damage.min, max: best.damage.max } };
+    if (best.attackIntervalSeconds != null) out.attackIntervalSeconds = best.attackIntervalSeconds;
+    else if (def.slotType === 'ranged') out.attackIntervalSeconds = 3.0; // sensible default for ranged
+    return out;
+}
+function _egUniqueFallbackBlockChance(def) {
+    if (def.slotType !== 'shield') return null;
+    if (typeof EG_ALL_BASE_TYPES === 'undefined' || !Array.isArray(EG_ALL_BASE_TYPES)) return null;
+    let candidates = EG_ALL_BASE_TYPES.filter(b => b.slotType === 'shield' && b.blockChance != null);
+    if (!candidates.length) return 24;
+    let sameArch = candidates.filter(b => b.archetype === def.archetype);
+    let pool = sameArch.length ? sameArch : candidates;
+    let eligible = pool.filter(b => (b.minLevel || 1) <= (def.minLevel || 1));
+    if (!eligible.length) eligible = pool;
+    let best = eligible.reduce((a, b) => (b.minLevel > a.minLevel ? b : a), eligible[0]);
+    return best.blockChance != null ? best.blockChance : 24;
+}
+
+// Helper: strenghten downside values to balance new implicits (~30% stronger).
+// Keeps ±1 untouched (e.g. -1 mistake_count) to avoid double-harsh penalties.
+function _egStrengthenDownsideValue(v) {
+    if (v === 0 || Math.abs(v) === 1) return v;
+    const factor = 1.30;
+    if (Number.isInteger(v)) {
+        const scaled = v * factor;
+        let r = Math.round(scaled);
+        if (r === v) r = v > 0 ? v + 1 : v - 1;
+        return r;
+    }
+    const scaled = v * factor;
+    return Math.round(scaled * 10) / 10;
+}
+function _egBuildUniqueImplicits(def, defenses) {
+    try {
+        if (typeof _egRollImplicitsForBase !== 'function') return [];
+        const syntheticBase = {
+            slotType: def.slotType,
+            defenses: defenses || def.defenses || { armour: 0, evasion: 0, absorption: 0 },
+            requirements: def.requirements || { level: def.minLevel || 1 },
+            minLevel: def.minLevel || 1
+        };
+        const res = _egRollImplicitsForBase(syntheticBase);
+        return Array.isArray(res) ? res : [];
+    } catch (e) { return []; }
+}
+// Retroactively heals an already-stashed unique that was saved before
+// base armor/damage was added or before implicits/downside rebalance.
+// Mutates `item` in place, returns true if anything was changed.
+function _egHealUniqueItem(item) {
+    if (!item || !item.isUnique || !item.baseId) return false;
+    let changed = false;
+    let def = null;
+    if (typeof EG_UNIQUE_ITEMS !== 'undefined' && Array.isArray(EG_UNIQUE_ITEMS)) {
+        def = EG_UNIQUE_ITEMS.find(u => u.uniqueId === item.baseId) || null;
+    }
+    // --- defenses ---
+    let expDef = null;
+    if (def && def.defenses) expDef = def.defenses;
+    else if (typeof _egUniqueFallbackDefenses === 'function') {
+        try { expDef = _egUniqueFallbackDefenses({ slotType: item.slotType, archetype: item.archetype, minLevel: item.itemLevel || (item.requirements && item.requirements.level) || 1 }); } catch (e) { expDef = null; }
+    }
+    if (expDef) {
+        const cur = item.defenses;
+        const missing = !cur || typeof cur.armour !== 'number' || typeof cur.evasion !== 'number' || typeof cur.absorption !== 'number';
+        const zeroButExpNonZero = cur && cur.armour === 0 && cur.evasion === 0 && cur.absorption === 0 && (expDef.armour || expDef.evasion || expDef.absorption);
+        if (missing || zeroButExpNonZero) {
+            item.defenses = { armour: expDef.armour || 0, evasion: expDef.evasion || 0, absorption: expDef.absorption || 0 };
+            changed = true;
+        }
+    }
+    // --- damage ---
+    let expDmg = null, expInterval = undefined;
+    if (def && def.damage) { expDmg = def.damage; expInterval = def.attackIntervalSeconds; }
+    else if (typeof _egUniqueFallbackDamage === 'function') {
+        try {
+            const fb = _egUniqueFallbackDamage({ slotType: item.slotType, archetype: item.archetype, minLevel: item.itemLevel || (item.requirements && item.requirements.level) || 1 });
+            if (fb) { expDmg = fb.damage; expInterval = fb.attackIntervalSeconds; }
+        } catch (e) {}
+    }
+    if (expDmg && (!item.damage || typeof item.damage.min !== 'number' || typeof item.damage.max !== 'number')) {
+        item.damage = { min: expDmg.min, max: expDmg.max };
+        if (expInterval != null) item.attackIntervalSeconds = expInterval;
+        changed = true;
+    }
+    // --- blockChance (shields) ---
+    if (item.slotType === 'shield') {
+        let expBlock = null;
+        if (def && def.blockChance != null) expBlock = def.blockChance;
+        else if (typeof _egUniqueFallbackBlockChance === 'function') {
+            try { expBlock = _egUniqueFallbackBlockChance({ slotType: item.slotType, archetype: item.archetype, minLevel: item.itemLevel || 1 }); } catch (e) {}
+        }
+        if (expBlock != null && (item.blockChance == null || typeof item.blockChance !== 'number')) {
+            item.blockChance = expBlock;
+            changed = true;
+        }
+    }
+    // --- implicits (now allowed on uniques) ---
+    if (!Array.isArray(item.implicits) || item.implicits.length === 0) {
+        const expImps = def ? _egBuildUniqueImplicits(def, item.defenses || expDef) : [];
+        // Also try fallback from item itself if no def
+        let imps = expImps;
+        if ((!imps || !imps.length) && typeof _egRollImplicitsForBase === 'function') {
+            try {
+                const syn = { slotType: item.slotType, defenses: item.defenses || expDef || {}, requirements: item.requirements || { level: item.itemLevel || 1 }, minLevel: item.itemLevel || 1 };
+                imps = _egRollImplicitsForBase(syn) || [];
+            } catch (e) { imps = []; }
+        }
+        if (imps && imps.length) {
+            item.implicits = imps;
+            changed = true;
+        } else if (!Array.isArray(item.implicits)) {
+            item.implicits = [];
+        }
+    }
+    // --- downsides: strengthen to balance new implicits ---
+    if (def && Array.isArray(def.downsides) && Array.isArray(item.mods)) {
+        for (let i = 0; i < def.downsides.length; i++) {
+            const stat = def.downsides[i];
+            const expected = _egStrengthenDownsideValue(stat.value);
+            const fid = `unique_${def.uniqueId}_down_${i}`;
+            const mod = item.mods.find(m => m.familyId === fid && m.isDownside);
+            if (!mod || !mod.rolledStats || !mod.rolledStats[0]) continue;
+            const curVal = mod.rolledStats[0].value;
+            if (curVal !== expected) {
+                mod.rolledStats[0].value = expected;
+                // rebuild label with new value
+                const tmpStat = { ...stat, value: expected };
+                mod.rolledStats[0].label = _egUniqueStatLabel(tmpStat);
+                // also keep key consistent
+                mod.rolledStats[0].key = stat.key;
+                changed = true;
+            }
+        }
+    }
+    return changed;
+}
+
 // Builds the full item object for a unique definition.
 function _egBuildUniqueItem(def, monsterLevel) {
     const name = (LANG === 'de') ? (def.nameDe || def.nameEn) : def.nameEn;
@@ -6113,17 +6361,48 @@ function _egBuildUniqueItem(def, monsterLevel) {
             value: stat.value,
         })),
     };
-    const downsideMods = (def.downsides || []).map((stat, i) => ({
-        familyId: `unique_${def.uniqueId}_down_${i}`,
-        type: 'unique',
-        tier: 0,
-        isDownside: true,
-        rolledStats: [{
-            key: stat.key,
-            label: _egUniqueStatLabel(stat),
-            value: stat.value,
-        }],
-    }));
+    const downsideMods = (def.downsides || []).map((stat, i) => {
+        const sv = _egStrengthenDownsideValue(stat.value);
+        const tmp = { ...stat, value: sv };
+        return {
+            familyId: `unique_${def.uniqueId}_down_${i}`,
+            type: 'unique',
+            tier: 0,
+            isDownside: true,
+            rolledStats: [{
+                key: stat.key,
+                label: _egUniqueStatLabel(tmp),
+                value: sv,
+            }],
+        };
+    });
+
+    // Resolve base stats — use explicit values if present, otherwise fall back
+    // to the closest base item so every unique has meaningful armor / damage.
+    let defenses = null;
+    if (def.defenses) defenses = { ...def.defenses };
+    else defenses = _egUniqueFallbackDefenses(def);
+
+    let damage = null;
+    let attackIntervalSeconds = undefined;
+    if (def.damage) {
+        damage = { ...def.damage };
+        attackIntervalSeconds = def.attackIntervalSeconds;
+    } else {
+        const fb = _egUniqueFallbackDamage(def);
+        if (fb) {
+            damage = fb.damage;
+            attackIntervalSeconds = fb.attackIntervalSeconds;
+        }
+    }
+
+    let blockChance = def.blockChance;
+    if (blockChance == null && def.slotType === 'shield') {
+        const fb = _egUniqueFallbackBlockChance(def);
+        if (fb != null) blockChance = fb;
+    }
+
+    const implicits = _egBuildUniqueImplicits(def, defenses);
 
     return {
         id: `${def.uniqueId}_${Date.now()}_${Math.floor(Math.random() * 10000)}_u`,
@@ -6141,12 +6420,12 @@ function _egBuildUniqueItem(def, monsterLevel) {
         itemLevel: Math.max(def.minLevel, monsterLevel || 1),
         requirements: JSON.parse(JSON.stringify(def.requirements || {})),
 
-        ...(def.defenses ? { defenses: { ...def.defenses } } : {}),
-        ...(def.damage ? { damage: { ...def.damage }, attackIntervalSeconds: def.attackIntervalSeconds } : {}),
-        ...(def.blockChance ? { blockChance: def.blockChance } : {}),
+        ...(defenses ? { defenses } : {}),
+        ...(damage ? { damage, ...(attackIntervalSeconds != null ? { attackIntervalSeconds } : {}) } : {}),
+        ...(blockChance != null ? { blockChance } : {}),
 
         mods: [bonusMod].concat(downsideMods),
-        implicits: [],
+        implicits,
 
         flavorEn: def.flavorEn,
         flavorDe: def.flavorDe,
@@ -6174,3 +6453,46 @@ function _egTryGenerateUniqueDrop(monsterLevel = 1) {
     const def = eligible[Math.floor(Math.random() * eligible.length)];
     return _egBuildUniqueItem(def, monsterLevel);
 }
+
+// ----------------------------------------------------------------------
+// Retroactively heals already-stashed uniques that were saved before
+// base armor/damage was added. Runs once after definitions are loaded
+// to cover the load-order race where _egLoadHubState ran before this
+// file was parsed (hub.js calls _egLoadHubState at file bottom).
+// Also healed on every future _egLoadHubState via the hub's own block.
+// ----------------------------------------------------------------------
+(function _egHealExistingUniqueStashOnLoad() {
+    try {
+        if (typeof _egHealUniqueItem !== 'function') return;
+        let changed = false;
+        const healGridState = (grid) => {
+            if (!Array.isArray(grid)) return;
+            for (let r = 0; r < grid.length; r++) {
+                if (!Array.isArray(grid[r])) continue;
+                for (let c = 0; c < grid[r].length; c++) {
+                    const it = grid[r][c];
+                    if (it && it.isUnique && _egHealUniqueItem(it)) changed = true;
+                }
+            }
+        };
+        // Heal STATE (persisted) and live _egInventory/_egEquipped if already initialized
+        if (typeof STATE !== 'undefined' && STATE) {
+            if (Array.isArray(STATE.egInventory)) healGridState(STATE.egInventory);
+            if (STATE.egEquipped && typeof STATE.egEquipped === 'object') {
+                for (const it of Object.values(STATE.egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) changed = true;
+            }
+            if (STATE.egMapSlotItem && STATE.egMapSlotItem.isUnique && _egHealUniqueItem(STATE.egMapSlotItem)) changed = true;
+            if (STATE.egCraftingBenchItem && STATE.egCraftingBenchItem.isUnique && _egHealUniqueItem(STATE.egCraftingBenchItem)) changed = true;
+        }
+        if (typeof _egInventory !== 'undefined' && Array.isArray(_egInventory)) healGridState(_egInventory);
+        if (typeof _egEquipped !== 'undefined' && _egEquipped && typeof _egEquipped === 'object') {
+            for (const it of Object.values(_egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) changed = true;
+        }
+        if (typeof _egMapSlotItem !== 'undefined' && _egMapSlotItem && _egMapSlotItem.isUnique && _egHealUniqueItem(_egMapSlotItem)) changed = true;
+        if (typeof _egCraftingBenchItem !== 'undefined' && _egCraftingBenchItem && _egCraftingBenchItem.isUnique && _egHealUniqueItem(_egCraftingBenchItem)) changed = true;
+        if (changed) {
+            if (typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
+            else if (typeof save === 'function') { try { save(); } catch (e) {} }
+        }
+    } catch (e) { /* ignore load-order */ }
+})();

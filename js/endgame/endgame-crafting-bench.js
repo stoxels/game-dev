@@ -40,8 +40,11 @@ function _egCraftingBenchCostTooltip(costs) {
 
 function _egCraftingBenchTooltipHTML(entry, tier, costs, disabled, affordable) {
     const label = LANG === 'de' && entry.family.labelDe ? entry.family.labelDe : entry.family.label;
-    const range = tier.min1 != null
-        ? `${tier.min1}-${tier.max1} / ${tier.min2}-${tier.max2}`
+    const hasSecond = tier.min2 != null;
+    const lo1 = tier.min1 != null ? tier.min1 : tier.min;
+    const hi1 = tier.max1 != null ? tier.max1 : tier.max;
+    const range = hasSecond
+        ? `${lo1}-${hi1} / ${tier.min2}-${tier.max2}`
         : `${tier.min}-${tier.max}`;
     let html = `<strong style="color:#f1d27b">${label}</strong>`;
     html += `<br><span style="color:#a8c8e8">Range:</span> ${range}`;
@@ -158,7 +161,10 @@ function _egCraftingBenchFamilies(item) {
 }
 
 function _egCraftingBenchTierLabel(tier) {
-    const range = tier.min1 != null ? `${tier.min1}-${tier.max1} / ${tier.min2}-${tier.max2}` : `${tier.min}-${tier.max}`;
+    const hasSecond = tier.min2 != null;
+    const lo1 = tier.min1 != null ? tier.min1 : tier.min;
+    const hi1 = tier.max1 != null ? tier.max1 : tier.max;
+    const range = hasSecond ? `${lo1}-${hi1} / ${tier.min2}-${tier.max2}` : `${tier.min}-${tier.max}`;
     return `<span class="tier-label">T${tier.tier} · ilvl ${tier.ilvl}</span><span class="tier-range">${range}</span>`;
 }
 

@@ -134,6 +134,90 @@ function _applyLowHealthVignette() {
 
 
 
+//-------------------LOW-TIME WARNING (CENTER OVERLAY)----------------------
+// Mirrors the endgame mistake/health/shield banners but fires for the
+// countdown timer at 300s (5 min), 120s (2 min) and 30s remaining.
+// Works in both endgame and normal levels — driven purely by timerSecs
+// and independent of _egIsActive.
+let _lowTimeWarningShown = { 300: false, 120: false, 30: false };
+let _lowTimeLastSecs = null;
+
+function _getLowTimeWarningTier(secs) {
+    if (secs <= 30) return 30;
+    if (secs <= 120) return 120;
+    if (secs <= 300) return 300;
+    return null;
+}
+
+function _showLowTimeWarningBanner(tier) {
+    const old = document.getElementById('eg-low-time-warning-banner');
+    if (old) old.remove();
+
+    const el = document.createElement('div');
+    el.id = 'eg-low-time-warning-banner';
+    el.className = `eg-lt-${tier}`;
+
+    const key = `eg_low_time_warning_${tier}`;
+    const raw = (typeof t === 'function') ? t(key) : '';
+    const fallbacks = { 300: '⏱️ 5 MINUTES REMAINING', 120: '⏱️ 2 MINUTES REMAINING!', 30: '⏱️ 30 SECONDS LEFT!' };
+    el.textContent = (raw && raw !== key) ? raw : fallbacks[tier];
+    document.body.appendChild(el);
+
+    const board = document.getElementById('ptable');
+    if (board) {
+        const r = board.getBoundingClientRect();
+        el.style.left = (r.left + r.width / 2) + 'px';
+        el.style.top = (r.top + r.height / 2) + 'px';
+    } else {
+        el.style.left = '50%';
+        el.style.top = '50%';
+    }
+
+    const toastKey = `eg_low_time_warning_toast_${tier}`;
+    const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
+    const toastFallback = el.textContent;
+    const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
+    const toastColors = { 300: '#facc15', 120: '#fb923c', 30: '#ef4444' };
+    if (typeof showToast === 'function') showToast(toastText, toastColors[tier] || '#facc15');
+
+    setTimeout(() => el.remove(), 2500);
+}
+
+function _maybeShowLowTimeWarning() {
+    if (typeof dead !== 'undefined' && dead) return;
+    if (typeof timerSecs === 'undefined') return;
+    if (timerSecs <= 0) return;
+    // No active puzzle/level — don't spam in menus/lobby
+    if (typeof cur !== 'undefined' && !cur) {
+        _lowTimeLastSecs = timerSecs;
+        return;
+    }
+
+    const tier = _getLowTimeWarningTier(timerSecs);
+    const prev = _lowTimeLastSecs;
+    _lowTimeLastSecs = timerSecs;
+
+    if (!tier) return;
+    if (_lowTimeWarningShown[tier]) return;
+    // Only fire when the timer *decreased* into this tier.
+    // Increases (items / time bonuses) update the tracker but never re-trigger.
+    if (prev != null && timerSecs >= prev) return;
+    if (prev != null && prev <= tier) return;
+    _lowTimeWarningShown[tier] = true;
+    // Mark any higher thresholds as implicitly passed so they don't fire
+    // out-of-order later (e.g. big penalty jump 400→20 should consume 300+120).
+    if (tier === 30) { _lowTimeWarningShown[120] = true; _lowTimeWarningShown[300] = true; }
+    else if (tier === 120) { _lowTimeWarningShown[300] = true; }
+    _showLowTimeWarningBanner(tier);
+}
+
+function _resetLowTimeWarningState() {
+    _lowTimeWarningShown = { 300: false, 120: false, 30: false };
+    _lowTimeLastSecs = null;
+    const banner = document.getElementById('eg-low-time-warning-banner');
+    if (banner) banner.remove();
+}
+
 // Applies the correct colour / animation class to the #timer-val element.
 // When the timer is frozen by the Freeze item or a class skill the element
 // gets an icy-blue inline colour that overrides the CSS classes.
@@ -161,6 +245,11 @@ function updTimer() {
     if (el) _applyTimerDisplayState(el);
     _applyLowTimeVignette();
     _applyLowHealthVignette();
+
+    // Low-time center warning — fires at 5/2/0.5 min thresholds (both
+    // endgame and normal levels). Checked on every display refresh so
+    // penalty deductions and item time gains are both observed.
+    if (typeof _maybeShowLowTimeWarning === 'function') _maybeShowLowTimeWarning();
 
     // Notify the passive skill tracker every tick (no-op when unavailable).
     if (typeof PassiveTracker !== 'undefined') PassiveTracker.onTimerTick();
@@ -546,6 +635,14 @@ function startTimer() {
     stopTimer();
     _initSkillTimers();
     _initProceduralSystems();
+    // Chain-puzzle continuity: timer is preserved across puzzles in an
+    // endgame map run (window._egSuppressEncounterStop). Keep the already-
+    // shown tiers but sync the drain tracker so the next countdown step is
+    // detected correctly. Fresh levels are reset by _initTimer in
+    // start-level.js before the first updTimer, so no reset is needed here.
+    if (window._egSuppressEncounterStop) {
+        _lowTimeLastSecs = timerSecs;
+    }
 
     timerInterval = setInterval(() => {
         // Skip the entire tick if the game is over or the timer is frozen.

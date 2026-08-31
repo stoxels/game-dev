@@ -10,6 +10,30 @@ const EG_BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1 — retuned af
                                      // global gear-damage buff (~x2) so boss stays a real fight
 const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
 
+// ── Late-endgame HP explosion ────────────────────────────────────────────
+// Linear 28% alone is not enough to outrun late gear scaling — bosses at
+// L85+ die in seconds on well-geared characters (player DPS roughly doubles
+// every ~30 levels from weapon + phys/power creep). A convex multiplier
+// on top of the linear curve keeps early bosses (≈L1-40) almost unchanged
+// but massively inflates HP towards the true endgame (T13-T16, L71-90).
+// Anchors: 1→1.0, 50→1.15, 60→1.7, 75→3.0, 85→4.8, 90→6.0, 95→7.2
+// Result at L87 (T15): ~5.2× the old linear HP (~135k vs ~26k for a 1k base).
+const EG_BOSS_LATE_HP_ANCHORS = [[1,1.0],[50,1.15],[60,1.7],[75,3.0],[85,4.8],[90,6.0],[95,7.2]];
+function _egGetBossLateHpMult(lvl) {
+    const l = Math.max(1, Number(lvl) || 1);
+    const a = EG_BOSS_LATE_HP_ANCHORS;
+    if (l <= a[0][0]) return a[0][1];
+    if (l >= a[a.length-1][0]) return a[a.length-1][1];
+    for (let i = 0; i < a.length - 1; i++) {
+        const [x0,y0] = a[i], [x1,y1] = a[i+1];
+        if (l >= x0 && l <= x1) {
+            const t = (l - x0) / (x1 - x0);
+            return y0 + (y1 - y0) * t;
+        }
+    }
+    return 1;
+}
+
 // ── Soft enrage ──────────────────────────────────────────────────────────────
 // If a boss fight drags on too long, the boss starts stacking damage buffs.
 // Prevents bosses from being trivialised by pure attrition/turtling.
@@ -79,7 +103,9 @@ function _egBuildBoss(defOrId, level = 1) {
     if (!def) { console.warn('Unknown Boss id:', defOrId); return null; }
 
     const lvl = Math.max(1, level);
-    const hpScale = 1 + EG_BOSS_LEVEL_HP_SCALE * (lvl - 1);
+    const baseHpScale = 1 + EG_BOSS_LEVEL_HP_SCALE * (lvl - 1);
+    const lateMult = (typeof _egGetBossLateHpMult === 'function') ? _egGetBossLateHpMult(lvl) : 1;
+    const hpScale = baseHpScale * lateMult;
     const dmgScale = 1 + EG_BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
 
     const maxHP = Math.round(def.baseHP * hpScale);

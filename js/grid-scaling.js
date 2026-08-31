@@ -104,9 +104,12 @@ function _measureNaturalSize(scaler) {
     // reflects true content width, not the flex container's available space.
     const prevPosition = scaler.style.position;
     const prevLeft = scaler.style.left;
+    const prevZoom = scaler.style.zoom;
+    const prevTransform = scaler.style.transform;
     scaler.style.position = 'absolute';
     scaler.style.left = '-99999px';
-    scaler.style.transform = 'scale(1)';
+    scaler.style.zoom = '1';
+    scaler.style.transform = 'none';
 
     const result = {
         w: scaler.offsetWidth,
@@ -115,6 +118,8 @@ function _measureNaturalSize(scaler) {
 
     scaler.style.position = prevPosition;
     scaler.style.left = prevLeft;
+    scaler.style.zoom = prevZoom;
+    scaler.style.transform = prevTransform;
 
     return result;
 }
@@ -139,23 +144,32 @@ function _calcAvailableSpace() {
     };
 }
 
-// Writes currentZoom to the scaler's CSS transform and resizes the wrapper
-// div so the browser's scrollbars appear correctly when zoomed in.
-//
-// Why resize the wrapper? CSS transform does NOT affect layout flow — the
-// element keeps its original footprint in the document even after scaling.
-// By explicitly setting the wrapper's height and minWidth to the post-scale
-// dimensions, we force the page to scroll properly when the player has
-// zoomed in beyond the viewport bounds.
+// Writes currentZoom to the scaler. Prefers CSS zoom (no stacking context)
+// so row/col clue headers (z-index 950) stay in the global context and
+// correctly outrank the fixed HUD/toast (z-index 15) while cells (auto)
+// stay below. Falls back to transform:scale where zoom isn't supported
+// (old Firefox) — in that fallback the clues will be trapped and the
+// HUD will sit behind the whole puzzle when overlapping, which is still
+// better than covering the clues.
 function _applyZoom() {
     const scaler = _getScaler();
     const wrap = _getWrap();
     if (!scaler || !wrap) return;
 
-    scaler.style.transform = `scale(${currentZoom})`;
+    const useZoom = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('zoom', '1');
 
-    wrap.style.height = (scaler.offsetHeight * currentZoom) + 'px';
-    wrap.style.minWidth = (scaler.offsetWidth * currentZoom) + 'px';
+    if (useZoom) {
+        scaler.style.transform = 'none';
+        scaler.style.zoom = String(currentZoom);
+        // Zoom affects layout, no manual wrapper sizing needed
+        wrap.style.height = '';
+        wrap.style.minWidth = '';
+    } else {
+        scaler.style.zoom = '';
+        scaler.style.transform = `scale(${currentZoom})`;
+        wrap.style.height = (scaler.offsetHeight * currentZoom) + 'px';
+        wrap.style.minWidth = (scaler.offsetWidth * currentZoom) + 'px';
+    }
 
     // Reposition the shield border / variance shield dome AFTER the browser
     // has actually settled the new transform, instead of reading
@@ -245,6 +259,11 @@ function resetZoom() {
     if (wrap) {
         wrap.style.height = '';
         wrap.style.minWidth = '';
+    }
+    const scaler = _getScaler();
+    if (scaler) {
+        scaler.style.zoom = '';
+        scaler.style.transform = '';
     }
 
     const container = document.querySelector('.puzzle-and-sidebar');
