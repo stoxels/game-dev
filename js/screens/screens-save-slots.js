@@ -58,11 +58,16 @@ function _buildSlotCardHtml(slotNum, summary) {
         ? `<img class="ssc-portrait" src="${portraitSrc}" alt="${summary.playerCharacter}">`
         : '';
 
+    const levelHtml = (summary.playerLevel && summary.playerLevel > 1)
+        ? `<div class="ssc-player-level">${t('eg_lvl_short').replace('{n}', summary.playerLevel)}</div>`
+        : '';
+
     return `<div class="ssc-num">${t('scr_slot_label').replace('{n}', slotNum)}</div>
-             ${portraitHtml}
-             <div class="ssc-score">${t('score_lbl')}: ${summary.totalScore}</div>
-             <div class="ssc-levels">${t('scr_stoxels_done').replace('{n}', summary.levelsDone)}</div>
-             <button class="ssc-delete-btn" data-slot="${slotNum}" title="${t('scr_delete_save')}">❌</button>`;
+              ${portraitHtml}
+              <div class="ssc-score">${t('score_lbl')}: ${summary.totalScore}</div>
+              <div class="ssc-levels">${t('scr_stoxels_done').replace('{n}', summary.levelsDone)}</div>
+              ${levelHtml}
+              <button class="ssc-delete-btn" data-slot="${slotNum}" title="${t('scr_delete_save')}">❌</button>`;
 }
 
 

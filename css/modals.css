@@ -556,3 +556,81 @@
         border-color: var(--accent);
         color: var(--accent);
     }
+
+
+
+
+
+/*
+    ------------------------------------------------------------------------
+    --------------------- 5. KEYBINDS MODAL --------------------------------
+    ---- Rebinding UI: one row per action, click a key chip to capture. ----
+    ------------------------------------------------------------------------
+*/
+
+.keybinds-box {
+    width: min(560px, 92vw);
+    max-height: 86vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.keybinds-hint {
+    font-size: 11px;
+    opacity: 0.7;
+    margin: 4px 0 12px;
+}
+
+.keybind-list {
+    overflow-y: auto;
+    border: 1px solid var(--border2, #333);
+    border-radius: 6px;
+    padding: 4px 0;
+    margin-bottom: 12px;
+}
+
+.keybind-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 14px;
+}
+
+    .keybind-row:nth-child(even) {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+.keybind-label {
+    font-size: 12px;
+    letter-spacing: 0.03em;
+}
+
+.keybind-key {
+    font-family: var(--PX, monospace);
+    font-size: 12px;
+    min-width: 92px;
+    text-align: center;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border2, #444);
+    border-radius: 4px;
+    color: var(--green, #7ee787);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+    .keybind-key:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--accent, #888);
+    }
+
+    .keybind-key.keybind-capturing {
+        color: var(--yellow, #f1c40f);
+        border-color: var(--yellow, #f1c40f);
+        animation: keybind-pulse 1s ease-in-out infinite;
+    }
+
+@keyframes keybind-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
+}

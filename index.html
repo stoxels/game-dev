@@ -84,24 +84,31 @@
                 ▶ PLAY
             </button>
 
+            <!-- LEFT COLUMN (4 buttons) -->
             <button class="title-overlay-btn block-general" id="btn-settings"
                     style="--bx: 30%; --by: 35%;"
                     data-t="btn_settings">
                 ⚙ SETTINGS
             </button>
 
-            <button class="title-overlay-btn block-general" id="btn-how-to-play"
+            <button class="title-overlay-btn block-general" id="btn-keybinds"
                     style="--bx: 30%; --by: 45%;"
+                    data-t="btn_keybinds">
+                ⌨ KEYBINDS
+            </button>
+
+            <button class="title-overlay-btn block-general" id="btn-how-to-play"
+                    style="--bx: 30%; --by: 55%;"
                     data-t="btn_howtoplay">
                 ? HOW TO PLAY
             </button>
 
-            <button class="title-overlay-btn block-general" id="btn-changelog"
-                    style="--bx: 30%; --by: 55%;"
-                    data-t="scr_btn_changelog">
-                📝 CHANGELOG
+            <button class="title-overlay-btn block-general" id="btn-replay"
+                    style="--bx: 30%; --by: 65%;">
+                🔁 REPLAY
             </button>
 
+            <!-- RIGHT COLUMN (4 buttons) -->
             <button class="title-overlay-btn block-general" id="btn-highscores"
                     style="--bx: 70%; --by: 35%;"
                     data-t="btn_highscores">
@@ -120,6 +127,12 @@
                 🏆 ACHIEVEMENTS
             </button>
 
+            <button class="title-overlay-btn block-general" id="btn-changelog"
+                    style="--bx: 70%; --by: 65%;"
+                    data-t="scr_btn_changelog">
+                📝 CHANGELOG
+            </button>
+
             <!--
             <button class="title-overlay-btn btn-danger" id="btn-reset"
                     style="--bx: 50%; --by: 55%;"
@@ -127,11 +140,6 @@
                 🗑 RESET
             </button>
             -->
-
-            <button class="title-overlay-btn block-general" id="btn-replay"
-                    style="--bx: 30%; --by: 65%;">
-                🔁 REPLAY
-            </button>
 
             <!-- Decoration kept but hidden — initTitleDecoration() in main.js still runs safely -->
             <div class="title-deco" id="tdeco" style="display:none;"></div>
@@ -298,24 +306,25 @@
 
     <!-- TEMP: DEV MODE SELECT SCREEN — remove once Adventure Mode replaces the world map -->
     <div id="screen-mode-select" class="screen">
+        <button class="back-btn dms-back" id="btn-mode-select-back" data-t="btn_back">◀ BACK</button>
         <div class="dms-wrap">
             <div class="dms-title" data-t="scr_select_mode">SELECT MODE</div>
             <div class="dms-sub"></div>
 
             <div class="dms-options">
                 <button class="dms-card" id="btn-mode-existing">
-                    <div class="dms-card-title" data-t="scr_mode_regular">🗺️ Regular Game</div>
-                    <div class="dms-card-desc" data-t="scr_mode_regular_desc">Launches the regular world-map implementation.</div>
+                    <div class="dms-card-title" data-t="scr_mode_regular">🗺️ Campaign</div>
+                    <div class="dms-card-desc" data-t="scr_mode_regular_desc">Play through the story of Stoxels.</div>
                 </button>
 
                 <button class="dms-card" id="btn-mode-adventure">
-                    <div class="dms-card-title" data-t="scr_mode_adventure">⚔️ Adventure Mode (Dev)</div>
-                    <div class="dms-card-desc" data-t="scr_mode_adventure_desc">In development</div>
+                    <div class="dms-card-title" data-t="scr_mode_adventure">⚔️ Adventure Mode</div>
+                    <div class="dms-card-desc" data-t="scr_mode_adventure_desc">In Development, not available yet.</div>
                 </button>
 
                 <button class="dms-card" id="btn-mode-endgame-test">
-                    <div class="dms-card-title" data-t="scr_mode_endgame_test">🧪 Endgame Test</div>
-                    <div class="dms-card-desc" data-t="scr_mode_endgame_test_desc">Endgame Map System Test.</div>
+                    <div class="dms-card-title" data-t="scr_mode_endgame_test">🧪 Endgame</div>
+                    <div class="dms-card-desc" data-t="scr_mode_endgame_test_desc">Test the upcoming Endgame Expansion.</div>
                 </button>
             </div>
         </div>
@@ -614,6 +623,19 @@
 
             </div><!-- /.settings-scroll -->
 
+        </div>
+    </div>
+
+    <!-- KEYBINDS MODAL -->
+    <div id="keybinds-modal" class="modal-bg">
+        <div class="modal-box keybinds-box">
+            <button class="modal-close" id="btn-keybinds-close" data-t="reset_close">✕ CLOSE</button>
+            <div class="modal-title" data-t="keybinds_title">⌨ KEYBINDS</div>
+            <p class="keybinds-hint" data-t="keybinds_hint">Click a key to rebind it. Changes are saved automatically and survive restarts.</p>
+            <div id="keybind-list" class="keybind-list"></div>
+            <div class="modal-actions">
+                <button class="title-btn back-btn" id="btn-keybinds-reset" data-t="keybinds_reset">RESET TO DEFAULTS</button>
+            </div>
         </div>
     </div>
 
@@ -1180,6 +1202,7 @@
     <script src="js/audio/audio-data.js"></script>
     <script src="js/audio/audio.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/keybinds.js"></script>
     <script src="js/translation/translations-strings.js"></script>
     <script src="js/translation/translations.js"></script>
     <script src="js/quests/quests-data.js"></script>
@@ -1289,6 +1312,7 @@
     <script src="js/endgame/endgame-crafting-bench.js"></script>
     <script src="js/endgame/endgame-essences.js"></script>
     <script src="js/endgame/endgame-shards.js"></script>
+    <script src="js/endgame/endgame-loot-filter.js"></script>
     <script src="js/endgame/endgame-mod-tables.js"></script>
     <script src="js/endgame/endgame-maps.js"></script>
     <script src="js/endgame/endgame-gold.js"></script>
@@ -1307,6 +1331,7 @@
     <script src="js/endgame/endgame-puzzle-generator.js"></script>
     <script src="js/endgame/endgame-map-launch.js"></script>
     <script src="js/endgame/endgame-hazards.js"></script>
+    <script src="js/adventure-mode.js"></script>
 
     <script src="main.js"></script>
 </body>

@@ -309,15 +309,18 @@ function _egBuildSpawnList() {
 //------------------------------------------------------------------------
 
 // Returns true if a respawn should be suppressed right now.
-// Checks encounter state, kill totals, boss phase, and concurrent cap.
+// Checks boss phase, boss presence, and the concurrent cap. NOTE: the kill
+// objective deliberately does NOT stop respawns — monsters keep flowing
+// until the player enters the boss arena (extra kills are extra XP/loot;
+// the leveling curve absorbs the higher per-map kill counts). Inside the
+// boss arena no natural spawns happen at all — adds only appear when a
+// boss ability purposefully summons them (_egMechSummonAdds).
 function _egShouldSuppressRespawn() {
     if (!_egIsActive()) return true;
 
-    const req = _egGetMapRequirements();
-    const total = req.totalMonsters;
-    if (total > 0 && _egChainKillCount >= total) return true;
-
-    // Boss arena chain: no regular monsters interfere with the duel
+    // Boss arena chain: no regular monsters interfere with the duel —
+    // except when a boss ability summons them (direct _egSpawnMonster calls
+    // from mechanic handlers bypass this gate by design).
     if (typeof _egBossPhaseActive !== 'undefined' && _egBossPhaseActive) return true;
 
     // Suppress if a boss is already on the field
@@ -635,8 +638,14 @@ function _egSetHoldEPauseVisual(isPaused) {
 }
 
 function _initEgHoldEPauseHotkey() {
+    // Parry key is configurable (js/keybinds.js, action 'eg-parry', E by
+    // default). keydown starts the parry window, keyup ends it.
+    const isParryKey = (e) => {
+        if (typeof keybindMatches === 'function') return keybindMatches(e, 'eg-parry');
+        return e.key && e.key.toLowerCase() === 'e';
+    };
     document.addEventListener('keydown', (e) => {
-        if (!e || !e.key || e.key.toLowerCase() !== 'e') return;
+        if (!e || !isParryKey(e)) return;
         if (e.repeat) return;
         const tag = document.activeElement?.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA') return;
@@ -647,7 +656,7 @@ function _initEgHoldEPauseHotkey() {
         _egSetHoldEPauseVisual(true);
     });
     document.addEventListener('keyup', (e) => {
-        if (!e || !e.key || e.key.toLowerCase() !== 'e') return;
+        if (!e || !isParryKey(e)) return;
         if (typeof _egHoldEPauseActive !== 'undefined' && !_egHoldEPauseActive) {
             _egSetHoldEPauseVisual(false);
             return;
@@ -2575,11 +2584,11 @@ function _egHandleNormalMonsterKill(dying) {
 
     _egUpdateObjectivesHUD();
 
-    // Keep spawning regular monsters until the total kill count is reached
-    const req = _egGetMapRequirements();
-    const total = req.totalMonsters;
-    const totalReached = total > 0 && _egChainKillCount >= total;
-    if (!totalReached) _egScheduleRespawn();
+    // Keep the field populated: replacements spawn until the player enters
+    // the boss arena (not just until the kill objective is reached — extra
+    // kills after the objective are intentional free XP/loot, see
+    // _egShouldSuppressRespawn).
+    _egScheduleRespawn();
 
     if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(false, dying.level);
     if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);

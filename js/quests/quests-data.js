@@ -1776,8 +1776,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 1: Grasslands Survey', titleDE: 'Atlas Stufe 1: Grasland-Vermessung',
-        descEn: 'Chart every region of Tier 1 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 1 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 1 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 1 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t1_complete', labelEn: 'All Tier 1 maps completed', labelDE: 'Alle Stufe-1-Karten abgeschlossen',
@@ -1791,8 +1791,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 2: Meadows Expedition', titleDE: 'Atlas Stufe 2: Wiesen-Expedition',
-        descEn: 'Chart every region of Tier 2 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 2 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 2 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 2 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t2_complete', labelEn: 'All Tier 2 maps completed', labelDE: 'Alle Stufe-2-Karten abgeschlossen',
@@ -1806,8 +1806,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 3: Bayou Exploration', titleDE: 'Atlas Stufe 3: Sumpf-Erkundung',
-        descEn: 'Chart every region of Tier 3 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 3 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 3 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 3 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t3_complete', labelEn: 'All Tier 3 maps completed', labelDE: 'Alle Stufe-3-Karten abgeschlossen',
@@ -1821,8 +1821,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 4: Rift Mapping', titleDE: 'Atlas Stufe 4: Rift-Kartierung',
-        descEn: 'Chart every region of Tier 4 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 4 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 4 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 4 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t4_complete', labelEn: 'All Tier 4 maps completed', labelDE: 'Alle Stufe-4-Karten abgeschlossen',
@@ -1836,8 +1836,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 5: Hinterlands Conquest', titleDE: 'Atlas Stufe 5: Hinterland-Eroberung',
-        descEn: 'Chart every region of Tier 5 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 5 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 5 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 5 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t5_complete', labelEn: 'All Tier 5 maps completed', labelDE: 'Alle Stufe-5-Karten abgeschlossen',
@@ -1851,8 +1851,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 6: Quarry Delve', titleDE: 'Atlas Stufe 6: Steinbruch-Erkundung',
-        descEn: 'Chart every region of Tier 6 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 6 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 6 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 6 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t6_complete', labelEn: 'All Tier 6 maps completed', labelDE: 'Alle Stufe-6-Karten abgeschlossen',
@@ -1866,8 +1866,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 7: Odds Outpost', titleDE: 'Atlas Stufe 7: Chancen-Außenposten',
-        descEn: 'Chart every region of Tier 7 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 7 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 7 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 7 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t7_complete', labelEn: 'All Tier 7 maps completed', labelDE: 'Alle Stufe-7-Karten abgeschlossen',
@@ -1881,8 +1881,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 8: Moment Junction', titleDE: 'Atlas Stufe 8: Momenten-Knoten',
-        descEn: 'Chart every region of Tier 8 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 8 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 8 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 8 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t8_complete', labelEn: 'All Tier 8 maps completed', labelDE: 'Alle Stufe-8-Karten abgeschlossen',
@@ -1896,8 +1896,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 9: Void Pocket', titleDE: 'Atlas Stufe 9: Leerenblase',
-        descEn: 'Chart every region of Tier 9 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 9 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 9 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 9 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t9_complete', labelEn: 'All Tier 9 maps completed', labelDE: 'Alle Stufe-9-Karten abgeschlossen',
@@ -1911,8 +1911,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 10: Ergodic Expanse', titleDE: 'Atlas Stufe 10: Ergodische Weite',
-        descEn: 'Chart every region of Tier 10 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 10 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 10 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 10 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t10_complete', labelEn: 'All Tier 10 maps completed', labelDE: 'Alle Stufe-10-Karten abgeschlossen',
@@ -1926,8 +1926,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 11: Infinite Nexus', titleDE: 'Atlas Stufe 11: Unendlicher Nexus',
-        descEn: 'Chart every region of Tier 11 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 11 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 11 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 11 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t11_complete', labelEn: 'All Tier 11 maps completed', labelDE: 'Alle Stufe-11-Karten abgeschlossen',
@@ -1941,8 +1941,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 12: Citadel Approach', titleDE: 'Atlas Stufe 12: Zitadellen-Anmarsch',
-        descEn: 'Chart every region of Tier 12 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 12 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 12 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 12 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t12_complete', labelEn: 'All Tier 12 maps completed', labelDE: 'Alle Stufe-12-Karten abgeschlossen',
@@ -1956,8 +1956,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 13: Core of Convergence', titleDE: 'Atlas Stufe 13: Kern der Konvergenz',
-        descEn: 'Chart every region of Tier 13 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 13 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 13 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 13 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t13_complete', labelEn: 'All Tier 13 maps completed', labelDE: 'Alle Stufe-13-Karten abgeschlossen',
@@ -1971,8 +1971,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 14: Vortex of Possibilities', titleDE: 'Atlas Stufe 14: Wirbel der Möglichkeiten',
-        descEn: 'Chart every region of Tier 14 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 14 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 14 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 14 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t14_complete', labelEn: 'All Tier 14 maps completed', labelDE: 'Alle Stufe-14-Karten abgeschlossen',
@@ -1986,8 +1986,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'atlas',
         icon: '🗺️',
         titleEn: 'Atlas Tier 15: The Final Theorem', titleDE: 'Atlas Stufe 15: Das Letzte Theorem',
-        descEn: 'Chart every region of Tier 15 in the Atlas of Worlds.',
-        descDE: 'Kartiere jede Region der Stufe 15 im Weltenatlas.',
+        descEn: 'Chart every region of Tier 15 in the Atlas of Statistica.',
+        descDE: 'Kartiere jede Region der Stufe 15 im Statistica-Atlas.',
         milestones: [
             {
                 id: 'atlas_t15_complete', labelEn: 'All Tier 15 maps completed', labelDE: 'Alle Stufe-15-Karten abgeschlossen',

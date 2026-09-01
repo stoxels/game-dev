@@ -60,10 +60,17 @@ function _egBuildMapOrbSlotHTML() {
 </div>`;
 }
 
-// Assembles the complete map device block: orb frame, drop slot, activate button.
+// Assembles the complete map device block: orb frame, drop slot, activate
+// button, plus the small "?" info button that opens the map-drop rules
+// tooltip (so the explainer costs no vertical space).
 function _egBuildMapDeviceHTML() {
     return `
 <div class="eg-map-device">
+    <button class="eg-gate-info-btn"
+            title="${t('eg_drop_rules_title')}"
+            onmouseenter="_egOnDropRulesEnter(event)"
+            onmousemove="_egOnDropRulesMove(event)"
+            onmouseleave="_egOnDropRulesLeave()">?</button>
     <div class="eg-map-device-frame">
         ${_egBuildMapOrbRingHTML()}
         ${_egBuildMapOrbSlotHTML()}
@@ -72,6 +79,29 @@ function _egBuildMapDeviceHTML() {
         ${t('eg_activate_map')}
     </button>
 </div>`;
+}
+
+// Hover tooltip for the map device's "?" info button: explains the
+// PoE-style map-drop rules (normal kills / cleared regions / bosses).
+// The one-line translation is split on its ' · ' separators so each rule
+// gets its own line inside the tooltip.
+function _egOnDropRulesEnter(e) {
+    const lines = t('eg_drop_rules_line').split(' · ').join('<br>');
+    const html = `
+<div class="eg-tt-frame" style="--tt-border:#9d93c9;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon">🗺️</div>
+        <div class="eg-tt-name" style="color:#9d93c9;">${t('eg_drop_rules_title')}</div>
+    </div>
+    <div class="eg-tt-section"><div class="eg-tt-desc">${lines}</div></div>
+</div>`;
+    if (typeof showGameTooltip === 'function') showGameTooltip(html, e);
+}
+function _egOnDropRulesMove(e) {
+    if (typeof moveGameTooltip === 'function') moveGameTooltip(e);
+}
+function _egOnDropRulesLeave() {
+    if (typeof hideGameTooltip === 'function') hideGameTooltip();
 }
 
 
@@ -348,7 +378,7 @@ function _egRenderGateLevelChip() {
 }
 
 // Builds the top navigation bar with back button, gate title, level chip and the
-// Atlas of Worlds button (opens the PoE-style map overview screen).
+// Atlas of Statistica button (opens the PoE-style map overview screen).
 function _egBuildGateTopbarHTML() {
     return `
 <div class="eg-topbar">
@@ -367,15 +397,53 @@ function _egBuildGateTopbarHTML() {
 }
 
 // Assembles the complete gate screen layout:
-// topbar → centered map device panel with map stash below.
+// topbar → per-tier atlas progress band → centered map device panel with map
+// stash below. The progress band is rendered by _egRenderGateTierStrip() on
+// every open so completions from the last run are visible before the player
+// even opens the atlas.
 function _egBuildGateFullScreenHTML() {
     return `
 <div class="eg-hub-layout">
     ${_egBuildGateTopbarHTML()}
+    <div class="eg-gate-tier-strip-band" id="eg-gate-tier-strip"></div>
     <div class="eg-gate-body">
         ${_egBuildGatePanelHTML()}
     </div>
 </div>`;
+}
+
+// One-time CSS injection for the gate's per-tier atlas progress band. The
+// strip itself (ega-tier-* classes) is styled by the atlas module; this only
+// lays out the band that hosts it inside the gate layout.
+function _egInjectGateTierStripStyles() {
+    if (document.getElementById('eg-gate-tier-strip-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'eg-gate-tier-strip-styles';
+    style.textContent = `
+        .eg-gate-tier-strip-band {
+            flex-shrink: 0;
+            padding: 5px 18px 3px;
+            background: linear-gradient(180deg, rgba(34, 25, 9, 0.55), rgba(16, 12, 6, 0.35));
+            border-bottom: 1px solid var(--border, #444);
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Renders the gate's per-tier atlas progress strip. Reuses the atlas screen's
+// own builder (same cells, same hover tooltip listing the tier's regions with
+// ✔/?/🔒 status), so gate and atlas always agree. Refreshed on every
+// showEndgameGate() so completions from the last run show up immediately.
+// No-op when the atlas module is not loaded.
+function _egRenderGateTierStrip() {
+    const el = document.getElementById('eg-gate-tier-strip');
+    if (!el) return;
+    if (typeof _egAtlasBuildTierProgressHTML !== 'function') {
+        el.style.display = 'none';
+        return;
+    }
+    el.style.display = '';
+    el.innerHTML = _egAtlasBuildTierProgressHTML();
 }
 
 
@@ -454,6 +522,18 @@ function _egInjectAtlasHighlightStyles() {
             opacity: 0.85;
             margin-left: auto;
         }
+        /* "?" info button on the map device: opens the map-drop rules
+           tooltip on hover (no vertical cost, unlike the old explainer line). */
+        #screen-endgame-gate .eg-map-device { position: relative; }
+        .eg-gate-info-btn {
+            position: absolute; top: 4px; right: 8px; z-index: 3;
+            width: 20px; height: 20px; line-height: 18px; padding: 0;
+            font-family: var(--PX, monospace); font-size: 10px;
+            color: #9d93c9; background: rgba(16, 14, 26, 0.9);
+            border: 1px solid #555; border-radius: 50%;
+            cursor: help; text-align: center;
+        }
+        .eg-gate-info-btn:hover { border-color: #9d93c9; color: #fff; }
     `;
     document.head.appendChild(style);
 }
@@ -816,6 +896,8 @@ function _egEnsureMapModsOverlay() {
     overlay.className = 'eg-mm-overlay-bg';
     overlay.innerHTML = `
 <div class="eg-mm-overlay-box">
+    <button class="eg-mm-close-x" onclick="egCloseMapModsOverlay()"
+            title="${t('ui_close')}" aria-label="${t('ui_close')}">✕</button>
     <div class="eg-mm-overlay-title">${t('eg_mm_title')}</div>
     <div class="eg-mm-overlay-body" id="eg-mm-overlay-body"></div>
     <div class="eg-mm-overlay-btns">
@@ -845,6 +927,18 @@ function egCloseMapModsOverlay() {
     if (overlay) overlay.classList.remove('show');
 }
 
+// Global Escape handler — closes the map-mods overlay when open.
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const ov = document.getElementById('eg-map-mods-overlay');
+        if (ov && ov.classList.contains('show')) {
+            egCloseMapModsOverlay();
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+});
+
 // One-time CSS injection for the overlay (guard id prevents duplicates).
 function _egInjectMapModsOverlayStyles() {
     if (document.getElementById('eg-map-mods-overlay-styles')) return;
@@ -857,6 +951,14 @@ function _egInjectMapModsOverlayStyles() {
 .eg-mm-overlay-box { width:min(560px, 92vw); max-height:80vh; display:flex; flex-direction:column;
                      background:#1a1d26; border:1px solid #c8a84b; border-radius:10px;
                      padding:18px 20px; box-shadow:0 8px 40px rgba(0,0,0,0.6); }
+.eg-mm-overlay-box { position: relative; }
+.eg-mm-close-x { position:absolute; top:8px; right:8px; width:22px; height:22px; padding:0;
+                 font-family:var(--PX, monospace); font-size:10px; line-height:1;
+                 color:var(--accent2, #fff); background:transparent;
+                 border:1px solid var(--border2, #656f96); border-radius:4px;
+                 cursor:pointer; transition:all 0.12s; }
+.eg-mm-close-x:hover { color:#ff6b6b; border-color:rgba(255,107,107,0.6);
+                       background:rgba(255,107,107,0.12); }
 .eg-mm-overlay-title { font-size:1.2em; font-weight:bold; color:#c8a84b; text-align:center;
                        margin-bottom:12px; letter-spacing:1px; }
 .eg-mm-overlay-body { overflow-y:auto; flex:1; padding-right:4px; }
@@ -926,12 +1028,16 @@ function showEndgameGate(backFn) {
     // Migrate old gate screens that were built before the side-by-side
     // layout (Orbs & Shards left of the gate) or before the atlas legend / tier tabs.
     const gateScreen = document.getElementById('screen-endgame-gate');
-    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs') || !gateScreen.querySelector('#eg-gate-level-chip'))) {
+    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs') || !gateScreen.querySelector('.eg-gate-info-btn') || !gateScreen.querySelector('#eg-gate-level-chip') || !gateScreen.querySelector('#eg-gate-tier-strip'))) {
         gateScreen.innerHTML = _egBuildGateFullScreenHTML();
     }
     _egInjectAtlasHighlightStyles();
     _egInjectMapStashTabStyles();
     _egInjectGateLevelChipStyles();
+    _egInjectGateTierStripStyles();
+    // The tier strip uses the atlas module's ega-tier-* classes; make sure its
+    // stylesheet exists even if the atlas screen was never opened this session.
+    if (typeof _egAtlasEnsureStyles === 'function') _egAtlasEnsureStyles();
 
     // The gate screen DOM is built once — keep the back button in sync
     // with the current return target.
@@ -978,5 +1084,6 @@ function showEndgameGate(backFn) {
     _egRenderMapStash();
     _egRenderCurrencyStash();
     _egRenderGateLevelChip();
+    _egRenderGateTierStrip();
     _egClearTooltip();
 }

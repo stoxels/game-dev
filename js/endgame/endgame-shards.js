@@ -101,7 +101,7 @@ const EG_SHARD_DEFS = {
 // The epic-affecting shards (ascension / elevation / cataclysm) have the
 // highest scaling so stat-rich items yield better shards more often.
 const EG_SHARD_ROLL_TABLE = [
-    { id: 'shard_transmutation', weight: 400, statScale: 0.00 },
+    { id: 'shard_transmutation', weight: 220, statScale: 0.00 },
     { id: 'shard_alchemy',       weight: 200, statScale: 0.06 },
     { id: 'shard_chaos',         weight: 90,  statScale: 0.14 },
     { id: 'shard_bloom',         weight: 85,  statScale: 0.10 },

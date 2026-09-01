@@ -69,6 +69,13 @@ const EG_STAT_KEY_MAP = {
     shadow_resist: { bucket: 'shadowResist', mode: 'add' },
     arcane_resistance: { bucket: 'arcaneResistFlat', mode: 'add' },
 
+    // Unique-only: raise the resistance CAP for one element / all elements.
+    max_fire_res: { bucket: 'fireResistMax', mode: 'add' },
+    max_cold_res: { bucket: 'coldResistMax', mode: 'add' },
+    max_lightning_res: { bucket: 'lightningResistMax', mode: 'add' },
+    max_shadow_res: { bucket: 'shadowResistMax', mode: 'add' },
+    max_all_res: { bucket: 'allResMax', mode: 'add' },
+
     accuracy: { bucket: 'accuracy', mode: 'add' },
     mistake_count: { bucket: 'mistakeCount', mode: 'add' },
     focus: { bucket: 'focusPct', mode: 'add' },
@@ -554,6 +561,10 @@ function _egComputePlayerStats() {
         intelligence: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.int : 0,
         lifeRegen: 0, manaRegen: 0,
         fireResist: 0, coldResist: 0, lightningResist: 0, shadowResist: 0, arcaneResistFlat: 0,
+        // "Increased maximum Resistance" bonuses (uniques) — raise the per-
+        // element resistance cap above the base 75%. allResMax applies to all
+        // four elements at once.
+        fireResistMax: 0, coldResistMax: 0, lightningResistMax: 0, shadowResistMax: 0, allResMax: 0,
         accuracy: 0, mistakeCount: 0, focusPct: 0, mistakeNotCountPct: 0,
         revealHintPct: 0, chanceForNewQuestionPct: 0,
         critChance: 0, critMultiplierPct: 0,
@@ -1079,9 +1090,6 @@ function _egFormatStatValue(val) {
 const EG_STAT_LAYOUT = {
     offense: [
         { catKey: 'eg_statcat_attributes', buckets: ['strength', 'agility', 'intelligence'] },
-        { catKey: 'eg_statcat_damage', buckets: [
-            'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
-            'physIncPct', 'spellDamageFlat', 'spellDamageIncPct'] },
         { catKey: 'eg_statcat_crit', buckets: ['critChance', 'critMultiplierPct'] },
         // Melee auto-strike channel — independent from the projectile
         // channel above; fed only by the weapon slot (see _egComputePlayerStats)
@@ -1089,6 +1097,8 @@ const EG_STAT_LAYOUT = {
             'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
             'meleeLightningRange', 'meleeShadowRange'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
+            'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
+            'physIncPct', 'spellDamageFlat', 'spellDamageIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
@@ -1212,6 +1222,23 @@ function _egBuildStatLine(bucket, stats) {
                 ? _egGetDeflectDamagePct()
                 : ((typeof EG_DEFLECT_BASE_DMG_PCT !== 'undefined' ? EG_DEFLECT_BASE_DMG_PCT : 30) + (stats.deflectDamagePct || 0));
             line = { label: t('eg_stat_deflect_damage'), value: `${_egFormatStatValue(total)}%` };
+            break;
+        }
+
+        // Elemental resistances — shown as the CAPPED (effective) value;
+        // the uncapped gear total + the current cap are revealed on hover
+        // (see _egBuildStatDescTooltipHTML in endgame-hub.js). The cap is
+        // 75% base, raised by "increased maximum Resistance" uniques.
+        case 'fireResist': case 'coldResist': case 'lightningResist': case 'shadowResist': {
+            const total = stats[bucket] || 0;
+            if (!total && !(stats[bucket.replace('Resist', 'ResistMax')] || 0) && !stats.allResMax) return null;
+            const element = bucket.replace('Resist', '');
+            const cap = (typeof EG_RESIST_CAP_PCT !== 'undefined' ? EG_RESIST_CAP_PCT : 75)
+                + Math.max(0, (stats[element + 'ResistMax'] || 0) + (stats.allResMax || 0));
+            const shown = Math.min(Math.max(0, total), cap);
+            line = { label: EG_STAT_DISPLAY_LABELS[bucket].label, value: `${_egFormatStatValue(shown)}%` };
+            line.resTotal = Math.max(0, total);
+            line.resCap = cap;
             break;
         }
 

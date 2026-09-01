@@ -378,7 +378,7 @@ const REPLAY_GALLERY_ENTRIES = [
 // FUTURE STORYLINE — NEXUS ENDGAME & ATLAS (design notes, not yet implemented)
 // =============================================================================
 // Everything below is PLANNED narrative material for the post-campaign endgame
-// (Nexus of Worlds, Atlas of Worlds, 16 map tiers, pinnacle boss). Parked here
+// (Nexus of Worlds, Atlas of Statistica, 16 map tiers, pinnacle bosses). Parked here
 // as comments so we can pick this up later and turn it into real beats,
 // captions and translation keys. Nothing below affects runtime behavior.
 //
@@ -396,10 +396,11 @@ const REPLAY_GALLERY_ENTRIES = [
 //   guaranteed under probability, blamed probability itself, and seeded THE
 //   FINAL NULL into the Apex. He speaks to the player in the Null Hypothesis
 //   Void: "Every Stoxel you've cleared undoes centuries of careful work."
-// - Endgame systems already present: Nexus hub, Atlas of Worlds (45 regions,
-//   tiers 1-16), Probability Gate map device, bosses Entropy / Bayes /
-//   Laplace's Demon / The Null; atlas nodes "The Final Theorem" and
-//   "Vortex of Possibilities: Overload".
+// - Endgame systems already present: Nexus hub, Atlas of Statistica (86 regions
+//   on a two-continent map with linear corner paths, tiers 1-16), Probability
+//   Gate map device,
+//   bosses Entropy / Bayes / Laplace's Demon / The Null; atlas nodes "The Final
+//   Theorem" and "Vortex of Possibilities: Overload".
 //
 // OPEN THREADS ALREADY PLANTED IN THE CODE (to be paid off in endgame):
 // - Trix's backstory: the Warden (OLS Observatory, Regression Rift)

@@ -528,7 +528,8 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'first_step', value: 2, en: '+#s Monsters delay Charge-up after Spawning', de: '+#s Monster verzögern Angriffsladen nach Erscheinen' },
-            { key: 'lightning_damage_1', value: 6, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' }
+            { key: 'lightning_damage_1', value: 6, en: 'Adds # Lightning Damage to Attacks', de: 'Fügt Angriffen # Blitzschaden hinzu' },
+            { key: 'max_lightning_res', value: 8, en: '+#% to maximum Lightning Resistance', de: '+#% zu maximalem Blitzwiderstand' }
         ],
         downsides: [
             { key: 'lightning_resist', value: -32, en: '-#% to Lightning Resistance', de: '-#% Blitzwiderstand' }
@@ -628,13 +629,14 @@ const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'intelligence', value: 15, en: '+# to Intelligence', de: '+# zu Intelligenz' },
             { key: 'reveal_hint', value: 12, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
-            { key: 'fire_resist', value: 20, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' }
+            { key: 'fire_resist', value: 20, en: '+#% to Fire Resistance', de: '+#% Feuerwiderstand' },
+            { key: 'max_fire_res', value: 10, en: '+#% to maximum Fire Resistance', de: '+#% zu maximalem Feuerwiderstand' }
         ],
         downsides: [
             { key: 'flat_health', value: -72, en: '-# to maximum Health', de: '-# zu maximalem Leben' }
         ],
-        flavorEn: 'Proof left as exercise for the wearer.',
-        flavorDe: 'Der Beweis bleibt dem Träger als Übung überlassen.',
+        flavorEn: 'Proof left as exercise for the wearer. The furnace never wins.',
+        flavorDe: 'Der Beweis bleibt dem Träger als Übung überlassen. Der Ofen gewinnt nie.',
     },
 
     {
@@ -780,6 +782,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'cold_resist', value: 15, en: '+#% to Cold Resistance', de: '+#% Kältewiderstand' },
             { key: 'lightning_resist', value: 15, en: '+#% to Lightning Resistance', de: '+#% Blitzwiderstand' },
             { key: 'shadow_resist', value: 15, en: '+#% to Shadow Resistance', de: '+#% Schattenwiderstand' },
+            { key: 'max_all_res', value: 5, en: '+#% to maximum Fire, Cold, Lightning and Shadow Resistances', de: '+#% zu maximalem Feuer-, Kälte-, Blitz- und Schattenwiderstand' },
             { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
         downsides: [

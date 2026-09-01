@@ -379,9 +379,9 @@ function _egGetAncientOrbEligibleUniques(item) {
 //------------------------------------------------------------------------
 
 const EG_CURRENCY_DROP_TABLE = [
-    { id: 'orb_transmutation', weight: 400 },
+    { id: 'orb_transmutation', weight: 180 },
     { id: 'orb_augmentation', weight: 300 },
-    { id: 'orb_alteration', weight: 260 },
+    { id: 'orb_alteration', weight: 380 },
     { id: 'orb_scouring', weight: 200 },
     { id: 'orb_alchemy', weight: 220 },
     { id: 'orb_chance', weight: 110 },

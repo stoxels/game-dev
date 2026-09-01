@@ -6,6 +6,10 @@
 //     Path-of-Exile-style multiplier: full XP only while the monster is
 //     within a safe level range of the character; beyond that range
 //     (too high OR too low) XP falls off exponentially.
+//   - The curve is tuned for the current 86-region atlas at the intended
+//     modded playstyle (2/4/6 mods for T1-5/6-10/11-16): a one-time sweep
+//     of every region lands ~level 94, and 94→100 is a dedicated modded
+//     T16 farming grind (≈30 more runs) — see EG_LEVELING_CONFIG.
 //   - Each level grants attrPointsPerLevel (currently 5) attribute points
 //     spendable on Strength /
 //     Agility / Intelligence via the attribute window (✦ button in the
@@ -54,56 +58,74 @@ const EG_LEVELING_CONFIG = {
     maxLevel: 100,
 
     // XP curve: xpToLeave(level) = xpBase * level^xpExp + xpLinear * level.
-    // Tuned under the assumption that the player clears every Tier 1 and
-    // Tier 2 atlas region exactly ONCE (4×T1 + 4×T2 = 8 maps, 140 normal
-    // kills + ~2 bosses at mLvl 3/6). That one-time sweep should bring a
-    // fresh character from 1 → ~8 (white maps) / ~9 (rare maps with +XP
-    // mods) — so T1 stays optimal through all 4 T1 maps and T2 stays
-    // optimal through the T2 sweep, without outleveling the content.
-    // Higher tiers then continue smoothly to 100.
-    xpBase: 125,
-    xpExp: 1.82,
-    xpLinear: 75,
+    // Tuned against the CURRENT atlas (86 regions; tier monster levels
+    // 3..90; 15 / 20 / 15+8·tier kills per map plus 1 boss each) AND the
+    // intended MODDED playstyle: T1-5 maps with 2 mods (≈+18% XP), T6-10
+    // with 4 (≈+46%), T11-16 with 6 (≈+77%) — measured over the real mod
+    // tables (EG_MAP_MOD_REWARDS × EG_MAP_MOD_TABLES tier rolls).
+    // A one-time sweep — clearing every region of every tier exactly once,
+    // at that mod load — lands on these levels (next tier's monster level
+    // in brackets):
+    //   T1→5 [6] · T2→9 [10] · T3→13 [14] · T4→19 [19] · T5→24 [24]
+    //   T6→30 [30] · T7→36 [36] · T8→44 [43] · T9→49 [50] · T10→55 [57]
+    //   T11→62 [64] · T12→69 [71] · T13→76 [78] · T14→83 [84] · T15→92 [90]
+    //   T16→94 (late-wall grind takes over from here)
+    // So every sweep ends 0-3 levels around the NEXT tier's monster level —
+    // full XP on entry, PoE's "enter the new act slightly under-levelled"
+    // rhythm — and the full 86-map sweep finishes ~level 94. White (0-mod)
+    // players fall behind this ladder by ~15-20 levels in T11+ and close
+    // the gap by repeat-farming their current tier at full XP (1.5-2× the
+    // total run count) — the classic PoE carry-your-level loop.
+    xpBase: 158,
+    xpExp: 2.14,
+    xpLinear: 197,
 
     // Early-game catch-up discount: below earlyXpDiscountLevels the XP
     // requirement is scaled down, fading linearly to zero so the curve
-    // joins the base formula exactly at that level. Reduced from 0.5 to
-    // 0.28 — the old 50% discount made 1→4 take only 75+253+556 XP, so a
-    // single T1 map (15×84 XP) already gave level 4. New discount keeps
-    // early levels cheap but not trivial.
-    earlyXpDiscountLevels: 5,
-    earlyXpDiscountFactor: 0.28,
+    // joins the base formula exactly at that level. Keeps the four T1 maps
+    // (≈7k modded XP) a fast but not trivial 1→5.
+    earlyXpDiscountLevels: 6,
+    earlyXpDiscountFactor: 0.29,
 
     // Base XP per kill: xpPerKillBase + xpPerKillGrowth * mLevel^xpPerKillExp.
-    // Lowered from 18+12×m^1.55 so a T2 kill (≈175 XP) is not 2.5× a T1
-    // kill (≈69 XP) — the old gap made the first T2 map burst 1.5-2 levels.
-    // T16 kill stays strong (~10.7k) so 90-100 grind is still ~16% slower
-    // than before, not 40%+.
-    xpPerKillBase: 15,
-    xpPerKillGrowth: 10,
-    xpPerKillExp: 1.55,
+    // Reduced from 15+11.3×m^1.65 to absorb the NEW kill economy: monsters
+    // keep spawning until the boss arena is entered, so a typical map now
+    // yields ≈+40% more kills than its kill objective (players lingering for
+    // loot, kills flowing while the last puzzles are being solved). Per-kill
+    // XP scaled ×~0.72 (base 15→12, growth 11.3→8.5) so the sweep ladder is
+    // preserved: modded T16 map ≈ 4.3M XP (168 kills × +77% mods), and the
+    // sweep still lands T16→95 with ±1-level checkpoint fidelity.
+    xpPerKillBase: 12,
+    xpPerKillGrowth: 8.5,
+    xpPerKillExp: 1.65,
     bossXpMultiplier: 3.5,
 
-    // Late-game PoE-style exponent: beyond xpLateStart the requirement is
+    // Late-game PoE-style wall: beyond xpLateStart the requirement is
     // multiplied by 1 + xpLateScale * ((lvl - start)/(max-start))^xpLatePower.
-    // This keeps 1→85 identical to before but makes 90→100 brutally steep,
-    // mirroring Path of Exile's 90+ wall (90→91 ~2×, 95 ~7×, 99 ~17× of old).
-    // Tuned so T13 at 91 needs ~3 maps/level and T16 at 99 needs ~6-7 maps.
+    // 1→94 unchanged; from there it ramps hard. With the continuous-spawn
+    // kill economy (+40% kills/map) the wall reads: modded T16 maps per
+    // level 94 ≈ 2 · 96 ≈ 3 · 98 ≈ 5 · 99 ≈ 7 · 100 ≈ 10 — the 94→100
+    // climb still costs a solid pile of endgame runs.
     xpLateStart: 85,
-    xpLatePower: 3,
-    xpLateScale: 20,
+    xpLatePower: 3.8,
+    xpLateScale: 15.4,
 
     // PoE-style safe range: monsters up to
     //   (safeRangeBelowBase + floor(playerLevel / safeRangeBelowLevelsPer))
     // levels BELOW the character give full XP; monsters up to
-    // safeRangeAbove levels above do too. Outside the band the multiplier
-    // decays as ratio^penaltyExponent (never below minMultiplier).
-    // Narrowed vs PoE's 3+floor(lvl/16) and steepened 6→8 so farming
-    // -15 level content at 91 is ~0.28× instead of 0.41×, pushing players
-    // into T16 for efficient late XP (T16 stays ~0.92× at 99, still optimal).
+    // safeRangeAbove levels above do too (softened 3→5 toward PoE's
+    // "full XP from anything above you", so white-only players who fall
+    // behind the tier ladder can still catch up on repeat farms). Outside
+    // the band the multiplier decays as ratio^penaltyExponent (never below
+    // minMultiplier), which still blocks tier-skipping hard (a level-20
+    // character in a T16 map earns 0.01×).
+    // Narrowed below vs PoE's 3+floor(lvl/16) and steepened 6→8 so farming
+    // content 20 levels below you at 91 pays ~0.28× instead of 0.41×,
+    // pushing players into T16 for efficient late XP (T16 at mLvl 90
+    // stays ~full-XP through the late 90s, still optimal at 99 ≈ 0.92×).
     safeRangeBelowBase: 2,
     safeRangeBelowLevelsPer: 16,
-    safeRangeAbove: 3,
+    safeRangeAbove: 5,
     penaltyExponent: 8,
     minMultiplier: 0.01,
 
@@ -710,6 +732,8 @@ function _egRenderAttrWindow() {
     }).join('');
 
     box.innerHTML = `
+<button class="eg-attr-close" onclick="_egCloseAttributeWindow()"
+        title="${t('ui_close')}" aria-label="${t('ui_close')}">✕</button>
 <div class="eg-attr-title">${t('eg_lvl_window_title')}</div>
 <div class="eg-attr-level-line">
     <span class="eg-attr-level-num">${t('eg_lvl_short').replace('{n}', lvl)}</span>
@@ -795,6 +819,7 @@ function _egInjectLevelingStyles() {
 
 /* ── Attribute window ── */
 .eg-attr-box {
+    position: relative;
     background: #12121e;
     border: 2px solid #c8a84b;
     border-radius: 8px;
@@ -805,6 +830,18 @@ function _egInjectLevelingStyles() {
     overflow-y: auto;
     color: #ddd;
     font-family: var(--PX, monospace);
+}
+.eg-attr-close {
+    position: absolute; top: 8px; right: 8px;
+    width: 22px; height: 22px; padding: 0;
+    font-family: var(--PX, monospace); font-size: 10px; line-height: 1;
+    color: var(--accent2, #fff); background: transparent;
+    border: 1px solid var(--border2, #656f96); border-radius: 4px;
+    cursor: pointer; transition: all 0.12s;
+}
+.eg-attr-close:hover {
+    color: #ff6b6b; border-color: rgba(255,107,107,0.6);
+    background: rgba(255,107,107,0.12);
 }
 .eg-attr-title {
     text-align: center;
@@ -936,3 +973,15 @@ function _egInjectLevelingStyles() {
 // endgame-hub.js) so level requirements are enforced without visiting the hub.
 _egLoadLevelingState();
 _egInjectLevelingStyles();
+
+// Global Escape handler — closes the attribute window when open.
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const m = document.getElementById('eg-attr-modal');
+        if (m && m.classList.contains('show')) {
+            _egCloseAttributeWindow();
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+});

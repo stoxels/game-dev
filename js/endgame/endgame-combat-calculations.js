@@ -122,7 +122,17 @@ function _egCalcPlayerMeleeDamage() {
 //------------------------------------------------------------------------
 
 // Resistances (player and monster side) never reduce more than this share.
+// The player cap can be raised ABOVE this base by "increased maximum
+// Resistance" bonuses from unique items (see _egGetPlayerResistCap).
 const EG_RESIST_CAP_PCT = 75;
+
+// Effective resistance cap for one player element: base cap plus the
+// aggregated max-resist bonuses (per-element + the all-elements bucket).
+// Monsters have no max-resist sources — they are hard-capped at the base.
+function _egGetPlayerResistCap(stats, element) {
+    const extra = ((stats[element + 'ResistMax']) || 0) + ((stats.allResMax) || 0);
+    return EG_RESIST_CAP_PCT + Math.max(0, extra);
+}
 
 const EG_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
 
@@ -190,7 +200,9 @@ function _egCalcPlayerResistanceReduction(amount, stats, element) {
         lightning: (stats.lightningResist || 0) * resistMult,
         shadow: (stats.shadowResist || 0) * resistMult,
     };
-    const resPct = Math.min(EG_RESIST_CAP_PCT, Math.max(0, resMap[element] || 0));
+    const cap = (typeof _egGetPlayerResistCap === 'function')
+        ? _egGetPlayerResistCap(stats, element) : EG_RESIST_CAP_PCT;
+    const resPct = Math.min(cap, Math.max(0, resMap[element] || 0));
     let reduced = amount * (1 - resPct / 100);
     reduced = Math.max(0, reduced - Math.max(0, stats.arcaneResistFlat || 0));
     return reduced;

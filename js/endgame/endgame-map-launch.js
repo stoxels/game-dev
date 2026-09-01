@@ -38,8 +38,10 @@ const EG_TIER1_MAX_MONSTERS = 3;
 // tier 1 = 3, tier 2 = 3, tier 3 = 4, tier 4 = 5, tier 5+ = 6.
 const EG_LOW_TIER_MONSTER_STEPS = [0, 0, 1, 2];
 
-// Percent chance that a tier 2+ device map rolls a boss at all. Bosses are
-// optional from tier 2 onwards — never guaranteed, never on tier 1.
+// Legacy: percent chance that a device map rolled a boss at all (maps
+// created before the "every map ends in a boss fight" rule). Bosses are
+// now guaranteed in every map (see _egRollMapBossStatus) — the constant is
+// only kept for the tooltip's legacy-map fallback line.
 const EG_MAP_BASE_BOSS_CHANCE = 50;
 
 // Total non-boss kills required per tier — early tiers stay short so new
@@ -384,15 +386,17 @@ function _egMapLootRarityWeightMult() {
 // Expands a size mix { small, medium, large, massive } into an ordered
 // queue of bucket names: small puzzles come first, massive ones close out
 // the run. If mods raised the required puzzle count above the mix total,
-// random buckets top the queue up.
-function _egBuildSizeQueue(sizeMix, targetLen) {
+// buckets top the queue up — via `rng` (seeded) when a chain blueprint is
+// present, so extended chains stay deterministic per region.
+function _egBuildSizeQueue(sizeMix, targetLen, rng) {
+    const R = rng || Math.random;
     const buckets = ['small', 'medium', 'large', 'massive'];
     const queue = [];
     buckets.forEach(b => {
         for (let i = 0; i < (sizeMix && sizeMix[b] ? sizeMix[b] : 0); i++) queue.push(b);
     });
     while (queue.length < targetLen) {
-        queue.push(buckets[Math.floor(Math.random() * buckets.length)]);
+        queue.push(buckets[Math.floor(R() * buckets.length)]);
     }
     return queue;
 }
@@ -400,9 +404,16 @@ function _egBuildSizeQueue(sizeMix, targetLen) {
 // Derives the baseline run parameters purely from the map's tier, mirroring
 // the progression of the test-map hub (EG_TEST_MAPS). The rolled map mods
 // are applied on top by _egApplyModsToBaseline().
+// Atlas regions additionally contribute their deterministic chain blueprint
+// (fixed story/generated mix, generator flavour, fixed boss) — the same
+// region always plays the same chain.
 function _egRollMapRunBaseline(map) {
     const tier = Math.max(1, map.mapTier || 1);
     const imp = (map && map.implicits) ? map.implicits : null;
+
+    // Deterministic region blueprint (null for legacy maps without a region).
+    const blueprint = (typeof egAtlasChainBlueprintForMap === 'function')
+        ? egAtlasChainBlueprintForMap(map) : null;
 
     // Size mix: baked implicit on newer maps, otherwise derive from tier.
     const sizeMix = (imp && imp.sizeMix)
@@ -419,23 +430,41 @@ function _egRollMapRunBaseline(map) {
         totalMonsters: tier === 1 ? EG_TIER1_MAX_TOTAL_MONSTERS
             : tier === 2 ? EG_TIER2_MAX_TOTAL_MONSTERS
             : Math.min(120, 15 + tier * 8),
-        // Bosses are too much for tier 1 beginners. From tier 2 onwards a
-        // boss MAY appear (chance-based roll), but is never guaranteed.
-        hasBoss: tier >= 2 && Math.random() * 100 < EG_MAP_BASE_BOSS_CHANCE,
+        // Every device map ends in a boss fight: the boss arena opens once
+        // all other objectives (kills / puzzles / questions) are done.
+        hasBoss: true,
         maxBosses: 1,
-        requiredPuzzles: Math.min(12, 3 + Math.floor(tier / 3)),
-        requiredQuestions: 0,
+        // T16 is the ceiling: at most 6 puzzles + 4 questions; lower tiers
+        // ramp down smoothly (puzzles 2→6, questions 1→4 — see
+        // egMapBasePuzzlesForTier / egMapBaseQuestionsForTier in endgame-maps.js).
+        requiredPuzzles: (typeof egMapBasePuzzlesForTier === 'function')
+            ? egMapBasePuzzlesForTier(tier)
+            : Math.max(1, Math.min(6, 2 + Math.floor((tier - 1) * 4 / 15))),
+        requiredQuestions: (typeof egMapBaseQuestionsForTier === 'function')
+            ? egMapBaseQuestionsForTier(tier)
+            : Math.max(1, Math.min(4, 1 + Math.floor((tier - 1) / 5))),
+        // Time limit and mistake budget scale with the same objective ramp
+        // (early tiers get proportionally less; T16 ≈ 30:00 / 10 — see
+        // egMapBaseDurationForTier / egMapBaseMistakesForTier).
+        egTimeLimit: (typeof egMapBaseDurationForTier === 'function')
+            ? egMapBaseDurationForTier(tier)
+            : 900 + tier * 60,
+        egMaxMistakes: (typeof egMapBaseMistakesForTier === 'function')
+            ? egMapBaseMistakesForTier(tier)
+            : 10,
         // Device runs pull from BOTH pools: story levels AND freshly
         // generated puzzles (symbols / random structures). When a size
         // mix exists, each chain step consumes the next grid-size bucket.
+        // Regions with a blueprint also carry the fixed chain plan + seed:
+        // the chain then replays identically on every run of that region.
         puzzlePool: {
             generated: true,          // fallback when no size queue exists
-            genMode: 'mixed',         // 'symbol' | 'random' | 'mixed'
+            genMode: (blueprint && blueprint.genMode) ? blueprint.genMode : 'mixed',
             genTier: tier,
             sizeQueue: [],
+            plan: blueprint ? blueprint.stepSources : null,   // per-step 'gen' | 'story'
+            chainSeed: blueprint ? blueprint.chainSeed : null,
         },
-        egTimeLimit: 900 + tier * 60,
-        egMaxMistakes: 10,
     };
 
     // Newer maps carry pre-computed implicits — use them verbatim so the
@@ -452,7 +481,11 @@ function _egRollMapRunBaseline(map) {
         else if (base.maxBosses < 1) base.maxBosses = 1;
     }
 
-    base.puzzlePool.sizeQueue = _egBuildSizeQueue(sizeMix, base.requiredPuzzles);
+    // Queue top-ups (mod bonus beyond the mix total) are seeded from the
+    // blueprint too, so extended chains stay deterministic per region.
+    const queueTopRng = (blueprint && typeof egAtlasMakeRng === 'function')
+        ? egAtlasMakeRng((blueprint.chainSeed ^ 0x51ed270b) >>> 0) : null;
+    base.puzzlePool.sizeQueue = _egBuildSizeQueue(sizeMix, base.requiredPuzzles, queueTopRng);
 
     return base;
 }
@@ -574,7 +607,7 @@ function _egCleanupMapRunSeedLevel() {
     delete level.isMapRunSeed;
     delete level.isMonsterLevel;
     ['monsterLevel', 'maxMonsters', 'totalMonsters', 'hasBoss', 'maxBosses',
-     'requiredPuzzles', 'requiredQuestions', 'puzzlePool',
+     'bosses', 'requiredPuzzles', 'requiredQuestions', 'puzzlePool',
      'egTimeLimit', 'egMaxMistakes'].forEach(key => delete level[key]);
 }
 
@@ -615,6 +648,14 @@ function _egLaunchMapFromDevice(mapItem) {
     level.totalMonsters = baseline.totalMonsters;
     level.hasBoss = baseline.hasBoss;
     if (baseline.maxBosses > 1) level.maxBosses = baseline.maxBosses;
+    // Fixed region boss (atlas chain blueprint): every region has its own
+    // boss identity, fought in the arena at the end of the chain. Boss
+    // levels still scale with the run's monster level.
+    const launchBlueprint = (typeof egAtlasChainBlueprintForMap === 'function')
+        ? egAtlasChainBlueprintForMap(mapItem) : null;
+    if (launchBlueprint && launchBlueprint.bossId) {
+        level.bosses = [{ id: launchBlueprint.bossId }];
+    }
     level.requiredPuzzles = baseline.requiredPuzzles;
     if (baseline.requiredQuestions > 0) level.requiredQuestions = baseline.requiredQuestions;
     if (Object.keys(baseline.puzzlePool).length > 0) level.puzzlePool = baseline.puzzlePool;

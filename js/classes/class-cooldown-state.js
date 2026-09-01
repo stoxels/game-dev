@@ -444,23 +444,42 @@ function _abilityHotkeysBlocked() {
     return false;
 }
 
-// Handles a numeric key press (1–5) by toggling the corresponding ability slot.
+// Handles a key press bound to an ability slot (ability-1…ability-5, keys
+// 1–5 by default) by toggling the corresponding ability slot.
 function _handleAbilityKeyPress(key, e) {
-    const slotMap = { '1': 'active1', '2': 'active2', '3': 'active3', '4': 'active4', '5': 'active5' };
-    const slot = slotMap[key];
+    let slot = null;
+    if (typeof keybindKeyFor === 'function') {
+        for (let i = 1; i <= 5; i++) {
+            if (keybindKeyFor(`ability-${i}`) === key) {
+                slot = `active${i}`;
+                break;
+            }
+        }
+    } else {
+        const slotMap = { '1': 'active1', '2': 'active2', '3': 'active3', '4': 'active4', '5': 'active5' };
+        slot = slotMap[key] ?? null;
+    }
     if (slot) {
         e.preventDefault();
         toggleActiveAbility(slot);
     }
 }
 
-// Sets up keyboard shortcuts for ability activation (1–5) and Escape to disarm.
+// Sets up keyboard shortcuts for ability activation (ability-1…ability-5,
+// keys 1–5 by default) and Escape to disarm.
 // Registered once at file load time.
 function _initClassAbilityHotkeys() {
     document.addEventListener('keydown', (e) => {
         if (_abilityHotkeysBlocked()) return;
 
-        if (['1', '2', '3', '4', '5'].includes(e.key)) {
+        if (typeof keybindMatches === 'function') {
+            for (let i = 1; i <= 5; i++) {
+                if (keybindMatches(e, `ability-${i}`)) {
+                    _handleAbilityKeyPress(e.key, e);
+                    return;
+                }
+            }
+        } else if (['1', '2', '3', '4', '5'].includes(e.key)) {
             _handleAbilityKeyPress(e.key, e);
             return;
         }

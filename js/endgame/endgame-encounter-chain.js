@@ -242,13 +242,16 @@ function _egPickInterstitialWorldNum() {
 }
 
 // Triggers a bonus question immediately, without requiring the current puzzle to be completed.
-// Used when all monsters are killed but questions remain.
+// Used when all monsters are killed but questions remain. Also available when the
+// only remaining objectives are questions + boss defeat (boss arena is gated behind
+// questions, so without this the button would never show on boss maps).
 function _egTriggerQuestionNow() {
     if (!_egIsActive()) return;
     const req = _egGetMapRequirements();
     if (req.requiredQuestions === 0) return;
     if (_egQuestionsAnswered >= req.requiredQuestions) return;
     if (req.totalMonsters > 0 && _egChainKillCount < req.totalMonsters) return;
+    if (req.requiredPuzzles > 0 && _egChainPuzzleSolvedCount < req.requiredPuzzles) return;
 
     showToast(t('eg_trigger_question_toast'), '#7fb8ff');
     _egShowInterstitialQuestion(() => {
@@ -505,19 +508,30 @@ function _egEnterBossArena() {
     _egAdvanceBossArena();
 }
 
-// Picks a fresh small generated puzzle for a boss arena. Falls back to a
-// story puzzle constrained to the same size window.
+// Picks the puzzle for a boss arena. For atlas regions the arena board is
+// part of the region's blueprint: seeded from the chain seed + boss index,
+// so the same map always fights its boss on the same (comfortably sized,
+// never trivially small) grid. Boss puzzles stay small enough that the
+// fight stays readable — capped by EG_BOSS_ARENA_MAX_ROWS/COLS and floored
+// at EG_BOSS_ARENA_MIN_CELLS so the arena is never a trivial 1-liner.
+const EG_BOSS_ARENA_MIN_CELLS = 36;
+
 function _egFindBossArenaPuzzleGi() {
     const activeDef = _egMapDef || cur;
     const pool = (activeDef.puzzlePool && typeof activeDef.puzzlePool === 'object')
         ? activeDef.puzzlePool : {};
 
     if (typeof _egCreateGeneratedLevel === 'function') {
+        const rng = (pool.chainSeed != null && typeof egAtlasMakeRng === 'function')
+            ? egAtlasMakeRng((((pool.chainSeed ^ 0x9E3779B9) >>> 0) + (_egBossKilledCount * 7919)) >>> 0)
+            : null;
         const gi = _egCreateGeneratedLevel({
             mode: pool.genMode || 'mixed',
             tier: pool.genTier || 1,
             maxRows: EG_BOSS_ARENA_MAX_ROWS,
             maxCols: EG_BOSS_ARENA_MAX_COLS,
+            minCells: EG_BOSS_ARENA_MIN_CELLS,
+            rng,
         });
         if (gi !== null) {
             _egTrackChainRecentGi(gi);
@@ -691,8 +705,11 @@ function _egBuildChainPool(criteria) {
     return pool;
 }
 
-function _egPickFromPool(pool, recentWindow) {
-    const picked = pool[Math.floor(Math.random() * pool.length)];
+// Picks from the pool; an optional seeded PRNG (chain blueprints) makes
+// the pick deterministic for a given pool state.
+function _egPickFromPool(pool, recentWindow, rng) {
+    const R = rng || Math.random;
+    const picked = pool[Math.floor(R() * pool.length)];
     _egChainRecentGis.push(picked.gIdx);
     if (_egChainRecentGis.length > (recentWindow || 8)) _egChainRecentGis.shift();
     return picked.gIdx;
@@ -707,7 +724,8 @@ function _egTrackChainRecentGi(gi, recentWindow) {
 
 // Picks from the story pool honouring the given criteria; relaxes pure
 // size filters when nothing qualifies so the chain never stalls.
-function _egPickStoryChainPuzzleGi(criteria) {
+// `rng` (optional seeded PRNG) makes the pick deterministic.
+function _egPickStoryChainPuzzleGi(criteria, rng) {
     let pool = _egBuildChainPool(criteria);
 
     if (pool.length === 0 && (criteria.minCells != null || criteria.maxCells != null)) {
@@ -715,14 +733,31 @@ function _egPickStoryChainPuzzleGi(criteria) {
     }
 
     if (pool.length === 0) return null;
-    return _egPickFromPool(pool, criteria.recentWindow);
+    return _egPickFromPool(pool, criteria.recentWindow, rng);
 }
 
-// Picks one puzzle for a map run, mixing BOTH sources:
-//   story levels (filtered by the current criteria) and freshly generated
-//   puzzles (symbols / random structures). When the map carries a size
-//   mix queue, each pull consumes the next grid-size bucket — small
-//   puzzles come first, massive ones close out the run.
+// Clones the chain criteria with a grid-size bucket's cell window applied.
+function _egBucketCriteria(criteria, bucket) {
+    const range = (typeof EG_GRID_SIZE_BUCKETS !== 'undefined')
+        ? EG_GRID_SIZE_BUCKETS[bucket] : null;
+    const c = { ...criteria };
+    if (range) {
+        c.minCells = Math.max(criteria.minCells || 0, range[0]);
+        c.maxCells = range[1] === Infinity ? null : range[1];
+    }
+    return c;
+}
+
+// Picks one puzzle for a map run. Two modes:
+//   ── Blueprint pull (atlas regions) ── the region's chain blueprint fixes
+//      every step in advance (same map → same chain, every run): the plan
+//      entry decides generated puzzle vs story level, the size queue (from
+//      the region's grid mix) fixes the grid size, and the generated grid
+//      itself is seeded from the blueprint, so the whole run is
+//      deterministic. Modifiers only extend the chain, they never
+//      reshuffle it.
+//   ── Legacy pull (no blueprint) ── the old random behaviour: 50/50 coin
+//      flip between generated and story per step.
 function _egPickMapRunPuzzleGi(criteria) {
     const canGenerate = typeof _egCreateGeneratedLevel === 'function';
     const generate = opts => {
@@ -730,19 +765,61 @@ function _egPickMapRunPuzzleGi(criteria) {
         return _egCreateGeneratedLevel(opts);
     };
 
-    // ── Bucketed pull (maps with a sizeMix implicit) ────────────────
+    const plan = Array.isArray(criteria.plan) ? criteria.plan : [];
+    const hasBlueprint = plan.length > 0 && criteria.chainSeed != null;
+
+    // ── Deterministic blueprint pull ──────────────────────────────────
+    if (hasBlueprint) {
+        criteria._planIdx = criteria._planIdx || 0;
+        const stepIdx = criteria._planIdx++;
+        const source = plan[stepIdx % plan.length] || 'gen';
+
+        // Grid-size bucket for this step (region's size mix, consumed in
+        // order — same queue every run of this region).
+        const queue = Array.isArray(criteria.sizeQueue) ? criteria.sizeQueue : [];
+        const bucket = queue.length > 0 ? queue.shift() : null;
+        const stepCriteria = bucket ? _egBucketCriteria(criteria, bucket) : criteria;
+
+        const genRng = (typeof egAtlasMakeRng === 'function')
+            ? egAtlasMakeRng((criteria.chainSeed + stepIdx * 7919) >>> 0) : null;
+        const storyRng = (typeof egAtlasMakeRng === 'function')
+            ? egAtlasMakeRng((criteria.chainSeed + stepIdx * 104729 + 17) >>> 0) : null;
+
+        if (source === 'gen') {
+            const gi = generate({
+                mode: criteria.genMode,
+                tier: criteria.genTier,
+                minCells: stepCriteria.minCells,
+                bucket,
+                rng: genRng,
+            });
+            if (gi !== null) { _egTrackChainRecentGi(gi, criteria.recentWindow); return gi; }
+        }
+
+        const storyGi = _egPickStoryChainPuzzleGi(stepCriteria, storyRng);
+        if (storyGi !== null) return storyGi;
+
+        if (source === 'story') {
+            const gi = generate({
+                mode: criteria.genMode,
+                tier: criteria.genTier,
+                minCells: stepCriteria.minCells,
+                bucket,
+                rng: genRng,
+            });
+            if (gi !== null) { _egTrackChainRecentGi(gi, criteria.recentWindow); return gi; }
+        }
+
+        // Neither source satisfied this step — take any puzzle instead.
+        console.warn('EG chain: blueprint step unsatisfiable, using any puzzle:', source, bucket);
+        return _egPickStoryChainPuzzleGi(criteria, storyRng);
+    }
+
+    // ── Legacy random pull (no size mix / no blueprint) ──────────────
     const queue = Array.isArray(criteria.sizeQueue) ? criteria.sizeQueue : [];
     if (queue.length > 0) {
         const bucket = queue.shift();   // consumed — shrinks as the run progresses
-        const range = (typeof EG_GRID_SIZE_BUCKETS !== 'undefined')
-            ? EG_GRID_SIZE_BUCKETS[bucket] : null;
-
-        // Story criteria clone constrained to this bucket's cell window
-        const bucketCriteria = { ...criteria };
-        if (range) {
-            bucketCriteria.minCells = Math.max(criteria.minCells || 0, range[0]);
-            bucketCriteria.maxCells = range[1] === Infinity ? null : range[1];
-        }
+        const bucketCriteria = _egBucketCriteria(criteria, bucket);
 
         // Coin flip which source leads; the other one is the fallback.
         const genFirst = Math.random() < 0.5;
@@ -765,7 +842,6 @@ function _egPickMapRunPuzzleGi(criteria) {
         return _egPickStoryChainPuzzleGi(criteria);
     }
 
-    // ── Legacy pull (no size mix): old behaviour ────────────────────
     if (criteria.generated) {
         const gi = generate({
             mode: criteria.genMode,
@@ -850,6 +926,17 @@ function _egRollBonusMapLoot() {
         // on the chip + "Bonus Loot" line in its tooltip) as the bonus item.
         item.isBonusLoot = true;
 
+        // ── Loot filter ── bonus loot obeys the same auto-vendor rules as
+        // normal pickups: rule-matching items are destroyed for a rolled
+        // shard (mirrored into the summary's runes & orbs row by the filter)
+        // and never reach the run loot bag. A filter failure keeps the item
+        // (defensive — same policy as the pickup claim hook).
+        if (typeof _egLootFilterAutoVendor === 'function') {
+            let vendored = false;
+            try { vendored = _egLootFilterAutoVendor(item); } catch (e) { vendored = false; }
+            if (vendored) continue;
+        }
+
         _egRunLoot.push(item);
         showToast(t('eg_bonus_loot')
             .replace('{icon}', item.icon || '')
@@ -859,7 +946,7 @@ function _egRollBonusMapLoot() {
 
 // Grants the active map's rolled completion reward (2–10× one higher-grade
 // orb or essence). Adds it to the real currency/essence stash AND to
-// _egRunCurrency so it shows up in the runes & orbs section of the
+// _egRunCurrency / _egRunEssences so it shows up in the correct section of the
 // leave-map transition screen. Must run BEFORE _egShowLeaveMapTransition()
 // renders the summary and before cleanup clears _egActiveMapItem /
 // _egRunCurrency.
@@ -878,10 +965,13 @@ function _egGrantMapCompletionReward() {
         : egAddCurrency(def.id, reward.count, def);
     if (!added) showToast(t('eg_map_stash_full'));
 
-    // Mirror into the transition screen's currency list (aggregated by id).
-    const existing = _egRunCurrency.find(e => e.id === def.id);
+    // Mirror into the transition screen's list (aggregated by id).
+    // Essences must go to the essence section, orbs/shards to the orbs section.
+    const isEssenceReward = def.category === 'essence' || (def.id && def.id.indexOf('essence_') === 0);
+    const targetList = isEssenceReward ? _egRunEssences : _egRunCurrency;
+    const existing = targetList.find(e => e.id === def.id);
     if (existing) existing.count += reward.count;
-    else _egRunCurrency.push({
+    else targetList.push({
         id: def.id,
         name: def.name,
         icon: def.icon,
@@ -1108,22 +1198,28 @@ function _egUpdateObjectivesHUD() {
 
     const canLeave = _egCanLeaveMap();
     const othersDone = _egNonBossObjectivesComplete();
-    const monstersDone = req.totalMonsters > 0 && _egChainKillCount >= req.totalMonsters;
+    const monstersDone = req.totalMonsters === 0 || _egChainKillCount >= req.totalMonsters;
+    const puzzlesDone = req.requiredPuzzles === 0 || _egChainPuzzleSolvedCount >= req.requiredPuzzles;
     const questionsRemain = req.requiredQuestions > 0 && _egQuestionsAnswered < req.requiredQuestions;
+    const nonQuestionObjectivesDone = monstersDone && puzzlesDone;
 
     // Action button logic — top-center, only when actionable:
     //   boss map + non-boss done + not in arena → Enter Boss Arena
     //   all objectives done                       → Complete Map (highlighted)
-    //   monsters done + questions remain          → Trigger Question
+    //   non-question objectives done + questions remain → Trigger Question
+    //     (also on boss maps when only questions + boss remain, since the
+    //      boss arena is gated behind questions and would otherwise never show)
     //   otherwise                                 → no button (just the line)
     let actionHTML = '';
     if (req.hasBoss && !_egBossDefeated()) {
         if (!_egBossPhaseActive && othersDone) {
             actionHTML = `<button class="eg-obj-action-btn eg-obj-action-boss" onclick="_egEnterBossArena()">${t('eg_enter_boss_arena')}</button>`;
+        } else if (questionsRemain && nonQuestionObjectivesDone) {
+            actionHTML = `<button class="eg-obj-action-btn eg-obj-action-question" onclick="_egTriggerQuestionNow()">${t('eg_trigger_question')}</button>`;
         }
     } else if (canLeave) {
         actionHTML = `<button class="eg-obj-action-btn eg-obj-action-complete" onclick="_egTryLeaveMap()">${t('eg_complete_map')}</button>`;
-    } else if (monstersDone && questionsRemain) {
+    } else if (questionsRemain && nonQuestionObjectivesDone) {
         actionHTML = `<button class="eg-obj-action-btn eg-obj-action-question" onclick="_egTriggerQuestionNow()">${t('eg_trigger_question')}</button>`;
     }
 
@@ -1336,7 +1432,10 @@ function _egChainCleanup() {
 // Builds the summary rows (equipment loot + regular items + maps + currency + essences + gold).
 // Reads the passed-in snapshots — must be called while _egRunLoot /
 // _egRunItems / _egRunMaps / _egRunCurrency / _egRunEssences still hold the run's data.
-function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, essences, gold = 0, includeSellHint = true) {
+// Note: since the loot filter auto-vendors rule-matching drops (including
+// bonus loot) at pickup, manual Ctrl+click selling was removed from this
+// summary — unwanted gear is already converted to shards during the run.
+function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, essences, gold = 0) {
     const lootHTML = loot.map((item, i) => `
         <div class="eg-leave-summary-chip eg-loot-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
             ${EG_ART.html('item', item.baseId, item.icon || '📦')}
@@ -1375,7 +1474,6 @@ function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, essences, gold
         <div class="eg-leave-summary-section">
             <div class="eg-leave-summary-title">${t('eg_loot_acquired').replace('{n}', loot.length)}</div>
             <div class="eg-leave-summary-row">${lootHTML || `<span class="eg-leave-summary-empty">${t('eg_no_loot_yet')}</span>`}</div>
-            ${includeSellHint ? `<div class="eg-leave-summary-hint">${t('eg_leave_sell_hint')}</div>` : ''}
         </div>
         <div class="eg-leave-summary-section">
             <div class="eg-leave-summary-title">${t('eg_items_acquired').replace('{n}', items.length)}</div>
@@ -1472,164 +1570,6 @@ function _egLeaveRarityLabel(rarity) {
         : rarity.charAt(0).toUpperCase() + rarity.slice(1);
 }
 
-// Ctrl + left-click on an equipment chip inside the leave-map overlay sells
-// the item instantly: it is removed from the run loot (and from the stash if
-// the flush already placed it there) and grants one rolled orb shard, which
-// appears both in the overlay's runes &amp; orbs row and in the real currency
-// stash. Returns true when the item was sold.
-function _egSellRunLootChip(item, state) {
-    if (!item) return false;
-
-    // Remove from the live run loot so _egFlushRunLootToStash skips it.
-    const liveIdx = Array.isArray(_egRunLoot) ? _egRunLoot.indexOf(item) : -1;
-    if (liveIdx !== -1) _egRunLoot.splice(liveIdx, 1);
-
-    // If the flush already ran, remove the item from the stash by identity.
-    let removedFromStash = false;
-    const _searchRows = (typeof _egGetInvRows === 'function') ? _egGetInvRows() : _egInventory.length;
-    for (let r = 0; r < _searchRows && !removedFromStash; r++) {
-        for (let c = 0; c < EG_INV_COLS && !removedFromStash; c++) {
-            if (_egInventory[r][c] === item) {
-                _egInventory[r][c] = null;
-                if (typeof _egRenderInventoryCell === 'function') _egRenderInventoryCell(r, c);
-                removedFromStash = true;
-            }
-        }
-    }
-    if (removedFromStash && typeof _egUpdateInvCount === 'function') _egUpdateInvCount();
-
-    // Free starter gear has no sell value: removed without granting a shard.
-    if (item.noSellValue) {
-        const idx0 = state.loot.indexOf(item);
-        if (idx0 !== -1) state.loot.splice(idx0, 1);
-
-        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-            Audio_Manager.playSFX('player_equip_pickup');
-        }
-        showToast(t('eg_sell_item_no_value').replace('{name}', item.name || '???'));
-
-        if (typeof egSaveHubState === 'function') egSaveHubState();
-        return true;
-    }
-
-    // Roll and grant the shard (goes straight into the currency stash).
-    // Unique items always grant an Ancient Shard.
-    const shardDef = (item.isUnique && typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS.shard_ancient)
-        ? EG_SHARD_DEFS.shard_ancient
-        : _egRollShardForItem(item);
-    const granted = egAddShard(shardDef.id, 1);
-
-    // Mirror the gain into the overlay's currency list (aggregated by id).
-    const existing = state.currency.find(e => e.id === shardDef.id);
-    if (existing) existing.count = (existing.count || 1) + 1;
-    else state.currency.push({
-        id: shardDef.id,
-        name: shardDef.name,
-        icon: shardDef.icon,
-        description: shardDef.description,
-        count: 1,
-    });
-
-    // Remove the sold item from the overlay's loot snapshot.
-    const idx = state.loot.indexOf(item);
-    if (idx !== -1) state.loot.splice(idx, 1);
-
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('player_equip_pickup');
-    }
-    showToast(t('eg_sell_item_sold')
-        .replace('{name}', item.name || '???')
-        .replace('{icon}', shardDef.icon)
-        .replace('{shard}', shardDef.name));
-
-    // Persist the sale immediately — egSaveHubState() already ran in
-    // _egEndMap before the player had a chance to interact with this overlay.
-    if (typeof egSaveHubState === 'function') egSaveHubState();
-
-    if (!granted) showToast(t('eg_map_stash_full'));
-    return true;
-}
-
-// Ctrl + left-click on a map chip inside the leave-map overlay sells the
-// map instantly: it is removed from the run maps (and from the map stash
-// if the flush already placed it there) and grants one Horizon Fragment,
-// which appears both in the overlay's runes &amp; orbs row and in the real
-// currency stash. Returns true when the map was sold.
-function _egSellRunMapChip(map, state) {
-    if (!map) return false;
-
-    // Remove from the live run maps so _egFlushRunLootToStash skips it.
-    const liveIdx = Array.isArray(_egRunMaps) ? _egRunMaps.indexOf(map) : -1;
-    if (liveIdx !== -1) _egRunMaps.splice(liveIdx, 1);
-
-    // If the flush already ran, remove the map from the map stash by identity (tiered).
-    let removedFromStash = false;
-    try {
-        if (typeof _egIsTieredMapStash === 'function' && _egIsTieredMapStash(_egMapStash)) {
-            for (let ti = 0; ti < _egMapStash.length && !removedFromStash; ti++) {
-                const tierGrid = _egMapStash[ti];
-                for (let r = 0; r < tierGrid.length && !removedFromStash; r++) {
-                    for (let c = 0; c < EG_MAP_STASH_COLS && !removedFromStash; c++) {
-                        if (tierGrid[r][c] === map) {
-                            tierGrid[r][c] = null;
-                            // only re-render if this tier is active
-                            if (ti === (_egMapTierToIndex(map.mapTier||1)) || ti === _egMapTierToIndex(_egMapStashActiveTier||1)) {
-                                if (typeof _egRenderMapStashCell === 'function') _egRenderMapStashCell(r, c);
-                            }
-                            if (typeof _egUpdateMapStashTabCounts === 'function') _egUpdateMapStashTabCounts();
-                            removedFromStash = true;
-                        }
-                    }
-                }
-            }
-        } else {
-            for (let r = 0; r < EG_MAP_STASH_ROWS && !removedFromStash; r++) {
-                for (let c = 0; c < EG_MAP_STASH_COLS && !removedFromStash; c++) {
-                    if (_egMapStash[r][c] === map) {
-                        _egMapStash[r][c] = null;
-                        if (typeof _egRenderMapStashCell === 'function') _egRenderMapStashCell(r, c);
-                        removedFromStash = true;
-                    }
-                }
-            }
-        }
-    } catch(e) {}
-
-    // Grant one Horizon Fragment (goes straight into the currency stash).
-    const shardDef = EG_SHARD_DEFS.shard_horizon;
-    const granted = egAddShard(shardDef.id, 1);
-
-    // Mirror the gain into the overlay's currency list (aggregated by id).
-    const existing = state.currency.find(e => e.id === shardDef.id);
-    if (existing) existing.count = (existing.count || 1) + 1;
-    else state.currency.push({
-        id: shardDef.id,
-        name: shardDef.name,
-        icon: shardDef.icon,
-        description: shardDef.description,
-        count: 1,
-    });
-
-    // Remove the sold map from the overlay's snapshot.
-    const idx = state.maps.indexOf(map);
-    if (idx !== -1) state.maps.splice(idx, 1);
-
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('player_equip_pickup');
-    }
-    showToast(t('eg_sell_item_sold')
-        .replace('{name}', map.name || '???')
-        .replace('{icon}', shardDef.icon)
-        .replace('{shard}', shardDef.name));
-
-    // Persist the sale immediately — egSaveHubState() already ran in
-    // _egEndMap before the player had a chance to interact with this overlay.
-    if (typeof egSaveHubState === 'function') egSaveHubState();
-
-    if (!granted) showToast(t('eg_map_stash_full'));
-    return true;
-}
-
 // Builds the tooltip body for a single summary chip (loot / item / map /
 // currency) from its data-loot-idx / data-item-idx / data-map-idx /
 // data-currency-idx attribute. Shared by the leave-map overlay and the
@@ -1661,7 +1601,8 @@ function _egBuildLeaveChipTooltipHTML(chip, state) {
 }
 
 // Wires loot / item / currency chips to the global floating tooltip engine
-// (tooltips-hud.js) plus the ctrl+click sell interaction for loot chips.
+// (tooltips-hud.js). Read-only: the loot filter auto-vendors rule-matching
+// gear during the run, so there is no manual selling on this summary.
 // The engine renders into a position:fixed element on document.body, so
 // tooltips are never clipped by the panel's overflow-y. Listeners live on
 // the panel (delegation), so re-rendering the summary rows is safe.
@@ -1684,29 +1625,6 @@ function _egWireLeaveMapSummaryTooltips(panel, state) {
     });
     panel.addEventListener('mouseout', (e) => {
         if (e.target.closest('.eg-leave-summary-chip')) hideGameTooltip();
-    });
-
-    // Ctrl + left-click on an equipment loot chip → instant sell (random
-    // orb shard). Ctrl + left-click on a map chip → instant sell for a
-    // Horizon Fragment.
-    panel.addEventListener('mousedown', (e) => {
-        if (!e.ctrlKey || e.button !== 0) return;
-        const chip = e.target.closest('.eg-loot-chip, .eg-map-pickup-chip');
-        if (!chip) return;
-        e.preventDefault();
-        e.stopImmediatePropagation();
-
-        if ('mapIdx' in chip.dataset) {
-            const map = state.maps[+chip.dataset.mapIdx];
-            if (!map) return;
-            _egSellRunMapChip(map, state);
-        } else {
-            const item = state.loot[+chip.dataset.lootIdx];
-            if (!item) return;
-            _egSellRunLootChip(item, state);
-        }
-        hideGameTooltip();
-        state.render();
     });
 }
 
@@ -1732,7 +1650,7 @@ function _egRenderPauseLootSummary() {
         gold: 0,
     };
 
-    container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold, false);
+    container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold);
 
     // Read-only tooltip wiring (mouseover/mousemove/mouseout only). Assigned
     // as on* properties so repeated pauses never stack duplicate listeners.
@@ -1768,9 +1686,7 @@ function _egShowLeaveMapTransition(atlasResult, opts) {
         el.id = 'eg-leave-map-transition';
         el.className = 'eg-leave-map-transition';
         document.body.appendChild(el);
-    }
-
-    // Gold badge when this run cleared the region on the Atlas of Worlds
+    }     // Gold badge when this run cleared the region on the Atlas of Statistica
     // for the very first time (win path only).
     const isFirstClear = !failed && !!(atlasResult && atlasResult.firstClear && atlasResult.node);
     let firstClearHTML = '';
@@ -1826,14 +1742,9 @@ function _egShowLeaveMapTransition(atlasResult, opts) {
 
     const panel = el.querySelector('.eg-leave-map-panel') || el;
     const container = document.getElementById('eg-leave-summary-container');
-    const includeSellHint = !failed; // Only show sell hint on successful completions
-    const render = () => {
-        if (container) {
-            container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold, includeSellHint);
-        }
-    };
-    state.render = render;
-    render();
+    if (container) {
+        container.innerHTML = _egBuildLeaveMapSummaryHTML(state.loot, state.items, state.maps, state.currency, state.essences, state.gold);
+    }
 
     _egWireLeaveMapSummaryTooltips(panel, state);
 

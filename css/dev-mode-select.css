@@ -3,6 +3,13 @@
    Remove this whole file once Adventure Mode replaces the map.
    ============================================================ */
 
+.dms-back {
+    position: absolute;
+    top: 1.5%;
+    left: 1.5%;
+    z-index: 10;
+}
+
 .dms-wrap {
     display: flex;
     flex-direction: column;

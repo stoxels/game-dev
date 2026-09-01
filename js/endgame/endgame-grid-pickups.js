@@ -1009,13 +1009,27 @@ function _egCheckLootClaim(row, col) {
     _egRemoveLootOverlay(key);
     _egAnimateLootClaim(row, col, item);
 
+    // ── Loot filter: auto-vendor non-matching equipment at pickup ──
+    // If the filter is enabled and the item matches no keep rule, it is
+    // destroyed for a rolled shard right here (Ctrl+click behaviour) and
+    // never reaches the run loot bag or the stash.
+    if (typeof _egLootFilterAutoVendor === 'function') {
+        try {
+            if (_egLootFilterAutoVendor(item)) {
+                _egUpdateObjectivesHUD();
+                return true;
+            }
+        } catch (e) { /* filter failure must never block a normal pickup */ }
+    }
+
     _egRunLoot.push(item);
     _egUpdateObjectivesHUD();
 
     Audio_Manager.playSFX('player_equip_pickup');
 
-    const nameSuffix = (item.category === 'equip' && Number.isFinite(item.itemLevel))
-        ? ` [${item.itemLevel}]`
+    const requiredLevel = item.requirements && item.requirements.level;
+    const nameSuffix = (item.category === 'equip' && Number.isFinite(requiredLevel))
+        ? ` [${requiredLevel}]`
         : '';
     showToast(t('eg_loot_claimed')
         .replace('{icon}', item.isUnique ? '✨' : (item.icon || ''))

@@ -1,19 +1,30 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //-------------------ENDGAME ATLAS SCREEN---------------------------------
 //------------------------------------------------------------------------
-// PoE-style atlas overview screen:
-//   - One column per map tier (1..16), regions rendered as nodes
-//   - SVG connection lines between linked regions
-//   - Node states: completed (gold ✔) / available (lit) / locked (dim)
-//   - Hover tooltip per node, click for a details panel at the bottom
-//   - Header shows atlas completion progress and highest cleared tier
+// PoE-style atlas overview, presented like a classic WoW atlas dialog
+// (faithful to the original Lua "Atlas of Azeroth" addon):
+//   - Regions are SMALL SQUARE NODES with the tier numeral (I..XVI) inside
+//   - The region name floats ABOVE the node, coloured by rarity band
+//     (game rarity palette): tiers I–V uncommon green · VI–X rare blue ·
+//     XI–XVI epic purple
+//   - Each region requires its band's difficulty to clear (Easy / Normal /
+//     Hard); runs finished on another difficulty do not count as completed
+//     (the requirement is shown on map item tooltips, not on the nodes)
+//   - Connections are thin DOTTED GREY LINES (gold once the region is done)
+//   - Two mirrored continents: each of the four tier-1 corner regions
+//     starts a linear path winding inward to the four tier-16 pinnacles
+//   - Node states: ✔ completed (gold) · ? available (gold, quest-style) ·
+//     locked (dimmed)
+//   - Bottom-left of every node: number of matching maps in the map stash
+//   - Search box (top right): matching regions glow blue (pulsing node
+//     frame + brightened name), including locked ones; matches by region
+//     name and by tier numeral / number (e.g. 'XV' or '15')
 //
 // Entry point: showEndgameAtlas() — opens from the Probability Gate
 // topbar button and from the Nexus of Worlds door.
-// Back navigation returns to the Probability Gate (the map device hub).
 //
 // Dependencies (must be loaded before this file):
-//   endgame-atlas.js — EG_ATLAS_NODES / status helpers
+//   endgame-atlas.js — EG_ATLAS_NODES (x, y) / status helpers
 //   screens.js       — switchScreen()
 //------------------------------------------------------------------------
 
@@ -22,32 +33,69 @@
 //-------------------LAYOUT CONSTANTS-------------------------------------
 //------------------------------------------------------------------------
 
-const EG_ATLAS_COL_W = 134;   // horizontal distance between tiers
-const EG_ATLAS_ROW_H = 108;   // vertical distance between slots
-const EG_ATLAS_PAD_X = 70;
-const EG_ATLAS_PAD_Y = 46;
-const EG_ATLAS_NODE_W = 112;
-const EG_ATLAS_NODE_H = 78;
+// The atlas canvas is a fixed-size stage sized like the classic dialog
+// (~1500×850). Node positions come straight from the atlas data
+// (EG_ATLAS_TIER_POSITIONS offsets around the centre).
+const EG_ATLAS_CANVAS_W = 1440;
+const EG_ATLAS_CANVAS_H = 820;
+const EG_ATLAS_CX = EG_ATLAS_CANVAS_W / 2;
+const EG_ATLAS_CY = EG_ATLAS_CANVAS_H / 2;
+const EG_ATLAS_LABEL_H = 15;        // reserved space above a node for its name
 
 // Name of the global function the BACK button calls — set by
 // showEndgameAtlas(backFn). Defaults to the Probability Gate.
 let _egAtlasBackFn = 'showEndgameGate';
 
 let _egAtlasSelectedNodeId = null;
+let _egAtlasSearchQuery = '';
+let _egAtlasStashCounts = {};
 
-
-function _egAtlasNodeX(node) {
-    return EG_ATLAS_PAD_X + (node.tier - 1) * EG_ATLAS_COL_W;
-}
-
-function _egAtlasNodeY(node) {
-    return EG_ATLAS_PAD_Y + node.slot * EG_ATLAS_ROW_H;
-}
+// View state: the atlas scales to fit the window by default and can be
+// zoomed (mouse wheel / controls) and panned (mouse drag) freely.
+let _egAtlasZoom = 1;
+let _egAtlasZoomIsFit = true;
+const EG_ATLAS_ZOOM_MIN = 0.35;
+const EG_ATLAS_ZOOM_MAX = 3;
 
 
 //------------------------------------------------------------------------
 //-------------------HTML HELPERS-----------------------------------------
 //------------------------------------------------------------------------
+
+// Centre position of a node on the atlas canvas.
+function _egAtlasNodeCenter(node) {
+    return {
+        x: EG_ATLAS_CX + (node.x || 0),
+        y: EG_ATLAS_CY + (node.y || 0),
+    };
+}
+
+// Node squares are small, like the classic atlas.
+function _egAtlasNodeSize(tier) {
+    if (tier >= EG_ATLAS_MAX_TIER) return { w: 38, h: 38 }; // pinnacle
+    return { w: 30, h: 30 };
+}
+
+// Rarity band colour, straight from the game's rarity palette
+// (RARITY_COLOR_MAP in items.js):
+//   tiers I–V   uncommon  #2ecc71 (green)
+//   tiers VI–X  rare      #3498db (blue)
+//   tiers XI–XVI epic     #c39bd3 (purple)
+function _egAtlasTierGroupColor(tier) {
+    if (tier <= 5) return '#2ecc71';   // uncommon
+    if (tier <= 10) return '#3498db';  // rare
+    return '#c39bd3';                  // epic
+}
+
+
+
+// Roman numerals for the tier inside the node square.
+function _egAtlasRoman(tier) {
+    const romans = (typeof EG_MAP_TIER_ROMANS !== 'undefined' && EG_MAP_TIER_ROMANS.length === EG_ATLAS_MAX_TIER)
+        ? EG_MAP_TIER_ROMANS
+        : ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI'];
+    return romans[tier - 1] || String(tier);
+}
 
 function _egAtlasNodeStatus(node) {
     if (egAtlasIsCompleted(node.id)) return 'completed';
@@ -58,49 +106,80 @@ function _egAtlasNodeStatus(node) {
 function _egAtlasStatusColor(status) {
     switch (status) {
         case 'completed': return '#f5d98a';
-        case 'available': return '#7fd67f';
-        default: return '#555';
+        case 'available': return '#f5f5f5';
+        default: return '#62626e';
     }
 }
 
 function _egAtlasStatusLabel(status) {
     switch (status) {
         case 'completed': return `✔ ${t('eg_atlas_status_completed')}`;
-        case 'available': return t('eg_atlas_status_available');
+        case 'available': return `? ${t('eg_atlas_status_available')}`;
         default: return `🔒 ${t('eg_atlas_status_locked')}`;
     }
 }
 
-// Builds one region node div.
+// Counts the stashed map items per atlas region (like the classic atlas
+// showed the number of map items in the player's bags on every node).
+function egAtlasCountStashedMaps() {
+    const counts = {};
+    let stash = null;
+    if (typeof _egMapStash !== 'undefined' && Array.isArray(_egMapStash)) stash = _egMapStash;
+    else if (typeof STATE !== 'undefined' && STATE.egMapStash && Array.isArray(STATE.egMapStash)) stash = STATE.egMapStash;
+    if (!stash) return counts;
+    stash.forEach(tierGrid => {
+        if (!Array.isArray(tierGrid)) return;
+        tierGrid.forEach(row => {
+            if (!Array.isArray(row)) return;
+            row.forEach(item => {
+                if (item && item.atlasNodeId) {
+                    counts[item.atlasNodeId] = (counts[item.atlasNodeId] || 0) + 1;
+                }
+            });
+        });
+    });
+    return counts;
+}
+
+// Builds one region node: a small square (tier numeral inside) with the
+// region name floating above it.
 function _egAtlasBuildNodeHTML(node) {
     const status = _egAtlasNodeStatus(node);
     const name = egAtlasNodeName(node);
-    const checkmark = status === 'completed' ? '<span class="ega-node-check">✔</span>' : '';
+    const size = _egAtlasNodeSize(node.tier);
+    const c = _egAtlasNodeCenter(node);
+    const col = _egAtlasTierGroupColor(node.tier);
+    const roman = _egAtlasRoman(node.tier);
+    const numeralSize = roman.length >= 4 ? 6 : roman.length === 3 ? 7 : roman.length === 2 ? 9 : 11;
+
+    const marker = status === 'completed' ? '<span class="ega-node-done">✔</span>'
+        : status === 'available' ? '<span class="ega-node-avail">?</span>'
+        : '';
+    const count = (_egAtlasStashCounts && _egAtlasStashCounts[node.id]) || 0;
+    const countHtml = count > 0 ? `<span class="ega-node-count">${count}</span>` : '';
 
     return `
-<div class="ega-node ega-${status}"
+<div class="ega-node ega-node-${status}"
      id="ega-node-${node.id}"
-     style="left:${_egAtlasNodeX(node)}px; top:${_egAtlasNodeY(node)}px;"
-     onclick="_egAtlasSelectNode('${node.id}')"
-     onmouseenter="_egAtlasShowNodeTooltip('${node.id}', event)"
-     onmousemove="typeof moveGameTooltip === 'function' && moveGameTooltip(event)"
-     onmouseleave="typeof hideGameTooltip === 'function' && hideGameTooltip()">
-    <div class="ega-node-tier">T${node.tier}</div>
-    ${checkmark}
-    <div class="ega-node-name">${name}</div>
+     style="left:${(c.x - size.w / 2).toFixed(1)}px; top:${(c.y - size.h / 2 - EG_ATLAS_LABEL_H).toFixed(1)}px; \
+width:${size.w}px; height:${size.h + EG_ATLAS_LABEL_H}px;"
+     onclick="_egAtlasSelectNode('${node.id}')">
+    <div class="ega-node-label" style="color:${col};">${name}</div>
+    <div class="ega-node-box" style="width:${size.w}px; height:${size.h}px; --egcol:${col};">
+        <span class="ega-node-numeral" style="font-size:${numeralSize}px; color:${col};">${roman}</span>
+        ${marker}${countHtml}
+    </div>
 </div>`;
 }
 
-// Builds all SVG connection lines (behind the nodes).
+// Builds the whole SVG underlay: thin dotted connection lines, exactly
+// like the classic atlas drew them between region coordinates.
 function _egAtlasBuildLinksSVG() {
-    const width = _egAtlasLayoutWidth();
-    const height = _egAtlasLayoutHeight();
     let lines = '';
     const drawn = new Set();
 
     EG_ATLAS_NODES.forEach(node => {
-        const x1 = _egAtlasNodeX(node) + EG_ATLAS_NODE_W / 2;
-        const y1 = _egAtlasNodeY(node) + EG_ATLAS_NODE_H / 2;
+        const c1 = _egAtlasNodeCenter(node);
 
         node.links.forEach(linkId => {
             // Each edge exists twice (bidirectional links) — draw once.
@@ -111,91 +190,100 @@ function _egAtlasBuildLinksSVG() {
             const other = egAtlasNodeById(linkId);
             if (!other) return;
 
-            const x2 = _egAtlasNodeX(other) + EG_ATLAS_NODE_W / 2;
-            const y2 = _egAtlasNodeY(other) + EG_ATLAS_NODE_H / 2;
+            const c2 = _egAtlasNodeCenter(other);
+            const isRing = other.tier === node.tier;
 
             // Line brightness follows the better end's status.
             const best = [_egAtlasNodeStatus(node), _egAtlasNodeStatus(other)]
                 .sort((a, b) => a === 'completed' ? -1 : b === 'completed' ? 1 : a === 'available' ? -1 : 1)[0];
-            const color = _egAtlasStatusColor(best);
-            const opacity = best === 'locked' ? 0.25 : 0.55;
-            const litClass = (best === 'completed') ? ' ega-link-completed' : '';
+            const color = best === 'completed' ? '#f5d98a'
+                : best === 'available' ? '#cfcfd8'
+                : '#8a8a96';
+            const opacity = best === 'locked' ? 0.28 : best === 'available' ? 0.55 : 0.8;
+            const width = isRing ? 1 : 1.2;
 
-            lines += `<line class="ega-link${litClass}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" \
-style="stroke:${color}; opacity:${opacity};"></line>`;
+            lines += `<line x1="${c1.x.toFixed(1)}" y1="${c1.y.toFixed(1)}" x2="${c2.x.toFixed(1)}" y2="${c2.y.toFixed(1)}" \
+stroke="${color}" stroke-width="${width}" stroke-dasharray="2 4" stroke-linecap="round" opacity="${opacity}"/>`;
         });
     });
 
-    return `<svg class="ega-links-svg" width="${width}" height="${height}">${lines}</svg>`;
+    return `<svg class="ega-links-svg" width="${EG_ATLAS_CANVAS_W}" height="${EG_ATLAS_CANVAS_H}" \
+viewBox="0 0 ${EG_ATLAS_CANVAS_W} ${EG_ATLAS_CANVAS_H}">${lines}</svg>`;
 }
 
-function _egAtlasLayoutWidth() {
-    return EG_ATLAS_PAD_X * 2 + (EG_ATLAS_MAX_TIER - 1) * EG_ATLAS_COL_W + EG_ATLAS_NODE_W;
-}
-
-function _egAtlasLayoutHeight() {
-    const maxSlots = Math.max(...EG_ATLAS_TIER_NAMES.map(n => n.length));
-    return EG_ATLAS_PAD_Y * 2 + (maxSlots - 1) * EG_ATLAS_ROW_H + EG_ATLAS_NODE_H;
-}
-
-// Builds the header strip: title, progress and legend.
+// Builds the header strip: progress and the search box.
 function _egAtlasBuildHeaderHTML() {
     const prog = egAtlasProgress();
+    const pct = prog.total > 0 ? Math.round(100 * prog.completed / prog.total) : 0;
     return `
 <div class="ega-header">
-    <span class="ega-header-progress">
-        ${t('eg_atlas_progress')
-            .replace('{c}', prog.completed)
-            .replace('{n}', prog.total)}
-        <span class="ega-header-highest">
-            ${t('eg_atlas_highest_tier').replace('{n}', prog.highestTier)}
-        </span>
-    </span>
-    <span class="ega-legend">
-        <span class="ega-legend-item"><span class="ega-swatch ega-sw-completed"></span>${t('eg_atlas_status_completed')}</span>
-        <span class="ega-legend-item"><span class="ega-swatch ega-sw-available"></span>${t('eg_atlas_status_available')}</span>
-        <span class="ega-legend-item"><span class="ega-swatch ega-sw-locked"></span>${t('eg_atlas_status_locked')}</span>
-    </span>
+    <div class="ega-header-top">
+        <div class="ega-header-main">
+            <div class="ega-header-line">
+                <span class="ega-header-progress">
+                    ${t('eg_atlas_progress')
+                        .replace('{c}', prog.completed)
+                        .replace('{n}', prog.total)}
+                </span>
+                <span class="ega-header-highest">
+                    ${t('eg_atlas_highest_tier').replace('{n}', prog.highestTier)}
+                </span>
+            </div>
+            <div class="ega-progress-track"><div class="ega-progress-fill" style="width:${pct}%"></div></div>
+        </div>
+        <input type="text" class="ega-search" id="ega-search"
+               placeholder="${t('eg_atlas_search')}"
+               value="${_egAtlasSearchQuery.replace(/"/g, '&quot;')}"
+               oninput="_egAtlasSearch(this.value)">
+    </div>
+    ${_egAtlasBuildTierProgressHTML()}
 </div>`;
 }
 
-// Builds the bottom details panel for the currently selected node.
-function _egAtlasBuildDetailsHTML() {
-    const node = egAtlasNodeById(_egAtlasSelectedNodeId);
-    if (!node) {
-        return `<div class="ega-details empty">${t('eg_atlas_select_hint')}</div>`;
+// Per-tier progress strip: one cell per tier (I..XVI) showing
+// "completed/total" regions, coloured by the tier's rarity band. Fully
+// cleared tiers light up gold, untouched ones stay dim. Hovering a cell
+// opens the shared tooltip with the tier's region list + statuses — so
+// the sweep pacing of the atlas (which region of a tier is still missing)
+// is visible at a glance.
+function _egAtlasBuildTierProgressHTML() {
+    const cells = [];
+    for (let tier = 1; tier <= EG_ATLAS_MAX_TIER; tier++) {
+        const nodes = EG_ATLAS_NODES.filter(n => n.tier === tier);
+        const done = nodes.filter(n => egAtlasIsCompleted(n.id)).length;
+        const cls = done === nodes.length ? 'ega-full' : (done === 0 ? 'ega-zero' : '');
+        cells.push(`
+    <div class="ega-tier-cell ${cls}" data-tier="${tier}"
+         onmouseenter="if (typeof showGameTooltip === 'function') showGameTooltip(_egAtlasBuildTierTooltipHTML(${tier}), event)"
+         onmousemove="if (typeof moveGameTooltip === 'function') moveGameTooltip(event)"
+         onmouseleave="if (typeof hideGameTooltip === 'function') hideGameTooltip()">
+        <span class="ega-tier-num" style="color:${_egAtlasTierGroupColor(tier)};">${_egAtlasRoman(tier)}</span>
+        <span class="ega-tier-count">${done}/${nodes.length}</span>
+    </div>`);
     }
-
-    const status = _egAtlasNodeStatus(node);
-    const color = _egAtlasStatusColor(status);
-    const monsterLevel = _egMapTierMonsterLevel(node.tier);
-
-    const connections = node.links
-        .map(id => egAtlasNodeById(id))
-        .filter(Boolean)
-        .sort((a, b) => a.tier - b.tier || a.slot - b.slot)
-        .map(other => {
-            const st = _egAtlasNodeStatus(other);
-            return `<span class="ega-conn ega-${st}" onclick="_egAtlasSelectNode('${other.id}')">\
-${egAtlasNodeName(other)} <small>T${other.tier}</small></span>`;
-        })
-        .join('');
-
-    const hint = (status === 'locked')
-        ? `<div class="ega-details-hint">${t('eg_atlas_locked_hint')}</div>`
-        : (status === 'completed'
-            ? `<div class="ega-details-hint done">${t('eg_atlas_completed_hint')}</div>`
-            : `<div class="ega-details-hint avail">${t('eg_atlas_run_hint')}</div>`);
-
     return `
-<div class="ega-details">
-    <div class="ega-details-title" style="color:${color};">
-        ${egAtlasNodeName(node)}
-        <small>· T${node.tier} · ${t('eg_map_monster_level_tt').replace('{n}', monsterLevel)}</small>
+    <div class="ega-tier-progress">
+        <span class="ega-tier-progress-label">${t('eg_atlas_tier_progress')}</span>${cells.join('')}
+    </div>`;
+}
+
+// Shared-tooltip content for one tier strip cell: every region of the tier
+// with its status glyph and colour (✔ cleared · ? available · 🔒 locked).
+function _egAtlasBuildTierTooltipHTML(tier) {
+    const nodes = EG_ATLAS_NODES.filter(n => n.tier === tier);
+    const done = nodes.filter(n => egAtlasIsCompleted(n.id)).length;
+    const rows = nodes.map(n => {
+        const status = _egAtlasNodeStatus(n);
+        const glyph = status === 'completed' ? '✔' : status === 'available' ? '?' : '🔒';
+        return `<div class="eg-tt-mod" style="color:${_egAtlasStatusColor(status)}">${glyph} ${egAtlasNodeName(n)}</div>`;
+    }).join('');
+    return `
+<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon">🗺</div>
+        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_map_tier_tt').replace('{n}', tier)} · ${done}/${nodes.length}</div>
     </div>
-    <div class="ega-details-status" style="color:${color};">${_egAtlasStatusLabel(status)}</div>
-    ${hint}
-    <div class="ega-details-conns">${connections}</div>
+    <div class="eg-tt-section">${rows}</div>
 </div>`;
 }
 
@@ -208,12 +296,21 @@ function _egAtlasBuildFullScreenHTML() {
         <span class="eg-topbar-title">${t('eg_atlas_title')}</span>
     </div>
     ${_egAtlasBuildHeaderHTML()}
-    <div class="ega-viewport">
-        <div class="ega-canvas" id="ega-canvas"
-             style="width:${_egAtlasLayoutWidth()}px; height:${_egAtlasLayoutHeight()}px;">
+    <div class="ega-frame">
+        <div class="ega-viewport" id="ega-viewport">
+            <div class="ega-zoom-wrap" id="ega-zoom-wrap">
+                <div class="ega-canvas" id="ega-canvas"
+                     style="width:${EG_ATLAS_CANVAS_W}px; height:${EG_ATLAS_CANVAS_H}px;">
+                </div>
+            </div>
+        </div>
+        <div class="ega-zoom-controls">
+            <button class="ega-zoom-btn" onclick="_egAtlasZoomStep(-1)">−</button>
+            <span class="ega-zoom-level" id="ega-zoom-level">100%</span>
+            <button class="ega-zoom-btn" onclick="_egAtlasZoomStep(1)">+</button>
+            <button class="ega-zoom-btn" onclick="_egAtlasZoomFit()" title="Fit to screen">⤢</button>
         </div>
     </div>
-    <div id="ega-details-panel"></div>
 </div>`;
 }
 
@@ -222,51 +319,206 @@ function _egAtlasBuildFullScreenHTML() {
 //-------------------RENDER-----------------------------------------------
 //------------------------------------------------------------------------
 
-// Rebuilds canvas nodes/links and the details panel.
+// Rebuilds canvas nodes/links.
 function _egAtlasRender() {
     const canvas = document.getElementById('ega-canvas');
     if (!canvas) return;
 
-    // Drop stale selection (keeps selection when the node still exists).
+    // Drop stale selection (keeps it when the node still exists).
     if (_egAtlasSelectedNodeId && !egAtlasNodeById(_egAtlasSelectedNodeId)) {
         _egAtlasSelectedNodeId = null;
     }
 
+    _egAtlasStashCounts = egAtlasCountStashedMaps();
+
     canvas.innerHTML = `${_egAtlasBuildLinksSVG()}${EG_ATLAS_NODES.map(_egAtlasBuildNodeHTML).join('')}`;
 
-    const panel = document.getElementById('ega-details-panel');
-    if (panel) panel.innerHTML = _egAtlasBuildDetailsHTML();
+    _egAtlasApplySearch();
+    _egAtlasRefreshSelection();
 }
 
-// Click handler: select a node and refresh its highlight + details panel.
-function _egAtlasSelectNode(nodeId) {
-    _egAtlasSelectedNodeId = nodeId;
+// Centers the scrollable viewport on the atlas heart.
+function _egAtlasCenterViewport() {
+    const vp = document.querySelector('#screen-endgame-atlas .ega-viewport');
+    const wrap = document.getElementById('ega-zoom-wrap');
+    if (!vp || !wrap) return;
+    vp.scrollLeft = Math.max(0, (wrap.offsetWidth - vp.clientWidth) / 2);
+    vp.scrollTop = Math.max(0, (wrap.offsetHeight - vp.clientHeight) / 2);
+}
 
-    document.querySelectorAll('.ega-node.selected').forEach(el => el.classList.remove('selected'));
-    const el = document.getElementById(`ega-node-${nodeId}`);
-    if (el) el.classList.add('selected');
+//-------------------ZOOM & PAN-----------------------------------------
 
-    const panel = document.getElementById('ega-details-panel');
-    if (panel) {
-        panel.innerHTML = _egAtlasBuildDetailsHTML();
-        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+function _egAtlasViewportEl() {
+    return document.querySelector('#screen-endgame-atlas .ega-viewport');
+}
+
+// Zoom level that shows the whole atlas inside the viewport.
+function _egAtlasComputeFitZoom() {
+    const vp = _egAtlasViewportEl();
+    if (!vp || !vp.clientWidth) return 1;
+    return Math.min(1,
+        (vp.clientWidth - 8) / EG_ATLAS_CANVAS_W,
+        (vp.clientHeight - 8) / EG_ATLAS_CANVAS_H);
+}
+
+// Reapplies the current zoom to the wrap/canvas elements.
+function _egAtlasApplyZoomStyles() {
+    const wrap = document.getElementById('ega-zoom-wrap');
+    const canvas = document.getElementById('ega-canvas');
+    if (wrap) {
+        wrap.style.width = (EG_ATLAS_CANVAS_W * _egAtlasZoom) + 'px';
+        wrap.style.height = (EG_ATLAS_CANVAS_H * _egAtlasZoom) + 'px';
+    }
+    if (canvas) canvas.style.transform = 'scale(' + _egAtlasZoom + ')';
+    const lvl = document.getElementById('ega-zoom-level');
+    if (lvl) lvl.textContent = Math.round(_egAtlasZoom * 100) + '%';
+}
+
+// Sets a new zoom level. With an anchor (viewport-relative x/y) the map
+// point under the anchor stays fixed — zooming into the cursor position.
+function _egAtlasSetZoom(z, ax, ay, isFit) {
+    const vp = _egAtlasViewportEl();
+    if (!vp) return;
+    z = Math.max(EG_ATLAS_ZOOM_MIN, Math.min(EG_ATLAS_ZOOM_MAX, z));
+    if (Math.abs(z - _egAtlasZoom) < 0.0005) return;
+
+    const sx = vp.scrollLeft, sy = vp.scrollTop;
+    const old = _egAtlasZoom;
+    _egAtlasZoom = z;
+    _egAtlasZoomIsFit = !!isFit;
+    _egAtlasApplyZoomStyles();
+
+    if (ax != null) {
+        vp.scrollLeft = Math.max(0, (sx + ax) * z / old - ax);
+        vp.scrollTop = Math.max(0, (sy + ay) * z / old - ay);
     }
 }
 
-// Hover tooltip body for a node (uses the shared floating game tooltip).
-function _egAtlasShowNodeTooltip(nodeId, event) {
-    const node = egAtlasNodeById(nodeId);
-    if (!node || typeof showGameTooltip !== 'function') return;
+// Steps zoom in/out around the viewport centre (the − / + buttons).
+function _egAtlasZoomStep(dir) {
+    const vp = _egAtlasViewportEl();
+    const ax = vp ? vp.clientWidth / 2 : null;
+    const ay = vp ? vp.clientHeight / 2 : null;
+    _egAtlasSetZoom(_egAtlasZoom * (dir > 0 ? 1.25 : 1 / 1.25), ax, ay, false);
+}
 
-    const status = _egAtlasNodeStatus(node);
-    const color = _egAtlasStatusColor(status);
-    const html = `
-<strong style="color:${color};">${egAtlasNodeName(node)}</strong><br>
-<span style="color:#ccc;">${t('eg_map_tier_tt').replace('{n}', node.tier)}
- · ${t('eg_map_monster_level_tt').replace('{n}', _egMapTierMonsterLevel(node.tier))}</span><br>
-<span style="color:${color};">${_egAtlasStatusLabel(status)}</span>`;
+// Resets the view: zoom so the whole atlas fits, centered.
+function _egAtlasZoomFit() {
+    _egAtlasSetZoom(_egAtlasComputeFitZoom(), null, null, true);
+    _egAtlasCenterViewport();
+}
 
-    showGameTooltip(html, event);
+// Delegated wheel / drag-pan / resize handling. Attached once to the
+// screen element (and window), so they survive the innerHTML refreshes.
+function _egAtlasAttachViewHandlers(screen) {
+    // Wheel = zoom around the cursor position.
+    screen.addEventListener('wheel', (e) => {
+        if (!e.target.closest('.ega-viewport')) return;
+        e.preventDefault();
+        const vp = _egAtlasViewportEl();
+        if (!vp) return;
+        const r = vp.getBoundingClientRect();
+        const d = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+        _egAtlasSetZoom(_egAtlasZoom * Math.pow(1.0018, -d), e.clientX - r.left, e.clientY - r.top, false);
+    }, { passive: false });
+
+    // Left-drag = pan.
+    let pan = null;
+    screen.addEventListener('mousedown', (e) => {
+        const vp = e.target.closest('.ega-viewport');
+        if (!vp || e.button !== 0) return;
+        pan = { vp, x: e.clientX, y: e.clientY, sx: vp.scrollLeft, sy: vp.scrollTop, moved: false };
+    });
+    window.addEventListener('mousemove', (e) => {
+        if (!pan) return;
+        const dx = e.clientX - pan.x, dy = e.clientY - pan.y;
+        if (!pan.moved && Math.abs(dx) + Math.abs(dy) > 4) {
+            pan.moved = true;
+            pan.vp.classList.add('ega-panning');
+        }
+        if (pan.moved) {
+            pan.vp.scrollLeft = pan.sx - dx;
+            pan.vp.scrollTop = pan.sy - dy;
+        }
+    });
+    window.addEventListener('mouseup', () => {
+        if (!pan) return;
+        if (pan.moved) {
+            pan.vp.classList.remove('ega-panning');
+            // Swallow the click that follows a pan so nodes are not selected.
+            _egAtlasPanEndedAt = performance.now();
+        }
+        pan = null;
+    });
+
+    // Keep the fitted view fitted when the window changes size.
+    window.addEventListener('resize', () => {
+        if (_egAtlasZoomIsFit && document.getElementById('screen-endgame-atlas')?.classList.contains('active')) {
+            _egAtlasSetZoom(_egAtlasComputeFitZoom(), null, null, true);
+            _egAtlasCenterViewport();
+        }
+    });
+}
+
+let _egAtlasPanEndedAt = 0;
+
+// Refreshes the selected-node outline without rebuilding the canvas.
+function _egAtlasRefreshSelection() {
+    document.querySelectorAll('.ega-node.selected').forEach(el => el.classList.remove('selected'));
+    if (!_egAtlasSelectedNodeId) return;
+    const el = document.getElementById(`ega-node-${_egAtlasSelectedNodeId}`);
+    if (el) el.classList.add('selected');
+}
+
+// Click handler: pin a region (outline highlight). Clicks that end a
+// pan drag are swallowed so panning never selects a node.
+function _egAtlasSelectNode(nodeId) {
+    if (performance.now() - _egAtlasPanEndedAt < 150) return;
+    _egAtlasSelectedNodeId = (_egAtlasSelectedNodeId === nodeId) ? null : nodeId;
+    _egAtlasRefreshSelection();
+}
+
+// Search: highlights matching regions with a glowing blue node frame
+// (.ega-search-hit). Matches by localized region name AND by tier —
+// either the roman numeral shown inside the nodes (e.g. 'XV',
+// case-insensitive) or the plain tier number (e.g. '15', 'tier 15').
+// Empty query clears the highlight.
+function _egAtlasSearch(query) {
+    _egAtlasSearchQuery = (query || '').trim();
+    _egAtlasApplySearch();
+}
+
+// Resolves a search query to a tier number (0 when the query is not a
+// tier): accepts the roman numerals I..XVI (case-insensitive, same set
+// the nodes display) and plain numbers 1-16, optionally prefixed with
+// 'tier' or 't' (e.g. 'tier 15', 't15').
+function _egAtlasQueryTier(q) {
+    if (!q) return 0;
+    const numMatch = q.match(/^(?:t(?:ier)?\s*)?(\d{1,2})$/);
+    if (numMatch) {
+        const n = parseInt(numMatch[1], 10);
+        return (n >= 1 && n <= EG_ATLAS_MAX_TIER) ? n : 0;
+    }
+    const romans = (typeof EG_MAP_TIER_ROMANS !== 'undefined' && EG_MAP_TIER_ROMANS.length === EG_ATLAS_MAX_TIER)
+        ? EG_MAP_TIER_ROMANS.map(r => r.toLowerCase())
+        : ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi'];
+    const idx = romans.indexOf(q);
+    return idx >= 0 ? idx + 1 : 0;
+}
+
+function _egAtlasApplySearch() {
+    const canvas = document.getElementById('ega-canvas');
+    if (!canvas) return;
+
+    const q = _egAtlasSearchQuery.toLowerCase();
+    const tierQ = _egAtlasQueryTier(q);
+    EG_ATLAS_NODES.forEach(node => {
+        const el = document.getElementById(`ega-node-${node.id}`);
+        if (!el) return;
+        const hit = (q && egAtlasNodeName(node).toLowerCase().includes(q))
+            || (tierQ > 0 && node.tier === tierQ);
+        el.classList.toggle('ega-search-hit', !!hit);
+    });
 }
 
 
@@ -285,84 +537,168 @@ function _egAtlasEnsureStyles() {
             font-family: var(--PX, monospace); color: var(--accent2, #e8daef);
         }
 
+        /* ── Header ─────────────────────────────────────────────────── */
         .ega-header {
+            display: flex; flex-direction: column; align-items: stretch;
+            gap: 7px; padding: 8px 16px;
+            background: linear-gradient(180deg, rgba(34, 25, 9, 0.55), rgba(16, 12, 6, 0.35));
+            border-bottom: 1px solid var(--border, #444);
+        }
+        .ega-header-top {
             display: flex; align-items: center; justify-content: space-between;
-            gap: 14px; padding: 8px 18px; flex-wrap: wrap;
-            background: rgba(20, 15, 5, 0.35); border-bottom: 1px solid var(--border, #444);
+            gap: 18px; flex-wrap: wrap;
         }
-        .ega-header-progress { font-size: 12px; letter-spacing: 1px; color: var(--accent, #c8a84b); }
-        .ega-header-highest { margin-left: 14px; opacity: 0.85; }
-        .ega-legend { display: flex; align-items: center; gap: 14px; font-size: 9px; letter-spacing: 1px; }
-        .ega-legend-item { display: inline-flex; align-items: center; gap: 5px; color: var(--accent2, #ccc); }
-        .ega-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
-        .ega-sw-completed { background: #f5d98a; box-shadow: 0 0 6px rgba(245,217,138,.7); }
-        .ega-sw-available { background: #7fd67f; }
-        .ega-sw-locked { background: #555; }
 
+        /* ── Per-tier progress strip ────────────────────────────────── */
+        .ega-tier-progress {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+        }
+        .ega-tier-progress-label {
+            font-size: 9px; letter-spacing: 1px; color: #9d93c9;
+            margin-right: 6px;
+        }
+        .ega-tier-cell {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 5px; min-width: 46px; height: 21px; padding: 0 7px;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 4px; cursor: default; user-select: none;
+            font-family: var(--PX, monospace); box-sizing: border-box;
+        }
+        .ega-tier-cell .ega-tier-num { font-size: 8px; }
+        .ega-tier-cell .ega-tier-count { font-size: 9px; color: #e8e4f0; }
+        .ega-tier-cell:hover { border-color: #fff; }
+        .ega-tier-cell.ega-zero { opacity: 0.55; }
+        .ega-tier-cell.ega-full {
+            border-color: rgba(245, 217, 138, 0.75);
+            background: linear-gradient(180deg, rgba(88, 68, 22, 0.55), rgba(48, 37, 13, 0.55));
+        }
+        .ega-tier-cell.ega-full .ega-tier-count { color: #f5d98a; }
+        .ega-header-main { display: flex; flex-direction: column; gap: 4px; min-width: 240px; }
+        .ega-header-line { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+        .ega-header-progress { font-size: 11px; letter-spacing: 1px; color: var(--accent, #c8a84b); }
+        .ega-header-highest { font-size: 11px; letter-spacing: 1px; color: var(--accent, #c8a84b); opacity: 0.85; }
+        .ega-progress-track {
+            width: 300px; max-width: 40vw; height: 4px; border-radius: 2px;
+            background: rgba(255, 255, 255, 0.08); overflow: hidden;
+        }
+        .ega-progress-fill {
+            height: 100%; border-radius: 2px;
+            background: linear-gradient(90deg, #8a6d2b, #f5d98a);
+            transition: width 0.4s ease;
+        }
+        .ega-search {
+            font-family: var(--PX, monospace); font-size: 9px; color: #e8e4f0;
+            background: rgba(10, 10, 18, 0.9); border: 1px solid #555; border-radius: 4px;
+            padding: 6px 10px; width: 190px; outline: none;
+        }
+        .ega-search:focus { border-color: #c8a84b; }
+        .ega-search::placeholder { color: #7d7890; }
+
+        /* ── Framed map area ────────────────────────────────────────── */
+        .ega-frame {
+            flex-grow: 1; margin: 10px 14px 12px; min-height: 0;
+            border: 2px solid #6b5836; border-radius: 10px;
+            box-shadow: inset 0 0 0 2px #1c160c, 0 0 0 1px #241c10;
+            background: #0a0a15; overflow: hidden; position: relative;
+        }
         .ega-viewport {
-            flex-grow: 1; overflow: auto; position: relative;
+            width: 100%; height: 100%; overflow: auto; position: relative;
+            display: flex;            /* centers the map when it fits */
+            cursor: grab; user-select: none;
             background:
-                radial-gradient(ellipse at 50% 0%, rgba(200,168,75,0.06), transparent 60%),
-                var(--bg, #0d0d17);
+                radial-gradient(ellipse at 50% 48%, rgba(150, 115, 45, 0.08), transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(55, 70, 140, 0.10), transparent 80%),
+                #0a0a15;
         }
-        .ega-canvas { position: relative; min-width: 100%; min-height: 100%; }
+        .ega-viewport.ega-panning { cursor: grabbing; }
+        .ega-zoom-wrap { position: relative; transform-origin: 0 0; margin: auto; flex-shrink: 0; }
+        .ega-canvas {
+            position: absolute; top: 0; left: 0; transform-origin: 0 0;
+            background-image:
+                radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1.6px),
+                radial-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1.6px);
+            background-size: 46px 46px, 46px 46px;
+            background-position: 0 0, 23px 23px;
+        }
         .ega-links-svg { position: absolute; inset: 0; pointer-events: none; }
-        .ega-link { stroke-width: 2; }
-        .ega-link-completed { filter: drop-shadow(0 0 3px rgba(245,217,138,0.7)); }
 
+        /* ── Nodes: small squares with the tier numeral inside ─────── */
         .ega-node {
-            position: absolute; width: 112px; height: 78px; box-sizing: border-box;
-            padding: 6px 7px; cursor: pointer; user-select: none;
-            background: rgba(20, 16, 8, 0.92); border: 1px solid #555; border-radius: 6px;
-            transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+            position: absolute; box-sizing: border-box; cursor: pointer; user-select: none;
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
         }
-        .ega-node:hover { transform: translateY(-2px); z-index: 3; }
-        .ega-node.selected { outline: 2px solid #fff; z-index: 4; }
+        .ega-node-label {
+            font-size: 9px; line-height: 1.2; letter-spacing: 0.3px;
+            max-width: 150px; text-align: center; margin-bottom: 3px;
+            text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 2px 2px #000;
+            white-space: normal;
+        }
+        .ega-node-box {
+            position: relative; box-sizing: border-box; flex-shrink: 0;
+            background: rgba(16, 14, 10, 0.92);
+            border: 1px solid #555; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ega-node-numeral {
+            font-family: var(--PX, monospace); letter-spacing: 0;
+            text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+        }
+        .ega-node:hover .ega-node-box { border-color: #fff; }
+        .ega-node.selected .ega-node-box { outline: 1px solid #fff; outline-offset: 1px; }
 
-        .ega-available { border-color: #7fd67f; box-shadow: 0 0 10px rgba(127,214,127,0.25); }
-        .ega-completed { border-color: #f5d98a; background: rgba(64, 52, 16, 0.92); box-shadow: 0 0 12px rgba(245,217,138,0.35); }
-        .ega-locked { opacity: 0.45; cursor: default; }
-        .ega-locked:hover { transform: none; }
+        .ega-node-completed .ega-node-box {
+            border-color: #f5d98a;
+            background: linear-gradient(180deg, rgba(88, 68, 22, 0.95), rgba(48, 37, 13, 0.95));
+        }
+        .ega-node-available .ega-node-box { border-color: var(--egcol); }
+        .ega-node-locked { opacity: 0.45; cursor: default; }
+        .ega-node-locked:hover .ega-node-box { border-color: #555; }
 
-        .ega-node-tier {
-            position: absolute; top: -8px; left: -8px;
-            font-size: 9px; padding: 1px 5px; border-radius: 3px;
-            background: var(--surface, #1a1a2e); border: 1px solid var(--border2, #555);
-            color: var(--accent, #c8a84b);
+        .ega-node-done {
+            position: absolute; top: -6px; right: -6px;
+            font-size: 8px; color: #111; background: #f5d98a;
+            width: 13px; height: 13px; line-height: 13px; text-align: center;
+            border-radius: 50%;
         }
-        .ega-completed .ega-node-tier { border-color: #f5d98a; color: #f5d98a; }
-        .ega-node-check {
-            position: absolute; top: -8px; right: -8px;
-            font-size: 11px; color: #111; background: #f5d98a;
-            width: 18px; height: 18px; line-height: 18px; text-align: center;
-            border-radius: 50%; box-shadow: 0 0 8px rgba(245,217,138,0.8);
+        .ega-node-avail {
+            position: absolute; top: -7px; right: -5px;
+            font-size: 10px; color: #ffd700;
+            text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
         }
-        .ega-node-name {
-            font-size: 9px; line-height: 1.35; letter-spacing: 0.5px;
-            color: var(--accent2, #ddd); margin-top: 8px; word-wrap: break-word;
+        .ega-node-count {
+            position: absolute; bottom: 1px; left: 3px;
+            font-size: 7px; color: #fff; opacity: 0.9;
+            text-shadow: 1px 1px 0 #000, -1px 1px 0 #000;
         }
-        .ega-completed .ega-node-name { color: #f5d98a; }
 
-        #ega-details-panel { flex-shrink: 0; border-top: 1px solid var(--border, #444); }
-        .ega-details { padding: 10px 18px 14px; background: rgba(20, 15, 5, 0.5); }
-        .ega-details.empty { font-size: 10px; color: var(--accent2, #999); letter-spacing: 1px; }
-        .ega-details-title { font-size: 13px; letter-spacing: 1px; }
-        .ega-details-title small { color: var(--accent2, #aaa); font-size: 9px; }
-        .ega-details-status { font-size: 10px; margin-top: 3px; letter-spacing: 1px; }
-        .ega-details-hint { font-size: 9px; color: var(--accent2, #999); margin-top: 4px; }
-        .ega-details-hint.done { color: #f5d98a; }
-        .ega-details-hint.avail { color: #7fd67f; }
-        .ega-details-conns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-        .ega-conn {
-            font-size: 9px; padding: 3px 8px; cursor: pointer;
-            border: 1px solid var(--border2, #555); border-radius: 3px;
-            color: var(--accent2, #ccc);
+        /* ── Search highlighting ───────────────────────────────────── */
+        /* Placed after the node state rules so it wins the cascade. */
+        .ega-search-hit .ega-node-box {
+            border-color: #4aa3ff;
+            animation: ega-search-pulse 1.6s ease-in-out infinite;
         }
-        .ega-conn small { opacity: 0.6; }
-        .ega-conn.ega-completed { border-color: #f5d98a; color: #f5d98a; }
-        .ega-conn.ega-available { border-color: #7fd67f; color: #7fd67f; }
-        .ega-conn.ega-locked { opacity: 0.5; cursor: default; }
-        .ega-conn:hover:not(.ega-locked) { filter: brightness(1.25); }
+        .ega-search-hit .ega-node-label { color: #8ecbff !important; }
+        .ega-node-locked.ega-search-hit { opacity: 0.8; }
+        @keyframes ega-search-pulse {
+            0%, 100% { box-shadow: 0 0 0 1px rgba(74, 163, 255, 0.55), 0 0 10px 2px rgba(74, 163, 255, 0.35); }
+            50%      { box-shadow: 0 0 0 2px rgba(74, 163, 255, 0.95), 0 0 16px 4px rgba(74, 163, 255, 0.60); }
+        }
+
+        /* ── Zoom controls ──────────────────────────────────────── */
+        .ega-zoom-controls {
+            position: absolute; right: 12px; bottom: 10px;
+            display: flex; align-items: center; gap: 4px;
+            background: rgba(13, 11, 20, 0.9); border: 1px solid #555;
+            border-radius: 6px; padding: 3px 6px; z-index: 6;
+        }
+        .ega-zoom-btn {
+            font-family: var(--PX, monospace); font-size: 10px; color: #e8e4f0;
+            background: #1a1a2e; border: 1px solid #555; border-radius: 4px;
+            padding: 4px 8px; cursor: pointer; line-height: 1;
+        }
+        .ega-zoom-btn:hover { border-color: #c8a84b; }
+        .ega-zoom-level { font-size: 9px; color: #9d93c9; min-width: 40px; text-align: center; }
     `;
     document.head.appendChild(style);
 }
@@ -379,13 +715,14 @@ function _egAtlasCreateScreen() {
     screen.className = 'screen';
     screen.innerHTML = _egAtlasBuildFullScreenHTML();
     document.body.appendChild(screen);
+    _egAtlasAttachViewHandlers(screen);
 }
 
 function ensureEndgameAtlasScreen() {
     if (!document.getElementById('screen-endgame-atlas')) _egAtlasCreateScreen();
 }
 
-// Entry point — opens the Atlas of Worlds screen.
+// Entry point — opens the Atlas of Statistica screen.
 // An optional backFn argument (name of a global function, e.g.
 // 'showEndgameHub') overrides where the BACK button returns to — used
 // when the atlas is opened from the endgame hub character sheet.
@@ -401,8 +738,10 @@ function showEndgameAtlas(backFn) {
         document.getElementById('screen-endgame-atlas').style.display = 'block';
     }
 
-    // Refresh header/canvas so completions from the last run show up.
+    // Refresh header/canvas so completions from the last run show up,
+    // then fit the whole atlas to the window and center it.
     const screen = document.getElementById('screen-endgame-atlas');
     screen.innerHTML = _egAtlasBuildFullScreenHTML();
     _egAtlasRender();
+    _egAtlasZoomFit();
 }

@@ -440,6 +440,7 @@ function getSlotSummary(slotNum) {
         ascendencySkill2Level: raw.ascendencySkill2Level || 1,
         questsClaimedCount: (raw.questsClaimed || []).length,
         totalTimePlayedSecs: raw.totalTimePlayedSecs || 0,
+        playerLevel: raw.playerLevel || 1,
 
         lifetimeTilesRevealed: (raw.questStats && raw.questStats.lifetimeTilesRevealed) || 0,
         lifetimeTilesFilled: (raw.questStats && raw.questStats.lifetimeTilesFilled) || 0,

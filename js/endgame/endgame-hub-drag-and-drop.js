@@ -903,7 +903,7 @@ function _egRenderCurrencyCell(row, col) {
             cell.innerHTML = '';
             cell.classList.add('eg-currency-assigned-empty');
             if (def && def.icon) cell.setAttribute('data-empty-icon', def.icon);
-            cell.title = def ? def.name : assignedId;
+            cell.removeAttribute('title');
         } else {
             cell.innerHTML = '';
             cell.classList.remove('eg-currency-assigned-empty');

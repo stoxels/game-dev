@@ -11,7 +11,7 @@
 //=       (endgame-hub.js)                                               =
 //=    2. Probability Gate         -> showEndgameGate()                  =
 //=       (endgame-gate.js)                                              =
-//=    3. Atlas of Worlds          -> showEndgameAtlas()                 =
+//=    3. Atlas of Statistica      -> showEndgameAtlas()                 =
 //=    4. Map Vendor               -> showEndgameVendor()                =
 //=       (endgame-vendor.js)                                            =
 //=                                                                      =

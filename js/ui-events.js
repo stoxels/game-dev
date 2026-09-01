@@ -163,6 +163,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onClick('btn-replay', () => { renderReplayModal(); showModal('replay-modal'); });
 
+    // Keybinds modal (title screen). openKeybindsModal/closeKeybindsModal and
+    // resetKeybinds live in js/keybinds.js; the capture flow is driven from
+    // the central dispatcher there.
+    onClick('btn-keybinds', () => {
+        if (typeof openKeybindsModal === 'function') openKeybindsModal();
+    });
+    onClick('btn-keybinds-close', () => {
+        if (typeof closeKeybindsModal === 'function') closeKeybindsModal();
+    });
+    onClick('btn-keybinds-reset', () => {
+        if (typeof resetKeybinds === 'function') resetKeybinds();
+    });
+
 
     //------------------------------------------------------------------------
     //-------------------GAME SETUP SCREEN------------------------------------
@@ -188,6 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
+    onClick('btn-mode-select-back', () => goToPreviousScreen());
+    onClick('btn-mode-select-back', () => goToPreviousScreen());
+    onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-existing', () => launchExistingGame());
     onClick('btn-mode-adventure', () => launchAdventureMode());
     onClick('btn-mode-endgame-test', () => launchEndgameTestMode());

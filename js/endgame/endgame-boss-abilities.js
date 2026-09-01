@@ -58,6 +58,9 @@ const EG_BOSS_MECHANICS = {
             { name: 'prior_bomb', intervalBase: 16000, intervalVariance: 4000, handler: '_egMechPriorBomb' },
             { name: 'frozen_cells', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechFrozenCells' },
             { name: 'prior_collapse', intervalBase: 24000, intervalVariance: 6000, handler: '_egMechPriorCollapse', phase2Only: true },
+            // Prior Summons — the only deliberate monster-spawn ability: the
+            // boss calls 1–2 weak minions into the arena (see _egMechSummonAdds).
+            { name: 'prior_summons', intervalBase: 20000, intervalVariance: 6000, handler: '_egMechSummonAdds', phase2Only: true },
             // grid_veil fires once on phase 2 activation; intervalBase is set
             // absurdly high so it never self-reschedules after that first trigger.
             { name: 'grid_veil', intervalBase: 999999999, intervalVariance: 0, handler: '_egMechGridVeil', phase2Only: true },
@@ -508,6 +511,33 @@ function _egUnfillCell(row, col) {
     renderCell(row, col);
     updClues(row, col);
     _egFlashPriorBombCell(row, col);
+}
+
+// Boss mechanic handler — deliberately SUMMONS monster reinforcements into
+// the arena. This is the one spawn path that stays open inside the boss
+// arena (natural respawns are suppressed there — see _egShouldSuppressRespawn
+// in endgame-encounter.js): the spawn here is a purposeful boss ability, not
+// ambient repopulation. Summons 2 minions in phase 3, 1 otherwise, at the
+// boss's own level, capped by the global concurrent-monster cap. Slain
+// minions pay out normal XP/loot on top of the boss reward.
+const EG_SUMMON_POOL = ['slime', 'ghost', 'rat', 'bat', 'bee'];
+function _egMechSummonAdds(monster, phase) {
+    if (typeof _egSpawnMonster !== 'function') return;
+    const count = phase >= 3 ? 2 : 1;
+    const level = Math.max(1, Math.round(monster.level || 1));
+    const name = monster.name || monster.baseId || '?';
+
+    let summoned = 0;
+    for (let i = 0; i < count; i++) {
+        if (typeof _egMonsters !== 'undefined' && _egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) break;
+        const defId = EG_SUMMON_POOL[Math.floor(Math.random() * EG_SUMMON_POOL.length)];
+        _egSpawnMonster(defId, level);
+        summoned++;
+    }
+    if (summoned > 0) {
+        showToast(t('eg_boss_summon').replace('{name}', name).replace('{n}', summoned), '#f87171');
+        if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
+    }
 }
 
 // Boss mechanic handler — unfills 1 or 2 of the most recently filled cells.

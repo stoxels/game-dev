@@ -173,7 +173,9 @@ function _updateAvatarSimpleImage() {
 // started. Instead we track which keys are currently held and move the
 // sprite every animation frame, so it reacts instantly and smoothly.
 
-const AVATAR_WASD_KEYS = new Set(['w', 'a', 's', 'd']);
+// Held-key movement. Keys come from the persisted keybind map
+// (js/keybinds.js, actions move-up/down/left/right, WASD by default) so
+// player rebindings take effect here too.
 const AVATAR_MOVE_SPEED_PX_PER_SEC = 320;
 
 // Boots movement-speed modifier (PoE-style). Reads live gear via
@@ -219,10 +221,12 @@ function _avatarMoveTick(ts) {
     if (!_avatarMoveUiBlocked()) {
         let dx = 0;
         let dy = 0;
-        if (_avatarMoveState.held.has('w')) dy -= 1;
-        if (_avatarMoveState.held.has('s')) dy += 1;
-        if (_avatarMoveState.held.has('a')) dx -= 1;
-        if (_avatarMoveState.held.has('d')) dx += 1;
+        // Direction from the persisted keybind map (defaults: WASD).
+        const held = _avatarMoveState.held;
+        if (held.has(keybindKeyFor('move-up') ?? 'w')) dy -= 1;
+        if (held.has(keybindKeyFor('move-down') ?? 's')) dy += 1;
+        if (held.has(keybindKeyFor('move-left') ?? 'a')) dx -= 1;
+        if (held.has(keybindKeyFor('move-right') ?? 'd')) dx += 1;
 
         if (dx || dy) {
             const dist = _avatarGetMoveSpeed() * dt;
@@ -241,7 +245,23 @@ function _makeAvatarWasdHandlers(elId) {
     const onKeyDown = (e) => {
         if (_avatarMoveUiBlocked()) return;
         const k = (e.key || '').toLowerCase();
-        if (!AVATAR_WASD_KEYS.has(k)) return;
+        // Which direction does this key drive? Read from the persisted
+        // keybind map (defaults: WASD).
+        let direction = null;
+        if (typeof keybindMatches === 'function') {
+            if (keybindMatches(e, 'move-up')) direction = 'up';
+            else if (keybindMatches(e, 'move-down')) direction = 'down';
+            else if (keybindMatches(e, 'move-left')) direction = 'left';
+            else if (keybindMatches(e, 'move-right')) direction = 'right';
+        } else {
+            switch (k) {
+                case 'w': direction = 'up'; break;
+                case 's': direction = 'down'; break;
+                case 'a': direction = 'left'; break;
+                case 'd': direction = 'right'; break;
+            }
+        }
+        if (!direction) return;
         e.preventDefault();
         if (_avatarMoveState.held.has(k)) return;   // ignore OS auto-repeat events
         _avatarMoveState.held.add(k);

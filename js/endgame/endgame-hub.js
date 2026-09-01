@@ -90,10 +90,11 @@ function _egAddItemToStash(item) {
 }
 
 // ── Orbs & Shards currency tab (PoE-style fixed slots) ──
-// 5 cols × 6 rows = 30 cells; 17 orbs + 8 shards = 25 assigned, 5 decorative empties.
-// Layout groups common orbs top-left, rarer centre, mirror + ancient orb, shards bottom.
+// 5 cols × 7 rows = 35 cells; 18 orbs + 9 shards + scouring = 28 assigned.
+// Rows 1-4: orbs with empties at (1,4), (2,4) and (4,4); Row 3,5 is Annulment, Row 5,5 is Mirror.
+// Row 5: separator row (5,1-5,4 EMPTY, 5,5 Mirror). Rows 6-7: shards in orb occurrence order.
 const EG_CURRENCY_COLS = 5;
-const EG_CURRENCY_ROWS = 6;
+const EG_CURRENCY_ROWS = 7;
 
 // Equipment currently offered to the crafting bench. The bench UI is opened
 // from the Orbs & Shards tab and accepts an item by drag-and-drop.
@@ -103,40 +104,49 @@ function _egBuildCraftingBenchSlotHTML() {
 }
 
 // Fixed assignment: currency id → {r,c}. Mirrors PoE currency tab ordering.
+// Layout as requested: orbs rows 1-4 with empties at (1,4),(2,4),(4,4); (3,5) is Annulment, (5,5) is Mirror.
+// Row 5 (r=4) separator with Mirror at (5,5); shards start at Row 6 (r=5) in orb occurrence order.
+// Orb of Scouring kept at (7,5) to retain functionality; remove its entry to make that cell empty.
 const EG_CURRENCY_SLOT_MAP = {
-    // Row 0 — common transmutation / alteration line
+    // Row 0 (1,1-1,5) — Transmutation, Augmentation, Alteration, EMPTY, Regal
     'orb_transmutation': { r: 0, c: 0 },
-    'orb_alteration':    { r: 0, c: 1 },
-    'orb_augmentation':  { r: 0, c: 2 },
-    'orb_alchemy':       { r: 0, c: 3 },
-    'orb_chance':        { r: 0, c: 4 },
-    // Row 1 — mid progression
-    'orb_regal':         { r: 1, c: 0 },
-    'orb_chaos':         { r: 1, c: 1 },
-    'orb_scouring':      { r: 1, c: 2 },
-    'orb_exalted':       { r: 1, c: 3 },
-    'orb_divine':        { r: 1, c: 4 },
-    // Row 2 — higher & specialised
-    'orb_annulment':     { r: 2, c: 0 },
-    'orb_ascension':     { r: 2, c: 1 },
-    'orb_elevation':     { r: 2, c: 2 },
-    'orb_cataclysm':     { r: 2, c: 3 },
-    'orb_horizons':      { r: 2, c: 4 },
-    // Row 3 — mirror + ancient orb + blessing + bloom (rare helper, regal-tier)
-    'orb_ancient':       { r: 3, c: 0 },
-    'orb_blessing':      { r: 3, c: 1 },
-    'mirror_of_kalandra':{ r: 3, c: 2 },
-    'orb_bloom':         { r: 3, c: 3 },
-    // Row 4-5 — shards (bottom section)
-    'shard_transmutation':{ r: 4, c: 0 },
-    'shard_alchemy':     { r: 4, c: 1 },
-    'shard_chaos':       { r: 4, c: 2 },
-    'shard_elevation':   { r: 4, c: 3 },
-    'shard_ascension':   { r: 4, c: 4 },
+    'orb_augmentation':  { r: 0, c: 1 },
+    'orb_alteration':    { r: 0, c: 2 },
+    // (0,3) intentionally EMPTY
+    'orb_regal':         { r: 0, c: 4 },
+    // Row 1 (2,1-2,5) — Alchemy, Blooming, Chaos, EMPTY, Elevation
+    'orb_alchemy':       { r: 1, c: 0 },
+    'orb_bloom':         { r: 1, c: 1 },
+    'orb_chaos':         { r: 1, c: 2 },
+    // (1,3) intentionally EMPTY
+    'orb_elevation':     { r: 1, c: 4 },
+    // Row 2 (3,1-3,5) — Ascension, Exalted, Cataclysm, Horizons, Annulment
+    'orb_ascension':     { r: 2, c: 0 },
+    'orb_exalted':       { r: 2, c: 1 },
+    'orb_cataclysm':     { r: 2, c: 2 },
+    'orb_horizons':      { r: 2, c: 3 },
+    'orb_annulment':     { r: 2, c: 4 },
+    // Row 3 (4,1-4,5) — Blessing, Ancient, Chance, EMPTY, Divine
+    'orb_blessing':      { r: 3, c: 0 },
+    'orb_ancient':       { r: 3, c: 1 },
+    'orb_chance':        { r: 3, c: 2 },
+    // (3,3) intentionally EMPTY (Annulment moved to 3,5)
+    'orb_divine':        { r: 3, c: 4 },
+    // Row 4 (5,1-5,5) — EMPTY with Mirror at (5,5)
+    // (4,0)-(4,3) EMPTY, (4,4) Mirror of Vors
+    'mirror_of_kalandra':{ r: 4, c: 4 },
+    // Row 5-6 (6,1-7,5) — shards in orb occurrence order (starting at 6,1)
+    'shard_transmutation':{ r: 5, c: 0 },
+    'shard_alchemy':     { r: 5, c: 1 },
     'shard_bloom':       { r: 5, c: 2 },
-    'shard_cataclysm':   { r: 5, c: 1 },
-    'shard_horizon':     { r: 5, c: 3 },
-    'shard_ancient':     { r: 5, c: 0 },
+    'shard_chaos':       { r: 5, c: 3 },
+    'shard_elevation':   { r: 5, c: 4 },
+    'shard_ascension':   { r: 6, c: 0 },
+    'shard_cataclysm':   { r: 6, c: 1 },
+    'shard_horizon':     { r: 6, c: 2 },
+    'shard_ancient':     { r: 6, c: 3 },
+    // Orb of Scouring retained at last cell (7,5) to preserve functionality
+    'orb_scouring':      { r: 6, c: 4 },
 };
 // Reverse map: "r-c" → id
 const EG_CURRENCY_SLOT_REVERSE = (() => {
@@ -625,6 +635,11 @@ function _egBuildStashPanelHTML() {
                      onmouseenter="_egShowItemLevelToggleTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
                      onmouseleave="hideGameTooltip()">${_egShowItemLevel ? '🔢' : '👤'} ${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</button>
+            <button class="eg-stash-btn eg-stash-btn-config" id="eg-loot-filter-btn"
+                     onclick="_egOpenLootFilterModal()"
+                     onmouseenter="_egShowLootFilterTooltip(event)"
+                     onmousemove="moveGameTooltip(event)"
+                     onmouseleave="hideGameTooltip()">⚗ ${t('eg_loot_filter_btn')}</button>
             <button class="eg-stash-btn eg-stash-btn-config" onclick="_egOpenMassSellModal()"
                      onmouseenter="_egShowMassSellConfigTooltip(event)"
                      onmousemove="moveGameTooltip(event)"
@@ -810,23 +825,25 @@ function _egShowMassSellTooltip(e) {
 // top-right of the Nexus of Worlds screen. Uses the shared game tooltip
 // engine (tooltips-hud.js) — not the browser title tooltip.
 function _egBuildHubInfoTooltipHTML() {
-    const line = (key) => `<div class="eg-tt-mod">${t(key)}</div>`;
+    const line = (key) => {
+        const txt = t(key);
+        if (!txt) return '';
+        return `<div class="eg-tt-mod">${txt}</div>`;
+    };
     return `
 <div class="eg-tt-frame" style="--tt-border:#c8a84b;">
     <div class="eg-tt-header">
         <div class="eg-tt-icon">❓</div>
         <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_hub_info_title')}</div>
     </div>
-    <div class="eg-tt-section">
+    <div class="eg-tt-section" style="display:flex;flex-direction:column;gap:5px;">
+        ${line('eg_hub_info_currency')}
+        ${line('eg_hub_info_sell')}
+        ${line('eg_hub_info_repeat')}
+        ${line('eg_hub_info_craft')}
+        <div style="height:1px;background:var(--border,#4a5475);opacity:.4;margin:2px 0;"></div>
         ${line('eg_hub_info_dragdrop')}
         ${line('eg_hub_info_compare')}
-        ${line('eg_hub_info_quickmove')}
-        ${line('eg_hub_info_sell')}
-        ${line('eg_hub_info_mass_sell')}
-        ${line('eg_hub_info_currency')}
-        ${line('eg_hub_info_blessing')}
-        ${line('eg_hub_info_essence')}
-        ${line('eg_hub_info_destroy')}
     </div>
 </div>`;
 }
@@ -941,7 +958,7 @@ function _egRenderInventoryCell(row, col) {
     if (!cell) return;
     const item = _egInventory[row][col];
     cell.innerHTML = item
-        ? _egBuildItemChipHTML(item) + _egBuildDeleteBtnHTML(row, col)   // ← delete btn added
+        ? _egBuildItemChipHTML(item)
         : '';
 
     // Fill the whole cell with the item's rarity color (red when its stat
@@ -997,7 +1014,7 @@ function _egRenderCurrencyCell(row, col) {
         cell.innerHTML = '';
         cell.classList.add('eg-currency-assigned-empty');
         if (def && def.icon) cell.setAttribute('data-empty-icon', def.icon);
-        cell.title = def ? def.name : assignedId;
+        cell.removeAttribute('title');
     } else {
         cell.innerHTML = '';
         cell.classList.remove('eg-currency-assigned-empty');
@@ -1055,7 +1072,7 @@ function _egRenderStatsList() {
 <div class="eg-stats-category">
     <div class="eg-stats-category-title">${cat.title}</div>
     ${cat.lines.map(line => `
-    <div class="eg-stat-row" data-desc-key="${line.descKey}" data-desc-label="${line.label}">
+    <div class="eg-stat-row" data-desc-key="${line.descKey}" data-desc-label="${line.label}"${line.resTotal != null ? ` data-res-total="${line.resTotal}" data-res-cap="${line.resCap}"` : ''}>
         <span class="eg-stat-name">${line.label}</span>
         <span class="eg-stat-value">${line.value}</span>
     </div>`).join('')}
@@ -1072,14 +1089,27 @@ function _egRenderStatsList() {
 // Builds the hover tooltip body for a single stat row: stat name as the
 // title plus its mechanic description. For armour and evasion the live
 // combat values (damage reduction / dodge chance) are appended, using the
-// exact formulas from endgame-player-stats.js.
-function _egBuildStatDescTooltipHTML(descKey, label) {
+// exact formulas from endgame-player-stats.js. For resistance rows the
+// uncapped gear total and the effective cap are revealed (the row itself
+// shows the capped value).
+function _egBuildStatDescTooltipHTML(descKey, label, row) {
     let html = `<strong style="color:var(--accent,#66fcf1)">${label}</strong>`;
     if (descKey) {
         const desc = t(descKey);
         // t() falls back to the raw key when a translation is missing
         if (desc && desc !== descKey) {
             html += `<br><span style="opacity:.75;font-size:.9em">${desc}</span>`;
+        }
+        // Resistance rows carry data-res-total / data-res-cap: show the
+        // uncapped total, and flag when the cap is clipping it.
+        if (row && row.dataset && row.dataset.resTotal != null) {
+            const total = parseFloat(row.dataset.resTotal);
+            const cap = parseFloat(row.dataset.resCap);
+            const capped = total > cap;
+            html += `<br><span style="color:var(--accent,#66fcf1)">`
+                + t('eg_statdesc_res_total').replace('{t}', total.toFixed(0))
+                + (capped ? ` — ${t('eg_statdesc_res_capped').replace('{c}', cap.toFixed(0))}` : '')
+                + `</span>`;
         }
         const stats = _egComputePlayerStats();
         // Armour/evasion live values are measured against a representative
@@ -1166,7 +1196,7 @@ function _egBindStatTooltips() {
         el.addEventListener('mouseover', e => {
             const row = e.target.closest ? e.target.closest('.eg-stat-row') : null;
             if (row && !row.classList.contains('eg-stat-placeholder')) {
-                showGameTooltip(_egBuildStatDescTooltipHTML(row.dataset.descKey, row.dataset.descLabel), e);
+                showGameTooltip(_egBuildStatDescTooltipHTML(row.dataset.descKey, row.dataset.descLabel, row), e);
             }
         });
         el.addEventListener('mousemove', e => {
@@ -1786,9 +1816,22 @@ function _egLoadHubState() {
     // and re-inserting them into their assigned slots (stacking counts).
     (function _migrateCurrency() {
         const saved = STATE.egCurrencyStash;
-        const needMigration = !Array.isArray(saved)
+        let needMigration = !Array.isArray(saved)
             || saved.length !== EG_CURRENCY_ROWS
             || (saved[0] && saved[0].length !== EG_CURRENCY_COLS);
+        // Also migrate when items are not in their assigned fixed slots
+        // (e.g. layout changed from old ordering to new requested ordering).
+        if (!needMigration && Array.isArray(saved)) {
+            outer: for (let r = 0; r < saved.length; r++) {
+                if (!Array.isArray(saved[r])) continue;
+                for (let c = 0; c < saved[r].length; c++) {
+                    const it = saved[r][c];
+                    if (!it || !it.id) continue;
+                    const pos = _egCurrencySlotForId(it.id);
+                    if (!pos || pos.r !== r || pos.c !== c) { needMigration = true; break outer; }
+                }
+            }
+        }
         if (!needMigration) {
             _egCurrencyStash = saved;
             return;
@@ -1967,6 +2010,8 @@ function _egLoadHubState() {
     }
     // Mass-sell filter — load (or default-initialise) from the persisted save.
     _egLoadMassSellSettings();
+    // Loot filter — load (or default-initialise) from the persisted save.
+    if (typeof _egLoadLootFilter === 'function') _egLoadLootFilter();
 
     // Heal legacy equipment items that were saved before implicits existed.
     try {
@@ -2030,7 +2075,6 @@ function _egCreateScreen() {
     screen.innerHTML = _egBuildFullScreenHTML();
     document.body.appendChild(screen);
     _egBindDragEvents();  // defined in endgame-hub-drag-and-drop.js
-    _egInjectDeleteUIStyles();
     _egInjectMassSellStyles();
 }
 
@@ -2104,135 +2148,7 @@ function egAddTestItems() {
 
 
 
-// Builds the small "destroy" button overlaid on a stash cell's item chip.
-// Row/col are baked into the onclick so the confirm flow knows which cell to clear.
-function _egBuildDeleteBtnHTML(row, col) {
-    return `<button class="eg-item-delete-btn" title="${t('eg_destroy_item_title')}"
-        onclick="event.stopPropagation(); _egRequestDeleteItem(${row}, ${col});">✕</button>`;
-}
 
-
-//------------------------------------------------------------------------
-//-------------------ITEM DELETE (STASH ONLY)------------------------------
-//------------------------------------------------------------------------
-
-// Cell awaiting confirmation, or null when no delete is pending.
-let _egPendingDeleteCell = null;
-
-// Lazily creates the confirm modal DOM (once).
-function _egEnsureDeleteModal() {
-    if (document.getElementById('eg-delete-modal')) return;
-
-    const modal = document.createElement('div');
-    modal.id = 'eg-delete-modal';
-    modal.className = 'eg-delete-modal-bg';
-    modal.innerHTML = `
-<div class="eg-delete-modal-box">
-    <div class="eg-delete-modal-title">${t('eg_destroy_item_confirm_title')}</div>
-    <div class="eg-delete-modal-text" id="eg-delete-modal-text"></div>
-    <div class="eg-delete-modal-btns">
-        <button class="eg-delete-modal-btn eg-delete-modal-confirm" onclick="_egConfirmDeleteItem()">${t('eg_destroy_btn')}</button>
-        <button class="eg-delete-modal-btn eg-delete-modal-cancel" onclick="_egCancelDeleteItem()">${t('reset_cancel')}</button>
-    </div>
-</div>`;
-    document.body.appendChild(modal);
-}
-
-// Opens the confirm modal for the given stash cell.
-function _egRequestDeleteItem(row, col) {
-    const item = _egInventory[row][col];
-    if (!item) return;
-
-    _egEnsureDeleteModal();
-    _egPendingDeleteCell = { row, col };
-
-    const textEl = document.getElementById('eg-delete-modal-text');
-    if (textEl) {
-        textEl.innerHTML = t('eg_destroy_confirm_text').replace('{n}', item.name || t('eg_this_item'));
-    }
-    document.getElementById('eg-delete-modal').classList.add('show');
-}
-
-// Confirms the pending delete: clears the cell, re-renders, saves.
-function _egConfirmDeleteItem() {
-    if (!_egPendingDeleteCell) return;
-    const { row, col } = _egPendingDeleteCell;
-
-    _egInventory[row][col] = null;
-    _egRenderInventoryCell(row, col);
-    _egUpdateInvCount();
-    _egClearTooltip();
-    egSaveHubState();
-
-    _egCancelDeleteItem();
-}
-
-// Closes the modal without deleting anything.
-function _egCancelDeleteItem() {
-    _egPendingDeleteCell = null;
-    const modal = document.getElementById('eg-delete-modal');
-    if (modal) modal.classList.remove('show');
-}
-
-
-
-// Injects styles for the stash delete button and confirm modal. Runs once.
-function _egInjectDeleteUIStyles() {
-    if (document.getElementById('eg-delete-ui-styles')) return;
-
-    const style = document.createElement('style');
-    style.id = 'eg-delete-ui-styles';
-    style.textContent = `
-        .eg-inv-cell { position: relative; }
-
-        .eg-item-delete-btn {
-            display: none;
-            position: absolute;
-            top: 1px; right: 1px;
-            width: 14px; height: 14px;
-            line-height: 12px;
-            font-size: 10px;
-            text-align: center;
-            background: rgba(180,20,20,0.85);
-            color: #fff;
-            border: 1px solid #700;
-            border-radius: 3px;
-            cursor: pointer;
-            z-index: 5;
-            padding: 0;
-        }
-        .eg-inv-cell:hover .eg-item-delete-btn { display: block; }
-        .eg-item-delete-btn:hover { background: #ff3333; }
-
-        .eg-delete-modal-bg {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 10000;
-            align-items: center; justify-content: center;
-        }
-        .eg-delete-modal-bg.show { display: flex; }
-        .eg-delete-modal-box {
-            background: #1a1a2e;
-            border: 2px solid #e74c3c;
-            border-radius: 8px;
-            padding: 20px 24px;
-            max-width: 340px;
-            text-align: center;
-        }
-        .eg-delete-modal-title { color: #e74c3c; font-weight: 700; margin-bottom: 10px; }
-        .eg-delete-modal-text { color: #ddd; margin-bottom: 16px; font-size: 0.9rem; }
-        .eg-delete-modal-btns { display: flex; gap: 10px; justify-content: center; }
-        .eg-delete-modal-btn { padding: 8px 14px; border-radius: 4px; border: none; cursor: pointer; font-weight: 700; }
-        .eg-delete-modal-confirm { background: #e74c3c; color: #fff; }
-        .eg-delete-modal-confirm:hover { background: #ff5c4d; }
-        .eg-delete-modal-cancel { background: #444; color: #ddd; }
-        .eg-delete-modal-cancel:hover { background: #555; }
-    `;
-    document.head.appendChild(style);
-}
-
-//------------------------------------------------------------------------
 //-------------------MASS SELL (STASH)------------------------------------
 //------------------------------------------------------------------------
 // Two buttons live in the stash header ("STASH" row):
@@ -2251,36 +2167,65 @@ function _egEnsureMassSellModal() {
     modal.id = 'eg-mass-sell-modal';
     modal.className = 'eg-mass-sell-modal-bg';
     modal.innerHTML = `
-<div class="eg-mass-sell-box">
-    <div class="eg-mass-sell-title">${t('eg_mass_sell_modal_title')}</div>
-    <div class="eg-mass-sell-desc">${t('eg_mass_sell_modal_desc')}</div>
-    <div class="eg-mass-sell-rarities" id="eg-mass-sell-rarities"></div>
-    <label class="eg-mass-sell-unique-row">
-        <input type="checkbox" id="eg-mass-sell-keep-unique">
-        <span>${t('eg_mass_sell_keep_unique')}</span>
-    </label>
-    <div class="eg-mass-sell-level-filters">
-        <div class="eg-mass-sell-level-row">
-            <label for="eg-mass-sell-min-ilvl">${t('eg_mass_sell_min_ilvl')}</label>
-            <input type="number" id="eg-mass-sell-min-ilvl" min="0" max="100" step="1" value="0">
+<div class="eg-mass-sell-box" id="eg-mass-sell-box">
+    <div class="eg-ms-head">
+        <span class="eg-ms-head-icon">⚒</span>
+        <span class="eg-ms-head-title">${t('eg_mass_sell_modal_title')}</span>
+        <button class="eg-ms-close" onclick="_egCloseMassSellModal()"
+                title="${t('eg_mass_sell_close')}" aria-label="${t('eg_mass_sell_close')}">✕</button>
+    </div>
+    <div class="eg-ms-body">
+        <div class="eg-ms-how">
+            <div class="eg-ms-how-title">${t('eg_mass_sell_how')}</div>
+            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b1')}</span></div>
+            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b2')}</span></div>
+            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b3')}</span></div>
         </div>
-        <div class="eg-mass-sell-level-row">
-            <label for="eg-mass-sell-min-reqlvl">${t('eg_mass_sell_min_reqlvl')}</label>
-            <input type="number" id="eg-mass-sell-min-reqlvl" min="0" max="100" step="1" value="0">
+        <div class="eg-ms-section-head">
+            <span class="eg-ms-section-title">${t('eg_mass_sell_rarities_section')}</span>
+            <span class="eg-ms-section-line"></span>
+        </div>
+        <div class="eg-mass-sell-rarities" id="eg-mass-sell-rarities"></div>
+        <label class="eg-ms-toggle eg-ms-toggle-gold">
+            <input type="checkbox" id="eg-mass-sell-keep-unique" class="eg-ms-check">
+            <span>${t('eg_mass_sell_keep_unique')}</span>
+        </label>
+        <div class="eg-ms-section-head">
+            <span class="eg-ms-section-title">${t('eg_mass_sell_levels_section')}</span>
+            <span class="eg-ms-section-line"></span>
+        </div>
+        <div class="eg-ms-level-filters">
+            <div class="eg-ms-field">
+                <label for="eg-mass-sell-min-ilvl">${t('eg_mass_sell_min_ilvl')}</label>
+                <input type="number" id="eg-mass-sell-min-ilvl" min="0" max="100" step="1" value="0">
+                <span class="eg-ms-zero-hint">${t('eg_mass_sell_zero_off')}</span>
+            </div>
+            <div class="eg-ms-field">
+                <label for="eg-mass-sell-min-reqlvl">${t('eg_mass_sell_min_reqlvl')}</label>
+                <input type="number" id="eg-mass-sell-min-reqlvl" min="0" max="100" step="1" value="0">
+                <span class="eg-ms-zero-hint">${t('eg_mass_sell_zero_off')}</span>
+            </div>
         </div>
     </div>
-    <div class="eg-mass-sell-preview" id="eg-mass-sell-preview"></div>
-    <div class="eg-mass-sell-btns">
-        <button class="eg-mass-sell-btn eg-mass-sell-save" onclick="_egSaveMassSellModal()">${t('eg_mass_sell_save')}</button>
-        <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCloseMassSellModal()">${t('reset_cancel')}</button>
+    <div class="eg-ms-foot">
+        <div class="eg-mass-sell-preview" id="eg-mass-sell-preview"></div>
+        <div class="eg-mass-sell-btns">
+            <button class="eg-mass-sell-btn eg-mass-sell-save" onclick="_egSaveMassSellModal()">${t('eg_mass_sell_save')}</button>
+            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCloseMassSellModal()">${t('reset_cancel')}</button>
+        </div>
     </div>
 </div>
 <div class="eg-mass-sell-confirm" id="eg-mass-sell-confirm" style="display:none;">
-    <div class="eg-mass-sell-confirm-title">${t('eg_mass_sell_confirm_title')}</div>
-    <div class="eg-mass-sell-confirm-text" id="eg-mass-sell-confirm-text"></div>
-    <div class="eg-mass-sell-btns">
-        <button class="eg-mass-sell-btn eg-mass-sell-confirm" onclick="_egConfirmMassSell()">${t('eg_mass_sell_confirm_btn')}</button>
-        <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCancelMassSellConfirm()">${t('eg_mass_sell_cancel')}</button>
+    <div class="eg-ms-head">
+        <span class="eg-ms-head-icon">⚒</span>
+        <span class="eg-ms-head-title">${t('eg_mass_sell_confirm_title')}</span>
+    </div>
+    <div class="eg-ms-confirm-body">
+        <div class="eg-mass-sell-confirm-text" id="eg-mass-sell-confirm-text"></div>
+        <div class="eg-mass-sell-btns">
+            <button class="eg-mass-sell-btn eg-mass-sell-confirm" onclick="_egConfirmMassSell()">${t('eg_mass_sell_confirm_btn')}</button>
+            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCancelMassSellConfirm()">${t('eg_mass_sell_cancel')}</button>
+        </div>
     </div>
 </div>`;
     // Clicking the dimmed backdrop closes the modal (but not clicks inside the box).
@@ -2317,7 +2262,7 @@ function _egRenderMassSellModalContent() {
         const col = _egRarityColor(r);
         const label = _egRarityLabel(r);
         return `<label class="eg-mass-sell-row" style="--rar:${col};">
-            <input type="checkbox" data-rarity="${r}" ${checked}>
+            <input type="checkbox" class="eg-ms-check" data-rarity="${r}" ${checked}>
             <span class="eg-mass-sell-dot"></span>
             <span class="eg-mass-sell-rarity-name">${label}</span>
             <span class="eg-mass-sell-keep-hint">${t('eg_mass_sell_keep_label').replace('{rarity}', label)}</span>
@@ -2373,17 +2318,56 @@ function _egUpdateMassSellPreview() {
             }
         }
     }
-    preview.textContent = t('eg_mass_sell_preview')
-        .replace('{keep}', String(keep))
-        .replace('{sell}', String(sell));
+    preview.innerHTML = t('eg_mass_sell_preview')
+        .replace('{keep}', `<span class="eg-ms-n-keep">${keep}</span>`)
+        .replace('{sell}', `<span class="eg-ms-n-sell">${sell}</span>`);
     // also stash for confirm step
     preview.dataset.keep = String(keep);
     preview.dataset.sell = String(sell);
 }
 
+// Re-applies the static shell strings on every open so a language switch
+// mid-session is picked up (the shell markup itself is built only once).
+function _egMassSellRenderStaticText(modal) {
+    const title = modal.querySelector('.eg-mass-sell-box .eg-ms-head-title');
+    if (title) title.textContent = t('eg_mass_sell_modal_title');
+    const close = modal.querySelector('.eg-ms-close');
+    if (close) {
+        close.title = t('eg_mass_sell_close');
+        close.setAttribute('aria-label', t('eg_mass_sell_close'));
+    }
+    const howTitle = modal.querySelector('.eg-ms-how-title');
+    if (howTitle) howTitle.textContent = t('eg_mass_sell_how');
+    const bullets = ['eg_mass_sell_b1', 'eg_mass_sell_b2', 'eg_mass_sell_b3'];
+    modal.querySelectorAll('.eg-ms-how-li > span:last-child').forEach((el, i) => {
+        if (bullets[i]) el.textContent = t(bullets[i]);
+    });
+    const sections = modal.querySelectorAll('.eg-mass-sell-box .eg-ms-section-title');
+    if (sections[0]) sections[0].textContent = t('eg_mass_sell_rarities_section');
+    if (sections[1]) sections[1].textContent = t('eg_mass_sell_levels_section');
+    const toggleSpan = modal.querySelector('.eg-ms-toggle-gold > span');
+    if (toggleSpan) toggleSpan.textContent = t('eg_mass_sell_keep_unique');
+    const ilvlLabel = modal.querySelector('label[for="eg-mass-sell-min-ilvl"]');
+    if (ilvlLabel) ilvlLabel.textContent = t('eg_mass_sell_min_ilvl');
+    const reqLabel = modal.querySelector('label[for="eg-mass-sell-min-reqlvl"]');
+    if (reqLabel) reqLabel.textContent = t('eg_mass_sell_min_reqlvl');
+    modal.querySelectorAll('.eg-ms-zero-hint').forEach(el => { el.textContent = t('eg_mass_sell_zero_off'); });
+    const saveBtn = modal.querySelector('.eg-mass-sell-btn.eg-mass-sell-save');
+    if (saveBtn) saveBtn.textContent = t('eg_mass_sell_save');
+    const cancelBtn = modal.querySelector('.eg-mass-sell-box .eg-mass-sell-btn.eg-mass-sell-cancel');
+    if (cancelBtn) cancelBtn.textContent = t('reset_cancel');
+    const confirmTitle = modal.querySelector('.eg-mass-sell-confirm .eg-ms-head-title');
+    if (confirmTitle) confirmTitle.textContent = t('eg_mass_sell_confirm_title');
+    const confirmSell = modal.querySelector('.eg-mass-sell-btn.eg-mass-sell-confirm');
+    if (confirmSell) confirmSell.textContent = t('eg_mass_sell_confirm_btn');
+    const confirmCancel = modal.querySelector('.eg-mass-sell-confirm .eg-mass-sell-btn.eg-mass-sell-cancel');
+    if (confirmCancel) confirmCancel.textContent = t('eg_mass_sell_cancel');
+}
+
 function _egOpenMassSellModal() {
     _egLoadMassSellSettings();
     const modal = _egEnsureMassSellModal();
+    _egMassSellRenderStaticText(modal);
     _egRenderMassSellModalContent();
     // ensure filter view is visible, confirm hidden
     const box = modal.querySelector('.eg-mass-sell-box');
@@ -2424,6 +2408,7 @@ function _egRequestMassSell() {
     }
     const modal = _egEnsureMassSellModal();
     // populate confirm text in the same modal (re-uses the overlay)
+    _egMassSellRenderStaticText(modal);
     _egRenderMassSellModalContent();
     const box = modal.querySelector('.eg-mass-sell-box');
     const confirm = document.getElementById('eg-mass-sell-confirm');
@@ -2561,7 +2546,8 @@ function _egExecuteMassSell() {
     }
 }
 
-// Global Escape handler for the mass-sell overlay (only when it is open).
+// Global Escape handler for the endgame stash modals (only when open):
+// closes the mass-sell overlay (confirm step steps back to filter view).
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const m = document.getElementById('eg-mass-sell-modal');
@@ -2584,6 +2570,7 @@ function _egInjectMassSellStyles() {
     const style = document.createElement('style');
     style.id = 'eg-mass-sell-styles';
     style.textContent = `
+        /* ── stash header buttons ── */
         .eg-stash-header {
             display: flex; align-items: center; justify-content: space-between; gap: 10px;
         }
@@ -2591,87 +2578,254 @@ function _egInjectMassSellStyles() {
         .eg-stash-btn {
             font-family: var(--PX, monospace); font-size: 9px; letter-spacing: 1px;
             padding: 5px 10px; cursor: pointer;
-            border: 1px solid var(--border2, #444); color: var(--accent2, #ccc);
-            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.25)), var(--surface, #1a1a2e);
+            border: 1px solid var(--border2, #656f96); color: var(--accent2, #fff);
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2)), var(--surface, #303648);
             transition: all 0.12s;
             white-space: nowrap;
         }
-        .eg-stash-btn:hover { color: var(--accent, #c8a84b); border-color: var(--accent, #c8a84b); }
-        .eg-stash-btn-sell { color: #f5d98a; border-color: rgba(200,168,75,0.6); }
-        .eg-stash-btn-sell:hover { box-shadow: 0 0 8px rgba(200,168,75,0.3); color: #fff; }
+        .eg-stash-btn:hover { color: var(--accent, #66fcf1); border-color: var(--accent, #66fcf1); }
+        .eg-stash-btn-sell { color: var(--yellow, #f5c518); border-color: rgba(245,197,24,0.55); }
+        .eg-stash-btn-sell:hover {
+            box-shadow: 0 0 8px rgba(245,197,24,0.3); color: #fff;
+            border-color: var(--yellow, #f5c518);
+        }
+
+        /* ── backdrop ── */
         .eg-mass-sell-modal-bg {
             display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.65); z-index: 10001;
+            background: rgba(5,8,14,0.78);
+            backdrop-filter: blur(2px);
+            z-index: 10001;
             align-items: center; justify-content: center;
         }
         .eg-mass-sell-modal-bg.show { display: flex; }
-        .eg-mass-sell-box, .eg-mass-sell-confirm {
-            background: #1a1a2e; border: 1px solid var(--accent, #c8a84b);
-            border-radius: 10px; padding: 18px 20px; width: min(420px, 92vw);
-            box-shadow: 0 0 18px rgba(200,168,75,0.2);
+
+        /* ── shell: fixed header, scrollable body, pinned footer ── */
+        .eg-mass-sell-box {
+            display: flex; flex-direction: column;
+            box-sizing: border-box;
+            background: var(--panel, #222630);
+            border: 1px solid var(--border2, #656f96);
+            border-radius: 8px;
+            width: min(480px, 94vw);
+            max-height: min(640px, 92vh);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.55),
+                        0 0 26px rgba(102,252,241,0.10),
+                        0 22px 48px rgba(0,0,0,0.55);
+            overflow: hidden;
         }
-        .eg-mass-sell-confirm { text-align: center; }
-        .eg-mass-sell-title, .eg-mass-sell-confirm-title {
-            font-family: var(--PX, monospace); font-size: 13px; letter-spacing: 2px;
-            color: var(--accent, #c8a84b); text-align: center; margin-bottom: 8px;
+        .eg-mass-sell-confirm {
+            box-sizing: border-box;
+            background: var(--panel, #222630);
+            border: 1px solid var(--border2, #656f96);
+            border-radius: 8px;
+            width: min(420px, 92vw);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.55),
+                        0 0 26px rgba(102,252,241,0.10),
+                        0 22px 48px rgba(0,0,0,0.55);
+            overflow: hidden;
         }
-        .eg-mass-sell-desc, .eg-mass-sell-confirm-text {
-            font-family: var(--PX, monospace); font-size: 10px; line-height: 1.6;
-            color: var(--accent2, #ccc); text-align: center; margin-bottom: 12px;
-            opacity: 0.9;
+
+        /* ── header ── */
+        .eg-ms-head {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--border, #4a5475);
+            background: linear-gradient(180deg, rgba(102,252,241,0.07), rgba(102,252,241,0.02));
+            flex-shrink: 0;
         }
-        .eg-mass-sell-rarities { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+        .eg-ms-head-icon {
+            font-size: 16px; line-height: 1; color: var(--accent, #66fcf1);
+            text-shadow: 0 0 8px rgba(102,252,241,0.5);
+        }
+        .eg-ms-head-title {
+            flex: 1; min-width: 0;
+            font-family: var(--PX, monospace); font-size: 11px; letter-spacing: 2px;
+            color: var(--accent, #66fcf1);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .eg-ms-close {
+            width: 24px; height: 24px; flex-shrink: 0;
+            font-family: var(--PX, monospace); font-size: 10px; line-height: 1;
+            color: var(--accent2, #fff); background: transparent;
+            border: 1px solid var(--border2, #656f96); border-radius: 4px;
+            cursor: pointer; transition: all 0.12s;
+        }
+        .eg-ms-close:hover {
+            color: #ff6b6b; border-color: rgba(255,107,107,0.6);
+            background: rgba(255,107,107,0.12);
+        }
+
+        /* ── scrollable body ── */
+        .eg-ms-body {
+            flex: 1; min-height: 0;
+            overflow-y: auto; overflow-x: hidden;
+            padding: 12px 14px;
+            display: flex; flex-direction: column; gap: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border2, #656f96) transparent;
+        }
+        .eg-ms-body::-webkit-scrollbar { width: 8px; }
+        .eg-ms-body::-webkit-scrollbar-track { background: transparent; }
+        .eg-ms-body::-webkit-scrollbar-thumb { background: var(--border2, #656f96); border-radius: 4px; }
+
+        /* ── how-it-works ── */
+        .eg-ms-how {
+            border: 1px solid var(--border, #4a5475);
+            border-left: 3px solid var(--accent, #66fcf1);
+            border-radius: 4px;
+            background: rgba(102,252,241,0.04);
+            padding: 8px 10px;
+        }
+        .eg-ms-how-title {
+            font-family: var(--PX, monospace); font-size: 7px; letter-spacing: 2px;
+            color: var(--accent, #66fcf1); opacity: 0.9; margin-bottom: 6px;
+        }
+        .eg-ms-how-li {
+            display: flex; gap: 7px; align-items: baseline;
+            font-family: var(--F, monospace); font-size: 12.5px; line-height: 1.45;
+            color: var(--accent2, #fff); opacity: 0.88;
+        }
+        .eg-ms-how-li + .eg-ms-how-li { margin-top: 3px; }
+        .eg-ms-how-b { color: var(--accent, #66fcf1); flex-shrink: 0; }
+
+        /* ── section headers ── */
+        .eg-ms-section-head { display: flex; align-items: center; gap: 8px; }
+        .eg-ms-section-title {
+            font-family: var(--PX, monospace); font-size: 8px; letter-spacing: 2px;
+            color: var(--accent, #66fcf1);
+        }
+        .eg-ms-section-line { flex: 1; height: 1px; background: var(--border, #4a5475); opacity: 0.6; }
+
+        /* ── rarity rows ── */
+        .eg-mass-sell-rarities { display: flex; flex-direction: column; gap: 4px; }
         .eg-mass-sell-row {
-            display: flex; align-items: center; gap: 8px;
-            padding: 6px 10px; border: 1px solid var(--border, #333);
-            background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;
-            font-family: var(--PX, monospace); font-size: 11px; color: #ddd;
+            display: flex; align-items: center; gap: 9px;
+            padding: 5px 8px; border: 1px solid transparent; border-radius: 3px;
+            background: transparent; cursor: pointer; user-select: none;
+            font-family: var(--F, monospace); font-size: 13px; color: var(--accent2, #fff);
+            transition: background 0.12s, border-color 0.12s;
         }
-        .eg-mass-sell-row:hover { border-color: var(--rar, #888); background: rgba(255,255,255,0.06); }
-        .eg-mass-sell-row input { accent-color: var(--rar, #c8a84b); }
-        .eg-mass-sell-dot { width: 10px; height: 10px; border-radius: 2px; background: var(--rar); display:inline-block; flex-shrink:0; }
+        .eg-mass-sell-row:hover { background: rgba(255,255,255,0.05); border-color: var(--rar, #888); }
+        .eg-mass-sell-dot {
+            width: 10px; height: 10px; border-radius: 2px; background: var(--rar);
+            display: inline-block; flex-shrink: 0;
+            box-shadow: 0 0 5px var(--rar);
+        }
         .eg-mass-sell-rarity-name { font-weight: 700; color: var(--rar); }
-        .eg-mass-sell-keep-hint { margin-left: auto; font-size: 9px; opacity: 0.6; letter-spacing: 1px; }
-        .eg-mass-sell-unique-row {
-            display: flex; align-items: center; gap: 8px; margin: 8px 0 4px;
-            font-family: var(--PX, monospace); font-size: 10px; color: #f1c40f; cursor: pointer;
+        .eg-mass-sell-keep-hint {
+            margin-left: auto;
+            font-family: var(--F, monospace); font-size: 11px;
+            opacity: 0.55; letter-spacing: 0.5px;
         }
-        .eg-mass-sell-level-filters {
-            display: flex; flex-direction: column; gap: 8px; margin: 10px 0;
-            padding: 10px; border: 1px solid var(--border, #333);
-            background: rgba(255,255,255,0.02); border-radius: 6px;
+
+        /* ── custom checkboxes (same look as the loot filter) ── */
+        .eg-ms-check {
+            appearance: none; -webkit-appearance: none;
+            width: 15px; height: 15px; flex-shrink: 0; margin: 0;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border2, #656f96); border-radius: 2px;
+            cursor: pointer; position: relative;
+            transition: all 0.12s;
         }
-        .eg-mass-sell-level-row {
-            display: flex; align-items: center; gap: 8px;
-            font-family: var(--PX, monospace); font-size: 11px; color: #ddd;
+        .eg-ms-check:hover { border-color: var(--accent, #66fcf1); }
+        .eg-ms-check:checked {
+            background: var(--accent, #66fcf1); border-color: var(--accent, #66fcf1);
+            box-shadow: 0 0 7px rgba(102,252,241,0.55);
         }
-        .eg-mass-sell-level-row label {
-            min-width: 120px; opacity: 0.8;
+        .eg-ms-check:checked::after {
+            content: '✓'; position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700; color: #0c1016;
         }
-        .eg-mass-sell-level-row input[type="number"] {
-            width: 60px; padding: 4px 8px; font-family: var(--PX, monospace); font-size: 11px;
-            background: #111; border: 1px solid var(--border2, #444); color: #f5d98a; border-radius: 4px;
-            text-align: center;
+
+        /* ── gold toggle row ── */
+        .eg-ms-toggle {
+            display: flex; align-items: center; gap: 9px;
+            padding: 5px 8px; border-radius: 3px; cursor: pointer; user-select: none;
+            font-family: var(--F, monospace); font-size: 13px; color: var(--accent2, #fff);
+            border: 1px solid transparent;
+            transition: background 0.12s, border-color 0.12s;
         }
-        .eg-mass-sell-level-row input[type="number"]:focus {
-            outline: none; border-color: var(--accent, #c8a84b); box-shadow: 0 0 4px rgba(200,168,75,0.3);
+        .eg-ms-toggle:hover { background: rgba(102,252,241,0.05); border-color: var(--border, #4a5475); }
+        .eg-ms-toggle-gold span { color: var(--yellow, #f5c518); }
+
+        /* ── level filter fields ── */
+        .eg-ms-level-filters { display: flex; flex-direction: column; gap: 8px; }
+        .eg-ms-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .eg-ms-field > label {
+            font-family: var(--PX, monospace); font-size: 7px; letter-spacing: 1px;
+            color: var(--setup-opt-inactive, #8892a3); text-transform: uppercase;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .eg-ms-field input[type="number"] {
+            width: 100%; box-sizing: border-box;
+            font-family: var(--F, monospace); font-size: 13px;
+            color: var(--accent, #66fcf1);
+            background: rgba(0,0,0,0.35);
+            border: 1px solid var(--border, #4a5475); border-radius: 3px;
+            padding: 4px 7px;
+            transition: border-color 0.12s, box-shadow 0.12s;
+        }
+        .eg-ms-field input[type="number"]:focus {
+            outline: none; border-color: var(--accent, #66fcf1);
+            box-shadow: 0 0 6px rgba(102,252,241,0.3);
+        }
+        .eg-ms-zero-hint {
+            font-family: var(--F, monospace); font-size: 10px; line-height: 1;
+            color: var(--setup-opt-inactive, #8892a3); opacity: 0.85;
+        }
+
+        /* ── footer (pinned: preview + save/cancel always visible) ── */
+        .eg-ms-foot {
+            flex-shrink: 0;
+            border-top: 1px solid var(--border, #4a5475);
+            background: rgba(0,0,0,0.18);
+            padding: 9px 14px 12px;
         }
         .eg-mass-sell-preview {
-            font-family: var(--PX, monospace); font-size: 10px; text-align: center;
-            color: #f5d98a; letter-spacing: 1px; margin: 10px 0 12px; min-height: 14px;
+            text-align: center; min-height: 17px; margin-bottom: 8px;
+            font-family: var(--F, monospace); font-size: 13px; letter-spacing: 0.5px;
+            color: var(--accent2, #fff);
         }
+        .eg-ms-n-keep { color: var(--green, #3ddc84); }
+        .eg-ms-n-sell { color: var(--orange, #ff8c42); }
         .eg-mass-sell-btns { display: flex; gap: 10px; justify-content: center; }
         .eg-mass-sell-btn {
-            font-family: var(--PX, monospace); font-size: 11px; letter-spacing: 1px;
-            padding: 8px 16px; cursor: pointer; border: 1px solid var(--border2, #444);
-            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.25)), var(--surface, #1a1a2e);
-            color: var(--accent2, #ccc); transition: all 0.12s;
+            font-family: var(--PX, monospace); font-size: 10px; letter-spacing: 1px;
+            padding: 9px 20px; cursor: pointer;
+            color: var(--accent2, #fff);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border2, #656f96); border-radius: 4px;
+            transition: all 0.12s;
         }
-        .eg-mass-sell-btn:hover { border-color: var(--accent, #c8a84b); color: var(--accent, #c8a84b); }
-        .eg-mass-sell-btn.eg-mass-sell-save, .eg-mass-sell-btn.eg-mass-sell-confirm {
-            color: #1a1a2e; background: var(--accent, #c8a84b); border-color: var(--accent, #c8a84b); font-weight: 700;
+        .eg-mass-sell-btn:hover { border-color: var(--accent, #66fcf1); color: var(--accent, #66fcf1); }
+        .eg-mass-sell-btn.eg-mass-sell-save {
+            color: #0c1016; background: var(--accent, #66fcf1);
+            border-color: var(--accent, #66fcf1); font-weight: 700;
         }
-        .eg-mass-sell-btn.eg-mass-sell-save:hover, .eg-mass-sell-btn.eg-mass-sell-confirm:hover { filter: brightness(1.1); }
+        .eg-mass-sell-btn.eg-mass-sell-save:hover { box-shadow: 0 0 12px rgba(102,252,241,0.5); }
+
+        /* ── confirm view ── */
+        .eg-ms-confirm-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+        .eg-mass-sell-confirm-text {
+            font-family: var(--F, monospace); font-size: 13px; line-height: 1.5;
+            color: var(--accent2, #fff); text-align: center;
+        }
+        /* Destructive action — red fill, matching the game's delete-confirm button */
+        .eg-mass-sell-btn.eg-mass-sell-confirm {
+            color: #fff; background: var(--red, #e74c3c);
+            border-color: var(--red, #e74c3c); font-weight: 700;
+        }
+        .eg-mass-sell-btn.eg-mass-sell-confirm:hover {
+            filter: brightness(1.1); box-shadow: 0 0 10px rgba(231,76,60,0.4);
+        }
+
+        /* ── narrow screens ── */
+        @media (max-width: 500px) {
+            .eg-ms-body { padding: 10px; }
+            .eg-ms-foot { padding: 8px 10px 10px; }
+        }
     `;
     document.head.appendChild(style);
 }

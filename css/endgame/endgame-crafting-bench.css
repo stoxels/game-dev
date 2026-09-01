@@ -1,42 +1,49 @@
-#eg-crafting-bench-overlay { display:none; position:fixed; inset:0; z-index:700; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,.82); pointer-events:none; }
-#eg-crafting-bench-overlay.show { display:flex; }
-.eg-craft-bench-panel { width:min(900px,96vw); max-height:92vh; overflow:auto; position:relative; padding:22px; color:#e8e0cc; background:linear-gradient(145deg,#211c2a,#11131d); border:1px solid #a88945; box-shadow:0 0 35px rgba(0,0,0,.8),0 0 18px rgba(200,160,70,.2); pointer-events:auto; }
-.eg-craft-bench-panel h2 { margin:0 0 14px; text-align:center; color:#f1d27b; letter-spacing:3px; }
-.eg-craft-close { position:absolute; right:12px; top:10px; background:transparent; border:1px solid #665536; color:#d8bd74; cursor:pointer; }
-.eg-crafting-launcher { padding:7px 6px 10px; border-top:1px solid rgba(181,146,72,.25); }
-.eg-crafting-open-btn,.eg-craft-apply { width:100%; padding:7px; border:1px solid #ad8d48; color:#f4d98b; background:#292231; cursor:pointer; font-weight:bold; }
-.eg-crafting-open-btn:hover,.eg-craft-apply:not(:disabled):hover { background:#493b29; }
-.eg-crafting-slot { min-height:34px; margin-top:6px; display:flex; align-items:center; justify-content:center; border:1px dashed #806b42; color:#a89978; font-size:.75rem; text-align:center; }
-.eg-craft-drop-active { border-color:#f1d27b; background:rgba(200,160,70,.18); }
-.eg-craft-bench-item { min-height:74px; display:flex; align-items:center; justify-content:center; border:1px solid #665536; background:rgba(0,0,0,.28); }
+#eg-crafting-bench-overlay { display:none; position:fixed; inset:0; z-index:700; align-items:center; justify-content:center; padding:16px; background:rgba(5,8,14,0.78); backdrop-filter:blur(2px); pointer-events:none; }
+#eg-crafting-bench-overlay.show { display:flex; pointer-events:auto; }
+.eg-craft-bench-panel { width:min(920px,96vw); max-height:92vh; display:flex; flex-direction:column; position:relative; box-sizing:border-box; overflow:hidden; color:var(--accent2,#e8e0cc); background:var(--panel,#222630); border:1px solid var(--border2,#656f96); border-radius:8px; box-shadow:0 0 0 1px rgba(0,0,0,0.55),0 0 26px rgba(102,252,241,0.10),0 22px 48px rgba(0,0,0,0.55); pointer-events:auto; }
+.eg-craft-head { display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--border,#4a5475); background:linear-gradient(180deg, rgba(102,252,241,0.07), rgba(102,252,241,0.02)); flex-shrink:0; }
+.eg-craft-head-icon { font-size:16px; line-height:1; color:var(--accent,#66fcf1); text-shadow:0 0 8px rgba(102,252,241,0.5); }
+.eg-craft-head-title { flex:1; min-width:0; font-family:var(--PX, monospace); font-size:11px; letter-spacing:2px; color:var(--accent,#66fcf1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.eg-craft-bench-panel h2 { display:none; }
+.eg-craft-close { width:24px; height:24px; flex-shrink:0; font-family:var(--PX, monospace); font-size:10px; line-height:1; color:var(--accent2,#fff); background:transparent; border:1px solid var(--border2,#656f96); border-radius:4px; cursor:pointer; transition:all 0.12s; }
+.eg-craft-close:hover { color:#ff6b6b; border-color:rgba(255,107,107,0.6); background:rgba(255,107,107,0.12); }
+.eg-craft-body { flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; padding:12px 14px; display:flex; flex-direction:column; gap:10px; scrollbar-width:thin; scrollbar-color:var(--border2,#656f96) transparent; }
+.eg-craft-body::-webkit-scrollbar { width:8px; }
+.eg-craft-body::-webkit-scrollbar-track { background:transparent; }
+.eg-craft-body::-webkit-scrollbar-thumb { background:var(--border2,#656f96); border-radius:4px; }
+.eg-crafting-launcher { padding:7px 6px 10px; border-top:1px solid rgba(181,146,72,.25); background:var(--panel); }
+.eg-crafting-open-btn { width:100%; padding:7px; font-family:var(--PX, monospace); font-size:9px; letter-spacing:1px; border:1px solid rgba(200,168,75,0.55); color:var(--yellow,#f5d98a); background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2)), var(--surface,#303648); cursor:pointer; transition:all 0.12s; }
+.eg-crafting-open-btn:hover { border-color:var(--yellow,#f5d98a); color:#fff; box-shadow:0 0 8px rgba(245,197,24,0.25); }
+.eg-craft-apply { width:100%; padding:10px 20px; font-family:var(--PX, monospace); font-size:10px; letter-spacing:1px; border-radius:4px; cursor:pointer; transition:all 0.12s; font-weight:700; }
+.eg-craft-apply { background:var(--accent,#66fcf1); color:#0c1016; border:1px solid var(--accent,#66fcf1); }
+.eg-craft-apply:not(:disabled):hover { box-shadow:0 0 12px rgba(102,252,241,0.5); filter:brightness(1.05); }
+.eg-craft-apply:disabled { opacity:.45; cursor:not-allowed; background:rgba(255,255,255,0.05); color:var(--accent2,#fff); border-color:var(--border2,#656f96); }
+.eg-crafting-slot { min-height:34px; margin-top:6px; display:flex; align-items:center; justify-content:center; border:1px dashed rgba(181,146,72,.35); background:rgba(255,255,255,0.02); color:var(--setup-opt-inactive,#a89978); font-family:var(--PX, monospace); font-size:7px; letter-spacing:1px; text-align:center; transition:all 0.12s; }
+.eg-craft-drop-active { border-color:var(--accent,#66fcf1) !important; background:rgba(102,252,241,0.08) !important; }
+.eg-craft-bench-item { min-height:74px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border,#4a5475); background:rgba(0,0,0,.18); border-radius:4px; }
 .eg-craft-bench-item .eg-item-chip { width:70px; height:70px; }
-.eg-craft-ilvl { padding:8px; text-align:center; color:#b6aa91; font-size:.8rem; }
-
-/* Crafted modifier capacity display */
-.eg-craft-capacity { display:flex; justify-content:space-between; padding:6px 10px; margin-bottom:8px; background:rgba(0,0,0,.2); border:1px solid #4e5368; font-size:.7rem; color:#b6aa91; }
+.eg-craft-ilvl { padding:6px 8px; text-align:center; color:var(--setup-opt-inactive,#b6aa91); font-family:var(--PX, monospace); font-size:8px; letter-spacing:1px; background:rgba(0,0,0,0.14); border:1px solid var(--border,#4a5475); border-radius:4px; }
+.eg-craft-capacity { display:flex; justify-content:space-between; gap:8px; padding:8px 10px; background:rgba(0,0,0,.18); border:1px solid var(--border,#4a5475); border-radius:4px; font-family:var(--PX, monospace); font-size:7px; letter-spacing:1px; color:var(--setup-opt-inactive,#b6aa91); }
 .eg-craft-capacity-item { display:flex; align-items:center; gap:6px; }
-.eg-craft-capacity-bar { width:80px; height:6px; background:#2a2a3a; border-radius:3px; overflow:hidden; }
-.eg-craft-capacity-fill { height:100%; background:#66c9ff; transition:width 0.2s; }
-
-.eg-craft-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:10px; max-height:52vh; overflow:auto; }
-.eg-craft-family { border:1px solid rgba(181,146,72,.3); padding:10px; background:rgba(255,255,255,.025); }
+.eg-craft-capacity-bar { width:80px; height:6px; background:rgba(0,0,0,0.35); border:1px solid var(--border,#4a5475); border-radius:3px; overflow:hidden; }
+.eg-craft-capacity-fill { height:100%; background:var(--accent,#66c9ff); transition:width 0.2s; }
+.eg-craft-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:8px; }
+.eg-craft-family { border:1px solid var(--border,#4a5475); border-radius:4px; padding:10px; background:rgba(255,255,255,.03); transition:border-color 0.12s; }
+.eg-craft-family:hover { border-color:rgba(102,252,241,0.25); }
 .eg-craft-family.prefix { border-left:3px solid #66c9ff; }
 .eg-craft-family.suffix { border-left:3px solid #f1d27b; }
-.eg-craft-family-name { margin-bottom:8px; font-size:.75rem; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; }
+.eg-craft-family-name { margin-bottom:8px; font-family:var(--PX, monospace); font-size:7px; letter-spacing:1.5px; font-weight:bold; text-transform:uppercase; }
 .eg-craft-family-name.prefix { color:#66c9ff; }
 .eg-craft-family-name.suffix { color:#f1d27b; }
 .eg-craft-tiers { display:flex; flex-wrap:wrap; gap:4px; }
-.eg-craft-tier { padding:6px 10px; border:1px solid #4e5368; background:#202435; color:#d9e1f2; text-align:left; cursor:pointer; font-size:.7rem; border-radius:3px; white-space:nowrap; min-width:120px; }
-.eg-craft-tier:hover,.eg-craft-tier.selected { border-color:#66c9ff; background:#263d50; }
-.eg-craft-tier.disabled { color:#817c78; border-color:#493f3a; background:#18181d; cursor:not-allowed; opacity:.7; }
-.eg-craft-tier .tier-label { color:#f1d27b; }
+.eg-craft-tier { padding:6px 10px; border:1px solid var(--border2,#656f96); background:rgba(0,0,0,0.22); color:var(--accent2,#d9e1f2); text-align:left; cursor:pointer; font-family:var(--PX, monospace); font-size:7px; letter-spacing:0.5px; border-radius:3px; white-space:nowrap; min-width:120px; transition:all 0.12s; }
+.eg-craft-tier:hover,.eg-craft-tier.selected { border-color:var(--accent,#66fcf1); background:rgba(102,252,241,0.10); color:#fff; }
+.eg-craft-tier.disabled { color:#6a7282; border-color:rgba(101,111,150,0.35); background:rgba(0,0,0,0.18); cursor:not-allowed; opacity:.6; }
+.eg-craft-tier .tier-label { color:var(--yellow,#f1d27b); }
 .eg-craft-tier .tier-range { color:#a8c8e8; margin-left:6px; }
-.eg-craft-tier .eg-craft-tier-cost { display:block; margin-top:3px; color:#d8c58d; font-size:.68rem; }
+.eg-craft-tier .eg-craft-tier-cost { display:block; margin-top:3px; color:#d8c58d; font-size:6px; }
 .eg-craft-tier .eg-craft-tier-cost.missing { color:#e87d70; font-weight:bold; }
-.eg-craft-empty { grid-column:1/-1; padding:25px; text-align:center; color:#a89978; }
-.eg-craft-footer { margin-top:14px; display:flex; flex-direction:column; gap:9px; }
+.eg-craft-empty { grid-column:1/-1; padding:22px; text-align:center; color:var(--setup-opt-inactive,#a89978); font-family:var(--PX, monospace); font-size:8px; letter-spacing:1px; border:1px dashed var(--border,#4a5475); border-radius:4px; background:rgba(255,255,255,0.02); }
+.eg-craft-footer { flex-shrink:0; border-top:1px solid var(--border,#4a5475); background:rgba(0,0,0,0.18); padding:10px 14px 12px; display:flex; flex-direction:column; gap:9px; }
 .eg-craft-cost { margin-right:12px; color:#d8c58d; font-size:.75rem; }
 .eg-craft-cost-missing { color:#e87d70; font-weight:bold; }
-.eg-craft-apply:disabled { opacity:.45; cursor:not-allowed; }
-.eg-craft-apply { background:#2a3a2a; border-color:#6a9c6a; }
-.eg-craft-apply:not(:disabled):hover { background:#3a4a3a; }

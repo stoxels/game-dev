@@ -31,6 +31,47 @@ const EG_MAP_DROP_CHANCE_BOSS = 0.44;    // 44% per boss kill (also scaled by Qu
 // Highest possible map tier (cap for tier upgrades via the Orb of Horizons).
 const EG_MAX_MAP_TIER = 16;
 
+// Base run objectives per tier. T16 is the ceiling: at most 6 puzzles and
+// 4 questions. Lower tiers ramp down smoothly in four bands so early maps
+// stay short:
+//   puzzles:   T1–4 → 2 · T5–8 → 3 · T9–12 → 4 · T13–15 → 5 · T16 → 6
+//   questions: T1–5 → 1 · T6–10 → 2 · T11–15 → 3 · T16 → 4
+// Rolled map modifiers (map_required_puzzles / map_extra_questions) stack
+// on top of these bases and can push beyond the cap (clamp 20). Tiers above
+// EG_MAX_MAP_TIER only exist on the testing screen, which hardcodes its own
+// counts and ignores these helpers.
+function egMapBasePuzzlesForTier(tier) {
+    const t = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tier || 1))); 
+    return Math.max(1, Math.min(6, 2 + Math.floor((t - 1) * 4 / 15))); 
+}
+function egMapBaseQuestionsForTier(tier) {
+    const t = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tier || 1))); 
+    return Math.max(1, Math.min(4, 1 + Math.floor((t - 1) * 3 / 15))); 
+}
+
+// Base time limit per tier — derived FROM the objective ramp so early tiers
+// get proportionally less time:
+//   300 s fixed overhead (drops, transitions, boss intro)
+//   + tier * 30 s (kill & content-density budget; T1 +30 → T16 +480)
+//   + puzzles * 150 s (tracks the 2→6 puzzle ramp)
+//   + questions * 30 s (tracks the 1→4 question ramp)
+// T1 ≈ 11:00 (old 16:00), T8 ≈ 17:30 (old 23:00), T16 = 30:00 (old 31:00 —
+// ceiling unchanged, since T16 objectives did not change). The time cost of
+// one puzzle stays ~2.5 min at every tier, so difficulty grows only through
+// objective count and monster density.
+function egMapBaseDurationForTier(tier) {
+    const t = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tier || 1))); 
+    return 300 + t * 30 + egMapBasePuzzlesForTier(t) * 150 + egMapBaseQuestionsForTier(t) * 30; 
+}
+
+// Base mistake budget per tier — also tracks the objective ramp: roughly one
+// allowed mistake per objective, so the per-puzzle forgiveness stays constant
+// while the absolute budget grows with the ramp (T1: 6, T16: 10 — ceiling
+// unchanged). The map_fewer_mistakes modifier applies on top (min 3).
+function egMapBaseMistakesForTier(tier) {
+    return 4 + egMapBasePuzzlesForTier(tier); 
+}
+
 // PoE-style convex monster-level curve per map tier.
 // Early tiers climb fast (quick leveling through the low tiers), late
 // tiers stretch out. Tier 16 sits at monster level 90 so a character can
@@ -920,7 +961,7 @@ function _egGetMapGoldRewardRange(map) {
 
 const EG_MAP_COMPLETION_REWARD_POOL = [
     // ── Orbs ─────────────────────────────────────────────────────
-    { id: 'orb_alteration', weight: 200 },
+    { id: 'orb_alteration', weight: 280 },
     { id: 'orb_scouring',   weight: 170 },
     { id: 'orb_alchemy',    weight: 150 },
     { id: 'orb_chance',     weight: 120 },
@@ -1025,7 +1066,7 @@ const EG_GRID_SIZE_BUCKETS = {
 // to the tier's base puzzle count.
 function _egRollMapSizeMix(tier, largerPct) {
     const t = Math.max(1, tier || 1);
-    const total = Math.min(12, 3 + Math.floor(t / 3));
+    const total = egMapBasePuzzlesForTier(t);
 
     let weights = {
         small:   Math.max(0.05, 0.50 - t * 0.04),
@@ -1063,28 +1104,21 @@ function _egRollMapSizeMix(tier, largerPct) {
     return weights;
 }
 
-// Determines whether a rolled map contains a boss encounter. The result is
-// deterministic per map item (baked into implicits) so the tooltip can state
-// definitively if the map has a boss or not. This is a pure implicit roll
-// that must stay immutable — orbs/mods MUST NOT be able to change it, so
-// it is derived only from the map's tier (no mod influence) and is preserved
-// across all orb rerolls via `_egWithImplicits`.
-// Tier 1 maps never have a boss. Tier 2+ maps have a 50% base chance.
+// Every device map ends in a boss fight: the boss arena opens once all
+// other objectives (kills / puzzles / questions) are done (see
+// _egCanLeaveMap in endgame-encounter-chain.js). The status is baked as an
+// immutable implicit so tooltips can state it definitively — orbs/mods
+// MUST NOT be able to remove it.
 function _egRollMapBossStatus(map) {
-    const tier = Math.max(1, map.mapTier || 1);
-    if (tier < 2) return { hasBoss: false, maxBosses: 0 };
-    const baseChance = (typeof EG_MAP_BASE_BOSS_CHANCE !== 'undefined') ? EG_MAP_BASE_BOSS_CHANCE : 50;
-    const hasBoss = Math.random() * 100 < baseChance;
-    const maxBosses = hasBoss ? 1 : 0;
-    return { hasBoss, maxBosses };
+    return { hasBoss: true, maxBosses: 1 };
 }
 
 function _egRollMapImplicits(map) {
     const tier = Math.max(1, map.mapTier || 1);
-    let puzzles = Math.min(12, 3 + Math.floor(tier / 3));
-    let questions = Math.min(8, Math.floor(tier / 2));
-    let mistakes = 10;
-    let duration = 900 + tier * 60;
+    let puzzles = egMapBasePuzzlesForTier(tier);
+    let questions = egMapBaseQuestionsForTier(tier);
+    let mistakes = egMapBaseMistakesForTier(tier);
+    let duration = egMapBaseDurationForTier(tier);
     let largerPct = 0;
 
     (Array.isArray(map.mods) ? map.mods : []).forEach(mod => {
@@ -1155,10 +1189,19 @@ function _egWithImplicits(map) {
 function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) {
     monsterLevel = Math.max(1, Math.round(monsterLevel || 1));
 
-    // Atlas override: keep item level / mod rolls consistent with the
-    // forced tier (tier N ≈ curve level, inverse of _egRollMapTier).
+    // Forced atlas region (PoE-style drop rules): the drop code resolves
+    // the exact region a map may come from — tier and item level derive
+    // from it. Atlas tier override: keep item level / mod rolls consistent
+    // with the forced tier (tier N ≈ curve level, inverse of _egRollMapTier).
     let mapTier;
-    if (tierOverride != null) {
+    let forcedNode = null;
+    if (opts && opts.atlasNodeId && typeof egAtlasNodeById === 'function') {
+        forcedNode = egAtlasNodeById(opts.atlasNodeId) || null;
+    }
+    if (forcedNode) {
+        mapTier = forcedNode.tier;
+        monsterLevel = _egMapTierMonsterLevel(mapTier);
+    } else if (tierOverride != null) {
         mapTier = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tierOverride)));
         monsterLevel = _egMapTierMonsterLevel(mapTier);
     } else {
@@ -1168,7 +1211,10 @@ function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) 
     if (opts && opts.forceNormal) {
         let normalName = null;
         let atlasNodeId = null;
-        if (typeof egAtlasPickNodeIdForTier === 'function') {
+        if (forcedNode) {
+            atlasNodeId = forcedNode.id;
+            normalName = egAtlasNodeName(forcedNode);
+        } else if (typeof egAtlasPickNodeIdForTier === 'function') {
             atlasNodeId = egAtlasPickNodeIdForTier(mapTier);
             const node = atlasNodeId ? egAtlasNodeById(atlasNodeId) : null;
             if (node) normalName = egAtlasNodeName(node);
@@ -1204,7 +1250,10 @@ function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) 
     // legacy band-based name roll when the atlas module isn't loaded.
     let baseName = null;
     let atlasNodeId = null;
-    if (typeof egAtlasPickNodeIdForTier === 'function') {
+    if (forcedNode) {
+        atlasNodeId = forcedNode.id;
+        baseName = egAtlasNodeName(forcedNode);
+    } else if (typeof egAtlasPickNodeIdForTier === 'function') {
         atlasNodeId = egAtlasPickNodeIdForTier(mapTier);
         const node = atlasNodeId ? egAtlasNodeById(atlasNodeId) : null;
         if (node) baseName = egAtlasNodeName(node);
@@ -1242,34 +1291,26 @@ function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) 
 // tier: low-tier maps find neighbouring regions far more often so early
 // players unlock the atlas (and climb tiers) quickly, while high-tier runs
 // stay focused on their own tier.
-const EG_MAP_CONNECTED_TIER_DROP_CHANCE_MAX = 0.60; // share at tier 1
-const EG_MAP_CONNECTED_TIER_DROP_CHANCE_MIN = 0.20; // share at tier 16
-
-function _egConnectedTierDropChance(activeTier) {
-    const t = Math.max(1, Math.min(EG_ATLAS_MAX_TIER, Math.round(activeTier || 1)));
-    const f = (t - 1) / (EG_ATLAS_MAX_TIER - 1);
-    return EG_MAP_CONNECTED_TIER_DROP_CHANCE_MAX
-        - f * (EG_MAP_CONNECTED_TIER_DROP_CHANCE_MAX - EG_MAP_CONNECTED_TIER_DROP_CHANCE_MIN);
-}
-
-function _egResolveAtlasDropTier(monsterLevel) {
+// Resolves the atlas REGION a map dropped inside the active run comes from
+// (PoE-style drop rules — see egAtlasDropNodeIds in endgame-atlas.js):
+//   normal kill: linked regions of the same or a lower tier + the active
+//                region itself + completed regions at or below the active
+//                tier
+//   boss kill:   additionally linked regions one tier higher — bosses are
+//                the only source that climbs the atlas
+// Returns a node id, or null when no device run is active / the atlas
+// module isn't loaded (callers then fall back to legacy tier rolling).
+// Boss kills favour the +1-tier climb regions (see egAtlasPickDropNodeId).
+function _egResolveAtlasDropTarget(isBoss) {
     if (typeof _egActiveMapItem === 'undefined' || !_egActiveMapItem || !_egActiveMapItem.atlasNodeId) return null;
-    if (typeof egAtlasAllowedDropTiers !== 'function') return null;
 
-    const activeNode = typeof egAtlasNodeById === 'function' ? egAtlasNodeById(_egActiveMapItem.atlasNodeId) : null;
-    const allowed = egAtlasAllowedDropTiers(_egActiveMapItem.atlasNodeId);
-    if (!allowed || allowed.length === 0 || !activeNode) return null;
-
-    const others = allowed.filter(t2 => t2 !== activeNode.tier);
-    if (others.length === 0) return activeNode.tier;
-    // Low-tier runs favour the next-HIGHER connected tier so drops push the
-    // player up the atlas instead of back down into cleared content.
-    let pool = others;
-    if (activeNode.tier < EG_ATLAS_MAX_TIER) {
-        const higher = others.filter(t2 => t2 > activeNode.tier);
-        if (higher.length > 0 && Math.random() < 0.7) pool = higher;
+    if (typeof egAtlasPickDropNodeId === 'function') {
+        return egAtlasPickDropNodeId(_egActiveMapItem.atlasNodeId, isBoss);
     }
-    if (Math.random() >= _egConnectedTierDropChance(activeNode.tier)) return activeNode.tier;
+    if (typeof egAtlasDropNodeIds !== 'function') return null;
+
+    const pool = egAtlasDropNodeIds(_egActiveMapItem.atlasNodeId, isBoss);
+    if (!pool || pool.length === 0) return null;
     return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -1540,15 +1581,20 @@ function _egTryDropMap(isBoss, monsterLevel) {
         qtyMult = 1 + (rw.quantity || 0) / 100;
     }
 
+    // PoE-style drop rules: the atlas region a dropped map belongs to is
+    // resolved per kill source (see _egResolveAtlasDropTarget). When no
+    // device run is active this is null and the legacy tier roll applies.
+    const targetNodeId = _egResolveAtlasDropTarget(isBoss);
+
     if (isBoss) {
         // Bosses always drop at least one map. When running a difficult map
         // (high Quantity) they have a bonus chance for a second map.
-        const map = _egGenerateMapDrop(monsterLevel, _egResolveAtlasDropTier(monsterLevel));
+        const map = _egGenerateMapDrop(monsterLevel, null, { atlasNodeId: targetNodeId });
         if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);
         if (qtyMult > 1) {
             const extraChance = Math.min(0.35, (qtyMult - 1) * 0.30);
             if (Math.random() < extraChance) {
-                const extra = _egGenerateMapDrop(monsterLevel, _egResolveAtlasDropTier(monsterLevel));
+                const extra = _egGenerateMapDrop(monsterLevel, null, { atlasNodeId: targetNodeId });
                 if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(extra);
             }
         }
@@ -1558,7 +1604,7 @@ function _egTryDropMap(isBoss, monsterLevel) {
     const baseChance = Math.min(1, EG_MAP_DROP_CHANCE_NORMAL * qtyMult);
     if (Math.random() > baseChance) return;
 
-    const map = _egGenerateMapDrop(monsterLevel, _egResolveAtlasDropTier(monsterLevel));
+    const map = _egGenerateMapDrop(monsterLevel, null, { atlasNodeId: targetNodeId });
     if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);
 }
 
@@ -1882,10 +1928,27 @@ function _egBuildMapTooltipBodyHTML(item) {
             const color = completed ? '#f5d98a' : '#aaa';
             const label = completed ? t('eg_map_atlas_completed') : t('eg_map_atlas_not_completed');
             const regionName = (typeof egAtlasNodeName === 'function') ? egAtlasNodeName(atlasNode) : atlasNode.name;
+            // Required difficulty (region tier band → easy / normal / hard).
+            // When the currently selected game difficulty doesn't match and
+            // the region is not completed yet, warn in red — such a run
+            // would not count as an atlas clear.
+            const reqDiff = atlasNode.difficulty
+                || (typeof egAtlasTierDifficulty === 'function' ? egAtlasTierDifficulty(atlasNode.tier) : 'normal');
+            const diffColors = { easy: '#2ecc71', normal: '#3498db', hard: '#c39bd3' };
+            const diffLineHTML = `<div class="eg-tt-desc" style="color:${diffColors[reqDiff] || '#f5d98a'}; font-size:0.85em;">⚖️ ${t('eg_map_atlas_requires_diff').replace('{d}', t('diff_' + reqDiff))}</div>`;
+            let mismatchHTML = '';
+            if (!completed) {
+                const runDiff = (typeof curDiff !== 'undefined' && curDiff) ? curDiff : 'normal';
+                if (runDiff !== reqDiff) {
+                    mismatchHTML = `<div class="eg-tt-desc" style="color:#e74c3c; font-size:0.85em;">${t('eg_map_atlas_diff_mismatch').replace('{d}', t('diff_' + runDiff))}</div>`;
+                }
+            }
             atlasStatusHTML = `
     <div class="eg-tt-section" style="border-left:2px solid ${color}; padding-left:8px;">
         <div class="eg-tt-mod" style="color:${color}; font-weight:700;">${label}</div>
         <div class="eg-tt-desc" style="color:#ccc; font-size:0.85em;">${regionName} · ${t('eg_map_tier_tt').replace('{n}', atlasNode.tier)}</div>
+        ${diffLineHTML}
+        ${mismatchHTML}
     </div>`;
         }
     } catch (e) { /* ignore tooltip atlas errors */ }
@@ -1941,9 +2004,11 @@ function _egBuildMapTooltipBodyHTML(item) {
 //------------------------------------------------------------------------
 //-------------------LEGACY MAP BOSS HEALING-------------------------------
 //------------------------------------------------------------------------
-// Older saves stored maps without `implicits.hasBoss`. Patch them so every
-// persisted map gets a deterministic boss status and the tooltip / run
-// stays consistent without re-rolling on each launch.
+// Older saves stored maps without `implicits.hasBoss` — and maps created
+// before the "every map ends in a boss fight" rule may have it baked as
+// false. Patch every persisted map so the boss fight is guaranteed: maps
+// without implicits roll fresh ones (boss always present), and a baked
+// hasBoss:false is upgraded to true (maxBosses 1).
 function _egHealMapBossImplicits(map) {
     if (!map || typeof map !== 'object') return map;
     if (!map.implicits || typeof map.implicits !== 'object') {
@@ -1954,6 +2019,10 @@ function _egHealMapBossImplicits(map) {
         const bossStatus = _egRollMapBossStatus(map);
         map.implicits.hasBoss = bossStatus.hasBoss;
         map.implicits.maxBosses = bossStatus.maxBosses;
+    } else if (!map.implicits.hasBoss) {
+        // Migration: the current design guarantees a boss in every map.
+        map.implicits.hasBoss = true;
+        map.implicits.maxBosses = Math.max(1, map.implicits.maxBosses || 1);
     }
     return map;
 }

@@ -220,7 +220,8 @@ function _egCraftingBenchBuildHTML() {
             const affordable = _egCraftingBenchCanAfford(costs);
             const costHTML = `<span class="eg-craft-tier-cost ${affordable ? '' : 'missing'}">${_egCraftingBenchCostLabel(costs)}</span>`;
             const tooltipHTML = _egCraftingBenchTooltipHTML(entry, tier, costs, disabled, affordable);
-            options += `<button class="eg-craft-tier ${selected ? 'selected' : ''} ${disabled || !affordable ? 'disabled' : ''}" ${disabled || !affordable ? 'disabled' : `onclick="_egCraftingBenchSelect('${entry.familyId}', '${entry.type}', ${tier.tier})"`} data-tooltip-html="${tooltipHTML.replace(/"/g, '&quot;')}">${_egCraftingBenchTierLabel(tier)}${costHTML}${disabled ? ' 🔒' : ''}</button>`;
+            const isDisabled = disabled || !affordable;
+            options += `<button class="eg-craft-tier ${selected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}" ${isDisabled ? 'aria-disabled="true"' : `onclick="_egCraftingBenchSelect('${entry.familyId}', '${entry.type}', ${tier.tier})"`} data-tooltip-html="${tooltipHTML.replace(/"/g, '&quot;')}">${_egCraftingBenchTierLabel(tier)}${costHTML}${disabled ? ' 🔒' : ''}</button>`;
         }
         options += '</div></div>';
     }
@@ -245,7 +246,7 @@ function _egCraftingBenchBuildHTML() {
 
     const capacityHTML = item ? _egCraftingBenchCapacityHTML(item) : '';
 
-    return `<div class="eg-craft-bench-panel"><button class="eg-craft-close" onclick="_egCloseCraftingBench()">✕</button><h2>⚒ CRAFTING BENCH</h2><div class="eg-craft-bench-item" id="eg-crafting-bench-item" data-eg-dropzone="crafting" ondragover="egDragOver(event)"><span>${item ? _egBuildItemChipHTML(item, 'large') : 'Drop an equipment item here'}</span></div><div class="eg-craft-ilvl">${item ? `Item level: ${item.itemLevel || 1}` : status}</div>${capacityHTML}<div class="eg-craft-options">${options || `<div class="eg-craft-empty">${status}</div>`}</div><div class="eg-craft-footer"><div>${_egCraftingBenchCostHTML()}</div><button class="eg-craft-apply" onclick="_egCraftingBenchApply()" ${!_egCraftingBenchSelection ? 'disabled' : ''}>CRAFT SELECTED MODIFIER</button></div></div>`;
+    return `<div class="eg-craft-bench-panel"><div class="eg-craft-head"><span class="eg-craft-head-icon">⚒</span><span class="eg-craft-head-title">CRAFTING BENCH</span><button class="eg-craft-close" onclick="_egCloseCraftingBench()" title="Close" aria-label="Close">✕</button></div><h2>⚒ CRAFTING BENCH</h2><div class="eg-craft-body"><div class="eg-craft-bench-item" id="eg-crafting-bench-item" data-eg-dropzone="crafting" ondragover="egDragOver(event)"><span>${item ? _egBuildItemChipHTML(item, 'large') : 'Drop an equipment item here'}</span></div><div class="eg-craft-ilvl">${item ? `Item level: ${item.itemLevel || 1}` : status}</div>${capacityHTML}<div class="eg-craft-options">${options || `<div class="eg-craft-empty">${status}</div>`}</div></div><div class="eg-craft-footer"><div>${_egCraftingBenchCostHTML()}</div><button class="eg-craft-apply" onclick="_egCraftingBenchApply()" ${!_egCraftingBenchSelection ? 'disabled' : ''}>CRAFT SELECTED MODIFIER</button></div></div>`;
 }
 
 function _egEnsureCraftingBenchOverlay() {
@@ -254,6 +255,7 @@ function _egEnsureCraftingBenchOverlay() {
     overlay.id = 'eg-crafting-bench-overlay';
     overlay.className = 'eg-craft-overlay';
     overlay.innerHTML = _egCraftingBenchBuildHTML();
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) _egCloseCraftingBench(); });
     document.body.appendChild(overlay);
     _egCraftingBenchBindDrop(overlay);
     _egCraftingBenchBindTooltips(overlay);
@@ -292,6 +294,18 @@ function _egCloseCraftingBench() {
     if (overlay) overlay.classList.remove('show');
     _egCraftingBenchSelection = null;
 }
+
+// Global Escape handler — closes the crafting bench when open.
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const ov = document.getElementById('eg-crafting-bench-overlay');
+        if (ov && ov.classList.contains('show')) {
+            _egCloseCraftingBench();
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+});
 
 function _egCraftingBenchSelect(familyId, type, tier) {
     _egCraftingBenchSelection = { familyId, type, tier };

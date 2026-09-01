@@ -88,6 +88,20 @@
     margin-top: 2px; /* ← levels-done text position */
 }
 
+/* Player level — only shown on save slot if endgame reached and level > 1 */
+.ssc-player-level {
+    font-family: var(--PX);
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #f5d98a;
+    background: rgba(200,168,75,0.16);
+    border: 1px solid rgba(200,168,75,0.35);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 6px auto 0;
+    display: inline-block;
+}
+
 .ssc-delete-btn {
     position: absolute;
     top: 4px;

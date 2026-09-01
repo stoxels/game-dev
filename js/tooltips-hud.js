@@ -44,7 +44,7 @@ function getGameTooltip() {
         tip.id = 'ghud-floating-tip';
         tip.style.cssText = `
             position: fixed;
-            z-index: 9999;
+            z-index: 10010;
             background: #12121e;
             border: 1px solid var(--accent, #5555aa);
             border-left: 3px solid var(--accent2, #aaaaff);

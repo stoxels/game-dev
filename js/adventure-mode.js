@@ -72,12 +72,22 @@ function _advInitWASD() {
         if (document.querySelector('.modal-bg.show')) return;
         if (!document.getElementById('screen-adventure').classList.contains('active')) return;
 
-        switch (e.key) {
-            case 'w': case 'W': _advMoveSprite(0, -ADV_MOVE_STEP); break;
-            case 's': case 'S': _advMoveSprite(0, ADV_MOVE_STEP); break;
-            case 'a': case 'A': _advMoveSprite(-ADV_MOVE_STEP, 0); break;
-            case 'd': case 'D': _advMoveSprite(ADV_MOVE_STEP, 0); break;
-            default: return;
+        // Keys come from the persisted keybind map (js/keybinds.js) so
+        // player rebindings take effect here too. Defaults are WASD.
+        if (typeof keybindMatches === 'function') {
+            if (keybindMatches(e, 'move-up')) _advMoveSprite(0, -ADV_MOVE_STEP);
+            else if (keybindMatches(e, 'move-down')) _advMoveSprite(0, ADV_MOVE_STEP);
+            else if (keybindMatches(e, 'move-left')) _advMoveSprite(-ADV_MOVE_STEP, 0);
+            else if (keybindMatches(e, 'move-right')) _advMoveSprite(ADV_MOVE_STEP, 0);
+            else return;
+        } else {
+            switch (e.key) {
+                case 'w': case 'W': _advMoveSprite(0, -ADV_MOVE_STEP); break;
+                case 's': case 'S': _advMoveSprite(0, ADV_MOVE_STEP); break;
+                case 'a': case 'A': _advMoveSprite(-ADV_MOVE_STEP, 0); break;
+                case 'd': case 'D': _advMoveSprite(ADV_MOVE_STEP, 0); break;
+                default: return;
+            }
         }
     };
 
