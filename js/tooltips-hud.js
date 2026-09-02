@@ -291,6 +291,18 @@ function _buildInventoryLabelTooltipHTML() {
         + `<br>${t('cg_inv_reward_pick').replace('{n}', typeof RESHUFFLE_GOAL !== 'undefined' ? RESHUFFLE_GOAL : 3)}`;
 }
 
+// 6. Title-screen "EXPANSION 1" badge — expansion history.
+// Lists the base game, the current expansion, and a tease of the next one.
+function _buildExpansionHistoryTooltipHTML() {
+    return `<strong style="color:#d4b8ff">${t('scr_expansion_tooltip_title')}</strong>`
+        + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_base')}</span>`
+        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_base_note')}</span>`
+        + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_badge')}: ${t('scr_expansion_1_name')}</span>`
+        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_1_note')}</span>`
+        + `<br><br><span style="color:#c39bd3">• ${t('scr_expansion_2_name')}</span>`
+        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_2_note')}</span>`;
+}
+
 
 //------------------------------------------------------------------------
 //----------------------------WIRING----------------------------------------
@@ -330,6 +342,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Title screen "EXPANSION 1" badge → expansion-history tooltip.
+    // Uses the bounding-box hover engine so the badge can stay interactive
+    // for the tooltip while still sitting inside the title canvas.
+    _wireHoverByRect(document.querySelector('.title-expansion-badge'), _buildExpansionHistoryTooltipHTML);
 });
 
 

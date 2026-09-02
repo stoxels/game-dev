@@ -10,40 +10,108 @@
  * storyline beat, plus a Tutorial entry if the tutorial has been completed.
  * Called from the "REPLAY" button binding inside the title-screen section.
  */
+function _romanRegionNumber(beatId) {
+    const m = /^region_(\d+)$/.exec(beatId || '');
+    if (!m) return '';
+    const n = parseInt(m[1], 10);
+    const table = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'];
+    return table[n] || String(n);
+}
+
+function _buildReplayRow(entry, unlocked, titleText) {
+    const row = document.createElement('div');
+    row.className = 'replay-track' + (unlocked ? '' : ' replay-track-locked');
+
+    // Thumbnail — artwork, character sprite, or a placeholder numeral tile
+    const thumbWrap = document.createElement('div');
+    thumbWrap.className = 'replay-track-thumb';
+    if (entry.thumb) {
+        const img = document.createElement('img');
+        img.className = 'replay-track-thumb-img';
+        img.src = entry.thumb;
+        img.alt = titleText;
+        img.loading = 'lazy';
+        thumbWrap.appendChild(img);
+    } else {
+        const num = document.createElement('span');
+        num.className = 'replay-track-thumb-num';
+        num.textContent = _romanRegionNumber(entry.beatId);
+        thumbWrap.appendChild(num);
+    }
+
+    // Title + subtitle
+    const text = document.createElement('div');
+    text.className = 'replay-track-text';
+    const title = document.createElement('div');
+    title.className = 'replay-track-title';
+    title.textContent = titleText;
+    const desc = document.createElement('div');
+    desc.className = 'replay-track-desc';
+    desc.textContent = t(entry.descKey);
+    text.appendChild(title);
+    text.appendChild(desc);
+
+    // Per-track play button
+    const play = document.createElement('button');
+    play.type = 'button';
+    play.className = 'replay-track-play';
+    play.setAttribute('aria-label', titleText);
+    if (unlocked) {
+        play.title = titleText;
+        play.addEventListener('click', () => {
+            hideModal('replay-modal');
+            if (entry.isTutorial) {
+                replayTutorialFromTitle();
+            } else {
+                showBeat(entry.beatId, { ...(entry.options || {}), force: true });
+            }
+        });
+    } else {
+        play.classList.add('replay-track-play-locked');
+        play.disabled = true;
+        play.title = t('scr_replay_locked');
+        const lock = document.createElement('span');
+        lock.className = 'replay-track-lock';
+        lock.textContent = '🔒';
+        play.appendChild(lock);
+    }
+
+    row.appendChild(thumbWrap);
+    row.appendChild(text);
+    row.appendChild(play);
+    return row;
+}
+
 function renderReplayModal() {
     const container = document.getElementById('replay-content');
     container.innerHTML = '';
 
-    const entries = getUnlockedReplayEntries(); // storyline-engine.js
+    let anyUnlocked = false;
 
+    const entries = (typeof REPLAY_GALLERY_ENTRIES !== 'undefined') ? REPLAY_GALLERY_ENTRIES : [];
     entries.forEach(entry => {
-        const btn = document.createElement('button');
-        btn.className = 'title-btn back-btn';
-        btn.style.display = 'block';
-        btn.style.margin = '8px auto';
-        btn.textContent = `▶ ${entry.label}`;
-        btn.addEventListener('click', () => {
-            hideModal('replay-modal');
-            showBeat(entry.beatId, { ...(entry.options || {}), force: true });
-        });
-        container.appendChild(btn);
+        const unlocked = isReplayEntryUnlocked(entry);
+        if (unlocked) anyUnlocked = true;
+        container.appendChild(_buildReplayRow(entry, unlocked, entry.label));
     });
 
+    // Tutorial replays only once it has been completed (per-save STATE flag).
     if (STATE.tutorialDone) {
-        const btn = document.createElement('button');
-        btn.className = 'title-btn back-btn';
-        btn.style.display = 'block';
-        btn.style.margin = '8px auto';
-        btn.textContent = `▶ ${t('scr_replay_tutorial')}`;
-        btn.addEventListener('click', () => {
-            hideModal('replay-modal');
-            replayTutorialFromTitle();
-        });
-        container.appendChild(btn);
+        anyUnlocked = true;
+        container.appendChild(_buildReplayRow({
+            id: 'tutorial',
+            label: t('scr_replay_tutorial'),
+            thumb: 'images/Replay_Cutscene_Screen/Replay_Tutorial_Background.png',
+            descKey: 'scr_replay_desc_tutorial',
+            isTutorial: true
+        }, true, t('scr_replay_tutorial')));
     }
 
-    if (entries.length === 0 && !STATE.tutorialDone) {
-        container.innerHTML = `<p style="text-align:center;opacity:.7;">${t('scr_nothing_to_replay')}</p>`;
+    if (!anyUnlocked) {
+        const empty = document.createElement('p');
+        empty.className = 'replay-empty';
+        empty.textContent = t('scr_nothing_to_replay');
+        container.appendChild(empty);
     }
 }
 

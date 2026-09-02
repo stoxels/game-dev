@@ -3174,4 +3174,587 @@
         ]
     },
 
+    //------------------------------------------------------------------------
+    //-----------------------------ENDGAME------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+
+    // ── ATLAS: REGIONS COMPLETED ──────────────────
+    {
+        id: 'eg_atlas_regions',
+        category: 'endgame',
+        icon: '🗺️',
+        nameEn: 'Cartographer',
+        nameDE: 'Kartograf',
+        descEn: 'Complete atlas regions on their required difficulty.',
+        descDE: 'Schließe Atlas-Regionen auf ihrer erforderlichen Schwierigkeit ab.',
+        stat: 'egAtlasRegions',
+        tiers: [
+            { threshold: 5, labelEn: 'Scout', labelDE: 'Kundschafter' },
+            { threshold: 15, labelEn: 'Explorer', labelDE: 'Entdecker' },
+            { threshold: 30, labelEn: 'Pathfinder', labelDE: 'Pfadfinder' },
+            { threshold: 50, labelEn: 'Master Cartographer', labelDE: 'Meisterkartograf' },
+            { threshold: 86, labelEn: 'Atlas Complete', labelDE: 'Atlas vollständig' },
+        ]
+    },
+
+    // ── ATLAS: HIGHEST TIER REACHED ───────────────
+    {
+        id: 'eg_atlas_highest_tier',
+        category: 'endgame',
+        icon: '⛰️',
+        nameEn: 'Ascension',
+        nameDE: 'Aufstieg',
+        descEn: 'Reach higher atlas tiers.',
+        descDE: 'Erreiche höhere Atlas-Stufen.',
+        stat: 'egAtlasHighestTier',
+        tiers: [
+            { threshold: 5, labelEn: 'Tier 5', labelDE: 'Stufe 5' },
+            { threshold: 10, labelEn: 'Tier 10', labelDE: 'Stufe 10' },
+            { threshold: 13, labelEn: 'Tier 13', labelDE: 'Stufe 13' },
+            { threshold: 16, labelEn: 'Pinnacle', labelDE: 'Gipfel' },
+        ]
+    },
+
+    // ── ATLAS: PINNACLE REGIONS (T16) ─────────────
+    {
+        id: 'eg_atlas_pinnacle',
+        category: 'endgame',
+        icon: '🏔️',
+        nameEn: 'At the Summit',
+        nameDE: 'Am Gipfel',
+        descEn: 'Complete pinnacle (Tier 16) atlas regions.',
+        descDE: 'Schließe Gipfel-Regionen (Stufe 16) ab.',
+        stat: 'egAtlasPinnacle',
+        tiers: [
+            { threshold: 1, labelEn: 'First Pinnacle', labelDE: 'Erster Gipfel' },
+            { threshold: 2, labelEn: 'Twin Peaks', labelDE: 'Doppelgipfel' },
+            { threshold: 4, labelEn: 'Absolute Inference', labelDE: 'Absolute Inferenz' },
+        ]
+    },
+
+    // ── MAPS: COMPLETED ───────────────────────────
+    {
+        id: 'eg_maps_completed',
+        category: 'endgame',
+        icon: '🗺️',
+        nameEn: 'Map Runner',
+        nameDE: 'Kartenläufer',
+        descEn: 'Complete endgame maps.',
+        descDE: 'Schließe Endgame-Karten ab.',
+        stat: 'egMapsCompleted',
+        tiers: [
+            { threshold: 10, labelEn: 'Wayfarer', labelDE: 'Wanderer' },
+            { threshold: 30, labelEn: 'Voyager', labelDE: 'Reisender' },
+            { threshold: 75, labelEn: 'Expedition Leader', labelDE: 'Expeditionsleiter' },
+            { threshold: 150, labelEn: 'Atlas Conqueror', labelDE: 'Atlas-Eroberer' },
+            { threshold: 300, labelEn: 'Endless Cartographer', labelDE: 'Endloser Kartograf' },
+        ]
+    },
+
+    // ── MAPS: T16 COMPLETED ───────────────────────
+    {
+        id: 'eg_maps_t16',
+        category: 'endgame',
+        icon: '🔥',
+        nameEn: 'Pinnacle Runner',
+        nameDE: 'Gipfelläufer',
+        descEn: 'Complete Tier 16 maps.',
+        descDE: 'Schließe Stufe-16-Karten ab.',
+        stat: 'egMapsT16Completed',
+        tiers: [
+            { threshold: 1, labelEn: 'First T16', labelDE: 'Erste T16' },
+            { threshold: 5, labelEn: 'Pinnacle Grinder', labelDE: 'Gipfel-Schleifer' },
+            { threshold: 15, labelEn: 'Pinnacle Master', labelDE: 'Gipfelmeister' },
+            { threshold: 30, labelEn: 'Pinnacle Overlord', labelDE: 'Gipfel-Overlord' },
+        ]
+    },
+
+    // ── MAPS: HEAVILY MODDED (4+ mods) ────────────
+    {
+        id: 'eg_maps_heavily_modded',
+        category: 'endgame',
+        icon: '⚙️',
+        nameEn: 'Risk Taker',
+        nameDE: 'Risikoträger',
+        descEn: 'Complete maps with 4 or more modifiers.',
+        descDE: 'Schließe Karten mit 4 oder mehr Modifikatoren ab.',
+        stat: 'egMapsHeavilyModded',
+        tiers: [
+            { threshold: 5, labelEn: 'Daredevil', labelDE: 'Draufgänger' },
+            { threshold: 15, labelEn: 'High Roller', labelDE: 'High Roller' },
+            { threshold: 40, labelEn: 'Masochist', labelDE: 'Masochist' },
+            { threshold: 80, labelEn: 'Glutton for Punishment', labelDE: 'Unersättlich' },
+        ]
+    },
+
+    // ── MAPS: HAZARD MAPS ─────────────────────────
+    {
+        id: 'eg_maps_hazard',
+        category: 'endgame',
+        icon: '🌋',
+        nameEn: 'Hazard Pay',
+        nameDE: 'Gefahrenzulage',
+        descEn: 'Complete maps with elemental hazards (lava, blizzard, lightning, etc.).',
+        descDE: 'Schließe Karten mit Elementargefahren ab (Lava, Blizzard, Blitz usw.).',
+        stat: 'egMapsHazardCompleted',
+        tiers: [
+            { threshold: 5, labelEn: 'Hazard Scout', labelDE: 'Gefahrenkundschafter' },
+            { threshold: 15, labelEn: 'Storm Chaser', labelDE: 'Sturmjäger' },
+            { threshold: 30, labelEn: 'Cataclysm Survivor', labelDE: 'Katastrophen-Überlebender' },
+            { threshold: 60, labelEn: 'Force of Nature', labelDE: 'Naturgewalt' },
+        ]
+    },
+
+    // ── MAPS: FLAWLESS (0 mistakes) ───────────────
+    {
+        id: 'eg_maps_flawless',
+        category: 'endgame',
+        icon: '💎',
+        nameEn: 'Flawless Cartographer',
+        nameDE: 'Makelloser Kartograf',
+        descEn: 'Complete maps without making a single mistake.',
+        descDE: 'Schließe Karten ohne einen einzigen Fehler ab.',
+        stat: 'egMapsFlawless',
+        tiers: [
+            { threshold: 5, labelEn: 'Steady Hand', labelDE: 'Ruhige Hand' },
+            { threshold: 15, labelEn: 'Precision Mapping', labelDE: 'Präzise Kartierung' },
+            { threshold: 30, labelEn: 'Immaculate', labelDE: 'Makellos' },
+            { threshold: 50, labelEn: 'Perfection Incarnate', labelDE: 'Perfektion in Person' },
+        ]
+    },
+
+    // ── MAPS: LAUNCHED VIA GATE ───────────────────
+    {
+        id: 'eg_maps_launched',
+        category: 'endgame',
+        icon: '🎲',
+        nameEn: 'Gatekeeper',
+        nameDE: 'Torwächter',
+        descEn: 'Launch maps through the Probability Gate.',
+        descDE: 'Starte Karten durch das Wahrscheinlichkeitstor.',
+        stat: 'egMapsLaunched',
+        tiers: [
+            { threshold: 10, labelEn: 'First Steps', labelDE: 'Erste Schritte' },
+            { threshold: 30, labelEn: 'Commuter', labelDE: 'Pendler' },
+            { threshold: 75, labelEn: 'Gate Veteran', labelDE: 'Torveteran' },
+            { threshold: 150, labelEn: 'Gate Master', labelDE: 'Tormeister' },
+        ]
+    },
+
+    // ── NEXUS: FIRST VISIT ────────────────────────
+    {
+        id: 'eg_nexus_visit',
+        category: 'endgame',
+        icon: '🌀',
+        nameEn: 'Beyond the Veil',
+        nameDE: 'Jenseits des Schleiers',
+        descEn: 'Enter the endgame Nexus and hubs.',
+        descDE: 'Betrete den Endgame-Nexus und die Drehscheiben.',
+        stat: 'egNexusVisits',
+        tiers: [
+            { threshold: 1, labelEn: 'Arrival', labelDE: 'Ankunft' },
+            { threshold: 10, labelEn: 'Frequent Traveller', labelDE: 'Vielreisender' },
+            { threshold: 30, labelEn: 'Nexus Dweller', labelDE: 'Nexus-Bewohner' },
+        ]
+    },
+
+    // ── COMBAT: MONSTERS SLAIN ────────────────────
+    {
+        id: 'eg_monsters_slain',
+        category: 'endgame',
+        icon: '👹',
+        nameEn: 'Monster Slayer',
+        nameDE: 'Monsterschlächter',
+        descEn: 'Defeat monsters in endgame encounters.',
+        descDE: 'Besiege Monster in Endgame-Begegnungen.',
+        stat: 'egMonstersSlain',
+        tiers: [
+            { threshold: 100, labelEn: 'Hunter', labelDE: 'Jäger' },
+            { threshold: 500, labelEn: 'Slayer', labelDE: 'Schlächter' },
+            { threshold: 2000, labelEn: 'Eradicator', labelDE: 'Ausrotter' },
+            { threshold: 5000, labelEn: 'Annihilator', labelDE: 'Vernichter' },
+            { threshold: 10000, labelEn: 'Extinction Event', labelDE: 'Auslöschung' },
+        ]
+    },
+
+    // ── COMBAT: BOSS KILLS ────────────────────────
+    {
+        id: 'eg_boss_kills',
+        category: 'endgame',
+        icon: '👁️',
+        nameEn: 'Boss Hunter',
+        nameDE: 'Bossjäger',
+        descEn: 'Defeat endgame bosses.',
+        descDE: 'Besiege Endgame-Bosse.',
+        stat: 'egBossKills',
+        tiers: [
+            { threshold: 5, labelEn: 'Boss Novice', labelDE: 'Boss-Neuling' },
+            { threshold: 20, labelEn: 'Boss Slayer', labelDE: 'Boss-Schlächter' },
+            { threshold: 50, labelEn: 'Demon Slayer', labelDE: 'Dämonenschlächter' },
+            { threshold: 100, labelEn: 'Pinnacle Slayer', labelDE: 'Gipfelschlächter' },
+            { threshold: 250, labelEn: 'God Slayer', labelDE: 'Götterschlächter' },
+        ]
+    },
+
+    // ── COMBAT: BOSS VARIETY ──────────────────────
+    {
+        id: 'eg_boss_variety',
+        category: 'endgame',
+        icon: '🧿',
+        nameEn: 'Pantheon',
+        nameDE: 'Pantheon',
+        descEn: 'Defeat each of the 5 unique endgame bosses at least once.',
+        descDE: 'Besiege jeden der 5 einzigartigen Endgame-Bosse mindestens einmal.',
+        stat: 'egBossTypesSlain',
+        tiers: [
+            { threshold: 2, labelEn: 'Duo', labelDE: 'Duo' },
+            { threshold: 3, labelEn: 'Trinity', labelDE: 'Trinität' },
+            { threshold: 5, labelEn: 'Pantheon Vanquished', labelDE: 'Pantheon bezwungen' },
+        ]
+    },
+
+    // ── CURRENCY: LOOTED ──────────────────────────
+    {
+        id: 'eg_currency_looted',
+        category: 'endgame',
+        icon: '🔮',
+        nameEn: 'Orb Hoarder',
+        nameDE: 'Orbsammler',
+        descEn: 'Loot currency orbs from monsters.',
+        descDE: 'Sammle Währungsorbs von Monstern.',
+        stat: 'egCurrencyLooted',
+        tiers: [
+            { threshold: 25, labelEn: 'Collector', labelDE: 'Sammler' },
+            { threshold: 100, labelEn: 'Hoarder', labelDE: 'Horter' },
+            { threshold: 250, labelEn: 'Vault Filler', labelDE: 'Tresorfüller' },
+            { threshold: 500, labelEn: 'Currency Tycoon', labelDE: 'Währungstycoon' },
+        ]
+    },
+
+    // ── CURRENCY: APPLIED ─────────────────────────
+    {
+        id: 'eg_currency_applied',
+        category: 'endgame',
+        icon: '✨',
+        nameEn: 'Alchemist',
+        nameDE: 'Alchemist',
+        descEn: 'Apply currency orbs to equipment or maps.',
+        descDE: 'Wende Währungsorbs auf Ausrüstung oder Karten an.',
+        stat: 'egCurrencyApplied',
+        tiers: [
+            { threshold: 10, labelEn: 'Tinkerer', labelDE: 'Bastler' },
+            { threshold: 50, labelEn: 'Artificer', labelDE: 'Kunsthandwerker' },
+            { threshold: 150, labelEn: 'Transmuter', labelDE: 'Transmutator' },
+            { threshold: 300, labelEn: 'Master Alchemist', labelDE: 'Meisteralchemist' },
+        ]
+    },
+
+    // ── CURRENCY: MIRROR USED ─────────────────────
+    {
+        id: 'eg_mirrors_used',
+        category: 'endgame',
+        icon: '🪞',
+        nameEn: 'Reflections',
+        nameDE: 'Spiegelungen',
+        descEn: 'Use Mirror of Kalandra to copy items.',
+        descDE: 'Nutze den Spiegel von Kalandra, um Gegenstände zu kopieren.',
+        stat: 'egMirrorsUsed',
+        tiers: [
+            { threshold: 1, labelEn: 'First Reflection', labelDE: 'Erste Reflexion' },
+            { threshold: 3, labelEn: 'Hall of Mirrors', labelDE: 'Spiegelkabinett' },
+            { threshold: 5, labelEn: 'Infinite Regress', labelDE: 'Unendlicher Regress' },
+        ]
+    },
+
+    // ── ESSENCES: LOOTED ──────────────────────────
+    {
+        id: 'eg_essences_looted',
+        category: 'endgame',
+        icon: '🧬',
+        nameEn: 'Essence Collector',
+        nameDE: 'Essenzsammler',
+        descEn: 'Loot essences from monsters.',
+        descDE: 'Sammle Essenzen von Monstern.',
+        stat: 'egEssencesLooted',
+        tiers: [
+            { threshold: 25, labelEn: 'Gatherer', labelDE: 'Sammler' },
+            { threshold: 100, labelEn: 'Harvester', labelDE: 'Ernter' },
+            { threshold: 250, labelEn: 'Essence Hoarder', labelDE: 'Essenz-Horter' },
+            { threshold: 500, labelEn: 'Essence Overlord', labelDE: 'Essenz-Overlord' },
+        ]
+    },
+
+    // ── ESSENCES: APPLIED ─────────────────────────
+    {
+        id: 'eg_essences_applied',
+        category: 'endgame',
+        icon: '⚗️',
+        nameEn: 'Essence Weaver',
+        nameDE: 'Essenzweber',
+        descEn: 'Apply essences to re-forge equipment.',
+        descDE: 'Wende Essenzen an, um Ausrüstung neu zu schmieden.',
+        stat: 'egEssencesApplied',
+        tiers: [
+            { threshold: 5, labelEn: 'First Infusion', labelDE: 'Erste Infusion' },
+            { threshold: 25, labelEn: 'Adept Weaver', labelDE: 'Adeptenweber' },
+            { threshold: 75, labelEn: 'Master Weaver', labelDE: 'Meisterweber' },
+            { threshold: 150, labelEn: 'Essence God', labelDE: 'Essenzgott' },
+        ]
+    },
+
+    // ── CRAFTING BENCH ────────────────────────────
+    {
+        id: 'eg_bench_crafts',
+        category: 'endgame',
+        icon: '⚒️',
+        nameEn: 'Craftsman',
+        nameDE: 'Handwerker',
+        descEn: 'Craft modifiers at the Crafting Bench.',
+        descDE: 'Fertige Modifikatoren an der Werkbank.',
+        stat: 'egBenchCrafts',
+        tiers: [
+            { threshold: 5, labelEn: 'Apprentice', labelDE: 'Lehrling' },
+            { threshold: 25, labelEn: 'Journeyman', labelDE: 'Geselle' },
+            { threshold: 75, labelEn: 'Artisan', labelDE: 'Kunsthandwerker' },
+            { threshold: 150, labelEn: 'Grandmaster Smith', labelDE: 'Großmeister-Schmied' },
+        ]
+    },
+
+    // ── EQUIPMENT: EPIC DROPS ─────────────────────
+    {
+        id: 'eg_epic_looted',
+        category: 'endgame',
+        icon: '🟣',
+        nameEn: 'Epic Hunter',
+        nameDE: 'Epik-Jäger',
+        descEn: 'Loot epic (purple) equipment.',
+        descDE: 'Sammle epische (lila) Ausrüstung.',
+        stat: 'egEpicLooted',
+        tiers: [
+            { threshold: 10, labelEn: 'First Epics', labelDE: 'Erste Epik' },
+            { threshold: 40, labelEn: 'Epic Collector', labelDE: 'Epiksammler' },
+            { threshold: 100, labelEn: 'Epic Hoarder', labelDE: 'Epik-Horter' },
+            { threshold: 250, labelEn: 'Drowning in Epics', labelDE: 'Ertrinkt in Epik' },
+        ]
+    },
+
+    // ── EQUIPMENT: 6-MOD EPIC ─────────────────────
+    {
+        id: 'eg_six_mod_epic',
+        category: 'endgame',
+        icon: '🌟',
+        nameEn: 'Perfection Rolled',
+        nameDE: 'Perfekt gewürfelt',
+        descEn: 'Loot epic items with 6 modifiers (max rolled).',
+        descDE: 'Sammle epische Gegenstände mit 6 Modifikatoren (maximal).',
+        stat: 'egSixModLooted',
+        tiers: [
+            { threshold: 1, labelEn: 'Jackpot', labelDE: 'Jackpot' },
+            { threshold: 5, labelEn: 'High Roller', labelDE: 'High Roller' },
+            { threshold: 15, labelEn: 'God-Tier', labelDE: 'Göttlich' },
+            { threshold: 40, labelEn: 'Mirror-Tier', labelDE: 'Spiegelstufe' },
+        ]
+    },
+
+    // ── EQUIPMENT: BLESSING (IMPLICITS) ───────────
+    {
+        id: 'eg_blessings_used',
+        category: 'endgame',
+        icon: '🙏',
+        nameEn: 'Blessed',
+        nameDE: 'Gesegnet',
+        descEn: 'Use Blessing Orbs to re-roll implicits.',
+        descDE: 'Nutze Segensorbs, um Implizite neu zu würfeln.',
+        stat: 'egBlessingsUsed',
+        tiers: [
+            { threshold: 1, labelEn: 'First Blessing', labelDE: 'Erster Segen' },
+            { threshold: 10, labelEn: 'Anointed', labelDE: 'Gesalbt' },
+            { threshold: 30, labelEn: 'Divinely Touched', labelDE: 'Göttlich berührt' },
+            { threshold: 60, labelEn: 'Avatar of Blessing', labelDE: 'Avatar des Segens' },
+        ]
+    },
+
+    // ── UNIQUES: COLLECTED ────────────────────────
+    {
+        id: 'eg_uniques_collected',
+        category: 'endgame',
+        icon: '👑',
+        nameEn: 'Unique Collector',
+        nameDE: 'Einzigartiger Sammler',
+        descEn: 'Collect unique (legendary) items.',
+        descDE: 'Sammle einzigartige (legendäre) Gegenstände.',
+        stat: 'egUniquesCollected',
+        tiers: [
+            { threshold: 5, labelEn: 'Curator', labelDE: 'Kurator' },
+            { threshold: 15, labelEn: 'Connoisseur', labelDE: 'Kenner' },
+            { threshold: 30, labelEn: 'Legend Seeker', labelDE: 'Legendensucher' },
+            { threshold: 45, labelEn: 'Vault of Legends', labelDE: 'Tresor der Legenden' },
+        ]
+    },
+
+    // ── LEVELING: CHARACTER LEVEL ─────────────────
+    {
+        id: 'eg_player_level',
+        category: 'endgame',
+        icon: '⭐',
+        nameEn: 'Level Up',
+        nameDE: 'Stufenaufstieg',
+        descEn: 'Reach character levels in the endgame.',
+        descDE: 'Erreiche Charakterstufen im Endgame.',
+        stat: 'egPlayerLevel',
+        tiers: [
+            { threshold: 30, labelEn: 'Seasoned', labelDE: 'Erfahren' },
+            { threshold: 50, labelEn: 'Veteran', labelDE: 'Veteran' },
+            { threshold: 70, labelEn: 'Elite', labelDE: 'Elite' },
+            { threshold: 90, labelEn: 'Master', labelDE: 'Meister' },
+            { threshold: 100, labelEn: 'Level 100', labelDE: 'Stufe 100' },
+        ]
+    },
+
+    // ── GOLD: EARNED ──────────────────────────────
+    {
+        id: 'eg_gold_earned',
+        category: 'endgame',
+        icon: '🪙',
+        nameEn: 'Treasure Hunter',
+        nameDE: 'Schatzjäger',
+        descEn: 'Earn gold from map completion rewards.',
+        descDE: 'Verdiene Gold durch Kartenabschluss-Belohnungen.',
+        stat: 'egGoldEarned',
+        tiers: [
+            { threshold: 1000, labelEn: 'Pocket Change', labelDE: 'Kleingeld' },
+            { threshold: 5000, labelEn: 'Coin Purse', labelDE: 'Münzbeutel' },
+            { threshold: 20000, labelEn: 'Treasure Chest', labelDE: 'Schatztruhe' },
+            { threshold: 50000, labelEn: 'Dragon Hoard', labelDE: 'Drachenhort' },
+            { threshold: 100000, labelEn: 'Kingdom Wealth', labelDE: 'Königreichsreichtum' },
+        ]
+    },
+
+    // ── GOLD: SPENT ───────────────────────────────
+    {
+        id: 'eg_gold_spent',
+        category: 'endgame',
+        icon: '💸',
+        nameEn: 'Big Spender',
+        nameDE: 'Großer Geldausgeber',
+        descEn: 'Spend gold at the Vendor and elsewhere.',
+        descDE: 'Gib Gold beim Händler und anderswo aus.',
+        stat: 'egGoldSpent',
+        tiers: [
+            { threshold: 1000, labelEn: 'First Purchase', labelDE: 'Erster Kauf' },
+            { threshold: 5000, labelEn: 'Patron', labelDE: 'Gönner' },
+            { threshold: 20000, labelEn: 'Whale', labelDE: 'Wal' },
+            { threshold: 50000, labelEn: 'Money to Burn', labelDE: 'Geld zum Verbrennen' },
+        ]
+    },
+
+    // ── VENDOR: PURCHASES ─────────────────────────
+    {
+        id: 'eg_vendor_purchases',
+        category: 'endgame',
+        icon: '🏪',
+        nameEn: 'Patron of the Bazaar',
+        nameDE: 'Gönner des Basars',
+        descEn: 'Purchase items from the Vendor.',
+        descDE: 'Kaufe Gegenstände beim Händler.',
+        stat: 'egVendorPurchases',
+        tiers: [
+            { threshold: 5, labelEn: 'Window Shopper', labelDE: 'Schaufensterbummler' },
+            { threshold: 20, labelEn: 'Regular', labelDE: 'Stammkunde' },
+            { threshold: 50, labelEn: 'VIP', labelDE: 'VIP' },
+            { threshold: 100, labelEn: 'Bazaar Lord', labelDE: 'Basar-Lord' },
+        ]
+    },
+
+    // ── SHARDS: ITEMS SOLD ────────────────────────
+    {
+        id: 'eg_items_sold',
+        category: 'endgame',
+        icon: '🔨',
+        nameEn: 'Salvager',
+        nameDE: 'Verwerter',
+        descEn: 'Sell items for shards (Ctrl+click in stash).',
+        descDE: 'Verkaufe Gegenstände für Scherben (Strg+Klick im Lager).',
+        stat: 'egItemsSold',
+        tiers: [
+            { threshold: 10, labelEn: 'Scrapper', labelDE: 'Schrotthändler' },
+            { threshold: 50, labelEn: 'Salvage Expert', labelDE: 'Verwertungsexperte' },
+            { threshold: 150, labelEn: 'Recycling Plant', labelDE: 'Recyclinganlage' },
+            { threshold: 300, labelEn: 'Industrial Salvager', labelDE: 'Industrieller Verwerter' },
+        ]
+    },
+
+    // ── SHARDS: CONVERTED TO ORBS ─────────────────
+    {
+        id: 'eg_shards_converted',
+        category: 'endgame',
+        icon: '💠',
+        nameEn: 'Shard Alchemist',
+        nameDE: 'Scherbenalchemist',
+        descEn: 'Convert full shard stacks into orbs.',
+        descDE: 'Wandle volle Scherbenstapel in Orbs um.',
+        stat: 'egShardsConverted',
+        tiers: [
+            { threshold: 10, labelEn: 'First Conversions', labelDE: 'Erste Umwandlungen' },
+            { threshold: 30, labelEn: 'Transmuter', labelDE: 'Transmutator' },
+            { threshold: 75, labelEn: 'Shard Master', labelDE: 'Scherbenmeister' },
+            { threshold: 150, labelEn: 'Shard God', labelDE: 'Scherbengott' },
+        ]
+    },
+
+    // ── QUIZ: CORRECT IN MAPS ─────────────────────
+    {
+        id: 'eg_quiz_correct',
+        category: 'endgame',
+        icon: '🧠',
+        nameEn: 'Scholar of the Atlas',
+        nameDE: 'Gelehrter des Atlas',
+        descEn: 'Answer quiz questions correctly during maps.',
+        descDE: 'Beantworte Quizfragen während Karten korrekt.',
+        stat: 'egQuizCorrect',
+        tiers: [
+            { threshold: 10, labelEn: 'Student', labelDE: 'Student' },
+            { threshold: 50, labelEn: 'Scholar', labelDE: 'Gelehrter' },
+            { threshold: 150, labelEn: 'Professor', labelDE: 'Professor' },
+            { threshold: 300, labelEn: 'Sage of the Atlas', labelDE: 'Weiser des Atlas' },
+        ]
+    },
+
+    // ── AILMENTS: INFLICTED ON MONSTERS ───────────
+    {
+        id: 'eg_ailments_inflicted',
+        category: 'endgame',
+        icon: '🔥',
+        nameEn: 'Afflictionist',
+        nameDE: 'Leidensbringer',
+        descEn: 'Inflict elemental ailments on monsters (ignite, chill, shock, etc.).',
+        descDE: 'Füge Monstern Elementarzustände zu (Entzünden, Kälte, Schock usw.).',
+        stat: 'egAilmentsInflicted',
+        tiers: [
+            { threshold: 25, labelEn: 'First Ailments', labelDE: 'Erste Leiden' },
+            { threshold: 100, labelEn: 'Afflictor', labelDE: 'Peiniger' },
+            { threshold: 250, labelEn: 'Plague Bringer', labelDE: 'Seuchenbringer' },
+            { threshold: 500, labelEn: 'Master of Maladies', labelDE: 'Meister der Leiden' },
+        ]
+    },
+
+    // ── LOOT FILTER: AUTO-VENDORED ────────────────
+    {
+        id: 'eg_lootfilter_vendored',
+        category: 'endgame',
+        icon: '🗑️',
+        nameEn: 'Filter Manager',
+        nameDE: 'Filtermanager',
+        descEn: 'Have the loot filter automatically vendor items.',
+        descDE: 'Lass den Lootfilter Gegenstände automatisch verwerten.',
+        stat: 'egLootFilterVendored',
+        tiers: [
+            { threshold: 10, labelEn: 'First Filtered', labelDE: 'Erst gefiltert' },
+            { threshold: 50, labelEn: 'Assembly Line', labelDE: 'Fließband' },
+            { threshold: 150, labelEn: 'Automated', labelDE: 'Automatisiert' },
+            { threshold: 300, labelEn: 'Full Automation', labelDE: 'Vollautomatisiert' },
+        ]
+    },
+
 ];

@@ -565,68 +565,183 @@
     ------------------------------------------------------------------------
     --------------------- 5. KEYBINDS MODAL --------------------------------
     ---- Rebinding UI: one row per action, click a key chip to capture. ----
+    ---- Visual style mirrors the settings modal (css/settings.css): the   --
+    ---- stone/parchment book frame from images/Settings/ with the title   --
+    ---- plaque + stone close button overhanging the frame edge.           --
     ------------------------------------------------------------------------
 */
 
-.keybinds-box {
-    width: min(560px, 92vw);
-    max-height: 86vh;
+.modal-box.keybinds-box {
+    position: relative;
+    width: 92%;
+    max-width: 680px;
+    aspect-ratio: 611 / 470;
+    background-image: url('../images/Settings/settings_background.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    border-left: none;
+    box-shadow: none;
+    padding: clamp(70px, 9vw, 100px) clamp(36px, 5vw, 60px) clamp(30px, 4vw, 50px);
+    box-sizing: border-box;
+    overflow: visible; /* let plaque + close button hang over the frame edge */
+    max-height: none;
+
+    /* Flex column so .keybinds-scroll can fill the remaining inner height
+       (title plaque + close button are absolutely positioned, out of flow). */
     display: flex;
     flex-direction: column;
 }
 
+/* TITLE PLAQUE — same asset + geometry as the settings modal, slightly
+   wider so the longer "KEYBINDS" heading stays comfortably inside. */
+.keybinds-box .modal-title {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(230px, 44%, 380px);
+    height: clamp(46px, 6vw, 68px);
+    background-image: url('../images/Settings/settings_title_plague.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--C);
+    font-size: clamp(14px, 1.8vw, 22px);
+    letter-spacing: 2px;
+    color: var(--yellow);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    margin: 0;
+    z-index: 3;
+}
+
+/* CLOSE BUTTON — stone square with X icon, top-right corner (same asset
+   as settings; the "✕ CLOSE" text is hidden, the art shows the X). */
+.keybinds-box .modal-close {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    width: clamp(34px, 4.4vw, 50px);
+    height: clamp(34px, 4.4vw, 50px);
+    background-image: url('../images/Settings/settings_close_button.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    font-size: 0; /* icon art already shows the X */
+    cursor: pointer;
+    padding: 0;
+    z-index: 4;
+    transition: transform .12s, filter .12s;
+}
+
+    .keybinds-box .modal-close:hover {
+        filter: brightness(1.2);
+        transform: scale(1.06);
+    }
+
+/* SCROLL PANEL — fills the frame's inner parchment area; the hint + rows
+   scroll vertically when they exceed it (mirrors .settings-scroll). */
+.keybinds-scroll {
+    flex: 1 1 auto;         /* fill the remaining inner parchment height */
+    min-height: 0;           /* required so flex children can shrink + scroll */
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: clamp(4px, 0.8vw, 10px); /* keep content clear of the scrollbar */
+
+    /* Firefox */
+    scrollbar-width: thin;
+}
+
+/* WebKit (Chrome/Edge/Safari) — parchment-toned scrollbar */
+.keybinds-scroll::-webkit-scrollbar {
+    width: clamp(6px, 0.7vw, 10px);
+}
+.keybinds-scroll::-webkit-scrollbar-track {
+    background: rgba(44, 26, 12, 0.15);
+    border-radius: 6px;
+}
+.keybinds-scroll::-webkit-scrollbar-thumb {
+    background: rgba(44, 26, 12, 0.45);
+    border-radius: 6px;
+}
+
 .keybinds-hint {
-    font-size: 11px;
-    opacity: 0.7;
-    margin: 4px 0 12px;
+    font-family: var(--F);
+    font-size: clamp(13px, 1.4vw, 16px);
+    line-height: 1.4;
+    color: #4a2c12;
+    background: rgba(255, 248, 220, 0.5);
+    border: 1px solid rgba(44, 26, 12, 0.25);
+    border-radius: 4px;
+    padding: clamp(6px, 0.9vw, 10px) clamp(8px, 1.2vw, 14px);
+    margin: 0 0 clamp(10px, 1.4vw, 14px);
 }
 
 .keybind-list {
-    overflow-y: auto;
-    border: 1px solid var(--border2, #333);
+    border: 2px solid rgba(44, 26, 12, 0.35);
     border-radius: 6px;
     padding: 4px 0;
-    margin-bottom: 12px;
+    background: rgba(255, 248, 220, 0.25);
 }
 
 .keybind-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 7px 14px;
+    padding: clamp(5px, 0.7vw, 8px) clamp(10px, 1.4vw, 16px);
 }
 
     .keybind-row:nth-child(even) {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(44, 26, 12, 0.06);
     }
 
 .keybind-label {
-    font-size: 12px;
-    letter-spacing: 0.03em;
+    font-family: var(--PX);
+    font-size: clamp(10px, 1.2vw, 13px);
+    color: var(--yellow);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 
+/* Key chip — stone tablet (Button-Block-1.png) same as the setup screen
+   option buttons; pressed/capture state swaps to the darker pressed art. */
 .keybind-key {
-    font-family: var(--PX, monospace);
-    font-size: 12px;
-    min-width: 92px;
+    font-family: var(--PX);
+    font-size: clamp(9px, 1.1vw, 12px);
+    min-width: clamp(86px, 11vw, 120px);
     text-align: center;
-    padding: 5px 12px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--border2, #444);
-    border-radius: 4px;
-    color: var(--green, #7ee787);
+    padding: clamp(6px, 0.9vw, 10px) 12px;
+    color: floralwhite;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    background-image: url('../images/Game_Setup/Button-Block-1.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    transition: transform .12s, filter .12s;
 }
 
     .keybind-key:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: var(--accent, #888);
+        filter: brightness(1.2);
+        transform: translateY(-1px);
     }
 
+    .keybind-key:active {
+        background-image: url('../images/Game_Setup/Button-Block-2.png');
+        transform: translateY(1px);
+    }
+
+    /* Capture state: swap to the pressed stone art + pulse while waiting
+       for the next keypress. */
     .keybind-key.keybind-capturing {
+        background-image: url('../images/Game_Setup/Button-Block-2.png');
         color: var(--yellow, #f1c40f);
-        border-color: var(--yellow, #f1c40f);
         animation: keybind-pulse 1s ease-in-out infinite;
     }
 
@@ -634,3 +749,221 @@
     0%, 100% { opacity: 1; }
     50%      { opacity: 0.45; }
 }
+
+/* Footer action row — the RESET TO DEFAULTS stone button, echoing the
+   setup screen's big stone buttons (Button-Block-1/2.png). */
+.keybinds-actions {
+    margin-top: clamp(10px, 1.6vw, 18px);
+    justify-content: center;
+}
+
+.keybinds-reset-btn {
+    font-family: var(--PX);
+    font-size: clamp(9px, 1.1vw, 12px);
+    letter-spacing: 2px;
+    color: var(--accent2);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.9), 0 0 12px rgba(102,252,241,0.4);
+    background-image: url('../images/Game_Setup/Button-Block-1.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    padding: clamp(10px, 1.6vw, 16px) clamp(24px, 3.6vw, 44px);
+    cursor: pointer;
+    transition: transform .12s, filter .12s;
+}
+
+    .keybinds-reset-btn:hover {
+        filter: brightness(1.25) saturate(1.1);
+        transform: translateY(-2px);
+    }
+
+    .keybinds-reset-btn:active {
+        background-image: url('../images/Game_Setup/Button-Block-2.png');
+        transform: translateY(1px);
+    }
+
+
+
+/*
+    ------------------------------------------------------------------------
+    --------------------- 6. HOW TO PLAY MODAL -----------------------------
+    ---- Tutorial help dialog. Visual style mirrors the settings modal     --
+    ---- (css/settings.css): the stone/parchment book frame from           --
+    ---- images/Settings/ with the title plaque + stone close button       --
+    ---- overhanging the frame edge. The nine tutorial sections sit on     --
+    ---- stone cards arranged in a wide 3-column grid over the parchment.  --
+    ------------------------------------------------------------------------
+*/
+
+/* WIDE BOX — same stone frame asset as settings/keybinds, but much wider
+   (3 columns need the room) and a bit taller (611/470 like keybinds). */
+.modal-box.tut-box {
+    position: relative;
+    width: 94%;
+    max-width: 1280px;
+    aspect-ratio: 611 / 470;
+    background-image: url('../images/Settings/settings_background.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    border-left: none;
+    box-shadow: none;
+    padding: clamp(70px, 9vw, 100px) clamp(36px, 5vw, 60px) clamp(30px, 4vw, 50px);
+    box-sizing: border-box;
+    overflow: visible; /* let plaque + close button hang over the frame edge */
+    max-height: none;
+
+    /* Flex column so .tut-scroll can fill the remaining inner height
+       (title plaque + close button are absolutely positioned, out of flow). */
+    display: flex;
+    flex-direction: column;
+}
+
+/* TITLE PLAQUE — same asset + geometry as the settings modal. */
+.tut-box .modal-title {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(230px, 44%, 380px);
+    height: clamp(46px, 6vw, 68px);
+    background-image: url('../images/Settings/settings_title_plague.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--C);
+    font-size: clamp(14px, 1.8vw, 22px);
+    letter-spacing: 2px;
+    color: var(--yellow);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    margin: 0;
+    z-index: 3;
+}
+
+/* CLOSE BUTTON — stone square with X icon, top-right corner (same asset
+   as settings; the "✕ CLOSE" text is hidden, the art shows the X). */
+.tut-box .modal-close {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    width: clamp(34px, 4.4vw, 50px);
+    height: clamp(34px, 4.4vw, 50px);
+    background-image: url('../images/Settings/settings_close_button.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    font-size: 0; /* icon art already shows the X */
+    cursor: pointer;
+    padding: 0;
+    z-index: 4;
+    transition: transform .12s, filter .12s;
+}
+
+    .tut-box .modal-close:hover {
+        filter: brightness(1.2);
+        transform: scale(1.06);
+    }
+
+/* SCROLL PANEL — fills the frame's inner parchment area; the 3-column
+   card grid scrolls vertically when it exceeds it (mirrors .settings-scroll). */
+.tut-scroll {
+    flex: 1 1 auto;         /* fill the remaining inner parchment height */
+    min-height: 0;           /* required so flex children can shrink + scroll */
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: clamp(4px, 0.8vw, 10px); /* keep content clear of the scrollbar */
+
+    /* Firefox */
+    scrollbar-width: thin;
+}
+
+/* WebKit (Chrome/Edge/Safari) — parchment-toned scrollbar */
+.tut-scroll::-webkit-scrollbar {
+    width: clamp(6px, 0.7vw, 10px);
+}
+.tut-scroll::-webkit-scrollbar-track {
+    background: rgba(44, 26, 12, 0.15);
+    border-radius: 6px;
+}
+.tut-scroll::-webkit-scrollbar-thumb {
+    background: rgba(44, 26, 12, 0.45);
+    border-radius: 6px;
+}
+
+/* 3-COLUMN GRID — one column falls back to full width on narrow windows.
+   minmax(0, 1fr) instead of plain 1fr: long German compound words would
+   otherwise inflate a track's min-content and make the columns unequal. */
+.tut-columns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(10px, 1.4vw, 18px);
+    align-items: start;
+}
+
+    @media (max-width: 900px) {
+        .tut-columns {
+            grid-template-columns: 1fr;
+        }
+    }
+
+/* On narrow windows drop the fixed frame aspect ratio so the box can grow
+   taller instead of squeezing the scroll panel into a sliver. */
+@media (max-width: 700px) {
+    .modal-box.tut-box {
+        aspect-ratio: auto;
+        min-height: 82vh;
+    }
+}
+
+/* STONE CARD — one tutorial section. Warm parchment panel with a stone
+   border; dark text so it stays readable on the light frame art. */
+.tut-section {
+    background: rgba(255, 248, 220, 0.55);
+    border: 2px solid rgba(44, 26, 12, 0.4);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 220, 0.5),
+                0 2px 6px rgba(0, 0, 0, 0.35);
+    padding: clamp(10px, 1.4vw, 16px) clamp(12px, 1.6vw, 18px);
+    margin-bottom: 0; /* grid gap handles the spacing inside .tut-columns */
+}
+
+/* Section heading — stone-brown like the settings hint text; the colored
+   left rule groups the cards into Basics / Difficulty / Progression. */
+.tut-section h3 {
+    font-family: var(--PX);
+    font-size: clamp(9px, 1vw, 12px);
+    color: #2c1a0c;
+    letter-spacing: 1px;
+    line-height: 1.5;
+    margin: 0 0 clamp(8px, 1.2vw, 12px);
+    padding-left: 8px;
+    border-left: 4px solid rgba(44, 26, 12, 0.55);
+    text-shadow: 0 1px 0 rgba(255, 248, 220, 0.8);
+    overflow-wrap: break-word;
+}
+
+    .tut-section-basics h3 { border-left-color: var(--accent); }
+    .tut-section-diff h3   { border-left-color: var(--orange); }
+    .tut-section-progression h3 { border-left-color: var(--purple); }
+
+/* Section body — dark brown instead of the shared modal grey-blue, so it
+   reads on the light parchment card. Inline colored <strong>s from the
+   translations stay as-is (they're bright enough on parchment). */
+.tut-section p {
+    font-family: var(--F);
+    font-size: clamp(11px, 1.15vw, 14px);
+    line-height: 1.7;
+    color: #4a2c12;
+    margin: 0;
+    overflow-wrap: break-word; /* let long compound words wrap inside the card */
+}
+
+    .tut-section p strong {
+        color: #2c1a0c;
+    }

@@ -720,6 +720,7 @@ function egAddEssence(id, amount = 1, def = null) {
     if (cell && cell.id === id) {
         cell.count = (cell.count || 1) + amount;
         _egRenderEssenceCell(r, c);
+        if (typeof trackAchStat === 'function') try { trackAchStat('egEssencesLooted', amount); } catch(e){}
         return true;
     }
     if (cell && cell.id !== id) {
@@ -734,6 +735,7 @@ function egAddEssence(id, amount = 1, def = null) {
     if (!_egEssenceStash[r][c].category) _egEssenceStash[r][c].category = 'essence';
     if (!_egEssenceStash[r][c].rarity) _egEssenceStash[r][c].rarity = 'essence';
     _egRenderEssenceCell(r, c);
+    if (typeof trackAchStat === 'function') try { trackAchStat('egEssencesLooted', amount); } catch(e){}
     return true;
 }
 
@@ -1003,6 +1005,8 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     stack.count = (stack.count || 1) - 1;
     if (stack.count <= 0) _egEssenceStash[sourceRow][sourceCol] = null;
     _egRenderEssenceCell(sourceRow, sourceCol);
+
+    if (typeof trackAchStat === 'function') try { trackAchStat('egEssencesApplied', 1); } catch(e){}
 
     if (keepActive && stack.count > 0) {
         _egRefreshEssenceUseHighlight();

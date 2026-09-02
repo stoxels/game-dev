@@ -4,15 +4,15 @@
 //=  ENDGAME VENDOR                                                       =
 //========================================================================
 //=  Gold-based vendor reached from the Nexus of Worlds screen via the    =
-//=  💰 door. Five tabs:                                                  =
-//=    MAPS      — freshly rolled Tier 1 maps (→ Probability Gate stash)  =
+//=  💰 door. Six tabs (Atlas Vendor):                                    =
+//=    MAPS      — free Tier 1 Normal map only (→ map stash)              =
+//=    STARTER   — free level 1 starter gear (no sell value)              =
 //=    CURRENCY  — all currency orbs (→ currency stash)                   =
-//=    ESSENCES  — all essences (→ essence tab)                           =
+//=    ESSENCES  — all 93 essences (→ essence tab)                        =
 //=    ITEMS     — all regular puzzle items (ITEM_DEFS → STATE.inventory) =
-//=    BASE      — all equipment base types, filterable by slot type and  =
-//=                sortable by equipment slot or item level. Items the    =
-//=                player cannot equip (level / stat requirements) are    =
-//=                highlighted with a red background.                     =
+//=    BASE      — all non-starter equipment base types, filterable by    =
+//=                slot type and auto-sorted descending by item level.    =
+//=                Items the player cannot equip are highlighted red.     =
 //=                                                                       =
 //=  Public API:                                                          =
 //=    showEndgameVendor() — creates the screen on first call and         =
@@ -26,9 +26,9 @@
 // Price of one vendor-bought Tier 1 map, in gold (0 = free).
 const EG_VENDOR_T1_MAP_PRICE = 0;
 
-// Base types given away for free in the Base Items tab — basic level 1
-// starter gear (melee weapon, ranged weapon, armour chest + pants) so new
-// players can gear up without gold.
+// Base types given away for free in the Starter Gear tab — basic level 1
+// starter gear so new players can gear up without gold. No longer part
+// of the Base Items tab.
 const EG_VENDOR_FREE_BASE_IDS = new Set([
     'wpn_1h_1',    // Rusted Sword (level 1 melee)
     'ranged_1',    // Shortbow (level 1 ranged)
@@ -41,46 +41,161 @@ const EG_VENDOR_FREE_BASE_IDS = new Set([
 ]);
 
 // Prices per currency orb id (gold). Missing ids fall back to the default.
+// Rebalanced: common crafting orbs are affordable, rare/epic orbs are
+// deliberately expensive so they remain chase items and cannot be spammed.
 const EG_VENDOR_CURRENCY_PRICES = {
-    orb_transmutation: 15,
-    orb_augmentation: 20,
-    orb_alteration: 20,
-    orb_scouring: 30,
-    orb_alchemy: 35,
-    orb_chance: 60,
-    orb_regal: 80,
-    orb_bloom: 85,
-    orb_annulment: 90,
-    orb_chaos: 120,
-    orb_divine: 180,
-    orb_elevation: 150,
-    orb_cataclysm: 160,
-    orb_ascension: 200,
-    orb_exalted: 220,
-    orb_ancient: 400,
-    mirror_of_kalandra: 2500,
+    orb_transmutation: 45,
+    orb_augmentation: 55,
+    orb_alteration: 65,
+    orb_scouring: 110,
+    orb_alchemy: 140,
+    orb_chance: 280,
+    orb_regal: 320,
+    orb_bloom: 380,
+    orb_annulment: 480,
+    orb_chaos: 620,
+    orb_divine: 950,
+    orb_elevation: 900,
+    orb_cataclysm: 1000,
+    orb_ascension: 1100,
+    orb_exalted: 1400,
+    orb_ancient: 2800,
+    orb_blessing: 420,
+    orb_horizons: 500,
+    mirror_of_kalandra: 8500,
 };
-const EG_VENDOR_CURRENCY_DEFAULT_PRICE = 50;
+const EG_VENDOR_CURRENCY_DEFAULT_PRICE = 320;
 
-// Prices per essence id (gold). All per-modifier essences share the default price.
+// Prices per essence id (gold). 93 per-modifier essences now all have
+// distinct prices: baseline 320, powerful families cost significantly more.
 const EG_VENDOR_ESSENCE_PRICES = {
+    // Recovery / absorption — 400-440
+    essence_absorption_on_kill: 440,
+    essence_absorption_regen_rate: 440,
+    // Cheap / puzzle-utility tier — ~260-320
+    essence_time_added: 260,
+    essence_mistake_count: 260,
+    essence_mistake_not_count: 280,
+    essence_focus: 280,
+    essence_reveal_hint: 280,
+    essence_chance_for_new_question: 300,
+    essence_fate: 320,
+    essence_echo: 320,
+    // Resistances — 340-380
+    essence_fire_resist: 360,
+    essence_cold_resist: 360,
+    essence_lightning_resist: 360,
+    essence_shadow_resist: 380,
+    essence_arcane_resistance: 380,
+    // Flat defenses — 380-450
+    essence_flat_armour: 420,
+    essence_flat_evasion: 420,
+    essence_flat_absorption: 420,
+    essence_inc_armour: 380,
+    essence_inc_evasion: 380,
+    essence_inc_absorption: 380,
+    essence_hybrid_armour_absorption: 480,
+    essence_hybrid_armour_evasion: 480,
+    essence_hybrid_evasion_absorption: 480,
+    essence_hybrid_evasion_armour: 480,
+    // Elemental / flat damage — 500-620
+    essence_fire_damage: 520,
+    essence_cold_damage: 520,
+    essence_lightning_damage: 520,
+    essence_shadow_damage: 520,
+    essence_spell_damage: 720,
+    essence_inc_spell_damage: 720,
+    essence_precision_damage: 580,
+    // Life / mana / hybrid life+mana — 550-750 (very desirable)
+    essence_flat_health: 650,
+    essence_inc_health: 620,
+    essence_flat_mana: 580,
+    essence_life_regen: 480,
+    essence_mana_regen: 480,
+    essence_hybrid_life_armour: 720,
+    essence_hybrid_life_evasion: 720,
+    essence_hybrid_life_absorption: 720,
+    essence_hybrid_mana_armour: 680,
+    essence_hybrid_mana_evasion: 680,
+    essence_hybrid_mana_absorption: 680,
+    // Attributes — 620
+    essence_strength: 620,
+    essence_agility: 620,
+    essence_intelligence: 620,
+    // Offensive power — most expensive
+    essence_flat_physical_damage: 820,
+    essence_inc_physical_damage: 820,
+    essence_crit_chance: 900,
+    essence_crit_multiplier: 900,
+    essence_attack_speed: 850,
+    essence_arcane_surge: 680,
+    essence_mana_to_damage: 700,
+    essence_precision_regen: 500,
+    // Weapon mechanics — mid-high
+    essence_accuracy: 460,
+    essence_pierce: 620,
+    essence_cleave: 620,
+    essence_splash_damage: 620,
+    essence_chain: 640,
+    essence_channel: 640,
+    essence_multishot: 680,
+    essence_snipe: 560,
+    essence_shield_bash: 520,
+    essence_overkill: 520,
+    essence_pushback: 420,
+    essence_stagger: 460,
+    // Defensive mechanics — 500-620
+    essence_block_chance: 620,
+    essence_spell_block_chance: 620,
+    essence_block_recovery: 420,
+    essence_dodge: 580,
+    essence_spell_dodge: 580,
+    essence_preemptive_dodge: 580,
+    essence_parry: 560,
+    essence_deflect: 520,
+    essence_deflect_damage: 520,
+    essence_first_step: 480,
+    essence_grounded: 480,
+    essence_warding: 520,
+    // Status / ailment chance — 480-560
+    essence_chance_to_ignite: 520,
+    essence_chance_to_freeze: 520,
+    essence_chance_to_shock: 520,
+    essence_chance_to_blind: 480,
+    essence_chance_to_convert: 500,
+    // Recovery / sustain — 440-520
+    essence_life_leech: 540,
+    essence_life_on_kill: 440,
+    essence_mana_on_kill: 440,
+    essence_mana_on_mistake: 440,
+    essence_absorption_on_kill: 440,
+    essence_absorption_regen_rate: 440,
+    essence_faster_absorption_regen_start: 400,
+    essence_heart_heal: 400,
+    essence_inc_heart_heal: 420,
+    essence_mana_heal: 400,
+    essence_inc_mana_heal: 420,
+    // Movement / utility
+    essence_movement_speed: 540,
 };
-const EG_VENDOR_ESSENCE_DEFAULT_PRICE = 80;
+const EG_VENDOR_ESSENCE_DEFAULT_PRICE = 350;
 
-// Puzzle item prices by rarity (gold).
+// Puzzle item prices by rarity (gold) — rebalanced to be more expensive
+// across the board so puzzle items remain meaningful purchases.
 const EG_VENDOR_ITEM_RARITY_PRICES = {
-    common: 25,
-    uncommon: 60,
-    rare: 120,
-    epic: 250,
-    legendary: 500,
-    artifact: 1000,
-    cursed: 750,
+    common: 55,
+    uncommon: 130,
+    rare: 280,
+    epic: 600,
+    legendary: 1300,
+    artifact: 2800,
+    cursed: 1950,
 };
 
 // Base item price scales with the item level of the base type.
+// Rebalanced to be ~2.5x more expensive than before so progression feels slower.
 function _egvBaseItemPrice(base) {
-    return Math.round(40 + Math.pow(base.minLevel || 1, 1.75));
+    return Math.round(90 + Math.pow(base.minLevel || 1, 1.78) * 2.3);
 }
 
 
@@ -90,11 +205,10 @@ function _egvBaseItemPrice(base) {
 
 let _egvActiveTab = 'maps';
 let _egvBaseFilterSlot = 'all';
-let _egvBaseFilterOffer = 'all'; // 'all' | 'free'
-let _egvBaseSortMode = 'slot'; // 'slot' | 'ilvl'
 
 const EG_VENDOR_TABS = [
     { id: 'maps', labelKey: 'eg_vendor_tab_maps' },
+    { id: 'starter', labelKey: 'eg_vendor_tab_starter' },
     { id: 'currency', labelKey: 'eg_vendor_tab_currency' },
     { id: 'essences', labelKey: 'eg_vendor_tab_essences' },
     { id: 'items', labelKey: 'eg_vendor_tab_items' },
@@ -104,6 +218,7 @@ const EG_VENDOR_TABS = [
 // Hint text shown below each tab's content.
 const EG_VENDOR_TAB_HINTS = {
     maps: 'eg_vendor_hint',
+    starter: 'eg_vendor_hint_starter',
     currency: 'eg_vendor_hint_currency',
     essences: 'eg_vendor_hint_essences',
     items: 'eg_vendor_hint_items',
@@ -165,6 +280,7 @@ function _egvRenderTabContent() {
 
     switch (_egvActiveTab) {
         case 'maps': contentEl.innerHTML = _egvBuildMapsTabHTML(); break;
+        case 'starter': contentEl.innerHTML = _egvBuildStarterTabHTML(); break;
         case 'currency': contentEl.innerHTML = _egvBuildCurrencyTabHTML(); break;
         case 'essences': contentEl.innerHTML = _egvBuildEssencesTabHTML(); break;
         case 'items': contentEl.innerHTML = _egvBuildItemsTabHTML(); break;
@@ -238,6 +354,7 @@ function _egvPurchase(price, grantFn) {
     }
     if (typeof egSaveHubState === 'function') egSaveHubState();
     Audio_Manager.playSFX('player_equip_pickup');
+    if (typeof trackAchStat === 'function') try { trackAchStat('egVendorPurchases', 1); } catch(e){}
     return true;
 }
 
@@ -246,44 +363,28 @@ function _egvPurchase(price, grantFn) {
 //-------------------TAB: MAPS----------------------------------------------
 //------------------------------------------------------------------------
 
-// Builds the Maps tab: one free card per tier (1..EG_MAX_MAP_TIER) so every
-// atlas tier can be tested without farming drops. Cards are free for now
-// and use the same rarity/mod rolls as regular map drops. The dedicated
-// Tier 1 starter offer stays available as the first card; buying it keeps
-// forceNormal (white, no mods) for a clean baseline run — other tiers roll
-// normally.
+// Builds the Maps tab: only a single free Tier 1 Normal map is offered.
+// Maps are always Normal (white, no modifiers) so players must use currency
+// orbs to upgrade them. This keeps progression gated through map drops.
 function _egvBuildMapsTabHTML() {
-    const maxTier = (typeof EG_MAX_MAP_TIER !== 'undefined') ? EG_MAX_MAP_TIER
-        : ((typeof EG_ATLAS_MAX_TIER !== 'undefined') ? EG_ATLAS_MAX_TIER : 16);
-    const cards = [];
-    for (let tier = 1; tier <= maxTier; tier++) {
-        const monsterLevel = (typeof _egMapTierMonsterLevel === 'function')
-            ? _egMapTierMonsterLevel(tier) : tier;
-        // Localised card title: replace the "1" in the Tier-1 template with the tier number.
-        let title;
-        try {
-            const tmpl = t('eg_vendor_offer_name');
-            title = tmpl.replace('1', String(tier));
-            // Fallback when translation does not contain "1"
-            if (title === tmpl && !title.includes(String(tier))) title = `Tier ${tier} Map`;
-        } catch (e) { title = `Tier ${tier} Map`; }
-        const sub = `Tier ${tier} · Monster Lv ${monsterLevel}`;
-        let desc;
-        try {
-            const dTmpl = t('eg_vendor_offer_desc');
-            desc = dTmpl.replace(/Tier 1/g, `Tier ${tier}`).replace(/Tier-1/g, `Tier-${tier}`);
-        } catch (e) { desc = `A freshly charted map of a Tier ${tier} region. Region and modifiers are revealed on purchase.`; }
-        cards.push(_egvBuildCardHTML({
-            icon: '🗺️',
-            title,
-            subtitle: sub,
-            desc,
-            price: 0,
-            buyCall: `_egvBuyTierMap(${tier})`,
-            extraClass: 'egv-map-card',
-        }));
-    }
-    return `<div class="egv-cards egv-cards-maps">${cards.join('')}</div>`;
+    const tier = 1;
+    const monsterLevel = (typeof _egMapTierMonsterLevel === 'function')
+        ? _egMapTierMonsterLevel(tier) : tier;
+    let title;
+    try { title = t('eg_vendor_offer_name'); } catch (e) { title = 'Tier 1 Map'; }
+    const sub = `Tier ${tier} · Monster Lv ${monsterLevel} · Normal`;
+    let desc;
+    try { desc = t('eg_vendor_offer_desc'); } catch (e) { desc = 'A freshly charted Tier 1 map — always Normal (white). Use currency orbs to add modifiers.'; }
+    const card = _egvBuildCardHTML({
+        icon: '🗺️',
+        title,
+        subtitle: sub,
+        desc,
+        price: 0,
+        buyCall: `_egvBuyTierMap(1)`,
+        extraClass: 'egv-map-card',
+    });
+    return `<div class="egv-cards egv-cards-maps">${card}</div>`;
 }
 
 // Refreshes dynamic bits on the Maps tab. All tier maps are free (price 0)
@@ -315,28 +416,19 @@ function _egvRefreshMapsTabDynamic() {
     _egvRefreshGoldDisplay();
 }
 
-// Core purchase helper for any tier (free for now). Tier 1 can optionally
-// force a white map for a clean starter run; all tiers currently roll with
-// normal rarity/mod generation so testers see realistic modifiers.
+// Core purchase helper — always produces a Normal (white) map with no
+// modifiers. Players must use currency orbs to upgrade the map afterwards.
 function _egvBuyTierMap(tier) {
     const maxTier = (typeof EG_MAX_MAP_TIER !== 'undefined') ? EG_MAX_MAP_TIER
         : ((typeof EG_ATLAS_MAX_TIER !== 'undefined') ? EG_ATLAS_MAX_TIER : 16);
     tier = Math.max(1, Math.min(maxTier, Math.round(tier || 1)));
+    // Vendor only sells Tier 1 for now — clamp higher tiers down.
+    tier = 1;
 
     if (typeof _egLoadHubState === 'function') _egLoadHubState();
 
-    // Tiered stashes are infinite — no capacity guard needed (kept as no-op for legacy callers)
-    // if (!_egMapStashHasFreeSlot(tier)) { ... }
-
-    // All vendor maps are free (price 0) for testing — no gold spend/refund needed.
-    // Tier 1 starter remains modifier-free when the global price is 0 so a fresh
-    // character gets a pristine baseline; other tiers roll normally.
-    let map;
-    if (tier === 1 && EG_VENDOR_T1_MAP_PRICE === 0) {
-        map = _egGenerateMapDrop(4, 1, { forceNormal: true });
-    } else {
-        map = _egGenerateMapDrop(1, tier);
-    }
+    // Always Normal — no rarity or mod rolls, but upgradeable with orbs.
+    const map = _egGenerateMapDrop(4, 1, { forceNormal: true });
     _egAddMapToMapStash(map);
     egSaveHubState();
 
@@ -345,6 +437,7 @@ function _egvBuyTierMap(tier) {
         .replace('{icon}', map.icon || '🗺️')
         .replace('{name}', map.name));
 
+    if (typeof trackAchStat === 'function') try { trackAchStat('egVendorPurchases', 1); } catch(e){}
     _egvRefreshMapsTabDynamic();
     _egvRefreshGoldDisplay();
 }
@@ -352,6 +445,35 @@ function _egvBuyTierMap(tier) {
 // Backwards-compat shim: old Maps tab and external callers used this name.
 function _egvBuyTierOneMap() {
     return _egvBuyTierMap(1);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------TAB: STARTER GEAR (FREE)-------------------------------
+//------------------------------------------------------------------------
+
+function _egvBuildStarterTabHTML() {
+    const slotOrder = _egvGetSlotOrder();
+    const starterBases = EG_ALL_BASE_TYPES.filter(b => EG_VENDOR_FREE_BASE_IDS.has(b.id));
+    // No filter — always show all 8 starter items, sorted by slot order
+    starterBases.sort((a, b) => slotOrder.indexOf(a.slotType) - slotOrder.indexOf(b.slotType) || a.minLevel - b.minLevel);
+
+    const cards = starterBases.map(base => {
+        const name = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
+        const missing = _egvGetMissingRequirements(base);
+        return _egvBuildCardHTML({
+            icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
+            title: name,
+            subtitle: `${t(`eg_slot_${base.slotType}`)} · ${t('eg_item_level').replace('{n}', base.minLevel)}`,
+            desc: _egvBuildReqSummaryText(base),
+            price: 0,
+            buyCall: `_egvBuyBaseItem('${base.id}')`,
+            extraAttrs: ` onmouseenter="_egvShowBaseTooltip('${base.id}', event)" onmouseleave="_egvHideBaseTooltip()"`,
+            blockedReason: missing.length ? t('eg_vendor_cannot_equip').replace('{list}', missing.join(', ')) : '',
+        });
+    }).join('');
+
+    return `<div class="egv-cards egv-cards-base">${cards}</div>`;
 }
 
 
@@ -477,11 +599,12 @@ function _egvBuyPuzzleItem(defId) {
     showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', def.icon)
         .replace('{name}', itemName(def)));
+    if (typeof trackAchStat === 'function') try { trackAchStat('egVendorPurchases', 1); } catch(e){}
     _egvRenderTabContent();
 }
 
 
-//------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 //-------------------TAB: BASE ITEMS----------------------------------------
 //------------------------------------------------------------------------
 
@@ -540,43 +663,35 @@ function _egvSetBaseFilter(value) {
     _egvRenderBaseListOnly();
 }
 
-function _egvSetBaseOfferFilter(value) {
-    _egvBaseFilterOffer = value;
-    _egvRenderBaseListOnly();
-}
-
-function _egvSetBaseSort(value) {
-    _egvBaseSortMode = value;
-    _egvRenderBaseListOnly();
-}
-
 // Re-renders only the base item list + filter controls (keeps focus/state).
 function _egvRenderBaseListOnly() {
     _egvHideBaseTooltip(); // hovered card may be replaced by the re-render
     const listEl = document.getElementById('egv-base-list');
     if (listEl) listEl.innerHTML = _egvBuildBaseListHTML();
+    // Also refresh the filter dropdown selected state
+    const sel = document.getElementById('egv-base-filter-select');
+    if (sel) sel.value = _egvBaseFilterSlot;
     _egvRefreshGoldDisplay();
 }
 
 function _egvGetFilteredSortedBases() {
-    const slotOrder = _egvGetSlotOrder();
-    let bases = EG_ALL_BASE_TYPES.slice();
+    // Exclude free starter gear — now in its own tab
+    let bases = EG_ALL_BASE_TYPES.filter(b => !EG_VENDOR_FREE_BASE_IDS.has(b.id));
 
     if (_egvBaseFilterSlot !== 'all') {
         bases = bases.filter(b => b.slotType === _egvBaseFilterSlot);
     }
 
-    if (_egvBaseFilterOffer === 'free') {
-        bases = bases.filter(b => EG_VENDOR_FREE_BASE_IDS.has(b.id));
-    }
-
-    if (_egvBaseSortMode === 'ilvl') {
-        bases.sort((a, b) => (a.minLevel - b.minLevel)
-            || slotOrder.indexOf(a.slotType) - slotOrder.indexOf(b.slotType));
-    } else {
-        // Group by equipment slot (canonical order), then by item level.
+    // Auto-sort: highest item level on top (descending). When filtering by
+    // a single slot, this surfaces the best bases for that slot first.
+    // When showing all slots, still group by slot order but with highest
+    // ilvl first within each slot group.
+    const slotOrder = _egvGetSlotOrder();
+    if (_egvBaseFilterSlot === 'all') {
         bases.sort((a, b) => slotOrder.indexOf(a.slotType) - slotOrder.indexOf(b.slotType)
-            || a.minLevel - b.minLevel);
+            || b.minLevel - a.minLevel);
+    } else {
+        bases.sort((a, b) => b.minLevel - a.minLevel);
     }
     return bases;
 }
@@ -593,27 +708,15 @@ function _egvBuildBaseFilterOptionsHTML() {
 
 function _egvBuildBaseTabHTML() {
     return `
-<div class="egv-base-controls">
-    <label class="egv-base-control-label">
-        <span>${t('eg_vendor_filter_type')}</span>
-        <select onchange="_egvSetBaseFilter(this.value)">${_egvBuildBaseFilterOptionsHTML()}</select>
-    </label>
-    <label class="egv-base-control-label">
-        <span>${t('eg_vendor_filter_offer')}</span>
-        <select onchange="_egvSetBaseOfferFilter(this.value)">
-            <option value="all"${_egvBaseFilterOffer === 'all' ? ' selected' : ''}>${t('eg_vendor_filter_offer_all')}</option>
-            <option value="free"${_egvBaseFilterOffer === 'free' ? ' selected' : ''}>${t('eg_vendor_filter_free')}</option>
-        </select>
-    </label>
-    <label class="egv-base-control-label">
-        <span>${t('eg_vendor_sort_by')}</span>
-        <select onchange="_egvSetBaseSort(this.value)">
-            <option value="slot"${_egvBaseSortMode === 'slot' ? ' selected' : ''}>${t('eg_vendor_sort_slot')}</option>
-            <option value="ilvl"${_egvBaseSortMode === 'ilvl' ? ' selected' : ''}>${t('eg_vendor_sort_ilvl')}</option>
-        </select>
-    </label>
-</div>
-<div class="egv-base-list" id="egv-base-list">${_egvBuildBaseListHTML()}</div>`;
+<div class="egv-base-wrap">
+    <div class="egv-base-controls">
+        <label class="egv-base-control-label">
+            <span>${t('eg_vendor_filter_type')}</span>
+            <select id="egv-base-filter-select" onchange="_egvSetBaseFilter(this.value)">${_egvBuildBaseFilterOptionsHTML()}</select>
+        </label>
+    </div>
+    <div class="egv-base-list" id="egv-base-list">${_egvBuildBaseListHTML()}</div>
+</div>`;
 }
 
 function _egvBuildBaseListHTML() {
@@ -757,8 +860,17 @@ function _egvEnsureStyles() {
             box-shadow: 0 0 10px rgba(200, 168, 75, 0.25), inset 0 0 8px rgba(200,168,75,0.08);
         }
         .egv-tab-content {
-            width: 100%; display: flex; justify-content: center;
+            width: 100%; display: flex; flex-direction: column; align-items: center;
             max-height: 58vh; overflow-y: auto; padding-right: 4px;
+        }
+        .egv-base-wrap {
+            display: flex; flex-direction: column; width: 100%; max-height: 58vh;
+        }
+        .egv-base-wrap .egv-base-list {
+            overflow-y: auto; flex: 1; min-height: 0; padding-right: 4px;
+        }
+        .egv-tab-content:has(.egv-base-wrap) {
+            overflow: hidden;
         }
         /* ── Card grid ───────────────────────────────────────────────── */
         .egv-cards {
@@ -806,6 +918,12 @@ function _egvEnsureStyles() {
         /* ── Base items: filter/sort controls ────────────────────────── */
         .egv-base-controls {
             display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+            position: sticky; top: 0; z-index: 5;
+            background: rgba(20, 15, 5, 0.92);
+            padding: 8px 0 10px 0;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            border-bottom: 1px solid rgba(200,168,75,0.18);
         }
         .egv-base-control-label {
             display: flex; align-items: center; gap: 8px;
@@ -818,6 +936,14 @@ function _egvEnsureStyles() {
             padding: 5px 8px; cursor: pointer;
         }
         .egv-base-list { width: 100%; }
+        .egv-base-list::-webkit-scrollbar { width: 10px; }
+        .egv-base-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        .egv-base-list::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb, #656f96); border-radius: 5px;
+        }
+        .egv-base-list::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover, #7882ab);
+        }
         .egv-tab-content::-webkit-scrollbar { width: 10px; }
         .egv-tab-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
         .egv-tab-content::-webkit-scrollbar-thumb {

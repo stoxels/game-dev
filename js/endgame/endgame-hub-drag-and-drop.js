@@ -1057,6 +1057,13 @@ function egAddCurrency(id, amount = 1, def = null) {
     if (existing && existing.id === id) {
         existing.count = (existing.count || 1) + amount;
         _egRenderCurrencyCell(r, c);
+        if (typeof trackAchStat === 'function') try {
+            const _isShard = id.indexOf('shard_') === 0;
+            if (!_isShard) trackAchStat('egCurrencyLooted', amount);
+            else trackAchStat('egEssencesLooted', 0); // shards not counted here
+            // track essences separately via egAddEssence
+            if (id.indexOf('essence_') === 0) trackAchStat('egEssencesLooted', amount);
+        } catch(e){}
         return true;
     }
     if (existing && existing.id !== id) {
@@ -1078,6 +1085,11 @@ function egAddCurrency(id, amount = 1, def = null) {
     if (!_egCurrencyStash[r][c].category) _egCurrencyStash[r][c].category = 'currency';
     if (!_egCurrencyStash[r][c].rarity) _egCurrencyStash[r][c].rarity = 'currency';
     _egRenderCurrencyCell(r, c);
+    if (typeof trackAchStat === 'function') try {
+        const _isShard2 = id.indexOf('shard_') === 0;
+        if (!_isShard2) trackAchStat('egCurrencyLooted', amount);
+        if (id.indexOf('essence_') === 0) trackAchStat('egEssencesLooted', amount);
+    } catch(e){}
     return true;
 }
 

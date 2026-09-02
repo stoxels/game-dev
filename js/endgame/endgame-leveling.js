@@ -328,6 +328,7 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
     _egSyncBaseAttributes();
     egSaveLevelingState();
     _egRenderLevelHUD();
+    if (typeof setAchStat === 'function') try { setAchStat('egPlayerLevel', _egGetPlayerLevel()); } catch(e){}
 
     if (levelsGained > 0) {
         // Reset all active ability cooldowns on level up
@@ -548,6 +549,7 @@ function _egLoadLevelingState() {
     if (!STATE.egAttrPoints) STATE.egAttrPoints = 0;
     if (!STATE.egAttrAllocated) STATE.egAttrAllocated = { str: 0, agi: 0, int: 0 };
     _egSyncBaseAttributes();
+    if (typeof setAchStat === 'function') try { setAchStat('egPlayerLevel', _egGetPlayerLevel()); } catch(e){}
 }
 
 

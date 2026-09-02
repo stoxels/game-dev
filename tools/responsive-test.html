@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>STOXELS - Responsive Test Harness</title>
+<style>
+    body {
+        margin: 0;
+        background: #14141c;
+        font-family: monospace;
+        color: #cfc8ff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+    }
+    .bar { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; align-items: center; }
+    button {
+        font-family: monospace;
+        background: #2a2440;
+        color: #cfc8ff;
+        border: 1px solid #5a4a8a;
+        padding: 4px 10px;
+        cursor: pointer;
+        font-size: 11px;
+    }
+    button:hover, button.sel { background: #3a3260; }
+    #status { font-size: 10px; opacity: .7; }
+    .stage { border: 1px dashed #4a5a8a; background: #000; }
+    iframe { border: 0; background: #000; display: block; transform-origin: top left; }
+</style>
+</head>
+<body>
+    <div class="bar" id="sizes"></div>
+    <div class="bar">
+        <button id="btn-en">EN</button>
+        <button id="btn-de">DE</button>
+        <span id="status"></span>
+    </div>
+    <div class="stage" id="stage"><iframe id="frame"></iframe></div>
+    <script>
+        const SIZES = [
+            { w: 360,  h: 800,  name: 'Phone S' },
+            { w: 390,  h: 844,  name: 'iPhone 14' },
+            { w: 430,  h: 932,  name: 'Phone L' },
+            { w: 600,  h: 960,  name: 'Tablet P' },
+            { w: 700,  h: 900,  name: 'BP edge' },
+            { w: 936,  h: 1008, name: 'Half desk' },
+            { w: 1376, h: 768,  name: 'Native art' },
+            { w: 1920, h: 1080, name: 'Full HD' },
+            { w: 2560, h: 1080, name: 'Ultrawide' }
+        ];
+        let lang = 'en';
+        let cur = SIZES[0];
+        const sizesBar = document.getElementById('sizes');
+        const statusEl = document.getElementById('status');
+        const stage = document.getElementById('stage');
+        const frame = document.getElementById('frame');
+        // Leave ~40px around the stage in the preview
+        const MAX = Math.min(window.innerWidth, 990) - 40;
+
+        // Fit a size into the preview by scaling the iframe visually.
+        // Transform scale does NOT change the iframe's internal CSS viewport,
+        // so media queries / container queries resolve against the true size.
+        function layout() {
+            const scale = Math.min(MAX / cur.w, 1);
+            frame.style.width = cur.w + 'px';
+            frame.style.height = cur.h + 'px';
+            frame.style.transform = 'scale(' + scale + ')';
+            stage.style.width = (cur.w * scale) + 'px';
+            stage.style.height = (cur.h * scale) + 'px';
+        }
+
+        function renderSizeButtons() {
+            sizesBar.innerHTML = '';
+            SIZES.forEach(s => {
+                const b = document.createElement('button');
+                b.textContent = s.name;
+                if (s === cur) b.classList.add('sel');
+                b.onclick = () => { cur = s; renderSizeButtons(); load(); };
+                sizesBar.appendChild(b);
+            });
+        }
+
+        function load() {
+            layout();
+            frame.src = '../index.html?lang=' + lang + '&size=' + cur.w + 'x' + cur.h + '&v=' + Date.now();
+            statusEl.textContent = cur.w + 'x' + cur.h + ' — ' + lang.toUpperCase();
+        }
+
+        document.getElementById('btn-en').onclick = () => { lang = 'en'; load(); };
+        document.getElementById('btn-de').onclick = () => { lang = 'de'; load(); };
+
+        renderSizeButtons();
+        load();
+    </script>
+</body>
+</html>

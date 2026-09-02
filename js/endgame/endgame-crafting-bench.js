@@ -420,6 +420,7 @@ function _egCraftingBenchApply() {
     item.name = _egBuildItemName(item.baseName || item.name, item.rarity, item.mods);
 
     _egCraftingBenchSelection = null;
+    if (typeof trackAchStat === 'function') try { trackAchStat('egBenchCrafts', 1); } catch(e){}
     _egRenderAll();
     egSaveHubState();
     _egRefreshCraftingBench(true, true);

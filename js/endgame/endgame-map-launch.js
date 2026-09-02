@@ -682,6 +682,7 @@ function _egLaunchMapFromDevice(mapItem) {
         showToast((typeof t === 'function') ? t('eg_map_activating').replace('{n}', mapItem.name)
                                             : `Activating ${mapItem.name}...`);
 
+        if (typeof trackAchStat === 'function') try { trackAchStat('egMapsLaunched', 1); } catch (e) {}
         startLevel(gi);
     } finally {
         window._egMapDeviceLaunching = false;

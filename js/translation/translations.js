@@ -56,6 +56,9 @@ function applyTranslationsToDOM() {
             el.innerHTML = value;
         }
     });
+    // Re-fill {k*} keybind placeholders (How-To-Play CONTROLS etc.) with
+    // the player's current bindings for the newly active language.
+    if (typeof tutUpdateKeybinds === 'function') tutUpdateKeybinds();
 }
 
 

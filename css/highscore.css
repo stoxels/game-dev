@@ -1,8 +1,37 @@
-﻿/* ---------------------------------------------------------------------- */
-/* SCREEN BACKGROUND                                                      */
+/* ---------------------------------------------------------------------- */
+/* HIGHSCORE SCREEN                                                       */
+/*                                                                        */
+/* Contents                                                               */
+/*   1. Screen background        5. Scrollable table body                */
+/*   2. Top row (menu + title)   6. Scroll-mover (right-edge crystal)     */
+/*   3. Slot filter              7. Responsive fallbacks                  */
+/*   4. Column headers                                                   */
+/*                                                                        */
+/* DISPLAY-COLOR VARIABLES                                                */
+/* The parchment background swallows dark satiated colors, so most of the  */
+/* screen palette is re-declared here in darker, parchment-legible shades. */
+/* Every table color is written as var(--hs-..., global-fallback) in the   */
+/* JS (screens-highscore.js), so the table still renders legibly even if   */
+/* this stylesheet ever fails to load.                                     */
 /* ---------------------------------------------------------------------- */
 
 #screen-hs.hs-redesign {
+    /* parchment-legible display colors */
+    --hs-diff-easy: #1d6b3e;     /* easy      — deep green   */
+    --hs-diff-normal: #4a4237;   /* normal    — warm grey    */
+    --hs-diff-hard: #8f1d1d;     /* hard      — deep red     */
+    --hs-mod-tt: #a35413;        /* Time Trial  (TT)        */
+    --hs-mod-hc: #8f1d1d;        /* Hardcore    (HC)        */
+    --hs-mod-im: #6b3fa0;        /* Ironman     (IM)        */
+    --hs-mod-cl: #16606b;        /* Classless   (CL)        */
+    --hs-mod-tl: #1d6b3e;        /* Treeless    (TL)        */
+    --hs-score: #8a5a00;         /* score numbers — old gold */
+    --hs-slot-text: #5d5346;     /* slot column — quiet ink  */
+    --hs-row: #2b2620;           /* default row text         */
+    --hs-row-alt: rgba(120, 90, 40, 0.08);   /* zebra stripe */
+    --hs-row-hover: rgba(120, 90, 40, 0.16); /* hover wash   */
+    --hs-divider: rgba(90, 70, 35, 0.25);    /* row separator */
+
     position: fixed;
     inset: 0;
     overflow: hidden;
@@ -18,15 +47,11 @@
 
 
 /* ---------------------------------------------------------------------- */
-/* SCROLL FRAME — locked to the artwork's real aspect ratio (same 1376x768
-   canvas your other screens' art uses), so at ANY viewport size the box
-   is letterboxed/pillarboxed within the screen instead of the image
-   itself being cropped by background-size:cover. Because the box ratio
-   now matches the image ratio exactly, "cover" fills it with zero crop.
-   All the percentage-based overlay positions below are relative to THIS
-   box, so they always agree with the artwork underneath it.
-   NOTE: if highscore_background.jpeg isn't actually 1376x768, swap the
-   aspect-ratio value below for the image's real width/height.          */
+/* 1. SCROLL FRAME — locked to the artwork's real aspect ratio (1376x768)  */
+/*    so the box letterboxes/pillarboxes within the screen instead of the  */
+/*    image itself being cropped by background-size:cover. Because the box */
+/*    ratio matches the image ratio exactly, "cover" fills it with zero    */
+/*    crop. All percentage-based positions below are relative to THIS box. */
 /* ---------------------------------------------------------------------- */
 
 .hs-scroll-frame {
@@ -44,10 +69,8 @@
 }
 
 
-
-
 /* ---------------------------------------------------------------------- */
-/* TOP ROW — menu button (left) + title plaque (center)                   */
+/* 2. TOP ROW — menu button (left) + title plaque (center)                 */
 /* ---------------------------------------------------------------------- */
 
 .hs-top-row {
@@ -60,12 +83,12 @@
     flex-shrink: 0;
 }
 
-/* ---- Menu button (stone slab, image 5) ---- */
+/* ---- Menu button (stone slab) ---- */
 
 .hs-menu-btn {
     position: absolute;
-    left: 0%;
-    top: 0%;
+    left: 0;
+    top: 0;
     width: clamp(64px, 10%, 170px);
     aspect-ratio: 16 / 9;
     background: none;
@@ -100,9 +123,8 @@
     position: relative;
     z-index: 1;
     font-family: var(--PX);
-    /* CHANGED: floor was 19px — far too high to shrink on narrow screens,
-       which made the label overflow the (correctly-shrinking) button
-       graphic behind it. Floor now scales down to 8px. */
+    /* floor scales down to 8px so the label can never outgrow the
+       shrinking button graphic on narrow screens */
     font-size: clamp(8px, 2.3vw, 22px);
     letter-spacing: clamp(0.5px, 0.15vw, 1px);
     color: #fffdfa;
@@ -110,45 +132,108 @@
     white-space: nowrap;
 }
 
-/* ---- Title plaque (stone frame, image 4) ---- */
+/* ---- Title plaque (carved stone banner, from the ledger/modal header) ----
+   Reused the warm carved-stone banner (inference-header.png) instead of the
+   plain grey-blue slab — it matches the parchment + grey menhir columns on
+   this screen and carries the title on a readable gold serif (Cinzel). */
 
 .hs-title-plaque {
     position: relative;
-    width: clamp(150px, 26%, 420px);
-    aspect-ratio: 16 / 9;
+    /* match the banner artwork's real aspect (955x260) so it isn't stretched */
+    aspect-ratio: 955 / 260;
+    width: clamp(240px, 36%, 640px);
+    padding: clamp(6px, 1.2vw, 14px) clamp(14px, 3vw, 20px);
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: url('../images/Inference/inference-header.png') center / 100% 100% no-repeat;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
 }
 
 .hs-title-plaque-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    pointer-events: none;
-    user-select: none;
+    /* the slab artwork is replaced by the banner background above */
+    display: none;
 }
 
 .hs-title-plaque-label {
     position: relative;
     z-index: 1;
-    font-family: var(--PX);
-    font-size: clamp(11px, 2vw, 26px);
-    /* CHANGED: fixed 3px letter-spacing had no floor/ceiling logic — made
-       long words like "HIGHSCORES" push past the plaque's edges on
-       narrow screens. Now scales down with the text itself. */
-    letter-spacing: clamp(0.5px, 0.3vw, 3px);
-    color: #2b2620;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+    font-family: var(--C, 'Cinzel', serif);
+    font-size: clamp(14px, 2.6vw, 30px);
+    letter-spacing: clamp(1px, 0.4vw, 4px);
+    color: #f0d090;
+    text-shadow: 0 0 12px var(--ledg-arcane-glow, rgba(94, 200, 216, 0.55)), 0 2px 0 rgba(0, 0, 0, 0.6);
+    text-transform: uppercase;
     white-space: nowrap;
 }
 
 
 /* ---------------------------------------------------------------------- */
-/* COLUMN HEADERS — each label sits on its own copy of the carved stone
-   header bar (image 7), laid out to match the four table columns.        */
+/* 3. SLOT FILTER — a chip row (ALL + slots 1..20) that narrows the table  */
+/*    to one save slot or keeps it aggregated across all of them. The row   */
+/*    is a max-content strip centered in a shallow scroll container, so at  */
+/*    wide viewports it sits centered and at narrow ones it scrolls from    */
+/*    the left without wrapping into the headers below.                     */
+/* ---------------------------------------------------------------------- */
+
+.hs-slot-filter {
+    position: absolute;
+    top: 18.2%;
+    left: 20%;
+    width: 60%;
+    height: 4.2%;
+    min-height: 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    z-index: 2;
+}
+
+    .hs-slot-filter::-webkit-scrollbar {
+        display: none;
+    }
+
+.hs-slot-filter-row {
+    width: max-content;
+    margin: 0 auto; /* centers when it fits; collapses to 0 when it must scroll */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: clamp(2px, 0.4%, 6px);
+}
+
+.hs-slot-chip {
+    font-family: var(--PX);
+    font-size: clamp(7px, 0.9vw, 12px);
+    color: #2b2620;
+    background: linear-gradient(180deg, #e9d9b1, #d8c08c);
+    border: 1px solid #8a6a34;
+    border-radius: 4px;
+    padding: clamp(2px, 0.35%, 5px) clamp(5px, 0.8vw, 12px);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: filter .12s, transform .08s;
+}
+
+    .hs-slot-chip:hover {
+        filter: brightness(1.08);
+    }
+
+    .hs-slot-chip:active {
+        transform: scale(0.96);
+    }
+
+    .hs-slot-chip.active {
+        background: linear-gradient(180deg, #ffdd75, #f0b93a);
+        border-color: #6b4a12;
+        box-shadow: 0 1px 0 rgba(0,0,0,0.25) inset;
+    }
+
+
+/* ---------------------------------------------------------------------- */
+/* 4. COLUMN HEADERS — each label sits on its own copy of the carved       */
+/*    stone header bar, laid out with the same 5-column grid as the table  */
+/*    below, so header and rows always line up.                            */
 /* ---------------------------------------------------------------------- */
 
 .hs-col-headers {
@@ -159,8 +244,8 @@
     height: 9%;
     min-height: 26px;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: clamp(2px, 1.5%, 12px);
+    grid-template-columns: var(--hs-col-widths, 1fr 1fr 1fr 1fr 1fr);
+    gap: clamp(2px, 1%, 10px);
     z-index: 2;
 }
 
@@ -171,38 +256,43 @@
     background-image: url('../images/Highscore_Screen/highscores_header.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    font-family: var(--PX);
-    /* CHANGED: floor was 8px already reasonable, but letter-spacing and
-       the fixed 18px top padding weren't responsive, so at small sizes
-       the header plate shrank while the text/padding didn't — that's
-       what was squashing the labels together. */
-    font-size: clamp(6px, 1vw, 13px);
-    letter-spacing: clamp(0.2px, 0.15vw, 1px);
-    padding-top: clamp(6px, 2.5%, 18px);
-    color: #2b2620;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+    /* readable serif instead of the tiny pixel font; dark-brown ink on the
+       stone bar, and no offset padding so the label sits truly centered */
+    font-family: var(--C, 'Cinzel', serif);
+    font-size: clamp(8px, 1.15vw, 15px);
+    letter-spacing: clamp(0.4px, 0.25vw, 2px);
+    color: #3a2510;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.25);
     white-space: nowrap;
     overflow: hidden;
 }
 
 
 /* ---------------------------------------------------------------------- */
-/* SCROLLABLE BODY — the table itself, sitting on the open parchment.
-   The original .hs-table / td / th rules from screens.css still apply;
-   we only retint them here to read against the parchment and hide the
-   stock <thead> since .hs-col-headers replaces it visually.              */
+/* 5. SCROLLABLE BODY — the table itself, sitting on the open parchment.   */
+/*    The stock <thead> is hidden; .hs-col-headers above replaces it       */
+/*    visually. Column widths are shared with the headers through          */
+/*    --hs-col-widths so the two grids always agree.                       */
 /* ---------------------------------------------------------------------- */
+
+.hs-redesign {
+    /* level | best | diff | mods | slot */
+    --hs-col-widths: 16% 23% 17% 30% 14%;
+}
 
 .hs-redesign .hs-body {
     position: absolute;
-    top: 32%; /* just below the headers (headers are at 23%, height 9%) */
-    left: 20%; /* same left as .hs-col-headers */
+    top: 32%;   /* just below the headers (headers are at 23%, height 9%) */
+    left: 20%;  /* same left as .hs-col-headers */
     width: 60%; /* same width as .hs-col-headers */
-    bottom: 5%;
+    bottom: 6.5%; /* stop above the parchment's curled bottom edge */
     overflow-y: auto;
     scrollbar-width: none;
-    padding: 0;
+    padding: 0 0 clamp(4px, 1%, 12px); /* breathing room under the last row */
     margin: 0;
+    /* rows dissolve softly into the parchment instead of a hard cut-off */
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
 }
 
     .hs-redesign .hs-body::-webkit-scrollbar {
@@ -212,95 +302,104 @@
 .hs-redesign .hs-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* ← forces columns to respect the widths you set */
+    table-layout: fixed; /* columns stick to the widths set on the colgroup */
 }
 
-    .hs-redesign .hs-table colgroup col:nth-child(1) {
-        width: 25%;
-    }
-
-    .hs-redesign .hs-table colgroup col:nth-child(2) {
-        width: 25%;
-    }
-
-    .hs-redesign .hs-table colgroup col:nth-child(3) {
-        width: 25%;
-    }
-
-    .hs-redesign .hs-table colgroup col:nth-child(4) {
-        width: 25%;
-    }
-
+    .hs-redesign .hs-table colgroup col:nth-child(1) { width: 16%; } /* level  */
+    .hs-redesign .hs-table colgroup col:nth-child(2) { width: 23%; } /* best   */
+    .hs-redesign .hs-table colgroup col:nth-child(3) { width: 17%; } /* diff   */
+    .hs-redesign .hs-table colgroup col:nth-child(4) { width: 30%; } /* mods   */
+    .hs-redesign .hs-table colgroup col:nth-child(5) { width: 14%; } /* slot   */
 
     .hs-redesign .hs-table thead {
         /* visually replaced by .hs-col-headers above */
         display: none;
-    }
-
-    .hs-redesign .hs-table td {
-        border-bottom: none;
+    }    .hs-redesign .hs-table td {
+        border-bottom: 1px solid var(--hs-divider);
         padding: clamp(2px, 0.6%, 8px) clamp(3px, 1vw, 9px);
         font-family: var(--PX);
         font-size: clamp(9px, 1.3vw, 17px);
-        color: #2b2620 !important;
+        color: var(--hs-row);
         text-align: center; /* match the centered header labels */
-        width: 25%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-        /* keep the score column's gold/yellow accent, just darkened slightly
-       to stay legible on the light parchment */
-        .hs-redesign .hs-table td:nth-child(2) {
-            color: #8a5a00 !important;
-            font-weight: bold;
+        /* five abbreviations + separators are the widest cell content —
+           a slightly smaller size keeps TT+HC+IM+CL+TL on one line, and
+           reduced side padding buys the last few pixels (span color is
+           set inline by the JS, so only size/spacing live here) */
+        .hs-redesign .hs-table td:nth-child(4),
+        .hs-redesign .hs-table td:nth-child(4) span {
+            font-size: clamp(8px, 1.15vw, 15px);
         }
 
-    .hs-redesign .hs-table tr:hover td {
-        background: rgba(120, 90, 40, 0.12);
-    }
+        .hs-redesign .hs-table td:nth-child(4) {
+            padding-left: 2px;
+            padding-right: 2px;
+            letter-spacing: -0.5px;
+        }
+
+        /* subtle zebra striping — makes wide rows easier to track */
+        .hs-redesign .hs-table tbody tr:nth-child(even) td {
+            background: var(--hs-row-alt);
+        }
+
+        .hs-redesign .hs-table tbody tr:hover td {
+            background: var(--hs-row-hover);
+        }
 
 .hs-redesign .hs-empty-msg {
     font-family: var(--PX);
     font-size: clamp(10px, 1.3vw, 15px);
-    color: #2b2620;
+    color: var(--hs-row);
     opacity: 0.7;
     padding: 10px 0;
 }
 
 
 /* ---------------------------------------------------------------------- */
-/* SCROLL-MOVER — purple crystal arrow track running down the right edge.
-   The track is the full-height hit area; the thumb image (image 6)
-   slides up/down inside it. Movement itself is driven by JS reading
-   #hs-body's scroll position (see hs-scrollbar-sync below) — pure CSS
-   cannot read scroll offset, so a tiny script is required for the motion.*/
+/* 6. SCROLL-MOVER — compact crystal marker riding the carved rod on the    */
+/*    right edge of the parchment (the "pin" groove in the background art). */
+/*    The track is a slim invisible hit zone centered on that rod; the thumb */
+/*    keeps the artwork's real aspect (297x768) and sizes itself from its   */
+/*    15% height. Interactive: drag the thumb, grab the rail anywhere or    */
+/*    wheel over it to scroll the table (JS in screens-highscore.js drives  */
+/*    both directions of the motion).                                       */
 /* ---------------------------------------------------------------------- */
 
 .hs-scrollbar-track {
     position: absolute;
-    right: 15%;
-    top: 30%;
-    width: clamp(10px, 3%, 30px);
-    height: 68%;
-    pointer-events: none;
+    right: 16.25%;          /* centers the thumb on the brown rod (~82.5%) */
+    top: 31%;
+    height: 66%;
+    width: 3.5%;             /* slim hit zone — the thumb is wider and centered */
+    pointer-events: auto;      /* interactive: drag / click / wheel */
+    cursor: ns-resize;
+    touch-action: none;        /* pointer events handle touch drags */
+    z-index: 3;
 }
 
 .hs-scrollbar-thumb {
     position: absolute;
-    left: -36%;
-    top: 10%; /* JS sets this to the live scroll percentage */
-    width: 100%;
-    height: auto;
-    transform: translateY(0%);
+    left: 50%;
+    top: 4%; /* JS sets this to the live scroll percentage */
+    height: 15%; /* compact marker — the artwork fills its own aspect from this */
+    width: auto;
+    transform: translateX(-50%);
     transition: top .08s linear;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    pointer-events: none; /* the track is the single hit area */
 }
+
+    .hs-scrollbar-track:hover .hs-scrollbar-thumb {
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)) brightness(1.2);
+    }
 
 
 /* ---------------------------------------------------------------------- */
-/* RESPONSIVE — narrow viewports                                          */
+/* 7. RESPONSIVE — narrow viewports                                        */
 /* ---------------------------------------------------------------------- */
 
 @media (max-width: 700px) {

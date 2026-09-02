@@ -312,6 +312,8 @@ function _egApplyPlayerShockAmp(amount) {
 function _egRollPlayerHitAilments(target, amount, elements) {
     if (!_egIsActive() || !target || target.currentHP <= 0) return;
     const stats = _egComputePlayerStats();
+    const _achPreHas = {};
+    if (target.statuses) { for (const k in target.statuses) if (target.statuses[k] && target.statuses[k].until > Date.now()) _achPreHas[k]=true; }
 
     const fireShare = elements ? (elements.fire || 0) : 0;
     const coldShare = elements ? (elements.cold || 0) : 0;
@@ -330,6 +332,12 @@ function _egRollPlayerHitAilments(target, amount, elements) {
     if (lightningShare > 0 && stats.shockPct > 0 && Math.random() * 100 < stats.shockPct) {
         _egApplyMonsterAilment(target, 'shocked');
     }
+    // Endgame achievement — count newly inflicted ailments on this hit
+    if (typeof trackAchStat === 'function') try {
+        let _newAil = 0;
+        if (target.statuses) for (const k in target.statuses) if (target.statuses[k] && target.statuses[k].until > Date.now() && !_achPreHas[k]) _newAil++;
+        if (_newAil>0) trackAchStat('egAilmentsInflicted', _newAil);
+    } catch(e){}
 }
 
 //------------------------------------------------------------------------

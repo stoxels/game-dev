@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HS Preview Harness</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/screens.css">
+<link rel="stylesheet" href="css/highscore.css">
+<style>body { margin: 0; }</style>
+</head>
+<body>
+
+    <!-- HIGHSCORES SCREEN (mirrored from index.html) -->
+    <div id="screen-hs" class="screen hs-redesign active">
+        <div class="hs-scroll-frame">
+
+            <!-- top row: menu button (left) + title plaque (center) -->
+            <div class="hs-top-row">
+                <button class="hs-menu-btn" id="btn-hs-back">
+                    <img class="hs-menu-btn-img" src="images/Highscore_Screen/return_to_menu_button.png" alt="">
+                    <span class="hs-menu-btn-label">MENU</span>
+                </button>
+
+                <div class="hs-title-plaque">
+                    <img class="hs-title-plaque-img" src="images/Highscore_Screen/highscores_header_stone.png" alt="">
+                    <span class="hs-title-plaque-label">HIGHSCORES</span>
+                </div>
+            </div>
+
+            <!-- slot filter chips: ALL + slots 1..20 (populated by JS) -->
+            <div class="hs-slot-filter" id="hs-slot-filter">
+                <div class="hs-slot-filter-row" id="hs-slot-filter-row"></div>
+            </div>
+
+            <!-- column headers, each using the stone header bar as its background -->
+            <div class="hs-col-headers" id="hs-col-headers">
+                <span class="hs-col-header hs-col-level">LEVEL</span>
+                <span class="hs-col-header hs-col-score">BEST SCORE</span>
+                <span class="hs-col-header hs-col-diff">DIFFICULTY</span>
+                <span class="hs-col-header hs-col-mods">MODIFIERS</span>
+                <span class="hs-col-header hs-col-slot">SLOT</span>
+            </div>
+
+            <!-- scrollable list itself -->
+            <div class="hs-body" id="hs-body"></div>
+
+            <!-- vertical scroll-mover track running down the right edge -->
+            <div class="hs-scrollbar-track" id="hs-scrollbar-track">
+                <img class="hs-scrollbar-thumb" id="hs-scrollbar-thumb"
+                     src="images/Highscore_Screen/vertical_scroll_mover.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <!-- Seeded test data + the real screen logic (order matters: constants first) -->
+    <script src="js/preview-highscore-seed.js"></script>
+    <script src="js/screens/screens-highscore.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            // Optional ?slot=N lets the harness open pre-filtered so a fresh
+            // navigation renders a filtered screenshot (DOM-only changes lag
+            // the preview capture).
+            const slot = new URLSearchParams(location.search).get('slot');
+            if (slot !== null) {
+                const n = parseInt(slot, 10);
+                if (!Number.isNaN(n)) hsSlotFilter = n;
+            }
+            buildHS();
+            if (window.__hsSeedInfo) {
+                console.info('[seed] ' + window.__hsSeedInfo);
+            }
+        });
+    </script>
+</body>
+</html>

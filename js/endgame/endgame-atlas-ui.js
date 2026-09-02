@@ -13,8 +13,8 @@
 //   - Connections are thin DOTTED GREY LINES (gold once the region is done)
 //   - Two mirrored continents: each of the four tier-1 corner regions
 //     starts a linear path winding inward to the four tier-16 pinnacles
-//   - Node states: ✔ completed (gold) · ? available (gold, quest-style) ·
-//     locked (dimmed)
+//   - Node states: ✔ completed (gold) · available (border highlight) ·
+ //     locked (dimmed)
 //   - Bottom-left of every node: number of matching maps in the map stash
 //   - Search box (top right): matching regions glow blue (pulsing node
 //     frame + brightened name), including locked ones; matches by region
@@ -153,7 +153,6 @@ function _egAtlasBuildNodeHTML(node) {
     const numeralSize = roman.length >= 4 ? 6 : roman.length === 3 ? 7 : roman.length === 2 ? 9 : 11;
 
     const marker = status === 'completed' ? '<span class="ega-node-done">✔</span>'
-        : status === 'available' ? '<span class="ega-node-avail">?</span>'
         : '';
     const count = (_egAtlasStashCounts && _egAtlasStashCounts[node.id]) || 0;
     const countHtml = count > 0 ? `<span class="ega-node-count">${count}</span>` : '';
@@ -660,11 +659,6 @@ function _egAtlasEnsureStyles() {
             font-size: 8px; color: #111; background: #f5d98a;
             width: 13px; height: 13px; line-height: 13px; text-align: center;
             border-radius: 50%;
-        }
-        .ega-node-avail {
-            position: absolute; top: -7px; right: -5px;
-            font-size: 10px; color: #ffd700;
-            text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
         }
         .ega-node-count {
             position: absolute; bottom: 1px; left: 3px;

@@ -364,7 +364,7 @@
 /* BETA TEST ONLY: Super Tutor is temporary, anchored on the right page */
 .setup-super-tutor-wrapper {
     position: absolute;
-    right: -2%;
+    right: -13%;
     top: 40%;
     z-index: 5;
 }

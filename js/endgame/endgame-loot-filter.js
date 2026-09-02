@@ -221,6 +221,7 @@ function _egLootFilterAutoVendor(item) {
             .replace('{icon}', shardDef.icon || '◆')
             .replace('{shard}', shardDef.name || '?'), '#f5d98a');
     }
+    if (typeof trackAchStat === 'function') try { trackAchStat('egLootFilterVendored', 1); } catch(e){}
     return true;
 }
 

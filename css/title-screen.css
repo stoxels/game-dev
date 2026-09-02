@@ -24,6 +24,11 @@
    artwork, at any screen size. Previously this used 16/9
    (1.7778), which is close but not exact — enough to crop the
    image slightly at extreme window ratios.
+
+   It is also a CSS *size container* (container-type: inline-size),
+   which makes every cqw unit used by its children resolve against
+   the CANVAS width instead of the viewport. Text therefore scales
+   exactly with the artwork, even when the window is letterboxed.
 */
 .title-canvas {
     position: relative;
@@ -33,6 +38,8 @@
     max-height: 100vh;
     height: auto;
     margin: 0 auto;
+    container-type: inline-size;
+    container-name: titlecanvas;
 }
 
 /* Background image fills its locked-ratio box exactly */
@@ -65,7 +72,7 @@
 .title-subtitle {
     position: absolute;
     left: 50%;
-    top: 23%;
+    top: 25.8%;
     transform: translateX(-50%);
     white-space: nowrap;
     font-family: 'Georgia', 'Times New Roman', serif;
@@ -76,17 +83,61 @@
     text-shadow: 0 0 18px rgba(160, 80, 255, 0.7), 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
+/*
+   "EXPANSION 1" badge — small stone plaque above the subtitle.
+   Marks Cartographers of Chance as the first of more expansions to come.
+*/
+.title-expansion-badge {
+    position: absolute;
+    left: 50%;
+    top: 21%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: var(--PX);
+    font-size: clamp(7px, 1.1cqw, 12px);
+    letter-spacing: 0.22em;
+    color: #e6d6ff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    background:
+        linear-gradient(180deg, rgba(64, 52, 92, 0.92) 0%, rgba(34, 28, 52, 0.94) 100%);
+    border: 1px solid rgba(164, 120, 255, 0.45);
+    border-radius: 3px;
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.55),
+        0 2px 6px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    padding: clamp(2px, 0.5cqw, 5px) clamp(8px, 1.4cqw, 16px);
+    cursor: help; /* signals the hover expansion-history tooltip */
+    z-index: 2;
+}
+
 /* Version number just below the subtitle */
 .title-version-line {
     position: absolute;
     left: 50%;
-    top: 26.5%;
+    top: 31.8%;
     transform: translateX(-50%);
     white-space: nowrap;
     font-family: var(--PX);
-    font-size: clamp(7px, 1cqw, 12px);
+    font-size: clamp(7px, 0.95cqw, 11px);
     color: rgba(200, 180, 255, 0.55);
     letter-spacing: 0.1em;
+}
+
+/* AI disclosure — unobtrusive line pinned to the bottom-right corner */
+.title-ai-disclosure {
+    position: absolute;
+    right: 0.8%;
+    bottom: 0.9%;
+    max-width: 46%;
+    font-family: var(--PX);
+    font-size: clamp(6px, 0.85cqw, 9px);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.48);
+    text-align: right;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    pointer-events: none;
+    z-index: 2;
 }
 
 .lang-btn {
@@ -138,6 +189,11 @@
    Each button reads --bx and --by from its inline style.
    Because .title-canvas is aspect-ratio locked, these
    percentages stay correct at any window size — no more drift.
+
+   Every button is ALSO its own inline-size container, so its
+   label font (in cqw) scales with the button's own width. The
+   text then always fits the stone block — in every language
+   (long German words included) and at every window size.
 */
 .title-overlay-btn {
     position: absolute;
@@ -145,19 +201,29 @@
     top: var(--by);
     transform: translate(-50%, -50%);
     font-family: var(--PX);
-    font-size: clamp(9px, 1.15cqw, 11px);
     background: transparent;
     border: none;
     color: #e8d8ff;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     cursor: pointer;
-    padding: 6px 10px;
+    padding: 6px 6px;
     text-align: center;
     white-space: nowrap;
     transition: color 0.15s, text-shadow 0.15s;
     text-shadow: 0 1px 4px rgba(0,0,0,0.9);
     z-index: 3;
+    container-type: inline-size;
 }
+
+    /* Label spans live INSIDE each button container, so their cqw font
+       sizes resolve against the button's own width — labels always fit
+       their stone block, in any language, at any window size.
+       5.2cqw + tight letter-spacing keeps even "EINSTELLUNGEN" inside. */
+    .title-overlay-btn .btn-label {
+        display: block;
+        font-size: clamp(6px, 5.2cqw, 18px);
+        letter-spacing: 0.03em;
+    }
 
     .title-overlay-btn:hover {
         color: #ffffff;
@@ -173,12 +239,10 @@
             text-shadow: 0 0 10px rgba(255, 60, 60, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9) !important;
         }
 
-#btn-play {
-    font-size: clamp(16px, 2.2cqw, 26px);
-}
-
-#btn-reset {
-    font-size: clamp(13px, 1.8cqw, 20px);
+#btn-play .btn-label {
+    /* ~9.5% of the block width per glyph keeps even "▶ SPIELEN" inside */
+    font-size: clamp(11px, 9.5cqw, 26px);
+    letter-spacing: 0.04em;
 }
 
 
@@ -188,7 +252,9 @@
     background-image: url('../images/Title_Screen/Play-Block.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    width: clamp(140px, 24%, 380px);
+    /* 20.5% keeps the block clear of the side columns (30% / 70%)
+       at every canvas width — no more overlap with KEYBINDS etc. */
+    width: clamp(140px, 20.5%, 380px);
     aspect-ratio: 4.2 / 1;
     display: flex;
     align-items: center;
@@ -199,6 +265,8 @@
     background-image: url('../images/Title_Screen/General-Block.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
+    /* Per-glyph width ~6.5% of the block keeps long translated labels
+       (EINSTELLUNGEN, ANLEITUNG, ...) inside at any size */
     width: clamp(90px, 18%, 200px);
     aspect-ratio: 5 / 1;
     display: flex;
@@ -227,7 +295,7 @@
    logo/art. PLAY sits in its natural place in that stack (right
    after the art), NOT forced to the top via `order`.
 */
-@media (max-width: 640px) {
+@media (max-width: 700px) {
 
     .title-canvas {
         aspect-ratio: auto;
@@ -242,25 +310,43 @@
     .title-bg-img {
         position: absolute;
         inset: 0;
-        height: 60%;
+        height: 100%;
         object-fit: cover;
         object-position: top center;
     }
 
     .title-logo-img,
     .title-subtitle,
+    .title-expansion-badge,
     .title-version-line,
+    .title-ai-disclosure,
     .title-lang-overlay {
         position: relative;
         left: auto;
+        right: auto;
         top: auto;
+        bottom: auto;
         transform: none;
         margin: 0 auto;
     }
 
     .title-logo-img {
-        width: 60%;
-        margin-top: 6%;
+        width: 62%;
+        margin-top: 8%;
+    }
+
+    .title-subtitle {
+        margin-top: 4%;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .title-expansion-badge {
+        margin-top: 4.5%;
+    }
+
+    .title-version-line {
+        margin-top: 3.5%;
     }
 
     .title-lang-overlay {
@@ -271,6 +357,15 @@
         gap: 10px;
     }
 
+    /* Disclosure drifts to the bottom of the stack, below the buttons */
+    .title-ai-disclosure {
+        order: 99;
+        margin: auto 18px 12px;
+        max-width: 85%;
+        text-align: center;
+        line-height: 1.7;
+    }
+
     #btn-play,
     .block-general,
     #btn-reset {
@@ -278,18 +373,61 @@
         left: auto;
         top: auto;
         transform: none;
-        width: 70%;
+        width: min(74%, 300px);
         max-width: 320px;
         aspect-ratio: 4 / 1;
-        margin: 6px auto 0;
+        margin: 8px auto 0;
         order: initial; /* PLAY no longer jumps to the top of the stack */
     }
 
     #btn-play {
-        margin-top: 4%;
+        margin-top: 5%;
     }
 
     .title-canvas > .title-bg-img ~ * {
         z-index: 2;
+    }
+}
+
+/*
+   ── PHONE BREAKPOINT ─────────────────────────────────────────
+   On narrow phones even the stacked column needs scrolling. A
+   2-column grid for the 8 side buttons halves the menu height so
+   everything fits on a typical phone screen without scrolling.
+*/
+@media (max-width: 480px) {
+
+    .title-canvas {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+        justify-items: center;
+        align-content: start;
+        row-gap: 0;
+        overflow-y: auto;
+    }
+
+    /* Full-width header rows, in DOM order */
+    .title-logo-img,
+    .title-subtitle,
+    .title-expansion-badge,
+    .title-version-line,
+    #btn-play {
+        grid-column: 1 / -1;
+    }
+
+    /* Explicit visual order: header → play → menu grid → disclosure
+       (badge above subtitle to match the desktop stack) */
+    .title-expansion-badge   { order: 1; }
+    .title-subtitle          { order: 2; }
+    .title-version-line      { order: 3; }
+    #btn-play                { order: 4; width: min(78%, 300px); margin-top: 7%; }
+    .block-general           { order: 5; width: min(96%, 230px); margin-top: 9%; }
+    .title-ai-disclosure     { order: 99; grid-column: 1 / -1; margin: 12px 14px 12px; }
+
+    /* Side-by-side menu buttons: 2 per row keeps the whole menu
+       inside a phone's first screen — no scrolling needed */
+    .block-general {
+        aspect-ratio: 3.6 / 1;
     }
 }

@@ -17,6 +17,7 @@ const ACH_CATEGORIES = [
     { key: 'class', icon: '🔮', labelEn: 'Classes & Abilities', labelDE: 'Klassen & Fähigkeiten' },
     { key: 'tree', icon: '🌳', labelEn: 'Probability Tree', labelDE: 'Wahrscheinlichkeitsbaum' },
     { key: 'inference', icon: '🔍', labelEn: 'Inference', labelDE: 'Inferenz' },
+    { key: 'endgame', icon: '⚔️', labelEn: 'Endgame', labelDE: 'Endgame' },
 ];
 
 // Toast queue state

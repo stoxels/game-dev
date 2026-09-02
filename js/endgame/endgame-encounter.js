@@ -2653,6 +2653,28 @@ function _egKillMonster(monsterId) {
 
     _egUpdateTargetAfterKill();
 
+    // Endgame achievements — combat
+    if (typeof trackAchStat === 'function') try {
+        if (dying && !dying.isBoss) trackAchStat('egMonstersSlain', 1);
+        if (dying && dying.isBoss) {
+            trackAchStat('egBossKills', 1);
+            // Track distinct boss types slain: maintain a set in ACH_STATE
+            const _bossBase = dying.baseId || dying.id || '';
+            const _bossStatKey = 'egBossTypesSlain';
+            // Use a helper stat per boss id to dedup
+            const _bossSeenKey = '_egBossSeen_' + _bossBase;
+            if (typeof ACH_STATE !== 'undefined' && ACH_STATE.stats && !ACH_STATE.stats[_bossSeenKey]) {
+                ACH_STATE.stats[_bossSeenKey] = 1;
+                if (typeof saveAchState === 'function') saveAchState();
+                // Count distinct seen keys
+                let _distinct = 0;
+                for (const k in ACH_STATE.stats) if (k.indexOf('_egBossSeen_') === 0 && ACH_STATE.stats[k]) _distinct++;
+                if (typeof setAchStat === 'function') setAchStat(_bossStatKey, _distinct);
+                else trackAchStat(_bossStatKey, 1);
+            }
+        }
+    } catch(e){}
+
     if (dying && !dying.isBoss) _egHandleNormalMonsterKill(dying);
     if (dying && dying.isBoss) _egHandleBossKill(dying);
 

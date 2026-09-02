@@ -536,6 +536,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     // Equipment copies go to the main inventory; map copies go to the
     // Probability Gate map stash. The copy keeps the original untouched and
     // can itself be modified further with any other currency.
+    if (typeof trackAchStat === 'function' && defId === 'mirror_of_kalandra') try { trackAchStat('egMirrorsUsed', 1); } catch(e){}
     if ((isMap && defId === 'mirror_of_kalandra') || (!isMap && def.isMirror)) {
         const copyToMapStash = isMap;
         if (copyToMapStash) {
@@ -703,6 +704,12 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     stack.count = (stack.count || 1) - 1;
     if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
     _egRenderCurrencyCell(sourceRow, sourceCol);
+
+    if (typeof trackAchStat === 'function') try {
+        trackAchStat('egCurrencyApplied', 1);
+        if (defId === 'orb_blessing') trackAchStat('egBlessingsUsed', 1);
+        if (defId === 'mirror_of_kalandra') trackAchStat('egMirrorsUsed', 1);
+    } catch(e){}
 
     // Shift-click chaining: keep the orb selected so further shift-clicks
     // re-use it on the next target until the stack runs out.

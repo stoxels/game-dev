@@ -211,6 +211,10 @@ function _buildCharacterSelectUI(onSelect) {
     document.getElementById('cs-confirm-btn').addEventListener('click', () => {
         if (!selectedId) return;
         STATE.playerCharacter = selectedId;
+        // Picking any character permanently unlocks the opening cinematic and
+        // all three character-intro replays in the Replay Gallery, regardless
+        // of which save slot is active (see storyline-engine.js).
+        if (typeof unlockReplayIntroBundle === 'function') unlockReplayIntroBundle();
         save();
         showBeat('character_intro', {
             character: selectedId,

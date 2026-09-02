@@ -348,29 +348,26 @@ STORY_BEATS.region_13 = {
 
 // ---------------------------------------------------------------------------
 // REPLAY GALLERY — flat registry of beats replayable from the title screen's
-// Replay panel, once unlocked (i.e. already seen). Add a new entry here any
-// time a new story beat should show up in that panel. `options` must match
-// whatever showBeat(beatId, options) expects for that beat.
+// Replay panel. An entry is shown when it is unlocked: `globalUnlock: true`
+// entries are permanently available (independent of save slots), everything
+// else unlocks once seen in the current save (see storyline-engine.js). Add
+// a new entry here any time a new story beat should show up in that panel.
+// `options` must match whatever showBeat(beatId, options) expects.
 // ---------------------------------------------------------------------------
 const REPLAY_GALLERY_ENTRIES = [
-    { beatId: 'intro_cinematic', label: 'Opening Cinematic' },
-    { beatId: 'character_intro', label: 'Stox — Character Intro', options: { character: 'stox' } },
-    { beatId: 'character_intro', label: 'Trix — Character Intro', options: { character: 'trix' } },
-    { beatId: 'character_intro', label: 'Syla — Character Intro', options: { character: 'syla' } },
+    // `id` is a stable, save-slot-independent key used for the global unlock
+    // flags (see storyline-engine.js). `thumb` is the artwork shown in the
+    // row; `descKey` resolves to a translated subtitle. Entries flagged
+    // `globalUnlock: true` are unlocked forever the moment the player picks
+    // any character (opening cinematic + all three character intros).
+    { id: 'opening_cinematic', beatId: 'intro_cinematic', label: 'Opening Cinematic', thumb: 'images/Replay_Cutscene_Screen/Replay_Opening_Camera.png', descKey: 'scr_replay_desc_cinematic', globalUnlock: true },
+    { id: 'intro_stox', beatId: 'character_intro', label: 'Stox — Character Intro', options: { character: 'stox' }, thumb: 'images/sprites/Stox_noclass.png', descKey: 'scr_replay_desc_intro_stox', globalUnlock: true },
+    { id: 'intro_trix', beatId: 'character_intro', label: 'Trix — Character Intro', options: { character: 'trix' }, thumb: 'images/sprites/Trix_noclass.png', descKey: 'scr_replay_desc_intro_trix', globalUnlock: true },
+    { id: 'intro_syla', beatId: 'character_intro', label: 'Syla — Character Intro', options: { character: 'syla' }, thumb: 'images/sprites/Syla_noclass.png', descKey: 'scr_replay_desc_intro_syla', globalUnlock: true },
 
-    { beatId: 'region_1', label: 'Probability Peaks' },
-    { beatId: 'region_2', label: 'Distribution Den' },
-    { beatId: 'region_3', label: 'Sampling Savanna' },
-    { beatId: 'region_4', label: 'The Vortex of Possibilities' },
-    { beatId: 'region_5', label: 'Regression Rift' },
-    { beatId: 'region_6', label: 'Frequency Forest' },
-    { beatId: 'region_7', label: 'Stochapolis' },
-    { beatId: 'region_8', label: 'Hypothesis Hinterlands' },
-    { beatId: 'region_9', label: 'Data Delta' },
-    { beatId: 'region_10', label: 'Parameter Plains' },
-    { beatId: 'region_11', label: 'Null Hypothesis Void' },
-    { beatId: 'region_12', label: 'Bayesian Bay' },
-    { beatId: 'region_13', label: 'Expectation Plateau' },
+    // Region interludes (region_1 … region_13) are intentionally NOT listed
+    // yet — their cutscenes don't exist. Re-add each here (with a `thumb` and
+    // `descKey`) once the corresponding world intro is built.
 ];
 
 

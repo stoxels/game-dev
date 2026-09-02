@@ -244,6 +244,16 @@ function initTitleDecoration() {
 // independent side-effecting calls (language setup, settings, listener
 // registration, initial DOM build) rather than function declarations.
 
+// Allow forcing the interface language via URL (?lang=de or ?lang=en).
+// Handy for testing localized layouts and sharing language-specific links;
+// it only overrides the boot-time value, clicking EN/DE still persists normally.
+try {
+    const _urlLang = new URLSearchParams(location.search).get('lang');
+    if (_urlLang === 'en' || _urlLang === 'de') {
+        SETTINGS.lang = _urlLang;
+    }
+} catch { /* URLSearchParams unavailable — ignore */ }
+
 // Set the active language from the persisted settings (falls back to 'en').
 setLang(SETTINGS.lang || 'en');
 

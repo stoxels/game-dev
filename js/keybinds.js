@@ -14,10 +14,11 @@ const KEYBINDS_KEY = 'stoxels_keybinds';
 const KEYBIND_DEFAULTS = [
     // Sprite movement (WASD by default). The sprite systems read these
     // live via keybindKeyFor(), so rebinding takes effect immediately.
-    { id: 'move-up',     label: 'Move up (sprite)',      keys: 'w' },
-    { id: 'move-down',   label: 'Move down (sprite)',    keys: 's' },
-    { id: 'move-left',   label: 'Move left (sprite)',    keys: 'a' },
-    { id: 'move-right',  label: 'Move right (sprite)',   keys: 'd' },
+    // Listed in the on-screen WASD arrangement: up, then left/down/right.
+    { id: 'move-up',     label: 'Move up',     keys: 'w' },
+    { id: 'move-left',   label: 'Move left',   keys: 'a' },
+    { id: 'move-down',   label: 'Move down',   keys: 's' },
+    { id: 'move-right',  label: 'Move right',  keys: 'd' },
 
     // Endgame parry (hold E by default).
     { id: 'eg-parry',    label: 'Endgame parry (hold)',  keys: 'e' },
@@ -128,6 +129,40 @@ function keybindDisplayLabel(key) {
 
 
 //------------------------------------------------------------------------
+//-------------------HELP TEXT INTEGRATION----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Fills {k1} {k2} … placeholders in translated help texts with the
+// player's CURRENT keybinds. Called after applyTranslationsToDOM() (which
+// overwrites innerHTML with the raw dictionary string) and whenever a
+// binding changes, so screens like the How-To-Play modal always show the
+// keys the player actually bound instead of hardcoded defaults.
+//
+// Placeholder → action mapping (index into KEYBIND_TUT_ACTIONS):
+//   {k1}…{k4} → ability-1…ability-4, {k5} → 'escape' (hard pause key).
+const KEYBIND_TUT_ACTIONS = [
+    'ability-1', 'ability-2', 'ability-3', 'ability-4',
+    null, // {k5} — the pause key is fixed, shown as its key-cap label
+];
+
+function tutUpdateKeybinds() {
+    document.querySelectorAll('[data-t]').forEach((el) => {
+        const value = t(el.getAttribute('data-t'));
+        if (!value || !value.includes('{k')) return;
+        const filled = value.replace(/\{k(\d+)\}/g, (m, idx) => {
+            const i = Number(idx);
+            const actionId = KEYBIND_TUT_ACTIONS[i - 1];
+            if (actionId) return keybindDisplayLabel(keybindKeyFor(actionId));
+            if (i === 5) return keybindDisplayLabel('escape');
+            return m; // unknown placeholder — leave it visible
+        });
+        el.innerHTML = filled;
+    });
+}
+
+
+//------------------------------------------------------------------------
 //-------------------SETUP SCREEN (MODAL)-----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -153,6 +188,10 @@ function renderKeybindsUI() {
         row.appendChild(btn);
         list.appendChild(row);
     }
+    // Keep {k*} placeholders in help screens (How-To-Play etc.) in sync —
+    // this also fires after captures, resets and cross-tab storage sync,
+    // since they all re-render through here.
+    if (typeof tutUpdateKeybinds === 'function') tutUpdateKeybinds();
 }
 
 // Puts the UI into capture mode for the given action: the next keydown

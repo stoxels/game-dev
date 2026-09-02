@@ -1025,6 +1025,12 @@ function _egCheckLootClaim(row, col) {
     _egRunLoot.push(item);
     _egUpdateObjectivesHUD();
 
+    if (typeof trackAchStat === 'function') try {
+        if (item.rarity === 'epic') trackAchStat('egEpicLooted', 1);
+        if (item.rarity === 'epic' && Array.isArray(item.mods) && item.mods.length >= 6) trackAchStat('egSixModLooted', 1);
+        if (item.isUnique) trackAchStat('egUniquesCollected', 1);
+    } catch(e){}
+
     Audio_Manager.playSFX('player_equip_pickup');
 
     const requiredLevel = item.requirements && item.requirements.level;

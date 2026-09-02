@@ -1717,11 +1717,63 @@ function markSeen(beatId, options = {}) {
     } catch (e) { /* storage unavailable */ }
 }
 
+// ---------------------------------------------------------------------------
+// GLOBAL REPLAY UNLOCKS — persist independently of the 20 save slots.
+//
+// Intro cutscenes (opening cinematic + all three character intros) are
+// unlocked FOREVER as soon as the player starts a game with any character.
+// Keys use their own `replay_unlocked_` prefix (NOT `storyline_seen_`), so
+// wipeSlot()/resetAllBeats() never touch them — the unlocks survive resets
+// and apply to every save slot. Everything else (region beats) stays tied to
+// the per-save "already seen" state.
+// ---------------------------------------------------------------------------
+
+function _replayGlobalKey(entryId) {
+    return `replay_unlocked_${entryId}`;
+}
+
+function _isReplayGloballyUnlocked(entryId) {
+    try {
+        return localStorage.getItem(_replayGlobalKey(entryId)) === '1';
+    } catch (e) {
+        return false;
+    }
+}
+
+function _setReplayGloballyUnlocked(entryId) {
+    try {
+        localStorage.setItem(_replayGlobalKey(entryId), '1');
+    } catch (e) { /* storage unavailable */ }
+}
+
+// isReplayEntryUnlocked — an entry is replayable if it is flagged as
+// permanently unlocked (globalUnlock → always available, all save slots),
+// OR carries a persisted global unlock flag, OR has been seen in the
+// current save. Intro cutscenes are meant to be available forever, so they
+// short-circuit to true.
+function isReplayEntryUnlocked(entry) {
+    if (!entry) return false;
+    if (entry.globalUnlock) return true;
+    if (entry.id && _isReplayGloballyUnlocked(entry.id)) return true;
+    return hasSeen(entry.beatId, entry.options || {});
+}
+
+// unlockReplayIntroBundle — called when the player confirms any character on
+// the start-of-game character select. Unlocks every gallery entry flagged
+// `globalUnlock` (the opening cinematic + the three character intros) for
+// good, across all save slots.
+function unlockReplayIntroBundle() {
+    if (typeof REPLAY_GALLERY_ENTRIES === 'undefined') return;
+    REPLAY_GALLERY_ENTRIES
+        .filter(entry => entry.globalUnlock && entry.id)
+        .forEach(entry => _setReplayGloballyUnlocked(entry.id));
+}
+
 // getUnlockedReplayEntries — subset of REPLAY_GALLERY_ENTRIES (storyline-beats.js)
-// the player has already seen. Used by the title screen's Replay panel.
+// the player can replay. Used by the title screen's Replay panel.
 function getUnlockedReplayEntries() {
     if (typeof REPLAY_GALLERY_ENTRIES === 'undefined') return [];
-    return REPLAY_GALLERY_ENTRIES.filter(entry => hasSeen(entry.beatId, entry.options || {}));
+    return REPLAY_GALLERY_ENTRIES.filter(entry => isReplayEntryUnlocked(entry));
 }
 
 

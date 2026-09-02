@@ -669,6 +669,22 @@ function _egAtlasOnMapCompleted(mapItem) {
         });
     }
 
+    // Endgame achievements — atlas progress
+    if (typeof trackAchStat === 'function' && firstClear) {
+        try {
+            const prog = (typeof egAtlasProgress === 'function') ? egAtlasProgress() : null;
+            if (prog) {
+                if (typeof setAchStat === 'function') {
+                    setAchStat('egAtlasRegions', prog.completed);
+                    setAchStat('egAtlasHighestTier', prog.highestTier);
+                }
+            } else {
+                trackAchStat('egAtlasRegions', 1);
+            }
+            if (node.tier === 16) trackAchStat('egAtlasPinnacle', 1);
+        } catch (e) {}
+    }
+
     _egAtlasPersist();
 
     // Notify the Inference quest system — atlas tier completion quests check

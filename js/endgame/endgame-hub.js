@@ -2458,6 +2458,36 @@ function _egLoadHubState() {
             try { if (typeof save === 'function') save(); } catch(e){}
         }
     } catch(e) { /* never break hub load for a bench cleanup */ }
+
+    // Endgame achievements — retroactive sync for existing saves
+    try {
+        if (typeof setAchStat === 'function' && typeof egAtlasProgress === 'function' && STATE.egAtlasCompleted) {
+            const _ap = egAtlasProgress();
+            setAchStat('egAtlasRegions', _ap.completed);
+            setAchStat('egAtlasHighestTier', _ap.highestTier);
+            // count T16 regions separately
+            let _pinn = 0;
+            for (const _id in STATE.egAtlasCompleted) {
+                const _node = (typeof egAtlasNodeById === 'function') ? egAtlasNodeById(_id) : null;
+                if (_node && _node.tier === 16 && STATE.egAtlasCompleted[_id]) _pinn++;
+            }
+            setAchStat('egAtlasPinnacle', _pinn);
+        }
+        if (typeof setAchStat === 'function' && typeof _egUniqueCollected !== 'undefined' && _egUniqueCollected) {
+            setAchStat('egUniquesCollected', _egUniqueCollected.size);
+        }
+        if (typeof setAchStat === 'function' && typeof _egGetPlayerLevel === 'function') {
+            setAchStat('egPlayerLevel', _egGetPlayerLevel());
+        }
+        if (typeof setAchStat === 'function' && typeof egGetGold === 'function') {
+            // gold earned is cumulative — can't reconstruct, seed with current balance as floor
+            const _curGold = egGetGold();
+            if (_curGold > 0 && (!ACH_STATE.stats.egGoldEarned || ACH_STATE.stats.egGoldEarned < _curGold)) {
+                // use setAchStat to at least reflect balance; real earned will grow via _egAddGold
+                setAchStat('egGoldEarned', _curGold);
+            }
+        }
+    } catch(e){}
 }
 
 // Call this immideatly so the player does NOT have to open the hub first to re-load his item state.

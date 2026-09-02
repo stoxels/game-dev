@@ -53,6 +53,7 @@
     <link rel="stylesheet" href="css/class_spell_upgrade.css">
     <link rel="stylesheet" href="css/class_ascendency_selection.css">
     <link rel="stylesheet" href="css/reset-game.css">
+    <link rel="stylesheet" href="css/replay.css">
     <link rel="stylesheet" href="css/dev-mode-select.css">
 </head>
 <body>
@@ -70,74 +71,66 @@
             <img class="title-logo-img" src="images/Title_Screen/STOXELS.png" alt="STOXELS">
 
             <!-- Subtitle + version replace the old <p class="title-tag"> and title-version span -->
+            <div class="title-expansion-badge" data-t="scr_expansion_badge">EXPANSION 1</div>
             <div class="title-subtitle" data-t="scr_cartographers_tagline">CARTOGRAPHERS OF CHANCE</div>
             <div class="title-version-line">v0.27 BETA</div>
-            <div class="title-ai-disclosure" style="position: absolute; bottom: 0; right: 0;" data-t="scr_ai_disclosure">This game contains AI-generated art, sound, music, and code.</div>
+            <div class="title-ai-disclosure" data-t="scr_ai_disclosure">This game contains AI-generated art, sound, music, and code.</div>
             <div class="title-lang-overlay">
                 <button class="lang-btn active" data-lang="en">EN</button>
                 <button class="lang-btn" data-lang="de">DE</button>
             </div>
 
             <button class="title-overlay-btn" id="btn-play"
-                    style="--bx: 50%; --by: 50%;"
-                    data-t="btn_play">
-                ▶ PLAY
+                    style="--bx: 50%; --by: 50%;">
+                <span class="btn-label" data-t="btn_play">▶ PLAY</span>
             </button>
 
             <!-- LEFT COLUMN (4 buttons) -->
             <button class="title-overlay-btn block-general" id="btn-settings"
-                    style="--bx: 30%; --by: 35%;"
-                    data-t="btn_settings">
-                ⚙ SETTINGS
+                    style="--bx: 30%; --by: 35%;">
+                <span class="btn-label" data-t="btn_settings">⚙ SETTINGS</span>
             </button>
 
             <button class="title-overlay-btn block-general" id="btn-keybinds"
-                    style="--bx: 30%; --by: 45%;"
-                    data-t="btn_keybinds">
-                ⌨ KEYBINDS
+                    style="--bx: 30%; --by: 45%;">
+                <span class="btn-label" data-t="btn_keybinds">⌨ KEYBINDS</span>
             </button>
 
             <button class="title-overlay-btn block-general" id="btn-how-to-play"
-                    style="--bx: 30%; --by: 55%;"
-                    data-t="btn_howtoplay">
-                ? HOW TO PLAY
+                    style="--bx: 30%; --by: 55%;">
+                <span class="btn-label" data-t="btn_howtoplay">? HOW TO PLAY</span>
             </button>
 
             <button class="title-overlay-btn block-general" id="btn-replay"
                     style="--bx: 30%; --by: 65%;">
-                🔁 REPLAY
+                <span class="btn-label">🔁 REPLAY</span>
             </button>
 
             <!-- RIGHT COLUMN (4 buttons) -->
             <button class="title-overlay-btn block-general" id="btn-highscores"
-                    style="--bx: 70%; --by: 35%;"
-                    data-t="btn_highscores">
-                🏆 HIGHSCORES
+                    style="--bx: 70%; --by: 35%;">
+                <span class="btn-label" data-t="btn_highscores">🏆 HIGHSCORES</span>
             </button>
 
             <button class="title-overlay-btn block-general" id="btn-codes"
-                    style="--bx: 70%; --by: 45%;"
-                    data-t="btn_codes">
-                🔑 MOODLE CODES
+                    style="--bx: 70%; --by: 45%;">
+                <span class="btn-label" data-t="btn_codes">🔑 MOODLE CODES</span>
             </button>
 
             <button class="title-overlay-btn block-general" id="btn-achievements"
-                    style="--bx: 70%; --by: 55%;"
-                    data-t="btn_achievements">
-                🏆 ACHIEVEMENTS
+                    style="--bx: 70%; --by: 55%;">
+                <span class="btn-label" data-t="btn_achievements">🏆 ACHIEVEMENTS</span>
             </button>
 
             <button class="title-overlay-btn block-general" id="btn-changelog"
-                    style="--bx: 70%; --by: 65%;"
-                    data-t="scr_btn_changelog">
-                📝 CHANGELOG
+                    style="--bx: 70%; --by: 65%;">
+                <span class="btn-label" data-t="scr_btn_changelog">📝 CHANGELOG</span>
             </button>
 
             <!--
             <button class="title-overlay-btn btn-danger" id="btn-reset"
-                    style="--bx: 50%; --by: 55%;"
-                    data-t="btn_reset">
-                🗑 RESET
+                    style="--bx: 50%; --by: 55%;">
+                <span class="btn-label" data-t="btn_reset">🗑 RESET</span>
             </button>
             -->
 
@@ -149,45 +142,56 @@
 
 
     <!-- HOW TO PLAY MODAL -->
+    <!-- Styled after the settings modal (css/settings.css): one big
+         stone/parchment frame from images/Settings/, title plaque + stone
+         close button hanging over the frame edge. The tutorial sections sit
+         on stone cards in a wide 3-column grid over the parchment. -->
     <div id="tut-modal" class="modal-bg">
-        <div class="modal-box">
+        <div class="modal-box tut-box">
             <button class="modal-close" data-modal-close="tut-modal" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title" data-t="tut_title">▸ HOW TO PLAY STOXELS</div>
-            <div class="modal-section">
-                <h3 data-t="tut_s1h">WHAT IS A NONOGRAM?</h3>
-                <p data-t="tut_s1p">A nonogram is a grid puzzle. Numbers along rows and columns tell you how many consecutive filled cells exist. Reveal the hidden symbol to win!</p>
-            </div>
-            <div class="modal-section">
-                <h3 data-t="tut_s2h">CONTROLS</h3>
-                <p data-t="tut_s2p"><strong>Left click</strong> — fill a cell (wrong fills cost time!)<br><strong>Right click</strong> — mark a cell with ✕ (safe, no penalty)<br><strong>Drag</strong> — paint multiple cells<br><strong>Escape</strong> — go back to previous screen</p>
-            </div>
-            <div class="modal-section">
-                <h3 data-t="tut_s3h">DIFFICULTY</h3>
-                <p data-t="tut_s3p"><strong class="text-green">Easy</strong> — small penalties (×1), ×0.5 score<br><strong class="text-yellow">Normal</strong> — standard (×2), ×1 score<br><strong class="text-red">Hard</strong> — heavy penalties (×4), ×1.5 score</p>
-            </div>
-            <div class="modal-section">
-                <h3 data-t="tut_s4h">MODIFIERS</h3>
-                <p data-t="tut_s4p"><strong class="text-orange">Time Trial</strong> — only 5 minutes!<br><strong class="text-red">Hardcore</strong> — one mistake fails the level<br><strong class="text-purple">Ironman</strong> — no items allowed, +15% score</p>
-            </div>
-            <div class="modal-section">
-                <h3 data-t="tut_s5h">ITEMS &amp; INVENTORY</h3>
-                <p data-t="tut_s5p">Complete the level's bonus objective to earn ONE random item. Items range from Common to Legendary — rarer items are more powerful. Corrupted items are gambles! Items cost score to use, and can be sold. Ironman disables all item use.</p>
-            </div>
-            <div class="modal-section">
-                <h3 data-t="tut_s8h">CLASSES &amp; CLASS SKILLS</h3>
-                <p data-t="tut_s8p">Completing Ascension - Levels allows you to select one out of three possible classes. Each class has a passive ability and two active abilities, which can heavily alter the way you approach a Stoxel and help in case you get stuck. Abilities can be upgraded by playing more Ascension - Levels.</p>
-            </div>
-            <div class="modal-section">
-                <h3 data-t="tut_s9h">CONVERGENCE, INFERENCE &amp; PROBABILITY TREE</h3>
-                <p data-t="tut_s9p">Completing Convergence - Levels grants Convergence Points, which can be spent on the Probability Tree to customize the way you play the game. Completing Inference - Objectives rewards additional Convergence Points.</p>
-            </div>
-            <div class="modal-section">
-                <h3 data-t="tut_s6h">BONUS OBJECTIVE &amp; QUIZ</h3>
-                <p data-t="tut_s6p">Each level has a bonus objective (shown on the level card). If you <strong>meet</strong> the bonus objective, a stats multiple-choice quiz appears after a brief pause — answer correctly for +50 pts and a bonus item! If you miss the objective, no quiz appears.</p>
-            </div>
-            <div class="modal-section">
-                <h3 data-t="tut_s7h">MOODLE CODES</h3>
-                <p data-t="tut_s7p">Complete all levels in a World to unlock a Moodle Code. Enter it in Moodle to earn a badge that is stored in your Moodle profile.</p>
+
+            <!-- SCROLL PANEL: the three-column section grid scrolls when it
+                 exceeds the frame's inner parchment area -->
+            <div class="tut-scroll">
+                <div class="tut-columns">
+                    <div class="modal-section tut-section tut-section-basics">
+                        <h3 data-t="tut_s1h">WHAT IS A NONOGRAM?</h3>
+                        <p data-t="tut_s1p">A nonogram is a grid puzzle. Numbers on row and columns tell you how many consecutive filled cells exist. Reveal the full symbol to win!</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-basics">
+                        <h3 data-t="tut_s2h">CONTROLS</h3>
+                        <p data-t="tut_s2p"><strong>Left click</strong> — fill a cell<br><strong>Right click</strong> — mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> — Zoom in &amp; out to scale<br><strong>Left &amp; Right Arrow Keys</strong> — Move the row clue headers towards the left/right<br><strong>1,2,3,4</strong> - use Class Abilities<br><strong>Escape</strong> - Pause the Game</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-diff">
+                        <h3 data-t="tut_s3h">DIFFICULTY</h3>
+                        <p data-t="tut_s3p"><strong style="color:var(--green)">Easy</strong> — low time penalties for mistakes, 50% less Score<br><strong style="color:var(--yellow)">Normal</strong> — standard time penalties for mistakes<br><strong style="color:var(--red)">Hard</strong> — heavy time penalties for mistakes, 50% more score</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-diff">
+                        <h3 data-t="tut_s4h">GAME MODIFIERS</h3>
+                        <p data-t="tut_s4p"><strong style="color:var(--orange)">Time Trial</strong> — 50% less time per level, but 20% more Score<br><strong style="color:var(--red)">Hardcore</strong> — one mistake fails the level, but 30% more Score<br><strong style="color:var(--purple)">Ironman</strong> — items cannot be used, but 15% more Score<br><strong style="color:var(--accent)">Classless</strong> — Class Abilities cannot be used, but 20% more Score<br><strong style="color:var(--green)">Treeless</strong> — Probability Tree nodes have no effect, but 25% more Score<br>Modifiers can be combined with each other.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-progression">
+                        <h3 data-t="tut_s5h">ITEMS &amp; INVENTORY</h3>
+                        <p data-t="tut_s5p">Complete a level's bonus objective to earn a random item. Cursed items are powerful but also have a negative effect.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-progression">
+                        <h3 data-t="tut_s6h">QUIZ &amp; Probability Gates</h3>
+                        <p data-t="tut_s6p">Some levels require answering a quiz correctly after finishing a level in order to achieve the bonus objective, and some levels have a Probability Gate that can be unlocked by solving an exercise.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-progression">
+                        <h3 data-t="tut_s7h">ACHIEVEMENT CODES</h3>
+                        <p data-t="tut_s7p">Reach score milestones to unlock Moodle Codes. You can see your progress towards the next achievement in the Highscores tab. More score can be earned by replaying levels on higher difficulties or by adding more game modifiers.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-progression">
+                        <h3 data-t="tut_s8h">CLASSES &amp; CLASS ABILITIES</h3>
+                        <p data-t="tut_s8p">Completing Ascension - Levels allows you to select one out of three possible classes. Each class has a passive ability and two active abilities, which can heavily alter the way you approach a Stoxel and help in case you get stuck. Abilities can be upgraded by playing more Ascension - Levels.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-progression">
+                        <h3 data-t="tut_s9h">CONVERGENCE, INFERENCE &amp; PROBABILITY TREE</h3>
+                        <p data-t="tut_s9p">Completing Convergence - Levels grants Convergence Points, which can be spent on the Probability Tree to customize the way you play the game. Completing Inference - Objectives rewards additional Convergence Points.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -631,14 +635,25 @@
     </div>
 
     <!-- KEYBINDS MODAL -->
+    <!-- Styled after the settings modal (css/settings.css): one big
+         stone/parchment frame from images/Settings/, title plaque + stone
+         close button hanging over the frame edge, content on a scroll panel. -->
     <div id="keybinds-modal" class="modal-bg">
         <div class="modal-box keybinds-box">
             <button class="modal-close" id="btn-keybinds-close" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title" data-t="keybinds_title">⌨ KEYBINDS</div>
+
+            <!-- HINT sits ABOVE the scrollable list (not inside it). -->
             <p class="keybinds-hint" data-t="keybinds_hint">Click a key to rebind it. Changes are saved automatically and survive restarts.</p>
-            <div id="keybind-list" class="keybind-list"></div>
-            <div class="modal-actions">
-                <button class="title-btn back-btn" id="btn-keybinds-reset" data-t="keybinds_reset">RESET TO DEFAULTS</button>
+
+            <!-- SCROLL PANEL: keybind rows scroll when they exceed the
+                 frame's inner parchment area -->
+            <div class="keybinds-scroll">
+                <div id="keybind-list" class="keybind-list"></div>
+            </div>
+
+            <div class="modal-actions keybinds-actions">
+                <button class="keybinds-reset-btn" id="btn-keybinds-reset" data-t="keybinds_reset">RESET TO DEFAULTS</button>
             </div>
         </div>
     </div>
@@ -655,10 +670,15 @@
 
     <!-- REPLAY GALLERY MODAL -->
     <div id="replay-modal" class="modal-bg">
-        <div class="modal-box">
-            <button class="modal-close" data-modal-close="replay-modal" data-t="reset_close">✕ CLOSE</button>
-            <div class="modal-title" data-t="scr_replay_gallery">🔁 REPLAY GALLERY</div>
-            <div id="replay-content" class="changelog-scroll-area"></div>
+        <div class="replay-modal-box">
+            <!-- Wax-seal close cross — re-used from the Inference system -->
+            <button class="modal-close" data-modal-close="replay-modal" aria-label="Close">✕ CLOSE</button>
+
+            <div class="replay-header">
+                <span class="replay-header-title" data-t="scr_replay_title">REPLAY</span>
+            </div>
+
+            <div class="replay-track-list" id="replay-content"></div>
         </div>
     </div>
 
@@ -904,12 +924,18 @@
                 </div>
             </div>
 
+            <!-- slot filter chips: ALL + slots 1..20 (populated by JS) -->
+            <div class="hs-slot-filter" id="hs-slot-filter">
+                <div class="hs-slot-filter-row" id="hs-slot-filter-row"></div>
+            </div>
+
             <!-- column headers, each using the stone header bar as its background -->
             <div class="hs-col-headers" id="hs-col-headers">
                 <span class="hs-col-header hs-col-level" data-t="hs_level">LEVEL</span>
                 <span class="hs-col-header hs-col-score" data-t="hs_best">BEST SCORE</span>
                 <span class="hs-col-header hs-col-diff" data-t="hs_diff">DIFFICULTY</span>
                 <span class="hs-col-header hs-col-mods" data-t="hs_mods">MODIFIERS</span>
+                <span class="hs-col-header hs-col-slot" data-t="hs_slot">SLOT</span>
             </div>
 
             <!-- scrollable list itself -->

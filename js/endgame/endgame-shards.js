@@ -234,6 +234,7 @@ function _egConvertShardsToOrb(shardDef) {
         .replace('{shard}', shardDef.name)
         .replace('{icon}', shardDef.orbIcon)
         .replace('{orb}', nameKey ? t(nameKey) : shardDef.orbId));
+    if (typeof trackAchStat === 'function') try { trackAchStat('egShardsConverted', 1); } catch(e){}
 }
 
 
@@ -292,6 +293,7 @@ function _egSellStashItem(row, col) {
         .replace('{name}', item.name || '???')
         .replace('{icon}', shardDef.icon)
         .replace('{shard}', shardDef.name));
+    if (typeof trackAchStat === 'function') try { trackAchStat('egItemsSold', 1); } catch(e){}
     return true;
 }
 

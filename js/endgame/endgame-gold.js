@@ -6,8 +6,8 @@
 // Gold is the endgame's soft trade currency. Monsters (and especially
 // bosses) drop gold coins onto the grid like any other drop type; claiming
 // a coin banks it into the player's persistent gold balance
-// (STATE.egGold). The Map Vendor on the Nexus of Worlds screen sells
-// Tier 1 maps for gold.
+// (STATE.egGold). The Atlas Vendor on the Nexus of Worlds screen sells
+// free Tier 1 Normal maps and other goods for gold.
 //
 // Load AFTER endgame-maps.js (vendor needs _egGenerateMapDrop) and AFTER
 // endgame-hub.js (needs egSaveHubState / _egMapStash helpers).
@@ -60,6 +60,7 @@ function _egAddGold(amount) {
     amount = Math.max(0, Math.round(amount));
     _egGoldAmount += amount;
     _egSyncGoldToState();
+    if (typeof trackAchStat === 'function') try { trackAchStat('egGoldEarned', amount); } catch(e){}
 }
 
 // Attempts to spend `amount` gold. Returns false (without changing anything)
@@ -69,6 +70,7 @@ function egSpendGold(amount) {
     if (amount < 0 || _egGoldAmount < amount) return false;
     _egGoldAmount -= amount;
     _egSyncGoldToState();
+    if (typeof trackAchStat === 'function') try { trackAchStat('egGoldSpent', amount); } catch(e){}
     return true;
 }
 

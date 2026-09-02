@@ -12,7 +12,7 @@
 //=    2. Probability Gate         -> showEndgameGate()                  =
 //=       (endgame-gate.js)                                              =
 //=    3. Atlas of Statistica      -> showEndgameAtlas()                 =
-//=    4. Map Vendor               -> showEndgameVendor()                =
+//=    4. Atlas Vendor            -> showEndgameVendor()                =
 //=       (endgame-vendor.js)                                            =
 //=                                                                      =
 //=  All child screens navigate BACK to this screen, so the Nexus        =
@@ -156,4 +156,5 @@ function ensureEndgameNexusScreen() {
 function showEndgameNexus() {
     ensureEndgameNexusScreen();
     switchScreen('screen-endgame-nexus');
+    if (typeof trackAchStat === 'function') try { trackAchStat('egNexusVisits', 1); } catch (e) {}
 }

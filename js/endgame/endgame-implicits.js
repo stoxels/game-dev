@@ -148,6 +148,18 @@ const EG_IMPLICIT_FAMILIES = {
     },
 };
 
+// Rebalance 2026: implicits str/agi/int hi 16-22 -> 12-16 (factor ~0.73) so gear doesn't carry top pure alone.
+(() => {
+    const fams = ['strength','agility','intelligence'];
+    for (const k of fams) {
+        const fam = EG_IMPLICIT_FAMILIES[k];
+        if (!fam || !fam.hi) continue;
+        fam.hi.min = Math.round(fam.hi.min * 0.73);
+        fam.hi.max = Math.round(fam.hi.max * 0.73);
+        // lo stays 4-6 as starter feel
+    }
+})();
+
 
 //------------------------------------------------------------------------
 //-------------------POOL BY SLOT------------------------------------------
