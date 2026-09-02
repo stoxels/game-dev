@@ -11,7 +11,7 @@ const INV_SLOT_GROUPS = [
     { label: 'Mark', slots: ['markWrong2', 'markWrong4', 'markWrong6', 'markWrong8'] },
     { label: 'Time', slots: ['addTime60', 'addTime300', 'addTime600', 'addTime900'] },
     { label: 'Utility', slots: ['shield', 'freeze', 'mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll', 'scoutPrimer'] },
-    { label: 'Power', slots: ['rowSolve', 'colSolve', 'artifactComplete'] },
+    { label: 'Power', slots: ['rowSolve', 'colSolve', 'surveyScope', 'artifactComplete'] },
     { label: 'Cursed', slots: ['cursedReveal', 'cursedTime', 'cursedShield', 'cursedRowSolve', 'cursedColSolve', 'cursedRowCol', 'chronoFracture'] },
     { label: 'Special', slots: ['pearlOfHaste', 'pearlOfSwiftness', 'grandPearl', 'theWitch', 'goldenClock', 'shadowSeal'] },
 ];

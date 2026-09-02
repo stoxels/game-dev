@@ -960,6 +960,32 @@ function _egInjectLevelingStyles() {
     color: #fff;
     text-shadow: 0 0 10px rgba(245,185,66,.8);
 }
+
+/* ── Shared eg modal shell (eg-delete-modal-bg) ──
+   The attribute window borrows the old stash delete-confirm modal's shell
+   classes. Those styles were injected by _egInjectDeleteUIStyles() in
+   endgame-hub.js and silently disappeared when the delete-confirm modal
+   was removed — leaving the window unpositioned (it rendered behind the
+   Orbs & Shards tab) and its buttons unstyled. They live here now. */
+.eg-delete-modal-bg {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 10000;
+    align-items: center; justify-content: center;
+}
+.eg-delete-modal-bg.show { display: flex; }
+.eg-delete-modal-btns { display: flex; gap: 10px; justify-content: center; }
+.eg-delete-modal-btn {
+    padding: 8px 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: var(--PX, monospace);
+}
+.eg-delete-modal-cancel { background: #444; color: #ddd; }
+.eg-delete-modal-cancel:hover { background: #555; }
 `;
     document.head.appendChild(style);
 }

@@ -151,21 +151,63 @@ function _egEssenceCompatibleSlotTypes(familyId) {
     return slots;
 }
 function _egEssenceCanApplyToItem(familyId, item) {
+    return _egEssenceIncompatibilityReason(familyId, item) === null;
+}
+
+// Classifies WHY an essence's guaranteed family cannot be applied to an item.
+// Returns null when compatible, otherwise one of:
+//   'no_mod_table'      — item's slotType has no mod table (unknown/odd base)
+//   'family_missing'    — family doesn't exist in the item's slot-type mod table
+//                         (e.g. Essence of Block Chance on a non-shield)
+//   'needs_armour'      — family is a local armour mod, base has no armour
+//   'needs_evasion'     — family is a local evasion mod, base has no evasion
+//   'needs_absorption'  — family is a local absorption mod, base has no absorption
+//   'needs_armour_evasion' / 'needs_armour_absorption' /
+//   'needs_evasion_absorption' — hybrid defence mods, base lacks one/both stats
+//   'no_eligible_tier'  — family exists on this slot, but every tier needs a
+//                         higher item level than the item has
+function _egEssenceIncompatibilityReason(familyId, item) {
+    if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return 'no_mod_table';
     const modTable = _egGetModTable(item);
-    if (!modTable) return false;
-    const hasFamily = (modTable.prefixes && modTable.prefixes[familyId]) || (modTable.suffixes && modTable.suffixes[familyId]);
-    if (!hasFamily) return false;
-    if (!_egFamilyAllowedOnBase(familyId, item.defenses)) return false;
-    // also need at least one eligible tier at itemLevel
+    if (!modTable) return 'no_mod_table';
     const sections = [modTable.prefixes || {}, modTable.suffixes || {}];
+    const hasFamily = sections.some(sec => !!sec[familyId]);
+    if (!hasFamily) return 'family_missing';
+    // Local-defence gate first: a wrong base stat is more informative to the
+    // player than tier availability (armour bases are the common failure).
+    const neededStats = (typeof EG_LOCAL_DEFENSE_FAMILY_STATS !== 'undefined')
+        ? EG_LOCAL_DEFENSE_FAMILY_STATS[familyId] : null;
+    if (neededStats) {
+        const defenses = item.defenses || {};
+        const missing = neededStats.filter(stat => !(defenses[stat] > 0));
+        if (missing.length > 0) {
+            // EG_LOCAL_DEFENSE_FAMILY_STATS lists stats in canonical order, so
+            // the joined key matches one of the dedicated translation keys.
+            return 'needs_' + missing.join('_');
+        }
+    }
+    // At least one eligible tier at the item's level?
     for (const sec of sections) {
         const fam = sec[familyId];
         if (!fam) continue;
         const tiers = _egEligibleTiers(fam, item.itemLevel || 1);
-        if (tiers && tiers.length > 0) return true;
+        if (tiers && tiers.length > 0) return null;
     }
-    return false;
+    return 'no_eligible_tier';
 }
+
+// Maps classifier reasons to translation keys for the reject messages.
+const EG_ESSENCE_REASON_KEYS = {
+    no_mod_table: 'eg_essence_no_mod_table',
+    family_missing: 'eg_essence_family_missing',
+    needs_armour: 'eg_essence_needs_armour',
+    needs_evasion: 'eg_essence_needs_evasion',
+    needs_absorption: 'eg_essence_needs_absorption',
+    needs_armour_evasion: 'eg_essence_needs_armour_evasion',
+    needs_armour_absorption: 'eg_essence_needs_armour_absorption',
+    needs_evasion_absorption: 'eg_essence_needs_evasion_absorption',
+    no_eligible_tier: 'eg_essence_no_eligible_tier',
+};
 
 
 //------------------------------------------------------------------------
@@ -864,6 +906,23 @@ function _egRenderEssenceStash() {
 
 let _egPendingEssenceUse = null; // { defId, sourceRow, sourceCol }
 
+// Shared rejection path: shows a short reason toast + stash info, flashes the
+// target chip, and exits use mode. `reasonKey` is null for plain failures.
+function _egRejectEssenceUse(reasonKey, chipEl, opts = {}) {
+    const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
+    const fallback = reasonKey ? (isDe ? 'Gegenstand nicht kompatibel.' : 'Item not compatible.') : (isDe ? 'Nicht anwendbar.' : 'Cannot be applied.');
+    const msg = reasonKey
+        ? (t(reasonKey) !== reasonKey ? t(reasonKey) : fallback)
+        : fallback;
+    showToast(msg);
+    if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error', duration: opts.duration || 5000 });
+    if (chipEl) {
+        chipEl.classList.add('eg-slot-reject');
+        setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
+    }
+    _egCancelEssenceUse(true);
+}
+
 function _egStartEssenceUse(def, row, col, chipEl) {
     if (typeof _egPendingCurrencyUse !== 'undefined' && _egPendingCurrencyUse) {
         _egCancelCurrencyUse(true);
@@ -911,57 +970,32 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     }
 
     if (!item || item.category !== 'equip' || item.isUnique) {
-        const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
-        showToast(msg);
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-        if (chipEl) {
-            chipEl.classList.add('eg-slot-reject');
-            setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
-        }
-        _egCancelEssenceUse(true);
+        // Distinct short reasons so the player knows WHY (no item name — the
+        // target is what's on screen, the essence is still highlighted).
+        _egRejectEssenceUse(
+            (item && item.isUnique) ? 'eg_essence_unique_reject'
+            : (item && item.category === 'equip') ? null
+            : 'eg_essence_not_equipment',
+            chipEl
+        );
         return;
     }
 
     // Compatibility check — does this base support the guaranteed family?
     const famList = def.guaranteedFamilies || (def.guaranteedFamily ? [def.guaranteedFamily] : []);
     const famForCheck = famList[0];
-    if (famForCheck && !_egEssenceCanApplyToItem(famForCheck, item)) {
-        const modName = _egEssenceFamilyDisplayName(famForCheck);
-        const slotTypes = _egEssenceCompatibleSlotTypes(famForCheck);
-        const slotLabel = (st) => { try { const tr = t('eg_slot_' + st); if (tr && tr !== 'eg_slot_' + st) return tr; } catch (e) { } return st; };
-        const slotsStr = slotTypes.length ? slotTypes.map(slotLabel).join(', ') : (typeof LANG !== 'undefined' && LANG === 'de' ? 'keine' : 'none');
-        const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
-        let msg = '';
-        if (isDe) {
-            msg = `⚠️ ${def.name} kann nicht auf ${item.name || item.baseName || '?'} angewendet werden — ${modName} kann nicht auf ${slotLabel(item.slotType)}-Gegenständen rollen. Funktioniert nur auf: ${slotsStr}.`;
-        } else {
-            msg = `⚠️ ${def.name} cannot be used on ${item.name || item.baseName || '?'} — ${modName} cannot roll on ${slotLabel(item.slotType)} items. Only works on: ${slotsStr}.`;
+    if (famForCheck) {
+        const reason = _egEssenceIncompatibilityReason(famForCheck, item);
+        if (reason) {
+            _egRejectEssenceUse(EG_ESSENCE_REASON_KEYS[reason] || null, chipEl);
+            return;
         }
-        showToast(msg);
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error', duration: 5000 });
-        if (chipEl) {
-            chipEl.classList.add('eg-slot-reject');
-            setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
-        }
-        _egCancelEssenceUse(true);
-        return;
     }
 
     const newItem = _egApplyEssenceCraft(item, def);
     if (!newItem) {
-        // Fallback — should already be caught by compatibility check, but keep generic message
-        const modName = _egEssenceFamilyDisplayName(famForCheck);
-        const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
-        const msg = isDe
-            ? `⚠️ ${def.name} kann nicht auf ${item.name || '?'} angewendet werden — ${modName} ist auf dieser Basis nicht verfügbar.`
-            : `⚠️ ${def.name} cannot be used on ${item.name || '?'} — ${modName} is not available on this base.`;
-        showToast(msg);
-        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-        if (chipEl) {
-            chipEl.classList.add('eg-slot-reject');
-            setTimeout(() => chipEl.classList.remove('eg-slot-reject'), 600);
-        }
-        _egCancelEssenceUse(true);
+        // Fallback — should already be caught by the checks above.
+        _egRejectEssenceUse(null, chipEl);
         return;
     }
     applyFn(newItem);

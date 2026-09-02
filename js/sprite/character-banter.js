@@ -1345,7 +1345,7 @@ function resetBanterState() {
 //
 // Item-specific banter (triggerItemBanter):
 //   item_<ITEM_DEFS id>     — e.g. item_reveal1, item_cursedRowSolve
-//   Fired from _consumeItem() in js/items/inventory-use-item.js
+//   Fired from _consumeItem() in js/puzzle-items/use-item.js
 //   Chance-gated (_BANTER_ITEM_CHANCE) with per-item cooldown.
 //
 // Skill-specific banter (triggerSkillBanter):

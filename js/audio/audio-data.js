@@ -2,7 +2,7 @@
 //  audio-data.js  —  Static audio registries (BGM + SFX)
 // ============================================================
 //  Pure data, no logic. Loaded before audio.js, which reads
-//  these as globals (same pattern as item-data.js / items.js,
+//  these as globals (same pattern as item-definitions.js / item-pool.js,
 //  quests-data.js / quests-logic.js, etc.)
 //
 //  Structure:

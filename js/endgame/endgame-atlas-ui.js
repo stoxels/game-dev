@@ -77,7 +77,7 @@ function _egAtlasNodeSize(tier) {
 }
 
 // Rarity band colour, straight from the game's rarity palette
-// (RARITY_COLOR_MAP in items.js):
+// (RARITY_COLOR_MAP in item-pool.js):
 //   tiers I–V   uncommon  #2ecc71 (green)
 //   tiers VI–X  rare      #3498db (blue)
 //   tiers XI–XVI epic     #c39bd3 (purple)

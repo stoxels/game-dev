@@ -2066,6 +2066,24 @@ function _egLoadHubState() {
     } else {
         _egInventory = Array.from({ length: EG_INV_INITIAL_ROWS }, () => Array(EG_INV_COLS).fill(null));
     }
+    // Heal legacy equipment cells: any item that looks like gear (has a
+    // slotType) but lost its category would be rejected by currency/essence
+    // application with a confusing "cannot be used" error.
+    if (Array.isArray(_egInventory)) {
+        for (let r = 0; r < _egInventory.length; r++) {
+            if (!Array.isArray(_egInventory[r])) continue;
+            for (let c = 0; c < _egInventory[r].length; c++) {
+                const it = _egInventory[r][c];
+                if (it && it.slotType && !it.category) it.category = 'equip';
+            }
+        }
+    }
+    if (_egEquipped && typeof _egEquipped === 'object') {
+        for (const k of Object.keys(_egEquipped)) {
+            const it = _egEquipped[k];
+            if (it && it.slotType && !it.category) it.category = 'equip';
+        }
+    }
     // ── Map stash: tiered 16× infinite stashes ──
     (function _migrateMapStash() {
         const saved = STATE.egMapStash;

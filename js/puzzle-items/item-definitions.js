@@ -48,6 +48,14 @@ const ITEM_DEFS = {
         rarity: 'legendary', weight: 4
     },
 
+    // SURVEY SCOPE
+    surveyScope: {
+        id: 'surveyScope', icon: '🔬',
+        nameEn: 'Survey Scope', nameDE: 'Vermessungsfernrohr',
+        descEn: 'Reveals all correct cells in a random 3×3 area', descDE: 'Enthüllt alle richtigen Zellen in einem zufälligen 3×3-Bereich',
+        rarity: 'epic', weight: 4
+    },
+
     // SCOUTS-PRIMER
     scoutPrimer: {
         id: 'scoutPrimer', icon: '📜',

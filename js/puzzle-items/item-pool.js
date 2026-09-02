@@ -5,7 +5,7 @@
 
 // Item sets used for passive-tree weight boosting, defined here so they
 // are not recreated on every pickRandomItem() call.
-const REVEAL_ITEM_IDS = new Set(['reveal1', 'reveal2', 'reveal3', 'reveal4']);
+const REVEAL_ITEM_IDS = new Set(['reveal1', 'reveal2', 'reveal3', 'reveal4', 'surveyScope']);
 const MARK_ITEM_IDS = new Set(['markWrong2', 'markWrong4', 'markWrong6', 'markWrong8']);
 const TUTOR_ITEM_IDS = new Set(['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll']);
 const SHIELD_ITEM_IDS = new Set(['shield']);
