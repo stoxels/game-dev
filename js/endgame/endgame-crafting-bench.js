@@ -8,6 +8,10 @@
 
 let _egCraftingBenchItem = null;
 let _egCraftingBenchSelection = null;
+// Surviving per-column scroll positions (keyed by 'prefix'/'suffix') so the
+// panel restores where you left off across open/close. A module-level store is
+// needed because hiding the overlay (display:none) resets scrollTop to 0.
+let _egCraftingBenchScroll = {};
 
 // Crafted modifier capacity limits (separate from regular affix caps).
 // PoE-style: 1 crafted prefix + 1 crafted suffix max by default.
@@ -38,6 +42,18 @@ function _egCraftingBenchCostTooltip(costs) {
     }).join(' + ');
 }
 
+// Effective cost of a craft: the base family cost, plus 1 Orb of Scouring when
+// this craft REPLACES an existing crafted modifier (re-rolling it in place).
+function _egCraftingBenchEffectiveCosts(entry, tier) {
+    const base = _egCraftingBenchCostFor(entry.familyId, tier.tier);
+    if (!entry.isReplace) return base;
+    const costs = base.map(c => ({ ...c }));
+    const scour = costs.find(c => c.id === 'orb_scouring');
+    if (scour) scour.count += 1;
+    else costs.push({ id: 'orb_scouring', count: 1 });
+    return costs;
+}
+
 function _egCraftingBenchTooltipHTML(entry, tier, costs, disabled, affordable) {
     const label = LANG === 'de' && entry.family.labelDe ? entry.family.labelDe : entry.family.label;
     const hasSecond = tier.min2 != null;
@@ -49,6 +65,7 @@ function _egCraftingBenchTooltipHTML(entry, tier, costs, disabled, affordable) {
     let html = `<strong style="color:#f1d27b">${label}</strong>`;
     html += `<br><span style="color:#a8c8e8">Range:</span> ${range}`;
     html += `<br><span style="color:#a8c8e8">Cost:</span> ${_egCraftingBenchCostTooltip(costs)}`;
+    if (entry.isReplace) html += `<br><span style="color:#f1d27b">Replaces the existing crafted ${entry.type} (includes +1 Orb of Scouring)</span>`;
     if (disabled) html += `<br><span style="color:#e87d70">Requires item level ${tier.ilvl}</span>`;
     else if (!affordable) html += '<br><span style="color:#e87d70">Not enough currency for this craft</span>';
     return html;
@@ -87,32 +104,36 @@ function _egCountRegularMods(item, type) {
     return (item.mods || []).filter(mod => mod.type === type && mod.crafted !== true).length;
 }
 
+// Computes how many crafted/regular mods a given type holds and whether it can
+// still accept a craft — either add a new one when there's room, or REPLACE the
+// existing crafted one. Replacement stays allowed even when the type's slots are
+// full, as long as a crafted mod already occupies a slot; this is what lets a
+// player re-roll a crafted prefix/suffix repeatedly until they like the value.
+function _egCraftingBenchTypeState(item, type) {
+    const crafted = _egCountCraftedMods(item, type);
+    const regular = _egCountRegularMods(item, type);
+    const caps = typeof EG_MOD_CAPS !== 'undefined' ? EG_MOD_CAPS[item.rarity] : null;
+    let maxForType;
+    if (item.rarity === 'common') {
+        maxForType = EG_CRAFTED_MOD_CAPS[type === 'prefix' ? 'maxPre' : 'maxSuf'];
+    } else {
+        maxForType = caps ? (type === 'prefix' ? caps.maxPre : caps.maxSuf) : 0;
+    }
+    const roomToAdd = (regular + crafted) < maxForType;
+    const hasCrafted = crafted > 0;
+    return { crafted, regular, maxForType, roomToAdd, hasCrafted, craftable: roomToAdd || hasCrafted };
+}
+
 function _egCraftingBenchCanUseItem(item) {
     if (!item || item.category !== 'equip' || item.isUnique) return false;
     // Ensure item has required properties
     if (!item.slotType) return false;
     const table = typeof _egGetModTable === 'function' ? _egGetModTable(item) : null;
     if (!table) return false;
-
-    const caps = typeof EG_MOD_CAPS !== 'undefined' ? EG_MOD_CAPS[item.rarity] : null;
-    const craftedPre = _egCountCraftedMods(item, 'prefix');
-    const craftedSuf = _egCountCraftedMods(item, 'suffix');
-    const regularPre = _egCountRegularMods(item, 'prefix');
-    const regularSuf = _egCountRegularMods(item, 'suffix');
-
-    // White items: no regular affix capacity, but can receive crafted mods
-    // up to EG_CRAFTED_MOD_CAPS limits.
-    if (item.rarity === 'common') {
-        return craftedPre < EG_CRAFTED_MOD_CAPS.maxPre || craftedSuf < EG_CRAFTED_MOD_CAPS.maxSuf;
-    }
-
-    // Non-white items: check both regular caps and crafted caps
-    if (!caps) return false;
-    if (regularPre >= caps.maxPre && regularSuf >= caps.maxSuf) return false;
-    if (craftedPre >= EG_CRAFTED_MOD_CAPS.maxPre && craftedSuf >= EG_CRAFTED_MOD_CAPS.maxSuf) return false;
-    if ((regularPre + craftedPre) >= caps.maxPre && (regularSuf + craftedSuf) >= caps.maxSuf) return false;
-
-    return true;
+    // The item is usable if either affix type can take a new craft OR replace an
+    // existing crafted mod (e.g. re-rolling a crafted prefix/suffix).
+    return _egCraftingBenchTypeState(item, 'prefix').craftable
+        || _egCraftingBenchTypeState(item, 'suffix').craftable;
 }
 
 function _egCraftingBenchFamilies(item) {
@@ -120,41 +141,30 @@ function _egCraftingBenchFamilies(item) {
     const table = typeof _egGetModTable === 'function' ? _egGetModTable(item) : null;
     if (!table) return [];
 
-    const existingFamilies = new Set((item.mods || []).map(mod => mod.familyId));
+    // Families already present as natural (non-crafted) mods are excluded — you
+    // can't craft a mod that already rolled on the item. Families present as
+    // CRAFTED mods stay eligible so they can be re-rolled / replaced.
+    const naturalFamilies = new Set((item.mods || []).filter(mod => mod.crafted !== true).map(mod => mod.familyId));
     const ilvl = item.itemLevel || 1;
-    const craftedPre = _egCountCraftedMods(item, 'prefix');
-    const craftedSuf = _egCountCraftedMods(item, 'suffix');
-    const regularPre = _egCountRegularMods(item, 'prefix');
-    const regularSuf = _egCountRegularMods(item, 'suffix');
-    const caps = typeof EG_MOD_CAPS !== 'undefined' ? EG_MOD_CAPS[item.rarity] : null;
     const defenses = item.defenses || {};
 
     const result = [];
     for (const type of ['prefix', 'suffix']) {
+        const state = _egCraftingBenchTypeState(item, type);
+        if (!state.craftable) continue;
         const section = table[type + 'es'] || {};
-        const usedCrafted = type === 'prefix' ? craftedPre : craftedSuf;
-        const usedRegular = type === 'prefix' ? regularPre : regularSuf;
-
-        // Determine max slots for this type (regular + crafted combined)
-        let maxForType;
-        if (item.rarity === 'common') {
-            maxForType = EG_CRAFTED_MOD_CAPS[type === 'prefix' ? 'maxPre' : 'maxSuf'];
-        } else {
-            maxForType = caps ? (type === 'prefix' ? caps.maxPre : caps.maxSuf) : 0;
-        }
-
-        const usedTotal = usedRegular + usedCrafted;
-        if (usedTotal >= maxForType) continue;
 
         for (const [familyId, family] of Object.entries(section)) {
-            if (existingFamilies.has(familyId)) continue;
+            if (naturalFamilies.has(familyId)) continue;
             if (typeof _egFamilyAllowedOnBase === 'function' && !_egFamilyAllowedOnBase(familyId, defenses)) continue;
 
             const tiers = (family.tiers || [])
                 .map(tier => ({ ...tier, eligible: tier.ilvl <= ilvl }))
                 .filter(tier => tier.eligible);
 
-            if (tiers.length) result.push({ familyId, family, type, tiers });
+            // isReplace tells the apply/tooltip logic that this craft overwrites
+            // the existing crafted modifier of this type (adding a Scouring cost).
+            if (tiers.length) result.push({ familyId, family, type, tiers, isReplace: state.hasCrafted });
         }
     }
     return result;
@@ -206,26 +216,11 @@ function _egCraftingBenchBuildHTML() {
     const valid = _egCraftingBenchCanUseItem(item);
     const families = valid ? _egCraftingBenchFamilies(item) : [];
 
-    let options = '';
-    for (const entry of families) {
-        const label = LANG === 'de' && entry.family.labelDe ? entry.family.labelDe : entry.family.label;
-        options += `<div class="eg-craft-family ${entry.type}"><div class="eg-craft-family-name ${entry.type}">${entry.type.toUpperCase()} · ${label}</div><div class="eg-craft-tiers">`;
-        for (const tier of entry.tiers) {
-            const selected = _egCraftingBenchSelection &&
-                _egCraftingBenchSelection.familyId === entry.familyId &&
-                _egCraftingBenchSelection.type === entry.type &&
-                _egCraftingBenchSelection.tier === tier.tier;
-            const disabled = !tier.eligible;
-            const costs = _egCraftingBenchCostFor(entry.familyId, tier.tier);
-            const affordable = _egCraftingBenchCanAfford(costs);
-            const costHTML = `<span class="eg-craft-tier-cost ${affordable ? '' : 'missing'}">${_egCraftingBenchCostLabel(costs)}</span>`;
-            const tooltipHTML = _egCraftingBenchTooltipHTML(entry, tier, costs, disabled, affordable);
-            const isDisabled = disabled || !affordable;
-            options += `<button class="eg-craft-tier ${selected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}" ${isDisabled ? 'aria-disabled="true"' : `onclick="_egCraftingBenchSelect('${entry.familyId}', '${entry.type}', ${tier.tier})"`} data-tooltip-html="${tooltipHTML.replace(/"/g, '&quot;')}">${_egCraftingBenchTierLabel(tier)}${costHTML}${disabled ? ' 🔒' : ''}</button>`;
-        }
-        options += '</div></div>';
-    }
+    const prefixFamilies = families.filter(f => f.type === 'prefix');
+    const suffixFamilies = families.filter(f => f.type === 'suffix');
 
+    // Status message is used below (empty-options state and ilvl strip), so it
+    // must be computed BEFORE any markup that may reference it (TDZ guard).
     let status;
     if (!item) {
         status = 'Only non-unique equipment can be crafted';
@@ -244,6 +239,36 @@ function _egCraftingBenchBuildHTML() {
         status = 'Select a modifier to craft.';
     }
 
+    // Render a single family card (title + tier list). Shared by both columns.
+    const buildCards = (columnFamilies) => {
+        let cards = '';
+        for (const entry of columnFamilies) {
+            const label = LANG === 'de' && entry.family.labelDe ? entry.family.labelDe : entry.family.label;
+            cards += `<div class="eg-craft-family ${entry.type}"><div class="eg-craft-family-head"><span class="eg-craft-family-badge ${entry.type}">${entry.type.toUpperCase()}</span><span class="eg-craft-family-name ${entry.type}">${label}</span></div><div class="eg-craft-tiers">`;
+            for (const tier of entry.tiers) {
+                const selected = _egCraftingBenchSelection &&
+                    _egCraftingBenchSelection.familyId === entry.familyId &&
+                    _egCraftingBenchSelection.type === entry.type &&
+                    _egCraftingBenchSelection.tier === tier.tier;
+                const disabled = !tier.eligible;
+                const costs = _egCraftingBenchEffectiveCosts(entry, tier);
+                const affordable = _egCraftingBenchCanAfford(costs);
+                const costHTML = `<span class="eg-craft-tier-cost ${affordable ? '' : 'missing'}">${_egCraftingBenchCostLabel(costs)}</span>`;
+                const tooltipHTML = _egCraftingBenchTooltipHTML(entry, tier, costs, disabled, affordable);
+                const isDisabled = disabled || !affordable;
+                cards += `<button class="eg-craft-tier ${selected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}" ${isDisabled ? 'aria-disabled="true"' : `onclick="_egCraftingBenchSelect('${entry.familyId}', '${entry.type}', ${tier.tier})"`} data-tooltip-html="${tooltipHTML.replace(/"/g, '&quot;')}">${_egCraftingBenchTierLabel(tier)}${costHTML}${disabled ? ' 🔒' : ''}</button>`;
+            }
+            cards += '</div></div>';
+        }
+        return cards;
+    };
+
+    // Two-column layout: prefixes on the left, suffixes on the right.
+    let options = '';
+    if (prefixFamilies.length) options += `<div class="eg-craft-col prefix"><div class="eg-craft-col-head prefix">PREFIX · ${prefixFamilies.length}</div>${buildCards(prefixFamilies)}</div>`;
+    if (suffixFamilies.length) options += `<div class="eg-craft-col suffix"><div class="eg-craft-col-head suffix">SUFFIX · ${suffixFamilies.length}</div>${buildCards(suffixFamilies)}</div>`;
+    if (!options) options = `<div class="eg-craft-empty">${status}</div>`;
+
     const capacityHTML = item ? _egCraftingBenchCapacityHTML(item) : '';
 
     return `<div class="eg-craft-bench-panel"><div class="eg-craft-head"><span class="eg-craft-head-icon">⚒</span><span class="eg-craft-head-title">CRAFTING BENCH</span><button class="eg-craft-close" onclick="_egCloseCraftingBench()" title="Close" aria-label="Close">✕</button></div><h2>⚒ CRAFTING BENCH</h2><div class="eg-craft-body"><div class="eg-craft-bench-item" id="eg-crafting-bench-item" data-eg-dropzone="crafting" ondragover="egDragOver(event)"><span>${item ? _egBuildItemChipHTML(item, 'large') : 'Drop an equipment item here'}</span></div><div class="eg-craft-ilvl">${item ? `Item level: ${item.itemLevel || 1}` : status}</div>${capacityHTML}<div class="eg-craft-options">${options || `<div class="eg-craft-empty">${status}</div>`}</div></div><div class="eg-craft-footer"><div>${_egCraftingBenchCostHTML()}</div><button class="eg-craft-apply" onclick="_egCraftingBenchApply()" ${!_egCraftingBenchSelection ? 'disabled' : ''}>CRAFT SELECTED MODIFIER</button></div></div>`;
@@ -256,6 +281,9 @@ function _egEnsureCraftingBenchOverlay() {
     overlay.className = 'eg-craft-overlay';
     overlay.innerHTML = _egCraftingBenchBuildHTML();
     overlay.addEventListener('click', (e) => { if (e.target === overlay) _egCloseCraftingBench(); });
+    // Capture-phase scroll listener keeps the surviving scroll store in sync
+    // while the panel is displayed (scroll events don't bubble to the overlay).
+    overlay.addEventListener('scroll', () => _egCraftingBenchSyncScrollStore(overlay), true);
     document.body.appendChild(overlay);
     _egCraftingBenchBindDrop(overlay);
     _egCraftingBenchBindTooltips(overlay);
@@ -274,10 +302,38 @@ function _egCraftingBenchBindDrop(overlay) {
     });
 }
 
-function _egRefreshCraftingBench() {
+// Persist the current scrollTop of each column into the surviving store. Called
+// from a delegated scroll listener (while displayed) and on close.
+function _egCraftingBenchSyncScrollStore(overlay) {
+    if (!overlay) return;
+    overlay.querySelectorAll('.eg-craft-col').forEach(el => {
+        const type = el.classList.contains('prefix') ? 'prefix' : 'suffix';
+        _egCraftingBenchScroll[type] = el.scrollTop;
+    });
+}
+
+// Restore each column's remembered scrollTop after a rebuild. The browser clamps
+// the value if the column is shorter now than when the position was stored.
+function _egCraftingBenchRestoreScroll(overlay) {
+    if (!overlay) return;
+    overlay.querySelectorAll('.eg-craft-col').forEach(el => {
+        const type = el.classList.contains('prefix') ? 'prefix' : 'suffix';
+        const t = _egCraftingBenchScroll[type];
+        if (typeof t === 'number') el.scrollTop = t;
+    });
+}
+
+function _egRefreshCraftingBench(preserveScroll = false, captureCurrent = false) {
     const overlay = document.getElementById('eg-crafting-bench-overlay');
     if (!overlay) return;
+    // While interacting (select/apply), refresh the store from the live DOM so the
+    // restore below returns to the exact position the user is reading, even before
+    // the scroll listener fires. On open we skip capture: the overlay was just
+    // shown and its column scroll is reset to 0 by display:none, so capturing would
+    // wipe the remembered position.
+    if (captureCurrent) _egCraftingBenchSyncScrollStore(overlay);
     overlay.innerHTML = _egCraftingBenchBuildHTML();
+    if (preserveScroll) _egCraftingBenchRestoreScroll(overlay);
     _egCraftingBenchBindDrop(overlay);
     _egCraftingBenchBindTooltips(overlay);
 }
@@ -286,12 +342,17 @@ function _egOpenCraftingBench() {
     _egEnsureCraftingBenchOverlay();
     const overlay = document.getElementById('eg-crafting-bench-overlay');
     overlay.classList.add('show');
-    _egRefreshCraftingBench();
+    _egRefreshCraftingBench(true);
 }
 
 function _egCloseCraftingBench() {
     const overlay = document.getElementById('eg-crafting-bench-overlay');
-    if (overlay) overlay.classList.remove('show');
+    if (overlay) {
+        // Remember where the user was before the overlay hides (display:none
+        // would otherwise wipe scrollTop), then hide.
+        _egCraftingBenchSyncScrollStore(overlay);
+        overlay.classList.remove('show');
+    }
     _egCraftingBenchSelection = null;
 }
 
@@ -309,7 +370,7 @@ window.addEventListener('keydown', (e) => {
 
 function _egCraftingBenchSelect(familyId, type, tier) {
     _egCraftingBenchSelection = { familyId, type, tier };
-    _egRefreshCraftingBench();
+    _egRefreshCraftingBench(true, true);
 }
 
 function _egCraftingBenchApply() {
@@ -324,7 +385,7 @@ function _egCraftingBenchApply() {
 
     if (!entry || !tier) return;
 
-    const costs = _egCraftingBenchCostFor(entry.familyId, tier.tier);
+    const costs = _egCraftingBenchEffectiveCosts(entry, tier);
     const missingCosts = costs.filter(cost => _egCraftCurrencyCount(cost.id) < cost.count);
     if (missingCosts.length) {
         const missing = missingCosts.map(cost => {
@@ -345,6 +406,8 @@ function _egCraftingBenchApply() {
         _egRenderCurrencyCell(pos.r, pos.c);
     }
 
+    // If this craft replaces an existing crafted modifier of the same type, drop
+    // the old one so it gets re-rolled (one crafted prefix + one crafted suffix max).
     const newMod = {
         familyId: entry.familyId,
         type: entry.type,
@@ -352,19 +415,23 @@ function _egCraftingBenchApply() {
         rolledStats: _egBuildRolledStats(entry.family, tier),
         crafted: true,
     };
-    item.mods = [...(item.mods || []), newMod];
+    const baseMods = (item.mods || []).filter(m => !(entry.isReplace && m.type === entry.type && m.crafted === true));
+    item.mods = [...baseMods, newMod];
     item.name = _egBuildItemName(item.baseName || item.name, item.rarity, item.mods);
 
     _egCraftingBenchSelection = null;
     _egRenderAll();
     egSaveHubState();
-    _egRefreshCraftingBench();
+    _egRefreshCraftingBench(true, true);
 }
 
 function _egSetCraftingBenchItem(item) {
     if (!item || item.category !== 'equip' || !item.slotType) return false;
+    // Uniques can never be crafted or placed on the bench.
+    if (item.isUnique) return false;
     _egCraftingBenchItem = item;
     _egCraftingBenchSelection = null;
+    _egCraftingBenchScroll = {};   // a new bench item starts from the top
     _egRefreshCraftingBench();
     if (typeof _egUpdateCraftingBenchLauncherSlot === 'function') _egUpdateCraftingBenchLauncherSlot();
     return true;

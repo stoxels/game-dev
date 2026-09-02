@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------
+﻿//------------------------------------------------------------------------
 //-------------------HELMET MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
 
@@ -1476,7 +1476,7 @@ const EG_MOD_TABLE_SHOULDERS = {
         // Overkill damage bleeds into nearby spawn locations.
         overkill: {
             id: 'overkill',
-            label: '#% Chance for Overkill Damage to spread to a nearby Monster', labelDe: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster überspringt',
+            label: '#% increased Overkill Damage transferred to a nearby Monster', labelDe: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird',
             tiers: [
                 { tier: 1, min: 22, max: 30, weight: 80, ilvl: 82 },
                 { tier: 2, min: 13, max: 21, weight: 200, ilvl: 60 },
@@ -5677,6 +5677,26 @@ const EG_MOD_TABLE_RING = {
 const EG_MOD_TABLE_ARCANE = {
     prefixes: {
 
+        // Individual class-ability cooldown reductions.
+        cooldown_tail_risk: { id: 'cooldown_tail_risk', label: 'Tail Risk Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_speedforce: { id: 'cooldown_speedforce', label: 'Speedforce Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_regression_to_prior: { id: 'cooldown_regression_to_prior', label: 'Regression to Prior Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_significance_threshold: { id: 'cooldown_significance_threshold', label: 'Significance Threshold Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_residual: { id: 'cooldown_residual', label: 'Residual Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_degrees_of_freedom: { id: 'cooldown_degrees_of_freedom', label: 'Degrees of Freedom Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_state_rollback: { id: 'cooldown_state_rollback', label: 'State Rollback Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_transition_matrix: { id: 'cooldown_transition_matrix', label: 'Transition Matrix Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_bayes_traps: { id: 'cooldown_bayes_traps', label: 'Bayes Traps Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_type_i_error_shield: { id: 'cooldown_type_i_error_shield', label: 'Type I Error Shield Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_brownian_motion: { id: 'cooldown_brownian_motion', label: 'Brownian Motion Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_drifter: { id: 'cooldown_drifter', label: 'Drifter Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+
+        cooldown_arcane_reveal: { id: 'cooldown_arcane_reveal', label: 'Arcane Reveal Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_absolute_zero: { id: 'cooldown_absolute_zero', label: 'Absolute Zero Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_data_strike: { id: 'cooldown_data_strike', label: 'Data Strike Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_diagonal_strike: { id: 'cooldown_diagonal_strike', label: 'Diagonal Strike Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_precision_shot: { id: 'cooldown_precision_shot', label: 'Precision Shot Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
+        cooldown_rain_of_arrows: { id: 'cooldown_rain_of_arrows', label: 'Rain Of Arrows Cooldown Recovery: # seconds', tiers: [{ tier: 1, min: 45, max: 60, weight: 45, ilvl: 84 }, { tier: 2, min: 30, max: 44, weight: 120, ilvl: 64 }, { tier: 3, min: 15, max: 29, weight: 300, ilvl: 40 }, { tier: 4, min: 5, max: 14, weight: 720, ilvl: 15 }] },
         // --- MANA (primary resource for this slot) ---
         flat_mana: {
             id: 'flat_mana',

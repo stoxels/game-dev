@@ -407,7 +407,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 12, str: 46, agi: 0, int: 0 },
         damage: { min: 38, max: 76 }, attackIntervalSeconds: 6.4,
         bonuses: [
-            { key: 'overkill', value: 25, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'overkill', value: 25, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'life_on_kill', value: 5, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' }
         ],
         downsides: [
@@ -910,7 +910,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 78, str: 0, agi: 0, int: 0 },
         bonuses: [
             { key: 'fate', value: 35, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
-            { key: 'overkill', value: 30, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'overkill', value: 30, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'flat_health', value: 88, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'flat_mana', value: 70, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
@@ -1402,7 +1402,7 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'chain', value: 30, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
-            { key: 'overkill', value: 20, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'overkill', value: 20, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'accuracy', value: 65, en: '+# Accuracy', de: '+# Präzision' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
@@ -2359,7 +2359,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 59, str: 0, agi: 0, int: 224 },
         bonuses: [
             { key: 'chance_to_convert', value: 18, en: '#% chance to Convert Monsters on kill', de: '#% Chance, Monster bei Kills zu konvertieren' },
-            { key: 'overkill', value: 20, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'overkill', value: 20, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'flat_health', value: 79, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'flat_mana', value: 55, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
@@ -2878,7 +2878,7 @@ const EG_UNIQUE_ITEMS = [
         minLevel: 68,
         requirements: { level: 68, str: 258, agi: 0, int: 0 },
         bonuses: [
-            { key: 'overkill', value: 30, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'overkill', value: 30, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'cleave', value: 25, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
             { key: 'flat_health', value: 73, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
@@ -3453,7 +3453,7 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 256, max: 512 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'snipe', value: 35, en: '#% chance for Projectiles to Snipe (double damage)', de: '#% Chance auf Sniping (doppelter Schaden)' },
-            { key: 'overkill', value: 25, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'overkill', value: 25, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
@@ -5940,7 +5940,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 72, str: 120, agi: 120, int: 40 },
         damage: { min: 260, max: 420 }, attackIntervalSeconds: 5.5,
         bonuses: [
-            { key: 'overkill', value: 35, en: '#% chance for Overkill Damage to spread to a nearby Monster', de: '#% Chance, dass überschüssiger Schaden auf ein nahes Monster übergeht' },
+            { key: 'overkill', value: 35, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'life_leech', value: 5, en: '#% of Damage Leeched as Life', de: '#% des Schadens als Leben abgesaugt' },
             { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'accuracy', value: 85, en: '+# Accuracy', de: '+# Präzision' }

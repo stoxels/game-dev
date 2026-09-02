@@ -1,13 +1,13 @@
 #eg-crafting-bench-overlay { display:none; position:fixed; inset:0; z-index:700; align-items:center; justify-content:center; padding:16px; background:rgba(5,8,14,0.78); backdrop-filter:blur(2px); pointer-events:none; }
 #eg-crafting-bench-overlay.show { display:flex; pointer-events:auto; }
-.eg-craft-bench-panel { width:min(920px,96vw); max-height:92vh; display:flex; flex-direction:column; position:relative; box-sizing:border-box; overflow:hidden; color:var(--accent2,#e8e0cc); background:var(--panel,#222630); border:1px solid var(--border2,#656f96); border-radius:8px; box-shadow:0 0 0 1px rgba(0,0,0,0.55),0 0 26px rgba(102,252,241,0.10),0 22px 48px rgba(0,0,0,0.55); pointer-events:auto; }
+.eg-craft-bench-panel { width:min(1080px,96vw); max-height:92vh; display:flex; flex-direction:column; position:relative; box-sizing:border-box; overflow:hidden; color:var(--accent2,#e8e0cc); background:var(--panel,#222630); border:1px solid var(--border2,#656f96); border-radius:8px; box-shadow:0 0 0 1px rgba(0,0,0,0.55),0 0 26px rgba(102,252,241,0.10),0 22px 48px rgba(0,0,0,0.55); pointer-events:auto; }
 .eg-craft-head { display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--border,#4a5475); background:linear-gradient(180deg, rgba(102,252,241,0.07), rgba(102,252,241,0.02)); flex-shrink:0; }
 .eg-craft-head-icon { font-size:16px; line-height:1; color:var(--accent,#66fcf1); text-shadow:0 0 8px rgba(102,252,241,0.5); }
 .eg-craft-head-title { flex:1; min-width:0; font-family:var(--PX, monospace); font-size:11px; letter-spacing:2px; color:var(--accent,#66fcf1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .eg-craft-bench-panel h2 { display:none; }
 .eg-craft-close { width:24px; height:24px; flex-shrink:0; font-family:var(--PX, monospace); font-size:10px; line-height:1; color:var(--accent2,#fff); background:transparent; border:1px solid var(--border2,#656f96); border-radius:4px; cursor:pointer; transition:all 0.12s; }
 .eg-craft-close:hover { color:#ff6b6b; border-color:rgba(255,107,107,0.6); background:rgba(255,107,107,0.12); }
-.eg-craft-body { flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; padding:12px 14px; display:flex; flex-direction:column; gap:10px; scrollbar-width:thin; scrollbar-color:var(--border2,#656f96) transparent; }
+.eg-craft-body { flex:1; min-height:0; overflow:hidden; padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
 .eg-craft-body::-webkit-scrollbar { width:8px; }
 .eg-craft-body::-webkit-scrollbar-track { background:transparent; }
 .eg-craft-body::-webkit-scrollbar-thumb { background:var(--border2,#656f96); border-radius:4px; }
@@ -22,28 +22,42 @@
 .eg-craft-drop-active { border-color:var(--accent,#66fcf1) !important; background:rgba(102,252,241,0.08) !important; }
 .eg-craft-bench-item { min-height:74px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border,#4a5475); background:rgba(0,0,0,.18); border-radius:4px; }
 .eg-craft-bench-item .eg-item-chip { width:70px; height:70px; }
-.eg-craft-ilvl { padding:6px 8px; text-align:center; color:var(--setup-opt-inactive,#b6aa91); font-family:var(--PX, monospace); font-size:8px; letter-spacing:1px; background:rgba(0,0,0,0.14); border:1px solid var(--border,#4a5475); border-radius:4px; }
-.eg-craft-capacity { display:flex; justify-content:space-between; gap:8px; padding:8px 10px; background:rgba(0,0,0,.18); border:1px solid var(--border,#4a5475); border-radius:4px; font-family:var(--PX, monospace); font-size:7px; letter-spacing:1px; color:var(--setup-opt-inactive,#b6aa91); }
+.eg-craft-ilvl { padding:6px 8px; text-align:center; color:var(--setup-opt-inactive,#b6aa91); font-family:var(--PX, monospace); font-size:9px; letter-spacing:1px; background:rgba(0,0,0,0.14); border:1px solid var(--border,#4a5475); border-radius:4px; }
+.eg-craft-capacity { display:flex; justify-content:space-between; gap:8px; padding:8px 10px; background:rgba(0,0,0,.18); border:1px solid var(--border,#4a5475); border-radius:4px; font-family:var(--PX, monospace); font-size:8px; letter-spacing:1px; color:var(--setup-opt-inactive,#b6aa91); }
 .eg-craft-capacity-item { display:flex; align-items:center; gap:6px; }
 .eg-craft-capacity-bar { width:80px; height:6px; background:rgba(0,0,0,0.35); border:1px solid var(--border,#4a5475); border-radius:3px; overflow:hidden; }
 .eg-craft-capacity-fill { height:100%; background:var(--accent,#66c9ff); transition:width 0.2s; }
-.eg-craft-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:8px; }
+.eg-craft-options { flex:1 1 auto; min-height:0; display:flex; gap:12px; align-items:stretch; width:100%; }
+.eg-craft-col { flex:1 1 auto; min-width:0; min-height:0; display:flex; flex-direction:column; gap:8px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border2,#656f96) transparent; }
+.eg-craft-col::-webkit-scrollbar { width:8px; }
+.eg-craft-col::-webkit-scrollbar-track { background:transparent; }
+.eg-craft-col::-webkit-scrollbar-thumb { background:var(--border2,#656f96); border-radius:4px; }
+.eg-craft-col-head { position:sticky; top:0; z-index:3; flex-shrink:0; padding:6px 10px; font-family:var(--PX, monospace); font-size:9px; letter-spacing:2px; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-radius:3px; background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)), var(--panel,#222630); border:1px solid var(--border,#4a5475); box-shadow:0 2px 6px rgba(0,0,0,0.35); }
+.eg-craft-col-head.prefix { color:#8fd9ff; border-color:rgba(102,201,255,0.4); }
+.eg-craft-col-head.suffix { color:#f7dfa0; border-color:rgba(241,210,123,0.4); }
+@media (max-width:720px) { .eg-craft-options { flex-direction:column; } }
 .eg-craft-family { border:1px solid var(--border,#4a5475); border-radius:4px; padding:10px; background:rgba(255,255,255,.03); transition:border-color 0.12s; }
 .eg-craft-family:hover { border-color:rgba(102,252,241,0.25); }
 .eg-craft-family.prefix { border-left:3px solid #66c9ff; }
 .eg-craft-family.suffix { border-left:3px solid #f1d27b; }
-.eg-craft-family-name { margin-bottom:8px; font-family:var(--PX, monospace); font-size:7px; letter-spacing:1.5px; font-weight:bold; text-transform:uppercase; }
-.eg-craft-family-name.prefix { color:#66c9ff; }
-.eg-craft-family-name.suffix { color:#f1d27b; }
-.eg-craft-tiers { display:flex; flex-wrap:wrap; gap:4px; }
-.eg-craft-tier { padding:6px 10px; border:1px solid var(--border2,#656f96); background:rgba(0,0,0,0.22); color:var(--accent2,#d9e1f2); text-align:left; cursor:pointer; font-family:var(--PX, monospace); font-size:7px; letter-spacing:0.5px; border-radius:3px; white-space:nowrap; min-width:120px; transition:all 0.12s; }
+.eg-craft-family-head { display:flex; align-items:center; gap:7px; margin-bottom:8px; }
+.eg-craft-family-badge { flex-shrink:0; padding:3px 6px; font-family:var(--PX, monospace); font-size:7px; letter-spacing:1px; border-radius:3px; }
+.eg-craft-family-badge.prefix { color:#0c1016; background:#66c9ff; }
+.eg-craft-family-badge.suffix { color:#241c08; background:#f1d27b; }
+.eg-craft-family-name { min-width:0; font-family:var(--PX, monospace); font-size:11px; letter-spacing:0.5px; font-weight:bold; text-transform:uppercase; line-height:1.35; }
+.eg-craft-family-name.prefix { color:#8fd9ff; }
+.eg-craft-family-name.suffix { color:#f7dfa0; }
+.eg-craft-tiers { display:flex; flex-direction:column; gap:4px; }
+.eg-craft-tier { display:flex; align-items:center; flex-wrap:wrap; gap:2px 8px; padding:6px 10px; border:1px solid var(--border2,#656f96); background:rgba(0,0,0,0.22); color:var(--accent2,#d9e1f2); text-align:left; cursor:pointer; font-family:var(--PX, monospace); font-size:9px; letter-spacing:0.5px; line-height:1.5; border-radius:3px; min-width:120px; transition:all 0.12s; }
 .eg-craft-tier:hover,.eg-craft-tier.selected { border-color:var(--accent,#66fcf1); background:rgba(102,252,241,0.10); color:#fff; }
 .eg-craft-tier.disabled { color:#6a7282; border-color:rgba(101,111,150,0.35); background:rgba(0,0,0,0.18); cursor:not-allowed; opacity:.6; }
 .eg-craft-tier .tier-label { color:var(--yellow,#f1d27b); }
 .eg-craft-tier .tier-range { color:#a8c8e8; margin-left:6px; }
-.eg-craft-tier .eg-craft-tier-cost { display:block; margin-top:3px; color:#d8c58d; font-size:6px; }
+.eg-craft-tier .eg-craft-tier-cost { display:inline-block; margin-left:8px; color:#d8c58d; font-size:8px; }
+.eg-craft-tier .eg-craft-tier-cost::before { content:'·'; margin-right:8px; color:var(--accent2,#d9e1f2); opacity:.55; }
 .eg-craft-tier .eg-craft-tier-cost.missing { color:#e87d70; font-weight:bold; }
-.eg-craft-empty { grid-column:1/-1; padding:22px; text-align:center; color:var(--setup-opt-inactive,#a89978); font-family:var(--PX, monospace); font-size:8px; letter-spacing:1px; border:1px dashed var(--border,#4a5475); border-radius:4px; background:rgba(255,255,255,0.02); }
+.eg-craft-tier .eg-craft-tier-cost.missing::before { content:''; margin-right:0; }
+.eg-craft-empty { flex:1 1 auto; align-self:stretch; width:100%; padding:22px; text-align:center; color:var(--setup-opt-inactive,#a89978); font-family:var(--PX, monospace); font-size:8px; letter-spacing:1px; border:1px dashed var(--border,#4a5475); border-radius:4px; background:rgba(255,255,255,0.02); }
 .eg-craft-footer { flex-shrink:0; border-top:1px solid var(--border,#4a5475); background:rgba(0,0,0,0.18); padding:10px 14px 12px; display:flex; flex-direction:column; gap:9px; }
 .eg-craft-cost { margin-right:12px; color:#d8c58d; font-size:.75rem; }
 .eg-craft-cost-missing { color:#e87d70; font-weight:bold; }

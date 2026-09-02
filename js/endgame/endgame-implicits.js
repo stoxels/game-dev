@@ -171,7 +171,7 @@ const EG_IMPLICIT_POOL_BY_SLOT = {
     ring:      ['flat_health','flat_mana','strength','agility','intelligence','fire_resist','cold_resist','lightning_resist','shadow_resist','life_regen','mana_regen','crit_chance','spell_damage','accuracy'],
     amulet:    ['flat_health','flat_mana','strength','agility','intelligence','fire_resist','cold_resist','lightning_resist','shadow_resist','crit_chance','crit_multiplier','spell_damage','accuracy'],
     talisman:  ['flat_health','flat_mana','strength','agility','intelligence','fire_resist','cold_resist','lightning_resist','dodge','crit_chance','spell_damage'],
-    arcane:    ['flat_health','flat_mana','intelligence','spell_damage','crit_chance','crit_multiplier','accuracy','mana_regen'],
+    arcane:    ['flat_health','flat_mana','intelligence','spell_damage','crit_chance','crit_multiplier','accuracy','mana_regen','cooldown_arcane_reveal','cooldown_absolute_zero','cooldown_data_strike','cooldown_diagonal_strike','cooldown_precision_shot','cooldown_rain_of_arrows','cooldown_tail_risk','cooldown_speedforce','cooldown_regression_to_prior','cooldown_significance_threshold','cooldown_residual','cooldown_degrees_of_freedom','cooldown_state_rollback','cooldown_transition_matrix','cooldown_bayes_traps','cooldown_type_i_error_shield','cooldown_brownian_motion','cooldown_drifter'],
     weapon:    ['inc_physical_damage','flat_physical_damage','crit_chance','crit_multiplier','attack_speed','accuracy','spell_damage'],
     shield:    ['block_chance','flat_health','strength','inc_armour','inc_absorption','life_regen','spell_damage'],
     ranged:    ['flat_physical_damage','inc_physical_damage','crit_chance','crit_multiplier','accuracy','attack_speed','spell_damage'],

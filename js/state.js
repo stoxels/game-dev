@@ -242,6 +242,9 @@ function buildFreshState() {
             typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8
         ),
         egMapSlotItem: null,
+        // Unique Stash — PoE-style collection tab: one slot per EG_UNIQUE_ITEMS entry
+        egUniqueStash: {},
+        egUniqueCollected: [],
     };
 }
 
@@ -365,6 +368,24 @@ function _migrateEndgameFields(s) {
     }
     if (s.egMapSlotItem === undefined) s.egMapSlotItem = null;
     if (s.egMapStashActiveTier === undefined) s.egMapStashActiveTier = 1;
+    if (!s.egUniqueStash || typeof s.egUniqueStash !== 'object' || Array.isArray(s.egUniqueStash)) s.egUniqueStash = {};
+    // Normalise each entry to array
+    for (const k of Object.keys(s.egUniqueStash)) {
+        if (!Array.isArray(s.egUniqueStash[k])) s.egUniqueStash[k] = s.egUniqueStash[k] ? [s.egUniqueStash[k]] : [];
+    }
+    if (!s.egUniqueCollected || !Array.isArray(s.egUniqueCollected)) s.egUniqueCollected = [];
+    // Derive collected from stash if missing (legacy)
+    if (s.egUniqueCollected.length === 0) {
+        for (const [uid, arr] of Object.entries(s.egUniqueStash)) {
+            if (Array.isArray(arr) && arr.length > 0 && !s.egUniqueCollected.includes(uid)) s.egUniqueCollected.push(uid);
+        }
+        // also scan inventory for uniques that somehow stayed there
+        if (Array.isArray(s.egInventory)) {
+            for (let r=0;r<s.egInventory.length;r++) for(let c=0;c<(s.egInventory[r]||[]).length;c++){
+                const it=s.egInventory[r]&&s.egInventory[r][c]; if(it&&it.isUnique&&it.baseId&&!s.egUniqueCollected.includes(it.baseId)) s.egUniqueCollected.push(it.baseId);
+            }
+        }
+    }
 }
 
 // migrateOldSave — fills in any fields that are missing from an older save.

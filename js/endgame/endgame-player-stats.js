@@ -275,7 +275,7 @@ function _egBuildMergedModLines(mods) {
             const matches = stat.label.match(NUM_RE);
             // Lines without any numeric value can't be meaningfully merged.
             if (!matches || matches.length === 0) {
-                groups.push({ label: stat.label, downside, tierLabel: _tierTag(mod), contributions: [{ type: mod.type, tier: mod.tier }] });
+                groups.push({ label: stat.label, downside, tierLabel: _tierTag(mod), contributions: [{ type: mod.type, tier: mod.tier, crafted: mod.crafted === true }] });
                 return;
             }
             const key = (downside ? 'down' : 'norm') + '|' +
@@ -290,7 +290,7 @@ function _egBuildMergedModLines(mods) {
                 const v = parseFloat(String(raw).replace(',', '.'));
                 if (!isNaN(v) && g.slots[i]) g.slots[i].push(v);
             });
-            g.contributions.push({ type: mod.type, tier: mod.tier });
+            g.contributions.push({ type: mod.type, tier: mod.tier, crafted: mod.crafted === true });
             g.count++;
         });
     });
@@ -298,7 +298,7 @@ function _egBuildMergedModLines(mods) {
     return groups.map(g => {
         // Lines without any numeric value were pushed with { label } only
         // (no template/count/slots) — return them verbatim.
-        if (g.template == null) return { label: g.label, downside: g.downside, tierLabel: g.tierLabel, contributions: g.contributions };
+        if (g.template == null) return { label: g.label, downside: g.downside, tierLabel: g.tierLabel, contributions: g.contributions, crafted: (g.contributions || []).every(c => c.crafted) };
         let label;
         if (g.count <= 1) {
             label = g.template;
@@ -315,7 +315,7 @@ function _egBuildMergedModLines(mods) {
             const tier = c.tier != null ? String(c.tier) : '?';
             return pfx ? pfx + tier : tier;
         }).join('+');
-        return { label, downside: g.downside, tierLabel, contributions: g.contributions };
+        return { label, downside: g.downside, tierLabel, contributions: g.contributions, crafted: (g.contributions || []).every(c => c.crafted) };
     });
 }
 
@@ -1106,7 +1106,7 @@ const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_arcane', buckets: [
             'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
             'channelMaxStacks', 'arcaneSurgeStreak', 'arcaneSurgeMana',
-            'manaToDamagePct', 'fatePct'] },
+            'manaToDamagePct'] },
     ],
     defense: [
         { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption'] },
@@ -1117,7 +1117,8 @@ const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_block_dodge', buckets: [
             'blockChance', 'spellBlockChance', 'blockRecoveryPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
-            'parryChancePct', 'deflectChancePct', 'deflectDamagePct'] },
+            'parryChancePct', 'deflectChancePct', 'deflectDamagePct',
+            'fatePct'] },
         { catKey: 'eg_statcat_resistances', buckets: [
             'fireResist', 'coldResist', 'lightningResist', 'shadowResist',
             'arcaneResistFlat'] },
@@ -1371,7 +1372,7 @@ Damage stats: (damage of player projectiles should scale with ranged weapon slot
 
     + pushback: pushes monsters attack timer back by X additional seconds
 
-    + overkill: chance to have overkill damage spread to a nearby monster
+    + overkill: increases the overkill damage transferred to a nearby monster
 
 
 

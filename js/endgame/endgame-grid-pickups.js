@@ -1065,31 +1065,49 @@ function _egStopLootDrops() {
 function _egFlushRunLootToStash() {
     if (_egRunLoot.length === 0) return;
 
-    let placed = 0;
+    let placedInv = 0, placedUniq = 0;
     for (const item of _egRunLoot) {
+        const isUniq = !!(item && item.isUnique);
         if (typeof _egAddItemToStash === 'function') {
+            // _egAddItemToStash routes uniques to the collection (which toasts itself); suppress its internal toast during bulk flush
+            // Temporarily mute unique toasts by flag
+            const prevMute = (typeof window !== 'undefined' ? window._egMuteUniqueToast : false);
+            if (isUniq && typeof window !== 'undefined') window._egMuteUniqueToast = true;
             _egAddItemToStash(item);
-            placed++;
+            if (typeof window !== 'undefined') window._egMuteUniqueToast = prevMute;
+            if (isUniq) placedUniq++; else placedInv++;
         } else {
-            // fallback if hub helpers not yet loaded
-            let done = false;
-            for (let r = 0; r < _egInventory.length && !done; r++) {
-                for (let c = 0; c < EG_INV_COLS && !done; c++) if (!_egInventory[r][c]) { _egInventory[r][c] = item; done = true; placed++; }
-            }
-            if (!done) {
-                _egInventory.push(Array(EG_INV_COLS).fill(null));
-                _egInventory[_egInventory.length - 1][0] = item;
-                placed++;
+            if (isUniq && typeof _egAddUniqueToCollection === 'function') { _egAddUniqueToCollection(item); placedUniq++; }
+            else {
+                let done = false;
+                for (let r = 0; r < _egInventory.length && !done; r++) {
+                    for (let c = 0; c < EG_INV_COLS && !done; c++) if (!_egInventory[r][c]) { _egInventory[r][c] = item; done = true; placedInv++; }
+                }
+                if (!done) {
+                    _egInventory.push(Array(EG_INV_COLS).fill(null));
+                    _egInventory[_egInventory.length - 1][0] = item;
+                    placedInv++;
+                }
             }
         }
     }
 
-    if (placed > 0) {
-        showToast(placed === 1
-            ? t('eg_stash_added_one')
-            : t('eg_stash_added_many').replace('{n}', placed));
-        // Re-render the stash grid if the hub screen is currently visible
+    if (placedInv > 0 || placedUniq > 0) {
+        if (placedUniq > 0 && placedInv === 0) {
+            // uniques only — single aggregate toast handled via collection helper? Provide one aggregate
+            showToast(placedUniq === 1
+                ? t('eg_unique_added_to_collection').replace('{name}', _egRunLoot.find(i=>i.isUnique)?.name || 'Unique')
+                : t('eg_stash_added_many').replace('{n}', placedUniq) + ' → Unique Collection');
+        } else if (placedUniq > 0 && placedInv > 0) {
+            showToast(t('eg_stash_added_many').replace('{n}', placedInv) + ` + ${placedUniq} Unique(s) → Collection`);
+        } else {
+            showToast(placedInv === 1
+                ? t('eg_stash_added_one')
+                : t('eg_stash_added_many').replace('{n}', placedInv));
+        }
+        // Re-render the stash grids if the hub screen is currently visible
         if (typeof _egRenderInventory === 'function') _egRenderInventory();
+        if (typeof _egRenderUniqueStash === 'function') _egRenderUniqueStash();
         if (typeof _egRebuildInventoryGrid === 'function') _egRebuildInventoryGrid();
         if (typeof egSaveHubState === 'function') egSaveHubState();
     }

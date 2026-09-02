@@ -51,6 +51,11 @@ const EG_INV_INITIAL_ROWS = 5;
 const EG_INV_ROWS = EG_INV_INITIAL_ROWS; // initial/minimum rows; stash grows unlimited beyond this
 const EG_INV_COLS = 24;
 
+// ── Unique Collection tab state ────────────────────────────────────────
+let _egUniqueStash = {}; // uniqueId -> array of item objects
+let _egUniqueCollected = new Set(); // strings of uniqueIds ever found
+let _egStashTab = 'inventory'; // 'inventory' | 'uniques'
+
 // ── Unlimited stash helpers (must sit after EG_INV_ROWS/COLS so _egInventory exists) ──
 function _egGetInvRows() { return _egInventory ? _egInventory.length : EG_INV_INITIAL_ROWS; }
 function _egGetInvCapacity() { return _egGetInvRows() * EG_INV_COLS; }
@@ -82,11 +87,91 @@ function _egFindFreeInvCell() {
     return { r, c: 0 };
 }
 function _egAddItemToStash(item) {
+    // Uniques never land in the regular inventory — they go to the Unique Collection
+    if (item && item.isUnique && item.baseId) {
+        _egAddUniqueToCollection(item);
+        return { r: -1, c: -1, unique: true };
+    }
     const pos = _egFindFreeInvCell();
     _egInventory[pos.r][pos.c] = item;
     _egRenderInventoryCell(pos.r, pos.c);
     _egUpdateInvCount();
     return pos;
+}
+
+// ── Unique Collection helpers ────────────────────────────────────────
+function _egEnsureUniqueStash() {
+    if (!_egUniqueStash || typeof _egUniqueStash !== 'object' || Array.isArray(_egUniqueStash)) _egUniqueStash = {};
+    if (!_egUniqueCollected || typeof _egUniqueCollected.has !== 'function') {
+        // may have been restored as array from STATE
+        const arr = Array.isArray(_egUniqueCollected) ? _egUniqueCollected : [];
+        _egUniqueCollected = new Set(arr);
+    }
+}
+function _egAddUniqueToCollection(item) {
+    _egEnsureUniqueStash();
+    const uid = item.baseId || item.uniqueId || item.id;
+    if (!uid) return;
+    if (!_egUniqueStash[uid]) _egUniqueStash[uid] = [];
+    _egUniqueStash[uid].push(item);
+    _egUniqueCollected.add(uid);
+    // update unique grid if visible
+    if (_egStashTab === 'uniques') _egRenderUniqueStash();
+    _egUpdateUniqueTabBadge();
+    try { egSaveHubState(); } catch(e) {}
+    // toast — muted during bulk flush
+    if (typeof window !== 'undefined' && window._egMuteUniqueToast) return;
+    try {
+        const nm = item.name || uid;
+        showToast(t('eg_unique_added_to_collection').replace('{name}', nm), '#f5b642');
+        if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_equip_pickup');
+    } catch(e) {}
+}
+function _egGetUniqueCount(uid) {
+    _egEnsureUniqueStash();
+    const arr = _egUniqueStash[uid];
+    return Array.isArray(arr) ? arr.length : 0;
+}
+function _egIsUniqueCollected(uid) {
+    _egEnsureUniqueStash();
+    return _egUniqueCollected.has(uid);
+}
+function _egUpdateUniqueTabBadge() {
+    _egEnsureUniqueStash();
+    const btn = document.getElementById('eg-tab-uniques');
+    if (!btn) return;
+    const total = (typeof EG_UNIQUE_ITEMS !== 'undefined' ? EG_UNIQUE_ITEMS.length : 0);
+    const found = _egUniqueCollected.size;
+    let badge = btn.querySelector('.eg-tab-count');
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'eg-tab-count';
+        btn.appendChild(badge);
+    }
+    badge.textContent = `${found}/${total}`;
+}
+function _egMoveUniqueToInventory(uid) {
+    _egEnsureUniqueStash();
+    const arr = _egUniqueStash[uid];
+    if (!arr || arr.length === 0) return false;
+    const item = arr.shift();
+    // keep empty array so cell stays in 'collected-empty' state instead of reverting to locked '?'
+    if (arr.length === 0) _egUniqueStash[uid] = [];
+    // keep collected set (never remove)
+    const pos = _egFindFreeInvCell();
+    // _egEnsureInvRows already inside
+    _egInventory[pos.r][pos.c] = item;
+    _egRenderInventoryCell(pos.r, pos.c);
+    _egRenderUniqueStash();
+    _egUpdateInvCount();
+    _egUpdateUniqueTabBadge();
+    try { egSaveHubState(); } catch(e) {}
+    try {
+        showToast(t('eg_unique_moved_to_inventory').replace('{name}', item.name || uid), '#f5b642');
+        if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_equip_pickup');
+    } catch(e) {}
+    // ensure inventory tab visible after move? keep on uniques so player can move more
+    return true;
 }
 
 // ── Orbs & Shards currency tab (PoE-style fixed slots) ──
@@ -617,13 +702,12 @@ function _egBuildInventoryGridHTML() {
 }
 
 // Assembles the full-width stash panel at the bottom of the screen.
-// Header now carries two stash actions: ⚙ opens the mass-sell filter modal,
-// ⚒ sells every stashed item whose rarity is NOT protected (same effect as
-// Ctrl+left-click, i.e. shards / no-value destroy).
-// The center span (#eg-stash-info) is an absolutely-positioned overlay that
-// shows transient feedback (orb failures, equip/unequip blocks, etc.) without
-// affecting layout — see endgame-hub.css .eg-stash-info.
+// Now with two tabs: INVENTORY (regular stash) and UNIQUES (PoE-style collection).
 function _egBuildStashPanelHTML() {
+    const invActive = _egStashTab !== 'uniques';
+    const uniqActive = _egStashTab === 'uniques';
+    const totalUniques = (typeof EG_UNIQUE_ITEMS !== 'undefined' ? EG_UNIQUE_ITEMS.length : 0);
+    const foundUniques = (_egUniqueCollected ? _egUniqueCollected.size : 0);
     return `
 <div class="eg-panel eg-panel-inv">
     <div class="eg-panel-label eg-stash-header">
@@ -650,10 +734,222 @@ function _egBuildStashPanelHTML() {
                      onmouseleave="hideGameTooltip()">⚒ ${t('eg_mass_sell_btn')}</button>
         </div>
     </div>
-    <div class="eg-inv-grid" id="eg-inv-grid" style="grid-template-columns: repeat(${EG_INV_COLS}, 1fr);">
-        ${_egBuildInventoryGridHTML()}
+    <div class="eg-stash-tabs" id="eg-stash-tabs">
+        <button class="eg-stash-tab ${invActive ? 'active' : ''}" id="eg-tab-inventory" data-tab="inventory" onclick="_egSwitchStashTab('inventory')">${t('eg_tab_inventory') || 'INVENTORY'}</button>
+        <button class="eg-stash-tab ${uniqActive ? 'active' : ''}" id="eg-tab-uniques" data-tab="uniques" onclick="_egSwitchStashTab('uniques')">${t('eg_tab_uniques') || 'UNIQUES'} <span class="eg-tab-count">${foundUniques}/${totalUniques}</span></button>
+    </div>
+    <div class="eg-stash-tab-body ${invActive ? 'active' : ''}" id="eg-stash-tab-inventory">
+        <div class="eg-inv-grid" id="eg-inv-grid" style="grid-template-columns: repeat(${EG_INV_COLS}, 1fr);">
+            ${_egBuildInventoryGridHTML()}
+        </div>
+    </div>
+    <div class="eg-stash-tab-body ${uniqActive ? 'active' : ''}" id="eg-stash-tab-uniques">
+        <div class="eg-unique-hint">${t('eg_unique_stash_hint')}</div>
+        <div class="eg-unique-count" id="eg-unique-count">${t('eg_uniques_collected').replace('{found}', foundUniques).replace('{total}', totalUniques)}</div>
+        <div class="eg-unique-grid" id="eg-unique-grid" data-eg-dropzone="uniques" ondragover="egDragOver(event)" ondragleave="egDragLeave(event)">
+            ${_egBuildUniqueGridHTML()}
+        </div>
     </div>
 </div>`;
+}
+function _egSwitchStashTab(tab) {
+    _egStashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
+    const invBody = document.getElementById('eg-stash-tab-inventory');
+    const uniqBody = document.getElementById('eg-stash-tab-uniques');
+    const invTab = document.getElementById('eg-tab-inventory');
+    const uniqTab = document.getElementById('eg-tab-uniques');
+    if (invBody) invBody.classList.toggle('active', _egStashTab === 'inventory');
+    if (uniqBody) uniqBody.classList.toggle('active', _egStashTab === 'uniques');
+    if (invTab) invTab.classList.toggle('active', _egStashTab === 'inventory');
+    if (uniqTab) uniqTab.classList.toggle('active', _egStashTab === 'uniques');
+    if (_egStashTab === 'uniques') _egRenderUniqueStash();
+    else _egRenderInventory();
+}
+function _egBuildUniqueGridHTML() {
+    if (typeof EG_UNIQUE_ITEMS === 'undefined' || !Array.isArray(EG_UNIQUE_ITEMS)) return '<div class="eg-unique-empty">No uniques defined</div>';
+    let html = '';
+    for (let i = 0; i < EG_UNIQUE_ITEMS.length; i++) {
+        const def = EG_UNIQUE_ITEMS[i];
+        const uid = def.uniqueId;
+        const collected = _egIsUniqueCollected(uid);
+        const count = _egGetUniqueCount(uid);
+        const items = collected ? (_egUniqueStash[uid] || []) : [];
+        const displayName = (LANG === 'de' ? (def.nameDe || def.nameEn) : def.nameEn) || uid;
+        let cellCls;
+        if (!collected) cellCls = 'locked';
+        else if (count === 0) cellCls = 'collected-empty';
+        else cellCls = 'collected';
+        const icon = collected ? (items[0] ? (items[0].icon || def.icon || '❓') : (def.icon || '❓')) : '?';
+        const countBadge = count > 1 ? `<span class="eg-unique-count-badge">${t('eg_unique_count').replace('{n}', count)}</span>` : (count === 0 && collected ? `<span class="eg-unique-count-badge" style="background:#888;">0</span>` : '');
+        const lockedOverlay = !collected ? '<span class="eg-unique-lock">?</span>' : '';
+        html += `<div class="eg-unique-cell ${cellCls}" data-unique-id="${uid}" data-uid="${uid}" data-eg-dropzone="uniques"
+            ondragover="egDragOver(event)" ondragleave="egDragLeave(event)"
+            onmouseenter="_egOnUniqueCellEnter('${uid}', event)"
+            onmousemove="_egOnUniqueCellMove('${uid}', event)"
+            onmouseleave="_egOnUniqueCellLeave('${uid}', event)"
+            oncontextmenu="_egOnUniqueCellRightClick(event, '${uid}')"
+            onclick="_egOnUniqueCellClick(event, '${uid}')">
+            <div class="eg-unique-cell-name">${displayName}</div>
+            <div class="eg-unique-cell-icon">${EG_ART ? EG_ART.html('item', uid, icon) : icon}${countBadge}${lockedOverlay}</div>
+        </div>`;
+    }
+    return html;
+}
+function _egRenderUniqueStash() {
+    const grid = document.getElementById('eg-unique-grid');
+    if (!grid) return;
+    grid.innerHTML = _egBuildUniqueGridHTML();
+    const total = (typeof EG_UNIQUE_ITEMS !== 'undefined' ? EG_UNIQUE_ITEMS.length : 0);
+    const found = (_egUniqueCollected ? _egUniqueCollected.size : 0);
+    const cntEl = document.getElementById('eg-unique-count');
+    if (cntEl) cntEl.textContent = t('eg_uniques_collected').replace('{found}', found).replace('{total}', total);
+    _egUpdateUniqueTabBadge();
+}
+function _egOnUniqueCellClick(e, uid) {
+    // left click does nothing except ensure tooltip stays; right-click handles transfer via contextmenu
+    if (e.button === 0) e.preventDefault();
+}
+function _egOnUniqueCellRightClick(e, uid) {
+    e.preventDefault();
+    _egEnsureUniqueStash();
+    const arr = _egUniqueStash[uid];
+    if (!arr || arr.length === 0) {
+        if (typeof _egShowStashInfo === 'function') _egShowStashInfo(t('eg_unique_not_collected'), {type:'info'});
+        return;
+    }
+    _egClearTooltip();
+    hideGameTooltip();
+    const ok = _egMoveUniqueToInventory(uid);
+    if (ok) _egRenderInventory();
+}
+function _egOnUniqueCellEnter(uid, e) {
+    _egEnsureUniqueStash();
+    const arr = _egUniqueStash[uid];
+    // Ensure previous multi-tip inline overrides don't leak into next tooltip
+    const prevTip = document.getElementById('ghud-floating-tip');
+    if (prevTip && prevTip.classList.contains('eg-unique-multi')) {
+        prevTip.classList.remove('eg-unique-multi','eg-wide-tip');
+        prevTip.style.maxWidth = '380px';
+        prevTip.style.width = '';
+        prevTip.style.maxHeight = '';
+        prevTip.style.overflowY = '';
+        prevTip.style.pointerEvents = 'none';
+        // remove multi hover handlers if any
+        prevTip.onmouseenter = null;
+        prevTip.onmouseleave = null;
+    }
+    if (!arr || arr.length === 0) {
+        const isCollected = _egIsUniqueCollected(uid);
+        const def = (typeof EG_UNIQUE_ITEMS !== 'undefined') ? EG_UNIQUE_ITEMS.find(u=>u.uniqueId===uid) : null;
+        const name = def ? ((LANG==='de'?def.nameDe:def.nameEn)||def.nameEn) : uid;
+        const icon = def ? (def.icon || '?') : '?';
+        if (isCollected) {
+            const html = `<div class="eg-tt-frame" style="--tt-border:#c8a84b;"><div class="eg-tt-header"><div class="eg-tt-icon" style="opacity:0.6;">${EG_ART ? EG_ART.html('item', uid, icon) : icon}</div><div class="eg-tt-name" style="color:#c8a84b;">${name}</div><div class="eg-tt-rarity-line" style="color:#f5d98a;">${t('eg_unique_in_inventory') || 'Collected — in Inventory (0 remaining)'}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.8;">${t('eg_unique_empty_hint') || 'All copies moved to Inventory. Drag one back or loot another.'}</div></div></div>`;
+            showGameTooltip(html, e);
+        } else {
+            const html = `<div class="eg-tt-frame" style="--tt-border:#555;"><div class="eg-tt-header"><div class="eg-tt-icon">?</div><div class="eg-tt-name" style="color:#888;">${name}</div><div class="eg-tt-rarity-line" style="color:#888;">${t('eg_unique_not_collected')}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.6;">${t('eg_unique_stash_hint')}</div></div></div>`;
+            showGameTooltip(html, e);
+        }
+        return;
+    }
+    // Build multi-tooltip: container with flex row of each variant's full tooltip body
+    if (arr.length === 1) {
+        _egShowTooltip(arr[0], e);
+        // append right-click hint
+        // we could inject after, but just let normal tooltip; right-click hint via extra line handled in custom?
+        // add hint via stash info? Instead append to tooltip DOM after show
+        setTimeout(()=>{
+            const tip=document.getElementById('ghud-floating-tip');
+            if(tip && !tip.querySelector('.eg-unique-tip-hint')){
+                const h=document.createElement('div');
+                h.className='eg-unique-tip-hint';
+                h.textContent=t('eg_unique_right_click_hint');
+                h.style.cssText='margin-top:6px;padding-top:4px;border-top:1px dashed #444;font-size:9px;color:#f5d98a;text-align:center;';
+                tip.appendChild(h);
+            }
+        },10);
+        return;
+    }
+    // Multiple copies: build side-by-side frames – scrollable, stays open while hovering tip
+    const frames = arr.map(it=>_egBuildTooltipBodyHTML(it)).join('');
+    const header = `<div style="text-align:center;font-family:var(--PX);font-size:9px;color:#f5d98a;margin-bottom:6px;letter-spacing:1px;">${t('eg_unique_tooltip_count').replace('{n}', arr.length)} — ${t('eg_unique_right_click_hint')}</div>`;
+    const html = `<div class="eg-unique-multi-tip">${header}<div class="eg-unique-multi-row">${frames}</div></div>`;
+    showGameTooltip(html, e);
+    const tip=document.getElementById('ghud-floating-tip');
+    if(tip){
+        tip.classList.add('eg-wide-tip','eg-unique-multi');
+        tip.style.maxWidth = '96vw';
+        tip.style.width = 'auto';
+        tip.style.maxHeight = '85vh';
+        tip.style.overflowY = 'auto';
+        tip.style.pointerEvents = 'auto';
+        // keep tip open when mouse moves from cell onto the tip itself
+        tip.onmouseenter = null;
+        tip.onmouseleave = (ev) => {
+            // hide when leaving the tip unless re-entering the originating cell
+            const stillOverCell = document.querySelector(`.eg-unique-cell[data-uid="${uid}"]:hover`);
+            if (!stillOverCell) {
+                hideGameTooltip();
+                tip.classList.remove('eg-wide-tip','eg-unique-multi');
+                tip.style.maxWidth = '380px';
+                tip.style.width = '';
+                tip.style.maxHeight = '';
+                tip.style.overflowY = '';
+                tip.style.pointerEvents = 'none';
+                tip.onmouseenter = null;
+                tip.onmouseleave = null;
+            }
+        };
+        if (typeof moveGameTooltip === 'function') moveGameTooltip(e);
+        else if (typeof _calcGameTooltipPos === 'function') {
+            const pos = _calcGameTooltipPos(e, tip.offsetWidth, tip.offsetHeight);
+            tip.style.left = pos.x + 'px';
+            tip.style.top = pos.y + 'px';
+        }
+    }
+}
+function _egOnUniqueCellMove(uid, e){
+    // support both signatures: (uid, e) and (e)
+    if (e === undefined) { e = uid; uid = null; }
+    const tip=document.getElementById('ghud-floating-tip');
+    if (tip && tip.classList.contains('eg-unique-multi')) return; // multi tip is pinned, don't follow mouse
+    if(typeof moveGameTooltip==='function') moveGameTooltip(e);
+}
+function _egOnUniqueCellLeave(uid, e){
+    if (e === undefined && typeof uid === 'object' && uid && uid.type) { e = uid; uid = null; }
+    const tip=document.getElementById('ghud-floating-tip');
+    if(tip && tip.classList.contains('eg-unique-multi')) {
+        // don't hide immediately – let tip's own mouseleave handle it, or delay to allow moving onto tip
+        setTimeout(()=>{
+            const tipNow=document.getElementById('ghud-floating-tip');
+            if(!tipNow) return;
+            const overTip = tipNow.matches(':hover');
+            const overCell = uid ? document.querySelector(`.eg-unique-cell[data-uid="${uid}"]:hover`) : null;
+            if (!overTip && !overCell) {
+                hideGameTooltip();
+                tipNow.classList.remove('eg-wide-tip','eg-unique-multi');
+                tipNow.style.maxWidth = '380px';
+                tipNow.style.width = '';
+                tipNow.style.maxHeight = '';
+                tipNow.style.overflowY = '';
+                tipNow.style.pointerEvents = 'none';
+                tipNow.onmouseenter = null;
+                tipNow.onmouseleave = null;
+            }
+        }, 80);
+        return;
+    }
+    hideGameTooltip();
+    if(tip) {
+        tip.classList.remove('eg-wide-tip','eg-unique-multi');
+        tip.style.maxWidth = '380px';
+        tip.style.width = '';
+        tip.style.maxHeight = '';
+        tip.style.overflowY = '';
+        tip.style.pointerEvents = 'none';
+        tip.onmouseenter = null;
+        tip.onmouseleave = null;
+    }
 }
 
 //------------------------------------------------------------------------
@@ -1224,6 +1520,17 @@ function _egUpdateCraftingBenchLauncherSlot() {
 function _egRenderAll() {
     _egRenderEquipSlots();
     _egRenderInventory();
+    _egRenderUniqueStash();
+    _egUpdateUniqueTabBadge();
+    // keep tab visibility in sync
+    const invBody = document.getElementById('eg-stash-tab-inventory');
+    const uniqBody = document.getElementById('eg-stash-tab-uniques');
+    const invTab = document.getElementById('eg-tab-inventory');
+    const uniqTab = document.getElementById('eg-tab-uniques');
+    if (invBody) invBody.classList.toggle('active', _egStashTab !== 'uniques');
+    if (uniqBody) uniqBody.classList.toggle('active', _egStashTab === 'uniques');
+    if (invTab) invTab.classList.toggle('active', _egStashTab !== 'uniques');
+    if (uniqTab) uniqTab.classList.toggle('active', _egStashTab === 'uniques');
     _egRenderMapSlot();
     _egRenderCurrencyStash();
     _egRenderEssenceStash();
@@ -1360,12 +1667,11 @@ function _egBuildTooltipBodyHTML(item) {
             ? _egBuildMergedModLines(implicits)
             : implicits.flatMap(imp => (imp.rolledStats||[]).map(s => ({ label: s.label, downside:false, tierLabel:'Implicit' })));
         const lines = merged.map(entry => {
-            // Implicits are always beneficial — render in PoE implicit blue
-            const tierSpan = `<span class="eg-tt-mod-tier eg-tt-mod-tier-implicit">${t('eg_tt_implicit')}</span>`;
-            return `<div class="eg-tt-mod eg-tt-mod-implicit"><span class="eg-tt-mod-label">${entry.label}</span>${tierSpan}</div>`;
+            // Implicits are always beneficial — render in PoE implicit blue (no text tag needed, color is the indicator)
+            return `<div class="eg-tt-mod eg-tt-mod-implicit"><span class="eg-tt-mod-label">${entry.label}</span></div>`;
         });
         if (lines.length) {
-            implicitsHTML = `<div class="eg-tt-section eg-tt-implicits-section"><div class="eg-tt-group-title" style="color:#88c0ff; font-size:0.7rem; letter-spacing:0.08em; margin-bottom:4px;">${t('eg_tt_implicits_title')}</div>${lines.join('')}</div>`;
+            implicitsHTML = `<div class="eg-tt-section eg-tt-implicits-section">${lines.join('')}</div>`;
         }
     }
 
@@ -1427,7 +1733,8 @@ function _egBuildTooltipBodyHTML(item) {
             // Unique downsides render in warning red instead of mod blue.
             const cls = entry.downside ? 'eg-tt-mod eg-tt-mod-downside' : 'eg-tt-mod';
             const tierSpan = (!hideTier && entry.tierLabel) ? `<span class="eg-tt-mod-tier">${entry.tierLabel}</span>` : '';
-            return `<div class="${cls}"><span class="eg-tt-mod-label">${entry.label}</span>${tierSpan}</div>`;
+            const craftedSpan = entry.crafted ? `<span class="eg-tt-mod-crafted">${t('eg_tt_crafted')}</span>` : '';
+            return `<div class="${cls}"><span class="eg-tt-mod-label">${entry.label}</span>${tierSpan}${craftedSpan}</div>`;
         });
         if (lines.length) {
             modsHTML = `<div class="eg-tt-section eg-tt-mods-section">${lines.join('')}</div>`;
@@ -1690,6 +1997,9 @@ function egSaveHubState() {
     STATE.egMapSlotItem = _egMapSlotItem;
     STATE.egMapStashActiveTier = _egMapStashActiveTier;
     STATE.egCraftingBenchItem = _egCraftingBenchItem;
+    // Unique collection
+    STATE.egUniqueStash = _egUniqueStash || {};
+    STATE.egUniqueCollected = _egUniqueCollected ? Array.from(_egUniqueCollected) : [];
     // Mass-sell filter (persisted alongside the stash so reconstructing the
     // hub after a reload restores the player's protection choices).
     if (_egMassSellKeep) STATE.egMassSellKeep = { ..._egMassSellKeep };
@@ -2055,6 +2365,81 @@ function _egLoadHubState() {
             if (uniqueChanged && typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
         }
     } catch (e) { /* ignore */ }
+
+    // ── Unique Collection load + legacy migration ────────────────────────
+    try {
+        _egEnsureUniqueStash();
+        // Load from STATE
+        if (STATE.egUniqueStash && typeof STATE.egUniqueStash === 'object' && !Array.isArray(STATE.egUniqueStash)) {
+            _egUniqueStash = STATE.egUniqueStash;
+            // ensure arrays
+            for (const k of Object.keys(_egUniqueStash)) if (!Array.isArray(_egUniqueStash[k])) _egUniqueStash[k] = _egUniqueStash[k] ? [_egUniqueStash[k]] : [];
+        } else {
+            _egUniqueStash = {};
+        }
+        if (Array.isArray(STATE.egUniqueCollected)) {
+            _egUniqueCollected = new Set(STATE.egUniqueCollected);
+        } else {
+            _egUniqueCollected = new Set();
+        }
+        // Legacy migration: move any isUnique items still sitting in regular inventory into the unique stash
+        let migrated = false;
+        if (Array.isArray(_egInventory)) {
+            for (let r = 0; r < _egInventory.length; r++) {
+                for (let c = 0; c < EG_INV_COLS; c++) {
+                    const it = _egInventory[r][c];
+                    if (it && it.isUnique && it.baseId) {
+                        const uid = it.baseId;
+                        if (!_egUniqueStash[uid]) _egUniqueStash[uid] = [];
+                        _egUniqueStash[uid].push(it);
+                        _egUniqueCollected.add(uid);
+                        _egInventory[r][c] = null;
+                        migrated = true;
+                    }
+                }
+            }
+        }
+        // Also ensure collected set contains every key present in stash
+        for (const uid of Object.keys(_egUniqueStash)) _egUniqueCollected.add(uid);
+        // Heal implicits/downsides on unique stash items as well
+        if (typeof _egHealUniqueItem === 'function') {
+            for (const arr of Object.values(_egUniqueStash)) {
+                for (const it of arr) _egHealUniqueItem(it);
+            }
+        }
+        if (migrated) {
+            STATE.egUniqueStash = _egUniqueStash;
+            STATE.egUniqueCollected = Array.from(_egUniqueCollected);
+            try { if (typeof save === 'function') save(); } catch(e){}
+            // persist via egSaveHubState shape (ensures other fields consistent)
+            try { egSaveHubState(); } catch(e){}
+        }
+    } catch(e) { /* ignore unique load */ }
+
+    // Evict any unique that leaked onto the crafting bench. Older builds
+    // allowed uniques onto the bench, persisting one in BOTH the bench and
+    // the Unique Collection → a duplicate after reload. Uniques are never
+    // craftable, so clear the slot; if it isn't already collected, recover
+    // it into the collection so nothing is lost. Placed OUTSIDE the unique-
+    // stash try above so a migration hiccup can't skip it.
+    try {
+        if (_egCraftingBenchItem && _egCraftingBenchItem.isUnique) {
+            if (typeof _egEnsureUniqueStash === 'function') _egEnsureUniqueStash();
+            const buid = _egCraftingBenchItem.baseId || _egCraftingBenchItem.uniqueId || _egCraftingBenchItem.id;
+            const present = buid && Array.isArray(_egUniqueStash[buid]) && _egUniqueStash[buid].length > 0;
+            if (buid && !present) {
+                if (!_egUniqueStash[buid]) _egUniqueStash[buid] = [];
+                _egUniqueStash[buid].push(_egCraftingBenchItem);
+                _egUniqueCollected.add(buid);
+            }
+            if (typeof _egHealUniqueItem === 'function') _egHealUniqueItem(_egCraftingBenchItem);
+            _egCraftingBenchItem = null;
+            STATE.egCraftingBenchItem = null;
+            STATE.egUniqueStash = _egUniqueStash;
+            STATE.egUniqueCollected = Array.from(_egUniqueCollected || []);
+            try { if (typeof save === 'function') save(); } catch(e){}
+        }
+    } catch(e) { /* never break hub load for a bench cleanup */ }
 }
 
 // Call this immideatly so the player does NOT have to open the hub first to re-load his item state.

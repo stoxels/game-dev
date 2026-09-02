@@ -105,7 +105,11 @@ function _dndZoneAccepts(targetZone) {
     if (!_dnd.item) return false;
     const itemCat = _dnd.item.category;
     // Equipment may go to both the main stash and the paperdoll char slots.
-    if (itemCat === 'equip') return targetZone === 'inv' || targetZone === 'equip' || targetZone === 'crafting';
+    // Uniques can also go to the Uniques collection tab (zone 'uniques')
+    if (itemCat === 'equip') {
+        if (targetZone === 'uniques') return !!_dnd.item.isUnique;
+        return targetZone === 'inv' || targetZone === 'equip' || targetZone === 'crafting';
+    }
     // Maps may go to the map device and the map stash.
     if (itemCat === 'map') return targetZone === 'map' || targetZone === 'mapstash';
     // Currency may only go to the currency stash.
@@ -400,10 +404,13 @@ function _dndFinalizeDrop() {
     _dndReset();
     _egUpdateInvCount();
     _egRenderInventory();
+    if (typeof _egRenderUniqueStash === 'function') _egRenderUniqueStash();
+    if (typeof _egUpdateUniqueTabBadge === 'function') _egUpdateUniqueTabBadge();
     _egRenderEquipSlots();
     _egRenderStatsList();
     _egRenderMapSlot();
     _egRenderMapStash();
+    document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
 }
 
 
@@ -442,6 +449,9 @@ function _dndDrop(e) {
     const equipSlotEl = target.closest('.eg-equip-slot');
     const mapSlotEl = target.closest('#eg-map-slot');
     const craftingSlotEl = target.closest('[data-eg-dropzone="crafting"]');
+    const uniqueCell = target.closest('.eg-unique-cell');
+    const uniqueGrid = target.closest('#eg-unique-grid');
+    const uniqueTabBtn = target.closest('#eg-tab-uniques');
 
     let dropped = false;
 
@@ -484,17 +494,31 @@ function _dndDrop(e) {
         }
 
     } else if (craftingSlotEl && _dndZoneAccepts('crafting')) {
-        // Dropping onto the bench consumes the source location but keeps the
-        // same object in the bench slot. The bench chip remains draggable.
-        // If there's already an item in the bench, displace it to the stash.
-        const existingBenchItem = _egCraftingBenchItem;
-        dropped = typeof _egSetCraftingBenchItem === 'function' && _egSetCraftingBenchItem(_dnd.item);
-        if (dropped && existingBenchItem) {
-            const free = _dndFirstFreeInvCell();
-            if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(free.r + 1);
-            _egInventory[free.r][free.c] = existingBenchItem;
-            _egRenderInventoryCell(free.r, free.c);
-            _egUpdateInvCount();
+        // Uniques can never sit on the crafting bench (they belong in the Unique
+        // Collection). Reject the drop with a message and return it to source.
+        if (_dnd.item.isUnique) {
+            const nm = _dnd.item.name || 'This unique item';
+            const msg = `⚠️ ${nm} is unique and cannot be placed on the Crafting Bench`;
+            if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
+            else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+            if (craftingSlotEl.classList) {
+                craftingSlotEl.classList.add('eg-slot-reject');
+                setTimeout(() => craftingSlotEl.classList.remove('eg-slot-reject'), 600);
+            }
+            // !dropped -> the generic tail returns the unique to its origin
+        } else {
+            // Dropping onto the bench consumes the source location but keeps the
+            // same object in the bench slot. The bench chip remains draggable.
+            // If there's already an item in the bench, displace it to the stash.
+            const existingBenchItem = _egCraftingBenchItem;
+            dropped = typeof _egSetCraftingBenchItem === 'function' && _egSetCraftingBenchItem(_dnd.item);
+            if (dropped && existingBenchItem) {
+                const free = _dndFirstFreeInvCell();
+                if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(free.r + 1);
+                _egInventory[free.r][free.c] = existingBenchItem;
+                _egRenderInventoryCell(free.r, free.c);
+                _egUpdateInvCount();
+            }
         }
 
     } else if (mapSlotEl && _dndZoneAccepts('map')) {
@@ -506,6 +530,41 @@ function _dndDrop(e) {
 
     } else if (equipSlotEl && _dndZoneAccepts('equip')) {
         dropped = _dndDropOnEquipSlot(equipSlotEl);
+
+    } else if ((uniqueCell || uniqueGrid || uniqueTabBtn) && _dndZoneAccepts('uniques')) {
+        // Dragging a unique back into the collection. Source was Inventory/equip.
+        // Works even when uniques tab body is hidden (display:none) – dropping on the tab button counts.
+        const uid = _dnd.item.baseId || _dnd.item.uniqueId || _dnd.item.id;
+        if (_dnd.item.isUnique && uid) {
+            if (typeof _egAddUniqueToCollection === 'function') {
+                _egAddUniqueToCollection(_dnd.item);
+                _dnd.item = null;
+                dropped = true;
+                const flashTarget = uniqueCell || uniqueGrid || uniqueTabBtn;
+                if (flashTarget) {
+                    flashTarget.classList.add('eg-dragover');
+                    setTimeout(() => flashTarget.classList.remove('eg-dragover'), 300);
+                }
+                // Auto-switch to uniques tab so the user sees the result
+                if (typeof _egSwitchStashTab === 'function') _egSwitchStashTab('uniques');
+            } else if (typeof _egUniqueStash !== 'undefined') {
+                if (!_egUniqueStash[uid]) _egUniqueStash[uid] = [];
+                _egUniqueStash[uid].push(_dnd.item);
+                if (typeof _egUniqueCollected !== 'undefined' && _egUniqueCollected.add) _egUniqueCollected.add(uid);
+                if (typeof _egRenderUniqueStash === 'function') _egRenderUniqueStash();
+                if (typeof _egUpdateUniqueTabBadge === 'function') _egUpdateUniqueTabBadge();
+                if (typeof egSaveHubState === 'function') egSaveHubState();
+                _dnd.item = null;
+                dropped = true;
+                if (typeof _egSwitchStashTab === 'function') _egSwitchStashTab('uniques');
+            }
+        } else {
+            const flashTarget = uniqueCell || uniqueGrid || uniqueTabBtn;
+            if (flashTarget) {
+                flashTarget.classList.add('eg-slot-reject');
+                setTimeout(() => flashTarget.classList.remove('eg-slot-reject'), 600);
+            }
+        }
 
     } else if (invCell && _dndZoneAccepts('inv')) {
         const r = +invCell.dataset.row, c = +invCell.dataset.col;
@@ -751,6 +810,10 @@ function _dndHandleRightClick(e) {
     if (!screenEl) return;
 
     e.preventDefault(); // suppress the browser context menu
+
+    // Right-click has no meaning on the crafting bench slot (overlay or launcher).
+    // Items there are only moved by drag-and-drop, so treat it as a pure no-op.
+    if (chip.closest && chip.closest('[data-eg-dropzone="crafting"]')) return;
 
     // The chip may move or vanish (quick-equip/unequip) — close its tooltip.
     _egClearTooltip();
@@ -1170,12 +1233,35 @@ function _dndBindListeners() {
                     mapGrid.scrollTop -= 14;
                 }
             }
+            // Unique stash dragover highlight (only for uniques) – includes tab button when grid is hidden
+            const uniqGrid = document.getElementById('eg-unique-grid');
+            const uniqTabBtnEl = document.getElementById('eg-tab-uniques');
+            // clear previous
+            document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
+            if (_dnd.item && _dnd.item.isUnique) {
+                const under = document.elementFromPoint(e.clientX, e.clientY);
+                const uCell = under && under.closest ? under.closest('.eg-unique-cell') : null;
+                const uGrid = under && under.closest ? under.closest('#eg-unique-grid') : null;
+                const uTab = under && under.closest ? under.closest('#eg-tab-uniques') : null;
+                if (uCell) uCell.classList.add('eg-dragover');
+                else if (uGrid) uGrid.classList.add('eg-dragover');
+                else if (uTab) uTab.classList.add('eg-dragover');
+                // Auto-hover switch: if hovering the uniques tab for a moment, show it
+                if (uTab && typeof _egSwitchStashTab === 'function' && _egStashTab !== 'uniques') {
+                    // debounce – switch immediately for visual feedback
+                    _egSwitchStashTab('uniques');
+                }
+            }
+        } else {
+            // clear stale highlights when not dragging
+            document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
         }
     });
 
     // Drop: release the mouse button anywhere on the window.
     window.addEventListener('mouseup', e => {
         if (_dnd.active) _dndDrop(e);
+        document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
     });
 
     // Right-click: quick-equip from stash or quick-unequip from char slot.
@@ -1187,6 +1273,7 @@ function _dndBindListeners() {
             _dndDestroyGhost();
             _dndReturnToSource();
             _dndReset();
+            document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
         }
     });
 }
