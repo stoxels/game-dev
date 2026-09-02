@@ -46,18 +46,103 @@ function hideResultOverlays() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+let _convResizeBound = null;
+let _convCloseTimer = null;
+let _convSfxTimer = null;
+
+// Scales the book modal up to fill the viewport (capped) so it reads large.
+function _fitConvergenceModal(modal) {
+    modal = modal || document.getElementById('convergence-modal');
+    const box = modal && modal.querySelector('.convm');
+    if (!box) return;
+    const s = Math.min(1.8, (window.innerHeight - 70) / 370, (window.innerWidth - 60) / 690);
+    box.style.transform = 'scale(' + Math.max(0.5, s) + ')';
+}
+
 // Shows the convergence modal and plays its sound effect.
 function showConvergenceModal() {
     const modal = document.getElementById('convergence-modal');
-    if (modal) modal.classList.add('show');
-    Audio_Manager.playSFX('convergence');
+    if (modal) {
+        if (_convCloseTimer) { clearTimeout(_convCloseTimer); _convCloseTimer = null; }
+        modal.classList.remove('closing');
+        // restart the enter animation even if we're re-opening mid-close
+        modal.classList.remove('show');
+        void modal.offsetWidth;
+        modal.classList.add('show');
+    }
+    // Land the SFX right as the entrance animation completes, like a reveal.
+    if (_convSfxTimer) { clearTimeout(_convSfxTimer); }
+    _convSfxTimer = setTimeout(() => { Audio_Manager.playSFX('convergence'); _convSfxTimer = null; }, 680);
     _hidePlayerAvatarSimple();
     _hidePlayerAvatar();
+    _updateConvergenceModalPoints(modal);
+    _fitConvergenceModal(modal);
+    if (!_convResizeBound) {
+        _convResizeBound = () => _fitConvergenceModal();
+        window.addEventListener('resize', _convResizeBound);
+    }
+}
+
+// Total number of campaign convergence levels across all worlds — the "X" in
+// the "earned / total" readout. Computed from live world data so it stays correct.
+let _convTotalCache = null;
+function _convergenceTotalMilestones() {
+    if (_convTotalCache != null) return _convTotalCache;
+    if (typeof WORLDS === 'undefined' || typeof isLevelConvergence !== 'function') return 0;
+    let total = 0;
+    WORLDS.forEach((w) => {
+        const data = (w && w.data) || [];
+        data.forEach((_, li) => {
+            if (isLevelConvergence(li, w, li === data.length - 1)) total++;
+        });
+    });
+    _convTotalCache = total;
+    return total;
+}
+
+// Fills the convergence modal's total-points chip with the current pool and
+// plays a short count-up from 0 so the reward reveal feels earned.
+function _updateConvergenceModalPoints(modal) {
+    modal = modal || document.getElementById('convergence-modal');
+    const plate = modal && modal.querySelector('.convm-total-plate span');
+    if (!plate) return;
+    const total = (typeof STATE !== 'undefined' && STATE.convergenceDone && STATE.convergenceDone.length) || 0;
+    const cap = _convergenceTotalMilestones();
+    const label = t('convergence_total');
+    const tmpl = (label && label !== 'convergence_total') ? label : 'TOTAL: {n} / {total}';
+    const render = (val) => { plate.textContent = tmpl.replace('{n}', val).replace('{total}', cap); };
+    render(0);
+    const start = performance.now();
+    const dur = 650;
+    const step = (now) => {
+        const p = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        render(Math.round(total * eased));
+        if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
 }
 
 // Hides the convergence modal.
 function hideConvergenceModal() {
-    hideModal('convergence-modal');
+    if (_convResizeBound) {
+        window.removeEventListener('resize', _convResizeBound);
+        _convResizeBound = null;
+    }
+    const modal = document.getElementById('convergence-modal');
+    if (modal && modal.classList.contains('show')) {
+        modal.classList.add('closing');
+        // finish the close animation, then actually hide
+        if (_convCloseTimer) clearTimeout(_convCloseTimer);
+        if (_convSfxTimer) { clearTimeout(_convSfxTimer); _convSfxTimer = null; }
+        _convCloseTimer = setTimeout(() => {
+            modal.classList.remove('show');
+            modal.classList.remove('closing');
+            _convCloseTimer = null;
+        }, 420);
+    } else {
+        hideModal('convergence-modal');
+    }
 }
 
 // Builds a button handler that closes the convergence modal,
@@ -75,9 +160,9 @@ function _buildConvergenceButtonHandler(proceed, extraAction) {
 // and route correctly: tree opens the passive tree, the other two
 // continue with the intended navigation.
 function _wireConvergenceModalButtons(modal, proceed) {
-    const treeBtn = modal.querySelector('.convergence-btn-tree');
-    const nextBtn = modal.querySelector('.convergence-btn-next');
-    const levelsBtn = modal.querySelector('.convergence-btn-levels');
+    const treeBtn = modal.querySelector('.convm-btn.open');
+    const nextBtn = modal.querySelector('.convm-btn.next');
+    const levelsBtn = modal.querySelector('.convm-btn.select');
 
     // Tree button opens the passive tree; navigation continues from there.
     treeBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { hideResultOverlays(); showPassiveTree(); });
@@ -127,6 +212,25 @@ function showTitle() {
     switchScreen('screen-title');
 }
 
+// Scales the setup book (fixed 1376x768 design box) to fit the current
+// viewport so the screen looks right on any window size. Called on show and
+// on window resize (only while the setup screen is active).
+let _setupResizeBound = false;
+function _fitSetupBook() {
+    const book = document.querySelector('#screen-setup .setup-book');
+    if (!book) return;
+    const designW = 1376;
+    const designH = 768;
+    const pad = 40;                       // leave room for the action buttons
+    const fit = Math.min(
+        (window.innerWidth - 12) / designW,
+        (window.innerHeight - pad) / designH,
+        2.2                                // cap so it doesn't get huge on 4K
+    );
+    const scale = Math.max(0.32, fit);
+    book.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+}
+
 // Navigates to the setup screen and refreshes difficulty/mod descriptions.
 function showSetup() {
     stopTimer();
@@ -137,6 +241,16 @@ function showSetup() {
     updModDesc();
     _updateSetupScreenCharacter();
     switchScreen('screen-setup');
+    _fitSetupBook();
+    if (!_setupResizeBound) {
+        _setupResizeBound = true;
+        window.addEventListener('resize', () => {
+            if (document.getElementById('screen-setup') &&
+                document.getElementById('screen-setup').classList.contains('active')) {
+                _fitSetupBook();
+            }
+        });
+    }
 }
 
 // Confirms setup and navigates to the temporary dev mode-select screen.

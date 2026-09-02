@@ -1,8 +1,12 @@
-﻿/* -----------------------------------------------------------------------
-   GAME SETUP SCREEN — book layout.
-   The whole UI now lives on an open book image (.setup-book), split into
-   a left page (.setup-page-left) and right page (.setup-page-right).
-   Every element below is positioned RELATIVE TO ITS PAGE, not the screen.
+/* -----------------------------------------------------------------------
+   GAME SETUP SCREEN — scaled book layout.
+   The book is rendered at its natural 1376x768 design size and scaled with
+   transform:scale() to fit the viewport (see _fitSetupBook in screens.js).
+   Because the whole book scales as one unit, EVERY inner size below is a
+   plain design pixel and stays proportionally correct at any window size.
+   A .setup-pages container tiles exactly the visible parchment (x 14%->92%,
+   y 12%->81% of the book), and all three zones live inside it so content
+   never spills onto the wooden frame.
    ----------------------------------------------------------------------- */
 
 #screen-setup {
@@ -32,16 +36,17 @@
 }
 
 /* -----------------------------------------------------------------------
-   THE BOOK — central positioning anchor for both pages.
-   Resize/reposition the WHOLE book by editing this one block.
+   THE BOOK — fixed design-size canvas, scaled to the viewport by JS.
    ----------------------------------------------------------------------- */
 .setup-book {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(1700px, 92vw); /* ← overall book width */
-    aspect-ratio: 1376 / 768; /* ← matches Book-Frame.png ratio; adjust if yours differs */
+    /* JS overrides transform with translate(-50%,-50%) scale(fit) */
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: center center;
+    width: 1376px;
+    height: 768px;
     z-index: 1;
 }
 
@@ -50,146 +55,117 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: fill;
     pointer-events: none;
     z-index: 0;
 }
 
 /* -----------------------------------------------------------------------
-   PAGES — each page is a positioning box sized to roughly one half
-   of the book image. Tweak left/width % if your book art's page
-   boundaries sit slightly differently.
+   CONTENT PAGES — boxes the visible parchment area. Sized as % of the book
+   from the measured parchment bounds (x 14->92, y 12->81). Everything that
+   must stay on the pages is a child of this.
    ----------------------------------------------------------------------- */
-.setup-page {
+.setup-pages {
     position: absolute;
-    top: 6%;
-    bottom: 6%;
+    left: 14%;
+    top: 12%;
+    right: 8%;
+    bottom: 19%;
     z-index: 1;
 }
 
-.setup-page-left {
-    left: 4%;
-    width: 44%;
-}
-
-.setup-page-right {
-    left: 52%;
-    width: 44%;
-}
-
 /* =========================================================================
-   LEFT PAGE — character name, portrait, lore scroll, active-modifiers scroll
+   ZONES — positioned as % of .setup-pages
    ========================================================================= */
+.setup-zone {
+    position: absolute;
+    box-sizing: border-box;
+    display: flex;
+}
+
+/* --- CHARACTER (upper-left page) --- */
+.setup-zone-char {
+    left: 2%;
+    top: 0%;
+    width: 46%;
+    height: 42%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+}
 
 .setup-char-name-img {
-    position: absolute;
-    top: 10%; /* ← move character name image up/down */
-    left: 60%;
-    transform: translateX(-40%);
-    width: 70%; /* ← name image size */
-    max-height: 14%;
+    width: 180px;
+    max-height: 52px;
     object-fit: contain;
     pointer-events: none;
-    z-index: 1;
 }
-
-
 
 .setup-char-portrait {
-    position: absolute;
-    top: 25%; /* ← move portrait up/down */
-    left: 60%;
-    transform: translateX(-40%);
-    width: 55%; /* ← portrait size */
-    height: 50%;
+    width: 210px;
+    max-height: 168px;
     object-fit: contain;
     pointer-events: none;
-    z-index: 1;
+    margin-top: -4px;
 }
 
-
-
-/* =========================================================================
-   RIGHT PAGE — difficulty + modifiers (same content/logic as before,
-   just re-anchored to the page instead of the full screen)
-   ========================================================================= */
+/* --- DIFFICULTY (upper-right page) --- */
+/* Centred over the right page: the spine sits ~46% into the pages box and the
+   right parchment edge ~94%, so the right page centres near 70%. */
+.setup-zone-diff {
+    left: 47%;
+    top: 0%;
+    width: 46%;
+    height: 38%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
 
 .setup-difficulty-label {
-    position: absolute;
-    top: 8%; /* ← move "GAME DIFFICULTY" label up/down */
-    left: 35%;
-    transform: translateX(-50%);
     font-family: var(--C);
-    font-size: clamp(11px, 1.6vw, 20px); /* CHANGED: was fixed 20px — scales on small screens */
+    font-size: 26px;
+    letter-spacing: 2px;
     color: #2c1a0c;
-    letter-spacing: 1px;
-    white-space: nowrap;
     text-shadow: none;
+    white-space: nowrap;
+    text-align: center;
 }
 
-
-
-/* -----------------------------------------------------------------------
-   SHARED BASE for both button rows (diff + tombstones)
-   .setup-options-diff and .setup-options both use these defaults,
-   then each overrides only what it needs below.
-   ----------------------------------------------------------------------- */
-.setup-options {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; /* ← container no longer blocks clicks */
-}
-
-    .setup-options > * {
-        pointer-events: auto; /* ← direct children (buttons, mod-wrappers) stay clickable */
-    }
-
-
-/* -----------------------------------------------------------------------
-   DIFFICULTY BUTTONS ROW (EASY / NORMAL / HARD)
-   This rule comes AFTER .setup-options so it wins the cascade.
-   Only override what's different from the shared base above.
-   ----------------------------------------------------------------------- */
+/* Difficulty buttons row */
 .setup-options-diff {
-    top: -34%; /* ← move EASY/NORMAL/HARD row up/down */
-    left: -4%;
-    width: 78%;
-    display: flex; /* CHANGED: added — this was previously relying on an external stylesheet to set flex, which may have been forcing the row to shrink-wrap its content instead of filling the intended 90% width. Declaring it here directly removes that dependency. */
-    justify-content: center; /* CHANGED: added — safety net so the row is centered even if flex-grow rounding leaves a sliver of extra space */
-    gap: clamp(4px, 1.5%, 14px); /* CHANGED: was flat 1.5% — small fixed floor keeps buttons from touching at tiny sizes */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
     align-items: center;
 }
 
-
-/* -----------------------------------------------------------------------
-   DIFFICULTY BUTTONS (EASY / NORMAL / HARD)
-   No position property — they sit inside the flex row of .setup-options-diff
-   ----------------------------------------------------------------------- */
 .setup-opt-diff {
-    box-sizing: border-box; /* CHANGED: added — ensures padding is counted inside each button's width rather than added on top of it */
-    flex: 1 1 0; /* CHANGED: added — makes all 3 buttons split the row's width equally, so they can never overflow regardless of screen size */
-    min-width: 0; /* CHANGED: added — without this, flex items default to a min-width based on their content, which can still force overflow; this lets them shrink freely */
+    box-sizing: border-box;
+    flex: 1 1 0;
+    min-width: 0;
     font-family: var(--PX);
-    font-size: clamp(7px, 1vw, 10px); /* CHANGED: was fixed 10px */
-    letter-spacing: 0.5px;
+    font-size: 17px;
+    letter-spacing: 1px;
     color: var(--setup-opt-inactive);
     background-image: url('../images/Game_Setup/Button-Block-1.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
     border: none;
-    padding: clamp(6px, 1vw, 10px) clamp(8px, 1.4vw, 14px); /* CHANGED: was fixed 10px 14px */
-    min-height: clamp(28px, 4vw, 50px); /* CHANGED: was fixed 50px */
+    padding: 16px 10px;
+    min-height: 62px;
     cursor: pointer;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     transition: transform .12s, filter .12s;
 }
 
     .setup-opt-diff:hover {
-        filter: brightness(1.15);
+        filter: brightness(1.2);
+        transform: translateY(-2px);
     }
 
     .setup-opt-diff.sel {
@@ -197,16 +173,8 @@
         color: var(--accent);
     }
 
-
-
-/* -----------------------------------------------------------------------
-   RIBBON — change top to move up/down
-   ----------------------------------------------------------------------- */
+/* Description ribbon */
 .setup-desc-ribbon {
-    position: absolute;
-    top: 20%; /* ← move ribbon up/down */
-    left: 37%;
-    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     width: 100%;
@@ -218,51 +186,106 @@
         background-repeat: no-repeat;
         background-position: center;
         font-family: 'Georgia', 'Times New Roman', serif;
-        font-size: clamp(8px, 1vw, 13px); /* CHANGED: was fixed 13px */
+        font-size: 15px;
         font-weight: 600;
         letter-spacing: 0.3px;
         color: #2c1a0c;
         text-shadow: none;
-        line-height: 1.3;
+        line-height: 1.25;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
-        width: 92%;
-        height: auto; /* CHANGED: was fixed 50px */
-        min-height: clamp(28px, 4vw, 50px); /* CHANGED: added so ribbon graphic still reads at small sizes */
-        padding: 0 8%;
+        width: 100%;
+        min-height: 60px;
+        padding: 0 5%;
         padding-bottom: 4px;
         box-sizing: border-box;
-        white-space: normal; /* CHANGED: was nowrap — let long descriptions wrap instead of overflowing */
+        white-space: normal;
     }
 
-/* -----------------------------------------------------------------------
-   MODIFIERS LABEL — change top to move up/down
-   ----------------------------------------------------------------------- */
-.setup-group-label {
-    position: absolute;
-    top: 28%; /* ← move "OPTIONAL MODIFIERS" label up/down */
-    left: 37%;
-    transform: translateX(-50%);
-    font-family: var(--C);
-    font-size: clamp(11px, 1.6vw, 20px); /* CHANGED: was fixed 20px */
-    color: #2c1a0c;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    text-shadow: none;
+/* =========================================================================
+   MODIFIERS ZONE (bottom row spanning both pages)
+   ========================================================================= */
+.setup-zone-mods {
+    left: 0%;
+    right: 0%;
+    top: 43%;
+    bottom: 0%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
 }
 
-/* -----------------------------------------------------------------------
-   TOMBSTONE BUTTONS
-   ----------------------------------------------------------------------- */
-.setup-opt-mod {
-    font-family: var(--PX);
-    font-size: clamp(6px, 0.9vw, 9px); /* CHANGED: was fixed 9px */
+.setup-group-label {
+    font-family: var(--C);
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: #2c1a0c;
+    text-shadow: none;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* The row of five tombstones, centered */
+.setup-mods-inner {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 18px;
+    width: 100%;
+}
+
+/* =========================================================================
+   MOD WRAPPER — title plate (top), tombstone slab with icon, score tag.
+   ========================================================================= */
+.mod-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 172px;
+    z-index: 1;
+}
+
+/* Title plate sits ABOVE the tombstone */
+.mod-title {
+    position: relative;
+    z-index: 3;
+    font-family: var(--C);
+    font-size: 19px;
     letter-spacing: 0.5px;
-    color: var(--setup-opt-inactive);
+    line-height: 1.1;
+    text-align: center;
+    color: #2c1a0c;
+    text-shadow: none;
+    background-image: url('../images/Game_Setup/Modifier_Plate.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 168px;
+    height: 48px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+/* Colour variants */
+.mod-title-gold   { color: #f5c518; text-shadow: 0 0 8px rgba(245,197,24,0.6); }
+.mod-title-orange { color: var(--orange); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.mod-title-red    { color: var(--red); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.mod-title-purple { color: #D4D7D9; }
+.mod-title-cyan   { color: var(--accent); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.mod-title-green  { color: var(--green); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+/* The tombstone slab — big and buff, holds the icon */
+.setup-opt-mod {
+    box-sizing: border-box;
     background-image: url('../images/Game_Setup/Modifier-Block-1.png');
-    background-size: 150% 100%; /* actual tombstone width and heigth */
+    background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
     background-color: transparent;
@@ -270,407 +293,136 @@
     cursor: pointer;
     position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
-    gap: 3px;
-    width: clamp(90px, 8.5vw, 200px); /* CHANGED: min/max were identical (200px/200px) so this never actually shrank — bug fix */
-    height: clamp(72px, 6.8vw, 200px); /* CHANGED: was clamp(160px, 7vw, 200px) */
-    padding: 8px 6px 10px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.85);
+    justify-content: center;
+    width: 172px;
+    height: 132px;
+    margin-top: 0;
+    padding: 0;
     transition: transform .12s, filter .12s;
-    margin: 0 -4px;
 }
 
     .setup-opt-mod:hover {
-        filter: brightness(1.15);
+        filter: brightness(1.18) saturate(1.1);
+        transform: translateY(-3px);
     }
 
-.setup-opt-mod.sel-yellow {
-    background-image: url('../images/Game_Setup/Modifier-Block-2.png');
-    color: var(--accent2);
-}
+    /* selected slab glows */
+    .setup-opt-mod.sel-yellow {
+        background-image: url('../images/Game_Setup/Modifier-Block-2.png');
+        filter: brightness(1.08) drop-shadow(0 0 12px rgba(102,252,241,0.5));
+    }
 
-/* BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period. */
-.setup-super-tutor-wrapper {
-    top: 45% !important;
-    right: -10% !important;
-}
-.mod-super-tutor {
-    border: none;
-}
-.mod-super-tutor.sel-yellow {
-    color: #f5c518;
-    filter: brightness(1.2);
-}
-.mod-title-gold {
-    color: #f5c518;
-    text-shadow: 0 0 8px rgba(245,197,24,0.6);
-}
-.mod-icon-super-tutor {
-    width: 100%;
-    height: 65%;
-    top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(24px, 3vw, 50px);
-}
-
-
-/* -----------------------------------------------------------------------
-   MOD TITLE (large coloured name) and SCORE TAG (line below it)
-   ----------------------------------------------------------------------- */
-.mod-title {
-    font-family: var(--C);
-    font-size: clamp(10px, 1.4vw, 20px); /* CHANGED: was fixed 20px */
-    letter-spacing: 0.5px;
-    line-height: 1.1;
-    text-align: center;
-    pointer-events: none;
-    z-index: 2;
-    background-image: url('../images/Game_Setup/Modifier_Plate.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    /*background-color: transparent;*/
-    /* The plate image looked unchanged because this element had no
-       explicit box — background-size: 100% 100% scales to THIS element's
-       own width/height, and with no width/height set it was only ever as
-       big as the text itself. Giving it an explicit width/height here is
-       what actually makes the plate graphic bigger. */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: clamp(80px, 9vw, 150px); /* CHANGED: was fixed 150px — plate width */
-    height: clamp(32px, 4vw, 60px); /* CHANGED: was fixed 60px — plate height */
-    padding: 0 10px;
-    box-sizing: border-box;
-    /* Position the title+plate ABOVE the tombstone instead of pushing it
-       down to the bottom (the old margin-bottom: 100px did the opposite). */
-    position: absolute;
-    top: clamp(-14px, -1.4vw, -20px); /* CHANGED: was fixed -20px — scales with plate size */
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-
-/* Colour variants — match image 2 */
-.mod-title-orange {
-    color: var(--orange);
-    text-shadow: 0 0 8px rgba(255,140,0,0.6);
-}
-
-.mod-title-red {
-    color: var(--red);
-    text-shadow: 0 0 8px rgba(220,50,50,0.6);
-}
-
-.mod-title-purple {
-    color: #D4D7D9; /* #C0C0C0; */
-    text-shadow: 0 0 8px rgba(95,87,97,0.6);
-}
-
-.mod-title-cyan {
-    color: var(--accent);
-    text-shadow: 0 0 8px rgba(100,220,220,0.6);
-}
-
-.mod-title-green {
-    color: var(--green);
-    text-shadow: 0 0 8px rgba(80,200,80,0.6);
-}
-
-.mod-score-tag {
-    font-family: var(--C);
-    font-size: clamp(8px, 1vw, 15px); /* CHANGED: was fixed 15px */
-    color: var(--accent2);
-    opacity: 0.85;
-    text-align: center;
-    pointer-events: none;
-    margin-bottom: 5px;
-    z-index: 2;
-}
-
-/* -----------------------------------------------------------------------
-   ICONS — base shared style
-   ----------------------------------------------------------------------- */
+/* Icon — big and clear, centred on the slab */
 .mod-icon {
+    flex: 0 0 auto;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     pointer-events: none;
-    position: absolute; /* allows per-icon free positioning */
-    z-index: 1;
+    width: 128px;
+    height: 128px;
 }
 
-/* -----------------------------------------------------------------------
-   PER-ICON size and position — adjust each independently
-   top   = distance from top of tombstone (negative = moves up/overlaps top edge)
-   width/height = icon size
-   ----------------------------------------------------------------------- */
-.mod-icon-timetrial {
-    width: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    height: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    top: clamp(-10px, -1vw, -20px); /* CHANGED: was fixed -20px */
-    background-image: url('../images/Game_Setup/Icon-TimeTrial.png');
+/* Per-icon images */
+.mod-icon-timetrial { background-image: url('../images/Game_Setup/Icon-TimeTrial.png'); }
+.mod-icon-hardcore  { background-image: url('../images/Game_Setup/Icon-Hardcore.png'); }
+.mod-icon-ironman   { background-image: url('../images/Game_Setup/Icon-Ironman.png'); }
+.mod-icon-classless { background-image: url('../images/Game_Setup/Icon-Classless.png'); }
+.mod-icon-treeless  { background-image: url('../images/Game_Setup/Icon-Treeless.png'); }
+.mod-icon-super-tutor { font-family: var(--PX); font-size: 54px; display: flex; align-items: center; justify-content: center; }
+
+/* Score tag under the slab */
+.mod-score-tag {
+    font-family: var(--C);
+    font-size: 15px;
+    color: var(--accent2);
+    opacity: 0.9;
+    text-align: center;
+    pointer-events: none;
+    margin-top: 4px;
 }
 
-.mod-icon-hardcore {
-    width: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    height: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    top: clamp(-10px, -1vw, -20px); /* CHANGED: was fixed -20px */
-    background-image: url('../images/Game_Setup/Icon-Hardcore.png');
-}
-
-.mod-icon-ironman {
-    width: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    height: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    top: clamp(-10px, -1vw, -20px); /* CHANGED: was fixed -20px */
-    background-image: url('../images/Game_Setup/Icon-Ironman.png');
-}
-
-.mod-icon-classless {
-    width: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    height: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    top: clamp(-10px, -1vw, -20px); /* CHANGED: was fixed -20px */
-    background-image: url('../images/Game_Setup/Icon-Classless.png');
-}
-
-.mod-icon-treeless {
-    width: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    height: clamp(90px, 8.5vw, 200px); /* CHANGED: was fixed 200px */
-    top: clamp(-10px, -1vw, -20px); /* CHANGED: was fixed -20px */
-    background-image: url('../images/Game_Setup/Icon-Treeless.png');
-}
-
-/* -----------------------------------------------------------------------
-   TOMBSTONE — needs position:relative so absolute icons sit inside it,
-   and enough top padding so icons don't cover the title text
-   ----------------------------------------------------------------------- */
-.setup-opt-mod {
-    position: relative;
-    justify-content: flex-end; /* title + score sit at the bottom */
-    padding: 8px 6px 14px; /* ← increase if icon overlaps title text */
-}
-
-
-
-/* -----------------------------------------------------------------------
-   MOD WRAPPER — each tombstone + its description text below.
-   With the book layout the 2x2 grid (Time Trial / Hardcore / Ironman /
-   Classless) just flows naturally via flex-wrap on .setup-options, so
-   the old per-tombstone nth-child offsets are no longer needed and have
-   been removed. The 5th slot (Treeless) is handled separately below
-   inside .mod-wrapper-special so it can carry the gold frame.
-   ----------------------------------------------------------------------- */
-.mod-wrapper {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: clamp(70px, 8vw, 130px); /* CHANGED: was fixed 130px */
-    z-index: 1;
-}
-
-    .mod-wrapper:has(.mod-timetrial) {
-        top: 33%;
-        left: 0%;
-    }
-
-    .mod-wrapper:has(.mod-hardcore) {
-        top: 33%;
-        left: 30%;
-    }
-
-    .mod-wrapper:has(.mod-ironman) {
-        top: 33%;
-        left: 60%;
-    }
-
-    .mod-wrapper:has(.mod-classless) {
-        top: 57%;
-        left: 13%;
-    }
-
-    .mod-wrapper:has(.mod-treeless) {
-        top: 57%;
-        left: 47%;
-    }
-
-
-/* Per-tombstone description text — hidden until tombstone is selected */
+/* Per-tombstone description — shown only when selected */
 .mod-per-desc {
     display: none;
-    font-size: clamp(9px, 1vw, 15px); /* CHANGED: was fixed 15px */
-    color: black;
+    font-size: 13px;
+    color: #2c1a0c;
     text-align: center;
-    line-height: 1.25;
-    max-width: clamp(90px, 10vw, 150px); /* CHANGED: was fixed 150px */
+    line-height: 1.3;
+    max-width: 176px;
     pointer-events: none;
-    margin-top: 6px; /* ← gap between tombstone and description */
+    margin-top: 3px;
     z-index: 20;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.4);
 }
 
-/* Show description when tombstone is selected */
-.setup-opt-mod.sel-yellow + .mod-per-desc {
+.setup-opt-mod.sel-yellow ~ .mod-per-desc {
     display: block;
 }
 
-/* -----------------------------------------------------------------------
-   SPECIAL CHALLENGE FRAME — wraps the Treeless tombstone in a gold
-   ornate frame with its own header, matching the storybook reference art.
-   ----------------------------------------------------------------------- */
-.mod-wrapper-special {
-    margin: 0 4px 0 14px; /* ← nudge the whole special card left/right */
-}
-
-.setup-special-frame {
-    position: relative;
-    width: 130px; /* ← special frame width */
-    padding: 22px 8px 10px; /* top padding makes room for the label */
-    background-image: url('../images/Game_Setup/Special-Challenge-Frame.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.setup-special-label {
+/* BETA TEST ONLY: Super Tutor is temporary, anchored on the right page */
+.setup-super-tutor-wrapper {
     position: absolute;
-    top: 4px; /* ← move "SPECIAL CHALLENGE" label up/down inside frame */
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--C);
-    font-size: 7px;
-    letter-spacing: 0.5px;
-    color: #2c1a0c;
-    white-space: nowrap;
-    text-align: center;
+    right: -2%;
+    top: 40%;
+    z-index: 5;
 }
 
-.setup-special-frame .setup-opt-mod {
-    margin: 0;
-}
-
-
-
-/* -----------------------------------------------------------------------
-   ACTION BUTTONS (SELECT LEVEL / BACK) — change top to move up/down
-   ----------------------------------------------------------------------- */
+/* =========================================================================
+   ACTION BUTTONS (SELECT LEVEL / BACK)
+   ========================================================================= */
 .setup-btns {
     position: absolute;
-    top: 90%; /* ← move SELECT LEVEL / BACK buttons up/down */
+    bottom: 1%;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     gap: 16px;
     white-space: nowrap;
-    z-index: 2;
+    z-index: 10;
 }
 
+/* SELECT LEVEL is the primary CTA — the strongest element on screen */
 .setup-btn-img {
     font-family: var(--PX);
-    font-size: clamp(9px, 1.2vw, 13px); /* CHANGED: was fixed 13px */
-    letter-spacing: 1px;
+    font-size: 22px;
+    letter-spacing: 2px;
     color: var(--accent2);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.9), 0 0 12px rgba(102,252,241,0.4);
     background-image: url('../images/Game_Setup/Button-Block-1.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
     border: none;
-    padding: clamp(10px, 1.6vw, 16px) clamp(16px, 3vw, 30px); /* CHANGED: was fixed 16px 30px */
-    min-width: clamp(120px, 14vw, 200px); /* CHANGED: was fixed 200px */
+    padding: 18px 36px;
+    min-width: 300px;
     cursor: pointer;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-    transition: transform .12s, filter .12s;
+    transition: transform .12s, filter .12s, box-shadow .12s;
 }
 
     .setup-btn-img:hover {
-        filter: brightness(1.15);
-        transform: translateY(-2px);
+        filter: brightness(1.25) saturate(1.1);
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 0 24px rgba(102,252,241,0.5);
     }
 
     .setup-btn-img:active {
         background-image: url('../images/Game_Setup/Button-Block-2.png');
-        transform: translateY(0);
-    }
-
-/* -----------------------------------------------------------------------
-   SCORE TAGS (the +SCORE badge on each tombstone)
-   ----------------------------------------------------------------------- */
-.setup-opt .tag {
-    position: absolute;
-    top: -8px;
-    right: 4px;
-    font-size: 7px;
-    background: var(--purple);
-    color: #fff;
-    padding: 1px 4px;
-    z-index: 2;
-}
-
-.tag.tag-orange {
-    background: var(--orange);
-    color: #fff;
-}
-
-.tag.tag-red {
-    background: var(--red);
-    color: #fff;
-}
-
-.tag.tag-purple {
-    background: var(--purple);
-    color: #fff;
-}
-
-.tag.tag-cyan {
-    background: var(--accent);
-    color: var(--bg);
-}
-
-.tag.tag-green {
-    background: var(--green);
-    color: var(--bg);
-}
-
-/* -----------------------------------------------------------------------
-   MISC
-   ----------------------------------------------------------------------- */
-.back-btn {
-    font-family: var(--PX);
-    font-size: 12px;
-    background: transparent;
-    border: 1px solid var(--border2);
-    color: var(--accent2);
-    padding: 7px 12px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all .12s;
-}
-
-    .back-btn:hover {
-        border-color: var(--accent);
         color: var(--accent);
+        transform: translateY(0) scale(1);
     }
 
-.label-optional {
-    font-size: 11px;
-    opacity: 0.7;
-}
-
-
+/* =========================================================================
+   BACK BUTTON (top-left corner)
+   ========================================================================= */
 .setup-back-corner-btn {
     position: absolute;
     top: 1.5%;
     left: 1.5%;
-    width: 10%;
     z-index: 10;
     font-family: var(--PX);
-    font-size: clamp(9px, 1.2vw, 13px); /* CHANGED: was fixed 13px */
+    font-size: 20px;
     letter-spacing: 1px;
     color: var(--accent2);
     background-image: url('../images/Game_Setup/return_to_menu_button.png');
@@ -678,14 +430,14 @@
     background-repeat: no-repeat;
     background-color: transparent;
     border: none;
-    padding: clamp(8px, 1.6vw, 16px) clamp(14px, 3vw, 30px); /* CHANGED: was fixed 16px 30px */
-    min-width: clamp(80px, 10vw, 160px); /* CHANGED: was fixed 160px */
+    padding: 16px 28px;
+    min-width: 150px;
     cursor: pointer;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     transition: transform .12s, filter .12s;
 }
 
     .setup-back-corner-btn:hover {
-        filter: brightness(1.15);
+        filter: brightness(1.2);
         transform: translateY(-2px);
     }

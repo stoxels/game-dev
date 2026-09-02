@@ -369,10 +369,12 @@ const T = {
 
         // Convergence modal
         convergence: 'Convergence',
+        convergence_kicker: 'Milestone Reached',
+        convergence_total: 'TOTAL: {n} / {total}',
         convergence_desc_1: 'You have reached a milestone and earned 1 Convergence Point.',
-        convergence_open_tree: '🌿 Open Probability Tree',
-        convergence_next_level: '▶ Next Level',
-        convergence_level_select: '☰ Select Level',
+        convergence_open_tree: 'Open Probability Tree',
+        convergence_next_level: 'Next Level',
+        convergence_level_select: 'Select Level',
     },
 
     de: {
@@ -735,10 +737,12 @@ const T = {
 
         // Convergence modal
         convergence: 'Konvergenz',
+        convergence_kicker: 'Meilenstein erreicht',
+        convergence_total: 'GESAMT: {n} / {total}',
         convergence_desc_1: 'Du hast einen Meilenstein erreicht und 1 Konvergenzpunkt erhalten.',
-        convergence_open_tree: '🌿 Wahrscheinlichkeitsbaum öffnen',
-        convergence_next_level: '▶ Nächstes Level',
-        convergence_level_select: '☰ Level wählen',
+        convergence_open_tree: 'Wahrscheinlichkeitsbaum öffnen',
+        convergence_next_level: 'Nächstes Level',
+        convergence_level_select: 'Level wählen',
     }
 };
 //------------------------------------------------------------------------

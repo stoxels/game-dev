@@ -213,84 +213,88 @@
             <div class="setup-book">
                 <img class="setup-book-img" src="images/Game_Setup/Book-Frame.png" alt="">
 
-                <!-- ============ LEFT PAGE ============ -->
-                <div class="setup-page setup-page-left">
+                <!-- ===== CONTENT PAGES — exactly matches the visible parchment ===== -->
+                <div class="setup-pages">
 
-                    <img class="setup-char-name-img" id="setup-char-name-img" src="" alt="">
-
-                    <!-- Char Portrait must be based on selected character and not hardcoded-->
-                    <img class="setup-char-portrait" id="setup-char-portrait" src="" alt="">
-
-                </div>
-
-                <!-- ============ RIGHT PAGE ============ -->
-                <div class="setup-page setup-page-right">
-
-                    <div class="setup-difficulty-label" data-t="setup_diff">GAME DIFFICULTY</div>
-                    <div class="setup-options setup-options-diff" id="diff-opts">
-                        <button class="setup-opt setup-opt-diff" data-diff="easy" data-t="diff_easy">EASY</button>
-                        <button class="setup-opt setup-opt-diff sel" data-diff="normal" data-t="diff_normal">NORMAL</button>
-                        <button class="setup-opt setup-opt-diff" data-diff="hard" data-t="diff_hard">HARD</button>
-                    </div>
-                    <div class="setup-desc-ribbon">
-                        <span class="setup-desc" id="diff-desc"></span>
+                    <!-- ============ CHARACTER ZONE (upper-left) ============ -->
+                    <div class="setup-zone setup-zone-char">
+                        <img class="setup-char-name-img" id="setup-char-name-img" src="" alt="">
+                        <!-- Char Portrait must be based on selected character and not hardcoded-->
+                        <img class="setup-char-portrait" id="setup-char-portrait" src="" alt="">
                     </div>
 
-                    <div class="setup-group-label" data-t="setup_mod">OPTIONAL MODIFIERS</div>
-                    <div class="setup-options">
-                        <!-- BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period. -->
-                        <div class="mod-wrapper setup-super-tutor-wrapper">
-                            <button class="setup-opt setup-opt-mod mod-super-tutor" id="btn-super-tutor" data-mod="superTutor" aria-pressed="false">
-                                <span class="mod-icon mod-icon-super-tutor">🎓</span>
-                                <span class="mod-title mod-title-gold" data-t="mod_super_tutor">SUPER TUTOR</span>
-                                <span class="mod-score-tag" data-t="mod_super_tutor_tag">BETA TEST</span>
-                            </button>
-                            <span class="mod-per-desc" data-t="mod_desc_super_tutor">100% correct answers; no Tutor item required. Temporary beta feature.</span>
+                    <!-- ============ DIFFICULTY ZONE (upper-right) ============ -->
+                    <div class="setup-zone setup-zone-diff">
+                        <div class="setup-difficulty-label" data-t="setup_diff">GAME DIFFICULTY</div>
+                        <div class="setup-options setup-options-diff" id="diff-opts">
+                            <button class="setup-opt setup-opt-diff" data-diff="easy" data-t="diff_easy">EASY</button>
+                            <button class="setup-opt setup-opt-diff sel" data-diff="normal" data-t="diff_normal">NORMAL</button>
+                            <button class="setup-opt setup-opt-diff" data-diff="hard" data-t="diff_hard">HARD</button>
                         </div>
+                        <div class="setup-desc-ribbon">
+                            <span class="setup-desc" id="diff-desc"></span>
+                        </div>
+                    </div>
+
+                <!-- ============ MODIFIERS ZONE (bottom row across both pages) ============ -->
+                <div class="setup-zone setup-zone-mods" id="setup-mods-row">
+                    <div class="setup-group-label" data-t="setup_mod">OPTIONAL MODIFIERS</div>
+                    <div class="setup-mods-inner">
                         <div class="mod-wrapper">
+                            <span class="mod-title mod-title-orange" data-t="mod_tt">TIME TRIAL</span>
                             <button class="setup-opt setup-opt-mod mod-timetrial" data-mod="timetrial">
                                 <span class="mod-icon mod-icon-timetrial"></span>
-                                <span class="mod-title mod-title-orange" data-t="mod_tt">TIME TRIAL</span>
-                                <span class="mod-score-tag">+SCORE (20%)</span>
                             </button>
+                            <span class="mod-score-tag">+SCORE (20%)</span>
                             <span class="mod-per-desc" data-t="mod_desc_tt"></span>
                         </div>
                         <div class="mod-wrapper">
+                            <span class="mod-title mod-title-red" data-t="mod_hc">HARDCORE</span>
                             <button class="setup-opt setup-opt-mod mod-hardcore" data-mod="hardcore">
                                 <span class="mod-icon mod-icon-hardcore"></span>
-                                <span class="mod-title mod-title-red" data-t="mod_hc">HARDCORE</span>
-                                <span class="mod-score-tag">+SCORE (30%)</span>
                             </button>
+                            <span class="mod-score-tag">+SCORE (30%)</span>
                             <span class="mod-per-desc" data-t="mod_desc_hc"></span>
                         </div>
                         <div class="mod-wrapper">
+                            <span class="mod-title mod-title-purple" data-t="mod_im">IRONMAN</span>
                             <button class="setup-opt setup-opt-mod mod-ironman" data-mod="ironman">
                                 <span class="mod-icon mod-icon-ironman"></span>
-                                <span class="mod-title mod-title-purple" data-t="mod_im">IRONMAN</span>
-                                <span class="mod-score-tag">+SCORE (15%)</span>
                             </button>
+                            <span class="mod-score-tag">+SCORE (15%)</span>
                             <span class="mod-per-desc" data-t="mod_desc_im"></span>
                         </div>
                         <div class="mod-wrapper">
+                            <span class="mod-title mod-title-cyan" data-t="mod_cl">CLASSLESS</span>
                             <button class="setup-opt setup-opt-mod mod-classless" data-mod="classless">
                                 <span class="mod-icon mod-icon-classless"></span>
-                                <span class="mod-title mod-title-cyan" data-t="mod_cl">CLASSLESS</span>
-                                <span class="mod-score-tag">+SCORE (20%)</span>
                             </button>
+                            <span class="mod-score-tag">+SCORE (20%)</span>
                             <span class="mod-per-desc" data-t="mod_desc_cl"></span>
                         </div>
                         <div class="mod-wrapper">
+                            <span class="mod-title mod-title-green" data-t="mod_tl">TREELESS</span>
                             <button class="setup-opt setup-opt-mod mod-treeless" data-mod="treeless">
                                 <span class="mod-icon mod-icon-treeless"></span>
-                                <span class="mod-title mod-title-green" data-t="mod_tl">TREELESS</span>
-                                <span class="mod-score-tag">+SCORE (25%)</span>
                             </button>
+                            <span class="mod-score-tag">+SCORE (25%)</span>
                             <span class="mod-per-desc" data-t="mod_desc_tl"></span>
                         </div>
                     </div>
+                </div>
+
+                <!-- BETA TEST ONLY: Super Tutor is temporary and stays anchored separately. -->
+                <div class="mod-wrapper setup-super-tutor-wrapper">
+                    <span class="mod-title mod-title-gold" data-t="mod_super_tutor">🎓 SUPER TUTOR</span>
+                    <button class="setup-opt setup-opt-mod mod-super-tutor" id="btn-super-tutor" data-mod="superTutor" aria-pressed="false">
+                        <span class="mod-icon mod-icon-super-tutor">🎓</span>
+                    </button>
+                    <span class="mod-score-tag" data-t="mod_super_tutor_tag">BETA TEST</span>
+                    <span class="mod-per-desc" data-t="mod_desc_super_tutor">100% correct answers; no Tutor item required. Temporary beta feature.</span>
+                </div>
 
                 </div>
-                <!-- ============ END RIGHT PAGE ============ -->
+                <!-- ============ END PAGES ============ -->
 
             </div>
             <!-- ============ END BOOK ============ -->
@@ -1121,20 +1125,34 @@
 
     <!-- CONVERGENCE -->
     <div class="modal-bg" id="convergence-modal">
-        <div class="modal convergence-modal-box">
-            <div class="convergence-modal-icon">🌿</div>
-            <div class="convergence-modal-title" data-t="convergence">Convergence!</div>
-            <div class="convergence-modal-desc" data-t="convergence_desc_1">You've reached a milestone and earned 1 Convergence Point.</div>
-            <div class="convergence-modal-btns">
-                <button class="btn convergence-btn-tree" data-t="convergence_open_tree" onclick="hideConvergenceModal(); hideResultOverlays(); showPassiveTree();">
-                    🌿 Open Probability Tree
-                </button>
-                <button class="btn convergence-btn-next" data-t="convergence_next_level" onclick="hideConvergenceModal(); goToNextLevel();">
-                    ▶ <span>Next Level</span>
-                </button>
-                <button class="btn convergence-btn-levels" data-t="convergence_level_select" onclick="hideConvergenceModal(); goToLevelSelect();">
-                    ☰ <span>Level Select</span>
-                </button>
+        <div class="convm">
+            <img class="convm-border" src="images/Convergence_Screen/convergence-border.png" alt="">
+            <img class="convm-book" src="images/Convergence_Screen/convergence-book.png" alt="">
+
+            <!-- LEFT PAGE -->
+            <div class="convm-page left">
+                <div class="convm-milestone">
+                    <div class="convm-msbar" data-t="convergence_kicker">MILESTONE REACHED</div>
+                </div>
+                <div class="convm-tree"><img src="images/Convergence_Screen/convergence-tree.png" alt=""></div>
+                <button class="convm-btn open" onclick="hideConvergenceModal(); hideResultOverlays(); showPassiveTree();"><img src="images/Game-Reset/Button-Stone.png" alt=""><span data-t="convergence_open_tree">OPEN PROBABILITY TREE</span></button>
+                <button class="convm-btn next" onclick="hideConvergenceModal(); goToNextLevel();"><img src="images/Game-Reset/Button-Stone.png" alt=""><span data-t="convergence_next_level">NEXT LEVEL</span></button>
+                <button class="convm-btn select" onclick="hideConvergenceModal(); goToLevelSelect();"><img src="images/Game-Reset/Button-Stone.png" alt=""><span data-t="convergence_level_select">SELECT LEVEL</span></button>
+            </div>
+
+            <!-- RIGHT PAGE -->
+            <div class="convm-page right">
+                <div class="convm-title"><span>CONVERGENCE</span></div>
+                <div class="convm-emblem">
+                    <img class="whirl" src="images/Convergence_Screen/convergence-whirl.png" alt="">
+                    <img class="medal" src="images/Convergence_Screen/convergence-stone-behind-whirl.png" alt="">
+                </div>
+                <div class="convm-desc" data-t="convergence_desc_1">You have reached a milestone and earned 1 Convergence Point.</div>
+                <div class="convm-total">
+                    <img class="convm-coins" src="images/Convergence_Screen/convergence-coins.png" alt="">
+                    <div class="convm-total-plate" id="convergence-modal-reward"><img src="images/Convergence_Screen/convergence-total.png" alt=""><span>TOTAL: 0</span></div>
+                    <img class="convm-shard" src="images/Convergence_Screen/convergence-shard.png" alt="">
+                </div>
             </div>
         </div>
     </div>
