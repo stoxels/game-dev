@@ -42,11 +42,57 @@
 
 .qr-panel {
     position: relative;
-    width: min(1500px, 100vw);
+    /* Enlarged panel: fills the viewport width (cap 1700px), but never
+       taller than the window — the height-aware min() keeps the 16/9 art
+       fully visible on short windows instead of clipping it. */
+    width: min(1700px, 100vw, calc((100vh - 16px) * 16 / 9));
     aspect-ratio: 16 / 9;
     background: url('../images/quiz/quiz-panel-background.png') center / 125% 100% no-repeat;
     /* No other border or shadow — the image IS the frame */
 }
+
+
+/* ============================================================
+   CLOSE BUTTON — stone X, top-right corner
+   Same visual family as the settings modal's close button
+   (images/Settings/settings_close_button.png). Sits on the stone
+   frame edge, matching the top-left gem column.
+   ============================================================ */
+
+.qr-close-x {
+    position: absolute;
+    /* Sits on the stone frame's top-right corner, centred on the gemstone.
+       The frame's corner gem is roughly 88% across and 15% down the panel
+       art, so centre the stone button there rather than on the panel's
+       outer edge (top:3.5% right:2.2% put it too far out in-game). */
+    top: 16.5%;
+    right: 9.5%;
+    width: clamp(34px, 3.6vw, 58px);
+    height: clamp(34px, 3.6vw, 58px);
+    background-image: url('../images/Settings/settings_close_button.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    font-size: 0; /* the art already shows the X */
+    cursor: pointer;
+    padding: 0;
+    z-index: 5;
+    transition: transform .12s, filter .12s;
+}
+
+    .qr-close-x:hover {
+        filter: brightness(1.2);
+        transform: scale(1.06);
+    }
+
+    .qr-close-x:active {
+        transform: scale(0.96);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .qr-close-x { transition: none; }
+    }
 
 
 /* ============================================================
@@ -93,16 +139,20 @@
 
 .qr-content {
     position: absolute;
-    top: 18%;
+    top: 17%;
     left: 10%;
     right: 8%;
-    bottom: 18%;
+    bottom: 10%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* was: space-between */
-    gap: 1.5%;
-    padding-bottom: 14%; /* reserve room so content doesn't sit under the footer */
+    justify-content: flex-start; /* top content is anchored here */
+    gap: 1%;
+    /* The footer is a normal flow item at the end of this column (it
+       overhangs the box's bottom edge via a negative margin), so overlap
+       between text and buttons is structurally impossible: the flex
+       layout guarantees every item gets its own band. */
+    padding-bottom: 1%;
 }
 
 
@@ -111,21 +161,25 @@
    ============================================================ */
 
 .qr-title {
-    margin-top: 7%; /* pushes it down from the top of .qr-content */
+    /* Clear the portrait medallion, which hangs down into the top of the
+       content column from the panel's centre-top. The portrait box
+       bottoms out ~26% of panel height; this margin drops the title just
+       below it without wasting the whole column. */
+    margin-top: 7.5%;
     font-family: var(--PX);
-    font-size: clamp(7px, 1.6vw, 14px);
+    font-size: clamp(8px, 1.7vw, 20px);
     color: #f5c518;
     letter-spacing: 0.15em;
     text-align: center;
     text-shadow: 0 0 10px rgba(245, 197, 24, 0.6);
-    margin-bottom: 2%;
+    margin-bottom: 1%;
     flex-shrink: 0;
 }
 
 /* World badge variant (Math Gate) */
 .qr-badge {
     font-family: var(--PX);
-    font-size: clamp(6px, 1.1vw, 10px);
+    font-size: clamp(7px, 1.2vw, 14px);
     color: #b06cff;
     letter-spacing: 0.12em;
     text-align: center;
@@ -140,13 +194,13 @@
 
 .qr-question {
     font-family: "STIX Two Math", "Cambria Math", "DejaVu Sans", var(--F), monospace;
-    font-size: clamp(10px, 1.9vw, 18px);
+    font-size: clamp(10px, 1.9vw, 26px);
     color: #e8d8b0;
     line-height: 1.55;
     text-align: center;
     text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     flex-shrink: 0;
-    max-width: 70%;
+    max-width: 76%;
 }
 
 
@@ -167,10 +221,11 @@
 /* The input-field.png image is the background; the <input> sits on top */
 .qr-input-wrap {
     position: relative;
-    /* input-field.png is 668×373 — we want it narrower here, so we set
-       an explicit width and lock the same aspect ratio */
-    width: 25%;
-    aspect-ratio: 16 / 9;
+    /* input-field.png is 668×373 — the 16:9 art lock made the field ~110px
+       tall at typical sizes, starving the feedback band below. A clamped
+       height keeps the wooden frame art proportionate AND leaves room. */
+    width: 22%;
+    height: clamp(44px, 8.5vh, 72px);
     background: url('../images/quiz/input-field.png') center / 100% 100% no-repeat;
     flex-shrink: 0;
 }
@@ -188,7 +243,7 @@
     outline: none;
     color: #e8d8b0;
     font-family: var(--PX);
-    font-size: clamp(9px, 1.5vw, 13px);
+    font-size: clamp(10px, 1.6vw, 18px);
     letter-spacing: 0.05em;
     text-align: center;
     caret-color: #f5c518;
@@ -196,7 +251,7 @@
 
     .qr-input::placeholder {
         color: #706050;
-        font-size: clamp(7px, 1.1vw, 11px);
+        font-size: clamp(8px, 1.2vw, 15px);
     }
 
     .qr-input:disabled {
@@ -206,7 +261,7 @@
 /* Unit label floats to the right of the input-wrap */
 .qr-unit {
     font-family: var(--PX);
-    font-size: clamp(7px, 1.1vw, 15px);
+    font-size: clamp(8px, 1.3vw, 20px);
     color: #fbb62e;
     white-space: nowrap;
     flex-shrink: 0;
@@ -216,14 +271,14 @@
 .qr-submit-btn {
     position: relative;
     width: 20%;
-    aspect-ratio: 16 / 9;
+    height: clamp(44px, 8.5vh, 72px);
     background: url('../images/quiz/check-button.png') center / 80% 80% no-repeat;
     border: none;
     cursor: pointer;
     flex-shrink: 0;
     /* Label text sits on the left side of the stone, arrow image is on right */
     font-family: var(--PX);
-    font-size: clamp(6px, 1.2vw, 13px);
+    font-size: clamp(8px, 1.4vw, 17px);
     color: #d0d0d0;
     letter-spacing: 0.06em;
     /* shift text left of the built-in arrow icon */
@@ -257,20 +312,30 @@
 .qr-opts {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10% 5%;
+    gap: 5% 4%;
     width: 67%;
     flex-shrink: 0;
+}
+
+/* The live MC buttons use overlays.css .quiz-opt (flat rectangles). In the
+   redesigned stone panel they sit in the .qr-opts grid; compact them a
+   little so the answer grid leaves room for the feedback band below. */
+.qr-opts .quiz-opt {
+    padding: 6% 9%;
+    font-size: clamp(9px, 1.4vw, 19px);
 }
 
 /* Each option reuses the skip-button stone panel as its background */
 .qr-opt {
     position: relative;
-    aspect-ratio: 604 / 376;
+    /* clamp instead of 604/376 lock so two option rows + feedback +
+       footer all fit without starving the feedback band */
+    height: clamp(44px, 9.5vh, 78px);
     background: url('../images/quiz/skip-button.png') center / 100% 100% no-repeat;
     border: none;
     cursor: pointer;
     font-family: var(--F);
-    font-size: clamp(8px, 1.35vw, 13px);
+    font-size: clamp(9px, 1.45vw, 18px);
     color: #d8c898;
     text-align: center;
     line-height: 1.3;
@@ -302,23 +367,58 @@
 
 
 /* ============================================================
+   FEEDBACK STACK (quiz + math gate)
+   Holds hint / result / explanation / rewards as a group. Anchored
+   to the bottom of the free space above the footer, so the text
+   appears just above the buttons and never overlaps the answer
+   options or the input row — regardless of how tall the question
+   text or the options grid is.
+   ============================================================ */
+
+.qr-feedback-stack {
+    /* Sits right under the answer content (options / input row) in normal
+       flow, so the hint/result/explanation reads as part of the answer —
+       not pushed to the bottom by margin-top:auto (which left a big gap
+       under the MC options, per the "wrong answer" screenshot). */
+    margin-top: 3%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: 100%;
+    /* The stack is the column's one shrinkable item: when space is tight
+       (small windows) it scrolls internally instead of pushing the footer
+       buttons off the panel or up into the answer area. In roomy layouts
+       it just sits in the clear chalkboard band above the footer. */
+    flex-shrink: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* ============================================================
    RESULT FEEDBACK
    ============================================================ */
 
-.qr-result {
+/* quiz.js swaps the result element's class to `quiz-result` (the legacy
+   overlays.css name, 20px) on answer. Scope the compact stone sizing to the
+   redesign panel so the feedback band stays above the footer. */
+.qr-panel .qr-result,
+.qr-panel .quiz-result {
     font-family: var(--PX);
-    font-size: clamp(7px, 1.2vw, 11px);
+    font-size: clamp(8px, 1.4vw, 15px);
     min-height: 1.4em;
     text-align: center;
     letter-spacing: 0.05em;
     flex-shrink: 0;
 }
 
-    .qr-result.ok {
+    .qr-panel .qr-result.ok,
+    .qr-panel .quiz-result.ok {
         color: #3ddc84;
     }
 
-    .qr-result.bad {
+    .qr-panel .qr-result.bad,
+    .qr-panel .quiz-result.bad {
         color: #f77070;
     }
 
@@ -329,7 +429,7 @@
 
 .qr-hint {
     font-family: "STIX Two Math", "Cambria Math", "DejaVu Sans", var(--F), monospace;
-    font-size: clamp(15px, 1.0vw, 20px);
+    font-size: clamp(15px, 1.2vw, 22px);
     color: #c8a8e8;
     text-align: center;
     line-height: 1.6;
@@ -338,17 +438,143 @@
     flex-shrink: 0;
 }
 
+    /* Wrapped hint lines never push the stack over the options/input */
+    .qr-hint,
+    .qr-hint-text {
+        max-width: 78%;
+        margin: 0 auto;
+    }
+
 
 /* ============================================================
    FOOTER ROW  (skip / continue / tutor / new-question)
    Uses skip-button.png as background for each button.
    ============================================================ */
 
+/* ============================================================
+   CORNER ICON BUTTONS  (tutor TL / explain BL / continue BR)
+   Small icon-only chips sitting on the four stone corner gems,
+   NOT the board texture. They describe themselves via the game
+   tooltip engine (showGameTooltip) on hover, so the board stays
+   uncluttered and nothing in the content column shifts to make
+   room for them.
+   ============================================================ */
+
+.qr-corner {
+    position: absolute;
+    z-index: 5;
+    width: clamp(30px, 3.4vw, 52px);
+    height: clamp(30px, 3.4vw, 52px);
+    border: none;
+    cursor: pointer;
+    /* Opaque enough to read against the dark stone frame, with a bright
+       stone rim + inner glow so the chip reads as a tappable button, not
+       a smudge on the board. It is deliberately NOT the skip-button art. */
+    background: radial-gradient(circle at 34% 30%, #4a4136, #2a241d 70%);
+    border-radius: 50%;
+    box-shadow:
+        0 3px 7px rgba(0,0,0,0.6),
+        0 0 0 2px rgba(224, 216, 176, 0.35),
+        inset 0 1px 2px rgba(255,255,255,0.18),
+        inset 0 0 10px rgba(245, 197, 24, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(14px, 1.7vw, 24px);
+    color: #f2e6c2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    line-height: 1;
+    transition: filter 0.12s, transform 0.12s, background 0.12s, box-shadow 0.12s;
+}
+
+    .qr-corner:hover {
+        filter: brightness(1.22);
+        background: radial-gradient(circle at 34% 30%, #5c5144, #3a3228 70%);
+        transform: scale(1.08);
+        box-shadow:
+            0 4px 10px rgba(0,0,0,0.65),
+            0 0 0 2px rgba(245, 197, 24, 0.55),
+            inset 0 1px 2px rgba(255,255,255,0.2),
+            inset 0 0 12px rgba(245, 197, 24, 0.28);
+    }
+
+    .qr-corner:active {
+        transform: scale(0.94);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .qr-corner { transition: none; }
+    }
+
+/* Corner positions — sit on the stone frame's gemstones, matching the ✕
+   close button (top:16.5% right:9.5%). The bottom gems sit a little lower
+   than the top ones so the chips read as being on the frame, not the board. */
+.qr-corner--tl {
+    top: 16.5%;
+    left: 9.5%;
+}
+
+.qr-corner--bl {
+    bottom: 18%;
+    left: 9.5%;
+}
+
+.qr-corner--br {
+    bottom: 18%;
+    right: 9.5%;
+}
+
+/* Math Gate's "try a different question" sits just above Continue so it
+   never collides with the corner chip but still lives on the bottom. */
+.qr-corner--newq {
+    bottom: 31%;
+    right: 9.5%;
+}
+
+
+/* ============================================================
+   QUESTION COUNTER  ("1/5")  — Scouts Primer
+   Sits in the top band, bounded left of the ✕ close button and
+   right of the portrait medallion, so it never collides with
+   either. Kept minimal: just the fraction, no "of" text.
+   ============================================================ */
+
+.qr-counter {
+    position: absolute;
+    top: 16%;
+    /* between portrait (top:7% width:11%, centred) and close (right:9.5%). */
+    right: 16%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: clamp(34px, 3vw, 56px);
+    height: clamp(26px, 2.4vw, 42px);
+    padding: 0 6px;
+    background: rgba(38, 198, 166, 0.12);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(38, 198, 166, 0.35);
+    font-family: var(--PX);
+    font-size: clamp(9px, 1.1vw, 16px);
+    color: #7ee6cf;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    /* counter is informational only — never clicks, so it can't block the
+       close button's hit area or the portrait below */
+    pointer-events: none;
+}
+
+
+/* ============================================================
+   STONE FOOTER ROW  (Scouts Primer only)
+   The quiz & math-gate overlays dropped this row in favour of the
+   corner icon chips above; the Scouts Primer still lays its tutor /
+   skip buttons out in a bottom row, so keep those styles here.
+   ============================================================ */
+
 .qr-footer {
-    position: absolute; /* now independent of content height above it */
-    left: 50%;
-    bottom: -16%;
-    transform: translateX(-50%);
+    position: static;
+    margin-bottom: -6%;
     display: flex;
     gap: 3%;
     justify-content: center;
@@ -357,16 +583,15 @@
     flex-shrink: 0;
 }
 
-/* Standard stone footer button */
 .qr-btn {
     position: relative;
-    height: auto;
-    aspect-ratio: 604 / 376;
+    height: clamp(40px, 9vh, 64px);
+    width: auto;
     background: url('../images/quiz/skip-button.png') center / 100% 75% no-repeat;
     border: none;
     cursor: pointer;
     font-family: var(--PX);
-    font-size: clamp(6px, 1.0vw, 11px);
+    font-size: clamp(7px, 1.2vw, 15px);
     color: #b0a080;
     letter-spacing: 0.05em;
     display: flex;
@@ -385,7 +610,6 @@
         transform: translateY(1px);
     }
 
-/* Width variants */
 .qr-btn--skip {
     width: 38%;
 }
@@ -410,38 +634,15 @@
 
 
 /* ============================================================
-   SCOUTS PRIMER — streak dots
+   SCOUTS PRIMER — legacy classes
+   The modal no longer renders streak dots or the "Question n of m"
+   label (replaced by the compact .qr-counter chip on the frame band);
+   these rules remain only for safety against any stale markup.
    ============================================================ */
 
-.qr-primer-dots {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.qr-primer-dot {
-    width: clamp(8px, 1.2vw, 12px);
-    height: clamp(8px, 1.2vw, 12px);
-    border-radius: 50%;
-    background: #3a3028;
-    border: 1px solid #5a4830;
-    transition: background 0.3s;
-}
-
-    .qr-primer-dot.filled {
-        background: #f5c518;
-        border-color: #f5c518;
-    }
-
+.qr-primer-dots,
 .qr-primer-progress {
-    font-family: var(--PX);
-    font-size: clamp(10px, 1vw, 21px);
-    color: #eea119;
-    text-align: center;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-    margin-bottom: 10px;
+    display: none;
 }
 
 
@@ -460,7 +661,7 @@
 
 .qr-reward-item {
     font-family: var(--PX);
-    font-size: clamp(6px, 0.9vw, 9px);
+    font-size: clamp(7px, 1.05vw, 13px);
     color: #b06cff;
     text-align: center;
     letter-spacing: 0.04em;
@@ -495,14 +696,26 @@
 
 .qr-explain {
     font-family: var(--F);
-    font-size: clamp(8px, 1.3vw, 15px);
+    font-size: clamp(9px, 1.5vw, 19px);
     color: #d8c898;
     line-height: 1.5;
     text-align: center;
-    max-width: 60%;
-    margin: 0 auto 4px;
+    max-width: 64%;
+    margin: 0 auto;
     flex-shrink: 0;
     display: none;
-    max-height: 18%;
+    /* Long explanations scroll inside the stack instead of pushing it up
+       into the options or down over the footer */
+    max-height: clamp(70px, 16vh, 190px);
     overflow-y: auto;
+    pointer-events: auto;
 }
+
+    .qr-explain::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .qr-explain::-webkit-scrollbar-thumb {
+        background: rgba(216, 200, 152, 0.35);
+        border-radius: 3px;
+    }

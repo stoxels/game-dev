@@ -1741,6 +1741,22 @@ function _egBuildTooltipBodyHTML(item) {
         }
     }
 
+    // ── Unique special modifiers (non-stat QoL perks) ─────────────────
+    // Rendered in implicit-blue between stat mods and flavor text so the
+    // zero-line auto-mark tradeoff is visible before equipping.
+    let specialHTML = '';
+    try {
+        const specials = (typeof _egGetUniqueSpecialLines === 'function')
+            ? _egGetUniqueSpecialLines(item) : [];
+        if (specials.length) {
+            const lines = specials.map(s => {
+                const label = (typeof LANG !== 'undefined' && LANG === 'de') ? (s.de || s.en) : (s.en || s.de);
+                return `<div class="eg-tt-mod eg-tt-mod-implicit"><span class="eg-tt-mod-label">✨ ${label}</span></div>`;
+            });
+            specialHTML = `<div class="eg-tt-section eg-tt-mods-section">${lines.join('')}</div>`;
+        }
+    } catch (e) { specialHTML = ''; }
+
     // ── Unique flavor text ────────────────────────────────────────────
     const flavorHTML = item.isUnique
         ? `<div class="eg-tt-section"><div class="eg-tt-flavor">${LANG === 'de'
@@ -1775,6 +1791,7 @@ function _egBuildTooltipBodyHTML(item) {
     ${reqHTML}
     ${chainHTML}
     ${modsHTML}
+    ${specialHTML}
     ${flavorHTML}
     ${ilvlHTML}
     ${mirroredHTML}

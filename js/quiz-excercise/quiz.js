@@ -185,7 +185,6 @@ function getQuizQuestion(worldNum) {
 function _quizResetOverlay() {
     document.getElementById('quiz-result').textContent = '';
     document.getElementById('quiz-continue').style.display = 'none';
-    document.getElementById('btn-skip-quiz').style.display = 'block';
     document.getElementById('quiz-opts').innerHTML = '';
 }
 
@@ -289,7 +288,7 @@ function _quizRefreshWhyButton() {
     box.textContent = '';
 
     const hasExplain = currentQuizQuestion && (currentQuizQuestion.explain || currentQuizQuestion.explainDE);
-    btn.style.display = hasExplain ? 'inline-block' : 'none';
+    btn.style.display = hasExplain ? 'flex' : 'none';
     btn.onclick = quizToggleExplain;
 }
 
@@ -456,7 +455,6 @@ function _resolveQuizAnswer(correct) {
         }
     }
     document.getElementById('quiz-continue').style.display = 'flex';
-    document.getElementById('btn-skip-quiz').style.display = 'none';
     _quizRefreshWhyButton();
 }
 
@@ -665,8 +663,12 @@ function _quizRefreshTutorButton() {
     const tutorCount = _quizCountTutorItems();
 
     if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
-        btn.style.display = 'inline-block';
-        btn.textContent = superTutorEnabled ? t('qz_super_tutor') : t('qz_ask_tutor').replace('{n}', tutorCount);
+        btn.style.display = 'flex';
+        // Corner chip shows just the tutor / professor emoji; the detail
+        // (item count or super-tutor name) moves into the hover tooltip.
+        btn.textContent = superTutorEnabled ? '📚' : '🎓';
+        btn.dataset.tipT = superTutorEnabled ? 'qz_super_tutor' : 'qz_ask_tutor';
+        btn.dataset.tipN = superTutorEnabled ? '' : tutorCount;
     } else {
         btn.style.display = 'none';
     }

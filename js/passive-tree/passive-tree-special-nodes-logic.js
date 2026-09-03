@@ -80,6 +80,8 @@ const DOF_FLASH_INTERVAL_MS = 30 * 1000; // Time between brief reveals
 const DOF_FLASH_DURATION_MS = 5 * 1000;  // How long clues stay visible during flash
 window._degreesOfFreedomChoice = null; // 'row' | 'col' — player's chosen hidden clue axis
 window._degreesOfFreedomNext = null; // Timestamp for next brief clue reveal
+window._degreesOfFreedomFlashTimeout = null; // Pending re-hide timeout of an active flash
+window._dofFlashToken = 0; // Bumps on every choice/reset; stale flash timeouts no-op on mismatch
 
 // --- Overfitting (node 299) — local var, not on window ---
 const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which mistakes stop being free
@@ -1082,43 +1084,87 @@ function _signalToNoiseCheckRestore() {
 //              timer.js setInterval → _degreesOfFreedomTick()
 //------------------------------------------------------------------------
 
+// Returns the clue-cell selector for a hidden axis choice.
+function _dofSelectorFor(choice) {
+    return choice === 'row' ? '[class*="rct-"]' : '[class*="cch-"]';
+}
+
+// Builds the inner HTML for the axis-selection modal.
+// Mirrors the Data Strike row/column choice modal (_dataStrikeOverlayHTML):
+// stone panel + title plaque + prompt + ROWS / COLS buttons. No cancel
+// button — the keystone downside is mandatory, so a choice is required.
+function _dofOverlayHTML() {
+    const title = t('pt_dof_title');
+    const question = t('pt_dof_question');
+    const detail = t('pt_tip_degrees_of_freedom');
+    const rowLabel = t('cls_rows_label');
+    const colLabel = t('cls_cols_label');
+
+    return `
+        <div class="ds-panel dof-panel">
+            <div class="ds-icon dof-icon"></div>
+            <div class="ds-title-plaque">
+                <span class="ds-title-text">${title}</span>
+            </div>
+            <div class="ds-prompt">${question}<span class="dof-detail">${detail}</span></div>
+            <div class="ds-btn-row">
+                <button class="ds-btn ds-btn-rows" onclick="_dofChoose('row')">${rowLabel}</button>
+                <button class="ds-btn ds-btn-cols" onclick="_dofChoose('col')">${colLabel}</button>
+            </div>
+        </div>`;
+}
+
 // Builds and appends the axis-selection modal to the page.
 function _dofShowModal() {
+    // Drop any stale modal first (e.g. leftover from a level restart).
+    // Without this, duplicate #dof-modal nodes pile up behind each other.
+    _dofRemoveModal();
     const modal = document.createElement('div');
     modal.className = 'modal-bg show';
     modal.id = 'dof-modal';
-    modal.innerHTML = `
-        <div class="modal-box" style="text-align:center;max-width:340px">
-            <h3>🎛️ ${t('pt_dof_title')}</h3>
-            <p style="margin:10px 0">${t('pt_dof_question')}</p>
-            <button onclick="_dofChoose('row')" style="margin:6px;padding:8px 18px">
-                ${t('pt_dof_btn_rows')}
-            </button>
-            <button onclick="_dofChoose('col')" style="margin:6px;padding:8px 18px">
-                ${t('pt_dof_btn_cols')}
-            </button>
-        </div>`;
+    modal.style.cssText = 'z-index:3000;';
+    modal.innerHTML = _dofOverlayHTML();
     document.body.appendChild(modal);
 }
 
-// Removes the selection modal if it exists.
+// Removes every selection modal instance if present.
 function _dofRemoveModal() {
-    const modal = document.getElementById('dof-modal');
-    if (modal) modal.remove();
+    document.querySelectorAll('#dof-modal').forEach(m => m.remove());
+}
+
+// Nudges the modal (shake) to signal that the choice is mandatory and
+// cannot be dismissed with Escape. Called from the generic modal-close paths.
+function _dofNudge() {
+    const panel = document.querySelector('#dof-modal .dof-panel');
+    if (!panel) return;
+    panel.classList.remove('dof-nudge');
+    void panel.offsetWidth; // force reflow so the animation restarts
+    panel.classList.add('dof-nudge');
 }
 
 // Hides the clues for the chosen axis across the whole board.
 function _dofHideChosenAxis(type) {
     if (!cur) return;
-    _setClueBlackout(type === 'row' ? '[class*="rct-"]' : '[class*="cch-"]', true);
+    _setClueBlackout(_dofSelectorFor(type), true);
+}
+
+// Cancels a pending flash re-hide timeout, if any.
+function _dofClearFlashTimeout() {
+    if (window._degreesOfFreedomFlashTimeout) {
+        clearTimeout(window._degreesOfFreedomFlashTimeout);
+        window._degreesOfFreedomFlashTimeout = null;
+    }
 }
 
 // Called when the player clicks one of the modal buttons.
 // Sets the chosen axis, closes the modal, and starts the flash timer.
 function _dofChoose(type) {
+    if (type !== 'row' && type !== 'col') return;
     _dofRemoveModal();
+    _dofClearFlashTimeout();
     window._degreesOfFreedomChoice = type;
     window._degreesOfFreedomNext = Date.now() + DOF_FLASH_INTERVAL_MS;
+    window._dofFlashToken = (window._dofFlashToken || 0) + 1;
 
     _dofHideChosenAxis(type);
 
@@ -1126,18 +1172,34 @@ function _dofChoose(type) {
     showToast(`🎛️ ${label}`);
 }
 
-// Flashes a set of elements as visible, then re-hides them after the flash duration.
-function _dofFlashElements(elements) {
-    elements.forEach(el => el.classList.remove('clue-blackout'));
-    setTimeout(() => elements.forEach(el => el.classList.add('clue-blackout')), DOF_FLASH_DURATION_MS);
+// Flashes the hidden clues as visible, then re-hides them after the flash
+// duration. The re-hide re-queries the live DOM (instead of re-hiding a
+// stale snapshot) and is guarded by the flash token, so a level restart or
+// a new choice mid-flash can never hide the wrong grid.
+function _dofFlashElements(token, choice) {
+    document.querySelectorAll(_dofSelectorFor(choice))
+        .forEach(el => el.classList.remove('clue-blackout'));
+
+    _dofClearFlashTimeout();
+    window._degreesOfFreedomFlashTimeout = setTimeout(() => {
+        window._degreesOfFreedomFlashTimeout = null;
+        if (token !== window._dofFlashToken) return;
+        if (choice !== window._degreesOfFreedomChoice) return;
+        if (!ptHasSkill('keystone_degrees_of_freedom')) return;
+        if (!cur) return;
+        document.querySelectorAll(_dofSelectorFor(choice))
+            .forEach(el => el.classList.add('clue-blackout'));
+    }, DOF_FLASH_DURATION_MS);
 }
 
 // Shows the axis-choice modal at level start.
 // Called from: start-level.js
 function _applyDegreesOfFreedom() {
     if (!ptHasSkill('keystone_degrees_of_freedom')) return;
+    _dofClearFlashTimeout();
     window._degreesOfFreedomNext = null;
     window._degreesOfFreedomChoice = null;
+    window._dofFlashToken = (window._dofFlashToken || 0) + 1;
     _dofShowModal();
 }
 
@@ -1151,10 +1213,7 @@ function _degreesOfFreedomTick() {
 
     window._degreesOfFreedomNext = Date.now() + DOF_FLASH_INTERVAL_MS;
 
-    const selector = window._degreesOfFreedomChoice === 'row' ? '[class*="rct-"]' : '[class*="cch-"]';
-    const elements = document.querySelectorAll(selector);
-
-    _dofFlashElements(elements);
+    _dofFlashElements(window._dofFlashToken, window._degreesOfFreedomChoice);
     showToast(`🎛️ ${t('pt_dof_flash')}`);
 }
 
@@ -1283,6 +1342,8 @@ function _resetNewNodeState() {
     window._signalToNoiseFakeClues = [];
     window._degreesOfFreedomChoice = null;
     window._degreesOfFreedomNext = null;
+    if (typeof _dofClearFlashTimeout === 'function') _dofClearFlashTimeout();
+    window._dofFlashToken = (window._dofFlashToken || 0) + 1;
     window._oracleActive = false;
     window._sparsePriorRevealedLines = new Set();
     window._residualAnalysisRewardedLines = new Set();

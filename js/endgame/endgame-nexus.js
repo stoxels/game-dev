@@ -14,6 +14,8 @@
 //=    3. Atlas of Statistica      -> showEndgameAtlas()                 =
 //=    4. Atlas Vendor            -> showEndgameVendor()                =
 //=       (endgame-vendor.js)                                            =
+//=    5. Boss Testing            -> showEndgameBossTest()                 =
+//=       (endgame-boss-test.js)                                       =
 //=                                                                      =
 //=  All child screens navigate BACK to this screen, so the Nexus        =
 //=  is the single anchor of the endgame screen cluster.                 =
@@ -56,6 +58,7 @@ function _egnBuildFullScreenHTML() {
         ${_egnBuildDoorHTML('🎲', 'mg_gate_badge', 'showEndgameGate()')}
         ${_egnBuildDoorHTML('🗺️', 'eg_atlas_title', 'showEndgameAtlas()')}
         ${_egnBuildDoorHTML('💰', 'eg_vendor_title', 'showEndgameVendor()')}
+        ${_egnBuildDoorHTML('💀', 'eg_boss_test_title', 'showEndgameBossTest()')}
     </div>
 </div>`;
 }
@@ -154,6 +157,9 @@ function ensureEndgameNexusScreen() {
 // (History push to 'screen-mode-select' happens in launchEndgameTestMode()
 // in screens.js on entry from the mode select screen.)
 function showEndgameNexus() {
+    // Leaving any boss-test context behind — a forfeit to the Nexus must
+    // not leak the flag into a later campaign run's goToLevelSelect().
+    window._egIsBossTestRun = false;
     ensureEndgameNexusScreen();
     switchScreen('screen-endgame-nexus');
     if (typeof trackAchStat === 'function') try { trackAchStat('egNexusVisits', 1); } catch (e) {}

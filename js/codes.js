@@ -129,16 +129,41 @@ function collectLockedCodesOnly() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// _pwFireSparkles — one-shot golden sparkle burst over a code display.
+// Each spark is a single absolutely-positioned star (css/modals.css 3j)
+// that fans out from the display's centre and fades; nodes self-remove
+// on animationend.
+function _pwFireSparkles(container) {
+    // Respect the reduced-motion off-switch in the CSS choreography.
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    container.querySelectorAll('.pw-spark').forEach(s => s.remove());
+    const EMOJIS = ['✦', '✧', '⭐'];
+    for (let i = 0; i < 12; i++) {
+        const s = document.createElement('span');
+        s.className = 'pw-spark';
+        s.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.5;
+        const dist = 26 + Math.random() * 30;
+        s.style.setProperty('--sx', `${Math.round(Math.cos(angle) * dist)}px`);
+        s.style.setProperty('--sy', `${Math.round(Math.sin(angle) * dist)}px`);
+        s.style.setProperty('--sr', `${Math.round(Math.random() * 90 - 45)}deg`);
+        s.style.setProperty('--sd', `${(Math.random() * 0.15).toFixed(2)}s`);
+        s.addEventListener('animationend', () => s.remove());
+        container.appendChild(s);
+    }
+}
+
 // Builds the HTML for a single code block inside the unlock modal.
+// One parchment stone card (css/modals.css section 3) containing the
+// code's title, the glowing code display, and the Moodle hint.
 function buildCodeUnlockBlock(worldCode) {
     const title = getCodeTitle(worldCode);
     return `
-        <div style="margin-bottom:14px;">
-            <div style="font-family:var(--PX);font-size:9px;color:var(--purple);margin-bottom:5px;">
-                ${title}
-            </div>
+        <div class="pw-card">
+            <div class="pw-card-title">${title}</div>
             <div class="pw-unlock-anim">${worldCode.code}</div>
-            <div style="font-size:11px;color:#666;margin-top:6px;">${t('pw_hint')}</div>
+            <div class="pw-hint">${t('pw_hint')}</div>
         </div>
     `;
 }
@@ -152,10 +177,24 @@ function showUnlockedCodesModal(codes) {
         .textContent = t('pw_title');
 
     contentEl.innerHTML =
-        `<p style="font-size:12px;color:#888;margin-bottom:16px;">${t('pw_intro')}</p>` +
+        `<p class="pw-intro">${t('pw_intro')}</p>` +
         codes.map(buildCodeUnlockBlock).join('');
 
     showModal('pw-modal');
+
+    // Reward fanfare: the achievement sting plus a golden sparkle burst
+    // over each code display, timed to the CSS shine sweep that peaks
+    // ~350ms into its run (css/modals.css 3j — sweep delays are
+    // 0.5s/0.64s/0.78s/… per card).
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('achievement');
+    }
+
+    const _shineDelays = [500, 640, 780, 920];
+    contentEl.querySelectorAll('.pw-unlock-anim').forEach((el, i) => {
+        const delay = _shineDelays[Math.min(i, _shineDelays.length - 1)] + 350;
+        setTimeout(() => _pwFireSparkles(el), delay);
+    });
 }
 
 // Builds the HTML for a single code block inside the "locked" modal.
@@ -177,12 +216,10 @@ function buildCodeLockedBlock(lockedEntry) {
         .replace('{needed}', needed);
 
     return `
-        <div style="margin-bottom:14px;">
-            <div style="font-family:var(--PX);font-size:9px;color:var(--purple);margin-bottom:5px;">
-                ${title}
-            </div>
-            <div style="font-size:12px;color:var(--green);margin-bottom:4px;">${scoreLineText}</div>
-            <div style="font-size:12px;color:var(--orange);">${achLineText}</div>
+        <div class="pw-card">
+            <div class="pw-card-title">${title}</div>
+            <div class="pw-card-status-score">${scoreLineText}</div>
+            <div class="pw-card-status-ach">${achLineText}</div>
         </div>
     `;
 }
@@ -202,7 +239,7 @@ function showLockedCodesModal(lockedCodes) {
         .textContent = lockedTitle;
 
     contentEl.innerHTML =
-        `<p style="font-size:12px;color:#888;margin-bottom:16px;">${lockedIntro}</p>` +
+        `<p class="pw-intro">${lockedIntro}</p>` +
         lockedCodes.map(buildCodeLockedBlock).join('');
 
     showModal('pw-modal');

@@ -23,9 +23,9 @@ const MG_RECENT_HISTORY_SIZE = 10;
 // at runtime, skipping any that don't exist in the current world data.
 
 // Purposefully empty while testers are testing the game
-const MATH_GATE_LEVELS = [];
+//const MATH_GATE_LEVELS = [];
 
-/*
+
 
 const MATH_GATE_LEVELS = [
     { world: 1, level: 6 },
@@ -84,7 +84,6 @@ const MATH_GATE_LEVELS = [
 
 ];
 
-*/
 
 
 
@@ -378,7 +377,7 @@ function _mgRefreshWhyButton() {
     box.textContent = '';
 
     const hasExplain = currentGateQuestion && (currentGateQuestion.explain || currentGateQuestion.explainDE);
-    btn.style.display = hasExplain ? 'inline-block' : 'none';
+    btn.style.display = hasExplain ? 'flex' : 'none';
     btn.onclick = mgToggleExplain;
 }
 
@@ -451,8 +450,12 @@ function mgRefreshTutorButton() {
     const tutorCount = STATE.inventory.filter(i => TUTOR_ITEM_IDS_2.includes(i.defId)).length;
 
     if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
-        btn.style.display = 'inline-block';
-        btn.textContent = superTutorEnabled ? t('qz_super_tutor') : t('qz_ask_tutor').replace('{n}', tutorCount);
+        btn.style.display = 'flex';
+        // Corner chip shows just the tutor / professor emoji; the detail
+        // (item count or super-tutor name) moves into the hover tooltip.
+        btn.textContent = superTutorEnabled ? '📚' : '🎓';
+        btn.dataset.tipT = superTutorEnabled ? 'qz_super_tutor' : 'qz_ask_tutor';
+        btn.dataset.tipN = superTutorEnabled ? '' : tutorCount;
     } else {
         btn.style.display = 'none';
     }
@@ -482,7 +485,7 @@ function mgHandleTutorSuccess() {
     questStat_tutorAnsweredCorrect();
 
     _mgRefreshWhyButton();
-    document.getElementById('mg-continue-btn').style.display = 'inline-block'; // was: setTimeout(...)
+    document.getElementById('mg-continue-btn').style.display = 'flex'; // was: setTimeout(...)
 }
 
 // Handles the outcome where the tutor fails to solve the question.
@@ -678,7 +681,7 @@ function mgHandleCorrectAnswer() {
         && typeof _egApplyQuizRewardBuff === 'function') _egApplyQuizRewardBuff();
 
     _mgRefreshWhyButton();
-    document.getElementById('mg-continue-btn').style.display = 'inline-block'; 
+    document.getElementById('mg-continue-btn').style.display = 'flex'; 
 }
 
 
@@ -719,7 +722,7 @@ function mgShowHint() {
 
 // Reveals the "try a different question" button in the modal.
 function mgShowNewQuestionButton() {
-    document.getElementById('mg-new-q-btn').style.display = 'inline-block';
+    document.getElementById('mg-new-q-btn').style.display = 'flex';
 }
 
 // Handles everything that happens when the player submits a wrong answer.

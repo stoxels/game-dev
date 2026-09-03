@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="css/classes/statistician.css">
     <link rel="stylesheet" href="css/classes/targeting-reticle.css">
     <link rel="stylesheet" href="css/endgame/monsters.css">
+    <link rel="stylesheet" href="css/endgame/bosses2.css">
     <link rel="stylesheet" href="css/endgame/projectiles.css">
     <link rel="stylesheet" href="css/endgame/hazards.css">
     <link rel="stylesheet" href="css/endgame/endgame-hub.css">
@@ -44,7 +45,7 @@
     <link rel="stylesheet" href="css/character-select.css">
     <link rel="stylesheet" href="css/map-view.css">
     <link rel="stylesheet" href="css/map-view-topbar.css">
-    <link rel="stylesheet" href="css/quiz-excercises.css">
+    <link rel="stylesheet" href="css/quiz-excercises.css?v=3">
     <link rel="stylesheet" href="css/highscore.css">
     <link rel="stylesheet" href="css/moodle-codes.css">
     <link rel="stylesheet" href="css/inference.css">
@@ -71,7 +72,6 @@
             <img class="title-logo-img" src="images/Title_Screen/STOXELS.png" alt="STOXELS">
 
             <!-- Subtitle + version replace the old <p class="title-tag"> and title-version span -->
-            <div class="title-expansion-badge" data-t="scr_expansion_badge">EXPANSION 1</div>
             <div class="title-subtitle" data-t="scr_cartographers_tagline">CARTOGRAPHERS OF CHANCE</div>
             <div class="title-version-line">v0.27 BETA</div>
             <div class="title-ai-disclosure" data-t="scr_ai_disclosure">This game contains AI-generated art, sound, music, and code.</div>
@@ -689,43 +689,60 @@
             <div class="modal-title" data-t="retry_setup_title">⟳ RETRY WITH NEW SETTINGS</div>
             <p class="retry-setup-hint" data-t="retry_setup_hint"></p>
 
-            <div class="retry-setup-section-label" data-t="setup_diff">DIFFICULTY</div>
-            <div class="retry-setup-diff-row">
-                <button class="setup-opt-diff" data-diff="easy" data-t="diff_easy">EASY</button>
-                <button class="setup-opt-diff" data-diff="normal" data-t="diff_normal">NORMAL</button>
-                <button class="setup-opt-diff" data-diff="hard" data-t="diff_hard">HARD</button>
+            <div class="retry-setup-body">
+                <div class="retry-setup-section-label" data-t="setup_diff">DIFFICULTY</div>
+                <div class="retry-setup-diff-row">
+                    <button class="setup-opt setup-opt-diff" data-diff="easy" data-t="diff_easy">EASY</button>
+                    <button class="setup-opt setup-opt-diff" data-diff="normal" data-t="diff_normal">NORMAL</button>
+                    <button class="setup-opt setup-opt-diff" data-diff="hard" data-t="diff_hard">HARD</button>
+                </div>
+
+                <div class="retry-setup-section-label" data-t="setup_mod">OPTIONAL MODIFIERS</div>
+                <div class="retry-setup-mods-row">
+                    <div class="mod-wrapper">
+                        <span class="mod-title mod-title-orange" data-t="mod_tt">TIME TRIAL</span>
+                        <button class="setup-opt setup-opt-mod mod-timetrial" data-mod="timetrial">
+                            <span class="mod-icon mod-icon-timetrial"></span>
+                        </button>
+                        <span class="mod-score-tag">+SCORE (20%)</span>
+                        <span class="mod-per-desc" data-t="mod_desc_tt"></span>
+                    </div>
+                    <div class="mod-wrapper">
+                        <span class="mod-title mod-title-red" data-t="mod_hc">HARDCORE</span>
+                        <button class="setup-opt setup-opt-mod mod-hardcore" data-mod="hardcore">
+                            <span class="mod-icon mod-icon-hardcore"></span>
+                        </button>
+                        <span class="mod-score-tag">+SCORE (30%)</span>
+                        <span class="mod-per-desc" data-t="mod_desc_hc"></span>
+                    </div>
+                    <div class="mod-wrapper">
+                        <span class="mod-title mod-title-purple" data-t="mod_im">IRONMAN</span>
+                        <button class="setup-opt setup-opt-mod mod-ironman" data-mod="ironman">
+                            <span class="mod-icon mod-icon-ironman"></span>
+                        </button>
+                        <span class="mod-score-tag">+SCORE (15%)</span>
+                        <span class="mod-per-desc" data-t="mod_desc_im"></span>
+                    </div>
+                    <div class="mod-wrapper">
+                        <span class="mod-title mod-title-cyan" data-t="mod_cl">CLASSLESS</span>
+                        <button class="setup-opt setup-opt-mod mod-classless" data-mod="classless">
+                            <span class="mod-icon mod-icon-classless"></span>
+                        </button>
+                        <span class="mod-score-tag">+SCORE (20%)</span>
+                        <span class="mod-per-desc" data-t="mod_desc_cl"></span>
+                    </div>
+                    <div class="mod-wrapper">
+                        <span class="mod-title mod-title-green" data-t="mod_tl">TREELESS</span>
+                        <button class="setup-opt setup-opt-mod mod-treeless" data-mod="treeless">
+                            <span class="mod-icon mod-icon-treeless"></span>
+                        </button>
+                        <span class="mod-score-tag">+SCORE (25%)</span>
+                        <span class="mod-per-desc" data-t="mod_desc_tl"></span>
+                    </div>
+                </div>
             </div>
 
-            <div class="retry-setup-section-label" data-t="setup_mod">OPTIONAL MODIFIERS</div>
-            <div class="retry-setup-mods-row">
-                <button class="setup-opt-mod mod-timetrial" data-mod="timetrial">
-                    <span class="mod-icon mod-icon-timetrial"></span>
-                    <span class="mod-title mod-title-orange" data-t="mod_tt">TIME TRIAL</span>
-                    <span class="mod-score-tag">+SCORE (20%)</span>
-                </button>
-                <button class="setup-opt-mod mod-hardcore" data-mod="hardcore">
-                    <span class="mod-icon mod-icon-hardcore"></span>
-                    <span class="mod-title mod-title-red" data-t="mod_hc">HARDCORE</span>
-                    <span class="mod-score-tag">+SCORE (30%)</span>
-                </button>
-                <button class="setup-opt-mod mod-ironman" data-mod="ironman">
-                    <span class="mod-icon mod-icon-ironman"></span>
-                    <span class="mod-title mod-title-purple" data-t="mod_im">IRONMAN</span>
-                    <span class="mod-score-tag">+SCORE (15%)</span>
-                </button>
-                <button class="setup-opt-mod mod-classless" data-mod="classless">
-                    <span class="mod-icon mod-icon-classless"></span>
-                    <span class="mod-title mod-title-cyan" data-t="mod_cl">CLASSLESS</span>
-                    <span class="mod-score-tag">+SCORE (20%)</span>
-                </button>
-                <button class="setup-opt-mod mod-treeless" data-mod="treeless">
-                    <span class="mod-icon mod-icon-treeless"></span>
-                    <span class="mod-title mod-title-green" data-t="mod_tl">TREELESS</span>
-                    <span class="mod-score-tag">+SCORE (25%)</span>
-                </button>
-            </div>
-
-            <div class="modal-actions">
+            <div class="modal-actions retry-setup-actions">
                 <button class="retry-start-btn" id="btn-retry-setup-start" data-t="retry_setup_start">▶ START RETRY</button>
             </div>
         </div>
@@ -734,10 +751,15 @@
     <!-- KEEP OR REVERT PROMPT — shown after completing/failing a retried level -->
     <div id="retry-keep-modal" class="modal-bg safe-center">
         <div class="modal-box modal-box-danger">
-            <div class="modal-title" data-t="retry_keep_title">KEEP THE NEW SETTINGS?</div>
+            <div class="modal-title" data-t="retry_keep_title">KEEP THE NEW SETUP?</div>
             <p class="reset-body-text" data-t="retry_keep_text"></p>
-            <div class="modal-actions">
-                <button class="retry-keep-btn" id="btn-retry-keep" data-t="btn_retry_keep">KEEP NEW SETTINGS</button>
+            <div class="retry-keep-compare">
+                <div class="retry-keep-row retry-keep-row-new"><span class="retry-keep-label" data-t="retry_keep_new_label">NEW SETUP:</span> <span id="retry-keep-new"></span></div>
+                <div class="retry-keep-row retry-keep-row-prev"><span class="retry-keep-label" data-t="retry_keep_prev_label">PREVIOUS SETUP:</span> <span id="retry-keep-prev"></span></div>
+            </div>
+            <div class="modal-actions retry-keep-actions">
+                <button class="retry-keep-btn" id="btn-retry-keep" data-t="btn_retry_keep">KEEP NEW SETUP</button>
+                <button class="retry-again-btn" id="btn-retry-again" data-t="btn_retry_again">↻ REPLAY AGAIN (DECIDE LATER)</button>
                 <button class="retry-revert-btn" id="btn-retry-revert" data-t="btn_retry_revert">REVERT TO PREVIOUS</button>
             </div>
         </div>
@@ -972,8 +994,8 @@
             <div id="item-reward-zone"></div>
 
             <div class="ov-btns ov-btns-2col">
-                <button class="ob s" id="btn-win-retry" data-t="btn_retry">RETRY</button>
-                <button class="ob y" id="btn-win-retry-setup" data-t="btn_retry_setup">⟳ RETRY (NEW SETUP)</button>
+                <button class="ob s" id="btn-win-retry" data-t="btn_retry">REPLAY</button>
+                <button class="ob y" id="btn-win-retry-setup" data-t="btn_retry_setup">⟳ REPLAY (NEW SETUP)</button>
                 <button class="ob p" id="btn-next-lvl" data-t="btn_next">NEXT ▶</button>
                 <button class="ob s" id="btn-win-levels" data-t="btn_levels">LEVELS</button>
             </div>
@@ -995,6 +1017,15 @@
     <!-- QUIZ OVERLAY -->
     <div class="qr-backdrop" id="quiz-overlay">
         <div class="qr-panel">
+
+            <!-- Stone X close button, top-right corner (same family as the
+                 settings modal's close button, css/quiz-excercises.css) -->
+            <button class="qr-close-x" id="quiz-close-x" aria-label="Close" data-t="reset_close">✕</button>
+
+            <!-- Corner action buttons (icon-only; describe themselves via tooltip) -->
+            <button class="qr-corner qr-corner--tl" id="quiz-tutor-btn" style="display:none;" aria-label="Tutor" data-tip-t="scr_tutor">🎓</button>
+            <button class="qr-corner qr-corner--bl" id="quiz-why-btn" style="display:none;" aria-label="Explanation" data-tip-t="scr_tell_me_why">💡</button>
+            <button class="qr-corner qr-corner--br" id="quiz-continue" style="display:none;" aria-label="Continue" data-tip-t="qz_corner_tip_continue">➤</button>
 
             <!-- Portrait: JS injects an <img> here -->
             <div class="qr-portrait" id="quiz-portrait"></div>
@@ -1018,18 +1049,16 @@
                     <button class="qr-submit-btn" id="quiz-input-submit" data-t="mg_submit">CHECK</button>
                 </div>
 
-                <div class="qr-hint" id="quiz-input-hint"></div>
-                <div class="qr-result" id="quiz-result"></div>
+                <!-- Feedback cluster (hint / result / explanation / item
+                     rewards) anchored above the footer so it never overlaps
+                     the answer options or the footer buttons -->
+                <div class="qr-feedback-stack">
+                    <div class="qr-hint" id="quiz-input-hint"></div>
+                    <div class="qr-result" id="quiz-result"></div>
 
-                <div class="qr-explain" id="quiz-explain" style="display:none;"></div>
+                    <div class="qr-explain" id="quiz-explain" style="display:none;"></div>
 
-                <div class="qr-reward-zone" id="item-reward-zone"></div>
-
-                <div class="qr-footer">
-                    <button class="qr-btn qr-btn--why" id="quiz-why-btn" style="display:none;" data-t="scr_tell_me_why">💡 Tell me why</button>
-                    <button class="qr-btn qr-btn--tutor" id="quiz-tutor-btn" style="display:none;" data-t="scr_tutor">🎓 TUTOR</button>
-                    <button class="qr-btn qr-btn--continue" id="quiz-continue" style="display:none;" data-t="quiz_continue">CONTINUE ▶</button>
-                    <button class="qr-btn qr-btn--skip" id="btn-skip-quiz" data-t="quiz_skip">SKIP</button>
+                    <div class="qr-reward-zone" id="item-reward-zone"></div>
                 </div>
 
             </div>
@@ -1038,11 +1067,17 @@
 
 
     <!-- CODE MODAL -->
-    <div id="pw-modal" class="modal-bg">
+    <!-- Stone/parchment frame chrome, same family as the settings modal: -->
+    <!-- background frame art + title plaque + stone close button overhanging -->
+    <!-- the frame edge (css/modals.css, section 3). -->
+    <div id="pw-modal" class="modal-bg safe-center">
         <div class="modal-box pw-box">
             <button class="modal-close" data-modal-close="pw-modal" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title" data-t="pw_title">🔑 NEW CODE UNLOCKED!</div>
-            <div id="pw-content"></div>
+
+            <!-- SCROLL PANEL: injected unlock/locked code cards; scrolls when -->
+            <!-- several codes unlock at once (mirrors .settings-scroll). -->
+            <div class="pw-scroll" id="pw-content"></div>
         </div>
     </div>
 
@@ -1077,6 +1112,16 @@
     <div id="mg-modal" class="modal-bg">
         <div class="qr-panel">
 
+            <!-- Stone X close button, top-right corner (same family as the
+                 settings modal's close button, css/quiz-excercises.css) -->
+            <button class="qr-close-x" id="mg-close-x" aria-label="Close" data-t="reset_close">✕</button>
+
+            <!-- Corner action buttons (icon-only; describe themselves via tooltip) -->
+            <button class="qr-corner qr-corner--tl" id="mg-tutor-btn" style="display:none;" aria-label="Tutor" data-tip-t="scr_tutor">🎓</button>
+            <button class="qr-corner qr-corner--bl" id="mg-why-btn" style="display:none;" aria-label="Explanation" data-tip-t="scr_tell_me_why">💡</button>
+            <button class="qr-corner qr-corner--newq" id="mg-new-q-btn" style="display:none;" aria-label="New question" data-tip-t="mg_new_q">🔄</button>
+            <button class="qr-corner qr-corner--br" id="mg-continue-btn" style="display:none;" aria-label="Continue" data-tip-t="qz_corner_tip_continue">➤</button>
+
             <!-- Portrait -->
             <div class="qr-portrait" id="mg-portrait"></div>
 
@@ -1095,20 +1140,17 @@
                     <button class="qr-submit-btn" id="mg-submit-btn" data-t="mg_submit">CHECK</button>
                 </div>
 
-                <div class="qr-hint" id="mg-hint-box">
-                    <div class="qr-hint-text" id="mg-hint-text"></div>
-                </div>
+                <!-- Feedback cluster (hint / result / explanation) anchored
+                     above the footer so it never overlaps the input row or
+                     the footer buttons -->
+                <div class="qr-feedback-stack">
+                    <div class="qr-hint" id="mg-hint-box">
+                        <div class="qr-hint-text" id="mg-hint-text"></div>
+                    </div>
 
-                <div class="qr-result mg-feedback" id="mg-feedback"></div>
+                    <div class="qr-result mg-feedback" id="mg-feedback"></div>
 
-                <div class="qr-explain" id="mg-explain" style="display:none;"></div>
-
-                <div class="qr-footer">
-                    <button class="qr-btn qr-btn--why" id="mg-why-btn" style="display:none;" data-t="scr_tell_me_why">💡 Tell me why</button>
-                    <button class="qr-btn qr-btn--tutor" id="mg-tutor-btn" style="display:none;" data-t="scr_tutor">🎓 TUTOR</button>
-                    <button class="qr-btn qr-btn--newq" id="mg-new-q-btn" style="display:none;" data-t="mg_new_q">🔄 NEW Q</button>
-                    <button class="qr-btn qr-btn--continue" id="mg-continue-btn" style="display:none;" data-t="quiz_continue">CONTINUE ▶</button>
-                    <button class="qr-btn qr-btn--skip" id="btn-mg-close" data-t="reset_close">✕ CLOSE</button>
+                    <div class="qr-explain" id="mg-explain" style="display:none;"></div>
                 </div>
 
             </div>
@@ -1324,7 +1366,7 @@
     <script src="js/screens/screens-world-levels.js"></script>
     <script src="js/screens/screens-level-select.js"></script>
     <script src="js/screens/screens.js"></script>
-    <script src="js/puzzle-items/scouts-primer.js"></script>
+    <script src="js/puzzle-items/scouts-primer.js?v=2"></script>
     <script src="js/start-level-passives.js"></script>
     <script src="js/start-level.js"></script>
     <script src="js/ui-reset.js"></script>
@@ -1362,14 +1404,101 @@
     <script src="js/passive-tree/passive-tree-expansion.js"></script>
     <script src="js/sprite/character-select.js"></script>
     <script src="js/ui-events.js"></script>
-    <script src="js/tooltips-hud.js"></script>
+    <script src="js/tooltips-hud.js?v=2"></script>
     <script src="js/changelog.js"></script>
     <script src="js/endgame/endgame-state.js"></script>
     <script src="js/endgame/endgame-player-stats.js"></script>
     <script src="js/endgame/endgame-requirements.js"></script>
     <script src="js/endgame/endgame-monsters.js"></script>
-    <script src="js/endgame/endgame-bosses.js"></script>
-    <script src="js/endgame/endgame-boss-abilities.js"></script>
+    <script src="js/endgame/bosses/boss-framework.js"></script>
+    <script src="js/endgame/bosses/shared-boss-abilities.js"></script>
+    <script src="js/endgame/bosses/boss-null.js"></script>
+    <script src="js/endgame/bosses/boss-bayes.js"></script>
+    <script src="js/endgame/bosses/boss-entropy.js"></script>
+    <script src="js/endgame/bosses/boss-laplace.js"></script>
+    <script src="js/endgame/bosses/boss-overfitter.js"></script>
+    <script src="js/endgame/bosses/boss-vise.js"></script>
+    <script src="js/endgame/bosses/boss-gale.js"></script>
+    <script src="js/endgame/bosses/boss-dynamo.js"></script>
+    <script src="js/endgame/bosses/boss-crash.js"></script>
+    <script src="js/endgame/bosses/boss-lodestone.js"></script>
+    <script src="js/endgame/bosses/boss-coil.js"></script>
+    <script src="js/endgame/bosses/boss-needle.js"></script>
+    <script src="js/endgame/bosses/boss-barrage.js"></script>
+    <script src="js/endgame/bosses/boss-marksman.js"></script>
+    <script src="js/endgame/bosses/boss-aegis.js"></script>
+    <script src="js/endgame/bosses/boss-brutus.js"></script>
+    <script src="js/endgame/bosses/boss-siren.js"></script>
+    <script src="js/endgame/bosses/boss-sirus.js"></script>
+    <script src="js/endgame/bosses/boss-maven.js"></script>
+    <script src="js/endgame/bosses/boss-exarch.js"></script>
+    <script src="js/endgame/bosses/boss-inferno.js"></script>
+    <script src="js/endgame/bosses/boss-monsoon.js"></script>
+    <script src="js/endgame/bosses/boss-buzz.js"></script>
+    <script src="js/endgame/bosses/boss-colossus.js"></script>
+    <script src="js/endgame/bosses/boss-gridlock.js"></script>
+    <script src="js/endgame/bosses/boss-jester.js"></script>
+    <script src="js/endgame/bosses/boss-abyss.js"></script>
+    <script src="js/endgame/bosses/boss-architect.js"></script>
+    <script src="js/endgame/bosses/boss-warden.js"></script>
+    <script src="js/endgame/bosses/boss-maelstrom.js"></script>
+    <script src="js/endgame/bosses/boss-arbiter.js"></script>
+    <script src="js/endgame/bosses/boss-thwomp.js"></script>
+    <script src="js/endgame/bosses/boss-medusa.js"></script>
+    <script src="js/endgame/bosses/boss-razor.js"></script>
+    <script src="js/endgame/bosses/boss-shaper.js"></script>
+    <script src="js/endgame/bosses/boss-bloom.js"></script>
+    <script src="js/endgame/bosses/boss-minotaur.js"></script>
+    <script src="js/endgame/bosses/boss-shrine.js"></script>
+    <script src="js/endgame/bosses/boss-swarm.js"></script>
+    <script src="js/endgame/bosses/boss-stack.js"></script>
+    <script src="js/endgame/bosses/boss-ember.js"></script>
+    <script src="js/endgame/bosses/boss-snail.js"></script>
+    <script src="js/endgame/bosses/boss-jelly.js"></script>
+    <script src="js/endgame/bosses/boss-gust.js"></script>
+    <script src="js/endgame/bosses/boss-sprout.js"></script>
+    <script src="js/endgame/bosses/boss-clock.js"></script>
+    <script src="js/endgame/bosses/boss-puddle.js"></script>
+    <script src="js/endgame/bosses/boss-firefly.js"></script>
+    <script src="js/endgame/bosses/boss-bumper.js"></script>
+    <script src="js/endgame/bosses/boss-striker.js"></script>
+    <script src="js/endgame/bosses/boss-centipede.js"></script>
+    <script src="js/endgame/bosses/boss-dancer.js"></script>
+    <script src="js/endgame/bosses/boss-gambler.js"></script>
+    <script src="js/endgame/bosses/boss-tactician.js"></script>
+    <script src="js/endgame/bosses/boss-gourmet.js"></script>
+    <script src="js/endgame/bosses/boss-encore.js"></script>
+    <script src="js/endgame/bosses/boss-bomber.js"></script>
+    <script src="js/endgame/bosses/boss-creeper.js"></script>
+    <script src="js/endgame/bosses/boss-maze.js"></script>
+    <script src="js/endgame/bosses/boss-tron.js"></script>
+    <script src="js/endgame/bosses/boss-belt.js"></script>
+    <script src="js/endgame/bosses/boss-hunter.js"></script>
+    <script src="js/endgame/bosses/boss-cyclops.js"></script>
+    <script src="js/endgame/bosses/boss-barricade.js"></script>
+    <script src="js/endgame/bosses/boss-guardian.js"></script>
+    <script src="js/endgame/bosses/boss-duelist.js"></script>
+    <script src="js/endgame/bosses/boss-mech.js"></script>
+    <script src="js/endgame/bosses/boss-phantom.js"></script>
+    <script src="js/endgame/bosses/boss-weaver.js"></script>
+    <script src="js/endgame/bosses/boss-velocity.js"></script>
+    <script src="js/endgame/bosses/boss-wormhole.js"></script>
+    <script src="js/endgame/bosses/boss-eclipse.js"></script>
+    <script src="js/endgame/bosses/boss-nightmare.js"></script>
+    <script src="js/endgame/bosses/boss-kraken.js"></script>
+    <script src="js/endgame/bosses/boss-executioner.js"></script>
+    <script src="js/endgame/bosses/boss-leviathan.js"></script>
+    <script src="js/endgame/bosses/boss-nemesis.js"></script>
+    <script src="js/endgame/bosses/boss-oblivion.js"></script>
+    <script src="js/endgame/bosses/boss-juggernaut.js"></script>
+    <script src="js/endgame/bosses/boss-stormqueen.js"></script>
+    <script src="js/endgame/bosses/boss-dreadnought.js"></script>
+    <script src="js/endgame/bosses/boss-warlord.js"></script>
+    <script src="js/endgame/bosses/boss-seraph.js"></script>
+    <script src="js/endgame/bosses/boss-chaos.js"></script>
+    <script src="js/endgame/bosses/boss-voidborn.js"></script>
+    <script src="js/endgame/bosses/boss-zenith.js"></script>
+    <script src="js/endgame/bosses/boss-rosters.js"></script>
     <script src="js/endgame/endgame-combat-calculations.js"></script>
     <script src="js/endgame/endgame-class-projectiles.js"></script>
     <script src="js/endgame/endgame-grid-pickups.js"></script>
@@ -1392,6 +1521,7 @@
     <script src="js/endgame/endgame-hub-drag-and-drop.js"></script>
     <script src="js/endgame/endgame-gate.js"></script>
     <script src="js/endgame/endgame-nexus.js"></script>
+    <script src="js/endgame/endgame-boss-test.js"></script>
     <script src="js/endgame/endgame-currency.js"></script>
     <script src="js/endgame/endgame-crafting-costs.js"></script>
     <script src="js/endgame/endgame-crafting-bench.js"></script>

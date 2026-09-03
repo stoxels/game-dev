@@ -68,7 +68,7 @@
     filter: drop-shadow(0 0 24px rgba(140, 60, 255, 0.55));
 }
 
-/* "CARTOGRAPHERS OF CHANCE" subtitle */
+/* "CARTOGRAPHERS OF CHANCE" subtitle — hover shows the expansion history */
 .title-subtitle {
     position: absolute;
     left: 50%;
@@ -81,34 +81,7 @@
     letter-spacing: 0.25em;
     color: #d4b8ff;
     text-shadow: 0 0 18px rgba(160, 80, 255, 0.7), 0 2px 6px rgba(0, 0, 0, 0.8);
-}
-
-/*
-   "EXPANSION 1" badge — small stone plaque above the subtitle.
-   Marks Cartographers of Chance as the first of more expansions to come.
-*/
-.title-expansion-badge {
-    position: absolute;
-    left: 50%;
-    top: 21%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    font-family: var(--PX);
-    font-size: clamp(7px, 1.1cqw, 12px);
-    letter-spacing: 0.22em;
-    color: #e6d6ff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-    background:
-        linear-gradient(180deg, rgba(64, 52, 92, 0.92) 0%, rgba(34, 28, 52, 0.94) 100%);
-    border: 1px solid rgba(164, 120, 255, 0.45);
-    border-radius: 3px;
-    box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.55),
-        0 2px 6px rgba(0, 0, 0, 0.55),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    padding: clamp(2px, 0.5cqw, 5px) clamp(8px, 1.4cqw, 16px);
     cursor: help; /* signals the hover expansion-history tooltip */
-    z-index: 2;
 }
 
 /* Version number just below the subtitle */
@@ -317,7 +290,6 @@
 
     .title-logo-img,
     .title-subtitle,
-    .title-expansion-badge,
     .title-version-line,
     .title-ai-disclosure,
     .title-lang-overlay {
@@ -339,10 +311,6 @@
         margin-top: 4%;
         text-align: center;
         white-space: normal;
-    }
-
-    .title-expansion-badge {
-        margin-top: 4.5%;
     }
 
     .title-version-line {
@@ -410,19 +378,16 @@
     /* Full-width header rows, in DOM order */
     .title-logo-img,
     .title-subtitle,
-    .title-expansion-badge,
     .title-version-line,
     #btn-play {
         grid-column: 1 / -1;
     }
 
-    /* Explicit visual order: header → play → menu grid → disclosure
-       (badge above subtitle to match the desktop stack) */
-    .title-expansion-badge   { order: 1; }
-    .title-subtitle          { order: 2; }
-    .title-version-line      { order: 3; }
-    #btn-play                { order: 4; width: min(78%, 300px); margin-top: 7%; }
-    .block-general           { order: 5; width: min(96%, 230px); margin-top: 9%; }
+    /* Explicit visual order: header → play → menu grid → disclosure */
+    .title-subtitle          { order: 1; }
+    .title-version-line      { order: 2; }
+    #btn-play                { order: 3; width: min(78%, 300px); margin-top: 7%; }
+    .block-general           { order: 4; width: min(96%, 230px); margin-top: 9%; }
     .title-ai-disclosure     { order: 99; grid-column: 1 / -1; margin: 12px 14px 12px; }
 
     /* Side-by-side menu buttons: 2 per row keeps the whole menu

@@ -149,7 +149,31 @@ function _getLowTimeWarningTier(secs) {
     return null;
 }
 
+// ── Center-grid big-message banners: replace, don't stack ───────────────
+// All large texts overlayed on the center of the grid (low time, mistakes,
+// low health, shield broken, boss arena available, map cleared) share the
+// same screen position. When several events fire at roughly the same time
+// the banners would otherwise stack on top of each other and become
+// unreadable, so every show-function first dismisses any other banner and
+// only then shows the newest one.
+function _egClearCenterGridBanners(exceptId) {
+    var ids = [
+        'eg-low-time-warning-banner',
+        'eg-mistakes-warning-banner',
+        'eg-low-health-warning-banner',
+        'eg-absorption-broken-banner',
+        'eg-boss-arena-available-banner',
+        'eg-map-cleared-banner'
+    ];
+    for (var i = 0; i < ids.length; i++) {
+        if (ids[i] === exceptId) continue;
+        const banner = document.getElementById(ids[i]);
+        if (banner) banner.remove();
+    }
+}
+
 function _showLowTimeWarningBanner(tier) {
+    if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners('eg-low-time-warning-banner');
     const old = document.getElementById('eg-low-time-warning-banner');
     if (old) old.remove();
 

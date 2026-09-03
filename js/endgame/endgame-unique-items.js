@@ -27,6 +27,12 @@ const EG_UNIQUE_DROP_CHANCE = 0.02;
 // The active map's loot-rarity bonus also makes uniques more likely
 // (applied as a square-root so rarity farming helps, but softly).
 
+// Unique-only QoL perk text for the zero-line auto-mark modifier.
+// Rendered as a special (blue) tooltip line, NOT a stat mod — it never
+// touches EG_STAT_KEY_MAP / _egComputePlayerStats.
+const EG_UNIQUE_ZERO_AUTOMARK_EN = 'Rows and Columns with zero filled cells are automatically marked incorrect on level start';
+const EG_UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen werden bei Levelstart automatisch als falsch markiert';
+
 
 //------------------------------------------------------------------------
 //-------------------UNIQUE DEFINITIONS-----------------------------------
@@ -41,6 +47,10 @@ const EG_UNIQUE_DROP_CHANCE = 0.02;
 //   defenses      — { armour, evasion, absorption } implicit
 //   damage        — { min, max } + attackIntervalSeconds (weapons)
 //   blockChance   — implicit block % (shields)
+//   autoMarkZeroLines — true → rows/cols with zero filled cells are auto-
+//     marked incorrect (grey X, userGrid=2) on level start. Unique-only QoL
+//     perk traded for raw power: the carrier uniques below are deliberately
+//     tuned slightly below curve for their level (see _egApplyUniqueZeroLineAutomark).
 
 const EG_UNIQUE_ITEMS = [
 
@@ -6161,6 +6171,76 @@ const EG_UNIQUE_ITEMS = [
         flavorDe: 'Blockt die meisten Dinge. Den Rest lässt er abtropfen.',
     },
 
+    // ══════════════════════════════════════════════════════════════════
+    // ── ZERO-AUTOMARK UNIQUES (QoL-for-power tradeoff) ─────────────────
+    // Each carries autoMarkZeroLines:true — empty rows/columns are marked
+    // incorrect on level start (see _egApplyUniqueZeroLineAutomark). To pay
+    // for that QoL their raw stats run slightly below curve for the level
+    // plus a real downside.
+    // ══════════════════════════════════════════════════════════════════
+    {
+        uniqueId: 'blank_slate_band',
+        nameEn: 'Blank Slate Band',
+        nameDe: 'Ring der Leeren Tafel',
+        icon: '⬜', slotType: 'ring', archetype: 'any',
+        minLevel: 24,
+        requirements: { level: 24, str: 0, agi: 91, int: 0 },
+        autoMarkZeroLines: true,
+        bonuses: [
+            { key: 'accuracy', value: 32, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'flat_health', value: 28, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
+            { key: 'mistake_not_count', value: 10, en: '#% chance for Mistakes to not count', de: '#% Chance, dass Fehler nicht gezählt werden' }
+        ],
+        downsides: [
+            { key: 'flat_mana', value: -40, en: '-# to maximum Mana', de: '-# zu maximalem Mana' },
+            { key: 'fire_resist', value: -20, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
+        ],
+        flavorEn: 'Nothing written, nothing wasted. The empty lines fill themselves.',
+        flavorDe: 'Nichts geschrieben, nichts verschwendet. Die leeren Zeilen füllen sich selbst.',
+    },
+
+    {
+        uniqueId: 'surveyors_final_draft',
+        nameEn: "Surveyor's Final Draft",
+        nameDe: 'Letzter Entwurf des Landvermessers',
+        icon: '📏', slotType: 'amulet', archetype: 'any',
+        minLevel: 48,
+        requirements: { level: 48, str: 0, agi: 0, int: 182 },
+        autoMarkZeroLines: true,
+        bonuses: [
+            { key: 'intelligence', value: 14, en: '+# to Intelligence', de: '+# zu Intelligenz' },
+            { key: 'reveal_hint', value: 12, en: '#% chance to show a Reveal Hint on questions', de: '#% Chance auf einen Aufdeckungshinweis bei Fragen' },
+            { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
+        ],
+        downsides: [
+            { key: 'time_added', value: -30, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'flat_mana', value: -30, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
+        ],
+        flavorEn: 'He measured every blank twice, so you would not have to.',
+        flavorDe: 'Er vermaß jede Leere zweimal, damit du es nicht musst.',
+    },
+
+    {
+        uniqueId: 'axiom_of_emptiness',
+        nameEn: 'Axiom of Emptiness',
+        nameDe: 'Axiom der Leere',
+        icon: '🕳️', slotType: 'talisman', archetype: 'any',
+        minLevel: 70,
+        requirements: { level: 70, str: 0, agi: 0, int: 0 },
+        autoMarkZeroLines: true,
+        bonuses: [
+            { key: 'fate', value: 20, en: '#% increased Fate', de: '#% erhöhtes Schicksal' },
+            { key: 'accuracy', value: 60, en: '+# Accuracy', de: '+# Präzision' },
+            { key: 'flat_health', value: 80, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
+        ],
+        downsides: [
+            { key: 'time_added', value: -40, en: '-#s to Puzzle Time', de: '-#s Rätselzeit' },
+            { key: 'shadow_resist', value: -25, en: '-#% to Shadow Resistance', de: '-#% Schattenwiderstand' }
+        ],
+        flavorEn: 'Prove nothing fills nothing, and the grid concedes the point.',
+        flavorDe: 'Beweise, dass nichts nichts füllt, und das Gitter gibt dir recht.',
+    },
+
 ];
 
 
@@ -6242,6 +6322,90 @@ const EG_UNIQUE_ITEMS = [
 //------------------------------------------------------------------------
 //-------------------HELPERS----------------------------------------------
 //------------------------------------------------------------------------
+
+// Returns the special (non-stat) modifier lines for a unique item or def.
+// Currently only the zero-line auto-mark perk. Each entry is { en, de }.
+function _egGetUniqueSpecialLines(itemOrDef) {
+    if (!itemOrDef) return [];
+    // Item instances carry the copied boolean flag (see _egBuildUniqueItem).
+    const hasZeroAutomark = !!itemOrDef.autoMarkZeroLines;
+    // Defs may also declare explicit specialLines for future perks.
+    const extra = Array.isArray(itemOrDef.specialLines) ? itemOrDef.specialLines : [];
+    const out = extra
+        .filter(s => s && (s.en || s.de))
+        .map(s => ({ en: s.en || s.de, de: s.de || s.en }));
+    if (hasZeroAutomark && !out.some(s => s.en === EG_UNIQUE_ZERO_AUTOMARK_EN)) {
+        out.push({ en: EG_UNIQUE_ZERO_AUTOMARK_EN, de: EG_UNIQUE_ZERO_AUTOMARK_DE });
+    }
+    return out;
+}
+
+// True when any currently equipped unique grants zero-line auto-mark.
+function _egHasZeroAutomarkEquipped() {
+    try {
+        if (typeof _egEquipped === 'undefined' || !_egEquipped) return false;
+        return Object.values(_egEquipped).some(it => !!it && !!it.isUnique && !!it.autoMarkZeroLines);
+    } catch (e) { return false; }
+}
+
+// Unique QoL perk: mark every cell of each all-empty row/column as
+// incorrect (grey X → userGrid=2 + systemMarkedGrid) at level start.
+// Call AFTER buildGrid() so the DOM exists. Returns the number of cells
+// marked. Respects ergodic_field / oracle (which disable all auto-marks).
+// Zero lines hold no solution cells, so this can never solve the puzzle
+// and intentionally skips checkWin().
+function _egApplyUniqueZeroLineAutomark() {
+    if (!_egHasZeroAutomarkEquipped()) return 0;
+    if (typeof cur === 'undefined' || !cur || !cur.grid) return 0;
+    try {
+        if (typeof ptHasSkill === 'function' && ptHasSkill('keystone_ergodic_field')) return 0;
+    } catch (e) {}
+    if (window._oracleActive) return 0;
+
+    const sol = cur.grid;
+    const rows = sol.length;
+    if (!rows) return 0;
+    const cols = sol[0].length;
+    if (!cols) return 0;
+
+    const affected = [];
+    const markCell = (r, c) => {
+        if (sol[r][c] !== 0) return;
+        if (typeof wrongGrid !== 'undefined' && wrongGrid[r][c]) return;
+        if (typeof userGrid === 'undefined' || userGrid[r][c] === 2) return;
+        // Only touch untouched/questioned cells — never overwrite fills.
+        if (userGrid[r][c] !== 0 && userGrid[r][c] !== 3) return;
+        userGrid[r][c] = 2;
+        try { systemMarkedGrid[r][c] = true; } catch (e) {}
+        try { renderCell(r, c); } catch (e) {}
+        affected.push(`g-${r}-${c}`);
+        // Keep intersecting non-zero lines' clue flags consistent; isInitial
+        // suppresses reward side-effects (see updClues).
+        try { if (typeof updClues === 'function') updClues(r, c, true); } catch (e) {}
+    };
+
+    for (let r = 0; r < rows; r++) {
+        let empty = true;
+        for (let c = 0; c < cols; c++) {
+            if (sol[r][c] === 1) { empty = false; break; }
+        }
+        if (!empty) continue;
+        for (let c = 0; c < cols; c++) markCell(r, c);
+    }
+    for (let c = 0; c < cols; c++) {
+        let empty = true;
+        for (let r = 0; r < rows; r++) {
+            if (sol[r][c] === 1) { empty = false; break; }
+        }
+        if (!empty) continue;
+        for (let r = 0; r < rows; r++) markCell(r, c);
+    }
+
+    if (affected.length && typeof _applyCellEffect === 'function') {
+        try { _applyCellEffect(affected, 'mark'); } catch (e) {}
+    }
+    return affected.length;
+}
 
 // Localized label for one unique stat line; '#' is replaced by the value
 // with an explicit '+' sign for positive numbers.
@@ -6401,6 +6565,11 @@ function _egHealUniqueItem(item) {
             item.implicits = [];
         }
     }
+    // --- unique-only QoL perks (non-stat flags) ---
+    if (def && def.autoMarkZeroLines && !item.autoMarkZeroLines) {
+        item.autoMarkZeroLines = true;
+        changed = true;
+    }
     // --- downsides: strengthen to balance new implicits ---
     if (def && Array.isArray(def.downsides) && Array.isArray(item.mods)) {
         for (let i = 0; i < def.downsides.length; i++) {
@@ -6488,6 +6657,7 @@ function _egBuildUniqueItem(def, monsterLevel) {
         name,
         baseName: name,
         icon,
+        ...(def.autoMarkZeroLines ? { autoMarkZeroLines: true } : {}),
 
         category: 'equip',
         slotType: def.slotType,

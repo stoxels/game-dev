@@ -549,13 +549,16 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     pointer-events: none;
 }
 
-    /* Solid black rectangle that covers the clue number */
+    /* Solid black rectangle that covers the clue number.
+       Must outrank the inner clue content (.ccinner / .rcinner and their
+       spans sit at z-index 951 inside the clue cell's stacking context),
+       otherwise the numbers paint ABOVE the overlay and show through it. */
     .clue-blackout::after {
         content: '';
         position: absolute;
         inset: 0;
         background: #000;
-        z-index: 10;
+        z-index: 960;
         border-radius: 2px;
     }
 

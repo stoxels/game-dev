@@ -137,6 +137,10 @@ function _egOnPuzzleComplete() {
     // non-boss case where the last monster is slain simultaneously with
     // the final puzzle fill.
     if (_egCanLeaveMap()) {
+        // Boss testing: single-arena duel — stay on the board so loot can
+        // be collected, then leave via Complete Map. Never chain into
+        // another puzzle (no quiz interstitial, no countdown).
+        if (typeof window !== 'undefined' && window._egIsBossTestRun) return;
         setTimeout(() => {
             if (!_egIsActive() || !_egCanLeaveMap()) return;
             if (document.getElementById('eg-leave-map-overlay')) return;
@@ -611,14 +615,14 @@ function _egSpawnNextArenaBoss() {
                 if (!_egIsActive()) return;
                 if (_egMonsters.some(m => m.isBoss)) return;
                 showToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
-                _egSpawnMonster(entry.id, entry.level || 1);
+                _egSpawnMonster(entry.id, entry.level || 1, entry.hpMult || 1);
                 _egUpdateObjectivesHUD();
             }, 200);
             return;
         }
         if (_egMonsters.some(m => m.isBoss)) return;
         showToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
-        _egSpawnMonster(entry.id, entry.level || 1);
+        _egSpawnMonster(entry.id, entry.level || 1, entry.hpMult || 1);
         _egUpdateObjectivesHUD();
     }, EG_BOSS_SPAWN_DELAY_MS);
 }
@@ -1274,6 +1278,7 @@ function _egUpdateObjectivesHUD() {
 // Shows a big green "MAP CLEARED" text centered over the puzzle grid for
 // 3 seconds. Purely cosmetic — pointer-events are disabled via CSS.
 function _egShowMapClearedBanner() {
+    if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners('eg-map-cleared-banner');
     const old = document.getElementById('eg-map-cleared-banner');
     if (old) old.remove();
 
@@ -1300,6 +1305,7 @@ function _egShowMapClearedBanner() {
 // becomes available (all non-boss objectives done). Mirrors the MAP
 // CLEARED banner in placement/animation but uses boss-red styling.
 function _egShowBossArenaAvailableBanner() {
+    if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners('eg-boss-arena-available-banner');
     const old = document.getElementById('eg-boss-arena-available-banner');
     if (old) old.remove();
 
@@ -1393,6 +1399,9 @@ function _egChainCleanup() {
     // runtime modifiers.
     if (typeof _egCleanupMapRunSeedLevel === 'function') _egCleanupMapRunSeedLevel();
 
+    // End of a boss-test run: restore the stamped seed level.
+    if (typeof _egCleanupBossTestSeedLevel === 'function') _egCleanupBossTestSeedLevel();
+
     _egChainKillCount = 0;
     _egChainPuzzleSolvedCount = 0;
     _egQuestionsAnswered = 0;
@@ -1420,7 +1429,9 @@ function _egChainCleanup() {
     _egBossKilledCount = 0;
     _egBossTotalCount = 0;
 
-    // Remove banners if still on screen
+    // Remove banners if still on screen (all center-grid types — a stale
+    // warning must never survive into the next map)
+    if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners();
     const banner = document.getElementById('eg-map-cleared-banner');
     if (banner) banner.remove();
     const bossBanner = document.getElementById('eg-boss-arena-available-banner');
@@ -1772,6 +1783,17 @@ function _egShowLeaveMapTransition(atlasResult, opts) {
         _egClearBonusLootFlags();
         _egHideLeaveMapTransition();
         window._egMapDefeatInProgress = false;
+        // Boss testing: win and defeat both return to the boss selection
+        // screen. Captured now (not read lazily) because _egStopEncounter
+        // already ran. The flag is consumed here so later campaign runs
+        // route normally again.
+        if (window._egIsBossTestRun) {
+            window._egIsBossTestRun = false;
+            if (typeof showEndgameBossTest === 'function') {
+                showEndgameBossTest();
+                return;
+            }
+        }
         showEndgameNexus();
     };
 }

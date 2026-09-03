@@ -133,9 +133,18 @@ function _isAnyModalOpen() {
 }
 
 // Closes all open modal backdrops at once.
+// The Degrees of Freedom choice modal (#dof-modal) is mandatory — its
+// keystone downside must always apply — so it is never dismissed here.
+// It only closes via _dofChoose(); Escape just nudges it instead.
 function _closeAllModals() {
     document.querySelectorAll('.modal-bg.show')
-        .forEach(m => m.classList.remove('show'));
+        .forEach(m => {
+            if (m.id === 'dof-modal') {
+                if (typeof _dofNudge === 'function') _dofNudge();
+                return;
+            }
+            m.classList.remove('show');
+        });
 }
 
 // Returns true if the win or lose end-of-level overlay is visible.

@@ -286,6 +286,64 @@
 
 /*
     ------------------------------------------------------------------------
+    -------------------DEGREES OF FREEDOM MODAL------------------------------
+    ------------------------------------------------------------------------
+    Reuses the Data Strike row/col selection chrome (.ds-panel, .ds-icon,
+    .ds-title-plaque, .ds-prompt, .ds-btn-row, .ds-btn) so both modals read
+    as the same "choose an axis" family. Only the icon art, the title size
+    (longer keystone name), the detail line, and the mandatory-choice nudge
+    below are DOF-specific. No cancel button: the keystone downside always
+    applies, so the player must pick ROWS or COLS.
+*/
+
+.dof-icon {
+    background-image: url('../../images/Class_Spell_Upgrade/degrees_of_freedom.png');
+}
+
+/* Longer keystone name than "DATA STRIKE" — shrink slightly so EN/DE titles
+   stay on the plaque's flat middle band. */
+.dof-panel .ds-title-text {
+    font-size: clamp(11px, 1.8vw, 19px);
+}
+
+/* Second prompt line: flash cadence + cooldown upside, dimmer than the question. */
+.dof-detail {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.85em;
+    line-height: 1.4;
+    color: #9fb0c0;
+}
+
+/* Mandatory-choice nudge: brief horizontal shake when Escape/back is pressed
+   while the modal is open (the modal itself is never dismissed that way). */
+.dof-panel.dof-nudge {
+    animation: dof-nudge-shake 0.3s ease;
+}
+
+@keyframes dof-nudge-shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-7px);
+    }
+
+    75% {
+        transform: translateX(7px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dof-panel.dof-nudge {
+        animation: none;
+    }
+}
+
+
+/*
+    ------------------------------------------------------------------------
     -------------------MOMENTUM: PARTICLE ACCELERATOR-------------------------
     ------------------------------------------------------------------------
 */

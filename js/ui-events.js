@@ -57,9 +57,9 @@ function _buildReplayRow(entry, unlocked, titleText) {
     play.className = 'replay-track-play';
     play.setAttribute('aria-label', titleText);
     if (unlocked) {
-        play.title = titleText;
         play.addEventListener('click', () => {
             hideModal('replay-modal');
+            hideGameTooltip(); // hide the custom tooltip immediately (replay modal is gone)
             if (entry.isTutorial) {
                 replayTutorialFromTitle();
             } else {
@@ -69,7 +69,6 @@ function _buildReplayRow(entry, unlocked, titleText) {
     } else {
         play.classList.add('replay-track-play-locked');
         play.disabled = true;
-        play.title = t('scr_replay_locked');
         const lock = document.createElement('span');
         lock.className = 'replay-track-lock';
         lock.textContent = '🔒';
@@ -114,6 +113,50 @@ function renderReplayModal() {
         container.appendChild(empty);
     }
 }
+
+
+//------------------------------------------------------------------------
+//-------------------REPLAY PLAY-BUTTON TOOLTIPS--------------------------
+//------------------------------------------------------------------------
+
+// Custom floating tooltip for the replay gallery's per-track play buttons
+// (replaces the native browser title tooltips). Delegated on a document-level
+// mousemove because the rows are rebuilt on every modal open. The locked
+// play buttons are `disabled` and therefore emit no mouse events of their
+// own, so the hovered button is resolved manually via elementFromPoint.
+// showGameTooltip/moveGameTooltip/hideGameTooltip live in tooltips-hud.js,
+// which loads after this file — they are referenced lazily inside the
+// handler (at interaction time), never at wiring time.
+let _replayTipBtn = null;
+
+document.addEventListener('mousemove', (e) => {
+    // Only active while the replay modal is open; also hides the tooltip
+    // after the modal was closed by any path (close button, track click…).
+    const modal = document.getElementById('replay-modal');
+    if (!modal || !modal.classList.contains('show')) {
+        if (_replayTipBtn) {
+            _replayTipBtn = null;
+            hideGameTooltip();
+        }
+        return;
+    }
+
+    const topEl = document.elementFromPoint(e.clientX, e.clientY);
+    const btn = (topEl && topEl.closest) ? topEl.closest('.replay-track-play') : null;
+    if (btn) {
+        if (_replayTipBtn !== btn) {
+            _replayTipBtn = btn;
+            const isLocked = btn.classList.contains('replay-track-play-locked');
+            const text = isLocked ? t('scr_replay_locked') : (btn.getAttribute('aria-label') || '');
+            showGameTooltip(text, e);
+        } else {
+            moveGameTooltip(e);
+        }
+    } else if (_replayTipBtn) {
+        _replayTipBtn = null;
+        hideGameTooltip();
+    }
+});
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -524,6 +567,21 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-retry-revert', () => retrySetupResolve(false));
 
     /**
+     * "Replay again, decide later": keeps the snapshot pending so the
+     * keep-modal reappears after the next win/fail, and immediately
+     * restarts the current level with the new setup still applied.
+     */
+    function onRetryAgainDecideLater() {
+        retrySetupDefer();
+        cleanupActiveGameSystems();
+        safeCall('_hidePlayerAvatarSimple');
+        safeCall('_hidePlayerAvatar');
+        replayLevel();
+    }
+
+    onClick('btn-retry-again', onRetryAgainDecideLater);
+
+    /**
      * Shows the keep-or-revert prompt whenever a result overlay (win or
      * lose) becomes visible during an active retry-with-other-settings run.
      * A single MutationObserver on both overlays covers every code path
@@ -533,7 +591,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!retrySetupIsActive()) return;
         const winShown = document.getElementById('ov-win').classList.contains('show');
         const loseShown = document.getElementById('ov-lose').classList.contains('show');
-        if (winShown || loseShown) showModal('retry-keep-modal');
+        if (winShown || loseShown) {
+            if (typeof updateRetryKeepModal === 'function') updateRetryKeepModal();
+            showModal('retry-keep-modal');
+        }
     });
     _retryResultObserver.observe(document.getElementById('ov-win'),
         { attributes: true, attributeFilter: ['class'] });
@@ -549,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('quiz-input-submit', () => answerQuizInput());
     onClick('quiz-tutor-btn', () => quizUseTutor());
     onClick('quiz-continue', () => finishQuiz());
-    onClick('btn-skip-quiz', () => skipQuiz());
+    onClick('quiz-close-x', () => skipQuiz());
 
 
     //------------------------------------------------------------------------
@@ -567,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('btn-mg-close', () => mgCloseToLevelSelect());
+    onClick('mg-close-x', () => mgCloseToLevelSelect());
     onClick('mg-submit-btn', () => submitMathGate());
     onClick('mg-tutor-btn', () => mgUseTutor());
     onClick('mg-new-q-btn', () => mgNewQuestion());
@@ -620,17 +681,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'pt-refund-modal';
-            modal.className = 'modal-bg';
+            // Same stone/parchment shell as the settings / how-to-play /
+            // achievements-reset modals (see css/modals.css §4).
+            modal.className = 'modal-bg safe-center';
             modal.innerHTML = `
-            <div class="modal-box">
-                <div class="modal-title">${t('pt_refund_all_title')}</div>
+            <div class="modal-box modal-box-danger">
+                <button class="modal-close" id="pt-refund-close">✕ CLOSE</button>
+                <div class="modal-title text-red">${t('pt_refund_all_title')}</div>
                 <div class="modal-section">
                     <p class="reset-body-text">
                         ${t('pt_refund_all_body')}
                     </p>
                 </div>
                 <div class="modal-actions">
-                    <button class="title-btn back-btn btn-danger" id="pt-refund-confirm">${t('pt_refund_all_confirm')}</button>
+                    <button class="title-btn back-btn" id="pt-refund-confirm">${t('pt_refund_all_confirm')}</button>
                     <button class="title-btn back-btn" id="pt-refund-cancel">${t('pt_refund_all_cancel')}</button>
                 </div>
             </div>`;
@@ -644,6 +708,9 @@ document.addEventListener('DOMContentLoaded', () => {
             onConfirm();
         };
         document.getElementById('pt-refund-cancel').onclick = () => {
+            modal.classList.remove('show');
+        };
+        document.getElementById('pt-refund-close').onclick = () => {
             modal.classList.remove('show');
         };
     }

@@ -314,6 +314,16 @@ function goToLevelSelect() {
             }
         }
 
+        // Route back to the boss testing screen if this run was a
+        // single-boss test fight (forfeit via the pause menu).
+        if (window._egIsBossTestRun) {
+            window._egIsBossTestRun = false;
+            if (typeof showEndgameBossTest === 'function') {
+                showEndgameBossTest();
+                return;
+            }
+        }
+
         // Route back to the endgame test hub if this run was launched from there
         if (window._egIsTestRun) {
             window._egIsTestRun = false;
@@ -352,6 +362,11 @@ function goToLevelSelect() {
 function goToPreviousScreen() {
     const openModal = document.querySelector('.modal-bg.show');
     if (openModal) {
+        // The Degrees of Freedom choice is mandatory — never dismiss it via back navigation.
+        if (openModal.id === 'dof-modal') {
+            if (typeof _dofNudge === 'function') _dofNudge();
+            return;
+        }
         openModal.classList.remove('show');
         return;
     }

@@ -725,7 +725,29 @@ function _egGetMistakesRemaining() {
     return max - curCount;
 }
 
+// Fallback when timer.js hasn't defined it (e.g. isolated test harness):
+// center-grid banners replace each other instead of stacking.
+if (typeof _egClearCenterGridBanners !== 'function') {
+    var _egClearCenterGridBanners = function (exceptId) {
+        var ids = [
+            'eg-low-time-warning-banner',
+            'eg-mistakes-warning-banner',
+            'eg-low-health-warning-banner',
+            'eg-absorption-broken-banner',
+            'eg-boss-arena-available-banner',
+            'eg-map-cleared-banner'
+        ];
+        for (var i = 0; i < ids.length; i++) {
+            if (ids[i] === exceptId) continue;
+            const banner = document.getElementById(ids[i]);
+            if (banner) banner.remove();
+        }
+    };
+}
+
 function _egShowMistakesWarningBanner(remaining) {
+    // Dismiss any other center-grid banner so concurrent events don't stack
+    _egClearCenterGridBanners('eg-mistakes-warning-banner');
     // Remove any stale banner so a rapid 3→2→1 cascade always shows the newest count
     const old = document.getElementById('eg-mistakes-warning-banner');
     if (old) old.remove();
@@ -816,6 +838,7 @@ function _egGetLowHealthWarningTier(pct) {
 }
 
 function _egShowLowHealthWarningBanner() {
+    _egClearCenterGridBanners('eg-low-health-warning-banner');
     const old = document.getElementById('eg-low-health-warning-banner');
     if (old) old.remove();
 
@@ -884,6 +907,7 @@ function _egResetLowHealthWarningState() {
 // not at percentage thresholds like the health warning.
 
 function _egShowAbsorptionBrokenBanner() {
+    _egClearCenterGridBanners('eg-absorption-broken-banner');
     const old = document.getElementById('eg-absorption-broken-banner');
     if (old) old.remove();
 
@@ -1376,6 +1400,12 @@ function _egOnCorrectCell(row, col) {
     if (!_egIsActive()) return;
 
     if (row !== undefined && col !== undefined) _egTrackRecentFill(row, col);
+
+    // Boss puzzle mechanics hook (Fated Cell, Soul Tithe): lets active boss
+    // mechanics observe correct fills. No-op unless a mechanic is listening.
+    if (row !== undefined && col !== undefined && typeof _egNotifyCorrectFill === 'function') {
+        try { _egNotifyCorrectFill(row, col); } catch (e) {}
+    }
 
     // Projectile map mod: "% reduced Projectile Damage" scales correct-fill shots.
     const projMult = (typeof _egMapPlayerProjectileMult === 'function') ? _egMapPlayerProjectileMult() : 1;
@@ -2736,10 +2766,11 @@ function _egAssignRandomSpawnZone(monster) {
 
 // Tries to build the monster from normal defs first, then boss defs as fallback.
 // Marks the monster as a boss if it was built from EG_BOSS_DEFS.
-function _egBuildMonsterOrBoss(defId, level) {
+// hpMult: optional multiplier for boss HP and damage (e.g., 500k HP test mode).
+function _egBuildMonsterOrBoss(defId, level, hpMult = 1) {
     let monster = _egBuildMonster(defId, level);
     if (!monster) {
-        monster = _egBuildBoss(defId, level);
+        monster = _egBuildBoss(defId, level, hpMult);
         if (monster) monster.isBoss = true;
     } else if (typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS[defId]) {
         monster.isBoss = true;
@@ -2759,10 +2790,11 @@ function _egNotifyMonsterArrival(monster) {
 
 // Adds a monster to the live encounter.
 // Assigns a random spawn zone, auto-targets if no target exists, and notifies the player.
-function _egSpawnMonster(defId, level) {
+// hpMult: optional multiplier for boss HP and damage (e.g., 500k HP test mode).
+function _egSpawnMonster(defId, level, hpMult = 1) {
     if (_egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) return;
 
-    const monster = _egBuildMonsterOrBoss(defId, level);
+    const monster = _egBuildMonsterOrBoss(defId, level, hpMult);
     if (!monster) return;
 
     // Gear: first_step — per-monster charge-up grace window after spawning

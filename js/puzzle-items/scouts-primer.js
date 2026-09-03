@@ -161,21 +161,15 @@ function _primerBuildAnswerHtml(question) {
 }
 
 // Assembles and returns the full inner HTML string for the primer modal box.
+// Matches the quiz / math-gate redesign: stone X close button top-right (here
+// it IS the skip action — closing applies any earned headstart), tutor chip
+// on the top-left gem, and a minimal "n/m" counter chip on the top frame band
+// between the portrait and the close button. No bottom button row and no
+// streak dots — the counter chip carries all the progress info.
 function _primerBuildModalHtml(question, streak) {
-    const dots = Array.from({ length: PRIMER_MAX }, (_, i) =>
-        `<span class="qr-primer-dot ${i < streak ? 'filled' : ''}"></span>`
-    ).join('');
-
-    const progressLabel = t('itm_primer_progress')
-        .replace('{n}', streak + 1)
-        .replace('{m}', PRIMER_MAX);
-
-    const footerText = streak === 0
-        ? t('itm_primer_footer_start')
-        : t('itm_primer_footer_streak').replace('{n}', streak);
+    const counterLabel = `${streak + 1}/${PRIMER_MAX}`;
 
     const title = t('itm_primer_title');
-    const skipLabel = t('itm_primer_skip');
 
     const answerHtml = question.isMultiChoice
         ? `<div class="qr-opts" id="primer-opts"></div>`
@@ -191,6 +185,10 @@ function _primerBuildModalHtml(question, streak) {
 
     return `
         <div class="qr-panel" style="position:relative;">
+            <button class="qr-close-x" id="primer-skip-btn" aria-label="Close (skips primer)" onclick="skipPrimer()" data-t="reset_close">✕</button>
+            <button class="qr-corner qr-corner--tl" id="primer-tutor-btn" style="display:none;" aria-label="Tutor" data-tip-t="qz_ask_tutor" onclick="primerUseTutor()">🎓</button>
+            <div class="qr-counter" id="primer-counter">${counterLabel}</div>
+
             <div class="qr-portrait" id="primer-portrait"></div>
 
             <div class="qr-content">
@@ -198,26 +196,12 @@ function _primerBuildModalHtml(question, streak) {
                     📜 ${title}
                 </div>
 
-                <div class="qr-primer-dots">${dots}</div>
-                <div class="qr-primer-progress">${progressLabel}</div>
-
                 <div class="qr-question" id="primer-question-text">${question.q}</div>
 
                 ${answerHtml}
 
                 <div class="qr-hint" id="primer-hint"></div>
                 <div class="qr-result" id="primer-feedback"></div>
-
-                <div class="qr-footer">
-                    <button class="qr-btn qr-btn--tutor" id="primer-tutor-btn" onclick="primerUseTutor()" style="display:none;">
-                        ${t('itm_tutor_btn')}
-                    </button>
-                    <button class="qr-btn qr-btn--skip" id="primer-skip-btn" onclick="skipPrimer()">
-                        ${skipLabel}
-                    </button>
-                </div>
-
-                <div class="qr-primer-progress">${footerText}</div>
             </div>
         </div>`;
 }
@@ -315,10 +299,13 @@ function showPrimerModal(streak = 0) {
 }
 
 // Removes the primer overlay from the DOM and resumes the game timer.
+// Also hides any corner-chip tooltip left open by the cursor (the overlay
+// is removed entirely, so the mouseout delegation on it dies with it).
 function closePrimerModal() {
     const el = document.getElementById('primer-overlay');
     if (el) el.remove();
     primerQuestion = null;
+    if (typeof hideGameTooltip === 'function') hideGameTooltip();
     if (typeof timerInterval !== 'undefined' && !dead) resumeTimer();
 }
 
@@ -364,7 +351,7 @@ function submitPrimerAnswer() {
     const fb = document.getElementById('primer-feedback');
 
     if (isNaN(entered)) {
-        fb.className = 'mg-feedback mg-bad';
+        fb.className = 'qr-result bad';
         fb.textContent = t('mg_not_a_number');
         return;
     }
@@ -395,7 +382,7 @@ function _primerRollBonusRewardForType() {
 // If the chain is complete, triggers the perfect reveal; otherwise chains to
 // the next question.
 function _primerHandleCorrectAnswer(fb, newStreak) {
-    fb.className = 'mg-feedback mg-ok';
+    fb.className = 'qr-result ok';
     _primerRollBonusRewardForType();
     Audio_Manager.playSFX('quizCorrect');
     trackAchStat('primerCorrect');
@@ -425,7 +412,7 @@ function _primerHandleCorrectAnswer(fb, newStreak) {
 // Handles a wrong answer. If the player built up any streak before this miss,
 // that partial headstart is applied; otherwise the primer closes with nothing.
 function _primerHandleWrongAnswer(fb) {
-    fb.className = 'mg-feedback mg-bad';
+    fb.className = 'qr-result bad';
     Audio_Manager.playSFX('quizWrong');
 
     if (primerStreak > 0) {
@@ -440,7 +427,7 @@ function _primerHandleWrongAnswer(fb) {
     }
 }
 
-// Central result dispatcher: hides the skip button, then routes to the
+// Central result dispatcher: hides the skip/close button, then routes to the
 // correct/wrong handler based on the outcome of the just-submitted answer.
 function showPrimerResult(correct) {
     const fb = document.getElementById('primer-feedback');
@@ -867,7 +854,7 @@ function _primerTutorLockMultiChoice() {
 function _primerTutorLockNumericInput() {
     const inp = document.getElementById('primer-input');
     if (inp) inp.disabled = true;
-    document.querySelectorAll('#primer-overlay .mg-submit-btn:not(#primer-skip-btn):not(#primer-tutor-btn)')
+    document.querySelectorAll('#primer-overlay .mg-submit-btn:not(#primer-tutor-btn)')
         .forEach(b => b.disabled = true);
 }
 
@@ -876,7 +863,7 @@ function _primerTutorLockNumericInput() {
 function _primerHandleTutorSuccess(fb) {
     questStat_tutorAnsweredCorrect();
     Audio_Manager.playSFX('tutorSuccess');
-    fb.className = 'mg-feedback mg-ok';
+    fb.className = 'qr-result ok';
     fb.textContent = t('itm_tutor_success');
 
     if (primerQuestion.isMultiChoice) {
@@ -892,45 +879,52 @@ function _primerHandleTutorSuccess(fb) {
 // The question remains active so the player can still answer manually.
 function _primerHandleTutorFailure(fb) {
     Audio_Manager.playSFX('tutorFail');
-    fb.className = 'mg-feedback mg-bad';
+    fb.className = 'qr-result bad';
     fb.textContent = t('itm_tutor_fail');
 }
 
-// Shows or hides the Tutor button based on whether the player has the
-// tutor_enable passive skill and at least one tutor item in inventory.
+// Shows or hides the Tutor chip on the top-left corner gem. Mirrors the quiz
+// modal: corner chip with 🎓 (📚 + unlimited uses when the super-tutor modifier
+// is active), and the item-count detail lives in the hover tooltip, not the
+// chip label.
 function _primerRefreshTutorButton() {
     const btn = document.getElementById('primer-tutor-btn');
     if (!btn) return;
 
-    const canUseTutor = PT.hasSkill('tutor_enable') || _charIs('trix');
+    const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
     const tutorCount = _primerCountTutorItems();
+    const canUseTutor = superTutorEnabled || PT.hasSkill('tutor_enable') || _charIs('trix');
 
-    if (canUseTutor && tutorCount > 0) {
-        btn.style.display = 'inline-block';
-        btn.textContent = t('itm_ask_tutor').replace('{n}', tutorCount);
+    if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
+        btn.style.display = 'flex';
+        btn.textContent = superTutorEnabled ? '📚' : '🎓';
+        btn.dataset.tipT = superTutorEnabled ? 'qz_super_tutor' : 'qz_ask_tutor';
+        btn.dataset.tipN = superTutorEnabled ? '' : tutorCount;
     } else {
         btn.style.display = 'none';
     }
 }
 
-// Called when the player clicks the Tutor button in the primer modal.
-// Finds the lowest-tier available tutor item, rolls for consumption and
-// success independently, then delegates to the success or failure handler.
-// Reuses the same chance/no-consume mechanics as the math gate and quiz tutors.
+// Called when the player clicks the Tutor chip in the primer modal.
+// With the super-tutor modifier active it needs no inventory item and always
+// succeeds; otherwise it finds the lowest-tier available tutor item, rolls
+// for consumption and success independently, then delegates to the success
+// or failure handler. Reuses the same mechanics as the math gate and quiz tutors.
 function primerUseTutor() {
     if (!primerQuestion) return;
 
-    const tutorItem = _primerFindLowestTierTutorItem();
-    if (!tutorItem) return;
+    const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
+    const tutorItem = superTutorEnabled ? null : _primerFindLowestTierTutorItem();
+    if (!superTutorEnabled && !tutorItem) return;
 
-    const successChance = _primerCalcTutorSuccessChance();
-    const noConsumeChance = _primerCalcTutorNoConsumeChance();
+    const successChance = superTutorEnabled ? 1 : _primerCalcTutorSuccessChance();
+    const noConsumeChance = superTutorEnabled ? 1 : _primerCalcTutorNoConsumeChance();
 
     // Roll consumption independently of success
-    const consumed = Math.random() >= noConsumeChance;
+    const consumed = !superTutorEnabled && Math.random() >= noConsumeChance;
     if (consumed) _primerConsumeTutorItem(tutorItem);
 
-    // Hide the tutor button regardless of outcome
+    // Hide the tutor chip regardless of outcome
     const btn = document.getElementById('primer-tutor-btn');
     if (btn) btn.style.display = 'none';
 

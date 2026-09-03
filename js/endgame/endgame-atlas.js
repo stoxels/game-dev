@@ -551,9 +551,17 @@ function egAtlasChainBlueprint(node) {
     const flavor = EG_ATLAS_CHAIN_FLAVORS[Math.floor(rng() * EG_ATLAS_CHAIN_FLAVORS.length)];
 
     // One fixed boss per region — the map's own boss, fought in the arena
-    // after the chain (like PoE's per-map bosses).
+    // after the chain (like PoE's per-map bosses). The roster in
+    // js/endgame/bosses/boss-rosters.js assigns each region its specific
+    // boss (easy fights low, brutal fights at the pinnacle).
     const bossIds = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.keys(EG_BOSS_DEFS) : [];
-    const bossId = bossIds.length > 0 ? bossIds[Math.floor(rng() * bossIds.length)] : null;
+    // Always consume the roll so the PRNG stream — and therefore every
+    // region's chain flavour and step sources — stays exactly as before,
+    // whether or not the roster overrides the result.
+    const rolledBossId = bossIds.length > 0 ? bossIds[Math.floor(rng() * bossIds.length)] : null;
+    const bossId = (typeof EG_ATLAS_REGION_BOSSES !== 'undefined' && node && EG_ATLAS_REGION_BOSSES[node.id])
+        ? EG_ATLAS_REGION_BOSSES[node.id]
+        : rolledBossId;
 
     const stepSources = [];
     for (let i = 0; i < 24; i++) {

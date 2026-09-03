@@ -202,3 +202,52 @@ function retrySetupResolve(keep) {
         updModDesc();
     }
 }
+
+// Modifier key -> i18n key for the short button labels, used to render the
+// keep-modal setup comparison in the active language.
+const RETRY_SETUP_MOD_LABEL_KEYS = {
+    timetrial: 'mod_tt',
+    hardcore: 'mod_hc',
+    ironman: 'mod_im',
+    classless: 'mod_cl',
+    treeless: 'mod_tl',
+    superTutor: 'mod_super_tutor',
+};
+
+// Formats one difficulty/modifier setup as a human-readable string, e.g.
+// "Hard + Hardcore, Ironman" or "Normal (no modifiers)". Used for the
+// keep-modal NEW vs PREVIOUS comparison so the player sees exactly what
+// each choice would keep or restore.
+function formatRetrySetup(diff, mods) {
+    const diffLabel = t('diff_' + diff);
+    const activeMods = Object.keys(mods || {})
+        .filter(m => mods[m])
+        .map(m => t(RETRY_SETUP_MOD_LABEL_KEYS[m] || m))
+        .filter(s => s && s !== '');
+    const diffName = (diffLabel && diffLabel !== 'diff_' + diff) ? diffLabel : String(diff);
+    if (!activeMods.length) {
+        return diffName + ' (' + t('retry_keep_none') + ')';
+    }
+    return diffName + ' + ' + activeMods.join(', ');
+}
+
+// Refreshes the NEW vs PREVIOUS comparison lines inside #retry-keep-modal
+// from the live selection (new) and the snapshot (previous). Called right
+// before the modal is shown so a mid-run language switch is also reflected.
+function updateRetryKeepModal() {
+    const orig = _retrySetupOriginal;
+    if (!orig) return;
+    const newEl = document.getElementById('retry-keep-new');
+    const prevEl = document.getElementById('retry-keep-prev');
+    if (newEl) newEl.textContent = formatRetrySetup(curDiff, curMods);
+    if (prevEl) prevEl.textContent = formatRetrySetup(orig.diff, orig.mods);
+}
+
+// Hides the keep-modal WITHOUT resolving the pending run, so the snapshot
+// stays active. The caller is expected to replay the level immediately —
+// the prompt will reappear after the next win/fail until the player finally
+// picks KEEP or REVERT. This is the "try the new setup again, decide later"
+// escape hatch for e.g. repeated hardcore fails.
+function retrySetupDefer() {
+    hideModal('retry-keep-modal');
+}

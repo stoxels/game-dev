@@ -82,11 +82,33 @@ function _formatCooldownLabel(secs) {
     return m > 0 ? `${m}m` : `${secs}s`;
 }
 
+// Resolves the effective cooldown for a HUD slot after all reductions
+// (passive tree nodes + endgame gear). Falls back to the base value when
+// the cooldown engine is not loaded yet (e.g. load-order edge cases).
+function _resolveEffectiveTooltipCooldown(slot, baseSeconds) {
+    if (typeof getEffectiveCooldown === 'function') {
+        try {
+            return getEffectiveCooldown(slot, baseSeconds);
+        } catch (e) { /* fall through to base */ }
+    }
+    return baseSeconds;
+}
+
 // Builds the cooldown footer line used inside skill tooltips.
-// e.g. "⏱ CD: 90s"
-function _buildTooltipCooldownLine(cooldownSeconds) {
+// e.g. "⏱ CD: 90s". When baseSeconds is provided and differs from the
+// effective value, the base is shown struck through so players can see
+// how much gear / passive nodes shaved off:
+// e.g. "⏱ CD: 90s (base 5m)"
+function _buildTooltipCooldownLine(cooldownSeconds, baseSeconds) {
     const cdSec = Math.ceil(cooldownSeconds || 0);
     const cdStr = _formatCooldownLabel(cdSec);
+    if (baseSeconds != null) {
+        const baseSec = Math.ceil(baseSeconds || 0);
+        if (baseSec !== cdSec) {
+            const baseStr = _formatCooldownLabel(baseSec);
+            return `<span style="opacity:.55;font-size:.85em">⏱ CD: ${cdStr} <span style="opacity:.65">(base ${baseStr})</span></span>`;
+        }
+    }
     return `<span style="opacity:.55;font-size:.85em">⏱ CD: ${cdStr}</span>`;
 }
 
@@ -226,14 +248,18 @@ function _buildPassiveTooltipHTML(def) {
 }
 
 // Builds the tooltip HTML for an active skill button on the compact HUD.
+// The cooldown footer reflects the effective cooldown after passive tree
+// and endgame gear reductions (see getEffectiveCooldown in class-cooldown-state.js).
 function _buildActiveTooltipHTML(def, key) {
     const skill = def[key];
     const skillLv = getActiveSkillLevel(key);
     const skillData = skill.levels[skillLv - 1];
+    const baseCd = def[key].cooldownSeconds || 0;
+    const effCd = _resolveEffectiveTooltipCooldown(key, baseCd);
     return `<strong style="color:${HUD_COLOR_ACTIVE}">${getLocalName(skill)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
-        + `<br>${_buildTooltipCooldownLine(def[key].cooldownSeconds || 0)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(key) : def[key].manaCost)}`;
+        + `<br>${_buildTooltipCooldownLine(effCd, baseCd)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(key) : def[key].manaCost)}`;
 }
 
 // Routes to the correct tooltip builder based on the skill slot key.
@@ -253,11 +279,13 @@ function buildAscendencySkillTooltip(hudSlot) {
     const skill = asc[ascSlot];
     const skillLv = _getAscendencySkillLevel(ascSlot);
     const skillData = skill.levels[skillLv - 1];
+    const baseCd = skill.cooldownSeconds || 0;
+    const effCd = _resolveEffectiveTooltipCooldown(hudSlot, baseCd);
 
     return `<strong style="color:#f1c40f">${getLocalName(skill)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
-        + `<br>${_buildTooltipCooldownLine(skill.cooldownSeconds || 0)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(hudSlot) : skill.manaCost)}`;
+        + `<br>${_buildTooltipCooldownLine(effCd, baseCd)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(hudSlot) : skill.manaCost)}`;
 }
 
 // Builds the tooltip HTML for the Heartbloom ability (active5 HUD slot).
@@ -266,7 +294,8 @@ function buildHeartbloomTooltip() {
     if (!def) return '';
     const data = def.levels[0];
     const manaLine = _buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost('active5') : def.manaCost);
-    const cdLine = _buildTooltipCooldownLine(def.cooldownSeconds || 0);
+    const baseCd = def.cooldownSeconds || 0;
+    const cdLine = _buildTooltipCooldownLine(_resolveEffectiveTooltipCooldown('active5', baseCd), baseCd);
     const endgameNote = (typeof isEndgameLevel === 'function' && !isEndgameLevel())
         ? `<br><span style="color:#e74c3c;font-size:.85em">⚠ Only usable during endgame maps</span>`
         : `<br><span style="opacity:.55;font-size:.85em">Endgame only</span>`;

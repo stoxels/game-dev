@@ -11,7 +11,7 @@
 // still need a working hover tooltip.
 //
 // OCCLUSION GUARD: for triggers that DO receive pointer events (e.g. the
-// title screen's EXPANSION badge), a raw rect hit is not enough — the
+// title screen's CARTOGRAPHERS subtitle), a raw rect hit is not enough — the
 // element can sit geometrically under the cursor while being covered by
 // an overlay stacked above it (modal backdrops etc.), which used to fire
 // tooltips "through" the overlay. Those triggers only count as hovered
@@ -315,7 +315,7 @@ function _buildModTombstoneTooltipHTML(btn) {
     return desc ? desc.innerHTML : '';
 }
 
-// 7. Title-screen "EXPANSION 1" badge — expansion history.
+// 7. Title-screen "CARTOGRAPHERS OF CHANCE" subtitle — expansion history.
 // Newest expansion first, then older ones: Expansion 2 (upcoming),
 // Expansion 1 (current), Base Game.
 function _buildExpansionHistoryTooltipHTML() {
@@ -367,10 +367,65 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Title screen "EXPANSION 1" badge → expansion-history tooltip.
-    // Uses the bounding-box hover engine so the badge can stay interactive
+    // Quiz / Math-Gate / Scouts Primer corner icon buttons (tutor / explanation /
+    // continue / new-q) describe themselves via a translation key in data-tip-t.
+    // Delegated on the overlays because the modal markup is static but the buttons
+    // are shown/hidden (and the primer rebuilds its overlay per question).
+    // The Tutor button's label is dynamic (item count / super-tutor), so its
+    // data-tip-t is refreshed in JS when it is re-labelled.
+    const showCornerTip = (btn, e) => {
+        let html = t(btn.dataset.tipT || '');
+        const n = btn.dataset.tipN;
+        if (n != null && n !== '') html = html.replace('{n}', n);
+        else html = html.replace(/\s*\(\{n\}\)/, ''); // count unknown → drop the placeholder cleanly
+        showGameTooltip(html, e);
+    };
+    const cornerHosts = [
+        document.getElementById('quiz-overlay'),
+        document.getElementById('mg-modal'),
+    ];
+    cornerHosts.forEach(host => {
+        if (!host) return;
+        host.addEventListener('mouseover', (e) => {
+            const btn = e.target.closest ? e.target.closest('.qr-corner') : null;
+            if (!btn) return;
+            showCornerTip(btn, e);
+        });
+        host.addEventListener('mousemove', (e) => {
+            if (e.target.closest && e.target.closest('.qr-corner')) moveGameTooltip(e);
+        });
+        host.addEventListener('mouseout', (e) => {
+            const btn = e.target.closest ? e.target.closest('.qr-corner') : null;
+            if (!btn) return;
+            const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.qr-corner') : null;
+            if (to !== btn) hideGameTooltip();
+        });
+    });
+
+    // The Scouts Primer overlay is built and appended per question, so it does
+    // not exist at setup time — delegate on the document, scoped to targets
+    // inside #primer-overlay, so quiz/mg hosts above never double-fire.
+    const inPrimer = (e) => e.target.closest && e.target.closest('#primer-overlay');
+    document.addEventListener('mouseover', (e) => {
+        if (!inPrimer(e)) return;
+        const btn = e.target.closest('.qr-corner');
+        if (btn) showCornerTip(btn, e);
+    });
+    document.addEventListener('mousemove', (e) => {
+        if (inPrimer(e) && e.target.closest('.qr-corner')) moveGameTooltip(e);
+    });
+    document.addEventListener('mouseout', (e) => {
+        if (!inPrimer(e)) return;
+        const btn = e.target.closest('.qr-corner');
+        if (!btn) return;
+        const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.qr-corner') : null;
+        if (to !== btn) hideGameTooltip();
+    });
+
+    // Title screen "CARTOGRAPHERS OF CHANCE" subtitle → expansion-history tooltip.
+    // Uses the bounding-box hover engine so the subtitle can stay interactive
     // for the tooltip while still sitting inside the title canvas.
-    _wireHoverByRect(document.querySelector('.title-expansion-badge'), _buildExpansionHistoryTooltipHTML);
+    _wireHoverByRect(document.querySelector('.title-subtitle'), _buildExpansionHistoryTooltipHTML);
 
     // Setup-screen modifier tombstones → per-tombstone effect text on hover.
     // Delegated on the static #screen-setup element (the tombstones are

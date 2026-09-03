@@ -466,6 +466,13 @@ function _doStartLevel(gi) {
     }
     _applyPassiveStartEffects();
     _applySylaForestAffinity();
+    // Unique QoL perk (endgame-unique-items.js): equipped zero-automark
+    // uniques mark all-empty rows/columns incorrect at level start. Runs
+    // after passives so manual passive marks are never overwritten, and on
+    // every chain puzzle via _doStartLevel.
+    if (typeof _egApplyUniqueZeroLineAutomark === 'function') {
+        try { _egApplyUniqueZeroLineAutomark(); } catch (e) {}
+    }
     // Flag that puzzle-start passives (auto-reveal / auto-mark) have fired for this Gi.
     // _egTransitionToChainPuzzle checks this flag after _doStartLevel to guarantee
     // every chained puzzle in a map re-triggers passives even if a future refactor

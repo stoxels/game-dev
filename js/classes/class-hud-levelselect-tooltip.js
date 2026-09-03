@@ -11,10 +11,32 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Resolves the effective cooldown for a level-select tooltip slot after all
+// reductions (passive tree nodes + endgame gear). Falls back to the base
+// value when the cooldown engine is not loaded yet.
+function _getLsEffectiveCooldown(slot, baseSeconds) {
+    if (typeof getEffectiveCooldown === 'function') {
+        try {
+            return getEffectiveCooldown(slot, baseSeconds);
+        } catch (e) { /* fall through to base */ }
+    }
+    return baseSeconds;
+}
+
 // Builds the small inline cooldown annotation used in the level-select tooltip.
-// e.g. " ⏱ 2m"  (lower opacity, smaller font)
-function _buildLsCooldownAnnotation(cooldownSeconds) {
-    return `<span style="opacity:.4;font-size:.8em"> ⏱ ${_formatCooldownLabel(cooldownSeconds)}</span>`;
+// e.g. " ⏱ 2m"  (lower opacity, smaller font). When the effective cooldown
+// differs from the base (gear / passive reductions), the base is shown in
+// parens: " ⏱ 2m (base 5m)".
+function _buildLsCooldownAnnotation(cooldownSeconds, baseSeconds) {
+    const effSec = Math.ceil(cooldownSeconds || 0);
+    const effStr = _formatCooldownLabel(effSec);
+    if (baseSeconds != null) {
+        const baseSec = Math.ceil(baseSeconds || 0);
+        if (baseSec !== effSec) {
+            return `<span style="opacity:.4;font-size:.8em"> ⏱ ${effStr} <span style="opacity:.75">(base ${_formatCooldownLabel(baseSec)})</span></span>`;
+        }
+    }
+    return `<span style="opacity:.4;font-size:.8em"> ⏱ ${effStr}</span>`;
 }
 
 // Builds the MAX rank badge shown next to a skill rank when it is maxed out.
@@ -33,13 +55,15 @@ function _buildMaxRankBadge(level) {
 //------------------------------------------------------------------------
 
 // Builds the HTML block for a single skill entry in the level-select tooltip.
-// Used for both base class and ascendency skills.
-function _buildLsSkillBlock(nameHTML, rankWord, level, maxLevel, cooldownSeconds, descHTML) {
+// Used for both base class and ascendency skills. cooldownSeconds should
+// already be the EFFECTIVE value; pass the unreduced base via baseCooldownSeconds
+// so reductions remain visible. Older callers that pass only 6 args keep working.
+function _buildLsSkillBlock(nameHTML, rankWord, level, maxLevel, cooldownSeconds, descHTML, baseCooldownSeconds) {
     return `
         <div style="color:#f1c40f;margin-bottom:2px;">
             🎯 ${nameHTML}
             <span style="opacity:.6;font-size:.85em">— ${rankWord} ${level}/${maxLevel}${_buildMaxRankBadge(level)}</span>
-            ${_buildLsCooldownAnnotation(cooldownSeconds)}
+            ${_buildLsCooldownAnnotation(cooldownSeconds, baseCooldownSeconds)}
         </div>
         <div style="color:#ccc;">${descHTML}</div>`;
 }
@@ -62,17 +86,21 @@ function _buildLsAscendencySection(rankWord) {
     const sk1Desc = getLocalDesc(sk1Data);
     const sk2Desc = getLocalDesc(sk2Data);
 
+    const sk1Base = asc.active1.cooldownSeconds || 0;
+    const sk2Base = asc.active2.cooldownSeconds || 0;
     const sk1Block = _buildLsSkillBlock(
         sk1Name,
         rankWord, sk1Lv, 3,
-        asc.active1.cooldownSeconds,
-        sk1Desc
+        _getLsEffectiveCooldown('active3', sk1Base),
+        sk1Desc,
+        sk1Base
     );
     const sk2Block = _buildLsSkillBlock(
         sk2Name,
         rankWord, sk2Lv, 3,
-        asc.active2.cooldownSeconds,
-        sk2Desc
+        _getLsEffectiveCooldown('active4', sk2Base),
+        sk2Desc,
+        sk2Base
     );
 
     return `
@@ -131,10 +159,10 @@ function buildLsClassTooltipHTML() {
             <div style="color:#ccc;">${passDesc}</div>
         </div>
         <div style="margin-bottom:7px;">
-            ${_buildLsSkillBlock(act1Name, rankWord, act1Lv, 3, def.active1.cooldownSeconds, act1Desc)}
+            ${_buildLsSkillBlock(act1Name, rankWord, act1Lv, 3, _getLsEffectiveCooldown('active1', def.active1.cooldownSeconds || 0), act1Desc, def.active1.cooldownSeconds || 0)}
         </div>
         <div>
-            ${_buildLsSkillBlock(act2Name, rankWord, act2Lv, 3, def.active2.cooldownSeconds, act2Desc)}
+            ${_buildLsSkillBlock(act2Name, rankWord, act2Lv, 3, _getLsEffectiveCooldown('active2', def.active2.cooldownSeconds || 0), act2Desc, def.active2.cooldownSeconds || 0)}
         </div>
         ${_buildLsAscendencySection(rankWord)}`;
 }
