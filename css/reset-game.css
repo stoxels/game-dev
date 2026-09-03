@@ -24,98 +24,131 @@
 
 
 /* -----------------------------------------------------------------------
-   OUTER STONE FRAME
-   The whole modal sits on one big frame image. Adjust aspect-ratio to
-   match your exported frame art so inner % based positions line up.
+   OUTER STONE FRAME — now the SAME settings_background.png asset as the
+   settings / how-to-play / changelog / danger modals, stretched 100%/100%.
+   Its carved border spans x 0→9% / 91%→100% and y 0→11% / 90%→100% of the
+   art; the padding below keeps the body columns on the flat parchment area.
    ----------------------------------------------------------------------- */
 .reset-modal-box {
     position: relative;
     width: min(1000px, 94vw);
-    aspect-ratio: 1376 / 768; /* ← match your Reset-Frame.png ratio */
-    padding: clamp(16px, 3vw, 34px) clamp(20px, 4vw, 50px);
+    aspect-ratio: 611 / 470; /* frame art ratio, like the sibling modals */
+    padding: clamp(48px, 12%, 164px) clamp(44px, 11%, 150px) clamp(42px, 11.5%, 157px);
     box-sizing: border-box;
-    background-image: url('../images/Game-Reset/Reset-Frame.png');
+    background-image: url('../images/Settings/settings_background.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
+    background-color: transparent;
     display: flex;
     flex-direction: column;
     gap: clamp(6px, 1.2vw, 14px);
-    color: var(--accent2);
+    color: #4a2c12;
     z-index: 1;
+    overflow: visible; /* let the plaque overhang the frame edge */
 }
 
 
 /* -----------------------------------------------------------------------
-   CLOSE BUTTON — top-right stone tablet button
+   TITLE PLAQUE — same asset + geometry as the settings / how-to-play /
+   replay / changelog plaques: settings_title_plague.png overhanging the
+   frame's top edge, title centred on the art's flat middle (~68% width;
+   the ends taper). Replaces the old inset Title-Plate.png.
+   ----------------------------------------------------------------------- */
+.reset-header {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max(min(56%, 720px), 340px);
+    height: clamp(46px, 6vw, 68px);
+    background-image: url('../images/Settings/settings_title_plague.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14%;
+    margin: 0;
+    z-index: 3;
+}
+
+.reset-title {
+    font-family: var(--C);
+    font-size: min(clamp(11px, 1.55vw, 19px), 3.2vh);
+    letter-spacing: 2px;
+    color: var(--yellow);
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* The old swirl/gear header icons flanked the inset title plate; on the
+   narrow plaque they would crowd the title, so they rest. */
+.reset-header .reset-header-slot {
+    display: none;
+}
+
+
+/* -----------------------------------------------------------------------
+   CLOSE BUTTON — top-right stone square with X icon (shared asset and
+   geometry with the sibling modals; the text is hidden, the art is the X).
    ----------------------------------------------------------------------- */
 .reset-close-btn {
     position: absolute;
-    top: 3%;
-    right: 0%;
-    z-index: 3;
-    font-family: var(--PX);
-    font-size: clamp(9px, 1.2vw, 13px);
-    letter-spacing: 1px;
-    color: var(--accent2);
-    background-image: url('../images/Game-Reset/Close-Button.png');
+    top: 2%;
+    right: 2%;
+    z-index: 4;
+    width: clamp(34px, 4.4vw, 50px);
+    height: clamp(34px, 4.4vw, 50px);
+    font-size: 0;
+    color: transparent;
+    background-image: url('../images/Settings/settings_close_button.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
     border: none;
-    padding: clamp(8px, 1.4vw, 14px) clamp(14px, 2.6vw, 26px);
+    padding: 0;
     cursor: pointer;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     transition: transform .12s, filter .12s;
 }
 
     .reset-close-btn:hover {
         filter: brightness(1.2);
-        transform: translateY(-1px);
+        transform: scale(1.06);
     }
 
 
 /* -----------------------------------------------------------------------
-   HEADER — swirl icon / title / gear icon row
-   ----------------------------------------------------------------------- */
-.reset-header {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(10px, 2vw, 22px);
-    padding-top: clamp(4px, 1vw, 10px);
-    overflow: visible; /* lets enlarged icons spill past their slot */
-}
-
-.reset-title {
-    font-family: var(--C);
-    font-size: clamp(18px, 2.6vw, 30px);
-    letter-spacing: 2px;
-    color: var(--accent2);
-    text-align: center;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.6);
-    background-image: url('../images/Game-Reset/Title-Plate.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    padding: clamp(8px, 1.4vw, 14px) clamp(20px, 3vw, 40px);
-}
-
-
-/* -----------------------------------------------------------------------
-   BODY — two-column list of what gets erased
+   BODY — two-column list of what gets erased.
+   Wrapped in a min-height:0 flex context so the whole body can scroll
+   inside the frame when the box is height-capped (portrait/short windows).
    ----------------------------------------------------------------------- */
 .reset-body {
     position: relative;
     z-index: 2;
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
     display: flex;
     gap: clamp(16px, 3vw, 40px);
     padding: clamp(10px, 1.6vw, 18px) clamp(6%, 8%, 10%);
     align-items: flex-start;
+
+    scrollbar-width: thin;
 }
+
+    .reset-body::-webkit-scrollbar {
+        width: clamp(6px, 0.7vw, 10px);
+    }
+    .reset-body::-webkit-scrollbar-track {
+        background: rgba(44, 26, 12, 0.15);
+        border-radius: 6px;
+    }
+    .reset-body::-webkit-scrollbar-thumb {
+        background: rgba(44, 26, 12, 0.45);
+        border-radius: 6px;
+    }
 
 .reset-col {
     flex: 1;
@@ -136,7 +169,7 @@
     font-family: var(--F, inherit);
     font-size: clamp(12px, 1.5vw, 17px);
     line-height: 1.3;
-    color: var(--accent2);
+    color: #4a2c12; /* dark stone-brown on the parchment frame area */
 }
 
 /* The little character-trio + portal illustration under the right column */
@@ -154,7 +187,9 @@
 
 
 /* -----------------------------------------------------------------------
-   NOTE BANNER — "will NOT reset achievements" strip with trophy + shield
+   NOTE BANNER — "will NOT reset achievements" strip with trophy + shield.
+   Unique to this modal: kept as its own dark stone banner art, floating on
+   the parchment frame area (light text stays).
    ----------------------------------------------------------------------- */
 .reset-note-banner {
     position: relative;
@@ -168,6 +203,8 @@
     background-size: 100% 115%;
     background-repeat: no-repeat;
     background-position: center;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     overflow: visible; /* lets enlarged icons spill past their slot */
 }
 
@@ -377,6 +414,12 @@
         height: auto;
         max-height: calc(100vh - 40px);
         overflow-y: auto;
+
+        /* Single tall column: the frame art's top/bottom border (11%/10% of
+           HEIGHT) outgrows width-based percent padding — switch those sides
+           to vh units (same fix as the sibling modals' portrait breakpoint). */
+        padding-top: clamp(48px, 11vh, 164px);
+        padding-bottom: clamp(42px, 10vh, 157px);
     }
 
     .reset-body {
@@ -395,5 +438,21 @@
 
     .reset-btn {
         width: 100%;
+    }
+}
+
+/* Tiny phones: the plaque's 340px width floor would exceed the box itself
+   (box = 94vw − backdrop padding), so pin the plaque to the box and drop
+   the title font a step (same fix as tut-box / changelog / replay). */
+@media (max-width: 400px) {
+    .reset-header {
+        width: min(100%, 340px);
+    }
+
+    .reset-title {
+        /* Tracking + floor tuned so the German "RESETTE DEINEN
+           FORTSCHRITT" stays inside the plaque's flat middle band. */
+        font-size: min(9px, 3.2vh);
+        letter-spacing: 1px;
     }
 }

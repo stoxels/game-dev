@@ -410,6 +410,9 @@ function _doResetAchievements() {
     localStorage.removeItem(ACH_SAVE_KEY);
     ACH_STATE = { stats: {}, unlocked: [] };
     saveAchState();
-    buildAchievementsScreen();
+    // Land back on the category overview, even if the reset was triggered
+    // from inside a category detail view.
+    if (typeof backToAchCategories === 'function') backToAchCategories();
+    else buildAchievementsScreen();
     if (typeof showToast === 'function') showToast(t('qa_achievements_cleared'));
 }

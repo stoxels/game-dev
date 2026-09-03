@@ -9,14 +9,28 @@
 // stay pointer-events:none (so they never block clicks on whatever sits
 // beneath them, e.g. the puzzle grid under the fixed corner HUD) but
 // still need a working hover tooltip.
+//
+// OCCLUSION GUARD: for triggers that DO receive pointer events (e.g. the
+// title screen's EXPANSION badge), a raw rect hit is not enough — the
+// element can sit geometrically under the cursor while being covered by
+// an overlay stacked above it (modal backdrops etc.), which used to fire
+// tooltips "through" the overlay. Those triggers only count as hovered
+// when the topmost element at the cursor is the trigger itself (or a
+// descendant). For pointer-events:none triggers the pass-through is the
+// whole point, so the plain rect test decides for them.
 function _wireHoverByRect(el, builder) {
     if (!el) return;
     let isOver = false;
 
     document.addEventListener('mousemove', (e) => {
         const rect = el.getBoundingClientRect();
-        const inside = e.clientX >= rect.left && e.clientX <= rect.right &&
+        let inside = e.clientX >= rect.left && e.clientX <= rect.right &&
             e.clientY >= rect.top && e.clientY <= rect.bottom;
+
+        if (inside && getComputedStyle(el).pointerEvents !== 'none') {
+            const topEl = document.elementFromPoint(e.clientX, e.clientY);
+            inside = !!topEl && (topEl === el || el.contains(topEl));
+        }
 
         if (inside) {
             if (!isOver) {
@@ -291,16 +305,26 @@ function _buildInventoryLabelTooltipHTML() {
         + `<br>${t('cg_inv_reward_pick').replace('{n}', typeof RESHUFFLE_GOAL !== 'undefined' ? RESHUFFLE_GOAL : 3)}`;
 }
 
-// 6. Title-screen "EXPANSION 1" badge — expansion history.
-// Lists the base game, the current expansion, and a tease of the next one.
+// 6. Setup-screen modifier tombstones — shows the same effect text as the
+// per-tombstone description that appears underneath a tombstone while it
+// is selected (.mod-per-desc), but as a hover tooltip so the effect can
+// also be read before activating it. Reads the live sibling span, so a
+// language switch is always reflected.
+function _buildModTombstoneTooltipHTML(btn) {
+    const desc = btn.parentElement.querySelector(':scope > .mod-per-desc');
+    return desc ? desc.innerHTML : '';
+}
+
+// 7. Title-screen "EXPANSION 1" badge — expansion history.
+// Newest expansion first, then older ones: Expansion 2 (upcoming),
+// Expansion 1 (current), Base Game.
 function _buildExpansionHistoryTooltipHTML() {
     return `<strong style="color:#d4b8ff">${t('scr_expansion_tooltip_title')}</strong>`
-        + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_base')}</span>`
-        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_base_note')}</span>`
+        + `<br><br><span style="color:#c39bd3">• ${t('scr_expansion_2_badge')}: ${t('scr_expansion_2_name')}</span>`
         + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_badge')}: ${t('scr_expansion_1_name')}</span>`
         + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_1_note')}</span>`
-        + `<br><br><span style="color:#c39bd3">• ${t('scr_expansion_2_name')}</span>`
-        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_2_note')}</span>`;
+        + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_base')}</span>`
+        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_base_note')}</span>`;
 }
 
 
@@ -347,6 +371,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Uses the bounding-box hover engine so the badge can stay interactive
     // for the tooltip while still sitting inside the title canvas.
     _wireHoverByRect(document.querySelector('.title-expansion-badge'), _buildExpansionHistoryTooltipHTML);
+
+    // Setup-screen modifier tombstones → per-tombstone effect text on hover.
+    // Delegated on the static #screen-setup element (the tombstones are
+    // never re-created); scoped to the setup screen so the compact
+    // tombstones in the retry-setup modal — which have no .mod-per-desc
+    // sibling — stay untouched.
+    const setupScreen = document.getElementById('screen-setup');
+    if (setupScreen) {
+        setupScreen.addEventListener('mouseover', (e) => {
+            const btn = e.target.closest ? e.target.closest('.setup-opt-mod') : null;
+            if (!btn) return;
+            const html = _buildModTombstoneTooltipHTML(btn);
+            if (html) showGameTooltip(html, e);
+        });
+        setupScreen.addEventListener('mousemove', (e) => {
+            // moveGameTooltip no-ops while the tooltip is hidden.
+            if (e.target.closest && e.target.closest('.setup-opt-mod')) moveGameTooltip(e);
+        });
+        setupScreen.addEventListener('mouseout', (e) => {
+            const btn = e.target.closest ? e.target.closest('.setup-opt-mod') : null;
+            if (!btn) return;
+            const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.setup-opt-mod') : null;
+            if (to !== btn) hideGameTooltip();
+        });
+    }
 });
 
 

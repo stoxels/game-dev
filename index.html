@@ -146,7 +146,7 @@
          stone/parchment frame from images/Settings/, title plaque + stone
          close button hanging over the frame edge. The tutorial sections sit
          on stone cards in a wide 3-column grid over the parchment. -->
-    <div id="tut-modal" class="modal-bg">
+    <div id="tut-modal" class="modal-bg safe-center">
         <div class="modal-box tut-box">
             <button class="modal-close" data-modal-close="tut-modal" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title" data-t="tut_title">▸ HOW TO PLAY STOXELS</div>
@@ -350,7 +350,7 @@
 
 
     <!-- RESET MODAL -->
-    <div id="reset-modal" class="modal-bg">
+    <div id="reset-modal" class="modal-bg safe-center">
         <div class="reset-modal-box">
 
             <button class="reset-close-btn" data-modal-close="reset-modal" data-t="reset_close">✕ CLOSE</button>
@@ -683,8 +683,8 @@
     </div>
 
     <!-- RETRY WITH OTHER DIFFICULTY / MODIFIERS MODAL (opened from win overlay) -->
-    <div id="retry-setup-modal" class="modal-bg">
-        <div class="modal-box retry-setup-box">
+    <div id="retry-setup-modal" class="modal-bg safe-center">
+        <div class="modal-box modal-box-danger retry-setup-box">
             <button class="modal-close" id="btn-retry-setup-cancel" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title" data-t="retry_setup_title">⟳ RETRY WITH NEW SETTINGS</div>
             <p class="retry-setup-hint" data-t="retry_setup_hint"></p>
@@ -732,7 +732,7 @@
     </div>
 
     <!-- KEEP OR REVERT PROMPT — shown after completing/failing a retried level -->
-    <div id="retry-keep-modal" class="modal-bg">
+    <div id="retry-keep-modal" class="modal-bg safe-center">
         <div class="modal-box modal-box-danger">
             <div class="modal-title" data-t="retry_keep_title">KEEP THE NEW SETTINGS?</div>
             <p class="reset-body-text" data-t="retry_keep_text"></p>
@@ -1122,14 +1122,26 @@
     </div>
 
 
-    <!-- ACHIEVEMENTS SCREEN -->
-    <div id="screen-achievements" class="screen">
-        <div class="ach-topbar">
-            <button class="gtb-btn" id="btn-ach-back" data-t="btn_menu">MENU</button>
-            <div class="ach-title" data-t="scr_achievements">ACHIEVEMENTS</div>
-            <button class="gtb-btn btn-danger" id="btn-reset-achievements" data-t="scr_reset_all_achievements">RESET ALL ACHIEVEMENTS</button>
+    <!-- ACHIEVEMENTS MODAL -->
+    <!-- Styled after the settings / how-to-play modal family
+         (css/modals.css): the stone/parchment frame from images/Settings/
+         with the title plaque + stone close button hanging over the frame
+         edge. The totals header stays fixed; only the category grid (or a
+         category's achievements) scrolls inside the parchment area. -->
+    <div id="achievements-modal" class="modal-bg">
+        <div class="modal-box ach-modal-box">
+            <button class="modal-close" id="btn-ach-close" aria-label="Close"></button>
+            <div class="ach-frame-title" id="ach-frame-title" data-t="scr_achievements">ACHIEVEMENTS</div>
+
+            <!-- JS-rendered: the totals banner + "Category Overview" caption
+                 stay fixed here while only the grid below scrolls -->
+            <div class="ach-overview-fixed" id="ach-overview-fixed"></div>
+            <div class="ach-body" id="ach-body"></div>
+
+            <div class="ach-frame-footer">
+                <button class="ach-reset-btn" id="btn-reset-achievements" data-t="scr_reset_all_achievements">RESET ALL ACHIEVEMENTS</button>
+            </div>
         </div>
-        <div class="ach-body" id="ach-body"></div>
     </div>
 
 
@@ -1185,7 +1197,7 @@
 
 
     <!-- ACHIEVEMENT RESET CONFIRM MODAL -->
-    <div id="ach-reset-modal" class="modal-bg">
+    <div id="ach-reset-modal" class="modal-bg safe-center">
         <div class="modal-box modal-box-danger">
             <button class="modal-close" onclick="hideAchResetModal()" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title text-red" data-t="scr_reset_ach_title">⚠ RESET ACHIEVEMENTS</div>
@@ -1196,7 +1208,7 @@
                 </p>
             </div>
             <div class="modal-actions">
-                <button class="title-btn back-btn" onclick="hideAchResetModal(); _doResetAchievements();" data-t="scr_reset_ach_confirm">🗑 YES, RESET ACHIEVEMENTS</button>
+                <button class="title-btn back-btn" onclick="hideAchResetModal(); _doResetAchievements();" data-t="scr_reset_ach_confirm">YES, RESET ACHIEVEMENTS</button>
                 <button class="title-btn back-btn" onclick="hideAchResetModal()" data-t="reset_cancel">CANCEL</button>
             </div>
         </div>

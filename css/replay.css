@@ -1,34 +1,39 @@
 /*
     ------------------------------------------------------------------------
     replay.css
-    Standalone redesign of the "REPLAY GALLERY" modal (#replay-modal) reached
-    from the title screen's ▶ REPLAY button.
+    "REPLAY GALLERY" modal (#replay-modal) reached from the title screen's
+    ▶ REPLAY button.
 
-    This file does NOT reuse .modal-box / .modal-title / .modal-actions from
-    modals.css. The only shared class is .modal-bg (the dimmed fullscreen
-    backdrop + .show toggle) — everything inside the box is scoped to its own
-    classes so it can't leak into or be broken by other modals.
+    Visual family: same stone/parchment chrome as the settings and
+    how-to-play modals (css/settings.css + css/modals.css) — the
+    settings_background.png frame, the settings_title_plague.png title
+    plaque and the settings_close_button.png stone X. Only shared class is
+    .modal-bg (the dimmed fullscreen backdrop + .show toggle); everything
+    inside the box is scoped to its own classes so it can't leak into or
+    be broken by other modals.
+
+    UNIQUE to this modal (kept): the dark inner gallery panel with stone
+    track rows, circular play buttons and thumbnails from
+    images/Replay_Cutscene_Screen/, plus the glowing blue-purple scrollbar.
 
     ASSETS (images/Replay_Cutscene_Screen/):
-      Replay_Background_inner.png        dark inner panel   (560x395)
-      Replay_Background_inner_border.png ornate frame layer (562x444)
       Replay_Track_Background.png        stone row/track bar (565x74)
       Replay_Start_Button.png            circular play button (90x80)
       Replay_Opening_Camera.png          opening-cinematic thumb (128x100)
       Replay_Tutorial_Background.png     tutorial thumb (163x136)
-
-    The title is styled text (not the Replay_Title.png plaque) — "REPLAY"
-    centred in the frame's header band. The close button re-uses the
-    Inference (quest-log) system's wax-seal cross (.modal-close with
-    images/Inference/close-button.png), so its text is hidden.
     ------------------------------------------------------------------------
 */
 
 
 /* -----------------------------------------------------------------------
-   OUTER STONE FRAME
-   Layered backgrounds: the ornate border sits on top, the plain inner
-   panel underneath. Both stretch to fill the box (border first = on top).
+   OUTER STONE FRAME — same settings_background.png asset as the settings /
+   how-to-play modals, stretched 100%/100%. Its carved border spans
+   x 0→9% / 91%→100% and y 0→11% / 90%→100% of the art, so the padding below
+   keeps the gallery inside the flat parchment area at every window size.
+   This box is height-driven (a scrollable gallery, not aspect-locked), so
+   the paddings track the art proportionally: the box is min(94vw, 920px)
+   wide × min(78vh, 700px) tall, hence min(8.5vw, 83px) ≈ 9% of width and
+   min(8.6vh, 78px) / min(7.8vh, 71px) ≈ 11% / 10% of height.
    ----------------------------------------------------------------------- */
 .replay-modal-box {
     position: relative;
@@ -36,67 +41,82 @@
     /* viewport-aware so the list can scroll instead of overflowing */
     height: min(78vh, 700px);
     box-sizing: border-box;
-    background-image:
-        url('../images/Replay_Cutscene_Screen/Replay_Background_inner_border.png'),
-        url('../images/Replay_Cutscene_Screen/Replay_Background_inner.png');
-    background-size: 100% 100%, 100% 100%;
-    background-repeat: no-repeat, no-repeat;
-    background-position: center, center;
+    background-image: url('../images/Settings/settings_background.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
     display: flex;
     flex-direction: column;
-    padding: clamp(18px, 3.4vw, 44px) clamp(18px, 3.6vw, 48px)
-             clamp(14px, 2.4vw, 30px) clamp(18px, 3.6vw, 48px);
+    padding: min(8.6vh, 78px) min(8.5vw, 83px) min(7.8vh, 71px);
     color: var(--accent2);
     z-index: 1;
 }
 
 /* -----------------------------------------------------------------------
-   CLOSE BUTTON — wax-seal cross re-used from the Inference (quest-log)
-   system's top-right close. The text is hidden; the image is the glyph.
-   ----------------------------------------------------------------------- */
-.replay-modal-box .modal-close {
-    position: absolute;
-    top: clamp(10px, 2vw, 20px);
-    right: clamp(10px, 2vw, 22px);
-    z-index: 100;
-    width: clamp(28px, 4vw, 44px);
-    height: clamp(28px, 4vw, 44px);
-    padding: 0;
-    border: none;
-    background: url('../images/Inference/close-button.png') center/contain no-repeat;
-    color: transparent;
-    font-size: 0;
-    cursor: pointer;
-    pointer-events: all;
-    transition: transform 0.15s;
-}
-
-    .replay-modal-box .modal-close:hover {
-        transform: scale(1.08) rotate(-4deg);
-    }
-
-
-/* -----------------------------------------------------------------------
-   TITLE — centred at the top inside the frame's header band
+   TITLE PLAQUE — same asset + geometry as the settings/how-to-play plaques
+   (see .tut-box .modal-title in css/modals.css): settings_title_plague.png
+   overhanging the frame's top edge, text centred on the art's flat middle
+   (~68% of the plaque width; the ends taper). The .replay-header wrapper
+   stays in the DOM for the translated <span> and simply becomes the plaque.
    ----------------------------------------------------------------------- */
 .replay-header {
-    flex-shrink: 0;
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max(min(56%, 720px), 340px);
+    height: clamp(46px, 6vw, 68px);
+    background-image: url('../images/Settings/settings_title_plague.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto clamp(2px, 0.6vw, 8px);
+    padding: 0 14%; /* keep glyphs clear of the tapering plaque ends */
+    margin: 0;
+    z-index: 3;
 }
 
 .replay-header-title {
     font-family: var(--C);
     font-weight: 700;
-    font-size: clamp(20px, 3.2vw, 40px);
+    font-size: clamp(14px, 1.8vw, 22px);
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: #e8c060;
-    text-shadow: 0 2px 0 #4a2f10, 0 3px 6px rgba(0, 0, 0, 0.7);
     white-space: nowrap;
+    color: var(--yellow);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
+
+/* -----------------------------------------------------------------------
+   CLOSE BUTTON — stone square with X icon, top-right corner (same asset and
+   geometry as the settings/how-to-play modals; the "✕ CLOSE" text is
+   hidden, the art shows the X).
+   ----------------------------------------------------------------------- */
+.replay-modal-box .modal-close {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    z-index: 4;
+    width: clamp(34px, 4.4vw, 50px);
+    height: clamp(34px, 4.4vw, 50px);
+    padding: 0;
+    border: none;
+    background-image: url('../images/Settings/settings_close_button.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    color: transparent;
+    font-size: 0;
+    cursor: pointer;
+    pointer-events: all;
+    transition: transform .12s, filter .12s;
+}
+
+    .replay-modal-box .modal-close:hover {
+        filter: brightness(1.2);
+        transform: scale(1.06);
+    }
 
 
 /* -----------------------------------------------------------------------
@@ -281,14 +301,18 @@
 
 
 /* -----------------------------------------------------------------------
-   NARROW-SCREEN FALLBACK
+   NARROW-SCREEN FALLBACK — height-driven like the desktop rule: keep the
+   top/bottom padding on vh units so the gallery never rides over the frame
+   art's top/bottom border when the box wraps to multiple rows (same fix as
+   the how-to-play modal's portrait breakpoint).
    ----------------------------------------------------------------------- */
 @media (max-width: 700px) {
     .replay-modal-box {
         width: 92vw;
         height: auto;
-        max-height: 90vh;
-        padding: 18px 14px 16px;
+        max-height: calc(100vh - 40px);
+        padding-top: clamp(48px, 11vh, 100px);
+        padding-bottom: clamp(42px, 10vh, 90px);
     }
 
     .replay-track {
@@ -298,5 +322,18 @@
 
     .replay-track-desc {
         white-space: normal;
+    }
+}
+
+/* Tiny phones: the plaque's 340px width floor would exceed the box itself
+   (box = 92vw − backdrop padding), so pin the plaque to the box and drop
+   the title a step — the German "WIEDERGABE" still fits the flat surface. */
+@media (max-width: 400px) {
+    .replay-header {
+        width: min(100%, 340px);
+    }
+
+    .replay-header-title {
+        font-size: 11px;
     }
 }

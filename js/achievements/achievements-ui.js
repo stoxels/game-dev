@@ -20,6 +20,38 @@ const ACH_CATEGORIES = [
     { key: 'endgame', icon: '⚔️', labelEn: 'Endgame', labelDE: 'Endgame' },
 ];
 
+
+
+//------------------------------------------------------------------------
+//------------------CATEGORY OVERVIEW — ASSETS & STATE--------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// ACH_CATEGORY_ASSETS — per-category card artwork and accent glow colour,
+// keyed by ACH_CATEGORIES key. The colours mirror the glow tones of the
+// category-overview reference art. Categories without an entry fall back
+// to the default glow colour in the card builder.
+const ACH_CATEGORY_ASSETS = {
+    completion: { img: 'images/Achievement_Screen/Achievements_Category_Completion.png',       glow: '#7ef29a' },
+    difficulty: { img: 'images/Achievement_Screen/Achievements_Category_Difficulty.png',       glow: '#ff6464' },
+    grid:       { img: 'images/Achievement_Screen/Achievements_Category_GridPuzzles.png',      glow: '#5ad8ff' },
+    score:      { img: 'images/Achievement_Screen/Achievements_Category_Score.png',            glow: '#c07bff' },
+    time:       { img: 'images/Achievement_Screen/Achievements_Category_TimeSpeed.png',        glow: '#5ad8ff' },
+    mistakes:   { img: 'images/Achievement_Screen/Achievements_category_MistakesComeback.png', glow: '#c07bff' },
+    items:      { img: 'images/Achievement_Screen/Achievements_Category_ItemsInventory.png',   glow: '#5ad8ff' },
+    quiz:       { img: 'images/Achievement_Screen/Achievements_Category_QuizExcercises.png',   glow: '#5ad8ff' },
+    class:      { img: 'images/Achievement_Screen/Achievements_Category_ClassesAbilities.png', glow: '#7ef29a' },
+    tree:       { img: 'images/Achievement_Screen/Achievements_Category_ProbabilityTree.png',  glow: '#7ef29a' },
+    inference:  { img: 'images/Achievement_Screen/Achievements_Category_Inference.png',        glow: '#ffc857' },
+    endgame:    { img: 'images/Achievement_Screen/Achievements_Category_Endgame.png',          glow: '#c07bff' },
+};
+
+// Which view is currently rendered inside #ach-body:
+//   'overview' → the category card grid
+//   'category' → the achievements of one specific category
+let _achView = 'overview';
+let _achCurrentCategory = null;
+
 // Toast queue state
 let _achToastQueue = [];   // pending toasts waiting to be shown one at a time
 let _achToastBusy = false; // true while a toast is currently visible; prevents overlap
@@ -349,6 +381,8 @@ function _buildCategoryHtml(cat, defs, lang) {
 //------------------------------------------------------------------------
 
 // buildAchievementsScreen — top-level builder.
+//   Renders whichever view is currently active: the category overview grid
+//   (default) or the achievement list of one specific category.
 //   Calculates all progress values, assembles the header and every category
 //   section in order, then injects the result into #ach-body.
 function buildAchievementsScreen() {
@@ -356,31 +390,210 @@ function buildAchievementsScreen() {
     if (!body) return;
 
     const lang = _getAchLang();
+    const fixed = document.getElementById('ach-overview-fixed');
+    // The RESET ALL ACHIEVEMENTS button only makes sense on the overview —
+    // hide it while a specific category's achievements are shown.
+    const footer = document.querySelector('#achievements-modal .ach-frame-footer');
+    if (footer) footer.style.display = (_achView === 'category') ? 'none' : '';
 
-    const totalTiers = _countTotalTiers();
-    const unlockedTiers = ACH_STATE.unlocked.length;
-    const milestonePct = _calcProgressPct(unlockedTiers, totalTiers);
-
-    const totalAchs = _countTotalAchievements();
-    const fullAchs = _countFullyUnlockedAchievements();
-    const fullPct = _calcProgressPct(fullAchs, totalAchs);
-
-    const grouped = _groupDefsByCategory();
-
-    let html = _buildHeaderHtml(fullAchs, totalAchs, fullPct, unlockedTiers, totalTiers, milestonePct, lang);
-    html += ACH_CATEGORIES
-        .map(cat => _buildCategoryHtml(cat, grouped[cat.key] || [], lang))
-        .join('');
-
-    body.innerHTML = html;
+    if (_achView === 'category' && _achCurrentCategory) {
+        if (fixed) fixed.innerHTML = ''; // the detail banner renders inside the scroll body
+        body.innerHTML = _buildCategoryDetailHtml(_achCurrentCategory, lang);
+        _setAchTopbarTitle(_achCurrentCategory, lang);
+    } else {
+        // Overview: the totals banner + caption live in the fixed header;
+        // only the category grid scrolls in .ach-body.
+        if (fixed) fixed.innerHTML = _buildOverviewFixedHeaderHtml(lang);
+        body.innerHTML = _buildCategoryGridHtml(lang);
+        _setAchTopbarTitle(null, lang);
+    }
 }
 
-// showAchievements — opens the Achievements overview screen.
-//   Rebuilds all cards and progress bars so they always reflect the latest stats.
+// _setAchTopbarTitle — swaps the modal's title plaque between the static
+//   "ACHIEVEMENTS" (overview) and the active category's name (detail view).
+function _setAchTopbarTitle(catKey, lang) {
+    const titleEl = document.getElementById('ach-frame-title');
+    if (!titleEl) return;
+    if (catKey) {
+        const cat = ACH_CATEGORIES.find(c => c.key === catKey);
+        titleEl.textContent = cat ? _pickLang(cat, 'label', lang).toUpperCase() : t('scr_achievements');
+        titleEl.removeAttribute('data-t'); // keep language switches from resetting it
+        titleEl.classList.add('ach-frame-title-category'); // long names wrap/shrink
+    } else {
+        titleEl.textContent = t('scr_achievements');
+        titleEl.setAttribute('data-t', 'scr_achievements');
+        titleEl.classList.remove('ach-frame-title-category');
+    }
+}
+
+// showAchievements — opens the Achievements modal.
+//   Resets to the category grid, then rebuilds all cards and progress bars
+//   so they always reflect the latest stats.
 function showAchievements() {
+    _achView = 'overview';
+    _achCurrentCategory = null;
     buildAchievementsScreen();
-    screenHistory.push('screen-title');
-    switchScreen('screen-achievements');
+    showModal('achievements-modal');
+}
+
+// openAchCategory — shows all achievements of one category inside the
+//   achievements screen (the per-category detail view).
+function openAchCategory(catKey) {
+    _achView = 'category';
+    _achCurrentCategory = catKey;
+    buildAchievementsScreen();
+    document.getElementById('ach-body')?.scrollTo(0, 0);
+}
+
+// backToAchCategories — returns from a category detail view to the overview.
+function backToAchCategories() {
+    _achView = 'overview';
+    _achCurrentCategory = null;
+    buildAchievementsScreen();
+    document.getElementById('ach-body')?.scrollTo(0, 0);
+}
+
+// Click delegation for the dynamically-rendered achievement body:
+//   - category cards on the overview open their detail view
+//   - the detail view's back button returns to the overview
+//   - keyboard activation (Enter / Space) mirrors a click on focused cards
+// Delegated on document so it survives innerHTML rebuilds of #ach-body.
+document.addEventListener('click', (e) => {
+    const backBtn = e.target.closest('#btn-ach-cat-back');
+    if (backBtn) {
+        e.preventDefault();
+        backToAchCategories();
+        return;
+    }
+    const card = e.target.closest('.ach-cat-card');
+    if (card && card.dataset.cat) {
+        openAchCategory(card.dataset.cat);
+    }
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = e.target.closest?.('.ach-cat-card');
+    if (card && card.dataset.cat) {
+        e.preventDefault();
+        openAchCategory(card.dataset.cat);
+    }
+});
+
+
+
+//------------------------------------------------------------------------
+//-------------------CATEGORY OVERVIEW — HTML BUILDER---------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// _buildOverviewFixedHeaderHtml — the non-scrolling header of the overview:
+//   the carved grand-totals banner and the "CATEGORY OVERVIEW" caption.
+function _buildOverviewFixedHeaderHtml(lang) {
+    // Grand totals across every category
+    const totalTiers = _countTotalTiers();
+    const unlockedTiers = ACH_STATE.unlocked.length;
+    const pct = _calcProgressPct(unlockedTiers, totalTiers);
+
+    return `
+        <div class="ach-total-banner">
+            <span class="ach-total-banner-label"><span class="ach-total-banner-label-text">${t('scr_ach_total_milestones')}</span></span>
+            <span class="ach-total-banner-value">${unlockedTiers.toLocaleString()} / ${totalTiers.toLocaleString()}</span>
+            <span class="ach-total-banner-pct">${pct}%</span>
+            <div class="ach-total-banner-bar">
+                <div class="ach-total-banner-bar-inner" style="width:${pct}%"></div>
+            </div>
+        </div>
+        <div class="ach-overview-caption">${t('scr_ach_category_overview')}</div>`;
+}
+
+// _buildCategoryGridHtml — the scrolling part of the overview: a responsive
+//   grid of clickable category cards. Each card shows the category artwork
+//   on its carved panel frame, the two progress counters, and a bar.
+function _buildCategoryGridHtml(lang) {
+    const grouped = _groupDefsByCategory();
+
+    const cardsHtml = ACH_CATEGORIES
+        .filter(cat => (grouped[cat.key] || []).length) // skip empty categories
+        .map(cat => _buildCategoryCardHtml(cat, grouped[cat.key] || [], lang))
+        .join('');
+
+    return `<div class="ach-cat-grid">${cardsHtml}</div>`;
+}
+
+// _buildCategoryCardHtml — one clickable category tile on the overview grid.
+function _buildCategoryCardHtml(cat, defs, lang) {
+    const catLabel = _pickLang(cat, 'label', lang);
+    const totalAchs = defs.length;
+    const unlockedAchs = defs.filter(def =>
+        def.tiers.every((_, ti) => _isTierUnlocked(def, ti))
+    ).length;
+    const totalTiers = _countCategoryTiers(defs);
+    const unlockedTiers = _countCategoryUnlocked(defs);
+    const pct = _calcProgressPct(unlockedTiers, totalTiers);
+    const asset = ACH_CATEGORY_ASSETS[cat.key] || {};
+    const isComplete = unlockedTiers >= totalTiers;
+    // Fully-completed categories burn gold instead of their normal glow
+    const glow = isComplete ? 'var(--yellow)' : (asset.glow || 'var(--accent)');
+    const bodyStyle = asset.img ? ` style="background-image:url('${asset.img}')"` : '';
+
+    return `
+        <div class="ach-cat-card ${isComplete ? 'complete' : ''}"
+             role="button" tabindex="0" data-cat="${cat.key}"
+             style="--cat-glow: ${glow}">
+            <div class="ach-cat-card-banner">
+                <img class="ach-cat-card-banner-img" src="images/Achievement_Screen/Achievements_Category_Header.png" alt="">
+                <span class="ach-cat-card-title">${catLabel}</span>
+            </div>
+            <div class="ach-cat-card-body"${bodyStyle}>
+                <div class="ach-cat-card-rows">
+                    <div class="ach-cat-card-row">
+                        <span class="ach-cat-card-row-label">${t('qa_ach_completed')}:</span>
+                        <span class="ach-cat-card-row-value">${unlockedAchs} / ${totalAchs}</span>
+                    </div>
+                    <div class="ach-cat-card-row">
+                        <span class="ach-cat-card-row-label">${t('qa_ach_milestones')}:</span>
+                        <span class="ach-cat-card-row-value">${unlockedTiers} / ${totalTiers}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ach-cat-card-footer">
+                <div class="ach-cat-card-bar-outer">
+                    <div class="ach-cat-card-bar-inner" style="width:${pct}%"></div>
+                </div>
+                <span class="ach-cat-card-pct">${pct}% ${t('scr_ach_pct_complete')}</span>
+            </div>
+        </div>`;
+}
+
+// _buildCategoryDetailHtml — detail view for one category.
+//   A single topbar row (back button — category art — progress numbers with
+//   the completion bar underneath), followed by every achievement card of
+//   that category. The category name itself lives on the modal's title
+//   plaque, so no second title row is rendered here.
+function _buildCategoryDetailHtml(catKey, lang) {
+    const cat = ACH_CATEGORIES.find(c => c.key === catKey);
+    if (!cat) return '';
+
+    const defs = _groupDefsByCategory()[catKey] || [];
+    const catLabel = _pickLang(cat, 'label', lang);
+    const totalTiers = _countCategoryTiers(defs);
+    const unlockedTiers = _countCategoryUnlocked(defs);
+    const pct = _calcProgressPct(unlockedTiers, totalTiers);
+    const cardsHtml = defs.map(def => _buildCardHtml(def, lang)).join('');
+    const asset = ACH_CATEGORY_ASSETS[catKey] || {};
+    const glow = asset.glow || 'var(--accent)';
+
+    return `
+        <div class="ach-cat-detail" style="--cat-glow: ${glow}">
+            <div class="ach-cat-detail-topbar">
+                <button class="ach-cat-back-btn" id="btn-ach-cat-back">${t('btn_back')}</button>
+                <span class="ach-cat-detail-count">${unlockedTiers} / ${totalTiers} — ${pct}%</span>
+            </div>
+            <div class="ach-cat-detail-bar-outer">
+                <div class="ach-cat-detail-bar-inner" style="width:${pct}%"></div>
+            </div>
+            <div class="ach-grid">${cardsHtml}</div>
+        </div>`;
 }
 
 

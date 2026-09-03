@@ -595,7 +595,9 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('btn-ach-back', () => goToPreviousScreen());
+    // Achievements modal — the stone close button hides it. Category-level
+    // back-navigation lives in the delegated handlers in achievements-ui.js.
+    onClick('btn-ach-close', () => hideModal('achievements-modal'));
     onClick('btn-reset-achievements', () => showResetAchievementsModal());
 
 

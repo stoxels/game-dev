@@ -8,7 +8,8 @@
      4.  SLOT GROUPS          — category label + horizontal slot row
      5.  SLOT BASE            — individual slot box, states, icon, badge
      6.  ITEM TOOLTIP         — floating tooltip shown on slot hover
-     7.  RESHUFFLE MODAL      — full-screen overlay with item cards
+     7.  RESHUFFLE MODAL      — stone/parchment overlay with item cards
+                              (settings/replay chrome family)
      8.  TOAST NOTIFICATION   — brief feedback pop-up after item use
      9.  QUEST REWARD TOOLTIP — separate tooltip used in the quest UI
   ----------------------------------------------------------------------- */
@@ -317,101 +318,324 @@
    7. RESHUFFLE MODAL
    -----------------------------------------------------------------------
    Full-screen overlay that presents the player with a choice of items
-   to reshuffle into. The modal contains a centred card grid.
+   to reshuffle into. Visual family: same stone/parchment chrome as the
+   settings / how-to-play / replay / changelog modals (css/settings.css,
+   css/modals.css, css/replay.css) — the settings_background.png frame,
+   the settings_title_plague.png title plaque and the settings_close_button.png
+   stone X. The backdrop is the shared .modal-bg (added in JS along with
+   .show); everything inside the box is scoped to #rshuffle-* / .rshuffle-*
+   so it can't leak into other modals.
+
+   UNIQUE to this modal: the three rarity-tinted parchment reward cards,
+   mirroring the How-To-Play modal's .tut-section stone cards.
+
    Sub-sections:
-     7a. Backdrop overlay
-     7b. Modal box
-     7c. Modal title and subtitle
-     7d. Card grid
-     7e. Individual card
-     7f. Card inner elements (icon, name, description)
+     7a. Stone frame box (settings_background.png shell)
+     7b. Title plaque (settings_title_plaque.png)
+     7c. Stone close button (settings_close_button.png)
+     7d. Subtitle (instruction line on the parchment)
+     7e. Card row
+     7f. Individual reward card (parchment stone card)
+     7g. Card inner elements (icon, name, description)
+     7h. Entrance animation (staggered card reveal)
+     7i. Narrow-screen fallbacks
    ----------------------------------------------------------------------- */
 
-/* 7a — Dark semi-transparent backdrop covering the whole screen */
+/* Backdrop fade — the shared .modal-bg flips display:none → flex on open;
+   this animates the dimming so the stone frame pops out of a darkening
+   scene instead of snapping in. */
 #rshuffle-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.75);
+    animation: rshuffle-fade-in 0.3s ease both;
+}
+
+/* 7a — STONE FRAME BOX — same settings_background.png asset as the settings /
+   how-to-play modals, stretched 100%/100%. Its carved border spans
+   x 0→9% / 91%→100% and y 0→11% / 90%→100% of the art, so the clamped
+   percentage padding keeps content on the flat parchment area at every
+   window size (identical geometry to .modal-box.tut-box in css/modals.css).
+   Aspect-locked like the tut/changelog boxes; the 130vh width cap keeps a
+   short-wide window from pushing the plaque out of reach. */
+#rshuffle-box {
+    position: relative;
+    width: 94%;
+    max-width: min(880px, 130vh);
+    aspect-ratio: 611 / 470;
+    background-image: url('../images/Settings/settings_background.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: clamp(48px, 12%, 164px) clamp(44px, 11%, 150px) clamp(42px, 11.5%, 157px);
+    overflow: visible; /* let plaque + close button hang over the frame edge */
+    color: #4a2c12; /* parchment body text instead of the shared modal grey */
+
+    /* Flex column; the card row centres in the remaining parchment area so
+       short content doesn't hug the frame's bottom border. */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    /* Reward-moment entrance — same springy overshoot curve as the
+       convergence modal's convm-in (css/screens.css): scale 0.94 → 1 with a
+       1.22 overshoot, so the frame "pops" as the backdrop dims. */
+    animation: rshuffle-box-in 0.55s cubic-bezier(0.16, 0.84, 0.32, 1.22) both;
+}
+
+/* 7b — TITLE PLAQUE — same asset + geometry as the tut-box/replay plaques:
+   settings_title_plague.png overhanging the frame's top edge, text centred
+   on the art's flat middle (~68% of the plaque width; the ends taper). */
+#rshuffle-title {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max(min(56%, 720px), 340px);
+    height: clamp(46px, 6vw, 68px);
+    background-image: url('../images/Settings/settings_title_plague.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* 7b — Centred white-bordered box */
-#rshuffle-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    padding: 28px 32px 32px;
-    max-width: 800px;
-    width: 90%;
-    text-align: center;
-}
-
-/* 7c — Modal heading */
-#rshuffle-title {
-    font-family: var(--PX);
-    font-size: 18px;
+    padding: 0 14%; /* keep glyphs clear of the tapering plaque ends */
+    font-family: var(--C);
+    font-size: clamp(14px, 1.8vw, 22px);
+    letter-spacing: 2px;
+    white-space: nowrap;
     color: var(--yellow);
-    letter-spacing: 1px;
-    margin-bottom: 6px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    margin: 0;
+    z-index: 3;
 }
 
-/* Modal sub-heading / instruction text */
+/* 7c — CLOSE BUTTON — stone square with X icon, top-right corner (same asset
+   and geometry as the settings/how-to-play/replay modals; the "✕ CLOSE"
+   text is hidden, the art shows the X). */
+#rshuffle-box .modal-close {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    width: clamp(34px, 4.4vw, 50px);
+    height: clamp(34px, 4.4vw, 50px);
+    background-image: url('../images/Settings/settings_close_button.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    color: transparent;
+    font-size: 0; /* icon art already shows the X */
+    cursor: pointer;
+    padding: 0;
+    z-index: 4;
+    transition: transform .12s, filter .12s;
+}
+
+    #rshuffle-box .modal-close:hover {
+        filter: brightness(1.2);
+        transform: scale(1.06);
+    }
+
+/* 7d — SUBTITLE — instruction line directly on the parchment, in the
+   parchment ink scheme (the shared grey #aaa would wash out here). */
 #rshuffle-subtitle {
-    font-size: 15px;
-    color: #aaa;
-    margin-bottom: 22px;
+    font-family: var(--PX);
+    font-size: clamp(10px, 1.2vw, 14px);
+    color: cyan;
+    letter-spacing: 0.5px;
+    text-align: center;
+    margin: 0 0 clamp(14px, 2vw, 22px);
+    text-shadow: 0 1px 0 rgba(255, 248, 220, 0.8);
+
+    /* Bridges the box pop and the first card: a soft fade/slide that lands
+       just before the reward cards start arriving. */
+    animation: rshuffle-fade-slide 0.35s ease 0.1s both;
 }
 
-/* 7d — Wrapping flex row of cards */
+/* 7e — CARD ROW — wrapping flex row of reward cards, centred in the
+   parchment's remaining space. */
 #rshuffle-cards {
     display: flex;
-    gap: 14px;
+    gap: clamp(10px, 1.6vw, 18px);
     justify-content: center;
+    align-items: stretch;
     flex-wrap: wrap;
 }
 
-/* 7e — Individual selectable card */
+/* 7f — INDIVIDUAL REWARD CARD — parchment stone card mirroring .tut-section
+   (How-To-Play modal). The 2px border color is set inline from JS with the
+   item's rarity color, so the tier is glance-readable on the parchment. */
 .rshuffle-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 18px 14px;
-    min-width: 150px;
-    max-width: 250px;
+    background: rgba(255, 248, 220, 0.55);
+    border: 2px solid rgba(44, 26, 12, 0.4);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 220, 0.5),
+                0 2px 6px rgba(0, 0, 0, 0.35);
+    padding: clamp(14px, 2vw, 22px) clamp(12px, 1.8vw, 20px);
+    width: clamp(150px, 18vw, 210px);
     cursor: pointer;
-    transition: border-color .12s, transform .12s;
+    transition: border-color .12s, transform .12s, filter .12s;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: clamp(6px, 1vw, 10px);
+    font: inherit; /* reset the <button> UA styles */
+    color: inherit;
+
+    /* Staggered reward reveal — each card fades/slides up in turn after the
+       frame has popped (delays in 7h). `scale`/`translate` (individual
+       transform properties, like convm-in uses) are animated INSTEAD of
+       `transform`, so they compose with the hover transform instead of
+       fighting it. */
+    animation: rshuffle-card-in 0.45s cubic-bezier(0.16, 0.84, 0.32, 1.22) both;
 }
 
     .rshuffle-card:hover {
-        border-color: var(--accent);
+        filter: brightness(1.06);
         transform: translateY(-3px);
+        box-shadow: inset 0 0 0 1px rgba(255, 248, 220, 0.5),
+                    0 6px 14px rgba(0, 0, 0, 0.45);
     }
 
-/* 7f — Card inner elements */
+    .rshuffle-card:active {
+        transform: translateY(0);
+    }
+
+    /* Keyboard focus ring — invisible on hover-only mouse play, clearly
+       visible when tabbing through the three choices. */
+    .rshuffle-card:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+/* 7g — CARD INNER ELEMENTS */
 
 /* Large emoji / item icon */
 .rshuffle-card-icon {
-    font-size: 42px;
+    font-size: clamp(34px, 4.4vw, 48px);
+    line-height: 1;
 }
 
-/* Short item name below the icon */
+/* Short item name below the icon — dark ink so it reads on the parchment
+   (the inline rarity tint moved to the card's border, see 7f). */
 .rshuffle-card-name {
     font-family: var(--PX);
-    font-size: 12px;
+    font-size: clamp(10px, 1.2vw, 13px);
+    color: #2c1a0c;
     text-align: center;
+    text-shadow: 0 1px 0 rgba(255, 248, 220, 0.8);
+    overflow-wrap: break-word;
 }
 
-/* Flavour description below the name */
+/* Flavour description below the name — dark brown like .tut-section p */
 .rshuffle-card-desc {
-    font-size: 15px;
-    color: #ccc;
+    font-family: var(--F);
+    font-size: clamp(11px, 1.2vw, 14px);
+    color: #4a2c12;
     text-align: center;
-    line-height: 1.4;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+
+/* 7h — ENTRANCE ANIMATION (staggered card reveal) —
+   Choreography: backdrop dims (0.3s) → frame pops with overshoot (0.55s)
+   → subtitle fades in (0.1s delay) → cards arrive left-to-right, each
+   0.14s after the previous, starting once the frame has mostly landed.
+   Delays are defined per nth-child so the stagger survives even if
+   RESHUFFLE_PICK_COUNT is ever raised above 3 (extra cards just follow
+   the rhythm at 0.58s+). */
+.rshuffle-card:nth-child(1) { animation-delay: 0.22s; }
+.rshuffle-card:nth-child(2) { animation-delay: 0.36s; }
+.rshuffle-card:nth-child(3) { animation-delay: 0.5s; }
+.rshuffle-card:nth-child(4) { animation-delay: 0.64s; }
+.rshuffle-card:nth-child(5) { animation-delay: 0.78s; }
+.rshuffle-card:nth-child(n + 6) { animation-delay: 0.92s; }
+
+@keyframes rshuffle-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes rshuffle-fade-slide {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rshuffle-box-in {
+    from {
+        opacity: 0;
+        scale: 0.94;
+    }
+
+    to {
+        opacity: 1;
+        scale: 1;
+    }
+}
+
+@keyframes rshuffle-card-in {
+    from {
+        opacity: 0;
+        scale: 0.96;
+        translate: 0 16px;
+    }
+
+    to {
+        opacity: 1;
+        scale: 1;
+        translate: 0 0;
+    }
+}
+
+/* Reduced-motion: skip the whole choreography and show the modal instantly
+   (same convention as inference.css / map-view.css). */
+@media (prefers-reduced-motion: reduce) {
+    #rshuffle-modal,
+    #rshuffle-box,
+    #rshuffle-subtitle,
+    .rshuffle-card {
+        animation: none !important;
+    }
+}
+
+/* 7i — NARROW-SCREEN FALLBACKS — same fix as the tut-box portrait
+   breakpoint: release the frame's aspect ratio and switch the vertical
+   paddings to vh units so the frame art's top/bottom border never
+   outgrows the width-based padding on a tall column. */
+@media (max-width: 700px) {
+    #rshuffle-box {
+        aspect-ratio: auto;
+        max-height: calc(100vh - 40px);
+
+        padding-top: clamp(48px, 11vh, 164px);
+        padding-bottom: clamp(42px, 10vh, 157px);
+    }
+
+    .rshuffle-card {
+        width: min(100%, 210px);
+    }
+}
+
+/* Tiny phones: the plaque's 340px width floor would exceed the box itself
+   (box = 94vw − backdrop padding), so pin the plaque to the box and drop
+   the title font a step (same fix as tut-box / changelog / replay). */
+@media (max-width: 400px) {
+    #rshuffle-title {
+        width: min(100%, 340px);
+        font-size: 11px;
+    }
 }
 
 

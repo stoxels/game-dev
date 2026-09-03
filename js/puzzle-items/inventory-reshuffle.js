@@ -70,27 +70,39 @@ function pickReshuffleRewardItems() {
 }
 
 // Builds the HTML string for a single reward card shown in the reshuffle modal.
+// The card is a parchment "stone card" mirroring .tut-section (How-To-Play modal);
+// its 2px border is tinted with the item's rarity color for a rarity glance-read.
 function buildReshuffleCardHtml(def) {
+    const rarity = rarityColors(def.rarity);
     return `
-        <div class="rshuffle-card" data-id="${def.id}">
+        <button type="button" class="rshuffle-card" data-id="${def.id}" style="border-color:${rarity.border}">
             <div class="rshuffle-card-icon">${def.icon}</div>
-            <div class="rshuffle-card-name" style="color:${rarityColors(def.rarity).color}">${itemName(def)}</div>
+            <div class="rshuffle-card-name">${itemName(def)}</div>
             <div class="rshuffle-card-desc">${itemDesc(def)}</div>
-        </div>`;
+        </button>`;
 }
 
 // Builds and returns the reshuffle modal DOM element, populated with the given item picks.
+// Markup mirrors the settings / how-to-play / replay family (css/modals.css,
+// css/replay.css): .modal-bg backdrop + a stone frame box built from the
+// Settings assets (settings_background.png shell, settings_title_plague.png
+// title plaque overhanging the top edge, settings_close_button.png stone X).
 function buildReshuffleModalElement(picks) {
     const cardsHtml = picks.map(buildReshuffleCardHtml).join('');
 
     const modal = document.createElement('div');
     modal.id = 'rshuffle-modal';
+    modal.className = 'modal-bg safe-center show';
     modal.innerHTML = `
         <div id="rshuffle-box">
-            <div id="rshuffle-title">♻ ${t('itm_reshuffle_title')}</div>
+            <button type="button" class="modal-close" id="rshuffle-close">${t('reset_close')}</button>
+            <div id="rshuffle-title" class="modal-title">♻ ${t('itm_reshuffle_title')}</div>
             <div id="rshuffle-subtitle">${t('itm_reshuffle_subtitle').replace('{n}', RESHUFFLE_GOAL)}</div>
             <div id="rshuffle-cards">${cardsHtml}</div>
         </div>`;
+
+    // Stone X — simply removes the modal; picking a reward handles itself.
+    modal.querySelector('#rshuffle-close').addEventListener('click', () => modal.remove());
 
     return modal;
 }
