@@ -83,9 +83,21 @@ const EG_BOSS_PHASE_NAMES = ['', 'eg_phase_1', 'eg_phase_2_enrage', 'eg_phase_3_
 const EG_RECENT_FILLS_CAPACITY = 20;
 
 
+// Global boss attack-speed tuning — all bosses charge their attack bar this
+// much faster than the chargeMax values in their defs (0.8 = 25% faster).
+const EG_BOSS_CHARGE_SPEED_MULT = 0.8;
+
+// Scales a raw boss chargeMax by the global attack-speed tuning, keeping a
+// sane minimum so the fastest bosses never attack faster than 3 ticks.
+function _egScaleBossChargeMax(raw) {
+    return Math.max(3, Math.round(raw * EG_BOSS_CHARGE_SPEED_MULT));
+}
+
 // Returns the scaled stats for a boss at the given level.
 // Accepts either a string id (looks up EG_BOSS_DEFS) or a def object directly.
-// hpMult: optional multiplier for HP and damage (e.g., 500k HP test mode).
+// hpMult: optional multiplier for boss max HP only (e.g., 500k HP test
+// mode). Damage is intentionally left at its normal scaled value so the
+// test boost never inflates the boss's attacks.
 function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
     const def = (typeof defOrId === 'string') ? EG_BOSS_DEFS[defOrId] : defOrId;
     if (!def) { console.warn('Unknown Boss id:', defOrId); return null; }
@@ -97,7 +109,7 @@ function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
     const dmgScale = 1 + EG_BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
 
     const maxHP = Math.round(def.baseHP * hpScale * hpMult);
-    const damage = Math.round(def.baseDamage * dmgScale * hpMult);
+    const damage = Math.round(def.baseDamage * dmgScale);
 
     const monster = {
         id: `${def.id}_${++_egMonsterSpawnCounter}`,
@@ -107,7 +119,7 @@ function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
         level: lvl,
         maxHP,
         currentHP: maxHP,
-        chargeMax: def.chargeMax,
+        chargeMax: _egScaleBossChargeMax(def.chargeMax),
         currentCharge: 0,
         damageValue: damage,
         element: def.element || null,
@@ -201,6 +213,8 @@ function _egBossCleanup(monsterId) {
         delete _egBossTimers[monsterId];
     }
     if (typeof _egClearAllCorruptedCells === 'function') _egClearAllCorruptedCells();
+    if (typeof _egClearPriorBombFuses === 'function') _egClearPriorBombFuses();
+    if (typeof _egClearShiftGlows === 'function') _egClearShiftGlows();
     if (typeof _egClearAllFrozenCells === 'function') _egClearAllFrozenCells();
     if (typeof _egRemoveVeil === 'function') _egRemoveVeil();
     if (typeof _egRemoveBlackout === 'function') _egRemoveBlackout();
@@ -214,6 +228,12 @@ function _egBossCleanup(monsterId) {
     if (typeof _egRemoveClueScramble === 'function') _egRemoveClueScramble();
     if (typeof _egTitheTeardown === 'function') _egTitheTeardown(monsterId);
     if (typeof _egNkTeardownBoss === 'function') _egNkTeardownBoss(monsterId);
+    // Brutus: sacrificial zombies roam in their own layer until he dies or
+    // the encounter stops — tear them down exactly when that happens (this
+    // hook never fires for individual zombie kills: their ids differ).
+    if (monsterId === 'boss_brutus' && typeof _egBrutusZombieTeardown === 'function') {
+        _egBrutusZombieTeardown();
+    }
 }
 
 
@@ -245,7 +265,7 @@ function _egBossApplyPhaseStats(monster, newPhase) {
     const phaseData = monster.bossDef.phases[newPhase - 1];
     monster.bossPhase = newPhase;
     monster.bossImmune = true;
-    monster.chargeMax = phaseData.chargeMax;
+    monster.chargeMax = _egScaleBossChargeMax(phaseData.chargeMax);
 
     // Active map run: re-apply the attack-speed mod, the raw phase value
     // just overwrote it.
@@ -271,6 +291,9 @@ function _egBossClearMechanicTimers(monster) {
 // Shows the phase transition toast and triggers the transition CSS animation on the card.
 function _egBossPlayTransitionFeedback(monster, newPhase) {
     const label = EG_BOSS_PHASE_NAMES[newPhase] ? t(EG_BOSS_PHASE_NAMES[newPhase]) : t('eg_phase_badge').replace('{n}', newPhase);
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('boss_phase_shift');
+    }
     showToast(`⚡ ${monster.name}: ${label}!`);
 
     const card = document.getElementById(`eg-card-${monster.id}`);
@@ -322,56 +345,72 @@ function _egCalcMechanicInterval(mech, phase) {
 }
 
 
+// Mechanic → activation-sting category. Shared mechanics (used by 2+ bosses)
+// are mapped explicitly; boss-unique names fall back to a keyword heuristic
+// (most one-off moves are hazard-style attacks).
+const _EG_MECH_CATEGORY = {
+    corrupt_cells: 'grid', prior_bomb: 'grid', probability_shift: 'grid',
+    fated_cell: 'grid', frozen_cells: 'grid', clue_scramble: 'grid',
+    clue_swap: 'grid', grid_invert: 'grid',
+    fog_bank: 'hazard', soul_tithe: 'hazard',
+    prior_summons: 'summon', sacrificial_zombies: 'summon',
+};
+
+// Resolves any mechanic name to a category so the activation sting's pitch
+// identifies the mechanic TYPE by ear: grid-affecting (mid) vs hazard (low)
+// vs summon (high). Uncategorized names return undefined → generic sting.
+function _egBossMechCategory(name) {
+    if (_EG_MECH_CATEGORY[name]) return _EG_MECH_CATEGORY[name];
+    if (/clue|grid|cell|invert|pattern|thread/.test(name)) return 'grid';
+    if (/summon|sprout|wisp|seek|ghost|guard|dive/.test(name)) return 'summon';
+    return 'hazard';
+}
+
+
 // Schedules a single mechanic for the given boss at the given phase.
 // Self-reschedules after each trigger so the mechanic keeps firing until the boss dies.
 function _egBossScheduleSingleMechanic(monster, mech, phase) {
     // phase2Only mechanics are skipped unless we're already in phase 2 or later
     if (mech.phase2Only && phase < 2) return;
 
+    // Runs one trigger of the mechanic — pause-aware, skipped only when the boss
+    // is gone or mid-immunity — then lines up the next trigger.
+    const fireTrigger = () => {
+        if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+            // Game is paused — retry after the pause lifts so the trigger isn't lost
+            const retry = setInterval(() => {
+                if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+                clearInterval(retry);
+                fireTrigger();
+            }, 200);
+            return;
+        }
+        const stillAlive = _egIsActive() && _egMonsters.find(m => m.id === monster.id);
+        if (stillAlive && !monster.bossImmune) {
+            const fn = window[mech.handler];
+            if (typeof fn === 'function') {
+                fn(monster, phase);
+            }
+        }
+        scheduleNext();
+    };
+
     const scheduleNext = () => {
         // Bail out if the encounter ended or this boss is already dead
         if (!_egIsActive() || !_egMonsters.find(m => m.id === monster.id)) return;
 
         const interval = _egCalcMechanicInterval(mech, phase);
-        const t = setTimeout(() => {
-            if (typeof _gamePaused !== 'undefined' && _gamePaused) {
-                // Game is paused — skip this tick and reschedule after pause lifts
-                const retry = setInterval(() => {
-                    if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
-                    clearInterval(retry);
-                    const stillAlive = _egIsActive() && _egMonsters.find(m => m.id === monster.id);
-                    if (stillAlive && !monster.bossImmune) {
-                        const fn = window[mech.handler];
-                        if (typeof fn === 'function') fn(monster, phase);
-                    }
-                    scheduleNext();
-                }, 200);
-                return;
-            }
-            const stillAlive = _egIsActive() && _egMonsters.find(m => m.id === monster.id);
-            if (stillAlive && !monster.bossImmune) {
-                const fn = window[mech.handler];
-                if (typeof fn === 'function') fn(monster, phase);
-            }
-            scheduleNext();
-        }, interval);
-
+        const t = setTimeout(fireTrigger, interval);
         if (_egBossTimers[monster.id]) _egBossTimers[monster.id].push(t);
     };
 
-    // Stagger the very first trigger so all mechanics don't fire simultaneously on spawn
-    const initialDelay = 4000 + Math.random() * 8000;
-    const t0 = setTimeout(() => {
-        if (typeof _gamePaused !== 'undefined' && _gamePaused) {
-            const retry = setInterval(() => {
-                if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
-                clearInterval(retry);
-                scheduleNext();
-            }, 200);
-            return;
-        }
-        scheduleNext();
-    }, initialDelay);
+    // The FIRST trigger fires after a short opening delay instead of waiting out
+    // a full interval, so a fresh boss — or a fresh phase — starts using its
+    // specials a few seconds after arriving. The random spread just staggers a
+    // multi-mechanic boss so its abilities don't all fire simultaneously on spawn;
+    // every later trigger keeps the full per-mechanic interval above.
+    const initialDelay = 3000 + Math.random() * 5000;
+    const t0 = setTimeout(fireTrigger, initialDelay);
     if (_egBossTimers[monster.id]) _egBossTimers[monster.id].push(t0);
 }
 

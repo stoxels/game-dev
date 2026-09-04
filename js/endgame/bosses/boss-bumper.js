@@ -63,14 +63,15 @@ function _egMechBumperParty(monster, phase) {
         const c = _egNkPlayerCenter();
         bumpers.forEach(b => {
             // Cheerful idle pulse is handled by CSS; hitbox stays put.
-            if (c && now >= b.cdUntil && _egNkCircleHit(b.x, b.y, radius, _egNkPlayerRect(), 0)) {
+            if (c && now >= b.cdUntil && _egNkDotHit(b.el, _egNkPlayerRect(), 0)) {
                 b.cdUntil = now + 900;
                 const dx = c.x - b.x, dy = c.y - b.y;
                 const d = Math.sqrt(dx * dx + dy * dy) || 1;
                 _egNkNudgeAvatar((dx / d) * fling * dtS * 10, (dy / d) * fling * dtS * 10);
                 b.el.classList.add('eg-nk-boom');
                 setTimeout(() => b.el.classList.remove('eg-nk-boom'), 300);
-                _egNkHit(dmgPct, null, level);
+                const dealt = _egNkHit(dmgPct, null, level);
+                _egNkAbilityHitToast(dealt, 'The Bumper', 'Bumper Party');
             }
         });
         return e < durMs;

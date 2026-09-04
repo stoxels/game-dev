@@ -73,7 +73,7 @@ function _egMechJugglerOrbs(monster, phase) {
             o.x = Math.max(radius, Math.min(window.innerWidth - radius, o.x));
             o.y = Math.max(radius, Math.min(window.innerHeight - radius, o.y));
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (pr && now >= o.cdUntil && _egNkCircleHit(o.x, o.y, radius, pr, 2)) {
+            if (pr && now >= o.cdUntil && _egNkDotHit(o.el, pr, 2)) {
                 o.cdUntil = now + 600;
                 _egNkHit(dmgPct, 'shadow', level);
             }

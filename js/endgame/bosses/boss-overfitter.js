@@ -119,7 +119,10 @@ function _egMechOverfitBloom(monster, phase) {
     const first = _egBlastPickPos(radius);
     _egRunScreenBlast({
         toastKey: 'eg_mech_overfit_bloom',
+        bossName: 'The Overfitter',
+        abilityName: 'Overfit Bloom',
         accent: '#d946ef',
+        tierNorm: _egBossTierNorm(monster),
         activeMs,
         damagePct: phase >= 3 ? 0.34 : 0.28,
         zones: [{ ...first, radius }],

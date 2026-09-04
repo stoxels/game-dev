@@ -427,6 +427,9 @@ function _egPlayLevelUpReward() {
 // element removes itself after the effect finishes. Safe mid-combat (the
 // overlay ignores pointer events).
 function _egPlayLevelUpEffect(newLevel) {
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('level_up');
+    }
     const el = document.createElement('div');
     el.className = 'eg-levelup-fx';
     el.innerHTML = `

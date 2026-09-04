@@ -48,7 +48,10 @@ function _egMechHeatBloom(monster, phase) {
 
     _egRunScreenBlast({
         toastKey: 'eg_mech_heat_bloom',
+        bossName: 'Entropy',
+        abilityName: 'Heat Death Bloom',
         accent: '#ff8c3c',
+        tierNorm: _egBossTierNorm(monster),
         activeMs: phase >= 3 ? 4200 : 5000,
         damagePct: 0.30,
         zones: [_egBlastPickPos(radius)].map(p => ({ ...p, radius })),

@@ -66,7 +66,7 @@ function _egMechCentipedeCross(monster, phase) {
             if (sx < -40) return;
             pending = true;
             sg.el.style.transform = 'translate(' + Math.round(sx - 14) + 'px,' + Math.round(sy - 14) + 'px)';
-            if (pr && now >= sg.cdUntil && _egNkCircleHit(sx, sy, radius, pr, 0)) {
+            if (pr && now >= sg.cdUntil && _egNkDotHit(sg.el, pr, 0)) {
                 sg.cdUntil = now + 800;
                 _egNkHit(dmgPct, null, level);
             }

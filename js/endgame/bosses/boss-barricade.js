@@ -99,7 +99,7 @@ function _egMechBulletWalls(monster, phase) {
                 if (inBand && !inGap) {
                     cdUntil = now + 800;
                     const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Barricade', 'Bullet Walls');
                 }
             }
         });

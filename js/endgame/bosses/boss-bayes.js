@@ -100,7 +100,10 @@ function _egMechPriorCollapse(monster, phase) {
 
     _egRunScreenBlast({
         toastKey: 'eg_mech_prior_collapse',
+        bossName: 'Bayes',
+        abilityName: 'Prior Collapse',
         accent: '#7fd67f',
+        tierNorm: _egBossTierNorm(monster),
         activeMs: 5000,
         damagePct: 0.30,
         zones: [{ ...a, radius }, { ...b, radius }],

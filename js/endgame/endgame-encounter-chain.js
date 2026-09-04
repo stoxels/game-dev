@@ -644,6 +644,7 @@ function _egOnAllBossesDead() {
     }
 
     showToast(t('eg_boss_all_slain'), '#4ade80');
+
 }
 
 

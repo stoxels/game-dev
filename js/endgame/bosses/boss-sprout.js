@@ -71,7 +71,7 @@ function _egMechSproutlings(monster, phase) {
                 m.y += (dy / d) * speed * dtS;
             }
             m.el.style.transform = 'translate(' + Math.round(m.x - 14) + 'px,' + Math.round(m.y - 14) + 'px)';
-            if (pr && now >= m.cdUntil && _egNkCircleHit(m.x, m.y, radius, pr, 2)) {
+            if (pr && now >= m.cdUntil && _egNkDotHit(m.el, pr, 2)) {
                 m.cdUntil = now + 700;
                 _egNkHit(dmgPct, null, level);
             }

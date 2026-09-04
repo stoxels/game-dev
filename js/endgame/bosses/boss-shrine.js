@@ -88,10 +88,11 @@ function _egMechSpiritFans(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkCircleHit(o.x, o.y, 10, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 600;
-                _egNkHit(dmgPct, 'lightning', level);
+                const dealt = _egNkHit(dmgPct, 'lightning', level);
+                _egNkAbilityHitToast(dealt, 'The Shrine Maiden', 'Spirit Fans');
             }
         }
         return fired < volleys || orbs.length > 0;

@@ -87,7 +87,7 @@ function _egMechRisingTide(monster, phase) {
             d.y += debrisSpeed * dtS;
             d.el.style.display = '';
             d.el.style.transform = 'translate(' + Math.round(d.x - 14) + 'px,' + Math.round(d.y - 14) + 'px)';
-            if (pr && now >= d.cdUntil && now >= orbCdUntil && _egNkCircleHit(d.x, d.y, debrisR, pr, 0)) {
+            if (pr && now >= d.cdUntil && now >= orbCdUntil && _egNkDotHit(d.el, pr, 0)) {
                 d.cdUntil = now + 800;
                 orbCdUntil = now + 400;
                 _egNkHit(debrisDmg, null, level);

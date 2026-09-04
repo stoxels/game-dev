@@ -79,10 +79,21 @@ function _egMechAppleSpiral(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkCircleHit(o.x, o.y, 10, pr, 2)) {
-                o.hitDone = true;
-                orbCdUntil = now + 500;
-                _egNkHit(dmgPct, 'fire', level);
+            if (!o.hitDone && pr && now >= orbCdUntil) {
+                // Hit test against the orb's ACTUAL rendered box instead of an
+                // idealized point-circle: the collision then matches what the
+                // player sees, so an orb that visibly touches the sprite always
+                // registers (and any CSS motion can't skew the hitbox).
+                const fr = o.el.getBoundingClientRect();
+                if (fr.width > 0 && _egNkRectsOverlap(
+                    { left: fr.left - 2, right: fr.right + 2, top: fr.top - 2, bottom: fr.bottom + 2 },
+                    pr
+                )) {
+                    o.hitDone = true;
+                    orbCdUntil = now + 500;
+                    const dealt = _egNkHit(dmgPct, 'fire', level);
+                    _egNkAbilityHitToast(dealt, 'The Barrage', 'Apple Spiral');
+                }
             }
         }
         return emitted < total || orbs.length > 0;

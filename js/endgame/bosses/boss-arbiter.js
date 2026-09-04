@@ -90,7 +90,7 @@ function _egMechStillnessTrial(monster, phase) {
                     if (blue || t >= activeMs) {
                         judged = true;
                         const dealt = _egNkHit(dmgPct, 'shadow', level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Arbiter', 'Stillness Trial');
                     }
                 }
             }

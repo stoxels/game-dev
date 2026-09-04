@@ -84,7 +84,7 @@ function _egMechThwompSlam(monster, phase) {
                     s.el.remove();
                     if (_egNkCircleHit(s.x, s.y, radius, _egNkPlayerRect(), 0)) {
                         const dealt = _egNkHit(dmgPct, null, level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Thwomp', 'Crushing Slam');
                     }
                 }
             }

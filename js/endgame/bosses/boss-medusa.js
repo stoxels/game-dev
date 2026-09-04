@@ -79,10 +79,10 @@ function _egMechSerpentWaves(monster, phase) {
             pending = true;
             hd.el.style.display = '';
             hd.el.style.transform = 'translate(' + Math.round(hd.x - 22) + 'px,' + Math.round(y - 22) + 'px)';
-            if (pr && now >= hd.cdUntil && _egNkCircleHit(hd.x, y, radius, pr, 0)) {
+            if (pr && now >= hd.cdUntil && _egNkDotHit(hd.el, pr, 0)) {
                 hd.cdUntil = now + 700;
                 const dealt = _egNkHit(dmgPct, null, level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Medusa', 'Serpent Waves');
             }
         });
         return pending;

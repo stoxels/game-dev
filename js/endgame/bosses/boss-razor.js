@@ -83,15 +83,15 @@ function _egMechRazorBoomerang(monster, phase) {
             b.x += (dx / d) * step;
             b.y += (dy / d) * step;
             b.el.style.transform = 'translate(' + Math.round(b.x - 22) + 'px,' + Math.round(b.y - 22) + 'px)';
-            if (pr && _egNkCircleHit(b.x, b.y, radius, pr, 0)) {
+            if (pr && _egNkDotHit(b.el, pr, 0)) {
                 if (b.leg === 'out' && !b.hitOut) {
                     b.hitOut = true;
                     const dealt = _egNkHit(dmgPct, 'lightning', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Razor', 'Razor Boomerangs');
                 } else if (b.leg === 'back' && !b.hitBack) {
                     b.hitBack = true;
                     const dealt = _egNkHit(dmgPct, 'lightning', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Razor', 'Razor Boomerangs');
                 }
             }
             if (d <= 12) {

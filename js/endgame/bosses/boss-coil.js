@@ -93,7 +93,7 @@ function _egMechSeekerSnakes(monster, phase) {
                     s.el.classList.add('eg-nk-boom');
                     if (pr && _egNkCircleHit(s.x, s.y, blastR, pr, 0)) {
                         const dealt = _egNkHit(dmgPct, 'shadow', level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Coil', 'Seeker Snakes');
                     }
                 }
             }

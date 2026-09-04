@@ -548,12 +548,14 @@ const EG_MONSTER_DEFS = {
 
 // Returns the scaled stats for a monster at the given level.
 // Accepts either a string id (looks up EG_MONSTER_DEFS) or a def object directly.
-function _egBuildMonster(defOrId, level = 1) {
+// hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
+// damage is left at its normal scaled value.
+function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
     const def = (typeof defOrId === 'string') ? EG_MONSTER_DEFS[defOrId] : defOrId;
 
     // FIX: If it's not a standard monster, check if it's a boss and route to the boss factory
     if (!def && typeof defOrId === 'string' && typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS[defOrId]) {
-        const boss = _egBuildBoss(defOrId, level);
+        const boss = _egBuildBoss(defOrId, level, hpMult);
         if (boss) boss.isBoss = true;
         return boss;
     }

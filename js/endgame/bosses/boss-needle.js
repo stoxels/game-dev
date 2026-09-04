@@ -89,7 +89,7 @@ function _egMechNeedleGates(monster, phase) {
                 if (hitTop || hitBot) {
                     g.cdUntil = now + 1000;
                     const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Needle', 'Spike Gates');
                 }
             }
         });

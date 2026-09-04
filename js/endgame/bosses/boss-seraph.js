@@ -82,7 +82,7 @@ function _egMechJudgmentPillars(monster, phase) {
                     && pr.right > pl.x - width / 2 && pr.left < pl.x + width / 2) {
                     pl.hitDone = true;
                     const dealt = _egNkHit(dmgPct, 'lightning', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Seraph', 'Judgment Pillars');
                 }
                 if (pl.t >= warnMs + activeMs) {
                     pl.stage = 'done';
@@ -136,10 +136,11 @@ function _egMechRadiantFans(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkCircleHit(o.x, o.y, 10, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 450;
-                _egNkHit(dmgPct, 'lightning', level);
+                const dealt = _egNkHit(dmgPct, 'lightning', level);
+                _egNkAbilityHitToast(dealt, 'The Seraph', 'Radiant Fans');
             }
         }
         return fired < volleys || orbs.length > 0;

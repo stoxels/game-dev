@@ -89,10 +89,10 @@ function _egMechDivebombers(monster, phase) {
                 s.y += speed * dtS;
             }
             s.el.style.transform = 'translate(' + Math.round(s.x - 22) + 'px,' + Math.round(s.y - 22) + 'px)';
-            if (!s.hitDone && _egNkCircleHit(s.x, s.y, radius, _egNkPlayerRect(), 0)) {
+            if (!s.hitDone && _egNkDotHit(s.el, _egNkPlayerRect(), 0)) {
                 s.hitDone = true;
                 const dealt = _egNkHit(dmgPct, 'fire', level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Swarm', 'Divebombers');
             }
             if (s.y > window.innerHeight + 60) {
                 s.stage = 'gone';

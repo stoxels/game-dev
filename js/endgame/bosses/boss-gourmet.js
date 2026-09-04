@@ -86,10 +86,11 @@ function _egMechGourmetGulp(monster, phase) {
                 continue;
             }
             s.el.style.transform = 'translate(' + Math.round(s.x - 14) + 'px,' + Math.round(s.y - 14) + 'px)';
-            if (!s.hitDone && pr && now >= orbCdUntil && _egNkCircleHit(s.x, s.y, starR, pr, 2)) {
+            if (!s.hitDone && pr && now >= orbCdUntil && _egNkDotHit(s.el, pr, 2)) {
                 s.hitDone = true;
                 orbCdUntil = now + 500;
-                _egNkHit(dmgPct, null, level);
+                const dealt = _egNkHit(dmgPct, null, level);
+                _egNkAbilityHitToast(dealt, 'The Gourmet', 'Gourmet Gulp');
             }
         }
         return stars.length > 0;

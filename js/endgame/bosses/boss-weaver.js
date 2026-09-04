@@ -98,7 +98,7 @@ function _egMechThreadGrid(monster, phase) {
                 if (caught && now >= (paint.cd || 0)) {
                     paint.cd = now + 900;
                     const dealt = _egNkHit(dmgPct, 'shadow', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Weaver', 'Thread Grid');
                 }
             }
             if (t >= liveMs) {

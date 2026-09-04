@@ -77,6 +77,14 @@ const EG_AILMENT_ICONS = {
 // Player afflictions: key → { until, dps, acc } (acc = DoT tick accumulator)
 let _egPlayerStatuses = {};
 
+// True while the player has any active DoT status — drives the soft 'drain
+// over' cue when the last one expires naturally (not via cleanup).
+let _egPlayerDotActive = false;
+
+// Throttle timestamp for the monster-side DoT knock (prevents pile-up when
+// a whole pack ticks in the same frame).
+let _egMonsterDotLastSfx = 0;
+
 // Active puzzle ailments: [{ type, until, timer, cells?, line? }]
 let _egPuzzleEffects = [];
 
@@ -112,6 +120,23 @@ function _egApplyStatusToMap(statusMap, key, durationS, dps) {
     };
 }
 
+// Maps an ailment key to its elemental SFX key (fire / cold / lightning /
+// shadow / arcane — see the elemental header at the top of this file).
+// Falls back to the generic ailment blip for unknown keys.
+function _egAilmentSfxKey(key) {
+    switch (key) {
+        case 'ignite': return 'ailment_fire';
+        case 'chill':
+        case 'frozen': return 'ailment_cold';
+        case 'shocked': return 'ailment_lightning';
+        case 'shadow':
+        case 'shadowburn': return 'ailment_shadow';
+        case 'polymorph':
+        case 'confused': return 'ailment_arcane';
+        default: return 'ailment_apply';
+    }
+}
+
 // Applies an ailment to a monster (or refreshes an existing one).
 function _egApplyMonsterAilment(monster, key, dps) {
     if (!monster) return;
@@ -130,6 +155,11 @@ function _egApplyMonsterAilment(monster, key, dps) {
     })[key];
     if (!durationS) return;
     _egApplyStatusToMap(monster.statuses, key, durationS, dps);
+    // No application blip on the monster side: elemental hits re-roll and
+    // refresh ailments on every strike, so a per-hit cue (ignite especially)
+    // reads as noise during fast auto-attacks. The per-second DoT tick and
+    // status icons still carry the feedback. (Monster → player applications
+    // in _egApplyPlayerAilment below keep their warning cue.)
 }
 
 // Applies an ailment to the player (or refreshes an existing one).
@@ -160,6 +190,9 @@ function _egApplyPlayerAilment(key, dps) {
     if (key === 'ignite') _egStartPlayerFireDrops();
     if (key === 'shadow') _egStartPlayerShadowClouds();
     showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph — the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX(_egAilmentSfxKey(key));
+    }
 }
 
 
@@ -275,12 +308,23 @@ function _egGetPlayerChargeMultiplier() {
     return 1;
 }
 
-// Charge-bar rate multiplier for a MONSTER (chill/frozen).
+// Charge-bar rate multiplier for a MONSTER (chill/frozen, plus Brutus's
+// sacrificial-feed haste: every zombie a ground slam devours stacks a
+// charge-up REDUCTION on Brutus for 15s, making his attack bar fill faster).
 function _egGetMonsterChargeMultiplier(m) {
-    if (!m || !m.statuses) return 1;
-    if (_egHasStatus(m.statuses, 'frozen')) return 0;
-    if (_egHasStatus(m.statuses, 'chill')) return EG_AIL_CHARGE_SLOW_MULT;
-    return 1;
+    let mult = 1;
+    if (!m || !m.statuses) {
+        // no statuses — fall through so the feed haste below still applies
+    } else if (_egHasStatus(m.statuses, 'frozen')) {
+        mult = 0;
+    } else if (_egHasStatus(m.statuses, 'chill')) {
+        mult = EG_AIL_CHARGE_SLOW_MULT;
+    }
+    if (mult > 0 && typeof _egBossFeedChargeMult === 'function') {
+        const feed = _egBossFeedChargeMult(m);
+        if (feed > 0) mult *= feed;
+    }
+    return mult;
 }
 
 // +shock damage-taken amplification for a MONSTER target.
@@ -444,6 +488,7 @@ function _egTickAilments() {
     _egExpireFromMap(_egPlayerStatuses, now);
     let playerDot = 0;
     let playerIgnoresShield = false;
+    const dotTicked = [];
     Object.keys(_egPlayerStatuses).forEach(key => {
         const st = _egPlayerStatuses[key];
         if (!(st.dps > 0)) return;
@@ -452,9 +497,33 @@ function _egTickAilments() {
             st.acc -= EG_AIL_TICK_INTERVAL_S;
             playerDot += Math.max(EG_AIL_MIN_DOT_DAMAGE, Math.round(st.dps));
             if (key === 'shadowburn') playerIgnoresShield = true;
+            dotTicked.push(key);
         }
     });
-    if (playerDot > 0) _egDealPlayerDotDamage(playerDot, playerIgnoresShield);
+    if (playerDot > 0) {
+        _egDealPlayerDotDamage(playerDot, playerIgnoresShield);
+        // Element-flavoured per-tick stings — ember-crackle while ignite ticks,
+        // damped dark pulse while shadowburn ticks — so the drain type is
+        // readable by ear. Stops automatically once the statuses expire
+        // (dotTicked falls empty). Simultaneous ignite + shadowburn layer both.
+        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+            for (const key of dotTicked) {
+                const tickKey = ({ ignite: 'ailment_dot_tick_fire', shadowburn: 'ailment_dot_tick_shadow' })[key] || 'ailment_dot_tick';
+                Audio_Manager.playSFX(tickKey);
+            }
+        }
+    }
+    // Soft 'all clear' the instant the LAST DoT status expires naturally:
+    // _egExpireFromMap already removed expired statuses above, so a transition
+    // from any DoT active → none means the drain just ended. Cleanup paths
+    // clear _egPlayerDotActive themselves, so transitions never cue it.
+    const playerDotStillActive = Object.keys(_egPlayerStatuses).some(key => _egPlayerStatuses[key].dps > 0);
+    if (_egPlayerDotActive && !playerDotStillActive) {
+        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+            Audio_Manager.playSFX('ailment_dot_end');
+        }
+    }
+    _egPlayerDotActive = playerDotStillActive;
 
     // --- Ground-fire damage: standing in burning ground burns the player ---
     // Uses radius-aware overlap check so edge contact counts as burning.
@@ -469,6 +538,10 @@ function _egTickAilments() {
             } else {
                 _egDealPlayerDotDamage(rawAmount, false);
             }
+            // Cadence tick for standing in burning ground — a hot sizzle-pop as
+            // the burn lands, matching the per-second DoT ticks. Stops on its
+            // own: this branch only runs while _egIsPlayerInsideFire().
+            if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('ground_fire_tick');
         }
     }
 
@@ -492,6 +565,14 @@ function _egTickAilments() {
         if (dotTotal > 0) {
             m.currentHP = Math.max(0, m.currentHP - dotTotal);
             if (typeof _egShowDamageNumber === 'function') _egShowDamageNumber(m.id, dotTotal, false, { fire: 0, cold: 0, lightning: 0, shadow: dotTotal });
+            // Monster-side drain cadence — one dry knock per ticking monster,
+            // throttled (~250 ms) so a mass-ignited pack reads as a knock
+            // cluster rather than a sting pile-up. Distinct timbre from the
+            // player's ember-crackle / dark-pulse ticks.
+            if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX && now - _egMonsterDotLastSfx >= 250) {
+                _egMonsterDotLastSfx = now;
+                Audio_Manager.playSFX('ailment_dot_tick_monster');
+            }
             if (m.currentHP <= 0) deadIds.push(m.id);
         }
     });
@@ -630,11 +711,13 @@ function _egPickHazardCell(existingKeys, radiusCenter) {
 
 function _egRegisterPuzzleEffect(effect) {
     effect.until = Date.now() + EG_PUZZLE_EFFECT_DURATION_MS;
-    effect.timer = setTimeout(() => _egRemovePuzzleEffect(effect), EG_PUZZLE_EFFECT_DURATION_MS);
+    // Natural expiry (vs. encounter cleanup / map swaps) so expiry cues like the
+    // soft veil-lift tone only play when the effect actually runs out.
+    effect.timer = setTimeout(() => _egRemovePuzzleEffect(effect, true), EG_PUZZLE_EFFECT_DURATION_MS);
     _egPuzzleEffects.push(effect);
 }
 
-function _egRemovePuzzleEffect(effect) {
+function _egRemovePuzzleEffect(effect, natural) {
     clearTimeout(effect.timer);
     _egPuzzleEffects = _egPuzzleEffects.filter(e => e !== effect);
 
@@ -647,6 +730,11 @@ function _egRemovePuzzleEffect(effect) {
         _egStopShockedCursor();
     } else if (effect.type === 'shadowline') {
         _egRestoreLineClues(effect.line);
+        // Soft resolution sting as the veiled clue numbers return — natural
+        // expiry only, never during encounter cleanup / map swaps.
+        if (natural && typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+            Audio_Manager.playSFX('shadow_veil_lift');
+        }
     } else if (effect.el) {
         effect.el.remove();
     }
@@ -686,6 +774,7 @@ function _egPuzzleLava() {
 
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'lava', cells });
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('puzzle_fire');
     showToast('🌋 The monster scorched the grid — lava cells punish wrong clicks doubly!');
 }
 
@@ -722,6 +811,7 @@ function _egPuzzleIce() {
 
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'ice', cells });
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('puzzle_cold');
     showToast('🧊 Ice spreads across the grid — clicks may slip!');
 }
 
@@ -745,6 +835,7 @@ function _egPuzzleIceRedirect(row, col) {
     if (neighbours.length === 0) return false;
 
     const [nr, nc] = neighbours[Math.floor(Math.random() * neighbours.length)];
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('puzzle_cold');
     showToast('🧊 Slippery! Your click slid to another cell.');
     _egIceRedirectDepth++;
     try {
@@ -768,6 +859,7 @@ function _egPuzzleShockedCursor() {
     if (_egPuzzleEffects.some(e => e.type === 'shockcursor')) return;
     _egStartShockedCursor();
     _egRegisterPuzzleEffect({ type: 'shockcursor' });
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('puzzle_lightning');
     showToast('⚡ Your cursor is shocked — reveals may scatter your ✕ marks!');
 }
 
@@ -863,6 +955,7 @@ function _egOnCorrectCellPuzzleFX(row, col) {
     systemMarkedGrid[r][c] = false;
     renderCell(r, c);
     _egSpawnCrossZapFX(r, c);
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('puzzle_lightning');
     showToast('⚡ A spark zapped one of your ✕ marks!');
 }
 
@@ -950,9 +1043,13 @@ function _egApplyPuzzleArcaneBomb() {
         const marks = adjacent.filter(([r,c]) => r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length && userGrid[r][c] === 2).length;
         const amount = Math.max(1, marks * 8);
         _egPlayerTakeDamage(amount, true, 'arcane');
+        // Punchy blast the moment the bomb goes off — the damage lands by ear,
+        // distinct from the 'appeared' blips played when it was planted.
+        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('puzzle_arcane_blast');
         _egRemovePuzzleEffect(bomb);
     }, EG_PUZZLE_EFFECT_DURATION_MS);
     _egPuzzleEffects.push(bomb);
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('puzzle_arcane');
     showToast('🔮 An arcane bomb appeared — remove adjacent ✕ marks before it detonates!');
 }
 
@@ -974,6 +1071,7 @@ function _egPuzzleShadowBlackout() {
     });
 
     _egRegisterPuzzleEffect({ type: 'shadowline', line });
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('puzzle_shadow');
     showToast(`🌑 Shadow veils a ${isRow ? 'row' : 'column'} of clue numbers!`);
 }
 
@@ -997,6 +1095,8 @@ function _egRestoreLineClues(line) {
 // Full reset — called when a fresh encounter starts.
 function _egAilmentsReset() {
     _egPlayerStatuses = {};
+    _egPlayerDotActive = false; // silent — fresh encounter, no 'drain over' cue
+    _egMonsterDotLastSfx = 0;
     _egClearAllPuzzleEffects();
     _egIceRedirectDepth = 0;
     _egGroundFireAcc = 0;
@@ -1010,6 +1110,8 @@ function _egAilmentsReset() {
 // Cleanup — called when the encounter stops (also covers game over).
 function _egAilmentsCleanup() {
     _egPlayerStatuses = {};
+    _egPlayerDotActive = false; // silent — encounter stopping, no 'drain over' cue
+    _egMonsterDotLastSfx = 0;
     _egClearAllPuzzleEffects();
     _egGroundFireAcc = 0;
     _egStopShockedCursor();

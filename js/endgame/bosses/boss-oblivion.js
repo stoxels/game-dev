@@ -119,7 +119,7 @@ function _egMechEventBeams(monster, phase) {
                     if (_egInfernoPtSegDist(pt[0], pt[1], cx, cy, bx, by) < halfW + 6) {
                         cdUntil = now + 900;
                         const dealt = _egNkHit(dmgPct, 'fire', level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Oblivion', 'Event Beams');
                         break;
                     }
                 }

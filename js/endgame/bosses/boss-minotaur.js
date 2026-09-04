@@ -74,7 +74,10 @@ function _egMechBullRush(monster, phase) {
             if (t >= warnMs) {
                 stage = 'dash';
                 t = 0;
-                if (lineEl) lineEl.classList.add('eg-nk-band-hit');
+                if (lineEl) {
+                    lineEl.classList.add('eg-nk-band-hit');
+                    _egNkSlamShatter(lineEl, run); // hooves tear the ground as the rush starts
+                }
                 bx = dir > 0 ? -90 : window.innerWidth + 90;
                 bullEl = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-charger', dir > 0 ? '🐂' : '🐂');
             }
@@ -90,7 +93,7 @@ function _egMechBullRush(monster, phase) {
                     && pr.bottom > ry - bandH / 2 && pr.top < ry + bandH / 2) {
                     hitDone = true;
                     const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Minotaur', 'Bull Rush');
                 }
             }
             const done = dir > 0 ? bx > window.innerWidth + 90 : bx < -90;

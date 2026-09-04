@@ -92,7 +92,7 @@ function _egMechTotemPulse(monster, phase) {
                 const c = _egNkPlayerCenter();
                 if (c && Math.hypot(c.x - tot.x, c.y - tot.y) <= blastR) {
                     const dealt = _egNkHit(dmgPct, 'lightning', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Warden', 'Pulse Totems');
                 }
             }
             if (t >= expandMs + gapMs) {

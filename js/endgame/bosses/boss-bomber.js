@@ -90,7 +90,7 @@ function _egMechCrossBlasts(monster, phase) {
                         && pr.bottom > q.y - armLen && pr.top < q.y + armLen;
                     if (inH || inV) {
                         const dealt = _egNkHit(dmgPct, 'fire', level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Bomber', 'Cross Blasts');
                     }
                 }
             }

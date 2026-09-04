@@ -92,7 +92,7 @@ function _egMechBlockFall(monster, phase) {
                     if (hit) {
                         cdUntil = now + 800;
                         const dealt = _egNkHit(dmgPct, null, level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Stack', 'Block Fall');
                     }
                 }
                 return;

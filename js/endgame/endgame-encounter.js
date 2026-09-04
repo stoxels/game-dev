@@ -252,6 +252,10 @@ function _egBuildFixedBossList(bosses, bossCap, baseLevel) {
     return bosses.slice(0, bossCap).map(entry => ({
         id: entry.id,
         level: entry.level != null ? entry.level : _egRollMonsterLevel(baseLevel),
+        // Preserve the optional HP multiplier (e.g. 500k HP test
+        // mode) so it survives the stamp → spawn-list → arena queue path.
+        // Only max HP is scaled — boss damage stays at its normal value.
+        hpMult: (entry.hpMult != null && entry.hpMult > 1) ? entry.hpMult : 1,
         isBossSpawn: true,
     }));
 }
@@ -534,6 +538,11 @@ function _egStopEncounter() {
 // Advances a single monster's charge bar by one tick (0.1s at 10Hz).
 // Fires the monster's attack when the charge bar fills completely.
 function _egTickMonster(m) {
+    // Brutus's sacrificial zombies never attack — they only shamble into the
+    // ground-slam band; their movement is driven by the roaming tick in
+    // boss-brutus.js, so skip charge/attack entirely.
+    if (m.isSacrificialZombie) return;
+
     // Active map run: monster regeneration — heals #% of max life per second.
     if (m.regenPctMaxLife > 0 && m.maxHP > 0 && m.currentHP > 0
         && m.currentHP < m.maxHP) {
@@ -557,6 +566,10 @@ function _egTickMonster(m) {
                 m.bossBaseDamage = Math.round(m.bossBaseDamage * (1 + enragePct / 100));
             }
             showToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
+            // One-time audio cue for the map-boss enrage
+            if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+                Audio_Manager.playSFX('boss_roar');
+            }
         }
     }
 
@@ -588,6 +601,14 @@ function _egTickPlayer() {
     // Hold-E pause: while E is held during an endgame encounter, freeze the player's
     // own auto-attack charge bar. Used to manually time melee strikes.
     if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+        // If not in an active encounter, fall through (no effect outside endgame)
+    }
+    // Grand Prior defuse pause: while the player stands on an armed bomb the
+    // charge bar freezes the same way (see _egPriorBombDefusing in
+    // shared-boss-abilities.js) — but with none of the parry behaviour:
+    // defusing is a DPS trade-off, not a defensive tool.
+    if (typeof _egPriorBombDefusing === 'function' && _egPriorBombDefusing()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
         // If not in an active encounter, fall through (no effect outside endgame)
     }
@@ -679,6 +700,32 @@ function _initEgHoldEPauseHotkey() {
     });
 }
 _initEgHoldEPauseHotkey();
+
+// ── Monster-card hover tooltip viewport clamp ──────────────────────────
+// The compact card tooltip is CSS-positioned BELOW the emoji (top: 125%).
+// Cards spawned into bottom-docked panels (eg-monster-panel, eg-panel-bottom)
+// or the lower part of the right-side stack can push that tooltip past the
+// bottom of the screen. On hover we measure the tooltip and, when it would
+// clip the viewport, flip it above the card via .eg-tip-flip.
+const EG_CARD_TOOLTIP_VIEW_MARGIN = 6;
+document.addEventListener('mouseover', (e) => {
+    const emoji = e.target && e.target.closest ? e.target.closest('.eg-emoji-wrapper') : null;
+    if (!emoji) return;
+    // Cards are static while hovered — evaluate once per rendered card.
+    if (emoji.dataset.egTipClamped) return;
+    emoji.dataset.egTipClamped = '1';
+
+    const tip = emoji.querySelector('.eg-monster-compact-tooltip');
+    if (!tip) return;
+
+    // Let the CSS :hover rule show the tooltip, then measure its real box.
+    requestAnimationFrame(() => {
+        if (!tip.isConnected) return;
+        const rect = tip.getBoundingClientRect();
+        tip.classList.toggle('eg-tip-flip',
+            rect.bottom > window.innerHeight - EG_CARD_TOOLTIP_VIEW_MARGIN);
+    });
+});
 
 // Renders the visual width of the player's charge bar.
 function _egUpdatePlayerChargeBar() {
@@ -1108,6 +1155,10 @@ function _egFireMonsterAttack(monster) {
     _egFlashMonsterAttackCard(monster);
     if (typeof _egMaybePuzzleAttack === 'function' && _egMaybePuzzleAttack(monster)) return;
     const attackType = _egResolveAttackType(monster);
+    // Audio cue for the monster's attack type at the moment it fires.
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX(attackType === 'melee' ? 'monster_swing' : 'monster_shoot');
+    }
     if (attackType === 'melee') {
         _egAnimateMonsterMelee(monster);
     } else {
@@ -1128,6 +1179,9 @@ function _egApplyPlayerMissFeedback() {
 
 // Floating "Blocked!" label on the player HUD after a successful block.
 function _egApplyPlayerBlockFeedback() {
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('player_block');
+    }
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -1333,7 +1387,6 @@ function _egRollPreemptiveDodge(monster) {
     if (pct <= 0 || Math.random() * 100 >= pct) return false;
 
     showToast(t('eg_dodged'));
-    Audio_Manager.playSFX('player_dodge_attack');
     _egApplyPlayerMissFeedback();
     return true;
 }
@@ -1532,7 +1585,6 @@ function _egRollFateNegation(stats) {
     const pct = stats.fatePct || 0;
     if (pct <= 0 || Math.random() * 100 >= pct) return false;
     showToast(t('eg_fate'));
-    Audio_Manager.playSFX('player_dodge_attack');
     _egApplyPlayerMissFeedback();
     _egScheduleAbsorptionRegen();
     return true;
@@ -1568,6 +1620,9 @@ function _egApplyPlayerParryFeedback() {
     setTimeout(() => label.remove(), 1050);
 }
 function _egApplyPlayerDeflectFeedback() {
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('player_deflect');
+    }
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -1602,7 +1657,7 @@ function _egRollParry(attacker, isProjectile) {
     if (chance <= 0) return false;
     if (Math.random() * 100 >= chance) return false;
     showToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
-    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_dodge_attack');
+    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_parry');
     _egApplyPlayerParryFeedback();
     _egScheduleAbsorptionRegen();
     return true;
@@ -2448,20 +2503,36 @@ function _egTryEchoHit(targetId, appliedAmount, elements, isCrit) {
 // flat Arcane Resistance. Physical hits (no element) ignore resistances.
 // `attackerLevel` feeds the level-scaled evasion benchmark; falls back to the
 // current target's level, then the encounter's base level.
+// `opts.isBossAbility` marks damage dealt by boss special abilities — those
+// hits can never be parried, dodged, blocked or fate-negated; they always
+// land unless the telegraphed mechanic itself was avoided by movement.
 function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null, opts = null) {
     if (!_egIsActive()) return 0;
 
+    // GODMODE — developer/test-only: blocks ALL incoming damage before any
+    // mitigation runs, so mechanic testing can ignore the player's health.
+    // Toggle with window._egGodMode = true/false from the console.
+    if (window._egGodMode) return 0;
+
     const stats = _egComputePlayerStats();
+
+    // Boss special abilities are never negatable — their damage always lands
+    // unless the player avoided the ability by movement/position (the
+    // telegraphed dodge mechanics are the only boss abilities assigned to be
+    // avoidable). Parry, evasion, block and fate all skip them; element
+    // resistances, armour and absorption still mitigate normally.
+    const isBossAbility = !!(opts && opts.isBossAbility);
 
     // Gear: fate — pure-luck chance to negate ANY incoming hit entirely
     // (attacks, spells and charge hits alike), before all other mitigation.
-    if (_egRollFateNegation(stats)) return 0;
+    if (!isBossAbility && _egRollFateNegation(stats)) return 0;
 
     // Hold-E Parry — 50% + gear chance to fully negate projectile and charge
-    // attacks while E is held. Hazards and monster spells (isSpell=true) are
-    // never parryable. On a successful projectile parry there is a 5% + gear
-    // deflect chance to hit another monster for 30% + gear damage.
-    if (!isSpell && typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
+    // attacks while E is held. Hazards, monster spells (isSpell=true) and boss
+    // special abilities are never parryable. On a successful projectile parry
+    // there is a 5% + gear deflect chance to hit another monster for 30% + gear
+    // damage.
+    if (!isSpell && !isBossAbility && typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
         if (typeof _egIsActive === 'function' && _egIsActive()) {
             const parryChance = _egGetParryChancePct();
             if (parryChance > 0 && Math.random() * 100 < parryChance) {
@@ -2469,7 +2540,6 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
                 const attacker = opts && opts.attacker ? opts.attacker : null;
                 const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
                 showToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
-                if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_dodge_attack');
                 _egApplyPlayerParryFeedback();
                 _egScheduleAbsorptionRegen();
                 if (isProjectile && attacker) _egTryDeflectProjectile(attacker, true);
@@ -2479,8 +2549,9 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     }
 
     // Evasion only applies to physical attacks (melee strikes and monster
-    // projectiles) — spells and environmental hazards cannot be dodged.
-    if (!isSpell) {
+    // projectiles) — spells, environmental hazards and boss special abilities
+    // cannot be dodged.
+    if (!isSpell && !isBossAbility) {
         const attackerLvl = Number(attackerLevel)
             || (_egGetTarget() && _egGetTarget().level)
             || _egGetEncounterBaseLevel()
@@ -2488,7 +2559,6 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
         const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, attackerLvl));
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
             showToast(t('eg_dodged'));
-            Audio_Manager.playSFX('player_dodge_attack');
             _egApplyPlayerMissFeedback();
             _egScheduleAbsorptionRegen();
             return 0;
@@ -2500,16 +2570,16 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     // blocks for a short window (reduced by block recovery). Player can
     // still attack while recovering — only blocking is suppressed.
     // Blocking requires an actual shield in the off-hand — block chance
-    // from mods/passives on other slots does nothing without one.
+    // from mods/passives on other slots does nothing without one. Boss
+    // special abilities are never blockable.
     const isBlockLockedOut = Date.now() < _egPlayerBlockLockoutUntil;
     const hasShieldEquipped = _egGetAllEquippedItems()
         .some(item => item.slotType === 'shield');
-    const blockChance = (!isBlockLockedOut && hasShieldEquipped)
+    const blockChance = (!isBossAbility && !isBlockLockedOut && hasShieldEquipped)
         ? Math.min(75, isSpell ? stats.spellBlockChance : stats.blockChance)
         : 0;
     if (blockChance > 0 && Math.random() * 100 < blockChance) {
         showToast(t('eg_blocked'));
-        Audio_Manager.playSFX('player_dodge_attack');
         _egApplyPlayerBlockFeedback();
         _egScheduleAbsorptionRegen();
 
@@ -2611,6 +2681,9 @@ function _egUpdateTargetAfterKill() {
 // Handles all post-kill logic for a normal (non-boss) monster death.
 function _egHandleNormalMonsterKill(dying) {
     _egChainKillCount++;
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('monster_kill');
+    }
 
     _egUpdateObjectivesHUD();
 
@@ -2620,11 +2693,22 @@ function _egHandleNormalMonsterKill(dying) {
     // _egShouldSuppressRespawn).
     _egScheduleRespawn();
 
-    if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(false, dying.level);
-    if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);
-    if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
-    if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false);
-    if (typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level);
+    // Sacrificial zombie adds (Brutus) never drop loot — their only reward is
+    // a chance to drop a healing heart onto the grid when the PLAYER kills
+    // them (a slam-devoured zombie drops nothing; it feeds Brutus instead).
+    if (dying && dying.noLoot) {
+        const heartChance = dying.zombieHeartDropChance || 0;
+        if (heartChance > 0 && Math.random() * 100 < heartChance * 100
+            && typeof _egDropHeartPickup === 'function') {
+            _egDropHeartPickup();
+        }
+    } else {
+        if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(false, dying.level);
+        if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);
+        if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
+        if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false);
+        if (typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level);
+    }
 }
 
 // Handles all post-kill logic for a boss monster death.
@@ -2766,9 +2850,10 @@ function _egAssignRandomSpawnZone(monster) {
 
 // Tries to build the monster from normal defs first, then boss defs as fallback.
 // Marks the monster as a boss if it was built from EG_BOSS_DEFS.
-// hpMult: optional multiplier for boss HP and damage (e.g., 500k HP test mode).
+// hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
+// damage is left at its normal scaled value.
 function _egBuildMonsterOrBoss(defId, level, hpMult = 1) {
-    let monster = _egBuildMonster(defId, level);
+    let monster = _egBuildMonster(defId, level, hpMult);
     if (!monster) {
         monster = _egBuildBoss(defId, level, hpMult);
         if (monster) monster.isBoss = true;
@@ -2785,12 +2870,17 @@ function _egBuildMonsterOrBoss(defId, level, hpMult = 1) {
 function _egNotifyMonsterArrival(monster) {
     if (monster.isBoss) {
         _egBossInit(monster);
+        // Boss materialises — deep roar announces the arrival
+        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+            Audio_Manager.playSFX('boss_roar');
+        }
     }
 }
 
 // Adds a monster to the live encounter.
 // Assigns a random spawn zone, auto-targets if no target exists, and notifies the player.
-// hpMult: optional multiplier for boss HP and damage (e.g., 500k HP test mode).
+// hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
+// damage is left at its normal scaled value.
 function _egSpawnMonster(defId, level, hpMult = 1) {
     if (_egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) return;
 
@@ -3084,6 +3174,9 @@ function _egClearAllZones() {
 // Uses += so multiple monsters assigned to the same zone stack correctly.
 function _egRenderMonstersIntoZones() {
     _egMonsters.forEach(m => {
+        // Brutus's sacrificial zombies render as roaming cards in the fixed
+        // #eg-zombie-layer, not in the static monster panel.
+        if (m.isSacrificialZombie) return;
         const zoneEl = document.getElementById(m.zoneId || 'eg-monster-panel');
         if (zoneEl) zoneEl.innerHTML += _egBuildMonsterCardHTML(m);
     });

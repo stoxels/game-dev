@@ -164,27 +164,41 @@ function _egScaleElements(elements, factor) {
 
 // Applies the target monster's elemental resistances to an incoming hit.
 // `elements` maps each element to the raw elemental damage carried by the hit
-// (proportional to `amount`); everything else counts as physical and passes
-// through unmitigated. Returns the post-resistance total.
+// (proportional to `amount`); everything else counts as physical. Positive
+// resistances reduce; NEGATIVE resistances AMPLIFY (vulnerability) — both
+// clamped to ±EG_RESIST_CAP_PCT. An optional `physical` resistance (heavy
+// armor) reduces only the physical share and applies even when the hit
+// carries no elemental breakdown at all. Monsters without these keys keep
+// their previous behaviour exactly. Returns the post-resistance total.
 function _egApplyTargetResistances(amount, target, elements) {
-    if (!target || !target.resistances || !elements) return amount;
+    if (!target || !target.resistances) return amount;
+    const res = target.resistances;
+    const clampRes = (v) => Math.max(-EG_RESIST_CAP_PCT, Math.min(EG_RESIST_CAP_PCT, Number(v) || 0));
+    const physRes = (typeof res.physical === 'number') ? clampRes(res.physical) : 0;
 
-    // Scale the stored breakdown to the actual hit size in case the caller
-    // applied multipliers after the roll (crit, reveal %, charged stacks).
-    const elemTotal = EG_ELEMENTS.reduce((sum, el) => sum + (elements[el] || 0), 0);
-    if (elemTotal <= 0 || elemTotal > amount) return amount;
+    // Split the hit into its elemental (resisted / amplified) and physical
+    // (armored) shares. A missing, empty or oversized breakdown means the
+    // whole hit is physical.
+    let physical = amount;
+    let elemental = 0;
+    if (elements) {
+        const elemTotal = EG_ELEMENTS.reduce((sum, el) => sum + (elements[el] || 0), 0);
+        if (elemTotal > 0 && elemTotal <= amount) {
+            // Scale the stored breakdown to the actual hit size in case the
+            // caller applied multipliers after the roll (crit, reveal %, etc.).
+            const factor = elemTotal / amount;
+            let mitigated = 0;
+            EG_ELEMENTS.forEach(el => {
+                const part = (elements[el] || 0) * factor;
+                if (part <= 0) return;
+                mitigated += part * (1 - clampRes(res[el]) / 100);
+            });
+            physical = amount - elemTotal;
+            elemental = mitigated;
+        }
+    }
 
-    const factor = elemTotal / amount;
-    let mitigated = 0;
-    EG_ELEMENTS.forEach(el => {
-        const part = (elements[el] || 0) * factor;
-        if (part <= 0) return;
-        const resPct = Math.min(EG_RESIST_CAP_PCT, Math.max(0, target.resistances[el] || 0));
-        mitigated += part * (1 - resPct / 100);
-    });
-
-    const physical = amount - elemTotal;
-    return Math.max(1, Math.round(physical + mitigated));
+    return Math.max(1, Math.round(physical * (1 - physRes / 100) + elemental));
 }
 
 // Reduces an elemental monster hit by the player's matching resistance %

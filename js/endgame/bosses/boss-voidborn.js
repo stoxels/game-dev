@@ -88,7 +88,7 @@ function _egMechVoidChoice(monster, phase) {
             const c = _egNkPlayerCenter();
             if (!c || Math.hypot(c.x - real.x, c.y - real.y) > radius) {
                 const dealt = _egNkHit(dmgPct, 'shadow', level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Voidborn', 'Void Choice');
             } else {
                 _egNkToast('eg_blast_dodged', '✅ You chose... wisely.', '#4ade80');
             }
@@ -132,7 +132,7 @@ function _egMechVoidTendrils(monster, phase) {
                 td.y += (dy / d) * speed * dtS + Math.sin(e / 1000 * 2.9 + td.wob) * 20 * dtS;
             }
             td.el.style.transform = 'translate(' + Math.round(td.x - 22) + 'px,' + Math.round(td.y - 22) + 'px)';
-            if (pr && now >= td.cdUntil && _egNkCircleHit(td.x, td.y, radius, pr, 0)) {
+            if (pr && now >= td.cdUntil && _egNkDotHit(td.el, pr, 0)) {
                 td.cdUntil = now + 800;
                 _egNkHit(dmgPct, 'shadow', level);
             }

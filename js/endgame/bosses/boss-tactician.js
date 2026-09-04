@@ -108,9 +108,10 @@ function _egTacticianOrbTick(run, o, level) {
             return;
         }
         o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-        if (!o.hitDone && _egNkCircleHit(o.x, o.y, 10, _egNkPlayerRect(), 2)) {
+        if (!o.hitDone && _egNkDotHit(o.el, _egNkPlayerRect(), 2)) {
             o.hitDone = true;
-            _egNkHit(0.06, null, level);
+            const dealt = _egNkHit(0.06, null, level);
+            _egNkAbilityHitToast(dealt, 'The Tactician', 'Battle Intent');
         }
         setTimeout(step, 50);
     };

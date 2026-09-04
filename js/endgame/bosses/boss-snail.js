@@ -61,10 +61,10 @@ function _egMechDoomSnail(monster, phase) {
             s.y += (dy / d) * speed * dtS;
         }
         s.el.style.transform = 'translate(' + Math.round(s.x - 30) + 'px,' + Math.round(s.y - 30) + 'px)';
-        if (c && now >= cdUntil && _egNkCircleHit(s.x, s.y, radius, _egNkPlayerRect(), 0)) {
+        if (c && now >= cdUntil && _egNkDotHit(s.el, _egNkPlayerRect(), 0)) {
             cdUntil = now + 1500;
             const dealt = _egNkHit(dmgPct, null, level);
-            _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+            _egNkAbilityHitToast(dealt, 'The Snail', 'Doom Snail');
         }
         return e < durMs;
     });

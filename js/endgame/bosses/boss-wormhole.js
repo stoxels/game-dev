@@ -92,10 +92,10 @@ function _egMechPortalWisp(monster, phase) {
             w.y += (dy / d) * wispSpeed * dtS;
         }
         wisp.style.transform = 'translate(' + Math.round(w.x - 22) + 'px,' + Math.round(w.y - 22) + 'px)';
-        if (c && now >= cdUntil && _egNkCircleHit(w.x, w.y, wispR, pr, 0)) {
+        if (c && now >= cdUntil && _egNkDotHit(wisp, pr, 0)) {
             cdUntil = now + 1000;
             const dealt = _egNkHit(dmgPct, 'shadow', level);
-            _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+            _egNkAbilityHitToast(dealt, 'The Wormhole', 'Portal Wisp');
         }
         return e < durMs;
     });

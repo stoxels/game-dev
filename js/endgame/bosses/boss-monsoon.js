@@ -80,7 +80,8 @@ function _egMechMonsoonRain(monster, phase) {
                 d.el.classList.add('eg-nk-mark-hit');
                 if (pr && now >= cdUntil && _egNkCircleHit(d.x, d.y, radius, pr, 0)) {
                     cdUntil = now + 400;
-                    _egNkHit(dmgPct, 'cold', level);
+                    const dealt = _egNkHit(dmgPct, 'cold', level);
+                    _egNkAbilityHitToast(dealt, 'The Monsoon', 'Shrapnel Rain');
                 }
             }
             if (d.t >= warnMs + 450) {

@@ -309,6 +309,7 @@ function applyPenalty(row, col) {
     if (typeof _egIsLavaCell === 'function' && _egIsLavaCell(row, col)) {
         mistakeCount++;
         effectivePen *= 2;
+        Audio_Manager.playSFX('puzzle_fire');
         showToast('🌋 Lava! The mistake counts twice!');
     }
 

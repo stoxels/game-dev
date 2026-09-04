@@ -105,7 +105,7 @@ function _egMechGhostGang(monster, phase) {
                 g.y += (dy / d) * g.speed * dtS;
             }
             g.el.style.transform = 'translate(' + Math.round(g.x - 22) + 'px,' + Math.round(g.y - 22) + 'px)';
-            if (pr && now >= g.cdUntil && _egNkCircleHit(g.x, g.y, radius, pr, 0)) {
+            if (pr && now >= g.cdUntil && _egNkDotHit(g.el, pr, 0)) {
                 g.cdUntil = now + 800;
                 _egNkHit(dmgPct, 'shadow', level);
             }

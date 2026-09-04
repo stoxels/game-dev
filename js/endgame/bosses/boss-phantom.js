@@ -86,7 +86,7 @@ function _egMechVentAmbush(monster, phase) {
                 }
                 if (_egNkCircleHit(vent.x, vent.y, slashR, _egNkPlayerRect(), 0)) {
                     const dealt = _egNkHit(dmgPct, 'shadow', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Phantom', 'Vent Ambush');
                 }
             }
         } else if (stage === 'slash') {

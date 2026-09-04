@@ -85,7 +85,8 @@ function _egMechDanceSteps(monster, phase) {
         }
         if (t >= beatMs) {
             // Missed the beat — zap, then move on.
-            _egNkHit(dmgPct, 'lightning', level);
+            const dealt = _egNkHit(dmgPct, 'lightning', level);
+            _egNkAbilityHitToast(dealt, 'The Dancer', 'Dance Steps');
             el.classList.remove('eg-nk-mem-on');
             setTimeout(() => el.remove(), 400);
             idx++;

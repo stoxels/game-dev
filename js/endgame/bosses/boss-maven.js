@@ -87,12 +87,7 @@ function _egMechMemoryRite(monster, phase) {
                 _egNkToast('eg_memory_done', '✅ Rite complete!', '#4ade80');
             } else {
                 const dealt = _egNkHit(Math.min(0.4, zapPct * missing), 'shadow', level);
-                let msg = '💥 The rite zaps you for ' + dealt + ' HP!';
-                try {
-                    const raw = t('eg_memory_fail');
-                    if (raw && raw !== 'eg_memory_fail') msg = raw.replace('{n}', dealt);
-                } catch (e2) {}
-                if (typeof showToast === 'function') showToast(msg, '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Mnemonic', 'Memory Rite');
             }
             return false;
         }

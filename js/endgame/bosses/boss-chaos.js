@@ -48,7 +48,10 @@ function _egChaosDrop(run, x, y, level, dmg) {
     const step = { update(dtS) { st.t += dtS * 1000; return st.t < 800; }, strike() {
         el.classList.add('eg-nk-mark-hit');
         setTimeout(() => el.remove(), 400);
-        if (_egNkCircleHit(x, y, 26, _egNkPlayerRect(), 0)) _egNkHit(dmg, 'shadow', level);
+        if (_egNkCircleHit(x, y, 26, _egNkPlayerRect(), 0)) {
+            const dealt = _egNkHit(dmg, 'shadow', level);
+            _egNkAbilityHitToast(dealt, 'The Chaos', 'Roulette of Ruin');
+        }
     } };
     return step;
 }
@@ -65,10 +68,11 @@ function _egChaosOrb(run, x, y, vx, vy, level, dmg) {
             return 'gone';
         }
         o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-        if (!o.hitDone && now >= cd.until && _egNkCircleHit(o.x, o.y, 10, _egNkPlayerRect(), 2)) {
+        if (!o.hitDone && now >= cd.until && _egNkDotHit(o.el, _egNkPlayerRect(), 2)) {
             o.hitDone = true;
             cd.until = now + 500;
-            _egNkHit(dmg, 'shadow', level);
+            const dealt = _egNkHit(dmg, 'shadow', level);
+            _egNkAbilityHitToast(dealt, 'The Chaos', 'Roulette of Ruin');
         }
         return 'fly';
     };
@@ -120,7 +124,7 @@ function _egMechChaosRoulette(monster, phase) {
                     ch.y += (dy / d) * 200 * dtS;
                 }
                 ch.el.style.transform = 'translate(' + Math.round(ch.x - 22) + 'px,' + Math.round(ch.y - 22) + 'px)';
-                if (now >= ch.cdU && _egNkCircleHit(ch.x, ch.y, 22, _egNkPlayerRect(), 0)) {
+                if (now >= ch.cdU && _egNkDotHit(ch.el, _egNkPlayerRect(), 0)) {
                     ch.cdU = now + 800;
                     _egNkHit(0.12, 'shadow', level);
                 }

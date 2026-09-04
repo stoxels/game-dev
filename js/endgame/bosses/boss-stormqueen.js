@@ -134,7 +134,8 @@ function _egMechShrapnelDownpour(monster, phase) {
                 d.el.classList.add('eg-nk-mark-hit');
                 if (pr && now >= cdUntil && _egNkCircleHit(d.x, d.y, radius, pr, 0)) {
                     cdUntil = now + 350;
-                    _egNkHit(dmgPct, 'lightning', level);
+                    const dealt = _egNkHit(dmgPct, 'lightning', level);
+                    _egNkAbilityHitToast(dealt, 'The Stormqueen', 'Shrapnel Downpour');
                 }
             }
             if (d.t >= warnMs + 400) {

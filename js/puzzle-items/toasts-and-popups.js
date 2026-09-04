@@ -121,6 +121,10 @@ function showToast(msg, accentColor) {
         () => _removeToast(entry),
         (typeof SETTINGS !== 'undefined' ? SETTINGS.toastDuration : TOAST_DISPLAY_DURATION_MS / 1000) * 1000
     );
+
+    // Returns the toast element so callers can add extra styling (e.g. the
+    // boss-colored left stripe on boss-ability damage toasts).
+    return el;
 }
 
 // Clears every visible/pending toast immediately. Called on level reset or scene transitions.

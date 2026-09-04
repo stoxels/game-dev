@@ -90,10 +90,10 @@ function _egMechDormantSeekers(monster, phase) {
                     s.y += (dy / dd) * chaseSpeed * dtS;
                 }
                 s.el.style.transform = 'translate(' + Math.round(s.x - 22) + 'px,' + Math.round(s.y - 22) + 'px)';
-                if (pr && now >= cdUntil && _egNkCircleHit(s.x, s.y, radius, pr, 0)) {
+                if (pr && now >= cdUntil && _egNkDotHit(s.el, pr, 0)) {
                     cdUntil = now + 800;
                     const dealt = _egNkHit(dmgPct, 'shadow', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Hunter', 'Dormant Seekers');
                 }
                 if (s.t >= chaseMs) {
                     s.stage = 'spent';

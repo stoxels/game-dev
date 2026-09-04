@@ -99,7 +99,7 @@ function _egMechLockOn(monster, phase) {
                     for (const pt of pts) {
                         if (_egInfernoPtSegDist(pt[0], pt[1], ax, ay, bx, by) < halfW + 6) {
                             const dealt = _egNkHit(dmgPct, 'lightning', level);
-                            _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                            _egNkAbilityHitToast(dealt, 'The Guardian', 'Lock-On');
                             break;
                         }
                     }

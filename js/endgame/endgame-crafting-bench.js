@@ -421,6 +421,9 @@ function _egCraftingBenchApply() {
 
     _egCraftingBenchSelection = null;
     if (typeof trackAchStat === 'function') try { trackAchStat('egBenchCrafts', 1); } catch(e){}
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('craft_apply');
+    }
     _egRenderAll();
     egSaveHubState();
     _egRefreshCraftingBench(true, true);

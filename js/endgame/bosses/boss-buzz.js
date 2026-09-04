@@ -69,10 +69,10 @@ function _egMechRailSaws(monster, phase) {
             s.x = Math.max(radius + 8, Math.min(window.innerWidth - radius - 8, s.x));
             s.y = Math.max(radius + 8, Math.min(window.innerHeight - radius - 8, s.y));
             s.el.style.transform = 'translate(' + Math.round(s.x - radius) + 'px,' + Math.round(s.y - radius) + 'px)';
-            if (pr && now >= cdUntil && _egNkCircleHit(s.x, s.y, radius, pr, 0)) {
+            if (pr && now >= cdUntil && _egNkDotHit(s.el, pr, 0)) {
                 cdUntil = now + 1000;
                 const dealt = _egNkHit(dmgPct, null, level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Buzzsaw', 'Rail Saws');
             }
         });
         return e < durMs;

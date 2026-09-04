@@ -68,7 +68,7 @@ function _egMechStickyBombs(monster, phase) {
                     b.el.classList.add('eg-nk-boom');
                     if (pr && _egNkCircleHit(b.x, b.y, blastR, pr, 0)) {
                         const dealt = _egNkHit(dmgPct, 'fire', level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Demolitionist', 'Sticky Bombs');
                     }
                 } else {
                     pending = true;

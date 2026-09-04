@@ -94,7 +94,7 @@ function _egMechLaserLattice(monster, phase) {
                     : (pr.right > l.pos - thick / 2 && pr.left < l.pos + thick / 2));
                 if (caught) {
                     const dealt = _egNkHit(dmgPct, 'lightning', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Gridlock', 'Laser Lattice');
                 }
             }
         }

@@ -92,6 +92,84 @@
     animation: none !important;
 }
 
+/* Shared ground-shatter visuals for band-style mechanics (Brutus ground
+   slam, Juggernaut/Minotaur bull rushes). When a band telegraph resolves,
+   the struck band itself quakes (Brutus) while a body-level burst
+   (fissures + rock shards + dust, see _egNkSlamShatter in
+   shared-boss-abilities.js) makes the ground look like it is shattering
+   across the whole targeted line. Every overlay here ignores pointers so
+   clicks always reach the grid. */
+.eg-slam-quake {
+    /* Shake only the struck band — later in the file than .eg-nk-band-hit,
+       so this wins the animation slot while both classes are attached. */
+    animation: eg-slam-quake-kf 0.32s ease-out !important;
+}
+@keyframes eg-slam-quake-kf {
+    0% { transform: translateY(0); }
+    20% { transform: translateY(-6px); }
+    45% { transform: translateY(5px); }
+    70% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
+}
+.eg-slam-burst {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9001;
+    overflow: visible;
+}
+.eg-slam-cracks {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    animation: eg-slam-cracks-fade 0.55s ease-in 0.85s forwards;
+}
+@keyframes eg-slam-cracks-fade { to { opacity: 0; } }
+.eg-slam-crack {
+    fill: none;
+    stroke: #fda4af;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    filter: drop-shadow(0 0 4px rgba(248, 113, 113, 0.8));
+    animation: eg-slam-crack-draw 0.24s ease-out forwards;
+}
+.eg-slam-crack-core {
+    stroke: #fecaca;
+    stroke-width: 3.2;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.45)) drop-shadow(0 0 8px rgba(248, 113, 113, 0.95));
+}
+@keyframes eg-slam-crack-draw { to { stroke-dashoffset: 0; } }
+.eg-slam-shard {
+    position: absolute;
+    border-radius: 2px;
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 45%, #334155 100%);
+    box-shadow: 0 0 5px rgba(248, 113, 113, 0.5), inset -1px -2px 0 rgba(0, 0, 0, 0.45);
+    animation: eg-slam-shard-fly var(--dur, 0.8s) linear forwards,
+        eg-slam-shard-spin var(--dur, 0.8s) linear forwards;
+    will-change: transform, opacity;
+}
+@keyframes eg-slam-shard-fly {
+    0% { transform: translate(0, 0); opacity: 0.95; }
+    45% { transform: translate(var(--dxa, 0px), var(--up, -40px)); opacity: 1; }
+    100% { transform: translate(var(--dxb, 0px), var(--land, 10px)); opacity: 0; }
+}
+@keyframes eg-slam-shard-spin { to { rotate: var(--rot, 200deg); } }
+.eg-slam-dust {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(248, 113, 113, 0.5) 0%, rgba(154, 68, 16, 0.38) 45%, rgba(120, 53, 15, 0) 72%);
+    filter: blur(1.5px);
+    animation: eg-slam-dust-puff var(--dur, 0.9s) ease-out forwards;
+}
+@keyframes eg-slam-dust-puff {
+    0% { transform: translateY(0) scale(0.4); opacity: 0.85; }
+    100% { transform: translateY(var(--rise, -24px)) scale(var(--sc, 2)); opacity: 0; }
+}
+
 /* Siren beam (anchor right, rotates via transform) */
 .eg-nk-beam {
     position: fixed;
@@ -403,6 +481,31 @@
     pointer-events: none;
     z-index: 20;
     overflow: hidden;
+    /* Drifting Fog (P2+): the bank glides smoothly between regions */
+    transition: left 0.7s ease, top 0.7s ease, width 0.7s ease, height 0.7s ease;
+}
+
+/* Clue numbers displaced by a Clue Swap read as unstable until they revert */
+.eg-swap-clue {
+    color: #fbbf24 !important;
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.9);
+}
+
+/* Mid-effect re-shuffle flicker (P3 Double Scramble) */
+.eg-scramble-shake {
+    animation: eg-scramble-shake-kf 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes eg-scramble-shake-kf {
+    from {
+        transform: translateY(0);
+        opacity: 0.6;
+    }
+
+    to {
+        transform: translateY(-2px);
+        opacity: 1;
+    }
 }
 
 /* Scrambled clue numbers read as unstable until they revert */
@@ -413,11 +516,25 @@
 
 /* ============ Boss Pack 5 — dodge-mechanic visuals ============ */
 
-/* Ember drift */
+/* Ember drift — the flame stays pinned to its falling lane: the wobble is
+   a glow/opacity flicker ONLY (never transform/rotate), so the rendered
+   box always matches the collision hitbox and players can dodge by lane.
+   (Rotate-keyframe animations orbit fixed-position dots around the screen
+   origin on some engines, growing with distance from it.) */
 .eg-nk-ember {
     width: 28px; height: 28px; font-size: 1.2rem;
     filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.9));
-    animation: eg-nk-wiggle 0.6s ease-in-out infinite alternate;
+    animation: eg-nk-ember-flicker 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-nk-ember-flicker {
+    from {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 6px rgba(251, 146, 60, 0.7));
+    }
+    to {
+        opacity: 1;
+        filter: drop-shadow(0 0 12px rgba(251, 146, 60, 1));
+    }
 }
 
 /* Doom snail */
@@ -772,4 +889,107 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
 .eg-nk-ring-crown {
     border-color: rgba(250, 204, 21, 0.95) !important;
     box-shadow: 0 0 34px rgba(250, 204, 21, 0.9), inset 0 0 40px rgba(250,204,21,0.3) !important;
+}
+
+
+
+/* ---- Brutus sacrificial-zombie roaming layer ---- */
+/* Roaming monster cards live outside the static monster panel in a
+   full-screen fixed layer so they can shamble into the ground-slam band.
+   Cards keep their own click/target/bars behaviour; bands (z 9001) draw
+   above them. The layer floats above the monster wrapper (200), floating
+   spawn panels (300) and objectives strip (250/400) so a walking zombie is
+   always the topmost clickable thing under the cursor — the layer itself
+   stays pointer-events: none so only the cards catch clicks. */
+#eg-zombie-layer {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 900;
+}
+#eg-zombie-layer .eg-monster-card-compact {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0;
+    pointer-events: auto;
+    transform-origin: center bottom;
+}
+/* Roaming cards are always hoverable/clickable targets — no dead zone */
+#eg-zombie-layer .eg-monster-card-compact:hover {
+    filter: brightness(1.12);
+}
+.eg-zombie-poof {
+    position: fixed;
+    z-index: 9002;
+    font-size: 20px;
+    pointer-events: none;
+    animation: eg-zombie-poof-kf 0.7s ease-out forwards;
+}
+@keyframes eg-zombie-poof-kf {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-26px) scale(1.6); }
+}
+
+/* ── Feed-haste chip on Brutus's card while sacrificial-feed haste is live ──
+   Row 1: live stack count + total attack-charge bonus (+30% per stack).
+   Row 2: drain bar counting down to the NEXT stack expiry, with the seconds
+   until that drop. Redrawn at 10Hz by the feed-HUD timer, so the bar reads
+   as a smooth countdown. Purely cosmetic — pointer-events none.
+
+   The chip docks on the card's LEFT side, clear of the ▼ TARGET ▼ pill that
+   floats above a targeted boss and clear of the hover tooltip below the
+   emoji frame — it must never be hidden by either. */
+.eg-boss-feed-badge {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 10px);
+    transform: translateY(-50%);
+    z-index: 13;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 66px;
+    box-sizing: border-box;
+    background: rgba(20, 20, 24, 0.92);
+    border: 1px solid rgba(250, 204, 21, 0.8);
+    color: #facc15;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 3px 5px;
+    border-radius: 6px;
+    pointer-events: none;
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.45), inset 0 0 6px rgba(250, 204, 21, 0.12);
+}
+.eg-boss-feed-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+.eg-boss-feed-mult {
+    color: #fde047;
+    opacity: 0.95;
+}
+.eg-boss-feed-track {
+    flex: 1;
+    height: 3px;
+    background: rgba(250, 204, 21, 0.22);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.eg-boss-feed-fill {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #facc15, #fde047);
+    box-shadow: 0 0 6px rgba(250, 204, 21, 0.9);
+}
+.eg-boss-feed-sec {
+    color: #fde68a;
+    font-variant-numeric: tabular-nums;
 }

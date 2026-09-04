@@ -73,7 +73,7 @@ function _egMechFlurry(monster, phase) {
             mark.classList.add('eg-nk-slash-hit');
             if (_egNkCircleHit(sx, sy, radius, _egNkPlayerRect(), 0)) {
                 const dealt = _egNkHit(dmgPct, null, level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Duelist', 'Flurry');
             }
             setTimeout(() => { if (mark) { mark.remove(); mark = null; } }, 300);
             s++;

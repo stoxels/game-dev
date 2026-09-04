@@ -84,10 +84,11 @@ function _egMechBroadsides(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 14) + 'px,' + Math.round(o.y - 14) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkCircleHit(o.x, o.y, 14, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 500;
-                _egNkHit(dmgPct, 'fire', level);
+                const dealt = _egNkHit(dmgPct, 'fire', level);
+                _egNkAbilityHitToast(dealt, 'The Dreadnought', 'Broadsides');
             }
         }
         return fired < volleys || orbs.length > 0;

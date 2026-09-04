@@ -80,7 +80,7 @@ function _egMechSparkPillars(monster, phase) {
                     && pr.right > pl.x - width / 2 && pr.left < pl.x + width / 2) {
                     pl.hitDone = true;
                     const dealt = _egNkHit(dmgPct, 'lightning', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Dynamo', 'Spark Pillars');
                 }
                 if (pl.t >= warnMs + activeMs) {
                     pl.stage = 'done';

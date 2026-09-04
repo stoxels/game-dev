@@ -97,10 +97,10 @@ function _egMechUmbralDashes(monster, phase) {
             dist -= step;
             if (shade) shade.style.transform = 'translate(' + Math.round(sx - 26) + 'px,' + Math.round(sy - 26) + 'px)';
             const pr = _egNkPlayerRect();
-            if (pr && !dashHit && _egNkCircleHit(sx, sy, 30, pr, 0)) {
+            if (pr && !dashHit && _egNkDotHit(shade, pr, 0)) {
                 dashHit = true;
                 const dealt = _egNkHit(dmgPct, 'shadow', level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Eclipse', 'Umbral Dashes');
             }
             if (dist <= 1) {
                 if (shade) { shade.remove(); shade = null; }

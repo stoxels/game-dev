@@ -79,7 +79,7 @@ function _egMechMaelstromVortex(monster, phase) {
             const c = _egNkPlayerCenter();
             if (c && Math.hypot(c.x - cx, c.y - cy) <= novaR) {
                 const dealt = _egNkHit(dmgPct, 'cold', level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Maelstrom', 'Vortex Nova');
             } else {
                 _egNkToast('eg_blast_dodged', '✅ You dodged the blast!', '#4ade80');
             }

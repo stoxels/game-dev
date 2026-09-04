@@ -81,10 +81,11 @@ function _egMechSpiralStorm(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkCircleHit(o.x, o.y, 10, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 450;
-                _egNkHit(dmgPct, 'shadow', level);
+                const dealt = _egNkHit(dmgPct, 'shadow', level);
+                _egNkAbilityHitToast(dealt, 'The Nemesis', 'Spiral Storm');
             }
         }
         return emitted < total || orbs.length > 0;
@@ -133,10 +134,11 @@ function _egMechReaperFans(monster, phase) {
                 continue;
             }
             o.el.style.transform = 'translate(' + Math.round(o.x - 9) + 'px,' + Math.round(o.y - 9) + 'px)';
-            if (!o.hitDone && pr && now >= orbCdUntil && _egNkCircleHit(o.x, o.y, 10, pr, 2)) {
+            if (!o.hitDone && pr && now >= orbCdUntil && _egNkDotHit(o.el, pr, 2)) {
                 o.hitDone = true;
                 orbCdUntil = now + 500;
-                _egNkHit(dmgPct, 'shadow', level);
+                const dealt = _egNkHit(dmgPct, 'shadow', level);
+                _egNkAbilityHitToast(dealt, 'The Nemesis', 'Reaper Fans');
             }
         }
         return fired < volleys || orbs.length > 0;

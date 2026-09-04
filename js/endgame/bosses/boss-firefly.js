@@ -42,7 +42,6 @@ function _egMechFireflyDrift(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = [0, 4, 5, 6][p];
     const speed = [0, 70, 85, 105][p];
-    const radius = 12;
     const dmgPct = [0, 0.04, 0.05, 0.06][p];
     const durMs = 9000;
     const run = _egNkNewRun(monster && monster.id, true);
@@ -70,9 +69,19 @@ function _egMechFireflyDrift(monster, phase) {
                 f.y += (dy / d) * speed * dtS + Math.sin(e / 1000 * 3.1 + f.wob) * 26 * dtS;
             }
             f.el.style.transform = 'translate(' + Math.round(f.x - 12) + 'px,' + Math.round(f.y - 12) + 'px)';
-            if (pr && now >= f.cdUntil && _egNkCircleHit(f.x, f.y, radius, pr, 2)) {
-                f.cdUntil = now + 700;
-                _egNkHit(dmgPct, 'lightning', level);
+            if (pr && now >= f.cdUntil) {
+                // Hit test against the firefly's ACTUAL rendered box instead of
+                // an idealized point-circle: the collision then matches what the
+                // player sees, so a firefly that visibly touches the sprite
+                // always registers (and any CSS motion can't skew the hitbox).
+                const fr = f.el.getBoundingClientRect();
+                if (fr.width > 0 && _egNkRectsOverlap(
+                    { left: fr.left - 2, right: fr.right + 2, top: fr.top - 2, bottom: fr.bottom + 2 },
+                    pr
+                )) {
+                    f.cdUntil = now + 700;
+                    _egNkHit(dmgPct, 'lightning', level);
+                }
             }
         });
         return e < durMs;

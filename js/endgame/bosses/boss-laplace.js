@@ -59,7 +59,10 @@ function _egMechFateRewrite(monster, phase) {
 
     _egRunScreenBlast({
         toastKey: 'eg_mech_fate_rewrite',
+        bossName: "Laplace's Demon",
+        abilityName: 'Rewrite Fate',
         accent: '#c39bd3',
+        tierNorm: _egBossTierNorm(monster),
         activeMs,
         damagePct: 0.32,
         zones: [{ ...first, radius }],

@@ -726,6 +726,33 @@ function _egSpawnPickup() {
     _egSchedulePickupExpiry(key, def);
 }
 
+// Places a healing heart on a random eligible grid cell — used when a
+// sacrificial zombie add is killed by the player. Unlike the ambient
+// spawner this is a direct on-kill reward, so it may sit on the board next
+// to the ambient pickup (total capped at one extra). Returns true when a
+// heart was placed.
+function _egDropHeartPickup() {
+    if (!_egIsActive()) return false;
+    if (typeof _egPickups === 'undefined' || typeof EG_PICKUP_DEFS === 'undefined') return false;
+    if (_egPickups.size >= EG_PICKUP_MAX_ON_BOARD + 1) return false;
+    if (typeof _egBuildPickupEligiblePool !== 'function') return false;
+
+    const pool = _egBuildPickupEligiblePool();
+    const free = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
+    if (free.length === 0) return false;
+
+    const [r, c] = free[Math.floor(Math.random() * free.length)];
+    // Small hearts are the common drop; medium the rarer, bigger heal.
+    const def = Math.random() < 0.65 ? EG_PICKUP_DEFS.heart_small : EG_PICKUP_DEFS.heart_medium;
+    const key = `${r}-${c}`;
+
+    _egPickups.set(key, def);
+    if (typeof _egRenderPickupOverlay === 'function') _egRenderPickupOverlay(r, c, def);
+    if (typeof _egSchedulePickupExpiry === 'function') _egSchedulePickupExpiry(key, def);
+    return true;
+}
+
+
 // Starts the recurring pickup spawn loop.
 function _egStartPickupSpawner() {
     _egScheduleNextPickupSpawn();
@@ -936,6 +963,11 @@ function _egPlaceLootDropForce(item) {
 function _egSpawnLootExplosion(monsterLevel = 1) {
     if (!_egIsActive()) return;
 
+    // Boom opens the cascade — the per-drop pickup blips follow underneath.
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX('loot_explosion');
+    }
+
     const tryScheduleOne = () => {
         // Unlimited stash: always has room
 
@@ -1031,7 +1063,9 @@ function _egCheckLootClaim(row, col) {
         if (item.isUnique) trackAchStat('egUniquesCollected', 1);
     } catch(e){}
 
-    Audio_Manager.playSFX('player_equip_pickup');
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX(item && item.isUnique ? 'item_claim_unique' : 'player_equip_pickup');
+    }
 
     const requiredLevel = item.requirements && item.requirements.level;
     const nameSuffix = (item.category === 'equip' && Number.isFinite(requiredLevel))
@@ -1264,7 +1298,9 @@ function _egCheckCurrencyDropClaim(row, col) {
         _egTrackRunCurrency(def);
     }
 
-    Audio_Manager.playSFX('player_equip_pickup');
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
+        Audio_Manager.playSFX(isEssence ? 'essence_pickup' : 'currency_pickup');
+    }
     if (added) showToast(t('eg_currency_acquired')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name), _egRarityToastColor('currency'));

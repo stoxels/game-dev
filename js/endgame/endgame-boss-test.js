@@ -129,9 +129,45 @@ function _egbtBuildBossTooltipHTML(def, level) {
         <div style="font-size:13px;font-weight:700;color:var(--accent,#c8a84b);margin-bottom:6px;">
             ${def.emoji || '💀'} ${def.name || def.id}
         </div>
-        <div style="font-size:11px;opacity:0.8;margin-bottom:10px;">
+        <div style="font-size:11px;opacity:0.8;margin-bottom:4px;">
             Lv ${level} · ❤️ ${preview.hp.toLocaleString()} · 🗡️ ${preview.dmg} base
         </div>`;
+
+    // Tier line — the boss's atlas tier drives every tier-scaled mechanic
+    // (Corrupt Cells caps/rates, Prior Bomb counts/fuse, Probability Shift
+    // target counts). Shown for every boss so playtesting numbers are
+    // transparent. Unassigned bosses fall back to the tier of their level.
+    let tier = (typeof _egbtBossTier === 'function') ? _egbtBossTier(def.id) : 0;
+    if (tier <= 0 && typeof _egRollMapTier === 'function') {
+        try { tier = _egRollMapTier(level); } catch (e) { tier = 0; }
+    }
+    if (tier > 0) {
+        html += `<div style="font-size:11px;margin-bottom:8px;">
+            <span style="color:#f5d98a;font-weight:700;">${t('eg_boss_test_tier').replace('{n}', tier)}</span>
+            <span style="opacity:0.6;"> · tier-scaled mechanics use these values</span>
+        </div>`;
+    }
+
+    // Corruption caps at this tier (only for bosses using corrupt_cells).
+    // Mirrors the live fight values: cap = P2 spread ceiling / P3 relentless ceiling.
+    if (mechDef.mechanics && mechDef.mechanics.some(m => (m.handler || '').includes('CorruptCells'))) {
+        const norm = (typeof _egBossTierNorm === 'function')
+            ? (() => { try { return _egBossTierNorm({ level }); } catch (e) { return 0.5; } })()
+            : 0.5;
+        const cap2 = (typeof _egCorruptSpreadCap === 'function')
+            ? _egCorruptSpreadCap({ p: 2, norm }) : null;
+        const cap3 = (typeof _egCorruptSpreadCap === 'function')
+            ? _egCorruptSpreadCap({ p: 3, norm }) : null;
+        if (cap2 != null && cap3 != null) {
+            html += `<div style="font-size:11px;margin-bottom:8px;">
+                <span style="color:#7fb8ff;">🧫 Corruption cap:</span>
+                <span style="color:#f87171;"> P2 ${cap2}</span>
+                <span style="opacity:0.6;"> /</span>
+                <span style="color:#f87171;">P3 ${cap3}</span>
+                <span style="opacity:0.6;"> cells</span>
+            </div>`;
+        }
+    }
 
     // Phases
     if (mechDef.phases && mechDef.phases.length > 0) {
@@ -182,7 +218,7 @@ function _egbtBuildBossTooltipHTML(def, level) {
 }
 
 // Test HP boost: scales boss to ~500k max HP while keeping phase thresholds
-// and damage proportional. Returns { hpMult, dmgMult }.
+// and damage unchanged.
 function _egbtCalcTestHPMultiplier(def, level) {
     const preview = _egbtScaledPreview(def, level);
     const targetHP = 500000;
@@ -200,15 +236,24 @@ function _egbtShowTooltip(cardEl, e) {
     if (html) showGameTooltip(html, e);
 }
 
-// Toggles the 500k HP test mode checkbox. Updates the card and button onclick hpMult parameters.
+// Toggles the 500k HP test mode checkbox. Rebinds the card and Fight
+// button handlers so the launch carries the boost (or drops it again on
+// uncheck). Handlers are real functions, not string attributes, so the
+// rebind works identically in every environment.
 function _egbtToggleTestHP(checkbox, bossId, level, hpMult) {
     const card = checkbox.closest('.egbt-boss-card');
     if (!card) return;
     const newHpMult = checkbox.checked ? hpMult : 1;
-    card.onclick = `event.target.closest('button')||_egLaunchBossTest('${bossId}', ${level}, ${newHpMult})`;
+    card.onclick = (ev) => {
+        if (ev.target.closest('button')) return;   // Fight button handles itself
+        _egLaunchBossTest(bossId, level, newHpMult);
+    };
     const btn = card.querySelector('.egbt-fight-btn');
     if (btn) {
-        btn.onclick = `event.stopPropagation(); _egLaunchBossTest('${bossId}', ${level}, ${newHpMult})`;
+        btn.onclick = (ev) => {
+            ev.stopPropagation();
+            _egLaunchBossTest(bossId, level, newHpMult);
+        };
     }
     const statsEl = card.querySelector('.egbt-boss-stats');
     if (statsEl) {
@@ -216,9 +261,69 @@ function _egbtToggleTestHP(checkbox, bossId, level, hpMult) {
         if (def) {
             const p = _egbtScaledPreview(def, level);
             const hp = checkbox.checked ? Math.round(p.hp * hpMult) : p.hp;
-            const dmg = checkbox.checked ? Math.round(p.dmg * hpMult) : p.dmg;
-            statsEl.textContent = `Lv ${level} · ❤️ ${hp} · 🗡️ ${dmg}`;
+            // Test boost only scales HP — damage stays at its normal value.
+            statsEl.textContent = `Lv ${level} · ❤️ ${hp} · 🗡️ ${p.dmg}`;
         }
+    }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------GODMODE DEBUG TOGGLE----------------------------------
+//------------------------------------------------------------------------
+// Proper UI switch for the damage-immune debug flag window._egGodMode
+// (honoured at the top of _egPlayerTakeDamage). Lives in the boss-test
+// settings bar, persists per browser so the state survives screen changes,
+// and a fixed HUD chip shows "GODMODE ON" wherever you are — no console
+// access needed. The chip also guards against accidentally leaving it on
+// during a real map run.
+let _egbtGodModeOn = false;
+
+
+// Applies the flag, persists it, and re-syncs every godmode UI element.
+function _egbtApplyGodMode(on) {
+    _egbtGodModeOn = !!on;
+    window._egGodMode = _egbtGodModeOn;
+    try { localStorage.setItem('_egbtGodMode', _egbtGodModeOn ? '1' : '0'); } catch (e) {}
+    _egbtSyncGodModeUI();
+}
+
+
+// Restores the persisted state (called when the boss-test screen opens and
+// once at script load, so the chip is correct even outside the screen).
+function _egbtInitGodMode() {
+    let on = false;
+    try { on = localStorage.getItem('_egbtGodMode') === '1'; } catch (e) {}
+    _egbtApplyGodMode(on);
+}
+
+
+// Checkbox handler (inline onchange).
+function _egbtToggleGodMode(checkbox) {
+    _egbtApplyGodMode(checkbox && checkbox.checked);
+}
+
+
+// Keeps every godmode UI element in sync: the settings checkbox + state
+// badge on the boss-test screen, and the always-visible in-game chip.
+function _egbtSyncGodModeUI() {
+    const on = _egbtGodModeOn;
+    document.querySelectorAll('.egbt-godmode-checkbox').forEach(cb => { cb.checked = on; });
+    const badge = document.getElementById('egbt-godmode-badge');
+    if (badge) {
+        badge.textContent = on ? t('eg_boss_test_godmode_on') : t('eg_boss_test_godmode_off');
+        badge.classList.toggle('egbt-godmode-on', on);
+    }
+    let chip = document.getElementById('egbt-godmode-chip');
+    if (on) {
+        if (!chip) {
+            chip = document.createElement('div');
+            chip.id = 'egbt-godmode-chip';
+            chip.textContent = '🛡️ ' + t('eg_boss_test_godmode_on');
+            document.body.appendChild(chip);
+        }
+    } else if (chip) {
+        chip.remove();
     }
 }
 
@@ -265,7 +370,8 @@ function _egbtPickArenaGi() {
 
 // Starts a single-boss test fight. Called from a boss card's onclick.
 // Falls back to the boss's tier level when no explicit level is passed.
-// hpMult: optional multiplier to apply to boss HP and damage (e.g., ~500k HP test mode).
+// hpMult: optional multiplier applied to boss max HP only (e.g., ~500k HP
+// test mode). Damage is left at its normal scaled value.
 function _egLaunchBossTest(bossId, level, hpMult) {
     if (typeof EG_BOSS_DEFS === 'undefined' || !EG_BOSS_DEFS[bossId]) return;
 
@@ -315,10 +421,13 @@ function _egLaunchBossTest(bossId, level, hpMult) {
 
     // Spawn the chosen boss straight onto this arena — no extra arena
     // transition. _egMapDef is already `cur` (set by _egResetEncounterState).
-    _egBossPhaseQueue = [{ id: bossId, level: lvl, isBossSpawn: true }];
+    // hpMult rides the queue entry so _egSpawnNextArenaBoss applies the
+    // 500k test boost to the spawned boss (entry.hpMult || 1).
+    _egBossPhaseQueue = [{ id: bossId, level: lvl, hpMult: boost, isBossSpawn: true }];
     _egBossTotalCount = 1;
     _egBossKilledCount = 0;
     _egBossPhaseActive = true;
+
     if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
     if (typeof _egSpawnNextArenaBoss === 'function') _egSpawnNextArenaBoss();
 }
@@ -351,14 +460,12 @@ function _egbtBuildBossCardHTML(def, level) {
     const preview = _egbtScaledPreview(def, level);
     const safeName = String(def.name || def.id).replace(/"/g, '"');
     const hpMult = _egbtCalcTestHPMultiplier(def, level);
-    const boostedHP = Math.round(preview.hp * hpMult);
-    const boostedDmg = Math.round(preview.dmg * hpMult);
     return `
 <div class="egbt-boss-card" data-boss-id="${def.id}" data-boss-level="${level}"
      onmouseenter="_egbtShowTooltip(this, event)"
      onmousemove="moveGameTooltip(event)"
      onmouseleave="hideGameTooltip()"
-     onclick="_egLaunchBossTest('${def.id}', ${level}, ${hpMult})"
+     onclick="_egLaunchBossTest('${def.id}', ${level})"
      title="${safeName}">
     <div class="egbt-boss-emoji">${def.emoji || '💀'}</div>
     <div class="egbt-boss-name">${def.name || def.id}</div>
@@ -374,7 +481,7 @@ function _egbtBuildBossCardHTML(def, level) {
         <span>${t('eg_boss_test_500k_hp')}</span>
     </label>
     <button class="title-btn egbt-fight-btn"
-            onclick="event.stopPropagation(); _egLaunchBossTest('${def.id}', ${level}, ${hpMult})">
+            onclick="event.stopPropagation(); _egLaunchBossTest('${def.id}', ${level})">
         ${t('eg_boss_test_fight')}
     </button>
 </div>`;
@@ -440,6 +547,12 @@ function _egbtBuildFullScreenHTML() {
         <input class="egbt-search" id="egbt-search" type="text"
             placeholder="${t('eg_boss_test_search_placeholder')}"
             oninput="window._egBossTestSearch=this.value;_egbtRenderGrid()">
+        <label class="egbt-godmode-label" title="${t('eg_boss_test_godmode_hint')}">
+            <input type="checkbox" class="egbt-godmode-checkbox"
+                onchange="_egbtToggleGodMode(this)">
+            <span>${t('eg_boss_test_godmode')}</span>
+        </label>
+        <span class="egbt-godmode-badge" id="egbt-godmode-badge"></span>
     </div>
     <div class="egbt-hint">${t('eg_boss_test_hint')}</div>
     <div class="egbt-boss-sections" id="egbt-boss-grid"></div>
@@ -516,6 +629,34 @@ function _egbtEnsureStyles() {
         .egbt-test-hp-label input[type="checkbox"] {
             width: 12px; height: 12px; accent-color: var(--accent, #c8a84b);
         }
+        .egbt-godmode-label {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 10px; cursor: pointer; color: var(--accent2, #ccc); opacity: 0.85;
+        }
+        .egbt-godmode-label input[type="checkbox"] {
+            width: 12px; height: 12px; accent-color: #4ade80;
+        }
+        .egbt-godmode-badge {
+            font-size: 9px; letter-spacing: 1px; padding: 2px 8px;
+            border-radius: 8px; border: 1px solid var(--border2, #444);
+            color: var(--accent2, #888); opacity: 0.6;
+        }
+        .egbt-godmode-badge.egbt-godmode-on {
+            color: #4ade80; border-color: rgba(74, 222, 128, 0.6); opacity: 1;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.35);
+        }
+        #egbt-godmode-chip {
+            position: fixed; top: 10px; right: 12px; z-index: 20000;
+            pointer-events: none; font-size: 11px; letter-spacing: 1px;
+            padding: 6px 12px; border-radius: 6px;
+            background: rgba(6, 40, 22, 0.88); border: 1px solid #4ade80; color: #4ade80;
+            box-shadow: 0 0 14px rgba(74, 222, 128, 0.45);
+            animation: egbt-godmode-chip-pulse 1.4s ease-in-out infinite alternate;
+        }
+        @keyframes egbt-godmode-chip-pulse {
+            from { box-shadow: 0 0 8px rgba(74, 222, 128, 0.35); }
+            to { box-shadow: 0 0 18px rgba(74, 222, 128, 0.7); }
+        }
         .egbt-empty { font-size: 12px; opacity: 0.6; grid-column: 1 / -1; text-align: center; padding: 24px; }
         .egbt-topbar .title-btn, .egbt-fight-btn {
             font-family: var(--PX, monospace);
@@ -580,4 +721,11 @@ function showEndgameBossTest() {
     }
     switchScreen('screen-endgame-boss-test');
     _egbtRenderGrid();
+    // Restore + re-apply the persisted godmode toggle (checkbox, badge, chip).
+    _egbtInitGodMode();
 }
+
+
+// Apply the persisted godmode flag at script load so the HUD chip is correct
+// even before the boss-test screen is ever opened.
+_egbtInitGodMode();

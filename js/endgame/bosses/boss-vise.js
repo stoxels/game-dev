@@ -173,8 +173,8 @@ function _egCrushEnsureLayer(st) {
         document.body.appendChild(label);
         st.labelEl = label;
     }
-    // Position boss: slide-in from the right edge during warning.
-    const warnT = Math.min(1, (performance.now() - st.createdAt) / EG_CRUSH_WARN_MS);
+    // Position boss: slide-in from the right edge during warning (tier-scaled).
+    const warnT = Math.min(1, (performance.now() - st.createdAt) / (st.params.warnMs || EG_CRUSH_WARN_MS));
     const startX = window.innerWidth + 80;
     const bx = startX + (st.bossX - startX) * Math.min(1, warnT * 1.15);
     st.bossEl.style.left = bx + 'px';
@@ -292,15 +292,16 @@ function _egCrushTick(now) {
             st.touchCooldownUntil = now + EG_CRUSH_TOUCH_COOLDOWN_MS;
             st.hitFlashUntil = now + 350;
             const damage = Math.max(1, Math.round(playerMaxHP * st.params.touchPct));
+            const shielded = (typeof _egNkShieldUp === 'function') && _egNkShieldUp();
             const dealt = (typeof _egPlayerTakeDamage === 'function')
-                ? _egPlayerTakeDamage(damage, true, 'lightning', st.monsterLevel) : 0;
+                ? _egPlayerTakeDamage(damage, true, 'lightning', st.monsterLevel, { isBossAbility: true }) : 0;
             if (dealt > 0 && typeof _egApplyPlayerHitFeedback === 'function') {
                 try { _egApplyPlayerHitFeedback(dealt); } catch (e) {}
             }
-            const key = 'eg_crush_hit';
-            const raw = (typeof t === 'function') ? t(key) : '';
-            const msg = (raw && raw !== key) ? raw.replace('{n}', dealt) : `🧱 The walls crush you for ${dealt} HP!`;
-            if (typeof showToast === 'function') showToast(msg, '#f87171');
+            if (typeof _egNkAbilityHitToast === 'function') {
+                _egNkLastHitAbsorbed = shielded && dealt <= 0;
+                _egNkAbilityHitToast(dealt, 'The Vise', 'Crushing Walls');
+            }
         }
 
         // Outside-corridor DoT: compare player center against wall Y at player X.
@@ -319,7 +320,7 @@ function _egCrushTick(now) {
             if (st.dotAcc >= Math.max(1, playerMaxHP * 0.01)) {
                 const tick = Math.floor(st.dotAcc);
                 st.dotAcc -= tick;
-                if (typeof _egPlayerTakeDamage === 'function') _egPlayerTakeDamage(tick, true, 'lightning', st.monsterLevel);
+                if (typeof _egPlayerTakeDamage === 'function') _egPlayerTakeDamage(tick, true, 'lightning', st.monsterLevel, { isBossAbility: true });
             }
             if (now - st.dotToastAt > 2500) {
                 st.dotToastAt = now;
@@ -367,6 +368,19 @@ function _egMechCrushingWalls(monster, phase) {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
 
     const params = _egCrushPhaseParams(phase);
+    // Same difficulty curve as every other dodge mechanic: gentle tiers get
+    // more warning + a slower, longer corridor; brutal tiers compress it.
+    // Speed scales inversely (1/factor) so the wall's time-to-cross matches
+    // the curve. Tier 8 is the anchor — factor 1.0, pre-scaling timing.
+    const crushTimeF = _egBossTierFactor(_egBossTierNorm(monster), EG_NK_TIER_FACTOR);
+    params.warnMs = Math.max(600, Math.round(EG_CRUSH_WARN_MS * crushTimeF));
+    params.speed = Math.max(60, Math.round(params.speed / crushTimeF));
+    params.activeMs = Math.round(params.activeMs * crushTimeF);
+    // Damage companion: wall-touch %maxHP and outside-corridor DoT %/s scale
+    // with tier like every other failed-dodge nk engine (tier 8 anchor ×1.0).
+    const crushDmgF = _egBossTierFactor(_egBossTierNorm(monster), EG_NK_DAMAGE_TIER);
+    params.touchPct = params.touchPct * crushDmgF;
+    params.dotPct = params.dotPct * crushDmgF;
     const bossX = Math.round(window.innerWidth * 0.78);
     const centerBase = Math.round(window.innerHeight * 0.5);
 
@@ -387,7 +401,7 @@ function _egMechCrushingWalls(monster, phase) {
         bossEl: null,
         overlayEl: null,
         labelEl: null,
-        tActive: -EG_CRUSH_WARN_MS, // warning counts down inside the same loop clock
+        tActive: -params.warnMs, // warning counts down inside the same loop clock
         distAcc: 0,
         dotAcc: 0,
         touchCooldownUntil: 0,

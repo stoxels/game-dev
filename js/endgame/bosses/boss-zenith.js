@@ -81,11 +81,11 @@ function _egMechRoyalDecree(monster, phase) {
                 if (blue && moved > moveTol) {
                     judged = true;
                     const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Zenith', 'Royal Decree');
                 } else if (!blue && t >= activeMs && moved < stillTol) {
                     judged = true;
                     const dealt = _egNkHit(dmgPct, null, level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Zenith', 'Royal Decree');
                 }
             }
             if (t >= activeMs + gapMs) {
@@ -141,7 +141,7 @@ function _egMechCrownRings(monster, phase) {
             if (c && now >= cdUntil && Math.abs(dist - rg.r) < bandHalf) {
                 cdUntil = now + 900;
                 const dealt = _egNkHit(dmgPct, null, level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Zenith', 'Crown Rings');
             }
         });
         return pending;

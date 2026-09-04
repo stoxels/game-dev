@@ -430,19 +430,64 @@ const SFX = {
     syla_nature: 'audio/sfx/characters/sfx_syla_nature.mp3',
 
     // --- Endgame ---
+    // ── Endgame: base combat feedback ──────────────
     player_damage_taken: 'audio/sfx/endgame/sfx_player_damage_taken.mp3',
     player_shield_damage_taken: 'audio/sfx/endgame/sfx_player_shield_damage_taken.mp3',
-    player_dodge_attack: 'audio/sfx/endgame/sfx_player_dodge_attack.mp3',
     heart_heals: 'audio/sfx/endgame/sfx_heart_heals.mp3',
     heart_destroyed: 'audio/sfx/endgame/sfx_heart_destroyed.mp3',
-    // Placeholder: reuses the heart heal sound until a dedicated mana
-    // pickup sound is added to audio/
-    mana_pickup: 'audio/sfx/endgame/sfx_heart_heals.mp3',
+    mana_pickup: 'audio/sfx/endgame/sfx_mana_pickup.wav',
     player_equip_pickup: 'audio/sfx/endgame/sfx_player_equip_pickup.mp3',
     player_equip_not_pickup: 'audio/sfx/endgame/sfx_player_equip_not_pickup.mp3',
     player_defeated: 'audio/sfx/endgame/sfx_player_defeated.mp3',
-    // Placeholder: reuses the diagonal strike sound until a dedicated
-    // cleave sweep sound is added to audio/
-    cleave: 'audio/sfx/classes/sfx_diagonal_strike.mp3',
+
+    // ── Endgame: menus & systems ───────────────────
+    vendor_buy: 'audio/sfx/endgame/sfx_vendor_buy.wav',
+    vendor_sell: 'audio/sfx/endgame/sfx_vendor_sell.wav',
+    loot_filter_save: 'audio/sfx/endgame/sfx_loot_filter_save.wav',
+    craft_apply: 'audio/sfx/endgame/sfx_craft_apply.wav',
+
+    // ── Endgame: items & loot ──────────────────────
+    currency_pickup: 'audio/sfx/endgame/sfx_currency_pickup.wav',
+    essence_pickup: 'audio/sfx/endgame/sfx_essence_pickup.wav',
+    map_pickup: 'audio/sfx/endgame/sfx_map_pickup.wav',
+    item_claim_unique: 'audio/sfx/endgame/sfx_item_claim_unique.wav',
+    loot_explosion: 'audio/sfx/endgame/sfx_loot_explosion.wav',
+    level_up: 'audio/sfx/endgame/sfx_level_up.wav',
+
+    // ── Endgame: combat layer ──────────────────────
+    player_block: 'audio/sfx/endgame/sfx_player_block.wav',
+    player_parry: 'audio/sfx/endgame/sfx_player_parry.wav',
+    player_deflect: 'audio/sfx/endgame/sfx_player_deflect.wav',
+    monster_kill: 'audio/sfx/endgame/sfx_monster_kill.wav',
+    monster_swing: 'audio/sfx/endgame/sfx_monster_swing.wav',
+    monster_shoot: 'audio/sfx/endgame/sfx_monster_shoot.wav',
+    hazard_spawn: 'audio/sfx/endgame/sfx_hazard_spawn.wav',
+    ailment_apply: 'audio/sfx/endgame/sfx_ailment_apply.wav',
+    // Elemental ailment variants — chosen per key via _egAilmentSfxKey()
+    ailment_fire: 'audio/sfx/endgame/sfx_ailment_fire.wav',
+    ailment_cold: 'audio/sfx/endgame/sfx_ailment_cold.wav',
+    ailment_lightning: 'audio/sfx/endgame/sfx_ailment_lightning.wav',
+    ailment_shadow: 'audio/sfx/endgame/sfx_ailment_shadow.wav',
+    shadow_veil_lift: 'audio/sfx/endgame/sfx_shadow_veil_lift.wav',
+    puzzle_fire: 'audio/sfx/endgame/sfx_puzzle_fire.wav',
+    puzzle_cold: 'audio/sfx/endgame/sfx_puzzle_cold.wav',
+    puzzle_lightning: 'audio/sfx/endgame/sfx_puzzle_lightning.wav',
+    puzzle_shadow: 'audio/sfx/endgame/sfx_puzzle_shadow.wav',
+    puzzle_arcane: 'audio/sfx/endgame/sfx_puzzle_arcane.wav',
+    puzzle_arcane_blast: 'audio/sfx/endgame/sfx_puzzle_arcane_blast.wav',
+    ailment_arcane: 'audio/sfx/endgame/sfx_ailment_arcane.wav',
+    ailment_dot_tick: 'audio/sfx/endgame/sfx_ailment_dot_tick.wav',
+    ailment_dot_tick_fire: 'audio/sfx/endgame/sfx_ailment_dot_tick_fire.wav',
+    ailment_dot_tick_shadow: 'audio/sfx/endgame/sfx_ailment_dot_tick_shadow.wav',
+    ailment_dot_tick_monster: 'audio/sfx/endgame/sfx_ailment_dot_tick_monster.wav',
+    ailment_dot_end: 'audio/sfx/endgame/sfx_ailment_dot_end.wav',
+    ground_fire_tick: 'audio/sfx/endgame/sfx_ground_fire_tick.wav',
+
+    // ── Endgame: bosses ────────────────────────────
+    boss_roar: 'audio/sfx/endgame/sfx_boss_roar.wav',
+    boss_phase_shift: 'audio/sfx/endgame/sfx_boss_phase_shift.wav',
+    // Dedicated wide-swing sweep for boss cleaves (was a placeholder
+    // reusing the diagonal-strike sound)
+    cleave: 'audio/sfx/endgame/sfx_boss_cleave_sweep.wav',
 
 };

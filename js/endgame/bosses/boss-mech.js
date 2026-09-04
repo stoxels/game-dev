@@ -98,7 +98,7 @@ function _egMechSelfDestruct(monster, phase) {
             }
             if (!covered) {
                 const dealt = _egNkHit(dmgPct, 'fire', level);
-                _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                _egNkAbilityHitToast(dealt, 'The Mech', 'Self-Destruct');
             } else {
                 _egNkToast('eg_blast_dodged', '✅ Cover held!', '#4ade80');
             }

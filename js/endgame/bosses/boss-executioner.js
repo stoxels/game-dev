@@ -68,10 +68,10 @@ function _egMechAxePendulum(monster, phase) {
         const bx = px + Math.sin(a) * armLen;
         const by = py + Math.cos(a) * armLen;
         blade.style.transform = 'translate(' + Math.round(bx - 30) + 'px,' + Math.round(by - 30) + 'px) rotate(' + (a * 2) + 'rad)';
-        if (now >= cdUntil && _egNkCircleHit(bx, by, bladeR, _egNkPlayerRect(), 0)) {
+        if (now >= cdUntil && _egNkDotHit(blade, _egNkPlayerRect(), 0)) {
             cdUntil = now + 1000;
             const dealt = _egNkHit(dmgPct, null, level);
-            _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+            _egNkAbilityHitToast(dealt, 'The Executioner', 'Axe Pendulum');
         }
         return e < durMs;
     });

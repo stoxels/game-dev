@@ -241,9 +241,15 @@ function _egMechVoidSurge(monster, phase) {
 
             if (!survived) {
                 const damage = Math.round(playerMaxHP * EG_VOID_SURGE_DAMAGE_PCT);
-                const dealt = _egPlayerTakeDamage(damage, true);
-                if (dealt > 0) _egApplyPlayerHitFeedback(dealt);
-                showToast(t('eg_void_surge_hit').replace('{n}', dealt));
+                const shielded = (typeof _egNkShieldUp === 'function') && _egNkShieldUp();
+                const dealt = _egPlayerTakeDamage(damage, true, null, null, { isBossAbility: true });
+                if (dealt > 0 && typeof _egApplyPlayerHitFeedback === 'function') {
+                    try { _egApplyPlayerHitFeedback(dealt); } catch (e) {}
+                }
+                if (typeof _egNkAbilityHitToast === 'function') {
+                    _egNkLastHitAbsorbed = shielded && dealt <= 0;
+                    _egNkAbilityHitToast(dealt, 'The Null', 'Void Surge');
+                }
             } else {
                 showToast(t('eg_void_surge_survived'));
             }

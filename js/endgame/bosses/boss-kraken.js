@@ -79,7 +79,7 @@ function _egMechTentacleSweep(monster, phase) {
                     if (_egInfernoPtSegDist(pt[0], pt[1], cx, cy, bx, by) < armHalf + 6) {
                         cdUntil = now + 1000;
                         const dealt = _egNkHit(dmgPct, 'cold', level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Kraken', 'Tentacle Sweep');
                         break;
                     }
                 }

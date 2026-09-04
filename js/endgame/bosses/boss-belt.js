@@ -91,7 +91,7 @@ function _egMechSplitterRocks(monster, phase) {
                     });
                 }
             }
-            if (pr && now >= r.cdUntil && _egNkCircleHit(r.x, r.y, rr, pr, 0)) {
+            if (pr && now >= r.cdUntil && _egNkDotHit(r.el, pr, 0)) {
                 r.cdUntil = now + 800;
                 _egNkHit(r.big ? bigDmg : shardDmg, null, level);
             }

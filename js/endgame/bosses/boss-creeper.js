@@ -82,7 +82,7 @@ function _egMechCreeperStalk(monster, phase) {
                 setTimeout(() => s.el.remove(), 450);
                 if (_egNkCircleHit(s.x, s.y, blastR, _egNkPlayerRect(), 0)) {
                     const dealt = _egNkHit(dmgPct, 'fire', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Creeper', 'Creeper Stalk');
                 }
             }
         });

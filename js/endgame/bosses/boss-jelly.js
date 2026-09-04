@@ -85,7 +85,7 @@ function _egMechJellyHops(monster, phase) {
                 setTimeout(() => h.mark.remove(), 400);
                 if (_egNkCircleHit(h.tx, h.ty, radius, _egNkPlayerRect(), 0)) {
                     const dealt = _egNkHit(dmgPct, 'cold', level);
-                    _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                    _egNkAbilityHitToast(dealt, 'The Jelly', 'Jelly Hops');
                 }
             }
         });

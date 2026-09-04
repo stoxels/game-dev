@@ -65,13 +65,13 @@ function _egMechStrikerBall(monster, phase) {
         b.y = Math.max(radius, Math.min(window.innerHeight - radius, b.y));
         b.el.style.transform = 'translate(' + Math.round(b.x - radius) + 'px,' + Math.round(b.y - radius) + 'px)';
         const c = _egNkPlayerCenter();
-        if (c && now >= cdUntil && _egNkCircleHit(b.x, b.y, radius, _egNkPlayerRect(), 0)) {
+        if (c && now >= cdUntil && _egNkDotHit(b.el, _egNkPlayerRect(), 0)) {
             cdUntil = now + 1000;
             const dx = c.x - b.x, dy = c.y - b.y;
             const d = Math.sqrt(dx * dx + dy * dy) || 1;
             _egNkNudgeAvatar((dx / d) * 220 * dtS * 10, (dy / d) * 220 * dtS * 10);
             const dealt = _egNkHit(dmgPct, null, level);
-            _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+            _egNkAbilityHitToast(dealt, 'The Striker', 'Striker Ball');
         }
         return e < durMs;
     });

@@ -72,10 +72,10 @@ function _egMechDarkHunt(monster, phase) {
             }
         }
         beast.style.transform = 'translate(' + Math.round(b.x - 22) + 'px,' + Math.round(b.y - 22) + 'px)';
-        if (c && now >= cdUntil && _egNkCircleHit(b.x, b.y, radius, pr, 0)) {
+        if (c && now >= cdUntil && _egNkDotHit(beast, pr, 0)) {
             cdUntil = now + 900;
             const dealt = _egNkHit(dmgPct, 'shadow', level);
-            _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+            _egNkAbilityHitToast(dealt, 'The Nightmare', 'Dark Hunt');
         }
         if (pr) _egNkDotTick(run, darkDot, dtS, level, 'shadow');
         return e < durMs;

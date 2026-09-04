@@ -287,7 +287,7 @@ function _egSellStashItem(row, col) {
     egSaveHubState();
 
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('player_equip_pickup');
+        Audio_Manager.playSFX('vendor_sell');
     }
     showToast(t('eg_sell_item_sold')
         .replace('{name}', item.name || '???')
@@ -315,7 +315,7 @@ function _egSellMapItem(map, sourceEl) {
 
     _egClearTooltip();
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('player_equip_pickup');
+        Audio_Manager.playSFX('vendor_sell');
     }
     showToast(t('eg_sell_item_sold')
         .replace('{name}', map.name || '???')

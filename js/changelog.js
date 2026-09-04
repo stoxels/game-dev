@@ -12,9 +12,31 @@
 // just append a pair.
 const CHANGELOG_DATA = [
 
+
+    {
+        version: "0.28 BETA",
+        date: "04.09.2026",
+        changes: [
+
+            {
+                category: ["New Features", "Neue Funktionen"],
+                items: [
+                    ["Thousands of Changes on all parts of the game, too many to list everything. This is a complete rework of the game in preparation of the upcoming second expansion.", "Tausende von Änderungen in allen Bereichen des Spiels, zu viele um sie hier aufzulisten. Dies ist eine komplette Überarbeitung des Spiels als Vorbereitung auf die nächste große Erweiterung."],
+                ],
+
+            },
+
+
+
+        ]
+
+
+    },
+
+
     {
         version: "v0.27 BETA",
-        date: "22.08.2026",
+        date: "03.09.2026",
         changes: [
             {
                 category: ["New Features", "Neue Funktionen"],

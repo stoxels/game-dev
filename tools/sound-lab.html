@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sound Lab — procedural SFX & music demo</title>
+<style>
+    :root {
+        --bg: #10131c;
+        --panel: #1a1f2e;
+        --panel2: #232a3f;
+        --text: #e8ecf5;
+        --muted: #8b93a8;
+        --accent: #6ee7ff;
+        --accent2: #ffd166;
+        --ok: #7be0a3;
+        --bad: #ff7b7b;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        background: radial-gradient(1200px 700px at 50% -10%, #1b2236 0%, var(--bg) 60%);
+        color: var(--text);
+        font-family: "Segoe UI", "Trebuchet MS", system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 28px 20px 60px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    h1 {
+        font-size: 26px;
+        margin: 0 0 4px;
+        letter-spacing: .5px;
+    }
+    h1 .lab { color: var(--accent2); }
+    .subtitle {
+        color: var(--muted);
+        font-size: 13px;
+        margin: 0 0 22px;
+        text-align: center;
+        max-width: 640px;
+        line-height: 1.5;
+    }
+    .note {
+        font-size: 11.5px;
+        color: var(--muted);
+        border: 1px dashed #3a4260;
+        border-radius: 8px;
+        padding: 8px 12px;
+        max-width: 660px;
+        text-align: center;
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+    .panel {
+        background: var(--panel);
+        border: 1px solid #2c3450;
+        border-radius: 14px;
+        padding: 18px;
+        width: min(720px, 100%);
+        margin-bottom: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
+    .panel h2 {
+        margin: 0 0 12px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--accent);
+    }
+    .panel h2.music-h { color: var(--accent2); }
+    .sfx-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 8px;
+    }
+    .btn {
+        font: inherit;
+        color: var(--text);
+        background: var(--panel2);
+        border: 1px solid #39415f;
+        border-radius: 10px;
+        padding: 11px 10px;
+        cursor: pointer;
+        transition: transform .06s ease, background .12s ease, border-color .12s ease;
+        user-select: none;
+    }
+    .btn:hover { background: #2b3350; border-color: var(--accent); }
+    .btn:active { transform: translateY(1px) scale(.98); }
+    .btn.flash { background: #3a4a78; border-color: var(--accent); }
+    .btn .ico { font-size: 17px; display: block; margin-bottom: 3px; }
+    .btn .lbl { font-size: 12.5px; }
+    .music-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+    .music-btn {
+        flex: 1 1 200px;
+    }
+    .music-btn.active { border-color: var(--accent2); box-shadow: 0 0 0 1px var(--accent2) inset; }
+    .music-btn .lbl { font-weight: 600; }
+    .badge {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        margin-left: 6px;
+        vertical-align: middle;
+        background: rgba(255,209,102,.15);
+        color: var(--accent2);
+        border: 1px solid rgba(255,209,102,.35);
+    }
+    .cat-group { margin-top: 16px; }
+    .cat-group:first-child { margin-top: 0; }
+    .cat-head {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--muted);
+        margin: 0 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    .cat-head .cat-count {
+        color: var(--ok);
+        font-size: 10.5px;
+        border: 1px solid rgba(123,224,163,.35);
+        border-radius: 20px;
+        padding: 1px 7px;
+        letter-spacing: .5px;
+    }
+    .vol-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+    }
+    .vol-row label { font-size: 12.5px; color: var(--muted); width: 60px; }
+    input[type=range] { flex: 1; accent-color: var(--accent); }
+    #status {
+        font-size: 12px;
+        color: var(--muted);
+        min-height: 16px;
+        margin-top: 10px;
+        font-family: Consolas, monospace;
+    }
+    .pulse-dot { color: var(--ok); }
+</style>
+</head>
+<body>
+
+<h1>🎛️ Sound <span class="lab">Lab</span></h1>
+<p class="subtitle">
+    Every sound on this page is <b>generated live</b> from pure math — oscillators, noise and envelopes,
+    scheduled through the Web Audio API. No audio files exist anywhere. This is the same technique I can use to
+    create real SFX and music for <b>Freebuff / Stoxels</b>.
+</p>
+<div class="note">
+    🔊 Browsers only allow audio after a click — press any button. The two music loops below are fully synthesized:
+    percussion, bass, pads and melody all come from code. Click a track button again to stop it.
+</div>
+
+<div class="panel">
+    <h2 class="music-h">🎧 Shipped Boss Assets <span class="badge">real .wav files</span></h2>
+    <p class="note" style="margin-bottom:12px;text-align:left;">
+        These buttons play the <b>actual generated files</b> wired into the game:
+        <code>audio/sfx/endgame/sfx_boss_roar.wav</code> and
+        <code>audio/sfx/endgame/sfx_boss_cleave_sweep.wav</code>.
+        The sandboxed preview here cannot serve sibling files, so if a button
+        stays silent just open <code>sound-lab.html</code> directly from disk
+        (double-click it — the buttons then play the real files from
+        <code>audio/</code>), or play the files straight from
+        <code>audio/sfx/endgame/</code>.
+    </p>
+    <div class="music-row">
+        <button class="btn music-btn ship-btn" id="ship-roar">
+            <span class="ico">🗣️</span><span class="lbl">Boss Roar (file)</span>
+        </button>
+        <button class="btn music-btn ship-btn" id="ship-cleave">
+            <span class="ico">⚔️</span><span class="lbl">Cleave Sweep (file)</span>
+        </button>
+        <button class="btn music-btn ship-btn" id="ship-stop">
+            <span class="ico">⏹️</span><span class="lbl">Stop File Audio</span>
+        </button>
+    </div>
+</div>
+
+<div class="panel">
+    <h2>🎬 Endgame SFX Catalog <span class="badge">real .wav files</span></h2>
+    <p class="note" style="margin-bottom:12px;text-align:left;">
+        Every endgame sound effect generated in this audio pass, grouped by use-case.
+        The buttons play the <b>actual files</b> wired into the game
+        (<code>audio/sfx/endgame/*.wav</code>). The sandboxed preview here cannot serve
+        sibling files, so if a button stays silent just open <code>sound-lab.html</code>
+        directly from disk (double-click it) or play the files straight from
+        <code>audio/sfx/endgame/</code>.
+    </p>
+    <div id="endgame-catalog"></div>
+</div>
+
+<div class="panel">
+    <h2>Sound Effects</h2>
+    <div class="sfx-grid" id="sfx-grid"></div>
+</div>
+
+<div class="panel">
+    <h2 class="music-h">Music Loops <span class="badge">synthesized</span></h2>
+    <div class="music-row">
+        <button class="btn music-btn" id="track-boss" title="Dark, driving minor-key loop — endgame boss arena">
+            <span class="ico">👹</span>
+            <span class="lbl">Boss Fight (dark, 140 BPM)</span>
+        </button>
+        <button class="btn music-btn" id="track-bright" title="Bright major-key arpeggio loop — puzzle / overworld">
+            <span class="ico">✨</span>
+            <span class="lbl">Bright World (upbeat, 124 BPM)</span>
+        </button>
+        <button class="btn music-btn" id="track-stop" title="Stop any looping music">
+            <span class="ico">⏹️</span>
+            <span class="lbl">Stop Music</span>
+        </button>
+    </div>
+    <div class="vol-row">
+        <label for="vol">Volume</label>
+        <input type="range" id="vol" min="0" max="100" value="70">
+        <span id="vol-pct" style="width:36px;text-align:right;color:var(--muted);font-size:12px">70%</span>
+    </div>
+    <div id="status"></div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   Tiny synth engine (all procedural — no audio files)
+   ============================================================ */
+
+let ctx = null;
+let master = null;
+
+const MIDI_A4 = 69;
+const mtof = m => 440 * Math.pow(2, (m - MIDI_A4) / 12);
+
+// Pre-built 1s white-noise buffer, reused for all noise-based sounds
+let noiseBuf = null;
+function getNoiseBuffer() {
+    if (noiseBuf) return noiseBuf;
+    const len = ctx.sampleRate;
+    noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    return noiseBuf;
+}
+
+function ensureAudio() {
+    if (!ctx) {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        master = ctx.createGain();
+        master.gain.value = 0.7;
+        const comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = -14;
+        comp.knee.value = 20;
+        comp.ratio.value = 8;
+        comp.attack.value = 0.003;
+        comp.release.value = 0.24;
+        master.connect(comp);
+        comp.connect(ctx.destination);
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+}
+
+// Simple oscillating tone with exponential attack + decay envelope.
+// freq2: optional glide target. lp: optional lowpass cutoff.
+function tone(start, freq, dur, opts = {}) {
+    const { type = 'sine', vol = 0.2, attack = 0.005, freq2 = null, lp = null, lp2 = null } = opts;
+    if (!ctx || dur <= 0) return;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, start);
+    if (freq2 !== null && freq2 > 0) {
+        osc.frequency.exponentialRampToValueAtTime(Math.max(1, freq2), start + dur);
+    }
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), start + attack);
+    const tail = Math.max(0.015, dur - attack);
+    g.gain.setTargetAtTime(0.0001, start + attack, tail / 3.2);
+
+    let node = g;
+    if (lp !== null) {
+        const fl = ctx.createBiquadFilter();
+        fl.type = 'lowpass';
+        fl.Q.value = 0.8;
+        fl.frequency.setValueAtTime(lp, start);
+        if (lp2 !== null) fl.frequency.exponentialRampToValueAtTime(Math.max(30, lp2), start + dur);
+        g.connect(fl);
+        node = fl;
+    }
+    osc.connect(g);
+    node.connect(master);
+    osc.start(start);
+    osc.stop(start + dur + 0.08);
+}
+
+// Filtered noise burst (percussion, explosions, wind…)
+function noise(start, dur, opts = {}) {
+    const { vol = 0.3, filter = 'bandpass', freq = 1000, q = 1, attack = 0.001, freq2 = null } = opts;
+    if (!ctx || dur <= 0) return;
+    const src = ctx.createBufferSource();
+    src.buffer = getNoiseBuffer();
+    src.loop = true;
+    const fl = ctx.createBiquadFilter();
+    fl.type = filter;
+    fl.Q.value = q;
+    fl.frequency.setValueAtTime(freq, start);
+    if (freq2 !== null && freq2 > 0) {
+        fl.frequency.exponentialRampToValueAtTime(Math.max(20, freq2), start + dur);
+    }
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), start + attack);
+    g.gain.setTargetAtTime(0.0001, start + attack, Math.max(0.012, (dur - attack) / 3));
+    src.connect(fl);
+    fl.connect(g);
+    g.connect(master);
+    src.start(start);
+    src.stop(start + dur + 0.05);
+}
+
+/* -------------------- percussion helpers -------------------- */
+
+function kick(start, vol = 0.8) {
+    tone(start, 155, 0.28, { type: 'sine', vol, freq2: 42, attack: 0.001 });
+    noise(start, 0.03, { vol: vol * 0.35, filter: 'lowpass', freq: 900 });
+}
+function snare(start, vol = 0.4) {
+    noise(start, 0.16, { vol, filter: 'highpass', freq: 1500 });
+    tone(start, 210, 0.1, { type: 'triangle', vol: vol * 0.5, freq2: 140 });
+}
+function hat(start, open = false, vol = 0.16) {
+    noise(start, open ? 0.3 : 0.05, { vol, filter: 'highpass', freq: 7600, q: 0.7, attack: 0.0005 });
+}
+
+/* ============================================================
+   Sound effects
+   ============================================================ */
+
+const SFX = {
+    ui_click() {
+        const t = ctx.currentTime;
+        tone(t, 700, 0.07, { type: 'square', vol: 0.10, freq2: 480 });
+    },
+    cell_fill() {
+        const t = ctx.currentTime;
+        [523.25, 659.25, 783.99].forEach((f, i) =>
+            tone(t + i * 0.055, f, 0.28, { type: 'sine', vol: 0.18, attack: 0.004 }));
+    },
+    wrong() {
+        const t = ctx.currentTime;
+        tone(t, 235, 0.32, { type: 'sawtooth', vol: 0.2, freq2: 110, lp: 900, lp2: 220 });
+        tone(t, 118, 0.32, { type: 'square', vol: 0.12, freq2: 58, lp: 500 });
+    },
+    pickup() {
+        const t = ctx.currentTime;
+        [880, 1108.7, 1318.5, 1760].forEach((f, i) =>
+            tone(t + i * 0.045, f, 0.22, { type: 'triangle', vol: 0.14 }));
+        tone(t, 3520, 0.3, { type: 'sine', vol: 0.05 });
+    },
+    laser() {
+        const t = ctx.currentTime;
+        tone(t, 520, 0.22, { type: 'square', vol: 0.13, freq2: 1900, lp: 4200 });
+        tone(t, 260, 0.22, { type: 'sawtooth', vol: 0.06, freq2: 950, lp: 3000 });
+    },
+    explosion() {
+        const t = ctx.currentTime;
+        noise(t, 0.9, { vol: 0.55, filter: 'lowpass', freq: 2600, freq2: 60 });
+        tone(t, 90, 0.7, { type: 'sine', vol: 0.6, freq2: 28, attack: 0.001 });
+    },
+    shield_block() {
+        const t = ctx.currentTime;
+        tone(t, 2600, 0.14, { type: 'triangle', vol: 0.16, lp: 6000 });
+        tone(t, 390, 0.3, { type: 'triangle', vol: 0.12, freq2: 320, attack: 0.003 });
+        noise(t, 0.1, { vol: 0.12, filter: 'highpass', freq: 3000 });
+    },
+    heal() {
+        const t = ctx.currentTime;
+        tone(t, 392, 0.5, { type: 'sine', vol: 0.15, attack: 0.03 });
+        tone(t + 0.22, 587.33, 0.6, { type: 'sine', vol: 0.16, attack: 0.03 });
+        tone(t + 0.44, 783.99, 0.7, { type: 'sine', vol: 0.12, attack: 0.03 });
+    },
+    boss_roar() {
+        const t = ctx.currentTime;
+        // Two detuned saws sliding down through a closing lowpass = monster voice
+        tone(t, 95, 1.5, { type: 'sawtooth', vol: 0.30, freq2: 46, lp: 700, lp2: 90, attack: 0.08 });
+        tone(t, 80.5, 1.5, { type: 'sawtooth', vol: 0.24, freq2: 39, lp: 620, lp2: 80, attack: 0.08 });
+        noise(t, 1.4, { vol: 0.10, filter: 'lowpass', freq: 400, freq2: 60 });
+        tone(t, 34, 1.3, { type: 'sine', vol: 0.5, freq2: 22, attack: 0.05 });
+    },
+    fanfare() {
+        const t = ctx.currentTime;
+        const seq = [[523.25, 0], [659.25, 0.09], [783.99, 0.18], [1046.5, 0.27]];
+        seq.forEach(([f, o]) => tone(t + o, f, 0.4, { type: 'square', vol: 0.09 }));
+        tone(t + 0.36, 1318.5, 0.7, { type: 'triangle', vol: 0.2, attack: 0.005 });
+        tone(t + 0.36, 659.25, 0.7, { type: 'sine', vol: 0.12 });
+        noise(t + 0.36, 0.5, { vol: 0.05, filter: 'highpass', freq: 6500 });
+    },
+    win_jingle() {
+        const t = ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5];
+        notes.forEach((f, i) => tone(t + i * 0.13, f, i === notes.length - 1 ? 0.9 : 0.2,
+            { type: 'triangle', vol: i === notes.length - 1 ? 0.22 : 0.16, attack: 0.006 }));
+        tone(t + notes.length * 0.13, 2093, 0.5, { type: 'sine', vol: 0.06 });
+    },
+};
+
+/* ============================================================
+   Music: two looping tracks, fully data-driven
+   ============================================================ */
+
+let activeTrack = null;
+let schedTimer = null;
+
+function stopMusic() {
+    activeTrack = null;
+    if (schedTimer) { clearTimeout(schedTimer); schedTimer = null; }
+    setStatus('music stopped');
+}
+
+// Each track: { bpm, beats (loop length in beats), events: [ {b, ...} ] } where b = start beat
+// Built once at load, then scheduled with a self-correcting loop.
+
+function buildBossTrack() {
+    const bpm = 140, spb = 60 / bpm;
+    const events = [];
+
+    // Drone + driving pulse
+    for (let bar = 0; bar < 8; bar++) {
+        const b0 = bar * 4;
+        // heavy downbeat root
+        events.push({ b: b0, kind: 'tone', f: mtof(33), d: 0.5, type: 'sawtooth', v: 0.28, lp: 500, lp2: 120 });
+        // pumping eighth-note pulse on the root octave
+        for (let e = 0; e < 8; e++) {
+            const b = b0 + e * 0.5;
+            events.push({ b, kind: 'tone', f: e % 2 === 0 ? mtof(45) : mtof(33), d: 0.19,
+                type: 'triangle', v: 0.15 });
+        }
+        // drums
+        for (let beat = 0; beat < 4; beat++) {
+            events.push({ b: b0 + beat, kind: 'kick', v: beat === 0 ? 0.85 : 0.6 });
+        }
+        events.push({ b: b0 + 1, kind: 'snare', v: 0.42 });
+        events.push({ b: b0 + 3, kind: 'snare', v: 0.42 });
+        for (let e = 0; e < 8; e++) {
+            const b = b0 + e * 0.5;
+            events.push({ b, kind: 'hat', open: e === 7, v: 0.12 });
+        }
+        // low ominous pad (root + fifth, very quiet)
+        events.push({ b: b0, kind: 'pad', f: mtof(45), d: 3.8, v: 0.045, attack: 0.5 });
+        events.push({ b: b0, kind: 'pad', f: mtof(52), d: 3.8, v: 0.035, attack: 0.5 });
+    }
+
+    // Lead — dark A-minor figure with a chromatic crawl, 2×8 bars (second pass +1 octave)
+    const phrase = [
+        [69, 0, 0.5], [72, 0.5, 0.5], [71, 1, 0.5], [69, 1.5, 0.5],     // A C B A
+        [67, 2, 1], [64, 3, 1],                                          // G E
+        [65, 4, 0.5], [67, 4.5, 0.5], [69, 5, 1], [71, 6, 0.5], [72, 6.5, 0.5], // F G A B C
+        [71, 7, 1],                                                      // B
+        [69, 8, 0.5], [70, 8.5, 0.5], [72, 9, 1], [71, 10, 0.5], [69, 10.5, 0.5], // A A# C B A  (chromatic menace)
+        [67, 11, 1], [64, 12, 0.5], [62, 12.5, 0.5], [64, 13, 0.5], [65, 13.5, 0.5], [67, 14, 2], // D…E
+    ];
+    for (let pass = 0; pass < 2; pass++) {
+        const octave = pass === 0 ? 0 : 12;
+        for (const [midi, b, d] of phrase) {
+            events.push({ b: b + pass * 16, kind: 'lead', f: mtof(midi + octave), d,
+                v: pass === 0 ? 0.12 : 0.085, type: pass === 0 ? 'square' : 'triangle' });
+        }
+    }
+
+    return {
+        name: 'Boss Fight (dark, 140 BPM)',
+        bpm, beats: 32,
+        build(b0) {
+            for (const ev of events) {
+                const t = b0 + ev.b * spb;
+                switch (ev.kind) {
+                    case 'tone': tone(t, ev.f, ev.d, { type: ev.type, vol: ev.v, lp: ev.lp, lp2: ev.lp2 }); break;
+                    case 'pad': tone(t, ev.f, ev.d, { type: 'sine', vol: ev.v, attack: ev.attack }); break;
+                    case 'lead': tone(t, ev.f, ev.d * spb, { type: ev.type, vol: ev.v }); break;
+                    case 'kick': kick(t, ev.v); break;
+                    case 'snare': snare(t, ev.v); break;
+                    case 'hat': hat(t, ev.open, ev.v); break;
+                }
+            }
+        },
+    };
+}
+
+function buildBrightTrack() {
+    const bpm = 124, spb = 60 / bpm;
+    const events = [];
+
+    // Chord progression C — G — Am — F, arpeggiated in 8ths
+    const chords = [
+        { root: 36, tones: [24, 28, 31, 36] },   // C
+        { root: 31, tones: [28, 31, 35, 38] },   // G  (B over G)
+        { root: 33, tones: [24, 27, 31, 36] },   // Am (A C E A)
+        { root: 29, tones: [28, 32, 35, 40] },   // F  (F A C F)
+    ];
+    const arpOrder = [0, 1, 2, 3, 2, 1, 2, 3];
+
+    for (let bar = 0; bar < 4; bar++) {
+        const b0 = bar * 4;
+        const chord = chords[bar];
+        const rootFreq = mtof(chord.root);
+        // bass: root pulse, heavier on the downbeat
+        events.push({ b: b0, kind: 'tone', f: rootFreq, d: 0.55, type: 'sine', v: 0.42, attack: 0.006 });
+        events.push({ b: b0 + 2, kind: 'tone', f: rootFreq, d: 0.4, type: 'triangle', v: 0.16 });
+        for (let e = 0; e < 8; e++) {
+            const i = arpOrder[e];
+            events.push({ b: b0 + e * 0.5, kind: 'tone',
+                f: mtof(chord.root + chord.tones[i]), d: 0.3, type: 'triangle',
+                v: i === 3 ? 0.15 : 0.11, attack: 0.003 });
+        }
+        // sparkle at the top of each bar
+        events.push({ b: b0 + 3.5, kind: 'tone', f: mtof(chord.root + chord.tones[3] + 12),
+            d: 0.35, type: 'sine', v: 0.05 });
+        // light percussion
+        events.push({ b: b0, kind: 'kick', v: 0.55 });
+        events.push({ b: b0 + 2, kind: 'kick', v: 0.4 });
+        events.push({ b: b0 + 1, kind: 'hat', v: 0.06 });
+        events.push({ b: b0 + 2.5, kind: 'hat', open: true, v: 0.07 });
+        events.push({ b: b0 + 3, kind: 'hat', v: 0.06 });
+        // soft shaker on offbeats
+        for (let e = 1; e < 8; e += 2) {
+            events.push({ b: b0 + e * 0.5, kind: 'shaker', v: 0.05 });
+        }
+    }
+
+    return {
+        name: 'Bright World (upbeat, 124 BPM)',
+        bpm, beats: 16,
+        build(b0) {
+            for (const ev of events) {
+                const t = b0 + ev.b * spb;
+                switch (ev.kind) {
+                    case 'tone': tone(t, ev.f, ev.d, { type: ev.type, vol: ev.v, attack: ev.attack }); break;
+                    case 'kick': kick(t, ev.v); break;
+                    case 'hat': hat(t, ev.open, ev.v); break;
+                    case 'shaker': noise(t, 0.05, { vol: ev.v, filter: 'highpass', freq: 6800 }); break;
+                }
+            }
+        },
+    };
+}
+
+const TRACKS = { boss: buildBossTrack(), bright: buildBrightTrack() };
+
+function playTrack(key) {
+    ensureAudio();
+    stopMusic();
+    const track = TRACKS[key];
+    if (!track) return;
+    activeTrack = key;
+    setStatus('▶ ' + track.name + ' — looping…');
+
+    function scheduleLoop() {
+        if (activeTrack !== key) return;
+        const b0 = ctx.currentTime + 0.12;             // schedule slightly ahead
+        track.build(b0);
+        const waitMs = Math.max(80, (b0 + track.beats * 60 / track.bpm - ctx.currentTime) * 1000 - 40);
+        schedTimer = setTimeout(scheduleLoop, waitMs);
+    }
+    scheduleLoop();
+}
+
+/* ============================================================
+   UI wiring
+   ============================================================ */
+
+const SFX_DEFS = [
+    { key: 'ui_click',   ico: '🖱️', lbl: 'UI Click' },
+    { key: 'cell_fill',  ico: '✅', lbl: 'Cell Fill (correct)' },
+    { key: 'wrong',      ico: '❌', lbl: 'Wrong Cell (buzz)' },
+    { key: 'pickup',     ico: '💎', lbl: 'Pickup Sparkle' },
+    { key: 'laser',      ico: '🔫', lbl: 'Laser / Shot' },
+    { key: 'explosion',  ico: '💥', lbl: 'Explosion' },
+    { key: 'shield_block', ico: '🛡️', lbl: 'Shield Block' },
+    { key: 'heal',       ico: '💚', lbl: 'Heal' },
+    { key: 'boss_roar',  ico: '👹', lbl: 'Boss Roar' },
+    { key: 'fanfare',    ico: '🏆', lbl: 'Achievement Fanfare' },
+    { key: 'win_jingle', ico: '🎉', lbl: 'Win Jingle' },
+];
+
+function flash(btn) {
+    btn.classList.add('flash');
+    setTimeout(() => btn.classList.remove('flash'), 140);
+}
+
+function makeSfxButtons() {
+    const grid = document.getElementById('sfx-grid');
+    for (const def of SFX_DEFS) {
+        const b = document.createElement('button');
+        b.className = 'btn';
+        b.innerHTML = `<span class="ico">${def.ico}</span><span class="lbl">${def.lbl}</span>`;
+        b.addEventListener('click', () => {
+            ensureAudio();
+            flash(b);
+            try { SFX[def.key](); } catch (e) { console.error(e); }
+        });
+        grid.appendChild(b);
+    }
+}
+
+function setStatus(text) {
+    document.getElementById('status').textContent = text;
+}
+
+function highlightTrack(key) {
+    for (const k of ['boss', 'bright', 'stop']) {
+        document.getElementById('track-' + k).classList.toggle('active', k === key);
+    }
+}
+
+document.getElementById('track-boss').addEventListener('click', () => {
+    playTrack('boss');
+    highlightTrack('boss');
+});
+document.getElementById('track-bright').addEventListener('click', () => {
+    playTrack('bright');
+    highlightTrack('bright');
+});
+document.getElementById('track-stop').addEventListener('click', () => {
+    stopMusic();
+    highlightTrack('stop');
+});
+
+const vol = document.getElementById('vol');
+vol.addEventListener('input', () => {
+    document.getElementById('vol-pct').textContent = vol.value + '%';
+    ensureAudio();
+    master.gain.value = vol.value / 100;
+    // mirror into the shipped-file players
+    for (const k in shipAudios) shipAudios[k].volume = vol.value / 100;
+    if (typeof catalogAudios !== 'undefined') {
+        for (const k in catalogAudios) catalogAudios[k].volume = vol.value / 100;
+    }
+});
+
+/* -------------------- shipped-file audition players -------------------- */
+const shipAudios = {
+    roar:   new Audio('../audio/sfx/endgame/sfx_boss_roar.wav'),
+    cleave: new Audio('../audio/sfx/endgame/sfx_boss_cleave_sweep.wav'),
+};
+let shipPlaying = null;
+
+for (const k in shipAudios) shipAudios[k].volume = vol.value / 100;
+
+function playShip(key) {
+    ensureAudio();
+    if (shipPlaying) { shipPlaying.pause(); shipPlaying.currentTime = 0; }
+    const a = shipAudios[key];
+    a.currentTime = 0;
+    const p = a.play();
+    if (p) p.catch(() => { });
+    shipPlaying = a;
+    if (a.readyState === 0 || a.error) {
+        setStatus('⚠ file unreachable in this preview — open sound-lab.html from disk, or play the files in audio/ directly');
+    } else {
+        setStatus('▶ playing shipped file: ' + key);
+    }
+}
+function stopShip() {
+    if (shipPlaying) { shipPlaying.pause(); shipPlaying.currentTime = 0; shipPlaying = null; }
+    setStatus('file audio stopped');
+}
+
+document.getElementById('ship-roar').addEventListener('click', () => playShip('roar'));
+document.getElementById('ship-cleave').addEventListener('click', () => playShip('cleave'));
+document.getElementById('ship-stop').addEventListener('click', stopShip);
+
+/* -------------------- full endgame SFX catalog (shipped files) -------------------- */
+
+// Every generated endgame sound, grouped by use-case. Keys map directly onto
+// audio/sfx/endgame/sfx_<key>.wav. Built as <Audio> objects so the Volume
+// slider and the in-game mix behave identically.
+const SHIPPED_SFX = [
+    { group: 'Menus & Systems', ico: '🎛️', items: [
+        { key: 'vendor_buy', ico: '💰', lbl: 'Vendor buy' },
+        { key: 'vendor_sell', ico: '🪙', lbl: 'Vendor sell' },
+        { key: 'loot_filter_save', ico: '🧹', lbl: 'Loot filter apply' },
+        { key: 'craft_apply', ico: '🛠️', lbl: 'Craft apply' },
+    ]},
+    { group: 'Items & Loot', ico: '💎', items: [
+        { key: 'mana_pickup', ico: '💧', lbl: 'Mana pickup' },
+        { key: 'currency_pickup', ico: '🪙', lbl: 'Currency pickup' },
+        { key: 'essence_pickup', ico: '✨', lbl: 'Essence pickup' },
+        { key: 'map_pickup', ico: '🗺️', lbl: 'Map pickup' },
+        { key: 'item_claim_unique', ico: '🏆', lbl: 'Unique claim' },
+        { key: 'loot_explosion', ico: '💥', lbl: 'Loot explosion' },
+        { key: 'level_up', ico: '⬆️', lbl: 'Level up' },
+    ]},
+    { group: 'Combat', ico: '⚔️', items: [
+        { key: 'player_block', ico: '🛡️', lbl: 'Player block' },
+        { key: 'player_parry', ico: '⚔️', lbl: 'Player parry' },
+        { key: 'player_deflect', ico: '🌀', lbl: 'Player deflect' },
+        { key: 'monster_kill', ico: '☠️', lbl: 'Monster kill' },
+        { key: 'monster_swing', ico: '👊', lbl: 'Monster swing' },
+        { key: 'monster_shoot', ico: '🔫', lbl: 'Monster shoot' },
+        { key: 'hazard_spawn', ico: '⚠️', lbl: 'Hazard spawn' },
+    ]},
+    { group: 'Ailments & DoT', ico: '🔥', items: [
+        { key: 'ailment_fire', ico: '🔥', lbl: 'Ailment: fire' },
+        { key: 'ailment_cold', ico: '❄️', lbl: 'Ailment: cold' },
+        { key: 'ailment_lightning', ico: '⚡', lbl: 'Ailment: lightning' },
+        { key: 'ailment_shadow', ico: '🌑', lbl: 'Ailment: shadow' },
+        { key: 'ailment_arcane', ico: '🌀', lbl: 'Ailment: arcane' },
+        { key: 'ailment_apply', ico: '💊', lbl: 'Ailment apply (generic)' },
+        { key: 'ailment_dot_tick', ico: '🕐', lbl: 'DoT tick (generic)' },
+        { key: 'ailment_dot_tick_fire', ico: '🔥', lbl: 'DoT tick: ignite' },
+        { key: 'ailment_dot_tick_shadow', ico: '🌑', lbl: 'DoT tick: shadowburn' },
+        { key: 'ailment_dot_tick_monster', ico: '👾', lbl: 'DoT tick: monster drain' },
+        { key: 'ailment_dot_end', ico: '🛌', lbl: 'DoT end (all clear)' },
+        { key: 'ground_fire_tick', ico: '🔥', lbl: 'Ground fire tick' },
+        { key: 'shadow_veil_lift', ico: '🌅', lbl: 'Shadow veil lift' },
+    ]},
+    { group: 'Puzzle Corruption', ico: '🧩', items: [
+        { key: 'puzzle_fire', ico: '🌋', lbl: 'Lava scorch' },
+        { key: 'puzzle_cold', ico: '🧊', lbl: 'Ice spread' },
+        { key: 'puzzle_lightning', ico: '⚡', lbl: 'Shocked cursor' },
+        { key: 'puzzle_shadow', ico: '🌑', lbl: 'Clue blackout' },
+        { key: 'puzzle_arcane', ico: '🔮', lbl: 'Arcane bomb (planted)' },
+        { key: 'puzzle_arcane_blast', ico: '💥', lbl: 'Arcane bomb blast' },
+    ]},
+    { group: 'Boss', ico: '👹', items: [
+        { key: 'boss_phase_shift', ico: '📈', lbl: 'Phase shift (rising horn)' },
+        { key: 'boss_roar', ico: '👹', lbl: 'Boss roar' },
+        { key: 'boss_cleave_sweep', ico: '⚔️', lbl: 'Cleave sweep' },
+    ]},
+];
+
+const catalogAudios = {};
+for (const grp of SHIPPED_SFX) {
+    for (const it of grp.items) {
+        catalogAudios[it.key] = new Audio('../audio/sfx/endgame/sfx_' + it.key + '.wav');
+        catalogAudios[it.key].volume = vol.value / 100;
+    }
+}
+
+function playCatalog(key) {
+    ensureAudio();
+    if (shipPlaying) { shipPlaying.pause(); shipPlaying.currentTime = 0; shipPlaying = null; }
+    const a = catalogAudios[key];
+    a.currentTime = 0;
+    const p = a.play();
+    if (p) p.catch(() => { });
+    if (a.readyState === 0 || a.error) {
+        setStatus('⚠ file unreachable in this preview — open sound-lab.html from disk, or play the files in audio/sfx/endgame/ directly');
+    } else {
+        setStatus('▶ playing endgame SFX: ' + key);
+    }
+}
+
+function buildCatalogPanel() {
+    const wrap = document.getElementById('endgame-catalog');
+    for (const grp of SHIPPED_SFX) {
+        const head = document.createElement('div');
+        head.className = 'cat-head';
+        head.innerHTML = `<span>${grp.ico} ${grp.group}</span><span class="cat-count">${grp.items.length}</span>`;
+        wrap.appendChild(head);
+        const grid = document.createElement('div');
+        grid.className = 'sfx-grid';
+        for (const it of grp.items) {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerHTML = `<span class="ico">${it.ico}</span><span class="lbl">${it.lbl}</span>`;
+            b.addEventListener('click', () => {
+                ensureAudio();
+                flash(b);
+                playCatalog(it.key);
+            });
+            grid.appendChild(b);
+        }
+        wrap.appendChild(grid);
+    }
+}
+
+buildCatalogPanel();
+makeSfxButtons();
+setStatus('ready — click any sound to start audio');
+</script>
+</body>
+</html>

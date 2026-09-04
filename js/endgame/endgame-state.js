@@ -29,7 +29,7 @@ let _egExpireCountdownEntries = []; // { overlayId, lifetimeMs, startedAt, expir
 // ── Boss state ───────────────────────────────────────────────────────────────
 let _egBossTimers = {};      // monsterId → array of mechanic timer handles
 let _egBossCorrupted = new Map(); // key:"row-col" → { timer } for Corrupt Cells
-let _egBossFrozen = new Map();    // key:"row-col" → { timer } for Frozen Cells
+let _egBossFrozen = new Map();    // key:"row-col" → { thawTimer, creepTimer, pending, cfg } for Frozen Cells
 
 // ── Loot drop state ──────────────────────────────────────────────────────────
 // Active loot drops on the grid: key "row-col" → item object
@@ -43,7 +43,7 @@ let _egVeilActive = false;   // true while the Grid Veil overlay is showing
 let _egBlackoutActive = false;  // true while the Clue Blackout is active
 
 let _egClueSwapRestoreTimer = null;  // pending restore for the Clue Swap mechanic
-let _egActiveClueSwap = null;        // [rowA, rowB] while a Clue Swap is active
+let _egActiveClueSwap = null;        // { groups:[{rows,spans,orig}] } while a Clue Swap is active
 let _egGridInvertTimer = null;       // pending removal of the Inversion Field filter
 
 let _egVoidSurgeActive = false;  // true while a Void Surge safe-zone is on screen

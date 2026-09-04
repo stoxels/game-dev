@@ -82,7 +82,7 @@ function _egMechScarletBloom(monster, phase) {
                     b.mark.classList.add('eg-nk-mark-hit');
                     if (_egNkCircleHit(b.x, b.y, radius, pr, 0)) {
                         const dealt = _egNkHit(dmgPct, 'fire', level);
-                        _egNkToast('eg_blast_hit', '💥 The blast hits you for ' + dealt + ' HP!', '#f87171');
+                        _egNkAbilityHitToast(dealt, 'The Bloom', 'Scarlet Bloom');
                     }
                     const rot = _egNkEl(run, 'div', 'eg-nk-rot');
                     rot.style.width = radius * 2 + 'px';

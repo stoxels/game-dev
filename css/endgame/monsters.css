@@ -1059,6 +1059,66 @@
     }
 }
 
+/* ── Corrupt Spread Telegraph ────────────────────── */
+/* Ghosted 🚫 pulsing on the target before spreading corruption lands there */
+.eg-corrupt-telegraph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    background: rgba(220, 38, 38, 0.15);
+    border: 2px dashed #dc2626;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 6;
+    animation: eg-corrupt-telegraph-pulse 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes eg-corrupt-telegraph-pulse {
+    from {
+        opacity: 0.3;
+        background: rgba(220, 38, 38, 0.08);
+    }
+
+    to {
+        opacity: 0.95;
+        background: rgba(220, 38, 38, 0.4);
+        border-color: #fca5a5;
+    }
+}
+
+/* ── Frozen Creep Telegraph ───────────────────────── */
+/* Ghosted ❄️ pulsing on the target before a creeping frost lands (P2+) */
+.eg-freeze-telegraph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    background: rgba(56, 189, 248, 0.15);
+    border: 2px dashed #38bdf8;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 6;
+    animation: eg-freeze-telegraph-pulse 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes eg-freeze-telegraph-pulse {
+    from {
+        opacity: 0.3;
+        background: rgba(56, 189, 248, 0.08);
+    }
+
+    to {
+        opacity: 0.95;
+        background: rgba(56, 189, 248, 0.45);
+        border-color: #bae6fd;
+    }
+}
+
 /* ── Frozen Cell Overlay ─────────────────────────── */
 .eg-freeze-overlay {
     position: absolute;
@@ -1084,6 +1144,133 @@
     to {
         background: rgba(56, 189, 248, 0.55);
         border-color: #bae6fd;
+    }
+}
+
+/* ── Prior Bomb Overlay (countdown above the icon) ── */
+/* A live 💣 bomb sits on a filled cell with its detonation countdown ABOVE
+   the icon. Standing the player sprite on the bomb pauses the fuse and
+   fills the green defuse strip — hold for 3s to disarm it. */
+.eg-prior-bomb-fuse {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 6;
+    background: rgba(139, 92, 246, 0.35);
+    border: 2px solid #8b5cf6;
+    border-radius: 3px;
+    animation: eg-prior-bomb-fuse-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes eg-prior-bomb-fuse-pulse {
+    from {
+        background: rgba(139, 92, 246, 0.25);
+        border-color: #8b5cf6;
+        transform: scale(0.95);
+    }
+
+    to {
+        background: rgba(139, 92, 246, 0.65);
+        border-color: #f0abfc;
+        transform: scale(1.06);
+    }
+}
+
+.eg-prior-bomb-fuse .eg-pb-icon {
+    font-size: 0.8em;
+    filter: drop-shadow(0 0 3px rgba(240, 171, 252, 0.95));
+}
+
+/* Detonation countdown, rendered above the icon */
+.eg-prior-bomb-fuse .eg-pb-cd {
+    font-size: 0.55em;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 0 2px #000, 0 0 4px #000;
+}
+
+/* Last 3s before detonation: urgent blink */
+.eg-prior-bomb-fuse .eg-pb-cd.eg-pb-critical {
+    color: #fca5a5;
+    animation: eg-pb-cd-blink 0.3s steps(2) infinite;
+}
+
+@keyframes eg-pb-cd-blink {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.4;
+    }
+}
+
+/* Defuse progress strip along the bottom of the bomb */
+.eg-prior-bomb-fuse .eg-pb-defuse {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.22);
+    display: none;
+    overflow: hidden;
+}
+
+.eg-prior-bomb-fuse .eg-pb-defuse i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: #4ade80;
+    transition: width 0.1s linear;
+}
+
+/* Player standing on the bomb: fuse paused, defusing in progress */
+.eg-prior-bomb-fuse.eg-pb-defusing {
+    animation: none;
+    background: rgba(16, 185, 129, 0.45);
+    border-color: #34d399;
+}
+
+.eg-prior-bomb-fuse.eg-pb-defusing .eg-pb-cd {
+    color: #bbf7d0;
+}
+
+/* Bomb successfully defused — brief green flash, the fill survives */
+.eg-pb-defused {
+    animation: eg-pb-defused-flash 1s ease-out forwards !important;
+}
+
+@keyframes eg-pb-defused-flash {
+    0% {
+        box-shadow: inset 0 0 0 3px #4ade80, 0 0 16px rgba(74, 222, 128, 0.95);
+    }
+
+    100% {
+        box-shadow: none;
+    }
+}
+
+/* ── Shifted Mark Glow (Probability Shift P2+) ──── */
+/* Brief golden halo on marks the boss just relocated so the shuffle is readable */
+.eg-shift-moved {
+    animation: eg-shift-glow 1.6s ease-out forwards;
+}
+
+@keyframes eg-shift-glow {
+    0% {
+        box-shadow: inset 0 0 0 2px #fbbf24, 0 0 14px rgba(251, 191, 36, 0.9);
+    }
+
+    100% {
+        box-shadow: inset 0 0 0 2px #fbbf24, 0 0 3px rgba(251, 191, 36, 0.25);
     }
 }
 
@@ -1422,6 +1609,147 @@
     background: rgba(239, 68, 68, 0.25);
     box-shadow: 0 0 50px rgba(239, 68, 68, 0.9);
     animation: none;
+}
+
+/* Bright flash on the warning → active boundary — "the blast is live NOW" */
+.eg-blast-overlay.eg-blast-impact {
+    background: rgba(255, 246, 224, 0.92);
+    transition: none;
+}
+
+/* Impact beat: a short, subtle whole-body shake so the blast going live
+   is felt as well as seen. The JS engine re-triggers .eg-screen-shake,
+   so the animation always restarts cleanly from its 0% keyframe. */
+.eg-screen-shake {
+    animation: eg-screen-shake 0.5s ease-out;
+}
+
+@keyframes eg-screen-shake {
+    0%   { transform: translate(0, 0); }
+    10%  { transform: translate(-6px, 4px); }
+    25%  { transform: translate(5px, -5px); }
+    42%  { transform: translate(-4px, -2px); }
+    60%  { transform: translate(3px, 2px); }
+    78%  { transform: translate(-2px, 1px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* Final seconds of the hold window: countdown turns red */
+.eg-blast-countdown.eg-blast-urgent {
+    color: #ff5a5a !important;
+    text-shadow: 0 0 14px rgba(255, 60, 60, 0.95), 0 2px 4px rgba(0, 0, 0, 0.9) !important;
+    animation: eg-blast-urgent-pulse 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes eg-blast-urgent-pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.18); }
+}
+
+/* Player outside during the final seconds: zone border flashes red/white */
+.eg-blast-circle.eg-blast-lastcall {
+    animation: eg-blast-lastcall-pulse 0.22s ease-in-out infinite alternate;
+}
+
+@keyframes eg-blast-lastcall-pulse {
+    from {
+        border-color: #ffffff !important;
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.8), inset 0 0 14px rgba(255, 255, 255, 0.25);
+    }
+
+    to {
+        border-color: #ff4444 !important;
+        box-shadow: 0 0 44px rgba(255, 70, 70, 1), inset 0 0 20px rgba(255, 70, 70, 0.4);
+    }
+}
+
+/* Rewrite Fate: the destination ghost "charges" right before the jump */
+.eg-blast-ghost.eg-blast-ghost-charge {
+    border-style: solid;
+    opacity: 1;
+    box-shadow: 0 0 30px var(--blast-accent, #ffd93c), inset 0 0 18px var(--blast-accent, #ffd93c);
+    animation: eg-blast-ghost-charge-pulse 0.15s ease-in-out infinite alternate;
+}
+
+@keyframes eg-blast-ghost-charge-pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.12); }
+}
+
+/* Bottom status line (crush-walls idiom) — hidden until the engine paints it */
+.eg-blast-status {
+    position: fixed;
+    left: 50%;
+    bottom: clamp(96px, 14vh, 180px);
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 9003;
+    font-size: 1.45rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    padding: 8px 20px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+    transition: opacity 0.15s ease;
+}
+
+.eg-blast-status-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.eg-blast-status-ok {
+    color: #4ade80;
+    border-color: rgba(74, 222, 128, 0.5);
+    box-shadow: 0 0 22px rgba(74, 222, 128, 0.45);
+}
+
+.eg-blast-status-warn {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.55);
+    box-shadow: 0 0 22px rgba(251, 191, 36, 0.45);
+    animation: eg-blast-status-pulse 0.7s ease-in-out infinite alternate;
+}
+
+.eg-blast-status-danger {
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.6);
+    box-shadow: 0 0 26px rgba(248, 113, 113, 0.6);
+    animation: eg-blast-status-pulse 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes eg-blast-status-pulse {
+    from { transform: translateX(-50%) scale(1); }
+    to { transform: translateX(-50%) scale(1.05); }
+}
+
+/* Resolve outcome emblems on the zone itself (overrides the ✨ tell) */
+.eg-blast-circle.eg-blast-survived::after,
+.eg-blast-circle.eg-blast-hit::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    font-weight: 900;
+    animation: none;
+}
+
+.eg-blast-circle.eg-blast-survived::after {
+    content: '✓';
+    color: #4ade80;
+    text-shadow: 0 0 18px rgba(74, 222, 128, 0.9);
+}
+
+.eg-blast-circle.eg-blast-hit::after {
+    content: '✗';
+    color: #f87171;
+    text-shadow: 0 0 18px rgba(248, 113, 113, 0.95);
 }
 
 /* ── Crushing Walls (boss_vise) ─────────────────────────────────────
@@ -1927,6 +2255,13 @@
     transform: translateX(0);
 }
 
+/* No room below the card (bottom-docked panels): flip the tooltip above.
+   Toggled on hover by the viewport clamp in endgame-encounter.js. */
+.eg-monster-compact-tooltip.eg-tip-flip {
+    top: auto;
+    bottom: 125%;
+}
+
 
 
 
@@ -2038,6 +2373,36 @@
 @keyframes eg-hold-pause-pulse {
     from { opacity: 0.82; transform: translate(-50%, -50%) scale(0.98); }
     to   { opacity: 1;    transform: translate(-50%, -50%) scale(1.03); }
+}
+
+/* Grand Prior defuse — floating "DEFUSING" text ABOVE the player sprite while
+   standing on a bomb (same visual language as the PARRYING label, but placed
+   above the head so the two never overlap when parry + defuse coincide). */
+#eg-defuse-label {
+    position: absolute;
+    top: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 26, 16, 0.92);
+    border: 1.5px solid rgba(120, 240, 150, 0.95);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #c9f8d7;
+    font-family: var(--PX, monospace);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.7px;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 30;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.75), 0 0 12px rgba(120,240,150,0.45);
+    animation: eg-defuse-pulse 0.85s ease-in-out infinite alternate;
+}
+@keyframes eg-defuse-pulse {
+    from { opacity: 0.82; transform: translateX(-50%) scale(0.98); }
+    to   { opacity: 1;    transform: translateX(-50%) scale(1.03); }
 }
 
 /* Drag-painting accuracy bonus — 1-word text on the player sprite while charging */
