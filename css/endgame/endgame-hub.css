@@ -1501,7 +1501,9 @@ img.eg-art-img {
 }
 
 .eg-gate-side-right {
-    /* empty spacer — same width as left so the gate stays visually centered */
+    /* hosts the potential-drops panel — wider than the left side for readability */
+    justify-content: flex-start;
+    width: 360px;
 }
 
 #screen-endgame-gate .eg-gate-currency-section {
@@ -1516,7 +1518,9 @@ img.eg-art-img {
     overflow: hidden;
 }
 
-/* Responsive: stack vertically on narrow viewports */
+/* Responsive: stack vertically on narrow viewports. The right side now hosts
+   the potential-drops panel (not just a centering spacer), so it stacks
+   below the device instead of being hidden. */
 @media (max-width: 900px) {
     .eg-gate-main {
         flex-direction: column;
@@ -1524,9 +1528,6 @@ img.eg-art-img {
     }
     .eg-gate-side {
         width: min(340px, 100%);
-    }
-    .eg-gate-side-right {
-        display: none;
     }
 }
 

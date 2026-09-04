@@ -1626,6 +1626,47 @@ function _egTryDropMap(isBoss, monsterLevel) {
     if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);
 }
 
+// Atlas completion bonus (PoE-style): after a SUCCESSFUL map run there is
+// one independent extra roll for an additional ADJACENT map drop. Chance =
+// +1% per completed atlas region (see egAtlasAdjacentBonusChance).
+// The bonus map comes from a region linked to the just-finished
+// run's region and is banked straight into the map stash (+ _egRunMaps so
+// it shows in the leave-map summary). Must be called from _egEndMap()
+// AFTER _egAtlasOnMapCompleted() so a fresh first clear already counts.
+// Returns the bonus map item when the roll succeeded, else null.
+function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
+    if (typeof egAtlasAdjacentBonusChance !== 'function') return null;
+    let chance = 0;
+    try { chance = egAtlasAdjacentBonusChance(); } catch (e) { chance = 0; }
+    if (!(chance > 0)) return null;
+    if (Math.random() >= chance) return null;
+
+    let bonusNodeId = null;
+    try {
+        bonusNodeId = egAtlasPickAdjacentBonusNodeId(
+            activeMapItem ? activeMapItem.atlasNodeId : null);
+    } catch (e) { bonusNodeId = null; }
+
+    const monsterLevel = (activeMapItem && (activeMapItem.monsterLevel || activeMapItem.itemLevel))
+        ? (activeMapItem.monsterLevel || activeMapItem.itemLevel) : 1;
+    const bonusMap = _egGenerateMapDrop(monsterLevel, null, { atlasNodeId: bonusNodeId });
+    if (!bonusMap) return null;
+
+    _egAddMapToMapStash(bonusMap);
+    if (typeof _egRunMaps !== 'undefined' && Array.isArray(_egRunMaps)) _egRunMaps.push(bonusMap);
+
+    let pct = 0;
+    try { pct = egAtlasAdjacentBonusPercent(); } catch (e) { pct = Math.round(chance * 100); }
+    if (typeof showToast === 'function') {
+        try {
+            showToast(t('eg_atlas_bonus_drop')
+                .replace('{p}', pct)
+                .replace('{name}', bonusMap.name || ''), '#7fd67f');
+        } catch (e) {}
+    }
+    return bonusMap;
+}
+
 // Places a map drop on an eligible grid cell (mirrors _egSpawnLootDrop).
 function _egSpawnMapDrop(map) {
     if (!_egIsActive() || !map) return;

@@ -459,6 +459,52 @@ function egAtlasDropNodeIds(activeNodeId, isBoss) {
     return pool;
 }
 
+// Bonus per completed atlas region for the independent adjacent-map drop
+// (PoE-style atlas bonus): every completed region grants +1% chance that
+// finishing a map awards one extra adjacent-region map on top of all
+// regular drops. No cap needed (86 regions max = 86% max).
+const EG_ATLAS_ADJACENT_BONUS_PER_MAP = 0.01;
+
+// Number of atlas regions currently marked as completed.
+function egAtlasCompletedCount() {
+    if (typeof STATE === 'undefined' || !STATE.egAtlasCompleted) return 0;
+    let n = 0;
+    for (const id in STATE.egAtlasCompleted) {
+        if (STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) n++;
+    }
+    return n;
+}
+
+// Independent extra-drop chance (0..1) for the adjacent-map atlas bonus.
+// Must be read AFTER _egAtlasOnMapCompleted() so a fresh first clear
+// already counts towards the bonus of the run that earned it.
+function egAtlasAdjacentBonusChance() {
+    return egAtlasCompletedCount() * EG_ATLAS_ADJACENT_BONUS_PER_MAP;
+}
+
+// Whole-percent display value of the adjacent-map atlas bonus.
+function egAtlasAdjacentBonusPercent() {
+    return Math.round(egAtlasAdjacentBonusChance() * 100);
+}
+
+// Picks the region an atlas-bonus drop comes from: a random node LINKED to
+// (adjacent on the atlas graph) the just-completed run's region. Falls back
+// to the active region itself when it has no links / is unknown, and to a
+// same-tier unlocked region when there is no active run at all.
+function egAtlasPickAdjacentBonusNodeId(activeNodeId) {
+    const active = activeNodeId ? egAtlasNodeById(activeNodeId) : null;
+    if (active && Array.isArray(active.links) && active.links.length > 0) {
+        const linked = active.links.filter(id => egAtlasNodeById(id));
+        if (linked.length > 0) return linked[Math.floor(Math.random() * linked.length)];
+        return active.id;
+    }
+    if (active) return active.id;
+    if (typeof egAtlasPickNodeIdForTier === 'function') {
+        return egAtlasPickNodeIdForTier(1);
+    }
+    return null;
+}
+
 // Share of boss drops that target a linked region exactly one tier higher
 // (the atlas-climb path) when such regions exist and are not completed
 // yet. The rest of the pool — the active region itself, linked same/lower

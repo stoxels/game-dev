@@ -60,17 +60,13 @@ function _egBuildMapOrbSlotHTML() {
 </div>`;
 }
 
-// Assembles the complete map device block: orb frame, drop slot, activate
-// button, plus the small "?" info button that opens the map-drop rules
-// tooltip (so the explainer costs no vertical space).
+// Assembles the complete map device block: orb frame, drop slot and
+// activate button. (The small "?" map-drop-rules button lives in the
+// potential-drops panel header, right of the device — see
+// _egBuildPotentialDropsPanelHTML.)
 function _egBuildMapDeviceHTML() {
     return `
 <div class="eg-map-device">
-    <button class="eg-gate-info-btn"
-            title="${t('eg_drop_rules_title')}"
-            onmouseenter="_egOnDropRulesEnter(event)"
-            onmousemove="_egOnDropRulesMove(event)"
-            onmouseleave="_egOnDropRulesLeave()">?</button>
     <div class="eg-map-device-frame">
         ${_egBuildMapOrbRingHTML()}
         ${_egBuildMapOrbSlotHTML()}
@@ -103,6 +99,171 @@ function _egOnDropRulesMove(e) {
 function _egOnDropRulesLeave() {
     if (typeof hideGameTooltip === 'function') hideGameTooltip();
 }
+
+
+//------------------------------------------------------------------------
+//-------------------HTML HELPERS: POTENTIAL MAP DROPS--------------------
+//------------------------------------------------------------------------
+// Right-hand panel next to the map device: lists every map that could
+// potentially drop while running the map currently in the device (PoE
+// drop rules, same pools the kill handlers roll from — see
+// egAtlasDropNodeIds in endgame-atlas.js):
+//   normal kills: this region + linked regions of the same/lower tier +
+//                 every COMPLETED region of the same/lower tier
+//   boss only:    linked regions one tier higher (⚔️)
+// Each row shows the region's completion status. Sorted by tier (highest
+// first), scrollable when the list grows long.
+
+// Resolves the potential-drop entries for the map in the device slot.
+// Returns null when no map is inserted, otherwise an array of
+// { id, name, tier, bossOnly, isSelf, completed } sorted tier-desc, name-asc.
+function _egPotentialDropEntries() {
+    const map = (typeof _egMapSlotItem !== 'undefined') ? _egMapSlotItem : null;
+    if (!map) return null;
+    const node = (typeof _egGetMapAtlasNode === 'function') ? _egGetMapAtlasNode(map) : null;
+    if (!node) return [];
+    if (typeof egAtlasDropNodeIds !== 'function') return [];
+    const normalPool = egAtlasDropNodeIds(node.id, false) || [];
+    const bossPool = egAtlasDropNodeIds(node.id, true) || [];
+    const normalSet = new Set(normalPool);
+    const pushEntry = (out, seen, id, bossOnly) => {
+        if (seen.has(id)) return;
+        seen.add(id);
+        const other = (typeof egAtlasNodeById === 'function') ? egAtlasNodeById(id) : null;
+        if (!other) return;
+        out.push({
+            id: other.id,
+            name: (typeof egAtlasNodeName === 'function') ? egAtlasNodeName(other) : other.name,
+            tier: other.tier,
+            bossOnly,
+            isSelf: other.id === node.id,
+            completed: (typeof egAtlasIsCompleted === 'function') ? egAtlasIsCompleted(other.id) : false,
+        });
+    };
+    const out = [];
+    const seen = new Set();
+    normalPool.forEach(id => pushEntry(out, seen, id, false));
+    bossPool.forEach(id => pushEntry(out, seen, id, true));
+    out.sort((a, b) => (b.tier - a.tier) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    return out;
+}
+
+// Builds the scrollable list body for the potential-drops panel.
+function _egBuildPotentialDropsBodyHTML() {
+    const entries = _egPotentialDropEntries();
+    if (entries === null) return `<div class="eg-potential-drops-empty">${t('eg_potential_drops_empty')}</div>`;
+    if (entries.length === 0) return `<div class="eg-potential-drops-empty">${t('eg_potential_drops_none')}</div>`;
+    return entries.map(e => {
+        const glyph = e.completed ? '✔' : '○';
+        const cls = e.completed ? 'eg-potential-drop-done' : 'eg-potential-drop-todo';
+        const tierLabel = (typeof _egAtlasRoman === 'function') ? _egAtlasRoman(e.tier) : String(e.tier);
+        const tierCol = (typeof _egAtlasTierGroupColor === 'function') ? _egAtlasTierGroupColor(e.tier) : '#ccc';
+        const boss = e.bossOnly ? ` <span class="eg-potential-drop-boss" title="${t('eg_potential_drops_boss_hint')}">⚔️</span>` : '';
+        const self = e.isSelf ? ` <span class="eg-potential-drop-current">${t('eg_potential_drops_current')}</span>` : '';
+        return `<div class="eg-potential-drop-row ${cls}"><span class="eg-potential-drop-status">${glyph}</span><span class="eg-potential-drop-tier" style="color:${tierCol};">${tierLabel}</span><span class="eg-potential-drop-name">${e.name}${self}</span>${boss}</div>`;
+    }).join('');
+}
+
+// Assembles the potential-drops panel: title with count, the "?" drop-rules
+// button on its right, a status legend and the scrollable region list.
+function _egBuildPotentialDropsPanelHTML() {
+    return `
+<div class="eg-potential-drops" id="eg-potential-drops">
+    <div class="eg-potential-drops-head">
+        <span class="eg-potential-drops-title" id="eg-potential-drops-title"></span>
+        <button class="eg-gate-info-btn eg-gate-info-btn-static"
+                title="${t('eg_drop_rules_title')}"
+                onmouseenter="_egOnDropRulesEnter(event)"
+                onmousemove="_egOnDropRulesMove(event)"
+                onmouseleave="_egOnDropRulesLeave()">?</button>
+    </div>
+    <div class="eg-potential-drops-legend">${t('eg_potential_drops_legend')}</div>
+    <div class="eg-potential-drops-list" id="eg-potential-drops-body"></div>
+</div>`;
+}
+
+// Refreshes the potential-drops panel from the current device slot.
+// No-ops while the gate screen is not in the DOM.
+function _egRenderPotentialDrops() {
+    const body = document.getElementById('eg-potential-drops-body');
+    if (!body) return;
+    body.innerHTML = _egBuildPotentialDropsBodyHTML();
+    const title = document.getElementById('eg-potential-drops-title');
+    if (title) {
+        const entries = _egPotentialDropEntries();
+        const n = Array.isArray(entries) ? entries.length : 0;
+        title.textContent = t('eg_potential_drops_title').replace('{n}', n);
+    }
+}
+
+// One-time CSS injection for the potential-drops panel.
+function _egInjectPotentialDropsStyles() {
+    if (document.getElementById('eg-potential-drops-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'eg-potential-drops-styles';
+    style.textContent = `
+        .eg-potential-drops {
+            width: 100%; box-sizing: border-box;
+            border: 1px solid var(--border); border-radius: 4px;
+            background: rgba(255,255,255,0.02);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .eg-potential-drops-head {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 8px; padding: 10px 12px 6px;
+        }
+        .eg-potential-drops-title {
+            font-family: var(--PX, monospace); font-size: 12px;
+            letter-spacing: 2px; color: #c8a84b;
+        }
+        /* static variant of the gate "?" button for the panel header */
+        .eg-gate-info-btn-static {
+            position: static; flex-shrink: 0;
+            width: 24px; height: 24px; line-height: 22px; font-size: 12px;
+        }
+        .eg-potential-drops-legend {
+            font-family: var(--PX, monospace); font-size: 9px;
+            letter-spacing: 1px; color: #9d93c9; opacity: 0.9;
+            padding: 0 12px 8px;
+        }
+        .eg-potential-drops-list {
+            overflow-y: auto; overflow-x: hidden;
+            max-height: 330px; min-height: 80px;
+            padding: 0 6px 8px 12px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border2) transparent;
+        }
+        .eg-potential-drops-list::-webkit-scrollbar { width: 8px; }
+        .eg-potential-drops-list::-webkit-scrollbar-track { background: transparent; }
+        .eg-potential-drops-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+        .eg-potential-drop-row {
+            display: flex; align-items: baseline; gap: 8px;
+            font-family: var(--PX, monospace); font-size: 12px;
+            padding: 4px 0; color: #e8e4f0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .eg-potential-drop-row:last-child { border-bottom: none; }
+        .eg-potential-drop-status { width: 16px; flex-shrink: 0; text-align: center; }
+        .eg-potential-drop-done .eg-potential-drop-status { color: #f5d98a; }
+        .eg-potential-drop-todo .eg-potential-drop-status { color: #62626e; }
+        .eg-potential-drop-todo .eg-potential-drop-name { color: #a9a4bd; }
+        .eg-potential-drop-tier { min-width: 34px; flex-shrink: 0; text-align: right; }
+        .eg-potential-drop-name { flex: 1; line-height: 1.35; }
+        .eg-potential-drop-boss { flex-shrink: 0; }
+        .eg-potential-drop-current {
+            font-size: 9px; letter-spacing: 1px; color: #14161d;
+            background: #c8a84b; border-radius: 8px;
+            padding: 1px 7px; margin-left: 6px; white-space: nowrap;
+        }
+        .eg-potential-drops-empty {
+            font-family: var(--PX, monospace); font-size: 10px; font-style: italic;
+            color: rgba(255,255,255,0.55); text-align: center; padding: 20px 10px;
+        }
+    `;
+    document.head.appendChild(style);
+}
+_egInjectPotentialDropsStyles();
 
 
 //------------------------------------------------------------------------
@@ -217,7 +378,9 @@ function _egBuildGatePanelHTML() {
         <div class="eg-gate-center">
             ${_egBuildMapDeviceHTML()}
         </div>
-        <div class="eg-gate-side eg-gate-side-right" aria-hidden="true"></div>
+        <div class="eg-gate-side eg-gate-side-right">
+            ${_egBuildPotentialDropsPanelHTML()}
+        </div>
     </div>
     <div class="eg-map-stash-section">
         <div class="eg-panel-label" style="display:flex; align-items:center; gap:8px;">
@@ -660,6 +823,9 @@ function _egRenderMapSlot() {
             slot.removeAttribute('title');
         }
     }
+
+    // Keep the potential-drops panel (right of the device) in sync with the slot.
+    _egRenderPotentialDrops();
 }
 
 
@@ -1028,7 +1194,7 @@ function showEndgameGate(backFn) {
     // Migrate old gate screens that were built before the side-by-side
     // layout (Orbs & Shards left of the gate) or before the atlas legend / tier tabs.
     const gateScreen = document.getElementById('screen-endgame-gate');
-    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs') || !gateScreen.querySelector('.eg-gate-info-btn') || !gateScreen.querySelector('#eg-gate-level-chip') || !gateScreen.querySelector('#eg-gate-tier-strip'))) {
+    if (gateScreen && (!gateScreen.querySelector('.eg-atlas-legend-hint') || !gateScreen.querySelector('.eg-gate-main') || !gateScreen.querySelector('.eg-map-stash-tabs') || !gateScreen.querySelector('.eg-gate-info-btn') || !gateScreen.querySelector('#eg-gate-level-chip') || !gateScreen.querySelector('#eg-gate-tier-strip') || !gateScreen.querySelector('#eg-potential-drops'))) {
         gateScreen.innerHTML = _egBuildGateFullScreenHTML();
     }
     _egInjectAtlasHighlightStyles();

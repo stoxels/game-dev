@@ -1111,6 +1111,14 @@ function _egEndMap() {
         ? _egAtlasOnMapCompleted(_egActiveMapItem)
         : null;
 
+    // Atlas completion bonus: independent +1%-per-region roll for one extra
+    // adjacent-region map. Must run while _egActiveMapItem is still set and
+    // after the atlas clear above (fresh clears count immediately). The
+    // bonus map lands in the stash + _egRunMaps before the summary renders.
+    if (typeof _egRollAtlasAdjacentBonusDrop === 'function') {
+        try { _egRollAtlasAdjacentBonusDrop(_egActiveMapItem); } catch (e) {}
+    }
+
     // Endgame achievements — map completion
     if (typeof trackAchStat === 'function') try {
         trackAchStat('egMapsCompleted', 1);

@@ -619,6 +619,12 @@ function _egTickPlayer() {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
         // If not in an active encounter, fall through (no effect outside endgame)
     }
+    // The Clock's Time Freeze: the auto-attack charge bar is frozen for the
+    // whole 30s window — a time-stop is not free DPS time (class abilities
+    // and E-releases still work). boss-clock.js.
+    if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
     // Ailments: frozen stops the auto-attack bar entirely (movement
     // prevention will hook into the same ailment once movement exists),
     // chilled slows it to half speed.

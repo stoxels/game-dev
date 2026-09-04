@@ -245,11 +245,45 @@
 .eg-nk-clock-call-minute { color: #a5f3fc; text-shadow: 0 0 10px rgba(103,232,249,0.9); }
 .eg-nk-clock-call-hour { color: #fde68a; text-shadow: 0 0 10px rgba(251,191,36,0.95); }
 
+/* The Clock — Time Freeze telegraph: ~2.5s before the freeze the clock
+   face flares gold and the hands halt (the warn flag freezes them too),
+   plus a center "TIME FREEZE INCOMING" callout. See
+   _egClockStartTimeFreezeWarn in boss-clock.js. */
+.eg-nk-clock-face.eg-clock-freeze-warn {
+    animation: eg-clock-freeze-warn-glow 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-clock-freeze-warn-glow {
+    from { filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.6)) brightness(1.15); }
+    to   { filter: drop-shadow(0 0 38px rgba(250, 204, 21, 1)) brightness(1.9); }
+}
+.eg-clock-freeze-warn-banner {
+    position: fixed;
+    z-index: 400;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-align: center;
+    line-height: 1.1;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+    animation: eg-clock-call-pop 2.6s ease-out forwards;
+}
+.eg-clock-freeze-warn-line {
+    font-size: clamp(1.6rem, 4.6vw, 3.2rem);
+    color: #fde68a;
+    text-shadow: 0 0 14px rgba(250, 204, 21, 0.95);
+}
+
 /* The Clock — Time Freeze (15% HP last-stand). Below 15% HP The Clock
    stops time: the hands freeze, the timer and mistake counter freeze, the
    avatar is locked, and a ring of beams rushes in from all sides to hover
    just short of the player. If the boss isn't slain in 30s every beam
-   lunges through the player. See boss-clock.js (_egClockStartTimeFreeze). */
+   lunges through the player (~90% max HP total). See boss-clock.js
+   (_egClockStartTimeFreeze). */
 .eg-clock-freeze-tint {
     position: fixed; inset: 0;
     pointer-events: none; z-index: 9000;
@@ -316,6 +350,47 @@
     0%   { opacity: 1; transform: scaleX(1); filter: brightness(1); }
     30%  { opacity: 1; transform: scaleX(var(--eg-freeze-strike-scale, 1.3)); filter: brightness(2.6); }
     100% { opacity: 0; transform: scaleX(var(--eg-freeze-strike-scale, 1.3)); filter: brightness(2.6); }
+}
+
+/* Screen-edge frost: ice creeps in from every side while time is stopped;
+   the edge shards flash bright white the moment the hands strike. */
+.eg-clock-freeze-frost {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9000;
+    opacity: 0;
+    animation: eg-clock-freeze-frost-in 1.1s ease-out forwards;
+    background:
+        linear-gradient(180deg, rgba(147, 197, 253, 0.22), rgba(147, 197, 253, 0) 22%),
+        linear-gradient(0deg, rgba(147, 197, 253, 0.22), rgba(147, 197, 253, 0) 22%),
+        linear-gradient(90deg, rgba(147, 197, 253, 0.18), rgba(147, 197, 253, 0) 18%),
+        linear-gradient(270deg, rgba(147, 197, 253, 0.18), rgba(147, 197, 253, 0) 18%);
+}
+@keyframes eg-clock-freeze-frost-in { from { opacity: 0; } to { opacity: 1; } }
+.eg-frost-edge {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.75;
+    background:
+        repeating-linear-gradient(115deg, transparent 0 22px, rgba(224, 242, 254, 0.7) 22px 24px, transparent 24px 40px),
+        repeating-linear-gradient(-115deg, transparent 0 26px, rgba(224, 242, 254, 0.5) 26px 28px, transparent 28px 46px);
+}
+.eg-frost-top    { top: 0;    left: 0; right: 0; height: 110px; }
+.eg-frost-bottom { bottom: 0; left: 0; right: 0; height: 110px; }
+.eg-frost-left   { left: 0;   top: 0; bottom: 0; width: 90px; }
+.eg-frost-right  { right: 0;  top: 0; bottom: 0; width: 90px; }
+.eg-clock-freeze-frost-strike .eg-frost-edge {
+    opacity: 1;
+    background:
+        repeating-linear-gradient(115deg, transparent 0 22px, rgba(255, 255, 255, 0.95) 22px 26px, transparent 26px 40px),
+        repeating-linear-gradient(-115deg, transparent 0 26px, rgba(191, 219, 254, 0.9) 26px 30px, transparent 30px 46px);
+}
+.eg-clock-freeze-frost-strike {
+    animation: eg-clock-freeze-frost-flash 0.8s ease-out forwards;
+}
+@keyframes eg-clock-freeze-frost-flash {
+    0%   { opacity: 0.35; }
+    25%  { opacity: 0.95; }
+    100% { opacity: 0.55; }
 }
 
 /* Hunting storms */

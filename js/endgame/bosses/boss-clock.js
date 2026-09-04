@@ -70,22 +70,28 @@ const EG_CLOCK_SPAWN_STAGGER_RAD = (2 * Math.PI) / 3; // new hands spawn ~120° 
 const EG_CLOCK_SPAWN_JITTER_RAD = (5 * Math.PI) / 180;  // ±5° randomness on top
 
 // ── Time Freeze tunables (the 15% HP last-stand) ─────────────────────────
+const EG_CLOCK_FREEZE_WARN_MS = 2500;    // telegraph before time actually stops
 const EG_CLOCK_FREEZE_TRIGGER_PCT = 0.15;   // boss HP% that stops time
 const EG_CLOCK_FREEZE_DURATION_MS = 30000;  // the frozen window (30s)
 const EG_CLOCK_FREEZE_STRIKE_MS = 800;      // beams lunge through the player
 const EG_CLOCK_FREEZE_BEAMS = 12;           // beams ringed all around the screen
 const EG_CLOCK_FREEZE_HOLD_PX = 68;         // hover radius from player center
 const EG_CLOCK_FREEZE_LUNGE_PX = 220;       // strike punches this far past the player
-const EG_CLOCK_FREEZE_DMG_PCT = 0.28;       // combined heavy damage on failure
+const EG_CLOCK_FREEZE_DMG_PCT = 0.90;       // total damage on failure — every beam hits, ~7.5% each × 12
 const EG_CLOCK_FREEZE_COLOR = '#ffe536';    // lightning yellow
 
-// Global freeze flag — true while The Clock holds time. Written BEFORE any
-// side effect so a single frame can never slip between the freeze starting
-// and the timer / mistakes / movement freezing. Read in:
-//   start-level.js   keeps timerFrozen alive across arena puzzle transitions
-//   penalty.js       mistake counter frozen
-//   player_sprite.js avatar can't move
-// Cleared by _egClockTimeFreezeEnd, which every freeze-run kill path runs.
+// Global freeze flags — true while The Clock is telegraphing then holding
+// time. _egClockTimeFreezeWarn is the 2.5s buildup (hands stop, face flares)
+// so the player isn't blindsided; _egClockTimeFreezeActive is the real 30s
+// freeze. Both are written BEFORE any side effect so a single frame can
+// never slip between the flag and the effect taking hold. Read in:
+//   start-level.js      keeps timerFrozen alive across arena transitions
+//   penalty.js          mistake counter frozen
+//   player_sprite.js    avatar can't move
+//   endgame-encounter.js auto-attack charge bar frozen
+// Cleared by _egClockClearFreezeWarn / _egClockTimeFreezeEnd, which every
+// freeze-run kill path runs.
+window._egClockTimeFreezeWarn = false;
 window._egClockTimeFreezeActive = false;
 
 
@@ -230,6 +236,7 @@ function _egMechClockHands(monster, phase) {
     const armed = {};    // summonPct → true once the threshold was crossed
     const pending = [];  // hand cfgs waiting for their center call
     let announced = [];  // { cfg, a, value } during the 3s call window
+    let freezeFired = false; // once-per-fight latch → Time Freeze never restarts
     let callBanner = null;
     let callMsLeft = 0;
 
@@ -293,15 +300,18 @@ function _egMechClockHands(monster, phase) {
         const pr = _egNkPlayerRect();
         const pts = pr ? _egClockPlayerPts(pr) : null;
 
-        // Time Freeze (≤15% HP): the clock stops — the hands freeze mid-sweep
-        // while the player races to slay the boss inside the 30s window.
-        if (!window._egClockTimeFreezeActive && pct <= EG_CLOCK_FREEZE_TRIGGER_PCT) {
-            _egClockStartTimeFreeze(m || monster, level);
+        // Time Freeze (≤15% HP): the clock stops — 2.5s telegraph first
+        // (hands halt, face flares, callout), then the 30s window while the
+        // player races to slay the boss. `freezeFired` latches for this
+        // fight, so a FAILED freeze never loops into a fresh one.
+        if (!freezeFired && pct <= EG_CLOCK_FREEZE_TRIGGER_PCT) {
+            freezeFired = true;
+            _egClockStartTimeFreezeWarn(m || monster, level);
         }
 
         // Phase scaling: phase 1 spins at base speed, phase 2 +20%,
         // phase 3 +40% — all hands share it, so their gaps stay fixed.
-        const timeStopped = !!window._egClockTimeFreezeActive;
+        const timeStopped = !!window._egClockTimeFreezeActive || !!window._egClockTimeFreezeWarn;
         const phaseNo = pct <= 0.30 ? 3 : pct <= 0.60 ? 2 : 1;
         const speed = EG_CLOCK_HAND_OMEGA
             * Math.pow(1 + EG_CLOCK_PHASE_SPEED_STEP, phaseNo - 1);
@@ -332,16 +342,21 @@ function _egMechClockHands(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------TIME FREEZE (15% HP LAST-STAND)----------------------
 //------------------------------------------------------------------------
-// Below 15% HP The Clock freezes time for 30 seconds:
-//   • the three rotating hands stop dead in the air (see the hands loop)
-//   • the map timer (timerFrozen) and the mistake counter freeze
-//   • the avatar cannot move (player_sprite.js / penalty.js read the flag)
+// Below 15% HP The Clock stops time:
+//   • a 2.5s telegraph first — the hands halt, the clock face flares and a
+//     "TIME FREEZE INCOMING" callout pops (see _egClockStartTimeFreezeWarn)
+//   • then the 30s freeze: hands stay stopped, the map timer (timerFrozen)
+//     and the mistake counter freeze, the avatar cannot move (player_sprite /
+//     penalty read the flag) and its auto-attack charge bar stops charging
+//     (endgame-encounter.js)
 //   • a ring of 12 frozen beams rushes in from all sides of the screen and
 //     hovers just short of the player, aimed straight at them
-// The player must slay the boss inside the window. If the freeze expires
-// with the boss still standing — even on a NEW PUZZLE when the arena grid
-// was solved mid-freeze (the countdown never resets) — every beam lunges
-// through the player for heavy damage.
+// The player must slay the boss inside the window — and the freeze fires
+// EXACTLY ONCE per fight: killing the boss ends it cleanly, and a failed
+// freeze never restarts.
+// If the freeze expires with the boss still standing — even on a NEW PUZZLE
+// when the arena grid was solved mid-freeze (the countdown never resets) —
+// every beam lunges through the player: 12 hits ≈ 90% max HP total.
 // The freeze lives in its OWN nk run owned by the boss id: it survives
 // boss-arena puzzle transitions (the boss is carried to the next grid), is
 // killed with the fight when the boss dies (success → no strike) or when
@@ -349,10 +364,23 @@ function _egMechClockHands(monster, phase) {
 // the game can never stay frozen.
 
 
+// Tears down the telegraph state (flag + face glow + center callout). Runs
+// as the warn run's onKill and defensively when the real freeze starts/ends.
+function _egClockClearFreezeWarn() {
+    window._egClockTimeFreezeWarn = false;
+    const face = document.getElementById('eg-nk-clock-face');
+    if (face) face.classList.remove('eg-clock-freeze-warn');
+    const banner = document.getElementById('eg-clock-freeze-warn-banner');
+    if (banner) banner.remove();
+}
+
+
 // Restores every system the Time Freeze pinned. Idempotent and safe to call
 // from onKill AND from the kill loop — the run is only ever killed once.
 function _egClockTimeFreezeEnd() {
-    if (!window._egClockTimeFreezeActive) return;
+    if (!window._egClockTimeFreezeActive && !window._egClockTimeFreezeWarn) return;
+    _egClockClearFreezeWarn();                       // warn-only? just the telegraph
+    if (!window._egClockTimeFreezeActive) return;    // nothing else was pinned
     window._egClockTimeFreezeActive = false;
     if (typeof timerFrozen !== 'undefined') timerFrozen = false;
     if (typeof updTimer === 'function') updTimer();
@@ -385,15 +413,85 @@ function _egClockRayEdgeDist(px, py, ux, uy) {
 }
 
 
-// Applies the combined strike damage + failed-freeze toast.
-function _egClockFreezeApplyStrike(level) {
-    const dealt = _egNkHit(EG_CLOCK_FREEZE_DMG_PCT, 'lightning', level);
+// Applies the strike: every beam hits once (≈7.5% each, 90% total) and a
+// single summed toast reports the whole barrage. Per-beam hits let an
+// absorption shield soften only part of the blow.
+function _egClockFreezeApplyStrike(level, beams) {
+    const count = Math.max(1, (beams && beams.length) || 1);
+    let dealt = 0;
+    for (let i = 0; i < count; i++) {
+        dealt += _egNkHit(EG_CLOCK_FREEZE_DMG_PCT / count, 'lightning', level);
+    }
     _egNkAbilityHitToast(dealt, 'The Clock', 'Time Freeze');
 }
 
 
+// Center-grid telegraph callout — same pop style as the hand-summon calls,
+// so the incoming freeze reads instantly without a new visual language.
+function _egClockShowFreezeWarnBanner() {
+    const banner = document.createElement('div');
+    banner.id = 'eg-clock-freeze-warn-banner';
+    banner.className = 'eg-clock-freeze-warn-banner';
+    const line = document.createElement('div');
+    line.className = 'eg-clock-freeze-warn-line';
+    line.textContent = _egClockL10n('eg_clock_freeze_warn', '⏳ TIME FREEZE INCOMING!');
+    banner.appendChild(line);
+    document.body.appendChild(banner);
+    const board = document.getElementById('ptable');
+    if (board) {
+        const r = board.getBoundingClientRect();
+        banner.style.left = (r.left + r.width / 2) + 'px';
+        banner.style.top = (r.top + r.height / 2) + 'px';
+    } else {
+        banner.style.left = '50%';
+        banner.style.top = '50%';
+    }
+}
+
+
+// 2.5s telegraph before time stops: the hands halt (the hands loop reads
+// the warn flag), the clock face flares gold, a center callout warns the
+// player, and a clock sound builds. Then the real Time Freeze begins.
+// Own boss-owned nk run so it survives arena transitions and dies with the
+// fight.
+function _egClockStartTimeFreezeWarn(monster, level) {
+    if (typeof _egNkNewRun !== 'function' || typeof _egNkEl !== 'function') return;
+    if (window._egClockTimeFreezeWarn || window._egClockTimeFreezeActive) return;
+
+    const bossId = (monster && monster.id) || 'boss_clock';
+    const lvl = (monster && monster.level) ? monster.level : (level || 1);
+
+    window._egClockTimeFreezeWarn = true;
+
+    if (typeof _egClearCenterGridBanners === 'function') {
+        _egClearCenterGridBanners('eg-clock-freeze-warn-banner');
+    }
+    const face = document.getElementById('eg-nk-clock-face');
+    if (face) face.classList.add('eg-clock-freeze-warn');
+
+    _egClockShowFreezeWarnBanner();
+
+    _egNkToast('eg_mech_clock_freeze_warn',
+        '🕐 The Clock: The hands are stopping — get ready!',
+        EG_CLOCK_FREEZE_COLOR);
+    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('clock');
+
+    const run = _egNkNewRun(bossId, false);
+    run.onKill = _egClockClearFreezeWarn;
+    let elapsedMs = 0;
+    _egNkLoop(run, (dtS) => {
+        elapsedMs += dtS * 1000;
+        if (elapsedMs >= EG_CLOCK_FREEZE_WARN_MS) {
+            _egClockStartTimeFreeze(monster, lvl);
+            return false;   // kill this run → onKill clears the warn state
+        }
+        return true;
+    });
+}
+
+
 // Kicks off the Time Freeze. Single-flight: the global flag is raised before
-// any side effect, and the hands loop only ever calls this once per fight.
+// any side effect, and the hands loop only ever starts it once per fight.
 function _egClockStartTimeFreeze(monster, level) {
     if (typeof _egNkNewRun !== 'function' || typeof _egNkEl !== 'function') return;
     if (window._egClockTimeFreezeActive) return;
@@ -405,6 +503,7 @@ function _egClockStartTimeFreeze(monster, level) {
     // block, so nothing else (timer tick, mistake penalty, WASD) can fire
     // between the flag and the freeze taking hold.
     window._egClockTimeFreezeActive = true;
+    _egClockClearFreezeWarn();   // telegraph done — drop its flag, glow, callout
     if (typeof timerFrozen !== 'undefined') timerFrozen = true;
     if (typeof updTimer === 'function') updTimer();
 
@@ -420,6 +519,15 @@ function _egClockStartTimeFreeze(monster, level) {
 
     // Full-screen cold tint (transparent centre so the grid stays readable).
     _egNkEl(run, 'div', 'eg-clock-freeze-tint');
+
+    // Screen-edge frost: ice creeps in from every side while time is stopped
+    // and flashes bright the instant the hands strike.
+    const frost = _egNkEl(run, 'div', 'eg-clock-freeze-frost');
+    ['eg-frost-top', 'eg-frost-bottom', 'eg-frost-left', 'eg-frost-right'].forEach(cls => {
+        const e = document.createElement('div');
+        e.className = 'eg-frost-edge ' + cls;
+        frost.appendChild(e);
+    });
 
     // Top-centre countdown banner.
     const banner = document.createElement('div');
@@ -463,6 +571,7 @@ function _egClockStartTimeFreeze(monster, level) {
     _egNkToast('eg_mech_clock_freeze',
         '🕐 The Clock: TIME FREEZE! Slay it before the hands strike!',
         EG_CLOCK_FREEZE_COLOR);
+    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('time_freeze');
 
     // Countdown runs on the nk loop's scaled clock (dtS accumulates only
     // ACTIVE time) — it pauses with the game (Escape) and through a
@@ -499,8 +608,10 @@ function _egClockStartTimeFreeze(monster, level) {
         // Freeze expired with the boss still standing → every beam lunges.
         if (!struck && elapsedMs >= EG_CLOCK_FREEZE_DURATION_MS) {
             struck = true;
-            _egClockFreezeApplyStrike(lvl);
+            _egClockFreezeApplyStrike(lvl, beams);
             beams.forEach(b => b.seg.classList.add('eg-clock-freeze-strike'));
+            frost.classList.add('eg-clock-freeze-frost-strike');
+            if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('absoluteZero');
             renderBanner(-1);
             return true; // keep looping so the strike animation plays out
         }

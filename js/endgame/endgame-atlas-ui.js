@@ -256,10 +256,14 @@ stroke="${color}" stroke-width="${width}" stroke-dasharray="2 4" stroke-linecap=
 viewBox="0 0 ${EG_ATLAS_CANVAS_W} ${EG_ATLAS_CANVAS_H}">${lines}</svg>`;
 }
 
-// Builds the header strip: progress and the search box.
+// Builds the header strip: progress, the adjacent-map bonus and the search box.
 function _egAtlasBuildHeaderHTML() {
     const prog = egAtlasProgress();
     const pct = prog.total > 0 ? Math.round(100 * prog.completed / prog.total) : 0;
+    const bonusPct = (typeof egAtlasAdjacentBonusPercent === 'function') ? egAtlasAdjacentBonusPercent() : 0;
+    const bonusLine = t('eg_atlas_adjacent_bonus')
+        .replace('{p}', bonusPct)
+        .replace('{c}', prog.completed);
     return `
 <div class="ega-header">
     <div class="ega-header-top">
@@ -275,6 +279,9 @@ function _egAtlasBuildHeaderHTML() {
                 </span>
             </div>
             <div class="ega-progress-track"><div class="ega-progress-fill" style="width:${pct}%"></div></div>
+            <div class="ega-header-line">
+                <span class="ega-header-bonus" title="${t('eg_atlas_adjacent_bonus_tooltip')}">🗺️ ${bonusLine}</span>
+            </div>
         </div>
         <input type="text" class="ega-search" id="ega-search"
                placeholder="${t('eg_atlas_search')}"
@@ -623,6 +630,7 @@ function _egAtlasEnsureStyles() {
         .ega-header-line { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
         .ega-header-progress { font-size: 11px; letter-spacing: 1px; color: var(--accent, #c8a84b); }
         .ega-header-highest { font-size: 11px; letter-spacing: 1px; color: var(--accent, #c8a84b); opacity: 0.85; }
+        .ega-header-bonus { font-size: 11px; letter-spacing: 1px; color: #7fd67f; }
         .ega-progress-track {
             width: 300px; max-width: 40vw; height: 4px; border-radius: 2px;
             background: rgba(255, 255, 255, 0.08); overflow: hidden;
