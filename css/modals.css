@@ -1057,6 +1057,108 @@
         color: #fff3cf;
     }
 
+/* -----------------------------------------------------------------------
+   EG LEAVE-MAP CONFIRM MODAL (#eg-forfeit-modal) — built in
+   js/ui-events.js (showEgForfeitConfirm), shown when the player abandons
+   an endgame map run from the in-run X button / pause overlay.
+   Same danger shell as the achievements-reset / passive-tree modals
+   above (stone frame, title plaque, stone close button) plus the same
+   readability pass: oversized parchment ink, a bigger plaque title and
+   real carved-stone action buttons. Scoped here so the shared danger
+   rules stay untouched.
+   ----------------------------------------------------------------------- */
+#eg-forfeit-modal .modal-box-danger {
+    max-width: min(720px, 120vh);
+}
+
+/* Body text sits directly on the frame's parchment — dark ink, centred,
+   comfortably large (same treatment as #pt-refund-modal / #ach-reset-modal). */
+#eg-forfeit-modal .reset-body-text {
+    font-family: var(--F);
+    font-size: clamp(15px, 2.6cqw, 18px);
+    line-height: 1.85;
+    color: #4a2c12;
+    text-align: center;
+}
+
+    /* Outcome lines render on their own rows with clear ✔ kept / ✖ lost
+       accents that stay legible on the parchment. */
+    #eg-forfeit-modal .eg-forfeit-keep,
+    #eg-forfeit-modal .eg-forfeit-lose {
+        display: inline-block;
+        margin-top: 2px;
+    }
+
+    #eg-forfeit-modal .eg-forfeit-keep {
+        color: #2c5e2c;
+        font-weight: 700;
+    }
+
+    #eg-forfeit-modal .eg-forfeit-lose {
+        color: #8a1f12;
+        font-weight: 700;
+    }
+
+/* Title plaque — keep the deep danger red, sized up a notch so the
+   headline matches the settings / how-to-play plaques. */
+#eg-forfeit-modal .modal-title.text-red {
+    color: #e05a3a;
+    font-size: clamp(16px, 2.6cqw, 21px);
+    letter-spacing: 2px;
+}
+
+/* Action buttons: real carved-stone buttons (Game-Reset/Button-Stone.png,
+   same art as the achievements-reset / refund-all confirms). */
+#eg-forfeit-modal .modal-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(10px, 2.4cqw, 16px);
+}
+
+#eg-forfeit-modal .modal-actions .title-btn,
+#eg-forfeit-modal .modal-actions .back-btn {
+    font-family: var(--PX);
+    font-size: clamp(10px, 2.4cqw, 14px);
+    letter-spacing: 0.5px;
+    color: var(--accent2);
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.85);
+    background-image: url('../images/Game-Reset/Button-Stone.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    padding: clamp(12px, 2.4cqw, 18px) clamp(20px, 3.4cqw, 30px);
+    width: min(90cqw, 440px);
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.12s;
+}
+
+    #eg-forfeit-modal .modal-actions .title-btn:hover,
+    #eg-forfeit-modal .modal-actions .back-btn:hover {
+        background-image: url('../images/Game-Reset/Button-Stone.png');
+        background-color: transparent;
+        filter: brightness(1.22);
+        transform: translateY(-1px);
+    }
+
+    /* Confirm reads as the destructive action: danger-orange text on stone */
+    #eg-forfeit-modal #eg-forfeit-confirm {
+        color: #ffb35c;
+    }
+
+    #eg-forfeit-modal #eg-forfeit-confirm:hover {
+        color: #ffd9a8;
+    }
+
+    /* Cancel is the safe choice: parchment-gold instead of the danger tint */
+    #eg-forfeit-modal #eg-forfeit-cancel {
+        color: #ffe9a8;
+    }
+
+    #eg-forfeit-modal #eg-forfeit-cancel:hover {
+        color: #fff3cf;
+    }
+
 /* CLOSE BUTTON — stone square with X icon, top-right corner (shared asset). */
 .modal-box-danger .modal-close {
     position: absolute;

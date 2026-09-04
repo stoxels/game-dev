@@ -375,8 +375,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Shows a "leave map?" confirmation modal for endgame monster levels,
-     * warning the player that run items/objective progress will be lost.
+     * Shows a "leave map?" confirmation modal for endgame monster levels.
+     * Forfeiting keeps everything the player already collected this run
+     * (loot is flushed to the stash and unclaimed map drops are banked —
+     * see the confirm handlers below), so the copy only warns about what
+     * is really lost: the consumed map and the unfinished run's rewards.
      * Builds the modal DOM once and reuses it on subsequent calls.
      *
      * @param {Function} onConfirm - Called if the player confirms leaving
@@ -387,9 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'eg-forfeit-modal';
-            modal.className = 'modal-bg';
+            // Same stone/parchment shell as the settings / how-to-play /
+            // achievements-reset modals (see css/modals.css §4 and the
+            // #eg-forfeit-modal readability pass below it).
+            modal.className = 'modal-bg safe-center';
             modal.innerHTML = `
             <div class="modal-box modal-box-danger">
+                <button class="modal-close" id="eg-forfeit-close">✕ CLOSE</button>
                 <div class="modal-title text-red">${t('scr_leave_map')}</div>
                 <div class="modal-section">
                     <p class="reset-body-text">
@@ -397,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </p>
                 </div>
                 <div class="modal-actions">
-                    <button class="title-btn back-btn btn-danger" id="eg-forfeit-confirm">${t('scr_leave_map_confirm')}</button>
+                    <button class="title-btn back-btn" id="eg-forfeit-confirm">${t('scr_leave_map_confirm')}</button>
                     <button class="title-btn back-btn" id="eg-forfeit-cancel">${t('scr_stay_in_map')}</button>
                 </div>
             </div>`;
@@ -411,6 +418,9 @@ document.addEventListener('DOMContentLoaded', () => {
             onConfirm();
         };
         document.getElementById('eg-forfeit-cancel').onclick = () => {
+            modal.classList.remove('show');
+        };
+        document.getElementById('eg-forfeit-close').onclick = () => {
             modal.classList.remove('show');
         };
     }
