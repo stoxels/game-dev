@@ -26,7 +26,11 @@ function _useFreeze(id, def) {
     }, 1000);
 
     setTimeout(() => {
-        timerFrozen = false;
+        // The Clock's Time Freeze holds the timer for its whole window —
+        // this item's 2s freeze must never cut that freeze short.
+        if (typeof window === 'undefined' || !window._egClockTimeFreezeActive) {
+            timerFrozen = false;
+        }
         window._freezeActive = false;
         shieldActive = false;
         clearInterval(freezeTick);

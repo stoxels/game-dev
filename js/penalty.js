@@ -263,6 +263,11 @@ function _triggerPenaltyFlash() {
 // Main penalty handler — called whenever the player selects a wrong cell.
 // row / col: grid coordinates of the mistake, used for beam effects and actuary logging.
 function applyPenalty(row, col) {
+    // The Clock's Time Freeze: the mistake counter is frozen — wrong fills
+    // still flash red and ring, but cost no mistake and no timer time until
+    // the 30s window ends (or the boss is slain). See _egClockStartTimeFreeze.
+    if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return;
+
     const penMult = getClassPenaltyMultiplier(); // 5.0 during Black Swan, 0 = shield absorbed
 
     // --- Shield check: if penMult is 0, the hit is fully absorbed; do nothing further ---

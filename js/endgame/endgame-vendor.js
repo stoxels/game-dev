@@ -757,6 +757,7 @@ function _egvBuildBaseItemFromBase(base) {
         requirements: { ...base.requirements },
         defenses: { ...base.defenses },
         ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
+        ...(base.hands ? { hands: base.hands } : {}),
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
     };
 }

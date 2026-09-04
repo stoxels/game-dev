@@ -2005,8 +2005,9 @@ const EG_BASE_TYPES_WEAPON = [
             const factor = 0.60 + 0.25 * t;
             req = Math.round(20 + (lvl - 1) * 5 * factor);
         }
-        const dmgMin = Math.round(3.8 * lvl + 4);
-        const dmgMax = Math.round(7.6 * lvl + 8);
+        const twoHandMult = isTwoHand ? 1.9 : 1; // 2H auto-bases hit ~1.9x harder (PoE-style)
+        const dmgMin = Math.round((3.8 * lvl + 4) * twoHandMult);
+        const dmgMax = Math.round((7.6 * lvl + 8) * twoHandMult);
         const baseInterval = arch === 'agility' ? 5.8 : arch === 'intellect' ? 7.2 : (isTwoHand ? 11.8 : 7.8);
         const interval = +(baseInterval + (lvl % 5) * 0.12).toFixed(1);
         EG_BASE_TYPES_WEAPON.push({
@@ -2015,6 +2016,7 @@ const EG_BASE_TYPES_WEAPON = [
             nameDe: nameDeFor[arch](lvl),
             archetype: arch,
             slotType: 'weapon',
+            hands: isTwoHand ? 2 : 1,
             icon: isTwoHand ? '🔨' : (iconFor[arch] || '⚔️'),
             minLevel: lvl,
             requirements: { level: lvl, str: arch === 'strength' ? req : 0, agi: arch === 'agility' ? req : 0, int: arch === 'intellect' ? req : 0 },
@@ -2022,6 +2024,38 @@ const EG_BASE_TYPES_WEAPON = [
             damage: { min: dmgMin, max: dmgMax },
             attackIntervalSeconds: interval,
         });
+    }
+})();
+
+//------------------------------------------------------------------------
+//-------------------WEAPON HAND CLASSIFICATION (PoE-STYLE)----------------
+//------------------------------------------------------------------------
+// Every melee weapon base carries `hands`: 1 (one-handed) or 2 (two-handed).
+//   1H → weapon1 (main-hand) OR weapon2 (off-hand, dual-wield)
+//   2H → weapon1 ONLY, and blocks the off-hand while equipped
+// Staves are 2H (PoE-style); wands / sceptres / swords / axes / daggers are 1H.
+// Static 2H bases are also rebalanced here: ~2x damage at a slower interval so
+// 2H DPS lands ~1.6-1.7x a same-tier 1H (offense vs shield defense tradeoff).
+(() => {
+    const STAFF_IDS = new Set(['wpn_int_2', 'wpn_int_4', 'wpn_int_7', 'wpn_int_8']);
+    for (const b of EG_BASE_TYPES_WEAPON) {
+        if (b.hands === 1 || b.hands === 2) continue;
+        if (/^wpn_2h/.test(b.id) || STAFF_IDS.has(b.id)) b.hands = 2;
+        else b.hands = 1;
+    }
+    // Rebalance static 2H bases: double damage, quicken the slowest swings a touch.
+    for (const b of EG_BASE_TYPES_WEAPON) {
+        if (b.hands !== 2 || b._rebalanced2H) continue;
+        if (b.damage) {
+            b.damage = {
+                min: Math.round(b.damage.min * 2),
+                max: Math.round(b.damage.max * 2),
+            };
+        }
+        if (typeof b.attackIntervalSeconds === 'number') {
+            b.attackIntervalSeconds = Math.round(Math.max(9.8, b.attackIntervalSeconds - 1.2) * 10) / 10;
+        }
+        b._rebalanced2H = true;
     }
 })();
 
@@ -3965,6 +3999,7 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
 
         // Weapons get their raw damage range attached as-is
         ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
+        ...(base.hands ? { hands: base.hands } : {}),
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
     };
 

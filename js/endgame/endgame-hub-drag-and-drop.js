@@ -38,7 +38,10 @@ const EG_ZONE_CATEGORIES = {
 
 // Maps each paperdoll slot id to the item slotType it accepts.
 // Multi-slot types (rings, earrings) share the same slotType value.
-// weapon1 only takes melee weapons; weapon2 is shield-exclusive.
+// weapon1 takes melee weapons (1H or 2H, never shields — so dual shields
+// are impossible); weapon2 takes shields or ONE-handed weapons (dual-wield).
+// The 1H/2H distinction is enforced hand-aware in _dndSlotAcceptsItem below
+// (see _egGetWeaponHands in endgame-requirements.js), not by this table alone.
 const EG_SLOT_ACCEPTS = {
     head: 'head',
     shoulders: 'shoulders',
@@ -120,8 +123,19 @@ function _dndZoneAccepts(targetZone) {
 }
 
 // Returns true when the dragged item's slotType matches what the given char slot accepts.
+// weapon1: melee weapons only (any hands, never shields).
+// weapon2: shields or ONE-handed weapons only (dual-wield off-hand; 2H rejected).
 function _dndSlotAcceptsItem(slotId) {
     if (!_dnd.item || _dnd.item.category !== 'equip') return false;
+    if (slotId === 'weapon1') return _dnd.item.slotType === 'weapon';
+    if (slotId === 'weapon2') {
+        if (_dnd.item.slotType === 'shield') return true;
+        if (_dnd.item.slotType !== 'weapon') return false;
+        if (typeof _egGetWeaponHands === 'function') {
+            return _egGetWeaponHands(_dnd.item) === 1;
+        }
+        return _dnd.item.hands !== 2;
+    }
     const required = EG_SLOT_ACCEPTS[slotId];
     return required && required === _dnd.item.slotType;
 }
@@ -710,9 +724,22 @@ function _dndDropOnEquipSlot(equipSlotEl) {
     }
     const gate = _egCanEquipInSlot(_dnd.item, slotId);
     if (!gate.ok) {
-        _egShowRequirementsToast('equip', gate.missing, _dnd.item);
-        _dndShowRejectFlash(equipSlotEl);
-        return false;
+        // PoE-style: equipping a 2H weapon auto-unequips the off-hand to the
+        // stash instead of rejecting (other hand conflicts still reject).
+        if (gate.handError === 'two_handed_blocks_offhand' && slotId === 'weapon1'
+            && typeof _egTryAutoUnequipOffhandForTwoHander === 'function'
+            && _egTryAutoUnequipOffhandForTwoHander()) {
+            const retry = _egCanEquipInSlot(_dnd.item, slotId);
+            if (!retry.ok) {
+                _egShowRequirementsToast('equip', retry, _dnd.item);
+                _dndShowRejectFlash(equipSlotEl);
+                return false;
+            }
+        } else {
+            _egShowRequirementsToast('equip', gate, _dnd.item);
+            _dndShowRejectFlash(equipSlotEl);
+            return false;
+        }
     }
     const displaced = _egEquipped[slotId] || null;
     _egEquipped[slotId] = _dnd.item;
@@ -726,14 +753,35 @@ function _dndDropOnEquipSlot(equipSlotEl) {
 //-------------------RIGHT-CLICK QUICK-MOVE-------------------------------
 //------------------------------------------------------------------------
 
-// Finds the first paperdoll slot that matches the item's slotType.
-// Prefers an empty slot; when all matching slots are occupied it prefers the
-// first slot whose requirement gate would accept the swap (multi-slot types
-// like rings can differ per slot — one swap may break chain dependencies the
-// other doesn't). Falls back to the first candidate so callers still get a
-// sensible slot for error feedback.
+// Finds the paperdoll slot for quick-equip (right-click).
+// Weapons are hand-aware: 2H → weapon1 only; 1H → first empty of
+// weapon1/weapon2, else the first slot whose gate accepts the swap;
+// shields → weapon2 only. Other slots use EG_SLOT_ACCEPTS directly.
 // Returns the slot id string, or null when no matching slot exists.
 function _dndFindTargetSlot(item) {
+    if (item && item.category === 'equip' && item.slotType === 'weapon') {
+        const isTwo = (typeof _egGetWeaponHands === 'function')
+            ? _egGetWeaponHands(item) === 2 : item.hands === 2;
+        const candidates = isTwo ? ['weapon1'] : ['weapon1', 'weapon2'];
+        if (!isTwo) {
+            const emptySlot = candidates.find(id => !_egEquipped[id]);
+            if (emptySlot) {
+                // A 1H weapon must not jump into the off-hand while a 2H holds main.
+                if (!(emptySlot === 'weapon2' && typeof _egIsTwoHandedWeapon === 'function'
+                    && _egIsTwoHandedWeapon(_egEquipped.weapon1))) return emptySlot;
+                if (emptySlot === 'weapon1') return emptySlot;
+            }
+        } else if (!_egEquipped.weapon1) {
+            return 'weapon1';
+        }
+        const fitting = (typeof _egCanEquipInSlot === 'function')
+            ? candidates.find(id => _egCanEquipInSlot(item, id).ok)
+            : null;
+        return fitting || candidates[0];
+    }
+    if (item && item.category === 'equip' && item.slotType === 'shield') {
+        return 'weapon2';
+    }
     const candidates = Object.entries(EG_SLOT_ACCEPTS)
         .filter(([, accepts]) => accepts === item.slotType)
         .map(([slotId]) => slotId);
@@ -777,10 +825,23 @@ function _dndQuickEquipFromStash(invCell) {
 
     const gate = _egCanEquipInSlot(item, slotId);
     if (!gate.ok) {
-        _egShowRequirementsToast('equip', gate.missing, item);
-        invCell.classList.add('eg-slot-reject');
-        setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
-        return;
+        // PoE-style: quick-equipping a 2H weapon auto-unequips the off-hand.
+        if (gate.handError === 'two_handed_blocks_offhand' && slotId === 'weapon1'
+            && typeof _egTryAutoUnequipOffhandForTwoHander === 'function'
+            && _egTryAutoUnequipOffhandForTwoHander()) {
+            const retry = _egCanEquipInSlot(item, slotId);
+            if (!retry.ok) {
+                _egShowRequirementsToast('equip', retry, item);
+                invCell.classList.add('eg-slot-reject');
+                setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
+                return;
+            }
+        } else {
+            _egShowRequirementsToast('equip', gate, item);
+            invCell.classList.add('eg-slot-reject');
+            setTimeout(() => invCell.classList.remove('eg-slot-reject'), 600);
+            return;
+        }
     }
 
     const displaced = _egEquipped[slotId] || null;

@@ -1594,6 +1594,35 @@ function _egBuildTooltipBodyHTML(item) {
             : item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1))
         : '';
 
+    // ── Weapon hand line (PoE-style): One-Handed / Two-Handed ──────────
+    // Shown directly under the rarity line so the 1H/2H choice — and with it
+    // the shield / dual-wield decision — is visible before equipping.
+    let handHTML = '';
+    if (item.slotType === 'weapon') {
+        let hands = (item.hands === 1 || item.hands === 2) ? item.hands : null;
+        if (hands == null && typeof _egGetWeaponHands === 'function') {
+            try { hands = _egGetWeaponHands(item); } catch (e) { hands = null; }
+        }
+        if (hands == null && typeof _egInferWeaponHands === 'function') {
+            try { hands = _egInferWeaponHands(item); } catch (e) { hands = null; }
+        }
+        if (hands === 1 || hands === 2) {
+            let handLabel = null;
+            try {
+                const key = hands === 2 ? 'eg_hands_two' : 'eg_hands_one';
+                const s = t(key);
+                if (s && s !== key) handLabel = s;
+            } catch (e) {}
+            if (!handLabel) {
+                const de = (typeof LANG !== 'undefined' && LANG === 'de');
+                handLabel = hands === 2
+                    ? (de ? 'Zweihandwaffe' : 'Two-Handed Weapon')
+                    : (de ? 'Einhandwaffe' : 'One-Handed Weapon');
+            }
+            handHTML = `<div class="eg-tt-hands">${handLabel}</div>`;
+        }
+    }
+
     // ── Implicit defenses & damage ───────────────────────────────────
     // Defense and damage values shown are the LOCAL-modified totals (base +
     // local flat, scaled by the item's own "% increased" mods — Path of
@@ -1720,6 +1749,29 @@ function _egBuildTooltipBodyHTML(item) {
             .replace('{list}', _egGetUnmetRequirementsText(chain.broken))}</div></div>`
         : '';
 
+    // ── Hand-conflict warning (PoE-style) ────────────────────────────
+    // Shown when the item fits its own slot but the hand setup forbids it
+    // (2H needs a free off-hand, off-hand takes 1H/shield only).
+    let handHTML2 = '';
+    try {
+        if (item && item.category === 'equip'
+            && (item.slotType === 'weapon' || item.slotType === 'shield')
+            && typeof _egCheckHandCompatibilityInSlot === 'function'
+            && typeof _dndFindTargetSlot === 'function') {
+            const equippedList = (typeof _egGetAllEquippedItems === 'function')
+                ? _egGetAllEquippedItems() : [];
+            if (!equippedList.includes(item)) {
+                const target = _dndFindTargetSlot(item);
+                if (target) {
+                    const hg = _egCheckHandCompatibilityInSlot(item, target);
+                    if (!hg.ok && hg.handError && typeof _egHandErrorMessage === 'function') {
+                        handHTML2 = `<div class="eg-tt-section"><div class="eg-tt-swap-warning">${_egHandErrorMessage(hg.handError, item)}</div></div>`;
+                    }
+                }
+            }
+        }
+    } catch (e) { handHTML2 = ''; }
+
     // ── Explicit mods ─────────────────────────────────────────────────
     const mods = Array.isArray(item.mods) ? item.mods : [];
     let modsHTML = '';
@@ -1785,11 +1837,13 @@ function _egBuildTooltipBodyHTML(item) {
         ${(item.baseName && item.baseName !== item.name)
             ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}
         <div class="eg-tt-rarity-line" style="color:${rc.color};">${rarityLabel} ${slotLabel}</div>
+        ${handHTML}
     </div>
     ${implicitHTML}
     ${implicitsHTML}
     ${reqHTML}
     ${chainHTML}
+    ${handHTML2}
     ${modsHTML}
     ${specialHTML}
     ${flavorHTML}
@@ -2062,8 +2116,43 @@ function _egHealEssenceItem(item) {
     return item;
 }
 
+// Deferred notice for the legacy hand migration below: _egLoadHubState also
+// runs at script parse time (no visible screen yet), so the message waits
+// here until showEndgameHub renders the sheet.
+let _egPendingHandMigrationToast = null;
+
 // Reads hub state from the global STATE object into local variables.
 // Missing entries are initialised to their default empty structures.
+
+// Explains a legacy hand migration (2H + shield equipped before the 1H/2H
+// split): the off-hand was moved to the stash. One toast per moved item.
+function _egShowHandMigrationToast(moves) {
+    if (!Array.isArray(moves) || !moves.length) return;
+    for (const mv of moves) {
+        const nm = (mv.item && mv.item.name) || '?';
+        let msg = null;
+        try {
+            if (mv.slotId === 'weapon2' && typeof _egIsTwoHandedWeapon === 'function'
+                && _egEquipped && _egIsTwoHandedWeapon(_egEquipped.weapon1)) {
+                const mainNm = (_egEquipped.weapon1 && _egEquipped.weapon1.name) || '?';
+                let tpl = null;
+                try { const s = t('eg_migrate_offhand_two_handed'); if (s && s !== 'eg_migrate_offhand_two_handed') tpl = s; } catch (e) {}
+                msg = (tpl || '⚠️ {off} moved to your stash — {main} is two-handed and needs a free off-hand')
+                    .replace('{off}', nm).replace('{main}', mainNm);
+            } else {
+                let tpl = null;
+                try { const s = t('eg_migrate_hand_generic'); if (s && s !== 'eg_migrate_hand_generic') tpl = s; } catch (e) {}
+                msg = (tpl || '⚠️ {name} moved to your stash — it cannot stay equipped in that slot')
+                    .replace('{name}', nm);
+            }
+        } catch (e) {
+            msg = `⚠️ ${nm} moved to your stash`;
+        }
+        try { if (typeof showToast === 'function') showToast(msg, '#f5b642'); } catch (e) {}
+        try { if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'info' }); } catch (e) {}
+    }
+}
+
 function _egLoadHubState() {
     _egEquipped = STATE.egEquipped || {};
     // Unlimited stash: keep whatever rows were saved; ensure at least the initial minimum
@@ -2401,6 +2490,46 @@ function _egLoadHubState() {
         }
     } catch (e) { /* ignore */ }
 
+    // ── Legacy weapon hands heal (pre-1H/2H saves) ──────────────────────
+    try {
+        if (typeof _egHealWeaponHands === 'function') {
+            let handsChanged = false;
+            const healWeaponGrid = (grid) => {
+                if (!Array.isArray(grid)) return;
+                for (let r = 0; r < grid.length; r++) {
+                    if (!Array.isArray(grid[r])) continue;
+                    for (let c = 0; c < grid[r].length; c++) {
+                        const it = grid[r][c];
+                        if (it && !_egHealWeaponHands(it)) continue;
+                        handsChanged = true;
+                    }
+                }
+            };
+            healWeaponGrid(_egInventory);
+            if (typeof _egEquipped === 'object' && _egEquipped) {
+                for (const it of Object.values(_egEquipped)) if (it && _egHealWeaponHands(it)) handsChanged = true;
+            }
+            if (typeof _egCraftingBenchItem !== 'undefined' && _egCraftingBenchItem && _egHealWeaponHands(_egCraftingBenchItem)) handsChanged = true;
+            if (handsChanged && typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
+        }
+    } catch (e) { /* ignore */ }
+
+    // ── Legacy hand migration (pre-1H/2H saves) ────────────────────────
+    // A 2H weapon + shield equipped before the patch is illegal now. Free the
+    // off-hand into the stash so the very next sheet visit shows a legal,
+    // working loadout (offense without block, as designed). Nothing is lost
+    // (stash is unlimited); the notice toast is deferred to showEndgameHub so
+    // it fires on the visible sheet.
+    try {
+        if (typeof _egMigrateIllegalHandsToStash === 'function') {
+            const _handMoves = _egMigrateIllegalHandsToStash();
+            if (_handMoves && _handMoves.length) {
+                if (typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
+                _egPendingHandMigrationToast = _handMoves;
+            }
+        }
+    } catch (e) { /* ignore */ }
+
     // ── Unique Collection load + legacy migration ────────────────────────
     try {
         _egEnsureUniqueStash();
@@ -2551,6 +2680,14 @@ function showEndgameHub() {
     _egLoadHubState();
     _egUpdateItemLevelToggleButton();
     _egRenderAll();
+    // Flush any deferred legacy-hand-migration notice on the visible sheet.
+    try {
+        if (_egPendingHandMigrationToast && _egPendingHandMigrationToast.length
+            && typeof _egShowHandMigrationToast === 'function') {
+            _egShowHandMigrationToast(_egPendingHandMigrationToast);
+        }
+    } catch (e) {}
+    _egPendingHandMigrationToast = null;
     _egClearTooltip();
 }
 

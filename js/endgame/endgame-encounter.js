@@ -1639,6 +1639,21 @@ function _egGetParryChancePct() {
     const gear = (_egComputePlayerStats().parryChancePct || 0);
     return base + gear;
 }
+// Dual-wield parry (PoE-style): two 1H weapons grant a base chance to parry
+// WITHOUT holding E (gear parry adds on top). Successful projectile parries
+// roll deflect exactly like held parries.
+function _egGetDualWieldParryChancePct() {
+    const base = (typeof EG_DUAL_WIELD_PARRY_PCT !== 'undefined' ? EG_DUAL_WIELD_PARRY_PCT : 15);
+    let gear = 0;
+    try { gear = (_egComputePlayerStats().parryChancePct || 0); } catch (e) {}
+    return base + gear;
+}
+function _egIsDualWieldParryActive() {
+    try {
+        if (typeof _egIsDualWielding === 'function') return _egIsDualWielding();
+    } catch (e) {}
+    return false;
+}
 function _egGetDeflectChancePct() {
     const base = (typeof EG_DEFLECT_BASE_PCT !== 'undefined' ? EG_DEFLECT_BASE_PCT : 5);
     const gear = (_egComputePlayerStats().deflectChancePct || 0);
@@ -1650,12 +1665,16 @@ function _egGetDeflectDamagePct() {
     return base + gear;
 }
 function _egRollParry(attacker, isProjectile) {
-    // Only while holding E during an active encounter
-    if (!(typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive)) return false;
+    // Hold-E parry, or dual-wield auto-parry (two 1H weapons, no key needed)
+    const holding = (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive);
+    const dualWield = (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());
+    if (!holding && !dualWield) return false;
     if (typeof _egIsActive === 'function' && !_egIsActive()) return false;
     // Hazards and boss spells are not parryable — they flow through isSpell=true,
     // but we also guard here for callers that bypass takeDamage.
-    const chance = _egGetParryChancePct();
+    const chance = holding
+        ? _egGetParryChancePct()
+        : (typeof _egGetDualWieldParryChancePct === 'function' ? _egGetDualWieldParryChancePct() : 15);
     if (chance <= 0) return false;
     if (Math.random() * 100 >= chance) return false;
     showToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
@@ -2532,10 +2551,16 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     // attacks while E is held. Hazards, monster spells (isSpell=true) and boss
     // special abilities are never parryable. On a successful projectile parry
     // there is a 5% + gear deflect chance to hit another monster for 30% + gear
-    // damage.
-    if (!isSpell && !isBossAbility && typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
+    // damage. Dual-wielding two 1H weapons grants the same roll at a 15% + gear
+    // base WITHOUT holding E.
+    const holdingE = (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive);
+    const dualWieldParry = !holdingE
+        && (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());
+    if (!isSpell && !isBossAbility && (holdingE || dualWieldParry)) {
         if (typeof _egIsActive === 'function' && _egIsActive()) {
-            const parryChance = _egGetParryChancePct();
+            const parryChance = holdingE
+                ? _egGetParryChancePct()
+                : (typeof _egGetDualWieldParryChancePct === 'function' ? _egGetDualWieldParryChancePct() : 15);
             if (parryChance > 0 && Math.random() * 100 < parryChance) {
                 const isProjectile = !!(opts && opts.isProjectile);
                 const attacker = opts && opts.attacker ? opts.attacker : null;

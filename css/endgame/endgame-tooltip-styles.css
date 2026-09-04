@@ -148,6 +148,16 @@
     letter-spacing: 0.06em;
 }
 
+/* Weapon hand line (One-Handed / Two-Handed) — same muted header style */
+.eg-tt-hands {
+    font-size: 0.75rem;
+    opacity: 0.85;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #d4c88a;
+}
+
 /* Sections — separated by a subtle divider */
 .eg-tt-section {
     padding: 5px 0;

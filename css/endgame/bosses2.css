@@ -192,12 +192,11 @@
 .eg-nk-beam-warn { opacity: 0.45; border-top-style: dashed; border-bottom-style: dashed; }
 
 /* The Clock — three permanent rotating hands (seconds red/thin, minutes
-   cyan/medium, hours amber/thick). Each hand is a single thin beam with a
-   HOLE inside it: an inner segment, an open gap, then an outer segment —
-   the gap is the only safe place to stand while the beam rotates. Summoned
-   at 90/60/30% HP, each announced by a center-grid time call ("35 seconds")
-   3s before it appears; the hands all rotate at the same speed until the
-   boss is won or lost. See boss-clock.js. */
+   cyan/medium, hours amber/thick). Each hand is a single solid thin beam
+   from the pivot to the screen edge — anywhere on the beam hurts, so stay
+   off every hand's line. Summoned at 90/60/30% HP, each announced by a
+   center-grid time call ("35 seconds") 3s before it appears; the hands all
+   rotate at the same speed until the boss is won or lost. See boss-clock.js. */
 .eg-nk-clock-hand {
     position: fixed;
     pointer-events: none;
@@ -245,6 +244,79 @@
 .eg-nk-clock-call-second { color: #fecaca; text-shadow: 0 0 10px rgba(248,113,113,0.9); }
 .eg-nk-clock-call-minute { color: #a5f3fc; text-shadow: 0 0 10px rgba(103,232,249,0.9); }
 .eg-nk-clock-call-hour { color: #fde68a; text-shadow: 0 0 10px rgba(251,191,36,0.95); }
+
+/* The Clock — Time Freeze (15% HP last-stand). Below 15% HP The Clock
+   stops time: the hands freeze, the timer and mistake counter freeze, the
+   avatar is locked, and a ring of beams rushes in from all sides to hover
+   just short of the player. If the boss isn't slain in 30s every beam
+   lunges through the player. See boss-clock.js (_egClockStartTimeFreeze). */
+.eg-clock-freeze-tint {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9000;
+    background: radial-gradient(circle at 50% 50%, rgba(148, 163, 255, 0.05), rgba(30, 41, 105, 0.45));
+}
+.eg-clock-freeze-banner {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 18px;
+    border-radius: 999px;
+    background: rgba(23, 37, 84, 0.88);
+    border: 1px solid rgba(147, 197, 253, 0.75);
+    box-shadow: 0 0 24px rgba(59, 130, 246, 0.5);
+    color: #dbeafe;
+    font-weight: 900;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    animation: eg-clock-freeze-banner-pulse 1.6s ease-in-out infinite alternate;
+}
+@keyframes eg-clock-freeze-banner-pulse {
+    from { box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); }
+    to   { box-shadow: 0 0 36px rgba(96, 165, 250, 0.8); }
+}
+.eg-clock-freeze-banner-title { color: #bfdbfe; }
+.eg-clock-freeze-banner-count { color: #fde68a; font-variant-numeric: tabular-nums; }
+.eg-clock-freeze-banner-urgent { border-color: rgba(251, 191, 36, 0.9); animation-duration: 0.5s; }
+.eg-clock-freeze-banner-urgent .eg-clock-freeze-banner-count { color: #fca5a5; }
+
+/* One beam: the outer div is positioned at the screen edge and rotated to
+   aim at the player; the inner seg carries the shared look and animations
+   so the strike scaleX never fights the aim rotation. */
+.eg-nk-clock-freeze-beam {
+    position: fixed;
+    height: 2px;
+    pointer-events: none;
+    z-index: 9001;
+    transform-origin: 0 50%;
+}
+.eg-nk-clock-freeze-beam-seg {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 50%;
+    opacity: 0;
+    background: linear-gradient(180deg, rgba(253, 224, 71, 0.0), rgba(253, 224, 71, 0.95) 35%, #fff8d0 50%, rgba(253, 224, 71, 0.95) 65%, rgba(253, 224, 71, 0.0));
+    border-top: 1px solid rgba(254, 240, 138, 0.85);
+    border-bottom: 1px solid rgba(254, 240, 138, 0.85);
+    box-shadow: 0 0 18px rgba(250, 204, 21, 0.85);
+    animation: eg-clock-freeze-beam-in 0.65s ease-out forwards;
+}
+@keyframes eg-clock-freeze-beam-in {
+    0%   { opacity: 0; transform: scaleX(0.06); }
+    55%  { opacity: 1; }
+    100% { opacity: 1; transform: scaleX(1); }
+}
+.eg-clock-freeze-beam-seg.eg-clock-freeze-strike {
+    animation: eg-clock-freeze-strike 0.8s ease-out forwards;
+}
+@keyframes eg-clock-freeze-strike {
+    0%   { opacity: 1; transform: scaleX(1); filter: brightness(1); }
+    30%  { opacity: 1; transform: scaleX(var(--eg-freeze-strike-scale, 1.3)); filter: brightness(2.6); }
+    100% { opacity: 0; transform: scaleX(var(--eg-freeze-strike-scale, 1.3)); filter: brightness(2.6); }
+}
 
 /* Hunting storms */
 .eg-nk-storm {
@@ -1184,6 +1256,60 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
         box-shadow: inset 0 0 10px rgba(125, 211, 252, 0.85),
             0 0 7px rgba(56, 189, 248, 0.55);
     }
+}
+
+/* Bouncing "STAND HERE" pill that floats above the icy cell nearest the
+   avatar while a shell blob is still squishing (rest phase, before it
+   locks). Fixed element positioned every frame by boss-jelly.js; it rides
+   with the gate's run so it is cleaned up when the run dies. The down
+   chevron points at the cell the player should stand on — the blob locks
+   onto wherever the player stands, so standing there makes it slip. */
+.eg-jelly-guide {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 9020;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: linear-gradient(180deg, #38bdf8 0%, #0e7490 100%);
+    color: #ffffff;
+    font-family: 'Impact', 'Anton', 'Arial Black', sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: 1.1px;
+    padding: 5px 12px 6px;
+    border-radius: 999px;
+    border: 2px solid #e0f2fe;
+    white-space: nowrap;
+    text-shadow:
+        -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000,
+        0 1px 2px rgba(0, 0, 0, 0.9);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.75),
+        0 0 12px rgba(56, 189, 248, 0.90),
+        0 0 22px rgba(125, 211, 252, 0.55);
+    animation: eg-jelly-guide-bounce 0.5s ease-in-out infinite;
+}
+
+/* Down chevron pointing at the icy cell below the pill. */
+.eg-jelly-guide::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top: 8px solid #0e7490;
+    border-bottom: none;
+}
+
+@keyframes eg-jelly-guide-bounce {
+    0%, 100% { transform: translate(-50%, -100%) translateY(0); }
+    50%      { transform: translate(-50%, -100%) translateY(-4px); }
 }
 
 /* Hop blob that slipped on ice — frosty trail while it launches at the

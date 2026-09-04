@@ -470,7 +470,11 @@ function _tickTimedStasis() {
     if (typeof playFreezeCountdownOverlay === 'function') playFreezeCountdownOverlay(freezeDur);
 
     setTimeout(() => {
-        timerFrozen = false;
+        // The Clock's Time Freeze holds the timer for its whole window —
+        // a short passive-freeze must never cut that freeze short.
+        if (typeof window === 'undefined' || !window._egClockTimeFreezeActive) {
+            timerFrozen = false;
+        }
         updTimer();
     }, freezeDur);
 }

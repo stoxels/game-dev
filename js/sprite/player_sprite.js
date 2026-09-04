@@ -210,6 +210,8 @@ const _avatarMoveState = {
 function _avatarMoveUiBlocked() {
     const tag = document.activeElement ? document.activeElement.tagName : null;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show')) return true;
+    // The Clock's Time Freeze locks the avatar in place for the whole window.
+    if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return true;
     if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return true;
     if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('frozen')) return true;
     return false;
@@ -259,6 +261,10 @@ function _avatarMoveTick(ts) {
             el.dataset.avatarFy = String(fy);
             _setAvatarPos(el, fx, fy);
         }
+    } else if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) {
+        // Drop keys that were held when Time Freeze started so the avatar
+        // doesn't lurch forward the instant the freeze lifts.
+        _avatarMoveState.held.clear();
     }
 
     _avatarMoveState.rafId = requestAnimationFrame(_avatarMoveTick);

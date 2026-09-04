@@ -18,6 +18,14 @@ const EG_PLAYER_STATS = {
     chargePushback: 1.5, // Seconds removed from a monster's charge bar on hit
 };
 
+// PoE-style weapon setups (see _egIsDualWielding in endgame-requirements.js):
+// dual-wielding two 1H weapons sums both weapons' melee damage then scales by
+// EG_DUAL_WIELD_DAMAGE_MULT (~1.4x a single 1H, below a 2H's ~1.6-1.7x), and
+// grants EG_DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding E
+// (gear parry adds on top; successful projectile parries can still deflect).
+const EG_DUAL_WIELD_DAMAGE_MULT = 0.7;
+const EG_DUAL_WIELD_PARRY_PCT = 15;
+
 
 
 
@@ -210,6 +218,8 @@ function _egTryHealLegacyDualMod(mod) {
         if (typeof EG_MOD_TABLE_ARCANE !== 'undefined') out.push(EG_MOD_TABLE_ARCANE);
         if (typeof EG_MOD_TABLE_TALISMAN !== 'undefined') out.push(EG_MOD_TABLE_TALISMAN);
         if (typeof EG_MOD_TABLE_WEAPON1 !== 'undefined') out.push(EG_MOD_TABLE_WEAPON1);
+        if (typeof EG_MOD_TABLE_WEAPON_1H !== 'undefined') out.push(EG_MOD_TABLE_WEAPON_1H);
+        if (typeof EG_MOD_TABLE_WEAPON_2H !== 'undefined') out.push(EG_MOD_TABLE_WEAPON_2H);
         if (typeof EG_MOD_TABLE_WEAPON2 !== 'undefined') out.push(EG_MOD_TABLE_WEAPON2);
         if (typeof EG_MOD_TABLE_SHIELD !== 'undefined') out.push(EG_MOD_TABLE_SHIELD);
         if (typeof EG_MOD_TABLE_RANGED !== 'undefined') out.push(EG_MOD_TABLE_RANGED);
@@ -652,6 +662,21 @@ function _egComputePlayerStats() {
         applyStatsFromList(item.implicits);
     });
 
+    // Dual-wield balance (PoE-style): two 1H weapons sum their base damage
+    // and melee mods, then the strike total is scaled by
+    // EG_DUAL_WIELD_DAMAGE_MULT (0.7) so dual-wield lands ~1.4x a single 1H —
+    // below a 2H weapon's ~1.6-1.7x, trading raw damage for the parry bonus.
+    // % increased multipliers are NOT scaled (only flat ranges are).
+    if (typeof _egIsDualWielding === 'function' && _egIsDualWielding()) {
+        const dw = (typeof EG_DUAL_WIELD_DAMAGE_MULT !== 'undefined') ? EG_DUAL_WIELD_DAMAGE_MULT : 0.7;
+        s.isDualWielding = true;
+        for (const k of ['meleePhysMin', 'meleePhysMax',
+            'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
+            'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
+            s[k] = Math.round((s[k] || 0) * dw);
+        }
+    }
+
     if (s.arcaneSurgeStreak === Infinity) s.arcaneSurgeStreak = 0;
 
     // Attribute side-effects per the design notes above:
@@ -1092,9 +1117,11 @@ const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_attributes', buckets: ['strength', 'agility', 'intelligence'] },
         { catKey: 'eg_statcat_crit', buckets: ['critChance', 'critMultiplierPct'] },
         // Melee auto-strike channel — independent from the projectile
-        // channel above; fed only by the weapon slot (see _egComputePlayerStats)
+        // channel above; fed only by the weapon slot (see _egComputePlayerStats).
+        // 'dualWield' heads the section while two 1H weapons are equipped so
+        // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
-            'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
+            'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
             'meleeLightningRange', 'meleeShadowRange'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
@@ -1154,6 +1181,15 @@ function _egBuildStatLine(bucket, stats) {
             if (stats.absorption > 0) line = { label: t('eg_tt_absorption'), value: `${_egFormatStatValue(stats.absorption)}` };
             break;
 
+        // Dual-wield indicator (pseudo-bucket): rendered only while two 1H
+        // weapons are equipped. The melee ranges below already reflect the
+        // combined-at-70% scaling — this line says why.
+        case 'dualWield': {
+            if (typeof _egIsDualWielding !== 'function' || !_egIsDualWielding()) return null;
+            line = { label: t('eg_stat_dual_wield'), value: t('eg_stat_dual_wield_value') };
+            break;
+        }
+
         // Effective melee strike interval: weapon base minus the summed
         // attack_speed mods from gear (always present — shown first in the
         // "Melee Strikes" category).
@@ -1203,12 +1239,25 @@ function _egBuildStatLine(bucket, stats) {
         // 0 gear) because they have meaningful baselines: 50% parry while
         // holding E, 5% deflect on a successful projectile parry, 30%
         // deflect damage. Use the live baseline helpers when available so the
-        // displayed total always matches combat.
+        // displayed total always matches combat. While dual-wielding, the
+        // auto-parry (15% baseline + gear, no key needed) is shown first with
+        // the held value in parentheses, mirroring the combat precedence.
         case 'parryChancePct': {
-            const total = (typeof _egGetParryChancePct === 'function')
+            const gear = stats.parryChancePct || 0;
+            const held = (typeof _egGetParryChancePct === 'function')
                 ? _egGetParryChancePct()
-                : ((typeof EG_PARRY_BASE_PCT !== 'undefined' ? EG_PARRY_BASE_PCT : 50) + (stats.parryChancePct || 0));
-            line = { label: t('eg_stat_parry'), value: `${_egFormatStatValue(total)}%` };
+                : ((typeof EG_PARRY_BASE_PCT !== 'undefined' ? EG_PARRY_BASE_PCT : 50) + gear);
+            const dual = (typeof _egIsDualWielding === 'function' && _egIsDualWielding());
+            if (dual) {
+                const auto = (typeof _egGetDualWieldParryChancePct === 'function')
+                    ? _egGetDualWieldParryChancePct()
+                    : ((typeof EG_DUAL_WIELD_PARRY_PCT !== 'undefined' ? EG_DUAL_WIELD_PARRY_PCT : 15) + gear);
+                let suffix = 'while holding [E]';
+                try { const s = t('eg_stat_parry_held_suffix'); if (s && s !== 'eg_stat_parry_held_suffix') suffix = s; } catch (e) {}
+                line = { label: t('eg_stat_parry'), value: `${_egFormatStatValue(auto)}% (${_egFormatStatValue(held)}% ${suffix})` };
+            } else {
+                line = { label: t('eg_stat_parry'), value: `${_egFormatStatValue(held)}%` };
+            }
             break;
         }
         case 'deflectChancePct': {

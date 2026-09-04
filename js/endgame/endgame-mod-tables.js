@@ -6703,6 +6703,53 @@ const EG_MOD_TABLE_WEAPON1 = {
 }
 };
 
+// One-handed melee table (main-hand + dual-wield off-hand). Identical to the
+// legacy WEAPON1 pool — kept as an alias so old references keep working.
+const EG_MOD_TABLE_WEAPON_1H = EG_MOD_TABLE_WEAPON1;
+
+// 1H-exclusive: Parry (dual-wield defense identity). Two-handed weapons are
+// pure offense and can never roll this — choosing 2H means giving up parry,
+// exactly like giving up block by dropping the shield.
+EG_MOD_TABLE_WEAPON_1H.suffixes.parry = {
+    id: 'parry',
+    label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+    tiers: [
+        { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
+        { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
+        { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
+    ]
+};
+
+//------------------------------------------------------------------------
+//-------------------TWO-HANDED MELEE MODIFIER TABLE----------------------
+//------------------------------------------------------------------------
+// PoE-style: 2H weapons roll the same families as 1H but hit ~45% harder on
+// flat damage (physical + elemental) and ~25% harder on % increased physical.
+// Attack speed / crit / accuracy / status / cleave pools are unchanged, so a
+// 2H weapon feels like a bigger version of a 1H — not a different item class.
+const EG_MOD_TABLE_WEAPON_2H = (() => {
+    const clone = JSON.parse(JSON.stringify(EG_MOD_TABLE_WEAPON1));
+    const scaleTierList = (tiers, factor) => {
+        for (const tr of tiers) {
+            for (const k of ['min', 'max', 'min1', 'max1', 'min2', 'max2']) {
+                if (typeof tr[k] === 'number') tr[k] = Math.round(tr[k] * factor * 10) / 10;
+            }
+        }
+    };
+    const FLAT_2H = 1.45, INC_2H = 1.25;
+    try {
+        const p = clone.prefixes || {};
+        if (p.flat_physical_damage) scaleTierList(p.flat_physical_damage.tiers, FLAT_2H);
+        if (p.inc_physical_damage) scaleTierList(p.inc_physical_damage.tiers, INC_2H);
+        for (const id of ['fire_damage', 'cold_damage', 'lightning_damage', 'shadow_damage']) {
+            if (p[id]) scaleTierList(p[id].tiers, FLAT_2H);
+        }
+    } catch (e) {}
+    // 2H is pure offense: strip the 1H-exclusive parry suffix (cloned above).
+    try { if (clone.suffixes && clone.suffixes.parry) delete clone.suffixes.parry; } catch (e) {}
+    return clone;
+})();
+
 //------------------------------------------------------------------------
 //-------------------WEAPON 2 (OFF-HAND / SHIELD) MODIFIER TABLE----------
 //------------------------------------------------------------------------

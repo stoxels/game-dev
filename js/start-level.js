@@ -73,7 +73,11 @@ function _resetGameplayFlags() {
     hoverRow = -1;
     hoverCol = -1;
     shieldActive = false;
-    timerFrozen = false;
+    // The Clock's Time Freeze pins the map timer and must survive arena
+    // puzzle transitions during the 30s window — only clear timerFrozen
+    // when the freeze isn't running (or on a genuinely fresh level).
+    timerFrozen = isChainTransition
+        && (typeof window !== 'undefined' && !!window._egClockTimeFreezeActive);
     quizAnsweredCorrectly = false;
     consecutiveCorrectFills = 0;
     _lawOfLargeNumbersNext = null;

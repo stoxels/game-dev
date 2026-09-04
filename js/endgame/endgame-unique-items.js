@@ -186,7 +186,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'hungering_edge',
         nameEn: 'Hungering Edge',
         nameDe: 'Hungrige Klinge',
-        icon: '🗡️', slotType: 'weapon', archetype: 'any',
+        icon: '🗡️', slotType: 'weapon', archetype: 'any', hands: 1,
         minLevel: 30,
         requirements: { level: 30, str: 82, agi: 0, int: 0 },
         damage: { min: 124, max: 241 }, attackIntervalSeconds: 7.2,
@@ -412,7 +412,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'butchers_cleaver',
         nameEn: "Butcher's Cleaver",
         nameDe: 'Schlachtermesser',
-        icon: '🔪', slotType: 'weapon', archetype: 'strength',
+        icon: '🔪', slotType: 'weapon', archetype: 'strength', hands: 1,
         minLevel: 12,
         requirements: { level: 12, str: 46, agi: 0, int: 0 },
         damage: { min: 74, max: 149 }, attackIntervalSeconds: 6.4,
@@ -807,10 +807,10 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'worldsplitter',
         nameEn: 'Worldsplitter',
         nameDe: 'Weltspalter',
-        icon: '⚔️', slotType: 'weapon', archetype: 'strength',
+        icon: '⚔️', slotType: 'weapon', archetype: 'strength', hands: 2,
         minLevel: 75,
         requirements: { level: 75, str: 285, agi: 0, int: 0 },
-        damage: { min: 708, max: 1304 }, attackIntervalSeconds: 8.8,
+        damage: { min: 820, max: 1510 }, attackIntervalSeconds: 12.0,
         bonuses: [
             { key: 'inc_physical_damage', value: 85, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'stagger', value: 40, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
@@ -1062,7 +1062,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'kindling_brand',
         nameEn: 'Kindling Brand',
         nameDe: 'Anzündbrand',
-        icon: '🗡️', slotType: 'weapon', archetype: 'any',
+        icon: '🗡️', slotType: 'weapon', archetype: 'any', hands: 1,
         minLevel: 17,
         requirements: { level: 17, str: 65, agi: 0, int: 0 },
         damage: { min: 100, max: 201 }, attackIntervalSeconds: 5.6,
@@ -1515,10 +1515,10 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'doomcallers_maul',
         nameEn: "Doomcaller's Maul",
         nameDe: 'Schicksalsrufer-Hammer',
-        icon: '🔨', slotType: 'weapon', archetype: 'strength',
+        icon: '🔨', slotType: 'weapon', archetype: 'strength', hands: 2,
         minLevel: 68,
         requirements: { level: 68, str: 258, agi: 0, int: 0 },
-        damage: { min: 981, max: 1846 }, attackIntervalSeconds: 9.5,
+        damage: { min: 1050, max: 1980 }, attackIntervalSeconds: 11.5,
         bonuses: [
             { key: 'stagger', value: 45, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'cleave', value: 40, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
@@ -1604,7 +1604,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'torch_stub',
         nameEn: 'Torch Stub',
         nameDe: 'Fackelstummel',
-        icon: '🕯️', slotType: 'weapon', archetype: 'any',
+        icon: '🕯️', slotType: 'weapon', archetype: 'any', hands: 1,
         minLevel: 4,
         requirements: { level: 4, str: 15, agi: 0, int: 0 },
         damage: { min: 29, max: 63 }, attackIntervalSeconds: 5.0,
@@ -2072,7 +2072,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'vampiric_fang',
         nameEn: 'Vampiric Fang',
         nameDe: 'Vampir-Reißzahn',
-        icon: '🦇', slotType: 'weapon', archetype: 'any',
+        icon: '🦇', slotType: 'weapon', archetype: 'any', hands: 1,
         minLevel: 41,
         requirements: { level: 41, str: 156, agi: 0, int: 0 },
         damage: { min: 380, max: 694 }, attackIntervalSeconds: 7.4,
@@ -2519,7 +2519,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'apex_predator_fang',
         nameEn: 'Apex Predator Fang',
         nameDe: 'Reißzahn des Spitzenprädatoren',
-        icon: '🐉', slotType: 'weapon', archetype: 'agility',
+        icon: '🐉', slotType: 'weapon', archetype: 'agility', hands: 1,
         minLevel: 75,
         requirements: { level: 75, str: 0, agi: 285, int: 0 },
         damage: { min: 731, max: 1323 }, attackIntervalSeconds: 6.8,
@@ -3295,7 +3295,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'splintered_oak_club',
         nameEn: 'Splintered Oak Club',
         nameDe: 'Splittriger Eichenknüppel',
-        icon: '🪵', slotType: 'weapon', archetype: 'strength',
+        icon: '🪵', slotType: 'weapon', archetype: 'strength', hands: 1,
         minLevel: 3,
         requirements: { level: 3, str: 12, agi: 0, int: 0 },
         damage: { min: 33, max: 74 }, attackIntervalSeconds: 6.0,
@@ -3314,7 +3314,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'carving_knife_of_endless_portions',
         nameEn: 'Carving Knife of Endless Portions',
         nameDe: 'Tranchiermesser der Endlosen Portionen',
-        icon: '🍴', slotType: 'weapon', archetype: 'any',
+        icon: '🍴', slotType: 'weapon', archetype: 'any', hands: 1,
         minLevel: 14,
         requirements: { level: 14, str: 53, agi: 0, int: 0 },
         damage: { min: 72, max: 132 }, attackIntervalSeconds: 5.4,
@@ -3334,7 +3334,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'oathbreaker_estoc',
         nameEn: 'Oathbreaker Estoc',
         nameDe: 'Eidbrecher-Estoc',
-        icon: '🗡️', slotType: 'weapon', archetype: 'agility',
+        icon: '🗡️', slotType: 'weapon', archetype: 'agility', hands: 1,
         minLevel: 33,
         requirements: { level: 33, str: 0, agi: 125, int: 0 },
         damage: { min: 179, max: 320 }, attackIntervalSeconds: 6.6,
@@ -3354,10 +3354,10 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'hammer_of_reasonable_doubt',
         nameEn: 'Hammer of Reasonable Doubt',
         nameDe: 'Hammer des Vernünftigen Zweifels',
-        icon: '🔨', slotType: 'weapon', archetype: 'strength',
+        icon: '🔨', slotType: 'weapon', archetype: 'strength', hands: 2,
         minLevel: 52,
         requirements: { level: 52, str: 198, agi: 0, int: 0 },
-        damage: { min: 646, max: 1131 }, attackIntervalSeconds: 8.2,
+        damage: { min: 700, max: 1250 }, attackIntervalSeconds: 11.0,
         bonuses: [
             { key: 'stagger', value: 40, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
@@ -3375,7 +3375,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'requiem_needle',
         nameEn: 'Requiem Needle',
         nameDe: 'Requiem-Nadel',
-        icon: '📌', slotType: 'weapon', archetype: 'agility',
+        icon: '📌', slotType: 'weapon', archetype: 'agility', hands: 1,
         minLevel: 71,
         requirements: { level: 71, str: 0, agi: 270, int: 0 },
         damage: { min: 637, max: 1105 }, attackIntervalSeconds: 5.8,
@@ -5827,7 +5827,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'ruler_of_measurable_ruin',
         nameEn: 'Ruler of Measurable Ruin',
         nameDe: 'Lineal des Messbaren Verderbens',
-        icon: '📏', slotType: 'weapon', archetype: 'strength',
+        icon: '📏', slotType: 'weapon', archetype: 'strength', hands: 1,
         minLevel: 14,
         requirements: { level: 14, str: 55, agi: 0, int: 0 },
         damage: { min: 43, max: 81 }, attackIntervalSeconds: 3.5,
@@ -5846,10 +5846,10 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'slide_rule_scythe',
         nameEn: 'Slide Rule Scythe',
         nameDe: 'Rechenschieben-Sense',
-        icon: '🌾', slotType: 'weapon', archetype: 'strength',
+        icon: '🌾', slotType: 'weapon', archetype: 'strength', hands: 2,
         minLevel: 58,
         requirements: { level: 58, str: 220, agi: 0, int: 0 },
-        damage: { min: 398, max: 625 }, attackIntervalSeconds: 6.5,
+        damage: { min: 460, max: 760 }, attackIntervalSeconds: 10.5,
         bonuses: [
             { key: 'crit_chance', value: 20, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 60, en: '+#% Critical Strike Multiplier', de: '+#% Kritischer Schadensmultiplikator' },
@@ -5867,7 +5867,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'chalksword_of_corrected_errors',
         nameEn: 'Chalksword of Corrected Errors',
         nameDe: 'Kreideschwert der Korrigierten Fehler',
-        icon: '🖍️', slotType: 'weapon', archetype: 'strength',
+        icon: '🖍️', slotType: 'weapon', archetype: 'strength', hands: 1,
         minLevel: 44,
         requirements: { level: 44, str: 168, agi: 0, int: 0 },
         damage: { min: 272, max: 453 }, attackIntervalSeconds: 5.0,
@@ -5886,7 +5886,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'abacus_flail',
         nameEn: 'Abacus Flail',
         nameDe: 'Abacus-Dreschflegel',
-        icon: '🧮', slotType: 'weapon', archetype: 'strength',
+        icon: '🧮', slotType: 'weapon', archetype: 'strength', hands: 1,
         minLevel: 36,
         requirements: { level: 36, str: 137, agi: 0, int: 0 },
         damage: { min: 236, max: 414 }, attackIntervalSeconds: 4.5,
@@ -5905,10 +5905,10 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'protractor_polearm',
         nameEn: 'Protractor Polearm',
         nameDe: 'Winkelmesser-Stangenwaffe',
-        icon: '📐', slotType: 'weapon', archetype: 'strength',
+        icon: '📐', slotType: 'weapon', archetype: 'strength', hands: 2,
         minLevel: 66,
         requirements: { level: 66, str: 250, agi: 0, int: 0 },
-        damage: { min: 816, max: 1415 }, attackIntervalSeconds: 7.5,
+        damage: { min: 880, max: 1560 }, attackIntervalSeconds: 11.0,
         bonuses: [
             { key: 'cleave', value: 50, en: '#% chance to Cleave (hit nearby Monsters)', de: '#% Chance auf Keilschlag (nahe Monster treffen)' },
             { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
@@ -5926,7 +5926,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'compass_needle_dirk',
         nameEn: 'Compass Needle Dirk',
         nameDe: 'Kompassnadel-Dolch',
-        icon: '🧭', slotType: 'weapon', archetype: 'agility',
+        icon: '🧭', slotType: 'weapon', archetype: 'agility', hands: 1,
         minLevel: 22,
         requirements: { level: 22, str: 0, agi: 85, int: 0 },
         damage: { min: 41, max: 75 }, attackIntervalSeconds: 2.2,
@@ -5945,7 +5945,7 @@ const EG_UNIQUE_ITEMS = [
         uniqueId: 'graders_red_pen',
         nameEn: "Grader's Red Pen",
         nameDe: 'Rotstift des Benoters',
-        icon: '🖊️', slotType: 'weapon', archetype: 'any',
+        icon: '🖊️', slotType: 'weapon', archetype: 'any', hands: 1,
         minLevel: 72,
         requirements: { level: 72, str: 120, agi: 120, int: 40 },
         damage: { min: 657, max: 1061 }, attackIntervalSeconds: 5.5,
@@ -6497,6 +6497,30 @@ function _egBuildUniqueImplicits(def, defenses) {
     } catch (e) { return []; }
 }
 // Retroactively heals an already-stashed unique that was saved before
+// Two-handed unique weapons (everything else with slotType 'weapon' is 1H).
+const EG_UNIQUE_TWO_HANDED_IDS = new Set([
+    'worldsplitter', 'doomcallers_maul', 'hammer_of_reasonable_doubt',
+    'protractor_polearm', 'slide_rule_scythe',
+]);
+
+// Infers 1H/2H for a weapon item without a `hands` field (legacy saves).
+// Prefers the unique def, then the base-type table, then a slow-interval heuristic.
+function _egInferWeaponHands(item) {
+    if (!item || item.slotType !== 'weapon') return null;
+    if (typeof EG_UNIQUE_ITEMS !== 'undefined' && item.baseId) {
+        const def = EG_UNIQUE_ITEMS.find(u => u.uniqueId === item.baseId);
+        if (def && (def.hands === 1 || def.hands === 2)) return def.hands;
+        if (def && EG_UNIQUE_TWO_HANDED_IDS.has(def.uniqueId)) return 2;
+    }
+    if (typeof EG_ALL_BASE_TYPES !== 'undefined' && item.baseId) {
+        const base = EG_ALL_BASE_TYPES.find(b => b.id === item.baseId);
+        if (base && (base.hands === 1 || base.hands === 2)) return base.hands;
+    }
+    // Heuristic: very slow swing (>= 9.8s) was a 2H swing in the old system.
+    if (typeof item.attackIntervalSeconds === 'number' && item.attackIntervalSeconds >= 9.8) return 2;
+    return 1;
+}
+
 // base armor/damage was added or before implicits/downside rebalance.
 // Mutates `item` in place, returns true if anything was changed.
 function _egHealUniqueItem(item) {
@@ -6544,6 +6568,22 @@ function _egHealUniqueItem(item) {
         }
         if (expBlock != null && (item.blockChance == null || typeof item.blockChance !== 'number')) {
             item.blockChance = expBlock;
+            changed = true;
+        }
+    }
+    // --- hands (1H/2H weapons) ---
+    if (item.slotType === 'weapon' && (item.hands !== 1 && item.hands !== 2)) {
+        if (def && (def.hands === 1 || def.hands === 2)) {
+            item.hands = def.hands;
+            changed = true;
+        } else if (typeof _egInferWeaponHands === 'function') {
+            const inferred = _egInferWeaponHands(item);
+            if (inferred === 1 || inferred === 2) {
+                item.hands = inferred;
+                changed = true;
+            }
+        } else {
+            item.hands = 1;
             changed = true;
         }
     }
@@ -6670,6 +6710,7 @@ function _egBuildUniqueItem(def, monsterLevel) {
 
         ...(defenses ? { defenses } : {}),
         ...(damage ? { damage, ...(attackIntervalSeconds != null ? { attackIntervalSeconds } : {}) } : {}),
+        ...(def.hands ? { hands: def.hands } : (def.slotType === 'weapon' ? { hands: 1 } : {})),
         ...(blockChance != null ? { blockChance } : {}),
 
         mods: [bonusMod].concat(downsideMods),

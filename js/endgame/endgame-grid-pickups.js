@@ -1065,6 +1065,7 @@ function _egCheckLootClaim(row, col) {
     showToast(t('eg_loot_claimed')
         .replace('{icon}', item.isUnique ? '✨' : (item.icon || ''))
         .replace('{name}', item.name + nameSuffix), _egRarityToastColor(item.rarity));
+    Audio_Manager.playSFX('player_equip_pickup');
     return true;
 }
 
@@ -1292,6 +1293,7 @@ function _egCheckCurrencyDropClaim(row, col) {
     if (added) showToast(t('eg_currency_acquired')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name), _egRarityToastColor('currency'));
+    Audio_Manager.playSFX('player_equip_pickup');
     return true;
 }
 

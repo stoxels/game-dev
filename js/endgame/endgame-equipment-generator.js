@@ -34,8 +34,9 @@ const EG_MOD_CAPS = {
 // Maps every slotType value (from endgame-equipment-base-items.js) to its
 // mod table.  weapon1/weapon2/ranged share separate tables because melee,
 // off-hand, and ranged have different mod pools.
-// NOTE: melee weapons use slotType 'weapon' (→ WEAPON1), shields use
-// slotType 'shield' (→ SHIELD, a defensive-only derivative of WEAPON2).
+// NOTE: melee weapons use slotType 'weapon' — 1H rolls WEAPON_1H, 2H rolls
+// the harder-hitting WEAPON_2H table (PoE-style). Shields use slotType
+// 'shield' (→ SHIELD, a defensive-only derivative of WEAPON2).
 const EG_SLOT_MOD_TABLE_MAP = {
     head: () => EG_MOD_TABLE_HEAD,
     earring: () => EG_MOD_TABLE_EARRING,
@@ -51,10 +52,29 @@ const EG_SLOT_MOD_TABLE_MAP = {
     ring: () => EG_MOD_TABLE_RING,
     arcane: () => EG_MOD_TABLE_ARCANE,
     talisman: () => EG_MOD_TABLE_TALISMAN,
-    weapon: () => EG_MOD_TABLE_WEAPON1,   // main-hand melee weapons
+    weapon: (base) => _egGetWeaponModTable(base),
     shield: () => EG_MOD_TABLE_SHIELD,    // shields (off-hand only)
     ranged: () => EG_MOD_TABLE_RANGED,
 };
+
+// Returns the melee mod table for the base currently being rolled:
+// two-handed weapons roll the harder-hitting WEAPON_2H pool, everything
+// else (1H main-hand + 1H off-hand dual-wield) rolls WEAPON_1H.
+function _egGetWeaponModTable(base) {
+    const b = base || _egCurrentWeaponBase || null;
+    const hands = b ? (b.hands === 2 ? 2 : 1) : 1;
+    try {
+        if (hands === 2 && typeof EG_MOD_TABLE_WEAPON_2H !== 'undefined') return EG_MOD_TABLE_WEAPON_2H;
+        if (typeof EG_MOD_TABLE_WEAPON_1H !== 'undefined') return EG_MOD_TABLE_WEAPON_1H;
+        return EG_MOD_TABLE_WEAPON1;
+    } catch (e) {
+        return (typeof EG_MOD_TABLE_WEAPON1 !== 'undefined') ? EG_MOD_TABLE_WEAPON1 : null;
+    }
+}
+
+// Set around the mod-roll so _egGetWeaponModTable can see the base even when
+// called via the slot map without arguments (essences / crafting paths).
+let _egCurrentWeaponBase = null;
 
 
 //------------------------------------------------------------------------
@@ -100,9 +120,10 @@ function _egFamilyAllowedOnBase(familyId, defenses) {
 // Returns the correct mod table object for a given base item.
 
 function _egGetModTable(base) {
+    if (base && base.slotType === 'weapon') _egCurrentWeaponBase = base;
     const getter = EG_SLOT_MOD_TABLE_MAP[base.slotType];
     if (!getter) return null;
-    try { return getter(); }
+    try { return getter(base); }
     catch (e) { return null; }  // table constant not yet defined — safe fallback
 }
 
@@ -602,6 +623,7 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
         defenses: { ...base.defenses },
 
         ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
+        ...(base.hands ? { hands: base.hands } : {}),
         ...(base.blockChance ? { blockChance: base.blockChance } : {}),
 
         mods,

@@ -313,19 +313,53 @@ function _egJellyClearSafeMark(g) {
 }
 
 
+// Hides the "stand here" guide pill (if any).
+function _egJellyHideGuide(g) {
+    if (g && g.guide) g.guide.style.display = 'none';
+}
+
+
+// Shows the "stand here" guide pill hovering just above an icy cell.
+function _egJellyShowGuide(g, entry) {
+    const el = g && g.guide;
+    if (!el) return;
+    if (!entry) { el.style.display = 'none'; return; }
+    const cell = document.getElementById('g-' + entry.r + '-' + entry.c);
+    if (!cell || !cell.isConnected) { el.style.display = 'none'; return; }
+    const r = cell.getBoundingClientRect();
+    if (!r.width && !r.height) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    el.style.left = Math.round(r.left + r.width / 2) + 'px';
+    el.style.top = Math.round(r.top - 6) + 'px';
+}
+
+
 // While a shell blob is alive, keeps the green hold-spot marker truthful:
-// during the blob's rest phase (before it locks) the marker follows the icy
-// cell under the avatar — "hold here and the blob will lock onto ice" — and
-// once the blob locks (warn/fly) it marks the locked landing cell, so the
-// player sees exactly where the blob will slip. No marker = not on ice.
+// during the blob's rest phase (before it locks) EVERY icy patch is a valid
+// lure spot, so they all glow green and a bouncing "STAND HERE" pill sits
+// above the one nearest the avatar — the blob locks onto wherever the
+// player stands, so that patch is where it will land and slip. Once the
+// blob locks (warn/fly) it marks the locked landing cell, so the player
+// sees exactly where the blob will slip. No marker = not on ice.
 function _egJellySyncSafeMark(g) {
     if (!g || !g.blob) return;
     const b = g.blob;
     _egJellyClearSafeMark(g);
+    _egJellyHideGuide(g);
     if (b.mode === 'rest') {
         const c = _egNkPlayerCenter();
-        const under = c ? _egJellyIceAt(c.x, c.y) : null;
-        if (under && under.el) under.el.classList.add('eg-jelly-ice-safe');
+        if (c) {
+            let nearest = null, best = Infinity;
+            g.ice.forEach(entry => {
+                const cell = document.getElementById('g-' + entry.r + '-' + entry.c);
+                if (!cell || !cell.isConnected) return;
+                entry.el.classList.add('eg-jelly-ice-safe');
+                const r = cell.getBoundingClientRect();
+                const d = Math.hypot(r.left + r.width / 2 - c.x, r.top + r.height / 2 - c.y);
+                if (d < best) { best = d; nearest = entry; }
+            });
+            _egJellyShowGuide(g, nearest);
+        }
     } else if (b.mode === 'warn' || b.mode === 'fly') {
         const at = _egJellyIceAt(b.tx, b.ty);
         if (at && at.el) at.el.classList.add('eg-jelly-ice-safe');
@@ -376,6 +410,12 @@ function _egJellyStartShieldGate(monster) {
     gate.bubble = _egNkEl(run, 'div', 'eg-jelly-bubble', '');
     gate.bubble.style.display = 'none';
 
+    // "STAND HERE" pill that points at the nearest icy patch while a blob
+    // is in its rest phase (before it locks). Hidden by default; positioned
+    // and shown by _egJellySyncSafeMark, cleaned up with the run.
+    gate.guide = _egNkEl(run, 'div', 'eg-jelly-guide', '❄️ STAND HERE!');
+    gate.guide.style.display = 'none';
+
     run.onKill = () => {
         const m = _egJellyMonsterById(gate.monsterId);
         if (m) m.jellyShieldUp = false;
@@ -384,7 +424,7 @@ function _egJellyStartShieldGate(monster) {
 
     _egJellyTopUpIce(gate, EG_JELLY_ICE_TARGET);
     _egNkToast('eg_jelly_ice_shell',
-        '🟢 The Jelly: Ice Shell! Lure a hop blob onto the ice to break it!', '#4ade80');
+        '🟢 The Jelly: Ice Shell! Stand on the ❄️ ice — the next blob slips and breaks it!', '#4ade80');
     if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e) {} }
 
     _egNkLoop(run, (dtS) => {
@@ -424,6 +464,7 @@ function _egJellyStartShieldGate(monster) {
             const alive = _egJellyStepBlob(g.blob, dtMs, true);
             if (!alive) {
                 _egJellyClearSafeMark(g);
+                _egJellyHideGuide(g);
                 const broke = g.blob.slipDone;
                 g.blob = null;
                 if (broke) {
@@ -481,6 +522,7 @@ function _egJellyShieldBroken(monster, run) {
 function _egJellyDropGateVisuals(gate) {
     if (_egJellyGate === gate) _egJellyGate = null;
     if (!gate) return;
+    _egJellyHideGuide(gate);
     gate.ice.forEach(entry => { try { entry.el.remove(); } catch (e) {} });
     gate.ice.clear();
     gate.blob = null;
