@@ -525,7 +525,30 @@ function _dndDrop(e) {
         const displaced = _egMapSlotItem;
         _egMapSlotItem = _dnd.item;
         _egRenderMapSlot();
-        if (displaced) _dndReturnDisplacedToSource(displaced);
+        if (displaced) {
+            // A map displaced from the device must never be dumped into a stash
+            // tab of a different tier: dropping a Tier 1 stash map onto a Tier 7
+            // device map used to send the Tier 7 map back to the Tier 1 grid
+            // (the drag source cell), corrupting the map sort. Route it to a
+            // free cell of its OWN tier instead — the same rule the right-click
+            // quick-load path follows. Same-tier swaps still return to source.
+            const draggedTier = (_dnd.item && _dnd.item.mapTier != null) ? _dnd.item.mapTier : null;
+            const displacedTier = (displaced.mapTier != null) ? displaced.mapTier : null;
+            const routeToOwnTier = draggedTier != null && displacedTier != null && draggedTier !== displacedTier
+                && typeof _egFindFreeMapCellForTier === 'function' && typeof _egGetMapTierGrid === 'function';
+            if (routeToOwnTier) {
+                try {
+                    const pos = _egFindFreeMapCellForTier(displacedTier);
+                    _egGetMapTierGrid(displacedTier)[pos.r][pos.c] = displaced;
+                    // Only the active tier's grid is in the DOM, so render there
+                    if (displacedTier === _egMapStashActiveTier) _egRenderMapStashCell(pos.r, pos.c);
+                } catch (e) {
+                    _dndReturnDisplacedToSource(displaced);
+                }
+            } else {
+                _dndReturnDisplacedToSource(displaced);
+            }
+        }
         dropped = true;
 
     } else if (equipSlotEl && _dndZoneAccepts('equip')) {
