@@ -487,15 +487,29 @@ function egAtlasAdjacentBonusPercent() {
     return Math.round(egAtlasAdjacentBonusChance() * 100);
 }
 
-// Picks the region an atlas-bonus drop comes from: a random node LINKED to
-// (adjacent on the atlas graph) the just-completed run's region. Falls back
-// to the active region itself when it has no links / is unknown, and to a
-// same-tier unlocked region when there is no active run at all.
+// Picks the region an atlas-bonus drop comes from: a node LINKED to
+// (adjacent on the atlas graph) the just-completed run's region. Climb
+// priority: when linked regions exactly one tier HIGHER exist that are not
+// yet completed, the bonus targets one of those — so the stacking bonus is
+// an alternate climb path beside boss kills and works on higher tiers too.
+// Otherwise a uniform random linked region (same/lower sustain, or an
+// already-completed +1). Falls back to the active region itself when it has
+// no links / is unknown, and to a same-tier unlocked region when there is
+// no active run at all.
 function egAtlasPickAdjacentBonusNodeId(activeNodeId) {
     const active = activeNodeId ? egAtlasNodeById(activeNodeId) : null;
     if (active && Array.isArray(active.links) && active.links.length > 0) {
         const linked = active.links.filter(id => egAtlasNodeById(id));
-        if (linked.length > 0) return linked[Math.floor(Math.random() * linked.length)];
+        if (linked.length > 0) {
+            // Links only ever span one tier by construction, so "higher"
+            // always means exactly +1.
+            const climb = linked.filter(id => {
+                const n = egAtlasNodeById(id);
+                return n && n.tier > active.tier && !egAtlasIsCompleted(id);
+            });
+            const pool = (climb.length > 0) ? climb : linked;
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
         return active.id;
     }
     if (active) return active.id;

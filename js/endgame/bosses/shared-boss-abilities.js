@@ -450,10 +450,121 @@ function _egBuildMarkDestinations(excludeKeys) {
 }
 
 
+// Flight time for the relocated ✕ to travel from its old cell to the new one.
+const EG_SHIFT_FLY_MS = 1500;
+
+// Active shift flyers (fixed-position ✕ nodes) so boss death / encounter
+// stop can remove mid-flight orphans. See _egClearShiftGlows.
+let _egShiftFlyNodes = [];
+
+
+// Ease in-out cubic for the shift flight — slow lift-off, fast cruise,
+// soft landing so the eye can track the ✕ across the grid.
+function _egShiftFlyEase(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+
+// Spawns one flying ✕ from the center of (sr, sc) to the center of (dr, dc)
+// over EG_SHIFT_FLY_MS. The destination rect is re-read every frame so a
+// scroll / zoom mid-flight still lands on the right cell. onLanded fires
+// exactly once (also when either cell is missing — no visual, just the
+// state commit).
+function _egShiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
+    let done = false;
+    const finish = () => {
+        if (done) return;
+        done = true;
+        if (typeof onLanded === 'function') {
+            try { onLanded(); } catch (e) { /* never break the flight loop */ }
+        }
+    };
+
+    const srcEl = document.getElementById(`g-${sr}-${sc}`);
+    const dstEl0 = document.getElementById(`g-${dr}-${dc}`);
+    if (!srcEl || !dstEl0) {
+        finish();
+        return;
+    }
+
+    const s = srcEl.getBoundingClientRect();
+    if (!s.width && !s.height) {
+        finish();
+        return;
+    }
+    const size = Math.max(10, s.width);
+    const startX = s.left + s.width / 2;
+    const startY = s.top + s.height / 2;
+
+    const node = document.createElement('div');
+    node.className = 'eg-shift-fly';
+    node.textContent = '✕';
+    node.style.width = `${size}px`;
+    node.style.height = `${size}px`;
+    node.style.fontSize = `${Math.round(size * 0.62)}px`;
+    node.style.left = `${startX - size / 2}px`;
+    node.style.top = `${startY - size / 2}px`;
+    document.body.appendChild(node);
+    _egShiftFlyNodes.push(node);
+
+    const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    const step = (now) => {
+        // Cancelled mid-flight (cleanup removed the node) — still commit
+        // the destination state so no mark stays visually missing.
+        if (!node.isConnected) {
+            const idx = _egShiftFlyNodes.indexOf(node);
+            if (idx !== -1) _egShiftFlyNodes.splice(idx, 1);
+            finish();
+            return;
+        }
+        const tRaw = Math.max(0, Math.min(1, ((now || t0) - t0) / EG_SHIFT_FLY_MS));
+        const t = _egShiftFlyEase(tRaw);
+
+        // Live destination so scrolling / rescaling mid-flight still lands.
+        const dstEl = document.getElementById(`g-${dr}-${dc}`);
+        let endX = startX, endY = startY;
+        if (dstEl) {
+            const d = dstEl.getBoundingClientRect();
+            if (d.width || d.height) {
+                endX = d.left + d.width / 2;
+                endY = d.top + d.height / 2;
+            }
+        }
+
+        const dx = endX - startX;
+        const dy = endY - startY;
+        // Gentle arc lifting off the grid so crossing paths stay readable.
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const lift = Math.min(46, 14 + dist * 0.12) * Math.sin(Math.PI * tRaw);
+        const x = dx * t;
+        const y = dy * t - lift;
+        node.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+        // Slight pop: grow a touch mid-flight, settle on landing.
+        const scale = 1 + 0.25 * Math.sin(Math.PI * tRaw);
+        node.style.transform += ` scale(${scale.toFixed(3)})`;
+
+        if (tRaw >= 1) {
+            node.remove();
+            const idx = _egShiftFlyNodes.indexOf(node);
+            if (idx !== -1) _egShiftFlyNodes.splice(idx, 1);
+            finish();
+            return;
+        }
+        requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+
+
 // Moves each target mark to a different empty cell. The ✕ stays on the board
 // (the emptiness just "shifts" elsewhere) so no information is destroyed —
-// the player has to hunt the marks down again. Moved marks glow briefly so
-// the shuffle stays readable.
+// the player has to hunt the marks down again.
+//
+// Visual: the old ✕ vanishes immediately and a floating ✕ flies from the old
+// cell to the new one over EG_SHIFT_FLY_MS, then the new mark lands with a
+// brief golden glow. Game state (userGrid) commits instantly so a click
+// mid-flight can never double-mark the destination; only the reveal is
+// delayed until the flyer lands.
 function _egRelocateMarks(targets) {
     const excludeKeys = new Set(targets.map(([r, c]) => `${r}-${c}`));
     const dests = _egBuildMarkDestinations(excludeKeys).sort(() => Math.random() - 0.5);
@@ -461,15 +572,24 @@ function _egRelocateMarks(targets) {
     targets.forEach(([r, c], i) => {
         const d = dests[i];
         if (!d) return; // ran out of legal destinations
+        const [dr, dc] = d;
+        // Commit state at once; render the source cleared now, the
+        // destination only once its flyer lands (see below).
         userGrid[r][c] = 0;
         renderCell(r, c);
-        userGrid[d[0]][d[1]] = 2;
-        renderCell(d[0], d[1]);
-        const el = document.getElementById(`g-${d[0]}-${d[1]}`);
-        if (el) {
-            el.classList.add('eg-shift-moved');
-            setTimeout(() => el.classList.remove('eg-shift-moved'), 1600);
-        }
+        userGrid[dr][dc] = 2;
+
+        _egShiftSpawnFlyer(r, c, dr, dc, () => {
+            // The player may have clicked the destination mid-flight —
+            // never stomp their newer input, just make the DOM match it.
+            renderCell(dr, dc);
+            if (userGrid[dr][dc] !== 2) return;
+            const el = document.getElementById(`g-${dr}-${dc}`);
+            if (el) {
+                el.classList.add('eg-shift-moved');
+                setTimeout(() => el.classList.remove('eg-shift-moved'), 1600);
+            }
+        });
     });
 }
 
@@ -520,9 +640,16 @@ function _egMechProbabilityShift(monster, phase) {
 
 
 // Removes any lingering "moved mark" glow (used defensively if a grid is
-// rebuilt mid-animation).
+// rebuilt mid-animation). Also removes in-flight ✕ flyers so no orphan can
+// outlive its grid — their onLanded callbacks still commit state safely via
+// renderCell, but the node check in the flight loop stops the animation.
 function _egClearShiftGlows() {
     document.querySelectorAll('.eg-shift-moved').forEach(el => el.classList.remove('eg-shift-moved'));
+    if (Array.isArray(_egShiftFlyNodes)) {
+        _egShiftFlyNodes.forEach(n => { try { n.remove(); } catch (e) { /* ignore */ } });
+        _egShiftFlyNodes = [];
+    }
+    document.querySelectorAll('.eg-shift-fly').forEach(el => el.remove());
 }
 
 

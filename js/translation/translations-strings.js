@@ -4943,8 +4943,8 @@ Object.assign(T.en, {
     eg_potential_drops_title: 'POTENTIAL MAP DROPS ({n})',
     eg_potential_drops_empty: 'Insert a map into the device to see which maps can drop from its run.',
     eg_potential_drops_none: 'No linked regions.',
-    eg_potential_drops_legend: '✔ completed · ○ not completed · ⚔️ boss only',
-    eg_potential_drops_boss_hint: 'Boss only — one tier higher',
+    eg_potential_drops_legend: '✔ completed · ○ not completed · ⚔️ boss or atlas bonus',
+    eg_potential_drops_boss_hint: 'Boss kill or atlas completion bonus — one tier higher',
     eg_potential_drops_current: 'current',
 });
 
@@ -4978,7 +4978,7 @@ Object.assign(T.de, {
     eg_potential_drops_title: 'MÖGLICHE KARTEN-DROPS ({n})',
     eg_potential_drops_empty: 'Lege eine Karte in das Gerät, um zu sehen, welche Karten im Run droppen können.',
     eg_potential_drops_none: 'Keine verlinkten Regionen.',
-    eg_potential_drops_legend: '✔ abgeschlossen · ○ nicht abgeschlossen · ⚔️ nur Boss',
-    eg_potential_drops_boss_hint: 'Nur Boss — eine Stufe höher',
+    eg_potential_drops_legend: '✔ abgeschlossen · ○ nicht abgeschlossen · ⚔️ Boss oder Atlas-Bonus',
+    eg_potential_drops_boss_hint: 'Boss-Kill oder Atlas-Abschlussbonus — eine Stufe höher',
     eg_potential_drops_current: 'aktuell',
 });

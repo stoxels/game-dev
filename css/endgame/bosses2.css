@@ -352,6 +352,57 @@
     100% { opacity: 0; transform: scaleX(var(--eg-freeze-strike-scale, 1.3)); filter: brightness(2.6); }
 }
 
+/* Countdown ring around the player: a gold arc depletes over the 30s
+   freeze with the seconds in the middle — readable without glancing at the
+   banner. Urgent red under 5s, white flash on the strike. */
+.eg-clock-freeze-ring-wrap {
+    position: fixed;
+    width: 200px; height: 200px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9002;
+}
+.eg-clock-freeze-ring {
+    width: 100%; height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.9));
+}
+.eg-clock-freeze-ring-track {
+    stroke: rgba(30, 41, 82, 0.85);
+    stroke-opacity: 0.9;
+}
+.eg-clock-freeze-ring-arc {
+    stroke: #ffe536;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke 0.3s;
+}
+.eg-clock-freeze-ring-label {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900;
+    font-size: 2.4rem;
+    color: #fde68a;
+    text-shadow: 0 0 12px rgba(250, 204, 21, 0.95);
+    font-variant-numeric: tabular-nums;
+}
+.eg-clock-freeze-ring-wrap.eg-clock-freeze-ring-urgent .eg-clock-freeze-ring-arc {
+    stroke: #f87171;
+    animation: eg-clock-freeze-ring-blink 0.5s ease-in-out infinite alternate;
+}
+.eg-clock-freeze-ring-wrap.eg-clock-freeze-ring-urgent .eg-clock-freeze-ring-label {
+    color: #fca5a5;
+}
+@keyframes eg-clock-freeze-ring-blink { from { opacity: 0.55; } to { opacity: 1; } }
+.eg-clock-freeze-ring-wrap.eg-clock-freeze-ring-struck .eg-clock-freeze-ring-arc {
+    stroke: #fecaca;
+}
+.eg-clock-freeze-ring-wrap.eg-clock-freeze-ring-struck .eg-clock-freeze-ring-label {
+    color: #fff;
+    text-shadow: 0 0 14px rgba(248, 113, 113, 1);
+}
+
 /* Screen-edge frost: ice creeps in from every side while time is stopped;
    the edge shards flash bright white the moment the hands strike. */
 .eg-clock-freeze-frost {

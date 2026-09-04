@@ -1258,6 +1258,29 @@
     }
 }
 
+/* ── Shifted Mark Flyer (Probability Shift P2+) ─── */
+/* Floating ✕ spawned by _egShiftSpawnFlyer: travels fixed-position from the
+   old cell to the new one over EG_SHIFT_FLY_MS (1.5s). Driven by rAF
+   transforms in JS — this class only provides the look (same dim-red cross
+   as .gc.marked::after, plus a golden halo so it reads while moving). */
+.eg-shift-fly {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    font-weight: 700;
+    color: rgba(255, 69, 69, 0.9);
+    text-shadow:
+        0 0 10px rgba(251, 191, 36, 0.9),
+        0 0 3px rgba(255, 69, 69, 0.8);
+    will-change: transform;
+}
+
 /* ── Shifted Mark Glow (Probability Shift P2+) ──── */
 /* Brief golden halo on marks the boss just relocated so the shuffle is readable */
 .eg-shift-moved {

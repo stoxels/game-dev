@@ -1629,10 +1629,12 @@ function _egTryDropMap(isBoss, monsterLevel) {
 // Atlas completion bonus (PoE-style): after a SUCCESSFUL map run there is
 // one independent extra roll for an additional ADJACENT map drop. Chance =
 // +1% per completed atlas region (see egAtlasAdjacentBonusChance).
-// The bonus map comes from a region linked to the just-finished
-// run's region and is banked straight into the map stash (+ _egRunMaps so
-// it shows in the leave-map summary). Must be called from _egEndMap()
-// AFTER _egAtlasOnMapCompleted() so a fresh first clear already counts.
+// The bonus map comes from a region linked to the just-finished run's
+// region — preferring an uncompleted +1-tier link so the bonus can climb
+// to higher tiers (see egAtlasPickAdjacentBonusNodeId) — and is banked
+// straight into the map stash (+ _egRunMaps so it shows in the leave-map
+// summary). Must be called from _egEndMap() AFTER _egAtlasOnMapCompleted()
+// so a fresh first clear already counts.
 // Returns the bonus map item when the roll succeeded, else null.
 function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
     if (typeof egAtlasAdjacentBonusChance !== 'function') return null;

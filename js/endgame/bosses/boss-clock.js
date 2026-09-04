@@ -79,6 +79,7 @@ const EG_CLOCK_FREEZE_HOLD_PX = 68;         // hover radius from player center
 const EG_CLOCK_FREEZE_LUNGE_PX = 220;       // strike punches this far past the player
 const EG_CLOCK_FREEZE_DMG_PCT = 0.90;       // total damage on failure — every beam hits, ~7.5% each × 12
 const EG_CLOCK_FREEZE_COLOR = '#ffe536';    // lightning yellow
+const EG_CLOCK_FREEZE_RING_RADIUS = 92;     // countdown ring radius (px) around the player
 
 // Global freeze flags — true while The Clock is telegraphing then holding
 // time. _egClockTimeFreezeWarn is the 2.5s buildup (hands stop, face flares)
@@ -568,6 +569,37 @@ function _egClockStartTimeFreeze(monster, level) {
         beams.push({ el: outer, seg, len });
     }
 
+    // Shrinking countdown ring around the avatar — the remaining freeze time
+    // is readable at a glance: the gold arc depletes over the 30s window,
+    // the seconds sit in the middle, and it turns red under 5s. Lives on the
+    // same fixed centre as the beams, so it follows the player across a
+    // mid-freeze puzzle transition too.
+    const RING_R = EG_CLOCK_FREEZE_RING_RADIUS;
+    const RING_C = 2 * Math.PI * RING_R;
+    const ringWrap = _egNkEl(run, 'div', 'eg-clock-freeze-ring-wrap');
+    ringWrap.style.left = Math.round(pc.x) + 'px';
+    ringWrap.style.top = Math.round(pc.y) + 'px';
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svgEl = document.createElementNS(svgNS, 'svg');
+    svgEl.setAttribute('class', 'eg-clock-freeze-ring');
+    svgEl.setAttribute('viewBox', '0 0 200 200');
+    const track = document.createElementNS(svgNS, 'circle');
+    track.setAttribute('class', 'eg-clock-freeze-ring-track');
+    track.setAttribute('cx', '100'); track.setAttribute('cy', '100'); track.setAttribute('r', String(RING_R));
+    track.setAttribute('fill', 'none'); track.setAttribute('stroke-width', '7');
+    const arcEl = document.createElementNS(svgNS, 'circle');
+    arcEl.setAttribute('class', 'eg-clock-freeze-ring-arc');
+    arcEl.setAttribute('cx', '100'); arcEl.setAttribute('cy', '100'); arcEl.setAttribute('r', String(RING_R));
+    arcEl.setAttribute('fill', 'none'); arcEl.setAttribute('stroke-width', '7');
+    arcEl.setAttribute('stroke-dasharray', String(RING_C));
+    arcEl.setAttribute('stroke-dashoffset', '0');
+    svgEl.appendChild(track);
+    svgEl.appendChild(arcEl);
+    ringWrap.appendChild(svgEl);
+    const labelEl = document.createElement('div');
+    labelEl.className = 'eg-clock-freeze-ring-label';
+    ringWrap.appendChild(labelEl);
+
     _egNkToast('eg_mech_clock_freeze',
         '🕐 The Clock: TIME FREEZE! Slay it before the hands strike!',
         EG_CLOCK_FREEZE_COLOR);
@@ -605,12 +637,23 @@ function _egClockStartTimeFreeze(monster, level) {
     _egNkLoop(run, (dtS) => {
         elapsedMs += dtS * 1000;
 
+        // Countdown ring: deplete the gold arc with the remaining freeze
+        // time and tick the seconds inside it (red + blinking under 5s).
+        if (!struck) {
+            const frac = Math.max(0, Math.min(1, (EG_CLOCK_FREEZE_DURATION_MS - elapsedMs) / EG_CLOCK_FREEZE_DURATION_MS));
+            arcEl.setAttribute('stroke-dashoffset', String(RING_C * (1 - frac)));
+            const rem = Math.max(0, Math.ceil((EG_CLOCK_FREEZE_DURATION_MS - elapsedMs) / 1000));
+            labelEl.textContent = String(rem);
+            ringWrap.classList.toggle('eg-clock-freeze-ring-urgent', rem <= 5);
+        }
+
         // Freeze expired with the boss still standing → every beam lunges.
         if (!struck && elapsedMs >= EG_CLOCK_FREEZE_DURATION_MS) {
             struck = true;
             _egClockFreezeApplyStrike(lvl, beams);
             beams.forEach(b => b.seg.classList.add('eg-clock-freeze-strike'));
             frost.classList.add('eg-clock-freeze-frost-strike');
+            ringWrap.classList.add('eg-clock-freeze-ring-struck');
             if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('absoluteZero');
             renderBanner(-1);
             return true; // keep looping so the strike animation plays out
