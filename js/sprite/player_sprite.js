@@ -190,6 +190,13 @@ function _avatarGetMoveSpeed() {
             if (pct) base *= (1 + pct / 100);
         }
     } catch (e) {}
+    // The Snail's broom: sweeping slows the player to a crawl so the Doom
+    // Snail can catch up while a slimed cell is being cleaned (see
+    // boss-snail.js — EG_SNAIL_BROOM_SPEED_MULT lives on window).
+    if (typeof _egSnailBroomHeld === 'function' && _egSnailBroomHeld()) {
+        base *= (typeof window.EG_SNAIL_BROOM_SPEED_MULT === 'number')
+            ? window.EG_SNAIL_BROOM_SPEED_MULT : 0.10;
+    }
     return base;
 }
 
@@ -231,10 +238,26 @@ function _avatarMoveTick(ts) {
         if (dx || dy) {
             const dist = _avatarGetMoveSpeed() * dt;
             const norm = Math.hypot(dx, dy);   // keeps diagonal speed equal
-            const left = parseInt(el.style.left) || 12;
-            const top = parseInt(el.style.top) ||
+            // Float accumulator (per element) so very slow speeds — e.g. The
+            // Snail's broom at ~10% — still move: a sub-pixel per-frame step
+            // would otherwise be truncated away by re-parsing the integer
+            // style position every frame, locking the avatar in place.
+            let fx = parseFloat(el.dataset.avatarFx);
+            let fy = parseFloat(el.dataset.avatarFy);
+            if (!isFinite(fx)) fx = parseInt(el.style.left) || 12;
+            if (!isFinite(fy)) fy = parseInt(el.style.top) ||
                 (el.id === 'player-avatar-wrapper' ? window.innerHeight - 220 : 80);
-            _setAvatarPos(el, left + (dx / norm) * dist, top + (dy / norm) * dist);
+            // Teleports / nudges / knockbacks write style.left/top directly —
+            // reseed the accumulator when the rendered position diverges.
+            const curX = parseFloat(el.style.left);
+            const curY = parseFloat(el.style.top);
+            if (isFinite(curX) && Math.abs(curX - fx) > 2) fx = curX;
+            if (isFinite(curY) && Math.abs(curY - fy) > 2) fy = curY;
+            fx += (dx / norm) * dist;
+            fy += (dy / norm) * dist;
+            el.dataset.avatarFx = String(fx);
+            el.dataset.avatarFy = String(fy);
+            _setAvatarPos(el, fx, fy);
         }
     }
 

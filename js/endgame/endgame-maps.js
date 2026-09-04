@@ -1113,6 +1113,24 @@ function _egRollMapBossStatus(map) {
     return { hasBoss: true, maxBosses: 1 };
 }
 
+// Resolves the specific boss assigned to a map item. Every atlas region has
+// one fixed boss (EG_ATLAS_REGION_BOSSES); the same lookup the launch code
+// uses (egAtlasChainBlueprintForMap), so a tooltip always names the boss
+// actually fought in the arena. Returns { id, name, emoji } or null when the
+// map has no atlas region / the boss def is unknown.
+function _egResolveMapBoss(mapItem) {
+    if (!mapItem || typeof egAtlasChainBlueprintForMap !== 'function') return null;
+    try {
+        const bp = egAtlasChainBlueprintForMap(mapItem);
+        if (!bp || !bp.bossId) return null;
+        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? EG_BOSS_DEFS[bp.bossId] : null;
+        if (!def) return null;
+        return { id: bp.bossId, name: def.name || bp.bossId, emoji: def.emoji || '💀' };
+    } catch (e) {
+        return null;
+    }
+}
+
 function _egRollMapImplicits(map) {
     const tier = Math.max(1, map.mapTier || 1);
     let puzzles = egMapBasePuzzlesForTier(tier);
@@ -1861,9 +1879,15 @@ function _egBuildMapTooltipBodyHTML(item) {
     const bossHas = imp.hasBoss;
     const bossCount = imp.maxBosses || 0;
     if (bossHas && bossCount > 0) {
-        const bossLabel = bossCount > 1
-            ? t('eg_map_boss_count').replace('{n}', bossCount)
-            : t('eg_map_has_boss');
+        // Name the region's specific boss (fixed per atlas region, see
+        // EG_ATLAS_REGION_BOSSES) instead of a generic encounter label.
+        // Multi-boss maps have no single identity, so they keep the count.
+        const boss = bossCount > 1 ? null : _egResolveMapBoss(item);
+        const bossLabel = boss
+            ? `${boss.emoji} ${boss.name}`
+            : (bossCount > 1
+                ? t('eg_map_boss_count').replace('{n}', bossCount)
+                : t('eg_map_has_boss'));
         implicitLines.push(`<span style="color:#e74c3c;font-weight:700;">${bossLabel}</span>`);
     } else if (bossHas === false) {
         implicitLines.push(`<span style="color:#888;">${t('eg_map_no_boss')}</span>`);

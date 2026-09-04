@@ -75,7 +75,7 @@ const EG_BOSS_SOFT_ENRAGE_MAX_STACKS = 10;     // hard cap: +80% damage
 // Index 0 is unused. Add entries here as you add more phases to any boss.
 // ── Phase display names (translation keys, indexed by phase number) ──────────
 // Index 0 is unused. Add entries here as you add more phases to any boss.
-const EG_BOSS_PHASE_NAMES = ['', 'eg_phase_1', 'eg_phase_2_enrage', 'eg_phase_3_fury'];
+const EG_BOSS_PHASE_NAMES = ['', 'eg_phase_1', 'eg_phase_2_enrage', 'eg_phase_3_fury', 'eg_phase_4_finale'];
 
 
 // ── Recent fill tracker capacity ─────────────────────────────────────────────
@@ -228,6 +228,8 @@ function _egBossCleanup(monsterId) {
     if (typeof _egRemoveClueScramble === 'function') _egRemoveClueScramble();
     if (typeof _egTitheTeardown === 'function') _egTitheTeardown(monsterId);
     if (typeof _egNkTeardownBoss === 'function') _egNkTeardownBoss(monsterId);
+    // The Snail: slimes + broom live outside nk runs — tear them down too.
+    if (typeof _egSnailTeardown === 'function') _egSnailTeardown();
     // Brutus: sacrificial zombies roam in their own layer until he dies or
     // the encounter stops — tear them down exactly when that happens (this
     // hook never fires for individual zombie kills: their ids differ).
@@ -315,7 +317,24 @@ function _egBossTransition(monster, newPhase) {
     _egBossPlayTransitionFeedback(monster, newPhase);
     _egRenderPanel();
 
+    // Optional per-boss phase-enter hook. A boss can define
+    // `onPhaseEnter(monster, newPhase)` in its EG_BOSS_MECHANICS entry to run
+    // phase-specific logic (gate events, special spawns) right at the moment
+    // the phase begins — before the generic immunity window. Returning true
+    // takes over the phase entirely: the boss owns its immunity release and
+    // mechanic rescheduling (the default immunity timer is skipped). This is
+    // how The Jelly keeps its Ice Shell up until a hop blob slips on the ice
+    // (see boss-jelly.js) instead of fading after immunityDuration.
+    if (monster.bossDef && typeof monster.bossDef.onPhaseEnter === 'function') {
+        try {
+            if (monster.bossDef.onPhaseEnter(monster, newPhase)) return;
+        } catch (e) {
+            // A buggy hook must never break the phase transition itself.
+        }
+    }
+
     setTimeout(() => {
+        if (!_egMonsters.find(m => m.id === monster.id)) return; // boss died mid-window
         monster.bossImmune = false;
         _egBossScheduleMechanics(monster, newPhase);
         _egRenderPanel();

@@ -608,6 +608,17 @@ function _egTickPlayer() {
     // charge bar freezes the same way (see _egPriorBombDefusing in
     // shared-boss-abilities.js) — but with none of the parry behaviour:
     // defusing is a DPS trade-off, not a defensive tool.
+    // The Snail's broom: while held, the auto-attack charge bar is frozen
+    // the same way (sweeping is a DPS trade-off — see boss-snail.js).
+    // Snailgeddon freeze: while the ≤20% Snail finisher runs (countdown
+    // AND the closing ring) the auto-attack charge bar stays frozen — it
+    // is a dodge-and-run set-piece, not free damage time (boss-snail.js).
+    if (typeof _egSnailgeddonActive === 'function' && _egSnailgeddonActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    if (typeof _egSnailBroomHeld === 'function' && _egSnailBroomHeld()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
     if (typeof _egPriorBombDefusing === 'function' && _egPriorBombDefusing()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
         // If not in an active encounter, fall through (no effect outside endgame)
@@ -668,6 +679,10 @@ function _initEgHoldEPauseHotkey() {
     document.addEventListener('keydown', (e) => {
         if (!e || !isParryKey(e)) return;
         if (e.repeat) return;
+        // The Snail: pressing E drops a held broom (it respawns outside the grid).
+        if (typeof _egSnailDropBroom === 'function') {
+            try { _egSnailDropBroom(); } catch (err) {}
+        }
         const tag = document.activeElement?.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA') return;
         if (document.querySelector('.modal-bg.show')) return;

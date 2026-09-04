@@ -19,7 +19,16 @@
 .eg-nk-snake { width: 44px; height: 44px; font-size: 1.9rem; animation: eg-nk-wiggle 0.5s ease-in-out infinite alternate; }
 @keyframes eg-nk-wiggle { from { rotate: -12deg; } to { rotate: 12deg; } }
 .eg-nk-anchor { width: 52px; height: 52px; font-size: 2.2rem; filter: drop-shadow(0 0 14px rgba(248,113,113,0.95)); animation: eg-nk-anchor-pulse 0.7s ease-in-out infinite alternate; }
-@keyframes eg-nk-anchor-pulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+/* Pulse via OPACITY only. Chromium applies the individual `scale`/`rotate`
+   properties around the VIEWPORT origin (ignoring transform-origin) on
+   position:fixed elements, so a transform-based keyframe either overrides
+   the inline translate (parking anchors at the top-left — the original bug)
+   or makes them orbit the screen corner (the `scale` variant). opacity
+   leaves the inline translate untouched: the anchor stays EXACTLY where the
+   JS put it, gently breathing in place. (NB: eg-nk-spin/wiggle still use the
+   individual `rotate` property and DO orbit the corner in Chromium — fix
+   pending, see eg-nk-anchor-pulse history.) */
+@keyframes eg-nk-anchor-pulse { from { opacity: 0.85; } to { opacity: 1; } }
 .eg-nk-orb {
     width: 18px; height: 18px; border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #fecaca, #ef4444 60%, #7f1d1d);
@@ -181,6 +190,36 @@
     box-shadow: 0 0 26px rgba(103, 232, 249, 0.9);
 }
 .eg-nk-beam-warn { opacity: 0.45; border-top-style: dashed; border-bottom-style: dashed; }
+
+/* The Clock — three hand variants (seconds red, minutes cyan, hours amber),
+   the dashed ghost preview shown during the telegraph, and the floating
+   time callouts ("35 seconds") that mark each hand's spawn angle.
+   See boss-clock.js. */
+.eg-nk-clock-second { height: 6px; background: linear-gradient(180deg, rgba(248,113,113,0.15), rgba(248,113,113,0.9) 50%, rgba(248,113,113,0.15)); border-top: 2px solid rgba(254,202,202,0.95); border-bottom: 2px solid rgba(254,202,202,0.95); box-shadow: 0 0 16px rgba(248,113,113,0.9); }
+.eg-nk-clock-minute { height: 12px; background: linear-gradient(180deg, rgba(103,232,249,0.15), rgba(103,232,249,0.9) 50%, rgba(103,232,249,0.15)); border-top: 2px solid rgba(207,250,254,0.95); border-bottom: 2px solid rgba(207,250,254,0.95); box-shadow: 0 0 20px rgba(103,232,249,0.9); }
+.eg-nk-clock-hour { height: 20px; background: linear-gradient(180deg, rgba(251,191,36,0.18), rgba(251,191,36,0.9) 50%, rgba(251,191,36,0.18)); border-top: 3px solid rgba(254,243,199,0.95); border-bottom: 3px solid rgba(254,243,199,0.95); box-shadow: 0 0 26px rgba(251,191,36,0.95); }
+.eg-nk-clock-ghost { opacity: 0.4; border-top-style: dashed; border-bottom-style: dashed; }
+.eg-nk-clock-call {
+    position: fixed; left: 0; top: 0;
+    pointer-events: none; z-index: 9001;
+    transform: translate(-50%, -50%);
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.85);
+    border: 1px solid rgba(253, 230, 138, 0.7);
+    color: #fde68a;
+    font-weight: 900;
+    font-size: 1.15rem;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    text-shadow: 0 0 10px rgba(253, 230, 138, 0.9);
+    box-shadow: 0 0 18px rgba(253, 230, 138, 0.45);
+    animation: eg-nk-clock-call-pulse 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-nk-clock-call-pulse { from { opacity: 0.8; } to { opacity: 1; } }
+.eg-nk-clock-call-second { color: #fecaca; border-color: rgba(248,113,113,0.75); text-shadow: 0 0 10px rgba(248,113,113,0.9); }
+.eg-nk-clock-call-minute { color: #a5f3fc; border-color: rgba(103,232,249,0.75); text-shadow: 0 0 10px rgba(103,232,249,0.9); }
+.eg-nk-clock-call-hour { color: #fde68a; border-color: rgba(251,191,36,0.8); text-shadow: 0 0 10px rgba(251,191,36,0.95); }
 
 /* Hunting storms */
 .eg-nk-storm {
@@ -992,4 +1031,495 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
 .eg-boss-feed-sec {
     color: #fde68a;
     font-variant-numeric: tabular-nums;
+}
+
+/* ── The Jelly: Ice Shell shield + icy floor (boss-jelly.js) ────────────── */
+/* Green immunity bubble that hugs The Jelly's card while its Ice Shell is
+   up (phase-2 gate at ≤50% HP). It is a fixed element repositioned every
+   frame by boss-jelly.js, so it survives monster-panel re-renders, and it
+   never blocks clicks. */
+.eg-jelly-bubble {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 9005;
+    border-radius: 50%;
+    box-sizing: border-box;
+    border: 3px solid rgba(74, 222, 128, 0.95);
+    background: radial-gradient(circle,
+        rgba(74, 222, 128, 0.30) 0%,
+        rgba(34, 197, 94, 0.14) 55%,
+        rgba(74, 222, 128, 0) 76%);
+    box-shadow:
+        0 0 18px rgba(74, 222, 128, 0.75),
+        0 0 44px rgba(74, 222, 128, 0.55),
+        inset 0 0 22px rgba(134, 239, 172, 0.35);
+    animation: eg-jelly-bubble-pulse 0.9s ease-in-out infinite alternate;
+}
+
+.eg-jelly-bubble::after {
+    content: '🛡️';
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    font-size: 1.1rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.95));
+}
+
+@keyframes eg-jelly-bubble-pulse {
+    from {
+        opacity: 0.72;
+        box-shadow:
+            0 0 12px rgba(74, 222, 128, 0.55),
+            0 0 30px rgba(74, 222, 128, 0.35),
+            inset 0 0 16px rgba(134, 239, 172, 0.22);
+    }
+    to {
+        opacity: 1;
+        box-shadow:
+            0 0 22px rgba(74, 222, 128, 0.95),
+            0 0 54px rgba(74, 222, 128, 0.70),
+            inset 0 0 30px rgba(134, 239, 172, 0.45);
+    }
+}
+
+/* Icy floor patches on grid cells while the shell is up. Purely cosmetic —
+   the cells stay fully playable and never block clicks. */
+.eg-jelly-ice {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e0f2fe;
+    line-height: 1;
+    text-shadow: 0 0 4px rgba(186, 230, 253, 0.95);
+    background: linear-gradient(160deg,
+        rgba(165, 243, 252, 0.80) 0%,
+        rgba(56, 189, 248, 0.38) 45%,
+        rgba(224, 242, 254, 0.75) 100%);
+    border: 1px solid rgba(224, 242, 254, 0.95);
+    border-radius: 3px;
+    box-shadow: inset 0 0 10px rgba(125, 211, 252, 0.85), 0 0 7px rgba(56, 189, 248, 0.55);
+    pointer-events: none;
+    z-index: 5;
+    animation: eg-jelly-ice-glint 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes eg-jelly-ice-glint {
+    from { filter: brightness(0.92); }
+    to   { filter: brightness(1.22); }
+}
+
+/* Ice Shell readability cues (boss-jelly.js). When a lobbed hop blob locks
+   onto the player, every icy patch pulses once — "a hop is incoming; the
+   ice is where it breaks". The patch under the avatar (rest phase) or the
+   locked landing cell (warn/fly) glows green as the hold spot. */
+/* Green hold-spot marker: pulses in the shell's color to read as "safe
+   spot that breaks the shield". Overrides the base glint while present
+   (both animations are filter/box-shadow-only, so nothing jumps). */
+.eg-jelly-ice-safe {
+    animation: eg-jelly-ice-safe-pulse 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes eg-jelly-ice-safe-pulse {
+    from {
+        filter: brightness(1.1);
+        box-shadow: inset 0 0 10px rgba(125, 211, 252, 0.85),
+            0 0 7px rgba(56, 189, 248, 0.55),
+            0 0 0 2px rgba(74, 222, 128, 0.85);
+    }
+    to {
+        filter: brightness(1.5);
+        box-shadow: inset 0 0 14px rgba(134, 239, 172, 0.9),
+            0 0 6px rgba(74, 222, 128, 0.9),
+            0 0 16px rgba(74, 222, 128, 0.95),
+            0 0 0 3px #4ade80;
+    }
+}
+
+/* One-shot white pulse on lock. Declared AFTER .eg-jelly-ice-safe so it
+   wins the cascade when a cell is both marked and flashing; once the class
+   is removed (boss-jelly.js, ~950 ms) the green hold-spot pulse resumes. */
+.eg-jelly-ice-flash {
+    animation: eg-jelly-ice-flash-kf 0.9s ease-out;
+}
+
+@keyframes eg-jelly-ice-flash-kf {
+    0% {
+        filter: brightness(2.0);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9),
+            0 0 20px rgba(125, 211, 252, 1),
+            inset 0 0 14px rgba(224, 242, 254, 1);
+    }
+    100% {
+        filter: brightness(1.15);
+        box-shadow: inset 0 0 10px rgba(125, 211, 252, 0.85),
+            0 0 7px rgba(56, 189, 248, 0.55);
+    }
+}
+
+/* Hop blob that slipped on ice — frosty trail while it launches at the
+   boss. Filter-only animation so the translated position stays put. */
+.eg-nk-jelly-slip {
+    filter: drop-shadow(0 0 16px rgba(165, 243, 252, 0.95))
+        drop-shadow(0 0 4px rgba(255, 255, 255, 0.8)) !important;
+    animation: eg-jelly-slip-flicker 0.22s ease-in-out infinite alternate;
+}
+
+@keyframes eg-jelly-slip-flicker {
+    from {
+        filter: drop-shadow(0 0 8px rgba(165, 243, 252, 0.80)) brightness(1);
+    }
+    to {
+        filter: drop-shadow(0 0 22px rgba(165, 243, 252, 1)) brightness(1.35);
+    }
+}
+
+/* Expanding shatter ring when the slipping blob slams into the shell. */
+.eg-jelly-shatter {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 9006;
+    border-radius: 50%;
+    border: 5px solid rgba(74, 222, 128, 0.95);
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.95), inset 0 0 22px rgba(187, 247, 208, 0.90);
+    animation: eg-jelly-shatter-kf 0.6s ease-out forwards;
+}
+
+@keyframes eg-jelly-shatter-kf {
+    0% {
+        width: 0;
+        height: 0;
+        margin-left: 0;
+        margin-top: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 190px;
+        height: 190px;
+        margin-left: -95px;
+        margin-top: -95px;
+        opacity: 0;
+    }
+}
+
+/* ============ The Snail — Doom Snail rework ============ */
+
+/* Slimed grid-cell overlay — blocks ALL interaction until swept clean */
+.eg-snail-slime {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    color: #d9f99d;
+    text-shadow: 0 0 6px rgba(190, 242, 100, 0.9);
+    background: radial-gradient(circle at 35% 30%, rgba(163, 230, 53, 0.55), rgba(101, 163, 13, 0.75) 70%, rgba(54, 83, 20, 0.88));
+    border: 2px solid #84cc16;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 6;
+    overflow: hidden;
+    animation: eg-snail-slime-pulse 1.4s ease-in-out infinite alternate;
+}
+@keyframes eg-snail-slime-pulse {
+    from {
+        background: radial-gradient(circle at 35% 30%, rgba(163, 230, 53, 0.45), rgba(101, 163, 13, 0.65) 70%, rgba(54, 83, 20, 0.78));
+    }
+    to {
+        background: radial-gradient(circle at 35% 30%, rgba(190, 242, 100, 0.6), rgba(132, 204, 22, 0.82) 70%, rgba(63, 98, 18, 0.92));
+    }
+}
+
+/* Sweep-progress fill along the bottom of a slimed cell (the player
+   sprite covers the cell while sweeping, so the readable progress rides
+   on the SWEEPING label above the head — this strip is just the glow). */
+.eg-snail-slime-fill {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 6px;
+    width: 0%;
+    background: #ecfccb;
+    box-shadow: 0 0 8px rgba(217, 249, 157, 0.9);
+    transition: width 0.1s linear;
+    pointer-events: none;
+}
+.eg-snail-slime-sweeping .eg-snail-slime-fill {
+    height: 9px;
+}
+
+/* Cell being actively swept — brighter goo + faster pulse */
+.eg-snail-slime-sweeping {
+    animation: eg-snail-slime-pulse 0.4s ease-in-out infinite alternate;
+    border-color: #ecfccb;
+}
+
+/* Green flash right before the slime is wiped away */
+.eg-snail-slime-cleaned {
+    animation: eg-snail-slime-clean 0.6s ease-out forwards !important;
+    border-color: #d9f99d;
+}
+@keyframes eg-snail-slime-clean {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+}
+
+/* 'SWEEPING' label above the player sprite while cleaning */
+.eg-snail-sweep-label {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #ecfccb;
+    background: rgba(20, 30, 8, 0.88);
+    border: 1px solid #84cc16;
+    border-radius: 4px;
+    padding: 1px 8px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1200;
+    text-shadow: 0 1px 2px #000;
+    animation: eg-snail-sweep-pulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes eg-snail-sweep-pulse {
+    from {
+        opacity: 0.75;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Broom — rests outside the grid, pins next to the player while held */
+.eg-snail-broom {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 9001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0 0 10px rgba(163, 230, 53, 0.85));
+    animation: eg-snail-broom-bob 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-snail-broom-bob {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-4px);
+    }
+}
+.eg-snail-broom-ico {
+    font-size: 2rem;
+    line-height: 1;
+}
+.eg-snail-broom-label {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: #d9f99d;
+    text-shadow: 0 1px 2px #000;
+    background: rgba(20, 30, 8, 0.8);
+    border: 1px solid rgba(132, 204, 22, 0.6);
+    border-radius: 4px;
+    padding: 0 6px;
+    margin-top: 2px;
+    white-space: nowrap;
+}
+
+/* While held: pinned smaller next to the player sprite */
+.eg-snail-broom-held {
+    animation: none !important;
+    filter: drop-shadow(0 0 8px rgba(190, 242, 100, 0.9));
+}
+.eg-snail-broom-held .eg-snail-broom-ico {
+    font-size: 1.5rem;
+}
+
+/* Respawn pop when the broom is dropped */
+.eg-snail-broom-pop {
+    animation: eg-snail-broom-pop-kf 0.4s ease-out;
+}
+@keyframes eg-snail-broom-pop-kf {
+    0% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Doom Snail squish + splash when it crashes into corruption */
+.eg-snail-squish {
+    position: fixed;
+    width: 80px;
+    height: 60px;
+    margin-left: -40px;
+    margin-top: -30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 9002;
+    animation: eg-snail-squish-kf 0.7s ease-out forwards;
+}
+@keyframes eg-snail-squish-kf {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    30% {
+        transform: scale(1.6);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.1);
+        opacity: 0;
+    }
+}
+
+/* Snailgeddon — The Snail's ≤20% HP finisher (countdown over the grid) */
+.eg-snailgeddon-cd {
+    position: fixed;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    z-index: 9010;
+    pointer-events: none;
+    text-align: center;
+    font-family: inherit;
+}
+.eg-snailgeddon-cd-label {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: #fecaca;
+    background: rgba(60, 5, 5, 0.72);
+    border: 1px solid rgba(248, 113, 113, 0.65);
+    border-radius: 999px;
+    padding: 0.3rem 1.1rem 0.25rem;
+    white-space: nowrap;
+}
+.eg-snailgeddon-cd-num {
+    font-size: 5.5rem;
+    font-weight: 900;
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 0 22px rgba(239, 68, 68, 0.95), 0 0 60px rgba(239, 68, 68, 0.5);
+    animation: eg-snailgeddon-throb 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-snailgeddon-throb {
+    from { opacity: 0.8; }
+    to { opacity: 1; }
+}
+.eg-snailgeddon-cd-hint {
+    font-size: 0.82rem;
+    color: #fecaca;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 0.6rem;
+    padding: 0.3rem 0.8rem;
+    max-width: 460px;
+}
+
+/* Amber immunity dome over The Snail's card while Snailgeddon runs
+   (countdown + ring). Mirrors the Jelly Ice Shell bubble: a FIXED element
+   repositioned every frame by boss-snail.js over the card's emoji, so it
+   survives monster-panel re-renders; it never blocks clicks. Amber is The
+   Snail's signature colour (toasts #f59e0b) — the dome reads as the boss
+   being shielded while it is untouchable. */
+.eg-snail-shield {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 9005;
+    border-radius: 50%;
+    box-sizing: border-box;
+    border: 3px solid rgba(251, 191, 36, 0.95);
+    background: radial-gradient(circle,
+        rgba(251, 191, 36, 0.26) 0%,
+        rgba(217, 119, 6, 0.12) 55%,
+        rgba(251, 191, 36, 0) 76%);
+    box-shadow:
+        0 0 18px rgba(251, 191, 36, 0.75),
+        0 0 44px rgba(217, 119, 6, 0.5),
+        inset 0 0 22px rgba(253, 230, 138, 0.35);
+    animation: eg-snail-shield-pulse 0.8s ease-in-out infinite alternate;
+}
+
+.eg-snail-shield::after {
+    content: '🛡️';
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    font-size: 1.1rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.95));
+}
+
+@keyframes eg-snail-shield-pulse {
+    from {
+        opacity: 0.75;
+        box-shadow:
+            0 0 12px rgba(251, 191, 36, 0.5),
+            0 0 28px rgba(217, 119, 6, 0.3),
+            inset 0 0 14px rgba(253, 230, 138, 0.2);
+    }
+    to {
+        opacity: 1;
+        box-shadow:
+            0 0 24px rgba(251, 191, 36, 0.95),
+            0 0 54px rgba(217, 119, 6, 0.65),
+            inset 0 0 30px rgba(253, 230, 138, 0.45);
+    }
+}
+
+/* Snailgeddon swarm — denser, angrier ring of doom snails */
+.eg-snailgeddon-swarm {
+    filter: drop-shadow(0 0 16px rgba(239, 68, 68, 1));
+}
+/* The one laggard whose gap is the way out — cyan tint + floating zzz */
+.eg-snailgeddon-slow {
+    position: relative;
+    filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.95));
+}
+.eg-snailgeddon-slow::after {
+    content: '💤';
+    position: absolute;
+    top: -15px;
+    right: -10px;
+    font-size: 1.05rem;
+    line-height: 1;
+    pointer-events: none;
+    animation: eg-snailgeddon-sleep 1.15s ease-in-out infinite;
+}
+@keyframes eg-snailgeddon-sleep {
+    0%, 100% { opacity: 0.55; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-3px); }
 }

@@ -227,7 +227,12 @@ function _buildMapRunTooltipHTML() {
     const imp = map.implicits || null;
     if (imp && imp.hasBoss != null) {
         if (imp.hasBoss && (imp.maxBosses || 0) > 0) {
-            const bossLabel = imp.maxBosses > 1 ? t('eg_map_boss_count').replace('{n}', imp.maxBosses) : t('eg_map_has_boss');
+            // Name the region's specific boss (same lookup the launch uses)
+            // when the map fights a single known boss.
+            const boss = (imp.maxBosses > 1 || typeof _egResolveMapBoss !== 'function') ? null : _egResolveMapBoss(map);
+            const bossLabel = boss
+                ? `${boss.emoji} ${boss.name}`
+                : (imp.maxBosses > 1 ? t('eg_map_boss_count').replace('{n}', imp.maxBosses) : t('eg_map_has_boss'));
             html += `<br><span style="color:#e74c3c;font-weight:700;">${bossLabel}</span>`;
         } else {
             html += `<br><span style="color:#888;">${t('eg_map_no_boss')}</span>`;

@@ -39,6 +39,10 @@ const EG_CORRUPT_CELL_LIFETIME_MS = 15000; // ms before corruption auto-expires 
 // cells linger as an ongoing hazard — they also chain his ground slams, so a
 // fuller field means more slams in a row. P3 (never expires) is unchanged.
 const EG_BRUTUS_CORRUPT_LIFETIME_MS = 30000;
+// The Snail keeps corruption on the grid for a full minute: banishing the
+// doom snail requires crashing it into a corrupted cell, and a 15 s cell
+// evaporates long before the slow snail can ever reach it.
+const EG_SNAIL_CORRUPT_LIFETIME_MS = 60000;
 
 // Spread cadence for the Corrupt Cells phase variants:
 //   P1 — static: corruptions just sit and expire (original behaviour)
@@ -168,10 +172,12 @@ function _egCorruptSpreadCap(cfg) {
 function _egCorruptConfig(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const isBrutus = !!(monster && (monster.id === 'boss_brutus' || monster.baseId === 'boss_brutus'));
+    const isSnail = !!(monster && (monster.id === 'boss_snail' || monster.baseId === 'boss_snail'));
     return {
         p,
         norm: _egBossTierNorm(monster),
-        lifetimeMs: isBrutus ? EG_BRUTUS_CORRUPT_LIFETIME_MS : EG_CORRUPT_CELL_LIFETIME_MS,
+        lifetimeMs: isBrutus ? EG_BRUTUS_CORRUPT_LIFETIME_MS
+            : (isSnail ? EG_SNAIL_CORRUPT_LIFETIME_MS : EG_CORRUPT_CELL_LIFETIME_MS),
     };
 }
 
