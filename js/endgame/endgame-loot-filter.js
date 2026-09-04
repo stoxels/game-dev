@@ -799,9 +799,6 @@ function _eglfSaveModal() {
     _eglfWorking = null;
     _egSaveLootFilter();
     _eglfCloseModal();
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('loot_filter_save');
-    }
     if (typeof showToast === 'function') showToast(t('eg_loot_filter_saved'));
 }
 

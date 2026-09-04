@@ -353,7 +353,6 @@ function _egvPurchase(price, grantFn) {
         return false;
     }
     if (typeof egSaveHubState === 'function') egSaveHubState();
-    Audio_Manager.playSFX('vendor_buy');
     if (typeof trackAchStat === 'function') try { trackAchStat('egVendorPurchases', 1); } catch(e){}
     return true;
 }

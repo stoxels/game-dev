@@ -189,7 +189,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🗡️', slotType: 'weapon', archetype: 'any',
         minLevel: 30,
         requirements: { level: 30, str: 82, agi: 0, int: 0 },
-        damage: { min: 68, max: 132 }, attackIntervalSeconds: 7.2,
+        damage: { min: 124, max: 241 }, attackIntervalSeconds: 7.2,
         bonuses: [
             { key: 'inc_physical_damage', value: 55, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'life_leech', value: 4, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
@@ -210,7 +210,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏹', slotType: 'ranged', archetype: 'agility',
         minLevel: 42,
         requirements: { level: 42, str: 0, agi: 160, int: 0 },
-        damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
+        damage: { min: 236, max: 471 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 30, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'pierce', value: 35, en: '#% chance for Projectiles to Pierce Monsters', de: '#% Chance, dass Projektile Monster durchbohren' },
@@ -359,7 +359,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💥', slotType: 'ranged', archetype: 'any',
         minLevel: 6,
         requirements: { level: 6, str: 0, agi: 23, int: 0 },
-        damage: { min: 12, max: 28 }, attackIntervalSeconds: 3.0,
+        damage: { min: 24, max: 57 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'splash_damage', value: 25, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
             { key: 'multishot', value: 15, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' }
@@ -415,7 +415,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔪', slotType: 'weapon', archetype: 'strength',
         minLevel: 12,
         requirements: { level: 12, str: 46, agi: 0, int: 0 },
-        damage: { min: 38, max: 76 }, attackIntervalSeconds: 6.4,
+        damage: { min: 74, max: 149 }, attackIntervalSeconds: 6.4,
         bonuses: [
             { key: 'overkill', value: 25, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'life_on_kill', value: 5, en: '+# Life gained on Kill', de: '+# Leben bei jedem Kill' }
@@ -676,7 +676,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔭', slotType: 'ranged', archetype: 'agility',
         minLevel: 36,
         requirements: { level: 36, str: 0, agi: 137, int: 0 },
-        damage: { min: 96, max: 194 }, attackIntervalSeconds: 3.0,
+        damage: { min: 163, max: 329 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'snipe', value: 30, en: '#% chance for Projectiles to Snipe (double damage)', de: '#% Chance auf Sniping (doppelter Schaden)' },
             { key: 'accuracy', value: 25, en: '+# Accuracy', de: '+# Präzision' },
@@ -810,7 +810,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '⚔️', slotType: 'weapon', archetype: 'strength',
         minLevel: 75,
         requirements: { level: 75, str: 285, agi: 0, int: 0 },
-        damage: { min: 380, max: 700 }, attackIntervalSeconds: 8.8,
+        damage: { min: 708, max: 1304 }, attackIntervalSeconds: 8.8,
         bonuses: [
             { key: 'inc_physical_damage', value: 85, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'stagger', value: 40, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
@@ -1065,7 +1065,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🗡️', slotType: 'weapon', archetype: 'any',
         minLevel: 17,
         requirements: { level: 17, str: 65, agi: 0, int: 0 },
-        damage: { min: 26, max: 52 }, attackIntervalSeconds: 5.6,
+        damage: { min: 100, max: 201 }, attackIntervalSeconds: 5.6,
         bonuses: [
             { key: 'fire_damage_1', value: 8, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
             { key: 'fire_damage_2', value: 14, en: 'Adds # Fire Damage to Attacks', de: 'Fügt Angriffen # Feuerschaden hinzu' },
@@ -1164,7 +1164,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏹', slotType: 'ranged', archetype: 'agility',
         minLevel: 34,
         requirements: { level: 34, str: 0, agi: 129, int: 0 },
-        damage: { min: 96, max: 194 }, attackIntervalSeconds: 3.0,
+        damage: { min: 120, max: 243 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 20, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'splash_damage', value: 20, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
@@ -1409,7 +1409,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏹', slotType: 'ranged', archetype: 'agility',
         minLevel: 57,
         requirements: { level: 57, str: 0, agi: 217, int: 0 },
-        damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
+        damage: { min: 323, max: 646 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'chain', value: 30, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
             { key: 'overkill', value: 20, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
@@ -1518,7 +1518,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔨', slotType: 'weapon', archetype: 'strength',
         minLevel: 68,
         requirements: { level: 68, str: 258, agi: 0, int: 0 },
-        damage: { min: 340, max: 640 }, attackIntervalSeconds: 9.5,
+        damage: { min: 981, max: 1846 }, attackIntervalSeconds: 9.5,
         bonuses: [
             { key: 'stagger', value: 45, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'cleave', value: 40, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
@@ -1607,7 +1607,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🕯️', slotType: 'weapon', archetype: 'any',
         minLevel: 4,
         requirements: { level: 4, str: 15, agi: 0, int: 0 },
-        damage: { min: 7, max: 15 }, attackIntervalSeconds: 5.0,
+        damage: { min: 29, max: 63 }, attackIntervalSeconds: 5.0,
         bonuses: [
             { key: 'chance_to_ignite', value: 12, en: '#% chance to Ignite Monsters on hit', de: '#% Chance, Monster bei Treffern zu entzünden' },
             { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
@@ -2075,7 +2075,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🦇', slotType: 'weapon', archetype: 'any',
         minLevel: 41,
         requirements: { level: 41, str: 156, agi: 0, int: 0 },
-        damage: { min: 82, max: 150 }, attackIntervalSeconds: 7.4,
+        damage: { min: 380, max: 694 }, attackIntervalSeconds: 7.4,
         bonuses: [
             { key: 'life_leech', value: 5, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
@@ -2279,7 +2279,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌪️', slotType: 'ranged', archetype: 'agility',
         minLevel: 54,
         requirements: { level: 54, str: 0, agi: 205, int: 0 },
-        damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
+        damage: { min: 225, max: 449 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 25, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'chain', value: 25, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
@@ -2522,7 +2522,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🐉', slotType: 'weapon', archetype: 'agility',
         minLevel: 75,
         requirements: { level: 75, str: 0, agi: 285, int: 0 },
-        damage: { min: 420, max: 760 }, attackIntervalSeconds: 6.8,
+        damage: { min: 731, max: 1323 }, attackIntervalSeconds: 6.8,
         bonuses: [
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'life_leech', value: 3, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
@@ -3298,7 +3298,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🪵', slotType: 'weapon', archetype: 'strength',
         minLevel: 3,
         requirements: { level: 3, str: 12, agi: 0, int: 0 },
-        damage: { min: 8, max: 18 }, attackIntervalSeconds: 6.0,
+        damage: { min: 33, max: 74 }, attackIntervalSeconds: 6.0,
         bonuses: [
             { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
@@ -3317,7 +3317,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🍴', slotType: 'weapon', archetype: 'any',
         minLevel: 14,
         requirements: { level: 14, str: 53, agi: 0, int: 0 },
-        damage: { min: 30, max: 55 }, attackIntervalSeconds: 5.4,
+        damage: { min: 72, max: 132 }, attackIntervalSeconds: 5.4,
         bonuses: [
             { key: 'cleave', value: 15, en: '#% chance to Cleave nearby Monsters', de: '#% Chance, nahe Monster zu spalten' },
             { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
@@ -3337,7 +3337,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🗡️', slotType: 'weapon', archetype: 'agility',
         minLevel: 33,
         requirements: { level: 33, str: 0, agi: 125, int: 0 },
-        damage: { min: 95, max: 170 }, attackIntervalSeconds: 6.6,
+        damage: { min: 179, max: 320 }, attackIntervalSeconds: 6.6,
         bonuses: [
             { key: 'crit_multiplier', value: 40, en: '+#% to Critical Strike Multiplier', de: '+#% Kritischer Trefferschaden' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
@@ -3357,7 +3357,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔨', slotType: 'weapon', archetype: 'strength',
         minLevel: 52,
         requirements: { level: 52, str: 198, agi: 0, int: 0 },
-        damage: { min: 240, max: 420 }, attackIntervalSeconds: 8.2,
+        damage: { min: 646, max: 1131 }, attackIntervalSeconds: 8.2,
         bonuses: [
             { key: 'stagger', value: 40, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
@@ -3378,7 +3378,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '📌', slotType: 'weapon', archetype: 'agility',
         minLevel: 71,
         requirements: { level: 71, str: 0, agi: 270, int: 0 },
-        damage: { min: 300, max: 520 }, attackIntervalSeconds: 5.8,
+        damage: { min: 637, max: 1105 }, attackIntervalSeconds: 5.8,
         bonuses: [
             { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
             { key: 'life_leech', value: 3, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
@@ -3401,7 +3401,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🎯', slotType: 'ranged', archetype: 'any',
         minLevel: 10,
         requirements: { level: 10, str: 0, agi: 38, int: 0 },
-        damage: { min: 12, max: 28 }, attackIntervalSeconds: 3.0,
+        damage: { min: 27, max: 63 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 12, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
@@ -3420,7 +3420,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '💥', slotType: 'ranged', archetype: 'agility',
         minLevel: 25,
         requirements: { level: 25, str: 0, agi: 95, int: 0 },
-        damage: { min: 52, max: 106 }, attackIntervalSeconds: 3.0,
+        damage: { min: 92, max: 188 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'splash_damage', value: 30, en: '#% increased Splash Area', de: '#% vergrößerter Spritzbereich' },
             { key: 'accuracy', value: 28, en: '+# Accuracy', de: '+# Präzision' },
@@ -3440,7 +3440,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🔱', slotType: 'ranged', archetype: 'strength',
         minLevel: 45,
         requirements: { level: 45, str: 171, agi: 0, int: 0 },
-        damage: { min: 150, max: 300 }, attackIntervalSeconds: 3.0,
+        damage: { min: 275, max: 550 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'chain', value: 30, en: '#% chance for Projectiles to Chain to distant Monsters', de: '#% Chance, dass Projektile auf ferne Monster überspringen' },
             { key: 'pushback', value: 0.5, en: '+#s Charge Pushback on hit', de: '+#s Angriffslade-Rückstoß bei Treffern' },
@@ -3460,7 +3460,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌟', slotType: 'ranged', archetype: 'any',
         minLevel: 69,
         requirements: { level: 69, str: 131, agi: 131, int: 0 },
-        damage: { min: 256, max: 512 }, attackIntervalSeconds: 3.0,
+        damage: { min: 332, max: 665 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'snipe', value: 35, en: '#% chance for Projectiles to Snipe (double damage)', de: '#% Chance auf Sniping (doppelter Schaden)' },
             { key: 'overkill', value: 25, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
@@ -5830,7 +5830,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '📏', slotType: 'weapon', archetype: 'strength',
         minLevel: 14,
         requirements: { level: 14, str: 55, agi: 0, int: 0 },
-        damage: { min: 18, max: 34 }, attackIntervalSeconds: 3.5,
+        damage: { min: 43, max: 81 }, attackIntervalSeconds: 3.5,
         bonuses: [
             { key: 'inc_physical_damage', value: 25, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'accuracy', value: 20, en: '+# Accuracy', de: '+# Präzision' },
@@ -5849,7 +5849,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🌾', slotType: 'weapon', archetype: 'strength',
         minLevel: 58,
         requirements: { level: 58, str: 220, agi: 0, int: 0 },
-        damage: { min: 210, max: 330 }, attackIntervalSeconds: 6.5,
+        damage: { min: 398, max: 625 }, attackIntervalSeconds: 6.5,
         bonuses: [
             { key: 'crit_chance', value: 20, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'crit_multiplier', value: 60, en: '+#% Critical Strike Multiplier', de: '+#% Kritischer Schadensmultiplikator' },
@@ -5870,7 +5870,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🖍️', slotType: 'weapon', archetype: 'strength',
         minLevel: 44,
         requirements: { level: 44, str: 168, agi: 0, int: 0 },
-        damage: { min: 120, max: 200 }, attackIntervalSeconds: 5.0,
+        damage: { min: 272, max: 453 }, attackIntervalSeconds: 5.0,
         bonuses: [
             { key: 'stagger', value: 45, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'pushback', value: 0.5, en: '+#s Pushback on hit', de: '+#s Rückstoß bei Treffern' },
@@ -5889,14 +5889,14 @@ const EG_UNIQUE_ITEMS = [
         icon: '🧮', slotType: 'weapon', archetype: 'strength',
         minLevel: 36,
         requirements: { level: 36, str: 137, agi: 0, int: 0 },
-        damage: { min: 80, max: 140 }, attackIntervalSeconds: 4.5,
+        damage: { min: 236, max: 414 }, attackIntervalSeconds: 4.5,
         bonuses: [
             { key: 'mana_on_kill', value: 8, en: '+# Mana gained on Kill', de: '+# Mana bei Kill' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -19.5, en: '#% reduced Attack Speed', de: '#% reduzierte Angriffsgeschwindigkeit' }
+            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 3s slower', de: 'Nahkampfschläge erfolgen 3s langsamer' }
         ],
         flavorEn: 'Counts your kills out loud. In base twelve.',
         flavorDe: 'Zählt deine Kills laut mit. Im Zwölfersystem.',
@@ -5908,7 +5908,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '📐', slotType: 'weapon', archetype: 'strength',
         minLevel: 66,
         requirements: { level: 66, str: 250, agi: 0, int: 0 },
-        damage: { min: 300, max: 520 }, attackIntervalSeconds: 7.5,
+        damage: { min: 816, max: 1415 }, attackIntervalSeconds: 7.5,
         bonuses: [
             { key: 'cleave', value: 50, en: '#% chance to Cleave (hit nearby Monsters)', de: '#% Chance auf Keilschlag (nahe Monster treffen)' },
             { key: 'inc_physical_damage', value: 40, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
@@ -5929,10 +5929,10 @@ const EG_UNIQUE_ITEMS = [
         icon: '🧭', slotType: 'weapon', archetype: 'agility',
         minLevel: 22,
         requirements: { level: 22, str: 0, agi: 85, int: 0 },
-        damage: { min: 30, max: 55 }, attackIntervalSeconds: 2.2,
+        damage: { min: 41, max: 75 }, attackIntervalSeconds: 2.2,
         bonuses: [
             { key: 'pierce', value: 40, en: '#% chance for Projectiles to Pierce', de: '#% Chance, dass Projektile durchdringen' },
-            { key: 'attack_speed', value: 15, en: '#% increased Attack Speed', de: '#% erhöhte Angriffsgeschwindigkeit' },
+            { key: 'attack_speed', value: 0.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
             { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
@@ -5948,7 +5948,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🖊️', slotType: 'weapon', archetype: 'any',
         minLevel: 72,
         requirements: { level: 72, str: 120, agi: 120, int: 40 },
-        damage: { min: 260, max: 420 }, attackIntervalSeconds: 5.5,
+        damage: { min: 657, max: 1061 }, attackIntervalSeconds: 5.5,
         bonuses: [
             { key: 'overkill', value: 35, en: '#% increased Overkill Damage transferred to a nearby Monster', de: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird' },
             { key: 'life_leech', value: 5, en: '#% of Damage Leeched as Life', de: '#% des Schadens als Leben abgesaugt' },
@@ -5971,7 +5971,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🎯', slotType: 'ranged', archetype: 'agility',
         minLevel: 12,
         requirements: { level: 12, str: 0, agi: 45, int: 0 },
-        damage: { min: 12, max: 22 }, attackIntervalSeconds: 1.8,
+        damage: { min: 36, max: 66 }, attackIntervalSeconds: 1.8,
         bonuses: [
             { key: 'crit_chance', value: 15, en: '+#% Critical Hit Chance', de: '+#% Kritische Trefferchance' },
             { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
@@ -5989,7 +5989,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🪃', slotType: 'ranged', archetype: 'agility',
         minLevel: 38,
         requirements: { level: 38, str: 0, agi: 145, int: 0 },
-        damage: { min: 70, max: 120 }, attackIntervalSeconds: 3.0,
+        damage: { min: 158, max: 271 }, attackIntervalSeconds: 3.0,
         bonuses: [
             { key: 'multishot', value: 30, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'crit_chance', value: 8, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
@@ -6008,7 +6008,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏹', slotType: 'ranged', archetype: 'agility',
         minLevel: 54,
         requirements: { level: 54, str: 0, agi: 205, int: 0 },
-        damage: { min: 140, max: 230 }, attackIntervalSeconds: 2.8,
+        damage: { min: 255, max: 419 }, attackIntervalSeconds: 2.8,
         bonuses: [
             { key: 'multishot', value: 60, en: '#% chance to fire an additional Projectile', de: '#% Chance auf ein zusätzliches Projektil' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
@@ -6028,7 +6028,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🏰', slotType: 'ranged', archetype: 'strength',
         minLevel: 70,
         requirements: { level: 70, str: 266, agi: 0, int: 0 },
-        damage: { min: 420, max: 850 }, attackIntervalSeconds: 9.5,
+        damage: { min: 356, max: 721 }, attackIntervalSeconds: 9.5,
         bonuses: [
             { key: 'stagger', value: 50, en: '#% chance to Stagger Monsters on hit', de: '#% Chance, Monster bei Treffern zu betäuben' },
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
@@ -6049,7 +6049,7 @@ const EG_UNIQUE_ITEMS = [
         icon: '🃏', slotType: 'ranged', archetype: 'agility',
         minLevel: 62,
         requirements: { level: 62, str: 0, agi: 235, int: 0 },
-        damage: { min: 180, max: 290 }, attackIntervalSeconds: 3.2,
+        damage: { min: 486, max: 783 }, attackIntervalSeconds: 3.2,
         bonuses: [
             { key: 'chain', value: 35, en: '#% chance for Projectiles to Chain', de: '#% Chance, dass Projektile ketten' },
             { key: 'chance_to_shock', value: 20, en: '#% chance to Shock', de: '#% Chance auf Schocken' },

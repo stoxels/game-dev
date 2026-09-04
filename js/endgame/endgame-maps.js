@@ -1713,9 +1713,6 @@ function _egCheckMapDropClaim(row, col) {
     // Track for the leave-map summary screen (mirrors _egTrackRunCurrency)
     if (typeof _egRunMaps !== 'undefined') _egRunMaps.push(map);
 
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('map_pickup');
-    }
     showToast(t('eg_map_claimed')
         .replace('{icon}', map.icon || '')
         .replace('{name}', map.name)

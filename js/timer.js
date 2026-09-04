@@ -162,6 +162,7 @@ function _egClearCenterGridBanners(exceptId) {
         'eg-mistakes-warning-banner',
         'eg-low-health-warning-banner',
         'eg-absorption-broken-banner',
+        'eg-clock-call-banner',
         'eg-boss-arena-available-banner',
         'eg-map-cleared-banner'
     ];

@@ -566,10 +566,6 @@ function _egTickMonster(m) {
                 m.bossBaseDamage = Math.round(m.bossBaseDamage * (1 + enragePct / 100));
             }
             showToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
-            // One-time audio cue for the map-boss enrage
-            if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-                Audio_Manager.playSFX('boss_roar');
-            }
         }
     }
 
@@ -796,6 +792,7 @@ if (typeof _egClearCenterGridBanners !== 'function') {
             'eg-mistakes-warning-banner',
             'eg-low-health-warning-banner',
             'eg-absorption-broken-banner',
+            'eg-clock-call-banner',
             'eg-boss-arena-available-banner',
             'eg-map-cleared-banner'
         ];
@@ -1170,10 +1167,6 @@ function _egFireMonsterAttack(monster) {
     _egFlashMonsterAttackCard(monster);
     if (typeof _egMaybePuzzleAttack === 'function' && _egMaybePuzzleAttack(monster)) return;
     const attackType = _egResolveAttackType(monster);
-    // Audio cue for the monster's attack type at the moment it fires.
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX(attackType === 'melee' ? 'monster_swing' : 'monster_shoot');
-    }
     if (attackType === 'melee') {
         _egAnimateMonsterMelee(monster);
     } else {
@@ -1194,9 +1187,6 @@ function _egApplyPlayerMissFeedback() {
 
 // Floating "Blocked!" label on the player HUD after a successful block.
 function _egApplyPlayerBlockFeedback() {
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('player_block');
-    }
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -1635,9 +1625,6 @@ function _egApplyPlayerParryFeedback() {
     setTimeout(() => label.remove(), 1050);
 }
 function _egApplyPlayerDeflectFeedback() {
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('player_deflect');
-    }
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -1672,7 +1659,6 @@ function _egRollParry(attacker, isProjectile) {
     if (chance <= 0) return false;
     if (Math.random() * 100 >= chance) return false;
     showToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
-    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_parry');
     _egApplyPlayerParryFeedback();
     _egScheduleAbsorptionRegen();
     return true;
@@ -2696,9 +2682,6 @@ function _egUpdateTargetAfterKill() {
 // Handles all post-kill logic for a normal (non-boss) monster death.
 function _egHandleNormalMonsterKill(dying) {
     _egChainKillCount++;
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('monster_kill');
-    }
 
     _egUpdateObjectivesHUD();
 
@@ -2885,10 +2868,6 @@ function _egBuildMonsterOrBoss(defId, level, hpMult = 1) {
 function _egNotifyMonsterArrival(monster) {
     if (monster.isBoss) {
         _egBossInit(monster);
-        // Boss materialises — deep roar announces the arrival
-        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-            Audio_Manager.playSFX('boss_roar');
-        }
     }
 }
 

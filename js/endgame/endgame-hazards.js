@@ -944,9 +944,6 @@ function _egHzInitArcane(intensity) {
 }
 
 function _egHzStartArcaneCharge() {
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('hazard_spawn');
-    }
     const y = _egHzRand(120, Math.max(140, window.innerHeight - 180));
     const chargeMs = _egHzRand(EG_HZ_ARCANE_CHARGE_MIN_MS, EG_HZ_ARCANE_CHARGE_MAX_MS);
     const size = 46;
@@ -1057,9 +1054,6 @@ function _egHzInitMeteor(intensity) {
 }
 
 function _egHzSpawnMeteor(delayMs) {
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('hazard_spawn');
-    }
     const pos = _egHzPointOutsideGrid(EG_HZ_METEOR_RADIUS * 0.6);
     const el = document.createElement('div');
     el.className = 'eg-hz-meteor-warning';

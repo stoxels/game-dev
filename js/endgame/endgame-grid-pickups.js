@@ -963,11 +963,6 @@ function _egPlaceLootDropForce(item) {
 function _egSpawnLootExplosion(monsterLevel = 1) {
     if (!_egIsActive()) return;
 
-    // Boom opens the cascade — the per-drop pickup blips follow underneath.
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('loot_explosion');
-    }
-
     const tryScheduleOne = () => {
         // Unlimited stash: always has room
 
@@ -1062,10 +1057,6 @@ function _egCheckLootClaim(row, col) {
         if (item.rarity === 'epic' && Array.isArray(item.mods) && item.mods.length >= 6) trackAchStat('egSixModLooted', 1);
         if (item.isUnique) trackAchStat('egUniquesCollected', 1);
     } catch(e){}
-
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX(item && item.isUnique ? 'item_claim_unique' : 'player_equip_pickup');
-    }
 
     const requiredLevel = item.requirements && item.requirements.level;
     const nameSuffix = (item.category === 'equip' && Number.isFinite(requiredLevel))
@@ -1298,9 +1289,6 @@ function _egCheckCurrencyDropClaim(row, col) {
         _egTrackRunCurrency(def);
     }
 
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX(isEssence ? 'essence_pickup' : 'currency_pickup');
-    }
     if (added) showToast(t('eg_currency_acquired')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name), _egRarityToastColor('currency'));

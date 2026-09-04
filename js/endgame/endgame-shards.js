@@ -286,9 +286,6 @@ function _egSellStashItem(row, col) {
     _egClearTooltip();
     egSaveHubState();
 
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('vendor_sell');
-    }
     showToast(t('eg_sell_item_sold')
         .replace('{name}', item.name || '???')
         .replace('{icon}', shardDef.icon)
@@ -314,9 +311,6 @@ function _egSellMapItem(map, sourceEl) {
     }
 
     _egClearTooltip();
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        Audio_Manager.playSFX('vendor_sell');
-    }
     showToast(t('eg_sell_item_sold')
         .replace('{name}', map.name || '???')
         .replace('{icon}', shardDef.icon)

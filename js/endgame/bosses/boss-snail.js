@@ -220,9 +220,6 @@ function _egSnailCrashIntoCorruption(state) {
 
     _egNkToast('eg_snail_banished',
         '💥 The Doom Snail smashes into the corruption and is destroyed!', '#f59e0b');
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        try { Audio_Manager.playSFX('monster_kill'); } catch (e) {}
-    }
     return true;
 }
 
@@ -233,10 +230,14 @@ const EG_SNAIL_BROOM_BOX_H = 70;
 
 
 // Picks `count` home spots for the resting brooms, all OUTSIDE the current
-// puzzle grid. Preference order: a vertical stack right of the grid, then
-// along its bottom edge, then left/top, then viewport corners. Every spot
-// keeps the full broom box clear of the (padded) grid so a grid rebuild
-// never leaves a broom sitting on top of the puzzle.
+// puzzle grid. The layout is deterministic and side-locked so brooms never
+// clump: with the usual 3 the homes are one LEFT of the grid (vertically
+// centred), one RIGHT of the grid, and one on TOP, centred above it. Homes
+// that cannot physically fit (tiny viewport / huge grid) fall back along
+// the bottom edge, then to viewport corners. Every spot keeps the full
+// broom box clear of the (padded) grid so a grid rebuild never leaves a
+// broom sitting on top of the puzzle, and the fallbacks keep one box-width
+// of gap so no two brooms ever share a spot.
 function _egSnailBroomHomes(count) {
     const vw = window.innerWidth, vh = window.innerHeight;
     const m = EG_SNAIL_BROOM_MARGIN;
@@ -259,17 +260,24 @@ function _egSnailBroomHomes(count) {
     const add = (x, y) => {
         if (out.length >= count) return;
         const xr = Math.round(x), yr = Math.round(y);
-        if (fits(xr, yr) && clearOfGrid(xr, yr)) out.push({ x: xr, y: yr });
+        if (!fits(xr, yr) || !clearOfGrid(xr, yr)) return;
+        // Never hand two brooms the same resting spot.
+        if (out.some(h => h.x === xr && h.y === yr)) return;
+        out.push({ x: xr, y: yr });
     };
     if (grid) {
-        const third = (grid.bottom - grid.top) / 3;
-        add(grid.right + m, grid.top + third * 0.5);
-        add(grid.right + m, grid.top + third * 1.5);
-        add(grid.right + m, grid.top + third * 2.5);
+        const cy = (grid.top + grid.bottom) / 2;
+        const cx = (grid.left + grid.right) / 2;
+        // 1. left of the grid, vertically centred
+        add(grid.left - m - EG_SNAIL_BROOM_BOX_W, cy - EG_SNAIL_BROOM_BOX_H / 2);
+        // 2. right of the grid, vertically centred
+        add(grid.right + m, cy - EG_SNAIL_BROOM_BOX_H / 2);
+        // 3. top, centred above the grid
+        add(cx - EG_SNAIL_BROOM_BOX_W / 2, grid.top - m - EG_SNAIL_BROOM_BOX_H);
+        // Only extra brooms (or missing sides on cramped layouts) spill
+        // along the bottom edge.
         add(grid.left + grid.width * 0.2, grid.bottom + m);
         add(grid.left + grid.width * 0.8, grid.bottom + m);
-        add(grid.left - m - EG_SNAIL_BROOM_BOX_W, (grid.top + grid.bottom) / 2);
-        add((grid.left + grid.right) / 2 - EG_SNAIL_BROOM_BOX_W / 2, grid.top - m - EG_SNAIL_BROOM_BOX_H);
     }
     const corners = [
         [vw - EG_SNAIL_BROOM_BOX_W - m, m],
@@ -279,15 +287,17 @@ function _egSnailBroomHomes(count) {
     ];
     corners.forEach(([x, y]) => add(x, y));
     // Absolute last resort: never return fewer than `count` homes — a spot
-    // that grazes a corner beats a missing broom entirely.
-    let fx = vw - 96, fy = vh - 120;
+    // that grazes a corner beats a missing broom entirely. Steps keep a
+    // full box between neighbours so the safety brooms never overlap.
+    const sx = EG_SNAIL_BROOM_BOX_W + 10, sy = EG_SNAIL_BROOM_BOX_H + 10;
+    let fx = vw - EG_SNAIL_BROOM_BOX_W - m, fy = vh - EG_SNAIL_BROOM_BOX_H - m;
     while (out.length < count) {
         out.push({
             x: Math.max(m, Math.min(vw - EG_SNAIL_BROOM_BOX_W - m, fx)),
             y: Math.max(m, Math.min(vh - EG_SNAIL_BROOM_BOX_H - m, fy)),
         });
-        fx -= 74;
-        fy -= 64;
+        fx -= sx;
+        fy -= sy;
     }
     return out;
 }
@@ -1142,9 +1152,6 @@ function _egSnailgeddonGo(g, monster) {
 
     _egNkToast('eg_snailgeddon_go',
         '🐌 The Snail: SNAILGEDDON! Escape through the gap in the ring!', '#f87171');
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        try { Audio_Manager.playSFX('boss_phase_shift'); } catch (e) {}
-    }
 
     run.onKill = () => { if (_egSnailgeddon === g) _egSnailgeddon = null; };
 

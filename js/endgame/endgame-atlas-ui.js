@@ -16,6 +16,10 @@
 //   - Node states: ✔ completed (gold) · available (border highlight) ·
  //     locked (dimmed)
 //   - Bottom-left of every node: number of matching maps in the map stash
+//   - Hovering a node opens a custom tooltip naming the region's fixed
+//     boss (emoji + name — the same guardian the region's map tooltips
+//     name, see EG_ATLAS_REGION_BOSSES in
+//     js/endgame/bosses/boss-rosters.js)
 //   - Search box (top right): matching regions glow blue (pulsing node
 //     frame + brightened name), including locked ones; matches by region
 //     name and by tier numeral / number (e.g. 'XV' or '15')
@@ -119,6 +123,24 @@ function _egAtlasStatusLabel(status) {
     }
 }
 
+// Resolves the fixed boss of an atlas region — the same deterministic
+// blueprint lookup (egAtlasChainBlueprint) the map tooltips and the map
+// launch code use, so the card always names the boss actually fought in
+// that region's maps. Returns { id, name, emoji } or null when the boss
+// cannot be resolved (unknown region / missing defs).
+function _egAtlasNodeBoss(node) {
+    if (!node || typeof egAtlasChainBlueprint !== 'function') return null;
+    try {
+        const bp = egAtlasChainBlueprint(node);
+        if (!bp || !bp.bossId) return null;
+        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? EG_BOSS_DEFS[bp.bossId] : null;
+        if (!def) return null;
+        return { id: bp.bossId, name: def.name || bp.bossId, emoji: def.emoji || '💀' };
+    } catch (e) {
+        return null;
+    }
+}
+
 // Counts the stashed map items per atlas region (like the classic atlas
 // showed the number of map items in the player's bags on every node).
 function egAtlasCountStashedMaps() {
@@ -142,7 +164,8 @@ function egAtlasCountStashedMaps() {
 }
 
 // Builds one region node: a small square (tier numeral inside) with the
-// region name floating above it.
+// region name floating above it. Hovering the node opens a custom
+// tooltip naming the region's fixed boss (see _egAtlasNodeBoss).
 function _egAtlasBuildNodeHTML(node) {
     const status = _egAtlasNodeStatus(node);
     const name = egAtlasNodeName(node);
@@ -162,11 +185,34 @@ function _egAtlasBuildNodeHTML(node) {
      id="ega-node-${node.id}"
      style="left:${(c.x - size.w / 2).toFixed(1)}px; top:${(c.y - size.h / 2 - EG_ATLAS_LABEL_H).toFixed(1)}px; \
 width:${size.w}px; height:${size.h + EG_ATLAS_LABEL_H}px;"
-     onclick="_egAtlasSelectNode('${node.id}')">
+     onclick="_egAtlasSelectNode('${node.id}')"
+     onmouseenter="if (typeof showGameTooltip === 'function') showGameTooltip(_egAtlasBuildNodeTooltipHTML('${node.id}'), event)"
+     onmousemove="if (typeof moveGameTooltip === 'function') moveGameTooltip(event)"
+     onmouseleave="if (typeof hideGameTooltip === 'function') hideGameTooltip()">
     <div class="ega-node-label" style="color:${col};">${name}</div>
     <div class="ega-node-box" style="width:${size.w}px; height:${size.h}px; --egcol:${col};">
         <span class="ega-node-numeral" style="font-size:${numeralSize}px; color:${col};">${roman}</span>
         ${marker}${countHtml}
+    </div>
+</div>`;
+}
+
+// Hover tooltip for one region node: names the region's fixed boss
+// (emoji + name, the same red boss line the map-item tooltips show).
+// Falls back to the generic boss label when the boss cannot be resolved.
+function _egAtlasBuildNodeTooltipHTML(nodeId) {
+    const node = (typeof egAtlasNodeById === 'function') ? egAtlasNodeById(nodeId) : null;
+    if (!node) return '';
+    const boss = _egAtlasNodeBoss(node);
+    const bossLabel = boss ? `${boss.emoji} ${boss.name}` : t('eg_map_has_boss');
+    return `
+<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
+    <div class="eg-tt-header">
+        <div class="eg-tt-icon">🗺</div>
+        <div class="eg-tt-name" style="color:#f5d98a;">${egAtlasNodeName(node)}</div>
+    </div>
+    <div class="eg-tt-section">
+        <div class="eg-tt-mod" style="color:#e74c3c;font-weight:700;">${bossLabel}</div>
     </div>
 </div>`;
 }
@@ -665,6 +711,9 @@ function _egAtlasEnsureStyles() {
             font-size: 7px; color: #fff; opacity: 0.9;
             text-shadow: 1px 1px 0 #000, -1px 1px 0 #000;
         }
+        /* Boss tooltip is built with the shared eg-tt-* tooltip frame
+           (see _egAtlasBuildNodeTooltipHTML) — nothing extra below the
+           node square. */
 
         /* ── Search highlighting ───────────────────────────────────── */
         /* Placed after the node state rules so it wins the cascade. */
