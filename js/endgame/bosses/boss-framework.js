@@ -200,6 +200,11 @@ function _egBossInit(monster) {
     monster.enrageStacks = 0;
 
     _egBossTimers[monster.id] = [];
+    // Persistent arena systems (such as The Firefly's lights) start before
+    // scheduled mechanics, so they are present from the opening second.
+    if (typeof def.onInit === 'function') {
+        try { def.onInit(monster); } catch (e) { console.warn('Boss init hook failed:', monster.baseId, e); }
+    }
     _egBossScheduleMechanics(monster, 1);
 }
 
@@ -228,13 +233,27 @@ function _egBossCleanup(monsterId) {
     if (typeof _egRemoveClueScramble === 'function') _egRemoveClueScramble();
     if (typeof _egTitheTeardown === 'function') _egTitheTeardown(monsterId);
     if (typeof _egNkTeardownBoss === 'function') _egNkTeardownBoss(monsterId);
+    if (typeof _egFireflyTeardown === 'function') _egFireflyTeardown(monsterId);
     // The Snail: slimes + broom live outside nk runs — tear them down too.
     if (typeof _egSnailTeardown === 'function') _egSnailTeardown();
+    // The Demolitionist: the Bomb Maze owns body-level state (countdown
+    // overlay, banner, charge-bar freeze) while it runs — drop it with the
+    // boss. Runs on boss death and on encounter stop via _egBossCleanupAll.
+    if (typeof _egCrashTeardown === 'function') _egCrashTeardown();
     // Brutus: sacrificial zombies roam in their own layer until he dies or
     // the encounter stops — tear them down exactly when that happens (this
     // hook never fires for individual zombie kills: their ids differ).
     if (monsterId === 'boss_brutus' && typeof _egBrutusZombieTeardown === 'function') {
         _egBrutusZombieTeardown();
+    }
+    // The Dynamo: lightning conductors and beam network.
+    if (monsterId.startsWith('boss_dynamo') && typeof _egDynamoTeardown === 'function') {
+        _egDynamoTeardown();
+    }
+    // The Gust: persistent storm-siege arena (lanes, water, clouds) plus
+    // the wind-lane charge-pause latch.
+    if (monsterId.startsWith('boss_gust') && typeof _egGustTeardown === 'function') {
+        _egGustTeardown();
     }
 }
 

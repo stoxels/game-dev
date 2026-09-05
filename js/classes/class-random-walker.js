@@ -281,8 +281,8 @@ function _executeBrownianMotion(row, col, paths, rank) {
 
     Audio_Manager.playSFX('browneySummon');
 
-    // Play staff-swing animation on the player avatar (Trix only, other chars no-op)
-    if (typeof _playAvatarSwingAnimation === 'function') _playAvatarSwingAnimation();
+    // Avatar combat animation is handled centrally in
+    // _dispatchAscendencyAbility (slot active3 → brownian).
 
     // Charge the bear companion sprite to the starting cell, then begin animation
     if (typeof _chargeCompanionToCell === 'function') {
@@ -635,8 +635,8 @@ function _executeSummonDrifter(duration, interval, smartTarget) {
     Audio_Manager.playSFX('drifterSummon');
     trackAchStat('skillSummonDrifter');
 
-    // Play staff-swing animation on the player avatar (Trix only, other chars no-op)
-    if (typeof _playAvatarSwingAnimation === 'function') _playAvatarSwingAnimation();
+    // Avatar combat animation is handled centrally in
+    // _dispatchAscendencyAbility (slot active4 → drifter).
 
     const hudUid = _spawnWalkerHudIndicator("🐶", "Drifter", window._drifterTimeRemainingSeconds, true);
 

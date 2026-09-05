@@ -612,6 +612,13 @@ function _egTickPlayer() {
     if (typeof _egSnailgeddonActive === 'function' && _egSnailgeddonActive()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
     }
+    // The Demolitionist's Bomb Maze: while the ≤25% finisher runs
+    // (countdown AND the chase) the auto-attack charge bar stays frozen —
+    // it is a pure dodge-and-run set-piece, not free damage time
+    // (boss-demolitionist.js).
+    if (typeof _egCrashMazeActive === 'function' && _egCrashMazeActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
     if (typeof _egSnailBroomHeld === 'function' && _egSnailBroomHeld()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
     }
@@ -619,10 +626,21 @@ function _egTickPlayer() {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
         // If not in an active encounter, fall through (no effect outside endgame)
     }
+    // The Gust's wind lanes: while the player rides a lane the auto-attack
+    // charge bar stays frozen — a dodge set-piece, not free DPS (boss-gust.js).
+    if (typeof _egGustChargePaused === 'function' && _egGustChargePaused()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
     // The Clock's Time Freeze: the auto-attack charge bar is frozen for the
     // whole 30s window — a time-stop is not free DPS time (class abilities
     // and E-releases still work). boss-clock.js.
     if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Firefly's formation trials: the auto-attack charge bar stays
+    // frozen while the swarm repositions — a coordination set-piece, not
+    // auto-attack time (boss-firefly.js).
+    if (typeof window !== 'undefined' && typeof window._egFireflyTrialActive === 'function' && window._egFireflyTrialActive()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
     }
     // Ailments: frozen stops the auto-attack bar entirely (movement
@@ -2792,6 +2810,14 @@ function _egKillMonster(monsterId) {
 
     _egBossCleanup(monsterId);
     _egFlashKillCard(monsterId);
+
+    // Dynamo conductors: beam-network sockets whose power source is gone.
+    // _egRemoveConductor fires the destruction burst and lets the roaming
+    // card linger briefly so the kill-flash animation can play out.
+    if (dying && dying.isDynamoConductor && typeof _egRemoveConductor === 'function') {
+        _egRemoveConductor(monsterId);
+    }
+
     _egMonsters = _egMonsters.filter(m => m.id !== monsterId);
 
     _egUpdateTargetAfterKill();
@@ -3202,6 +3228,10 @@ function _egRenderMonstersIntoZones() {
         // Brutus's sacrificial zombies render as roaming cards in the fixed
         // #eg-zombie-layer, not in the static monster panel.
         if (m.isSacrificialZombie) return;
+        // The Dynamo's Lightning Conductors render as roaming cards in the
+        // fixed #eg-dynamo-layer (beam-network anchors must stay at their
+        // spawn spots) — never in the static monster panel.
+        if (m.isDynamoConductor) return;
         const zoneEl = document.getElementById(m.zoneId || 'eg-monster-panel');
         if (zoneEl) zoneEl.innerHTML += _egBuildMonsterCardHTML(m);
     });

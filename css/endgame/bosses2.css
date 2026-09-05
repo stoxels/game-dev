@@ -40,21 +40,200 @@
 @keyframes eg-nk-fuse-blink { 0% { filter: brightness(1); } 100% { filter: brightness(2.2) saturate(0.2); } }
 .eg-nk-boom { filter: brightness(2.4) !important; transform-origin: center; }
 
-/* Spark pillars */
+/* Spark pillars — all orientations use lightning yellow/gold */
 .eg-nk-pillar-warn {
-    position: fixed; top: 0; bottom: 0; height: 100vh;
+    position: fixed;
     pointer-events: none; z-index: 9001;
     border: 2px dashed rgba(253, 224, 71, 0.9);
     background: rgba(253, 224, 71, 0.07);
     animation: eg-nk-warn-pulse 0.4s ease-in-out infinite alternate;
 }
+.eg-nk-pillar-warn.vertical { top: 0; bottom: 0; height: 100vh; }
+.eg-nk-pillar-warn.horizontal { left: 0; right: 0; width: 100vw; }
 @keyframes eg-nk-warn-pulse { from { opacity: 0.5; } to { opacity: 1; } }
+
 .eg-nk-pillar {
-    position: fixed; top: 0; bottom: 0; height: 100vh;
+    position: fixed;
     pointer-events: none; z-index: 9001;
     background: linear-gradient(180deg, #fefce8, #facc15 40%, #854d0e);
     border-left: 2px solid #fef9c3; border-right: 2px solid #fef9c3;
     box-shadow: 0 0 26px rgba(250, 204, 21, 0.95), inset 0 0 14px rgba(255,255,255,0.6);
+}
+.eg-nk-pillar.vertical { top: 0; bottom: 0; height: 100vh; }
+.eg-nk-pillar.horizontal { left: 0; right: 0; width: 100vw; }
+
+/* The Dynamo — spark pillars as REAL lightning: a fixed container rotated
+   to the pillar axis holds an SVG with layered flat strokes — a wide faint
+   halo under a mid glow under a hot white core — instead of SVG filters
+   (blur/drop-shadow repainted huge screen areas and tanked FPS). Paths are
+   re-jittered a few times per second so the arc visibly crackles.
+   (The generic .eg-nk-pillar blocks above stay for other bosses — Seraph.) */
+.eg-nk-bolt {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9001;
+    overflow: visible;
+}
+.eg-nk-bolt svg { display: block; overflow: visible; }
+.eg-nk-bolt .bolt-halo {
+    fill: none;
+    stroke: rgba(250, 204, 21, 0.1);
+    stroke-width: 16;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+.eg-nk-bolt .bolt-glow {
+    fill: none;
+    stroke: rgba(250, 204, 21, 0.4);
+    stroke-width: 8.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+.eg-nk-bolt .bolt-core {
+    fill: none;
+    stroke: #fffbe0;
+    stroke-width: 4;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+/* Warn stage: faint crackling sparks tracing the incoming strike */
+.eg-nk-bolt.eg-bolt-warn .bolt-halo { opacity: 0.3; }
+.eg-nk-bolt.eg-bolt-warn .bolt-glow {
+    stroke: rgba(250, 204, 21, 0.22);
+    stroke-width: 7;
+}
+.eg-nk-bolt.eg-bolt-warn .bolt-core {
+    stroke: rgba(253, 224, 71, 0.75);
+    stroke-width: 2.5;
+    stroke-dasharray: 14 10;
+    animation: eg-bolt-warn-flicker 0.16s steps(2) infinite;
+}
+@keyframes eg-bolt-warn-flicker {
+    0%   { opacity: 0.35; }
+    50%  { opacity: 0.95; }
+    100% { opacity: 0.5; }
+}
+/* Strike: white-hot flash across the whole arc, then a fading ember glow */
+.eg-nk-bolt.eg-bolt-active {
+    animation: eg-bolt-strike-flash 0.22s ease-out;
+}
+.eg-nk-bolt.eg-bolt-active .bolt-glow {
+    stroke: rgba(250, 204, 21, 0.55);
+    stroke-width: 10;
+}
+.eg-nk-bolt.eg-bolt-active .bolt-core {
+    stroke: #ffffff;
+    stroke-width: 4.5;
+}
+@keyframes eg-bolt-strike-flash {
+    /* Opacity snap instead of filter brightness — no per-frame re-raster. */
+    0%   { opacity: 0.3; }
+    40%  { opacity: 1; }
+    60%  { opacity: 0.55; }
+    100% { opacity: 1; }
+}
+
+/* The Dynamo — conductor network SVG layer (fixed overlay above the grid,
+   below pillars). The single SVG carries the field polygon + jagged beams;
+   conductor CARDS live in #eg-dynamo-layer and stay clickable. */
+#eg-dynamo-layer {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 900;
+}
+#eg-dynamo-layer .eg-monster-card-compact {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0;
+    pointer-events: auto;
+    transform: translate(-50%, -50%); /* left/top are the beam anchor (card centre) */
+    transform-origin: center bottom;
+}
+#eg-dynamo-layer .eg-monster-card-compact:hover {
+    filter: brightness(1.15);
+}
+
+#eg-dynamo-net {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9004;
+    overflow: visible;
+    /* Own compositor layer so per-tick path repaints stay isolated from the
+       rest of the page (no invalidating the game grid every crackle tick). */
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* Charged field — filled convex hull of the whole beam network. The interior
+   shocks the player (heavy). Shapes redraw every crackle tick. */
+.eg-dynamo-field {
+    fill: rgba(250, 204, 21, 0.14);
+    stroke: none;
+    /* Opacity pulse instead of animating fill — compositor-friendly. */
+    animation: eg-dynamo-field-pulse 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-dynamo-field-pulse {
+    from { opacity: 0.55; }
+    to   { opacity: 1; }
+}
+.eg-dynamo-field-edge {
+    fill: none;
+    stroke: rgba(253, 224, 71, 0.6);
+    stroke-width: 2;
+    stroke-dasharray: 10 8;
+}
+
+/* Electric arcs: layered flat strokes — wide faint halo, mid glow, hot
+   white-gold core. The JS creates halo/mid/core paths; SVG filters are gone
+   (blur/drop-shadow over the full-viewport SVG forced huge repaints).
+   Re-struck by _egDynamoRebuildNet. */
+.eg-dynamo-beam-halo {
+    fill: none;
+    stroke: rgba(250, 204, 21, 0.1);
+    stroke-width: 12;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+.eg-dynamo-beam-mid {
+    fill: none;
+    stroke: rgba(250, 204, 21, 0.4);
+    stroke-width: 6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+.eg-dynamo-beam-core {
+    fill: none;
+    stroke: #fffbe6;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+/* Arrival / destruction burst at a conductor anchor */
+.eg-dynamo-burst {
+    position: fixed;
+    z-index: 9002;
+    font-size: 34px;
+    pointer-events: none;
+    color: #fff8d0;
+    text-shadow: 0 0 14px rgba(250, 204, 21, 1), 0 0 30px rgba(253, 224, 71, 0.9);
+    transform: translate(-50%, -50%);
+    animation: eg-dynamo-burst-kf 0.75s ease-out forwards;
+}
+.eg-dynamo-burst-small { font-size: 20px; }
+@keyframes eg-dynamo-burst-kf {
+    0%   { opacity: 0.9; transform: translate(-50%, -50%) scale(0.5); }
+    55%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.25); }
+    100% { opacity: 0;   transform: translate(-50%, -50%) scale(1.8); }
 }
 
 /* Needle gates */
@@ -708,6 +887,37 @@
     box-shadow: 0 0 12px rgba(124, 58, 237, 0.8);
 }
 
+/* ============ The Dynamo — Lightning Conductors ============ */
+/* Summoned conductor monsters with health bars and lightning beam network */
+/* Conductor roaming cards — the mechanical look lives on the emoji tile:
+   a charged brass socket that pulses like a capacitor. Reuses the shared
+   compact-card bar/tooltip structure (targets + bars work unchanged). */
+.eg-dynamo-conductor-card .eg-emoji-wrapper {
+    background: radial-gradient(circle at 32% 30%, #fff9e0 0%, #ffe066 38%, #a16207 82%, #713f12 100%);
+    border: 2px solid rgba(253, 224, 71, 0.95);
+    border-radius: 10px;
+    box-shadow:
+        0 0 16px rgba(253, 224, 71, 0.9),
+        0 0 32px rgba(250, 204, 21, 0.6),
+        inset 0 0 10px rgba(255, 255, 255, 0.45);
+    /* Compositor-only pulse: static glow, scale breath instead of animating
+       filter/box-shadow (4 cards × repaint-per-frame added up). */
+    animation: eg-dynamo-socket-pulse 1.2s ease-in-out infinite alternate;
+}
+.eg-dynamo-conductor-card .eg-monster-emoji-compact {
+    filter: drop-shadow(0 0 6px rgba(255, 250, 205, 0.95));
+}
+@keyframes eg-dynamo-socket-pulse {
+    from { transform: scale(0.97); }
+    to   { transform: scale(1.04); }
+}
+
+/* No charge bar — conductors never attack (chargeMax 9999 keeps the
+   engine's own bar empty too). */
+.eg-dynamo-conductor-card .eg-charge-track-compact {
+    display: none !important;
+}
+
 /* ============ Pack 4 — shared puzzle mechanic visuals ============ */
 
 /* Fated Cell doom-clock mark (never blocks the fill — a race, not a lock) */
@@ -811,16 +1021,8 @@
     filter: drop-shadow(0 0 10px rgba(110, 231, 183, 0.9));
 }
 
-/* Gust lanes + burning edges */
-.eg-nk-gustlane {
-    position: fixed; left: 0; right: 0; width: 100vw;
-    pointer-events: none; z-index: 9001;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem; letter-spacing: 0.6em;
-    background: rgba(125, 211, 252, 0.08);
-    border-top: 2px dashed rgba(125, 211, 252, 0.6);
-    border-bottom: 2px dashed rgba(125, 211, 252, 0.6);
-}
+/* Gust arena visuals — spikes, wind, windbreak walls, wind blades,
+   tornadoes + boss core. See boss-gust.js for the mechanic layout. */
 .eg-nk-edge-burn {
     position: fixed; left: 0; right: 0; height: 90px; width: 100vw;
     pointer-events: none; z-index: 9001;
@@ -850,10 +1052,104 @@
 
 /* Fireflies */
 .eg-nk-firefly {
-    width: 24px; height: 24px; font-size: 1rem;
-    filter: drop-shadow(0 0 10px rgba(253, 224, 71, 0.95));
-    animation: eg-nk-warn-pulse 0.5s ease-in-out infinite alternate;
+    position: fixed; left: 0; top: 0; z-index: 9012;
+    width: 30px; height: 30px; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: auto; /* drag handle */
+    cursor: grab;
+    touch-action: none;   /* pointer events, no scroll interference */
 }
+/* The emoji wrapper carries ALL sprite visuals (glow, pulse, flash, chip,
+   hurt, cluster tint): animations on it can never clobber the root's
+   positioning translate (animating transform on the root teleports the
+   sprite to the top-left corner for the animation's duration). */
+.eg-firefly-glyph { display: block; line-height: 1; filter: drop-shadow(0 0 10px rgba(253, 224, 71, 0.95)); animation: eg-nk-warn-pulse 0.5s ease-in-out infinite alternate; }
+.eg-nk-firefly:active { cursor: grabbing; }
+.eg-nk-firefly.eg-firefly-dragging { z-index: 9013; }
+.eg-nk-firefly.eg-firefly-dragging .eg-firefly-glyph { animation: none; filter: drop-shadow(0 0 16px rgba(255, 250, 205, 1)) brightness(1.25); }
+body.eg-firefly-drag-cursor, body.eg-firefly-drag-cursor * { cursor: grabbing !important; }
+.eg-nk-firefly.eg-firefly-clustered .eg-firefly-glyph { text-shadow: 0 0 12px rgba(255, 250, 205, 0.9); }
+.eg-firefly-darkness { position: fixed; inset: 0; z-index: 9008; pointer-events: none; background: transparent; }
+.eg-firefly-darkness svg { display: block; width: 100%; height: 100%; }
+.eg-firefly-darkness.eg-firefly-blast { animation: eg-firefly-blast .55s ease-out; }
+@keyframes eg-firefly-blast { 0% { background: rgba(255,245,157,.95); } 18% { background: rgba(255,190,40,.82); } 100% { background: rgba(0,0,8,.82); } }
+/* Visible glow pool around each fairy. Size is driven by JS each tick so
+   huddled fairies visibly widen the light: 1 fairy = base pool, every extra
+   huddled fairy adds a step (2/3/4/5 stacks read as clearly bigger pools). */
+.eg-firefly-light { position: fixed; z-index: 9009; pointer-events: none; width: 420px; height: 420px; margin: -210px 0 0 -210px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.14) 0%, rgba(255,255,235,.07) 35%, transparent 72%); box-shadow: inset 0 0 36px rgba(255,255,255,.13); transition: width .35s ease-out, height .35s ease-out, margin .35s ease-out; }
+.eg-firefly-badge { position: absolute; right: -8px; top: -8px; min-width: 16px; height: 16px; border-radius: 9px; padding: 0 2px; display: grid; place-items: center; color: #1a1200; background: #fef08a; border: 1px solid #fff; font: 800 10px/1 sans-serif; pointer-events: none; }
+/* Selection clarity: the targeted light is a bright beacon with a pulsing
+   ring and a pill showing the LIVE command key; every other light dims so
+   the chosen one pops against the darkness. */
+.eg-nk-firefly:not(.eg-firefly-selected):not(.eg-firefly-hurt) { opacity: .62; }
+.eg-nk-firefly.eg-firefly-selected { outline: none; }
+.eg-nk-firefly.eg-firefly-selected .eg-firefly-glyph { animation: none; filter: drop-shadow(0 0 18px rgba(255, 250, 205, 1)) brightness(1.3); }
+.eg-nk-firefly.eg-firefly-selected::after { content: ''; position: absolute; inset: -11px; border-radius: 50%; border: 3px solid rgba(255, 247, 174, .95); box-shadow: 0 0 14px rgba(250, 204, 21, .8); pointer-events: none; animation: eg-firefly-sel-ring 1.15s ease-out infinite; }
+@keyframes eg-firefly-sel-ring { 0% { transform: scale(.72); opacity: 1; } 100% { transform: scale(1.55); opacity: 0; } }
+.eg-firefly-keytag { display: none; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); padding: 2px 8px; border-radius: 8px; background: #facc15; color: #1a1200; font: 900 11px/1.3 sans-serif; letter-spacing: .08em; box-shadow: 0 0 12px rgba(250, 204, 21, .9), 0 2px 4px rgba(0, 0, 0, .8); pointer-events: none; z-index: 2; }
+.eg-nk-firefly.eg-firefly-selected .eg-firefly-keytag { display: block; }
+.eg-nk-firefly.eg-firefly-dragging .eg-firefly-keytag { display: none; }
+/* G hand-off flash: a quick bright pop + ring snap the moment the cycle
+   key selects a new fairy, so the eye catches who just became targeted. */
+.eg-nk-firefly.eg-firefly-flash .eg-firefly-glyph { animation: eg-firefly-flash-pop .65s ease-out; }
+@keyframes eg-firefly-flash-pop {
+    0% { filter: drop-shadow(0 0 6px rgba(253, 224, 71, .6)) brightness(1); transform: scale(1); }
+    22% { filter: drop-shadow(0 0 26px rgba(255, 255, 200, 1)) brightness(2); transform: scale(1.55); }
+    60% { filter: drop-shadow(0 0 18px rgba(255, 250, 205, .9)) brightness(1.45); transform: scale(1.12); }
+    100% { filter: drop-shadow(0 0 18px rgba(255, 250, 205, 1)) brightness(1.3); transform: scale(1); }
+}
+.eg-nk-firefly.eg-firefly-flash::before { content: ''; position: absolute; inset: -13px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, .95); box-shadow: 0 0 18px rgba(253, 224, 71, .95); pointer-events: none; animation: eg-firefly-flash-ring .65s ease-out forwards; }
+@keyframes eg-firefly-flash-ring { 0% { transform: scale(.55); opacity: 1; } 100% { transform: scale(2.1); opacity: 0; } }
+/* The dark gnaws: pulsing violet vignette while the keeper stands outside
+   every fairy's light — the damage tell for the darkness tick. */
+.eg-firefly-darkness.eg-firefly-dark-danger::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 42%, rgba(96, 40, 168, .34) 100%); animation: eg-firefly-dark-pulse 1.1s ease-in-out infinite; }
+@keyframes eg-firefly-dark-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+/* LUMEN BURST — the boss's direct attack. The tell blooms (a growing ring
+   + core marking the blast zone), then the boom flashes and fades. Both
+   animate transform/opacity only so they stay cheap. */
+.eg-firefly-burst-tell { position: fixed; z-index: 9010; pointer-events: none; width: 260px; height: 260px; margin: -130px 0 0 -130px; border-radius: 50%; background: radial-gradient(circle, rgba(253,224,71,.62) 0%, rgba(250,204,21,.3) 45%, transparent 70%); box-shadow: inset 0 0 0 4px rgba(253,224,71,.75), inset 0 0 34px rgba(250,204,21,.75), 0 0 26px rgba(250,204,21,.45); animation: eg-firefly-burst-tell 2s ease-in forwards; }
+@keyframes eg-firefly-burst-tell { 0% { transform: scale(.1); opacity: .35; } 60% { transform: scale(.72); opacity: .9; } 100% { transform: scale(1); opacity: 1; } }
+.eg-firefly-burst-boom { position: fixed; z-index: 9011; pointer-events: none; width: 320px; height: 320px; margin: -160px 0 0 -160px; border-radius: 50%; opacity: 0; }
+.eg-firefly-burst-boom.eg-firefly-burst-fire { animation: eg-firefly-burst-fire .6s ease-out forwards; }
+@keyframes eg-firefly-burst-fire { 0% { opacity: 1; transform: scale(.45); background: radial-gradient(circle, rgba(255,255,240,.95) 0%, rgba(253,224,71,.8) 30%, rgba(250,204,21,.35) 60%, transparent 75%); } 55% { opacity: .8; transform: scale(1.02); background: radial-gradient(circle, rgba(255,255,200,.55) 0%, rgba(253,224,71,.4) 45%, transparent 72%); } 100% { opacity: 0; transform: scale(1.12); background: radial-gradient(circle, rgba(253,224,71,.2) 0%, transparent 70%); } }
+/* Fairy caught by a burst but surviving: a short scorch flash. */
+.eg-nk-firefly.eg-firefly-chip .eg-firefly-glyph { animation: eg-firefly-chip-flash .5s ease-out; }
+@keyframes eg-firefly-chip-flash { 0%, 100% { filter: drop-shadow(0 0 10px rgba(253, 224, 71, 0.95)); } 30% { filter: drop-shadow(0 0 4px rgba(120, 30, 0, .9)) brightness(.55) saturate(.4); } }
+/* Fairy name under each sprite — subtle until the fly is the selected one. */
+.eg-firefly-name { position: absolute; bottom: -17px; left: 50%; transform: translateX(-50%); font: 700 9px/1.2 sans-serif; letter-spacing: .05em; white-space: nowrap; color: rgba(254, 240, 138, .55); text-shadow: 0 1px 3px #000, 0 0 6px rgba(0, 0, 0, .8); pointer-events: none; }
+.eg-nk-firefly.eg-firefly-selected .eg-firefly-name { color: #fef08a; text-shadow: 0 0 8px rgba(250, 204, 21, .9), 0 1px 3px #000; }
+.eg-nk-firefly.eg-firefly-hurt .eg-firefly-glyph { filter: grayscale(1) brightness(0.65); }
+.eg-firefly-target { position: fixed; z-index: 9010; width: 160px; height: 160px; margin: -80px 0 0 -80px; border: 4px dashed #fef08a; border-radius: 50%; display: grid; place-items: center; align-content: center; gap: 2px; color: #fff9c4; background: rgba(113, 63, 18, 0.25); text-align: center; font: 800 13px/1.1 sans-serif; text-shadow: 0 1px 3px #000; pointer-events: none; animation: eg-nk-warn-pulse .65s ease-in-out infinite alternate; }
+.eg-firefly-target .eg-firefly-quota { font-size: 30px; font-weight: 900; letter-spacing: .02em; }
+.eg-firefly-target .eg-firefly-quota-sub { font-size: 12px; opacity: .85; }
+.eg-firefly-target.eg-firefly-target-you { border-color: #fca5a5; color: #fecaca; background: rgba(127, 29, 29, 0.3); }
+.eg-firefly-target.eg-firefly-target-ok { border-style: solid; border-color: #86efac; color: #bbf7d0; background: rgba(20, 83, 45, 0.35); animation: none; }
+.eg-firefly-countdown { position: fixed; z-index: 9015; left: 50%; top: 12%; transform: translateX(-50%); color: #fff7ae; font: 900 25px/1 sans-serif; text-align: center; text-shadow: 0 0 12px #000, 0 2px 4px #000; pointer-events: none; }
+.eg-firefly-respawn { position: fixed; z-index: 9016; left: 50%; bottom: 7%; transform: translateX(-50%); opacity: 0; color: #fecaca; font: 800 15px/1.2 sans-serif; letter-spacing: .04em; text-shadow: 0 2px 5px #000; pointer-events: none; transition: opacity .15s; }
+.eg-firefly-respawn-visible { opacity: 1; }
+/* Control guide shown for the WHOLE fight (removed with the run's
+   teardown) — the short keybind cheat-sheet always stays at hand. Sits
+   under the top HUD, above the darkness; .eg-firefly-controls-hide is
+   kept for any future manual fade-out. */
+.eg-firefly-controls {
+    position: fixed; left: 50%; top: 76px; transform: translateX(-50%);
+    z-index: 9020; pointer-events: none;
+    width: max-content;
+    max-width: min(720px, 92vw);
+    padding: .55rem 1.1rem;
+    border-radius: .7rem;
+    text-align: center;
+    font: 800 clamp(.78rem, 1.6vw, 1rem)/1.4 sans-serif;
+    letter-spacing: .03em;
+    color: #fef08a;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, .9);
+    background: rgba(10, 10, 26, .85);
+    border: 1px solid rgba(250, 204, 21, .5);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, .55), 0 0 24px rgba(250, 204, 21, .15);
+    opacity: 1;
+    transition: opacity .6s ease;
+}
+.eg-firefly-controls.eg-firefly-controls-hide { opacity: 0; }
 
 /* Bumpers */
 .eg-nk-bumper {
@@ -1799,4 +2095,583 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
 @keyframes eg-snailgeddon-sleep {
     0%, 100% { opacity: 0.55; transform: translateY(0); }
     50% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* ============ The Demolitionist (boss_demolitionist) ============
+   Three-act bomb show: sticky volleys, telegraphed mega bombs that chain
+   corrupted cells, and the Bomb Maze. All overlays are pointer-events:
+   none so clicks always reach the grid. Scale/rotate animations always run
+   on CHILD elements — the fixed wrappers themselves only ever carry
+   left/top (Chromium orbits transformed fixed elements around the
+   viewport origin). */
+
+/* Shared bomb-dot sizing: small sticks vs the big mega bomb */
+.eg-crash-mini {
+    filter: drop-shadow(0 0 10px rgba(251, 146, 60, 0.95));
+}
+.eg-crash-mega {
+    font-size: 3.4rem;
+    filter: drop-shadow(0 0 20px rgba(255, 120, 20, 1)) drop-shadow(0 0 6px rgba(255, 200, 120, 0.8));
+    animation: eg-crash-mega-breathe 0.7s ease-in-out infinite alternate;
+}
+@keyframes eg-crash-mega-breathe {
+    from { opacity: 0.9; filter: drop-shadow(0 0 12px rgba(255, 120, 20, 0.85)); }
+    to   { opacity: 1; filter: drop-shadow(0 0 26px rgba(255, 120, 20, 1)); }
+}
+
+/* Dashed danger ring shown while a bomb fuses (sized to the true blast
+   radius in JS) — opacity-only pulse so it never fights the inline
+   translate on fixed dots */
+.eg-crash-warn {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9001;
+    border: 3px dashed rgba(248, 113, 113, 0.95);
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0.03) 68%, transparent 72%);
+    box-shadow: inset 0 0 34px rgba(239, 68, 68, 0.28), 0 0 22px rgba(248, 113, 113, 0.5);
+    animation: eg-crash-warn-pulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-crash-warn-pulse {
+    from { opacity: 0.65; }
+    to   { opacity: 1; }
+}
+
+/* One detonation. The wrapper is positioned at the blast centre; core,
+   ring and sparks are children so their scale/fly animations stay local. */
+.eg-crash-burst {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9001;
+}
+.eg-crash-core {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+        rgba(255, 255, 235, 1) 0%,
+        rgba(255, 200, 90, 0.95) 22%,
+        rgba(255, 120, 20, 0.75) 45%,
+        rgba(200, 40, 0, 0.4) 68%,
+        transparent 78%);
+    box-shadow: 0 0 60px 22px rgba(255, 120, 20, 0.65);
+    animation: eg-crash-core-kf 0.55s ease-out forwards;
+}
+@keyframes eg-crash-core-kf {
+    0%   { transform: scale(0.1); opacity: 1; filter: brightness(1.9); }
+    55%  { opacity: 1; }
+    100% { transform: scale(1.02); opacity: 0; filter: brightness(1); }
+}
+.eg-crash-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 5px solid rgba(255, 200, 110, 0.95);
+    box-shadow: 0 0 44px 14px rgba(255, 120, 20, 0.75), inset 0 0 60px rgba(255, 120, 20, 0.4);
+    animation: eg-crash-ring-kf 0.6s ease-out forwards;
+}
+@keyframes eg-crash-ring-kf {
+    0%   { transform: scale(0.9); opacity: 1; }
+    16%  { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.9); opacity: 0; }
+}
+.eg-crash-spark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff6d8 0%, #ffd166 45%, #ff8c42 100%);
+    box-shadow: 0 0 12px 3px rgba(255, 150, 60, 0.9);
+    animation: eg-crash-spark-kf 0.7s ease-out forwards;
+}
+@keyframes eg-crash-spark-kf {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx, 40px), var(--dy, -60px)) scale(0.15); opacity: 0; }
+}
+
+/* Corrupted-cell chain fuse (rendered inside a grid cell) */
+.eg-crash-cell-fuse {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9em;
+    line-height: 1;
+    background: rgba(190, 30, 0, 0.35);
+    border: 2px solid rgba(255, 120, 60, 0.95);
+    border-radius: 3px;
+    box-shadow: inset 0 0 14px rgba(255, 90, 0, 0.6);
+    pointer-events: none;
+    z-index: 8;
+    animation: eg-crash-cell-fuse-kf 0.28s ease-in-out infinite alternate;
+}
+@keyframes eg-crash-cell-fuse-kf {
+    from { background: rgba(190, 30, 0, 0.25); }
+    to   { background: rgba(255, 90, 0, 0.55); }
+}
+
+/* ============ Bomb Maze ============ */
+
+/* Maze countdown overlay (positioned by JS) */
+.eg-crash-cd {
+    position: fixed;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-crash-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #fed7aa;
+    text-shadow: 0 0 16px rgba(249, 115, 22, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+}
+.eg-crash-cd-num {
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(4.2rem, 11vw, 7.5rem);
+    line-height: 1;
+    color: #fb923c;
+    text-shadow: 0 0 34px rgba(249, 115, 22, 1), 0 0 90px rgba(239, 68, 68, 0.7), 0 3px 8px rgba(0, 0, 0, 0.9);
+}
+.eg-crash-cd-num.eg-crash-cd-pop {
+    animation: eg-crash-cd-pop 0.8s ease-out;
+}
+@keyframes eg-crash-cd-pop {
+    0%   { transform: scale(1.7); opacity: 0.15; }
+    45%  { opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.eg-crash-cd-hint {
+    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fdba74;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* Run banner + arena tint once the maze starts */
+.eg-crash-run-banner {
+    position: fixed;
+    transform: translateX(-50%);
+    z-index: 9003;
+    pointer-events: none;
+    padding: 8px 22px;
+    border-radius: 999px;
+    background: rgba(60, 10, 0, 0.88);
+    border: 2px solid rgba(251, 146, 60, 0.95);
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
+    color: #fff1e2;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    font-size: clamp(1.1rem, 2.8vw, 1.8rem);
+    white-space: nowrap;
+    animation: eg-crash-warn-pulse 0.4s ease-in-out infinite alternate;
+}
+.eg-crash-maze-tint {
+    position: fixed;
+    inset: 0;
+    z-index: 8999;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, rgba(120, 20, 0, 0) 42%, rgba(90, 10, 0, 0.34) 100%);
+}
+
+/* Corridor floor (faint amber), wall bombs and the exit */
+.eg-crash-floor {
+    font-size: 1.05rem;
+    color: rgba(253, 230, 138, 0.75);
+    text-shadow: 0 0 8px rgba(250, 204, 21, 0.35);
+    z-index: 9000;
+}
+.eg-crash-floor-start {
+    color: #fde68a;
+    text-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
+}
+.eg-crash-goal {
+    font-size: 2.2rem;
+    filter: drop-shadow(0 0 16px rgba(74, 222, 128, 1));
+    animation: eg-crash-goal-pulse 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-crash-goal-pulse {
+    from { opacity: 0.65; }
+    to   { opacity: 1; }
+}
+.eg-crash-wall {
+    font-size: 1.9rem;
+    filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.9));
+    animation: eg-crash-wall-warn 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-crash-wall-warn {
+    from { opacity: 0.82; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6)); }
+    to   { opacity: 1; filter: drop-shadow(0 0 18px rgba(239, 68, 68, 1)); }
+}
+
+/* Demolitionist — Bomb Maze SUPER BOMB: a giant bomb that slams onto the
+   start tile ~1s into the maze, then rolls the corridor after the player.
+   The element is left/top driven every frame (never translate), so its
+   motion/effects use filter + rotation only — same fixed-position rule as
+   the other crash layers. */
+.eg-crash-super {
+    position: fixed;
+    z-index: 960;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    user-select: none;
+}
+.eg-crash-super-falling {
+    filter: drop-shadow(0 0 10px rgba(251, 146, 60, 0.55));
+    animation: eg-crash-super-rush 0.45s ease-in infinite alternate;
+}
+.eg-crash-super-armed {
+    filter: drop-shadow(0 0 14px rgba(251, 146, 60, 0.8));
+    animation: eg-crash-super-pulse 0.3s ease-in-out infinite alternate,
+               eg-crash-super-roll 0.18s linear infinite;
+}
+@keyframes eg-crash-super-rush {
+    from { filter: drop-shadow(0 0 4px rgba(251, 146, 60, 0.3)); }
+    to   { filter: drop-shadow(0 0 18px rgba(251, 146, 60, 1)); }
+}
+@keyframes eg-crash-super-pulse {
+    from { filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.5)) brightness(1); }
+    to   { filter: drop-shadow(0 0 28px rgba(251, 146, 60, 1)) brightness(1.45); }
+}
+@keyframes eg-crash-super-roll {
+    from { transform: rotate(-8deg); }
+    to   { transform: rotate(8deg); }
+}
+/* Landing-zone ring (reuses the dashed warn-ring look from the sticky
+   bombs) — brighter while the bomb is still falling. */
+.eg-crash-super-warn {
+    animation: eg-crash-super-warnpulse 0.3s ease-in-out infinite alternate;
+}
+@keyframes eg-crash-super-warnpulse {
+    from { opacity: 0.5; }
+    to   { opacity: 1; }
+}
+
+/* Wind overlay — whole-screen directional gale, visible for the ENTIRE
+   wind phase (warn + blow). Lives on body classes eg-gust-wind-from-*;
+   the .eg-gust-windfx node the JS creates carries the drifting debris
+   particles. The node is never display:none — the CSS opacity fade is
+   what reveals/hides it. */
+.eg-gust-windfx {
+    position: fixed; inset: 0; z-index: 8990;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background:
+        /* fast fine streaks — the gust lines that make motion obvious */
+        repeating-linear-gradient(90deg,
+            transparent 0 36px,
+            rgba(224, 242, 254, 0.35) 36px 40px,
+            rgba(224, 242, 254, 0.9) 40px 45px,
+            rgba(224, 242, 254, 0.35) 45px 49px,
+            transparent 49px 76px),
+        /* mid-width streaks */
+        repeating-linear-gradient(90deg,
+            transparent 0 92px,
+            rgba(165, 216, 246, 0.28) 92px 106px,
+            rgba(186, 230, 253, 0.5) 106px 128px,
+            transparent 128px 168px),
+        /* broad soft gusts */
+        repeating-linear-gradient(90deg,
+            transparent 0 220px,
+            rgba(125, 211, 252, 0.16) 220px 258px,
+            rgba(147, 197, 253, 0.22) 258px 330px,
+            transparent 330px 480px);
+}
+body.eg-gust-wind-from-left .eg-gust-windfx {
+    opacity: 1;
+    box-shadow: inset 52px 0 44px -24px rgba(125, 211, 252, 0.7);
+    animation: eg-gust-streak-r 0.5s linear infinite;
+}
+body.eg-gust-wind-from-right .eg-gust-windfx {
+    opacity: 1;
+    box-shadow: inset -52px 0 44px -24px rgba(125, 211, 252, 0.7);
+    animation: eg-gust-streak-l 0.5s linear infinite;
+}
+/* Bright emission band across the WHOLE windward edge — the wind visibly
+   pours out of this entire side, top to bottom. */
+.eg-gust-windfx::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0; width: 14px;
+    background: linear-gradient(90deg, rgba(186, 230, 253, 0.0), rgba(224, 242, 254, 0.9));
+    filter: blur(1px);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+body.eg-gust-wind-from-left .eg-gust-windfx::after {
+    left: 0;
+    opacity: 1;
+    animation: eg-gust-edge-emit 0.45s ease-in-out infinite alternate;
+}
+body.eg-gust-wind-from-right .eg-gust-windfx::after {
+    right: 0;
+    background: linear-gradient(90deg, rgba(224, 242, 254, 0.9), rgba(186, 230, 253, 0.0));
+    opacity: 1;
+    animation: eg-gust-edge-emit 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-gust-edge-emit { from { width: 10px; opacity: 0.55; } to { width: 28px; opacity: 1; } }
+/* Each streak layer animates by exactly its own period → seamless loop. */
+@keyframes eg-gust-streak-r {
+    from { background-position-x: 0px, 0px, 0px; }
+    to   { background-position-x: 76px, 168px, 480px; }
+}
+@keyframes eg-gust-streak-l {
+    from { background-position-x: 0px, 0px, 0px; }
+    to   { background-position-x: -76px, -168px, -480px; }
+}
+/* Drifting debris: bright comet-like wind lines sweeping across the whole
+   screen in the gale's direction, spawning from the windward side across
+   its full height. Position/size/delay are randomized per particle in
+   boss-gust.js; only the direction comes from the body class. */
+.eg-gust-windfx i {
+    position: absolute;
+    top: 0; left: 0;
+    height: 2px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, transparent 0 25%, rgba(224, 242, 254, 0.55) 60%, #fff 100%);
+    box-shadow: 0 0 8px rgba(186, 230, 253, 0.95), 0 0 2px rgba(255, 255, 255, 0.9);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    will-change: transform;
+}
+/* mirrored comet tails when the wind blows the other way */
+body.eg-gust-wind-from-right .eg-gust-windfx i {
+    background: linear-gradient(90deg, #fff 0 40%, rgba(224, 242, 254, 0.55) 75%, transparent 100%);
+}
+body.eg-gust-wind-from-left .eg-gust-windfx i {
+    opacity: var(--d-op, 0.75);
+    animation: eg-gust-debris-r 1s linear infinite;
+}
+body.eg-gust-wind-from-right .eg-gust-windfx i {
+    opacity: var(--d-op, 0.75);
+    animation: eg-gust-debris-l 1s linear infinite;
+}
+@keyframes eg-gust-debris-r {
+    0%   { transform: translateX(-14vw) translateY(0) rotate(0deg); }
+    100% { transform: translateX(116vw) translateY(-5vh) rotate(240deg); }
+}
+@keyframes eg-gust-debris-l {
+    0%   { transform: translateX(116vw) translateY(0) rotate(0deg); }
+    100% { transform: translateX(-14vw) translateY(5vh) rotate(-240deg); }
+}
+/* Windbreak wall: stacked wooden planks bound by rope, spawned on the
+   downwind edge next to the spike strip at a random height. It pulses
+   while the gale blows so the safe catch spot is easy to read. */
+.eg-gust-break {
+    position: fixed; z-index: 9002;
+    width: 30px;
+    height: 170px;
+    pointer-events: none;
+    background:
+        /* plank separators */
+        repeating-linear-gradient(180deg,
+            rgba(0, 0, 0, 0.3) 0 3px,
+            rgba(0, 0, 0, 0) 3px 24px,
+            rgba(0, 0, 0, 0.3) 24px 27px,
+            rgba(0, 0, 0, 0) 27px 48px,
+            rgba(0, 0, 0, 0.3) 48px 51px,
+            rgba(0, 0, 0, 0) 51px 72px,
+            rgba(0, 0, 0, 0.3) 72px 75px,
+            rgba(0, 0, 0, 0) 75px 96px,
+            rgba(0, 0, 0, 0.3) 96px 99px,
+            rgba(0, 0, 0, 0) 99px 120px,
+            rgba(0, 0, 0, 0.3) 120px 123px,
+            rgba(0, 0, 0, 0) 123px 144px,
+            rgba(0, 0, 0, 0.3) 144px 147px,
+            rgba(0, 0, 0, 0) 147px 170px),
+        /* wood grain with a rounded profile */
+        repeating-linear-gradient(90deg,
+            #7c4f26 0 6px,
+            #96642e 6px 14px,
+            #6b4423 14px 20px,
+            #8a5a2b 20px 26px,
+            #7c4f26 26px 30px);
+    border: 2px solid #3f2a15;
+    border-radius: 4px;
+    box-shadow:
+        0 0 18px rgba(0, 0, 0, 0.7),
+        inset 0 0 12px rgba(0, 0, 0, 0.5),
+        inset 3px 0 6px rgba(255, 220, 160, 0.28);
+    animation:
+        eg-gust-break-in 0.25s ease-out,
+        eg-gust-break-pulse 0.9s ease-in-out 0.3s infinite alternate;
+}
+/* Rope bands binding the planks, top and bottom. */
+.eg-gust-break::before,
+.eg-gust-break::after {
+    content: '';
+    position: absolute; left: -7px; right: -7px; height: 13px;
+    background: repeating-linear-gradient(90deg, #a16207 0 7px, #854d0e 7px 14px);
+    border: 1px solid #713f12;
+    border-radius: 3px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.55);
+}
+.eg-gust-break::before { top: 12px; }
+.eg-gust-break::after { bottom: 12px; }
+.eg-gust-break-right { right: calc(46px + 60px); } /* spike width + gap */
+.eg-gust-break-left { left: calc(46px + 60px); }
+.eg-gust-break-out {
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+}
+@keyframes eg-gust-break-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes eg-gust-break-pulse {
+    from { box-shadow: 0 0 14px rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(0, 0, 0, 0.5), inset 3px 0 6px rgba(255, 220, 160, 0.28), 0 0 0 rgba(253, 224, 71, 0); }
+    to   { box-shadow: 0 0 20px rgba(0, 0, 0, 0.7), inset 0 0 12px rgba(0, 0, 0, 0.5), inset 3px 0 6px rgba(255, 220, 160, 0.28), 0 0 18px rgba(253, 224, 71, 0.5); }
+}
+/* Spike flash when the thorns bite — brief hot flare on the biting side. */
+body.eg-gust-spike-hot-l .eg-nk-gust-spike-left,
+body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
+    filter: drop-shadow(0 0 16px rgba(254, 202, 202, 1)) brightness(1.9);
+}
+/* Sawtooth spike walls: dark iron bar with red-tipped teeth. The teeth
+   jut into the arena and their tips line up with the damage boundary
+   (46px from the edge), so "touch a tooth tip = hurt" reads correctly. */
+.eg-nk-gust-spike {
+    position: fixed; top: 0; bottom: 0; width: 46px; z-index: 9001;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(8, 10, 18, 0.0), rgba(8, 10, 18, 0.5)),
+        repeating-linear-gradient(180deg,
+            #3a0c0c 0 19px,
+            #571212 19px 38px,
+            #3a0c0c 38px 57px);
+    box-shadow: inset 0 0 26px rgba(127, 29, 29, 0.9);
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+}
+.eg-nk-gust-spike::before {
+    content: '';
+    position: absolute; top: 0; bottom: 0; width: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='40' viewBox='0 0 20 40'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23475569'/%3E%3Cstop offset='0.6' stop-color='%23dbe4ee'/%3E%3Cstop offset='1' stop-color='%2394a3b8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 0 L20 10 L0 20 L0 20 L20 30 L0 40 Z' fill='url(%23s)'/%3E%3Cpath d='M10 5 L20 10 L10 15 Z' fill='%23ef4444'/%3E%3Cpath d='M10 25 L20 30 L10 35 Z' fill='%23ef4444'/%3E%3C/svg%3E");
+    background-repeat: repeat-y;
+    background-size: 20px 40px;
+}
+.eg-nk-gust-spike-left { left: 0; }
+.eg-nk-gust-spike-left::before { right: 0; }
+.eg-nk-gust-spike-right { right: 0; }
+.eg-nk-gust-spike-right::before { left: 0; transform: scaleX(-1); }
+/* Wind blade: crescent drawn from layered radial arcs + a hot core. */
+.eg-nk-gust-blade {
+    position: fixed; left: 0; top: 0; z-index: 9003;
+    width: 60px; height: 60px;
+    pointer-events: none;
+    border-radius: 50%;
+}
+.eg-gust-blade-tell {
+    background: radial-gradient(circle, rgba(186, 230, 253, 0.9), rgba(125, 211, 252, 0.25) 60%, transparent 72%);
+    animation: eg-gust-glint 0.25s ease-in-out infinite alternate;
+}
+@keyframes eg-gust-glint { from { opacity: 0.4; } to { opacity: 1; } }
+.eg-gust-blade-left, .eg-gust-blade-right {
+    filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.9));
+    animation: eg-gust-blade-spin 0.5s linear infinite;
+}
+/* Crescent faces its travel direction via gradient position (the inline
+   translate owns the element's transform, so no scaleX flip here). */
+.eg-gust-blade-right {
+    background:
+        radial-gradient(circle at 64% 50%, rgba(224, 242, 254, 0.95) 0 18%, transparent 40%),
+        radial-gradient(circle at 64% 50%, transparent 0 44%, rgba(125, 211, 252, 0.85) 46% 58%, transparent 62%);
+}
+.eg-gust-blade-left {
+    background:
+        radial-gradient(circle at 36% 50%, rgba(224, 242, 254, 0.95) 0 18%, transparent 40%),
+        radial-gradient(circle at 36% 50%, transparent 0 44%, rgba(125, 211, 252, 0.85) 46% 58%, transparent 62%);
+}
+@keyframes eg-gust-blade-spin { to { filter: drop-shadow(0 0 16px rgba(186, 230, 253, 1)); } }
+/* Tornado: swirling vortex — soft cloud mass, a funnel skirt, and three
+   counter-rotating rings. Direction-agnostic so it reads the same
+   sweeping left, right, or diving from the top. */
+.eg-nk-gust-tornado {
+    position: fixed; left: 0; top: 0; z-index: 9003;
+    width: 96px; height: 96px;
+    pointer-events: none;
+}
+/* cloudy body */
+.eg-nk-gust-tornado::before {
+    content: '';
+    position: absolute; inset: 2px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(224, 242, 254, 0.30), rgba(125, 211, 252, 0.14) 55%, transparent 74%);
+    filter: blur(2px);
+}
+/* funnel skirt narrowing toward the base */
+.eg-nk-gust-tornado::after {
+    content: '';
+    position: absolute; left: 50%; top: 30%;
+    width: 46px; height: 64px;
+    transform: translateX(-50%);
+    clip-path: polygon(16% 0, 84% 0, 66% 100%, 34% 100%);
+    background: linear-gradient(180deg, rgba(224, 242, 254, 0.55), rgba(148, 197, 245, 0.18) 72%, transparent);
+    filter: drop-shadow(0 0 6px rgba(186, 230, 253, 0.6));
+}
+.eg-nk-gust-tornado i {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    border-top-color: rgba(224, 242, 254, 0.95);
+    border-right-color: rgba(125, 211, 252, 0.6);
+    border-left-color: rgba(147, 197, 253, 0.35);
+    filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.85));
+    animation: eg-gust-swirl 0.55s linear infinite;
+}
+.eg-nk-gust-tornado i:nth-child(2) { inset: 15px; border-width: 3px; animation-duration: 0.4s; animation-direction: reverse; }
+.eg-nk-gust-tornado i:nth-child(3) { inset: 30px; border-width: 2px; animation-duration: 0.28s; }
+@keyframes eg-gust-swirl { to { transform: rotate(360deg); } }
+/* Volley telegraph: pulsing band at the entry edge with animated stripes
+   that show which way the funnel will sweep (left / right / down). */
+.eg-gust-warn {
+    position: fixed; z-index: 9002; pointer-events: none;
+    background: rgba(125, 211, 252, 0.22);
+    animation: eg-nk-warn-pulse 0.35s ease-in-out infinite alternate;
+}
+.eg-gust-warn-h { left: 0; width: 100vw; height: 96px; border-top: 3px dashed rgba(186, 230, 253, 0.95); border-bottom: 3px dashed rgba(186, 230, 253, 0.95); }
+.eg-gust-warn-v { top: 0; height: 100vh; width: 96px; border-left: 3px dashed rgba(186, 230, 253, 0.95); border-right: 3px dashed rgba(186, 230, 253, 0.95); }
+.eg-gust-warn-h::before,
+.eg-gust-warn-v::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(100deg,
+        transparent 0 20px,
+        rgba(186, 230, 253, 0.40) 20px 27px,
+        transparent 27px 48px);
+    animation: eg-gust-warn-sweep-r 0.45s linear infinite;
+}
+.eg-gust-warn-h.eg-gust-warn-left::before {
+    background: repeating-linear-gradient(80deg,
+        transparent 0 20px,
+        rgba(186, 230, 253, 0.40) 20px 27px,
+        transparent 27px 48px);
+    animation-name: eg-gust-warn-sweep-l;
+}
+.eg-gust-warn-v::before {
+    background: repeating-linear-gradient(180deg,
+        transparent 0 20px,
+        rgba(186, 230, 253, 0.40) 20px 27px,
+        transparent 27px 48px);
+    animation-name: eg-gust-warn-sweep-d;
+}
+@keyframes eg-gust-warn-sweep-r { from { background-position: 0 0; } to { background-position: 48px 0; } }
+@keyframes eg-gust-warn-sweep-l { from { background-position: 0 0; } to { background-position: -48px 0; } }
+@keyframes eg-gust-warn-sweep-d { from { background-position: 0 0; } to { background-position: 0 48px; } }
+#eg-gust-wind-label {
+    font: 900 10px/1.2 sans-serif; letter-spacing: 0.12em;
+    color: #7dd3fc; text-shadow: 0 1px 3px #000;
+    text-align: center; margin-top: 2px;
 }

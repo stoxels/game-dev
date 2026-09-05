@@ -81,6 +81,7 @@ function _renderPlayerAvatarSimple() {
 
             // Companions don't change image, but re-run facing so order stays correct
             _updateAvatarFacing(existing);
+            if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation('avatar-sprite-img-simple');
             return;
         }
     }
@@ -143,6 +144,9 @@ function _renderPlayerAvatarSimple() {
     document.body.appendChild(wrapper);
     _initSimpleAvatarWASD(wrapper);
     _updateAvatarFacing(wrapper);
+    // Start the idle loop (static portrait until idle frames exist) and
+    // warm the frame cache for this character/variant in the background.
+    if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation('avatar-sprite-img-simple');
 }
 
 // Removes the simple avatar (called when entering a monster level).
@@ -160,6 +164,15 @@ function _updateAvatarSimpleImage() {
     if (img) img.src = _getPlayerCharacterImage();
     const imgFull = document.getElementById('avatar-sprite-img');
     if (imgFull) imgFull.src = _getPlayerCharacterImage();
+    // New class/variant: drop stale frame cache, warm the new one, and
+    // (re)start the idle loop so fresh idle art appears.
+    if (typeof _animRefreshCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
+        _animRefreshCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass');
+    }
+    if (typeof _startAvatarIdleAnimation === 'function') {
+        _startAvatarIdleAnimation('avatar-sprite-img-simple');
+        _startAvatarIdleAnimation('avatar-sprite-img');
+    }
 }
 
 
@@ -259,7 +272,14 @@ function _avatarMoveTick(ts) {
             fy += (dy / norm) * dist;
             el.dataset.avatarFx = String(fx);
             el.dataset.avatarFy = String(fy);
-            _setAvatarPos(el, fx, fy);
+            // Dominant-axis direction hint for directional walk frames
+            // (sprite_animations.js falls back to omni when absent).
+            let dirHint = null;
+            if (dx || dy) {
+                if (Math.abs(dx) >= Math.abs(dy)) dirHint = dx > 0 ? 'right' : 'left';
+                else dirHint = dy > 0 ? 'down' : 'up';
+            }
+            _setAvatarPos(el, fx, fy, dirHint);
         }
     } else if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) {
         // Drop keys that were held when Time Freeze started so the avatar
@@ -444,7 +464,9 @@ function _updateAvatarFacing(el) {
 // Also drives the walking animation: every position change starts/keeps
 // the walk loop running and re-arms its idle debounce (see
 // sprite_animations.js for _playAvatarWalkAnimation).
-function _setAvatarPos(el, x, y) {
+// direction is optional ('up' | 'down' | 'left' | 'right') — picks the
+// directional walk set when it exists, omni otherwise.
+function _setAvatarPos(el, x, y, direction) {
     const w = el.offsetWidth || 72;
     const h = el.offsetHeight || 90;
     const maxX = window.innerWidth - w - 4;
@@ -460,7 +482,7 @@ function _setAvatarPos(el, x, y) {
         const spriteImgId = el.id === 'player-avatar-wrapper'
             ? 'avatar-sprite-img'
             : 'avatar-sprite-img-simple';
-        _playAvatarWalkAnimation(spriteImgId);
+        _playAvatarWalkAnimation(spriteImgId, direction);
     }
 }
 
@@ -583,6 +605,7 @@ function _renderPlayerAvatar() {
 
         _initFullAvatarWASD(avatar);
         _updateAvatarFacing(avatar);
+        if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation('avatar-sprite-img');
     }
 
     avatar.style.display = 'flex';   // always ensure visible, regardless of prior hide

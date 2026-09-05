@@ -239,6 +239,7 @@ function _egMechClockHands(monster, phase) {
     let announced = [];  // { cfg, a, value } during the 3s call window
     let freezeFired = false; // once-per-fight latch → Time Freeze never restarts
     let callBanner = null;
+    let callLines = [];  // banner line els, index-aligned with `announced`
     let callMsLeft = 0;
 
     function beginAnnounce() {
@@ -247,6 +248,11 @@ function _egMechClockHands(monster, phase) {
         // Plan spawn angles in order — each new hand starts ~120° past the
         // previous planned one (or past the last live hand). Because every
         // hand rotates at the SAME speed, those gaps stay open forever.
+        // NOTE: the live hands keep rotating during the 3s call window, so
+        // these planned angles are advanced frame-by-frame in the loop below
+        // (at the same speed, pausing while time is frozen) — otherwise the
+        // new hand would spawn at a stale angle and land almost on top of a
+        // live hand (up to ~119° of drift in phase 3).
         announced = [];
         let lastAngle = live.length ? live[live.length - 1].a : -Math.PI / 2;
         batch.forEach(cfg => {
@@ -257,6 +263,7 @@ function _egMechClockHands(monster, phase) {
         });
         callMsLeft = EG_CLOCK_SUMMON_WARN_MS;
         callBanner = _egClockShowCall(announced);
+        callLines = Array.prototype.slice.call(callBanner.children);
         run.els.push(callBanner);
     }
 
@@ -273,6 +280,7 @@ function _egMechClockHands(monster, phase) {
             }
         });
         if (callBanner) { callBanner.remove(); callBanner = null; }
+        callLines = [];
         announced = [];
     }
 
@@ -292,12 +300,6 @@ function _egMechClockHands(monster, phase) {
         });
         if (!announced.length && pending.length) beginAnnounce();
 
-        // 3s call window → the announced hand(s) spawn and start rotating.
-        if (announced.length) {
-            callMsLeft -= dtS * 1000;
-            if (callMsLeft <= 0) spawnAnnounced(now);
-        }
-
         const pr = _egNkPlayerRect();
         const pts = pr ? _egClockPlayerPts(pr) : null;
 
@@ -310,12 +312,33 @@ function _egMechClockHands(monster, phase) {
             _egClockStartTimeFreezeWarn(m || monster, level);
         }
 
-        // Phase scaling: phase 1 spins at base speed, phase 2 +20%,
-        // phase 3 +40% — all hands share it, so their gaps stay fixed.
+        // Phase scaling: phase 1 spins at base speed, each further phase
+        // +33% (×1.33² ≈ +77% in phase 3) — all hands share it, so their
+        // gaps stay fixed.
         const timeStopped = !!window._egClockTimeFreezeActive || !!window._egClockTimeFreezeWarn;
         const phaseNo = pct <= 0.30 ? 3 : pct <= 0.60 ? 2 : 1;
         const speed = EG_CLOCK_HAND_OMEGA
             * Math.pow(1 + EG_CLOCK_PHASE_SPEED_STEP, phaseNo - 1);
+
+        // 3s call window → the announced hand(s) spawn and start rotating.
+        // The live hands keep sweeping during the call, so the planned
+        // angles are advanced at the same speed (and frozen with everything
+        // else while time is stopped) — otherwise the stagger measured at
+        // announce time would collapse by the time the hand spawns. The
+        // call banner is refreshed to match, so the dial reading still
+        // describes the actual spawn position.
+        if (announced.length && !timeStopped) {
+            for (let i = 0; i < announced.length; i++) {
+                announced[i].a += dtS * speed;
+                const v = _egClockValueFromAngle(announced[i].cfg, announced[i].a);
+                announced[i].value = v;
+                if (callLines[i]) callLines[i].textContent = _egClockUnitLabel(announced[i].cfg, v);
+            }
+        }
+        if (announced.length) {
+            callMsLeft -= dtS * 1000;
+            if (callMsLeft <= 0) spawnAnnounced(now);
+        }
         for (const h of live) {
             // Frozen hands stand dead still (and stop hurting) during Time Freeze.
             if (timeStopped) continue;

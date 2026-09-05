@@ -227,6 +227,12 @@ function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
         triggerSkillBanter(`${playerClass}_${activeKey}`);
     }
 
+    // Combat animation for this exact class + skill combination (no-op
+    // until art exists — the static portrait keeps showing).
+    if (typeof _playAvatarSkillAnimationForSlot === 'function') {
+        try { _playAvatarSkillAnimationForSlot(activeKey); } catch (e) {}
+    }
+
     if (activeKey === 'active1') {
         _dispatchBaseActive1(playerClass, row, col, effect);
     } else {
@@ -254,6 +260,12 @@ function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
     // Character banter for this exact ascendency + skill combination.
     if (typeof triggerSkillBanter === 'function') {
         triggerSkillBanter(`${ascendency}_${ascSlot}`);
+    }
+
+    // Combat animation for this exact ascendency + skill combination
+    // (no-op until art exists — the static portrait keeps showing).
+    if (typeof _playAvatarSkillAnimationForSlot === 'function') {
+        try { _playAvatarSkillAnimationForSlot(hudSlot); } catch (e) {}
     }
 
     updateQuestStats('classAbilityUsed', {});
@@ -534,6 +546,9 @@ function _fireInstantHeartbloomAbility() {
     if (spawned > 0) {
         if (typeof showToast === 'function') showToast(`💚 Heartbloom: ${spawned} heart${spawned > 1 ? 's' : ''} spawned!`, '#ff6b9d');
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('heart_heals');
+        if (typeof _playAvatarSkillAnimationForSlot === 'function') {
+            try { _playAvatarSkillAnimationForSlot('active5'); } catch (e) {}
+        }
         if (typeof trackAchStat === 'function') trackAchStat('skillHeartbloomUsed');
         if (typeof updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
         if (typeof triggerSkillBanter === 'function') triggerSkillBanter('heartbloom');

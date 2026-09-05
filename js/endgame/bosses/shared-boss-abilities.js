@@ -669,6 +669,76 @@ function _egFlashPriorBombCell(row, col) {
 }
 
 
+// One Prior Bomb detonation, at the bomb's cell centre: the Demolitionist's
+// boom (fireball core + expanding shockwave ring + ember sparks, sized to the
+// blast disc), plus a purple-purple tint left on the detonated cell and a
+// subtle whole-screen shake so the countdown payoff is FELT. Purely visual —
+// the mechanic's own effect (unfilling the cell) stays in the caller.
+// Orphan layer: the effect outlives any nk run and self-removes (same
+// pattern as _egCrashBoom's orphan branch).
+function _egPriorBombBoom(x, y, radius) {
+    const R = Math.max(12, radius);
+
+    let layer = document.createElement('div');
+    layer.className = 'eg-crash-burst';
+    layer.style.left = Math.round(x - R) + 'px';
+    layer.style.top = Math.round(y - R) + 'px';
+    layer.style.width = (R * 2) + 'px';
+    layer.style.height = (R * 2) + 'px';
+    document.body.appendChild(layer);
+
+    const core = document.createElement('div');
+    core.className = 'eg-crash-core';
+    layer.appendChild(core);
+    const ring = document.createElement('div');
+    ring.className = 'eg-crash-ring';
+    layer.appendChild(ring);
+    for (let i = 0; i < 7; i++) {
+        const s = document.createElement('div');
+        s.className = 'eg-crash-spark';
+        const ang = Math.random() * Math.PI * 2;
+        const dist = R * (0.35 + Math.random() * 0.8);
+        s.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
+        s.style.setProperty('--dy', Math.round(Math.sin(ang) * dist) + 'px');
+        s.style.animationDelay = Math.round(Math.random() * 90) + 'ms';
+        layer.appendChild(s);
+    }
+    setTimeout(() => { try { layer.remove(); } catch (e) {} }, 900);
+
+    // The blast is felt as well as seen — same subtle shake language the
+    // screen-blast impact uses (class exists on <body>, restart-clean).
+    const shakeBody = document.body;
+    shakeBody.classList.remove('eg-screen-shake');
+    void shakeBody.offsetWidth;
+    shakeBody.classList.add('eg-screen-shake');
+    setTimeout(() => shakeBody.classList.remove('eg-screen-shake'), 550);
+
+    if (typeof Audio_Manager !== 'undefined' && Audio_Manager && typeof Audio_Manager.playSFX === 'function') {
+        try { Audio_Manager.playSFX('drifterExplosion'); } catch (e) {}
+    }
+}
+
+
+// Detonation FX + purple tint on the cell itself. Fired from
+// _egPriorBombExplode BEFORE the cell is unfilled so the tint sits on the
+// still-filled cell and visibly pops as it is cleared.
+function _egPriorBombDetonationFX(b) {
+    const cellEl = b.cellEl && b.cellEl.isConnected ? b.cellEl
+        : document.getElementById(`g-${b.r}-${b.c}`);
+    if (cellEl) {
+        cellEl.classList.add('eg-pb-detonated');
+        setTimeout(() => cellEl.classList.remove('eg-pb-detonated'), 900);
+        const r = cellEl.getBoundingClientRect();
+        if (r.width && r.height) {
+            _egPriorBombBoom(r.left + r.width / 2, r.top + r.height / 2, Math.max(34, r.width * 1.15));
+            return;
+        }
+    }
+    // Cell not measurable (mid-rebuild) — still detonate audibly/shakily.
+    _egPriorBombBoom(window.innerWidth / 2, window.innerHeight / 2, 40);
+}
+
+
 // Unfills a single cell and removes it from the recent-fills tracker.
 function _egUnfillCell(row, col) {
     userGrid[row][col] = 0;
@@ -827,9 +897,13 @@ function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
 }
 
 
-// Detonation: unfills the cell. Re-validated so an arena transition or a
-// refill mid-fuse can never corrupt the new grid (original behaviour).
+// Detonation: the fuse pays off — explosion FX (boom + screen shake + SFX)
+// fire at the cell, THEN the fill is removed. Re-validated so an arena
+// transition or a refill mid-fuse can never corrupt the new grid (original
+// behaviour). A ghosted cell (grid rebuilt but cell still present) still
+// pops visually — the FX read from the DOM cell when possible.
 function _egPriorBombExplode(b) {
+    _egPriorBombDetonationFX(b);
     if (b.fuseEl) b.fuseEl.remove();
     if (!cur || !cur.grid) return;
     if (b.r >= cur.grid.length || b.c >= cur.grid[0].length) return;

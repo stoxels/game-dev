@@ -186,6 +186,20 @@ function _egbtBuildBossTooltipHTML(def, level) {
         html += `</div>`;
     }
 
+    // Special phase mechanics (from onPhaseEnter hooks, etc.)
+    const specialPhases = _egbtGetSpecialPhaseInfo(def.id);
+    if (specialPhases && specialPhases.length > 0) {
+        html += `<div style="margin-bottom:8px;">`;
+        specialPhases.forEach(sp => {
+            html += `<div style="font-size:11px;margin:3px 0;">
+                <span style="color:var(--accent2,#ccc);">${t('eg_boss_test_special_phase') || 'Special'}:</span>
+                <span style="color:#f5d98a;"> ${sp.name}</span>
+                <span style="opacity:0.6;"> — ${sp.desc}</span>
+            </div>`;
+        });
+        html += `</div>`;
+    }
+
     // Mechanics
     if (mechDef.mechanics && mechDef.mechanics.length > 0) {
         html += `<div style="border-top:1px solid rgba(200,168,75,0.3);padding-top:8px;">`;
@@ -215,6 +229,32 @@ function _egbtBuildBossTooltipHTML(def, level) {
 
     html += `</div>`;
     return html;
+}
+
+// Returns special phase mechanic info for bosses with onPhaseEnter hooks
+// or unique mechanics not listed in the standard mechanics array.
+function _egbtGetSpecialPhaseInfo(bossId) {
+    switch (bossId) {
+        case 'boss_snail':
+            return [
+                { name: 'Snailgeddon', desc: t('eg_boss_test_snail_snailgeddon') || 'At ≤20% HP: 5s countdown → teleport to centre, closing ring of snails with a lagging wedge. Escape through the gap!' }
+            ];
+        case 'boss_jelly':
+            return [
+                { name: 'Ice Shell', desc: t('eg_boss_test_jelly_ice_shell') || 'At 50% HP: Boss gains immunity. Lure a hop blob onto ❄️ ice to slip it into the Jelly and shatter the shell.' },
+                { name: 'Jelly Army', desc: t('eg_boss_test_jelly_army') || 'At 20% HP: 10 hop blobs spawn staggered, each leaping at you. Dodge the shadows!' }
+            ];
+        case 'boss_clock':
+            return [
+                { name: 'Time Freeze', desc: t('eg_boss_test_clock_time_freeze') || 'At 15% HP: 2.5s telegraph → 30s global freeze (timer, movement, charge bar). 12 beams hover then strike for ~90% HP if boss survives.' }
+            ];
+        case 'boss_demolitionist':
+            return [
+                { name: 'Bomb Maze', desc: t('eg_boss_test_demolitionist_bomb_maze') || 'At ≤25% HP: 5…1 countdown → teleport into a serpentine corridor walled by bombs that detonate behind you. ~1s later a SUPER BOMB slams onto your start and rolls the corridor after you — caught = instant defeat. Outrun it to the 🏁 (charge bar frozen).' }
+            ];
+        default:
+            return [];
+    }
 }
 
 // Test HP boost: scales boss to ~500k max HP while keeping phase thresholds

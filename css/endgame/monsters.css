@@ -1258,6 +1258,27 @@
     }
 }
 
+/* Bomb detonated — short destructive purple flash while the cell is
+   unfilled. Same hue family as the armed fuse so the state reads as
+   "the fuse went off here", NOT "you defused this" (that one is green).
+   The fireball/ring/sparks of the blast itself are spawned by
+   _egPriorBombBoom in shared-boss-abilities.js. */
+.eg-pb-detonated {
+    animation: eg-pb-detonated-flash 0.9s ease-out forwards !important;
+}
+
+@keyframes eg-pb-detonated-flash {
+    0% {
+        box-shadow: inset 0 0 0 4px #f0abfc, 0 0 26px 6px rgba(192, 132, 252, 0.95);
+        filter: brightness(1.6);
+    }
+
+    100% {
+        box-shadow: none;
+        filter: brightness(1);
+    }
+}
+
 /* ── Shifted Mark Flyer (Probability Shift P2+) ─── */
 /* Floating ✕ spawned by _egShiftSpawnFlyer: travels fixed-position from the
    old cell to the new one over EG_SHIFT_FLY_MS (1.5s). Driven by rAF

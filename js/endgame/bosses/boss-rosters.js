@@ -29,7 +29,7 @@ const EG_ATLAS_REGION_BOSSES = {
     'atlas_t2_4': 'boss_firefly',
     'atlas_t2_5': 'boss_marksman',
     'atlas_t2_6': 'boss_dynamo',
-    'atlas_t2_7': 'boss_crash',
+    'atlas_t2_7': 'boss_demolitionist',
     // ── Tier 3 ──
     'atlas_t3_0': 'boss_bumper',
     'atlas_t3_1': 'boss_striker',

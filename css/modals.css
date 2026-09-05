@@ -1071,11 +1071,17 @@
     max-width: min(720px, 120vh);
 }
 
+/* Tighten the shared block spacing — the box vertically centres its
+   content itself, so the stacked section margins just waste parchment. */
+#eg-forfeit-modal .modal-section {
+    margin-bottom: 0;
+}
+
 /* Body text sits directly on the frame's parchment — dark ink, centred,
    comfortably large (same treatment as #pt-refund-modal / #ach-reset-modal). */
 #eg-forfeit-modal .reset-body-text {
     font-family: var(--F);
-    font-size: clamp(15px, 2.6cqw, 18px);
+    font-size: clamp(15px, 3.4cqw, 19px);
     line-height: 1.85;
     color: #4a2c12;
     text-align: center;
@@ -1100,10 +1106,13 @@
     }
 
 /* Title plaque — keep the deep danger red, sized up a notch so the
-   headline matches the settings / how-to-play plaques. */
+   headline matches the settings / how-to-play plaques. The German title
+   ("⚠ KARTE VERLASSEN?") needs more of the plaque's flat surface than the
+   shared 58 % width gives it, so the plaque is widened for this dialog. */
 #eg-forfeit-modal .modal-title.text-red {
+    width: max(min(64%, 900px), 440px);
     color: #e05a3a;
-    font-size: clamp(16px, 2.6cqw, 21px);
+    font-size: clamp(18px, 3.2cqw, 22px);
     letter-spacing: 2px;
 }
 
@@ -1112,7 +1121,8 @@
 #eg-forfeit-modal .modal-actions {
     flex-direction: column;
     align-items: center;
-    gap: clamp(10px, 2.4cqw, 16px);
+    gap: clamp(10px, 2cqw, 14px);
+    margin-top: clamp(6px, 1.4cqw, 10px);
 }
 
 #eg-forfeit-modal .modal-actions .title-btn,

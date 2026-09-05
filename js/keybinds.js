@@ -23,12 +23,23 @@ const KEYBIND_DEFAULTS = [
     // Endgame parry (hold E by default).
     { id: 'eg-parry',    label: 'Endgame parry (hold)',  keys: 'e' },
 
+    // Endgame special abilities. Ability 1 is live today (The Firefly's
+    // command key); Ability 2 is The Firefly's fairy-selection cycle; Ability
+    // 3 is The Firefly's recall-all. Future endgame bosses re-point these
+    // SAME channels at their own mechanics WITHOUT new plumbing: any system
+    // can bind to the 'eg-special-N' action via
+    // onKeybindAction('eg-special-N', …) and the player's chosen key just
+    // works (conflict-checked like every other binding).
+    { id: 'eg-special',   label: 'Endgame Special Ability 1', keys: 'f' },
+    { id: 'eg-special-2', label: 'Endgame Special Ability 2', keys: 'g' },
+    { id: 'eg-special-3', label: 'Endgame Special Ability 3', keys: 'h' },
+
     // Class abilities (keys 1-5 by default).
-    { id: 'ability-1',   label: 'Class ability 1',       keys: '1' },
-    { id: 'ability-2',   label: 'Class ability 2',       keys: '2' },
-    { id: 'ability-3',   label: 'Class ability 3',       keys: '3' },
-    { id: 'ability-4',   label: 'Class ability 4',       keys: '4' },
-    { id: 'ability-5',   label: 'Class ability 5',       keys: '5' },
+    { id: 'ability-1',   label: 'Class Ability 1',       keys: '1' },
+    { id: 'ability-2',   label: 'Class Ability 2',       keys: '2' },
+    { id: 'ability-3',   label: 'Class Ability 3',       keys: '3' },
+    { id: 'ability-4',   label: 'Class Ability 4',       keys: '4' },
+    { id: 'ability-5',   label: 'Class Ability 5',       keys: '5' },
 ];
 
 // Live keybind map: action id -> key string. Rebuilt by loadKeybinds().
