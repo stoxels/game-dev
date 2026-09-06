@@ -76,6 +76,7 @@ const EG_STRK_PEN_SHOTS = 3;                 // shots in the shootout
 const EG_STRK_PEN_WARN_MS = 1300;            // target-ring telegraph per shot
 const EG_STRK_PEN_FLIGHT_MS = 260;           // ball flight to the mark
 const EG_STRK_PEN_GAP_MS = 800;              // between shots
+const EG_STRK_PEN_TRACK_MS = 800;            // ring stalks the player, then locks
 const EG_STRK_PEN_DMG = [0, 0.13, 0.15, 0.18]; // %maxHP per shot by phase
 const EG_STRK_PEN_MS = 10500;                // whole set-piece budget
 // Free kick (charge attack)
@@ -93,7 +94,7 @@ let _egStrkFkActive = false;  // a free kick set-piece is running
 function _egStrikerSweep() {
     _egStrkFkActive = false;
     try {
-        document.querySelectorAll('.eg-strk-ball, .eg-strk-corner, .eg-strk-cross, .eg-strk-goal, .eg-strk-spot, .eg-strk-shot, .eg-strk-shotring, .eg-strk-fk-wall, .eg-strk-fkball, .eg-strk-fkdot, .eg-strk-fkmark').forEach(el => el.remove());
+        document.querySelectorAll('.eg-strk-ball, .eg-strk-corner, .eg-strk-cross, .eg-strk-goal, .eg-strk-spot, .eg-strk-shot, .eg-strk-shotring, .eg-strk-fk-wall, .eg-strk-fkball, .eg-strk-fkdot, .eg-strk-fkmark, .eg-strk-penhud, .eg-strk-penline, .eg-strk-pencore, .eg-strk-pensaved').forEach(el => el.remove());
     } catch (e) {}
 }
 
@@ -150,7 +151,9 @@ function _egStrkAdvanceBall(st, dtS, now, pr, p) {
         if (c2) {
             const dx = c2.x - b.x, dy = c2.y - b.y;
             const d = Math.hypot(dx, dy) || 1;
-            _egNkNudgeAvatar((dx / d) * EG_STRK_TACKLE_FLING[p], (dy / d) * EG_STRK_TACKLE_FLING[p]);
+            // Animated fling (contact at the ball): the avatar glides away
+            // with a tumble + impact burst instead of teleporting.
+            _egNkFlingAvatar((dx / d) * EG_STRK_TACKLE_FLING[p], (dy / d) * EG_STRK_TACKLE_FLING[p], b.x, b.y);
         }
         b.el.classList.add('tackle');
         setTimeout(() => { try { b.el.classList.remove('tackle'); } catch (e) {} }, 260);
@@ -267,6 +270,9 @@ function _egStrikerArenaInit(monster) {
                 const el = _egNkEl(st.run, 'div', 'eg-strk-shot', '⚽');
                 pk.shotEl = el;
                 pk.shotT = 0;
+                try { if (pk.ringEl) pk.ringEl.classList.add('fired'); } catch (e) {}
+                try { if (pk.lineEl) pk.lineEl.classList.add('fired'); } catch (e) {}
+                try { if (pk.coreEl) pk.coreEl.remove(); } catch (e) {}
                 try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('striker_kick'); } catch (e) {}
             } else if (pk.phase === 'flight') {
                 pk.shotT += dtS * 1000;
@@ -280,8 +286,12 @@ function _egStrikerArenaInit(monster) {
                     _egNkAbilityHitToast(dealt, 'The Striker', 'Penalty');
                 }
                 if (k >= 1) {
+                    // Dodge feedback: a brief SAVED! pop at the mark.
+                    if (!pk.hit) _egStrkPenSaved(pk.tx, pk.ty);
                     try { pk.shotEl.remove(); } catch (e) {}
                     try { pk.ringEl.remove(); } catch (e) {}
+                    try { if (pk.lineEl) pk.lineEl.remove(); } catch (e) {}
+                    try { if (pk.coreEl) pk.coreEl.remove(); } catch (e) {}
                     pk.shot++;
                     if (pk.shot >= EG_STRK_PEN_SHOTS || pk.t >= EG_STRK_PEN_MS - EG_STRK_PEN_WARN_MS) {
                         pk.phase = 'done';
@@ -296,8 +306,38 @@ function _egStrikerArenaInit(monster) {
                 try { if (pk.goalEl) pk.goalEl.remove(); } catch (e) {}
                 try { if (pk.spotEl) pk.spotEl.remove(); } catch (e) {}
                 try { if (pk.ringEl) pk.ringEl.remove(); } catch (e) {}
+                try { if (pk.lineEl) pk.lineEl.remove(); } catch (e) {}
+                try { if (pk.coreEl) pk.coreEl.remove(); } catch (e) {}
                 try { if (pk.shotEl) pk.shotEl.remove(); } catch (e) {}
+                try { if (pk.hudEl) pk.hudEl.remove(); } catch (e) {}
                 st.pen = null;
+            }
+            // While aiming: the ring stalks the player until the lock moment,
+            // then freezes on the spot and the countdown core shrinks to the
+            // kick. The aim line's far end follows the mark too.
+            if (st.pen && pk.phase === 'aim') {
+                const trackEnd = EG_STRK_PEN_TRACK_MS;
+                if (!pk.locked && pk.t < trackEnd) {
+                    const c = _egNkPlayerCenter();
+                    if (c) {
+                        pk.tx = c.x; pk.ty = c.y;
+                        pk.ringEl.style.left = Math.round(c.x) + 'px';
+                        pk.ringEl.style.top = Math.round(c.y) + 'px';
+                        _egStrkPenAimLine(pk);
+                    }
+                } else if (!pk.locked) {
+                    pk.locked = true;
+                    pk.ringEl.classList.remove('track');
+                    pk.ringEl.classList.add('lock');
+                    pk.lineEl.classList.add('lock');
+                }
+                if (pk.locked) {
+                    // Countdown core shrinks linearly from lock → kick.
+                    const k = 1 - Math.min(1, (pk.t - trackEnd) / (EG_STRK_PEN_WARN_MS - trackEnd));
+                    pk.coreEl.style.left = pk.tx + 'px';
+                    pk.coreEl.style.top = pk.ty + 'px';
+                    pk.coreEl.style.transform = 'translate(-50%, -50%) scale(' + (0.25 + 0.75 * k).toFixed(3) + ')';
+                }
             }
         }
 
@@ -374,28 +414,82 @@ function _egStrkPenalty(st, now) {
     const sx = fromRight ? W - 320 : 320;
     spotEl.style.left = Math.round(sx - 14) + 'px';
     spotEl.style.top = Math.round(H / 2 - 14) + 'px';
+    // Shot pips under the goal: which of the shootout's shots remain.
+    const hudEl = _egNkEl(st.run, 'div', 'eg-strk-penhud');
+    for (let i = 0; i < EG_STRK_PEN_SHOTS; i++) {
+        hudEl.appendChild(document.createElement('div')).className = 'eg-strk-penpip';
+    }
+    hudEl.style[fromRight ? 'right' : 'left'] = '0px';
+    hudEl.style.top = Math.round(H / 2 + 142) + 'px';
     const pk = {
-        phase: 'setup', t: 0, shot: 0, hit: false,
+        phase: 'setup', t: 0, shot: 0, hit: false, locked: false,
         sx, sy: H / 2,
-        goalEl, spotEl, ringEl: null, shotEl: null,
+        goalEl, spotEl, hudEl, ringEl: null, shotEl: null, lineEl: null, coreEl: null,
     };
     st.pen = pk;
     _egStrkPenMark(st, pk);
-    _egNkToast('eg_striker_penalty', '🥅 PENALTY SHOOTOUT! Clear the marked lanes!');
+    _egNkToast('eg_striker_penalty', '🥅 PENALTY SHOOTOUT! 3 aimed shots — keep moving!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('striker_kick'); } catch (e) {}
 }
 
 
 // Marks a fresh target ring at the player's live position for the next shot.
+// Readability pass: an aim LINE runs from the penalty spot to the mark (the
+// shot path reads at a glance), the ring STALKS the player for the first
+// 800ms before locking (same follow → lock language as the Thwomp's Grand
+// Slam), a shrinking core counts down to the kick, and the shot pip for this
+// volley dims so you always know how many shots remain.
 function _egStrkPenMark(st, pk) {
     const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     pk.tx = c.x;
     pk.ty = c.y;
+    pk.locked = false;
     try { if (pk.ringEl) pk.ringEl.remove(); } catch (e) {}
-    const ringEl = _egNkEl(st.run, 'div', 'eg-strk-shotring');
+    try { if (pk.lineEl) pk.lineEl.remove(); } catch (e) {}
+    try { if (pk.coreEl) pk.coreEl.remove(); } catch (e) {}
+    const ringEl = _egNkEl(st.run, 'div', 'eg-strk-shotring track');
     ringEl.style.left = Math.round(c.x) + 'px';
     ringEl.style.top = Math.round(c.y) + 'px';
     pk.ringEl = ringEl;
+    // Aim line: thin dashed beam from the spot to the current mark; both
+    // ends are updated every frame by the state machine while tracking.
+    const lineEl = _egNkEl(st.run, 'div', 'eg-strk-penline');
+    pk.lineEl = lineEl;
+    // Countdown core: shrinks inside the ring until the kick.
+    const coreEl = _egNkEl(st.run, 'div', 'eg-strk-pencore');
+    pk.coreEl = coreEl;
+    _egStrkPenAimLine(pk);
+    // Dim the pip for the shot now being telegraphed.
+    const pips = pk.hudEl ? pk.hudEl.children : [];
+    for (let i = 0; i < pips.length; i++) pips[i].classList.toggle('spent', i < pk.shot);
+}
+
+
+// Repositions the aim line so it spans penalty spot → current mark.
+function _egStrkPenAimLine(pk) {
+    if (!pk.lineEl) return;
+    const dx = pk.tx - pk.sx, dy = pk.ty - pk.sy;
+    const len = Math.hypot(dx, dy);
+    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    pk.lineEl.style.left = pk.sx + 'px';
+    pk.lineEl.style.top = pk.sy + 'px';
+    pk.lineEl.style.width = Math.round(len) + 'px';
+    pk.lineEl.style.transform = 'rotate(' + ang.toFixed(2) + 'deg)';
+}
+
+
+// "SAVED!" pop when a penalty shot whiffs — instant feedback that dodging
+// worked. Self-removing; no run tracking needed.
+function _egStrkPenSaved(x, y) {
+    try {
+        const el = document.createElement('div');
+        el.className = 'eg-strk-pensaved';
+        el.textContent = 'SAVED!';
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 700);
+    } catch (e) {}
 }
 
 

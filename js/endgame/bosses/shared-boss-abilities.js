@@ -2084,7 +2084,7 @@ function _egNkLoop(run, tick) {
         const dtS = (run.dodge && run.tierFactor && run.tierFactor !== 1)
             ? rawDt / run.tierFactor : rawDt;
         let cont = true;
-        try { cont = tick(dtS, now); } catch (e) { cont = false; }
+        try { cont = tick(dtS, now); } catch (e) { console.warn('nk loop tick error:', e); cont = false; }
         if (cont && _egNkRuns.has(run.id)) run.raf = requestAnimationFrame(step);
         else _egNkKillRun(run);
     };
@@ -2469,14 +2469,125 @@ function _egNkNudgeAvatar(dx, dy) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (!el) return;
-    const l = (parseInt(el.style.left) || 0) + dx;
-    const tp = (parseInt(el.style.top) || 0) + dy;
+    let l = parseInt(el.style.left);
+    let tp = parseInt(el.style.top);
+    if (!isFinite(l) || !isFinite(tp)) {
+        // Never write the inline position? Anchor on the rendered rect
+        // instead of (0,0) so the nudge doesn't teleport the avatar to
+        // the top-left corner.
+        const r = el.getBoundingClientRect();
+        if (!isFinite(l)) l = r.left;
+        if (!isFinite(tp)) tp = r.top;
+        el.style.left = l + 'px';
+        el.style.top = tp + 'px';
+    }
+    l += dx;
+    tp += dy;
     if (typeof _setAvatarPos === 'function') {
         try { _setAvatarPos(el, l, tp); } catch (e) {}
     } else {
         el.style.left = Math.max(0, Math.min(window.innerWidth - 40, l)) + 'px';
         el.style.top = Math.max(0, Math.min(window.innerHeight - 40, tp)) + 'px';
     }
+}
+
+
+// Animated knockback: same contract as _egNkNudgeAvatar but the avatar's
+// PIXELS glide to the new spot instead of teleporting — a decaying ease-out
+// slide done with a CSS transition on left/top (compositor-driven, so it
+// animates smoothly and never fights the game's rAF loops) plus a tumble
+// wobble keyframe on the wrapper. Also pops an impact burst at the contact
+// point so the bump itself reads on screen.
+//   dx, dy          — fling impulse in px (same as the nudge)
+//   srcX, srcY      — optional contact point for the burst (default:
+//                     between the avatar and its landing spot)
+let _egFlingSeq = 0;
+function _egNkFlingAvatar(dx, dy, srcX, srcY) {
+    const el = document.getElementById('player-avatar-wrapper')
+        || document.getElementById('player-avatar-simple');
+    if (!el) return;
+    const w = el.offsetWidth || 72, h = el.offsetHeight || 90;
+    let x0 = parseFloat(el.style.left);
+    let y0 = parseFloat(el.style.top);
+    const midGlide = !!el.dataset.egFlingActive;
+    if (midGlide || !isFinite(x0) || !isFinite(y0)) {
+        // Mid-glide: style.left already holds the glide TARGET (not where
+        // the sprite is) — sample the rendered rect instead so chained
+        // flings blend from the sprite's actual position. Missing inline
+        // position (fresh spawn / companion return cleared it): anchor on
+        // the rect too — falling back to (0,0) flung the avatar at the
+        // top-left corner, which read as a random teleport.
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        if (midGlide || !isFinite(x0)) x0 = cx - w / 2;
+        if (midGlide || !isFinite(y0)) y0 = cy - h / 2;
+        el.style.left = x0 + 'px';
+        el.style.top = y0 + 'px';
+    }
+    const x1 = Math.max(4, Math.min(window.innerWidth - w - 4, x0 + dx));
+    const y1 = Math.max(4, Math.min(window.innerHeight - h - 4, y0 + dy));
+    const dist = Math.hypot(x1 - x0, y1 - y0);
+    const bx = (srcX != null) ? srcX : x0 + w / 2 - dx * 0.4;
+    const by = (srcY != null) ? srcY : y0 + h / 2 - dy * 0.4;
+    _egFlingBurst(bx, by, Math.atan2(dy, dx));
+    if (dist < 6) return; // nothing worth tweening
+    const seq = ++_egFlingSeq;
+    const dur = Math.max(300, Math.min(430, 260 + dist * 0.5));
+    // Tumble wobble on the wrapper (its transform is otherwise unused) —
+    // direction-signed via a CSS var so left/right flings tilt oppositely.
+    el.style.setProperty('--eg-fling-spin', dx >= 0 ? '1' : '-1');
+    el.style.setProperty('--eg-fling-tilt', Math.min(10, 4 + dist / 22).toFixed(1) + 'deg');
+    el.classList.add('eg-flinging');
+    // Tell the WASD ticker a glide owns the position (it must not reseed
+    // from style.left — that's the TARGET — or it snaps the sprite there).
+    el.dataset.egFlingActive = '1';
+    // Force a style flush so the transition sees the old position first.
+    void el.offsetWidth;
+    el.style.transition = 'left ' + dur + 'ms cubic-bezier(0.16, 0.75, 0.3, 1), top ' + dur + 'ms cubic-bezier(0.16, 0.75, 0.3, 1)';
+    el.style.left = x1 + 'px';
+    el.style.top = y1 + 'px';
+    // Cleanup after the glide: strip the tween styling. The WASD ticker
+    // reseeds its float accumulator from the rendered position on its own
+    // (divergence check), so control resumes seamlessly wherever the fling
+    // ended up — no snap-back if the player fought the knockback.
+    setTimeout(() => {
+        if (seq !== _egFlingSeq) return; // superseded by a newer fling
+        try {
+            el.style.transition = '';
+            el.classList.remove('eg-flinging');
+            delete el.dataset.egFlingActive;
+            el.style.removeProperty('--eg-fling-spin');
+            el.style.removeProperty('--eg-fling-tilt');
+            el.dataset.avatarFx = el.style.left;
+            el.dataset.avatarFy = el.style.top;
+        } catch (e) {}
+    }, dur + 60);
+}
+
+
+// Small impact punctuation for a fling: sparks + an expanding ring at (x, y).
+// Self-removing after ~0.5s; no run tracking needed.
+function _egFlingBurst(x, y, angle) {
+    try {
+        const ring = document.createElement('div');
+        ring.className = 'eg-fling-ring';
+        ring.style.left = x + 'px';
+        ring.style.top = y + 'px';
+        document.body.appendChild(ring);
+        setTimeout(() => ring.remove(), 500);
+        for (let i = 0; i < 6; i++) {
+            const s = document.createElement('div');
+            s.className = 'eg-fling-spark';
+            s.style.left = x + 'px';
+            s.style.top = y + 'px';
+            const a = angle + (Math.random() - 0.5) * 2.2;
+            const d = 26 + Math.random() * 30;
+            s.style.setProperty('--eg-spark-x', (Math.cos(a) * d).toFixed(0) + 'px');
+            s.style.setProperty('--eg-spark-y', (Math.sin(a) * d).toFixed(0) + 'px');
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 520);
+        }
+    } catch (e) {}
 }
 
 
@@ -2715,6 +2826,11 @@ const EG_FOG_DRIFT_F = [1.2, 0.8];      // drift-interval factor [tier1, tier16]
 
 // Positions one fog element over a cell region (r0,c0)-(r0+h-1,c0+w-1).
 // Recomputes fresh rects so a drifted bank lands exactly on the new cells.
+// Persistent hidden sentinel at the grid container's layout origin — lets
+// us map viewport rects into the container's local coordinate space without
+// mutating the fog element (a style write + forced flush here would arm the
+// fog's CSS transition and make it glide in from (0,0)).
+let _egFogProbe = null;
 function _egFogPlace(el, r0, c0, h, w) {
     const tbl = document.getElementById('ptable');
     const cellA = document.getElementById(`g-${r0}-${c0}`);
@@ -2723,13 +2839,34 @@ function _egFogPlace(el, r0, c0, h, w) {
     const parent = tbl.parentElement;
     if (!parent) return false;
 
-    const pr = parent.getBoundingClientRect();
+    // Naive viewport-rect deltas (cellRect - parentRect) break whenever an
+    // ancestor carries a transform or scroll offset (vertical centering
+    // does) — the fog would land at wrong, sometimes offscreen coordinates.
+    // Instead, map the target cells through a zero-size sentinel parked at
+    // the parent's layout origin, dividing out any ancestor scale.
+    if (!_egFogProbe || !_egFogProbe.isConnected || _egFogProbe.parentElement !== parent) {
+        _egFogProbe = document.createElement('div');
+        _egFogProbe.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;margin:0;padding:0;border:0;pointer-events:none;visibility:hidden;';
+        parent.appendChild(_egFogProbe);
+    }
+    const probe = _egFogProbe.getBoundingClientRect();
     const ra = cellA.getBoundingClientRect();
     const rb = cellB.getBoundingClientRect();
-    el.style.left = (ra.left - pr.left) + 'px';
-    el.style.top = (ra.top - pr.top) + 'px';
-    el.style.width = (rb.right - ra.left) + 'px';
-    el.style.height = (rb.bottom - ra.top) + 'px';
+    const parentRect = parent.getBoundingClientRect();
+    const scaleX = (parent.offsetWidth > 0 && parentRect.width > 0) ? (parentRect.width / parent.offsetWidth) : 1;
+    const scaleY = (parent.offsetHeight > 0 && parentRect.height > 0) ? (parentRect.height / parent.offsetHeight) : 1;
+    const left = (ra.left - probe.left) / (scaleX || 1);
+    const top = (ra.top - probe.top) / (scaleY || 1);
+    const width = (rb.right - ra.left) / (scaleX || 1);
+    const height = (rb.bottom - ra.top) / (scaleY || 1);
+    // Containment clamp: the bank always sits over the grid container,
+    // never hanging off an edge even if the grid is smaller than expected.
+    const maxL = Math.max(0, parent.offsetWidth - width - 1);
+    const maxT = Math.max(0, parent.offsetHeight - height - 1);
+    el.style.left = Math.max(0, Math.min(maxL, left)) + 'px';
+    el.style.top = Math.max(0, Math.min(maxT, top)) + 'px';
+    el.style.width = width + 'px';
+    el.style.height = height + 'px';
     return true;
 }
 
@@ -2770,23 +2907,46 @@ function _egFogSpawnBank(driftMs, durationMs) {
     const fog = document.createElement('div');
     fog.className = 'eg-fog-bank';
     fog.id = `eg-fog-bank-${++_egFogSeq}`;
-    fog.textContent = '🌫️';
+    // Layered drifting mist blobs — the fog reads as churning vapor
+    // instead of a flat grey box. Positions are staggered per blob.
+    ['', 'm2', 'm3'].forEach((cls, i) => {
+        const m = document.createElement('div');
+        m.className = ('eg-fog-mist ' + cls).trim();
+        m.textContent = '🌫️';
+        m.style.left = (14 + i * 27) + '%';
+        m.style.top = (20 + ((i * 31) % 44)) + '%';
+        fog.appendChild(m);
+    });
     parent.style.position = 'relative';
     parent.appendChild(fog);
 
     const bank = { el: fog, r0: reg.r0, c0: reg.c0, h: reg.h, w: reg.w, driftTimer: null, expireTimer: null };
+    // First placement must be instant: a fresh element has no left/top yet,
+    // so the stylesheet's glide transition would animate it in from (0,0)
+    // — the classic "fog spawns offscreen / slides in from the corner" bug.
+    // Suppress the transition for this one write, then restore it so the
+    // P2/P3 drift glides keep their smooth movement.
+    fog.style.transition = 'none';
     _egFogPlace(fog, reg.r0, reg.c0, reg.h, reg.w);
+    void fog.offsetWidth; // flush so the suppressed write commits
+    fog.style.transition = '';
     if (driftMs > 0) bank.driftTimer = setInterval(() => _egFogDrift(bank), driftMs);
     bank.expireTimer = setTimeout(() => _egFogKillBank(bank), durationMs);
     _egFogBanks.push(bank);
     return bank;
 }
 
-// Removes a single bank and its timers.
+// Removes a single bank and its timers (with a dissolve fade-out).
 function _egFogKillBank(bank) {
+    if (bank.dead) return;
+    bank.dead = true;
     clearInterval(bank.driftTimer);
     clearTimeout(bank.expireTimer);
-    if (bank.el && bank.el.isConnected) bank.el.remove();
+    if (bank.el && bank.el.isConnected) {
+        const el = bank.el;
+        el.classList.add('eg-fog-out');
+        setTimeout(() => { try { el.remove(); } catch (e) {} }, 480);
+    }
     const idx = _egFogBanks.indexOf(bank);
     if (idx !== -1) _egFogBanks.splice(idx, 1);
 }

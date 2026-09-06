@@ -217,7 +217,9 @@ function _egThwompArenaInit(monster) {
                     if (c) {
                         const dx = c.x - b.x, dy = c.y - b.y;
                         const d = Math.hypot(dx, dy) || 1;
-                        _egNkNudgeAvatar((dx / d) * EG_THW_STOMP_FLING[p], (dy / d) * EG_THW_STOMP_FLING[p]);
+                        // Animated fling (contact at the impact): glide +
+                        // tumble + burst instead of a raw teleport.
+                        _egNkFlingAvatar((dx / d) * EG_THW_STOMP_FLING[p], (dy / d) * EG_THW_STOMP_FLING[p], b.x, b.y);
                     }
                 }
                 _egThwShockRing(st, b.x, b.y, EG_THW_STOMP_R, 0.5);

@@ -60,6 +60,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 // ── Carnival tuning ─────────────────────────────────────────────────────
 // Roaming bumpers
 const EG_BUMP_BUMPER_N = [0, 2, 3, 3];      // alive at once per boss phase
+const EG_BUMP_BUMPER_R = 30;                // bumper visual radius (el at b.x - 30)
 const EG_BUMP_BUMPER_SPEED = [0, 34, 46, 60]; // px/s drift
 const EG_BUMP_FLING = [0, 150, 180, 210];   // px fling impulse per thwack
 const EG_BUMP_THWACK_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP per bumper touch
@@ -70,6 +71,13 @@ const EG_BUMP_BALL_SPEED = [0, 230, 280, 330]; // px/s
 const EG_BUMP_BALL_DMG = 0.05;              // %maxHP per ball touch (physical)
 const EG_BUMP_BALL_CD_MS = 450;             // global ball-hit cooldown
 const EG_BUMP_BALL_R = 26;                  // ball radius
+const EG_BUMP_BALL_BOUNCE_BOOST = 55;       // px/s kick when bouncing off a bumper
+// Slingshots: the two diagonal kickers in the bottom corners — real
+// pinball-table physics for pinballs that hit them.
+const EG_BUMP_SLING_LEN = 300;              // kicker length (px)
+const EG_BUMP_SLING_T = 46;                 // collision half-thickness (px)
+const EG_BUMP_SLING_KICK = 340;             // px/s normal-speed boost on a kick
+const EG_BUMP_SLING_TILT_KICK = 430;        // px/s during TILT enrage
 // Tilt! Flipper Frenzy (60% gate)
 const EG_BUMP_FLIP_MS = 9000;               // whole frenzy duration
 const EG_BUMP_FLIP_WARN_MS = 1000;          // arc band telegraph before a slap
@@ -114,15 +122,88 @@ function _egBumperTeardown() {
 
 
 // One thwack: fling the player away from (x, y) and deal the touch damage.
+// The fling is animated (decaying slide + tumble + impact burst) so the
+// bump visually reads as a physical bounce instead of a teleport.
 function _egBumpFlingHit(st, x, y, flingPx, dmgPct, label) {
     const c = _egNkPlayerCenter();
     if (c) {
         const dx = c.x - x, dy = c.y - y;
         const d = Math.sqrt(dx * dx + dy * dy) || 1;
-        _egNkNudgeAvatar((dx / d) * flingPx, (dy / d) * flingPx);
+        _egNkFlingAvatar((dx / d) * flingPx, (dy / d) * flingPx, x, y);
     }
     const dealt = _egNkHit(dmgPct, null, st.level);
     _egNkAbilityHitToast(dealt, 'The Bumper', label || 'Bumper');
+}
+
+
+// Spawns the two diagonal slingshot kickers (bottom-left and bottom-right,
+// slanted up-inward like a real table's out-lane guides). Registered on the
+// run so boss death removes them with everything else.
+function _egBumpSpawnSlings(st, run) {
+    const W = window.innerWidth, H = window.innerHeight;
+    const defs = [
+        { side: 'left', x0: 26, y0: H - 60, ang: -42 },   // up-inward from bottom-left
+        { side: 'right', x0: W - 26, y0: H - 60, ang: 222 }, // mirrored on the right
+    ];
+    defs.forEach(d => {
+        const el = _egNkEl(run, 'div', 'eg-bump-sling ' + d.side);
+        el.style.left = d.x0 + 'px';
+        el.style.top = d.y0 + 'px';
+        el.style.width = EG_BUMP_SLING_LEN + 'px';
+        el.style.transformOrigin = '0 50%';
+        el.style.transform = 'rotate(' + d.ang + 'deg)';
+        const rad = d.ang * Math.PI / 180;
+        // Unit normal pointing INTO the playfield (perpendicular to the kicker).
+        const nx = Math.sin(rad), ny = -Math.cos(rad);
+        if (nx > 0 || (nx === 0 && ny < 0)) { /* keep pointing inward */ }
+        // Left kicker: normal must point right-ish; right kicker: left-ish.
+        const wantRight = d.side === 'left';
+        const nSign = (wantRight ? (nx >= 0 ? 1 : -1) : (nx <= 0 ? 1 : -1));
+        st.slings.push({
+            side: d.side, x0: d.x0, y0: d.y0,
+            dxu: Math.cos(rad), dyu: Math.sin(rad), // unit along the kicker
+            nx: nx * nSign, ny: ny * nSign,         // inward unit normal
+            len: EG_BUMP_SLING_LEN, flashUntil: 0, el,
+        });
+    });
+}
+
+
+// Slingshot collision for one pinball: treat each kicker as a capsule
+// (segment + half-thickness). On contact, reflect the velocity about the
+// inward normal (like hitting a wall at an angle) and add the kick boost —
+// the ball gets shot back into the playfield, exactly like a real machine.
+function _egBumpSlingBall(st, b, now, tilting) {
+    st.slings.forEach(sl => {
+        // Project the ball onto the kicker segment.
+        const rx = b.x - sl.x0, ry = b.y - sl.y0;
+        let t = rx * sl.dxu + ry * sl.dyu;
+        t = Math.max(0, Math.min(sl.len, t));
+        const cx = sl.x0 + sl.dxu * t, cy = sl.y0 + sl.dyu * t; // closest point
+        const dx = b.x - cx, dy = b.y - cy;
+        const d = Math.hypot(dx, dy) || 1;
+        const minD = EG_BUMP_SLING_T + EG_BUMP_BALL_R;
+        if (d < minD) {
+            // The kicker's normal always points INTO the playfield — use it
+            // directly (a radial sign flip here would silently disable the
+            // kick for balls approaching from the playfield side).
+            const nx = sl.nx, ny = sl.ny;
+            b.x = cx + nx * minD;
+            b.y = cy + ny * minD;
+            const dot = b.vx * nx + b.vy * ny; // v·n
+            if (dot < 0) { // only reflect if the ball moves INTO the kicker
+                b.vx -= 2 * dot * nx;
+                b.vy -= 2 * dot * ny;
+                const kick = tilting ? EG_BUMP_SLING_TILT_KICK : EG_BUMP_SLING_KICK;
+                b.vx += nx * kick;
+                b.vy += ny * kick;
+                sl.flashUntil = now + 260;
+                sl.el.classList.add('fired');
+                setTimeout(() => { try { sl.el.classList.remove('fired'); } catch (e) {} }, 260);
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
+            }
+        }
+    });
 }
 
 
@@ -132,6 +213,7 @@ function _egBumperArenaInit(monster) {
     const st = {
         monsterId, level: monster ? monster.level : 1,
         bumpers: [], balls: [], showerAcc: 0, ballCd: 0,
+        slings: [],
         tiltUntil: 0, flip: null,
         gate60Done: false, gate30Done: false, rushDone: false,
         everLive: false, bornAt: performance.now(),
@@ -149,6 +231,9 @@ function _egBumperArenaInit(monster) {
     // Pinball-table side rails: pure decoration that frames the arena for
     // the whole fight (registered on the run → auto-removed on teardown).
     ['left', 'right', 'top'].forEach(side => _egNkEl(run, 'div', 'eg-bump-rail ' + side));
+    // Slingshots: the two diagonal kickers above the bottom corners. Like a
+    // real machine, they physically punt pinballs that roll into them.
+    _egBumpSpawnSlings(st, run);
     run.onKill = () => {
         if (_egBumpWatcher && _egBumpWatcher.run === run) _egBumpWatcher = null;
         _egBumperSweep(); // boss died → clear the carnival immediately
@@ -225,9 +310,34 @@ function _egBumperArenaInit(monster) {
             const b = st.balls[i];
             b.x += b.vx * dtS;
             b.y += b.vy * dtS;
+            // Bumpers are solid: a pinball that hits one bounces off exactly
+            // like it hit a wall on the outer edge — reflect about the
+            // contact normal, seat the ball on the surface, and give it a
+            // lively kick away. The bumper flashes like it does on a thwack.
+            st.bumpers.forEach(bp => {
+                const dx = b.x - bp.x, dy = b.y - bp.y;
+                const d = Math.hypot(dx, dy) || 1;
+                const minD = EG_BUMP_BUMPER_R + EG_BUMP_BALL_R;
+                if (d < minD) {
+                    b.x = bp.x + (dx / d) * minD;
+                    b.y = bp.y + (dy / d) * minD;
+                    const dot = (b.vx * dx + b.vy * dy) / d; // v·n
+                    if (dot < 0) { // only reflect if the ball moves INTO the bumper
+                        b.vx -= 2 * dot * (dx / d);
+                        b.vy -= 2 * dot * (dy / d);
+                        b.vx += (dx / d) * EG_BUMP_BALL_BOUNCE_BOOST;
+                        b.vy += (dy / d) * EG_BUMP_BALL_BOUNCE_BOOST;
+                        bp.el.classList.add('eg-nk-boom');
+                        setTimeout(() => bp.el.classList.remove('eg-nk-boom'), 300);
+                        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
+                    }
+                }
+            });
             if (b.x < EG_BUMP_BALL_R || b.x > W - EG_BUMP_BALL_R) { b.vx = -b.vx; b.x = Math.max(EG_BUMP_BALL_R, Math.min(W - EG_BUMP_BALL_R, b.x)); }
             if (b.y < EG_BUMP_BALL_R || b.y > H - EG_BUMP_BALL_R) { b.vy = -b.vy; b.y = Math.max(EG_BUMP_BALL_R, Math.min(H - EG_BUMP_BALL_R, b.y)); }
             b.el.style.transform = 'translate(' + Math.round(b.x - EG_BUMP_BALL_R) + 'px,' + Math.round(b.y - EG_BUMP_BALL_R) + 'px)';
+            // Slingshot kickers: pinballs get punted back into the playfield.
+            _egBumpSlingBall(st, b, now, tilting);
             if (c && pr && now >= st.ballCd && _egNkCircleHit(b.x, b.y, EG_BUMP_BALL_R, pr, 0)) {
                 st.ballCd = now + EG_BUMP_BALL_CD_MS;
                 const dealt = _egNkHit(EG_BUMP_BALL_DMG, null, st.level);
@@ -292,9 +402,11 @@ function _egBumperFlipperFrenzy(st, now) {
     st.tiltUntil = now + EG_BUMP_TILT_MS;
     st.bumpers.forEach(b => b.el.classList.add('tilt'));
     document.querySelectorAll('.eg-bump-rail').forEach(r => r.classList.add('tilt'));
+    document.querySelectorAll('.eg-bump-sling').forEach(r => r.classList.add('tilt'));
     setTimeout(() => {
         document.querySelectorAll('.eg-bump-bumper.tilt').forEach(b => { try { b.classList.remove('tilt'); } catch (e) {} });
         document.querySelectorAll('.eg-bump-rail.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
+        document.querySelectorAll('.eg-bump-sling.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
     }, EG_BUMP_TILT_MS + 400);
     _egNkToast('eg_bump_tilt', '⚠️ TILT! The flippers are furious — stay off the lower lanes!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}

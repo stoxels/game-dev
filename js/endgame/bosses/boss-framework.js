@@ -295,6 +295,41 @@ function _egBossCleanup(monsterId) {
     if (monsterId.startsWith('boss_coil') && typeof _egCoilTeardown === 'function') {
         _egCoilTeardown();
     }
+    // The Dancer: persistent ballroom (mirror ball, spotlight steps,
+    // rhythm ribbons, curtain call patches, petal storm, pirouette rings).
+    if (monsterId.startsWith('boss_dancer') && typeof _egDancerTeardown === 'function') {
+        _egDancerTeardown();
+    }
+    // The Gale: persistent storm (wandering eye, crosswind, cyclone
+    // funnels, tornado ladder, contracting rings, cyclone lance).
+    if (monsterId.startsWith('boss_gale') && typeof _egGaleTeardown === 'function') {
+        _egGaleTeardown();
+    }
+    // The Gambler: persistent casino (house chips, card volleys, wheel of
+    // fortune, jackpot rush, russian roulette mark).
+    if (monsterId.startsWith('boss_gambler') && typeof _egGamblerTeardown === 'function') {
+        _egGamblerTeardown();
+    }
+    // The Gourmet: persistent tasting menu (drifting maw, aroma inhale,
+    // sizzling plate + grease pools, dinner service, banquet, devour).
+    if (monsterId.startsWith('boss_gourmet') && typeof _egGourmetTeardown === 'function') {
+        _egGourmetTeardown();
+    }
+    // The Lodestone: persistent magnetic field (drifting stone, polarity
+    // drag + flip pulses, filings, vortex, railgun, leash).
+    if (monsterId.startsWith('boss_lodestone') && typeof _egLodestoneTeardown === 'function') {
+        _egLodestoneTeardown();
+    }
+    // The Stack: persistent construction site (tetromino core, soft/hard
+    // drops, floor terrain, line clears, garbage rise).
+    if (monsterId.startsWith('boss_stack') && typeof _egStackTeardown === 'function') {
+        _egStackTeardown();
+    }
+    // The Tactician: persistent chess siege (gliding queen, battle intents,
+    // pawn marches, check lanes, zugzwang, checkmate walls).
+    if (monsterId.startsWith('boss_tactician') && typeof _egTacticianTeardown === 'function') {
+        _egTacticianTeardown();
+    }
 }
 
 

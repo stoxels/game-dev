@@ -196,7 +196,8 @@ function _egCoilArenaInit(monster) {
             mw.biteCd = now + EG_COIL_BITE_CD_MS;
             const bdx = c.x - mw.x, bdy = c.y - mw.y;
             const bd = Math.hypot(bdx, bdy) || 1;
-            _egNkNudgeAvatar((bdx / bd) * EG_COIL_BITE_FLING[p], (bdy / bd) * EG_COIL_BITE_FLING[p]);
+            // Animated fling (contact at the maw): glide + tumble + burst.
+            _egNkFlingAvatar((bdx / bd) * EG_COIL_BITE_FLING[p], (bdy / bd) * EG_COIL_BITE_FLING[p], mw.x, mw.y);
             const dealt = _egNkHit(EG_COIL_BITE_DMG[p], 'shadow', st.level);
             _egNkAbilityHitToast(dealt, 'The Coil', 'Bite');
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('coil_hiss'); } catch (e) {}

@@ -264,10 +264,21 @@ function _avatarMoveTick(ts) {
                 (el.id === 'player-avatar-wrapper' ? window.innerHeight - 220 : 80);
             // Teleports / nudges / knockbacks write style.left/top directly —
             // reseed the accumulator when the rendered position diverges.
-            const curX = parseFloat(el.style.left);
-            const curY = parseFloat(el.style.top);
-            if (isFinite(curX) && Math.abs(curX - fx) > 2) fx = curX;
-            if (isFinite(curY) && Math.abs(curY - fy) > 2) fy = curY;
+            // While a boss-knockback glide is active, style.left/top hold the
+            // glide TARGET (the transition animates toward it), so sampling
+            // them mid-glide would snap the sprite to the target instantly —
+            // the "knockback looks like a teleport" bug. Sample the RENDERED
+            // rect instead and let the inputs blend with the glide.
+            if (el.dataset.egFlingActive) {
+                const fr = el.getBoundingClientRect();
+                fx = fr.left;
+                fy = fr.top;
+            } else {
+                const curX = parseFloat(el.style.left);
+                const curY = parseFloat(el.style.top);
+                if (isFinite(curX) && Math.abs(curX - fx) > 2) fx = curX;
+                if (isFinite(curY) && Math.abs(curY - fy) > 2) fy = curY;
+            }
             fx += (dx / norm) * dist;
             fy += (dy / norm) * dist;
             el.dataset.avatarFx = String(fx);

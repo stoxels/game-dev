@@ -1208,6 +1208,55 @@ function _egFireMonsterAttack(monster) {
         _egSproutVineLunge(monster);
         return;
     }
+    // The Dancer: the mirror ball flashes, then unleashes 3 expanding
+    // lightning rings — dodge the rings, dance the gaps (boss-dancer.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_dancer')
+        && typeof _egDancerPirouette === 'function') {
+        _egDancerPirouette(monster);
+        return;
+    }
+    // The Gale: a wind lance lane telegraphs, then a compressed air bolt
+    // blasts across it, flinging anyone hit (boss-gale.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_gale')
+        && typeof _egGaleCycloneLance === 'function') {
+        _egGaleCycloneLance(monster);
+        return;
+    }
+    // The Gambler: a 6-chamber cylinder ticks down over the player, then
+    // the hammer falls — 5/6 blank, 1/6 heavy shadow hit (boss-gambler.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_gambler')
+        && typeof _egGamblerRoulette === 'function') {
+        _egGamblerRoulette(monster);
+        return;
+    }
+    // The Gourmet: the maw locks on, then inhales hard — fight the suction
+    // or be swallowed for heavy damage (boss-gourmet.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_gourmet')
+        && typeof _egGourmetDevour === 'function') {
+        _egGourmetDevour(monster);
+        return;
+    }
+    // The Lodestone: a chain line telegraphs from the stone, then reels
+    // anyone caught into the clamp radius (boss-lodestone.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_lodestone')
+        && typeof _egLodestoneLeash === 'function') {
+        _egLodestoneLeash(monster);
+        return;
+    }
+    // The Stack: gray garbage rows flood up from the bottom — stay high or
+    // be flung off the rising edge (boss-stack.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_stack')
+        && typeof _egStackGarbage === 'function') {
+        _egStackGarbage(monster);
+        return;
+    }
+    // The Tactician: the four board edges slam inward as castle walls —
+    // get inside the shrinking ring before they meet (boss-tactician.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_tactician')
+        && typeof _egTacticianCheckmate === 'function') {
+        _egTacticianCheckmate(monster);
+        return;
+    }
     // The Bumper: a giant carnival bumper slams onto a telegraphed target
     // ring at the player, flinging anyone inside (boss-bumper.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_bumper')
