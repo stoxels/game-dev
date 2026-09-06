@@ -246,15 +246,32 @@
     box-shadow: 0 0 14px rgba(148, 163, 184, 0.8);
 }
 
-/* Marked strikes */
+/* Marked strikes — crosshair reticle: the Marksman is AIMING here.
+   Ring + cross ticks + center dot; the arrow impacts the center point. */
 .eg-nk-mark {
     position: fixed;
     pointer-events: none; z-index: 9001;
     border-radius: 50%;
     border: 3px solid rgba(248, 113, 113, 0.95);
-    background: rgba(248, 113, 113, 0.10);
+    background:
+        radial-gradient(circle, #fca5a5 0 3px, rgba(248, 113, 113, 0) 4px),
+        rgba(248, 113, 113, 0.10);
     box-shadow: 0 0 18px rgba(248, 113, 113, 0.7), inset 0 0 24px rgba(248,113,113,0.25);
     animation: eg-nk-mark-pulse 0.3s ease-in-out infinite alternate;
+}
+/* horizontal crosshair tick */
+.eg-nk-mark::before {
+    content: '';
+    position: absolute; left: 4%; right: 4%; top: 50%; height: 2px; margin-top: -1px;
+    background: linear-gradient(90deg, transparent, #fecaca 16%, #fecaca 84%, transparent);
+    filter: drop-shadow(0 0 3px rgba(248, 113, 113, 0.9));
+}
+/* vertical crosshair tick */
+.eg-nk-mark::after {
+    content: '';
+    position: absolute; top: 4%; bottom: 4%; left: 50%; width: 2px; margin-left: -1px;
+    background: linear-gradient(180deg, transparent, #fecaca 16%, #fecaca 84%, transparent);
+    filter: drop-shadow(0 0 3px rgba(248, 113, 113, 0.9));
 }
 @keyframes eg-nk-mark-pulse { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.06); opacity: 1; } }
 .eg-nk-mark-hit {
@@ -262,6 +279,95 @@
     background: rgba(239, 68, 68, 0.45) !important;
     box-shadow: 0 0 44px rgba(239, 68, 68, 1) !important;
     animation: none !important;
+}
+.eg-nk-mark-hit::before,
+.eg-nk-mark-hit::after { opacity: 0.25; }
+
+/* The Marksman's arrow: concave-arc dart, head leads along the tangent
+   (JS rotates it). Shaft + arrowhead via clip-path, faint speed tail. */
+.eg-marks-arrow {
+    position: fixed; left: 0; top: 0; z-index: 9002;
+    width: 26px; height: 5px; margin: -2.5px 0 0 -13px;
+    pointer-events: none;
+    background: linear-gradient(90deg, #92400e, #d97706 55%, #fbbf24);
+    clip-path: polygon(0 45%, 62% 42%, 62% 0, 100% 50%, 62% 100%, 62% 58%, 0 55%);
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.8));
+}
+.eg-marks-arrow::after {
+    content: '';
+    position: absolute; right: 88%; top: 50%; width: 20px; height: 2px; margin-top: -1px;
+    background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.7));
+}
+
+/* ── Arrow Gauntlet (The Marksman set-piece) ────── */
+/* Countdown overlay: title + big popping 5-4-3-2-1 above the arena. */
+.eg-gauntlet-countdown {
+    position: fixed; left: 50%; top: 16%;
+    transform: translateX(-50%);
+    z-index: 9022; pointer-events: none;
+    text-align: center;
+}
+.eg-gauntlet-cd-title {
+    font: 900 22px/1.4 sans-serif; letter-spacing: 0.14em;
+    color: #fecaca; text-shadow: 0 0 14px rgba(239, 68, 68, 0.9), 0 2px 4px #000;
+}
+.eg-gauntlet-cd-num {
+    font: 900 64px/1.1 sans-serif;
+    color: #fff;
+    text-shadow: 0 0 24px rgba(239, 68, 68, 1), 0 0 60px rgba(239, 68, 68, 0.7), 0 3px 6px #000;
+    animation: eg-gauntlet-cd-pop 0.95s ease-out forwards;
+}
+@keyframes eg-gauntlet-cd-pop {
+    0%   { transform: scale(2.1); opacity: 0; }
+    18%  { transform: scale(1);   opacity: 1; }
+    70%  { transform: scale(1);   opacity: 1; }
+    100% { transform: scale(0.92); opacity: 0.15; }
+}
+
+/* The bow-wall rectangle: a sealed formation of conjured bows. */
+.eg-gauntlet-wall {
+    position: fixed; z-index: 9005; pointer-events: none;
+    background: rgba(120, 53, 15, 0.35);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.25), inset 0 0 12px rgba(0, 0, 0, 0.5);
+    display: flex; align-items: center; justify-content: space-evenly;
+    overflow: hidden;
+    animation: eg-gauntlet-wall-in 0.3s ease-out;
+}
+.eg-gauntlet-wall.left,
+.eg-gauntlet-wall.right { flex-direction: column; }
+@keyframes eg-gauntlet-wall-in { from { opacity: 0; } to { opacity: 1; } }
+.eg-gauntlet-bow {
+    font-size: 22px; line-height: 1;
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+}
+/* Telegraph: the individual bows that are ABOUT to loose a wall glow and
+   pulse — a per-bow tell, not a full row/column band. Stragglers (next
+   arrows) arm with a short delay so the volley reads as a cascade. */
+.eg-gauntlet-bow-arm {
+    animation: eg-gauntlet-bow-arm-pulse 0.45s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 6px rgba(248, 113, 113, 0.95)) drop-shadow(0 0 16px rgba(239, 68, 68, 0.65));
+}
+@keyframes eg-gauntlet-bow-arm-pulse {
+    from { transform: scale(1); opacity: 0.8; }
+    to { transform: scale(1.3); opacity: 1; }
+}
+.eg-gauntlet-wall-out { opacity: 0; transition: opacity 0.5s ease; }
+
+/* Gauntlet arrows: heavy darts with a speed tail. Bright red on white so
+   they read against the dark grid, the storm backdrop AND the bow walls. */
+.eg-gauntlet-arrow {
+    position: fixed; left: 0; top: 0; z-index: 9006;
+    width: 44px; height: 9px; margin: -4.5px 0 0 -22px;
+    pointer-events: none;
+    background: linear-gradient(90deg, #7f1d1d, #ef4444 45%, #fecaca);
+    clip-path: polygon(0 45%, 58% 40%, 58% 0, 100% 50%, 58% 100%, 58% 60%, 0 55%);
+    filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.95)) drop-shadow(0 0 24px rgba(239, 68, 68, 0.55));
+}
+.eg-gauntlet-arrow::after {
+    content: '';
+    position: absolute; right: 84%; top: 50%; width: 40px; height: 4px; margin-top: -2px;
+    background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.8));
 }
 
 /* Brutus slam band */
@@ -2598,41 +2704,76 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 /* Tornado: swirling vortex — soft cloud mass, a funnel skirt, and three
    counter-rotating rings. Direction-agnostic so it reads the same
    sweeping left, right, or diving from the top. */
+/* ── Tornado set-piece: a towering funnel ───────── */
+/* Dark rotating cloud head on top, a tapering debris funnel below, and
+   seven stacked swirl rings tracing the cone. ~150×320 px; the whole
+   column is the danger zone (hitbox mirrors it in boss-gust.js). */
 .eg-nk-gust-tornado {
     position: fixed; left: 0; top: 0; z-index: 9003;
-    width: 96px; height: 96px;
+    width: 150px; height: 320px;
     pointer-events: none;
+    filter: drop-shadow(0 0 18px rgba(125, 211, 252, 0.55));
 }
-/* cloudy body */
+/* funnel body: tapering cone pivoting under the cloud head */
 .eg-nk-gust-tornado::before {
     content: '';
-    position: absolute; inset: 2px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(224, 242, 254, 0.30), rgba(125, 211, 252, 0.14) 55%, transparent 74%);
-    filter: blur(2px);
+    position: absolute; left: 50%; top: 16%;
+    width: 136px; height: 250px;
+    transform: translateX(-50%);
+    transform-origin: top center;
+    background:
+        repeating-conic-gradient(from 0deg at 50% 0%,
+            rgba(224, 242, 254, 0.16) 0deg 7deg,
+            rgba(125, 211, 252, 0.10) 7deg 15deg,
+            transparent 15deg 22deg),
+        linear-gradient(180deg, rgba(224, 242, 254, 0.50), rgba(148, 197, 245, 0.22) 50%, rgba(51, 65, 85, 0.35) 85%, transparent);
+    clip-path: polygon(4% 0, 96% 0, 60% 100%, 40% 100%);
+    filter: blur(0.5px);
+    animation: eg-gust-funnel-sway 1.6s ease-in-out infinite alternate;
 }
-/* funnel skirt narrowing toward the base */
+@keyframes eg-gust-funnel-sway {
+    from { transform: translateX(-50%) rotate(-5deg); }
+    to   { transform: translateX(-50%) rotate(5deg); }
+}
+/* churning storm-cloud head */
 .eg-nk-gust-tornado::after {
     content: '';
-    position: absolute; left: 50%; top: 30%;
-    width: 46px; height: 64px;
+    position: absolute; left: 50%; top: 0;
+    width: 150px; height: 78px;
     transform: translateX(-50%);
-    clip-path: polygon(16% 0, 84% 0, 66% 100%, 34% 100%);
-    background: linear-gradient(180deg, rgba(224, 242, 254, 0.55), rgba(148, 197, 245, 0.18) 72%, transparent);
-    filter: drop-shadow(0 0 6px rgba(186, 230, 253, 0.6));
+    background:
+        radial-gradient(circle at 30% 65%, rgba(226, 232, 240, 0.95) 0 26%, transparent 60%),
+        radial-gradient(circle at 55% 40%, rgba(203, 213, 225, 0.90) 0 30%, transparent 62%),
+        radial-gradient(circle at 78% 62%, rgba(148, 163, 184, 0.80) 0 26%, transparent 60%),
+        radial-gradient(circle at 15% 45%, rgba(148, 163, 184, 0.70) 0 22%, transparent 55%),
+        radial-gradient(ellipse at 50% 55%, rgba(71, 85, 105, 0.55), transparent 70%);
+    filter: blur(1px);
+    animation: eg-gust-cloud-churn 2.2s ease-in-out infinite alternate;
 }
+@keyframes eg-gust-cloud-churn {
+    from { transform: translateX(-56%) scale(1); }
+    to   { transform: translateX(-44%) scale(1.05); }
+}
+/* swirl rings: elliptical coils shrinking toward the ground tip */
 .eg-nk-gust-tornado i {
-    position: absolute; inset: 0;
-    border-radius: 50%;
-    border: 4px solid transparent;
+    position: absolute;
+    left: 50%;
+    border-style: solid;
+    border-color: transparent;
     border-top-color: rgba(224, 242, 254, 0.95);
-    border-right-color: rgba(125, 211, 252, 0.6);
-    border-left-color: rgba(147, 197, 253, 0.35);
-    filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.85));
-    animation: eg-gust-swirl 0.55s linear infinite;
+    border-right-color: rgba(125, 211, 252, 0.55);
+    border-left-color: rgba(147, 197, 253, 0.30);
+    border-radius: 50%;
+    filter: drop-shadow(0 0 8px rgba(125, 211, 252, 0.85));
+    animation: eg-gust-swirl 0.5s linear infinite;
 }
-.eg-nk-gust-tornado i:nth-child(2) { inset: 15px; border-width: 3px; animation-duration: 0.4s; animation-direction: reverse; }
-.eg-nk-gust-tornado i:nth-child(3) { inset: 30px; border-width: 2px; animation-duration: 0.28s; }
+.eg-nk-gust-tornado i:nth-child(1) { top: 16%; width: 130px; height: 30px; margin-left: -65px; border-width: 5px; }
+.eg-nk-gust-tornado i:nth-child(2) { top: 27%; width: 112px; height: 27px; margin-left: -56px; border-width: 5px; animation-duration: 0.44s; }
+.eg-nk-gust-tornado i:nth-child(3) { top: 38%; width: 95px;  height: 24px; margin-left: -47px; border-width: 4px; animation-duration: 0.38s; }
+.eg-nk-gust-tornado i:nth-child(4) { top: 49%; width: 79px;  height: 21px; margin-left: -39px; border-width: 4px; animation-duration: 0.33s; animation-direction: reverse; }
+.eg-nk-gust-tornado i:nth-child(5) { top: 60%; width: 64px;  height: 18px; margin-left: -32px; border-width: 3px; animation-duration: 0.30s; }
+.eg-nk-gust-tornado i:nth-child(6) { top: 71%; width: 50px;  height: 15px; margin-left: -25px; border-width: 3px; animation-duration: 0.26s; animation-direction: reverse; }
+.eg-nk-gust-tornado i:nth-child(7) { top: 82%; width: 37px;  height: 12px; margin-left: -18px; border-width: 2px; animation-duration: 0.22s; }
 @keyframes eg-gust-swirl { to { transform: rotate(360deg); } }
 /* Volley telegraph: pulsing band at the entry edge with animated stripes
    that show which way the funnel will sweep (left / right / down). */
@@ -2641,8 +2782,9 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     background: rgba(125, 211, 252, 0.22);
     animation: eg-nk-warn-pulse 0.35s ease-in-out infinite alternate;
 }
-.eg-gust-warn-h { left: 0; width: 100vw; height: 96px; border-top: 3px dashed rgba(186, 230, 253, 0.95); border-bottom: 3px dashed rgba(186, 230, 253, 0.95); }
-.eg-gust-warn-v { top: 0; height: 100vh; width: 96px; border-left: 3px dashed rgba(186, 230, 253, 0.95); border-right: 3px dashed rgba(186, 230, 253, 0.95); }
+/* Band sizes mirror the tornado's danger column (300px tall / 150px wide). */
+.eg-gust-warn-h { left: 0; width: 100vw; height: 300px; border-top: 3px dashed rgba(186, 230, 253, 0.95); border-bottom: 3px dashed rgba(186, 230, 253, 0.95); }
+.eg-gust-warn-v { top: 0; height: 100vh; width: 150px; border-left: 3px dashed rgba(186, 230, 253, 0.95); border-right: 3px dashed rgba(186, 230, 253, 0.95); }
 .eg-gust-warn-h::before,
 .eg-gust-warn-v::before {
     content: '';
@@ -2670,6 +2812,56 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 @keyframes eg-gust-warn-sweep-r { from { background-position: 0 0; } to { background-position: 48px 0; } }
 @keyframes eg-gust-warn-sweep-l { from { background-position: 0 0; } to { background-position: -48px 0; } }
 @keyframes eg-gust-warn-sweep-d { from { background-position: 0 0; } to { background-position: 0 48px; } }
+/* Lightning pre-warning: ~2 s before a storm front rolls in, a jagged bolt
+   strikes down the windward edge (see _egGustLightningWarn). The container
+   is an invisible strike zone; the ::before bolt flickers in and fades,
+   the ::after paints a soft glow down the whole edge. */
+.eg-gust-lightning {
+    position: fixed; top: 0; bottom: 0; z-index: 9020;
+    width: 130px;
+    pointer-events: none;
+}
+.eg-gust-lightning-left { left: 0; }
+.eg-gust-lightning-right { right: 0; transform: scaleX(-1); }
+/* the bolt itself: jagged taper silhouette (⚡-style zigzag) */
+.eg-gust-lightning::before {
+    content: '';
+    position: absolute; top: 0;
+    left: 34px;
+    width: 44px; height: 62vh;
+    background: linear-gradient(180deg,
+        #ffffff 0%, rgba(224, 242, 254, 0.95) 45%,
+        rgba(147, 197, 253, 0.6) 75%, rgba(125, 211, 252, 0.15) 95%, transparent);
+    clip-path: polygon(38% 0, 74% 0, 46% 44%, 68% 46%, 26% 100%, 38% 54%, 14% 52%);
+    filter: drop-shadow(0 0 12px rgba(224, 242, 254, 0.95)) drop-shadow(0 0 30px rgba(125, 211, 252, 0.65));
+    opacity: 0;
+    animation: eg-gust-lightning-flash 0.85s ease-out forwards;
+}
+@keyframes eg-gust-lightning-flash {
+    0%   { opacity: 0; }
+    7%   { opacity: 1; }
+    15%  { opacity: 0.15; }
+    25%  { opacity: 1; }
+    38%  { opacity: 0.35; }
+    52%  { opacity: 0.9; }
+    74%  { opacity: 0.25; }
+    100% { opacity: 0; }
+}
+/* whole-edge strike glow behind the bolt */
+.eg-gust-lightning::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(90deg, rgba(186, 230, 253, 0.55), rgba(125, 211, 252, 0.12) 55%, transparent);
+    opacity: 0;
+    animation: eg-gust-lightning-glow 0.85s ease-out forwards;
+}
+@keyframes eg-gust-lightning-glow {
+    0%   { opacity: 0; }
+    8%   { opacity: 1; }
+    30%  { opacity: 0.3; }
+    48%  { opacity: 0.8; }
+    100% { opacity: 0; }
+}
 #eg-gust-wind-label {
     font: 900 10px/1.2 sans-serif; letter-spacing: 0.12em;
     color: #7dd3fc; text-shadow: 0 1px 3px #000;

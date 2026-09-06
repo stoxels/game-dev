@@ -255,6 +255,11 @@ function _egBossCleanup(monsterId) {
     if (monsterId.startsWith('boss_gust') && typeof _egGustTeardown === 'function') {
         _egGustTeardown();
     }
+    // The Marksman: HP-gate watcher + any running Arrow Gauntlet (bow walls,
+    // flying arrows, countdown overlay, charge-bar pause).
+    if (monsterId.startsWith('boss_marksman') && typeof _egMarksmanTeardown === 'function') {
+        _egMarksmanTeardown();
+    }
 }
 
 

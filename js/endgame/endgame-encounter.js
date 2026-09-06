@@ -582,6 +582,10 @@ function _egTickMonster(m) {
     if (m.staggeredUntil && Date.now() < m.staggeredUntil) return;
     // Gear: first_step — monsters don't charge-up their attacks for the first X seconds after spawning
     if (m.firstStepUntil && Date.now() < m.firstStepUntil) return;
+    // The Marksman's Arrow Gauntlet: the boss's own attack charge freezes —
+    // the bow volley IS his attack while the gauntlet holds the arena
+    // (boss-marksman.js).
+    if (m.isBoss && typeof _egMarksGauntletChargePaused === 'function' && _egMarksGauntletChargePaused()) return;
     // Ailments: frozen monsters don't charge, chilled ones charge at 50%
     const chargeMult = (typeof _egGetMonsterChargeMultiplier === 'function') ? _egGetMonsterChargeMultiplier(m) : 1;
     m.currentCharge += 0.1 * chargeMult;
@@ -629,6 +633,12 @@ function _egTickPlayer() {
     // The Gust's wind lanes: while the player rides a lane the auto-attack
     // charge bar stays frozen — a dodge set-piece, not free DPS (boss-gust.js).
     if (typeof _egGustChargePaused === 'function' && _egGustChargePaused()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Marksman's Arrow Gauntlet: countdown + arrow waves are a dodge
+    // set-piece — the auto-attack bar is paused for the whole gauntlet
+    // (boss-marksman.js).
+    if (typeof _egMarksGauntletChargePaused === 'function' && _egMarksGauntletChargePaused()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
     }
     // The Clock's Time Freeze: the auto-attack charge bar is frozen for the

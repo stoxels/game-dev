@@ -147,6 +147,13 @@ function checkElementalAilmentIntercept(row, col) {
 // Runs all special intercepts in priority order.
 // Returns true if any intercept consumed the click.
 function checkSpecialIntercepts(row, col) {
+    // The Marksman's Arrow Gauntlet seals the grid: no fills/marks while
+    // the bows hold the arena, so a stray click can't take a mistake or
+    // start a new puzzle mid-set-piece (boss-marksman.js).
+    if (typeof _egMarksGauntletActive === 'function' && _egMarksGauntletActive()) {
+        if (typeof _egMarksGauntletGridLockToast === 'function') _egMarksGauntletGridLockToast();
+        return true;
+    }
     if (checkBossCorruptionIntercept(row, col)) return true;
     if (checkBayesianTrapIntercept(row, col)) return true;
     if (checkActiveAbilityIntercept(row, col)) return true;

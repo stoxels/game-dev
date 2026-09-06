@@ -240,7 +240,7 @@ function _egCorruptPickNeighbor(r, c) {
 }
 
 
-// Shows the ghosted 🚫 on the chosen target and schedules the corruption to
+// Shows the ghosted ☣️ on the chosen target and schedules the corruption to
 // land there after the telegraph window. Stored on the source cell's entry so
 // dispelling or expiring the source cancels the pending spread with it.
 function _egCorruptTelegraphSpread(key, data, tr, tc) {
@@ -250,7 +250,7 @@ function _egCorruptTelegraphSpread(key, data, tr, tc) {
     const tel = document.createElement('span');
     tel.className = 'eg-corrupt-telegraph';
     tel.id = `eg-corrupt-tel-${tr}-${tc}`;
-    tel.textContent = '🚫';
+    tel.textContent = '☣️';
     el.appendChild(tel);
 
     data.pending = {
@@ -308,7 +308,7 @@ function _egCorruptSpreadTick(key) {
 }
 
 
-// Places the 🚫 corruption overlay on a cell and registers its expiry timer.
+// Places the ☣️ corruption overlay on a cell and registers its expiry timer.
 // cfg drives the variants (see _egCorruptConfig): p = phase (P1 static+expire,
 // P2 expire+spread, P3 never expires) and norm = tier weight for how fast the
 // field spreads and how large it may grow. Newly spread cells inherit the same
@@ -322,7 +322,7 @@ function _egApplyCellCorruption(r, c, cfg) {
     const overlay = document.createElement('span');
     overlay.className = 'eg-corrupt-overlay';
     overlay.id = `eg-corrupt-${r}-${c}`;
-    overlay.textContent = '🚫';
+    overlay.textContent = '☣️';
     el.appendChild(overlay);
 
     const data = { timer: null, spreadTimer: null, pending: null, cfg };

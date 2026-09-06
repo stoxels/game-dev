@@ -438,6 +438,9 @@ const SFX = {
     // Placeholder: reuses the heart heal sound until a dedicated mana
     // pickup sound is added to audio/
     mana_pickup: 'audio/sfx/endgame/sfx_heart_heals.mp3',
+    // Placeholder: reuses the shield-break crack until a dedicated thunder
+    // crack is added to audio/ (plays for The Gust's lightning pre-warning)
+    gust_thunder: 'audio/sfx/items/sfx_shield_break.mp3',
     player_equip_pickup: 'audio/sfx/endgame/sfx_player_equip_pickup.mp3',
     player_equip_not_pickup: 'audio/sfx/endgame/sfx_player_equip_not_pickup.mp3',
     player_defeated: 'audio/sfx/endgame/sfx_player_defeated.mp3',
