@@ -1147,6 +1147,427 @@
     animation: eg-nk-wiggle 0.5s ease-in-out infinite alternate;
 }
 
+/* ── The Sprout: garden-siege visuals ─────────────────────────────── */
+/* Vine claiming a cell: grows in, sways, withers out. */
+.eg-sprout-vine {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    z-index: 5; pointer-events: none;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.28), rgba(74, 222, 128, 0.06) 70%, transparent);
+    text-shadow: 0 0 6px rgba(74, 222, 128, 0.9);
+    animation: eg-sprout-vine-grow 0.35s ease-out, eg-sprout-vine-sway 2.4s ease-in-out 0.35s infinite alternate;
+}
+.eg-sprout-vine.prune {
+    animation: eg-sprout-vine-prune 0.24s ease-in forwards;
+}
+@keyframes eg-sprout-vine-grow {
+    from { transform: scale(0.2); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+@keyframes eg-sprout-vine-sway {
+    from { transform: rotate(-4deg) scale(1); }
+    to { transform: rotate(4deg) scale(1.05); }
+}
+@keyframes eg-sprout-vine-prune {
+    to { transform: scale(0.1) rotate(30deg); opacity: 0; }
+}
+/* Puffball spore drifting across the screen. */
+.eg-sprout-spore {
+    position: fixed; left: 0; top: 0; z-index: 9002;
+    font-size: 1.05rem; pointer-events: none;
+    filter: drop-shadow(0 0 7px rgba(134, 239, 172, 0.85));
+    animation: eg-sprout-spore-pulse 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-sprout-spore-pulse {
+    from { transform-origin: center; opacity: 0.75; }
+    to { opacity: 1; }
+}
+/* Bramble Wall: thorned strips along the grid edges. */
+.eg-sprout-bramble {
+    position: fixed; z-index: 9002; pointer-events: none;
+    background:
+        repeating-linear-gradient(90deg,
+            rgba(22, 101, 52, 0.95) 0 10px, rgba(74, 222, 128, 0.9) 10px 14px,
+            rgba(21, 128, 61, 0.95) 14px 24px, rgba(134, 239, 172, 0.85) 24px 27px);
+    border-radius: 6px;
+    box-shadow: 0 0 14px rgba(74, 222, 128, 0.55), inset 0 0 8px rgba(22, 101, 52, 0.9);
+    animation: eg-sprout-bramble-grow 0.5s ease-out;
+}
+@keyframes eg-sprout-bramble-grow {
+    from { transform: scaleY(0.2); opacity: 0; }
+    to { transform: scaleY(1); opacity: 1; }
+}
+/* Root tendrils: thin thorned roots growing from the bramble strips into
+   the outermost ring of cells — makes "the wall seals these cells" literal. */
+.eg-sprout-conn {
+    position: fixed; z-index: 9001; pointer-events: none;
+    background: linear-gradient(180deg, rgba(22, 101, 52, 0.9), rgba(74, 222, 128, 0.75));
+    border-radius: 2px;
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.55);
+    transform-origin: center;
+    animation: eg-sprout-conn-grow 0.45s ease-out backwards;
+}
+@keyframes eg-sprout-conn-grow {
+    from { opacity: 0; scale: 0.15; }
+    to { opacity: 1; scale: 1; }
+}
+/* Thorn badge + green seal on each locked outer-ring cell. */
+.eg-sprout-ringlock {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; z-index: 6; pointer-events: none;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.22), rgba(21, 128, 61, 0.1) 65%, transparent);
+    box-shadow: inset 0 0 0 2px rgba(74, 222, 128, 0.55);
+    animation: eg-sprout-ringlock-pulse 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-sprout-ringlock-pulse {
+    from { box-shadow: inset 0 0 0 2px rgba(74, 222, 128, 0.35); opacity: 0.8; }
+    to { box-shadow: inset 0 0 0 3px rgba(134, 239, 172, 0.85); opacity: 1; }
+}
+/* A thorned whip lashing outward from a bramble edge. */
+.eg-sprout-whip {
+    position: fixed; left: 0; top: 0; z-index: 9003; pointer-events: none;
+    height: 9px;
+    border-radius: 0 5px 5px 0;
+    background: linear-gradient(90deg, rgba(22, 101, 52, 0.95), rgba(74, 222, 128, 0.9) 60%, rgba(190, 242, 100, 0.95));
+    box-shadow: 0 0 9px rgba(74, 222, 128, 0.7);
+}
+/* Pre-lash tell: a coiled thorn nub sits at each lash point until the
+   whip's moment arrives, so every lash has a visible origin telegraph. */
+.eg-sprout-whip.coiled {
+    width: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(190, 242, 100, 0.95), rgba(22, 101, 52, 0.95) 70%);
+    animation: eg-sprout-coil 1s ease-in-out infinite alternate;
+}
+@keyframes eg-sprout-coil {
+    from { box-shadow: 0 0 4px rgba(74, 222, 128, 0.5); opacity: 0.75; }
+    to { box-shadow: 0 0 11px rgba(190, 242, 100, 0.9); opacity: 1; }
+}
+
+/* ── The Bumper: carnival ring ─────────────────────────────────────── */
+/* Pinball-table side rails: frame the arena so the carnival theme reads
+   even between set-pieces. Pure decoration — sits under every hazard. */
+.eg-bump-rail {
+    position: fixed; z-index: 8990; pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(120, 53, 15, 0.0), rgba(120, 53, 15, 0.55) 30%, rgba(69, 26, 3, 0.65)),
+        linear-gradient(180deg, rgba(250, 204, 21, 0.0), rgba(250, 204, 21, 0.28) 50%, rgba(250, 204, 21, 0.0));
+    box-shadow: inset 0 0 0 2px rgba(250, 204, 21, 0.45), 0 0 14px rgba(250, 204, 21, 0.22);
+}
+.eg-bump-rail.left { left: 0; top: 0; bottom: 0; width: 26px; border-radius: 0 10px 10px 0; }
+.eg-bump-rail.right { right: 0; top: 0; bottom: 0; width: 26px; border-radius: 10px 0 0 10px; }
+.eg-bump-rail.top {
+    left: 0; right: 0; top: 0; height: 18px;
+    border-radius: 0 0 12px 12px;
+    background:
+        linear-gradient(180deg, rgba(69, 26, 3, 0.6), rgba(120, 53, 15, 0.5) 40%, rgba(120, 53, 15, 0.0)),
+        linear-gradient(90deg, rgba(250, 204, 21, 0.0), rgba(250, 204, 21, 0.28) 50%, rgba(250, 204, 21, 0.0));
+    box-shadow: inset 0 -2px 0 rgba(250, 204, 21, 0.45), 0 0 12px rgba(250, 204, 21, 0.2);
+}
+/* Lane chevrons on the side rails — classic pinball shooter-lane arrows. */
+.eg-bump-rail.left::after, .eg-bump-rail.right::after {
+    content: '▲▼';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.65rem; letter-spacing: 2px;
+    color: rgba(253, 224, 71, 0.65);
+    text-shadow: 0 0 6px rgba(250, 204, 21, 0.8);
+    writing-mode: vertical-rl;
+}
+/* TILT: the whole table flashes angry red while the flippers rage. */
+.eg-bump-rail.tilt {
+    box-shadow: inset 0 0 0 2px rgba(248, 113, 113, 0.7), 0 0 18px rgba(239, 68, 68, 0.55);
+    animation: eg-bump-rail-tilt 0.4s ease-in-out infinite alternate;
+}
+@keyframes eg-bump-rail-tilt {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.5) saturate(1.4); }
+}
+/* Roaming carnival bumper: glossy golden dome */
+.eg-bump-bumper {
+    position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    width: 60px; height: 60px; font-size: 2.2rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(254, 240, 138, 0.5), rgba(250, 204, 21, 0.18) 55%, rgba(120, 53, 15, 0.35));
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(250, 204, 21, 0.85);
+    animation: eg-bump-pulse 0.7s ease-in-out infinite alternate;
+}
+@keyframes eg-bump-pulse {
+    from { filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.7)); }
+    to { filter: drop-shadow(0 0 16px rgba(253, 224, 71, 1)); }
+}
+/* TILT enrage: red-hot bumpers during the flipper frenzy */
+.eg-bump-bumper.tilt {
+    border-color: rgba(248, 113, 113, 0.95);
+    background: radial-gradient(circle at 35% 30%, rgba(254, 202, 202, 0.55), rgba(239, 68, 68, 0.3) 55%, rgba(127, 29, 29, 0.4));
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.9), inset 0 0 10px rgba(255, 200, 200, 0.3);
+    animation-duration: 0.3s;
+}
+/* Steel pinballs: glossy metal spheres */
+.eg-bump-ball {
+    position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    width: 52px; height: 52px; font-size: 2rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(248, 250, 252, 0.9), rgba(148, 163, 184, 0.45) 55%, rgba(30, 41, 59, 0.55));
+    box-shadow: 0 0 12px rgba(226, 232, 240, 0.75), inset -4px -6px 10px rgba(15, 23, 42, 0.5);
+}
+.eg-bump-ball.hot {
+    box-shadow: 0 0 18px rgba(253, 224, 71, 0.95), inset -4px -6px 10px rgba(120, 53, 15, 0.55);
+    filter: brightness(1.2);
+}
+/* Flipper arc band: dashed magenta warn → hot slap → fade */
+.eg-bump-flip {
+    position: fixed; z-index: 9002; pointer-events: none;
+    height: 44px;
+    border-radius: 22px;
+    background: linear-gradient(90deg, rgba(217, 70, 239, 0.12), rgba(217, 70, 239, 0.22));
+    border: 2px dashed rgba(232, 121, 249, 0.75);
+}
+.eg-bump-flip.hot {
+    background: linear-gradient(90deg, rgba(217, 70, 239, 0.5), rgba(244, 114, 182, 0.42));
+    border: 2px solid rgba(251, 207, 232, 0.95);
+    box-shadow: 0 0 22px rgba(217, 70, 239, 0.8);
+    animation: eg-bump-flip-flash 0.38s ease-out 1;
+}
+@keyframes eg-bump-flip-flash {
+    from { filter: brightness(2.1); }
+    to { filter: brightness(1); }
+}
+/* Bumper Slam: target-ring telegraph + impact core */
+.eg-bump-slam-ring {
+    position: fixed; z-index: 9005; pointer-events: none;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 3px dashed rgba(250, 204, 21, 0.9);
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.16), rgba(250, 204, 21, 0.04) 70%);
+    animation: eg-bump-ring-charge 1.05s ease-in-out infinite alternate;
+}
+.eg-bump-slam-ring.hot {
+    border: 4px solid rgba(254, 240, 138, 1);
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.42), rgba(250, 204, 21, 0.1) 70%);
+    box-shadow: 0 0 34px rgba(250, 204, 21, 0.95);
+    animation: none;
+}
+@keyframes eg-bump-ring-charge {
+    from { transform: translate(-50%, -50%) scale(1); opacity: 0.75; }
+    to { transform: translate(-50%, -50%) scale(1.09); opacity: 1; }
+}
+.eg-bump-slam-core {
+    position: fixed; z-index: 9006; pointer-events: none;
+    transform: translate(-50%, -50%);
+    font-size: 4.4rem;
+    animation: eg-bump-slam-pop 0.42s ease-out 1 forwards;
+}
+@keyframes eg-bump-slam-pop {
+    from { transform: translate(-50%, -50%) scale(0.4); }
+    60% { transform: translate(-50%, -50%) scale(1.25); filter: brightness(1.8); }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* ── The Centipede: colony siege ───────────────────────────────────── */
+/* Colony segments: the main body (head 🐛 + 🟤 chain). */
+.eg-cent-seg, .eg-cent-mini {
+    position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    width: 28px; height: 28px; font-size: 1.3rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 7px rgba(120, 53, 15, 0.9));
+}
+.eg-cent-seg:first-child, .eg-cent-mini:first-child { font-size: 1.7rem; }
+/* Molt mini: paler, faster-looking. */
+.eg-cent-mini {
+    filter: drop-shadow(0 0 7px rgba(190, 242, 100, 0.8));
+    opacity: 0.92;
+}
+/* Molt swell telegraph: every segment throbs before the split. */
+.eg-cent-seg.swell {
+    animation: eg-cent-swell 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-cent-swell {
+    from { filter: drop-shadow(0 0 6px rgba(120, 53, 15, 0.9)); }
+    to { filter: drop-shadow(0 0 20px rgba(244, 114, 182, 1)); transform: scale(1.25); }
+}
+/* Tunnel mound: rumbling dirt telegraph → bursting geyser → lingering bump. */
+.eg-cent-mound {
+    position: fixed; z-index: 9001; pointer-events: none;
+    transform: translate(-50%, -50%);
+    width: 116px; height: 116px; font-size: 1.6rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(120, 53, 15, 0.25), rgba(69, 26, 3, 0.4) 60%, transparent 70%);
+    border: 3px dashed rgba(180, 130, 60, 0.75);
+    animation: eg-cent-rumble 0.3s ease-in-out infinite alternate;
+}
+@keyframes eg-cent-rumble {
+    from { transform: translate(-50%, -50%) scale(0.94); opacity: 0.75; }
+    to { transform: translate(-50%, -50%) scale(1.06); opacity: 1; }
+}
+.eg-cent-mound.burst {
+    background: radial-gradient(circle, rgba(180, 130, 60, 0.55), rgba(120, 53, 15, 0.45) 55%, transparent 70%);
+    border: 3px solid rgba(214, 168, 100, 0.95);
+    box-shadow: 0 0 26px rgba(180, 130, 60, 0.8);
+    animation: none;
+}
+/* Exoskeleton chitin plates: spiraling shield emojis. */
+.eg-cent-shell {
+    position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    width: 32px; height: 32px; font-size: 1.5rem;
+    display: flex; align-items: center; justify-content: center;
+    filter: drop-shadow(0 0 8px rgba(214, 168, 100, 0.9));
+}
+/* Venom: target ring, flying blobs, lingering toxic pools. */
+.eg-cent-ring {
+    position: fixed; z-index: 9005; pointer-events: none;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 3px dashed rgba(163, 230, 53, 0.9);
+    background: radial-gradient(circle, rgba(163, 230, 53, 0.15), transparent 70%);
+    animation: eg-cent-ring-charge 1.05s ease-in-out infinite alternate;
+}
+@keyframes eg-cent-ring-charge {
+    from { transform: translate(-50%, -50%) scale(1); opacity: 0.75; }
+    to { transform: translate(-50%, -50%) scale(1.09); opacity: 1; }
+}
+.eg-cent-blob {
+    position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    width: 26px; height: 26px; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    filter: drop-shadow(0 0 8px rgba(163, 230, 53, 0.95));
+}
+.eg-cent-pool {
+    position: fixed; z-index: 9000; pointer-events: none;
+    transform: translate(-50%, -50%);
+    width: 92px; height: 52px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(163, 230, 53, 0.4), rgba(101, 163, 13, 0.25) 60%, transparent 75%);
+    border: 2px solid rgba(190, 242, 100, 0.6);
+    animation: eg-cent-pool-bubble 1.3s ease-in-out infinite alternate;
+}
+@keyframes eg-cent-pool-bubble {
+    from { opacity: 0.75; }
+    to { opacity: 1; filter: brightness(1.2); }
+}
+/* Stampede: full-screen lane band, dashed warn → hot dash. */
+.eg-cent-stampede {
+    position: fixed; left: 0; right: 0; z-index: 9002; pointer-events: none;
+    background: linear-gradient(180deg, rgba(120, 53, 15, 0.1), rgba(120, 53, 15, 0.26), rgba(120, 53, 15, 0.1));
+    border-top: 2px dashed rgba(214, 168, 100, 0.75);
+    border-bottom: 2px dashed rgba(214, 168, 100, 0.75);
+}
+.eg-cent-stampede.hot {
+    background: linear-gradient(180deg, rgba(120, 53, 15, 0.4), rgba(214, 168, 100, 0.34), rgba(120, 53, 15, 0.4));
+    border-top: 2px solid rgba(254, 240, 138, 0.98);
+    border-bottom: 2px solid rgba(254, 240, 138, 0.98);
+    box-shadow: 0 0 24px rgba(180, 130, 60, 0.85);
+    animation: eg-bump-flip-flash 0.4s ease-out 1;
+}
+/* Doom bud swelling over the grid before a bloom. */
+.eg-sprout-bud {
+    position: fixed; z-index: 9005; pointer-events: none;
+    filter: drop-shadow(0 0 14px rgba(244, 114, 182, 0.85));
+    animation: eg-sprout-bud-throb 0.7s ease-in-out infinite alternate;
+}
+@keyframes eg-sprout-bud-throb {
+    from { filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.7)); }
+    to { filter: drop-shadow(0 0 20px rgba(251, 207, 232, 0.95)); }
+}
+/* Pollen dust on a cell: clicking it bursts pollen around the player. */
+.eg-sprout-dust {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; z-index: 5; pointer-events: none;
+    background: radial-gradient(circle, rgba(253, 224, 71, 0.3), rgba(253, 224, 71, 0.05) 70%, transparent);
+    animation: eg-sprout-dust-in 0.3s ease-out;
+}
+/* About to clear: blink so waiting is a visible plan. */
+.eg-sprout-dust.expiring {
+    animation: eg-sprout-dust-blink 0.45s steps(2) infinite;
+}
+@keyframes eg-sprout-dust-blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.35; }
+    100% { opacity: 1; }
+}
+.eg-sprout-dust.fade { animation: eg-sprout-dust-out 0.3s ease-in forwards; }
+@keyframes eg-sprout-dust-in { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+@keyframes eg-sprout-dust-out { to { opacity: 0; transform: scale(0.6); } }
+/* Flying pollen motes after a bloom. */
+.eg-sprout-mote {
+    position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    font-size: 0.9rem;
+    filter: drop-shadow(0 0 6px rgba(253, 224, 71, 0.9));
+}
+/* Pollen burst puff around the player when dust is disturbed. */
+.eg-sprout-puff {
+    position: fixed; z-index: 9006; pointer-events: none;
+    width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(253, 224, 71, 0.55), rgba(253, 224, 71, 0.18) 55%, transparent 75%);
+    animation: eg-sprout-puff 0.6s ease-out forwards;
+}
+@keyframes eg-sprout-puff {
+    from { transform: scale(0.4); opacity: 1; }
+    to { transform: scale(1.6); opacity: 0; }
+}
+/* ── Vine Lunge (charge attack): telegraph band → hot whip → retract ──
+   A full-screen band through the player; the tendril graphic grows from
+   both ends toward the middle during the warn, then snaps hot and retracts. */
+.eg-sprout-lunge {
+    position: fixed; z-index: 9008; pointer-events: none;
+    border-radius: 28px;
+    overflow: hidden;
+    background:
+        repeating-linear-gradient(90deg,
+            rgba(22, 101, 52, 0.4) 0 16px, rgba(74, 222, 128, 0.42) 16px 24px,
+            rgba(21, 128, 61, 0.4) 24px 40px, rgba(134, 239, 172, 0.4) 40px 46px);
+    border: 2px dashed rgba(134, 239, 172, 0.75);
+    box-shadow: 0 0 16px rgba(74, 222, 128, 0.35), inset 0 0 18px rgba(22, 101, 52, 0.5);
+}
+/* Growing tendril tips during the telegraph. */
+.eg-sprout-lunge::before,
+.eg-sprout-lunge::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0;
+    width: 50%;
+    background: linear-gradient(90deg,
+        rgba(22, 101, 52, 0.95), rgba(74, 222, 128, 0.9) 65%, rgba(190, 242, 100, 0.95));
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.75);
+    animation: eg-sprout-lunge-grow 1.05s ease-in forwards;
+}
+.eg-sprout-lunge::before { left: 0; transform-origin: left center; border-radius: 0 28px 28px 0; }
+.eg-sprout-lunge::after { right: 0; transform-origin: right center; transform: scaleX(-1); border-radius: 0 28px 28px 0; }
+@keyframes eg-sprout-lunge-grow {
+    from { transform: scaleX(0.06); }
+    to { transform: scaleX(1); }
+}
+.eg-sprout-lunge::after { animation-name: eg-sprout-lunge-grow-flip; }
+@keyframes eg-sprout-lunge-grow-flip {
+    from { transform: scaleX(-0.06); }
+    to { transform: scaleX(-1); }
+}
+/* Strike: the whole tendril snaps hot. Deliberately transform-free —
+   a vertical lunge's inline rotate(90deg) must survive the animation. */
+.eg-sprout-lunge.hit {
+    border-style: solid;
+    border-color: rgba(190, 242, 100, 0.95);
+    box-shadow: 0 0 26px rgba(163, 230, 53, 0.9), 0 0 54px rgba(74, 222, 128, 0.5), inset 0 0 22px rgba(190, 242, 100, 0.55);
+    animation: eg-sprout-lunge-strike 0.35s ease-out;
+}
+@keyframes eg-sprout-lunge-strike {
+    0% { filter: brightness(1.9) saturate(1.2); }
+    100% { filter: brightness(1.25); }
+}
+/* Retract: fade + desaturate. */
+.eg-sprout-lunge.fade {
+    transition: opacity 0.7s ease-in, filter 0.7s ease-in;
+    opacity: 0;
+    filter: brightness(0.6) saturate(0.5);
+}
+
 /* Wander puddles */
 .eg-nk-puddle {
     position: fixed; left: 0; top: 0;
@@ -1154,6 +1575,202 @@
     border-radius: 50%;
     background: radial-gradient(circle, rgba(186,230,253,0.4), rgba(56,189,248,0.3) 60%, transparent 75%);
     border: 2px solid rgba(125, 211, 252, 0.8);
+}
+
+/* ── The Puddle: rain / rising water / fountains / air bubbles ───── */
+/* The flood: translucent water with a bright animated surface line. */
+.eg-pud-water {
+    position: fixed; left: 0; bottom: 0; width: 100vw; height: 0;
+    pointer-events: none; z-index: 9002;
+    background: linear-gradient(180deg,
+        rgba(125, 211, 252, 0.42),
+        rgba(14, 116, 144, 0.62) 26%,
+        rgba(8, 51, 68, 0.82) 70%,
+        rgba(4, 32, 44, 0.9));
+    border-top: 3px solid rgba(186, 230, 253, 0.95);
+    box-shadow: 0 -2px 18px rgba(125, 211, 252, 0.55), 0 -8px 28px rgba(56, 189, 248, 0.3);
+}
+.eg-pud-water::before {
+    /* shimmering surface waves */
+    content: '';
+    position: absolute; left: -50%; top: -6px; width: 200%; height: 12px;
+    background: radial-gradient(ellipse 46px 9px at 50% 50%, rgba(224, 242, 254, 0.85) 0%, rgba(224, 242, 254, 0) 70%);
+    background-size: 92px 12px;
+    animation: eg-pud-surface 2.4s linear infinite;
+}
+@keyframes eg-pud-surface {
+    from { transform: translateX(0); }
+    to { transform: translateX(92px); }
+}
+/* Rain drop: bright streak with a soft cyan glow. */
+.eg-pud-drop {
+    position: fixed; left: 0; top: 0; z-index: 9004;
+    width: 4px; height: 19px; margin: -9.5px 0 0 -2px;
+    pointer-events: none;
+    border-radius: 3px;
+    background: linear-gradient(180deg, rgba(125, 211, 252, 0.55), rgba(224, 242, 254, 1));
+    filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.95)) drop-shadow(0 0 9px rgba(125, 211, 252, 0.7));
+}
+/* Ground splash (drop hitting dry ground — no water yet). */
+.eg-pud-splash {
+    position: fixed; z-index: 9003; pointer-events: none;
+    width: 26px; height: 9px; margin: -4px 0 0 -13px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(224, 242, 254, 0.9), rgba(125, 211, 252, 0.25) 70%, transparent);
+    animation: eg-pud-splash 0.5s ease-out forwards;
+}
+@keyframes eg-pud-splash {
+    from { transform: scale(0.3); opacity: 1; }
+    to { transform: scale(1.7); opacity: 0; }
+}
+/* Fountain anchor sits at the water surface; the jet is drawn upward. */
+.eg-pud-fountain {
+    position: fixed; z-index: 9005; pointer-events: none;
+    width: 0; height: 0;
+}
+.eg-pud-fountain-jet {
+    position: absolute; left: -6px; bottom: 0;
+    width: 12px; height: 0;
+    border-radius: 6px;
+    background: linear-gradient(180deg,
+        rgba(240, 249, 255, 0.98),
+        rgba(186, 230, 253, 0.9) 40%,
+        rgba(56, 189, 248, 0.55) 80%,
+        rgba(56, 189, 248, 0));
+    box-shadow: 0 0 10px rgba(125, 211, 252, 0.75), 0 0 22px rgba(56, 189, 248, 0.35);
+    clip-path: polygon(38% 0, 62% 0, 88% 100%, 12% 100%);
+    filter: brightness(1.12);
+}
+/* Crown canopy: wide lacy umbrella flaring open above the stem (the
+   classic slow-motion droplet-impact splash). Anchored centered on the
+   stem head via left offset + JS-driven top; scales in as it opens. */
+.eg-pud-fountain-crown {
+    position: absolute; left: -48px; width: 96px; height: 44px;
+    pointer-events: none;
+    opacity: 0;
+    border-radius: 50%;
+    background:
+        radial-gradient(ellipse 50% 38% at 50% 46%, rgba(240, 249, 255, 0.55), rgba(240, 249, 255, 0) 70%),
+        radial-gradient(ellipse 46% 30% at 50% 50%, rgba(186, 230, 253, 0.45), rgba(186, 230, 253, 0) 72%);
+    border: 2px solid rgba(224, 242, 254, 0.6);
+    border-bottom-color: rgba(224, 242, 254, 0.1);
+    box-shadow: 0 0 18px rgba(186, 230, 253, 0.4), inset 0 2px 10px rgba(240, 249, 255, 0.55);
+}
+/* Droplets draping off the canopy rim. */
+.eg-pud-drape {
+    position: absolute; top: 78%;
+    width: 5px; height: 7px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(240, 249, 255, 0.95), rgba(186, 230, 253, 0.6));
+    opacity: 0;
+    animation: eg-pud-drape 0.75s ease-in infinite;
+}
+.eg-pud-drape.d1 { left: 6%;  --dx: -26px; animation-delay: 0s; }
+.eg-pud-drape.d2 { left: 26%; --dx: -10px; animation-delay: 0.12s; }
+.eg-pud-drape.d3 { left: 46%; --dx: 4px;   animation-delay: 0.24s; }
+.eg-pud-drape.d4 { left: 66%; --dx: 16px;  animation-delay: 0.36s; }
+.eg-pud-drape.d5 { left: 86%; --dx: 30px;  animation-delay: 0.48s; }
+@keyframes eg-pud-drape {
+    0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+    20% { opacity: 0.95; }
+    100% { transform: translate(var(--dx, 12px), 26px) scale(0.5); opacity: 0; }
+}
+/* Air bubble: glossy sphere with highlight, subtle wobble. */
+.eg-pud-bubble {
+    position: fixed; left: 0; top: 0; z-index: 9003;
+    width: 54px; height: 54px;
+    pointer-events: none;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0 8%, rgba(255, 255, 255, 0) 18%),
+        radial-gradient(circle at 68% 76%, rgba(186, 230, 253, 0.5) 0 12%, rgba(255, 255, 255, 0) 30%),
+        radial-gradient(circle, rgba(224, 242, 254, 0.16), rgba(125, 211, 252, 0.30) 62%, rgba(56, 189, 248, 0.42) 88%);
+    border: 1.5px solid rgba(224, 242, 254, 0.85);
+    box-shadow: inset -4px -6px 12px rgba(255, 255, 255, 0.4), 0 0 12px rgba(125, 211, 252, 0.5);
+    animation: eg-pud-bubble-wobble 2.2s ease-in-out infinite alternate;
+}
+@keyframes eg-pud-bubble-wobble {
+    from { border-radius: 50% 50% 48% 52% / 52% 48% 52% 48%; }
+    to { border-radius: 48% 52% 50% 50% / 48% 52% 48% 52%; }
+}
+/* Pop ring when a bubble bursts. */
+.eg-pud-pop {
+    position: fixed; z-index: 9004; pointer-events: none;
+    width: 54px; height: 54px; margin: -27px 0 0 -27px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(224, 242, 254, 0.95);
+    animation: eg-pud-pop 0.45s ease-out forwards;
+}
+@keyframes eg-pud-pop {
+    from { transform: scale(0.7); opacity: 1; }
+    to { transform: scale(1.9); opacity: 0; }
+}
+/* Bubble shrapnel flying off to the screen sides. */
+.eg-pud-shard {
+    position: fixed; left: 0; top: 0; z-index: 9004;
+    width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, rgba(255,255,255,0.9) 0 12%, rgba(224,242,254,0.4) 40%, rgba(125,211,252,0.6));
+    border: 1px solid rgba(224, 242, 254, 0.9);
+    filter: drop-shadow(0 0 4px rgba(125, 211, 252, 0.8));
+}
+
+/* ── Gate wave: curling crest that sweeps the flood surface ──
+   Outer = position + flip (JS sets left/top/height per band); inner = the
+   crest art. JS anchors the top at the WATER SURFACE — translateY(-100%)
+   lifts the whole crest box ABOVE the surface so it looms over the grid
+   (without it, the box extends down into the flood and is invisible). */
+.eg-pud-wave {
+    position: fixed; z-index: 9006; pointer-events: none;
+    left: 0; top: 0; width: 96px;
+    transform: translateY(-100%);
+    transform-origin: 50% 100%;
+}
+.eg-pud-wave.flip { transform: scaleX(-1) translateY(-100%); }  /* sweeping right→left */
+.eg-pud-wave-inner {
+    position: absolute; left: 0; bottom: 0;
+    width: 100%; height: 100%;
+}
+.eg-pud-wave-inner::before {           /* the curling barrel of the wave */
+    content: ''; position: absolute; inset: 0;
+    border-radius: 100% 18% 0 0 / 95% 22% 0 0;
+    background:
+        radial-gradient(circle at 22% 30%, rgba(240, 249, 255, 0.55), rgba(240, 249, 255, 0) 55%),
+        linear-gradient(295deg, rgba(240, 249, 255, 0.95) 0%, rgba(186, 230, 253, 0.85) 30%, rgba(56, 189, 248, 0.7) 62%, rgba(14, 116, 144, 0.75));
+    box-shadow: 0 0 26px rgba(125, 211, 252, 0.55), inset 0 0 22px rgba(240, 249, 255, 0.5);
+    border: 2px solid rgba(224, 242, 254, 0.85);
+    border-bottom: none;
+    animation: eg-pud-wave-curl 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-pud-wave-curl {
+    from { border-radius: 100% 18% 0 0 / 95% 22% 0 0; }
+    to { border-radius: 88% 26% 0 0 / 84% 30% 0 0; }
+}
+.eg-pud-wave-inner::after {            /* foam lip curling forward */
+    content: ''; position: absolute;
+    left: -8px; top: 4%; width: 34px; height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(240, 249, 255, 0.95), rgba(224, 242, 254, 0.35) 65%, transparent);
+    filter: blur(0.5px);
+}
+/* Loom phase: crest charges at the screen edge, growing and boiling. */
+.eg-pud-wave:not(.sweep) .eg-pud-wave-inner {
+    animation: eg-pud-wave-loom 0.35s ease-in-out infinite alternate;
+}
+@keyframes eg-pud-wave-loom {
+    from { transform: scale(0.55); opacity: 0.55; }
+    to { transform: scale(1); opacity: 0.95; }
+}
+/* Foam spray kicked up along the travelling crest (JS-spawned). */
+.eg-pud-wave-spray {
+    position: fixed; z-index: 9007; pointer-events: none;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(240, 249, 255, 0.95), rgba(186, 230, 253, 0.5) 70%, transparent);
+    animation: eg-pud-wave-spray 0.5s ease-out forwards;
+}
+@keyframes eg-pud-wave-spray {
+    from { transform: translateY(0) scale(1); opacity: 1; }
+    to { transform: translateY(-34px) scale(0.3); opacity: 0; }
 }
 
 /* Fireflies */
@@ -2867,3 +3484,268 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     color: #7dd3fc; text-shadow: 0 1px 3px #000;
     text-align: center; margin-top: 2px;
 }
+
+/* ── The Striker: football pitch ───────────────────────────────────── */
+/* The persistent match ball: glossy football with a rolling spin. */
+.eg-strk-ball {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    width: 110px; height: 110px; font-size: 84px; line-height: 110px;
+    text-align: center; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6));
+    will-change: transform;
+}
+.eg-strk-ball.tackle {
+    animation: eg-strk-tackle-flash 0.26s ease-out 1;
+}
+@keyframes eg-strk-tackle-flash {
+    0% { filter: drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
+    40% { filter: drop-shadow(0 0 26px rgba(255,255,255,0.95)) brightness(1.6); }
+    100% { filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6)); }
+}
+/* Corner flag telegraph: plants with a pop, waves while volleys fire. */
+.eg-strk-corner {
+    position: fixed; z-index: 9004; pointer-events: none;
+    font-size: 34px; filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.8));
+    animation: eg-strk-flag-pop 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) 1, eg-strk-flag-wave 0.7s ease-in-out 0.3s infinite alternate;
+}
+@keyframes eg-strk-flag-pop { from { transform: scale(0.2); } to { transform: scale(1); } }
+@keyframes eg-strk-flag-wave { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+/* Crossed balls from a corner volley. */
+.eg-strk-cross {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    font-size: 26px; filter: drop-shadow(0 0 6px rgba(255,255,255,0.55));
+    will-change: transform;
+}
+/* Penalty goal frame + penalty spot. */
+.eg-strk-goal {
+    position: fixed; z-index: 9004; pointer-events: none;
+    font-size: 150px; line-height: 260px; text-align: center;
+    width: 190px; filter: drop-shadow(0 0 16px rgba(96, 165, 250, 0.7));
+    animation: eg-strk-goal-in 0.4s cubic-bezier(0.2, 1.4, 0.4, 1) 1;
+}
+.eg-strk-goal.flip { transform: scaleX(-1); }
+@keyframes eg-strk-goal-in { from { transform: translateX(-40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.eg-strk-spot {
+    position: fixed; z-index: 9004; pointer-events: none;
+    font-size: 26px; opacity: 0.85;
+}
+/* Penalty target ring: grows while aiming, the shot fires at its mark. */
+.eg-strk-shotring {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+    border: 3px solid rgba(248, 113, 113, 0.9);
+    box-shadow: 0 0 18px rgba(248, 113, 113, 0.5), inset 0 0 14px rgba(248, 113, 113, 0.25);
+    animation: eg-strk-shotring-in 0.25s ease-out 1;
+}
+@keyframes eg-strk-shotring-in { from { transform: scale(1.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* The penalty shot ball in flight. */
+.eg-strk-shot {
+    position: fixed; left: 0; top: 0; z-index: 9006; pointer-events: none;
+    font-size: 30px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7));
+    will-change: transform;
+}
+/* Free-kick defender wall (cones) + dotted arc + landing mark. */
+.eg-strk-fk-wall {
+    position: fixed; inset: 0; z-index: 9004; pointer-events: none;
+}
+.eg-strk-cone {
+    position: absolute; font-size: 26px;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55));
+    animation: eg-strk-cone-in 0.25s ease-out 1;
+}
+@keyframes eg-strk-cone-in { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.eg-strk-fkdot {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%;
+    background: rgba(254, 240, 138, 0.95); box-shadow: 0 0 8px rgba(254, 240, 138, 0.8);
+    animation: eg-strk-dot-pulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-strk-dot-pulse { from { opacity: 0.45; transform: scale(0.75); } to { opacity: 1; transform: scale(1.15); } }
+.eg-strk-fkmark {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 50%;
+    border: 3px dashed rgba(254, 240, 138, 0.9);
+    box-shadow: 0 0 16px rgba(254, 240, 138, 0.45);
+}
+.eg-strk-fkball {
+    position: fixed; left: 0; top: 0; z-index: 9006; pointer-events: none;
+    font-size: 30px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+    transition: opacity 0.1s linear;
+}
+
+/* ── The Thwomp: fortress siege ───────────────────────────────────── */
+/* The hovering block: big angry stone face bobbing over the arena. */
+.eg-thw-block {
+    position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    width: 124px; height: 124px; font-size: 92px; line-height: 124px;
+    text-align: center;
+    filter: drop-shadow(0 10px 22px rgba(0,0,0,0.65));
+    animation: eg-thw-bob 2.6s ease-in-out infinite alternate;
+    will-change: transform;
+}
+@keyframes eg-thw-bob { from { filter: drop-shadow(0 8px 16px rgba(0,0,0,0.55)); } to { filter: drop-shadow(0 16px 30px rgba(0,0,0,0.75)); } }
+.eg-thw-block.crash { animation: none; }
+/* Telegraph rings: dust ring for stomps (big) and minis (small). */
+.eg-thw-ring {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    margin: 0 0 0 0; border-radius: 50%;
+    border: 3px dashed rgba(214, 168, 100, 0.85);
+    background: radial-gradient(circle, rgba(146, 64, 14, 0.28), rgba(146, 64, 14, 0.08) 65%, transparent);
+    animation: eg-thw-ring-in 0.3s ease-out 1;
+}
+.eg-thw-ring.mini { border-width: 2px; border-color: rgba(214, 168, 100, 0.7); }
+@keyframes eg-thw-ring-in { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.eg-thw-ring.hot {
+    border-style: solid; border-color: rgba(254, 240, 138, 0.95);
+    background: radial-gradient(circle, rgba(180, 83, 9, 0.5), rgba(180, 83, 9, 0.2) 65%, transparent);
+    box-shadow: 0 0 26px rgba(180, 130, 60, 0.9);
+}
+/* Rubble warning marks before a stone falls. */
+.eg-thw-mark {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    width: 88px; height: 88px; border-radius: 14px;
+    border: 3px dashed rgba(168, 162, 158, 0.9);
+    background: radial-gradient(circle, rgba(120, 113, 108, 0.32), rgba(120, 113, 108, 0.08) 70%, transparent);
+    animation: eg-thw-mark-throb 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-thw-mark-throb { from { opacity: 0.55; } to { opacity: 1; } }
+/* A falling stone at impact + lingering aftershock dust cloud. */
+.eg-thw-stone {
+    position: fixed; z-index: 9006; pointer-events: none;
+    font-size: 56px; margin: -28px 0 0 -28px;
+    filter: drop-shadow(0 0 14px rgba(255,255,255,0.6));
+    animation: eg-thw-stone-drop 0.3s cubic-bezier(0.5, 0, 1, 1) 1;
+}
+@keyframes eg-thw-stone-drop { from { transform: translateY(-160px) scale(1.1); opacity: 0.4; } to { transform: translateY(0) scale(1); opacity: 1; } }
+.eg-thw-cloud {
+    position: fixed; z-index: 9004; pointer-events: none;
+    width: 96px; height: 60px; margin: -30px 0 0 -48px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(214, 211, 209, 0.4), rgba(214, 211, 209, 0.12) 60%, transparent);
+    animation: eg-thw-cloud-fade 2.6s ease-out forwards;
+}
+@keyframes eg-thw-cloud-fade { from { opacity: 1; transform: scale(0.8); } to { opacity: 0; transform: scale(1.5); } }
+/* Mini-thwomps: small angry blocks hopping after you. */
+.eg-thw-mini {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    font-size: 38px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+    will-change: transform;
+}
+/* Grand slam: stalking shadow mark + the crashing block + shockwave. */
+.eg-thw-gs-mark {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    border-radius: 16px;
+    border: 3px dashed rgba(127, 29, 29, 0.85);
+    background: radial-gradient(circle, rgba(127, 29, 29, 0.3), rgba(127, 29, 29, 0.08) 70%, transparent);
+}
+.eg-thw-gs-mark.lock {
+    border-style: solid; border-color: rgba(248, 113, 113, 0.95);
+    box-shadow: 0 0 20px rgba(248, 113, 113, 0.6);
+    animation: eg-thw-gs-lock 0.28s ease-out 1;
+}
+@keyframes eg-thw-gs-lock { from { transform: scale(1.25); } to { transform: scale(1); } }
+.eg-thw-gs-mark.hot {
+    background: radial-gradient(circle, rgba(153, 27, 27, 0.5), rgba(153, 27, 27, 0.2) 70%, transparent);
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.85);
+}
+.eg-thw-crash {
+    position: fixed; left: 0; top: 0; z-index: 9006; pointer-events: none;
+    width: 124px; height: 124px; font-size: 92px; line-height: 124px;
+    text-align: center;
+    filter: drop-shadow(0 0 24px rgba(0,0,0,0.8));
+    will-change: transform, top;
+}
+.eg-thw-shock {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
+    border: 4px solid rgba(254, 240, 138, 0.9);
+    animation: eg-thw-shock 0.55s ease-out 1 forwards;
+}
+@keyframes eg-thw-shock {
+    from { transform: scale(0.4); opacity: 1; }
+    to { transform: scale(calc(1 + var(--eg-thw-pow, 0.5) * 3)); opacity: 0; width: var(--eg-thw-r, 120px); height: var(--eg-thw-r, 120px); margin: calc(var(--eg-thw-r, 120px) / -2) 0 0 calc(var(--eg-thw-r, 120px) / -2); }
+}
+
+/* ── The Coil: serpent pit ─────────────────────────────────────────── */
+/* The coiled maw: a rotating spiral of serpent coils with a head. */
+.eg-coil-maw {
+    position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    width: 112px; height: 112px;
+    will-change: transform;
+}
+.eg-coil-loop {
+    position: absolute; left: 50%; top: 50%;
+    font-size: 30px; margin: -15px 0 0 -15px;
+    transform: rotate(calc(var(--i) * 60deg)) translateY(-38px);
+    animation: eg-coil-spin 5.5s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.7));
+}
+@keyframes eg-coil-spin { from { transform: rotate(calc(var(--i) * 60deg)) translateY(-38px) rotate(0deg); } to { transform: rotate(calc(var(--i) * 60deg)) translateY(-38px) rotate(360deg); } }
+.eg-coil-head {
+    position: absolute; left: 50%; top: 50%;
+    font-size: 40px; margin: -20px 0 0 -20px;
+    filter: drop-shadow(0 0 12px rgba(244, 114, 182, 0.85));
+    animation: eg-coil-head-sway 1.4s ease-in-out infinite alternate;
+}
+@keyframes eg-coil-head-sway { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+/* Seeker serpents + fuse/boom states. */
+.eg-coil-snake {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    font-size: 40px;
+    animation: eg-coil-wiggle 0.45s ease-in-out infinite alternate;
+    will-change: transform;
+}
+@keyframes eg-coil-wiggle { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(40deg) brightness(1.25); } }
+.eg-coil-snake.fuse { animation: eg-coil-fuse-blink 0.18s steps(2) infinite !important; }
+@keyframes eg-coil-fuse-blink { 0% { filter: brightness(1); } 100% { filter: brightness(2.4) saturate(0.2); } }
+.eg-coil-snake.boom { filter: brightness(2.6) drop-shadow(0 0 24px rgba(216, 180, 254, 1)) !important; }
+/* Venom trail: glowing poison droplets that fade out. */
+.eg-coil-trail {
+    position: fixed; z-index: 9003; pointer-events: none;
+    width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(134, 239, 172, 0.5), rgba(134, 239, 172, 0.15) 60%, transparent);
+    border: 1px solid rgba(134, 239, 172, 0.35);
+    animation: eg-coil-trail-in 0.25s ease-out 1;
+}
+.eg-coil-trail.fade { animation: eg-coil-trail-out 0.35s ease-in forwards; }
+@keyframes eg-coil-trail-in { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes eg-coil-trail-out { to { transform: scale(0.5); opacity: 0; } }
+/* Constrictor contracting rings. */
+.eg-coil-ring {
+    position: fixed; left: 0; top: 0; z-index: 9005; pointer-events: none;
+    border-radius: 50%;
+    border: 4px solid rgba(192, 132, 252, 0.85);
+    box-shadow: 0 0 22px rgba(167, 139, 250, 0.5), inset 0 0 18px rgba(167, 139, 250, 0.25);
+    will-change: width, height, left, top;
+}
+/* Serpent tide: edge band telegraph + chargers. */
+.eg-coil-tideband {
+    position: fixed; left: 0; right: 0; z-index: 9004; pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgba(167, 139, 250, 0.22), transparent);
+    border-top: 2px dashed rgba(216, 180, 254, 0.8);
+    border-bottom: 2px dashed rgba(216, 180, 254, 0.8);
+}
+.eg-coil-tideband.hot {
+    border-style: solid;
+    background: linear-gradient(180deg, transparent, rgba(126, 34, 206, 0.4), transparent);
+    box-shadow: 0 0 26px rgba(167, 139, 250, 0.8);
+}
+.eg-coil-charger {
+    position: fixed; left: 0; top: 0; z-index: 9006; pointer-events: none;
+    font-size: 34px;
+    filter: drop-shadow(0 0 8px rgba(216, 180, 254, 0.9));
+    will-change: transform;
+}
+/* Cobra strike: hood-shadow lane + lash. */
+.eg-coil-cobra {
+    position: fixed; left: 0; right: 0; z-index: 9005; pointer-events: none;
+    background: linear-gradient(180deg, rgba(88, 28, 135, 0.12), rgba(88, 28, 135, 0.3), rgba(88, 28, 135, 0.12));
+    border-top: 2px dashed rgba(216, 180, 254, 0.8);
+    border-bottom: 2px dashed rgba(216, 180, 254, 0.8);
+}
+.eg-coil-cobra.strike {
+    background: linear-gradient(180deg, rgba(126, 34, 206, 0.4), rgba(216, 180, 254, 0.35), rgba(126, 34, 206, 0.4));
+    border-top: 2px solid rgba(244, 114, 182, 0.98);
+    border-bottom: 2px solid rgba(244, 114, 182, 0.98);
+    box-shadow: 0 0 30px rgba(192, 132, 252, 0.9);
+    animation: eg-coil-lash 0.38s ease-out 1;
+}
+@keyframes eg-coil-lash { 0% { filter: brightness(2.2); } 100% { filter: brightness(1); } }

@@ -260,6 +260,41 @@ function _egBossCleanup(monsterId) {
     if (monsterId.startsWith('boss_marksman') && typeof _egMarksmanTeardown === 'function') {
         _egMarksmanTeardown();
     }
+    // The Puddle: persistent weather arena (rain, rising water, fountains,
+    // air bubbles + burst shrapnel).
+    if (monsterId.startsWith('boss_puddle') && typeof _egPuddleTeardown === 'function') {
+        _egPuddleTeardown();
+    }
+    // The Sprout: persistent garden arena (root vines, spore drift, bramble
+    // wall whips, doom bud blooms + pollen dust).
+    if (monsterId.startsWith('boss_sprout') && typeof _egSproutTeardown === 'function') {
+        _egSproutTeardown();
+    }
+    // The Bumper: persistent carnival arena (roaming bumpers, pinball
+    // shower, flipper frenzy bands, multiball rush + slam rings).
+    if (monsterId.startsWith('boss_bumper') && typeof _egBumperTeardown === 'function') {
+        _egBumperTeardown();
+    }
+    // The Centipede: persistent colony arena (winding body, molt mini,
+    // tunnel mounds, exoskeleton plates, venom blobs + pools).
+    if (monsterId.startsWith('boss_centipede') && typeof _egCentipedeTeardown === 'function') {
+        _egCentipedeTeardown();
+    }
+    // The Striker: persistent pitch arena (homing match ball, corner-kick
+    // barrage, penalty shootout, free-kick charge attack).
+    if (monsterId.startsWith('boss_striker') && typeof _egStrikerTeardown === 'function') {
+        _egStrikerTeardown();
+    }
+    // The Thwomp: persistent fortress arena (hovering block, quake stomps,
+    // ceiling collapse, mini-thwomp siege, grand slam charge attack).
+    if (monsterId.startsWith('boss_thwomp') && typeof _egThwompTeardown === 'function') {
+        _egThwompTeardown();
+    }
+    // The Coil: persistent serpent nest (coiled maw, seeker serpents,
+    // venom trails, constrictor rings, serpent tide, cobra strike).
+    if (monsterId.startsWith('boss_coil') && typeof _egCoilTeardown === 'function') {
+        _egCoilTeardown();
+    }
 }
 
 

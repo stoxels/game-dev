@@ -441,6 +441,18 @@ const SFX = {
     // Placeholder: reuses the shield-break crack until a dedicated thunder
     // crack is added to audio/ (plays for The Gust's lightning pre-warning)
     gust_thunder: 'audio/sfx/items/sfx_shield_break.mp3',
+    pud_pop: 'audio/sfx/passive/sfx_sample_efficiency_pop.mp3',
+    pud_fountain: 'audio/sfx/items/sfx_tidal_wave.mp3',
+    sprout_prune: 'audio/sfx/passive/sfx_sample_efficiency_pop.mp3',
+    sprout_thorn: 'audio/sfx/classes/sfx_diagonal_strike.mp3',
+    sprout_bloom: 'audio/sfx/items/sfx_tidal_wave.mp3',
+    bump_thwack: 'audio/sfx/classes/sfx_diagonal_strike.mp3',
+    cent_skitter: 'audio/sfx/classes/sfx_diagonal_strike.mp3',
+    thwomp_slam: 'audio/sfx/classes/sfx_diagonal_strike.mp3',
+    coil_hiss: 'audio/sfx/classes/sfx_diagonal_strike.mp3',
+    striker_kick: 'audio/sfx/classes/sfx_diagonal_strike.mp3',
+    cent_venom: 'audio/sfx/items/sfx_tidal_wave.mp3',
+    pud_wave: 'audio/sfx/items/sfx_tidal_wave.mp3',
     player_equip_pickup: 'audio/sfx/endgame/sfx_player_equip_pickup.mp3',
     player_equip_not_pickup: 'audio/sfx/endgame/sfx_player_equip_not_pickup.mp3',
     player_defeated: 'audio/sfx/endgame/sfx_player_defeated.mp3',

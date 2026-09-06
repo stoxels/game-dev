@@ -154,6 +154,9 @@ function checkSpecialIntercepts(row, col) {
         if (typeof _egMarksGauntletGridLockToast === 'function') _egMarksGauntletGridLockToast();
         return true;
     }
+    // The Sprout's garden: prune vines off cells, keep out of the bramble
+    // ring, disturb pollen dust at your peril (boss-sprout.js).
+    if (typeof _egSproutCellIntercept === 'function' && _egSproutCellIntercept(row, col)) return true;
     if (checkBossCorruptionIntercept(row, col)) return true;
     if (checkBayesianTrapIntercept(row, col)) return true;
     if (checkActiveAbilityIntercept(row, col)) return true;

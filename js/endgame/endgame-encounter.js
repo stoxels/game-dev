@@ -1200,6 +1200,49 @@ function _egResolveAttackType(monster) {
 function _egFireMonsterAttack(monster) {
     _egFlashMonsterAttackCard(monster);
     if (typeof _egMaybePuzzleAttack === 'function' && _egMaybePuzzleAttack(monster)) return;
+    // The Sprout: his charge-bar attack IS the set-piece — a thorned vine
+    // tendril telegraphs across the screen through the player, then whips
+    // (boss-sprout.js). No generic projectile/melee on top.
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_sprout')
+        && typeof _egSproutVineLunge === 'function') {
+        _egSproutVineLunge(monster);
+        return;
+    }
+    // The Bumper: a giant carnival bumper slams onto a telegraphed target
+    // ring at the player, flinging anyone inside (boss-bumper.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_bumper')
+        && typeof _egBumperSlam === 'function') {
+        _egBumperSlam(monster);
+        return;
+    }
+    // The Centipede: the whole colony stampedes across a telegraphed lane
+    // through the player's row (boss-centipede.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_centipede')
+        && typeof _egCentStampede === 'function') {
+        _egCentStampede(monster);
+        return;
+    }
+    // The Striker: a curved free kick — dotted arc telegraph, cone wall,
+    // the ball bends around it onto the marked spot (boss-striker.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_striker')
+        && typeof _egStrkFreeKick === 'function') {
+        _egStrkFreeKick(monster);
+        return;
+    }
+    // The Thwomp: a shadow marker stalks and locks, then the whole block
+    // crashes down on the mark with a huge shockwave (boss-thwomp.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_thwomp')
+        && typeof _egThwompGrandSlam === 'function') {
+        _egThwompGrandSlam(monster);
+        return;
+    }
+    // The Coil: a hood-shadow lane telegraphs, then the maw strikes across
+    // it in one lightning lash (boss-coil.js).
+    if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_coil')
+        && typeof _egCoilCobraStrike === 'function') {
+        _egCoilCobraStrike(monster);
+        return;
+    }
     const attackType = _egResolveAttackType(monster);
     if (attackType === 'melee') {
         _egAnimateMonsterMelee(monster);

@@ -6,6 +6,7 @@
 .vs/
 turnaround_images/
 walk_videos/
+walk_frames/
 tools/
 
 # local preview server / temp

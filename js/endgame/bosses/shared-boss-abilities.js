@@ -1975,7 +1975,7 @@ let _egNkSeq = 0;
 function _egNkDodgeBusy() {
     if (typeof _egCrushState !== 'undefined' && _egCrushState) return true;
     if (typeof _egActiveBlasts !== 'undefined' && _egActiveBlasts.size > 0) return true;
-    for (const r of _egNkRuns.values()) if (r.dodge) return true;
+    for (const r of _egNkRuns.values()) if (r.dodge && !r.passive) return true;
     return false;
 }
 
@@ -1985,8 +1985,15 @@ function _egNkNewRun(bossId, isDodge) {
     const run = { id, bossId: bossId || null, dodge: !!isDodge, raf: 0, timers: [], els: [], dotAcc: 0 };
     // Tier scaling for DODGE runs: the run's internal clock advances on a
     // scaled dtS (see _egNkLoop), so every per-boss nk hazard — slam bands,
-    // storms, shrapnel, chase orbs — shares the screen-blast difficulty
-    // curve. Non-dodge runs (shields, summons) keep real-time timing.
+    // storms, shrapnel, chase orbs, weather watchers (Puddle), garden
+    // watchers (Sprout) — shares the screen-blast difficulty curve.
+    // Non-dodge runs (shields, summons, buff enrage) keep real-time timing.
+    // PERSISTENT WATCHERS (Puddle/Sprout/Bumper/Marksman gauntlet-watcher):
+    // they want the tier clock but must NOT count as an active set-piece —
+    // a forever-alive dodge run would trip _egNkDodgeBusy() and permanently
+    // block scheduled mechanics (sproutlings, fog bank) and other bosses'
+    // set-pieces. They set run.passive = true right after creation; the
+    // tierFactor lookup below runs on the same tick either way.
     run.tierFactor = 1;
     if (run.dodge && bossId && typeof _egMonsters !== 'undefined') {
         try {
