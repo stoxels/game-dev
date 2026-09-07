@@ -56,8 +56,44 @@
     <link rel="stylesheet" href="css/reset-game.css">
     <link rel="stylesheet" href="css/replay.css">
     <link rel="stylesheet" href="css/dev-mode-select.css">
+    <!-- Boot: discover title art as early as possible -->
+    <link rel="preload" as="image" href="images/Title_Screen/Title_Background2.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="images/Title_Screen/STOXELS.webp" fetchpriority="high">
+    <style>
+        /* Boot loader — inline so it paints before stylesheets finish. */
+        #boot-loader {
+            position: fixed; inset: 0; z-index: 99999;
+            background: #0d0d1a;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 18px;
+            font-family: monospace; color: #f5d98a;
+            transition: opacity 0.4s ease-out;
+        }
+        #boot-loader.done { opacity: 0; pointer-events: none; }
+        #boot-loader .boot-title { font-size: 42px; letter-spacing: 10px; font-weight: bold; }
+        #boot-loader .boot-sub { font-size: 12px; letter-spacing: 3px; color: #8a8aa3; }
+        #boot-loader .boot-bar {
+            width: min(420px, 70vw); height: 12px;
+            background: #111; border: 1px solid #4a4a6a; border-radius: 6px;
+            overflow: hidden;
+        }
+        #boot-loader .boot-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(180deg, #f5d98a, #c8a84b);
+            transition: width 0.15s ease-out;
+        }
+        #boot-loader .boot-status { font-size: 11px; color: #8a8aa3; min-height: 14px; }
+    </style>
 </head>
 <body>
+
+    <!-- BOOT LOADER (removed by js/boot-loader.js once title assets land) -->
+    <div id="boot-loader">
+        <div class="boot-title">STOXELS</div>
+        <div class="boot-sub">CARTOGRAPHERS OF CHANCE</div>
+        <div class="boot-bar"><div class="boot-fill" id="boot-fill"></div></div>
+        <div class="boot-status" id="boot-status">Loading…</div>
+    </div>
 
     <!-- TITLE SCREEN -->
     <div id="screen-title" class="screen active">
@@ -1548,6 +1584,8 @@
     <script src="js/endgame/endgame-hazards.js"></script>
     <script src="js/adventure-mode.js"></script>
 
+    <script src="js/asset-preload.js"></script>
+    <script src="js/boot-loader.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
