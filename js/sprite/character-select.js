@@ -19,7 +19,7 @@ const CHARACTERS = {
         personalityDE: 'Trocken, methodisch und still unerbittlich. Er vertraut Daten mehr als Instinkt, und einem guten Muster mehr als einem guten Gefühl.',
         strength: 'Reads patterns fast and rarely panics under pressure - mistakes are just data points to him, not setbacks.',
         strengthDE: 'Erkennt Muster schnell und gerät selten in Panik - Fehler sind für ihn nur Datenpunkte, keine Rückschläge.',
-        image: 'images/sprites/Stox_noclass.png',
+        image: 'images/sprites/Stox_noclass.webp',
         accentColor: '#4fc3f7',
         glowColor: 'rgba(79,195,247,0.35)',
         traits: [
@@ -51,7 +51,7 @@ const CHARACTERS = {
         personalityDE: 'Frech, schlagfertig und überaus selbstbewusst - meist, weil sie meistens recht hat.',
         strength: 'Thrives on risk and reads dangerous situations like a game she already knows how to win.',
         strengthDE: 'Blüht im Risiko auf und liest gefährliche Situationen wie ein Spiel, das sie schon gewonnen hat.',
-        image: 'images/sprites/Trix_noclass.png',
+        image: 'images/sprites/Trix_noclass.webp',
         accentColor: '#ce93d8',
         glowColor: 'rgba(206,147,216,0.35)',
 
@@ -85,7 +85,7 @@ const CHARACTERS = {
         personalityDE: 'Warmherzig, geduldig und unendlich nachsichtig bei Fehlern - sie sieht jeden Rückschlag einfach als Teil des Wachsens.',
         strength: 'Stays calm and steady no matter how badly things are going, and bounces back quickly from setbacks.',
         strengthDE: 'Bleibt ruhig und gefasst, egal wie schlecht es läuft, und erholt sich schnell von Rückschlägen.',
-        image: 'images/sprites/Syla_noclass.png',
+        image: 'images/sprites/Syla_noclass.webp',
         accentColor: '#66bb6a',
         glowColor: 'rgba(102,187,106,0.35)',
 

@@ -623,6 +623,60 @@ function _egTickPlayer() {
     if (typeof _egCrashMazeActive === 'function' && _egCrashMazeActive()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
     }
+    // The Bomber's TOTAL CARPET: while the ≤10% finale runs (countdown
+    // AND the detonation waves) the auto-attack charge bar stays frozen —
+    // pure dodge-into-the-dome set-piece, not free DPS (boss-bomber.js).
+    if (typeof _egBomberFinalActive === 'function' && _egBomberFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Creeper's SSSS…BOOM: while the ≤10% finale runs (countdown AND
+    // the mega blast) the auto-attack charge bar stays frozen — a flee-the-
+    // ring set-piece, not free DPS (boss-creeper.js).
+    if (typeof _egCrpFinalActive === 'function' && _egCrpFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Aegis's LAST BASTION: while the ≤10% finale runs (the beam sweep
+    // AND the vanguard) the auto-attack charge bar stays frozen — a dodge-
+    // the-sweep set-piece, not free DPS (boss-aegis.js).
+    if (typeof _egAgFinalActive === 'function' && _egAgFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Needle's FINAL STITCH: while the ≤10% finale runs (the stabs AND
+    // the last stitch) the auto-attack charge bar stays frozen — a thread-
+    // the-eye set-piece, not free DPS (boss-needle.js).
+    if (typeof _egNdFinalActive === 'function' && _egNdFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Monsoon's GREAT FLOOD: while the ≤10% finale runs (the surges
+    // AND the break) the auto-attack charge bar stays frozen — a climb-to-
+    // the-island set-piece, not free DPS (boss-monsoon.js).
+    if (typeof _egMnFinalActive === 'function' && _egMnFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Maze's GAME OVER: while the ≤10% finale runs (convergence slams
+    // AND the chomp) the auto-attack charge bar stays frozen — a never-
+    // stand-still set-piece, not free DPS (boss-maze.js).
+    if (typeof _egMzFinalActive === 'function' && _egMzFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Medusa's THE STARE: while the ≤10% finale runs (statue beats AND
+    // the gaze sweep) the auto-attack charge bar stays frozen — a shelter-
+    // from-the-light set-piece, not free DPS (boss-medusa.js).
+    if (typeof _egMdFinalActive === 'function' && _egMdFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Encore's CURTAIN CALL: while the ≤10% finale runs (musical-chairs
+    // spotlight AND the ovation) the auto-attack charge bar stays frozen —
+    // a follow-the-light set-piece, not free DPS (boss-encore.js).
+    if (typeof _egEnFinalActive === 'function' && _egEnFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Buzzsaw's FINAL CUT: while the ≤10% finale runs (walls closing AND
+    // the crosscut) the auto-attack charge bar stays frozen — a hold-the-
+    // centre set-piece, not free DPS (boss-buzz.js).
+    if (typeof _egBzFinalActive === 'function' && _egBzFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
     if (typeof _egSnailBroomHeld === 'function' && _egSnailBroomHeld()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
     }
@@ -3238,7 +3292,7 @@ function _egBuildMonsterCardHTML(m) {
     const targetedCls = isTarget ? ' eg-card-targeted' : '';
 
     return `
-    <div class="eg-monster-card-compact${bossCls}${targetedCls}" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')">
+    <div class="eg-monster-card-compact${bossCls}${targetedCls}" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')" style="--eg-art:${m.artScale || 1}">
         ${isTarget ? '<span class="eg-target-arrow"><span class="eg-target-arrow-icon">▼</span> TARGET <span class="eg-target-arrow-icon">▼</span></span>' : ''}
 
         <!-- Bars stacked top-to-bottom: Charge bar then HP bar above the icon -->
@@ -3257,7 +3311,7 @@ function _egBuildMonsterCardHTML(m) {
         <!-- Emoji icon with level badge and hover tooltip -->
         <div class="eg-emoji-wrapper${m.isBoss ? ' eg-boss-emoji-wrapper' : ''}${(m.enrageStacks || 0) > 0 ? ' eg-boss-enraged' : ''} ${isTarget ? 'eg-compact-targeted' : ''}">
             ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
-            <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.baseId, m.emoji)}</span>
+            <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
 
             <div class="eg-monster-compact-tooltip">

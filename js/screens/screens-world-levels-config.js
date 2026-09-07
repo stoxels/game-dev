@@ -11,7 +11,7 @@ const WD_WORLD_CONFIGS = [
     // PROBABILITY PEAKS
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Probability-Peaks.jpeg',
+        bgImage: 'images/Probability-Peaks.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 55.8, y: 85.3 },
         nodes: [
@@ -40,7 +40,7 @@ const WD_WORLD_CONFIGS = [
     // THE DISTRIBUTION DEN
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Distribution-Den.jpeg',
+        bgImage: 'images/Distribution-Den.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 3.9, y: 35.0 },
         nodes: [
@@ -68,7 +68,7 @@ const WD_WORLD_CONFIGS = [
     // SAMPLING SAVANNA
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Sampling-Savanna.jpeg',
+        bgImage: 'images/Sampling-Savanna.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 95.0, y: 93.6 },
         nodes: [
@@ -91,7 +91,7 @@ const WD_WORLD_CONFIGS = [
     // THE VORTEX OF POSSIBILITIES
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Vortex-of-Possibilities.jpeg',
+        bgImage: 'images/Vortex-of-Possibilities.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 5.6, y: 89.2 },
         nodes: [
@@ -125,7 +125,7 @@ const WD_WORLD_CONFIGS = [
     // REGRESSION RIFT
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Regression-Rift.jpeg',
+        bgImage: 'images/Regression-Rift.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 54.8, y: 24.9 },
         nodes: [
@@ -154,7 +154,7 @@ const WD_WORLD_CONFIGS = [
     // FREQUENCY FOREST 
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Frequency-Forest.jpeg',
+        bgImage: 'images/Frequency-Forest.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 42.3, y: 91.1 },
         nodes: [
@@ -185,7 +185,7 @@ const WD_WORLD_CONFIGS = [
     // Stochapolis
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Stochapolis.jpeg',
+        bgImage: 'images/Stochapolis.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 50.5, y: 92.7 }, 
         nodes: [
@@ -213,7 +213,7 @@ const WD_WORLD_CONFIGS = [
     // HYPOTHESIS HINTERLANDS
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Hypothesis-Hinterlands.jpeg',
+        bgImage: 'images/Hypothesis-Hinterlands.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 39.2, y: 27.3 },
         nodes: [
@@ -240,7 +240,7 @@ const WD_WORLD_CONFIGS = [
     // DATA DELTA
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Data-Delta.jpeg',
+        bgImage: 'images/Data-Delta.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 15.8, y: 15.1 },
         nodes: [
@@ -273,7 +273,7 @@ const WD_WORLD_CONFIGS = [
     // PARAMETER PLAINS
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Parameter-Plains.jpeg',
+        bgImage: 'images/Parameter-Plains.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 51.5, y: 91.2 },
         nodes: [
@@ -302,7 +302,7 @@ const WD_WORLD_CONFIGS = [
     // NULL HYPOTHESIS VOID
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Null-Hypothesis-Void.jpeg',
+        bgImage: 'images/Null-Hypothesis-Void.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 6.1, y: 88.6 },
         nodes: [
@@ -332,7 +332,7 @@ const WD_WORLD_CONFIGS = [
     // BAYESIAN BAY
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Bayesian-Bay.jpeg',
+        bgImage: 'images/Bayesian-Bay.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 89.4, y: 35.5 },
         nodes: [
@@ -363,7 +363,7 @@ const WD_WORLD_CONFIGS = [
     // EXPECTATION PLATEAU 
     // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Expectation-Plateau.jpeg',
+        bgImage: 'images/Expectation-Plateau.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 89.8, y: 92.1 },
         nodes: [
@@ -378,7 +378,7 @@ const WD_WORLD_CONFIGS = [
 
     // TEMP TESTING — Nexus / Endgame Sandbox, remove after testing
     {
-        bgImage: 'images/Expectation-Plateau.jpeg', // placeholder, swap for a real Nexus bg later
+        bgImage: 'images/Expectation-Plateau.webp', // placeholder, swap for a real Nexus bg later
         imageAspect: 16 / 9,
         entrancePos: { x: 50, y: 90 },
         nodes: [

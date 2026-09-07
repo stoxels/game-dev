@@ -17,7 +17,7 @@
         max-height: 100vh;
         height: auto;
         margin: 0 auto;
-        background-image: url('../images/Class_Selection/class_selection_bg.jpeg');
+        background-image: url('../images/Class_Selection/class_selection_bg.webp');
         background-size: cover; /* safe — box ratio matches image ratio exactly */
         background-position: center;
     }
@@ -193,15 +193,15 @@
            Placeholder images — reusing the existing pillar art for now.
            Swap these urls once the real weapon-locker art is ready. */
     #class-selection-overlay[data-mode="select"] .cs-card[data-classid="statistician"] .cs-weapon-locker {
-        background-image: url('../images/Class_Selection/sword_weapon_locker.png');
+        background-image: url('../images/Class_Selection/sword_weapon_locker.webp');
     }
 
     #class-selection-overlay[data-mode="select"] .cs-card[data-classid="mathmagician"] .cs-weapon-locker {
-        background-image: url('../images/Class_Selection/staff_weapon_locker.png');
+        background-image: url('../images/Class_Selection/staff_weapon_locker.webp');
     }
 
     #class-selection-overlay[data-mode="select"] .cs-card[data-classid="probabilist"] .cs-weapon-locker {
-        background-image: url('../images/Class_Selection/bow_weapon_locker.png');
+        background-image: url('../images/Class_Selection/bow_weapon_locker.webp');
     }
 
 

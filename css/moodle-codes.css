@@ -54,7 +54,7 @@
     max-height: 100vh;
     height: auto;
     margin: 0 auto;
-    background: url('../images/Moodle_Codes_Screen/Moodle_Codes_Background.jpeg') center / cover no-repeat;
+    background: url('../images/Moodle_Codes_Screen/Moodle_Codes_Background.webp') center / cover no-repeat;
 }
 
 /* -----------------------------------------------------------------------
@@ -67,7 +67,7 @@
     left: 1.5%;
     font-family: var(--PX);
     font-size: clamp(8px, 1vw, 20px);
-    background-image: url('../images/Moodle_Codes_Screen/return_to_menu_button.png');
+    background-image: url('../images/Moodle_Codes_Screen/return_to_menu_button.webp');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -102,7 +102,7 @@
     left: 30%;
     height: 13%;
     width: 49%;
-    background: url('../images/Moodle_Codes_Screen/codes_ribbon.png') center / 100% 100% no-repeat;
+    background: url('../images/Moodle_Codes_Screen/codes_ribbon.webp') center / 100% 100% no-repeat;
     display: flex;
     align-items: center;
     gap: 12px;

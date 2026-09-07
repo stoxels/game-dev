@@ -953,7 +953,7 @@ A thin meta-bar sits at the very top of the game content (inside the scroll area
 .convm-page.right { right: 26px; width: calc(50% - 44px); justify-content: flex-start; gap: 11px; text-align: center; }
 
 .convm-milestone { position: relative; width: 100%; }
-.convm-msbar { background: url('../images/Convergence_Screen/convergence-main-title.png') center/100% 100% no-repeat; height: 52px; width: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--PX); font-size: 10px; color: var(--gold2); letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 1px 2px #000; }
+.convm-msbar { background: url('../images/Convergence_Screen/convergence-main-title.webp') center/100% 100% no-repeat; height: 52px; width: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--PX); font-size: 10px; color: var(--gold2); letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 1px 2px #000; }
 
 .convm-tree { width: min(100%, 220px); flex: 0 0 auto; }
 .convm-tree img { width: 100%; display: block; }

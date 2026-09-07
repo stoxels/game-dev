@@ -9,9 +9,9 @@
 // keys or a different image folder — this is a best-effort match based on
 // the naming convention seen elsewhere (images/Game_Setup/...).
 const CHAR_PORTRAIT_SRC = {
-    stox: 'images/sprites/Stox_noclass.png',
-    trix: 'images/sprites/Trix_noclass.png',
-    syla: 'images/sprites/Syla_noclass.png',
+    stox: 'images/sprites/Stox_noclass.webp',
+    trix: 'images/sprites/Trix_noclass.webp',
+    syla: 'images/sprites/Syla_noclass.webp',
 };
 
 // window._pendingSaveSlotCallback — callback to resume the normal
@@ -41,7 +41,7 @@ function getCharPortraitSrc(summary) {
         : (summary.playerClass ? summary.playerClass : 'noclass');
 
     const charCap = char.charAt(0).toUpperCase() + char.slice(1);
-    return `images/sprites/${charCap}_${classKey}.png`;
+    return `images/sprites/${charCap}_${classKey}.webp`;
 }
 
 // Builds the inner markup for a save-slot card, empty or filled.

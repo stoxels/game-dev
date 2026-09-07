@@ -475,6 +475,7 @@ function _egBrutusRenderZombieCard(z) {
     card.style.left = z.x + 'px';
     card.style.top = z.y + 'px';
     card.style.transform = 'translate(-50%, -50%)';
+    card.style.setProperty('--eg-art', z.artScale || 1);
     card.setAttribute('onclick', "_egSelectTarget('" + z.id + "')");
 
     const hpPct = Math.max(0, Math.round((z.currentHP / z.maxHP) * 100));
@@ -485,7 +486,7 @@ function _egBrutusRenderZombieCard(z) {
         '</div>' +
         '<div class="eg-status-strip" id="eg-status-' + z.id + '"></div>' +
         '<div class="eg-emoji-wrapper">' +
-            '<span class="eg-monster-emoji-compact">' + z.emoji + '</span>' +
+            '<span class="eg-monster-emoji-compact">' + ((typeof EG_ART !== 'undefined' && EG_ART.html) ? EG_ART.html('monster', z.artId || z.baseId, z.emoji) : z.emoji) + '</span>' +
             '<span class="eg-level-bottom-left">' + z.level + '</span>' +
             '<div class="eg-monster-compact-tooltip">' +
                 '<div class="eg-tooltip-name">' + z.name + '</div>' +

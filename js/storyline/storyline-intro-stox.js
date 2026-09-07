@@ -36,37 +36,37 @@ const STOX_INTRO_SONG = {
     imagePath: STOX_INTRO_IMAGE_PATH,
 
     images: [
-        { image: "1.jpeg", time: 0 },           // establishing: alone in the archive
-        { image: "2.jpeg", time: 9000 },        // "Inside this archive"
-        { image: "3.jpeg", time: 16000 },       // "He didn't write a word of it"
-        { image: "4.jpeg", time: 20500 },       // "But he's read every line"
-        { image: "5.jpeg", time: 25500 },       // "Every note, every survey log"
-        { image: "6.jpeg", time: 29500 },       // "Every parameter they made"
-        { image: "7.jpeg", time: 36000 },       // "Everything the First Cartographers"
-        { image: "8.jpeg", time: 40500 },       // "Ever left in their wake"
-        { image: "9.jpeg", time: 46500 },       // "He's been through it all"
-        { image: "10.jpeg", time: 68000 },      // "The timeline never added up"
-        { image: "11.jpeg", time: 73000 },      // "The failures came too clean"
-        { image: "12.jpeg", time: 79500 },      // "The corruption spread in a pattern"
-        { image: "13.jpeg", time: 89500 },      // "He's mapped every connection"
-        { image: "14.jpeg", time: 105000 },     // "Understood it down to every part"
-        { image: "15.jpeg", time: 124000 },     // "One of the First Cartographers"
-        { image: "16.jpeg", time: 133500 },     // "He cannot find who, or why"
-        { image: "17.jpeg", time: 140000 },     // "The archive won't tell him how"
-        { image: "18.jpeg", time: 151000 },     // "The shelves have run dry"
-        { image: "19.jpeg", time: 161500 },     // "He's read everything they kept"
-        { image: "20.jpeg", time: 171000 },     // "Whatever's still hidden"
-        { image: "21.jpeg", time: 182000 },     // "In the regions, in the Stoxels"
-        { image: "22.jpeg", time: 194500 },     // "The records all point inward" (Chorus 2)
-        { image: "23.jpeg", time: 208000 },     // "Not from someone who won't stop"
-        { image: "24.jpeg", time: 221500 },     // "But he knows where the answers drop"
-        { image: "25.jpeg", time: 233000 },     // "The archive ran out of answers"
-        { image: "26.jpeg", time: 247000 },     // "He is finished waiting"
-        { image: "27.jpeg", time: 273500 },     // "The archive kept its secrets..."
-        { image: "28.jpeg", time: 282000 },     // "Now he steps out past it"
-        { image: "29.jpeg", time: 291000 },     // "He'll trade his pages..."
-        { image: "30.jpeg", time: 313000 },     // "Ready to learn what he can't understand"
-        { image: "31.jpeg", time: 325000 },
+        { image: "1.webp", time: 0 },           // establishing: alone in the archive
+        { image: "2.webp", time: 9000 },        // "Inside this archive"
+        { image: "3.webp", time: 16000 },       // "He didn't write a word of it"
+        { image: "4.webp", time: 20500 },       // "But he's read every line"
+        { image: "5.webp", time: 25500 },       // "Every note, every survey log"
+        { image: "6.webp", time: 29500 },       // "Every parameter they made"
+        { image: "7.webp", time: 36000 },       // "Everything the First Cartographers"
+        { image: "8.webp", time: 40500 },       // "Ever left in their wake"
+        { image: "9.webp", time: 46500 },       // "He's been through it all"
+        { image: "10.webp", time: 68000 },      // "The timeline never added up"
+        { image: "11.webp", time: 73000 },      // "The failures came too clean"
+        { image: "12.webp", time: 79500 },      // "The corruption spread in a pattern"
+        { image: "13.webp", time: 89500 },      // "He's mapped every connection"
+        { image: "14.webp", time: 105000 },     // "Understood it down to every part"
+        { image: "15.webp", time: 124000 },     // "One of the First Cartographers"
+        { image: "16.webp", time: 133500 },     // "He cannot find who, or why"
+        { image: "17.webp", time: 140000 },     // "The archive won't tell him how"
+        { image: "18.webp", time: 151000 },     // "The shelves have run dry"
+        { image: "19.webp", time: 161500 },     // "He's read everything they kept"
+        { image: "20.webp", time: 171000 },     // "Whatever's still hidden"
+        { image: "21.webp", time: 182000 },     // "In the regions, in the Stoxels"
+        { image: "22.webp", time: 194500 },     // "The records all point inward" (Chorus 2)
+        { image: "23.webp", time: 208000 },     // "Not from someone who won't stop"
+        { image: "24.webp", time: 221500 },     // "But he knows where the answers drop"
+        { image: "25.webp", time: 233000 },     // "The archive ran out of answers"
+        { image: "26.webp", time: 247000 },     // "He is finished waiting"
+        { image: "27.webp", time: 273500 },     // "The archive kept its secrets..."
+        { image: "28.webp", time: 282000 },     // "Now he steps out past it"
+        { image: "29.webp", time: 291000 },     // "He'll trade his pages..."
+        { image: "30.webp", time: 313000 },     // "Ready to learn what he can't understand"
+        { image: "31.webp", time: 325000 },
     ],
 
     // Lyric timeline — all 57 lines from the SRT, in order, as bilingual

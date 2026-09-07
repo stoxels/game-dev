@@ -67,19 +67,19 @@ function _tailRiskBuildOverlayHTML(secondsPerCell, maxCells) {
 
     return `
         <div class="ih-canvas">
-            <img class="ih-bg-img" src="images/Infinite_Hunger/infinite-hunger-background.jpeg" alt="">
+            <img class="ih-bg-img" src="images/Infinite_Hunger/infinite-hunger-background.webp" alt="">
 
             <div class="ih-tablet">
-                <img class="ih-tablet-img" src="images/Infinite_Hunger/stone-tablet.png" alt="">
+                <img class="ih-tablet-img" src="images/Infinite_Hunger/stone-tablet.webp" alt="">
 
                 <div class="ih-title">${title}</div>
                 <div class="ih-prompt">${prompt}</div>
 
                 <div class="ih-slider-row">
                     <div class="ih-slider-track">
-                        <img class="ih-selector-bar-img" src="images/Infinite_Hunger/selector-bar.png" alt="">
+                        <img class="ih-selector-bar-img" src="images/Infinite_Hunger/selector-bar.webp" alt="">
                         <input type="range" id="tr-slider" class="ih-slider" min="1" max="${maxCells}" value="1">
-                        <img class="ih-clock-broken-icon" src="images/Infinite_Hunger/clock-broken.png" alt="">
+                        <img class="ih-clock-broken-icon" src="images/Infinite_Hunger/clock-broken.webp" alt="">
                     </div>
                 </div>
 
@@ -87,11 +87,11 @@ function _tailRiskBuildOverlayHTML(secondsPerCell, maxCells) {
 
                 <div class="ih-btns">
                     <button class="ih-btn ih-btn-sacrifice" onclick="_tailRiskResolve()">
-                        <img class="ih-btn-bg" src="images/Infinite_Hunger/sacrifice-stone.png" alt="">
+                        <img class="ih-btn-bg" src="images/Infinite_Hunger/sacrifice-stone.webp" alt="">
                         <span class="ih-btn-label">${confirmLabel}</span>
                     </button>
                     <button class="ih-btn ih-btn-cancel" onclick="_tailRiskCancel()">
-                        <img class="ih-btn-bg" src="images/Infinite_Hunger/cancel-stone.png" alt="">
+                        <img class="ih-btn-bg" src="images/Infinite_Hunger/cancel-stone.webp" alt="">
                         <span class="ih-btn-label">${cancelLabel}</span>
                     </button>
                 </div>

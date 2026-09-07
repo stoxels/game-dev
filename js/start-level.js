@@ -6,20 +6,20 @@
 // Maps world number (1-based) to its background image path.
 // Place your background images in images/backgrounds/
 const WORLD_BACKGROUNDS = {
-    1: 'images/backgrounds/Probability-Peaks-Background.jpeg',
-    2: 'images/backgrounds/Distribution-Den-Background.jpeg',
-    3: 'images/backgrounds/Sampling-Savanna-Background.jpeg',
-    4: 'images/backgrounds/Vortex-of-Possibilities-Background.jpeg',
-    5: 'images/backgrounds/Regression-Rift-Background.jpeg',
-    6: 'images/backgrounds/Frequency-Forest-Background.jpeg',
-    7: 'images/backgrounds/Stochapolis-Background.jpeg',
-    8: 'images/backgrounds/Hypothesis-Hinterlands-Background.jpeg',
-    9: 'images/backgrounds/Data-Delta-Background.jpeg',
-    10: 'images/backgrounds/Parameter-Plains-Background.jpeg',
-    11: 'images/backgrounds/Null-Hypothesis-Void.jpeg',
-    12: 'images/backgrounds/Bayesian-Bay-Background.jpeg',
-    13: 'images/backgrounds/Expectation-Plateau-Background.jpeg',
-    14: 'images/backgrounds/The-Nexus-Background.jpeg',
+    1: 'images/backgrounds/Probability-Peaks-Background.webp',
+    2: 'images/backgrounds/Distribution-Den-Background.webp',
+    3: 'images/backgrounds/Sampling-Savanna-Background.webp',
+    4: 'images/backgrounds/Vortex-of-Possibilities-Background.webp',
+    5: 'images/backgrounds/Regression-Rift-Background.webp',
+    6: 'images/backgrounds/Frequency-Forest-Background.webp',
+    7: 'images/backgrounds/Stochapolis-Background.webp',
+    8: 'images/backgrounds/Hypothesis-Hinterlands-Background.webp',
+    9: 'images/backgrounds/Data-Delta-Background.webp',
+    10: 'images/backgrounds/Parameter-Plains-Background.webp',
+    11: 'images/backgrounds/Null-Hypothesis-Void.webp',
+    12: 'images/backgrounds/Bayesian-Bay-Background.webp',
+    13: 'images/backgrounds/Expectation-Plateau-Background.webp',
+    14: 'images/backgrounds/The-Nexus-Background.webp',
 };
 
 

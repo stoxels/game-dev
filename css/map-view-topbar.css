@@ -48,7 +48,7 @@
     align-items: center;
     flex-wrap: wrap;
     row-gap: clamp(4px, 1vw, 8px);
-    background-image: url('../images/Level_Select_Topbar/topbar-stone-background.png');
+    background-image: url('../images/Level_Select_Topbar/topbar-stone-background.webp');
     background-size: auto;
     background-repeat: repeat-x;
     background-position: center;
@@ -71,7 +71,7 @@
     font-weight: bold;
     letter-spacing: 1px;
     color: #f5e9c8;
-    background: url('../images/Level_Select_Topbar/back-arrow.png') center / 100% 100% no-repeat;
+    background: url('../images/Level_Select_Topbar/back-arrow.webp') center / 100% 100% no-repeat;
     height: auto;
     width: clamp(90px, 15vw, 200px);
     aspect-ratio: 2.5 / 1;
@@ -138,7 +138,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: url('../images/Level_Select_Topbar/score-pts-scroll.png') center / 100% 100% no-repeat;
+    background: url('../images/Level_Select_Topbar/score-pts-scroll.webp') center / 100% 100% no-repeat;
     width: clamp(140px, 20vw, 300px);
     height: auto;
     aspect-ratio: 3.75 / 1;
@@ -185,7 +185,7 @@
     font-size: clamp(11px, 2.6vw, 30px);
     letter-spacing: clamp(1px, 0.5vw, 6px);
     color: #f0d090;
-    background: url('../images/Level_Select_Topbar/banner-title.png') center / 100% 100% no-repeat;
+    background: url('../images/Level_Select_Topbar/banner-title.webp') center / 100% 100% no-repeat;
     height: clamp(40px, 8vw, 90px);
     box-sizing: border-box;
     padding: 0 clamp(4px, 1vw, 10px);
@@ -263,11 +263,11 @@
 }
 
 #screen-map-view #mv-btn-quest-log {
-    background: url('../images/Level_Select_Topbar/Inference-Block.png') center / 100% 100% no-repeat;
+    background: url('../images/Level_Select_Topbar/Inference-Block.webp') center / 100% 100% no-repeat;
 }
 
 #screen-map-view #mv-btn-passive-tree {
-    background: url('../images/Level_Select_Topbar/Probability-Tree-Block.png') center / 100% 100% no-repeat;
+    background: url('../images/Level_Select_Topbar/Probability-Tree-Block.webp') center / 100% 100% no-repeat;
     color: #f0d090 !important; /* override any inline JS color */
 }
 

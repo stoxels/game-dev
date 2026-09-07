@@ -257,9 +257,48 @@ function _egTriggerQuestionNow() {
     if (_egQuestionsAnswered >= req.requiredQuestions) return;
     if (req.totalMonsters > 0 && _egChainKillCount < req.totalMonsters) return;
     if (req.requiredPuzzles > 0 && _egChainPuzzleSolvedCount < req.requiredPuzzles) return;
+    // Ignore double-clicks while a question is already open.
+    try {
+        const qOverlay = document.getElementById('quiz-overlay');
+        if (qOverlay && qOverlay.classList.contains('show')) return;
+    } catch (e) {}
+    if (typeof window._egInterstitialDone === 'function') return;
 
     showToast(t('eg_trigger_question_toast'), '#7fb8ff');
+
+    // Pause the run while the question is answered (silent pause: no pause
+    // overlay, the quiz modal stays visible). The tick loop, boss mechanics,
+    // class cooldowns and spawn schedulers already gate on _gamePaused, and
+    // pauseTimer() freezes the puzzle clock. _egOnPause() snapshots grid-drop
+    // timers so loot/pickups don't expire behind the quiz.
+    // If the player already paused via Escape, keep their pause untouched.
+    let _triggerPausedByUs = false;
+    try {
+        if (typeof _gamePaused !== 'undefined' && !_gamePaused) {
+            if (typeof pauseTimer === 'function') pauseTimer();
+            _gamePaused = true;
+            if (typeof _egOnPause === 'function') {
+                try { _egOnPause(); } catch (e) {}
+            }
+            _triggerPausedByUs = true;
+        }
+    } catch (e) {}
+
     _egShowInterstitialQuestion(() => {
+        if (_triggerPausedByUs) {
+            _triggerPausedByUs = false;
+            try {
+                if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+                    _gamePaused = false;
+                    if (typeof _egOnResume === 'function') {
+                        try { _egOnResume(); } catch (e) {}
+                    }
+                }
+            } catch (e) {}
+            try {
+                if (typeof resumeTimer === 'function') resumeTimer();
+            } catch (e) {}
+        }
         _egUpdateObjectivesHUD();
         if (typeof _egHazardsShowAfterQuiz === 'function') {
             try { _egHazardsShowAfterQuiz(); } catch (e) {}

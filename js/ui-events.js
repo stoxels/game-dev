@@ -100,7 +100,7 @@ function renderReplayModal() {
         container.appendChild(_buildReplayRow({
             id: 'tutorial',
             label: t('scr_replay_tutorial'),
-            thumb: 'images/Replay_Cutscene_Screen/Replay_Tutorial_Background.png',
+            thumb: 'images/Replay_Cutscene_Screen/Replay_Tutorial_Background.webp',
             descKey: 'scr_replay_desc_tutorial',
             isTutorial: true
         }, true, t('scr_replay_tutorial')));

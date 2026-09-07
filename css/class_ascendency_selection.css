@@ -40,7 +40,7 @@
 */
 
 #class-selection-overlay[data-mode="ascend-select"] {
-    background-image: url('../images/Class_Selection/class_selection_bg.jpeg');
+    background-image: url('../images/Class_Selection/class_selection_bg.webp');
     background-size: cover;
     background-position: center;
     backdrop-filter: blur(2px);
@@ -49,15 +49,15 @@
     /* Optional per-base-class tint — reusing the class-upgrade backgrounds as
        placeholders for now. Swap for dedicated ascend-select art later. */
     #class-selection-overlay[data-mode="ascend-select"][data-classid="statistician"] {
-        background-image: url('../images/Class_Ascendency_Selection/statistician_ascendency_selection.jpeg');
+        background-image: url('../images/Class_Ascendency_Selection/statistician_ascendency_selection.webp');
     }
 
     #class-selection-overlay[data-mode="ascend-select"][data-classid="mathmagician"] {
-        background-image: url('../images/Class_Ascendency_Selection/mathmagician_ascendency_selection.jpeg');
+        background-image: url('../images/Class_Ascendency_Selection/mathmagician_ascendency_selection.webp');
     }
 
     #class-selection-overlay[data-mode="ascend-select"][data-classid="probabilist"] {
-        background-image: url('../images/Class_Ascendency_Selection/probabilist_ascendency_selection.jpeg');
+        background-image: url('../images/Class_Ascendency_Selection/probabilist_ascendency_selection.webp');
     }
     /* ============ END PER-BASE-CLASS BACKGROUND ============ */
 
@@ -251,27 +251,27 @@
        Placeholder images — reusing the base weapon-locker art for now.
        Swap these urls once real per-ascendency art is ready. */
     #class-selection-overlay[data-mode="ascend-select"] .cs-card[data-classid="outlier"] .cs-ascendency-locker {
-        background-image: url('../images/Class_Ascendency_Selection/outlier_weapons.png');
+        background-image: url('../images/Class_Ascendency_Selection/outlier_weapons.webp');
     }
 
     #class-selection-overlay[data-mode="ascend-select"] .cs-card[data-classid="actuary"] .cs-ascendency-locker {
-        background-image: url('../images/Class_Ascendency_Selection/actuary_weapons.png');
+        background-image: url('../images/Class_Ascendency_Selection/actuary_weapons.webp');
     }
 
     #class-selection-overlay[data-mode="ascend-select"] .cs-card[data-classid="recursionist"] .cs-ascendency-locker {
-        background-image: url('../images/Class_Ascendency_Selection/recursionist_weapons.png');
+        background-image: url('../images/Class_Ascendency_Selection/recursionist_weapons.webp');
     }
 
     #class-selection-overlay[data-mode="ascend-select"] .cs-card[data-classid="markovian"] .cs-ascendency-locker {
-        background-image: url('../images/Class_Ascendency_Selection/markovian_weapons.png');
+        background-image: url('../images/Class_Ascendency_Selection/markovian_weapons.webp');
     }
 
     #class-selection-overlay[data-mode="ascend-select"] .cs-card[data-classid="bayesian"] .cs-ascendency-locker {
-        background-image: url('../images/Class_Ascendency_Selection/bayesian_weapons.png');
+        background-image: url('../images/Class_Ascendency_Selection/bayesian_weapons.webp');
     }
 
     #class-selection-overlay[data-mode="ascend-select"] .cs-card[data-classid="random_walker"] .cs-ascendency-locker {
-        background-image: url('../images/Class_Ascendency_Selection/random_walker_weapons.png');
+        background-image: url('../images/Class_Ascendency_Selection/random_walker_weapons.webp');
     }
 
 

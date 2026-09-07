@@ -320,7 +320,7 @@ function _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers) {
 
     return `
     <div class="mc-row mc-row--${rowIndex}${unlocked ? ' mc-row--unlocked' : ''}">
-        <img class="mc-icon" src="images/Moodle_Codes_Screen/icon_${rowIndex}.png" alt="">
+        <img class="mc-icon" src="images/Moodle_Codes_Screen/icon_${rowIndex}.webp" alt="">
         <div class="mc-row-content">
             <div class="mc-row-title">${tierName}${codeReveal}</div>
             ${scoreBlock}
@@ -354,7 +354,7 @@ function buildCodesScreen() {
         <div class="mc-canvas">
 
             <!-- MOODLE CODES logo image -->
-            <img class="mc-logo" src="images/Moodle_Codes_Screen/Moodle_Codes_logo.png" alt="Moodle Codes">
+            <img class="mc-logo" src="images/Moodle_Codes_Screen/Moodle_Codes_logo.webp" alt="Moodle Codes">
 
             <!-- MENU button — top-left -->
             <button class="mc-menu-btn" id="btn-codes-back">◀ ${menuText}</button>

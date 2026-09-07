@@ -38,36 +38,36 @@ const TRIX_INTRO_SONG = {
     // Image timeline — placeholders, adjust filenames and times once images exist.
     // Each entry fires when playback crosses its `time` (ms from song start).
     images: [
-        { image: "1.jpeg", time: 0 },          // establishing shot before vocals
-        { image: "2.jpeg", time: 12000 },      // "Three hundred years since the world came apart"
-        { image: "3.jpeg", time: 22500 },      // "A handful of Cartographers stood up and swore"
-        { image: "4.jpeg", time: 33500 },      // "The Guild called it heresy"
-        { image: "5.jpeg", time: 44000 },      // "A fold in the world" / Regression Rift
-        { image: "6.jpeg", time: 57000 },      // "Generations learned to live on borrowed time"
-        { image: "7.jpeg", time: 68500 },      // "But the Rift was a teacher"
-        { image: "8.jpeg", time: 90500 },      // "Trix was born in the one room still burning light"
-        { image: "9.jpeg", time: 101000 },     // "Raised on ruins, raised on questions"
-        { image: "10.jpeg", time: 111500 },     // "Then the readings started sliding"
-        { image: "11.jpeg", time: 122000 },     // "Zero isn't quiet — zero's a verdict"
-        { image: "12.jpeg", time: 135500 },     // "She knew her family wasn't wrong"
-        { image: "13.jpeg", time: 146500 },     // "So she packed a lantern"
-        { image: "14.jpeg", time: 158000 },     // "The guards brought her in to a man called the Warden"
-        { image: "15.jpeg", time: 163000 },     // "Are you here to join us?"
-        { image: "16.jpeg", time: 174000 },     // "Of course — easier than fighting"
-        { image: "17.jpeg", time: 184500 },     // "A key around his neck, gone before he closed the door"
-        { image: "18.jpeg", time: 194500 },     // "Already counting down the days"
-        { image: "19.jpeg", time: 202000 },     // "She hid the key beneath her pillow"
-        { image: "20.jpeg", time: 212500 },     // "Then one night she walked the halls"
-        { image: "21.jpeg", time: 217500 },     // "Found a door in the archive"
-        { image: "22.jpeg", time: 223500 },     // "The key turned like it knew her"
-        { image: "23.jpeg", time: 228500 },     // "Behind it: every answer"
-        { image: "24.jpeg", time: 234000 },     // "Her name was in those pages"
-        { image: "25.jpeg", time: 245500 },     // "Watch and learn"
-        { image: "26.jpeg", time: 255500 },     // "But the door behind the door changed why she came to stay"
-        { image: "27.jpeg", time: 261000 },     // "Not loyalty, not duty"
-        { image: "28.jpeg", time: 266500 },     // "So she keeps the uniform"
-        { image: "29.jpeg", time: 276500 },     // "Walks among Cartographers now"
-        { image: "30.jpeg", time: 298000 },     // TRIX nameplate
+        { image: "1.webp", time: 0 },          // establishing shot before vocals
+        { image: "2.webp", time: 12000 },      // "Three hundred years since the world came apart"
+        { image: "3.webp", time: 22500 },      // "A handful of Cartographers stood up and swore"
+        { image: "4.webp", time: 33500 },      // "The Guild called it heresy"
+        { image: "5.webp", time: 44000 },      // "A fold in the world" / Regression Rift
+        { image: "6.webp", time: 57000 },      // "Generations learned to live on borrowed time"
+        { image: "7.webp", time: 68500 },      // "But the Rift was a teacher"
+        { image: "8.webp", time: 90500 },      // "Trix was born in the one room still burning light"
+        { image: "9.webp", time: 101000 },     // "Raised on ruins, raised on questions"
+        { image: "10.webp", time: 111500 },     // "Then the readings started sliding"
+        { image: "11.webp", time: 122000 },     // "Zero isn't quiet — zero's a verdict"
+        { image: "12.webp", time: 135500 },     // "She knew her family wasn't wrong"
+        { image: "13.webp", time: 146500 },     // "So she packed a lantern"
+        { image: "14.webp", time: 158000 },     // "The guards brought her in to a man called the Warden"
+        { image: "15.webp", time: 163000 },     // "Are you here to join us?"
+        { image: "16.webp", time: 174000 },     // "Of course — easier than fighting"
+        { image: "17.webp", time: 184500 },     // "A key around his neck, gone before he closed the door"
+        { image: "18.webp", time: 194500 },     // "Already counting down the days"
+        { image: "19.webp", time: 202000 },     // "She hid the key beneath her pillow"
+        { image: "20.webp", time: 212500 },     // "Then one night she walked the halls"
+        { image: "21.webp", time: 217500 },     // "Found a door in the archive"
+        { image: "22.webp", time: 223500 },     // "The key turned like it knew her"
+        { image: "23.webp", time: 228500 },     // "Behind it: every answer"
+        { image: "24.webp", time: 234000 },     // "Her name was in those pages"
+        { image: "25.webp", time: 245500 },     // "Watch and learn"
+        { image: "26.webp", time: 255500 },     // "But the door behind the door changed why she came to stay"
+        { image: "27.webp", time: 261000 },     // "Not loyalty, not duty"
+        { image: "28.webp", time: 266500 },     // "So she keeps the uniform"
+        { image: "29.webp", time: 276500 },     // "Walks among Cartographers now"
+        { image: "30.webp", time: 298000 },     // TRIX nameplate
     ],
 
     // Lyric timeline — all 46 lines from the SRT, in order, as bilingual

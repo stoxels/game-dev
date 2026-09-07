@@ -114,6 +114,8 @@ function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
     const monster = {
         id: `${def.id}_${++_egMonsterSpawnCounter}`,
         baseId: def.id,
+        artId: def.id, // bosses have no variants — always the base id
+        artScale: 1, // bosses keep their fixed (large) frame size
         name: def.name,
         emoji: def.emoji,
         level: lvl,
@@ -329,6 +331,51 @@ function _egBossCleanup(monsterId) {
     // pawn marches, check lanes, zugzwang, checkmate walls).
     if (monsterId.startsWith('boss_tactician') && typeof _egTacticianTeardown === 'function') {
         _egTacticianTeardown();
+    }
+    // The Bomber (rework): mine field, keeper run, TOTAL CARPET set-piece
+    // and the flying presentation (target pip).
+    if (monsterId.startsWith('boss_bomber') && typeof _egBmbTeardown === 'function') {
+        _egBmbTeardown();
+    }
+    // The Creeper (rework): creeper packs, TNT chains, SSSS…BOOM set-piece
+    // and the primed-boss presentation.
+    if (monsterId.startsWith('boss_creeper') && typeof _egCrpTeardown === 'function') {
+        _egCrpTeardown();
+    }
+    // The Buzzsaw (rework): ricochet saws, cut lines, saw traps, pendulum
+    // blades and the FINAL CUT set-piece.
+    if (monsterId.startsWith('boss_buzz') && typeof _egBzTeardown === 'function') {
+        _egBzTeardown();
+    }
+    // The Encore (rework): encore circles, EQ slams, stage lights, beat
+    // mines and the CURTAIN CALL set-piece.
+    if (monsterId.startsWith('boss_encore') && typeof _egEnTeardown === 'function') {
+        _egEnTeardown();
+    }
+    // The Medusa (rework): stone gaze, snake strikes, petrify waves, coil
+    // cage and THE STARE set-piece.
+    if (monsterId.startsWith('boss_medusa') && typeof _egMdTeardown === 'function') {
+        _egMdTeardown();
+    }
+    // The Maze (rework): ghost gang, dot walls, the labyrinth, lights-out
+    // eyes and the GAME OVER set-piece.
+    if (monsterId.startsWith('boss_maze') && typeof _egMzTeardown === 'function') {
+        _egMzTeardown();
+    }
+    // The Monsoon (rework): rain bands, thunderbolts, storm surge, hail
+    // barrage and the GREAT FLOOD set-piece.
+    if (monsterId.startsWith('boss_monsoon') && typeof _egMnTeardown === 'function') {
+        _egMnTeardown();
+    }
+    // The Needle (rework): spike gates, pin drops, stitch wave, pincushion
+    // burst and the FINAL STITCH set-piece.
+    if (monsterId.startsWith('boss_needle') && typeof _egNdTeardown === 'function') {
+        _egNdTeardown();
+    }
+    // The Aegis (rework): aegis protocol, shield charge, sentry shields,
+    // guard rotor and the LAST BASTION set-piece.
+    if (monsterId.startsWith('boss_aegis') && typeof _egAgTeardown === 'function') {
+        _egAgTeardown();
     }
 }
 

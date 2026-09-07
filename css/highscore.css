@@ -65,7 +65,7 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    background: url('../images/Highscore_Screen/highscore_background.jpeg') center / cover no-repeat;
+    background: url('../images/Highscore_Screen/highscore_background.webp') center / cover no-repeat;
     /* Inline-size container: lets descendants size text in cqw against the
        frame itself, so type scales in lockstep with the background art even
        when the window aspect clamps/crops the frame (same pattern as
@@ -152,7 +152,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: url('../images/Inference/inference-header.png') center / 100% 100% no-repeat;
+    background: url('../images/Inference/inference-header.webp') center / 100% 100% no-repeat;
     filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
 }
 
@@ -263,7 +263,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-image: url('../images/Highscore_Screen/highscores_header.png');
+    background-image: url('../images/Highscore_Screen/highscores_header.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     /* readable serif instead of the tiny pixel font; dark-brown ink on the
@@ -399,7 +399,7 @@
        and would eat the plate on wide viewports. The 28px floor forces the
        single-line case to wrap while its ends are still on the flat field. */
     padding: 0 clamp(28px, 1.8cqw, 42px);
-    background: url('../images/Level_Select_Topbar/score-pts-scroll.png') center / 100% 100% no-repeat;
+    background: url('../images/Level_Select_Topbar/score-pts-scroll.webp') center / 100% 100% no-repeat;
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
     text-align: center;
     text-wrap: balance;      /* balanced 2-line wrap instead of a ragged

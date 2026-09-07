@@ -12,10 +12,10 @@ function _getPlayerCharacterImage() {
         ? STATE.playerAscendency
         : (STATE && STATE.playerClass ? STATE.playerClass : 'noclass');
 
-    // Expected filenames: e.g. images/sprites/Stox_statistician.png
-    // No-class fallback: images/sprites/Stox_noclass.png
+    // Expected filenames: e.g. images/sprites/Stox_statistician.webp
+    // No-class fallback: images/sprites/Stox_noclass.webp
     const charCap = char.charAt(0).toUpperCase() + char.slice(1);
-    return `images/sprites/${charCap}_${classKey}.png`;
+    return `images/sprites/${charCap}_${classKey}.webp`;
 }
 
 
@@ -121,7 +121,7 @@ function _renderPlayerAvatarSimple() {
             gap: 4px;
         ">
             ${withCompanions ? `<img
-                src="images/sprites/companion_drifter.png"
+                src="images/sprites/companion_drifter.webp"
                 id="avatar-companion-drifter"
                 style="width: 80px; height: 80px; object-fit: contain; pointer-events: none;"
                 draggable="false"
@@ -133,7 +133,7 @@ function _renderPlayerAvatarSimple() {
                 draggable="false"
             />
             ${withCompanions ? `<img
-                src="images/sprites/companion_browney.png"
+                src="images/sprites/companion_browney.webp"
                 id="avatar-companion-brownian"
                 style="width: 112px; height: 112px; object-fit: contain; pointer-events: none;"
                 draggable="false"
@@ -518,11 +518,11 @@ function _updateLSAvatarImage() {
 
 // Maps character id → the per-character name-image asset shown on the
 // left page of the setup screen's book. Expected filenames:
-// images/Game_Setup/Stox.png, Trix.png, Syla.png
+// images/Game_Setup/Stox.webp, Trix.png, Syla.png
 function _getSetupCharNameImage() {
     const char = (STATE && STATE.playerCharacter) ? STATE.playerCharacter : 'stox';
     const charCap = char.charAt(0).toUpperCase() + char.slice(1);
-    return `images/Game_Setup/${charCap}.png`;
+    return `images/Game_Setup/${charCap}.webp`;
 }
 
 

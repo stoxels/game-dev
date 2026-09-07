@@ -158,7 +158,7 @@
     position: relative;
     width: min(900px, 92vw);
     aspect-ratio: 1376 / 768;
-    background-image: url('../../images/Data_Strike/Data_Strike_UI_background.png');
+    background-image: url('../../images/Data_Strike/Data_Strike_UI_background.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
@@ -171,7 +171,7 @@
     width: 13%;
     height: auto;
     aspect-ratio: 1 / 1;
-    background-image: url('../../images/Data_Strike/Sword_Icon.png');
+    background-image: url('../../images/Data_Strike/Sword_Icon.webp');
     background-size: contain;
     background-repeat: no-repeat;
     pointer-events: none;
@@ -185,7 +185,7 @@
     transform: translateX(-50%);
     width: 50%;
     height: 36%;
-    background-image: url('../../images/Data_Strike/Upper_Stone.png');
+    background-image: url('../../images/Data_Strike/Upper_Stone.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     display: flex;
@@ -251,11 +251,11 @@
     }
 
 .ds-btn-rows {
-    background-image: url('../../images/Data_Strike/Rows_Button.png');
+    background-image: url('../../images/Data_Strike/Rows_Button.webp');
 }
 
 .ds-btn-cols {
-    background-image: url('../../images/Data_Strike/Cols_Button.png');
+    background-image: url('../../images/Data_Strike/Cols_Button.webp');
 }
 
 .ds-cancel-btn {
@@ -265,7 +265,7 @@
     transform: translateX(-50%);
     width: 33%;
     aspect-ratio: 4.5 / 1;
-    background-image: url('../../images/Data_Strike/Cancel_Button.png');
+    background-image: url('../../images/Data_Strike/Cancel_Button.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -297,7 +297,7 @@
 */
 
 .dof-icon {
-    background-image: url('../../images/Class_Spell_Upgrade/degrees_of_freedom.png');
+    background-image: url('../../images/Class_Spell_Upgrade/degrees_of_freedom.webp');
 }
 
 /* Longer keystone name than "DATA STRIKE" — shrink slightly so EN/DE titles

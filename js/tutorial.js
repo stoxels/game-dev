@@ -23,18 +23,18 @@
 // NOTE: top/left percentages are relative to #tut-demo-area, which always
 // fills the available space at the image's aspect ratio (see tutorial.css).
 const TUTORIAL_STEPS = [
-    { image: 'step1.jpeg', titleKey: 'tut2_s0_title', textKey: 'tut2_s0_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // WELCOME TO STOXELS
-    { image: 'step2.png', titleKey: 'tut2_s1_title', textKey: 'tut2_s1_text', box: { top: '70%', left: '85%' }, arrowTo: null }, // THE GAME SCREEN
-    { image: 'step2.png', titleKey: 'tut2_s2_title', textKey: 'tut2_s2_text', box: { top: '70%', left: '85%' }, arrowTo: { top: '45%', left: '50%' } },  // THE PUZZLE GRID
-    { image: 'step2.png', titleKey: 'tut2_s3_title', textKey: 'tut2_s3_text', box: { top: '20%', left: '20%' }, arrowTo: { top: '40%', left: '35%' } },  // ROW CLUES
-    { image: 'step2.png', titleKey: 'tut2_s4_title', textKey: 'tut2_s4_text', box: { top: '20%', left: '20%' }, arrowTo: { top: '23%', left: '52%' } },  // COLUMN CLUES
-    { image: 'step2.png', titleKey: 'tut2_s5_title', textKey: 'tut2_s5_text', box: { top: '20%', left: '20%' }, arrowTo: { top: '10%', left: '50%' } },  // THE TIMER
-    { image: 'step2.png', titleKey: 'tut2_s6_title', textKey: 'tut2_s6_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '30%', left: '65%' } },  // PENALTIES
-    { image: 'step2.png', titleKey: 'tut2_s7_title', textKey: 'tut2_s7_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '10%', left: '25%' } },  // BONUS OBJECTIVES
-    { image: 'step2.png', titleKey: 'tut2_s8_title', textKey: 'tut2_s8_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '90%', left: '20%' } },  // INVENTORY
-    { image: 'step3.png', titleKey: 'tut2_s9_title', textKey: 'tut2_s9_text', box: { top: '80%', left: '50%' }, arrowTo: null },  // PROBABILITY TREE
-    { image: 'step4.jpeg', titleKey: 'tut2_s10_title', textKey: 'tut2_s10_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // INFERENCE
-    { image: 'step5.jpeg', titleKey: 'tut2_s11_title', textKey: 'tut2_s11_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // CLASSES
+    { image: 'step1.webp', titleKey: 'tut2_s0_title', textKey: 'tut2_s0_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // WELCOME TO STOXELS
+    { image: 'step2.webp', titleKey: 'tut2_s1_title', textKey: 'tut2_s1_text', box: { top: '70%', left: '85%' }, arrowTo: null }, // THE GAME SCREEN
+    { image: 'step2.webp', titleKey: 'tut2_s2_title', textKey: 'tut2_s2_text', box: { top: '70%', left: '85%' }, arrowTo: { top: '45%', left: '50%' } },  // THE PUZZLE GRID
+    { image: 'step2.webp', titleKey: 'tut2_s3_title', textKey: 'tut2_s3_text', box: { top: '20%', left: '20%' }, arrowTo: { top: '40%', left: '35%' } },  // ROW CLUES
+    { image: 'step2.webp', titleKey: 'tut2_s4_title', textKey: 'tut2_s4_text', box: { top: '20%', left: '20%' }, arrowTo: { top: '23%', left: '52%' } },  // COLUMN CLUES
+    { image: 'step2.webp', titleKey: 'tut2_s5_title', textKey: 'tut2_s5_text', box: { top: '20%', left: '20%' }, arrowTo: { top: '10%', left: '50%' } },  // THE TIMER
+    { image: 'step2.webp', titleKey: 'tut2_s6_title', textKey: 'tut2_s6_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '30%', left: '65%' } },  // PENALTIES
+    { image: 'step2.webp', titleKey: 'tut2_s7_title', textKey: 'tut2_s7_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '10%', left: '25%' } },  // BONUS OBJECTIVES
+    { image: 'step2.webp', titleKey: 'tut2_s8_title', textKey: 'tut2_s8_text', box: { top: '60%', left: '20%' }, arrowTo: { top: '90%', left: '20%' } },  // INVENTORY
+    { image: 'step3.webp', titleKey: 'tut2_s9_title', textKey: 'tut2_s9_text', box: { top: '80%', left: '50%' }, arrowTo: null },  // PROBABILITY TREE
+    { image: 'step4.webp', titleKey: 'tut2_s10_title', textKey: 'tut2_s10_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // INFERENCE
+    { image: 'step5.webp', titleKey: 'tut2_s11_title', textKey: 'tut2_s11_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // CLASSES
 ];
 
 // Arrow color (golden) — kept as a JS constant too, in case you want to

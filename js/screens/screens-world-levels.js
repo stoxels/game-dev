@@ -1014,7 +1014,7 @@ function _wdBuildSprite() {
     img.id = 'wd-sprite-img';
     img.src = (typeof _getPlayerCharacterImage === 'function')
         ? _getPlayerCharacterImage()
-        : 'images/sprites/Stox_noclass.png';
+        : 'images/sprites/Stox_noclass.webp';
     img.alt = 'Player';
     img.draggable = false;
 

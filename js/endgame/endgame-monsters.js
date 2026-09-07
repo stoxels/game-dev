@@ -584,6 +584,14 @@ function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
     const monster = {
         id: `${def.id}_${++_egMonsterSpawnCounter}`,
         baseId: def.id, // unsuffixed def id — used for EG_ART image lookups
+        // Fixed at spawn so re-renders keep the same image. Holds either the
+        // base id or one of its "<base>_<n>" variants (see EG_ART.randomVariant).
+        artId: (typeof EG_ART !== 'undefined' && EG_ART.randomVariant)
+            ? EG_ART.randomVariant('monster', def.id)
+            : def.id,
+        // Uniform random display scale (0.9–1.35) so spawns of the same
+        // type vary in size. Uniform — never stretches the sprite.
+        artScale: Math.round((0.9 + Math.random() * 0.45) * 100) / 100,
         name: def.name,
         emoji: def.emoji,
         level: lvl,

@@ -32,18 +32,18 @@ const ACH_CATEGORIES = [
 // category-overview reference art. Categories without an entry fall back
 // to the default glow colour in the card builder.
 const ACH_CATEGORY_ASSETS = {
-    completion: { img: 'images/Achievement_Screen/Achievements_Category_Completion.png',       glow: '#7ef29a' },
-    difficulty: { img: 'images/Achievement_Screen/Achievements_Category_Difficulty.png',       glow: '#ff6464' },
-    grid:       { img: 'images/Achievement_Screen/Achievements_Category_GridPuzzles.png',      glow: '#5ad8ff' },
-    score:      { img: 'images/Achievement_Screen/Achievements_Category_Score.png',            glow: '#c07bff' },
-    time:       { img: 'images/Achievement_Screen/Achievements_Category_TimeSpeed.png',        glow: '#5ad8ff' },
-    mistakes:   { img: 'images/Achievement_Screen/Achievements_category_MistakesComeback.png', glow: '#c07bff' },
-    items:      { img: 'images/Achievement_Screen/Achievements_Category_ItemsInventory.png',   glow: '#5ad8ff' },
-    quiz:       { img: 'images/Achievement_Screen/Achievements_Category_QuizExcercises.png',   glow: '#5ad8ff' },
-    class:      { img: 'images/Achievement_Screen/Achievements_Category_ClassesAbilities.png', glow: '#7ef29a' },
-    tree:       { img: 'images/Achievement_Screen/Achievements_Category_ProbabilityTree.png',  glow: '#7ef29a' },
-    inference:  { img: 'images/Achievement_Screen/Achievements_Category_Inference.png',        glow: '#ffc857' },
-    endgame:    { img: 'images/Achievement_Screen/Achievements_Category_Endgame.png',          glow: '#c07bff' },
+    completion: { img: 'images/Achievement_Screen/Achievements_Category_Completion.webp',       glow: '#7ef29a' },
+    difficulty: { img: 'images/Achievement_Screen/Achievements_Category_Difficulty.webp',       glow: '#ff6464' },
+    grid:       { img: 'images/Achievement_Screen/Achievements_Category_GridPuzzles.webp',      glow: '#5ad8ff' },
+    score:      { img: 'images/Achievement_Screen/Achievements_Category_Score.webp',            glow: '#c07bff' },
+    time:       { img: 'images/Achievement_Screen/Achievements_Category_TimeSpeed.webp',        glow: '#5ad8ff' },
+    mistakes:   { img: 'images/Achievement_Screen/Achievements_category_MistakesComeback.webp', glow: '#c07bff' },
+    items:      { img: 'images/Achievement_Screen/Achievements_Category_ItemsInventory.webp',   glow: '#5ad8ff' },
+    quiz:       { img: 'images/Achievement_Screen/Achievements_Category_QuizExcercises.webp',   glow: '#5ad8ff' },
+    class:      { img: 'images/Achievement_Screen/Achievements_Category_ClassesAbilities.webp', glow: '#7ef29a' },
+    tree:       { img: 'images/Achievement_Screen/Achievements_Category_ProbabilityTree.webp',  glow: '#7ef29a' },
+    inference:  { img: 'images/Achievement_Screen/Achievements_Category_Inference.webp',        glow: '#ffc857' },
+    endgame:    { img: 'images/Achievement_Screen/Achievements_Category_Endgame.webp',          glow: '#c07bff' },
 };
 
 // Which view is currently rendered inside #ach-body:
@@ -541,7 +541,7 @@ function _buildCategoryCardHtml(cat, defs, lang) {
              role="button" tabindex="0" data-cat="${cat.key}"
              style="--cat-glow: ${glow}">
             <div class="ach-cat-card-banner">
-                <img class="ach-cat-card-banner-img" src="images/Achievement_Screen/Achievements_Category_Header.png" alt="">
+                <img class="ach-cat-card-banner-img" src="images/Achievement_Screen/Achievements_Category_Header.webp" alt="">
                 <span class="ach-cat-card-title">${catLabel}</span>
             </div>
             <div class="ach-cat-card-body"${bodyStyle}>

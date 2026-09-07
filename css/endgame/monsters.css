@@ -13,8 +13,8 @@
     padding: 0 12px;
     box-sizing: border-box;
     pointer-events: none;
-    min-height: 130px; /* tall enough for one full card */
-    height: 130px; /* fixed — prevents layout shift when cards appear/disappear */
+    min-height: 260px; /* tall enough for one full card (173px art + bars + pill) */
+    height: 260px; /* fixed — prevents layout shift when cards appear/disappear */
     overflow: visible; /* cards can visually overflow without pushing content below */
 }
 
@@ -1978,7 +1978,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    width: 54px; /* Perfectly bounds the emoji structure */
+    width: calc(128px * var(--eg-art, 1) + 12px); /* frame follows per-spawn scale, bars match */
     position: relative;
     cursor: pointer;
     user-select: none;
@@ -2014,11 +2014,11 @@
 }
 
 .eg-charge-track-compact {
-    height: 7px;
+    height: 8px;
 }
 
 .eg-hp-track-compact {
-    height: 9px;
+    height: 10px;
 }
 
 .eg-hp-bar-compact {
@@ -2068,8 +2068,8 @@
         0 0 10px rgba(255,215,0,0.72),
         0 0 18px rgba(255,140,0,0.42);
 }
-.eg-monster-card-compact.eg-card-targeted .eg-charge-track-compact { height: 8px; }
-.eg-monster-card-compact.eg-card-targeted .eg-hp-track-compact     { height: 10px; }
+.eg-monster-card-compact.eg-card-targeted .eg-charge-track-compact { height: 9px; }
+.eg-monster-card-compact.eg-card-targeted .eg-hp-track-compact     { height: 12px; }
 .eg-monster-card-compact.eg-card-targeted .eg-hp-bar-compact,
 .eg-monster-card-compact.eg-card-targeted .eg-charge-bar {
     filter: brightness(1.14);
@@ -2089,40 +2089,62 @@
     50%      { filter: brightness(1.35); }
 }
 
-/* Emoji Wrap Space */
+/* Monster art floats free — no passive frame (frames were an emoji-era
+   leftover). The border stays transparent until the monster is targeted
+   or enraged, so highlights never cause layout shift. Size varies per
+   spawn via --eg-art (see _egBuildMonster artScale). */
 .eg-emoji-wrapper {
     position: relative;
-    width: 48px;
-    height: 48px;
-    background: #222;
-    border: 2px solid #444;
-    border-radius: 8px;
+    width: calc(128px * var(--eg-art, 1));
+    height: calc(128px * var(--eg-art, 1));
+    background: transparent;
+    border: 3px solid transparent;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+/* Real monster art fills the frame (item icons keep the 1em rule in endgame-hub.css) */
+.eg-emoji-wrapper img.eg-art-img {
+    width: 88%;
+    height: 88%;
+    /* pop sprites off busy backgrounds now that the dark tile is gone */
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+}
+
+/* Subtle hover affordance now that there is no frame to hover */
+.eg-monster-card-compact:hover .eg-emoji-wrapper:not(.eg-compact-targeted) {
+    transform: scale(1.05);
+}
+
 .eg-monster-emoji-compact {
-    font-size: 2rem;
+    font-size: 3rem;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 
 /* ── Boss Cards — much larger than normal creatures ───────────── */
 .eg-monster-card-compact.eg-boss-card {
-    width: 104px;
+    width: calc(192px * var(--eg-art, 1) + 16px);
     margin: 0 8px;
 }
 
+/* No passive gold frame either — the crown + size already mark the boss.
+   Gold only appears when targeted, red when enraged. */
 .eg-emoji-wrapper.eg-boss-emoji-wrapper {
-    width: 96px;
-    height: 96px;
-    border: 3px solid #d4af37;
-    animation: eg-boss-glow 2s ease-in-out infinite alternate;
+    width: calc(192px * var(--eg-art, 1));
+    height: calc(192px * var(--eg-art, 1));
+    border: 3px solid transparent;
 }
 
 .eg-monster-emoji-compact.eg-boss-emoji {
-    font-size: 4rem;
+    font-size: 6rem;
     filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6));
 }
 
@@ -2135,9 +2157,9 @@
 /* Crown badge pinned to the top-right of the boss frame */
 .eg-boss-crown {
     position: absolute;
-    top: -16px;
-    right: -6px;
-    font-size: 1.3rem;
+    top: -22px;
+    right: -8px;
+    font-size: 1.7rem;
     line-height: 1;
     z-index: 2;
     pointer-events: none;
@@ -2278,7 +2300,7 @@
 }
 /* Boss cards are twice the size — lift the pill a bit higher */
 .eg-boss-card .eg-target-arrow {
-    top: -36px;
+    top: -40px;
     font-size: 13px;
     padding: 5px 12px;
     letter-spacing: 1.3px;

@@ -38,26 +38,26 @@
 
 #class-selection-overlay[data-mode="upgrade"],
 #class-selection-overlay[data-mode="ascend-upgrade"] {
-    background-image: url('../images/Class_Selection/class_selection_bg.jpeg');
+    background-image: url('../images/Class_Selection/class_selection_bg.webp');
     background-size: cover;
     background-position: center;
     backdrop-filter: blur(2px);
 }
 
     #class-selection-overlay[data-mode="upgrade"][data-classid="statistician"] {
-        background-image: url('../images/Class_Spell_Upgrade/statistician_upgrade_bg.jpeg');
+        background-image: url('../images/Class_Spell_Upgrade/statistician_upgrade_bg.webp');
         background-size: cover;
         background-position: center;
     }
 
     #class-selection-overlay[data-mode="upgrade"][data-classid="mathmagician"] {
-        background-image: url('../images/Class_Spell_Upgrade/mathmagician_upgrade_bg.jpeg');
+        background-image: url('../images/Class_Spell_Upgrade/mathmagician_upgrade_bg.webp');
         background-size: cover;
         background-position: center;
     }
 
     #class-selection-overlay[data-mode="upgrade"][data-classid="probabilist"] {
-        background-image: url('../images/Class_Spell_Upgrade/probabilist_upgrade_bg.jpeg');
+        background-image: url('../images/Class_Spell_Upgrade/probabilist_upgrade_bg.webp');
         background-size: cover;
         background-position: center;
     }
@@ -303,48 +303,48 @@
 */
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="statistician"][data-type="passive"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/momentum.png');
+        background-image: url('../images/Class_Spell_Upgrade/momentum.webp');
         background-size: cover;
     }
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="statistician"][data-type="active1"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/data_strike.png');
+        background-image: url('../images/Class_Spell_Upgrade/data_strike.webp');
         background-size: cover;
     }
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="statistician"][data-type="active2"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/diagonal_strike.png');
+        background-image: url('../images/Class_Spell_Upgrade/diagonal_strike.webp');
         background-size: cover;
     }
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="mathmagician"][data-type="passive"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/variance_shield.png');
+        background-image: url('../images/Class_Spell_Upgrade/variance_shield.webp');
         background-size: cover;
     }
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="mathmagician"][data-type="active1"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/arcane_reveal.png');
+        background-image: url('../images/Class_Spell_Upgrade/arcane_reveal.webp');
         background-size: cover;
     }
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="mathmagician"][data-type="active2"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/absolute_zero.png');
+        background-image: url('../images/Class_Spell_Upgrade/absolute_zero.webp');
         background-size: cover;
     }
 
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="probabilist"][data-type="passive"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/bayesian_insight.png');
+        background-image: url('../images/Class_Spell_Upgrade/bayesian_insight.webp');
         background-size: cover;
     }
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="probabilist"][data-type="active1"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/precision_shot.png');
+        background-image: url('../images/Class_Spell_Upgrade/precision_shot.webp');
         background-size: cover;
     }
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-card[data-classid="probabilist"][data-type="active2"] .cs-spell-locker {
-        background-image: url('../images/Class_Spell_Upgrade/rain_of_arrows.png');
+        background-image: url('../images/Class_Spell_Upgrade/rain_of_arrows.webp');
         background-size: cover;
     }
 
@@ -559,38 +559,38 @@
 /* Full Background images for the specific-classes */
 
 #class-selection-overlay[data-mode="ascend-upgrade"][data-classid="outlier"] {
-    background-image: url('../images/Class_Spell_Upgrade/outlier_upgrade_bg.jpeg');
+    background-image: url('../images/Class_Spell_Upgrade/outlier_upgrade_bg.webp');
     background-size: cover;
     background-position: center;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"][data-classid="actuary"] {
-    background-image: url('../images/Class_Spell_Upgrade/actuary_upgrade_bg.jpeg');
+    background-image: url('../images/Class_Spell_Upgrade/actuary_upgrade_bg.webp');
     background-size: cover;
     background-position: center;
 }
 
 
 #class-selection-overlay[data-mode="ascend-upgrade"][data-classid="recursionist"] {
-    background-image: url('../images/Class_Spell_Upgrade/recursionist_upgrade_bg.jpeg');
+    background-image: url('../images/Class_Spell_Upgrade/recursionist_upgrade_bg.webp');
     background-size: cover;
     background-position: center;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"][data-classid="markovian"] {
-    background-image: url('../images/Class_Spell_Upgrade/markovian_upgrade_bg.jpeg');
+    background-image: url('../images/Class_Spell_Upgrade/markovian_upgrade_bg.webp');
     background-size: cover;
     background-position: center;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"][data-classid="bayesian"] {
-    background-image: url('../images/Class_Spell_Upgrade/bayesian_upgrade_bg.jpeg');
+    background-image: url('../images/Class_Spell_Upgrade/bayesian_upgrade_bg.webp');
     background-size: cover;
     background-position: center;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"][data-classid="random_walker"] {
-    background-image: url('../images/Class_Spell_Upgrade/random_walker_upgrade_bg.jpeg');
+    background-image: url('../images/Class_Spell_Upgrade/random_walker_upgrade_bg.webp');
     background-size: cover;
     background-position: center;
 }
@@ -605,12 +605,12 @@
 
 /*Outlier*/
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="outlier"][data-type="active1"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/tail_risk.png');
+    background-image: url('../images/Class_Spell_Upgrade/tail_risk.webp');
     background-size: cover;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="outlier"][data-type="active2"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/speedforce.png');
+    background-image: url('../images/Class_Spell_Upgrade/speedforce.webp');
     background-size: cover;
 }
 
@@ -618,48 +618,48 @@
 /*Actuary */
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="actuary"][data-type="active1"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/regression_to_prior.png');
+    background-image: url('../images/Class_Spell_Upgrade/regression_to_prior.webp');
     background-size: cover;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="actuary"][data-type="active2"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/significance_threshold.png');
+    background-image: url('../images/Class_Spell_Upgrade/significance_threshold.webp');
     background-size: cover;
 }
 
 /* Recursionist */
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="recursionist"][data-type="active1"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/residual.png');
+    background-image: url('../images/Class_Spell_Upgrade/residual.webp');
     background-size: cover;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="recursionist"][data-type="active2"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/degrees_of_freedom.png');
+    background-image: url('../images/Class_Spell_Upgrade/degrees_of_freedom.webp');
     background-size: cover;
 }
 
 /* Markovian */
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="markovian"][data-type="active1"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/state_rollback.png');
+    background-image: url('../images/Class_Spell_Upgrade/state_rollback.webp');
     background-size: cover;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="markovian"][data-type="active2"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/transition_matrix.png');
+    background-image: url('../images/Class_Spell_Upgrade/transition_matrix.webp');
     background-size: cover;
 }
 
 /* Bayesian */
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="bayesian"][data-type="active1"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/bayes_traps.png');
+    background-image: url('../images/Class_Spell_Upgrade/bayes_traps.webp');
     background-size: cover;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="bayesian"][data-type="active2"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/type1_error_shield.png');
+    background-image: url('../images/Class_Spell_Upgrade/type1_error_shield.webp');
     background-size: cover;
 }
 
@@ -667,11 +667,11 @@
 /* Random Walker */
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="random_walker"][data-type="active1"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/brownian_motion.png');
+    background-image: url('../images/Class_Spell_Upgrade/brownian_motion.webp');
     background-size: cover;
 }
 
 #class-selection-overlay[data-mode="ascend-upgrade"] .cs-spell-card[data-classid="random_walker"][data-type="active2"] .cs-spell-locker {
-    background-image: url('../images/Class_Spell_Upgrade/drifter.png');
+    background-image: url('../images/Class_Spell_Upgrade/drifter.webp');
     background-size: cover;
 }

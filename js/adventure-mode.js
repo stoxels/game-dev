@@ -35,7 +35,7 @@ function _advBuildSprite() {
     sprite.className = 'adv-player-sprite';
     sprite.src = (typeof _getPlayerCharacterImage === 'function')
         ? _getPlayerCharacterImage()
-        : 'images/sprites/Stox_noclass.png';
+        : 'images/sprites/Stox_noclass.webp';
     sprite.draggable = false;
     sprite.style.left = '50%';
     sprite.style.top = '50%';

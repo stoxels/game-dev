@@ -431,7 +431,7 @@ function _egDynamoRenderConductorCard(m, rec) {
 
     const hpPct = Math.max(0, Math.round((m.currentHP / m.maxHP) * 100));
     const art = (typeof EG_ART !== 'undefined' && EG_ART.html)
-        ? EG_ART.html('monster', m.baseId, m.emoji) : m.emoji;
+        ? EG_ART.html('monster', m.artId || m.baseId, m.emoji) : m.emoji;
 
     const card = document.createElement('div');
     card.className = 'eg-monster-card-compact eg-dynamo-conductor-card';

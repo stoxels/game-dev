@@ -147,7 +147,7 @@
 }
 
 .lang-btn {
-    background-image: url('../images/Title_Screen/Language-Block.png');
+    background-image: url('../images/Title_Screen/Language-Block.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     width: clamp(60px, 5.5%, 64px);
@@ -222,7 +222,7 @@
 /* ── BLOCK BACKGROUND IMAGES ───────────────────────────── */
 
 #btn-play {
-    background-image: url('../images/Title_Screen/Play-Block.png');
+    background-image: url('../images/Title_Screen/Play-Block.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     /* 20.5% keeps the block clear of the side columns (30% / 70%)
@@ -235,7 +235,7 @@
 }
 
 .block-general {
-    background-image: url('../images/Title_Screen/General-Block.png');
+    background-image: url('../images/Title_Screen/General-Block.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     /* Per-glyph width ~6.5% of the block keeps long translated labels
@@ -248,7 +248,7 @@
 }
 
 #btn-reset {
-    background-image: url('../images/Title_Screen/Reset-Block.png');
+    background-image: url('../images/Title_Screen/Reset-Block.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     width: clamp(170px, 19%, 250px);

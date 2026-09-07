@@ -168,11 +168,34 @@ const EG_ART = (function () {
         }
     }
 
+    // Lists every known art id for a base id: [base, base_2, base_3, ...].
+    // Variant files are named "<base>_<n>.<ext>" (see tools/process-monster-art.py).
+    // Driven by the manifest cache, so no extra requests. Always contains at
+    // least the base id itself — callers fall back to emoji when art is missing.
+    function variants(kind, baseId) {
+        if (!baseId) return [];
+        const out = [baseId];
+        let n = 2;
+        while (_cache.get(_key(kind, baseId + '_' + n))) {
+            out.push(baseId + '_' + n);
+            n++;
+        }
+        return out;
+    }
+
+    // Picks a random variant for a base id. The caller is expected to store
+    // the result on the spawned entity (e.g. monster.artId) so re-renders
+    // keep showing the same image instead of flickering between variants.
+    function randomVariant(kind, baseId) {
+        const v = variants(kind, baseId);
+        return v[(Math.random() * v.length) | 0];
+    }
+
     // Kept for API compatibility. With the manifest present everything is
     // already cached by the single fetch above; nothing to do here.
     function preload() { /* handled by the manifest fetch */ }
 
-    return { url, html, fillElement, preload };
+    return { url, html, fillElement, variants, randomVariant, preload };
 })();
 
 

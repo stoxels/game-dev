@@ -35,7 +35,7 @@
     aspect-ratio: 611 / 470; /* frame art ratio, like the sibling modals */
     padding: clamp(48px, 12%, 164px) clamp(44px, 11%, 150px) clamp(42px, 11.5%, 157px);
     box-sizing: border-box;
-    background-image: url('../images/Settings/settings_background.png');
+    background-image: url('../images/Settings/settings_background.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -62,7 +62,7 @@
     transform: translateX(-50%);
     width: max(min(56%, 720px), 340px);
     height: clamp(46px, 6vw, 68px);
-    background-image: url('../images/Settings/settings_title_plague.png');
+    background-image: url('../images/Settings/settings_title_plague.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     display: flex;
@@ -103,7 +103,7 @@
     height: clamp(34px, 4.4vw, 50px);
     font-size: 0;
     color: transparent;
-    background-image: url('../images/Settings/settings_close_button.png');
+    background-image: url('../images/Settings/settings_close_button.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -177,7 +177,7 @@
     align-self: center;
     width: clamp(120px, 16vw, 270px);
     aspect-ratio: 2.2 / 1;
-    background-image: url('../images/Game-Reset/Companions-Portal-Deco.png');
+    background-image: url('../images/Game-Reset/Companions-Portal-Deco.webp');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -199,7 +199,7 @@
     gap: clamp(10px, 2vw, 20px);
     margin: 0 clamp(2%, 4%, 6%);
     padding: clamp(10px, 1.6vw, 16px) clamp(14px, 2.4vw, 24px);
-    background-image: url('../images/Game-Reset/Note-Banner.png');
+    background-image: url('../images/Game-Reset/Note-Banner.webp');
     background-size: 100% 115%;
     background-repeat: no-repeat;
     background-position: center;
@@ -236,7 +236,7 @@
     font-size: clamp(10px, 1.4vw, 14px);
     letter-spacing: 1px;
     color: var(--accent2);
-    background-image: url('../images/Game-Reset/Button-Stone.png');
+    background-image: url('../images/Game-Reset/Button-Stone.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -273,7 +273,7 @@
     width: clamp(70px, 9vw, 120px);
     height: clamp(70px, 9vw, 120px);
     margin: 0 clamp(-24px, -2vw, -10px); /* pulls buttons in so it visually sits between them */
-    background-image: url('../images/Game-Reset/Portal-Deco.png');
+    background-image: url('../images/Game-Reset/Portal-Deco.webp');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -337,67 +337,67 @@
 
 /* Header icons */
 .reset-icon-swirl {
-    background-image: url('../images/Game-Reset/Icon-Swirl.png');
+    background-image: url('../images/Game-Reset/Icon-Swirl.webp');
     filter: drop-shadow(0 0 12px rgba(170, 80, 255, 0.7));
     --icon-size: 200%; 
 }
 
 .reset-icon-gear {
-    background-image: url('../images/Game-Reset/Icon-Gear-Cracked.png');
+    background-image: url('../images/Game-Reset/Icon-Gear-Cracked.webp');
     opacity: 0.9;
     --icon-size: 200%; 
 }
 
 /* Left column item icons */
 .reset-icon-levels {
-    background-image: url('../images/Game-Reset/Icon-Levels.png');
+    background-image: url('../images/Game-Reset/Icon-Levels.webp');
     --icon-size: 150%;
 }
 
 .reset-icon-highscores {
-    background-image: url('../images/Game-Reset/Icon-Highscores.png');
+    background-image: url('../images/Game-Reset/Icon-Highscores.webp');
     --icon-size: 150%;
 }
 
 .reset-icon-bonus {
-    background-image: url('../images/Game-Reset/Icon-Bonus.png');
+    background-image: url('../images/Game-Reset/Icon-Bonus.webp');
     --icon-size: 150%;
 }
 
 .reset-icon-inventory {
-    background-image: url('../images/Game-Reset/Icon-Inventory.png');
+    background-image: url('../images/Game-Reset/Icon-Inventory.webp');
     --icon-size: 150%;
 }
 
 .reset-icon-codes {
-    background-image: url('../images/Game-Reset/Icon-Codes.png');
+    background-image: url('../images/Game-Reset/Icon-Codes.webp');
     --icon-size: 150%;
 }
 
 /* Right column item icons */
 .reset-icon-class {
-    background-image: url('../images/Game-Reset/Icon-Class.png');
+    background-image: url('../images/Game-Reset/Icon-Class.webp');
     --icon-size: 150%;
 }
 
 .reset-icon-inference {
-    background-image: url('../images/Game-Reset/Icon-Inference.png');
+    background-image: url('../images/Game-Reset/Icon-Inference.webp');
     --icon-size: 150%;
 }
 
 .reset-icon-convergence {
-    background-image: url('../images/Game-Reset/Icon-Convergence.png');
+    background-image: url('../images/Game-Reset/Icon-Convergence.webp');
     --icon-size: 150%;
 }
 
 /* Note banner icons */
 .reset-icon-trophy {
-    background-image: url('../images/Game-Reset/Icon-Trophy.png');
+    background-image: url('../images/Game-Reset/Icon-Trophy.webp');
     --icon-size: 150%;
 }
 
 .reset-icon-shield {
-    background-image: url('../images/Game-Reset/Icon-Shield-Star.png');
+    background-image: url('../images/Game-Reset/Icon-Shield-Star.webp');
     --icon-size: 150%;
 }
 

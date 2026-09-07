@@ -1,0 +1,23 @@
+Match the art style of the attached reference images EXACTLY:
+chibi cartoon game sprite, thick bold black outlines, flat cel-shading
+with soft gradients, simple clean shapes, big expressive eyes (for
+creatures that have eyes), full body visible, centered, facing the
+viewer in a 3/4 front view.
+
+Create a single boss game sprite: The Lodestone, a magnetic rock golem
+pulling iron filings into field-line patterns, horseshoe-magnet fists,
+attracting all metal with crushing force.
+
+Theme: a doomed apocalyptic world built on mathematics, stochastics
+and statistics. The monster must visually embody its math concept
+(e.g. cracked formulas on skin, dice/p-values/runes, glitching
+probability curves, bell-curve silhouettes, fractal growths).
+
+Technical requirements:
+- single character only, full body, no cropping
+- plain solid white background, no scenery, no shadow
+- square 1:1 composition with breathing room on all sides
+- bold readable silhouette that still works scaled down to 32px
+- limited color palette (3-5 main colors + black outlines)
+- no text, no letters, no numbers, no watermark, no logo
+- cartoon style only, NOT photorealistic, NOT 3D render, NOT anime

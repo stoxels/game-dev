@@ -33,7 +33,7 @@
     max-width: none; /* override .modal-box's 660px cap */
     aspect-ratio: 611 / 470;
     max-height: calc(100vh - 40px);
-    background-image: url('../images/Settings/settings_background.png');
+    background-image: url('../images/Settings/settings_background.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -89,7 +89,7 @@
        same visual weight the settings plaque has on its smaller box. */
     width: max(min(46%, 560px), 340px);
     height: clamp(56px, 9cqw, 120px);
-    background-image: url('../images/Settings/settings_title_plague.png');
+    background-image: url('../images/Settings/settings_title_plague.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     display: flex;
@@ -124,7 +124,7 @@
     right: 2%;
     width: clamp(34px, 4.4cqw, 50px);
     height: clamp(34px, 4.4cqw, 50px);
-    background-image: url('../images/Settings/settings_close_button.png');
+    background-image: url('../images/Settings/settings_close_button.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -155,7 +155,7 @@
     font-size: clamp(12px, 1.6cqw, 18px);
     letter-spacing: 1px;
     color: #8a3324;
-    background-image: url('../images/Game_Setup/Button-Block-1.png');
+    background-image: url('../images/Game_Setup/Button-Block-1.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -175,7 +175,7 @@
     }
 
     .ach-reset-btn:active {
-        background-image: url('../images/Game_Setup/Button-Block-2.png');
+        background-image: url('../images/Game_Setup/Button-Block-2.webp');
         transform: translateY(1px);
     }
 
@@ -216,7 +216,7 @@
     margin: 0 auto clamp(10px, 1.6cqw, 18px);
     padding: clamp(12px, 2.5cqw, 28px) clamp(18px, 4.5cqw, 62px);
     box-sizing: border-box;
-    background-image: url('../images/Inference/inference-header.png');
+    background-image: url('../images/Inference/inference-header.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
@@ -855,7 +855,7 @@
     letter-spacing: 1px;
     color: var(--accent2, #ffffff);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    background: url('../images/Game_Setup/return_to_menu_button.png') center / 100% 100% no-repeat;
+    background: url('../images/Game_Setup/return_to_menu_button.webp') center / 100% 100% no-repeat;
     background-color: transparent;
     border: none;
     padding: clamp(8px, 1.1cqw, 13px) clamp(14px, 1.8cqw, 22px);

@@ -48,35 +48,35 @@ const SYLA_INTRO_SONG = {
     // Image timeline — placeholders, adjust filenames and times once images exist.
     // Each entry fires when playback crosses its `time` (ms from song start).
     images: [
-        { image: "1.jpeg", time: 0 },          // establishing shot before vocals
-        { image: "2.jpeg", time: 12000 },      // "Born beneath the Normal Grove"
-        { image: "3.jpeg", time: 21000 },      // "And the forest was her home"
-        { image: "4.jpeg", time: 30000 },      // "Knew the mushrooms' glowing nights"
-        { image: "5.jpeg", time: 36000 },      // "But the fox takes the same path now"
-        { image: "6.jpeg", time: 45500 },      // "Same branch, same time, same song"
-        { image: "7.jpeg", time: 54500 },      // "Something's pulling at the wild"
-        { image: "8.jpeg", time: 60500 },      // "She checks her parents' instruments"
-        { image: "9.jpeg", time: 70000 },      // "But nobody answers here"
-        { image: "10.jpeg", time: 78000 },     // "And near the end it bends too far" (Chorus 1)
-        { image: "11.jpeg", time: 90500 },     // "Something deliberate / planned"
-        { image: "12.jpeg", time: 96500 },     // "Every wound connects to one point"
-        { image: "13.jpeg", time: 112000 },    // "Then she watches her own mother"
-        { image: "14.jpeg", time: 124000 },    // "And her father at the window"
-        { image: "15.jpeg", time: 133000 },    // "Cold and quiet, like thin ice"
-        { image: "16.jpeg", time: 136000 },    // "She's the only one still moving"
-        { image: "17.jpeg", time: 145500 },    // "She won't be who she needs to be"
-        { image: "18.jpeg", time: 154000 },    // "And near the end it bends too far" (Chorus 2)
-        { image: "19.jpeg", time: 169500 },    // "Every wound connects to one point"
-        { image: "20.jpeg", time: 177500 },    // "The Guild man looks at her boots"
-        { image: "21.jpeg", time: 181500 },    // Not her notebooks, not her proof
-        { image: "22.jpeg", time: 190000 },    // There's a program, someone says
-        { image: "23.jpeg", time: 196500 },    // She signs her name without a pause
-        { image: "24.jpeg", time: 204500 },    // She steps away from everything
-        { image: "25.jpeg", time: 207500 },    // The Grove, the logs, the glowing nights
-        { image: "26.jpeg", time: 211000 },    // Notebook open, not yet closed
-        { image: "27.jpeg", time: 217000 },    // The animals are waiting still
-        { image: "28.jpeg", time: 226000 },
-        { image: "29.jpeg", time: 232000 },
+        { image: "1.webp", time: 0 },          // establishing shot before vocals
+        { image: "2.webp", time: 12000 },      // "Born beneath the Normal Grove"
+        { image: "3.webp", time: 21000 },      // "And the forest was her home"
+        { image: "4.webp", time: 30000 },      // "Knew the mushrooms' glowing nights"
+        { image: "5.webp", time: 36000 },      // "But the fox takes the same path now"
+        { image: "6.webp", time: 45500 },      // "Same branch, same time, same song"
+        { image: "7.webp", time: 54500 },      // "Something's pulling at the wild"
+        { image: "8.webp", time: 60500 },      // "She checks her parents' instruments"
+        { image: "9.webp", time: 70000 },      // "But nobody answers here"
+        { image: "10.webp", time: 78000 },     // "And near the end it bends too far" (Chorus 1)
+        { image: "11.webp", time: 90500 },     // "Something deliberate / planned"
+        { image: "12.webp", time: 96500 },     // "Every wound connects to one point"
+        { image: "13.webp", time: 112000 },    // "Then she watches her own mother"
+        { image: "14.webp", time: 124000 },    // "And her father at the window"
+        { image: "15.webp", time: 133000 },    // "Cold and quiet, like thin ice"
+        { image: "16.webp", time: 136000 },    // "She's the only one still moving"
+        { image: "17.webp", time: 145500 },    // "She won't be who she needs to be"
+        { image: "18.webp", time: 154000 },    // "And near the end it bends too far" (Chorus 2)
+        { image: "19.webp", time: 169500 },    // "Every wound connects to one point"
+        { image: "20.webp", time: 177500 },    // "The Guild man looks at her boots"
+        { image: "21.webp", time: 181500 },    // Not her notebooks, not her proof
+        { image: "22.webp", time: 190000 },    // There's a program, someone says
+        { image: "23.webp", time: 196500 },    // She signs her name without a pause
+        { image: "24.webp", time: 204500 },    // She steps away from everything
+        { image: "25.webp", time: 207500 },    // The Grove, the logs, the glowing nights
+        { image: "26.webp", time: 211000 },    // Notebook open, not yet closed
+        { image: "27.webp", time: 217000 },    // The animals are waiting still
+        { image: "28.webp", time: 226000 },
+        { image: "29.webp", time: 232000 },
     ],
 
     // Lyric timeline — all 70 lines from the SRT, in order, as bilingual

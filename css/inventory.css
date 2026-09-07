@@ -360,7 +360,7 @@
     width: 94%;
     max-width: min(880px, 130vh);
     aspect-ratio: 611 / 470;
-    background-image: url('../images/Settings/settings_background.png');
+    background-image: url('../images/Settings/settings_background.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -392,7 +392,7 @@
     transform: translateX(-50%);
     width: max(min(56%, 720px), 340px);
     height: clamp(46px, 6vw, 68px);
-    background-image: url('../images/Settings/settings_title_plague.png');
+    background-image: url('../images/Settings/settings_title_plague.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     display: flex;
@@ -418,7 +418,7 @@
     right: 2%;
     width: clamp(34px, 4.4vw, 50px);
     height: clamp(34px, 4.4vw, 50px);
-    background-image: url('../images/Settings/settings_close_button.png');
+    background-image: url('../images/Settings/settings_close_button.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;

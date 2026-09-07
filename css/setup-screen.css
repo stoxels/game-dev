@@ -151,7 +151,7 @@
     font-size: 17px;
     letter-spacing: 1px;
     color: var(--setup-opt-inactive);
-    background-image: url('../images/Game_Setup/Button-Block-1.png');
+    background-image: url('../images/Game_Setup/Button-Block-1.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -169,7 +169,7 @@
     }
 
     .setup-opt-diff.sel {
-        background-image: url('../images/Game_Setup/Button-Block-2.png');
+        background-image: url('../images/Game_Setup/Button-Block-2.webp');
         color: var(--accent);
     }
 
@@ -181,7 +181,7 @@
 }
 
     .setup-desc-ribbon .setup-desc {
-        background-image: url('../images/Game_Setup/Ribbon-Banner.png');
+        background-image: url('../images/Game_Setup/Ribbon-Banner.webp');
         background-size: 100% 100%;
         background-repeat: no-repeat;
         background-position: center;
@@ -259,7 +259,7 @@
     text-align: center;
     color: #2c1a0c;
     text-shadow: none;
-    background-image: url('../images/Game_Setup/Modifier_Plate.png');
+    background-image: url('../images/Game_Setup/Modifier_Plate.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -284,7 +284,7 @@
 /* The tombstone slab — big and buff, holds the icon */
 .setup-opt-mod {
     box-sizing: border-box;
-    background-image: url('../images/Game_Setup/Modifier-Block-1.png');
+    background-image: url('../images/Game_Setup/Modifier-Block-1.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -309,7 +309,7 @@
 
     /* selected slab glows */
     .setup-opt-mod.sel-yellow {
-        background-image: url('../images/Game_Setup/Modifier-Block-2.png');
+        background-image: url('../images/Game_Setup/Modifier-Block-2.webp');
         filter: brightness(1.08) drop-shadow(0 0 12px rgba(102,252,241,0.5));
     }
 
@@ -325,11 +325,11 @@
 }
 
 /* Per-icon images */
-.mod-icon-timetrial { background-image: url('../images/Game_Setup/Icon-TimeTrial.png'); }
-.mod-icon-hardcore  { background-image: url('../images/Game_Setup/Icon-Hardcore.png'); }
-.mod-icon-ironman   { background-image: url('../images/Game_Setup/Icon-Ironman.png'); }
-.mod-icon-classless { background-image: url('../images/Game_Setup/Icon-Classless.png'); }
-.mod-icon-treeless  { background-image: url('../images/Game_Setup/Icon-Treeless.png'); }
+.mod-icon-timetrial { background-image: url('../images/Game_Setup/Icon-TimeTrial.webp'); }
+.mod-icon-hardcore  { background-image: url('../images/Game_Setup/Icon-Hardcore.webp'); }
+.mod-icon-ironman   { background-image: url('../images/Game_Setup/Icon-Ironman.webp'); }
+.mod-icon-classless { background-image: url('../images/Game_Setup/Icon-Classless.webp'); }
+.mod-icon-treeless  { background-image: url('../images/Game_Setup/Icon-Treeless.webp'); }
 .mod-icon-super-tutor { font-family: var(--PX); font-size: 54px; display: flex; align-items: center; justify-content: center; }
 
 /* Score tag under the slab */
@@ -390,7 +390,7 @@
     letter-spacing: 2px;
     color: var(--accent2);
     text-shadow: 1px 1px 2px rgba(0,0,0,0.9), 0 0 12px rgba(102,252,241,0.4);
-    background-image: url('../images/Game_Setup/Button-Block-1.png');
+    background-image: url('../images/Game_Setup/Button-Block-1.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -408,7 +408,7 @@
     }
 
     .setup-btn-img:active {
-        background-image: url('../images/Game_Setup/Button-Block-2.png');
+        background-image: url('../images/Game_Setup/Button-Block-2.webp');
         color: var(--accent);
         transform: translateY(0) scale(1);
     }
@@ -425,7 +425,7 @@
     font-size: 20px;
     letter-spacing: 1px;
     color: var(--accent2);
-    background-image: url('../images/Game_Setup/return_to_menu_button.png');
+    background-image: url('../images/Game_Setup/return_to_menu_button.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;

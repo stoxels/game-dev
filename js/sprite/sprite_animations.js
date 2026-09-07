@@ -11,7 +11,7 @@
 //
 // Expected filename convention (place in animations/<Char>/):
 //   <Char>_<state>_<animKey>_<frameIndex>.png
-// e.g. animations/Trix/abilities/Trix_random_walker_swing_1.png
+// e.g. animations/Trix/abilities/Trix_random_walker_swing_1.webp
 // (legacy flat files directly under walk/ and abilities/ keep working;
 // see ANIMATION CATALOG below for the canonical nested layout, e.g.
 // animations/Trix/abilities/random_walker/brownian/Trix_random_walker_brownian_1.png)
@@ -79,51 +79,51 @@ function _playSpriteAnimation(imgElementId, frames, timings, idleSrc, idleDelayM
 const _WALK_FRAMES = {
     stox: {
         noclass: [
-            'animations/Stox/walk/Stox_noclass_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_noclass_walk_2.png', // passing: mid-stride
-            'animations/Stox/walk/Stox_noclass_walk_3.png', // contact: right foot forward
+            'animations/Stox/walk/Stox_noclass_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_noclass_walk_2.webp', // passing: mid-stride
+            'animations/Stox/walk/Stox_noclass_walk_3.webp', // contact: right foot forward
         ],
         statistician: [
-            'animations/Stox/walk/Stox_statistician_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_statistician_walk_2.png', // passing: mid-stride
-            'animations/Stox/walk/Stox_statistician_walk_3.png', // contact: right foot forward
+            'animations/Stox/walk/Stox_statistician_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_statistician_walk_2.webp', // passing: mid-stride
+            'animations/Stox/walk/Stox_statistician_walk_3.webp', // contact: right foot forward
         ],
         outlier: [
-            'animations/Stox/walk/Stox_outlier_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_outlier_walk_2.png', // passing: mid-stride
-            'animations/Stox/walk/Stox_outlier_walk_3.png', // contact: right foot forward
+            'animations/Stox/walk/Stox_outlier_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_outlier_walk_2.webp', // passing: mid-stride
+            'animations/Stox/walk/Stox_outlier_walk_3.webp', // contact: right foot forward
         ],
         actuary: [
-            'animations/Stox/walk/Stox_actuary_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_actuary_walk_2.png', // passing: mid-stride
+            'animations/Stox/walk/Stox_actuary_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_actuary_walk_2.webp', // passing: mid-stride
         ],
         mathmagician: [
-            'animations/Stox/walk/Stox_mathmagician_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_mathmagician_walk_2.png', // passing: mid-stride
-            'animations/Stox/walk/Stox_mathmagician_walk_3.png', // contact: right foot forward
+            'animations/Stox/walk/Stox_mathmagician_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_mathmagician_walk_2.webp', // passing: mid-stride
+            'animations/Stox/walk/Stox_mathmagician_walk_3.webp', // contact: right foot forward
         ],
         recursionist: [
-            'animations/Stox/walk/Stox_recursionist_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_recursionist_walk_2.png', // passing: mid-stride
+            'animations/Stox/walk/Stox_recursionist_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_recursionist_walk_2.webp', // passing: mid-stride
         ],
         markovian: [
-            'animations/Stox/walk/Stox_markovian_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_markovian_walk_2.png', // passing: mid-stride
+            'animations/Stox/walk/Stox_markovian_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_markovian_walk_2.webp', // passing: mid-stride
         ],
         probabilist: [
-            'animations/Stox/walk/Stox_probabilist_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_probabilist_walk_2.png', // passing: mid-stride
-            'animations/Stox/walk/Stox_probabilist_walk_3.png', // contact: right foot forward
+            'animations/Stox/walk/Stox_probabilist_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_probabilist_walk_2.webp', // passing: mid-stride
+            'animations/Stox/walk/Stox_probabilist_walk_3.webp', // contact: right foot forward
         ],
         bayesian: [
-            'animations/Stox/walk/Stox_bayesian_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_bayesian_walk_2.png', // passing: mid-stride
-            'animations/Stox/walk/Stox_bayesian_walk_3.png', // contact: right foot forward
+            'animations/Stox/walk/Stox_bayesian_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_bayesian_walk_2.webp', // passing: mid-stride
+            'animations/Stox/walk/Stox_bayesian_walk_3.webp', // contact: right foot forward
         ],
         random_walker: [
-            'animations/Stox/walk/Stox_random_walker_walk_1.png', // contact: left foot forward
-            'animations/Stox/walk/Stox_random_walker_walk_2.png', // passing: mid-stride
-            'animations/Stox/walk/Stox_random_walker_walk_3.png', // contact: right foot forward
+            'animations/Stox/walk/Stox_random_walker_walk_1.webp', // contact: left foot forward
+            'animations/Stox/walk/Stox_random_walker_walk_2.webp', // passing: mid-stride
+            'animations/Stox/walk/Stox_random_walker_walk_3.webp', // contact: right foot forward
         ],
 
 
@@ -132,102 +132,102 @@ const _WALK_FRAMES = {
 
     trix: {
         noclass: [
-            'animations/Trix/walk/Trix_noclass_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_noclass_walk_2.png', // passing: mid-stride
-            'animations/Trix/walk/Trix_noclass_walk_3.png', // contact: right foot forward
+            'animations/Trix/walk/Trix_noclass_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_noclass_walk_2.webp', // passing: mid-stride
+            'animations/Trix/walk/Trix_noclass_walk_3.webp', // contact: right foot forward
         ],
         statistician: [
-            'animations/Trix/walk/Trix_statistician_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_statistician_walk_2.png', // passing: mid-stride
+            'animations/Trix/walk/Trix_statistician_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_statistician_walk_2.webp', // passing: mid-stride
         ],
         outlier: [
-            'animations/Trix/walk/Trix_outlier_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_outlier_walk_2.png', // passing: mid-stride
-            'animations/Trix/walk/Trix_outlier_walk_3.png', // contact: right foot forward
+            'animations/Trix/walk/Trix_outlier_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_outlier_walk_2.webp', // passing: mid-stride
+            'animations/Trix/walk/Trix_outlier_walk_3.webp', // contact: right foot forward
         ],
         actuary: [
-            'animations/Trix/walk/Trix_actuary_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_actuary_walk_2.png', // passing: mid-stride
-            'animations/Trix/walk/Trix_actuary_walk_3.png', // contact: right foot forward
+            'animations/Trix/walk/Trix_actuary_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_actuary_walk_2.webp', // passing: mid-stride
+            'animations/Trix/walk/Trix_actuary_walk_3.webp', // contact: right foot forward
         ],
         mathmagician: [
-            'animations/Trix/walk/Trix_mathmagician_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_mathmagician_walk_2.png', // passing: mid-stride
+            'animations/Trix/walk/Trix_mathmagician_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_mathmagician_walk_2.webp', // passing: mid-stride
         ],
         recursionist: [
-            'animations/Trix/walk/Trix_recursionist_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_recursionist_walk_2.png', // passing: mid-stride
-            'animations/Trix/walk/Trix_recursionist_walk_3.png', // contact: right foot forward
+            'animations/Trix/walk/Trix_recursionist_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_recursionist_walk_2.webp', // passing: mid-stride
+            'animations/Trix/walk/Trix_recursionist_walk_3.webp', // contact: right foot forward
         ],
         markovian: [
-            'animations/Trix/walk/Trix_markovian_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_markovian_walk_2.png', // passing: mid-stride
-            'animations/Trix/walk/Trix_markovian_walk_3.png', // contact: right foot forward
+            'animations/Trix/walk/Trix_markovian_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_markovian_walk_2.webp', // passing: mid-stride
+            'animations/Trix/walk/Trix_markovian_walk_3.webp', // contact: right foot forward
         ],
         probabilist: [
-            'animations/Trix/walk/Trix_probabilist_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_probabilist_walk_2.png', // passing: mid-stride
-            'animations/Trix/walk/Trix_probabilist_walk_3.png', // contact: right foot forward
+            'animations/Trix/walk/Trix_probabilist_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_probabilist_walk_2.webp', // passing: mid-stride
+            'animations/Trix/walk/Trix_probabilist_walk_3.webp', // contact: right foot forward
         ],
         bayesian: [
-            'animations/Trix/walk/Trix_bayesian_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_bayesian_walk_2.png', // passing: mid-stride
-            'animations/Trix/walk/Trix_bayesian_walk_3.png', // contact: right foot forward
+            'animations/Trix/walk/Trix_bayesian_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_bayesian_walk_2.webp', // passing: mid-stride
+            'animations/Trix/walk/Trix_bayesian_walk_3.webp', // contact: right foot forward
         ],
         random_walker: [
-            'animations/Trix/walk/Trix_random_walker_walk_1.png', // contact: left foot forward
-            'animations/Trix/walk/Trix_random_walker_walk_2.png', // passing: mid-stride
-            'animations/Trix/walk/Trix_random_walker_walk_3.png', // contact: right foot forward
+            'animations/Trix/walk/Trix_random_walker_walk_1.webp', // contact: left foot forward
+            'animations/Trix/walk/Trix_random_walker_walk_2.webp', // passing: mid-stride
+            'animations/Trix/walk/Trix_random_walker_walk_3.webp', // contact: right foot forward
         ],
     },
 
     syla: {
         noclass: [
-            'animations/Syla/walk/Syla_noclass_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_noclass_walk_2.png', // passing: mid-stride
-            'animations/Syla/walk/Syla_noclass_walk_3.png', // contact: right foot forward
+            'animations/Syla/walk/Syla_noclass_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_noclass_walk_2.webp', // passing: mid-stride
+            'animations/Syla/walk/Syla_noclass_walk_3.webp', // contact: right foot forward
         ],
         statistician: [
-            'animations/Syla/walk/Syla_statistician_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_statistician_walk_2.png', // passing: mid-stride
+            'animations/Syla/walk/Syla_statistician_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_statistician_walk_2.webp', // passing: mid-stride
         ],
         outlier: [
-            'animations/Syla/walk/Syla_outlier_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_outlier_walk_2.png', // passing: mid-stride
+            'animations/Syla/walk/Syla_outlier_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_outlier_walk_2.webp', // passing: mid-stride
         ],
         actuary: [
-            'animations/Syla/walk/Syla_actuary_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_actuary_walk_2.png', // passing: mid-stride
-            'animations/Syla/walk/Syla_actuary_walk_3.png', // contact: right foot forward
+            'animations/Syla/walk/Syla_actuary_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_actuary_walk_2.webp', // passing: mid-stride
+            'animations/Syla/walk/Syla_actuary_walk_3.webp', // contact: right foot forward
         ],
         mathmagician: [
-            'animations/Syla/walk/Syla_mathmagician_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_mathmagician_walk_2.png', // passing: mid-stride
-            'animations/Syla/walk/Syla_mathmagician_walk_3.png', // contact: right foot forward
+            'animations/Syla/walk/Syla_mathmagician_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_mathmagician_walk_2.webp', // passing: mid-stride
+            'animations/Syla/walk/Syla_mathmagician_walk_3.webp', // contact: right foot forward
         ],
         recursionist: [
-            'animations/Syla/walk/Syla_recursionist_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_recursionist_walk_2.png', // passing: mid-stride
-            'animations/Syla/walk/Syla_recursionist_walk_3.png', // contact: right foot forward
+            'animations/Syla/walk/Syla_recursionist_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_recursionist_walk_2.webp', // passing: mid-stride
+            'animations/Syla/walk/Syla_recursionist_walk_3.webp', // contact: right foot forward
         ],
         markovian: [
-            'animations/Syla/walk/Syla_markovian_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_markovian_walk_2.png', // passing: mid-stride
+            'animations/Syla/walk/Syla_markovian_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_markovian_walk_2.webp', // passing: mid-stride
         ],
         probabilist: [
-            'animations/Syla/walk/Syla_probabilist_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_probabilist_walk_2.png', // passing: mid-stride
-            'animations/Syla/walk/Syla_probabilist_walk_3.png', // contact: right foot forward
+            'animations/Syla/walk/Syla_probabilist_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_probabilist_walk_2.webp', // passing: mid-stride
+            'animations/Syla/walk/Syla_probabilist_walk_3.webp', // contact: right foot forward
         ],
         bayesian: [
-            'animations/Syla/walk/Syla_bayesian_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_bayesian_walk_2.png', // passing: mid-stride
-            'animations/Syla/walk/Syla_bayesian_walk_3.png', // contact: right foot forward
+            'animations/Syla/walk/Syla_bayesian_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_bayesian_walk_2.webp', // passing: mid-stride
+            'animations/Syla/walk/Syla_bayesian_walk_3.webp', // contact: right foot forward
         ],
         random_walker: [
-            'animations/Syla/walk/Syla_random_walker_walk_1.png', // contact: left foot forward
-            'animations/Syla/walk/Syla_random_walker_walk_2.png', // passing: mid-stride
-            'animations/Syla/walk/Syla_random_walker_walk_3.png', // contact: right foot forward
+            'animations/Syla/walk/Syla_random_walker_walk_1.webp', // contact: left foot forward
+            'animations/Syla/walk/Syla_random_walker_walk_2.webp', // passing: mid-stride
+            'animations/Syla/walk/Syla_random_walker_walk_3.webp', // contact: right foot forward
         ],
     },
 
@@ -395,9 +395,9 @@ const _SKILL_FRAMES = {
     trix: {
         random_walker: {
             swing: [
-                'animations/Trix/abilities/Trix_random_walker_swing_1.png',
-                'animations/Trix/abilities/Trix_random_walker_swing_2.png',
-                'animations/Trix/abilities/Trix_random_walker_swing_3.png',
+                'animations/Trix/abilities/Trix_random_walker_swing_1.webp',
+                'animations/Trix/abilities/Trix_random_walker_swing_2.webp',
+                'animations/Trix/abilities/Trix_random_walker_swing_3.webp',
             ],
         },
     },
@@ -558,7 +558,7 @@ function _animProbe(src) {
 async function _animDiscoverFrames(dir, prefix) {
     const frames = [];
     for (let i = 1; i <= ANIM_MAX_FRAMES; i++) {
-        const src = `${dir}/${prefix}_${i}.png`;
+        const src = `${dir}/${prefix}_${i}.webp`;
         let ok = false;
         try {
             ok = await _animProbe(src);

@@ -165,7 +165,7 @@
         height: var(--ih-thumb-size);
         margin-top: calc((var(--ih-track-h) - var(--ih-thumb-size)) / 2 + 30px); /* ← tweak this offset */
         border-radius: 0;
-        background-image: url('../../images/Infinite_Hunger/clock.png');
+        background-image: url('../../images/Infinite_Hunger/clock.webp');
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
@@ -179,7 +179,7 @@
         width: var(--ih-thumb-size);
         height: var(--ih-thumb-size);
         border-radius: 0;
-        background-image: url('../../images/Infinite_Hunger/clock.png');
+        background-image: url('../../images/Infinite_Hunger/clock.webp');
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;

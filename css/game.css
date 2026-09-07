@@ -1048,7 +1048,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
 .hud-corner-btn {
     width: 26px;
     height: 26px;
-    background-image: url('../images/Settings/settings_close_button.png');
+    background-image: url('../images/Settings/settings_close_button.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
