@@ -210,6 +210,15 @@ function _avatarGetMoveSpeed() {
         base *= (typeof window.EG_SNAIL_BROOM_SPEED_MULT === 'number')
             ? window.EG_SNAIL_BROOM_SPEED_MULT : 0.10;
     }
+    // Entropy's order economy: outside the ordered zones the cold makes you
+    // progressively sluggish (never locked — floors at 55%). Perfect crystal
+    // order during the finale restores full speed (see boss-entropy.js —
+    // _egEntrMoveMult reads the order meter).
+    if (typeof _egEntrMoveMult === 'function') {
+        const entrMult = _egEntrMoveMult();
+        if (entrMult < 1) base *= entrMult;
+        else if (entrMult > 1) base = Math.min(base, AVATAR_MOVE_SPEED_PX_PER_SEC * 1.05) * entrMult;
+    }
     return base;
 }
 
@@ -223,6 +232,9 @@ const _avatarMoveState = {
 function _avatarMoveUiBlocked() {
     const tag = document.activeElement ? document.activeElement.tagName : null;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show')) return true;
+    // A question modal (quiz overlay / math gate / scouts primer) hides the
+    // avatar via CSS — suspend its movement input along with it.
+    if (document.body.classList.contains('question-modal-open')) return true;
     // The Clock's Time Freeze locks the avatar in place for the whole window.
     if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return true;
     if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return true;
@@ -472,9 +484,11 @@ function _updateAvatarFacing(el) {
 
 
 // Sets position clamped to the viewport so the avatar never goes off-screen.
-// Also drives the walking animation: every position change starts/keeps
-// the walk loop running and re-arms its idle debounce (see
-// sprite_animations.js for _playAvatarWalkAnimation).
+// Voluntary directed movement also drives the walking animation: it starts/
+// keeps the walk loop running and re-arms its idle debounce (see
+// sprite_animations.js for _playAvatarWalkAnimation). Positional shoves
+// (boss nudges, wormhole pulls) pass no direction and leave the current
+// animation state and facing untouched.
 // direction is optional ('up' | 'down' | 'left' | 'right') — picks the
 // directional walk set when it exists, omni otherwise.
 function _setAvatarPos(el, x, y, direction) {
@@ -489,7 +503,13 @@ function _setAvatarPos(el, x, y, direction) {
 
     if (typeof _banterRepositionBubbleIfVisible === 'function') _banterRepositionBubbleIfVisible();
 
-    if (typeof _playAvatarWalkAnimation === 'function') {
+    // Only voluntary, directed movement drives the walk cycle. Positional
+    // callers (boss nudges, wormhole pulls) pass no direction: they must
+    // move the sprite WITHOUT touching animation state. Driving the loop
+    // with direction=null previously resolved the legacy fallback art and
+    // clobbered the facing, so e.g. the Marksman bow-wall clamp flickered
+    // the sprite back to the old frames while pinned.
+    if (direction && typeof _playAvatarWalkAnimation === 'function') {
         const spriteImgId = el.id === 'player-avatar-wrapper'
             ? 'avatar-sprite-img'
             : 'avatar-sprite-img-simple';

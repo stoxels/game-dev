@@ -3,7 +3,7 @@
     SCREENS-WORLD-LEVELS.JS
     ========================================================================
     Handles the per-world level selection screen in Map View.
-    Reusable for all 13 worlds.
+    Reusable for all 14 worlds.
 
     Configuration data (background images, node positions, etc.) lives in
     screens-world-levels-config.js (WD_WORLD_CONFIGS).
@@ -504,8 +504,13 @@ function _wdIsConvergenceNode(li, world) {
 /**
  * Returns true if the given level is accessible to the player.
  * Level 0 requires the tutorial to be done; all others require the previous level.
+ * Any level inside the Nexus World additionally requires the whole
+ * campaign (worlds 1..13) to be finished first.
  */
-function _wdIsLevelUnlocked(li, gi) {
+function _wdIsLevelUnlocked(li, gi, wi) {
+    if (typeof wi === 'number' && typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
+        if (typeof isNexusWorldUnlocked === 'function' && !isNexusWorldUnlocked()) return false;
+    }
     if (li === 0) return !!(STATE && STATE.tutorialDone);
     return !!(STATE && STATE.done && STATE.done.includes(gi - 1));
 }
@@ -877,10 +882,13 @@ function _wdIsMaxCleared(gi) {
  * Applies the CSS state classes (done/locked/ascension/convergence/etc.) to
  * a level node element based on its computed state flags.
  */
-function _wdApplyNodeStateClasses(node, isDone, isLocked, isLastInWorld, isConvergence, isMathGated, isMaxCleared) {
+function _wdApplyNodeStateClasses(node, isDone, isLocked, isLastInWorld, isConvergence, isMathGated, isMaxCleared, isNexusPoint) {
     if (isDone) node.classList.add('done');
     else if (isLocked) node.classList.add('locked');
     if (isLastInWorld) node.classList.add('ascension');
+    // The Nexus Point keeps the ascension visuals (gold ring) but carries its
+    // own marker class so it can be styled / labelled distinctly.
+    if (isNexusPoint) node.classList.add('nexus-point');
     if (isConvergence) node.classList.add('convergence');
     if (isMathGated) node.classList.add('math-gated');
     if (isMaxCleared) node.classList.add('max-cleared');
@@ -904,8 +912,8 @@ function _wdPositionNodeOnCanvas(node, wi, pos) {
 /**
  * Wires up mouse tooltip events on a level node element.
  */
-function _wdWireNodeTooltip(node, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared) {
-    node.addEventListener('mouseenter', (e) => _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared));
+function _wdWireNodeTooltip(node, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint) {
+    node.addEventListener('mouseenter', (e) => _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint));
     node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
     node.addEventListener('mouseleave', () => _wdHideTooltip());
 }
@@ -921,9 +929,11 @@ function _wdBuildLevelNode(wi, li, pos) {
 
     // Determine state flags
     const isDone = !!(STATE && STATE.done && STATE.done.includes(gi));
-    const isUnlocked = _wdIsLevelUnlocked(li, gi);
+    const isUnlocked = _wdIsLevelUnlocked(li, gi, wi);
     const isLocked = !isUnlocked;
     const isLastInWorld = !!(world && li === world.data.length - 1);
+    const isNexusPoint = typeof isNexusPointLevel === 'function' && isNexusPointLevel(wi, li);
+    const isAscensionNode = isLastInWorld && !isNexusPoint;
     const isConvergence = !!(world && _wdIsConvergenceNode(li, world));
     const isMathGated = _wdIsMathGated(gi);
 
@@ -939,7 +949,7 @@ function _wdBuildLevelNode(wi, li, pos) {
     node.className = 'wd-level-node';
     node.dataset.li = li;
     _wdPositionNodeOnCanvas(node, wi, pos);
-    _wdApplyNodeStateClasses(node, isDone, isLocked, isLastInWorld, isConvergence, isMathGated, isMaxCleared);
+    _wdApplyNodeStateClasses(node, isDone, isLocked, isLastInWorld, isConvergence, isMathGated, isMaxCleared, isNexusPoint);
 
     // Build inner HTML — the stoxel aura is universal; special effects layer on top
     const stoxelHtml = _wdBuildStoxelAuraHtml(isDone);
@@ -958,7 +968,7 @@ function _wdBuildLevelNode(wi, li, pos) {
     if (!isLocked) {
         node.addEventListener('click', () => _wdOnLevelNodeClick(wi, li));
     }
-    _wdWireNodeTooltip(node, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared);
+    _wdWireNodeTooltip(node, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint);
 
     return node;
 }
@@ -1409,7 +1419,11 @@ function _wdBuildCanvas(wi) {
  */
 function _wdCreateEnterButton(wi, li, cfg) {
     const pos = cfg.nodes[li];
-    const btnText = t('scr_enter_level').replace('{lvl}', `${wi + 1}-${li + 1}`);
+    const isNexusPoint = typeof isNexusPointLevel === 'function' && isNexusPointLevel(wi, li);
+    const rawNexusLabel = t('scr_enter_nexus_point');
+    const btnText = isNexusPoint && rawNexusLabel !== 'scr_enter_nexus_point'
+        ? rawNexusLabel
+        : t('scr_enter_level').replace('{lvl}', `${wi + 1}-${li + 1}`);
 
     const btn = document.createElement('button');
     btn.id = 'wd-enter-btn';
@@ -1520,10 +1534,11 @@ function _wdEnsureTooltip() {
 
 /**
  * Returns the type-label prefix string for the tooltip title
- * (e.g. "⚗️ ASCENSION · " or "🌿 CONVERGENCE · ").
+ * (e.g. "⚗️ ASCENSION · ", "🌌 NEXUS POINT · " or "🌿 CONVERGENCE · ").
  * Returns empty string for standard nodes.
  */
-function _wdGetTooltipTypeLabel(isLastInWorld, isConvergence) {
+function _wdGetTooltipTypeLabel(isLastInWorld, isConvergence, isNexusPoint) {
+    if (isNexusPoint) return `${t('scr_nexus_point_badge')} · `;
     if (isLastInWorld) return `${t('scr_ascension_badge')} · `;
     if (isConvergence) return `${t('scr_convergence_badge')} · `;
     return '';
@@ -1619,14 +1634,17 @@ function _wdBuildTooltipGridHtml(levelData, world, isLocked) {
 /**
  * Populates and shows the enriched tooltip for a level node on mouseenter.
  */
-function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared) {
+function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint) {
     const tip = _wdEnsureTooltip();
     const gi = WORLD_START_GI[wi] + li;
     const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
     const world = WORLDS && WORLDS[wi];
     const levelData = world && world.data[li];
+    if (typeof isNexusPoint === 'undefined' && typeof isNexusPointLevel === 'function') {
+        isNexusPoint = isNexusPointLevel(wi, li);
+    }
 
-    const typeLabel = _wdGetTooltipTypeLabel(isLastInWorld, isConvergence);
+    const typeLabel = _wdGetTooltipTypeLabel(isLastInWorld, isConvergence, isNexusPoint);
     const statusText = _wdGetTooltipStatusText(gi, isDone, isLocked);
     const hint = _wdGetLevelHint(wi, li);
 

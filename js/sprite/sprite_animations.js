@@ -286,6 +286,12 @@ function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simple', di
     const asc = STATE?.playerAscendency || STATE?.playerClass || 'noclass';
     if (!char) return;
 
+    // Remember facing so the sprite keeps looking its travel direction
+    // once it stops (directional idle). Updated on every directed step.
+    if (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1) {
+        try { _lastFacingDir = direction; } catch (e) { /* pre-init: ignore */ }
+    }
+
     // Pause the idle loop while walking (no src restore — we take over below).
     if (typeof _stopAvatarIdleAnimation === 'function') _stopAvatarIdleAnimation(false);
 
@@ -344,9 +350,11 @@ function _scheduleAvatarWalkIdle() {
     }, _WALK_IDLE_DEBOUNCE_MS);
 }
 
-// Immediately stops the walk loop and hands the sprite back to the idle
-// loop (which restores the static portrait when no idle frames exist).
+// Immediately stops the walk loop and hands the sprite to the idle
+// loop, keeping the last travel direction so the sprite stands facing
+// where it was heading (directional idle art) instead of the portrait.
 function _stopAvatarWalkAnimation() {
+    const lastDir = _walkState.dirName;
     if (_walkState.intervalId) {
         clearInterval(_walkState.intervalId);
         _walkState.intervalId = null;
@@ -366,7 +374,7 @@ function _stopAvatarWalkAnimation() {
     if (!imgElementId) return;
 
     if (typeof _startAvatarIdleAnimation === 'function') {
-        _startAvatarIdleAnimation(imgElementId);
+        _startAvatarIdleAnimation(imgElementId, lastDir);
         return;
     }
     const el = document.getElementById(imgElementId);
@@ -467,6 +475,9 @@ function _playAvatarSwingAnimation() {
 //
 //   idle (looping, ping-pong):
 //     animations/<Char>/idle/<variant>/<Char>_<variant>_idle_<N>.png
+//   idle, per-direction override = gameplay standing pose (static):
+//     animations/<Char>/idle/<variant>/<dir>/<Char>_<variant>_idle_<dir>_<N>.png
+//     (played when movement stops; menus always use the static portrait)
 //   movement, omnidirectional fallback (looping, ping-pong):
 //     animations/<Char>/walk/<variant>/<Char>_<variant>_walk_<N>.png
 //   movement, per-direction override (looping, ping-pong):
@@ -580,6 +591,9 @@ function _animWarmCacheFor(char, variant) {
     if (!charCap) return;
     const jobs = [];
     jobs.push([`idle|${charCap}|${variant}`, `${ANIM_BASE_PATH}/${charCap}/idle/${variant}`, `${charCap}_${variant}_idle`]);
+    for (const d of ANIM_DIRECTIONS) {
+        jobs.push([`idle|${charCap}|${variant}|${d}`, `${ANIM_BASE_PATH}/${charCap}/idle/${variant}/${d}`, `${charCap}_${variant}_idle_${d}`]);
+    }
     jobs.push([`walk|${charCap}|${variant}|`, `${ANIM_BASE_PATH}/${charCap}/walk/${variant}`, `${charCap}_${variant}_walk`]);
     for (const d of ANIM_DIRECTIONS) {
         jobs.push([`walk|${charCap}|${variant}|${d}`, `${ANIM_BASE_PATH}/${charCap}/walk/${variant}/${d}`, `${charCap}_${variant}_walk_${d}`]);
@@ -624,11 +638,17 @@ function _animGetWalkFramesSync(char, variant, direction) {
     return (_WALK_FRAMES[char] && _WALK_FRAMES[char][variant]) || [];
 }
 
-// Sync idle-frame lookup (discovered nested art only; static portrait is
-// the fallback and needs no table).
-function _animGetIdleFramesSync(char, variant) {
+// Sync idle-frame lookup: directional idle art (already discovered) ->
+// omnidirectional idle art (already discovered). Empty when neither exists,
+// and callers fall back to the static portrait. Menus always use the static
+// portrait via _getPlayerCharacterImage() directly and never call this.
+function _animGetIdleFramesSync(char, variant, direction) {
     const charCap = _animCharCap(char);
     if (!charCap) return [];
+    if (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1) {
+        const dk = `idle|${charCap}|${variant}|${direction}`;
+        if (_animCache[dk] && _animCache[dk].length) return _animCache[dk];
+    }
     return _animCache[`idle|${charCap}|${variant}`] || [];
 }
 
@@ -642,8 +662,33 @@ const _idleState = {
     frameIndex: 0,
     direction: 1, // ping-pong direction through frames
     imgElementId: null,
-    key: null,    // char|variant the loop was started for
+    key: null,    // char|variant|facing the loop was started for
 };
+
+// Last movement facing, so the gameplay sprite keeps looking its travel
+// direction when it stops (directional idle art) instead of snapping back
+// to the static portrait. Menus are unaffected: they render
+// _getPlayerCharacterImage() on separate elements and never go through
+// the idle loop.
+let _lastFacingDir = 'down';
+
+// Retry state for the cold-cache case below (first spawn before art
+// discovery finishes). Bounded: at most _IDLE_RETRY_MAX attempts.
+let _idleRetryKey = null;
+let _idleRetryCount = 0;
+const _idleRetryDelays = [600, 1500];
+const _IDLE_RETRY_MAX = 2;
+
+// True while the idle art for this char/variant/facing may still be
+// probing (warming started, no result yet) rather than confirmed missing.
+function _animIdlePending(charCap, variant, face) {
+    if (!charCap || !variant) return false;
+    const keys = [`idle|${charCap}|${variant}`];
+    if (face && ANIM_DIRECTIONS.indexOf(face) !== -1) {
+        keys.push(`idle|${charCap}|${variant}|${face}`);
+    }
+    return keys.some((k) => _animWarmStarted[k] && typeof _animCache[k] === 'undefined');
+}
 
 function _stopAvatarIdleAnimation() {
     if (_idleState.intervalId) {
@@ -660,19 +705,28 @@ function _stopAvatarIdleAnimation() {
 // creation, class selection, walk end, spell end): it no-ops when the
 // right loop already runs, and falls back to the static portrait when
 // no idle frames exist yet.
-function _startAvatarIdleAnimation(imgElementId) {
+//
+// direction is optional ('up' | 'down' | 'left' | 'right'). When omitted,
+// the last movement facing is used, so a sprite that just stopped walking
+// keeps looking its travel direction. Menu-adjacent callers pass nothing
+// and get the portrait fallback exactly as before whenever no directional
+// idle art was discovered.
+function _startAvatarIdleAnimation(imgElementId, direction) {
     const id = (typeof _animTargetImgId === 'function') ? _animTargetImgId(imgElementId) : imgElementId;
     if (!id || typeof document === 'undefined') return;
     const char = (typeof STATE !== 'undefined' && STATE) ? STATE.playerCharacter : null;
     const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
     if (!char) return;
-    const key = `${char}|${variant}`;
+    const face = (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1)
+        ? direction
+        : ((typeof _lastFacingDir === 'string' && ANIM_DIRECTIONS.indexOf(_lastFacingDir) !== -1) ? _lastFacingDir : null);
+    const key = `${char}|${variant}|${face || 'portrait'}`;
 
     if (_idleState.intervalId && _idleState.imgElementId === id && _idleState.key === key) return;
     _stopAvatarIdleAnimation();
 
     if (typeof _animWarmCacheFor === 'function') _animWarmCacheFor(char, variant);
-    const frames = (typeof _animGetIdleFramesSync === 'function') ? _animGetIdleFramesSync(char, variant) : [];
+    const frames = (typeof _animGetIdleFramesSync === 'function') ? _animGetIdleFramesSync(char, variant, face) : [];
 
     const el = document.getElementById(id);
     if (!el) return;
@@ -681,8 +735,30 @@ function _startAvatarIdleAnimation(imgElementId) {
             const idleSrc = _getPlayerCharacterImage();
             if (idleSrc && el.getAttribute('src') !== idleSrc) el.src = idleSrc;
         }
+        // Cold cache: the facing art may still be probing (first spawn
+        // right after load). Retry shortly so the sprite upgrades from
+        // the portrait to its facing idle once discovery lands. Skipped
+        // once walking takes over, and bounded so confirmed-missing art
+        // never retries forever.
+        if (_idleRetryKey !== key) { _idleRetryKey = key; _idleRetryCount = 0; }
+        if (_idleRetryCount < _IDLE_RETRY_MAX
+            && (typeof _animIdlePending === 'function')
+            && _animIdlePending(_animCharCap(char), variant, face)) {
+            const attempt = _idleRetryCount++;
+            const retryId = id, retryFace = face;
+            setTimeout(() => {
+                if (_walkState.intervalId) return;
+                if (_lastFacingDir !== retryFace) return;
+                _startAvatarIdleAnimation(retryId, retryFace);
+            }, _idleRetryDelays[Math.min(attempt, _idleRetryDelays.length - 1)]);
+        } else {
+            _idleRetryKey = null;
+            _idleRetryCount = 0;
+        }
         return;
     }
+    _idleRetryKey = null;
+    _idleRetryCount = 0;
 
     _idleState.imgElementId = id;
     _idleState.key = key;

@@ -145,6 +145,9 @@ function _closeAllModals() {
             }
             m.classList.remove('show');
         });
+    // Re-sync the question-modal avatar-hide flag (covers the math gate and
+    // scouts primer, which this bulk-close may have just dismissed).
+    if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
 }
 
 // Returns true if the win or lose end-of-level overlay is visible.

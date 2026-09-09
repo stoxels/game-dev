@@ -707,6 +707,106 @@ function _egTickPlayer() {
     if (typeof window !== 'undefined' && typeof window._egFireflyTrialActive === 'function' && window._egFireflyTrialActive()) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
     }
+    // The Striker's scoring set-pieces (Kick-Off Challenge / Hat-Trick):
+    // while the player runs, charges and kicks the match ball the auto-attack
+    // charge bar stays frozen — scoring IS the attack during the challenge,
+    // not free DPS on top of it (boss-striker.js).
+    if (typeof _egStrkScoringActive === 'function' && _egStrkScoringActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Gridlock's SYSTEM LOCKDOWN: while the wire-grid finale runs the
+    // auto-attack charge bar stays frozen — a pure read-the-grid set-piece,
+    // not free DPS (boss-gridlock.js).
+    if (typeof _egGlFinalActive === 'function' && _egGlFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Jester's GRAND FINALE: while the full-house show runs the
+    // auto-attack charge bar stays frozen — a pure read-the-reveal
+    // set-piece, not free DPS (boss-jester.js).
+    if (typeof _egJsFinalActive === 'function' && _egJsFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Shaper's SHAPED WINTER: while the monolith finale runs the
+    // auto-attack charge bar stays frozen — core-shattering IS the attack,
+    // not free DPS on top of it (boss-shaper.js).
+    if (typeof _egShpFinalActive === 'function' && _egShpFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Siren's DEADLY ARIA: while the bubble-song finale runs the
+    // auto-attack charge bar stays frozen — following the song IS the
+    // set-piece, not free DPS (boss-siren.js).
+    if (typeof _egSireFinalActive === 'function' && _egSireFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Swarm's SWARM SINGULARITY: while the drone-ball finale runs the
+    // auto-attack charge bar stays frozen — reading the charges and slipping
+    // the funnel IS the set-piece, not free DPS (boss-swarm.js).
+    if (typeof _egSwFinalActive === 'function' && _egSwFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Colossus' TITAN'S FALL: while the seal-climbing finale runs the
+    // auto-attack charge bar stays frozen — climbing and breaking seals IS
+    // the set-piece, not free DPS (boss-colossus.js).
+    if (typeof _egColoFinalActive === 'function' && _egColoFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // Bayes' THEOMERE'S GAMBIT: the belief set-piece owns the board — no
+    // free auto-attack charging while Bayes bets everything (boss-bayes.js).
+    if (typeof _egBayFinalActive === 'function' && _egBayFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // Entropy's THE LAST DEGREE: shard-gathering IS the set-piece — no free
+    // auto-attack charging while absolute zero approaches (boss-entropy.js).
+    if (typeof _egEntrFinalActive === 'function' && _egEntrFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // Laplace's THE CLOSED TIMELINE: the learnable loop owns the arena — no
+    // free auto-attack charging while the Demon replays your fate
+    // (boss-laplace.js).
+    if (typeof _egLapFinalActive === 'function' && _egLapFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Inferno's SUPERVOLCANIC WINTER: lure-and-dodge IS the set-piece —
+    // no free auto-attack charging while the arena is frozen over
+    // (boss-inferno.js).
+    if (typeof _egInfVFinalActive === 'function' && _egInfVFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Null's PROOF BY CONTRADICTION: the white-out proof owns the arena
+    // — no free auto-attack charging while the hypothesis is tested
+    // (boss-null.js).
+    if (typeof _egNulFinalActive === 'function' && _egNulFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Barrage's FINAL BOMBARDMENT: reading the volleys and racing to the
+    // safe tile IS the set-piece — no free auto-attack charging while the
+    // guns walk the board (boss-barrage.js).
+    if (typeof _egBarFinalActive === 'function' && _egBarFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Bloom's FULMINATION: carving scars to open the ONE TRUE GAP is the
+    // set-piece — no free auto-attack charging while the garden blooms from
+    // every direction (boss-bloom.js).
+    if (typeof _egBlmFinalActive === 'function' && _egBlmFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Minotaur's WARDEN'S LABYRINTH: stone-breaking IS the set-piece — no
+    // free auto-attack charging while the final maze rises (boss-minotaur.js).
+    if (typeof _egMntFinalActive === 'function' && _egMntFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Overfitter's FINAL EPOCH: reading the heat-map of your own fight
+    // history IS the set-piece — no free auto-attack charging while the
+    // model re-trains on you (boss-overfitter.js).
+    if (typeof _egOvrFinalActive === 'function' && _egOvrFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
+    // The Razor's A THOUSAND EDGES: walking the reversing spoke clock IS the
+    // set-piece — no free auto-attack charging while the blades condense
+    // (boss-razor.js).
+    if (typeof _egRzrFinalActive === 'function' && _egRzrFinalActive()) {
+        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+    }
     // Ailments: frozen stops the auto-attack bar entirely (movement
     // prevention will hook into the same ailment once movement exists),
     // chilled slows it to half speed.
@@ -2470,17 +2570,15 @@ function _egCycleTarget(reverse) {
     _egSelectTarget(_egMonsters[nextIdx].id);
 }
 
-// Tab targeting: registered once at load. Only active during an encounter.
+// Tab targeting: registered via keybind system. Only active during an encounter.
 function _initEgTargetHotkeys() {
-    document.addEventListener('keydown', (e) => {
-        if (e.key !== 'Tab') return;
-        const tag = document.activeElement?.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-        if (!STATE.playerClass || isClassless()) return;
-
-        e.preventDefault();
-        _egCycleTarget(e.shiftKey);
-    });
+    if (typeof onKeybindAction === 'function') {
+        onKeybindAction('cycle-target', (e) => {
+            if (!STATE.playerClass || isClassless()) return false;
+            _egCycleTarget(e.shiftKey);
+            return false;
+        });
+    }
 }
 
 _initEgTargetHotkeys();

@@ -76,7 +76,7 @@ function _egMechTentacleSweep(monster, phase) {
             if (pts && now >= cdUntil) {
                 const bx = cx + Math.cos(a) * armLen, by = cy + Math.sin(a) * armLen;
                 for (const pt of pts) {
-                    if (_egInfernoPtSegDist(pt[0], pt[1], cx, cy, bx, by) < armHalf + 6) {
+                    if (_egPtSegDist(pt[0], pt[1], cx, cy, bx, by) < armHalf + 6) {
                         cdUntil = now + 1000;
                         const dealt = _egNkHit(dmgPct, 'cold', level);
                         _egNkAbilityHitToast(dealt, 'The Kraken', 'Tentacle Sweep');

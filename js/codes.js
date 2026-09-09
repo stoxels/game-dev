@@ -385,6 +385,14 @@ function checkWorldCodes() {
     if (newCodes.length) showUnlockedCodesModal(newCodes);
 }
 
+// Synchronous unlock check without UI — call this to persist unlocks immediately.
+// Returns the list of newly unlocked codes.
+function checkWorldCodesSync() {
+    const { newCodes } = collectCodeUnlockResults();
+    if (newCodes.length) save();
+    return newCodes;
+}
+
 // Call this once, when the player confirms Game Setup (before entering
 // level select). Shows the locked-codes reminder at most once per session.
 function checkLockedCodesOnSetup() {

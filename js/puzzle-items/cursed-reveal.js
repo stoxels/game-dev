@@ -5,6 +5,7 @@
 // cursedReveal — reveals 6 cells; downside clears all wrong marks.
 function _useCursedReveal(id, def) {
     _trackWitchImmuneCursedUse();
+    questStat_revealItemUsed();
 
     revealTiles(6, 'item');
 

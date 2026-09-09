@@ -782,6 +782,7 @@ function showQuiz(worldNum) {
 
     const overlayEl = document.getElementById('quiz-overlay');
     overlayEl.classList.add('show');
+    if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
 
     // Inject character portrait
     const portraitEl = document.getElementById('quiz-portrait');
@@ -800,6 +801,7 @@ function showQuiz(worldNum) {
 // Called by finishQuiz(), skipQuiz(), and the Escape handler in main.js.
 function closeQuiz() {
     document.getElementById('quiz-overlay').classList.remove('show');
+    if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
     currentQuizQuestion = null;
 
     // Cancel the auto-finish timer if the player clicked Continue manually
@@ -831,15 +833,17 @@ function _quizHandleInterstitialExit() {
 
 // Closes the overlay, runs post-quiz world checks, saves, and shows
 // the win overlay. Called from the "CONTINUE" button and (if re-enabled)
-// the auto-finish timer.
-function finishQuiz() {
-    if (_quizHandleInterstitialExit()) return;
-    closeQuiz();
-    checkWorldCodes();
-    checkWorldCompletion();
-    save();
-    _quizShowWinOverlay();
-}
+    // the auto-finish timer.
+    function finishQuiz() {
+        if (_quizHandleInterstitialExit()) return;
+        closeQuiz();
+        checkWorldCodesSync();
+        checkWorldCompletion();
+        save();
+        _quizShowWinOverlay();
+        // Codes popup delayed so it feels distinct
+        setTimeout(() => checkWorldCodes(), 1000);
+    }
 
 // Called when the player clicks "SKIP" or presses Escape.
 // No points or items are awarded; shows the win overlay immediately.

@@ -52,7 +52,7 @@ const MAP_HOME_POS = { x: 7.6, y: 86.3 };
 
 // World node positions and localized names.
 // Index matches the world index (wi) used throughout the codebase.
-// wi=13 is the special Nexus endgame hub.
+// wi=13 is the Nexus World — secret World 14 (Descriptive Statistics).
 // Coordinates are percentages of the background IMAGE.
 const MAP_WORLD_POSITIONS = [
     { x: 25, y: 83.1, labelEN: "Probability Peaks", labelDE: "Probability Peaks" },
@@ -68,7 +68,7 @@ const MAP_WORLD_POSITIONS = [
     { x: 71.1, y: 16.6, labelEN: "Null Hypothesis Void", labelDE: "Null Hypothesis Void" },
     { x: 37.5, y: 39.9, labelEN: "Bayesian Bay", labelDE: "Bayesian Bay" },
     { x: 35.1, y: 22.5, labelEN: "Expectation Plateau", labelDE: "Expectation Plateau" },
-    { x: 49.6, y: 15.0, labelEN: "The Nexus", labelDE: "The Nexus" },
+    { x: 49.6, y: 15.0, labelEN: "Nexus World", labelDE: "Nexus World" },
 ];
 
 // Road segments that define the visual paths drawn on the map.
@@ -318,10 +318,10 @@ const ROAD_SEGMENTS = [
 
     {
         n1: 'junction1112nexus',
-        n2: 13, // World 14: The Nexus (Endgame Hub)
+        n2: 13, // World 14: Nexus World (secret campaign world)
         waypoints: [
             { x: 48.4, y: 30.5 }, // ← Automatically added junction point
-            { x: 49.6, y: 15.0 }  // ← Automatically added The Nexus position
+            { x: 49.6, y: 15.0 }  // ← Automatically added Nexus World position
         ]
     },
 
@@ -462,24 +462,29 @@ function _isWorldComplete(wi) {
 
 /**
  * Returns true if the player is allowed to enter a given world.
- * Currently all worlds are unlocked (TEMP — for waypoint tuning).
- * Restore the commented block below to re-enable proper unlock logic.
+ *
+ * Worlds 1..13 unlock sequentially (previous world's first level clears
+ * the way). The Nexus World (World 14, wi 13) is secret: it only opens
+ * once the player has finished ALL levels of every other world, making it
+ * the last interlude world before the endgame.
  *
  * @param {number} wi - World index
  * @returns {boolean}
  */
 function _isWorldAccessible(wi) {
-    /*
+    // Nexus World gate — must come first so it stays locked even while
+    // earlier worlds are still in progress.
+    if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
+        return typeof isNexusWorldUnlocked === 'function' ? isNexusWorldUnlocked() : false;
+    }
+
     // World 0 requires tutorial completion
-    if (wi === 0) return STATE && STATE.tutorialDone;
+    if (wi === 0) return !!(STATE && STATE.tutorialDone);
 
     // All other worlds require at least the first level of the previous world to be done
     if (!WORLDS || !WORLDS[wi - 1]) return false;
     const prevFirstGi = WORLD_START_GI[wi - 1];
-    return STATE && STATE.done && STATE.done.includes(prevFirstGi);
-    */
-
-    return true; // TEMP: all worlds unlocked for waypoint tuning
+    return !!(STATE && STATE.done && STATE.done.includes(prevFirstGi));
 }
 
 /**
@@ -1079,33 +1084,29 @@ function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
     const label = _getWorldLabel(wi);
     let statusText;
 
-    if (wi === 13) {
-        // Nexus has special unlock text
-        statusText = isLocked
-            ? t('scr_nexus_tooltip_locked')
-            : t('scr_enter_nexus_short');
-    } else {
-        const worldData = WORLDS && WORLDS[wi];
-        const levelCount = worldData ? worldData.data.length : '?';
+    // The Nexus World (wi 13) is a regular campaign world — World 14 lives there.
+    const worldData = WORLDS && WORLDS[wi];
+    const levelCount = worldData ? worldData.data.length : '?';
 
-        if (isDone) {
-            statusText = t('scr_world_done').replace('{n}', levelCount);
-        } else if (isLocked) {
-            statusText = t('scr_locked');
-        } else {
-            statusText = t('scr_level_count').replace('{n}', levelCount);
-        }
+    if (isDone) {
+        statusText = t('scr_world_done').replace('{n}', levelCount);
+    } else if (isLocked) {
+        // The secret Nexus World explains its own unlock condition.
+        statusText = (typeof isNexusWorld === 'function' && isNexusWorld(wi))
+            ? t('scr_nexus_tooltip_locked')
+            : t('scr_locked');
+    } else {
+        statusText = t('scr_level_count').replace('{n}', levelCount);
     }
 
     // Detailed per-world progress: stoxels solved/unsolved, convergence
-    // points and class upgrade status (regular worlds only).
-    const progressHtml = (wi !== 13)
-        ? `<div class="mv-tooltip-sub">${_getWorldStoxelProgressText(wi)}</div>` +
-          `<div class="mv-tooltip-sub">${_getWorldConvergenceText(wi)}</div>` +
-          `<div class="mv-tooltip-sub">${_getWorldClassUpgradeText(wi)}</div>`
-        : '';
+    // points and class upgrade status.
+    const progressHtml =
+        `<div class="mv-tooltip-sub">${_getWorldStoxelProgressText(wi)}</div>` +
+        `<div class="mv-tooltip-sub">${_getWorldConvergenceText(wi)}</div>` +
+        `<div class="mv-tooltip-sub">${_getWorldClassUpgradeText(wi)}</div>`;
 
-    const remainingHtml = (isDone && wi !== 13)
+    const remainingHtml = (isDone)
         ? `<div class="mv-tooltip-remaining">${_buildRemainingWorkText(healingTier)}</div>`
         : '';
 
@@ -1221,9 +1222,10 @@ function _buildEnterButton(wi) {
 
     btn.addEventListener('click', () => {
         btn.remove();
-        if (wi === 13 && typeof showEndgameNexus === 'function') {
-            showEndgameNexus();
-        } else if (typeof showWorldDetail === 'function') {
+        // wi 13 is the Nexus World — a regular (secret) campaign world.
+        // The endgame Nexus screen stays reachable from inside endgame maps
+        // (btn-go-nexus) and the endgame chain's back buttons.
+        if (typeof showWorldDetail === 'function') {
             showWorldDetail(wi);
         }
     });
@@ -1363,7 +1365,7 @@ function _buildWorldNode(pos, wi) {
     const canvas = document.getElementById('mv-canvas');
     const isDone = _isWorldComplete(wi);
     const isLocked = !_isWorldAccessible(wi);
-    const healingTier = _getWorldHealingTier(wi); // Nexus (wi 13) safely returns 0
+    const healingTier = _getWorldHealingTier(wi);
 
     const node = document.createElement('div');
     node.className = 'mv-world-node';
@@ -1509,7 +1511,7 @@ function _buildOutpostLabel() {
 
 /**
  * Appends all world node elements to the canvas.
- * Nodes are skipped if their world data doesn't exist yet (except for the Nexus at wi=13).
+ * Nodes are skipped if their world data doesn't exist yet.
  *
  * @param {HTMLElement} canvas
  */

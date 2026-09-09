@@ -27,6 +27,23 @@ function hideModal(id) {
 }
 
 
+// Body flag: a QUESTION modal (quiz overlay, math gate, scouts primer —
+// the input or multiple-choice surfaces) is on screen. While it is set the
+// controllable player avatar sprite is hidden via CSS; the character
+// portrait baked into the background (boss card / top-centre sprite) is
+// untouched. Call after any open/close state change of those modals.
+function _refreshQuestionModalFlag() {
+    const qz = document.getElementById('quiz-overlay');
+    const mg = document.getElementById('mg-modal');
+    const open = !!(
+        document.getElementById('primer-overlay') ||
+        (qz && qz.classList.contains('show')) ||
+        (mg && mg.classList.contains('show'))
+    );
+    document.body.classList.toggle('question-modal-open', open);
+}
+
+
 
 //------------------------------------------------------------------------
 //------------------------OVERLAY UTILITIES-------------------------------
@@ -231,6 +248,24 @@ function _fitSetupBook() {
     book.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
 }
 
+// Refreshes the setup-screen Nexus button: visible only once the player
+// has completed the Nexus Point. Kept separate so win-overlay and load
+// flows can refresh it without re-entering the whole setup screen.
+function refreshSetupNexusButton() {
+    const btn = document.getElementById('btn-enter-nexus-setup');
+    if (!btn) return;
+    const unlocked = typeof isNexusUnlocked === 'function' ? isNexusUnlocked() : false;
+    btn.style.display = unlocked ? '' : 'none';
+}
+
+// Enters the endgame Nexus directly from the setup screen.
+// Only reachable when the Nexus Point has been completed.
+function enterNexusFromSetup() {
+    if (typeof isNexusUnlocked === 'function' && !isNexusUnlocked()) return;
+    screenHistory.push('screen-setup');
+    if (typeof showEndgameNexus === 'function') showEndgameNexus();
+}
+
 // Navigates to the setup screen and refreshes difficulty/mod descriptions.
 function showSetup() {
     stopTimer();
@@ -241,6 +276,7 @@ function showSetup() {
     updModDesc();
     _updateSetupScreenCharacter();
     switchScreen('screen-setup');
+    refreshSetupNexusButton();
     _fitSetupBook();
     if (!_setupResizeBound) {
         _setupResizeBound = true;
@@ -368,6 +404,7 @@ function goToPreviousScreen() {
             return;
         }
         openModal.classList.remove('show');
+        if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
         return;
     }
 

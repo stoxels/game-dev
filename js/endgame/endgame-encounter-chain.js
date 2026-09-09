@@ -203,6 +203,7 @@ function _egShowInterstitialQuestion(onDone) {
     window._egInterstitialDone = function () {
         window._egInterstitialDone = null;
         document.getElementById('quiz-overlay').classList.remove('show');
+        if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
         currentQuizQuestion = null;
         onDone();
     };

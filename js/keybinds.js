@@ -23,6 +23,9 @@ const KEYBIND_DEFAULTS = [
     // Endgame parry (hold E by default).
     { id: 'eg-parry',    label: 'Endgame parry (hold)',  keys: 'e' },
 
+    // Target cycling (Tab by default).
+    { id: 'cycle-target', label: 'Cycle Target', keys: 'tab' },
+
     // Endgame special abilities. Ability 1 is live today (The Firefly's
     // command key); Ability 2 is The Firefly's fairy-selection cycle; Ability
     // 3 is The Firefly's recall-all. Future endgame bosses re-point these
@@ -130,10 +133,11 @@ function keybindMatches(e, actionId) {
     return bound !== null && _keybindNormalize(e) === bound;
 }
 
-// Human-readable label for a stored key (' ', 'escape' → 'Space', 'Esc').
+// Human-readable label for a stored key (' ', 'escape', 'tab' → 'Space', 'Esc', 'Tab').
 function keybindDisplayLabel(key) {
     if (key === ' ') return 'Space';
     if (key === 'escape') return 'Esc';
+    if (key === 'tab') return 'Tab';
     if (key.length === 1) return key.toUpperCase();
     return key.charAt(0).toUpperCase() + key.slice(1);
 }

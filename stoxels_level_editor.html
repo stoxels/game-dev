@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stoxels — Level Editor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #f0f2f5;
+            --panel: #ffffff;
+            --surface: #f7f8fa;
+            --border: #dde1e9;
+            --border2: #c8cdd8;
+            --ink: #1a1d26;
+            --ink2: #4a5068;
+            --ink3: #8892a8;
+            --accent: #0e7ff5;
+            --accent-bg: #e8f1fe;
+            --green: #1ab87a;
+            --green-bg: #e6f9f2;
+            --red: #e53535;
+            --red-bg: #fdeaea;
+            --yellow: #d4900a;
+            --yellow-bg: #fdf4e3;
+            --cell-off: #eef0f5;
+            --cell-on: #0e7ff5;
+            --cell-on-b: #0a65c2;
+            --clue-col: #6672a8;
+            --F: 'DM Mono', monospace;
+            --FS: 'DM Sans', sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg: #111318;
+            --panel: #1a1d26;
+            --surface: #22263a;
+            --border: #2e3347;
+            --border2: #3a4060;
+            --ink: #e8eaf2;
+            --ink2: #a0a8c0;
+            --ink3: #606880;
+            --accent: #4a9eff;
+            --accent-bg: #0e1e38;
+            --green: #1dd68a;
+            --green-bg: #0a2a1e;
+            --red: #f05454;
+            --red-bg: #2a1010;
+            --yellow: #f0b340;
+            --yellow-bg: #2a1e08;
+            --cell-off: #1e2236;
+            --cell-on: #1a6edc;
+            --cell-on-b: #1358b0;
+            --clue-col: #7a8ab8;
+        }
+
+            [data-theme="dark"] div.gc {
+                border-color: #2e3a54;
+            }
+
+                [data-theme="dark"] div.gc:hover {
+                    border-color: #4a7ec8;
+                    background: #162040;
+                }
+
+                [data-theme="dark"] div.gc.br {
+                    border-right-color: #3a4a6a !important;
+                }
+
+                [data-theme="dark"] div.gc.bb {
+                    border-bottom-color: #3a4a6a !important;
+                }
+
+            [data-theme="dark"] textarea.code-out {
+                background: #141824;
+                color: #6aafff;
+            }
+
+            [data-theme="dark"] .instr-box {
+                background: #0e1e38;
+                border-color: #1e3a6a;
+                color: #7ab0f0;
+            }
+
+            [data-theme="dark"] .info-tag {
+                background: #2a1e08;
+                border-color: #5a3e10;
+                color: #c0922a;
+            }
+
+            [data-theme="dark"] button.danger {
+                border-color: #5a2020;
+                background: var(--red-bg);
+            }
+
+            [data-theme="dark"] .copy-btn {
+                border-color: #1e3a6a;
+            }
+
+                [data-theme="dark"] .copy-btn.copied {
+                    border-color: #0a3a22;
+                }
+
+            [data-theme="dark"] select {
+                background: var(--surface);
+                color: var(--ink);
+                border-color: var(--border2);
+            }
+
+            [data-theme="dark"] input[type="number"] {
+                color-scheme: dark;
+            }
+
+            [data-theme="dark"] ::-webkit-scrollbar-track {
+                background: #111318;
+            }
+
+            [data-theme="dark"] ::-webkit-scrollbar-thumb {
+                background: #3a4060;
+            }
+
+            [data-theme="dark"] table.ptable {
+                box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+            }
+
+        #btn-darkmode {
+            font-size: 15px;
+            padding: 5px 10px;
+            line-height: 1;
+            border-radius: 4px;
+        }
+
+        .world-file-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .world-file-header {
+            font-family: var(--F);
+            font-size: 10px;
+            color: var(--ink2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .world-file-badge {
+            font-family: var(--F);
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 3px;
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid #a0e0c4;
+            display: none;
+        }
+
+        [data-theme="dark"] .world-file-badge {
+            border-color: #0a3a22;
+        }
+
+        .world-file-badge.visible {
+            display: inline;
+        }
+
+        .world-dropdowns {
+            display: flex;
+            gap: 6px;
+        }
+
+            .world-dropdowns select {
+                font-family: var(--F);
+                font-size: 11px;
+                background: var(--panel);
+                color: var(--ink);
+                border: 1px solid var(--border2);
+                padding: 5px 6px;
+                border-radius: 4px;
+                flex: 1;
+                min-width: 0;
+            }
+
+                .world-dropdowns select:disabled {
+                    opacity: 0.45;
+                    cursor: not-allowed;
+                }
+
+        .world-file-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-load-level {
+            flex: 1;
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            font-size: 11px;
+            padding: 5px 10px;
+        }
+
+            .btn-load-level:hover {
+                background: var(--cell-on-b);
+                border-color: var(--cell-on-b);
+                color: #fff;
+            }
+
+            .btn-load-level:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+        .btn-export-file {
+            flex: 1;
+            background: var(--green-bg);
+            color: var(--green);
+            border-color: #a0e0c4;
+            font-size: 11px;
+            padding: 5px 10px;
+        }
+
+            .btn-export-file:hover {
+                background: var(--green);
+                color: #fff;
+                border-color: var(--green);
+            }
+
+            .btn-export-file:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+        .world-status {
+            font-family: var(--F);
+            font-size: 10px;
+            min-height: 14px;
+            color: var(--ink3);
+        }
+
+        label.file-upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--F);
+            font-size: 11px;
+            background: var(--surface);
+            color: var(--ink2);
+            border: 1px solid var(--border2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.13s;
+            white-space: nowrap;
+        }
+
+            label.file-upload-btn:hover {
+                background: var(--accent-bg);
+                color: var(--accent);
+                border-color: var(--accent);
+            }
+
+            label.file-upload-btn input[type="file"] {
+                display: none;
+            }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: var(--FS);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--panel);
+            border-bottom: 2px solid var(--border);
+            padding: 0 24px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .logo {
+            font-family: var(--F);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        .logo-sep {
+            color: var(--border2);
+            margin: 0 4px;
+        }
+
+        .logo-sub {
+            color: var(--ink3);
+            font-size: 11px;
+            letter-spacing: 0;
+            font-weight: 400;
+        }
+
+        header .spacer {
+            flex: 1;
+        }
+
+        .header-hint {
+            font-family: var(--F);
+            font-size: 11px;
+            color: var(--ink3);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 5px 12px;
+            border-radius: 4px;
+        }
+
+            .header-hint strong {
+                color: var(--accent);
+                font-weight: 500;
+            }
+
+        .controls-bar {
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            padding: 9px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .ctrl-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ctrl-label {
+            font-family: var(--F);
+            font-size: 10px;
+            color: var(--ink3);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+
+        input[type="number"] {
+            font-family: var(--F);
+            background: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border2);
+            padding: 5px 8px;
+            font-size: 13px;
+            width: 68px;
+            text-align: center;
+            border-radius: 4px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+            input[type="number"]:focus {
+                outline: none;
+                border-color: var(--accent);
+                box-shadow: 0 0 0 3px rgba(14,127,245,0.12);
+            }
+
+        .x-label {
+            color: var(--ink3);
+            font-size: 13px;
+            font-family: var(--F);
+        }
+
+        .vdiv {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+
+        button {
+            font-family: var(--F);
+            background: var(--surface);
+            color: var(--ink2);
+            border: 1px solid var(--border2);
+            padding: 6px 13px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.13s;
+            white-space: nowrap;
+        }
+
+            button:hover {
+                background: var(--accent-bg);
+                color: var(--accent);
+                border-color: var(--accent);
+            }
+
+            button.primary {
+                background: var(--accent);
+                color: #fff;
+                border-color: var(--accent);
+            }
+
+                button.primary:hover {
+                    background: var(--cell-on-b);
+                    border-color: var(--cell-on-b);
+                    color: #fff;
+                }
+
+            button.danger {
+                color: var(--red);
+                border-color: #f0b8b8;
+                background: var(--red-bg);
+            }
+
+                button.danger:hover {
+                    background: var(--red);
+                    color: #fff;
+                    border-color: var(--red);
+                }
+
+            button.preset {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+        .info-tag {
+            font-family: var(--F);
+            font-size: 10px;
+            color: var(--ink3);
+            background: #fff3cd;
+            border: 1px solid #ffd96a;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .canvas-area {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 28px;
+            background: var(--bg);
+        }
+
+        table.ptable {
+            border-collapse: collapse;
+            table-layout: fixed;
+            user-select: none;
+            flex-shrink: 0;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+            padding: 14px;
+        }
+
+        td.corner {
+            background: transparent;
+            border: none;
+        }
+
+        td.cch {
+            vertical-align: bottom;
+            text-align: center;
+            padding: 0 1px 5px;
+        }
+
+        td.rct {
+            text-align: right;
+            vertical-align: middle;
+            padding-right: 8px;
+            white-space: nowrap;
+        }
+
+        .ccinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+            .ccinner span, .rcinner span {
+                font-family: var(--F);
+                color: var(--clue-col);
+                line-height: 1.35;
+                display: block;
+                font-weight: 500;
+            }
+
+        .rcinner {
+            display: flex;
+            flex-direction: row;
+            gap: 4px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        td.gc-wrap {
+            padding: 0;
+            border: none;
+        }
+
+        div.gc {
+            border: 1px solid #cdd2de;
+            background: var(--cell-off);
+            cursor: pointer;
+            position: relative;
+            transition: background 0.06s, border-color 0.06s;
+            border-radius: 2px;
+            margin: 1px;
+        }
+
+            div.gc:hover {
+                border-color: #90b8f5;
+                background: #dce9fd;
+            }
+
+            div.gc.on {
+                background: var(--cell-on);
+                border-color: var(--cell-on-b);
+                box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 1px 4px rgba(14,127,245,0.28);
+            }
+
+            div.gc.sel {
+                border-color: var(--accent) !important;
+                box-shadow: inset 0 0 0 2px var(--accent);
+                background: rgba(14,127,245,0.22);
+            }
+
+                div.gc.sel.on {
+                    box-shadow: inset 0 0 0 2px var(--accent), inset 0 1px 0 rgba(255,255,255,0.22);
+                }
+
+            div.gc.br {
+                border-right: 2px solid #a8b4cc !important;
+            }
+
+            div.gc.bb {
+                border-bottom: 2px solid #a8b4cc !important;
+            }
+
+        .sidebar {
+            width: 460px;
+            flex-shrink: 0;
+            background: var(--panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.04);
+        }
+
+        .sidebar-header {
+            font-family: var(--F);
+            font-size: 10px;
+            color: var(--ink3);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            flex-shrink: 0;
+        }
+
+        .sidebar-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .meta-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .meta-label {
+            font-family: var(--F);
+            font-size: 10px;
+            color: var(--ink2);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .meta-sub {
+            color: var(--ink3);
+            font-size: 9px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        input[type="text"] {
+            font-family: var(--FS);
+            background: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border2);
+            padding: 8px 10px;
+            font-size: 13px;
+            width: 100%;
+            border-radius: 4px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+            input[type="text"]:focus {
+                outline: none;
+                border-color: var(--accent);
+                box-shadow: 0 0 0 3px rgba(14,127,245,0.12);
+            }
+
+            input[type="text"]::placeholder {
+                color: var(--ink3);
+            }
+
+        .stats-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 8px 8px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-family: var(--F);
+            font-size: 18px;
+            color: var(--accent);
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .stat-lbl {
+            font-family: var(--F);
+            font-size: 9px;
+            color: var(--ink3);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .output-block {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .out-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .out-label-text {
+            font-family: var(--F);
+            font-size: 10px;
+            color: var(--ink2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn {
+            font-size: 10px;
+            padding: 3px 9px;
+            color: var(--accent);
+            border-color: #b8d4f8;
+            background: var(--accent-bg);
+        }
+
+            .copy-btn:hover {
+                background: var(--accent);
+                color: #fff;
+                border-color: var(--accent);
+            }
+
+            .copy-btn.copied {
+                color: var(--green);
+                border-color: #a0e0c4;
+                background: var(--green-bg);
+            }
+
+                .copy-btn.copied:hover {
+                    background: var(--green);
+                    color: #fff;
+                    border-color: var(--green);
+                }
+
+        textarea.code-out {
+            font-family: var(--F);
+            background: #f4f6fb;
+            color: #1a5fad;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            padding: 10px 12px;
+            font-size: 11px;
+            width: 100%;
+            resize: vertical;
+            min-height: 78px;
+            line-height: 1.6;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+        }
+
+        .howto-box {
+            background: var(--yellow-bg);
+            border: 1px solid #f0d080;
+            border-left: 3px solid var(--yellow);
+            padding: 12px 14px;
+            font-size: 12px;
+            color: #5a4010;
+            line-height: 1.85;
+            border-radius: 0 4px 4px 0;
+        }
+
+            .howto-box strong {
+                color: var(--yellow);
+                display: block;
+                margin-bottom: 6px;
+                font-size: 11px;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                font-family: var(--F);
+            }
+
+            .howto-box code {
+                background: rgba(212,144,10,0.14);
+                color: #7a4e00;
+                padding: 1px 5px;
+                border-radius: 3px;
+                font-family: var(--F);
+                font-size: 11px;
+            }
+
+        .instr-box {
+            background: var(--accent-bg);
+            border: 1px solid #b8d4f8;
+            border-left: 3px solid var(--accent);
+            padding: 11px 14px;
+            font-size: 12px;
+            color: #1a408a;
+            line-height: 1.85;
+            border-radius: 0 4px 4px 0;
+        }
+
+            .instr-box strong {
+                color: var(--accent);
+            }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 3px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #a8b0c4;
+            }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">STOXELS <span class="logo-sep">/</span> <span class="logo-sub">LEVEL EDITOR</span></div>
+        <div class="spacer"></div>
+        <div class="header-hint">
+            <strong>Left-click</strong> fill &nbsp;·&nbsp; <strong>Right-click</strong> erase &nbsp;·&nbsp; <strong>Drag</strong> to paint &nbsp;·&nbsp; <strong>Shift+Drag</strong> select
+        </div>
+        <button id="btn-darkmode" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
+    </header>
+
+    <div class="controls-bar">
+        <div class="ctrl-group">
+            <span class="ctrl-label">Rows</span>
+            <input type="number" id="inp-rows" value="10" min="2" max="50">
+            <span class="x-label">×</span>
+            <span class="ctrl-label">Cols</span>
+            <input type="number" id="inp-cols" value="10" min="2" max="50">
+            <button class="primary" onclick="applySize()">Apply</button>
+        </div>
+        <div class="vdiv"></div>
+        <div class="ctrl-group">
+            <span class="ctrl-label">Presets</span>
+            <button class="preset" onclick="setPreset(5,5)">5×5</button>
+            <button class="preset" onclick="setPreset(10,10)">10×10</button>
+            <button class="preset" onclick="setPreset(15,15)">15×15</button>
+            <button class="preset" onclick="setPreset(20,20)">20×20</button>
+            <button class="preset" onclick="setPreset(9,11)">9×11</button>
+            <button class="preset" onclick="setPreset(8,13)">8×13</button>
+            <button class="preset" onclick="setPreset(11,6)">11×6</button>
+            <button class="preset" onclick="setPreset(30,30)">30×30</button>
+            <button class="preset" onclick="setPreset(40,40)">40×40</button>
+        </div>
+        <div class="vdiv"></div>
+        <div class="ctrl-group">
+            <span class="ctrl-label">Shift</span>
+            <button class="preset" onclick="shiftGrid('up')" title="Shift Up">⬆️</button>
+            <button class="preset" onclick="shiftGrid('down')" title="Shift Down">⬇️</button>
+            <button class="preset" onclick="shiftGrid('left')" title="Shift Left">⬅️</button>
+            <button class="preset" onclick="shiftGrid('right')" title="Shift Right">➡️</button>
+        </div>
+        <button class="preset" onclick="undo()" title="Undo (Ctrl+Z)">↶ Undo</button>
+        <button class="preset" onclick="redo()" title="Redo (Ctrl+Y)">↷ Redo</button>
+        <div class="vdiv"></div>
+        <button class="preset" onclick="invertGrid()" title="Flip every cell">◐ Invert</button>
+        <button class="danger" onclick="clearGrid()">✕ Clear</button>
+        <span class="info-tag" id="size-tag">10 rows × 10 cols</span>
+        <span class="info-tag" id="sel-tag" style="display:none;"></span>
+    </div>
+
+    <div class="main">
+        <div class="canvas-area">
+            <table class="ptable" id="ptable" oncontextmenu="return false;"></table>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-header">◈ Level Properties</div>
+            <div class="sidebar-body">
+
+                <div class="world-file-section">
+                    <div class="world-file-header">
+                        <span>◎ World File</span>
+                        <span class="world-file-badge" id="wf-badge">loaded</span>
+                    </div>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <label class="file-upload-btn">
+                            ↑ Load .js file
+                            <input type="file" accept=".js" onchange="loadWorldFile(event)">
+                        </label>
+                        <span id="wf-filename" style="font-family:var(--F);font-size:10px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;"></span>
+                    </div>
+                    <div class="world-dropdowns">
+                        <select id="sel-world" disabled onchange="onWorldChange()">
+                            <option value="">— World —</option>
+                        </select>
+                        <select id="sel-level" disabled onchange="onLevelChange()">
+                            <option value="">— Level —</option>
+                        </select>
+                    </div>
+                    <div class="world-file-actions">
+                        <button class="btn-load-level" id="btn-load-level" disabled onclick="loadSelectedLevel()">↓ Load into editor</button>
+                        <button class="btn-export-file" id="btn-export-file" disabled onclick="exportWorldFile()">↓ Export full file</button>
+                    </div>
+                    <div class="world-status" id="wf-status"></div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="meta-group">
+                    <div class="meta-label">Hint (EN) <span class="meta-sub">(shown during puzzle)</span></div>
+                    <input type="text" id="inp-hint" placeholder="e.g. the arithmetic average of all values">
+                </div>
+                <div class="meta-group">
+                    <div class="meta-label">Hint (DE) <span class="meta-sub">(German translation)</span></div>
+                    <input type="text" id="inp-hint-de" placeholder="z.B. das arithmetische Mittel aller Werte">
+                </div>
+
+                <div class="meta-group">
+                    <div class="meta-label">Reveal (EN) <span class="meta-sub">(shown on win screen)</span></div>
+                    <input type="text" id="inp-reveal" placeholder="e.g. μ — Mean">
+                </div>
+                <div class="meta-group">
+                    <div class="meta-label">Reveal (DE) <span class="meta-sub">(German translation)</span></div>
+                    <input type="text" id="inp-reveal-de" placeholder="z.B. μ — Mittelwert">
+                </div>
+
+                <div class="meta-group">
+                    <div class="meta-label">Bonus Hint (EN) <span class="meta-sub">(objective shown on card)</span></div>
+                    <input type="text" id="inp-bonus-hint" placeholder="e.g. Finish with 0 mistakes">
+                </div>
+                <div class="meta-group">
+                    <div class="meta-label">Bonus Hint (DE) <span class="meta-sub">(German translation)</span></div>
+                    <input type="text" id="inp-bonus-hint-de" placeholder="z.B. Ohne Fehler abschließen">
+                </div>
+                <div class="meta-group">
+                    <div class="meta-label">Bonus Type &amp; Param</div>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <select id="inp-bonus-type" style="font-family:var(--F);font-size:12px;background:var(--surface);border:1px solid var(--border2);padding:6px 8px;border-radius:4px;color:var(--ink);flex:1;">
+                            <option value="nomiss">nomiss — No mistakes</option>
+                            <option value="fast">fast — Speed run</option>
+                            <option value="lowmiss">lowmiss — At most N mistakes</option>
+                            <option value="noitem">noitem — No items used</option>
+                            <option value="quiz">quiz — Bonus question</option>
+                            <option value="combo">combo — Speed + no mistakes</option>
+                            <option value="noitem_nomiss">noitem_nomiss — No items + no mistakes</option>
+                            <option value="noitem_fast">noitem_fast — No items + speed</option>
+                        </select>
+                        <input type="number" id="inp-bonus-param" value="0" min="0"
+                               style="width:60px;font-family:var(--F);font-size:12px;background:var(--surface);border:1px solid var(--border2);padding:6px 8px;border-radius:4px;color:var(--ink);text-align:center;"
+                               title="bonusParam — seconds for fast/combo, mistake count for lowmiss, 0 otherwise">
+                        <span style="font-family:var(--F);font-size:9px;color:var(--ink3);white-space:nowrap;">param</span>
+                    </div>
+                </div>
+
+                <div class="meta-group">
+                    <div class="meta-label">Timer <span class="meta-sub">(seconds allowed to solve; 0 = no timer)</span></div>
+                    <input type="number" id="inp-timer" value="1800" min="0" step="30"
+                           style="font-family:var(--F);font-size:13px;background:var(--surface);border:1px solid var(--border2);padding:7px 10px;border-radius:4px;color:var(--ink);width:100%;">
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-val" id="stat-filled">0</div>
+                        <div class="stat-lbl">Filled</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="stat-total">100</div>
+                        <div class="stat-lbl">Cells</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="stat-size">10×10</div>
+                        <div class="stat-lbl">Grid</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="stat-density">0%</div>
+                        <div class="stat-lbl">Density</div>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <button class="preset" onclick="runSolvabilityCheck()" title="Verify the clues can be solved by pure line logic">🔍 Check solvability</button>
+                </div>
+                <div class="world-status" id="solve-status"></div>
+
+                <hr class="divider">
+
+                <div class="output-block">
+                    <div class="out-label">
+                        <span class="out-label-text">Complete Level Object</span>
+                        <button class="copy-btn" id="btn-copy-full" onclick="copyCode('out-full','btn-copy-full')">Copy</button>
+                    </div>
+                    <textarea class="code-out" id="out-full" readonly rows="14"></textarea>
+                </div>
+
+                <div class="instr-box">
+                    <strong>Left-click</strong> fills a cell.<br>
+                    <strong>Right-click</strong> erases a cell.<br>
+                    <strong>Drag</strong> to paint or erase many cells.<br>
+                    <strong>Shift+Drag</strong> selects an area.<br>
+                    <strong>Ctrl+C / Ctrl+X</strong> copy / cut the selection, <strong>Ctrl+V</strong> pastes at the hovered cell, <strong>Esc</strong> deselects.<br>
+                    With a selection: <strong>Arrow keys</strong> move the cells, <strong>Shift+Arrows</strong> move just the selection box.<br>
+                    <strong>Ctrl+Z</strong> undo · <strong>Ctrl+Y</strong> redo.<br>
+                    Grid max: <strong>50 rows × 50 cols</strong>.
+                </div>
+
+                <hr class="divider">
+
+                <div class="output-block">
+                    <div class="out-label">
+                        <span class="out-label-text">Import Level Object</span>
+                        <button class="copy-btn" id="btn-import" onclick="importLevel()" style="color:var(--green);border-color:#a0e0c4;background:var(--green-bg);">↓ Import</button>
+                    </div>
+                    <textarea class="code-out" id="inp-import" rows="10" placeholder="Paste a level object here, e.g.:&#10;{&#10;  hint: &quot;Probability&quot;,&#10;  hintDE: &quot;Wahrscheinlichkeit&quot;,&#10;  timer: 1800,&#10;  ...&#10;  grid: G([1,0,1],[0,1,0])&#10;}" style="border-left-color:var(--green);color:var(--ink2);background:#f4faf8;resize:vertical;"></textarea>
+                    <div id="import-msg" style="font-family:var(--F);font-size:10px;min-height:16px;"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDark() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const next = isDark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            document.getElementById('btn-darkmode').textContent = next === 'dark' ? '☀️' : '🌙';
+            try { localStorage.setItem('stoxels-theme', next); } catch (e) { }
+        }
+
+        (function () {
+            let saved = null;
+            try { saved = localStorage.getItem('stoxels-theme'); } catch (e) { }
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('btn-darkmode');
+                if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+            });
+        })();
+
+        let rows = 10, cols = 10;
+        let gridData = [];
+        let isDrawing = false;
+        let drawMode = 1;
+
+        function maxClueDepth(n) { return Math.ceil(n / 2); }
+
+        function clues(line) {
+            const r = []; let c = 0;
+            for (const v of line) { if (v === 1) c++; else if (c > 0) { r.push(c); c = 0; } }
+            if (c > 0) r.push(c);
+            return r.length ? r : [0];
+        }
+        function rowClues() { return gridData.map(row => clues(row)); }
+        function colClues() {
+            const cc = [];
+            for (let c = 0; c < cols; c++) cc.push(clues(gridData.map(row => row[c])));
+            return cc;
+        }
+
+        function setPreset(r, c) {
+            document.getElementById('inp-rows').value = r;
+            document.getElementById('inp-cols').value = c;
+            applySize();
+        }
+        function applySize() {
+            const nr = Math.max(2, Math.min(50, parseInt(document.getElementById('inp-rows').value) || 10));
+            const nc = Math.max(2, Math.min(50, parseInt(document.getElementById('inp-cols').value) || 10));
+            document.getElementById('inp-rows').value = nr;
+            document.getElementById('inp-cols').value = nc;
+            pushUndo();
+            const old = gridData; rows = nr; cols = nc;
+            gridData = Array.from({ length: rows }, (_, r) => Array.from({ length: cols }, (_, c) => (old[r] && old[r][c]) ? old[r][c] : 0));
+            document.getElementById('size-tag').textContent = `${rows} rows × ${cols} cols`;
+            buildTable();
+            updateOutput();
+        }
+        function clearGrid() {
+            pushUndo();
+            gridData = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+            // Reset all sidebar text fields to defaults
+            document.getElementById('inp-hint').value = '';
+            document.getElementById('inp-hint-de').value = '';
+            document.getElementById('inp-reveal').value = '';
+            document.getElementById('inp-reveal-de').value = '';
+            document.getElementById('inp-bonus-hint').value = '';
+            document.getElementById('inp-bonus-hint-de').value = '';
+            document.getElementById('inp-bonus-type').value = 'nomiss';
+            document.getElementById('inp-bonus-param').value = '0';
+            document.getElementById('inp-timer').value = '1800';
+
+            buildTable();
+            updateOutput();
+        }
+
+
+        function shiftGrid(direction) {
+            pushUndo();
+            // Create a completely fresh grid filled with 0s
+            const newGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+            // Loop through the current grid to find filled cells
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (gridData[r][c] === 1) {
+                        let newR = r;
+                        let newC = c;
+
+                        // Apply the directional shift
+                        if (direction === 'up') newR = r - 1;
+                        if (direction === 'down') newR = r + 1;
+                        if (direction === 'left') newC = c - 1;
+                        if (direction === 'right') newC = c + 1;
+
+                        // Only carry the cell over if it hasn't fallen off the edge of the board
+                        if (newR >= 0 && newR < rows && newC >= 0 && newC < cols) {
+                            newGrid[newR][newC] = 1;
+                        }
+                    }
+                }
+            }
+
+            // Replace the old grid data with the newly shifted grid
+            gridData = newGrid;
+
+            // Rebuild the visual table and update the output code
+            buildTable();
+            updateOutput();
+        }
+
+
+        // ─── FULL TABLE BUILD ──────────────────────────────────────────────────────
+        function buildTable() {
+            const maxDim = Math.max(rows, cols);
+            const csz = maxDim <= 5 ? 44 : maxDim <= 10 ? 34 : maxDim <= 15 ? 26 : maxDim <= 20 ? 21 : maxDim <= 30 ? 17 : maxDim <= 40 ? 14 : 12;
+            const fsz = maxDim <= 5 ? 15 : maxDim <= 10 ? 13 : maxDim <= 15 ? 11 : maxDim <= 20 ? 10 : 9;
+            const clueColW = fsz + 10;
+            const clueRowH = fsz + 8;
+
+            const MCD = maxClueDepth(rows);
+            const MRW = maxClueDepth(cols);
+
+            let h = `<colgroup>`;
+            for (let i = 0; i < MRW; i++) h += `<col style="width:${clueColW}px">`;
+            for (let c = 0; c < cols; c++) h += `<col style="width:${csz + 2}px">`;
+            h += `</colgroup><tbody>`;
+
+            const CC = colClues();
+            for (let d = 0; d < MCD; d++) {
+                h += `<tr>`;
+                for (let i = 0; i < MRW; i++) h += `<td class="corner"></td>`;
+                for (let col = 0; col < cols; col++) {
+                    const cl = CC[col], off = MCD - cl.length, num = d >= off ? cl[d - off] : null;
+                    h += `<td class="cch" style="height:${clueRowH}px" id="cc-${d}-${col}">`;
+                    if (num !== null) h += `<div class="ccinner"><span style="font-size:${fsz}px">${num}</span></div>`;
+                    h += `</td>`;
+                }
+                h += `</tr>`;
+            }
+
+            const RC = rowClues();
+            for (let r = 0; r < rows; r++) {
+                h += `<tr>`;
+                const rc = RC[r], pad = MRW - rc.length;
+                for (let i = 0; i < MRW; i++) {
+                    const clueIdx = i - pad;
+                    if (clueIdx >= 0 && clueIdx < rc.length) {
+                        h += `<td class="rct" style="font-size:${fsz}px" id="rc-${r}-${i}"><div class="rcinner"><span>${rc[clueIdx]}</span></div></td>`;
+                    } else {
+                        h += `<td class="corner" id="rc-${r}-${i}"></td>`;
+                    }
+                }
+                for (let c = 0; c < cols; c++) {
+                    const on = gridData[r][c] ? ' on' : '';
+                    const br = (c + 1) % 5 === 0 && c < cols - 1 ? ' br' : '';
+                    const bb = (r + 1) % 5 === 0 && r < rows - 1 ? ' bb' : '';
+                    h += `<td class="gc-wrap"><div class="gc${on}${br}${bb}" style="width:${csz}px;height:${csz}px"
+                        id="gc-${r}-${c}"
+                        onmousedown="onDown(event,${r},${c})"
+                        onmouseenter="onEnter(event,${r},${c})"
+                        onmouseup="onUp()"></div></td>`;
+                }
+                h += `</tr>`;
+            }
+            h += `</tbody>`;
+            const table = document.getElementById('ptable');
+            table.innerHTML = h;
+            table.dataset.fsz = fsz;
+            table.dataset.mcd = MCD;
+            table.dataset.mrw = MRW;
+            applySelVisuals();
+        }
+
+        // ─── INCREMENTAL CELL UPDATE ───────────────────────────────────────────────
+        function updateCell(r, c) {
+            const table = document.getElementById('ptable');
+            const fsz = parseInt(table.dataset.fsz);
+            const MCD = parseInt(table.dataset.mcd);
+            const MRW = parseInt(table.dataset.mrw);
+
+            const cell = document.getElementById(`gc-${r}-${c}`);
+            if (cell) {
+                if (gridData[r][c] === 1) cell.classList.add('on');
+                else cell.classList.remove('on');
+            }
+
+            const rc = clues(gridData[r]);
+            const pad = MRW - rc.length;
+            for (let i = 0; i < MRW; i++) {
+                const td = document.getElementById(`rc-${r}-${i}`);
+                if (!td) continue;
+                const clueIdx = i - pad;
+                if (clueIdx >= 0 && clueIdx < rc.length) {
+                    td.className = 'rct';
+                    td.style.fontSize = fsz + 'px';
+                    td.innerHTML = `<div class="rcinner"><span>${rc[clueIdx]}</span></div>`;
+                } else {
+                    td.className = 'corner';
+                    td.innerHTML = '';
+                }
+            }
+
+            const colVals = gridData.map(row => row[c]);
+            const cc = clues(colVals);
+            const colOff = MCD - cc.length;
+            for (let d = 0; d < MCD; d++) {
+                const td = document.getElementById(`cc-${d}-${c}`);
+                if (!td) continue;
+                const clueIdx = d - colOff;
+                if (clueIdx >= 0 && clueIdx < cc.length) {
+                    td.innerHTML = `<div class="ccinner"><span style="font-size:${fsz}px">${cc[clueIdx]}</span></div>`;
+                } else {
+                    td.innerHTML = '';
+                }
+            }
+        }
+
+        // ─── INPUT HANDLERS ────────────────────────────────────────────────────────
+        function onDown(e, r, c) {
+            e.preventDefault();
+            hoverCell = { r, c };
+            if (e.shiftKey) {
+                isSelecting = true;
+                selStart = { r, c };
+                selEnd = { r, c };
+                applySelVisuals();
+                return;
+            }
+            isDrawing = true;
+            drawMode = e.button === 2 ? 0 : 1;
+            pendingSnap = snapshot();
+            setCellValue(r, c);
+        }
+        function onEnter(e, r, c) {
+            hoverCell = { r, c };
+            if (isSelecting) { selEnd = { r, c }; applySelVisuals(); return; }
+            if (!isDrawing) return;
+            setCellValue(r, c);
+        }
+        function endSelectionDrag() {
+            isSelecting = false;
+            updateSelTag();
+        }
+        function onUp() { isDrawing = false; pendingSnap = null; }
+        document.addEventListener('mouseup', () => {
+            isDrawing = false; pendingSnap = null;
+            if (isSelecting) endSelectionDrag();
+        });
+
+        function setCellValue(r, c) {
+            if (gridData[r][c] === drawMode) return;
+            if (pendingSnap) { commitUndo(pendingSnap); pendingSnap = null; }
+            gridData[r][c] = drawMode;
+            updateCell(r, c);
+            updateOutput();
+        }
+
+        // ─── UNDO / REDO ───────────────────────────────────────────────────────────
+        let undoStack = [], redoStack = [];
+        let pendingSnap = null;
+
+        function snapshot() {
+            return { rows, cols, grid: gridData.map(r => r.slice()) };
+        }
+        function commitUndo(snap) {
+            undoStack.push(snap);
+            if (undoStack.length > 200) undoStack.shift();
+            redoStack = [];
+        }
+        function pushUndo() { commitUndo(snapshot()); }
+        function restoreSnapshot(s) {
+            rows = s.rows; cols = s.cols;
+            gridData = s.grid.map(r => r.slice());
+            document.getElementById('inp-rows').value = rows;
+            document.getElementById('inp-cols').value = cols;
+            document.getElementById('size-tag').textContent = `${rows} rows × ${cols} cols`;
+            buildTable();
+            updateOutput();
+        }
+        function undo() {
+            if (!undoStack.length) return;
+            redoStack.push(snapshot());
+            restoreSnapshot(undoStack.pop());
+        }
+        function redo() {
+            if (!redoStack.length) return;
+            undoStack.push(snapshot());
+            restoreSnapshot(redoStack.pop());
+        }
+
+        document.addEventListener('keydown', e => {
+            const t = e.target.tagName;
+            if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return;
+            const k = e.key.toLowerCase();
+            if ((e.ctrlKey || e.metaKey) && k === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+            else if ((e.ctrlKey || e.metaKey) && (k === 'y' || (k === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
+            else if ((e.ctrlKey || e.metaKey) && k === 'c') { e.preventDefault(); copySelection(); }
+            else if ((e.ctrlKey || e.metaKey) && k === 'x') { e.preventDefault(); cutSelection(); }
+            else if ((e.ctrlKey || e.metaKey) && k === 'v') { e.preventDefault(); pasteClipboard(); }
+            else if (k === 'escape') { clearSelection(); }
+            else if (k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright') {
+                if (!getSelRect()) return; // no selection → normal page scroll
+                e.preventDefault();
+                const dr = k === 'arrowup' ? -1 : k === 'arrowdown' ? 1 : 0;
+                const dc = k === 'arrowleft' ? -1 : k === 'arrowright' ? 1 : 0;
+                if (e.shiftKey) nudgeSelection(dr, dc);   // move the marquee only
+                else shiftSelection(dr, dc);              // move the cells
+            }
+        });
+
+        function invertGrid() {
+            pushUndo();
+            for (let r = 0; r < rows; r++)
+                for (let c = 0; c < cols; c++)
+                    gridData[r][c] = gridData[r][c] ? 0 : 1;
+            buildTable();
+            updateOutput();
+        }
+
+        // ─── SELECTION & CLIPBOARD ─────────────────────────────────────────────────
+        let isSelecting = false, selStart = null, selEnd = null;
+        let clipBoard = null;
+        let hoverCell = { r: 0, c: 0 };
+
+        function getSelRect() {
+            if (!selStart || !selEnd) return null;
+            return {
+                r1: Math.min(selStart.r, selEnd.r), r2: Math.max(selStart.r, selEnd.r),
+                c1: Math.min(selStart.c, selEnd.c), c2: Math.max(selStart.c, selEnd.c)
+            };
+        }
+        function applySelVisuals() {
+            document.querySelectorAll('#ptable div.gc.sel').forEach(el => el.classList.remove('sel'));
+            const rc = getSelRect();
+            if (!rc) return;
+            for (let r = rc.r1; r <= rc.r2; r++)
+                for (let c = rc.c1; c <= rc.c2; c++) {
+                    const el = document.getElementById(`gc-${r}-${c}`);
+                    if (el) el.classList.add('sel');
+                }
+        }
+        function clearSelection() { selStart = null; selEnd = null; applySelVisuals(); updateSelTag(); }
+        function updateSelTag(text) {
+            const el = document.getElementById('sel-tag');
+            if (!el) return;
+            if (text) { el.style.display = ''; el.textContent = text; return; }
+            const rc = getSelRect();
+            if (!rc) { el.style.display = 'none'; el.textContent = ''; return; }
+            el.style.display = '';
+            el.textContent = `Selected ${rc.r2 - rc.r1 + 1}×${rc.c2 - rc.c1 + 1} — Ctrl+C copy`;
+        }
+        function copySelection() {
+            const rc = getSelRect();
+            if (!rc) { updateSelTag('No selection — Shift+Drag to select'); return; }
+            clipBoard = [];
+            for (let r = rc.r1; r <= rc.r2; r++)
+                clipBoard.push(gridData[r].slice(rc.c1, rc.c2 + 1));
+            updateSelTag(`Copied ${clipBoard.length}×${clipBoard[0].length}`);
+        }
+        function cutSelection() {
+            const rc = getSelRect();
+            if (!rc) { updateSelTag('No selection — Shift+Drag to select'); return; }
+            copySelection();
+            pushUndo();
+            for (let r = rc.r1; r <= rc.r2; r++)
+                for (let c = rc.c1; c <= rc.c2; c++) {
+                    if (gridData[r][c] !== 0) { gridData[r][c] = 0; updateCell(r, c); }
+                }
+            updateOutput();
+            updateSelTag(`Cut ${rc.r2 - rc.r1 + 1}×${rc.c2 - rc.c1 + 1}`);
+        }
+        function pasteClipboard() {
+            if (!clipBoard || !clipBoard.length) { updateSelTag('Clipboard empty — select an area and Ctrl+C first'); return; }
+            const h = clipBoard.length, w = clipBoard[0].length;
+            // Anchor: cell the mouse is currently hovering (top-left of the paste)
+            const r0 = Math.max(0, Math.min(rows - 1, hoverCell.r));
+            const c0 = Math.max(0, Math.min(cols - 1, hoverCell.c));
+            pushUndo();
+            for (let i = 0; i < h; i++)
+                for (let j = 0; j < w; j++) {
+                    const r = r0 + i, c = c0 + j;
+                    if (r >= rows || c >= cols) continue; // clip at grid edge
+                    if (gridData[r][c] !== clipBoard[i][j]) {
+                        gridData[r][c] = clipBoard[i][j] ? 1 : 0;
+                        updateCell(r, c);
+                    }
+                }
+            // Deselect after pasting so no stale marquee stays active
+            selStart = null; selEnd = null;
+            applySelVisuals();
+            updateSelTag(`Pasted ${h}×${w} at ${r0},${c0}`);
+            updateOutput();
+        }
+        function shiftSelection(dr, dc) {
+            const rc = getSelRect();
+            if (!rc) return;
+            const h = rc.r2 - rc.r1 + 1, w = rc.c2 - rc.c1 + 1;
+            const block = [];
+            for (let r = rc.r1; r <= rc.r2; r++) block.push(gridData[r].slice(rc.c1, rc.c2 + 1));
+            pushUndo();
+            for (let r = rc.r1; r <= rc.r2; r++)
+                for (let c = rc.c1; c <= rc.c2; c++) {
+                    if (gridData[r][c] !== 0) { gridData[r][c] = 0; updateCell(r, c); }
+                }
+            for (let i = 0; i < h; i++)
+                for (let j = 0; j < w; j++) {
+                    const r = rc.r1 + dr + i, c = rc.c1 + dc + j;
+                    if (r < 0 || r >= rows || c < 0 || c >= cols) continue; // clipped at edge
+                    if (gridData[r][c] !== block[i][j]) {
+                        gridData[r][c] = block[i][j] ? 1 : 0;
+                        updateCell(r, c);
+                    }
+                }
+            selStart = { r: rc.r1 + dr, c: rc.c1 + dc };
+            selEnd = { r: rc.r2 + dr, c: rc.c2 + dc };
+            applySelVisuals();
+            updateOutput();
+        }
+        function nudgeSelection(dr, dc) {
+            const rc = getSelRect();
+            if (!rc) return;
+            selStart = { r: Math.max(0, Math.min(rows - 1, rc.r1 + dr)), c: Math.max(0, Math.min(cols - 1, rc.c1 + dc)) };
+            selEnd = { r: Math.max(0, Math.min(rows - 1, rc.r2 + dr)), c: Math.max(0, Math.min(cols - 1, rc.c2 + dc)) };
+            applySelVisuals();
+        }
+
+        // ─── AUTOSAVE (localStorage) ───────────────────────────────────────────────
+        const LS_KEY = 'stoxels-editor-v1';
+        let restoring = false;
+        let saveTimer = null;
+
+        function scheduleSave() {
+            if (restoring) return;
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveState, 400);
+        }
+        function saveState() {
+            try {
+                localStorage.setItem(LS_KEY, JSON.stringify({
+                    rows, cols, grid: gridData,
+                    hint: document.getElementById('inp-hint').value,
+                    hintDE: document.getElementById('inp-hint-de').value,
+                    reveal: document.getElementById('inp-reveal').value,
+                    revealDE: document.getElementById('inp-reveal-de').value,
+                    bonusHint: document.getElementById('inp-bonus-hint').value,
+                    bonusHintDE: document.getElementById('inp-bonus-hint-de').value,
+                    bonusType: document.getElementById('inp-bonus-type').value,
+                    bonusParam: document.getElementById('inp-bonus-param').value,
+                    timer: document.getElementById('inp-timer').value
+                }));
+            } catch (e) { }
+        }
+        function restoreState() {
+            let s = null;
+            try { s = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) { }
+            if (!s || !Array.isArray(s.grid) || !s.grid.length || !Array.isArray(s.grid[0])) return false;
+            restoring = true;
+            try {
+                rows = Math.max(2, Math.min(50, parseInt(s.rows) || s.grid.length));
+                cols = Math.max(2, Math.min(50, parseInt(s.cols) || s.grid[0].length));
+                gridData = Array.from({ length: rows }, (_, r) =>
+                    Array.from({ length: cols }, (_, c) => (s.grid[r] && s.grid[r][c]) ? 1 : 0));
+                const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+                set('inp-hint', s.hint || ''); set('inp-hint-de', s.hintDE || '');
+                set('inp-reveal', s.reveal || ''); set('inp-reveal-de', s.revealDE || '');
+                set('inp-bonus-hint', s.bonusHint || ''); set('inp-bonus-hint-de', s.bonusHintDE || '');
+                if (s.bonusType) {
+                    const sel = document.getElementById('inp-bonus-type');
+                    if ([...sel.options].some(o => o.value === s.bonusType)) sel.value = s.bonusType;
+                }
+                set('inp-bonus-param', s.bonusParam != null ? s.bonusParam : 0);
+                set('inp-timer', s.timer != null && s.timer !== '' ? s.timer : 1800);
+                set('inp-rows', rows); set('inp-cols', cols);
+                document.getElementById('size-tag').textContent = `${rows} rows × ${cols} cols`;
+                buildTable();
+                updateOutput();
+            } finally { restoring = false; }
+            return true;
+        }
+
+        // ─── CODE GENERATION ───────────────────────────────────────────────────────
+        // Generates the grid as a G(...) call with rows grouped 3 per line,
+        // indented with 8 spaces so it looks clean when pasted into levels.js.
+        function generateGridCode(indent) {
+            const pad = ' '.repeat(indent);
+            const rowStrs = gridData.map(row => `[${row.join(',')}]`);
+            const chunk = 3;
+            let out = 'G(\n';
+            for (let i = 0; i < rowStrs.length; i += chunk) {
+                const sl = rowStrs.slice(i, i + chunk);
+                out += pad + '    ' + sl.join(',') + (i + chunk < rowStrs.length ? ',\n' : '\n');
+            }
+            return out + pad + ')';
+        }
+
+        // Escapes double-quotes inside a string value so it is safe inside "...".
+        function esc(s) { return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"'); }
+
+        function updateOutput() {
+            const filled = gridData.flat().filter(v => v === 1).length;
+            const total = rows * cols;
+            document.getElementById('stat-filled').textContent = filled;
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-size').textContent = `${rows}×${cols}`;
+            document.getElementById('stat-density').textContent = total ? Math.round(filled / total * 100) + '%' : '0%';
+
+            const timer = parseInt(document.getElementById('inp-timer').value) || 0;
+            const hint = esc(document.getElementById('inp-hint').value.trim() || 'your hint here');
+            const hintDE = esc(document.getElementById('inp-hint-de').value.trim() || 'your hint here (DE)');
+            const reveal = esc(document.getElementById('inp-reveal').value.trim() || 'your reveal here');
+            const revealDE = esc(document.getElementById('inp-reveal-de').value.trim() || 'your reveal here (DE)');
+            const bHint = esc(document.getElementById('inp-bonus-hint').value.trim() || 'Complete level');
+            const bHintDE = esc(document.getElementById('inp-bonus-hint-de').value.trim() || 'Complete level (DE)');
+            const bType = document.getElementById('inp-bonus-type').value || 'nomiss';
+            const bParam = parseInt(document.getElementById('inp-bonus-param').value) || 0;
+
+            // Build a nicely indented level object — 4-space indent inside the object,
+            // grid indented an additional 4 spaces so G( rows look clean.
+            const gridCode = generateGridCode(4);
+
+            const lines = [
+                `    {   //${rows}x${cols}`,
+                `        hint: "${hint}",`,
+                `        hintDE: "${hintDE}",`,
+                `        reveal: "${reveal}",`,
+                `        revealDE: "${revealDE}",`,
+                `        timer: ${timer},`,
+                `        bonusHint: "${bHint}",`,
+                `        bonusHintDE: "${bHintDE}",`,
+                `        bonusType: "${bType}",`,
+                `        bonusParam: ${bParam},`,
+                `        grid: ${gridCode}`,
+                `    },`,
+            ];
+
+            document.getElementById('out-full').value = lines.join('\n');
+            syncCurrentLevelBack();
+            scheduleSave();
+        }
+
+        function copyCode(taId, btnId) {
+            const ta = document.getElementById(taId);
+            const done = () => {
+                const btn = document.getElementById(btnId);
+                btn.textContent = '✓ Copied'; btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(ta.value).then(done).catch(() => legacyCopy(ta, done));
+            } else {
+                legacyCopy(ta, done);
+            }
+        }
+        function legacyCopy(ta, done) {
+            ta.focus(); ta.select();
+            try { document.execCommand('copy'); } catch (e) { }
+            done();
+        }
+
+        // Attach input listeners for all fields that affect the output
+        ['inp-hint', 'inp-hint-de', 'inp-reveal', 'inp-reveal-de',
+            'inp-bonus-hint', 'inp-bonus-hint-de'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateOutput);
+            });
+        document.getElementById('inp-bonus-type').addEventListener('change', updateOutput);
+        document.getElementById('inp-bonus-param').addEventListener('input', updateOutput);
+        document.getElementById('inp-timer').addEventListener('input', updateOutput);
+
+        // ─── IMPORT LEVEL ──────────────────────────────────────────────────────────
+        function importLevel() {
+            const raw = document.getElementById('inp-import').value.trim();
+            const msg = document.getElementById('import-msg');
+            if (!raw) { showImportMsg('Paste a level object first.', 'red'); return; }
+
+            try {
+                // Normalise: wrap in parens so we can eval as an expression.
+                // Replace G(...) calls with a sentinel so we can eval the rest.
+                let gridData2D = null;
+
+                // Extract and evaluate the G(...) grid expression
+                const gridMatch = raw.match(/grid\s*:\s*(G\s*\([\s\S]*?\))\s*[,}]/);
+                if (!gridMatch) { showImportMsg('Could not find a grid: G(...) in the pasted text.', 'red'); return; }
+
+                // Evaluate G(...) — define a local G that returns the 2D array
+                const G_local = (...rows) => rows.map(r => r.map(v => +v));
+                try {
+                    gridData2D = (new Function('G', `return ${gridMatch[1]}`))(G_local);
+                } catch (e) { showImportMsg('Could not parse the G(...) grid: ' + e.message, 'red'); return; }
+
+                if (!Array.isArray(gridData2D) || !Array.isArray(gridData2D[0])) {
+                    showImportMsg('Grid parsed but has unexpected shape.', 'red'); return;
+                }
+
+                // Helper to extract a string field value
+                function extractStr(src, key) {
+                    const m = src.match(new RegExp(key + `\\s*:\\s*["'\`]([^"'\`]*)["'\`]`));
+                    return m ? m[1] : '';
+                }
+                function extractNum(src, key) {
+                    const m = src.match(new RegExp(key + `\\s*:\\s*(\\d+)`));
+                    return m ? parseInt(m[1]) : 0;
+                }
+
+                // Populate text fields
+                const fields = {
+                    'inp-hint': extractStr(raw, 'hint'),
+                    'inp-hint-de': extractStr(raw, 'hintDE'),
+                    'inp-reveal': extractStr(raw, 'reveal'),
+                    'inp-reveal-de': extractStr(raw, 'revealDE'),
+                    'inp-bonus-hint': extractStr(raw, 'bonusHint'),
+                    'inp-bonus-hint-de': extractStr(raw, 'bonusHintDE'),
+                };
+                for (const [id, val] of Object.entries(fields)) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = val;
+                }
+
+                // Timer
+                const timerVal = extractNum(raw, 'timer');
+                document.getElementById('inp-timer').value = timerVal;
+
+                // Bonus type
+                const btMatch = raw.match(/bonusType\s*:\s*["']([^"']+)["']/);
+                if (btMatch) {
+                    const sel = document.getElementById('inp-bonus-type');
+                    const opt = [...sel.options].find(o => o.value === btMatch[1]);
+                    if (opt) sel.value = btMatch[1];
+                }
+
+                // Bonus param (last occurrence wins, matching levels.js pattern)
+                const bpMatches = [...raw.matchAll(/bonusParam\s*:\s*(\d+)/g)];
+                if (bpMatches.length) {
+                    document.getElementById('inp-bonus-param').value = bpMatches[bpMatches.length - 1][1];
+                }
+
+                // Apply grid dimensions and data
+                pushUndo();
+                const newRows = gridData2D.length;
+                const newCols = gridData2D[0].length;
+
+                document.getElementById('inp-rows').value = newRows;
+                document.getElementById('inp-cols').value = newCols;
+                document.getElementById('size-tag').textContent = `${newRows} rows × ${newCols} cols`;
+
+                rows = newRows; cols = newCols;
+                gridData = gridData2D.map(r => r.slice());
+                buildTable();
+                updateOutput();
+
+                showImportMsg(`✓ Imported ${newRows}×${newCols} grid successfully.`, 'green');
+            } catch (e) {
+                showImportMsg('Parse error: ' + e.message, 'red');
+            }
+        }
+
+        function showImportMsg(text, color) {
+            const el = document.getElementById('import-msg');
+            el.textContent = text;
+            el.style.color = color === 'green' ? 'var(--green)' : 'var(--red)';
+            setTimeout(() => { el.textContent = ''; }, 4000);
+        }
+
+        // ─── SOLVABILITY CHECK ─────────────────────────────────────────────────────
+        // Line solver: given a clue list and a partially known line (-1 unknown,
+        // 0 empty, 1 filled), determines which cells can be filled / empty in at
+        // least one valid completion. Returns null if the line has no valid
+        // completion (contradiction).
+        function solveLine(clueList, line) {
+            const n = line.length, m = clueList.length;
+            const memo = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(-1));
+
+            function feas(i, j) {
+                if (j === m) {
+                    for (let k = i; k < n; k++) if (line[k] === 1) return false;
+                    return true;
+                }
+                if (i >= n) return false;
+                if (memo[i][j] !== -1) return !!memo[i][j];
+                let res = false;
+                if (line[i] !== 1 && feas(i + 1, j)) res = true;
+                if (!res) {
+                    const len = clueList[j];
+                    if (i + len <= n) {
+                        let ok = true;
+                        for (let k = i; k < i + len; k++) if (line[k] === 0) { ok = false; break; }
+                        if (ok) {
+                            if (i + len === n) { if (feas(n, j + 1)) res = true; }
+                            else if (line[i + len] !== 1 && feas(i + len + 1, j + 1)) res = true;
+                        }
+                    }
+                }
+                memo[i][j] = res ? 1 : 0;
+                return res;
+            }
+
+            if (!feas(0, 0)) return null;
+
+            const canFill = new Array(n).fill(false), canEmpty = new Array(n).fill(false);
+            const seen = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(false));
+            const st = [[0, 0]];
+            seen[0][0] = true;
+            while (st.length) {
+                const [i, j] = st.pop();
+                if (j === m) {
+                    for (let k = i; k < n; k++) canEmpty[k] = true;
+                    continue;
+                }
+                if (i >= n) continue;
+                if (line[i] !== 1 && feas(i + 1, j)) {
+                    canEmpty[i] = true;
+                    if (!seen[i + 1][j]) { seen[i + 1][j] = true; st.push([i + 1, j]); }
+                }
+                const len = clueList[j];
+                if (i + len <= n) {
+                    let ok = true;
+                    for (let k = i; k < i + len; k++) if (line[k] === 0) { ok = false; break; }
+                    if (ok) {
+                        let ni = -1, sepCell = -1;
+                        if (i + len === n) ni = n;
+                        else if (line[i + len] !== 1) { ni = i + len + 1; sepCell = i + len; }
+                        if (ni !== -1 && feas(ni, j + 1)) {
+                            for (let k = i; k < i + len; k++) canFill[k] = true;
+                            if (sepCell !== -1) canEmpty[sepCell] = true;
+                            if (!seen[ni][j + 1]) { seen[ni][j + 1] = true; st.push([ni, j + 1]); }
+                        }
+                    }
+                }
+            }
+            return { canFill, canEmpty };
+        }
+
+        function runSolvabilityCheck() {
+            const strip = cl => (cl.length === 1 && cl[0] === 0) ? [] : cl;
+            const RC = rowClues().map(strip), CC = colClues().map(strip);
+            const R = rows, C = cols;
+            const g = Array.from({ length: R }, () => Array(C).fill(-1));
+            let contradiction = false, changed = true;
+
+            while (changed && !contradiction) {
+                changed = false;
+                for (let r = 0; r < R && !contradiction; r++) {
+                    const res = solveLine(RC[r], g[r]);
+                    if (!res) { contradiction = true; break; }
+                    for (let c = 0; c < C; c++) {
+                        const v = g[r][c];
+                        if (v === 1) { if (!res.canFill[c]) { contradiction = true; break; } }
+                        else if (v === 0) { if (!res.canEmpty[c]) { contradiction = true; break; } }
+                        else if (res.canFill[c] && !res.canEmpty[c]) { g[r][c] = 1; changed = true; }
+                        else if (!res.canFill[c] && res.canEmpty[c]) { g[r][c] = 0; changed = true; }
+                        else if (!res.canFill[c] && !res.canEmpty[c]) { contradiction = true; break; }
+                    }
+                }
+                if (contradiction) break;
+                for (let c = 0; c < C && !contradiction; c++) {
+                    const col = [];
+                    for (let r = 0; r < R; r++) col.push(g[r][c]);
+                    const res = solveLine(CC[c], col);
+                    if (!res) { contradiction = true; break; }
+                    for (let r = 0; r < R; r++) {
+                        const v = col[r];
+                        if (v === 1) { if (!res.canFill[r]) { contradiction = true; break; } }
+                        else if (v === 0) { if (!res.canEmpty[r]) { contradiction = true; break; } }
+                        else if (res.canFill[r] && !res.canEmpty[r]) { g[r][c] = 1; changed = true; }
+                        else if (!res.canFill[r] && res.canEmpty[r]) { g[r][c] = 0; changed = true; }
+                        else if (!res.canFill[r] && !res.canEmpty[r]) { contradiction = true; break; }
+                    }
+                }
+            }
+
+            let msg, color;
+            if (contradiction) {
+                msg = '✗ Clues are contradictory — no picture satisfies them.';
+                color = 'red';
+            } else {
+                let unknown = 0, mismatch = 0;
+                for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+                    if (g[r][c] === -1) unknown++;
+                    else if (g[r][c] !== gridData[r][c]) mismatch++;
+                }
+                if (!unknown && !mismatch) { msg = '✓ Uniquely solvable by pure logic'; color = 'green'; }
+                else if (!unknown) { msg = `✗ Clues force a DIFFERENT picture (${mismatch} cells differ from your design).`; color = 'red'; }
+                else { msg = `△ Needs guessing — ${unknown} cell${unknown === 1 ? '' : 's'} not determined by line logic. May still be unique.`; color = 'yellow'; }
+            }
+            setSolveMsg(msg, color);
+        }
+
+        function setSolveMsg(text, color) {
+            const el = document.getElementById('solve-status');
+            el.textContent = text;
+            el.style.color = color === 'green' ? 'var(--green)' : color === 'red' ? 'var(--red)' : color === 'yellow' ? 'var(--yellow)' : 'var(--ink3)';
+        }
+
+        // ─── WORLD FILE ────────────────────────────────────────────────────────────
+        // In-memory store: worldsData[worldIndex] = { label, labelDE, levels: [{...levelObj, _raw}] }
+        // _raw = original source text for the level (used to reconstruct file on export)
+        let worldsData = null;
+        let rawFileSource = '';
+        let currentWorldIdx = null;
+        let currentLevelIdx = null;
+
+        function loadWorldFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                rawFileSource = e.target.result;
+                document.getElementById('wf-filename').textContent = file.name;
+                parseWorldFile(rawFileSource);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseWorldFile(src) {
+            const G_local = (...rows) => rows.map(r => r.map(v => +v));
+            const status = document.getElementById('wf-status');
+
+            try {
+                // 1. Find all const Wn = [...] blocks
+                // We extract each world array block by finding "const Wn = [" and matching its closing "];"
+                const worldBlocks = [];
+                const worldRegex = /const\s+(W\d+)\s*=\s*\[/g;
+                let m;
+                while ((m = worldRegex.exec(src)) !== null) {
+                    const varName = m[1];
+                    const blockStart = m.index;
+                    const arrStart = src.indexOf('[', blockStart + m[0].length - 1);
+                    // Find matching closing bracket
+                    let depth = 0, i = arrStart;
+                    while (i < src.length) {
+                        if (src[i] === '[') depth++;
+                        else if (src[i] === ']') { depth--; if (depth === 0) break; }
+                        i++;
+                    }
+                    const arrText = src.slice(arrStart, i + 1);
+                    worldBlocks.push({ varName, blockStart, blockEnd: i + 1, arrText });
+                }
+
+                if (!worldBlocks.length) { setWFStatus('No world arrays (W1, W2 …) found in file.', 'red'); return; }
+
+                // 2. Find WORLDS array to get labels
+                const worldsMatch = src.match(/const\s+WORLDS\s*=\s*\[([\s\S]*?)\];/);
+                const labelMap = {}; // varName → { label, labelDE }
+                if (worldsMatch) {
+                    const worldsBody = worldsMatch[1];
+                    const entryRe = /\{\s*label\s*:\s*['"]([^'"]*)['"]\s*,\s*labelDE\s*:\s*['"]([^'"]*)['"]\s*,\s*data\s*:\s*(\w+)\s*\}/g;
+                    let em;
+                    while ((em = entryRe.exec(worldsBody)) !== null) {
+                        labelMap[em[3]] = { label: em[1], labelDE: em[2] };
+                    }
+                }
+
+                // 3. Parse each world block into level objects
+                worldsData = [];
+                for (const wb of worldBlocks) {
+                    const levels = parseLevelsFromArray(wb.arrText, wb.blockStart, wb.varName, G_local, src);
+                    const info = labelMap[wb.varName] || { label: wb.varName, labelDE: wb.varName };
+                    worldsData.push({
+                        varName: wb.varName,
+                        label: info.label,
+                        labelDE: info.labelDE,
+                        blockStart: wb.blockStart,
+                        blockEnd: wb.blockEnd,
+                        arrText: wb.arrText,
+                        levels
+                    });
+                }
+
+                // 4. Populate world dropdown
+                const selWorld = document.getElementById('sel-world');
+                selWorld.innerHTML = '<option value="">— World —</option>';
+                worldsData.forEach((w, wi) => {
+                    const opt = document.createElement('option');
+                    opt.value = wi;
+                    opt.textContent = `${w.label} (${w.levels.length})`;
+                    selWorld.appendChild(opt);
+                });
+                selWorld.disabled = false;
+                document.getElementById('sel-level').disabled = true;
+                document.getElementById('sel-level').innerHTML = '<option value="">— Level —</option>';
+                document.getElementById('btn-load-level').disabled = true;
+                document.getElementById('btn-export-file').disabled = false;
+                document.getElementById('wf-badge').classList.add('visible');
+
+                const totalLevels = worldsData.reduce((s, w) => s + w.levels.length, 0);
+                setWFStatus(`✓ Loaded ${worldsData.length} worlds, ${totalLevels} levels.`, 'green');
+            } catch (err) {
+                setWFStatus('Parse error: ' + err.message, 'red');
+                console.error(err);
+            }
+        }
+
+        function parseLevelsFromArray(arrText, globalOffset, varName, G_local, fullSrc) {
+            // Split arrText into individual level objects by finding top-level { } blocks
+            const levels = [];
+            let depth = 0, start = null;
+            for (let i = 0; i < arrText.length; i++) {
+                const ch = arrText[i];
+                if (ch === '{') {
+                    if (depth === 0) start = i;
+                    depth++;
+                } else if (ch === '}') {
+                    depth--;
+                    if (depth === 0 && start !== null) {
+                        const objText = arrText.slice(start, i + 1);
+                        const level = parseSingleLevel(objText, G_local);
+                        if (level) {
+                            level._rawText = objText;
+                            level._varName = varName;
+                            levels.push(level);
+                        }
+                        start = null;
+                    }
+                }
+            }
+            return levels;
+        }
+
+        function parseSingleLevel(objText, G_local) {
+            function extractStr(src, key) {
+                const m = src.match(new RegExp(key + `\\s*:\\s*["'\`]([^"'\`\\\\]*(\\\\.[^"'\`\\\\]*)*)["'\`]`));
+                if (m) return m[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                const m2 = src.match(new RegExp(key + `\\s*:\\s*["']([^"']*)["']`));
+                return m2 ? m2[1] : '';
+            }
+            function extractNum(src, key) {
+                const m = src.match(new RegExp(key + `\\s*:\\s*(\\d+)`));
+                return m ? parseInt(m[1]) : 0;
+            }
+
+            const gridMatch = objText.match(/grid\s*:\s*(G\s*\([\s\S]*?\))\s*[,}]/);
+            if (!gridMatch) return null;
+
+            let grid2D = null;
+            try {
+                grid2D = (new Function('G', `return ${gridMatch[1]}`))(G_local);
+            } catch (e) { return null; }
+            if (!Array.isArray(grid2D) || !Array.isArray(grid2D[0])) return null;
+
+            const btMatch = objText.match(/bonusType\s*:\s*["']([^"']+)["']/);
+            const bpMatches = [...objText.matchAll(/bonusParam\s*:\s*(\d+)/g)];
+
+            return {
+                hint: extractStr(objText, 'hint'),
+                hintDE: extractStr(objText, 'hintDE'),
+                reveal: extractStr(objText, 'reveal'),
+                revealDE: extractStr(objText, 'revealDE'),
+                bonusHint: extractStr(objText, 'bonusHint'),
+                bonusHintDE: extractStr(objText, 'bonusHintDE'),
+                bonusType: btMatch ? btMatch[1] : 'nomiss',
+                bonusParam: bpMatches.length ? parseInt(bpMatches[bpMatches.length - 1][1]) : 0,
+                timer: extractNum(objText, 'timer'),
+                grid: grid2D,
+            };
+        }
+
+        function onWorldChange() {
+            const wi = parseInt(document.getElementById('sel-world').value);
+            const selLevel = document.getElementById('sel-level');
+            selLevel.innerHTML = '<option value="">— Level —</option>';
+            document.getElementById('btn-load-level').disabled = true;
+
+            if (isNaN(wi) || !worldsData || !worldsData[wi]) {
+                selLevel.disabled = true;
+                currentWorldIdx = null;
+                return;
+            }
+            currentWorldIdx = wi;
+            const world = worldsData[wi];
+            world.levels.forEach((lv, li) => {
+                const opt = document.createElement('option');
+                opt.value = li;
+                const nr = lv.grid.length, nc = lv.grid[0].length;
+                opt.textContent = `#${li + 1} — ${lv.hint || '(no hint)'} [${nr}×${nc}]`;
+                selLevel.appendChild(opt);
+            });
+            selLevel.disabled = false;
+        }
+
+        function onLevelChange() {
+            const li = parseInt(document.getElementById('sel-level').value);
+            document.getElementById('btn-load-level').disabled = isNaN(li);
+            if (!isNaN(li)) currentLevelIdx = li;
+        }
+
+        function loadSelectedLevel() {
+            if (currentWorldIdx === null || currentLevelIdx === null) return;
+            const lv = worldsData[currentWorldIdx].levels[currentLevelIdx];
+            if (!lv) return;
+
+            pushUndo();
+            const newRows = lv.grid.length, newCols = lv.grid[0].length;
+            document.getElementById('inp-rows').value = newRows;
+            document.getElementById('inp-cols').value = newCols;
+            document.getElementById('size-tag').textContent = `${newRows} rows × ${newCols} cols`;
+            rows = newRows; cols = newCols;
+            gridData = lv.grid.map(r => r.slice());
+
+            document.getElementById('inp-hint').value = lv.hint || '';
+            document.getElementById('inp-hint-de').value = lv.hintDE || '';
+            document.getElementById('inp-reveal').value = lv.reveal || '';
+            document.getElementById('inp-reveal-de').value = lv.revealDE || '';
+            document.getElementById('inp-bonus-hint').value = lv.bonusHint || '';
+            document.getElementById('inp-bonus-hint-de').value = lv.bonusHintDE || '';
+            document.getElementById('inp-timer').value = lv.timer || 1800;
+            document.getElementById('inp-bonus-param').value = lv.bonusParam || 0;
+            const sel = document.getElementById('inp-bonus-type');
+            const opt = [...sel.options].find(o => o.value === lv.bonusType);
+            if (opt) sel.value = lv.bonusType;
+
+            buildTable();
+            updateOutput();
+            setWFStatus(`Loaded: ${lv.hint || '(no hint)'} [${newRows}×${newCols}]`, 'green');
+        }
+
+        // Called every time the editor state changes — syncs back to worldsData
+        function syncCurrentLevelBack() {
+            if (currentWorldIdx === null || currentLevelIdx === null || !worldsData) return;
+            const lv = worldsData[currentWorldIdx].levels[currentLevelIdx];
+            if (!lv) return;
+            lv.hint = document.getElementById('inp-hint').value.trim();
+            lv.hintDE = document.getElementById('inp-hint-de').value.trim();
+            lv.reveal = document.getElementById('inp-reveal').value.trim();
+            lv.revealDE = document.getElementById('inp-reveal-de').value.trim();
+            lv.bonusHint = document.getElementById('inp-bonus-hint').value.trim();
+            lv.bonusHintDE = document.getElementById('inp-bonus-hint-de').value.trim();
+            lv.bonusType = document.getElementById('inp-bonus-type').value;
+            lv.bonusParam = parseInt(document.getElementById('inp-bonus-param').value) || 0;
+            lv.timer = parseInt(document.getElementById('inp-timer').value) || 0;
+            lv.grid = gridData.map(r => r.slice());
+            // Update level dropdown label to reflect new hint
+            const selLevel = document.getElementById('sel-level');
+            const opt = selLevel.options[currentLevelIdx + 1]; // +1 for placeholder
+            if (opt) {
+                const nr = lv.grid.length, nc = lv.grid[0].length;
+                opt.textContent = `#${currentLevelIdx + 1} — ${lv.hint || '(no hint)'} [${nr}×${nc}]`;
+            }
+        }
+
+        function levelToString(lv, indent) {
+            const pad = ' '.repeat(indent);
+            const inner = ' '.repeat(indent + 4);
+            function esc2(s) { return (s || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"'); }
+            const nr = lv.grid.length, nc = lv.grid[0] ? lv.grid[0].length : 0;
+            const rowStrs = lv.grid.map(row => `[${row.join(', ')}]`);
+            const chunk = 3;
+            let gridStr = 'G(\n';
+            for (let i = 0; i < rowStrs.length; i += chunk) {
+                const sl = rowStrs.slice(i, i + chunk);
+                gridStr += inner + '    ' + sl.join(', ') + (i + chunk < rowStrs.length ? ',\n' : '\n');
+            }
+            gridStr += inner + ')';
+
+            return [
+                `${inner}{   //${nr}x${nc}`,
+                `${inner}    hint: "${esc2(lv.hint)}",`,
+                `${inner}    hintDE: "${esc2(lv.hintDE)}",`,
+                `${inner}    reveal: "${esc2(lv.reveal)}",`,
+                `${inner}    revealDE: "${esc2(lv.revealDE)}",`,
+                `${inner}    timer: ${lv.timer},`,
+                `${inner}    bonusHint: "${esc2(lv.bonusHint)}",`,
+                `${inner}    bonusHintDE: "${esc2(lv.bonusHintDE)}",`,
+                `${inner}    bonusType: "${lv.bonusType}",`,
+                `${inner}    bonusParam: ${lv.bonusParam},`,
+                `${inner}    grid: ${gridStr}`,
+                `${inner}},`,
+            ].join('\n');
+        }
+
+        function exportWorldFile() {
+            if (!worldsData || !rawFileSource) { setWFStatus('No file loaded.', 'red'); return; }
+
+            // Sync current editor state back before export
+            syncCurrentLevelBack();
+
+            // Rebuild source: replace each world array block in reverse order (to preserve offsets)
+            // Strategy: collect all replacement ranges, then apply from end to start
+            let out = rawFileSource;
+
+            // Sort world blocks by blockStart descending so replacements don't shift offsets
+            const sorted = [...worldsData].sort((a, b) => b.blockStart - a.blockStart);
+
+            for (const world of sorted) {
+                // Find the array start/end in current `out` by re-scanning from blockStart
+                // We re-find the block since other replacements may have shifted text.
+                // Better: rebuild from scratch since we have all data.
+                // We'll do a single full rebuild instead.
+            }
+
+            // Full rebuild: reconstruct the entire file
+            // Keep the header (G function def + comments) then regenerate each world const
+            // then reconstruct the WORLDS array at the bottom.
+
+            // Extract everything before first world const
+            const firstWorldStart = worldsData.reduce((min, w) => Math.min(min, w.blockStart), Infinity);
+            const header = rawFileSource.slice(0, firstWorldStart);
+
+            // Find WORLDS const in source to preserve it
+            const worldsConstMatch = rawFileSource.match(/const\s+WORLDS\s*=\s*\[[\s\S]*?\];/);
+            const worldsConst = worldsConstMatch ? worldsConstMatch[0] : null;
+
+            let body = '';
+            for (const world of worldsData) {
+                // Section header comment
+                body += `\n\n\n`;
+                body += `//------------------------------------------------------------------------\n`;
+                body += `//-------------------${world.label}: Level Data----------------------------------\n`;
+                body += `//------------------------------------------------------------------------\n`;
+                body += `//------------------------------------------------------------------------\n\n\n`;
+                body += `const ${world.varName} = [\n\n`;
+                for (const lv of world.levels) {
+                    body += levelToString(lv, 0) + '\n\n\n';
+                }
+                body += `];\n`;
+            }
+
+            // Append the WORLDS array (use original if found, else regenerate)
+            body += '\n\n\n';
+            body += `//------------------------------------------------------------------------\n`;
+            body += `//-------------------WORLD container -------------------------------------\n`;
+            body += `//------------------------------------------------------------------------\n`;
+            body += `//------------------------------------------------------------------------\n\n\n\n`;
+            if (worldsConst) {
+                body += worldsConst + '\n';
+            } else {
+                body += `const WORLDS = [\n`;
+                for (const w of worldsData) {
+                    body += `    { label: '${w.label}', labelDE: '${w.labelDE}', data: ${w.varName} },\n`;
+                }
+                body += `];\n`;
+            }
+
+            // Download
+            const blob = new Blob([header + body], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'level-world-data.js';
+            a.click();
+            URL.revokeObjectURL(url);
+            setWFStatus('✓ File exported as level-world-data.js', 'green');
+        }
+
+        function setWFStatus(msg, color) {
+            const el = document.getElementById('wf-status');
+            el.textContent = msg;
+            el.style.color = color === 'green' ? 'var(--green)' : color === 'red' ? 'var(--red)' : 'var(--ink3)';
+        }
+
+        document.addEventListener('contextmenu', e => {
+            const t = e.target.tagName;
+            if (t !== 'INPUT' && t !== 'TEXTAREA') e.preventDefault();
+        });
+
+        if (!restoreState()) {
+            gridData = Array.from({ length: rows }, () => Array(cols).fill(0));
+            buildTable();
+            updateOutput();
+        }
+    </script>
+</body>
+</html>

@@ -138,7 +138,7 @@ const LEDGER_CATEGORIES = [
             },
             {
                 id: 'world_4', labelEn: 'All worlds completed', labelDE: 'Alle Welten abgeschlossen',
-                check: qs => ({ current: qs.worldsCompleted || 0, target: 13 }),
+                check: qs => ({ current: qs.worldsCompleted || 0, target: 14 }),
                 reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'mistakeEraserAll', 'addTime900'] }
             },
         ]

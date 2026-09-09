@@ -2718,8 +2718,248 @@ const W11 = [
 
 const W12 = [
 
+    {   //5x5
+        hint: "True Correlation",
+        hintDE: "Wahre Korrelation",
+        reveal: "Rho is the true correlation between X and Y, covariance over both standard deviations",
+        revealDE: "Rho ist die wahre Korrelation zwischen X und Y, Kovarianz geteilt durch beide Standardabweichungen",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 1, 1, 0, 0], [0, 1, 0, 1, 0], [0, 1, 1, 0, 0],
+        [0, 1, 0, 0, 0], [0, 1, 0, 0, 0]
+    )
+    },
 
+    {   //5x5
+        hint: "Covariance",
+        hintDE: "Kovarianz",
+        reveal: "Gamma XY is the covariance of X and Y, the mean of the centred product",
+        revealDE: "Gamma XY ist die Kovarianz von X und Y, der Mittelwert des zentrierten Produkts",
+        timer: 1800,
+        bonusHint: "Finish in less than 20 seconds",
+        bonusHintDE: "In weniger als 20 Sekunden abschließen",
+        bonusType: "fast",
+        bonusParam: 20,
+        grid: G(
+            [0, 1, 0, 0, 1], [1, 0, 1, 1, 0], [0, 0, 1, 0, 0],
+            [0, 1, 1, 0, 0], [0, 1, 0, 0, 0]
+        )
+    },
 
+    {   //5x20
+        hint: "Correlation Test",
+        hintDE: "Korrelationstest",
+        reveal: "Two-sided test of no correlation: the null says rho equals zero",
+        revealDE: "Zweiseitiger Test auf fehlende Korrelation: die Nullhypothese besagt, dass Rho gleich null ist",
+        timer: 1800,
+        bonusHint: "Finish without mistakes",
+        bonusHintDE: "Beende das Level ohne Fehler zu machen",
+        bonusType: "nomiss",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0], [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+        [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0]
+    )
+    },
+
+    {   //5x25
+        hint: "Sample Correlation",
+        hintDE: "Stichprobenkorrelation",
+        reveal: "The sample correlation centres every pair and scales the joint sum by both spreads",
+        revealDE: "Die Stichprobenkorrelation zentriert alle Paare und skaliert die gemeinsame Summe mit beiden Streuungen",
+        timer: 1800,
+        bonusHint: "Finish without using items",
+        bonusHintDE: "Beende das Level ohne Items zu nutzen",
+        bonusType: "noitem",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0]
+    )
+    },
+
+    {   //5x20
+        hint: "Regression Line",
+        hintDE: "Regressionsgerade",
+        reveal: "Observed points scatter around a straight line; the regression line is the best-fitting line",
+        revealDE: "Beobachtete Punkte streuen um eine Gerade; die Regressionsgerade ist die am besten passende Gerade",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+    },
+
+    {   //5x25
+        hint: "Linear Model",
+        hintDE: "Lineares Modell",
+        reveal: "Each observation follows the line plus noise with mean zero and constant variance",
+        revealDE: "Jede Beobachtung folgt der Geraden plus Rauschen mit Mittelwert null und konstanter Varianz",
+        timer: 1800,
+        bonusHint: "Finish with at most 3 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 3,
+        grid: G(
+        [0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0], [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0],
+        [0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0]
+    )
+    },
+
+    {   //5x35
+        hint: "Slope Estimate",
+        hintDE: "Steigungsschätzung",
+        reveal: "The least-squares slope divides the sample covariance by the sample variance of x",
+        revealDE: "Die Kleinste-Quadrate-Steigung teilt die Stichprobenkovarianz durch die Stichprobenvarianz von x",
+        timer: 1800,
+        bonusHint: "Finish in less than 5 minutes",
+        bonusHintDE: "In weniger als 5 Minuten abschließen",
+        bonusType: "fast",
+        bonusParam: 300,
+        grid: G(
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1], [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1]
+    )
+    },
+
+    {   //5x35
+        hint: "Normal Equations",
+        hintDE: "Normalgleichungen",
+        reveal: "The least-squares solution balances the normal equations built from all observations",
+        revealDE: "Die Kleinste-Quadrate-Lösung erfüllt die Normalgleichungen aus allen Beobachtungen",
+        timer: 1800,
+        bonusHint: "Finish without using items",
+        bonusHintDE: "Beende das Level ohne Items zu nutzen",
+        bonusType: "noitem",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0], [0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
+    )
+    },
+
+    {   //5x40
+        hint: "Coefficient of Determination",
+        hintDE: "Bestimmtheitsmaß",
+        reveal: "R squared is the explained share of the total variation, the model sum over the total sum",
+        revealDE: "Das R-Quadrat ist der erklärte Anteil der Gesamtstreuung, Modellsumme über Gesamtsumme",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0], [1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+        [1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0], [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0]
+    )
+    },
+
+    {   //5x50
+        hint: "Fitted Values",
+        hintDE: "Angepasste Werte",
+        reveal: "A worked example: the fitted line through x from 1 to 7 with intercept 1.19 and slope 0.43",
+        revealDE: "Ein Zahlenbeispiel: die angepasste Gerade über x von 1 bis 7 mit Achsenabschnitt 1,19 und Steigung 0,43",
+        timer: 1800,
+        bonusHint: "Finish in less than 10 minutes",
+        bonusHintDE: "In weniger als 10 Minuten abschließen",
+        bonusType: "fast",
+        bonusParam: 600,
+        grid: G(
+        [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0], [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+        [0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0]
+    )
+    },
+
+    {   //10x10
+        hint: "Scatter Plot",
+        hintDE: "Streudiagramm",
+        reveal: "Plotted pairs form a point cloud that scatters around the hidden line",
+        revealDE: "Geplottete Paare bilden eine Punktwolke, die um die verborgene Gerade streut",
+        timer: 1800,
+        bonusHint: "Finish without mistakes",
+        bonusHintDE: "Beende das Level ohne Fehler zu machen",
+        bonusType: "nomiss",
+        bonusParam: 0,
+        grid: G(
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 1, 1, 0], [1, 0, 0, 0, 0, 0, 1, 0, 1, 0], [1, 0, 0, 0, 0, 1, 0, 1, 0, 0], [1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+        [1, 0, 0, 1, 0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0, 0, 0, 0, 0], [1, 0, 1, 1, 0, 0, 0, 0, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    )
+    },
+
+    {   //10x10
+        hint: "Least-Squares Line",
+        hintDE: "Ausgleichsgerade",
+        reveal: "The least-squares line through the cloud minimises the squared vertical distances",
+        revealDE: "Die Kleinste-Quadrate-Gerade durch die Wolke minimiert die quadrierten vertikalen Abstände",
+        timer: 1800,
+        bonusHint: "Finish with at most 5 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 5 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 5,
+        grid: G(
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 1, 1, 0], [1, 0, 0, 0, 0, 0, 1, 0, 1, 1], [1, 0, 0, 0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 0, 1, 0, 1, 1, 0, 0],
+        [1, 0, 0, 1, 0, 1, 0, 0, 0, 0], [1, 0, 1, 1, 1, 0, 0, 0, 0, 0], [1, 0, 1, 1, 0, 0, 0, 0, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    )
+    },
+
+    {   //10x15
+        hint: "Squared Residual",
+        hintDE: "Quadrierter Rest",
+        reveal: "Each squared residual measures one vertical gap; least squares minimises their sum",
+        revealDE: "Jeder quadrierte Rest misst einen vertikalen Abstand; die kleinsten Quadrate minimieren ihre Summe",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+    },
+
+    {   //15x15
+        hint: "Residual Plot",
+        hintDE: "Residuenplot",
+        reveal: "Plotting each residual against its index reveals hidden structure in the fit",
+        revealDE: "Das Plotten jedes Residuums gegen seinen Index enthüllt verborgene Strukturen der Anpassung",
+        timer: 1800,
+        bonusHint: "Finish with at most 3 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 3,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+    },
+
+    {   //20x20
+        hint: "Plot Your Data",
+        hintDE: "Plotte deine Daten",
+        reveal: "Four different datasets share one regression line, so always plot your data first",
+        revealDE: "Vier verschiedene Datensätze teilen eine Ausgleichsgerade, also plotte deine Daten zuerst",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0], [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1], [1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0],
+        [1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0], [1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0], [1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0], [1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    )
+    },
 
 ];
 
@@ -2733,15 +2973,255 @@ const W12 = [
 
 const W13 = [
 
+    {   //5x5
+        hint: "Wilcoxon Statistic",
+        hintDE: "Wilcoxon-Statistik",
+        reveal: "W is the Wilcoxon rank sum of the second sample",
+        revealDE: "W ist die Wilcoxon-Rangsumme der zweiten Stichprobe",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [1, 0, 0, 0, 1], [1, 0, 0, 0, 1], [1, 0, 1, 0, 1],
+        [1, 1, 0, 1, 1], [1, 0, 0, 0, 1]
+    )
+    },
 
+    {   //5x5
+        hint: "Location Shift",
+        hintDE: "Lageverschiebung",
+        reveal: "Delta is the shift between two samples: shifted second-sample values match the first sample",
+        revealDE: "Delta ist die Verschiebung zwischen zwei Stichproben: verschobene Werte der zweiten Stichprobe gleichen der ersten",
+        timer: 1800,
+        bonusHint: "Finish in less than 20 seconds",
+        bonusHintDE: "In weniger als 20 Sekunden abschließen",
+        bonusType: "fast",
+        bonusParam: 20,
+        grid: G(
+        [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1], [1, 0, 0, 0, 1]
+    )
+    },
 
+    {   //5x20
+        hint: "Shift Hypotheses",
+        hintDE: "Shift-Hypothesen",
+        reveal: "The null says both samples share one distribution, so the shift equals zero",
+        revealDE: "Die Nullhypothese besagt, dass beide Stichproben eine Verteilung teilen, der Shift also null ist",
+        timer: 1800,
+        bonusHint: "Finish without mistakes",
+        bonusHintDE: "Beende das Level ohne Fehler zu machen",
+        bonusType: "nomiss",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0]
+    )
+    },
+
+    {   //5x20
+        hint: "Ranking",
+        hintDE: "Rangvergabe",
+        reveal: "Order all observations, number them from 1 to n, then sum the ranks per sample",
+        revealDE: "Ordne alle Beobachtungen, nummeriere sie von 1 bis n und summiere dann die Ränge pro Stichprobe",
+        timer: 1800,
+        bonusHint: "Finish without using items",
+        bonusHintDE: "Beende das Level ohne Items zu nutzen",
+        bonusType: "noitem",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0], [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+    )
+    },
+
+    {   //5x25
+        hint: "Equal Distributions",
+        hintDE: "Gleiche Verteilungen",
+        reveal: "Under the null both samples come from the same distribution function",
+        revealDE: "Unter der Nullhypothese stammen beide Stichproben aus derselben Verteilungsfunktion",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0]
+    )
+    },
+
+    {   //5x30
+        hint: "Pooled Sample Size",
+        hintDE: "Gesamtstichprobenumfang",
+        reveal: "The total size sums both groups; the ranks from 1 to n sum to n times n plus 1 over 2",
+        revealDE: "Der Gesamtumfang summiert beide Gruppen; die Ränge von 1 bis n summieren sich zu n mal n plus 1 durch 2",
+        timer: 1800,
+        bonusHint: "Finish with at most 3 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 3,
+        grid: G(
+        [0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0], [0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0], [0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0],
+        [0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0], [0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0]
+    )
+    },
+
+    {   //5x35
+        hint: "Standardised Statistic",
+        hintDE: "Standardisierte Statistik",
+        reveal: "Standardising W by its null mean and variance gives an approximately standard normal test",
+        revealDE: "Die Standardisierung von W mit Nullerwartung und Nullvarianz ergibt einen annähernd standardnormalen Test",
+        timer: 1800,
+        bonusHint: "Finish in less than 5 minutes",
+        bonusHintDE: "In weniger als 5 Minuten abschließen",
+        bonusType: "fast",
+        bonusParam: 300,
+        grid: G(
+        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1], [0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0]
+    )
+    },
+
+    {   //5x50
+        hint: "Null Moments",
+        hintDE: "Nullmomente",
+        reveal: "Under the null the rank sum has a known mean and variance depending only on the sample sizes",
+        revealDE: "Unter der Nullhypothese hat die Rangsumme einen bekannten Erwartungswert und eine bekannte Varianz aus den Umfängen",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0]
+    )
+    },
+
+    {   //5x30
+        hint: "Independence Model",
+        hintDE: "Unabhängigkeitsmodell",
+        reveal: "Under independence each cell probability factorises and expected counts follow from the margins",
+        revealDE: "Unter Unabhängigkeit faktorisiert jede Zellwahrscheinlichkeit und die erwarteten Anzahlen folgen aus den Rändern",
+        timer: 1800,
+        bonusHint: "Finish without using items",
+        bonusHintDE: "Beende das Level ohne Items zu nutzen",
+        bonusType: "noitem",
+        bonusParam: 0,
+        grid: G(
+        [0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0], [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0], [0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0],
+        [0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0]
+    )
+    },
+
+    {   //5x40
+        hint: "Chi-Square Statistic",
+        hintDE: "Chi-Quadrat-Statistik",
+        reveal: "Q sums squared gaps between observed and expected counts, scaled by the expectation",
+        revealDE: "Q summiert quadrierte Abstände zwischen beobachteten und erwarteten Anzahlen, skaliert mit der Erwartung",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0], [1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
+        [1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0]
+    )
+    },
+
+    {   //5x50
+        hint: "Degrees of Freedom",
+        hintDE: "Freiheitsgrade",
+        reveal: "Under the null Q follows a chi-square law with rows minus 1 times columns minus 1 degrees of freedom",
+        revealDE: "Unter der Nullhypothese folgt Q einer Chi-Quadrat-Verteilung mit Zeilen minus 1 mal Spalten minus 1 Freiheitsgraden",
+        timer: 1800,
+        bonusHint: "Finish in less than 10 minutes",
+        bonusHintDE: "In weniger als 10 Minuten abschließen",
+        bonusType: "fast",
+        bonusParam: 600,
+        grid: G(
+        [1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1], [1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1], [1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0]
+    )
+    },
+
+    {   //10x10
+        hint: "Fourfold Table",
+        hintDE: "Vierfeldertafel",
+        reveal: "For two-by-two tables Q simplifies to a closed form in the four cell counts",
+        revealDE: "Für Zwei-mal-zwei-Tafeln vereinfacht sich Q zu einer geschlossenen Formel in den vier Zellzahlen",
+        timer: 1800,
+        bonusHint: "Finish without mistakes",
+        bonusHintDE: "Beende das Level ohne Fehler zu machen",
+        bonusType: "nomiss",
+        bonusParam: 0,
+        grid: G(
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 0, 1, 0, 1, 0, 1, 0, 0, 1], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 0, 1, 1, 1, 0, 1, 0, 0, 1], [1, 0, 0, 0, 1, 0, 0, 1, 0, 1], [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    )
+    },
+
+    {   //10x15
+        hint: "Counts and Margins",
+        hintDE: "Häufigkeiten und Ränder",
+        reveal: "Cell counts meet row and column totals; together they fix the expected counts under independence",
+        revealDE: "Zellzahlen treffen Zeilen- und Spaltensummen; gemeinsam legen sie die erwarteten Anzahlen unter Unabhängigkeit fest",
+        timer: 1800,
+        bonusHint: "Finish with at most 5 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 5 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 5,
+        grid: G(
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    )
+    },
+
+    {   //15x15
+        hint: "Rejection Region",
+        hintDE: "Ablehnbereich",
+        reveal: "Reject independence when Q exceeds the chi-square quantile, for example 3.84 at level 5 percent",
+        revealDE: "Verwirf die Unabhängigkeit, wenn Q das Chi-Quadrat-Quantil übersteigt, zum Beispiel 3,84 beim Niveau 5 Prozent",
+        timer: 1800,
+        bonusHint: "Finish with at most 3 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 3,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+    },
+
+    {   //20x20
+        hint: "Contingency Table",
+        hintDE: "Kontingenztafel",
+        reveal: "A full rows-by-columns table compares every observed count with its expected count via Q",
+        revealDE: "Eine vollständige Zeilen-mal-Spalten-Tafel vergleicht jede beobachtete Anzahl via Q mit ihrer Erwartung",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1], [1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1], [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1], [1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1], [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1],
+        [1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1], [1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1], [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1],
+        [1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1], [1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    )
+    },
 
 ];
 
 
 
 //------------------------------------------------------------------------
-//-------------------DevWorld1: Level Data----------------------------------
+//-------------------Nexus World (World 14): Level Data----------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -2749,25 +3229,248 @@ const W13 = [
 
 
 const W14 = [
-
     {   //5x5
-        hint: "dev",
-        hintDE: "your hint here (DE)",
-        reveal: "your reveal here",
-        revealDE: "your reveal here (DE)",
-        timer: 300,
-        bonusHint: "Complete level",
-        bonusHintDE: "Complete level (DE)",
-        bonusType: "nomiss",
+        hint: "Population",
+        hintDE: "Grundgesamtheit",
+        reveal: "G is the population: the set of all statistical units under study",
+        revealDE: "G ist die Grundgesamtheit: die Menge aller untersuchten statistischen Einheiten",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
         bonusParam: 0,
         grid: G(
-        [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0],
-        [1, 0, 0, 0, 0], [1, 0, 0, 0, 0]
+        [0, 1, 1, 1, 0], [0, 1, 0, 0, 0], [0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0], [0, 1, 1, 1, 0]
     )
     },
 
+    {   //5x5
+        hint: "Variable",
+        hintDE: "Merkmal",
+        reveal: "A variable assigns every unit its observed value",
+        revealDE: "Ein Merkmal ordnet jeder Einheit ihren beobachteten Wert zu",
+        timer: 1800,
+        bonusHint: "Finish in less than 20 seconds",
+        bonusHintDE: "In weniger als 20 Sekunden abschließen",
+        bonusType: "fast",
+        bonusParam: 20,
+        grid: G(
+        [0, 1, 0, 1, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0], [0, 1, 0, 1, 0]
+    )
+    },
+
+    {   //5x20
+        hint: "Observation Rule",
+        hintDE: "Beobachtungsvorschrift",
+        reveal: "X maps every unit g to its value X of g inside the value set M",
+        revealDE: "X bildet jede Einheit g auf ihren Wert X von g in der Wertemenge M ab",
+        timer: 1800,
+        bonusHint: "Finish without mistakes",
+        bonusHintDE: "Beende das Level ohne Fehler zu machen",
+        bonusType: "nomiss",
+        bonusParam: 0,
+        grid: G(
+        [1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0], [1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+        [1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0], [1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0]
+    )
+    },
+
+    {   //5x20
+        hint: "Scales of Measurement",
+        hintDE: "Skalenniveaus",
+        reveal: "Nominal values differ only; ordinal values can be ordered; metric values can be measured",
+        revealDE: "Nominale Werte sind nur unterscheidbar; ordinale Werte sind vergleichbar; metrische Werte sind messbar",
+        timer: 1800,
+        bonusHint: "Finish without using items",
+        bonusHintDE: "Beende das Level ohne Items zu nutzen",
+        bonusType: "noitem",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0]
+    )
+    },
+
+    {   //5x25
+        hint: "Absolute Frequencies",
+        hintDE: "Absolute Häufigkeiten",
+        reveal: "Absolute frequencies count each value; together they sum to the sample size n",
+        revealDE: "Absolute Häufigkeiten zählen jeden Wert; gemeinsam summieren sie sich zum Stichprobenumfang n",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0], [0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0], [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0],
+        [0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], [0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+    )
+    },
+
+    {   //5x30
+        hint: "Relative Frequencies",
+        hintDE: "Relative Häufigkeiten",
+        reveal: "Relative frequency divides the absolute count by n: the share of each value",
+        revealDE: "Die relative Häufigkeit teilt die absolute Anzahl durch n: der Anteil jedes Wertes",
+        timer: 1800,
+        bonusHint: "Finish with at most 3 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 3,
+        grid: G(
+        [0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0], [0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0]
+    )
+    },
+
+    {   //5x35
+        hint: "Frequency Sum",
+        hintDE: "Häufigkeitssumme",
+        reveal: "Relative frequencies always sum to one across all observed values",
+        revealDE: "Relative Häufigkeiten summieren sich über alle beobachteten Werte stets zu eins",
+        timer: 1800,
+        bonusHint: "Finish in less than 5 minutes",
+        bonusHintDE: "In weniger als 5 Minuten abschließen",
+        bonusType: "fast",
+        bonusParam: 300,
+        grid: G(
+        [1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0], [1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0], [1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1]
+    )
+    },
+
+    {   //5x35
+        hint: "Histogram Height",
+        hintDE: "Histogrammhöhe",
+        reveal: "Histogram bars scale frequency by class width, so each bar area matches its share",
+        revealDE: "Histogrammbalken skalieren die Häufigkeit mit der Klassenbreite, sodass jede Fläche dem Anteil entspricht",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0], [0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0]
+    )
+    },
+
+    {   //5x40
+        hint: "Order Statistics",
+        hintDE: "Ordnungsstatistiken",
+        reveal: "Sorted values run from smallest to largest and span the observed range",
+        revealDE: "Sortierte Werte laufen vom kleinsten bis zum größten und spannen den Messbereich auf",
+        timer: 1800,
+        bonusHint: "Finish without using items",
+        bonusHintDE: "Beende das Level ohne Items zu nutzen",
+        bonusType: "noitem",
+        bonusParam: 0,
+        grid: G(
+        [1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0], [1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0], [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0],
+        [1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0], [1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0]
+    )
+    },
+
+    {   //5x40
+        hint: "Sample Mean",
+        hintDE: "Stichprobenmittel",
+        reveal: "The arithmetic mean divides the total of all values by their number",
+        revealDE: "Das arithmetische Mittel teilt die Summe aller Werte durch ihre Anzahl",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0], [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0], [0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0],
+        [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0], [1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0]
+    )
+    },
+
+    {   //5x50
+        hint: "Sample Variance",
+        hintDE: "Stichprobenvarianz",
+        reveal: "The variance averages the squared gaps between each value and the mean",
+        revealDE: "Die Varianz mittelt die quadrierten Abstände jedes Wertes zum Mittelwert",
+        timer: 1800,
+        bonusHint: "Finish in less than 10 minutes",
+        bonusHintDE: "In weniger als 10 Minuten abschließen",
+        bonusType: "fast",
+        bonusParam: 600,
+        grid: G(
+        [0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0], [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0], [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0], [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0]
+    )
+    },
+
+    {   //10x10
+        hint: "Entropy",
+        hintDE: "Entropie",
+        reveal: "Shannon entropy weighs every share by its own surprise; it peaks for the uniform distribution",
+        revealDE: "Die Shannon-Entropie gewichtet jeden Anteil mit seiner Überraschung; sie ist maximal bei Gleichverteilung",
+        timer: 1800,
+        bonusHint: "Finish without mistakes",
+        bonusHintDE: "Beende das Level ohne Fehler zu machen",
+        bonusType: "nomiss",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 1, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 1, 0, 0], [0, 0, 1, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 1, 0, 0, 1, 1, 0, 0]
+    )
+    },
+
+    {   //10x15
+        hint: "Solar Histogram",
+        hintDE: "Solar-Histogramm",
+        reveal: "A histogram of thirty solar outputs shows where the measurements pile up",
+        revealDE: "Ein Histogramm aus dreißig Solarleistungen zeigt, wo sich die Messungen häufen",
+        timer: 1800,
+        bonusHint: "Finish with at most 5 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 5 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 5,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0],
+        [1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0], [1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0], [1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0], [1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    )
+    },
+
+    {   //15x15
+        hint: "Ozone Boxplot",
+        hintDE: "Ozon-Boxplot",
+        reveal: "The boxplot compresses ozone data into minimum, quartiles, median and maximum",
+        revealDE: "Der Boxplot verdichtet Ozondaten zu Minimum, Quartilen, Median und Maximum",
+        timer: 1800,
+        bonusHint: "Finish with at most 3 mistakes",
+        bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
+        bonusType: "lowmiss",
+        bonusParam: 3,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1], [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+    },
+
+    {   //20x20
+        hint: "Nexus Point",
+        hintDE: "Nexus-Punkt",
+        reveal: "Five numbers seal the Nexus: minimum, quartiles, median and maximum. Restore the summary to open the Nexus of Worlds",
+        revealDE: "Fünf Zahlen versiegeln den Nexus: Minimum, Quartile, Median und Maximum. Stelle die Zusammenfassung wieder her, um den Nexus der Welten zu öffnen",
+        timer: 1800,
+        bonusHint: "Answer the bonus question correctly",
+        bonusHintDE: "Beantworte die Bonusfrage richtig",
+        bonusType: "quiz",
+        bonusParam: 0,
+        grid: G(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+    )
+    },
 
 ];
+
 
 
 
@@ -3096,6 +3799,7 @@ const WORLDS = [
     { label: 'NULL HYPOTHESIS VOID', labelDE: 'NULL HYPOTHESIS VOID', data: W11 },
     { label: 'BAYESIAN BAY', labelDE: 'BAYESIAN BAY', data: W12 },
     { label: 'EXPECTATION PLATEAU', labelDE: 'EXPECTATION PLATEAU', data: W13 },
+    { label: 'NEXUS WORLD', labelDE: 'NEXUS WORLD', data: W14 },
 
     /*
     // TEMP TESTING — remove when done: makes the Nexus enterable

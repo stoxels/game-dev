@@ -350,7 +350,7 @@ function _egMechClockHands(monster, phase) {
             if (now < h.cdUntil || now - h.safeSince < EG_CLOCK_SPAWN_GRACE_MS) continue;
             const bx = cx + Math.cos(h.a) * len, by = cy + Math.sin(h.a) * len;
             for (const pt of pts) {
-                if (_egInfernoPtSegDist(pt[0], pt[1], cx, cy, bx, by) < h.cfg.halfW + EG_CLOCK_HIT_SLACK_PX) {
+                if (_egPtSegDist(pt[0], pt[1], cx, cy, bx, by) < h.cfg.halfW + EG_CLOCK_HIT_SLACK_PX) {
                     h.cdUntil = now + EG_CLOCK_HIT_CD_MS;
                     const dealt = _egNkHit(h.cfg.dmgPct, 'lightning', level);
                     _egNkAbilityHitToast(dealt, 'The Clock', 'Clock Hand');

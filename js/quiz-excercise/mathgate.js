@@ -81,6 +81,24 @@ const MATH_GATE_LEVELS = [
     { world: 11, level: 6 },
     { world: 11, level: 8 },
     { world: 11, level: 10 },
+    { world: 12, level: 1 },
+    { world: 12, level: 4 },
+    { world: 12, level: 6 },
+    { world: 12, level: 9 },
+    { world: 12, level: 12 },
+    { world: 12, level: 14 },
+    { world: 13, level: 1 },
+    { world: 13, level: 4 },
+    { world: 13, level: 6 },
+    { world: 13, level: 9 },
+    { world: 13, level: 12 },
+    { world: 13, level: 14 },
+    { world: 14, level: 1 },
+    { world: 14, level: 4 },
+    { world: 14, level: 6 },
+    { world: 14, level: 9 },
+    { world: 14, level: 12 },
+    { world: 14, level: 14 },
 
 ];
 
@@ -386,6 +404,7 @@ function _mgRefreshWhyButton() {
 // Closes the math gate modal and clears all module-level state.
 function hideMathGate() {
     hideModal('mg-modal');
+    if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
     currentGateQuestion = null;
     pendingGateGi = null;
 }
@@ -549,6 +568,7 @@ function showMathGate(gi, launchFn) {
     mgResetModalInputState();
     mgSetUnitLabel(currentGateQuestion);
     showModal('mg-modal');
+    if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
     _mgPopulateModalPortrait();
     mgRefreshTutorButton();
 

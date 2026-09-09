@@ -296,8 +296,9 @@ function _buildLevelNameTooltipHTML() {
         html += `<br>${t('cg_tt_grid_class')} <b>${t(tierLabels[tier])}</b>`;
     }
 
-    const { isAscension, isConvergence } = _getLevelSpecialStatus(cur);
-    if (isAscension) html += `<br><span style="color:#c080ff">${t('cg_ascension_lvl')}</span>`;
+    const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
+    if (isNexusPoint) html += `<br><span style="color:#7fd4ff">${t('scr_nexus_point_badge')}</span>`;
+    else if (isAscension) html += `<br><span style="color:#c080ff">${t('cg_ascension_lvl')}</span>`;
     if (isConvergence) html += `<br><span style="color:#6dbf40">${t('cg_convergence_lvl')}</span>`;
 
     return html;

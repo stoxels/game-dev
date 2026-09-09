@@ -457,17 +457,25 @@ function handleWrongFill(row, col) {
 
 // Picks a primary item reward and optionally a bonus item (generous_fortune skill).
 // Pushes both into inventory and returns the composed toast message.
+// Returns null item IDs if Apex Collector suppresses the drop.
 function claimLuckyTileItems() {
     const wonItemId = pickLuckyItem();
-    const newItem = {
-        uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-        defId: wonItemId
-    };
-    STATE.inventory.push(newItem);
+    const grantedIds = [];
+    let toastMsg;
 
-    const def = ITEM_DEFS[newItem.defId];
-    let toastMsg = t('cg_lucky_tile_found').replace('{x}', `${def.icon} ${itemName(def)}`);
-    const grantedIds = [newItem.defId];
+    if (wonItemId) {
+        const newItem = {
+            uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+            defId: wonItemId
+        };
+        STATE.inventory.push(newItem);
+
+        const def = ITEM_DEFS[wonItemId];
+        toastMsg = t('cg_lucky_tile_found').replace('{x}', `${def.icon} ${itemName(def)}`);
+        grantedIds.push(wonItemId);
+    } else {
+        toastMsg = t('cg_lucky_tile_found').replace('{x}', t('cg_lucky_tile_suppressed'));
+    }
 
     // generous_fortune (192-194): each node adds a stacking bonus-item chance
     const bonusChance = (ptHasSkill('generous_fortune_1') ? 0.10 : 0)
@@ -476,14 +484,16 @@ function claimLuckyTileItems() {
 
     if (bonusChance > 0 && Math.random() < bonusChance) {
         const bonusItemId = pickLuckyItem();
-        const bonusItem = {
-            uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-            defId: bonusItemId
-        };
-        STATE.inventory.push(bonusItem);
-        const bonusDef = ITEM_DEFS[bonusItem.defId];
-        toastMsg += ` + ${bonusDef.icon} ${itemName(bonusDef)}`;
-        grantedIds.push(bonusItem.defId);
+        if (bonusItemId) {
+            const bonusItem = {
+                uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                defId: bonusItemId
+            };
+            STATE.inventory.push(bonusItem);
+            const bonusDef = ITEM_DEFS[bonusItemId];
+            toastMsg += ` + ${bonusDef.icon} ${itemName(bonusDef)}`;
+            grantedIds.push(bonusItemId);
+        }
     }
 
     return { toastMsg, grantedIds };

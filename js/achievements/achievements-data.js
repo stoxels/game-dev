@@ -140,7 +140,7 @@
             { threshold: 2, labelEn: 'Double Champion', labelDE: 'Doppelweltmeister' },
             { threshold: 5, labelEn: 'Grand Completionist', labelDE: 'Groß-Perfektionist' },
             { threshold: 10, labelEn: 'Ultimate Completionist', labelDE: 'Ultimativer Perfektionist' },
-            { threshold: 13, labelEn: 'Completionist Supreme', labelDE: 'Supreme Perfektionist' },
+            { threshold: 14, labelEn: 'Completionist Supreme', labelDE: 'Supreme Perfektionist' },
         ]
     },
 
@@ -318,6 +318,19 @@
             { threshold: 1, labelEn: 'Grandmaster of Chance', labelDE: 'Großmeister des Zufalls' },
         ]
     },
+    {
+        id: 'world14_complete',
+        category: 'completion',
+        icon: '🌌',
+        nameEn: 'World 14 Complete',
+        nameDE: 'Welt 14 Abgeschlossen',
+        descEn: 'Complete all levels in World 14.',
+        descDE: 'Schließe alle Level in Welt 14 ab.',
+        stat: 'world14Complete',
+        tiers: [
+            { threshold: 1, labelEn: 'Cartographer of the Nexus', labelDE: 'Kartograf des Nexus' },
+        ]
+    },
 
 
     // ── DIFFERENT WORLDS PLAYED ───────────────────
@@ -334,7 +347,7 @@
             { threshold: 3, labelEn: 'First Worlds', labelDE: 'Erste Welten' },
             { threshold: 7, labelEn: 'Explorer', labelDE: 'Entdecker' },
             { threshold: 10, labelEn: 'Adventurer', labelDE: 'Abenteurer' },
-            { threshold: 13, labelEn: 'World Traveller', labelDE: 'Weltreisender' },
+            { threshold: 14, labelEn: 'World Traveller', labelDE: 'Weltreisender' },
         ]
     },
 

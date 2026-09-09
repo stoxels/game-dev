@@ -336,21 +336,21 @@ const WD_WORLD_CONFIGS = [
         imageAspect: 16 / 9,
         entrancePos: { x: 89.4, y: 35.5 },
         nodes: [
-            /*
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  // 
-            { x: 0, y: 0 },  //
-            */
+            { x: 84.0, y: 40.0 },  // 12-1 harbor docks
+            { x: 85.0, y: 28.0 },  // 12-2 cliff harbor
+            { x: 73.0, y: 22.0 },  // 12-3 toward silent keep
+            { x: 62.0, y: 28.0 },  // 12-4 silent keep temple
+            { x: 48.0, y: 32.0 },  // 12-5 north water (Convergence)
+            { x: 32.0, y: 30.0 },  // 12-6 promontory edge
+            { x: 20.0, y: 28.0 },  // 12-7 crystal cliffs
+            { x: 14.0, y: 42.0 },  // 12-8 west shipwreck north
+            { x: 20.0, y: 55.0 },  // 12-9 wreck masts
+            { x: 26.0, y: 66.0 },  // 12-10 dead-tree islet (Convergence)
+            { x: 38.0, y: 72.0 },  // 12-11 south whirlpool rim
+            { x: 55.0, y: 70.0 },  // 12-12 south rim east
+            { x: 70.0, y: 62.0 },  // 12-13 toward straits
+            { x: 78.0, y: 75.0 },  // 12-14 credible straits obelisk
+            { x: 66.0, y: 85.0 },  // 12-15 Ascension over maelstrom
         ],
         extraRoads: [
 
@@ -367,7 +367,21 @@ const WD_WORLD_CONFIGS = [
         imageAspect: 16 / 9,
         entrancePos: { x: 89.8, y: 92.1 },
         nodes: [
-
+            { x: 80.0, y: 84.0 },  // 13-1 hamlet ruins
+            { x: 88.0, y: 70.0 },  // 13-2 tower base
+            { x: 78.0, y: 60.0 },  // 13-3 integration bridge east
+            { x: 66.0, y: 55.0 },  // 13-4 bridge arch
+            { x: 58.0, y: 62.0 },  // 13-5 canyon rim (Convergence)
+            { x: 52.0, y: 50.0 },  // 13-6 variance valley
+            { x: 42.0, y: 38.0 },  // 13-7 sigma rocks
+            { x: 32.0, y: 32.0 },  // 13-8 deviation spires (Convergence)
+            { x: 20.0, y: 40.0 },  // 13-9 cliff lake overlook
+            { x: 14.0, y: 55.0 },  // 13-10 lake of large numbers
+            { x: 24.0, y: 62.0 },  // 13-11 sigma bridge
+            { x: 36.0, y: 58.0 },  // 13-12 canyon west rim
+            { x: 48.0, y: 32.0 },  // 13-13 ascent slope
+            { x: 58.0, y: 22.0 },  // 13-14 peak base
+            { x: 62.0, y: 12.0 },  // 13-15 Peak Mu summit Ascension
         ],
         extraRoads: [
 
@@ -376,16 +390,34 @@ const WD_WORLD_CONFIGS = [
     },
 
 
-    // TEMP TESTING — Nexus / Endgame Sandbox, remove after testing
+    // -----------------------------------------------------------------------
+    // NEXUS WORLD (secret World 14 — Descriptive Statistics)
+    // -----------------------------------------------------------------------
     {
-        bgImage: 'images/Expectation-Plateau.webp', // placeholder, swap for a real Nexus bg later
+        bgImage: 'images/The-Nexus.webp',
         imageAspect: 16 / 9,
-        entrancePos: { x: 50, y: 90 },
+        entrancePos: { x: 8.0, y: 90.0 },
         nodes: [
-            { x: 40, y: 60 },  // W_ENDGAME level 1
-            { x: 60, y: 40 },  // W_ENDGAME level 2
+            { x: 10.0, y: 80.0 },  // 14-1 compass point, Sample Space rim
+            { x: 16.0, y: 62.0 },  // 14-2 Omega ring west
+            { x: 24.0, y: 45.0 },  // 14-3 beneath Sample Space text
+            { x: 33.0, y: 40.0 },  // 14-4 Kolmogorov Cradle
+            { x: 40.0, y: 52.0 },  // 14-5 P(Omega)=1 (Convergence)
+            { x: 42.0, y: 64.0 },  // 14-6 P(A)>=0 floor
+            { x: 47.0, y: 74.0 },  // 14-7 union formula floor
+            { x: 56.0, y: 64.0 },  // 14-8 Variance Collapse Epicenter
+            { x: 64.0, y: 60.0 },  // 14-9 crack road to sanctum
+            { x: 72.0, y: 55.0 },  // 14-10 Cartographers Sanctum (Convergence)
+            { x: 84.0, y: 56.0 },  // 14-11 Entropy Archives approach
+            { x: 92.0, y: 56.0 },  // 14-12 Entropy Archives
+            { x: 78.0, y: 72.0 },  // 14-13 Constants Pillars
+            { x: 80.0, y: 86.0 },  // 14-14 Null Event Void
+            { x: 51.0, y: 34.0 },  // 14-15 Apex of Stochastics Ascension
         ],
-        extraRoads: [],
+        extraRoads: [
+
+
+        ],
     },
 
 ];

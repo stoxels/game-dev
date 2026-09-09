@@ -204,7 +204,10 @@ function _egAtlasBuildNodeTooltipHTML(nodeId) {
     const node = (typeof egAtlasNodeById === 'function') ? egAtlasNodeById(nodeId) : null;
     if (!node) return '';
     const boss = _egAtlasNodeBoss(node);
-    const bossLabel = boss ? `${boss.emoji} ${boss.name}` : t('eg_map_has_boss');
+    const bossIcon = boss
+        ? ((typeof EG_ART !== 'undefined' && EG_ART.html) ? EG_ART.html('monster', boss.id, boss.emoji) : boss.emoji)
+        : null;
+    const bossLabel = boss ? `${bossIcon} ${boss.name}` : t('eg_map_has_boss');
     return `
 <div class="eg-tt-frame" style="--tt-border:#c8a84b;">
     <div class="eg-tt-header">

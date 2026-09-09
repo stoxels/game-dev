@@ -304,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     onClick('btn-start-setup', () => confirmSetup());
+    onClick('btn-enter-nexus-setup', () => enterNexusFromSetup());
     onClick('btn-setup-back', () => showTitle());
 
 

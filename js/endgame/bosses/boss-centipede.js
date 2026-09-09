@@ -9,10 +9,11 @@
 //     body (5/7/9 segments per phase) sinuously winds around the arena,
 //     homing loosely toward the player. Touching any segment is a physical
 //     hit. Cutting through the fight means dodging it constantly.
-//   • TUNNEL MOUNDS — dirt mounds surface at random spots (telegraphed by
-//     a rumbling dirt ring), then burst: a short-lived dirt geyser that
-//     deals physical damage, and the mound stays as a speed-bump obstacle
-//     you have to path around.
+//   • BURROW HOLES — after Molt, dirt holes surface at random spots and
+//     stay open for a while. Stand on one to bait the molt mini-centipede
+//     (it homes onto you): if it reaches the hole you're in, it buries
+//     itself and is gone for 15s. Standing in a hole while it BURIES is
+//     harmless — but the hole then collapses and closes for a while.
 //
 //   HP GATES (watcher):
 //   • 60% — EXOSKELETON: the boss sheds chitin plates that orbit it in a
@@ -73,12 +74,18 @@ const EG_CENT_SPEED = [0, 95, 120, 150];  // px/s winding speed
 const EG_CENT_MOLT_SPEED = 1.35;          // main body speed × after molt
 const EG_CENT_SEG_DMG = [0, 0.05, 0.06, 0.07]; // %maxHP per segment touch
 const EG_CENT_SEG_CD_MS = 700;            // global segment-touch cooldown
-// Tunnel mounds
+// Burrow holes (post-molt): safe holes that bait the molt mini-centipede
+// into burying itself. Standing on one is harmless — but the hole collapses
+// when the mini buries (or expires) and reopens after a while.
 const EG_CENT_MOUND_INTERVAL_MS = [0, 8000, 6200, 4600]; // per boss phase
-const EG_CENT_MOUND_WARN_MS = 1100;       // rumble telegraph before burst
-const EG_CENT_MOUND_R = 58;               // mound radius (visual + burst hit)
-const EG_CENT_MOUND_DMG = 0.09;           // %maxHP per geyser burst (physical)
-const EG_CENT_MOUND_LIFE_MS = 7000;       // burst mound lingers as an obstacle
+const EG_CENT_MOUND_R = 58;               // hole radius (visual + bait check)
+const EG_CENT_MOUND_LIFE_MS = 9000;       // how long a hole stays open
+const EG_CENT_MOUND_CLOSED_MS = 6000;     // collapsed hole reopens after this
+const EG_CENT_MOLT_BURY_MS = 15000;       // the mini-centipede is buried for 15s
+const EG_CENT_RESURFACE_WARN_MS = 1000;   // dirt-mound telegraph before it pops out
+const EG_CENT_RESURFACE_DMG = 0.07;       // %maxHP burst if you stand on the pop-out
+const EG_CENT_RESURF_BAIT_R = 280;        // stand within this of the mound to bait the pop-out
+const EG_CENT_RESURF_BAIT_LOCK_MS = 600;  // committed straight-line charge at the baiter
 // Exoskeleton (60% gate)
 const EG_CENT_SHELL_MS = 8000;            // whole shell set-piece duration
 const EG_CENT_SHELL_WAVES = 2;            // rotating spiral waves
@@ -112,7 +119,7 @@ let _egCentStampedeActive = false; // a stampede set-piece is running
 function _egCentipedeSweep() {
     _egCentStampedeActive = false;
     try {
-        document.querySelectorAll('.eg-cent-seg, .eg-cent-mini, .eg-cent-mound, .eg-cent-ring, .eg-cent-blob, .eg-cent-pool, .eg-cent-stampede, .eg-cent-shell').forEach(el => el.remove());
+        document.querySelectorAll('.eg-cent-seg, .eg-cent-mini, .eg-cent-mound, .eg-cent-resurf, .eg-cent-ring, .eg-cent-blob, .eg-cent-pool, .eg-cent-stampede, .eg-cent-shell').forEach(el => el.remove());
     } catch (e) {}
 }
 
@@ -129,15 +136,13 @@ function _egCentipedeTeardown() {
 
 
 // Spawns one centipede body (main or molt mini). Returns its part objects.
-function _egCentSpawnBody(st, cls, n, label) {
+function _egCentSpawnBody(st, cls, n, label, anchor) {
     const parts = [];
+    const ax = (anchor && anchor.x != null) ? anchor.x : window.innerWidth * (0.25 + Math.random() * 0.5);
+    const ay = (anchor && anchor.y != null) ? anchor.y : window.innerHeight * (0.2 + Math.random() * 0.5);
     for (let i = 0; i < n; i++) {
         const el = _egNkEl(st.run, 'div', cls, i === 0 ? '🐛' : '🟤');
-        const spot = {
-            x: window.innerWidth * (0.25 + Math.random() * 0.5),
-            y: window.innerHeight * (0.2 + Math.random() * 0.5),
-        };
-        parts.push({ x: spot.x - i * EG_CENT_SEG_GAP, y: spot.y, cdUntil: 0, el });
+        parts.push({ x: ax - i * EG_CENT_SEG_GAP, y: ay, cdUntil: 0, el });
     }
     return { parts, label };
 }
@@ -145,23 +150,37 @@ function _egCentSpawnBody(st, cls, n, label) {
 
 // Advances one body along a sine path biased toward the player.
 // segHitDmg: %maxHP per touch; null = visual only.
+// body.lock (set on a baited resurface) makes the head charge STRAIGHT at
+// the locked point at full speed — no wobble, no turn delay — so a player
+// who baited the pop-out gets a crisp, funnelable charge out of it.
 function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
     const W = window.innerWidth, H = window.innerHeight;
     const head = body.parts[0];
     const c = _egNkPlayerCenter();
-    // Head steers loosely toward the player, wobbling as it goes.
-    if (c) {
-        const dx = c.x - head.x, dy = c.y - head.y;
-        const d = Math.hypot(dx, dy) || 1;
-        head.a = head.a == null ? Math.atan2(dy, dx) : head.a;
-        let want = Math.atan2(dy, dx);
-        let diff = want - head.a;
-        while (diff > Math.PI) diff -= Math.PI * 2;
-        while (diff < -Math.PI) diff += Math.PI * 2;
-        head.a += Math.max(-2.4 * dtS, Math.min(2.4 * dtS, diff)); // turn rate cap
-    } else if (head.a == null) head.a = Math.random() * Math.PI * 2;
-    const wob = Math.sin(now / 260) * 0.55;
-    const ang = head.a + wob * 0.4;
+    let ang;
+    if (body.lock && now < body.lock.until) {
+        // Committed bait charge: straight at the spot the player stood when
+        // the mini popped out.
+        const lx = body.lock.x - head.x, ly = body.lock.y - head.y;
+        const ld = Math.hypot(lx, ly) || 1;
+        head.a = Math.atan2(ly, lx);
+        ang = head.a;
+    } else {
+        body.lock = null;
+        // Head steers loosely toward the player, wobbling as it goes.
+        if (c) {
+            const dx = c.x - head.x, dy = c.y - head.y;
+            const d = Math.hypot(dx, dy) || 1;
+            head.a = head.a == null ? Math.atan2(dy, dx) : head.a;
+            let want = Math.atan2(dy, dx);
+            let diff = want - head.a;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            head.a += Math.max(-2.4 * dtS, Math.min(2.4 * dtS, diff)); // turn rate cap
+        } else if (head.a == null) head.a = Math.random() * Math.PI * 2;
+        const wob = Math.sin(now / 260) * 0.55;
+        ang = head.a + wob * 0.4;
+    }
     head.x += Math.cos(ang) * speed * dtS;
     head.y += Math.sin(ang) * speed * dtS + Math.sin(now / 300) * 26 * dtS * 10 * 0.1;
     // Bounce off walls.
@@ -196,11 +215,13 @@ function _egCentipedeArenaInit(monster) {
         segCd: 0, moundAcc: 0, venomAcc: 0,
         mounds: [], pools: [], blobs: [], shell: null,
         body: null, mini: null,
+        miniBuriedUntil: 0, miniBuryGraceUntil: 0,
+        resurfWarned: false, resurfAnchor: null, resurfEl: null,
+        resurfBait: null, resurfBaitWarned: false,
         gate60Done: false, gate30Done: false, molted: false,
         everLive: false, bornAt: performance.now(),
     };
-    _egCentWatcher = st;
-    _egNkToast('eg_cent_intro', '🐛 The Centipede: The colony infests the arena — cut it down!');
+    _egCentWatcher = st;        _egNkToast('eg_cent_intro', '🐛 The Centipede: The colony infests the arena — cut it down!');
     // Tier-scaled clock: mound/venom/shell telegraphs breathe with tier.
     // Passive run: lives the whole fight without hogging _egNkDodgeBusy().
     const run = _egNkNewRun(monsterId, true);
@@ -242,28 +263,107 @@ function _egCentipedeArenaInit(monster) {
         const spd = EG_CENT_SPEED[p] * (st.molted ? EG_CENT_MOLT_SPEED : 1);
         _egCentAdvance(st, st.body, dtS, now, pr, spd, EG_CENT_SEG_DMG[p]);
         if (st.mini) _egCentAdvance(st, st.mini, dtS, now, pr, EG_CENT_MOLT_MINI_SPEED, EG_CENT_SEG_DMG[p] * 0.8);
+        // The mini-centipede crawling over an OPEN hole buries itself for
+        // EG_CENT_MOLT_BURY_MS — the rewarded relief from the chase. It
+        // homes onto the player, so guide it by standing in a hole.
+        if (st.mini && now >= (st.miniBuryGraceUntil || 0)) {
+            const hole = _egCentMoundHit(st, st.mini);
+            if (hole) {
+                _egCentCloseMound(hole);
+                st.mini.parts.forEach(sg => { try { sg.el.remove(); } catch (e) {} });
+                st.mini = null;
+                st.miniBuriedUntil = now + EG_CENT_MOLT_BURY_MS;
+                st.resurfWarned = false; // re-arm the resurface telegraph
+                _egNkToast('eg_cent_buried', '🕳️ BURIED! The mini centipede is gone for 15s!');
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
+            }
+        }
+        // After a burial, the mini breaks back out at a random edge — a
+        // rumbling dirt mound telegraphs the exact spot 1s before it pops
+        // out. Steer clear (the pop-out bursts for damage if you stand on
+        // it) or use the warning to pre-position your next bait.
+        if (st.miniBuriedUntil && !st.resurfWarned
+            && now >= st.miniBuriedUntil - EG_CENT_RESURFACE_WARN_MS) {
+            st.resurfWarned = true;
+            const side = Math.floor(Math.random() * 4);
+            st.resurfAnchor = side === 0 ? { x: 70, y: 90 + Math.random() * Math.max(120, H - 200) }
+                : side === 1 ? { x: W - 70, y: 90 + Math.random() * Math.max(120, H - 200) }
+                : side === 2 ? { x: 90 + Math.random() * Math.max(120, W - 200), y: 70 }
+                : { x: 90 + Math.random() * Math.max(120, W - 200), y: H - 70 };
+            st.resurfEl = _egNkEl(st.run, 'div', 'eg-cent-resurf', '🕳️');
+            st.resurfEl.style.left = Math.round(st.resurfAnchor.x) + 'px';
+            st.resurfEl.style.top = Math.round(st.resurfAnchor.y) + 'px';
+            st.resurfBaitWarned = false; // re-arm the bait hint for this mound
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
+        }
+        // Bait: while the telegraph is live, standing NEAR the mound primes
+        // the pop-out — the mini bursts out in a committed straight charge
+        // at you, so you can funnel it over a nearby open hole. (Standing ON
+        // the mound still eats the pop-out burst — bait from just outside.)
+        if (st.resurfEl && st.miniBuriedUntil && now < st.miniBuriedUntil) {
+            const c = _egNkPlayerCenter();
+            const bait = c && Math.hypot(c.x - st.resurfAnchor.x, c.y - st.resurfAnchor.y) <= EG_CENT_RESURF_BAIT_R;
+            st.resurfEl.classList.toggle('bait', !!bait);
+            if (bait) {
+                st.resurfBait = { x: c.x, y: c.y };
+                if (!st.resurfBaitWarned) {
+                    st.resurfBaitWarned = true;
+                    _egNkToast('eg_cent_resurf_bait', '🧲 Bait ready! The mini will pop out straight at you — lure it into a hole!');
+                }
+            } else {
+                st.resurfBait = null;
+            }
+        }
+        if (st.miniBuriedUntil && now >= st.miniBuriedUntil) {
+            st.miniBuriedUntil = 0;
+            const anchor = st.resurfAnchor || { x: W / 2, y: H / 2 };
+            const baitLock = st.resurfBait || null;
+            st.resurfBait = null;
+            try { if (st.resurfEl) st.resurfEl.remove(); } catch (e) {}
+            st.resurfEl = null;
+            st.resurfAnchor = null;
+            st.resurfWarned = false;
+            // Pop-out burst: standing on the telegraphed spot when it
+            // erupts hurts — the old geyser language (dodge the rumble or
+            // eat the hit), now punishing camping the resurface point.
+            if (pr && _egNkCircleHit(anchor.x, anchor.y, EG_CENT_MOUND_R, pr, 0)) {
+                const dealt = _egNkHit(EG_CENT_RESURFACE_DMG, null, st.level);
+                _egNkAbilityHitToast(dealt, 'The Centipede', 'Resurface');
+            }
+            try { _egFlingBurst(anchor.x, anchor.y, -Math.PI / 2); } catch (e) {}
+            st.mini = _egCentSpawnBody(st, 'eg-cent-mini', EG_CENT_MOLT_MINI_SEGS, 'Molt', anchor);
+            if (baitLock) {
+                // Baited: committed straight charge at the player's spot.
+                st.mini.lock = { x: baitLock.x, y: baitLock.y, until: now + EG_CENT_RESURF_BAIT_LOCK_MS };
+            }
+            st.miniBuryGraceUntil = now + 2500; // can't instantly re-bury on the spot
+            _egNkToast('eg_cent_resurfaced', '🐛 The mini centipede breaks back out of the ground!');
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
+        }
 
-        // ── Tunnel mounds ──
+        // ── Burrow holes (post-molt): bait the mini into burying itself ──
         st.moundAcc += dtS * 1000;
-        const mInt = EG_CENT_MOUND_INTERVAL_MS[p] || EG_CENT_MOUND_INTERVAL_MS[1];
-        if (st.moundAcc >= mInt) {
-            st.moundAcc = 0;
-            _egCentMound(st, now);
+        if (st.molted) {
+            const mInt = EG_CENT_MOUND_INTERVAL_MS[p] || EG_CENT_MOUND_INTERVAL_MS[1];
+            if (st.moundAcc >= mInt) {
+                st.moundAcc = 0;
+                _egCentMound(st, now);
+            }
         }
         for (let i = st.mounds.length - 1; i >= 0; i--) {
             const m = st.mounds[i];
             m.t += dtS * 1000;
-            if (!m.burst && m.t >= EG_CENT_MOUND_WARN_MS) {
-                m.burst = true;
-                m.el.classList.add('burst');
-                if (pr && _egNkCircleHit(m.x, m.y, EG_CENT_MOUND_R, pr, 0)) {
-                    const dealt = _egNkHit(EG_CENT_MOUND_DMG, null, st.level);
-                    _egNkAbilityHitToast(dealt, 'The Centipede', 'Geyser');
+            if (m.closed) {
+                // Collapsed: the visual shrinks shut, then the spot reopens
+                // as a fresh hole after the closed window.
+                if (m.t >= EG_CENT_MOUND_CLOSED_MS) {
+                    m.closed = false;
+                    m.t = 0;
+                    m.el.classList.remove('closed');
+                    m.el.classList.add('fresh');
                 }
-            }
-            if (m.t >= EG_CENT_MOUND_WARN_MS + EG_CENT_MOUND_LIFE_MS) {
-                try { m.el.remove(); } catch (e) {}
-                st.mounds.splice(i, 1);
+            } else if (m.t >= EG_CENT_MOUND_LIFE_MS) {
+                _egCentCloseMound(m);
             }
         }
 
@@ -340,16 +440,46 @@ function _egCentipedeArenaInit(monster) {
 }
 
 
-// ── Tunnel mounds ───────────────────────────────────────────────────────
+// ── Burrow holes ────────────────────────────────────────────────────────
 function _egCentMound(st, now) {
     const W = window.innerWidth, H = window.innerHeight;
     const x = 90 + Math.random() * Math.max(120, W - 180);
     const y = 90 + Math.random() * Math.max(120, H - 180);
-    const el = _egNkEl(st.run, 'div', 'eg-cent-mound', '🕳️');
+    const el = _egNkEl(st.run, 'div', 'eg-cent-mound fresh', '🕳️');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
-    st.mounds.push({ x, y, t: 0, burst: false, el });
+    // First hole ever → teach the mechanic once, right where it becomes
+    // relevant (holes only exist after the Molt).
+    if (!st.mounds.length) {
+        _egNkToast('eg_cent_holes_hint', '🕳️ Burrow holes open — lure the mini centipede into one!');
+    }
+    st.mounds.push({ x, y, t: 0, closed: false, el });
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
+}
+
+
+// A hole collapses shut (mini buried in it, or it expired empty). It
+// reopens as a fresh hole after EG_CENT_MOUND_CLOSED_MS.
+function _egCentCloseMound(m) {
+    if (m.closed) return;
+    m.closed = true;
+    m.t = 0;
+    m.el.classList.remove('fresh');
+    m.el.classList.add('closed');
+}
+
+
+// Does any part of the body sit inside an open burrow hole? Returns it or null.
+function _egCentMoundHit(st, body) {
+    for (let i = 0; i < st.mounds.length; i++) {
+        const m = st.mounds[i];
+        if (m.closed) continue;
+        for (let j = 0; j < body.parts.length; j++) {
+            const sg = body.parts[j];
+            if (Math.hypot(sg.x - m.x, sg.y - m.y) <= EG_CENT_MOUND_R) return m;
+        }
+    }
+    return null;
 }
 
 
@@ -398,7 +528,10 @@ function _egCentMolt(st, now) {
         const detached = s.body.parts.splice(s.body.parts.length - cut, cut);
         detached.forEach(sg => sg.el.className = 'eg-cent-mini');
         s.mini = { parts: detached, label: 'Molt' };
-        _egNkToast('eg_cent_molt', '🦋 MOLT! The colony splits — two centipedes now!');
+        // Short grace so a hole that happens to open right on the fresh
+        // mini can't bury it before the player ever baited it.
+        s.miniBuryGraceUntil = performance.now() + 2500;
+        _egNkToast('eg_cent_molt', '🦋 MOLT! The colony splits — lure the mini into a burrow hole!');
         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
     }, EG_CENT_MOLT_SWELL_MS);
     _egNkToast('eg_cent_molt_swell', '🐛 The Centipede swells — its shell is cracking!');

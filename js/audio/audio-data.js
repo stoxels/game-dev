@@ -185,6 +185,57 @@ const BGM_TRACKS = {
     level_11_9: 'audio/bgm/bgm_46.mp3',
     level_11_10: 'audio/bgm/bgm_47.mp3',
     level_11_11: 'audio/bgm/bgm_47.mp3',
+
+    // World 12 (Bayesian Bay — Correlation & Regression; user adds files manually)
+    level_12_1: 'audio/bgm/bgm_48.mp3',
+    level_12_2: 'audio/bgm/bgm_48.mp3',
+    level_12_3: 'audio/bgm/bgm_48.mp3',
+    level_12_4: 'audio/bgm/bgm_49.mp3',
+    level_12_5: 'audio/bgm/bgm_49.mp3',
+    level_12_6: 'audio/bgm/bgm_49.mp3',
+    level_12_7: 'audio/bgm/bgm_50.mp3',
+    level_12_8: 'audio/bgm/bgm_50.mp3',
+    level_12_9: 'audio/bgm/bgm_50.mp3',
+    level_12_10: 'audio/bgm/bgm_51.mp3',
+    level_12_11: 'audio/bgm/bgm_51.mp3',
+    level_12_12: 'audio/bgm/bgm_51.mp3',
+    level_12_13: 'audio/bgm/bgm_52.mp3',
+    level_12_14: 'audio/bgm/bgm_52.mp3',
+    level_12_15: 'audio/bgm/bgm_52.mp3',
+
+    // World 13 (Expectation Plateau — Wilcoxon & Contingency; user adds files manually)
+    level_13_1: 'audio/bgm/bgm_53.mp3',
+    level_13_2: 'audio/bgm/bgm_53.mp3',
+    level_13_3: 'audio/bgm/bgm_53.mp3',
+    level_13_4: 'audio/bgm/bgm_54.mp3',
+    level_13_5: 'audio/bgm/bgm_54.mp3',
+    level_13_6: 'audio/bgm/bgm_54.mp3',
+    level_13_7: 'audio/bgm/bgm_55.mp3',
+    level_13_8: 'audio/bgm/bgm_55.mp3',
+    level_13_9: 'audio/bgm/bgm_55.mp3',
+    level_13_10: 'audio/bgm/bgm_56.mp3',
+    level_13_11: 'audio/bgm/bgm_56.mp3',
+    level_13_12: 'audio/bgm/bgm_56.mp3',
+    level_13_13: 'audio/bgm/bgm_57.mp3',
+    level_13_14: 'audio/bgm/bgm_57.mp3',
+    level_13_15: 'audio/bgm/bgm_57.mp3',
+
+    // World 14 (Nexus World — Descriptive Statistics; user adds files manually)
+    level_14_1: 'audio/bgm/bgm_58.mp3',
+    level_14_2: 'audio/bgm/bgm_58.mp3',
+    level_14_3: 'audio/bgm/bgm_58.mp3',
+    level_14_4: 'audio/bgm/bgm_59.mp3',
+    level_14_5: 'audio/bgm/bgm_59.mp3',
+    level_14_6: 'audio/bgm/bgm_59.mp3',
+    level_14_7: 'audio/bgm/bgm_60.mp3',
+    level_14_8: 'audio/bgm/bgm_60.mp3',
+    level_14_9: 'audio/bgm/bgm_60.mp3',
+    level_14_10: 'audio/bgm/bgm_61.mp3',
+    level_14_11: 'audio/bgm/bgm_61.mp3',
+    level_14_12: 'audio/bgm/bgm_61.mp3',
+    level_14_13: 'audio/bgm/bgm_62.mp3',
+    level_14_14: 'audio/bgm/bgm_62.mp3',
+    level_14_15: 'audio/bgm/bgm_62.mp3',
 };
 
 
@@ -268,6 +319,27 @@ const LEVEL_BGM = {
     '11-4': 'level_11_4', '11-5': 'level_11_5', '11-6': 'level_11_6',
     '11-7': 'level_11_7', '11-8': 'level_11_8', '11-9': 'level_11_9',
     '11-10': 'level_11_10', '11-11': 'level_11_11',
+
+    // World 12
+    '12-1': 'level_12_1', '12-2': 'level_12_2', '12-3': 'level_12_3',
+    '12-4': 'level_12_4', '12-5': 'level_12_5', '12-6': 'level_12_6',
+    '12-7': 'level_12_7', '12-8': 'level_12_8', '12-9': 'level_12_9',
+    '12-10': 'level_12_10', '12-11': 'level_12_11', '12-12': 'level_12_12',
+    '12-13': 'level_12_13', '12-14': 'level_12_14', '12-15': 'level_12_15',
+
+    // World 13
+    '13-1': 'level_13_1', '13-2': 'level_13_2', '13-3': 'level_13_3',
+    '13-4': 'level_13_4', '13-5': 'level_13_5', '13-6': 'level_13_6',
+    '13-7': 'level_13_7', '13-8': 'level_13_8', '13-9': 'level_13_9',
+    '13-10': 'level_13_10', '13-11': 'level_13_11', '13-12': 'level_13_12',
+    '13-13': 'level_13_13', '13-14': 'level_13_14', '13-15': 'level_13_15',
+
+    // World 14
+    '14-1': 'level_14_1', '14-2': 'level_14_2', '14-3': 'level_14_3',
+    '14-4': 'level_14_4', '14-5': 'level_14_5', '14-6': 'level_14_6',
+    '14-7': 'level_14_7', '14-8': 'level_14_8', '14-9': 'level_14_9',
+    '14-10': 'level_14_10', '14-11': 'level_14_11', '14-12': 'level_14_12',
+    '14-13': 'level_14_13', '14-14': 'level_14_14', '14-15': 'level_14_15',
 };
 
 

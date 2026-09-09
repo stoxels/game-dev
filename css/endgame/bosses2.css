@@ -1487,26 +1487,70 @@
     from { filter: drop-shadow(0 0 6px rgba(120, 53, 15, 0.9)); }
     to { filter: drop-shadow(0 0 20px rgba(244, 114, 182, 1)); transform: scale(1.25); }
 }
-/* Tunnel mound: rumbling dirt telegraph → bursting geyser → lingering bump. */
+/* Burrow hole: open pit that baits the molt mini-centipede into burying
+   itself. Open holes breathe softly; a hole that buried the mini (or
+   expired) collapses shut and later reopens as a fresh hole. */
 .eg-cent-mound {
     position: fixed; z-index: 9001; pointer-events: none;
     transform: translate(-50%, -50%);
     width: 116px; height: 116px; font-size: 1.6rem;
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(120, 53, 15, 0.25), rgba(69, 26, 3, 0.4) 60%, transparent 70%);
-    border: 3px dashed rgba(180, 130, 60, 0.75);
-    animation: eg-cent-rumble 0.3s ease-in-out infinite alternate;
+    background: radial-gradient(circle, rgba(20, 12, 4, 0.85) 0%, rgba(69, 26, 3, 0.75) 45%, rgba(120, 53, 15, 0.35) 68%, transparent 78%);
+    border: 3px solid rgba(180, 130, 60, 0.8);
+    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.75), 0 0 12px rgba(120, 53, 15, 0.45);
+    animation: eg-cent-hole-breathe 1.6s ease-in-out infinite alternate;
 }
-@keyframes eg-cent-rumble {
-    from { transform: translate(-50%, -50%) scale(0.94); opacity: 0.75; }
-    to { transform: translate(-50%, -50%) scale(1.06); opacity: 1; }
+@keyframes eg-cent-hole-breathe {
+    from { transform: translate(-50%, -50%) scale(0.96); opacity: 0.85; }
+    to { transform: translate(-50%, -50%) scale(1.04); opacity: 1; }
 }
-.eg-cent-mound.burst {
-    background: radial-gradient(circle, rgba(180, 130, 60, 0.55), rgba(120, 53, 15, 0.45) 55%, transparent 70%);
-    border: 3px solid rgba(214, 168, 100, 0.95);
-    box-shadow: 0 0 26px rgba(180, 130, 60, 0.8);
-    animation: none;
+.eg-cent-mound.fresh {
+    animation: eg-cent-hole-open 0.45s ease-out 1, eg-cent-hole-breathe 1.6s ease-in-out 0.45s infinite alternate;
+}
+@keyframes eg-cent-hole-open {
+    from { transform: translate(-50%, -50%) scale(0.25); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+.eg-cent-mound.closed {
+    animation: eg-cent-hole-shut 0.5s ease-in forwards 1;
+    background: radial-gradient(circle, rgba(120, 53, 15, 0.4), rgba(69, 26, 3, 0.55) 55%, transparent 75%);
+    border: 3px dashed rgba(180, 130, 60, 0.45);
+    box-shadow: none;
+}
+@keyframes eg-cent-hole-shut {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    55% { transform: translate(-50%, -50%) scale(0.72); opacity: 0.85; }
+    100% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.35; }
+}
+/* Resurface telegraph: a rumbling dirt mound marks the exact spot where
+   the buried mini-centipede will pop out, 1s ahead. Same rumble language
+   the old mound geysers used, so "dirt moving = bug incoming" reads fast. */
+.eg-cent-resurf {
+    position: fixed; z-index: 9002; pointer-events: none;
+    transform: translate(-50%, -50%);
+    width: 116px; height: 116px; font-size: 1.6rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(120, 53, 15, 0.3), rgba(69, 26, 3, 0.45) 60%, transparent 72%);
+    border: 3px dashed rgba(214, 168, 100, 0.85);
+    animation: eg-cent-resurf-rumble 0.22s ease-in-out infinite alternate;
+}
+@keyframes eg-cent-resurf-rumble {
+    from { transform: translate(-50%, -50%) scale(0.92) rotate(-2deg); opacity: 0.8; }
+    to { transform: translate(-50%, -50%) scale(1.08) rotate(2deg); opacity: 1; }
+}
+/* Bait primed: the player stands in the bait ring — the mound flares gold
+   and shakes harder, promising the mini will pop out straight at them. */
+.eg-cent-resurf.bait {
+    border-color: rgba(250, 204, 21, 1);
+    border-style: solid;
+    box-shadow: 0 0 26px rgba(250, 204, 21, 0.75), inset 0 0 18px rgba(250, 204, 21, 0.35);
+    animation: eg-cent-resurf-bait 0.15s ease-in-out infinite alternate;
+}
+@keyframes eg-cent-resurf-bait {
+    from { transform: translate(-50%, -50%) scale(1.02) rotate(-3deg); filter: brightness(1.15); }
+    to { transform: translate(-50%, -50%) scale(1.14) rotate(3deg); filter: brightness(1.55); }
 }
 /* Exoskeleton chitin plates: spiraling shield emojis. */
 .eg-cent-shell {
@@ -3596,6 +3640,41 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     40% { filter: drop-shadow(0 0 26px rgba(255,255,255,0.95)) brightness(1.6); }
     100% { filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6)); }
 }
+/* Parry kick: gold boot flash on the ball — visually distinct from the
+   white tackle flash so the two reads never blur. */
+.eg-strk-ball.parry {
+    animation: eg-strk-parry-flash 0.5s ease-out 1;
+}
+@keyframes eg-strk-parry-flash {
+    0% { filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.5)); }
+    35% { filter: drop-shadow(0 0 34px rgba(250, 204, 21, 1)) brightness(1.9) saturate(1.4); }
+    100% { filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6)); }
+}
+/* Kick streaks: gold dashes shot along the kick vector at the boot. */
+.eg-strk-kickstreak {
+    position: fixed; z-index: 9100; pointer-events: none;
+    width: 34px; height: 3px; margin: -1.5px 0 0 -1.5px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, rgba(250, 204, 21, 0), #fde047, rgba(250, 204, 21, 0));
+    transform-origin: 0 50%;
+    animation: eg-strk-kickstreak 0.5s ease-out 1 forwards;
+}
+@keyframes eg-strk-kickstreak {
+    from { transform: rotate(var(--streak-ang, 0rad)) translateX(6px) scaleX(0.4); opacity: 1; }
+    to { transform: rotate(var(--streak-ang, 0rad)) translateX(var(--streak-len, 120px)) scaleX(1.25); opacity: 0; }
+}
+/* Fading ghost of the ball along its kick flight (position inline, fade only). */
+.eg-strk-ballghost {
+    position: fixed; z-index: 9004; pointer-events: none;
+    width: 110px; height: 110px; font-size: 84px; line-height: 110px;
+    text-align: center;
+    filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.75));
+    animation: eg-strk-ballghost 0.42s ease-out 1 forwards;
+}
+@keyframes eg-strk-ballghost {
+    from { opacity: 0.55; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.82); }
+}
 /* Corner flag telegraph: plants with a pop, waves while volleys fire. */
 .eg-strk-corner {
     position: fixed; z-index: 9004; pointer-events: none;
@@ -3610,7 +3689,9 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     font-size: 26px; filter: drop-shadow(0 0 6px rgba(255,255,255,0.55));
     will-change: transform;
 }
-/* Penalty goal frame + penalty spot. */
+/* Penalty goal frame + penalty spot. The PERSISTENT goal (whole fight) is
+   the scoreable one: guide the match ball into its mouth to send the ball
+   out of play for 30s. `.scored` flashes the net when a goal lands. */
 .eg-strk-goal {
     position: fixed; z-index: 9004; pointer-events: none;
     font-size: 150px; line-height: 260px; text-align: center;
@@ -3619,6 +3700,96 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 }
 .eg-strk-goal.flip { transform: scaleX(-1); }
 @keyframes eg-strk-goal-in { from { transform: translateX(-40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.eg-strk-goal.persistent {
+    opacity: 0.95;
+    animation: eg-strk-goal-in 0.4s cubic-bezier(0.2, 1.4, 0.4, 1) 1, eg-strk-goal-glow 2.2s ease-in-out 0.4s infinite alternate;
+}
+@keyframes eg-strk-goal-glow {
+    from { filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.5)); }
+    to { filter: drop-shadow(0 0 22px rgba(96, 165, 250, 0.95)); }
+}
+.eg-strk-goal.scored {
+    animation: eg-strk-goal-scored 0.7s ease-out 1;
+}
+@keyframes eg-strk-goal-scored {
+    0% { filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.5)) brightness(1); }
+    30% { filter: drop-shadow(0 0 34px rgba(250, 204, 21, 1)) brightness(1.9); }
+    100% { filter: drop-shadow(0 0 16px rgba(96, 165, 250, 0.7)) brightness(1); }
+}
+/* Goal return timer: while the scored ball is out of play, a conic
+   countdown ring + seconds count sits on the goal mouth. The ring
+   depletes via --timer-frac (0..1 remaining); final 5s turn red. */
+.eg-strk-goal-timer {
+    position: fixed; z-index: 9006; pointer-events: none;
+    transform: translate(-50%, -50%);
+    width: 96px; height: 96px; border-radius: 50%;
+    background:
+        radial-gradient(circle, rgba(10, 10, 26, 0.88) 54%, transparent 55%),
+        conic-gradient(from -90deg, rgba(250, 204, 21, 0.95) calc(var(--timer-frac, 1) * 360deg), rgba(148, 163, 184, 0.18) 0deg);
+    border: 2px solid rgba(250, 204, 21, 0.65);
+    box-shadow: 0 0 18px rgba(250, 204, 21, 0.35);
+    display: flex; align-items: center; justify-content: center;
+    font: 800 1.5rem/1 sans-serif;
+    color: #fef08a;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    animation: eg-strk-goal-timer-pop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 1;
+}
+.eg-strk-goal-timer::before {
+    content: '⚽';
+    position: absolute;
+    top: -14px;
+    font-size: 1.05rem;
+    animation: eg-strk-goal-timer-ball 1.4s ease-in-out infinite alternate;
+}
+.eg-strk-goal-timer::after {
+    content: attr(data-left);
+    position: relative;
+}
+@keyframes eg-strk-goal-timer-pop {
+    from { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+@keyframes eg-strk-goal-timer-ball {
+    from { transform: translateY(0) rotate(-14deg); }
+    to { transform: translateY(-4px) rotate(14deg); }
+}
+.eg-strk-goal-timer.urgent {
+    border-color: rgba(248, 113, 113, 0.85);
+    color: #fca5a5;
+    box-shadow: 0 0 22px rgba(248, 113, 113, 0.5);
+    animation: eg-strk-goal-timer-pop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 1, eg-strk-goal-timer-urgent 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-strk-goal-timer-urgent {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.35); }
+}
+/* Keeper throw-back: the glove pops out of the net, winds up and hurls
+   the ball onto the pitch. The ball leaves at the same moment, so the
+   glove's 1s arc reads as the throw motion. */
+.eg-strk-keeper {
+    position: fixed; z-index: 9007; pointer-events: none;
+    transform: translate(-50%, -50%);
+    font-size: 2.6rem;
+    filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.85));
+    animation: eg-strk-keeper-throw 1s ease-out 1 forwards;
+}
+@keyframes eg-strk-keeper-throw {
+    0% { transform: translate(-50%, -50%) scale(0.3) rotate(-22deg); opacity: 0; }
+    18% { transform: translate(-50%, -50%) scale(1.18) rotate(8deg); opacity: 1; }
+    32% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+    72% { transform: translate(-50%, -50%) scale(1) rotate(-10deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.8) rotate(-4deg); opacity: 0; }
+}
+/* Kick-off ball: fades in where the fresh ball spawns. (Opacity only —
+   the ball's position is an inline translate transform, which a CSS
+   transform animation would override and flash at the top-left.) */
+.eg-strk-ball.kickoff {
+    animation: eg-strk-kickoff-pop 0.45s ease-out 1;
+}
+@keyframes eg-strk-kickoff-pop {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 .eg-strk-spot {
     position: fixed; z-index: 9004; pointer-events: none;
     font-size: 26px; opacity: 0.85;
@@ -3704,6 +3875,96 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     position: fixed; left: 0; top: 0; z-index: 9006; pointer-events: none;
     font-size: 30px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7));
     will-change: transform;
+}
+/* Kick-Off Challenge / Hat-Trick: the stationary kick ball on the grid.
+   The charge strip mirrors the Prior-Bomb defuse strip (green fill on a
+   dark rail) so the "stand here and hold" language is shared. */
+.eg-strk-kickring {
+    position: fixed; z-index: 9003; pointer-events: none;
+    transform: translate(-50%, -50%);
+    width: 230px; height: 230px; border-radius: 50%;
+    border: 2px dashed rgba(250, 204, 21, 0.45);
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.07), transparent 65%);
+    animation: eg-strk-kickring-pulse 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-strk-kickring-pulse {
+    from { opacity: 0.5; }
+    to { opacity: 0.95; }
+}
+.eg-strk-kickcharge {
+    position: fixed; z-index: 9007; pointer-events: none;
+    transform: translate(-50%, -50%);
+    width: 90px; height: 9px; border-radius: 5px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.eg-strk-kickcharge.on { opacity: 1; }
+.eg-strk-kickcharge::after {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: var(--kick-charge, 0%);
+    background: linear-gradient(90deg, #4ade80, #facc15 70%, #f97316);
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.8);
+    transition: width 0.08s linear;
+}
+/* Potential-damage label under the charge strip: grows with the charge,
+   tinted along the same green → gold → orange ramp. 'full' pops it. */
+.eg-strk-kickdmg {
+    position: fixed; z-index: 9007; pointer-events: none;
+    transform: translate(-50%, -50%);
+    font: 800 0.95rem/1 sans-serif;
+    letter-spacing: 0.02em;
+    color: #86efac;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 10px rgba(74, 222, 128, 0.5);
+    opacity: 0;
+    transition: opacity 0.15s ease, color 0.2s ease, text-shadow 0.2s ease;
+}
+.eg-strk-kickdmg.on { opacity: 1; }
+.eg-strk-kickdmg.mid {
+    color: #fde047;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 10px rgba(250, 204, 21, 0.55);
+}
+.eg-strk-kickdmg.full {
+    color: #fdba74;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 14px rgba(249, 115, 22, 0.75);
+    animation: eg-strk-kickdmg-full 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-strk-kickdmg-full {
+    from { transform: translate(-50%, -50%) scale(1); }
+    to { transform: translate(-50%, -50%) scale(1.14); }
+}
+/* Score HUD: goals/needed + seconds left, top-centre during the set-piece. */
+.eg-strk-scorehud {
+    position: fixed; z-index: 9100; pointer-events: none;
+    left: 50%; top: 10px; transform: translateX(-50%);
+    font: 800 clamp(.9rem, 1.8vw, 1.25rem)/1.2 sans-serif;
+    letter-spacing: .04em;
+    color: #fef08a; text-shadow: 0 1px 4px rgba(0, 0, 0, .9);
+    background: rgba(10, 10, 26, .85);
+    border: 1px solid rgba(250, 204, 21, .5);
+    border-radius: 10px;
+    padding: 6px 14px;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, .55), 0 0 24px rgba(250, 204, 21, .15);
+}
+.eg-strk-scorehud.urgent { color: #fca5a5; border-color: rgba(248, 113, 113, .6); }
+/* Big gold GOAL! / HAT-TRICK! fanfare pop. */
+.eg-strk-goalpop {
+    position: fixed; z-index: 9200; pointer-events: none;
+    transform: translate(-50%, -50%);
+    font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; letter-spacing: 3px;
+    color: #fde047;
+    text-shadow: 0 0 18px rgba(250, 204, 21, .95), 0 0 42px rgba(250, 204, 21, .5), 0 3px 6px rgba(0,0,0,.8);
+    animation: eg-strk-goalpop 1.4s cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
+}
+@keyframes eg-strk-goalpop {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+    18% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
+    30% { transform: translate(-50%, -50%) scale(1); }
+    75% { opacity: 1; transform: translate(-50%, -62%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -80%) scale(1.04); }
 }
 /* Free-kick defender wall (cones) + dotted arc + landing mark. */
 .eg-strk-fk-wall {
@@ -6877,3 +7138,3623 @@ body.eg-ag-flash::after {
     50%      { transform: translateY(-2px) scale(1.03); }
 }
 
+
+
+/* ======================================================================== */
+/* ============================ THE GRIDLOCK ============================== */
+/* ======================================================================== */
+
+/* Signal Scramble: towers + dashed cables that aim at where you were. */
+.eg-gl-tower {
+    position: fixed; z-index: 9002; pointer-events: none;
+    font-size: 1.6rem; line-height: 1;
+    filter: drop-shadow(0 0 8px rgba(103, 232, 249, 0.9));
+    animation: eg-gl-tower-blink 0.8s ease-in-out infinite alternate;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+@keyframes eg-gl-tower-blink {
+    from { transform: scale(1); }
+    to   { transform: scale(1.12); }
+}
+.eg-gl-tower-fire {
+    filter: drop-shadow(0 0 16px rgba(165, 243, 252, 1)) brightness(1.6);
+}
+.eg-gl-tower-fade { opacity: 0; }
+.eg-gl-tline {
+    position: fixed; z-index: 9001; pointer-events: none;
+    height: 4px;
+    transform-origin: 0 50%;
+    background: repeating-linear-gradient(90deg, rgba(103, 232, 249, 0.85) 0 9px, transparent 9px 18px);
+    box-shadow: 0 0 8px rgba(103, 232, 249, 0.45);
+    animation: eg-gl-tline-pulse 0.4s ease-in-out infinite alternate;
+    transition: opacity 0.3s ease;
+}
+@keyframes eg-gl-tline-pulse {
+    from { opacity: 0.55; }
+    to   { opacity: 1; }
+}
+.eg-gl-tline-fire {
+    background: repeating-linear-gradient(90deg, rgba(224, 255, 255, 1) 0 9px, rgba(103, 232, 249, 0.4) 9px 18px);
+    box-shadow: 0 0 26px rgba(103, 232, 249, 1), 0 0 60px rgba(34, 211, 238, 0.7);
+    animation: none;
+}
+.eg-gl-tline-fade { opacity: 0; }
+
+/* Surge Chaser: the roaming ⚡ orb + its live cable trail. */
+.eg-gl-orb {
+    position: fixed; z-index: 9003; pointer-events: none;
+    font-size: 1.75rem; line-height: 1;
+    filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.95));
+    animation: eg-gl-orb-zap 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-gl-orb-zap {
+    from { transform: scale(1) rotate(-6deg); }
+    to   { transform: scale(1.18) rotate(6deg); }
+}
+.eg-gl-trail {
+    position: fixed; z-index: 9002; pointer-events: none;
+    height: 6px;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, rgba(250, 204, 21, 0.95), rgba(249, 115, 22, 0.55));
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.8);
+    animation: eg-gl-trail-fade 1.2s linear forwards;
+}
+@keyframes eg-gl-trail-fade {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* SYSTEM LOCKDOWN: circuit-board overlay + wire grid. */
+.eg-gl-arena {
+    position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(8, 47, 73, 0.55) 0%, rgba(8, 47, 73, 0.75) 100%),
+        repeating-linear-gradient(0deg, rgba(34, 211, 238, 0.05) 0 1px, transparent 1px 90px),
+        repeating-linear-gradient(90deg, rgba(34, 211, 238, 0.05) 0 1px, transparent 1px 90px);
+}
+.eg-gl-arena.eg-gl-arena-on { opacity: 1; }
+.eg-gl-grid {
+    position: fixed; inset: 0; z-index: 9002; pointer-events: none;
+}
+.eg-gl-wire {
+    position: absolute; pointer-events: none;
+    transition: background 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+}
+.eg-gl-wire-h { left: 0; right: 0; height: 6px; margin-top: -3px; background: rgba(34, 211, 238, 0.14); }
+.eg-gl-wire-v { top: 0; bottom: 0; width: 6px; margin-left: -3px; background: rgba(34, 211, 238, 0.14); }
+/* Beat batches: charge → fire. */
+.eg-gl-wire-charge {
+    background: rgba(250, 204, 21, 0.55);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.8);
+    animation: eg-gl-wire-charge-kf 0.35s ease-in-out infinite alternate;
+}
+@keyframes eg-gl-wire-charge-kf {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+}
+.eg-gl-wire-fire {
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 0 30px rgba(103, 232, 249, 1), 0 0 70px rgba(34, 211, 238, 0.8) !important;
+}
+/* THE JAM: everything charges except the safe crossing. */
+.eg-gl-wire-jamcharge {
+    background: rgba(249, 115, 22, 0.65);
+    box-shadow: 0 0 16px rgba(249, 115, 22, 0.85);
+    animation: eg-gl-wire-charge-kf 0.22s ease-in-out infinite alternate;
+}
+.eg-gl-wire-jamfire {
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 0 34px rgba(249, 115, 22, 1), 0 0 80px rgba(234, 88, 12, 0.9) !important;
+}
+.eg-gl-wire-safe {
+    background: rgba(74, 222, 128, 0.35) !important;
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.7) !important;
+    animation: none !important;
+}
+.eg-gl-safepip {
+    position: fixed; z-index: 9004; pointer-events: none;
+    width: 44px; height: 44px;
+    transform: translate(-50%, -50%);
+    border: 3px solid rgba(74, 222, 128, 0.95);
+    border-radius: 50%;
+    background: rgba(74, 222, 128, 0.18);
+    box-shadow: 0 0 18px rgba(74, 222, 128, 0.8), inset 0 0 12px rgba(74, 222, 128, 0.5);
+    animation: eg-gl-safepip-pulse 0.7s ease-in-out infinite alternate;
+}
+@keyframes eg-gl-safepip-pulse {
+    from { transform: translate(-50%, -50%) scale(1); }
+    to   { transform: translate(-50%, -50%) scale(1.14); }
+}
+/* Surge dive: the ⚡ that dives the safe cell along the safe wire. */
+.eg-gl-diveline {
+    position: fixed; z-index: 9002; pointer-events: none;
+    background: repeating-linear-gradient(90deg, rgba(250, 204, 21, 0.75) 0 12px, transparent 12px 24px);
+    border-top: 2px dashed rgba(250, 204, 21, 0.9);
+    border-bottom: 2px dashed rgba(250, 204, 21, 0.9);
+    animation: eg-nk-warn-pulse 0.4s ease-in-out infinite alternate;
+}
+.eg-gl-dive {
+    position: fixed; z-index: 9004; pointer-events: none;
+    font-size: 2.4rem; line-height: 1;
+    filter: drop-shadow(0 0 16px rgba(250, 204, 21, 1));
+}
+
+/* Countdown overlay (cyan theme, mirrors the others). */
+.eg-gl-cd {
+    position: fixed;
+    left: 50%;
+    top: 26%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-gl-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #67e8f9;
+    text-shadow: 0 0 16px rgba(103, 232, 249, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+}
+.eg-gl-cd-num {
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(4.2rem, 11vw, 7.5rem);
+    line-height: 1;
+    color: #67e8f9;
+    text-shadow: 0 0 34px rgba(103, 232, 249, 1), 0 0 90px rgba(34, 211, 238, 0.7), 0 3px 8px rgba(0, 0, 0, 0.9);
+}
+.eg-gl-cd-num.eg-bmb-cd-pop {
+    animation: eg-bmb-cd-pop 0.8s ease-out;
+}
+.eg-gl-cd-hint {
+    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fde68a;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+/* The boss locks in during the finale. */
+.eg-gl-locked {
+    animation: eg-gl-lock-kf 1.6s ease-in-out infinite !important;
+}
+@keyframes eg-gl-lock-kf {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-2px) scale(1.03); }
+}
+
+/* Electric spark burst (mirrors the Aegis debris language). */
+.eg-gl-sparks {
+    position: fixed;
+    width: 0; height: 0;
+    pointer-events: none;
+    z-index: 9005;
+}
+.eg-gl-bolt {
+    position: absolute;
+    left: 0; top: 0;
+    width: 5px; height: 14px;
+    border-radius: 2px;
+    background: #a5f3fc;
+    box-shadow: 0 0 8px rgba(165, 243, 252, 0.95);
+    animation: eg-gl-bolt-kf 0.75s ease-out forwards;
+}
+.eg-gl-sparks-big .eg-gl-bolt {
+    width: 7px; height: 20px;
+    animation-duration: 1s;
+}
+@keyframes eg-gl-bolt-kf {
+    0%   { opacity: 1; transform: translate(0, 0) rotate(0deg) scaleY(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(90deg) scaleY(0.5); }
+}
+
+
+
+/* ======================================================================== */
+/* ============================= THE JESTER =============================== */
+/* ======================================================================== */
+
+/* Bouncing Mayhem: the beat hop (squash-and-pulse on every beat). */
+.eg-js-orb-hop {
+    animation: eg-js-orb-hop-kf 0.32s ease-out;
+}
+@keyframes eg-js-orb-hop-kf {
+    0%   { filter: brightness(1); }
+    40%  { filter: brightness(1.8); }
+    100% { filter: brightness(1); }
+}
+
+/* Card Toss: oversized playing cards that fly in and stick as hazards. */
+.eg-js-card {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 46px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem; font-weight: 800; line-height: 1;
+    color: #1e1b4b;
+    background: linear-gradient(160deg, #ffffff, #e2e8f0);
+    border: 2px solid rgba(30, 27, 75, 0.85);
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease;
+}
+.eg-js-card-red { color: #be123c; }
+.eg-js-card-stuck {
+    box-shadow: 0 0 14px rgba(233, 213, 255, 0.75), 0 3px 10px rgba(0, 0, 0, 0.5);
+    animation: eg-js-card-idle 1.6s ease-in-out infinite alternate;
+}
+@keyframes eg-js-card-idle {
+    from { transform: scale(1); }
+    to   { transform: scale(1.05); }
+}
+.eg-js-card-out { opacity: 0; }
+
+/* Juggler's Jinx: the orbit balls (purple = bite, gold = heal). */
+.eg-js-ball {
+    position: fixed; z-index: 9003; pointer-events: none;
+    font-size: 1.85rem; line-height: 1;
+    animation: eg-js-ball-spin 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-js-ball-spin {
+    from { transform: rotate(-14deg) scale(1); }
+    to   { transform: rotate(14deg) scale(1.1); }
+}
+.eg-js-ball-jinx { filter: drop-shadow(0 0 12px rgba(192, 132, 252, 0.95)); }
+.eg-js-ball-luck { filter: drop-shadow(0 0 14px rgba(250, 204, 21, 1)); }
+
+/* THE GRAND FINALE: curtain, card table, reveal states. */
+.eg-js-curtain {
+    position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(88, 28, 135, 0.5) 0%, rgba(30, 10, 50, 0.78) 70%),
+        repeating-linear-gradient(90deg, rgba(147, 51, 234, 0.08) 0 26px, transparent 26px 52px);
+}
+.eg-js-curtain.eg-js-curtain-on { opacity: 1; }
+.eg-js-table {
+    position: fixed; inset: 0; z-index: 9002; pointer-events: none;
+}
+.eg-js-tablecard {
+    transform: scale(0.6);
+    opacity: 0;
+}
+.eg-js-tablecard.eg-js-card-dealt {
+    transform: scale(1);
+    opacity: 1;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+}
+.eg-js-card-faceup { box-shadow: 0 0 12px rgba(233, 213, 255, 0.7), 0 3px 10px rgba(0, 0, 0, 0.5); }
+.eg-js-card-down {
+    color: transparent;
+    background: linear-gradient(160deg, #7c3aed, #4c1d95);
+    border-color: rgba(233, 213, 255, 0.5);
+}
+.eg-js-card-down::after {
+    content: '★';
+    position: absolute;
+    font-size: 1.2rem;
+    color: rgba(233, 213, 255, 0.85);
+}
+.eg-js-card-safe {
+    background: linear-gradient(160deg, #fef08a, #facc15) !important;
+    border-color: #fde047 !important;
+    box-shadow: 0 0 22px rgba(250, 204, 21, 0.95), 0 0 55px rgba(250, 204, 21, 0.6) !important;
+    animation: eg-js-card-safe-kf 0.55s ease-in-out infinite alternate !important;
+}
+.eg-js-card-down.eg-js-card-safe {
+    color: #713f12;
+}
+.eg-js-card-down.eg-js-card-safe::after { content: none; }
+@keyframes eg-js-card-safe-kf {
+    from { transform: scale(1); }
+    to   { transform: scale(1.12); }
+}
+
+/* Curtain Call barrage. */
+.eg-js-sweepwarn, .eg-js-sweep {
+    position: fixed; left: 0; pointer-events: none;
+}
+.eg-js-sweepwarn {
+    z-index: 9002;
+    border-top: 2px dashed rgba(233, 213, 255, 0.9);
+    border-bottom: 2px dashed rgba(233, 213, 255, 0.9);
+    background: rgba(192, 132, 252, 0.14);
+    animation: eg-ag-warn-pulse 0.5s ease-in-out infinite alternate;
+}
+.eg-js-sweep {
+    z-index: 9003;
+    background: linear-gradient(90deg, rgba(233, 213, 255, 0.95), rgba(147, 51, 234, 0.85), rgba(233, 213, 255, 0.95));
+    box-shadow: 0 0 30px rgba(192, 132, 252, 0.9);
+}
+.eg-js-sweep.eg-js-from-left { border-radius: 0 60% 60% 0; }
+.eg-js-sweep.eg-js-from-right { border-radius: 60% 0 0 60%; }
+
+/* Finale overlay (violet theme, mirrors the others). */
+.eg-js-cd {
+    position: fixed;
+    left: 50%;
+    top: 22%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-js-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #d8b4fe;
+    text-shadow: 0 0 16px rgba(216, 180, 254, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+}
+.eg-js-cd-hint {
+    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fde68a;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+/* The boss bows during the finale. */
+.eg-js-bowing {
+    animation: eg-js-bow-kf 1.7s ease-in-out infinite !important;
+}
+@keyframes eg-js-bow-kf {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-3px) scale(1.03); }
+}
+
+/* Confetti puff (mirrors the Aegis debris language). */
+.eg-js-confetti {
+    position: fixed;
+    width: 0; height: 0;
+    pointer-events: none;
+    z-index: 9005;
+}
+.eg-js-bit {
+    position: absolute;
+    left: 0; top: 0;
+    width: 7px; height: 10px;
+    border-radius: 2px;
+    animation: eg-js-bit-kf 0.85s ease-out forwards;
+}
+.eg-js-confetti-big .eg-js-bit {
+    width: 9px; height: 13px;
+    animation-duration: 1.05s;
+}
+@keyframes eg-js-bit-kf {
+    0%   { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); }
+}
+
+
+
+/* ======================================================================== */
+/* ============================ THE SHAPER ================================ */
+/* ======================================================================== */
+
+/* Glacier Rift: telegraph fissures + the rolling eruption front. */
+.eg-shp-riftwarn {
+    position: fixed; left: 0; z-index: 9000; pointer-events: none;
+    background: rgba(125, 211, 252, 0.06);
+}
+.eg-shp-fissure {
+    position: fixed; left: 0; z-index: 9001; pointer-events: none;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, rgba(224, 242, 254, 0.85) 0 16px, transparent 16px 30px);
+    box-shadow: 0 0 10px rgba(125, 211, 252, 0.7);
+    animation: eg-nk-warn-pulse 0.4s ease-in-out infinite alternate;
+}
+.eg-shp-front {
+    position: fixed; top: 0; z-index: 9002; pointer-events: none;
+    background: linear-gradient(90deg,
+        rgba(224, 242, 254, 0.15), rgba(125, 211, 252, 0.5) 45%, rgba(255, 255, 255, 0.9) 100%);
+    box-shadow: 0 0 40px rgba(56, 189, 248, 0.9), 0 0 90px rgba(56, 189, 248, 0.5);
+}
+.eg-shp-front.eg-shp-from-left {
+    background: linear-gradient(270deg,
+        rgba(224, 242, 254, 0.15), rgba(125, 211, 252, 0.5) 45%, rgba(255, 255, 255, 0.9) 100%);
+}
+.eg-shp-front.eg-shp-from-right {
+    background: linear-gradient(90deg,
+        rgba(224, 242, 254, 0.15), rgba(125, 211, 252, 0.5) 45%, rgba(255, 255, 255, 0.9) 100%);
+}
+/* Lingering ice pools (the front's aftermath). */
+.eg-shp-pool {
+    position: fixed; left: 0; top: 0;
+    pointer-events: none; z-index: 9001;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(224, 242, 254, 0.3), rgba(56, 189, 248, 0.32) 55%, transparent 72%);
+    border: 3px solid rgba(125, 211, 252, 0.85);
+    box-shadow: 0 0 26px rgba(56, 189, 248, 0.7), inset 0 0 26px rgba(56, 189, 248, 0.35);
+    transition: opacity 0.4s ease;
+}
+.eg-shp-pool.eg-shp-pool-out { opacity: 0; }
+
+/* Frost Monoliths: rune statues + the shrinking walls they erect. */
+.eg-shp-mono {
+    position: fixed; z-index: 9003; pointer-events: none;
+    font-size: 2.2rem; line-height: 1;
+    filter: drop-shadow(0 0 12px rgba(125, 211, 252, 0.95));
+    animation: eg-shp-mono-thrum 1.2s ease-in-out infinite alternate;
+}
+@keyframes eg-shp-mono-thrum {
+    from { transform: scale(1); }
+    to   { transform: scale(1.07); }
+}
+.eg-shp-mono-crack1 { filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.8)) brightness(1.15); }
+.eg-shp-mono-crack2 { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.9)) brightness(1.3) hue-rotate(-20deg); }
+.eg-shp-wall {
+    position: fixed; z-index: 9002; pointer-events: none;
+    height: 22px; margin-top: -11px;
+    transform-origin: 0 50%;
+    background: repeating-linear-gradient(90deg,
+        rgba(224, 242, 254, 0.8) 0 14px, rgba(56, 189, 248, 0.5) 14px 22px);
+    border-top: 2px solid rgba(255, 255, 255, 0.85);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
+}
+
+/* Ice Walker + shard shrapnel. */
+.eg-shp-walker {
+    position: fixed; z-index: 9003; pointer-events: none;
+    font-size: 2rem; line-height: 1;
+    filter: drop-shadow(0 0 12px rgba(224, 242, 254, 0.95));
+    animation: eg-shp-walker-waddle 0.6s ease-in-out infinite alternate;
+}
+@keyframes eg-shp-walker-waddle {
+    from { transform: rotate(-8deg) scale(1); }
+    to   { transform: rotate(8deg) scale(1.08); }
+}
+.eg-shp-shardlet {
+    position: fixed; z-index: 9002; pointer-events: none;
+    font-size: 1rem; line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(224, 242, 254, 0.9));
+}
+
+/* Ice-shard burst (mirrors the Aegis debris language). */
+.eg-shp-shards {
+    position: fixed;
+    width: 0; height: 0;
+    pointer-events: none;
+    z-index: 9005;
+}
+.eg-shp-shard {
+    position: absolute;
+    left: 0; top: 0;
+    width: 6px; height: 13px;
+    border-radius: 2px;
+    background: #e0f2fe;
+    box-shadow: 0 0 7px rgba(224, 242, 254, 0.95);
+    animation: eg-shp-shard-kf 0.8s ease-out forwards;
+}
+.eg-shp-shards-big .eg-shp-shard {
+    width: 9px; height: 18px;
+    animation-duration: 1.1s;
+}
+@keyframes eg-shp-shard-kf {
+    0%   { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); }
+}
+
+/* THE SHAPED WINTER: the colossal monolith, arms, cores, overlay. */
+.eg-shp-gmonolith {
+    position: fixed; z-index: 9002; pointer-events: none;
+    font-size: 4.2rem; line-height: 1;
+    filter: drop-shadow(0 0 26px rgba(125, 211, 252, 1)) drop-shadow(0 0 70px rgba(56, 189, 248, 0.7));
+    transform: scale(0.4);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+}
+.eg-shp-gmonolith.eg-shp-gmonolith-on {
+    transform: scale(1);
+    opacity: 1;
+    animation: eg-shp-gmonolith-thrum 1.4s ease-in-out infinite alternate;
+}
+@keyframes eg-shp-gmonolith-thrum {
+    from { filter: drop-shadow(0 0 26px rgba(125, 211, 252, 1)); }
+    to   { filter: drop-shadow(0 0 44px rgba(165, 243, 252, 1)); }
+}
+.eg-shp-arm {
+    position: fixed; z-index: 9001; pointer-events: none;
+    height: 22px; margin-top: -11px;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(125, 211, 252, 0.7) 60%, rgba(56, 189, 248, 0.35));
+    box-shadow: 0 0 22px rgba(56, 189, 248, 0.9), 0 0 60px rgba(56, 189, 248, 0.4);
+}
+.eg-shp-core {
+    position: fixed; z-index: 9004; pointer-events: none;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    border: 3px solid rgba(125, 211, 252, 0.65);
+    background: rgba(30, 58, 138, 0.55);
+    opacity: 0.5;
+    transition: opacity 0.3s ease, box-shadow 0.3s ease;
+}
+.eg-shp-core.eg-shp-core-lit {
+    opacity: 1;
+    border-color: #fde047;
+    background: rgba(250, 204, 21, 0.25);
+    box-shadow: 0 0 22px rgba(250, 204, 21, 0.9), 0 0 55px rgba(250, 204, 21, 0.5);
+    animation: eg-shp-core-lit-kf 0.6s ease-in-out infinite alternate;
+}
+@keyframes eg-shp-core-lit-kf {
+    from { transform: scale(1); }
+    to   { transform: scale(1.14); }
+}
+.eg-shp-core.eg-shp-core-crack1 { filter: brightness(1.2); }
+.eg-shp-core.eg-shp-core-crack2 { filter: brightness(1.45) hue-rotate(-15deg); }
+.eg-shp-core.eg-shp-core-shattered {
+    opacity: 0.25;
+    filter: grayscale(1);
+    animation: none;
+}
+/* Break ring + white-cyan flash. */
+.eg-shp-breakring {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 260px; height: 260px;
+    transform: translate(-50%, -50%);
+    border: 4px dashed rgba(125, 211, 252, 0.95);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(224, 242, 254, 0.35) 0%, rgba(125, 211, 252, 0.12) 45%, transparent 70%);
+    box-shadow: 0 0 26px rgba(56, 189, 248, 0.8), inset 0 0 26px rgba(56, 189, 248, 0.5);
+    animation: eg-shp-breakring-pulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-shp-breakring-pulse {
+    from { transform: translate(-50%, -50%) scale(1); }
+    to   { transform: translate(-50%, -50%) scale(1.1); }
+}
+body.eg-shp-flash::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9500;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, rgba(240, 249, 255, 0.95) 0%, rgba(125, 211, 252, 0.5) 45%, rgba(12, 74, 110, 0.35) 100%);
+    animation: eg-bmb-flash-kf 0.6s ease-out forwards;
+}
+/* Countdown overlay (ice theme, mirrors the others). */
+.eg-shp-cd {
+    position: fixed;
+    left: 50%;
+    top: 26%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-shp-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #7dd3fc;
+    text-shadow: 0 0 16px rgba(125, 211, 252, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+}
+.eg-shp-cd-num {
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(4.2rem, 11vw, 7.5rem);
+    line-height: 1;
+    color: #7dd3fc;
+    text-shadow: 0 0 34px rgba(125, 211, 252, 1), 0 0 90px rgba(56, 189, 248, 0.7), 0 3px 8px rgba(0, 0, 0, 0.9);
+}
+.eg-shp-cd-num.eg-bmb-cd-pop {
+    animation: eg-bmb-cd-pop 0.8s ease-out;
+}
+.eg-shp-cd-hint {
+    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #e0f2fe;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+/* The boss channels during the finale. */
+.eg-shp-channelling {
+    animation: eg-shp-channel-kf 1.7s ease-in-out infinite !important;
+}
+@keyframes eg-shp-channel-kf {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-3px) scale(1.03); }
+}
+
+
+
+/* ============================ THE SIREN ================================ */
+
+/* Wail Beam echoes: soft singing-along zones along the swept arc. */
+.eg-sire-echo {
+    position: fixed; left: 0; top: 0;
+    pointer-events: none; z-index: 9001;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    background: radial-gradient(circle, rgba(224, 242, 254, 0.28), rgba(56, 189, 248, 0.22) 55%, transparent 72%);
+    border: 2px dashed rgba(125, 211, 252, 0.85);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.5);
+    animation: eg-sire-echo-pulse 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-sire-echo-pulse {
+    from { transform: translate(var(--tx, 0), var(--ty, 0)) scale(1); opacity: 0.75; }
+    to   { transform: translate(var(--tx, 0), var(--ty, 0)) scale(1.1); opacity: 1; }
+}
+/* Undertow: whirlpool + spiralling flotsam. */
+.eg-sire-pool {
+    position: fixed; left: 0; top: 0;
+    pointer-events: none; z-index: 9001;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, rgba(8, 47, 73, 0.75) 0%, rgba(14, 116, 144, 0.55) 45%, rgba(56, 189, 248, 0.2) 70%, transparent 78%);
+    border: 3px solid rgba(125, 211, 252, 0.7);
+    box-shadow: 0 0 34px rgba(56, 189, 248, 0.7), inset 0 0 40px rgba(8, 47, 73, 0.8);
+    animation: eg-sire-pool-spin 2.4s linear infinite;
+}
+@keyframes eg-sire-pool-spin {
+    from { transform: translate(var(--tx, 0), var(--ty, 0)) rotate(0deg); }
+    to   { transform: translate(var(--tx, 0), var(--ty, 0)) rotate(360deg); }
+}
+.eg-sire-pool::before {
+    content: '';
+    position: absolute; inset: 14%;
+    border-radius: 50%;
+    border: 3px dashed rgba(207, 250, 254, 0.75);
+    animation: eg-sire-pool-spin-inner 1.6s linear infinite reverse;
+}
+@keyframes eg-sire-pool-spin-inner {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+.eg-sire-pool.eg-sire-pool-nova {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(125, 211, 252, 0.7) 40%, transparent 75%);
+    box-shadow: 0 0 70px rgba(56, 189, 248, 1);
+    animation: none;
+}
+.eg-sire-flotsam {
+    position: fixed; z-index: 9002; pointer-events: none;
+    font-size: 1.6rem; line-height: 1;
+    filter: drop-shadow(0 0 8px rgba(125, 211, 252, 0.8));
+    animation: eg-sire-flotsam-tumble 1.2s ease-in-out infinite alternate;
+}
+@keyframes eg-sire-flotsam-tumble {
+    from { transform: rotate(-14deg); }
+    to   { transform: rotate(14deg); }
+}
+/* Reply beams: thin mirror variants of the shared beam. */
+.eg-sire-beam-thin {
+    background: linear-gradient(180deg, rgba(165, 243, 252, 0.12), rgba(103, 232, 249, 0.65) 50%, rgba(165, 243, 252, 0.12));
+    border-top: 1px solid rgba(207, 250, 254, 0.8);
+    border-bottom: 1px solid rgba(207, 250, 254, 0.8);
+}
+.eg-sire-beam-fat {
+    background: linear-gradient(180deg, rgba(165, 243, 252, 0.18), rgba(103, 232, 249, 0.7) 50%, rgba(165, 243, 252, 0.18));
+}
+/* Deadly Aria: the flooded hall, bubbles and song states. */
+.eg-sire-stage {
+    position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(8, 47, 73, 0.5) 0%, rgba(8, 47, 73, 0.72) 100%),
+        repeating-radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.05) 0 2px, transparent 2px 120px);
+}
+.eg-sire-stage.eg-sire-stage-on { opacity: 1; }
+.eg-sire-bubble {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.55), rgba(125, 211, 252, 0.25) 55%, rgba(8, 47, 73, 0.4) 100%);
+    border: 2px solid rgba(207, 250, 254, 0.75);
+    box-shadow: 0 0 12px rgba(125, 211, 252, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.25);
+    animation: eg-sire-bubble-bob 2.2s ease-in-out infinite alternate;
+}
+@keyframes eg-sire-bubble-bob {
+    from { transform: translateY(0) scale(1); }
+    to   { transform: translateY(-7px) scale(1.05); }
+}
+.eg-sire-bubble-lit {
+    border-color: #fde047 !important;
+    background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.7), rgba(250, 204, 21, 0.45) 55%, rgba(120, 53, 15, 0.45) 100%) !important;
+    box-shadow: 0 0 22px rgba(250, 204, 21, 0.95), 0 0 55px rgba(250, 204, 21, 0.55) !important;
+    animation: eg-sire-bubble-lit-kf 0.55s ease-in-out infinite alternate !important;
+}
+@keyframes eg-sire-bubble-lit-kf {
+    from { transform: scale(1); }
+    to   { transform: scale(1.16); }
+}
+.eg-sire-bubble-safe {
+    border-color: #4ade80 !important;
+    background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.7), rgba(74, 222, 128, 0.45) 55%, rgba(6, 46, 28, 0.5) 100%) !important;
+    box-shadow: 0 0 26px rgba(74, 222, 128, 1), 0 0 70px rgba(74, 222, 128, 0.6) !important;
+    animation: eg-sire-bubble-lit-kf 0.4s ease-in-out infinite alternate !important;
+}
+.eg-sire-bubble-doom {
+    border-color: #f87171 !important;
+    background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.55), rgba(248, 113, 113, 0.5) 55%, rgba(60, 10, 10, 0.55) 100%) !important;
+    box-shadow: 0 0 18px rgba(248, 113, 113, 0.85) !important;
+}
+/* Water splash burst (mirrors the other bosses' debris language). */
+.eg-sire-splash {
+    position: fixed;
+    width: 0; height: 0;
+    pointer-events: none;
+    z-index: 9005;
+}
+.eg-sire-droplet {
+    position: absolute;
+    left: 0; top: 0;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #a5f3fc;
+    box-shadow: 0 0 7px rgba(165, 243, 252, 0.95);
+    animation: eg-sire-droplet-kf 0.8s ease-out forwards;
+}
+.eg-sire-splash-big .eg-sire-droplet {
+    width: 10px; height: 10px;
+    animation-duration: 1.05s;
+}
+@keyframes eg-sire-droplet-kf {
+    0%   { opacity: 1; transform: translate(0, 0); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); }
+}
+/* Finale overlay (deep-water theme, mirrors the others). */
+.eg-sire-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-sire-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #67e8f9;
+    text-shadow: 0 0 16px rgba(103, 232, 249, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+}
+.eg-sire-cd-hint {
+    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #e0f2fe;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+/* The boss sings during the finale. */
+.eg-sire-singing {
+    animation: eg-sire-sing-kf 1.5s ease-in-out infinite !important;
+}
+@keyframes eg-sire-sing-kf {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-3px) scale(1.03); }
+}
+
+
+
+/* ======================================================================== */
+/* ------------------ THE SWARM (boss_swarm) — rework --------------------- */
+/* ======================================================================== */
+
+/* Drone sprite: the swarm's working unit. Self-contained fixed positioning
+   (these do NOT rely on the shared .eg-nk-dot base class). */
+.eg-sw-drone {
+    position: fixed; z-index: 9001; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; font-size: 1.9rem;
+    filter: drop-shadow(0 0 10px rgba(255, 179, 122, 0.85));
+    animation: eg-sw-buzz 0.42s ease-in-out infinite alternate;
+}
+@keyframes eg-sw-buzz {
+    from { margin-top: 0; }
+    to   { margin-top: -5px; }
+}
+
+/* Sign marker: a hatchling splitting off the wedge. */
+.eg-sw-hatch {
+    position: fixed; z-index: 9001; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; font-size: 1.5rem;
+    filter: drop-shadow(0 0 10px rgba(253, 224, 71, 0.95));
+    animation: eg-sw-hatch-spin 0.8s linear infinite;
+}
+@keyframes eg-sw-hatch-spin {
+    from { rotate: -14deg; } to { rotate: 14deg; }
+}
+
+/* Laval glow trail: the arc's burn edge (dodge line). */
+.eg-sw-trail {
+    position: fixed; z-index: 9001; pointer-events: none;
+    width: 64px; height: 64px; margin: -32px 0 0 -32px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 154, 60, 0.5) 0%, rgba(255, 94, 31, 0.28) 45%, transparent 72%);
+    animation: eg-sw-trail-kf 2.6s linear forwards;
+}
+@keyframes eg-sw-trail-kf {
+    0%   { opacity: 0.95; transform: scale(0.55); }
+    30%  { opacity: 0.85; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.25); }
+}
+
+/* Hatch ping: a small expanding ring where a drone peels off. */
+.eg-sw-ping {
+    position: fixed; z-index: 9001; pointer-events: none;
+    width: 26px; height: 26px; margin: -13px 0 0 -13px;
+    border-radius: 50%;
+    border: 2px solid rgba(253, 224, 71, 0.9);
+    animation: eg-sw-ping-kf 1s ease-out forwards;
+}
+@keyframes eg-sw-ping-kf {
+    from { opacity: 1; transform: scale(0.4); }
+    to   { opacity: 0; transform: scale(3.2); }
+}
+
+/* MIMIC QUEEN: host drone + larva + stink cloud + jelly flare. */
+.eg-sw-host {
+    width: 52px; height: 52px; font-size: 2.2rem;
+    filter: drop-shadow(0 0 12px rgba(255, 179, 122, 0.9));
+    transition: transform 0.45s ease, filter 0.45s ease;
+}
+.eg-sw-host.eg-sw-host-open {
+    transform: scale(1.35) rotate(8deg);
+    filter: drop-shadow(0 0 18px rgba(255, 94, 31, 0.95));
+}
+.eg-sw-larva {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 48px; height: 48px; font-size: 2rem;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transform: scale(0.3);
+    transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 0 12px rgba(255, 209, 102, 0.95));
+}
+.eg-sw-larva.eg-sw-larva-on { opacity: 1; transform: scale(1); animation: eg-sw-larva-wriggle 1.1s ease-in-out infinite; }
+@keyframes eg-sw-larva-wriggle {
+    0%, 100% { rotate: -6deg; } 50% { rotate: 6deg; }
+}
+.eg-sw-cloud {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 120px; height: 120px; font-size: 1.9rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(163, 230, 53, 0.32) 0%, rgba(101, 163, 13, 0.2) 55%, transparent 75%);
+    filter: drop-shadow(0 0 12px rgba(163, 230, 53, 0.55));
+    animation: eg-sw-cloud-kf 4.5s ease-out forwards;
+}
+@keyframes eg-sw-cloud-kf {
+    0%   { opacity: 0; transform: scale(0.4); }
+    18%  { opacity: 1; transform: scale(1.05); }
+    80%  { opacity: 0.85; }
+    100% { opacity: 0; transform: scale(1.2); }
+}
+.eg-sw-larva-pop {
+    position: fixed; z-index: 9003; pointer-events: none;
+    font-size: 2.6rem;
+    animation: eg-sw-pop-kf 1s ease-out forwards;
+}
+@keyframes eg-sw-pop-kf {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+    25%  { opacity: 1; transform: translate(-50%, -60%) scale(1.35); }
+    100% { opacity: 0; transform: translate(-50%, -130%) scale(0.9); }
+}
+
+/* HIVE EYE: the bloom — a screen-dark smoke ring with a clear hole. */
+.eg-sw-probe {
+    width: 46px; height: 46px; font-size: 2rem;
+    filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.95));
+    animation: none;
+}
+.eg-sw-guard {
+    position: fixed; z-index: 9002; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; font-size: 1.4rem;
+    filter: drop-shadow(0 0 8px rgba(255, 179, 122, 0.9));
+}
+.eg-sw-bloom {
+    position: fixed; z-index: 9002; pointer-events: none;
+    opacity: 0;
+    animation: eg-sw-bloom-kf 0.7s ease-out forwards;
+}
+@keyframes eg-sw-bloom-kf { from { opacity: 0; } to { opacity: 1; } }
+
+/* FINALE: the whirling ball of wings. */
+.eg-sw-ball {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 190px; height: 190px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 40% 38%, rgba(255, 209, 102, 0.5) 0%, rgba(255, 94, 31, 0.32) 55%, rgba(60, 22, 6, 0.55) 100%);
+    border: 3px solid rgba(255, 179, 122, 0.85);
+    box-shadow: 0 0 34px rgba(255, 154, 60, 0.75), inset 0 0 26px rgba(255, 209, 102, 0.5);
+    animation: eg-sw-ball-kf 0.5s linear infinite;
+}
+@keyframes eg-sw-ball-kf { from { rotate: 0deg; } to { rotate: 360deg; } }
+
+/* Charge telegraph line + safe gap. */
+.eg-sw-chargeline {
+    position: fixed; z-index: 9001; pointer-events: none;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, rgba(255, 94, 31, 0.15) 0%, rgba(255, 94, 31, 0.55) 55%, rgba(255, 209, 102, 0.9) 100%);
+    border-top: 2px solid rgba(255, 209, 102, 0.75);
+    border-bottom: 2px solid rgba(255, 209, 102, 0.75);
+    animation: eg-sw-line-kf 0.6s ease-in-out infinite alternate;
+}
+@keyframes eg-sw-line-kf {
+    from { opacity: 0.55; } to { opacity: 1; }
+}
+.eg-sw-gap {
+    position: fixed; z-index: 9003; pointer-events: none;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 3px dashed rgba(74, 222, 128, 0.95);
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.18) 0%, transparent 65%);
+    box-shadow: 0 0 22px rgba(74, 222, 128, 0.55), inset 0 0 18px rgba(74, 222, 128, 0.25);
+    animation: eg-sw-gap-kf 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-sw-gap-kf {
+    from { transform: scale(0.92); opacity: 0.8; }
+    to   { transform: scale(1.08); opacity: 1; }
+}
+
+/* Funnel drone wall. */
+.eg-sw-funnel-drone {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 46px; height: 46px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    filter: drop-shadow(0 0 10px rgba(255, 154, 60, 0.9));
+    animation: eg-sw-buzz 0.35s ease-in-out infinite alternate;
+}
+
+/* Finale countdown overlay + boss-card swarm crown. */
+.eg-sw-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-sw-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #ffb37a;
+    text-shadow: 0 0 16px rgba(255, 154, 60, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+}
+.eg-sw-cd-hint {
+    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff7ed;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+.eg-sw-enraged {
+    animation: eg-sw-crown-kf 0.9s ease-in-out infinite !important;
+}
+@keyframes eg-sw-crown-kf {
+    0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 8px rgba(255, 154, 60, 0.6)); }
+    50%      { transform: translateY(-3px) scale(1.04); filter: drop-shadow(0 0 16px rgba(255, 209, 102, 0.95)); }
+}
+
+
+
+/* ======================================================================== */
+/* ---------------- THE COLOSSUS (boss_colossus) — rework ----------------- */
+/* ======================================================================== */
+
+/* SEISMIC STRIDE: footprint telegraph, slam, and the shockwave overlay. */
+.eg-colo-foot-warn {
+    position: fixed; z-index: 9001; pointer-events: none;
+    width: 156px; height: 104px;
+    border-radius: 52px;
+    border: 3px dashed rgba(214, 200, 168, 0.9);
+    background: radial-gradient(ellipse at center, rgba(214, 200, 168, 0.16) 0%, transparent 70%);
+    animation: eg-colo-foot-warn-kf 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-colo-foot-warn-kf {
+    from { opacity: 0.55; transform: scale(0.94); }
+    to   { opacity: 1; transform: scale(1.04); }
+}
+.eg-colo-foot-slam {
+    position: fixed; z-index: 9001; pointer-events: none;
+    width: 156px; height: 104px;
+    border-radius: 52px;
+    background: radial-gradient(ellipse at centre, rgba(255, 236, 200, 0.5) 0%, rgba(146, 122, 84, 0.45) 55%, transparent 78%);
+    box-shadow: 0 0 30px rgba(214, 200, 168, 0.6);
+    animation: eg-colo-slam-kf 2.4s ease-out forwards;
+}
+@keyframes eg-colo-slam-kf {
+    0%   { opacity: 1; transform: scale(0.85); }
+    18%  { opacity: 0.95; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1); }
+}
+.eg-colo-wave {
+    border-color: rgba(214, 200, 168, 0.85) !important;
+    box-shadow: 0 0 22px rgba(214, 200, 168, 0.55), inset 0 0 26px rgba(146, 122, 84, 0.35);
+}
+
+/* Rock chips + rubble puffs (shared Colossus debris burst). */
+.eg-colo-chip {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 10px; height: 10px;
+    background: #a8a29e;
+    border-radius: 3px;
+    box-shadow: 0 0 6px rgba(214, 200, 168, 0.8);
+    animation: eg-colo-chip-kf 0.9s ease-out forwards;
+}
+@keyframes eg-colo-chip-kf {
+    0%   { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    100% { opacity: 0; transform: translate(0, -46px) rotate(140deg); }
+}
+
+/* BOULDER RAIN: the falling boulder and its rolling fragments. */
+.eg-colo-boulder {
+    position: fixed; z-index: 9002; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; font-size: 2.4rem;
+    filter: drop-shadow(0 14px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 10px rgba(214, 200, 168, 0.7));
+}
+.eg-colo-frag {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 18px; height: 18px;
+    background: radial-gradient(circle at 35% 30%, #d6c8a8, #78716c 70%);
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(214, 200, 168, 0.7);
+    animation: eg-colo-frag-kf 0.5s linear infinite;
+}
+@keyframes eg-colo-frag-kf {
+    from { rotate: 0deg; } to { rotate: 360deg; }
+}
+
+/* GRANITE GOLEMS: the pusher statue with its two crack stages. */
+.eg-colo-golem {
+    position: fixed; z-index: 9001; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px; font-size: 2.5rem;
+    filter: drop-shadow(0 0 12px rgba(168, 162, 158, 0.9));
+    transition: filter 0.25s ease;
+}
+.eg-colo-golem.eg-colo-golem-crack1 { filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.85)) saturate(0.8); }
+.eg-colo-golem.eg-colo-golem-crack2 { filter: drop-shadow(0 0 14px rgba(248, 113, 113, 0.95)) saturate(0.6) brightness(0.85); }
+
+/* TITAN'S FALL: joint seals (lit / crack stages / broken). */
+.eg-colo-seal {
+    position: fixed; z-index: 9002; pointer-events: none;
+    width: 92px; height: 92px;
+    border-radius: 50%;
+    border: 3px solid rgba(168, 162, 158, 0.55);
+    background: radial-gradient(circle, rgba(120, 113, 108, 0.4) 0%, transparent 70%);
+    opacity: 0.45;
+    transition: opacity 0.3s ease, box-shadow 0.3s ease;
+}
+.eg-colo-seal.eg-colo-seal-lit {
+    opacity: 1;
+    border-color: rgba(250, 204, 21, 0.95);
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.28) 0%, transparent 72%);
+    box-shadow: 0 0 24px rgba(250, 204, 21, 0.65), inset 0 0 16px rgba(250, 204, 21, 0.4);
+    animation: eg-colo-seal-kf 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-colo-seal-kf {
+    from { transform: scale(0.95); } to { transform: scale(1.06); }
+}
+.eg-colo-seal.eg-colo-seal-crack1 { border-style: dashed; filter: brightness(1.15); }
+.eg-colo-seal.eg-colo-seal-crack2 { border-style: dotted; filter: brightness(1.3) saturate(0.7); }
+.eg-colo-seal.eg-colo-seal-broken {
+    opacity: 0.2;
+    border-color: rgba(74, 222, 128, 0.8);
+    animation: none;
+}
+
+/* Rock chutes: telegraphed lane, then the raining rocks. */
+.eg-colo-chute-warn {
+    position: fixed; z-index: 9001; pointer-events: none;
+    border: 2px dashed rgba(214, 200, 168, 0.85);
+    background: repeating-linear-gradient(0deg, rgba(214, 200, 168, 0.08) 0 18px, transparent 18px 36px);
+    animation: eg-colo-chute-warn-kf 0.4s ease-in-out infinite alternate;
+}
+@keyframes eg-colo-chute-warn-kf {
+    from { opacity: 0.5; } to { opacity: 1; }
+}
+.eg-colo-chute {
+    position: fixed; z-index: 9002; pointer-events: none;
+    background:
+        radial-gradient(circle at 30% 10%, rgba(214, 200, 168, 0.5) 0 4px, transparent 5px),
+        radial-gradient(circle at 70% 30%, rgba(168, 162, 158, 0.5) 0 5px, transparent 6px),
+        radial-gradient(circle at 45% 55%, rgba(214, 200, 168, 0.45) 0 4px, transparent 5px),
+        radial-gradient(circle at 80% 75%, rgba(168, 162, 158, 0.5) 0 5px, transparent 6px),
+        radial-gradient(circle at 25% 88%, rgba(214, 200, 168, 0.45) 0 4px, transparent 5px);
+    background-size: 88px 120px;
+    animation: eg-colo-chute-roll 0.7s linear infinite;
+}
+@keyframes eg-colo-chute-roll {
+    from { background-position: 0 -120px; } to { background-position: 0 0; }
+}
+
+/* CAVE-IN punish dust. */
+.eg-colo-cavein {
+    position: fixed; inset: 0; z-index: 9003; pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 50%, transparent 0 90px, rgba(87, 83, 78, 0.55) 30%, rgba(41, 37, 36, 0.92) 68%);
+    animation: eg-colo-cavein-kf 1.6s ease-out forwards;
+}
+@keyframes eg-colo-cavein-kf {
+    0%  { opacity: 0; }
+    22% { opacity: 1; }
+    80% { opacity: 0.95; }
+    100% { opacity: 0; }
+}
+
+/* Finale countdown overlay + kneeling boss-card state. */
+.eg-colo-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-colo-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #d6c8a8;
+    text-shadow: 0 0 16px rgba(214, 200, 168, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    white-space: nowrap;
+}
+.eg-colo-cd-hint {
+    font-size: clamp(0.8rem, 1.8vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fefce8;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+.eg-colo-kneeling {
+    animation: eg-colo-kneel-kf 2.2s ease-in-out infinite !important;
+}
+@keyframes eg-colo-kneel-kf {
+    0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 8px rgba(214, 200, 168, 0.5)); }
+    50%      { transform: translateY(3px) scale(0.96); filter: drop-shadow(0 0 14px rgba(146, 122, 84, 0.85)); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BAYES — "The Grand Prior" (Tier 7 rework)
+   Evidence updates beliefs: a visible BELIEF METER re-weights the arena.
+   All sprites are self-contained position:fixed (no shared base class).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Belief meter (top-centre HUD; needle position = --bay-lean −100..100) ── */
+.eg-bay-meter {
+    position: fixed;
+    left: 50%;
+    top: 54px;
+    transform: translateX(-50%);
+    width: min(420px, 60vw);
+    height: 26px;
+    border-radius: 13px;
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
+    border: 2px solid rgba(196, 181, 253, 0.85);
+    box-shadow: 0 0 14px rgba(139, 92, 246, 0.45), inset 0 0 8px rgba(0, 0, 0, 0.55);
+    z-index: 8800;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(96, 165, 250, 0.28) 0%, rgba(30, 30, 46, 0.75) 50%, rgba(248, 113, 113, 0.28) 100%);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+}
+.eg-bay-meter-half {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(238, 233, 254, 0.92);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+.eg-bay-meter-needle {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 6px;
+    border-radius: 3px;
+    background: #fef08a;
+    box-shadow: 0 0 10px 2px rgba(254, 240, 138, 0.9);
+    left: calc(50% + (var(--bay-lean, 0) * 0.465%) - 3px);
+    transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.eg-bay-meter-balanced .eg-bay-meter-needle {
+    background: #86efac;
+    box-shadow: 0 0 12px 3px rgba(134, 239, 172, 0.95);
+}
+.eg-bay-meter-balanced::after {
+    content: '50/50 — CLARITY';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bbf7d0;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+/* ── Posterior Bolts: column telegraph then strike ── */
+.eg-bay-bolt-warn {
+    position: fixed;
+    z-index: 8600;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(196, 181, 253, 0.16) 0px, rgba(196, 181, 253, 0.16) 10px, rgba(76, 29, 149, 0.30) 10px, rgba(76, 29, 149, 0.30) 20px);
+    border-left: 2px solid rgba(196, 181, 253, 0.75);
+    border-right: 2px solid rgba(196, 181, 253, 0.75);
+    animation: eg-bay-warn-pulse 0.42s ease-in-out infinite alternate;
+}
+@keyframes eg-bay-warn-pulse {
+    from { opacity: 0.5; }
+    to   { opacity: 1; }
+}
+.eg-bay-bolt {
+    position: fixed;
+    z-index: 8700;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(196, 181, 253, 0.1) 0%, rgba(233, 213, 255, 0.95) 18%, rgba(255, 255, 255, 1) 50%, rgba(233, 213, 255, 0.95) 82%, rgba(196, 181, 253, 0.1) 100%);
+    box-shadow: 0 0 26px 8px rgba(167, 139, 250, 0.85);
+    animation: eg-bay-bolt-flash 0.5s ease-out forwards;
+}
+@keyframes eg-bay-bolt-flash {
+    0%   { opacity: 0; transform: scaleX(0.4); }
+    12%  { opacity: 1; transform: scaleX(1); }
+    100% { opacity: 0; transform: scaleX(1.06); }
+}
+
+/* ── Evidence ring (hold through a bolt = meter flips your way) ── */
+.eg-bay-evidence {
+    position: fixed;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 3px dashed rgba(134, 239, 172, 0.9);
+    background: radial-gradient(circle, rgba(134, 239, 172, 0.22) 0%, rgba(134, 239, 172, 0.05) 60%, transparent 72%);
+    box-shadow: 0 0 18px rgba(134, 239, 172, 0.5), inset 0 0 14px rgba(134, 239, 172, 0.35);
+    z-index: 8550;
+    pointer-events: none;
+    animation: eg-bay-ring-spin 5s linear infinite;
+}
+@keyframes eg-bay-ring-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+.eg-bay-evidence-pop {
+    animation: eg-bay-ring-pop 0.45s ease-out, eg-bay-ring-spin 5s linear infinite;
+}
+@keyframes eg-bay-ring-pop {
+    0%   { filter: brightness(1); transform: scale(1); }
+    40%  { filter: brightness(1.9); transform: scale(1.12); }
+    100% { filter: brightness(1); transform: scale(1); }
+}
+
+/* ── Evidence wisps (glowing = free flip; plain = sting) ── */
+.eg-bay-wisp {
+    position: fixed;
+    font-size: 1.6rem;
+    line-height: 1;
+    z-index: 8560;
+    pointer-events: none;
+    filter: drop-shadow(0 0 6px rgba(196, 181, 253, 0.8));
+    transition: transform 0.2s ease;
+}
+.eg-bay-wisp-glow {
+    animation: eg-bay-wisp-glow-kf 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-bay-wisp-glow-kf {
+    from { filter: drop-shadow(0 0 6px rgba(134, 239, 172, 0.8)); transform: scale(1); }
+    to   { filter: drop-shadow(0 0 16px rgba(134, 239, 172, 1)) drop-shadow(0 0 30px rgba(134, 239, 172, 0.7)); transform: scale(1.18); }
+}
+
+/* ── Belief Veil upgrades (tint layer over the shared .eg-grid-veil) ── */
+.eg-bay-veil-tinted {
+    background:
+        linear-gradient(calc(90deg + var(--bay-lean, 0) * 0.2deg), rgba(139, 92, 246, 0.14), rgba(139, 92, 246, 0.05) 55%, transparent),
+        repeating-linear-gradient(45deg, rgba(139, 92, 246, 0.08) 0px, rgba(139, 92, 246, 0.08) 4px, transparent 4px, transparent 12px);
+}
+.eg-bay-veil-chip {
+    position: fixed;
+    left: 50%;
+    top: 88px;
+    transform: translateX(-50%);
+    padding: 4px 14px;
+    border-radius: 12px;
+    background: rgba(30, 20, 55, 0.88);
+    border: 2px solid rgba(196, 181, 253, 0.85);
+    color: #e9d5ff;
+    font-size: 0.8rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    z-index: 8801;
+    pointer-events: none;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+}
+.eg-bay-veil-chip-clear {
+    border-color: rgba(134, 239, 172, 0.9);
+    color: #bbf7d0;
+    box-shadow: 0 0 12px rgba(134, 239, 172, 0.55);
+}
+
+/* ── THEOMERE'S GAMBIT: 3×3 districts + truth chips ── */
+.eg-bay-district {
+    position: fixed;
+    width: 210px;
+    height: 164px;
+    border-radius: 14px;
+    border: 2px solid rgba(196, 181, 253, 0.35);
+    background: rgba(30, 20, 55, 0.30);
+    z-index: 8500;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+.eg-bay-chip {
+    min-width: 64px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: rgba(15, 10, 30, 0.92);
+    border: 2px solid rgba(196, 181, 253, 0.8);
+    color: #e9d5ff;
+    font-size: 1.05rem;
+    font-weight: 900;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.45);
+    transition: transform 0.2s ease;
+}
+.eg-bay-district-flipped {
+    border-color: rgba(250, 204, 21, 0.95);
+    background: rgba(250, 204, 21, 0.10);
+    box-shadow: 0 0 16px rgba(250, 204, 21, 0.5);
+}
+.eg-bay-district-flipped .eg-bay-chip {
+    border-color: rgba(250, 204, 21, 0.95);
+    color: #fef08a;
+    transform: scale(1.08) rotate(-2deg);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.65);
+}
+.eg-bay-district-strike {
+    border-color: rgba(248, 113, 113, 0.95);
+    background: rgba(248, 113, 113, 0.16);
+    box-shadow: 0 0 26px rgba(248, 113, 113, 0.75), inset 0 0 20px rgba(248, 113, 113, 0.35);
+    animation: eg-bay-strike-kf 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-bay-strike-kf {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.5); }
+}
+.eg-bay-district-safe-reveal {
+    border-color: rgba(134, 239, 172, 0.9);
+    background: rgba(134, 239, 172, 0.10);
+}
+
+/* ── All-in boss card (the oracle goes quiet and bets everything) ── */
+.eg-bay-allin {
+    animation: eg-bay-allin-kf 1.4s ease-in-out infinite alternate !important;
+}
+@keyframes eg-bay-allin-kf {
+    from { filter: drop-shadow(0 0 6px rgba(196, 181, 253, 0.7)); }
+    to   { filter: drop-shadow(0 0 20px rgba(167, 139, 250, 1)) drop-shadow(0 0 34px rgba(139, 92, 246, 0.8)); }
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-bay-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-bay-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #e9d5ff;
+    text-shadow: 0 0 18px rgba(139, 92, 246, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-bay-cd-hint {
+    font-size: 0.95rem;
+    color: #c4b5fd;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ENTROPY — "The Second Law" (Tier 7 rework)
+   Everything winds down; order is a resource you spend. All sprites are
+   self-contained position:fixed (no shared base class).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Order meter (bottom-centre HUD; fill height = --entr-order 0..100) ── */
+.eg-entr-order {
+    position: fixed;
+    left: 50%;
+    bottom: 84px;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 150px;
+    border-radius: 15px;
+    border: 2px solid rgba(147, 197, 253, 0.85);
+    background: rgba(8, 18, 34, 0.8);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.4), inset 0 0 8px rgba(0, 0, 0, 0.6);
+    z-index: 8800;
+    pointer-events: none;
+    overflow: hidden;
+}
+.eg-entr-order-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(var(--entr-order, 100) * 1%);
+    background: linear-gradient(180deg, #e0f2fe 0%, #7dd3fc 45%, #38bdf8 100%);
+    box-shadow: 0 0 12px rgba(125, 211, 252, 0.8);
+    transition: height 0.3s ease-out;
+}
+.eg-entr-order-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.56rem;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    color: #e0f2fe;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+    writing-mode: vertical-rl;
+}
+.eg-entr-order-low .eg-entr-order-fill {
+    background: linear-gradient(180deg, #fecaca 0%, #f87171 100%);
+    box-shadow: 0 0 12px rgba(248, 113, 113, 0.8);
+}
+.eg-entr-order-low .eg-entr-order-label { color: #fecaca; }
+
+/* ── Heat Death Drift: bloom telegraph, merged pools, ordered zones ── */
+.eg-entr-bloom-warn {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px dashed rgba(147, 197, 253, 0.8);
+    background: radial-gradient(circle, rgba(147, 197, 253, 0.18) 0%, transparent 70%);
+    z-index: 8550;
+    pointer-events: none;
+    animation: eg-entr-bloom-kf 0.6s ease-in-out infinite alternate;
+}
+@keyframes eg-entr-bloom-kf {
+    from { transform: scale(0.85); opacity: 0.55; }
+    to   { transform: scale(1.06); opacity: 1; }
+}
+.eg-entr-pool {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.42) 0%, rgba(14, 116, 144, 0.32) 55%, rgba(8, 47, 73, 0.18) 100%);
+    border: 2px solid rgba(125, 211, 252, 0.5);
+    box-shadow: inset 0 0 30px rgba(56, 189, 248, 0.35), 0 0 18px rgba(56, 189, 248, 0.25);
+    z-index: 8500;
+    pointer-events: none;
+    animation: eg-entr-pool-kf 4.5s ease-in-out infinite alternate;
+}
+@keyframes eg-entr-pool-kf {
+    from { filter: brightness(0.92); }
+    to   { filter: brightness(1.12); }
+}
+.eg-entr-zone {
+    position: fixed;
+    border-radius: 50%;
+    border: 3px solid rgba(254, 240, 138, 0.95);
+    background: radial-gradient(circle, rgba(254, 240, 138, 0.20) 0%, rgba(254, 240, 138, 0.06) 55%, transparent 72%);
+    box-shadow: 0 0 22px rgba(254, 240, 138, 0.55), inset 0 0 18px rgba(254, 240, 138, 0.35);
+    z-index: 8560;
+    pointer-events: none;
+    animation: eg-entr-zone-kf 1.6s ease-in-out infinite alternate;
+}
+@keyframes eg-entr-zone-kf {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.25); }
+}
+
+/* ── Recursive Decay: cursed cells (standing on one burns it out) ── */
+.eg-entr-cell {
+    position: fixed;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.35) 0%, rgba(21, 128, 61, 0.28) 60%, rgba(20, 83, 45, 0.15) 100%);
+    border: 2px solid rgba(134, 239, 172, 0.8);
+    box-shadow: 0 0 12px rgba(134, 239, 172, 0.5);
+    z-index: 8540;
+    pointer-events: none;
+    animation: eg-entr-cell-kf 2.2s ease-in-out infinite alternate;
+}
+@keyframes eg-entr-cell-kf {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.15); }
+}
+.eg-entr-cell-burning {
+    border-color: rgba(251, 191, 36, 0.95);
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.85);
+    animation: eg-entr-cell-burn-kf 0.3s linear infinite alternate;
+}
+@keyframes eg-entr-cell-burn-kf {
+    from { filter: brightness(0.95) hue-rotate(0deg); }
+    to   { filter: brightness(1.5) hue-rotate(-30deg); }
+}
+
+/* ── Maxwell's Door: the hot and cold choices ── */
+.eg-entr-door {
+    position: fixed;
+    width: 68px;
+    height: 104px;
+    border-radius: 34px 34px 6px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    z-index: 8565;
+    pointer-events: none;
+    animation: eg-entr-door-kf 1.3s ease-in-out infinite alternate;
+}
+@keyframes eg-entr-door-kf {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.3); }
+}
+.eg-entr-door-hot {
+    background: linear-gradient(180deg, rgba(251, 146, 60, 0.35), rgba(154, 52, 18, 0.3));
+    border: 3px solid rgba(253, 186, 116, 0.95);
+    box-shadow: 0 0 22px rgba(251, 146, 60, 0.7), inset 0 0 14px rgba(251, 146, 60, 0.4);
+}
+.eg-entr-door-cold {
+    background: linear-gradient(180deg, rgba(125, 211, 252, 0.35), rgba(12, 74, 110, 0.3));
+    border: 3px solid rgba(147, 197, 253, 0.95);
+    box-shadow: 0 0 22px rgba(125, 211, 252, 0.7), inset 0 0 14px rgba(125, 211, 252, 0.4);
+}
+/* Elemental auras on the avatar while a door state lasts. */
+.eg-entr-hot-aura {
+    filter: drop-shadow(0 0 10px rgba(251, 146, 60, 0.95)) drop-shadow(0 0 22px rgba(251, 146, 60, 0.6)) !important;
+}
+.eg-entr-cold-aura {
+    filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.95)) drop-shadow(0 0 22px rgba(125, 211, 252, 0.6)) !important;
+}
+
+/* ── THE LAST DEGREE: lattice, singularity, shards, sparks ── */
+.eg-entr-lattice {
+    position: fixed;
+    inset: 0;
+    z-index: 8400;
+    pointer-events: none;
+    background:
+        linear-gradient(rgba(186, 230, 253, 0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(186, 230, 253, 0.14) 1px, transparent 1px);
+    background-size: 64px 64px;
+    animation: eg-entr-lattice-kf 7s linear infinite;
+}
+@keyframes eg-entr-lattice-kf {
+    from { background-position: 0 0, 0 0; }
+    to   { background-position: 64px 64px, 64px 64px; }
+}
+.eg-entr-singularity {
+    position: fixed;
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(224, 242, 254, 0.5) 0%, rgba(56, 189, 248, 0.28) 40%, rgba(8, 47, 73, 0.12) 70%, transparent 100%);
+    border: 3px solid rgba(186, 230, 253, 0.9);
+    box-shadow: 0 0 34px rgba(125, 211, 252, 0.85), inset 0 0 24px rgba(186, 230, 253, 0.5);
+    z-index: 8560;
+    pointer-events: none;
+    animation: eg-entr-sing-kf 2.6s ease-in-out infinite alternate;
+}
+@keyframes eg-entr-sing-kf {
+    from { transform: scale(0.94); filter: brightness(0.9); }
+    to   { transform: scale(1.06); filter: brightness(1.25); }
+}
+.eg-entr-shard-warn {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px dashed rgba(253, 230, 138, 0.9);
+    background: radial-gradient(circle, rgba(253, 230, 138, 0.22) 0%, transparent 70%);
+    z-index: 8565;
+    pointer-events: none;
+    animation: eg-entr-bloom-kf 0.5s ease-in-out infinite alternate;
+}
+.eg-entr-shard {
+    position: fixed;
+    font-size: 1.7rem;
+    line-height: 1;
+    z-index: 8570;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgba(253, 230, 138, 1)) drop-shadow(0 0 20px rgba(253, 230, 138, 0.7));
+    animation: eg-entr-shard-kf 1s ease-in-out infinite alternate;
+}
+@keyframes eg-entr-shard-kf {
+    from { transform: scale(0.95) rotate(-8deg); }
+    to   { transform: scale(1.1) rotate(8deg); }
+}
+.eg-entr-spark {
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fffbeb 0%, #fde68a 45%, rgba(253, 230, 138, 0) 75%);
+    box-shadow: 0 0 20px 6px rgba(253, 230, 138, 0.95);
+    z-index: 8600;
+    pointer-events: none;
+    animation: eg-entr-spark-kf 1.15s cubic-bezier(0.4, 0, 0.9, 0.6) forwards;
+}
+@keyframes eg-entr-spark-kf {
+    from { transform: translate(0, 0) scale(0.9); opacity: 1; }
+    to   { transform: translate(var(--fly-dx, 0px), var(--fly-dy, 0px)) scale(0.35); opacity: 0.85; }
+}
+.eg-entr-heatwave {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 6px solid rgba(248, 113, 113, 0.9);
+    background: rgba(248, 113, 113, 0.15);
+    box-shadow: 0 0 40px 16px rgba(248, 113, 113, 0.6);
+    transform: translate(-50%, -50%);
+    z-index: 8650;
+    pointer-events: none;
+    animation: eg-entr-heatwave-kf 2.2s ease-out forwards;
+}
+@keyframes eg-entr-heatwave-kf {
+    from { width: 10px; height: 10px; opacity: 0.6; }
+    to   { width: 260vmax; height: 260vmax; opacity: 0.95; }
+}
+.eg-entr-restart-flash {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 251, 235, 0.95) 0%, rgba(253, 230, 138, 0.55) 35%, rgba(253, 230, 138, 0) 75%);
+    z-index: 8700;
+    pointer-events: none;
+    animation: eg-entr-restart-kf 1.4s ease-out forwards;
+}
+@keyframes eg-entr-restart-kf {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* ── Boss card states (all-in freeze / shard-hit flare) ── */
+.eg-entr-allin {
+    animation: eg-entr-allin-kf 2s ease-in-out infinite alternate !important;
+}
+@keyframes eg-entr-allin-kf {
+    from { filter: drop-shadow(0 0 6px rgba(186, 230, 253, 0.7)); }
+    to   { filter: drop-shadow(0 0 20px rgba(125, 211, 252, 1)) drop-shadow(0 0 30px rgba(56, 189, 248, 0.8)); }
+}
+.eg-entr-hit {
+    animation: eg-entr-hit-kf 0.5s ease-out !important;
+}
+@keyframes eg-entr-hit-kf {
+    0%   { filter: brightness(1); }
+    35%  { filter: brightness(2.2) drop-shadow(0 0 22px rgba(253, 230, 138, 1)); }
+    100% { filter: brightness(1); }
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-entr-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-entr-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #e0f2fe;
+    text-shadow: 0 0 18px rgba(56, 189, 248, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-entr-cd-timer {
+    font-weight: 900;
+    font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+    color: #fde68a;
+    text-shadow: 0 0 12px rgba(253, 230, 138, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+.eg-entr-cd-hint {
+    font-size: 0.95rem;
+    color: #bae6fd;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LAPLACE'S DEMON — "It Has Already Seen This" (Tier 7 rework)
+   The boss predicts; you falsify. Every telegraph pre-runs as a harmless
+   ghost. All sprites are self-contained position:fixed.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Ghost pre-run: dashed corridor + translucent head ── */
+.eg-lap-ghost-corridor {
+    position: fixed;
+    border: 2px dashed rgba(240, 171, 252, 0.55);
+    background: repeating-linear-gradient(90deg, rgba(240, 171, 252, 0.06) 0px, rgba(240, 171, 252, 0.06) 14px, transparent 14px, transparent 28px);
+    z-index: 8540;
+    pointer-events: none;
+    opacity: 0.8;
+}
+.eg-lap-ghost-head {
+    position: fixed;
+    font-size: 1.5rem;
+    line-height: 1;
+    z-index: 8550;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgba(240, 171, 252, 0.9));
+    opacity: 0.85;
+}
+
+/* ── The real lance: solid fire corridor + head + endpoint pin ── */
+.eg-lap-lance {
+    position: fixed;
+    background: linear-gradient(180deg, rgba(251, 146, 60, 0.1) 0%, rgba(251, 146, 60, 0.5) 30%, rgba(253, 224, 71, 0.65) 50%, rgba(251, 146, 60, 0.5) 70%, rgba(251, 146, 60, 0.1) 100%);
+    border-top: 2px solid rgba(253, 224, 71, 0.9);
+    border-bottom: 2px solid rgba(253, 224, 71, 0.9);
+    box-shadow: 0 0 24px rgba(251, 146, 60, 0.7);
+    z-index: 8600;
+    pointer-events: none;
+}
+.eg-lap-lance-full {
+    background: linear-gradient(90deg, rgba(251, 146, 60, 0.2) 0%, rgba(253, 224, 71, 0.75) 12%, rgba(251, 146, 60, 0.75) 50%, rgba(253, 224, 71, 0.75) 88%, rgba(251, 146, 60, 0.2) 100%);
+    box-shadow: 0 0 30px rgba(251, 146, 60, 0.8);
+}
+.eg-lap-lance-head {
+    position: fixed;
+    font-size: 1.5rem;
+    line-height: 1;
+    z-index: 8610;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(253, 224, 71, 1));
+}
+.eg-lap-pin-blast {
+    position: fixed;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 5px solid rgba(253, 224, 71, 0.95);
+    background: radial-gradient(circle, rgba(253, 224, 71, 0.35) 0%, rgba(251, 146, 60, 0.18) 55%, transparent 75%);
+    box-shadow: 0 0 30px rgba(253, 224, 71, 0.8);
+    z-index: 8590;
+    pointer-events: none;
+    animation: eg-lap-pin-kf 0.7s ease-out forwards;
+}
+@keyframes eg-lap-pin-kf {
+    from { transform: scale(0.4); opacity: 1; }
+    to   { transform: scale(1.08); opacity: 0.25; }
+}
+
+/* ── Conditional Branches: walk lines, phantoms, future cells ── */
+.eg-lap-walk-line {
+    position: fixed;
+    background: repeating-linear-gradient(90deg, rgba(240, 171, 252, 0.7) 0px, rgba(240, 171, 252, 0.7) 10px, transparent 10px, transparent 20px);
+    z-index: 8530;
+    pointer-events: none;
+    opacity: 0.65;
+}
+.eg-lap-phantom {
+    position: fixed;
+    font-size: 1.6rem;
+    line-height: 1;
+    z-index: 8560;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgba(240, 171, 252, 0.9));
+    opacity: 0.9;
+}
+.eg-lap-phantom-hunter {
+    filter: drop-shadow(0 0 12px rgba(248, 113, 113, 1));
+    opacity: 1;
+}
+.eg-lap-branch {
+    position: fixed;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 900;
+    background: rgba(30, 16, 48, 0.88);
+    border: 2px solid rgba(240, 171, 252, 0.7);
+    color: #f0abfc;
+    z-index: 8565;
+    pointer-events: none;
+    box-shadow: 0 0 12px rgba(240, 171, 252, 0.4);
+    transition: transform 0.2s ease;
+}
+.eg-lap-branch-true {
+    border-color: rgba(134, 239, 172, 0.95);
+    color: #bbf7d0;
+    box-shadow: 0 0 18px rgba(134, 239, 172, 0.7);
+    transform: scale(1.1);
+}
+.eg-lap-branch-fake {
+    border-color: rgba(167, 243, 208, 0.8);
+    color: #a7f3d0;
+}
+
+/* ── Ghost-form (greed window) + dizzy swap ── */
+.eg-lap-ghost {
+    animation: eg-lap-ghostform-kf 0.5s ease-in-out infinite alternate !important;
+}
+@keyframes eg-lap-ghostform-kf {
+    from { filter: drop-shadow(0 0 6px rgba(167, 243, 208, 0.8)); opacity: 0.85; }
+    to   { filter: drop-shadow(0 0 18px rgba(167, 243, 208, 1)); opacity: 0.55; }
+}
+.eg-lap-dizzy #player-avatar-wrapper,
+.eg-lap-dizzy #player-avatar-simple {
+    animation: eg-lap-dizzy-kf 0.6s ease-in-out;
+}
+@keyframes eg-lap-dizzy-kf {
+    0%   { filter: blur(0); }
+    30%  { filter: blur(2.5px) hue-rotate(18deg); }
+    60%  { filter: blur(1.5px) hue-rotate(-12deg); }
+    100% { filter: blur(0); }
+}
+
+/* ── Timeline Fray: recorded path dots + the clone ── */
+.eg-lap-fray-dot {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(240, 171, 252, 0.8);
+    box-shadow: 0 0 6px rgba(240, 171, 252, 0.7);
+    z-index: 8520;
+    pointer-events: none;
+}
+.eg-lap-clone {
+    position: fixed;
+    font-size: 1.6rem;
+    line-height: 1;
+    z-index: 8560;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgba(196, 181, 253, 0.95));
+    animation: eg-lap-clone-kf 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-lap-clone-kf {
+    from { opacity: 0.75; transform: scale(0.96); }
+    to   { opacity: 1; transform: scale(1.04); }
+}
+
+/* ── THE CLOSED TIMELINE: nodes, loop warn bands, collapse ── */
+.eg-lap-node {
+    position: fixed;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background:
+        radial-gradient(closest-side, rgba(30, 16, 48, 0.9) 74%, transparent 76% 100%),
+        conic-gradient(#a7f3d0 calc(var(--node-prog, 0) * 100%), rgba(167, 243, 208, 0.22) 0);
+    border: 2px solid rgba(167, 243, 208, 0.85);
+    box-shadow: 0 0 14px rgba(167, 243, 208, 0.55);
+    z-index: 8570;
+    pointer-events: none;
+}
+.eg-lap-node-breaking {
+    animation: eg-lap-node-kf 0.4s ease-in-out infinite alternate;
+}
+@keyframes eg-lap-node-kf {
+    from { filter: brightness(0.95); }
+    to   { filter: brightness(1.5); }
+}
+.eg-lap-loop-warn {
+    position: fixed;
+    border: 2px dashed rgba(253, 224, 71, 0.85);
+    background: repeating-linear-gradient(90deg, rgba(253, 224, 71, 0.14) 0px, rgba(253, 224, 71, 0.14) 16px, transparent 16px, transparent 32px);
+    z-index: 8590;
+    pointer-events: none;
+    animation: eg-lap-warn-kf 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-lap-warn-kf {
+    from { opacity: 0.55; }
+    to   { opacity: 1; }
+}
+.eg-lap-collapse {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(240, 171, 252, 0.9) 0%, rgba(167, 139, 250, 0.5) 40%, rgba(167, 139, 250, 0) 75%);
+    z-index: 8700;
+    pointer-events: none;
+    animation: eg-lap-collapse-kf 1.5s ease-out forwards;
+}
+@keyframes eg-lap-collapse-kf {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* ── Boss card state (looping all-in freeze) ── */
+.eg-lap-allin {
+    animation: eg-lap-allin-kf 1.1s ease-in-out infinite alternate !important;
+}
+@keyframes eg-lap-allin-kf {
+    from { filter: drop-shadow(0 0 6px rgba(240, 171, 252, 0.7)); transform: none; }
+    to   { filter: drop-shadow(0 0 20px rgba(240, 171, 252, 1)); transform: translateY(-2px); }
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-lap-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-align: center;
+}
+.eg-lap-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #f5d0fe;
+    text-shadow: 0 0 18px rgba(240, 171, 252, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-lap-cd-loop {
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    font-size: clamp(0.95rem, 2vw, 1.3rem);
+    color: #a7f3d0;
+    text-shadow: 0 0 10px rgba(167, 243, 208, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+.eg-lap-cd-timer {
+    font-weight: 900;
+    font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+    color: #fde68a;
+    text-shadow: 0 0 12px rgba(253, 230, 138, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+.eg-lap-cd-hint {
+    font-size: 0.95rem;
+    color: #f0abfc;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THE INFERNO — "The Living Volcano" (Tier 7 rework)
+   Escalating heat you must actively cool. All sprites are self-contained
+   position:fixed (no shared base class).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Heat meter (bottom-left HUD; fill width = --infv-heat 0..100) ── */
+.eg-infv-heat {
+    position: fixed;
+    left: 50%;
+    bottom: 54px;
+    transform: translateX(-50%);
+    width: min(320px, 44vw);
+    height: 18px;
+    border-radius: 9px;
+    border: 2px solid rgba(251, 146, 60, 0.9);
+    background: rgba(30, 12, 4, 0.82);
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.45), inset 0 0 8px rgba(0, 0, 0, 0.65);
+    z-index: 8800;
+    pointer-events: none;
+    overflow: hidden;
+}
+.eg-infv-heat-fill {
+    position: absolute;
+    inset: 0;
+    width: calc(var(--infv-heat, 0) * 1%);
+    background: linear-gradient(90deg, #fdba74 0%, #f97316 55%, #ef4444 100%);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.85);
+    transition: width 0.25s ease-out;
+}
+.eg-infv-heat-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.58rem;
+    font-weight: 900;
+    letter-spacing: 0.28em;
+    color: #ffedd5;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+.eg-infv-heat-critical .eg-infv-heat-fill {
+    background: linear-gradient(90deg, #fca5a5 0%, #ef4444 60%, #dc2626 100%);
+    animation: eg-infv-heat-crit-kf 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-infv-heat-crit-kf {
+    from { filter: brightness(0.95); }
+    to   { filter: brightness(1.45); }
+}
+
+/* ── Magma Tides: telegraphs, lava floods, obsidian tiles ── */
+.eg-infv-tide-warn {
+    position: fixed;
+    background: repeating-linear-gradient(45deg, rgba(249, 115, 22, 0.16) 0px, rgba(249, 115, 22, 0.16) 12px, rgba(124, 45, 18, 0.22) 12px, rgba(124, 45, 18, 0.22) 24px);
+    border: 2px dashed rgba(251, 146, 60, 0.7);
+    z-index: 8500;
+    pointer-events: none;
+    animation: eg-infv-warn-pulse 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-infv-warn-pulse {
+    from { opacity: 0.5; }
+    to   { opacity: 1; }
+}
+.eg-infv-lava {
+    position: fixed;
+    background:
+        radial-gradient(ellipse 90px 26px at 22% 30%, rgba(253, 224, 71, 0.35), transparent 70%),
+        radial-gradient(ellipse 120px 30px at 70% 64%, rgba(253, 224, 71, 0.3), transparent 70%),
+        linear-gradient(180deg, rgba(234, 88, 12, 0.62) 0%, rgba(194, 65, 12, 0.7) 45%, rgba(120, 33, 8, 0.78) 100%);
+    box-shadow: inset 0 0 60px rgba(253, 186, 116, 0.35);
+    z-index: 8480;
+    pointer-events: none;
+    animation: eg-infv-lava-kf 3.2s ease-in-out infinite alternate;
+}
+@keyframes eg-infv-lava-kf {
+    from { filter: brightness(0.92); }
+    to   { filter: brightness(1.14); }
+}
+.eg-infv-tile {
+    position: fixed;
+    width: 68px;
+    height: 68px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(38, 38, 42, 0.96) 0%, rgba(18, 18, 22, 0.96) 100%);
+    border: 3px solid rgba(148, 163, 184, 0.85);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(226, 232, 240, 0.25);
+    z-index: 8520;
+    pointer-events: none;
+    transition: transform 0.4s ease;
+}
+.eg-infv-tile[data-crack='1'] {
+    border-color: rgba(214, 211, 209, 0.75);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7), 0 4px 10px rgba(0, 0, 0, 0.6);
+    transform: scale(0.96);
+}
+.eg-infv-tile[data-crack='2'] {
+    border-color: rgba(120, 113, 108, 0.7);
+    box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.85);
+    transform: scale(0.9) rotate(2deg);
+}
+
+/* ── Pyroclastic Surge: wall, gaps, ash, edge telegraph ── */
+.eg-infv-wall {
+    position: fixed;
+    background: linear-gradient(90deg, rgba(253, 224, 71, 0.85) 0%, rgba(249, 115, 22, 0.92) 30%, rgba(234, 88, 12, 0.95) 100%);
+    box-shadow: 0 0 34px rgba(249, 115, 22, 0.9), inset 0 0 18px rgba(253, 224, 71, 0.5);
+    z-index: 8600;
+    pointer-events: none;
+}
+.eg-infv-surge-warn {
+    position: fixed;
+    background: rgba(253, 224, 71, 0.75);
+    box-shadow: 0 0 18px rgba(253, 224, 71, 1);
+    z-index: 8580;
+    pointer-events: none;
+    animation: eg-infv-warn-pulse 0.4s ease-in-out infinite alternate;
+}
+.eg-infv-ash {
+    position: fixed;
+    background:
+        radial-gradient(ellipse 140px 60px at 30% 20%, rgba(120, 113, 108, 0.32), transparent 70%),
+        radial-gradient(ellipse 180px 70px at 60% 70%, rgba(87, 83, 78, 0.38), transparent 70%),
+        rgba(41, 37, 36, 0.55);
+    z-index: 8590;
+    pointer-events: none;
+    animation: eg-infv-ash-kf 2.4s ease-in-out infinite alternate;
+}
+@keyframes eg-infv-ash-kf {
+    from { opacity: 0.75; }
+    to   { opacity: 0.95; }
+}
+
+/* ── Eruption Vents: telegraph, jet, heat haze ── */
+.eg-infv-vent-warn {
+    position: fixed;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.9);
+    background: radial-gradient(circle, rgba(248, 113, 113, 0.2) 0%, transparent 70%);
+    z-index: 8550;
+    pointer-events: none;
+    animation: eg-infv-warn-pulse 0.5s ease-in-out infinite alternate;}
+.eg-infv-jet {
+    position: fixed;
+    width: 68px;
+    background: linear-gradient(180deg, rgba(253, 224, 71, 0.9) 0%, rgba(249, 115, 22, 0.8) 40%, rgba(234, 88, 12, 0.35) 100%);
+    border-radius: 34px;
+    box-shadow: 0 0 26px rgba(249, 115, 22, 0.9);
+    z-index: 8620;
+    pointer-events: none;
+    animation: eg-infv-jet-kf 0.55s ease-out forwards;
+}
+@keyframes eg-infv-jet-kf {
+    0%   { transform: scaleY(0.15); opacity: 0; transform-origin: bottom; }
+    25%  { transform: scaleY(1.15); opacity: 1; }
+    100% { transform: scaleY(1); opacity: 0.75; }
+}
+.eg-infv-haze {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.22) 0%, rgba(251, 146, 60, 0.1) 55%, transparent 75%);
+    border: 2px solid rgba(251, 146, 60, 0.45);
+    z-index: 8540;
+    pointer-events: none;
+    animation: eg-infv-haze-kf 2s ease-in-out infinite alternate;
+}
+@keyframes eg-infv-haze-kf {
+    from { filter: blur(0px); }
+    to   { filter: blur(2px) brightness(1.2); }
+}
+
+/* ── SUPERVOLCANIC WINTER: ice sheet, fissures, surges, bombs ── */
+.eg-infv-ice {
+    position: fixed;
+    inset: 0;
+    z-index: 8400;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(224, 242, 254, 0.1), transparent 40%),
+        radial-gradient(circle at 75% 65%, rgba(224, 242, 254, 0.12), transparent 45%),
+        linear-gradient(160deg, rgba(186, 230, 253, 0.16) 0%, rgba(125, 211, 252, 0.1) 50%, rgba(224, 242, 254, 0.18) 100%);
+    animation: eg-infv-ice-kf 6s ease-in-out infinite alternate;
+}
+@keyframes eg-infv-ice-kf {
+    from { filter: brightness(0.95); }
+    to   { filter: brightness(1.1); }
+}
+.eg-infv-fissure {
+    position: fixed;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 3px solid rgba(56, 189, 248, 0.95);
+    background:
+        radial-gradient(closest-side, rgba(8, 47, 73, 0.9) 62%, transparent 66% 100%),
+        conic-gradient(#38bdf8 calc(var(--vent-glow, 0) * 100%), rgba(56, 189, 248, 0.2) 0);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
+    z-index: 8560;
+    pointer-events: none;
+    animation: eg-infv-warn-pulse 0.6s ease-in-out infinite alternate;
+}
+.eg-infv-surge-blob {
+    position: fixed;
+    width: 120px;
+    height: 88px;
+    border-radius: 60px;
+    background: radial-gradient(ellipse at 50% 40%, #fde047 0%, #f97316 45%, rgba(194, 65, 12, 0.85) 100%);
+    box-shadow: 0 0 30px rgba(249, 115, 22, 1), inset 0 0 14px rgba(253, 224, 71, 0.8);
+    z-index: 8610;
+    pointer-events: none;
+    animation: eg-infv-blob-kf 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-infv-blob-kf {
+    from { transform: scale(1); }
+    to   { transform: scale(1.08); }
+}
+.eg-infv-vent-flash {
+    position: fixed;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(254, 240, 138, 0.95) 0%, rgba(249, 115, 22, 0.5) 45%, transparent 72%);
+    z-index: 8650;
+    pointer-events: none;
+    animation: eg-infv-flash-kf 0.9s ease-out forwards;
+}
+@keyframes eg-infv-flash-kf {
+    from { transform: scale(0.3); opacity: 1; }
+    to   { transform: scale(1.15); opacity: 0; }
+}
+.eg-infv-bomb-warn {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95);
+    background: radial-gradient(circle, rgba(248, 113, 113, 0.25) 0%, transparent 70%);
+    z-index: 8570;
+    pointer-events: none;
+    animation: eg-infv-warn-pulse 0.45s ease-in-out infinite alternate;
+}
+.eg-infv-bomb-boom {
+    position: fixed;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fef08a 0%, rgba(249, 115, 22, 0.75) 40%, transparent 72%);
+    box-shadow: 0 0 34px rgba(249, 115, 22, 1);
+    z-index: 8620;
+    pointer-events: none;
+    animation: eg-infv-flash-kf 0.7s ease-out forwards;
+}
+.eg-infv-laststand {
+    position: fixed;
+    background: radial-gradient(circle at 50% 50%, rgba(254, 240, 138, 0.85) 0%, rgba(239, 68, 68, 0.6) 35%, rgba(127, 29, 29, 0.5) 70%, rgba(30, 58, 138, 0.4) 100%);
+    z-index: 8660;
+    pointer-events: none;
+    animation: eg-infv-flash-kf 1.6s ease-out forwards;
+}
+.eg-infv-restart-flash {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(254, 240, 138, 0.95) 0%, rgba(249, 115, 22, 0.55) 40%, rgba(186, 230, 253, 0.35) 70%, rgba(186, 230, 253, 0) 100%);
+    z-index: 8700;
+    pointer-events: none;
+    animation: eg-infv-flash-kf 1.5s ease-out forwards;
+}
+
+/* ── Boss card state (inverted to ice during the winter) ── */
+.eg-infv-allin {
+    animation: eg-infv-allin-kf 2.2s ease-in-out infinite alternate !important;
+}
+@keyframes eg-infv-allin-kf {
+    from { filter: drop-shadow(0 0 8px rgba(186, 230, 253, 0.8)) drop-shadow(0 0 6px rgba(249, 115, 22, 0.5)); }
+    to   { filter: drop-shadow(0 0 18px rgba(125, 211, 252, 1)) drop-shadow(0 0 24px rgba(56, 189, 248, 0.8)); }
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-infv-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-infv-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #bae6fd;
+    text-shadow: 0 0 18px rgba(56, 189, 248, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-infv-cd-timer {
+    font-weight: 900;
+    font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+    color: #fde68a;
+    text-shadow: 0 0 12px rgba(253, 230, 138, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+.eg-infv-cd-hint {
+    font-size: 0.95rem;
+    color: #bae6fd;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THE NULL — "The Null Hypothesis" (Tier 7 rework)
+   Erasure of certainty: void lines, readable sabotage, pure-white proof.
+   All sprites are self-contained position:fixed (no shared base class).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Void Lattice: floor lines + hexagon ring segments ── */
+.eg-nul-line {
+    position: fixed;
+    background: linear-gradient(90deg, rgba(129, 140, 248, 0.1) 0%, rgba(165, 180, 252, 0.75) 18%, rgba(67, 56, 202, 0.85) 50%, rgba(165, 180, 252, 0.75) 82%, rgba(129, 140, 248, 0.1) 100%);
+    box-shadow: 0 0 10px rgba(129, 140, 248, 0.7);
+    z-index: 8450;
+    pointer-events: none;
+    animation: eg-nul-line-kf 2.6s ease-in-out infinite alternate;
+}
+@keyframes eg-nul-line-kf {
+    from { opacity: 0.7; }
+    to   { opacity: 1; }
+}
+.eg-nul-ring-seg {
+    background: linear-gradient(90deg, rgba(165, 180, 252, 0.5) 0%, rgba(129, 140, 248, 0.85) 50%, rgba(165, 180, 252, 0.5) 100%);
+}
+
+/* ── Null Rays: anchor + orbiting eye-beams ── */
+.eg-nul-anchor {
+    position: fixed;
+    font-size: 2.1rem;
+    line-height: 1;
+    z-index: 8560;
+    pointer-events: none;
+    filter: drop-shadow(0 0 12px rgba(129, 140, 248, 1)) drop-shadow(0 0 26px rgba(79, 70, 229, 0.8));
+    animation: eg-nul-anchor-kf 1.8s ease-in-out infinite alternate;
+}
+@keyframes eg-nul-anchor-kf {
+    from { transform: scale(0.94); }
+    to   { transform: scale(1.08); }
+}
+.eg-nul-ray {
+    position: fixed;
+    background: linear-gradient(180deg, rgba(196, 181, 253, 0.12) 0%, rgba(129, 140, 248, 0.65) 50%, rgba(196, 181, 253, 0.12) 100%);
+    border-top: 1px solid rgba(199, 210, 254, 0.8);
+    border-bottom: 1px solid rgba(199, 210, 254, 0.8);
+    box-shadow: 0 0 16px rgba(129, 140, 248, 0.7);
+    z-index: 8580;
+    pointer-events: none;
+}
+
+/* ── Hypothesis Erasure: marker + greyed-out state ── */
+.eg-nul-erase-marker {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    z-index: 9100;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(129, 140, 248, 1));
+    animation: eg-nul-marker-kf 1.4s ease-in-out infinite alternate;
+}
+@keyframes eg-nul-marker-kf {
+    from { opacity: 0.65; }
+    to   { opacity: 1; }
+}
+.eg-nul-erase-marker-free {
+    position: fixed;
+    left: 50%;
+    top: 14%;
+    transform: translate(-50%, -50%);
+}
+.eg-nul-erased {
+    filter: grayscale(1) brightness(0.55) !important;
+    opacity: 0.45 !important;
+}
+
+/* ── PROOF BY CONTRADICTION: white-out, phantom, strike, shells ── */
+.eg-nul-white {
+    position: fixed;
+    inset: 0;
+    z-index: 8400;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.97) 0%, rgba(238, 242, 255, 0.93) 55%, rgba(224, 231, 255, 0.88) 100%);
+    animation: eg-nul-white-kf 5s ease-in-out infinite alternate;
+}
+@keyframes eg-nul-white-kf {
+    from { filter: brightness(0.98); }
+    to   { filter: brightness(1.03); }
+}
+.eg-nul-phantom {
+    position: fixed;
+    font-size: 1.7rem;
+    line-height: 1;
+    z-index: 8520;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.95));
+    opacity: 0.85;
+    animation: eg-nul-phantom-kf 0.8s ease-in-out infinite alternate;
+}
+@keyframes eg-nul-phantom-kf {
+    from { opacity: 0.6; }
+    to   { opacity: 0.95; }
+}
+.eg-nul-strike-warn {
+    position: fixed;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.95);
+    background: radial-gradient(circle, rgba(248, 113, 113, 0.25) 0%, transparent 70%);
+    z-index: 8530;
+    pointer-events: none;
+    animation: eg-infv-warn-pulse 0.45s ease-in-out infinite alternate;
+}
+.eg-nul-shatter {
+    position: fixed;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background:
+        conic-gradient(from 20deg, rgba(165, 180, 252, 0.9) 0 12deg, transparent 12deg 40deg, rgba(199, 210, 254, 0.8) 40deg 55deg, transparent 55deg 90deg, rgba(129, 140, 248, 0.85) 90deg 105deg, transparent 105deg 150deg, rgba(199, 210, 254, 0.75) 150deg 168deg, transparent 168deg 210deg, rgba(129, 140, 248, 0.8) 210deg 226deg, transparent 226deg 280deg, rgba(199, 210, 254, 0.8) 280deg 292deg, transparent 292deg 360deg),
+        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(165, 180, 252, 0.4) 55%, transparent 75%);
+    z-index: 8560;
+    pointer-events: none;
+    animation: eg-nul-shatter-kf 0.8s ease-out forwards;
+}
+@keyframes eg-nul-shatter-kf {
+    from { transform: scale(0.4) rotate(0deg); opacity: 1; }
+    to   { transform: scale(1.25) rotate(18deg); opacity: 0; }
+}
+.eg-nul-implode {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0%, rgba(199, 210, 254, 0.7) 30%, rgba(67, 56, 202, 0.45) 60%, rgba(30, 27, 75, 0) 100%);
+    z-index: 8700;
+    pointer-events: none;
+    animation: eg-nul-implode-kf 1.5s ease-in forwards;
+}
+@keyframes eg-nul-implode-kf {
+    from { opacity: 0; transform: scale(1.4); }
+    40%  { opacity: 1; }
+    to   { opacity: 0; transform: scale(0.2); }
+}
+.eg-nul-dark {
+    position: fixed;
+    inset: 0;
+    z-index: 8650;
+    pointer-events: none;
+    background: rgba(2, 2, 8, 0.97);
+    animation: eg-nul-dark-kf 1s ease-out forwards;
+}
+@keyframes eg-nul-dark-kf {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+.eg-nul-ring-safe {
+    position: fixed;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    border: 5px solid rgba(255, 255, 255, 1);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 60%, transparent 72%);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.85), inset 0 0 22px rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    margin-left: 130px;
+    margin-top: 130px;
+    z-index: 8660;
+    pointer-events: none;
+    animation: eg-nul-ring-kf 1.6s ease-in-out infinite alternate;
+}
+@keyframes eg-nul-ring-kf {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.2); }
+}
+
+/* ── Boss card state (whitened all-in freeze) ── */
+.eg-nul-allin {
+    animation: eg-nul-allin-kf 1.8s ease-in-out infinite alternate !important;
+}
+@keyframes eg-nul-allin-kf {
+    from { filter: drop-shadow(0 0 6px rgba(199, 210, 254, 0.8)); }
+    to   { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1)) drop-shadow(0 0 28px rgba(129, 140, 248, 0.9)); }
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-nul-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-align: center;
+}
+.eg-nul-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #312e81;
+    text-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 2px 6px rgba(224, 231, 255, 0.95);
+}
+.eg-nul-cd-status {
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    font-size: clamp(0.95rem, 2vw, 1.3rem);
+    color: #4338ca;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.95);
+}
+.eg-nul-cd-timer {
+    font-weight: 900;
+    font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+    color: #1e1b4b;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.95);
+}
+.eg-nul-cd-hint {
+    font-size: 0.95rem;
+    color: #4338ca;
+    text-shadow: 0 1px 4px rgba(255, 255, 255, 0.9);
+    max-width: 90vw;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THE BARRAGE — "The War-Machine Brute" (Tier 8 rework)
+   Artillery barrage theming: a creeping shelling curtain you fight
+   through, supply-drop jammers, shot shells with shrapnel lanes and the
+   FINAL BOMBARDMENT set-piece. All sprites are self-contained
+   position:fixed (no shared base class). Palette: artillery orange /
+   gunmetal — reads apart from Inferno's lava red.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Shelling curtain: the advancing wall of splashes ── */
+.eg-bar-curtain {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+        rgba(255, 107, 53, 0.10) 0%,
+        rgba(255, 107, 53, 0.34) 55%,
+        rgba(255, 214, 102, 0.72) 100%);
+    border-right: 3px solid rgba(255, 214, 102, 0.95);
+    box-shadow: 0 0 30px rgba(255, 107, 53, 0.5), inset 0 0 24px rgba(255, 107, 53, 0.35);
+}
+/* Phase 3 sweeps top→bottom — flip the gradient + bright edge */
+.eg-bar-curtain-v {
+    background: linear-gradient(180deg,
+        rgba(255, 107, 53, 0.10) 0%,
+        rgba(255, 107, 53, 0.34) 55%,
+        rgba(255, 214, 102, 0.72) 100%);
+    border-right: none;
+    border-bottom: 3px solid rgba(255, 214, 102, 0.95);
+}
+.eg-bar-splash {
+    position: fixed;
+    z-index: 8651;
+    pointer-events: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 236, 179, 0.95) 0%, rgba(255, 138, 61, 0.6) 55%, transparent 75%);
+    animation: eg-bar-splash-kf 0.7s ease-out forwards;
+}
+@keyframes eg-bar-splash-kf {
+    0%   { transform: scale(0.4); opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* ── Supply drop: crash telegraph + jammer crate ── */
+.eg-bar-drop-warn {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    width: 84px;
+    height: 84px;
+    border-radius: 12px;
+    border: 3px dashed rgba(255, 196, 92, 0.9);
+    background: rgba(255, 154, 60, 0.14);
+    box-shadow: 0 0 18px rgba(255, 154, 60, 0.45), inset 0 0 14px rgba(255, 154, 60, 0.25);
+    animation: eg-bar-drop-warn-kf 0.8s ease-in-out infinite alternate;
+}
+@keyframes eg-bar-drop-warn-kf {
+    from { transform: scale(0.85); opacity: 0.75; }
+    to   { transform: scale(1.08); opacity: 1; }
+}
+.eg-bar-jammer {
+    position: fixed;
+    z-index: 8651;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: rgba(30, 27, 22, 0.88);
+    border: 2px solid rgba(255, 196, 92, 0.8);
+    box-shadow: 0 0 14px rgba(255, 154, 60, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 0 8px rgba(255, 196, 92, 0.8);
+    animation: eg-bar-jammer-idle 1.6s ease-in-out infinite alternate;
+}
+@keyframes eg-bar-jammer-idle {
+    from { filter: brightness(0.95); }
+    to   { filter: brightness(1.25); }
+}
+
+/* ── Mortar shells (lobbed by jammers) ── */
+.eg-bar-mortar {
+    background: none !important;
+    font-size: 18px;
+    text-shadow: 0 0 8px rgba(255, 120, 40, 0.9);
+    z-index: 8652;
+}
+.eg-bar-mortar-boom {
+    position: fixed;
+    z-index: 8652;
+    pointer-events: none;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 176, 59, 0.95);
+    background: radial-gradient(circle, rgba(255, 176, 59, 0.5) 0%, rgba(255, 107, 53, 0.22) 60%, transparent 75%);
+    animation: eg-bar-boom-kf 0.5s ease-out forwards;
+}
+@keyframes eg-bar-boom-kf {
+    0%   { transform: scale(0.5); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ── Shot shells: ring telegraph + burst + shrapnel ── */
+.eg-bar-shell-warn {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    border: 3px dashed rgba(255, 214, 102, 0.9);
+    background: rgba(255, 107, 53, 0.12);
+    box-shadow: inset 0 0 16px rgba(255, 107, 53, 0.35);
+    animation: eg-bar-shell-warn-kf 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-bar-shell-warn-kf {
+    from { transform: scale(1); opacity: 0.7; }
+    to   { transform: scale(1.12); opacity: 1; }
+}
+.eg-bar-shell-boom {
+    position: fixed;
+    z-index: 8652;
+    pointer-events: none;
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 214, 102, 0.95);
+    background: radial-gradient(circle, rgba(255, 236, 179, 0.55) 0%, rgba(255, 107, 53, 0.3) 55%, transparent 78%);
+    box-shadow: 0 0 26px rgba(255, 138, 61, 0.8);
+    animation: eg-bar-boom-kf 0.5s ease-out forwards;
+}
+.eg-bar-shrap {
+    background: none !important;
+    font-size: 15px;
+    text-shadow: 0 0 7px rgba(255, 138, 61, 0.95);
+    z-index: 8652;
+}
+
+/* ── FINAL BOMBARDMENT: shelling grid tiles ── */
+.eg-bar-strike {
+    position: fixed;
+    z-index: 8649;
+    pointer-events: none;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 107, 53, 0.4);
+    background: rgba(255, 107, 53, 0.07);
+    transition: background 0.25s ease-out, box-shadow 0.25s ease-out;
+}
+.eg-bar-strike-safe {
+    border-color: rgba(134, 239, 172, 0.85);
+    background: rgba(134, 239, 172, 0.12);
+    box-shadow: inset 0 0 14px rgba(134, 239, 172, 0.3);
+}
+.eg-bar-safe-pulse {
+    animation: eg-bar-safe-pulse-kf 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-bar-safe-pulse-kf {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.6); box-shadow: inset 0 0 22px rgba(134, 239, 172, 0.65); }
+}
+.eg-bar-strike-hot {
+    border-color: rgba(255, 214, 102, 0.95);
+    background: rgba(255, 107, 53, 0.34);
+    box-shadow: 0 0 22px rgba(255, 138, 61, 0.75), inset 0 0 18px rgba(255, 107, 53, 0.45);
+    animation: eg-bar-hot-kf 0.7s ease-in-out infinite alternate;
+}
+@keyframes eg-bar-hot-kf {
+    from { filter: brightness(0.95); }
+    to   { filter: brightness(1.45); }
+}
+
+/* ── All-in boss card (the guns speak for themselves) ── */
+.eg-bar-allin {
+    animation: eg-bar-allin-kf 1.3s ease-in-out infinite alternate !important;
+}
+@keyframes eg-bar-allin-kf {
+    from { filter: drop-shadow(0 0 6px rgba(255, 154, 60, 0.7)); }
+    to   { filter: drop-shadow(0 0 20px rgba(255, 107, 53, 1)) drop-shadow(0 0 34px rgba(255, 214, 102, 0.8)); }
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-bar-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-bar-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #ffe0b2;
+    text-shadow: 0 0 18px rgba(255, 107, 53, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-bar-cd-hint {
+    font-size: 0.95rem;
+    color: #ffcc99;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THE BLOOM — "The Garden's Verdict" (Tier 8 rework)
+   The arena is a garden that grows whether you fight or not. Scarlet
+   blooms track your position, rot gardens sweep stamen beams and burst
+   into seed pods that plant new gardens, the withering veil thins as you
+   fill cells, and FULMINATION blooms from every direction. Palette:
+   scarlet rose / deep rot crimson — reads apart from Inferno/Barrage.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Bloom marker: tracks (dashed) → locks (solid, swelling) → bursts ── */
+.eg-blm-bloom-mark {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    border-radius: 50%;
+    transform: translate(0, 0);
+    background: radial-gradient(circle, rgba(255, 127, 165, 0.10) 0%, rgba(255, 62, 120, 0.16) 60%, transparent 75%);
+}
+.eg-blm-bloom-track {
+    border: 2px dashed rgba(255, 127, 165, 0.85);
+    animation: eg-blm-track-pulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes eg-blm-track-pulse {
+    from { opacity: 0.65; }
+    to   { opacity: 1; }
+}
+.eg-blm-bloom-lock {
+    border: 3px solid rgba(255, 62, 120, 0.95);
+    background: radial-gradient(circle, rgba(255, 127, 165, 0.16) 0%, rgba(255, 62, 120, 0.26) 60%, transparent 78%);
+    box-shadow: 0 0 20px rgba(255, 62, 120, 0.55), inset 0 0 16px rgba(255, 62, 120, 0.35);
+    animation: eg-blm-lock-swell 0.7s ease-in-out infinite alternate;
+}
+@keyframes eg-blm-lock-swell {
+    from { transform: scale(0.96); }
+    to   { transform: scale(1.05); }
+}
+.eg-blm-bloom-burst {
+    animation: eg-blm-burst-kf 0.5s ease-out forwards;
+}
+@keyframes eg-blm-burst-kf {
+    0%   { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+.eg-blm-flower {
+    background: none !important;
+    font-size: 26px;
+    text-shadow: 0 0 10px rgba(255, 62, 120, 0.9);
+    z-index: 8651;
+}
+
+/* ── Rot garden: burn floor + stamen rotor beam ── */
+.eg-blm-rot {
+    position: fixed;
+    z-index: 8649;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 2px solid rgba(190, 24, 93, 0.5);
+    background: radial-gradient(circle, rgba(190, 24, 93, 0.16) 0%, rgba(146, 16, 73, 0.10) 55%, transparent 74%);
+    box-shadow: inset 0 0 26px rgba(190, 24, 93, 0.35);
+}
+.eg-blm-rot-crit {
+    animation: eg-blm-rot-crit-kf 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-blm-rot-crit-kf {
+    from { filter: brightness(1); }
+    to   { filter: brightness(1.7); }
+}
+.eg-blm-rotor {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    width: 8px;
+    height: 170px;   /* set to garden reach */
+    transform-origin: 50% 0;
+    background: linear-gradient(180deg, rgba(255, 143, 177, 0.95) 0%, rgba(255, 62, 120, 0.55) 70%, transparent 100%);
+    box-shadow: 0 0 10px rgba(255, 62, 120, 0.8);
+    border-radius: 4px;
+}
+
+/* ── Seed pods ── */
+.eg-blm-pod {
+    background: none !important;
+    font-size: 18px;
+    text-shadow: 0 0 8px rgba(190, 24, 93, 0.9);
+    z-index: 8651;
+}
+
+/* ── Withering veil (tint over the shared #eg-grid-veil) + chip ── */
+.eg-grid-veil.eg-blm-veil-tinted {
+    background:
+        radial-gradient(circle at 30% 25%, rgba(255, 127, 165, 0.16) 0%, transparent 42%),
+        radial-gradient(circle at 72% 68%, rgba(190, 24, 93, 0.18) 0%, transparent 46%),
+        rgba(52, 8, 28, calc(0.82 - (var(--blm-wilt, 0) * 0.006)));
+}
+.eg-grid-veil.eg-blm-veil-open {
+    box-shadow: inset 0 0 40px rgba(134, 239, 172, 0.25);
+}
+.eg-blm-veil-chip {
+    position: fixed;
+    left: 50%;
+    bottom: 15%;
+    transform: translateX(-50%);
+    z-index: 8653;
+    pointer-events: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    color: #ffd6e3;
+    background: rgba(52, 8, 28, 0.75);
+    border: 1px solid rgba(255, 127, 165, 0.6);
+    border-radius: 8px;
+    padding: 5px 12px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+/* ── FULMINATION: petal-chain lanes, judgment mark, the ONE TRUE GAP ── */
+.eg-blm-petal-warn {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    height: 8px;
+    transform-origin: 0 0;
+    background: linear-gradient(90deg, rgba(255, 127, 165, 0.75) 0%, rgba(255, 62, 120, 0.35) 60%, transparent 100%);
+    box-shadow: 0 0 12px rgba(255, 62, 120, 0.7);
+    border-radius: 4px;
+    animation: eg-blm-petal-kf 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-blm-petal-kf {
+    from { opacity: 0.55; }
+    to   { opacity: 1; }
+}
+.eg-blm-judgment-mark {
+    border-width: 3px;
+    border-style: solid;
+    border-color: rgba(255, 62, 120, 0.95);
+    animation: eg-blm-lock-swell 0.55s ease-in-out infinite alternate;
+}
+.eg-blm-gap {
+    position: fixed;
+    z-index: 8648;
+    pointer-events: none;
+    height: 340px;
+    transform-origin: 0 0;
+    background: linear-gradient(90deg,
+        rgba(134, 239, 172, 0.02) 0%,
+        rgba(134, 239, 172, 0.16) 26%,
+        rgba(134, 239, 172, 0.16) 44%,
+        rgba(134, 239, 172, 0.02) 70%);
+    border-top: 2px solid rgba(134, 239, 172, 0.8);
+    border-bottom: 2px solid rgba(134, 239, 172, 0.8);
+}
+.eg-blm-gap-bloom {
+    animation: eg-blm-gap-kf 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-blm-gap-kf {
+    from { filter: brightness(1); }
+    to   { filter: brightness(1.8); }
+}
+
+/* ── All-in boss card (the garden blooms for itself) ── */
+.eg-blm-allin {
+    animation: eg-blm-allin-kf 1.4s ease-in-out infinite alternate !important;
+}
+@keyframes eg-blm-allin-kf {
+    from { filter: drop-shadow(0 0 6px rgba(255, 127, 165, 0.7)); }
+    to   { filter: drop-shadow(0 0 20px rgba(255, 62, 120, 1)) drop-shadow(0 0 34px rgba(190, 24, 93, 0.8)); }
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-blm-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-blm-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #ffd6e3;
+    text-shadow: 0 0 18px rgba(255, 62, 120, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-blm-cd-hint {
+    font-size: 0.95rem;
+    color: #ffb3c9;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THE MINOTAUR — "The Labyrinth's Warden" (Tier 8 rework)
+   Labyrinth duel: telegraphed wall slabs carve the arena into lanes, the
+   bull charges the lane at your row, hoof craters + dust storms accumulate
+   terrain, the Thread of Ariadne marks an honest-but-bait safe lane, and
+   THE WARDEN'S LABYRINTH ends in an all-lane TRAMPLE. Elementless — pure
+   physical, amber/gunmetal palette (matches the Minotaur toast color).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Labyrinth walls: rise telegraph → solid slab → crumble ── */
+.eg-mnt-wall-rise {
+    position: fixed;
+    z-index: 8649;
+    pointer-events: none;
+    border: 2px dashed rgba(217, 180, 106, 0.8);
+    background: rgba(120, 100, 60, 0.12);
+    animation: eg-mnt-rise-kf 1s ease-in-out infinite alternate;
+}
+@keyframes eg-mnt-rise-kf {
+    from { opacity: 0.5; }
+    to   { opacity: 1; }
+}
+.eg-mnt-wall {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    border: 2px solid rgba(190, 155, 88, 0.95);
+    background: linear-gradient(180deg, rgba(88, 74, 48, 0.92) 0%, rgba(56, 46, 30, 0.95) 100%);
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(217, 180, 106, 0.25);
+}
+.eg-mnt-wall-crumble {
+    animation: eg-mnt-crumble-kf 0.6s ease-out forwards;
+}
+@keyframes eg-mnt-crumble-kf {
+    0%   { filter: brightness(1); opacity: 1; }
+    100% { filter: brightness(1.8); opacity: 0; transform: scaleY(0.4); }
+}
+
+/* ── Charge lane + trample lanes (extend the shared band) ── */
+.eg-mnt-lane {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.05) 0%, rgba(251, 191, 36, 0.18) 50%, rgba(251, 191, 36, 0.05) 100%) !important;
+    border-top: 1px solid rgba(251, 191, 36, 0.45);
+    border-bottom: 1px solid rgba(251, 191, 36, 0.45);
+}
+.eg-mnt-trample-lane {
+    position: fixed;
+    z-index: 8649;
+    pointer-events: none;
+    box-sizing: border-box;
+    border-top: 1px solid rgba(251, 191, 36, 0.3);
+    background: rgba(251, 191, 36, 0.07);
+    transition: background 0.25s ease-out, box-shadow 0.25s ease-out;
+}
+.eg-mnt-trample-safe {
+    background: rgba(134, 239, 172, 0.12);
+    box-shadow: inset 0 0 16px rgba(134, 239, 172, 0.3);
+    border-top: 1px solid rgba(134, 239, 172, 0.8);
+    animation: eg-mnt-safe-kf 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-mnt-safe-kf {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.5); }
+}
+.eg-mnt-trample-hot {
+    background: rgba(251, 146, 60, 0.34);
+    box-shadow: 0 0 20px rgba(251, 146, 60, 0.7), inset 0 0 16px rgba(180, 83, 9, 0.45);
+    animation: eg-mnt-hot-kf 0.65s ease-in-out infinite alternate;
+}
+@keyframes eg-mnt-hot-kf {
+    from { filter: brightness(0.95); }
+    to   { filter: brightness(1.4); }
+}
+
+/* ── Hoof craters: warn → stamp → lingering hoofprint ── */
+.eg-mnt-crater-warn {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 3px dashed rgba(251, 191, 36, 0.9);
+    background: rgba(120, 90, 30, 0.12);
+    animation: eg-mnt-crater-warn-kf 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-mnt-crater-warn-kf {
+    from { transform: scale(0.92); opacity: 0.7; }
+    to   { transform: scale(1.08); opacity: 1; }
+}
+.eg-mnt-crater-boom {
+    position: fixed;
+    z-index: 8652;
+    pointer-events: none;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 4px solid rgba(217, 180, 106, 0.95);
+    background: radial-gradient(circle, rgba(217, 180, 106, 0.5) 0%, rgba(120, 90, 30, 0.25) 60%, transparent 78%);
+    animation: eg-bar-boom-kf 0.5s ease-out forwards;
+}
+.eg-mnt-hoofprint {
+    position: fixed;
+    z-index: 8649;
+    pointer-events: none;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 46, 30, 0.55) 0%, rgba(56, 46, 30, 0.25) 65%, transparent 80%);
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.55);
+}
+
+/* ── Dust storm trailing the charge lane ── */
+.eg-mnt-dust {
+    position: fixed;
+    z-index: 8648;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 25% 40%, rgba(180, 140, 80, 0.30) 0%, transparent 45%),
+        radial-gradient(circle at 65% 70%, rgba(140, 105, 55, 0.32) 0%, transparent 50%),
+        radial-gradient(circle at 85% 25%, rgba(180, 140, 80, 0.22) 0%, transparent 45%);
+    filter: blur(2px);
+    animation: eg-mnt-dust-kf 0.8s ease-in-out infinite alternate;
+}
+@keyframes eg-mnt-dust-kf {
+    from { opacity: 0.7; }
+    to   { opacity: 1; }
+}
+
+/* ── Thread of Ariadne: honest safe lane, frays, snaps ── */
+.eg-mnt-thread {
+    position: fixed;
+    left: 0;
+    z-index: 8651;
+    pointer-events: none;
+    width: 100%;
+    background: linear-gradient(90deg,
+        rgba(255, 209, 102, 0.0) 0%,
+        rgba(255, 209, 102, 0.45) 18%,
+        rgba(255, 232, 166, 0.75) 50%,
+        rgba(255, 209, 102, 0.45) 82%,
+        rgba(255, 209, 102, 0.0) 100%);
+    border-top: 2px solid rgba(255, 209, 102, 0.85);
+    border-bottom: 2px solid rgba(255, 209, 102, 0.85);
+    box-shadow: 0 0 16px rgba(255, 209, 102, 0.5);
+    animation: eg-mnt-thread-kf 1.2s ease-in-out infinite alternate;
+}
+@keyframes eg-mnt-thread-kf {
+    from { opacity: 0.75; }
+    to   { opacity: 1; }
+}
+.eg-mnt-thread-held {
+    animation: eg-mnt-held-kf 0.5s ease-in-out 3 !important;
+}
+@keyframes eg-mnt-held-kf {
+    from { box-shadow: 0 0 12px rgba(74, 222, 128, 0.5); }
+    to   { box-shadow: 0 0 26px rgba(74, 222, 128, 0.95); }
+}
+.eg-mnt-thread-fray {
+    opacity: 0.55;
+    filter: saturate(0.6);
+}
+.eg-mnt-thread-snap {
+    animation: eg-mnt-snap-kf 0.45s ease-out forwards;
+}
+@keyframes eg-mnt-snap-kf {
+    0%   { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(40px); }
+}
+
+/* ── Mazewall stones (finale body-check targets) ── */
+.eg-mnt-stone {
+    position: fixed;
+    z-index: 8651;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    border-radius: 14px;
+    border: 3px solid rgba(251, 191, 36, 0.95);
+    background: radial-gradient(circle, rgba(88, 74, 48, 0.85) 0%, rgba(40, 34, 22, 0.9) 100%);
+    box-shadow: 0 0 22px rgba(251, 191, 36, 0.7), inset 0 0 16px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 0 12px rgba(251, 191, 36, 0.9);
+    animation: eg-mnt-stone-kf 1s ease-in-out infinite alternate;
+}
+@keyframes eg-mnt-stone-kf {
+    from { filter: brightness(1); }
+    to   { filter: brightness(1.35); }
+}
+.eg-mnt-stone-hit {
+    animation: eg-mnt-stone-hit-kf 0.3s ease-out 1;
+}
+@keyframes eg-mnt-stone-hit-kf {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.12); filter: brightness(2); }
+    100% { transform: scale(1); }
+}
+.eg-mnt-stone-shattered {
+    opacity: 0.85;
+    filter: grayscale(1);
+    animation: none !important;
+}
+.eg-mnt-stone-dim {
+    opacity: 0.35;
+    filter: grayscale(1);
+    animation: none !important;
+}
+
+/* ── All-in boss card (the warden lowers its horns) ── */
+.eg-mnt-allin {
+    animation: eg-mnt-allin-kf 1.2s ease-in-out infinite alternate !important;
+}
+@keyframes eg-mnt-allin-kf {
+    from { filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7)); }
+    to   { filter: drop-shadow(0 0 20px rgba(217, 180, 106, 1)) drop-shadow(0 0 34px rgba(180, 83, 9, 0.8)); }
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-mnt-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-mnt-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #fde68a;
+    text-shadow: 0 0 18px rgba(180, 83, 9, 0.9), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-mnt-cd-hint {
+    font-size: 0.95rem;
+    color: #fcd34d;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+
+/*============================================================================
+   THE OVERFITTER — "The Model That Learned Too Much" (Tier 8 rework)
+   Shadow/ML identity: violet-ink gradients, live data trails, a heat-map
+   made of the player's own fight history. Palette reads apart from the
+   Null (colder void-violet) via hot underfit-orange accents.
+============================================================================*/
+
+/* ── Gradient Descent: training bands + local minimum ── */
+.eg-ovr-band {
+    position: fixed;
+    z-index: 7100;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(126, 34, 206, 0.05), rgba(126, 34, 206, 0.16));
+    border-left: 1px dashed rgba(192, 132, 252, 0.55);
+    border-right: 1px dashed rgba(192, 132, 252, 0.55);
+}
+.eg-ovr-band-hot {
+    background: linear-gradient(180deg, rgba(147, 51, 234, 0.34), rgba(88, 28, 135, 0.42));
+    border-left: 2px solid rgba(216, 180, 254, 0.85);
+    border-right: 2px solid rgba(216, 180, 254, 0.85);
+    box-shadow: 0 0 26px rgba(147, 51, 234, 0.5), inset 0 0 34px rgba(168, 85, 247, 0.35);
+    animation: eg-ovr-band-pulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-ovr-band-pulse {
+    from { filter: brightness(0.85); }
+    to   { filter: brightness(1.25); }
+}
+.eg-ovr-min-ring {
+    position: fixed;
+    z-index: 7101;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 3px dashed rgba(240, 171, 252, 0.9);
+    background: radial-gradient(circle, rgba(88, 28, 135, 0.42) 0%, rgba(88, 28, 135, 0.12) 60%, transparent 75%);
+    animation: eg-ovr-min-spin 1.6s linear infinite;
+}
+@keyframes eg-ovr-min-spin {
+    from { transform: rotate(0deg) scale(1); }
+    50%  { transform: rotate(180deg) scale(1.06); }
+    to   { transform: rotate(360deg) scale(1); }
+}
+.eg-ovr-min-boom {
+    animation: none;
+    border: 3px solid #e879f9;
+    background: radial-gradient(circle, rgba(232, 121, 249, 0.75) 0%, rgba(147, 51, 234, 0.4) 55%, transparent 78%);
+    box-shadow: 0 0 60px rgba(192, 38, 211, 0.8);
+}
+
+/* ── Pattern Lock: trail dots, replay dart, echoes ── */
+.eg-ovr-trail-dot {
+    position: fixed;
+    z-index: 7102;
+    pointer-events: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px dashed rgba(216, 180, 254, 0.85);
+    background: rgba(126, 34, 206, 0.25);
+}
+.eg-ovr-dart {
+    position: fixed;
+    z-index: 7103;
+    pointer-events: none;
+    width: 44px;
+    height: 44px;
+    font-size: 30px;
+    line-height: 44px;
+    text-align: center;
+    filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.95));
+}
+.eg-ovr-echo {
+    position: fixed;
+    z-index: 7102;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 2px solid rgba(251, 146, 60, 0.9);
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.5) 0%, transparent 70%);
+    animation: eg-ovr-echo-pop 0.48s ease-out forwards;
+}
+.eg-ovr-echo-final {
+    border: 3px solid #f97316;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.65) 0%, rgba(249, 115, 22, 0.2) 60%, transparent 75%);
+    box-shadow: 0 0 34px rgba(249, 115, 22, 0.75);
+}
+@keyframes eg-ovr-echo-pop {
+    from { transform: scale(0.35); opacity: 1; }
+    to   { transform: scale(1.25); opacity: 0; }
+}
+
+/* ── Validation Set: test rings ── */
+.eg-ovr-val-ring {
+    position: fixed;
+    z-index: 7101;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 3px dashed rgba(147, 197, 253, 0.9);
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.14) 0%, transparent 68%);
+    animation: eg-ovr-val-hold 1.2s ease-in-out infinite alternate;
+}
+@keyframes eg-ovr-val-hold {
+    from { box-shadow: 0 0 12px rgba(147, 197, 253, 0.35); }
+    to   { box-shadow: 0 0 26px rgba(147, 197, 253, 0.65); }
+}
+.eg-ovr-val-boom {
+    border: 3px solid #f97316;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.6) 0%, rgba(249, 115, 22, 0.22) 60%, transparent 76%);
+    box-shadow: 0 0 46px rgba(249, 115, 22, 0.8);
+}
+.eg-ovr-val-fizzle {
+    animation: eg-ovr-val-fizzle 0.55s ease-out forwards;
+}
+@keyframes eg-ovr-val-fizzle {
+    to { opacity: 0; transform: scale(1.35); filter: blur(4px); }
+}
+.eg-ovr-val-burst {
+    position: fixed;
+    z-index: 7102;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 4px solid #fdba74;
+    animation: eg-ovr-echo-pop 0.55s ease-out forwards;
+}
+
+/* ── THE FINAL EPOCH: the player's own heat-map ── */
+.eg-ovr-heatcell {
+    position: fixed;
+    z-index: 8200;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(0.7rem, 1.6vw, 1.15rem);
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.65);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(192, 132, 252, 0.14);
+    background: rgba(30, 17, 51, 0.05);
+    transition: background 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.eg-ovr-heat-0 { background: rgba(30, 17, 51, 0.04); }
+.eg-ovr-heat-1 { background: rgba(126, 34, 206, 0.2); border-color: rgba(192, 132, 252, 0.4); }
+.eg-ovr-heat-2 { background: rgba(147, 51, 234, 0.34); border-color: rgba(216, 180, 254, 0.6); }
+.eg-ovr-heat-3 {
+    background: rgba(168, 85, 247, 0.5);
+    border-color: rgba(240, 171, 252, 0.85);
+    box-shadow: inset 0 0 26px rgba(192, 38, 211, 0.45);
+}
+.eg-ovr-hot {
+    border: 2px solid #f97316 !important;
+    background: rgba(249, 115, 22, 0.3) !important;
+    box-shadow: inset 0 0 30px rgba(249, 115, 22, 0.5), 0 0 22px rgba(249, 115, 22, 0.4) !important;
+    animation: eg-ovr-hot-pulse 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-ovr-hot-pulse {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.4); }
+}
+.eg-ovr-boom {
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.85) 0%, rgba(249, 115, 22, 0.45) 55%, transparent 85%) !important;
+    box-shadow: 0 0 56px rgba(249, 115, 22, 0.85) !important;
+    transition: none;
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-ovr-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-ovr-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #e9d5ff;
+    text-shadow: 0 0 18px rgba(147, 51, 234, 0.95), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-ovr-cd-hint {
+    font-size: 0.95rem;
+    color: #c4b5fd;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* ── Boss card set-piece glow (final epoch) ── */
+.eg-emoji-wrapper.eg-ovr-allin {
+    filter: drop-shadow(0 0 14px rgba(192, 132, 252, 0.95));
+    animation: eg-ovr-card-throb 1s ease-in-out infinite alternate;
+}
+@keyframes eg-ovr-card-throb {
+    from { filter: drop-shadow(0 0 8px rgba(147, 51, 234, 0.7)); }
+    to   { filter: drop-shadow(0 0 18px rgba(216, 180, 254, 1)); }
+}
+
+/*============================================================================
+   THE RAZOR — "The Whetted Edge" (Tier 8 rework)
+   Lightning/metal identity: polished-steel wires, hot edge-flash, orange
+   cast-warnings. Reads apart from the Dynamo (storm yellow) via steel
+   greys and blade glints.
+============================================================================*/
+
+/* ── Blade Cyclone: anchor + fan blades ── */
+.eg-rzr-anchor {
+    filter: drop-shadow(0 0 12px rgba(253, 224, 71, 0.9));
+}
+.eg-rzr-blade {
+    position: fixed;
+    z-index: 7300;
+    pointer-events: none;
+    font-size: 26px;
+    line-height: 44px;
+    text-align: center;
+    filter: drop-shadow(0 0 9px rgba(253, 224, 71, 0.85));
+}
+
+/* ── Razor Wire Lattice: telegraph → taut → snap ── */
+.eg-rzr-wire {
+    position: fixed;
+    z-index: 7301;
+    pointer-events: none;
+    height: 3px;
+    transform-origin: 0 50%;
+}
+.eg-rzr-wire-warn {
+    background: repeating-linear-gradient(90deg, rgba(253, 224, 71, 0.75) 0 14px, transparent 14px 26px);
+    opacity: 0.7;
+}
+.eg-rzr-wire-taut {
+    background: linear-gradient(90deg, #fef08a, #fde047 30%, #fff 50%, #fde047 70%, #fef08a);
+    box-shadow: 0 0 14px rgba(253, 224, 71, 0.95), 0 0 4px rgba(255, 255, 255, 0.9);
+    animation: eg-rzr-wire-hum 0.32s linear infinite alternate;
+}
+@keyframes eg-rzr-wire-hum {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.35); }
+}
+.eg-rzr-wire-snap {
+    animation: eg-rzr-wire-snap 0.45s ease-out forwards;
+}
+@keyframes eg-rzr-wire-snap {
+    0%  { opacity: 1; }
+    30% { opacity: 0.4; filter: brightness(2); }
+    100% { opacity: 0; }
+}
+.eg-rzr-whip-seg {
+    position: fixed;
+    z-index: 7302;
+    pointer-events: none;
+    width: 3px;
+    height: 5px;
+    background: #fef08a;
+    box-shadow: 0 0 10px rgba(253, 224, 71, 0.9);
+    animation: eg-rzr-whip-fly 0.42s ease-out forwards;
+}
+@keyframes eg-rzr-whip-fly {
+    from { transform: translate(0, 0) rotate(var(--rzr-whip-ang, 0deg)); opacity: 1; }
+    to   { transform: translate(var(--rzr-whip-dx, 200px), var(--rzr-whip-dy, 0px)) rotate(var(--rzr-whip-ang, 0deg)); opacity: 0; }
+}
+
+/* ── Hone and Cast: whetstone + grind aura + giant scythe ── */
+.eg-rzr-stone {
+    position: fixed;
+    z-index: 7303;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    border-radius: 50%;
+    border: 3px solid rgba(148, 163, 184, 0.85);
+    background: radial-gradient(circle, rgba(71, 85, 105, 0.65) 0%, rgba(30, 41, 59, 0.5) 65%, transparent 78%);
+    animation: eg-rzr-stone-pulse 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-rzr-stone-pulse {
+    from { box-shadow: 0 0 10px rgba(148, 163, 184, 0.4); }
+    to   { box-shadow: 0 0 24px rgba(203, 213, 225, 0.8); }
+}
+.eg-rzr-stone-hit {
+    animation: eg-rzr-stone-flash 0.3s ease-out;
+}
+@keyframes eg-rzr-stone-flash {
+    0%  { filter: brightness(2.4); transform: scale(1.12); }
+    100% { filter: brightness(1); transform: scale(1); }
+}
+.eg-rzr-stone-shattered {
+    animation: none;
+    border-color: #4ade80;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.4) 0%, transparent 70%);
+    opacity: 0.85;
+}
+.eg-rzr-stone-dim { opacity: 0.4; animation: none; }
+.eg-rzr-grind {
+    position: fixed;
+    z-index: 7302;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 2px dashed rgba(226, 232, 240, 0.55);
+    background: radial-gradient(circle, rgba(203, 213, 225, 0.16) 0%, transparent 70%);
+    animation: eg-rzr-grind-spin 2.6s linear infinite;
+}
+@keyframes eg-rzr-grind-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+.eg-rzr-grind-done { opacity: 0.25; animation: none; }
+.eg-rzr-giant {
+    position: fixed;
+    z-index: 7304;
+    pointer-events: none;
+    width: 76px;
+    height: 76px;
+    font-size: 56px;
+    line-height: 76px;
+    text-align: center;
+    filter: drop-shadow(0 0 18px rgba(249, 115, 22, 0.95));
+    animation: eg-rzr-giant-spin 0.5s linear infinite;
+}
+@keyframes eg-rzr-giant-spin {
+    from { filter: drop-shadow(0 0 18px rgba(249, 115, 22, 0.95)) brightness(1); }
+    to   { filter: drop-shadow(0 0 18px rgba(249, 115, 22, 0.95)) brightness(1.5); }
+}
+.eg-rzr-scythe-warn {
+    background: linear-gradient(180deg, rgba(249, 115, 22, 0.14), rgba(249, 115, 22, 0.3));
+}
+
+/* ── A THOUSAND EDGES: spoke clock + condensing blades ── */
+.eg-rzr-spoke {
+    position: fixed;
+    z-index: 8400;
+    pointer-events: none;
+    height: 4px;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, #fff 0%, #fde047 22%, rgba(253, 224, 71, 0.65) 78%, transparent 100%);
+    box-shadow: 0 0 10px rgba(253, 224, 71, 0.8);
+}
+.eg-rzr-spoke-condense {
+    transition: transform 0.5s ease-in, opacity 0.5s ease-in;
+    opacity: 0.15;
+}
+.eg-rzr-stone-safe {
+    border-color: rgba(74, 222, 128, 0.85);
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.22) 0%, transparent 72%);
+    animation: eg-rzr-stone-pulse 1.1s ease-in-out infinite alternate;
+}
+
+/* ── Finale countdown overlay (mirrors the shared cd pattern) ── */
+.eg-rzr-cd {
+    position: fixed;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9003;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.eg-rzr-cd-label {
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.4rem, 3.6vw, 2.6rem);
+    color: #fef9c3;
+    text-shadow: 0 0 18px rgba(234, 179, 8, 0.95), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-rzr-cd-hint {
+    font-size: 0.95rem;
+    color: #fef08a;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    max-width: 90vw;
+}
+
+/* ── Boss card set-piece glow (a thousand edges) ── */
+.eg-emoji-wrapper.eg-rzr-allin {
+    animation: eg-rzr-card-throb 1s ease-in-out infinite alternate;
+}
+@keyframes eg-rzr-card-throb {
+    from { filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.7)); }
+    to   { filter: drop-shadow(0 0 18px rgba(254, 240, 138, 1)); }
+}

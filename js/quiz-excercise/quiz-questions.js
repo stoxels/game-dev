@@ -3385,7 +3385,170 @@ const BONUS_QUIZ_POOLS = {
 
 
 
-    12: [],
+    12: [
+        {
+            q: "The correlation rho = Cor(X,Y) is defined as:",
+            qDE: "Die Korrelation rho = Cor(X,Y) ist definiert als:",
+            opts: ["gammaXY / (sigmaX sigmaY)", "gammaXY · sigmaX sigmaY", "E[X] · E[Y]", "Var(X) + Var(Y)"],
+            optsDE: ["gammaXY / (sigmaX sigmaY)", "gammaXY · sigmaX sigmaY", "E[X] · E[Y]", "Var(X) + Var(Y)"],
+            correct: 0,
+            explain: "Lecture slide 128: rho = gammaXY/(sigmaX sigmaY).",
+            explainDE: "Vorlesung Folie 128: rho = gammaXY/(sigmaX sigmaY)."
+        },
+        {
+            q: "The covariance gammaXY is defined as:",
+            qDE: "Die Kovarianz gammaXY ist definiert als:",
+            opts: ["E[(X-muX)(Y-muY)]", "E[X] + E[Y]", "Var(X)·Var(Y)", "E[X²+Y²]"],
+            optsDE: ["E[(X-muX)(Y-muY)]", "E[X] + E[Y]", "Var(X)·Var(Y)", "E[X²+Y²]"],
+            correct: 0,
+            explain: "Slide 128: Cov(X,Y) = E(X-muX)(Y-muY).",
+            explainDE: "Folie 128: Cov(X,Y) = E(X-muX)(Y-muY)."
+        },
+        {
+            q: "The two-sided correlation test (slide 129) tests:",
+            qDE: "Der zweiseitige Korrelationstest (Folie 129) testet:",
+            opts: ["H0: rho = 0 vs H1: rho != 0", "H0: mu = 0 vs H1: mu > 0", "H0: sigma² = 1 vs H1: sigma² < 1", "H0: b = 1 vs H1: b = 2"],
+            optsDE: ["H0: rho = 0 gegen H1: rho != 0", "H0: mu = 0 gegen H1: mu > 0", "H0: sigma² = 1 gegen H1: sigma² < 1", "H0: b = 1 gegen H1: b = 2"],
+            correct: 0,
+            explain: "Testproblem H0: rho=0 vs H1: rho!=0.",
+            explainDE: "Testproblem H0: rho=0 gegen H1: rho!=0."
+        },
+        {
+            q: "The correlation test statistic (slide 129) is:",
+            qDE: "Die Korrelationsteststatistik (Folie 129) lautet:",
+            opts: ["T = r·sqrt(n-2)/sqrt(1-r²)", "T = r·(n-2)", "T = sqrt(r)/(n-2)", "T = r²·(n-2)"],
+            optsDE: ["T = r·sqrt(n-2)/sqrt(1-r²)", "T = r·(n-2)", "T = sqrt(r)/(n-2)", "T = r²·(n-2)"],
+            correct: 0,
+            explain: "T = rho_hat·sqrt(n-2)/sqrt(1-rho_hat²) ~ t(n-2) under H0.",
+            explainDE: "T = rho-Dach·sqrt(n-2)/sqrt(1-rho-Dach²) ~ t(n-2) unter H0."
+        },
+        {
+            q: "Under H0: rho = 0, T follows:",
+            qDE: "Unter H0: rho = 0 folgt T:",
+            opts: ["t(n-2)", "N(0,1) exactly", "chi²(n)", "F(1,n)"],
+            optsDE: ["t(n-2)", "N(0,1) exakt", "chi²(n)", "F(1,n)"],
+            correct: 0,
+            explain: "Slide 129: T ~ t(n-2).",
+            explainDE: "Folie 129: T ~ t(n-2)."
+        },
+        {
+            q: "Reject H0: rho = 0 (two-sided) if:",
+            qDE: "H0: rho = 0 (zweiseitig) wird abgelehnt, falls:",
+            opts: ["|T| > t(n-2)_{1-alpha/2}", "|T| < 0", "T = 0", "r = 1 always"],
+            optsDE: ["|T| > t(n-2)_{1-alpha/2}", "|T| < 0", "T = 0", "r = 1 immer"],
+            correct: 0,
+            explain: "Rule 1 on slide 129.",
+            explainDE: "Regel 1 auf Folie 129."
+        },
+        {
+            q: "The regression model (slide 131) is:",
+            qDE: "Das Regressionsmodell (Folie 131) lautet:",
+            opts: ["f(x) = a + b·x", "f(x) = a/x + b", "f(x) = a^x", "f(x) = sin(a+bx)"],
+            optsDE: ["f(x) = a + b·x", "f(x) = a/x + b", "f(x) = a^x", "f(x) = sin(a+bx)"],
+            correct: 0,
+            explain: "Data scatter around line f(x)=a+b·x.",
+            explainDE: "Daten streuen um Gerade f(x)=a+b·x."
+        },
+        {
+            q: "In regression, yi is called:",
+            qDE: "In der Regression heißt yi:",
+            opts: ["target / response / output", "regressor / input", "residual", "quantile"],
+            optsDE: ["Zielwert / Response / Output", "Regressor / Input", "Residuum", "Quantil"],
+            correct: 0,
+            explain: "Slide 131: yi target, xi regressor.",
+            explainDE: "Folie 131: yi Zielwert, xi Regressor."
+        },
+        {
+            q: "KQ minimizes (slide 137):",
+            qDE: "KQ minimiert (Folie 137):",
+            opts: ["Q(a,b) = sum(yi-(a+b·xi))²", "Q = sum|yi-a-b·xi|", "Q = max|yi-a-b·xi|", "Q = sum(yi+a+b·xi)"],
+            optsDE: ["Q(a,b) = sum(yi-(a+b·xi))²", "Q = sum|yi-a-b·xi|", "Q = max|yi-a-b·xi|", "Q = sum(yi+a+b·xi)"],
+            correct: 0,
+            explain: "Least squares: minimize sum of squared y-distances.",
+            explainDE: "Kleinste Quadrate: Summe quadrierter y-Abstände minimieren."
+        },
+        {
+            q: "The KQ slope solution (slide 137) is:",
+            qDE: "Die KQ-Steigungsloesung (Folie 137) lautet:",
+            opts: ["b_hat = sxy / s_x²", "b_hat = s_x² / sxy", "b_hat = xbar/ybar", "b_hat = sum yi"],
+            optsDE: ["b-Dach = sxy / s_x²", "b-Dach = s_x² / sxy", "b-Dach = xquer/yquer", "b-Dach = sum yi"],
+            correct: 0,
+            explain: "b_hat = sxy/s_x², a_hat = ybar-b_hat·xbar.",
+            explainDE: "b-Dach = sxy/s_x², a-Dach = yquer-b-Dach·xquer."
+        },
+        {
+            q: "The intercept estimate is:",
+            qDE: "Der Achsenabschnitt-Schaetzer lautet:",
+            opts: ["a_hat = ybar - b_hat·xbar", "a_hat = ybar + b_hat·xbar", "a_hat = b_hat/ybar", "a_hat = 0 always"],
+            optsDE: ["a-Dach = yquer - b-Dach·xquer", "a-Dach = yquer + b-Dach·xquer", "a-Dach = b-Dach/yquer", "a-Dach = 0 immer"],
+            correct: 0,
+            explain: "Slide 137/139.",
+            explainDE: "Folie 137/139."
+        },
+        {
+            q: "Fitted values and residuals (slide 139):",
+            qDE: "Prognosewerte und Residuen (Folie 139):",
+            opts: ["y_hat_i = a_hat+b_hat·xi; e_hat_i = yi-y_hat_i", "y_hat_i = xi-yi; e = 0", "y_hat = a·b", "e_hat = y_hat + y"],
+            optsDE: ["y-Dach_i = a-Dach+b-Dach·xi; e-Dach_i = yi-y-Dach_i", "y-Dach_i = xi-yi; e = 0", "y-Dach = a·b", "e-Dach = y-Dach + y"],
+            correct: 0,
+            explain: "Vorhersage minus Residuum definition.",
+            explainDE: "Definition Prognosewert und Residuum."
+        },
+        {
+            q: "Decomposition of variance (slide 141):",
+            qDE: "Streuungszerlegung (Folie 141):",
+            opts: ["SST = SSR + SSE", "SST = SSR - SSE", "SSR = SST·SSE", "SSE = 0 always"],
+            optsDE: ["SST = SSR + SSE", "SST = SSR - SSE", "SSR = SST·SSE", "SSE = 0 immer"],
+            correct: 0,
+            explain: "SST = sum(Yi-Ybar)² = SSR + SSE.",
+            explainDE: "SST = sum(Yi-Yquer)² = SSR + SSE."
+        },
+        {
+            q: "The coefficient of determination (slide 141):",
+            qDE: "Das Bestimmtheitsmaß (Folie 141):",
+            opts: ["R² = SSR/SST = r_XY²", "R² = SSE/SST", "R² = SSR·SST", "R² = 1-SST"],
+            optsDE: ["R² = SSR/SST = r_XY²", "R² = SSE/SST", "R² = SSR·SST", "R² = 1-SST"],
+            correct: 0,
+            explain: "R² = SSR/SST = r²_XY.",
+            explainDE: "R² = SSR/SST = r²_XY."
+        },
+        {
+            q: "The Zahlenbeispiel (slide 142) gives:",
+            qDE: "Das Zahlenbeispiel (Folie 142) ergibt:",
+            opts: ["f_hat(x) = 1.1928 + 0.4293·x", "f_hat(x) = 0 + 1·x", "f_hat(x) = 5 - 2·x", "f_hat(x) = x²"],
+            optsDE: ["f-Dach(x) = 1,1928 + 0,4293·x", "f-Dach(x) = 0 + 1·x", "f-Dach(x) = 5 - 2·x", "f-Dach(x) = x²"],
+            correct: 0,
+            explain: "Computed b≈0.4293, a≈1.1928 on [1,7].",
+            explainDE: "Berechnet b≈0,4293, a≈1,1928 auf [1,7]."
+        },
+        {
+            q: "The stochastic model (slide 143) is:",
+            qDE: "Das stochastische Modell (Folie 143) lautet:",
+            opts: ["Yi = a + b·xi + ei", "Yi = a·b·xi", "Yi = ei only", "Yi = a + ei²"],
+            optsDE: ["Yi = a + b·xi + ei", "Yi = a·b·xi", "Yi = nur ei", "Yi = a + ei²"],
+            correct: 0,
+            explain: "With E(ei)=0, Var(ei)=sigma².",
+            explainDE: "Mit E(ei)=0, Var(ei)=sigma²."
+        },
+        {
+            q: "Slide 144 (4 datasets, identical fits) teaches:",
+            qDE: "Folie 144 (4 Datensaetze, identische Fits) lehrt:",
+            opts: ["Always plot your data", "Never plot data", "R² is useless", "n does not matter"],
+            optsDE: ["Plotte stets deine Daten", "Plotte nie Daten", "R² ist nutzlos", "n ist egal"],
+            correct: 0,
+            explain: "Anscombe-style quartet warning.",
+            explainDE: "Anscombe-Warnung."
+        },
+        {
+            q: "Normal equations (slide 155):",
+            qDE: "Normalgleichungen (Folie 155):",
+            opts: ["X'X b_hat = X'Y", "X'X = Y'Y", "b_hat = X+Y", "X'b = 0"],
+            optsDE: ["X'X b-Dach = X'Y", "X'X = Y'Y", "b-Dach = X+Y", "X'b = 0"],
+            correct: 0,
+            explain: "KQ solution of Y = Xb+e.",
+            explainDE: "KQ-Loesung von Y = Xb+e."
+        },
+    ],
 
 
 
@@ -3516,6 +3679,409 @@ const BONUS_QUIZ_POOLS = {
             correct: 0
         },
 
+        // --- WORLD 13 lecture: Wilcoxon (slides 162-165) ---
+        {
+            q: "The Wilcoxon test works with two samples that are:",
+            qDE: "Der Wilcoxon-Test arbeitet mit zwei Stichproben, die sind:",
+            opts: ["Independent, sizes n1 and n2, total n = n1+n2", "Always paired with equal size", "Both of size 1", "Dependent with known variance"],
+            optsDE: ["Unabhängig, Umfänge n1 und n2, gesamt n = n1+n2", "Immer verbunden mit gleichem Umfang", "Beide vom Umfang 1", "Abhängig mit bekannter Varianz"],
+            correct: 0,
+            explain: "Slide 162: two independent samples Xi1..Xini ~ Fi, n = n1+n2.",
+            explainDE: "Folie 162: zwei unabhängige Stichproben Xi1..Xini ~ Fi, n = n1+n2."
+        },
+        {
+            q: "In the shift (location) model, the second sample satisfies:",
+            qDE: "Im Shiftmodell (Lokationsmodell) erfüllt die zweite Stichprobe:",
+            opts: ["X2j - Delta has the same distribution as X1i", "X2j + X1i = 0", "X2j = 2·X1i", "F2(x) = F1(x) + Delta"],
+            optsDE: ["X2j - Delta ist verteilt wie X1i", "X2j + X1i = 0", "X2j = 2·X1i", "F2(x) = F1(x) + Delta"],
+            correct: 0,
+            explain: "Slide 162: F2(x+Delta) = F1(x), i.e. F2(x) = F1(x-Delta).",
+            explainDE: "Folie 162: F2(x+Delta) = F1(x), d.h. F2(x) = F1(x-Delta)."
+        },
+        {
+            q: "The Wilcoxon test problem (slide 162) is:",
+            qDE: "Das Wilcoxon-Testproblem (Folie 162) lautet:",
+            opts: ["H0: F1 = F2 (Delta = 0) vs H1: F1 != F2 (Delta != 0)", "H0: mu = 0 vs H1: mu = 1", "H0: sigma1 = sigma2 vs H1: sigma1 < sigma2", "H0: p = 0.5 vs H1: p > 0.5"],
+            optsDE: ["H0: F1 = F2 (Delta = 0) gegen H1: F1 != F2 (Delta != 0)", "H0: mu = 0 gegen H1: mu = 1", "H0: sigma1 = sigma2 gegen H1: sigma1 < sigma2", "H0: p = 0,5 gegen H1: p > 0,5"],
+            correct: 0,
+            explain: "Nonparametric location test on Delta.",
+            explainDE: "Nichtparametrischer Lokationstest auf Delta."
+        },
+        {
+            q: "Step 2 of awarding ranks (slide 163) is:",
+            qDE: "Schritt 2 der Rangvergabe (Folie 163) lautet:",
+            opts: ["Write numbers 1..n left to right below the points: the rank numbers", "Sort each sample separately", "Compute the sample means", "Square all observations"],
+            optsDE: ["Schreibe Zahlen 1..n von links nach rechts unter die Punkte: die Rangzahlen", "Sortiere jede Stichprobe einzeln", "Berechne die Stichprobenmittel", "Quadriere alle Beobachtungen"],
+            correct: 0,
+            explain: "Ranks come from the pooled ordered axis.",
+            explainDE: "Ränge stammen von der gepoolten geordneten Achse."
+        },
+        {
+            q: "The Wilcoxon statistic W is:",
+            qDE: "Die Wilcoxon-Statistik W ist:",
+            opts: ["W := R2. = sum of ranks of sample 2", "W = mean of sample 1", "W = n1·n2", "W = max rank minus min rank"],
+            optsDE: ["W := R2. = Rangsumme der 2. Stichprobe", "W = Mittel der 1. Stichprobe", "W = n1·n2", "W = max. Rang minus min. Rang"],
+            correct: 0,
+            explain: "Slide 163: W := R2. = sum R2j.",
+            explainDE: "Folie 163: W := R2. = Summe R2j."
+        },
+        {
+            q: "For the two rank sums holds (slide 163):",
+            qDE: "Für die beiden Rangsummen gilt (Folie 163):",
+            opts: ["R1. + R2. = n(n+1)/2", "R1. + R2. = n²", "R1. = R2. always", "R1. + R2. = n1·n2"],
+            optsDE: ["R1. + R2. = n(n+1)/2", "R1. + R2. = n²", "R1. = R2. immer", "R1. + R2. = n1·n2"],
+            correct: 0,
+            explain: "Sum of 1..n.",
+            explainDE: "Summe von 1..n."
+        },
+        {
+            q: "Under H0, the null mean of W is:",
+            qDE: "Unter H0 gilt für den Null-Erwartungswert von W:",
+            opts: ["E0(W) = n2(n+1)/2", "E0(W) = 0", "E0(W) = n1·n2", "E0(W) = (n+1)/2"],
+            optsDE: ["E0(W) = n2(n+1)/2", "E0(W) = 0", "E0(W) = n1·n2", "E0(W) = (n+1)/2"],
+            correct: 0,
+            explain: "Slide 163.",
+            explainDE: "Folie 163."
+        },
+        {
+            q: "Under H0, the null variance of W is:",
+            qDE: "Unter H0 gilt für die Null-Varianz von W:",
+            opts: ["Var0(W) = n1·n2(n+1)/12", "Var0(W) = n2(n+1)/2", "Var0(W) = 1", "Var0(W) = n1+n2"],
+            optsDE: ["Var0(W) = n1·n2(n+1)/12", "Var0(W) = n2(n+1)/2", "Var0(W) = 1", "Var0(W) = n1+n2"],
+            correct: 0,
+            explain: "Slide 163.",
+            explainDE: "Folie 163."
+        },
+        {
+            q: "The standardized Wilcoxon statistic (slide 164) satisfies as n → ∞:",
+            qDE: "Die standardisierte Wilcoxon-Statistik (Folie 164) erfüllt für n → ∞:",
+            opts: ["T = (W-E0(W))/sqrt(Var0(W)) → N(0,1)", "T → chi²(1)", "T → t(n) exactly", "T → 0"],
+            optsDE: ["T = (W-E0(W))/sqrt(Var0(W)) → N(0,1)", "T → chi²(1)", "T → t(n) exakt", "T → 0"],
+            correct: 0,
+            explain: "Asymptotic normality.",
+            explainDE: "Asymptotische Normalität."
+        },
+        {
+            q: "The Wilcoxon test rejects H0 at level alpha if (slide 164):",
+            qDE: "Der Wilcoxon-Test verwirft H0 zum Niveau alpha, falls (Folie 164):",
+            opts: ["|T| > z_{1-alpha/2}", "|T| < 0", "W = E0(W) exactly", "T < 0 always"],
+            optsDE: ["|T| > z_{1-alpha/2}", "|T| < 0", "W = E0(W) exakt", "T < 0 immer"],
+            correct: 0,
+            explain: "Two-sided normal critical value.",
+            explainDE: "Zweiseitiger Normal-Quantilswert."
+        },
+        // --- WORLD 13 lecture: contingency tables (slides 166-171) ---
+        {
+            q: "Contingency tables typically arise in two ways (slide 166):",
+            qDE: "Kontingenztafeln entstehen typischerweise auf zwei Arten (Folie 166):",
+            opts: ["Cross-classification of pairs (Xi,Yi), or comparing r samples with s outcomes", "Only from normal data", "Only from time series", "By sorting one sample"],
+            optsDE: ["Kreuzklassifikation von Paaren (Xi,Yi) oder Vergleich von r Stichproben mit s Ausprägungen", "Nur aus Normaldaten", "Nur aus Zeitreihen", "Durch Sortieren einer Stichprobe"],
+            correct: 0,
+            explain: "Slide 166 lists both data models.",
+            explainDE: "Folie 166 nennt beide Datenmodelle."
+        },
+        {
+            q: "In an r×s table, Nij and Ni. denote (slide 167):",
+            qDE: "In einer r×s-Tafel bezeichnen Nij und Ni. (Folie 167):",
+            opts: ["Nij = count in cell (i,j); Ni. = row sample size sum_j Nij", "Nij = row size; Ni. = cell count", "Both are probabilities", "Nij = expected count; Ni. = observed"],
+            optsDE: ["Nij = Anzahl in Zelle (i,j); Ni. = Zeilenumfang sum_j Nij", "Nij = Zeilenumfang; Ni. = Zellanzahl", "Beides sind Wahrscheinlichkeiten", "Nij = erwartet; Ni. = beobachtet"],
+            correct: 0,
+            explain: "Cell counts and row totals.",
+            explainDE: "Zellanzahlen und Zeilensummen."
+        },
+        {
+            q: "Under H0 of identical row distributions, pj is estimated by (slide 168):",
+            qDE: "Unter H0 identischer Zeilenverteilungen wird pj geschätzt durch (Folie 168):",
+            opts: ["p̂j = N.j / N", "p̂j = Nij / Ni.", "p̂j = 1/r", "p̂j = Ni. / N"],
+            optsDE: ["p̂j = N.j / N", "p̂j = Nij / Ni.", "p̂j = 1/r", "p̂j = Ni. / N"],
+            correct: 0,
+            explain: "Pooled column relative frequency.",
+            explainDE: "Gepoolte Spalten-Relativhäufigkeit."
+        },
+        {
+            q: "The estimated expected counts are (slides 168/171):",
+            qDE: "Die geschätzten erwarteten Anzahlen lauten (Folien 168/171):",
+            opts: ["Êij = Ni.·N.j / N", "Êij = Nij·N", "Êij = Ni. + N.j", "Êij = N/(Ni.·N.j)"],
+            optsDE: ["Êij = Ni.·N.j / N", "Êij = Nij·N", "Êij = Ni. + N.j", "Êij = N/(Ni.·N.j)"],
+            correct: 0,
+            explain: "Row total times column total over N.",
+            explainDE: "Zeilensumme mal Spaltensumme durch N."
+        },
+        {
+            q: "The chi-squared statistic (slides 168/171) is:",
+            qDE: "Die Chiquadratstatistik (Folien 168/171) lautet:",
+            opts: ["Q = sum (Nij - Ni.·N.j/N)² / (Ni.·N.j/N)", "Q = sum (Nij - Êij)", "Q = max|Nij - Êij|", "Q = sum Nij·Êij"],
+            optsDE: ["Q = Summe (Nij - Ni.·N.j/N)² / (Ni.·N.j/N)", "Q = Summe (Nij - Êij)", "Q = max|Nij - Êij|", "Q = Summe Nij·Êij"],
+            correct: 0,
+            explain: "Squared standardized deviations summed.",
+            explainDE: "Quadrierte standardisierte Abweichungen summiert."
+        },
+        {
+            q: "Under H0, Q is approximately chi-squared with df (slides 168/171):",
+            qDE: "Unter H0 ist Q näherungsweise chiquadrat mit df (Folien 168/171):",
+            opts: ["df = (r-1)(s-1)", "df = r·s", "df = r+s", "df = N-1"],
+            optsDE: ["df = (r-1)(s-1)", "df = r·s", "df = r+s", "df = N-1"],
+            correct: 0,
+            explain: "Reject if Q > chi²((r-1)(s-1))_{1-alpha}.",
+            explainDE: "Verwerfe falls Q > chi²((r-1)(s-1))_{1-alpha}."
+        },
+        {
+            q: "For a 2×2 table with entries a,b,c,d (slide 169):",
+            qDE: "Für eine 2×2-Tafel mit Einträgen a,b,c,d (Folie 169):",
+            opts: ["Q = n(ad-bc)² / ((a+b)(c+d)(a+c)(b+d))", "Q = (ad-bc)/(a+b+c+d)", "Q = (a+d)-(b+c)", "Q = abcd/n"],
+            optsDE: ["Q = n(ad-bc)² / ((a+b)(c+d)(a+c)(b+d))", "Q = (ad-bc)/(a+b+c+d)", "Q = (a+d)-(b+c)", "Q = abcd/n"],
+            correct: 0,
+            explain: "Shortcut formula with n = a+b+c+d.",
+            explainDE: "Abkürzungsformel mit n = a+b+c+d."
+        },
+        {
+            q: "At alpha = 0.05 the critical value c_krit is (slide 169):",
+            qDE: "Bei alpha = 0,05 beträgt der kritische Wert c_krit (Folie 169):",
+            opts: ["3.842", "2.706", "6.635", "10.83"],
+            optsDE: ["3,842", "2,706", "6,635", "10,83"],
+            correct: 0,
+            explain: "Table: 0.1→2.706, 0.05→3.842, 0.01→6.635.",
+            explainDE: "Tabelle: 0,1→2,706, 0,05→3,842, 0,01→6,635."
+        },
+        {
+            q: "H0 of the chi-squared independence test (slide 170):",
+            qDE: "H0 des Chiquadrat-Unabhängigkeitstests (Folie 170):",
+            opts: ["Row variable X and column variable Y are stochastically independent", "All cell counts are equal", "r = s always", "N > 1000"],
+            optsDE: ["Zeilenvariable X und Spaltenvariable Y sind stochastisch unabhängig", "Alle Zellanzahlen sind gleich", "r = s immer", "N > 1000"],
+            correct: 0,
+            explain: "With pij = pi·qj under H0; same computation as before, different interpretation.",
+            explainDE: "Mit pij = pi·qj unter H0; gleiche Rechnung wie zuvor, andere Interpretation."
+        },
+
+    ],
+
+    14: [
+        // --- WORLD 14 lecture: Descriptive Statistics (STAT EAS 2026, slides 2-46) ---
+        {
+            q: "The population G (slide 4) is:",
+            qDE: "Die Grundgesamtheit G (Folie 4) ist:",
+            opts: ["The set of all statistical units", "One observed value", "The sample size n", "A single variable"],
+            optsDE: ["Die Menge aller statistischen Einheiten", "Ein einzelner beobachteter Wert", "Der Stichprobenumfang n", "Eine einzelne Variable"],
+            correct: 0,
+            explain: "G is the set of all units under study.",
+            explainDE: "G ist die Menge aller Untersuchungseinheiten."
+        },
+        {
+            q: "A variable X with values in M (slide 4) is formally:",
+            qDE: "Ein Merkmal X mit Werten in M (Folie 4) ist formal:",
+            opts: ["X: G → M, g ↦ X(g)", "X: M → G", "X = G × M", "X(g) = n"],
+            optsDE: ["X: G → M, g ↦ X(g)", "X: M → G", "X = G × M", "X(g) = n"],
+            correct: 0,
+            explain: "Each unit g gets a value X(g) in M.",
+            explainDE: "Jede Einheit g erhält einen Wert X(g) in M."
+        },
+        {
+            q: "Nominal scale (slide 7) means the values are:",
+            qDE: "Nominalskala (Folie 7) bedeutet, die Ausprägungen sind:",
+            opts: ["Only distinguishable (labels)", "Ordered and comparable", "Measurable with a unit", "Always numeric"],
+            optsDE: ["Nur unterscheidbar (Labels)", "Geordnet und vergleichbar", "Mit Einheit messbar", "Immer numerisch"],
+            correct: 0,
+            explain: "Nominal: e.g. study subject, gender.",
+            explainDE: "Nominal: z.B. Studienfach, Geschlecht."
+        },
+        {
+            q: "Ordinal scale (slide 7): values can be compared. Example:",
+            qDE: "Ordinalskala (Folie 7): Ausprägungen sind vergleichbar. Beispiel:",
+            opts: ["School grades or agreement 1–5", "Hair colour", "Lengths in cm", "Country names"],
+            optsDE: ["Schulnoten oder Zustimmung 1–5", "Haarfarbe", "Längen in cm", "Ländernamen"],
+            correct: 0,
+            explain: "Order exists, but differences are not measurable.",
+            explainDE: "Ordnung existiert, Differenzen sind aber nicht messbar."
+        },
+        {
+            q: "Ratio scale vs interval scale (slide 7):",
+            qDE: "Ratioskala vs Intervallskala (Folie 7):",
+            opts: ["Ratio has an absolute zero (lengths, money); interval zero is arbitrary (temperature)", "Both lack a zero point", "Interval allows quotients, ratio does not", "They are identical"],
+            optsDE: ["Ratio hat absoluten Nullpunkt (Längen, Geld); Intervall-Null ist willkürlich (Temperatur)", "Beide haben keinen Nullpunkt", "Intervall erlaubt Quotienten, Ratio nicht", "Sie sind identisch"],
+            correct: 0,
+            explain: "Only with a true zero can quotients be interpreted.",
+            explainDE: "Nur mit echtem Nullpunkt sind Quotienten interpretierbar."
+        },
+        {
+            q: "Coded data (slide 8, ATTENTION):",
+            qDE: "Kodierte Daten (Folie 8, ACHTUNG):",
+            opts: ["Numbers do not imply meaningful arithmetic; valid methods depend on the scale level", "Any computation is always valid", "Coding destroys all information", "Only means are ever valid"],
+            optsDE: ["Zahlen bedeuten keine sinnvolle Arithmetik; zulässige Methoden hängen vom Skalenniveau ab", "Jede Rechnung ist immer zulässig", "Kodieren zerstört alle Information", "Nur Mittelwerte sind je zulässig"],
+            correct: 0,
+            explain: "Scale level decides which operations make sense.",
+            explainDE: "Das Skalenniveau entscheidet, welche Rechenoperationen sinnvoll sind."
+        },
+        {
+            q: "In the data matrix (slide 9):",
+            qDE: "In der Datenmatrix (Folie 9):",
+            opts: ["Rows = observations, columns = variables", "Rows = variables, columns = observations", "It is always square", "It contains only means"],
+            optsDE: ["Zeilen = Beobachtungen, Spalten = Variablen", "Zeilen = Variablen, Spalten = Beobachtungen", "Sie ist immer quadratisch", "Sie enthält nur Mittelwerte"],
+            correct: 0,
+            explain: "Row i: values of unit i; column j: sample of variable j.",
+            explainDE: "Zeile i: Werte der Einheit i; Spalte j: Stichprobe des Merkmals j."
+        },
+        {
+            q: "Principle of area fidelity (slide 10):",
+            qDE: "Prinzip der Flächentreue (Folie 10):",
+            opts: ["Areas must be proportional to the numbers; for circles (F = πr²) radii ∝ square root", "Heights must equal the numbers", "Colours must match the numbers", "Only bar width matters"],
+            optsDE: ["Flächen müssen proportional zu den Zahlen sein; bei Kreisen (F = πr²) Radien ∝ Wurzel", "Höhen müssen den Zahlen gleichen", "Farben müssen den Zahlen entsprechen", "Nur Balkenbreite zählt"],
+            correct: 0,
+            explain: "The brain responds to area, not height or width.",
+            explainDE: "Das Gehirn reagiert auf Fläche, nicht auf Höhe oder Breite."
+        },
+        {
+            q: "Absolute frequencies (slide 11):",
+            qDE: "Absolute Häufigkeiten (Folie 11):",
+            opts: ["hj = count of xi with xi = aj; n = h1 + … + hk", "hj = hj/n always", "hj are always equal", "n = h1 · … · hk"],
+            optsDE: ["hj = Anzahl der xi mit xi = aj; n = h1 + … + hk", "hj = hj/n immer", "hj sind immer gleich", "n = h1 · … · hk"],
+            correct: 0,
+            explain: "Counting occurrences per value aj.",
+            explainDE: "Auszählen der Vorkommen je Wert aj."
+        },
+        {
+            q: "Relative frequencies (slide 12):",
+            qDE: "Relative Häufigkeiten (Folie 12):",
+            opts: ["fj = hj/n, and f1 + … + fk = 1", "fj = hj·n, summing to n", "fj = n/hj, summing to k", "fj are angles in radians"],
+            optsDE: ["fj = hj/n, und f1 + … + fk = 1", "fj = hj·n, Summe n", "fj = n/hj, Summe k", "fj sind Winkel im Bogenmaß"],
+            correct: 0,
+            explain: "fj is the share of observations with value aj.",
+            explainDE: "fj ist der Anteil der Beobachtungen mit Wert aj."
+        },
+        {
+            q: "In a pie chart (slide 13), a relative frequency fi gets angle:",
+            qDE: "Im Kreisdiagramm (Folie 13) gehört zu relativer Häufigkeit fi der Winkel:",
+            opts: ["φi = 2πfi (fi·360°)", "φi = fi + 360°", "φi = fi/360°", "φi = π/fi"],
+            optsDE: ["φi = 2πfi (fi·360°)", "φi = fi + 360°", "φi = fi/360°", "φi = π/fi"],
+            correct: 0,
+            explain: "The 360° (2π) are split by the frequencies.",
+            explainDE: "Die 360° (2π) werden nach den Häufigkeiten aufgeteilt."
+        },
+        {
+            q: "Order statistics (slide 14):",
+            qDE: "Ordnungsstatistik (Folie 14):",
+            opts: ["x(1) ≤ … ≤ x(n); range [xmin, xmax]", "x(1) ≥ … ≥ x(n); range (0,1)", "Sorted means are medians", "xmin is always 0"],
+            optsDE: ["x(1) ≤ … ≤ x(n); Messbereich [xmin, xmax]", "x(1) ≥ … ≥ x(n); Bereich (0,1)", "Sortierte Mittel sind Mediane", "xmin ist immer 0"],
+            correct: 0,
+            explain: "Parentheses mark the sorting step; range is the smallest interval covering all data.",
+            explainDE: "Klammern markieren den Sortierschritt; Messbereich ist das kleinste Intervall aller Daten."
+        },
+        {
+            q: "For grouped data (slide 15), class width and midpoint are:",
+            qDE: "Bei gruppierten Daten (Folie 15) sind Gruppenbreite und -mitte:",
+            opts: ["bj = gj+1 − gj, mj = (gj+1 + gj)/2", "bj = mj/2, gj = bj + mj", "bj = fj/n, mj = hj", "bj = k/n, mj = n/k"],
+            optsDE: ["bj = gj+1 − gj, mj = (gj+1 + gj)/2", "bj = mj/2, gj = bj + mj", "bj = fj/n, mj = hj", "bj = k/n, mj = n/k"],
+            correct: 0,
+            explain: "Classes Ij = (gj, gj+1] cover the range.",
+            explainDE: "Klassen Ij = (gj, gj+1] überdecken den Messbereich."
+        },
+        {
+            q: "Histogram bar height (slide 16):",
+            qDE: "Histogramm-Balkenhöhe (Folie 16):",
+            opts: ["lj = fj/bj, so that area bj·lj = fj", "lj = fj·bj", "lj = bj − fj", "lj = n/k always"],
+            optsDE: ["lj = fj/bj, sodass Fläche bj·lj = fj", "lj = fj·bj", "lj = bj − fj", "lj = n/k immer"],
+            correct: 0,
+            explain: "The histogram shows relative frequencies with area fidelity.",
+            explainDE: "Das Histogramm zeigt relative Häufigkeiten flächentreu."
+        },
+        {
+            q: "The frequency density f̂(x) (slides 19-20):",
+            qDE: "Die Häufigkeitsdichte f̂(x) (Folien 19-20):",
+            opts: ["Is itself a probability density: ≥ 0 and integrates to 1", "Is always normal", "Sums to n over the classes", "Is zero inside every class"],
+            optsDE: ["Ist selbst eine Wahrscheinlichkeitsdichte: ≥ 0 und Integral 1", "Ist immer normalverteilt", "Summiert sich zu n über Klassen", "Ist in jeder Klasse null"],
+            correct: 0,
+            explain: "It estimates the probability density f(x) of the variable.",
+            explainDE: "Sie schätzt die Wahrscheinlichkeitsdichte f(x) des Merkmals."
+        },
+        {
+            q: "The median (slides 22-25): for the 13 ozone values, x(7) = 66 means:",
+            qDE: "Der Median (Folien 22-25): Bei 13 Ozonwerten bedeutet x(7) = 66:",
+            opts: ["At least 50% are ≤ 66 and at least 50% are ≥ 66", "Exactly 66% of the data equal 66", "The mean equals 66", "66 is the maximum"],
+            optsDE: ["Mindestens 50% sind ≤ 66 und mindestens 50% sind ≥ 66", "Genau 66% der Daten gleichen 66", "Der Mittelwert ist 66", "66 ist das Maximum"],
+            correct: 0,
+            explain: "n odd: xmed = x((n+1)/2).",
+            explainDE: "n ungerade: xmed = x((n+1)/2)."
+        },
+        {
+            q: "The ozone mean (slide 28):",
+            qDE: "Das Ozonmittel (Folie 28):",
+            opts: ["x̄ = 974/13 = 74.923", "x̄ = 66 (like the median)", "x̄ = 974·13", "x̄ = 188 − 26"],
+            optsDE: ["x̄ = 974/13 = 74,923", "x̄ = 66 (wie der Median)", "x̄ = 974·13", "x̄ = 188 − 26"],
+            correct: 0,
+            explain: "Sum 974 over 13 measurements.",
+            explainDE: "Summe 974 über 13 Messungen."
+        },
+        {
+            q: "Minimizers (slides 26/29):",
+            qDE: "Minimierer (Folien 26/29):",
+            opts: ["Median minimizes Σ|xi − m|; mean minimizes Σ(xi − m)²", "Mean minimizes both", "Median minimizes both", "Neither minimizes anything"],
+            optsDE: ["Median minimiert Σ|xi − m|; Mittel minimiert Σ(xi − m)²", "Mittel minimiert beides", "Median minimiert beides", "Keiner minimiert etwas"],
+            correct: 0,
+            explain: "Absolute vs squared loss — different centres.",
+            explainDE: "Absolut- vs Quadratverlust — verschiedene Zentren."
+        },
+        {
+            q: "Robustness (slide 31): 9 farmers earn 1000, one rich earns 20000.",
+            qDE: "Robustheit (Folie 31): 9 Bauern verdienen 1000, ein Reicher 20000.",
+            opts: ["Mean 2900 is outlier-driven; median 1000 is robust", "Mean 1000, median 2900", "Both equal 20000", "Median does not exist here"],
+            optsDE: ["Mittel 2900 ist ausreißergetrieben; Median 1000 ist robust", "Mittel 1000, Median 2900", "Beide sind 20000", "Median existiert hier nicht"],
+            correct: 0,
+            explain: "x̄ reacts sensitively to outliers, xmed does not.",
+            explainDE: "x̄ reagiert empfindlich auf Ausreißer, xmed nicht."
+        },
+        {
+            q: "Shannon entropy (slides 36-37):",
+            qDE: "Shannon-Entropie (Folien 36-37):",
+            opts: ["H = −Σ fj log(fj), 0 ≤ H ≤ log(k); max at uniform, min at one-point", "H = Σ fj, always 1", "H is maximal at one-point distributions", "H < 0 always"],
+            optsDE: ["H = −Σ fj log(fj), 0 ≤ H ≤ log(k); max bei Gleichverteilung, min bei Einpunkt", "H = Σ fj, immer 1", "H ist maximal bei Einpunktverteilungen", "H < 0 immer"],
+            correct: 0,
+            explain: "Relative entropy J = H/log(k) lies in [0,1].",
+            explainDE: "Relative Entropie J = H/log(k) liegt in [0,1]."
+        },
+        {
+            q: "Sample variance (slide 38):",
+            qDE: "Stichprobenvarianz (Folie 38):",
+            opts: ["s² = (1/n)Σ(xi − x̄)²; grouped s²g = Σ fj(mj − x̄g)²; s = √s²", "s² = Σ|xi − x̄|", "s² = x̄² − n", "s² is always 1"],
+            optsDE: ["s² = (1/n)Σ(xi − x̄)²; gruppiert s²g = Σ fj(mj − x̄g)²; s = √s²", "s² = Σ|xi − x̄|", "s² = x̄² − n", "s² ist immer 1"],
+            correct: 0,
+            explain: "Mean squared deviation from the mean.",
+            explainDE: "Mittlere quadratische Abweichung vom Mittel."
+        },
+        {
+            q: "Variance rules (slide 39):",
+            qDE: "Varianzregeln (Folie 39):",
+            opts: ["var(a + x) = var(x); var(b·x) = b²·var(x)", "var(a + x) = a + var(x); var(b·x) = b·var(x)", "Variance is always shift-sensitive", "var(b·x) = var(x)/b"],
+            optsDE: ["var(a + x) = var(x); var(b·x) = b²·var(x)", "var(a + x) = a + var(x); var(b·x) = b·var(x)", "Varianz ist immer lageempfindlich", "var(b·x) = var(x)/b"],
+            correct: 0,
+            explain: "Invariant under shifts, quadratic under scaling.",
+            explainDE: "Invariant unter Lageänderung, quadratisch bei Maßstab."
+        },
+        {
+            q: "Shift theorem and practice (slides 40-41):",
+            qDE: "Verschiebungssatz und Praxis (Folien 40-41):",
+            opts: ["Σ(xi − x̄)² = Σxi² − n·x̄²; practice uses 1/(n−1), unbiased for σ²", "Σ(xi − x̄)² = n·x̄² − Σxi²; practice uses 1/n²", "The shift theorem needs normality", "1/(n−1) is biased but simpler"],
+            optsDE: ["Σ(xi − x̄)² = Σxi² − n·x̄²; Praxis nutzt 1/(n−1), erwartungstreu für σ²", "Σ(xi − x̄)² = n·x̄² − Σxi²; Praxis nutzt 1/n²", "Der Verschiebungssatz braucht Normalität", "1/(n−1) ist verzerrt, aber einfacher"],
+            correct: 0,
+            explain: "Computational form plus the unbiased practice estimator.",
+            explainDE: "Rechenform plus erwartungstreuer Praxisschätzer."
+        },
+        {
+            q: "Quartiles and IQR (slide 44):",
+            qDE: "Quartile und IQR (Folie 44):",
+            opts: ["Q1 = x̃0.25, Q2 = median, Q3 = x̃0.75; IQR = Q3 − Q1 is robust", "Q1 = minimum, Q3 = maximum", "IQR = Q3 + Q1", "Quartiles need grouped data"],
+            optsDE: ["Q1 = x̃0,25, Q2 = Median, Q3 = x̃0,75; IQR = Q3 − Q1 ist robust", "Q1 = Minimum, Q3 = Maximum", "IQR = Q3 + Q1", "Quartile brauchen gruppierte Daten"],
+            correct: 0,
+            explain: "The central 50% lie between Q1 and Q3.",
+            explainDE: "Die zentralen 50% liegen zwischen Q1 und Q3."
+        },
+        {
+            q: "Five-point summary and boxplot (slide 46):",
+            qDE: "Fünf-Punkte-Zusammenfassung und Boxplot (Folie 46):",
+            opts: ["xmin, Q1, median, Q3, xmax — drawn as a boxplot", "Mean, variance, n, min, max", "Five histograms side by side", "Only the three quartiles"],
+            optsDE: ["xmin, Q1, Median, Q3, xmax — dargestellt als Boxplot", "Mittel, Varianz, n, Min, Max", "Fünf Histogramme nebeneinander", "Nur die drei Quartile"],
+            correct: 0,
+            explain: "Ozone example: 26, 49, 66, 86, 188.",
+            explainDE: "Ozonbeispiel: 26, 49, 66, 86, 188."
+        },
     ],
 };
 

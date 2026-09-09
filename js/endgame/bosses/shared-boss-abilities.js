@@ -2184,6 +2184,18 @@ function _egNkHit(pct, element, level) {
 }
 
 
+// Distance from point (px,py) to segment (ax,ay)-(bx,by).
+// Shared since the Tier 7 Colossus rework (was _egInfernoPtSegDist in
+// boss-inferno.js; also used by Clock, Guardian, Kraken, Oblivion and the
+// Colossus rework's rock chutes).
+function _egPtSegDist(px, py, ax, ay, bx, by) {
+    const dx = bx - ax, dy = by - ay;
+    const len2 = dx * dx + dy * dy || 1;
+    const f = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+    return Math.hypot(px - (ax + dx * f), py - (ay + dy * f));
+}
+
+
 // DoT chunking: accumulates fractional damage, applies whole-HP ticks.
 function _egNkDotTick(run, pctPerSec, dtS, level, element) {
     // dtS arrives already clock-scaled from _egNkLoop (real / tierFactor);
@@ -2510,19 +2522,45 @@ function _egNkFlingAvatar(dx, dy, srcX, srcY) {
     let x0 = parseFloat(el.style.left);
     let y0 = parseFloat(el.style.top);
     const midGlide = !!el.dataset.egFlingActive;
-    if (midGlide || !isFinite(x0) || !isFinite(y0)) {
+    // The melee lunge (and the crit shake) animate the wrapper's TRANSFORM
+    // via WAAPI without touching style.left/top, so the inline position is
+    // stale while the sprite is visually displaced (e.g. mid auto-attack
+    // lunge at a boss). A fling landing in that window must anchor on the
+    // RENDERED rect and end the lunge — otherwise the sprite snaps back to
+    // its pre-lunge spot and the wobble + lunge fight over the transform.
+    let lungeAnim = null;
+    if (el.getAnimations) {
+        try {
+            lungeAnim = el.getAnimations().find(a => {
+                if (typeof CSSAnimation !== 'undefined' && a instanceof CSSAnimation) return false;
+                try {
+                    const kfs = (a.effect && a.effect.getKeyframes) ? a.effect.getKeyframes() : [];
+                    return kfs.some(k => k && k.transform !== undefined);
+                } catch (e) { return false; }
+            }) || null;
+        } catch (e) { lungeAnim = null; }
+    }
+    if (midGlide || lungeAnim || !isFinite(x0) || !isFinite(y0)) {
         // Mid-glide: style.left already holds the glide TARGET (not where
         // the sprite is) — sample the rendered rect instead so chained
         // flings blend from the sprite's actual position. Missing inline
         // position (fresh spawn / companion return cleared it): anchor on
         // the rect too — falling back to (0,0) flung the avatar at the
-        // top-left corner, which read as a random teleport.
+        // top-left corner, which read as a random teleport. The rect is
+        // sampled while the lunge is still live so it includes the lunge's
+        // transform displacement.
         const r = el.getBoundingClientRect();
         const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-        if (midGlide || !isFinite(x0)) x0 = cx - w / 2;
-        if (midGlide || !isFinite(y0)) y0 = cy - h / 2;
+        if (midGlide || lungeAnim || !isFinite(x0)) x0 = cx - w / 2;
+        if (midGlide || lungeAnim || !isFinite(y0)) y0 = cy - h / 2;
         el.style.left = x0 + 'px';
         el.style.top = y0 + 'px';
+    }
+    if (lungeAnim) {
+        // finish() (not cancel()) so the lunge's onfinish still restores
+        // the zIndex it raised; its end state is identity, so nothing
+        // visual jumps — the wobble + glide take over from the rect anchor.
+        try { lungeAnim.finish(); } catch (e) { try { lungeAnim.cancel(); } catch (e2) {} }
     }
     const x1 = Math.max(4, Math.min(window.innerWidth - w - 4, x0 + dx));
     const y1 = Math.max(4, Math.min(window.innerHeight - h - 4, y0 + dy));

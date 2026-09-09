@@ -280,6 +280,7 @@ function showPrimerModal(streak = 0) {
     overlay.innerHTML = _primerBuildModalHtml(primerQuestion, streak);
 
     document.body.appendChild(overlay);
+    if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
 
     // Inject character portrait
     const primerPortrait = document.getElementById('primer-portrait');
@@ -304,6 +305,7 @@ function showPrimerModal(streak = 0) {
 function closePrimerModal() {
     const el = document.getElementById('primer-overlay');
     if (el) el.remove();
+    if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
     primerQuestion = null;
     if (typeof hideGameTooltip === 'function') hideGameTooltip();
     if (typeof timerInterval !== 'undefined' && !dead) resumeTimer();

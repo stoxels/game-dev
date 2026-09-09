@@ -116,7 +116,7 @@ function _egMechEventBeams(monster, phase) {
             if (pts && now >= cdUntil) {
                 const bx = cx + Math.cos(a) * len, by = cy + Math.sin(a) * len;
                 for (const pt of pts) {
-                    if (_egInfernoPtSegDist(pt[0], pt[1], cx, cy, bx, by) < halfW + 6) {
+                    if (_egPtSegDist(pt[0], pt[1], cx, cy, bx, by) < halfW + 6) {
                         cdUntil = now + 900;
                         const dealt = _egNkHit(dmgPct, 'fire', level);
                         _egNkAbilityHitToast(dealt, 'The Oblivion', 'Event Beams');

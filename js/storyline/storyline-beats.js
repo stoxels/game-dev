@@ -345,6 +345,19 @@ STORY_BEATS.region_13 = {
     }
 };
 
+STORY_BEATS.region_14 = {
+    video: {
+        clips: _regionClips(14),
+        captions: _captions([
+            ['st_r14_c1', 0],
+            ['st_r14_c2', 8000],
+            ['st_r14_c3', 16000],
+            ['st_r14_c4', 24000],
+            ['st_r14_c5', 32000]
+        ]),
+    }
+};
+
 
 // ---------------------------------------------------------------------------
 // REPLAY GALLERY — flat registry of beats replayable from the title screen's

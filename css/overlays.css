@@ -524,3 +524,16 @@
         width: 90%;
     }
 }
+
+/* ======================================================================== */
+/* QUESTION MODALS HIDE THE CONTROLLABLE AVATAR SPRITE                      */
+/* ======================================================================== */
+/* While a question modal is open (quiz overlay, math gate, scouts primer — */
+/* input or multiple-choice surfaces), the controllable player avatar       */
+/* sprite is hidden so it doesn't peek out from behind the modal backdrop.  */
+/* The character sprite baked into the background (boss card / top-centre   */
+/* stage sprite) is NOT touched — only the WASD-controlled sprite hides.    */
+body.question-modal-open #player-avatar-wrapper,
+body.question-modal-open #player-avatar-simple {
+    display: none !important;
+}

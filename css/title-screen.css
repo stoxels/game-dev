@@ -4,6 +4,178 @@
     ------------------------------------------------------------------------
     ------------------------------------------------------------------------
 */
+/* ── BOOT LOADER ────────────────────────────────────────── */
+/*
+   The boot-up screen, styled to read as one continuous boot into
+   the title: same locked-ratio canvas, same background art, same
+   STOXELS logo image and italic serif "CARTOGRAPHERS OF CHANCE"
+   tagline. A small stone progress bar + status line at the bottom
+   is the only new element.
+
+   Only #boot-loader's own box (fixed layer, bg, fade transition)
+   lives inline in index.html so the very first paint is already
+   correct even before this stylesheet arrives. Everything else is
+   here so the boot look can never drift from the title screen.
+*/
+
+#boot-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#boot-loader .boot-canvas {
+    position: relative;
+    aspect-ratio: 1376 / 768;
+    width: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    height: auto;
+    margin: 0 auto;
+    container-type: inline-size;
+    container-name: bootcanvas;
+}
+
+/* Background art fills the locked-ratio box exactly */
+#boot-loader .boot-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Logo image — same position, size and glow as the title screen */
+#boot-loader .boot-logo-img {
+    position: absolute;
+    left: 50%;
+    top: 3%;
+    transform: translateX(-50%);
+    width: clamp(200px, 28%, 480px);
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 0 24px rgba(140, 60, 255, 0.55));
+}
+
+/* "CARTOGRAPHERS OF CHANCE" — same styling as .title-subtitle */
+#boot-loader .boot-sub {
+    position: absolute;
+    left: 50%;
+    top: 25.8%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: clamp(11px, 1.9cqw, 22px);
+    font-style: italic;
+    letter-spacing: 0.25em;
+    color: #d4b8ff;
+    text-shadow: 0 0 18px rgba(160, 80, 255, 0.7), 0 2px 6px rgba(0, 0, 0, 0.8);
+    z-index: 1;
+}
+
+/*
+   Stone progress bar + status line pinned near the bottom, in the
+   title palette (lilac text, purple-gold stones, --PX display font).
+   Widths use cqw so the bar scales with the artwork like everything
+   else; the outer clamp keeps it sane at extreme window sizes.
+*/
+#boot-loader .boot-footer {
+    position: absolute;
+    left: 50%;
+    bottom: 7.5%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1cqw;
+    width: 34%;
+    max-width: min(520px, 80vw);
+    z-index: 2;
+}
+
+#boot-loader .boot-bar {
+    width: 100%;
+    height: clamp(8px, 1.2cqw, 14px);
+    background: rgba(10, 10, 18, 0.72);
+    border: 1px solid #4a4a6a;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0.55);
+}
+
+#boot-loader .boot-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #8c3cff, #f5d98a);
+    box-shadow: 0 0 10px rgba(180, 120, 255, 0.65);
+    transition: width 0.15s ease-out;
+}
+
+#boot-loader .boot-status {
+    font-family: var(--PX);
+    font-size: clamp(7px, 0.95cqw, 11px);
+    letter-spacing: 0.12em;
+    color: rgba(200, 180, 255, 0.65);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+    min-height: 1.4em;
+    text-align: center;
+}
+
+/*
+   Narrow screens: mirror the title screen's stacked fallback —
+   the canvas flows vertically, art covers it, content stacks.
+*/
+@media (max-width: 700px) {
+    #boot-loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #boot-loader .boot-canvas {
+        aspect-ratio: auto;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4%;
+    }
+
+    #boot-loader .boot-bg-img {
+        object-position: top center;
+    }
+
+    #boot-loader .boot-logo-img,
+    #boot-loader .boot-sub,
+    #boot-loader .boot-footer {
+        position: relative;
+        left: auto;
+        top: auto;
+        bottom: auto;
+        transform: none;
+    }
+
+    #boot-loader .boot-logo-img {
+        width: 62%;
+    }
+
+    #boot-loader .boot-sub {
+        white-space: normal;
+        text-align: center;
+    }
+
+    #boot-loader .boot-footer {
+        width: min(74%, 320px);
+        gap: 10px;
+    }
+}
+
 /* ── NEW TITLE SCREEN ─────────────────────────────────────── */
 
 #screen-title {

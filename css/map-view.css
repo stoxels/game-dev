@@ -446,6 +446,12 @@
     box-shadow: 0 0 10px rgba(240, 192, 64, 0.5);
 }
 
+/* Nexus Point (final node of the Nexus World) — cyan ring instead of gold */
+.wd-level-node.nexus-point .wd-node-circle {
+    border-color: #7fd4ff;
+    box-shadow: 0 0 12px rgba(127, 212, 255, 0.6);
+}
+
 /* Convergence level node — green ring */
 .wd-level-node.convergence .wd-node-circle {
     border-color: #6fcf6f;

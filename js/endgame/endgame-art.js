@@ -211,5 +211,9 @@ document.addEventListener('eg-art-loaded', function () {
         }
         if (typeof _egRenderInventory === 'function') _egRenderInventory();
         if (typeof _egRenderEquipSlots === 'function') _egRenderEquipSlots();
+        // Boss test screen: swap emoji fallbacks for freshly loaded boss art.
+        if (typeof _egbtRenderGrid === 'function' && document.getElementById('egbt-boss-grid')) {
+            _egbtRenderGrid();
+        }
     } catch (e) { /* screens not initialised yet — safe to ignore */ }
 });

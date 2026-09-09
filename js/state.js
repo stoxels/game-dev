@@ -206,6 +206,11 @@ function buildFreshState() {
         // Convergence levels
         convergenceDone: [],
 
+        // Nexus World (World 14) / Nexus Point progress.
+        // Set to true on the first clear of the Nexus Point level; unlocks
+        // the Nexus screen and the setup-screen "Enter the Nexus" button.
+        nexusUnlocked: false,
+
         // Quests
         questStats: {},
         questsClaimed: [],
@@ -270,6 +275,7 @@ function _migrateCoreFields(s) {
     if (!s.levelMistakes) s.levelMistakes = {};
     if (!s.achStats) s.achStats = {};
     if (!s.convergenceDone) s.convergenceDone = [];
+    if (s.nexusUnlocked === undefined) s.nexusUnlocked = false;
 
     if (s.totalTimePlayedSecs === undefined) s.totalTimePlayedSecs = 0;
 }

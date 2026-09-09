@@ -125,9 +125,12 @@ function _egbtBuildBossTooltipHTML(def, level) {
     const mechDef = (typeof EG_BOSS_MECHANICS !== 'undefined') ? EG_BOSS_MECHANICS[def.id] : null;
     if (!mechDef) return null;
 
+    const bossIcon = (typeof EG_ART !== 'undefined' && EG_ART.html)
+        ? EG_ART.html('monster', def.id, def.emoji || '💀')
+        : (def.emoji || '💀');
     let html = `<div style="min-width:280px;">
         <div style="font-size:13px;font-weight:700;color:var(--accent,#c8a84b);margin-bottom:6px;">
-            ${def.emoji || '💀'} ${def.name || def.id}
+            ${bossIcon} ${def.name || def.id}
         </div>
         <div style="font-size:11px;opacity:0.8;margin-bottom:4px;">
             Lv ${level} · ❤️ ${preview.hp.toLocaleString()} · 🗡️ ${preview.dmg} base
@@ -322,6 +325,83 @@ function _egbtGetSpecialPhaseInfo(bossId) {
                 { name: 'Guard Rotor', desc: _egbtTr('eg_boss_test_ag_rotor', 'At 60% HP: two guardian orbs tether a beam that sweeps around a pivot like a radar blade. Stay off the arms!') },
                 { name: 'THE LAST BASTION', desc: _egbtTr('eg_boss_test_ag_final', 'At 10% HP: a bastion plants at the centre and sweeps the field with two beams that spin faster every beat — then the VANGUARD: three rapid shield charges, the last one huge! (charge bar frozen)') },
             ];
+        case 'boss_gridlock':
+            return [
+                { name: 'Laser Lattice', desc: _egbtTr('eg_boss_test_gl_lattice', 'All fight: alternating full-screen laser waves sweep the lit lanes — each wave STAGGER-FIRES line by line. Clear the lane whose turn is coming!') },
+                { name: 'Signal Scramble', desc: _egbtTr('eg_boss_test_gl_scramble', 'At 60% HP: signal towers plant and draw dashed cables to YOUR position, then all fire together. Move after they draw — the starburst aims at where you were!') },
+                { name: 'Surge Chaser', desc: _egbtTr('eg_boss_test_gl_surge', 'At 60% HP: a roaming ⚡ orb homes slowly and sheds a LIVE CABLE TRAIL behind it (two in phase 3). Kite it — the arena accumulates hot wires while you run!') },
+                { name: 'SYSTEM LOCKDOWN', desc: _egbtTr('eg_boss_test_gl_final', 'At 10% HP: a circuit grid floods the arena — 3 beats of charging wire batches, then THE JAM: every wire fires except one safe H+V crossing (green pip). Reach it, survive the SURGE DIVE that targets the safe cell — step off! (charge bar frozen)') },
+            ];
+        case 'boss_jester':
+            return [
+                { name: 'Bouncing Mayhem', desc: _egbtTr('eg_boss_test_js_orbs', 'All fight: juggling orbs bounce in RHYTHM — they glide calmly between beats, then all HOP and reshuffle direction on the beat. Dodge to the rhythm!') },
+                { name: 'Card Toss', desc: _egbtTr('eg_boss_test_js_cards', 'At 60% HP: fans of oversized playing cards arc across the stage and STICK face-up as hazards — the last volley aims at you. Mind the card table!') },
+                { name: 'Juggler\u2019s Jinx', desc: _egbtTr('eg_boss_test_js_jinx', 'At 60% HP: purple jinx balls orbit and bite, but one gold LUCK ball drifts through the chaos — touching it heals. Greed bait in the mayhem!') },
+                { name: 'THE GRAND FINALE', desc: _egbtTr('eg_boss_test_js_final', 'At 10% HP: the curtain drops and the FULL HOUSE deals — each reveal names a safe suit: stand on it when the reveal lands (reveals accelerate), then survive the BLACKOUT + CURTAIN CALL sweeps from the lit columns! (charge bar frozen)') },
+            ];
+        case 'boss_shaper':
+            return [
+                { name: 'Glacier Rift', desc: _egbtTr('eg_boss_test_shp_rift', 'All fight: a glacier front sweeps the whole screen (a band with 3 fissure gaps) and leaves LINGERING ICE POOLS that drain while you stand in them. Outrun the front, slip the gaps, respect the pools!') },
+                { name: 'Frost Monoliths', desc: _egbtTr('eg_boss_test_shp_monos', 'At 60% HP: rune monoliths plant at the edges and each grows a FROST WALL that shrinks the arena toward the centre. Body-check a monolith 3\u00d7 to shatter it and stop its wall!') },
+                { name: 'Ice Walker', desc: _egbtTr('eg_boss_test_shp_walker', 'At 60% HP: an ice walker (\u26c4) stalks you and SHATTERS on contact — its hit plus a burst of shard shrapnel. Two in phase 3. Let it kiss you at the right moment, or never!') },
+                { name: 'THE SHAPED WINTER', desc: _egbtTr('eg_boss_test_shp_final', 'At 10% HP: a colossal monolith assembles at the centre — three frost arms sweep faster each beat while CORES light up one at a time: body-check the lit core 3\u00d7 to shatter it. Break all three, or the MONOLITH BREAK shockwave detonates (only the central eye is safe)! (charge bar frozen)') },
+            ];
+        case 'boss_colossus':
+            return [
+                { name: 'Seismic Stride', desc: _egbtTr('eg_boss_test_colo_stride', 'All fight: the Colossus WALKS — two giant footprints slam in sequence, each rolling a full-screen SHOCKWAVE RING with a jump-window. Pure physical: resists do nothing. Phase 3 strides cut diagonally!') },
+                { name: 'Boulder Rain', desc: _egbtTr('eg_boss_test_colo_boulder', 'At 60% HP: the quarries hurl 🪨 boulders that arc in and SHATTER into rolling fragments that keep travelling. Dodge the impact ring AND the fragment lanes!') },
+                { name: 'Granite Golems', desc: _egbtTr('eg_boss_test_colo_golem', 'At 60% HP: two granite golems climb out and slow-push you into telegraphs — moving walls. Body-check one 3× to crumble it early, or they crumble on their own.') },
+                { name: "TITAN'S FALL", desc: _egbtTr('eg_boss_test_colo_final', 'At 10% HP: the titan KNEELS — three JOINT SEALS light up one at a time: body-check the lit seal 3× while rock chutes sweep the arena. Break all three and it collapses; a failed seal answers with a CAVE-IN (only the seal ring is safe)! (charge bar frozen)') },
+            ];
+        case 'boss_swarm':
+            return [
+                { name: 'Swarm Arc', desc: _egbtTr('eg_boss_test_sw_arc', 'All fight: a wedge of drones carves a huge SWARM ARC across the stage — every drone trails a LAVAL GLOW burn line and a 🐝 hatchling splits off mid-arc to cut a tighter inner arc. Ride the edge, respect the glow!') },
+                { name: 'Mimic Queen', desc: _egbtTr('eg_boss_test_sw_mimic', 'At 60% HP: four drones halt and open to reveal 👑 larvae — ONE is real, three are MIMICS. Crush the real one for ROYAL JELLY (+15% maxHP heal); step on a mimic and a rancid stink cloud erupts! Larvae sink after ~4s.') },
+                { name: 'Hive Eye', desc: _egbtTr('eg_boss_test_sw_eye', 'At 60% HP: a probe 🛸 flies to your position and BLOOMS — smoke covers everything except a 150px clear hole where you stood. Drone guards circle the hole. Plan your position BEFORE the bloom (two blooms in phase 3)!') },
+                { name: 'THE SWARM SINGULARITY', desc: _egbtTr('eg_boss_test_sw_final', 'At 10% HP: every drone recalls into a whirling ball of wings — 3 rapid CHARGES, each telegraphed with a green safe gap opposite the charge line. Then the ball implodes into a FUNNEL of 4 drone walls: slip through each wandering gap! (charge bar frozen)') },
+            ];
+        case 'boss_siren':
+            return [
+                { name: 'Wail Beam', desc: _egbtTr('eg_boss_test_sire_wail', 'All fight: the sweeping wail beam now sings PATTERNS — wide swing, narrow flick or stutter reversals (may reverse mid-song in phase 3). Glowing ECHO ZONES heal you if you stand in one while the beam passes. Bait = learn!') },
+                { name: 'Undertow', desc: _egbtTr('eg_boss_test_sire_undertow', 'At 60% HP: a whirlpool spins up at the anchor and DRAGS you toward it in slow pulls (moving breaks the pull) while flotsam spirals in and bites. Then it NOVAS — get out of the ring!') },
+                { name: 'Siren\u2019s Reply', desc: _egbtTr('eg_boss_test_sire_reply', 'At 60% HP: the beam splits — a mirror beam sweeps AGAINST the first, and phase 3 adds a third slow arc. Read every song before you cross!') },
+                { name: 'THE DEADLY ARIA', desc: _egbtTr('eg_boss_test_sire_final', 'At 10% HP: the hall floods with her bubble audience and the DEADLY ARIA begins — each song line lights a chain of bubbles: reach the FAR bubble before the note lands, because the rest of the song pops! The KILLER CRESCENDO detonates every bubble except one — stand on it! (charge bar frozen)') },
+            ];
+        case 'boss_bayes':
+            return [
+                { name: 'Posterior Bolts', desc: _egbtTr('eg_boss_test_bay_bolts', 'All fight: every cast strikes the side Bayes BELIEVES is safe in wide ⚡ columns — then the belief meter shifts AGAINST you. The green EVIDENCE RING spawns on the punished side: hold it through a landing bolt to flip the meter your way!') },
+                { name: 'Evidence Wisps', desc: _egbtTr('eg_boss_test_bay_wisps', 'At 60% HP: 🔮 wisps drift in wide loops — the GLOWING ones (on the disbelieved side) are free evidence: touch one to flip the meter; wisps on the believed side sting.') },
+                { name: 'Belief Veil', desc: _egbtTr('eg_boss_test_bay_veil', 'At 60% HP (once): the puzzle grid vanishes AS BAYES BELIEVES IT — the veil leans with the meter. Near 50/50 it reads clearest: balance is clarity.') },
+                { name: "THEOMERE'S GAMBIT", desc: _egbtTr('eg_boss_test_bay_final', 'At 10% HP: a 3×3 of districts shows TRUE danger odds — stand on a chip to flip it to its complement (one flip each). Three cast waves strike the true danger districts; survive all three and Bayes CONCEDES — the boss pays its own remaining HP! (charge bar frozen)') },
+            ];
+        case 'boss_entropy':
+            return [
+                { name: 'Heat Death Drift', desc: _egbtTr('eg_boss_test_entr_drift', 'All fight: ❄ pools bloom outward and MERGE into bigger ones while lit ORDER ZONES shrink — the only places that keep you crisp. Outside them your movement turns sluggish (never locked). Zone time refills your ORDER meter — spend it by staying crisp!') },
+                { name: 'Recursive Decay', desc: _egbtTr('eg_boss_test_entr_decay', 'At 60% HP: cursed cells AGE — every 4s one spreads to a neighbour (max 9). Stand ON a cell to burn it out, but the burn costs you. Triage the pack before it owns the map!') },
+                { name: "Maxwell's Door", desc: _egbtTr('eg_boss_test_entr_door', 'At 60% HP: a 🔥 hot and a ❄ cold door spawn at opposite edges — enter one to take its element for 8s. HOT: pools HEAL you (but heat scatters order). COLD: pool-proof (but order drains twice as fast). Choose your poison!') },
+                { name: 'THE LAST DEGREE', desc: _egbtTr('eg_boss_test_entr_final', 'At 10% HP: the arena freezes into a perfect lattice and ORDER SHARDS rain — touch each shard so its spark flies to the singularity: every delivered shard pops the boss for 20% of ITS HP! Collect 5 before the timer dies, or HEAT DEATH sweeps everything but the centre! (charge bar frozen)') },
+            ];
+        case 'boss_laplace':
+            return [
+                { name: 'Demonstrated Fate', desc: _egbtTr('eg_boss_test_lap_fate', 'All fight: every cast shows a harmless GHOST pre-run ~3s ahead, then the REAL fire lance follows the same path — and pins its ENDPOINT, exactly where the ghost ended. Never stand where the ghost dies! Phase 3 crosses two lances.') },
+                { name: 'Conditional Branches', desc: _egbtTr('eg_boss_test_lap_branches', 'At 60% HP: three phantoms walk dashed paths and each plants a future cell — ONE is ✅ real and detonates; the other two are fakes. Stand on a FAKE when it resolves for 2s GHOST-FORM: untouchable, so greed the next lance!') },
+                { name: 'Timeline Fray', desc: _egbtTr('eg_boss_test_lap_fray', 'At 60% HP: a 👣 clone walks a recording of YOUR last 6 seconds (path pre-drawn as dots). Touch it and you swap with where it was 2s ago — no damage, just dizzying. Watch the dots!') },
+                { name: 'THE CLOSED TIMELINE', desc: _egbtTr('eg_boss_test_lap_final', 'At 10% HP: the same gauntlet loops every 20s with IDENTICAL telegraphs — learn it! Break the ⛓️ timeline node each loop (stand on it); three breaks close the loop and kill the Demon. Failed dodges extend the loop and add a hunting phantom! (charge bar frozen)') },
+            ];
+        case 'boss_inferno':
+            return [
+                { name: 'Magma Tides', desc: _egbtTr('eg_boss_test_infv_tides', 'All fight: 🌊 lava floods half the arena in alternating tides (quartered in phase 3) — a heavy DoT. The tide edge leaves COOLING OBSIDIAN TILES that crack in 3 states before sinking: stand on them to cool your HEAT meter, and keep moving — standing still heats you up!') },
+                { name: 'Pyroclastic Surge', desc: _egbtTr('eg_boss_test_infv_surge', 'At 60% HP: a wall of fire sweeps the arena with TWO readable gaps — slip through. The ash cloud behind it is pressure, not punish: it just blocks your view.') },
+                { name: 'Eruption Vents', desc: _egbtTr('eg_boss_test_infv_vents', 'At 60% HP: three vents telegraph, then JET upward — and the jets leave HEAT HAZE zones that heat you 2.5x faster while inside. Do not linger!') },
+                { name: 'SUPERVOLCANIC WINTER', desc: _egbtTr('eg_boss_test_infv_final', 'At 10% HP: the Inferno detonates and the arena FREEZES (fire→ice!). The ice sheet makes you DRIFT (momentum!), magma bombs mark landings, and you must LURE each magma surge into the glowing fissure vents — three lured surges blow the cap and kill the core! (charge bar frozen)') },
+            ];
+        case 'boss_null':
+            return [
+                { name: 'Void Lattice', desc: _egbtTr('eg_boss_test_nul_lattice', 'All fight: a star-lattice of 🕸️ void lines covers the arena — standing ON a line is a shadow DoT. Every ~12s the lattice RE-CONTRACTS to a new centre (brief grace window). The safe cells are the triangular gaps — read the lines!') },
+                { name: 'Hypothesis Erasure', desc: _egbtTr('eg_boss_test_nul_erasure', 'At 60% HP: the Null ERASES one system for 8s — your clue numbers, your charge bar readout, or your class HUD — with a 🧿 marker on what it took. The info always comes back. Prove you can win with less!') },
+                { name: 'Null Rays', desc: _egbtTr('eg_boss_test_nul_rays', 'At 60% HP: 🧿 eye-beams orbit the anchor — crossing one damages you AND CHILLS your charge bar (half fill speed). Stay in the gaps between the gaze!') },
+                { name: 'PROOF BY CONTRADICTION', desc: _egbtTr('eg_boss_test_nul_final', 'At 10% HP: the arena turns PURE WHITE and the Null asserts you cannot hit it. Phantoms replay YOUR recent path and strike toward their heading — stand OPPOSITE the strike, near the phantom, to shatter a shell. 3 shells = the hypothesis collapses! Three failures = NULLIFICATION: only the white ring is safe! (charge bar frozen)') },
+            ];
         case 'boss_snail':
             return [
                 { name: 'Snailgeddon', desc: _egbtTr('eg_boss_test_snail_snailgeddon', 'At ≤20% HP: 5s countdown → teleport to centre, closing ring of snails with a lagging wedge. Escape through the gap!') }
@@ -381,13 +461,13 @@ function _egbtGetSpecialPhaseInfo(bossId) {
             ];
         case 'boss_striker':
             return [
-                { name: 'Corner Kicks', desc: _egbtTr('eg_boss_test_striker_corners', 'At 60% HP: 2 corners × 3 volleys × 6 crossing balls fan across the arena. Thread the gaps in the fan.') },
-                { name: 'Penalty Shootout', desc: _egbtTr('eg_boss_test_striker_penalty', 'At 30% HP: a goal appears — the ring stalks you, then locks: 3 shots, 260ms flight each. Move until the lock, then juke.') }
+                { name: 'Kick-Off Challenge', desc: _egbtTr('eg_boss_test_striker_corners', 'At 60% HP: the homing ball leaves — a resting ball drops on the pitch. Run to it, stand next to it to charge, step away to shoot. Score 1 goal into the edge goal.') },
+                { name: 'Hat-Trick', desc: _egbtTr('eg_boss_test_striker_penalty', 'At 30% HP: same kick rules, 3 goals in 60s. The ball rolls out after each shot — chase it and re-kick. Full power needs 1.5s of charge.') }
             ];
         case 'boss_centipede':
             return [
                 { name: 'Exoskeleton', desc: _egbtTr('eg_boss_test_centipede_shell', 'At 60% HP: 2 waves × 8 armour plates spiral out from your position. Weave the gaps.') },
-                { name: 'Molt', desc: _egbtTr('eg_boss_test_centipede_molt', 'At 30% HP: the tail detaches into a permanent faster mini-centipede while the main body enrages. A 2-body fight for the rest — never collapses back.') }
+                { name: 'Molt', desc: _egbtTr('eg_boss_test_centipede_molt', 'At 30% HP: the tail detaches into a faster mini-centipede. Burrow holes open — lure it over one to bury it for 15s before it resurfaces.') }
             ];
         case 'boss_thwomp':
             return [
@@ -439,6 +519,41 @@ function _egbtGetSpecialPhaseInfo(bossId) {
                 { name: 'Constrictor', desc: _egbtTr('eg_boss_test_coil_constrict', 'At 60% HP: 3–5 rings contract onto your position — stand in the gaps between rings.') },
                 { name: 'Serpent Tide', desc: _egbtTr('eg_boss_test_coil_tide', 'At 30% HP: 3 tidal waves of chargers cross at your height. Exit the row vertically; kite seeker snakes away so they detonate elsewhere.') },
                 { name: 'Cobra Strike', desc: _egbtTr('eg_boss_test_coil_cobra', 'Charge attack: horizontal H92 lane at your height, 380ms lash. Venom trails tick shadow DoT — don’t stand in them to dodge.') }
+            ];
+        case 'boss_minotaur':
+            return [
+                { name: 'Labyrinth Walls', desc: _egbtTr('eg_boss_test_mnt_labyrinth', 'All fight: 5–6 wall slabs rise and hold ~8s, carving the arena into lanes — then the bull charges the open lane at YOUR row. The maze channels the charge; the bull crumbles one wall per rush. Phase 3: double charges per cast!') },
+                { name: 'Hooftread Terrain', desc: _egbtTr('eg_boss_test_mnt_hoof', 'At 60% HP: hoof craters stamp down the lane in sequence and plant lingering hoofprints, while a DUST STORM trails the charge lane. The maze accumulates burn terrain the longer the duel runs!') },
+                { name: 'Thread of Ariadne', desc: _egbtTr('eg_boss_test_mnt_thread', 'At 60% HP: a glowing thread marks the ONE SAFE LANE — honest, and bait. Hold it once for a heal; it frays, snaps and re-forms elsewhere. Travel through it, never live in it!') },
+                { name: "THE WARDEN'S LABYRINTH", desc: _egbtTr('eg_boss_test_mnt_final', 'At 10% HP: three wall generations rise while the Warden charges each TWICE — body-check the glowing MAZEWALL STONES 3× each to shatter them. Then the TRAMPLE runs EVERY lane at once: only shattered lanes are safe! (charge bar frozen)') },
+            ];
+        case 'boss_barrage':
+            return [
+                { name: 'Shelling Curtain', desc: _egbtTr('eg_boss_test_bar_curtain', 'All fight: a creeping wall of shell splashes sweeps the arena — the telegraph stays visible while it rolls, so fight INSIDE the barrage and clear cells between shell lines. Phase 3: the curtain also comes from the top — fight the diagonal!') },
+                { name: 'Supply Drop', desc: _egbtTr('eg_boss_test_bar_supply', 'At 60% HP: cargo crates crash down and flip open into artillery JAMMERS that lob slow mortar shells at your last position. Step into a crate to SMASH it (+15% maxHP heal) before it digs in!') },
+                { name: 'Shot Shells', desc: _egbtTr('eg_boss_test_bar_shells', 'At 60% HP: heavy shells fall on telegraphed rings (most aim near where you are) and each burst scatters six hot shrapnel spokes that keep travelling. Read the ring AND the fragment lanes!') },
+                { name: 'FINAL BOMBARDMENT', desc: _egbtTr('eg_boss_test_bar_final', 'At 10% HP: the whole arena becomes the target zone — three full-screen shelling grids with two safe gaps each, then the ALL-OUT SALVO detonates everything except ONE safe tile. Reach it! (charge bar frozen)') },
+            ];
+        case 'boss_bloom':
+            return [
+                { name: 'Scarlet Blooms', desc: _egbtTr('eg_boss_test_blm_blooms', 'All fight: flowers open where you STAND — the marker TRACKS you until it freezes, then bursts. Every bloom plants a ROT GARDEN: a sweeping stamen beam, a burn floor, and one CRITICAL MASS burst whose seed pods plant NEW gardens. Untended, the garden takes over! Phase 3: blooms chase in converging pairs!') },
+                { name: 'Seed Volley', desc: _egbtTr('eg_boss_test_blm_volley', 'At 60% HP: three seed pods arc across the arena and plant three fresh rot gardens in a line toward you — the garden is coming to YOU. Interrupt the march by standing where they land? No — move!') },
+                { name: 'Withering Bloom', desc: _egbtTr('eg_boss_test_blm_veil', 'At 60% HP (once): the puzzle grid hides behind a blooming veil — every cell you FILL wilts it (visible thinning), every mistake REGROWS it. The puzzle is the pruning!') },
+                { name: 'FULMINATION', desc: _egbtTr('eg_boss_test_blm_final', 'At 10% HP: the boss blooms from EVERY direction — petal-chains crawl along radial lanes while a judgment-bloom stamps your position. Each dodge carves a SCAR; three scars open the ONE TRUE GAP, and THE LAST BLOOM detonates everything outside it! (charge bar frozen)') },
+            ];
+        case 'boss_overfitter':
+            return [
+                { name: 'Gradient Descent', desc: _egbtTr('eg_boss_test_ovr_gradient', 'All fight: training steps march across the arena as hot gradient bands — a shadow DoT inside. The sweep ends with a LOCAL MINIMUM that locks where you stood and detonates; Phase 3: a second minimum chases your CURRENT position!') },
+                { name: 'Pattern Lock', desc: _egbtTr('eg_boss_test_ovr_lock', 'At 60% HP: the model RECORDS your movement (the dashed trail is live) then REPLAYS it — a spike walks your exact path, detonating echoes at every step and an OVERFIT STRIKE where you stopped. Take no hit and you are UNLEARNED (+heal)!') },
+                { name: 'Validation Set', desc: _egbtTr('eg_boss_test_ovr_valid', 'At 60% HP: two rings, one test — the model detonates the ring you are CLOSEST to. Break equidistance or get near neither and it UNDERFITS: nothing detonates at all!') },
+                { name: 'THE FINAL EPOCH', desc: _egbtTr('eg_boss_test_ovr_final', 'At 10% HP: the whole fight was training data — your ACTUAL position history renders as a heat-map, then re-trains in three waves. Hot cells detonate, cool cells are safe, and it RE-RECORDS between waves. New ground is safe ground! (charge bar frozen)') },
+            ];
+        case 'boss_razor':
+            return [
+                { name: 'Blade Cyclone', desc: _egbtTr('eg_boss_test_rzr_cyclone', 'All fight: a fan of boomerangs flies out, wheels around, and returns along CURVED arcs that cross each other — dodge the throw, then read the crossfire home. Phase 3: a second fan launches while the first is still returning!') },
+                { name: 'Razor Wire Lattice', desc: _egbtTr('eg_boss_test_rzr_wires', 'At 60% HP: taut wires snap across the arena — lightning DoT on contact, then they SNAP and the cut ends whip outward. Path between the wires and LEAVE the line before it dies! Phase 3: five wires, one already taut.') },
+                { name: 'Hone and Cast', desc: _egbtTr('eg_boss_test_rzr_hone', 'At 60% HP: the whetstone grinds a GIANT SCYTHE (grind aura chips you) — body-check the stone 2× to shatter it (+12% maxHP heal) and CANCEL the cast, or the scythe crosses the whole arena at your row. Phase 3: it comes back the other way!') },
+                { name: 'A THOUSAND EDGES', desc: _egbtTr('eg_boss_test_rzr_final', 'At 10% HP: nine razor spokes rotate around the centre and REVERSE every few seconds — rim fans shave across the middle each reversal. Survive three cycles for THE LAST EDGE: one full-screen scythe with a single safe pocket (the grind aura) that CHIPS you to stand in! (charge bar frozen)') },
             ];
         default:
             return [];
@@ -684,6 +799,13 @@ function _egbtScaledPreview(def, level) {
 //-------------------HTML BUILDERS------------------------------------------
 //------------------------------------------------------------------------
 
+function _egbtBossIconHTML(def) {
+    // Real boss art when it exists (see images/endgame/monsters/boss_*.jpeg),
+    // otherwise the emoji fallback — same helper the arena cards use.
+    if (typeof EG_ART !== 'undefined' && EG_ART.html) return EG_ART.html('monster', def.id, def.emoji || '💀');
+    return def.emoji || '💀';
+}
+
 function _egbtBuildBossCardHTML(def, level) {
     const preview = _egbtScaledPreview(def, level);
     const safeName = String(def.name || def.id).replace(/"/g, '"');
@@ -695,7 +817,7 @@ function _egbtBuildBossCardHTML(def, level) {
      onmouseleave="hideGameTooltip()"
      onclick="_egLaunchBossTest('${def.id}', ${level})"
      title="${safeName}">
-    <div class="egbt-boss-emoji">${def.emoji || '💀'}</div>
+    <div class="egbt-boss-emoji">${_egbtBossIconHTML(def)}</div>
     <div class="egbt-boss-name">${def.name || def.id}</div>
     <div class="egbt-boss-stats">Lv ${level} · ❤️ ${preview.hp} · 🗡️ ${preview.dmg}</div>
     <div class="egbt-boss-id">${def.id}</div>
@@ -845,6 +967,10 @@ function _egbtEnsureStyles() {
             box-shadow: 0 4px 14px rgba(200, 168, 75, 0.35);
         }
         .egbt-boss-emoji { font-size: 30px; }
+        .egbt-boss-emoji img.eg-art-img {
+            width: 64px; height: 64px;
+            object-fit: cover; border-radius: 8px;
+        }
         .egbt-boss-name { font-size: 12px; color: var(--accent, #c8a84b); }
         .egbt-boss-stats { font-size: 10px; opacity: 0.85; }
         .egbt-boss-id { font-size: 9px; opacity: 0.45; word-break: break-all; }

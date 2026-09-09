@@ -280,14 +280,33 @@ function applyAscensionReward(irz) {
     irz.innerHTML = _buildItemRewardCard(defId, codexDef, label);
 }
 
-// Dispatcher for convergence and ascension one-time rewards.
+// Builds the Nexus Point unlock card shown in the win overlay's reward zone.
+function applyNexusPointReward(irz) {
+    if (typeof setNexusUnlocked === 'function') setNexusUnlocked();
+    else if (typeof STATE !== 'undefined' && STATE) {
+        STATE.nexusUnlocked = true;
+        if (typeof save === 'function') save();
+    }
+    if (!irz) return;
+    const label = `🌌 ${t('scr_nexus_unlocked_title')}: ${t('scr_enter_nexus_short')}`;
+    irz.innerHTML += `<div class="item-reward" style="border-color:#7fd4ff;color:#bfe9ff;cursor:default;">${label}<br><span style="opacity:0.8;font-size:0.9em">${t('scr_nexus_unlocked_desc')}</span></div>`;
+    if (typeof showToast === 'function') showToast(`🌌 ${t('scr_nexus_unlocked_title')}`);
+}
+
+// Dispatcher for convergence, ascension and Nexus Point one-time rewards.
 // Called during win-overlay rendering; writes into the item-reward zone (irz)
-// when an ascension reward applies.
-function handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz }) {
+// when a special reward applies. The Nexus Point never grants the ascension
+// codex — it unlocks the Nexus instead.
+function handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, isNexusPoint }) {
     const worldData = WORLDS[cur.world - 1];
 
     if (isConvergenceLevel(worldData, isAscensionLevel) && isFirstClear) {
         applyConvergenceReward(gi);
+    }
+
+    if (isNexusPoint) {
+        if (isFirstClear) applyNexusPointReward(irz);
+        return;
     }
 
     if (isAscensionLevel && isFirstClear && !curMods.ironman) {
@@ -469,14 +488,14 @@ function buildBonusClaimedNote() {
 //   2. Repeat bonus clear     → "already claimed" note + lucky drop chance
 //   3. Bonus missed           → lucky drop chance only
 // Ironman mode and quiz bonuses suppress all item rewards.
-function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel) {
+function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNexusPoint) {
     const irz = document.getElementById('item-reward-zone');
     irz.innerHTML = '';
     const bonusAlreadyDone = STATE.bonusDone.includes(gi);
     const isQuizBonus = cur.bonusType === 'quiz';
 
-    // Special one-time rewards (convergence points, ascension codex) go first
-    handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz });
+    // Special one-time rewards (convergence points, ascension codex, Nexus unlock) go first
+    handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, isNexusPoint });
 
     // Mark the bonus as done on first clear (before item logic so save() is called once)
     if (bonusMet && !bonusAlreadyDone && !isQuizBonus) {
@@ -508,21 +527,48 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel) {
 }
 
 // Orchestrates the full win overlay render: stats, bonus badge, and item rewards.
-function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear }) {
+function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear, isNexusPoint }) {
     document.getElementById('ov-reveal-quote').innerHTML = `"${lvText(cur, 'reveal')}"`;
     buildScoreColumn(pts, ptsAwarded, prevBest, mult);
     buildTimeColumn(elapsed);
     renderBonusBadge(bonusMet);
-    renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel);
+    renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNexusPoint);
 
     // Ascension levels always route back to the overworld: hide Next/Retry
     // and promote the Levels button to the primary action.
+    // The Nexus Point behaves the same, but gains a dedicated gateway
+    // button into the Nexus screen (separate element, so the static
+    // Next/Levels handlers wired in ui-events.js keep working untouched).
     const nextBtn = document.getElementById('btn-next-lvl');
     const retryBtn = document.getElementById('btn-win-retry');
     const levelsBtn = document.getElementById('btn-win-levels');
-    if (nextBtn) nextBtn.style.display = isAscensionLevel ? 'none' : '';
-    if (retryBtn) retryBtn.style.display = isAscensionLevel ? 'none' : '';
-    if (levelsBtn) levelsBtn.className = isAscensionLevel ? 'ob p' : 'ob s';
+    const endOfLine = isAscensionLevel || isNexusPoint;
+    if (nextBtn) nextBtn.style.display = endOfLine ? 'none' : '';
+    if (retryBtn) retryBtn.style.display = endOfLine ? 'none' : '';
+    if (levelsBtn) levelsBtn.className = endOfLine ? 'ob p' : 'ob s';
+    _updateNexusWinButton(isNexusPoint);
+}
+
+// Ensures the win overlay has a dedicated "Enter the Nexus" button.
+// Created once, then shown only after the Nexus Point. Uses its own id so
+// it never collides with the static Next/Levels handlers.
+function _updateNexusWinButton(show) {
+    const container = document.querySelector('#ov-win .ov-btns');
+    if (!container) return;
+    let btn = document.getElementById('btn-enter-nexus-win');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'btn-enter-nexus-win';
+        btn.className = 'ob p';
+        btn.addEventListener('click', () => {
+            hideResultOverlays();
+            if (typeof showEndgameNexus === 'function') showEndgameNexus();
+            else goToLevelSelect();
+        });
+        container.appendChild(btn);
+    }
+    btn.textContent = t('scr_enter_nexus_short');
+    btn.style.display = show ? '' : 'none';
 }
 
 
@@ -568,9 +614,14 @@ function checkIsLargeAdjMatrix() {
 
 function _getLevelSpecialStatus(level) {
     const worldData = WORLDS[level.world - 1];
-    const isAscension = level.li === worldData.data.length;
+    const wi = level.world - 1;
+    const li = level.li - 1;
+    const isNexusPoint = typeof isNexusPointLevel === 'function'
+        ? isNexusPointLevel(wi, li)
+        : (wi === 13 && li === worldData.data.length - 1);
+    const isAscension = !isNexusPoint && level.li === worldData.data.length;
     const isConvergence = isConvergenceLevel(worldData, isAscension);
-    return { isAscension, isConvergence };
+    return { isAscension, isConvergence, isNexusPoint };
 }
 
 
@@ -629,7 +680,9 @@ function checkWin() {
     const cols = sol[0].length;
     const gi = cur.gIdx;
     const worldData = WORLDS[cur.world - 1];
-    const isAscensionLevel = _getLevelSpecialStatus(cur).isAscension;   
+    const _special = _getLevelSpecialStatus(cur);
+    const isAscensionLevel = _special.isAscension;
+    const isNexusPoint = !!_special.isNexusPoint;
     const isFirstClear = !STATE.done.includes(gi);
 
     if (isFirstClear) STATE.done.push(gi);
@@ -668,13 +721,14 @@ function checkWin() {
 
     if (typeof triggerBanter === 'function') triggerBanter('win');
 
-    // Render the win overlay content (buildReveal() is deferred until
+// Render the win overlay content (buildReveal() is deferred until
     // #ov-win is actually visible — see the two branches below, and
     // finishQuiz()/skipQuiz() in quiz.js for the quiz-bonus path)
-    renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear });
+    renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear, isNexusPoint });
 
-    // World completion hooks (codes popup delayed so it feels distinct)
-    setTimeout(() => checkWorldCodes(), 2000);
+    // World completion hooks — persist code unlocks immediately so they're
+    // not lost if the player closes the game before the delayed modal shows.
+    checkWorldCodesSync();
     checkWorldCompletion();
 
     // Show the win overlay (or quiz flow if the bonus type is 'quiz')
@@ -689,6 +743,9 @@ function checkWin() {
             requestAnimationFrame(() => buildReveal());
         }, 1000);
     }
+
+    // Codes popup delayed so it feels distinct from the win overlay
+    setTimeout(() => checkWorldCodes(), 2000);
 
     Audio_Manager.playSFX('win');
 

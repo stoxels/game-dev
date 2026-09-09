@@ -377,6 +377,88 @@ function _egBossCleanup(monsterId) {
     if (monsterId.startsWith('boss_aegis') && typeof _egAgTeardown === 'function') {
         _egAgTeardown();
     }
+    // The Gridlock (rework): laser lattice, signal scramble, surge chaser
+    // and the SYSTEM LOCKDOWN set-piece.
+    if (monsterId.startsWith('boss_gridlock') && typeof _egGlTeardown === 'function') {
+        _egGlTeardown();
+    }
+    // The Jester (rework): bouncing mayhem, card toss, juggler's jinx and
+    // the GRAND FINALE set-piece.
+    if (monsterId.startsWith('boss_jester') && typeof _egJsTeardown === 'function') {
+        _egJsTeardown();
+    }
+    // The Shaper (rework): glacier rift, frost monoliths, ice walkers and
+    // the SHAPED WINTER set-piece.
+    if (monsterId.startsWith('boss_shaper') && typeof _egShpTeardown === 'function') {
+        _egShpTeardown();
+    }
+    // The Siren (rework): wail beam patterns, undertow, siren's reply and
+    // the DEADLY ARIA set-piece.
+    if (monsterId.startsWith('boss_siren') && typeof _egSireTeardown === 'function') {
+        _egSireTeardown();
+    }
+    // The Swarm (rework): swarm arcs, mimic queen, hive eye blooms and the
+    // SWARM SINGULARITY set-piece.
+    if (monsterId.startsWith('boss_swarm') && typeof _egSwTeardown === 'function') {
+        _egSwTeardown();
+    }
+    // The Colossus (rework): stride footfalls, boulders, golems and the
+    // TITAN'S FALL set-piece.
+    if (monsterId.startsWith('boss_colossus') && typeof _egColoTeardown === 'function') {
+        _egColoTeardown();
+    }
+    // Bayes (rework): belief meter, gambit board, veil chip and the veil
+    // itself — the framework's shared typeof-guarded veil removal resolves
+    // to the copies that live in boss-bayes.js.
+    if (monsterId.startsWith('boss_bayes') && typeof _egBayTeardown === 'function') {
+        _egBayTeardown();
+    }
+    // Entropy (rework): order meter, pools/zones/cells, door auras and the
+    // LAST DEGREE set-piece.
+    if (monsterId.startsWith('boss_entropy') && typeof _egEntrTeardown === 'function') {
+        _egEntrTeardown();
+    }
+    // Laplace (rework): ghost corridors, branches, the movement clone and
+    // the CLOSED TIMELINE set-piece.
+    if (monsterId.startsWith('boss_laplace') && typeof _egLapTeardown === 'function') {
+        _egLapTeardown();
+    }
+    // The Inferno (rework): heat meter, tides/tiles/hazes and the
+    // SUPERVOLCANIC WINTER set-piece.
+    if (monsterId.startsWith('boss_inferno') && typeof _egInfVTeardown === 'function') {
+        _egInfVTeardown();
+    }
+    // The Null (rework): lattice lines, erasure markers, rays and the
+    // PROOF BY CONTRADICTION set-piece. Also owns the legacy blackout and
+    // void-surge teardowns the framework typeof-guards.
+    if (monsterId.startsWith('boss_null') && typeof _egNulTeardown === 'function') {
+        _egNulTeardown();
+    }
+    // The Barrage (rework): shelling curtain, supply jammers, shot shells
+    // and the FINAL BOMBARDMENT set-piece.
+    if (monsterId.startsWith('boss_barrage') && typeof _egBarTeardown === 'function') {
+        _egBarTeardown();
+    }
+    // The Bloom (rework): rot gardens, stamen rotors, seed pods and the
+    // FULMINATION set-piece.
+    if (monsterId.startsWith('boss_bloom') && typeof _egBlmTeardown === 'function') {
+        _egBlmTeardown();
+    }
+    // The Minotaur (rework): labyrinth walls, hoof craters, dust storms,
+    // Ariadne threads and the WARDEN'S LABYRINTH set-piece.
+    if (monsterId.startsWith('boss_minotaur') && typeof _egMntTeardown === 'function') {
+        _egMntTeardown();
+    }
+    // The Overfitter (rework): gradient sweeps, pattern replays, validation
+    // rings and the FINAL EPOCH heat-map set-piece.
+    if (monsterId.startsWith('boss_overfitter') && typeof _egOvrTeardown === 'function') {
+        _egOvrTeardown();
+    }
+    // The Razor (rework): cyclone blades, razor wires, whetstones and the
+    // A THOUSAND EDGES spoke-clock set-piece.
+    if (monsterId.startsWith('boss_razor') && typeof _egRzrTeardown === 'function') {
+        _egRzrTeardown();
+    }
 }
 
 

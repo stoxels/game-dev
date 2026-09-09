@@ -326,7 +326,7 @@ function questStat_timerItemUsed() {
     _incDirect('_ql_timerItemsUsedThisLevel');
 }
 
-// Called when a reveal item (not cursedReveal) is used.
+// Called when a reveal item (including cursedReveal) is used.
 function questStat_revealItemUsed() {
     _incDirect('_ql_revealItemsThisLevel');
     STATE.questStats._ql_hasUsedManualReveal = true;
@@ -706,8 +706,8 @@ function _questStats_onItemUsed(payload) {
     const id = payload.defId;
     if (!id) return;
 
-    // All reveal* items except the cursed variant
-    if (id.startsWith('reveal') && id !== 'cursedReveal') _inc('revealItemsUsed');
+    // All reveal* items including cursedReveal
+    if (id.startsWith('reveal')) _inc('revealItemsUsed');
 
     // Mistake-eraser family (tutor items)
     if (_TUTOR_ITEM_IDS.has(id)) _inc('tutorItemsUsed');

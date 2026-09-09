@@ -1924,8 +1924,11 @@ function _egBuildMapTooltipBodyHTML(item) {
         // EG_ATLAS_REGION_BOSSES) instead of a generic encounter label.
         // Multi-boss maps have no single identity, so they keep the count.
         const boss = bossCount > 1 ? null : _egResolveMapBoss(item);
+        const bossIcon = boss
+            ? ((typeof EG_ART !== 'undefined' && EG_ART.html) ? EG_ART.html('monster', boss.id, boss.emoji) : boss.emoji)
+            : null;
         const bossLabel = boss
-            ? `${boss.emoji} ${boss.name}`
+            ? `${bossIcon} ${boss.name}`
             : (bossCount > 1
                 ? t('eg_map_boss_count').replace('{n}', bossCount)
                 : t('eg_map_has_boss'));

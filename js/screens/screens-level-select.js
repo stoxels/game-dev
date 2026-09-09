@@ -221,10 +221,10 @@ function renderLSWorlds() {
             grid.appendChild(card);
         });
 
-        // Inject the special Endgame Hub card at the front of World 13 (index 12)
+        // Inject the special Endgame Hub card at the front of World 14 (index 13, the Nexus World)
 
-     
-        if (wi === 22) {
+      
+        if (wi === 13) {
             const hubCard = buildEndgameHubCard(w, wi, tip);
             grid.prepend(hubCard);
         }
@@ -329,12 +329,14 @@ function getStars(gi) {
 
 
 // Builds the CSS class string for a level card based on its current state.
-function buildLevelCardClass({ isUnlocked, isDone, isMathGated, isLastInWorld, isConvergenceLevel, w, gi }) {
+// The Nexus Point keeps the ascension frame but adds its own marker class.
+function buildLevelCardClass({ isUnlocked, isDone, isMathGated, isLastInWorld, isConvergenceLevel, w, gi, isNexusPoint }) {
     return 'level-card' +
         (isUnlocked ? '' : ' locked') +
         (isDone ? ' done' : '') +
         (isMathGated && isUnlocked ? ' math-gated' : '') +
         (isLastInWorld && w.data.length > 1 ? ' ascension' : '') +
+        (isNexusPoint ? ' nexus-point' : '') +
         (isConvergenceLevel ? ' convergence' : '') +
         (isMaxCleared(gi) ? ' max-cleared' : '');
 }
@@ -383,8 +385,10 @@ function buildGridSizeStr(p, w) {
 
 // Returns the ASCENSION badge HTML for the final level of a world.
 // Only shown when the world has more than one level.
-function buildAscensionBadge(isLastInWorld, w) {
+// The Nexus Point shows its own badge instead of the Ascension badge.
+function buildAscensionBadge(isLastInWorld, w, isNexusPoint) {
     if (!isLastInWorld || w.data.length <= 1) return '';
+    if (isNexusPoint) return `<div class="lc-ascension-badge lc-nexus-point-badge">${t('scr_nexus_point_badge')}</div>`;
     return `<div class="lc-ascension-badge">${t('scr_ascension_badge')}</div>`;
 }
 
@@ -399,13 +403,13 @@ function buildConvergenceBadge(isConvergenceLevel, gi) {
 }
 
 // Assembles the full inner HTML for a level card.
-function buildLevelCardHTML({ p, li, wi, w, gi, isUnlocked, isDone, hs, isLastInWorld, isConvergenceLevel }) {
+function buildLevelCardHTML({ p, li, wi, w, gi, isUnlocked, isDone, hs, isLastInWorld, isConvergenceLevel, isNexusPoint }) {
     const stars = isDone ? getStars(gi) : '';
     const hsHtml = buildHSHtml(hs);
     const bonusHtml = buildBonusHtml(p, gi, isUnlocked);
     const modTagsHtml = buildModTagsHtml(hs);
     const gridSizeStr = buildGridSizeStr(p, w);
-    const ascensionBadge = buildAscensionBadge(isLastInWorld, w);
+    const ascensionBadge = buildAscensionBadge(isLastInWorld, w, isNexusPoint);
     const convergenceBadge = buildConvergenceBadge(isConvergenceLevel, gi);
     const maxBadge = isMaxCleared(gi) ? `<div class="lc-max-badge">👑</div>` : '';
     const hintText = isUnlocked ? lvText(p, 'hint') : '???';
@@ -440,9 +444,15 @@ function attachLevelCardEvents(card, gi, isDone, isMathGated, tip) {
 
 // Builds and returns a fully constructed level card element.
 // Resolves all state flags, builds the DOM element, and attaches events if unlocked.
+// Levels inside the Nexus World stay locked until the whole campaign is finished.
 function buildLevelCard(p, li, wi, w, tip) {
     const gi = WORLD_START_GI[wi] + li;
-    const isUnlocked = li === 0 ? STATE.tutorialDone : STATE.done.includes(gi - 1);
+    const isNexusPoint = typeof isNexusPointLevel === 'function' && isNexusPointLevel(wi, li);
+    let isUnlocked = li === 0 ? STATE.tutorialDone : STATE.done.includes(gi - 1);
+    if (typeof isNexusWorld === 'function' && isNexusWorld(wi)
+        && typeof isNexusWorldUnlocked === 'function' && !isNexusWorldUnlocked()) {
+        isUnlocked = false;
+    }
     const isDone = STATE.done.includes(gi);
     const hs = STATE.levelHS[gi];
     const isMathGated = isGatedLevel(gi) && !isMathGatePassed(gi);
@@ -450,8 +460,8 @@ function buildLevelCard(p, li, wi, w, tip) {
     const isConvergenceLevel = isLevelConvergence(li, w, isLastInWorld);
 
     const card = document.createElement('div');
-    card.className = buildLevelCardClass({ isUnlocked, isDone, isMathGated, isLastInWorld, isConvergenceLevel, w, gi });
-    card.innerHTML = buildLevelCardHTML({ p, li, wi, w, gi, isUnlocked, isDone, hs, isLastInWorld, isConvergenceLevel });
+    card.className = buildLevelCardClass({ isUnlocked, isDone, isMathGated, isLastInWorld, isConvergenceLevel, w, gi, isNexusPoint });
+    card.innerHTML = buildLevelCardHTML({ p, li, wi, w, gi, isUnlocked, isDone, hs, isLastInWorld, isConvergenceLevel, isNexusPoint });
 
     if (isUnlocked) {
         attachLevelCardEvents(card, gi, isDone, isMathGated, tip);
@@ -468,23 +478,17 @@ function buildLevelCard(p, li, wi, w, tip) {
 //------------------------------------------------------------------------
 
 
-// Dynamically constructs the special Endgame Hub level-card entry.
-// Unlocks automatically when the final standard level of World 13 is completed.
-
+// Dynamically constructs the special Endgame Hub level-card entry,
+// prepended to World 14 (the Nexus World) in the level select.
+// Unlocks once the Nexus Point has been completed (which itself requires
+// finishing every campaign world first).
 
 
 function buildEndgameHubCard(w, wi, tip) {
     const hubCard = document.createElement('div');
 
-    // Calculate if ALL ascension levels are done
-    const allAscensionsDone = WORLDS.every((world, index) => {
-        const finalLevelGi = WORLD_START_GI[index] + (world.data.length - 1);
-        return STATE.done.includes(finalLevelGi);
-    });
-
-    // The Hub is unlocked if all ascensions are done
-    //const isHubUnlocked = allAscensionsDone;
-    const isHubUnlocked = true;                     // only for testing purposes, remove before release TODO
+    // The Nexus (and its hub card) opens via the Nexus Point completion.
+    const isHubUnlocked = typeof isNexusUnlocked === 'function' ? isNexusUnlocked() : false;
 
 
     hubCard.className = 'level-card endgame-hub-card' + (isHubUnlocked ? '' : ' locked');
@@ -499,6 +503,12 @@ function buildEndgameHubCard(w, wi, tip) {
     if (isHubUnlocked) {
         hubCard.addEventListener('click', () => {
             tip.classList.remove('show');
+            if (typeof showEndgameHub === 'function') {
+                showEndgameHub();
+                if (typeof initEndgameHubDnD === 'function') initEndgameHubDnD({ seedTestItems: true });
+            } else if (typeof showEndgameNexus === 'function') {
+                showEndgameNexus();
+            }
             /*
             showBeat('nexus_opens', {
                 onComplete: () => {

@@ -349,8 +349,8 @@ function _updateHUD() {
                 ? rarityColors(egMap.rarity).color : '';
         } else {
             nameEl.textContent = `${lvText(cur, 'hint')}`;
-            const { isAscension, isConvergence } = _getLevelSpecialStatus(cur);
-            nameEl.style.color = isAscension ? '#c080ff' : isConvergence ? '#6dbf40' : '';
+            const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
+            nameEl.style.color = isNexusPoint ? '#7fd4ff' : isAscension ? '#c080ff' : isConvergence ? '#6dbf40' : '';
         }
     }
 }

@@ -282,6 +282,24 @@
     animation: ascension-pulse 2.5s ease-in-out infinite;
 }
 
+    /* Nexus Point card + badge — same frame as Ascension, cyan instead of purple */
+    .level-card.nexus-point {
+        border-color: #7fd4ff;
+        background: linear-gradient(160deg, var(--surface) 60%, rgba(127, 212, 255, 0.12) 100%);
+        box-shadow: 0 0 10px rgba(127, 212, 255, 0.25);
+    }
+
+        .level-card.nexus-point:hover {
+            border-color: #bfe9ff;
+            box-shadow: 0 0 18px rgba(127, 212, 255, 0.45);
+        }
+
+    .lc-nexus-point-badge {
+        color: #7fd4ff;
+        border-color: rgba(127, 212, 255, 0.5);
+        background: rgba(127, 212, 255, 0.1);
+    }
+
 @keyframes ascension-pulse {
     0%, 100% {
         opacity: 0.75;

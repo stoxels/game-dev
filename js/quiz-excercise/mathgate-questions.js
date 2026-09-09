@@ -3424,7 +3424,116 @@ const MATH_GATE_POOLS = {
 
 
 
-    12: [],
+    12: [
+        {
+            q: 'n = 7, sum xi = 28. Compute xbar.',
+            qDE: 'n = 7, sum xi = 28. Berechne xquer.',
+            answer: 4, tolerance: 0.001, unit: '',
+            hintEn: 'x̄ = 28/7 = 4 (slide 142).',
+            hintDE: 'x̄ = 28/7 = 4 (Folie 142).',
+            explain: 'x̄ = 28/7 = 4.',
+            explainDE: 'x̄ = 28/7 = 4.'
+        },
+        {
+            q: 'sum xi*yi = 93.5, n·xbar·ybar = 7·4·2.91429 = 81.6. Numerator of b_hat = ? Round to 2 decimals.',
+            qDE: 'sum xi*yi = 93,5, n·xquer·yquer = 7·4·2,91429 = 81,6. Zaehler von b-Dach = ? Auf 2 Dezimalen.',
+            answer: 11.9, tolerance: 0.15, unit: '',
+            hintEn: '93.5 − 81.6 = 11.9 (≈12.02 with unrounded ȳ).',
+            hintDE: '93,5 − 81,6 = 11,9 (≈12,02 mit ungerundetem ȳ).',
+            explain: 'Numerator ≈ 12.02 → b̂ ≈ 0.4293.',
+            explainDE: 'Zähler ≈ 12,02 → b̂ ≈ 0,4293.'
+        },
+        {
+            q: 'Denominator sum xi² − n·xbar² = 140 − 7·16 = ?',
+            qDE: 'Nenner sum xi² − n·xquer² = 140 − 7·16 = ?',
+            answer: 28, tolerance: 0, unit: '',
+            hintEn: '140 − 112 = 28.',
+            hintDE: '140 − 112 = 28.',
+            explain: 'Denominator = 28, so b̂ = 12.02/28 ≈ 0.4293.',
+            explainDE: 'Nenner = 28, also b̂ = 12,02/28 ≈ 0,4293.'
+        },
+        {
+            q: 'ybar = 2.91429, b_hat = 0.4293, xbar = 4. Compute a_hat = ybar − b·xbar. Round to 2 decimals.',
+            qDE: 'yquer = 2,91429, b-Dach = 0,4293, xquer = 4. Berechne a-Dach = yquer − b·xquer. Auf 2 Dezimalen.',
+            answer: 1.2, tolerance: 0.05, unit: '',
+            hintEn: '2.91429 − 0.4293·4 = 2.91429 − 1.7172 ≈ 1.19.',
+            hintDE: '2,91429 − 0,4293·4 = 2,91429 − 1,7172 ≈ 1,19.',
+            explain: 'â ≈ 1.1928.',
+            explainDE: 'â ≈ 1,1928.'
+        },
+        {
+            q: 'r = 0.6, n = 12. Compute T = r·sqrt(n−2)/sqrt(1−r²). Round to 2 decimals.',
+            qDE: 'r = 0,6, n = 12. Berechne T = r·sqrt(n−2)/sqrt(1−r²). Auf 2 Dezimalen.',
+            answer: 2.37, tolerance: 0.05, unit: '',
+            hintEn: 'T = 0.6·√10/√0.64 = 0.6·3.162/0.8 ≈ 2.37.',
+            hintDE: 'T = 0,6·√10/√0,64 = 0,6·3,162/0,8 ≈ 2,37.',
+            explain: 'Compare |T| to t(10) critical value.',
+            explainDE: 'Vergleiche |T| mit t(10)-Quantil.'
+        },
+        {
+            q: 'Correlation test with n = 27. Degrees of freedom of T under H0?',
+            qDE: 'Korrelationstest mit n = 27. Freiheitsgrade von T unter H0?',
+            answer: 25, tolerance: 0, unit: '',
+            hintEn: 'df = n − 2 = 25.',
+            hintDE: 'df = n − 2 = 25.',
+            explain: 'T ~ t(n−2).',
+            explainDE: 'T ~ t(n−2).'
+        },
+        {
+            q: 'sxy = 12.02, s_x² = 4. Compute b_hat = sxy/(n·s_x²)? No — use b = 12.02/28. Round to 3 decimals.',
+            qDE: 'b = 12,02/28. Runde auf 3 Dezimalen.',
+            answer: 0.429, tolerance: 0.002, unit: '',
+            hintEn: '12.02/28 ≈ 0.4293.',
+            hintDE: '12,02/28 ≈ 0,4293.',
+            explain: 'Matches slide 142.',
+            explainDE: 'Wie Folie 142.'
+        },
+        {
+            q: 'SSR = 30, SST = 50. Compute R². Round to 2 decimals.',
+            qDE: 'SSR = 30, SST = 50. Berechne R². Auf 2 Dezimalen.',
+            answer: 0.6, tolerance: 0.01, unit: '',
+            hintEn: 'R² = SSR/SST = 30/50 = 0.6.',
+            hintDE: 'R² = SSR/SST = 30/50 = 0,6.',
+            explain: 'R² = r²_XY.',
+            explainDE: 'R² = r²_XY.'
+        },
+        {
+            q: 'SST = 100, SSR = 64. Compute SSE = SST − SSR.',
+            qDE: 'SST = 100, SSR = 64. Berechne SSE = SST − SSR.',
+            answer: 36, tolerance: 0, unit: '',
+            hintEn: '100 − 64 = 36.',
+            hintDE: '100 − 64 = 36.',
+            explain: 'SST = SSR + SSE.',
+            explainDE: 'SST = SSR + SSE.'
+        },
+        {
+            q: 'a_hat = 1.1928, b_hat = 0.4293. Predict y_hat at x = 7. Round to 2 decimals.',
+            qDE: 'a-Dach = 1,1928, b-Dach = 0,4293. Prognose y-Dach an x = 7. Auf 2 Dezimalen.',
+            answer: 4.2, tolerance: 0.05, unit: '',
+            hintEn: '1.1928 + 0.4293·7 = 1.1928 + 3.0051 ≈ 4.20.',
+            hintDE: '1,1928 + 0,4293·7 = 1,1928 + 3,0051 ≈ 4,20.',
+            explain: 'Fitted value on the regression line.',
+            explainDE: 'Prognosewert auf der Ausgleichsgeraden.'
+        },
+        {
+            q: 'Residual: y = 4.6, y_hat = 4.2. Compute e_hat = y − y_hat. Round to 2 decimals.',
+            qDE: 'Residuum: y = 4,6, y-Dach = 4,2. Berechne e-Dach = y − y-Dach. Auf 2 Dezimalen.',
+            answer: 0.4, tolerance: 0.02, unit: '',
+            hintEn: '4.6 − 4.2 = 0.4.',
+            hintDE: '4,6 − 4,2 = 0,4.',
+            explain: 'êᵢ = yᵢ − ŷᵢ.',
+            explainDE: 'êᵢ = yᵢ − ŷᵢ.'
+        },
+        {
+            q: 'Two-sided correlation test, |T| = 2.5, critical t(n−2)_{1−α/2} = 2.06. Reject H0? Enter 1 yes, 0 no.',
+            qDE: 'Zweiseitiger Korrelationstest, |T| = 2,5, kritisch 2,06. H0 verwerfen? 1 ja, 0 nein.',
+            answer: 1, tolerance: 0, unit: '',
+            hintEn: '|T| > critical → reject.',
+            hintDE: '|T| > kritisch → verwerfen.',
+            explain: '2.5 > 2.06 → reject H0: ρ = 0.',
+            explainDE: '2,5 > 2,06 → H0: ρ = 0 verwerfen.'
+        },
+    ],
 
 
 
@@ -3434,8 +3543,8 @@ const MATH_GATE_POOLS = {
             q: 'Var(2X) = ? if Var(X) = 9. Enter the numeric value.',
             qDE: 'Var(2X) = ? wenn Var(X) = 9. Gib den numerischen Wert ein.',
             answer: 36, tolerance: 0, unit: '',
-            hintEn: 'Var(aX) = a² · Var(X) = 4 × 9 = 36.',
-            hintDE: 'Var(aX) = a² · Var(X) = 4 × 9 = 36.'
+            hintEn: 'Var(aX) = a²·Var(X) = 4 × 9 = 36.',
+            hintDE: 'Var(aX) = a²·Var(X) = 4 × 9 = 36.'
         },
         {
             q: 'E[X²] = 10 and E[X] = 2. What is Var(X)? (Use Var(X) = E[X²] − (E[X])²)',
@@ -3476,8 +3585,8 @@ const MATH_GATE_POOLS = {
             q: 'For a Poisson process with rate λ=2 per hour, what is the expected number of events in 3 hours?',
             qDE: 'Für einen Poisson-Prozess mit Rate λ=2 pro Stunde, wie viele Ereignisse werden in 3 Stunden erwartet?',
             answer: 6, tolerance: 0, unit: 'events',
-            hintEn: 'E[events] = λ · t = 2 × 3 = 6.',
-            hintDE: 'E[Ereignisse] = λ · t = 2 × 3 = 6.'
+            hintEn: 'E[events] = λ·t = 2 × 3 = 6.',
+            hintDE: 'E[Ereignisse] = λ·t = 2 × 3 = 6.'
         },
 
 
@@ -3485,11 +3594,183 @@ const MATH_GATE_POOLS = {
             q: 'Cov(X,Y) = 6, Var(X) = 9, Var(Y) = 16. What is the correlation coefficient r? Round to 2 decimal places.',
             qDE: 'Cov(X,Y) = 6, Var(X) = 9, Var(Y) = 16. Wie groß ist der Korrelationskoeffizient r? Auf 2 Dezimalstellen gerundet.',
             answer: 0.5, tolerance: 0.01, unit: '',
-            hintEn: 'r = Cov(X,Y) / (σX · σY) = 6 / (3 × 4) = 6/12 = 0.5.',
-            hintDE: 'r = Cov(X,Y) / (σX · σY) = 6 / (3 × 4) = 6/12 = 0,5.'
+            hintEn: 'ρ = Cov(X,Y)/(σₓ·σᵧ) = 6/(3 × 4) = 6/12 = 0.5.',
+            hintDE: 'ρ = Cov(X,Y)/(σₓ·σᵧ) = 6/(3 × 4) = 6/12 = 0,5.'
+        },
+
+        // --- WORLD 13 lecture: Wilcoxon (slides 162-165) ---
+        {
+            q: 'n1 = 8, n2 = 7. Total n = n1 + n2 = ?',
+            qDE: 'n1 = 8, n2 = 7. Gesamt n = n1 + n2 = ?',
+            answer: 15, tolerance: 0, unit: '',
+            hintEn: 'n = 8 + 7 = 15.',
+            hintDE: 'n = 8 + 7 = 15.'
+        },
+        {
+            q: 'n = 10. Rank-sum identity: R1. + R2. = n(n+1)/2 = ?',
+            qDE: 'n = 10. Rangsummen-Identität: R1. + R2. = n(n+1)/2 = ?',
+            answer: 55, tolerance: 0, unit: '',
+            hintEn: '10×11/2 = 55.',
+            hintDE: '10×11/2 = 55.'
+        },
+        {
+            q: 'n2 = 6, n = 11. Null mean E0(W) = n2(n+1)/2 = ?',
+            qDE: 'n2 = 6, n = 11. Null-Erwartung E0(W) = n2(n+1)/2 = ?',
+            answer: 36, tolerance: 0, unit: '',
+            hintEn: '6×12/2 = 36.',
+            hintDE: '6×12/2 = 36.'
+        },
+        {
+            q: 'n1 = 5, n2 = 6, n = 11. Null variance Var0(W) = n1·n2(n+1)/12 = ?',
+            qDE: 'n1 = 5, n2 = 6, n = 11. Null-Varianz Var0(W) = n1·n2(n+1)/12 = ?',
+            answer: 30, tolerance: 0, unit: '',
+            hintEn: '5×6×12/12 = 30.',
+            hintDE: '5×6×12/12 = 30.'
+        },
+        {
+            q: 'W = 45, E0(W) = 36, Var0(W) = 30. T = (W−E0)/sqrt(Var0). Round to 2 decimals.',
+            qDE: 'W = 45, E0(W) = 36, Var0(W) = 30. T = (W−E0)/sqrt(Var0). Auf 2 Dezimalen.',
+            answer: 1.64, tolerance: 0.02, unit: '',
+            hintEn: 'T = 9/√30 = 9/5.477 ≈ 1.64.',
+            hintDE: 'T = 9/√30 = 9/5,477 ≈ 1,64.'
+        },
+        {
+            q: '|T| = 1.64, z_{0.975} = 1.96. Reject H0 at α = 0.05? Enter 1 yes, 0 no.',
+            qDE: '|T| = 1,64, z_{0,975} = 1,96. H0 zu α = 0,05 verwerfen? 1 ja, 0 nein.',
+            answer: 0, tolerance: 0, unit: '',
+            hintEn: '1.64 < 1.96 → not rejected.',
+            hintDE: '1,64 < 1,96 → nicht verworfen.'
+        },
+        // --- WORLD 13 lecture: contingency (slides 166-171) ---
+        {
+            q: 'Row total Ni. = 40, column total N.j = 30, N = 200. Expected Êij = Ni.·N.j/N = ?',
+            qDE: 'Zeilensumme Ni. = 40, Spaltensumme N.j = 30, N = 200. Erwartet Êij = Ni.·N.j/N = ?',
+            answer: 6, tolerance: 0, unit: '',
+            hintEn: '40×30/200 = 6.',
+            hintDE: '40×30/200 = 6.'
+        },
+        {
+            q: 'Nij = 14, Êij = 10. Contribution (Nij−Êij)²/Êij = ? Round to 2 decimals.',
+            qDE: 'Nij = 14, Êij = 10. Beitrag (Nij−Êij)²/Êij = ? Auf 2 Dezimalen.',
+            answer: 1.6, tolerance: 0.02, unit: '',
+            hintEn: '(14−10)²/10 = 16/10 = 1.6.',
+            hintDE: '(14−10)²/10 = 16/10 = 1,6.'
+        },
+        {
+            q: 'Table with r = 3 rows, s = 4 columns. df = (r−1)(s−1) = ?',
+            qDE: 'Tafel mit r = 3 Zeilen, s = 4 Spalten. df = (r−1)(s−1) = ?',
+            answer: 6, tolerance: 0, unit: '',
+            hintEn: '2×3 = 6.',
+            hintDE: '2×3 = 6.'
+        },
+        {
+            q: '2×2 table a=20, b=10, c=10, d=20 (n=60). Q = n(ad−bc)²/((a+b)(c+d)(a+c)(b+d)). Round to 2 decimals.',
+            qDE: '2×2-Tafel a=20, b=10, c=10, d=20 (n=60). Q = n(ad−bc)²/((a+b)(c+d)(a+c)(b+d)). Auf 2 Dezimalen.',
+            answer: 6.67, tolerance: 0.05, unit: '',
+            hintEn: 'ad−bc = 400−100 = 300; Q = 60×90000/(30×30×30×30) = 5400000/810000 ≈ 6.67.',
+            hintDE: 'ad−bc = 400−100 = 300; Q = 60×90000/(30×30×30×30) = 5400000/810000 ≈ 6,67.'
+        },
+        {
+            q: 'Q = 6.67 with df = 1, critical value 3.842 at α = 0.05. Reject H0? Enter 1 yes, 0 no.',
+            qDE: 'Q = 6,67 bei df = 1, kritisch 3,842 zu α = 0,05. H0 verwerfen? 1 ja, 0 nein.',
+            answer: 1, tolerance: 0, unit: '',
+            hintEn: '6.67 > 3.842 → reject.',
+            hintDE: '6,67 > 3,842 → verwerfen.'
+        },
+        {
+            q: 'N = 500, Ni. = 100, N.j = 125. Êij = ?',
+            qDE: 'N = 500, Ni. = 100, N.j = 125. Êij = ?',
+            answer: 25, tolerance: 0, unit: '',
+            hintEn: '100×125/500 = 25.',
+            hintDE: '100×125/500 = 25.'
         },
     ],
 
-
-
+    14: [
+        // --- WORLD 14 lecture: Descriptive Statistics (STAT EAS 2026) ---
+        {
+            q: 'Counts h = [12, 18, 20]. Sample size n = h1+h2+h3 = ?',
+            qDE: 'Anzahlen h = [12, 18, 20]. Stichprobenumfang n = h1+h2+h3 = ?',
+            answer: 50, tolerance: 0, unit: '',
+            hintEn: 'n = 12 + 18 + 20 = 50.',
+            hintDE: 'n = 12 + 18 + 20 = 50.'
+        },
+        {
+            q: 'hj = 15, n = 60. Relative frequency fj = hj/n = ? Round to 2 decimals.',
+            qDE: 'hj = 15, n = 60. Relative Häufigkeit fj = hj/n = ? Auf 2 Dezimalen.',
+            answer: 0.25, tolerance: 0.01, unit: '',
+            hintEn: 'fj = 15/60 = 0.25.',
+            hintDE: 'fj = 15/60 = 0,25.'
+        },
+        {
+            q: 'fi = 0.25. Pie angle φi = fi·360° = ?',
+            qDE: 'fi = 0,25. Kuchenwinkel φi = fi·360° = ?',
+            answer: 90, tolerance: 0, unit: '°',
+            hintEn: '0.25 × 360° = 90°.',
+            hintDE: '0,25 × 360° = 90°.'
+        },
+        {
+            q: 'Class borders g1 = 210, g2 = 212.5. Width b1 = g2−g1 = ?',
+            qDE: 'Gruppengrenzen g1 = 210, g2 = 212,5. Breite b1 = g2−g1 = ?',
+            answer: 2.5, tolerance: 0, unit: '',
+            hintEn: '212.5 − 210 = 2.5.',
+            hintDE: '212,5 − 210 = 2,5.'
+        },
+        {
+            q: 'Same class: midpoint m1 = (g1+g2)/2 = ? Round to 2 decimals.',
+            qDE: 'Gleiche Klasse: Mitte m1 = (g1+g2)/2 = ? Auf 2 Dezimalen.',
+            answer: 211.25, tolerance: 0.01, unit: '',
+            hintEn: '(210 + 212.5)/2 = 211.25.',
+            hintDE: '(210 + 212,5)/2 = 211,25.'
+        },
+        {
+            q: 'fj = 0.4, bj = 2.5. Histogram height lj = fj/bj = ? Round to 3 decimals.',
+            qDE: 'fj = 0,4, bj = 2,5. Histogrammhöhe lj = fj/bj = ? Auf 3 Dezimalen.',
+            answer: 0.16, tolerance: 0.002, unit: '',
+            hintEn: '0.4/2.5 = 0.16.',
+            hintDE: '0,4/2,5 = 0,16.'
+        },
+        {
+            q: 'Ozone sum = 974, n = 13. Mean x̄ = 974/13. Round to 2 decimals.',
+            qDE: 'Ozonsumme = 974, n = 13. Mittel x̄ = 974/13. Auf 2 Dezimalen.',
+            answer: 74.92, tolerance: 0.02, unit: '',
+            hintEn: '974/13 ≈ 74.923.',
+            hintDE: '974/13 ≈ 74,923.'
+        },
+        {
+            q: 'Grouped solar data: x̄g = Σ fj·mj = 217.17 (given f, m from slide 17). Enter 217.17.',
+            qDE: 'Gruppierte Solardaten: x̄g = Σ fj·mj = 217,17 (f, m aus Folie 17). Gib 217,17 ein.',
+            answer: 217.17, tolerance: 0.1, unit: '',
+            hintEn: 'Σ fⱼ·mⱼ = 0.167×211.25 + 0.033×213.75 + 0.233×216.25 + 0.4×218.75 + 0.167×221.25 ≈ 217.17.',
+            hintDE: 'Σ fⱼ·mⱼ = 0,167×211,25 + 0,033×213,75 + 0,233×216,25 + 0,4×218,75 + 0,167×221,25 ≈ 217,17.'
+        },
+        {
+            q: '13 sorted ozone values, 7th is 66. Median = ?',
+            qDE: '13 sortierte Ozonwerte, 7. ist 66. Median = ?',
+            answer: 66, tolerance: 0, unit: '',
+            hintEn: 'n odd: xmed = x((n+1)/2) = x(7) = 66.',
+            hintDE: 'n ungerade: xmed = x((n+1)/2) = x(7) = 66.'
+        },
+        {
+            q: 'Q1 = 49, Q3 = 86. IQR = Q3−Q1 = ?',
+            qDE: 'Q1 = 49, Q3 = 86. IQR = Q3−Q1 = ?',
+            answer: 37, tolerance: 0, unit: '',
+            hintEn: '86 − 49 = 37.',
+            hintDE: '86 − 49 = 37.'
+        },
+        {
+            q: 'Data 2,4,4,4,5,5,7,9 (mean 5). s² = (1/8)Σ(xi−5)² = ?',
+            qDE: 'Daten 2,4,4,4,5,5,7,9 (Mittel 5). s² = (1/8)Σ(xi−5)² = ?',
+            answer: 4, tolerance: 0, unit: '',
+            hintEn: '(9+1+1+1+0+0+4+16)/8 = 32/8 = 4.',
+            hintDE: '(9+1+1+1+0+0+4+16)/8 = 32/8 = 4.'
+        },
+        {
+            q: 'Same data: Σxi² = 232, n = 8, x̄ = 5. Σ(xi−x̄)² = Σxi² − n·x̄² = ?',
+            qDE: 'Gleiche Daten: Σxi² = 232, n = 8, x̄ = 5. Σ(xi−x̄)² = Σxi² − n·x̄² = ?',
+            answer: 32, tolerance: 0, unit: '',
+            hintEn: '232 − 8×25 = 232 − 200 = 32 (shift theorem).',
+            hintDE: '232 − 8×25 = 232 − 200 = 32 (Verschiebungssatz).'
+        },
+    ],
 };

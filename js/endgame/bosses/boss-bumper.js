@@ -72,6 +72,7 @@ const EG_BUMP_BALL_DMG = 0.05;              // %maxHP per ball touch (physical)
 const EG_BUMP_BALL_CD_MS = 450;             // global ball-hit cooldown
 const EG_BUMP_BALL_R = 26;                  // ball radius
 const EG_BUMP_BALL_BOUNCE_BOOST = 55;       // px/s kick when bouncing off a bumper
+const EG_BUMP_BALL_MAX_SPEED = 640;         // px/s hard cap — kicks can't snowball
 // Slingshots: the two diagonal kickers in the bottom corners — real
 // pinball-table physics for pinballs that hit them.
 const EG_BUMP_SLING_LEN = 300;              // kicker length (px)
@@ -99,6 +100,19 @@ const EG_BUMP_SLAM_FLING = 220;             // px fling away from impact
 
 let _egBumpWatcher = null; // per-fight carnival state
 let _egBumpSlamActive = false; // a slam set-piece is running
+
+
+// Hard cap on pinball speed. Sling kicks and bumper boosts ADD velocity on
+// every hit, so without a cap a ball ricocheting around the table could
+// snowball to unbounded speed. Clamp the magnitude after any boost.
+function _egBumpCapBallSpeed(b) {
+    const s = Math.hypot(b.vx, b.vy);
+    if (s > EG_BUMP_BALL_MAX_SPEED) {
+        const k = EG_BUMP_BALL_MAX_SPEED / s;
+        b.vx *= k;
+        b.vy *= k;
+    }
+}
 
 
 // Sweep every carnival overlay off the screen. Safe to call twice.
@@ -197,6 +211,7 @@ function _egBumpSlingBall(st, b, now, tilting) {
                 const kick = tilting ? EG_BUMP_SLING_TILT_KICK : EG_BUMP_SLING_KICK;
                 b.vx += nx * kick;
                 b.vy += ny * kick;
+                _egBumpCapBallSpeed(b);
                 sl.flashUntil = now + 260;
                 sl.el.classList.add('fired');
                 setTimeout(() => { try { sl.el.classList.remove('fired'); } catch (e) {} }, 260);
@@ -327,6 +342,7 @@ function _egBumperArenaInit(monster) {
                         b.vy -= 2 * dot * (dy / d);
                         b.vx += (dx / d) * EG_BUMP_BALL_BOUNCE_BOOST;
                         b.vy += (dy / d) * EG_BUMP_BALL_BOUNCE_BOOST;
+                        _egBumpCapBallSpeed(b);
                         bp.el.classList.add('eg-nk-boom');
                         setTimeout(() => bp.el.classList.remove('eg-nk-boom'), 300);
                         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
