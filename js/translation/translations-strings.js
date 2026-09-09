@@ -1265,7 +1265,7 @@ Object.assign(T.en, {
     eg_mech_rzr_final_cd: '🪃💀 A THOUSAND EDGES — walk the spoke clock. It reverses!',
     eg_mech_rzr_wave: '🪃 EDGE CYCLE {n}/3 — keep walking with the clock!',
     eg_mech_rzr_reverse: '🪃 REVERSE — the clock spins the other way!',
-    eg_mech_rzr_last_edge: '🪃💀 THE LAST EDGE — every blade condenses! The whetstone’s aura is the ONLY safe ground — and it chips you!'
+    eg_mech_rzr_last_edge: '🪃💀 THE LAST EDGE — every blade condenses! The whetstone’s aura is the ONLY safe ground — and it chips you!',
     eg_mech_crushing_walls: '🧱 The Vise: Crushing Walls! Stay between the walls!',
     eg_crush_stay: '↕ STAY BETWEEN THE WALLS ↕',
     eg_crush_hit: '🧱 The walls crush you for {n} HP!',
@@ -3750,7 +3750,7 @@ Object.assign(T.de, {
     eg_mech_rzr_final_cd: '🪃💀 TAUSEND SCHNEIDEN — gehe mit dem Speichen-Zifferblatt. Es kehrt sich um!',
     eg_mech_rzr_wave: '🪃 SCHNEIDEN-ZYKLUS {n}/3 — bleib in Bewegung mit dem Zifferblatt!',
     eg_mech_rzr_reverse: '🪃 UMKHR — das Zifferblat dreht sich andersherum!',
-    eg_mech_rzr_last_edge: '🪃💀 DIE LETZTE SCHNEIDE — jede Klinge verdichtet sich! Die Aura des Wetzsteins ist der EINZIGE sichere Boden — und sie nummelt dich!'
+    eg_mech_rzr_last_edge: '🪃💀 DIE LETZTE SCHNEIDE — jede Klinge verdichtet sich! Die Aura des Wetzsteins ist der EINZIGE sichere Boden — und sie nummelt dich!',
     eg_mech_crushing_walls: '🧱 Der Schraubstock: Quetschwände! Bleib zwischen den Wänden!',
     eg_crush_stay: '↕ BLEIB ZWISCHEN DEN WÄNDEN ↕',
     eg_crush_hit: '🧱 Die Wände zerquetschen dich für {n} LP!',
