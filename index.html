@@ -3,10 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Tag file:// launches early so CSS can skip features Firefox blocks
+        // on file:// (e.g. mask-image:url() CORS fetches on the title glow).
+        try {
+            if (location.protocol === 'file:') {
+                document.documentElement.classList.add('file-protocol');
+            }
+        } catch (e) { /* class absent → default (hosted) styling */ }
+    </script>
     <link rel="icon" type="image/png" href="images/favicon.png">
     <title>STOXELS - v0.28 BETA</title>
     <link rel="stylesheet" href="css/base.css?v=2">
-    <link rel="stylesheet" href="css/pause.css?v=2">
+    <link rel="stylesheet" href="css/pause.css?v=3">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/title-screen.css">
     <link rel="stylesheet" href="css/save-slots.css?v=3">
@@ -42,6 +51,7 @@
          _egWarmBossStylesheet / _egEnsureBossStylesheetSync in
          endgame-encounter.js). -->
     <link rel="stylesheet" href="css/endgame/projectiles.css">
+    <link rel="stylesheet" href="css/endgame/weapon-swing.css">
     <link rel="stylesheet" href="css/endgame/hazards.css">
     <link rel="stylesheet" href="css/endgame/endgame-hub.css?v=2">
     <link rel="stylesheet" href="css/endgame/endgame-crafting-bench.css">
@@ -126,49 +136,49 @@
             </div>
 
             <button class="title-overlay-btn" id="btn-play"
-                    style="--bx: 50%; --by: 50%;">
+                    style="--bx: 50%; --by: 87%;">
                 <span class="btn-label" data-t="btn_play">▶ PLAY</span>
             </button>
 
             <!-- LEFT COLUMN (4 buttons) -->
-            <button class="title-overlay-btn block-general" id="btn-settings"
-                    style="--bx: 30%; --by: 35%;">
+            <button class="title-overlay-btn block-left-1" id="btn-settings"
+                    style="--bx: 12%; --by: 18%;">
                 <span class="btn-label" data-t="btn_settings">⚙ SETTINGS</span>
             </button>
 
-            <button class="title-overlay-btn block-general" id="btn-keybinds"
-                    style="--bx: 30%; --by: 45%;">
+            <button class="title-overlay-btn block-left-2" id="btn-keybinds"
+                    style="--bx: 12%; --by: 30%;">
                 <span class="btn-label" data-t="btn_keybinds">⌨ KEYBINDS</span>
             </button>
 
-            <button class="title-overlay-btn block-general" id="btn-how-to-play"
-                    style="--bx: 30%; --by: 55%;">
+            <button class="title-overlay-btn block-left-1" id="btn-how-to-play"
+                    style="--bx: 12%; --by: 42%;">
                 <span class="btn-label" data-t="btn_howtoplay">? HOW TO PLAY</span>
             </button>
 
-            <button class="title-overlay-btn block-general" id="btn-replay"
-                    style="--bx: 30%; --by: 65%;">
+            <button class="title-overlay-btn block-left-2" id="btn-replay"
+                    style="--bx: 12%; --by: 54%;">
                 <span class="btn-label">🔁 REPLAY</span>
             </button>
 
             <!-- RIGHT COLUMN (4 buttons) -->
-            <button class="title-overlay-btn block-general" id="btn-highscores"
-                    style="--bx: 70%; --by: 35%;">
+            <button class="title-overlay-btn block-right-1" id="btn-highscores"
+                    style="--bx: 88%; --by: 18%;">
                 <span class="btn-label" data-t="btn_highscores">🏆 HIGHSCORES</span>
             </button>
 
-            <button class="title-overlay-btn block-general" id="btn-codes"
-                    style="--bx: 70%; --by: 45%;">
+            <button class="title-overlay-btn block-right-2" id="btn-codes"
+                    style="--bx: 88%; --by: 30%;">
                 <span class="btn-label" data-t="btn_codes">🔑 MOODLE CODES</span>
             </button>
 
-            <button class="title-overlay-btn block-general" id="btn-achievements"
-                    style="--bx: 70%; --by: 55%;">
+            <button class="title-overlay-btn block-right-1" id="btn-achievements"
+                    style="--bx: 88%; --by: 42%;">
                 <span class="btn-label" data-t="btn_achievements">🏆 ACHIEVEMENTS</span>
             </button>
 
-            <button class="title-overlay-btn block-general" id="btn-changelog"
-                    style="--bx: 70%; --by: 65%;">
+            <button class="title-overlay-btn block-right-2" id="btn-changelog"
+                    style="--bx: 88%; --by: 54%;">
                 <span class="btn-label" data-t="scr_btn_changelog">📝 CHANGELOG</span>
             </button>
 
@@ -1454,6 +1464,7 @@
             </div>
 
             <div class="pause-actions">
+                <button id="btn-pause-spellbook" data-t="btn_spellbook">📖 SPELLBOOK</button>
                 <button id="btn-pause-keybinds" data-t="btn_keybinds">⌨ KEYBINDS</button>
                 <button id="btn-pause-settings" data-t="btn_settings">⚙ SETTINGS</button>
                 <button class="gtb-btn" id="btn-go-levels" data-t="btn_levels">◀ LEVELS</button>
@@ -1604,7 +1615,7 @@
     <script src="js/classes/class-defs.js"></script>
     <script src="js/classes/ascendency-defs.js"></script>
     <script src="js/classes/class-cooldown-state.js?v=2"></script>
-    <script src="js/classes/class-ui.js?v=2"></script>
+    <script src="js/classes/class-ui.js?v=3"></script>
     <script src="js/classes/class-hud.js"></script>
     <script src="js/classes/class-hud-levelselect-tooltip.js"></script>
     <script src="js/classes/class-abilities.js"></script>
@@ -1746,6 +1757,9 @@
          window / their own definitions). Tick before overlays: the tick
          file owns the _egClearCenterGridBanners fallback guard. -->
     <script src="js/endgame/endgame-encounter-tick.js"></script>
+    <!-- Manual weapon attack (E) + shared CSS swing visuals. After tick so
+         the parry hotkey owns its key first; typeof-guarded either way. -->
+    <script src="js/endgame/endgame-weapon-swing.js"></script>
     <script src="js/endgame/endgame-encounter-overlays.js"></script>
     <script src="js/endgame/endgame-encounter-chain.js"></script>
     <script src="js/endgame/endgame-quiz-buffs.js?v=2"></script>

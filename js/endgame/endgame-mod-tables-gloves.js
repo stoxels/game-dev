@@ -471,7 +471,7 @@ const EG_MOD_TABLE_GLOVES = {
     
         parry: {
             id: 'parry',
-            label: '#% Chance to Parry Attacks while holding [E]', labelDe: '#% Chance, Angriffe beim Halten von [E] zu parieren',
+            label: '#% Chance to Parry Attacks while holding [R]', labelDe: '#% Chance, Angriffe beim Halten von [R] zu parieren',
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 100, ilvl: 80 },
                 { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },

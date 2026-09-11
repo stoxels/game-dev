@@ -577,6 +577,9 @@ function confirmClassSelection(cid) {
 
     Audio_Manager.playSFX('classSelected');
     showToast(`${def.icon} ${className} ${selectedLabel}`);
+    // A fresh class starts with an empty/patchy hotbar, so point the player at
+    // the spell book where they pick and drag their new skills onto the bar.
+    if (typeof showToast === 'function') showToast(t('spellbook_after_class_hint'), '#ffd27f');
     updateQuestStats('classChosen', {});
 
     closeClassOverlay();

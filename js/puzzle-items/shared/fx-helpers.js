@@ -334,6 +334,10 @@ function _fxSpawnParticles(opts) {
             p.style.left = (startX + (Math.random() - 0.5) * spreadX) + 'px';
             p.style.top = (startY + (Math.random() - 0.5) * spreadY) + 'px';
             p.style.animationDuration = (duration * (0.7 + Math.random() * 0.6)) + 'ms';
+            // Per-particle drift for keyframes using var(--dx)/var(--dy)
+            // (e.g. fx-chaos-shard-fly). Harmless for other particle classes.
+            p.style.setProperty('--dx', ((Math.random() - 0.5) * 60).toFixed(1) + 'px');
+            p.style.setProperty('--dy', (-30 - Math.random() * 30).toFixed(1) + 'px');
             container.appendChild(p);
             setTimeout(() => p.remove(), duration * 1.5);
         }, i * (duration / count / 2));

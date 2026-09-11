@@ -805,7 +805,7 @@ let _egPriorBombChargePauseShown = false; // dedupes the charge-bar pause style 
 
 // True while the player is actively defusing a Prior Bomb (standing on it with
 // its fuse paused). _egTickPlayer reads this to freeze the player's auto-attack
-// charge bar — the same pause as the Hold-E parry, but WITHOUT the parry
+// charge bar — the same pause as the hold-parry, but WITHOUT the parry
 // behaviour: defusing simply costs the player their DPS while they stand there.
 function _egPriorBombDefusing() {
     return _egPriorBombDefusingActive;
@@ -813,7 +813,7 @@ function _egPriorBombDefusing() {
 
 
 // Keeps the player charge bar's paused style in sync with defusing (same visual
-// language as the Hold-E charge pause). Touches the DOM only on real changes.
+// language as the hold-parry charge pause). Touches the DOM only on real changes.
 function _egSyncDefuseChargePause(active) {
     _egPriorBombDefusingActive = !!active;
     if (!!active === _egPriorBombChargePauseShown) return;
@@ -827,7 +827,7 @@ function _egSyncDefuseChargePause(active) {
 
 
 // 'DEFUSING' hint label on the player sprite while standing on a bomb — the
-// same visual language as the Hold-E PARRYING label (#eg-hold-pause-label),
+// same visual language as the hold-parry PARRYING label (#eg-hold-pause-label),
 // but in defuse green and driven by the bomb tick instead of the parry key.
 // Touches the DOM only on real state changes (caller dedupes transitions).
 function _egSyncDefuseLabel(show) {

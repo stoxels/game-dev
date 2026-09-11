@@ -140,18 +140,25 @@ const Audio_Manager = (() => {
     }
 
     // Returns the track key for a given world and level number.
-    // Priority: LEVEL_BGM entry → WORLD_BGM fallback → 'world1' last resort.
+    // Priority: LEVEL_BGM entry → WORLD_BGM fallback → 'level_1_1' last resort.
     function trackForLevel(worldNum, levelNum) {
         const levelKey = `${worldNum}-${levelNum}`;
         if (LEVEL_BGM[levelKey]) return LEVEL_BGM[levelKey];
-        return WORLD_BGM[worldNum] || 'world1';
+        return WORLD_BGM[worldNum] || 'level_1_1';
     }
 
     // Returns an array of all keys in BGM_TRACKS, optionally excluding
     // special tracks (title, convergence) that are not regular gameplay music.
+    // Tracks whose file previously failed to load (404 / decode error) are
+    // also excluded so the random chain can never get stuck on silence.
+    const _badBgmSrcs = new Set();
     function _getAllBGMKeys(excludeSpecial = true) {
         const specialKeys = new Set(['title', 'convergence']);
-        return Object.keys(BGM_TRACKS).filter(k => !excludeSpecial || !specialKeys.has(k));
+        return Object.keys(BGM_TRACKS).filter(k => {
+            if (excludeSpecial && specialKeys.has(k)) return false;
+            if (_badBgmSrcs.has(BGM_TRACKS[k])) return false;
+            return true;
+        });
     }
 
 
@@ -204,6 +211,18 @@ const Audio_Manager = (() => {
         // While focus-muted, only queue the track — it starts on unmute
         if (focusMuted) return;
 
+        // Level track file previously failed to load (missing bgm_48+):
+        // fall back to a working random track so we never go silent.
+        if (_badBgmSrcs.has(src)) {
+            if (randomBgmEnabled) {
+                if (_randomTrackActive && currentBGM && !currentBGM.paused) return;
+                _playRandomBGMTrack();
+            } else if (trackKey !== 'level_1_1' && BGM_TRACKS['level_1_1']) {
+                playBGM('level_1_1');
+            }
+            return;
+        }
+
         if (randomBgmEnabled) {
             // Already mid-chain — don't interrupt it. playBGM() just means
             // "make sure appropriate music is playing"; when random mode is
@@ -221,6 +240,16 @@ const Audio_Manager = (() => {
         stopBGM();
 
         const audio = _createBGMAudioElement(src, true);
+        audio.addEventListener('error', () => {
+            _badBgmSrcs.add(src);
+            if (currentBGM === audio) {
+                currentBGM = null;
+                currentBGMSrc = '';
+            }
+            if (trackKey !== 'level_1_1' && BGM_TRACKS['level_1_1']) {
+                playBGM('level_1_1');
+            }
+        });
         audio.play().catch(() => {
             _registerAutoplayResumeListeners(audio);
         });
@@ -239,9 +268,14 @@ const Audio_Manager = (() => {
 
     // Picks a random track (excluding special tracks), plays it without looping,
     // and wires an 'ended' listener so the next random track auto-chains.
-    function _playRandomBGMTrack() {
+    // Missing audio files (e.g. unshipped bgm_48+ tracks) fire 'error' instead
+    // of 'ended' — those are remembered in _badBgmSrcs and skipped so the
+    // chain never gets stuck on silence after a puzzle finishes.
+    function _playRandomBGMTrack(attemptsLeft) {
         const keys = _getAllBGMKeys(true);
         if (keys.length === 0) return;
+        if (attemptsLeft === undefined) attemptsLeft = keys.length;
+        if (attemptsLeft <= 0) return;
 
         const randomKey = keys[Math.floor(Math.random() * keys.length)];
         const src = BGM_TRACKS[randomKey];
@@ -251,9 +285,21 @@ const Audio_Manager = (() => {
         stopBGM(0);
 
         const audio = _createBGMAudioElement(src, false);
-        _randomTrackActive = true; 
+        _randomTrackActive = true;
         audio.addEventListener('ended', _onRandomTrackEnded);
+        audio.addEventListener('error', () => {
+            // File missing / undecodable — never pick it again this session.
+            _badBgmSrcs.add(src);
+            _randomTrackActive = false;
+            if (currentBGM === audio) {
+                currentBGM = null;
+                currentBGMSrc = '';
+            }
+            _playRandomBGMTrack(attemptsLeft - 1);
+        });
         audio.play().catch(() => {
+            // Autoplay-blocked: wait for user gesture. If the element later
+            // errors (404), the 'error' handler above skips to the next track.
             _registerAutoplayResumeListeners(audio);
         });
     }
@@ -261,7 +307,10 @@ const Audio_Manager = (() => {
     // Fires when a random track finishes. Chains into another random track,
     // unless random mode or BGM got turned off in the meantime.
     function _onRandomTrackEnded() {
+        _syncBGMEnabledFromSettings();
+        _syncRandomBGMFromSettings();
         if (!randomBgmEnabled || !bgmEnabled) return;
+        if (bgmLocked || focusMuted) return;
         _playRandomBGMTrack();
     }
 
@@ -406,6 +455,8 @@ const Audio_Manager = (() => {
         setFocusMuted,
 
         get lastBGMKey() { return _lastBGMKey; },
+        // Legacy alias — storyline-engine.js reads Audio_Manager._lastBGMKey.
+        get _lastBGMKey() { return _lastBGMKey; },
 
         // SFX
         playSFX,

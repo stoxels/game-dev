@@ -1483,8 +1483,8 @@
 }
 
 /* Shard fragments that fly outward from the explosion origin.
-   Note: random() in transforms is not standard CSS — these are
-   controlled via inline style overrides set by JS per shard. */
+   Direction comes from --dx/--dy custom properties set per shard by JS
+   (see _fxSpawnParticles); fallbacks keep the animation valid in Firefox. */
 @keyframes fx-chaos-shard-fly {
     0% {
         opacity: 1;
@@ -1497,7 +1497,7 @@
 
     100% {
         opacity: 0;
-        transform: translate(-50%, -50%) translate(calc((random() - 0.5) * 60px), calc(-30px - random() * 30px)) scale(0.3);
+        transform: translate(-50%, -50%) translate(var(--dx, 15px), var(--dy, -45px)) scale(0.3);
     }
 }
 

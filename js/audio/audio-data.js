@@ -351,7 +351,7 @@ const LEVEL_BGM = {
 // Uncomment and set a BGM_TRACKS key for each world as needed.
 
 const WORLD_BGM = {
-    1: 'world1',
+    1: 'level_1_1',
     //2: 'world2',
     //3: 'world3',
     //4: 'world4',

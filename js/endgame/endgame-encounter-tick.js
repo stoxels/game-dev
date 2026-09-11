@@ -1,7 +1,7 @@
 //  endgame-encounter-tick.js
 //  COMBAT TICK LOOP — extracted 2026-09-10 from endgame-encounter.js
 //  (tick loop, player/monster charge ticking, charge-pause gates,
-//  hold-E parry pause, mistakes-limit logic, life regen, pause/resume).
+//  hold-parry pause, mistakes-limit logic, life regen, pause/resume).
 //  Loads AFTER endgame-encounter.js (its load-time code only touches
 //  window and its own definitions; runtime calls cross freely).
 //
@@ -211,8 +211,9 @@ EG_PLAYER_CHARGE_PAUSE_GATES.forEach(function (name) {
 // Advances the player's charge bar. Fires the player attack when full.
 // The bar's max comes from the equipped weapon (see _egGetPlayerAttackInterval).
 function _egTickPlayer() {
-    // Hold-E pause: while E is held during an endgame encounter, freeze the player's
-    // own auto-attack charge bar. Used to manually time melee strikes.
+    // Hold-parry pause: while the parry key (R by default) is held during an
+    // endgame encounter, freeze the player's own auto-attack charge bar.
+    // Used to manually time melee strikes.
     if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
         // If not in an active encounter, fall through (no effect outside endgame)
@@ -262,13 +263,13 @@ function _egTickPlayer() {
     }
 }
 
-// ── Hold-E charge pause — freeze own auto-attack bar while E is held ───────
+// ── Hold-parry charge pause — freeze own auto-attack bar while held ───────
 function _egSetHoldEPauseVisual(isPaused) {
     const bar = document.getElementById('avatar-charge-fill');
     if (bar) bar.classList.toggle('eg-charge-paused', !!isPaused);
     const alt = document.getElementById('eg-player-charge-bar');
     if (alt) alt.classList.toggle('eg-charge-paused', !!isPaused);
-    // Sprite feedback — show "CHARGE PAUSED" directly on the avatar while E is held
+    // Sprite feedback — show "CHARGE PAUSED" directly on the avatar while the parry key is held
     const hud = document.getElementById('player-avatar-wrapper');
     if (hud) {
         let lbl = document.getElementById('eg-hold-pause-label');
@@ -293,16 +294,16 @@ function _egSetHoldEPauseVisual(isPaused) {
 }
 
 function _initEgHoldEPauseHotkey() {
-    // Parry key is configurable (js/keybinds.js, action 'eg-parry', E by
+    // Parry key is configurable (js/keybinds.js, action 'eg-parry', R by
     // default). keydown starts the parry window, keyup ends it.
     const isParryKey = (e) => {
         if (typeof keybindMatches === 'function') return keybindMatches(e, 'eg-parry');
-        return e.key && e.key.toLowerCase() === 'e';
+        return e.key && e.key.toLowerCase() === 'r';
     };
     document.addEventListener('keydown', (e) => {
         if (!e || !isParryKey(e)) return;
         if (e.repeat) return;
-        // The Snail: pressing E drops a held broom (it respawns outside the grid).
+        // The Snail: pressing the parry key drops a held broom (it respawns outside the grid).
         if (typeof _egSnailDropBroom === 'function') {
             try { _egSnailDropBroom(); } catch (err) {}
         }

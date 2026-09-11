@@ -232,6 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // overlay in css/pause.css.
     onClick('btn-pause-keybinds', () => { if (typeof openKeybindsModal === 'function') openKeybindsModal(); });
 
+    // Spellbook from the pause menu — the game stays paused behind the book
+    // so the player can review spells mid-puzzle. The book is raised above
+    // the pause overlay in css/pause.css.
+    onClick('btn-pause-spellbook', () => { if (typeof openSpellbook === 'function') openSpellbook(); });
+
     //------------------------------------------------------------------------
     //-------------------TITLE SCREEN-----------------------------------------
     //------------------------------------------------------------------------

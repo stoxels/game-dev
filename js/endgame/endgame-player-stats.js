@@ -21,7 +21,7 @@ const EG_PLAYER_STATS = {
 // PoE-style weapon setups (see _egIsDualWielding in endgame-requirements.js):
 // dual-wielding two 1H weapons sums both weapons' melee damage then scales by
 // EG_DUAL_WIELD_DAMAGE_MULT (~1.4x a single 1H, below a 2H's ~1.6-1.7x), and
-// grants EG_DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding E
+// grants EG_DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding the parry key
 // (gear parry adds on top; successful projectile parries can still deflect).
 const EG_DUAL_WIELD_DAMAGE_MULT = 0.7;
 const EG_DUAL_WIELD_PARRY_PCT = 15;
@@ -1234,7 +1234,7 @@ function _egBuildStatLine(bucket, stats) {
 
         // Parry / Deflect are always shown in the defensive block (even with
         // 0 gear) because they have meaningful baselines: 50% parry while
-        // holding E, 5% deflect on a successful projectile parry, 30%
+        // holding the parry key, 5% deflect on a successful projectile parry, 30%
         // deflect damage. Use the live baseline helpers when available so the
         // displayed total always matches combat. While dual-wielding, the
         // auto-parry (15% baseline + gear, no key needed) is shown first with
@@ -1249,7 +1249,7 @@ function _egBuildStatLine(bucket, stats) {
                 const auto = (typeof _egGetDualWieldParryChancePct === 'function')
                     ? _egGetDualWieldParryChancePct()
                     : ((typeof EG_DUAL_WIELD_PARRY_PCT !== 'undefined' ? EG_DUAL_WIELD_PARRY_PCT : 15) + gear);
-                let suffix = 'while holding [E]';
+                let suffix = 'while holding [R]';
                 try { const s = t('eg_stat_parry_held_suffix'); if (s && s !== 'eg_stat_parry_held_suffix') suffix = s; } catch (e) {}
                 line = { label: t('eg_stat_parry'), value: `${_egFormatStatValue(auto)}% (${_egFormatStatValue(held)}% ${suffix})` };
             } else {

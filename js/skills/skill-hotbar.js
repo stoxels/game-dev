@@ -39,25 +39,61 @@ let _suppressHotbarClick = false;
 //--------------------------DOM CONTAINER---------------------------------
 //------------------------------------------------------------------------
 
-// Returns the hotbar container, creating it on first use.
-//
-// NOTE: it lives directly on <body>, NOT inside #screen-game. That screen is
-// a fixed, animated element and therefore its own stacking context, which
-// would trap the bar beneath the spell book's modal backdrop (making
-// drag-and-drop impossible). On <body> the bar competes in the root stacking
-// context and can lift above the backdrop while the book is open.
-// Visibility is gated manually on the game screen's .active class instead.
+// Default home for the bar: the puzzle's flex row, inserted BEFORE the grid
+// wrapper in tree order. Both the bar and #puzzle-scaler-wrap are positioned
+// elements in the game screen's stacking context, so on overlap the later one
+// (the grid) paints on top and receives the cell clicks. Keeping the bar out
+// of #screen-game entirely would lift it above the grid and steal those clicks
+// (the bug this replaces).
+function _hotbarHomeHost() {
+    return document.querySelector('.puzzle-and-sidebar')
+        || document.getElementById('screen-game')
+        || document.body;
+}
+
+// Where the bar should be mounted right now. While the spell book is open it
+// must escape the game screen's stacking context (otherwise the modal backdrop
+// traps it and spells cannot be dropped on it), so it hops onto <body> above
+// the backdrop. The book's open/close handlers call setHotbarAboveModal().
+function _hotbarMountHost() {
+    if (document.body.classList.contains('spellbook-open')) return document.body;
+    return _hotbarHomeHost();
+}
+
+// Returns the hotbar container, creating it on first use and re-homing it
+// whenever the current mount host changed (spell book open/close).
 function _ensureHotbarContainer() {
     let bar = document.getElementById('skill-hotbar');
-    if (bar) return bar;
+    if (bar) {
+        const host = _hotbarMountHost();
+        if (bar.parentElement !== host) {
+            if (host === document.body) host.appendChild(bar);
+            else host.insertBefore(bar, host.firstChild);
+        }
+        return bar;
+    }
 
     bar = document.createElement('div');
     bar.id = 'skill-hotbar';
     bar.className = 'skill-hotbar';
     bar.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    document.body.appendChild(bar);
+    const host = _hotbarMountHost();
+    if (host === document.body) host.appendChild(bar);
+    else host.insertBefore(bar, host.firstChild);
     return bar;
+}
+
+// Moves the bar above the spell book's modal backdrop (or back home).
+// Called from openSpellbook()/closeSpellbook() — the body class drives both
+// the host choice and the z-index lift in css/skills.css.
+function setHotbarAboveModal(above) {
+    const bar = document.getElementById('skill-hotbar');
+    if (!bar) return;
+    const host = _hotbarMountHost();
+    if (bar.parentElement === host) return;
+    if (host === document.body) host.appendChild(bar);
+    else host.insertBefore(bar, host.firstChild);
 }
 
 // True while the game screen is the visible one.
@@ -111,18 +147,29 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
     ].filter(Boolean).join(' ');
 
     const cdOverlay = isOnCD
-        ? `<span class="skill-hotbar-cd">${_formatHotbarCooldown(cdRemaining)}</span>`
+        ? `<span class="skill-hotbar-cd${cdRemaining >= 60 ? ' is-long' : ''}">${_formatHotbarCooldown(cdRemaining)}</span>`
         : '';
     const noManaMark = noMana ? `<span class="skill-hotbar-nomana">✦</span>` : '';
     const lockMark = locked ? `<span class="skill-hotbar-lock">🔒</span>` : '';
 
-    return `<div class="skill-hotbar-slot ${stateClasses}" data-slot="${slotIndex}" data-skill="${skillId}">`
+    // Prefer the class-upgrade artwork when the skill ships one, else the
+    // emoji/glyph from the registry. The image is a real <img> so it scales
+    // cleanly and can't be drag-selected.
+    const image = (typeof getSkillImage === 'function') ? getSkillImage(skillId) : null;
+    const iconMarkup = image
+        ? `<img class="skill-hotbar-icon" src="${image}" alt="${getSkillName(skillId)}" draggable="false">`
+        : `<span class="skill-hotbar-icon">${def.icon || '✦'}</span>`;
+
+    // Hovering a slot shows the same Path-of-Exile tooltip the spell book does.
+    return `<div class="skill-hotbar-slot ${stateClasses}" data-slot="${slotIndex}" data-skill="${skillId}"
+                 onmouseenter="handleSkillTip(event,'${skillId}')"
+                 onmousemove="handleSkillTipMove(event)"
+                 onmouseleave="handleSkillTipLeave()">`
         + keyLabel
-        + `<span class="skill-hotbar-icon">${def.icon || '✦'}</span>`
+        + iconMarkup
         + cdOverlay
         + noManaMark
         + lockMark
-        + `<span class="skill-hotbar-name">${getSkillName(skillId)}</span>`
         + `</div>`;
 }
 
@@ -145,6 +192,7 @@ function renderSkillHotbar() {
         || (typeof isClassless === 'function' && isClassless())
         || !_isGameScreenActive()) {
         bar.style.display = 'none';
+        document.body.classList.remove('skill-hotbar-visible');
         if (typeof hideHUDTooltip === 'function') hideHUDTooltip();
         return;
     }
@@ -161,6 +209,13 @@ function renderSkillHotbar() {
     }
     bar.innerHTML = html;
 
+    // Tell the inventory dock how much bottom-right room the bar needs, so on
+    // narrower viewports its (centred) box shifts clear of the corner instead
+    // of sliding under the bar. See the reserve rule in css/skills.css.
+    document.body.classList.add('skill-hotbar-visible');
+    const barW = bar.offsetWidth || (SKILL_HOTBAR_COLS * 57 + 12);
+    document.body.style.setProperty('--skill-hotbar-reserve', (barW + 14) + 'px');
+
 }
 
 // In-place cooldown text patch for one skill (called every cooldown tick so
@@ -172,6 +227,14 @@ function patchHotbarSlotCooldown(skillId) {
     if (!slot) return;
 
     const cdRemaining = (typeof getSkillCooldownRemaining === 'function') ? getSkillCooldownRemaining(skillId) : 0;
+
+    // Keep the slot's state classes in sync too. A skill that was unaffordable
+    // when the hotbar last rendered would otherwise keep its blue "no mana"
+    // wash/✦ marker on top of the countdown text, which is what made the
+    // cooldown read as broken. While on cooldown the cool-down state wins.
+    slot.classList.toggle('on-cd', cdRemaining > 0);
+    if (cdRemaining > 0) slot.classList.remove('no-mana');
+
     let cdEl = slot.querySelector('.skill-hotbar-cd');
     if (cdRemaining > 0) {
         if (!cdEl) {
@@ -179,6 +242,7 @@ function patchHotbarSlotCooldown(skillId) {
             cdEl.className = 'skill-hotbar-cd';
             slot.appendChild(cdEl);
         }
+        cdEl.classList.toggle('is-long', cdRemaining >= 60);
         cdEl.textContent = _formatHotbarCooldown(cdRemaining);
     } else if (cdEl) {
         cdEl.remove();
@@ -361,6 +425,13 @@ function _initSkillKeybinds() {
     }
 
     onKeybindAction('spellbook', () => {
+        // Toggle-close must work even while the book is open: the book
+        // itself is a .modal-bg, which makes _abilityHotkeysBlocked() true,
+        // so check for the open book first and let P close it.
+        if (typeof isSpellbookOpen === 'function' && isSpellbookOpen()) {
+            if (typeof toggleSpellbook === 'function') toggleSpellbook();
+            return false;
+        }
         if (typeof _abilityHotkeysBlocked === 'function' && _abilityHotkeysBlocked()) return false;
         if (typeof toggleSpellbook === 'function') toggleSpellbook();
         return false;

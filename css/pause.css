@@ -147,7 +147,8 @@
 }
 
 #pause-overlay #btn-pause-settings,
-#pause-overlay #btn-pause-keybinds {
+#pause-overlay #btn-pause-keybinds,
+#pause-overlay #btn-pause-spellbook {
     padding: 9px 22px;
     font-size: 0.95rem;
     letter-spacing: 0.05em;
@@ -160,7 +161,8 @@
 }
 
 #pause-overlay #btn-pause-settings:hover,
-#pause-overlay #btn-pause-keybinds:hover {
+#pause-overlay #btn-pause-keybinds:hover,
+#pause-overlay #btn-pause-spellbook:hover {
     background: rgba(255, 255, 255, 0.18);
 }
 
@@ -198,6 +200,13 @@
 /* Same treatment for the keybinds modal, which is also reachable from the
    pause menu so bindings can be reviewed/changed mid-puzzle. */
 #keybinds-modal.show {
+    z-index: 10000;
+}
+
+/* Same treatment for the spellbook overlay, which is also reachable from
+   the pause menu so spells can be reviewed mid-puzzle. The game stays
+   paused behind the book. */
+#spellbook-overlay.show {
     z-index: 10000;
 }
 

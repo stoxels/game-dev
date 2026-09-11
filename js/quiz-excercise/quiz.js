@@ -184,7 +184,9 @@ function getQuizQuestion(worldNum) {
 // before populating a new question.
 function _quizResetOverlay() {
     document.getElementById('quiz-result').textContent = '';
-    document.getElementById('quiz-continue').style.display = 'none';
+    const contBtn = document.getElementById('quiz-continue');
+    contBtn.style.display = 'none';
+    contBtn.classList.remove('qr-continue-attention');
     document.getElementById('quiz-opts').innerHTML = '';
 }
 
@@ -455,6 +457,9 @@ function _resolveQuizAnswer(correct) {
         }
     }
     document.getElementById('quiz-continue').style.display = 'flex';
+    // After a correct answer the continue chip must demand attention —
+    // pulse green so players never miss the way to the next screen.
+    document.getElementById('quiz-continue').classList.toggle('qr-continue-attention', !!correct);
     _quizRefreshWhyButton();
 }
 

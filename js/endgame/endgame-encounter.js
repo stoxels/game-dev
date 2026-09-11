@@ -66,8 +66,8 @@ const EG_MONSTER_PROJ_DURATION_MS = 400;
 // blocking. Reduced by the blockRecoveryPct stat.
 const EG_BLOCK_LOCKOUT_BASE_MS = 8000;
 
-// Hold-E parry baseline values (gear adds on top via parry/deflect mods)
-const EG_PARRY_BASE_PCT = 50;          // 50% baseline while holding E
+// Hold-parry baseline values (gear adds on top via parry/deflect mods)
+const EG_PARRY_BASE_PCT = 50;          // 50% baseline while holding the parry key (R by default)
 const EG_DEFLECT_BASE_PCT = 5;         // 5% chance on a successful parry to deflect
 const EG_DEFLECT_BASE_DMG_PCT = 30;    // deflected projectile deals 30% of monster's damage
 
@@ -455,7 +455,7 @@ function _egResetEncounterState() {
     // First step toast flag reset
     _egFirstStepToastShown = false;
 
-    // Hold-E pause starts released
+    // Hold-parry pause starts released
     if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
     if (typeof _egSetHoldEPauseVisual === 'function') _egSetHoldEPauseVisual(false);
 
@@ -1113,8 +1113,8 @@ function _egApplyGroundedReduction(rawDamage) {
     return rawDamage * (1 - reduction / 100);
 }
 
-// ── Hold-E Parry & Deflect ─────────────────────────────────────────────
-// While holding E the player pauses their own charge bar and can parry
+// ── Hold-Parry & Deflect ─────────────────────────────────────────────
+// While holding the parry key (R by default) the player pauses their own charge bar and can parry
 // incoming monster projectile and charge (melee) attacks. Hazards and boss
 // spells (isSpell=true) are never parryable. Baseline 50% + gear parry.
 // On a successful projectile parry there is a 5% + gear deflect chance to
@@ -1145,7 +1145,7 @@ function _egGetParryChancePct() {
     return base + gear;
 }
 // Dual-wield parry (PoE-style): two 1H weapons grant a base chance to parry
-// WITHOUT holding E (gear parry adds on top). Successful projectile parries
+// WITHOUT holding the parry key (gear parry adds on top). Successful projectile parries
 // roll deflect exactly like held parries.
 function _egGetDualWieldParryChancePct() {
     const base = (typeof EG_DUAL_WIELD_PARRY_PCT !== 'undefined' ? EG_DUAL_WIELD_PARRY_PCT : 15);
@@ -1170,7 +1170,7 @@ function _egGetDeflectDamagePct() {
     return base + gear;
 }
 function _egRollParry(attacker, isProjectile) {
-    // Hold-E parry, or dual-wield auto-parry (two 1H weapons, no key needed)
+    // Hold-parry, or dual-wield auto-parry (two 1H weapons, no key needed)
     const holding = (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive);
     const dualWield = (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());
     if (!holding && !dualWield) return false;
@@ -1699,6 +1699,19 @@ function _egAnimatePlayerMelee(targetId) {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
 
+    // Shared weapon-swing overlay, aimed at the target card so auto-attacks
+    // show the equipped weapon family (E uses movement facing instead).
+    try {
+        if (typeof _egShowWeaponSwing === 'function') {
+            const fam = (typeof _egGetEquippedWeaponInfo === 'function')
+                ? _egGetEquippedWeaponInfo().family : 'sword';
+            const face = (typeof _egFacingFromVector === 'function')
+                ? _egFacingFromVector(dx, dy) : 'down';
+            _egShowWeaponSwing(fam, face);
+            if (typeof _egWeaponSwingSound === 'function') _egWeaponSwingSound(fam);
+        }
+    } catch (e) {}
+
     // Bring to front during the lunge
     const originalZIndex = avatarWrapper.style.zIndex;
     avatarWrapper.style.zIndex = '9999';
@@ -2050,12 +2063,12 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     // (attacks, spells and charge hits alike), before all other mitigation.
     if (!isBossAbility && _egRollFateNegation(stats)) return 0;
 
-    // Hold-E Parry — 50% + gear chance to fully negate projectile and charge
-    // attacks while E is held. Hazards, monster spells (isSpell=true) and boss
-    // special abilities are never parryable. On a successful projectile parry
-    // there is a 5% + gear deflect chance to hit another monster for 30% + gear
-    // damage. Dual-wielding two 1H weapons grants the same roll at a 15% + gear
-    // base WITHOUT holding E.
+    // Hold-Parry — 50% + gear chance to fully negate projectile and charge
+    // attacks while the parry key (R by default) is held. Hazards, monster
+    // spells (isSpell=true) and boss special abilities are never parryable.
+    // On a successful projectile parry there is a 5% + gear deflect chance to
+    // hit another monster for 30% + gear damage. Dual-wielding two 1H weapons
+    // grants the same roll at a 15% + gear base WITHOUT holding the key.
     const holdingE = (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive);
     const dualWieldParry = !holdingE
         && (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());

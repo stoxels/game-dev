@@ -8191,7 +8191,7 @@ body.eg-shp-flash::after {
     position: fixed; z-index: 9001; pointer-events: none;
     width: 156px; height: 104px;
     border-radius: 52px;
-    background: radial-gradient(ellipse at centre, rgba(255, 236, 200, 0.5) 0%, rgba(146, 122, 84, 0.45) 55%, transparent 78%);
+    background: radial-gradient(ellipse at center, rgba(255, 236, 200, 0.5) 0%, rgba(146, 122, 84, 0.45) 55%, transparent 78%);
     box-shadow: 0 0 30px rgba(214, 200, 168, 0.6);
     animation: eg-colo-slam-kf 2.4s ease-out forwards;
 }
@@ -10877,7 +10877,7 @@ body.eg-shp-flash::after {
     position: fixed; inset: 0; z-index: 9300; pointer-events: none;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 10px;
-    background: radial-gradient(ellipse at centre, rgba(69, 26, 3, 0.55), rgba(15, 8, 4, 0.82));
+    background: radial-gradient(ellipse at center, rgba(69, 26, 3, 0.55), rgba(15, 8, 4, 0.82));
     animation: eg-shr-cd-in 0.5s ease-out;
 }
 @keyframes eg-shr-cd-in { from { opacity: 0; } to { opacity: 1; } }
@@ -11078,7 +11078,7 @@ body.eg-shp-flash::after {
     position: fixed; inset: 0; z-index: 9300; pointer-events: none;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 10px;
-    background: radial-gradient(ellipse at centre, rgba(8, 47, 73, 0.55), rgba(2, 6, 23, 0.85));
+    background: radial-gradient(ellipse at center, rgba(8, 47, 73, 0.55), rgba(2, 6, 23, 0.85));
     animation: eg-sr-cd-in 0.5s ease-out;
 }
 @keyframes eg-sr-cd-in { from { opacity: 0; } to { opacity: 1; } }
@@ -11223,7 +11223,7 @@ body.eg-shp-flash::after {
     position: fixed; inset: 0; z-index: 9300; pointer-events: none;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 10px;
-    background: radial-gradient(ellipse at centre, rgba(30, 41, 59, 0.6), rgba(2, 6, 23, 0.85));
+    background: radial-gradient(ellipse at center, rgba(30, 41, 59, 0.6), rgba(2, 6, 23, 0.85));
     animation: eg-vis-cd-in 0.5s ease-out;
 }
 @keyframes eg-vis-cd-in { from { opacity: 0; } to { opacity: 1; } }

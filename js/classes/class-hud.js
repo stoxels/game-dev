@@ -23,6 +23,13 @@ const HUD_SHIELD_PIP_MAX = 5;
 // are dismissed for good.
 const CLASS_HUD_HINT_MAX_USES = 3;
 
+// The compact class HUD has been retired: the skill hotbar
+// (js/skills/skill-hotbar.js) owns every cast/cooldown affordance and the
+// spell book owns passives/traits. Flip this to true to bring the old panel
+// back while the remaining status widgets (shield pips, momentum bar,
+// duration badges) are re-homed onto the hotbar.
+const CLASS_HUD_ENABLED = false;
+
 
 
 //------------------------------------------------------------------------
@@ -603,6 +610,17 @@ function buildClassHUD() {
     if (!panel) return;
 
     hideHUDTooltip();
+
+    // Retired panel: keep the element around (boss effects use it as a
+    // last-resort anchor) but never render anything into it. The skill hotbar
+    // still needs a refresh on every HUD rebuild, so route that first.
+    if (!CLASS_HUD_ENABLED) {
+        panel.innerHTML = '';
+        panel.style.display = 'none';
+        if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
+        if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
+        return;
+    }
 
     if (!STATE.playerClass || isClassless()) {
         panel.innerHTML = '';

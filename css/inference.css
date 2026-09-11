@@ -181,7 +181,7 @@
     justify-content: space-evenly;
     gap: clamp(6px, 1.5vw, 0px);
     row-gap: 10px;
-    margin: -2 auto 5px;
+    margin: -2px auto 5px;
     width: 83%;
     padding: clamp(16px, 4vw, 50px) clamp(10px, 2.5vw, 25px);
     background: url('../images/Inference/summary_parchment.webp') center/100% 100% no-repeat;

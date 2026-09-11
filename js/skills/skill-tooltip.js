@@ -167,12 +167,41 @@ function buildPassiveSkillTooltipHTML(passiveId) {
 }
 
 
+// Builds the tooltip HTML for one of the character's innate traits.
+// Traits are always-on (never placed on the hotbar), so they reuse the
+// passive tooltip look but are tagged as a character trait.
+function buildTraitTooltipHTML(traitIndex) {
+    const traits = (typeof getPlayerTraits === 'function') ? getPlayerTraits() : [];
+    const trait = traits[traitIndex];
+    if (!trait) return '';
+
+    const name = LANG === 'de' ? (trait.nameDE || trait.nameEn) : trait.nameEn;
+    const desc = LANG === 'de' ? (trait.descDE || trait.descEn) : trait.descEn;
+
+    return `<div class="skl-tip">`
+        + `<div class="skl-tip-title" style="color:#7fe0ff">${trait.icon || '★'} ${name}</div>`
+        + `<div class="skl-tip-tags">${t('skill_tip_trait_tag')}</div>`
+        + `<div class="skl-tip-sep"></div>`
+        + `<div class="skl-tip-desc">${desc}</div>`
+        + `<div class="skl-tip-note">${t('skill_tip_trait_locked')}</div>`
+        + `</div>`;
+}
+
+
 //------------------------------------------------------------------------
 //-------------------------EVENT HANDLERS---------------------------------
 //------------------------------------------------------------------------
 // Inline onmouseenter/onmousemove/onmouseleave hooks, mirroring the class
 // HUD's handleHUDTip so both systems behave identically.
 //------------------------------------------------------------------------
+
+// Shows the tooltip for a character trait (by index into getPlayerTraits()).
+function handleTraitTip(e, traitIndex) {
+    if (typeof showHUDTooltip !== 'function') return;
+    const html = buildTraitTooltipHTML(Number(traitIndex));
+    if (html) showHUDTooltip(html, e);
+}
+
 
 // Shows the tooltip for a castable OR passive skill id.
 function handleSkillTip(e, skillId) {

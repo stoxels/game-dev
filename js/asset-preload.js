@@ -41,6 +41,10 @@ var AssetPreload = (function () {
             'images/Title_Screen/Language-Block.webp',
             'images/Title_Screen/Play-Block.webp',
             'images/Title_Screen/General-Block.webp',
+            'images/Title_Screen/left-block-1.webp',
+            'images/Title_Screen/left-block-2.webp',
+            'images/Title_Screen/right-block-1.webp',
+            'images/Title_Screen/right-block-2.webp',
             'images/Title_Screen/Reset-Block.webp'
         ],
         'screen-hs': [

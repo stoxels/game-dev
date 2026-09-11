@@ -1052,7 +1052,7 @@
 .wd-level-node.locked .wd-stoxel-spark {
     /* Bigger, brighter sparks */
     filter: drop-shadow(0 0 6px #c020ff) drop-shadow(0 0 3px #ff00ff);
-    r: 3.5;
+    r: 3.5px;
 }
 
 .wd-level-node.locked .wd-stoxel-crackle {
@@ -1125,7 +1125,7 @@
 
 /* Band 2 — bright purple loop */
 .wd-stoxel-band-2 {
-    stroke:rgba(90, 10, 180, 0.92); }
+    stroke: rgba(90, 10, 180, 0.92);
     transform-origin: 52px 52px;
     animation: stoxelBandSpin2 7s linear infinite reverse;
 }

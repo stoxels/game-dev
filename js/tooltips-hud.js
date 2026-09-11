@@ -322,11 +322,14 @@ function _buildModTombstoneTooltipHTML(btn) {
 }
 
 // 7. Title-screen expansion logo — expansion history.
-// Newest expansion first, then older ones: Expansion 2 (upcoming),
-// Expansion 1 (current), Base Game.
+// Current expansion first, then older ones:
+// Expansion 2 "Rise of the Beasts" (current), Expansion 1
+// "Cartographers of Chance" (characters, cutscenes, world map,
+// large visual overhaul), Base Game.
 function _buildExpansionHistoryTooltipHTML() {
     return `<strong style="color:#d4b8ff">${t('scr_expansion_tooltip_title')}</strong>`
         + `<br><br><span style="color:#c39bd3">• ${t('scr_expansion_2_badge')}: ${t('scr_expansion_2_name')}</span>`
+        + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_2_note')}</span>`
         + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_badge')}: ${t('scr_expansion_1_name')}</span>`
         + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_1_note')}</span>`
         + `<br><br><span style="color:#e6d6ff">• ${t('scr_expansion_base')}</span>`

@@ -143,6 +143,14 @@ function _closeAllModals() {
                 if (typeof _dofNudge === 'function') _dofNudge();
                 return;
             }
+            // Route through closeSpellbook() so the body class and the
+            // hotbar stacking are reset (plain class removal would leave
+            // the hotbar lifted above modals).
+            if (m.id === 'spellbook-overlay') {
+                if (typeof closeSpellbook === 'function') closeSpellbook();
+                else m.classList.remove('show');
+                return;
+            }
             m.classList.remove('show');
         });
     // Re-sync the question-modal avatar-hide flag (covers the math gate and

@@ -174,17 +174,13 @@ function _renderPlayerAvatarSimple() {
     // Responsive anchor/scale for narrow viewports (no-op on desktop).
     _applyAvatarResponsiveLayout(wrapper);
 
+    // No character name above the sprite any more: the mana bar sits directly
+    // above the sprite instead (Health order in endgame matches the same idea).
     wrapper.innerHTML = `
-        <div id="avatar-simple-drag-handle" style="
-            width: 100%;
-            text-align: center;
-            font-size: 15px;
-            letter-spacing: 1px;
-            color: ${_getAvatarCharacterColor()};
-            cursor: default;
-            padding: 2px 0 4px;
-            font-family: monospace;
-        ">${_getAvatarCharacterName()}</div>
+        <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap">
+            <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
+            <span id="avatar-mana-text" class="avatar-mana-bar-text"></span>
+        </div>
         <div class="avatar-sprite-row" style="
             display: flex;
             flex-direction: row;
@@ -209,10 +205,6 @@ function _renderPlayerAvatarSimple() {
                 style="width: 112px; height: 112px; object-fit: contain; pointer-events: none;"
                 draggable="false"
             />` : ''}
-        </div>
-        <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap">
-            <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
-            <span id="avatar-mana-text" class="avatar-mana-bar-text"></span>
         </div>
     `;
 
@@ -825,22 +817,20 @@ function _renderPlayerAvatar() {
             user-select: none;
         `;
 
+        // Stack order, top → bottom: Health, Mana, Shield, Attack charge, then
+        // the sprite itself. The character name label above the sprite is gone.
         avatar.innerHTML = `
-            <div id="avatar-name-label" style="
-                width: 100%;
-                text-align: center;
-                font-size: 9px;
-                letter-spacing: 1px;
-                color: ${_getAvatarCharacterColor()};
-                padding: 2px 0 4px;
-                font-family: monospace;
-            ">${_getAvatarCharacterName()}</div>
-
             <div style="width: 100%; margin-bottom: 4px;">
                 <span id="avatar-hp-text" style="font-size: 12px; font-weight: bold; color: white; display: block; text-align: center; text-shadow: 1px 1px 2px black;"></span>
                 <div style="background: #111; width: 100%; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #000;">
                     <div id="avatar-hp-fill" style="background: red; width: 100%; height: 100%; transition: width 0.1s;"></div>
                 </div>
+            </div>
+
+            <!-- mana bar (moved off the class HUD) -->
+            <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap" style="width: 100%; margin-bottom: 4px;">
+                <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
+                <span id="avatar-mana-text" class="avatar-mana-bar-text"></span>
             </div>
 
             <!-- absorption / shield bar -->
@@ -851,16 +841,11 @@ function _renderPlayerAvatar() {
                 </div>
             </div>
 
+            <!-- attack charge-up bar -->
             <div style="width: 100%; margin-bottom: 8px;">
                 <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
                     <div id="avatar-charge-fill" style="background: #4ade80; width: 0%; height: 100%; transition: width 0.1s linear;"></div>
                 </div>
-            </div>
-
-            <!-- mana bar (moved off the class HUD) -->
-            <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap" style="width: 100%; margin-bottom: 6px;">
-                <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
-                <span id="avatar-mana-text" class="avatar-mana-bar-text"></span>
             </div>
 
             <img src="${_getPlayerCharacterImage()}" id="avatar-sprite-img"
@@ -912,7 +897,7 @@ function _renderPlayerAvatar() {
 
     if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 
-    // Hold-E pause — keep sprite label in sync if the avatar was recreated while E is still held
+    // Hold-parry pause — keep sprite label in sync if the avatar was recreated while the parry key is still held
     if (typeof _egHoldEPauseActive !== 'undefined' && typeof _egSetHoldEPauseVisual === 'function') {
         // Avoid redundant DOM churn: _egSetHoldEPauseVisual is idempotent and cheap
         const lbl = document.getElementById('eg-hold-pause-label');

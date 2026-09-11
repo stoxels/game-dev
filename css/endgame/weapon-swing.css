@@ -1,0 +1,381 @@
+/* ============================================================================
+   WEAPON SWING EFFECTS (endgame)
+   ============================================================================
+   Pure-CSS weapon attack visuals — one shared overlay anchored to the
+   player avatar, skinned per weapon family. This deliberately avoids
+   per-character / per-class weapon sprite art: the effect is drawn from
+   gradients + clip-path + box-shadow only, and rotates toward the
+   direction the player is facing (eg-dir-up/down/left/right).
+
+   Families (resolved in js/endgame/endgame-weapon-swing.js):
+     sword   — broad silver slash arc
+     dagger  — fast double thrust
+     axe     — heavy overhead chop
+     mace    — blunt slam + shockwave ring
+     wand    — arcane bolt flick
+     staff   — long spinning sweep
+     bow     — loosed arrow
+     unarmed — bare-handed jab puff (no weapon equipped)
+
+   DOM contract (built by _egShowWeaponSwing):
+     .eg-weapon-swing.eg-swing-<family>.eg-dir-<dir>
+       > .egw-rot              (direction rotator: right 0, down 90,
+                                left 180, up 270 — shape drawn aiming +x)
+         > family-specific parts (.egw-arc, .egw-blade, ...)
+   The JS removes the node after the family duration; every animation
+   below is fire-once (forwards) so no cleanup state lingers.
+   ============================================================================ */
+
+/* ── Anchor / rotator ─────────────────────────────────────────────────── */
+.eg-weapon-swing {
+    position: absolute;
+    left: 50%;
+    /* The avatar wrapper is a column: bars on top, sprite below. ~62%
+       lands the effect centre on the sprite instead of the bars. */
+    top: 62%;
+    width: 150px;
+    height: 150px;
+    margin-left: -75px;
+    margin-top: -75px;
+    pointer-events: none;
+    z-index: 1001;
+}
+
+.egw-rot {
+    position: absolute;
+    inset: 0;
+}
+
+.eg-weapon-swing.eg-dir-right .egw-rot { transform: rotate(0deg); }
+.eg-weapon-swing.eg-dir-down  .egw-rot { transform: rotate(90deg); }
+.eg-weapon-swing.eg-dir-left  .egw-rot { transform: rotate(180deg); }
+.eg-weapon-swing.eg-dir-up    .egw-rot { transform: rotate(270deg); }
+
+/* Bigger weapons sweep a wider circle (2H swords/axes/maces/staves). */
+.eg-weapon-swing.eg-heavy {
+    width: 190px;
+    height: 190px;
+    margin-left: -95px;
+    margin-top: -95px;
+}
+
+.egw-part {
+    position: absolute;
+    pointer-events: none;
+}
+
+/* ── SWORD: broad silver slash ──────────────────────────────────────────
+   A crescent arc sweeping -70° → +70° plus a bright blade streak. */
+.eg-swing-sword .egw-arc {
+    left: 8px;
+    top: 8px;
+    width: 134px;
+    height: 134px;
+    border-radius: 50%;
+    border: 7px solid transparent;
+    border-top-color: #eceff1;
+    border-right-color: rgba(176, 190, 197, 0.85);
+    filter: drop-shadow(0 0 6px rgba(207, 216, 220, 0.9));
+    opacity: 0;
+    animation: egw-sword-sweep 300ms ease-out forwards;
+}
+
+.eg-heavy.eg-swing-sword .egw-arc {
+    left: 10px;
+    top: 10px;
+    width: 170px;
+    height: 170px;
+    border-width: 9px;
+}
+
+.eg-swing-sword .egw-blade {
+    left: 75px;
+    top: 70px;
+    width: 66px;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, rgba(236, 239, 241, 0), #eceff1 55%, #ffffff);
+    clip-path: polygon(0 20%, 78% 0, 100% 50%, 78% 100%, 0 80%);
+    opacity: 0;
+    animation: egw-sword-streak 300ms ease-out forwards;
+}
+
+@keyframes egw-sword-sweep {
+    0%   { opacity: 0; transform: rotate(-70deg) scale(0.85); }
+    25%  { opacity: 1; }
+    100% { opacity: 0; transform: rotate(70deg) scale(1.05); }
+}
+
+@keyframes egw-sword-streak {
+    0%   { opacity: 0; transform: translateX(-18px) scaleX(0.6); }
+    35%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(14px) scaleX(1.1); }
+}
+
+/* ── DAGGER: fast double thrust ─────────────────────────────────────────
+   Short ice-blue needle jabbing twice — quick and stabby. */
+.eg-swing-dagger .egw-blade {
+    left: 70px;
+    top: 70px;
+    width: 52px;
+    height: 5px;
+    border-radius: 3px;
+    background: linear-gradient(to right, rgba(179, 229, 252, 0), #b3e5fc 60%, #ffffff);
+    clip-path: polygon(0 25%, 82% 0, 100% 50%, 82% 100%, 0 75%);
+    filter: drop-shadow(0 0 5px rgba(179, 229, 252, 0.9));
+    opacity: 0;
+    animation: egw-dagger-jab 240ms ease-out forwards;
+}
+
+.eg-swing-dagger .egw-arc {
+    left: 96px;
+    top: 66px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, rgba(179, 229, 252, 0.9) 45%, transparent 70%);
+    opacity: 0;
+    animation: egw-dagger-ping 240ms ease-out forwards;
+}
+
+@keyframes egw-dagger-jab {
+    0%   { opacity: 0; transform: translateX(-10px) scaleX(0.5); }
+    20%  { opacity: 1; transform: translateX(16px) scaleX(1); }
+    40%  { opacity: 0.4; transform: translateX(2px) scaleX(0.8); }
+    60%  { opacity: 1; transform: translateX(20px) scaleX(1.05); }
+    100% { opacity: 0; transform: translateX(26px) scaleX(1.1); }
+}
+
+@keyframes egw-dagger-ping {
+    0%, 45% { opacity: 0; transform: scale(0.4); }
+    60%     { opacity: 1; transform: scale(1); }
+    100%    { opacity: 0; transform: scale(1.6); }
+}
+
+/* ── AXE: heavy overhead chop ───────────────────────────────────────────
+   Amber wedge biting downward + dust-burst ring on impact. */
+.eg-swing-axe .egw-blade {
+    left: 78px;
+    top: 18px;
+    width: 56px;
+    height: 60px;
+    background: linear-gradient(135deg, #ffe0b2 0%, #ff9800 55%, #e65100 100%);
+    clip-path: polygon(0 0, 100% 12%, 78% 100%, 12% 88%);
+    filter: drop-shadow(0 0 7px rgba(255, 152, 0, 0.85));
+    opacity: 0;
+    transform-origin: 20% 10%;
+    animation: egw-axe-chop 380ms cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
+}
+
+.eg-swing-axe .egw-arc {
+    left: 92px;
+    top: 92px;
+    width: 44px;
+    height: 22px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 224, 178, 0.9);
+    opacity: 0;
+    animation: egw-axe-ring 380ms ease-out forwards;
+}
+
+@keyframes egw-axe-chop {
+    0%   { opacity: 0; transform: rotate(-55deg) translateY(-16px); }
+    30%  { opacity: 1; transform: rotate(-12deg) translateY(-4px); }
+    55%  { opacity: 1; transform: rotate(14deg) translateY(10px); }
+    100% { opacity: 0; transform: rotate(20deg) translateY(16px); }
+}
+
+@keyframes egw-axe-ring {
+    0%, 50%  { opacity: 0; transform: scale(0.4); }
+    70%      { opacity: 1; transform: scale(1); }
+    100%     { opacity: 0; transform: scale(1.7); }
+}
+
+/* ── MACE: blunt slam + shockwave ───────────────────────────────────────
+   Dark-iron head crashing down, ring blast radiating out. */
+.eg-swing-mace .egw-blade {
+    left: 96px;
+    top: 30px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: radial-gradient(circle at 35% 30%, #b0bec5, #546e7a 55%, #263238 100%);
+    border: 3px solid #3e2723;
+    box-sizing: border-box;
+    filter: drop-shadow(0 0 7px rgba(176, 190, 197, 0.8));
+    opacity: 0;
+    animation: egw-mace-slam 400ms cubic-bezier(0.3, 0.6, 0.4, 1) forwards;
+}
+
+.eg-swing-mace .egw-arc {
+    left: 78px;
+    top: 52px;
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 205, 112, 0.95);
+    opacity: 0;
+    animation: egw-mace-shock 400ms ease-out forwards;
+}
+
+@keyframes egw-mace-slam {
+    0%   { opacity: 0; transform: translateY(-26px) scale(0.8); }
+    35%  { opacity: 1; transform: translateY(6px) scale(1.05); }
+    55%  { opacity: 1; transform: translateY(14px) scale(1); }
+    100% { opacity: 0; transform: translateY(18px) scale(0.95); }
+}
+
+@keyframes egw-mace-shock {
+    0%, 40% { opacity: 0; transform: scale(0.35); }
+    60%     { opacity: 1; transform: scale(0.9); }
+    100%    { opacity: 0; transform: scale(1.8); }
+}
+
+/* ── WAND: arcane bolt flick ────────────────────────────────────────────
+   Violet-white spark darting forward on a fading trail. */
+.eg-swing-wand .egw-blade {
+    left: 72px;
+    top: 66px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #ffffff 0%, #ce93d8 40%, #7b1fa2 100%);
+    filter: drop-shadow(0 0 8px rgba(206, 147, 216, 0.95));
+    opacity: 0;
+    animation: egw-wand-bolt 340ms ease-in forwards;
+}
+
+.eg-swing-wand .egw-arc {
+    left: 40px;
+    top: 71px;
+    width: 40px;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, transparent, rgba(206, 147, 216, 0.9));
+    opacity: 0;
+    animation: egw-wand-trail 340ms ease-in forwards;
+}
+
+@keyframes egw-wand-bolt {
+    0%   { opacity: 0; transform: translateX(0) scale(0.5); }
+    25%  { opacity: 1; transform: translateX(14px) scale(1); }
+    100% { opacity: 0; transform: translateX(58px) scale(0.9); }
+}
+
+@keyframes egw-wand-trail {
+    0%   { opacity: 0; }
+    30%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ── STAFF: long spinning sweep ─────────────────────────────────────────
+   Arcane-violet shaft whirling ~300° + orbiting motes. Heavy = wide. */
+.eg-swing-staff .egw-blade {
+    left: 20px;
+    top: 68px;
+    width: 110px;
+    height: 9px;
+    border-radius: 5px;
+    background: linear-gradient(to right, #4a148c, #7b1fa2 30%, #ba68c8 60%, #fff9c4 92%, #ffffff);
+    transform-origin: 18% 50%;
+    filter: drop-shadow(0 0 8px rgba(186, 104, 200, 0.9));
+    opacity: 0;
+    animation: egw-staff-spin 460ms cubic-bezier(0.35, 0.1, 0.35, 1) forwards;
+}
+
+.eg-heavy.eg-swing-staff .egw-blade {
+    width: 150px;
+}
+
+.eg-swing-staff .egw-arc {
+    left: 100px;
+    top: 62px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fffde7 0%, #ce93d8 55%, transparent 72%);
+    opacity: 0;
+    animation: egw-staff-mote 460ms ease-out forwards;
+}
+
+@keyframes egw-staff-spin {
+    0%   { opacity: 0; transform: rotate(-140deg); }
+    20%  { opacity: 1; }
+    100% { opacity: 0; transform: rotate(160deg); }
+}
+
+@keyframes egw-staff-mote {
+    0%   { opacity: 0; transform: translateX(0) scale(0.5); }
+    40%  { opacity: 1; transform: translateX(26px) scale(1.1); }
+    100% { opacity: 0; transform: translateX(52px) scale(0.7); }
+}
+
+/* ── BOW: loosed arrow ──────────────────────────────────────────────────
+   Slender shaft streaking far forward — the bow-bash at melee range. */
+.eg-swing-bow .egw-blade {
+    left: 70px;
+    top: 71px;
+    width: 62px;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(to right, rgba(255, 224, 130, 0), #ffe082 60%, #ffffff);
+    opacity: 0;
+    animation: egw-bow-shot 320ms ease-in forwards;
+}
+
+.eg-swing-bow .egw-blade::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: -4px;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 10px solid #ffca28;
+}
+
+.eg-swing-bow .egw-arc {
+    left: 58px;
+    top: 64px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 224, 130, 0.8);
+    opacity: 0;
+    animation: egw-bow-string 320ms ease-out forwards;
+}
+
+@keyframes egw-bow-shot {
+    0%   { opacity: 0; transform: translateX(-8px); }
+    25%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(60px); }
+}
+
+@keyframes egw-bow-string {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.3); }
+}
+
+/* ── UNARMED: bare-handed jab ─────────────────────────────────────────── */
+.eg-swing-unarmed .egw-blade {
+    left: 78px;
+    top: 64px;
+    width: 30px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 70%);
+    opacity: 0;
+    animation: egw-unarmed-jab 260ms ease-out forwards;
+}
+
+@keyframes egw-unarmed-jab {
+    0%   { opacity: 0; transform: translateX(-6px) scale(0.6); }
+    40%  { opacity: 1; transform: translateX(12px) scale(1); }
+    100% { opacity: 0; transform: translateX(20px) scale(1.3); }
+}
+
+/* ── Reduced motion: still show a brief flash, skip the sweep ────────── */
+@media (prefers-reduced-motion: reduce) {
+    .eg-weapon-swing .egw-part {
+        animation-duration: 120ms !important;
+    }
+}

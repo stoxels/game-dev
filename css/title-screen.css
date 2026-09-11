@@ -52,9 +52,9 @@
 #boot-loader .boot-logo-img {
     position: absolute;
     left: 50%;
-    top: 3%;
+    top: 2%;
     transform: translateX(-50%);
-    width: clamp(200px, 28%, 480px);
+    width: clamp(220px, 32%, 540px);
     height: auto;
     pointer-events: none;
     user-select: none;
@@ -62,13 +62,13 @@
 }
 
 /* Expansion logo image — same position and size as .title-expansion-logo.
-   Kept at 22% width so it clears the side button columns (30%/70%). */
+   Kept at 34% width so it clears the side button columns (12%/88%). */
 #boot-loader .boot-expansion-logo {
     position: absolute;
     left: 50%;
-    top: 24.5%;
+    top: 26%;
     transform: translateX(-50%);
-    width: clamp(180px, 22%, 380px);
+    width: clamp(260px, 34%, 560px);
     height: auto;
     user-select: none;
     filter: drop-shadow(0 0 18px rgba(255, 120, 40, 0.45));
@@ -228,9 +228,9 @@
 .title-logo-img {
     position: absolute;
     left: 50%;
-    top: 3%;
+    top: 2%;
     transform: translateX(-50%);
-    width: clamp(200px, 28%, 480px);
+    width: clamp(220px, 32%, 540px);
     height: auto;
     pointer-events: none;
     user-select: none;
@@ -238,13 +238,13 @@
 }
 
 /* Expansion logo image ("Rise of the Beasts" EN/DE) — hover shows the expansion history.
-   Kept at 22% width so it clears the side button columns (30%/70%). */
+   Kept at 34% width so it clears the side button columns (12%/88%). */
 .title-expansion-logo {
     position: absolute;
     left: 50%;
-    top: 24.5%;
+    top: 26%;
     transform: translateX(-50%);
-    width: clamp(180px, 22%, 380px);
+    width: clamp(260px, 34%, 560px);
     height: auto;
     user-select: none;
     filter: drop-shadow(0 0 18px rgba(255, 120, 40, 0.45));
@@ -256,13 +256,14 @@
 .title-version-line {
     position: absolute;
     left: 50%;
-    top: 31.8%;
+    top: 37%;
     transform: translateX(-50%);
     white-space: nowrap;
     font-family: var(--PX);
     font-size: clamp(7px, 0.95cqw, 11px);
-    color: rgba(200, 180, 255, 0.55);
+    color: rgba(255, 110, 110, 0.9);
     letter-spacing: 0.1em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
 /* AI disclosure — unobtrusive line pinned to the bottom-right corner */
@@ -335,6 +336,9 @@
    label font (in cqw) scales with the button's own width. The
    text then always fits the stone block — in every language
    (long German words included) and at every window size.
+
+   Menu blocks carry a subtle purple ambient glow (idle + hover
+   intensifies); PLAY carries a red one — see the glow section below.
 */
 .title-overlay-btn {
     position: absolute;
@@ -387,32 +391,138 @@
 }
 
 
-/* ── BLOCK BACKGROUND IMAGES ───────────────────────────── */
+/* ── BLOCK BACKGROUND IMAGES & AMBIENT GLOW ───────────── */
+
+/*
+   Glow implementation: a box-shadow would light up a plain rectangle
+   around each block, so instead every button gets a ::before layer
+   BEHIND its stone artwork that paints a blurred, tinted copy of the
+   block image itself. The artwork on top covers the centre, so only
+   the soft coloured halo shows around the block's real silhouette.
+
+   --glow-color / --glow-opacity / --glow-hover-opacity are overridden
+   per block variant (red for PLAY, purple for menu blocks); the slow
+   pulse + hover intensification are shared.
+*/
+.title-overlay-btn::before {
+    content: '';
+    position: absolute;
+    inset: -12%;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--glow-color, rgba(150, 90, 255, 0.55));
+    -webkit-mask: var(--block-img) center / 100% 100% no-repeat;
+    mask: var(--block-img) center / 100% 100% no-repeat;
+    filter: blur(var(--glow-blur, 9px)) brightness(var(--glow-brightness, 1.6));
+    opacity: var(--glow-opacity, 0.32);
+    transition: opacity 0.25s ease;
+    animation: title-btn-glow-pulse 3.2s ease-in-out infinite;
+}
+
+.title-overlay-btn:hover::before {
+    opacity: var(--glow-hover-opacity, 0.85);
+}
+
+/* file:// fallback: Firefox treats `mask-image: url(...)` as a CORS fetch,
+   which is blocked on file:// ("CORS-Anfrage war nicht http") and spams the
+   console once per button. The stone art itself (background-image / <img>)
+   loads fine — only the blurred halo layer needs masking. So on local
+   file:// launches the mask layer is skipped and the glow falls back to a
+   drop-shadow (no extra fetch, follows the block's alpha silhouette).
+   Hosted builds (http/https) keep the richer mask glow above untouched.
+   The `file-protocol` class is set on <html> by the inline head script in
+   index.html. */
+html.file-protocol .title-overlay-btn::before {
+    display: none;
+}
+
+html.file-protocol .title-overlay-btn {
+    filter: drop-shadow(0 0 6px var(--glow-color, rgba(150, 90, 255, 0.55)));
+}
+
+html.file-protocol #btn-play {
+    filter: drop-shadow(0 0 10px rgba(255, 60, 45, 0.8));
+}
+
+html.file-protocol .title-overlay-btn:hover {
+    filter: drop-shadow(0 0 12px var(--glow-color, rgba(150, 90, 255, 0.85))) brightness(1.1);
+}
+
+html.file-protocol #btn-play:hover {
+    filter: drop-shadow(0 0 16px rgba(255, 60, 45, 1)) brightness(1.1);
+}
+
+@keyframes title-btn-glow-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.045); }
+}
 
 #btn-play {
+    /* Red glow for PLAY — stronger/brighter than the menu purple so it
+       reads against the dark red sky behind it */
+    --glow-color: rgba(255, 60, 45, 0.8);
+    --glow-opacity: 0.7;
+    --glow-hover-opacity: 1;
+    --glow-blur: 14px;
+    --glow-brightness: 2.1;
+    --block-img: url('../images/Title_Screen/Play-Block.webp');
     background-image: url('../images/Title_Screen/Play-Block.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    /* 20.5% keeps the block clear of the side columns (30% / 70%)
-       at every canvas width — no more overlap with KEYBINDS etc. */
+    /* 20.5% keeps the block clear of the side columns (12% / 88%)
+       at every canvas width — no more overlap with KEYBINDS etc.
+       3.6/1 (was 4.2/1) gives PLAY noticeably more height. */
     width: clamp(140px, 20.5%, 380px);
-    aspect-ratio: 4.2 / 1;
+    aspect-ratio: 3.6 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.block-general,
+.block-left-1,
+.block-left-2,
+.block-right-1,
+.block-right-2 {
+    /* Subtle purple glow for the 8 menu blocks */
+    --glow-color: rgba(150, 90, 255, 0.55);
+    --glow-opacity: 0.32;
+    --glow-hover-opacity: 0.85;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    /* Per-glyph width ~6.5% of the block keeps long translated labels
+       (EINSTELLUNGEN, ANLEITUNG, ...) inside at any size.
+       Sized UP (22%) so the 8 menu buttons read clearly against the art. */
+    width: clamp(110px, 22%, 280px);
+    aspect-ratio: 4.1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .block-general {
+    --block-img: url('../images/Title_Screen/General-Block.webp');
     background-image: url('../images/Title_Screen/General-Block.webp');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    /* Per-glyph width ~6.5% of the block keeps long translated labels
-       (EINSTELLUNGEN, ANLEITUNG, ...) inside at any size */
-    width: clamp(90px, 18%, 200px);
-    aspect-ratio: 5 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+}
+
+.block-left-1 {
+    --block-img: url('../images/Title_Screen/left-block-1.webp');
+    background-image: url('../images/Title_Screen/left-block-1.webp');
+}
+
+.block-left-2 {
+    --block-img: url('../images/Title_Screen/left-block-2.webp');
+    background-image: url('../images/Title_Screen/left-block-2.webp');
+}
+
+.block-right-1 {
+    --block-img: url('../images/Title_Screen/right-block-1.webp');
+    background-image: url('../images/Title_Screen/right-block-1.webp');
+}
+
+.block-right-2 {
+    --block-img: url('../images/Title_Screen/right-block-2.webp');
+    background-image: url('../images/Title_Screen/right-block-2.webp');
 }
 
 #btn-reset {
@@ -503,6 +613,10 @@
 
     #btn-play,
     .block-general,
+    .block-left-1,
+    .block-left-2,
+    .block-right-1,
+    .block-right-2,
     #btn-reset {
         position: relative;
         left: auto;
@@ -554,12 +668,20 @@
     .title-expansion-logo    { order: 1; }
     .title-version-line      { order: 2; }
     #btn-play                { order: 3; width: min(78%, 300px); margin-top: 7%; }
-    .block-general           { order: 4; width: min(96%, 230px); margin-top: 9%; }
+    .block-general,
+    .block-left-1,
+    .block-left-2,
+    .block-right-1,
+    .block-right-2  { order: 4; width: min(96%, 230px); margin-top: 9%; }
     .title-ai-disclosure     { order: 99; grid-column: 1 / -1; margin: 12px 14px 12px; }
 
     /* Side-by-side menu buttons: 2 per row keeps the whole menu
        inside a phone's first screen — no scrolling needed */
-    .block-general {
+    .block-general,
+    .block-left-1,
+    .block-left-2,
+    .block-right-1,
+    .block-right-2 {
         aspect-ratio: 3.6 / 1;
     }
 }

@@ -8,7 +8,7 @@
 //     around the arena and steers toward you (loose homing with a turn cap,
 //     so it is always readable). Touching it is a TACKLE: a heavy physical
 //     hit plus a fling away from the impact. Faster every phase.
-//     PARRY KICK: holding E (parry) when the ball reaches you boots the
+//     PARRY KICK: holding the parry key (R by default) when the ball reaches you boots the
 //     ball away instead — no damage, no fling; the kick burst decays back
 //     to the phase seek speed and homing resumes.
 //   • THE GOAL — a goal frame stands at a screen edge for the whole fight.
@@ -285,7 +285,7 @@ function _egStrkBallGhost(x, y) {
 
 // Advances the match ball: loose homing with a turn cap, wall bounces,
 // tackle on touch (hit + fling away from the impact) — or a parry kick
-// away from the player while E is held.
+// away from the player while the parry key is held.
 function _egStrkAdvanceBall(st, dtS, now, pr, p) {
     const b = st.ball;
     const W = window.innerWidth, H = window.innerHeight;

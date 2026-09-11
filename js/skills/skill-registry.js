@@ -203,6 +203,7 @@ function _registerSkill(id, source, def, slotKind) {
     SKILL_REGISTRY[id] = {
         id,
         icon: def.icon || _skillIconFor(id, source, slotKind),
+        image: _skillImageFor(id),
         nameEn: def.nameEn,
         nameDE: def.nameDE,
         descCursorEn: def.descCursorEn,
@@ -233,6 +234,43 @@ const SKILL_ICON_OVERRIDES = {
     random_walker_active1: '🌊', random_walker_active2: '🧭',
 };
 
+// Per-skill artwork shipped in images/class_spell_upgrade/ (the same art the
+// class-upgrade screen uses). The hotbar and spell book prefer these over the
+// emoji/`def.icon` fallback whenever an entry exists here. Heartbloom has no
+// artwork yet, so it keeps its glyph. Keyed by skill id.
+const SKILL_UPGRADE_IMAGES = {
+    mathmagician_active1: 'arcane_reveal.webp',
+    mathmagician_active2: 'absolute_zero.webp',
+    mathmagician_passive: 'variance_shield.webp',
+    statistician_active1: 'data_strike.webp',
+    statistician_active2: 'diagonal_strike.webp',
+    statistician_passive: 'momentum.webp',
+    probabilist_active1: 'precision_shot.webp',
+    probabilist_active2: 'rain_of_arrows.webp',
+    probabilist_passive: 'bayesian_insight.webp',
+    outlier_active1: 'tail_risk.webp',
+    outlier_active2: 'speedforce.webp',
+    actuary_active1: 'regression_to_prior.webp',
+    actuary_active2: 'significance_threshold.webp',
+    recursionist_active1: 'residual.webp',
+    recursionist_active2: 'degrees_of_freedom.webp',
+    markovian_active1: 'state_rollback.webp',
+    markovian_active2: 'transition_matrix.webp',
+    bayesian_active1: 'bayes_traps.webp',
+    bayesian_active2: 'type1_error_shield.webp',
+    random_walker_active1: 'brownian_motion.webp',
+    random_walker_active2: 'drifter.webp',
+};
+
+// Folder (relative to index.html) holding SKILL_UPGRADE_IMAGES artwork.
+const SKILL_UPGRADE_IMAGE_DIR = 'images/class_spell_upgrade/';
+
+// Resolves the artwork URL for a skill/passive id, or null when none exists.
+function _skillImageFor(id) {
+    const file = SKILL_UPGRADE_IMAGES[id];
+    return file ? SKILL_UPGRADE_IMAGE_DIR + file : null;
+}
+
 // Resolves a display icon for a skill. Precedence:
 //   1. an explicit def.icon (heartbloom)
 //   2. the per-class spell icon table (CLASS_SPELL_ICONS)
@@ -255,6 +293,7 @@ function _registerPassive(id, def, source) {
     PASSIVE_SKILL_REGISTRY[id] = {
         id,
         icon: def.icon || (classIcons && classIcons.passive) || '💠',
+        image: _skillImageFor(id),
         nameEn: def.nameEn,
         nameDE: def.nameDE,
         levels: def.levels,
@@ -310,6 +349,27 @@ function getPassiveSkillDef(skillId) {
 // True if the id belongs to a passive (never movable into the hotbar).
 function isSkillPassive(skillId) {
     return !!PASSIVE_SKILL_REGISTRY[skillId];
+}
+
+// Upgrade artwork URL for a castable skill, or null when it has none.
+function getSkillImage(skillId) {
+    const def = getSkillDef(skillId);
+    return def ? (def.image || null) : null;
+}
+
+// Upgrade artwork URL for a passive ability, or null when it has none.
+function getPassiveSkillImage(passiveId) {
+    const def = getPassiveSkillDef(passiveId);
+    return def ? (def.image || null) : null;
+}
+
+// The character's innate traits (CHARACTERS, character-select.js). These are
+// always-on abilities that are not class skills, so they are surfaced in the
+// spell book's passive section rather than the hotbar.
+function getPlayerTraits() {
+    if (typeof CHARACTERS === 'undefined' || !STATE || !STATE.playerCharacter) return [];
+    const char = CHARACTERS[STATE.playerCharacter];
+    return (char && Array.isArray(char.traits)) ? char.traits : [];
 }
 
 // True if a skill may be placed into the hotbar.
@@ -528,17 +588,17 @@ function getPlayerSkillIds() {
 function getPlayerSkillGroups() {
     const groups = [];
     const base = _playerBaseSkillIds().filter((id) => !!getSkillDef(id));
-    if (base.length) groups.push({ labelKey: 'skillbook_group_class', ids: base });
+    if (base.length) groups.push({ labelKey: 'spellbook_group_class', ids: base });
     const asc = _playerAscendencySkillIds().filter((id) => !!getSkillDef(id));
     if (asc.length) {
         const ascDef = ASCENDENCY_DEFS[STATE.playerAscendency];
         groups.push({
-            labelKey: 'skillbook_group_ascendency',
+            labelKey: 'spellbook_group_ascendency',
             labelFallback: ascDef ? (LANG === 'de' ? (ascDef.nameDE || ascDef.nameEn) : ascDef.nameEn) : '',
             ids: asc,
         });
     }
-    if (getSkillDef(HEARTBLOOM_SKILL_ID)) groups.push({ labelKey: 'skillbook_group_endgame', ids: [HEARTBLOOM_SKILL_ID] });
+    if (getSkillDef(HEARTBLOOM_SKILL_ID)) groups.push({ labelKey: 'spellbook_group_endgame', ids: [HEARTBLOOM_SKILL_ID] });
     return groups;
 }
 

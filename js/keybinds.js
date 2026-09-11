@@ -20,8 +20,12 @@ const KEYBIND_DEFAULTS = [
     { id: 'move-down',   label: 'Move down',   keys: 's' },
     { id: 'move-right',  label: 'Move right',  keys: 'd' },
 
-    // Endgame parry (hold E by default).
-    { id: 'eg-parry',    label: 'Endgame parry (hold)',  keys: 'e' },
+    // Endgame parry (hold R by default) and manual weapon attack (E).
+    // The attack swings the equipped weapon toward the facing direction
+    // with a pure-CSS effect (see js/endgame/endgame-weapon-swing.js) —
+    // no per-character/per-class weapon art needed.
+    { id: 'eg-parry',    label: 'Endgame parry (hold)',  keys: 'r' },
+    { id: 'eg-attack',   label: 'Endgame attack (weapon swing)', keys: 'e' },
 
     // Target cycling (Tab by default).
     { id: 'cycle-target', label: 'Cycle Target', keys: 'tab' },
@@ -51,7 +55,7 @@ const KEYBIND_DEFAULTS = [
     { id: 'hotbar-10', label: 'Hotbar Slot 10', keys: '0' },
 
     // Spell book (P by default — Path-of-Exile/WoW-style spellbook key).
-    { id: 'spellbook', label: 'Open Spellbook', keys: 'p' },
+    { id: 'spellbook', label: 'Toggle Spellbook', keys: 'p' },
 ];
 
 // Live keybind map: action id -> key string. Rebuilt by loadKeybinds().
@@ -82,6 +86,18 @@ function loadKeybinds() {
         for (const def of KEYBIND_DEFAULTS) {
             const k = saved[def.id];
             if (typeof k === 'string' && k.length > 0) KEYBINDS[def.id] = k;
+        }
+        // One-time migration (2026-09-11): parry moved from E to R so E
+        // could become the weapon-attack key. Players with a saved layout
+        // from before eg-attack existed keep their custom parry key unless
+        // it is still the old 'e' default — then parry slides to 'r' and
+        // the new attack takes 'e'. Fresh profiles just get the defaults.
+        if (saved && typeof saved === 'object' && !('eg-attack' in saved)) {
+            if (KEYBINDS['eg-parry'] === 'e') {
+                KEYBINDS['eg-parry'] = 'r';
+                KEYBINDS['eg-attack'] = 'e';
+                try { saveKeybinds(); } catch { /* storage may be unavailable */ }
+            }
         }
     } catch {
         // corrupt payload — defaults already applied above

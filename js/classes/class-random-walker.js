@@ -106,13 +106,33 @@ function _revealCellForAgent(r, c) {
 //--------------------BROWNIAN MOTION — PATH GENERATION------------------
 //------------------------------------------------------------------------
 
-// Builds a right-biased random walk path starting from (startR, 0).
+// Returns the first column from the left that still has at least one
+// unrevealed filled cell. Columns whose filled cells are all already
+// revealed/filled (or that contain no filled cells at all) count as done.
+// Falls back to 0 when everything is finished or no level is active.
+function _findFirstUnfinishedColumn() {
+    if (typeof cur === 'undefined' || !cur) return 0;
+    const sol = cur.grid;
+    if (!sol || !sol.length) return 0;
+    const rows = sol.length;
+    const cols = sol[0].length;
+    for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+            if (sol[r][c] === 1 && !revealedGrid[r][c] && userGrid[r][c] !== 1) {
+                return c;
+            }
+        }
+    }
+    return 0;
+}
+
+// Builds a right-biased random walk path starting from (startR, startC).
 // The bear always drifts rightward across the grid, with random vertical steps.
-// Returns an array of { r, c } positions from left edge to right edge.
-function _buildBearPath(startR, rows, cols) {
+// Returns an array of { r, c } positions from the start column to right edge.
+function _buildBearPath(startR, rows, cols, startC = 0) {
     const path = [];
     let r = startR;
-    let c = 0;
+    let c = Math.max(0, Math.min(startC, cols - 1));
     let emergencyStop = BEAR_PATH_EMERGENCY_STOP;
 
     path.push({ r, c });
@@ -264,13 +284,17 @@ function _executeBrownianMotion(row, col, paths, rank) {
 
     const stepDurationMs = BEAR_STEP_MS_BY_RANK[rank] ?? BEAR_STEP_MS_BY_RANK[1];
 
+    // Both bears start in the first column from the left that is not fully
+    // filled yet, so the walk is spent where work remains.
+    const startC = _findFirstUnfinishedColumn();
+
     // Primary bear — Browney
     const startR1 = Math.floor(Math.random() * rows);
-    const path1 = _buildBearPath(startR1, rows, cols);
+    const path1 = _buildBearPath(startR1, rows, cols, startC);
 
     // Second bear — Wiener (rank 3 / paths > 1 only)
     const startR2 = paths > 1 ? Math.floor(Math.random() * rows) : null;
-    const path2 = paths > 1 ? _buildBearPath(startR2, rows, cols) : null;
+    const path2 = paths > 1 ? _buildBearPath(startR2, rows, cols, startC) : null;
 
     if (paths === 1) {
         showToast(t('cls_browney_unleashed'));

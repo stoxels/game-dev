@@ -14,7 +14,7 @@
 //   • The BROOM sits outside the grid. Walk over it to pick it up and
 //     stand on a slimed cell for EG_SNAIL_SWEEP_MS to clean it. Holding
 //     the broom slows you to a crawl and freezes your auto-attack charge
-//     so the snail can catch up — press E (the parry) to drop it.
+//     so the snail can catch up — press the parry key (R by default) to drop it.
 //   • At ≤20% HP: SNAILGEDDON — a 5-second warning, then the player is
 //     yanked to the grid centre while a closing frame of snails traps them.
 //     A wedge of snails lags far behind, tearing a wide, player-sized
