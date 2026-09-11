@@ -27,30 +27,39 @@
 
 :root {
     /* Shared with .game-main below so the content offset always matches
-       the panel's real (fluid) height instead of drifting out of sync. */
-    --inv-panel-h: clamp(58px, 9vw, 75px);
+       the panel's real (fluid) height instead of drifting out of sync.
+       Compact category bar — one button per item group; the slot rows live
+       in a hover/pinned flyout ABOVE the bar, not inside it. */
+    --inv-panel-h: clamp(40px, 5.5vw, 52px);
 }
 
 #inv-panel {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 500;
-    height: var(--inv-panel-h); /* Fluid height — fits label + one row of slots */
-    padding: clamp(6px, 1.2vw, 10px) clamp(10px, 2vw, 16px);
+    height: var(--inv-panel-h); /* Fluid height — one row of category buttons */
+    width: fit-content; /* Floating dock — only as wide as its buttons */
+    max-width: calc(100vw - 12px); /* Never wider than the viewport itself */
+    padding: clamp(4px, 0.8vw, 8px) clamp(8px, 1.4vw, 14px);
     background: var(--panel);
-    border-top: 1px solid var(--border);
-    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.55); /* Shadow casts upward */
+    border: 1px solid var(--border);
+    border-radius: 8px; /* Rounded dock pill */
+    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.55), 0 4px 14px rgba(0, 0, 0, 0.4);
 
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: clamp(10px, 2vw, 20px);
-    overflow-x: auto; /* Horizontal scroll when slot groups overflow */
-    overflow-y: hidden; /* Prevents accidental vertical scrollbar */
+    gap: clamp(4px, 0.9vw, 10px);
+    overflow-x: auto; /* Horizontal scroll when category buttons overflow */
+    overflow-y: hidden;
     scrollbar-width: thin; /* Firefox thin scrollbar */
 }
+
+    #inv-panel::-webkit-scrollbar {
+        height: 4px; /* unobtrusive on the floating dock */
+    }
 
 /* Push game content up so the fixed bar does not overlap it.
    Panel height + 25px breathing room, derived from the same var so
@@ -70,7 +79,7 @@
    ----------------------------------------------------------------------- */
 
 #inv-panel::-webkit-scrollbar {
-    height: 6px;
+    height: 4px; /* unobtrusive on the floating dock */
 }
 
 #inv-panel::-webkit-scrollbar-track {
@@ -96,7 +105,9 @@
    the "INVENTORY" label and the current reshuffle charge counter.
    ----------------------------------------------------------------------- */
 
-/* Wrapper that stacks the label above the counter */
+/* Wrapper that stacks the label above the counter.
+   Hidden on small screens where the dock must stay tiny — the reshuffle
+   counter is the only essential bit and still shows via a separate chip. */
 .inv-panel-toprow {
     display: flex;
     flex-direction: column;
@@ -105,6 +116,12 @@
     min-width: clamp(64px, 8vw, 90px);
     flex-shrink: 0;
     gap: 4px;
+}
+
+@media (max-width: 700px) {
+    .inv-panel-toprow {
+        display: none;
+    }
 }
 
 /* "INVENTORY" heading text */
@@ -123,6 +140,146 @@
     letter-spacing: 0.5px;
     white-space: nowrap;
 }
+
+/* Tiny reshuffle chip — hidden on desktop (the label block shows the same
+   info), shown on small screens where the label block is display:none. */
+.reshuffle-counter-mini {
+    display: none;
+    font-family: var(--PX);
+    font-size: clamp(8px, 1vw, 10px);
+    color: #aaa;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+
+
+
+/* -----------------------------------------------------------------------
+   3b. CATEGORY BUTTONS (compact bar)
+   -----------------------------------------------------------------------
+   One button per item group. Hover opens the flyout panel above the bar;
+   click pins it open until clicked again / outside click. The count badge
+   shows total owned items in that group so the player can see at a
+   glance which categories actually hold something.
+   ----------------------------------------------------------------------- */
+
+.inv-cat-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    min-width: clamp(56px, 8vw, 84px);
+    height: 100%;
+    padding: 2px clamp(6px, 1vw, 12px);
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-family: inherit;
+    transition: border-color .12s, background .12s;
+}
+
+    .inv-cat-btn:hover,
+    .inv-cat-btn.active {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: var(--border);
+        border-bottom-color: var(--accent);
+    }
+
+/* Icon above the tiny label inside the button */
+.inv-cat-icon {
+    font-size: clamp(13px, 1.8vw, 17px);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Category name under the icon */
+.inv-cat-label {
+    font-family: var(--PX);
+    font-size: clamp(6px, 0.8vw, 8px);
+    color: #999;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+    .inv-cat-btn:hover .inv-cat-label,
+    .inv-cat-btn.active .inv-cat-label {
+        color: var(--accent2);
+    }
+
+/* Owned-items badge, top-right corner of the button */
+.inv-cat-count {
+    position: absolute;
+    top: 1px;
+    right: 3px;
+    font-family: var(--PX);
+    font-size: clamp(7px, 0.9vw, 9px);
+    color: var(--yellow);
+    line-height: 1;
+    text-shadow: 0 0 3px #000, 0 0 3px #000;
+    pointer-events: none;
+}
+
+/* Small screens: icon-only buttons keep the floating dock narrow enough
+   to fit every category without scrolling. The mini reshuffle chip takes
+   over from the hidden label block. */
+@media (max-width: 700px) {
+    .inv-cat-btn {
+        min-width: 0;
+        padding: 2px 6px;
+    }
+
+    .inv-cat-label {
+        display: none;
+    }
+
+    .reshuffle-counter-mini {
+        display: inline-block;
+    }
+}
+
+
+
+
+/* -----------------------------------------------------------------------
+   3c. FLYOUT PANEL (the actual items)
+   -----------------------------------------------------------------------
+   Opens above the compact bar when a category button is hovered or
+   pinned. Holds the same slot row the old bar rendered inline. Lives at
+   body level (#inv-flyout) so bar rebuilds never destroy open panels.
+   ----------------------------------------------------------------------- */
+
+#inv-flyout {
+    position: fixed;
+    z-index: 499; /* under the bar itself (500) so the bar never gets covered */
+    display: none;
+    flex-direction: column;
+    padding: clamp(8px, 1.2vw, 12px) clamp(10px, 1.6vw, 14px);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity .12s ease, transform .12s ease;
+    pointer-events: none; /* closed state must never eat clicks */
+}
+
+    #inv-flyout.open {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
 
 
 

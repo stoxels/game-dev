@@ -88,53 +88,16 @@
     flex-shrink: 0;
 }
 
-/* ---- Menu button (stone slab) ---- */
+/* ---- Menu/back button — now the unified .back-btn stone slab (base.css).
+      Anchored to the screen's top-left corner (the screen itself is the
+      positioning context), out of the centered .hs-top-row flow. ---- */
 
-.hs-menu-btn {
+#screen-hs > .back-btn {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: clamp(64px, 10%, 170px);
-    aspect-ratio: 16 / 9;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: filter .15s, transform .1s;
-}
-
-    .hs-menu-btn:hover {
-        filter: brightness(1.25);
-    }
-
-    .hs-menu-btn:active {
-        transform: scale(0.97);
-    }
-
-.hs-menu-btn-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    pointer-events: none;
-    user-select: none;
-}
-
-.hs-menu-btn-label {
-    position: relative;
-    z-index: 1;
-    font-family: var(--PX);
-    /* floor scales down to 8px so the label can never outgrow the
-       shrinking button graphic on narrow screens */
-    font-size: clamp(8px, 2.3vw, 22px);
-    letter-spacing: clamp(0.5px, 0.15vw, 1px);
-    color: #fffdfa;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.25);
-    white-space: nowrap;
+    top: 2%;
+    left: 1.5%;
+    z-index: 10;
+    font-size: clamp(10px, 1.6vw, 16px);
 }
 
 /* ---- Title plaque (carved stone banner, from the ledger/modal header) ----

@@ -853,8 +853,15 @@ function _primerTutorLockMultiChoice() {
 
 // Disables the numeric input and submit button after the tutor succeeds
 // on a free-text question.
+// Fills the correct answer (formatted via the question's tolerance, see
+// mgFormatTutorAnswer in mathgate.js) before locking, so the player sees
+// WHAT the tutor solved instead of just a "solved" message.
 function _primerTutorLockNumericInput() {
     const inp = document.getElementById('primer-input');
+    if (inp && primerQuestion) {
+        const fill = (typeof mgFormatTutorAnswer === 'function') ? mgFormatTutorAnswer(primerQuestion) : '';
+        if (fill !== '') inp.value = fill;
+    }
     if (inp) inp.disabled = true;
     document.querySelectorAll('#primer-overlay .mg-submit-btn:not(#primer-tutor-btn)')
         .forEach(b => b.disabled = true);

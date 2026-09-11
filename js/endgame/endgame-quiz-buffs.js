@@ -273,18 +273,23 @@ function _egShowQuizBuffBurst(type, labelText) {
 
 // Helper: grant one stacking +10% damage stack and its visuals/toast.
 function _egGrantQuizDamageReward() {
-    _egQuizDmgBuffStacks.push(Date.now() + EG_QUIZ_BUFF_DURATION_MS);
+    // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev-testing.js):
+    // ×1 = exact shipped behaviour (30 min stacks are unobservable in tests).
+    const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
+        ? window.STOX_EFFECT_TIME_SCALE : 1;
+    const durationMs = EG_QUIZ_BUFF_DURATION_MS * scale;
+    _egQuizDmgBuffStacks.push(Date.now() + durationMs);
     _egPruneQuizDamageStacks();
     const stacks = _egQuizDmgBuffStacks.length;
     const totalPct = Number((stacks * EG_QUIZ_BUFF_DAMAGE_PER_STACK * 100).toFixed(1));
     // Strip trailing .0 so integers display as "30" not "30.0"
     const totalPctLabel = Number.isInteger(totalPct) ? String(Math.round(totalPct)) : String(totalPct);
-    const durLabel = _egFormatQuizBuffDuration(EG_QUIZ_BUFF_DURATION_MS);
+    const durLabel = _egFormatQuizBuffDuration(durationMs);
     if (typeof showToast === 'function') {
         const stackInfo = stacks > 1 ? ` (x${stacks} → +${totalPctLabel}% total)` : '';
         showToast(`⚔️ Scholar's Wrath: +10% damage for ${durLabel}${stackInfo}!`);
     }
-    _egAddQuizShieldFX(EG_QUIZ_BUFF_DURATION_MS);
+    _egAddQuizShieldFX(durationMs);
 
     const label = document.createElement('div');
     label.className = 'eg-damage-number eg-quiz-buff-label';

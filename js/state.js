@@ -6,6 +6,27 @@
 // These are reset at the start of each level (see startLevel() in screens.js).
 //------------------------------------------------------------------------
 
+// --- Ad-hoc gameplay flags (namespaced 2026-09-10, Pass 4) ---
+// These used to be loose window._* globals written from 12 files with no
+// single owner. Now they live in one namespace; _resetStoxFlags() zeroes
+// them all at level start (called from _resetClassLevelState in
+// class-abilities.js).
+window.STOX_FLAGS = {
+    cursedImmune: false,      // Cursed Shield / The Witch: item curses do nothing this level
+    goldenClockActive: false, // Golden Clock: the timer is frozen
+    veiledCursedUsed: false,  // Veil of the Cursed: one-time curse redirection per level
+    devTestActive: false,     // js/dev-testing.js harness engaged (never set in normal play)
+};
+
+// Resets every STOX_FLAGS entry — call at level start/end so a flag that
+// was left set (e.g. immunity that outlived the level) can never leak.
+function _resetStoxFlags() {
+    window.STOX_FLAGS.cursedImmune = false;
+    window.STOX_FLAGS.goldenClockActive = false;
+    window.STOX_FLAGS.veiledCursedUsed = false;
+    // devTestActive survives: it describes the session, not the level.
+}
+
 
 // --- Grid state ---
 
@@ -145,6 +166,35 @@ const SAVE_SLOT_COUNT = 20;
 // localStorage key used to remember which slot is currently active.
 const ACTIVE_SLOT_KEY = 'stoxels_active_slot';
 
+// localStorage key for the slot-name map ({ "1": "Alice", "7": "Hardcore Run" }).
+// Stored OUTSIDE the save blobs on purpose: a name can exist for an empty
+// slot (named before first save) and wiping a slot's data must never be
+// blocked by or entangled with the naming metadata.
+const SLOT_NAMES_KEY = 'stoxels_slot_names';
+
+// Returns the custom name for a save slot (string), or '' when unnamed.
+function getSlotName(slotNum) {
+    try {
+        const map = JSON.parse(localStorage.getItem(SLOT_NAMES_KEY) || '{}');
+        return (map && typeof map[slotNum] === 'string') ? map[slotNum] : '';
+    } catch {
+        return '';
+    }
+}
+
+// Writes a custom name for a save slot. Pass an empty/whitespace-only name
+// to remove it (falls back to the default "SLOT {n}" label everywhere).
+// Names are trimmed and hard-capped at 20 chars so the save-slot card
+// layout can never overflow.
+function setSlotName(slotNum, name) {
+    let map = {};
+    try { map = JSON.parse(localStorage.getItem(SLOT_NAMES_KEY) || '{}') || {}; } catch { map = {}; }
+    const clean = String(name || '').trim().slice(0, 20);
+    if (clean) map[slotNum] = clean;
+    else delete map[slotNum];
+    try { localStorage.setItem(SLOT_NAMES_KEY, JSON.stringify(map)); } catch { /* storage full — name is cosmetic */ }
+}
+
 
 //------------------------------------------------------------------------
 //------------------------GAME PERSISTENCE--------------------------------
@@ -192,6 +242,18 @@ function buildFreshState() {
         classActiveChoice: 'active1',
 
         classHudHintUses: 0,   // how many times player has activated via slot 1/2
+
+        // Skill hotbar: fixed-length array of skill ids (or null) for the 10
+        // action-bar slots. Populated by ensureSkillHotbar() in
+        // js/skills/skill-registry.js once the class defs are loaded.
+        skillHotbar: new Array(10).fill(null),
+        skillHotbarInit: false,   // auto-seed already done for this save
+        skillHotbarOwner: null,   // '<class>|<ascendency>' the bar was seeded for
+
+        // Class-change tokens (Nexus Ascension Level grants one; future
+        // endgame sources may grant more). One token = one base-class switch.
+        classChangeTokens: 0,
+        classChangeUsed: false,
 
         // Ascendency progression
         playerAscendency: null,
@@ -292,6 +354,17 @@ function _migrateClassFields(s) {
     // Older saves stored classActiveChoice as a number; replace with the string default.
     if (!s.classActiveChoice || typeof s.classActiveChoice === 'number') s.classActiveChoice = 'active1';
     if (s.classHudHintUses === undefined) s.classHudHintUses = 0;
+    if (s.classChangeTokens === undefined) s.classChangeTokens = 0;
+    if (s.classChangeUsed === undefined) s.classChangeUsed = false;
+
+    // Skill hotbar (js/skills/). Older saves predate the bar; _defaultSkillHotbar
+    // is not loaded yet at init time, so seed empty slots and let
+    // ensureSkillHotbar() fill them from the player's class on first render.
+    if (!Array.isArray(s.skillHotbar) || s.skillHotbar.length !== 10) {
+        s.skillHotbar = (typeof _defaultSkillHotbar === 'function')
+            ? _defaultSkillHotbar(s)
+            : new Array(10).fill(null);
+    }
 }
 
 // _migrateAscendencyFields — fills in ascendency-progression fields missing from an older save.
@@ -441,13 +514,26 @@ function loadRawSaveFromSlot(slotNum) {
     }
 }
 
+// Migrates a legacy slot name that was stored inside the save blob
+// (raw.slotName) into the dedicated names map — used by getSlotSummary so
+// names written by future in-save storage still show up after the split.
+function _migrateSlotNameFromBlob(slotNum, raw) {
+    if (!raw || typeof raw.slotName !== 'string') return;
+    if (!getSlotName(slotNum)) setSlotName(slotNum, raw.slotName);
+    delete raw.slotName;
+    try { localStorage.setItem(_slotKey(slotNum), JSON.stringify(raw)); } catch { /* cosmetic only */ }
+}
+
 // Lightweight summary used to render the save-slot select screen.
 function getSlotSummary(slotNum) {
     const raw = loadRawSaveFromSlot(slotNum);
-    if (!raw) return { slot: slotNum, empty: true };
+    // Legacy blobs may carry a slotName field — promote it to the names map.
+    if (raw && typeof raw.slotName === 'string') _migrateSlotNameFromBlob(slotNum, raw);
+    if (!raw) return { slot: slotNum, empty: true, name: getSlotName(slotNum) };
     return {
         slot: slotNum,
         empty: false,
+        name: getSlotName(slotNum),
         totalScore: raw.totalScore || 0,
         levelsDone: (raw.done || []).length,
         playerCharacter: raw.playerCharacter || null,
@@ -479,15 +565,100 @@ function getSlotSummary(slotNum) {
     };
 }
 
+// _stoxAnyItem — true when v (a stash grid / object-of-arrays / item) holds
+// at least one real item. Used by the save() degraded-state guard so it can
+// tell "player owns nothing endgame" apart from "hub mirrors failed to load".
+function _stoxAnyItem(v) {
+    if (!v) return false;
+    if (Array.isArray(v)) {
+        for (const x of v) {
+            if (x && typeof x === 'object' && (x.id || x.baseId)) return true;
+            if (Array.isArray(x) && _stoxAnyItem(x)) return true;
+        }
+        return false;
+    }
+    if (typeof v === 'object') {
+        for (const k in v) {
+            if (Array.isArray(v[k]) && _stoxAnyItem(v[k])) return true;
+            if (v[k] && typeof v[k] === 'object' && !Array.isArray(v[k]) && (v[k].id || v[k].baseId)) return true;
+        }
+    }
+    return false;
+}
+
 // save — serialises STATE into the currently active slot (defaults to
 // Slot 1 if nothing has been explicitly chosen yet, matching old behaviour).
+//
+// Safety net (added 2026-09 after a refactor-session incident where a
+// stale/empty hub wiped a leveled character's stash):
+//   1. ROLLING BACKUPS — the first write to a slot in a browser session
+//      snapshots the previous save into <key>_backup_1 (and shifts the old
+//      backup_1 into _backup_2). The last two pre-session states therefore
+//      stay recoverable at all times (see tools/save-doctor.html).
+//   2. DEGRADED-WRITE GUARD — refuses to overwrite a leveled character's
+//      save with one whose ENTIRE endgame inventory is empty (all of
+//      egEquipped/egInventory/egMapStash/egCurrencyStash/egEssenceStash/
+//      egUniqueStash), because that pattern in practice only occurs when
+//      the hub's mirrors failed to load (script error / stale cache).
+//      Intentional resets are unaffected (the slot key is wiped first, so
+//      there is no previous save to compare against).
 function save() {
     const slot = getActiveSlot() || 1;
     const toSave = { ...STATE };
     if (STATE.passiveTreeAllocated instanceof Set) {
         toSave.passiveTreeAllocated = [...STATE.passiveTreeAllocated];
     }
-    localStorage.setItem(_slotKey(slot), JSON.stringify(toSave));
+    const key = _slotKey(slot);
+    let json;
+    try {
+        json = JSON.stringify(toSave);
+    } catch (e) {
+        console.error('[save] serialisation failed — previous save left untouched', e);
+        return;
+    }
+    const raw = localStorage.getItem(key);
+    let prev = null;
+    try { prev = raw ? JSON.parse(raw) : null; } catch (e) { prev = null; }
+    const endgameEmpty =
+        (!toSave.egEquipped || Object.keys(toSave.egEquipped).length === 0) &&
+        !_stoxAnyItem(toSave.egInventory) &&
+        !_stoxAnyItem(toSave.egMapStash) &&
+        !_stoxAnyItem(toSave.egCurrencyStash) &&
+        !_stoxAnyItem(toSave.egEssenceStash) &&
+        !_stoxAnyItem(toSave.egUniqueStash) &&
+        !(toSave.egMapSlotItem && (toSave.egMapSlotItem.id || toSave.egMapSlotItem.baseId));
+    if (prev && (prev.playerLevel || 0) > 1 && endgameEmpty && !window._stoxAllowDegradedSave) {
+        // Log once per session — a save-deadlock with a spamming console helps
+        // nobody. The override lets a genuinely intentional full reset (or a
+        // recovered save) proceed; everything is documented in save-doctor.
+        if (!window._stoxSaveRefusalLogged) {
+            console.error('[save] REFUSED to overwrite: previous save has playerLevel', prev.playerLevel,
+                'but this save has NO endgame items at all — that pattern means the hub state failed to load,',
+                'not that the player sold everything. Previous save left untouched.',
+                'Inspect/recover via tools/save-doctor.html. If this refusal is wrong (you really do own nothing),',
+                'run  window._stoxAllowDegradedSave = true  in this console to override for this session.');
+            window._stoxSaveRefusalLogged = true;
+        }
+        window._stoxLastSaveRefusal = { at: Date.now(), prevLevel: prev.playerLevel, slot };
+        return;
+    }
+    // Rolling backups — first write per session snapshots the pre-session state.
+    if (window._stoxLastSavedKey !== key) {
+        try {
+            const b1 = localStorage.getItem(key + '_backup_1');
+            if (b1) localStorage.setItem(key + '_backup_2', b1);
+            if (raw) localStorage.setItem(key + '_backup_1', raw);
+        } catch (e) { /* storage full — the main save still proceeds */ }
+    }
+    try {
+        localStorage.setItem(key, json);
+        // Only mark the backup as rotated after the real write succeeded, so a
+        // failed write (quota) retries the rotation on the next save.
+        window._stoxLastSavedKey = key;
+    } catch (e) {
+        console.error('[save] write failed (storage full?) — previous save left untouched', e);
+        return;
+    }
 }
 
 // Loads (or freshly creates) the STATE for a given slot, marks it active,
@@ -502,6 +673,11 @@ function loadStateFromSlot(slotNum) {
     }
     setActiveSlot(slotNum);
     STATE = raw;
+    // New slot = new data: clear this session's hub load/save latches so the
+    // hub re-syncs its mirrors from the freshly loaded STATE (and so a load
+    // failure bound to the previous slot does not poison this one).
+    window._stoxHubStateLoaded = false;
+    window._stoxHubLoadFailed = false;
     // Re-sync endgame leveling (player level / attribute points) to the newly loaded save.
     if (typeof _egLoadLevelingState === 'function') _egLoadLevelingState();
     save();
@@ -511,8 +687,11 @@ function loadStateFromSlot(slotNum) {
 // Wipes ONLY the given slot's save data. Used by the "Reset Progress" flow
 // on the title screen — achievements live in their own global key
 // (ACH_SAVE_KEY, achievements.js) and are never touched by this.
+// The custom slot name is cleared too: a deleted save should not leave a
+// stale label on the now-empty slot.
 function wipeSlot(slotNum) {
     localStorage.removeItem(_slotKey(slotNum));
+    setSlotName(slotNum, '');
     if (typeof resetAllBeatsForSlot === 'function') resetAllBeatsForSlot(slotNum);
 }
 

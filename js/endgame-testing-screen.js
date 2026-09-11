@@ -760,7 +760,7 @@ function _egtBuildFullScreenHTML() {
     return `
 <div class="egt-hub-layout">
     <div class="egt-topbar">
-        <button class="title-btn back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
+        <button class="back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
         <span class="egt-topbar-title">${t('egt_title')}</span>
     </div>
     <div class="egt-map-grid" id="egt-map-grid">

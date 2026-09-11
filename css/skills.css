@@ -1,0 +1,433 @@
+/* -----------------------------------------------------------------------
+   SKILLS — HOTBAR, SPELL BOOK, SKILL TOOLTIP
+   -----------------------------------------------------------------------
+   Sections:
+     1. HOTBAR SHELL      — fixed bottom-right action bar (2 rows of 5)
+     2. HOTBAR SLOT       — slot box, key label, icon, cooldown / mana states
+     3. DRAG & DROP       — drag ghost + drop-target highlight
+     4. SPELL BOOK        — overlay, groups, draggable entries
+     5. SKILL TOOLTIP     — Path-of-Exile style hover tooltip contents
+   ----------------------------------------------------------------------- */
+
+
+/* -----------------------------------------------------------------------
+   1. HOTBAR SHELL
+   ----------------------------------------------------------------------- */
+
+.skill-hotbar {
+    position: fixed;
+    right: 12px;
+    /* Sit above the inventory dock so the two never overlap. */
+    bottom: calc(var(--inv-panel-h, 52px) + 16px);
+    z-index: 520;
+    display: grid;
+    grid-template-columns: repeat(var(--skill-hotbar-cols, 5), auto);
+    gap: 5px;
+    padding: 6px;
+    background: rgba(10, 10, 20, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 9px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    user-select: none;
+    touch-action: none;
+}
+
+/* While the spell book is open the bar must sit ABOVE its modal backdrop,
+   otherwise the backdrop swallows the drop and spells can't be dragged on. */
+body.spellbook-open .skill-hotbar,
+body:has(#spellbook-overlay.show) .skill-hotbar { z-index: 4500; }
+
+/* Slots that belong to the hotbar shouldn't drag-select their emoji. */
+.skill-hotbar-icon,
+.skill-hotbar-key,
+.skill-hotbar-name { pointer-events: none; }
+
+
+/* -----------------------------------------------------------------------
+   2. HOTBAR SLOT
+   ----------------------------------------------------------------------- */
+
+.skill-hotbar-slot {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 6px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: border-color .12s, background .12s, transform .06s;
+    overflow: hidden;
+}
+
+.skill-hotbar-slot:hover {
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.skill-hotbar-slot.is-empty {
+    cursor: default;
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.skill-hotbar-slot.is-empty:hover { border-color: rgba(255, 255, 255, 0.28); }
+
+.skill-hotbar-icon {
+    font-size: 26px;
+    line-height: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+}
+
+.skill-hotbar-empty {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.18);
+}
+
+.skill-hotbar-key {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-family: var(--PX, monospace);
+    font-size: 9px;
+    font-weight: bold;
+    color: #cfd6e6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    pointer-events: none;
+}
+
+/* Cooldown overlay: dark wash + big countdown centred on the slot. */
+.skill-hotbar-cd {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.62);
+    color: #ffb347;
+    font-family: var(--PX, monospace);
+    font-size: 15px;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .02em;
+    pointer-events: none;
+}
+
+.skill-hotbar-slot.on-cd { border-color: rgba(230, 126, 34, 0.6); }
+
+/* Insufficient mana: dimmed icon + blue ✦ marker in the corner. */
+.skill-hotbar-slot.no-mana { border-color: rgba(127, 179, 255, 0.55); }
+.skill-hotbar-slot.no-mana .skill-hotbar-icon { opacity: .42; }
+.skill-hotbar-slot.no-mana { opacity: .78; }
+.skill-hotbar-slot.no-mana::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(60, 110, 210, 0.22);
+    pointer-events: none;
+}
+
+.skill-hotbar-nomana {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 10px;
+    color: #7fb3ff;
+    text-shadow: 0 0 5px rgba(127, 179, 255, 0.9);
+}
+
+/* Locked (e.g. Heartbloom outside endgame maps). */
+.skill-hotbar-slot.locked { opacity: .5; border-color: #555; cursor: not-allowed; }
+
+.skill-hotbar-lock {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    font-size: 10px;
+}
+
+/* Armed — waiting for the player to click a grid cell. */
+.skill-hotbar-slot.armed {
+    outline: 2px solid #e74c3c;
+    outline-offset: 1px;
+    background: rgba(231, 76, 60, 0.16);
+}
+
+/* Hover-only name plate that floats above the slot. */
+.skill-hotbar-name {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: var(--PX, monospace);
+    font-size: 10px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    z-index: 2;
+}
+
+.skill-hotbar-slot:hover .skill-hotbar-name { display: block; }
+
+
+/* -----------------------------------------------------------------------
+   3. DRAG & DROP
+   ----------------------------------------------------------------------- */
+
+body.skill-dragging { cursor: grabbing; user-select: none; }
+
+.skill-drag-ghost {
+    position: fixed;
+    z-index: 100000;
+    font-size: 30px;
+    line-height: 1;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+    transform: translate(-2px, -2px);
+}
+
+.skill-hotbar-slot.drop-target {
+    border-color: #4fc3f7;
+    box-shadow: 0 0 10px rgba(79, 195, 247, 0.8), inset 0 0 10px rgba(79, 195, 247, 0.35);
+    background: rgba(79, 195, 247, 0.16);
+}
+
+
+/* -----------------------------------------------------------------------
+   4. SPELL BOOK
+   ----------------------------------------------------------------------- */
+
+.spellbook-bg { z-index: 4000; }
+
+.spellbook-box {
+    max-width: 560px;
+    width: min(92vw, 560px);
+}
+
+.spellbook-hint {
+    margin: 0 0 8px;
+    font-size: 11px;
+    opacity: .75;
+    text-align: center;
+    font-family: var(--PX, monospace);
+}
+
+.spellbook-scroll {
+    max-height: min(58vh, 460px);
+    overflow-y: auto;
+    padding: 4px 2px 8px;
+}
+
+.spellbook-group { margin-bottom: 10px; }
+
+.spellbook-group-title {
+    font-family: var(--PX, monospace);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #9fb4d8;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 4px 2px;
+    margin-bottom: 6px;
+}
+
+.spellbook-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 6px;
+}
+
+.spellbook-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    cursor: grab;
+    transition: border-color .12s, background .12s;
+    touch-action: none;
+}
+
+.spellbook-entry:hover {
+    border-color: var(--accent2, #aaaaff);
+    background: rgba(120, 140, 220, 0.14);
+}
+
+.spellbook-entry:active { cursor: grabbing; }
+
+.spellbook-entry.is-passive,
+.spellbook-entry.is-locked {
+    cursor: not-allowed;
+    opacity: .6;
+    filter: grayscale(.35);
+}
+
+.spellbook-entry-icon {
+    font-size: 24px;
+    line-height: 1;
+    flex: 0 0 auto;
+}
+
+.spellbook-entry-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.spellbook-entry-name {
+    font-family: var(--PX, monospace);
+    font-size: 11px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spellbook-entry-tags {
+    font-size: 9px;
+    color: #8fb8ff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spellbook-entry-rank {
+    font-family: var(--PX, monospace);
+    font-size: 9px;
+    color: #f1c40f;
+    flex: 0 0 auto;
+}
+
+.spellbook-entry-onbar {
+    color: #4fc3f7;
+    font-size: 12px;
+    font-weight: bold;
+    flex: 0 0 auto;
+}
+
+.spellbook-entry-lock { font-size: 13px; flex: 0 0 auto; }
+
+.spellbook-empty {
+    text-align: center;
+    font-family: var(--PX, monospace);
+    font-size: 12px;
+    opacity: .7;
+    padding: 24px 0;
+}
+
+
+/* -----------------------------------------------------------------------
+   5. SKILL TOOLTIP (inside #chud-floating-tip)
+   ----------------------------------------------------------------------- */
+
+/* Skill tooltips need more room than the tiny class-HUD tooltips. */
+#chud-floating-tip:has(.skl-tip) { max-width: 330px; }
+
+.skl-tip { font-size: 11px; line-height: 1.55; }
+
+.skl-tip-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #f5d98b;
+    text-align: center;
+    letter-spacing: .02em;
+    margin-bottom: 1px;
+}
+
+.skl-tip-tags {
+    text-align: center;
+    color: #7fb3ff;
+    font-size: 10px;
+    margin-bottom: 3px;
+}
+
+.skl-tip-stat { color: #d7d7e6; }
+.skl-tip-stat b { font-weight: bold; }
+
+.skl-tip-sep {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.16);
+    margin: 6px 0;
+}
+
+.skl-tip-desc { color: #dcd7f0; margin-bottom: 4px; }
+
+.skl-tip-dmg { color: #7fb3ff; }
+.skl-tip-dmg b { color: #a9ccff; }
+
+.skl-tip-scaling { color: #b8a9ff; margin-top: 4px; }
+.skl-tip-note { color: #9a9ab0; font-size: 10px; margin-top: 4px; }
+.skl-tip-warn { color: #ff6b6b; font-size: 10px; margin-top: 4px; }
+
+.skl-tip-foot {
+    margin-top: 6px;
+    font-size: 9px;
+    color: #7a7a92;
+    font-style: italic;
+    text-align: center;
+}
+
+
+/* -----------------------------------------------------------------------
+   6. MANA BAR ON THE PLAYER SPRITE
+   -----------------------------------------------------------------------
+   Moved off the class HUD so the hotbar owns all cast feedback.
+   ----------------------------------------------------------------------- */
+
+.avatar-mana-bar-wrap {
+    position: relative;
+    width: 120px;
+    height: 13px;
+    margin-top: 4px;
+    background: rgba(10, 10, 20, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 7px;
+    overflow: hidden;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.avatar-mana-bar-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 100%;
+    background: linear-gradient(180deg, #6ea8ff, #2c5aa0);
+    transition: width .25s ease;
+}
+
+.avatar-mana-bar-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--PX, monospace);
+    font-size: 9px;
+    color: #dce8ff;
+    letter-spacing: .04em;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+
+/* -----------------------------------------------------------------------
+   7. NARROW VIEWPORTS — shrink the bar so it never crowds the grid.
+   ----------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+    .skill-hotbar-slot { width: 40px; height: 40px; }
+    .skill-hotbar-icon { font-size: 20px; }
+    .skill-hotbar-cd { font-size: 12px; }
+    .skill-hotbar { gap: 3px; padding: 4px; }
+}

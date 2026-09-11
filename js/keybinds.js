@@ -37,12 +37,21 @@ const KEYBIND_DEFAULTS = [
     { id: 'eg-special-2', label: 'Endgame Special Ability 2', keys: 'g' },
     { id: 'eg-special-3', label: 'Endgame Special Ability 3', keys: 'h' },
 
-    // Class abilities (keys 1-5 by default).
-    { id: 'ability-1',   label: 'Class Ability 1',       keys: '1' },
-    { id: 'ability-2',   label: 'Class Ability 2',       keys: '2' },
-    { id: 'ability-3',   label: 'Class Ability 3',       keys: '3' },
-    { id: 'ability-4',   label: 'Class Ability 4',       keys: '4' },
-    { id: 'ability-5',   label: 'Class Ability 5',       keys: '5' },
+    // Hotbar slots (keys 1-9,0 by default). Each action casts whatever
+    // spell the player has dragged onto that slot (see js/skills/).
+    { id: 'hotbar-1',  label: 'Hotbar Slot 1',  keys: '1' },
+    { id: 'hotbar-2',  label: 'Hotbar Slot 2',  keys: '2' },
+    { id: 'hotbar-3',  label: 'Hotbar Slot 3',  keys: '3' },
+    { id: 'hotbar-4',  label: 'Hotbar Slot 4',  keys: '4' },
+    { id: 'hotbar-5',  label: 'Hotbar Slot 5',  keys: '5' },
+    { id: 'hotbar-6',  label: 'Hotbar Slot 6',  keys: '6' },
+    { id: 'hotbar-7',  label: 'Hotbar Slot 7',  keys: '7' },
+    { id: 'hotbar-8',  label: 'Hotbar Slot 8',  keys: '8' },
+    { id: 'hotbar-9',  label: 'Hotbar Slot 9',  keys: '9' },
+    { id: 'hotbar-10', label: 'Hotbar Slot 10', keys: '0' },
+
+    // Spell book (P by default — Path-of-Exile/WoW-style spellbook key).
+    { id: 'spellbook', label: 'Open Spellbook', keys: 'p' },
 ];
 
 // Live keybind map: action id -> key string. Rebuilt by loadKeybinds().
@@ -155,9 +164,9 @@ function keybindDisplayLabel(key) {
 // keys the player actually bound instead of hardcoded defaults.
 //
 // Placeholder → action mapping (index into KEYBIND_TUT_ACTIONS):
-//   {k1}…{k4} → ability-1…ability-4, {k5} → 'escape' (hard pause key).
+//   {k1}…{k4} → hotbar-1…hotbar-4, {k5} → 'escape' (hard pause key).
 const KEYBIND_TUT_ACTIONS = [
-    'ability-1', 'ability-2', 'ability-3', 'ability-4',
+    'hotbar-1', 'hotbar-2', 'hotbar-3', 'hotbar-4',
     null, // {k5} — the pause key is fixed, shown as its key-cap label
 ];
 
@@ -207,6 +216,11 @@ function renderKeybindsUI() {
     // this also fires after captures, resets and cross-tab storage sync,
     // since they all re-render through here.
     if (typeof tutUpdateKeybinds === 'function') tutUpdateKeybinds();
+
+    // Hotbar slots print their bound key on the slot, so refresh them too
+    // whenever a binding changed (make sure the function exists — skills are
+    // an optional layer).
+    if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
 }
 
 // Puts the UI into capture mode for the given action: the next keydown

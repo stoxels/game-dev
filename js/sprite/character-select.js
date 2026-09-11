@@ -326,9 +326,10 @@ function _hideCharacterTooltip() {
 }
 
 // renderMapViewCharacterPortrait — injects the chosen character's sprite
-// into #mv-char-portrait-wrap (index.html). Safe to call repeatedly.
-function renderMapViewCharacterPortrait() {
-    const wrap = document.getElementById('mv-char-portrait-wrap');
+// into #<p>-char-portrait-wrap ('mv' = overworld map view, 'wd' = the
+// world-detail screen's mirrored topbar). Safe to call repeatedly.
+function renderMapViewCharacterPortrait(p = 'mv') {
+    const wrap = document.getElementById(p + '-char-portrait-wrap');
     if (!wrap) return;
 
     if (!STATE.playerCharacter || !CHARACTERS[STATE.playerCharacter]) {

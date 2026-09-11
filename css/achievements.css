@@ -847,27 +847,13 @@
     margin: 0 auto;
 }
 
-/* Back button — the same carved arrow-slab as the game setup screen's
-   BACK button (Game_Setup/return_to_menu_button.png). */
+/* Back button — the unified .back-btn stone slab (base.css).
+   .ach-cat-back-btn remains as an alias for older markup. */
 .ach-cat-back-btn {
-    font-family: var(--PX);
     font-size: clamp(11px, 1.15cqw, 14px);
-    letter-spacing: 1px;
-    color: var(--accent2, #ffffff);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    background: url('../images/Game_Setup/return_to_menu_button.webp') center / 100% 100% no-repeat;
-    background-color: transparent;
-    border: none;
     padding: clamp(8px, 1.1cqw, 13px) clamp(14px, 1.8cqw, 22px);
     min-width: clamp(96px, 11cqw, 140px);
-    cursor: pointer;
-    transition: filter 0.15s, transform 0.12s;
 }
-
-    .ach-cat-back-btn:hover {
-        filter: brightness(1.2);
-        transform: translateY(-1px);
-    }
 
     .ach-cat-back-btn:active {
         transform: translateY(1px);

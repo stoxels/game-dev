@@ -422,21 +422,46 @@
 
 
 /* -----------------------------------------------------------------------
-   Unrelated in-game HUD button — left as-is
+   Touchpad FILL/MARK toggle — lives INSIDE #puzzle-scaler-wrap, centred
+   below the grid (moved out of the corner HUD so it sits next to the
+   puzzle it acts on — easy to reach for touchpad / touch players).
+   Hidden unless Settings → Touchpad Mode is enabled.
    ----------------------------------------------------------------------- */
-.touchpad-mode-btn {
-    margin-left: 8px;
-    padding: 2px 8px;
-    font-size: 0.75rem;
+.puzzle-scaler-wrap > .touchpad-mode-btn {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -34px;
+    z-index: 50;
+    padding: 4px 10px;
+    font-family: var(--PX);
+    font-size: clamp(10px, 1.3vw, 13px);
     line-height: 1.4;
     border-radius: 4px;
     border: 1px solid rgba(255,255,255,0.25);
-    background: rgba(255,255,255,0.08);
-    color: var(--white, #fff);
+    background: rgba(10,10,18,0.7);
+    color: var(--accent2, #fff);
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.15s ease, border-color 0.15s ease;
 }
+
+    /* Settings-driven visibility (updateTouchpadModeButtonVisibility() in
+       js/mouse-button-handlers.js). NOTE: there is no global `.hidden`
+       utility class in this codebase — each component scopes its own. */
+    .puzzle-scaler-wrap > .touchpad-mode-btn.hidden {
+        display: none;
+    }
+
+    .puzzle-scaler-wrap > .touchpad-mode-btn:hover {
+        background: rgba(255,255,255,0.16);
+    }
+
+    .puzzle-scaler-wrap > .touchpad-mode-btn.touchpad-mode-active {
+        background: var(--red, #c0392b);
+        border-color: var(--red, #c0392b);
+        color: #fff;
+    }
 
     .touchpad-mode-btn:hover {
         background: rgba(255,255,255,0.16);

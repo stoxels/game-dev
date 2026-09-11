@@ -46,9 +46,19 @@ function getCharPortraitSrc(summary) {
 
 // Builds the inner markup for a save-slot card, empty or filled.
 function _buildSlotCardHtml(slotNum, summary) {
+    // Custom slot name — shown instead of the default "SLOT {n}" heading
+    // whenever the player has named this slot (works for empty slots too,
+    // e.g. "Hardcore Run" prepared before the first save).
+    const customName = summary.name || '';
+    const headingHtml = customName
+        ? `<div class="ssc-num ssc-num-named">${t('scr_slot_label').replace('{n}', slotNum)}</div>
+           <div class="ssc-name" title="${customName.replace(/"/g, '&quot;')}">${customName.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`
+        : `<div class="ssc-num">${t('scr_slot_label').replace('{n}', slotNum)}</div>`;
+
     if (summary.empty) {
-        return `<div class="ssc-num">${t('scr_slot_label').replace('{n}', slotNum)}</div>
-                <div class="ssc-empty">${t('scr_new_game')}</div>`;
+        return `${headingHtml}
+                <div class="ssc-empty">${t('scr_new_game')}</div>
+                <button class="ssc-name-btn" data-slot="${slotNum}" title="${t('scr_slot_name_edit')}">✏️</button>`;
     }
 
     // UPDATE HERE: Pass the full summary object instead of just the character ID
@@ -62,11 +72,12 @@ function _buildSlotCardHtml(slotNum, summary) {
         ? `<div class="ssc-player-level">${t('eg_lvl_short').replace('{n}', summary.playerLevel)}</div>`
         : '';
 
-    return `<div class="ssc-num">${t('scr_slot_label').replace('{n}', slotNum)}</div>
+    return `${headingHtml}
               ${portraitHtml}
               <div class="ssc-score">${t('score_lbl')}: ${summary.totalScore}</div>
               <div class="ssc-levels">${t('scr_stoxels_done').replace('{n}', summary.levelsDone)}</div>
               ${levelHtml}
+              <button class="ssc-name-btn" data-slot="${slotNum}" title="${t('scr_slot_name_edit')}">✏️</button>
               <button class="ssc-delete-btn" data-slot="${slotNum}" title="${t('scr_delete_save')}">❌</button>`;
 }
 
@@ -76,6 +87,7 @@ function _buildSlotCardHtml(slotNum, summary) {
 function _attachSlotCardListeners(card, slotNum) {
     card.addEventListener('click', (e) => {
         if (e.target.classList.contains('ssc-delete-btn')) return;
+        if (e.target.classList.contains('ssc-name-btn')) return;
         onSaveSlotChosen(slotNum);
     });
 
@@ -84,6 +96,14 @@ function _attachSlotCardListeners(card, slotNum) {
         delBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             showDeleteSlotConfirm(slotNum);
+        });
+    }
+
+    const nameBtn = card.querySelector('.ssc-name-btn');
+    if (nameBtn) {
+        nameBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showSlotNameModal(slotNum);
         });
     }
 
@@ -142,6 +162,48 @@ function showSaveSlotSelect(onSlotChosen) {
     renderSaveSlotScreen();
     screenHistory.push('screen-title');
     switchScreen('screen-save-slots');
+}
+
+//------------------------------------------------------------------------
+//-------------------SLOT NAME MODAL---------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Opens the name-a-slot modal for the given slot. Pre-fills the input with
+// the current name (or empty), focuses it with the text selected so typing
+// replaces it immediately. Enter confirms, Escape cancels.
+function showSlotNameModal(slotNum) {
+    window._pendingSlotNameSlot = slotNum;
+    const modal = document.getElementById('slot-name-modal');
+    const input = document.getElementById('slot-name-input');
+    const title = document.getElementById('slot-name-title');
+    if (!modal || !input) return;
+
+    if (title) title.textContent = t('scr_slot_name_title').replace('{n}', slotNum);
+    input.value = getSlotName(slotNum);
+    input.placeholder = t('scr_slot_name_placeholder');
+    input.maxLength = 20;
+    showModal('slot-name-modal');
+    // Focus after the modal is visible; select-all so overwrite typing is instant.
+    requestAnimationFrame(() => { input.focus(); input.select(); });
+}
+
+// Confirms the name edit: writes the (trimmed, ≤20 char) name and re-renders
+// the slot grid so the card heading updates immediately.
+function confirmSlotName() {
+    const slotNum = window._pendingSlotNameSlot;
+    const input = document.getElementById('slot-name-input');
+    hideModal('slot-name-modal');
+    window._pendingSlotNameSlot = null;
+    if (!slotNum || !input) return;
+    setSlotName(slotNum, input.value);
+    renderSaveSlotScreen();
+}
+
+// Cancels the name edit without changing anything.
+function cancelSlotName() {
+    hideModal('slot-name-modal');
+    window._pendingSlotNameSlot = null;
 }
 
 //------------------------------------------------------------------------

@@ -25,15 +25,12 @@ function _fxMakeVortexStrips(container, r) {
     const colW = r.width / cols;
 
     for (let i = 0; i < Math.min(cols, 8); i++) {
-        const strip = document.createElement('div');
-        strip.className = 'fx-vortex-strip';
-        strip.style.cssText = `
+        _fxMakeElement(container, `
             position:absolute;
             top:${r.top}px; height:${r.height}px;
             left:${r.left + colW * i}px; width:${colW}px;
             animation:fx-vortex-strip-swirl 0.9s ease-in ${i * 0.06}s forwards;
-        `;
-        container.appendChild(strip);
+        `, 'fx-vortex-strip');
     }
 }
 

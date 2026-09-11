@@ -368,8 +368,7 @@ function rollLuckyDrops() {
     if (!ptHasSkill('lucky_drops') && !_charIs('trix')) return '';
     if (Math.random() >= getLuckyDropChance()) return '';
 
-    STATE.questStats = STATE.questStats || {};
-    STATE.questStats.luckyDropsClaimed = (STATE.questStats.luckyDropsClaimed || 0) + 1;
+    questStat_luckyDropClaimed();
 
     const count = rollLuckyDropCount();
     let html = '';
@@ -546,6 +545,11 @@ function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusM
     if (nextBtn) nextBtn.style.display = endOfLine ? 'none' : '';
     if (retryBtn) retryBtn.style.display = endOfLine ? 'none' : '';
     if (levelsBtn) levelsBtn.className = endOfLine ? 'ob p' : 'ob s';
+    // The buttons live in per-column wrappers (LEVELS | REPLAY pair | NEXT);
+    // a fully hidden column must collapse so the row re-centres instead of
+    // leaving an empty gap (ascension / Nexus Point wins hide Next+Replay).
+    const nextCol = nextBtn ? nextBtn.closest('.ov-btns-col') : null;
+    if (nextCol) nextCol.style.display = endOfLine ? 'none' : '';
     _updateNexusWinButton(isNexusPoint);
 }
 
@@ -555,6 +559,11 @@ function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusM
 function _updateNexusWinButton(show) {
     const container = document.querySelector('#ov-win .ov-btns');
     if (!container) return;
+    // Prefer the NEXT column wrapper (the Nexus button occupies Next's slot
+    // on Nexus Point wins, where Next itself is hidden); fall back to the
+    // bare container for any markup without column wrappers.
+    const nextBtn = document.getElementById('btn-next-lvl');
+    const target = (nextBtn && nextBtn.closest('.ov-btns-col')) || container;
     let btn = document.getElementById('btn-enter-nexus-win');
     if (!btn) {
         btn = document.createElement('button');
@@ -565,10 +574,17 @@ function _updateNexusWinButton(show) {
             if (typeof showEndgameNexus === 'function') showEndgameNexus();
             else goToLevelSelect();
         });
-        container.appendChild(btn);
+        target.appendChild(btn);
+    } else if (btn.parentElement !== target) {
+        target.appendChild(btn);
     }
     btn.textContent = t('scr_enter_nexus_short');
     btn.style.display = show ? '' : 'none';
+    // On Nexus wins the Next column was hidden a moment earlier (endOfLine);
+    // re-show the wrapper so the Nexus button is actually rendered.
+    if (show && target.classList && target.classList.contains('ov-btns-col')) {
+        target.style.display = '';
+    }
 }
 
 

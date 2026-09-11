@@ -73,9 +73,9 @@ function _playSpriteAnimation(imgElementId, frames, timings, idleSrc, idleDelayM
 // PLACEHOLDER FILENAMES — swap these for real walk-cycle art per
 // character/state. Order matters: frame 1 = contact (left foot forward),
 // frame 2 = passing (mid-stride), frame 3 = contact (right foot forward).
-// Playback ping-pongs through these (1,2,3,2,1,2,3,...) rather than
-// wrapping straight from the last frame back to the first — see
-// _advanceWalkFrameIndex() below.
+// Playback wraps through these in time order (1,2,3,1,2,3,...) — see
+// _advanceWalkFrameIndex() below. Pick frames as a closed loop so the
+// last frame flows back into the first.
 const _WALK_FRAMES = {
     stox: {
         noclass: [
@@ -241,35 +241,24 @@ const _WALK_IDLE_DEBOUNCE_MS = 180;  // ms of no movement before snapping back t
 const _walkState = {
     intervalId: null,
     frameIndex: 0,
-    direction: 1, // +1 advancing forward through frames, -1 bouncing back
+    direction: 1, // legacy ping-pong stepper, unused since the walk loop wraps
     idleTimeoutId: null,
     imgElementId: null,
     dirName: null, // 'up' | 'down' | 'left' | 'right' | null (omni)
     frames: null,  // resolved frame list for the active loop
+    usesDirectional: false, // true when frames are true directional art (never mirror)
 };
 
-// Advances _walkState.frameIndex by one step of a ping-pong sequence
-// across the given frame count. For a 3-frame set this produces the
-// cycle: 0,1,2,1,0,1,2,1,0,... (i.e. contact,passing,contact,passing,...)
-// instead of a hard wrap from the last frame back to the first, which
-// would visually "snap" rather than step naturally.
-//
-// Works for any frame count >= 2. A 2-frame set simply alternates
-// 0,1,0,1,... since there's no distinct middle frame to bounce through.
+// Advances _walkState.frameIndex by one step of a wrapping sequence
+// across the given frame count. For a 4-frame set this produces the
+// cycle: 0,1,2,3,0,1,2,3,0,... (each frame shows once per loop, in
+// time order). Pick walk frames as a closed loop — the last frame
+// must flow back into the first — otherwise the wrap point visibly
+// "snaps" rather than stepping naturally.
 function _advanceWalkFrameIndex(frameCount) {
     if (frameCount <= 1) return 0;
 
-    let next = _walkState.frameIndex + _walkState.direction;
-
-    if (next >= frameCount) {
-        _walkState.direction = -1;
-        next = frameCount - 2 >= 0 ? frameCount - 2 : 0;
-    } else if (next < 0) {
-        _walkState.direction = 1;
-        next = frameCount > 1 ? 1 : 0;
-    }
-
-    return next;
+    return (_walkState.frameIndex + 1) % frameCount;
 }
 
 // Starts (or keeps alive) the looping walk animation on the current
@@ -298,6 +287,16 @@ function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simple', di
     const frames = (typeof _animGetWalkFramesSync === 'function')
         ? _animGetWalkFramesSync(char, asc, direction)
         : (_WALK_FRAMES[char]?.[asc] || []);
+    // True directional art is already drawn facing its travel direction and
+    // must NEVER be mirrored. Omni fallback art is drawn facing right, so
+    // leftward movement still needs the scaleX(-1) mirror (handled by the
+    // _animShouldMirrorFor() helper consumed in player_sprite.js / map code).
+    let usesDirectional = false;
+    if (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1) {
+        const charCap = _animCharCap(char);
+        const dk = `walk|${charCap}|${asc}|${direction}`;
+        usesDirectional = !!(_animCache[dk] && _animCache[dk].length);
+    }
     if (!frames || frames.length === 0) {
         // No walk art at all — hand back to idle (static portrait fallback).
         if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation(imgElementId);
@@ -322,6 +321,7 @@ function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simple', di
     _walkState.imgElementId = imgElementId;
     _walkState.dirName = direction || null;
     _walkState.frames = frames;
+    _walkState.usesDirectional = usesDirectional;
     _walkState.frameIndex = 0;
     _walkState.direction = 1;
 
@@ -368,6 +368,7 @@ function _stopAvatarWalkAnimation() {
     _walkState.direction = 1;
     _walkState.dirName = null;
     _walkState.frames = null;
+    _walkState.usesDirectional = false;
 
     const imgElementId = _walkState.imgElementId;
     _walkState.imgElementId = null;
@@ -478,9 +479,9 @@ function _playAvatarSwingAnimation() {
 //   idle, per-direction override = gameplay standing pose (static):
 //     animations/<Char>/idle/<variant>/<dir>/<Char>_<variant>_idle_<dir>_<N>.png
 //     (played when movement stops; menus always use the static portrait)
-//   movement, omnidirectional fallback (looping, ping-pong):
+//   movement, omnidirectional fallback (looping, wrap-around):
 //     animations/<Char>/walk/<variant>/<Char>_<variant>_walk_<N>.png
-//   movement, per-direction override (looping, ping-pong):
+//   movement, per-direction override (looping, wrap-around):
 //     animations/<Char>/walk/<variant>/<dir>/<Char>_<variant>_walk_<dir>_<N>.png
 //   combat, one spell each (played once, then back to idle):
 //     animations/<Char>/abilities/<variant>/<spell>/<Char>_<variant>_<spell>_<N>.png
@@ -652,6 +653,124 @@ function _animGetIdleFramesSync(char, variant, direction) {
     return _animCache[`idle|${charCap}|${variant}`] || [];
 }
 
+// True when directional WALK art has already been discovered for this
+// char/variant/dir. Directional art is drawn facing its travel direction,
+// so callers must NOT mirror it (no scaleX(-1) / scale '-1 1'). Omni
+// fallback art is drawn facing right and still needs the mirror for left.
+function _animHasDirectionalWalkSync(char, variant, direction) {
+    if (!direction || ANIM_DIRECTIONS.indexOf(direction) === -1) return false;
+    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+    if (!charCap || !variant) return false;
+    const dk = `walk|${charCap}|${variant}|${direction}`;
+    return !!(_animCache[dk] && _animCache[dk].length);
+}
+
+// Should the sprite <img> be mirrored for this movement direction?
+// Returns false when directional art is active (never mirror — this is the
+// Trix left/right swap fix), true only for the omni right-facing fallback
+// moving left.
+function _animShouldMirrorFor(char, variant, direction) {
+    if (!direction) return false;
+    if (_animHasDirectionalWalkSync(char, variant, direction)) return false;
+    // Omni fallback faces right: mirror only when heading left.
+    return direction === 'left';
+}
+
+// Whether the currently running walk loop (if any) uses true directional
+// art for the given element. Lets facing helpers skip the mirror even when
+// they don't know the char/variant (e.g. map sprites).
+function _animWalkIsDirectionalFor(imgElementId) {
+    if (!_walkState.intervalId) return false;
+    if (imgElementId && _walkState.imgElementId && _walkState.imgElementId !== imgElementId) return false;
+    return !!_walkState.usesDirectional;
+}
+
+// Cached down-facing frame for gameplay defaults (standing pose preferred):
+// directional idle-down frame 1, else directional walk-down frame 1.
+// Null when nothing directional has been discovered yet (cold cache).
+function _animGetDownFallbackSrc(char, variant) {
+    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+    if (!charCap || !variant) return null;
+    const idleDk = `idle|${charCap}|${variant}|down`;
+    if (_animCache[idleDk] && _animCache[idleDk].length) return _animCache[idleDk][0];
+    const walkDk = `walk|${charCap}|${variant}|down`;
+    if (_animCache[walkDk] && _animCache[walkDk].length) return _animCache[walkDk][0];
+    return null;
+}
+
+// Optimistic down-facing src for cold-cache first paint (before async
+// discovery finishes). Points at the canonical idle-down frame 1, which the
+// browser loads directly when the art exists. Callers chain onerror to the
+// walk-down frame and finally the menu portrait, so variants without
+// directional art still land on the portrait instead of a broken image.
+function _animExpectedDownSrc(char, variant) {
+    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+    if (!charCap || !variant) return null;
+    return `${ANIM_BASE_PATH}/${charCap}/idle/${variant}/down/${charCap}_${variant}_idle_down_1.webp`;
+}
+
+function _animExpectedWalkDownSrc(char, variant) {
+    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+    if (!charCap || !variant) return null;
+    return `${ANIM_BASE_PATH}/${charCap}/walk/${variant}/down/${charCap}_${variant}_walk_down_1.webp`;
+}
+
+// Gameplay default image: move-down art, never the menu portrait.
+// Prefers already-discovered down frames (instant, no 404), otherwise the
+// optimistic idle-down path (with onerror chain handled by the caller via
+// _animSetDefaultDownImage), otherwise the menu portrait.
+function _getPlayerPuzzleDefaultImage() {
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
+    const char = st ? st.playerCharacter : null;
+    const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
+    if (!char) {
+        return (typeof _getPlayerCharacterImage === 'function') ? _getPlayerCharacterImage() : '';
+    }
+    if (typeof _animWarmCacheFor === 'function') _animWarmCacheFor(char, variant);
+    const cached = (typeof _animGetDownFallbackSrc === 'function') ? _animGetDownFallbackSrc(char, variant) : null;
+    if (cached) return cached;
+    const expected = (typeof _animExpectedDownSrc === 'function') ? _animExpectedDownSrc(char, variant) : null;
+    if (expected) return expected;
+    return (typeof _getPlayerCharacterImage === 'function') ? _getPlayerCharacterImage() : '';
+}
+
+// Sets an <img> to the gameplay default (move-down) with a safe fallback
+// chain: idle-down → walk-down → menu portrait. Covers the cold-cache first
+// paint where discovery hasn't confirmed the art yet.
+function _animSetDefaultDownImage(imgEl) {
+    if (!imgEl) return;
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
+    const char = st ? st.playerCharacter : null;
+    const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
+    const menuSrc = (typeof _getPlayerCharacterImage === 'function') ? _getPlayerCharacterImage() : '';
+    if (!char) {
+        if (menuSrc) imgEl.src = menuSrc;
+        return;
+    }
+    if (typeof _animWarmCacheFor === 'function') _animWarmCacheFor(char, variant);
+    const cached = (typeof _animGetDownFallbackSrc === 'function') ? _animGetDownFallbackSrc(char, variant) : null;
+    if (cached) {
+        imgEl.src = cached;
+        return;
+    }
+    const idleDown = (typeof _animExpectedDownSrc === 'function') ? _animExpectedDownSrc(char, variant) : null;
+    const walkDown = (typeof _animExpectedWalkDownSrc === 'function') ? _animExpectedWalkDownSrc(char, variant) : null;
+    imgEl.onerror = function () {
+        imgEl.onerror = function () {
+            imgEl.onerror = null;
+            if (menuSrc) imgEl.src = menuSrc;
+        };
+        if (walkDown && imgEl.src !== walkDown) imgEl.src = walkDown;
+        else if (menuSrc) { imgEl.onerror = null; imgEl.src = menuSrc; }
+    };
+    if (idleDown) imgEl.src = idleDown;
+    else if (walkDown) {
+        imgEl.onerror = function () { imgEl.onerror = null; if (menuSrc) imgEl.src = menuSrc; };
+        imgEl.src = walkDown;
+    }
+    else if (menuSrc) imgEl.src = menuSrc;
+}
+
 
 //------------------------------------------------------------------------
 //-------------------IDLE LOOP---------------------------------------------
@@ -731,7 +850,29 @@ function _startAvatarIdleAnimation(imgElementId, direction) {
     const el = document.getElementById(id);
     if (!el) return;
     if (!frames || frames.length === 0) {
-        if (typeof _getPlayerCharacterImage === 'function') {
+        // Gameplay fallback: move-down art, NOT the menu portrait. The menu
+        // portrait stays reserved for save slots, level-select topbar and
+        // quiz/exercise modals (they render _getPlayerCharacterImage()
+        // directly and never go through the idle loop). Cold-cache first
+        // paint uses the optimistic down path with a safe chain back to the
+        // portrait for variants without directional art.
+        if (typeof _animSetDefaultDownImage === 'function') {
+            const cur = el.getAttribute('src') || '';
+            const wantCached = (typeof _animGetDownFallbackSrc === 'function')
+                ? _animGetDownFallbackSrc(char, variant) : null;
+            if (wantCached) {
+                if (cur !== wantCached) el.src = wantCached;
+            } else if (typeof _animExpectedDownSrc === 'function' && _animExpectedDownSrc(char, variant)) {
+                // Only install the optimistic default when the element isn't
+                // already showing a directional frame (avoids clobbering a
+                // walk frame that just played before discovery finished).
+                const isAnimFrame = /_(idle|walk)_(up|down|left|right)_/i.test(cur);
+                if (!isAnimFrame) _animSetDefaultDownImage(el);
+            } else if (typeof _getPlayerCharacterImage === 'function') {
+                const idleSrc = _getPlayerCharacterImage();
+                if (idleSrc && cur !== idleSrc) el.src = idleSrc;
+            }
+        } else if (typeof _getPlayerCharacterImage === 'function') {
             const idleSrc = _getPlayerCharacterImage();
             if (idleSrc && el.getAttribute('src') !== idleSrc) el.src = idleSrc;
         }

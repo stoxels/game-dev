@@ -45,14 +45,11 @@ function _useCursedReveal(id, def) {
 
 // Helper: creates the sickly green tint rect over the grid.
 function _fxMakeCursedTint(container, r) {
-    const tint = document.createElement('div');
-    tint.className = 'fx-cursed-tint';
-    tint.style.cssText = `
+    _fxMakeElement(container, `
         position:absolute;
         left:${r.left}px; top:${r.top}px;
         width:${r.width}px; height:${r.height}px;
-    `;
-    container.appendChild(tint);
+    `, 'fx-cursed-tint');
 }
 
 // ☠️ Cursed Reveal — sickly green skull flash + ✕ marks dissolve.

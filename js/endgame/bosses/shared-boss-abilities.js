@@ -3306,3 +3306,20 @@ function _egTitheTeardown(monsterId) {
     const card = document.getElementById('eg-card-' + monsterId);
     if (card) card.classList.remove('eg-nk-shielded');
 }
+
+
+// Removes the Grid Veil overlay. THE single implementation (consolidated
+// 2026-09 from boss-bayes.js / boss-bloom.js, whose copies used to shadow
+// each other via load order — bloom's superset won): clears every
+// tint/state class either boss applies, so cleanup works regardless of
+// which boss's veil was active. Called by the framework's _egBossCleanup
+// typeof-guard.
+function _egRemoveVeil() {
+    if (typeof _egVeilActive !== 'undefined') _egVeilActive = false;
+    const veil = document.getElementById('eg-grid-veil');
+    if (veil) {
+        veil.classList.remove('eg-blm-veil-tinted', 'eg-bay-veil-tinted', 'eg-blm-veil-open');
+        veil.style.removeProperty('--blm-wilt');
+        veil.remove();
+    }
+}

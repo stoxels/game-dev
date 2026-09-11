@@ -30,14 +30,11 @@ function _fxMakeFogTendrils(container, r) {
         { top: r.bottom, left: r.right },
     ];
     corners.forEach((pos, i) => {
-        const fog = document.createElement('div');
-        fog.className = 'fx-cursed-fog';
-        fog.style.cssText = `
+        _fxMakeElement(container, `
             position:absolute;
             left:${pos.left}px; top:${pos.top}px;
             animation:fx-fog-bloom 1.2s ease-out ${i * 0.15}s forwards;
-        `;
-        container.appendChild(fog);
+        `, 'fx-cursed-fog');
     });
 }
 

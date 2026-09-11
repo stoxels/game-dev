@@ -4,9 +4,10 @@
 }
 
 .ss-topbar {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: center; /* title sits top-center; the back button is absolute */
     padding: 14px 20px;
 }
 
@@ -117,3 +118,348 @@
     .ssc-delete-btn:hover {
         opacity: 1;
     }
+
+/* ✏️ name-edit button — top-left corner of the card, mirrored from the
+   ❌ delete button. Opens the slot-name modal. */
+.ssc-name-btn {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    opacity: 0.6;
+}
+
+    .ssc-name-btn:hover {
+        opacity: 1;
+    }
+
+/* Custom slot name — replaces the default heading once the player names
+   the slot (works for empty slots too). The small default slot label stays
+   above it so players can still tell which physical slot is which. */
+.ssc-name {
+    font-family: var(--PX);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: var(--yellow);
+    margin: 2px 0 6px;
+    padding: 0 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+    .ssc-num-named {
+        color: var(--accent);
+        opacity: 0.75;
+    }
+
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS — smaller displays & phones
+   ============================================================
+   The desktop layout above (>900px) is the reference design and
+   stays untouched. Everything below only tightens sizes so the
+   same 20-slot grid stays usable on tablets and phones.
+
+   Bands (mirrors the breakpoints used in class_selection.css,
+   title-screen.css, modals.css, ...):
+     ≤900px  tablet band      — same 5-col grid, scaled down
+     ≤700px  phone band       — auto-fill columns, fluid portraits
+     ≤700px + ≤450px height   — phone landscape, extra-compact cards
+     ≤400px  small phones     — micro refinements
+   ============================================================ */
+
+/* -----------------------------------------------------------------------
+   ≤900px — TABLET BAND
+   Same 5-column desktop grid, but the 1fr tracks are allowed to shrink
+   (minmax(0, 1fr)) and the fixed 150px portraits / 20px stats text are
+   scaled down so 5 columns still fit without horizontal overflow.
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+    .ss-topbar {
+        padding: 10px 14px;
+    }
+
+    .ss-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+        padding: 8px 14px 16px;
+    }
+
+    .save-slot-card {
+        padding: 10px 6px;
+    }
+
+    .ssc-num {
+        font-size: 8px;
+        margin-bottom: 4px;
+    }
+
+    .ssc-portrait {
+        width: 90px;
+        height: 90px;
+    }
+
+    .ssc-score,
+    .ssc-levels {
+        font-size: 13px;
+    }
+
+    .ssc-player-level {
+        font-size: 9px;
+        padding: 1px 6px;
+    }
+
+    .ssc-delete-btn {
+        font-size: 16px;
+    }
+}
+
+/* -----------------------------------------------------------------------
+   ≤700px — PHONE BAND
+   Real reflow: columns are chosen by available width (auto-fill) instead
+   of a hardcoded 5, the portrait becomes fluid, and the topbar is compacted
+   so the back button and title no longer overlap.
+   ----------------------------------------------------------------------- */
+@media (max-width: 700px) {
+    /* Title sits LEFT of center, next to the (smaller) back slab, so the
+       two never collide on narrow screens. */
+    .ss-topbar {
+        justify-content: flex-start;
+        padding: 8px 10px 8px 132px;
+    }
+
+    .ss-title {
+        font-size: 11px;
+    }
+
+    /* Scoped shrink of the shared back-slab button (base.css) — other
+       screens are unaffected. */
+    #screen-save-slots .back-btn {
+        font-size: 10px;
+        min-width: 96px;
+        padding: 10px 14px;
+    }
+
+    .ss-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        padding: 6px 12px 18px;
+        overscroll-behavior: contain;
+    }
+
+    .save-slot-card {
+        padding: 12px 8px;
+    }
+
+    /* Fluid portrait box: always square (aspect-ratio), scales with the
+       card width but never drops below 84px or above the old 150px. */
+    .ssc-portrait {
+        width: clamp(84px, 55%, 150px);
+        height: auto;
+        aspect-ratio: 1 / 1;
+    }
+
+    .ssc-empty {
+        font-size: 10px;
+    }
+
+    .ssc-score,
+    .ssc-levels {
+        font-size: 15px;
+    }
+
+    .ssc-player-level {
+        font-size: 9px;
+        margin-top: 4px;
+    }
+}
+
+/* -----------------------------------------------------------------------
+   ≤700px wide AND ≤450px high — PHONE LANDSCAPE
+   Very little vertical space: extra-compact cards so at least two rows
+   of slots are visible without scrolling.
+   ----------------------------------------------------------------------- */
+@media (max-width: 700px) and (max-height: 450px) {
+    .ss-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        padding: 4px 10px 10px;
+    }
+
+    .save-slot-card {
+        padding: 6px 4px;
+    }
+
+    .ssc-num {
+        margin-bottom: 2px;
+    }
+
+    .ssc-portrait {
+        width: 64px;
+        margin: 2px auto 3px;
+    }
+
+    .ssc-score,
+    .ssc-levels {
+        font-size: 12px;
+        margin-top: 0;
+    }
+
+    .ssc-empty {
+        font-size: 9px;
+    }
+
+    .ssc-player-level {
+        padding: 1px 5px;
+        margin-top: 3px;
+    }
+
+    .ssc-delete-btn {
+        font-size: 14px;
+    }
+}
+
+/* -----------------------------------------------------------------------
+   ≤400px — SMALL PHONES
+   Micro refinements: the back slab and title are shrunk once more so even
+   a 320px-wide display fits them side by side, and single-column cards
+   center their content a bit tighter.
+   ----------------------------------------------------------------------- */
+@media (max-width: 400px) {
+    .ss-topbar {
+        padding-left: 118px;
+    }
+
+    .ss-title {
+        font-size: 9px;
+    }
+
+    #screen-save-slots .back-btn {
+        font-size: 9px;
+        min-width: 88px;
+        padding: 9px 12px;
+    }
+
+    .ssc-score,
+    .ssc-levels {
+        font-size: 14px;
+    }
+
+    .ssc-name {
+        font-size: 11px;
+    }
+
+    .ssc-name-btn {
+        font-size: 13px;
+    }
+}
+
+
+/* ============================================================
+   SLOT NAME MODAL (#slot-name-modal)
+   Compact variant of the reset-modal stone frame: same frame art,
+   title plaque, stone buttons and close X (all classes are shared
+   with reset-game.css), but a smaller box with just an input row.
+   ============================================================ */
+.slot-name-box {
+    position: relative;
+    width: min(560px, 94vw);
+    padding: clamp(56px, 10vw, 88px) clamp(28px, 6vw, 56px) clamp(30px, 5vw, 48px);
+    box-sizing: border-box;
+    background-image: url('../images/Settings/settings_background.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    z-index: 1;
+    overflow: visible;
+}
+
+/* Title plaque geometry comes from .reset-header (reset-game.css); on the
+   narrower box the 56% width would overhang the frame edges, so widen it. */
+.slot-name-box .reset-header {
+    width: max(min(80%, 460px), 300px);
+    height: clamp(44px, 6vw, 60px);
+}
+
+.slot-name-input-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.slot-name-input {
+    width: min(100%, 380px);
+    font-family: var(--PX);
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: #4a2c12;
+    background: rgba(255, 246, 224, 0.92);
+    border: 2px solid #7a5a34;
+    border-radius: 4px;
+    padding: 10px 14px;
+    text-align: center;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+    .slot-name-input:focus {
+        border-color: var(--accent);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 8px rgba(255, 200, 90, 0.35);
+    }
+
+    .slot-name-input::placeholder {
+        color: #a08663;
+        opacity: 0.8;
+    }
+
+.slot-name-hint {
+    font-family: var(--PX);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: #6b4a26;
+    text-align: center;
+    opacity: 0.85;
+}
+
+/* The footer row (SAVE NAME / portal / CANCEL) reuses .reset-footer +
+   .reset-btn, but the stone buttons are sized for the 1000px-wide reset
+   modal — shrink them a touch here so two fit the 560px frame. */
+.slot-name-box .reset-btn {
+    min-width: clamp(120px, 16vw, 180px);
+    padding: clamp(10px, 1.6vw, 16px) clamp(14px, 2.4vw, 24px);
+    font-size: clamp(9px, 1.2vw, 12px);
+}
+
+.slot-name-box .reset-portal-deco {
+    width: clamp(48px, 6vw, 72px);
+    height: clamp(48px, 6vw, 72px);
+    margin: 0 clamp(-16px, -1.4vw, -8px);
+}
+
+@media (max-width: 700px) {
+    .slot-name-box {
+        gap: 10px;
+    }
+
+    .slot-name-input {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+
+    .slot-name-hint {
+        font-size: 8px;
+    }
+
+    .slot-name-box .reset-btn {
+        min-width: 104px;
+        padding: 9px 12px;
+        font-size: 9px;
+    }
+}

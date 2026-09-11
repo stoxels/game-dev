@@ -1,0 +1,2119 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passive Tree Editor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cinzel:wght@400;600;700&display=swap');
+
+        :root {
+            /* ── DARK (default) ── */
+            --bg: #0a0a12;
+            --bg2: #0f0f1e;
+            --bg3: #141428;
+            --panel: #0d0d1f;
+            --border: #2a2245;
+            --border2: #3a3560;
+            --gold: #b89a50;
+            --gold2: #d4b870;
+            --gold3: #ffd700;
+            --green: #6dbf40;
+            --green2: #8de060;
+            --cyan: #66fcf1;
+            --red: #e04040;
+            --locked: #3a3350;
+            --unlocked: #b89a50;
+            --allocated: #6dbf40;
+            --text: #c8c0a0;
+            --text2: #8880a0;
+            --mono: 'Share Tech Mono', monospace;
+            --serif: 'Cinzel', serif;
+            --conn-locked: rgba(80,70,110,0.4);
+            --conn-unlocked: rgba(160,130,80,0.6);
+            --conn-allocated: rgba(109,191,64,0.8);
+            --node-r: 22;
+
+            /* theme-dependent extras */
+            --canvas-bg: navy; /* dark blue canvas, tuned via dev tools */
+            --grid-dot: rgba(255,255,255,0.05);
+            --btn-active-bg: #1a2510;
+            --btn-danger-hover-bg: #2a1010;
+            --btn-primary-bg: #12201a;
+            --btn-primary-hover-bg: #1a3028;
+            --overlay-bg: rgba(0,0,0,0.75);
+            --tooltip-bg: rgba(10,10,20,0.97);
+            --tooltip-border: rgba(184,154,80,0.4);
+            --conn-line: #8f8c68; /* pale khaki, like in-game links */
+        }
+
+        /* ── LIGHT MODE ── */
+        body.light {
+            --bg: #aaa394;
+            --bg2: #b3ac9d;
+            --bg3: #beb7a8;
+            --panel: #b5aea0;
+            --border: #8d8674;
+            --border2: #9c9584;
+            --gold: #7a601c;
+            --gold2: #5f4a12;
+            --gold3: #a67c00;
+            --green: #3f7d22;
+            --green2: #2f6118;
+            --cyan: #0d6e82;
+            --red: #ab2f2f;
+            --locked: #8d8674;
+            --unlocked: #7a601c;
+            --allocated: #3f7d22;
+            --text: #38321f;
+            --text2: #665f4d;
+            --conn-locked: rgba(90,84,120,0.45);
+            --conn-unlocked: rgba(130,100,40,0.65);
+            --conn-allocated: rgba(63,125,34,0.85);
+
+            --canvas-bg: #b3ac9d;
+            --grid-dot: rgba(90,80,60,0.22);
+            --btn-active-bg: #d9e6c6;
+            --btn-danger-hover-bg: #eccfcf;
+            --btn-primary-bg: #d2e6e4;
+            --btn-primary-hover-bg: #bcd9d6;
+            --overlay-bg: rgba(58,50,36,0.45);
+            --tooltip-bg: rgba(252,249,238,0.98);
+            --tooltip-border: rgba(122,96,28,0.5);
+            --conn-line: #7a72a8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--mono);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── TOP BAR ── */
+        #topbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border2);
+            flex-shrink: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+
+            #topbar h1 {
+                font-family: var(--serif);
+                font-size: 16px;
+                color: var(--gold2);
+                letter-spacing: 2px;
+                margin-right: 8px;
+                text-transform: uppercase;
+            }
+
+        .tb-sep {
+            width: 1px;
+            height: 22px;
+            background: var(--border2);
+            margin: 0 4px;
+        }
+
+        .btn {
+            font-family: var(--mono);
+            font-size: 13px;
+            padding: 5px 11px;
+            background: var(--bg3);
+            color: var(--gold);
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            white-space: nowrap;
+        }
+
+            .btn:hover {
+                background: var(--border2);
+                color: var(--gold3);
+                border-color: var(--gold);
+            }
+
+            .btn.active {
+                background: var(--btn-active-bg);
+                color: var(--green);
+                border-color: var(--green);
+            }
+
+            .btn.danger:hover {
+                background: var(--btn-danger-hover-bg);
+                color: var(--red);
+                border-color: var(--red);
+            }
+
+            .btn.primary {
+                background: var(--btn-primary-bg);
+                color: var(--cyan);
+                border-color: var(--cyan);
+            }
+
+                .btn.primary:hover {
+                    background: var(--btn-primary-hover-bg);
+                }
+
+        #mode-label {
+            font-size: 13px;
+            color: var(--text2);
+            padding: 4px 8px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        #zoom-display {
+            font-size: 12px;
+            color: var(--text2);
+            min-width: 46px;
+            text-align: right;
+        }
+
+        #node-count {
+            font-size: 12px;
+            color: var(--text2);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        #main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ── CANVAS AREA ── */
+        #canvas-wrap {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+            /* dark mode: flat in-game grey, like the probability tree screen */
+            background: var(--canvas-bg);
+        }
+
+        body.light #canvas-wrap {
+            background:
+                radial-gradient(ellipse at 50% 42%, rgba(255,250,230,0.5) 0%, transparent 55%),
+                radial-gradient(ellipse at 30% 40%, rgba(140,120,190,0.10) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(120,160,90,0.08) 0%, transparent 60%),
+                var(--bg);
+            box-shadow: inset 0 0 160px rgba(90,70,40,0.22);
+        }
+
+            #canvas-wrap.grabbing {
+                cursor: grabbing;
+            }
+
+            #canvas-wrap.connecting {
+                cursor: crosshair;
+            }
+
+        #world {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+            will-change: transform;
+        }
+
+        #conn-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        #nodes-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* grid dots (moves with pan/zoom via CSS vars set from JS) */
+        #canvas-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, var(--grid-dot) 1px, transparent 1px);
+            background-size: var(--grid-s, 40px) var(--grid-s, 40px);
+            background-position: var(--grid-x, 0px) var(--grid-y, 0px);
+            pointer-events: none;
+        }
+
+        /* ── CONNECTIONS ── */
+        #conn-svg line.conn-line {
+            stroke: var(--conn-line);
+            stroke-width: 2;
+            stroke-linecap: round;
+            opacity: 0.65;
+        }
+
+        /* ── NODE ELEMENTS ── */
+        .node {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: box-shadow 0.15s, transform 0.12s;
+            z-index: 2;
+            user-select: none;
+        }
+
+            .node:hover {
+                transform: scale(1.12);
+                z-index: 10;
+            }
+
+            .node.selected {
+                outline: 2px solid var(--cyan);
+                outline-offset: 3px;
+                z-index: 20;
+            }
+
+            .node.connect-src {
+                outline: 2px solid var(--green);
+                outline-offset: 3px;
+                animation: pulse-src 0.8s ease-in-out infinite alternate;
+            }
+
+        @keyframes pulse-src {
+            from {
+                box-shadow: 0 0 6px rgba(109,191,64,0.4);
+            }
+
+            to {
+                box-shadow: 0 0 18px rgba(109,191,64,0.9);
+            }
+        }
+
+        .node.connect-hover {
+            outline: 2px solid var(--gold3);
+            outline-offset: 3px;
+        }
+
+        .node-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .node-icon {
+            font-size: 16px;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .node-img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        /* node label under circle */
+        .node-label {
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: var(--text2);
+            white-space: nowrap;
+            pointer-events: none;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        /* ── RIGHT PANEL ── */
+        #panel {
+            width: 320px;
+            min-width: 260px;
+            background: var(--panel);
+            border-left: 1px solid var(--border2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        #panel-header {
+            padding: 10px 14px 8px;
+            border-bottom: 1px solid var(--border);
+            font-family: var(--serif);
+            font-size: 13px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            #panel-header .node-id-badge {
+                font-family: var(--mono);
+                font-size: 12px;
+                color: var(--cyan);
+                background: rgba(102,252,241,0.08);
+                padding: 2px 7px;
+                border-radius: 2px;
+                border: 1px solid rgba(102,252,241,0.2);
+            }
+
+        #panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+            #panel-body::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            #panel-body::-webkit-scrollbar-track {
+                background: var(--bg);
+            }
+
+            #panel-body::-webkit-scrollbar-thumb {
+                background: var(--border2);
+                border-radius: 2px;
+            }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .field-row {
+            display: flex;
+            gap: 6px;
+        }
+
+            .field-row .field-group {
+                flex: 1;
+            }
+
+        label {
+            font-size: 12px;
+            color: var(--text2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        input, textarea, select {
+            font-family: var(--mono);
+            font-size: 13px;
+            background: var(--bg3);
+            color: var(--text);
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            padding: 5px 8px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.15s;
+            resize: vertical;
+        }
+
+            input:focus, textarea:focus, select:focus {
+                border-color: var(--gold);
+                color: var(--gold2);
+            }
+
+        textarea {
+            min-height: 60px;
+        }
+
+        .section-title {
+            font-family: var(--serif);
+            font-size: 12px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+            margin-top: 4px;
+        }
+
+        #panel-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text2);
+            font-size: 13px;
+            text-align: center;
+            padding: 20px;
+            opacity: 0.6;
+        }
+
+            #panel-empty .hint-key {
+                display: inline-block;
+                background: var(--bg3);
+                border: 1px solid var(--border2);
+                border-radius: 3px;
+                padding: 2px 6px;
+                font-size: 10px;
+                color: var(--gold);
+            }
+
+        .conn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .conn-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 3px 7px;
+            font-size: 12px;
+        }
+
+            .conn-item span {
+                color: var(--gold);
+            }
+
+        .conn-del {
+            cursor: pointer;
+            color: var(--text2);
+            font-size: 14px;
+            line-height: 1;
+            padding: 0 3px;
+            background: none;
+            border: none;
+            font-family: var(--mono);
+        }
+
+            .conn-del:hover {
+                color: var(--red);
+            }
+
+        /* ── TOOLTIP ── */
+        #tooltip {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            max-width: 240px;
+            background: var(--tooltip-bg);
+            border: 1px solid var(--tooltip-border);
+            border-radius: 5px;
+            padding: 8px 11px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--gold);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.7);
+            opacity: 0;
+            transition: opacity 0.1s;
+            line-height: 1.5;
+        }
+
+        /* ── MODALS ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay-bg);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: 6px;
+            padding: 20px 22px;
+            min-width: 520px;
+            max-width: 720px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+            .modal h2 {
+                font-family: var(--serif);
+                font-size: 15px;
+                color: var(--gold2);
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }
+
+            .modal textarea {
+                flex: 1;
+                min-height: 300px;
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+        .modal-btns {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* ── SCROLLBAR for conn-list ── */
+        .conn-list::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .conn-list::-webkit-scrollbar-thumb {
+            background: var(--border2);
+        }
+
+        /* ── STATUS BAR ── */
+        #statusbar {
+            padding: 4px 14px;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text2);
+            display: flex;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+            #statusbar span {
+                color: var(--gold);
+            }
+
+        /* ── CONN PREVIEW LINE ── */
+        #conn-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: visible;
+            z-index: 50;
+        }
+        /* ── EMOJI PICKER ── */
+        .icon-input-wrap {
+            position: relative;
+            display: flex;
+            gap: 6px;
+            align-items: stretch;
+        }
+
+        .icon-input-wrap input {
+            flex: 1;
+        }
+
+        #btn-emoji-pick {
+            flex-shrink: 0;
+            font-size: 18px;
+            padding: 4px 8px;
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            cursor: pointer;
+            line-height: 1;
+            transition: border-color 0.15s;
+        }
+
+        #btn-emoji-pick:hover {
+            border-color: var(--gold);
+        }
+
+        #emoji-picker {
+            display: none;
+            position: fixed;
+            z-index: 5000;
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: 6px;
+            padding: 10px;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.8);
+            width: 300px;
+        }
+
+        #emoji-picker.open {
+            display: block;
+        }
+
+        #emoji-search {
+            width: 100%;
+            font-family: var(--mono);
+            font-size: 13px;
+            background: var(--bg3);
+            color: var(--text);
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            padding: 5px 8px;
+            outline: none;
+            margin-bottom: 8px;
+        }
+
+        #emoji-search:focus { border-color: var(--gold); }
+
+        .emoji-cats {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .emoji-cat-btn {
+            font-size: 15px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 3px 6px;
+            cursor: pointer;
+            transition: border-color 0.1s;
+        }
+
+        .emoji-cat-btn:hover, .emoji-cat-btn.active {
+            border-color: var(--gold);
+        }
+
+        #emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        #emoji-grid::-webkit-scrollbar { width: 4px; }
+        #emoji-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+        .emoji-btn {
+            font-size: 20px;
+            background: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 3px;
+            text-align: center;
+            line-height: 1.2;
+            transition: background 0.1s, border-color 0.1s;
+        }
+
+        .emoji-btn:hover {
+            background: var(--bg3);
+            border-color: var(--border2);
+        }
+
+        #emoji-picker-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--text2);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+            font-family: var(--mono);
+        }
+
+        #emoji-picker-close:hover { color: var(--red); }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR -->
+    <div id="topbar">
+        <h1>⬡ Passive Tree Editor</h1>
+        <div class="tb-sep"></div>
+
+        <button class="btn" id="btn-add-node" title="Add a new node at center of view (N)">+ Node</button>
+        <button class="btn" id="btn-connect-mode" title="Toggle connection mode (C)">⟷ Connect</button>
+        <button class="btn danger" id="btn-del-node" title="Delete selected node (Del)">✕ Delete</button>
+
+        <div class="tb-sep"></div>
+
+        <button class="btn" id="btn-import" title="Import JSON tree data">↑ Import</button>
+        <button class="btn primary" id="btn-export" title="Export to PT_SKILL_DEFS + layout JSON">↓ Export</button>
+        <button class="btn" id="btn-export-skills" title="Export only PT_SKILL_DEFS JS object">↓ Skills JS</button>
+
+        <div class="tb-sep"></div>
+
+        <button class="btn" id="btn-fit" title="Fit all nodes to view (F)">⊞ Fit</button>
+        <button class="btn" id="btn-clear" title="Clear everything">⚠ Clear</button>
+
+        <div class="tb-sep"></div>
+        <div id="mode-label">MODE: SELECT / PAN</div>
+        <div id="zoom-display">100%</div>
+        <button class="btn" id="btn-theme" title="Toggle dark / light mode">☀️</button>
+        <div class="tb-sep"></div>
+        <div id="node-count">0 nodes · 0 connections</div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="main">
+        <!-- CANVAS -->
+        <div id="canvas-wrap">
+            <div id="world">
+                <svg id="conn-svg"></svg>
+                <svg id="conn-preview"></svg>
+                <div id="nodes-layer"></div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div id="panel">
+            <div id="panel-header">
+                <span>Node Properties</span>
+                <span id="node-id-badge" class="node-id-badge" style="display:none">ID: —</span>
+            </div>
+            <div id="panel-body">
+                <div id="panel-empty">
+                    <div>Select a node to edit its properties</div>
+                    <div style="margin-top:8px;line-height:2">
+                        <span class="hint-key">N</span> New node &nbsp;
+                        <span class="hint-key">C</span> Connect mode<br>
+                        <span class="hint-key">Del</span> Delete selected &nbsp;
+                        <span class="hint-key">F</span> Fit view<br>
+                        <span class="hint-key">Ctrl+Z</span> Undo &nbsp;
+                        <span class="hint-key">Ctrl+Y</span> Redo<br>
+                        <span class="hint-key">Scroll</span> Zoom &nbsp;
+                        <span class="hint-key">Drag</span> Pan canvas
+                    </div>
+                </div>
+                <div id="panel-fields" style="display:none;flex-direction:column;gap:10px">
+
+                    <div class="section-title">Identity</div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label>Node ID</label>
+                            <input type="number" id="f-id" placeholder="11" min="1">
+                        </div>
+                        <div class="field-group">
+                            <label>Stat Key</label>
+                            <input type="text" id="f-statkey" placeholder="my_skill">
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label>Icon (emoji / path)</label>
+                            <div class="icon-input-wrap">
+                                <input type="text" id="f-icon" placeholder="🎓 or /icons/foo.png">
+                                <button id="btn-emoji-pick" title="Pick an emoji">😀</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Position</div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label>X</label>
+                            <input type="number" id="f-x" placeholder="0">
+                        </div>
+                        <div class="field-group">
+                            <label>Y</label>
+                            <input type="number" id="f-y" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="section-title">Names</div>
+                    <div class="field-group">
+                        <label>Name (EN)</label>
+                        <input type="text" id="f-name-en" placeholder="Skill Name">
+                    </div>
+                    <div class="field-group">
+                        <label>Name (DE)</label>
+                        <input type="text" id="f-name-de" placeholder="Fähigkeitsname">
+                    </div>
+
+                    <div class="section-title">Descriptions</div>
+                    <div class="field-group">
+                        <label>Description (EN)</label>
+                        <textarea id="f-desc-en" placeholder="English description…"></textarea>
+                    </div>
+                    <div class="field-group">
+                        <label>Description (DE)</label>
+                        <textarea id="f-desc-de" placeholder="Deutsche Beschreibung…"></textarea>
+                    </div>
+
+                    <div class="section-title">Connections</div>
+                    <div id="conn-list" class="conn-list"></div>
+                    <div style="font-size:10px;color:var(--text2);margin-top:2px;">
+                        Press <span style="color:var(--gold)">C</span> to enter connect mode, then click another node to link it.
+                    </div>
+
+                    <div style="display:flex;gap:6px;margin-top:4px;">
+                        <button class="btn" id="btn-apply" style="flex:1">✓ Apply</button>
+                        <button class="btn danger" id="btn-del-panel">✕ Delete Node</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div id="statusbar">
+        <div>Nodes: <span id="st-nodes">0</span></div>
+        <div>Connections: <span id="st-conns">0</span></div>
+        <div>Selected: <span id="st-sel">—</span></div>
+        <div id="st-msg" style="margin-left:auto;color:var(--green)"></div>
+    </div>
+
+    <!-- TOOLTIP -->
+    <div id="tooltip"></div>
+
+    <!-- IMPORT MODAL -->
+    <div class="modal-overlay" id="import-modal" style="display:none">
+        <div class="modal">
+            <h2>↑ Import Tree Data</h2>
+            <div style="font-size:10px;color:var(--text2);line-height:1.6">
+                Paste either:<br>
+                • The full <b>exported JSON</b> from this editor (recommended)<br>
+                • Or a <b>TALENT_TREE_DATA.FullData</b> object + a <b>PT_SKILL_DEFS</b> object as a single JSON:<br>
+                <code style="color:var(--cyan)">{"skills":[…],"connections":[…],"defs":{…}}</code>
+            </div>
+            <textarea id="import-text" placeholder='{"nodes":[...],"connections":[...]}'></textarea>
+            <div class="modal-btns">
+                <button class="btn" id="import-cancel">Cancel</button>
+                <button class="btn primary" id="import-ok">↑ Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXPORT MODAL -->
+    <div class="modal-overlay" id="export-modal" style="display:none">
+        <div class="modal">
+            <h2 id="export-title">↓ Export</h2>
+            <div style="font-size:10px;color:var(--text2)" id="export-desc"></div>
+            <textarea id="export-text" readonly></textarea>
+            <div class="modal-btns">
+                <button class="btn primary" id="export-copy">⎘ Copy to Clipboard</button>
+                <button class="btn" id="export-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMOJI PICKER -->
+    <div id="emoji-picker">
+        <button id="emoji-picker-close" title="Close">✕</button>
+        <input type="text" id="emoji-search" placeholder="Search emojis…">
+        <div class="emoji-cats" id="emoji-cats"></div>
+        <div id="emoji-grid"></div>
+    </div>
+
+    <script>// ═══════════════════════════════════════════════════════════════════════
+//  PASSIVE TREE EDITOR — main.js (embedded)
+// ═══════════════════════════════════════════════════════════════════════
+
+// ── DATA MODEL ──────────────────────────────────────────────────────────
+// Each node: { id, x, y, nameEn, nameDe, descEn, descDe, icon, statKey }
+// Each conn: { id, from, to, dotted }
+
+let nodes = [];       // array of node objects
+let conns = [];       // array of connection objects
+let nodeMap = {};     // id → node
+let connMap = {};     // id → conn
+let _nextNodeId = 1;
+let _nextConnId = 1;
+
+function freshNodeId() {
+  const used = new Set(nodes.map(n => n.id));
+  while (used.has(_nextNodeId)) _nextNodeId++;
+  return _nextNodeId++;
+}
+function freshConnId() { return _nextConnId++; }
+
+// ── VIEWPORT STATE ───────────────────────────────────────────────────────
+let scale = 1, tx = 0, ty = 0;
+let dragging = false, dragStartX = 0, dragStartY = 0, dragTxStart = 0, dragTyStart = 0;
+let dragNode = null, dragNodeStartX = 0, dragNodeStartY = 0, dragMouseStartX = 0, dragMouseStartY = 0;
+let movedThisMouseDown = false;
+let _dragSnapshot = null;
+
+// ── INTERACTION STATE ────────────────────────────────────────────────────
+let selectedId = null;
+let connectMode = false;
+let connectSrcId = null;
+
+// ── UNDO / REDO ──────────────────────────────────────────────────────────
+let undoStack = [], redoStack = [];
+const HISTORY_MAX = 60;
+
+function snapshot() {
+  return JSON.stringify({ nodes, conns, nextN: _nextNodeId, nextC: _nextConnId });
+}
+
+function pushHistory() {
+  undoStack.push(snapshot());
+  if (undoStack.length > HISTORY_MAX) undoStack.shift();
+  redoStack.length = 0;
+}
+
+function rebuildMaps() {
+  nodeMap = {}; connMap = {};
+  nodes.forEach(n => nodeMap[n.id] = n);
+  conns.forEach(c => connMap[c.id] = c);
+}
+
+function restoreSnapshot(snap) {
+  const d = JSON.parse(snap);
+  nodes = d.nodes; conns = d.conns;
+  _nextNodeId = d.nextN; _nextConnId = d.nextC;
+  rebuildMaps();
+  setConnectMode(false);
+  renderAllNodes();
+  renderAllConns();
+  closePanel();
+  refreshStatus();
+  scheduleSave();
+}
+
+function doUndo() {
+  if (!undoStack.length) { flashMsg('Nothing to undo', 'var(--red)'); return; }
+  redoStack.push(snapshot());
+  restoreSnapshot(undoStack.pop());
+  flashMsg('Undo');
+}
+
+function doRedo() {
+  if (!redoStack.length) { flashMsg('Nothing to redo', 'var(--red)'); return; }
+  undoStack.push(snapshot());
+  restoreSnapshot(redoStack.pop());
+  flashMsg('Redo');
+}
+
+// ── AUTOSAVE (localStorage) ───────────────────────────────────────────────
+const SAVE_KEY = 'pte_tree_autosave_v1';
+let _saveTimer = null;
+
+function serializeTree() {
+  return JSON.stringify({ nodes, connections: conns });
+}
+
+function scheduleSave() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    try { localStorage.setItem(SAVE_KEY, serializeTree()); } catch (e) { /* storage unavailable */ }
+  }, 400);
+}
+
+// ── DOM REFS ─────────────────────────────────────────────────────────────
+const canvasWrap  = document.getElementById('canvas-wrap');
+const world       = document.getElementById('world');
+const connSvg     = document.getElementById('conn-svg');
+const previewSvg  = document.getElementById('conn-preview');
+const nodesLayer  = document.getElementById('nodes-layer');
+const tooltip     = document.getElementById('tooltip');
+const modeLabel   = document.getElementById('mode-label');
+const zoomDisplay = document.getElementById('zoom-display');
+const nodeCountEl = document.getElementById('node-count');
+const stNodes     = document.getElementById('st-nodes');
+const stConns     = document.getElementById('st-conns');
+const stSel       = document.getElementById('st-sel');
+const stMsg       = document.getElementById('st-msg');
+
+// panel
+const panelEmpty  = document.getElementById('panel-empty');
+const panelFields = document.getElementById('panel-fields');
+const nodeIdBadge = document.getElementById('node-id-badge');
+const fId         = document.getElementById('f-id');
+const fStatkey    = document.getElementById('f-statkey');
+const fIcon       = document.getElementById('f-icon');
+const fX          = document.getElementById('f-x');
+const fY          = document.getElementById('f-y');
+const fNameEn     = document.getElementById('f-name-en');
+const fNameDe     = document.getElementById('f-name-de');
+const fDescEn     = document.getElementById('f-desc-en');
+const fDescDe     = document.getElementById('f-desc-de');
+const connListEl  = document.getElementById('conn-list');
+
+// node DOM elements
+const nodeEls = {};  // id → .node div
+const connEls = {};  // connId → SVG line
+
+// ── THEME (dark / light) ──────────────────────────────────────────────────
+const THEME_KEY = 'pte_theme';
+let theme = 'dark';
+try { theme = localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark'; } catch (e) {}
+
+function applyTheme(t) {
+  theme = t;
+  document.body.classList.toggle('light', t === 'light');
+  const btn = document.getElementById('btn-theme');
+  if (btn) btn.textContent = t === 'light' ? '🌙' : '☀️';
+  try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+  renderAllNodes(); // re-apply theme-aware node colors
+}
+
+document.getElementById('btn-theme').addEventListener('click', () => {
+  applyTheme(theme === 'dark' ? 'light' : 'dark');
+});
+applyTheme(theme);
+
+// ── WORLD SIZING ─────────────────────────────────────────────────────────
+const WORLD_W = 4000;
+const WORLD_H = 4000;
+
+function initWorld() {
+  world.style.width  = WORLD_W + 'px';
+  world.style.height = WORLD_H + 'px';
+  connSvg.setAttribute('width', WORLD_W);
+  connSvg.setAttribute('height', WORLD_H);
+  connSvg.style.width  = WORLD_W + 'px';
+  connSvg.style.height = WORLD_H + 'px';
+  previewSvg.setAttribute('width', WORLD_W);
+  previewSvg.setAttribute('height', WORLD_H);
+  previewSvg.style.width  = WORLD_W + 'px';
+  previewSvg.style.height = WORLD_H + 'px';
+  nodesLayer.style.width  = WORLD_W + 'px';
+  nodesLayer.style.height = WORLD_H + 'px';
+  // start view centred
+  const cw = canvasWrap.clientWidth, ch = canvasWrap.clientHeight;
+  tx = cw/2 - WORLD_W/2 * scale;
+  ty = ch/2 - WORLD_H/2 * scale;
+  applyTransform();
+}
+
+// ── TRANSFORM ────────────────────────────────────────────────────────────
+function applyTransform() {
+  world.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+  zoomDisplay.textContent = Math.round(scale * 100) + '%';
+  // keep background grid in sync with pan/zoom
+  const s = 40 * scale;
+  const ox = ((tx % s) + s) % s;
+  const oy = ((ty % s) + s) % s;
+  canvasWrap.style.setProperty('--grid-s', s + 'px');
+  canvasWrap.style.setProperty('--grid-x', ox + 'px');
+  canvasWrap.style.setProperty('--grid-y', oy + 'px');
+}
+
+// world → screen
+function worldToScreen(wx, wy) { return { x: wx*scale + tx, y: wy*scale + ty }; }
+// screen → world
+function screenToWorld(sx, sy) { return { x: (sx - tx)/scale, y: (sy - ty)/scale }; }
+
+// ── NODE RADIUS ───────────────────────────────────────────────────────────
+const NODE_R = 22;
+const START_ID = 1;
+const START_NODE_ID = 11; // default start node id (matches game data)
+function getR(id) { return id === START_ID ? Math.round(NODE_R * 1.4) : NODE_R; }
+
+// ── RENDER HELPERS ────────────────────────────────────────────────────────
+function nodeColor(id) {
+  const light = document.body.classList.contains('light');
+  if (id === START_ID) {
+    return light
+      ? { bg:'#efe4c0', border:'3px solid #a67c00', dot:'#a67c00' }
+      : { bg:'#33411f', border:'3px solid #ffd700', dot:'#ffd700' };
+  }
+  return light
+    ? { bg:'#f5efdd', border:'2px solid #8d8674', dot:'#9c9584' }
+    : { bg:'#211f2b', border:'2px solid #6a6488', dot:'#7d78a0' };
+}
+
+function renderNode(node) {
+  // Remove old element if exists
+  if (nodeEls[node.id]) nodeEls[node.id].remove();
+
+  const r = getR(node.id);
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.dataset.id = node.id;
+  el.style.left   = (node.x - r) + 'px';
+  el.style.top    = (node.y - r) + 'px';
+  el.style.width  = r*2 + 'px';
+  el.style.height = r*2 + 'px';
+
+  const col = nodeColor(node.id);
+  el.style.background = col.bg;
+  el.style.border     = col.border;
+  el.style.boxShadow  = '0 0 6px rgba(20,16,40,0.35)';
+
+  // Icon
+  const icon = node.icon;
+  const isUrl = icon && (icon.startsWith('/') || icon.startsWith('http'));
+  if (isUrl) {
+    const img = document.createElement('img');
+    img.src = icon;
+    img.className = 'node-img';
+    el.appendChild(img);
+  } else if (icon && icon.trim()) {
+    const sp = document.createElement('span');
+    sp.className = 'node-icon';
+    sp.textContent = icon;
+    sp.style.fontSize = (r * 0.85) + 'px';
+    el.appendChild(sp);
+  } else {
+    const dot = document.createElement('div');
+    dot.className = 'node-dot';
+    dot.style.background = col.dot;
+    el.appendChild(dot);
+  }
+
+  // Label
+  const lbl = document.createElement('div');
+  lbl.className = 'node-label';
+  lbl.textContent = node.nameEn || ('ID ' + node.id);
+  el.appendChild(lbl);
+
+  // Apply selected style
+  if (selectedId === node.id) el.classList.add('selected');
+  if (connectMode && connectSrcId === node.id) el.classList.add('connect-src');
+
+  // Events
+  el.addEventListener('mousedown', e => onNodeMouseDown(e, node.id));
+  el.addEventListener('mouseenter', e => showTooltip(node, e));
+  el.addEventListener('mousemove', e => posTooltip(e));
+  el.addEventListener('mouseleave', hideTooltip);
+  el.addEventListener('click', e => onNodeClick(e, node.id));
+
+  nodesLayer.appendChild(el);
+  nodeEls[node.id] = el;
+}
+
+function renderAllNodes() {
+  Object.values(nodeEls).forEach(el => el.remove());
+  Object.keys(nodeEls).forEach(k => delete nodeEls[k]);
+  nodes.forEach(n => renderNode(n));
+}
+
+function updateNodePosition(id) {
+  const node = nodeMap[id];
+  if (!node) return;
+  const el = nodeEls[id];
+  if (!el) return;
+  const r = getR(id);
+  el.style.left = (node.x - r) + 'px';
+  el.style.top  = (node.y - r) + 'px';
+  // update connected lines
+  conns.filter(c => c.from === id || c.to === id).forEach(c => updateConnLine(c));
+}
+
+// ── CONNECTIONS ───────────────────────────────────────────────────────────
+function renderConn(conn) {
+  if (connEls[conn.id]) connEls[conn.id].remove();
+  const from = nodeMap[conn.from], to = nodeMap[conn.to];
+  if (!from || !to) return;
+
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  updateConnLineEl(line, from, to);
+  line.setAttribute('class', 'conn-line');
+  if (conn.dotted) line.setAttribute('stroke-dasharray', '5,5');
+  connSvg.appendChild(line);
+  connEls[conn.id] = line;
+}
+
+function updateConnLine(conn) {
+  const line = connEls[conn.id];
+  if (!line) return;
+  const from = nodeMap[conn.from], to = nodeMap[conn.to];
+  if (!from || !to) return;
+  updateConnLineEl(line, from, to);
+}
+
+function updateConnLineEl(line, from, to) {
+  line.setAttribute('x1', from.x); line.setAttribute('y1', from.y);
+  line.setAttribute('x2', to.x);   line.setAttribute('y2', to.y);
+}
+
+function renderAllConns() {
+  while (connSvg.firstChild) connSvg.removeChild(connSvg.firstChild);
+  Object.keys(connEls).forEach(k => delete connEls[k]);
+  conns.forEach(c => renderConn(c));
+}
+
+// ── STATUS / COUNTS ───────────────────────────────────────────────────────
+function refreshStatus() {
+  stNodes.textContent   = nodes.length;
+  stConns.textContent   = conns.length;
+  stSel.textContent     = selectedId != null ? ('#' + selectedId) : '—';
+  nodeCountEl.textContent = nodes.length + ' nodes · ' + conns.length + ' connections';
+  scheduleSave();
+}
+
+function flashMsg(msg, color) {
+  stMsg.style.color = color || 'var(--green)';
+  stMsg.textContent = msg;
+  clearTimeout(flashMsg._t);
+  flashMsg._t = setTimeout(() => stMsg.textContent = '', 2500);
+}
+
+// ── PANEL ─────────────────────────────────────────────────────────────────
+function openPanel(id) {
+  const node = nodeMap[id];
+  if (!node) { closePanel(); return; }
+
+  panelEmpty.style.display  = 'none';
+  panelFields.style.display = 'flex';
+  nodeIdBadge.style.display = '';
+  nodeIdBadge.textContent   = 'ID: ' + id;
+
+  fId.value       = node.id;
+  fStatkey.value  = node.statKey || '';
+  fIcon.value     = node.icon    || '';
+  fX.value        = Math.round(node.x);
+  fY.value        = Math.round(node.y);
+  fNameEn.value   = node.nameEn  || '';
+  fNameDe.value   = node.nameDe  || '';
+  fDescEn.value   = node.descEn  || '';
+  fDescDe.value   = node.descDe  || '';
+
+  renderConnList(id);
+}
+
+function closePanel() {
+  panelEmpty.style.display  = '';
+  panelFields.style.display = 'none';
+  nodeIdBadge.style.display = 'none';
+  selectedId = null;
+  Object.values(nodeEls).forEach(el => el.classList.remove('selected'));
+  refreshStatus();
+}
+
+function renderConnList(id) {
+  connListEl.innerHTML = '';
+  const related = conns.filter(c => c.from === id || c.to === id);
+  if (!related.length) {
+    connListEl.innerHTML = '<div style="font-size:10px;color:var(--text2);padding:2px 0">No connections yet</div>';
+    return;
+  }
+  related.forEach(c => {
+    const otherId = c.from === id ? c.to : c.from;
+    const other   = nodeMap[otherId];
+    const label   = other ? (other.nameEn || 'Node ' + otherId) : ('ID ' + otherId);
+
+    const item = document.createElement('div');
+    item.className = 'conn-item';
+    item.innerHTML = `<span>⟷ ${otherId} — ${label}</span>`;
+    const btn = document.createElement('button');
+    btn.className = 'conn-del';
+    btn.textContent = '✕';
+    btn.title = 'Remove connection';
+    btn.addEventListener('click', () => {
+      pushHistory();
+      removeConn(c.id);
+      renderConnList(id);
+      refreshStatus();
+    });
+    item.appendChild(btn);
+    connListEl.appendChild(item);
+  });
+}
+
+function applyPanel() {
+  if (selectedId == null) return;
+  const node = nodeMap[selectedId];
+  if (!node) return;
+
+  const newId = parseInt(fId.value);
+  if (newId !== selectedId && nodeMap[newId]) {
+    flashMsg('ID ' + newId + ' already exists!', 'var(--red)');
+    return;
+  }
+  pushHistory();
+
+  // Handle ID change
+  if (newId !== selectedId && !isNaN(newId)) {
+    delete nodeMap[selectedId];
+    // update connections
+    conns.forEach(c => {
+      if (c.from === selectedId) c.from = newId;
+      if (c.to   === selectedId) c.to   = newId;
+    });
+    node.id = newId;
+    nodeMap[newId] = node;
+    // move DOM el
+    const el = nodeEls[selectedId];
+    if (el) { delete nodeEls[selectedId]; el.dataset.id = newId; nodeEls[newId] = el; }
+    selectedId = newId;
+    nodeIdBadge.textContent = 'ID: ' + newId;
+  }
+
+  node.statKey = fStatkey.value.trim();
+  node.icon    = fIcon.value.trim();
+  const nx = parseFloat(fX.value), ny = parseFloat(fY.value);
+  if (!isNaN(nx)) node.x = Math.round(nx);
+  if (!isNaN(ny)) node.y = Math.round(ny);
+  node.nameEn  = fNameEn.value;
+  node.nameDe  = fNameDe.value;
+  node.descEn  = fDescEn.value;
+  node.descDe  = fDescDe.value;
+
+  renderNode(node);
+  nodeEls[node.id].classList.add('selected');
+  conns.filter(c => c.from === node.id || c.to === node.id).forEach(c => renderConn(c));
+  updateNodePosition(node.id);
+  renderConnList(node.id);
+  refreshStatus();
+  flashMsg('Node ' + node.id + ' updated.');
+}
+
+// ── ADD / DELETE NODES ────────────────────────────────────────────────────
+function addNode(wx, wy) {
+  pushHistory();
+  const id = freshNodeId();
+  const node = {
+    id,
+    x: Math.round(wx), y: Math.round(wy),
+    nameEn: 'Skill ' + id, nameDe: 'Fähigkeit ' + id,
+    descEn: '', descDe: '',
+    icon: '', statKey: 'skill_' + id
+  };
+  nodes.push(node);
+  nodeMap[id] = node;
+  renderNode(node);
+  selectNode(id);
+  refreshStatus();
+  flashMsg('Added node ' + id);
+}
+
+function deleteNode(id) {
+  const idx = nodes.findIndex(n => n.id === id);
+  if (idx < 0) return;
+  pushHistory();
+  nodes.splice(idx, 1);
+  delete nodeMap[id];
+  if (nodeEls[id]) { nodeEls[id].remove(); delete nodeEls[id]; }
+  // remove related conns
+  const toRemove = conns.filter(c => c.from === id || c.to === id).map(c => c.id);
+  toRemove.forEach(cid => removeConn(cid));
+  if (selectedId === id) closePanel();
+  refreshStatus();
+  flashMsg('Deleted node ' + id, 'var(--red)');
+}
+
+function removeConn(cid) {
+  const idx = conns.findIndex(c => c.id === cid);
+  if (idx < 0) return;
+  conns.splice(idx, 1);
+  delete connMap[cid];
+  if (connEls[cid]) { connEls[cid].remove(); delete connEls[cid]; }
+}
+
+function addConn(fromId, toId, dotted) {
+  // deduplicate
+  if (conns.find(c => (c.from===fromId&&c.to===toId)||(c.from===toId&&c.to===fromId))) return;
+  if (fromId === toId) return;
+  pushHistory();
+  const cid = freshConnId();
+  const conn = { id: cid, from: fromId, to: toId, dotted: !!dotted };
+  conns.push(conn);
+  connMap[cid] = conn;
+  renderConn(conn);
+}
+
+// ── SELECTION ─────────────────────────────────────────────────────────────
+function selectNode(id) {
+  if (selectedId !== null && nodeEls[selectedId]) nodeEls[selectedId].classList.remove('selected');
+  selectedId = id;
+  if (id != null && nodeEls[id]) nodeEls[id].classList.add('selected');
+  if (id != null) openPanel(id); else closePanel();
+  stSel.textContent = id != null ? ('#' + id) : '—';
+}
+
+// ── CONNECT MODE ──────────────────────────────────────────────────────────
+function setConnectMode(on) {
+  connectMode = on;
+  if (!on) {
+    connectSrcId = null;
+    canvasWrap.classList.remove('connecting');
+    document.getElementById('btn-connect-mode').classList.remove('active');
+    modeLabel.textContent = 'MODE: SELECT / PAN';
+    clearPreviewLine();
+    // clear all connect-hover / connect-src classes
+    Object.values(nodeEls).forEach(el => {
+      el.classList.remove('connect-src', 'connect-hover');
+    });
+  } else {
+    canvasWrap.classList.add('connecting');
+    document.getElementById('btn-connect-mode').classList.add('active');
+    modeLabel.textContent = 'MODE: CONNECT (C to cancel)';
+    flashMsg('Connect mode: click source node, then target node');
+  }
+}
+
+// ── PREVIEW LINE ──────────────────────────────────────────────────────────
+let previewLine = null;
+function showPreviewLine(x1, y1, x2, y2) {
+  if (!previewLine) {
+    previewLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+    previewLine.setAttribute('stroke','#6dbf40');
+    previewLine.setAttribute('stroke-width','2');
+    previewLine.setAttribute('stroke-dasharray','6,4');
+    previewLine.setAttribute('opacity','0.7');
+    previewSvg.appendChild(previewLine);
+  }
+  previewLine.setAttribute('x1',x1); previewLine.setAttribute('y1',y1);
+  previewLine.setAttribute('x2',x2); previewLine.setAttribute('y2',y2);
+}
+function clearPreviewLine() {
+  if (previewLine) { previewLine.remove(); previewLine = null; }
+}
+
+// ── TOOLTIP ───────────────────────────────────────────────────────────────
+function showTooltip(node, e) {
+  tooltip.innerHTML = `
+    <div style="font-size:15px;font-weight:bold;color:var(--cyan);margin-bottom:4px">
+      ${node.nameEn || '(unnamed)'}
+    </div>
+    <div style="font-size:15px;color:var(--text2);margin-bottom:3px">
+      ID: ${node.id} &nbsp;·&nbsp; ${node.statKey || '—'}
+    </div>
+    ${node.descEn ? `<div style="font-size:15px;color:var(--gold);line-height:1.5">${node.descEn.replace(/\n/g,'<br>')}</div>` : ''}
+  `;
+  tooltip.style.opacity = '1';
+  posTooltip(e);
+}
+function posTooltip(e) {
+  const W = window.innerWidth, H = window.innerHeight;
+  const tw = tooltip.offsetWidth || 200, th = tooltip.offsetHeight || 60;
+  let x = e.clientX + 14, y = e.clientY - th/2;
+  if (x + tw > W - 8) x = e.clientX - tw - 14;
+  if (y < 4) y = 4;
+  if (y + th > H - 4) y = H - th - 4;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = y + 'px';
+}
+function hideTooltip() { tooltip.style.opacity = '0'; }
+
+// ── NODE MOUSE EVENTS ─────────────────────────────────────────────────────
+function onNodeMouseDown(e, id) {
+  if (connectMode) return;
+  e.stopPropagation();
+  dragNode = id;
+  movedThisMouseDown = false;
+  _dragSnapshot = snapshot();
+  const node = nodeMap[id];
+  dragNodeStartX  = node.x;
+  dragNodeStartY  = node.y;
+  dragMouseStartX = e.clientX;
+  dragMouseStartY = e.clientY;
+}
+
+function onNodeClick(e, id) {
+  e.stopPropagation();
+  if (movedThisMouseDown) { movedThisMouseDown = false; return; }
+  hideTooltip();
+
+  if (connectMode) {
+    if (connectSrcId === null) {
+      connectSrcId = id;
+      if (nodeEls[id]) nodeEls[id].classList.add('connect-src');
+      flashMsg('Source: node ' + id + ' — now click target node');
+    } else if (connectSrcId !== id) {
+      const srcId = connectSrcId;
+      addConn(srcId, id);
+      if (nodeEls[srcId]) nodeEls[srcId].classList.remove('connect-src');
+      connectSrcId = null;
+      clearPreviewLine();
+      // refresh panel conn list
+      if (selectedId != null) renderConnList(selectedId);
+      flashMsg('Connected ' + srcId + ' ↔ ' + id);
+      refreshStatus();
+    }
+  } else {
+    selectNode(id);
+  }
+}
+
+// ── CANVAS EVENTS ─────────────────────────────────────────────────────────
+canvasWrap.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  if (e.target.closest('.node')) return;
+  dragging = true;
+  dragStartX = e.clientX; dragStartY = e.clientY;
+  dragTxStart = tx; dragTyStart = ty;
+  canvasWrap.classList.add('grabbing');
+});
+
+canvasWrap.addEventListener('dblclick', e => {
+  if (connectMode) return;
+  if (e.target.closest('.node')) return;
+  const wp = screenToWorld(e.clientX, e.clientY);
+  addNode(wp.x, wp.y);
+});
+
+canvasWrap.addEventListener('click', e => {
+  if (e.target.closest('.node')) return;
+  if (connectMode) {
+    // clicked empty space while connecting — cancel
+    if (connectSrcId !== null) {
+      if (nodeEls[connectSrcId]) nodeEls[connectSrcId].classList.remove('connect-src');
+      connectSrcId = null;
+      clearPreviewLine();
+      flashMsg('Connection cancelled');
+    }
+    return;
+  }
+  selectNode(null);
+});
+
+window.addEventListener('mousemove', e => {
+  if (dragNode !== null) {
+    const dx = (e.clientX - dragMouseStartX) / scale;
+    const dy = (e.clientY - dragMouseStartY) / scale;
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) movedThisMouseDown = true;
+    const node = nodeMap[dragNode];
+    if (node) {
+      node.x = Math.round(dragNodeStartX + dx);
+      node.y = Math.round(dragNodeStartY + dy);
+      updateNodePosition(dragNode);
+      // sync panel position fields
+      if (selectedId === dragNode) { fX.value = node.x; fY.value = node.y; }
+    }
+    return;
+  }
+  if (dragging) {
+    tx = dragTxStart + (e.clientX - dragStartX);
+    ty = dragTyStart + (e.clientY - dragStartY);
+    applyTransform();
+    return;
+  }
+  // preview line
+  if (connectMode && connectSrcId !== null) {
+    const src = nodeMap[connectSrcId];
+    if (src) {
+      const wp = screenToWorld(e.clientX, e.clientY);
+      showPreviewLine(src.x, src.y, wp.x, wp.y);
+    }
+    // hover class
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const nodeEl = el && el.closest('.node');
+    Object.values(nodeEls).forEach(n => n.classList.remove('connect-hover'));
+    if (nodeEl) nodeEl.classList.add('connect-hover');
+  }
+});
+
+window.addEventListener('mouseup', e => {
+  if (dragNode !== null) {
+    // commit a single undo entry for the whole drag (only if it actually moved)
+    if (movedThisMouseDown && _dragSnapshot !== null) {
+      undoStack.push(_dragSnapshot);
+      if (undoStack.length > HISTORY_MAX) undoStack.shift();
+      redoStack.length = 0;
+      scheduleSave();
+    }
+    _dragSnapshot = null;
+    dragNode = null;
+  }
+  if (dragging) { dragging = false; canvasWrap.classList.remove('grabbing'); }
+});
+
+canvasWrap.addEventListener('wheel', e => {
+  e.preventDefault();
+  const dir = e.deltaY < 0 ? 1 : -1;
+  const factor = 1 + dir * 0.1;
+  const ns = Math.min(4, Math.max(0.1, scale * factor));
+  const rect = canvasWrap.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const r = ns / scale;
+  tx = mx - r*(mx - tx);
+  ty = my - r*(my - ty);
+  scale = ns;
+  applyTransform();
+}, { passive: false });
+
+// touch
+let _lastDist = null, _touchDragStart = null;
+canvasWrap.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    if (e.target.closest('.node')) return;
+    dragging = true;
+    dragStartX = e.touches[0].clientX; dragStartY = e.touches[0].clientY;
+    dragTxStart = tx; dragTyStart = ty;
+  }
+  if (e.touches.length === 2) {
+    dragging = false;
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    _lastDist = Math.hypot(dx, dy);
+  }
+}, { passive: true });
+
+canvasWrap.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1 && dragging) {
+    tx = dragTxStart + (e.touches[0].clientX - dragStartX);
+    ty = dragTyStart + (e.touches[0].clientY - dragStartY);
+    applyTransform();
+  }
+  if (e.touches.length === 2 && _lastDist) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.hypot(dx, dy);
+    scale = Math.min(4, Math.max(0.1, scale * (dist/_lastDist)));
+    _lastDist = dist;
+    applyTransform();
+  }
+}, { passive: false });
+
+canvasWrap.addEventListener('touchend', () => { dragging = false; _lastDist = null; });
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const k = e.key.toLowerCase();
+  // Undo / redo (also prevents plain 'c' from toggling connect mode while copying)
+  if (e.ctrlKey || e.metaKey) {
+    if (k === 'z' && !e.shiftKey) { e.preventDefault(); doUndo(); }
+    else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); doRedo(); }
+    return;
+  }
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === 'n' || e.key === 'N') {
+    const wp = screenToWorld(canvasWrap.clientWidth/2, canvasWrap.clientHeight/2);
+    addNode(wp.x + (Math.random()-0.5)*60, wp.y + (Math.random()-0.5)*60);
+  }
+  if (e.key === 'c' || e.key === 'C') setConnectMode(!connectMode);
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId != null) deleteNode(selectedId);
+  if (e.key === 'f' || e.key === 'F') fitView();
+  if (e.key === 'Escape') {
+    document.getElementById('import-modal').style.display = 'none';
+    document.getElementById('export-modal').style.display = 'none';
+    closePicker();
+    if (connectMode) setConnectMode(false);
+    else selectNode(null);
+  }
+});
+
+// ── FIT VIEW ──────────────────────────────────────────────────────────────
+function fitView() {
+  if (!nodes.length) return;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  nodes.forEach(n => {
+    if (n.x < minX) minX = n.x; if (n.y < minY) minY = n.y;
+    if (n.x > maxX) maxX = n.x; if (n.y > maxY) maxY = n.y;
+  });
+  const pad = 80;
+  const cw = canvasWrap.clientWidth, ch = canvasWrap.clientHeight;
+  const treeW = maxX - minX + pad*2, treeH = maxY - minY + pad*2;
+  scale = Math.min(cw/treeW, ch/treeH, 1.5);
+  tx = cw/2 - ((minX + maxX)/2) * scale;
+  ty = ch/2 - ((minY + maxY)/2) * scale;
+  applyTransform();
+}
+
+// ── TOOLBAR BUTTONS ───────────────────────────────────────────────────────
+document.getElementById('btn-add-node').addEventListener('click', () => {
+  const wp = screenToWorld(canvasWrap.clientWidth/2, canvasWrap.clientHeight/2);
+  addNode(wp.x + (Math.random()-0.5)*80, wp.y + (Math.random()-0.5)*80);
+});
+document.getElementById('btn-connect-mode').addEventListener('click', () => setConnectMode(!connectMode));
+document.getElementById('btn-del-node').addEventListener('click', () => { if (selectedId != null) deleteNode(selectedId); });
+document.getElementById('btn-fit').addEventListener('click', fitView);
+document.getElementById('btn-apply').addEventListener('click', applyPanel);
+document.getElementById('btn-del-panel').addEventListener('click', () => { if (selectedId != null) deleteNode(selectedId); });
+
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (!confirm('Clear all nodes and connections?')) return;
+  pushHistory();
+  nodes = []; conns = []; nodeMap = {}; connMap = {};
+  _nextNodeId = 1; _nextConnId = 1;
+  Object.values(nodeEls).forEach(el => el.remove());
+  Object.keys(nodeEls).forEach(k => delete nodeEls[k]);
+  Object.values(connEls).forEach(el => el.remove());
+  Object.keys(connEls).forEach(k => delete connEls[k]);
+  closePanel();
+  refreshStatus();
+  flashMsg('Cleared (Ctrl+Z to undo).', 'var(--red)');
+});
+
+// ── IMPORT ────────────────────────────────────────────────────────────────
+document.getElementById('btn-import').addEventListener('click', () => {
+  document.getElementById('import-modal').style.display = 'flex';
+});
+document.getElementById('import-cancel').addEventListener('click', () => {
+  document.getElementById('import-modal').style.display = 'none';
+});
+document.getElementById('import-ok').addEventListener('click', () => {
+    const raw = document.getElementById('import-text').value.trim();
+    if (!raw) return;
+    try {
+        let cleaned = raw.replace(/^const\s+\w+\s*=\s*/, '').replace(/;$/, '').trim();
+        let data = JSON.parse(cleaned);
+
+    // Try to detect format
+    // Format A: our own editor export { nodes:[], connections:[] }
+    if (data.nodes && Array.isArray(data.nodes)) {
+      if (!importFromEditorFormat(data)) {
+        flashMsg('Invalid nodes array in import data.', 'var(--red)');
+        return;
+      }
+    }
+    // Format B: TALENT_TREE_DATA.FullData style + optional defs
+    // { skills:[], connections:[], defs:{} }
+    else if (data.skills && Array.isArray(data.skills)) {
+      importFromLegacyFormat(data);
+    }
+    // Format C: wrapped in FullData
+    else if (data.FullData) {
+      importFromLegacyFormat(data.FullData);
+    }
+    else {
+      flashMsg('Unrecognised format — see hint text.', 'var(--red)');
+      return;
+    }
+    document.getElementById('import-modal').style.display = 'none';
+    document.getElementById('import-text').value = '';
+    fitView();
+    flashMsg('Imported successfully!');
+  } catch(err) {
+    flashMsg('Parse error: ' + err.message, 'var(--red)');
+  }
+});
+
+function importFromEditorFormat(data) {
+  if (!Array.isArray(data.nodes)) return false;
+  pushHistory();
+  clearAll();
+  data.nodes.forEach(n => {
+    const node = { ...n, id: parseInt(n.id) };
+    nodes.push(node);
+    nodeMap[node.id] = node;
+    _nextNodeId = Math.max(_nextNodeId, node.id + 1);
+  });
+  (data.connections || []).forEach(c => {
+    const conn = { ...c, id: parseInt(c.id), from: parseInt(c.from), to: parseInt(c.to) };
+    conns.push(conn);
+    connMap[conn.id] = conn;
+    _nextConnId = Math.max(_nextConnId, conn.id + 1);
+  });
+  renderAllNodes();
+  renderAllConns();
+  refreshStatus();
+  return true;
+}
+
+function importFromLegacyFormat(data) {
+  pushHistory();
+  clearAll();
+  const defs = data.defs || {};
+  (data.skills || []).forEach(s => {
+    const def = defs[s.id] || {};
+    const node = {
+      id:      parseInt(s.id),
+      x:       s.x || 0,
+      y:       s.y || 0,
+      nameEn:  def.nameEn  || s.name        || 'Skill ' + s.id,
+      nameDe:  def.nameDe  || s.name        || 'Fähigkeit ' + s.id,
+      descEn:  def.descEn  || s.description || '',
+      descDe:  def.descDe  || s.description || '',
+      icon:    def.icon    || s.image        || '',
+      statKey: def.statKey || ''
+    };
+    nodes.push(node);
+    nodeMap[node.id] = node;
+    _nextNodeId = Math.max(_nextNodeId, node.id + 1);
+  });
+  (data.connections || []).forEach((c, i) => {
+    const conn = {
+      id:     i + 1,
+      from:   parseInt(c.from),
+      to:     parseInt(c.to),
+      dotted: !!c.dotted
+    };
+    conns.push(conn);
+    connMap[conn.id] = conn;
+    _nextConnId = Math.max(_nextConnId, conn.id + 1);
+  });
+  renderAllNodes();
+  renderAllConns();
+  refreshStatus();
+}
+
+function clearAll() {
+  nodes = []; conns = []; nodeMap = {}; connMap = {};
+  _nextNodeId = 1; _nextConnId = 1;
+  Object.values(nodeEls).forEach(el => el.remove());
+  Object.keys(nodeEls).forEach(k => delete nodeEls[k]);
+  Object.values(connEls).forEach(el => el.remove());
+  Object.keys(connEls).forEach(k => delete connEls[k]);
+  closePanel();
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────
+document.getElementById('btn-export').addEventListener('click', () => {
+    const data = {
+        nodes: nodes.map(n => ({ ...n })),
+        connections: conns.map(c => ({ ...c }))
+    };
+    openExportModal(
+        '↓ Export — Full Editor JSON',
+        'Import this back into the editor at any time. Also contains all data needed for your game.',
+        'const TALENT_TREE_DATA = ' + JSON.stringify(data, null, 2) + ';'
+    );
+});
+
+document.getElementById('btn-export-skills').addEventListener('click', () => {
+  const lines = [];
+  lines.push('// ── AUTO-GENERATED by Passive Tree Editor ──');
+  lines.push('// Unified node data: position + skill defs + connections embedded');
+  lines.push('');
+  lines.push('const PT_SKILL_DEFS = {');
+  nodes.forEach((n, i) => {
+    const comma = i < nodes.length - 1 ? ',' : '';
+    lines.push(`    // ── id ${n.id} ── ${n.nameEn || ''} ${'─'.repeat(Math.max(0,40 - (n.nameEn||'').length - String(n.id).length - 8))}`);
+    lines.push(`    ${n.id}: {`);
+    lines.push(`        nameEn: ${JSON.stringify(n.nameEn || '')},`);
+    lines.push(`        nameDe: ${JSON.stringify(n.nameDe || '')},`);
+    lines.push(`        descEn: ${JSON.stringify(n.descEn || '')},`);
+    lines.push(`        descDe: ${JSON.stringify(n.descDe || '')},`);
+    lines.push(`        icon:   ${JSON.stringify(n.icon   || '')},`);
+    lines.push(`        statKey:${JSON.stringify(n.statKey|| '')},`);
+    lines.push(`        x: ${n.x}, y: ${n.y},`);
+    // Inline connections for this node (outgoing, deduped by always listing smaller id as from)
+    const myConns = conns
+      .filter(c => c.from === n.id || c.to === n.id)
+      .map(c => ({ to: c.from === n.id ? c.to : c.from, dotted: c.dotted }));
+    if (myConns.length) {
+      lines.push(`        connections: [${myConns.map(c => c.dotted ? `{to:${c.to},dotted:true}` : c.to).join(', ')}],`);
+    }
+    lines.push(`    }${comma}`);
+    lines.push('');
+  });
+  lines.push('};');
+  lines.push('');
+  lines.push('// Connection list (for TALENT_TREE_DATA compatibility):');
+  lines.push('// const PT_CONNECTIONS = ' + JSON.stringify(conns.map(c=>({from:c.from,to:c.to,dotted:c.dotted||undefined})).map(c=>{const o={from:c.from,to:c.to};if(c.dotted)o.dotted=true;return o;}), null, 2) + ';');
+
+  openExportModal(
+    '↓ Export — PT_SKILL_DEFS (JavaScript)',
+    'Paste this into passive-tree-skills.js. Each skill now includes x, y, and connections.',
+    lines.join('\n')
+  );
+});
+
+function openExportModal(title, desc, text) {
+  document.getElementById('export-title').textContent = title;
+  document.getElementById('export-desc').textContent  = desc;
+  document.getElementById('export-text').value        = text;
+  document.getElementById('export-modal').style.display = 'flex';
+}
+
+document.getElementById('export-close').addEventListener('click', () => {
+  document.getElementById('export-modal').style.display = 'none';
+});
+
+document.getElementById('export-copy').addEventListener('click', () => {
+  const ta = document.getElementById('export-text');
+  ta.select();
+  try {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(ta.value).then(() => flashMsg('Copied to clipboard!'));
+    } else {
+      document.execCommand('copy');
+      flashMsg('Copied to clipboard!');
+    }
+  } catch(e) { flashMsg('Copy failed — select manually', 'var(--red)'); }
+});
+
+// close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) ov.style.display = 'none'; });
+});
+
+// ── PANEL LIVE SYNC ───────────────────────────────────────────────────────
+// Pressing Enter in ID/statkey/icon/x/y applies immediately
+[fId, fStatkey, fIcon, fX, fY].forEach(el => {
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') applyPanel(); });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+initWorld();
+refreshStatus();
+
+(function initContent() {
+  // Restore previous session if available
+  let saved = null;
+  try { saved = localStorage.getItem(SAVE_KEY); } catch (e) {}
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      if (data && Array.isArray(data.nodes) && data.nodes.length) {
+        clearAll();
+        data.nodes.forEach(n => {
+          const node = { ...n, id: parseInt(n.id) };
+          nodes.push(node);
+          nodeMap[node.id] = node;
+          _nextNodeId = Math.max(_nextNodeId, node.id + 1);
+        });
+        (data.connections || []).forEach(c => {
+          const conn = { ...c, id: parseInt(c.id), from: parseInt(c.from), to: parseInt(c.to) };
+          conns.push(conn);
+          connMap[conn.id] = conn;
+          _nextConnId = Math.max(_nextConnId, conn.id + 1);
+        });
+        renderAllNodes();
+        renderAllConns();
+        refreshStatus();
+        fitView();
+        flashMsg('Restored previous session (' + nodes.length + ' nodes)');
+        return;
+      }
+    } catch (e) { /* corrupt save — fall through to starter */ }
+  }
+
+  // Fresh start: create the default Start node (id 11, matching game data)
+  const node = {
+    id: START_NODE_ID,
+    x: WORLD_W / 2, y: WORLD_H / 2,
+    nameEn: 'Start', nameDe: 'Start',
+    descEn: 'The origin of your passive skill tree.', descDe: '',
+    icon: '', statKey: 'start'
+  };
+  nodes.push(node);
+  nodeMap[node.id] = node;
+  _nextNodeId = START_NODE_ID + 1;
+  renderNode(node);
+  selectNode(START_NODE_ID);
+  refreshStatus();
+  fitView();
+})();// ── EMOJI PICKER ──────────────────────────────────────────────────────────
+const EMOJI_CATS = [
+  { label: '⭐', name: 'Skills & RPG', emojis: ['⭐','🌟','✨','💫','🔥','❄️','⚡','🌊','🌪️','☄️','💥','🎯','🏆','🎖️','🥇','🎪','🎨','🎭','🎬','🎤','🎵','🎶','🎸','🎹','🎺','🎻','🥁','🎲','🃏','🎴','🀄','♟️','🎮','🕹️','🎰'] },
+  { label: '⚔️', name: 'Combat', emojis: ['⚔️','🗡️','🛡️','🏹','🪃','🔱','⚙️','🔩','🔧','🔨','⛏️','🪓','🪚','🗺️','🧭','🔭','🔬','💣','🧨','💊','🧪','🧫','🧬','☠️','💀','👻','👾','🤖','🦾','🦿'] },
+  { label: '🌿', name: 'Nature', emojis: ['🌿','🍃','🌱','🌾','🍀','🌸','🌺','🌻','🌹','🌷','🍄','🌴','🌵','🌲','🌳','🍂','🍁','🍇','🍎','🍊','🍋','🍒','🍓','🫐','🌙','☀️','🌤️','⛅','🌈','🌊','🏔️','⛰️','🗻','🌋','🏝️','🏜️'] },
+  { label: '✨', name: 'Magic', emojis: ['✨','🔮','🪄','🧿','🌀','💎','💠','🔷','🔹','🔶','🔸','🟣','🟡','🟠','🔴','🔵','⚗️','🧲','🪬','🧸','👁️','🌐','🕸️','🪩','💫','🌠','🌌','🌃','🎆','🎇','🪐','🌑','🌕','🌗','🌒'] },
+  { label: '💪', name: 'Body', emojis: ['💪','🦾','🤜','👊','✊','🤛','👐','🙌','👐','🤲','🫶','❤️','🧠','👁️','👂','👃','🫀','🫁','💉','🩸','🦷','🦴','👣','🧍','🧎','🧘','🏃','🚶','🤸','🏋️','🤼','🥊','🤺','🏊','🧗'] },
+  { label: '🏰', name: 'Places', emojis: ['🏰','🏯','⛩️','🗼','🗽','🏛️','🕌','🕍','⛪','🛕','🏗️','🏠','🏡','🏢','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏬','🏭','🗺️','🗾','🌍','🌎','🌏','🪨','🌁','🌉','🏙️','🌃','🏞️','🌄'] },
+  { label: '🐉', name: 'Creatures', emojis: ['🐉','🦄','🐺','🦊','🐻','🐼','🐨','🦁','🐯','🐮','🦝','🦔','🦦','🦥','🐸','🦎','🐍','🦕','🦖','🦟','🕷️','🦂','🐢','🦋','🦁','🦅','🦆','🦉','🦚','🦜','🐬','🐳','🦈','🐙','🦑'] },
+  { label: '💡', name: 'Symbols', emojis: ['💡','🔑','🗝️','🔐','🔒','🔓','🚪','🪟','🪞','🛋️','🪑','🚀','🛸','✈️','🚂','⚓','🏴','🚩','🎌','🏁','📜','📖','📚','📰','🗒️','📋','🗃️','📦','📫','📬','📭','📮','🗳️','🗂️','🗄️'] },
+];
+// de-dupe category lists
+EMOJI_CATS.forEach(c => c.emojis = [...new Set(c.emojis)]);
+
+// Keyword index for emoji search: emoji → space-separated keywords
+const EMOJI_NAMES = {
+'⭐':'star skill magic rpg favorite favorite quality','🌟':'glowing star shiny special rare elite','✨':'sparkles magic glitter shimmer wish enchant','💫':'dizzy star spin swirl stun confusion cosmic','🔥':'fire flame burn hot passion damage dot inferno','❄️':'snow ice frost cold freeze winter chill slow','⚡':'lightning bolt electric shock speed quick energy thunder storm zap haste','🌊':'water wave sea ocean flow tide flood liquid','🌪️':'tornado wind storm whirlwind cyclone chaos pull gust air','☄️':'comet meteor falling impact strike celestial space','💥':'explosion boom blast burst impact crash collision aoe','🎯':'target bullseye aim crit precision accuracy focus mark hit chance','🏆':'trophy champion win victory award prize achievement best','🎖️':'military medal honor decoration service rank prestige','🥇':'gold medal first place winner number one top','🎪':'circus carnival tent show performance spectacle','🎨':'art paint palette creative color design craft aesthetic','🎭':'theater masks drama act role play disguise deception performance','🎬':'movie film clapper cinema scene action take production','🎤':'microphone sing voice song performance speech bard shout command','🎵':'music note song melody tune sound rhythm audio single tone','🎶':'music notes melody harmony sound multiple songs chorus','🎸':'guitar string instrument rock music riff bard strum','🎹':'piano keyboard keys instrument music classical melody compose','🎺':'trumpet horn brass fanfare announce call war signal loud','🎻':'violin bow strings classical elegant refined grace orchestra','🥁':'drum beat rhythm percussion march war pulse tempo cadence','🎲':'dice random chance luck gamble probability roll rng fortune fate stochastic','🃏':'joker wild card trump unpredictable chaos trickster wildcard','🎴':'flower card game hanafuda deck play cards luck','🀄':'mahjong tile game four wind east luck strategy','♟️':'chess pawn strategy sacrifice plan tactic calculated forward','🎮':'gamepad controller game play console video gaming','🕹️':'joystick arcade retro game control machine oldschool insert coin','🎰':'slot machine gamble jackpot casino chance reels lucky spin',
+'⚔️':'swords duel melee cross blades fight combat war attack warrior clash','🗡️':'dagger knife blade stealth assassin backstab pierce rogue light weapon','🛡️':'shield defense block protect armor guard tank absorb ward bulwark','🏹':'bow arrow ranged archery pierce distance hunter sniper volley shot','🪃':'boomerang return thrown ranged recur come back hit twice','🔱':'trident spear poseidon ocean three prong pierce thrust sea god','⚙️':'gear cog machine clockwork mechanics construct technology system process engineering','🔩':'nut bolt screw fasten hardware metal assembly construct parts','🔧':'wrench fix repair tool adjust maintain maintenance mechanic tweak','🔨':'hammer smith forge hit strike build blacksmith craft blunt crush','⛏️':'pickaxe mining drill dig excavate ore gather harvest stone tunnel','🪓':'axe chop wood lumber cut split timber berserk cleave tree','🪚':'saw cut slice teeth carpenter wood build sever blade','🗺️':'map treasure explore atlas chart navigate travel adventure expedition discovery route path world geography','🧭':'compass navigation direction north find guide orient bearing explore wayfinding','🔭':'telescope stars observe astronomy see far vision scope discover watch range','🔬':'microscope science examine small detail analysis research study inspect cells','💣':'bomb explode tnt fuse destroy demolition kaboom charge volatile','🧨':'dynamite firecracker blast explosive detonate fuse boom danger','💊':'pill medicine drug heal potion cure capsule buff remedy dose','🧪':'test tube potion alchemy experiment chemistry brew elixir mixture acid science flask','🧫':'petri dish culture biology lab grow sample experiment bacteria science','🧬':'dna gene genetics life evolve mutation biology clone heredity bloodline splicer','☠️':'skull poison death danger toxic crossbones lethal venom hazard deadly','💀':'skull dead skeleton bones death lich undead grim remains necro','👻':'ghost spirit haunted undead phantom invisible ethereal wraith spooky haunt','👾':'alien monster invader space creature retro arcade enemy pixel extraterrestrial','🤖':'robot mech android ai automation construct artificial golem machine droid','🦾':'prosthetic arm mechanical cyber strong limb bionic strength augment robot fist','🦿':'mechanical leg cyber leg strength bionic kick augment prosthetic speed',
+'🌿':'herb leaf plant green nature alchemy growth ingredient remedy druid','🍃':'leaf wind flutter light nature breeze drift fall gentle','🌱':'seedling sprout grow growth new begin young potential life plant start nature','🌾':'sheaf grain wheat harvest farm abundance crop food yield autumn golden','🍀':'clover luck shamrock four leaf fortune irish blessing chance lucky','🌸':'cherry blossom sakura flower spring beauty bloom pink petal delicate renewal','🌺':'hibiscus flower tropical beauty bloom island exotic red vibrant','🌻':'sunflower summer flower sun bright yellow warmth joy optimism light day','🌹':'rose flower love red romance passion thorn beauty romance blood','🌷':'tulip flower spring garden bloom colorful netherlands fresh','🍄':'mushroom fungus spore toadstool forest poison heal fantasy red cap growth','🌴':'palm tree beach island tropical vacation paradise warm oasis coast','🌵':'cactus desert prickly dry survive harsh endurance spike arid hardy','🌲':'evergreen pine tree forest conifer wood cold north wilderness taiga timber','🌳':'tree oak forest shade big nature life wood grove ancient elder','🍂':'fallen leaves autumn fall dry season end decay orange brown transition','🍁':'maple leaf canada autumn fall season change orange red harvest','🍇':'grapes fruit vine wine bunch purple sweet fermentation harvest vineyard','🍎':'apple fruit red healthy food eden health vitality orchard fresh bite','🍊':'orange tangerine citrus fruit vitamin sun fresh juicy segment zest','🍋':'lemon citrus sour fruit acid fresh tangy bitter sharp zest','🍒':'cherries fruit red pair sweet twin double duo bonus jackpot slots','🍓':'strawberry berry fruit red sweet heart shaped summer fresh delicate','🫐':'blueberries berry fruit dark antioxidant small cluster purple indigo forage','🌙':'moon night crescent sleep dark lunar dream shadow rest evening arcane','☀️':'sun day light hot solar bright fire star radiant summer dawn morning','🌤️':'partly cloudy sun behind cloud forecast weather morning clear mild pleasant','⛅':'sun cloud weather day partly overcast mixed temperate fair','🌈':'rainbow colors arch rain promise hope spectrum prisma bridge multicolor variety after storm','🏔️':'snow mountain peak alps cold high summit climb grand majesty frozen roof world','⛰️':'mountain rock hill climb elevation terrain rugged stone ascent highland','🗻':'fuji mountain japan volcano iconic landmark sacred peak snow perfect symmetrical','🌋':'volcano eruption lava magma fire ash mountain heat destructive forge primordial','🏝️':'desert island tropical palm sand paradise remote stranded refuge shore beach alone','🏜️':'desert sand dunes dry hot barren waste arid empty camel vast scorched',
+'🔮':'crystal ball fortune oracle psychic future divination mana orb predict seer mystic','🪄':'magic wand spell wizard cast point transform conjure mage arcane flick','🧿':'nazar amulet evil eye protection charm curse ward deflect blue talisman resist','🌀':'cyclone spiral vortex portal whirlpool warp teleport hypno spin gateway rift','💎':'gem diamond jewel crystal precious gemstone luxury rare mineral clarity pure mana','💠':'diamond dot flower ornament decorative geometric pattern pixel art fancy','🔷':'blue diamond shape large geometric cool ice sapphire element','🔹':'small blue diamond tiny shape minor geometric accent','🔶':'orange diamond shape large geometric fire amber element','🔸':'small orange diamond tiny shape minor geometric ember accent','🟣':'purple circle orb void arcane element amethyst round','🟡':'yellow circle orb sun light element gold round holy','🟠':'orange circle orb fire element amber round copper warm','🔴':'red circle orb blood life fire element ruby round power','🔵':'blue circle orb water mana ice element sapphire round calm','⚗️':'alembic alchemy distill chemistry transmute potion brew convert essence laboratory','🧲':'magnet attract iron pull attraction force gravity metal draw lure grip','🪬':'hamsa hand fatima amulet protection luck charm bless guard palm mystical','🧸':'teddy bear plush toy comfort child innocent soft cute hug companion','👁️':'eye sight watch see vision observe perceive insight all seeing surveillance awareness clairvoyance','🌐':'globe internet web world network sphere earth connect global online link','🕸️':'spider web cobweb trap net silk snare entangle catch sticky weave spinner fang','🪩':'mirror ball disco reflect party light sparkle rotate shine celebration glimmer','🌠':'shooting star meteor wish falling night sky streak hope destiny sign omen','🌌':'milky way galaxy space cosmos stars universe nebula infinite astral deep night void','🌃':'night city stars urban evening skyline metropolis lights late modern civilization','🎆':'fireworks festival celebrate new year explosion light sky colorful grand finale display','🎇':'sparkler firework celebration small light handheld glow festival spark glitter','🪐':'ringed planet saturn space cosmic orbit alien world celestial giant astronomical','🌑':'new moon dark eclipse shadow void hidden lunar absence secret blackout','🌕':'full moon bright lunar werewolf light night complete transformation illumination cycle peak','🌗':'last quarter moon half phase waning decline transition cycle balance shift','🌘':'waning crescent moon phase dark fading end cycle diminishing twilight',
+'💪':'flexed biceps muscle arm strong power strength workout gym force might vigor tough','🤜':'right fist punch hit strike boxing attack knock blow forward jab','👊':'fist punch bump fight hit blow melee knuckles strike assault','✊':'raised fist power solidarity resistance punch grip determination resolve defiance hold','🤛':'left fist punch strike jab blow backward counter attack hook','👐':'open hands generous share give open receiving offer release embrace palms','🙌':'raising hands celebrate praise joy hooray victory exalt worship triumph hallelujah','🤲':'palms up together prayer offer receive beg cup supplicate humble request give','🫶':'heart hands love appreciation gratitude care kindness affection support thanks bond','❤️':'heart love health red life affection passion hp vital heal romantic core soul','🧠':'brain mind intelligence smart think psychic wisdom memory mental intellect clever psionic knowledge iq','👂':'ear listen hear sound audio acoustic sense perception eavesdrop echo hearing','👃':'nose smell sniff scent sense breath tracking odor aroma detect inhale','🫀':'anatomical heart organ pulse cardiology blood pump lifeforce core vital beat circulation','🫁':'lungs breathing organ air respiration oxygen breath stamina endurance wind capacity vital','💉':'syringe shot vaccine inject needle medicine heal drug stim booster shot antidote','🩸':'blood drop wound injury bleed damage hurt red life sacrifice hemorrhage vital loss','🦷':'tooth teeth bite chew dental mouth gnaw fang maw crunch tear','🦴':'bone skeleton dog fossil marrow frame structure calcify remains skeletal support','👣':'footprints steps track walk trail feet travel journey path follow follow wander pilgrimage','🧍':'person standing stand idle body upright posture presence still halt stationary','🧎':'kneeling person kneel submit pray down humble surrender devotion plead bow','🧘':'lotus meditation zen yoga calm peace focus mind balance spirit chi serenity inner stillness trance','🏃':'runner running sprint fast speed dash cardio quick flee escape rush momentum hustle marathon','🚶':'walking pedestrian stroll step pace march travel foot journey advance wander roam','🤸':'cartwheel gymnastics flip acrobatic agile flexibility tumble dodge evasive somersault nimble graceful','🏋️':'weightlifting lift barbell strong muscle power strength training gym bulk heavy effort exertion','🤼':'wrestling grapple fight pin wrestle struggle clinch contest takedown raw strength duel bodies','🥊':'boxing glove punch fight combat strike jab uppercut brawler pugilist knockout ring','🤺':'fencing sword duel lunge thrust parry bladesman duelist precise elegant foil riposte','🏊':'swimmer swimming water dive stroke breaststroke float amphibious pool depth underwater glide','🧗':'climbing cliff boulder mountaineer grip ascend scaling vertical perseverance reach summit crag',
+'🏰':'castle medieval fortress royal king palace stone tower citadel stronghold keep lord kingdom defense','🏯':'japanese castle asia pagoda feudal shogun oriental fortress samurai empire dynasty','⛩️':'shinto shrine japan torii gate sacred spiritual religion portal threshold holy vermilion passage','🗼':'tokyo tower japan landmark city radio broadcast height observation signal beacon urban','🗽':'statue liberty new york freedom usa landmark monument independence icon liberty hope','🏛️':'classical building museum ancient greece rome pillars columns law justice academy institution wisdom order civilization','🕌':'mosque islam muslim prayer crescent dome religion faith east minaret devotion worship','🕍':'synagogue jewish star david religion hebrew temple faith israel congregation tradition torah','⛪':'church christian cross cathedral chapel religion holy faith prayer sanctuary blessed consecrated','🛕':'hindu temple india worship religion gods sanctuary faith shrine sacred devotion mantra','🏗️':'building construction crane site work progress build industry development scaffold rising create erect','🏠':'house home dwelling family cottage residence shelter safe base simple hearth comfort domestic','🏡':'garden house cottage home yard suburb villa countryside peaceful rural idyllic homestead','🏢':'office building business corporate work city tower downtown firm company industry commerce bureau','🏣':'japanese post office mail send branch delivery station communication message courier official','🏤':'post office europe mail letters stamps postal service delivery correspondence message dispatch','🏥':'hospital medical health doctor emergency clinic care medicine aid heal treatment recovery first aid','🏦':'bank money finance vault cash credit treasury safe gold loan economy wealth deposit interest','🏨':'hotel lodging stay travel accommodation inn rest room hospitality resort temporary shelter bed','🏪':'convenience store shop corner market buy goods supplies retail mart grocery kiosk vendor trade','🏫':'school education learn students teacher class academy study knowledge college university discipline training','🏬':'department store mall shopping retail fashion boutique plaza emporium consumer variety goods','🏭':'factory industry production manufacturing plant machinery smoke worker assembly forge mill mass produce output','🗾':'japan map outline geography island archipelago nation orient land territory homeland','🌍':'earth globe europe africa world planet international nature terra land ground realm global continent','🌎':'earth americas globe world planet west continent territory domain international hemisphere frontier','🌏':'earth asia australia globe east world planet orient continent region international far','🪨':'rock stone boulder solid granite pebble hard mineral earth grit bedrock foundation sturdy immovable','🌁':'foggy bridge san francisco mist haze weather obscured mystery fog unclear veil shrouded','🌉':'bridge night crossing span connection river bay link road architecture connect join pathway','🏙️':'cityscape skyline urban downtown buildings metropolis civilization towers night lights modern metropolis hub','🏞️':'national park scenery nature landscape valley mountains river outdoors wilderness scenic preserve vista pristine','🌄':'sunrise over mountains dawn morning new beginning horizon daybreak fresh start elevation light peaks',
+'💡':'light bulb idea invention bright think creative innovation insight genius spark inspiration energy lamp glow revelation eureka','🔑':'key unlock open secret access solution lock door gate reveal password crypt answer entry authority','🗝️':'old key antique lock secret vault door rusted relic unlock hidden crypt dungeon heritage legacy heirloom','🔐':'locked pen secure private protected closed safe encryption sealed restricted confidential guarded','🔒':'lock padlock security closed protect safe privacy barrier immovable fixed sealed locked fastened','🔓':'unlocked open access free released available accessible liberated exposed unbarred entry','🚪':'door entrance exit gateway opening threshold passage portal entry barrier room beyond transition','🪟':'window view glass opening light pane aperture outlook frame vista glimpse through transparency','🪞':'mirror reflection reflect image glass illusion self doppelganger clone vanity surface copy duplicate mimic','🛋️':'couch sofa furniture relax lounge comfort living rest seat sit idle recover recuperate homebase','🪑':'chair seat furniture sit rest throne stool perch bench position camp establish dominion rule','🚀':'rocket launch spaceship space travel boost accelerate speed upward project startup thrust ascend missile progress rapid','🛸':'flying saucer ufo alien spacecraft hover abduction sci-fi futuristic disk levitate strange anti gravity float','✈️':'airplane plane flight travel jet aviation airport fly fast wing airliner transport sky voyage speed','🚂':'locomotive train steam railway engine track transport haul cargo chugga momentum power rail convoy industrial','⚓':'anchor ship boat sea port stable hold moor secure navy harbor maritime steadfast grounding stop anchor','🏴':'black flag pirate rebellion dark banner mark warning challenge crew bannerless rogue outlaw corsair anarch','🚩':'triangular flag marker goal milestone point checkpoint claim target destination signal alert red rally banner territory','🎌':'crossed flags japan celebration border nation dual banner ceremony festival competition versus rivalry','🏁':'chequered flag race finish goal start end complete victory motorsport final done lap conclusion achievement complete','📜':'scroll parchment paper ancient writing spell manuscript record tome archive lore history decree quest document contract','📖':'open book reading study learn story knowledge pages literature manual guide codex lore bible tutorial','📚':'books shelf stack library study knowledge collection education research volumes encyclopedia archive wisdom lore collection','📰':'newspaper news press article media information journal report headline daily announcement bulletin gazette public notice','🗒️':'spiral notepad notes memo jot write list reminder scratchpad draft record planning ledger scribble','📋':'clipboard checklist tasks inventory list organize manage survey record audit requisition form admin track','🗃️':'card file box archive organize database index records storage collection catalog repository vault systematic','📦':'package box parcel crate container shipping storage delivery loot cargo supply chest bundle reward','📫':'closed mailbox raised flag mail post letter message incoming received inbox notification communication arrival summons','📬':'open mailbox raised flag mail new message letter arrived post incoming alert communication notice summons received','📭':'empty mailbox no mail cleared inbox nothing quiet dormant inactive idle vacant silence','📮':'postbox mail drop box letter send outgoing deposit public royal correspondence submission dispatch deliver','🗳️':'ballot box vote election democracy choice polling decision select choose poll referendum verdict decide','🗂️':'card index dividers organize files sections categories sort partition classify tabbed compartmentalize group organize','🗄️':'file cabinet drawer office records storage archive documents organization repository secure files'
+};
+
+const pickerEl    = document.getElementById('emoji-picker');
+const emojiGrid   = document.getElementById('emoji-grid');
+const emojiSearch = document.getElementById('emoji-search');
+const emojiCatsEl = document.getElementById('emoji-cats');
+let activeCat = 0;
+
+function buildEmojiCats() {
+  emojiCatsEl.innerHTML = '';
+  EMOJI_CATS.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'emoji-cat-btn' + (i === activeCat ? ' active' : '');
+    btn.textContent = cat.label;
+    btn.title = cat.name;
+    btn.addEventListener('click', () => {
+      activeCat = i;
+      emojiSearch.value = '';
+      buildEmojiCats();
+      buildEmojiGrid(cat.emojis);
+    });
+    emojiCatsEl.appendChild(btn);
+  });
+}
+
+function buildEmojiGrid(emojis, emptyMsg) {
+  emojiGrid.innerHTML = '';
+  if (!emojis.length) {
+    const div = document.createElement('div');
+    div.style.cssText = 'grid-column:1/-1;color:var(--text2);font-size:11px;text-align:center;padding:12px 0';
+    div.textContent = emptyMsg || 'No matches';
+    emojiGrid.appendChild(div);
+    return;
+  }
+  emojis.forEach(emoji => {
+    const btn = document.createElement('button');
+    btn.className = 'emoji-btn';
+    btn.textContent = emoji;
+    btn.title = EMOJI_NAMES[emoji] || emoji;
+    btn.addEventListener('click', () => {
+      fIcon.value = emoji;
+      closePicker();
+    });
+    emojiGrid.appendChild(btn);
+  });
+}
+
+function openPicker() {
+  buildEmojiCats();
+  buildEmojiGrid(EMOJI_CATS[activeCat].emojis);
+  emojiSearch.value = '';
+  pickerEl.classList.add('open');
+  // position near the button
+  const btn = document.getElementById('btn-emoji-pick');
+  const rect = btn.getBoundingClientRect();
+  const pickerW = 300, pickerH = 300;
+  let left = rect.left;
+  let top  = rect.bottom + 6;
+  if (left + pickerW > window.innerWidth - 8) left = window.innerWidth - pickerW - 8;
+  if (top + pickerH > window.innerHeight - 8) top = rect.top - pickerH - 6;
+  pickerEl.style.left = left + 'px';
+  pickerEl.style.top  = top  + 'px';
+  setTimeout(() => emojiSearch.focus(), 10);
+}
+
+function closePicker() {
+  pickerEl.classList.remove('open');
+}
+
+document.getElementById('btn-emoji-pick').addEventListener('click', e => {
+  e.stopPropagation();
+  pickerEl.classList.contains('open') ? closePicker() : openPicker();
+});
+
+document.getElementById('emoji-picker-close').addEventListener('click', closePicker);
+
+emojiSearch.addEventListener('input', () => {
+  const q = emojiSearch.value.trim().toLowerCase();
+  if (!q) {
+    buildEmojiGrid(EMOJI_CATS[activeCat].emojis);
+    return;
+  }
+  const all = [...new Set(EMOJI_CATS.flatMap(c => c.emojis))];
+  const words = q.split(/\s+/);
+  // every search word must match somewhere in the emoji's keywords
+  const matches = all.filter(e => {
+    const kw = EMOJI_NAMES[e] || '';
+    return words.every(w => kw.includes(w));
+  });
+  buildEmojiGrid(matches, 'No emojis match "' + q + '"');
+});
+
+document.addEventListener('click', e => {
+  if (!pickerEl.contains(e.target) && e.target.id !== 'btn-emoji-pick') closePicker();
+});
+</script>
+</body>
+</html>

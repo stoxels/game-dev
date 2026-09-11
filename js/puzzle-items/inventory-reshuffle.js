@@ -18,9 +18,14 @@ const RESHUFFLE_MAX_ATTEMPTS = 50;  // max loop iterations when picking distinct
 
 // Updates the reshuffle progress badge shown in the UI (e.g. "♻ 3/5").
 // Called by buildInventoryPanel() and whenever reshuffleCount changes.
+// Updates BOTH renderings: the label-block counter and the small-screen
+// mini chip inside the floating inventory dock.
 function updateReshuffleCounter() {
+    const txt = `♻ ${reshuffleCount}/${RESHUFFLE_GOAL}`;
     const el = document.getElementById('reshuffle-counter');
-    if (el) el.textContent = `♻ ${reshuffleCount}/${RESHUFFLE_GOAL}`;
+    if (el) el.textContent = txt;
+    const mini = document.getElementById('reshuffle-counter-mini');
+    if (mini) mini.textContent = txt;
 }
 
 

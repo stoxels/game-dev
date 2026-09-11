@@ -102,3 +102,303 @@
     object-fit: contain;
     pointer-events: none;
 }
+
+
+/* ---------------------------------------------------------
+   CHEAT: CHARACTER LAB — 30-combo sprite tester
+   (button on the mode-select screen + modal)
+   --------------------------------------------------------- */
+
+.dms-charlab-btn {
+    margin-top: 6px;
+    font-family: var(--PX, monospace);
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #f5e9c8;
+    background: rgba(20, 14, 34, 0.85);
+    border: 1px solid #6a4fa0;
+    border-radius: 8px;
+    padding: 9px 22px;
+    cursor: pointer;
+    transition: filter 0.15s, border-color 0.15s;
+}
+
+    .dms-charlab-btn:hover {
+        filter: brightness(1.35);
+        border-color: #a98fe0;
+    }
+
+#charlab-modal .cl-box {
+    width: min(1060px, 94vw);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    background: #191227;
+    border: 1px solid #6a4fa0;
+    border-radius: 12px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+}
+
+.cl-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(106, 79, 160, 0.25);
+    border-bottom: 1px solid #6a4fa0;
+}
+
+.cl-title {
+    font-family: var(--PX, monospace);
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: #f0d090;
+}
+
+.cl-close {
+    background: transparent;
+    border: 1px solid #6a4fa0;
+    border-radius: 6px;
+    color: #f5e9c8;
+    font-family: var(--PX, monospace);
+    font-size: 13px;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+    .cl-close:hover {
+        filter: brightness(1.4);
+    }
+
+.cl-body {
+    display: flex;
+    gap: 14px;
+    padding: 14px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Left: the 30 combos, grouped by character */
+.cl-grid {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-width: 0;
+    padding-right: 4px;
+}
+
+.cl-char-row {
+    margin-bottom: 10px;
+}
+
+.cl-char-name {
+    font-family: var(--PX, monospace);
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #c8b8ee;
+    margin: 6px 0 6px 2px;
+}
+
+.cl-combo-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.cl-combo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 8px 4px 6px;
+    cursor: pointer;
+    transition: filter 0.12s, border-color 0.12s, background 0.12s;
+}
+
+    .cl-combo:hover {
+        filter: brightness(1.3);
+        border-color: #a98fe0;
+    }
+
+    .cl-combo.cl-active {
+        background: rgba(160, 120, 255, 0.18);
+        border-color: #c8a84b;
+        box-shadow: 0 0 8px rgba(200, 168, 75, 0.4);
+    }
+
+    .cl-combo img {
+        width: 52px;
+        height: 52px;
+        object-fit: contain;
+        image-rendering: pixelated;
+        pointer-events: none;
+    }
+
+.cl-combo-label {
+    font-family: var(--PX, monospace);
+    font-size: 8.5px;
+    color: #e8ddf5;
+    text-align: center;
+    line-height: 1.15;
+    white-space: normal;
+}
+
+.cl-art {
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    font-size: 9px;
+}
+
+.cl-art-ok {
+    color: #7dd87d;
+}
+
+.cl-art-missing {
+    color: #777;
+    opacity: 0.8;
+}
+
+/* Right: live animated preview */
+.cl-preview-pane {
+    flex: 0 0 218px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 12px 10px;
+}
+
+.cl-preview-label {
+    font-family: var(--PX, monospace);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #f0d090;
+    text-align: center;
+}
+
+.cl-preview-stage {
+    width: 132px;
+    height: 132px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 0% 50%) 0 0 / 24px 24px,
+        rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cl-preview-img {
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.cl-preview-state {
+    font-family: var(--PX, monospace);
+    font-size: 9px;
+    color: #9fd8a8;
+}
+
+.cl-dir-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.cl-dir-mid {
+    display: flex;
+    gap: 3px;
+}
+
+.cl-dir,
+.cl-stop {
+    font-family: var(--PX, monospace);
+    font-size: 13px;
+    color: #f5e9c8;
+    background: rgba(106, 79, 160, 0.35);
+    border: 1px solid #6a4fa0;
+    border-radius: 6px;
+    padding: 4px 9px;
+    cursor: pointer;
+}
+
+    .cl-dir:hover,
+    .cl-stop:hover {
+        filter: brightness(1.35);
+    }
+
+.cl-stop {
+    font-size: 10px;
+    letter-spacing: 1px;
+    width: 100%;
+}
+
+.cl-portrait-label {
+    font-family: var(--PX, monospace);
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: #8f83a8;
+    margin-top: 2px;
+}
+
+.cl-portrait-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.cl-save {
+    font-family: var(--PX, monospace);
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    color: #f5e9c8;
+    background: rgba(60, 140, 70, 0.3);
+    border: 1px solid #4f8f58;
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    width: 100%;
+}
+
+    .cl-save:hover {
+        filter: brightness(1.35);
+    }
+
+.cl-hint {
+    font-family: var(--PX, monospace);
+    font-size: 8px;
+    color: #8f83a8;
+    text-align: center;
+}
+
+/* Narrow screens: preview pane moves below the grid */
+@media (max-width: 860px) {
+    .cl-body {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .cl-preview-pane {
+        flex: 0 0 auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .cl-combo-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

@@ -894,7 +894,7 @@ function _randomWalkInit() {
 function _randomWalkTick() {
     if (!ptHasSkill('keystone_random_walk')) return;
     if (!cur || dead) return;
-    if (window._oracleActive) return;
+    if (_autoActionsBlocked()) return; // Ergodic Field / The Oracle block all auto-actions
 
     // Enforce the loss condition BEFORE doing anything else
     if (mistakeCount >= RANDOM_WALK_MAX_MISTAKES) {

@@ -364,6 +364,10 @@ let _mvCanvasEl = null;
 // the sprite reaches the next real road node, so it never leaves the roads.
 let _mvPendingRedirect = null;
 
+// Last world-node click ({ wi, t }) for double-click-to-enter detection in
+// _onWorldNodeClick. null when no recent click is pending.
+let _lastWorldNodeClick = null;
+
 
 //------------------------------------------------------------------------
 //-------------------COORDINATE HELPERS-----------------------------------
@@ -761,19 +765,52 @@ function _calcStepDurationMs(startPos, endPos) {
 }
 
 /**
- * Updates the sprite's horizontal flip based on which direction it is walking.
- * Uses the CSS `scale` property so it doesn't interfere with other transforms
- * (like the vertical bob animation).
+ * Dominant-axis travel direction for a map segment (image-% space).
+ * Used to pick the directional walk set (up/down/left/right) instead of
+ * the old menu-portrait/omni fallback.
+ *
+ * @param {{ x: number, y: number }} startPos
+ * @param {{ x: number }} endPos
+ * @returns {'up'|'down'|'left'|'right'}
+ */
+function _mvDirectionForSegment(startPos, endPos) {
+    const dx = (endPos.x || 0) - (startPos.x || 0);
+    const dy = (endPos.y || 0) - (startPos.y || 0);
+    if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? 'left' : 'right';
+    return dy < 0 ? 'up' : 'down';
+}
+
+/**
+ * Updates the sprite's facing for one walk segment.
+ * Directional walk art is drawn facing its travel direction, so it must
+ * NEVER be mirrored (this mirrors the Trix left/right fix in
+ * player_sprite.js). Only the omni right-facing fallback keeps the old
+ * horizontal flip. Uses the CSS `scale` property so it doesn't interfere
+ * with other transforms (like the vertical bob animation).
  *
  * @param {HTMLElement} sprite
- * @param {{ x: number }} startPos
- * @param {{ x: number }} endPos
+ * @param {{ x: number, y: number }} startPos
+ * @param {{ x: number, y: number }} endPos
  */
 function _updateSpriteDirection(sprite, startPos, endPos) {
     const img = sprite.querySelector('img');
-    if (img) {
-        img.style.scale = (endPos.x < startPos.x) ? '-1 1' : '1 1';
+    if (!img) return;
+    const dir = _mvDirectionForSegment(startPos, endPos);
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
+    const char = st ? st.playerCharacter : null;
+    const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
+    let directional = false;
+    if (typeof _animHasDirectionalWalkSync === 'function' && char) {
+        directional = _animHasDirectionalWalkSync(char, variant, dir);
     }
+    if (!directional && typeof _animWalkIsDirectionalFor === 'function' && _animWalkIsDirectionalFor('mv-sprite-img')) {
+        directional = true;
+    }
+    if (directional) {
+        img.style.scale = '1 1';
+        return;
+    }
+    img.style.scale = (dir === 'left') ? '-1 1' : '1 1';
 }
 
 /**
@@ -854,6 +891,15 @@ function _walkAlongPath(sprite, points, markers, segIdx, onComplete) {
     const endPos = points[segIdx + 1];
     const durationMs = _calcStepDurationMs(startPos, endPos);
 
+    // Drive the directional walk set for this segment (up/down/left/right)
+    // instead of the old directionless omni loop. Safe to call per segment:
+    // _playAvatarWalkAnimation no-ops when the same loop already runs and
+    // just re-arms the idle debounce otherwise.
+    if (typeof _playAvatarWalkAnimation === 'function') {
+        try { _playAvatarWalkAnimation('mv-sprite-img', _mvDirectionForSegment(startPos, endPos)); }
+        catch (e) {}
+    }
+
     _animateWalkStep(sprite, startPos, endPos, durationMs, () => {
         const reachedIndex = segIdx + 1;
         const marker = markers.find(m => m.index === reachedIndex);
@@ -918,6 +964,9 @@ function _walkSpriteTo(targetWorldIdx, onArrived) {
 
     _mvWalking = true;
     sprite.classList.add('walking');
+    if (typeof _animWarmCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
+        try { _animWarmCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass'); } catch (e) {}
+    }
     if (typeof _startAvatarWalkAnimation === 'function') _startAvatarWalkAnimation('mv-sprite-img');
 
     _continueWalkFromNode(sprite, _mvCurrentWorldIdx, targetWorldIdx, onArrived);
@@ -938,6 +987,9 @@ function _walkSpriteToHome() {
 
     _mvWalking = true;
     sprite.classList.add('walking');
+    if (typeof _animWarmCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
+        try { _animWarmCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass'); } catch (e) {}
+    }
     if (typeof _startAvatarWalkAnimation === 'function') _startAvatarWalkAnimation('mv-sprite-img');
 
     _continueWalkFromNode(sprite, _mvCurrentWorldIdx, 'home', null);
@@ -951,8 +1003,10 @@ function _walkSpriteToHome() {
 
 /**
  * Creates and returns the player sprite DOM element.
- * The sprite image is sourced from _getPlayerCharacterImage() if available,
- * otherwise falls back to the default no-class sprite.
+ * Gameplay default: move-down art (never the menu portrait — the menu
+ * portrait stays reserved for save slots, level-select topbar and
+ * quiz/exercise modals). Falls back to the no-class portrait only for
+ * variants without directional art.
  *
  * @returns {HTMLElement}
  */
@@ -963,13 +1017,23 @@ function _buildMapSprite() {
 
     const img = document.createElement('img');
     img.id = 'mv-sprite-img';
-    img.src = (typeof _getPlayerCharacterImage === 'function')
-        ? _getPlayerCharacterImage()
-        : 'images/sprites/Stox_noclass.webp';
+    img.src = (typeof _getPlayerPuzzleDefaultImage === 'function')
+        ? _getPlayerPuzzleDefaultImage()
+        : ((typeof _getPlayerCharacterImage === 'function')
+            ? _getPlayerCharacterImage()
+            : 'images/sprites/Stox_noclass.webp');
     img.alt = 'Player';
     img.draggable = false;
 
     sprite.appendChild(img);
+    if (typeof _animSetDefaultDownImage === 'function') {
+        try { _animSetDefaultDownImage(img); } catch (e) {}
+    }
+    if (typeof _startAvatarIdleAnimation === 'function') {
+        // Resolve the element after insertion; idle shows directional
+        // standing art (last facing, default down) once discovery lands.
+        setTimeout(() => { try { _startAvatarIdleAnimation('mv-sprite-img'); } catch (e) {} }, 0);
+    }
     return sprite;
 }
 
@@ -1067,6 +1131,11 @@ function _getWorldConvergenceText(wi) {
  * @returns {string} Localised status text
  */
 function _getWorldClassUpgradeText(wi) {
+    // The Nexus World (secret world 14) grants a one-time CLASS CHANGE on
+    // its Ascension Level instead of a class upgrade — show that instead.
+    if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
+        return t('scr_nexus_ascension_hint');
+    }
     const obtained = STATE.classWorldsCompleted && STATE.classWorldsCompleted.includes(wi);
     return obtained ? t('scr_world_class_upgrade_done') : t('scr_world_class_upgrade_missing');
 }
@@ -1406,6 +1475,16 @@ function _buildWorldNode(pos, wi) {
  * @param {number} wi - World index
  */
 function _onWorldNodeClick(wi) {
+    // Double-click enters the world directly, skipping the walk-to-node
+    // + enter-button step (parity with the old level-select grid, where
+    // clicking the current level opened it immediately).
+    if (typeof _lastWorldNodeClick === 'object' && _lastWorldNodeClick &&
+        _lastWorldNodeClick.wi === wi &&
+        (performance.now() - _lastWorldNodeClick.t) < 450) {
+        _lastWorldNodeClick = null;
+        if (typeof showWorldDetail === 'function') { showWorldDetail(wi); return; }
+    }
+    _lastWorldNodeClick = { wi, t: performance.now() };
     _walkSpriteTo(wi, () => _showEnterButton(wi));
 }
 
@@ -1662,10 +1741,12 @@ function _renderTopBarMods() {
 }
 
 /**
- * Renders the total score display in the map view top bar.
+ * Renders the total score display in a top bar.
+ * p = id prefix ('mv' for the overworld map view, 'wd' for the world-detail
+ * screen's mirrored topbar).
  */
-function _renderTopBarScore() {
-    const scoreEl = document.getElementById('mv-ls-score');
+function _renderTopBarScore(p = 'mv') {
+    const scoreEl = document.getElementById(p + '-ls-score');
     if (scoreEl) {
         scoreEl.textContent = (STATE ? STATE.totalScore : 0);
     }
@@ -1674,8 +1755,8 @@ function _renderTopBarScore() {
 /**
  * Renders the "points to next code" display in the map view top bar.
  */
-function _renderTopBarNextCode() {
-    const ptsNextEl = document.getElementById('mv-ls-pts-next');
+function _renderTopBarNextCode(p = 'mv') {
+    const ptsNextEl = document.getElementById(p + '-ls-pts-next');
     if (ptsNextEl && typeof buildNextCodeStr === 'function') {
         ptsNextEl.textContent = buildNextCodeStr();
     }
@@ -1684,8 +1765,8 @@ function _renderTopBarNextCode() {
 /**
  * Renders the player class / ascendency status widget in the map view top bar.
  */
-function _renderTopBarClassStatus() {
-    const classEl = document.getElementById('mv-class-status');
+function _renderTopBarClassStatus(p = 'mv') {
+    const classEl = document.getElementById(p + '-class-status');
     if (!classEl) return;
 
     if (STATE && STATE.playerClass) {
@@ -1697,22 +1778,15 @@ function _renderTopBarClassStatus() {
     }
 }
 
-/**
- * Shows or hides the quest log notification badge in the map view top bar.
- */
-function _renderTopBarQuestBadge() {
-    const badge = document.getElementById('mv-quest-log-badge');
+function _renderTopBarQuestBadge(p = 'mv') {
+    const badge = document.getElementById(p + '-quest-log-badge');
     if (badge && typeof hasActiveQuestNotification === 'function') {
         badge.style.display = hasActiveQuestNotification() ? 'inline' : 'none';
     }
 }
 
-/**
- * Highlights the Probability Tree button when there are unspent
- * Convergence Points: golden glow frame + yellow point count.
- */
-function _renderTopBarTreePoints() {
-    const treeBtn = document.getElementById('mv-btn-passive-tree');
+function _renderTopBarTreePoints(p = 'mv') {
+    const treeBtn = document.getElementById(p + '-btn-passive-tree');
     if (!treeBtn) return;
 
     const points = (STATE && STATE.passiveTreePoints) || 0;
@@ -1724,28 +1798,33 @@ function _renderTopBarTreePoints() {
 
     // Yellow point count appended next to the translated label —
     // appended as a sibling so i18n re-renders cannot wipe it
-    let countEl = document.getElementById('ptb-point-count-mv');
+    let countEl = document.getElementById('ptb-point-count-' + p);
     if (!countEl) {
         countEl = document.createElement('span');
-        countEl.id = 'ptb-point-count-mv';
+        countEl.id = 'ptb-point-count-' + p;
         treeBtn.appendChild(countEl);
     }
     countEl.textContent = hasPoints ? ` (${points})` : '';
 }
 
 /**
- * Wires up the navigation buttons in the map view top bar.
- * Using .onclick assignment is intentional — it's safe to call multiple times
- * without accumulating duplicate event listeners.
+ * Wires up the navigation buttons in a top bar. The wd variant's back
+ * button returns to the overworld map instead of the setup screen.
  */
-function _wireTopBarButtons() {
-    const backBtn = document.getElementById('mv-btn-back');
-    const questBtn = document.getElementById('mv-btn-quest-log');
-    const treeBtn = document.getElementById('mv-btn-passive-tree');
+function _wireTopBarButtons(p = 'mv') {
+    const backBtn = document.getElementById(p + '-btn-back');
+    const questBtn = document.getElementById(p + '-btn-quest-log');
+    const treeBtn = document.getElementById(p + '-btn-passive-tree');
+    const changeBtn = document.getElementById(p + '-btn-class-change');
 
-    if (backBtn) backBtn.onclick = () => showSetup();
+    if (backBtn) {
+        backBtn.onclick = (p === 'wd')
+            ? () => { if (typeof wdGoBackToMap === 'function') wdGoBackToMap(); else showMapView(); }
+            : () => showSetup();
+    }
     if (questBtn) questBtn.onclick = () => showQuestLog();
     if (treeBtn) treeBtn.onclick = () => showPassiveTree();
+    if (changeBtn) changeBtn.onclick = () => { if (typeof showClassChange === 'function') showClassChange(); };
 }
 
 /**
@@ -1760,6 +1839,8 @@ function _buildMapViewTopBar() {
     _renderTopBarQuestBadge();
     _renderTopBarTreePoints();
     _wireTopBarButtons();
+    // Class-change token entry button — only visible while a token is held.
+    if (typeof updateClassChangeButtons === 'function') updateClassChangeButtons();
 
     // Character portrait (replaces the old List-view toggle button) —
     // hovering it shows the character's traits tooltip.

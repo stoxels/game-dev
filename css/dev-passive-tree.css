@@ -1,0 +1,69 @@
+﻿/*
+    ------------------------------------------------------------------------
+    ------------------DEV PASSIVE TREE (SANDBOX)-----------------------------
+    ------------------------------------------------------------------------
+    Development-only screen: new passive tree layout playground.
+    Reuses the generic .pt-topbar / .pt-canvas / .pt-points classes from
+    probability_tree.css; this file only adds dev-specific bits.
+    ------------------------------------------------------------------------
+*/
+
+/* Amber-tinted title so this sandbox screen is visually distinct from the
+   live Probability Tree screen at a glance. */
+#screen-dev-passive-tree .pt-title {
+    color: #e8a020;
+    white-space: nowrap; /* "🌳 PASSIVE TREE — DEV" must stay on one line */
+}
+
+/* Points counter sits in the amber palette too. */
+#screen-dev-passive-tree .pt-points {
+    color: #e8a020;
+}
+
+/* Dev pool top-up button — sits right after the Refund All button. */
+#btn-dpt-add-points {
+    margin-left: 8px;
+}
+
+/* Mirror the live tree's layout: push Refund All and everything after it
+   to the right edge of the topbar. */
+#btn-dpt-refund-all {
+    margin-left: auto;
+}
+
+/* Allocated-node counter (e.g. "Allocated: 12 / 364"). */
+#dpt-count {
+    margin-left: 14px;
+    font-family: var(--PX);
+    font-size: 12px;
+    color: #93a7bd;
+    letter-spacing: 1px;
+}
+
+/* Faint noclass portrait behind a character-start node. Positioned and
+   sized by JS (see _dptAppendSprite in passive-tree-dev.js); sits beneath
+   the node div in DOM order. */
+.dpt-start-sprite {
+    position: absolute;
+    object-fit: contain;
+    opacity: 0.22;
+    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.6)) saturate(0.9);
+    pointer-events: none;
+    z-index: 0;
+    user-select: none;
+}
+
+/* Sandbox status hint pinned to the bottom of the canvas. */
+.dpt-hint {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--PX, monospace);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(147, 167, 189, 0.55);
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+}

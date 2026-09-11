@@ -146,7 +146,8 @@
     flex-wrap: wrap;
 }
 
-#pause-overlay #btn-pause-settings {
+#pause-overlay #btn-pause-settings,
+#pause-overlay #btn-pause-keybinds {
     padding: 9px 22px;
     font-size: 0.95rem;
     letter-spacing: 0.05em;
@@ -158,7 +159,8 @@
     transition: background .12s;
 }
 
-#pause-overlay #btn-pause-settings:hover {
+#pause-overlay #btn-pause-settings:hover,
+#pause-overlay #btn-pause-keybinds:hover {
     background: rgba(255, 255, 255, 0.18);
 }
 
@@ -190,6 +192,12 @@
 /* Make sure the settings modal renders ABOVE the pause overlay
    when opened from the pause screen (pause overlay is z-index 9999) */
 #settings-modal.show {
+    z-index: 10000;
+}
+
+/* Same treatment for the keybinds modal, which is also reachable from the
+   pause menu so bindings can be reviewed/changed mid-puzzle. */
+#keybinds-modal.show {
     z-index: 10000;
 }
 

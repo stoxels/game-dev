@@ -119,3 +119,8 @@ const EG_ATLAS_REGION_BOSSES = {
     'atlas_t16_2': 'boss_voidborn',
     'atlas_t16_3': 'boss_zenith',
 };
+
+// This is the last boss file to load — validate every mechanic handler
+// name once so a typo surfaces at boot (console warning) instead of
+// silently disabling a mechanic mid-fight.
+if (typeof _egValidateAllBossHandlers === 'function') _egValidateAllBossHandlers();

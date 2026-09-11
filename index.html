@@ -5,21 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="images/favicon.png">
     <title>STOXELS - v0.28 BETA</title>
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/pause.css">
+    <link rel="stylesheet" href="css/base.css?v=2">
+    <link rel="stylesheet" href="css/pause.css?v=2">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/title-screen.css">
-    <link rel="stylesheet" href="css/save-slots.css">
+    <link rel="stylesheet" href="css/save-slots.css?v=3">
     <link rel="stylesheet" href="css/screens.css">
-    <link rel="stylesheet" href="css/game.css">
-    <link rel="stylesheet" href="css/setup-screen.css">
+    <link rel="stylesheet" href="css/game.css?v=2">
+    <link rel="stylesheet" href="css/setup-screen.css?v=4">
     <link rel="stylesheet" href="css/inventory.css">
     <link rel="stylesheet" href="css/overlays.css">
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/class.css">
-    <link rel="stylesheet" href="css/achievements.css">
+    <link rel="stylesheet" href="css/skills.css?v=1">
+    <link rel="stylesheet" href="css/achievements.css?v=2">
     <link rel="stylesheet" href="css/item_effects.css">
-    <link rel="stylesheet" href="css/probability_tree.css">
+    <link rel="stylesheet" href="css/probability_tree.css?v=2">
     <link rel="stylesheet" href="css/passive_effects.css">
     <link rel="stylesheet" href="css/quests.css">
     <link rel="stylesheet" href="css/passive-tracker.css">
@@ -30,41 +31,48 @@
     <link rel="stylesheet" href="css/classes/mathmagician.css">
     <link rel="stylesheet" href="css/classes/outlier.css">
     <link rel="stylesheet" href="css/classes/probabilist.css">
-    <link rel="stylesheet" href="css/classes/random-walker.css">
     <link rel="stylesheet" href="css/classes/recursionist.css">
     <link rel="stylesheet" href="css/classes/statistician.css">
     <link rel="stylesheet" href="css/classes/targeting-reticle.css">
     <link rel="stylesheet" href="css/endgame/monsters.css">
-    <link rel="stylesheet" href="css/endgame/bosses2.css">
+    <!-- bosses2.css (442 KB / 11,290 lines, boss-FX only — verified no
+         non-boss code uses its classes; base monster-card styles live in
+         monsters.css) is NOT render-blocking: it is warmed up once at idle
+         after boot and force-loaded at encounter start if needed (see
+         _egWarmBossStylesheet / _egEnsureBossStylesheetSync in
+         endgame-encounter.js). -->
     <link rel="stylesheet" href="css/endgame/projectiles.css">
     <link rel="stylesheet" href="css/endgame/hazards.css">
-    <link rel="stylesheet" href="css/endgame/endgame-hub.css">
+    <link rel="stylesheet" href="css/endgame/endgame-hub.css?v=2">
     <link rel="stylesheet" href="css/endgame/endgame-crafting-bench.css">
     <link rel="stylesheet" href="css/endgame/endgame-tooltip-styles.css">
     <link rel="stylesheet" href="css/endgame/objectives_hud.css">
     <link rel="stylesheet" href="css/character-select.css">
     <link rel="stylesheet" href="css/map-view.css">
-    <link rel="stylesheet" href="css/map-view-topbar.css">
+    <link rel="stylesheet" href="css/map-view-topbar.css?v=8">
     <link rel="stylesheet" href="css/quiz-excercises.css?v=3">
-    <link rel="stylesheet" href="css/highscore.css">
-    <link rel="stylesheet" href="css/moodle-codes.css">
+    <link rel="stylesheet" href="css/highscore.css?v=4">
+    <link rel="stylesheet" href="css/moodle-codes.css?v=2">
     <link rel="stylesheet" href="css/inference.css">
     <link rel="stylesheet" href="css/tutorial.css">
-    <link rel="stylesheet" href="css/class_selection.css">
+    <link rel="stylesheet" href="css/class_selection.css?v=2">
     <link rel="stylesheet" href="css/class_spell_upgrade.css">
     <link rel="stylesheet" href="css/class_ascendency_selection.css">
     <link rel="stylesheet" href="css/reset-game.css">
     <link rel="stylesheet" href="css/replay.css">
     <link rel="stylesheet" href="css/dev-mode-select.css">
+    <link rel="stylesheet" href="css/dev-passive-tree.css">
     <!-- Boot: discover title art as early as possible -->
-    <link rel="preload" as="image" href="images/Title_Screen/Title_Background2.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_TitleScreen_Background.webp" fetchpriority="high">
     <link rel="preload" as="image" href="images/Title_Screen/STOXELS.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_GermanLogo.webp" fetchpriority="high">
     <style>
         /* Boot loader — inline so it paints before stylesheets finish.
            Only the few rules needed for a first paint with zero flash live
            here; the full STOXELS-styled look comes from css/title-screen.css
-           (#boot-loader section), which mirrors the title screen: same art,
-           same logo image, same italic serif tagline. */
+            (#boot-loader section), which mirrors the title screen: same art,
+            same logo images. */
         #boot-loader {
             position: fixed; inset: 0; z-index: 99999;
             background: #0a0a12;
@@ -80,14 +88,14 @@
     <!-- BOOT LOADER (removed by js/boot-loader.js once title assets land)
          Styled exactly like the title screen so it reads as one continuous
          boot-up: same locked-ratio canvas, same background art, same STOXELS
-         logo image and italic serif "CARTOGRAPHERS OF CHANCE" tagline.
+         logo image and expansion logo image.
          A small stone progress bar + status line at the bottom replaces the
          old text-only loader. -->
     <div id="boot-loader">
         <div class="boot-canvas">
-            <img class="boot-bg-img" src="images/Title_Screen/Title_Background2.webp" alt="">
+            <img class="boot-bg-img" src="images/Title_Screen/RiseOfTheBeasts_TitleScreen_Background.webp" alt="">
             <img class="boot-logo-img" src="images/Title_Screen/STOXELS.webp" alt="STOXELS">
-            <div class="boot-sub">CARTOGRAPHERS OF CHANCE</div>
+            <img class="boot-expansion-logo" id="boot-expansion-logo" src="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" alt="Rise of the Beasts">
 
             <div class="boot-footer">
                 <div class="boot-bar"><div class="boot-fill" id="boot-fill"></div></div>
@@ -100,7 +108,7 @@
     <div id="screen-title" class="screen active">
 
         <!-- Background image fills the whole screen -->
-        <img class="title-bg-img" src="images/Title_Screen/Title_Background2.webp" alt="">
+        <img class="title-bg-img" src="images/Title_Screen/RiseOfTheBeasts_TitleScreen_Background.webp" alt="">
 
         <!-- All content sits in a container that matches the bg image's aspect ratio -->
         <div class="title-canvas">
@@ -108,8 +116,8 @@
             <!-- Logo image replaces the old <h1> text -->
             <img class="title-logo-img" src="images/Title_Screen/STOXELS.webp" alt="STOXELS">
 
-            <!-- Subtitle + version replace the old <p class="title-tag"> and title-version span -->
-            <div class="title-subtitle" data-t="scr_cartographers_tagline">CARTOGRAPHERS OF CHANCE</div>
+            <!-- Expansion logo (EN/DE swapped by setLang) — hover shows expansion history -->
+            <img class="title-expansion-logo" id="title-expansion-logo" src="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" alt="Rise of the Beasts">
             <div class="title-version-line">v0.28 BETA</div>
             <div class="title-ai-disclosure" data-t="scr_ai_disclosure">This game contains AI-generated art, sound, music, and code.</div>
             <div class="title-lang-overlay">
@@ -164,12 +172,8 @@
                 <span class="btn-label" data-t="scr_btn_changelog">📝 CHANGELOG</span>
             </button>
 
-            <!--
-            <button class="title-overlay-btn btn-danger" id="btn-reset"
-                    style="--bx: 50%; --by: 55%;">
-                <span class="btn-label" data-t="btn_reset">🗑 RESET</span>
-            </button>
-            -->
+            <!-- RESET button intentionally absent: ui-reset.js stays loaded for the
+                 save-slot delete flow (confirmSlotDelete via _pendingResetSlot). -->
 
             <!-- Decoration kept but hidden — initTitleDecoration() in main.js still runs safely -->
             <div class="title-deco" id="tdeco" style="display:none;"></div>
@@ -237,7 +241,7 @@
     <!-- SAVE SLOT SELECT SCREEN -->
     <div id="screen-save-slots" class="screen">
         <div class="ss-topbar">
-            <button class="back-btn" id="btn-save-slots-back" data-t="btn_back">◀ BACK</button>
+            <button class="back-btn back-btn-corner" id="btn-save-slots-back" data-t="btn_back">◀ BACK</button>
             <span class="ss-title" data-t="scr_save_file_title">SELECT SAVE FILE</span>
         </div>
         <div class="ss-grid" id="save-slots-grid"></div>
@@ -340,7 +344,7 @@
             </div>
             <!-- ============ END BOOK ============ -->
 
-            <button class="setup-back-corner-btn" id="btn-setup-back" data-t="btn_back">◀ BACK</button>
+            <button class="setup-back-corner-btn back-btn back-btn-corner" id="btn-setup-back" data-t="btn_back">◀ BACK</button>
             <div class="setup-btns">
                 <button class="title-btn setup-btn-img" id="btn-start-setup" data-t="btn_confirm">▶ SELECT LEVEL</button>
                 <button class="title-btn setup-btn-img" id="btn-enter-nexus-setup" data-t="scr_enter_nexus_short" style="display:none;">🌌 Enter the Nexus</button>
@@ -352,7 +356,7 @@
 
     <!-- TEMP: DEV MODE SELECT SCREEN — remove once Adventure Mode replaces the world map -->
     <div id="screen-mode-select" class="screen">
-        <button class="back-btn dms-back" id="btn-mode-select-back" data-t="btn_back">◀ BACK</button>
+        <button class="back-btn back-btn-corner dms-back" id="btn-mode-select-back" data-t="btn_back">◀ BACK</button>
         <div class="dms-wrap">
             <div class="dms-title" data-t="scr_select_mode">SELECT MODE</div>
             <div class="dms-sub"></div>
@@ -372,6 +376,48 @@
                     <div class="dms-card-title" data-t="scr_mode_endgame_test">🧪 Endgame</div>
                     <div class="dms-card-desc" data-t="scr_mode_endgame_test_desc">Test the upcoming Endgame Expansion.</div>
                 </button>
+
+                <!-- DEV SANDBOX: new passive tree layout playground -->
+                <button class="dms-card" id="btn-mode-passive-tree-dev">
+                    <div class="dms-card-title" data-t="scr_mode_passive_tree_dev">🌳 Passive Tree (Dev)</div>
+                    <div class="dms-card-desc" data-t="scr_mode_passive_tree_dev_desc">Design the new passive tree layout. Sandbox, not connected to gameplay.</div>
+                </button>
+            </div>
+
+            <!-- CHEAT: Character Lab — test all 30 char/class combos + animations -->
+            <button class="dms-charlab-btn" id="btn-char-lab" onclick="showCharLab()">🧪 CHARACTER LAB</button>
+        </div>
+    </div>
+
+    <!-- CHEAT: CHARACTER LAB MODAL (all 30 character/class combos) -->
+    <div id="charlab-modal" class="modal-bg">
+        <div class="cl-box">
+            <div class="cl-head">
+                <span class="cl-title">🧪 CHARACTER LAB</span>
+                <button class="cl-close" onclick="closeCharLab()">✕</button>
+            </div>
+            <div class="cl-body">
+                <div id="charlab-grid" class="cl-grid"></div>
+                <div class="cl-preview-pane">
+                    <div class="cl-preview-label" id="charlab-preview-label">—</div>
+                    <div class="cl-preview-stage">
+                        <img id="charlab-preview-img" class="cl-preview-img" alt="">
+                    </div>
+                    <div class="cl-preview-state" id="charlab-preview-state">idle (move-down)</div>
+                    <div class="cl-dir-row">
+                        <button class="cl-dir" onclick="_charLabWalkDir('up')" title="Walk up">⬆</button>
+                        <div class="cl-dir-mid">
+                            <button class="cl-dir" onclick="_charLabWalkDir('left')" title="Walk left">⬅</button>
+                            <button class="cl-dir" onclick="_charLabWalkDir('down')" title="Walk down">⬇</button>
+                            <button class="cl-dir" onclick="_charLabWalkDir('right')" title="Walk right">➡</button>
+                        </div>
+                    </div>
+                    <button class="cl-stop" onclick="_charLabStopPreview()">■ STOP</button>
+                    <div class="cl-portrait-label">menu portrait</div>
+                    <img id="charlab-preview-portrait" class="cl-portrait-img" alt="">
+                    <button class="cl-save" onclick="_charLabSaveCurrent()">💾 SAVE INTO CURRENT SLOT</button>
+                    <div class="cl-hint">◉ directional walk art · ○ missing (omni fallback)</div>
+                </div>
             </div>
         </div>
     </div>
@@ -379,7 +425,7 @@
     <!-- ADVENTURE MODE SANDBOX (stub) -->
     <div id="screen-adventure" class="screen">
         <div class="adv-topbar">
-            <button class="back-btn" id="btn-adventure-back" data-t="btn_back">◀ BACK</button>
+            <button class="back-btn back-btn-corner" id="btn-adventure-back" data-t="btn_back">◀ BACK</button>
             <span class="adv-title" data-t="scr_adventure_sandbox_title">ADVENTURE MODE — SANDBOX</span>
         </div>
         <div id="adv-canvas-wrap" class="adv-canvas-wrap"></div>
@@ -483,6 +529,39 @@
                 </button>
             </div>
 
+        </div>
+    </div>
+
+    <!-- SLOT NAME MODAL — names a save slot (✏️ button on the save-slot card) -->
+    <div id="slot-name-modal" class="modal-bg safe-center">
+        <div class="slot-name-box">
+            <button class="reset-close-btn" data-modal-close="slot-name-modal" data-t="reset_close">✕ CLOSE</button>
+
+            <div class="reset-header">
+                <div class="reset-icon-slot reset-header-slot">
+                    <div class="reset-header-icon reset-icon-gear"></div>
+                </div>
+                <div class="reset-title" id="slot-name-title" data-t="scr_slot_name_title">NAME SAVE SLOT {n}</div>
+                <div class="reset-icon-slot reset-header-slot">
+                    <div class="reset-header-icon reset-icon-swirl"></div>
+                </div>
+            </div>
+
+            <div class="slot-name-input-wrap">
+                <input type="text" id="slot-name-input" class="slot-name-input"
+                       placeholder="TYPE A NAME..." maxlength="20" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="slot-name-hint" data-t="scr_slot_name_hint">Leave empty to use the default slot number. Max 20 characters.</div>
+
+            <div class="reset-footer">
+                <button class="reset-btn reset-btn-confirm" id="btn-confirm-slot-name" data-t="scr_slot_name_save">
+                    SAVE NAME
+                </button>
+                <div class="reset-portal-deco"></div>
+                <button class="reset-btn reset-btn-cancel" id="btn-cancel-slot-name" data-t="reset_cancel">
+                    CANCEL
+                </button>
+            </div>
         </div>
     </div>
 
@@ -815,7 +894,7 @@
     <div id="screen-levels" class="screen">
         <div class="ls-topbar">
             <div class="ls-topbar-row1">
-                <button class="back-btn" id="btn-levels-back">◀ <span data-t="btn_setup">SETUP</span></button>
+                <button class="back-btn" id="btn-levels-back" data-t="btn_back">◀ BACK</button>
                 <span class="ls-title" data-t="ls_title">SELECT LEVEL</span>
                 <button id="btn-toggle-map-view" class="btn-toggle-view" data-t="scr_btn_map">🗺️ MAP VIEW</button>
                 <div class="ls-topbar-right">
@@ -838,7 +917,7 @@
     <!-- MAP - VIEW OF LEVEL SELECT SCREEN  -->
     <div id="screen-map-view" class="screen">
         <div class="ls-topbar">
-            <button class="back-btn" id="mv-btn-back"><span data-t="btn_setup">SETUP</span></button>
+            <button class="back-btn" id="mv-btn-back" data-t="btn_back">◀ BACK</button>
             <div class="mv-char-portrait-wrap" id="mv-char-portrait-wrap"></div>
             <div class="mv-ribbon-combined">
                 <span id="mv-ls-score"> 0</span>
@@ -848,6 +927,7 @@
 
             <div class="ls-topbar-right">
                 <span class="ls-class-status" id="mv-class-status"></span>
+                <button class="gtb-btn cc-token-btn" id="mv-btn-class-change" data-t="cls_change_btn_short" style="display:none;">🔄 CHANGE</button>
                 <button class="gtb-btn gtb-btn-inference" id="mv-btn-quest-log" data-t="btn_inference">
                     INFERENCE <span id="mv-quest-log-badge" class="quest-badge" style="display:none;">!</span>
                 </button>
@@ -864,8 +944,28 @@
     </div>
 
     <div id="screen-world-detail" class="screen">
-        <div class="wd-topbar" style="display: flex; gap: 15px; align-items: center; padding: 10px; background: rgba(0,0,0,0.1);">
-            <button id="btn-wd-back" class="btn-back" onclick="wdGoBackToMap()" data-t="scr_back_to_overworld">← BACK TO OVERWORLD</button>
+        <!-- Mirrors the overworld map-view topbar exactly (same assets, same
+             layout, wd- prefixed ids) — see css/map-view-topbar.css. The one
+             difference: the plaque shows the CURRENT WORLD NAME instead of
+             SELECT LEVEL. Populated by _wdBuildTopBar(). -->
+        <div class="ls-topbar">
+            <button class="back-btn" id="wd-btn-back" data-t="btn_back">◀ BACK</button>
+            <div class="mv-char-portrait-wrap" id="wd-char-portrait-wrap"></div>
+            <div class="mv-ribbon-combined">
+                <span id="wd-ls-score"> 0</span>
+                <span id="wd-ls-pts-next"></span>
+            </div>
+            <!-- (class-change token button lives in .ls-topbar-right below) -->
+            <span class="ls-title" id="wd-title-plaque">WORLD</span>
+
+            <div class="ls-topbar-right">
+                <span class="ls-class-status" id="wd-class-status"></span>
+                <button class="gtb-btn cc-token-btn" id="wd-btn-class-change" data-t="cls_change_btn_short" style="display:none;">🔄 CHANGE</button>
+                <button class="gtb-btn gtb-btn-inference" id="wd-btn-quest-log" data-t="btn_inference">
+                    INFERENCE <span id="wd-quest-log-badge" class="quest-badge" style="display:none;">!</span>
+                </button>
+                <button class="gtb-btn" id="wd-btn-passive-tree" data-t="tree">TREE</button>
+            </div>
         </div>
 
         <div id="wd-canvas-wrap" class="wd-canvas-wrap" style="position: relative; width: 100%; height: calc(100vh - 60px); overflow: hidden;">
@@ -908,9 +1008,10 @@
                     <span class="gtb-pen" id="pen-info"></span>
                 </div>
                 <span class="gtb-mistakes" id="mistake-counter">✗ 0</span>
-                <button class="touchpad-mode-btn hidden" id="btn-touchpad-mode" data-t="touchpad_btn_fill">
-                    🖊️ FILL
-                </button>
+                <!-- Clue-side toggles (CLUES ▶/◀, CLUES ▼/▲) — created by
+                     _buildRowClueToggle() in js/grid.js and appended into
+                     this slot, underneath the mistakes counter. -->
+                <div class="clue-toggle-slot" id="clue-toggle-slot"></div>
                 <div class="eg-bonus-loot-chance hidden" id="eg-bonus-loot-chance">
                     <span class="eg-bonus-loot-chance-icon">🎁</span>
                     <span class="eg-bonus-loot-chance-val" id="eg-bonus-loot-chance-val"></span>
@@ -948,6 +1049,14 @@
             <div class="puzzle-and-sidebar">
                 <div id="class-hud-panel"></div>
                 <div class="puzzle-scaler-wrap" id="puzzle-scaler-wrap">
+                    <!-- Touchpad FILL/MARK toggle — lives below the grid so
+                         it is easy to reach with a thumb / touchpad. Shown
+                         only when Settings → Touchpad Mode is enabled
+                         (updateTouchpadModeButtonVisibility() in
+                         js/mouse-button-handlers.js toggles .hidden). -->
+                    <button class="touchpad-mode-btn hidden" id="btn-touchpad-mode" data-t="touchpad_btn_fill">
+                        🖊️ FILL
+                    </button>
                     <div class="puzzle-scaler" id="puzzle-scaler">
                         <div class="puzzle-hud">
                         </div>
@@ -969,15 +1078,12 @@
 
     <!-- HIGHSCORES SCREEN -->
     <div id="screen-hs" class="screen hs-redesign">
+        <button class="back-btn" id="btn-hs-back" data-t="btn_back">◀ BACK</button>
         <div class="hs-scroll-frame">
 
-            <!-- top row: menu button (left) + title plaque (center) -->
+            <!-- top row: title plaque (center); back button is a direct
+                 child of the screen, anchored top-left via #screen-hs > .back-btn -->
             <div class="hs-top-row">
-                <button class="hs-menu-btn" id="btn-hs-back">
-                    <img class="hs-menu-btn-img" src="images/Highscore_Screen/return_to_menu_button.webp" alt="">
-                    <span class="hs-menu-btn-label"><span data-t="btn_menu">MENU</span></span>
-                </button>
-
                 <div class="hs-title-plaque">
                     <img class="hs-title-plaque-img" src="images/Highscore_Screen/highscores_header_stone.webp" alt="">
                     <span class="hs-title-plaque-label" data-t="hs_title">HIGHSCORES</span>
@@ -1031,11 +1137,17 @@
             <div class="bonus-list" id="bonus-list"></div>
             <div id="item-reward-zone"></div>
 
-            <div class="ov-btns ov-btns-2col">
-                <button class="ob s" id="btn-win-retry" data-t="btn_retry">REPLAY</button>
-                <button class="ob y" id="btn-win-retry-setup" data-t="btn_retry_setup">⟳ REPLAY (NEW SETUP)</button>
-                <button class="ob p" id="btn-next-lvl" data-t="btn_next">NEXT ▶</button>
-                <button class="ob s" id="btn-win-levels" data-t="btn_levels">LEVELS</button>
+            <div class="ov-btns ov-btns-win-grid">
+                <div class="ov-btns-col">
+                    <button class="ob s" id="btn-win-levels" data-t="btn_levels">LEVELS</button>
+                </div>
+                <div class="ov-btns-col">
+                    <button class="ob s" id="btn-win-retry" data-t="btn_retry">REPLAY</button>
+                    <button class="ob y" id="btn-win-retry-setup" data-t="btn_retry_setup">⟳ REPLAY (NEW SETUP)</button>
+                </div>
+                <div class="ov-btns-col">
+                    <button class="ob p" id="btn-next-lvl" data-t="btn_next">NEXT ▶</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1228,7 +1340,7 @@
     <!-- PROBABILITY TREE SCREEN -->
     <div class="screen" id="screen-passive-tree">
         <div class="pt-topbar">
-            <button class="gtb-btn" id="btn-pt-back" data-t="btn_back">◀ BACK</button>
+            <button class="back-btn" id="btn-pt-back" data-t="btn_back">◀ BACK</button>
             <span class="pt-title">🌿 <span data-t="scr_probability_tree">PROBABILITY TREE</span></span>
             <div id="pt-search-wrap"></div>
             <div id="pt-zoom-wrap">
@@ -1239,6 +1351,25 @@
             <span class="pt-points" id="pt-points"></span>
         </div>
         <div class="pt-canvas" id="pt-canvas"></div>
+    </div>
+
+    <!-- DEV SANDBOX: new passive tree layout playground (not connected to gameplay) -->
+    <div class="screen" id="screen-dev-passive-tree">
+        <div class="pt-topbar">
+            <button class="back-btn" id="btn-dpt-back" data-t="btn_back">◀ BACK</button>
+            <span class="pt-title">🌳 <span data-t="dpt_title">PASSIVE TREE — DEV</span></span>
+            <div id="dpt-search-wrap"></div>
+            <div id="dpt-zoom-wrap">
+                <span id="dpt-zoom-label">100%</span>
+                <input type="range" id="dpt-zoom-bar" min="0" max="100" value="50" step="1">
+            </div>
+            <button class="gtb-btn" id="btn-dpt-add-points" data-t="dpt_add_points_btn">+10 POINTS</button>
+            <button class="gtb-btn" id="btn-dpt-refund-all" data-t="dpt_refund_all_btn">♻ REFUND ALL</button>
+            <span class="pt-points" id="dpt-points"></span>
+            <span id="dpt-count"></span>
+        </div>
+        <div class="pt-canvas" id="dpt-canvas"></div>
+        <div class="dpt-hint" data-t="dpt_hint">CLICK: allocate / remove · SHIFT+CLICK / RIGHT-CLICK: unspend node + stranded branch · 🔍 search · ♻ refund all</div>
     </div>
 
     <!-- CONVERGENCE -->
@@ -1323,6 +1454,7 @@
             </div>
 
             <div class="pause-actions">
+                <button id="btn-pause-keybinds" data-t="btn_keybinds">⌨ KEYBINDS</button>
                 <button id="btn-pause-settings" data-t="btn_settings">⚙ SETTINGS</button>
                 <button class="gtb-btn" id="btn-go-levels" data-t="btn_levels">◀ LEVELS</button>
                 <button class="gtb-btn" id="btn-go-nexus" data-t="eg_return_to_nexus" style="display:none;">🌌 RETURN TO NEXUS</button>
@@ -1334,12 +1466,70 @@
 
 
 
-    <!-- SCRIPTS -->
+    <!-- SCRIPTS
+    ============================================================
+    SCRIPT LOAD ORDER — READ BEFORE MOVING ANYTHING.
+    This project has no module system: every file is global scope,
+    so ORDER IS SEMANTIC. Do not sort alphabetically or "by
+    dependency" blindly — the graph contains deliberate cycles that
+    only work because every cross-file call is deferred (event
+    handlers / runtime calls) or typeof-guarded.
+
+    HARD INVARIANTS (moving these breaks the game SILENTLY):
+    • The old LAST-DECLARED-WINS duplicate functions were consolidated
+      into single implementations in 2026-09 — DO NOT re-declare them
+      elsewhere:
+        _egShowTooltip        -> endgame-currency.js
+        _egRenderCurrencyCell -> endgame-hub-drag-and-drop.js
+        _egGenerateEquipmentDrop -> endgame-equipment-generator.js
+        _egBuildItemName + naming helpers -> endgame-mod-application.js
+          (a second _egBuildItemName/_egModNameEntry pair that read the
+          [enAdjective, enOfPhrase, deGenitive] dictionary in the wrong
+          slot order was deleted 2026-09-11 — do not re-add)
+        _egGetElementalDamageBonus -> endgame-combat-calculations.js
+        _egRemoveVeil         -> shared-boss-abilities.js
+        _egPtSegDist          -> shared-boss-abilities.js
+        _shuffleArray         -> class-probabilist.js
+    • boss-framework.js + shared-boss-abilities.js MUST precede
+      every boss-*.js (they Object.assign into EG_BOSS_DEFS /
+      EG_BOSS_MECHANICS at load time).
+    • asset-preload.js → boot-loader.js → main.js is the boot
+      sequence; main.js stays LAST.
+    • Cyclic-by-design clusters (deferred calls only — never
+      reorder files across these boundaries):
+        endgame-encounter.js ↔ bosses/* (typeof-guarded hooks)
+        class-abilities.js ↔ class-*.js
+        screens-map-view.js ↔ screens-level-select.js ↔ screens-world-levels.js
+        achievements.js ↔ achievements-ui.js
+        storyline-engine.js ↔ storyline-beats.js (beats loads LAST on purpose)
+    • The quests-* block MUST load BEFORE state.js: state.js's top-level
+      initState() → migrateOldSave() calls migrateQuestState() at load
+      time. Quest files themselves only touch STATE etc. from deferred
+      calls, so loading them early is safe. (A 2026-09 attempt to move
+      quests after the passive-tree family broke the migration call —
+      do NOT move this block.)
+
+    LOAD-TIME GUARDS:
+    • boot-loader.js runs a sanity check that warns in the console if a
+      script failed to load or was ordered wrong.
+    • boss-rosters.js (last boss file) validates every mechanic handler
+      name via _egValidateAllBossHandlers().
+    • Boss per-boss hooks are DATA, not if-blocks: EG_BOSS_TEARDOWN_HOOKS
+      (boss-framework.js) and EG_PLAYER_CHARGE_PAUSE_GATES
+      (endgame-encounter.js) — new bosses add one entry there.
+    • The dev sandbox tree (passive-tree-dev*.js, ~1 MB) is NOT loaded
+      here — ui-events.js injects it on first sandbox open.
+    • endgame-state.js owns EG_SCREEN_NAV + _egResolveBackFn for the
+      atlas/gate/nexus back-navigation strings.
+
+    CACHE-BUSTING: the ?v= param is per-file; bump it whenever that
+    file's content changes so players don't run stale scripts.
+    ============================================================ -->
     <script src="js/audio/audio-data.js"></script>
     <script src="js/audio/audio.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/keybinds.js"></script>
-    <script src="js/translation/translations-strings.js"></script>
+    <script src="js/translation/translations-strings.js?v=3"></script>
     <script src="js/translation/translations.js"></script>
     <script src="js/quests/quests-data.js"></script>
     <script src="js/quests/quests-stats.js"></script>
@@ -1347,7 +1537,7 @@
     <script src="js/quests/quests-styles.js"></script>
     <script src="js/quests/quests-ui.js"></script>
     <script src="js/screens/screens-save-slots.js"></script>
-    <script src="js/state.js"></script>
+    <script src="js/state.js?v=3"></script>
     <script src="js/difficulty-modifiers.js"></script>
     <script src="js/levels/level-world-data.js"></script>
     <script src="js/levels/levels.js"></script>
@@ -1375,7 +1565,7 @@
     <script src="js/puzzle-items/reveal.js"></script>
     <script src="js/puzzle-items/mark-wrong.js"></script>
     <script src="js/puzzle-items/add-time.js"></script>
-    <script src="js/puzzle-items/shield.js"></script>
+    <script src="js/puzzle-items/shield.js?v=2"></script>
     <script src="js/puzzle-items/freeze.js"></script>
     <script src="js/puzzle-items/mistake-eraser.js"></script>
     <script src="js/puzzle-items/scouts-primer-item.js"></script>
@@ -1397,11 +1587,11 @@
     <script src="js/puzzle-items/use-item.js"></script>
     <script src="js/puzzle-items/inventory-reshuffle.js"></script>
     <script src="js/puzzle-items/toasts-and-popups.js"></script>
-    <script src="js/codes.js"></script>
+    <script src="js/codes.js?v=2"></script>
     <script src="js/screens/screens-highscore.js"></script>
-    <script src="js/screens/screens-map-view.js"></script>
+    <script src="js/screens/screens-map-view.js?v=4"></script>
     <script src="js/screens/screens-world-levels-config.js"></script>
-    <script src="js/screens/screens-world-levels.js"></script>
+    <script src="js/screens/screens-world-levels.js?v=6"></script>
     <script src="js/screens/screens-level-select.js"></script>
     <script src="js/screens/screens.js"></script>
     <script src="js/puzzle-items/scouts-primer.js?v=2"></script>
@@ -1413,12 +1603,19 @@
     <script src="js/quiz-excercise/mathgate.js"></script>
     <script src="js/classes/class-defs.js"></script>
     <script src="js/classes/ascendency-defs.js"></script>
-    <script src="js/classes/class-cooldown-state.js"></script>
-    <script src="js/classes/class-ui.js"></script>
+    <script src="js/classes/class-cooldown-state.js?v=2"></script>
+    <script src="js/classes/class-ui.js?v=2"></script>
     <script src="js/classes/class-hud.js"></script>
     <script src="js/classes/class-hud-levelselect-tooltip.js"></script>
     <script src="js/classes/class-abilities.js"></script>
     <script src="js/classes/class-mana.js"></script>
+    <!-- Skill book / hotbar system (registry → tooltip → hotbar → spell book).
+         Loaded after the class defs + abilities so the registry can build
+         itself from CLASS_DEFS / ASCENDENCY_DEFS / ENDGAME_HEARTBLOOM_DEF. -->
+    <script src="js/skills/skill-registry.js"></script>
+    <script src="js/skills/skill-tooltip.js"></script>
+    <script src="js/skills/skill-hotbar.js"></script>
+    <script src="js/skills/skill-spellbook.js"></script>
     <script src="js/classes/class-statistician.js"></script>
     <script src="js/classes/class-mathmagician.js"></script>
     <script src="js/classes/class-probabilist.js"></script>
@@ -1430,17 +1627,20 @@
     <script src="js/classes/class-bayesian.js"></script>
     <script src="js/achievements/achievements.js"></script>
     <script src="js/achievements/achievements-data.js"></script>
-    <script src="js/achievements/achievements-ui.js"></script>
-    <script src="js/passive-tree/passive-tree-data.js"></script>
+    <script src="js/achievements/achievements-ui.js?v=2"></script>
+    <!-- Dev sandbox tree (passive-tree-dev-data.js, ~41k lines / 951 KB) is
+         NOT loaded here — it is injected on demand the first time the
+         sandbox is opened (see _loadDevPassiveTreeAndOpen in ui-events.js). -->
+    <script src="js/passive-tree/passive-tree-data.js?v=2"></script>
     <script src="js/passive-tree/passive-tree-state-points.js"></script>
-    <script src="js/passive-tree/passive-tree-ui.js"></script>
+    <script src="js/passive-tree/passive-tree-ui.js?v=2"></script>
     <script src="js/passive-tree/passive-tree-viewport.js"></script>
     <script src="js/passive-tree/passive-tree-special-nodes-logic.js"></script>
     <script src="js/passive-tree/passive-tree.js"></script>
     <script src="js/passive-tree/passive-tracker.js"></script>
     <script src="js/passive-tree/passive-effects.js"></script>
     <script src="js/passive-tree/passive-tree-expansion.js"></script>
-    <script src="js/sprite/character-select.js"></script>
+    <script src="js/sprite/character-select.js?v=2"></script>
     <script src="js/ui-events.js"></script>
     <script src="js/tooltips-hud.js?v=2"></script>
     <script src="js/changelog.js"></script>
@@ -1541,37 +1741,79 @@
     <script src="js/endgame/endgame-class-projectiles.js"></script>
     <script src="js/endgame/endgame-grid-pickups.js"></script>
     <script src="js/endgame/endgame-encounter.js"></script>
+    <!-- Split out of endgame-encounter.js 2026-09-10 (Pass 3). MUST load
+         AFTER endgame-encounter.js (their load-time code only touches
+         window / their own definitions). Tick before overlays: the tick
+         file owns the _egClearCenterGridBanners fallback guard. -->
+    <script src="js/endgame/endgame-encounter-tick.js"></script>
+    <script src="js/endgame/endgame-encounter-overlays.js"></script>
     <script src="js/endgame/endgame-encounter-chain.js"></script>
-    <script src="js/endgame/endgame-quiz-buffs.js"></script>
-    <script src="js/endgame/endgame-ailments.js"></script>
+    <script src="js/endgame/endgame-quiz-buffs.js?v=2"></script>
+    <script src="js/endgame/endgame-ailments.js?v=2"></script>
     <script src="js/endgame/endgame-ui.js"></script>
     <script src="js/endgame/endgame-screens.js"></script>
     <script src="js/endgame/endgame-atlas.js"></script>
-    <script src="js/endgame/endgame-atlas-ui.js"></script>
+    <script src="js/endgame/endgame-atlas-ui.js?v=2"></script>
     <script src="js/endgame/endgame-equipment-base-items.js"></script>
     <script src="js/endgame/endgame-implicits.js"></script>
     <script src="js/endgame/endgame-art.js"></script>
-    <script src="js/endgame/endgame-equipment-generator.js"></script>
     <script src="js/endgame/endgame-unique-items.js"></script>
     <script src="js/endgame/endgame-equipment-tooltip.js"></script>
     <script src="js/endgame/endgame-leveling.js"></script>
-    <script src="js/endgame/endgame-hub.js"></script>
+    <!-- Split out of endgame-hub.js 2026-09-10 (Pass 3). hub-uniques MUST
+         load BEFORE hub.js (hub.js's load-time _egLoadHubState calls
+         _egEnsureUniqueStash unguarded); hub-tooltips loads AFTER hub.js. -->
+    <script src="js/endgame/endgame-hub-uniques.js"></script>
+    <script src="js/endgame/endgame-hub.js?v=2"></script>
+    <script src="js/endgame/endgame-hub-tooltips.js"></script>
     <script src="js/endgame/endgame-hub-drag-and-drop.js"></script>
-    <script src="js/endgame/endgame-gate.js"></script>
-    <script src="js/endgame/endgame-nexus.js"></script>
-    <script src="js/endgame/endgame-boss-test.js"></script>
+    <script src="js/endgame/endgame-gate.js?v=2"></script>
+    <script src="js/endgame/endgame-nexus.js?v=2"></script>
+    <script src="js/endgame/endgame-boss-test.js?v=2"></script>
     <script src="js/endgame/endgame-currency.js"></script>
     <script src="js/endgame/endgame-crafting-costs.js"></script>
     <script src="js/endgame/endgame-crafting-bench.js"></script>
     <script src="js/endgame/endgame-essences.js"></script>
     <script src="js/endgame/endgame-shards.js"></script>
     <script src="js/endgame/endgame-loot-filter.js"></script>
-    <script src="js/endgame/endgame-mod-tables.js"></script>
+    <!-- endgame-mod-tables.js split per slot 2026-09-10 (Pass 3). Order
+         among the tables is free; endgame-mod-tables-rebalance.js MUST
+         load after every table (it evals each EG_MOD_TABLE_* at load
+         time). The equipment generator moved down here 2026-09-11 (Pass
+         6): endgame-mod-application.js (its naming/mod-application half)
+         needs the name-words dictionary, and generator.js calls into it
+         at load time via _egGenerateEquipmentDrop. -->
+    <script src="js/endgame/endgame-mod-name-words.js"></script>
+    <script src="js/endgame/endgame-mod-tables-head.js"></script>
+    <script src="js/endgame/endgame-mod-tables-earring.js"></script>
+    <script src="js/endgame/endgame-mod-tables-amulet.js"></script>
+    <script src="js/endgame/endgame-mod-tables-shoulders.js"></script>
+    <script src="js/endgame/endgame-mod-tables-cloak.js"></script>
+    <script src="js/endgame/endgame-mod-tables-chest.js"></script>
+    <script src="js/endgame/endgame-mod-tables-bracers.js"></script>
+    <script src="js/endgame/endgame-mod-tables-gloves.js"></script>
+    <script src="js/endgame/endgame-mod-tables-belt.js"></script>
+    <script src="js/endgame/endgame-mod-tables-pants.js"></script>
+    <script src="js/endgame/endgame-mod-tables-boots.js"></script>
+    <script src="js/endgame/endgame-mod-tables-ring.js"></script>
+    <script src="js/endgame/endgame-mod-tables-arcane.js"></script>
+    <script src="js/endgame/endgame-mod-tables-talisman.js"></script>
+    <script src="js/endgame/endgame-mod-tables-weapon1.js"></script>
+    <script src="js/endgame/endgame-mod-tables-weapon-2h.js"></script>
+    <script src="js/endgame/endgame-mod-tables-weapon2.js"></script>
+    <script src="js/endgame/endgame-mod-tables-shield.js"></script>
+    <script src="js/endgame/endgame-mod-tables-rebalance.js"></script>
+    <!-- Pass 6: mod application + naming extracted from the generator.
+         application BEFORE generator (generator's load-time override
+         calls _egBuildItemName / _egRollMods from application). -->
+    <script src="js/endgame/endgame-mod-application.js"></script>
+    <script src="js/endgame/endgame-equipment-generator.js"></script>
     <script src="js/endgame/endgame-maps.js"></script>
     <script src="js/endgame/endgame-gold.js"></script>
-    <script src="js/endgame/endgame-vendor.js"></script>
+    <script src="js/endgame/endgame-vendor.js?v=2"></script>
     <script src="js/sprite/sprite_animations.js"></script>
-    <script src="js/sprite/player_sprite.js"></script>
+    <script src="js/sprite/player_sprite.js?v=6"></script>
+    <script src="js/sprite/cheat-combo-picker.js"></script>
     <script src="js/sprite/character-banter.js"></script>
     <script src="js/classes/targeting-reticle.js"></script>
     <script src="js/storyline/storyline-engine.js"></script>
@@ -1580,14 +1822,15 @@
     <script src="js/storyline/storyline-intro-trix.js"></script>
     <script src="js/storyline/storyline-intro-syla.js"></script>
     <script src="js/storyline/storyline-beats.js"></script>
-    <script src="js/endgame-testing-screen.js"></script>
+    <script src="js/endgame-testing-screen.js?v=2"></script>
     <script src="js/endgame/endgame-puzzle-generator.js"></script>
     <script src="js/endgame/endgame-map-launch.js"></script>
     <script src="js/endgame/endgame-hazards.js"></script>
     <script src="js/adventure-mode.js"></script>
 
-    <script src="js/asset-preload.js"></script>
+    <script src="js/asset-preload.js?v=2"></script>
     <script src="js/boot-loader.js"></script>
+    <script src="js/dev-testing.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

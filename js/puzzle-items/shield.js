@@ -30,8 +30,11 @@ function _useShield(id, def) {
         + (ptHasSkill('cursed_ward_2') ? 5 : 0)
         + (ptHasSkill('cursed_ward_3') ? 5 : 0);
     if (cursedImmunitySecs > 0) {
-        window._cursedImmune = true;
-        setTimeout(() => { window._cursedImmune = false; }, cursedImmunitySecs * 1000);
+        window.STOX_FLAGS.cursedImmune = true;
+        // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev-testing.js)
+        const scale = (window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
+            ? window.STOX_EFFECT_TIME_SCALE : 1;
+        setTimeout(() => { window.STOX_FLAGS.cursedImmune = false; }, cursedImmunitySecs * scale * 1000);
         showToast(t('itm_cursed_warded'));
     }
 

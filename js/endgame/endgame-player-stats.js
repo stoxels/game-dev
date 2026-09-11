@@ -937,14 +937,11 @@ function _egRollCrit(stats) {
     return 1;
 }
 
-// Rolls the total flat elemental damage bonus (fire+cold+lightning+shadow) for one hit.
-function _egGetElementalDamageBonus(stats) {
-    const roll = (min, max) => (min > 0 || max > 0) ? min + Math.random() * (max - min) : 0;
-    return roll(stats.fireDmgMin, stats.fireDmgMax)
-        + roll(stats.coldDmgMin, stats.coldDmgMax)
-        + roll(stats.lightningDmgMin, stats.lightningDmgMax)
-        + roll(stats.shadowDmgMin, stats.shadowDmgMax);
-}
+// _egGetElementalDamageBonus (rolls the total flat elemental damage bonus
+// for one hit) is defined ONCE, in endgame-combat-calculations.js (it sums
+// _egRollElementalBreakdown — identical math). The copy that used to live
+// here was removed 2026-09; it was silently shadowed by the later file via
+// load order, so behaviour is unchanged.
 
 
 //------------------------------------------------------------------------

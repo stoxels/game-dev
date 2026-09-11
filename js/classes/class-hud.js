@@ -556,44 +556,14 @@ function renderCompactHUD(def) {
         ? '<div id="chud-momentum-bar-wrap"><div id="chud-momentum-bar"></div><span id="chud-momentum-count"></span></div>'
         : '';
 
-    // The mana bar sits above the drag handle and shows the current mana pool.
-    const manaBar = `
-        <div id="chud-mana-bar-wrap">
-            <div id="chud-mana-fill"></div>
-            <span id="chud-mana-text"></span>
-        </div>`;
-
-    // Button layout: single row (1×2) for base class, 2×2 grid once an
-    // ascendency is active so 1/2 and 3/4 sit in two rows. The universal
-    // Heartbloom (active5) always occupies third row, first col (5th ability).
-    // Hidden placeholders reserve the second row when no ascendency is active
-    // so the heart stays visually in row 3 as requested.
-    let buttonsHTML = '';
-    if (STATE.playerAscendency && ASCENDENCY_DEFS[STATE.playerAscendency]) {
-        const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
-        buttonsHTML = `
-            <div class="chud-btn-grid chud-btn-grid--asc chud-btn-grid--with-heart">
-                ${renderCompactActiveBtn(def, 'active1')}
-                ${renderCompactActiveBtn(def, 'active2')}
-                ${renderCompactAscBtn(asc, 'active3', 'active1')}
-                ${renderCompactAscBtn(asc, 'active4', 'active2')}
-                ${renderHeartbloomBtn()}
-                <span class="chud-btn-placeholder" style="visibility:hidden"></span>
-            </div>`;
-    } else {
-        buttonsHTML = `
-            <div class="chud-btn-grid chud-btn-grid--with-heart">
-                ${renderCompactActiveBtn(def, 'active1')}
-                ${renderCompactActiveBtn(def, 'active2')}
-                <span class="chud-btn-placeholder" style="visibility:hidden; min-width:44px"></span>
-                <span class="chud-btn-placeholder" style="visibility:hidden; min-width:44px"></span>
-                ${renderHeartbloomBtn()}
-                <span class="chud-btn-placeholder" style="visibility:hidden"></span>
-            </div>`;
-    }
+    // NOTE: the active-skill buttons and the mana bar used to live here.
+    // They have moved to the skill hotbar (js/skills/skill-hotbar.js) and the
+    // player sprite (player_sprite.js) respectively. What remains is the
+    // CLASS STATUS widget: drag grip, passive-skill icon + tooltip, the
+    // Variance Shield pips and the Statistician momentum bar — none of which
+    // the hotbar can express.
 
     return `
-        ${manaBar}
         <div id="class-hud-drag-handle" ${shieldAttr}>
             <span class="chud-grip">⠿</span>
             <span class="chud-icon-sm"
@@ -603,7 +573,6 @@ function renderCompactHUD(def) {
                   onmouseleave="hideHUDTooltip()">
                 ${def.icon}
             </span>
-            ${buttonsHTML}
             ${shieldPips}
         </div>
         ${momentumBar}`;
@@ -652,12 +621,16 @@ function buildClassHUD() {
     panel.style.display = 'flex';
     panel.innerHTML = renderCompactHUD(def);
 
-    // Patch the mana bar with the current pool values after the rebuild.
+    // Patch the mana bar (now on the player sprite) with the current values.
     if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
 
     _updatePanelShieldAttribute(panel);
     injectCompactHUDStyles(def);
     makeClassHUDDraggable();
+
+    // Keep the skill hotbar in sync — it is rebuilt on every class/level/
+    // ability change too, so the two never drift apart.
+    if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
 
     // If the Drifter timer is running, keep the badge docked
     if (window._drifterHudInterval && typeof remainingSeconds !== 'undefined' && remainingSeconds > 0) {

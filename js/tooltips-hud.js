@@ -321,7 +321,7 @@ function _buildModTombstoneTooltipHTML(btn) {
     return desc ? desc.innerHTML : '';
 }
 
-// 7. Title-screen "CARTOGRAPHERS OF CHANCE" subtitle — expansion history.
+// 7. Title-screen expansion logo — expansion history.
 // Newest expansion first, then older ones: Expansion 2 (upcoming),
 // Expansion 1 (current), Base Game.
 function _buildExpansionHistoryTooltipHTML() {
@@ -428,10 +428,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (to !== btn) hideGameTooltip();
     });
 
-    // Title screen "CARTOGRAPHERS OF CHANCE" subtitle → expansion-history tooltip.
-    // Uses the bounding-box hover engine so the subtitle can stay interactive
+    // Title screen expansion logo ("Rise of the Beasts" EN/DE) → expansion-history tooltip.
+    // Uses the bounding-box hover engine so the logo stays interactive
     // for the tooltip while still sitting inside the title canvas.
-    _wireHoverByRect(document.querySelector('.title-subtitle'), _buildExpansionHistoryTooltipHTML);
+    _wireHoverByRect(document.getElementById('title-expansion-logo'), _buildExpansionHistoryTooltipHTML);
 
     // Setup-screen modifier tombstones → per-tombstone effect text on hover.
     // Delegated on the static #screen-setup element (the tombstones are

@@ -475,15 +475,9 @@ function _egMechBlmVeil(monster, phase) {
 // Bayes's copy (boss-bayes.js loads first, boss-bloom.js last) — behaviour
 // is a superset: the element goes away either way, and both bosses' tint
 // classes are stripped so either boss's teardown leaves a clean grid.
-function _egRemoveVeil() {
-    if (typeof _egVeilActive !== 'undefined') _egVeilActive = false;
-    const veil = document.getElementById('eg-grid-veil');
-    if (veil) {
-        veil.classList.remove('eg-blm-veil-tinted', 'eg-bay-veil-tinted', 'eg-blm-veil-open');
-        veil.style.removeProperty('--blm-wilt');
-        veil.remove();
-    }
-}
+// _egRemoveVeil is defined ONCE, in shared-boss-abilities.js (consolidated
+// 2026-09 from this file and boss-bayes.js — this version's behaviour is
+// the merged one).
 
 
 //------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 
 // goldenClock — halts the timer until 3 more mistakes are made.
 function _useGoldenClock(id, def) {
-    window._goldenClockActive = true;
+    window.STOX_FLAGS.goldenClockActive = true;
     window._goldenClockMistakesLeft = 3;
     playItemEffect(id);
 

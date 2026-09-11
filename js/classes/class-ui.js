@@ -318,9 +318,148 @@ function checkWorldCompletion() {
     if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
     if (STATE.classWorldsCompleted.includes(wi)) return;
 
+    // Nexus World special case: its Ascension Level grants a one-time
+    // CLASS CHANGE TOKEN instead of the normal upgrade/ascendency flow.
+    // The token is spent from the class-change screen (topbar button).
+    if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
+        grantClassChangeToken(wi);
+        return;
+    }
+
     STATE._pendingClassEvent = true;
     STATE._lastClassWorld = wi;
     save();
+}
+
+
+
+
+//------------------------------------------------------------------------
+//-------------------CLASS CHANGE TOKENS----------------------------------
+//------------------------------------------------------------------------
+// The Nexus Ascension Level (and, in the future, endgame sources) grant
+// class-change tokens. Spending one lets the player pick a new base class;
+// every class upgrade and the ascendency already earned are replayed on the
+// new class (the spent worlds' upgrade list is carried over 1:1).
+
+// Grants one class-change token (once per Nexus completion).
+function grantClassChangeToken(wi) {
+    if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
+    if (!STATE.classWorldsCompleted.includes(wi)) STATE.classWorldsCompleted.push(wi);
+    STATE._lastClassWorld = wi;
+
+    if (STATE.classChangeTokens === undefined) STATE.classChangeTokens = 0;
+    STATE.classChangeTokens++;
+    save();
+
+    if (typeof showToast === 'function') showToast(t('cls_change_token_toast'));
+    Audio_Manager.playSFX('classSelected');
+
+    // The topbars read token state on populate — refresh both entry buttons.
+    if (typeof updateClassChangeButtons === 'function') updateClassChangeButtons();
+}
+
+// Returns how many class-change tokens the player currently holds.
+function getClassChangeTokens() {
+    return STATE.classChangeTokens || 0;
+}
+
+// Shows/hides the topbar class-change buttons (mv + wd) based on token count.
+function updateClassChangeButtons() {
+    ['mv', 'wd'].forEach(p => {
+        const btn = document.getElementById(p + '-btn-class-change');
+        if (btn) btn.style.display = getClassChangeTokens() > 0 ? '' : 'none';
+    });
+}
+
+// Opens the class-change screen (token-gated entry point).
+function showClassChange() {
+    if (getClassChangeTokens() <= 0) return;
+    showClassChangeSelection();
+}
+
+// The class-change screen: same card grid as the initial class selection,
+// but the current class is marked, the CTA consumes a token, and the
+// subtitle explains what happens to progression.
+function showClassChangeSelection() {
+    const title = t('cls_change_title');
+    const subtitle = t('cls_change_sub')
+        .replace('{n}', getClassChangeTokens())
+        .replace('{old}', STATE.playerClass ? _clsGetLocalizedName(CLASS_DEFS[STATE.playerClass]) : '—');
+
+    const header = buildOverlayHeader(`🔄 ${title}`, subtitle);
+    const cards = CLASS_LIST.map(cid => buildClassCard(cid, 'change')).join('');
+
+    openClassOverlay(`
+        ${header}
+        <div class="cs-cards">${cards}</div>
+        <div id="cs-tooltip" class="cs-tooltip"></div>
+    `, 'class-change');
+
+    Audio_Manager.playSFX('classSelection');
+}
+
+// Consumes one class-change token and switches the base class.
+// Ascendency + all skill levels are reset, but every world-upgrade the
+// player has already banked is replayed on the new class, in order:
+// base upgrades → ascendency selection → ascendency upgrades.
+function confirmClassChange(cid) {
+    if (!CLASS_DEFS[cid]) return;
+    if (getClassChangeTokens() <= 0) return;
+    if (cid === STATE.playerClass) { hideClassTooltip(); return; } // no-op pick
+
+    STATE.classChangeTokens--;
+    STATE.classChangeUsed = true;
+
+    // Full reset of the class + ascendency progression...
+    STATE.playerClass = cid;
+    STATE.playerAscendency = null;
+    STATE.classPassiveLevel = 1;
+    STATE.classActive1Level = 1;
+    STATE.classActive2Level = 1;
+    STATE.classActiveLevel = 1;
+    STATE.classActiveChoice = 'active1';
+    STATE.ascendencySkill1Level = 1;
+    STATE.ascendencySkill2Level = 1;
+
+    // ...then replay the earned upgrade flow on the new class: every
+    // previously-completed world except the Nexus world itself queues one
+    // class event (the very first of those was the original class CHOICE,
+    // not an upgrade, so it doesn't count). The router serves them in the
+    // correct order: base upgrades → ascendency selection → ascendency
+    // upgrades, exactly as if the worlds had been completed in sequence.
+    const nexusWi = (typeof NEXUS_WORLD_INDEX !== 'undefined') ? NEXUS_WORLD_INDEX : 13;
+    const eventsToReplay = Math.max(0,
+        (STATE.classWorldsCompleted || []).filter(w => w !== nexusWi).length - 1);
+    STATE._classChangeReplayRemaining = eventsToReplay;
+    // The replayed upgrades must not push worlds into classWorldsCompleted
+    // again — clear the pointer so markLastWorldCompleted() no-ops.
+    STATE._lastClassWorld = null;
+
+    save();
+
+    const def = CLASS_DEFS[cid];
+    Audio_Manager.playSFX('classSelected');
+    showToast(`🔄 ${_clsGetLocalizedName(def)} ${t('cls_selected_toast')}`);
+    updateQuestStats('classChosen', {});
+
+    closeClassOverlay();
+    buildClassHUD();
+    serveClassChangeReplay();
+    if (typeof updateClassChangeButtons === 'function') updateClassChangeButtons();
+}
+
+// Serves the next queued class-change replay event, if any. Called after
+// the class-change confirmation and after every progression-advancing
+// applier (applyClassUpgrade, confirmAscendencySelection,
+// applyAscendencyUpgrade) so the replayed events chain back-to-back.
+function serveClassChangeReplay() {
+    const left = STATE._classChangeReplayRemaining || 0;
+    if (left <= 0) return;
+    STATE._classChangeReplayRemaining = left - 1;
+    STATE._pendingClassEvent = true;
+    save();
+    setTimeout(() => { triggerClassEventIfPending(); }, AFTER_CLASS_EVENT_DELAY_MS);
 }
 
 
@@ -360,15 +499,22 @@ function buildClassTooltipContent(def) {
 function buildClassCard(cid, mode) {
     const def = CLASS_DEFS[cid];
 
-    const cta = mode === 'select'
-        ? `<div class="cs-card-cta" onclick="confirmClassSelection('${cid}')">${t('cls_btn_select')}</div>`
-        : '';
+    let cta = '';
+    if (mode === 'select') {
+        cta = `<div class="cs-card-cta" onclick="confirmClassSelection('${cid}')">${t('cls_btn_select')}</div>`;
+    } else if (mode === 'change') {
+        // Class-change screen: the current class gets a badge instead of a CTA;
+        // every other class spends a token via confirmClassChange().
+        cta = (cid === STATE.playerClass)
+            ? `<div class="cc-current-tag">${t('cls_change_current_tag')}</div>`
+            : `<div class="cs-card-cta" onclick="confirmClassChange('${cid}')">${t('cls_change_btn').replace('{n}', getClassChangeTokens())}</div>`;
+    }
 
     const name = _clsGetLocalizedName(def);
     const desc = _clsGetLocalizedDesc(def);
 
     return `
-        <div class="cs-card"
+        <div class="cs-card${mode === 'change' && cid === STATE.playerClass ? ' cc-current' : ''}"
              style="border-color:${def.color};--cls-color:${def.color};--cls-light:${def.colorLight};"
              data-classid="${cid}">
             <div class="cs-card-icon">${def.icon}</div>
@@ -572,9 +718,14 @@ function decrementUpgradesAvailable() {
 }
 
 // Appends the last completed world index to the classWorldsCompleted list.
+// Guards against null and duplicates (class-change replay sets _lastClassWorld
+// to null so replayed upgrades don't pollute the completion list).
 function markLastWorldCompleted() {
     if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
-    STATE.classWorldsCompleted.push(STATE._lastClassWorld);
+    const wi = STATE._lastClassWorld;
+    if (wi === null || wi === undefined) return;
+    if (STATE.classWorldsCompleted.includes(wi)) return;
+    STATE.classWorldsCompleted.push(wi);
 }
 
 // Shows a toast confirming which ability was upgraded and to what level.
@@ -598,6 +749,7 @@ function applyClassUpgrade(type) {
     closeClassOverlay();
     showClassUpgradeToast(type);
     buildClassHUD();
+    serveClassChangeReplay();
 }
 
 
@@ -713,6 +865,7 @@ function confirmAscendencySelection(aid) {
     trackAchStat('ascendencyChosen');
     closeClassOverlay();
     buildClassHUD();
+    serveClassChangeReplay();
 }
 
 
@@ -848,6 +1001,7 @@ function applyAscendencyUpgrade(type) {
     trackAchStat('ascendencyUpgradesApplied');
     closeClassOverlay();
     buildClassHUD();
+    serveClassChangeReplay();
 }
 
 

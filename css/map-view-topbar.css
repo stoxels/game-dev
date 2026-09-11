@@ -42,14 +42,24 @@
    1. TOPBAR ROOT — flex row that wraps once it runs out of room
    --------------------------------------------------------- */
 
-#screen-map-view .ls-topbar {
+#screen-map-view .ls-topbar,
+#screen-world-detail .ls-topbar {
     display: flex;
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
     row-gap: clamp(4px, 1vw, 8px);
-    background-image: url('../images/Level_Select_Topbar/topbar-stone-background.webp');
-    background-size: auto;
+    /* Seamless stone tile (cut + seam-fixed from the original full-screen
+       background art by tools_make_tile.py). The original 668x373 image is a
+       vignetted screen background with fully transparent side margins — tiled
+       with repeat-x it produced a hard transparent seam every 668px (visible
+       as vertical texture breaks across the bar). The 578x140 tile uses a
+       natural-match wrap window (no edge morphing — the first attempt's 40px
+       ramp sheared the cracks into horizontal streaks), so the wrap boundary
+       is invisible and the stone stays sharp edge to edge. */
+    background-color: #4f485c; /* tile mean — paints during image load */
+    background-image: url('../images/Level_Select_Topbar/topbar-stone-tile2.webp');
+    background-size: auto 100%;
     background-repeat: repeat-x;
     background-position: center;
     border-bottom: 2px solid #5a3a14;
@@ -62,39 +72,20 @@
 
 
 /* ---------------------------------------------------------
-   2. SETUP (back) BUTTON
+   2. SETUP (back) BUTTON — the unified .back-btn stone slab (base.css).
+      The topbar only shrinks the slab a little to fit the bar height.
    --------------------------------------------------------- */
 
-#screen-map-view #mv-btn-back {
-    font-family: var(--PX, monospace);
-    font-size: clamp(9px, 1.4vw, 17px);
-    font-weight: bold;
-    letter-spacing: 1px;
-    color: #f5e9c8;
-    background: url('../images/Level_Select_Topbar/back-arrow.webp') center / 100% 100% no-repeat;
-    height: auto;
-    width: clamp(90px, 15vw, 200px);
-    aspect-ratio: 2.5 / 1;
-    box-sizing: border-box;
-    border: none;
-    /* Push text toward the right/center — the arrow graphic is on the left of the image */
-    padding: 0 clamp(6px, 2vw, 12px) 0 clamp(28px, 9vw, 70px);
-    cursor: pointer;
-    text-shadow: 1px 1px 3px #000, 0 0 8px rgba(0,0,0,0.8);
-    transition: filter 0.15s, transform 0.1s;
-    white-space: nowrap;
-    flex-shrink: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+#screen-map-view #mv-btn-back,
+#screen-world-detail #wd-btn-back {
+    font-size: clamp(10px, 1.2vw, 14px);
+    min-width: clamp(96px, 12vw, 160px);
+    padding: 10px 18px;
 }
 
-    #screen-map-view #mv-btn-back:hover {
+    #screen-map-view #mv-btn-back:hover,
+    #screen-world-detail #wd-btn-back:hover {
         filter: brightness(1.25);
-    }
-
-    #screen-map-view #mv-btn-back:active {
-        transform: translateY(1px);
     }
 
 
@@ -102,7 +93,8 @@
    3. CHARACTER SPRITE PORTRAIT
    --------------------------------------------------------- */
 
-#screen-map-view .mv-char-portrait-wrap {
+#screen-map-view .mv-char-portrait-wrap,
+#screen-world-detail .mv-char-portrait-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -116,12 +108,14 @@
     transition: filter 0.15s, border-color 0.15s;
 }
 
-    #screen-map-view .mv-char-portrait-wrap:hover {
+    #screen-map-view .mv-char-portrait-wrap:hover,
+    #screen-world-detail .mv-char-portrait-wrap:hover {
         filter: brightness(1.2);
         border-color: #c8a84b;
     }
 
-#screen-map-view .mv-char-portrait-img {
+#screen-map-view .mv-char-portrait-img,
+#screen-world-detail .mv-char-portrait-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -133,7 +127,8 @@
    4. COMBINED SCORE + DIFFICULTY RIBBON (single scroll)
    --------------------------------------------------------- */
 
-#screen-map-view .mv-ribbon-combined {
+#screen-map-view .mv-ribbon-combined,
+#screen-world-detail .mv-ribbon-combined {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -151,7 +146,8 @@
 }
 
 /* Line 1 — total score (e.g. "TOTAL: 2939") */
-#screen-map-view #mv-ls-score {
+#screen-map-view #mv-ls-score,
+#screen-world-detail #wd-ls-score {
     font-size: clamp(9px, 1.3vw, 15px);
     font-weight: bold;
     color: #ffffff;
@@ -160,7 +156,8 @@
 }
 
 /* Line 2 — points to next code */
-#screen-map-view #mv-ls-pts-next {
+#screen-map-view #mv-ls-pts-next,
+#screen-world-detail #wd-ls-pts-next {
     font-size: clamp(7px, 1vw, 11px);
     color: #010101;
     opacity: 1;
@@ -174,7 +171,8 @@
    overlap the buttons on either side, at any width.
    --------------------------------------------------------- */
 
-#screen-map-view .ls-title {
+#screen-map-view .ls-title,
+#screen-world-detail .ls-title {
     flex: 1 1 clamp(140px, 30vw, 500px);
     min-width: 0;
     max-width: 700px;
@@ -185,8 +183,17 @@
     font-size: clamp(11px, 2.6vw, 30px);
     letter-spacing: clamp(1px, 0.5vw, 6px);
     color: #f0d090;
-    background: url('../images/Level_Select_Topbar/banner-title.webp') center / 100% 100% no-repeat;
-    height: clamp(40px, 8vw, 90px);
+    /* Cropped plaque art (banner-title-plaque.webp = the true art bounds of
+       banner-title.webp, which was drawn on a 668x373 full-screen canvas and
+       previously squashed into a thin strip with huge invisible transparent
+       padding). Stretch the plaque over the FULL topbar height: the bar's
+       height is portrait (clamp 56-100px) + 2x padding, so size the title to
+       exactly that and pull it out over the padding with negative margins —
+       the texture then touches the bar's top edge and bottom border. */
+    background: url('../images/Level_Select_Topbar/banner-title-plaque.webp') center / 100% 100% no-repeat;
+    height: calc(clamp(56px, 8vw, 100px) + 2 * clamp(4px, 1vw, 6px));
+    margin-top: calc(-1 * clamp(4px, 1vw, 6px));
+    margin-bottom: calc(-1 * clamp(4px, 1vw, 6px));
     box-sizing: border-box;
     padding: 0 clamp(4px, 1vw, 10px);
     text-shadow: 1px 1px 0 #000, 2px 2px 4px #000, 0 0 18px rgba(255, 200, 80, 0.35);
@@ -200,7 +207,8 @@
    6. RIGHT-SIDE BADGE GROUP
    --------------------------------------------------------- */
 
-#screen-map-view .ls-topbar-right {
+#screen-map-view .ls-topbar-right,
+#screen-world-detail .ls-topbar-right {
     margin-left: auto;
     display: flex;
     position: relative;
@@ -213,7 +221,8 @@
 }
 
 /* Class status badge */
-#screen-map-view #mv-class-status {
+#screen-map-view #mv-class-status,
+#screen-world-detail #wd-class-status {
     font-family: var(--PX, monospace);
     font-size: clamp(8px, 1vw, 11px);
     background: rgba(0, 0, 0, 0.45);
@@ -227,7 +236,8 @@
     text-shadow: 1px 1px 2px #000;
 }
 
-    #screen-map-view #mv-class-status:empty {
+    #screen-map-view #mv-class-status:empty,
+    #screen-world-detail #wd-class-status:empty {
         display: none;
     }
 
@@ -238,7 +248,9 @@
    of each image stays visible.
 */
 #screen-map-view #mv-btn-quest-log,
-#screen-map-view #mv-btn-passive-tree {
+#screen-world-detail #wd-btn-quest-log,
+#screen-map-view #mv-btn-passive-tree,
+#screen-world-detail #wd-btn-passive-tree {
     font-family: var(--PX, monospace);
     font-size: clamp(7px, 0.9vw, 10px);
     letter-spacing: 1px;
@@ -262,37 +274,44 @@
     transition: filter 0.15s;
 }
 
-#screen-map-view #mv-btn-quest-log {
+#screen-map-view #mv-btn-quest-log,
+#screen-world-detail #wd-btn-quest-log {
     background: url('../images/Level_Select_Topbar/Inference-Block.webp') center / 100% 100% no-repeat;
 }
 
-#screen-map-view #mv-btn-passive-tree {
+#screen-map-view #mv-btn-passive-tree,
+#screen-world-detail #wd-btn-passive-tree {
     background: url('../images/Level_Select_Topbar/Probability-Tree-Block.webp') center / 100% 100% no-repeat;
     color: #f0d090 !important; /* override any inline JS color */
 }
 
     #screen-map-view #mv-btn-quest-log:hover,
-    #screen-map-view #mv-btn-passive-tree:hover {
+    #screen-world-detail #wd-btn-quest-log:hover,
+    #screen-map-view #mv-btn-passive-tree:hover,
+    #screen-world-detail #wd-btn-passive-tree:hover {
         filter: brightness(1.25);
     }
 
 /* Golden frame + glow when there are unspent Convergence Points.
    Uses outline/box-shadow because the stone-block background sets
    border: none !important. */
-#screen-map-view #mv-btn-passive-tree.unspent-points {
+#screen-map-view #mv-btn-passive-tree.unspent-points,
+#screen-world-detail #wd-btn-passive-tree.unspent-points {
     outline: 2px solid #ffd700;
     outline-offset: -3px;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.85);
 }
 
 /* Yellow unspent point count next to the button label */
-#screen-map-view #ptb-point-count-mv {
+#screen-map-view #ptb-point-count-mv,
+#screen-world-detail #ptb-point-count-mv {
     color: #ffd700;
     font-weight: bold;
 }
 
 /* Notification badge ("!" dot on Inference button) */
-#screen-map-view #mv-quest-log-badge {
+#screen-map-view #mv-quest-log-badge,
+#screen-world-detail #wd-quest-log-badge {
     background: var(--red, #e74c3c);
     color: #fff;
     border-radius: 50%;
@@ -314,16 +333,19 @@
    into the row(s) beneath it. */
 @media (max-width: 760px) {
 
-    #screen-map-view .ls-topbar {
+    #screen-map-view .ls-topbar,
+    #screen-world-detail .ls-topbar {
         justify-content: center;
     }
 
-    #screen-map-view .ls-title {
+    #screen-map-view .ls-title,
+    #screen-world-detail .ls-title {
         flex: 1 1 100%;
         max-width: 100%;
     }
 
-    #screen-map-view .ls-topbar-right {
+    #screen-map-view .ls-topbar-right,
+    #screen-world-detail .ls-topbar-right {
         margin-left: 0;
         justify-content: center;
     }
@@ -333,28 +355,93 @@
    ribbon further so nothing wraps to a third/fourth row. */
 @media (max-width: 480px) {
 
-    #screen-map-view #mv-btn-back {
-        width: clamp(70px, 24vw, 120px);
-        padding-left: clamp(22px, 8vw, 40px);
+    #screen-map-view #mv-btn-back,
+    #screen-world-detail #wd-btn-back {
+        font-size: 9px;
+        min-width: 76px;
+        padding: 8px 10px;
     }
 
     #screen-map-view #mv-btn-quest-log,
-    #screen-map-view #mv-btn-passive-tree {
+    #screen-world-detail #wd-btn-quest-log,
+    #screen-map-view #mv-btn-passive-tree,
+    #screen-world-detail #wd-btn-passive-tree {
         width: clamp(52px, 18vw, 90px);
         font-size: 7px;
     }
 
-    #screen-map-view .mv-ribbon-combined {
+    #screen-map-view .mv-ribbon-combined,
+    #screen-world-detail .mv-ribbon-combined {
         width: clamp(110px, 34vw, 180px);
     }
 
-    #screen-map-view #mv-class-status {
+    #screen-map-view #mv-class-status,
+    #screen-world-detail #wd-class-status {
         font-size: 7px;
         padding: 2px 5px;
     }
 
-    #screen-map-view .mv-char-portrait-wrap {
+    #screen-map-view .mv-char-portrait-wrap,
+    #screen-world-detail .mv-char-portrait-wrap {
         width: clamp(44px, 16vw, 70px);
         height: clamp(44px, 16vw, 70px);
+    }
+}
+
+/* ---------------------------------------------------------
+   WORLD-DETAIL ONLY: the plaque carries the WORLD NAME here
+   (up to ~27 chars vs the constant SELECT LEVEL), so use a
+   slightly smaller font/spacing to keep long names inside
+   the plaque at every width. Everything else is identical.
+   --------------------------------------------------------- */
+
+#screen-world-detail .ls-title {
+    font-size: clamp(9px, 2vw, 22px);
+    letter-spacing: clamp(1px, 0.3vw, 3px);
+}
+
+/* ---------------------------------------------------------
+   CLASS-CHANGE TOKEN BUTTON (mv + wd topbars)
+   Only visible while the player holds a class-change token
+   (granted by the Nexus Ascension Level). Same stone-block
+   look as the TREE/INFERENCE buttons, with a cyan-teal tint
+   to read as "special/one-time" rather than a menu jump.
+   --------------------------------------------------------- */
+
+#screen-map-view #mv-btn-class-change,
+#screen-world-detail #wd-btn-class-change {
+    font-family: var(--PX, monospace);
+    font-size: clamp(7px, 0.9vw, 10px);
+    letter-spacing: 1px;
+    color: #9fe8d8 !important; /* teal-cream, distinct from TREE gold */
+    border: 1px solid rgba(120, 220, 200, 0.55) !important;
+    background: rgba(20, 60, 55, 0.55);
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: filter 0.15s, transform 0.1s;
+    animation: cc-token-pulse 2.2s ease-in-out infinite;
+}
+
+    #screen-map-view #mv-btn-class-change:hover,
+    #screen-world-detail #wd-btn-class-change:hover {
+        filter: brightness(1.3);
+    }
+
+    #screen-map-view #mv-btn-class-change:active,
+    #screen-world-detail #wd-btn-class-change:active {
+        transform: translateY(1px);
+    }
+
+@keyframes cc-token-pulse {
+    0%, 100% { box-shadow: 0 0 4px rgba(120, 220, 200, 0.25); }
+    50%      { box-shadow: 0 0 12px rgba(120, 220, 200, 0.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #screen-map-view #mv-btn-class-change,
+    #screen-world-detail #wd-btn-class-change {
+        animation: none;
     }
 }

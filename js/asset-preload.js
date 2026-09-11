@@ -34,8 +34,10 @@ var AssetPreload = (function () {
     // showModal ids. Every url must exist on disk (see preflight check).
     var SURFACE_ASSETS = {
         'screen-title': [
-            'images/Title_Screen/Title_Background2.webp',
+            'images/Title_Screen/RiseOfTheBeasts_TitleScreen_Background.webp',
             'images/Title_Screen/STOXELS.webp',
+            'images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp',
+            'images/Title_Screen/RiseOfTheBeasts_GermanLogo.webp',
             'images/Title_Screen/Language-Block.webp',
             'images/Title_Screen/Play-Block.webp',
             'images/Title_Screen/General-Block.webp',
@@ -91,7 +93,7 @@ var AssetPreload = (function () {
         'achievements-modal': [
             'images/Game_Setup/Button-Block-1.webp',
             'images/Game_Setup/Button-Block-2.webp',
-            'images/Game_Setup/return_to_menu_button.webp',
+            'images/Game_Setup/back-slab.webp',
             'images/Inference/inference-header.webp',
             'images/Settings/settings_background.webp',
             'images/Settings/settings_close_button.webp',
@@ -148,8 +150,7 @@ var AssetPreload = (function () {
             'images/Game_Setup/Modifier-Block-1.webp',
             'images/Game_Setup/Modifier-Block-2.webp',
             'images/Game_Setup/Modifier_Plate.webp',
-            'images/Game_Setup/Ribbon-Banner.webp',
-            'images/Game_Setup/return_to_menu_button.webp'
+            'images/Game_Setup/Ribbon-Banner.webp'
         ],
         'screen-character-select': [
             'images/sprites/Stox_noclass.webp',
@@ -166,9 +167,9 @@ var AssetPreload = (function () {
         ],
         'screen-levels': [
             'images/level-selection-screen.webp',
-            'images/Level_Select_Topbar/topbar-stone-background.webp',
+            'images/Level_Select_Topbar/topbar-stone-tile2.webp',
             'images/Level_Select_Topbar/back-arrow.webp',
-            'images/Level_Select_Topbar/banner-title.webp',
+            'images/Level_Select_Topbar/banner-title-plaque.webp',
             'images/Level_Select_Topbar/score-pts-scroll.webp',
             'images/Level_Select_Topbar/Inference-Block.webp',
             'images/Level_Select_Topbar/Probability-Tree-Block.webp'

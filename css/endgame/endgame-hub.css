@@ -40,22 +40,16 @@ Layout Architecture:
     flex-shrink: 0;
 }
 
+/* Endgame back button — the unified .back-btn stone slab (base.css).
+   .eg-back-btn keeps only the size tweak for the slim endgame topbar. */
 .eg-back-btn {
-    font-family: var(--PX);
-    font-size: 9px;
-    background: transparent;
-    border: 1px solid var(--border2);
-    color: var(--accent2);
-    padding: 7px 12px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.12s;
-    white-space: nowrap;
+    font-size: 12px;
+    padding: 8px 16px;
+    min-width: 110px;
 }
 
     .eg-back-btn:hover {
-        border-color: var(--accent);
-        color: var(--accent);
+        filter: brightness(1.25);
     }
 
 .eg-topbar-title {

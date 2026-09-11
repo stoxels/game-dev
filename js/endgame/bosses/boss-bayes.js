@@ -350,11 +350,9 @@ function _egActivateVeil() {
 
 
 // Removes the veil overlay element entirely (framework calls on any cleanup).
-function _egRemoveVeil() {
-    _egVeilActive = false;
-    const veil = document.getElementById('eg-grid-veil');
-    if (veil) veil.remove();
-}
+// _egRemoveVeil is defined ONCE, in shared-boss-abilities.js (consolidated
+// 2026-09 from this file and boss-bloom.js — the copies used to shadow
+// each other via load order, and bloom's superset already won).
 
 
 //------------------------------------------------------------------------

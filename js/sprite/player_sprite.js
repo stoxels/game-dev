@@ -45,6 +45,55 @@ function _charIs(id) {
 //-------------------SIMPLE IN-GAME AVATAR (non-monster levels)-----------
 //------------------------------------------------------------------------
 
+// Viewport-aware scale factor for the simple avatar. On narrow screens
+// (phones) the fixed 250px anchor position and the 128px sprite would
+// overlap the right-hand HUD/zoom bar, so the whole wrapper is shrunk.
+// Uses CSS zoom (same mechanism as the puzzle scaler) so offsetWidth
+// stays in sync and _setAvatarPos() keeps clamping correctly.
+function _avatarResponsiveScale() {
+    const vw = window.innerWidth || 1280;
+    if (vw >= 700) return 1;   // desktop anchor — unchanged behaviour
+    if (vw >= 480) return 0.8; // large phones / small tablets
+    return 0.6;                // phones
+}
+
+// Anchor X/Y for the simple avatar wrapper. On phones the avatar moves to
+// the left edge BELOW the clock/mistake HUD (that HUD is ~74px tall, plus
+// extra rows when the touchpad toggle is shown), so it never covers the
+// timer. Desktop keeps the original 250px/15px anchor.
+//
+// The 128px sprite img sits centered inside the (narrower) wrapper, so on a
+// zoom-scaled phone layout its visual box spills past the wrapper's left
+// edge by (128 - wrapperWidth) * scale / 2 px. The anchor compensates for
+// that spill so the ARTWORK — not the wrapper box — keeps an 8px margin.
+function _avatarAnchorLeft() {
+    const vw = window.innerWidth || 1280;
+    if (vw >= 700) return '250px';
+    const withCompanions = _hasCompanions();
+    const wrapperW = withCompanions ? 328 : 72;
+    const scale = _avatarResponsiveScale();
+    const spill = Math.max(0, (128 - wrapperW) * scale / 2);
+    return Math.round(8 + spill) + 'px';
+}
+
+function _avatarAnchorTop() {
+    if ((window.innerWidth || 1280) >= 700) return '15px';
+    const hud = document.querySelector('.game-hud-corner');
+    const hudBottom = hud ? hud.getBoundingClientRect().bottom : 0;
+    return Math.max(84, Math.ceil(hudBottom) + 6) + 'px';
+}
+
+// Applies the responsive anchor + zoom scale to a simple-avatar wrapper.
+// Desktop (>700px) is a no-op — behaviour there is byte-for-byte unchanged.
+function _applyAvatarResponsiveLayout(wrapper) {
+    if (!wrapper) return;
+    wrapper.style.left = _avatarAnchorLeft();
+    wrapper.style.top = _avatarAnchorTop();
+    const scale = _avatarResponsiveScale();
+    const zoomSupported = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('zoom', '1');
+    wrapper.style.zoom = (zoomSupported && scale !== 1) ? String(scale) : '';
+}
+
 // Renders a small WASD-controlled sprite in the top-left of the game meta bar.
 // No HP or charge bars — those are monster-level only.
 function _renderPlayerAvatarSimple() {
@@ -71,13 +120,33 @@ function _renderPlayerAvatarSimple() {
             existing.remove();
         } else {
             const img = existing.querySelector('#avatar-sprite-img-simple');
-            if (img) img.src = _getPlayerCharacterImage();
+            // Gameplay default: move-down art, not the menu portrait (the
+            // idle loop below upgrades this to the exact facing frame once
+            // discovery lands; menus keep using _getPlayerCharacterImage()).
+            if (img) {
+                if (typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(img);
+                else img.src = _getPlayerCharacterImage();
+            }
 
             const nameLabel = existing.querySelector('#avatar-simple-drag-handle');
             if (nameLabel) {
                 nameLabel.textContent = _getAvatarCharacterName();
                 nameLabel.style.color = _getAvatarCharacterColor();
             }
+
+            // Viewport may have changed since the wrapper was first built
+            // (e.g. rotating a phone) — re-sync anchor/scale before reuse.
+            _applyAvatarResponsiveLayout(existing);
+
+            // Self-heal: a mid-boot error between wrapper creation and
+            // listener wiring used to leave the sprite drawn but unmovable
+            // for the whole session (movement only worked after some later
+            // flow re-rendered the avatar, e.g. entering the nexus).
+            if (!window._avatarWASDHandler) _initSimpleAvatarWASD(existing);
+
+            // Keep the mana bar in sync when the avatar is reused (e.g. after
+            // a level transition where the pool was reset).
+            if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
 
             // Companions don't change image, but re-run facing so order stays correct
             _updateAvatarFacing(existing);
@@ -102,6 +171,8 @@ function _renderPlayerAvatarSimple() {
         cursor: default;
         user-select: none;
     `;
+    // Responsive anchor/scale for narrow viewports (no-op on desktop).
+    _applyAvatarResponsiveLayout(wrapper);
 
     wrapper.innerHTML = `
         <div id="avatar-simple-drag-handle" style="
@@ -139,15 +210,58 @@ function _renderPlayerAvatarSimple() {
                 draggable="false"
             />` : ''}
         </div>
+        <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap">
+            <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
+            <span id="avatar-mana-text" class="avatar-mana-bar-text"></span>
+        </div>
     `;
 
     document.body.appendChild(wrapper);
+    // Mana bar lives on the sprite now (moved off the class HUD).
+    if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
+    // Gameplay default: move-down art on first paint (cold cache included),
+    // with a safe chain back to the menu portrait for variants without
+    // directional art. Menus (save slots, level-select topbar, quiz modal)
+    // keep rendering _getPlayerCharacterImage() directly.
+    const _newSimpleImg = wrapper.querySelector('#avatar-sprite-img-simple');
+    if (_newSimpleImg && typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(_newSimpleImg);
     _initSimpleAvatarWASD(wrapper);
     _updateAvatarFacing(wrapper);
+    // Re-sync anchor/scale once the rest of the level HUD has settled — the
+    // touchpad toggle (FÜLLEN button) can appear after this point and grow
+    // the left HUD, which the phone anchor is derived from.
+    setTimeout(() => _applyAvatarResponsiveLayout(wrapper), 350);
     // Start the idle loop (static portrait until idle frames exist) and
     // warm the frame cache for this character/variant in the background.
     if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation('avatar-sprite-img-simple');
 }
+
+// Keeps the simple avatar's responsive anchor/scale in sync with viewport
+// changes (phone rotation, window resizing). Only repositions when the
+// player hasn't deliberately moved the sprite off its anchor — WASD movement
+// and boss pushes write style.left/top directly and must never be overridden.
+(function _initAvatarResizeSync() {
+    let lastVW = window.innerWidth, lastVH = window.innerHeight;
+    window.addEventListener('resize', () => {
+        const vw = window.innerWidth, vh = window.innerHeight;
+        if (vw === lastVW && vh === lastVH) return;
+        const changedW = vw !== lastVW;
+        lastVW = vw; lastVH = vh;
+        if (vw >= 700) return; // desktop keeps its free-placement behaviour
+        const wrapper = document.getElementById('player-avatar-simple');
+        if (!wrapper || wrapper.style.display === 'none') return;
+        // Width change = rotation/resize → re-anchor + rescale.
+        // Height-only change → just re-clamp vertically, keep player's X.
+        if (changedW) {
+            _applyAvatarResponsiveLayout(wrapper);
+        } else {
+            const maxX = window.innerWidth - wrapper.offsetWidth - 4;
+            const maxY = window.innerHeight - wrapper.offsetHeight - 4;
+            wrapper.style.top = Math.max(4, Math.min(maxY, parseInt(wrapper.style.top) || 0)) + 'px';
+            wrapper.style.left = Math.max(4, Math.min(maxX, parseInt(wrapper.style.left) || 0)) + 'px';
+        }
+    });
+})();
 
 // Removes the simple avatar (called when entering a monster level).
 function _removePlayerAvatarSimple() {
@@ -161,9 +275,15 @@ function _removePlayerAvatarSimple() {
 // Refreshes the sprite image on the simple avatar (e.g. after class selection).
 function _updateAvatarSimpleImage() {
     const img = document.getElementById('avatar-sprite-img-simple');
-    if (img) img.src = _getPlayerCharacterImage();
+    if (img) {
+        if (typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(img);
+        else img.src = _getPlayerCharacterImage();
+    }
     const imgFull = document.getElementById('avatar-sprite-img');
-    if (imgFull) imgFull.src = _getPlayerCharacterImage();
+    if (imgFull) {
+        if (typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(imgFull);
+        else imgFull.src = _getPlayerCharacterImage();
+    }
     // New class/variant: drop stale frame cache, warm the new one, and
     // (re)start the idle loop so fresh idle art appears.
     if (typeof _animRefreshCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
@@ -233,10 +353,30 @@ function _avatarMoveUiBlocked() {
     const tag = document.activeElement ? document.activeElement.tagName : null;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show')) return true;
     // A question modal (quiz overlay / math gate / scouts primer) hides the
-    // avatar via CSS — suspend its movement input along with it.
-    if (document.body.classList.contains('question-modal-open')) return true;
+    // avatar via CSS — suspend its movement input along with it. The body
+    // flag can go STALE (an overlay removed without a flag refresh, or an
+    // interrupted boot), which used to dead-claim WASD until some unrelated
+    // flow re-synced the flag — verify against the live DOM and self-heal
+    // when no question modal is actually visible.
+    if (document.body.classList.contains('question-modal-open')) {
+        const qz = document.getElementById('quiz-overlay');
+        const mg = document.getElementById('mg-modal');
+        const open = !!(document.getElementById('primer-overlay') ||
+            (qz && qz.classList.contains('show')) ||
+            (mg && mg.classList.contains('show')));
+        if (open) return true;
+        if (typeof _refreshQuestionModalFlag === 'function') {
+            try { _refreshQuestionModalFlag(); } catch (e) {}
+        } else {
+            document.body.classList.remove('question-modal-open');
+        }
+    }
     // The Clock's Time Freeze locks the avatar in place for the whole window.
     if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return true;
+    // Dev-testing harness (js/dev-testing.js) explicitly freezes the avatar
+    // for scripted movement tests; never set in normal play.
+    if (typeof window !== 'undefined' && window.STOX_FLAGS && window.STOX_FLAGS.devTestActive
+        && window.STOX_FLAGS.devTestFreezeAvatar) return true;
     if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return true;
     if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('frozen')) return true;
     return false;
@@ -380,8 +520,16 @@ function _initSimpleAvatarWASD(wrapper) {
 }
 
 // Returns true when the random_walker companions should be shown.
+// try/typeof-guard: this runs during avatar render, and a mid-boot STATE
+// hiccup here used to abort the whole render — including the WASD listener
+// wiring below it — leaving the sprite permanently unmovable for the
+// session (the "movement only works after visiting the nexus" report).
 function _hasCompanions() {
-    return STATE && STATE.playerAscendency === 'random_walker';
+    try {
+        return !!(typeof STATE !== 'undefined' && STATE && STATE.playerAscendency === 'random_walker');
+    } catch (e) {
+        return false;
+    }
 }
 
 // Charges a companion sprite from its current position to a grid cell,
@@ -445,17 +593,100 @@ function _chargeCompanionToCell(companionId, targetR, targetC, onArrival, onRetu
     }, 380);
 }
 
-// Flips sprites to always face the screen centre.
+// Facing helper. While moving, the sprite faces its TRAVEL direction:
+//   - directional walk art (up/down/left/right) is drawn facing that way,
+//     so it must never be mirrored (this fixes the Trix left/right swap);
+//   - omni fallback art faces right, so only leftward movement mirrors it.
+// Idle (no direction) keeps the legacy face-the-screen-centre behaviour so
+// the menu-style portrait presentation is unchanged.
 // With companions, also reorders Drifter/Brownian so they stay on the
 // correct side (Drifter left, Brownian right) relative to the character.
-function _updateAvatarFacing(el) {
+function _updateAvatarFacing(el, direction) {
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
+    const char = st ? st.playerCharacter : null;
+    const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
+    const dir = (direction && typeof ANIM_DIRECTIONS !== 'undefined' && ANIM_DIRECTIONS.indexOf(direction) !== -1)
+        ? direction : null;
+
+    const playerImg = el.querySelector('#avatar-sprite-img-simple') || el.querySelector('#avatar-sprite-img');
+
+    // Moving with true directional art: clear any mirror, keep travel facing.
+    // Checks both the discovered-art cache and the live walk loop (which
+    // knows whether the frames it plays are directional).
+    let directionalActive = false;
+    if (dir && char) {
+        if (typeof _animHasDirectionalWalkSync === 'function' && _animHasDirectionalWalkSync(char, variant, dir)) {
+            directionalActive = true;
+        } else if (typeof _animWalkIsDirectionalFor === 'function') {
+            const spriteId = playerImg ? playerImg.id : null;
+            if (_animWalkIsDirectionalFor(spriteId)) directionalActive = true;
+        }
+    }
+
+    if (directionalActive) {
+        if (playerImg) playerImg.style.transform = 'scaleX(1)';
+        // Companions still flank relative to screen centre; only the player
+        // sprite itself must not mirror.
+        if (_hasCompanions()) {
+            const left = parseInt(el.style.left) || 0;
+            const avatarCenterX = left + (el.offsetWidth || 72) / 2;
+            const facingLeft = avatarCenterX > window.innerWidth / 2;
+            const row = el.querySelector('.avatar-sprite-row');
+            const drifterImg = el.querySelector('#avatar-companion-drifter');
+            const brownianImg = el.querySelector('#avatar-companion-brownian');
+            [drifterImg, brownianImg].forEach(img => {
+                if (img) img.style.transform = facingLeft ? 'scaleX(-1)' : 'scaleX(1)';
+            });
+            if (row && drifterImg && brownianImg) {
+                if (facingLeft) {
+                    row.prepend(brownianImg);
+                    row.append(drifterImg);
+                } else {
+                    row.prepend(drifterImg);
+                    row.append(brownianImg);
+                }
+            }
+        }
+        return;
+    }
+
+    // Moving with omni fallback art: mirror follows travel direction, not
+    // screen position (old screen-centre logic faced the wrong way whenever
+    // the sprite walked away from the centre).
+    if (dir) {
+        const mirror = (typeof _animShouldMirrorFor === 'function')
+            ? _animShouldMirrorFor(char, variant, dir)
+            : (dir === 'left');
+        const facingLeft = mirror;
+        if (_hasCompanions()) {
+            const row = el.querySelector('.avatar-sprite-row');
+            const drifterImg = el.querySelector('#avatar-companion-drifter');
+            const brownianImg = el.querySelector('#avatar-companion-brownian');
+            [playerImg, drifterImg, brownianImg].forEach(img => {
+                if (img) img.style.transform = facingLeft ? 'scaleX(-1)' : 'scaleX(1)';
+            });
+            if (row && drifterImg && brownianImg) {
+                if (facingLeft) {
+                    row.prepend(brownianImg);
+                    row.append(drifterImg);
+                } else {
+                    row.prepend(drifterImg);
+                    row.append(brownianImg);
+                }
+            }
+        } else {
+            if (playerImg) playerImg.style.transform = facingLeft ? 'scaleX(-1)' : 'scaleX(1)';
+        }
+        return;
+    }
+
+    // Idle: legacy face-the-screen-centre behaviour (unchanged).
     const left = parseInt(el.style.left) || 0;
     const avatarCenterX = left + (el.offsetWidth || 72) / 2;
     const facingLeft = avatarCenterX > window.innerWidth / 2;
 
     if (_hasCompanions()) {
         const row = el.querySelector('.avatar-sprite-row');
-        const playerImg = el.querySelector('#avatar-sprite-img-simple');
         const drifterImg = el.querySelector('#avatar-companion-drifter');
         const brownianImg = el.querySelector('#avatar-companion-brownian');
 
@@ -476,8 +707,7 @@ function _updateAvatarFacing(el) {
             }
         }
     } else {
-        const img = el.querySelector('#avatar-sprite-img-simple');
-        if (img) img.style.transform = facingLeft ? 'scaleX(-1)' : 'scaleX(1)';
+        if (playerImg) playerImg.style.transform = facingLeft ? 'scaleX(-1)' : 'scaleX(1)';
     }
 }
 
@@ -499,7 +729,7 @@ function _setAvatarPos(el, x, y, direction) {
     el.style.bottom = 'auto';   // <-- add this
     el.style.left = Math.max(4, Math.min(maxX, x)) + 'px';
     el.style.top = Math.max(4, Math.min(maxY, y)) + 'px';
-    _updateAvatarFacing(el);
+    _updateAvatarFacing(el, direction);
 
     if (typeof _banterRepositionBubbleIfVisible === 'function') _banterRepositionBubbleIfVisible();
 
@@ -627,6 +857,12 @@ function _renderPlayerAvatar() {
                 </div>
             </div>
 
+            <!-- mana bar (moved off the class HUD) -->
+            <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap" style="width: 100%; margin-bottom: 6px;">
+                <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
+                <span id="avatar-mana-text" class="avatar-mana-bar-text"></span>
+            </div>
+
             <img src="${_getPlayerCharacterImage()}" id="avatar-sprite-img"
                 style="width: 100px; height: 100px; object-fit: contain; pointer-events: none;"
                 draggable="false" />
@@ -634,6 +870,10 @@ function _renderPlayerAvatar() {
 
         document.body.appendChild(avatar);
 
+        // Gameplay default: move-down art on first paint (same as the simple
+        // avatar — the menu portrait stays reserved for menus).
+        const _newFullImg = avatar.querySelector('#avatar-sprite-img');
+        if (_newFullImg && typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(_newFullImg);
         _initFullAvatarWASD(avatar);
         _updateAvatarFacing(avatar);
         if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation('avatar-sprite-img');
@@ -666,6 +906,9 @@ function _renderPlayerAvatar() {
     const chargeMax = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
     const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / chargeMax) * 100));
     document.getElementById('avatar-charge-fill').style.width = chargePct + '%';
+
+    // Update the mana bar (shared with the story-mode simple avatar).
+    if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
 
     if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 

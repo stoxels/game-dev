@@ -9,7 +9,7 @@
 // Must be called once at the very top of every cursed item handler,
 // before any downside logic runs.
 function _trackWitchImmuneCursedUse() {
-    if (window._cursedImmune) {
+    if (window.STOX_FLAGS.cursedImmune) {
         updateQuestStats('cursedUnderImmunityUsed', {});
     }
 }

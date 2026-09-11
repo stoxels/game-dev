@@ -246,8 +246,11 @@
         cursor: pointer;
     }
 
-/* -- Zoom control container (outermost, positions label + slider together) -- */
-#pt-zoom-wrap {
+/* -- Zoom control container (outermost, positions label + slider together) --
+   Shared by the live tree (#pt-zoom-wrap) and the dev sandbox tree
+   (#dpt-zoom-wrap), which reuses the same visual shell. -- */
+#pt-zoom-wrap,
+#dpt-zoom-wrap {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -256,4 +259,12 @@
     border-radius: 6px;
     padding: 5px 10px;
     box-shadow: 0 2px 10px var(--pt-zoom-wrap-shadow);
+}
+
+/* -- Unified back button (.back-btn slab from base.css): slightly smaller
+   inside the slim passive-tree topbar so it fits the bar height. -- */
+.pt-topbar .back-btn {
+    font-size: 12px;
+    min-width: 110px;
+    padding: 8px 16px;
 }

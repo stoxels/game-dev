@@ -84,7 +84,7 @@ function _applyLowTimeVignette() {
     el.classList.remove('ltv-tier1', 'ltv-tier2', 'ltv-tier3');
 
     // Setting disabled, or timer frozen / Golden Clock active — no vignette
-    if (!SETTINGS.lowTimeVignette || timerFrozen || window._goldenClockActive) return;
+    if (!SETTINGS.lowTimeVignette || timerFrozen || window.STOX_FLAGS.goldenClockActive) return;
 
     const tier = _getLowTimeVignetteTier(timerSecs);
     if (tier) el.classList.add(tier);
@@ -586,7 +586,7 @@ function _tickLawOfLargeNumbers() {
 // Decrements timerSecs by the correct amount for the current frame.
 // Golden Clock halts all countdown. Black Swan drains 10× as fast.
 function _tickCountdown() {
-    if (window._goldenClockActive) return; // clock is paused
+    if (window.STOX_FLAGS.goldenClockActive) return; // clock is paused
 
     timerSecs--;
 

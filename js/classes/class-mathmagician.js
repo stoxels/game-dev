@@ -49,13 +49,9 @@ const BLIZZARD_FLAKE_MAX_DELAY_S = 0.5;
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Performs an in-place Durstenfeld shuffle on the given array.
-function _shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
+// _shuffleArray (in-place Durstenfeld shuffle) is defined ONCE, in
+// class-probabilist.js — the identical local copy was removed 2026-09 (it
+// shadowed the other via load order).
 
 // Returns a random element from the given array.
 function _randomFrom(array) {

@@ -171,13 +171,25 @@
     justify-content: center;
 }
 
-/* 2x2 grid variant (win overlay): row 1 = Retry / Retry (New Setup),
-   row 2 = Next / Levels. Buttons auto-place in DOM order. */
-.ov-btns-2col {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, max-content));
-    gap: clamp(8px, 2vw, 15px);
+/* Win overlay action grid: LEVELS | REPLAY over REPLAY (NEW SETUP) | NEXT.
+   Levels and Next are single-button columns, vertically centred against
+   the stacked Replay pair in the middle. Columns collapse via JS when a
+   whole column is hidden (ascension / Nexus Point wins). */
+.ov-btns-win-grid {
+    display: flex;
+    align-items: center;
     justify-content: center;
+    gap: clamp(8px, 2vw, 15px);
+}
+
+.ov-btns-win-grid .ov-btns-col {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1.2vw, 10px);
+}
+
+.ov-btns-win-grid .ob {
+    min-width: clamp(110px, 16vw, 170px);
 }
 
 /* Shared base style for all overlay buttons */
@@ -511,8 +523,23 @@
     }
 
     .ov-btns,
-    .ov-btns-2col {
+    .ov-btns-win-grid {
         gap: 8px;
+    }
+
+    /* 3 columns × fixed min-width overflows phones — let the grid wrap
+       into two rows and let buttons size to their labels. Slightly tighter
+       padding/gap keeps the full LEVELS | REPLAY pair | NEXT row intact
+       down to ~400px; narrower phones wrap gracefully below it. */
+    .ov-btns-win-grid {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .ov-btns-win-grid .ob {
+        min-width: 0;
+        padding-left: 8px;
+        padding-right: 8px;
     }
 
     .ob {

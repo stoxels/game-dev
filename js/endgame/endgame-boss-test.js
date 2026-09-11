@@ -520,6 +520,13 @@ function _egbtGetSpecialPhaseInfo(bossId) {
                 { name: 'Serpent Tide', desc: _egbtTr('eg_boss_test_coil_tide', 'At 30% HP: 3 tidal waves of chargers cross at your height. Exit the row vertically; kite seeker snakes away so they detonate elsewhere.') },
                 { name: 'Cobra Strike', desc: _egbtTr('eg_boss_test_coil_cobra', 'Charge attack: horizontal H92 lane at your height, 380ms lash. Venom trails tick shadow DoT — don’t stand in them to dodge.') }
             ];
+        case 'boss_vise':
+            return [
+                { name: 'Crushing Walls', desc: _egbtTr('eg_boss_test_vis_walls', 'All fight: the corridor BREATHES — two block walls sweep the arena around a gap that widens and narrows like a living thing. Outside the walls burns; touching a block is a chunk + chill. Ride the gap, never fight the iron! Phase 3: the gap breathes FASTER!') },
+                { name: 'Bench Vise', desc: _egbtTr('eg_boss_test_vis_bench', 'At 60% HP: a bench vise clamps down on YOUR row — two jaws crawl from the edges and BITE. Escape the slice before the bite; lingering in the squeezed band afterward chips you with sparks. Phase 3: two slices at once!') },
+                { name: 'Quench or Shatter', desc: _egbtTr('eg_boss_test_vis_quench', 'At 60% HP: the Vise plants a glowing workpiece and HAMMERS it (sparks splash off each strike) — body-check the piece 2× to SHATTER it (+12% maxHP heal), or it is QUENCHED: a giant wall-block crosses the arena at your row. Phase 3: it comes back the other way!') },
+                { name: 'THE FULL CLAMP', desc: _egbtTr('eg_boss_test_vis_final', 'At 10% HP: three compression waves squeeze the arena — a corridor of SAFE SLABS lights up, reach it before each squeeze. Survive all three for THE IRON VISE: the overclench slams everything except the stress-fracture slab! (charge bar frozen)') },
+            ];
         case 'boss_minotaur':
             return [
                 { name: 'Labyrinth Walls', desc: _egbtTr('eg_boss_test_mnt_labyrinth', 'All fight: 5–6 wall slabs rise and hold ~8s, carving the arena into lanes — then the bull charges the open lane at YOUR row. The maze channels the charge; the bull crumbles one wall per rush. Phase 3: double charges per cast!') },
@@ -554,6 +561,20 @@ function _egbtGetSpecialPhaseInfo(bossId) {
                 { name: 'Razor Wire Lattice', desc: _egbtTr('eg_boss_test_rzr_wires', 'At 60% HP: taut wires snap across the arena — lightning DoT on contact, then they SNAP and the cut ends whip outward. Path between the wires and LEAVE the line before it dies! Phase 3: five wires, one already taut.') },
                 { name: 'Hone and Cast', desc: _egbtTr('eg_boss_test_rzr_hone', 'At 60% HP: the whetstone grinds a GIANT SCYTHE (grind aura chips you) — body-check the stone 2× to shatter it (+12% maxHP heal) and CANCEL the cast, or the scythe crosses the whole arena at your row. Phase 3: it comes back the other way!') },
                 { name: 'A THOUSAND EDGES', desc: _egbtTr('eg_boss_test_rzr_final', 'At 10% HP: nine razor spokes rotate around the centre and REVERSE every few seconds — rim fans shave across the middle each reversal. Survive three cycles for THE LAST EDGE: one full-screen scythe with a single safe pocket (the grind aura) that CHIPS you to stand in! (charge bar frozen)') },
+            ];
+        case 'boss_shrine':
+            return [
+                { name: 'Knot Barriers', desc: _egbtTr('eg_boss_test_shr_bars', 'All fight: paper barrier bars hum then LIGHT — crossing lightning-paper that ticks on touch. When a barrier dies, the KNOT holds: a wall grows from the rope on YOUR side, then burns away (clip it and it hurts). Phase 3: a vertical barrier crosses the horizontals!') },
+                { name: 'Mirror Spirits', desc: _egbtTr('eg_boss_test_shr_mirrors', 'At 60% HP: a five-way spirit fan flies from the anchored ⛩️ while a SIGNATURE records your steps — after 2.5s it SHATTERS and a mirror spirit replays your last 1.5s in REVERSE, detonating your route and striking where you stopped. Stop repeating yourself! Phase 3: it plays your route FORWARD!') },
+                { name: 'Ofuda Ward', desc: _egbtTr('eg_boss_test_shr_ward', 'At 60% HP: the Maiden plants a golden ofuda and chants — the chant DRAINS you while it stands. Body-check the talisman 3× to tear it down (+12% maxHP heal) and cancel, or the SHINTO SEAL sweeps the arena at your row. Phase 3: it comes back the other way!') },
+                { name: 'THOUSAND ARMS', desc: _egbtTr('eg_boss_test_shr_final', 'At 10% HP: eight torii beams sweep like a lighthouse while KNOCKS land — 20 talismans with ONE safe cell each, 3.5s to reach it. Survive three knocks for THE THOUSANDTH ARM: one final sweep and everything outside the descending circle is annulled! (charge bar frozen)') },
+            ];
+        case 'boss_sirus':
+            return [
+                { name: 'Ion Current', desc: _egbtTr('eg_boss_test_sir_ion', 'All fight: glowing ion fronts slide across the arena on telegraphed lanes — hot inside, EXCEPT the tangent sliver on the lane centre. Standing in the current builds CHARGE (5 stacks): while charged you tick to everything nearby, and charge draws the chains! Phase 3: pincer currents close from both sides!') },
+                { name: 'Chain Lightning', desc: _egbtTr('eg_boss_test_sir_chain', 'At 60% HP: a ⚡ bolt HUNTS you — you cannot outwalk it, only outposition it. Rivers sweep the arena and leave standing water: lure the bolt across water and it GROUNDS at the shore. Cold pools always ground it — ice does not conduct! Phase 3: two bolts.') },
+                { name: 'Storm Eye', desc: _egbtTr('eg_boss_test_sir_eye', 'At 60% HP (once): the Stormcaller descends to the centre — 7 hot cells and a web of SAFE tiles CONNECTED to the eye. The safe web protects from everything. He spends his mobility here: the eye NEVER moves again!') },
+                { name: 'PERFECT STORM', desc: _egbtTr('eg_boss_test_sir_final', 'At 10% HP: four ion currents enclose the arena in a shrinking box — stay OUTSIDE as it closes. Then the storm grows TEETH: your own stored CHARGE fires hunting bullets at you. Empty your charge before the wall hits! (charge bar frozen)') },
             ];
         default:
             return [];
@@ -889,7 +910,7 @@ function _egbtBuildFullScreenHTML() {
     return `
 <div class="egbt-hub-layout">
     <div class="egbt-topbar">
-        <button class="title-btn back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
+        <button class="back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
         <span class="egbt-topbar-title">${t('eg_boss_test_title')}</span>
         <span class="egbt-count" id="egbt-count"></span>
     </div>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STOXELS — Win Overlay Layout Preview (dev-only)</title>
+<!--
+  Dev-only test page (like responsive-preview.html / test-sprite-faces.html).
+  NOT linked from the game. Renders a static copy of the #ov-win win overlay
+  (exact markup from index.html, real css/base.css + css/overlays.css) inside
+  same-origin iframes at common device widths so the action-button grid
+  (LEVELS | REPLAY over REPLAY (NEW SETUP) | NEXT) can be checked at a glance.
+
+  No game JS is loaded — this page is cheap and never blocks the main thread.
+  Buttons are non-functional here; only layout/styling is under test.
+-->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/overlays.css">
+<script>
+    // embed=1 → render ONLY the overlay (this page is loaded inside the
+    // width-test iframes below). Without the param → render the iframe rack.
+    const EMBED = new URLSearchParams(location.search).has('embed');
+</script>
+<style>
+    body.embed > .rack { display: none; }
+    .rack { padding: 10px; background: #141414; min-height: 100vh; box-sizing: border-box; }
+    .rack h2 { color: #ddd; font: 12px monospace; letter-spacing: 1px; margin: 8px 0 2px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
+    .frame-box { border: 1px solid #555; overflow: hidden; }
+    .frame-label { color: #ccc; font: 10px monospace; padding: 2px 6px; background: #333; white-space: nowrap; }
+    .scaler { transform-origin: top left; }
+    iframe { border: 0; background: #000; display: block; }
+</style>
+</head>
+<body>
+<div class="rack">
+    <h2>WIN OVERLAY — ACTION BUTTON GRID @ REAL DEVICE WIDTHS</h2>
+    <div class="row" id="frames"></div>
+</div>
+
+<!-- ==== exact copy of index.html #ov-win ==== -->
+<div class="overlay" id="ov-win">
+    <div class="ov-top-half" id="ov-top-half">
+        <div id="ov-reveal" class="ov-reveal"></div>
+    </div>
+    <div class="ov-bottom-half">
+        <div class="ov-title win" data-t="ov_win">STOXEL SOLVED!</div>
+        <div class="ov-reveal-quote" id="ov-reveal-quote"></div>
+
+        <div class="ov-stats-columns">
+            <div class="ov-col" id="ov-col-score"></div>
+            <div class="ov-col" id="ov-col-time"></div>
+        </div>
+
+        <div class="bonus-list" id="bonus-list"></div>
+        <div id="item-reward-zone"></div>
+
+        <div class="ov-btns ov-btns-win-grid">
+            <div class="ov-btns-col">
+                <button class="ob s" id="btn-win-levels" data-t="btn_levels">LEVELS</button>
+            </div>
+            <div class="ov-btns-col">
+                <button class="ob s" id="btn-win-retry" data-t="btn_retry">REPLAY</button>
+                <button class="ob y" id="btn-win-retry-setup" data-t="btn_retry_setup">⟳ REPLAY (NEW SETUP)</button>
+            </div>
+            <div class="ov-btns-col">
+                <button class="ob p" id="btn-next-lvl" data-t="btn_next">NEXT ▶</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    if (EMBED) {
+        document.body.classList.add('embed');
+
+        // Representative win content (same strings the DE game shows)
+        document.getElementById('ov-col-score').innerHTML =
+            '<div class="ov-sub-line ov-sub-pts">1240 Punkte</div>' +
+            '<div class="ov-sub-line ov-sub-pts">Multiplikator: ×1.35</div>' +
+            '<div class="ov-sub-line ov-sub-pts">(+1240)</div>';
+        document.getElementById('ov-col-time').innerHTML =
+            '<div class="ov-sub-line ov-sub-time">⏱ 03:12 übrig · gelöst in 04:47</div>' +
+            '<div class="ov-sub-line ov-sub-miss-ok">✗ 0 Fehler</div>';
+        document.getElementById('bonus-list').innerHTML =
+            '<span class="bonus-badge earned">✓ Bonus erfüllt</span>';
+        document.getElementById('ov-reveal-quote').textContent =
+            '“Jedes System beugt sich seiner Statistik.”';
+
+        // Normal win state: all buttons + columns visible
+        document.getElementById('ov-win').classList.add('show');
+    } else {
+        // iframe rack — widths chosen so the ≤640px media query fires inside
+        // the phone frames but not the laptop frame.
+        const DEVICES = [
+            { name: '1280x800 laptop', w: 1280, h: 800, s: 0.52 },
+            { name: '768x1024 tablet', w: 768,  h: 1024, s: 0.52 },
+            { name: '414x896 phone',   w: 414,  h: 896,  s: 0.55 },
+            { name: '320x568 phone',   w: 320,  h: 568,  s: 0.65 }
+        ];
+        const row = document.getElementById('frames');
+        DEVICES.forEach(d => {
+            const box = document.createElement('div');
+            box.className = 'frame-box';
+            box.innerHTML = `<div class="frame-label">${d.name} (scale ${d.s})</div>`;
+            const scaler = document.createElement('div');
+            scaler.className = 'scaler';
+            scaler.style.width = (d.w * d.s) + 'px';
+            scaler.style.height = (d.h * d.s) + 'px';
+            scaler.style.transform = 'scale(' + d.s + ')';
+            const f = document.createElement('iframe');
+            f.width = d.w; f.height = d.h;
+            f.src = 'win-overlay-preview.html?embed=1';
+            scaler.appendChild(f);
+            box.appendChild(scaler);
+            row.appendChild(box);
+        });
+    }
+</script>
+</body>
+</html>

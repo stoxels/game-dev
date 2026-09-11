@@ -284,6 +284,11 @@ function getEffectiveCooldown(slot, baseSeconds) {
 // This avoids rebuilding the entire HUD on every tick — we just swap the text.
 // Falls back silently if the button can't be found (e.g. panel was re-rendered).
 function _patchCooldownButton(slot) {
+    // Hotbar slots show the same countdown (skills are cast from the bar now).
+    if (typeof patchHotbarCooldownForLegacySlot === 'function') {
+        patchHotbarCooldownForLegacySlot(slot);
+    }
+
     const btn = document.querySelector(
         `#class-hud-panel .chud-skill-btn[data-slot="${slot}"]`
     );
@@ -387,7 +392,11 @@ function startSlotCooldown(slot, seconds) {
     const state = cooldownState[slot];
 
     if (state.interval) clearInterval(state.interval);
-    state.remaining = seconds;
+    // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev-testing.js):
+    // ×1 = exact shipped behaviour; scales every ability cooldown centrally.
+    const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
+        ? window.STOX_EFFECT_TIME_SCALE : 1;
+    state.remaining = Math.max(1, Math.round(seconds * scale));
 
     _patchCooldownButton(slot);
     state.interval = setInterval(() => _tickSlotCooldown(slot), 1000);
@@ -444,51 +453,21 @@ function _abilityHotkeysBlocked() {
     return false;
 }
 
-// Handles a key press bound to an ability slot (ability-1…ability-5, keys
-// 1–5 by default) by toggling the corresponding ability slot.
-function _handleAbilityKeyPress(key, e) {
-    let slot = null;
-    if (typeof keybindKeyFor === 'function') {
-        for (let i = 1; i <= 5; i++) {
-            if (keybindKeyFor(`ability-${i}`) === key) {
-                slot = `active${i}`;
-                break;
-            }
-        }
-    } else {
-        const slotMap = { '1': 'active1', '2': 'active2', '3': 'active3', '4': 'active4', '5': 'active5' };
-        slot = slotMap[key] ?? null;
-    }
-    if (slot) {
-        e.preventDefault();
-        toggleActiveAbility(slot);
-    }
-}
-
-// Sets up keyboard shortcuts for ability activation (ability-1…ability-5,
-// keys 1–5 by default) and Escape to disarm.
+// Sets up Escape to disarm a pending (armed) ability.
+//
+// Ability ACTIVATION no longer lives here: the hotbar slots own the
+// hotbar-1…hotbar-10 keybinds and route through activateHotbarSlot()
+// (see js/skills/skill-hotbar.js), so the player can rebind them like any
+// other key and remap spells freely.
 // Registered once at file load time.
-function _initClassAbilityHotkeys() {
+function _initAbilityEscapeHotkey() {
     document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
         if (_abilityHotkeysBlocked()) return;
-
-        if (typeof keybindMatches === 'function') {
-            for (let i = 1; i <= 5; i++) {
-                if (keybindMatches(e, `ability-${i}`)) {
-                    _handleAbilityKeyPress(e.key, e);
-                    return;
-                }
-            }
-        } else if (['1', '2', '3', '4', '5'].includes(e.key)) {
-            _handleAbilityKeyPress(e.key, e);
-            return;
-        }
-
-        if (e.key === 'Escape' && activeAbilityMode) {
-            _setAbilityMode(false);
-            buildClassHUD();
-        }
+        if (!activeAbilityMode) return;
+        _setAbilityMode(false);
+        buildClassHUD();
     });
 }
 
-_initClassAbilityHotkeys();
+_initAbilityEscapeHotkey();

@@ -891,10 +891,13 @@ document.addEventListener('keydown', function (e) {
 //------------------------------------------------------------------------
 //-------------------TOOLTIP OVERRIDE (currency items)---------------------
 //------------------------------------------------------------------------
-// Overrides _egShowTooltip from endgame-hub.js: currency items get a
-// simple description tooltip; equipment still uses the full stat block.
-// Renders into the floating game tooltip (tooltips-hud.js) instead of
-// the old tooltip panel.
+// THE single _egShowTooltip implementation (consolidated 2026-09 from
+// endgame-hub.js / endgame-hub-drag-and-drop.js, where duplicate copies
+// used to race via load order). Currency/essence/shard items get a styled
+// card; maps use endgame-maps.js's tooltip builder; everything else uses
+// the full stat block from _egBuildTooltipBodyHTML. Renders into the
+// floating game tooltip (tooltips-hud.js) and drives the Alt-compare
+// tooltip.
 
 function _egShowTooltip(item, e) {
     _egTooltipItem = item;

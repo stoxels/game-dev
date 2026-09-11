@@ -186,22 +186,21 @@
         background-repeat: no-repeat;
         background-position: center;
         font-family: 'Georgia', 'Times New Roman', serif;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         letter-spacing: 0.3px;
         color: #2c1a0c;
         text-shadow: none;
-        line-height: 1.25;
+        line-height: 1.3;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
         width: 100%;
         min-height: 60px;
-        padding: 0 5%;
-        padding-bottom: 4px;
+        padding: 2px 5% 4px;
         box-sizing: border-box;
-        white-space: normal;
+        white-space: pre-line;
     }
 
 /* =========================================================================
@@ -414,30 +413,10 @@
     }
 
 /* =========================================================================
-   BACK BUTTON (top-left corner)
+   BACK BUTTON (top-left corner) — now the unified .back-btn slab from
+   base.css (positioning comes from .back-btn-corner); this block only
+   keeps the setup screen's slightly larger label.
    ========================================================================= */
 .setup-back-corner-btn {
-    position: absolute;
-    top: 1.5%;
-    left: 1.5%;
-    z-index: 10;
-    font-family: var(--PX);
     font-size: 20px;
-    letter-spacing: 1px;
-    color: var(--accent2);
-    background-image: url('../images/Game_Setup/return_to_menu_button.webp');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    border: none;
-    padding: 16px 28px;
-    min-width: 150px;
-    cursor: pointer;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-    transition: transform .12s, filter .12s;
 }
-
-    .setup-back-corner-btn:hover {
-        filter: brightness(1.2);
-        transform: translateY(-2px);
-    }

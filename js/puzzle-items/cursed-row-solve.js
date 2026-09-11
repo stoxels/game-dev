@@ -22,17 +22,14 @@ function _useCursedRowSolve(id, def) {
 // Helper: creates one tidal wave div at the given pass index.
 // Opacity decreases with each successive wave to fade them out.
 function _fxMakeWave(container, r, pass) {
-    const w = document.createElement('div');
-    w.className = 'fx-tidal-wave';
-    w.style.cssText = `
+    _fxMakeElement(container, `
         position:absolute;
         top:${r.top}px; height:${r.height}px;
         left:${r.left - r.width}px; width:${r.width * 1.3}px;
         animation:fx-wave-sweep 0.7s ease-in forwards;
         --wave-dist:${r.width * 2.5}px;
         opacity:${0.7 - pass * 0.18};
-    `;
-    container.appendChild(w);
+    `, 'fx-tidal-wave');
 }
 
 // 🌊 Tidal Wave — waves of blue sweep across the grid multiple times.

@@ -1,0 +1,1081 @@
+diff --git a/index.html b/index.html
+index 067ee1e..f0955c1 100644
+--- a/index.html
++++ b/index.html
+@@ -8 +8 @@
+-    <link rel="stylesheet" href="css/base.css">
++    <link rel="stylesheet" href="css/base.css?v=2">
+@@ -12 +12 @@
+-    <link rel="stylesheet" href="css/save-slots.css">
++    <link rel="stylesheet" href="css/save-slots.css?v=3">
+@@ -14,2 +14,2 @@
+-    <link rel="stylesheet" href="css/game.css">
+-    <link rel="stylesheet" href="css/setup-screen.css">
++    <link rel="stylesheet" href="css/game.css?v=2">
++    <link rel="stylesheet" href="css/setup-screen.css?v=4">
+@@ -20 +20 @@
+-    <link rel="stylesheet" href="css/achievements.css">
++    <link rel="stylesheet" href="css/achievements.css?v=2">
+@@ -22 +22 @@
+-    <link rel="stylesheet" href="css/probability_tree.css">
++    <link rel="stylesheet" href="css/probability_tree.css?v=2">
+@@ -33 +32,0 @@
+-    <link rel="stylesheet" href="css/classes/random-walker.css">
+@@ -41 +40 @@
+-    <link rel="stylesheet" href="css/endgame/endgame-hub.css">
++    <link rel="stylesheet" href="css/endgame/endgame-hub.css?v=2">
+@@ -47 +46 @@
+-    <link rel="stylesheet" href="css/map-view-topbar.css">
++    <link rel="stylesheet" href="css/map-view-topbar.css?v=8">
+@@ -49,2 +48,2 @@
+-    <link rel="stylesheet" href="css/highscore.css">
+-    <link rel="stylesheet" href="css/moodle-codes.css">
++    <link rel="stylesheet" href="css/highscore.css?v=4">
++    <link rel="stylesheet" href="css/moodle-codes.css?v=2">
+@@ -53 +52 @@
+-    <link rel="stylesheet" href="css/class_selection.css">
++    <link rel="stylesheet" href="css/class_selection.css?v=2">
+@@ -58,0 +58 @@
++    <link rel="stylesheet" href="css/dev-passive-tree.css">
+@@ -240 +240 @@
+-            <button class="back-btn" id="btn-save-slots-back" data-t="btn_back">◀ BACK</button>
++            <button class="back-btn back-btn-corner" id="btn-save-slots-back" data-t="btn_back">◀ BACK</button>
+@@ -343 +343 @@
+-            <button class="setup-back-corner-btn" id="btn-setup-back" data-t="btn_back">◀ BACK</button>
++            <button class="setup-back-corner-btn back-btn back-btn-corner" id="btn-setup-back" data-t="btn_back">◀ BACK</button>
+@@ -355 +355 @@
+-        <button class="back-btn dms-back" id="btn-mode-select-back" data-t="btn_back">◀ BACK</button>
++        <button class="back-btn back-btn-corner dms-back" id="btn-mode-select-back" data-t="btn_back">◀ BACK</button>
+@@ -374,0 +375,42 @@
++
++                <!-- DEV SANDBOX: new passive tree layout playground -->
++                <button class="dms-card" id="btn-mode-passive-tree-dev">
++                    <div class="dms-card-title" data-t="scr_mode_passive_tree_dev">🌳 Passive Tree (Dev)</div>
++                    <div class="dms-card-desc" data-t="scr_mode_passive_tree_dev_desc">Design the new passive tree layout. Sandbox, not connected to gameplay.</div>
++                </button>
++            </div>
++
++            <!-- CHEAT: Character Lab — test all 30 char/class combos + animations -->
++            <button class="dms-charlab-btn" id="btn-char-lab" onclick="showCharLab()">🧪 CHARACTER LAB</button>
++        </div>
++    </div>
++
++    <!-- CHEAT: CHARACTER LAB MODAL (all 30 character/class combos) -->
++    <div id="charlab-modal" class="modal-bg">
++        <div class="cl-box">
++            <div class="cl-head">
++                <span class="cl-title">🧪 CHARACTER LAB</span>
++                <button class="cl-close" onclick="closeCharLab()">✕</button>
++            </div>
++            <div class="cl-body">
++                <div id="charlab-grid" class="cl-grid"></div>
++                <div class="cl-preview-pane">
++                    <div class="cl-preview-label" id="charlab-preview-label">—</div>
++                    <div class="cl-preview-stage">
++                        <img id="charlab-preview-img" class="cl-preview-img" alt="">
++                    </div>
++                    <div class="cl-preview-state" id="charlab-preview-state">idle (move-down)</div>
++                    <div class="cl-dir-row">
++                        <button class="cl-dir" onclick="_charLabWalkDir('up')" title="Walk up">⬆</button>
++                        <div class="cl-dir-mid">
++                            <button class="cl-dir" onclick="_charLabWalkDir('left')" title="Walk left">⬅</button>
++                            <button class="cl-dir" onclick="_charLabWalkDir('down')" title="Walk down">⬇</button>
++                            <button class="cl-dir" onclick="_charLabWalkDir('right')" title="Walk right">➡</button>
++                        </div>
++                    </div>
++                    <button class="cl-stop" onclick="_charLabStopPreview()">■ STOP</button>
++                    <div class="cl-portrait-label">menu portrait</div>
++                    <img id="charlab-preview-portrait" class="cl-portrait-img" alt="">
++                    <button class="cl-save" onclick="_charLabSaveCurrent()">💾 SAVE INTO CURRENT SLOT</button>
++                    <div class="cl-hint">◉ directional walk art · ○ missing (omni fallback)</div>
++                </div>
+@@ -382 +424 @@
+-            <button class="back-btn" id="btn-adventure-back" data-t="btn_back">◀ BACK</button>
++            <button class="back-btn back-btn-corner" id="btn-adventure-back" data-t="btn_back">◀ BACK</button>
+@@ -818 +860 @@
+-                <button class="back-btn" id="btn-levels-back">◀ <span data-t="btn_setup">SETUP</span></button>
++                <button class="back-btn" id="btn-levels-back" data-t="btn_back">◀ BACK</button>
+@@ -841 +883 @@
+-            <button class="back-btn" id="mv-btn-back"><span data-t="btn_setup">SETUP</span></button>
++            <button class="back-btn" id="mv-btn-back" data-t="btn_back">◀ BACK</button>
+@@ -850,0 +893 @@
++                <button class="gtb-btn cc-token-btn" id="mv-btn-class-change" data-t="cls_change_btn_short" style="display:none;">🔄 CHANGE</button>
+@@ -867,2 +910,22 @@
+-        <div class="wd-topbar" style="display: flex; gap: 15px; align-items: center; padding: 10px; background: rgba(0,0,0,0.1);">
+-            <button id="btn-wd-back" class="btn-back" onclick="wdGoBackToMap()" data-t="scr_back_to_overworld">← BACK TO OVERWORLD</button>
++        <!-- Mirrors the overworld map-view topbar exactly (same assets, same
++             layout, wd- prefixed ids) — see css/map-view-topbar.css. The one
++             difference: the plaque shows the CURRENT WORLD NAME instead of
++             SELECT LEVEL. Populated by _wdBuildTopBar(). -->
++        <div class="ls-topbar">
++            <button class="back-btn" id="wd-btn-back" data-t="btn_back">◀ BACK</button>
++            <div class="mv-char-portrait-wrap" id="wd-char-portrait-wrap"></div>
++            <div class="mv-ribbon-combined">
++                <span id="wd-ls-score"> 0</span>
++                <span id="wd-ls-pts-next"></span>
++            </div>
++            <!-- (class-change token button lives in .ls-topbar-right below) -->
++            <span class="ls-title" id="wd-title-plaque">WORLD</span>
++
++            <div class="ls-topbar-right">
++                <span class="ls-class-status" id="wd-class-status"></span>
++                <button class="gtb-btn cc-token-btn" id="wd-btn-class-change" data-t="cls_change_btn_short" style="display:none;">🔄 CHANGE</button>
++                <button class="gtb-btn gtb-btn-inference" id="wd-btn-quest-log" data-t="btn_inference">
++                    INFERENCE <span id="wd-quest-log-badge" class="quest-badge" style="display:none;">!</span>
++                </button>
++                <button class="gtb-btn" id="wd-btn-passive-tree" data-t="tree">TREE</button>
++            </div>
+@@ -971,0 +1035 @@
++        <button class="back-btn" id="btn-hs-back" data-t="btn_back">◀ BACK</button>
+@@ -974 +1038,2 @@
+-            <!-- top row: menu button (left) + title plaque (center) -->
++            <!-- top row: title plaque (center); back button is a direct
++                 child of the screen, anchored top-left via #screen-hs > .back-btn -->
+@@ -976,5 +1040,0 @@
+-                <button class="hs-menu-btn" id="btn-hs-back">
+-                    <img class="hs-menu-btn-img" src="images/Highscore_Screen/return_to_menu_button.webp" alt="">
+-                    <span class="hs-menu-btn-label"><span data-t="btn_menu">MENU</span></span>
+-                </button>
+-
+@@ -1231 +1291 @@
+-            <button class="gtb-btn" id="btn-pt-back" data-t="btn_back">◀ BACK</button>
++            <button class="back-btn" id="btn-pt-back" data-t="btn_back">◀ BACK</button>
+@@ -1243,0 +1304,19 @@
++    <!-- DEV SANDBOX: new passive tree layout playground (not connected to gameplay) -->
++    <div class="screen" id="screen-dev-passive-tree">
++        <div class="pt-topbar">
++            <button class="back-btn" id="btn-dpt-back" data-t="btn_back">◀ BACK</button>
++            <span class="pt-title">🌳 <span data-t="dpt_title">PASSIVE TREE — DEV</span></span>
++            <div id="dpt-search-wrap"></div>
++            <div id="dpt-zoom-wrap">
++                <span id="dpt-zoom-label">100%</span>
++                <input type="range" id="dpt-zoom-bar" min="0" max="100" value="50" step="1">
++            </div>
++            <button class="gtb-btn" id="btn-dpt-add-points" data-t="dpt_add_points_btn">+10 POINTS</button>
++            <button class="gtb-btn" id="btn-dpt-refund-all" data-t="dpt_refund_all_btn">♻ REFUND ALL</button>
++            <span class="pt-points" id="dpt-points"></span>
++            <span id="dpt-count"></span>
++        </div>
++        <div class="pt-canvas" id="dpt-canvas"></div>
++        <div class="dpt-hint" data-t="dpt_hint">CLICK: allocate / remove · SHIFT+CLICK / RIGHT-CLICK: unspend node + stranded branch · 🔍 search · ♻ refund all</div>
++    </div>
++
+@@ -1337 +1416,50 @@
+-    <!-- SCRIPTS -->
++    <!-- SCRIPTS
++    ============================================================
++    SCRIPT LOAD ORDER — READ BEFORE MOVING ANYTHING.
++    This project has no module system: every file is global scope,
++    so ORDER IS SEMANTIC. Do not sort alphabetically or "by
++    dependency" blindly — the graph contains deliberate cycles that
++    only work because every cross-file call is deferred (event
++    handlers / runtime calls) or typeof-guarded.
++
++    HARD INVARIANTS (moving these breaks the game SILENTLY):
++    • The old LAST-DECLARED-WINS duplicate functions were consolidated
++      into single implementations in 2026-09 — DO NOT re-declare them
++      elsewhere:
++        _egShowTooltip        -> endgame-currency.js
++        _egRenderCurrencyCell -> endgame-hub-drag-and-drop.js
++        _egGenerateEquipmentDrop -> endgame-equipment-generator.js
++        _egGetElementalDamageBonus -> endgame-combat-calculations.js
++        _egRemoveVeil         -> shared-boss-abilities.js
++        _egPtSegDist          -> shared-boss-abilities.js
++        _shuffleArray         -> class-probabilist.js
++    • boss-framework.js + shared-boss-abilities.js MUST precede
++      every boss-*.js (they Object.assign into EG_BOSS_DEFS /
++      EG_BOSS_MECHANICS at load time).
++    • asset-preload.js → boot-loader.js → main.js is the boot
++      sequence; main.js stays LAST.
++    • Cyclic-by-design clusters (deferred calls only — never
++      reorder files across these boundaries):
++        endgame-encounter.js ↔ bosses/* (typeof-guarded hooks)
++        class-abilities.js ↔ class-*.js
++        screens-map-view.js ↔ screens-level-select.js ↔ screens-world-levels.js
++        achievements.js ↔ achievements-ui.js
++        storyline-engine.js ↔ storyline-beats.js (beats loads LAST on purpose)
++    • The quests-* block MUST load BEFORE state.js: state.js's top-level
++      initState() → migrateOldSave() calls migrateQuestState() at load
++      time. Quest files themselves only touch STATE etc. from deferred
++      calls, so loading them early is safe. (A 2026-09 attempt to move
++      quests after the passive-tree family broke the migration call —
++      do NOT move this block.)
++
++    LOAD-TIME GUARDS:
++    • boot-loader.js runs a sanity check that warns in the console if a
++      script failed to load or was ordered wrong.
++    • boss-rosters.js (last boss file) validates every mechanic handler
++      name via _egValidateAllBossHandlers().
++    • endgame-state.js owns EG_SCREEN_NAV + _egResolveBackFn for the
++      atlas/gate/nexus back-navigation strings.
++
++    CACHE-BUSTING: the ?v= param is per-file; bump it whenever that
++    file's content changes so players don't run stale scripts.
++    ============================================================ -->
+@@ -1342 +1470 @@
+-    <script src="js/translation/translations-strings.js"></script>
++    <script src="js/translation/translations-strings.js?v=3"></script>
+@@ -1350 +1478 @@
+-    <script src="js/state.js"></script>
++    <script src="js/state.js?v=2"></script>
+@@ -1400 +1528 @@
+-    <script src="js/codes.js"></script>
++    <script src="js/codes.js?v=2"></script>
+@@ -1402 +1530 @@
+-    <script src="js/screens/screens-map-view.js"></script>
++    <script src="js/screens/screens-map-view.js?v=3"></script>
+@@ -1404 +1532 @@
+-    <script src="js/screens/screens-world-levels.js"></script>
++    <script src="js/screens/screens-world-levels.js?v=5"></script>
+@@ -1417 +1545 @@
+-    <script src="js/classes/class-ui.js"></script>
++    <script src="js/classes/class-ui.js?v=2"></script>
+@@ -1433,2 +1561,5 @@
+-    <script src="js/achievements/achievements-ui.js"></script>
+-    <script src="js/passive-tree/passive-tree-data.js"></script>
++    <script src="js/achievements/achievements-ui.js?v=2"></script>
++    <!-- Dev sandbox tree (passive-tree-dev-data.js, ~41k lines / 951 KB) is
++         NOT loaded here — it is injected on demand the first time the
++         sandbox is opened (see _loadDevPassiveTreeAndOpen in ui-events.js). -->
++    <script src="js/passive-tree/passive-tree-data.js?v=2"></script>
+@@ -1436 +1567 @@
+-    <script src="js/passive-tree/passive-tree-ui.js"></script>
++    <script src="js/passive-tree/passive-tree-ui.js?v=2"></script>
+@@ -1443 +1574 @@
+-    <script src="js/sprite/character-select.js"></script>
++    <script src="js/sprite/character-select.js?v=2"></script>
+@@ -1550 +1681 @@
+-    <script src="js/endgame/endgame-atlas-ui.js"></script>
++    <script src="js/endgame/endgame-atlas-ui.js?v=2"></script>
+@@ -1558 +1689 @@
+-    <script src="js/endgame/endgame-hub.js"></script>
++    <script src="js/endgame/endgame-hub.js?v=2"></script>
+@@ -1560,3 +1691,3 @@
+-    <script src="js/endgame/endgame-gate.js"></script>
+-    <script src="js/endgame/endgame-nexus.js"></script>
+-    <script src="js/endgame/endgame-boss-test.js"></script>
++    <script src="js/endgame/endgame-gate.js?v=2"></script>
++    <script src="js/endgame/endgame-nexus.js?v=2"></script>
++    <script src="js/endgame/endgame-boss-test.js?v=2"></script>
+@@ -1572 +1703 @@
+-    <script src="js/endgame/endgame-vendor.js"></script>
++    <script src="js/endgame/endgame-vendor.js?v=2"></script>
+@@ -1574 +1705,2 @@
+-    <script src="js/sprite/player_sprite.js"></script>
++    <script src="js/sprite/player_sprite.js?v=4"></script>
++    <script src="js/sprite/cheat-combo-picker.js"></script>
+@@ -1583 +1715 @@
+-    <script src="js/endgame-testing-screen.js"></script>
++    <script src="js/endgame-testing-screen.js?v=2"></script>
+@@ -1589 +1721 @@
+-    <script src="js/asset-preload.js"></script>
++    <script src="js/asset-preload.js?v=2"></script>
+diff --git a/js/endgame/bosses/boss-framework.js b/js/endgame/bosses/boss-framework.js
+index 6d2592f..87eb572 100644
+--- a/js/endgame/bosses/boss-framework.js
++++ b/js/endgame/bosses/boss-framework.js
+@@ -214,31 +214,8 @@ function _egBossInit(monster) {
+-// Cancels all mechanic timers for a specific boss and cleans up any
+-// active field effects it created (corrupted cells, veil, blackout).
+-function _egBossCleanup(monsterId) {
+-    const timers = _egBossTimers[monsterId];
+-    if (timers) {
+-        timers.forEach(t => { clearTimeout(t); clearInterval(t); });
+-        delete _egBossTimers[monsterId];
+-    }
+-    if (typeof _egClearAllCorruptedCells === 'function') _egClearAllCorruptedCells();
+-    if (typeof _egClearPriorBombFuses === 'function') _egClearPriorBombFuses();
+-    if (typeof _egClearShiftGlows === 'function') _egClearShiftGlows();
+-    if (typeof _egClearAllFrozenCells === 'function') _egClearAllFrozenCells();
+-    if (typeof _egRemoveVeil === 'function') _egRemoveVeil();
+-    if (typeof _egRemoveBlackout === 'function') _egRemoveBlackout();
+-    if (typeof _egRemoveClueSwap === 'function') _egRemoveClueSwap();
+-    if (typeof _egRemoveGridInvert === 'function') _egRemoveGridInvert();
+-    if (typeof _egVoidSurgeTeardown === 'function') _egVoidSurgeTeardown();
+-    if (typeof _egBlastTeardownAll === 'function') _egBlastTeardownAll();
+-    if (typeof _egCrushTeardown === 'function') _egCrushTeardown();
+-    if (typeof _egClearFateMarks === 'function') _egClearFateMarks();
+-    if (typeof _egRemoveFogBank === 'function') _egRemoveFogBank();
+-    if (typeof _egRemoveClueScramble === 'function') _egRemoveClueScramble();
+-    if (typeof _egTitheTeardown === 'function') _egTitheTeardown(monsterId);
+-    if (typeof _egNkTeardownBoss === 'function') _egNkTeardownBoss(monsterId);
+-    if (typeof _egFireflyTeardown === 'function') _egFireflyTeardown(monsterId);
+-    // The Snail: slimes + broom live outside nk runs — tear them down too.
+-    if (typeof _egSnailTeardown === 'function') _egSnailTeardown();
+-    // The Demolitionist: the Bomb Maze owns body-level state (countdown
+-    // overlay, banner, charge-bar freeze) while it runs — drop it with the
+-    // boss. Runs on boss death and on encounter stop via _egBossCleanupAll.
+-    if (typeof _egCrashTeardown === 'function') _egCrashTeardown();
++// Per-boss teardown hooks: [monsterIdPrefix, globalTeardownFn, exactMatch?].
++// A hook fires when the monster id matches (prefix match unless
++// exactMatch) and the named teardown is a global function. Boss files
++// load AFTER this file, so the functions resolve at cleanup time — that
++// is also why every entry keeps the typeof guard (a boss file that fails
++// to load must not break cleanup). Keeps _egBossCleanup free of per-boss
++// if-blocks: a new boss only adds one array entry.
++const EG_BOSS_TEARDOWN_HOOKS = [
+@@ -248,3 +225 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId === 'boss_brutus' && typeof _egBrutusZombieTeardown === 'function') {
+-        _egBrutusZombieTeardown();
+-    }
++    ['boss_brutus', '_egBrutusZombieTeardown', true],
+@@ -252,3 +227 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_dynamo') && typeof _egDynamoTeardown === 'function') {
+-        _egDynamoTeardown();
+-    }
++    ['boss_dynamo', '_egDynamoTeardown'],
+@@ -257,8 +230,4 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_gust') && typeof _egGustTeardown === 'function') {
+-        _egGustTeardown();
+-    }
+-    // The Marksman: HP-gate watcher + any running Arrow Gauntlet (bow walls,
+-    // flying arrows, countdown overlay, charge-bar pause).
+-    if (monsterId.startsWith('boss_marksman') && typeof _egMarksmanTeardown === 'function') {
+-        _egMarksmanTeardown();
+-    }
++    ['boss_gust', '_egGustTeardown'],
++    // The Marksman: HP-gate watcher + any running Arrow Gauntlet (bow
++    // walls, flying arrows, countdown overlay, charge-bar pause).
++    ['boss_marksman', '_egMarksmanTeardown'],
+@@ -267,8 +236,4 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_puddle') && typeof _egPuddleTeardown === 'function') {
+-        _egPuddleTeardown();
+-    }
+-    // The Sprout: persistent garden arena (root vines, spore drift, bramble
+-    // wall whips, doom bud blooms + pollen dust).
+-    if (monsterId.startsWith('boss_sprout') && typeof _egSproutTeardown === 'function') {
+-        _egSproutTeardown();
+-    }
++    ['boss_puddle', '_egPuddleTeardown'],
++    // The Sprout: persistent garden arena (root vines, spore drift,
++    // bramble wall whips, doom bud blooms + pollen dust).
++    ['boss_sprout', '_egSproutTeardown'],
+@@ -277,3 +242 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_bumper') && typeof _egBumperTeardown === 'function') {
+-        _egBumperTeardown();
+-    }
++    ['boss_bumper', '_egBumperTeardown'],
+@@ -282,3 +245 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_centipede') && typeof _egCentipedeTeardown === 'function') {
+-        _egCentipedeTeardown();
+-    }
++    ['boss_centipede', '_egCentipedeTeardown'],
+@@ -287,3 +248 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_striker') && typeof _egStrikerTeardown === 'function') {
+-        _egStrikerTeardown();
+-    }
++    ['boss_striker', '_egStrikerTeardown'],
+@@ -292,3 +251 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_thwomp') && typeof _egThwompTeardown === 'function') {
+-        _egThwompTeardown();
+-    }
++    ['boss_thwomp', '_egThwompTeardown'],
+@@ -297,3 +254 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_coil') && typeof _egCoilTeardown === 'function') {
+-        _egCoilTeardown();
+-    }
++    ['boss_coil', '_egCoilTeardown'],
+@@ -302,3 +257 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_dancer') && typeof _egDancerTeardown === 'function') {
+-        _egDancerTeardown();
+-    }
++    ['boss_dancer', '_egDancerTeardown'],
+@@ -307,3 +260 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_gale') && typeof _egGaleTeardown === 'function') {
+-        _egGaleTeardown();
+-    }
++    ['boss_gale', '_egGaleTeardown'],
+@@ -312,3 +263 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_gambler') && typeof _egGamblerTeardown === 'function') {
+-        _egGamblerTeardown();
+-    }
++    ['boss_gambler', '_egGamblerTeardown'],
+@@ -317,3 +266 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_gourmet') && typeof _egGourmetTeardown === 'function') {
+-        _egGourmetTeardown();
+-    }
++    ['boss_gourmet', '_egGourmetTeardown'],
+@@ -322,3 +269 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_lodestone') && typeof _egLodestoneTeardown === 'function') {
+-        _egLodestoneTeardown();
+-    }
++    ['boss_lodestone', '_egLodestoneTeardown'],
+@@ -327,8 +272,4 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_stack') && typeof _egStackTeardown === 'function') {
+-        _egStackTeardown();
+-    }
+-    // The Tactician: persistent chess siege (gliding queen, battle intents,
+-    // pawn marches, check lanes, zugzwang, checkmate walls).
+-    if (monsterId.startsWith('boss_tactician') && typeof _egTacticianTeardown === 'function') {
+-        _egTacticianTeardown();
+-    }
++    ['boss_stack', '_egStackTeardown'],
++    // The Tactician: persistent chess siege (gliding queen, battle
++    // intents, pawn marches, check lanes, zugzwang, checkmate walls).
++    ['boss_tactician', '_egTacticianTeardown'],
+@@ -337,3 +278 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_bomber') && typeof _egBmbTeardown === 'function') {
+-        _egBmbTeardown();
+-    }
++    ['boss_bomber', '_egBmbTeardown'],
+@@ -342,3 +281 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_creeper') && typeof _egCrpTeardown === 'function') {
+-        _egCrpTeardown();
+-    }
++    ['boss_creeper', '_egCrpTeardown'],
+@@ -347,3 +284 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_buzz') && typeof _egBzTeardown === 'function') {
+-        _egBzTeardown();
+-    }
++    ['boss_buzz', '_egBzTeardown'],
+@@ -352,3 +287 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_encore') && typeof _egEnTeardown === 'function') {
+-        _egEnTeardown();
+-    }
++    ['boss_encore', '_egEnTeardown'],
+@@ -357,3 +290 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_medusa') && typeof _egMdTeardown === 'function') {
+-        _egMdTeardown();
+-    }
++    ['boss_medusa', '_egMdTeardown'],
+@@ -362,3 +293 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_maze') && typeof _egMzTeardown === 'function') {
+-        _egMzTeardown();
+-    }
++    ['boss_maze', '_egMzTeardown'],
+@@ -367,3 +296 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_monsoon') && typeof _egMnTeardown === 'function') {
+-        _egMnTeardown();
+-    }
++    ['boss_monsoon', '_egMnTeardown'],
+@@ -372,3 +299 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_needle') && typeof _egNdTeardown === 'function') {
+-        _egNdTeardown();
+-    }
++    ['boss_needle', '_egNdTeardown'],
+@@ -377,3 +302 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_aegis') && typeof _egAgTeardown === 'function') {
+-        _egAgTeardown();
+-    }
++    ['boss_aegis', '_egAgTeardown'],
+@@ -382,3 +305 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_gridlock') && typeof _egGlTeardown === 'function') {
+-        _egGlTeardown();
+-    }
++    ['boss_gridlock', '_egGlTeardown'],
+@@ -387,3 +308 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_jester') && typeof _egJsTeardown === 'function') {
+-        _egJsTeardown();
+-    }
++    ['boss_jester', '_egJsTeardown'],
+@@ -392,3 +311 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_shaper') && typeof _egShpTeardown === 'function') {
+-        _egShpTeardown();
+-    }
++    ['boss_shaper', '_egShpTeardown'],
+@@ -397,3 +314 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_siren') && typeof _egSireTeardown === 'function') {
+-        _egSireTeardown();
+-    }
++    ['boss_siren', '_egSireTeardown'],
+@@ -402,3 +317 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_swarm') && typeof _egSwTeardown === 'function') {
+-        _egSwTeardown();
+-    }
++    ['boss_swarm', '_egSwTeardown'],
+@@ -407,3 +320 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_colossus') && typeof _egColoTeardown === 'function') {
+-        _egColoTeardown();
+-    }
++    ['boss_colossus', '_egColoTeardown'],
+@@ -411,5 +322,2 @@ function _egBossCleanup(monsterId) {
+-    // itself — the framework's shared typeof-guarded veil removal resolves
+-    // to the copies that live in boss-bayes.js.
+-    if (monsterId.startsWith('boss_bayes') && typeof _egBayTeardown === 'function') {
+-        _egBayTeardown();
+-    }
++    // itself (the shared _egRemoveVeil lives in shared-boss-abilities.js).
++    ['boss_bayes', '_egBayTeardown'],
+@@ -418,3 +326 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_entropy') && typeof _egEntrTeardown === 'function') {
+-        _egEntrTeardown();
+-    }
++    ['boss_entropy', '_egEntrTeardown'],
+@@ -423,3 +329 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_laplace') && typeof _egLapTeardown === 'function') {
+-        _egLapTeardown();
+-    }
++    ['boss_laplace', '_egLapTeardown'],
+@@ -428,3 +332 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_inferno') && typeof _egInfVTeardown === 'function') {
+-        _egInfVTeardown();
+-    }
++    ['boss_inferno', '_egInfVTeardown'],
+@@ -434,3 +336 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_null') && typeof _egNulTeardown === 'function') {
+-        _egNulTeardown();
+-    }
++    ['boss_null', '_egNulTeardown'],
+@@ -439,3 +339 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_barrage') && typeof _egBarTeardown === 'function') {
+-        _egBarTeardown();
+-    }
++    ['boss_barrage', '_egBarTeardown'],
+@@ -444,3 +342 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_bloom') && typeof _egBlmTeardown === 'function') {
+-        _egBlmTeardown();
+-    }
++    ['boss_bloom', '_egBlmTeardown'],
+@@ -449,8 +345,4 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_minotaur') && typeof _egMntTeardown === 'function') {
+-        _egMntTeardown();
+-    }
+-    // The Overfitter (rework): gradient sweeps, pattern replays, validation
+-    // rings and the FINAL EPOCH heat-map set-piece.
+-    if (monsterId.startsWith('boss_overfitter') && typeof _egOvrTeardown === 'function') {
+-        _egOvrTeardown();
+-    }
++    ['boss_minotaur', '_egMntTeardown'],
++    // The Overfitter (rework): gradient sweeps, pattern replays,
++    // validation rings and the FINAL EPOCH heat-map set-piece.
++    ['boss_overfitter', '_egOvrTeardown'],
+@@ -459,2 +351,51 @@ function _egBossCleanup(monsterId) {
+-    if (monsterId.startsWith('boss_razor') && typeof _egRzrTeardown === 'function') {
+-        _egRzrTeardown();
++    ['boss_razor', '_egRzrTeardown'],
++    // The Shrine Maiden (rework): knot barriers, mirror spirits, ofuda
++    // wards and the THOUSAND ARMS talisman-grid set-piece.
++    ['boss_shrine', '_egShrTeardown'],
++    // The Stormcaller (rework): ion currents, chain lightning, the storm
++    // eye grid and the PERFECT STORM charge-bullet set-piece.
++    ['boss_sirus', '_egSirTeardown'],
++    // The Vise (rework): breathing crushing walls, the bench vise jaws,
++    // quench casts and the FULL CLAMP safe-slab set-piece (replaces the
++    // legacy _egCrushTeardown corridor hook).
++    ['boss_vise', '_egVisTeardown'],
++];
++
++
++// Cancels all mechanic timers for a specific boss and cleans up any
++// active field effects it created (corrupted cells, veil, blackout).
++function _egBossCleanup(monsterId) {
++    const timers = _egBossTimers[monsterId];
++    if (timers) {
++        timers.forEach(t => { clearTimeout(t); clearInterval(t); });
++        delete _egBossTimers[monsterId];
++    }
++    if (typeof _egClearAllCorruptedCells === 'function') _egClearAllCorruptedCells();
++    if (typeof _egClearPriorBombFuses === 'function') _egClearPriorBombFuses();
++    if (typeof _egClearShiftGlows === 'function') _egClearShiftGlows();
++    if (typeof _egClearAllFrozenCells === 'function') _egClearAllFrozenCells();
++    if (typeof _egRemoveVeil === 'function') _egRemoveVeil();
++    if (typeof _egRemoveBlackout === 'function') _egRemoveBlackout();
++    if (typeof _egRemoveClueSwap === 'function') _egRemoveClueSwap();
++    if (typeof _egRemoveGridInvert === 'function') _egRemoveGridInvert();
++    if (typeof _egVoidSurgeTeardown === 'function') _egVoidSurgeTeardown();
++    if (typeof _egBlastTeardownAll === 'function') _egBlastTeardownAll();
++    if (typeof _egCrushTeardown === 'function') _egCrushTeardown();
++    if (typeof _egClearFateMarks === 'function') _egClearFateMarks();
++    if (typeof _egRemoveFogBank === 'function') _egRemoveFogBank();
++    if (typeof _egRemoveClueScramble === 'function') _egRemoveClueScramble();
++    if (typeof _egTitheTeardown === 'function') _egTitheTeardown(monsterId);
++    if (typeof _egNkTeardownBoss === 'function') _egNkTeardownBoss(monsterId);
++    if (typeof _egFireflyTeardown === 'function') _egFireflyTeardown(monsterId);
++    // The Snail: slimes + broom live outside nk runs — tear them down too.
++    if (typeof _egSnailTeardown === 'function') _egSnailTeardown();
++    // The Demolitionist: the Bomb Maze owns body-level state (countdown
++    // overlay, banner, charge-bar freeze) while it runs — drop it with the
++    // boss. Runs on boss death and on encounter stop via _egBossCleanupAll.
++    if (typeof _egCrashTeardown === 'function') _egCrashTeardown();
++    // Per-boss field-effect teardowns — registry-driven
++    // (EG_BOSS_TEARDOWN_HOOKS above; entries keep their own typeof guard).
++    for (let i = 0; i < EG_BOSS_TEARDOWN_HOOKS.length; i++) {
++        const hook = EG_BOSS_TEARDOWN_HOOKS[i];
++        const matches = hook[2] ? monsterId === hook[0] : monsterId.startsWith(hook[0]);
++        if (matches && typeof window[hook[1]] === 'function') window[hook[1]]();
+@@ -663,0 +605,28 @@ function _egBossScheduleMechanics(monster, phase) {
++
++
++// Sweeps every registered boss and warns about mechanic handler names that
++// do not resolve to a global function. Called once after all boss files
++// have loaded (end of boss-rosters.js) so a typo'd handler string can
++// never silently disable a mechanic. Dispatch happens via
++// window[mech.handler] in _egBossScheduleSingleMechanic, so every handler
++// must be a top-level function declaration.
++function _egValidateAllBossHandlers() {
++    const missing = [];
++    Object.keys(EG_BOSS_MECHANICS).forEach(bossId => {
++        const def = EG_BOSS_MECHANICS[bossId];
++        (def.mechanics || []).forEach(mech => {
++            if (mech.handler && typeof window[mech.handler] !== 'function') {
++                missing.push(`${bossId}: ${mech.handler} (${mech.name || 'unnamed mechanic'})`);
++            }
++        });
++    });
++    // Teardown hooks are dispatched via window[name] in _egBossCleanup.
++    EG_BOSS_TEARDOWN_HOOKS.forEach(hook => {
++        if (typeof window[hook[1]] !== 'function') {
++            missing.push(`${hook[0]}: teardown ${hook[1]}`);
++        }
++    });
++    if (missing.length) {
++        console.warn(`[boss-framework] ${missing.length} mechanic handler(s) do not resolve to a global function:`, missing.join(', '));
++    }
++}
+diff --git a/js/endgame/endgame-encounter.js b/js/endgame/endgame-encounter.js
+index 4bfd487..8d099ff 100644
+--- a/js/endgame/endgame-encounter.js
++++ b/js/endgame/endgame-encounter.js
+@@ -597,0 +598,138 @@ function _egTickMonster(m) {
++// Freeze-gates for the player auto-attack charge bar: an ordered list of
++// global predicate function names. A gate "holds" when its predicate
++// returns true AND an endgame encounter is active — during set-pieces the
++// bar must not charge (dodge/read set-pieces are not free DPS time). The
++// Clock's time-freeze (a window flag) and the Firefly's trial (a window
++// function) stay as explicit checks after the loop — all gates are
++// independent predicates, so order between them has no observable effect.
++// New bosses add one entry here instead of another if-block in
++// _egTickPlayer. Names are validated at load (all boss files load before
++// this file), see the warn loop below.
++const EG_PLAYER_CHARGE_PAUSE_GATES = [
++    // The Snail's Snailgeddon: while the ≤20% finisher runs (countdown
++    // AND the closing ring) the bar stays frozen (boss-snail.js).
++    '_egSnailgeddonActive',
++    // The Demolitionist's Bomb Maze: while the ≤25% finisher runs
++    // (countdown AND the chase) the bar stays frozen
++    // (boss-demolitionist.js).
++    '_egCrashMazeActive',
++    // The Bomber's TOTAL CARPET: while the ≤10% finale runs (countdown
++    // AND the detonation waves) the bar stays frozen (boss-bomber.js).
++    '_egBomberFinalActive',
++    // The Creeper's SSSS…BOOM: while the ≤10% finale runs (countdown AND
++    // the mega blast) the bar stays frozen (boss-creeper.js).
++    '_egCrpFinalActive',
++    // The Aegis's LAST BASTION: while the ≤10% finale runs (the beam
++    // sweep AND the vanguard) the bar stays frozen (boss-aegis.js).
++    '_egAgFinalActive',
++    // The Needle's FINAL STITCH: while the ≤10% finale runs (the stabs
++    // AND the last stitch) the bar stays frozen (boss-needle.js).
++    '_egNdFinalActive',
++    // The Monsoon's GREAT FLOOD: while the ≤10% finale runs (the surges
++    // AND the break) the bar stays frozen (boss-monsoon.js).
++    '_egMnFinalActive',
++    // The Maze's GAME OVER: while the ≤10% finale runs (convergence slams
++    // AND the chomp) the bar stays frozen (boss-maze.js).
++    '_egMzFinalActive',
++    // The Medusa's THE STARE: while the ≤10% finale runs (statue beats
++    // AND the gaze sweep) the bar stays frozen (boss-medusa.js).
++    '_egMdFinalActive',
++    // The Encore's CURTAIN CALL: while the ≤10% finale runs
++    // (musical-chairs spotlight AND the ovation) the bar stays frozen
++    // (boss-encore.js).
++    '_egEnFinalActive',
++    // The Buzzsaw's FINAL CUT: while the ≤10% finale runs (walls closing
++    // AND the crosscut) the bar stays frozen (boss-buzz.js).
++    '_egBzFinalActive',
++    // The Snail's broom: while held, sweeping is a DPS trade-off — the
++    // bar stays frozen (boss-snail.js).
++    '_egSnailBroomHeld',
++    // Grand Prior defuse pause: while the player stands on an armed bomb
++    // the bar freezes — defusing is a DPS trade-off, not a defensive tool
++    // (shared-boss-abilities.js, _egPriorBombDefusing).
++    '_egPriorBombDefusing',
++    // The Gust's wind lanes: while the player rides a lane the bar stays
++    // frozen — a dodge set-piece (boss-gust.js).
++    '_egGustChargePaused',
++    // The Marksman's Arrow Gauntlet: countdown + arrow waves are a dodge
++    // set-piece — the bar is paused for the whole gauntlet
++    // (boss-marksman.js).
++    '_egMarksGauntletChargePaused',
++    // The Striker's scoring set-pieces (Kick-Off Challenge / Hat-Trick):
++    // while the player runs, charges and kicks the match ball the bar
++    // stays frozen — scoring IS the attack during the challenge
++    // (boss-striker.js).
++    '_egStrkScoringActive',
++    // The Gridlock's SYSTEM LOCKDOWN: while the wire-grid finale runs the
++    // bar stays frozen (boss-gridlock.js).
++    '_egGlFinalActive',
++    // The Jester's GRAND FINALE: while the full-house show runs the bar
++    // stays frozen (boss-jester.js).
++    '_egJsFinalActive',
++    // The Shaper's SHAPED WINTER: while the monolith finale runs the bar
++    // stays frozen — core-shattering IS the attack (boss-shaper.js).
++    '_egShpFinalActive',
++    // The Siren's DEADLY ARIA: while the bubble-song finale runs the bar
++    // stays frozen (boss-siren.js).
++    '_egSireFinalActive',
++    // The Swarm's SWARM SINGULARITY: while the drone-ball finale runs the
++    // bar stays frozen (boss-swarm.js).
++    '_egSwFinalActive',
++    // The Colossus' TITAN'S FALL: while the seal-climbing finale runs the
++    // bar stays frozen (boss-colossus.js).
++    '_egColoFinalActive',
++    // Bayes' THEOMERE'S GAMBIT: the belief set-piece owns the board — no
++    // free auto-attack charging while Bayes bets everything (boss-bayes.js).
++    '_egBayFinalActive',
++    // Entropy's THE LAST DEGREE: shard-gathering IS the set-piece — no
++    // free auto-attack charging while absolute zero approaches
++    // (boss-entropy.js).
++    '_egEntrFinalActive',
++    // Laplace's THE CLOSED TIMELINE: the learnable loop owns the arena —
++    // no free auto-attack charging while the Demon replays your fate
++    // (boss-laplace.js).
++    '_egLapFinalActive',
++    // The Inferno's SUPERVOLCANIC WINTER: lure-and-dodge IS the set-piece
++    // — no free auto-attack charging while the arena is frozen over
++    // (boss-inferno.js).
++    '_egInfVFinalActive',
++    // The Null's PROOF BY CONTRADICTION: the white-out proof owns the
++    // arena — no free auto-attack charging while the hypothesis is tested
++    // (boss-null.js).
++    '_egNulFinalActive',
++    // The Barrage's FINAL BOMBARDMENT: reading the volleys and racing to
++    // the safe tile IS the set-piece (boss-barrage.js).
++    '_egBarFinalActive',
++    // The Bloom's FULMINATION: carving scars to open the ONE TRUE GAP is
++    // the set-piece (boss-bloom.js).
++    '_egBlmFinalActive',
++    // The Minotaur's WARDEN'S LABYRINTH: stone-breaking IS the set-piece
++    // (boss-minotaur.js).
++    '_egMntFinalActive',
++    // The Overfitter's FINAL EPOCH: reading the heat-map of your own fight
++    // history IS the set-piece (boss-overfitter.js).
++    '_egOvrFinalActive',
++    // The Razor's A THOUSAND EDGES: walking the reversing spoke clock IS
++    // the set-piece (boss-razor.js).
++    '_egRzrFinalActive',
++    // The Shrine Maiden's THOUSAND ARMS: reading the knocks IS the
++    // set-piece (boss-shrine.js).
++    '_egShrFinalActive',
++    // The Stormcaller's PERFECT STORM: dodging your own charge IS the
++    // set-piece (boss-sirus.js).
++    '_egSirFinalActive',
++    // The Vise's FULL CLAMP: reading the compression IS the set-piece
++    // (boss-vise.js).
++    '_egVisFinalActive',
++];
++
++// Boot-time validation: every gate name must resolve to a global function
++// (all boss files load before this file). A typo'd name would otherwise
++// silently disable the freeze for that boss's set-piece.
++EG_PLAYER_CHARGE_PAUSE_GATES.forEach(function (name) {
++    if (typeof window[name] !== 'function') {
++        console.warn('[boss-framework] charge-pause gate missing:', name);
++    }
++});
++
++
+@@ -616,81 +754,7 @@ function _egTickPlayer() {
+-    if (typeof _egSnailgeddonActive === 'function' && _egSnailgeddonActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Demolitionist's Bomb Maze: while the ≤25% finisher runs
+-    // (countdown AND the chase) the auto-attack charge bar stays frozen —
+-    // it is a pure dodge-and-run set-piece, not free damage time
+-    // (boss-demolitionist.js).
+-    if (typeof _egCrashMazeActive === 'function' && _egCrashMazeActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Bomber's TOTAL CARPET: while the ≤10% finale runs (countdown
+-    // AND the detonation waves) the auto-attack charge bar stays frozen —
+-    // pure dodge-into-the-dome set-piece, not free DPS (boss-bomber.js).
+-    if (typeof _egBomberFinalActive === 'function' && _egBomberFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Creeper's SSSS…BOOM: while the ≤10% finale runs (countdown AND
+-    // the mega blast) the auto-attack charge bar stays frozen — a flee-the-
+-    // ring set-piece, not free DPS (boss-creeper.js).
+-    if (typeof _egCrpFinalActive === 'function' && _egCrpFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Aegis's LAST BASTION: while the ≤10% finale runs (the beam sweep
+-    // AND the vanguard) the auto-attack charge bar stays frozen — a dodge-
+-    // the-sweep set-piece, not free DPS (boss-aegis.js).
+-    if (typeof _egAgFinalActive === 'function' && _egAgFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Needle's FINAL STITCH: while the ≤10% finale runs (the stabs AND
+-    // the last stitch) the auto-attack charge bar stays frozen — a thread-
+-    // the-eye set-piece, not free DPS (boss-needle.js).
+-    if (typeof _egNdFinalActive === 'function' && _egNdFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Monsoon's GREAT FLOOD: while the ≤10% finale runs (the surges
+-    // AND the break) the auto-attack charge bar stays frozen — a climb-to-
+-    // the-island set-piece, not free DPS (boss-monsoon.js).
+-    if (typeof _egMnFinalActive === 'function' && _egMnFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Maze's GAME OVER: while the ≤10% finale runs (convergence slams
+-    // AND the chomp) the auto-attack charge bar stays frozen — a never-
+-    // stand-still set-piece, not free DPS (boss-maze.js).
+-    if (typeof _egMzFinalActive === 'function' && _egMzFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Medusa's THE STARE: while the ≤10% finale runs (statue beats AND
+-    // the gaze sweep) the auto-attack charge bar stays frozen — a shelter-
+-    // from-the-light set-piece, not free DPS (boss-medusa.js).
+-    if (typeof _egMdFinalActive === 'function' && _egMdFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Encore's CURTAIN CALL: while the ≤10% finale runs (musical-chairs
+-    // spotlight AND the ovation) the auto-attack charge bar stays frozen —
+-    // a follow-the-light set-piece, not free DPS (boss-encore.js).
+-    if (typeof _egEnFinalActive === 'function' && _egEnFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Buzzsaw's FINAL CUT: while the ≤10% finale runs (walls closing AND
+-    // the crosscut) the auto-attack charge bar stays frozen — a hold-the-
+-    // centre set-piece, not free DPS (boss-buzz.js).
+-    if (typeof _egBzFinalActive === 'function' && _egBzFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    if (typeof _egSnailBroomHeld === 'function' && _egSnailBroomHeld()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    if (typeof _egPriorBombDefusing === 'function' && _egPriorBombDefusing()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-        // If not in an active encounter, fall through (no effect outside endgame)
+-    }
+-    // The Gust's wind lanes: while the player rides a lane the auto-attack
+-    // charge bar stays frozen — a dodge set-piece, not free DPS (boss-gust.js).
+-    if (typeof _egGustChargePaused === 'function' && _egGustChargePaused()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Marksman's Arrow Gauntlet: countdown + arrow waves are a dodge
+-    // set-piece — the auto-attack bar is paused for the whole gauntlet
+-    // (boss-marksman.js).
+-    if (typeof _egMarksGauntletChargePaused === 'function' && _egMarksGauntletChargePaused()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
++    // Freeze-gates: set-piece predicates, registry-driven (see
++    // EG_PLAYER_CHARGE_PAUSE_GATES above). Each gate holds only while an
++    // endgame encounter is active.
++    for (let i = 0; i < EG_PLAYER_CHARGE_PAUSE_GATES.length; i++) {
++        const gate = window[EG_PLAYER_CHARGE_PAUSE_GATES[i]];
++        if (typeof gate === 'function' && gate()
++            && typeof _egIsActive === 'function' && _egIsActive()) return;
+@@ -710,100 +773,0 @@ function _egTickPlayer() {
+-    // The Striker's scoring set-pieces (Kick-Off Challenge / Hat-Trick):
+-    // while the player runs, charges and kicks the match ball the auto-attack
+-    // charge bar stays frozen — scoring IS the attack during the challenge,
+-    // not free DPS on top of it (boss-striker.js).
+-    if (typeof _egStrkScoringActive === 'function' && _egStrkScoringActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Gridlock's SYSTEM LOCKDOWN: while the wire-grid finale runs the
+-    // auto-attack charge bar stays frozen — a pure read-the-grid set-piece,
+-    // not free DPS (boss-gridlock.js).
+-    if (typeof _egGlFinalActive === 'function' && _egGlFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Jester's GRAND FINALE: while the full-house show runs the
+-    // auto-attack charge bar stays frozen — a pure read-the-reveal
+-    // set-piece, not free DPS (boss-jester.js).
+-    if (typeof _egJsFinalActive === 'function' && _egJsFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Shaper's SHAPED WINTER: while the monolith finale runs the
+-    // auto-attack charge bar stays frozen — core-shattering IS the attack,
+-    // not free DPS on top of it (boss-shaper.js).
+-    if (typeof _egShpFinalActive === 'function' && _egShpFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Siren's DEADLY ARIA: while the bubble-song finale runs the
+-    // auto-attack charge bar stays frozen — following the song IS the
+-    // set-piece, not free DPS (boss-siren.js).
+-    if (typeof _egSireFinalActive === 'function' && _egSireFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Swarm's SWARM SINGULARITY: while the drone-ball finale runs the
+-    // auto-attack charge bar stays frozen — reading the charges and slipping
+-    // the funnel IS the set-piece, not free DPS (boss-swarm.js).
+-    if (typeof _egSwFinalActive === 'function' && _egSwFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Colossus' TITAN'S FALL: while the seal-climbing finale runs the
+-    // auto-attack charge bar stays frozen — climbing and breaking seals IS
+-    // the set-piece, not free DPS (boss-colossus.js).
+-    if (typeof _egColoFinalActive === 'function' && _egColoFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // Bayes' THEOMERE'S GAMBIT: the belief set-piece owns the board — no
+-    // free auto-attack charging while Bayes bets everything (boss-bayes.js).
+-    if (typeof _egBayFinalActive === 'function' && _egBayFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // Entropy's THE LAST DEGREE: shard-gathering IS the set-piece — no free
+-    // auto-attack charging while absolute zero approaches (boss-entropy.js).
+-    if (typeof _egEntrFinalActive === 'function' && _egEntrFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // Laplace's THE CLOSED TIMELINE: the learnable loop owns the arena — no
+-    // free auto-attack charging while the Demon replays your fate
+-    // (boss-laplace.js).
+-    if (typeof _egLapFinalActive === 'function' && _egLapFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Inferno's SUPERVOLCANIC WINTER: lure-and-dodge IS the set-piece —
+-    // no free auto-attack charging while the arena is frozen over
+-    // (boss-inferno.js).
+-    if (typeof _egInfVFinalActive === 'function' && _egInfVFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Null's PROOF BY CONTRADICTION: the white-out proof owns the arena
+-    // — no free auto-attack charging while the hypothesis is tested
+-    // (boss-null.js).
+-    if (typeof _egNulFinalActive === 'function' && _egNulFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Barrage's FINAL BOMBARDMENT: reading the volleys and racing to the
+-    // safe tile IS the set-piece — no free auto-attack charging while the
+-    // guns walk the board (boss-barrage.js).
+-    if (typeof _egBarFinalActive === 'function' && _egBarFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Bloom's FULMINATION: carving scars to open the ONE TRUE GAP is the
+-    // set-piece — no free auto-attack charging while the garden blooms from
+-    // every direction (boss-bloom.js).
+-    if (typeof _egBlmFinalActive === 'function' && _egBlmFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Minotaur's WARDEN'S LABYRINTH: stone-breaking IS the set-piece — no
+-    // free auto-attack charging while the final maze rises (boss-minotaur.js).
+-    if (typeof _egMntFinalActive === 'function' && _egMntFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Overfitter's FINAL EPOCH: reading the heat-map of your own fight
+-    // history IS the set-piece — no free auto-attack charging while the
+-    // model re-trains on you (boss-overfitter.js).
+-    if (typeof _egOvrFinalActive === 'function' && _egOvrFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+-    // The Razor's A THOUSAND EDGES: walking the reversing spoke clock IS the
+-    // set-piece — no free auto-attack charging while the blades condense
+-    // (boss-razor.js).
+-    if (typeof _egRzrFinalActive === 'function' && _egRzrFinalActive()) {
+-        if (typeof _egIsActive === 'function' && _egIsActive()) return;
+-    }
+diff --git a/js/puzzle-items/cursed-col-solve.js b/js/puzzle-items/cursed-col-solve.js
+index bc74f49..6c455d2 100644
+--- a/js/puzzle-items/cursed-col-solve.js
++++ b/js/puzzle-items/cursed-col-solve.js
+@@ -28,3 +28 @@ function _fxMakeVortexStrips(container, r) {
+-        const strip = document.createElement('div');
+-        strip.className = 'fx-vortex-strip';
+-        strip.style.cssText = `
++        _fxMakeElement(container, `
+@@ -35,2 +33 @@ function _fxMakeVortexStrips(container, r) {
+-        `;
+-        container.appendChild(strip);
++        `, 'fx-vortex-strip');
+diff --git a/js/puzzle-items/cursed-reveal.js b/js/puzzle-items/cursed-reveal.js
+index a422f8a..a30f109 100644
+--- a/js/puzzle-items/cursed-reveal.js
++++ b/js/puzzle-items/cursed-reveal.js
+@@ -48,3 +48 @@ function _fxMakeCursedTint(container, r) {
+-    const tint = document.createElement('div');
+-    tint.className = 'fx-cursed-tint';
+-    tint.style.cssText = `
++    _fxMakeElement(container, `
+@@ -54,2 +52 @@ function _fxMakeCursedTint(container, r) {
+-    `;
+-    container.appendChild(tint);
++    `, 'fx-cursed-tint');
+diff --git a/js/puzzle-items/cursed-row-col.js b/js/puzzle-items/cursed-row-col.js
+index 9bbdcd7..797b7b6 100644
+--- a/js/puzzle-items/cursed-row-col.js
++++ b/js/puzzle-items/cursed-row-col.js
+@@ -25,2 +24,0 @@ function _fxDetonateBlast(container, r) {
+-    const blast = document.createElement('div');
+-    blast.className = 'fx-chaos-blast';
+@@ -28 +26 @@ function _fxDetonateBlast(container, r) {
+-    blast.style.cssText = `
++    const blast = _fxMakeElement(container, `
+@@ -34,2 +32 @@ function _fxDetonateBlast(container, r) {
+-    `;
+-    container.appendChild(blast);
++    `, 'fx-chaos-blast');
+diff --git a/js/puzzle-items/cursed-row-solve.js b/js/puzzle-items/cursed-row-solve.js
+index afcefa3..b09117f 100644
+--- a/js/puzzle-items/cursed-row-solve.js
++++ b/js/puzzle-items/cursed-row-solve.js
+@@ -25,3 +25 @@ function _fxMakeWave(container, r, pass) {
+-    const w = document.createElement('div');
+-    w.className = 'fx-tidal-wave';
+-    w.style.cssText = `
++    _fxMakeElement(container, `
+@@ -34,2 +32 @@ function _fxMakeWave(container, r, pass) {
+-    `;
+-    container.appendChild(w);
++    `, 'fx-tidal-wave');
+diff --git a/js/puzzle-items/cursed-shield.js b/js/puzzle-items/cursed-shield.js
+index 3554971..d014b3b 100644
+--- a/js/puzzle-items/cursed-shield.js
++++ b/js/puzzle-items/cursed-shield.js
+@@ -25,3 +25 @@ function _fxMakeEyeScanLines(container, r) {
+-        const line = document.createElement('div');
+-        line.className = 'fx-eye-scanline';
+-        line.style.cssText = `
++        _fxMakeElement(container, `
+@@ -32,2 +30 @@ function _fxMakeEyeScanLines(container, r) {
+-        `;
+-        container.appendChild(line);
++        `, 'fx-eye-scanline');
+diff --git a/js/puzzle-items/cursed-time.js b/js/puzzle-items/cursed-time.js
+index 842701b..933c607 100644
+--- a/js/puzzle-items/cursed-time.js
++++ b/js/puzzle-items/cursed-time.js
+@@ -33,3 +33 @@ function _fxMakeFogTendrils(container, r) {
+-        const fog = document.createElement('div');
+-        fog.className = 'fx-cursed-fog';
+-        fog.style.cssText = `
++        _fxMakeElement(container, `
+@@ -39,2 +37 @@ function _fxMakeFogTendrils(container, r) {
+-        `;
+-        container.appendChild(fog);
++        `, 'fx-cursed-fog');
+diff --git a/js/ui-events.js b/js/ui-events.js
+index 7ec2117..121f8dc 100644
+--- a/js/ui-events.js
++++ b/js/ui-events.js
+@@ -315,0 +316,32 @@ document.addEventListener('DOMContentLoaded', () => {
++    // Lazy-loads the dev sandbox passive tree (passive-tree-dev-data.js +
++    // passive-tree-dev.js are NOT in index.html — together they are ~41k
++    // lines / ~1 MB and would otherwise be parsed on every page load). The
++    // first click on the sandbox button injects both scripts sequentially
++    // (data first — dev.js reads it at load time), then opens the tree.
++    // Subsequent clicks see showDevPassiveTree already defined and go
++    // straight to the screen.
++    function _loadDevPassiveTreeAndOpen() {
++        if (typeof showDevPassiveTree === 'function') {
++            showDevPassiveTree();
++            return;
++        }
++        const files = [
++            'js/passive-tree/passive-tree-dev-data.js',
++            'js/passive-tree/passive-tree-dev.js',
++        ];
++        let i = 0;
++        const loadNext = () => {
++            if (i >= files.length) {
++                if (typeof showDevPassiveTree === 'function') showDevPassiveTree();
++                else console.warn('[dev-tree] scripts loaded but showDevPassiveTree is still missing');
++                return;
++            }
++            const s = document.createElement('script');
++            s.src = files[i++];
++            s.onload = loadNext;
++            s.onerror = () => console.warn('[dev-tree] failed to load', s.src);
++            document.head.appendChild(s);
++        };
++        loadNext();
++    }
++
+@@ -322,0 +355,3 @@ document.addEventListener('DOMContentLoaded', () => {
++    // DEV SANDBOX: new passive tree layout playground (not connected to gameplay)
++    onClick('btn-mode-passive-tree-dev', () => _loadDevPassiveTreeAndOpen());
++
+@@ -682,0 +718,3 @@ document.addEventListener('DOMContentLoaded', () => {
++    // DEV SANDBOX passive tree — BACK returns to the select-mode screen.
++    onClick('btn-dpt-back', () => dptGoBack());
++

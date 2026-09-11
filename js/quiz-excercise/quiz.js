@@ -620,7 +620,15 @@ function _quizTutorRevealMcAnswer() {
 
 // Locks the numeric-input controls.
 // Called when the Tutor succeeds on an input question.
+// Fills the correct answer (formatted via the question's tolerance, see
+// mgFormatTutorAnswer in mathgate.js) before locking, so the player sees
+// WHAT the tutor solved instead of just a "solved" message.
 function _quizTutorLockInputQuestion() {
+    const inp = document.getElementById('quiz-input');
+    if (inp && currentQuizQuestion) {
+        const fill = (typeof mgFormatTutorAnswer === 'function') ? mgFormatTutorAnswer(currentQuizQuestion) : '';
+        if (fill !== '') inp.value = fill;
+    }
     document.getElementById('quiz-input').disabled = true;
     document.getElementById('quiz-input-submit').disabled = true;
 }

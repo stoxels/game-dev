@@ -58,6 +58,30 @@ function _ptIsKeystoneNode(def) {
 
 
 
+//------------------------------------------------------------------------
+//----------------------NODE TIER CLASSIFICATION-------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// The three visual/importance tiers a node can belong to (Path of Exile
+// style): travel nodes are small connectors, notables are the regular
+// mechanical pickups, keystones are build-defining and visually dominant.
+const PT_TIER_TRAVEL = 'travel';
+const PT_TIER_NOTABLE = 'notable';
+const PT_TIER_KEYSTONE = 'keystone';
+
+// Returns the tier string for a skill definition (see constants above).
+// Keystones win over travel markers by design; anything that is neither is
+// a notable — which matches the data, where every non-marker node carries a
+// full mechanical description.
+function _ptGetNodeTier(def) {
+    if (_ptIsKeystoneNode(def)) return PT_TIER_KEYSTONE;
+    if (def && def.statKey && def.statKey.startsWith('travel_')) return PT_TIER_TRAVEL;
+    return PT_TIER_NOTABLE;
+}
+
+
+
 
 //------------------------------------------------------------------------
 //---------------------NODE STYLE HELPERS---------------------------------
@@ -70,40 +94,76 @@ function _ptIsKeystoneNode(def) {
 // _ptApplyNodeStyle() is the only function that actually touches the DOM.
 
 // --- allocated ---
-function _ptStylePropsAllocated(isKeystone) {
+function _ptStylePropsAllocated(tier) {
+    // Keystone: ornate amber — radial-lit gem with a double ring frame
+    if (tier === PT_TIER_KEYSTONE) {
+        return {
+            bg: 'radial-gradient(circle at 50% 35%, #2a1804 0%, #140a00 60%, #0d0600 100%)',
+            border: '3px solid #e8a020',
+            shadow: '0 0 16px rgba(232,160,32,0.8), 0 0 4px rgba(232,160,32,0.5), '
+                  + 'inset 0 0 0 2px rgba(232,160,32,0.35), inset 0 0 8px rgba(0,0,0,0.6)',
+            dotColor: '#e8a020',
+            cursor: 'pointer',
+        };
+    }
+    // Notable: the standard allocated look plus a subtle inner ring
+    if (tier === PT_TIER_NOTABLE) {
+        return {
+            bg: PT_COL_ALLOCATED_BG,
+            border: `2px solid ${PT_COL_ALLOCATED_BORDER}`,
+            shadow: '0 0 12px rgba(109,191,64,0.6), inset 0 0 0 1px rgba(109,191,64,0.35), inset 0 0 4px rgba(0,0,0,0.3)',
+            dotColor: PT_COL_ALLOCATED_DOT,
+            cursor: 'pointer',
+        };
+    }
+    // Travel: minimal — small, plain, quietly green
     return {
-        bg: isKeystone ? '#1a1000' : PT_COL_ALLOCATED_BG,
-        border: isKeystone
-            ? '2px solid #e8a020'
-            : `2px solid ${PT_COL_ALLOCATED_BORDER}`,
-        shadow: isKeystone
-            ? '0 0 14px rgba(232,160,32,0.75), inset 0 0 6px rgba(0,0,0,0.4)'
-            : '0 0 10px rgba(109,191,64,0.55), inset 0 0 4px rgba(0,0,0,0.3)',
-        dotColor: isKeystone ? '#e8a020' : PT_COL_ALLOCATED_DOT,
+        bg: '#16220e',
+        border: `2px solid ${PT_COL_ALLOCATED_BORDER}`,
+        shadow: '0 0 6px rgba(109,191,64,0.4)',
+        dotColor: PT_COL_ALLOCATED_DOT,
         cursor: 'pointer',
     };
 }
 
 // --- unlockable (reachable but not yet taken) ---
-function _ptStylePropsUnlockable(isStart, isKeystone) {
+function _ptStylePropsUnlockable(isStart, tier) {
     // The start node gets a special golden border even in unlockable state
-    const border = isStart
-        ? `3px solid ${PT_COL_START}`
-        : isKeystone
-            ? '2px solid #c07818'
-            : `2px solid ${PT_COL_UNLOCKED_BORDER}`;
-
-    const shadow = isStart
-        ? '0 0 12px rgba(255,215,0,0.6), inset 0 0 6px rgba(255,215,0,0.15)'
-        : isKeystone
-            ? '0 0 8px rgba(192,120,24,0.45), inset 0 0 4px rgba(0,0,0,0.4)'
-            : '0 0 6px rgba(184,154,80,0.3), inset 0 0 4px rgba(0,0,0,0.4)';
-
+    if (isStart) {
+        return {
+            bg: PT_COL_UNLOCKED_BG,
+            border: `3px solid ${PT_COL_START}`,
+            shadow: '0 0 12px rgba(255,215,0,0.6), inset 0 0 6px rgba(255,215,0,0.15)',
+            dotColor: PT_COL_START,
+            cursor: 'pointer',
+        };
+    }
+    // Keystone: dark ember gem with warm amber frame
+    if (tier === PT_TIER_KEYSTONE) {
+        return {
+            bg: 'radial-gradient(circle at 50% 35%, #201203 0%, #0f0700 60%, #0a0400 100%)',
+            border: '3px solid #c07818',
+            shadow: '0 0 10px rgba(192,120,24,0.5), inset 0 0 0 2px rgba(192,120,24,0.3), inset 0 0 8px rgba(0,0,0,0.6)',
+            dotColor: '#c07818',
+            cursor: 'pointer',
+        };
+    }
+    // Notable: golden frame with a faint inner ring — richer than travel
+    if (tier === PT_TIER_NOTABLE) {
+        return {
+            bg: PT_COL_UNLOCKED_BG,
+            border: `2px solid ${PT_COL_UNLOCKED_BORDER}`,
+            shadow: '0 0 7px rgba(184,154,80,0.4), inset 0 0 0 1px rgba(184,154,80,0.3), inset 0 0 4px rgba(0,0,0,0.4)',
+            dotColor: PT_COL_UNLOCKED_DOT,
+            cursor: 'pointer',
+        };
+    }
+    // Travel: small and muted
     return {
-        bg: isKeystone ? '#100800' : PT_COL_UNLOCKED_BG,
-        border,
-        shadow,
-        dotColor: isStart ? PT_COL_START : isKeystone ? '#c07818' : PT_COL_UNLOCKED_DOT,
+        bg: '#151522',
+        border: '2px solid #7a6a42',
+        shadow: 'none',
+        dotColor: '#7a6a42',
         cursor: 'pointer',
     };
 }
@@ -120,17 +180,18 @@ function _ptStylePropsLocked() {
 }
 
 // Picks the correct style props for the given node id based on its current
-// visual state (allocated / unlockable / locked) and type (keystone / start).
+// visual state (allocated / unlockable / locked) and its tier
+// (travel / notable / keystone).
 function _ptResolveNodeStyleProps(id) {
     const isStart = (id === PT_START_ID);
     const state = _ptGetNodeVisualState(id);
     const skill = _pt_skillMap[id];
     const def = skill ? skill._def : null;
-    const isKeystone = _ptIsKeystoneNode(def);
+    const tier = _ptGetNodeTier(def);
 
     switch (state) {
-        case 'allocated': return _ptStylePropsAllocated(isKeystone);
-        case 'unlockable': return _ptStylePropsUnlockable(isStart, isKeystone);
+        case 'allocated': return _ptStylePropsAllocated(tier);
+        case 'unlockable': return _ptStylePropsUnlockable(isStart, tier);
         default: return _ptStylePropsLocked();       // 'locked'
     }
 }
@@ -245,7 +306,18 @@ function _ptTooltipBuildHtml(id) {
     const desc = _ptTooltipResolveDesc(def, lang);
     const statusHtml = _ptTooltipBuildStatusHtml(id, state, lang);
 
+    // Tier caption above the name — keystones and notables introduce
+    // themselves, plain travel markers stay uncaptioned.
+    const tier = _ptGetNodeTier(def);
+    let typeHtml = '';
+    if (tier === PT_TIER_KEYSTONE) {
+        typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#e8a020;margin-bottom:3px;">${t('pt_node_keystone')}</div>`;
+    } else if (tier === PT_TIER_NOTABLE) {
+        typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#93a7bd;margin-bottom:3px;">${t('pt_node_notable')}</div>`;
+    }
+
     return `
+        ${typeHtml}
         <div style="font-size:13px;font-weight:bold;color:#66fcf1;margin-bottom:5px;">${name}</div>
         ${desc ? `<div style="color:#bba870;">${desc}</div>` : ''}
         ${statusHtml}
@@ -476,11 +548,12 @@ function _ptAppendImageIcon(node, iconSrc, isKeystone) {
 }
 
 // Creates and appends an emoji <span> icon inside the node.
-function _ptAppendEmojiIcon(node, emoji, isKeystone) {
+// `scale` scales the emoji with the node's tier size (1 = regular node).
+function _ptAppendEmojiIcon(node, emoji, isKeystone, scale) {
     const span = document.createElement('span');
     span.textContent = emoji;
     span.style.cssText = `
-        font-size: ${PT_NODE_RADIUS * 0.95}px;
+        font-size: ${PT_NODE_RADIUS * 0.95 * (scale || 1)}px;
         line-height: 1;
         pointer-events: none;
         user-select: none;
@@ -507,7 +580,8 @@ function _ptAppendDotFallback(node, isKeystone) {
 // Resolves which icon string to use for a skill, preferring the definition
 // data over the layout data, then delegates to the right append helper.
 // The placeholder image 'axe-hammer-grey' is treated the same as no icon.
-function _ptAppendNodeIcon(node, skill, def, isKeystone) {
+// `scale` scales emoji icons with the node's tier size.
+function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
     const icon = (def && def.icon) ? def.icon : skill.image;
     const isImageUrl = icon && (icon.startsWith('/') || icon.startsWith('http'));
     const isRealImg = isImageUrl && !icon.includes('axe-hammer-grey');
@@ -516,7 +590,7 @@ function _ptAppendNodeIcon(node, skill, def, isKeystone) {
     if (isRealImg) {
         _ptAppendImageIcon(node, icon, isKeystone);
     } else if (isEmoji) {
-        _ptAppendEmojiIcon(node, icon, isKeystone);
+        _ptAppendEmojiIcon(node, icon, isKeystone, scale);
     } else {
         _ptAppendDotFallback(node, isKeystone);
     }
@@ -581,27 +655,38 @@ function _ptBindNodeEvents(node, skill, isKeystone) {
 
 // Builds and appends a single node <div> for the given skill.
 // Shape, icon, and events are handled by the helpers above.
+// Node size follows the three-tier hierarchy (Path of Exile style):
+//   keystone  1.5x — ornate amber gems, build-defining choices
+//   notable   1.12x — the regular mechanical pickups
+//   travel    0.8x — small connectors (statKey prefix 'travel_')
+// The start node keeps its dedicated 1.4x size.
 function _ptDrawNode(skill, offsetX, offsetY) {
     const cx = skill.x + offsetX;
     const cy = skill.y + offsetY;
     const isStart = (skill.id === PT_START_ID);
     const def = skill._def || null;
-    const isKeystone = _ptIsKeystoneNode(def);
-    // The start node is slightly larger than regular nodes
-    const r = isStart ? PT_NODE_RADIUS * 1.4 : PT_NODE_RADIUS;
+    const tier = _ptGetNodeTier(def);
+    const isKeystone = (tier === PT_TIER_KEYSTONE);
+
+    const r = isStart ? PT_NODE_RADIUS * 1.4
+        : tier === PT_TIER_KEYSTONE ? PT_NODE_RADIUS * 1.5
+        : tier === PT_TIER_TRAVEL ? PT_NODE_RADIUS * 0.8
+        : PT_NODE_RADIUS * 1.12;
 
     const node = document.createElement('div');
-    node.className = isKeystone ? 'pt-node pt-node-keystone' : 'pt-node';
+    node.className = isKeystone ? 'pt-node pt-node-keystone'
+        : tier === PT_TIER_TRAVEL ? 'pt-node pt-node-travel'
+        : 'pt-node';
     node.dataset.id = skill.id;
 
-    // Apply the correct shape layout (circle vs rotated diamond)
+    // Apply the correct shape layout (circle vs rotated diamond gem)
     if (isKeystone) {
         _ptApplyDiamondShape(node, cx, cy, r);
     } else {
         _ptApplyCircleShape(node, cx, cy, r);
     }
 
-    _ptAppendNodeIcon(node, skill, def, isKeystone);
+    _ptAppendNodeIcon(node, skill, def, isKeystone, r / PT_NODE_RADIUS);
     _ptBindNodeEvents(node, skill, isKeystone);
 
     _pt_nodesLayer.appendChild(node);

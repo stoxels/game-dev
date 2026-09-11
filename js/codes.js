@@ -342,7 +342,6 @@ function buildCodesScreen() {
     const achPct = calcAchievementProgress();
     const { total: totalAchTiers, have: unlockedAchTiers } = _getAchievementTierCounts();
 
-    const menuText = (typeof t === 'function' ? t('btn_menu') : null) || 'MENU';
     const footerMsg = (typeof t === 'function' ? t('scr_codes_footer') : null)
         || 'Earn points to unlock these powerful achievement codes!';
 
@@ -356,8 +355,8 @@ function buildCodesScreen() {
             <!-- MOODLE CODES logo image -->
             <img class="mc-logo" src="images/Moodle_Codes_Screen/Moodle_Codes_logo.webp" alt="Moodle Codes">
 
-            <!-- MENU button — top-left -->
-            <button class="mc-menu-btn" id="btn-codes-back">◀ ${menuText}</button>
+            <!-- BACK button — top-left (unified .back-btn stone slab) -->
+            <button class="back-btn back-btn-corner mc-menu-btn" id="btn-codes-back" data-t="btn_back">◀ BACK</button>
 
 
             <!-- 5 parchment row overlays (text + bars only, no icons) -->

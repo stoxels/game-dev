@@ -545,7 +545,7 @@ function _egRenderGateLevelChip() {
 function _egBuildGateTopbarHTML() {
     return `
 <div class="eg-topbar">
-    <button class="eg-back-btn" onclick="${_egGateBackFn}()">${t('btn_back')}</button>
+    <button class="eg-back-btn back-btn" onclick="${_egGateBackFn}()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('mg_gate_badge')}</span>
     <span id="eg-gate-level-chip" class="eg-gate-level-chip"
           onclick="if(typeof _egOpenAttributeWindow==='function')_egOpenAttributeWindow()"
@@ -1179,7 +1179,7 @@ function ensureEndgameGateScreen() {
 
 // Name of the global function the BACK button calls — set by
 // showEndgameGate(backFn). Defaults to the Nexus of Worlds.
-let _egGateBackFn = 'showEndgameNexus';
+let _egGateBackFn = EG_SCREEN_NAV.nexus;
 
 // Transitions to the Probability Gate screen and refreshes all rendered zones.
 // This is the main entry point called from elsewhere in the codebase.
@@ -1187,8 +1187,8 @@ let _egGateBackFn = 'showEndgameNexus';
 // 'showEndgameHub') overrides where the BACK button returns to — used
 // when the gate is opened from the endgame hub character sheet.
 function showEndgameGate(backFn) {
-    if (typeof backFn === 'string') _egGateBackFn = backFn;
-    else _egGateBackFn = 'showEndgameNexus';
+    if (typeof backFn === 'string') _egGateBackFn = _egResolveBackFn(backFn, EG_SCREEN_NAV.nexus);
+    else _egGateBackFn = EG_SCREEN_NAV.nexus;
     ensureEndgameGateScreen();
 
     // Migrate old gate screens that were built before the side-by-side

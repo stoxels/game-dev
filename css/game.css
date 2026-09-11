@@ -867,6 +867,10 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     align-items: flex-start;
     gap: 6px;
     padding: 6px 12px;
+    /* Cap the left HUD's width so on narrow viewports it can never grow
+       under the right-hand HUD (level name / zoom bar). Desktop is unaffected
+       (40vw is far wider than the clock + mistake counter ever get). */
+    max-width: 40vw;
 }
 
     .game-hud-corner .game-meta-clock {
@@ -904,10 +908,16 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         white-space: nowrap;
     }
 
-    .game-hud-corner .touchpad-mode-btn {
-        padding: 4px 8px;
-        font-size: clamp(10px, 1.3vw, 13px);
+    .game-hud-corner .clue-toggle-slot {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 5px;
     }
+
+        .game-hud-corner .clue-toggle-slot:empty {
+            display: none; /* no stray gap before the buttons are built */
+        }
 
     .game-hud-corner .eg-bonus-loot-chance {
         display: flex;
@@ -933,6 +943,12 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         left: 6px;
         gap: 8px;
         padding: 4px 8px;
+    }
+
+    .game-hud-corner .clue-toggle-slot {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
     }
 }
 
@@ -969,6 +985,12 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         text-align: right;
         padding: 2px 6px;
         pointer-events: none;
+        /* Long level names must never run into the timer on the left side.
+           The cap only bites on narrow viewports — every known level name is
+           far shorter than 52vw on desktop, so full-screen play is unchanged. */
+        max-width: min(52vw, 480px);
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
 /* Vertical zoom control — buttons top/bottom, fill bar in between */
@@ -1036,6 +1058,17 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
 
     .zoom-track {
         height: 70px;
+    }
+
+    /* Phones: shrink the level name further and cap it harder so the
+       timer block and the level name never overlap. */
+    .game-hud-corner-right .hud-level-name {
+        font-size: 9px;
+        max-width: 44vw;
+    }
+
+    .game-hud-corner {
+        max-width: 46vw;
     }
 }
 

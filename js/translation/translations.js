@@ -67,10 +67,28 @@ function applyTranslationsToDOM() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Swaps the title/boot expansion logo image to match the active language
+// (English vs. German "Rise of the Beasts" artwork). Called on every
+// language switch, including the boot-time setLang in main.js.
+function updateTitleExpansionLogos(lang) {
+    const src = lang === 'de'
+        ? 'images/Title_Screen/RiseOfTheBeasts_GermanLogo.webp'
+        : 'images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp';
+    const alt = lang === 'de' ? 'Aufstieg der Bestien' : 'Rise of the Beasts';
+    ['title-expansion-logo', 'boot-expansion-logo'].forEach(id => {
+        const img = document.getElementById(id);
+        if (img && img.getAttribute('src') !== src) {
+            img.setAttribute('src', src);
+            img.setAttribute('alt', alt);
+        }
+    });
+}
+
 // Switches the active language and refreshes all translated UI elements.
 // Called when the player clicks a language button on the title screen.
 function setLang(lang) {
     LANG = lang;
     updateLangButtons(lang);
     applyTranslationsToDOM();
+    updateTitleExpansionLogos(lang);
 }

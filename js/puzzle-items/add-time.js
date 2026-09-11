@@ -16,7 +16,7 @@ function _useAddTime(id, def) {
     // Countdown Crisis inverts timer items — but the Golden Clock guarantees
     // the timer can only increase, so the inversion is suppressed while it
     // is active.
-    if (ptHasSkill('keystone_countdown_crisis') && !window._goldenClockActive) {
+    if (ptHasSkill('keystone_countdown_crisis') && !window.STOX_FLAGS.goldenClockActive) {
         questStat_timerItemUsed();
         const before = timerSecs;
         timerSecs = Math.max(0, timerSecs - secs);

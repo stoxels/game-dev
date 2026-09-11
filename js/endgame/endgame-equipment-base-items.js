@@ -3948,60 +3948,9 @@ const EG_ALL_BASE_TYPES = [
 
 
 //------------------------------------------------------------------------
-//-------------------EQUIPMENT DROP GENERATOR-----------------------------
-//------------------------------------------------------------------------
-// _egGenerateEquipmentDrop(monsterLevel)
-//
-// Called by _egSpawnLootDrop() in endgame-grid-pickups.js whenever a
-// monster dies and the drop-chance roll succeeds.
-//
-// Steps:
-//   1. Filter the base type pool to entries whose minLevel ≤ monsterLevel.
-//   2. Pick one uniformly at random.
-//   3. Scale defensive values by ilvl.
-//   4. Wrap into a full item object compatible with the hub stash / DnD system.
-//
-// Returns a plain item object; never returns null (falls back to the
-// lowest-level item in the pool if nothing else qualifies).
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-//-------------------EQUIPMENT DROP GENERATOR-----------------------------
-//------------------------------------------------------------------------
-function _egGenerateEquipmentDrop(monsterLevel = 1) {
-    // Filter to base types the current monster level can drop.
-    let eligible = EG_ALL_BASE_TYPES.filter(b => b.minLevel <= monsterLevel);
-
-    // Fallback — should only trigger at ilvl 0 or if pool is misconfigured.
-    if (eligible.length === 0) eligible = EG_ALL_BASE_TYPES;
-
-    const base = eligible[Math.floor(Math.random() * eligible.length)];
-
-    // Build the full item object.
-    const baseName = (LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
-    const item = {
-        // Identity
-        id: `${base.id}_${Date.now()}`,
-        baseId: base.id,
-        name: baseName,
-        icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
-        // Classification
-        category: 'equip',
-        slotType: base.slotType,
-        archetype: base.archetype,
-        rarity: 'common',       // base drops are always Normal (white) rarity
-
-        // Level & requirements
-        itemLevel: monsterLevel, // We keep this so the item knows what level monster dropped it
-        requirements: { ...base.requirements },
-
-        // Defenses (Unscaled, raw copy from the base template)
-        defenses: { ...base.defenses },
-
-        // Weapons get their raw damage range attached as-is
-        ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
-        ...(base.hands ? { hands: base.hands } : {}),
-        ...(base.blockChance ? { blockChance: base.blockChance } : {}),
-    };
-
-    return item;
-}
+// _egGenerateEquipmentDrop(monsterLevel) is defined ONCE, in
+// endgame-equipment-generator.js (rarity roll + mod table + implicits).
+// A legacy common-only copy used to live at the end of this file and was
+// silently shadowed by the generator's version via load order — it was
+// removed 2026-09. Callers (_egSpawnLootDrop in endgame-grid-pickups.js,
+// endgame-encounter-chain.js) resolve to the generator's implementation.

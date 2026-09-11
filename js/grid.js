@@ -275,12 +275,12 @@ function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjM
 
 
 // _buildRowClueToggle — creates (or re-creates) the clue placement buttons
-//   below the puzzle wrap:
+//   in the top-left corner HUD, underneath the mistakes counter:
 //     "CLUES ▶/◀" — flips row clues between the left and right side of the grid
 //     "CLUES ▼/▲" — moves column clues between the top and bottom of the grid
 //   Both carry a mouse-over tooltip describing which way they currently move
 //   the clue numbers. Called once per buildGrid() so it always attaches to the
-//   current puzzle wrap.
+//   current HUD corner.
 
 // _wireClueBtnTooltip — attaches the shared game tooltip (tooltips-hud.js)
 //   to a clue toggle button. The button's current tip text lives in its
@@ -295,17 +295,17 @@ function _buildRowClueToggle() {
     document.getElementById('row-clue-toggle-btn')?.remove();
     document.getElementById('col-clue-toggle-btn')?.remove();
 
-    const wrap = document.getElementById('puzzle-scaler-wrap');
-    if (!wrap) return;
+    // Anchor: the corner HUD's dedicated clue-toggle slot (below the
+    // mistakes counter). Falls back to the puzzle wrap if the HUD is
+    // missing (defensive — the HUD is static markup in index.html).
+    const host = document.getElementById('clue-toggle-slot')
+        || document.getElementById('puzzle-scaler-wrap');
+    if (!host) return;
 
     const baseCss = `
-        position: absolute;
-        bottom: -28px;
-        transform: translateX(-50%);
-        z-index: 50;
         font-family: var(--PX);
         font-size: 9px;
-        padding: 4px 7px;
+        padding: 3px 7px;
         background: rgba(10,10,18,0.7);
         border: 1px solid var(--border2);
         color: var(--accent2);
@@ -313,25 +313,25 @@ function _buildRowClueToggle() {
         letter-spacing: 1px;
     `;
 
-    // Row clues button — sits just left of centre below the grid
+    // Row clues button — flips row clues left/right
     const rowBtn = document.createElement('button');
     rowBtn.id = 'row-clue-toggle-btn';
     rowBtn.textContent = t('cg_clues_btn_right');
     rowBtn.dataset.tip = t('cg_clues_title_right');
-    rowBtn.style.cssText = `${baseCss} left: calc(50% - 65px);`;
+    rowBtn.style.cssText = baseCss;
     rowBtn.onclick = _toggleRowCluesSide;
     _wireClueBtnTooltip(rowBtn);
-    wrap.appendChild(rowBtn);
+    host.appendChild(rowBtn);
 
-    // Column clues button — sits just right of centre below the grid
+    // Column clues button — moves column clues top/bottom
     const colBtn = document.createElement('button');
     colBtn.id = 'col-clue-toggle-btn';
     colBtn.textContent = t('cg_clues_btn_down');
     colBtn.dataset.tip = t('cg_clues_col_title_bottom');
-    colBtn.style.cssText = `${baseCss} left: calc(50% + 65px);`;
+    colBtn.style.cssText = baseCss;
     colBtn.onclick = _toggleColCluesSide;
     _wireClueBtnTooltip(colBtn);
-    wrap.appendChild(colBtn);
+    host.appendChild(colBtn);
 }
 
 

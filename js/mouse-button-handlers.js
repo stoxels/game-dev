@@ -294,6 +294,7 @@ function tryAbsorbWithConfidenceInterval(row, col) {
     renderCell(row, col);
     consecutiveCorrectFills = 0;        // CI absorption also breaks the correct-fill streak
     _streakBonusFills = 0;
+    if (typeof PassiveTracker !== 'undefined') PassiveTracker.onStreakReset();
     showToast(`📐 ${t('cg_ci_absorb')}`);
     return true;
 }
@@ -372,7 +373,7 @@ function openConfidenceIntervalGraceWindow() {
 // Golden Clock: decrement its mistake budget and trigger game-over if exhausted.
 // Returns true if the clock fired a game-over (caller should return).
 function checkGoldenClockAfterMistake() {
-    if (!window._goldenClockActive) return false;
+    if (!window.STOX_FLAGS.goldenClockActive) return false;
 
     window._goldenClockMistakesLeft = (window._goldenClockMistakesLeft || 0) - 1;
 
@@ -385,7 +386,7 @@ function checkGoldenClockAfterMistake() {
     }
 
     if (window._goldenClockMistakesLeft <= 0) {
-        window._goldenClockActive = false;
+        window.STOX_FLAGS.goldenClockActive = false;
         dead = true;
         stopTimer();
         window._lastFailedGi = cur.gIdx;
@@ -686,7 +687,7 @@ function checkStreakBonus() {
 
 // Orchestrates everything that happens after a verified correct left-click fill.
 function handleCorrectFill(row, col) {
-    if (STATE.questStats) STATE.questStats._ql_hasManuallyFilledCell = true;
+    questStat_hasManuallyFilledCell();
     Audio_Manager.playSFX('cellFill');
 
     trackAchStat('cellsFilled');
@@ -911,15 +912,25 @@ function stopPainting() {
 
 // Shows or hides the in-game toggle button based on the settings flag.
 // Called on settings change (settings.js) and once on level start.
+// The button hangs below the grid inside #puzzle-scaler-wrap, so showing/
+// hiding it also changes the space the grid needs — re-run the puzzle
+// scaling afterwards to keep the toggle clear of the inventory bar.
 function updateTouchpadModeButtonVisibility() {
     const btn = document.getElementById('btn-touchpad-mode');
     if (!btn) return;
+    const wasHidden = btn.classList.contains('hidden');
     btn.classList.toggle('hidden', !SETTINGS.touchpadModeEnabled);
 
     // If the setting was turned off while active, force back to normal mode
     if (!SETTINGS.touchpadModeEnabled && touchpadMarkModeActive) {
         touchpadMarkModeActive = false;
         _refreshTouchpadModeButtonLabel();
+    }
+
+    // Grid must re-fit whenever the toggle appears or disappears mid-level
+    if (wasHidden !== !SETTINGS.touchpadModeEnabled
+        && typeof scalePuzzle === 'function' && typeof _getWrap === 'function' && _getWrap()) {
+        scalePuzzle();
     }
 }
 

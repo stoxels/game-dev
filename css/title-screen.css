@@ -8,8 +8,8 @@
 /*
    The boot-up screen, styled to read as one continuous boot into
    the title: same locked-ratio canvas, same background art, same
-   STOXELS logo image and italic serif "CARTOGRAPHERS OF CHANCE"
-   tagline. A small stone progress bar + status line at the bottom
+   STOXELS logo image and expansion logo image.
+   A small stone progress bar + status line at the bottom
    is the only new element.
 
    Only #boot-loader's own box (fixed layer, bg, fade transition)
@@ -61,19 +61,17 @@
     filter: drop-shadow(0 0 24px rgba(140, 60, 255, 0.55));
 }
 
-/* "CARTOGRAPHERS OF CHANCE" — same styling as .title-subtitle */
-#boot-loader .boot-sub {
+/* Expansion logo image — same position and size as .title-expansion-logo.
+   Kept at 22% width so it clears the side button columns (30%/70%). */
+#boot-loader .boot-expansion-logo {
     position: absolute;
     left: 50%;
-    top: 25.8%;
+    top: 24.5%;
     transform: translateX(-50%);
-    white-space: nowrap;
-    font-family: 'Georgia', 'Times New Roman', serif;
-    font-size: clamp(11px, 1.9cqw, 22px);
-    font-style: italic;
-    letter-spacing: 0.25em;
-    color: #d4b8ff;
-    text-shadow: 0 0 18px rgba(160, 80, 255, 0.7), 0 2px 6px rgba(0, 0, 0, 0.8);
+    width: clamp(180px, 22%, 380px);
+    height: auto;
+    user-select: none;
+    filter: drop-shadow(0 0 18px rgba(255, 120, 40, 0.45));
     z-index: 1;
 }
 
@@ -152,7 +150,7 @@
     }
 
     #boot-loader .boot-logo-img,
-    #boot-loader .boot-sub,
+    #boot-loader .boot-expansion-logo,
     #boot-loader .boot-footer {
         position: relative;
         left: auto;
@@ -165,9 +163,8 @@
         width: 62%;
     }
 
-    #boot-loader .boot-sub {
-        white-space: normal;
-        text-align: center;
+    #boot-loader .boot-expansion-logo {
+        width: 56%;
     }
 
     #boot-loader .boot-footer {
@@ -240,23 +237,22 @@
     filter: drop-shadow(0 0 24px rgba(140, 60, 255, 0.55));
 }
 
-/* "CARTOGRAPHERS OF CHANCE" subtitle — hover shows the expansion history */
-.title-subtitle {
+/* Expansion logo image ("Rise of the Beasts" EN/DE) — hover shows the expansion history.
+   Kept at 22% width so it clears the side button columns (30%/70%). */
+.title-expansion-logo {
     position: absolute;
     left: 50%;
-    top: 25.8%;
+    top: 24.5%;
     transform: translateX(-50%);
-    white-space: nowrap;
-    font-family: 'Georgia', 'Times New Roman', serif;
-    font-size: clamp(11px, 1.9cqw, 22px);
-    font-style: italic;
-    letter-spacing: 0.25em;
-    color: #d4b8ff;
-    text-shadow: 0 0 18px rgba(160, 80, 255, 0.7), 0 2px 6px rgba(0, 0, 0, 0.8);
+    width: clamp(180px, 22%, 380px);
+    height: auto;
+    user-select: none;
+    filter: drop-shadow(0 0 18px rgba(255, 120, 40, 0.45));
     cursor: help; /* signals the hover expansion-history tooltip */
+    z-index: 1;
 }
 
-/* Version number just below the subtitle */
+/* Version number just below the expansion logo */
 .title-version-line {
     position: absolute;
     left: 50%;
@@ -461,7 +457,7 @@
     }
 
     .title-logo-img,
-    .title-subtitle,
+    .title-expansion-logo,
     .title-version-line,
     .title-ai-disclosure,
     .title-lang-overlay {
@@ -479,14 +475,13 @@
         margin-top: 8%;
     }
 
-    .title-subtitle {
-        margin-top: 4%;
-        text-align: center;
-        white-space: normal;
+    .title-expansion-logo {
+        width: 56%;
+        margin-top: 2%;
     }
 
     .title-version-line {
-        margin-top: 3.5%;
+        margin-top: 2%;
     }
 
     .title-lang-overlay {
@@ -549,14 +544,14 @@
 
     /* Full-width header rows, in DOM order */
     .title-logo-img,
-    .title-subtitle,
+    .title-expansion-logo,
     .title-version-line,
     #btn-play {
         grid-column: 1 / -1;
     }
 
     /* Explicit visual order: header → play → menu grid → disclosure */
-    .title-subtitle          { order: 1; }
+    .title-expansion-logo    { order: 1; }
     .title-version-line      { order: 2; }
     #btn-play                { order: 3; width: min(78%, 300px); margin-top: 7%; }
     .block-general           { order: 4; width: min(96%, 230px); margin-top: 9%; }

@@ -257,6 +257,21 @@ function mgIsAnswerCorrect(entered, question) {
     return Math.abs(entered - question.answer) <= question.tolerance;
 }
 
+// Formats a question's numeric answer for the tutor auto-fill: integers as-is,
+// non-integers rounded to as many decimals as the question's tolerance makes
+// meaningful (tolerance 0.01 → 2 decimals, 0.0001 → 4). Returns '' for
+// non-finite answers so callers leave the field untouched.
+// Shared by all three tutor surfaces (mathgate / quiz / scouts-primer).
+function mgFormatTutorAnswer(question) {
+    if (!question) return '';
+    const a = Number(question.answer);
+    if (!Number.isFinite(a)) return '';
+    if (Number.isInteger(a)) return String(a);
+    const tol = Number(question.tolerance) > 0 ? Number(question.tolerance) : 0.001;
+    const decimals = Math.min(6, Math.max(0, Math.ceil(-Math.log10(tol))));
+    return a.toFixed(decimals);
+}
+
 
 //------------------------------------------------------------------------
 //----------------------------MODAL DOM HELPERS----------------------------
@@ -496,6 +511,14 @@ function mgHandleTutorSuccess() {
 
     Audio_Manager.playSFX('tutorSuccess');
     showMgFeedback(msg, true);
+    // Fill the answer field with the correct solution (formatted via the
+    // question's tolerance) before locking it, so the player sees WHAT the
+    // tutor solved instead of just a "solved" message.
+    const ansEl = document.getElementById('mg-answer-input');
+    if (ansEl && currentGateQuestion) {
+        const fill = mgFormatTutorAnswer(currentGateQuestion);
+        if (fill !== '') ansEl.value = fill;
+    }
     document.getElementById('mg-tutor-btn').style.display = 'none';
     document.getElementById('mg-submit-btn').disabled = true;
     document.getElementById('mg-answer-input').disabled = true; // prevent re-submission via Enter key

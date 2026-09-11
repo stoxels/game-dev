@@ -1064,65 +1064,11 @@ function _egRenderCurrencyCell(row, col) {
 
 
 //------------------------------------------------------------------------
-//-------------------TOOLTIP OVERRIDE-------------------------------------
-//------------------------------------------------------------------------
-
-// Overrides the base _egShowTooltip from endgame-hub.js.
-// Identical behaviour for all item types except currency: appends a "× N"
-// count line when the item has a count field greater than 1.
-// This file loads after endgame-hub.js, so this definition takes precedence.
-// Overrides the base _egShowTooltip from endgame-hub.js.
-// Routes equipment items through _egBuildTooltipBodyHTML (full stat block),
-// and handles currency stacks with a count line.
-// This file loads after endgame-hub.js, so this definition takes precedence.
-
-/*
-
-function _egShowTooltip(item) {
-    _egTooltipItem = item;
-    const panel = document.getElementById('eg-tooltip-panel-body');
-    if (!panel) return;
-
-    if (!item) {
-        panel.innerHTML = '<span class="eg-tooltip-empty">Hover over an item to inspect it</span>';
-        return;
-    }
-
-    // Equipment items — use the full tooltip builder from endgame-hub.js
-    if (item.category === 'equip') {
-        panel.innerHTML = _egBuildTooltipBodyHTML(item);
-        return;
-    }
-
-    // Currency stacks and everything else — simple tooltip
-    const rarityLabel = item.rarity
-        ? item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)
-        : 'Common';
-    const rarityClass = item.rarity ? `eg-rarity-${item.rarity}` : '';
-
-    const isCurrencyStack = item.category === 'currency' && item.count != null && item.count > 1;
-    const nameLine = isCurrencyStack
-        ? `<div class="eg-tooltip-name">${item.name || '???'} <span class="eg-tooltip-count">×${item.count}</span></div>`
-        : `<div class="eg-tooltip-name">${item.name || '???'}</div>`;
-
-    const statsHTML = item.stats
-        ? Object.entries(item.stats).map(([k, v]) => `<div class="eg-tooltip-stat">+${v} ${k}</div>`).join('')
-        : '';
-
-    panel.innerHTML = `
-<div class="eg-tooltip-item ${rarityClass}">
-    <div class="eg-tooltip-icon">${item.icon || '📦'}</div>
-    ${nameLine}
-    <div class="eg-tooltip-rarity">${rarityLabel}</div>
-    ${item.type ? `<div class="eg-tooltip-type">${item.type.toUpperCase()}</div>` : ''}
-    ${item.desc ? `<div class="eg-tooltip-desc">${item.desc}</div>` : ''}
-    ${statsHTML}
-</div>`;
-}
-
-*/
-
-
+// _egShowTooltip now lives ONLY in endgame-currency.js (single source of
+// truth). The legacy override copies that used to race via load order in
+// this file and endgame-hub.js were removed 2026-09; the commented-out
+// panel-based implementation below was already dead code. Currency chips
+// rendered by this file dispatch through the shared global at runtime.
 //------------------------------------------------------------------------
 //-------------------CURRENCY PUBLIC API----------------------------------
 //------------------------------------------------------------------------

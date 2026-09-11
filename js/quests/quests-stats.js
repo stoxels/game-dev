@@ -332,6 +332,22 @@ function questStat_revealItemUsed() {
     STATE.questStats._ql_hasUsedManualReveal = true;
 }
 
+// Called from handleCorrectFill: the player filled at least one cell by
+// hand this level (drives the "Fill a cell by hand" quest). Centralises
+// the _ql_hasManuallyFilledCell write (was a direct STATE.questStats write
+// in mouse-button-handlers.js).
+function questStat_hasManuallyFilledCell() {
+    _ensureQuestStats();
+    STATE.questStats._ql_hasManuallyFilledCell = true;
+}
+
+// Called from rollLuckyDrops: one lucky-drop reward was claimed.
+// Centralises the luckyDropsClaimed increment (was a direct
+// STATE.questStats write in scoring.js).
+function questStat_luckyDropClaimed() {
+    _incDirect('luckyDropsClaimed');
+}
+
 // Called from a class ability when it reveals cells.
 function questStat_classRevealUsed(count) {
     _incDirect('_ql_abilityRevealsThisLevel', count || 1);

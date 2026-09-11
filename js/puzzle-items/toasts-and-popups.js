@@ -195,8 +195,10 @@ function _ensureItemGainPopupStyle() {
 }
 
 // Finds the DOM element for an inventory slot by its defId.
-// Slots are always rendered (even at count 0) as long as the defId is
-// listed in INV_SLOT_GROUPS, so this is reliable during normal gameplay.
+// Since the compact-bar redesign, slots live in the category flyout panel
+// (#inv-flyout) and only exist in the DOM while that category is open —
+// so this can legitimately return null with the flyout closed (the gain
+// popup then silently no-ops, same as before the panel was ever built).
 function _findInvSlotEl(defId) {
     return document.querySelector(`.inv-slot[data-def-id="${defId}"]`);
 }

@@ -84,7 +84,7 @@ function _resetGameplayFlags() {
     _confidenceIntervalActive = false;
     _streakBonusFills = 0;
 
-    window._veiled_cursedUsed = false;
+    window.STOX_FLAGS.veiledCursedUsed = false;
     window._asymptoticLinesCompleted = 0;
     window._stochasticLastFired = false;
     window._deadReckoningActive = false;

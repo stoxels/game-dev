@@ -22,15 +22,12 @@ function _useCursedShield(id, def) {
 // Helper: creates the dark-red scan lines that creep down the grid.
 function _fxMakeEyeScanLines(container, r) {
     for (let i = 0; i < 5; i++) {
-        const line = document.createElement('div');
-        line.className = 'fx-eye-scanline';
-        line.style.cssText = `
+        _fxMakeElement(container, `
             position:absolute;
             left:${r.left}px; width:${r.width}px;
             top:${r.top + (r.height / 5) * i}px; height:${r.height / 5}px;
             animation:fx-scanline-darken 0.5s ease-in ${0.6 + i * 0.1}s forwards;
-        `;
-        container.appendChild(line);
+        `, 'fx-eye-scanline');
     }
 }
 

@@ -736,13 +736,13 @@ function _resetClassLevelState() {
     nextPenaltyHalved = false;
     window._momentumThisLevel = 0;
     window._dataStrikeUsesThisLevel = 0;
-    window._veiled_cursedUsed = false;
     window._shadowSealActive = false;
-    window._goldenClockActive = false;
     window._goldenClockMistakesLeft = null;
     window._chronoFractureActive = false;
-    window._cursedImmune = false;
     window._shieldExtraCharges = 0;
+    // cursedImmune / goldenClockActive / veiledCursedUsed now live in
+    // window.STOX_FLAGS (state.js) — reset them all in one call.
+    _resetStoxFlags();
     window._bayesTrapsState = null;
     window._typeIShieldedCells = new Set();
     window._typeIBonusReveal = false;

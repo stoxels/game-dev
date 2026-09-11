@@ -226,6 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onClick('btn-pause-settings', () => { loadSettingsUI(); showModal('settings-modal'); });
 
+    // Keybinds from the pause menu — the game stays paused behind the modal,
+    // so bindings (including the new hotbar slots and the spellbook key) can
+    // be reviewed and rebound mid-puzzle. The modal is raised above the pause
+    // overlay in css/pause.css.
+    onClick('btn-pause-keybinds', () => { if (typeof openKeybindsModal === 'function') openKeybindsModal(); });
+
     //------------------------------------------------------------------------
     //-------------------TITLE SCREEN-----------------------------------------
     //------------------------------------------------------------------------
@@ -313,12 +319,47 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
+    // Lazy-loads the dev sandbox passive tree (passive-tree-dev-data.js +
+    // passive-tree-dev.js are NOT in index.html — together they are ~41k
+    // lines / ~1 MB and would otherwise be parsed on every page load). The
+    // first click on the sandbox button injects both scripts sequentially
+    // (data first — dev.js reads it at load time), then opens the tree.
+    // Subsequent clicks see showDevPassiveTree already defined and go
+    // straight to the screen.
+    function _loadDevPassiveTreeAndOpen() {
+        if (typeof showDevPassiveTree === 'function') {
+            showDevPassiveTree();
+            return;
+        }
+        const files = [
+            'js/passive-tree/passive-tree-dev-data.js',
+            'js/passive-tree/passive-tree-dev.js',
+        ];
+        let i = 0;
+        const loadNext = () => {
+            if (i >= files.length) {
+                if (typeof showDevPassiveTree === 'function') showDevPassiveTree();
+                else console.warn('[dev-tree] scripts loaded but showDevPassiveTree is still missing');
+                return;
+            }
+            const s = document.createElement('script');
+            s.src = files[i++];
+            s.onload = loadNext;
+            s.onerror = () => console.warn('[dev-tree] failed to load', s.src);
+            document.head.appendChild(s);
+        };
+        loadNext();
+    }
+
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-existing', () => launchExistingGame());
     onClick('btn-mode-adventure', () => launchAdventureMode());
     onClick('btn-mode-endgame-test', () => launchEndgameTestMode());
+
+    // DEV SANDBOX: new passive tree layout playground (not connected to gameplay)
+    onClick('btn-mode-passive-tree-dev', () => _loadDevPassiveTreeAndOpen());
 
 
     //------------------------------------------------------------------------
@@ -336,6 +377,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Confirmation button inside the reset modal.
     onClick('btn-confirm-reset', () => confirmReset());
+
+    // Save-slot name modal (✏️ button on the save-slot cards).
+    onClick('btn-confirm-slot-name', () => confirmSlotName());
+    onClick('btn-cancel-slot-name', () => cancelSlotName());
+
+    // Enter confirms / Escape cancels while typing in the slot-name input.
+    const slotNameInput = document.getElementById('slot-name-input');
+    if (slotNameInput) {
+        slotNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); confirmSlotName(); }
+            else if (e.key === 'Escape') { e.preventDefault(); cancelSlotName(); }
+        });
+    }
 
 
     //------------------------------------------------------------------------
@@ -679,6 +733,9 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
 
     onClick('btn-pt-back', () => ptGoBack());
+
+    // DEV SANDBOX passive tree — BACK returns to the select-mode screen.
+    onClick('btn-dpt-back', () => dptGoBack());
 
     /**
      * Shows an "are you sure?" confirmation modal for the passive tree's

@@ -22,17 +22,14 @@ function _useCursedRowCol(id, def) {
 
 // Helper: detonates one explosion blast + shrapnel at a random grid position.
 function _fxDetonateBlast(container, r) {
-    const blast = document.createElement('div');
-    blast.className = 'fx-chaos-blast';
     const blastColor = CHAOS_BLAST_COLOURS[Math.floor(Math.random() * CHAOS_BLAST_COLOURS.length)];
-    blast.style.cssText = `
+    const blast = _fxMakeElement(container, `
         position:absolute;
         left:${r.left + Math.random() * r.width}px;
         top:${r.top + Math.random() * r.height}px;
         --blast-color:${blastColor};
         animation:fx-chaos-explode 0.5s ease-out forwards;
-    `;
-    container.appendChild(blast);
+    `, 'fx-chaos-blast');
 
     // Shrapnel particles radiating from the blast origin
     _fxSpawnParticles({

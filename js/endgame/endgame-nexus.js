@@ -33,7 +33,7 @@
 function _egnBuildTopbarHTML() {
     return `
 <div class="egn-topbar">
-    <button class="title-btn back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
+    <button class="back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
     <span class="egn-topbar-title">${t('eg_nexus_title')}</span>
 </div>`;
 }

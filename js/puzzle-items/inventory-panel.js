@@ -43,6 +43,13 @@ function _rarityLabel(rarity) {
 // Cached reference to the shared tooltip element — created once on first use.
 let _invTooltipEl = null;
 
+// Currently open flyout group (label string) — null when none is open.
+// One flyout at a time; switching category buttons swaps the panel.
+let _invOpenFlyoutGroup = null;
+// Close-on-leave grace timer id: keeps the flyout open while the pointer
+// travels across the small gap between the category button and the panel.
+let _invFlyoutCloseTimer = null;
+
 
 
 
@@ -212,6 +219,106 @@ function _buildInvSlot(defId) {
 
 
 //------------------------------------------------------------------------
+//----------------------------FLYOUT PANEL--------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Cancels a pending flyout close (pointer came back in time).
+function _invCancelFlyoutClose() {
+    if (_invFlyoutCloseTimer) {
+        clearTimeout(_invFlyoutCloseTimer);
+        _invFlyoutCloseTimer = null;
+    }
+}
+
+// Schedules the open flyout to close shortly after the pointer left both
+// the button and the panel. The delay bridges the physical gap between
+// them so diagonal mouse paths don't flicker the panel shut. Never fires
+// while a flyout is PINNED — pinning means "stay open until I click".
+function _invScheduleFlyoutClose() {
+    if (window._invPinnedFlyoutGroup) return;
+    _invCancelFlyoutClose();
+    _invFlyoutCloseTimer = setTimeout(() => {
+        _invFlyoutCloseTimer = null;
+        if (!window._invPinnedFlyoutGroup) closeInventoryFlyout();
+    }, 220);
+}
+
+// Opens (or switches to) the flyout panel for the given group label.
+// Renders the group's slot row into #inv-flyout and anchors it above the
+// category button that was hovered. Empty groups (no items of any of the
+// group's defs in the inventory at all) still open — the slots show as
+// dimmed empties, matching the old always-visible bar behaviour.
+function openInventoryFlyout(groupLabel, anchorBtn) {
+    const flyout = document.getElementById('inv-flyout');
+    if (!flyout) return;
+    _invCancelFlyoutClose();
+
+    const group = INV_SLOT_GROUPS.find(g => g.label === groupLabel);
+    if (!group) return;
+
+    // Rebuild content only when the group actually changes — keeps hover
+    // jitter from visibly re-rendering the same slots over and over.
+    if (_invOpenFlyoutGroup !== groupLabel || !flyout.firstChild) {
+        _invOpenFlyoutGroup = groupLabel;
+        flyout.innerHTML = '';
+        const slotsEl = document.createElement('div');
+        slotsEl.className = 'inv-group-slots';
+        group.slots.forEach(defId => {
+            const slot = _buildInvSlot(defId);
+            if (slot) slotsEl.appendChild(slot);
+        });
+        flyout.appendChild(slotsEl);
+    }
+
+    // Highlight the active category button
+    document.querySelectorAll('.inv-cat-btn.active').forEach(b => b.classList.remove('active'));
+    if (anchorBtn) anchorBtn.classList.add('active');
+
+    flyout.classList.add('open');
+
+    // Anchor horizontally above the button (clamped to the viewport),
+    // bottom edge flush with the top of the compact bar. Render hidden
+    // for one measurement, position, then let the .open class take over.
+    const bar = document.getElementById('inv-panel');
+    const barTop = bar ? bar.getBoundingClientRect().top : window.innerHeight;
+    const br = anchorBtn.getBoundingClientRect();
+    flyout.style.visibility = 'hidden';
+    flyout.style.display = 'flex';
+    flyout.classList.add('open');
+    // Measure after display so offsetWidth is real, then place.
+    const fw = flyout.offsetWidth;
+    let left = br.left + br.width / 2 - fw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - fw - 8));
+    flyout.style.left = left + 'px';
+    flyout.style.bottom = (window.innerHeight - barTop) + 'px';
+    flyout.style.top = 'auto';
+    flyout.style.visibility = '';
+    flyout.style.display = '';
+}
+
+// Hides the flyout panel and clears button highlighting. Safe to call
+// when nothing is open.
+function closeInventoryFlyout() {
+    const flyout = document.getElementById('inv-flyout');
+    if (flyout) flyout.classList.remove('open');
+    _invOpenFlyoutGroup = null;
+    document.querySelectorAll('.inv-cat-btn.active').forEach(b => b.classList.remove('active'));
+}
+
+// True while the pointer is over the compact bar itself — the bar keeps
+// the flyout open so moving from the panel down to another button feels
+// like switching categories, not closing.
+function _invPointerInBar(x, y) {
+    const bar = document.getElementById('inv-panel');
+    if (!bar) return false;
+    const r = bar.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+}
+
+
+
+//------------------------------------------------------------------------
 //----------------------------SLOT GROUP BUILDER--------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -252,15 +359,28 @@ function _buildInvGroup(group) {
 
 // Rebuilds the entire inventory panel from scratch.
 // Called whenever inventory state changes (item used, gained, discarded, reshuffled).
+//
+// Compact layout: one button per item category (INV_SLOT_GROUPS). Hovering
+// a button opens a flyout panel above the bar showing that category's slots;
+// clicking a slot inside the flyout uses the item exactly like the old
+// always-visible bar. A pinned (clicked) flyout stays open across rebuilds
+// so using an item — which triggers buildInventoryPanel() — doesn't slam
+// the panel shut on the player's hand.
 function buildInventoryPanel() {
     _hideSlotTooltip();
 
     const panel = document.getElementById('inv-panel');
     if (!panel) return;
 
+    // Any currently-open flyout (hover-opened or pinned) must be refreshed
+    // after the rebuild so slot counts/badges never go stale after an item
+    // use — the rebuild itself IS the inventory change.
+    const openGroup = _invOpenFlyoutGroup;
+    const pinnedGroup = window._invPinnedFlyoutGroup || null;
+
     panel.innerHTML = '';
 
-    // Header row: panel title and reshuffle progress counter
+    // Header block: INVENTORY label + reshuffle progress counter
     const topRow = document.createElement('div');
     topRow.className = 'inv-panel-toprow';
     topRow.innerHTML = `
@@ -268,15 +388,134 @@ function buildInventoryPanel() {
         <span id="reshuffle-counter">♻ ${reshuffleCount}/${RESHUFFLE_GOAL}</span>`;
     panel.appendChild(topRow);
 
-    // Build each slot group
+    // Compact-screen chip: the label block is hidden below 700px, but the
+    // reshuffle counter must stay readable — render a second, tiny chip
+    // that only the small-screen CSS shows.
+    const chip = document.createElement('span');
+    chip.id = 'reshuffle-counter-mini';
+    chip.className = 'reshuffle-counter-mini';
+    chip.textContent = `♻ ${reshuffleCount}/${RESHUFFLE_GOAL}`;
+    panel.appendChild(chip);
+
+    // One compact category button per group — the flyout shows its slots
     INV_SLOT_GROUPS.forEach(group => {
-        const groupEl = _buildInvGroup(group);
-        if (groupEl) panel.appendChild(groupEl);
+        const defsExist = group.slots.some(id => ITEM_DEFS[id]);
+        if (!defsExist) return;
+
+        // Total owned items across the group's defs → badge on the button
+        const owned = group.slots.reduce((n, id) =>
+            n + STATE.inventory.filter(i => i.defId === id).length, 0);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'inv-cat-btn';
+        btn.dataset.group = group.label;
+        btn.setAttribute('aria-label', t(INV_GROUP_LABEL_KEYS[group.label] || group.label));
+        btn.innerHTML = `
+            <span class="inv-cat-icon">${invGroupIcon(group.label)}</span>
+            <span class="inv-cat-label">${t(INV_GROUP_LABEL_KEYS[group.label] || group.label)}</span>
+            ${owned > 0 ? `<span class="inv-cat-count">${owned}</span>` : ''}`;
+
+        btn.addEventListener('mouseenter', () => openInventoryFlyout(group.label, btn));
+        btn.addEventListener('mouseleave', (e) => {
+            // Keep the panel open while the pointer is still inside the bar
+            // (moving to a neighbouring button switches instead of closing).
+            if (!_invPointerInBar(e.clientX, e.clientY)) _invScheduleFlyoutClose();
+        });
+        // Click pins the flyout: it stays open (also across rebuilds) until
+        // the button is clicked again or a click lands outside the bar.
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            _invCancelFlyoutClose();
+            if (window._invPinnedFlyoutGroup === group.label) {
+                window._invPinnedFlyoutGroup = null;
+                closeInventoryFlyout();
+            } else {
+                window._invPinnedFlyoutGroup = group.label;
+                openInventoryFlyout(group.label, btn);
+            }
+        });
+
+        panel.appendChild(btn);
     });
+
+    // Ensure the flyout element exists (created once, lives outside the bar
+    // so its content survives bar rebuilds).
+    _ensureInvFlyoutEl();
+
+    // Refresh an open flyout with fresh slots (anchored to its button in
+    // the rebuilt bar). Covers both hover-open and pinned states — otherwise
+    // using an item would leave the old stack count showing. Reset the
+    // open-group cache first so openInventoryFlyout's same-group reuse guard
+    // re-renders the slots instead of keeping the stale DOM.
+    if (openGroup) {
+        const anchor = panel.querySelector(`.inv-cat-btn[data-group="${openGroup}"]`);
+        if (anchor) {
+            _invOpenFlyoutGroup = null;
+            openInventoryFlyout(openGroup, anchor);
+        } else {
+            // Group vanished (no defs) — close and drop any pin.
+            window._invPinnedFlyoutGroup = null;
+            closeInventoryFlyout();
+        }
+    } else if (pinnedGroup) {
+        // Pinned but not currently rendered open (edge case) — drop the pin.
+        window._invPinnedFlyoutGroup = null;
+    }
 
     checkInventoryAchievements();
     updateReshuffleCounter();
+}
 
+
+
+//------------------------------------------------------------------------
+//----------------------------FLYOUT ELEMENT------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Creates the shared flyout container once (a body-level sibling of the
+// bar, so bar.innerHTML='' rebuilds never destroy its children mid-use).
+function _ensureInvFlyoutEl() {
+    let flyout = document.getElementById('inv-flyout');
+    if (flyout) return flyout;
+
+    flyout = document.createElement('div');
+    flyout.id = 'inv-flyout';
+    document.body.appendChild(flyout);
+
+    // Keep open while the pointer is inside the panel; start the close
+    // grace timer as soon as it leaves (button leave already scheduled one —
+    // this is what closes it when the pointer exits upward out of the panel).
+    flyout.addEventListener('mouseenter', _invCancelFlyoutClose);
+    flyout.addEventListener('mouseleave', (e) => {
+        if (!_invPointerInBar(e.clientX, e.clientY)) _invScheduleFlyoutClose();
+    });
+
+    // A click anywhere outside the bar/flyout un-pins and closes (only
+    // matters while pinned — hover users just move the pointer away).
+    document.addEventListener('click', (e) => {
+        if (!window._invPinnedFlyoutGroup) return;
+        if (e.target.closest('#inv-panel') || e.target.closest('#inv-flyout')) return;
+        window._invPinnedFlyoutGroup = null;
+        closeInventoryFlyout();
+    });
+
+    return flyout;
+}
+
+// Small distinguishing icon per category (pure decoration next to the label).
+function invGroupIcon(label) {
+    switch (label) {
+        case 'Reveal':  return '🔍';
+        case 'Mark':    return '✏️';
+        case 'Time':    return '⏳';
+        case 'Utility': return '🛠️';
+        case 'Power':   return '⚡';
+        case 'Cursed':  return '💀';
+        case 'Special': return '✨';
+        default:        return '📦';
+    }
 }
 
 

@@ -17,6 +17,10 @@
 
 const MANA_REGEN_INTERVAL_MS = 5000; // Matches "Mana regenerated every 5 seconds"
 
+// Flat regen applied on top of gear manaRegen so the pool always refills
+// outside endgame (story levels have no equipment). Tunable in one place.
+const MANA_BASE_REGEN = 5;
+
 // Scales flat ability mana costs up as the pool grows from gear so late-game
 // costs stay meaningful. Below the baseline the def's manaCost is charged as
 // defined; every DIVISOR points of max mana beyond the baseline adds +100%
@@ -46,10 +50,12 @@ function _scaleAbilityManaCost(cost) {
 }
 
 
-// Mana is an endgame-only mechanic: in story/campaign levels the pool stays
-// empty, the HUD bar hides itself and every ability cost resolves to zero.
+// Mana is active everywhere: the pool, the bar and ability costs all run in
+// story levels as well as endgame maps. (It used to be endgame-only, which
+// meant every story-mode ability was free — the spell hotbar now shows a
+// mana cost and an unaffordable indicator for every skill.)
 function _manaEnabled() {
-    return (typeof isEndgameLevel === 'function') && isEndgameLevel();
+    return true;
 }
 
 
@@ -187,19 +193,38 @@ function payAbilityCost(cost) {
 }
 
 
-// Patches the mana bar fill width / label on the class HUD. Safe to call
-// any time — no-ops when the bar isn't in the DOM yet.
+// Patches the mana bar that now lives on the player sprite (see
+// _renderPlayerAvatarSimple in player_sprite.js). Safe to call any time —
+// no-ops when the bar isn't in the DOM yet. The old class-HUD element ids
+// are still honoured in case a stale element lingers during a rebuild.
 function updateClassHUDManaBar() {
-    const wrap = document.getElementById('chud-mana-bar-wrap');
-    if (!wrap) return;
-
     const max = _getPlayerMaxMana();
-    if (max <= 0) { wrap.style.display = 'none'; return; }
-
     const cur = Math.round(Math.max(0, Math.min(playerCurrentMana, max)));
-    const pct = (cur / max) * 100;
-    document.getElementById('chud-mana-fill').style.width = pct + '%';
-    document.getElementById('chud-mana-text').innerText = `${cur} / ${max}`;
+    const pct = max > 0 ? (cur / max) * 100 : 0;
+
+    const avatarWrap = document.getElementById('avatar-mana-bar-wrap');
+    if (avatarWrap) {
+        // Hide the whole bar while there is no class / pool (menus, classless).
+        if (!STATE.playerClass) {
+            avatarWrap.style.display = 'none';
+        } else {
+            avatarWrap.style.display = '';
+            const fill = document.getElementById('avatar-mana-fill');
+            const text = document.getElementById('avatar-mana-text');
+            if (fill) fill.style.width = pct + '%';
+            if (text) text.innerText = `${cur} / ${max}`;
+        }
+    }
+
+    const legacyWrap = document.getElementById('chud-mana-bar-wrap');
+    if (legacyWrap) {
+        if (max <= 0) legacyWrap.style.display = 'none';
+        else legacyWrap.style.display = '';
+        const fill = document.getElementById('chud-mana-fill');
+        const text = document.getElementById('chud-mana-text');
+        if (fill) fill.style.width = pct + '%';
+        if (text) text.innerText = `${cur} / ${max}`;
+    }
 }
 
 
@@ -212,7 +237,7 @@ function _ensureManaRegenLoop() {
         if (dead) return;
         const stats = (typeof _egComputePlayerStats === 'function')
             ? _egComputePlayerStats() : null;
-        const regen = stats ? (stats.manaRegen || 0) : 0;
+        const regen = MANA_BASE_REGEN + (stats ? (stats.manaRegen || 0) : 0);
         if (regen > 0 && playerMaxMana > 0 && playerCurrentMana < playerMaxMana) {
             gainMana(regen);
         }

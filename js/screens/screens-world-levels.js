@@ -1013,7 +1013,10 @@ function _wdBuildEntranceMarker(wi, cfg, canvas) {
 
 /**
  * Creates the player sprite DOM element (wrapper div + character image).
- * The image source is determined by the active player character, if available.
+ * Gameplay default: move-down art (never the menu portrait — the menu
+ * portrait stays reserved for save slots, level-select topbar and
+ * quiz/exercise modals). Falls back to the no-class portrait only for
+ * variants without directional art.
  */
 function _wdBuildSprite() {
     const sprite = document.createElement('div');
@@ -1022,13 +1025,21 @@ function _wdBuildSprite() {
 
     const img = document.createElement('img');
     img.id = 'wd-sprite-img';
-    img.src = (typeof _getPlayerCharacterImage === 'function')
-        ? _getPlayerCharacterImage()
-        : 'images/sprites/Stox_noclass.webp';
+    img.src = (typeof _getPlayerPuzzleDefaultImage === 'function')
+        ? _getPlayerPuzzleDefaultImage()
+        : ((typeof _getPlayerCharacterImage === 'function')
+            ? _getPlayerCharacterImage()
+            : 'images/sprites/Stox_noclass.webp');
     img.alt = 'Player';
     img.draggable = false;
 
     sprite.appendChild(img);
+    if (typeof _animSetDefaultDownImage === 'function') {
+        try { _animSetDefaultDownImage(img); } catch (e) {}
+    }
+    if (typeof _startAvatarIdleAnimation === 'function') {
+        setTimeout(() => { try { _startAvatarIdleAnimation('wd-sprite-img'); } catch (e) {} }, 0);
+    }
     return sprite;
 }
 
@@ -1078,8 +1089,23 @@ function _wdEaseInOut(t) {
 }
 
 /**
- * Updates the sprite's CSS position and horizontal facing direction for one
+ * Dominant-axis travel direction for a world-detail segment (image-% space).
+ * Used to pick the directional walk set (up/down/left/right) instead of
+ * the old menu-portrait/omni fallback.
+ */
+function _wdDirectionForSegment(startPos, endPos) {
+    const dx = (endPos.x || 0) - (startPos.x || 0);
+    const dy = (endPos.y || 0) - (startPos.y || 0);
+    if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? 'left' : 'right';
+    return dy < 0 ? 'up' : 'down';
+}
+
+/**
+ * Updates the sprite's CSS position and facing direction for one
  * animation frame. ease is the pre-computed eased progress value (0–1).
+ * Directional walk art is drawn facing its travel direction, so it must
+ * NEVER be mirrored (same Trix left/right fix as the overworld map).
+ * Only the omni right-facing fallback keeps the horizontal flip.
  */
 function _wdUpdateSpriteFrame(sprite, startPos, endPos, ease) {
     const rawX = startPos.x + (endPos.x - startPos.x) * ease;
@@ -1091,9 +1117,24 @@ function _wdUpdateSpriteFrame(sprite, startPos, endPos, ease) {
     sprite.style.left = pct.x + '%';
     sprite.style.top = pct.y + '%';
 
-    // Flip the sprite image to face the direction of travel
+    const dir = _wdDirectionForSegment(startPos, endPos);
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
+    const char = st ? st.playerCharacter : null;
+    const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
+    let directional = false;
+    if (typeof _animHasDirectionalWalkSync === 'function' && char) {
+        directional = _animHasDirectionalWalkSync(char, variant, dir);
+    }
+    if (!directional && typeof _animWalkIsDirectionalFor === 'function' && _animWalkIsDirectionalFor('wd-sprite-img')) {
+        directional = true;
+    }
     const img = sprite.querySelector('img');
-    if (img) img.style.scale = (endPos.x < startPos.x) ? '-1 1' : '1 1';
+    if (!img) return;
+    if (directional) {
+        img.style.scale = '1 1';
+        return;
+    }
+    img.style.scale = (dir === 'left') ? '-1 1' : '1 1';
 }
 
 /**
@@ -1127,12 +1168,24 @@ function _wdWalkAlongPoints(points, markers, segIdx, onComplete) {
     const startPos = points[segIdx];
     const endPos = points[segIdx + 1];
     const durationMs = _wdGetSegmentDurationMs(startPos, endPos, _wdCurrentWi);
+    const dir = _wdDirectionForSegment(startPos, endPos);
     const startTime = performance.now();
 
     const step = (now) => {
         const t = Math.min((now - startTime) / durationMs, 1);
         const ease = _wdEaseInOut(t);
         _wdUpdateSpriteFrame(sprite, startPos, endPos, ease);
+
+        // Drive the directional walk set EVERY FRAME while the glide runs —
+        // same pattern as the WASD tick. _playAvatarWalkAnimation no-ops when
+        // the same loop already runs, and _scheduleAvatarWalkIdle() re-arms
+        // its short idle-debounce timer; calling it only once per segment
+        // let that timer fire mid-glide, snapping the sprite back to idle
+        // art for the rest of the walk ("sprite runs but never animates").
+        if (typeof _playAvatarWalkAnimation === 'function') {
+            try { _playAvatarWalkAnimation('wd-sprite-img', dir); }
+            catch (e) {}
+        }
 
         if (t < 1) {
             _wdWalkAnim = requestAnimationFrame(step);
@@ -1238,11 +1291,53 @@ function _wdGetWorldName(wi) {
  * Updates the world-detail top bar: sets the screen title and world name label.
  */
 function _wdBuildTopBar(wi) {
-    const titleEl = document.getElementById('wd-title-text');
-    if (titleEl) titleEl.textContent = t('scr_world_map');
+    // The one difference vs the overworld topbar: the plaque carries the
+    // CURRENT WORLD NAME instead of the SELECT LEVEL title.
+    const plaque = document.getElementById('wd-title-plaque');
+    if (plaque) {
+        plaque.textContent = _wdGetWorldName(wi);
+        _wdFitPlaqueText(plaque);
+        // The screen may still be display:none during the first call (clientWidth 0
+        // hides any overflow), so re-fit once it is actually laid out.
+        requestAnimationFrame(function () { _wdFitPlaqueText(plaque); });
+    }
 
-    const nameEl = document.getElementById('wd-world-name');
-    if (nameEl) nameEl.textContent = _wdGetWorldName(wi);
+    // Everything else mirrors the overworld map-view topbar exactly
+    // (same populate helpers, wd- prefixed ids, same visuals).
+    _renderTopBarScore('wd');
+    _renderTopBarNextCode('wd');
+    _renderTopBarClassStatus('wd');
+    _renderTopBarQuestBadge('wd');
+    _renderTopBarTreePoints('wd');
+    _wireTopBarButtons('wd');
+    // Class-change token entry button — only visible while a token is held.
+    if (typeof updateClassChangeButtons === 'function') updateClassChangeButtons();
+
+    if (typeof renderMapViewCharacterPortrait === 'function') renderMapViewCharacterPortrait('wd');
+}
+
+/**
+ * Fits the world-name text inside the plaque: starts from the CSS-clamped
+ * font-size and shrinks (with letter-spacing scaled to match) until the name
+ * fits without overflow. Long localized names (e.g. "The Vortex of
+ * Possibilities") can exceed the clamp's capacity at narrow widths.
+ */
+function _wdFitPlaqueText(plaque) {
+    if (!plaque) return;
+    // Re-derive from the CSS clamp each run so repeat calls (e.g. after the
+    // screen becomes visible) start from the natural size, not the last fit.
+    plaque.style.fontSize = '';
+    plaque.style.letterSpacing = '';
+    const cs = getComputedStyle(plaque);
+    let size = parseFloat(cs.fontSize);
+    const min = 9;
+    let guard = 0;
+    while (size > min && plaque.scrollWidth > plaque.clientWidth && guard < 30) {
+        size -= 1;
+        plaque.style.fontSize = size + 'px';
+        plaque.style.letterSpacing = (size * 0.15) + 'px';
+        guard++;
+    }
 }
 
 /**
@@ -1397,12 +1492,6 @@ function _wdBuildCanvas(wi) {
     canvas.appendChild(sprite);
 
     _wdInitialLayout(canvas, svg, wi, sprite);
-
-    // Dev tool: clicking the background canvas itself logs image-relative coords
-    canvas.addEventListener('click', (e) => {
-        if (e.target !== canvas) return;
-        _wdLogClickCoords(e, wi, cfg, canvas);
-    });
 
     _wdObserveCanvasResize(canvas, wi);
     _wdEnsureTooltip();
@@ -1710,21 +1799,6 @@ function _wdHideTooltip() {
 //------------------------------------------------------------------------
 //-------------------DEV TOOLS---------------------------------------------
 //------------------------------------------------------------------------
-
-/**
- * Logs image-relative click coordinates to the console in a format ready
- * to paste directly into WD_WORLD_CONFIGS. Click the canvas background
- * (not a node) to trigger this. Useful when tuning node positions.
- */
-function _wdLogClickCoords(e, wi, cfg, canvas) {
-    const rect = canvas.getBoundingClientRect();
-    const aspect = cfg.imageAspect || WD_DEFAULT_IMAGE_ASPECT;
-    const { imgW, imgH, imgX, imgY } = _wdGetImageRectInCanvas(rect.width, rect.height, aspect);
-
-    const x = (((e.clientX - rect.left) - imgX) / imgW * 100).toFixed(1);
-    const y = (((e.clientY - rect.top) - imgY) / imgH * 100).toFixed(1);
-    console.log(`WD wi=${wi}: { x: ${x}, y: ${y} },`);
-}
 
 
 //------------------------------------------------------------------------

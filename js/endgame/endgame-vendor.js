@@ -233,7 +233,7 @@ const EG_VENDOR_TAB_HINTS = {
 function _egvBuildTopbarHTML() {
     return `
 <div class="egn-topbar">
-    <button class="title-btn back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
+    <button class="back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
     <span class="egn-topbar-title">${t('eg_vendor_title')}</span>
 </div>`;
 }

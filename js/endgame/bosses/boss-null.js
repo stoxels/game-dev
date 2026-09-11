@@ -208,7 +208,12 @@ function _egMechNulLattice(monster, phase) {
             seg.style.transformOrigin = '0 50%';
             seg.style.transform = 'rotate(' + Math.atan2(y2 - y1, x2 - x1) + 'rad)';
             document.body.appendChild(seg);
-            _egNulRing.push({ el: seg });
+            // Pass 5: cache the painted box at draw time. The lattice is static
+            // body-absolute px geometry (left/top/width/height inline + rotate),
+            // so the box never changes after creation — reading it live every
+            // damage tick (6 gBCR per 100 ms) was pure layout thrash.
+            const segBox = seg.getBoundingClientRect();
+            _egNulRing.push({ el: seg, rect: { left: segBox.left, right: segBox.right, top: segBox.top, bottom: segBox.bottom } });
         }
     };
 
@@ -249,7 +254,7 @@ function _egMechNulLattice(monster, phase) {
                     l.cx + Math.cos(l.ang) * l.len / 2, l.cy + Math.sin(l.ang) * l.len / 2
                 ) < EG_NUL_LINE_W / 2 + 9) ||
                 _egNulRing.some(r => {
-                    const rect = r.el.getBoundingClientRect();
+                    const rect = r.rect || r.el.getBoundingClientRect(); // rect cached at draw time (static geometry — Pass 5)
                     return pc.x > rect.left - 9 && pc.x < rect.right + 9 && pc.y > rect.top - 9 && pc.y < rect.bottom + 9;
                 });
             if (onLine) _egNkDotTick(run, EG_NUL_LINE_DPS, 0.1, level, 'shadow');

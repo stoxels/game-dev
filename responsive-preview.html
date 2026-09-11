@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>STOXELS — Responsive Preview Harness</title>
+<!--
+  Dev-only test page (like test-sprite-faces.html). NOT linked from the game.
+  Renders index.html in same-origin iframes at common device sizes so
+  media-query layouts can be verified at a glance.
+
+  ?screen=save-slots (default) — opens the save-slot select screen
+  ?screen=game                — loads slot 1 and jumps straight into level 1-1
+                                (actual gameplay puzzle screen)
+
+  Each iframe keeps its REAL pixel width (so CSS media queries inside see
+  an authentic device width) and is visually shrunk with transform:scale
+  to fit several devices side by side in the preview window.
+-->
+<style>
+    body { background: #1a1a1a; margin: 0; padding: 6px; font-family: monospace; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+    h2 { color: #ddd; font-size: 13px; margin: 10px 0 4px; letter-spacing: 1px; }
+    .frame-box { border: 1px solid #555; flex: 0 0 auto; overflow: hidden; }
+    .frame-label { color: #ccc; font-size: 10px; padding: 2px 5px; background: #333; white-space: nowrap; }
+    .scaler { transform-origin: top left; }
+    iframe { border: 0; background: #000; display: block; }
+</style>
+</head>
+<body>
+<h2 id="section-title">SCREENS</h2>
+<div class="row" id="frames"></div>
+<script>
+    // Which screen should the frames show?  save-slots | game
+    const PARAMS = new URLSearchParams(location.search);
+    const MODE = PARAMS.get('screen') || 'save-slots';
+    const LEVEL = parseInt(PARAMS.get('level') || '0', 10); // game mode: global level index
+    document.getElementById('section-title').textContent =
+        MODE === 'game' ? `GAMEPLAY PUZZLE SCREEN — level gi=${LEVEL}` : 'SAVE SLOT SELECT SCREEN';
+
+    // device, iframeW/H, visual scale
+    const DEVICES = [
+        { name: '1280x800 laptop fullscreen', w: 1280, h: 800, s: 0.32 },
+        { name: '768x1024 tablet portrait',   w: 768,  h: 1024, s: 0.32 },
+        { name: '414x896 phone large',        w: 414,  h: 896,  s: 0.40 },
+        { name: '375x667 phone small',        w: 375,  h: 667,  s: 0.40 },
+        { name: '320x568 phone tiny',         w: 320,  h: 568,  s: 0.40 },
+        { name: '700x375 phone landscape',    w: 700,  h: 375,  s: 0.40 }
+    ];
+
+    // Seed a few realistic saves once (localStorage is shared by all
+    // same-origin frames).
+    (function seedSaves() {
+        const mk = (o) => ({
+            totalScore: o.score, done: Array.from({ length: o.levels }, (_, i) => i),
+            playerCharacter: o.ch, playerClass: o.cls || null, playerAscendency: o.asc || null,
+            playerLevel: o.lvl || 1, tutorialDone: true, bonusDone: [], levelHS: {},
+            questsClaimed: [], totalTimePlayedSecs: 3600 * o.levels,
+            questStats: { lifetimeTilesRevealed: 500, lifetimeTilesFilled: 1200, lifetimeMistakesMade: 30, itemsUsedTotal: 5, classAbilitiesUsed: 12, lifetimePassivePointsObtained: 3, questionsCorrect: 8 }
+        });
+        const seeds = {
+            stoxels: mk({ score: 15420, levels: 14, ch: 'stox', asc: 'actuary', lvl: 12 }),
+            stoxels_slot_2: mk({ score: 8600, levels: 9, ch: 'trix', cls: 'bayesian' }),
+            stoxels_slot_5: mk({ score: 2200, levels: 3, ch: 'syla' }),
+            stoxels_slot_12: mk({ score: 99, levels: 1, ch: 'stox', cls: 'mathmagician', lvl: 3 })
+        };
+        Object.entries(seeds).forEach(([k, v]) => localStorage.setItem(k, JSON.stringify(v)));
+        localStorage.setItem('stoxels_active_slot', '1');
+    })();
+
+    const row = document.getElementById('frames');
+    // ?only=414 → show just that device width, unscaled, for detail screenshots
+    const only = PARAMS.get('only');
+    const devices = only ? DEVICES.filter(d => d.w === parseInt(only, 10)).map(d => ({ ...d, s: 1 })) : DEVICES;
+    devices.forEach(d => {
+        const box = document.createElement('div');
+        box.className = 'frame-box';
+        box.style.width = (d.w * d.s) + 'px';
+        box.innerHTML = `<div class="frame-label">${d.name}</div>`;
+        const scaler = document.createElement('div');
+        scaler.className = 'scaler';
+        scaler.style.transform = `scale(${d.s})`;
+        const frame = document.createElement('iframe');
+        frame.width = d.w; frame.height = d.h;
+        frame.src = 'index.html?h=' + Date.now(); // cache-bust so CSS/HTML edits show up immediately
+        scaler.appendChild(frame);
+        box.appendChild(scaler);
+        row.appendChild(box);
+        frame.addEventListener('load', () => {
+            const w = frame.contentWindow;
+            // Poll until the frame's scripts are ready, then open the target
+            // screen. A single delayed call is unreliable when six game
+            // instances boot simultaneously — keep retrying until the
+            // screen actually activates (or ~20s pass).
+            const targetId = MODE === 'game' ? 'screen-game' : 'screen-save-slots';
+            const deadline = Date.now() + 20000;
+            const tryOpen = () => {
+                let ok = false;
+                try {
+                    if (MODE === 'game' && typeof w.startLevel === 'function') {
+                        // Build a FULL-shape save (via the game's own
+                        // buildFreshState) so the whole level-start chain
+                        // (inventory panel, classes, quests) finds every
+                        // field it expects, then jump into the level.
+                        let raw = null;
+                        try { raw = JSON.parse(w.localStorage.getItem('stoxels') || 'null'); } catch (e) {}
+                        if (!raw || typeof raw.inventory === 'undefined') {
+                            const base = (typeof w.buildFreshState === 'function') ? w.buildFreshState() : {};
+                            raw = Object.assign(base, {
+                                totalScore: 15420,
+                                done: Array.from({ length: 14 }, (_, i) => i),
+                                playerCharacter: 'stox',
+                                playerAscendency: 'actuary',
+                                playerLevel: 12,
+                                tutorialDone: true
+                            });
+                            w.localStorage.setItem('stoxels', JSON.stringify(raw));
+                        }
+                        w.loadStateFromSlot(1);
+                        w.startLevel(LEVEL);
+                    } else if (typeof w.showSaveSlotSelect === 'function') {
+                        w.showSaveSlotSelect(() => {});
+                    }
+                    ok = !!w.document.getElementById(targetId)?.classList.contains('active');
+                } catch (e) { /* not ready yet */ }
+                if (!ok && Date.now() < deadline) { setTimeout(tryOpen, 600); }
+            };
+            tryOpen();
+        });
+    });
+</script>
+</body>
+</html>

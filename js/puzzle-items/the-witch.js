@@ -10,12 +10,12 @@ function _useTheWitch(id, def) {
     _trackTimerDelta(before, timerSecs);
     updTimer();
 
-    window._cursedImmune = true;
+    window.STOX_FLAGS.cursedImmune = true;
     playItemEffect(id);
     showToast(`🧙 ${t('itm_witch_immunity')}`);
 
     setTimeout(() => {
-        window._cursedImmune = false;
+        window.STOX_FLAGS.cursedImmune = false;
         showToast(`🧙 ${t('itm_witch_faded')}`);
     }, 60000);
 

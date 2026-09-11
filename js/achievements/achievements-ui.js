@@ -586,7 +586,7 @@ function _buildCategoryDetailHtml(catKey, lang) {
     return `
         <div class="ach-cat-detail" style="--cat-glow: ${glow}">
             <div class="ach-cat-detail-topbar">
-                <button class="ach-cat-back-btn" id="btn-ach-cat-back">${t('btn_back')}</button>
+                <button class="ach-cat-back-btn back-btn" id="btn-ach-cat-back">${t('btn_back')}</button>
                 <span class="ach-cat-detail-count">${unlockedTiers} / ${totalTiers} — ${pct}%</span>
             </div>
             <div class="ach-cat-detail-bar-outer">

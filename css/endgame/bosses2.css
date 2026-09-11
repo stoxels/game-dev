@@ -10758,3 +10758,533 @@ body.eg-shp-flash::after {
     from { filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.7)); }
     to   { filter: drop-shadow(0 0 18px rgba(254, 240, 138, 1)); }
 }
+
+/* ============================================================
+   THE SHRINE MAIDEN (rework) — "The Bound God" (atlas_t8_5)
+   Gold-ofuda + shrine-crimson + sacred-paper palette; reuses
+   .eg-nk-orb-spirit (cyan spirit orbs) and .eg-nk-band.
+   ============================================================ */
+
+/* ── Knot Barriers ── */
+.eg-shr-bar {
+    position: fixed; z-index: 8990; pointer-events: none;
+    border-radius: 3px;
+}
+.eg-shr-bar-warn {
+    background:
+        repeating-linear-gradient(90deg, rgba(253, 224, 71, 0.35) 0 10px, rgba(253, 224, 71, 0.08) 10px 20px);
+    border: 1px dashed rgba(253, 224, 71, 0.75);
+    animation: eg-shr-hum 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-shr-hum { from { opacity: 0.45; } to { opacity: 0.95; } }
+.eg-shr-bar-lit {
+    background: linear-gradient(90deg, rgba(253, 224, 71, 0.85), rgba(250, 204, 21, 0.55), rgba(253, 224, 71, 0.85));
+    border: 1px solid rgba(254, 249, 195, 0.95);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.8), 0 0 34px rgba(253, 224, 71, 0.45);
+    animation: eg-shr-lit-pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes eg-shr-lit-pulse { from { filter: brightness(0.9); } to { filter: brightness(1.25); } }
+.eg-shr-bar-knotting { opacity: 0; transition: opacity 0.4s ease; }
+
+/* Knot wall — the rope side holds (then burns away) */
+.eg-shr-knotwall {
+    position: fixed; z-index: 8989; pointer-events: none;
+    background:
+        repeating-linear-gradient(0deg, rgba(180, 83, 9, 0.4) 0 12px, rgba(120, 53, 15, 0.55) 12px 24px),
+        linear-gradient(90deg, rgba(120, 53, 15, 0.35), rgba(180, 83, 9, 0.5), rgba(120, 53, 15, 0.35));
+    border: 2px solid rgba(217, 119, 6, 0.85);
+    box-shadow: 0 0 12px rgba(180, 83, 9, 0.6);
+    animation: eg-shr-knot-grow 0.35s ease-out;
+}
+@keyframes eg-shr-knot-grow { from { opacity: 0; transform: scaleX(0.6); } to { opacity: 1; transform: none; } }
+.eg-shr-knotwall-burn {
+    animation: eg-shr-knot-burn 0.6s ease-in forwards;
+    filter: brightness(1.6) saturate(1.4);
+}
+@keyframes eg-shr-knot-burn {
+    0% { opacity: 1; filter: brightness(1) sepia(0); }
+    55% { opacity: 1; filter: brightness(1.8) sepia(0.9) hue-rotate(-18deg); }
+    100% { opacity: 0; filter: brightness(2.2) sepia(1) hue-rotate(-30deg); }
+}
+
+/* ── Mirror Spirits ── */
+.eg-shr-anchor {
+    width: 52px; height: 52px; font-size: 2.2rem;
+    filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.95));
+    animation: eg-nk-anchor-pulse 0.6s ease-in-out infinite alternate;
+}
+.eg-shr-trail {
+    position: fixed; left: 0; top: 0; width: 32px; height: 32px;
+    pointer-events: none; z-index: 8991;
+    border-radius: 50%;
+    border: 2px dashed rgba(103, 232, 249, 0.9);
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+    opacity: 0.5; transition: opacity 0.5s ease;
+}
+.eg-shr-shard {
+    position: fixed; left: 0; top: 0;
+    pointer-events: none; z-index: 8992;
+    font-size: 1.6rem;
+    filter: drop-shadow(0 0 12px rgba(103, 232, 249, 1));
+    transition: opacity 0.3s ease;
+}
+.eg-shr-echo {
+    position: fixed; z-index: 8991; pointer-events: none;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(253, 224, 71, 0.85) 0%, rgba(250, 204, 21, 0.4) 55%, transparent 75%);
+    border: 2px solid rgba(254, 249, 195, 0.9);
+    animation: eg-shr-echo-pop 0.32s ease-out forwards;
+}
+@keyframes eg-shr-echo-pop {
+    from { transform: scale(0.4); opacity: 1; }
+    to   { transform: scale(1.25); opacity: 0; }
+}
+.eg-shr-strike-warn {
+    background: radial-gradient(circle, rgba(253, 224, 71, 0.25), transparent 70%);
+    border: 2px dashed rgba(253, 224, 71, 0.9);
+}
+
+/* ── Ofuda Ward ── */
+.eg-shr-ward {
+    position: fixed; z-index: 8990; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; border-radius: 50%;
+    background: radial-gradient(circle, rgba(253, 224, 71, 0.28), rgba(120, 53, 15, 0.35) 70%, transparent 75%);
+    border: 3px solid rgba(253, 224, 71, 0.9);
+    box-shadow: 0 0 18px rgba(253, 224, 71, 0.65), inset 0 0 22px rgba(180, 83, 9, 0.5);
+    animation: eg-shr-ward-pulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes eg-shr-ward-pulse { from { filter: brightness(0.9); } to { filter: brightness(1.2); } }
+.eg-shr-ward-hit { animation: eg-shr-ward-crack 0.35s ease-out; }
+@keyframes eg-shr-ward-crack {
+    0% { filter: brightness(2.2) hue-rotate(-30deg); transform: scale(1.12); }
+    100% { filter: none; transform: none; }
+}
+.eg-shr-ward-torn { opacity: 0.25; filter: grayscale(0.8); transition: all 0.5s ease; }
+.eg-shr-ward-dim { opacity: 0.45; filter: saturate(0.6); transition: all 0.5s ease; }
+.eg-shr-seal-warn {
+    background: rgba(253, 224, 71, 0.18);
+    border-left: 2px dashed rgba(253, 224, 71, 0.9);
+    border-right: 2px dashed rgba(253, 224, 71, 0.9);
+}
+.eg-shr-seal {
+    font-size: 3rem;
+    filter: drop-shadow(0 0 14px rgba(253, 224, 71, 1));
+}
+
+/* ── THOUSAND ARMS (finale) ── */
+.eg-shr-cd {
+    position: fixed; inset: 0; z-index: 9300; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px;
+    background: radial-gradient(ellipse at centre, rgba(69, 26, 3, 0.55), rgba(15, 8, 4, 0.82));
+    animation: eg-shr-cd-in 0.5s ease-out;
+}
+@keyframes eg-shr-cd-in { from { opacity: 0; } to { opacity: 1; } }
+.eg-shr-cd-label {
+    font-size: 2.6rem; font-weight: 900; letter-spacing: 0.14em;
+    color: #fde047;
+    text-shadow: 0 0 24px rgba(253, 224, 71, 0.9), 0 2px 10px rgba(0, 0, 0, 0.9);
+    animation: eg-shr-cd-throb 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-shr-cd-throb { from { transform: scale(1); } to { transform: scale(1.05); } }
+.eg-shr-cd-hint {
+    font-size: 1.05rem; max-width: min(620px, 88vw); text-align: center;
+    line-height: 1.5; color: #fef9c3;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95);
+}
+.eg-shr-beam {
+    position: fixed; height: 10px; z-index: 8991; pointer-events: none;
+    border-radius: 5px;
+    background: linear-gradient(90deg, rgba(254, 249, 195, 0.95), rgba(253, 224, 71, 0.75) 40%, rgba(250, 204, 21, 0.35));
+    box-shadow: 0 0 16px rgba(253, 224, 71, 0.85);
+    transform-origin: 0 50%;
+}
+.eg-shr-beam-condense {
+    animation: eg-shr-arm-final 1.1s ease-in forwards;
+}
+@keyframes eg-shr-arm-final {
+    0% { filter: brightness(1); opacity: 1; }
+    40% { filter: brightness(2.4); opacity: 1; }
+    100% { filter: brightness(3); opacity: 0; }
+}
+.eg-shr-talisman {
+    position: fixed; z-index: 8990; pointer-events: none;
+    border-radius: 6px;
+    background:
+        linear-gradient(160deg, rgba(254, 249, 195, 0.14), rgba(120, 53, 15, 0.3)),
+        repeating-linear-gradient(45deg, rgba(253, 224, 71, 0.1) 0 8px, transparent 8px 16px);
+    border: 2px solid rgba(253, 224, 71, 0.65);
+    box-shadow: 0 0 8px rgba(253, 224, 71, 0.35);
+    animation: eg-shr-talisman-drop 0.35s ease-out;
+}
+@keyframes eg-shr-talisman-drop { from { transform: scale(0.55); opacity: 0; } to { transform: none; opacity: 1; } }
+.eg-shr-talisman-safe {
+    border-color: rgba(74, 222, 128, 0.95);
+    background:
+        linear-gradient(160deg, rgba(74, 222, 128, 0.22), rgba(20, 83, 45, 0.35)),
+        repeating-linear-gradient(45deg, rgba(74, 222, 128, 0.12) 0 8px, transparent 8px 16px);
+    box-shadow: 0 0 16px rgba(74, 222, 128, 0.7), inset 0 0 14px rgba(74, 222, 128, 0.4);
+    animation: eg-shr-safe-pulse 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-shr-safe-pulse { from { filter: brightness(0.85); } to { filter: brightness(1.25); } }
+.eg-shr-talisman-hot {
+    animation: eg-shr-hot-flash 0.45s ease-in forwards;
+    background: linear-gradient(160deg, rgba(254, 240, 138, 0.7), rgba(180, 83, 9, 0.8));
+    border-color: rgba(254, 249, 195, 1);
+}
+@keyframes eg-shr-hot-flash {
+    0% { filter: brightness(1); }
+    35% { filter: brightness(2.2); transform: scale(1.08); }
+    100% { filter: brightness(1.4); opacity: 0; }
+}
+.eg-shr-safe-circle {
+    position: fixed; z-index: 8989; pointer-events: none;
+    border-radius: 50%;
+    border: 3px solid rgba(74, 222, 128, 0.9);
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.16) 0%, rgba(74, 222, 128, 0.06) 60%, transparent 75%);
+    box-shadow: 0 0 26px rgba(74, 222, 128, 0.55), inset 0 0 30px rgba(74, 222, 128, 0.25);
+    animation: eg-shr-circle-descend 2.4s ease-in-out, eg-shr-safe-pulse 0.7s ease-in-out infinite alternate 2.4s;
+}
+@keyframes eg-shr-circle-descend {
+    0% { transform: scale(1.6); opacity: 0; }
+    55% { transform: scale(1.08); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Boss card set-piece glow (thousand arms) ── */
+.eg-emoji-wrapper.eg-shr-allin {
+    animation: eg-shr-card-throb 1s ease-in-out infinite alternate;
+}
+@keyframes eg-shr-card-throb {
+    from { filter: drop-shadow(0 0 8px rgba(253, 224, 71, 0.7)); }
+    to   { filter: drop-shadow(0 0 18px rgba(254, 249, 195, 1)); }
+}
+
+/* ============================================================
+   THE STORMCALLER (rework) — "The Eye of the Storm" (boss_sirus)
+   Deep storm-slate + electric cyan + ion violet; reuses
+   .eg-nk-band and .eg-nk-dot. Distinct from Shrine gold (shr)
+   and Razor yellow (rzr).
+   ============================================================ */
+
+/* ── Charge HUD chip (⚡ stacks) ── */
+.eg-sir-charge-chip {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 9200; pointer-events: none;
+    padding: 6px 14px; border-radius: 999px;
+    font-size: 0.95rem; font-weight: 800; letter-spacing: 0.06em;
+    color: #e0f2fe;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(56, 189, 248, 0.7);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+}
+.eg-sir-charge-full {
+    color: #fff;
+    border-color: rgba(250, 204, 21, 0.95);
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.8);
+    animation: eg-sir-charge-throb 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-sir-charge-throb { from { filter: brightness(1); } to { filter: brightness(1.35); } }
+
+/* ── Ion Current ── */
+.eg-sir-ion-warn {
+    background:
+        repeating-linear-gradient(90deg, rgba(56, 189, 248, 0.22) 0 14px, rgba(56, 189, 248, 0.05) 14px 28px);
+    border: 1px dashed rgba(125, 211, 252, 0.8);
+    animation: eg-sr-ion-hum 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-sr-ion-hum { from { opacity: 0.45; } to { opacity: 0.9; } }
+.eg-sir-ion-front {
+    background:
+        linear-gradient(180deg, rgba(125, 211, 252, 0.5), rgba(14, 116, 144, 0.55) 45%, rgba(125, 211, 252, 0.5)),
+        repeating-linear-gradient(90deg, rgba(224, 242, 254, 0.14) 0 10px, transparent 10px 22px);
+    border: 1px solid rgba(224, 242, 254, 0.9);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.85), inset 0 0 22px rgba(14, 116, 144, 0.6);
+    animation: eg-sr-ion-pulse 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-sr-ion-pulse { from { filter: brightness(0.95); } to { filter: brightness(1.25); } }
+.eg-sir-tangent {
+    position: fixed; z-index: 8992; pointer-events: none;
+    background: linear-gradient(90deg, transparent, #e0f2fe 12%, #a5f3fc 50%, #e0f2fe 88%, transparent);
+    box-shadow: 0 0 12px rgba(165, 243, 252, 1);
+    animation: eg-sr-tangent-pulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-sr-tangent-pulse { from { opacity: 0.75; } to { opacity: 1; } }
+
+/* ── Chain Lightning: rivers + bolt + grounding ── */
+.eg-sir-river {
+    position: fixed; z-index: 8988; pointer-events: none;
+}
+.eg-sir-river-sweep {
+    background: linear-gradient(180deg, transparent, #67e8f9 45%, #0e7490 55%, transparent);
+    box-shadow: 0 0 10px rgba(103, 232, 249, 0.9);
+    transition: opacity 0.6s ease;
+}
+.eg-sir-river-pool {
+    background:
+        radial-gradient(ellipse at 30% 30%, rgba(103, 232, 249, 0.35), transparent 60%),
+        linear-gradient(90deg, rgba(14, 116, 144, 0.4), rgba(8, 51, 68, 0.55), rgba(14, 116, 144, 0.4));
+    border: 1px solid rgba(103, 232, 249, 0.6);
+    box-shadow: inset 0 0 24px rgba(8, 51, 68, 0.7);
+    animation: eg-sr-river-in 0.8s ease-out;
+}
+@keyframes eg-sr-river-in { from { opacity: 0; } to { opacity: 1; } }
+.eg-sir-bolt {
+    font-size: 1.7rem;
+    filter: drop-shadow(0 0 14px rgba(250, 204, 21, 1));
+}
+.eg-sir-ground {
+    position: fixed; z-index: 8990; pointer-events: none;
+    width: 92px; height: 92px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(254, 249, 195, 0.9) 0%, rgba(250, 204, 21, 0.45) 45%, transparent 72%);
+    border: 2px solid rgba(254, 249, 195, 0.9);
+    animation: eg-sr-ground-pop 0.6s ease-out forwards;
+}
+@keyframes eg-sr-ground-pop {
+    from { transform: scale(0.4); opacity: 1; }
+    to   { transform: scale(1.3); opacity: 0; }
+}
+
+/* ── Storm Eye (4×4 grid) ── */
+.eg-sir-cell {
+    position: fixed; z-index: 8989; pointer-events: none;
+    border-radius: 8px;
+}
+.eg-sir-cell-hot {
+    background:
+        radial-gradient(circle at 50% 60%, rgba(250, 204, 21, 0.4), rgba(120, 53, 15, 0.5) 75%),
+        repeating-linear-gradient(45deg, rgba(250, 204, 21, 0.12) 0 8px, transparent 8px 16px);
+    border: 2px solid rgba(250, 204, 21, 0.85);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.6), inset 0 0 16px rgba(120, 53, 15, 0.6);
+    animation: eg-sr-cell-hot 0.7s ease-in-out infinite alternate;
+}
+@keyframes eg-sr-cell-hot { from { filter: brightness(0.9); } to { filter: brightness(1.25); } }
+.eg-sir-cell-safe {
+    background: rgba(125, 211, 252, 0.14);
+    border: 2px dashed rgba(125, 211, 252, 0.75);
+    box-shadow: inset 0 0 14px rgba(56, 189, 248, 0.25);
+}
+.eg-sir-cell-eye {
+    background: radial-gradient(circle, rgba(224, 242, 254, 0.5), rgba(2, 132, 199, 0.4) 70%, transparent);
+    border: 3px solid rgba(224, 242, 254, 0.95);
+    box-shadow: 0 0 24px rgba(224, 242, 254, 0.9), inset 0 0 20px rgba(2, 132, 199, 0.5);
+    animation: eg-sr-eye-throb 1.1s ease-in-out infinite alternate;
+}
+@keyframes eg-sr-eye-throb { from { filter: brightness(1); } to { filter: brightness(1.4); } }
+
+/* ── PERFECT STORM (finale) ── */
+.eg-sir-cd {
+    position: fixed; inset: 0; z-index: 9300; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px;
+    background: radial-gradient(ellipse at centre, rgba(8, 47, 73, 0.55), rgba(2, 6, 23, 0.85));
+    animation: eg-sr-cd-in 0.5s ease-out;
+}
+@keyframes eg-sr-cd-in { from { opacity: 0; } to { opacity: 1; } }
+.eg-sir-cd-label {
+    font-size: 2.6rem; font-weight: 900; letter-spacing: 0.14em;
+    color: #7dd3fc;
+    text-shadow: 0 0 24px rgba(56, 189, 248, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9);
+    animation: eg-sr-cd-throb 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-sr-cd-throb { from { transform: scale(1); } to { transform: scale(1.05); } }
+.eg-sir-cd-hint {
+    font-size: 1.05rem; max-width: min(620px, 88vw); text-align: center;
+    line-height: 1.5; color: #e0f2fe;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95);
+}
+.eg-sir-box {
+    position: fixed; z-index: 8990; pointer-events: none;
+    border: 4px solid rgba(56, 189, 248, 0.9);
+    box-shadow: 0 0 24px rgba(56, 189, 248, 0.7), inset 0 0 40px rgba(14, 116, 144, 0.55);
+    background:
+        repeating-linear-gradient(0deg, rgba(56, 189, 248, 0.10) 0 18px, transparent 18px 36px),
+        repeating-linear-gradient(90deg, rgba(56, 189, 248, 0.10) 0 18px, transparent 18px 36px);
+}
+.eg-sir-box-final {
+    animation: eg-sr-box-final 1.1s ease-in forwards;
+}
+@keyframes eg-sr-box-final {
+    0% { filter: brightness(1); opacity: 1; }
+    40% { filter: brightness(2.6); opacity: 1; }
+    100% { filter: brightness(3.2); opacity: 0; }
+}
+.eg-sir-bullet {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fef9c3, #facc15 55%, #854d0e);
+    border: 2px solid rgba(254, 249, 195, 0.95);
+    box-shadow: 0 0 12px rgba(250, 204, 21, 0.95);
+}
+
+/* ── Boss card set-piece glow (perfect storm) ── */
+.eg-emoji-wrapper.eg-sir-allin {
+    animation: eg-sr-card-throb 1s ease-in-out infinite alternate;
+}
+@keyframes eg-sr-card-throb {
+    from { filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.7)); }
+    to   { filter: drop-shadow(0 0 18px rgba(224, 242, 254, 1)); }
+}
+
+/* ============================================================
+   THE VISE (rework) — "Cold Iron" (boss_vise, atlas_t8_0)
+   Cold-iron slate + forge-ember orange + quench cyan; reuses
+   .eg-nk-band. Distinct from Razor yellow (rzr) and Shrine gold
+   (shr): industrial slate + ember heat.
+   ============================================================ */
+
+/* ── Crushing Walls: the breathing corridor ── */
+.eg-vis-wblock {
+    position: fixed; left: 0; top: 0;
+    pointer-events: none; z-index: 8990;
+    border-radius: 4px;
+    background:
+        linear-gradient(180deg, #94a3b8, #475569 55%, #1e293b),
+        repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.25) 0 4px, transparent 4px 8px);
+    border: 2px solid rgba(203, 213, 225, 0.85);
+    box-shadow: 0 0 10px rgba(71, 85, 105, 0.9), inset 0 0 6px rgba(15, 23, 42, 0.8);
+}
+.eg-vis-wblock-up {
+    background:
+        linear-gradient(0deg, #94a3b8, #475569 55%, #1e293b),
+        repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.25) 0 4px, transparent 4px 8px);
+}
+
+/* ── Bench Vise: jaws + strain ── */
+.eg-vis-bench-warn {
+    background: repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.28) 0 16px, rgba(148, 163, 184, 0.06) 16px 32px);
+    border: 1px dashed rgba(203, 213, 225, 0.8);
+    animation: eg-vis-bench-hum 0.5s ease-in-out infinite alternate;
+}
+@keyframes eg-vis-bench-hum { from { opacity: 0.45; } to { opacity: 0.9; } }
+.eg-vis-bench-closing { border-style: solid; }
+.eg-vis-bench-bitten {
+    background:
+        linear-gradient(180deg, rgba(251, 146, 60, 0.35), rgba(120, 53, 15, 0.5)),
+        repeating-linear-gradient(90deg, rgba(251, 146, 60, 0.15) 0 12px, transparent 12px 24px);
+    border: 1px solid rgba(253, 186, 116, 0.9);
+    box-shadow: 0 0 16px rgba(251, 146, 60, 0.6), inset 0 0 20px rgba(120, 53, 15, 0.6);
+    animation: eg-vis-strain-pulse 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-vis-strain-pulse { from { filter: brightness(0.9); } to { filter: brightness(1.3); } }
+.eg-vis-bench-done { opacity: 0; transition: opacity 0.4s ease; }
+.eg-vis-jaw {
+    position: fixed; z-index: 8991; pointer-events: none;
+    border-radius: 3px;
+    background:
+        linear-gradient(90deg, #64748b, #334155 40%, #94a3b8 50%, #334155 60%, #1e293b);
+    border: 2px solid rgba(203, 213, 225, 0.9);
+    box-shadow: 0 0 14px rgba(51, 65, 85, 0.95);
+}
+
+/* ── Quench or Shatter: workpiece + hammer + sparks ── */
+.eg-vis-piece {
+    position: fixed; z-index: 8990; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; border-radius: 10px;
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.5), rgba(120, 53, 15, 0.55) 70%, transparent 78%);
+    border: 3px solid rgba(251, 146, 60, 0.95);
+    box-shadow: 0 0 20px rgba(251, 146, 60, 0.75), inset 0 0 24px rgba(120, 53, 15, 0.7);
+    animation: eg-vis-piece-glow 0.8s ease-in-out infinite alternate;
+}
+@keyframes eg-vis-piece-glow { from { filter: brightness(0.95); } to { filter: brightness(1.3); } }
+.eg-vis-piece-hit { animation: eg-vis-piece-crack 0.35s ease-out; }
+@keyframes eg-vis-piece-crack {
+    0% { filter: brightness(2.4) hue-rotate(-25deg); transform: scale(1.12); }
+    100% { filter: none; transform: none; }
+}
+.eg-vis-piece-shatter { opacity: 0.2; filter: grayscale(1); transition: all 0.5s ease; }
+.eg-vis-piece-quenched { opacity: 0.35; filter: saturate(0.3) brightness(0.7); transition: all 0.5s ease; }
+.eg-vis-hammer-warn {
+    background: rgba(251, 146, 60, 0.16);
+    border-left: 2px dashed rgba(253, 186, 116, 0.9);
+    border-right: 2px dashed rgba(253, 186, 116, 0.9);
+}
+.eg-vis-sparks {
+    position: fixed; z-index: 8989; pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(254, 240, 138, 0.55) 0%, rgba(251, 146, 60, 0.3) 50%, transparent 72%);
+    border: 2px solid rgba(254, 240, 138, 0.8);
+    animation: eg-vis-spark-in 0.3s ease-out;
+}
+@keyframes eg-vis-spark-in { from { transform: scale(0.5); opacity: 0; } to { transform: none; opacity: 1; } }
+.eg-vis-block-warn {
+    background: rgba(251, 146, 60, 0.18);
+    border-top: 2px dashed rgba(253, 186, 116, 0.9);
+    border-bottom: 2px dashed rgba(253, 186, 116, 0.9);
+}
+.eg-vis-quenched-block {
+    font-size: 3.4rem;
+    filter: drop-shadow(0 0 16px rgba(100, 116, 139, 1)) saturate(0.4) brightness(1.15);
+}
+
+/* ── THE FULL CLAMP (finale) ── */
+.eg-vis-cd {
+    position: fixed; inset: 0; z-index: 9300; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px;
+    background: radial-gradient(ellipse at centre, rgba(30, 41, 59, 0.6), rgba(2, 6, 23, 0.85));
+    animation: eg-vis-cd-in 0.5s ease-out;
+}
+@keyframes eg-vis-cd-in { from { opacity: 0; } to { opacity: 1; } }
+.eg-vis-cd-label {
+    font-size: 2.6rem; font-weight: 900; letter-spacing: 0.14em;
+    color: #cbd5e1;
+    text-shadow: 0 0 24px rgba(148, 163, 184, 0.95), 0 2px 10px rgba(0, 0, 0, 0.9);
+    animation: eg-vis-cd-throb 0.9s ease-in-out infinite alternate;
+}
+@keyframes eg-vis-cd-throb { from { transform: scale(1); } to { transform: scale(1.05); } }
+.eg-vis-cd-hint {
+    font-size: 1.05rem; max-width: min(620px, 88vw); text-align: center;
+    line-height: 1.5; color: #e2e8f0;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95);
+}
+.eg-vis-cd-slam { animation: eg-vis-cd-slam 1.1s ease-in forwards; }
+@keyframes eg-vis-cd-slam {
+    0% { filter: brightness(1); opacity: 1; }
+    40% { filter: brightness(2.6); opacity: 1; }
+    100% { filter: brightness(3.2); opacity: 0; }
+}
+.eg-vis-slab {
+    position: fixed; z-index: 8990; pointer-events: none;
+    border-radius: 6px;
+    background:
+        linear-gradient(160deg, rgba(148, 163, 184, 0.14), rgba(30, 41, 59, 0.4)),
+        repeating-linear-gradient(45deg, rgba(148, 163, 184, 0.08) 0 8px, transparent 8px 16px);
+    border: 2px solid rgba(148, 163, 184, 0.55);
+    box-shadow: 0 0 8px rgba(71, 85, 105, 0.4);
+    animation: eg-vis-slab-drop 0.35s ease-out;
+}
+@keyframes eg-vis-slab-drop { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.eg-vis-slab-safe {
+    border-color: rgba(125, 211, 252, 0.95);
+    background:
+        linear-gradient(160deg, rgba(125, 211, 252, 0.25), rgba(30, 58, 138, 0.4)),
+        repeating-linear-gradient(45deg, rgba(125, 211, 252, 0.12) 0 8px, transparent 8px 16px);
+    box-shadow: 0 0 16px rgba(125, 211, 252, 0.7), inset 0 0 14px rgba(125, 211, 252, 0.35);
+    animation: eg-vis-safe-pulse 0.55s ease-in-out infinite alternate;
+}
+@keyframes eg-vis-safe-pulse { from { filter: brightness(0.85); } to { filter: brightness(1.25); } }
+.eg-vis-slab-fracture {
+    border-color: rgba(254, 240, 138, 0.95);
+    box-shadow: 0 0 22px rgba(254, 240, 138, 0.8), inset 0 0 18px rgba(254, 240, 138, 0.4);
+}
+.eg-vis-slab-hot {
+    animation: eg-vis-hot-flash 0.45s ease-in forwards;
+    background: linear-gradient(160deg, rgba(251, 146, 60, 0.7), rgba(120, 53, 15, 0.8));
+    border-color: rgba(253, 186, 116, 1);
+}
+@keyframes eg-vis-hot-flash {
+    0% { filter: brightness(1); }
+    35% { filter: brightness(2.2); transform: scale(1.08); }
+    100% { filter: brightness(1.4); opacity: 0; }
+}
+
+/* ── Boss card set-piece glow (full clamp) ── */
+.eg-emoji-wrapper.eg-vis-allin {
+    animation: eg-vis-card-throb 1s ease-in-out infinite alternate;
+}
+@keyframes eg-vis-card-throb {
+    from { filter: drop-shadow(0 0 8px rgba(148, 163, 184, 0.7)); }
+    to   { filter: drop-shadow(0 0 18px rgba(203, 213, 225, 1)); }
+}

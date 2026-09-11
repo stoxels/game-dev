@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sprite facing check</title>
+<style>
+  body { background: #1a1a2e; color: #eee; font-family: monospace; margin: 16px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 18px; }
+  .cell { text-align: center; width: 150px; }
+  .cell img { width: 128px; height: 128px; object-fit: contain; image-rendering: auto; }
+  .cell div { font-size: 11px; margin-top: 4px; color: #9fd; }
+  h3 { color: #f9c; margin: 14px 0 6px; }
+</style>
+</head>
+<body>
+  <h3>Trix OMNI walk frames (which way do they face?)</h3>
+  <div class="grid" id="omni"></div>
+  <h3>Trix directional: actuary / mathmagician / markovian (left vs right frame 1)</h3>
+  <div class="grid" id="dirs"></div>
+  <h3>Trix bayesian down (only down exists)</h3>
+  <div class="grid" id="bay"></div>
+  <h3>Stox noclass baseline (known good?) left vs right</h3>
+  <div class="grid" id="stox"></div>
+  <h3>Missing-art probes (should show broken/alt text if 404)</h3>
+  <div class="grid" id="missing"></div>
+<script>
+  const add = (id, src, label) => {
+    const d = document.createElement('div');
+    d.className = 'cell';
+    const img = document.createElement('img');
+    img.src = src;
+    const cap = document.createElement('div');
+    cap.textContent = label;
+    d.appendChild(img); d.appendChild(cap);
+    document.getElementById(id).appendChild(d);
+  };
+  ['1','2','3'].forEach(n => add('omni', `animations/Trix/walk/Trix_noclass_walk_${n}.webp`, `omni walk ${n}`));
+  add('dirs', 'animations/Trix/walk/actuary/left/Trix_actuary_walk_left_1.webp', 'actuary LEFT 1');
+  add('dirs', 'animations/Trix/walk/actuary/right/Trix_actuary_walk_right_1.webp', 'actuary RIGHT 1');
+  add('dirs', 'animations/Trix/walk/mathmagician/left/Trix_mathmagician_walk_left_1.webp', 'mathmag LEFT 1');
+  add('dirs', 'animations/Trix/walk/mathmagician/right/Trix_mathmagician_walk_right_1.webp', 'mathmag RIGHT 1');
+  add('dirs', 'animations/Trix/walk/markovian/left/Trix_markovian_walk_left_1.webp', 'markovian LEFT 1');
+  add('dirs', 'animations/Trix/walk/markovian/right/Trix_markovian_walk_right_1.webp', 'markovian RIGHT 1');
+  add('bay', 'animations/Trix/walk/bayesian/down/Trix_bayesian_walk_down_1.webp', 'bayesian DOWN 1');
+  add('stox', 'animations/Stox/walk/noclass/left/Stox_noclass_walk_left_1.webp', 'stox LEFT 1');
+  add('stox', 'animations/Stox/walk/noclass/right/Stox_noclass_walk_right_1.webp', 'stox RIGHT 1');
+  add('missing', 'animations/Trix/idle/noclass/down/Trix_noclass_idle_down_1.webp', 'trix idle down (expect missing)');
+  add('missing', 'animations/Trix/walk/noclass/down/Trix_noclass_walk_down_1.webp', 'trix walk down (expect missing)');
+  add('missing', 'images/sprites/Trix_noclass.webp', 'MENU portrait (for compare)');
+</script>
+</body>
+</html>

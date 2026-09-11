@@ -135,8 +135,17 @@ function _calcAvailableSpace() {
     // '.inv-strip' never matches anything, so this used to silently return
     // null and skip subtracting the inventory bar's height entirely.
     const invStrip = document.getElementById('inv-panel');
+    // The touchpad FILL/MARK toggle hangs below the grid (absolute,
+    // bottom: -34px inside #puzzle-scaler-wrap). When it is visible it
+    // needs a strip of free space between grid and inventory bar — so
+    // reserve its height here, exactly like the other chrome bars.
+    const fillToggle = document.getElementById('btn-touchpad-mode');
+    const fillToggleH = (fillToggle && !fillToggle.classList.contains('hidden'))
+        ? fillToggle.offsetHeight + 16
+        : 0;
     const usedH = (metaBar ? metaBar.offsetHeight : 0)
-        + (invStrip ? invStrip.offsetHeight : 0);
+        + (invStrip ? invStrip.offsetHeight : 0)
+        + fillToggleH;
 
     return {
         w: window.innerWidth * SCALE_FILL_W,
