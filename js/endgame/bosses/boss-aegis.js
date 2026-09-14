@@ -1,35 +1,35 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE AEGIS (boss_aegis)-------------------------
 //------------------------------------------------------------------------
-// REWORK — guardian-fortress homage, rebuilt as a full bulwark gauntlet.
+// REWORK - guardian-fortress homage, rebuilt as a full bulwark gauntlet.
 // The Aegis fights like a castle that learned to walk: it hides behind
 // summoned guards, charges you behind its shield, plants sentries that
-// hurl tracking orbs, and sweeps the field with a rotating guard rotor —
+// hurl tracking orbs, and sweeps the field with a rotating guard rotor -
 // then, at the very end, it plants THE LAST BASTION and sweeps the whole
 // arena with escalating beams before one final vanguard charge.
 //
-//   Phase 1 (100–60%) — AEGIS PROTOCOL (signature, upgraded). The boss
+//   Phase 1 (100–60%) - AEGIS PROTOCOL (signature, upgraded). The boss
 //                       summons a guard squad and goes IMMUNE while they
-//                       live — kill the guards to break the shield (40s
+//                       live - kill the guards to break the shield (40s
 //                       failsafe). Guards now wear a pulsing guardian ring
 //                       and the whole arena gets an "aegis active" glow so
 //                       the state reads at a glance.
 //                       Plus SHIELD CHARGE. The boss picks your row and
 //                       BARRELS across it behind its shield. Out of the
 //                       lane! Two charges per cast; three at the end.
-//   Phase 2 ( ≤60%)   — SENTRY SHIELDS. Sentry shields plant at the edges
+//   Phase 2 ( ≤60%)   - SENTRY SHIELDS. Sentry shields plant at the edges
 //                       and hurl slow tracking orbs at you for a while.
 //                       Strafe the orbs!
 //                       Plus GUARD ROTOR. Two guardian orbs tether a beam
 //                       that sweeps around a pivot like a radar blade.
 //                       Stay off the arms! Everything gets faster.
-//   Phase 3 ( ≤30%)   — Three charges, three sentries, a faster rotor. The
+//   Phase 3 ( ≤30%)   - Three charges, three sentries, a faster rotor. The
 //                       gates will not hold much longer.
-//   Finale ( ≤10%)    — THE LAST BASTION (one-shot set-piece): the boss
+//   Finale ( ≤10%)    - THE LAST BASTION (one-shot set-piece): the boss
 //                       goes immune and shielded and FORTIFIES while a
 //                       stone citadel swallow the arena. A bastion plants
 //                       at the centre and sweeps the field with two
-//                       opposite beams — each beat they spin FASTER (80° →
+//                       opposite beams - each beat they spin FASTER (80° →
 //                       115° → 150° per second). Then the VANGUARD: the
 //                       beams retract and three shield charges barrel
 //                       across your row, the last one huge. STAY OFF THE
@@ -110,7 +110,7 @@ function _egAgTouch(pct, level, label) {
 }
 
 // Arena-wide glow so the shielded state reads at a glance (managed element,
-// not a body class — flashes own the body pseudo-elements).
+// not a body class - flashes own the body pseudo-elements).
 let _egAgGlowEl = null;
 function _egAgAegisGlow(on) {
     if (on) {
@@ -149,7 +149,7 @@ function _egAgDebris(x, y, big) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: AEGIS PROTOCOL (signature)-------------------
 //------------------------------------------------------------------------
-// The boss summons a guard squad and goes IMMUNE while they live — kill
+// The boss summons a guard squad and goes IMMUNE while they live - kill
 // the guards to break the shield (40s failsafe). Upgraded: guards wear a
 // pulsing guardian ring and the arena glows while the aegis is up, so the
 // state reads at a glance.
@@ -200,7 +200,7 @@ function _egMechAgAegisProtocol(monster, phase) {
             const c2 = document.getElementById('eg-card-' + monster.id);
             if (c2) c2.classList.remove('eg-nk-shielded');
             _egAgAegisGlow(false);
-            _egNkToast('eg_mech_aegis_down', '🛡️ Aegis shield down — burn the boss!', '#4ade80');
+            _egNkToast('eg_mech_aegis_down', '🛡️ Aegis shield down - burn the boss!', '#4ade80');
             if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e2) {} }
             return false;
         }
@@ -249,7 +249,7 @@ function _egMechAgShieldCharge(monster, phase) {
         charges.push({ y, fromLeft, warn, el: null, at: warnMs + i * gapMs, x: 0, done: false });
     }
 
-    _egNkToast('eg_mech_ag_charge', '🛡️ The Aegis: SHIELD CHARGE — out of the lane!', '#e2e8f0');
+    _egNkToast('eg_mech_ag_charge', '🛡️ The Aegis: SHIELD CHARGE - out of the lane!', '#e2e8f0');
 
     let t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -297,7 +297,7 @@ function _egMechAgShieldCharge(monster, phase) {
 //-------------------MECHANIC: SENTRY SHIELDS (phase 2+)--------------------
 //------------------------------------------------------------------------
 // Sentry shields plant at the edges and hurl slow tracking orbs at you for
-// a while. Strafe the orbs — they home, but they are slow.
+// a while. Strafe the orbs - they home, but they are slow.
 const EG_AG_SENTRY_COUNT = [0, 0, 2, 3];
 const EG_AG_SENTRY_LIFE  = 6500;
 const EG_AG_ORB_SPEED    = 130;
@@ -327,7 +327,7 @@ function _egMechAgSentries(monster, phase) {
         sentries.push({ x: spot[0], y: spot[1], el, nextFire: 900 * _EG_AG_DEBUG_MULT + i * 500 * _EG_AG_DEBUG_MULT });
     }
 
-    _egNkToast('eg_mech_ag_sentries', '🛡️ The Aegis: SENTRY SHIELDS — dodge the orbs!', '#e2e8f0');
+    _egNkToast('eg_mech_ag_sentries', '🛡️ The Aegis: SENTRY SHIELDS - dodge the orbs!', '#e2e8f0');
 
     const orbs = [];
     let t = 0, touchCd = 0;
@@ -417,7 +417,7 @@ function _egMechAgGuardRotor(monster, phase) {
         return el;
     });
 
-    _egNkToast('eg_mech_ag_rotor', '🛡️ The Aegis: GUARD ROTOR — stay off the arms!', '#e2e8f0');
+    _egNkToast('eg_mech_ag_rotor', '🛡️ The Aegis: GUARD ROTOR - stay off the arms!', '#e2e8f0');
 
     let t = 0, ang = Math.random() * 360, touchCd = 0, live = false;
     _egNkLoop(run, (dtS, now) => {
@@ -459,7 +459,7 @@ function _egMechAgGuardRotor(monster, phase) {
 //------------------------------------------------------------------------
 // The boss goes immune + shielded and FORTIFIES while a stone citadel
 // swallows the arena. A bastion plants at the centre and sweeps the field
-// with two opposite beams — each beat they spin faster. Then the VANGUARD:
+// with two opposite beams - each beat they spin faster. Then the VANGUARD:
 // the beams retract and three shield charges barrel across your row, the
 // last one huge. Charge bar frozen for the whole set-piece (gate in
 // _egTickPlayer via _egAgFinalActive).
@@ -576,11 +576,11 @@ function _egAgFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-ag-cd-label">🛡️ THE LAST BASTION</div>' +
         '<div class="eg-ag-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-ag-cd-hint">The bastion sweeps the field — stay off the beams!</div>';
+        '<div class="eg-ag-cd-hint">The bastion sweeps the field - stay off the beams!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_ag_final_cd', '🏰💀 THE LAST BASTION — off the beams!', '#e2e8f0');
+    _egNkToast('eg_mech_ag_final_cd', '🏰💀 THE LAST BASTION - off the beams!', '#e2e8f0');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -598,7 +598,7 @@ function _egAgFinalStart(monster) {
     const level = monster.level || 1;
     let touchCd = 0;
     _egNkLoop(g.fxRun, (dtS, now) => {
-        if (!g.beamOn) return true;   // idle — the vanguard's loop now drives the run
+        if (!g.beamOn) return true;   // idle - the vanguard's loop now drives the run
         if (_egNkFrozen()) return true;
         g.arm += g.omega * dtS;
         g.beams.forEach((el, i) => { el.style.rotate = (g.arm + i * 180) + 'deg'; });
@@ -773,7 +773,7 @@ function _egAgFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egAgTeardown() {
     if (_egAgFinal) { try { _egAgFinalEnd(_egAgFinal); } catch (e) {} _egAgFinal = null; }
@@ -796,8 +796,8 @@ function _egAgTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_AG_DEBUG.fire('protocol'|'charge'|'sentries'|'rotor') — runs one now
-//   _EG_AG_DEBUG.final()                                      — BASTION now
+//   _EG_AG_DEBUG.fire('protocol'|'charge'|'sentries'|'rotor') - runs one now
+//   _EG_AG_DEBUG.final()                                      - BASTION now
 if (typeof window !== 'undefined') {
     window._EG_AG_DEBUG = {
         fire: (name, phase) => {

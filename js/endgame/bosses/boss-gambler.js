@@ -3,29 +3,29 @@
 //------------------------------------------------------------------------
 // A rework of the old one-shot Loaded Dice into a persistent casino siege.
 // The Gambler runs the table and the table is the arena. Fight identity:
-// RISK — every mechanic offers a visible payout or a visible price.
+// RISK - every mechanic offers a visible payout or a visible price.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE HOUSE CHIPS — the boss's arena body: a stack of 4 glowing casino
+//   • THE HOUSE CHIPS - the boss's arena body: a stack of 4 glowing casino
 //     chips that drifts around the table. Touching it is a Croupier Slam:
 //     animated fling + shadow damage.
-//   • CHIP VOLLEY — the chips periodically fan out and whip at you like
+//   • CHIP VOLLEY - the chips periodically fan out and whip at you like
 //     thrown playing cards (fast small shadow hits, phase-scaled count).
 //
-//   60% GATE — WHEEL OF FORTUNE: a giant prize wheel spins center-screen
+//   60% GATE - WHEEL OF FORTUNE: a giant prize wheel spins center-screen
 //   for ~4s (visibly ticking through wedges). Where it stops, everyone
-//   pays — one of: SNAKE EYES (heavy hit + double volley), FREE SPIN
+//   pays - one of: SNAKE EYES (heavy hit + double volley), FREE SPIN
 //   (the wheel fires again immediately), JACKPOT (the Gambler heals 12%),
-//   or YOU WIN (you heal 10% — the one good wedge). The wheel result is
+//   or YOU WIN (you heal 10% - the one good wedge). The wheel result is
 //   broadcast with a big toast; the gamble is real.
 //
-//   30% GATE — JACKPOT RUSH: slot symbols rain across the table in waves
+//   30% GATE - JACKPOT RUSH: slot symbols rain across the table in waves
 //   (🍒🔔🍋7️⃣); matching 7️⃣s detonate in expanding coin bursts. Pure
 //   dodge pressure, phase-scaled.
 //
-//   CHARGE ATTACK — RUSSIAN ROULETTE: a 6-chamber cylinder overlays your
+//   CHARGE ATTACK - RUSSIAN ROULETTE: a 6-chamber cylinder overlays your
 //   position; chambers tick down visibly (1.8s total). When the hammer
-//   falls, 5 of 6 chambers are blanks — a visible shell lands harmless —
+//   falls, 5 of 6 chambers are blanks - a visible shell lands harmless -
 //   but the loaded chamber deal a heavy shadow hit. Pure odds, fully
 //   telegraphed; move out of the mark before the click.
 //
@@ -55,7 +55,7 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            // Kept for schedule compatibility — the persistent watcher now
+            // Kept for schedule compatibility - the persistent watcher now
             // owns the chip volley; the handler no-ops (same shim pattern
             // as the other reworked bosses).
             { name: 'loaded_dice', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechLoadedDice' },
@@ -101,7 +101,7 @@ const EG_GMB_RR_R = 110;                     // mark radius
 
 let _egGamblerWatcher = null; // per-fight casino state
 
-// Phase lookup helper — resolves the boss's current phase (default 1).
+// Phase lookup helper - resolves the boss's current phase (default 1).
 function _egGmbPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
         const m = _egMonsters.find(x => x && x.id === st.monsterId);
@@ -110,7 +110,7 @@ function _egGmbPhase(st) {
     return 1;
 }
 
-// Flat player heal (% of maxHP) — same inline pattern as the hearts.
+// Flat player heal (% of maxHP) - same inline pattern as the hearts.
 function _egGmbHealPct(pct) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
@@ -271,7 +271,7 @@ function _egGamblerArenaInit(monster) {
                     rr.el.textContent = '🔫' + '⚪'.repeat(Math.max(0, chamber));
                 }
             } else {
-                // Hammer falls: the mark detonates (5/6 odds it's a blank —
+                // Hammer falls: the mark detonates (5/6 odds it's a blank -
                 // rolled here; both outcomes are broadcast).
                 const loaded = Math.random() < (1 / 6);
                 try { rr.el.remove(); } catch (e) {}
@@ -282,10 +282,10 @@ function _egGamblerArenaInit(monster) {
                         const dealt = _egNkHit(EG_GMB_RR_DMG[rr.p], 'shadow', st.level);
                         _egNkAbilityHitToast(dealt, 'The Gambler', 'Russian Roulette');
                     } else {
-                        _egNkToast('eg_gmb_blank', '🔘 CLICK — the chamber was loaded, but you stepped out!', '#4ade80');
+                        _egNkToast('eg_gmb_blank', '🔘 CLICK - the chamber was loaded, but you stepped out!', '#4ade80');
                     }
                 } else {
-                    _egNkToast('eg_gmb_blank', '🔘 CLICK — blank. This time.', '#4ade80');
+                    _egNkToast('eg_gmb_blank', '🔘 CLICK - blank. This time.', '#4ade80');
                     _egGamblerShellPop(st, rr.x, rr.y);
                 }
                 st.rr = null;
@@ -343,7 +343,7 @@ function _egGamblerTickCards(st, dtS, pr) {
 
 // ── 60% gate: Wheel of Fortune ───────────────────────────────────────────
 // A giant prize wheel spins center-screen, visibly ticking wedges, then
-// lands on one of four outcomes — including one that helps the player.
+// lands on one of four outcomes - including one that helps the player.
 const EG_GMB_WHEEL_FACES = ['🍒', '7️⃣', '💎', '🎲'];
 const EG_GMB_WHEEL_KEYS = ['snake', 'free', 'jackpot', 'win'];
 
@@ -388,7 +388,7 @@ function _egGamblerWheelResolve(st, wl, live) {
         wl.el.classList.remove('landed');
         return;
     } else if (key === 'jackpot') {
-        resultEl.textContent = '💰 JACKPOT — THE HOUSE WINS!';
+        resultEl.textContent = '💰 JACKPOT - THE HOUSE WINS!';
         _egGmbHealBoss(live, EG_GMB_WHEEL_HEAL_BOSS);
     } else {
         resultEl.textContent = '⭐ YOU WIN!';
@@ -404,7 +404,7 @@ function _egGamblerWheelResolve(st, wl, live) {
 function _egGamblerRush(st, now) {
     if (st.rush) return;
     st.rush = { wave: 0, t: 0 };
-    _egNkToast('eg_gmb_rush', '🎰 JACKPOT RUSH! Dodge the reels — mind the 7s!');
+    _egNkToast('eg_gmb_rush', '🎰 JACKPOT RUSH! Dodge the reels - mind the 7s!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gambler_deal'); } catch (e) {}
 }
 
@@ -499,7 +499,7 @@ function _egGamblerTickBursts(st, dtS) {
 
 // ── Charge attack: Russian Roulette ──────────────────────────────────────
 // A 6-chamber cylinder telegraphs over the player for 1.8s, visibly
-// ticking down; then the hammer falls — 5/6 blank, 1/6 heavy hit.
+// ticking down; then the hammer falls - 5/6 blank, 1/6 heavy hit.
 function _egGamblerRoulette(monster) {
     const st = _egGamblerWatcher;
     if (!st || st.rr || _egNkDodgeBusy() || _egNkFrozen()) return;
@@ -531,7 +531,7 @@ function _egGamblerShellPop(st, x, y) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent chip volley — keep the
+// The old scheduled mechanic is now the persistent chip volley - keep the
 // handler name alive so any stale schedule entry no-ops instead of
 // erroring.
 function _egMechLoadedDice(monster, phase) { void monster; void phase; }

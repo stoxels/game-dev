@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stoxels — Level Editor</title>
+    <title>Stoxels - Level Editor</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
 
@@ -880,10 +880,10 @@
                     </div>
                     <div class="world-dropdowns">
                         <select id="sel-world" disabled onchange="onWorldChange()">
-                            <option value="">— World —</option>
+                            <option value="">- World -</option>
                         </select>
                         <select id="sel-level" disabled onchange="onLevelChange()">
-                            <option value="">— Level —</option>
+                            <option value="">- Level -</option>
                         </select>
                     </div>
                     <div class="world-file-actions">
@@ -906,11 +906,11 @@
 
                 <div class="meta-group">
                     <div class="meta-label">Reveal (EN) <span class="meta-sub">(shown on win screen)</span></div>
-                    <input type="text" id="inp-reveal" placeholder="e.g. μ — Mean">
+                    <input type="text" id="inp-reveal" placeholder="e.g. μ - Mean">
                 </div>
                 <div class="meta-group">
                     <div class="meta-label">Reveal (DE) <span class="meta-sub">(German translation)</span></div>
-                    <input type="text" id="inp-reveal-de" placeholder="z.B. μ — Mittelwert">
+                    <input type="text" id="inp-reveal-de" placeholder="z.B. μ - Mittelwert">
                 </div>
 
                 <div class="meta-group">
@@ -925,18 +925,18 @@
                     <div class="meta-label">Bonus Type &amp; Param</div>
                     <div style="display:flex;gap:6px;align-items:center;">
                         <select id="inp-bonus-type" style="font-family:var(--F);font-size:12px;background:var(--surface);border:1px solid var(--border2);padding:6px 8px;border-radius:4px;color:var(--ink);flex:1;">
-                            <option value="nomiss">nomiss — No mistakes</option>
-                            <option value="fast">fast — Speed run</option>
-                            <option value="lowmiss">lowmiss — At most N mistakes</option>
-                            <option value="noitem">noitem — No items used</option>
-                            <option value="quiz">quiz — Bonus question</option>
-                            <option value="combo">combo — Speed + no mistakes</option>
-                            <option value="noitem_nomiss">noitem_nomiss — No items + no mistakes</option>
-                            <option value="noitem_fast">noitem_fast — No items + speed</option>
+                            <option value="nomiss">nomiss - No mistakes</option>
+                            <option value="fast">fast - Speed run</option>
+                            <option value="lowmiss">lowmiss - At most N mistakes</option>
+                            <option value="noitem">noitem - No items used</option>
+                            <option value="quiz">quiz - Bonus question</option>
+                            <option value="combo">combo - Speed + no mistakes</option>
+                            <option value="noitem_nomiss">noitem_nomiss - No items + no mistakes</option>
+                            <option value="noitem_fast">noitem_fast - No items + speed</option>
                         </select>
                         <input type="number" id="inp-bonus-param" value="0" min="0"
                                style="width:60px;font-family:var(--F);font-size:12px;background:var(--surface);border:1px solid var(--border2);padding:6px 8px;border-radius:4px;color:var(--ink);text-align:center;"
-                               title="bonusParam — seconds for fast/combo, mistake count for lowmiss, 0 otherwise">
+                               title="bonusParam - seconds for fast/combo, mistake count for lowmiss, 0 otherwise">
                         <span style="font-family:var(--F);font-size:9px;color:var(--ink3);white-space:nowrap;">param</span>
                     </div>
                 </div>
@@ -1358,11 +1358,11 @@
             const rc = getSelRect();
             if (!rc) { el.style.display = 'none'; el.textContent = ''; return; }
             el.style.display = '';
-            el.textContent = `Selected ${rc.r2 - rc.r1 + 1}×${rc.c2 - rc.c1 + 1} — Ctrl+C copy`;
+            el.textContent = `Selected ${rc.r2 - rc.r1 + 1}×${rc.c2 - rc.c1 + 1} - Ctrl+C copy`;
         }
         function copySelection() {
             const rc = getSelRect();
-            if (!rc) { updateSelTag('No selection — Shift+Drag to select'); return; }
+            if (!rc) { updateSelTag('No selection - Shift+Drag to select'); return; }
             clipBoard = [];
             for (let r = rc.r1; r <= rc.r2; r++)
                 clipBoard.push(gridData[r].slice(rc.c1, rc.c2 + 1));
@@ -1370,7 +1370,7 @@
         }
         function cutSelection() {
             const rc = getSelRect();
-            if (!rc) { updateSelTag('No selection — Shift+Drag to select'); return; }
+            if (!rc) { updateSelTag('No selection - Shift+Drag to select'); return; }
             copySelection();
             pushUndo();
             for (let r = rc.r1; r <= rc.r2; r++)
@@ -1381,7 +1381,7 @@
             updateSelTag(`Cut ${rc.r2 - rc.r1 + 1}×${rc.c2 - rc.c1 + 1}`);
         }
         function pasteClipboard() {
-            if (!clipBoard || !clipBoard.length) { updateSelTag('Clipboard empty — select an area and Ctrl+C first'); return; }
+            if (!clipBoard || !clipBoard.length) { updateSelTag('Clipboard empty - select an area and Ctrl+C first'); return; }
             const h = clipBoard.length, w = clipBoard[0].length;
             // Anchor: cell the mouse is currently hovering (top-left of the paste)
             const r0 = Math.max(0, Math.min(rows - 1, hoverCell.r));
@@ -1525,7 +1525,7 @@
             const bType = document.getElementById('inp-bonus-type').value || 'nomiss';
             const bParam = parseInt(document.getElementById('inp-bonus-param').value) || 0;
 
-            // Build a nicely indented level object — 4-space indent inside the object,
+            // Build a nicely indented level object - 4-space indent inside the object,
             // grid indented an additional 4 spaces so G( rows look clean.
             const gridCode = generateGridCode(4);
 
@@ -1592,7 +1592,7 @@
                 const gridMatch = raw.match(/grid\s*:\s*(G\s*\([\s\S]*?\))\s*[,}]/);
                 if (!gridMatch) { showImportMsg('Could not find a grid: G(...) in the pasted text.', 'red'); return; }
 
-                // Evaluate G(...) — define a local G that returns the 2D array
+                // Evaluate G(...) - define a local G that returns the 2D array
                 const G_local = (...rows) => rows.map(r => r.map(v => +v));
                 try {
                     gridData2D = (new Function('G', `return ${gridMatch[1]}`))(G_local);
@@ -1780,7 +1780,7 @@
 
             let msg, color;
             if (contradiction) {
-                msg = '✗ Clues are contradictory — no picture satisfies them.';
+                msg = '✗ Clues are contradictory - no picture satisfies them.';
                 color = 'red';
             } else {
                 let unknown = 0, mismatch = 0;
@@ -1790,7 +1790,7 @@
                 }
                 if (!unknown && !mismatch) { msg = '✓ Uniquely solvable by pure logic'; color = 'green'; }
                 else if (!unknown) { msg = `✗ Clues force a DIFFERENT picture (${mismatch} cells differ from your design).`; color = 'red'; }
-                else { msg = `△ Needs guessing — ${unknown} cell${unknown === 1 ? '' : 's'} not determined by line logic. May still be unique.`; color = 'yellow'; }
+                else { msg = `△ Needs guessing - ${unknown} cell${unknown === 1 ? '' : 's'} not determined by line logic. May still be unique.`; color = 'yellow'; }
             }
             setSolveMsg(msg, color);
         }
@@ -1878,7 +1878,7 @@
 
                 // 4. Populate world dropdown
                 const selWorld = document.getElementById('sel-world');
-                selWorld.innerHTML = '<option value="">— World —</option>';
+                selWorld.innerHTML = '<option value="">- World -</option>';
                 worldsData.forEach((w, wi) => {
                     const opt = document.createElement('option');
                     opt.value = wi;
@@ -1887,7 +1887,7 @@
                 });
                 selWorld.disabled = false;
                 document.getElementById('sel-level').disabled = true;
-                document.getElementById('sel-level').innerHTML = '<option value="">— Level —</option>';
+                document.getElementById('sel-level').innerHTML = '<option value="">- Level -</option>';
                 document.getElementById('btn-load-level').disabled = true;
                 document.getElementById('btn-export-file').disabled = false;
                 document.getElementById('wf-badge').classList.add('visible');
@@ -1967,7 +1967,7 @@
         function onWorldChange() {
             const wi = parseInt(document.getElementById('sel-world').value);
             const selLevel = document.getElementById('sel-level');
-            selLevel.innerHTML = '<option value="">— Level —</option>';
+            selLevel.innerHTML = '<option value="">- Level -</option>';
             document.getElementById('btn-load-level').disabled = true;
 
             if (isNaN(wi) || !worldsData || !worldsData[wi]) {
@@ -1981,7 +1981,7 @@
                 const opt = document.createElement('option');
                 opt.value = li;
                 const nr = lv.grid.length, nc = lv.grid[0].length;
-                opt.textContent = `#${li + 1} — ${lv.hint || '(no hint)'} [${nr}×${nc}]`;
+                opt.textContent = `#${li + 1} - ${lv.hint || '(no hint)'} [${nr}×${nc}]`;
                 selLevel.appendChild(opt);
             });
             selLevel.disabled = false;
@@ -2023,7 +2023,7 @@
             setWFStatus(`Loaded: ${lv.hint || '(no hint)'} [${newRows}×${newCols}]`, 'green');
         }
 
-        // Called every time the editor state changes — syncs back to worldsData
+        // Called every time the editor state changes - syncs back to worldsData
         function syncCurrentLevelBack() {
             if (currentWorldIdx === null || currentLevelIdx === null || !worldsData) return;
             const lv = worldsData[currentWorldIdx].levels[currentLevelIdx];
@@ -2043,7 +2043,7 @@
             const opt = selLevel.options[currentLevelIdx + 1]; // +1 for placeholder
             if (opt) {
                 const nr = lv.grid.length, nc = lv.grid[0].length;
-                opt.textContent = `#${currentLevelIdx + 1} — ${lv.hint || '(no hint)'} [${nr}×${nc}]`;
+                opt.textContent = `#${currentLevelIdx + 1} - ${lv.hint || '(no hint)'} [${nr}×${nc}]`;
             }
         }
 

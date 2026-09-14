@@ -1,8 +1,8 @@
 //  endgame-mod-tables-chest.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------CHEST MODIFIER TABLE---------------------------------
@@ -12,8 +12,8 @@
 // and hosts some powerful exclusive mods: a spell damage multiplier
 // (inscribed into the breastplate), precision (the stacking puzzle buff),
 // and the heaviest absorption mods outside of dedicated shield builds.
-// Block/dodge both appear here — the chest handles both archetypes.
-// No elemental damage, crit, chain, splash, multishot, or pushback —
+// Block/dodge both appear here - the chest handles both archetypes.
+// No elemental damage, crit, chain, splash, multishot, or pushback -
 // those belong to weapons, amulets, and cloaks respectively.
 
 const EG_MOD_TABLE_CHEST = {
@@ -244,7 +244,7 @@ const EG_MOD_TABLE_CHEST = {
 
         // --- CHEST-EXCLUSIVE: SPELL DAMAGE MULTIPLIER ---
         // A rune or inscription carved into the breastplate that amplifies
-        // class ability power. % multiplier rather than flat — rarer and
+        // class ability power. % multiplier rather than flat - rarer and
         // more impactful than the amulet's flat spell_damage.
         inc_spell_damage: {
             id: 'inc_spell_damage',
@@ -254,6 +254,22 @@ const EG_MOD_TABLE_CHEST = {
                 { tier: 2, min: 20, max: 34, weight: 180, ilvl: 64 },
                 { tier: 3, min: 10, max: 19, weight: 420, ilvl: 40 },
                 { tier: 4, min: 3, max: 9, weight: 950, ilvl: 15 }
+            ]
+        },
+
+        // --- CHEST-EXCLUSIVE: HEALING POWER MULTIPLIER ---
+        // The support mirror of inc_spell_damage above: a % multiplier carved
+        // into the breastplate. Only the % half rolls on the chest (flat lives
+        // on amulet / sigil / offhand), and like its offensive twin it is the
+        // rare, high-ilvl half of the stat.
+        inc_healing_power: {
+            id: 'inc_healing_power',
+            label: '#% increased Healing Power', labelDe: '#% erhöhte Heilkraft',
+            tiers: [
+                { tier: 1, min: 30, max: 42, weight: 70, ilvl: 84 },
+                { tier: 2, min: 18, max: 29, weight: 180, ilvl: 64 },
+                { tier: 3, min: 9, max: 17, weight: 420, ilvl: 40 },
+                { tier: 4, min: 3, max: 8, weight: 950, ilvl: 15 }
             ]
         },
 
@@ -377,7 +393,7 @@ const EG_MOD_TABLE_CHEST = {
                 { tier: 4, min: 2, max: 4, weight: 1100, ilvl: 1 }
             ]
         },
-        // Absorption regen mods — shared with shoulders, natural fit for
+        // Absorption regen mods - shared with shoulders, natural fit for
         // both torso pieces that most directly manage the absorption layer.
         absorption_regen_rate: {
             id: 'absorption_regen_rate',
@@ -446,7 +462,7 @@ const EG_MOD_TABLE_CHEST = {
         },
 
         // --- BLOCK & DODGE ---
-        // Chest gets the highest block values of any slot — it IS your
+        // Chest gets the highest block values of any slot - it IS your
         // armour even without a dedicated shield. Slightly above shoulders.
         block_chance: {
             id: 'block_chance',
@@ -517,7 +533,7 @@ const EG_MOD_TABLE_CHEST = {
         // a stacking buff, all stacks lost on mistake. The chest is the
         // centrepiece slot so it's the right home for this high-skill,
         // high-reward puzzle modifier. The # value is the buff magnitude
-        // per stack — the generator/runtime decides what the buff applies
+        // per stack - the generator/runtime decides what the buff applies
         // to (damage, regen, crit) when the item rolls this mod.
         precision_damage: {
             id: 'precision_damage',

@@ -359,7 +359,7 @@ function _quizHandleFirstCorrectReward(resEl) {
 
     // Mark bonus as claimed regardless of Ironman mode or item availability
     STATE.bonusDone.push(cur.gIdx);
-    // Re-check world aggregates — claiming this bonus may have completed
+    // Re-check world aggregates - claiming this bonus may have completed
     // the "all bonuses in a world" achievement set.
     if (typeof checkWorldCompleteAch === 'function') checkWorldCompleteAch();
 
@@ -457,7 +457,7 @@ function _resolveQuizAnswer(correct) {
         }
     }
     document.getElementById('quiz-continue').style.display = 'flex';
-    // After a correct answer the continue chip must demand attention —
+    // After a correct answer the continue chip must demand attention -
     // pulse green so players never miss the way to the next screen.
     document.getElementById('quiz-continue').classList.toggle('qr-continue-attention', !!correct);
     _quizRefreshWhyButton();
@@ -724,7 +724,7 @@ function quizUseTutor() {
 
 // Injects the character-portrait medallion into the quiz overlay and
 // drives its accent/crack colours from the active character.
-// NOTE: not currently called anywhere in this file — see summary.
+// NOTE: not currently called anywhere in this file - see summary.
 function _quizInjectPortrait(overlayEl) {
     // Remove stale portrait if it exists
     const old = overlayEl.querySelector('.qr-portrait-wrap');

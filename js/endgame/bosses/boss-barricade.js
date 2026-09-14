@@ -2,7 +2,7 @@
 //-------------------BOSS: THE BARRICADE (boss_barricade)-----------------------
 //------------------------------------------------------------------------
 // Bullet-wall homage: walls of shot sweep down the screen, each with one
-// gap — and the gap drifts sideways as it falls. Start moving early and
+// gap - and the gap drifts sideways as it falls. Start moving early and
 // track it all the way down.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

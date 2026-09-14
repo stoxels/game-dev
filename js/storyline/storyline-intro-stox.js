@@ -1,19 +1,19 @@
 ﻿// =============================================================================
-// storyline-intro-stox.js — The Cartographers of Chance
+// storyline-intro-stox.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // Character intro data for Stox ("The Analyst").
 // Depends on: storyline-engine.js (_wordsFromLine, MAX_SONG_SECTION_LINES,
-// DEFAULT_SLIDE_DURATION_MS etc.) — must load AFTER that file.
+// DEFAULT_SLIDE_DURATION_MS etc.) - must load AFTER that file.
 
 // Folder where Stox's intro images live (relative to your index.html)
 const STOX_INTRO_IMAGE_PATH = "images/Intro/Stox_Intro/";
 
 
 // ---------------------------------------------------------------------------
-// SONG BEAT — karaoke-style Stox intro
+// SONG BEAT - karaoke-style Stox intro
 // ---------------------------------------------------------------------------
 //
-// STOX_INTRO_SONG — timed from Stox_Intro_Song.srt. Each line's start/end
+// STOX_INTRO_SONG - timed from Stox_Intro_Song.srt. Each line's start/end
 // comes directly from the SRT (real vocal timing), with start times rounded
 // DOWN to the nearest 0.5s (e.g. 9367 -> 9000) so line-changes land on a
 // clean half-second beat. End times are left as-is from the SRT. Word-level
@@ -32,7 +32,7 @@ const STOX_INTRO_IMAGE_PATH = "images/Intro/Stox_Intro/";
 // than "The archive kept its secrets..."). If you regenerate or reorder any
 // images, keep this array sorted by ascending `time`.
 const STOX_INTRO_SONG = {
-    audio: "audio/Intro/Stox_Intro_Song.mp3",
+    audio: "audio/Intro/Stox_Intro_Song.ogg",
     imagePath: STOX_INTRO_IMAGE_PATH,
 
     images: [
@@ -69,7 +69,7 @@ const STOX_INTRO_SONG = {
         { image: "31.webp", time: 325000 },
     ],
 
-    // Lyric timeline — all 57 lines from the SRT, in order, as bilingual
+    // Lyric timeline - all 57 lines from the SRT, in order, as bilingual
     // entries { section, en, de, s, e }: start times rounded down to the
     // nearest 0.5s; end times are the real SRT ends. The engine resolves the
     // active language's text into timed words via _wordsFromLine() at

@@ -14,22 +14,23 @@
     </script>
     <link rel="icon" type="image/png" href="images/favicon.png">
     <title>STOXELS - v0.28 BETA</title>
-    <link rel="stylesheet" href="css/base.css?v=2">
-    <link rel="stylesheet" href="css/pause.css?v=3">
+    <link rel="stylesheet" href="css/base.css?v=3">
+    <link rel="stylesheet" href="css/pause.css?v=4">
     <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/title-screen.css">
-    <link rel="stylesheet" href="css/save-slots.css?v=3">
+    <link rel="stylesheet" href="css/title-screen.css?v=3">
+    <link rel="stylesheet" href="css/save-slots.css?v=4">
     <link rel="stylesheet" href="css/screens.css">
-    <link rel="stylesheet" href="css/game.css?v=2">
-    <link rel="stylesheet" href="css/setup-screen.css?v=4">
+    <link rel="stylesheet" href="css/game.css?v=3">
+    <link rel="stylesheet" href="css/setup-screen.css?v=5">
     <link rel="stylesheet" href="css/inventory.css">
     <link rel="stylesheet" href="css/overlays.css">
     <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/class.css">
-    <link rel="stylesheet" href="css/skills.css?v=1">
-    <link rel="stylesheet" href="css/achievements.css?v=2">
+    <link rel="stylesheet" href="css/class.css?v=5">
+    <link rel="stylesheet" href="css/skills.css?v=17">
+    <link rel="stylesheet" href="css/universal-spells.css?v=5">
+    <link rel="stylesheet" href="css/achievements.css?v=3">
     <link rel="stylesheet" href="css/item_effects.css">
-    <link rel="stylesheet" href="css/probability_tree.css?v=2">
+    <link rel="stylesheet" href="css/probability_tree.css?v=3">
     <link rel="stylesheet" href="css/passive_effects.css">
     <link rel="stylesheet" href="css/quests.css">
     <link rel="stylesheet" href="css/passive-tracker.css">
@@ -44,7 +45,7 @@
     <link rel="stylesheet" href="css/classes/statistician.css">
     <link rel="stylesheet" href="css/classes/targeting-reticle.css">
     <link rel="stylesheet" href="css/endgame/monsters.css">
-    <!-- bosses2.css (442 KB / 11,290 lines, boss-FX only — verified no
+    <!-- bosses2.css (442 KB / 11,290 lines, boss-FX only - verified no
          non-boss code uses its classes; base monster-card styles live in
          monsters.css) is NOT render-blocking: it is warmed up once at idle
          after boot and force-loaded at encounter start if needed (see
@@ -53,19 +54,19 @@
     <link rel="stylesheet" href="css/endgame/projectiles.css">
     <link rel="stylesheet" href="css/endgame/weapon-swing.css">
     <link rel="stylesheet" href="css/endgame/hazards.css">
-    <link rel="stylesheet" href="css/endgame/endgame-hub.css?v=2">
+    <link rel="stylesheet" href="css/endgame/endgame-hub.css?v=3">
     <link rel="stylesheet" href="css/endgame/endgame-crafting-bench.css">
     <link rel="stylesheet" href="css/endgame/endgame-tooltip-styles.css">
     <link rel="stylesheet" href="css/endgame/objectives_hud.css">
-    <link rel="stylesheet" href="css/character-select.css">
+    <link rel="stylesheet" href="css/character-select.css?v=7">
     <link rel="stylesheet" href="css/map-view.css">
-    <link rel="stylesheet" href="css/map-view-topbar.css?v=8">
-    <link rel="stylesheet" href="css/quiz-excercises.css?v=3">
-    <link rel="stylesheet" href="css/highscore.css?v=4">
-    <link rel="stylesheet" href="css/moodle-codes.css?v=2">
+    <link rel="stylesheet" href="css/map-view-topbar.css?v=11">
+    <link rel="stylesheet" href="css/quiz-excercises.css?v=4">
+    <link rel="stylesheet" href="css/highscore.css?v=5">
+    <link rel="stylesheet" href="css/moodle-codes.css?v=3">
     <link rel="stylesheet" href="css/inference.css">
-    <link rel="stylesheet" href="css/tutorial.css">
-    <link rel="stylesheet" href="css/class_selection.css?v=2">
+    <link rel="stylesheet" href="css/tutorial.css?v=16">
+    <link rel="stylesheet" href="css/class_selection.css?v=3">
     <link rel="stylesheet" href="css/class_spell_upgrade.css">
     <link rel="stylesheet" href="css/class_ascendency_selection.css">
     <link rel="stylesheet" href="css/reset-game.css">
@@ -78,7 +79,7 @@
     <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" fetchpriority="high">
     <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_GermanLogo.webp" fetchpriority="high">
     <style>
-        /* Boot loader — inline so it paints before stylesheets finish.
+        /* Boot loader - inline so it paints before stylesheets finish.
            Only the few rules needed for a first paint with zero flash live
            here; the full STOXELS-styled look comes from css/title-screen.css
             (#boot-loader section), which mirrors the title screen: same art,
@@ -104,7 +105,9 @@
     <div id="boot-loader">
         <div class="boot-canvas">
             <img class="boot-bg-img" src="images/Title_Screen/RiseOfTheBeasts_TitleScreen_Background.webp" alt="">
-            <img class="boot-logo-img" src="images/Title_Screen/STOXELS.webp" alt="STOXELS">
+            <div class="boot-logo-shimmer" aria-hidden="true">
+                <img class="boot-logo-img" src="images/Title_Screen/STOXELS.webp" alt="STOXELS">
+            </div>
             <img class="boot-expansion-logo" id="boot-expansion-logo" src="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" alt="Rise of the Beasts">
 
             <div class="boot-footer">
@@ -124,68 +127,70 @@
         <div class="title-canvas">
 
             <!-- Logo image replaces the old <h1> text -->
-            <img class="title-logo-img" src="images/Title_Screen/STOXELS.webp" alt="STOXELS">
+            <div class="title-logo-shimmer" aria-hidden="true">
+                <img class="title-logo-img" src="images/Title_Screen/STOXELS.webp" alt="STOXELS">
+            </div>
 
-            <!-- Expansion logo (EN/DE swapped by setLang) — hover shows expansion history -->
+            <!-- Expansion logo (EN/DE swapped by setLang) - hover shows expansion history -->
             <img class="title-expansion-logo" id="title-expansion-logo" src="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" alt="Rise of the Beasts">
             <div class="title-version-line">v0.28 BETA</div>
             <div class="title-ai-disclosure" data-t="scr_ai_disclosure">This game contains AI-generated art, sound, music, and code.</div>
             <div class="title-lang-overlay">
-                <button class="lang-btn active" data-lang="en">EN</button>
-                <button class="lang-btn" data-lang="de">DE</button>
+                <button class="lang-btn active" data-lang="en"><span class="btn-label">EN</span></button>
+                <button class="lang-btn" data-lang="de"><span class="btn-label">DE</span></button>
             </div>
 
             <button class="title-overlay-btn" id="btn-play"
                     style="--bx: 50%; --by: 87%;">
-                <span class="btn-label" data-t="btn_play">▶ PLAY</span>
+                <span class="btn-label" data-t="btn_play">PLAY</span>
             </button>
 
             <!-- LEFT COLUMN (4 buttons) -->
             <button class="title-overlay-btn block-left-1" id="btn-settings"
                     style="--bx: 12%; --by: 18%;">
-                <span class="btn-label" data-t="btn_settings">⚙ SETTINGS</span>
+                <span class="btn-label" data-t="btn_settings">SETTINGS</span>
             </button>
 
             <button class="title-overlay-btn block-left-2" id="btn-keybinds"
                     style="--bx: 12%; --by: 30%;">
-                <span class="btn-label" data-t="btn_keybinds">⌨ KEYBINDS</span>
+                <span class="btn-label" data-t="btn_keybinds">KEYBINDS</span>
             </button>
 
             <button class="title-overlay-btn block-left-1" id="btn-how-to-play"
                     style="--bx: 12%; --by: 42%;">
-                <span class="btn-label" data-t="btn_howtoplay">? HOW TO PLAY</span>
+                <span class="btn-label" data-t="btn_howtoplay">HOW TO PLAY</span>
             </button>
 
             <button class="title-overlay-btn block-left-2" id="btn-replay"
                     style="--bx: 12%; --by: 54%;">
-                <span class="btn-label">🔁 REPLAY</span>
+                <span class="btn-label">REPLAY</span>
             </button>
 
             <!-- RIGHT COLUMN (4 buttons) -->
             <button class="title-overlay-btn block-right-1" id="btn-highscores"
                     style="--bx: 88%; --by: 18%;">
-                <span class="btn-label" data-t="btn_highscores">🏆 HIGHSCORES</span>
+                <span class="btn-label" data-t="btn_highscores">HIGHSCORES</span>
             </button>
 
             <button class="title-overlay-btn block-right-2" id="btn-codes"
                     style="--bx: 88%; --by: 30%;">
-                <span class="btn-label" data-t="btn_codes">🔑 MOODLE CODES</span>
+                <span class="btn-label" data-t="btn_codes">MOODLE CODES</span>
             </button>
 
             <button class="title-overlay-btn block-right-1" id="btn-achievements"
                     style="--bx: 88%; --by: 42%;">
-                <span class="btn-label" data-t="btn_achievements">🏆 ACHIEVEMENTS</span>
+                <span class="btn-label" data-t="btn_achievements">ACHIEVEMENTS</span>
             </button>
 
             <button class="title-overlay-btn block-right-2" id="btn-changelog"
                     style="--bx: 88%; --by: 54%;">
-                <span class="btn-label" data-t="scr_btn_changelog">📝 CHANGELOG</span>
+                <span class="btn-label" data-t="scr_btn_changelog">CHANGELOG</span>
             </button>
 
             <!-- RESET button intentionally absent: ui-reset.js stays loaded for the
                  save-slot delete flow (confirmSlotDelete via _pendingResetSlot). -->
 
-            <!-- Decoration kept but hidden — initTitleDecoration() in main.js still runs safely -->
+            <!-- Decoration kept but hidden - initTitleDecoration() in main.js still runs safely -->
             <div class="title-deco" id="tdeco" style="display:none;"></div>
         </div>
     </div>
@@ -200,7 +205,7 @@
     <div id="tut-modal" class="modal-bg safe-center">
         <div class="modal-box tut-box">
             <button class="modal-close" data-modal-close="tut-modal" data-t="reset_close">✕ CLOSE</button>
-            <div class="modal-title" data-t="tut_title">▸ HOW TO PLAY STOXELS</div>
+            <div class="modal-title" data-t="tut_title">HOW TO PLAY STOXELS</div>
 
             <!-- SCROLL PANEL: the three-column section grid scrolls when it
                  exceeds the frame's inner parchment area -->
@@ -212,15 +217,15 @@
                     </div>
                     <div class="modal-section tut-section tut-section-basics">
                         <h3 data-t="tut_s2h">CONTROLS</h3>
-                        <p data-t="tut_s2p"><strong>Left click</strong> — fill a cell<br><strong>Right click</strong> — mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> — Zoom in &amp; out to scale<br><strong>Left &amp; Right Arrow Keys</strong> — Move the row clue headers towards the left/right<br><strong>1,2,3,4</strong> - use Class Abilities<br><strong>Escape</strong> - Pause the Game</p>
+                        <p data-t="tut_s2p"><strong>Left click</strong> - fill a cell<br><strong>Right click</strong> - mark a cell as empty<br><strong>Hold Left Click and Drag</strong> - fill multiple cells<br><strong>CTRL + MouseWheel</strong> - Zoom in &amp; out to scale<br><strong>Left &amp; Right Arrow Keys</strong> - Move the row clue headers towards the left/right<br><strong>1,2,3,4</strong> - use Class Abilities<br><strong>Escape</strong> - Pause the Game</p>
                     </div>
                     <div class="modal-section tut-section tut-section-diff">
                         <h3 data-t="tut_s3h">DIFFICULTY</h3>
-                        <p data-t="tut_s3p"><strong style="color:var(--green)">Easy</strong> — low time penalties for mistakes, 50% less Score<br><strong style="color:var(--yellow)">Normal</strong> — standard time penalties for mistakes<br><strong style="color:var(--red)">Hard</strong> — heavy time penalties for mistakes, 50% more score</p>
+                        <p data-t="tut_s3p"><strong style="color:var(--green)">Easy</strong> - low time penalties for mistakes, 50% less Score<br><strong style="color:var(--yellow)">Normal</strong> - standard time penalties for mistakes<br><strong style="color:var(--red)">Hard</strong> - heavy time penalties for mistakes, 50% more score</p>
                     </div>
                     <div class="modal-section tut-section tut-section-diff">
                         <h3 data-t="tut_s4h">GAME MODIFIERS</h3>
-                        <p data-t="tut_s4p"><strong style="color:var(--orange)">Time Trial</strong> — 50% less time per level, but 20% more Score<br><strong style="color:var(--red)">Hardcore</strong> — one mistake fails the level, but 30% more Score<br><strong style="color:var(--purple)">Ironman</strong> — items cannot be used, but 15% more Score<br><strong style="color:var(--accent)">Classless</strong> — Class Abilities cannot be used, but 20% more Score<br><strong style="color:var(--green)">Treeless</strong> — Probability Tree nodes have no effect, but 25% more Score<br>Modifiers can be combined with each other.</p>
+                        <p data-t="tut_s4p"><strong style="color:var(--orange)">Time Trial</strong> - 50% less time per level, but 20% more Score<br><strong style="color:var(--red)">Hardcore</strong> - one mistake fails the level, but 30% more Score<br><strong style="color:var(--purple)">Ironman</strong> - items cannot be used, but 15% more Score<br><strong style="color:var(--accent)">Classless</strong> - Class Abilities cannot be used, but 20% more Score<br><strong style="color:var(--green)">Treeless</strong> - Probability Tree nodes have no effect, but 25% more Score<br>Modifiers can be combined with each other.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
                         <h3 data-t="tut_s5h">ITEMS &amp; INVENTORY</h3>
@@ -239,8 +244,12 @@
                         <p data-t="tut_s8p">Completing Ascension - Levels allows you to select one out of three possible classes. Each class has a passive ability and two active abilities, which can heavily alter the way you approach a Stoxel and help in case you get stuck. Abilities can be upgraded by playing more Ascension - Levels.</p>
                     </div>
                     <div class="modal-section tut-section tut-section-progression">
-                        <h3 data-t="tut_s9h">CONVERGENCE, INFERENCE &amp; PROBABILITY TREE</h3>
-                        <p data-t="tut_s9p">Completing Convergence - Levels grants Convergence Points, which can be spent on the Probability Tree to customize the way you play the game. Completing Inference - Objectives rewards additional Convergence Points.</p>
+                        <h3 data-t="tut_s9h">CHARMS &amp; SPELL SLOTS</h3>
+                        <p data-t="tut_s9p"><strong>Charms</strong> drop from defeated monsters onto the grid - bosses always drop one. Every skill has one charm for each rank (1–10). Unlocking a class grants its rank-1 charms, and upgrading an ability grants the next rank.<br><strong>Spell Slots</strong> - 10 slots (2 rows of 5) in the spell book. Slotting a charm unlocks that spell at that rank; drag it onto your hotbar to cast it. A higher rank hits far harder but costs far more mana.<br><strong>Duplicates</strong> become a <strong>Lemma</strong> - 10 Lemmas automatically prove one <strong>Theorem</strong>.<br><strong>Shift-left-click</strong> a charm to spend a Theorem: +1% permanent damage for that spell.</p>
+                    </div>
+                    <div class="modal-section tut-section tut-section-progression">
+                        <h3 data-t="tut_s10h">CONVERGENCE, INFERENCE &amp; PROBABILITY TREE</h3>
+                        <p data-t="tut_s10p">Completing Convergence - Levels grants Convergence Points, which can be spent on the Probability Tree to customize the way you play the game. Completing Inference - Objectives rewards additional Convergence Points.</p>
                     </div>
                 </div>
             </div>
@@ -268,7 +277,7 @@
             <div class="setup-book">
                 <img class="setup-book-img" src="images/Game_Setup/Book-Frame.webp" alt="">
 
-                <!-- ===== CONTENT PAGES — exactly matches the visible parchment ===== -->
+                <!-- ===== CONTENT PAGES - exactly matches the visible parchment ===== -->
                 <div class="setup-pages">
 
                     <!-- ============ CHARACTER ZONE (upper-left) ============ -->
@@ -344,7 +353,7 @@
                     <button class="setup-opt setup-opt-mod mod-super-tutor" id="btn-super-tutor" data-mod="superTutor" aria-pressed="false">
                         <span class="mod-icon mod-icon-super-tutor">🎓</span>
                     </button>
-                    <span class="mod-score-tag" data-t="mod_super_tutor_tag">BETA TEST</span>
+                    <span class="mod-score-tag" data-t="mod_super_tutor_tag">BETA FEATURE</span>
                     <span class="mod-per-desc" data-t="mod_desc_super_tutor">100% correct answers; no Tutor item required. Temporary beta feature.</span>
                 </div>
 
@@ -364,7 +373,7 @@
 
 
 
-    <!-- TEMP: DEV MODE SELECT SCREEN — remove once Adventure Mode replaces the world map -->
+    <!-- TEMP: DEV MODE SELECT SCREEN - remove once Adventure Mode replaces the world map -->
     <div id="screen-mode-select" class="screen">
         <button class="back-btn back-btn-corner dms-back" id="btn-mode-select-back" data-t="btn_back">◀ BACK</button>
         <div class="dms-wrap">
@@ -394,7 +403,7 @@
                 </button>
             </div>
 
-            <!-- CHEAT: Character Lab — test all 30 char/class combos + animations -->
+            <!-- CHEAT: Character Lab - test all 30 char/class combos + animations -->
             <button class="dms-charlab-btn" id="btn-char-lab" onclick="showCharLab()">🧪 CHARACTER LAB</button>
         </div>
     </div>
@@ -409,17 +418,17 @@
             <div class="cl-body">
                 <div id="charlab-grid" class="cl-grid"></div>
                 <div class="cl-preview-pane">
-                    <div class="cl-preview-label" id="charlab-preview-label">—</div>
+                    <div class="cl-preview-label" id="charlab-preview-label">-</div>
                     <div class="cl-preview-stage">
                         <img id="charlab-preview-img" class="cl-preview-img" alt="">
                     </div>
                     <div class="cl-preview-state" id="charlab-preview-state">idle (move-down)</div>
                     <div class="cl-dir-row">
-                        <button class="cl-dir" onclick="_charLabWalkDir('up')" title="Walk up">⬆</button>
+                        <button class="cl-dir" onclick="_charLabWalkDir('up')" data-tip="Walk up" aria-label="Walk up">⬆</button>
                         <div class="cl-dir-mid">
-                            <button class="cl-dir" onclick="_charLabWalkDir('left')" title="Walk left">⬅</button>
-                            <button class="cl-dir" onclick="_charLabWalkDir('down')" title="Walk down">⬇</button>
-                            <button class="cl-dir" onclick="_charLabWalkDir('right')" title="Walk right">➡</button>
+                            <button class="cl-dir" onclick="_charLabWalkDir('left')" data-tip="Walk left" aria-label="Walk left">⬅</button>
+                            <button class="cl-dir" onclick="_charLabWalkDir('down')" data-tip="Walk down" aria-label="Walk down">⬇</button>
+                            <button class="cl-dir" onclick="_charLabWalkDir('right')" data-tip="Walk right" aria-label="Walk right">➡</button>
                         </div>
                     </div>
                     <button class="cl-stop" onclick="_charLabStopPreview()">■ STOP</button>
@@ -436,7 +445,7 @@
     <div id="screen-adventure" class="screen">
         <div class="adv-topbar">
             <button class="back-btn back-btn-corner" id="btn-adventure-back" data-t="btn_back">◀ BACK</button>
-            <span class="adv-title" data-t="scr_adventure_sandbox_title">ADVENTURE MODE — SANDBOX</span>
+            <span class="adv-title" data-t="scr_adventure_sandbox_title">ADVENTURE MODE - SANDBOX</span>
         </div>
         <div id="adv-canvas-wrap" class="adv-canvas-wrap"></div>
     </div>
@@ -542,7 +551,7 @@
         </div>
     </div>
 
-    <!-- SLOT NAME MODAL — names a save slot (✏️ button on the save-slot card) -->
+    <!-- SLOT NAME MODAL - names a save slot (✏️ button on the save-slot card) -->
     <div id="slot-name-modal" class="modal-bg safe-center">
         <div class="slot-name-box">
             <button class="reset-close-btn" data-modal-close="slot-name-modal" data-t="reset_close">✕ CLOSE</button>
@@ -768,7 +777,7 @@
     <div id="keybinds-modal" class="modal-bg">
         <div class="modal-box keybinds-box">
             <button class="modal-close" id="btn-keybinds-close" data-t="reset_close">✕ CLOSE</button>
-            <div class="modal-title" data-t="keybinds_title">⌨ KEYBINDS</div>
+            <div class="modal-title" data-t="keybinds_title">KEYBINDS</div>
 
             <!-- HINT sits ABOVE the scrollable list (not inside it). -->
             <p class="keybinds-hint" data-t="keybinds_hint">Click a key to rebind it. Changes are saved automatically and survive restarts.</p>
@@ -789,7 +798,7 @@
     <div id="changelog-modal" class="modal-bg">
         <div class="modal-box changelog-box">
             <button class="modal-close" data-modal-close="changelog-modal" data-t="reset_close">✕ CLOSE</button>
-            <div class="modal-title" data-t="scr_changelog_title">📝 CHANGELOG</div>
+            <div class="modal-title" data-t="scr_changelog_title">CHANGELOG</div>
 
             <div id="changelog-content" class="changelog-scroll-area"></div>
         </div>
@@ -798,7 +807,7 @@
     <!-- REPLAY GALLERY MODAL -->
     <div id="replay-modal" class="modal-bg">
         <div class="replay-modal-box">
-            <!-- Wax-seal close cross — re-used from the Inference system -->
+            <!-- Wax-seal close cross - re-used from the Inference system -->
             <button class="modal-close" data-modal-close="replay-modal" aria-label="Close">✕ CLOSE</button>
 
             <div class="replay-header">
@@ -875,7 +884,7 @@
         </div>
     </div>
 
-    <!-- KEEP OR REVERT PROMPT — shown after completing/failing a retried level -->
+    <!-- KEEP OR REVERT PROMPT - shown after completing/failing a retried level -->
     <div id="retry-keep-modal" class="modal-bg safe-center">
         <div class="modal-box modal-box-danger">
             <div class="modal-title" data-t="retry_keep_title">KEEP THE NEW SETUP?</div>
@@ -941,6 +950,7 @@
                 <button class="gtb-btn gtb-btn-inference" id="mv-btn-quest-log" data-t="btn_inference">
                     INFERENCE <span id="mv-quest-log-badge" class="quest-badge" style="display:none;">!</span>
                 </button>
+                <button class="gtb-btn" id="mv-btn-spellbook" data-t="btn_spellbook_short">SPELLBOOK</button>
                 <button class="gtb-btn" id="mv-btn-passive-tree" data-t="tree">TREE</button>
             </div>
         </div>
@@ -955,7 +965,7 @@
 
     <div id="screen-world-detail" class="screen">
         <!-- Mirrors the overworld map-view topbar exactly (same assets, same
-             layout, wd- prefixed ids) — see css/map-view-topbar.css. The one
+             layout, wd- prefixed ids) - see css/map-view-topbar.css. The one
              difference: the plaque shows the CURRENT WORLD NAME instead of
              SELECT LEVEL. Populated by _wdBuildTopBar(). -->
         <div class="ls-topbar">
@@ -974,6 +984,7 @@
                 <button class="gtb-btn gtb-btn-inference" id="wd-btn-quest-log" data-t="btn_inference">
                     INFERENCE <span id="wd-quest-log-badge" class="quest-badge" style="display:none;">!</span>
                 </button>
+                <button class="gtb-btn" id="wd-btn-spellbook" data-t="btn_spellbook_short">SPELLBOOK</button>
                 <button class="gtb-btn" id="wd-btn-passive-tree" data-t="tree">TREE</button>
             </div>
         </div>
@@ -1008,7 +1019,7 @@
                 <div class="lhv-edge lhv-right"></div>
             </div>
 
-            <!-- CORNER HUD: clock, mistakes, fill — floats over the top-left corner,
+            <!-- CORNER HUD: clock, mistakes, fill - floats over the top-left corner,
              out of normal document flow, so it never reserves vertical space
              above the puzzle grid. -->
             <div class="game-hud-corner" id="game-hud-corner">
@@ -1018,7 +1029,7 @@
                     <span class="gtb-pen" id="pen-info"></span>
                 </div>
                 <span class="gtb-mistakes" id="mistake-counter">✗ 0</span>
-                <!-- Clue-side toggles (CLUES ▶/◀, CLUES ▼/▲) — created by
+                <!-- Clue-side toggles (CLUES ▶/◀, CLUES ▼/▲) - created by
                      _buildRowClueToggle() in js/grid.js and appended into
                      this slot, underneath the mistakes counter. -->
                 <div class="clue-toggle-slot" id="clue-toggle-slot"></div>
@@ -1059,7 +1070,7 @@
             <div class="puzzle-and-sidebar">
                 <div id="class-hud-panel"></div>
                 <div class="puzzle-scaler-wrap" id="puzzle-scaler-wrap">
-                    <!-- Touchpad FILL/MARK toggle — lives below the grid so
+                    <!-- Touchpad FILL/MARK toggle - lives below the grid so
                          it is easy to reach with a thumb / touchpad. Shown
                          only when Settings → Touchpad Mode is enabled
                          (updateTouchpadModeButtonVisibility() in
@@ -1081,7 +1092,7 @@
             <div class="toast-stack" id="toast-stack"></div>
             <div id="inv-panel"></div>
         </div>
-        <!-- ENDGAME OBJECTIVES — fixed left panel, zero layout impact -->
+        <!-- ENDGAME OBJECTIVES - fixed left panel, zero layout impact -->
         <div id="eg-objectives-strip" class="eg-hidden"></div>
     </div>
 
@@ -1367,7 +1378,7 @@
     <div class="screen" id="screen-dev-passive-tree">
         <div class="pt-topbar">
             <button class="back-btn" id="btn-dpt-back" data-t="btn_back">◀ BACK</button>
-            <span class="pt-title">🌳 <span data-t="dpt_title">PASSIVE TREE — DEV</span></span>
+            <span class="pt-title">🌳 <span data-t="dpt_title">PASSIVE TREE - DEV</span></span>
             <div id="dpt-search-wrap"></div>
             <div id="dpt-zoom-wrap">
                 <span id="dpt-zoom-label">100%</span>
@@ -1479,16 +1490,16 @@
 
     <!-- SCRIPTS
     ============================================================
-    SCRIPT LOAD ORDER — READ BEFORE MOVING ANYTHING.
+    SCRIPT LOAD ORDER - READ BEFORE MOVING ANYTHING.
     This project has no module system: every file is global scope,
     so ORDER IS SEMANTIC. Do not sort alphabetically or "by
-    dependency" blindly — the graph contains deliberate cycles that
+    dependency" blindly - the graph contains deliberate cycles that
     only work because every cross-file call is deferred (event
     handlers / runtime calls) or typeof-guarded.
 
     HARD INVARIANTS (moving these breaks the game SILENTLY):
     • The old LAST-DECLARED-WINS duplicate functions were consolidated
-      into single implementations in 2026-09 — DO NOT re-declare them
+      into single implementations in 2026-09 - DO NOT re-declare them
       elsewhere:
         _egShowTooltip        -> endgame-currency.js
         _egRenderCurrencyCell -> endgame-hub-drag-and-drop.js
@@ -1496,7 +1507,7 @@
         _egBuildItemName + naming helpers -> endgame-mod-application.js
           (a second _egBuildItemName/_egModNameEntry pair that read the
           [enAdjective, enOfPhrase, deGenitive] dictionary in the wrong
-          slot order was deleted 2026-09-11 — do not re-add)
+          slot order was deleted 2026-09-11 - do not re-add)
         _egGetElementalDamageBonus -> endgame-combat-calculations.js
         _egRemoveVeil         -> shared-boss-abilities.js
         _egPtSegDist          -> shared-boss-abilities.js
@@ -1506,7 +1517,7 @@
       EG_BOSS_MECHANICS at load time).
     • asset-preload.js → boot-loader.js → main.js is the boot
       sequence; main.js stays LAST.
-    • Cyclic-by-design clusters (deferred calls only — never
+    • Cyclic-by-design clusters (deferred calls only - never
       reorder files across these boundaries):
         endgame-encounter.js ↔ bosses/* (typeof-guarded hooks)
         class-abilities.js ↔ class-*.js
@@ -1517,7 +1528,7 @@
       initState() → migrateOldSave() calls migrateQuestState() at load
       time. Quest files themselves only touch STATE etc. from deferred
       calls, so loading them early is safe. (A 2026-09 attempt to move
-      quests after the passive-tree family broke the migration call —
+      quests after the passive-tree family broke the migration call -
       do NOT move this block.)
 
     LOAD-TIME GUARDS:
@@ -1527,9 +1538,9 @@
       name via _egValidateAllBossHandlers().
     • Boss per-boss hooks are DATA, not if-blocks: EG_BOSS_TEARDOWN_HOOKS
       (boss-framework.js) and EG_PLAYER_CHARGE_PAUSE_GATES
-      (endgame-encounter.js) — new bosses add one entry there.
+      (endgame-encounter.js) - new bosses add one entry there.
     • The dev sandbox tree (passive-tree-dev*.js, ~1 MB) is NOT loaded
-      here — ui-events.js injects it on first sandbox open.
+      here - ui-events.js injects it on first sandbox open.
     • endgame-state.js owns EG_SCREEN_NAV + _egResolveBackFn for the
       atlas/gate/nexus back-navigation strings.
 
@@ -1537,18 +1548,18 @@
     file's content changes so players don't run stale scripts.
     ============================================================ -->
     <script src="js/audio/audio-data.js"></script>
-    <script src="js/audio/audio.js"></script>
+    <script src="js/audio/audio.js?v=2"></script>
     <script src="js/settings.js"></script>
     <script src="js/keybinds.js"></script>
-    <script src="js/translation/translations-strings.js?v=3"></script>
+    <script src="js/translation/translations-strings.js?v=23"></script>
     <script src="js/translation/translations.js"></script>
     <script src="js/quests/quests-data.js"></script>
-    <script src="js/quests/quests-stats.js"></script>
+    <script src="js/quests/quests-stats.js?v=4"></script>
     <script src="js/quests/quests-logic.js"></script>
     <script src="js/quests/quests-styles.js"></script>
     <script src="js/quests/quests-ui.js"></script>
-    <script src="js/screens/screens-save-slots.js"></script>
-    <script src="js/state.js?v=3"></script>
+    <script src="js/screens/screens-save-slots.js?v=3"></script>
+    <script src="js/state.js?v=6"></script>
     <script src="js/difficulty-modifiers.js"></script>
     <script src="js/levels/level-world-data.js"></script>
     <script src="js/levels/levels.js"></script>
@@ -1564,7 +1575,7 @@
     <script src="js/mouse-over.js"></script>
     <script src="js/mouse-button-handlers.js"></script>
     <script src="js/penalty.js"></script>
-    <script src="js/scoring.js"></script>
+    <script src="js/scoring.js?v=3"></script>
     <script src="js/puzzle-items/shared/puzzle-helpers.js"></script>
     <script src="js/puzzle-items/shared/quest-tracking.js"></script>
     <script src="js/puzzle-items/shared/clue-blackout.js"></script>
@@ -1576,7 +1587,7 @@
     <script src="js/puzzle-items/reveal.js"></script>
     <script src="js/puzzle-items/mark-wrong.js"></script>
     <script src="js/puzzle-items/add-time.js"></script>
-    <script src="js/puzzle-items/shield.js?v=2"></script>
+    <script src="js/puzzle-items/shield.js?v=3"></script>
     <script src="js/puzzle-items/freeze.js"></script>
     <script src="js/puzzle-items/mistake-eraser.js"></script>
     <script src="js/puzzle-items/scouts-primer-item.js"></script>
@@ -1598,35 +1609,47 @@
     <script src="js/puzzle-items/use-item.js"></script>
     <script src="js/puzzle-items/inventory-reshuffle.js"></script>
     <script src="js/puzzle-items/toasts-and-popups.js"></script>
-    <script src="js/codes.js?v=2"></script>
+    <script src="js/codes.js?v=3"></script>
     <script src="js/screens/screens-highscore.js"></script>
-    <script src="js/screens/screens-map-view.js?v=4"></script>
+    <script src="js/screens/screens-map-view.js?v=6"></script>
     <script src="js/screens/screens-world-levels-config.js"></script>
-    <script src="js/screens/screens-world-levels.js?v=6"></script>
+    <script src="js/screens/screens-world-levels.js?v=8"></script>
     <script src="js/screens/screens-level-select.js"></script>
-    <script src="js/screens/screens.js"></script>
-    <script src="js/puzzle-items/scouts-primer.js?v=2"></script>
+    <script src="js/screens/screens.js?v=2"></script>
+    <script src="js/puzzle-items/scouts-primer.js?v=3"></script>
     <script src="js/start-level-passives.js"></script>
-    <script src="js/start-level.js"></script>
+    <script src="js/start-level.js?v=5"></script>
     <script src="js/ui-reset.js"></script>
-    <script src="js/tutorial.js"></script>
+    <script src="js/tutorial.js?v=3"></script>
+    <script src="js/tutorial-quest.js?v=37"></script>
     <script src="js/quiz-excercise/mathgate-questions.js"></script>
     <script src="js/quiz-excercise/mathgate.js"></script>
     <script src="js/classes/class-defs.js"></script>
     <script src="js/classes/ascendency-defs.js"></script>
-    <script src="js/classes/class-cooldown-state.js?v=2"></script>
-    <script src="js/classes/class-ui.js?v=3"></script>
-    <script src="js/classes/class-hud.js"></script>
+    <script src="js/classes/class-cooldown-state.js?v=4"></script>
+    <script src="js/classes/class-ui.js?v=6"></script>
+    <script src="js/classes/class-hud.js?v=3"></script>
     <script src="js/classes/class-hud-levelselect-tooltip.js"></script>
     <script src="js/classes/class-abilities.js"></script>
-    <script src="js/classes/class-mana.js"></script>
+    <script src="js/classes/class-mana.js?v=5"></script>
     <!-- Skill book / hotbar system (registry → tooltip → hotbar → spell book).
          Loaded after the class defs + abilities so the registry can build
          itself from CLASS_DEFS / ASCENDENCY_DEFS / ENDGAME_HEARTBLOOM_DEF. -->
-    <script src="js/skills/skill-registry.js"></script>
-    <script src="js/skills/skill-tooltip.js"></script>
-    <script src="js/skills/skill-hotbar.js"></script>
-    <script src="js/skills/skill-spellbook.js"></script>
+    <script src="js/skills/skill-registry.js?v=3"></script>
+    <script src="js/skills/skill-tooltip.js?v=5"></script>
+    <script src="js/skills/skill-hotbar.js?v=4"></script>
+    <script src="js/skills/skill-spellbook.js?v=9"></script>
+    <!-- Universal spell arsenal (PoE/WoW-inspired): themed FX first, then the
+         spell defs + cast engine (registers into SKILL_REGISTRY at load). -->
+    <script src="js/skills/universal-spell-fx.js?v=4"></script>
+    <script src="js/skills/universal-spells.js?v=6"></script>
+    <!-- Hold-to-cast engine (WoW-style cast bar + charging orb). Loaded after
+         the arsenal so getSkillCastTimeSeconds() sees every registered def. -->
+    <script src="js/skills/spell-casttime.js?v=1"></script>
+    <!-- Charm system: per skill+rank charm items, spell slots, shards/orbs
+         and the grid drops that feed the spell book's charm panel. Loaded
+         last so it can see every registered skill (universal spells too). -->
+    <script src="js/skills/skill-charms.js?v=7"></script>
     <script src="js/classes/class-statistician.js"></script>
     <script src="js/classes/class-mathmagician.js"></script>
     <script src="js/classes/class-probabilist.js"></script>
@@ -1636,27 +1659,27 @@
     <script src="js/classes/class-random-walker.js"></script>
     <script src="js/classes/class-markovian.js"></script>
     <script src="js/classes/class-bayesian.js"></script>
-    <script src="js/achievements/achievements.js"></script>
+    <script src="js/achievements/achievements.js?v=4"></script>
     <script src="js/achievements/achievements-data.js"></script>
-    <script src="js/achievements/achievements-ui.js?v=2"></script>
+    <script src="js/achievements/achievements-ui.js?v=4"></script>
     <!-- Dev sandbox tree (passive-tree-dev-data.js, ~41k lines / 951 KB) is
-         NOT loaded here — it is injected on demand the first time the
+         NOT loaded here - it is injected on demand the first time the
          sandbox is opened (see _loadDevPassiveTreeAndOpen in ui-events.js). -->
-    <script src="js/passive-tree/passive-tree-data.js?v=2"></script>
+    <script src="js/passive-tree/passive-tree-data.js?v=3"></script>
     <script src="js/passive-tree/passive-tree-state-points.js"></script>
-    <script src="js/passive-tree/passive-tree-ui.js?v=2"></script>
+    <script src="js/passive-tree/passive-tree-ui.js?v=3"></script>
     <script src="js/passive-tree/passive-tree-viewport.js"></script>
     <script src="js/passive-tree/passive-tree-special-nodes-logic.js"></script>
     <script src="js/passive-tree/passive-tree.js"></script>
-    <script src="js/passive-tree/passive-tracker.js"></script>
+    <script src="js/passive-tree/passive-tracker.js?v=3"></script>
     <script src="js/passive-tree/passive-effects.js"></script>
     <script src="js/passive-tree/passive-tree-expansion.js"></script>
-    <script src="js/sprite/character-select.js?v=2"></script>
+    <script src="js/sprite/character-select.js?v=10"></script>
     <script src="js/ui-events.js"></script>
-    <script src="js/tooltips-hud.js?v=2"></script>
+    <script src="js/tooltips-hud.js?v=4"></script>
     <script src="js/changelog.js"></script>
     <script src="js/endgame/endgame-state.js"></script>
-    <script src="js/endgame/endgame-player-stats.js"></script>
+    <script src="js/endgame/endgame-player-stats.js?v=3"></script>
     <script src="js/endgame/endgame-requirements.js"></script>
     <script src="js/endgame/endgame-monsters.js"></script>
     <script src="js/endgame/bosses/boss-framework.js"></script>
@@ -1757,39 +1780,42 @@
          window / their own definitions). Tick before overlays: the tick
          file owns the _egClearCenterGridBanners fallback guard. -->
     <script src="js/endgame/endgame-encounter-tick.js"></script>
+    <!-- Monster positioning: static panels + occasional melee sidestep
+         (no permanent patrol). After encounter.js (uses its render helpers). -->
+    <script src="js/endgame/endgame-monster-roam.js"></script>
     <!-- Manual weapon attack (E) + shared CSS swing visuals. After tick so
          the parry hotkey owns its key first; typeof-guarded either way. -->
-    <script src="js/endgame/endgame-weapon-swing.js"></script>
+    <script src="js/endgame/endgame-weapon-swing.js?v=2"></script>
     <script src="js/endgame/endgame-encounter-overlays.js"></script>
     <script src="js/endgame/endgame-encounter-chain.js"></script>
-    <script src="js/endgame/endgame-quiz-buffs.js?v=2"></script>
-    <script src="js/endgame/endgame-ailments.js?v=2"></script>
+    <script src="js/endgame/endgame-quiz-buffs.js?v=3"></script>
+    <script src="js/endgame/endgame-ailments.js?v=4"></script>
     <script src="js/endgame/endgame-ui.js"></script>
     <script src="js/endgame/endgame-screens.js"></script>
     <script src="js/endgame/endgame-atlas.js"></script>
-    <script src="js/endgame/endgame-atlas-ui.js?v=2"></script>
+    <script src="js/endgame/endgame-atlas-ui.js?v=4"></script>
     <script src="js/endgame/endgame-equipment-base-items.js"></script>
     <script src="js/endgame/endgame-implicits.js"></script>
     <script src="js/endgame/endgame-art.js"></script>
     <script src="js/endgame/endgame-unique-items.js"></script>
     <script src="js/endgame/endgame-equipment-tooltip.js"></script>
-    <script src="js/endgame/endgame-leveling.js"></script>
+    <script src="js/endgame/endgame-leveling.js?v=3"></script>
     <!-- Split out of endgame-hub.js 2026-09-10 (Pass 3). hub-uniques MUST
          load BEFORE hub.js (hub.js's load-time _egLoadHubState calls
          _egEnsureUniqueStash unguarded); hub-tooltips loads AFTER hub.js. -->
     <script src="js/endgame/endgame-hub-uniques.js"></script>
-    <script src="js/endgame/endgame-hub.js?v=2"></script>
+    <script src="js/endgame/endgame-hub.js?v=5"></script>
     <script src="js/endgame/endgame-hub-tooltips.js"></script>
-    <script src="js/endgame/endgame-hub-drag-and-drop.js"></script>
-    <script src="js/endgame/endgame-gate.js?v=2"></script>
-    <script src="js/endgame/endgame-nexus.js?v=2"></script>
-    <script src="js/endgame/endgame-boss-test.js?v=2"></script>
+    <script src="js/endgame/endgame-hub-drag-and-drop.js?v=3"></script>
+    <script src="js/endgame/endgame-gate.js?v=4"></script>
+    <script src="js/endgame/endgame-nexus.js?v=3"></script>
+    <script src="js/endgame/endgame-boss-test.js?v=4"></script>
     <script src="js/endgame/endgame-currency.js"></script>
-    <script src="js/endgame/endgame-crafting-costs.js"></script>
-    <script src="js/endgame/endgame-crafting-bench.js"></script>
-    <script src="js/endgame/endgame-essences.js"></script>
+    <script src="js/endgame/endgame-crafting-costs.js?v=3"></script>
+    <script src="js/endgame/endgame-crafting-bench.js?v=3"></script>
+    <script src="js/endgame/endgame-essences.js?v=4"></script>
     <script src="js/endgame/endgame-shards.js"></script>
-    <script src="js/endgame/endgame-loot-filter.js"></script>
+    <script src="js/endgame/endgame-loot-filter.js?v=3"></script>
     <!-- endgame-mod-tables.js split per slot 2026-09-10 (Pass 3). Order
          among the tables is free; endgame-mod-tables-rebalance.js MUST
          load after every table (it evals each EG_MOD_TABLE_* at load
@@ -1797,24 +1823,24 @@
          6): endgame-mod-application.js (its naming/mod-application half)
          needs the name-words dictionary, and generator.js calls into it
          at load time via _egGenerateEquipmentDrop. -->
-    <script src="js/endgame/endgame-mod-name-words.js"></script>
+    <script src="js/endgame/endgame-mod-name-words.js?v=3"></script>
     <script src="js/endgame/endgame-mod-tables-head.js"></script>
     <script src="js/endgame/endgame-mod-tables-earring.js"></script>
-    <script src="js/endgame/endgame-mod-tables-amulet.js"></script>
+    <script src="js/endgame/endgame-mod-tables-amulet.js?v=3"></script>
     <script src="js/endgame/endgame-mod-tables-shoulders.js"></script>
     <script src="js/endgame/endgame-mod-tables-cloak.js"></script>
-    <script src="js/endgame/endgame-mod-tables-chest.js"></script>
+    <script src="js/endgame/endgame-mod-tables-chest.js?v=3"></script>
     <script src="js/endgame/endgame-mod-tables-bracers.js"></script>
     <script src="js/endgame/endgame-mod-tables-gloves.js"></script>
     <script src="js/endgame/endgame-mod-tables-belt.js"></script>
     <script src="js/endgame/endgame-mod-tables-pants.js"></script>
     <script src="js/endgame/endgame-mod-tables-boots.js"></script>
     <script src="js/endgame/endgame-mod-tables-ring.js"></script>
-    <script src="js/endgame/endgame-mod-tables-arcane.js"></script>
-    <script src="js/endgame/endgame-mod-tables-talisman.js"></script>
+    <script src="js/endgame/endgame-mod-tables-arcane.js?v=3"></script>
+    <script src="js/endgame/endgame-mod-tables-talisman.js?v=3"></script>
     <script src="js/endgame/endgame-mod-tables-weapon1.js"></script>
     <script src="js/endgame/endgame-mod-tables-weapon-2h.js"></script>
-    <script src="js/endgame/endgame-mod-tables-weapon2.js"></script>
+    <script src="js/endgame/endgame-mod-tables-weapon2.js?v=3"></script>
     <script src="js/endgame/endgame-mod-tables-shield.js"></script>
     <script src="js/endgame/endgame-mod-tables-rebalance.js"></script>
     <!-- Pass 6: mod application + naming extracted from the generator.
@@ -1824,27 +1850,36 @@
     <script src="js/endgame/endgame-equipment-generator.js"></script>
     <script src="js/endgame/endgame-maps.js"></script>
     <script src="js/endgame/endgame-gold.js"></script>
-    <script src="js/endgame/endgame-vendor.js?v=2"></script>
+    <script src="js/endgame/endgame-vendor.js?v=5"></script>
     <script src="js/sprite/sprite_animations.js"></script>
-    <script src="js/sprite/player_sprite.js?v=6"></script>
-    <script src="js/sprite/cheat-combo-picker.js"></script>
-    <script src="js/sprite/character-banter.js"></script>
+    <script src="js/sprite/player_sprite.js?v=13"></script>
+    <script src="js/sprite/cheat-combo-picker.js?v=3"></script>
+    <script src="js/sprite/character-banter.js?v=5"></script>
     <script src="js/classes/targeting-reticle.js"></script>
-    <script src="js/storyline/storyline-engine.js"></script>
+    <script src="js/storyline/storyline-engine.js?v=2"></script>
     <script src="js/storyline/storyline-intro.js"></script>
     <script src="js/storyline/storyline-intro-stox.js"></script>
     <script src="js/storyline/storyline-intro-trix.js"></script>
     <script src="js/storyline/storyline-intro-syla.js"></script>
     <script src="js/storyline/storyline-beats.js"></script>
-    <script src="js/endgame-testing-screen.js?v=2"></script>
+    <script src="js/endgame-testing-screen.js?v=3"></script>
     <script src="js/endgame/endgame-puzzle-generator.js"></script>
     <script src="js/endgame/endgame-map-launch.js"></script>
+    <!-- Campaign trials (Convergence + Ascension mini-maps). After map-launch
+         (reuses its seed picker) and after the world screens (uses their nav);
+         all cross-calls are typeof-guarded either way. -->
+    <script src="js/campaign-trials.js"></script>
     <script src="js/endgame/endgame-hazards.js"></script>
     <script src="js/adventure-mode.js"></script>
 
-    <script src="js/asset-preload.js?v=2"></script>
+    <script src="js/asset-preload.js?v=3"></script>
     <script src="js/boot-loader.js"></script>
     <script src="js/dev-testing.js"></script>
+    <!-- Dev-only spell rank audit screen (every rank of one spell side by side).
+         AFTER dev-testing.js: it registers itself onto that harness's DevTest
+         object at load, and DevTest is a script-scope const, so an earlier
+         script would hit its temporal dead zone. Nothing else depends on it. -->
+    <script src="js/skills/spell-rank-audit.js?v=4"></script>
     <script src="main.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-﻿// quests-styles.js  —  Injects all Ledger / Quest CSS once on load
+﻿// quests-styles.js  -  Injects all Ledger / Quest CSS once on load
 //
 // No dependencies. Safe to load before the DOM is ready (uses
 // document.head.appendChild which works as soon as <head> exists).
@@ -112,7 +112,7 @@
     /*------------------------- LEDGER CATEGORY CARDS -----------------------*/
     /*-----------------------------------------------------------------------*/
 
-    /* Base card style — clickable, centred content */
+    /* Base card style - clickable, centred content */
     .ledger-card {
         position: relative;
         border: 1px solid var(--border2, #333);
@@ -294,7 +294,7 @@
         letter-spacing: 1px;
     }
 
-    /* Status label — top-right corner of each quest row */
+    /* Status label - top-right corner of each quest row */
     .quest-status-label {
         font-family: var(--PX, monospace);
         font-size: 9px;
@@ -405,7 +405,7 @@
         padding: 2px 7px;
     }
 
-    /* Claim button — shown when the quest is claimable */
+    /* Claim button - shown when the quest is claimable */
     .quest-claim-btn {
         font-family: var(--PX, monospace);
         font-size: 9px;
@@ -422,7 +422,7 @@
         background: rgba(243, 156, 18, 0.24);
     }
 
-    /* State: reward already claimed — button turns green and is non-interactive */
+    /* State: reward already claimed - button turns green and is non-interactive */
     .quest-claimed-btn {
         border-color: #2ecc71;
         background: rgba(46, 204, 113, 0.07);

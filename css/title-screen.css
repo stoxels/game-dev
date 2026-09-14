@@ -48,27 +48,36 @@
     user-select: none;
 }
 
-/* Logo image — same position, size and glow as the title screen */
-#boot-loader .boot-logo-img {
+/* Logo block - same position, size and glow as the title screen.
+   The wrapper owns placement + the slow breathing pulse; the img inside
+   carries the artwork, its glow layers, and the shimmer sweep (shared rules
+   in the TITLE LOGO SHIMMER section). */
+#boot-loader .boot-logo-shimmer {
     position: absolute;
     left: 50%;
-    top: 2%;
+    top: -4.5%;
     transform: translateX(-50%);
-    width: clamp(220px, 32%, 540px);
+    width: clamp(260px, 40%, 680px);
+    animation: title-logo-breathe 5.2s ease-in-out infinite;
+}
+
+#boot-loader .boot-logo-img {
+    position: relative;
+    display: block;
+    width: 100%;
     height: auto;
     pointer-events: none;
     user-select: none;
-    filter: drop-shadow(0 0 24px rgba(140, 60, 255, 0.55));
 }
 
-/* Expansion logo image — same position and size as .title-expansion-logo.
-   Kept at 34% width so it clears the side button columns (12%/88%). */
+/* Expansion logo image - same position and size as .title-expansion-logo.
+   Kept at 42% width so it clears the side button columns (12%/88%). */
 #boot-loader .boot-expansion-logo {
     position: absolute;
     left: 50%;
     top: 26%;
     transform: translateX(-50%);
-    width: clamp(260px, 34%, 560px);
+    width: clamp(320px, 42%, 700px);
     height: auto;
     user-select: none;
     filter: drop-shadow(0 0 18px rgba(255, 120, 40, 0.45));
@@ -123,7 +132,7 @@
 }
 
 /*
-   Narrow screens: mirror the title screen's stacked fallback —
+   Narrow screens: mirror the title screen's stacked fallback -
    the canvas flows vertically, art covers it, content stacks.
 */
 @media (max-width: 700px) {
@@ -149,7 +158,7 @@
         object-position: top center;
     }
 
-    #boot-loader .boot-logo-img,
+    #boot-loader .boot-logo-shimmer,
     #boot-loader .boot-expansion-logo,
     #boot-loader .boot-footer {
         position: relative;
@@ -159,12 +168,13 @@
         transform: none;
     }
 
-    #boot-loader .boot-logo-img {
-        width: 62%;
+    #boot-loader .boot-logo-shimmer {
+        width: 72%;
+        animation-name: title-logo-breathe-center; /* stacked layout centers via margin, not translateX */
     }
 
     #boot-loader .boot-expansion-logo {
-        width: 56%;
+        width: 66%;
     }
 
     #boot-loader .boot-footer {
@@ -188,10 +198,10 @@
 /*
    ── THE CANVAS ───────────────────────────────────────────────
    Locked to the artwork's real aspect ratio (1376x768 = 1.7917),
-   so every % based coordinate inside it — background image and
-   buttons alike — always lines up with the same point in the
+   so every % based coordinate inside it - background image and
+   buttons alike - always lines up with the same point in the
    artwork, at any screen size. Previously this used 16/9
-   (1.7778), which is close but not exact — enough to crop the
+   (1.7778), which is close but not exact - enough to crop the
    image slightly at extreme window ratios.
 
    It is also a CSS *size container* (container-type: inline-size),
@@ -217,34 +227,115 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* safe — box ratio already matches image ratio */
+    object-fit: cover; /* safe - box ratio already matches image ratio */
     object-position: center;
     z-index: 0;
     pointer-events: none;
     user-select: none;
 }
 
-/* Logo image — positioned at top-center */
-.title-logo-img {
+/*
+   ── TITLE LOGO SHIMMER ──────────────────────────────────────
+   The STOXELS title gets two stacked, subtle effects:
+     1. a slow breathing pulse (wrapper scale + glow intensity),
+     2. a fixed soft purple ambient glow via ::before (drop-shadow-like,
+        but animatable).
+   The wrapper owns placement (left/top/width); the img is position:relative
+   inside it so the absolutely-positioned glow layers track the artwork.
+   Boot loader reuses the same effect classes on .boot-logo-*.
+
+   file:// Firefox blocks mask-image:url() as a CORS fetch (same issue as
+   the button glow above) - there the ::before glow is skipped entirely.
+*/
+.title-logo-shimmer {
     position: absolute;
     left: 50%;
-    top: 2%;
+    top: -4.5%;
     transform: translateX(-50%);
-    width: clamp(220px, 32%, 540px);
+    width: clamp(260px, 40%, 680px);
+    pointer-events: none;
+    animation: title-logo-breathe 5.2s ease-in-out infinite;
+}
+
+.title-logo-img {
+    position: relative;
+    display: block;
+    width: 100%;
     height: auto;
     pointer-events: none;
     user-select: none;
+}
+
+/* Soft purple ambient glow (replaces the old static drop-shadow filter) */
+.title-logo-shimmer::before,
+#boot-loader .boot-logo-shimmer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(140, 60, 255, 0.55);
+    -webkit-mask: url('../images/Title_Screen/STOXELS.webp') center / 100% 100% no-repeat;
+    mask: url('../images/Title_Screen/STOXELS.webp') center / 100% 100% no-repeat;
+    filter: blur(14px) brightness(1.5);
+    opacity: 0.35;
+    animation: title-logo-glow 5.2s ease-in-out infinite;
+}
+
+@keyframes title-logo-breathe {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50%      { transform: translateX(-50%) scale(1.016); }
+}
+
+/* Stacked (mobile) layout centers the wrapper via margin:auto instead of
+   translateX - this variant keeps the pulse without re-introducing the
+   translateX that the static `transform: none` there removes. */
+@keyframes title-logo-breathe-center {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.016); }
+}
+
+@keyframes title-logo-glow {
+    0%, 100% { opacity: 0.30; }
+    50%      { opacity: 0.46; }
+}
+
+/* file:// fallback: Firefox treats mask-image:url() as a CORS fetch, which
+   is blocked on file:// (same as the button glow masks). Keep the breathing
+   pulse, skip the masked glow layer. */
+html.file-protocol .title-logo-shimmer::before,
+html.file-protocol #boot-loader .boot-logo-shimmer::before {
+    display: none;
+}
+
+html.file-protocol .title-logo-shimmer,
+html.file-protocol #boot-loader .boot-logo-shimmer {
     filter: drop-shadow(0 0 24px rgba(140, 60, 255, 0.55));
 }
 
-/* Expansion logo image ("Rise of the Beasts" EN/DE) — hover shows the expansion history.
-   Kept at 34% width so it clears the side button columns (12%/88%). */
+/* Accessibility: honor prefers-reduced-motion - keep the static look
+   (fixed ambient glow), drop the pulse entirely. */
+@media (prefers-reduced-motion: reduce) {
+    .title-logo-shimmer,
+    #boot-loader .boot-logo-shimmer {
+        animation: none;
+    }
+
+    .title-logo-shimmer::before,
+    #boot-loader .boot-logo-shimmer::before {
+        animation: none;
+        opacity: 0.35;
+    }
+
+}
+
+/* Expansion logo image ("Rise of the Beasts" EN/DE) - hover shows the expansion history.
+   Sized UP (42%, was 34%) to match the bigger main logo; glyph extents still
+   clear the side button columns (12%/88%) and end above the version line. */
 .title-expansion-logo {
     position: absolute;
     left: 50%;
     top: 26%;
     transform: translateX(-50%);
-    width: clamp(260px, 34%, 560px);
+    width: clamp(320px, 42%, 700px);
     height: auto;
     user-select: none;
     filter: drop-shadow(0 0 18px rgba(255, 120, 40, 0.45));
@@ -252,11 +343,12 @@
     z-index: 1;
 }
 
-/* Version number just below the expansion logo */
+/* Version number just below the expansion logo (nudged down with it -
+   the bigger subtitle's glyphs end ~14px above this line) */
 .title-version-line {
     position: absolute;
     left: 50%;
-    top: 37%;
+    top: 38.2%;
     transform: translateX(-50%);
     white-space: nowrap;
     font-family: var(--PX);
@@ -266,7 +358,7 @@
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
-/* AI disclosure — unobtrusive line pinned to the bottom-right corner */
+/* AI disclosure - unobtrusive line pinned to the bottom-right corner */
 .title-ai-disclosure {
     position: absolute;
     right: 0.8%;
@@ -289,10 +381,22 @@
     background: transparent;
     border: none;
     color: #d4b8ff;
-    padding: 6px 14px;
+    padding: 0;
     cursor: pointer;
     transition: all .12s;
     text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+    /* Stone-plate text centering: .btn-label is absolutely positioned at
+       --tx/--ty (see the STONE-PLATE TEXT CENTERING section) - the button
+       must be its containing block. */
+    position: relative;
+    /* % width would resolve against the shrink-to-fit overlay (cyclic →
+       falls back to the floor). cqw resolves against the title canvas, so
+       the block scales with the artwork like every other button. */
+    width: clamp(48px, 4.6cqw, 72px);
+    /* True ratio of Language-Block.webp (59x41) - 1.5/1 stretched it slightly */
+    aspect-ratio: 59 / 41;
+    /* The label's cqw font size then resolves against the button itself */
+    container-type: inline-size;
 }
 
     .lang-btn.active {
@@ -304,13 +408,15 @@
         text-shadow: 0 0 10px rgba(180, 120, 255, 0.9), 0 1px 4px rgba(0,0,0,0.9);
     }
 
-/* Language switch — top-right corner */
+/* Language switch - top-right corner */
 .title-lang-overlay {
     position: absolute;
     left: 80%;
     top: 5%;
     display: flex;
-    gap: clamp(15px, 1.2%, 16px);
+    /* % gap is cyclic inside a shrink-to-fit overlay and collapses -
+       size the gap in cqw so it scales with the canvas too. */
+    gap: clamp(10px, 0.9cqw, 16px);
     z-index: 5;
     background: none;
 }
@@ -319,10 +425,6 @@
     background-image: url('../images/Title_Screen/Language-Block.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    width: clamp(60px, 5.5%, 64px);
-    aspect-ratio: 1.5 / 1;
-    display: flex;
-    align-items: center;
 }
 
 
@@ -330,15 +432,15 @@
    ── OVERLAY BUTTONS ──────────────────────────────────────────
    Each button reads --bx and --by from its inline style.
    Because .title-canvas is aspect-ratio locked, these
-   percentages stay correct at any window size — no more drift.
+   percentages stay correct at any window size - no more drift.
 
    Every button is ALSO its own inline-size container, so its
    label font (in cqw) scales with the button's own width. The
-   text then always fits the stone block — in every language
+   text then always fits the stone block - in every language
    (long German words included) and at every window size.
 
    Menu blocks carry a subtle purple ambient glow (idle + hover
-   intensifies); PLAY carries a red one — see the glow section below.
+   intensifies); PLAY carries a red one - see the glow section below.
 */
 .title-overlay-btn {
     position: absolute;
@@ -360,20 +462,52 @@
     container-type: inline-size;
 }
 
-    /* Label spans live INSIDE each button container, so their cqw font
-       sizes resolve against the button's own width — labels always fit
-       their stone block, in any language, at any window size.
-       5.2cqw + tight letter-spacing keeps even "EINSTELLUNGEN" inside. */
-    .title-overlay-btn .btn-label {
-        display: block;
-        font-size: clamp(6px, 5.2cqw, 18px);
-        letter-spacing: 0.03em;
-    }
-
+    /* Label font sizes use cqw and resolve against the button's own width
+       (each button is an inline-size container), so labels always fit their
+       stone block, in any language, at any window size. The shared label
+       POSITIONING rule (absolute --tx/--ty stone-plate centering) lives in
+       the STONE-PLATE LABEL POSITIONING section below; per-variant values
+       are in STONE-PLATE TEXT CENTERING at the bottom. */
     .title-overlay-btn:hover {
         color: #ffffff;
-        text-shadow: 0 0 10px rgba(180, 120, 255, 0.9), 0 1px 4px rgba(0, 0, 0, 0.9);
+        text-shadow: 0 0 10px rgba(180, 120, 255, 0.9), 0 1px 4px rgba(0,0,0,0.9);
     }
+
+/*
+   ── STONE-PLATE LABEL POSITIONING (shared) ─────────────────
+   .btn-label is positioned at the visual center of each block's stone
+   plate - NOT the button box - so decorations (tentacle, claws) never
+   skew the centering. The per-variant values live in the
+   STONE-PLATE TEXT CENTERING section at the bottom of this file; the
+   language buttons reuse the same mechanism with values in .lang-btn.
+*/
+.title-overlay-btn .btn-label,
+.lang-btn .btn-label {
+    position: absolute;
+    left: var(--tx, 50%);
+    top: var(--ty, 50%);
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Press Start 2P's default line box is taller below the baseline than
+       above it, which makes the label read visibly low inside the block.
+       line-height:1 collapses the line box to the glyph em box so the
+       centering lands on the visual middle. */
+    line-height: 1;
+    font-size: clamp(6px, 5.2cqw, 18px);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.lang-btn .btn-label {
+    /* Language-Block.webp (59x41) is visually symmetric; 50.85% is the
+       measured stone-plate center, and y is optically centered like the
+       other blocks. Font scales with the block itself (its own inline-size
+       container), so EN/DE always fit at every window size. */
+    --tx: 50.85%; --ty: 48%;
+    font-size: clamp(7px, 26cqw, 16px);
+}
 
     .title-overlay-btn.btn-danger {
         color: #ff8080 !important;
@@ -388,6 +522,7 @@
     /* ~9.5% of the block width per glyph keeps even "▶ SPIELEN" inside */
     font-size: clamp(11px, 9.5cqw, 26px);
     letter-spacing: 0.04em;
+    line-height: 1;
 }
 
 
@@ -426,7 +561,7 @@
 /* file:// fallback: Firefox treats `mask-image: url(...)` as a CORS fetch,
    which is blocked on file:// ("CORS-Anfrage war nicht http") and spams the
    console once per button. The stone art itself (background-image / <img>)
-   loads fine — only the blurred halo layer needs masking. So on local
+   loads fine - only the blurred halo layer needs masking. So on local
    file:// launches the mask layer is skipped and the glow falls back to a
    drop-shadow (no extra fetch, follows the block's alpha silhouette).
    Hosted builds (http/https) keep the richer mask glow above untouched.
@@ -458,7 +593,7 @@ html.file-protocol #btn-play:hover {
 }
 
 #btn-play {
-    /* Red glow for PLAY — stronger/brighter than the menu purple so it
+    /* Red glow for PLAY - stronger/brighter than the menu purple so it
        reads against the dark red sky behind it */
     --glow-color: rgba(255, 60, 45, 0.8);
     --glow-opacity: 0.7;
@@ -470,7 +605,7 @@ html.file-protocol #btn-play:hover {
     background-size: 100% 100%;
     background-repeat: no-repeat;
     /* 20.5% keeps the block clear of the side columns (12% / 88%)
-       at every canvas width — no more overlap with KEYBINDS etc.
+       at every canvas width - no more overlap with KEYBINDS etc.
        3.6/1 (was 4.2/1) gives PLAY noticeably more height. */
     width: clamp(140px, 20.5%, 380px);
     aspect-ratio: 3.6 / 1;
@@ -493,7 +628,7 @@ html.file-protocol #btn-play:hover {
     /* Per-glyph width ~6.5% of the block keeps long translated labels
        (EINSTELLUNGEN, ANLEITUNG, ...) inside at any size.
        Sized UP (22%) so the 8 menu buttons read clearly against the art. */
-    width: clamp(110px, 22%, 280px);
+    width: clamp(110px, 22%, 300px);
     aspect-ratio: 4.1 / 1;
     display: flex;
     align-items: center;
@@ -523,6 +658,45 @@ html.file-protocol #btn-play:hover {
 .block-right-2 {
     --block-img: url('../images/Title_Screen/right-block-2.webp');
     background-image: url('../images/Title_Screen/right-block-2.webp');
+}
+
+/*
+   ── STONE-PLATE TEXT CENTERING ─────────────────────────────────
+   The labels center on the STONE PLATE only - the tentacle / claw
+   decoration hanging off each block's side must not count toward
+   the centering. These are the measured stone-plate centers, as %
+   of the button box (50%/50% would be the full image incl. tentacle).
+
+   Measured from the block art by finding the flat stone area while
+   excluding the decoration; tweak on title-text-alignment.html and
+   paste the values back 1:1. Each class here styles two buttons (the
+   left/right variants alternate per row), so one value aligns both
+   labels of a column pair.
+*/
+.block-left-1 {
+    /* SETTINGS, KEYBINDS - tentacle curls off the LEFT edge */
+    --tx: 54.7%; --ty: 49.6%;
+}
+
+.block-left-2 {
+    /* HOW TO PLAY, REPLAY - tentacle hangs off the LEFT edge */
+    --tx: 55.8%; --ty: 43.6%;
+}
+
+.block-right-1 {
+    /* HIGHSCORES, ACHIEVEMENTS - tentacle curls off the RIGHT edge */
+    --tx: 43.8%; --ty: 44.4%;
+}
+
+.block-right-2 {
+    /* MOODLE CODES, CHANGELOG - tentacle hangs off the RIGHT edge */
+    --tx: 46.6%; --ty: 45.6%;
+}
+
+#btn-play {
+    /* PLAY - beast claws grip both top corners; the flat engraved
+       center sits slightly left of and above the image middle */
+    --tx: 45.6%; --ty: 48.7%;
 }
 
 #btn-reset {
@@ -566,7 +740,7 @@ html.file-protocol #btn-play:hover {
         object-position: top center;
     }
 
-    .title-logo-img,
+    .title-logo-shimmer,
     .title-expansion-logo,
     .title-version-line,
     .title-ai-disclosure,
@@ -580,13 +754,14 @@ html.file-protocol #btn-play:hover {
         margin: 0 auto;
     }
 
-    .title-logo-img {
-        width: 62%;
-        margin-top: 8%;
+    .title-logo-shimmer {
+        width: 72%;
+        margin-top: 6%;
+        animation-name: title-logo-breathe-center;
     }
 
     .title-expansion-logo {
-        width: 56%;
+        width: 66%;
         margin-top: 2%;
     }
 
@@ -629,6 +804,18 @@ html.file-protocol #btn-play:hover {
         order: initial; /* PLAY no longer jumps to the top of the stack */
     }
 
+    /* Labels are absolutely positioned against the button box (stone-plate
+       centering) - the button must stay a containing block once it stops
+       being position:absolute itself in the stacked layout. */
+    #btn-play,
+    .block-general,
+    .block-left-1,
+    .block-left-2,
+    .block-right-1,
+    .block-right-2 {
+        position: relative;
+    }
+
     #btn-play {
         margin-top: 5%;
     }
@@ -657,7 +844,7 @@ html.file-protocol #btn-play:hover {
     }
 
     /* Full-width header rows, in DOM order */
-    .title-logo-img,
+    .title-logo-shimmer,
     .title-expansion-logo,
     .title-version-line,
     #btn-play {
@@ -676,7 +863,7 @@ html.file-protocol #btn-play:hover {
     .title-ai-disclosure     { order: 99; grid-column: 1 / -1; margin: 12px 14px 12px; }
 
     /* Side-by-side menu buttons: 2 per row keeps the whole menu
-       inside a phone's first screen — no scrolling needed */
+       inside a phone's first screen - no scrolling needed */
     .block-general,
     .block-left-1,
     .block-left-2,

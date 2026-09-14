@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------MARK WRONG — ERASER / SWEEPER / ERROR MAGNET / ERROR GEM----------------------
+//-------------------MARK WRONG - ERASER / SWEEPER / ERROR MAGNET / ERROR GEM----------------------
 //------------------------------------------------------------------------
 
-// markWrong2 / markWrong4 / etc. — marks N random empty non-solution cells.
+// markWrong2 / markWrong4 / etc. - marks N random empty non-solution cells.
 function _useMarkWrong(id, def) {
     // Blinding Truth keystone blocks all mark-wrong items entirely
     if (ptHasSkill('keystone_blinding_truth')) {
@@ -34,7 +34,7 @@ function _fxMakeEraserStreak(container, r, yFraction, delaySeconds) {
     container.appendChild(streak);
 }
 
-// ✏️ Eraser — pink rubber streaks wipe across the grid.
+// ✏️ Eraser - pink rubber streaks wipe across the grid.
 function _fxEraser() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -81,7 +81,7 @@ function _fxMakeDustParticles(container, r, count) {
     }
 }
 
-// 🧹 Sweeper — a sweeping broom icon trails dust particles.
+// 🧹 Sweeper - a sweeping broom icon trails dust particles.
 function _fxSweeper() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -140,7 +140,7 @@ function _fxMagnetCrossParticles(container, r, magnetX, magnetY, count) {
     }
 }
 
-// 🧲 Error Magnet — a magnet swoops in, ✕ crosses fly toward it.
+// 🧲 Error Magnet - a magnet swoops in, ✕ crosses fly toward it.
 function _fxErrorMagnet() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -170,7 +170,7 @@ function _fxMakeGemIcon(wrap, cx, cy) {
     setTimeout(() => gem.remove(), 1400);
 }
 
-// 💎 Error Gem — gem pulses, then showers coloured sparkles top-down.
+// 💎 Error Gem - gem pulses, then showers coloured sparkles top-down.
 function _fxErrorGem() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

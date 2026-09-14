@@ -1,22 +1,22 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BARRAGE (boss_barrage)---------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK — "The War-Machine Brute". artillery barrage theming. The
+// TIER 8 REWORK - "The War-Machine Brute". artillery barrage theming. The
 // fight is a creeping shelling curtain you fight THROUGH, not away from.
-// Element: fire (keep — artillery, not apples).
+// Element: fire (keep - artillery, not apples).
 //
-//   • SHELLING CURTAIN (signature, all fight) — a creeping wall of shell
+//   • SHELLING CURTAIN (signature, all fight) - a creeping wall of shell
 //     splashes advances across the arena each cast; the telegraph stays
 //     visible while it rolls, so you fight inside the barrage and clear
 //     puzzle cells between the shell lines. Phase 3: the curtain comes from
-//     the top as well — fight on a diagonal front.
-//   • SUPPLY DROP (60%) — cargo crates crash down (slam telegraphs); each
+//     the top as well - fight on a diagonal front.
+//   • SUPPLY DROP (60%) - cargo crates crash down (slam telegraphs); each
 //     one flips open into a small artillery JAMMER that lobs slow mortar
 //     shells at your last position. Destructible: step into one to smash it.
-//   • SHOT SHELLS (60%) — heavy shells fall on telegraphed rings, each burst
+//   • SHOT SHELLS (60%) - heavy shells fall on telegraphed rings, each burst
 //     scatters hot shrapnel that keeps travelling. Impact ring + fragment
-//     lanes — read both.
-//   • 💀 FINAL BOMBARDMENT (≤10%, one-shot finale) — the whole arena becomes
+//     lanes - read both.
+//   • 💀 FINAL BOMBARDMENT (≤10%, one-shot finale) - the whole arena becomes
 //     the target zone: THREE massive strikes light up one at a time (each a
 //     widening volley), then the ALL-OUT SALVO detonates everything except
 //     the single untouched safe tile. Charge bar frozen (gate in
@@ -49,7 +49,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_barrage — "The War-Machine Brute" (rework)
+    // boss_barrage - "The War-Machine Brute" (rework)
     // Phase 1 (100% → 60%): Shelling Curtain + Corrupt Cells
     // Phase 2 ( 60% → 30%): immune window; Supply Drop + Shot Shells join
     // Phase 3 ( 30% →  0%): curtain comes from the top as well; at 10% the
@@ -112,7 +112,7 @@ function _egBarHeal(amount) {
 //-------------------SIGNATURE: SHELLING CURTAIN (all fight)---------------
 //------------------------------------------------------------------------
 // A creeping wall of shell splashes advances across the arena each cast.
-// The telegraph stays visible while it rolls — fight INSIDE the barrage.
+// The telegraph stays visible while it rolls - fight INSIDE the barrage.
 // Phase 3: a second curtain sweeps from the top edge simultaneously, so the
 // safe wedge is a moving diagonal.
 const EG_BAR_CURTAIN_W   = 120;        // splash band width (px)
@@ -128,7 +128,7 @@ function _egMechBarCurtain(monster, phase) {
     const speed = (W * 0.42) * _EG_BAR_DEBUG_MULT;      // px/s sweep speed
     const fromTop = p >= 3;
 
-    _egNkToast('eg_mech_bar_curtain', '🍎 SHELLING CURTAIN — the wall of splashes advances! Fight through it!', '#ff6b35');
+    _egNkToast('eg_mech_bar_curtain', '🍎 SHELLING CURTAIN - the wall of splashes advances! Fight through it!', '#ff6b35');
 
     // The curtain sweeps left→right (or top→bottom in phase 3), with the
     // leading edge telegraphed as a live splash band.
@@ -186,7 +186,7 @@ function _egMechBarCurtain(monster, phase) {
 //------------------------------------------------------------------------
 // Cargo crates crash down (slam telegraphs); each flips open into a small
 // artillery JAMMER that lobs slow mortar shells at your last position.
-// Destructible: step into one to smash it (small heal — proven reward
+// Destructible: step into one to smash it (small heal - proven reward
 // pattern). Two crates in phase 2, three in phase 3.
 const EG_BAR_DROP_WARN_MS  = 1500;
 const EG_BAR_JAMMER_LIFE   = 12000;     // ms a jammer stays live
@@ -202,7 +202,7 @@ function _egMechBarSupplyDrop(monster, phase) {
     const run = _egNkNewRun(monster && monster.id, true);
     const count = p >= 3 ? 3 : 2;
 
-    _egNkToast('eg_mech_bar_supply', '📦 SUPPLY DROP — artillery jammers landing! Smash them before they dig in!', '#ff6b35');
+    _egNkToast('eg_mech_bar_supply', '📦 SUPPLY DROP - artillery jammers landing! Smash them before they dig in!', '#ff6b35');
 
     const spots = [];
     for (let i = 0; i < count; i++) {
@@ -307,7 +307,7 @@ function _egMechBarSupplyDrop(monster, phase) {
 //-------------------ACT II: SHOT SHELLS (60%)-----------------------------
 //------------------------------------------------------------------------
 // Heavy shells fall on telegraphed rings; each burst scatters hot shrapnel
-// that keeps travelling. Impact ring + fragment lanes — read both.
+// that keeps travelling. Impact ring + fragment lanes - read both.
 const EG_BAR_SHELL_COUNT  = [0, 0, 3, 4];
 const EG_BAR_SHELL_WARN_MS = 1600;
 const EG_BAR_SHELL_DMG    = [0, 0, 0.15, 0.17];   // %maxHP caught in the ring
@@ -321,7 +321,7 @@ function _egMechBarShotShells(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_bar_shells', '🍎 SHOT SHELLS — heavy shells incoming, mind the shrapnel!', '#ff6b35');
+    _egNkToast('eg_mech_bar_shells', '🍎 SHOT SHELLS - heavy shells incoming, mind the shrapnel!', '#ff6b35');
 
     const shells = [];
     for (let i = 0; i < EG_BAR_SHELL_COUNT[p]; i++) {
@@ -478,11 +478,11 @@ function _egBarFinalStart(monster) {
     ov.className = 'eg-bar-cd';
     ov.innerHTML =
         '<div class="eg-bar-cd-label">🍎 FINAL BOMBARDMENT</div>' +
-        '<div class="eg-bar-cd-hint">Three massive strikes — then the ALL-OUT SALVO. Read the volley gaps!</div>';
+        '<div class="eg-bar-cd-hint">Three massive strikes - then the ALL-OUT SALVO. Read the volley gaps!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_bar_final_cd', '🍎💀 FINAL BOMBARDMENT — read the volleys, find the safe tile!', '#ff6b35');
+    _egNkToast('eg_mech_bar_final_cd', '🍎💀 FINAL BOMBARDMENT - read the volleys, find the safe tile!', '#ff6b35');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -505,7 +505,7 @@ function _egBarFinalStart(monster) {
             runSalvo();
             return;
         }
-        _egNkToast('eg_mech_bar_volley', '🍎 Strike ' + g.volley + '/' + EG_BAR_VOLLEYS + ' — read the gaps!', '#ff6b35');
+        _egNkToast('eg_mech_bar_volley', '🍎 Strike ' + g.volley + '/' + EG_BAR_VOLLEYS + ' - read the gaps!', '#ff6b35');
 
         // Each strike: a full-screen shelling grid with 2 safe gaps that
         // wander slightly between volleys. Telegraphed 2.2s.
@@ -552,7 +552,7 @@ function _egBarFinalStart(monster) {
     // ── The ALL-OUT SALVO: everything detonates except one safe tile. ────
     const runSalvo = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_bar_salvo', '🍎💀 ALL-OUT SALVO — one safe tile remains. Reach it!', '#ff6b35');
+        _egNkToast('eg_mech_bar_salvo', '🍎💀 ALL-OUT SALVO - one safe tile remains. Reach it!', '#ff6b35');
 
         const cols = 10, rows = 7;
         const cw = W / cols, rh = H / rows;
@@ -627,7 +627,7 @@ function _egBarFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egBarTeardown() {
     if (_egBarFinal) { try { _egBarFinalEnd(_egBarFinal, null); } catch (e) {} _egBarFinal = null; }
@@ -648,8 +648,8 @@ function _egBarTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_BAR_DEBUG.fire('curtain'|'supply'|'shells', phase) — runs one now
-//   _EG_BAR_DEBUG.final()                                  — FINAL BOMBARDMENT now
+//   _EG_BAR_DEBUG.fire('curtain'|'supply'|'shells', phase) - runs one now
+//   _EG_BAR_DEBUG.final()                                  - FINAL BOMBARDMENT now
 if (typeof window !== 'undefined') {
     window._EG_BAR_DEBUG = {
         fire: (name, phase) => {

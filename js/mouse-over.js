@@ -62,7 +62,7 @@ function _setColCellsHighlight(col, on) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// applyHover — draws the crosshair highlight on the row and column
+// applyHover - draws the crosshair highlight on the row and column
 //   that pass through (row, col): tints the clue cells and all grid cells
 //   along both axes.
 function applyHover(row, col) {
@@ -73,7 +73,7 @@ function applyHover(row, col) {
     _setColCellsHighlight(col, true);
 }
 
-// clearHover — removes the crosshair highlight from the row and column
+// clearHover - removes the crosshair highlight from the row and column
 //   that were previously highlighted.
 //   Early-exits if nothing is currently hovered or there is no active puzzle.
 function clearHover() {
@@ -103,7 +103,7 @@ function _isDragCellAllowed(row, col) {
         else dragAxis = 'row';   // diagonal: default to row
     }
 
-    // No axis locked yet (cursor hasn't moved) — allow the cell.
+    // No axis locked yet (cursor hasn't moved) - allow the cell.
     if (dragAxis === null) return true;
     if (dragAxis === 'row' && row === dragStartRow) return true;
     if (dragAxis === 'col' && col === dragStartCol) return true;
@@ -139,7 +139,7 @@ function _countAdjacentPrefillRun(row, col, axis) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// onHover — fired by onmouseenter on every grid cell.
+// onHover - fired by onmouseenter on every grid cell.
 //   Moves the crosshair to the newly entered cell and, when the player is
 //   mid-drag, applies the current paint stroke to the cell (respecting
 //   axis-lock if it is enabled).
@@ -157,7 +157,7 @@ function onHover(e, row, col) {
     }
 }
 
-// onHoverOut — fired by onmouseleave on every grid cell.
+// onHoverOut - fired by onmouseleave on every grid cell.
 //   Clears the crosshair only when the cell being left is the one that is
 //   currently highlighted. This guards against stale clears caused by the
 //   browser firing leave/enter events in an unexpected order.
@@ -176,7 +176,7 @@ function onHoverOut(row, col) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _getOrCreateCounterOverlay — returns the overlay <span> inside a cell,
+// _getOrCreateCounterOverlay - returns the overlay <span> inside a cell,
 //   creating and appending it first if it does not already exist.
 function _getOrCreateCounterOverlay(cellEl) {
     let overlay = cellEl.querySelector('.drag-count-overlay');
@@ -188,7 +188,7 @@ function _getOrCreateCounterOverlay(cellEl) {
     return overlay;
 }
 
-// dragCounterApply — sets the stroke-count number shown on a cell
+// dragCounterApply - sets the stroke-count number shown on a cell
 //   during a drag so the player can see how many cells they have painted.
 function dragCounterApply(row, col, count) {
     const cellEl = document.getElementById(`g-${row}-${col}`);
@@ -197,7 +197,7 @@ function dragCounterApply(row, col, count) {
     overlay.textContent = count;
 }
 
-// dragCounterClear — removes all stroke-count overlays from the entire board,
+// dragCounterClear - removes all stroke-count overlays from the entire board,
 //   called when a drag stroke ends.
 function dragCounterClear() {
     document.querySelectorAll('.drag-count-overlay').forEach(el => el.remove());

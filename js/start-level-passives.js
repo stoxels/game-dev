@@ -170,7 +170,7 @@ function _deadReckoningCheckUnlock() {
 
     if (playerFilled < Math.ceil(totalFilled * 0.25)) return;
 
-    // Threshold reached — restore exact clue numbers for all rows and cols
+    // Threshold reached - restore exact clue numbers for all rows and cols
     window._deadReckoningUnlocked = true;
 
     for (let r = 0; r < rows; r++) {
@@ -640,7 +640,7 @@ function triggerSylaFlowerEffect(coords) {
     });
 }
 
-// Syla — Nature's Aid: on forest levels, the grove reveals one correct tile for her.
+// Syla - Nature's Aid: on forest levels, the grove reveals one correct tile for her.
 function _applySylaForestAffinity() {
     if (!_charIs('syla')) return;
     if (!cur || !cur.isForestLevel) return;

@@ -1,5 +1,5 @@
 //  endgame-hub-tooltips.js
-//  HUB TOOLTIPS — extracted 2026-09-10 from endgame-hub.js
+//  HUB TOOLTIPS - extracted 2026-09-10 from endgame-hub.js
 //  (stat-block tooltip builder, mouse tracking, Alt-compare tooltip
 //  and their event listeners). Loads AFTER endgame-hub.js; the single
 //  _egShowTooltip implementation in endgame-currency.js dispatches to
@@ -53,8 +53,8 @@ function _egBuildTooltipBodyHTML(item) {
         : '';
 
     // ── Weapon hand line (PoE-style): One-Handed / Two-Handed ──────────
-    // Shown directly under the rarity line so the 1H/2H choice — and with it
-    // the shield / dual-wield decision — is visible before equipping.
+    // Shown directly under the rarity line so the 1H/2H choice - and with it
+    // the shield / dual-wield decision - is visible before equipping.
     let handHTML = '';
     if (item.slotType === 'weapon') {
         let hands = (item.hands === 1 || item.hands === 2) ? item.hands : null;
@@ -83,7 +83,7 @@ function _egBuildTooltipBodyHTML(item) {
 
     // ── Implicit defenses & damage ───────────────────────────────────
     // Defense and damage values shown are the LOCAL-modified totals (base +
-    // local flat, scaled by the item's own "% increased" mods — Path of
+    // local flat, scaled by the item's own "% increased" mods - Path of
     // Exile style). Values altered by local mods get the
     // .eg-tt-val-modified highlight so the player can tell them apart from
     // the untouched base value.
@@ -121,8 +121,9 @@ function _egBuildTooltipBodyHTML(item) {
         } else {
             rangeLine('eg_stat_phys_damage', item.damage.min, item.damage.max, false);
         }
-        // Only the melee weapon slot has an auto-strike interval — ranged
-        // weapons scale the input-driven projectile channel instead.
+        // Only the melee weapon slot has a charge interval (time to 100% for
+        // manual E strikes) - ranged weapons scale the input-driven
+        // projectile channel instead.
         if (item.slotType === 'weapon') {
             let atkEff = null;
             try { atkEff = _egGetItemEffectiveAttackInterval(item); } catch (e) { atkEff = null; }
@@ -154,7 +155,7 @@ function _egBuildTooltipBodyHTML(item) {
             ? _egBuildMergedModLines(implicits)
             : implicits.flatMap(imp => (imp.rolledStats||[]).map(s => ({ label: s.label, downside:false, tierLabel:'Implicit' })));
         const lines = merged.map(entry => {
-            // Implicits are always beneficial — render in PoE implicit blue (no text tag needed, color is the indicator)
+            // Implicits are always beneficial - render in PoE implicit blue (no text tag needed, color is the indicator)
             return `<div class="eg-tt-mod eg-tt-mod-implicit"><span class="eg-tt-mod-label">${entry.label}</span></div>`;
         });
         if (lines.length) {
@@ -166,7 +167,7 @@ function _egBuildTooltipBodyHTML(item) {
     // ── Requirements ─────────────────────────────────────────────────
     // Each requirement part is compared against the attribute totals as the
     // equip gate will see them after the swap (displaced occupant removed,
-    // item's own bonuses included — self-carrying). This keeps the tooltip
+    // item's own bonuses included - self-carrying). This keeps the tooltip
     // consistent with what _egCanEquipInSlot will actually accept.
     const req = item.requirements || {};
     const curAttrs = _egPreviewEquipAttributes(item);
@@ -237,7 +238,7 @@ function _egBuildTooltipBodyHTML(item) {
         // Mods sharing the same stat (e.g. flat Health + the Health half of
         // a hybrid roll) are merged into one combined line per stat.
         const mergedLines = _egBuildMergedModLines(mods);
-        // Unique items use bespoke mods without tiers — hide PoE-style tier badges.
+        // Unique items use bespoke mods without tiers - hide PoE-style tier badges.
         const hideTier = !!item.isUnique;
         const lines = mergedLines.map(entry => {
             // Unique downsides render in warning red instead of mod blue.
@@ -319,7 +320,7 @@ function _egBuildTooltipBodyHTML(item) {
 // and drives the Alt-compare tooltip (_egUpdateCompareTooltip /
 // _egHideCompareTooltip). Historically this file and
 // endgame-hub-drag-and-drop.js each shipped their own copy and the
-// LAST-DECLARED-WINS load-order rule picked currency's version silently —
+// LAST-DECLARED-WINS load-order rule picked currency's version silently -
 // the duplicates were removed (2026-09) and this is the single source.
 
 
@@ -343,7 +344,7 @@ function _egMoveTooltip(e) {
 // True while the Alt key is held down.
 let _egAltDown = false;
 
-// Last known cursor position — fallback anchor when no event is available.
+// Last known cursor position - fallback anchor when no event is available.
 let _egLastMouse = { x: 0, y: 0 };
 
 document.addEventListener('mousemove', e => {
@@ -374,14 +375,14 @@ window.addEventListener('keydown', e => {
 
 window.addEventListener('keyup', e => {
     if (e.key === 'Alt') {
-        // Firefox triggers the menu bar on Alt *release* — block that too.
+        // Firefox triggers the menu bar on Alt *release* - block that too.
         if (_egIsItemScreenActive()) e.preventDefault();
         _egAltDown = false;
         _egUpdateCompareTooltip();
     }
 });
 
-// Alt state is unreliable after alt-tabbing away — reset on blur.
+// Alt state is unreliable after alt-tabbing away - reset on blur.
 window.addEventListener('blur', () => {
     _egAltDown = false;
     _egUpdateCompareTooltip();

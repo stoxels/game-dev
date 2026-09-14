@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------ARTIFACT COMPLETE — CODEX OF COMPLETION----------------------
+//-------------------ARTIFACT COMPLETE - CODEX OF COMPLETION----------------------
 //------------------------------------------------------------------------
 
-// artifactComplete (Codex of Completion) — reveals every remaining cell.
+// artifactComplete (Codex of Completion) - reveals every remaining cell.
 function _useArtifactComplete(id, def) {
     const sol = cur.grid;
     const rows = sol.length;
@@ -56,7 +56,7 @@ function _fxMakeArtifactFill(container, r) {
     container.appendChild(fill);
 }
 
-// 🌟 Artifact Complete — full golden supernova engulfs the grid.
+// 🌟 Artifact Complete - full golden supernova engulfs the grid.
 function _fxArtifact() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

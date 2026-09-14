@@ -46,7 +46,7 @@
     100% { transform: translateY(0) rotate(4deg); }
 }
 
-/* Countdown phase — label turns red and pulses */
+/* Countdown phase - label turns red and pulses */
 .dof-zombie.dof-zombie-counting .dof-zombie-timer {
     color: #e74c3c;
     border-color: #c0392b;
@@ -116,7 +116,7 @@
     to   { transform: translateY(-3px); }
 }
 
-/* Arc jump between mistakes — vertical lift while left/top glide */
+/* Arc jump between mistakes - vertical lift while left/top glide */
 .residual-skeleton.skeleton-jump-arc .residual-skeleton-icon {
     animation: skeletonLeapArc 0.7s ease-in-out;
 }
@@ -134,7 +134,7 @@
 
 /* ── DEGREES OF FREEDOM ──────────────────────────────────────────── */
 
-/* Reverted mistake cell — faint purple ghost, not blank, not wrong */
+/* Reverted mistake cell - faint purple ghost, not blank, not wrong */
 .dof-reverted {
     background: rgba(142, 68, 173, 0.12) !important;
     outline: 1px solid rgba(187, 143, 206, 0.35) !important;

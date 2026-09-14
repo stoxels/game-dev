@@ -20,7 +20,7 @@ let _ledger_activeCategoryId = null;
 
 /**
  * Category icons layered on top of the shared stone-and-parchment card
- * frame (that frame is one shared image set in CSS, .ledger-card-art —
+ * frame (that frame is one shared image set in CSS, .ledger-card-art -
  * only this small icon changes per category). Every category id from
  * quests-data.js needs exactly one entry here.
  */
@@ -333,7 +333,7 @@ function _ledger_buildCategoryCard(cat) {
 }
 
 /**
- * Builds the full category grid as one continuous flowing grid — no
+ * Builds the full category grid as one continuous flowing grid - no
  * fixed-size "pages"/scroll-snap. The scroll region just scrolls normally
  * and the CSS grid wraps into however many rows the current column count
  * needs at any screen size.
@@ -568,7 +568,7 @@ function _ledger_renderDetailView(modal) {
 /**
  * Re-renders the quest-log modal in-place.
  * Decides whether to show the grid overview or a category detail view.
- * Safe to call when the modal is not open — it will no-op.
+ * Safe to call when the modal is not open - it will no-op.
  */
 function renderQuestLog() {
     const modal = document.getElementById('quest-log-modal');
@@ -741,7 +741,7 @@ function _drainQuestToastQueue() {
 }
 
 /**
- * Public entry point — queues a "milestone reached" toast notification.
+ * Public entry point - queues a "milestone reached" toast notification.
  * Called from quests-stats.js when a milestone becomes complete.
  * @param {Object} milestone
  * @param {Object} category

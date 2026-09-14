@@ -40,7 +40,7 @@ let baselineZoom = 1;
 let manualZoomActive = false;
 
 // Cached natural (unscaled) puzzle dimensions from the last scalePuzzle()
-// call. Reused by manual zoom so we never have to re-measure — measuring
+// call. Reused by manual zoom so we never have to re-measure - measuring
 // is destructive (temporarily resets transform/wrapper sizing) and was
 // previously being called a second time in _onCtrlWheelZoom without ever
 // restoring what it clobbered.
@@ -87,7 +87,7 @@ function _getInvList() {
 // Why clear the wrapper? _applyZoom() sets wrap.style.height and minWidth to
 // the post-scale pixel values. If those are left in place while we measure,
 // the browser constrains the scaler's reported size to fit inside those stale
-// dimensions — which means each resize event measures a progressively smaller
+// dimensions - which means each resize event measures a progressively smaller
 // "natural" size and calculates a progressively smaller scale. This was the
 // cause of the F12 devtools-open/close shrink bug.
 //
@@ -137,7 +137,7 @@ function _calcAvailableSpace() {
     const invStrip = document.getElementById('inv-panel');
     // The touchpad FILL/MARK toggle hangs below the grid (absolute,
     // bottom: -34px inside #puzzle-scaler-wrap). When it is visible it
-    // needs a strip of free space between grid and inventory bar — so
+    // needs a strip of free space between grid and inventory bar - so
     // reserve its height here, exactly like the other chrome bars.
     const fillToggle = document.getElementById('btn-touchpad-mode');
     const fillToggleH = (fillToggle && !fillToggle.classList.contains('hidden'))
@@ -157,7 +157,7 @@ function _calcAvailableSpace() {
 // so row/col clue headers (z-index 950) stay in the global context and
 // correctly outrank the fixed HUD/toast (z-index 15) while cells (auto)
 // stay below. Falls back to transform:scale where zoom isn't supported
-// (old Firefox) — in that fallback the clues will be trapped and the
+// (old Firefox) - in that fallback the clues will be trapped and the
 // HUD will sit behind the whole puzzle when overlapping, which is still
 // better than covering the clues.
 function _applyZoom() {
@@ -184,7 +184,7 @@ function _applyZoom() {
     // has actually settled the new transform, instead of reading
     // getBoundingClientRect() in the same synchronous tick that just set
     // style.transform. Doing it synchronously can occasionally measure
-    // stale geometry from the previous zoom level — worse the bigger the
+    // stale geometry from the previous zoom level - worse the bigger the
     // jump between zoom levels, which is exactly why this only shows up
     // once you zoom in "very much" (e.g. several fast +clicks in a row).
     // buildGrid() in grid.js works around the same class of issue with its
@@ -218,7 +218,7 @@ function _applyZoom() {
 
 
 
-// _updateZoomBarUI — syncs the vertical zoom-bar fill height to currentZoom,
+// _updateZoomBarUI - syncs the vertical zoom-bar fill height to currentZoom,
 // mapped between the manual zoom bounds. Called from every path that can
 // change currentZoom (auto-fit scale, wheel zoom, +/- buttons) so the bar
 // never drifts out of sync with the actual puzzle scale.
@@ -231,7 +231,7 @@ function _updateZoomBarUI() {
     fill.style.height = `${clampedPct * 100}%`;
 }
 
-// _adjustZoom — shared clamp+apply step for any manual zoom input
+// _adjustZoom - shared clamp+apply step for any manual zoom input
 // (Ctrl+Wheel or the +/- buttons). Marks manualZoomActive so scalePuzzle()
 // stops overriding the player's chosen zoom level on resize/rebuild.
 function _adjustZoom(delta) {
@@ -241,7 +241,7 @@ function _adjustZoom(delta) {
     _applyVerticalCentering(_lastNaturalH * currentZoom);
 }
 
-// zoomInBtn / zoomOutBtn — public entry points wired to the zoom-bar buttons.
+// zoomInBtn / zoomOutBtn - public entry points wired to the zoom-bar buttons.
 function zoomInBtn() {
     _adjustZoom(ZOOM_SPEED);
 }
@@ -287,7 +287,7 @@ const VERTICAL_CENTER_FACTOR = 0.6;
 // Nudges .puzzle-and-sidebar down (via margin-top) when the scaled puzzle
 // is shorter than the available vertical space, so it sits closer to
 // center instead of always hugging the top. Does nothing (stays at 0)
-// once the puzzle is tall enough to need the full available height —
+// once the puzzle is tall enough to need the full available height -
 // this naturally accounts for row count AND the tallest column-clue
 // stack, because both are already baked into natural.h via
 // _measureNaturalSize() (cell rows + column clue header rows).
@@ -310,7 +310,7 @@ function _applyVerticalCentering(scaledHeight) {
 //   1. Measures the element's natural (unscaled) pixel dimensions.
 //   2. Calculates the maximum scale that fits within SCALE_FILL_W of the
 //      viewport width and the remaining height, capped at SCALE_MAX.
-//   3. Only updates currentZoom if the player hasn't manually zoomed —
+//   3. Only updates currentZoom if the player hasn't manually zoomed -
 //      this preserves the player's chosen zoom across resize events.
 //   4. Calls _applyZoom() to write the transform and fix wrapper dimensions.
 //

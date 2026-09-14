@@ -139,6 +139,7 @@ const EG_CRAFT_FAMILY_CURRENCIES = {
     // Damage and offensive effects
     flat_physical_damage: 'orb_exalted', inc_physical_damage: 'orb_exalted',
     spell_damage: 'orb_ascension', inc_spell_damage: 'orb_ascension',
+    healing_power: 'orb_ascension', inc_healing_power: 'orb_ascension',
     fire_damage: 'orb_chaos', cold_damage: 'orb_chaos', lightning_damage: 'orb_chaos',
     shadow_damage: 'orb_chaos', crit_chance: 'orb_divine', crit_multiplier: 'orb_divine',
     attack_speed: 'orb_regal', pierce: 'orb_elevation', cleave: 'orb_elevation',

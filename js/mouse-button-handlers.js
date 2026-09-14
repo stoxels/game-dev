@@ -72,6 +72,7 @@ function _egDiscardAllDrops(row, col) {
     if (typeof _egDiscardItemDrop === 'function') _egDiscardItemDrop(row, col);
     if (typeof _egDiscardMapDrop === 'function') _egDiscardMapDrop(row, col);
     if (typeof _egDiscardGoldDrop === 'function') _egDiscardGoldDrop(row, col);
+    if (typeof _charmDiscardDrop === 'function') _charmDiscardDrop(row, col);
 }
 
 // Endgame: claims any pickup, loot drop, or currency drop sitting on a
@@ -85,6 +86,7 @@ function _egCheckAllClaims(row, col) {
     if (typeof _egCheckItemDropClaim === 'function') _egCheckItemDropClaim(row, col);
     if (typeof _egCheckMapDropClaim === 'function') _egCheckMapDropClaim(row, col);
     if (typeof _egCheckGoldDropClaim === 'function') _egCheckGoldDropClaim(row, col);
+    if (typeof _charmCheckClaim === 'function') _charmCheckClaim(row, col);
 }
 
 
@@ -99,7 +101,7 @@ function _egCheckAllClaims(row, col) {
 // The player must click again afterward to actually fill.
 // Frozen cells simply reject the click until they thaw.
 function checkBossCorruptionIntercept(row, col) {
-    // Slimed cells (The Snail) block ALL interaction until swept clean —
+    // Slimed cells (The Snail) block ALL interaction until swept clean -
     // checked first so a slimed cell can never be clicked around.
     if (typeof _egSnailIsCellSlimed === 'function' && _egSnailIsCellSlimed(row, col)) {
         showToast(t('eg_snail_slimed_blocked'));
@@ -196,7 +198,7 @@ function isEraseOnRevealedCell(row, col) {
 }
 
 // No-op: with "Protect Marked Cells" enabled, a fill stroke (single click
-// or drag-paint) cannot paint over a cell currently marked with ✕ — whether
+// or drag-paint) cannot paint over a cell currently marked with ✕ - whether
 // the player marked it themselves or it was marked by an item, passive, or
 // ability effect (both share userGrid state 2; systemMarkedGrid only affects
 // styling, not this check).
@@ -317,7 +319,7 @@ function tryAbsorbMistake(row, col) {
 //------------------------------------------------------------------------
 //-------------------REAL MISTAKE CONSEQUENCE HELPERS--------------------
 //------------------------------------------------------------------------
-// These helpers fire after absorption fails — the mistake is real and
+// These helpers fire after absorption fails - the mistake is real and
 // costs the player. Run them in order inside applyRealMistake().
 //------------------------------------------------------------------------
 
@@ -342,7 +344,7 @@ function breakFillStreaksOnMistake() {
 
     if (typeof PassiveTracker !== 'undefined') PassiveTracker.onMistake();
 
-    // Animals no longer flee outright on a real mistake — instead they lose
+    // Animals no longer flee outright on a real mistake - instead they lose
     // remaining time (Browney/Wiener −20 s each, Drifter −5 s)
     if (typeof penalizeRandomWalkersOnMistake === 'function') {
         penalizeRandomWalkersOnMistake();
@@ -396,7 +398,7 @@ function checkGoldenClockAfterMistake() {
         document.getElementById('lose-title').textContent = t('ov_lose');
         document.getElementById('lose-sub').textContent = t('cg_golden_clock_fail');
         document.getElementById('ov-lose').classList.add('show');
-        return true;    // game over — caller must return
+        return true;    // game over - caller must return
     }
     return false;
 }
@@ -444,7 +446,7 @@ function handleWrongFill(row, col) {
     // Try to absorb the mistake with a shield, freeze, class passive, or CI window
     if (tryAbsorbMistake(row, col)) return true;
 
-    // No absorption — apply real penalty and check for game-over
+    // No absorption - apply real penalty and check for game-over
     return applyRealMistake(row, col);
 }
 
@@ -595,7 +597,7 @@ function updateDragStrokeCounter(row, col) {
     // Figure out which axis to measure along.
     let axis = dragAxis;
     if (!axis) {
-        // Still on the start cell / direction not known yet — pick whichever
+        // Still on the start cell / direction not known yet - pick whichever
         // axis has the longer existing run as a best guess.
         const rowRun = _countAdjacentPrefillRun(row, col, 'row');
         const colRun = _countAdjacentPrefillRun(row, col, 'col');
@@ -734,7 +736,7 @@ function applyCell(row, col) {
     if (checkSpecialIntercepts(row, col)) return;
 
     // Cells that are already correctly filled (revealed by an item/skill,
-    // or filled earlier) get skipped by the guard below as a no-op — but
+    // or filled earlier) get skipped by the guard below as a no-op - but
     // they should still count toward the drag-stroke counter as we pass
     // over them.
     if (painting && pval === 1 && userGrid[row][col] === 1) {
@@ -763,7 +765,7 @@ function applyCell(row, col) {
             return;
         }
 
-        // handleWrongFill handled everything — don't fall through to valid-move logic
+        // handleWrongFill handled everything - don't fall through to valid-move logic
         return;
     }
 
@@ -913,7 +915,7 @@ function stopPainting() {
 // Shows or hides the in-game toggle button based on the settings flag.
 // Called on settings change (settings.js) and once on level start.
 // The button hangs below the grid inside #puzzle-scaler-wrap, so showing/
-// hiding it also changes the space the grid needs — re-run the puzzle
+// hiding it also changes the space the grid needs - re-run the puzzle
 // scaling afterwards to keep the toggle clear of the inventory bar.
 function updateTouchpadModeButtonVisibility() {
     const btn = document.getElementById('btn-touchpad-mode');
@@ -935,7 +937,7 @@ function updateTouchpadModeButtonVisibility() {
 }
 
 // Updates the button's text/icon so it always reflects the CURRENT behaviour
-// (not the behaviour you'll switch to) — e.g. while in Mark mode, the button
+// (not the behaviour you'll switch to) - e.g. while in Mark mode, the button
 // reads "MARK" so the player always knows what left-click currently does.
 function _refreshTouchpadModeButtonLabel() {
     const btn = document.getElementById('btn-touchpad-mode');

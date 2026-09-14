@@ -1,16 +1,16 @@
 //  endgame-mod-tables-amulet.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------AMULET MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
-// Amulets are the prestige jewelry slot — they bridge offense and defense.
+// Amulets are the prestige jewelry slot - they bridge offense and defense.
 // They can roll elemental damage, crit, spell damage, and status effect
 // chances alongside the usual life/mana/resist/attribute suffixes.
-// No local armor/evasion/absorption — jewelry never grants those.
+// No local armor/evasion/absorption - jewelry never grants those.
 // Values are slightly higher than earring equivalents to reflect the
 // importance of the slot.
 
@@ -85,7 +85,7 @@ const EG_MOD_TABLE_AMULET = {
         lightning_damage: {
             id: 'lightning_damage',
             label: 'Adds # to @ Lightning Damage', labelDe: 'Fügt # bis @ Blitzschaden hinzu',
-            // Lightning has a wider min/max spread — high variance, high ceiling
+            // Lightning has a wider min/max spread - high variance, high ceiling
             tiers: [
                 { tier: 1, min1: 10, max1: 24, min2: 120, max2: 180, weight: 120, ilvl: 80 },
                 { tier: 2, min1: 6, max1: 16, min2: 76, max2: 118, weight: 250, ilvl: 60 },
@@ -96,7 +96,7 @@ const EG_MOD_TABLE_AMULET = {
         shadow_damage: {
             id: 'shadow_damage',
             label: 'Adds # to @ Shadow Damage', labelDe: 'Fügt # bis @ Schattenschaden hinzu',
-            // Shadow is rarer and slightly lower values — it has strong status effects
+            // Shadow is rarer and slightly lower values - it has strong status effects
             tiers: [
                 { tier: 1, min1: 30, max1: 44, min2: 80, max2: 116, weight: 80, ilvl: 82 },
                 { tier: 2, min1: 18, max1: 28, min2: 50, max2: 78, weight: 180, ilvl: 62 },
@@ -140,6 +140,22 @@ const EG_MOD_TABLE_AMULET = {
             ]
         },
 
+        // --- HEALING POWER ---
+        // The flat support stat, exactly where flat spell_damage sits. Only the
+        // flat half rolls here: the % half is the sigil's and the chest's so
+        // that stacking both halves is a deliberate multi-slot choice.
+        healing_power: {
+            id: 'healing_power',
+            label: '+# to Healing Power', labelDe: '+# zu Heilkraft',
+            tiers: [
+                { tier: 1, min: 40, max: 55, weight: 100, ilvl: 80 },
+                { tier: 2, min: 26, max: 39, weight: 250, ilvl: 60 },
+                { tier: 3, min: 14, max: 25, weight: 500, ilvl: 38 },
+                { tier: 4, min: 5, max: 13, weight: 1000, ilvl: 15 },
+                { tier: 5, min: 1, max: 4, weight: 2000, ilvl: 1 }
+            ]
+        },
+
         // --- PUZZLE / UTILITY ---
         time_added: {
             id: 'time_added',
@@ -153,7 +169,7 @@ const EG_MOD_TABLE_AMULET = {
         mistake_not_count: {
             id: 'mistake_not_count',
             label: '#% Chance for Mistakes to not Count', labelDe: '#% Chance, dass Fehler nicht gewertet werden',
-            // Amulet-exclusive — powerful puzzle utility, kept very rare
+            // Amulet-exclusive - powerful puzzle utility, kept very rare
             tiers: [
                 { tier: 1, min: 12, max: 18, weight: 90, ilvl: 70 },
                 { tier: 2, min: 6, max: 11, weight: 240, ilvl: 40 },
@@ -299,7 +315,7 @@ const EG_MOD_TABLE_AMULET = {
         },
 
         // --- STATUS EFFECT CHANCES ---
-        // These are amulet-flavored — the enchanted pendant channels elemental/shadow power.
+        // These are amulet-flavored - the enchanted pendant channels elemental/shadow power.
         // Values are % chance per hit to apply the status.
         chance_to_ignite: {
             id: 'chance_to_ignite',
@@ -361,7 +377,7 @@ const EG_MOD_TABLE_AMULET = {
         },
         chance_to_convert: {
             id: 'chance_to_convert',
-            // Rarest status — very powerful, shadow-locked, no T5
+            // Rarest status - very powerful, shadow-locked, no T5
             label: '#% Chance to Convert on Hit', labelDe: '#% Chance zur Umwandlung bei Treffer',
             tiers: [
                 { tier: 1, min: 8, max: 12, weight: 50, ilvl: 84 },

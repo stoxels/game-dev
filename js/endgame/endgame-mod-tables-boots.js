@@ -1,8 +1,8 @@
 //  endgame-mod-tables-boots.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------BOOTS MODIFIER TABLE---------------------------------
@@ -10,20 +10,20 @@
 //------------------------------------------------------------------------
 //-------------------BOOTS MODIFIER TABLE---------------------------------
 //------------------------------------------------------------------------
-// Boots are solid, grounded footwear — they are about stability and
+// Boots are solid, grounded footwear - they are about stability and
 // readiness rather than mobility. Their primary defence is armour
 // (hard soles, reinforced toe caps) rather than evasion (that's pants
-// and cloaks). Life values are slightly below pants — boots are a
+// and cloaks). Life values are slightly below pants - boots are a
 // smaller piece. Defences sit at bracer/gloves scale.
 //
 // Boots-exclusive mods:
-//   grounded — when a monster's charge attack lands, there is a chance
+//   grounded - when a monster's charge attack lands, there is a chance
 //              the damage is reduced by a flat amount. Your planted feet
 //              brace the impact. Distinct from block (full negation with
 //              downtime), dodge (full avoidance, random), and armour
-//              (always-on reduction) — grounded only fires on charge
+//              (always-on reduction) - grounded only fires on charge
 //              hits specifically, but the reduction is significant.
-//   first_step — when a monster spawns, it does not charge-up its
+//   first_step - when a monster spawns, it does not charge-up its
 //                attacks for the first # seconds. Your boots give you
 //                an edge against fresh spawns before they find their
 //                footing. A powerful stat that rewards aggressive
@@ -39,7 +39,7 @@ const EG_MOD_TABLE_BOOTS = {
     prefixes: {
 
         // --- LIFE & MANA ---
-        // Slightly below pants scale — boots are a smaller piece.
+        // Slightly below pants scale - boots are a smaller piece.
         flat_health: {
             id: 'flat_health',
             label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
@@ -82,7 +82,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
 
         // --- LOCAL DEFENSES ---
-        // Armour is the boots' primary defence — hard soles and
+        // Armour is the boots' primary defence - hard soles and
         // reinforced construction. Slightly above bracer/gloves scale,
         // below chest/shoulders.
         flat_armour: {
@@ -210,7 +210,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
 
         // --- HYBRID DEFENSES ---
-        // Armour pairs are premium here — boots' primary stat.
+        // Armour pairs are premium here - boots' primary stat.
         hybrid_armour_evasion: {
             id: 'hybrid_armour_evasion',
             label: '+# to Armour\n+@ to Evasion', labelDe: '+# zu Rüstung\n+@ zu Ausweichen',
@@ -254,7 +254,7 @@ const EG_MOD_TABLE_BOOTS = {
         },
 
         // --- BOOTS-EXCLUSIVE: GROUNDED ---
-        // Planted feet brace a monster's charge impact — when a charge
+        // Planted feet brace a monster's charge impact - when a charge
         // attack lands, there is a chance the damage is reduced by a
         // flat amount. Unlike armour (always-on, scales with value) and
         // block (full negation with a recovery downside), grounded is a
@@ -296,7 +296,7 @@ const EG_MOD_TABLE_BOOTS = {
     suffixes: {
 
         // --- ATTRIBUTES ---
-        // Strength is primary for boots — solid, planted, heavy footwear.
+        // Strength is primary for boots - solid, planted, heavy footwear.
         strength: {
             id: 'strength',
             label: '+# to Strength', labelDe: '+# zu Stärke',
@@ -416,7 +416,7 @@ const EG_MOD_TABLE_BOOTS = {
         // --- BOOTS-EXCLUSIVE: FIRST STEP ---
         // Your boots carry you into the fight before enemies have found
         // their footing. When a monster spawns, it does not begin charging
-        // its attacks for the first # seconds — a window to deal damage
+        // its attacks for the first # seconds - a window to deal damage
         // freely before it finds its rhythm. Rewards players who engage
         // aggressively against fresh spawns. Does not stack with multiple
         // boots (only one boot slot), but pairs naturally with grounded
@@ -472,7 +472,7 @@ const EG_MOD_TABLE_BOOTS = {
 
         // --- BOOTS-EXCLUSIVE: MOVEMENT SPEED (PoE-style) ---
         // Flat % increased movement speed for your on-screen avatar.
-        // Affects WASD travel — crucial for dodging
+        // Affects WASD travel - crucial for dodging
         // telegraphed hazards like Fire Walls. PoE values: 10–35% in
         // 5% steps; higher tiers are rarer. Caps at ~35% per boot
         // (only one boot slot, so at most 35%).

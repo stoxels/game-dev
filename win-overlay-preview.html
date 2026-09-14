@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>STOXELS — Win Overlay Layout Preview (dev-only)</title>
+<title>STOXELS - Win Overlay Layout Preview (dev-only)</title>
 <!--
   Dev-only test page (like responsive-preview.html / test-sprite-faces.html).
   NOT linked from the game. Renders a static copy of the #ov-win win overlay
@@ -11,7 +11,7 @@
   same-origin iframes at common device widths so the action-button grid
   (LEVELS | REPLAY over REPLAY (NEW SETUP) | NEXT) can be checked at a glance.
 
-  No game JS is loaded — this page is cheap and never blocks the main thread.
+  No game JS is loaded - this page is cheap and never blocks the main thread.
   Buttons are non-functional here; only layout/styling is under test.
 -->
 <link rel="stylesheet" href="css/base.css">
@@ -34,7 +34,7 @@
 </head>
 <body>
 <div class="rack">
-    <h2>WIN OVERLAY — ACTION BUTTON GRID @ REAL DEVICE WIDTHS</h2>
+    <h2>WIN OVERLAY - ACTION BUTTON GRID @ REAL DEVICE WIDTHS</h2>
     <div class="row" id="frames"></div>
 </div>
 
@@ -90,7 +90,7 @@
         // Normal win state: all buttons + columns visible
         document.getElementById('ov-win').classList.add('show');
     } else {
-        // iframe rack — widths chosen so the ≤640px media query fires inside
+        // iframe rack - widths chosen so the ≤640px media query fires inside
         // the phone frames but not the laptop frame.
         const DEVICES = [
             { name: '1280x800 laptop', w: 1280, h: 800, s: 0.52 },

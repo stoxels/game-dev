@@ -1,21 +1,21 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SWARM (boss_swarm)--------------------------
 //------------------------------------------------------------------------
-// Galaga homage turned living hive: the drones never sit still — the whole
+// Galaga homage turned living hive: the drones never sit still - the whole
 // arena breathes with them.
-//   • SWARM ARC (signature, all fight) — a wedge of 🛸 drones carves a huge
+//   • SWARM ARC (signature, all fight) - a wedge of 🛸 drones carves a huge
 //     arc across the stage; drones trail LAVAL GLOW so the arc edge is the
 //     dodge line, and a hatchling 🐝 splinters off mid-arc to keep cutting.
-//   • MIMIC QUEEN (60%) — four 🛸 drones halt mid-flight and open like
+//   • MIMIC QUEEN (60%) - four 🛸 drones halt mid-flight and open like
 //     flowers to reveal 👑 larvae. One is real, three are mimics: step on
-//     the REAL larva to crush it — royal jelly heals you 15% maxHP (golden
+//     the REAL larva to crush it - royal jelly heals you 15% maxHP (golden
 //     flare + toast). Step on a mimic and it bursts a rancid stink cloud
 //     (mist-green, 12% hit while you stand in it). Larvae sink after 4s.
-//   • HIVE EYE (60%) — the hive blinds you: a probe sweeps from the hive
+//   • HIVE EYE (60%) - the hive blinds you: a probe sweeps from the hive
 //     to your position, then BLOOMS a smoke ring that covers everything
 //     outside its 150px clear hole for ~6s. Two overlapping blooms in
 //     phase 3. Read the ring edge and plan BEFORE the bloom.
-//   • 🐝 THE SWARM SINGULARITY (≤10%, one-shot finale) — every drone
+//   • 🐝 THE SWARM SINGULARITY (≤10%, one-shot finale) - every drone
 //     recalls into a whirling ball of wings; 3 rapid CHARGES from the ball
 //     (stand in the marked gap), then the ball implodes into a funnel of
 //     24 drones you must SLIP BETWEEN. Survive the funnel: the swarm
@@ -152,7 +152,7 @@ function _egMechSwSwarmArc(monster, phase) {
     let hatchling = null;                              // { el, x, y, lead }
     const trails = [];                                 // { x, y, el, age }
     let ang = startAng, arcT = 0, hatchAt = 0.45 + Math.random() * 0.2, hatched = false;
-    _egNkToast('eg_mech_sw_arc', '🛸 The Swarm: SWARM ARC — ride the edge!', '#ffb37a');
+    _egNkToast('eg_mech_sw_arc', '🛸 The Swarm: SWARM ARC - ride the edge!', '#ffb37a');
 
     _egNkLoop(run, (dtS) => {
         arcT += dtS;
@@ -203,7 +203,7 @@ function _egMechSwSwarmArc(monster, phase) {
                 }
             }
         }
-        // Drone body contact (whole wedge) — per-frame check but rate-limited
+        // Drone body contact (whole wedge) - per-frame check but rate-limited
         // by the shared touch cooldown inside _egSwTouch.
         if (pr) {
             for (const d of drones) {
@@ -252,7 +252,7 @@ function _egMechSwMimicQueen(monster, phase) {
         spots.push({ x, y });
     }
     const realIdx = Math.floor(Math.random() * 4);
-    _egNkToast('eg_mech_sw_mimic', '🛸👑 MIMIC QUEEN — crush the REAL larva, mind the mimics!', '#ffd166');
+    _egNkToast('eg_mech_sw_mimic', '🛸👑 MIMIC QUEEN - crush the REAL larva, mind the mimics!', '#ffd166');
     let resolved = false;
     const clouds = [];   // { x, y, el, age }
 
@@ -307,7 +307,7 @@ function _egMechSwMimicQueen(monster, phase) {
                 try { s.host.remove(); } catch (e) {}
                 if (i === realIdx) {
                     // REAL larva crushed: the queen wails and bleeds royal
-                    // jelly — a 15% maxHP heal (the Siren's echo-zone
+                    // jelly - a 15% maxHP heal (the Siren's echo-zone
                     // pattern; no vulnerability hook exists in the damage
                     // path, so the reward is survivability, not DPS).
                     resolved = true;
@@ -315,7 +315,7 @@ function _egMechSwMimicQueen(monster, phase) {
                     const heal = Math.max(1, Math.round(maxHP * EG_SW_LARVA_HEAL));
                     _egSwHeal(heal);
                     _egSwFlareEl(run, s.x, s.y, 'eg-sw-larva-pop', '🍯');
-                    _egNkToast('eg_mech_sw_real', '👑 ROYAL JELLY! +' + heal + ' HP — the queen wails in fury!', '#ffd166');
+                    _egNkToast('eg_mech_sw_real', '👑 ROYAL JELLY! +' + heal + ' HP - the queen wails in fury!', '#ffd166');
                 } else {
                     // Mimic! Stink cloud.
                     const cl = _egNkEl(run, 'div', 'eg-sw-cloud', '☠️');
@@ -351,7 +351,7 @@ function _egSwFlareEl(run, x, y, cls, glyph) {
 // The hive blinds you. A probe 🛸 sweeps from the hive (top centre) to your
 // position, then BLOOMS into a smoke ring: everything outside the 150px
 // clear hole goes dark for ~6s. Two overlapping blooms in phase 3. Plan
-// your position BEFORE the bloom — inside the hole you see everything.
+// your position BEFORE the bloom - inside the hole you see everything.
 const EG_BLOOM_LIFE = 6;        // s the smoke covers the screen
 const EG_BLOOM_HOLE = 150;      // px radius of the clear centre
 
@@ -362,11 +362,11 @@ function _egMechSwHiveEye(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
     const bloomCount = p >= 3 ? 2 : 1;
-    _egNkToast('eg_mech_sw_eye', '🛸👁 HIVE EYE — the probe marks where the dark will bloom!', '#f59e0b');
+    _egNkToast('eg_mech_sw_eye', '🛸👁 HIVE EYE - the probe marks where the dark will bloom!', '#f59e0b');
 
     // ONE single loop drives the whole mechanic: each entry is a bloom in
     // flight or bloomed (a second probe launches ~2.6s after the first in
-    // phase 3 — two overlapping blooms). Critical: _egNkLoop ends the whole
+    // phase 3 - two overlapping blooms). Critical: _egNkLoop ends the whole
     // RUN when any tick returns false, so nested per-bloom loops would kill
     // every other bloom mid-flight.
     const blooms = [];
@@ -402,7 +402,7 @@ function _egMechSwHiveEye(monster, phase) {
                 b.probe.style.left = Math.round(b.sx + (b.tx - b.sx) * ease - 22) + 'px';
                 b.probe.style.top = Math.round(b.sy + (b.ty - b.sy) * ease - 22) + 'px';
                 if (f >= 1) {
-                    // BLOOM: the probe bursts into a covering smoke ring —
+                    // BLOOM: the probe bursts into a covering smoke ring -
                     // everything outside the clear hole goes dark.
                     try { b.probe.remove(); } catch (e) {}
                     b.state = 'bloom';
@@ -463,9 +463,9 @@ function _egMechSwHiveEye(monster, phase) {
 //-------------------THE SWARM SINGULARITY (≤10%, finale)------------------
 //------------------------------------------------------------------------
 // Every drone recalls into a whirling ball of wings. THREE rapid charges
-// from the ball toward your position — each telegraphs a gap in the
+// from the ball toward your position - each telegraphs a gap in the
 // charge line; stand in the gap. Then the ball IMPLODES into a funnel of
-// 24 drones streaming down-screen — you must slip BETWEEN the drone
+// 24 drones streaming down-screen - you must slip BETWEEN the drone
 // streams. Survive the funnel: the swarm scatters, the fight resumes.
 // Charge bar frozen for the whole set-piece (gate in _egTickPlayer via
 // _egSwFinalActive).
@@ -568,7 +568,7 @@ function _egSwFinalStart(monster) {
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_sw_final_cd', '🐝💀 THE SWARM SINGULARITY — find the gap!', '#ffb37a');
+    _egNkToast('eg_mech_sw_final_cd', '🐝💀 THE SWARM SINGULARITY - find the gap!', '#ffb37a');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -649,11 +649,11 @@ function _egSwFinalStart(monster) {
 
     // ── Stage 2: the funnel of drones ────────────────────────────────────
     // ONE loop on the FX run advances every row's drones together (nested
-    // per-row loops would kill the whole run when the first row finished —
+    // per-row loops would kill the whole run when the first row finished -
     // _egNkLoop ends the run whenever ANY tick returns false).
     function _egSwFunnel(gg, mm, lvl) {
         if (gg.finished) return;
-        _egNkToast('eg_mech_sw_funnel', '🐝 THE FUNNEL — slip between the streams!', '#ffb37a');
+        _egNkToast('eg_mech_sw_funnel', '🐝 THE FUNNEL - slip between the streams!', '#ffb37a');
         const hint = document.querySelector('.eg-sw-cd-hint');
         if (hint) hint.textContent = 'SLIP BETWEEN the drone streams!';
         const activeRows = [];
@@ -765,7 +765,7 @@ function _egSwFinalEnd(g, monster) {
         if (m) m.bossImmune = false;
     } catch (e) {}
     if (typeof _egNkToast === 'function') {
-        _egNkToast('eg_mech_sw_scatter', '🛸 THE SWARM SCATTERS — the fight resumes!', '#ffb37a');
+        _egNkToast('eg_mech_sw_scatter', '🛸 THE SWARM SCATTERS - the fight resumes!', '#ffb37a');
     }
     void monster;
 }
@@ -774,7 +774,7 @@ function _egSwFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egSwTeardown() {
     if (_egSwFinal) { try { _egSwFinalEnd(_egSwFinal, null); } catch (e) {} _egSwFinal = null; }
@@ -796,8 +796,8 @@ function _egSwTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_SW_DEBUG.fire('arc'|'mimic'|'eye', phase) — runs one now
-//   _EG_SW_DEBUG.final()                          — SINGULARITY now
+//   _EG_SW_DEBUG.fire('arc'|'mimic'|'eye', phase) - runs one now
+//   _EG_SW_DEBUG.final()                          - SINGULARITY now
 if (typeof window !== 'undefined') {
     window._EG_SW_DEBUG = {
         fire: (name, phase) => {

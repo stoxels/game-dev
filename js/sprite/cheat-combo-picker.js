@@ -7,7 +7,7 @@
 //
 // Entry point: the "CHARACTER LAB" button on the dev mode-select screen.
 // The modal lists all 30 combos grouped by character; each combo shows its
-// menu portrait (images/sprites/<Char>_<variant>.webp — exists for every
+// menu portrait (images/sprites/<Char>_<variant>.webp - exists for every
 // combo) and applies instantly on click:
 //   1. stamps STATE (playerCharacter + playerClass/playerAscendency and
 //      the same skill-level fields the real confirm*Selection() fns set,
@@ -20,7 +20,7 @@
 // Persisting the combo is opt-in via "SAVE INTO CURRENT SLOT" so testers
 // can experiment freely without dirtying their save. Cheats never grant
 // achievements or quest stats (the real confirm*Selection() flows do).
-// Menu-only characters never get class buttons — mirrors the setup flow.
+// Menu-only characters never get class buttons - mirrors the setup flow.
 //------------------------------------------------------------------------
 
 'use strict';
@@ -35,7 +35,7 @@ const _CHAR_LAB_VARIANTS = [
     'outlier', 'actuary', 'recursionist', 'markovian', 'bayesian', 'random_walker',
 ];
 
-// Display names + emoji (label only — defs stay the single source of truth
+// Display names + emoji (label only - defs stay the single source of truth
 // for behaviour; the lab just needs stable pretty labels).
 const _CHAR_LAB_LABELS = {
     stox: 'Stox', trix: 'Trix', syla: 'Syla',
@@ -66,7 +66,7 @@ function _charLabPortraitSrc(charId, variant) {
 }
 
 // Is this combo's directional walk art present on disk (already discovered)?
-// Used for the little art-coverage badge on each combo card — the whole
+// Used for the little art-coverage badge on each combo card - the whole
 // point of the lab is spotting which combos still need art.
 function _charLabArtState(charId, variant) {
     if (typeof _animHasDirectionalWalkSync !== 'function') return '';
@@ -92,7 +92,7 @@ function showCharLab() {
     if (typeof _animWarmCacheFor === 'function') {
         for (const c of _CHAR_LAB_CHARS) for (const v of _CHAR_LAB_VARIANTS) _animWarmCacheFor(c, v);
     }
-    // Art discovery is async — refresh the badges as the cache fills.
+    // Art discovery is async - refresh the badges as the cache fills.
     setTimeout(_charLabRefreshBadges, 1200);
     setTimeout(_charLabRefreshBadges, 3000);
     setTimeout(_charLabRefreshBadges, 6000);
@@ -103,7 +103,13 @@ function closeCharLab() {
     _charLabStopPreview();
 }
 
-// Updates the ◉/○ art badges in place (no grid rebuild — keeps scroll).
+// The one place the directional-walk-art badge text lives, so the rendered
+// grid and the in-place refresh above can never disagree.
+function _charLabArtTip(full) {
+    return full ? 'Directional walk art found' : 'No directional walk art (omni fallback)';
+}
+
+// Updates the ◉/○ art badges in place (no grid rebuild - keeps scroll).
 function _charLabRefreshBadges() {
     document.querySelectorAll('.cl-combo').forEach(b => {
         const badge = b.querySelector('.cl-art');
@@ -111,7 +117,7 @@ function _charLabRefreshBadges() {
         const full = _charLabArtState(b.dataset.char, b.dataset.variant) === 'full';
         badge.className = 'cl-art ' + (full ? 'cl-art-ok' : 'cl-art-missing');
         badge.textContent = full ? '◉' : '○';
-        badge.title = full ? 'Directional walk art found' : 'No directional walk art (omni fallback)';
+        badge.setAttribute('data-tip', _charLabArtTip(full));
     });
 }
 
@@ -126,9 +132,9 @@ function _charLabRenderGrid() {
             const parent = _charLabParentOf(variant);
             const art = _charLabArtState(charId, variant);
             const artBadge = art === 'full'
-                ? '<span class="cl-art cl-art-ok" title="Directional walk art found">◉</span>'
-                : '<span class="cl-art cl-art-missing" title="No directional walk art (omni fallback)">○</span>';
-            const lockedTitle = parent ? ` title="${_CHAR_LAB_LABELS[parent]} ascendency"` : '';
+                ? `<span class="cl-art cl-art-ok" data-tip="${_tipAttr(_charLabArtTip(true))}">◉</span>`
+                : `<span class="cl-art cl-art-missing" data-tip="${_tipAttr(_charLabArtTip(false))}">○</span>`;
+            const lockedTitle = parent ? ` data-tip="${_tipAttr(_CHAR_LAB_LABELS[parent] + ' ascendency')}"` : '';
             html += `
                 <button class="cl-combo" data-char="${charId}" data-variant="${variant}"${lockedTitle}
                         onclick="_charLabApply('${charId}','${variant}')">
@@ -150,7 +156,7 @@ function _charLabRenderGrid() {
 // Applies a combo to STATE exactly like the real selection flows do
 // (same skill-level fields confirmClassSelection/confirmAscendencySelection
 // set), refreshes the animation cache, and updates the live preview.
-// Never persists — "SAVE INTO CURRENT SLOT" does that explicitly.
+// Never persists - "SAVE INTO CURRENT SLOT" does that explicitly.
 function _charLabApply(charId, variant) {
     if (!STATE) return;
     STATE.playerCharacter = charId;
@@ -243,7 +249,7 @@ function _charLabStartWalk() {
         _playAvatarWalkAnimation('charlab-preview-img', _charLabPreview.dir);
     }
     // The game's walk loop auto-returns to idle after ~180ms without
-    // movement — keep re-arming it so the preview walks continuously.
+    // movement - keep re-arming it so the preview walks continuously.
     if (!_charLabPreview.keepAlive) {
         _charLabPreview.keepAlive = setInterval(() => {
             if (!_charLabPreview.walking) return;

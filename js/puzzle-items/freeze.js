@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------FREEZE — TIME FREEZE----------------------
+//-------------------FREEZE - TIME FREEZE----------------------
 //------------------------------------------------------------------------
 
-// freeze — freezes the timer for 2 s and activates a temporary shield.
+// freeze - freezes the timer for 2 s and activates a temporary shield.
 function _useFreeze(id, def) {
     const FREEZE_DURATION_MS = 2000;
 
@@ -26,7 +26,7 @@ function _useFreeze(id, def) {
     }, 1000);
 
     setTimeout(() => {
-        // The Clock's Time Freeze holds the timer for its whole window —
+        // The Clock's Time Freeze holds the timer for its whole window -
         // this item's 2s freeze must never cut that freeze short.
         if (typeof window === 'undefined' || !window._egClockTimeFreezeActive) {
             timerFrozen = false;
@@ -45,7 +45,7 @@ function _useFreeze(id, def) {
 //-------------------ITEM VISUAL EFFECT-----------------------------------
 //------------------------------------------------------------------------
 
-// ❄️ Freeze — icy blizzard creeps in from the edges.
+// ❄️ Freeze - icy blizzard creeps in from the edges.
 // Delegates to the shared blizzard system defined in class.js.
 function _fxFreeze() {
     _startBlizzardEffect(2200);

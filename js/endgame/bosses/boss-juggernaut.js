@@ -2,7 +2,7 @@
 //-------------------BOSS: THE JUGGERNAUT (boss_juggernaut)---------------------
 //------------------------------------------------------------------------
 // Pinnacle momentum: five bull rushes at full gallop, then three thwomps
-// with shortened fuses — sometimes back to back. The arena is never safe,
+// with shortened fuses - sometimes back to back. The arena is never safe,
 // only safer. Keep your feet moving and your eyes up.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

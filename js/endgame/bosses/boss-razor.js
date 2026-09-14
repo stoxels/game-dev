@@ -1,36 +1,36 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE RAZOR (boss_razor)-------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK — "The Whetted Edge". The Metal-Man soul, scaled to an
+// TIER 8 REWORK - "The Whetted Edge". The Metal-Man soul, scaled to an
 // arena: every blade comes back, every line is an edge, and the boss
 // hones its edges on a whetstone you must break before the cast finishes.
 // Element: lightning.
 //
-//   • BLADE CYCLONE (signature, all fight) — a fan of boomerangs flies OUT
+//   • BLADE CYCLONE (signature, all fight) - a fan of boomerangs flies OUT
 //     to the far edge, wheels around, and returns along CURVED arcs that
 //     cross each other on the way home. Dodge the throw, then read the
 //     crossfire of every return path. Phase 3: a second fan launches while
 //     the first is still returning.
-//   • RAZOR WIRE LATTICE (60%) — taut wires snap across the arena (line
+//   • RAZOR WIRE LATTICE (60%) - taut wires snap across the arena (line
 //     hazard, lightning DoT on contact), hold, then SNAP: the cut ends
 //     whip outward and sting anyone still near the line. Path between the
 //     wires, then leave the line before it dies. Phase 3: five wires and
 //     one arrives already taut.
-//   • HONE AND CAST (60%) — the Razor plants a WHETSTONE and hones a GIANT
+//   • HONE AND CAST (60%) - the Razor plants a WHETSTONE and hones a GIANT
 //     BLADE while a grind aura chips anything nearby. Body-check the stone
 //     2× to shatter it (+12% maxHP heal) and cancel the cast; fail and the
 //     giant scythe crosses the whole arena at your row. Phase 3: the scythe
 //     comes back the other way.
-//   • 🪃 A THOUSAND EDGES (≤10%, one-shot finale) — a clock of nine razor
+//   • 🪃 A THOUSAND EDGES (≤10%, one-shot finale) - a clock of nine razor
 //     spokes rotates around the arena centre; the gaps between spokes are
 //     safe, but the clock REVERSES every few seconds and rim fans shave
 //     across the middle each time. Survive three cycles and the blades
-//     condense into THE LAST EDGE — one full-screen scythe with a single
+//     condense into THE LAST EDGE - one full-screen scythe with a single
 //     safe pocket: the whetstone's grind aura. The safe zone chips you for
 //     standing in it. Knife-edge, literally. Charge bar frozen (gate in
 //     _egTickPlayer via _egRzrFinalActive).
 //
-// Shared soul kept: probability_shift still turns the puzzle's clues —
+// Shared soul kept: probability_shift still turns the puzzle's clues -
 // fitting for a boss about angles and deflection. clue_scramble retired
 // (its pressure lives in the wires you must path around).
 //
@@ -61,7 +61,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_razor — "The Whetted Edge" (rework)
+    // boss_razor - "The Whetted Edge" (rework)
     // Phase 1 (100% → 60%): Blade Cyclone + Probability Shift
     // Phase 2 ( 60% → 30%): immune window; Razor Wire Lattice + Hone and
     //                        Cast join
@@ -93,7 +93,7 @@ const EG_RZR_TOUCH_CD_MS = 700;      // shared touch cooldown
 //-------------------SHARED VISUAL HELPERS---------------------------------
 //------------------------------------------------------------------------
 
-// Touch damage helper shared by all Razor hazards. Lightning-element boss —
+// Touch damage helper shared by all Razor hazards. Lightning-element boss -
 // hits go in with element 'lightning' so the toast palette stays yellow.
 let _egRzrHitCd = 0;
 function _egRzrTouch(pct, level, label) {
@@ -141,7 +141,7 @@ function _egMechRzrCyclone(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_rzr_cyclone', '🪃 BLADE CYCLONE — the fan flies out and comes back CROSSING! Read the return arcs!', '#fde047');
+    _egNkToast('eg_mech_rzr_cyclone', '🪃 BLADE CYCLONE - the fan flies out and comes back CROSSING! Read the return arcs!', '#fde047');
 
     const ax = W * 0.85, ay = H * 0.5;
     const anchor = _egNkEl(run, 'div', 'eg-nk-dot eg-rzr-anchor', '🪃');
@@ -217,7 +217,7 @@ function _egMechRzrCyclone(monster, phase) {
         if (p >= 3 && !wave2 && blades.length && blades.every(b => b.leg === 'back' || b.leg === 'done')) {
             wave2 = true;
             throwFan();
-            _egNkToast('eg_mech_rzr_cyclone2', '🪃 SECOND FAN — the returns cross the new throws!', '#fde047');
+            _egNkToast('eg_mech_rzr_cyclone2', '🪃 SECOND FAN - the returns cross the new throws!', '#fde047');
         }
 
         return pending;
@@ -228,7 +228,7 @@ function _egMechRzrCyclone(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------ACT II: RAZOR WIRE LATTICE (60%)----------------------
 //------------------------------------------------------------------------
-// Taut wires snap across the arena, hold, then SNAP — the cut ends whip
+// Taut wires snap across the arena, hold, then SNAP - the cut ends whip
 // outward and sting anyone still near the line. Phase 3: five wires, one
 // arrives already taut.
 const EG_RZR_WIRE_N     = [0, 0, 3, 5];  // wires per cast, by phase
@@ -246,7 +246,7 @@ function _egMechRzrWires(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_rzr_wires', '🪃 RAZOR WIRES — the arena is strung taut. Path between them, then LEAVE the line!', '#fde047');
+    _egNkToast('eg_mech_rzr_wires', '🪃 RAZOR WIRES - the arena is strung taut. Path between them, then LEAVE the line!', '#fde047');
 
     const n = EG_RZR_WIRE_N[p];
     const wires = [];
@@ -351,7 +351,7 @@ function _egMechRzrHone(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_rzr_hone', '🪃 HONE AND CAST — the whetstone grinds a GIANT BLADE. Smash the stone to cancel it!', '#fde047');
+    _egNkToast('eg_mech_rzr_hone', '🪃 HONE AND CAST - the whetstone grinds a GIANT BLADE. Smash the stone to cancel it!', '#fde047');
 
     // Plant the whetstone away from the player.
     const pc0 = _egRzrPC();
@@ -373,7 +373,7 @@ function _egMechRzrHone(monster, phase) {
     grind.style.height = (EG_RZR_GRIND_R * 2) + 'px';
 
     const state = { honed: false, shattered: false, hp: EG_RZR_STONE_HP, lastHit: 0, scythes: 0, scythesTotal: p >= 3 ? 2 : 1, bandY: 0, axis: 'h', dir: 1 };
-    let honeT = 0;   // run.born is not part of the run contract — time it here
+    let honeT = 0;   // run.born is not part of the run contract - time it here
     const honeMs = EG_RZR_HONE_MS[p] * _EG_RZR_DEBUG_MULT;
 
     _egNkLoop(run, (dtS, now) => {
@@ -402,7 +402,7 @@ function _egMechRzrHone(monster, phase) {
                 state.shattered = true;
                 stone.classList.add('eg-rzr-stone-shattered');
                 _egRzrHeal(_egNkMaxHP() * EG_RZR_HEAL_CANCEL);
-                _egNkToast('eg_mech_rzr_stone', '🪃🪨 WHETSTONE SHATTERED — the cast is cancelled! (+heal)', '#4ade80');
+                _egNkToast('eg_mech_rzr_stone', '🪃🪨 WHETSTONE SHATTERED - the cast is cancelled! (+heal)', '#4ade80');
             }
         }
 
@@ -411,7 +411,7 @@ function _egMechRzrHone(monster, phase) {
             state.honed = true;
             stone.classList.add('eg-rzr-stone-dim');
             grind.classList.add('eg-rzr-grind-done');
-            _egNkToast('eg_mech_rzr_scythe', '🪃 THE GIANT SCYTHE is honed — the arena is its path!', '#f97316');
+            _egNkToast('eg_mech_rzr_scythe', '🪃 THE GIANT SCYTHE is honed - the arena is its path!', '#f97316');
             // Lock the sweep band to your current position, alternating axis.
             state.axis = state.scythes % 2 === 0 ? 'h' : 'v';
             state.dir = state.scythes % 2 === 0 ? 1 : -1;
@@ -479,7 +479,7 @@ function _egMechRzrHone(monster, phase) {
 // A clock of nine razor spokes rotates around the arena centre; the gaps
 // are safe but the clock REVERSES every few seconds and rim fans shave
 // across the middle each reversal. Survive three cycles and the blades
-// condense into THE LAST EDGE — one full-screen scythe with a single safe
+// condense into THE LAST EDGE - one full-screen scythe with a single safe
 // pocket: the whetstone's grind aura (which chips you while you stand in
 // it). Charge bar frozen (gate in _egTickPlayer via _egRzrFinalActive).
 const EG_RZR_SPOKES      = 9;       // spokes on the clock
@@ -578,11 +578,11 @@ function _egRzrFinalStart(monster) {
     ov.className = 'eg-rzr-cd';
     ov.innerHTML =
         '<div class="eg-rzr-cd-label">🪃 A THOUSAND EDGES</div>' +
-        '<div class="eg-rzr-cd-hint">Walk WITH the spoke clock — it REVERSES, and every reversal shaves a fan across the middle. Survive three cycles for THE LAST EDGE: only the whetstone\u2019s grind aura is safe, and it CHIPS you to stand there!</div>';
+        '<div class="eg-rzr-cd-hint">Walk WITH the spoke clock - it REVERSES, and every reversal shaves a fan across the middle. Survive three cycles for THE LAST EDGE: only the whetstone\u2019s grind aura is safe, and it CHIPS you to stand there!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_rzr_final_cd', '🪃💀 A THOUSAND EDGES — walk the spoke clock. It reverses!', '#fde047');
+    _egNkToast('eg_mech_rzr_final_cd', '🪃💀 A THOUSAND EDGES - walk the spoke clock. It reverses!', '#fde047');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -608,7 +608,7 @@ function _egRzrFinalStart(monster) {
     }
 
     // One rim fan: blades cross the arena through the centre region. Each
-    // blade gets its own run (never share a run across _egNkLoop calls —
+    // blade gets its own run (never share a run across _egNkLoop calls -
     // the second registration would overwrite the first loop's raf handle).
     const rimFan = () => {
         if (g.finished) return;
@@ -638,12 +638,12 @@ function _egRzrFinalStart(monster) {
         if (g.finished) return;
         g.cycle++;
         if (g.cycle > EG_RZR_CYCLES) { runLastEdge(); return; }
-        _egNkToast('eg_mech_rzr_wave', '🪃 EDGE CYCLE ' + g.cycle + '/' + EG_RZR_CYCLES + ' — keep walking with the clock!', '#fde047');
+        _egNkToast('eg_mech_rzr_wave', '🪃 EDGE CYCLE ' + g.cycle + '/' + EG_RZR_CYCLES + ' - keep walking with the clock!', '#fde047');
 
         _egRzrAfter(g, (EG_RZR_CYCLE_MS / 2) * _EG_RZR_DEBUG_MULT, () => {
             if (g.finished) return;
             g.dir *= -1;
-            _egNkToast('eg_mech_rzr_reverse', '🪃 REVERSE — the clock spins the other way!', '#f97316');
+            _egNkToast('eg_mech_rzr_reverse', '🪃 REVERSE - the clock spins the other way!', '#f97316');
             rimFan();
             _egRzrAfter(g, (EG_RZR_CYCLE_MS / 2) * _EG_RZR_DEBUG_MULT, () => {
                 if (g.finished) return;
@@ -654,10 +654,10 @@ function _egRzrFinalStart(monster) {
         });
     };
 
-    // ── THE LAST EDGE: one scythe, one safe pocket — the grind aura. ─────
+    // ── THE LAST EDGE: one scythe, one safe pocket - the grind aura. ─────
     const runLastEdge = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_rzr_last_edge', '🪃💀 THE LAST EDGE — every blade condenses! The whetstone\u2019s aura is the ONLY safe ground — and it chips you!', '#f97316');
+        _egNkToast('eg_mech_rzr_last_edge', '🪃💀 THE LAST EDGE - every blade condenses! The whetstone\u2019s aura is the ONLY safe ground - and it chips you!', '#f97316');
         // Plant the pocket away from the edges.
         let px = W * 0.5, py = H * 0.5;
         for (let tries = 0; tries < 24; tries++) {
@@ -765,7 +765,7 @@ function _egRzrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egRzrTeardown() {
     if (_egRzrFinal) { try { _egRzrFinalEnd(_egRzrFinal, null); } catch (e) {} _egRzrFinal = null; }
@@ -786,8 +786,8 @@ function _egRzrTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_RZR_DEBUG.fire('cyclone'|'wires'|'hone', phase) — runs one now
-//   _EG_RZR_DEBUG.final()                               — A THOUSAND EDGES now
+//   _EG_RZR_DEBUG.fire('cyclone'|'wires'|'hone', phase) - runs one now
+//   _EG_RZR_DEBUG.final()                               - A THOUSAND EDGES now
 if (typeof window !== 'undefined') {
     window._EG_RZR_DEBUG = {
         fire: (name, phase) => {

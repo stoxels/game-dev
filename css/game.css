@@ -24,7 +24,7 @@
     overflow-y: visible;
 }
 
-/* The table itself does not scroll — scrolling is handled by the wrapper above */
+/* The table itself does not scroll - scrolling is handled by the wrapper above */
 .ptable-scroll {
     overflow-x: visible;
 }
@@ -85,7 +85,7 @@
     gap: 8px;
 }
 
-/* Timer block — now a normal grid child (grid-area: clock) instead of
+/* Timer block - now a normal grid child (grid-area: clock) instead of
    position:absolute, so the layout always reserves real space for it
    and it can never sit on top of the score/level buttons again. */
 .game-meta-clock {
@@ -177,7 +177,7 @@
         max-width: clamp(140px, 30vw, 400px);
     }
 
-/* Standalone bonus sidebar (legacy/fallback — kept in normal flow, not fixed) */
+/* Standalone bonus sidebar (legacy/fallback - kept in normal flow, not fixed) */
 .bonus-sidebar {
     position: static;
     display: flex;
@@ -291,25 +291,25 @@ td.corner {
     text-shadow: 0px 0px 0 rgba(0,0,0,0.85), 0px 0px 0 rgba(0,0,0,0.85), 0px 1px 0 rgba(0,0,0,0.85), 1px 1px 0 rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.6);
 }
 
-/* Applied when a row/column is fully solved — strikes out the clue numbers */
+/* Applied when a row/column is fully solved - strikes out the clue numbers */
 .clue-done {
     text-decoration: line-through;
     opacity: 0.45;
 }
 
 /*small effect on row and col clue numbers if that specific row or col has been fully solved*/
-/* Base solved state — fires once, on a single host cell per row/col */
+/* Base solved state - fires once, on a single host cell per row/col */
 /*small effect on row and col clue numbers if that specific row or col has been fully solved*/
-/* Persistent glow wash — applied to every cell in the box. Plain, non-
+/* Persistent glow wash - applied to every cell in the box. Plain, non-
    animated background so it never fights the hover highlight cascade
    (an animated property, even after finishing with forwards, permanently
-   outranks a normal declaration on that property — that was the bug). */
+   outranks a normal declaration on that property - that was the bug). */
 .rct.clue-line-solved,
 .cch.clue-line-solved {
     background: rgba(102, 252, 241, 0.12);
 }
 
-/* One-time explosion — plays on a single host cell only, via pseudo-
+/* One-time explosion - plays on a single host cell only, via pseudo-
    elements exclusively. Nothing here ever touches the cell's own
    `background`, so hover keeps working normally on that cell too. */
 .clue-line-solved-fx {
@@ -341,7 +341,7 @@ td.corner {
         animation: clue-particle-burst 0.5s ease-out forwards;
     }
 
-/* Cell scale-pop — transform only, never background, so it can't shadow
+/* Cell scale-pop - transform only, never background, so it can't shadow
    the hover rule the way the old version did. */
 @keyframes clue-solve-scale {
     0% {
@@ -392,7 +392,7 @@ td.corner {
     ------------------------------------------------------------------------
 */
 
-/* Base cell style — every grid cell starts here */
+/* Base cell style - every grid cell starts here */
 .gc {
     border: 1px solid var(--cell-border);
     background: var(--cell-empty);
@@ -428,7 +428,7 @@ td.corner {
         font-family: var(--F);
     }
 
-    /* User-placed cross — dim red, indicating "I think this is empty" */
+    /* User-placed cross - dim red, indicating "I think this is empty" */
     .gc.marked::after {
         color: rgba(255, 69, 69, .55);
     }
@@ -456,7 +456,7 @@ td.corner {
             line-height: 1;
         }
 
-    /* ----- Wrong mark — cell filled incorrectly ----- */
+    /* ----- Wrong mark - cell filled incorrectly ----- */
 
     .gc.wrong-mark {
         background: var(--cell-wrong-bg);
@@ -541,7 +541,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     transition: outline 0.1s;
 }
 
-/* ----- Cursed item — blackout clue numbers ----- */
+/* ----- Cursed item - blackout clue numbers ----- */
 
 /* Wrapper that positions the black overlay over a clue number */
 .clue-blackout {
@@ -719,7 +719,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     animation: glimpse-fadein 0.4s ease;
 }
 
-    /* Hidden state — toggled by JS when there is no text to show.
+    /* Hidden state - toggled by JS when there is no text to show.
        Uses visibility instead of display:none so the bar keeps reserving
        its vertical space; otherwise the grid would jump upwards when the
        glimpse timer expires. */
@@ -733,7 +733,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     flex-shrink: 0;
 }
 
-/* The flavour text itself — truncates with ellipsis if too long */
+/* The flavour text itself - truncates with ellipsis if too long */
 .completion-glimpse-text {
     font-style: italic;
     opacity: 0.9;
@@ -812,7 +812,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-    /* Visible state — toggled by JS */
+    /* Visible state - toggled by JS */
     .char-speech-bubble.show {
         opacity: 1;
         transform: translate(0, 0) scale(1);
@@ -986,14 +986,14 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         padding: 2px 6px;
         pointer-events: none;
         /* Long level names must never run into the timer on the left side.
-           The cap only bites on narrow viewports — every known level name is
+           The cap only bites on narrow viewports - every known level name is
            far shorter than 52vw on desktop, so full-screen play is unchanged. */
         max-width: min(52vw, 480px);
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-/* Vertical zoom control — buttons top/bottom, fill bar in between */
+/* Vertical zoom control - buttons top/bottom, fill bar in between */
 .zoom-bar {
     display: flex;
     flex-direction: column;
@@ -1027,7 +1027,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
         transform: scale(0.92);
     }
 
-/* Track the fill bar climbs — bottom = min zoom, top = max zoom */
+/* Track the fill bar climbs - bottom = min zoom, top = max zoom */
 .zoom-track {
     position: relative;
     width: 6px;
@@ -1075,7 +1075,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
 
 
 
-/* Compact "return to levels" button — same stone/X visual as the
+/* Compact "return to levels" button - same stone/X visual as the
    settings modal's close button (.settings-box .modal-close), just
    smaller and living in the gameplay corner HUD instead of a modal. */
 .hud-corner-btn {
@@ -1125,7 +1125,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     ------------------------------------------------------------------------
 */
 
-/* Full-screen wrapper — sits above the puzzle, below modals/overlays */
+/* Full-screen wrapper - sits above the puzzle, below modals/overlays */
 .low-time-vignette {
     position: fixed;
     inset: 0;
@@ -1173,18 +1173,18 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     background: linear-gradient(to left, rgba(102, 204, 255, 0.55), rgba(102, 204, 255, 0));
 }
 
-/* ----- Tier 1: ≤ 10 minutes — subtle, static ----- */
+/* ----- Tier 1: ≤ 10 minutes - subtle, static ----- */
 .low-time-vignette.ltv-tier1 .ltv-edge {
     opacity: 0.35;
 }
 
-/* ----- Tier 2: ≤ 5 minutes — stronger, slow pulse ----- */
+/* ----- Tier 2: ≤ 5 minutes - stronger, slow pulse ----- */
 .low-time-vignette.ltv-tier2 .ltv-edge {
     opacity: 0.6;
     animation: ltv-pulse 2.2s ease-in-out infinite;
 }
 
-/* ----- Tier 3: ≤ 2 minutes — strongest, fast urgent pulse ----- */
+/* ----- Tier 3: ≤ 2 minutes - strongest, fast urgent pulse ----- */
 .low-time-vignette.ltv-tier3 .ltv-edge {
     opacity: 0.85;
     animation: ltv-pulse 1s ease-in-out infinite;
@@ -1219,7 +1219,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     ------------------------------------------------------------------------
 */
 
- /* Full-screen wrapper — red edge glow when player health is low (sits above timer vignette so both can be visible simultaneously) */
+ /* Full-screen wrapper - red edge glow when player health is low (sits above timer vignette so both can be visible simultaneously) */
 .low-health-vignette {
     position: fixed;
     inset: 0;
@@ -1266,7 +1266,7 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     background: linear-gradient(to left, rgba(200, 20, 20, 0.55), rgba(200, 20, 20, 0));
 }
 
-/* ----- Single tier: ≤ 35% HP — pulsing warning ----- */
+/* ----- Single tier: ≤ 35% HP - pulsing warning ----- */
 .low-health-vignette.lhv-active .lhv-edge {
     opacity: 0.7;
     animation: lhv-pulse 1.5s ease-in-out infinite;

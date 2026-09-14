@@ -1,5 +1,5 @@
 ﻿/* =========================================================
-   MAP VIEW TOPBAR — css/map-view-topbar.css
+   MAP VIEW TOPBAR - css/map-view-topbar.css
    =========================================================
    Dedicated stylesheet for the redesigned top bar of the
    Map View level-selection screen ONLY.
@@ -10,11 +10,11 @@
    RESPONSIVE STRATEGY (matches title-screen.css / setup-screen.css /
    character-select.css):
      - Every size (fonts, block dimensions, gaps) uses clamp() so the
-       whole bar scales continuously as the window shrinks — no sudden
+       whole bar scales continuously as the window shrinks - no sudden
        jumps between breakpoints.
      - The "SELECT LEVEL" title used to be position:absolute, centered
        on top of the flex row. That's what caused it to overlap the
-       other buttons at smaller widths — it wasn't part of the flex
+       other buttons at smaller widths - it wasn't part of the flex
        layout at all, so nothing made room for it. It is now a normal
        flex child (flex: 1 1 ...), so the row always reserves space
        for it and it can never sit on top of anything else again.
@@ -33,13 +33,13 @@
      - Inference-Block.png
      - Probability-Tree-Block.png
 
-   NOTE: class-status.png is no longer used — the class status
+   NOTE: class-status.png is no longer used - the class status
    span (#mv-class-status) has been removed from the topbar HTML.
    ========================================================= */
 
 
 /* ---------------------------------------------------------
-   1. TOPBAR ROOT — flex row that wraps once it runs out of room
+   1. TOPBAR ROOT - flex row that wraps once it runs out of room
    --------------------------------------------------------- */
 
 #screen-map-view .ls-topbar,
@@ -51,13 +51,13 @@
     row-gap: clamp(4px, 1vw, 8px);
     /* Seamless stone tile (cut + seam-fixed from the original full-screen
        background art by tools_make_tile.py). The original 668x373 image is a
-       vignetted screen background with fully transparent side margins — tiled
+       vignetted screen background with fully transparent side margins - tiled
        with repeat-x it produced a hard transparent seam every 668px (visible
        as vertical texture breaks across the bar). The 578x140 tile uses a
-       natural-match wrap window (no edge morphing — the first attempt's 40px
+       natural-match wrap window (no edge morphing - the first attempt's 40px
        ramp sheared the cracks into horizontal streaks), so the wrap boundary
        is invisible and the stone stays sharp edge to edge. */
-    background-color: #4f485c; /* tile mean — paints during image load */
+    background-color: #4f485c; /* tile mean - paints during image load */
     background-image: url('../images/Level_Select_Topbar/topbar-stone-tile2.webp');
     background-size: auto 100%;
     background-repeat: repeat-x;
@@ -72,7 +72,7 @@
 
 
 /* ---------------------------------------------------------
-   2. SETUP (back) BUTTON — the unified .back-btn stone slab (base.css).
+   2. SETUP (back) BUTTON - the unified .back-btn stone slab (base.css).
       The topbar only shrinks the slab a little to fit the bar height.
    --------------------------------------------------------- */
 
@@ -145,7 +145,7 @@
     line-height: 1.35;
 }
 
-/* Line 1 — total score (e.g. "TOTAL: 2939") */
+/* Line 1 - total score (e.g. "TOTAL: 2939") */
 #screen-map-view #mv-ls-score,
 #screen-world-detail #wd-ls-score {
     font-size: clamp(9px, 1.3vw, 15px);
@@ -155,7 +155,7 @@
     letter-spacing: 1px;
 }
 
-/* Line 2 — points to next code */
+/* Line 2 - points to next code */
 #screen-map-view #mv-ls-pts-next,
 #screen-world-detail #wd-ls-pts-next {
     font-size: clamp(7px, 1vw, 11px);
@@ -166,7 +166,7 @@
 
 
 /* ---------------------------------------------------------
-   5. TITLE BANNER — a normal flex child now (NOT absolute),
+   5. TITLE BANNER - a normal flex child now (NOT absolute),
    so the row always reserves room for it and it can never
    overlap the buttons on either side, at any width.
    --------------------------------------------------------- */
@@ -188,7 +188,7 @@
        previously squashed into a thin strip with huge invisible transparent
        padding). Stretch the plaque over the FULL topbar height: the bar's
        height is portrait (clamp 56-100px) + 2x padding, so size the title to
-       exactly that and pull it out over the padding with negative margins —
+       exactly that and pull it out over the padding with negative margins -
        the texture then touches the bar's top edge and bottom border. */
     background: url('../images/Level_Select_Topbar/banner-title-plaque.webp') center / 100% 100% no-repeat;
     height: calc(clamp(56px, 8vw, 100px) + 2 * clamp(4px, 1vw, 6px));
@@ -216,6 +216,7 @@
     align-items: center;
     gap: clamp(4px, 1vw, 6px);
     flex-shrink: 1;
+    min-width: 0; /* let the group shrink instead of wrapping to row 2 */
     flex-wrap: wrap;
     justify-content: flex-end;
 }
@@ -233,6 +234,7 @@
     line-height: 1.4;
     cursor: help;
     flex-shrink: 1;
+    max-width: 170px; /* two short lines max - keeps the one-row budget */
     text-shadow: 1px 1px 2px #000;
 }
 
@@ -242,22 +244,29 @@
     }
 
 /*
-   Inference + Probability Tree buttons
-   Both use their stone-block background images.
+   Inference + Probability Tree + Spellbook buttons
+   All use their stone-block background images.
    Text is pushed to the BOTTOM so the icon graphic at the top
    of each image stays visible.
+   Spellbook shares the Inference block art (open book icon) -
+   the tree block stays exclusive to TREE.
 */
 #screen-map-view #mv-btn-quest-log,
 #screen-world-detail #wd-btn-quest-log,
+#screen-map-view #mv-btn-spellbook,
+#screen-world-detail #wd-btn-spellbook,
 #screen-map-view #mv-btn-passive-tree,
 #screen-world-detail #wd-btn-passive-tree {
     font-family: var(--PX, monospace);
-    font-size: clamp(7px, 0.9vw, 10px);
+    font-size: clamp(7px, 0.85vw, 10px);
     letter-spacing: 1px;
     color: #f0d090; /* warm gold-cream, visible on dark stone */
 
     border: none !important;
-    width: clamp(70px, 11vw, 200px);
+    /* Compact enough that status + 3 blocks + back/portrait/ribbon/title
+       all fit ONE row on desktop - at 11vw/200px the added Spellbook button
+       pushed the whole right group onto a second row (double-height bar). */
+    width: clamp(56px, 8vw, 140px);
     height: auto;
     aspect-ratio: 2.5 / 1;
     box-sizing: border-box;
@@ -274,8 +283,11 @@
     transition: filter 0.15s;
 }
 
+/* Inference and Spellbook share the open-book block art. */
 #screen-map-view #mv-btn-quest-log,
-#screen-world-detail #wd-btn-quest-log {
+#screen-world-detail #wd-btn-quest-log,
+#screen-map-view #mv-btn-spellbook,
+#screen-world-detail #wd-btn-spellbook {
     background: url('../images/Level_Select_Topbar/Inference-Block.webp') center / 100% 100% no-repeat;
 }
 
@@ -287,6 +299,8 @@
 
     #screen-map-view #mv-btn-quest-log:hover,
     #screen-world-detail #wd-btn-quest-log:hover,
+    #screen-map-view #mv-btn-spellbook:hover,
+    #screen-world-detail #wd-btn-spellbook:hover,
     #screen-map-view #mv-btn-passive-tree:hover,
     #screen-world-detail #wd-btn-passive-tree:hover {
         filter: brightness(1.25);
@@ -328,7 +342,7 @@
    --------------------------------------------------------- */
 
 /* Below this width there isn't room for the title AND every
-   button on one line even with clamp() shrinking them — force
+   button on one line even with clamp() shrinking them - force
    the title onto its own full-width row, everything else wraps
    into the row(s) beneath it. */
 @media (max-width: 760px) {
@@ -351,7 +365,7 @@
     }
 }
 
-/* Very small phones — shrink the two big square buttons and the
+/* Very small phones - shrink the two big square buttons and the
    ribbon further so nothing wraps to a third/fourth row. */
 @media (max-width: 480px) {
 
@@ -364,6 +378,8 @@
 
     #screen-map-view #mv-btn-quest-log,
     #screen-world-detail #wd-btn-quest-log,
+    #screen-map-view #mv-btn-spellbook,
+    #screen-world-detail #wd-btn-spellbook,
     #screen-map-view #mv-btn-passive-tree,
     #screen-world-detail #wd-btn-passive-tree {
         width: clamp(52px, 18vw, 90px);

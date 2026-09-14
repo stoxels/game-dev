@@ -25,7 +25,7 @@ let _puzzleColWidth = 0; // px width of a puzzle column
 //------------------------------------------------------------------------
 
 
-// clues(line) — converts a single row or column of solution values into
+// clues(line) - converts a single row or column of solution values into
 //   the nonogram clue array for that line.
 //   A "clue" is the count of each consecutive run of filled cells (1s).
 //
@@ -56,7 +56,7 @@ function clues(line) {
 }
 
 
-// _computeRowClues — returns the clue array for every row of the solution.
+// _computeRowClues - returns the clue array for every row of the solution.
 //   Shared by buildGrid() and updClues() so the run-length pass over the
 //   solution isn't duplicated in both places.
 function _computeRowClues(sol) {
@@ -64,7 +64,7 @@ function _computeRowClues(sol) {
 }
 
 
-// _computeColClues — returns the clue array for every column of the solution.
+// _computeColClues - returns the clue array for every column of the solution.
 //   Mirrors _computeRowClues() but transposes each column into a line first.
 function _computeColClues(sol) {
     const cols = sol[0].length;
@@ -80,7 +80,7 @@ function _computeColClues(sol) {
 //------------------------------------------------------------------------
 
 
-// _calcCellSize — returns the pixel width/height for a single puzzle cell
+// _calcCellSize - returns the pixel width/height for a single puzzle cell
 //   based on the largest grid dimension, so smaller puzzles get bigger cells
 //   and larger puzzles shrink to fit within a ~700px budget.
 function _calcCellSize(maxDim) {
@@ -92,7 +92,7 @@ function _calcCellSize(maxDim) {
 }
 
 
-// _calcFontSize — returns the clue number font size (px) scaled to the grid.
+// _calcFontSize - returns the clue number font size (px) scaled to the grid.
 //   Follows the same breakpoints as _calcCellSize so clue text fits neatly
 //   inside the clue header columns.
 function _calcFontSize(maxDim) {
@@ -104,7 +104,7 @@ function _calcFontSize(maxDim) {
 }
 
 
-// _calcClueColWidth — returns the px width of a clue/corner column for a
+// _calcClueColWidth - returns the px width of a clue/corner column for a
 //   given font size. Shared by the colgroup sizing, row-clue cell
 //   positioning, and the row-clue side-toggle rebuild, so the "+7" padding
 //   constant only lives in one place.
@@ -121,15 +121,15 @@ function _calcClueColWidth(fontSize) {
 //------------------------------------------------------------------------
 
 
-// _buildColgroup — returns the <colgroup> HTML string that sets column widths.
+// _buildColgroup - returns the <colgroup> HTML string that sets column widths.
 //   In adjacency matrix mode the row-clue columns are suppressed entirely,
 //   so only the puzzle data columns are emitted.
 //
-//   maxRowWidth  — number of clue columns needed on the left (for row clues)
-//   cols         — number of puzzle data columns
-//   cellSize     — px width for each puzzle column
-//   fontSize     — px font size (used to derive row-clue column width)
-//   isAdjMatrix  — when true, skip row-clue columns
+//   maxRowWidth  - number of clue columns needed on the left (for row clues)
+//   cols         - number of puzzle data columns
+//   cellSize     - px width for each puzzle column
+//   fontSize     - px font size (used to derive row-clue column width)
+//   isAdjMatrix  - when true, skip row-clue columns
 function _buildColgroup(maxRowWidth, cols, cellSize, fontSize, isAdjMatrix) {
     let html = `<colgroup>`;
 
@@ -144,15 +144,15 @@ function _buildColgroup(maxRowWidth, cols, cellSize, fontSize, isAdjMatrix) {
 }
 
 
-// _buildColClueHeaderRows — returns the HTML for all column-clue header rows
+// _buildColClueHeaderRows - returns the HTML for all column-clue header rows
 //   that sit above the puzzle grid.  Each column's clue numbers are stacked
 //   vertically; shorter clue lists are bottom-aligned via an offset (off).
 //
-//   colClues     — array of clue arrays, one per column
-//   maxColDepth  — tallest column clue (number of header rows needed)
-//   maxRowWidth  — number of corner cells to pad the left side
-//   cols         — number of puzzle columns
-//   fontSize     — px font size for clue numbers
+//   colClues     - array of clue arrays, one per column
+//   maxColDepth  - tallest column clue (number of header rows needed)
+//   maxRowWidth  - number of corner cells to pad the left side
+//   cols         - number of puzzle columns
+//   fontSize     - px font size for clue numbers
 function _buildColClueHeaderRows(colClues, maxColDepth, maxRowWidth, cols, fontSize) {
     let html = '';
 
@@ -180,16 +180,16 @@ function _buildColClueHeaderRows(colClues, maxColDepth, maxRowWidth, cols, fontS
 }
 
 
-// _buildRowClueCell — returns the HTML for a single sticky row-clue <td>.
+// _buildRowClueCell - returns the HTML for a single sticky row-clue <td>.
 //   Each clue number in the row gets its own cell, positioned with CSS sticky
 //   so it remains visible during horizontal scroll.
 //
-//   row      — row index
-//   clueIdx  — index of this clue number within the row's clue array
-//   padLeft  — number of empty corner cells to the left of this cell
-//   value    — the clue number to display
-//   fontSize — px font size
-//   colWidth — px width of each row-clue column (see _calcClueColWidth)
+//   row      - row index
+//   clueIdx  - index of this clue number within the row's clue array
+//   padLeft  - number of empty corner cells to the left of this cell
+//   value    - the clue number to display
+//   fontSize - px font size
+//   colWidth - px width of each row-clue column (see _calcClueColWidth)
 function _buildRowClueCell(row, clueIdx, padLeft, value, fontSize, colWidth) {
     const leftPx = (padLeft + clueIdx) * colWidth;
     return `<td class="rct rct-${row}${window._shadowSealActive ? ' clue-blackout' : ''}" id="rct-${row}-${clueIdx}"` +
@@ -199,14 +199,14 @@ function _buildRowClueCell(row, clueIdx, padLeft, value, fontSize, colWidth) {
 }
 
 
-// _buildPuzzleCell — returns the HTML for one interactive puzzle <td>.
+// _buildPuzzleCell - returns the HTML for one interactive puzzle <td>.
 //   Adds border-right (br) and border-bottom (bb) classes every 5 cells
 //   to draw the 5×5 section guides.
 //
-//   row, col     — cell position
-//   totalRows    — total rows in grid (used to suppress guide on last row)
-//   totalCols    — total cols in grid (used to suppress guide on last col)
-//   cellSize     — px size of the cell
+//   row, col     - cell position
+//   totalRows    - total rows in grid (used to suppress guide on last row)
+//   totalCols    - total cols in grid (used to suppress guide on last col)
+//   cellSize     - px size of the cell
 function _buildPuzzleCell(row, col, totalRows, totalCols, cellSize) {
     const borderRight = (col + 1) % 5 === 0 && col < totalCols - 1 ? ' br' : '';
     const borderBottom = (row + 1) % 5 === 0 && row < totalRows - 1 ? ' bb' : '';
@@ -220,15 +220,15 @@ function _buildPuzzleCell(row, col, totalRows, totalCols, cellSize) {
 }
 
 
-// _buildPuzzleRows — returns the HTML for all puzzle data rows, including
+// _buildPuzzleRows - returns the HTML for all puzzle data rows, including
 //   the row-clue sticky cells on the left and the interactive grid cells.
 //
-//   rowClues    — array of clue arrays, one per row
-//   maxRowWidth — maximum row-clue depth (for alignment padding)
-//   sol         — 2D solution array
-//   cellSize    — px size for puzzle cells
-//   fontSize    — px font size for clue labels
-//   isAdjMatrix — when true, skip row-clue cells
+//   rowClues    - array of clue arrays, one per row
+//   maxRowWidth - maximum row-clue depth (for alignment padding)
+//   sol         - 2D solution array
+//   cellSize    - px size for puzzle cells
+//   fontSize    - px font size for clue labels
+//   isAdjMatrix - when true, skip row-clue cells
 function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjMatrix) {
     const rows = sol.length;
     const cols = sol[0].length;
@@ -238,7 +238,7 @@ function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjM
     for (let row = 0; row < rows; row++) {
         html += `<tr>`;
 
-        // Row clue sticky cells — hidden in adjacency matrix mode
+        // Row clue sticky cells - hidden in adjacency matrix mode
         if (!isAdjMatrix) {
             const rowClue = rowClues[row];
             const padCells = maxRowWidth - rowClue.length; // empty corner pads for alignment
@@ -274,15 +274,15 @@ function _buildPuzzleRows(rowClues, maxRowWidth, sol, cellSize, fontSize, isAdjM
 //------------------------------------------------------------------------
 
 
-// _buildRowClueToggle — creates (or re-creates) the clue placement buttons
+// _buildRowClueToggle - creates (or re-creates) the clue placement buttons
 //   in the top-left corner HUD, underneath the mistakes counter:
-//     "CLUES ▶/◀" — flips row clues between the left and right side of the grid
-//     "CLUES ▼/▲" — moves column clues between the top and bottom of the grid
+//     "CLUES ▶/◀" - flips row clues between the left and right side of the grid
+//     "CLUES ▼/▲" - moves column clues between the top and bottom of the grid
 //   Both carry a mouse-over tooltip describing which way they currently move
 //   the clue numbers. Called once per buildGrid() so it always attaches to the
 //   current HUD corner.
 
-// _wireClueBtnTooltip — attaches the shared game tooltip (tooltips-hud.js)
+// _wireClueBtnTooltip - attaches the shared game tooltip (tooltips-hud.js)
 //   to a clue toggle button. The button's current tip text lives in its
 //   data-tip attribute so the toggle handlers can update it in place.
 function _wireClueBtnTooltip(btn) {
@@ -297,7 +297,7 @@ function _buildRowClueToggle() {
 
     // Anchor: the corner HUD's dedicated clue-toggle slot (below the
     // mistakes counter). Falls back to the puzzle wrap if the HUD is
-    // missing (defensive — the HUD is static markup in index.html).
+    // missing (defensive - the HUD is static markup in index.html).
     const host = document.getElementById('clue-toggle-slot')
         || document.getElementById('puzzle-scaler-wrap');
     if (!host) return;
@@ -313,7 +313,7 @@ function _buildRowClueToggle() {
         letter-spacing: 1px;
     `;
 
-    // Row clues button — flips row clues left/right
+    // Row clues button - flips row clues left/right
     const rowBtn = document.createElement('button');
     rowBtn.id = 'row-clue-toggle-btn';
     rowBtn.textContent = t('cg_clues_btn_right');
@@ -323,7 +323,7 @@ function _buildRowClueToggle() {
     _wireClueBtnTooltip(rowBtn);
     host.appendChild(rowBtn);
 
-    // Column clues button — moves column clues top/bottom
+    // Column clues button - moves column clues top/bottom
     const colBtn = document.createElement('button');
     colBtn.id = 'col-clue-toggle-btn';
     colBtn.textContent = t('cg_clues_btn_down');
@@ -335,7 +335,7 @@ function _buildRowClueToggle() {
 }
 
 
-// _toggleRowCluesSide — flips row-clue cells between the left and right
+// _toggleRowCluesSide - flips row-clue cells between the left and right
 //   side of the puzzle table by rebuilding the <colgroup> and physically
 //   moving the existing <td> elements within each row (no HTML regen).
 function _toggleRowCluesSide() {
@@ -409,7 +409,7 @@ function _toggleRowCluesSide() {
 }
 
 
-// _toggleColCluesSide — moves the column-clue header rows between the top
+// _toggleColCluesSide - moves the column-clue header rows between the top
 //   and the bottom of the puzzle table by physically relocating those <tr>
 //   elements within the <tbody> (no HTML regen). Also keeps the tooltip and
 //   button label in sync with the current placement.
@@ -474,7 +474,7 @@ function _toggleColCluesSide() {
 
 
 // Adjacency matrix mode (skill 302) shows Minesweeper-style neighbour
-// counts on each empty cell — the number of surrounding solution cells
+// counts on each empty cell - the number of surrounding solution cells
 // that haven't been correctly filled yet.  Row/column clue headers are
 // hidden in this mode (see buildGrid / _buildColgroup).
 //
@@ -483,10 +483,10 @@ function _toggleColCluesSide() {
 // _adjacencyMatrixUpdateOverlay() defined here.
 
 
-// _adjacencyMatrixCount — returns how many of the 8 surrounding cells are
+// _adjacencyMatrixCount - returns how many of the 8 surrounding cells are
 //   unfilled solution cells (sol === 1 but not yet player-filled or revealed).
 //
-//   row, col — the cell whose neighbours to count
+//   row, col - the cell whose neighbours to count
 function _adjacencyMatrixCount(row, col) {
     if (!cur) return 0;
 
@@ -509,11 +509,11 @@ function _adjacencyMatrixCount(row, col) {
 }
 
 
-// _adjacencyMatrixUpdateOverlay — writes (or removes) the neighbour-count
+// _adjacencyMatrixUpdateOverlay - writes (or removes) the neighbour-count
 //   span inside a single cell.  Only visible on unfilled, non-wrong cells.
 //   A count of 0 shows as blank, matching Minesweeper convention.
 //
-//   row, col — the cell to update
+//   row, col - the cell to update
 function _adjacencyMatrixUpdateOverlay(row, col) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
@@ -536,7 +536,7 @@ function _adjacencyMatrixUpdateOverlay(row, col) {
 }
 
 
-// _adjacencyMatrixRefreshAll — refreshes adjacency overlays for every cell
+// _adjacencyMatrixRefreshAll - refreshes adjacency overlays for every cell
 //   on the board.  Called at level start (after the grid DOM is ready) and
 //   after any bulk reveal that changes many cells at once.
 function _adjacencyMatrixRefreshAll() {
@@ -561,7 +561,7 @@ function _adjacencyMatrixRefreshAll() {
 //------------------------------------------------------------------------
 
 
-// buildGrid — constructs the full puzzle table HTML and injects it into
+// buildGrid - constructs the full puzzle table HTML and injects it into
 //   the #ptable element, then triggers a scale pass on the next frame.
 //
 //   Reads cur.grid for the solution, computes row/column clues, sizes
@@ -629,14 +629,14 @@ function buildGrid() {
 //------------------------------------------------------------------------
 
 
-// _calcCluePositionWindows — determines, for each clue in a line, the
+// _calcCluePositionWindows - determines, for each clue in a line, the
 //   earliest (leftmost) and latest (rightmost) cell index where that
 //   clue's run could possibly START, based purely on the solution layout.
 //
-//   Returns { earliest[], latest[] } — both arrays indexed by clue index.
+//   Returns { earliest[], latest[] } - both arrays indexed by clue index.
 //
-//   clueNums — array of run lengths (the clue numbers for this line)
-//   solRow   — solution values for the line (array of 0s and 1s)
+//   clueNums - array of run lengths (the clue numbers for this line)
+//   solRow   - solution values for the line (array of 0s and 1s)
 function _calcCluePositionWindows(clueNums, solRow) {
     const len = solRow.length;
     const n = clueNums.length;
@@ -679,14 +679,14 @@ function _calcCluePositionWindows(clueNums, solRow) {
 }
 
 
-// _collectPlayerRuns — scans a line and returns all correctly-filled runs
+// _collectPlayerRuns - scans a line and returns all correctly-filled runs
 //   made by the player.  Only cells where both userRow and solRow are 1
 //   are counted, so over-marked wrong cells are ignored.
 //
 //   Returns an array of { start, size } objects.
 //
-//   userRow — player's fill state for the line
-//   solRow  — solution values for the line
+//   userRow - player's fill state for the line
+//   solRow  - solution values for the line
 function _collectPlayerRuns(userRow, solRow) {
     const len = solRow.length;
     const playerRuns = [];
@@ -706,16 +706,16 @@ function _collectPlayerRuns(userRow, solRow) {
 }
 
 
-// getSolvedClueFlags — returns a boolean array, one entry per clue number,
+// getSolvedClueFlags - returns a boolean array, one entry per clue number,
 //   indicating whether that specific run has already been correctly filled.
 //
 //   A clue is only marked solved when its positional window doesn't overlap
 //   with an adjacent clue's window (ambiguous windows are skipped), AND
 //   the player has exactly one correctly-sized run inside that window.
 //
-//   clueNums — clue run lengths for this line
-//   userRow  — player's fill state
-//   solRow   — solution values
+//   clueNums - clue run lengths for this line
+//   userRow  - player's fill state
+//   solRow   - solution values
 function getSolvedClueFlags(clueNums, userRow, solRow) {
     const n = clueNums.length;
     const { earliest, latest } = _calcCluePositionWindows(clueNums, solRow);
@@ -751,15 +751,15 @@ function getSolvedClueFlags(clueNums, userRow, solRow) {
 //------------------------------------------------------------------------
 
 
-// _applyRowClueState — updates the strikethrough CSS class on every clue
+// _applyRowClueState - updates the strikethrough CSS class on every clue
 //   number span for the given row, and (when the row just became fully
 //   solved) plays the explosion effect exactly once on a single "host"
 //   cell sized via CSS vars to visually cover the whole clue-number box.
 //
-//   row        — row index
-//   rowDone    — whether the entire row is fully solved
-//   rowClues   — clue arrays for all rows (used to iterate span indices)
-//   rowFlags   — per-run solved booleans from getSolvedClueFlags
+//   row        - row index
+//   rowDone    - whether the entire row is fully solved
+//   rowClues   - clue arrays for all rows (used to iterate span indices)
+//   rowFlags   - per-run solved booleans from getSolvedClueFlags
 function _applyRowClueState(row, rowDone, rowClues, rowFlags) {
     rowClues[row].forEach((_, i) => {
         const span = document.getElementById(`rn-${row}-${i}`);
@@ -779,14 +779,14 @@ function _applyRowClueState(row, rowDone, rowClues, rowFlags) {
 }
 
 
-// _applyColClueState — updates the strikethrough CSS class on every clue
+// _applyColClueState - updates the strikethrough CSS class on every clue
 //   number span for the given column, and (when the column just became
 //   fully solved) plays the explosion effect exactly once on a single
 //   "host" cell sized via CSS vars to cover the whole clue-number box.
 //
-//   col      — column index
-//   colDone  — whether the entire column is fully solved
-//   colFlags — per-run solved booleans from getSolvedClueFlags
+//   col      - column index
+//   colDone  - whether the entire column is fully solved
+//   colFlags - per-run solved booleans from getSolvedClueFlags
 function _applyColClueState(col, colDone, colFlags) {
     document.querySelectorAll(`[id^="cn-${col}-"]`).forEach((span, i) => {
         span.classList.toggle('clue-done', colDone || colFlags[i]);
@@ -805,25 +805,25 @@ function _applyColClueState(col, colDone, colFlags) {
 }
 
 
-// _isRowSolved — returns true when every solution-filled cell in the row
+// _isRowSolved - returns true when every solution-filled cell in the row
 //   is correctly filled by the player (or revealed) and has no wrong mark.
 //
-//   sol  — 2D solution array
-//   row  — row index to check
+//   sol  - 2D solution array
+//   row  - row index to check
 function _isRowSolved(sol, row) {
     return sol[row].every((cellValue, col) => {
-        if (cellValue !== 1) return true;  // empty solution cell — irrelevant
+        if (cellValue !== 1) return true;  // empty solution cell - irrelevant
         if (wrongGrid[row][col]) return false; // wrong mark on a correct cell
         return userGrid[row][col] === 1 || revealedGrid[row][col];
     });
 }
 
 
-// _isColSolved — returns true when every solution-filled cell in the column
+// _isColSolved - returns true when every solution-filled cell in the column
 //   is correctly filled by the player (or revealed) and has no wrong mark.
 //
-//   sol  — 2D solution array
-//   col  — column index to check
+//   sol  - 2D solution array
+//   col  - column index to check
 function _isColSolved(sol, col) {
     return sol.every((rowData, row) => {
         if (rowData[col] !== 1) return true;
@@ -834,14 +834,14 @@ function _isColSolved(sol, col) {
 
 
 
-// _markZeroClueLinesSolved — rows/cols whose clue is [0] have no solution
+// _markZeroClueLinesSolved - rows/cols whose clue is [0] have no solution
 //   cells at all, so the player never fills a cell in that line and
 //   updClues() never runs for it. Mark those lines solved immediately
 //   after the grid is built, reusing the same state-apply helpers so
 //   both clue-done (strikethrough) and clue-line-solved (highlight) fire.
 //
-//   rowClues — clue arrays for all rows (from buildGrid)
-//   colClues — clue arrays for all cols (from buildGrid)
+//   rowClues - clue arrays for all rows (from buildGrid)
+//   colClues - clue arrays for all cols (from buildGrid)
 function _markZeroClueLinesSolved(rowClues, colClues) {
     rowClues.forEach((clue, row) => {
         if (clue.length === 1 && clue[0] === 0) {
@@ -864,22 +864,22 @@ function _markZeroClueLinesSolved(rowClues, colClues) {
 //------------------------------------------------------------------------
 
 
-// _handleRegressionReward — awards bonus seconds when a row or column is
+// _handleRegressionReward - awards bonus seconds when a row or column is
 //   completed for the first time, if the player has any regression_reward
 //   nodes unlocked.  Uses _regressionRewardedLines to prevent double-dips
 //   from overmark-then-reveal exploits.
 //
-//   row, col   — the cell that was just filled
-//   rowDone    — whether the affected row is now complete
-//   colDone    — whether the affected column is now complete
-//   sol        — 2D solution array
+//   row, col   - the cell that was just filled
+//   rowDone    - whether the affected row is now complete
+//   colDone    - whether the affected column is now complete
+//   sol        - 2D solution array
 function _handleRegressionReward(row, col, rowDone, colDone, sol) {
     if (ptHasSkill('keystone_gamblers_ruin')) return; // bonus time from other sources is disabled
     if (!ptHasSkill('regression_reward_1') &&
         !ptHasSkill('regression_reward_2') &&
         !ptHasSkill('regression_reward_3')) return;
 
-    // Only trigger on a genuine player fill — not revealed cells or erasure
+    // Only trigger on a genuine player fill - not revealed cells or erasure
     const cellWasPlayerFilled = (sol[row][col] === 1) && (userGrid[row][col] === 1) && !revealedGrid[row][col];
     if (!cellWasPlayerFilled) return;
 
@@ -912,12 +912,12 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
 }
 
 
-// _tryAutoMarkAdjacentLine — attempts to auto-mark exactly one wrong empty
+// _tryAutoMarkAdjacentLine - attempts to auto-mark exactly one wrong empty
 //   cell in one of the given adjacent lines.  Used by residual analysis to
 //   reward line completion with a free cross mark in a neighbouring line.
 //
-//   adjacentIndices — [prevIndex, nextIndex] (row or column neighbours)
-//   getCandidates   — function(index) → array of [row, col] pairs that are
+//   adjacentIndices - [prevIndex, nextIndex] (row or column neighbours)
+//   getCandidates   - function(index) → array of [row, col] pairs that are
 //                     valid empty non-solution cells to mark
 function _tryAutoMarkAdjacentLine(adjacentIndices, getCandidates) {
     // Randomise direction so the benefit isn't always biased toward one side
@@ -951,15 +951,15 @@ function _tryAutoMarkAdjacentLine(adjacentIndices, getCandidates) {
 }
 
 
-// _handleResidualAnalysis — when a row/col is completed, rolls a chance
+// _handleResidualAnalysis - when a row/col is completed, rolls a chance
 //   to auto-mark exactly one wrong empty cell in an adjacent row/col.
 //   Chance scales with unlocked nodes (25% base + 5% + 10% = max 40%).
 //   Skipped entirely when oracle is active or ergodic field is unlocked.
 //
-//   row, col   — the cell that was just filled
-//   rowDone    — whether the affected row is now complete
-//   colDone    — whether the affected column is now complete
-//   sol        — 2D solution array
+//   row, col   - the cell that was just filled
+//   rowDone    - whether the affected row is now complete
+//   colDone    - whether the affected column is now complete
+//   sol        - 2D solution array
 function _handleResidualAnalysis(row, col, rowDone, colDone, sol) {
     if (window._oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
@@ -967,7 +967,7 @@ function _handleResidualAnalysis(row, col, rowDone, colDone, sol) {
         !ptHasSkill('residual_analysis_2') &&
         !ptHasSkill('residual_analysis_3')) return;
 
-    // Only trigger on a correctly filled cell — not on erasure or undo
+    // Only trigger on a correctly filled cell - not on erasure or undo
     const cellWasCorrectlyFilled = (sol[row][col] === 1) && (userGrid[row][col] === 1 || revealedGrid[row][col]);
     if (!cellWasCorrectlyFilled) return;
 
@@ -981,7 +981,7 @@ function _handleResidualAnalysis(row, col, rowDone, colDone, sol) {
     const rows = sol.length;
     const cols = sol[0].length;
 
-    // Row completion — try to mark in an adjacent row
+    // Row completion - try to mark in an adjacent row
     if (rowDone && !window._residualAnalysisRewardedLines.has(`r${row}`)) {
         window._residualAnalysisRewardedLines.add(`r${row}`);
 
@@ -1001,7 +1001,7 @@ function _handleResidualAnalysis(row, col, rowDone, colDone, sol) {
         }
     }
 
-    // Column completion — try to mark in an adjacent column
+    // Column completion - try to mark in an adjacent column
     if (colDone && !window._residualAnalysisRewardedLines.has(`c${col}`)) {
         window._residualAnalysisRewardedLines.add(`c${col}`);
 
@@ -1031,7 +1031,7 @@ function _handleResidualAnalysis(row, col, rowDone, colDone, sol) {
 //------------------------------------------------------------------------
 
 
-// updClues(row, col) — called after every cell change.
+// updClues(row, col) - called after every cell change.
 //   Checks whether the affected row and column are now fully solved and
 //   toggles the CSS class 'clue-done' (strikethrough) on clue number
 //   spans accordingly.  Also fires various skill reward checks.
@@ -1042,7 +1042,7 @@ function updClues(row, col, isInitial = false) {
     const rows = sol.length;
     const cols = sol[0].length;
 
-    // --- Row clue state — always updated so passive reveals at puzzle start
+    // --- Row clue state - always updated so passive reveals at puzzle start
     // (central_tendency, marginal_distribution, maximum_likelihood) correctly
     // grey out / strike through clues when a row is completed by a proc'd
     // reveal during an endgame chain transition. isInitial only suppresses
@@ -1053,7 +1053,7 @@ function updClues(row, col, isInitial = false) {
 
     _applyRowClueState(row, rowDone, rowClues, rowFlags);
 
-    // --- Column clue state — same always-update guarantee as rows ---
+    // --- Column clue state - same always-update guarantee as rows ---
     const colDone = _isColSolved(sol, col);
     const colClues = _computeColClues(sol);
     const colUserLine = userGrid.map(r => r[col]);
@@ -1076,7 +1076,7 @@ function updClues(row, col, isInitial = false) {
         _sparsePriorOnLineComplete(col, false);
     }
 
-    // --- Keystone: asymptotic mastery — count newly completed lines ---
+    // --- Keystone: asymptotic mastery - count newly completed lines ---
     if (ptHasSkill('keystone_asymptotic_mastery')) {
         const cellIsCorrectlyFilled = (sol[row][col] === 1) && (userGrid[row][col] === 1 || revealedGrid[row][col]);
         if (cellIsCorrectlyFilled) {
@@ -1105,7 +1105,7 @@ function updClues(row, col, isInitial = false) {
 //------------------------------------------------------------------------
 
 
-// _clearCellClasses — strips all visual state classes from a cell element
+// _clearCellClasses - strips all visual state classes from a cell element
 //   so we start from a clean slate before applying the new state.
 //   Also snapshots and removes the DoF reverted ghost class separately
 //   (it will be conditionally re-added at the end of renderCell).
@@ -1118,11 +1118,11 @@ function _clearCellClasses(el, row, col) {
 }
 
 
-// _refreshAdjacencyNeighbours — after a cell state change, refreshes the
+// _refreshAdjacencyNeighbours - after a cell state change, refreshes the
 //   adjacency count overlays for the cell itself and all 8 surrounding cells.
 //   Needed because filling one cell changes the count shown on its neighbours.
 //
-//   row, col — the cell that changed
+//   row, col - the cell that changed
 function _refreshAdjacencyNeighbours(row, col) {
     _adjacencyMatrixUpdateOverlay(row, col);
 
@@ -1151,7 +1151,7 @@ function _refreshAdjacencyNeighbours(row, col) {
 //------------------------------------------------------------------------
 
 
-// renderCell(row, col) — updates the visual CSS classes of a single grid
+// renderCell(row, col) - updates the visual CSS classes of a single grid
 //   cell to reflect its current state in userGrid / wrongGrid / revealedGrid.
 //
 //   Priority order (highest wins):
@@ -1163,17 +1163,17 @@ function _refreshAdjacencyNeighbours(row, col) {
 //     6. userGrid = 0 → 'cell-lucky'         (shimmer hint if lucky tile)
 function renderCell(row, col) {
     const el = document.getElementById(`g-${row}-${col}`);
-    if (!el) return; // safety guard — cell may not be in DOM yet
+    if (!el) return; // safety guard - cell may not be in DOM yet
 
     const wasReverted = _clearCellClasses(el, row, col);
 
-    // Priority 1: wrong fill marker — overrides everything else
+    // Priority 1: wrong fill marker - overrides everything else
     if (wrongGrid[row][col]) {
         el.classList.add('wrong-mark');
         return;
     }
 
-    // Absolute Zero: this cell's wrong mark may have just been cleared —
+    // Absolute Zero: this cell's wrong mark may have just been cleared -
     // if it was carrying a stalagmite, thaw it now instead of waiting
     // for the freeze to end.
     if (typeof _arcaneFreeze_clearStalagmiteIfWrongMarkGone === 'function') {
@@ -1183,7 +1183,7 @@ function renderCell(row, col) {
     // Priority 2: item-revealed cell (permanent green fill)
     if (revealedGrid[row][col]) {
         el.classList.add('filled', 'revealed');
-        // Revealed cells can't be filled manually — auto-claim any drop
+        // Revealed cells can't be filled manually - auto-claim any drop
         // (loot / currency / item / heart pickup) sitting on this cell.
         if (typeof _egAutoClaimDropsOnReveal === 'function') {
             _egAutoClaimDropsOnReveal(row, col);
@@ -1226,7 +1226,7 @@ function renderCell(row, col) {
         if (userGrid[row][col] === 0 && !wrongGrid[row][col] && !revealedGrid[row][col]) {
             el.classList.add('dof-reverted');
         } else {
-            // Cell has been filled or corrected — remove from tracking set
+            // Cell has been filled or corrected - remove from tracking set
             window._dofRevertedCells.delete(`${row}-${col}`);
         }
     }
@@ -1241,7 +1241,7 @@ function renderCell(row, col) {
 //------------------------------------------------------------------------
 
 
-// buildReveal — constructs the small solution preview grid shown in the
+// buildReveal - constructs the small solution preview grid shown in the
 //   win overlay.  Sizes cells to fill most of the viewport while keeping
 //   them square, then stamps a div per cell coloured by the solution value.
 function buildReveal() {

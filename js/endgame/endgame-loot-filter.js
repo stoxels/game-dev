@@ -12,22 +12,22 @@
 //   - An empty rule list vendored nothing (safe default).
 //   - Filter disabled (default) vendored nothing.
 //
-// Per-rule conditions (all UPPER bounds — vendor rules target trash):
-//   slot       — 'any' or a specific slotType
-//   baseId     — 'any' or a specific base type id (within that slot)
-//   maxIlvl    — item must have itemLevel <= value (0 = off)
-//   maxReq     — item must have requirements.level <= value (0 = off)
-//   modMode    — 'none'     : no modifier condition
+// Per-rule conditions (all UPPER bounds - vendor rules target trash):
+//   slot       - 'any' or a specific slotType
+//   baseId     - 'any' or a specific base type id (within that slot)
+//   maxIlvl    - item must have itemLevel <= value (0 = off)
+//   maxReq     - item must have requirements.level <= value (0 = off)
+//   modMode    - 'none'     : no modifier condition
 //                'has_t1'   : item has a Tier 1 modifier (optionally of a
 //                             specific family) on that slot's mod table
 //                'not_has'  : item does NOT have the chosen modifier family
 //                             on that slot's mod table
-//   maxT1      — item must have at most N Tier 1 modifiers (null = off).
+//   maxT1      - item must have at most N Tier 1 modifiers (null = off).
 //                Counts T1 mods across ALL families, e.g. 0 = "no T1 mods
-//                at all" — the classic "vendor everything unpromising" rule.
+//                at all" - the classic "vendor everything unpromising" rule.
 //
 // Hard exceptions (never vendored, regardless of rules):
-//   - starter gear (noSellValue) — nothing to gain, blocks an exploit
+//   - starter gear (noSellValue) - nothing to gain, blocks an exploit
 //   - unique items, when "keep uniques" is on (default on)
 //   - any item when the shard stash is full (mirrors Ctrl+click failure)
 //
@@ -48,7 +48,7 @@ let _egLootFilter = null;
 
 function _eglfDefaultState() {
     return {
-        enabled: false,     // off by default — nothing is vendored until opted in
+        enabled: false,     // off by default - nothing is vendored until opted in
         keepUnique: true,   // golden items are never auto-vendored
         rules: [],
     };
@@ -130,7 +130,7 @@ function _eglfRuleMatches(rule, item) {
         if (t1Count > rule.maxT1) return false;
     }
     if (rule.modMode === 'has_t1') {
-        // Tier 1 modifier present — optionally restricted to one family.
+        // Tier 1 modifier present - optionally restricted to one family.
         const hasT1 = mods.some(m =>
             m.tier === 1 && (!rule.modFamily || m.familyId === rule.modFamily));
         if (!hasT1) return false;
@@ -148,7 +148,7 @@ function _egLootFilterShouldVendor(item) {
     if (!item || item.category !== 'equip') return false;
     if (!_egLootFilter) _egLoadLootFilter();
     if (!_egLootFilter.enabled) return false;
-    if (item.noSellValue) return false;                      // starter gear — nothing to gain
+    if (item.noSellValue) return false;                      // starter gear - nothing to gain
     if (_egLootFilter.keepUnique && item.isUnique) return false;
     const rules = _egLootFilter.rules.filter(r => r.enabled);
     if (rules.length === 0) return false;                    // no rules → keep everything
@@ -165,7 +165,7 @@ function _egLootFilterKeeps(item) {
 //-------------------AUTO-VENDOR (PICKUP HOOK)----------------------------
 //------------------------------------------------------------------------
 // Called from _egCheckLootClaim (endgame-grid-pickups.js) right after a
-// successful claim. Returns true when the item was consumed — the caller
+// successful claim. Returns true when the item was consumed - the caller
 // then skips pushing it into _egRunLoot, so it never reaches the stash.
 // Mirrors _egSellStashItem (Ctrl+click): unique → Ancient Shard, else a
 // rolled shard; shard stash full → item is kept.
@@ -179,7 +179,7 @@ function _egLootFilterAutoVendor(item) {
         ? EG_SHARD_DEFS.shard_ancient
         : (typeof _egRollShardForItem === 'function' ? _egRollShardForItem(item) : null);
 
-    if (!shardDef) return false; // shard system unavailable — keep the item
+    if (!shardDef) return false; // shard system unavailable - keep the item
 
     let granted = false;
     try {
@@ -187,7 +187,7 @@ function _egLootFilterAutoVendor(item) {
     } catch (e) { granted = false; }
 
     if (!granted) {
-        // Shard stash full — keep the item and tell the player why.
+        // Shard stash full - keep the item and tell the player why.
         if (typeof showToast === 'function') {
             showToast(t('eg_loot_filter_shard_full')
                 .replace('{name}', item.name || '???'), '#f87171');
@@ -198,7 +198,7 @@ function _egLootFilterAutoVendor(item) {
     // Mirror the granted shard into the run currency tracker so it shows up
     // in the runes & orbs row of the pause screen and the map win/loss
     // summary (same aggregation the Ctrl+click sell chips use). Only during
-    // an active run — vendoring happens exclusively inside map runs.
+    // an active run - vendoring happens exclusively inside map runs.
     if (typeof _egRunCurrency !== 'undefined' && Array.isArray(_egRunCurrency)
         && (typeof _egIsActive !== 'function' || _egIsActive())) {
         const existing = _egRunCurrency.find(e => e.id === shardDef.id);
@@ -574,7 +574,7 @@ function _egEnsureLootFilterModal() {
         <span class="eg-lf-head-icon">⚗</span>
         <span class="eg-lf-head-title">${t('eg_loot_filter_title')}</span>
         <button class="eg-lf-close" onclick="_eglfCloseModal()"
-                title="${t('eg_loot_filter_close')}" aria-label="${t('eg_loot_filter_close')}">✕</button>
+                data-tip-t="eg_loot_filter_close" aria-label="${t('eg_loot_filter_close')}">✕</button>
     </div>
     <div class="eg-lf-body">
         <div class="eg-lf-how">
@@ -648,9 +648,9 @@ function _eglfRuleHTML(rule, idx) {
 <div class="eg-lf-rule${rule.enabled ? '' : ' eg-lf-rule-off'}">
     <div class="eg-lf-rule-head">
         <input type="checkbox" class="eg-lf-check" ${rule.enabled ? 'checked' : ''}
-               onchange="_eglfSetRule(${idx}, 'enabled', this.checked)" title="${t('eg_loot_filter_rule_enable')}">
+               onchange="_eglfSetRule(${idx}, 'enabled', this.checked)" data-tip-t="eg_loot_filter_rule_enable">
         <span class="eg-lf-rule-title">${t('eg_loot_filter_rule')} ${idx + 1}</span>
-        <button class="eg-lf-rule-del" onclick="_eglfDelRule(${idx})" title="${t('eg_loot_filter_rule_del')}">✕</button>
+        <button class="eg-lf-rule-del" onclick="_eglfDelRule(${idx})" data-tip-t="eg_loot_filter_rule_del" aria-label="${t('eg_loot_filter_rule_del')}">✕</button>
     </div>
     <div class="eg-lf-fields">
         <div class="eg-lf-field">
@@ -757,7 +757,8 @@ function _eglfRenderStaticText(modal) {
     if (title) title.textContent = t('eg_loot_filter_title');
     const close = modal.querySelector('.eg-lf-close');
     if (close) {
-        close.title = t('eg_loot_filter_close');
+        // data-tip-t resolves at hover time, so only the accessible name needs
+        // re-applying when the language changes mid-session.
         close.setAttribute('aria-label', t('eg_loot_filter_close'));
     }
     const howTitle = modal.querySelector('.eg-lf-how-title');
@@ -848,7 +849,7 @@ function _eglfDelRule(idx) {
     _eglfUpdatePreview();
 }
 
-// Global Escape handler — closes the loot filter overlay when open.
+// Global Escape handler - closes the loot filter overlay when open.
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const m = document.getElementById('eg-loot-filter-modal');

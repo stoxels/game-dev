@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ZENITH (boss_zenith)-----------------------------
 //------------------------------------------------------------------------
-// The final throne: Royal Decrees — alternating freeze/move trials, three
-// in a row, no mercy between them — beneath a triple crown of fast rings.
+// The final throne: Royal Decrees - alternating freeze/move trials, three
+// in a row, no mercy between them - beneath a triple crown of fast rings.
 // Everything the atlas taught you, at once, at its fastest. Good luck.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -53,7 +53,7 @@ function _egMechRoyalDecree(monster, phase) {
         if (tint) { tint.remove(); tint = null; }
         if (label) { label.remove(); label = null; }
     };
-    _egNkToast('eg_mech_zenith', '👑 The Zenith: Royal Decree! Obey — instantly!');
+    _egNkToast('eg_mech_zenith', '👑 The Zenith: Royal Decree! Obey - instantly!');
     _egNkLoop(run, (dtS) => {
         if (stage === 'idle') {
             if (left <= 0) { clearEls(); return false; }

@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Internal shared references — populated by PT.loadInline() so all sub-files
+// Internal shared references - populated by PT.loadInline() so all sub-files
 // operate on the same arrays without passing them as arguments on every call.
 let _pt_skills = [];   // layout skill objects
 let _pt_conns = [];   // connection objects
@@ -389,7 +389,7 @@ function _ptTrackOuterRimCount(allocatedKeys) {
     setAchStat('treeOuterRimNodes', count);
 }
 
-// Master dispatcher — runs all achievement checks after a node is allocated.
+// Master dispatcher - runs all achievement checks after a node is allocated.
 // Requires trackAchStat to be available; bails silently if it is not.
 function _ptTrackAllocationAchievements(nodeId, alloc) {
     if (typeof trackAchStat !== 'function') return;
@@ -409,7 +409,7 @@ function _ptTrackAllocationAchievements(nodeId, alloc) {
 
 
 //------------------------------------------------------------------------
-//----------CLICK HANDLER — ALLOCATION AND DEALLOCATION------------------
+//----------CLICK HANDLER - ALLOCATION AND DEALLOCATION------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 

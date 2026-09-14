@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------
 // Pinnacle gravity: a singularity drags you toward a burning core while
 // three flame beams sweep the disc. Feed the beams distance, feed the
-// core sideways motion — feed both at once, or be unmade.
+// core sideways motion - feed both at once, or be unmade.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
 //   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
@@ -55,7 +55,7 @@ function _egMechSingularity(monster, phase) {
     ring.style.top = Math.round(cy - coreR) + 'px';
     ring.style.width = coreR * 2 + 'px';
     ring.style.height = coreR * 2 + 'px';
-    _egNkToast('eg_mech_singularity', '🌌 The Oblivion: Singularity! Orbit — do not fall in!');
+    _egNkToast('eg_mech_singularity', '🌌 The Oblivion: Singularity! Orbit - do not fall in!');
     let e = 0, dotWarnAt = 0;
     _egNkLoop(run, (dtS, now) => {
         e += dtS * 1000;

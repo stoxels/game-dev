@@ -327,7 +327,7 @@ const CLASS_SPELL_ICONS = {
 // Universal 5th ability: spawns 3 hearts onto the grid. Endgame-only,
 // instant cast, 5-minute cooldown, ~50 mana. Rendered in the HUD's
 // third row, first column (slot active5). Not tied to a class or
-// ascendency — available to every class but gated by isEndgameLevel().
+// ascendency - available to every class but gated by isEndgameLevel().
 const ENDGAME_HEARTBLOOM_DEF = {
     id: 'heartbloom',
     icon: '💚',

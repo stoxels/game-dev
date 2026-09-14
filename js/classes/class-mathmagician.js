@@ -11,7 +11,7 @@
 
 // Arcane Reveal
 
-// Arcane Reveal — three-stage arcane-mathematics sequence
+// Arcane Reveal - three-stage arcane-mathematics sequence
 const ARCANE_REVEAL_INVOKE_MS = 1000;         // Stage 1: invocation sigil on origin cell
 const ARCANE_REVEAL_FIELD_MS = 1000;          // Stage 2: field formation + magical sweep
 const ARCANE_REVEAL_MARK_STAGGER_MS = 250;   // Stage 3: delay between each cell's rune mark
@@ -50,7 +50,7 @@ const BLIZZARD_FLAKE_MAX_DELAY_S = 0.5;
 //------------------------------------------------------------------------
 
 // _shuffleArray (in-place Durstenfeld shuffle) is defined ONCE, in
-// class-probabilist.js — the identical local copy was removed 2026-09 (it
+// class-probabilist.js - the identical local copy was removed 2026-09 (it
 // shadowed the other via load order).
 
 // Returns a random element from the given array.
@@ -60,7 +60,7 @@ function _randomFrom(array) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — CANDIDATE SELECTION------------------
+//-------------------ARCANE REVEAL - CANDIDATE SELECTION------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -114,14 +114,14 @@ function _arcaneReveal_collectCells(row, col, radius, rows, cols, sol, maxReveal
 
     // NOTE: we intentionally do NOT call _resolveCell() here anymore.
     // _resolveCell() is what actually writes to userGrid/revealedGrid and
-    // calls renderCell() — i.e. it performs the real reveal. Calling it at
+    // calls renderCell() - i.e. it performs the real reveal. Calling it at
     // candidate-collection time (before Stage 1 even starts) is what made
     // cells appear solved instantly. We now only build a plain id for
     // still-untouched cells, and defer the real _resolveCell() call to
     // _arcaneReveal_onCellRevealed(), which fires once Stage 3 finishes.
     const affected = [];
     finalCells.forEach(([r, c]) => {
-        if (userGrid[r][c] !== 0) return; // already resolved/marked — skip
+        if (userGrid[r][c] !== 0) return; // already resolved/marked - skip
         affected.push(`g-${r}-${c}`);
     });
 
@@ -143,7 +143,7 @@ function _arcaneReveal_findCellElement(row, col) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — DOM/GEOMETRY HELPERS-----------------
+//-------------------ARCANE REVEAL - DOM/GEOMETRY HELPERS-----------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -174,12 +174,12 @@ function _arcaneReveal_getCellBounds(el, wrap, zoom) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — STAGE 1: INVOCATION------------------
+//-------------------ARCANE REVEAL - STAGE 1: INVOCATION------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Fires on the exact cell the player selected. A precise violet sigil
 // traces the cell, corner runes flicker, and the energy condenses into a
-// small blue-white point at the cell's center — the "origin" of the spell.
+// small blue-white point at the cell's center - the "origin" of the spell.
 
 function _arcaneReveal_playInvocation(originEl, wrap, zoom) {
     const b = _arcaneReveal_getCellBounds(originEl, wrap, zoom);
@@ -209,7 +209,7 @@ function _arcaneReveal_playInvocation(originEl, wrap, zoom) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — STAGE 2: FIELD FORMATION-------------
+//-------------------ARCANE REVEAL - STAGE 2: FIELD FORMATION-------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Draws the full targeting square as a translucent arcane diagram: glowing
@@ -255,7 +255,7 @@ function _arcaneReveal_fadeField(field) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — STAGE 3: REVELATION------------------
+//-------------------ARCANE REVEAL - STAGE 3: REVELATION------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // For each chosen cell (staggered): a small rune mark appears, then a thin
@@ -311,11 +311,11 @@ function _arcaneReveal_spawnCellFlash(el, wrap, zoom) {
 function _arcaneReveal_onCellRevealed(id, sol) {
     const [, r, c] = id.split('-').map(Number);
 
-    // This is the actual data reveal — writes userGrid/revealedGrid and
+    // This is the actual data reveal - writes userGrid/revealedGrid and
     // calls renderCell(). Correctly deferred until Stage 3 finishes now,
     // instead of firing early inside _arcaneReveal_collectCells.
     const resolvedId = _resolveCell(r, c, sol);
-    if (!resolvedId) return; // already resolved by the time we got here — skip
+    if (!resolvedId) return; // already resolved by the time we got here - skip
 
     _applyCellEffect([resolvedId], 'reveal');
     _spawnArcaneSparkles([resolvedId]);
@@ -335,7 +335,7 @@ function _arcaneReveal_onCellRevealed(id, sol) {
 function _arcaneReveal_revelationSequence(originRow, originCol, revealedIds, wrap, zoom, sol) {
     const originEl = _arcaneReveal_findCellElement(originRow, originCol);
     if (!originEl) {
-        // No DOM anchor to draw beams from — resolve instantly instead.
+        // No DOM anchor to draw beams from - resolve instantly instead.
         revealedIds.forEach(id => _arcaneReveal_onCellRevealed(id, sol));
         return;
     }
@@ -349,7 +349,7 @@ function _arcaneReveal_revelationSequence(originRow, originCol, revealedIds, wra
             const [, r, c] = id.split('-').map(Number);
             const cellEl = _arcaneReveal_findCellElement(r, c);
             if (!cellEl) {
-                // No DOM to animate against for this cell — reveal it
+                // No DOM to animate against for this cell - reveal it
                 // immediately rather than leaving it stranded.
                 _arcaneReveal_onCellRevealed(id, sol);
                 return;
@@ -379,7 +379,7 @@ function _arcaneReveal_revelationSequence(originRow, originCol, revealedIds, wra
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — SPARKLE VFX--------------------------
+//-------------------ARCANE REVEAL - SPARKLE VFX--------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -444,7 +444,7 @@ function _spawnArcaneSparkles(cellIds) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — ORCHESTRATION------------------------
+//-------------------ARCANE REVEAL - ORCHESTRATION------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -485,7 +485,7 @@ function _arcaneReveal_applyExposureMarks(markedIds) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — AREA PREVIEW (while armed)-----------
+//-------------------ARCANE REVEAL - AREA PREVIEW (while armed)-----------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Live dashed-square preview shown while Arcane Reveal is armed, mirroring
@@ -493,13 +493,13 @@ function _arcaneReveal_applyExposureMarks(markedIds) {
 // class-probabilist.js). Unlike Field Scan's fixed NxN region, Arcane
 // Reveal's area is a (radius*2+1) square *centred* on the hovered cell and
 // simply clamped at the grid edges (never re-centred/shifted the way Field
-// Scan's region is) — this matches _arcaneReveal_buildCandidatePools exactly.
+// Scan's region is) - this matches _arcaneReveal_buildCandidatePools exactly.
 
 // Module state for the live preview outline.
 let _arcaneRevealPreviewEl = null;
 let _arcaneRevealPreviewKey = null; // last-rendered region, to skip redundant rebuilds
 
-// _arcaneReveal_getEffectiveRadiusForPreview — returns the current effective
+// _arcaneReveal_getEffectiveRadiusForPreview - returns the current effective
 // radius (base radius for the ability's rank + passive bonuses via
 // _arcaneReveal_calcRadius) for whatever rank Arcane Reveal is at. Kept
 // separate from the main execute path since the preview fires before the
@@ -507,13 +507,19 @@ let _arcaneRevealPreviewKey = null; // last-rendered region, to skip redundant r
 function _arcaneReveal_getEffectiveRadiusForPreview() {
     const def = CLASS_DEFS?.mathmagician;
     if (!def) return 1;
-    const level = STATE.classActive1Level || 1;
+    // Effect rank follows the slotted charm when one is placed
+    // (js/skills/skill-charms.js).
+    let level = STATE.classActive1Level || 1;
+    if (typeof getSkillCastRankClamped === 'function') {
+        const charmRank = getSkillCastRankClamped('mathmagician_active1');
+        if (charmRank) level = charmRank;
+    }
     const actData = def.active1.levels[level - 1];
     if (!actData) return 1;
     return _arcaneReveal_calcRadius(actData.effect.radius);
 }
 
-// _arcaneReveal_getHoveredCell — resolves which grid cell is under the given
+// _arcaneReveal_getHoveredCell - resolves which grid cell is under the given
 // viewport coordinates, or null if the cursor isn't over the grid at all.
 function _arcaneReveal_getHoveredCell(clientX, clientY) {
     const el = document.elementFromPoint(clientX, clientY);
@@ -524,7 +530,7 @@ function _arcaneReveal_getHoveredCell(clientX, clientY) {
     return { r: parseInt(m[1], 10), c: parseInt(m[2], 10) };
 }
 
-// _arcaneReveal_buildPreviewBounds — computes the pixel bounds (relative to
+// _arcaneReveal_buildPreviewBounds - computes the pixel bounds (relative to
 // #puzzle-scaler, zoom-adjusted) of the clamped square region running from
 // (startRow, startCol) to (endRow, endCol) inclusive. Same corner-cell
 // approach as _scanBeamBuildRegionBounds in class-probabilist.js, just
@@ -557,7 +563,7 @@ function _arcaneReveal_buildPreviewBounds(startRow, startCol, endRow, endCol, wr
     };
 }
 
-// _arcaneReveal_buildPreviewEl — creates the dashed preview outline once and
+// _arcaneReveal_buildPreviewEl - creates the dashed preview outline once and
 // appends it to #puzzle-scaler. Reused across hover updates rather than
 // recreated every mousemove.
 function _arcaneReveal_buildPreviewEl(wrap) {
@@ -570,7 +576,7 @@ function _arcaneReveal_buildPreviewEl(wrap) {
     return el;
 }
 
-// _arcaneReveal_clearPreview — removes the live preview outline. Called when
+// _arcaneReveal_clearPreview - removes the live preview outline. Called when
 // Arcane Reveal is disarmed (cancelled, executed, or the player switches to
 // a different ability/slot) and whenever the cursor leaves the grid while armed.
 function _arcaneReveal_clearPreview() {
@@ -581,7 +587,7 @@ function _arcaneReveal_clearPreview() {
     }
 }
 
-// _arcaneReveal_updatePreview — called on every mousemove while any ability
+// _arcaneReveal_updatePreview - called on every mousemove while any ability
 // is armed (see targeting-reticle.js). No-ops unless Arcane Reveal
 // specifically is the one armed. Moves/resizes the dashed square to match
 // the region currently centred under the cursor, clamped exactly the way
@@ -607,7 +613,7 @@ function _arcaneReveal_updatePreview(clientX, clientY) {
     const endCol = Math.min(cols - 1, hovered.c + radius);
 
     const key = `${startRow}-${startCol}-${endRow}-${endCol}`;
-    if (key === _arcaneRevealPreviewKey) return; // region unchanged since last move — skip rebuild
+    if (key === _arcaneRevealPreviewKey) return; // region unchanged since last move - skip rebuild
     _arcaneRevealPreviewKey = key;
 
     const wrap = document.getElementById('puzzle-scaler');
@@ -626,11 +632,11 @@ function _arcaneReveal_updatePreview(clientX, clientY) {
 
 
 //------------------------------------------------------------------------
-//-------------------ARCANE REVEAL — MAIN FUNCTION-----------------------
+//-------------------ARCANE REVEAL - MAIN FUNCTION-----------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _executeArcaneReveal — main entry point for the Arcane Reveal ability.
+// _executeArcaneReveal - main entry point for the Arcane Reveal ability.
 // Reveals up to maxReveals correct cells within radius steps of (row, col),
 // including diagonals. Passive nodes can extend radius and reveal cap.
 function _executeArcaneReveal(row, col, radius, maxReveals = 4) {
@@ -656,22 +662,22 @@ function _executeArcaneReveal(row, col, radius, maxReveals = 4) {
 
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) {
-        // No DOM to animate against — resolve everything instantly.
+        // No DOM to animate against - resolve everything instantly.
         revealedIds.forEach(id => _arcaneReveal_onCellRevealed(id, sol));
         _arcaneReveal_applyExposureMarks(markedIds);
         return;
     }
     if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
 
-    // STAGE 1 — Invocation on the origin cell
+    // STAGE 1 - Invocation on the origin cell
     const originEl = _arcaneReveal_findCellElement(row, col);
     if (originEl) _arcaneReveal_playInvocation(originEl, wrap, currentZoom || 1);
 
-    // STAGE 2 — Field formation over the whole targeting square
+    // STAGE 2 - Field formation over the whole targeting square
     setTimeout(() => {
         const field = _arcaneReveal_playFieldFormation(startRow, startCol, endRow, endCol, wrap);
 
-        // STAGE 3 — Revelation: mark → beam → flash for each chosen cell
+        // STAGE 3 - Revelation: mark → beam → flash for each chosen cell
         setTimeout(() => {
             _arcaneReveal_fadeField(field);
             _arcaneReveal_revelationSequence(row, col, revealedIds, wrap, currentZoom || 1, sol);
@@ -681,7 +687,7 @@ function _executeArcaneReveal(row, col, radius, maxReveals = 4) {
 }
 
 //------------------------------------------------------------------------
-//-------------------VARIANCE SHIELD — ARCANE BUBBLE VFX------------------
+//-------------------VARIANCE SHIELD - ARCANE BUBBLE VFX------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -692,14 +698,14 @@ const VARIANCE_SHIELD_DOME_PADDING_PX = 5; // how far the dome bulges past the a
 let _varianceShieldRemovalTimer = null;
 
 // Positions the fixed dome to match the grid's current screen rect,
-// using only the corner cells (g-0-0 / g-{lastRow}-{lastCol}) — same
+// using only the corner cells (g-0-0 / g-{lastRow}-{lastCol}) - same
 // approach as _fxShieldBorderAdd's _repositionShieldBorder, so clue
 // number gutters are never included and zoom/transform can't skew it.
 
 function _varianceShield_reposition() {
     const bubble = document.getElementById('variance-shield-bubble');
     // Use the wrap-relative rect helper (item_effects.js) instead of manual
-    // zoom-divided math — the bubble now lives in #puzzle-scaler-wrap
+    // zoom-divided math - the bubble now lives in #puzzle-scaler-wrap
     // (unscaled), so no currentZoom division should ever be applied here.
     // This mirrors the fix for #fx-shield-border, which had the exact same
     // bug: dividing by currentZoom at high zoom levels produced wildly
@@ -738,7 +744,7 @@ function _varianceShield_spawnBubble() {
             <div class="vs-bubble-inner-ring"></div>
             <div class="vs-bubble-rim"></div>
         `;
-        // Attach to the WRAP (unscaled), not the scaler — see
+        // Attach to the WRAP (unscaled), not the scaler - see
         // _varianceShield_reposition() for why. Coordinates written there
         // are now wrap-relative and must NOT be divided by currentZoom.
         const wrapEl = document.getElementById('puzzle-scaler-wrap');
@@ -794,7 +800,7 @@ function _varianceShield_removeBubble() {
 // Shows/hides the dome based on current shield stack count.
 // Call this any time window._classFreeMistakes changes.
 function _varianceShield_updateVisibility() {
-    if (window._vsSuppressAutoHide) return; // a meteor is currently resolving this exact mistake — don't interfere
+    if (window._vsSuppressAutoHide) return; // a meteor is currently resolving this exact mistake - don't interfere
 
     const stacks = window._classFreeMistakes || 0;
     if (STATE.playerClass === 'mathmagician' && stacks > 0) {
@@ -830,7 +836,7 @@ function _varianceShield_playCometImpact(impactPoint) {
 
 
 //------------------------------------------------------------------------
-//-------------------VARIANCE SHIELD — METEOR IMPACT VFX------------------
+//-------------------VARIANCE SHIELD - METEOR IMPACT VFX------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -913,7 +919,7 @@ function _varianceShield_shatterBubble() {
     }, VARIANCE_SHIELD_SHATTER_MS);
 }
 
-// _varianceShield_absorbMistake — call this from game.js at the exact
+// _varianceShield_absorbMistake - call this from game.js at the exact
 // moment a free mistake is consumed by the shield (i.e. right where
 // window._classFreeMistakes gets decremented), INSTEAD of calling
 // _varianceShield_updateVisibility() at that spot. Flies a meteor in
@@ -927,7 +933,7 @@ function _varianceShield_absorbMistake() {
 
     _varianceShield_spawnMeteor((impactPoint) => {
         if (bubble) bubble.classList.remove('vs-pending-impact');
-        window._vsSuppressAutoHide = false; // meteor resolved — outside visibility syncs can run again
+        window._vsSuppressAutoHide = false; // meteor resolved - outside visibility syncs can run again
 
         _varianceShield_playCometImpact(impactPoint);
 
@@ -946,7 +952,7 @@ function _varianceShield_absorbMistake() {
 
 
 //------------------------------------------------------------------------
-//-------------------ABSOLUTE ZERO — HELPERS------------------------------
+//-------------------ABSOLUTE ZERO - HELPERS------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1011,14 +1017,14 @@ function _arcaneFreeze_end(tick) {
     buildClassHUD();
 
     _arcaneFreeze_removeFrozenFloor();
-    // Frost tiles are intentionally left in place — they now persist for
+    // Frost tiles are intentionally left in place - they now persist for
     // the rest of the level, just like stalagmites, and only clear via
     // _arcaneFreeze_clearAllFrostAndStalagmites() on win/lose/leave.
 }
 
 
 //------------------------------------------------------------------------
-//-------------------ABSOLUTE ZERO — BLIZZARD VFX------------------------
+//-------------------ABSOLUTE ZERO - BLIZZARD VFX------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1067,7 +1073,7 @@ function _blizzard_scheduleFadeOut(overlay, tint, durationMs) {
     }, durationMs);
 }
 
-// _startBlizzardEffect — creates the full blizzard visual overlay for Absolute Zero.
+// _startBlizzardEffect - creates the full blizzard visual overlay for Absolute Zero.
 // Spawns a snowflake blizzard and an ice-tint screen wash for the given duration.
 function _startBlizzardEffect(durationMs) {
     // Clear any leftover blizzard from a previous cast
@@ -1090,14 +1096,14 @@ function _startBlizzardEffect(durationMs) {
 
 
 //------------------------------------------------------------------------
-//-------------------ABSOLUTE ZERO — FROZEN TILE VFX----------------------
+//-------------------ABSOLUTE ZERO - FROZEN TILE VFX----------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Persistent per-cell ice: a light frost crust on cells correctly filled
 // while Absolute Zero is active, and a large stalagmite on cells where a
 // mistake was absorbed by the freeze. Both persist until the freeze ends
 // naturally (thaw animation, see _arcaneFreeze_thawAllFrostAndStalagmites)
-// or the level ends outright — win, defeat, or leaving via LEVELS
+// or the level ends outright - win, defeat, or leaving via LEVELS
 // (instant removal, see _arcaneFreeze_clearAllFrostAndStalagmites).
 
 // Tracks which cells currently carry each overlay type, so cleanup never
@@ -1154,7 +1160,7 @@ function _arcaneFreeze_spawnStalagmite(row, col) {
 // Plays the melt-away transition on every persistently-frosted cell, then
 // removes the frost overlays once the animation finishes. Used when
 // Absolute Zero expires naturally (see _arcaneFreeze_end).
-// NOTE: stalagmites are intentionally NOT cleared here — they persist
+// NOTE: stalagmites are intentionally NOT cleared here - they persist
 // until their specific wrong mark is cleared (see
 // _arcaneFreeze_clearStalagmiteIfWrongMarkGone) or the level ends outright
 // (see _arcaneFreeze_clearAllFrostAndStalagmites).
@@ -1186,7 +1192,7 @@ function _arcaneFreeze_clearStalagmiteIfWrongMarkGone(row, col) {
     if (!window._stalagmiteTileCells) return;
     const key = `${row}-${col}`;
     if (!window._stalagmiteTileCells.has(key)) return;
-    if (wrongGrid[row][col]) return; // still wrong — keep the stalagmite
+    if (wrongGrid[row][col]) return; // still wrong - keep the stalagmite
 
     const el = document.getElementById(`g-${row}-${col}`);
     const overlay = el?.querySelector('.stalagmite-tile-overlay');
@@ -1198,8 +1204,8 @@ function _arcaneFreeze_clearStalagmiteIfWrongMarkGone(row, col) {
 }
 
 // Instantly strips every frost/stalagmite overlay with no animation.
-// Called whenever the level ends outright — win, defeat, or the player
-// leaving through the LEVELS button — so nothing lingers into the next
+// Called whenever the level ends outright - win, defeat, or the player
+// leaving through the LEVELS button - so nothing lingers into the next
 // level or the overlay screens.
 function _arcaneFreeze_clearAllFrostAndStalagmites() {
     document.querySelectorAll('.frost-tile-overlay, .stalagmite-tile-overlay')
@@ -1211,11 +1217,11 @@ function _arcaneFreeze_clearAllFrostAndStalagmites() {
 
 
 //------------------------------------------------------------------------
-//-------------------ABSOLUTE ZERO — MAIN FUNCTION------------------------
+//-------------------ABSOLUTE ZERO - MAIN FUNCTION------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _executeArcaneFreeze — main entry point for the Absolute Zero ability.
+// _executeArcaneFreeze - main entry point for the Absolute Zero ability.
 // Freezes the game timer for durationMs (modified by passives).
 // While frozen, wrong fills cost zero time (window._freezeActive flag).
 function _executeArcaneFreeze(durationMs) {

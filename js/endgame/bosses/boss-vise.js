@@ -1,39 +1,39 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE VISE (boss_vise)----------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK — "Cold Iron". The Mega-Man corridor soul, rebuilt on the
+// TIER 8 REWORK - "Cold Iron". The Mega-Man corridor soul, rebuilt on the
 // shared nk-run standard: the walls still sweep, the gap still breathes,
 // and the corridor still demands you stay between the walls. But now the
 // Vise is a forge that works you: every pass QUENCHES a workpiece, the
 // bench can BREAK before the cast, and the finale turns the whole arena
 // into a finished blade that snaps. Element: lightning.
 //
-//   • CRUSHING WALLS (signature, all fight) — the corridor, on nk runs:
+//   • CRUSHING WALLS (signature, all fight) - the corridor, on nk runs:
 //     two block walls sweep right → left around a BREATHING gap (the gap
 //     widens and narrows in a sine; the safe band is a living thing, not a
 //     straight pipe). Outside the walls burns. Touch a block: chunk +
 //     slow. Phase 3: the gap breathes FASTER while the walls hold.
-//   • BENCH VISE (60%, ~21s) — a great bench vise clamps down on a wide
+//   • BENCH VISE (60%, ~21s) - a great bench vise clamps down on a wide
 //     slice of the arena: two jaws crawl from opposite edges toward a
 //     centre line at your row (row telegraph), and the squeeze leaves a
 //     standing strain zone: sparks chip you if you linger in the squeezed
 //     band after the jaws bite. Escape the slice before the bite.
-//   • QUENCH OR SHATTER (60%, ~23s) — the Vise plants a glowing workpiece
+//   • QUENCH OR SHATTER (60%, ~23s) - the Vise plants a glowing workpiece
 //     and HAMMERS it: telegraphed hammer arcs slam along the piece; a
 //     sparks pool splashes off each strike. Body-check the workpiece 2×
-//     to knock it loose (+12% maxHP heal) and the piece SHATTERS — fail
+//     to knock it loose (+12% maxHP heal) and the piece SHATTERS - fail
 //     and the piece is QUENCHED: a giant wall-block crosses the arena at
 //     your row (the corridor comes for you). Phase 3: the quenched block
 //     returns the other way.
-//   • 🧱 THE FULL CLAMP (≤10%, one-shot finale) — three compression waves
+//   • 🧱 THE FULL CLAMP (≤10%, one-shot finale) - three compression waves
 //     squeeze the arena into a corridor of shrinking SAFE SLABS (lit blue
 //     tiles connected like a corridor; everything else detonates per
 //     wave). Survive three squeezes and the VISE OVERCLENCHES: THE IRON
-//     VISE slams full-screen (35%) — only the stress-fracture SAFE SLAB
+//     VISE slams full-screen (35%) - only the stress-fracture SAFE SLAB
 //     holds. Charge bar frozen (gate in _egTickPlayer via
 //     _egVisFinalActive).
 //
-// Shared soul kept: probability_shift still turns the puzzle's clues —
+// Shared soul kept: probability_shift still turns the puzzle's clues -
 // fitting for a boss about pressure and release. clue_scramble and
 // corrupt_cells retired (their pressure lives in the squeeze).
 //
@@ -64,7 +64,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_vise — "Cold Iron" (rework)
+    // boss_vise - "Cold Iron" (rework)
     // Phase 1 (100% → 60%): Crushing Walls + Probability Shift
     // Phase 2 ( 60% → 30%): immune window; Bench Vise + Quench or Shatter
     //                        join
@@ -96,7 +96,7 @@ const EG_VIS_TOUCH_CD_MS = 700;      // shared touch cooldown
 //-------------------SHARED VISUAL HELPERS---------------------------------
 //------------------------------------------------------------------------
 
-// Touch damage helper shared by all Vise hazards. Lightning-element boss —
+// Touch damage helper shared by all Vise hazards. Lightning-element boss -
 // hits go in with element 'lightning' so the toast palette stays yellow.
 let _egVisHitCd = 0;
 function _egVisTouch(pct, level, label) {
@@ -127,7 +127,7 @@ function _egVisHeal(amount) {
 //-------------------SIGNATURE: CRUSHING WALLS (all fight)------------------
 //------------------------------------------------------------------------
 // The corridor, rebuilt on nk runs: two block walls sweep right → left
-// around a BREATHING gap — the safe band widens and narrows in a slow
+// around a BREATHING gap - the safe band widens and narrows in a slow
 // sine, so the corridor is a living thing, not a straight pipe. Outside
 // the walls burns (DoT); touching a block is a chunk + brief slow.
 // Phase 3: the gap breathes faster while the walls hold.
@@ -149,7 +149,7 @@ function _egMechVisWalls(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_vis_walls', '🧱 CRUSHING WALLS — the corridor BREATHES. Stay between the walls as the gap opens and closes!', '#fde047');
+    _egNkToast('eg_mech_vis_walls', '🧱 CRUSHING WALLS - the corridor BREATHES. Stay between the walls as the gap opens and closes!', '#fde047');
 
     const S = EG_VIS_WALL_BLOCK;
     const gap0 = EG_VIS_WALL_GAP[p], amp = EG_VIS_WALL_AMP[p], rate = EG_VIS_WALL_RATE[p];
@@ -173,7 +173,7 @@ function _egMechVisWalls(monster, phase) {
         const upY = cy - gap / 2, loY = cy + gap / 2;
 
         // Spawn blocks at the boss head with the CURRENT gap (frozen at
-        // spawn — the polyline the player dodges through records the
+        // spawn - the polyline the player dodges through records the
         // breathing as it swept past).
         distAcc += spd * dtS;
         while (distAcc >= EG_VIS_WALL_STEP) {
@@ -219,7 +219,7 @@ function _egMechVisWalls(monster, phase) {
             try { if (typeof _egApplyPlayerAilment === 'function') _egApplyPlayerAilment('chill'); } catch (e) {}
         }
         // Outside = above the upper wall or below the lower wall (walls
-        // only cover where blocks exist — grace while they sweep in).
+        // only cover where blocks exist - grace while they sweep in).
         let coveredX = null;
         for (const b of blocks) { if (coveredX === null || b.x > coveredX) coveredX = b.x; }
         if (coveredX !== null && pc.x < coveredX + S) {
@@ -267,12 +267,12 @@ function _egMechVisBench(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_vis_bench', '🧱 BENCH VISE — the jaws crawl in. Escape the slice before it BITES!', '#fde047');
+    _egNkToast('eg_mech_vis_bench', '🧱 BENCH VISE - the jaws crawl in. Escape the slice before it BITES!', '#fde047');
 
     const nSlices = p >= 3 ? 2 : 1;
     const slices = [];
     for (let i = 0; i < nSlices; i++) {
-        // One slice: it clamps down on YOUR current row (honest telegraph —
+        // One slice: it clamps down on YOUR current row (honest telegraph -
         // the band shows where the jaws will meet, so move out of it).
         // Two slices (phase 3): fixed offset rows.
         const y = nSlices === 1
@@ -356,7 +356,7 @@ function _egMechVisBench(monster, phase) {
 // The Vise plants a glowing workpiece and HAMMERS it: telegraphed hammer
 // arcs slam along the piece; a sparks pool splashes off each strike.
 // Body-check the workpiece 2× to knock it loose (+12% maxHP heal) and the
-// piece SHATTERS — fail and the piece is QUENCHED: a giant wall-block
+// piece SHATTERS - fail and the piece is QUENCHED: a giant wall-block
 // crosses the arena at your row (the corridor comes for you). Phase 3:
 // the quenched block returns the other way.
 const EG_VIS_QUEN_MS    = [0, 0, 7000, 5500]; // hammer time by phase
@@ -377,7 +377,7 @@ function _egMechVisQuench(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_vis_quench', '🧱 QUENCH OR SHATTER — the hammer falls. Knock the workpiece loose to SHATTER it!', '#fde047');
+    _egNkToast('eg_mech_vis_quench', '🧱 QUENCH OR SHATTER - the hammer falls. Knock the workpiece loose to SHATTER it!', '#fde047');
 
     // Plant the workpiece away from the player.
     const pc0 = _egVisPC();
@@ -463,7 +463,7 @@ function _egMechVisQuench(monster, phase) {
                 state.knocked = true;
                 piece.classList.add('eg-vis-piece-shatter');
                 _egVisHeal(_egNkMaxHP() * EG_VIS_HEAL_CANCEL);
-                _egNkToast('eg_mech_vis_shatter', '🧱💥 WORKPIECE SHATTERED — the quench is cancelled! (+heal)', '#4ade80');
+                _egNkToast('eg_mech_vis_shatter', '🧱💥 WORKPIECE SHATTERED - the quench is cancelled! (+heal)', '#4ade80');
             }
         }
 
@@ -473,7 +473,7 @@ function _egMechVisQuench(monster, phase) {
             piece.classList.add('eg-vis-piece-quenched');
             state.sparkUntil = 0;
             if (state.sparkEl) { try { state.sparkEl.remove(); } catch (e) {} }
-            _egNkToast('eg_mech_vis_block', '🧱 THE QUENCH — the piece is iron now. It comes for your row!', '#f97316');
+            _egNkToast('eg_mech_vis_block', '🧱 THE QUENCH - the piece is iron now. It comes for your row!', '#f97316');
             state.dir = state.blocks % 2 === 0 ? 1 : -1;
             state.bandY = pc.y;
             const band = _egNkEl(run, 'div', 'eg-nk-band eg-vis-block-warn');
@@ -515,7 +515,7 @@ function _egMechVisQuench(monster, phase) {
                 if (state.blocks >= state.blocksTotal) {
                     return false;   // cast complete
                 }
-                // Phase 3: re-arm the hammer — a second quench, and the
+                // Phase 3: re-arm the hammer - a second quench, and the
                 // block returns the other way (dir flips on next cast).
                 state.quenched = false;
                 hammerT = 0;
@@ -535,7 +535,7 @@ function _egMechVisQuench(monster, phase) {
 // Three compression waves squeeze the arena into a corridor of shrinking
 // SAFE SLABS (lit blue tiles connected like a corridor; everything else
 // detonates per wave). Survive three squeezes and the VISE OVERCLENCHES:
-// THE IRON VISE slams full-screen (35%) — only the stress-fracture SAFE
+// THE IRON VISE slams full-screen (35%) - only the stress-fracture SAFE
 // SLAB holds. Charge bar frozen (gate in _egTickPlayer via
 // _egVisFinalActive).
 const EG_VIS_FIN_SQUEEZES  = 3;      // compression waves
@@ -626,11 +626,11 @@ function _egVisFinalStart(monster) {
     ov.className = 'eg-vis-cd';
     ov.innerHTML =
         '<div class="eg-vis-cd-label">🧱 THE FULL CLAMP</div>' +
-        '<div class="eg-vis-cd-hint">Three compression waves squeeze the arena — a corridor of SAFE SLABS lights up: reach it before each squeeze. Survive all three for THE IRON VISE: the overclench slams everything except the stress fracture!</div>';
+        '<div class="eg-vis-cd-hint">Three compression waves squeeze the arena - a corridor of SAFE SLABS lights up: reach it before each squeeze. Survive all three for THE IRON VISE: the overclench slams everything except the stress fracture!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_vis_final_cd', '🧱💀 THE FULL CLAMP — the whole arena is the workpiece now!', '#fde047');
+    _egNkToast('eg_mech_vis_final_cd', '🧱💀 THE FULL CLAMP - the whole arena is the workpiece now!', '#fde047');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -650,7 +650,7 @@ function _egVisFinalStart(monster) {
         if (g.finished) return;
         g.squeeze++;
         if (g.squeeze > EG_VIS_FIN_SQUEEZES) { runIronVise(); return; }
-        _egNkToast('eg_mech_vis_squeeze', '🧱 COMPRESSION ' + g.squeeze + '/' + EG_VIS_FIN_SQUEEZES + ' — find the corridor!', '#fde047');
+        _egNkToast('eg_mech_vis_squeeze', '🧱 COMPRESSION ' + g.squeeze + '/' + EG_VIS_FIN_SQUEEZES + ' - find the corridor!', '#fde047');
 
         const cols = EG_VIS_FIN_COLS, rows = EG_VIS_FIN_ROWS;
         const cell = Math.min(W / cols, H / rows);
@@ -697,10 +697,10 @@ function _egVisFinalStart(monster) {
         });
     };
 
-    // ── THE IRON VISE: the overclench — full-screen slam, one safe slab. ──
+    // ── THE IRON VISE: the overclench - full-screen slam, one safe slab. ──
     const runIronVise = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_vis_iron', '🧱💀 THE IRON VISE — the overclench! The stress fracture is the only safe ground!', '#f97316');
+        _egNkToast('eg_mech_vis_iron', '🧱💀 THE IRON VISE - the overclench! The stress fracture is the only safe ground!', '#f97316');
         // One stress-fracture slab, away from the edges.
         const cell = Math.min(W / EG_VIS_FIN_COLS, H / EG_VIS_FIN_ROWS);
         let px = W * 0.5, py = H * 0.5;
@@ -762,9 +762,9 @@ function _egVisFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-// NOTE: replaces the legacy _egCrushTeardown corridor hook — the corridor
+// NOTE: replaces the legacy _egCrushTeardown corridor hook - the corridor
 // was rebuilt on nk runs. The framework's old typeof-guarded call to
 // _egCrushTeardown is now a safe no-op; THIS teardown is wired separately
 // in _egBossCleanup (boss_vise branch).
@@ -788,8 +788,8 @@ function _egVisTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_VIS_DEBUG.fire('walls'|'bench'|'quench', phase) — runs one now
-//   _EG_VIS_DEBUG.final()                               — THE FULL CLAMP now
+//   _EG_VIS_DEBUG.fire('walls'|'bench'|'quench', phase) - runs one now
+//   _EG_VIS_DEBUG.final()                               - THE FULL CLAMP now
 if (typeof window !== 'undefined') {
     window._EG_VIS_DEBUG = {
         fire: (name, phase) => {

@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE KRAKEN (boss_kraken)-----------------------------
 //------------------------------------------------------------------------
-// Deep-sea homage: two great tentacle arms sweep around a central maw —
+// Deep-sea homage: two great tentacle arms sweep around a central maw -
 // slow, thick, and impossible to outrun forever. Slip between the arms'
 // rhythm like a tide-pool dancer.
 // This file holds EVERYTHING this boss needs in one place:

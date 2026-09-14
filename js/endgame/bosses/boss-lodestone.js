@@ -3,30 +3,30 @@
 //------------------------------------------------------------------------
 // A rework of the old one-shot Polarity Field into a persistent magnetic
 // siege. The Lodestone is a living magnet and the whole arena is its
-// field. Fight identity: POLARITY — you are metal; it moves you.
+// field. Fight identity: POLARITY - you are metal; it moves you.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE LODESTONE — the boss's arena body: a floating 🧲 that drifts
+//   • THE LODESTONE - the boss's arena body: a floating 🧲 that drifts
 //     around the table. Touching it is a MAGNETIC CLAMP: you are flung
 //     INTO the stone (magnetism pulls, it doesn't push) + lightning hit.
-//   • POLARITY DRAG — the stone constantly ATTRACTS you (gentle radial
+//   • POLARITY DRAG - the stone constantly ATTRACTS you (gentle radial
 //     pull, phase-scaled). Every ~6-7s its polarity FLIPS (visible N/S
 //     recolor + banner): the flip emits a REPULSION PULSE that shoves you
 //     hard away from the stone. Ride the pull, respect the flips.
-//   • SHRAPNEL FILINGS — the stone sheds magnetized iron filings (🔩)
+//   • SHRAPNEL FILINGS - the stone sheds magnetized iron filings (🔩)
 //     that spiral outward and launch radially. Lightning hits.
 //
-//   60% GATE — MAGNETIC VORTEX: the stone plants itself at center and
+//   60% GATE - MAGNETIC VORTEX: the stone plants itself at center and
 //   spins up (spiral field visuals): a strong drag pulls everything toward
 //   it for ~4.5s; standing too close grinds you against it (lightning
 //   DoT). Fight the pull and keep your distance.
 //
-//   30% GATE — RAILGUN: the stone aligns magnetic rails through itself
+//   30% GATE - RAILGUN: the stone aligns magnetic rails through itself
 //   (full-screen lane telegraphs aimed at you), gathers filings into the
 //   lane, then fires a ⚡ slug down each one. Anyone hit is flung.
 //
-//   CHARGE ATTACK — MAGNETIC LEASH: the stone fires a chain 🔗 along a
-//   telegraphed line. If it connects, you are REELED IN fast — end up
+//   CHARGE ATTACK - MAGNETIC LEASH: the stone fires a chain 🔗 along a
+//   telegraphed line. If it connects, you are REELED IN fast - end up
 //   inside the clamp radius when the chain runs out and you take heavy
 //   lightning damage + a clamp fling. If it misses, the chain sticks
 //   harmlessly.
@@ -38,7 +38,7 @@
 //
 // Shared mechanics live in shared-boss-abilities.js and are referenced
 // by handler-name string. Damage flows through the shared tier curve.
-// NOTE: exactly ONE _egNkLoop runs on the watcher's run — every state
+// NOTE: exactly ONE _egNkLoop runs on the watcher's run - every state
 // machine (flip pulse, vortex, railgun, leash) lives in that single tick.
 //------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            // Kept for schedule compatibility — the persistent watcher now
+            // Kept for schedule compatibility - the persistent watcher now
             // owns the drag/flip cadence; the handler no-ops (same shim
             // pattern as the other reworked bosses).
             { name: 'polarity_field', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechPolarityField' },
@@ -110,7 +110,7 @@ const EG_LDS_LEASH_FLING = [0, 180, 205, 230];
 
 let _egLodestoneWatcher = null; // per-fight magnetic state
 
-// Phase lookup helper — resolves the boss's current phase (default 1).
+// Phase lookup helper - resolves the boss's current phase (default 1).
 function _egLdsPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
         const m = _egMonsters.find(x => x && x.id === st.monsterId);
@@ -234,7 +234,7 @@ function _egLodestoneArenaInit(monster) {
                 }
                 _egLdsPulseRing(st, sn.x, sn.y);
             }
-            _egNkToast('eg_lds_flip', st.polarity === 'N' ? '🧲 POLARITY FLIP — N! Repulsion pulse!' : '🧲 POLARITY FLIP — S! Repulsion pulse!');
+            _egNkToast('eg_lds_flip', st.polarity === 'N' ? '🧲 POLARITY FLIP - N! Repulsion pulse!' : '🧲 POLARITY FLIP - S! Repulsion pulse!');
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
         } else if (!vortexing && !st.leash && c) {
             // Gentle attraction toward the stone between flips.
@@ -471,7 +471,7 @@ function _egLdsVortex(st) {
     if (st.vortex) return;
     const el = _egNkEl(st.run, 'div', 'eg-lds-vortex');
     st.vortex = { t: 0, el, grindAcc: 0 };
-    _egNkToast('eg_lds_vortex', '🌀 MAGNETIC VORTEX! Fight the pull — the stone grinds!');
+    _egNkToast('eg_lds_vortex', '🌀 MAGNETIC VORTEX! Fight the pull - the stone grinds!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
 }
 
@@ -511,7 +511,7 @@ function _egLodestoneLeash(monster) {
     const warnEl = _egNkEl(st.run, 'div', 'eg-lds-leash-line');
     _egLdsPlaceLine(warnEl, st.stone.x, st.stone.y, c.x, c.y);
     st.leash = { phase: 'warn', t: 0, px: c.x, py: c.y, locked: false, warnEl, chainEl: null };
-    _egNkToast('eg_lds_leash_warn', '🔗 The Lodestone coils a chain — dodge the line!');
+    _egNkToast('eg_lds_leash_warn', '🔗 The Lodestone coils a chain - dodge the line!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
 }
 
@@ -542,7 +542,7 @@ function _egLdsDistToSegment(px, py, x1, y1, x2, y2) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent drag/flip cadence —
+// The old scheduled mechanic is now the persistent drag/flip cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
 function _egMechPolarityField(monster, phase) { void monster; void phase; }

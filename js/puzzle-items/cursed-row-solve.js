@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------CURSED ROW SOLVE — TIDAL WAVE----------------------
+//-------------------CURSED ROW SOLVE - TIDAL WAVE----------------------
 //------------------------------------------------------------------------
 
-// cursedRowSolve — solves 3 rows; downside erases 1 pre-existing row.
+// cursedRowSolve - solves 3 rows; downside erases 1 pre-existing row.
 function _useCursedRowSolve(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -32,7 +32,7 @@ function _fxMakeWave(container, r, pass) {
     `, 'fx-tidal-wave');
 }
 
-// 🌊 Tidal Wave — waves of blue sweep across the grid multiple times.
+// 🌊 Tidal Wave - waves of blue sweep across the grid multiple times.
 function _fxTidalWave() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

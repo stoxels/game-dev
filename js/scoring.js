@@ -226,14 +226,13 @@ function _buildItemRewardCard(defId, def, labelHtml) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Returns true if the current level sits at the 33% or 66% milestone
-// within its world — these are "convergence" levels that grant a passive tree point.
+// Convergence milestones no longer live on campaign puzzle levels (Leveling
+// Rework): every former convergence level is a REGULAR puzzle level now.
+// Passive points for milestones come from Convergence Trials instead (see
+// js/campaign-trials.js). Kept as a function because quest stats, the world
+// screens and old saves still call it; it always reports "not convergence".
 function isConvergenceLevel(worldData, isAscensionLevel) {
-    if (worldData.data.length <= 2) return false;
-    const c1 = Math.floor((worldData.data.length - 1) / 3);
-    const c2 = Math.floor((worldData.data.length - 1) * 2 / 3);
-    const idx = cur.li - 1;
-    return (idx === c1 || idx === c2) && !isAscensionLevel;
+    return false;
 }
 
 // Grants one passive tree point on the first clear of a convergence level
@@ -261,7 +260,7 @@ function applyConvergenceReward(gi) {
 
 // Grants the Codex of Completion artifact on the first clear of the final
 // level in a world (the ascension level), and writes its reward HTML into irz.
-// Does nothing in ironman mode — that mode disables item rewards.
+// Does nothing in ironman mode - that mode disables item rewards.
 function applyAscensionReward(irz) {
     const defId = 'artifactComplete';
     const codexDef = ITEM_DEFS[defId];
@@ -296,7 +295,7 @@ function applyNexusPointReward(irz) {
 // Dispatcher for convergence, ascension and Nexus Point one-time rewards.
 // Called during win-overlay rendering; writes into the item-reward zone (irz)
 // when a special reward applies. The Nexus Point never grants the ascension
-// codex — it unlocks the Nexus instead.
+// codex - it unlocks the Nexus instead.
 function handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, isNexusPoint }) {
     const worldData = WORLDS[cur.world - 1];
 
@@ -398,7 +397,7 @@ function formatTime(totalSeconds) {
 // Otherwise shows just the total points awarded.
 function buildGainNote(pts, ptsAwarded, prevBest) {
     if (ptsAwarded < pts) {
-        return ` (+${ptsAwarded} ${t('ov_win_new')} — ${t('ov_win_best_was')} ${prevBest})`;
+        return ` (+${ptsAwarded} ${t('ov_win_new')} - ${t('ov_win_best_was')} ${prevBest})`;
     }
     return ` (+${ptsAwarded})`;
 }
@@ -415,7 +414,7 @@ function buildMistakeLine() {
     const absorbedNote = `<span style="opacity:0.55;font-size:0.85em">(${absorbedMistakes} ${t('ov_win_absorbed')})</span>`;
 
     if (absorbedMistakes > 0 && mistakeCount === 0) {
-        // All wrong clicks were absorbed — still shows as a clean run
+        // All wrong clicks were absorbed - still shows as a clean run
         return `<div class="ov-sub-line ov-sub-miss-ok">✗ 0 ${t('ov_win_mistakes')} ${absorbedNote}</div>`;
     }
 
@@ -500,7 +499,7 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNe
     if (bonusMet && !bonusAlreadyDone && !isQuizBonus) {
         STATE.bonusDone.push(gi);
         save();
-        // Re-check world aggregates — claiming this bonus may have completed
+        // Re-check world aggregates - claiming this bonus may have completed
         // the "all bonuses in a world" achievement set.
         if (typeof checkWorldCompleteAch === 'function') checkWorldCompleteAch();
     }
@@ -630,6 +629,9 @@ function checkIsLargeAdjMatrix() {
 
 function _getLevelSpecialStatus(level) {
     const worldData = WORLDS[level.world - 1];
+    // Tutorial-quest levels live outside the WORLDS array (world 15) - they
+    // are never ascension/convergence/nexus levels.
+    if (!worldData) return { isAscension: false, isConvergence: false, isNexusPoint: false };
     const wi = level.world - 1;
     const li = level.li - 1;
     const isNexusPoint = typeof isNexusPointLevel === 'function'
@@ -657,8 +659,11 @@ function _getLevelSpecialStatus(level) {
 function checkWin() {
     if (!isPuzzleSolved()) return;
 
-    // Monster levels hand off to the encounter chain instead of the normal win flow
-    if (typeof _egIsActive === 'function' && _egIsActive()) {
+    // Monster levels hand off to the encounter chain instead of the normal
+    // win flow. Campaign levels also run monsters (cur.campaignMonsters) but
+    // must still complete as normal puzzle levels, so they are excluded.
+    if (typeof _egIsActive === 'function' && _egIsActive()
+        && !(cur && cur.campaignMonsters)) {
         if (typeof _egOnPuzzleComplete === 'function') {
             dead = true;
             stopTimer();
@@ -669,7 +674,7 @@ function checkWin() {
 
     // Map-device run: puzzle solved by start-of-level passives BEFORE the
     // encounter flag has flipped (initial puzzle only). The normal
-    // win/scoring path must NOT run — the puzzle belongs to the encounter
+    // win/scoring path must NOT run - the puzzle belongs to the encounter
     // chain (question modal → countdown → next puzzle). Suppress the normal
     // overlay here; _doStartLevel() will hand off to _egOnPuzzleComplete
     // immediately after it starts the encounter.
@@ -696,13 +701,21 @@ function checkWin() {
     const cols = sol[0].length;
     const gi = cur.gIdx;
     const worldData = WORLDS[cur.world - 1];
+    if (!worldData) return;   // tutorial-quest levels bypass the normal win flow
     const _special = _getLevelSpecialStatus(cur);
     const isAscensionLevel = _special.isAscension;
     const isNexusPoint = !!_special.isNexusPoint;
     const isFirstClear = !STATE.done.includes(gi);
 
     if (isFirstClear) STATE.done.push(gi);
-    // Region entry beat — fires on first clear of that world's designated trigger level
+
+    // Campaign XP: a first clear grants the full amount, a replay a fraction
+    // of it (see _egGrantCampaignLevelXP / EG_LEVELING_CONFIG). Endgame map
+    // runs return above via _egOnPuzzleComplete and never reach this path.
+    if (typeof _egGrantCampaignLevelXP === 'function') {
+        try { _egGrantCampaignLevelXP(gi, isFirstClear); } catch (e) {}
+    }
+    // Region entry beat - fires on first clear of that world's designated trigger level
     /*
     if (isFirstClear && cur.li === (REGION_BEAT_TRIGGER_LEVEL[cur.world] || 1)) {
         showBeat('region_' + cur.world);
@@ -738,18 +751,18 @@ function checkWin() {
     if (typeof triggerBanter === 'function') triggerBanter('win');
 
 // Render the win overlay content (buildReveal() is deferred until
-    // #ov-win is actually visible — see the two branches below, and
+    // #ov-win is actually visible - see the two branches below, and
     // finishQuiz()/skipQuiz() in quiz.js for the quiz-bonus path)
     renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear, isNexusPoint });
 
-    // World completion hooks — persist code unlocks immediately so they're
+    // World completion hooks - persist code unlocks immediately so they're
     // not lost if the player closes the game before the delayed modal shows.
     checkWorldCodesSync();
     checkWorldCompletion();
 
     // Show the win overlay (or quiz flow if the bonus type is 'quiz')
     if (bonusMet && cur.bonusType === 'quiz') {
-        // ov-win itself isn't shown yet here — showQuiz() opens the separate
+        // ov-win itself isn't shown yet here - showQuiz() opens the separate
         // quiz-overlay first. buildReveal() runs later, in finishQuiz()/skipQuiz()
         // in quiz.js, right when ov-win actually becomes visible.
         setTimeout(() => showQuiz(cur.world), 1500);

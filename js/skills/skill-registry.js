@@ -20,7 +20,7 @@
 //   <ascId>_active2       e.g. markovian_active2      (Transition Matrix)
 //   heartbloom            universal endgame skill
 //
-// Each castable skill resolves to a "legacy slot" (active1…active5) — the
+// Each castable skill resolves to a "legacy slot" (active1…active5) - the
 // key the existing execution + cooldown engine already understands. For the
 // current roster that mapping is 1:1 per player, so cooldowns stay per-skill
 // without touching the class ability files.
@@ -41,14 +41,14 @@ const HEARTBLOOM_SKILL_ID = 'heartbloom';
 //------------------------------------------------------------------------
 // Extra info the ability defs do not carry. Keyed by skill id.
 //
-//   tags    — the PoE-style type line ("Spell, AoE, Duration")
-//   scaling — what the skill's numbers grow with (shown as "Scales with")
-//   damage  — null for non-damaging skills, otherwise:
+//   tags    - the PoE-style type line ("Spell, AoE, Duration")
+//   scaling - what the skill's numbers grow with (shown as "Scales with")
+//   damage  - null for non-damaging skills, otherwise:
 //               count(effect, level) → how many reveal projectiles it fires
 //               perHit: [[min,max] per rank] → reference damage per hit
 //             The live endgame value (gear-scaled) overrides perHit when an
 //             encounter is running (see getSkillDamage()).
-//   castTime — 'instant' | 'channel' | null, purely informational
+//   castTime - 'instant' | 'channel' | null, purely informational
 //------------------------------------------------------------------------
 
 const SKILL_META = {
@@ -372,10 +372,20 @@ function getPlayerTraits() {
     return (char && Array.isArray(char.traits)) ? char.traits : [];
 }
 
-// True if a skill may be placed into the hotbar.
+// True if a skill may be placed into the hotbar. Sealed universal spells
+// are refused (setHotbarSlot + startSkillDrag both funnel through here).
 function isSkillMovable(skillId) {
     const def = getSkillDef(skillId);
-    return !!def && def.movable !== false;
+    if (!def || def.movable === false) return false;
+    if (def.slotKind === 'universal' && typeof isUniversalSpellUnlocked === 'function') {
+        try { if (!isUniversalSpellUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
+    }
+    // Charm gate: a spell can only be placed on the hotbar while its charm
+    // sits in one of the spell slots (js/skills/skill-charms.js).
+    if (typeof isSkillCharmUnlocked === 'function') {
+        try { if (!isSkillCharmUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
+    }
+    return true;
 }
 
 // Returns the rank (1-based) of a castable skill for the current player.
@@ -391,11 +401,22 @@ function getSkillLevel(skillId) {
     }
 }
 
-// Returns the level data object (desc, effect) for the skill's current rank.
+// Returns the level data object (desc, effect) for the rank the skill is
+// actually CAST at. That is the slotted charm's rank when one is placed and
+// the trained rank otherwise (js/skills/skill-charms.js), so slotting a rank-1
+// charm makes every consumer of this - the spellbook/HUD description and the
+// damage estimate's effect lookup - describe the rank-1 variant even while the
+// character has the skill trained to rank 3. getSkillCastRankClamped also
+// clamps to the authored level table, so indexing is always in range.
 function getSkillLevelData(skillId) {
     const def = getSkillDef(skillId);
     if (!def || !def.levels) return null;
-    const lvl = Math.min(getSkillLevel(skillId), def.levels.length);
+    let lvl = getSkillLevel(skillId);
+    if (typeof getSkillCastRankClamped === 'function') {
+        const castRank = getSkillCastRankClamped(skillId);
+        if (castRank) lvl = castRank;
+    }
+    lvl = Math.max(1, Math.min(lvl, def.levels.length));
     return def.levels[lvl - 1] || def.levels[0] || null;
 }
 
@@ -434,12 +455,16 @@ function getSkillBaseManaCost(skillId) {
     return def.manaCost || 0;
 }
 
-// Live mana cost of the skill — includes gear/map cost scaling and the
+// Live mana cost of the skill - includes gear/map cost scaling and the
 // Blood Magic (life) swap. Prefers the existing per-slot resolver so the
-// tooltip and the actual cast always agree.
+// tooltip and the actual cast always agree. Universal spells (slotKind
+// 'universal', legacySlot null) delegate to their own cost resolver.
 function getSkillManaCost(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 0;
+    if (def.slotKind === 'universal' && typeof getUniversalSpellManaCost === 'function') {
+        try { return getUniversalSpellManaCost(skillId); } catch (e) { /* fall through */ }
+    }
     if (typeof _getAbilityManaCost === 'function') {
         try { return _getAbilityManaCost(def.legacySlot); } catch (e) { /* fall through */ }
     }
@@ -452,10 +477,14 @@ function getSkillBaseCooldown(skillId) {
     return def ? (def.cooldownSeconds || 0) : 0;
 }
 
-// Live cooldown after passive-tree and gear reductions.
+// Live cooldown after passive-tree and gear reductions. Universal spells
+// own their per-spell cooldown map (see universal-spells.js).
 function getSkillCooldown(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 0;
+    if (def.slotKind === 'universal' && typeof getUniversalSpellEffectiveCooldown === 'function') {
+        try { return getUniversalSpellEffectiveCooldown(skillId); } catch (e) { /* fall through */ }
+    }
     if (typeof getEffectiveCooldown === 'function') {
         try { return getEffectiveCooldown(def.legacySlot, def.cooldownSeconds || 0); } catch (e) { /* fall through */ }
     }
@@ -463,9 +492,13 @@ function getSkillCooldown(skillId) {
 }
 
 // Remaining cooldown seconds for the skill (0 when ready / unknown).
+// Universal spells read their own cooldown map (legacySlot is null).
 function getSkillCooldownRemaining(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 0;
+    if (def.slotKind === 'universal' && typeof getUniversalSpellCooldownRemaining === 'function') {
+        try { return getUniversalSpellCooldownRemaining(skillId); } catch (e) { return 0; }
+    }
     const state = (typeof cooldownState !== 'undefined') ? cooldownState[def.legacySlot] : null;
     return (state && state.remaining) || 0;
 }
@@ -474,6 +507,9 @@ function getSkillCooldownRemaining(skillId) {
 function canAffordSkill(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return false;
+    if (def.slotKind === 'universal' && typeof canAffordUniversalSpell === 'function') {
+        try { return canAffordUniversalSpell(skillId); } catch (e) { /* fall through */ }
+    }
     if (typeof _abilityCanAfford === 'function') {
         try { return _abilityCanAfford(def.legacySlot); } catch (e) { /* fall through */ }
     }
@@ -481,12 +517,21 @@ function canAffordSkill(skillId) {
 }
 
 // True while the skill's own usability gate allows casting (Heartbloom is
-// endgame-only; everything else is always available).
+// endgame-only; sealed universal spells are locked; everything else is
+// always available).
 function isSkillUsableNow(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return false;
+    if (def.slotKind === 'universal' && typeof isUniversalSpellUnlocked === 'function') {
+        try { if (!isUniversalSpellUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
+    }
     if (def.endgameOnly) {
         if (typeof isEndgameLevel === 'function' && !isEndgameLevel()) return false;
+    }
+    // Charm gate: only spells whose charm is currently placed in one of the
+    // spell slots may be cast (js/skills/skill-charms.js).
+    if (typeof isSkillCharmUnlocked === 'function') {
+        try { if (!isSkillCharmUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
     }
     return true;
 }
@@ -520,27 +565,41 @@ function _skillLiveRevealDamage() {
 }
 
 // Returns { perHitMin, perHitMax, count, totalMin, totalMax } or null.
+// Universal spells estimate from their def (volley/DoT/chain aware).
 function getSkillDamage(skillId) {
     const def = getSkillDef(skillId);
-    if (!def || !def.damage) return null;
+    if (!def) return null;
+    if (def.slotKind === 'universal' && typeof getUniversalSpellDamageEstimate === 'function') {
+        try { return getUniversalSpellDamageEstimate(skillId); } catch (e) { return null; }
+    }
+    if (!def.damage) return null;
 
-    const level = getSkillLevel(skillId);
+    // Damage follows the cast rank (the slotted charm's rank, else the
+    // trained rank): ranks are the late-game damage knob - see
+    // SPELL_RANK_DAMAGE_MULT in js/skills/skill-charms.js. The reference
+    // perHit values are rank-1 baselines, so they are scaled by the rank
+    // multiplier instead of indexed per rank.
+    const level = (typeof getSkillCastRankFull === 'function') ? getSkillCastRankFull(skillId) : getSkillLevel(skillId);
     const effect = getSkillEffect(skillId);
+    const rankMult = (typeof getSpellRankDamageMult === 'function') ? getSpellRankDamageMult(level) : 1;
     let count = 1;
     try { count = Math.max(1, Number(def.damage.count(effect, level)) || 1); } catch (e) { count = 1; }
 
     const live = _skillLiveRevealDamage();
     if (live) {
+        const perHitMin = Math.max(1, Math.round(live.min * rankMult));
+        const perHitMax = Math.max(1, Math.round(live.max * rankMult));
         return {
-            perHitMin: live.min,
-            perHitMax: live.max,
+            perHitMin,
+            perHitMax,
             count,
-            totalMin: live.min * count,
-            totalMax: live.max * count,
+            totalMin: perHitMin * count,
+            totalMax: perHitMax * count,
         };
     }
 
-    const range = (def.damage.perHit && def.damage.perHit[level - 1]) || (def.damage.perHit && def.damage.perHit[0]) || [1, 1];
+    const base = (def.damage.perHit && def.damage.perHit[0]) || [1, 1];
+    const range = [Math.max(1, Math.round(base[0] * rankMult)), Math.max(1, Math.round(base[1] * rankMult))];
     return {
         perHitMin: range[0],
         perHitMax: range[1],
@@ -574,13 +633,19 @@ function _playerAscendencySkillIds() {
 }
 
 // Every castable skill the current player owns, in display order:
-// base actives → ascendency actives → Heartbloom.
+// base actives → ascendency actives → Heartbloom → universal spells.
 function getPlayerSkillIds() {
     const ids = [
         ..._playerBaseSkillIds(),
         ..._playerAscendencySkillIds(),
     ].filter((id) => !!getSkillDef(id));
     if (getSkillDef(HEARTBLOOM_SKILL_ID)) ids.push(HEARTBLOOM_SKILL_ID);
+    // Universal spell arsenal (universal-spells.js): open to every class.
+    if (typeof UNIVERSAL_SPELL_DEFS !== 'undefined') {
+        for (const spell of UNIVERSAL_SPELL_DEFS) {
+            if (getSkillDef(spell.id) && !ids.includes(spell.id)) ids.push(spell.id);
+        }
+    }
     return ids;
 }
 
@@ -599,6 +664,35 @@ function getPlayerSkillGroups() {
         });
     }
     if (getSkillDef(HEARTBLOOM_SKILL_ID)) groups.push({ labelKey: 'spellbook_group_endgame', ids: [HEARTBLOOM_SKILL_ID] });
+    // Universal spell arsenal - labelFallback (bilingual via _uspGroupTitle)
+    // so no translation keys are required for the section header.
+    if (typeof UNIVERSAL_SPELL_DEFS !== 'undefined') {
+        // The arsenal is split into SUPPORT (defensive self-casts), MOVEMENT
+        // (repositioning self-casts) and the offensive spells, so the handful
+        // of utility spells is findable instead of being buried in the
+        // 40-spell list. Order matters: the self-cast families sit directly
+        // under the player's own skills, support first because it is the one
+        // you reach for under pressure.
+        const isSupport = (typeof isUniversalSupportSpell === 'function')
+            ? isUniversalSupportSpell : () => false;
+        const isMovement = (typeof isUniversalMovementSpell === 'function')
+            ? isUniversalMovementSpell : () => false;
+        const supIds = UNIVERSAL_SPELL_DEFS.filter((s) => isSupport(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
+        const movIds = UNIVERSAL_SPELL_DEFS.filter((s) => !isSupport(s) && isMovement(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
+        const uspIds = UNIVERSAL_SPELL_DEFS.filter((s) => !isSupport(s) && !isMovement(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
+        if (supIds.length) {
+            const supTitle = (typeof _uspSupportGroupTitle === 'function') ? _uspSupportGroupTitle() : 'Support Spells';
+            groups.push({ labelKey: 'spellbook_group_support', labelFallback: supTitle, ids: supIds });
+        }
+        if (movIds.length) {
+            const movTitle = (typeof _uspMovementGroupTitle === 'function') ? _uspMovementGroupTitle() : 'Movement Spells';
+            groups.push({ labelKey: 'spellbook_group_movement', labelFallback: movTitle, ids: movIds });
+        }
+        if (uspIds.length) {
+            const title = (typeof _uspGroupTitle === 'function') ? _uspGroupTitle() : 'Universal Spells';
+            groups.push({ labelKey: 'spellbook_group_universal', labelFallback: title, ids: uspIds });
+        }
+    }
     return groups;
 }
 
@@ -638,8 +732,8 @@ function _defaultSkillHotbar(state) {
 }
 
 // Ensures STATE.skillHotbar exists and is the right length, prunes skills the
-// player no longer owns (e.g. after a class change), and — only on the very
-// first init or when the class/ascendency changes — fills the free slots from
+// player no longer owns (e.g. after a class change), and - only on the very
+// first init or when the class/ascendency changes - fills the free slots from
 // the new roster.
 //
 // The auto-fill MUST NOT run on every call: clearing a slot would otherwise
@@ -663,11 +757,15 @@ function ensureSkillHotbar() {
 
     // First-ever init, or the player's class/ascendency changed → seed the
     // bar with the (new) roster so there's always something to press.
+    // Universal spells are NEVER auto-seeded: the player drags them onto
+    // the bar themselves (mirrors the tutorial Fireball rule).
     const ownerKey = `${STATE.playerClass || ''}|${STATE.playerAscendency || ''}`;
     const shouldSeed = !STATE.skillHotbarInit || STATE.skillHotbarOwner !== ownerKey;
     if (shouldSeed) {
         const placed = new Set(STATE.skillHotbar.filter(Boolean));
         for (const id of getPlayerSkillIds()) {
+            const seedDef = getSkillDef(id);
+            if (seedDef && seedDef.slotKind === 'universal') continue;
             if (placed.has(id)) continue;
             const free = STATE.skillHotbar.indexOf(null);
             if (free === -1) break;
@@ -736,10 +834,24 @@ function activateHotbarSlot(slotIndex) {
 function activateSkill(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return false;
+    // Charm gate first so the player gets the actionable message rather than
+    // the generic "endgame only" one.
+    if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked(skillId)) {
+        if (typeof showToast === 'function') showToast(t('charm_locked_toast'), '#ff6b9d');
+        return false;
+    }
     if (!isSkillUsableNow(skillId)) {
         if (typeof showToast === 'function') {
             showToast(t('skill_endgame_only'), '#ff6b9d');
         }
+        return false;
+    }
+    // Remember the casting skill so its charm orb bonus reaches the reveal
+    // projectiles it fires (see getCharmCastingDamageMult).
+    if (typeof noteCharmCast === 'function') noteCharmCast(skillId);
+    // Universal spells bypass the legacy slot engine entirely.
+    if (def.slotKind === 'universal') {
+        if (typeof castUniversalSpell === 'function') return castUniversalSpell(skillId);
         return false;
     }
     if (typeof toggleActiveAbility === 'function') {

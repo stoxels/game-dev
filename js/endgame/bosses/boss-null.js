@@ -1,24 +1,24 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE NULL (boss_null)----------------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK — 🧿 "The Null Hypothesis". Erasure of certainty: the Null
-// deletes your information and your tools, and the fight is a proof — prove
+// TIER 7 REWORK - 🧿 "The Null Hypothesis". Erasure of certainty: the Null
+// deletes your information and your tools, and the fight is a proof - prove
 // you can win with less. Element: shadow (unchanged).
-//   • VOID LATTICE (signature, all fight) — a permanent star-lattice of
+//   • VOID LATTICE (signature, all fight) - a permanent star-lattice of
 //     void lines on the floor; standing ON a line is a shadow DoT. The
 //     lattice re-contracts every ~12s to a new random centre (old lines
-//     dissolve, new ones grow — a 1.2s grace window between).
-//   • HYPOTHESIS ERASURE (60%) — the Null targets ONE system each cast
+//     dissolve, new ones grow - a 1.2s grace window between).
+//   • HYPOTHESIS ERASURE (60%) - the Null targets ONE system each cast
 //     (clue numbers / auto-attack charge bar / class HUD) and greys it out
 //     for 8s with a clear 🧿 marker over what it took. Readable sabotage
 //     instead of blackout chaos. (Clue numbers reuse the blackout spans.)
-//   • NULL RAYS (60%) — two eye-beams orbit the anchor; crossing a ray
-//     CHILLS your charge bar (50% fill for the ailment duration — the soft
+//   • NULL RAYS (60%) - two eye-beams orbit the anchor; crossing a ray
+//     CHILLS your charge bar (50% fill for the ailment duration - the soft
 //     punish) plus contact damage.
-//   • 💀 PROOF BY CONTRADICTION (≤10%, one-shot) — the arena empties to
+//   • 💀 PROOF BY CONTRADICTION (≤10%, one-shot) - the arena empties to
 //     pure white; the Null asserts "you cannot hit me" (immune). Three
 //     COUNTER-EXAMPLE WINDOWS open in sequence: a phantom replays your own
-//     recent movement and telegraphs a strike toward its heading — stand
+//     recent movement and telegraphs a strike toward its heading - stand
 //     OPPOSITE the strike (within reach) to expose the contradiction and
 //     shatter a shell. Three exposures → the hypothesis collapses (the
 //     Null implodes and pays its own HP). Three failed windows →
@@ -35,7 +35,7 @@
 //
 // Prefix discipline: everything here is _egNul / eg-nul-.
 // Compatibility: the framework's shared cleanup typeof-guards
-// _egRemoveBlackout and _egVoidSurgeTeardown — both still live HERE.
+// _egRemoveBlackout and _egVoidSurgeTeardown - both still live HERE.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Null's timing 2.5x so manual playtests / screenshot
@@ -53,7 +53,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_null — "The Null Hypothesis" (rework)
+    // boss_null - "The Null Hypothesis" (rework)
     // Phase 1 (100% → 60%): Void Lattice teaches line-reading
     // Phase 2 ( 60% → 30%): immune window, Erasure + Rays join
     // Phase 3 ( 30% →  0%): tighter lattice; at 10% the PROOF begins
@@ -113,7 +113,7 @@ function _egNulTouch(pct, level, label) {
 function _egNulPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Prefixed delay for out-of-run callbacks: defers while the game is
-// frozen (visual-only use — the finale uses _egNulAfter instead).
+// frozen (visual-only use - the finale uses _egNulAfter instead).
 function _egNulDelay(ms, fn) {
     setTimeout(() => { if (!_egNkFrozen()) fn(); else setTimeout(() => { if (!_egNkFrozen()) fn(); }, 120); }, ms);
 }
@@ -147,23 +147,23 @@ function _egNulEnsureRecRun(monster) {
 //-------------------SIGNATURE: VOID LATTICE (all fight)-------------------
 //------------------------------------------------------------------------
 // A permanent star-lattice of void lines: standing ON a line is a shadow
-// DoT. Every ~12s the lattice re-contracts to a new random centre — old
+// DoT. Every ~12s the lattice re-contracts to a new random centre - old
 // lines dissolve, new ones grow (a ~1.2s grace window between states).
 // Geometry: 3 lines through the centre at 60° steps (6 spokes), plus a
-// hollow hexagon ring — the safe cells are the triangular gaps.
+// hollow hexagon ring - the safe cells are the triangular gaps.
 let _egNulLatRun = null;
 let _egNulLines = [];   // { el, cx, cy, ang, len }
 let _egNulRing = [];    // { el, cx, cy, ang, d } (hexagon segments)
 
 function _egMechNulLattice(monster, phase) {
-    // The lattice is permanent — one long-lived passive run owns it.
+    // The lattice is permanent - one long-lived passive run owns it.
     // Later scheduled casts must NOT re-toast or rebuild it.
     if (_egNulLatRun && _egNkRuns.has(_egNulLatRun.id)) return;
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
-    _egNkToast('eg_mech_nul_lattice', '🧿🕸️ VOID LATTICE — the void lines erase what touches them!', '#a5b4fc');
+    _egNkToast('eg_mech_nul_lattice', '🧿🕸️ VOID LATTICE - the void lines erase what touches them!', '#a5b4fc');
     _egNulEnsureRecRun(monster);
 
     const run = _egNkNewRun(monster && monster.id, false);
@@ -210,7 +210,7 @@ function _egMechNulLattice(monster, phase) {
             document.body.appendChild(seg);
             // Pass 5: cache the painted box at draw time. The lattice is static
             // body-absolute px geometry (left/top/width/height inline + rotate),
-            // so the box never changes after creation — reading it live every
+            // so the box never changes after creation - reading it live every
             // damage tick (6 gBCR per 100 ms) was pure layout thrash.
             const segBox = seg.getBoundingClientRect();
             _egNulRing.push({ el: seg, rect: { left: segBox.left, right: segBox.right, top: segBox.top, bottom: segBox.bottom } });
@@ -254,7 +254,7 @@ function _egMechNulLattice(monster, phase) {
                     l.cx + Math.cos(l.ang) * l.len / 2, l.cy + Math.sin(l.ang) * l.len / 2
                 ) < EG_NUL_LINE_W / 2 + 9) ||
                 _egNulRing.some(r => {
-                    const rect = r.rect || r.el.getBoundingClientRect(); // rect cached at draw time (static geometry — Pass 5)
+                    const rect = r.rect || r.el.getBoundingClientRect(); // rect cached at draw time (static geometry - Pass 5)
                     return pc.x > rect.left - 9 && pc.x < rect.right + 9 && pc.y > rect.top - 9 && pc.y < rect.bottom + 9;
                 });
             if (onLine) _egNkDotTick(run, EG_NUL_LINE_DPS, 0.1, level, 'shadow');
@@ -268,10 +268,10 @@ function _egMechNulLattice(monster, phase) {
 //-------------------COMPAT: CLUE BLACKOUT (framework hooks)---------------
 //------------------------------------------------------------------------
 // The framework's shared cleanup typeof-guards _egRemoveBlackout and
-// _egVoidSurgeTeardown — both stay defined HERE. The blackout span-hiding
+// _egVoidSurgeTeardown - both stay defined HERE. The blackout span-hiding
 // machinery is also reused by Hypothesis Erasure below.
 // NOTE: _egBlackoutActive / _egVoidSurgeActive / _egVoidSurgePollInterval
-// are DECLARED IN endgame-state.js (loads earlier) — redeclaring them here
+// are DECLARED IN endgame-state.js (loads earlier) - redeclaring them here
 // would be a fatal SyntaxError that kills this whole file.
 
 // Hides all clue spans and stores their original text so it can be restored.
@@ -317,7 +317,7 @@ function _egMechNulErasure(monster, phase) {
     if (_egNkFrozen()) return;
     void phase;
     const target = EG_NUL_ERASE_TARGETS[Math.floor(Math.random() * EG_NUL_ERASE_TARGETS.length)];
-    _egNkToast('eg_mech_nul_erasure', '🧿 HYPOTHESIS ERASED — the Null took your ' +
+    _egNkToast('eg_mech_nul_erasure', '🧿 HYPOTHESIS ERASED - the Null took your ' +
         (target === 'clues' ? 'clue numbers' : target === 'charge' ? 'charge bar' : 'class HUD') + ' for 8s!', '#a5b4fc');
 
     const marker = document.createElement('div');
@@ -344,7 +344,7 @@ function _egMechNulErasure(monster, phase) {
     }
 
     // Erasure hides INFORMATION only (the design: grey it out, marker on
-    // top) — the bar keeps filling; you just cannot read it.
+    // top) - the bar keeps filling; you just cannot read it.
     if (target === 'charge') {
         ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
             const el = document.getElementById(id);
@@ -374,14 +374,14 @@ function _egMechNulErasure(monster, phase) {
 //-------------------ACT II: NULL RAYS (60%)-------------------------------
 //------------------------------------------------------------------------
 // Two eye-beams orbit the anchor. Crossing one: contact damage PLUS the
-// chill ailment (charge bar fills at 50% — a verified soft punish).
+// chill ailment (charge bar fills at 50% - a verified soft punish).
 function _egMechNulRays(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_nul_rays', '🧿👁️ NULL RAYS — do not cross the gaze!', '#818cf8');
+    _egNkToast('eg_mech_nul_rays', '🧿👁️ NULL RAYS - do not cross the gaze!', '#818cf8');
     _egNulEnsureRecRun(monster);
 
     const cx = W / 2, cy = H * 0.45;
@@ -414,7 +414,7 @@ function _egMechNulRays(monster, phase) {
         if (crossed) {
             if (_egNulTouch(EG_NUL_RAY_HIT, level, 'Null Ray')) {
                 try { _egApplyPlayerAilment('chill'); } catch (err) {}
-                _egNkToast('eg_mech_nul_chilled', '🧿❄️ Your charge bar is CHILLED — it fills at half speed!', '#93c5fd');
+                _egNkToast('eg_mech_nul_chilled', '🧿❄️ Your charge bar is CHILLED - it fills at half speed!', '#93c5fd');
             }
         }
         return e < 9000 * _EG_NUL_DEBUG_MULT;
@@ -427,7 +427,7 @@ function _egMechNulRays(monster, phase) {
 //------------------------------------------------------------------------
 // The arena empties to pure white; the Null asserts "you cannot hit me"
 // (immune). Three counter-example windows open in sequence: a phantom of
-// YOUR recent movement walks and telegraphs a strike toward its heading —
+// YOUR recent movement walks and telegraphs a strike toward its heading -
 // stand OPPOSITE the strike (within reach of the phantom) to expose the
 // contradiction and shatter a shell. Three exposures → the hypothesis
 // collapses (the Null pays its own HP). Three failures → NULLIFICATION:
@@ -484,7 +484,7 @@ function _egNulAfter(g, ms, fn) {
 function _egNulFinalStart(monster) {
     if (_egNulFinal || !monster) return;
 
-    // The proof takes over: kill every ACTIVE mechanic run of this boss —
+    // The proof takes over: kill every ACTIVE mechanic run of this boss -
     // the lattice and recorder runs idle (they check _egNulFinalActive).
     Array.from(_egNkRuns.values()).forEach(r => {
         if (r.bossId !== monster.id || r.passive) return;
@@ -529,15 +529,15 @@ function _egNulFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-nul-cd-label">🧿💀 PROOF BY CONTRADICTION</div>' +
         '<div class="eg-nul-cd-status">SHELLS 0/' + EG_NUL_EXPOSE_GOAL + '</div>' +
-        '<div class="eg-nul-cd-timer">—</div>' +
-        '<div class="eg-nul-cd-hint">The phantom replays YOUR path — stand OPPOSITE its strike to expose the contradiction!</div>';
+        '<div class="eg-nul-cd-timer">-</div>' +
+        '<div class="eg-nul-cd-hint">The phantom replays YOUR path - stand OPPOSITE its strike to expose the contradiction!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.statusEl = ov.querySelector('.eg-nul-cd-status');
     g.timerEl = ov.querySelector('.eg-nul-cd-timer');
     g.fxRun.els.push(ov);
 
-    _egNkToast('eg_mech_nul_final_cd', '🧿💀 PROOF BY CONTRADICTION — the Null says you cannot hit it. Prove it wrong!', '#c7d2fe');
+    _egNkToast('eg_mech_nul_final_cd', '🧿💀 PROOF BY CONTRADICTION - the Null says you cannot hit it. Prove it wrong!', '#c7d2fe');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -553,10 +553,10 @@ function _egNulFinalStart(monster) {
     const runWindow = () => {
         if (g.finished) return;
         g.window++;
-        _egNkToast('eg_mech_nul_window', '🧿 Counter-example ' + g.window + '/3 — expose it!', '#c7d2fe');
+        _egNkToast('eg_mech_nul_window', '🧿 Counter-example ' + g.window + '/3 - expose it!', '#c7d2fe');
 
         const buf = _egNulRecBuf.slice();
-        if (buf.length < 8) {   // not enough recorded yet — wait a beat, retry
+        if (buf.length < 8) {   // not enough recorded yet - wait a beat, retry
             _egNulAfter(g, 800 * _EG_NUL_DEBUG_MULT, runWindow);
             return;
         }
@@ -591,7 +591,7 @@ function _egNulFinalStart(monster) {
                     // Standing WHERE it strikes: the hypothesis holds.
                     g.fails++;
                     _egNulTouch(EG_NUL_STRIKE_HIT, level, 'Void Strike');
-                    _egNkToast('eg_mech_nul_fail', '🧿 The strike found you — the hypothesis holds!', '#f87171');
+                    _egNkToast('eg_mech_nul_fail', '🧿 The strike found you - the hypothesis holds!', '#f87171');
                 } else if (nearPhantom) {
                     // Opposite the strike, within reach: CONTRADICTION.
                     g.shatters++;
@@ -599,10 +599,10 @@ function _egNulFinalStart(monster) {
                     shatter.style.left = Math.round(endS.x - 70) + 'px';
                     shatter.style.top = Math.round(endS.y - 70) + 'px';
                     _egNulAfter(g, 800, () => { try { shatter.remove(); } catch (e) {} });
-                    _egNkToast('eg_mech_nul_expose', '🧿💥 CONTRADICTION EXPOSED — shell ' + g.shatters + '/' + EG_NUL_EXPOSE_GOAL + ' shatters!', '#a7f3d0');
+                    _egNkToast('eg_mech_nul_expose', '🧿💥 CONTRADICTION EXPOSED - shell ' + g.shatters + '/' + EG_NUL_EXPOSE_GOAL + ' shatters!', '#a7f3d0');
                 } else {
                     g.fails++;
-                    _egNkToast('eg_mech_nul_fail', '🧿 You never engaged the phantom — the hypothesis holds!', '#f87171');
+                    _egNkToast('eg_mech_nul_fail', '🧿 You never engaged the phantom - the hypothesis holds!', '#f87171');
                 }
                 if (g.statusEl) g.statusEl.textContent = 'SHELLS ' + g.shatters + '/' + EG_NUL_EXPOSE_GOAL;
                 try { phantom.remove(); } catch (e) {}
@@ -631,11 +631,11 @@ function _egNulFinalStart(monster) {
     runWindow();
 }
 
-// Three exposures: the hypothesis collapses — the Null implodes inward and
+// Three exposures: the hypothesis collapses - the Null implodes inward and
 // pays its own remaining HP (canonical path, immunity already released).
 function _egNulCollapse(g, monster) {
     if (g.finished) return;
-    _egNkToast('eg_mech_nul_collapse', '🧿💥 THE HYPOTHESIS COLLAPSES — the Null refutes itself!', '#a7f3d0');
+    _egNkToast('eg_mech_nul_collapse', '🧿💥 THE HYPOTHESIS COLLAPSES - the Null refutes itself!', '#a7f3d0');
     const flash = document.createElement('div');
     flash.className = 'eg-nul-implode';
     document.body.appendChild(flash);
@@ -650,10 +650,10 @@ function _egNulCollapse(g, monster) {
     void monster;
 }
 
-// Three failures: NULLIFICATION — darkness returns except one white ring.
+// Three failures: NULLIFICATION - darkness returns except one white ring.
 function _egNulNullification(g, monster, level) {
     if (g.finished) return;
-    _egNkToast('eg_mech_nul_nullify', '🧿💀 NULLIFICATION — everything is erased but the ring!', '#f87171');
+    _egNkToast('eg_mech_nul_nullify', '🧿💀 NULLIFICATION - everything is erased but the ring!', '#f87171');
     const W = window.innerWidth, H = window.innerHeight;
     const dark = document.createElement('div');
     dark.className = 'eg-nul-dark';
@@ -673,7 +673,7 @@ function _egNulNullification(g, monster, level) {
             const dealt = _egNkHit(EG_NUL_NULLIFY, 'shadow', level);
             _egNkAbilityHitToast(dealt, 'The Null', 'Nullification');
         } else {
-            _egNkToast('eg_mech_nul_survived', '🧿 You survived the nullification — the fight resumes!', '#a7f3d0');
+            _egNkToast('eg_mech_nul_survived', '🧿 You survived the nullification - the fight resumes!', '#a7f3d0');
         }
         // The proof failed: the arena returns and the fight resumes.
         _egNulFinalEnd(g, monster);
@@ -707,7 +707,7 @@ function _egNulFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
 function _egNulTeardown() {
     if (_egNulFinal) { try { _egNulFinalEnd(_egNulFinal, null); } catch (e) {} _egNulFinal = null; }
@@ -743,7 +743,7 @@ function _egNulTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_NUL_DEBUG.fire('lattice'|'erasure'|'rays'|'final') — run one now
+//   _EG_NUL_DEBUG.fire('lattice'|'erasure'|'rays'|'final') - run one now
 if (typeof window !== 'undefined') {
     window._EG_NUL_DEBUG = {
         fire: (name, phase) => {

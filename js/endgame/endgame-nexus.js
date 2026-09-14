@@ -1,7 +1,7 @@
 'use strict';
 
 //========================================================================
-//=  ENDGAME NEXUS OF WORLDS — PARENT SCREEN                             =
+//=  ENDGAME NEXUS OF WORLDS - PARENT SCREEN                             =
 //========================================================================
 //=  Central hub screen for the endgame system. Reached from the mode    =
 //=  select screen ("Endgame Test") and from all "Return to Nexus"       =
@@ -21,7 +21,7 @@
 //=  is the single anchor of the endgame screen cluster.                 =
 //=                                                                      =
 //=  Public API:                                                         =
-//=    showEndgameNexus() — creates the screen on first call and         =
+//=    showEndgameNexus() - creates the screen on first call and         =
 //=                         switches to it.                              =
 //========================================================================
 
@@ -68,7 +68,7 @@ function _egnBuildFullScreenHTML() {
 //-------------------STYLES (INJECTED ONCE)---------------------------------
 //------------------------------------------------------------------------
 // Injected via JS, same pattern as _egtEnsureStyles() in
-// endgame-testing-screen.js — avoids needing to touch the (large) main CSS file.
+// endgame-testing-screen.js - avoids needing to touch the (large) main CSS file.
 
 function _egnEnsureStyles() {
     if (document.getElementById('egn-nexus-style')) return;
@@ -153,11 +153,11 @@ function ensureEndgameNexusScreen() {
     if (!document.getElementById('screen-endgame-nexus')) _egnCreateScreen();
 }
 
-// Entry point — call this to show the Nexus of Worlds screen.
+// Entry point - call this to show the Nexus of Worlds screen.
 // (History push to 'screen-mode-select' happens in launchEndgameTestMode()
 // in screens.js on entry from the mode select screen.)
 function showEndgameNexus() {
-    // Leaving any boss-test context behind — a forfeit to the Nexus must
+    // Leaving any boss-test context behind - a forfeit to the Nexus must
     // not leak the flag into a later campaign run's goToLevelSelect().
     window._egIsBossTestRun = false;
     ensureEndgameNexusScreen();

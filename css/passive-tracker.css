@@ -9,7 +9,7 @@
 /* ------------------------------------------------------------------------- */
 
 :root {
-    /* Gold accent — used for borders, text highlights, scrollbar, hover tints */
+    /* Gold accent - used for borders, text highlights, scrollbar, hover tints */
     --pt-gold: 184, 154, 80;
     --pt-gold-text: #d4b870;
     --pt-gold-title: rgba(212, 184, 112, 0.8);
@@ -21,7 +21,7 @@
     --pt-text-muted: #888;
     --pt-text-gold: #bba870;
     --pt-text-highlight: #e8d490;
-    --pt-text-accent: #66fcf1; /* Tooltip title — teal pop */
+    --pt-text-accent: #66fcf1; /* Tooltip title - teal pop */
     --pt-text-warn: #ff8060; /* Warning / error state */
     /* Shared shape */
     --pt-radius: 6px;
@@ -77,7 +77,7 @@
     cursor: default;
 }
 
-/* Small all-caps label — styled like a HUD readout */
+/* Small all-caps label - styled like a HUD readout */
 .pt-tracker-title {
     font-size: 10px;
     letter-spacing: 1.5px;
@@ -126,7 +126,7 @@
     scrollbar-color: rgba(var(--pt-gold), 0.3) transparent;
 }
 
-    /* Webkit scrollbar — keep it thin and gold-tinted */
+    /* Webkit scrollbar - keep it thin and gold-tinted */
     .pt-tracker-body::-webkit-scrollbar {
         width: 3px;
     }
@@ -189,7 +189,7 @@
 /* These flex together to fill the row width cleanly.                       */
 /* ------------------------------------------------------------------------- */
 
-/* Small colored circle — used to indicate effect category or status */
+/* Small colored circle - used to indicate effect category or status */
 .pt-tracker-dot {
     width: 5px;
     height: 5px;
@@ -206,7 +206,7 @@
     text-align: center;
 }
 
-/* Effect name — truncates with ellipsis if too long */
+/* Effect name - truncates with ellipsis if too long */
 .pt-tracker-label {
     color: var(--pt-text-body);
     flex: 1;
@@ -217,7 +217,7 @@
     text-overflow: ellipsis;
 }
 
-/* Numeric readout — always right-aligned, bold, fixed minimum width */
+/* Numeric readout - always right-aligned, bold, fixed minimum width */
 .pt-tracker-value {
     font-size: 10px;
     font-weight: bold;
@@ -253,7 +253,7 @@
     flex-shrink: 0;
 }
 
-/* The colored fill — width is set inline as a percentage */
+/* The colored fill - width is set inline as a percentage */
 .pt-tracker-bar-fill {
     height: 100%;
     background: var(--bar-color, #6dbf40);
@@ -300,7 +300,7 @@
     color: var(--pt-text-gold);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
     line-height: 1.55;
-    /* Hidden by default — JS adds .visible to show */
+    /* Hidden by default - JS adds .visible to show */
     opacity: 0;
     transition: opacity 0.1s;
 }
@@ -317,7 +317,7 @@
 /* Child utility classes handle highlighted values, warnings, and muted text*/
 /* ------------------------------------------------------------------------- */
 
-/* Teal title — stands out clearly against the dark background */
+/* Teal title - stands out clearly against the dark background */
 .pt-tip-title {
     font-size: 12px;
     font-weight: bold;
@@ -336,14 +336,14 @@
         color: var(--pt-text-highlight);
     }
 
-    /* Warning line — shown below the main body when a cap or issue is active */
+    /* Warning line - shown below the main body when a cap or issue is active */
     .pt-tip-body .tip-warn {
         color: var(--pt-text-warn);
         display: block;
         margin-top: 4px;
     }
 
-    /* Secondary / footnote text — de-emphasized */
+    /* Secondary / footnote text - de-emphasized */
     .pt-tip-body .tip-mute {
         color: var(--pt-text-muted);
         font-size: 10px;

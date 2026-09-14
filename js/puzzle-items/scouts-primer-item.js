@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------SCOUT'S PRIMER — USE HANDLER----------------------
+//-------------------SCOUT'S PRIMER - USE HANDLER----------------------
 //------------------------------------------------------------------------
 
-// scoutPrimer — marks the next puzzle start so a reveal fires immediately.
+// scoutPrimer - marks the next puzzle start so a reveal fires immediately.
 function _useScoutPrimer(id, def) {
     STATE.primerPending = true;
     save();
@@ -34,7 +34,7 @@ function _fxMakePrimerArrows(container, cx, cy, r) {
     });
 }
 
-// 📜 Scout's Primer — golden compass-points radiate outward.
+// 📜 Scout's Primer - golden compass-points radiate outward.
 function _fxScoutPrimer() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

@@ -1,6 +1,6 @@
-/* Endgame Boss Pack 2 — dodge-mechanic visuals
-   (see js/endgame/bosses/ — one file per boss + shared-boss-abilities.js)
-   Everything here is pointer-events: none — mechanics never block clicks. */
+/* Endgame Boss Pack 2 - dodge-mechanic visuals
+   (see js/endgame/bosses/ - one file per boss + shared-boss-abilities.js)
+   Everything here is pointer-events: none - mechanics never block clicks. */
 
 /* Shared floating dots (funnels, bombs, snakes, orbs, anchors) */
 .eg-nk-dot {
@@ -22,11 +22,11 @@
 /* Pulse via OPACITY only. Chromium applies the individual `scale`/`rotate`
    properties around the VIEWPORT origin (ignoring transform-origin) on
    position:fixed elements, so a transform-based keyframe either overrides
-   the inline translate (parking anchors at the top-left — the original bug)
+   the inline translate (parking anchors at the top-left - the original bug)
    or makes them orbit the screen corner (the `scale` variant). opacity
    leaves the inline translate untouched: the anchor stays EXACTLY where the
    JS put it, gently breathing in place. (NB: eg-nk-spin/wiggle still use the
-   individual `rotate` property and DO orbit the corner in Chromium — fix
+   individual `rotate` property and DO orbit the corner in Chromium - fix
    pending, see eg-nk-anchor-pulse history.) */
 @keyframes eg-nk-anchor-pulse { from { opacity: 0.85; } to { opacity: 1; } }
 .eg-nk-orb {
@@ -40,7 +40,7 @@
 @keyframes eg-nk-fuse-blink { 0% { filter: brightness(1); } 100% { filter: brightness(2.2) saturate(0.2); } }
 .eg-nk-boom { filter: brightness(2.4) !important; transform-origin: center; }
 
-/* Spark pillars — all orientations use lightning yellow/gold */
+/* Spark pillars - all orientations use lightning yellow/gold */
 .eg-nk-pillar-warn {
     position: fixed;
     pointer-events: none; z-index: 9001;
@@ -62,12 +62,12 @@
 .eg-nk-pillar.vertical { top: 0; bottom: 0; height: 100vh; }
 .eg-nk-pillar.horizontal { left: 0; right: 0; width: 100vw; }
 
-/* The Dynamo — spark pillars as REAL lightning: a fixed container rotated
-   to the pillar axis holds an SVG with layered flat strokes — a wide faint
-   halo under a mid glow under a hot white core — instead of SVG filters
+/* The Dynamo - spark pillars as REAL lightning: a fixed container rotated
+   to the pillar axis holds an SVG with layered flat strokes - a wide faint
+   halo under a mid glow under a hot white core - instead of SVG filters
    (blur/drop-shadow repainted huge screen areas and tanked FPS). Paths are
    re-jittered a few times per second so the arc visibly crackles.
-   (The generic .eg-nk-pillar blocks above stay for other bosses — Seraph.) */
+   (The generic .eg-nk-pillar blocks above stay for other bosses - Seraph.) */
 .eg-nk-bolt {
     position: fixed;
     pointer-events: none;
@@ -126,16 +126,17 @@
     stroke-width: 4.5;
 }
 @keyframes eg-bolt-strike-flash {
-    /* Opacity snap instead of filter brightness — no per-frame re-raster. */
+    /* Opacity snap instead of filter brightness - no per-frame re-raster. */
     0%   { opacity: 0.3; }
     40%  { opacity: 1; }
     60%  { opacity: 0.55; }
     100% { opacity: 1; }
 }
 
-/* The Dynamo — conductor network SVG layer (fixed overlay above the grid,
-   below pillars). The single SVG carries the field polygon + jagged beams;
-   conductor CARDS live in #eg-dynamo-layer and stay clickable. */
+/* The Dynamo - conductor network SVG layer (below the grid so overlapping
+   cards never steal cell clicks; clickable everywhere else). The single SVG
+   carries the field polygon + jagged beams; conductor CARDS live in
+   #eg-dynamo-layer and stay clickable. */
 #eg-dynamo-layer {
     position: fixed;
     left: 0;
@@ -143,7 +144,7 @@
     width: 0;
     height: 0;
     pointer-events: none;
-    z-index: 900;
+    z-index: 1;
 }
 #eg-dynamo-layer .eg-monster-card-compact {
     position: absolute;
@@ -173,12 +174,12 @@
     transform: translateZ(0);
 }
 
-/* Charged field — filled convex hull of the whole beam network. The interior
+/* Charged field - filled convex hull of the whole beam network. The interior
    shocks the player (heavy). Shapes redraw every crackle tick. */
 .eg-dynamo-field {
     fill: rgba(250, 204, 21, 0.14);
     stroke: none;
-    /* Opacity pulse instead of animating fill — compositor-friendly. */
+    /* Opacity pulse instead of animating fill - compositor-friendly. */
     animation: eg-dynamo-field-pulse 1.1s ease-in-out infinite alternate;
 }
 @keyframes eg-dynamo-field-pulse {
@@ -192,7 +193,7 @@
     stroke-dasharray: 10 8;
 }
 
-/* Electric arcs: layered flat strokes — wide faint halo, mid glow, hot
+/* Electric arcs: layered flat strokes - wide faint halo, mid glow, hot
    white-gold core. The JS creates halo/mid/core paths; SVG filters are gone
    (blur/drop-shadow over the full-viewport SVG forced huge repaints).
    Re-struck by _egDynamoRebuildNet. */
@@ -246,7 +247,7 @@
     box-shadow: 0 0 14px rgba(148, 163, 184, 0.8);
 }
 
-/* Marked strikes — crosshair reticle: the Marksman is AIMING here.
+/* Marked strikes - crosshair reticle: the Marksman is AIMING here.
    Ring + cross ticks + center dot; the arrow impacts the center point. */
 .eg-nk-mark {
     position: fixed;
@@ -342,7 +343,7 @@
     filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
 }
 /* Telegraph: the individual bows that are ABOUT to loose a wall glow and
-   pulse — a per-bow tell, not a full row/column band. Stragglers (next
+   pulse - a per-bow tell, not a full row/column band. Stragglers (next
    arrows) arm with a short delay so the volley reads as a cascade. */
 .eg-gauntlet-bow-arm {
     animation: eg-gauntlet-bow-arm-pulse 0.45s ease-in-out infinite alternate;
@@ -394,7 +395,7 @@
    across the whole targeted line. Every overlay here ignores pointers so
    clicks always reach the grid. */
 .eg-slam-quake {
-    /* Shake only the struck band — later in the file than .eg-nk-band-hit,
+    /* Shake only the struck band - later in the file than .eg-nk-band-hit,
        so this wins the animation slot while both classes are attached. */
     animation: eg-slam-quake-kf 0.32s ease-out !important;
 }
@@ -476,9 +477,9 @@
 }
 .eg-nk-beam-warn { opacity: 0.45; border-top-style: dashed; border-bottom-style: dashed; }
 
-/* The Clock — three permanent rotating hands (seconds red/thin, minutes
+/* The Clock - three permanent rotating hands (seconds red/thin, minutes
    cyan/medium, hours amber/thick). Each hand is a single solid thin beam
-   from the pivot to the screen edge — anywhere on the beam hurts, so stay
+   from the pivot to the screen edge - anywhere on the beam hurts, so stay
    off every hand's line. Summoned at 90/60/30% HP, each announced by a
    center-grid time call ("35 seconds") 3s before it appears; the hands all
    rotate at the same speed until the boss is won or lost. See boss-clock.js. */
@@ -530,7 +531,7 @@
 .eg-nk-clock-call-minute { color: #a5f3fc; text-shadow: 0 0 10px rgba(103,232,249,0.9); }
 .eg-nk-clock-call-hour { color: #fde68a; text-shadow: 0 0 10px rgba(251,191,36,0.95); }
 
-/* The Clock — Time Freeze telegraph: ~2.5s before the freeze the clock
+/* The Clock - Time Freeze telegraph: ~2.5s before the freeze the clock
    face flares gold and the hands halt (the warn flag freezes them too),
    plus a center "TIME FREEZE INCOMING" callout. See
    _egClockStartTimeFreezeWarn in boss-clock.js. */
@@ -563,7 +564,7 @@
     text-shadow: 0 0 14px rgba(250, 204, 21, 0.95);
 }
 
-/* The Clock — Time Freeze (15% HP last-stand). Below 15% HP The Clock
+/* The Clock - Time Freeze (15% HP last-stand). Below 15% HP The Clock
    stops time: the hands freeze, the timer and mistake counter freeze, the
    avatar is locked, and a ring of beams rushes in from all sides to hover
    just short of the player. If the boss isn't slain in 30s every beam
@@ -638,7 +639,7 @@
 }
 
 /* Countdown ring around the player: a gold arc depletes over the 30s
-   freeze with the seconds in the middle — readable without glancing at the
+   freeze with the seconds in the middle - readable without glancing at the
    banner. Urgent red under 5s, white flash on the strike. */
 .eg-clock-freeze-ring-wrap {
     position: fixed;
@@ -806,7 +807,7 @@
     pointer-events: none;
 }
 
-/* ============ Boss Pack 3 — dodge-mechanic visuals ============ */
+/* ============ Boss Pack 3 - dodge-mechanic visuals ============ */
 
 /* Inferno rotating beams (fire variant of the siren beam) */
 .eg-nk-beam-fire {
@@ -907,7 +908,7 @@
     opacity: 0.75;
 }
 
-/* ============ Boss Pack 4 — dodge-mechanic visuals ============ */
+/* ============ Boss Pack 4 - dodge-mechanic visuals ============ */
 
 /* Arbiter trial tints + center label */
 .eg-nk-trial-blue {
@@ -993,9 +994,9 @@
     box-shadow: 0 0 12px rgba(124, 58, 237, 0.8);
 }
 
-/* ============ The Dynamo — Lightning Conductors ============ */
+/* ============ The Dynamo - Lightning Conductors ============ */
 /* Summoned conductor monsters with health bars and lightning beam network */
-/* Conductor roaming cards — the mechanical look lives on the emoji tile:
+/* Conductor roaming cards - the mechanical look lives on the emoji tile:
    a charged brass socket that pulses like a capacitor. Reuses the shared
    compact-card bar/tooltip structure (targets + bars work unchanged). */
 .eg-dynamo-conductor-card .eg-emoji-wrapper {
@@ -1018,15 +1019,15 @@
     to   { transform: scale(1.04); }
 }
 
-/* No charge bar — conductors never attack (chargeMax 9999 keeps the
+/* No charge bar - conductors never attack (chargeMax 9999 keeps the
    engine's own bar empty too). */
 .eg-dynamo-conductor-card .eg-charge-track-compact {
     display: none !important;
 }
 
-/* ============ Pack 4 — shared puzzle mechanic visuals ============ */
+/* ============ Pack 4 - shared puzzle mechanic visuals ============ */
 
-/* Fated Cell doom-clock mark (never blocks the fill — a race, not a lock) */
+/* Fated Cell doom-clock mark (never blocks the fill - a race, not a lock) */
 .eg-fate-overlay {
     position: absolute;
     inset: 0;
@@ -1046,7 +1047,7 @@
     to { background: rgba(202,138,4,0.6); border-color: #fef08a; }
 }
 
-/* Fog Bank region cover (playable underneath — pointer-events pass through) */
+/* Fog Bank region cover (playable underneath - pointer-events pass through) */
 .eg-fog-bank {
     position: absolute;
     display: flex;
@@ -1159,9 +1160,9 @@
     text-shadow: 0 0 8px rgba(192, 132, 252, 0.9);
 }
 
-/* ============ Boss Pack 5 — dodge-mechanic visuals ============ */
+/* ============ Boss Pack 5 - dodge-mechanic visuals ============ */
 
-/* Ember drift — the flame stays pinned to its falling lane: the wobble is
+/* Ember drift - the flame stays pinned to its falling lane: the wobble is
    a glow/opacity flicker ONLY (never transform/rotate), so the rendered
    box always matches the collision hitbox and players can dodge by lane.
    (Rotate-keyframe animations orbit fixed-position dots around the screen
@@ -1194,7 +1195,7 @@
     filter: drop-shadow(0 0 10px rgba(110, 231, 183, 0.9));
 }
 
-/* Gust arena visuals — spikes, wind, windbreak walls, wind blades,
+/* Gust arena visuals - spikes, wind, windbreak walls, wind blades,
    tornadoes + boss core. See boss-gust.js for the mechanic layout. */
 .eg-nk-edge-burn {
     position: fixed; left: 0; right: 0; height: 90px; width: 100vw;
@@ -1266,7 +1267,7 @@
     to { transform: scaleY(1); opacity: 1; }
 }
 /* Root tendrils: thin thorned roots growing from the bramble strips into
-   the outermost ring of cells — makes "the wall seals these cells" literal. */
+   the outermost ring of cells - makes "the wall seals these cells" literal. */
 .eg-sprout-conn {
     position: fixed; z-index: 9001; pointer-events: none;
     background: linear-gradient(180deg, rgba(22, 101, 52, 0.9), rgba(74, 222, 128, 0.75));
@@ -1315,7 +1316,7 @@
 
 /* ── The Bumper: carnival ring ─────────────────────────────────────── */
 /* Pinball-table side rails: frame the arena so the carnival theme reads
-   even between set-pieces. Pure decoration — sits under every hazard. */
+   even between set-pieces. Pure decoration - sits under every hazard. */
 .eg-bump-rail {
     position: fixed; z-index: 8990; pointer-events: none;
     background:
@@ -1333,7 +1334,7 @@
         linear-gradient(90deg, rgba(250, 204, 21, 0.0), rgba(250, 204, 21, 0.28) 50%, rgba(250, 204, 21, 0.0));
     box-shadow: inset 0 -2px 0 rgba(250, 204, 21, 0.45), 0 0 12px rgba(250, 204, 21, 0.2);
 }
-/* Lane chevrons on the side rails — classic pinball shooter-lane arrows. */
+/* Lane chevrons on the side rails - classic pinball shooter-lane arrows. */
 .eg-bump-rail.left::after, .eg-bump-rail.right::after {
     content: '▲▼';
     position: absolute; top: 50%; left: 50%;
@@ -1540,7 +1541,7 @@
     from { transform: translate(-50%, -50%) scale(0.92) rotate(-2deg); opacity: 0.8; }
     to { transform: translate(-50%, -50%) scale(1.08) rotate(2deg); opacity: 1; }
 }
-/* Bait primed: the player stands in the bait ring — the mound flares gold
+/* Bait primed: the player stands in the bait ring - the mound flares gold
    and shakes harder, promising the mini will pop out straight at them. */
 .eg-cent-resurf.bait {
     border-color: rgba(250, 204, 21, 1);
@@ -1688,7 +1689,7 @@
     from { transform: scaleX(-0.06); }
     to { transform: scaleX(-1); }
 }
-/* Strike: the whole tendril snaps hot. Deliberately transform-free —
+/* Strike: the whole tendril snaps hot. Deliberately transform-free -
    a vertical lunge's inline rotate(90deg) must survive the animation. */
 .eg-sprout-lunge.hit {
     border-style: solid;
@@ -1750,7 +1751,7 @@
     background: linear-gradient(180deg, rgba(125, 211, 252, 0.55), rgba(224, 242, 254, 1));
     filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.95)) drop-shadow(0 0 9px rgba(125, 211, 252, 0.7));
 }
-/* Ground splash (drop hitting dry ground — no water yet). */
+/* Ground splash (drop hitting dry ground - no water yet). */
 .eg-pud-splash {
     position: fixed; z-index: 9003; pointer-events: none;
     width: 26px; height: 9px; margin: -4px 0 0 -13px;
@@ -1856,7 +1857,7 @@
 
 /* ── Gate wave: curling crest that sweeps the flood surface ──
    Outer = position + flip (JS sets left/top/height per band); inner = the
-   crest art. JS anchors the top at the WATER SURFACE — translateY(-100%)
+   crest art. JS anchors the top at the WATER SURFACE - translateY(-100%)
    lifts the whole crest box ABOVE the surface so it looms over the grid
    (without it, the box extends down into the flood and is invisible). */
 .eg-pud-wave {
@@ -1963,10 +1964,10 @@ body.eg-firefly-drag-cursor, body.eg-firefly-drag-cursor * { cursor: grabbing !i
 .eg-nk-firefly.eg-firefly-flash::before { content: ''; position: absolute; inset: -13px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, .95); box-shadow: 0 0 18px rgba(253, 224, 71, .95); pointer-events: none; animation: eg-firefly-flash-ring .65s ease-out forwards; }
 @keyframes eg-firefly-flash-ring { 0% { transform: scale(.55); opacity: 1; } 100% { transform: scale(2.1); opacity: 0; } }
 /* The dark gnaws: pulsing violet vignette while the keeper stands outside
-   every fairy's light — the damage tell for the darkness tick. */
+   every fairy's light - the damage tell for the darkness tick. */
 .eg-firefly-darkness.eg-firefly-dark-danger::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 42%, rgba(96, 40, 168, .34) 100%); animation: eg-firefly-dark-pulse 1.1s ease-in-out infinite; }
 @keyframes eg-firefly-dark-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
-/* LUMEN BURST — the boss's direct attack. The tell blooms (a growing ring
+/* LUMEN BURST - the boss's direct attack. The tell blooms (a growing ring
    + core marking the blast zone), then the boom flashes and fades. Both
    animate transform/opacity only so they stay cheap. */
 .eg-firefly-burst-tell { position: fixed; z-index: 9010; pointer-events: none; width: 260px; height: 260px; margin: -130px 0 0 -130px; border-radius: 50%; background: radial-gradient(circle, rgba(253,224,71,.62) 0%, rgba(250,204,21,.3) 45%, transparent 70%); box-shadow: inset 0 0 0 4px rgba(253,224,71,.75), inset 0 0 34px rgba(250,204,21,.75), 0 0 26px rgba(250,204,21,.45); animation: eg-firefly-burst-tell 2s ease-in forwards; }
@@ -1977,7 +1978,7 @@ body.eg-firefly-drag-cursor, body.eg-firefly-drag-cursor * { cursor: grabbing !i
 /* Fairy caught by a burst but surviving: a short scorch flash. */
 .eg-nk-firefly.eg-firefly-chip .eg-firefly-glyph { animation: eg-firefly-chip-flash .5s ease-out; }
 @keyframes eg-firefly-chip-flash { 0%, 100% { filter: drop-shadow(0 0 10px rgba(253, 224, 71, 0.95)); } 30% { filter: drop-shadow(0 0 4px rgba(120, 30, 0, .9)) brightness(.55) saturate(.4); } }
-/* Fairy name under each sprite — subtle until the fly is the selected one. */
+/* Fairy name under each sprite - subtle until the fly is the selected one. */
 .eg-firefly-name { position: absolute; bottom: -17px; left: 50%; transform: translateX(-50%); font: 700 9px/1.2 sans-serif; letter-spacing: .05em; white-space: nowrap; color: rgba(254, 240, 138, .55); text-shadow: 0 1px 3px #000, 0 0 6px rgba(0, 0, 0, .8); pointer-events: none; }
 .eg-nk-firefly.eg-firefly-selected .eg-firefly-name { color: #fef08a; text-shadow: 0 0 8px rgba(250, 204, 21, .9), 0 1px 3px #000; }
 .eg-nk-firefly.eg-firefly-hurt .eg-firefly-glyph { filter: grayscale(1) brightness(0.65); }
@@ -1990,7 +1991,7 @@ body.eg-firefly-drag-cursor, body.eg-firefly-drag-cursor * { cursor: grabbing !i
 .eg-firefly-respawn { position: fixed; z-index: 9016; left: 50%; bottom: 7%; transform: translateX(-50%); opacity: 0; color: #fecaca; font: 800 15px/1.2 sans-serif; letter-spacing: .04em; text-shadow: 0 2px 5px #000; pointer-events: none; transition: opacity .15s; }
 .eg-firefly-respawn-visible { opacity: 1; }
 /* Control guide shown for the WHOLE fight (removed with the run's
-   teardown) — the short keybind cheat-sheet always stays at hand. Sits
+   teardown) - the short keybind cheat-sheet always stays at hand. Sits
    under the top HUD, above the darkness; .eg-firefly-controls-hide is
    kept for any future manual fade-out. */
 .eg-firefly-controls {
@@ -2317,10 +2318,9 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
 /* Roaming monster cards live outside the static monster panel in a
    full-screen fixed layer so they can shamble into the ground-slam band.
    Cards keep their own click/target/bars behaviour; bands (z 9001) draw
-   above them. The layer floats above the monster wrapper (200), floating
-   spawn panels (300) and objectives strip (250/400) so a walking zombie is
-   always the topmost clickable thing under the cursor — the layer itself
-   stays pointer-events: none so only the cards catch clicks. */
+   above them. The layer sits BELOW the puzzle grid so a wandering zombie
+   never steals cell clicks - the layer itself stays pointer-events: none
+   so only the cards catch clicks where they don't overlap the grid. */
 #eg-zombie-layer {
     position: fixed;
     left: 0;
@@ -2328,7 +2328,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     width: 0;
     height: 0;
     pointer-events: none;
-    z-index: 900;
+    z-index: 1;
 }
 #eg-zombie-layer .eg-monster-card-compact {
     position: absolute;
@@ -2338,7 +2338,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     pointer-events: auto;
     transform-origin: center bottom;
 }
-/* Roaming cards are always hoverable/clickable targets — no dead zone */
+/* Roaming cards are always hoverable/clickable targets - no dead zone */
 #eg-zombie-layer .eg-monster-card-compact:hover {
     filter: brightness(1.12);
 }
@@ -2358,11 +2358,11 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
    Row 1: live stack count + total attack-charge bonus (+30% per stack).
    Row 2: drain bar counting down to the NEXT stack expiry, with the seconds
    until that drop. Redrawn at 10Hz by the feed-HUD timer, so the bar reads
-   as a smooth countdown. Purely cosmetic — pointer-events none.
+   as a smooth countdown. Purely cosmetic - pointer-events none.
 
    The chip docks on the card's LEFT side, clear of the ▼ TARGET ▼ pill that
    floats above a targeted boss and clear of the hover tooltip below the
-   emoji frame — it must never be hidden by either. */
+   emoji frame - it must never be hidden by either. */
 .eg-boss-feed-badge {
     position: absolute;
     top: 50%;
@@ -2466,7 +2466,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     }
 }
 
-/* Icy floor patches on grid cells while the shell is up. Purely cosmetic —
+/* Icy floor patches on grid cells while the shell is up. Purely cosmetic -
    the cells stay fully playable and never block clicks. */
 .eg-jelly-ice {
     position: absolute;
@@ -2495,7 +2495,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
 }
 
 /* Ice Shell readability cues (boss-jelly.js). When a lobbed hop blob locks
-   onto the player, every icy patch pulses once — "a hop is incoming; the
+   onto the player, every icy patch pulses once - "a hop is incoming; the
    ice is where it breaks". The patch under the avatar (rest phase) or the
    locked landing cell (warn/fly) glows green as the hold spot. */
 /* Green hold-spot marker: pulses in the shell's color to read as "safe
@@ -2546,7 +2546,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
    avatar while a shell blob is still squishing (rest phase, before it
    locks). Fixed element positioned every frame by boss-jelly.js; it rides
    with the gate's run so it is cleaned up when the run dies. The down
-   chevron points at the cell the player should stand on — the blob locks
+   chevron points at the cell the player should stand on - the blob locks
    onto wherever the player stands, so standing there makes it slip. */
 .eg-jelly-guide {
     position: fixed;
@@ -2596,7 +2596,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     50%      { transform: translate(-50%, -100%) translateY(-4px); }
 }
 
-/* Hop blob that slipped on ice — frosty trail while it launches at the
+/* Hop blob that slipped on ice - frosty trail while it launches at the
    boss. Filter-only animation so the translated position stays put. */
 .eg-nk-jelly-slip {
     filter: drop-shadow(0 0 16px rgba(165, 243, 252, 0.95))
@@ -2645,9 +2645,9 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     }
 }
 
-/* ============ The Snail — Doom Snail rework ============ */
+/* ============ The Snail - Doom Snail rework ============ */
 
-/* Slimed grid-cell overlay — blocks ALL interaction until swept clean */
+/* Slimed grid-cell overlay - blocks ALL interaction until swept clean */
 .eg-snail-slime {
     position: absolute;
     inset: 0;
@@ -2676,7 +2676,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
 
 /* Sweep-progress fill along the bottom of a slimed cell (the player
    sprite covers the cell while sweeping, so the readable progress rides
-   on the SWEEPING label above the head — this strip is just the glow). */
+   on the SWEEPING label above the head - this strip is just the glow). */
 .eg-snail-slime-fill {
     position: absolute;
     left: 0;
@@ -2692,7 +2692,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     height: 9px;
 }
 
-/* Cell being actively swept — brighter goo + faster pulse */
+/* Cell being actively swept - brighter goo + faster pulse */
 .eg-snail-slime-sweeping {
     animation: eg-snail-slime-pulse 0.4s ease-in-out infinite alternate;
     border-color: #ecfccb;
@@ -2743,7 +2743,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     }
 }
 
-/* Broom — rests outside the grid, pins next to the player while held */
+/* Broom - rests outside the grid, pins next to the player while held */
 .eg-snail-broom {
     position: fixed;
     left: 0;
@@ -2837,7 +2837,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     }
 }
 
-/* Snailgeddon — The Snail's ≤20% HP finisher (countdown over the grid) */
+/* Snailgeddon - The Snail's ≤20% HP finisher (countdown over the grid) */
 .eg-snailgeddon-cd {
     position: fixed;
     transform: translate(-50%, -50%);
@@ -2886,7 +2886,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
    (countdown + ring). Mirrors the Jelly Ice Shell bubble: a FIXED element
    repositioned every frame by boss-snail.js over the card's emoji, so it
    survives monster-panel re-renders; it never blocks clicks. Amber is The
-   Snail's signature colour (toasts #f59e0b) — the dome reads as the boss
+   Snail's signature colour (toasts #f59e0b) - the dome reads as the boss
    being shielded while it is untouchable. */
 .eg-snail-shield {
     position: fixed;
@@ -2935,11 +2935,11 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     }
 }
 
-/* Snailgeddon swarm — denser, angrier ring of doom snails */
+/* Snailgeddon swarm - denser, angrier ring of doom snails */
 .eg-snailgeddon-swarm {
     filter: drop-shadow(0 0 16px rgba(239, 68, 68, 1));
 }
-/* The one laggard whose gap is the way out — cyan tint + floating zzz */
+/* The one laggard whose gap is the way out - cyan tint + floating zzz */
 .eg-snailgeddon-slow {
     position: relative;
     filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.95));
@@ -2963,7 +2963,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
    Three-act bomb show: sticky volleys, telegraphed mega bombs that chain
    corrupted cells, and the Bomb Maze. All overlays are pointer-events:
    none so clicks always reach the grid. Scale/rotate animations always run
-   on CHILD elements — the fixed wrappers themselves only ever carry
+   on CHILD elements - the fixed wrappers themselves only ever carry
    left/top (Chromium orbits transformed fixed elements around the
    viewport origin). */
 
@@ -2982,7 +2982,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
 }
 
 /* Dashed danger ring shown while a bomb fuses (sized to the true blast
-   radius in JS) — opacity-only pulse so it never fights the inline
+   radius in JS) - opacity-only pulse so it never fights the inline
    translate on fixed dots */
 .eg-crash-warn {
     position: fixed;
@@ -3179,10 +3179,10 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     to   { opacity: 1; filter: drop-shadow(0 0 18px rgba(239, 68, 68, 1)); }
 }
 
-/* Demolitionist — Bomb Maze SUPER BOMB: a giant bomb that slams onto the
+/* Demolitionist - Bomb Maze SUPER BOMB: a giant bomb that slams onto the
    start tile ~1s into the maze, then rolls the corridor after the player.
    The element is left/top driven every frame (never translate), so its
-   motion/effects use filter + rotation only — same fixed-position rule as
+   motion/effects use filter + rotation only - same fixed-position rule as
    the other crash layers. */
 .eg-crash-super {
     position: fixed;
@@ -3216,7 +3216,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     to   { transform: rotate(8deg); }
 }
 /* Landing-zone ring (reuses the dashed warn-ring look from the sticky
-   bombs) — brighter while the bomb is still falling. */
+   bombs) - brighter while the bomb is still falling. */
 .eg-crash-super-warn {
     animation: eg-crash-super-warnpulse 0.3s ease-in-out infinite alternate;
 }
@@ -3225,10 +3225,10 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     to   { opacity: 1; }
 }
 
-/* Wind overlay — whole-screen directional gale, visible for the ENTIRE
+/* Wind overlay - whole-screen directional gale, visible for the ENTIRE
    wind phase (warn + blow). Lives on body classes eg-gust-wind-from-*;
    the .eg-gust-windfx node the JS creates carries the drifting debris
-   particles. The node is never display:none — the CSS opacity fade is
+   particles. The node is never display:none - the CSS opacity fade is
    what reveals/hides it. */
 .eg-gust-windfx {
     position: fixed; inset: 0; z-index: 8990;
@@ -3236,7 +3236,7 @@ div.eg-nk-pillar.eg-nk-pillar-holy {
     opacity: 0;
     transition: opacity 0.4s ease;
     background:
-        /* fast fine streaks — the gust lines that make motion obvious */
+        /* fast fine streaks - the gust lines that make motion obvious */
         repeating-linear-gradient(90deg,
             transparent 0 36px,
             rgba(224, 242, 254, 0.35) 36px 40px,
@@ -3266,7 +3266,7 @@ body.eg-gust-wind-from-right .eg-gust-windfx {
     box-shadow: inset -52px 0 44px -24px rgba(125, 211, 252, 0.7);
     animation: eg-gust-streak-l 0.5s linear infinite;
 }
-/* Bright emission band across the WHOLE windward edge — the wind visibly
+/* Bright emission band across the WHOLE windward edge - the wind visibly
    pours out of this entire side, top to bottom. */
 .eg-gust-windfx::after {
     content: '';
@@ -3397,7 +3397,7 @@ body.eg-gust-wind-from-right .eg-gust-windfx i {
     from { box-shadow: 0 0 14px rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(0, 0, 0, 0.5), inset 3px 0 6px rgba(255, 220, 160, 0.28), 0 0 0 rgba(253, 224, 71, 0); }
     to   { box-shadow: 0 0 20px rgba(0, 0, 0, 0.7), inset 0 0 12px rgba(0, 0, 0, 0.5), inset 3px 0 6px rgba(255, 220, 160, 0.28), 0 0 18px rgba(253, 224, 71, 0.5); }
 }
-/* Spike flash when the thorns bite — brief hot flare on the biting side. */
+/* Spike flash when the thorns bite - brief hot flare on the biting side. */
 body.eg-gust-spike-hot-l .eg-nk-gust-spike-left,
 body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     filter: drop-shadow(0 0 16px rgba(254, 202, 202, 1)) brightness(1.9);
@@ -3457,7 +3457,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
         radial-gradient(circle at 36% 50%, transparent 0 44%, rgba(125, 211, 252, 0.85) 46% 58%, transparent 62%);
 }
 @keyframes eg-gust-blade-spin { to { filter: drop-shadow(0 0 16px rgba(186, 230, 253, 1)); } }
-/* Tornado: swirling vortex — soft cloud mass, a funnel skirt, and three
+/* Tornado: swirling vortex - soft cloud mass, a funnel skirt, and three
    counter-rotating rings. Direction-agnostic so it reads the same
    sweeping left, right, or diving from the top. */
 /* ── Tornado set-piece: a towering funnel ───────── */
@@ -3640,7 +3640,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     40% { filter: drop-shadow(0 0 26px rgba(255,255,255,0.95)) brightness(1.6); }
     100% { filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6)); }
 }
-/* Parry kick: gold boot flash on the ball — visually distinct from the
+/* Parry kick: gold boot flash on the ball - visually distinct from the
    white tackle flash so the two reads never blur. */
 .eg-strk-ball.parry {
     animation: eg-strk-parry-flash 0.5s ease-out 1;
@@ -3780,7 +3780,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     72% { transform: translate(-50%, -50%) scale(1) rotate(-10deg); opacity: 1; }
     100% { transform: translate(-50%, -50%) scale(0.8) rotate(-4deg); opacity: 0; }
 }
-/* Kick-off ball: fades in where the fresh ball spawns. (Opacity only —
+/* Kick-off ball: fades in where the fresh ball spawns. (Opacity only -
    the ball's position is an inline translate transform, which a CSS
    transform animation would override and flash at the top-left.) */
 .eg-strk-ball.kickoff {
@@ -3836,7 +3836,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 }
 .eg-strk-penline.lock { border-top-style: solid; border-top-color: rgba(254, 226, 226, 0.9); }
 .eg-strk-penline.fired { opacity: 0.25; }
-/* Countdown core: shrinks inside the ring while locked — kicks at zero. */
+/* Countdown core: shrinks inside the ring while locked - kicks at zero. */
 .eg-strk-pencore {
     position: fixed; left: 0; top: 0; z-index: 9006; pointer-events: none;
     width: 44px; height: 44px; border-radius: 50%;
@@ -3844,7 +3844,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     background: radial-gradient(circle, rgba(254, 226, 226, 0.95), rgba(248, 113, 113, 0.55) 65%, transparent 72%);
     box-shadow: 0 0 14px rgba(248, 113, 113, 0.8);
 }
-/* Shot pips: 3 dots under the goal — dimmed once their shot is done. */
+/* Shot pips: 3 dots under the goal - dimmed once their shot is done. */
 .eg-strk-penhud {
     position: fixed; z-index: 9004; pointer-events: none;
     display: flex; gap: 9px; padding: 5px 10px; border-radius: 12px;
@@ -4438,7 +4438,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 }
 
 /* ------------------------------------------------------------------
-   THE GAMBLER — persistent casino arena (boss-gambler.js)
+   THE GAMBLER - persistent casino arena (boss-gambler.js)
    House chips stack, thrown cards, prize wheel, slot reels,
    coin bursts, russian-roulette cylinder.
    ------------------------------------------------------------------ */
@@ -4537,7 +4537,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 }
 
 /* ------------------------------------------------------------------
-   THE GOURMET — persistent tasting-menu arena (boss-gourmet.js)
+   THE GOURMET - persistent tasting-menu arena (boss-gourmet.js)
    Drifting maw, aroma rings, spit food, sizzling plate + grease
    pools, cloche slams, dessert rain, devour ring.
    ------------------------------------------------------------------ */
@@ -4638,7 +4638,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 @keyframes eg-gmt-warncol-blink {
     50% { opacity: 0.55; }
 }
-/* Devour: the maw's danger ring — tracks the maw, not the player. */
+/* Devour: the maw's danger ring - tracks the maw, not the player. */
 .eg-gmt-maw {
     position: fixed; z-index: 9002; pointer-events: none;
     border-radius: 50%;
@@ -4672,7 +4672,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 }
 
 /* ------------------------------------------------------------------
-   THE LODESTONE — persistent magnetic field arena (boss-lodestone.js)
+   THE LODESTONE - persistent magnetic field arena (boss-lodestone.js)
    Drifting stone with polarity faces, filings, vortex spiral,
    railgun lanes + slugs, leash line + chain.
    ------------------------------------------------------------------ */
@@ -4776,7 +4776,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 }
 
 /* ------------------------------------------------------------------
-   THE STACK — persistent construction-site arena (boss-stack.js)
+   THE STACK - persistent construction-site arena (boss-stack.js)
    Tetromino core, falling pieces, floor terrain, warn columns,
    line-clear rows, shockwaves, rising garbage.
    ------------------------------------------------------------------ */
@@ -4848,7 +4848,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 }
 
 /* ------------------------------------------------------------------
-   THE TACTICIAN — persistent chess-siege arena (boss-tactician.js)
+   THE TACTICIAN - persistent chess-siege arena (boss-tactician.js)
    Gliding queen, intent banners, knight orbs, pawn ranks, rook
    lanes, bishop beams, knight leaps, checkmate walls.
    ------------------------------------------------------------------ */
@@ -4965,7 +4965,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 
 
 /* ============================================================
-   ============ The Bomber — reworked ground war ============
+   ============ The Bomber - reworked ground war ============
    ============================================================
    Aerial bombing arena: flying boss presentation, orbiting
    collar mines, proximity mine rings, carpet-run lanes, cluster
@@ -5213,7 +5213,7 @@ body.eg-bmb-flash::after {
 
 
 /* ============================================================
-   ============ The Creeper — reworked nest mother ============
+   ============ The Creeper - reworked nest mother ============
    ============================================================
    Green-homage arena: stalking creeper sprites with fuse
    swell/flash, TNT chain clusters, pounce shadow markers,
@@ -5437,7 +5437,7 @@ body.eg-crp-flash::after {
 
 
 /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
-/* THE BUZZSAW (boss_buzz) — rework: ricochet saws, cut lines, saw traps,  */
+/* THE BUZZSAW (boss_buzz) - rework: ricochet saws, cut lines, saw traps,  */
 /* pendulum blades, THE FINAL CROSSCUT set-piece.                          */
 /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
 /* Saw wrapper: fixed, translate-positioned (never animated). */
@@ -5523,7 +5523,7 @@ body.eg-crp-flash::after {
     from { opacity: 0.55; }
     to   { opacity: 1; }
 }
-/* Cut line live: the sweep is coming — band ignites orange-white. */
+/* Cut line live: the sweep is coming - band ignites orange-white. */
 .eg-bz-cutband.eg-bz-cutband-live {
     border-color: rgba(255, 237, 213, 0.95);
     background: rgba(249, 115, 22, 0.22);
@@ -5686,7 +5686,7 @@ body.eg-bz-flash::after {
 }
 
 
-/* THE ENCORE (boss_encore) — rework: encore circles, EQ slams, stage     */
+/* THE ENCORE (boss_encore) - rework: encore circles, EQ slams, stage     */
 /* lights, beat mines and the CURTAIN CALL musical-chairs set-piece.      */
 /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
 /* Floor spot: gold showman circle marking where a ring will land. */
@@ -5778,7 +5778,7 @@ body.eg-bz-flash::after {
     from { opacity: 0.75; }
     to   { opacity: 1; }
 }
-/* Locked: the rig has you — red and hard-edged. */
+/* Locked: the rig has you - red and hard-edged. */
 .eg-en-light.eg-en-light-locked {
     animation: none;
     opacity: 1;
@@ -5951,7 +5951,7 @@ body.eg-en-flash::after {
 }
 
 
-/* THE MEDUSA (boss_medusa) — rework: stone gaze, snake strikes, petrify  */
+/* THE MEDUSA (boss_medusa) - rework: stone gaze, snake strikes, petrify  */
 /* waves, coil cage and THE STARE statue-shelter set-piece.               */
 /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
 /* Gorgon eyes: two glowing serpent eyes peering in from an edge. */
@@ -6236,7 +6236,7 @@ body.eg-md-flash::after {
 }
 
 
-/* THE MAZE (boss_maze) — rework: ghost gang, dot walls, the labyrinth,   */
+/* THE MAZE (boss_maze) - rework: ghost gang, dot walls, the labyrinth,   */
 /* lights-out eyes and the GAME OVER convergence set-piece.               */
 /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
 /* Arcade ghost: colour via currentColor, skirt via clip-path. */
@@ -6444,7 +6444,7 @@ body.eg-mz-flash::after {
 }
 
 
-/* THE MONSOON (boss_monsoon) — rework: rain bands, thunderbolts, storm   */
+/* THE MONSOON (boss_monsoon) - rework: rain bands, thunderbolts, storm   */
 /* surge, hail barrage and THE GREAT FLOOD rising-water set-piece.        */
 /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
 /* Rain curtain: diagonal pouring band (rotate set inline by JS). */
@@ -6654,7 +6654,7 @@ body.eg-mn-flash::after {
 }
 
 
-/* THE NEEDLE (boss_needle) — rework: spike gates, pin drops, stitch      */
+/* THE NEEDLE (boss_needle) - rework: spike gates, pin drops, stitch      */
 /* wave, pincushion burst and THE FINAL STITCH eye-of-the-needle set-piece*/
 /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
 /* Gate segments: metallic needles with tips facing the gap. */
@@ -6889,7 +6889,7 @@ body.eg-nd-flash::after {
 }
 
 
-/* THE AEGIS (boss_aegis) — rework: aegis protocol, shield charge, sentry */
+/* THE AEGIS (boss_aegis) - rework: aegis protocol, shield charge, sentry */
 /* shields, guard rotor and THE LAST BASTION beam set-piece.              */
 /*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
 /* Aegis-up glow: the whole arena reads "shielded". */
@@ -7957,7 +7957,7 @@ body.eg-shp-flash::after {
 
 
 /* ======================================================================== */
-/* ------------------ THE SWARM (boss_swarm) — rework --------------------- */
+/* ------------------ THE SWARM (boss_swarm) - rework --------------------- */
 /* ======================================================================== */
 
 /* Drone sprite: the swarm's working unit. Self-contained fixed positioning
@@ -8062,7 +8062,7 @@ body.eg-shp-flash::after {
     100% { opacity: 0; transform: translate(-50%, -130%) scale(0.9); }
 }
 
-/* HIVE EYE: the bloom — a screen-dark smoke ring with a clear hole. */
+/* HIVE EYE: the bloom - a screen-dark smoke ring with a clear hole. */
 .eg-sw-probe {
     width: 46px; height: 46px; font-size: 2rem;
     filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.95));
@@ -8171,7 +8171,7 @@ body.eg-shp-flash::after {
 
 
 /* ======================================================================== */
-/* ---------------- THE COLOSSUS (boss_colossus) — rework ----------------- */
+/* ---------------- THE COLOSSUS (boss_colossus) - rework ----------------- */
 /* ======================================================================== */
 
 /* SEISMIC STRIDE: footprint telegraph, slam, and the shockwave overlay. */
@@ -8355,7 +8355,7 @@ body.eg-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BAYES — "The Grand Prior" (Tier 7 rework)
+   BAYES - "The Grand Prior" (Tier 7 rework)
    Evidence updates beliefs: a visible BELIEF METER re-weights the arena.
    All sprites are self-contained position:fixed (no shared base class).
    ═══════════════════════════════════════════════════════════════════════ */
@@ -8405,7 +8405,7 @@ body.eg-shp-flash::after {
     box-shadow: 0 0 12px 3px rgba(134, 239, 172, 0.95);
 }
 .eg-bay-meter-balanced::after {
-    content: '50/50 — CLARITY';
+    content: '50/50 - CLARITY';
     position: absolute;
     inset: 0;
     display: flex;
@@ -8611,7 +8611,7 @@ body.eg-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   ENTROPY — "The Second Law" (Tier 7 rework)
+   ENTROPY - "The Second Law" (Tier 7 rework)
    Everything winds down; order is a resource you spend. All sprites are
    self-contained position:fixed (no shared base class).
    ═══════════════════════════════════════════════════════════════════════ */
@@ -8922,7 +8922,7 @@ body.eg-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   LAPLACE'S DEMON — "It Has Already Seen This" (Tier 7 rework)
+   LAPLACE'S DEMON - "It Has Already Seen This" (Tier 7 rework)
    The boss predicts; you falsify. Every telegraph pre-runs as a harmless
    ghost. All sprites are self-contained position:fixed.
    ═══════════════════════════════════════════════════════════════════════ */
@@ -9180,7 +9180,7 @@ body.eg-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   THE INFERNO — "The Living Volcano" (Tier 7 rework)
+   THE INFERNO - "The Living Volcano" (Tier 7 rework)
    Escalating heat you must actively cool. All sprites are self-contained
    position:fixed (no shared base class).
    ═══════════════════════════════════════════════════════════════════════ */
@@ -9493,7 +9493,7 @@ body.eg-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   THE NULL — "The Null Hypothesis" (Tier 7 rework)
+   THE NULL - "The Null Hypothesis" (Tier 7 rework)
    Erasure of certainty: void lines, readable sabotage, pure-white proof.
    All sprites are self-contained position:fixed (no shared base class).
    ═══════════════════════════════════════════════════════════════════════ */
@@ -9716,12 +9716,12 @@ body.eg-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   THE BARRAGE — "The War-Machine Brute" (Tier 8 rework)
+   THE BARRAGE - "The War-Machine Brute" (Tier 8 rework)
    Artillery barrage theming: a creeping shelling curtain you fight
    through, supply-drop jammers, shot shells with shrapnel lanes and the
    FINAL BOMBARDMENT set-piece. All sprites are self-contained
    position:fixed (no shared base class). Palette: artillery orange /
-   gunmetal — reads apart from Inferno's lava red.
+   gunmetal - reads apart from Inferno's lava red.
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── Shelling curtain: the advancing wall of splashes ── */
@@ -9736,7 +9736,7 @@ body.eg-shp-flash::after {
     border-right: 3px solid rgba(255, 214, 102, 0.95);
     box-shadow: 0 0 30px rgba(255, 107, 53, 0.5), inset 0 0 24px rgba(255, 107, 53, 0.35);
 }
-/* Phase 3 sweeps top→bottom — flip the gradient + bright edge */
+/* Phase 3 sweeps top→bottom - flip the gradient + bright edge */
 .eg-bar-curtain-v {
     background: linear-gradient(180deg,
         rgba(255, 107, 53, 0.10) 0%,
@@ -9929,12 +9929,12 @@ body.eg-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   THE BLOOM — "The Garden's Verdict" (Tier 8 rework)
+   THE BLOOM - "The Garden's Verdict" (Tier 8 rework)
    The arena is a garden that grows whether you fight or not. Scarlet
    blooms track your position, rot gardens sweep stamen beams and burst
    into seed pods that plant new gardens, the withering veil thins as you
    fill cells, and FULMINATION blooms from every direction. Palette:
-   scarlet rose / deep rot crimson — reads apart from Inferno/Barrage.
+   scarlet rose / deep rot crimson - reads apart from Inferno/Barrage.
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── Bloom marker: tracks (dashed) → locks (solid, swelling) → bursts ── */
@@ -10125,11 +10125,11 @@ body.eg-shp-flash::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   THE MINOTAUR — "The Labyrinth's Warden" (Tier 8 rework)
+   THE MINOTAUR - "The Labyrinth's Warden" (Tier 8 rework)
    Labyrinth duel: telegraphed wall slabs carve the arena into lanes, the
    bull charges the lane at your row, hoof craters + dust storms accumulate
    terrain, the Thread of Ariadne marks an honest-but-bait safe lane, and
-   THE WARDEN'S LABYRINTH ends in an all-lane TRAMPLE. Elementless — pure
+   THE WARDEN'S LABYRINTH ends in an all-lane TRAMPLE. Elementless - pure
    physical, amber/gunmetal palette (matches the Minotaur toast color).
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -10371,7 +10371,7 @@ body.eg-shp-flash::after {
 
 
 /*============================================================================
-   THE OVERFITTER — "The Model That Learned Too Much" (Tier 8 rework)
+   THE OVERFITTER - "The Model That Learned Too Much" (Tier 8 rework)
    Shadow/ML identity: violet-ink gradients, live data trails, a heat-map
    made of the player's own fight history. Palette reads apart from the
    Null (colder void-violet) via hot underfit-orange accents.
@@ -10572,7 +10572,7 @@ body.eg-shp-flash::after {
 }
 
 /*============================================================================
-   THE RAZOR — "The Whetted Edge" (Tier 8 rework)
+   THE RAZOR - "The Whetted Edge" (Tier 8 rework)
    Lightning/metal identity: polished-steel wires, hot edge-flash, orange
    cast-warnings. Reads apart from the Dynamo (storm yellow) via steel
    greys and blade glints.
@@ -10760,7 +10760,7 @@ body.eg-shp-flash::after {
 }
 
 /* ============================================================
-   THE SHRINE MAIDEN (rework) — "The Bound God" (atlas_t8_5)
+   THE SHRINE MAIDEN (rework) - "The Bound God" (atlas_t8_5)
    Gold-ofuda + shrine-crimson + sacred-paper palette; reuses
    .eg-nk-orb-spirit (cyan spirit orbs) and .eg-nk-band.
    ============================================================ */
@@ -10786,7 +10786,7 @@ body.eg-shp-flash::after {
 @keyframes eg-shr-lit-pulse { from { filter: brightness(0.9); } to { filter: brightness(1.25); } }
 .eg-shr-bar-knotting { opacity: 0; transition: opacity 0.4s ease; }
 
-/* Knot wall — the rope side holds (then burns away) */
+/* Knot wall - the rope side holds (then burns away) */
 .eg-shr-knotwall {
     position: fixed; z-index: 8989; pointer-events: none;
     background:
@@ -10962,7 +10962,7 @@ body.eg-shp-flash::after {
 }
 
 /* ============================================================
-   THE STORMCALLER (rework) — "The Eye of the Storm" (boss_sirus)
+   THE STORMCALLER (rework) - "The Eye of the Storm" (boss_sirus)
    Deep storm-slate + electric cyan + ion violet; reuses
    .eg-nk-band and .eg-nk-dot. Distinct from Shrine gold (shr)
    and Razor yellow (rzr).
@@ -11127,7 +11127,7 @@ body.eg-shp-flash::after {
 }
 
 /* ============================================================
-   THE VISE (rework) — "Cold Iron" (boss_vise, atlas_t8_0)
+   THE VISE (rework) - "Cold Iron" (boss_vise, atlas_t8_0)
    Cold-iron slate + forge-ember orange + quench cyan; reuses
    .eg-nk-band. Distinct from Razor yellow (rzr) and Shrine gold
    (shr): industrial slate + ember heat.

@@ -5,17 +5,17 @@
 //========================================================================
 //=  Gold-based vendor reached from the Nexus of Worlds screen via the    =
 //=  💰 door. Six tabs (Atlas Vendor):                                    =
-//=    MAPS      — free Tier 1 Normal map only (→ map stash)              =
-//=    STARTER   — free level 1 starter gear (no sell value)              =
-//=    CURRENCY  — all currency orbs (→ currency stash)                   =
-//=    ESSENCES  — all 93 essences (→ essence tab)                        =
-//=    ITEMS     — all regular puzzle items (ITEM_DEFS → STATE.inventory) =
-//=    BASE      — all non-starter equipment base types, filterable by    =
+//=    MAPS      - free Tier 1 Normal map only (→ map stash)              =
+//=    STARTER   - free level 1 starter gear (no sell value)              =
+//=    CURRENCY  - all currency orbs (→ currency stash)                   =
+//=    ESSENCES  - all 93 essences (→ essence tab)                        =
+//=    ITEMS     - all regular puzzle items (ITEM_DEFS → STATE.inventory) =
+//=    BASE      - all non-starter equipment base types, filterable by    =
 //=                slot type and auto-sorted descending by item level.    =
 //=                Items the player cannot equip are highlighted red.     =
 //=                                                                       =
 //=  Public API:                                                          =
-//=    showEndgameVendor() — creates the screen on first call and         =
+//=    showEndgameVendor() - creates the screen on first call and         =
 //=                          switches to it.                              =
 //========================================================================
 
@@ -26,7 +26,7 @@
 // Price of one vendor-bought Tier 1 map, in gold (0 = free).
 const EG_VENDOR_T1_MAP_PRICE = 0;
 
-// Base types given away for free in the Starter Gear tab — basic level 1
+// Base types given away for free in the Starter Gear tab - basic level 1
 // starter gear so new players can gear up without gold. No longer part
 // of the Base Items tab.
 const EG_VENDOR_FREE_BASE_IDS = new Set([
@@ -66,13 +66,13 @@ const EG_VENDOR_CURRENCY_PRICES = {
 };
 const EG_VENDOR_CURRENCY_DEFAULT_PRICE = 320;
 
-// Prices per essence id (gold). 93 per-modifier essences now all have
-// distinct prices: baseline 320, powerful families cost significantly more.
+// Prices per essence id (gold). Every per-modifier essence has a distinct
+// price: baseline 320, powerful families cost significantly more.
 const EG_VENDOR_ESSENCE_PRICES = {
-    // Recovery / absorption — 400-440
+    // Recovery / absorption - 400-440
     essence_absorption_on_kill: 440,
     essence_absorption_regen_rate: 440,
-    // Cheap / puzzle-utility tier — ~260-320
+    // Cheap / puzzle-utility tier - ~260-320
     essence_time_added: 260,
     essence_mistake_count: 260,
     essence_mistake_not_count: 280,
@@ -81,13 +81,13 @@ const EG_VENDOR_ESSENCE_PRICES = {
     essence_chance_for_new_question: 300,
     essence_fate: 320,
     essence_echo: 320,
-    // Resistances — 340-380
+    // Resistances - 340-380
     essence_fire_resist: 360,
     essence_cold_resist: 360,
     essence_lightning_resist: 360,
     essence_shadow_resist: 380,
     essence_arcane_resistance: 380,
-    // Flat defenses — 380-450
+    // Flat defenses - 380-450
     essence_flat_armour: 420,
     essence_flat_evasion: 420,
     essence_flat_absorption: 420,
@@ -98,15 +98,19 @@ const EG_VENDOR_ESSENCE_PRICES = {
     essence_hybrid_armour_evasion: 480,
     essence_hybrid_evasion_absorption: 480,
     essence_hybrid_evasion_armour: 480,
-    // Elemental / flat damage — 500-620
+    // Elemental / flat damage - 500-620
     essence_fire_damage: 520,
     essence_cold_damage: 520,
     essence_lightning_damage: 520,
     essence_shadow_damage: 520,
     essence_spell_damage: 720,
     essence_inc_spell_damage: 720,
+    // Support counterpart of the two above - priced alongside them, since a
+    // healing build wants it exactly as much as a damage build wants spell power.
+    essence_healing_power: 700,
+    essence_inc_healing_power: 700,
     essence_precision_damage: 580,
-    // Life / mana / hybrid life+mana — 550-750 (very desirable)
+    // Life / mana / hybrid life+mana - 550-750 (very desirable)
     essence_flat_health: 650,
     essence_inc_health: 620,
     essence_flat_mana: 580,
@@ -118,11 +122,11 @@ const EG_VENDOR_ESSENCE_PRICES = {
     essence_hybrid_mana_armour: 680,
     essence_hybrid_mana_evasion: 680,
     essence_hybrid_mana_absorption: 680,
-    // Attributes — 620
+    // Attributes - 620
     essence_strength: 620,
     essence_agility: 620,
     essence_intelligence: 620,
-    // Offensive power — most expensive
+    // Offensive power - most expensive
     essence_flat_physical_damage: 820,
     essence_inc_physical_damage: 820,
     essence_crit_chance: 900,
@@ -131,7 +135,7 @@ const EG_VENDOR_ESSENCE_PRICES = {
     essence_arcane_surge: 680,
     essence_mana_to_damage: 700,
     essence_precision_regen: 500,
-    // Weapon mechanics — mid-high
+    // Weapon mechanics - mid-high
     essence_accuracy: 460,
     essence_pierce: 620,
     essence_cleave: 620,
@@ -144,7 +148,7 @@ const EG_VENDOR_ESSENCE_PRICES = {
     essence_overkill: 520,
     essence_pushback: 420,
     essence_stagger: 460,
-    // Defensive mechanics — 500-620
+    // Defensive mechanics - 500-620
     essence_block_chance: 620,
     essence_spell_block_chance: 620,
     essence_block_recovery: 420,
@@ -157,13 +161,13 @@ const EG_VENDOR_ESSENCE_PRICES = {
     essence_first_step: 480,
     essence_grounded: 480,
     essence_warding: 520,
-    // Status / ailment chance — 480-560
+    // Status / ailment chance - 480-560
     essence_chance_to_ignite: 520,
     essence_chance_to_freeze: 520,
     essence_chance_to_shock: 520,
     essence_chance_to_blind: 480,
     essence_chance_to_convert: 500,
-    // Recovery / sustain — 440-520
+    // Recovery / sustain - 440-520
     essence_life_leech: 540,
     essence_life_on_kill: 440,
     essence_mana_on_kill: 440,
@@ -180,7 +184,7 @@ const EG_VENDOR_ESSENCE_PRICES = {
 };
 const EG_VENDOR_ESSENCE_DEFAULT_PRICE = 350;
 
-// Puzzle item prices by rarity (gold) — rebalanced to be more expensive
+// Puzzle item prices by rarity (gold) - rebalanced to be more expensive
 // across the board so puzzle items remain meaningful purchases.
 const EG_VENDOR_ITEM_RARITY_PRICES = {
     common: 55,
@@ -308,7 +312,7 @@ function _egvSwitchTab(tabId) {
 
 function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraClass = '', blockedReason = '', extraAttrs = '' }) {
     const blockedCls = blockedReason ? ' egv-card-blocked' : '';
-    const blockedTitle = blockedReason ? ` title="${blockedReason.replace(/"/g, '&quot;')}"` : '';
+    const blockedTitle = blockedReason ? ` data-tip="${_tipAttr(blockedReason)}"` : '';
     // Free offers (price 0) never show a gold deficit.
     const isFree = price <= 0;
     // Dim the card + show the deficit while the player cannot afford it.
@@ -373,7 +377,7 @@ function _egvBuildMapsTabHTML() {
     try { title = t('eg_vendor_offer_name'); } catch (e) { title = 'Tier 1 Map'; }
     const sub = `Tier ${tier} · Monster Lv ${monsterLevel} · Normal`;
     let desc;
-    try { desc = t('eg_vendor_offer_desc'); } catch (e) { desc = 'A freshly charted Tier 1 map — always Normal (white). Use currency orbs to add modifiers.'; }
+    try { desc = t('eg_vendor_offer_desc'); } catch (e) { desc = 'A freshly charted Tier 1 map - always Normal (white). Use currency orbs to add modifiers.'; }
     const card = _egvBuildCardHTML({
         icon: '🗺️',
         title,
@@ -387,7 +391,7 @@ function _egvBuildMapsTabHTML() {
 }
 
 // Refreshes dynamic bits on the Maps tab. All tier maps are free (price 0)
-// so there is no cannot-afford state — we keep legacy single-card support
+// so there is no cannot-afford state - we keep legacy single-card support
 // for save-compatibility and simply refresh the gold balance.
 function _egvRefreshMapsTabDynamic() {
     // Legacy single-card path (pre multi-tier): keep behaviour if that DOM still exists.
@@ -415,18 +419,18 @@ function _egvRefreshMapsTabDynamic() {
     _egvRefreshGoldDisplay();
 }
 
-// Core purchase helper — always produces a Normal (white) map with no
+// Core purchase helper - always produces a Normal (white) map with no
 // modifiers. Players must use currency orbs to upgrade the map afterwards.
 function _egvBuyTierMap(tier) {
     const maxTier = (typeof EG_MAX_MAP_TIER !== 'undefined') ? EG_MAX_MAP_TIER
         : ((typeof EG_ATLAS_MAX_TIER !== 'undefined') ? EG_ATLAS_MAX_TIER : 16);
     tier = Math.max(1, Math.min(maxTier, Math.round(tier || 1)));
-    // Vendor only sells Tier 1 for now — clamp higher tiers down.
+    // Vendor only sells Tier 1 for now - clamp higher tiers down.
     tier = 1;
 
     if (typeof _egLoadHubState === 'function') _egLoadHubState();
 
-    // Always Normal — no rarity or mod rolls, but upgradeable with orbs.
+    // Always Normal - no rarity or mod rolls, but upgradeable with orbs.
     const map = _egGenerateMapDrop(4, 1, { forceNormal: true });
     _egAddMapToMapStash(map);
     egSaveHubState();
@@ -454,7 +458,7 @@ function _egvBuyTierOneMap() {
 function _egvBuildStarterTabHTML() {
     const slotOrder = _egvGetSlotOrder();
     const starterBases = EG_ALL_BASE_TYPES.filter(b => EG_VENDOR_FREE_BASE_IDS.has(b.id));
-    // No filter — always show all 8 starter items, sorted by slot order
+    // No filter - always show all 8 starter items, sorted by slot order
     starterBases.sort((a, b) => slotOrder.indexOf(a.slotType) - slotOrder.indexOf(b.slotType) || a.minLevel - b.minLevel);
 
     const cards = starterBases.map(base => {
@@ -607,7 +611,7 @@ function _egvBuyPuzzleItem(defId) {
 //-------------------TAB: BASE ITEMS----------------------------------------
 //------------------------------------------------------------------------
 
-// Canonical slot order — first appearance inside EG_ALL_BASE_TYPES.
+// Canonical slot order - first appearance inside EG_ALL_BASE_TYPES.
 function _egvGetSlotOrder() {
     const order = [];
     EG_ALL_BASE_TYPES.forEach(base => {
@@ -674,7 +678,7 @@ function _egvRenderBaseListOnly() {
 }
 
 function _egvGetFilteredSortedBases() {
-    // Exclude free starter gear — now in its own tab
+    // Exclude free starter gear - now in its own tab
     let bases = EG_ALL_BASE_TYPES.filter(b => !EG_VENDOR_FREE_BASE_IDS.has(b.id));
 
     if (_egvBaseFilterSlot !== 'all') {
@@ -740,7 +744,7 @@ function _egvBuildBaseListHTML() {
     return `<div class="egv-cards egv-cards-base">${cards}</div>`;
 }
 
-// Builds a preview/purchase item object from an equipment base type —
+// Builds a preview/purchase item object from an equipment base type -
 // used both for vendor purchases and for the mouseover stat tooltip.
 function _egvBuildBaseItemFromBase(base) {
     const baseName = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
@@ -785,7 +789,7 @@ function _egvBuyBaseItem(baseId) {
     if (!_egvPurchase(price, () => {
         const item = _egvBuildBaseItemFromBase(base);
         item.id = `${base.id}_${Date.now()}`;
-        // Free starter gear sells for nothing — prevents a buy-free/sell-shard loop.
+        // Free starter gear sells for nothing - prevents a buy-free/sell-shard loop.
         if (price === 0) item.noSellValue = true;
 
         if (typeof _egAddItemToStash === 'function') {
@@ -1012,7 +1016,7 @@ function _egvCreateScreen() {
     document.body.appendChild(screen);
 }
 
-// Entry point — opens the Vendor screen on the last active tab.
+// Entry point - opens the Vendor screen on the last active tab.
 function showEndgameVendor() {
     if (!document.getElementById('screen-endgame-vendor')) _egvCreateScreen();
 

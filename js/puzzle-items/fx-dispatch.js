@@ -2,7 +2,7 @@
 //-------------------FX DISPATCH----------------------
 //------------------------------------------------------------------------
 
-// playItemEffect(defId) — routes an item id to its visual effect
+// playItemEffect(defId) - routes an item id to its visual effect
 // function. The effect implementations live in the per-item files; this
 // dispatcher is the only place that references them by name.
 

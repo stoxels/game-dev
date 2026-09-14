@@ -39,7 +39,7 @@ const EG_DUAL_WIELD_PARRY_PCT = 15;
 const EG_STAT_KEY_MAP = {
     // NOTE: flat_armour / inc_armour / flat_evasion / inc_evasion /
     // flat_absorption / inc_absorption (and the defense halves of the hybrid
-    // families) are LOCAL modifiers — they only affect the base value of the
+    // families) are LOCAL modifiers - they only affect the base value of the
     // item they roll on. They are handled by _egGetItemEffectiveDefenses()
     // below and intentionally absent from this map.
     flat_health: { bucket: 'health', mode: 'add' },
@@ -109,6 +109,13 @@ const EG_STAT_KEY_MAP = {
 
     spell_damage: { bucket: 'spellDamageFlat', mode: 'add' },
     inc_spell_damage: { bucket: 'spellDamageIncPct', mode: 'add' },
+
+    // Support analogue of Spell Damage - feeds the magnitude of every SUPPORT
+    // spell (heal / HoT / absorption restore). Read by _uspApplyHealingPower()
+    // in js/skills/universal-spells.js, which leaves every capped buff axis
+    // (guard / evade / ward / thorns) alone on purpose.
+    healing_power: { bucket: 'healingPowerFlat', mode: 'add' },
+    inc_healing_power: { bucket: 'healingPowerIncPct', mode: 'add' },
 
     life_leech: { bucket: 'lifeLeechPct', mode: 'add' },
 
@@ -238,9 +245,9 @@ function _egTryHealLegacyDualMod(mod) {
         if (tierDef) break;
     }
     // Fallback: if table lookup failed, try to use any attached family data or
-    // infer a range from the existing value — at least hide the placeholder.
+    // infer a range from the existing value - at least hide the placeholder.
     if (!tierDef || tierDef.min2 == null) {
-        // No tier info — replace stray '@' with '?' to avoid showing raw placeholder
+        // No tier info - replace stray '@' with '?' to avoid showing raw placeholder
         mod.rolledStats[0].label = lab.replace('@', '?');
         return;
     }
@@ -257,7 +264,7 @@ function _egTryHealLegacyDualMod(mod) {
             { key: family.id + '_2', label: l2, value: val2 },
         ];
     } else {
-        // Fallback — single-line replacement
+        // Fallback - single-line replacement
         mod.rolledStats[0].label = lab.replace('@', String(val2));
         mod.rolledStats.push({ key: mod.familyId + '_2', label: '', value: val2 });
     }
@@ -307,7 +314,7 @@ function _egBuildMergedModLines(mods) {
 
     return groups.map(g => {
         // Lines without any numeric value were pushed with { label } only
-        // (no template/count/slots) — return them verbatim.
+        // (no template/count/slots) - return them verbatim.
         if (g.template == null) return { label: g.label, downside: g.downside, tierLabel: g.tierLabel, contributions: g.contributions, crafted: (g.contributions || []).every(c => c.crafted) };
         let label;
         if (g.count <= 1) {
@@ -365,7 +372,7 @@ const EG_LOCAL_DEFENSE_INC_KEYS = {
 
 // Computes an item's effective (local-modified) defenses.
 // Returns { armour, evasion, absorption, modded: { armour, evasion, absorption } }
-// where modded.<stat> is true when local mods altered that value — used by
+// where modded.<stat> is true when local mods altered that value - used by
 // the tooltip to highlight already-increased values.
 function _egGetItemEffectiveDefenses(item) {
     const base = item.defenses || {};
@@ -439,7 +446,7 @@ const EG_LOCAL_DAMAGE_INC_KEYS = {
 // Returns { physMin, physMax, fireMin, fireMax, coldMin, coldMax,
 // lightningMin, lightningMax, shadowMin, shadowMax,
 // modded: { phys, fire, cold, lightning, shadow } } where modded.<elem>
-// is true when local mods altered that range — used by the tooltip to
+// is true when local mods altered that range - used by the tooltip to
 // highlight already-increased values.
 function _egGetItemEffectiveDamage(item) {
     const base = item.damage || {};
@@ -493,11 +500,11 @@ function _egGetItemEffectiveDamage(item) {
 //------------------------------------------------------------------------
 //-------------------LOCAL ITEM ATTACK INTERVAL---------------------------
 //------------------------------------------------------------------------
-// The weapon's "Attacks every Xs" implicit is reduced by its own rolled
-// "Melee Strikes occur #s more often" mod (attack_speed) — LOCAL in the
-// same display sense as the damage ranges above. Clamped to
-// EG_PLAYER_MIN_ATTACK_INTERVAL so it matches the combat interval in
-// _egGetPlayerAttackIntervalBreakdown().
+// The weapon's "Fully charges in Xs" implicit is reduced by its own rolled
+// "Melee charges #s faster" mod (attack_speed) - LOCAL in the same display
+// sense as the damage ranges above - then shortened by
+// EG_PLAYER_CHARGE_TIME_MULT. Clamped to EG_PLAYER_MIN_ATTACK_INTERVAL so
+// it matches the combat interval in _egGetPlayerAttackIntervalBreakdown().
 function _egGetItemEffectiveAttackInterval(item) {
     const base = Number(item.attackIntervalSeconds);
     if (!isFinite(base)) return { base: null, interval: null, modded: false };
@@ -514,10 +521,14 @@ function _egGetItemEffectiveAttackInterval(item) {
 
     const minInterval = (typeof EG_PLAYER_MIN_ATTACK_INTERVAL !== 'undefined')
         ? EG_PLAYER_MIN_ATTACK_INTERVAL : 2;
+    let interval = Math.round(Math.max(minInterval, base - reduction) * 100) / 100;
+    if (typeof EG_PLAYER_CHARGE_TIME_MULT !== 'undefined') {
+        interval = Math.round(interval * EG_PLAYER_CHARGE_TIME_MULT * 100) / 100;
+    }
     return {
         base,
         // Round away float subtraction noise (e.g. 5.6 - 0.2 = 5.4000000000000004)
-        interval: Math.round(Math.max(minInterval, base - reduction) * 100) / 100,
+        interval,
         modded: reduction > 0,
     };
 }
@@ -555,7 +566,7 @@ function _egGetItemEffectiveBlockChance(item) {
 }
 
 // Aggregates every equipped item's implicit defenses + rolled mods into one
-// stats object. Recomputed on demand (cheap — ~19 slots, ≤6 mods each) so it
+// stats object. Recomputed on demand (cheap - ~19 slots, ≤6 mods each) so it
 // never goes stale after an equip/unequip.
 function _egComputePlayerStats() {
     const s = {
@@ -571,7 +582,7 @@ function _egComputePlayerStats() {
         intelligence: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.int : 0,
         lifeRegen: 0, manaRegen: 0,
         fireResist: 0, coldResist: 0, lightningResist: 0, shadowResist: 0, arcaneResistFlat: 0,
-        // "Increased maximum Resistance" bonuses (uniques) — raise the per-
+        // "Increased maximum Resistance" bonuses (uniques) - raise the per-
         // element resistance cap above the base 75%. allResMax applies to all
         // four elements at once.
         fireResistMax: 0, coldResistMax: 0, lightningResistMax: 0, shadowResistMax: 0, allResMax: 0,
@@ -581,7 +592,7 @@ function _egComputePlayerStats() {
         physFlatMin: 0, physFlatMax: 0, physIncPct: 0,
         fireDmgMin: 0, fireDmgMax: 0, coldDmgMin: 0, coldDmgMax: 0,
         lightningDmgMin: 0, lightningDmgMax: 0, shadowDmgMin: 0, shadowDmgMax: 0,
-        // Melee-only damage channel — fed exclusively by the weapon slot's
+        // Melee-only damage channel - fed exclusively by the weapon slot's
         // base damage range and its "… to Melee Strikes" mods. Projectiles
         // (cell reveals / class abilities) read the shared buckets above;
         // unscoped slots (bracers/rings/amulet) feed BOTH channels.
@@ -590,6 +601,7 @@ function _egComputePlayerStats() {
         meleeLightningMin: 0, meleeLightningMax: 0,
         meleeShadowMin: 0, meleeShadowMax: 0,
         spellDamageFlat: 0, spellDamageIncPct: 0,
+        healingPowerFlat: 0, healingPowerIncPct: 0,
         lifeLeechPct: 0,
         blockChance: 0, spellBlockChance: 0, blockRecoveryPct: 0,
         dodgeChance: 0, spellDodgeChance: 0,
@@ -612,7 +624,7 @@ function _egComputePlayerStats() {
     _egGetAllEquippedItems().forEach(item => {
         if (item.defenses) {
             // Use the LOCAL-modified values (base + flat, scaled by the
-            // item's own "% increased" mods) — see _egGetItemEffectiveDefenses.
+            // item's own "% increased" mods) - see _egGetItemEffectiveDefenses.
             const eff = _egGetItemEffectiveDefenses(item);
             s.armourFlat += eff.armour;
             s.evasionFlat += eff.evasion;
@@ -664,7 +676,7 @@ function _egComputePlayerStats() {
 
     // Dual-wield balance (PoE-style): two 1H weapons sum their base damage
     // and melee mods, then the strike total is scaled by
-    // EG_DUAL_WIELD_DAMAGE_MULT (0.7) so dual-wield lands ~1.4x a single 1H —
+    // EG_DUAL_WIELD_DAMAGE_MULT (0.7) so dual-wield lands ~1.4x a single 1H -
     // below a 2H weapon's ~1.6-1.7x, trading raw damage for the parry bonus.
     // % increased multipliers are NOT scaled (only flat ranges are).
     if (typeof _egIsDualWielding === 'function' && _egIsDualWielding()) {
@@ -674,6 +686,21 @@ function _egComputePlayerStats() {
             'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
             'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
             s[k] = Math.round((s[k] || 0) * dw);
+        }
+    }
+
+    // Manual-melee balance (Secret-of-Mana-style): manual strikes land far
+    // less often than the old auto-strikes did, so the whole melee channel
+    // (base ranges + "to Melee Strikes" mods, both channels for unscoped
+    // slots) hits EG_MELEE_DAMAGE_MULT times harder. Applied here so the
+    // char-sheet ranges and combat agree. % increased multipliers are NOT
+    // scaled (only flat ranges are).
+    if (typeof EG_MELEE_DAMAGE_MULT !== 'undefined' && EG_MELEE_DAMAGE_MULT !== 1) {
+        const mm = EG_MELEE_DAMAGE_MULT;
+        for (const k of ['meleePhysMin', 'meleePhysMax',
+            'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
+            'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
+            s[k] = Math.round((s[k] || 0) * mm);
         }
     }
 
@@ -760,32 +787,38 @@ function _egComputePlayerStats() {
 //-------------------AUTO-ATTACK INTERVAL---------------------------------
 //------------------------------------------------------------------------
 
-// Base charge time (in seconds) between automatic melee strikes.
+// Base charge time (in seconds) to fully charge a manual melee strike.
 // The equipped weapon's base type defines the interval via its
-// attackIntervalSeconds implicit ("Attacks every Xs"); the summed
-// attack_speed mod values ("Melee Strikes occur #s more often") are then
-// subtracted, clamped to a minimum so strikes can't be spammed.
+// attackIntervalSeconds implicit ("Fully charges in Xs"); the summed
+// attack_speed mod values ("Melee charges #s faster") are then subtracted,
+// clamped to a minimum so charging can't be spammed, and the result is
+// shortened globally by EG_PLAYER_CHARGE_TIME_MULT for manual pacing.
 // Full breakdown for display: { base, reduction, interval } where interval
-// is the effective strike time (base minus summed attack_speed mods,
-// clamped to EG_PLAYER_MIN_ATTACK_INTERVAL).
+// is the effective time-to-full-charge.
 function _egGetPlayerAttackIntervalBreakdown() {
     const defBase = EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
     let base = defBase;
-    // Only the melee weapon slot defines the auto-strike interval — ranged
-    // weapons scale the input-driven projectile channel instead.
+    // Only the melee weapon slot defines the manual-strike charge time -
+    // ranged weapons scale the input-driven projectile channel instead.
     const weapon = _egGetAllEquippedItems().find(it => it.slotType === 'weapon');
     if (weapon) {
         if (weapon.attackIntervalSeconds != null) {
             base = Number(weapon.attackIntervalSeconds) || defBase;
         } else if (weapon.attacksPerSecond != null) {
-            // Legacy saves predate the rename — derive interval from aps
+            // Legacy saves predate the rename - derive interval from aps
             base = Math.round((defBase / (Number(weapon.attacksPerSecond) || 1)) * 100) / 100;
         }
     }
     const reduction = _egComputePlayerStats().attackSpeed || 0;
     let interval = Math.round(Math.max(EG_PLAYER_MIN_ATTACK_INTERVAL, base - reduction) * 100) / 100;
 
-    // Active map run: Temporal Chains — you act #% slower.
+    // Manual pacing: the old auto-strike intervals become time-to-full-charge,
+    // shortened globally so manual combat feels responsive.
+    if (typeof EG_PLAYER_CHARGE_TIME_MULT !== 'undefined') {
+        interval = Math.round(interval * EG_PLAYER_CHARGE_TIME_MULT * 100) / 100;
+    }
+
+    // Active map run: Temporal Chains - you act #% slower.
     if (typeof _egMapActionSlowMult === 'function') {
         interval *= _egMapActionSlowMult();
     }
@@ -807,7 +840,7 @@ function _egGetPlayerAttackInterval() {
 // Armour mitigation is damage-relative (PoE-style): the same armour value
 // mitigates many small hits strongly but large hits weakly, so it never
 // trivially caps once gear values grow and stays relevant at every level.
-const EG_ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) — was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
+const EG_ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) - was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
 const EG_ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
 
 // Returns armour's % reduction (0..EG_ARMOUR_MAX_REDUCTION) against a hit of
@@ -829,7 +862,7 @@ function _egCalcArmourMitigation(rawDamage, armour) {
 // higher-level monsters are harder to dodge, so evasion keeps requiring
 // upgrades instead of permanently sitting at the cap once gear values grow.
 const EG_EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
-const EG_EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 — retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
+const EG_EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 - retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
 const EG_EVASION_DODGE_CAP_PCT = 75;
 
 function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
@@ -843,7 +876,7 @@ function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
 // Miss chance scales linearly with the target's level and inversely with
 // accuracy, clamped to a floor (never perfectly accurate) and a ceiling
 // (attacks always have a chance to land). Applied identically to melee
-// strikes and projectiles — see _egRollPlayerMiss in endgame-encounter.js.
+// strikes and projectiles - see _egRollPlayerMiss in endgame-encounter.js.
 //
 // Every character additionally gains INNATE accuracy with their own level
 // (PoE-style level scaling), so a fresh, under-geared character is not
@@ -865,7 +898,7 @@ function _egGetInnateAccuracy() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-//  Drag-painting accuracy bonus — threshold-based reward for sustained
+//  Drag-painting accuracy bonus - threshold-based reward for sustained
 //  correct drags. More stacked cells = higher bonus, so a risky long
 //  drag that finally lands feels good instead of whiffing for 0 damage.
 //  Thresholds: >5  → tier 1, >10 → tier 2, >15 → tier 3 (highest).
@@ -939,7 +972,7 @@ function _egRollCrit(stats) {
 
 // _egGetElementalDamageBonus (rolls the total flat elemental damage bonus
 // for one hit) is defined ONCE, in endgame-combat-calculations.js (it sums
-// _egRollElementalBreakdown — identical math). The copy that used to live
+// _egRollElementalBreakdown - identical math). The copy that used to live
 // here was removed 2026-09; it was silently shadowed by the later file via
 // load order, so behaviour is unchanged.
 
@@ -954,17 +987,17 @@ function _egRollCrit(stats) {
 // gear: absorption_regen_rate increases the refill speed (%).
 
 // Base delay before regeneration starts (reduced by fasterAbsorptionRegenStart).
-const EG_ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 — 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
+const EG_ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 - 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
 
 // Base share of max Absorption restored per regen tick (scaled by absorptionRegenRatePct).
-const EG_ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 — 5s to full (was 3.3s), so even after delay a full shield takes longer
+const EG_ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 - 5s to full (was 3.3s), so even after delay a full shield takes longer
 
 function _egCancelAbsorptionRegen() {
     if (_egPlayerAbsorptionRegenDelayTimer) { clearTimeout(_egPlayerAbsorptionRegenDelayTimer); _egPlayerAbsorptionRegenDelayTimer = null; }
     if (_egPlayerAbsorptionRegenInterval) { clearInterval(_egPlayerAbsorptionRegenInterval); _egPlayerAbsorptionRegenInterval = null; }
 }
 
-// Called on every hit taken — interrupts any in-progress regen and restarts the delay.
+// Called on every hit taken - interrupts any in-progress regen and restarts the delay.
 function _egScheduleAbsorptionRegen() {
     _egCancelAbsorptionRegen();
 
@@ -1040,6 +1073,8 @@ const EG_STAT_DISPLAY_LABELS = {
     physIncPct: { label: t('eg_stat_inc_phys_dmg'), suffix: '%' },
     spellDamageFlat: { label: t('eg_stat_spell_damage'), suffix: '' },
     spellDamageIncPct: { label: t('eg_stat_inc_spell_damage'), suffix: '%' },
+    healingPowerFlat: { label: t('eg_stat_healing_power'), suffix: '' },
+    healingPowerIncPct: { label: t('eg_stat_inc_healing_power'), suffix: '%' },
 
     lifeLeechPct: { label: t('eg_stat_life_leech'), suffix: '%' },
 
@@ -1104,16 +1139,16 @@ function _egFormatStatValue(val) {
 //------------------------------------------------------------------------
 // Defines WHERE each stat is shown on the hub equipment screen and how
 // stats are grouped into categories:
-//   offense — upper left corner block (damage, crit, projectiles, ...)
-//   defense — upper right corner block (defences, life/mana, resistances)
-//   puzzle  — center column between the paperdoll slots (mistakes/time,
+//   offense - upper left corner block (damage, crit, projectiles, ...)
+//   defense - upper right corner block (defences, life/mana, resistances)
+//   puzzle  - center column between the paperdoll slots (mistakes/time,
 //             quiz helpers)
 // Buckets not listed in any category are silently omitted from display.
 const EG_STAT_LAYOUT = {
     offense: [
         { catKey: 'eg_statcat_attributes', buckets: ['strength', 'agility', 'intelligence'] },
         { catKey: 'eg_statcat_crit', buckets: ['critChance', 'critMultiplierPct'] },
-        // Melee auto-strike channel — independent from the projectile
+        // Manual melee charge channel - independent from the projectile
         // channel above; fed only by the weapon slot (see _egComputePlayerStats).
         // 'dualWield' heads the section while two 1H weapons are equipped so
         // the combined-at-70% ranges below read correctly.
@@ -1123,6 +1158,7 @@ const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct',
+            'healingPowerFlat', 'healingPowerIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
@@ -1180,16 +1216,17 @@ function _egBuildStatLine(bucket, stats) {
 
         // Dual-wield indicator (pseudo-bucket): rendered only while two 1H
         // weapons are equipped. The melee ranges below already reflect the
-        // combined-at-70% scaling — this line says why.
+        // combined-at-70% scaling - this line says why.
         case 'dualWield': {
             if (typeof _egIsDualWielding !== 'function' || !_egIsDualWielding()) return null;
             line = { label: t('eg_stat_dual_wield'), value: t('eg_stat_dual_wield_value') };
             break;
         }
 
-        // Effective melee strike interval: weapon base minus the summed
-        // attack_speed mods from gear (always present — shown first in the
-        // "Melee Strikes" category).
+        // Effective melee charge time: weapon base minus the summed
+        // attack_speed mods from gear, shortened by the global charge
+        // pacing (always present - shown first in the "Melee Strikes"
+        // category).
         case 'attackInterval': {
             if (typeof _egGetPlayerAttackIntervalBreakdown !== 'function') return null;
             const { interval } = _egGetPlayerAttackIntervalBreakdown();
@@ -1204,7 +1241,7 @@ function _egBuildStatLine(bucket, stats) {
                 line = { label: t('eg_stat_phys_damage'), value: `${_egFormatStatValue(stats.physFlatMin)}–${_egFormatStatValue(stats.physFlatMax)}` };
             }
             break;
-        // Melee-only damage ranges — same labels, grouped under the
+        // Melee-only damage ranges - same labels, grouped under the
         // "Melee Strikes" category so the two channels stay distinct
         case 'meleePhysRange':
             if (stats.meleePhysMin > 0 || stats.meleePhysMax > 0) {
@@ -1272,7 +1309,7 @@ function _egBuildStatLine(bucket, stats) {
             break;
         }
 
-        // Elemental resistances — shown as the CAPPED (effective) value;
+        // Elemental resistances - shown as the CAPPED (effective) value;
         // the uncapped gear total + the current cap are revealed on hover
         // (see _egBuildStatDescTooltipHTML in endgame-hub.js). The cap is
         // 75% base, raised by "increased maximum Resistance" uniques.
@@ -1294,7 +1331,7 @@ function _egBuildStatLine(bucket, stats) {
             if (!meta) return null;
             const val = stats[bucket];
             if (!val || val === 0) return null;
-            // Attributes are absolute totals (base + gear), not bonuses —
+            // Attributes are absolute totals (base + gear), not bonuses -
             // no "+" prefix so the number matches requirement checks.
             const isAttribute = bucket === 'strength' || bucket === 'agility' || bucket === 'intelligence';
             line = { label: meta.label, value: `${isAttribute ? '' : '+'}${_egFormatStatValue(val)}${meta.suffix}` };
@@ -1304,7 +1341,7 @@ function _egBuildStatLine(bucket, stats) {
     if (!line) return null;
     line.bucket = bucket;
     // Melee damage ranges share tooltips with their projectile counterparts
-    // (eg_statdesc_meleeFireRange does not exist — fall back to eg_statdesc_fireRange)
+    // (eg_statdesc_meleeFireRange does not exist - fall back to eg_statdesc_fireRange)
     const descBucket = bucket.startsWith('melee') ? bucket.charAt(5).toLowerCase() + bucket.slice(6) : bucket;
     line.descKey = `eg_statdesc_${descBucket}`;
     return line;

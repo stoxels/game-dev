@@ -94,7 +94,7 @@ function _discardToastEntry(entry) {
 // and fades out on its own timer, without affecting other visible messages.
 // If the same message is already visible, it is replaced so repeated uses of
 // an item always surface a fresh toast instead of being suppressed.
-// `accentColor` (optional) tints the message text — used e.g. for
+// `accentColor` (optional) tints the message text - used e.g. for
 // rarity-colored loot / pickup notifications.
 function showToast(msg, accentColor) {
     const container = document.getElementById('toast-stack');
@@ -112,7 +112,7 @@ function showToast(msg, accentColor) {
     const entry = { msg, el, removing: false, timeoutId: null };
     activeToasts.push(entry);
 
-    // Cap how many messages can pile up — trim the oldest first.
+    // Cap how many messages can pile up - trim the oldest first.
     if (activeToasts.length > TOAST_MAX_VISIBLE) {
         _removeToast(activeToasts[0]);
     }
@@ -196,7 +196,7 @@ function _ensureItemGainPopupStyle() {
 
 // Finds the DOM element for an inventory slot by its defId.
 // Since the compact-bar redesign, slots live in the category flyout panel
-// (#inv-flyout) and only exist in the DOM while that category is open —
+// (#inv-flyout) and only exist in the DOM while that category is open -
 // so this can legitimately return null with the flyout closed (the gain
 // popup then silently no-ops, same as before the panel was ever built).
 function _findInvSlotEl(defId) {

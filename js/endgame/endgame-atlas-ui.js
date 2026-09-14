@@ -17,19 +17,19 @@
  //     locked (dimmed)
 //   - Bottom-left of every node: number of matching maps in the map stash
 //   - Hovering a node opens a custom tooltip naming the region's fixed
-//     boss (emoji + name — the same guardian the region's map tooltips
+//     boss (emoji + name - the same guardian the region's map tooltips
 //     name, see EG_ATLAS_REGION_BOSSES in
 //     js/endgame/bosses/boss-rosters.js)
 //   - Search box (top right): matching regions glow blue (pulsing node
 //     frame + brightened name), including locked ones; matches by region
 //     name and by tier numeral / number (e.g. 'XV' or '15')
 //
-// Entry point: showEndgameAtlas() — opens from the Probability Gate
+// Entry point: showEndgameAtlas() - opens from the Probability Gate
 // topbar button and from the Nexus of Worlds door.
 //
 // Dependencies (must be loaded before this file):
-//   endgame-atlas.js — EG_ATLAS_NODES (x, y) / status helpers
-//   screens.js       — switchScreen()
+//   endgame-atlas.js - EG_ATLAS_NODES (x, y) / status helpers
+//   screens.js       - switchScreen()
 //------------------------------------------------------------------------
 
 
@@ -46,7 +46,7 @@ const EG_ATLAS_CX = EG_ATLAS_CANVAS_W / 2;
 const EG_ATLAS_CY = EG_ATLAS_CANVAS_H / 2;
 const EG_ATLAS_LABEL_H = 15;        // reserved space above a node for its name
 
-// Name of the global function the BACK button calls — set by
+// Name of the global function the BACK button calls - set by
 // showEndgameAtlas(backFn). Defaults to the Probability Gate.
 let _egAtlasBackFn = EG_SCREEN_NAV.gate;
 
@@ -123,7 +123,7 @@ function _egAtlasStatusLabel(status) {
     }
 }
 
-// Resolves the fixed boss of an atlas region — the same deterministic
+// Resolves the fixed boss of an atlas region - the same deterministic
 // blueprint lookup (egAtlasChainBlueprint) the map tooltips and the map
 // launch code use, so the card always names the boss actually fought in
 // that region's maps. Returns { id, name, emoji } or null when the boss
@@ -230,7 +230,7 @@ function _egAtlasBuildLinksSVG() {
         const c1 = _egAtlasNodeCenter(node);
 
         node.links.forEach(linkId => {
-            // Each edge exists twice (bidirectional links) — draw once.
+            // Each edge exists twice (bidirectional links) - draw once.
             const key = [node.id, linkId].sort().join('|');
             if (drawn.has(key)) return;
             drawn.add(key);
@@ -283,7 +283,7 @@ function _egAtlasBuildHeaderHTML() {
             </div>
             <div class="ega-progress-track"><div class="ega-progress-fill" style="width:${pct}%"></div></div>
             <div class="ega-header-line">
-                <span class="ega-header-bonus" title="${t('eg_atlas_adjacent_bonus_tooltip')}">🗺️ ${bonusLine}</span>
+                <span class="ega-header-bonus" data-tip-t="eg_atlas_adjacent_bonus_tooltip">🗺️ ${bonusLine}</span>
             </div>
         </div>
         <input type="text" class="ega-search" id="ega-search"
@@ -298,7 +298,7 @@ function _egAtlasBuildHeaderHTML() {
 // Per-tier progress strip: one cell per tier (I..XVI) showing
 // "completed/total" regions, coloured by the tier's rarity band. Fully
 // cleared tiers light up gold, untouched ones stay dim. Hovering a cell
-// opens the shared tooltip with the tier's region list + statuses — so
+// opens the shared tooltip with the tier's region list + statuses - so
 // the sweep pacing of the atlas (which region of a tier is still missing)
 // is visible at a glance.
 function _egAtlasBuildTierProgressHTML() {
@@ -363,7 +363,7 @@ function _egAtlasBuildFullScreenHTML() {
             <button class="ega-zoom-btn" onclick="_egAtlasZoomStep(-1)">−</button>
             <span class="ega-zoom-level" id="ega-zoom-level">100%</span>
             <button class="ega-zoom-btn" onclick="_egAtlasZoomStep(1)">+</button>
-            <button class="ega-zoom-btn" onclick="_egAtlasZoomFit()" title="Fit to screen">⤢</button>
+            <button class="ega-zoom-btn" onclick="_egAtlasZoomFit()" data-tip="Fit to screen" aria-label="Fit to screen">⤢</button>
         </div>
     </div>
 </div>`;
@@ -430,7 +430,7 @@ function _egAtlasApplyZoomStyles() {
 }
 
 // Sets a new zoom level. With an anchor (viewport-relative x/y) the map
-// point under the anchor stays fixed — zooming into the cursor position.
+// point under the anchor stays fixed - zooming into the cursor position.
 function _egAtlasSetZoom(z, ax, ay, isFit) {
     const vp = _egAtlasViewportEl();
     if (!vp) return;
@@ -534,7 +534,7 @@ function _egAtlasSelectNode(nodeId) {
 }
 
 // Search: highlights matching regions with a glowing blue node frame
-// (.ega-search-hit). Matches by localized region name AND by tier —
+// (.ega-search-hit). Matches by localized region name AND by tier -
 // either the roman numeral shown inside the nodes (e.g. 'XV',
 // case-insensitive) or the plain tier number (e.g. '15', 'tier 15').
 // Empty query clears the highlight.
@@ -723,7 +723,7 @@ function _egAtlasEnsureStyles() {
             text-shadow: 1px 1px 0 #000, -1px 1px 0 #000;
         }
         /* Boss tooltip is built with the shared eg-tt-* tooltip frame
-           (see _egAtlasBuildNodeTooltipHTML) — nothing extra below the
+           (see _egAtlasBuildNodeTooltipHTML) - nothing extra below the
            node square. */
 
         /* ── Search highlighting ───────────────────────────────────── */
@@ -776,9 +776,9 @@ function ensureEndgameAtlasScreen() {
     if (!document.getElementById('screen-endgame-atlas')) _egAtlasCreateScreen();
 }
 
-// Entry point — opens the Atlas of Statistica screen.
+// Entry point - opens the Atlas of Statistica screen.
 // An optional backFn argument (name of a global function, e.g.
-// 'showEndgameHub') overrides where the BACK button returns to — used
+// 'showEndgameHub') overrides where the BACK button returns to - used
 // when the atlas is opened from the endgame hub character sheet.
 function showEndgameAtlas(backFn) {
     if (typeof backFn === 'string') _egAtlasBackFn = _egResolveBackFn(backFn, EG_SCREEN_NAV.gate);

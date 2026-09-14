@@ -1,39 +1,39 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SHAPER (boss_shaper)------------------------
 //------------------------------------------------------------------------
-// REWORK — snow-globe homage, rebuilt as a sculptor of winter. The Shaper
+// REWORK - snow-globe homage, rebuilt as a sculptor of winter. The Shaper
 // does not merely chill the floor: it SHAPES the arena. It plants ice
 // monoliths that erect walls of frost, snaps a glacier finger at you,
 // and sculpts living ice that walks. The finale is the sculpture itself:
-// the SHAPED WINTER — the boss assembles a colossal ice monolith that
+// the SHAPED WINTER - the boss assembles a colossal ice monolith that
 // grinds the whole arena with rotating frost arms while you shatter its
 // three exposed cores.
 //
-//   Phase 1 (100–60%) — GLACIER RIFT (signature, upgraded). Frost fissures
+//   Phase 1 (100–60%) - GLACIER RIFT (signature, upgraded). Frost fissures
 //                       spider out from the boss side and erupt in a
-//                       rolling wave — no longer instant zones, but a
+//                       rolling wave - no longer instant zones, but a
 //                       CREeping front you outpace. Where the front
 //                       settles, lingering ice pools remain (the old
 //                       domains, kept as the aftermath).
 //                       Plus SOUL TITHE (shared).
-//   Phase 2 ( ≤60%)   — FROST MONOLITHS. The Shaper plants rune-carved
+//   Phase 2 ( ≤60%)   - FROST MONOLITHS. The Shaper plants rune-carved
 //                       monoliths at the edges; each erects a growing wall
 //                       of frost that slowly SHRINKS the arena. Break the
 //                       monoliths (3 hits each) to stop the walls.
 //                       Plus ICE WALKER. A sculpted ice sentinel stalks
-//                       you, trailing a freezing wake — it shatters on
+//                       you, trailing a freezing wake - it shatters on
 //                       contact, spawning shard shrapnel.
-//   Phase 3 ( ≤30%)   — Three monoliths, two walkers, the rift front
+//   Phase 3 ( ≤30%)   - Three monoliths, two walkers, the rift front
 //                       closes faster. Winter is winning.
-//   Finale ( ≤10%)    — ⛄ THE SHAPED WINTER (one-shot set-piece): the boss
+//   Finale ( ≤10%)    - ⛄ THE SHAPED WINTER (one-shot set-piece): the boss
 //                       assembles a colossal ice monolith at the centre
 //                       and goes immune. Three frost arms (like a radar
 //                       blade) sweep the arena, spinning faster each
-//                       beat — and three CORES on the monolith's faces
+//                       beat - and three CORES on the monolith's faces
 //                       light up one at a time. Reach the lit core's safe
 //                       arc and land 3 hits to SHATTER it; a shattered
 //                       core stalls the sweep. Shatter all three before
-//                       the final beat to break the sculpture — otherwise
+//                       the final beat to break the sculpture - otherwise
 //                       the MONOLITH BREAK: a full-screen ice shockwave
 //                       (huge damage, only the eye at the centre is safe).
 //                       Charge bar frozen for the whole set-piece (gate
@@ -148,7 +148,7 @@ function _egShpPrunePools(now) {
 //------------------------------------------------------------------------
 // Frost fissures spider out from a random side and erupt in a ROLLING
 // WAVE: a crested front (≈180px band) sweeps the screen over ~2.2s and
-// erupts as it passes — outpace it or slip between the fissure gaps.
+// erupts as it passes - outpace it or slip between the fissure gaps.
 // Where the front settles, LINGERING ICE POOLS remain (the old frozen
 // domains, now clearly the aftermath of the front) that drain while you
 // stand in them.
@@ -187,7 +187,7 @@ function _egMechShpRift(monster, phase) {
         line.style.width = W + 'px';
     });
 
-    _egNkToast('eg_mech_shp_rift', '❄️ The Shaper: GLACIER RIFT — outrun the front!', '#7dd3fc');
+    _egNkToast('eg_mech_shp_rift', '❄️ The Shaper: GLACIER RIFT - outrun the front!', '#7dd3fc');
 
     const poolEls = new Map();  // zone → its element (persistent per pool)
     let t = 0, erupted = false, frontX = fromLeft ? 0 : W;
@@ -300,7 +300,7 @@ function _egMechShpMonoliths(monster, phase) {
         spots.push(cands.splice(Math.floor(Math.random() * cands.length), 1)[0]);
     }
 
-    _egNkToast('eg_mech_shp_monos', '❄️ The Shaper: FROST MONOLITHS — break them to stop the walls!', '#7dd3fc');
+    _egNkToast('eg_mech_shp_monos', '❄️ The Shaper: FROST MONOLITHS - break them to stop the walls!', '#7dd3fc');
 
     const monos = spots.map(spot => {
         const el = _egNkEl(run, 'div', 'eg-shp-mono', '🗿');
@@ -359,7 +359,7 @@ function _egMechShpMonoliths(monster, phase) {
 
     // Monoliths are player-breakable: clicking the monolith's card is not a
     // thing (they are arena objects), so we shatter them when the player
-    // touches them 3 times while DODGING — body-check the ice. Each touch
+    // touches them 3 times while DODGING - body-check the ice. Each touch
     // (with a cooldown) cracks a stage; the 3rd shatters it.
     const crackLoop = _egNkNewRun(monster && monster.id, true);
     let crackCd = 0;
@@ -381,7 +381,7 @@ function _egMechShpMonoliths(monster, phase) {
                         _egShpShards(m.x, m.y, true);
                         try { m.el.remove(); } catch (e) {}
                         try { m.wall.remove(); } catch (e) {}
-                        _egNkToast('eg_mech_shp_mono_down', '❄️ Monolith shattered — the wall recedes!', '#4ade80');
+                        _egNkToast('eg_mech_shp_mono_down', '❄️ Monolith shattered - the wall recedes!', '#4ade80');
                     }
                     break;
                 }
@@ -397,7 +397,7 @@ function _egMechShpMonoliths(monster, phase) {
 //-------------------MECHANIC: ICE WALKER (phase 2+)------------------------
 //------------------------------------------------------------------------
 // A sculpted ice sentinel (⛄) stalks you, trailing a freezing wake. It
-// shatters on contact — dealing its hit AND spawning shard shrapnel that
+// shatters on contact - dealing its hit AND spawning shard shrapnel that
 // scatters outward. Phase 3 spawns two walkers.
 const EG_SHP_WALKER_SPEED = 165;
 const EG_SHP_WALKER_TURN = 1.9;
@@ -434,7 +434,7 @@ function _egMechShpWalker(monster, phase) {
     const n = p >= 3 ? 2 : 1;
     for (let i = 0; i < n; i++) mk(i * 1800 * _EG_SHP_DEBUG_MULT);
 
-    _egNkToast('eg_mech_shp_walker', '❄️ The Shaper: ICE WALKER — it shatters on contact!', '#7dd3fc');
+    _egNkToast('eg_mech_shp_walker', '❄️ The Shaper: ICE WALKER - it shatters on contact!', '#7dd3fc');
 
     const shards = [];   // { x, y, vx, vy, el, born, dead }
     let t = 0, touchCd = 0, shardTouchCd = 0;
@@ -474,7 +474,7 @@ function _egMechShpWalker(monster, phase) {
             if (wk.y < 30 || wk.y > H - 30) { wk.ang = -wk.ang; wk.y = Math.max(30, Math.min(H - 30, wk.y)); }
             wk.el.style.left = Math.round(wk.x - 18) + 'px';
             wk.el.style.top = Math.round(wk.y - 18) + 'px';
-            // Contact: the walker shatters — hit + shrapnel.
+            // Contact: the walker shatters - hit + shrapnel.
             if (pr && now >= touchCd && _egNkCircleHit(wk.x, wk.y, 20, pr, 0)) {
                 touchCd = now + EG_SHP_HIT_CD_MS;
                 _egShpTouch(dmgPct, level, 'Ice Walker');
@@ -512,11 +512,11 @@ function _egMechShpWalker(monster, phase) {
 //------------------------------------------------------------------------
 // The Shaper assembles a colossal ice monolith at the centre and goes
 // immune. Three frost arms sweep the arena like a radar blade, spinning
-// faster each beat — and three CORES on the monolith's faces light up one
+// faster each beat - and three CORES on the monolith's faces light up one
 // at a time. Reach the lit core's arc and stand there to SHATTER it (3
 // stage-cracks, each stalling the sweep briefly); a shattered core stops
 // its arm pair. Shatter all three before the final beat to break the
-// sculpture — otherwise the MONOLITH BREAK: a full-screen ice shockwave
+// sculpture - otherwise the MONOLITH BREAK: a full-screen ice shockwave
 // (only the eye at the centre is safe). Charge bar frozen for the whole
 // set-piece (gate in _egTickPlayer via _egShpFinalActive).
 const EG_SHP_FINAL_BEATS = 3;
@@ -618,7 +618,7 @@ function _egShpFinalStart(monster) {
     });
 
     // Cores: three 60° arcs, one per arm lane, at 120° spacing. The lit
-    // core is the safe arc the player must stand in — and body-check.
+    // core is the safe arc the player must stand in - and body-check.
     g.cores = [0, 120, 240].map((ang) => {
         const el = document.createElement('div');
         el.className = 'eg-shp-core';
@@ -636,11 +636,11 @@ function _egShpFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-shp-cd-label">⛄ THE SHAPED WINTER</div>' +
         '<div class="eg-shp-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-shp-cd-hint">Body-check the lit core — shatter all three!</div>';
+        '<div class="eg-shp-cd-hint">Body-check the lit core - shatter all three!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_shp_final_cd', '⛄💀 THE SHAPED WINTER — shatter the cores!', '#7dd3fc');
+    _egNkToast('eg_mech_shp_final_cd', '⛄💀 THE SHAPED WINTER - shatter the cores!', '#7dd3fc');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -685,7 +685,7 @@ function _egShpFinalStart(monster) {
             }
         }
 
-        // Core cracking: body-check the lit core (its arc is "safe" — the
+        // Core cracking: body-check the lit core (its arc is "safe" - the
         // arm behind it is stalled while the core is lit).
         const lc = litCore();
         if (lc && c && now >= coreTouchCd) {
@@ -708,7 +708,7 @@ function _egShpFinalStart(monster) {
                         _egShpFinalEnd(g, true);
                         return false;
                     }
-                    _egNkToast('eg_mech_shp_core_down', '❄️ Core shattered — ' + g.coresUp + ' to go!', '#4ade80');
+                    _egNkToast('eg_mech_shp_core_down', '❄️ Core shattered - ' + g.coresUp + ' to go!', '#4ade80');
                 }
             }
         }
@@ -730,7 +730,7 @@ function _egShpFinalStart(monster) {
             num.classList.add('eg-bmb-cd-pop');
         }
         if (g.count <= 0) {
-            // THE MONOLITH BREAK: full-screen ice shockwave — only the eye
+            // THE MONOLITH BREAK: full-screen ice shockwave - only the eye
             // at the centre is safe.
             _egShpBreak(g, level);
             return;
@@ -742,19 +742,19 @@ function _egShpFinalStart(monster) {
         g.cores.forEach(c2 => { if (c2 !== next) c2.lit = false; c2.el.classList.toggle('eg-shp-core-lit', c2 === next); });
         if (next) {
             next.lit = true;
-            _egNkToast('eg_mech_shp_core_lit', '💎 A core lights up — crack it!', '#7dd3fc');
+            _egNkToast('eg_mech_shp_core_lit', '💎 A core lights up - crack it!', '#7dd3fc');
         }
         g.beatTimer = setTimeout(lightNext, beatMs);
     };
     g.beatTimer = setTimeout(lightNext, beatMs * 0.6);
 }
 
-// THE MONOLITH BREAK: the sculpture detonates — a full-screen ice
+// THE MONOLITH BREAK: the sculpture detonates - a full-screen ice
 // shockwave with a safe eye at the centre.
 function _egShpBreak(g, level) {
     if (!g || g.finished) return;
     const W = window.innerWidth, H = window.innerHeight;
-    _egNkToast('eg_mech_shp_break', '⛄💀 THE MONOLITH BREAK — reach the eye!', '#7dd3fc');
+    _egNkToast('eg_mech_shp_break', '⛄💀 THE MONOLITH BREAK - reach the eye!', '#7dd3fc');
     // Ring telegraph, then detonate. Safe: within 130px of the centre.
     const ring = document.createElement('div');
     ring.className = 'eg-shp-breakring';
@@ -813,7 +813,7 @@ function _egShpFinalEnd(g, success) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egShpTeardown() {
     if (_egShpFinal) { try { _egShpFinalEnd(_egShpFinal, false); } catch (e) {} _egShpFinal = null; }
@@ -837,8 +837,8 @@ function _egShpTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_SHP_DEBUG.fire('rift'|'monos'|'walker', phase) — runs one now
-//   _EG_SHP_DEBUG.final()                              — SHAPED WINTER now
+//   _EG_SHP_DEBUG.fire('rift'|'monos'|'walker', phase) - runs one now
+//   _EG_SHP_DEBUG.final()                              - SHAPED WINTER now
 if (typeof window !== 'undefined') {
     window._EG_SHP_DEBUG = {
         fire: (name, phase) => {

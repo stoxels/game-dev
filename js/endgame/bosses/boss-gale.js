@@ -3,30 +3,30 @@
 //------------------------------------------------------------------------
 // A rework of the old 8-second Cyclone Vault into a persistent storm
 // siege. The Gale is a living weather system that never leaves the arena.
-// Fight identity: the WHOLE FIGHT is about wind reading — every set-piece
+// Fight identity: the WHOLE FIGHT is about wind reading - every set-piece
 // pushes, pulls or lifts, and the player wins by positioning, not DPS
 // dodges alone.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE EYE — the boss itself: a swirling vortex that wanders the arena.
+//   • THE EYE - the boss itself: a swirling vortex that wanders the arena.
 //     Touching it is an Updraft: animated fling upward-ish + cold damage.
-//   • CROSSWIND — a slow global breeze that alternates direction every
+//   • CROSSWIND - a slow global breeze that alternates direction every
 //     ~7s (telegraphed by a wind-streak banner + toast): a gentle constant
 //     push the player must lean against. It feeds every other mechanic.
-//   • CYCLONE FUNNELS — the old Vault, now perpetual: 2–4 wandering
+//   • CYCLONE FUNNELS - the old Vault, now perpetual: 2–4 wandering
 //     funnels roam the floor on a phase-scaled cadence, each leaving a
 //     short-lived dust telegraph where it will next cut across. Inside a
 //     funnel = cold DoT (the old 7/9/12% per second, tier-scaled).
 //
-//   60% GATE — TORNADO LADDER: three huge twisters spawn in a column and
+//   60% GATE - TORNADO LADDER: three huge twisters spawn in a column and
 //   climb the screen one after another through telegraphed lanes; each
 //   lifts the player upward if caught (positioning fight).
 //
-//   30% GATE — EYE OF THE STORM: the arena collapses inward — 4 vortex
+//   30% GATE - EYE OF THE STORM: the arena collapses inward - 4 vortex
 //   rings contract toward the screen center in sequence while the Eye
 //   plants itself in the middle; thread the ring timings or be ground up.
 //
-//   CHARGE ATTACK — CYCLONE LANCE: a wind lance telegraphs as a lane,
+//   CHARGE ATTACK - CYCLONE LANCE: a wind lance telegraphs as a lane,
 //   then a compressed air bolt blasts across it, flinging anyone hit.
 //
 // This file holds EVERYTHING this boss needs in one place:
@@ -55,7 +55,7 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            // Kept for schedule compatibility — the persistent watcher now
+            // Kept for schedule compatibility - the persistent watcher now
             // owns the funnels; the handler no-ops (same shim pattern as
             // the other reworked bosses).
             { name: 'gale_vault', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechGaleVault' },
@@ -107,7 +107,7 @@ const EG_GAL_LANCE_FLING = [0, 170, 200, 230];  // px fling when hit
 
 let _egGaleWatcher = null; // per-fight storm state
 
-// Phase lookup helper — resolves the boss's current phase (default 1).
+// Phase lookup helper - resolves the boss's current phase (default 1).
 function _egGalPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
         const m = _egMonsters.find(x => x && x.id === st.monsterId);
@@ -559,7 +559,7 @@ function _egGaleTickLances(st, dtS, pr, p) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the perpetual funnels — keep the
+// The old scheduled mechanic is now the perpetual funnels - keep the
 // handler name alive so any stale schedule entry no-ops instead of
 // erroring.
 function _egMechGaleVault(monster, phase) { void monster; void phase; }

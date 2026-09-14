@@ -2,7 +2,7 @@
 //-------------------ENDGAME EQUIPMENT BASE ITEMS-------------------------
 //------------------------------------------------------------------------
 // Defines all equipment base types in the game, grouped by slot.
-// Base types have NO affixes — they are raw templates. Affixes (modifiers
+// Base types have NO affixes - they are raw templates. Affixes (modifiers
 // like +life, +damage, resistances) will be added by a separate crafting /
 // loot-generation layer in a future step.
 //
@@ -21,7 +21,7 @@
 // REQUIREMENTS: Level, Str, Agi, Int. Values are set per base type.
 // Items without a requirement for a stat have that stat set to 0.
 // Enforced on every equip/unequip path by endgame-requirements.js
-// (self-carrying allowed — attribute totals include gear bonuses).
+// (self-carrying allowed - attribute totals include gear bonuses).
 //
 // ENTRY POINT:
 //   _egGenerateEquipmentDrop(monsterLevel = 1)
@@ -30,7 +30,7 @@
 //
 // ADDING NEW BASE TYPES:
 //   Push a new entry into the appropriate EG_BASE_TYPES_* array.
-//   No other files need changing — the generator samples all arrays.
+//   No other files need changing - the generator samples all arrays.
 //------------------------------------------------------------------------
 
 
@@ -3951,6 +3951,6 @@ const EG_ALL_BASE_TYPES = [
 // _egGenerateEquipmentDrop(monsterLevel) is defined ONCE, in
 // endgame-equipment-generator.js (rarity roll + mod table + implicits).
 // A legacy common-only copy used to live at the end of this file and was
-// silently shadowed by the generator's version via load order — it was
+// silently shadowed by the generator's version via load order - it was
 // removed 2026-09. Callers (_egSpawnLootDrop in endgame-grid-pickups.js,
 // endgame-encounter-chain.js) resolve to the generator's implementation.

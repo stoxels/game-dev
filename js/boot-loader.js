@@ -96,7 +96,7 @@
         ['STATE', 'core state (js/state.js)'],
         ['ITEM_DEFS', 'item definitions (js/puzzle-items/item-definitions.js)'],
         ['PT', 'passive tree (js/passive-tree/passive-tree.js)'],
-        ['STORY_BEATS', 'storyline beats (js/storyline/storyline-beats.js — loads last by design)'],
+        ['STORY_BEATS', 'storyline beats (js/storyline/storyline-beats.js - loads last by design)'],
         ['EG_BOSS_DEFS', 'boss registry (js/endgame/bosses/boss-framework.js)'],
         ['EG_BOSS_MECHANICS', 'boss mechanics registry (boss-framework.js)'],
         ['_egShowTooltip', 'single tooltip implementation (js/endgame/endgame-currency.js)'],
@@ -125,7 +125,7 @@
         return safeTypeof(entry[0]) === 'undefined';
     });
     if (missing.length) {
-        console.warn('[load-order] ' + missing.length + ' expected global(s) missing — a script failed to load or is ordered wrong: ' +
+        console.warn('[load-order] ' + missing.length + ' expected global(s) missing - a script failed to load or is ordered wrong: ' +
             missing.map(function (entry) { return entry[0] + ' (' + entry[1] + ')'; }).join(', '));
     }
 })();

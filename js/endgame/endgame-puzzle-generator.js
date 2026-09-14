@@ -5,12 +5,12 @@
 // the chain is no longer limited to story puzzles from the world list.
 //
 // Two generation modes:
-//   'symbol' — rasterises a glyph onto an offscreen canvas (Greek letters,
+//   'symbol' - rasterises a glyph onto an offscreen canvas (Greek letters,
 //              math operators, card suits, weather, ... any Unicode symbol)
 //              and downsamples the pixels into a binary solution grid
-//   'random' — random structures of various sizes: drunkard-walk blobs,
+//   'random' - random structures of various sizes: drunkard-walk blobs,
 //              refined by cellular-automata smoothing, optionally mirrored
-//   'mixed'  — per puzzle: 70% symbol / 30% random
+//   'mixed'  - per puzzle: 70% symbol / 30% random
 //
 // Generated levels are appended to ALL and flagged with isGeneratedPuzzle
 // so _egBuildChainPool() never leaks them into the story pool. They carry
@@ -67,7 +67,7 @@ const EG_GEN_SYMBOLS = [
     { ch: 'Ø', en: 'Average',      de: 'Durchschnitt' },
     { ch: 'µ', en: 'Micro',        de: 'Mikro' },
 
-    // Everything else — not limited to math structures
+    // Everything else - not limited to math structures
     { ch: '♠', en: 'Spades',       de: 'Pik' },
     { ch: '♥', en: 'Hearts',       de: 'Herz' },
     { ch: '♦', en: 'Diamonds',     de: 'Karo' },
@@ -89,7 +89,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '✚', en: 'Cross',        de: 'Kreuz-Zeichen' },
     { ch: '❤', en: 'Heart',        de: 'Herz-Zeichen' },
 
-    // Greek — capitals & more
+    // Greek - capitals & more
     { ch: 'Ζ', en: 'Zeta',         de: 'Zeta' },
     { ch: 'Η', en: 'Eta',          de: 'Eta' },
     { ch: 'Ι', en: 'Iota',         de: 'Iota' },
@@ -103,7 +103,7 @@ const EG_GEN_SYMBOLS = [
     { ch: 'Φ', en: 'Phi Capital',  de: 'Phi (groß)' },
     { ch: 'Ψ', en: 'Psi Capital',  de: 'Psi (groß)' },
 
-    // Math — relations, logic and set symbols
+    // Math - relations, logic and set symbols
     { ch: '≤', en: 'Less Equal',   de: 'Kleiner gleich' },
     { ch: '≥', en: 'Greater Equal', de: 'Größer gleich' },
     { ch: '≡', en: 'Identical',    de: 'Identisch' },
@@ -215,7 +215,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '‡', en: 'Double Dagger', de: 'Doppelkreuz (Dagger)' },
     { ch: '☪', en: 'Star-Crescent', de: 'Stern und Halbmond' },
 
-    // I Ching trigrams — perfect blocky nonogram material
+    // I Ching trigrams - perfect blocky nonogram material
     { ch: '☰', en: 'Trigram Heaven', de: 'Trigramm Himmel' },
     { ch: '☱', en: 'Trigram Lake',   de: 'Trigramm See' },
     { ch: '☲', en: 'Trigram Fire',   de: 'Trigramm Feuer' },
@@ -288,7 +288,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '⚘', en: 'Flower Stem',  de: 'Blume mit Stiel' },
     { ch: '❧', en: 'Rotated Floral Heart', de: 'Blütenherz (gedreht)' },
 
-    // Science & hazard — very much at home in Stoxels
+    // Science & hazard - very much at home in Stoxels
     { ch: '☢', en: 'Radioactive',  de: 'Radioaktiv' },
     { ch: '☣', en: 'Biohazard',    de: 'Biogefährdung' },
     { ch: '⚗', en: 'Alembic',      de: 'Retorte' },
@@ -301,7 +301,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '⌘', en: 'Command Key',  de: 'Befehlstaste' },
     { ch: '⌀', en: 'Diameter',     de: 'Durchmesser' },
 
-    // Chess — remaining pieces
+    // Chess - remaining pieces
     { ch: '♚', en: 'Black King',   de: 'Schwarzer König' },
     { ch: '♜', en: 'Black Rook',   de: 'Schwarzer Turm' },
     { ch: '♝', en: 'Black Bishop', de: 'Schwarzer Läufer' },
@@ -349,7 +349,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '◸', en: 'Upper Left Triangle', de: 'Dreieck oben links' },
     { ch: '◿', en: 'Lower Right Triangle', de: 'Dreieck unten rechts' },
 
-    // Elder Futhark runes — bold strokes, ideal nonogram material
+    // Elder Futhark runes - bold strokes, ideal nonogram material
     { ch: 'ᚠ', en: 'Rune Fehu',    de: 'Rune Fehu' },
     { ch: 'ᚢ', en: 'Rune Uruz',    de: 'Rune Uruz' },
     { ch: 'ᚦ', en: 'Rune Thurisaz', de: 'Rune Thurisaz' },
@@ -359,11 +359,11 @@ const EG_GEN_SYMBOLS = [
     { ch: 'ᛞ', en: 'Rune Dagaz',   de: 'Rune Dagaz' },
     { ch: 'ᛟ', en: 'Rune Othala',  de: 'Rune Othala' },
 
-    // Braille patterns — chunky dot grids
+    // Braille patterns - chunky dot grids
     { ch: '⣿', en: 'Full Braille Pattern', de: 'Braille-Muster (voll)' },
     { ch: '⠿', en: 'Six-Dot Braille', de: 'Braille (sechs Punkte)' },
 
-    // I Ching hexagrams — blocky stacked bars
+    // I Ching hexagrams - blocky stacked bars
     { ch: '䷀', en: 'Hexagram Creation', de: 'Hexagramm Schöpfung' },
     { ch: '䷾', en: 'Hexagram Completion', de: 'Hexagramm Vollendung' },
 
@@ -373,7 +373,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '⚔', en: 'Crossed Swords', de: 'Gekreuzte Schwerter' },
     { ch: '⏦', en: 'AC Sine Wave', de: 'Sinuswelle' },
 
-    // Crosses — outlined & shadowed variants
+    // Crosses - outlined & shadowed variants
     { ch: '✙', en: 'Outlined Greek Cross', de: 'Kreuz (umrissen)' },
     { ch: '✛', en: 'Heavy Open Cross', de: 'Dickes offenes Kreuz' },
     { ch: '✞', en: 'Shadowed Latin Cross', de: 'Kreuz mit Schatten' },
@@ -383,7 +383,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '❅', en: 'Snowflake Variant', de: 'Schneeflocke (Variante)' },
     { ch: '❆', en: 'Tight Snowflake', de: 'Schneeflocke (dicht)' },
 
-    // Card suits — outline versions
+    // Card suits - outline versions
     { ch: '♤', en: 'Spades Outline', de: 'Pik (Umriss)' },
     { ch: '♡', en: 'Hearts Outline', de: 'Herz (Umriss)' },
     { ch: '♧', en: 'Clubs Outline', de: 'Kreuz-Symbol (Umriss)' },
@@ -394,7 +394,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '❥', en: 'Rotated Heart', de: 'Gedrehtes Herz' },
     { ch: '❣', en: 'Heart Exclamation', de: 'Herz-Ausrufezeichen' },
 
-    // Alchemy — classical elements
+    // Alchemy - classical elements
     { ch: '🜁', en: 'Alchemy Air',   de: 'Alchemie Luft' },
     { ch: '🜂', en: 'Alchemy Fire',  de: 'Alchemie Feuer' },
     { ch: '🜃', en: 'Alchemy Water', de: 'Alchemie Wasser' },
@@ -416,18 +416,18 @@ const EG_GEN_SYMBOLS = [
     { ch: '▥', en: 'Patterned Square', de: 'Quadrat (Muster)' },
     { ch: '▧', en: 'Hatched Square', de: 'Quadrat (Schraffur)' },
 
-    // Runes — more Elder Futhark
+    // Runes - more Elder Futhark
     { ch: 'ᚲ', en: 'Rune Kenaz',   de: 'Rune Kenaz' },
     { ch: 'ᚹ', en: 'Rune Wunjo',   de: 'Rune Wunjo' },
     { ch: 'ᛒ', en: 'Rune Berkano', de: 'Rune Berkano' },
 
-    // Astrology — Ophiuchus & asteroids
+    // Astrology - Ophiuchus & asteroids
     { ch: '⛎', en: 'Ophiuchus',   de: 'Schlangenträger' },
     { ch: '⚳', en: 'Pallas',       de: 'Pallas' },
     { ch: '⚴', en: 'Juno',         de: 'Juno' },
     { ch: '⚷', en: 'Chiron',       de: 'Chiron' },
 
-    // Hands — filled pointers
+    // Hands - filled pointers
     { ch: '☛', en: 'Pointing Right Black', de: 'Zeigende Hand rechts (schwarz)' },
     { ch: '☟', en: 'Pointing Down', de: 'Zeigende Hand unten' },
     { ch: '☚', en: 'Pointing Left Black', de: 'Zeigende Hand links (schwarz)' },
@@ -446,7 +446,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '⚚', en: 'Staff of Hermes', de: 'Hermesstab' },
     { ch: '➔', en: 'Wide Right Arrow', de: 'Pfeil nach rechts (dick)' },
 
-    // Planets, astrology & zodiac — leftovers
+    // Planets, astrology & zodiac - leftovers
     { ch: '⚶', en: 'Vesta',        de: 'Vesta' },
 
     // Weather & sky
@@ -473,7 +473,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '𝄐', en: 'Fermata',      de: 'Fermate' },
     { ch: '🀄', en: 'Mahjong Red Dragon', de: 'Mahjong Drache' },
 
-    // Geometry — rectangles & triangles
+    // Geometry - rectangles & triangles
     { ch: '▭', en: 'Rectangle',    de: 'Rechteck' },
     { ch: '◫', en: 'Vertical Rectangle', de: 'Rechteck (senkrecht)' },
     { ch: '⬒', en: 'Square Top Half', de: 'Quadrat (oben gefüllt)' },
@@ -485,13 +485,13 @@ const EG_GEN_SYMBOLS = [
     { ch: '⏣', en: 'Benzene Ring', de: 'Benzolring' },
     { ch: '⌗', en: 'Viewdata Square', de: 'Gitterquadrat' },
 
-    // Runes — final Elder Futhark
+    // Runes - final Elder Futhark
     { ch: 'ᛗ', en: 'Rune Mannaz',  de: 'Rune Mannaz' },
     { ch: 'ᛜ', en: 'Rune Ingwaz',  de: 'Rune Ingwaz' },
     { ch: 'ᛏ', en: 'Rune Tiwaz',   de: 'Rune Tiwaz' },
     { ch: 'ᛋ', en: 'Rune Sowilo',  de: 'Rune Sowilo' },
 
-    // Alchemy — compounds
+    // Alchemy - compounds
     { ch: '🜍', en: 'Alchemy Sulfur', de: 'Alchemie Schwefel' },
     { ch: '🜔', en: 'Alchemy Salt', de: 'Alchemie Salz' },
 
@@ -511,7 +511,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '☺', en: 'Smile Outline', de: 'Smiley (Umriss)' },
     { ch: '☻', en: 'Black Smiley', de: 'Smiley (schwarz)' },
 
-    // Flowers & asterisks — final
+    // Flowers & asterisks - final
     { ch: '☙', en: 'Reversed Floral Heart', de: 'Blütenherz (gespiegelt)' },
     { ch: '❃', en: 'Chevron Snowflake', de: 'Schneeflocke (Winkel)' },
     { ch: '✽', en: 'Heavy Teardrop Asterisk', de: 'Tropfen-Asterisk' },
@@ -520,7 +520,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '¤', en: 'Currency Sign', de: 'Währungssymbol' },
     { ch: '₿', en: 'Bitcoin',      de: 'Bitcoin' },
 
-    // Katakana — bold blocky strokes, excellent nonogram material
+    // Katakana - bold blocky strokes, excellent nonogram material
     { ch: 'ロ', en: 'Katakana Ro', de: 'Katakana Ro' },
     { ch: 'コ', en: 'Katakana Ko', de: 'Katakana Ko' },
     { ch: 'ニ', en: 'Katakana Ni', de: 'Katakana Ni' },
@@ -530,7 +530,7 @@ const EG_GEN_SYMBOLS = [
     { ch: 'マ', en: 'Katakana Ma', de: 'Katakana Ma' },
     { ch: 'モ', en: 'Katakana Mo', de: 'Katakana Mo' },
 
-    // Simple kanji — iconic pictographs
+    // Simple kanji - iconic pictographs
     { ch: '日', en: 'Kanji Sun',     de: 'Zeichen Sonne' },
     { ch: '月', en: 'Kanji Moon',    de: 'Zeichen Mond' },
     { ch: '山', en: 'Kanji Mountain', de: 'Zeichen Berg' },
@@ -540,13 +540,13 @@ const EG_GEN_SYMBOLS = [
     { ch: '川', en: 'Kanji River',   de: 'Zeichen Fluss' },
     { ch: '十', en: 'Kanji Ten',     de: 'Zeichen Zehn' },
 
-    // Hangul jamo — geometric letter blocks
+    // Hangul jamo - geometric letter blocks
     { ch: 'ㅁ', en: 'Hangul Mieum', de: 'Hangul Mieum' },
     { ch: 'ㅅ', en: 'Hangul Siots', de: 'Hangul Siot' },
     { ch: 'ㅈ', en: 'Hangul Jieut', de: 'Hangul Jieut' },
     { ch: 'ㅌ', en: 'Hangul Tieut', de: 'Hangul Tieut' },
 
-    // Cyrillic capitals — striking symmetric forms
+    // Cyrillic capitals - striking symmetric forms
     { ch: 'Ж', en: 'Cyrillic Zhe', de: 'Kyrillisch Sche' },
     { ch: 'Ф', en: 'Cyrillic Ef',  de: 'Kyrillisch Ef' },
     { ch: 'Ц', en: 'Cyrillic Tse', de: 'Kyrillisch Ze' },
@@ -559,7 +559,7 @@ const EG_GEN_SYMBOLS = [
     { ch: '۞', en: 'Rub El Hizb',  de: 'Rub-el-Hizb' },
     { ch: 'ॐ', en: 'Om Sign',      de: 'Om-Zeichen' },
 
-    // Glagolitic — ancient Slavic letters
+    // Glagolitic - ancient Slavic letters
     { ch: 'Ⰰ', en: 'Glagolitic Az',   de: 'Glagolitisch Az' },
     { ch: 'Ⱄ', en: 'Glagolitic Slovo', de: 'Glagolitisch Slovo' },
     { ch: 'Ⱌ', en: 'Glagolitic Yest', de: 'Glagolitisch Yest' },
@@ -571,20 +571,20 @@ const EG_GEN_SYMBOLS = [
     { ch: '𝄆', en: 'Repeat Sign', de: 'Wiederholungszeichen' },
     { ch: '⌬', en: 'Benzene Ring Variant', de: 'Benzolring (Variante)' },
 
-    // Geometry — striped circle, quarter circles, quadrant squares
+    // Geometry - striped circle, quarter circles, quadrant squares
     { ch: '◍', en: 'Striped Circle', de: 'Kreis (gestreift)' },
     { ch: '◲', en: 'Circle Lower Left Quarter', de: 'Kreis (Viertel unten links)' },
     { ch: '◳', en: 'Circle Lower Right Quarter', de: 'Kreis (Viertel unten rechts)' },
     { ch: '▚', en: 'Quadrant Pattern', de: 'Quadrantenmuster' },
     { ch: '▞', en: 'Quadrant Pattern Diagonal', de: 'Quadrantenmuster (diagonal)' },
 
-    // Runes — remaining Elder Futhark
+    // Runes - remaining Elder Futhark
     { ch: 'ᚷ', en: 'Rune Gebo',    de: 'Rune Gebo' },
     { ch: 'ᛇ', en: 'Rune Eihwaz',  de: 'Rune Eihwaz' },
     { ch: 'ᛈ', en: 'Rune Perthro', de: 'Rune Perthro' },
     { ch: 'ᛚ', en: 'Rune Laguz',   de: 'Rune Laguz' },
 
-    // Games — more mahjong & cards
+    // Games - more mahjong & cards
     { ch: '🀅', en: 'Mahjong Green Dragon', de: 'Mahjong grüner Drache' },
     { ch: '🀆', en: 'Mahjong White Dragon', de: 'Mahjong weißer Drache' },
     { ch: '🂠', en: 'Playing Card Back', de: 'Kartenrückseite' },
@@ -714,7 +714,7 @@ function _egRasterizeSymbolGrid(ch, rows, cols) {
 //------------------------------------------------------------------------
 
 // One cellular-automata smoothing pass: cells with many filled neighbours
-// solidify, isolated cells vanish — turns noisy walks into organic blobs.
+// solidify, isolated cells vanish - turns noisy walks into organic blobs.
 function _egSmoothStructure(grid, rows, cols) {
     const out = Array.from({ length: rows }, () => new Array(cols).fill(0));
     for (let r = 0; r < rows; r++) {
@@ -796,7 +796,7 @@ function _egGenerateRandomStructure(rows, cols, rng) {
         grid = _egSmoothStructure(grid, rows, cols);
         if (R() < 0.5) grid = _egSmoothStructure(grid, rows, cols);
 
-        // Optional symmetry — mirrored halves feel far more "designed"
+        // Optional symmetry - mirrored halves feel far more "designed"
         const symRoll = R();
         if (symRoll < 0.45) {          // horizontal mirror
             for (let r = 0; r < rows; r++)
@@ -816,7 +816,7 @@ function _egGenerateRandomStructure(rows, cols, rng) {
         return grid;
     }
 
-    // Fallback: seeded scatter + heavy smoothing — always yields something
+    // Fallback: seeded scatter + heavy smoothing - always yields something
     let grid = Array.from({ length: rows }, () =>
         Array.from({ length: cols }, () => R() < 0.42 ? 1 : 0));
     grid = _egSmoothStructure(_egSmoothStructure(grid, rows, cols), rows, cols);
@@ -830,7 +830,7 @@ function _egGenerateRandomStructure(rows, cols, rng) {
 
 // Picks a grid size: honours the minCells floor from map mods and, when a
 // size bucket is requested, only draws sizes inside that bucket's range.
-// maxRows / maxCols (optional) hard-cap the dimensions — used by boss
+// maxRows / maxCols (optional) hard-cap the dimensions - used by boss
 // arenas to keep the fight on a small board.
 // Biases toward bigger grids as the map tier climbs. Falls back to the
 // closest eligible size when no size sits inside the window.
@@ -887,21 +887,21 @@ function _egPickRandomSymbol(rng) {
 }
 
 const EG_GEN_RANDOM_REVEALS = [
-    { en: 'A pattern woven by pure chance — order emerged anyway.', de: 'Ein vom reinen Zufall gewebtes Muster — und trotzdem entstand Ordnung.' },
-    { en: 'The noise condensed into structure, exactly once.', de: 'Das Rauschen verdichtete sich zu einer Struktur — genau einmalig.' },
+    { en: 'A pattern woven by pure chance - order emerged anyway.', de: 'Ein vom reinen Zufall gewebtes Muster - und trotzdem entstand Ordnung.' },
+    { en: 'The noise condensed into structure, exactly once.', de: 'Das Rauschen verdichtete sich zu einer Struktur - genau einmalig.' },
     { en: 'No sigil, no symbol: just randomness given form.', de: 'Kein Sigill, kein Symbol: nur Zufall, der Gestalt annimmt.' },
     { en: 'A shape sampled from the space of all possible shapes.', de: 'Eine Form, gezogen aus dem Raum aller möglichen Formen.' },
     { en: 'One realization of a random walk through the grid.', de: 'Eine Realisierung einer Zufallsbewegung über das Raster.' },
     { en: 'Coin flips, mirrored until they looked intentional.', de: 'Münzwürfe, gespiegelt, bis sie absichtlich aussahen.' },
-    { en: 'Entropy painted this — then thought better of erasing it.', de: 'Die Entropie malte dies — und verzichtete dann doch auf das Löschen.' },
+    { en: 'Entropy painted this - then thought better of erasing it.', de: 'Die Entropie malte dies - und verzichtete dann doch auf das Löschen.' },
 ];
 
 // Builds one generated puzzle level, appends it to ALL and returns its gi.
-// opts: { mode, tier, minCells, bucket, maxRows, maxCols, rng } — mode
+// opts: { mode, tier, minCells, bucket, maxRows, maxCols, rng } - mode
 // defaults to 'mixed'. When opts.rng (a seeded PRNG function) is given,
 // EVERY random decision (mode coin flip, size roll, glyph, structure walk,
 // flavour text, world) derives from it, so the same seed always produces
-// the same grid — used by the atlas chain blueprints for per-map chains.
+// the same grid - used by the atlas chain blueprints for per-map chains.
 // Returns null only if even the random fallback failed.
 function _egCreateGeneratedLevel(opts) {
     if (typeof ALL === 'undefined') return null;
@@ -920,7 +920,7 @@ function _egCreateGeneratedLevel(opts) {
     let symbolMeta = null;
 
     if (effMode === 'symbol') {
-        // Try a few different glyphs — exotic characters may render empty
+        // Try a few different glyphs - exotic characters may render empty
         // depending on installed fonts.
         for (let attempt = 0; attempt < 4 && !grid; attempt++) {
             symbolMeta = _egPickRandomSymbol(rng);

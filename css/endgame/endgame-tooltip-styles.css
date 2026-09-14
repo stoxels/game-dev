@@ -1,9 +1,9 @@
 ﻿/* ================================================================
-   ENDGAME ITEM TOOLTIP — PoE-style frame
+   ENDGAME ITEM TOOLTIP - PoE-style frame
    Add these rules to your main CSS file (wherever .eg-tooltip-* lives).
    ================================================================ */
 
-/* Outer frame — border color driven by --tt-border CSS var */
+/* Outer frame - border color driven by --tt-border CSS var */
 .eg-tt-frame {
     border: 2px solid var(--tt-border, #7a7a7a);
     border-radius: 4px;
@@ -17,14 +17,14 @@
 }
 
 /* The shared game tooltip engine caps its floating tip at a narrower
-   default — lift that cap while an endgame equipment tooltip is shown. */
+   default - lift that cap while an endgame equipment tooltip is shown. */
 #ghud-floating-tip.eg-wide-tip {
     max-width: 560px;
 }
 
 /* Dedicated extra-wide mode for the hub "?" controls tooltip ONLY.
    The shared engine sets max-width as an INLINE style, so this rule
-   needs !important to win — other tooltips are unaffected because
+   needs !important to win - other tooltips are unaffected because
    the class is only applied while the info tooltip is open. */
 #ghud-floating-tip.eg-controls-tip {
     max-width: 640px !important;
@@ -35,7 +35,7 @@
         max-width: none;
     }
 
-/* Equipment / currency item tooltips — widened purely via content
+/* Equipment / currency item tooltips - widened purely via content
    detection (:has), so EVERY call site that renders an .eg-tt-frame gets
    the extra width automatically (the engine's inline max-width would
    otherwise crush non-hub call sites down to ~280px). Must come BEFORE
@@ -49,7 +49,7 @@
     max-width: none;
 }
 
-/* Map item tooltips — widened purely via content detection (:has), so
+/* Map item tooltips - widened purely via content detection (:has), so
    EVERY call site that renders a map tooltip gets the extra width
    automatically, with no class add/remove juggling and no leak into
    other tooltips (the width only applies while a map frame is present).
@@ -64,7 +64,7 @@
     max-width: none;
 }
 
-/* Safety net — no descendant of the tooltip frame should ever be able to
+/* Safety net - no descendant of the tooltip frame should ever be able to
    push past its right edge, even a single long unbroken string with no
    spaces to wrap on (e.g. a long guaranteed-modifier description). */
 .eg-tt-frame,
@@ -74,7 +74,7 @@
     box-sizing: border-box;
 }
 
-/* Essence tooltip — "Guaranteed modifier" / "Works on" section.
+/* Essence tooltip - "Guaranteed modifier" / "Works on" section.
    These classes are built dynamically by _egBuildEssenceDetailHTML() but
    previously had no rules at all, so long modifier descriptions (unlike
    the short 2-3 word names most families use) had nothing forcing them
@@ -148,7 +148,7 @@
     letter-spacing: 0.06em;
 }
 
-/* Weapon hand line (One-Handed / Two-Handed) — same muted header style */
+/* Weapon hand line (One-Handed / Two-Handed) - same muted header style */
 .eg-tt-hands {
     font-size: 0.75rem;
     opacity: 0.85;
@@ -158,7 +158,7 @@
     color: #d4c88a;
 }
 
-/* Sections — separated by a subtle divider */
+/* Sections - separated by a subtle divider */
 .eg-tt-section {
     padding: 5px 0;
     border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -184,7 +184,7 @@
     margin-left: 8px;
 }
 
-    /* Defense value already includes the item's local "% increased" mods —
+    /* Defense value already includes the item's local "% increased" mods -
    tinted gold to distinguish it from the plain base value */
     .eg-tt-val.eg-tt-val-modified {
         color: #ffcf70;
@@ -218,7 +218,7 @@
 
 /* Explicit mod lines */
 .eg-tt-mods-section {
-    /* no extra border — inherits .eg-tt-section */
+    /* no extra border - inherits .eg-tt-section */
 }
 
 .eg-tt-mod {
@@ -265,7 +265,7 @@
     margin-left: 6px;
 }
 
-/* Implicit mod lines — PoE-style distinct blue with separator */
+/* Implicit mod lines - PoE-style distinct blue with separator */
 .eg-tt-implicits-section {
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
@@ -284,7 +284,7 @@
     font-family: var(--PX, monospace);
 }
 
-/* Downside mod lines on unique items — shown in warning red */
+/* Downside mod lines on unique items - shown in warning red */
 .eg-tt-mod.eg-tt-mod-downside {
     color: #e74c3c;
 }

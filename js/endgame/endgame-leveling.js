@@ -1,22 +1,24 @@
 ﻿//------------------------------------------------------------------------
 //-------------------ENDGAME CHARACTER LEVELING---------------------------
 //------------------------------------------------------------------------
-// Experience & attribute-point system for the endgame:
-//   - Monsters grant XP on kill, scaled by their level and by a
-//     Path-of-Exile-style multiplier: full XP only while the monster is
-//     within a safe level range of the character; beyond that range
-//     (too high OR too low) XP falls off exponentially.
-//   - The curve is tuned for the current 86-region atlas at the intended
-//     modded playstyle (2/4/6 mods for T1-5/6-10/11-16): a one-time sweep
-//     of every region lands ~level 94, and 94→100 is a dedicated modded
-//     T16 farming grind (≈30 more runs) — see EG_LEVELING_CONFIG.
-//   - Each level grants attrPointsPerLevel (currently 5) attribute points
-//     spendable on Strength /
-//     Agility / Intelligence via the attribute window (✦ button in the
-//     Nexus topbar or the level chip on the character panel).
-//   - Attribute points can be refunded. A refund is verified against the
-//     live equipment loadout first — it is blocked while any equipped
-//     item would violate its stat requirements afterwards.
+// Experience & progression system shared by the CAMPAIGN and the endgame:
+//   - XP is earned from the very first story level: completing a level
+//     grants a one-time XP bonus (replays grant a reduced amount) and every
+//     monster killed grants kill XP.
+//   - Monster XP is scaled by the monster's level and by a Path-of-Exile
+//     multiplier: full XP only while the monster is within a safe level
+//     range of the character; beyond that range (too high OR too low) XP
+//     falls off exponentially - so re-farming old content gives little.
+//   - The campaign carries the character from level 1 to ~level 68 (the
+//     atlas entry level); a one-time sweep of the atlas then reaches ~94
+//     and 94→100 is the dedicated late grind - see EG_LEVELING_CONFIG and
+//     tools/xp-curve-tune.py.
+//   - Each level grants passivePointsPerLevel (1) passive tree point. Raw
+//     attribute points are no longer granted per level; the character's
+//     +stats now come from the passive tree (not wired into combat yet).
+//   - The legacy attribute window (✦ button) remains for backwards-
+//     compatible saves and refunds; a refund is still verified against the
+//     live equipment loadout first.
 //
 // Wiring notes:
 //   - _egSyncBaseAttributes() keeps EG_PLAYER_BASE_ATTRIBUTES
@@ -29,9 +31,9 @@
 //     which calls _egGrantMonsterXP(monsterLevel, isBoss).
 //
 // Dependencies (must be loaded before this file):
-//   js/state.js             — STATE, save()
-//   endgame-player-stats.js  — _egGetAllEquippedItems()
-//   endgame-requirements.js — EG_PLAYER_BASE_ATTRIBUTES,
+//   js/state.js             - STATE, save()
+//   endgame-player-stats.js  - _egGetAllEquippedItems()
+//   endgame-requirements.js - EG_PLAYER_BASE_ATTRIBUTES,
 //                             _egSumAttributeBonuses(),
 //                             _egFindUnmetRequirements(),
 //                             _egGetUnmetRequirementsText()
@@ -57,27 +59,18 @@ const EG_LEVELING_CONFIG = {
     startLevel: 1,
     maxLevel: 100,
 
-    // XP curve: xpToLeave(level) = xpBase * level^xpExp + xpLinear * level.
-    // Tuned against the CURRENT atlas (86 regions; tier monster levels
-    // 3..90; 15 / 20 / 15+8·tier kills per map plus 1 boss each) AND the
-    // intended MODDED playstyle: T1-5 maps with 2 mods (≈+18% XP), T6-10
-    // with 4 (≈+46%), T11-16 with 6 (≈+77%) — measured over the real mod
-    // tables (EG_MAP_MOD_REWARDS × EG_MAP_MOD_TABLES tier rolls).
-    // A one-time sweep — clearing every region of every tier exactly once,
-    // at that mod load — lands on these levels (next tier's monster level
-    // in brackets):
-    //   T1→5 [6] · T2→9 [10] · T3→13 [14] · T4→19 [19] · T5→24 [24]
-    //   T6→30 [30] · T7→36 [36] · T8→44 [43] · T9→49 [50] · T10→55 [57]
-    //   T11→62 [64] · T12→69 [71] · T13→76 [78] · T14→83 [84] · T15→92 [90]
-    //   T16→94 (late-wall grind takes over from here)
-    // So every sweep ends 0-3 levels around the NEXT tier's monster level —
-    // full XP on entry, PoE's "enter the new act slightly under-levelled"
-    // rhythm — and the full 86-map sweep finishes ~level 94. White (0-mod)
-    // players fall behind this ladder by ~15-20 levels in T11+ and close
-    // the gap by repeat-farming their current tier at full XP (1.5-2× the
-    // total run count) — the classic PoE carry-your-level loop.
+    // XP curve: xpToLeave(level) = xpBase * level^xpExp + xpLinear * level
+    // for the CAMPAIGN segment (level < campaignEndLevel), multiplied by the
+    // endgame segment beyond it. The campaign hands out XP from level 1 and
+    // is tuned (tools/xp-curve-tune.py) so a clean playthrough of all 184 story
+    // levels + their monsters ends around campaignEndLevel (68) - Tier 1
+    // maps are then tuned around monster level ~68 instead of level 3, so
+    // the atlas is a genuine next step, PoE-style (T1 = 68 → T16 = 90).
+    // Campaign pacing does not depend on the curve's shape: level-completion
+    // XP is a FRACTION of xpToNextLevel(expectedLevel) - see
+    // EG_LEVELING_CONFIG.campaignFirstClearFraction.
     xpBase: 158,
-    xpExp: 2.14,
+    xpExp: 1.72,
     xpLinear: 197,
 
     // Early-game catch-up discount: below earlyXpDiscountLevels the XP
@@ -100,15 +93,19 @@ const EG_LEVELING_CONFIG = {
     xpPerKillExp: 1.65,
     bossXpMultiplier: 3.5,
 
-    // Late-game PoE-style wall: beyond xpLateStart the requirement is
-    // multiplied by 1 + xpLateScale * ((lvl - start)/(max-start))^xpLatePower.
-    // 1→94 unchanged; from there it ramps hard. With the continuous-spawn
-    // kill economy (+40% kills/map) the wall reads: modded T16 maps per
-    // level 94 ≈ 2 · 96 ≈ 3 · 98 ≈ 5 · 99 ≈ 7 · 100 ≈ 10 — the 94→100
-    // climb still costs a solid pile of endgame runs.
-    xpLateStart: 85,
-    xpLatePower: 3.8,
-    xpLateScale: 15.4,
+    // Endgame requirement segment: from campaignEndLevel up the requirement
+    // is multiplied by 1 + xpEndgameScale * t^xpEndgamePower, where
+    //   t = (level - campaignEndLevel + 1) / (maxLevel - campaignEndLevel + 1).
+    // The atlas now spans monster levels ~68-90 (EG_MAP_TIER_MONSTER_LEVELS),
+    // so one character level inside the atlas costs far more raw XP than it
+    // did when T1 monsters were level 3. Tuned (tools/xp-curve-tune.py) so that:
+    //   • entering the atlas at 68, a T1 map (≈15 kills) ≈ 2-3 maps per level
+    //   • T16 (mLvl 90) ≈ 1-2 modded maps per level
+    //   • one full sweep of all 86 atlas regions ends ≈ level 94, leaving
+    //     94→100 as the dedicated late grind.
+    campaignEndLevel: 68,
+    xpEndgameScale: 90,
+    xpEndgamePower: 3,
 
     // PoE-style safe range: monsters up to
     //   (safeRangeBelowBase + floor(playerLevel / safeRangeBelowLevelsPer))
@@ -134,8 +131,21 @@ const EG_LEVELING_CONFIG = {
     // counts as "Poor XP".
     hintPoorMultiplier: 0.25,
 
-    // Attribute points granted per level gained.
-    attrPointsPerLevel: 5,
+    // Regular level-ups no longer hand out spendable attributes - each
+    // level now grants a passive tree point instead and the character's
+    // +stats come from the passive tree (not wired into combat yet).
+    attrPointsPerLevel: 0,
+    passivePointsPerLevel: 1,
+
+    // Campaign completion XP (levels 1..campaignEndLevel): a first clear
+    // grants campaignFirstClearFraction of the XP needed for the level's
+    // EXPECTED character level, and a replay grants campaignReplayFraction
+    // of that. Both are additionally scaled by the PoE-style range
+    // multiplier against the expected level, so farming old content gives
+    // almost nothing. Monster kills (see _egGrantMonsterXP) make up the
+    // rest of the budget.
+    campaignFirstClearFraction: 0.22,
+    campaignReplayFraction: 0.35,
 };
 
 // Pristine copy of the base attribute pool from endgame-requirements.js,
@@ -186,12 +196,14 @@ function _egGetXpForNextLevel(level) {
         const fade = (level - 1) / c.earlyXpDiscountLevels;
         xp *= 1 - c.earlyXpDiscountFactor * (1 - fade);
     }
-    // Late-game PoE wall: steeply inflate cost beyond xpLateStart.
-    // 1→xpLateStart unchanged; 86→100 ramps to ~ (1+scale)× at cap.
-    if (c.xpLateStart != null && c.xpLateScale != null && level > c.xpLateStart) {
-        const t = (level - c.xpLateStart) / (c.maxLevel - c.xpLateStart);
-        const p = (c.xpLatePower != null) ? c.xpLatePower : 3;
-        xp *= 1 + c.xpLateScale * Math.pow(t, p);
+    // Endgame segment: steepen from campaignEndLevel up so the atlas
+    // (monster levels ~68-90) costs a real number of maps per level and the
+    // final levels become the dedicated grind wall.
+    if (c.campaignEndLevel != null && level >= c.campaignEndLevel) {
+        const span = Math.max(1, c.maxLevel - c.campaignEndLevel + 1);
+        const t = (level - c.campaignEndLevel + 1) / span;
+        const p = (c.xpEndgamePower != null) ? c.xpEndgamePower : 3;
+        xp *= 1 + (c.xpEndgameScale || 0) * Math.pow(t, p);
     }
     return Math.floor(xp);
 }
@@ -293,37 +305,44 @@ function _egBuildXpTiersHTML() {
     return rows.join('');
 }
 
-// Awards XP for killing one monster of `monsterLevel`, handles multi-level
-// ups (+1 attribute point each), plays the level-up effect and persists.
-function _egGrantMonsterXP(monsterLevel, isBoss) {
-    if (typeof STATE === 'undefined' || !STATE) return;
+// Grants a raw amount of character XP and resolves every level-up it
+// triggers. Each gained level now awards passivePointsPerLevel passive tree
+// points (attributes come from the passive tree, not from level-ups), plus
+// the classic full life/mana/shield refill and level-up effect. Returns the
+// number of levels gained. All XP sources (monster kills and campaign level
+// completions) funnel through here so progression stays consistent.
+function _egAwardXP(xpGain) {
+    if (typeof STATE === 'undefined' || !STATE) return 0;
+    const c = EG_LEVELING_CONFIG;
 
-    const playerLevel = _egGetPlayerLevel();
-    if (playerLevel >= EG_LEVELING_CONFIG.maxLevel) {
-        // Level cap reached — no more XP accumulates.
+    if (_egGetPlayerLevel() >= c.maxLevel) {
+        // Level cap reached - no more XP accumulates.
         if (STATE.playerXP !== 0) { STATE.playerXP = 0; egSaveLevelingState(); }
-        return;
+        return 0;
     }
 
-    const mLvl = Math.max(1, Number(monsterLevel) || 1);
-    const c = EG_LEVELING_CONFIG;
-    let xp = c.xpPerKillBase + c.xpPerKillGrowth * Math.pow(mLvl, c.xpPerKillExp);
-    if (isBoss) xp *= c.bossXpMultiplier;
-    // Active map's "% more Experience" reward bonus (neutral outside runs).
-    const mapXpMult = (typeof _egMapXpMult === 'function') ? _egMapXpMult() : 1;
-    xp = Math.max(1, Math.round(xp * _egCalcXpMultiplier(playerLevel, mLvl) * mapXpMult));
-
-    STATE.playerXP = _egGetPlayerXP() + xp;
+    const gain = Math.max(0, Math.round(Number(xpGain) || 0));
+    if (gain <= 0) return 0;
+    STATE.playerXP = _egGetPlayerXP() + gain;
 
     let levelsGained = 0;
+    let passiveGained = 0;
     while (_egGetPlayerLevel() < c.maxLevel
         && STATE.playerXP >= _egGetXpForNextLevel(_egGetPlayerLevel())) {
         STATE.playerXP -= _egGetXpForNextLevel(_egGetPlayerLevel());
         STATE.playerLevel++;
-        STATE.egAttrPoints = (STATE.egAttrPoints || 0) + c.attrPointsPerLevel;
         levelsGained++;
+        // Legacy: attribute points per level are disabled (0) now, but the
+        // field is still honoured if a future pass re-enables it.
+        if (c.attrPointsPerLevel) STATE.egAttrPoints = (STATE.egAttrPoints || 0) + c.attrPointsPerLevel;
+        passiveGained += (c.passivePointsPerLevel || 0);
     }
     if (_egGetPlayerLevel() >= c.maxLevel) STATE.playerXP = 0;
+
+    if (passiveGained > 0) {
+        STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + passiveGained;
+        if (typeof _incDirect === 'function') try { _incDirect('lifetimePassivePointsObtained', passiveGained); } catch (e) {}
+    }
 
     _egSyncBaseAttributes();
     egSaveLevelingState();
@@ -367,6 +386,95 @@ function _egGrantMonsterXP(monsterLevel, isBoss) {
         if (typeof _egRenderInventory === 'function') try { _egRenderInventory(); } catch (e) {}
         if (typeof _egRenderEquipSlots === 'function') try { _egRenderEquipSlots(); } catch (e) {}
     }
+    return levelsGained;
+}
+
+// Awards XP for killing one monster of `monsterLevel`: the kill value is
+// scaled by the PoE-style range multiplier against the character level and
+// by the active map's "% more Experience" bonus (neutral outside runs),
+// then handed to _egAwardXP.
+function _egGrantMonsterXP(monsterLevel, isBoss) {
+    if (typeof STATE === 'undefined' || !STATE) return;
+    if (_egGetPlayerLevel() >= EG_LEVELING_CONFIG.maxLevel) {
+        if (STATE.playerXP !== 0) { STATE.playerXP = 0; egSaveLevelingState(); }
+        return;
+    }
+
+    const playerLevel = _egGetPlayerLevel();
+    const mLvl = Math.max(1, Number(monsterLevel) || 1);
+    const c = EG_LEVELING_CONFIG;
+    let xp = c.xpPerKillBase + c.xpPerKillGrowth * Math.pow(mLvl, c.xpPerKillExp);
+    if (isBoss) xp *= c.bossXpMultiplier;
+    const mapXpMult = (typeof _egMapXpMult === 'function') ? _egMapXpMult() : 1;
+    xp = Math.max(1, Math.round(xp * _egCalcXpMultiplier(playerLevel, mLvl) * mapXpMult));
+
+    _egAwardXP(xp);
+}
+
+
+//------------------------------------------------------------------------
+//-------------------CAMPAIGN PROGRESSION---------------------------------
+//------------------------------------------------------------------------
+// The campaign awards XP from the very first level, so the player arrives
+// at the atlas around campaignEndLevel instead of level 1:
+//   • Completing a story level grants a FRACTION of the XP required for
+//     that level's expected character level - a first clear grants
+//     campaignFirstClearFraction, a replay campaignReplayFraction of that.
+//   • Monsters spawning in every campaign level grant kill XP through the
+//     normal _egGrantMonsterXP path; their level tracks the expected level
+//     so the PoE range multiplier stays ~1 during normal play.
+// Both are scaled by _egCalcXpMultiplier(), so re-farming content far below
+// the character's level gives almost nothing (anti-farm, PoE-style).
+
+let _egCampaignLevelCountCache = null;
+
+// Number of story levels in the campaign (excludes monster/endgame levels).
+function _egCampaignTotalLevels() {
+    if (_egCampaignLevelCountCache != null) return _egCampaignLevelCountCache;
+    let n = 0;
+    if (typeof ALL !== 'undefined' && ALL) {
+        for (const lvl of ALL) {
+            if (lvl && !lvl.isMonsterLevel && !lvl.isEndgameSandbox) n++;
+        }
+    }
+    _egCampaignLevelCountCache = n;
+    return n;
+}
+
+// Character level a player is expected to be at when completing story level
+// `gi`, spread linearly from 1 to campaignEndLevel across the campaign.
+// Drives both level-completion XP and campaign monster levels.
+function _egCampaignExpectedLevel(gi) {
+    const n = _egCampaignTotalLevels();
+    if (n <= 1) return 1;
+    const end = EG_LEVELING_CONFIG.campaignEndLevel || 68;
+    const idx = Math.max(0, Math.min(n - 1, Number(gi) || 0));
+    return 1 + (end - 1) * idx / (n - 1);
+}
+
+// Monster level for campaign monsters on story level `gi`.
+function _egCampaignMonsterLevel(gi) {
+    return Math.max(1, Math.round(_egCampaignExpectedLevel(gi)));
+}
+
+// Awards level-completion XP for story level `gi`. Called from checkWin()
+// on every campaign clear (first clear and replay alike). No-ops during
+// endgame map/chain runs.
+function _egGrantCampaignLevelXP(gi, isFirstClear) {
+    if (typeof STATE === 'undefined' || !STATE) return 0;
+    if (typeof cur === 'undefined' || !cur) return 0;
+    // Never award campaign XP during an endgame map/chain run.
+    if (cur.isMonsterLevel && !cur.campaignMonsters) return 0;
+    if (_egGetPlayerLevel() >= EG_LEVELING_CONFIG.maxLevel) return 0;
+
+    const c = EG_LEVELING_CONFIG;
+    const refLevel = Math.max(1, Math.round(_egCampaignExpectedLevel(gi)));
+    const base = _egGetXpForNextLevel(refLevel);
+    const fraction = c.campaignFirstClearFraction
+        * (isFirstClear ? 1 : (c.campaignReplayFraction || 0));
+    const mult = _egCalcXpMultiplier(_egGetPlayerLevel(), refLevel);
+    const xp = Math.max(1, Math.round(base * fraction * mult));
+    return _egAwardXP(xp);
 }
 
 
@@ -488,7 +596,7 @@ function _egSimulateRefundUnmet(attr) {
 // True when removing one point of `attr` is legal:
 //   - at least one allocated point exists on that attribute, AND
 //   - the equipped gear stays fully valid afterwards (no NEW unmet
-//     requirements compared to the current state — same grandfather rule
+//     requirements compared to the current state - same grandfather rule
 //     the equip gate uses).
 function _egCanRefundAttribute(attr) {
     if ((_egGetAllocatedAttributes()[attr] || 0) <= 0) return false;
@@ -558,7 +666,7 @@ function _egLoadLevelingState() {
 //------------------------------------------------------------------------
 
 // Refreshes the ✦ topbar badge and the small level chip on the character
-// panel label. Both elements are optional — this no-ops outside the hub.
+// panel label. Both elements are optional - this no-ops outside the hub.
 function _egRenderLevelHUD() {
     const pts = _egGetUnspentPoints();
     const lvl = _egGetPlayerLevel();
@@ -728,14 +836,14 @@ function _egRenderAttrWindow() {
     <button class="eg-attr-btn eg-attr-btn-add" ${canAdd ? '' : 'disabled'}
          onclick="_egAllocateAttribute('${a.key}')">+</button>
     <button class="eg-attr-btn eg-attr-btn-remove" ${canRemove ? '' : 'disabled'}
-         title="${removeTitle}"
+         data-tip="${_tipAttr(removeTitle)}" aria-label="${_tipAttr(removeTitle)}"
          onclick="_egRefundAttribute('${a.key}')">−</button>
 </div>`;
     }).join('');
 
     box.innerHTML = `
 <button class="eg-attr-close" onclick="_egCloseAttributeWindow()"
-        title="${t('ui_close')}" aria-label="${t('ui_close')}">✕</button>
+        data-tip-t="ui_close" aria-label="${t('ui_close')}">✕</button>
 <div class="eg-attr-title">${t('eg_lvl_window_title')}</div>
 <div class="eg-attr-level-line">
     <span class="eg-attr-level-num">${t('eg_lvl_short').replace('{n}', lvl)}</span>
@@ -967,7 +1075,7 @@ function _egInjectLevelingStyles() {
    The attribute window borrows the old stash delete-confirm modal's shell
    classes. Those styles were injected by _egInjectDeleteUIStyles() in
    endgame-hub.js and silently disappeared when the delete-confirm modal
-   was removed — leaving the window unpositioned (it rendered behind the
+   was removed - leaving the window unpositioned (it rendered behind the
    Orbs & Shards tab) and its buttons unstyled. They live here now. */
 .eg-delete-modal-bg {
     display: none;
@@ -1002,7 +1110,7 @@ function _egInjectLevelingStyles() {
 _egLoadLevelingState();
 _egInjectLevelingStyles();
 
-// Global Escape handler — closes the attribute window when open.
+// Global Escape handler - closes the attribute window when open.
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const m = document.getElementById('eg-attr-modal');

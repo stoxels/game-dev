@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════════════════════════════════
    Every player projectile is built from nested divs (see the build() functions
    in js/endgame/endgame-class-projectiles.js). All shapes are drawn pointing
-   RIGHT (+x) inside a 44x28 px box — the flight code rotates the whole box
+   RIGHT (+x) inside a 44x28 px box - the flight code rotates the whole box
    onto the atan2 flight vector, so projectiles always aim at their target.
 
    Layout contract per shape:
@@ -42,7 +42,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   PROBABILIST — golden hunting dart (🎯)
+   PROBABILIST - golden hunting dart (🎯)
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-arrow { filter: drop-shadow(0 0 5px rgba(255, 224, 102, 0.9)); }
 
@@ -81,7 +81,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   MATHMAGICIAN — arcane firebolt (🔮)
+   MATHMAGICIAN - arcane firebolt (🔮)
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-fireball { filter: drop-shadow(0 0 8px rgba(255, 112, 67, 0.95)); }
 
@@ -130,7 +130,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   STATISTICIAN — thrown blade (⚔️)
+   STATISTICIAN - thrown blade (⚔️)
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-sword { filter: drop-shadow(0 0 5px rgba(170, 212, 245, 0.9)); }
 
@@ -176,7 +176,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   OUTLIER — rogue shooting star (💫): streak + spinning star core
+   OUTLIER - rogue shooting star (💫): streak + spinning star core
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-dizzy { filter: drop-shadow(0 0 6px rgba(179, 136, 255, 0.95)); }
 
@@ -202,7 +202,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   ACTUARY — served contract: paper dart with wax seal (📜→✉)
+   ACTUARY - served contract: paper dart with wax seal (📜→✉)
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-scroll { filter: drop-shadow(0 0 5px rgba(255, 213, 79, 0.85)); }
 
@@ -243,7 +243,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   RECURSIONIST — fractal soul shard with self-similar echoes (♾️)
+   RECURSIONIST - fractal soul shard with self-similar echoes (♾️)
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-infinity { filter: drop-shadow(0 0 6px rgba(100, 255, 218, 0.9)); }
 
@@ -290,7 +290,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   MARKOVIAN — chain shot: iron ball towing shortening links (⛓️)
+   MARKOVIAN - chain shot: iron ball towing shortening links (⛓️)
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-chain { filter: drop-shadow(0 0 5px rgba(144, 164, 174, 0.9)); }
 
@@ -319,7 +319,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   BAYESIAN — alchemical vial dart with reactive charge (🧪)
+   BAYESIAN - alchemical vial dart with reactive charge (🧪)
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-brain { filter: drop-shadow(0 0 6px rgba(105, 240, 174, 0.9)); }
 
@@ -376,7 +376,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   RANDOM WALKER — tumbling pipped die (🎲): inner spin, aimed flight
+   RANDOM WALKER - tumbling pipped die (🎲): inner spin, aimed flight
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-dice { filter: drop-shadow(0 0 5px rgba(255, 241, 118, 0.85)); }
 
@@ -429,7 +429,7 @@
 
 
 /* ════════════════════════════════════════════════════════════════════════
-   DEFAULT — lightning bolt (⚡): classic bolt silhouette rotated to fly
+   DEFAULT - lightning bolt (⚡): classic bolt silhouette rotated to fly
    tip-first (the vertical glyph is turned -90° inside the aimed container)
    ════════════════════════════════════════════════════════════════════════ */
 .eg-proj-default { filter: drop-shadow(0 0 6px rgba(255, 224, 102, 0.95)); }

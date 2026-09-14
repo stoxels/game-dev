@@ -1,32 +1,32 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MINOTAUR (boss_minotaur)-------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK — "The Labyrinth's Warden". The bull-rush soul, weaponised
+// TIER 8 REWORK - "The Labyrinth's Warden". The bull-rush soul, weaponised
 // into a full labyrinth duel: walls rise to MAKE the maze, the bull runs
 // the lanes it creates, and the thread you follow is the fight. Element:
-// null — pure physical, resists do nothing (the Colossus precedent).
+// null - pure physical, resists do nothing (the Colossus precedent).
 //
-//   • LABYRINTH WALLS + CHARGES (signature, all fight) — 5–6 labyrinth
+//   • LABYRINTH WALLS + CHARGES (signature, all fight) - 5–6 labyrinth
 //     walls rise from the floor (telegraphed slabs) and hold for ~8s. Each
 //     charge, the Minotaur locks onto the open lane that matches your
-//     current row/column and BULL-RUSHES down it — the maze channels the
+//     current row/column and BULL-RUSHES down it - the maze channels the
 //     charge, so the walls are both cover and deathtrap. Phase 3: double
 //     rushes per cast, and the walls grow an extra row.
-//   • HOOFTREAD TERRAIN (60%) — every charge leaves HOOF CRATERS along its
+//   • HOOFTREAD TERRAIN (60%) - every charge leaves HOOF CRATERS along its
 //     lane (small impact rings that plant lingering hoofprint hazards) and
 //     a DUST STORM trails the bull for a few seconds (burn lane). The maze
 //     accumulates terrain the longer the duel runs.
-//   • THREAD OF ARIADNE (60%) — a glowing thread marks the ONE SAFE LANE
-//     through the current walls. It is honest — and it is bait: standing
+//   • THREAD OF ARIADNE (60%) - a glowing thread marks the ONE SAFE LANE
+//     through the current walls. It is honest - and it is bait: standing
 //     in the thread when the charge comes keeps you safe, but the thread
 //     then snaps and re-forms elsewhere for the next charge (the maze is
 //     never solved twice). Read it fast, move through it, do not live in it.
-//   • 🐂 THE WARDEN'S LABYRINTH (≤10%, one-shot finale) — the final maze:
+//   • 🐂 THE WARDEN'S LABYRINTH (≤10%, one-shot finale) - the final maze:
 //     three wall generations rise one after another while the Warden
 //     charges each generation TWICE. Break the maze: three MAZEWALL
-//     STONES glow in the walls — body-check a lit stone 3× to shatter it
+//     STONES glow in the walls - body-check a lit stone 3× to shatter it
 //     (each shatter shortens the next generation's wall set). Shatter all
-//     three before the TRAMPLE — the last charge runs EVERY lane at once
+//     three before the TRAMPLE - the last charge runs EVERY lane at once
 //     and only shattered lanes are safe. Charge bar frozen (gate in
 //     _egTickPlayer via _egMntFinalActive).
 //
@@ -57,7 +57,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_minotaur — "The Labyrinth's Warden" (rework)
+    // boss_minotaur - "The Labyrinth's Warden" (rework)
     // Phase 1 (100% → 60%): Labyrinth Walls + Charges / Prior Bomb
     // Phase 2 ( 60% → 30%): immune window; Hooftread Terrain + Thread of
     //                        Ariadne join
@@ -89,7 +89,7 @@ const EG_MNT_TOUCH_CD_MS = 700;      // shared touch cooldown
 //-------------------SHARED VISUAL HELPERS---------------------------------
 //------------------------------------------------------------------------
 
-// Touch damage helper shared by all Minotaur hazards. Elementless boss —
+// Touch damage helper shared by all Minotaur hazards. Elementless boss -
 // hits go in with element null (pure physical) and keep the amber
 // signature color via EG_NK_BOSS_SIGNATURE_COLORS.
 let _egMntHitCd = 0;
@@ -123,7 +123,7 @@ function _egMntHeal(amount) {
 // 5–6 telegraphed wall slabs rise and hold ~8s, partitioning the arena
 // into lanes. Each cast, the Warden charges the open lane matching your
 // current row (alternating from left/right). Walls block the charge line
-// only in the sense that they DEFINE it — the lane between two walls is
+// only in the sense that they DEFINE it - the lane between two walls is
 // where the bull runs. Phase 3: two charges per cast, extra wall row.
 //
 // The walls also hook into the charge path: a wall slab hit by the bull
@@ -145,7 +145,7 @@ function _egMechMntLabyrinth(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_mnt_labyrinth', '🐂🧱 LABYRINTH — walls rise and the bull runs the lanes!', '#fbbf24');
+    _egNkToast('eg_mech_mnt_labyrinth', '🐂🧱 LABYRINTH - walls rise and the bull runs the lanes!', '#fbbf24');
 
     // ── Walls: vertical slabs at spread x positions. ────────────────────
     const wallN = p >= 3 ? 6 : 5;
@@ -289,7 +289,7 @@ function _egMechMntHoofterrain(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_mnt_hoof', '🐂💥 HOOFTREAD — hoof craters and a dust storm tear the lane!', '#fbbf24');
+    _egNkToast('eg_mech_mnt_hoof', '🐂💥 HOOFTREAD - hoof craters and a dust storm tear the lane!', '#fbbf24');
 
     // A lane across the arena through your current row.
     const pc = _egMntPC();
@@ -383,7 +383,7 @@ function _egMechMntHoofterrain(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------ACT II: THREAD OF ARIADNE (60%)-----------------------
 //------------------------------------------------------------------------
-// A glowing thread marks the ONE SAFE LANE through the current walls —
+// A glowing thread marks the ONE SAFE LANE through the current walls -
 // honest, and bait: it snaps and re-forms elsewhere after each charge.
 const EG_MNT_THREAD_LIFE = 6000;   // ms the thread stays honest
 const EG_MNT_THREAD_HEAL = 0.06;   // %maxHP one-time hold reward
@@ -395,10 +395,10 @@ function _egMechMntThread(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_mnt_thread', '🧵 THREAD OF ARIADNE — the safe lane is marked. Trust it, but never live in it!', '#ffd166');
+    _egNkToast('eg_mech_mnt_thread', '🧵 THREAD OF ARIADNE - the safe lane is marked. Trust it, but never live in it!', '#ffd166');
 
     // The thread: a horizontal lane at a random height (NOT your current row
-    // — the maze is never solved twice; you must travel to it).
+    // - the maze is never solved twice; you must travel to it).
     const threadY = H * (0.2 + Math.random() * 0.6);
     const thread = _egNkEl(run, 'div', 'eg-mnt-thread');
     thread.style.top = Math.round(threadY - 22) + 'px';
@@ -414,7 +414,7 @@ function _egMechMntThread(monster, phase) {
             rewardTaken = true;
             thread.classList.add('eg-mnt-thread-held');
             _egMntHeal(_egNkMaxHP() * EG_MNT_THREAD_HEAL);
-            _egNkToast('eg_mech_mnt_thread_safe', '🧵 The thread holds you — one safe crossing!', '#4ade80');
+            _egNkToast('eg_mech_mnt_thread_safe', '🧵 The thread holds you - one safe crossing!', '#4ade80');
         }
         // The thread frays as its life runs out.
         if (t > EG_MNT_THREAD_LIFE * _EG_MNT_DEBUG_MULT * 0.7) {
@@ -435,8 +435,8 @@ function _egMechMntThread(monster, phase) {
 //------------------------------------------------------------------------
 // The final maze: three wall generations rise one after another while the
 // Warden charges each generation TWICE. Three MAZEWALL STONES glow in the
-// walls — body-check a lit stone 3× to shatter it (each shatter shortens
-// the next generation). Shatter all three before the TRAMPLE — the last
+// walls - body-check a lit stone 3× to shatter it (each shatter shortens
+// the next generation). Shatter all three before the TRAMPLE - the last
 // charge runs EVERY lane at once and only shattered lanes are safe. Charge
 // bar frozen (gate in _egTickPlayer via _egMntFinalActive).
 const EG_MNT_GENWALLS   = 3;      // wall generations
@@ -523,11 +523,11 @@ function _egMntFinalStart(monster) {
     ov.className = 'eg-mnt-cd';
     ov.innerHTML =
         '<div class="eg-mnt-cd-label">🐂 THE WARDEN\u2019S LABYRINTH</div>' +
-        '<div class="eg-mnt-cd-hint">Body-check the glowing MAZEWALL STONES 3× each — shattered lanes are the only safe ground for the TRAMPLE!</div>';
+        '<div class="eg-mnt-cd-hint">Body-check the glowing MAZEWALL STONES 3× each - shattered lanes are the only safe ground for the TRAMPLE!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_mnt_final_cd', '🐂💀 THE WARDEN\u2019S LABYRINTH — shatter the stones before the TRAMPLE!', '#fbbf24');
+    _egNkToast('eg_mech_mnt_final_cd', '🐂💀 THE WARDEN\u2019S LABYRINTH - shatter the stones before the TRAMPLE!', '#fbbf24');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -550,7 +550,7 @@ function _egMntFinalStart(monster) {
             runTrample();
             return;
         }
-        _egNkToast('eg_mech_mnt_gen', '🐂 Generation ' + g.gen + '/' + EG_MNT_GENWALLS + ' — the maze rises again!', '#fbbf24');
+        _egNkToast('eg_mech_mnt_gen', '🐂 Generation ' + g.gen + '/' + EG_MNT_GENWALLS + ' - the maze rises again!', '#fbbf24');
 
         // Walls for this generation (fewer as stones shatter).
         const shattered = g.stones.filter(s => s.shattered).length;
@@ -661,10 +661,10 @@ function _egMntFinalStart(monster) {
         });
     };
 
-    // ── THE TRAMPLE: every lane runs at once — shattered lanes are safe. ──
+    // ── THE TRAMPLE: every lane runs at once - shattered lanes are safe. ──
     const runTrample = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_mnt_trample', '🐂💀 THE TRAMPLE — every lane runs at once. Shattered lanes are SAFE!', '#fbbf24');
+        _egNkToast('eg_mech_mnt_trample', '🐂💀 THE TRAMPLE - every lane runs at once. Shattered lanes are SAFE!', '#fbbf24');
         const lanes = 7;
         const laneH = H / lanes;
         const shattered = g.stones.filter(s => s.shattered).length;
@@ -743,7 +743,7 @@ function _egMntFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egMntTeardown() {
     if (_egMntFinal) { try { _egMntFinalEnd(_egMntFinal, null); } catch (e) {} _egMntFinal = null; }
@@ -764,8 +764,8 @@ function _egMntTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_MNT_DEBUG.fire('labyrinth'|'hoof'|'thread', phase) — runs one now
-//   _EG_MNT_DEBUG.final()                                  — THE WARDEN'S LABYRINTH now
+//   _EG_MNT_DEBUG.fire('labyrinth'|'hoof'|'thread', phase) - runs one now
+//   _EG_MNT_DEBUG.final()                                  - THE WARDEN'S LABYRINTH now
 if (typeof window !== 'undefined') {
     window._EG_MNT_DEBUG = {
         fire: (name, phase) => {

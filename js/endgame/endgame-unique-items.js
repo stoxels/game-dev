@@ -1,13 +1,13 @@
 ﻿//------------------------------------------------------------------------
 //-------------------UNIQUE ITEMS (PoE-STYLE)-----------------------------
 //------------------------------------------------------------------------
-// Fixed-modifier named items with a built-in downside — the golden tier
+// Fixed-modifier named items with a built-in downside - the golden tier
 // above epics. Uniques are NOT rolled: every copy of a unique has the exact
 // same stats, but each one carries a twist that makes it build-defining in
 // the right setup and a trap in the wrong one.
 //
 // Load AFTER endgame-equipment-generator.js (uses _egMapLootRarityWeightMult,
-// EG_SLOT_ICONS) — the drop hook is applied inside _egSpawnLootDrop
+// EG_SLOT_ICONS) - the drop hook is applied inside _egSpawnLootDrop
 // (endgame-grid-pickups.js), which tries _egTryGenerateUniqueDrop() first.
 //
 // Rarity string is 'legendary' (the game's golden tier) plus `isUnique:true`
@@ -28,7 +28,7 @@ const EG_UNIQUE_DROP_CHANCE = 0.02;
 // (applied as a square-root so rarity farming helps, but softly).
 
 // Unique-only QoL perk text for the zero-line auto-mark modifier.
-// Rendered as a special (blue) tooltip line, NOT a stat mod — it never
+// Rendered as a special (blue) tooltip line, NOT a stat mod - it never
 // touches EG_STAT_KEY_MAP / _egComputePlayerStats.
 const EG_UNIQUE_ZERO_AUTOMARK_EN = 'Rows and Columns with zero filled cells are automatically marked incorrect on level start';
 const EG_UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen werden bei Levelstart automatisch als falsch markiert';
@@ -38,16 +38,16 @@ const EG_UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen wer
 //-------------------UNIQUE DEFINITIONS-----------------------------------
 //------------------------------------------------------------------------
 // Stat keys MUST exist in EG_STAT_KEY_MAP (endgame-player-stats.js) so the
-// mods actually apply to gameplay. Negative values are real downsides —
+// mods actually apply to gameplay. Negative values are real downsides -
 // stat aggregation simply adds them, so e.g. flat_health:-30 reduces life.
 // Label templates use '#' for the value ('+' prefix is auto-inserted for
 // positive values).
 //
 // Optional per-unique fields:
-//   defenses      — { armour, evasion, absorption } implicit
-//   damage        — { min, max } + attackIntervalSeconds (weapons)
-//   blockChance   — implicit block % (shields)
-//   autoMarkZeroLines — true → rows/cols with zero filled cells are auto-
+//   defenses      - { armour, evasion, absorption } implicit
+//   damage        - { min, max } + attackIntervalSeconds (weapons)
+//   blockChance   - implicit block % (shields)
+//   autoMarkZeroLines - true → rows/cols with zero filled cells are auto-
 //     marked incorrect (grey X, userGrid=2) on level start. Unique-only QoL
 //     perk traded for raw power: the carrier uniques below are deliberately
 //     tuned slightly below curve for their level (see _egApplyUniqueZeroLineAutomark).
@@ -153,7 +153,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'grounded_1', value: 25, en: '#% chance to be Grounded instead of Knocked Back', de: '#% Chance, statt zurückgestoßen zu Boden gestoßen zu werden' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'attack_speed', value: -2.6, en: 'Melee charges 2s slower', de: 'Nahkampf lädt 2s langsamer' },
             { key: 'dodge', value: -13, en: '-#% chance to Dodge Attacks', de: '-#% Ausweichchance' }
         ],
         flavorEn: 'The wall held. The kingdom behind it did not.',
@@ -305,7 +305,7 @@ const EG_UNIQUE_ITEMS = [
         downsides: [
             { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' }
         ],
-        flavorEn: 'All the time in the world — for someone who never makes mistakes.',
+        flavorEn: 'All the time in the world - for someone who never makes mistakes.',
         flavorDe: 'Unendlich viel Zeit – für jemanden, der niemals Fehler macht.',
     },
 
@@ -385,7 +385,7 @@ const EG_UNIQUE_ITEMS = [
         downsides: [
             { key: 'intelligence', value: -18, en: '-# to Intelligence', de: '-# zu Intelligenz' }
         ],
-        flavorEn: 'It never learned to ring true — only to ring again.',
+        flavorEn: 'It never learned to ring true - only to ring again.',
         flavorDe: 'Sie lernte nie, rein zu läuten – nur erneut zu läuten.',
     },
 
@@ -698,7 +698,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 33, str: 0, agi: 125, int: 0 },
         defenses: { armour: 0, evasion: 145, absorption: 0 },
         bonuses: [
-            { key: 'attack_speed', value: 2, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'attack_speed', value: 2, en: 'Melee charges #s faster', de: 'Nahkampf lädt #s schneller auf' },
             { key: 'channel_1', value: 3, en: '+# Channel Damage per Stack', de: '+# Kanalisierungsschaden pro Stapel' },
             { key: 'flat_health', value: 43, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
@@ -883,7 +883,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'warding', value: 150, en: '+# Warding', de: '+# Wardschutz' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' },
+            { key: 'attack_speed', value: -2.6, en: 'Melee charges 2s slower', de: 'Nahkampf lädt 2s langsamer' },
             { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'The titan is no longer with us. The hide did not notice.',
@@ -948,7 +948,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'flat_health', value: 90, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -3.9, en: 'Melee Strikes occur 3s slower', de: 'Nahkampfschläge erfolgen 3s langsamer' },
+            { key: 'attack_speed', value: -3.9, en: 'Melee charges 3s slower', de: 'Nahkampf lädt 3s langsamer' },
             { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Behind this, even prayers take a number.',
@@ -1094,7 +1094,7 @@ const EG_UNIQUE_ITEMS = [
         downsides: [
             { key: 'reveal_hint', value: -26, en: '-#% chance to show a Reveal Hint on questions', de: '-#% Chance auf einen Aufdeckungshinweis bei Fragen' }
         ],
-        flavorEn: 'It whispers: are you sure? — every single time.',
+        flavorEn: 'It whispers: are you sure? - every single time.',
         flavorDe: 'Es flüstert: Bist du sicher? – jedes einzelne Mal.',
     },
 
@@ -1186,7 +1186,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 37, str: 141, agi: 0, int: 0 },
         defenses: { armour: 120, evasion: 0, absorption: 0 },
         bonuses: [
-            { key: 'attack_speed', value: 2, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'attack_speed', value: 2, en: 'Melee charges #s faster', de: 'Nahkampf lädt #s schneller auf' },
             { key: 'inc_physical_damage', value: 30, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'flat_health', value: 47, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
@@ -1212,7 +1212,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'flat_health', value: 49, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' }
+            { key: 'attack_speed', value: -2.6, en: 'Melee charges 2s slower', de: 'Nahkampf lädt 2s langsamer' }
         ],
         flavorEn: 'The best answer to every question is a wall to the face.',
         flavorDe: 'Die beste Antwort auf jede Frage ist eine Wand ins Gesicht.',
@@ -1924,7 +1924,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 1.5s slower', de: 'Nahkampfschläge erfolgen 1,5s langsamer' }
+            { key: 'attack_speed', value: -2, en: 'Melee charges 1.5s slower', de: 'Nahkampf lädt 1,5s langsamer' }
         ],
         flavorEn: 'Breathe in. Breathe out. Swing tomorrow.',
         flavorDe: 'Einatmen. Ausatmen. Morgen zuschlagen.',
@@ -2022,7 +2022,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'flat_health', value: 48, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 1.5s slower', de: 'Nahkampfschläge erfolgen 1,5s langsamer' }
+            { key: 'attack_speed', value: -2, en: 'Melee charges 1.5s slower', de: 'Nahkampf lädt 1,5s langsamer' }
         ],
         flavorEn: 'Cold patience, frozen enemies, unhurried fists.',
         flavorDe: 'Kalte Geduld, eingefrorene Feinde, ungeeilte Fäuste.',
@@ -2245,7 +2245,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'inc_armour', value: 35, en: '#% increased Armour', de: '#% erhöhte Rüstung' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' }
+            { key: 'attack_speed', value: -2.6, en: 'Melee charges 2s slower', de: 'Nahkampf lädt 2s langsamer' }
         ],
         flavorEn: 'Winter wears you now.',
         flavorDe: 'Der Winter trägt jetzt dich.',
@@ -2412,7 +2412,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 61, str: 0, agi: 116, int: 116 },
         defenses: { armour: 222, evasion: 0, absorption: 0 },
         bonuses: [
-            { key: 'attack_speed', value: 2.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'attack_speed', value: 2.5, en: 'Melee charges #s faster', de: 'Nahkampf lädt #s schneller auf' },
             { key: 'channel_2', value: 2, en: '+# maximum Channel Stacks', de: '+# maximale Kanalisierungsstapel' },
             { key: 'echo_2', value: 35, en: 'Echoes deal #% of the original damage', de: 'Echos verursachen #% des ursprünglichen Schadens' },
             { key: 'flat_health', value: 66, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
@@ -2486,7 +2486,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'block_chance', value: 10, en: '+#% Block Chance', de: '+#% Blockchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -3.9, en: 'Melee Strikes occur 3s slower', de: 'Nahkampfschläge erfolgen 3s langsamer' },
+            { key: 'attack_speed', value: -3.9, en: 'Melee charges 3s slower', de: 'Nahkampf lädt 3s langsamer' },
             { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Behind this shield, patience becomes a weapon.',
@@ -2576,7 +2576,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'mistake_count', value: -1, en: '-1 Allowed Mistake', de: '-1 erlaubter Fehler' },
             { key: 'fire_resist', value: -18, en: '-#% to Fire Resistance', de: '-#% Feuerwiderstand' }
         ],
-        flavorEn: 'Time enough at last — for those who never slip.',
+        flavorEn: 'Time enough at last - for those who never slip.',
         flavorDe: 'Endlich genug Zeit – für diejenigen, die nie straucheln.',
     },
 
@@ -3032,7 +3032,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 27, str: 0, agi: 103, int: 0 },
         defenses: { armour: 0, evasion: 144, absorption: 0 },
         bonuses: [
-            { key: 'attack_speed', value: 1.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'attack_speed', value: 1.5, en: 'Melee charges #s faster', de: 'Nahkampf lädt #s schneller auf' },
             { key: 'life_leech', value: 2, en: '#% of Damage Dealt Leeched as Life', de: '#% des verursachten Schadens werden als Leben abgezweigt' },
             { key: 'accuracy', value: 28, en: '+# Accuracy', de: '+# Präzision' }
         ],
@@ -3053,7 +3053,7 @@ const EG_UNIQUE_ITEMS = [
         defenses: { armour: 230, evasion: 0, absorption: 0 },
         bonuses: [
             { key: 'crit_chance', value: 7, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' },
-            { key: 'attack_speed', value: 1.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'attack_speed', value: 1.5, en: 'Melee charges #s faster', de: 'Nahkampf lädt #s schneller auf' },
             { key: 'flat_health', value: 43, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
@@ -3257,7 +3257,7 @@ const EG_UNIQUE_ITEMS = [
         requirements: { level: 41, str: 0, agi: 156, int: 0 },
         defenses: { armour: 0, evasion: 260, absorption: 0 },
         bonuses: [
-            { key: 'attack_speed', value: 2, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'attack_speed', value: 2, en: 'Melee charges #s faster', de: 'Nahkampf lädt #s schneller auf' },
             { key: 'flat_health', value: 41, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'dodge', value: 8, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
@@ -3365,7 +3365,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'crit_chance', value: 10, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' }
+            { key: 'attack_speed', value: -2.6, en: 'Melee charges 2s slower', de: 'Nahkampf lädt 2s langsamer' }
         ],
         flavorEn: 'It raises questions. Then it answers them.',
         flavorDe: 'Er stellt Fragen. Dann beantwortet er sie.',
@@ -4084,7 +4084,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'spell_block_chance', value: 6, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2.6, en: 'Melee Strikes occur 2s slower', de: 'Nahkampfschläge erfolgen 2s langsamer' }
+            { key: 'attack_speed', value: -2.6, en: 'Melee charges 2s slower', de: 'Nahkampf lädt 2s langsamer' }
         ],
         flavorEn: 'Knock knock. No.',
         flavorDe: 'Klopf klopf. Nein.',
@@ -4383,8 +4383,8 @@ const EG_UNIQUE_ITEMS = [
         downsides: [
             { key: 'accuracy', value: -33, en: '-# Accuracy', de: '-# Präzision' }
         ],
-        flavorEn: 'Are you sure? Are you really sure? Are you—',
-        flavorDe: 'Bist du sicher? Ganz sicher? Bist du—',
+        flavorEn: 'Are you sure? Are you really sure? Are you-',
+        flavorDe: 'Bist du sicher? Ganz sicher? Bist du-',
     },
     {
         uniqueId: 'icepick_stud',
@@ -5542,7 +5542,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'flat_mana', value: -35, en: '-# to maximum Mana', de: '-# zu maximalem Mana' }
         ],
         flavorEn: 'Fortune favors the bold, and devours the fragile.',
-        flavorDe: 'Das Glück ist dem Mutigen hold — und verschlingt die Zerbrechlichen.',
+        flavorDe: 'Das Glück ist dem Mutigen hold - und verschlingt die Zerbrechlichen.',
     },
     {
         uniqueId: 'dial_ring_of_daily_doubles',
@@ -5896,7 +5896,7 @@ const EG_UNIQUE_ITEMS = [
             { key: 'accuracy', value: 40, en: '+# Accuracy', de: '+# Präzision' }
         ],
         downsides: [
-            { key: 'attack_speed', value: -2, en: 'Melee Strikes occur 3s slower', de: 'Nahkampfschläge erfolgen 3s langsamer' }
+            { key: 'attack_speed', value: -2, en: 'Melee charges 3s slower', de: 'Nahkampf lädt 3s langsamer' }
         ],
         flavorEn: 'Counts your kills out loud. In base twelve.',
         flavorDe: 'Zählt deine Kills laut mit. Im Zwölfersystem.',
@@ -5932,7 +5932,7 @@ const EG_UNIQUE_ITEMS = [
         damage: { min: 41, max: 75 }, attackIntervalSeconds: 2.2,
         bonuses: [
             { key: 'pierce', value: 40, en: '#% chance for Projectiles to Pierce', de: '#% Chance, dass Projektile durchdringen' },
-            { key: 'attack_speed', value: 0.5, en: 'Melee Strikes occur #s more often', de: 'Nahkampfschläge erfolgen #s häufiger' },
+            { key: 'attack_speed', value: 0.5, en: 'Melee charges #s faster', de: 'Nahkampf lädt #s schneller auf' },
             { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' }
         ],
         downsides: [
@@ -6173,7 +6173,7 @@ const EG_UNIQUE_ITEMS = [
 
     // ══════════════════════════════════════════════════════════════════
     // ── ZERO-AUTOMARK UNIQUES (QoL-for-power tradeoff) ─────────────────
-    // Each carries autoMarkZeroLines:true — empty rows/columns are marked
+    // Each carries autoMarkZeroLines:true - empty rows/columns are marked
     // incorrect on level start (see _egApplyUniqueZeroLineAutomark). To pay
     // for that QoL their raw stats run slightly below curve for the level
     // plus a real downside.
@@ -6373,7 +6373,7 @@ function _egApplyUniqueZeroLineAutomark() {
         if (sol[r][c] !== 0) return;
         if (typeof wrongGrid !== 'undefined' && wrongGrid[r][c]) return;
         if (typeof userGrid === 'undefined' || userGrid[r][c] === 2) return;
-        // Only touch untouched/questioned cells — never overwrite fills.
+        // Only touch untouched/questioned cells - never overwrite fills.
         if (userGrid[r][c] !== 0 && userGrid[r][c] !== 3) return;
         userGrid[r][c] = 2;
         try { systemMarkedGrid[r][c] = true; } catch (e) {}
@@ -6415,7 +6415,7 @@ function _egUniqueStatLabel(stat) {
     const str = String(template);
     const signed = val >= 0 ? `+${val}` : `${val}`;
     // Templates historically use '+#' / '-#' while the helper also adds a
-    // sign — replacing only '#' would produce "++2" / "--30" (e.g. Pebble
+    // sign - replacing only '#' would produce "++2" / "--30" (e.g. Pebble
     // of Patience). Handle signed placeholders first.
     if (str.includes('+#') || str.includes('-#')) {
         return str.replace('+#', signed).replace('-#', signed);
@@ -6664,7 +6664,7 @@ function _egBuildUniqueItem(def, monsterLevel) {
         };
     });
 
-    // Resolve base stats — use explicit values if present, otherwise fall back
+    // Resolve base stats - use explicit values if present, otherwise fall back
     // to the closest base item so every unique has meaningful armor / damage.
     let defenses = null;
     if (def.defenses) defenses = { ...def.defenses };

@@ -12,7 +12,7 @@
    live Probability Tree screen at a glance. */
 #screen-dev-passive-tree .pt-title {
     color: #e8a020;
-    white-space: nowrap; /* "🌳 PASSIVE TREE — DEV" must stay on one line */
+    white-space: nowrap; /* "🌳 PASSIVE TREE - DEV" must stay on one line */
 }
 
 /* Points counter sits in the amber palette too. */
@@ -20,7 +20,7 @@
     color: #e8a020;
 }
 
-/* Dev pool top-up button — sits right after the Refund All button. */
+/* Dev pool top-up button - sits right after the Refund All button. */
 #btn-dpt-add-points {
     margin-left: 8px;
 }

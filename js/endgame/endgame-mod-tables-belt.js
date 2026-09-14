@@ -1,26 +1,26 @@
 //  endgame-mod-tables-belt.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------BELT MODIFIER TABLE----------------------------------
 //------------------------------------------------------------------------
-// The belt girds the body — it is the premier sustain and vitality slot.
+// The belt girds the body - it is the premier sustain and vitality slot.
 // It has the highest flat life values of any non-chest piece and the
 // strongest heart_heal numbers in the game. The belt-exclusive
 // inc_heart_heal (% multiplier on heart healing) makes it the
 // centrepiece of any heart-focused sustain build. life_on_kill sits
-// here as a natural partner to gloves' mana_on_kill — the belt absorbs
+// here as a natural partner to gloves' mana_on_kill - the belt absorbs
 // the fallen enemy's vitality directly.
 //
-// Defences are modest (bracers/gloves scale) — a belt is not a major
+// Defences are modest (bracers/gloves scale) - a belt is not a major
 // armour piece, but it does carry all three defence types since it wraps
 // the whole torso. No block/dodge, no crit, no status effect chances,
 // no chain/splash/multishot, no spell damage, no quiz exclusives, no
 // pushback/overkill, no precision. Strength is the primary attribute
-// here — a heavy belt implies physical bulk.
+// here - a heavy belt implies physical bulk.
 
 const EG_MOD_TABLE_BELT = {
     prefixes: {
@@ -52,7 +52,7 @@ const EG_MOD_TABLE_BELT = {
 
         // --- BELT-PRIMARY: HEART HEAL (flat) ---
         // Highest flat heart_heal values in the game. The belt is the
-        // "flask slot" equivalent — it defines how well you recover.
+        // "flask slot" equivalent - it defines how well you recover.
         heart_heal: {
             id: 'heart_heal',
             label: 'Hearts heal for an additional # Health', labelDe: 'Herzen heilen zusätzlich um # Leben',
@@ -64,7 +64,7 @@ const EG_MOD_TABLE_BELT = {
             ]
         },
         // --- BELT-PRIMARY: MANA HEAL (flat) ---
-        // Mirrors heart_heal — highest flat mana_heal values in the game.
+        // Mirrors heart_heal - highest flat mana_heal values in the game.
         mana_heal: {
             id: 'mana_heal',
             label: 'Mana Orbs restore an additional # Mana', labelDe: 'Mana-Orbs stellen zusätzlich # Mana wieder her',
@@ -77,7 +77,7 @@ const EG_MOD_TABLE_BELT = {
         },
 
         // --- BELT-EXCLUSIVE: INCREASED HEART HEAL (% multiplier) ---
-        // A % multiplier on all heart healing received — stacks with the
+        // A % multiplier on all heart healing received - stacks with the
         // flat heart_heal on belt, helmet, chest, amulet etc. The only
         // slot this rolls on. Dedicated heart builds will want both this
         // and a high flat heart_heal prefix, costing the full prefix budget.
@@ -92,7 +92,7 @@ const EG_MOD_TABLE_BELT = {
             ]
         },
         // --- BELT-EXCLUSIVE: INCREASED MANA HEAL (% multiplier) ---
-        // Mirrors inc_heart_heal — stacks with flat mana_heal on belt,
+        // Mirrors inc_heart_heal - stacks with flat mana_heal on belt,
         // helmet, chest etc. The only slot this rolls on.
         inc_mana_heal: {
             id: 'inc_mana_heal',
@@ -106,7 +106,7 @@ const EG_MOD_TABLE_BELT = {
         },
 
         // --- LOCAL DEFENSES ---
-        // Modest values — bracers/gloves scale.
+        // Modest values - bracers/gloves scale.
         flat_armour: {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
@@ -297,7 +297,7 @@ const EG_MOD_TABLE_BELT = {
     suffixes: {
 
         // --- ATTRIBUTES ---
-        // Strength is the primary attribute for belts — a heavy buckled
+        // Strength is the primary attribute for belts - a heavy buckled
         // belt implies raw physical bulk. It rolls with better weight
         // here than agility or intelligence.
         strength: {
@@ -335,7 +335,7 @@ const EG_MOD_TABLE_BELT = {
         },
 
         // --- REGEN & RECOVERY ---
-        // life_regen is a primary stat for belts — best weights of any
+        // life_regen is a primary stat for belts - best weights of any
         // armour slot. The belt "sustains" the body passively.
         life_regen: {
             id: 'life_regen',
@@ -361,7 +361,7 @@ const EG_MOD_TABLE_BELT = {
         },
 
         // --- BELT-EXCLUSIVE: LIFE ON KILL ---
-        // The belt absorbs the fallen enemy's vitality directly —
+        // The belt absorbs the fallen enemy's vitality directly -
         // the counterpart to gloves' mana_on_kill. Together they form
         // a kill-triggered sustain pair that rewards aggressive play.
         // Higher ceiling than mana_on_kill since life is more scarce.

@@ -1,38 +1,38 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE OVERFITTER (boss_overfitter)---------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK — "The Model That Learned Too Much". The ML soul, made
-// lethal: the Overfitter does not attack you — it LEARNS you. Every
+// TIER 8 REWORK - "The Model That Learned Too Much". The ML soul, made
+// lethal: the Overfitter does not attack you - it LEARNS you. Every
 // mechanic is your own data turned back against you, and the only way to
 // win is to refuse to be predictable. Element: shadow.
 //
-//   • GRADIENT DESCENT (signature, all fight) — the training run: bands of
+//   • GRADIENT DESCENT (signature, all fight) - the training run: bands of
 //     hot gradient STAMP down in sequence, marching across the arena like
 //     steps of a descending loss curve (shadow DoT inside a hot band). At
 //     the end of the sweep the LOCAL MINIMUM locks onto your position and
-//     detonates — the loss surface collapses where you were standing.
+//     detonates - the loss surface collapses where you were standing.
 //     Phase 3: a second minimum chases your CURRENT position.
-//   • PATTERN LOCK (60%) — the model RECORDS your movement for ~4s (the
-//     dashed trail is live — you watch yourself being learned), then
+//   • PATTERN LOCK (60%) - the model RECORDS your movement for ~4s (the
+//     dashed trail is live - you watch yourself being learned), then
 //     REPLAYS it: a spike walks the exact path you walked, detonating an
 //     echo at every recorded sample, and an OVERFIT STRIKE where you
-//     stopped. Beat your own record — take no hit during the replay — and
+//     stopped. Beat your own record - take no hit during the replay - and
 //     the model marks you unlearned (+heal). Move unlike yourself.
-//   • VALIDATION SET (60%) — two rings, one test. The model detonates the
+//   • VALIDATION SET (60%) - two rings, one test. The model detonates the
 //     ring you are CLOSEST to (it learned to aim); the other dissipates.
-//     Break equidistance and it underfits — nothing detonates at all.
-//   • 📈 THE FINAL EPOCH (≤10%, one-shot finale) — the whole fight was
+//     Break equidistance and it underfits - nothing detonates at all.
+//   • 📈 THE FINAL EPOCH (≤10%, one-shot finale) - the whole fight was
 //     training data. Your ACTUAL position history (recorded since spawn)
 //     is rendered as a live HEAT-MAP over the arena, then re-trained in
 //     three waves: hot cells detonate, cool cells are safe, and between
-//     waves the map RE-RECORDS — camp anywhere and your own heat betrays
+//     waves the map RE-RECORDS - camp anywhere and your own heat betrays
 //     you. New ground is safe ground. Charge bar frozen (gate in
 //     _egTickPlayer via _egOvrFinalActive).
 //
 // Legacy soul kept: PATTERN BREAK still strips your recent fills every
-// ~16s — the puzzle pressure that made the Overfitter hateful lives on.
+// ~16s - the puzzle pressure that made the Overfitter hateful lives on.
 // Shared frozen_cells dropped (the kit is full); model_drift and the old
-// overfit_bloom blast are retired — their souls live in PATTERN LOCK and
+// overfit_bloom blast are retired - their souls live in PATTERN LOCK and
 // the LOCAL MINIMUM.
 //
 // Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
@@ -62,7 +62,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_overfitter — "The Model That Learned Too Much" (rework)
+    // boss_overfitter - "The Model That Learned Too Much" (rework)
     // Phase 1 (100% → 60%): Gradient Descent + Pattern Break
     // Phase 2 ( 60% → 30%): immune window; Pattern Lock + Validation Set
     //                        join
@@ -95,7 +95,7 @@ const EG_OVR_TOUCH_CD_MS = 700;      // shared touch cooldown
 //------------------------------------------------------------------------
 
 // Touch damage helper shared by all Overfitter hazards. Shadow-element boss
-// — hits go in with element 'shadow' so the toast palette stays violet.
+// - hits go in with element 'shadow' so the toast palette stays violet.
 let _egOvrHitCd = 0;
 function _egOvrTouch(pct, level, label) {
     const now = performance.now();
@@ -156,7 +156,7 @@ function _egOvrEnsureRecorder(monster) {
 // Training steps march across the arena: bands of hot gradient stamp down
 // one after another (telegraph → hot shadow-DoT band → fade), sweeping left
 // to right like a descending loss curve. When the sweep ends, the LOCAL
-// MINIMUM locks onto your position and detonates — the loss surface
+// MINIMUM locks onto your position and detonates - the loss surface
 // collapses where you were standing. Phase 3: a second minimum chases your
 // CURRENT position after the first.
 const EG_OVR_STEPS      = 6;        // stamped bands per sweep
@@ -175,7 +175,7 @@ function _egMechOvrGradient(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_ovr_gradient', '📈 GRADIENT DESCENT — training steps march across the arena! Stay off the hot bands!', '#c084ff');
+    _egNkToast('eg_mech_ovr_gradient', '📈 GRADIENT DESCENT - training steps march across the arena! Stay off the hot bands!', '#c084ff');
 
     // ── Sweep: bands stamp left → right. ─────────────────────────────────
     const cadence = 750 * _EG_OVR_DEBUG_MULT;
@@ -272,7 +272,7 @@ function _egMechOvrGradient(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------LEGACY SOUL: PATTERN BREAK (kept)---------------------
 //------------------------------------------------------------------------
-// (Handler lives below, unchanged — it strips your recent fills every
+// (Handler lives below, unchanged - it strips your recent fills every
 // ~16s and remains the Overfitter's puzzle-layer pressure.)
 
 
@@ -318,7 +318,7 @@ function _egMechPatternBreak(monster, phase) {
 // The model RECORDS your movement (~4s, dashed trail is live) then REPLAYS
 // it: a spike walks the exact path you walked, detonating an echo at every
 // recorded sample and an OVERFIT STRIKE at your final position. Take no hit
-// during the replay and the model marks you UNLEARNED (+heal) — the reward
+// during the replay and the model marks you UNLEARNED (+heal) - the reward
 // for moving unlike yourself.
 const EG_OVR_LOCK_REC_MS   = [0, 3500, 3800, 4200]; // recording length by phase
 const EG_OVR_LOCK_SAMPLE_MS = 250;  // sample cadence (ms)
@@ -336,7 +336,7 @@ function _egMechOvrPatternLock(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_ovr_lock', '🧠 PATTERN LOCK — recording your movement… the model is learning you!', '#c084ff');
+    _egNkToast('eg_mech_ovr_lock', '🧠 PATTERN LOCK - recording your movement… the model is learning you!', '#c084ff');
 
     // ── Stage RECORD: sample your position, grow the live dashed trail. ──
     const recMs = EG_OVR_LOCK_REC_MS[p] * _EG_OVR_DEBUG_MULT;
@@ -366,7 +366,7 @@ function _egMechOvrPatternLock(monster, phase) {
                 path.push({ x: c.x, y: c.y, el });
             }
             if (recT >= recMs || path.length < 2) {
-                if (path.length < 2) { return false; }   // barely moved — nothing to learn
+                if (path.length < 2) { return false; }   // barely moved - nothing to learn
                 stage = 'replay';
                 // Cumulative distances for detonation timing.
                 let acc = 0;
@@ -377,7 +377,7 @@ function _egMechOvrPatternLock(monster, phase) {
                 }
                 dart = _egNkEl(run, 'div', 'eg-nk-dot eg-ovr-dart', '📈');
                 dist = 0;
-                _egNkToast('eg_mech_ovr_replay', '🧠 REPLAY! It fires along the path YOU walked — move unlike yourself!', '#f97316');
+                _egNkToast('eg_mech_ovr_replay', '🧠 REPLAY! It fires along the path YOU walked - move unlike yourself!', '#f97316');
             }
             return pending;
         }
@@ -420,10 +420,10 @@ function _egMechOvrPatternLock(monster, phase) {
             }
 
             if (dist >= prefix[prefix.length - 1] + 40) {
-                // Replay finished — judge the record.
+                // Replay finished - judge the record.
                 if (!hitFlag) {
                     _egOvrHeal(_egNkMaxHP() * EG_OVR_UNLEARN_HEAL);
-                    _egNkToast('eg_mech_ovr_unlearned', '✅ You beat your own record — UNLEARNED!', '#4ade80');
+                    _egNkToast('eg_mech_ovr_unlearned', '✅ You beat your own record - UNLEARNED!', '#4ade80');
                 }
                 stage = 'done';
                 pending = false;
@@ -439,7 +439,7 @@ function _egMechOvrPatternLock(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------ACT II: VALIDATION SET (60%)---------------------------
 //------------------------------------------------------------------------
-// Two rings, one test. The model detonates the ring you are CLOSEST to —
+// Two rings, one test. The model detonates the ring you are CLOSEST to -
 // it learned to aim. The other ring dissipates. Break equidistance (or get
 // near neither) and the model underfits: nothing detonates at all.
 const EG_OVR_VAL_R        = 115;    // ring radius (px, phase < 3)
@@ -458,7 +458,7 @@ function _egMechOvrValidation(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_ovr_valid', '🧪 VALIDATION SET — two rings, and it strikes the one you are closest to! Get near neither!', '#c084ff');
+    _egNkToast('eg_mech_ovr_valid', '🧪 VALIDATION SET - two rings, and it strikes the one you are closest to! Get near neither!', '#c084ff');
 
     const r = p >= 3 ? EG_OVR_VAL_R - 20 : EG_OVR_VAL_R;
     const pc0 = _egOvrPC();
@@ -496,9 +496,9 @@ function _egMechOvrValidation(monster, phase) {
         const d2 = Math.hypot(pc.x - b.x, pc.y - b.y);
         const pr = _egNkPlayerRect();
         if (Math.min(d1, d2) > EG_OVR_VAL_CLEAR || Math.abs(d1 - d2) < EG_OVR_VAL_TIE) {
-            // Underfit — the model cannot decide. Both rings dissipate.
+            // Underfit - the model cannot decide. Both rings dissipate.
             ringEls.forEach(el => el.classList.add('eg-ovr-val-fizzle'));
-            _egNkToast('eg_mech_ovr_underfit', '🌫️ Underfit — the model cannot decide. Nothing detonates!', '#93c5fd');
+            _egNkToast('eg_mech_ovr_underfit', '🌫️ Underfit - the model cannot decide. Nothing detonates!', '#93c5fd');
         } else {
             const nearFirst = d1 < d2;
             const hitRing = nearFirst ? a : b;
@@ -531,7 +531,7 @@ function _egMechOvrValidation(monster, phase) {
 // The whole fight was training data. Your ACTUAL position history renders
 // as a live heat-map over the arena (hot = where you have been), then the
 // model re-trains in three waves: hot cells detonate, cool cells are safe,
-// and between waves the map RE-RECORDS — camp anywhere and your own heat
+// and between waves the map RE-RECORDS - camp anywhere and your own heat
 // betrays you. Charge bar frozen (gate in _egTickPlayer via
 // _egOvrFinalActive).
 const EG_OVR_HEAT_COLS  = 6;
@@ -632,11 +632,11 @@ function _egOvrFinalStart(monster) {
     ov.className = 'eg-ovr-cd';
     ov.innerHTML =
         '<div class="eg-ovr-cd-label">📈 THE FINAL EPOCH</div>' +
-        '<div class="eg-ovr-cd-hint">The model memorized your every step — the heat-map is YOUR data. Hot cells detonate, cool cells are safe, and it RE-RECORDS between waves. New ground is safe ground!</div>';
+        '<div class="eg-ovr-cd-hint">The model memorized your every step - the heat-map is YOUR data. Hot cells detonate, cool cells are safe, and it RE-RECORDS between waves. New ground is safe ground!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_ovr_final_cd', '📈💀 THE FINAL EPOCH — the model memorized your every step. New ground is safe ground!', '#c084ff');
+    _egNkToast('eg_mech_ovr_final_cd', '📈💀 THE FINAL EPOCH - the model memorized your every step. New ground is safe ground!', '#c084ff');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -679,7 +679,7 @@ function _egOvrFinalStart(monster) {
     // ── One training wave: hot cells detonate, cool cells are safe. ──────
     const runWave = (wave) => {
         if (g.finished) return;
-        repaint();   // the map re-recorded between waves — retrain on fresh data
+        repaint();   // the map re-recorded between waves - retrain on fresh data
 
         const counts = _egOvrHeatCounts(W, H);
         const maxC = Math.max(1, ...counts);
@@ -697,7 +697,7 @@ function _egOvrFinalStart(monster) {
         }
 
         if (!hot.length) {
-            _egNkToast('eg_mech_ovr_underfit', '🌫️ Underfit — the model cannot decide. Nothing detonates!', '#93c5fd');
+            _egNkToast('eg_mech_ovr_underfit', '🌫️ Underfit - the model cannot decide. Nothing detonates!', '#93c5fd');
             if (wave >= EG_OVR_WAVES) {
                 _egOvrAfter(g, 1400 * _EG_OVR_DEBUG_MULT, () => _egOvrFinalEnd(g, monster));
             } else {
@@ -706,7 +706,7 @@ function _egOvrFinalStart(monster) {
             return;
         }
 
-        _egNkToast('eg_mech_ovr_wave', '📈 EPOCH ' + wave + '/' + EG_OVR_WAVES + ' — ' + hot.length + ' hot cells re-train! Stand on NEW ground!', '#f97316');
+        _egNkToast('eg_mech_ovr_wave', '📈 EPOCH ' + wave + '/' + EG_OVR_WAVES + ' - ' + hot.length + ' hot cells re-train! Stand on NEW ground!', '#f97316');
         hot.forEach(i => { try { g.cells[i].el.classList.add('eg-ovr-hot'); } catch (e) {} });
 
         _egOvrAfter(g, EG_OVR_FUSE_MS * _EG_OVR_DEBUG_MULT, () => {
@@ -728,7 +728,7 @@ function _egOvrFinalStart(monster) {
                 _egNkAbilityHitToast(dealt, 'The Overfitter', 'Epoch ' + wave);
             }
             if (wave < EG_OVR_WAVES) {
-                _egNkToast('eg_mech_ovr_reheat', '🔥 RE-RECORDING — your recent steps reshape the heat-map! Keep moving!', '#f97316');
+                _egNkToast('eg_mech_ovr_reheat', '🔥 RE-RECORDING - your recent steps reshape the heat-map! Keep moving!', '#f97316');
                 _egOvrAfter(g, EG_OVR_REHEAT_MS * _EG_OVR_DEBUG_MULT, () => runWave(wave + 1));
             } else {
                 _egOvrAfter(g, 1300 * _EG_OVR_DEBUG_MULT, () => _egOvrFinalEnd(g, monster));
@@ -768,7 +768,7 @@ function _egOvrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egOvrTeardown() {
     if (_egOvrFinal) { try { _egOvrFinalEnd(_egOvrFinal, null); } catch (e) {} _egOvrFinal = null; }
@@ -791,8 +791,8 @@ function _egOvrTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_OVR_DEBUG.fire('gradient'|'lock'|'valid', phase) — runs one now
-//   _EG_OVR_DEBUG.final()                                — THE FINAL EPOCH now
+//   _EG_OVR_DEBUG.fire('gradient'|'lock'|'valid', phase) - runs one now
+//   _EG_OVR_DEBUG.final()                                - THE FINAL EPOCH now
 if (typeof window !== 'undefined') {
     window._EG_OVR_DEBUG = {
         fire: (name, phase) => {

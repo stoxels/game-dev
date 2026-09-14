@@ -55,7 +55,7 @@ function _tryProcStochasticResonance(row, col) {
         }
         Audio_Manager.playSFX('stochastic_resonance');
         showToast(`〰️ ${t('cg_stoch_resonance')}`);
-        return true; // penalty absorbed — no mistakeCount increment, no time loss
+        return true; // penalty absorbed - no mistakeCount increment, no time loss
     }
     window._stochasticLastFired = false;
     return false;
@@ -109,7 +109,7 @@ function _tryProcStandardDeviation(mistakeRow, mistakeCol) {
 //------------------------------------------------------------------------
 // Returns the penalty (seconds) for the Nth mistake (1-based), taken from
 // the difficulty config. Clamps to the last entry once past the defined
-// list, and never goes below index 0 — guards against being called before
+// list, and never goes below index 0 - guards against being called before
 // any mistake has happened yet (e.g. the mistakes tooltip previewing the
 // "next" penalty).
 function _getPenaltySecondsAtCount(count) {
@@ -260,10 +260,10 @@ function _triggerPenaltyFlash() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Main penalty handler — called whenever the player selects a wrong cell.
+// Main penalty handler - called whenever the player selects a wrong cell.
 // row / col: grid coordinates of the mistake, used for beam effects and actuary logging.
 function applyPenalty(row, col) {
-    // The Clock's Time Freeze: the mistake counter is frozen — wrong fills
+    // The Clock's Time Freeze: the mistake counter is frozen - wrong fills
     // still flash red and ring, but cost no mistake and no timer time until
     // the 30s window ends (or the boss is slain). See _egClockStartTimeFreeze.
     if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return;
@@ -309,7 +309,7 @@ function applyPenalty(row, col) {
     // --- Calculate and apply the time penalty ---
     let effectivePen = _calcEffectivePenalty(penMult);
 
-    // Endgame ailment: wrong clicks on LAVA cells burn twice as hard —
+    // Endgame ailment: wrong clicks on LAVA cells burn twice as hard -
     // count as a second mistake AND double the time loss.
     if (typeof _egIsLavaCell === 'function' && _egIsLavaCell(row, col)) {
         mistakeCount++;
@@ -330,6 +330,6 @@ function applyPenalty(row, col) {
     // --- End the game if the timer expired from this penalty ---
     _checkTimerExpiry();
 
-    // NOTE: kept as-is from the original — see "Possible bugs spotted" below.
+    // NOTE: kept as-is from the original - see "Possible bugs spotted" below.
     _updateMistakeCounterHUD();
 }

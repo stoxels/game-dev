@@ -60,8 +60,10 @@ const DECO_PANELS = [
 // On endgame maps the pause menu offers "Return to Nexus" instead of "Levels".
 // Returns whether the current level is an endgame map.
 function _updatePauseMenuReturnButtons() {
+    // Campaign levels also carry isMonsterLevel (their light monster pack),
+    // but they are NOT endgame maps - they keep the normal "Levels" button.
     const onEndgameMap = typeof cur !== 'undefined' && cur &&
-        (cur.isMonsterLevel || cur.isEndgameSandbox);
+        ((cur.isMonsterLevel && !cur.campaignMonsters) || cur.isEndgameSandbox);
     const levelsBtn = document.getElementById('btn-go-levels');
     const nexusBtn = document.getElementById('btn-go-nexus');
     if (levelsBtn) levelsBtn.style.display = onEndgameMap ? 'none' : '';
@@ -133,8 +135,8 @@ function _isAnyModalOpen() {
 }
 
 // Closes all open modal backdrops at once.
-// The Degrees of Freedom choice modal (#dof-modal) is mandatory — its
-// keystone downside must always apply — so it is never dismissed here.
+// The Degrees of Freedom choice modal (#dof-modal) is mandatory - its
+// keystone downside must always apply - so it is never dismissed here.
 // It only closes via _dofChoose(); Escape just nudges it instead.
 function _closeAllModals() {
     document.querySelectorAll('.modal-bg.show')
@@ -192,6 +194,20 @@ function _handleEscapeKey() {
     }
     if (_isOnGameScreen()) {
         togglePause();
+        return;
+    }
+    // B sheet overlay over a running puzzle: Escape closes back into the
+    // puzzle like B/BACK do - diving into screen history here would strand
+    // the paused run on some stale screen with no way back.
+    if (typeof isHubGameOverlay === 'function' && isHubGameOverlay()
+        && typeof closeHubToGame === 'function') {
+        closeHubToGame();
+        return;
+    }
+    // K tree overlay over a running puzzle: same no-strand rule as B.
+    if (typeof isTreeGameOverlay === 'function' && isTreeGameOverlay()
+        && typeof closeTreeToGame === 'function') {
+        closeTreeToGame();
         return;
     }
     goToPreviousScreen();
@@ -272,7 +288,7 @@ try {
     if (_urlLang === 'en' || _urlLang === 'de') {
         SETTINGS.lang = _urlLang;
     }
-} catch { /* URLSearchParams unavailable — ignore */ }
+} catch { /* URLSearchParams unavailable - ignore */ }
 
 // Set the active language from the persisted settings (falls back to 'en').
 setLang(SETTINGS.lang || 'en');
@@ -282,7 +298,7 @@ setLang(SETTINGS.lang || 'en');
 initSettingsControls();
 applySettings();
 
-// Global keydown listener — currently only acts on the Escape key.
+// Global keydown listener - currently only acts on the Escape key.
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         _handleEscapeKey();
@@ -305,7 +321,7 @@ window.addEventListener('resize', () => {
 
 // Starts title screen BGM on the very first user click.
 // Uses { once: true } so the listener removes itself immediately after
-// firing — respects the browser autoplay policy that requires a user gesture.
+// firing - respects the browser autoplay policy that requires a user gesture.
 document.addEventListener('click', () => {
     Audio_Manager.playBGM('title');
 }, { once: true });

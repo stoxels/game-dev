@@ -1,13 +1,13 @@
 //  endgame-mod-tables-cloak.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------CLOAK MODIFIER TABLE---------------------------------
 //------------------------------------------------------------------------
-// Cloaks are flowing garments — they favour evasion over raw armour.
+// Cloaks are flowing garments - they favour evasion over raw armour.
 // Their thematic identity is concealment and mobility: dodge, blind,
 // chain, multishot, and splash live here as exclusive or near-exclusive
 // mods. No block (that's shoulders/chest). No elemental damage or crit
@@ -53,7 +53,7 @@ const EG_MOD_TABLE_CLOAK = {
         },
 
         // --- LOCAL DEFENSES ---
-        // Evasion is the cloak's primary stat — highest values of any slot.
+        // Evasion is the cloak's primary stat - highest values of any slot.
         flat_evasion: {
             id: 'flat_evasion',
             label: '+# to Evasion', labelDe: '+# zu Ausweichen',
@@ -74,7 +74,7 @@ const EG_MOD_TABLE_CLOAK = {
                 { tier: 4, min: 10, max: 35, weight: 2100, ilvl: 1 }
             ]
         },
-        // Armour is secondary on a cloak — slightly below helmet scale.
+        // Armour is secondary on a cloak - slightly below helmet scale.
         flat_armour: {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
@@ -356,7 +356,7 @@ const EG_MOD_TABLE_CLOAK = {
             ]
         },
 
-        // --- CLOAK-EXCLUSIVE: DODGE (not block — cloaks slip away) ---
+        // --- CLOAK-EXCLUSIVE: DODGE (not block - cloaks slip away) ---
         dodge: {
             id: 'dodge',
             label: '+#% Chance to Dodge Attacks', labelDe: '+#% Chance, Angriffen auszuweichen',

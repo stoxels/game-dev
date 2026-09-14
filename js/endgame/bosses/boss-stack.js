@@ -4,27 +4,27 @@
 // A rework of the old one-shot Block Fall into a persistent construction
 // siege. The Stack is a living tetromino cluster and the arena is its
 // build site: it drops pieces, slams its mass, and clears its lines with
-// you still inside them. Fight identity: GRAVITY — everything falls, and
+// you still inside them. Fight identity: GRAVITY - everything falls, and
 // everything that lands becomes terrain.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE CORE STACK — the boss's arena body: a 4-block T-tetromino that
+//   • THE CORE STACK - the boss's arena body: a 4-block T-tetromino that
 //     drifts around the table. Touching it is a STACK SLAM: animated
 //     fling + physical damage.
-//   • SOFT DROP — every few seconds pieces telegraph a landing column,
+//   • SOFT DROP - every few seconds pieces telegraph a landing column,
 //     fall, and thud down: the landing burst hurts, and each landed piece
 //     LINGERS as floor terrain for a moment before the Stack absorbs it.
 //
-//   60% GATE — HARD DROP: three giant pieces (an O and two I-beams) ghost
-//   above your column, then slam down at full speed — each landing fires
+//   60% GATE - HARD DROP: three giant pieces (an O and two I-beams) ghost
+//   above your column, then slam down at full speed - each landing fires
 //   a shockwave ring and leaves a heavy floor block behind.
 //
-//   30% GATE — LINE CLEAR: full-width rows flash (telegraph), then
+//   30% GATE - LINE CLEAR: full-width rows flash (telegraph), then
 //   detonate across their entire width, one after another. Dodge
 //   vertically between the flashing bands.
 //
-//   CHARGE ATTACK — GARBAGE RISE: gray garbage rows rise from the BOTTOM
-//   of the screen and flood the lower half — touch the rising edge and
+//   CHARGE ATTACK - GARBAGE RISE: gray garbage rows rise from the BOTTOM
+//   of the screen and flood the lower half - touch the rising edge and
 //   you're flung upward; stand inside and it grinds you. Stay high until
 //   the garbage sinks.
 //
@@ -35,7 +35,7 @@
 //
 // Shared mechanics live in shared-boss-abilities.js and are referenced
 // by handler-name string. Damage flows through the shared tier curve.
-// NOTE: exactly ONE _egNkLoop runs on the watcher's run — every state
+// NOTE: exactly ONE _egNkLoop runs on the watcher's run - every state
 // machine (soft drop, hard drop, line clear, garbage rise) lives in that
 // single tick.
 //------------------------------------------------------------------------
@@ -57,7 +57,7 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            // Kept for schedule compatibility — the persistent watcher now
+            // Kept for schedule compatibility - the persistent watcher now
             // owns the soft-drop cadence; the handler no-ops (same shim
             // pattern as the other reworked bosses).
             { name: 'block_fall', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechBlockFall' },
@@ -87,7 +87,7 @@ const EG_STK_FLOOR_TTL = 3000;                // floor terrain lifetime
 // Hard Drop (60% gate)
 const EG_STK_HD_N = 3;                        // sequential giant pieces
 const EG_STK_HD_WARN_MS = 900;
-const EG_STK_HD_FALL = 520;                   // px/s — much faster than soft
+const EG_STK_HD_FALL = 520;                   // px/s - much faster than soft
 const EG_STK_HD_SHOCK_R = 175;                // landing shockwave radius
 const EG_STK_HD_DMG = [0, 0.13, 0.15, 0.18];
 const EG_STK_HD_FLING = [0, 160, 185, 210];
@@ -117,7 +117,7 @@ const EG_STK_COLORS = ['#22d3ee', '#3b82f6', '#f97316', '#facc15', '#22c55e', '#
 
 let _egStackWatcher = null; // per-fight build-site state
 
-// Phase lookup helper — resolves the boss's current phase (default 1).
+// Phase lookup helper - resolves the boss's current phase (default 1).
 function _egStkPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
         const m = _egMonsters.find(x => x && x.id === st.monsterId);
@@ -582,7 +582,7 @@ function _egStackGarbage(monster) {
         els.push(gel);
     }
     st.garbage = { phase: 'rise', t: 0, topY: H, els, hitCd: 0 };
-    _egNkToast('eg_stk_garbage', '🧱 GARBAGE RISE! Stay high — the floor is rising!');
+    _egNkToast('eg_stk_garbage', '🧱 GARBAGE RISE! Stay high - the floor is rising!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('stk_thud'); } catch (e) {}
 }
 
@@ -590,7 +590,7 @@ function _egStackGarbage(monster) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent soft-drop cadence —
+// The old scheduled mechanic is now the persistent soft-drop cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
 function _egMechBlockFall(monster, phase) { void monster; void phase; }

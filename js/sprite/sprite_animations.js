@@ -70,10 +70,10 @@ function _playSpriteAnimation(imgElementId, frames, timings, idleSrc, idleDelayM
 // Populate as walk-cycle art is added for each of the 3 characters x 10
 // sprite states (no class, 3 base classes, 6 ascendencies).
 
-// PLACEHOLDER FILENAMES — swap these for real walk-cycle art per
+// PLACEHOLDER FILENAMES - swap these for real walk-cycle art per
 // character/state. Order matters: frame 1 = contact (left foot forward),
 // frame 2 = passing (mid-stride), frame 3 = contact (right foot forward).
-// Playback wraps through these in time order (1,2,3,1,2,3,...) — see
+// Playback wraps through these in time order (1,2,3,1,2,3,...) - see
 // _advanceWalkFrameIndex() below. Pick frames as a closed loop so the
 // last frame flows back into the first.
 const _WALK_FRAMES = {
@@ -236,7 +236,7 @@ const _WALK_FRAMES = {
 const _WALK_FRAME_INTERVAL_MS = 150; // ms between each walk frame while looping
 const _WALK_IDLE_DEBOUNCE_MS = 180;  // ms of no movement before snapping back to idle
 
-// Internal loop/debounce state. Keyed nothing — only one avatar walks at
+// Internal loop/debounce state. Keyed nothing - only one avatar walks at
 // a time, so a single shared state object is fine.
 const _walkState = {
     intervalId: null,
@@ -252,8 +252,8 @@ const _walkState = {
 // Advances _walkState.frameIndex by one step of a wrapping sequence
 // across the given frame count. For a 4-frame set this produces the
 // cycle: 0,1,2,3,0,1,2,3,0,... (each frame shows once per loop, in
-// time order). Pick walk frames as a closed loop — the last frame
-// must flow back into the first — otherwise the wrap point visibly
+// time order). Pick walk frames as a closed loop - the last frame
+// must flow back into the first - otherwise the wrap point visibly
 // "snaps" rather than stepping naturally.
 function _advanceWalkFrameIndex(frameCount) {
     if (frameCount <= 1) return 0;
@@ -262,14 +262,14 @@ function _advanceWalkFrameIndex(frameCount) {
 }
 
 // Starts (or keeps alive) the looping walk animation on the current
-// character's sprite. Safe to call on every movement tick — it only
+// character's sprite. Safe to call on every movement tick - it only
 // actually starts the interval once, and just resets the idle debounce
 // on subsequent calls.
 //
 // direction is optional ('up' | 'down' | 'left' | 'right'). When
 // directional frames were discovered for that direction they are used,
 // otherwise the omnidirectional set plays. Draw walk frames facing
-// right — the avatar flip in player_sprite.js mirrors them when needed.
+// right - the avatar flip in player_sprite.js mirrors them when needed.
 function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simple', direction = null) {
     const char = STATE?.playerCharacter;
     const asc = STATE?.playerAscendency || STATE?.playerClass || 'noclass';
@@ -281,7 +281,7 @@ function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simple', di
         try { _lastFacingDir = direction; } catch (e) { /* pre-init: ignore */ }
     }
 
-    // Pause the idle loop while walking (no src restore — we take over below).
+    // Pause the idle loop while walking (no src restore - we take over below).
     if (typeof _stopAvatarIdleAnimation === 'function') _stopAvatarIdleAnimation(false);
 
     const frames = (typeof _animGetWalkFramesSync === 'function')
@@ -298,21 +298,21 @@ function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simple', di
         usesDirectional = !!(_animCache[dk] && _animCache[dk].length);
     }
     if (!frames || frames.length === 0) {
-        // No walk art at all — hand back to idle (static portrait fallback).
+        // No walk art at all - hand back to idle (static portrait fallback).
         if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation(imgElementId);
         return;
     }
 
-    // Always cancel any pending "return to idle" — we're moving again.
+    // Always cancel any pending "return to idle" - we're moving again.
     if (_walkState.idleTimeoutId) {
         clearTimeout(_walkState.idleTimeoutId);
         _walkState.idleTimeoutId = null;
     }
 
-    // Loop already running for this element, frames and direction — nothing else to do.
+    // Loop already running for this element, frames and direction - nothing else to do.
     if (_walkState.intervalId && _walkState.imgElementId === imgElementId && _walkState.dirName === (direction || null)) return;
 
-    // Switching elements, frames or direction — stop the old loop first.
+    // Switching elements, frames or direction - stop the old loop first.
     if (_walkState.intervalId) {
         clearInterval(_walkState.intervalId);
         _walkState.intervalId = null;
@@ -492,7 +492,7 @@ function _playAvatarSwingAnimation() {
 // <Char> is capitalized (Stox/Trix/Syla) to match the existing art,
 // <variant> is noclass, a base class or an ascendency id (lowercase,
 // e.g. random_walker), <dir> is up/down/left/right, <N> counts from 1
-// with NO gaps — discovery stops at the first missing file, so any
+// with NO gaps - discovery stops at the first missing file, so any
 // animation may hold anywhere from 1 to ANIM_MAX_FRAMES images.
 //
 // Spell folder names per variant (HUD slot in brackets):
@@ -517,7 +517,7 @@ function _playAvatarSwingAnimation() {
 //------------------------------------------------------------------------
 
 const ANIM_BASE_PATH = 'animations';
-// Upper bound probed per animation — raise if you ever need longer cuts.
+// Upper bound probed per animation - raise if you ever need longer cuts.
 const ANIM_MAX_FRAMES = 12;
 const ANIM_DIRECTIONS = ['up', 'down', 'left', 'right'];
 const ANIM_VARIANTS = ['noclass', 'statistician', 'mathmagician', 'probabilist', 'outlier', 'actuary', 'recursionist', 'markovian', 'bayesian', 'random_walker'];
@@ -666,7 +666,7 @@ function _animHasDirectionalWalkSync(char, variant, direction) {
 }
 
 // Should the sprite <img> be mirrored for this movement direction?
-// Returns false when directional art is active (never mirror — this is the
+// Returns false when directional art is active (never mirror - this is the
 // Trix left/right swap fix), true only for the omni right-facing fallback
 // moving left.
 function _animShouldMirrorFor(char, variant, direction) {
@@ -850,7 +850,7 @@ function _scheduleIdleFaceReset(imgElementId, face) {
     const capturedId = imgElementId;
     _idleState.faceResetTimeoutId = setTimeout(() => {
         _idleState.faceResetTimeoutId = null;
-        if (_walkState.intervalId) return; // moving again — walk owns the sprite
+        if (_walkState.intervalId) return; // moving again - walk owns the sprite
         try {
             if (typeof _lastFacingDir === 'string' && _lastFacingDir !== capturedFace) return;
         } catch (e) { /* pre-init: fall through and reset */ }
@@ -1062,7 +1062,7 @@ async function _playAvatarSkillAnimationGeneric(char, variant, spell, imgElement
     }
     if (!frames || !frames.length) return;
 
-    // Pause walk/idle loops without restoring static — this sequence owns
+    // Pause walk/idle loops without restoring static - this sequence owns
     // the sprite until it hands back to idle in onComplete.
     if (_walkState.intervalId) {
         clearInterval(_walkState.intervalId);

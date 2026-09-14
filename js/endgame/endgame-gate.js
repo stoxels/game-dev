@@ -10,12 +10,12 @@
 // state via egSaveHubState() / _egLoadHubState().
 //
 // Dependencies (must be loaded before this file):
-//   endgame-hub.js              — state vars, chip builder, persistence
-//   endgame-hub-drag-and-drop.js — drag & drop zone handling
-//   tooltips-hud.js             — floating tooltip engine
+//   endgame-hub.js              - state vars, chip builder, persistence
+//   endgame-hub-drag-and-drop.js - drag & drop zone handling
+//   tooltips-hud.js             - floating tooltip engine
 //
 // Entry point:
-//   showEndgameGate() — creates the screen on first call and switches to it.
+//   showEndgameGate() - creates the screen on first call and switches to it.
 //------------------------------------------------------------------------
 
 
@@ -62,7 +62,7 @@ function _egBuildMapOrbSlotHTML() {
 
 // Assembles the complete map device block: orb frame, drop slot and
 // activate button. (The small "?" map-drop-rules button lives in the
-// potential-drops panel header, right of the device — see
+// potential-drops panel header, right of the device - see
 // _egBuildPotentialDropsPanelHTML.)
 function _egBuildMapDeviceHTML() {
     return `
@@ -106,7 +106,7 @@ function _egOnDropRulesLeave() {
 //------------------------------------------------------------------------
 // Right-hand panel next to the map device: lists every map that could
 // potentially drop while running the map currently in the device (PoE
-// drop rules, same pools the kill handlers roll from — see
+// drop rules, same pools the kill handlers roll from - see
 // egAtlasDropNodeIds in endgame-atlas.js):
 //   normal kills: this region + linked regions of the same/lower tier +
 //                 every COMPLETED region of the same/lower tier
@@ -158,7 +158,7 @@ function _egBuildPotentialDropsBodyHTML() {
         const cls = e.completed ? 'eg-potential-drop-done' : 'eg-potential-drop-todo';
         const tierLabel = (typeof _egAtlasRoman === 'function') ? _egAtlasRoman(e.tier) : String(e.tier);
         const tierCol = (typeof _egAtlasTierGroupColor === 'function') ? _egAtlasTierGroupColor(e.tier) : '#ccc';
-        const boss = e.bossOnly ? ` <span class="eg-potential-drop-boss" title="${t('eg_potential_drops_boss_hint')}">⚔️</span>` : '';
+        const boss = e.bossOnly ? ` <span class="eg-potential-drop-boss" data-tip-t="eg_potential_drops_boss_hint">⚔️</span>` : '';
         const self = e.isSelf ? ` <span class="eg-potential-drop-current">${t('eg_potential_drops_current')}</span>` : '';
         return `<div class="eg-potential-drop-row ${cls}"><span class="eg-potential-drop-status">${glyph}</span><span class="eg-potential-drop-tier" style="color:${tierCol};">${tierLabel}</span><span class="eg-potential-drop-name">${e.name}${self}</span>${boss}</div>`;
     }).join('');
@@ -172,7 +172,7 @@ function _egBuildPotentialDropsPanelHTML() {
     <div class="eg-potential-drops-head">
         <span class="eg-potential-drops-title" id="eg-potential-drops-title"></span>
         <button class="eg-gate-info-btn eg-gate-info-btn-static"
-                title="${t('eg_drop_rules_title')}"
+                aria-label="${t('eg_drop_rules_title')}"
                 onmouseenter="_egOnDropRulesEnter(event)"
                 onmousemove="_egOnDropRulesMove(event)"
                 onmouseleave="_egOnDropRulesLeave()">?</button>
@@ -295,7 +295,7 @@ function _egBuildMapStashGridHTMLForTier(tier) {
     }
     return html;
 }
-// Legacy alias — returns grid for active tier
+// Legacy alias - returns grid for active tier
 function _egBuildMapStashGridHTML() {
     return _egBuildMapStashGridHTMLForTier(_egMapStashActiveTier || 1);
 }
@@ -455,7 +455,7 @@ function _egOnGateCurrencyCellEnter(row, col, e) {
     <div class="eg-tt-header">
         <div class="eg-tt-icon" style="opacity:0.55;">${def.icon || '◻'}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${def.name || assignedId}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} — ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
+        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${def.description || ''}</div></div>
 </div>`;
@@ -535,9 +535,9 @@ function _egRenderGateLevelChip() {
     const ptsHtml = pts > 0 ? `<span class="eg-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>` : '';
     // inner chip is styled by the shared eg-lvl-chip rules from endgame-leveling.js
     el.innerHTML = `<span class="eg-lvl-chip" style="pointer-events:none;"><span class="eg-lvl-chip-lvl">${lvlLabel}</span><span class="eg-lvl-chip-bar"><span class="eg-lvl-chip-bar-fill" style="width:${pct}%"></span></span>${ptsHtml}</span>`;
-    // tooltip title fallback for native hover before JS tooltip takes over
-    const tipTitle = (typeof t === 'function') ? (t('eg_lvl_button_title') || t('eg_lvl_window_title') || '') : '';
-    if (tipTitle) el.setAttribute('title', tipTitle);
+    // No native title fallback here: the chip's hint is the styled tooltip
+    // driven from its own onmouseenter (see _egBuildGateTopbarHTML), and a
+    // title attribute would render the OS popup underneath it.
 }
 
 // Builds the top navigation bar with back button, gate title, level chip and the
@@ -756,7 +756,7 @@ function _egInjectMapStashTabStyles() {
             background: rgba(200,168,75,0.30);
             color: #f5d98a;
         }
-        /* Scrollable infinite stash grid — mirrors .eg-inv-grid */
+        /* Scrollable infinite stash grid - mirrors .eg-inv-grid */
         .eg-map-stash-section {
             display: flex;
             flex-direction: column;
@@ -817,10 +817,8 @@ function _egRenderMapSlot() {
         _egInjectAtlasHighlightStyles();
         if (_egMapSlotItem && _egIsMapAtlasIncomplete(_egMapSlotItem)) {
             slot.classList.add('eg-map-atlas-incomplete');
-            slot.title = (typeof t === 'function') ? t('eg_map_atlas_not_completed') : 'Not yet completed on Atlas';
         } else {
             slot.classList.remove('eg-map-atlas-incomplete');
-            slot.removeAttribute('title');
         }
     }
 
@@ -858,7 +856,7 @@ function _egRenderMapStashCell(row, col) {
         if (_egIsMapAtlasIncomplete(item)) {
             _egInjectAtlasHighlightStyles();
             cell.classList.add('eg-map-atlas-incomplete');
-            // Don't overwrite the gold borderColor — stash CSS uses !important
+            // Don't overwrite the gold borderColor - stash CSS uses !important
             cell.style.borderColor = '';
         } else {
             cell.classList.remove('eg-map-atlas-incomplete');
@@ -868,21 +866,11 @@ function _egRenderMapStashCell(row, col) {
         cell.style.background = '';
         cell.style.borderColor = '';
         cell.classList.remove('eg-map-atlas-incomplete');
-        cell.removeAttribute('title');
     }
-    if (item) {
-        // Tooltip hint: also set title for quick hover (real tooltip is the floating one)
-        if (_egIsMapAtlasIncomplete(item)) {
-            cell.title = (typeof t === 'function') ? t('eg_map_atlas_not_completed') : 'Not yet completed on Atlas';
-        } else if (cell.classList.contains('eg-map-atlas-incomplete')) {
-            cell.removeAttribute('title');
-        } else if (item && typeof _egGetMapAtlasNode === 'function') {
-            const node = _egGetMapAtlasNode(item);
-            if (node && typeof egAtlasIsCompleted === 'function' && egAtlasIsCompleted(node.id)) {
-                cell.removeAttribute('title');
-            }
-        }
-    }
+    // NOTE: the atlas-incomplete status deliberately sets NO title attribute.
+    // It already has a dedicated section in the map's floating tooltip (see
+    // _egBuildMapTooltipBodyHTML → atlasStatusHTML), and a title would stack
+    // the OS popup on top of that styled card.
     _egUpdateMapStashTabCounts();
 }
 
@@ -907,17 +895,14 @@ function _egRenderMapStashForTier(tier) {
                     _egInjectAtlasHighlightStyles();
                     cell.classList.add('eg-map-atlas-incomplete');
                     cell.style.borderColor = '';
-                    cell.title = (typeof t === 'function') ? t('eg_map_atlas_not_completed') : 'Not yet completed on Atlas';
                 } else {
                     cell.classList.remove('eg-map-atlas-incomplete');
                     cell.style.borderColor = fill.replace(/[\d.]+\)$/, '0.9)');
-                    cell.removeAttribute('title');
                 }
             } else {
-                cell.style.background = '';
-                cell.style.borderColor = '';
-                cell.classList.remove('eg-map-atlas-incomplete');
-                cell.removeAttribute('title');
+            cell.style.background = '';
+            cell.style.borderColor = '';
+            cell.classList.remove('eg-map-atlas-incomplete');
             }
         }
     }
@@ -965,7 +950,7 @@ function egActivateMap() {
 // Follows the create-once + .show toggle pattern of _egEnsureDeleteModal()
 // in endgame-hub.js.
 
-// Category colors — same scheme as the map tooltips (tooltips-hud.js).
+// Category colors - same scheme as the map tooltips (tooltips-hud.js).
 const EG_MM_CATEGORY_COLORS = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
 
 // Localized category name for a mod's `affects` tag.
@@ -1063,7 +1048,7 @@ function _egEnsureMapModsOverlay() {
     overlay.innerHTML = `
 <div class="eg-mm-overlay-box">
     <button class="eg-mm-close-x" onclick="egCloseMapModsOverlay()"
-            title="${t('ui_close')}" aria-label="${t('ui_close')}">✕</button>
+            data-tip-t="ui_close" aria-label="${t('ui_close')}">✕</button>
     <div class="eg-mm-overlay-title">${t('eg_mm_title')}</div>
     <div class="eg-mm-overlay-body" id="eg-mm-overlay-body"></div>
     <div class="eg-mm-overlay-btns">
@@ -1093,7 +1078,7 @@ function egCloseMapModsOverlay() {
     if (overlay) overlay.classList.remove('show');
 }
 
-// Global Escape handler — closes the map-mods overlay when open.
+// Global Escape handler - closes the map-mods overlay when open.
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const ov = document.getElementById('eg-map-mods-overlay');
@@ -1177,14 +1162,14 @@ function ensureEndgameGateScreen() {
     }
 }
 
-// Name of the global function the BACK button calls — set by
+// Name of the global function the BACK button calls - set by
 // showEndgameGate(backFn). Defaults to the Nexus of Worlds.
 let _egGateBackFn = EG_SCREEN_NAV.nexus;
 
 // Transitions to the Probability Gate screen and refreshes all rendered zones.
 // This is the main entry point called from elsewhere in the codebase.
 // An optional backFn argument (name of a global function, e.g.
-// 'showEndgameHub') overrides where the BACK button returns to — used
+// 'showEndgameHub') overrides where the BACK button returns to - used
 // when the gate is opened from the endgame hub character sheet.
 function showEndgameGate(backFn) {
     if (typeof backFn === 'string') _egGateBackFn = _egResolveBackFn(backFn, EG_SCREEN_NAV.nexus);
@@ -1205,7 +1190,7 @@ function showEndgameGate(backFn) {
     // stylesheet exists even if the atlas screen was never opened this session.
     if (typeof _egAtlasEnsureStyles === 'function') _egAtlasEnsureStyles();
 
-    // The gate screen DOM is built once — keep the back button in sync
+    // The gate screen DOM is built once - keep the back button in sync
     // with the current return target.
     const backBtn = document.querySelector('#screen-endgame-gate .eg-back-btn');
     if (backBtn) backBtn.setAttribute('onclick', `${_egGateBackFn}()`);

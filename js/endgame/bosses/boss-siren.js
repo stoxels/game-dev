@@ -1,43 +1,43 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SIREN (boss_siren)--------------------------
 //------------------------------------------------------------------------
-// REWORK — PoE Merveil homage, rebuilt as a full stage concert. The Siren
-// fights like her myth: her voice IS the weapon. Every mechanic is sung —
+// REWORK - PoE Merveil homage, rebuilt as a full stage concert. The Siren
+// fights like her myth: her voice IS the weapon. Every mechanic is sung -
 // sweeping wail beams that pin the arena, an undertow whirlpool that drags
 // the whole stage toward her, and the finale is her DEADLY ARIA: the
 // audience of bubbles sings along, and the last note kills anyone who
 // sings it wrong.
 //
-//   Phase 1 (100–60%) — WAIL BEAM (signature, upgraded). The beam still
-//                       sweeps from its anchor — now in a variable pattern
+//   Phase 1 (100–60%) - WAIL BEAM (signature, upgraded). The beam still
+//                       sweeps from its anchor - now in a variable pattern
 //                       (wide swing / narrow flick / stutter reversals),
 //                       and glowing ECHO ZONES spawn along its path:
 //                       standing in one while the beam passes = a small
 //                       heal (the sea sings with you). Bait = learn.
 //                       Plus FROZEN CELLS (shared).
-//   Phase 2 ( ≤60%)   — UNDERTOW. A whirlpool spins up at the anchor and
+//   Phase 2 ( ≤60%)   - UNDERTOW. A whirlpool spins up at the anchor and
 //                       DRAGS the whole arena toward it (the avatar glides
 //                       in slow pulls you must fight); flotsam chunks orbit
-//                       in and bite. The whirlpool then NOVAS — get out of
+//                       in and bite. The whirlpool then NOVAS - get out of
 //                       the ring before the pull becomes a blast.
 //                       Plus SIREN'S REPLY. The beam splits: a second,
 //                       thinner beam mirrors the first from the opposite
-//                       side — one sweeps with it, one against it. Read
+//                       side - one sweeps with it, one against it. Read
 //                       both.
-//   Phase 3 ( ≤30%)   — Everything faster: the undertow pulls harder and
+//   Phase 3 ( ≤30%)   - Everything faster: the undertow pulls harder and
 //                       novas sooner, the reply beam adds a third arc, and
 //                       the wail sweeps reverse mid-song. The concert
 //                       crescendos.
-//   Finale ( ≤10%)    — 🌀 THE DEADLY ARIA (one-shot set-piece): the arena
+//   Finale ( ≤10%)    - 🌀 THE DEADLY ARIA (one-shot set-piece): the arena
 //                       floods with her audience of bubbles, three rings
-//                       deep. The Siren sings SONG LINES — each line
+//                       deep. The Siren sings SONG LINES - each line
 //                       lights up a chain of bubbles through the rings, and
 //                       you must follow the far end: reach the last lit
 //                       bubble of the line before the note lands and the
 //                       rest of the song pops around you. Lines get longer
 //                       and faster. The final note is the KILLER CRESSENDO:
 //                       every bubble in the arena detonates EXCEPT the one
-//                       far bubble — stand on it or be hit hard. Charge
+//                       far bubble - stand on it or be hit hard. Charge
 //                       bar frozen for the whole set-piece (gate in
 //                       _egTickPlayer via _egSireFinalActive).
 //
@@ -114,7 +114,7 @@ function _egSireTouch(pct, level, label) {
     return true;
 }
 
-// Flat heal + HUD refresh (mirrors the Dancer/Jester — no shared helper).
+// Flat heal + HUD refresh (mirrors the Dancer/Jester - no shared helper).
 function _egSireHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
@@ -174,7 +174,7 @@ function _egSireBeamHit(ax, ay, ang, len, halfW, pr, pad) {
 //------------------------------------------------------------------------
 // The sweeping beam returns with SONG PATTERNS: each cast picks wide
 // swing / narrow flick / stutter reversals (phase 3 may reverse mid-song).
-// Glowing ECHO ZONES bloom along the swept arc — standing in one while the
+// Glowing ECHO ZONES bloom along the swept arc - standing in one while the
 // beam passes heals you a little. The bait that teaches the sweep.
 const EG_SIRE_BEAM_PATTERNS = ['wide', 'flick', 'stutter'];
 
@@ -213,7 +213,7 @@ function _egMechSireWail(monster, phase) {
         echoes.push({ x: ex, y: ey, r: 60, used: false, el });
     }
 
-    _egNkToast('eg_mech_sire_wail', '🌀 The Siren: WAIL BEAM — track the song!', '#7dd3fc');
+    _egNkToast('eg_mech_sire_wail', '🌀 The Siren: WAIL BEAM - track the song!', '#7dd3fc');
 
     let e = 0, cdUntil = 0;
     const angleAt = (t) => {
@@ -267,7 +267,7 @@ function _egMechSireWail(monster, phase) {
 //------------------------------------------------------------------------
 // A whirlpool spins up at the anchor and DRAGS the whole arena toward it
 // in slow pulls you must fight; flotsam chunks spiral inward and bite.
-// Then the whirlpool NOVAS — be out of the ring before the pull becomes
+// Then the whirlpool NOVAS - be out of the ring before the pull becomes
 // the blast.
 const EG_SIRE_PULL_CYCLE = 700;
 const EG_SIRE_PULL_STEP = 26;      // px per pull
@@ -301,12 +301,12 @@ function _egMechSireUndertow(monster, phase) {
         flotsam.push({ ang: aa, r: rr, el });
     }
 
-    _egNkToast('eg_mech_sire_undertow', '🌀 The Siren: UNDERTOW — fight the pull!', '#7dd3fc');
+    _egNkToast('eg_mech_sire_undertow', '🌀 The Siren: UNDERTOW - fight the pull!', '#7dd3fc');
 
     let t = 0, nextPull = 0, novaDone = false, touchCd = 0, novaCd = 0;
     _egNkLoop(run, (dtS, now) => {
         t += dtS * 1000;
-        // The pull: every cycle, drag the avatar a step toward the anchor —
+        // The pull: every cycle, drag the avatar a step toward the anchor -
         // unless the player is moving (input overrides the sea).
         if (t >= nextPull && t < lifeMs * 0.75) {
             nextPull = t + cycleMs;
@@ -373,7 +373,7 @@ function _egMechSireUndertow(monster, phase) {
 //-------------------MECHANIC: SIREN'S REPLY (phase 2+)---------------------
 //------------------------------------------------------------------------
 // The beam splits: a second, thinner beam mirrors the first from the same
-// anchor — one sweeps with the song, one against it. Phase 3 adds a third
+// anchor - one sweeps with the song, one against it. Phase 3 adds a third
 // slow arc. Read both (all three) before crossing.
 const EG_SIRE_REPLY_LIFE = 5200;
 
@@ -403,7 +403,7 @@ function _egMechSireReply(monster, phase) {
     const b2 = mk(10, 'eg-sire-beam-thin');
     const b3 = p >= 3 ? mk(13, 'eg-sire-beam-fat') : null;
 
-    _egNkToast('eg_mech_sire_reply', '🌀 The Siren: SIREN\u2019S REPLY — two songs at once!', '#7dd3fc');
+    _egNkToast('eg_mech_sire_reply', '🌀 The Siren: SIREN\u2019S REPLY - two songs at once!', '#7dd3fc');
 
     let e = 0, cdUntil = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -444,11 +444,11 @@ function _egMechSireReply(monster, phase) {
 //-------------------🌀… THE DEADLY ARIA (≤10% HP one-shot finale)----------
 //------------------------------------------------------------------------
 // The arena floods with her audience of bubbles, three rings deep. The
-// Siren sings SONG LINES — each line lights a chain of bubbles through
+// Siren sings SONG LINES - each line lights a chain of bubbles through
 // the rings; reach the FAR end of the line before the note lands (the
 // rest of the song pops around you). Lines lengthen and quicken. The
 // final note is the KILLER CRESSEND0: every bubble detonates EXCEPT the
-// far one — stand on it. Charge bar frozen for the whole set-piece (gate
+// far one - stand on it. Charge bar frozen for the whole set-piece (gate
 // in _egTickPlayer via _egSireFinalActive).
 const EG_SIRE_FINALE_LINES = 3;
 const EG_SIRE_LINE_CHARGE = 3600;   // ms to reach the far bubble (per line, shrinks)
@@ -547,11 +547,11 @@ function _egSireFinalStart(monster) {
     ov.className = 'eg-sire-cd';
     ov.innerHTML =
         '<div class="eg-sire-cd-label">🌀 THE DEADLY ARIA</div>' +
-        '<div class="eg-sire-cd-hint">Follow the song line — reach the far bubble!</div>';
+        '<div class="eg-sire-cd-hint">Follow the song line - reach the far bubble!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_sire_final_cd', '🌀💀 THE DEADLY ARIA — follow the song line!', '#7dd3fc');
+    _egNkToast('eg_mech_sire_final_cd', '🌀💀 THE DEADLY ARIA - follow the song line!', '#7dd3fc');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -605,8 +605,8 @@ function _egSireFinalStart(monster) {
             b.el.style.setProperty('--lit-delay', (i * 90) + 'ms');
         });
         const far = chain[chain.length - 1];
-        _egNkToast('eg_mech_sire_line', '🌀 The line is sung — reach the far bubble!', '#7dd3fc');
-        // The judge: the note lands — every bubble pops EXCEPT the far one;
+        _egNkToast('eg_mech_sire_line', '🌀 The line is sung - reach the far bubble!', '#7dd3fc');
+        // The judge: the note lands - every bubble pops EXCEPT the far one;
         // standing on the far bubble is safe, otherwise the pop-storm bites.
         const judge = () => {
             if (!_egSireFinal || _egSireFinal !== g || g.finished) return;
@@ -635,19 +635,19 @@ function _egSireFinalStart(monster) {
 }
 
 // THE KILLER CRESCENDO: every remaining bubble detonates EXCEPT one far
-// bubble — the last note of the aria.
+// bubble - the last note of the aria.
 function _egSireCrescendo(g, monster, level) {
     if (!g || g.finished) return;
     const alive = g.bubbles.filter(b => !b.popped);
     if (!alive.length) { _egSireFinalEnd(g); return; }
     const c0 = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     // The safe bubble: the farthest ALIVE bubble from the player (the "far"
-    // note — the aria always gives you a place to run to).
+    // note - the aria always gives you a place to run to).
     const far = alive.reduce((best, b) =>
         Math.hypot(b.x - c0.x, b.y - c0.y) > Math.hypot(best.x - c0.x, best.y - c0.y) ? b : best, alive[0]);
     far.el.classList.add('eg-sire-bubble-safe');
     alive.forEach(b => { if (b !== far) b.el.classList.add('eg-sire-bubble-doom'); });
-    _egNkToast('eg_mech_sire_crescendo', '🌀💀 THE KILLER CRESCENDO — stand on the last bubble!', '#7dd3fc');
+    _egNkToast('eg_mech_sire_crescendo', '🌀💀 THE KILLER CRESCENDO - stand on the last bubble!', '#7dd3fc');
     const warnMs = 2600 * (_EG_SIRE_DEBUG_SLOW ? 8 : 1);
     g.lineTimer = setTimeout(() => {
         if (!_egSireFinal || _egSireFinal !== g || g.finished) return;
@@ -696,7 +696,7 @@ function _egSireFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egSireTeardown() {
     if (_egSireFinal) { try { _egSireFinalEnd(_egSireFinal); } catch (e) {} _egSireFinal = null; }
@@ -717,8 +717,8 @@ function _egSireTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_SIRE_DEBUG.fire('wail'|'undertow'|'reply', phase) — runs one now
-//   _EG_SIRE_DEBUG.final()                                — DEADLY ARIA now
+//   _EG_SIRE_DEBUG.fire('wail'|'undertow'|'reply', phase) - runs one now
+//   _EG_SIRE_DEBUG.final()                                - DEADLY ARIA now
 if (typeof window !== 'undefined') {
     window._EG_SIRE_DEBUG = {
         fire: (name, phase) => {

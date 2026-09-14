@@ -2,7 +2,7 @@
 //-------------------SHIELD----------------------
 //------------------------------------------------------------------------
 
-// shield — activates the damage shield, optionally adding extra charges
+// shield - activates the damage shield, optionally adding extra charges
 // and a cursed-immunity window from passive nodes.
 function _useShield(id, def) {
     // Several keystones block shield items entirely
@@ -18,14 +18,14 @@ function _useShield(id, def) {
 
     shieldActive = true;
 
-    // Passive: Reinforced Ward — each node adds 1 extra absorbed mistake
+    // Passive: Reinforced Ward - each node adds 1 extra absorbed mistake
     const extraCharges = (ptHasSkill('reinforced_ward_1') ? 1 : 0)
         + (ptHasSkill('reinforced_ward_2') ? 1 : 0)
         + (ptHasSkill('reinforced_ward_3') ? 1 : 0);
     // Stored on the window so the mistake handler can consume them
     window._shieldExtraCharges = (window._shieldExtraCharges || 0) + extraCharges;
 
-    // Passive: Cursed Ward — each node grants 5 s of cursed immunity (max 15 s)
+    // Passive: Cursed Ward - each node grants 5 s of cursed immunity (max 15 s)
     const cursedImmunitySecs = (ptHasSkill('cursed_ward_1') ? 5 : 0)
         + (ptHasSkill('cursed_ward_2') ? 5 : 0)
         + (ptHasSkill('cursed_ward_3') ? 5 : 0);
@@ -62,7 +62,7 @@ function _fxMakeShieldOverlay(wrap, r) {
     setTimeout(() => shield.remove(), 1500);
 }
 
-// 🛡️ Shield — a golden hexagonal shield briefly overlays the puzzle.
+// 🛡️ Shield - a golden hexagonal shield briefly overlays the puzzle.
 function _fxShield() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -84,7 +84,7 @@ function _fxShield() {
     Audio_Manager.playSFX('shield');
 }
 
-// 🛡️💥 Shield Break — Spawns shattering particles at the exact cell location
+// 🛡️💥 Shield Break - Spawns shattering particles at the exact cell location
 function playShieldBreakEffect(row, col) {
     const wrap = document.getElementById('puzzle-scaler');
     const cell = document.getElementById(`g-${row}-${col}`);

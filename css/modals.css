@@ -4,10 +4,10 @@
     Styles for all modal windows and popup dialogs.
 
     Sections:
-        1. Shared Base Styles    — backdrop, box shell, close button, title, body sections
-        2. Math Gate Modal       — question display, answer input row, feedback, hint, buttons, footer
-        3. Moodle Code Modal     — unlock code display and glow animation
-        4. Danger / Reset Modal  — destructive-action confirmation dialogs
+        1. Shared Base Styles    - backdrop, box shell, close button, title, body sections
+        2. Math Gate Modal       - question display, answer input row, feedback, hint, buttons, footer
+        3. Moodle Code Modal     - unlock code display and glow animation
+        4. Danger / Reset Modal  - destructive-action confirmation dialogs
     ------------------------------------------------------------------------
 */
 
@@ -41,7 +41,7 @@
         display: flex;
     }
 
-/* When a modal is taller than the window, the backdrop scrolls — but with
+/* When a modal is taller than the window, the backdrop scrolls - but with
    align-items: center the overflowing top edge is clipped beyond scroll
    reach (classic flexbox centering pitfall). Auto margins keep the box
    centered while it fits AND fully reachable when it overflows. Targets
@@ -157,7 +157,7 @@
 
 /*
     --- 2a. BOX OVERRIDE ---
-    Wider content box for the gate — needs more horizontal space for math.
+    Wider content box for the gate - needs more horizontal space for math.
 */
 .mg-box {
     max-width: 860px;
@@ -253,7 +253,7 @@
     Submit is the primary action; tutor and new-question are secondary.
 */
 
-/* Primary check/submit button — confirms the typed answer */
+/* Primary check/submit button - confirms the typed answer */
 .mg-submit-btn {
     background: transparent;
     border: 1px solid var(--accent);
@@ -276,7 +276,7 @@
         cursor: default;
     }
 
-/* AI tutor button — opens a step-by-step explanation panel */
+/* AI tutor button - opens a step-by-step explanation panel */
 .mg-tutor-btn {
     background: transparent;
     border: 1px solid var(--yellow);
@@ -333,7 +333,7 @@
         color: var(--red);
     }
 
-/* Hint panel — revealed after a wrong attempt to guide the player */
+/* Hint panel - revealed after a wrong attempt to guide the player */
 .mg-hint-box {
     background: rgba(80, 40, 120, 0.18);
     border: 1px solid var(--purple);
@@ -371,7 +371,7 @@
     ---- Shown when a player hits the score threshold for a world. ----------
     ---- Displays an animated unlock code the player copies into Moodle. ---
     ---- Visual family: same stone/parchment chrome as the settings / ------
-    ---- how-to-play / keybinds modals — the settings_background.png frame -
+    ---- how-to-play / keybinds modals - the settings_background.png frame -
     ---- with the title plaque + stone close button overhanging the edge. --
     ------------------------------------------------------------------------
 */
@@ -418,7 +418,7 @@
 }
 
 /* Narrow windows: single-column boxes get much taller than wide, so the
-   frame art's top/bottom borders outgrow the width-based padding — switch
+   frame art's top/bottom borders outgrow the width-based padding - switch
    those two sides to viewport-height units (same fix as .tut-box). */
 @media (max-width: 700px) {
     .pw-box {
@@ -476,7 +476,7 @@
 /*
     --- 3c. CLOSE BUTTON ---
     Stone square with X icon, top-right corner (shared asset; the
-    "✕ CLOSE" text is hidden — the art shows the X).
+    "✕ CLOSE" text is hidden - the art shows the X).
 */
 .pw-box .modal-close {
     position: absolute;
@@ -521,7 +521,7 @@
     scrollbar-width: thin;
 }
 
-/* WebKit (Chrome/Edge/Safari) — parchment-toned scrollbar */
+/* WebKit (Chrome/Edge/Safari) - parchment-toned scrollbar */
 .pw-scroll::-webkit-scrollbar {
     width: clamp(6px, 0.7vw, 10px);
 }
@@ -552,7 +552,7 @@
 
 /*
     --- 3f. CODE CARD ---
-    One stone card per code — mirrors the How-To-Play modal's .tut-section
+    One stone card per code - mirrors the How-To-Play modal's .tut-section
     parchment cards (same fill, border, inset highlight + drop shadow).
     Stacks vertically so multiple unlocked codes read as a list.
 */
@@ -571,7 +571,7 @@
         margin-bottom: 0;
     }
 
-/* Card heading — the code's title ("Code 1" etc.), stone-brown like the
+/* Card heading - the code's title ("Code 1" etc.), stone-brown like the
    .tut-section h3 headings. */
 .pw-card-title {
     font-family: var(--PX);
@@ -613,7 +613,7 @@
     }
 }
 
-/* Hint line under the code — dark ink on the parchment card. */
+/* Hint line under the code - dark ink on the parchment card. */
 .pw-hint {
     font-family: var(--F);
     font-size: clamp(11px, 1.8cqw, 14px);
@@ -703,7 +703,7 @@
     fires a short sparkle burst: absolutely-positioned stars fan out from
     the display's centre and fade (one DOM node per spark, injected by
     js/codes.js with --sx/--sy/--sd custom properties for angle, distance
-    and delay). Locks the reward onto the code itself — the thing the
+    and delay). Locks the reward onto the code itself - the thing the
     player is meant to read and copy.
 */
 #pw-modal .pw-unlock-anim {
@@ -738,7 +738,7 @@
     100% { filter: brightness(1); }
 }
 
-/* Sparkle particle — a single emoji star, no image asset needed. */
+/* Sparkle particle - a single emoji star, no image asset needed. */
 .pw-spark {
     position: absolute;
     left: 50%;
@@ -824,7 +824,7 @@
     gap: 4px;
 }
 
-/* TITLE PLAQUE — same asset + geometry as the tut-box/changelog plaques.
+/* TITLE PLAQUE - same asset + geometry as the tut-box/changelog plaques.
    Slightly wider floor (380px) than the siblings: danger titles are long
    ("KEEP THE NEW SETTINGS?" / "⚠ ERFOLGE ZURÜCKSETZEN") and the extra flat
    surface keeps them on one line at dialog sizes. */
@@ -873,7 +873,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   ACHIEVEMENTS-RESET MODAL — readability pass
+   ACHIEVEMENTS-RESET MODAL - readability pass
    The danger frame shares its shell with the retry modals, so everything
    below is scoped to #ach-reset-modal and leaves them untouched.
    The body text sits directly on the frame's parchment, so it uses the
@@ -905,7 +905,7 @@
         font-weight: 700;
     }
 
-    /* Title uses .text-red for the danger accent — keep the deep red
+    /* Title uses .text-red for the danger accent - keep the deep red
        that stays legible on the gold plaque art */
     #ach-reset-modal .modal-title.text-red {
         color: #e05a3a;
@@ -914,7 +914,7 @@
 
 /* Action buttons: real carved-stone buttons (Game-Reset/Button-Stone.png,
    same art as the big RESET PROGRESS modal) instead of the flat outlined
-   rectangles — light pixel text pops against the dark stone. */
+   rectangles - light pixel text pops against the dark stone. */
 #ach-reset-modal .modal-actions {
     /* The pixel-font labels are long (DE: "JA, ERFOLGE ZURÜCKSETZEN"), so
        the two stone buttons stack vertically instead of squeezing side by
@@ -928,7 +928,7 @@
 #ach-reset-modal .modal-actions .back-btn {
     font-family: var(--PX);
     /* Press Start 2P is a very wide face and the DE confirm label is long
-       ("JA, ERFOLGE ZURÜCKSETZEN") — size the font off the box and let the
+       ("JA, ERFOLGE ZURÜCKSETZEN") - size the font off the box and let the
        button take nearly the full parchment width so it always fits. */
     font-size: clamp(9px, 2.5cqw, 14px);
     letter-spacing: 0.5px;
@@ -983,7 +983,7 @@
     max-width: min(680px, 120vh);
 }
 
-/* Body text sits directly on the frame's parchment — dark ink, centred,
+/* Body text sits directly on the frame's parchment - dark ink, centred,
    comfortably large (same readability treatment as #ach-reset-modal). */
 #pt-refund-modal .reset-body-text {
     font-family: var(--PX);
@@ -997,7 +997,7 @@
         color: #2e1a0a;
     }
 
-/* Title uses .text-red for the danger accent — keep the deep red that
+/* Title uses .text-red for the danger accent - keep the deep red that
    stays legible on the gold plaque art. */
 #pt-refund-modal .modal-title.text-red {
     color: #e05a3a;
@@ -1005,7 +1005,7 @@
 }
 
 /* Action buttons: real carved-stone buttons (Game-Reset/Button-Stone.png,
-   same art as the achievements-reset confirm), stacked and centred — the
+   same art as the achievements-reset confirm), stacked and centred - the
    pixel-font labels are long (DE: "♻ ALLES ERSTATTEN"). */
 #pt-refund-modal .modal-actions {
     flex-direction: column;
@@ -1058,7 +1058,7 @@
     }
 
 /* -----------------------------------------------------------------------
-   EG LEAVE-MAP CONFIRM MODAL (#eg-forfeit-modal) — built in
+   EG LEAVE-MAP CONFIRM MODAL (#eg-forfeit-modal) - built in
    js/ui-events.js (showEgForfeitConfirm), shown when the player abandons
    an endgame map run from the in-run X button / pause overlay.
    Same danger shell as the achievements-reset / passive-tree modals
@@ -1071,13 +1071,13 @@
     max-width: min(720px, 120vh);
 }
 
-/* Tighten the shared block spacing — the box vertically centres its
+/* Tighten the shared block spacing - the box vertically centres its
    content itself, so the stacked section margins just waste parchment. */
 #eg-forfeit-modal .modal-section {
     margin-bottom: 0;
 }
 
-/* Body text sits directly on the frame's parchment — dark ink, centred,
+/* Body text sits directly on the frame's parchment - dark ink, centred,
    comfortably large (same treatment as #pt-refund-modal / #ach-reset-modal). */
 #eg-forfeit-modal .reset-body-text {
     font-family: var(--F);
@@ -1105,7 +1105,7 @@
         font-weight: 700;
     }
 
-/* Title plaque — keep the deep danger red, sized up a notch so the
+/* Title plaque - keep the deep danger red, sized up a notch so the
    headline matches the settings / how-to-play plaques. The German title
    ("⚠ KARTE VERLASSEN?") needs more of the plaque's flat surface than the
    shared 58 % width gives it, so the plaque is widened for this dialog. */
@@ -1169,7 +1169,7 @@
         color: #fff3cf;
     }
 
-/* CLOSE BUTTON — stone square with X icon, top-right corner (shared asset). */
+/* CLOSE BUTTON - stone square with X icon, top-right corner (shared asset). */
 .modal-box-danger .modal-close {
     position: absolute;
     top: 2%;
@@ -1195,7 +1195,7 @@
 
 /*
     --- 4b. BODY TEXT ---
-    Red-tinted paragraph text used inside danger modal descriptions — dark
+    Red-tinted paragraph text used inside danger modal descriptions - dark
     enough to read on the light parchment card area.
 */
 .reset-body-text {
@@ -1230,10 +1230,10 @@
     }
 
 /* Danger content lives directly on the parchment frame area (no separate
-   card), so flip the shared section styles to the parchment scheme —
+   card), so flip the shared section styles to the parchment scheme -
    scoped to .modal-box-danger so the grey-blue theme modals are untouched.
    (The achievements-reset modal overrides these further below with larger,
-   centered pixel text — see its readability pass.) */
+   centered pixel text - see its readability pass.) */
 .modal-box-danger .modal-section p {
     color: #6b3a1e;
 }
@@ -1243,7 +1243,7 @@
     }
 
     /* .text-accent2 (near-white) inside the reset-body paragraph would be
-       invisible on the parchment — flip it to the dark scheme here. */
+       invisible on the parchment - flip it to the dark scheme here. */
     .modal-box-danger .text-accent2 {
         color: #4a2c12;
     }
@@ -1256,7 +1256,7 @@
 
 /*
     NOTE: The action button row (.modal-actions) for danger modals
-    is defined in Section 1f above — it is shared with all modals.
+    is defined in Section 1f above - it is shared with all modals.
 */
 
 
@@ -1314,7 +1314,7 @@
 }
 
 /* --- 5c. SECTION LABELS (Difficulty / Modifiers) ---
-   Cinzel instead of Press Start 2P — same carved-stone look as the setup
+   Cinzel instead of Press Start 2P - same carved-stone look as the setup
    screen's "GAME DIFFICULTY" / "OPTIONAL MODIFIERS" headings. */
 .retry-setup-section-label {
     font-family: var(--C);
@@ -1360,7 +1360,7 @@
         width: clamp(96px, 18.5cqw, 148px);
     }
 
-    /* Title plate above each slab — same art + proportions as the setup
+    /* Title plate above each slab - same art + proportions as the setup
        screen (plate ≈ 48/168 of the wrapper width). */
     .retry-setup-mods-row .mod-title {
         width: 100%;
@@ -1378,7 +1378,7 @@
         padding: 0;
     }
 
-    /* Icons stay visible (they were hidden in the old compact variant) —
+    /* Icons stay visible (they were hidden in the old compact variant) -
        scaled down from the 128px setup-screen size. */
     .retry-setup-mods-row .mod-icon {
         width: clamp(46px, 9cqw, 70px);
@@ -1394,7 +1394,7 @@
         text-shadow: 0 1px 0 rgba(255, 248, 220, 0.6);
     }
 
-    /* Per-tombstone effect text — only when the tombstone is selected
+    /* Per-tombstone effect text - only when the tombstone is selected
        (same .sel-yellow sibling mechanism as the setup screen). Serif for
        readability, like the hint. */
     .retry-setup-mods-row .mod-per-desc {
@@ -1592,7 +1592,7 @@
 /* Danger boxes are aspect-locked like the tut/changelog boxes: on narrow
    windows release the ratio and switch the vertical paddings to vh units
    (single tall column makes the frame art's top/bottom border outgrow
-   width-based padding — same fix as the tut-box portrait breakpoint). */
+   width-based padding - same fix as the tut-box portrait breakpoint). */
 @media (max-width: 700px) {
     .modal-box-danger {
         aspect-ratio: auto;
@@ -1654,7 +1654,7 @@
     flex-direction: column;
 }
 
-/* TITLE PLAQUE — same asset + geometry as the settings modal, slightly
+/* TITLE PLAQUE - same asset + geometry as the settings modal, slightly
    wider so the longer "KEYBINDS" heading stays comfortably inside. */
 .keybinds-box .modal-title {
     position: absolute;
@@ -1678,7 +1678,7 @@
     z-index: 3;
 }
 
-/* CLOSE BUTTON — stone square with X icon, top-right corner (same asset
+/* CLOSE BUTTON - stone square with X icon, top-right corner (same asset
    as settings; the "✕ CLOSE" text is hidden, the art shows the X). */
 .keybinds-box .modal-close {
     position: absolute;
@@ -1703,7 +1703,7 @@
         transform: scale(1.06);
     }
 
-/* SCROLL PANEL — fills the frame's inner parchment area; the hint + rows
+/* SCROLL PANEL - fills the frame's inner parchment area; the hint + rows
    scroll vertically when they exceed it (mirrors .settings-scroll). */
 .keybinds-scroll {
     flex: 1 1 auto;         /* fill the remaining inner parchment height */
@@ -1717,7 +1717,7 @@
     scrollbar-width: thin;
 }
 
-/* WebKit (Chrome/Edge/Safari) — parchment-toned scrollbar */
+/* WebKit (Chrome/Edge/Safari) - parchment-toned scrollbar */
 .keybinds-scroll::-webkit-scrollbar {
     width: clamp(6px, 0.7vw, 10px);
 }
@@ -1767,7 +1767,7 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 
-/* Key chip — stone tablet (Button-Block-1.png) same as the setup screen
+/* Key chip - stone tablet (Button-Block-1.png) same as the setup screen
    option buttons; pressed/capture state swaps to the darker pressed art. */
 .keybind-key {
     font-family: var(--PX);
@@ -1810,7 +1810,7 @@
     50%      { opacity: 0.45; }
 }
 
-/* Footer action row — the RESET TO DEFAULTS stone button, echoing the
+/* Footer action row - the RESET TO DEFAULTS stone button, echoing the
    setup screen's big stone buttons (Button-Block-1/2.png). */
 .keybinds-actions {
     margin-top: clamp(10px, 1.6vw, 18px);
@@ -1856,7 +1856,7 @@
     ------------------------------------------------------------------------
 */
 
-/* WIDE BOX — same stone frame asset as settings/keybinds, but much wider
+/* WIDE BOX - same stone frame asset as settings/keybinds, but much wider
    (3 columns need the room) and a bit taller (611/470 like keybinds). */
 .modal-box.tut-box {
     position: relative;
@@ -1874,7 +1874,7 @@
        x 0→9% / 91%→100% and y 0→11% / 90%→100% of the 611×409 asset. The
        percentages resolve against the viewport (the containing block) and
        the box is 94vw, so the values hold proportionally until the box hits
-       its max-width — where the px clamps stop them from overgrowing
+       its max-width - where the px clamps stop them from overgrowing
        the frame (≈12% of 1280/0.94 ≈ 164px, etc.). */
     padding: clamp(48px, 12%, 164px) clamp(44px, 11%, 150px) clamp(42px, 11.5%, 157px);
 
@@ -1893,7 +1893,7 @@
     flex-direction: column;
 }
 
-/* TITLE PLAQUE — same asset as the settings modal, but sized to the title:
+/* TITLE PLAQUE - same asset as the settings modal, but sized to the title:
    the plaque art's flat surface is only the middle ~68% of the image (the
    sides taper), so the width scales with the text and the flex centering
    keeps the label on the flat band instead of spilling onto the taper. */
@@ -1924,7 +1924,7 @@
     z-index: 3;
 }
 
-/* CLOSE BUTTON — stone square with X icon, top-right corner (same asset
+/* CLOSE BUTTON - stone square with X icon, top-right corner (same asset
    as settings; the "✕ CLOSE" text is hidden, the art shows the X). */
 .tut-box .modal-close {
     position: absolute;
@@ -1949,7 +1949,7 @@
         transform: scale(1.06);
     }
 
-/* SCROLL PANEL — fills the frame's inner parchment area; the 3-column
+/* SCROLL PANEL - fills the frame's inner parchment area; the 3-column
    card grid scrolls vertically when it exceeds it (mirrors .settings-scroll). */
 .tut-scroll {
     flex: 1 1 auto;         /* fill the remaining inner parchment height */
@@ -1963,7 +1963,7 @@
     scrollbar-width: thin;
 }
 
-/* WebKit (Chrome/Edge/Safari) — parchment-toned scrollbar */
+/* WebKit (Chrome/Edge/Safari) - parchment-toned scrollbar */
 .tut-scroll::-webkit-scrollbar {
     width: clamp(6px, 0.7vw, 10px);
 }
@@ -1976,7 +1976,7 @@
     border-radius: 6px;
 }
 
-/* 3-COLUMN GRID — drops to 2 columns ≤1000px and 1 column ≤700px.
+/* 3-COLUMN GRID - drops to 2 columns ≤1000px and 1 column ≤700px.
    minmax(0, 1fr) instead of plain 1fr: long German compound words would
    otherwise inflate a track's min-content and make the columns unequal.
    align-items: stretch (the default) makes every card in a row grow to its
@@ -2033,7 +2033,7 @@
 
         /* Single-column boxes are much taller than wide, so the frame art's
            top/bottom borders (11%/10% of HEIGHT) outgrow the width-based
-           percent padding — switch those two sides to viewport-height units
+           percent padding - switch those two sides to viewport-height units
            (box height ≈ viewport height here). Left/right stay width-based. */
         padding-top: clamp(48px, 11vh, 164px);
         padding-bottom: clamp(42px, 10vh, 157px);
@@ -2042,7 +2042,7 @@
 
 /* Tiny phones: the plaque's 340px width floor would exceed the box itself
    (box = 94vw − backdrop padding), so pin the plaque to the box and drop
-   the title font a step — the German title still fits the flat surface. */
+   the title font a step - the German title still fits the flat surface. */
 @media (max-width: 400px) {
     .tut-box .modal-title {
         width: min(100%, 340px);
@@ -2050,9 +2050,9 @@
     }
 }
 
-/* STONE CARD — one tutorial section. Cards stretch to their row's tallest
+/* STONE CARD - one tutorial section. Cards stretch to their row's tallest
    sibling (grid stretch), so the base fill shows on odd rows while even
-   rows get the deeper tint below — clean alternating stripes. */
+   rows get the deeper tint below - clean alternating stripes. */
 .tut-section {
     background: rgba(255, 248, 220, 0.55);
     border: 2px solid rgba(44, 26, 12, 0.4);
@@ -2063,7 +2063,7 @@
     margin-bottom: 0; /* grid gap handles the spacing inside .tut-columns */
 }
 
-    /* 2nd, 4th, … rows — deeper parchment tint so short and long cards
+    /* 2nd, 4th, … rows - deeper parchment tint so short and long cards
        align into clean alternating stripes across the whole row. In a
        3-column grid a row is 3 cards, so even rows are the 6n+4/5/6
        cycle (cards 4–6, 10–12, …). */
@@ -2073,7 +2073,7 @@
         background: rgba(214, 190, 150, 0.45);
     }
 
-/* Section heading — stone-brown like the settings hint text. */
+/* Section heading - stone-brown like the settings hint text. */
 .tut-section h3 {
     font-family: var(--PX);
     font-size: clamp(9px, 1vw, 12px);
@@ -2085,7 +2085,7 @@
     overflow-wrap: break-word;
 }
 
-/* Section body — dark brown instead of the shared modal grey-blue, so it
+/* Section body - dark brown instead of the shared modal grey-blue, so it
    reads on the light parchment card. Inline colored <strong>s from the
    translations stay as-is (they're bright enough on parchment). */
 .tut-section p {

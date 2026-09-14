@@ -26,13 +26,13 @@ const BEAR_TIME_LOSS_S_BY_RANK = {
     3: 5,
 };
 
-// Path generation safety cap — prevents infinite loops on large grids
+// Path generation safety cap - prevents infinite loops on large grids
 const BEAR_PATH_EMERGENCY_STOP = 1500;
 
 // Throttle bear reveal sound: only plays once every 8–15 seconds
 let _nextBearRevealSoundTime = 0;
 
-// Active bear movement intervals — stored so they can be killed on level end
+// Active bear movement intervals - stored so they can be killed on level end
 window._bearIntervals = window._bearIntervals || [];
 
 // Live agent-state objects for every currently walking bear
@@ -45,7 +45,7 @@ window._activeBearAgents = window._activeBearAgents || [];
 // agent state and are shown above the bear on the grid instead.
 window._walkerHudState = window._walkerHudState || {};
 
-// Active HUD timer intervals — each entry is { id, loopId }
+// Active HUD timer intervals - each entry is { id, loopId }
 window._walkerHudTimers = window._walkerHudTimers || [];
 
 
@@ -103,7 +103,7 @@ function _revealCellForAgent(r, c) {
 
 
 //------------------------------------------------------------------------
-//--------------------BROWNIAN MOTION — PATH GENERATION------------------
+//--------------------BROWNIAN MOTION - PATH GENERATION------------------
 //------------------------------------------------------------------------
 
 // Returns the first column from the left that still has at least one
@@ -138,7 +138,7 @@ function _buildBearPath(startR, rows, cols, startC = 0) {
     path.push({ r, c });
 
     while (emergencyStop-- > 0) {
-        if (c >= cols - 1) break; // Reached right edge — stop
+        if (c >= cols - 1) break; // Reached right edge - stop
 
         const possibleMoves = [];
 
@@ -160,7 +160,7 @@ function _buildBearPath(startR, rows, cols, startC = 0) {
 
 
 //------------------------------------------------------------------------
-//--------------------BROWNIAN MOTION — BEAR ANIMATION------------------
+//--------------------BROWNIAN MOTION - BEAR ANIMATION------------------
 //------------------------------------------------------------------------
 
 // Creates the floating bear DOM element and sets its initial CSS.
@@ -233,7 +233,7 @@ function _startBearAnimation(path, icon, stepDurationMs, bearName, pathColor, ra
         state.step++;
 
         if (state.step >= state.path.length) {
-            // Path complete — clean up interval, timer label, and bear visual
+            // Path complete - clean up interval, timer label, and bear visual
             _finishBearAgent(state);
             return;
         }
@@ -270,7 +270,7 @@ function _finishBearAgent(state) {
 
 
 //------------------------------------------------------------------------
-//--------------------BROWNIAN MOTION — MAIN ENTRY-----------------------
+//--------------------BROWNIAN MOTION - MAIN ENTRY-----------------------
 //------------------------------------------------------------------------
 
 // Spawns one bear (rank 1–2) or two bears (rank 3) that walk across the grid.
@@ -288,11 +288,11 @@ function _executeBrownianMotion(row, col, paths, rank) {
     // filled yet, so the walk is spent where work remains.
     const startC = _findFirstUnfinishedColumn();
 
-    // Primary bear — Browney
+    // Primary bear - Browney
     const startR1 = Math.floor(Math.random() * rows);
     const path1 = _buildBearPath(startR1, rows, cols, startC);
 
-    // Second bear — Wiener (rank 3 / paths > 1 only)
+    // Second bear - Wiener (rank 3 / paths > 1 only)
     const startR2 = paths > 1 ? Math.floor(Math.random() * rows) : null;
     const path2 = paths > 1 ? _buildBearPath(startR2, rows, cols, startC) : null;
 
@@ -329,7 +329,7 @@ function _executeBrownianMotion(row, col, paths, rank) {
 
 
 //------------------------------------------------------------------------
-//--------------------DRIFTER — STATE & DOM HELPERS----------------------
+//--------------------DRIFTER - STATE & DOM HELPERS----------------------
 //------------------------------------------------------------------------
 
 // Moves the drifter element to the center of the given grid cell.
@@ -401,7 +401,7 @@ function _drifterClear() {
 
 
 //------------------------------------------------------------------------
-//--------------------DRIFTER — LEVEL UP LOGIC---------------------------
+//--------------------DRIFTER - LEVEL UP LOGIC---------------------------
 //------------------------------------------------------------------------
 
 // Returns the number of feed points required to reach the next drifter level.
@@ -441,7 +441,7 @@ function _drifterUpdateXpBar() {
     }
 }
 
-// Public — called externally when the player feeds the drifter a tile reveal.
+// Public - called externally when the player feeds the drifter a tile reveal.
 // Grants bonus lifetime, advances XP, and levels up the drifter if threshold is met.
 window.feedDrifter = function () {
     if (!window._drifterActive) return;
@@ -474,7 +474,7 @@ window.feedDrifter = function () {
 
 
 //------------------------------------------------------------------------
-//--------------------DRIFTER — EXPLOSION PHASE--------------------------
+//--------------------DRIFTER - EXPLOSION PHASE--------------------------
 //------------------------------------------------------------------------
 
 // Strips the drifter's level UI and replaces the icon with a poop emoji
@@ -557,7 +557,7 @@ function _drifterPoopExplosion(el, r, c, rows, cols) {
             return;
         }
 
-        // Countdown hit 0 — detonate!
+        // Countdown hit 0 - detonate!
         clearInterval(window._drifterFuseInterval);
         window._drifterFuseInterval = null;
         _removeWalkerHudIndicator(hudUid);
@@ -578,7 +578,7 @@ function _drifterPoopExplosion(el, r, c, rows, cols) {
 
 
 //------------------------------------------------------------------------
-//--------------------DRIFTER — ROAMING LOOP-----------------------------
+//--------------------DRIFTER - ROAMING LOOP-----------------------------
 //------------------------------------------------------------------------
 
 // Schedules the next drifter movement step using the current interval speed.
@@ -613,7 +613,7 @@ function _drifterStartCountdownTimer(drifterEl, currPos, rows, cols, hudUid) {
         }
 
         if (window._drifterTimeRemainingSeconds <= 0) {
-            // Stop roaming — but keep the DOM element alive for the explosion phase
+            // Stop roaming - but keep the DOM element alive for the explosion phase
             window._drifterActive = false;
             if (window._drifterInterval) { clearTimeout(window._drifterInterval); window._drifterInterval = null; }
             if (window._drifterTimer) { clearInterval(window._drifterTimer); window._drifterTimer = null; }
@@ -626,7 +626,7 @@ function _drifterStartCountdownTimer(drifterEl, currPos, rows, cols, hudUid) {
 
 
 //------------------------------------------------------------------------
-//--------------------DRIFTER — MAIN ENTRY-------------------------------
+//--------------------DRIFTER - MAIN ENTRY-------------------------------
 //------------------------------------------------------------------------
 
 // Summons a roaming drifter dog that walks the grid for `duration` ms,
@@ -687,7 +687,7 @@ function _executeSummonDrifter(duration, interval, smartTarget) {
 
 
 //------------------------------------------------------------------------
-//--------------------HUD TIMER PANEL — HELPERS--------------------------
+//--------------------HUD TIMER PANEL - HELPERS--------------------------
 //------------------------------------------------------------------------
 
 // Returns the walker HUD panel container, creating it if it doesn't exist yet.
@@ -772,7 +772,7 @@ function _startHudCardTicker(uniqueId, initialSeconds, isDrifter) {
 
 
 //------------------------------------------------------------------------
-//--------------------HUD TIMER PANEL — MAIN FUNCTIONS------------------
+//--------------------HUD TIMER PANEL - MAIN FUNCTIONS------------------
 //------------------------------------------------------------------------
 
 // Spawns a live timer card in the HUD panel for an active agent.
@@ -913,7 +913,7 @@ function _redrawBearPathOverlays() {
         return;
     }
 
-    // Only remove the live preview lines — the temporary red "cut" animations
+    // Only remove the live preview lines - the temporary red "cut" animations
     // are separate groups that must survive redraws.
     svg.querySelectorAll('polyline[data-role="bear-path"]').forEach(p => p.remove());
 
@@ -963,7 +963,7 @@ function _playPathCutAnimation(lostSteps, baseColor) {
     setTimeout(() => group.remove(), 1100);
 }
 
-// Public reposition hook — snaps all agents instantly back onto their current
+// Public reposition hook - snaps all agents instantly back onto their current
 // grid cell (no glide across a resized layout) and redraws the path overlays.
 // Wired to window resize, puzzle zoom and clue-side toggles.
 window._repositionRandomWalkerAgents = function () {
@@ -996,7 +996,7 @@ window._repositionRandomWalkerAgents = function () {
 };
 
 window.addEventListener('resize', () => {
-    // Only react while walkers are actually on the grid — avoids spawning
+    // Only react while walkers are actually on the grid - avoids spawning
     // the overlay SVG on menu screens.
     if ((window._activeBearAgents || []).length > 0 || window._drifterActive) {
         window._repositionRandomWalkerAgents();
@@ -1008,14 +1008,14 @@ window.addEventListener('resize', () => {
 //--------------------MISTAKE PENALTY------------------------------------
 //------------------------------------------------------------------------
 
-// Public — called on every real (unabsorbed) player mistake. Instead of
+// Public - called on every real (unabsorbed) player mistake. Instead of
 // fleeing outright, active walkers lose remaining time:
 //   Browney / Wiener lose 15s (rank 1), 10s (rank 2) or 5s (rank 3) each,
 //   Drifter loses 5 seconds of roaming time.
 window.penalizeRandomWalkersOnMistake = function () {
     const DRIFTER_TIME_LOSS_S = 5;
 
-    // Bears — chop steps worth ~N s off the END of each active walk, so
+    // Bears - chop steps worth ~N s off the END of each active walk, so
     // the bear simply stops earlier instead of skipping cells mid-path.
     // The removed tail flashes red on the path preview, then fades out.
     // Loss is rank-scaled: 15s / 10s / 5s for rank 1 / 2 / 3.
@@ -1025,7 +1025,7 @@ window.penalizeRandomWalkersOnMistake = function () {
         const stepsToCut = Math.ceil((bearLoss * 1000) / state.stepDurationMs);
 
         if (remainingSteps <= stepsToCut) {
-            // Not enough walk left to survive the penalty — the entire
+            // Not enough walk left to survive the penalty - the entire
             // remaining tail is lost and the bear heads home early.
             // Finish first, then animate: the cut animation re-shows the
             // overlay even when this was the last active bear.
@@ -1043,7 +1043,7 @@ window.penalizeRandomWalkersOnMistake = function () {
         _redrawBearPathOverlays();
     });
 
-    // Drifter — shave 5 s off its remaining roaming time. If that drains
+    // Drifter - shave 5 s off its remaining roaming time. If that drains
     // the timer completely, its own countdown triggers the explosion.
     if (window._drifterActive) {
         window._drifterTimeRemainingSeconds = Math.max(0, window._drifterTimeRemainingSeconds - DRIFTER_TIME_LOSS_S);
@@ -1067,7 +1067,7 @@ window.clearActiveRandomWalkers = function () {
     (window._activeBearAgents || []).slice().forEach(_finishBearAgent);
     window._activeBearAgents = [];
 
-    // Legacy interval list kept for safety — should already be empty
+    // Legacy interval list kept for safety - should already be empty
     if (window._bearIntervals?.length > 0) {
         window._bearIntervals.forEach(id => clearInterval(id));
         window._bearIntervals = [];

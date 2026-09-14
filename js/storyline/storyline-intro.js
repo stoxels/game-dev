@@ -1,13 +1,13 @@
 ﻿// =============================================================================
-// storyline-intro.js — The Cartographers of Chance
+// storyline-intro.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // Data for the main opening cinematic / intro song (Part 1).
 // Depends on: storyline-engine.js (_wordsFromLine, MAX_SONG_SECTION_LINES,
-// DEFAULT_SLIDE_DURATION_MS, SLIDE_FADE_MS) — must load AFTER that file.
+// DEFAULT_SLIDE_DURATION_MS, SLIDE_FADE_MS) - must load AFTER that file.
 // =============================================================================
 
 // ---------------------------------------------------------------------------
-// INTRO CINEMATIC — IMAGE SLIDESHOW (Part 1: Opening Cinematic)
+// INTRO CINEMATIC - IMAGE SLIDESHOW (Part 1: Opening Cinematic)
 // ---------------------------------------------------------------------------
 //
 // Each slide shows one image from images/Intro/Stoxels_Intro/ (1.jpeg ... 24.jpeg)
@@ -56,7 +56,7 @@ const INTRO_CINEMATIC_IMAGE_PATH = "images/Intro/Stoxels_Intro/";
 
 
 // ---------------------------------------------------------------------------
-// SONG BEATS — karaoke-style intro (Part 1.5: vocal intro song)
+// SONG BEATS - karaoke-style intro (Part 1.5: vocal intro song)
 // ---------------------------------------------------------------------------
 //
 // A "song" beat decouples images from text completely:
@@ -66,16 +66,16 @@ const INTRO_CINEMATIC_IMAGE_PATH = "images/Intro/Stoxels_Intro/";
 //     `time` on a word = the ms (from song start) at which that word should be
 //     FULLY revealed (i.e. finished being "sung"). Letters within the word are
 //     revealed by interpolating between the previous word's time and this one.
-//     `section` groups lines (Verse 1, Chorus, etc.) — lines in the same
+//     `section` groups lines (Verse 1, Chorus, etc.) - lines in the same
 //     section accumulate on screen together; a new section clears the block.
 //   - `audio` is the path to the vocal track. Playback of this file IS the
-//     master clock — both images and lyrics sync to audioEl.currentTime.
+//     master clock - both images and lyrics sync to audioEl.currentTime.
 //
 
-// INTRO_SONG — full intro song, timed from Stoxels_Intro_Song.srt.
+// INTRO_SONG - full intro song, timed from Stoxels_Intro_Song.srt.
 // Each line's start/end comes directly from the SRT (real vocal timing).
 // Word-level reveal within each line is still interpolated evenly across
-// that line's SRT window via _wordsFromLine — true word-by-word timestamps
+// that line's SRT window via _wordsFromLine - true word-by-word timestamps
 // would need finer-grained data than SRT provides (SRT is line-level only),
 // but this means every line change is locked exactly to the vocals, and the
 // typewriter effect within a line plays out at a steady pace across the
@@ -85,12 +85,12 @@ const INTRO_CINEMATIC_IMAGE_PATH = "images/Intro/Stoxels_Intro/";
 // parse script used to build it (parses the .srt, emits one
 // _wordsFromLine(...) call per cue with that cue's real start/end ms).
 const INTRO_SONG = {
-    audio: "audio/Intro/Stoxels_Intro_Song.mp3",
+    audio: "audio/Intro/Stoxels_Intro_Song.ogg",
     imagePath: INTRO_CINEMATIC_IMAGE_PATH,
 
-    // Image timeline — one change roughly every 2 lyric lines, snapped to
+    // Image timeline - one change roughly every 2 lyric lines, snapped to
     // that line's real start time, cycling through images 1-24. Adjust
-    // freely — this list is independent of the lyric timing below.
+    // freely - this list is independent of the lyric timing below.
     images: [
         { image: "0.webp", time: 0},
         { image: "1.webp", time: 5000 },
@@ -129,16 +129,23 @@ const INTRO_SONG = {
         { image: "34.webp", time: 247000 },
         { image: "35.webp", time: 256000 },
         { image: "36.webp", time: 265001 },
-        { image: "37.webp", time: 276501 },
+        // 37.webp is the FINAL image - it must be on screen while the
+        // musician sings the outro ("And you... / Are one of them",
+        // SRT 270001–286000). Cue it to the outro vocal's start (275501),
+        // NOT after it: this is the frame the character-select handoff
+        // freezes (see close() in storyline-engine.js + _csiDissolveIntroOverlay
+        // in character-select.js), so the select screen appears to replace
+        // exactly the image the player was last looking at.
+        { image: "37.webp", time: 275501 },
 
 
     ],
 
-    // Lyric timeline — all 66 lines from the SRT, in order, as bilingual
+    // Lyric timeline - all 66 lines from the SRT, in order, as bilingual
     // entries { section, en, de, s, e }: s/e are the line's real SRT start/end
     // ms; the engine resolves the active language's text into timed words via
     // _wordsFromLine() at playback time (see startSong in storyline-engine.js).
-    // Each line also carries a `section` label (Verse 1, Chorus, etc.) — lines
+    // Each line also carries a `section` label (Verse 1, Chorus, etc.) - lines
     // in the same section accumulate in the display block; a new section
     // clears the block and starts fresh.
     lines: [

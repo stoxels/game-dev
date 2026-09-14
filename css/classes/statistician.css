@@ -300,7 +300,7 @@
     background-image: url('../../images/Class_Spell_Upgrade/degrees_of_freedom.webp');
 }
 
-/* Longer keystone name than "DATA STRIKE" — shrink slightly so EN/DE titles
+/* Longer keystone name than "DATA STRIKE" - shrink slightly so EN/DE titles
    stay on the plaque's flat middle band. */
 .dof-panel .ds-title-text {
     font-size: clamp(11px, 1.8vw, 19px);

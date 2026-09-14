@@ -2,28 +2,28 @@
 //-------------------BOSS: THE FIREFLY (boss_firefly)---------------------
 //------------------------------------------------------------------------
 // The Firefly is an arena-light survival puzzle. The whole screen drowns in
-// darkness; the player's five fairies are the only light sources — and the
+// darkness; the player's five fairies are the only light sources - and the
 // darkness itself is the enemy: stand outside every fairy's light and the
 // dark gnaws you HEAVILY. The swarm is commanded like RTS units: press the
 // Special Ability key (F by default) to send the selected fairy to the
 // mouse cursor, or simply drag a fairy with the mouse. Fairies that cluster
-// overlap their glow — the more that stack, the bigger the safe pool —
+// overlap their glow - the more that stack, the bigger the safe pool -
 // while formation trials force the swarm to spread out.
 //
 // Between trials the boss fights back directly: LUMEN BURSTS. A bright
-// tell blooms somewhere on the grid (~2s), then detonates — searing the
+// tell blooms somewhere on the grid (~2s), then detonates - searing the
 // keeper if she stands inside and chipping every fairy caught in the blast
 // (three hits fell a fairy). Bursts aim at the keeper herself and at the
 // biggest fairy cluster, so the answer is to keep moving AND keep the swarm
 // spread. Trials cancel pending bursts (a set-piece owns the screen).
 //
 // Formation trials (per intended design):
-//   75% HP → LIGHTFALL — all 5 fairies + the keeper in one shared position
+//   75% HP → LIGHTFALL - all 5 fairies + the keeper in one shared position
 //            (10s to gather)
-//   50% HP → SPLIT — 2 groups of fairies, keeper in a third position (15s)
-//   25% HP → SCATTER — every fairy in its own position, keeper in the 5th
+//   50% HP → SPLIT - 2 groups of fairies, keeper in a third position (15s)
+//   25% HP → SCATTER - every fairy in its own position, keeper in the 5th
 //            (20s)
-// Circles are QUOTA-based ("3× fairies"), never per-number — any fairy can
+// Circles are QUOTA-based ("3× fairies"), never per-number - any fairy can
 // fill any slot, and greedy nearest-assignment decides the verdict.
 //
 // Commanding: F sends the SELECTED fairy to the cursor; G cycles which
@@ -64,10 +64,10 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 // ── Tuning ────────────────────────────────────────────────────────────────
-const EG_FIREFLY_COUNT = 5;        // the swarm — permanently flying around the keeper
+const EG_FIREFLY_COUNT = 5;        // the swarm - permanently flying around the keeper
 const EG_FIREFLY_MAX_HP = 3;       // restored on respawn (fairies die outright to trial fails)
 const EG_FIREFLY_RESPAWN_MS = 60000;  // lost lights return after one minute
-// Fairy names so the keeper can tell the swarm apart — shown on the sprites
+// Fairy names so the keeper can tell the swarm apart - shown on the sprites
 // and used in every message that mentions a light.
 const EG_FIREFLY_NAMES = ['Lumina', 'Faye', 'Glimmer', 'Willow', 'Twila'];
 function _egFireflyName(i) {
@@ -78,7 +78,7 @@ function _egFireflyName(i) {
 }
 const EG_FIREFLY_ORBIT_SPEED = 180;   // px/s while orbiting the keeper
 const EG_FIREFLY_FLY_SPEED = 430;    // px/s on a commanded flight
-// Darkness damage: the real threat — the keeper takes heavy ticking damage
+// Darkness damage: the real threat - the keeper takes heavy ticking damage
 // while NO living fairy's light reaches them. Inside light you are simply
 // safe (fairies never hurt their keeper); straying into the dark to fill a
 // cell is the actual risk, and the veil pulses as a damage tell.
@@ -94,11 +94,11 @@ const EG_FIREFLY_BURST_TWINS = 2;        // simultaneous bursts in phase 4
 const EG_FIREFLY_HOLE_R = 150;       // fully lit radius in the darkness mask
 const EG_FIREFLY_FEATHER_R = 235;    // feathered falloff radius beyond that
 // Graduated cluster bonus: every EXTRA fairy inside another's radius widens
-// that fairy's mask hole by this much — 2 huddled fairies light visibly
+// that fairy's mask hole by this much - 2 huddled fairies light visibly
 // more than one, 3 more than 2, up to the full 5-stack. Both the mask hole
 // and the visible halo div grow, so pool size always tells the truth.
 const EG_FIREFLY_CLUSTER_BONUS_R = 55;
-// Fairy emblems — the fairy trio 🧚‍♀️🧚🧚‍♂️, cycled across the five fairies
+// Fairy emblems - the fairy trio 🧚‍♀️🧚🧚‍♂️, cycled across the five fairies
 // (Lumina ♀, Faye neutral, Glimmer ♂, Willow ♀, Twila neutral) so the swarm
 // reads as individual sprites rather than five copies of one glyph.
 const EG_FIREFLY_EMOJIS = ['🧚‍♀️', '🧚', '🧚‍♂️'];
@@ -199,7 +199,7 @@ function _egFireflyStart(monster) {
     run.keyLabel = keyLabel;
     run.flies.forEach(f => { f.keytag.textContent = keyLabel; });
     _egFireflyToast('eg_ff_intro',
-        '✨ The Firefly: command your fairies — they are your only lanterns! {key} sends a fairy to your cursor, {cycle} picks another fairy, {recall} recalls the whole swarm — or simply drag one!',
+        '✨ The Firefly: command your fairies - they are your only lanterns! {key} sends a fairy to your cursor, {cycle} picks another fairy, {recall} recalls the whole swarm - or simply drag one!',
         { key: keyLabel, cycle: cycleLabel, recall: recallLabel });
 
     // Control guide banner: how to command the swarm, shown on level load
@@ -259,7 +259,7 @@ function _egFireflyTick(now) {
         // Keep the selected fairy's key tag honest if the bind changes.
         if (i === run.selected && fly.keytag.textContent !== run.keyLabel) fly.keytag.textContent = run.keyLabel;
         // Clustered tint: a neighbour inside this fairy's radius means the
-        // glows merge — tint the sprite so pairing up reads at a glance.
+        // glows merge - tint the sprite so pairing up reads at a glance.
         fly.el.classList.toggle('eg-firefly-clustered',
             fly.hp > 0 && aliveFlies.some(o => o !== fly && Math.hypot(o.x - fly.x, o.y - fly.y) < EG_FIREFLY_HOLE_R));
     });
@@ -279,7 +279,7 @@ function _egFireflyTick(now) {
     });
 
     // The dark itself is the enemy: while NO living fairy's light reaches
-    // the keeper, it gnaws — heavy, ticking, and telegraphed by a pulsing
+    // the keeper, it gnaws - heavy, ticking, and telegraphed by a pulsing
     // vignette. Inside any light (full radius OR feathered falloff) you are
     // simply safe; fairies never hurt their own keeper.
     if (center) {
@@ -303,13 +303,13 @@ function _egFireflyTick(now) {
         ? _egFireflyText('eg_ff_respawn_entry', '{name}: {s}s', { name: _egFireflyName(i), s: Math.max(0, Math.ceil((fly.respawnAt - now) / 1000)) })
         : '').filter(Boolean);
     run.respawnStatus.textContent = missing.length
-        ? ((t('eg_ff_respawn_bar') || '✦ LIGHT LOST — RESPAWNING: ') + missing.join('  ·  '))
+        ? ((t('eg_ff_respawn_bar') || '✦ LIGHT LOST - RESPAWNING: ') + missing.join('  ·  '))
         : '';
     run.respawnStatus.classList.toggle('eg-firefly-respawn-visible', missing.length > 0);
 
     // Live trial feedback: markers turn green as their quota fills (the
     // YOU circle once the keeper stands in it). Quota check every 5 frames
-    // — greedy assignment on 5 flies is trivially cheap, but no need at
+    // - greedy assignment on 5 flies is trivially cheap, but no need at
     // full frame rate.
     run.frame++;
     // Refresh the command-key labels occasionally (rebinds mid-fight).
@@ -354,7 +354,7 @@ function _egFireflyPaintMask(run) {
     const alive = run.flies.filter(f => f.hp > 0);
     run.flies.forEach(fly => {
         const on = fly.hp > 0;
-        // Graduated cluster bonus — the same radius the tick computes for
+        // Graduated cluster bonus - the same radius the tick computes for
         // the halo div: 1 fairy lights her base pool, each extra huddled
         // fairy adds a full step, so 2 / 3 / 4 / 5 stacks light visibly
         // larger and larger pools.
@@ -391,7 +391,7 @@ function _egFireflyCommand() {
 }
 if (typeof onKeybindAction === 'function') onKeybindAction('eg-special', _egFireflyCommand);
 
-// G (rebindable — "Endgame Special Ability 2", reserved channel): cycles
+// G (rebindable - "Endgame Special Ability 2", reserved channel): cycles
 // WHICH fairy the F command controls. The hand-off gets a short flash so
 // the eye catches which fairy just became targeted even mid-trial.
 function _egFireflyCycle() {
@@ -415,8 +415,8 @@ function _egFireflyCycle() {
 }
 if (typeof onKeybindAction === 'function') onKeybindAction('eg-special-2', _egFireflyCycle);
 
-// H (rebindable — "Endgame Special Ability 3", reserved channel): recalls
-// the WHOLE swarm — every stationed fairy drops its target and resumes its
+// H (rebindable - "Endgame Special Ability 3", reserved channel): recalls
+// the WHOLE swarm - every stationed fairy drops its target and resumes its
 // orbit around the keeper. The go-to panic button when the light gets thin
 // or a burst is about to land on a far-flung cluster.
 function _egFireflyRecallAll() {
@@ -436,7 +436,7 @@ function _egFireflyRecallAll() {
             lastName = _egFireflyName(i);
         }
     });
-    // Only surface a toast when something actually changed — pressing H
+    // Only surface a toast when something actually changed - pressing H
     // with nobody stationed shouldn't spam the log. One fairy reuses the
     // single recall message; several get a count summary.
     if (recalled === 1) {
@@ -498,7 +498,7 @@ document.addEventListener('pointerup', e => {
     e.stopPropagation();
 }, { capture: true });
 
-// Alt-tab, incoming call, missed capture — any lost pointer ends the drag
+// Alt-tab, incoming call, missed capture - any lost pointer ends the drag
 // so a light never stays glued to the cursor.
 document.addEventListener('pointercancel', () => {
     const run = Array.from(_egFireflyRuns.values())[0];
@@ -527,7 +527,7 @@ function _egFireflyBurstRemove(run, burst) {
 
 // Schedule the next burst wave. Phase 1 (above 75%) is calm; from phase 2
 // on the boss lobs light at the keeper and the biggest fairy cluster, and
-// phase 4 fires twin bursts. One timer only — rescheduling replaces it.
+// phase 4 fires twin bursts. One timer only - rescheduling replaces it.
 function _egFireflyBurstSchedule(run, monster, delay) {
     if (run.burstTimer) clearTimeout(run.burstTimer);
     run.burstTimer = null;
@@ -590,11 +590,11 @@ function _egFireflyBurstCast(run, monster, index) {
                 if (Math.hypot(fly.x - x, fly.y - y) > EG_FIREFLY_BURST_R) return;
                 fly.hp -= EG_FIREFLY_BURST_CHIP;
                 if (fly.hp <= 0) {
-                    // Fell to the blast — same loss flow as a failed trial.
+                    // Fell to the blast - same loss flow as a failed trial.
                     fly.hp = 0;
                     fly.respawnAt = performance.now() + EG_FIREFLY_RESPAWN_MS;
                     fly.el.remove(); fly.light.remove();
-                    _egFireflyToast('eg_ff_fairy_down', '⚠️ {name} fell to the burst — she returns in {s} seconds!', { name: _egFireflyName(i), s: EG_FIREFLY_RESPAWN_MS / 1000 });
+                    _egFireflyToast('eg_ff_fairy_down', '⚠️ {name} fell to the burst - she returns in {s} seconds!', { name: _egFireflyName(i), s: EG_FIREFLY_RESPAWN_MS / 1000 });
                 } else {
                     fly.el.classList.add('eg-firefly-chip');
                     setTimeout(() => fly.el.classList.remove('eg-firefly-chip'), 500);
@@ -612,15 +612,15 @@ function _egFireflyBurstCast(run, monster, index) {
 // ── Formation trials ──────────────────────────────────────────────────────
 
 // Trial layouts are QUOTA-based: circles show how many lights each needs,
-// not which numbered light goes where — any light can fill any slot.
-//   phase 2 LIGHTFALL — one circle wanting all 5 fairies, plus YOU
-//   phase 3 SPLIT     — two circles of fairies, plus YOU
-//   phase 4 SCATTER   — five circles of 1 fairy each, plus YOU
+// not which numbered light goes where - any light can fill any slot.
+//   phase 2 LIGHTFALL - one circle wanting all 5 fairies, plus YOU
+//   phase 3 SPLIT     - two circles of fairies, plus YOU
+//   phase 4 SCATTER   - five circles of 1 fairy each, plus YOU
 // Trial layouts are ALIVE-AWARE: circle quotas scale to the fairies currently
 // in the fight, so a fairy you already lost (or a dead fairy mid-respawn)
 // never leaves a circle nobody can fill. Losing a swarm unit still hurts
 // (less light, less flexibility) but a trial is always winnable with the
-// lights you have — no death spiral from a fixed quota you can't reach.
+// lights you have - no death spiral from a fixed quota you can't reach.
 function _egFireflyTrialLayout(phase, alive) {
     const w = window.innerWidth, h = window.innerHeight;
     const n = Math.max(0, Math.min(EG_FIREFLY_COUNT, Number(alive) || 0));
@@ -648,14 +648,14 @@ function _egFireflyTrialLayout(phase, alive) {
 }
 
 const EG_FIREFLY_TRIALS = {
-    2: { seconds: 10, key: 'eg_ff_trial_gather', fallback: 'LIGHTFALL — every light and you into the circle!', severity: 1.0 },
-    3: { seconds: 15, key: 'eg_ff_trial_split', fallback: 'SPLIT — lights in two circles, you take the third!', severity: 1.25 },
-    4: { seconds: 20, key: 'eg_ff_trial_scatter', fallback: 'SCATTER — one light per mark, you to the last circle!', severity: 1.5 },
+    2: { seconds: 10, key: 'eg_ff_trial_gather', fallback: 'LIGHTFALL - every light and you into the circle!', severity: 1.0 },
+    3: { seconds: 15, key: 'eg_ff_trial_split', fallback: 'SPLIT - lights in two circles, you take the third!', severity: 1.25 },
+    4: { seconds: 20, key: 'eg_ff_trial_scatter', fallback: 'SCATTER - one light per mark, you to the last circle!', severity: 1.5 },
 };
 
 // True while a formation trial is running. The encounter engine checks this
 // (via the window flag) to freeze the player's charge-up attack bar during
-// the trial — a coordination set-piece, not free auto-attack time, same
+// the trial - a coordination set-piece, not free auto-attack time, same
 // pattern as the Clock's Time Freeze or the Snail's finisher.
 function _egFireflyTrialActive() {
     const run = Array.from(_egFireflyRuns.values())[0];
@@ -669,7 +669,7 @@ function _egFireflyStartTrial(monster, phase) {
     const spec = EG_FIREFLY_TRIALS[phase];
     if (!spec) return; // phase 1 has no trial
     // The set-piece owns the attack cadence: no NEW bursts are scheduled
-    // while a trial runs. Bursts already telegraphed keep their timers —
+    // while a trial runs. Bursts already telegraphed keep their timers -
     // their tells are on screen and dodging them stays part of the trial.
     if (run.burstTimer) { clearTimeout(run.burstTimer); run.burstTimer = null; }
     const alive = run.flies.filter(f => f.hp > 0).length;
@@ -706,7 +706,7 @@ function _egFireflyInTarget(fly, target) {
 }
 
 // Greedy quota fill: each living light claims the nearest circle that still
-// has free capacity. Lights are interchangeable — only the counts matter.
+// has free capacity. Lights are interchangeable - only the counts matter.
 function _egFireflyAssignToCircles(run, trial) {
     const capacity = trial.circles.map(c => c.quota);
     const assignment = new Map(); // flyIndex → circleIndex (or -1)
@@ -733,7 +733,7 @@ function _egFireflyResolveTrial(monster, run) {
     let failedLights = 0;
     const lostNames = [];
     run.flies.forEach((fly, i) => {
-        // A light that's already down was counted when it fell — don't reset
+        // A light that's already down was counted when it fell - don't reset
         // its respawn timer here.
         if (fly.hp <= 0) return;
         if (assignment.get(i) === -1) {
@@ -760,10 +760,10 @@ function _egFireflyResolveTrial(monster, run) {
         _egNkToast('eg_ff_trial_fail', '💥 The formation collapsed! The burst sears through the dark!');
         // Name the lost lights so the keeper knows exactly who to wait for.
         if (lostNames.length === 1) {
-            _egFireflyToast('eg_ff_light_lost', '⚠️ {name} missed the mark and was lost — she returns in {s} seconds!',
+            _egFireflyToast('eg_ff_light_lost', '⚠️ {name} missed the mark and was lost - she returns in {s} seconds!',
                 { name: lostNames[0], s: EG_FIREFLY_RESPAWN_MS / 1000 });
         } else if (lostNames.length > 1) {
-            _egFireflyToast('eg_ff_lights_lost', '⚠️ {names} missed the mark and were lost — they return in {s} seconds!',
+            _egFireflyToast('eg_ff_lights_lost', '⚠️ {names} missed the mark and were lost - they return in {s} seconds!',
                 { names: lostNames.join(', '), s: EG_FIREFLY_RESPAWN_MS / 1000 });
         }
     } else {

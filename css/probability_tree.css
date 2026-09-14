@@ -98,7 +98,7 @@
     color: var(--yellow);
 }
 
-/* -- Refund All button — pushed to the right edge via auto margin, so it
+/* -- Refund All button - pushed to the right edge via auto margin, so it
    sits between the centred search field and the points counter -- */
 #btn-pt-refund-all {
     margin-left: auto;

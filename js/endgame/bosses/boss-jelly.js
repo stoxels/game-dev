@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE JELLY (boss_jelly)-------------------------------
 //------------------------------------------------------------------------
-// Dragon-Quest homage and first-steps fight — a cold-element blob boss
+// Dragon-Quest homage and first-steps fight - a cold-element blob boss
 // that teaches dodging hop shadows. The fight has three acts:
-//   Phase 1 (100–50%): Jelly Hops — the classic chained hop attack. The
+//   Phase 1 (100–50%): Jelly Hops - the classic chained hop attack. The
 //     Jelly telegraphs slow hops toward where you stand. Watch the shadow,
 //     leave before it lands.
 //   Phase 2 (50–20%): ICE SHELL. At 50% the Jelly hardens behind a green
-//     immunity shield — projectiles and auto attacks deal nothing. The
+//     immunity shield - projectiles and auto attacks deal nothing. The
 //     floor ices over while the Jelly lobs single hop blobs at you. Lure a
 //     hop blob onto an icy cell: it slips on the frost and jumps straight
 //     into the Jelly, shattering the shell so the fight can continue.
@@ -32,10 +32,10 @@ Object.assign(EG_BOSS_DEFS, {
 });
 
 Object.assign(EG_BOSS_MECHANICS, {
-    // boss_jelly — "The Jelly"
+    // boss_jelly - "The Jelly"
     // The phase thresholds double as the fight's signature moments:
     //   ≤50% HP enters the Ice Shell immunity gate (held until a hop blob
-    //   slips on ice — see _egJellyOnPhaseEnter) and ≤20% triggers the
+    //   slips on ice - see _egJellyOnPhaseEnter) and ≤20% triggers the
     //   one-shot Jelly Army wave.
     boss_jelly: {
         phases: [
@@ -48,7 +48,7 @@ Object.assign(EG_BOSS_MECHANICS, {
             { name: 'jelly_hops', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechJellyHops' },
             { name: 'probability_shift', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechProbabilityShift' },
         ],
-        // Phase-enter hook — see _egJellyOnPhaseEnter below.
+        // Phase-enter hook - see _egJellyOnPhaseEnter below.
         onPhaseEnter: _egJellyOnPhaseEnter,
     },
 });
@@ -59,7 +59,7 @@ const EG_JELLY_HOP_ARC_PX = 90;           // arc height of a hop flight
 const EG_JELLY_SLIP_TO_BOSS_MS = 750;     // glide duration once a blob slips on ice
 const EG_JELLY_SLIP_ARC_PX = 70;          // second small arc of the slip launch
 
-// Ice Shell (P2) knobs. Times are run-clock ms — dodge runs run on the
+// Ice Shell (P2) knobs. Times are run-clock ms - dodge runs run on the
 // tier-scaled clock (gentler on tier 1, see _egNkNewRun), so these feel
 // the same on every boss tier.
 const EG_JELLY_GATE_DMG_PCT = 0.12;       // damage when a shell-phase blob lands on you
@@ -78,7 +78,7 @@ const EG_JELLY_ARMY_STAGGER_MS = 780;     // delay between consecutive spawns
 const EG_JELLY_ARMY_DMG_PCT = 0.085;      // per-blob damage when one lands on you
 const EG_JELLY_ARMY_REST_MS = 420;        // blob readies itself before targeting
 const EG_JELLY_ARMY_WARN_MS = 850;        // shadow telegraph + flight duration
-const EG_JELLY_ARMY_RADIUS = 46;          // tighter mark/hitbox — a weave, not a single jump
+const EG_JELLY_ARMY_RADIUS = 46;          // tighter mark/hitbox - a weave, not a single jump
 
 
 // ── Module-level state ──────────────────────────────────────────────────────
@@ -219,7 +219,7 @@ function _egJellyStepBlob(b, dtMs, slipOk) {
 
 
 // ── Ice on the ground (Ice Shell) ───────────────────────────────────────────
-// While the shell is up the Jelly ices random EMPTY grid cells — purely
+// While the shell is up the Jelly ices random EMPTY grid cells - purely
 // visual floor patches (cells stay fully playable). A hop blob that lands on
 // one slips. Ice melts on a timer and is topped back up so the player always
 // has a patch to lure a blob onto.
@@ -229,7 +229,7 @@ function _egJellyIcePickTargets(gate, count) {
     const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
-    const clean = [];   // untouched cells — ideal ice spots
+    const clean = [];   // untouched cells - ideal ice spots
     const any = [];     // fallback so a solved grid can never soft-lock the shell
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -280,7 +280,7 @@ function _egJellyPruneIce(gate, dtMs) {
 }
 
 
-// Finds the icy patch (if any) sitting under the point (x, y) — with
+// Finds the icy patch (if any) sitting under the point (x, y) - with
 // forgiving padding so a blob landing at a cell's edge still slips.
 function _egJellyIceAt(x, y) {
     const g = _egJellyGate;
@@ -337,7 +337,7 @@ function _egJellyShowGuide(g, entry) {
 // While a shell blob is alive, keeps the green hold-spot marker truthful:
 // during the blob's rest phase (before it locks) EVERY icy patch is a valid
 // lure spot, so they all glow green and a bouncing "STAND HERE" pill sits
-// above the one nearest the avatar — the blob locks onto wherever the
+// above the one nearest the avatar - the blob locks onto wherever the
 // player stands, so that patch is where it will land and slip. Once the
 // blob locks (warn/fly) it marks the locked landing cell, so the player
 // sees exactly where the blob will slip. No marker = not on ice.
@@ -368,7 +368,7 @@ function _egJellySyncSafeMark(g) {
 
 
 // A shell blob just locked onto the player (its shadow mark appeared): every
-// icy patch pulses once — "a hop is incoming — ice is where it breaks".
+// icy patch pulses once - "a hop is incoming - ice is where it breaks".
 function _egJellyBlobLockedCue() {
     const g = _egJellyGate;
     if (!g || !g.ice || g.ice.size === 0) return;
@@ -392,7 +392,7 @@ function _egJellyBlobLockedCue() {
 
 function _egJellyStartShieldGate(monster) {
     if (!monster || monster.jellyShieldUp) return;
-    monster.bossImmune = true;              // the transition set this — keep it held
+    monster.bossImmune = true;              // the transition set this - keep it held
     monster.jellyShieldUp = true;
 
     const run = _egNkNewRun(monster.id, true);
@@ -424,7 +424,7 @@ function _egJellyStartShieldGate(monster) {
 
     _egJellyTopUpIce(gate, EG_JELLY_ICE_TARGET);
     _egNkToast('eg_jelly_ice_shell',
-        '🟢 The Jelly: Ice Shell! Stand on the ❄️ ice — the next blob slips and breaks it!', '#4ade80');
+        '🟢 The Jelly: Ice Shell! Stand on the ❄️ ice - the next blob slips and breaks it!', '#4ade80');
     if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e) {} }
 
     _egNkLoop(run, (dtS) => {
@@ -436,7 +436,7 @@ function _egJellyStartShieldGate(monster) {
 
         _egJellyPlaceBubble(g);
 
-        // Floor upkeep: melt expired ice (per-frame — at most 3 patches)
+        // Floor upkeep: melt expired ice (per-frame - at most 3 patches)
         // and top the floor back up to the target count on a short cadence.
         _egJellyPruneIce(g, dtMs);
         g.refillAt -= dtMs;
@@ -500,7 +500,7 @@ function _egJellyPlaceBubble(g) {
 }
 
 
-// A hop blob slipped on the ice and slammed into the boss — break the shell.
+// A hop blob slipped on the ice and slammed into the boss - break the shell.
 function _egJellyShieldBroken(monster, run) {
     if (!monster) return;
     monster.bossImmune = false;
@@ -508,9 +508,9 @@ function _egJellyShieldBroken(monster, run) {
     _egJellyDropGateVisuals(_egJellyGate);
     _egJellyShatterBurst(monster);
     _egNkToast('eg_jelly_ice_broken',
-        '💥 The Ice Shell shatters — The Jelly is vulnerable!', '#4ade80');
+        '💥 The Ice Shell shatters - The Jelly is vulnerable!', '#4ade80');
     if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e) {} }
-    // The shell was the phase-2 opener — now the fight runs normally.
+    // The shell was the phase-2 opener - now the fight runs normally.
     if (monster.bossPhase === 2 && typeof _egBossScheduleMechanics === 'function') {
         try { _egBossScheduleMechanics(monster, 2); } catch (e) {}
     }
@@ -555,7 +555,7 @@ function _egJellyStartArmy(monster) {
     run.onKill = () => { if (_egJellyArmy && _egJellyArmy.run === run) _egJellyArmy = null; };
 
     _egNkToast('eg_mech_jelly_army',
-        '🟢 The Jelly: Jelly Army! 10 hop blobs incoming — dodge the shadows!', '#7dd3fc');
+        '🟢 The Jelly: Jelly Army! 10 hop blobs incoming - dodge the shadows!', '#7dd3fc');
 
     _egNkLoop(run, (dtS) => {
         const a = _egJellyArmy;
@@ -606,7 +606,7 @@ function _egJellyOnPhaseEnter(monster, newPhase) {
 //------------------------------------------------------------------------
 // The classic act: one chained hop blob follows you for 3–4 hops, each hop
 // re-telegraphing to where you stand at that moment. Watch the shadow,
-// leave before it lands. Not used while the Ice Shell holds — the shell
+// leave before it lands. Not used while the Ice Shell holds - the shell
 // phase only lobs single hop blobs (see _egJellyStartShieldGate).
 
 function _egMechJellyHops(monster, phase) {

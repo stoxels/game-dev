@@ -2,7 +2,7 @@
 //-------------------BOSS: THE NEMESIS (boss_nemesis)---------------------------
 //------------------------------------------------------------------------
 // Pinnacle hunter: a dense storm spiral to drown in, interleaved with
-// aimed reaper fans that punish every pause. There is no rest here —
+// aimed reaper fans that punish every pause. There is no rest here -
 // only gaps, and they move.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

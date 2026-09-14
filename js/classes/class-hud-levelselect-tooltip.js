@@ -7,7 +7,7 @@
 // _formatCooldownLabel, _calcTooltipPosition, _applyTooltipPosition.
 
 //------------------------------------------------------------------------
-//----------LEVEL-SELECT TOOLTIP — COOLDOWN & RANK BADGE HELPERS---------
+//----------LEVEL-SELECT TOOLTIP - COOLDOWN & RANK BADGE HELPERS---------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ function _buildMaxRankBadge(level) {
 
 
 //------------------------------------------------------------------------
-//----------LEVEL-SELECT CLASS TOOLTIP — DATA HELPERS--------------------
+//----------LEVEL-SELECT CLASS TOOLTIP - DATA HELPERS--------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ function _buildLsSkillBlock(nameHTML, rankWord, level, maxLevel, cooldownSeconds
     return `
         <div style="color:#f1c40f;margin-bottom:2px;">
             🎯 ${nameHTML}
-            <span style="opacity:.6;font-size:.85em">— ${rankWord} ${level}/${maxLevel}${_buildMaxRankBadge(level)}</span>
+            <span style="opacity:.6;font-size:.85em">- ${rankWord} ${level}/${maxLevel}${_buildMaxRankBadge(level)}</span>
             ${_buildLsCooldownAnnotation(cooldownSeconds, baseCooldownSeconds)}
         </div>
         <div style="color:#ccc;">${descHTML}</div>`;
@@ -119,7 +119,7 @@ function _buildLsAscendencySection(rankWord) {
 
 
 //------------------------------------------------------------------------
-//----------LEVEL-SELECT CLASS TOOLTIP — MAIN BUILDER--------------------
+//----------LEVEL-SELECT CLASS TOOLTIP - MAIN BUILDER--------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ function buildLsClassTooltipHTML() {
         <div style="margin-bottom:7px;">
             <div style="color:${HUD_COLOR_PASSIVE};margin-bottom:2px;">
                 ⚡ ${passName}
-                <span style="opacity:.6;font-size:.85em">— ${rankWord} ${passLv}/3${_buildMaxRankBadge(passLv)}</span>
+                <span style="opacity:.6;font-size:.85em">- ${rankWord} ${passLv}/3${_buildMaxRankBadge(passLv)}</span>
             </div>
             <div style="color:#ccc;">${passDesc}</div>
         </div>
@@ -171,7 +171,7 @@ function buildLsClassTooltipHTML() {
 
 
 //------------------------------------------------------------------------
-//----------LEVEL-SELECT CLASS TOOLTIP — DOM & VISIBILITY----------------
+//----------LEVEL-SELECT CLASS TOOLTIP - DOM & VISIBILITY----------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 

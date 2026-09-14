@@ -19,7 +19,7 @@
 //------------------------------------------------------------------------
 
 // Maps internal mod keys to their short display abbreviations.
-// NOTE: superTutor is deliberately absent — it is a temporary beta-testing
+// NOTE: superTutor is deliberately absent - it is a temporary beta-testing
 // cheat mode that contributes nothing to scoring, so it must never appear
 // in the highscore table (see HS_SCORED_MODS below).
 const MOD_ABBR_MAP = {
@@ -31,7 +31,7 @@ const MOD_ABBR_MAP = {
 };
 
 // The mod keys that legitimately contribute to a score. Only these are ever
-// displayed in the table — anything else found in a saved mods object
+// displayed in the table - anything else found in a saved mods object
 // (e.g. the temporary superTutor beta cheat flag) is filtered out.
 const HS_SCORED_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
 
@@ -45,7 +45,7 @@ let hsSlotFilter = 0;
 // fall back to the global bright screen colors if that sheet is missing.
 const DIFF_COLOR_MAP = {
     easy: 'var(--hs-diff-easy, var(--green))',
-    normal: 'var(--hs-diff-normal, var(--hs-row-text))',   // neutral — normal is intentionally understated
+    normal: 'var(--hs-diff-normal, var(--hs-row-text))',   // neutral - normal is intentionally understated
     hard: 'var(--hs-diff-hard, var(--red))'
 };
 
@@ -99,8 +99,8 @@ function buildSlotHighscores(slotNum) {
 }
 
 // Aggregates the all-time best highscore for every level across ALL save
-// slots (SAVE_SLOT_COUNT in state.js). For each level the winning entry —
-// the highest score, wherever it was achieved — keeps its own difficulty,
+// slots (SAVE_SLOT_COUNT in state.js). For each level the winning entry -
+// the highest score, wherever it was achieved - keeps its own difficulty,
 // its own modifiers and the slot number it was set in.
 function buildCrossSlotHighscores() {
     const best = {};
@@ -157,12 +157,12 @@ function buildModSeparator() {
 }
 
 // Converts a mods object into a string of colored <span> elements joined by "+".
-// Only scored modifiers (HS_SCORED_MODS) are shown — a saved mods object can
+// Only scored modifiers (HS_SCORED_MODS) are shown - a saved mods object can
 // still carry the temporary superTutor beta flag, which never contributed to
 // scoring and must not appear in the table.
-// Returns "—" if no scored mods are active or if the mods object is missing.
+// Returns "-" if no scored mods are active or if the mods object is missing.
 function formatModsString(mods) {
-    if (!mods) return '—';
+    if (!mods) return '-';
 
     const activeSpans = HS_SCORED_MODS
         .filter(m => mods[m])
@@ -170,12 +170,12 @@ function formatModsString(mods) {
 
     return activeSpans.length
         ? activeSpans.join(buildModSeparator())
-        : '—';
+        : '-';
 }
 
-// Resolves the display label for a difficulty value, or "—" if not set.
+// Resolves the display label for a difficulty value, or "-" if not set.
 function getDiffLabel(diff) {
-    return diff ? t('diff_' + diff) : '—';
+    return diff ? t('diff_' + diff) : '-';
 }
 
 
@@ -187,8 +187,8 @@ function getDiffLabel(diff) {
 //------------------------------------------------------------------------
 
 // Builds the HTML for a single row in the highscore table.
-// lv — the level object (has .world and .li)
-// hs — the cross-slot best highscore (has .score, .diff, .mods, .slot)
+// lv - the level object (has .world and .li)
+// hs - the cross-slot best highscore (has .score, .diff, .mods, .slot)
 function buildHSTableRow({ lv, hs }) {
     const diffLabel = getDiffLabel(hs.diff);
     const diffColor = getDiffColor(hs.diff);
@@ -285,7 +285,7 @@ function _updateHSScrollMoverPosition() {
     thumb.style.top = (topInset + scrollPct * maxThumbTravel) + 'px';
 }
 
-// Scrolls #hs-body so the thumb center lands on the given pointer position —
+// Scrolls #hs-body so the thumb center lands on the given pointer position -
 // the inverse of _updateHSScrollMoverPosition(), used by drag/click.
 function _hsScrollFromPointer(scrollEl, track, thumb, clientY) {
     const scrollable = scrollEl.scrollHeight - scrollEl.clientHeight;

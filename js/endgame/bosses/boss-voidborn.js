@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE VOIDBORN (boss_voidborn)-------------------------
 //------------------------------------------------------------------------
-// Pinnacle hunger: a collapsing choice — two zones, only the marked one
-// real, and the choice comes fast — while void tendrils crawl after you
+// Pinnacle hunger: a collapsing choice - two zones, only the marked one
+// real, and the choice comes fast - while void tendrils crawl after you
 // from every corner. Choose quickly, then keep running from your choice.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -74,7 +74,7 @@ function _egMechVoidChoice(monster, phase) {
     };
     const elA = mkZone(a, realFirst);
     const elB = mkZone(b, !realFirst);
-    _egNkToast('eg_mech_voidborn', '🌚 The Voidborn: Void Choice! Only the ✨ zone is real — hurry!');
+    _egNkToast('eg_mech_voidborn', '🌚 The Voidborn: Void Choice! Only the ✨ zone is real - hurry!');
     let e = 0, resolved = false;
     _egNkLoop(run, (dtS) => {
         e += dtS * 1000;

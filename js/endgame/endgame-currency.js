@@ -68,7 +68,7 @@ function _egRerollItemModValues(item, modTable) {
         const family = section && (section[mod.familyId]
             || Object.values(section).find(f => f.id === mod.familyId));
         const tierObj = family && family.tiers.find(tr => tr.tier === mod.tier);
-        if (!family || !tierObj) return mod; // unknown family/tier — keep as-is
+        if (!family || !tierObj) return mod; // unknown family/tier - keep as-is
         return { ...mod, rolledStats: _egBuildRolledStats(family, tierObj) };
     });
     return { ...item, mods };
@@ -246,7 +246,7 @@ const EG_CURRENCY_DEFS = {
         description: t('eg_orb_chance_desc'),
         canApply(item) { return item.rarity === 'common'; },
         apply(item) {
-            // ~2.5% chance to act like an Ancient Orb — eligible uniques are
+            // ~2.5% chance to act like an Ancient Orb - eligible uniques are
             // same slotType with required level <= source item's level.
             const UNIQUE_CHANCE = 0.025;
             if (Math.random() < UNIQUE_CHANCE
@@ -276,7 +276,7 @@ const EG_CURRENCY_DEFS = {
         },
     },
 
-    // Blessing Orb — rerolls the numeric values of an item's IMPLICIT modifiers (PoE Blessed Orb).
+    // Blessing Orb - rerolls the numeric values of an item's IMPLICIT modifiers (PoE Blessed Orb).
     // Only orb that can touch implicits; regular orbs preserve them.
     orb_blessing: {
         id: 'orb_blessing', name: t('eg_orb_blessing'), icon: '🙏',
@@ -291,14 +291,14 @@ const EG_CURRENCY_DEFS = {
         },
     },
 
-    // MAP ONLY — raises a map's tier by one. Equipment can never be a
+    // MAP ONLY - raises a map's tier by one. Equipment can never be a
     // target (canApply rejects non-maps); maps route through the dedicated
     // EG_MAP_CURRENCY_RULES entry in endgame-maps.js.
     orb_horizons: {
         id: 'orb_horizons', name: t('eg_orb_horizons'), icon: '🌌',
         description: t('eg_orb_horizons_desc'),
         canApply(item) { return item.category === 'map'; },
-        apply(item) { return item; }, // unused — see EG_MAP_CURRENCY_RULES
+        apply(item) { return item; }, // unused - see EG_MAP_CURRENCY_RULES
     },
 
     // Creates a copy of an item in the next free inventory slot.
@@ -312,7 +312,7 @@ const EG_CURRENCY_DEFS = {
     },
 
     // Adds one modifier to a rare item (stays rare). Also works on an uncommon
-    // item with 1 modifier to fill its second slot — the budget Exalted for
+    // item with 1 modifier to fill its second slot - the budget Exalted for
     // blue/green gear. Mirrors the requested "about as common as Regal" niche.
     orb_bloom: {
         id: 'orb_bloom', name: t('eg_orb_bloom'), icon: '🌸',
@@ -324,7 +324,7 @@ const EG_CURRENCY_DEFS = {
             return false;
         },
         apply(item) {
-            // stays at the same rarity — only the mod count grows
+            // stays at the same rarity - only the mod count grows
             const updated = _egAddOneModToItem(item, item.rarity);
             const name = _egBuildItemName(updated.baseName || updated.name, updated.rarity, updated.mods);
             return { ...updated, name };
@@ -356,7 +356,7 @@ const EG_CURRENCY_DEFS = {
     },
 };
 
-// Helper: eligible uniques for Ancient Orb — same slotType and required level <= source
+// Helper: eligible uniques for Ancient Orb - same slotType and required level <= source
 function _egGetAncientOrbEligibleUniques(item) {
     if (!item || typeof EG_UNIQUE_ITEMS === 'undefined' || !Array.isArray(EG_UNIQUE_ITEMS)) return [];
     const slot = item.slotType;
@@ -391,7 +391,7 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_bloom', weight: 85 },
     { id: 'orb_chaos', weight: 55 },
     { id: 'orb_divine', weight: 35 },
-    // Epic-tier orbs — deliberately much more common than before so that
+    // Epic-tier orbs - deliberately much more common than before so that
     // endgame crafting is actually reachable through normal play.
     // Orb of Ascension heavily buffed per player feedback (was 22).
     { id: 'orb_elevation', weight: 45 },
@@ -400,7 +400,7 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_exalted', weight: 22 },
     // Mirror stays genuinely rare, but shows up over a long session.
     { id: 'mirror_of_kalandra', weight: 5 },
-    // Ancient Orb — very rare (rarer than exalted, near-mirror tier).
+    // Ancient Orb - very rare (rarer than exalted, near-mirror tier).
     { id: 'orb_ancient', weight: 4 },
 ];
 
@@ -590,7 +590,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.mirrored = true;
                 const pos = _egAddItemToStash(copy);
-                // consume mirror below — handled after early return path
+                // consume mirror below - handled after early return path
                 // consume and update source
                 stack.count = (stack.count || 1) - 1;
                 if (stack.count <= 0) _egCurrencyStash[sourceRow][sourceCol] = null;
@@ -737,7 +737,7 @@ document.addEventListener('contextmenu', function (e) {
     if (!chip || (typeof _dndChipScreenEl === 'function' ? !_dndChipScreenEl(chip) : !chip.closest('#screen-endgame-hub'))) return;
 
     const currencyCell = chip.closest('.eg-currency-cell');
-    if (!currencyCell) return; // not currency — let the normal handler deal with it
+    if (!currencyCell) return; // not currency - let the normal handler deal with it
 
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -819,7 +819,7 @@ document.addEventListener('mousedown', function (e) {
             else targetItem = _egMapStash[r][c];
         } catch(e) { targetItem = null; }
         applyFn = (newItem) => {
-            // Horizons changes tier — move item to its new tier if needed
+            // Horizons changes tier - move item to its new tier if needed
             const oldTier = activeTier;
             const newTier = (newItem && newItem.mapTier != null) ? newItem.mapTier : oldTier;
             if (newTier !== oldTier && typeof _egGetMapTierGrid === 'function') {
@@ -861,7 +861,7 @@ document.addEventListener('mousedown', function (e) {
             _egEquipped[slotId] = newItem;
             _egRenderEquipSlot(slotId);
             // Rerolled mods change the attribute totals, which can flip the
-            // requirement-blocked (red) state of other items — refresh both
+            // requirement-blocked (red) state of other items - refresh both
             // the stash and all paperdoll slots.
             _egRenderInventory();
             _egRenderEquipSlots();

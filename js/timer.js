@@ -7,7 +7,7 @@
 // (normal vs time trial) is known.
 let timerSecs = 0;
 
-// ID returned by setInterval — kept so we can cancel the loop via
+// ID returned by setInterval - kept so we can cancel the loop via
 // clearInterval() in stopTimer() / pauseTimer().
 let timerInterval = null;
 
@@ -45,9 +45,9 @@ function _formatTimerDisplay(totalSecs) {
 
 // Returns the CSS class name that matches the current urgency level, or
 // an empty string when the timer is in its normal state.
-//   'danger'  — ≤ 60 s  — red fast-blink
-//   'warn'    — ≤ 180 s — orange slow-blink
-//   ''        — > 180 s — default accent colour
+//   'danger'  - ≤ 60 s  - red fast-blink
+//   'warn'    - ≤ 180 s - orange slow-blink
+//   ''        - > 180 s - default accent colour
 function _getTimerUrgencyClass(secs) {
     if (secs <= 60) return 'danger';
     if (secs <= 180) return 'warn';
@@ -63,10 +63,10 @@ function _getTimerUrgencyClass(secs) {
 // Returns the vignette tier class for the current timerSecs, or '' when
 // above all thresholds. Mirrors _getTimerUrgencyClass()'s breakpoints but
 // drives the full-screen edge effect instead of just the clock text.
-//   'ltv-tier3' — ≤ 120s  (2 min, strongest)
-//   'ltv-tier2' — ≤ 300s  (5 min)
-//   'ltv-tier1' — ≤ 600s  (10 min)
-//   ''          — > 600s
+//   'ltv-tier3' - ≤ 120s  (2 min, strongest)
+//   'ltv-tier2' - ≤ 300s  (5 min)
+//   'ltv-tier1' - ≤ 600s  (10 min)
+//   ''          - > 600s
 function _getLowTimeVignetteTier(secs) {
     if (secs <= 120) return 'ltv-tier3';
     if (secs <= 300) return 'ltv-tier2';
@@ -83,7 +83,7 @@ function _applyLowTimeVignette() {
 
     el.classList.remove('ltv-tier1', 'ltv-tier2', 'ltv-tier3');
 
-    // Setting disabled, or timer frozen / Golden Clock active — no vignette
+    // Setting disabled, or timer frozen / Golden Clock active - no vignette
     if (!SETTINGS.lowTimeVignette || timerFrozen || window.STOX_FLAGS.goldenClockActive) return;
 
     const tier = _getLowTimeVignetteTier(timerSecs);
@@ -98,15 +98,15 @@ function _applyLowTimeVignette() {
 // Returns the vignette tier for the current health percentage, or '' when
 // above the threshold. Independent from the timer vignette so both can be
 // visible simultaneously (blue for time, red for health).
-//   'lhv-active' — ≤ 35% HP
-//   ''           — > 35% HP
+//   'lhv-active' - ≤ 35% HP
+//   ''           - > 35% HP
 function _getLowHealthVignetteTier(pct) {
     if (pct <= 0.35) return 'lhv-active';
     return '';
 }
 
 // Applies (or clears) the correct tier class on the health vignette element.
-// Suppressed only by its own settings toggle — health vignette is not tied
+// Suppressed only by its own settings toggle - health vignette is not tied
 // to timerFrozen / Golden Clock. Uses SETTINGS.lowHealthVignette (falls back
 // to lowTimeVignette if the new key is missing from an old save).
 function _applyLowHealthVignette() {
@@ -137,7 +137,7 @@ function _applyLowHealthVignette() {
 //-------------------LOW-TIME WARNING (CENTER OVERLAY)----------------------
 // Mirrors the endgame mistake/health/shield banners but fires for the
 // countdown timer at 300s (5 min), 120s (2 min) and 30s remaining.
-// Works in both endgame and normal levels — driven purely by timerSecs
+// Works in both endgame and normal levels - driven purely by timerSecs
 // and independent of _egIsActive.
 let _lowTimeWarningShown = { 300: false, 120: false, 30: false };
 let _lowTimeLastSecs = null;
@@ -212,7 +212,7 @@ function _maybeShowLowTimeWarning() {
     if (typeof dead !== 'undefined' && dead) return;
     if (typeof timerSecs === 'undefined') return;
     if (timerSecs <= 0) return;
-    // No active puzzle/level — don't spam in menus/lobby
+    // No active puzzle/level - don't spam in menus/lobby
     if (typeof cur !== 'undefined' && !cur) {
         _lowTimeLastSecs = timerSecs;
         return;
@@ -252,7 +252,7 @@ function _applyTimerDisplayState(el) {
     el.style.color = '';
 
     if (timerFrozen) {
-        el.style.color = '#6cf'; // icy blue — overrides CSS
+        el.style.color = '#6cf'; // icy blue - overrides CSS
         return;
     }
 
@@ -261,7 +261,7 @@ function _applyTimerDisplayState(el) {
 }
 
 
-// updTimer — refreshes the #timer-val element to match timerSecs and
+// updTimer - refreshes the #timer-val element to match timerSecs and
 // re-applies urgency styling. Also called by applyPenalty() (input.js)
 // so the display updates immediately when a mistake is made.
 function updTimer() {
@@ -271,7 +271,7 @@ function updTimer() {
     _applyLowTimeVignette();
     _applyLowHealthVignette();
 
-    // Low-time center warning — fires at 5/2/0.5 min thresholds (both
+    // Low-time center warning - fires at 5/2/0.5 min thresholds (both
     // endgame and normal levels). Checked on every display refresh so
     // penalty deductions and item time gains are both observed.
     if (typeof _maybeShowLowTimeWarning === 'function') _maybeShowLowTimeWarning();
@@ -290,7 +290,7 @@ function updTimer() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Shared low-level teardown used by both stopTimer() and pauseTimer() —
+// Shared low-level teardown used by both stopTimer() and pauseTimer() -
 // they behave identically, just called from different semantic contexts.
 function _clearTimerInterval() {
     if (timerInterval) {
@@ -327,12 +327,13 @@ function pauseTimer() {
 // tick loop before this function runs.
 function timesUp() {
     // Endgame map runs must never show the generic lose overlay with a
-    // Retry button — the player keeps loot and returns via the map-failed
+    // Retry button - the player keeps loot and returns via the map-failed
     // screen (_egEndMapDefeated). Intercept timer defeats directly here
     // instead of relying on the async MutationObserver fallback in
     // endgame-encounter.js, which would otherwise flash the overlay first.
-    // Campaign / story mode is unaffected (guard checks _egIsActive).
-    if (typeof _egIsActive === 'function' && _egIsActive()) {
+    // Campaign / story mode is unaffected (guard checks _egIsMapRun, which
+    // excludes the campaign's own monster levels).
+    if (typeof _egIsMapRun === 'function' && _egIsMapRun()) {
         if (typeof _egEndMapDefeated === 'function') {
             if (cur) window._lastFailedGi = cur.gIdx;
             const title = (typeof t === 'function') ? t('eg_map_failed') : 'Map Failed';
@@ -420,7 +421,7 @@ function _initProceduralSystems() {
 //------------------------------------------------------------------------
 
 // Accumulates total seconds played across the whole save (persisted the
-// next time save() runs elsewhere — win, item use, etc.). Only ticks while
+// next time save() runs elsewhere - win, item use, etc.). Only ticks while
 // a level is actually running (guarded by the same dead/timerFrozen check
 // as the rest of the tick loop).
 function _tickPlaytimeTracker() {
@@ -470,7 +471,7 @@ function _tickTimedStasis() {
     if (typeof playFreezeCountdownOverlay === 'function') playFreezeCountdownOverlay(freezeDur);
 
     setTimeout(() => {
-        // The Clock's Time Freeze holds the timer for its whole window —
+        // The Clock's Time Freeze holds the timer for its whole window -
         // a short passive-freeze must never cut that freeze short.
         if (typeof window === 'undefined' || !window._egClockTimeFreezeActive) {
             timerFrozen = false;
@@ -574,7 +575,7 @@ function _triggerLawOfLargeNumbers() {
 function _tickLawOfLargeNumbers() {
     if (!window._lawOfLargeNext) return;
     if (Date.now() < window._lawOfLargeNext) return;
-    if (timerSecs <= 900) return; // last 15 min — no reveal
+    if (timerSecs <= 900) return; // last 15 min - no reveal
 
     // Schedule the next trigger 5 minutes from now.
     window._lawOfLargeNext = Date.now() + 5 * 60 * 1000;

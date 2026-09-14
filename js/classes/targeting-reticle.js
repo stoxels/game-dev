@@ -60,7 +60,7 @@ function _arResolveTheme() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _arBuildReticleDOM — builds the reticle markup once and appends it to
+// _arBuildReticleDOM - builds the reticle markup once and appends it to
 //   <body>. Safe to call multiple times; it is a no-op after the first.
 function _arBuildReticleDOM() {
     if (_arReticleEl) return;
@@ -98,7 +98,7 @@ function _arBuildReticleDOM() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _arMoveTo — positions the reticle at the given viewport coordinates.
+// _arMoveTo - positions the reticle at the given viewport coordinates.
 //   Uses a transform on the root element so we only ever touch one
 //   property per move, keeping this cheap even on fast mouse movement.
 function _arMoveTo(x, y) {
@@ -109,7 +109,7 @@ function _arMoveTo(x, y) {
     }
 }
 
-// _arOnMouseMove — listener bound to the whole document while armed, so
+// _arOnMouseMove - listener bound to the whole document while armed, so
 //   the reticle keeps following the cursor regardless of whether it is
 //   currently over the grid, the HUD, or empty page space.
 function _arOnMouseMove(e) {
@@ -125,7 +125,7 @@ function _arOnMouseMove(e) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _arShowArmPop — briefly replays the "just armed" pop animation by
+// _arShowArmPop - briefly replays the "just armed" pop animation by
 //   re-triggering the CSS animation class (removing then re-adding it on
 //   the next frame, since browsers won't restart an animation just by
 //   re-adding the same class without a reflow in between).
@@ -136,7 +136,7 @@ function _arShowArmPop() {
     _arStageEl.classList.add('ar-just-armed');
 }
 
-// activateTargetingReticle — arms or disarms the custom targeting reticle.
+// activateTargetingReticle - arms or disarms the custom targeting reticle.
 //   Called from _setAbilityMode() in class-abilities.js so the reticle
 //   lifecycle always matches activeAbilityMode exactly.
 function activateTargetingReticle(armed) {
@@ -155,7 +155,7 @@ function activateTargetingReticle(armed) {
         _arShowArmPop();
 
         // Field Scan gets an extra live NxN boundary preview, synced to the
-        // same mousemove handler — see _fieldScanUpdatePreview in class-probabilist.js.
+        // same mousemove handler - see _fieldScanUpdatePreview in class-probabilist.js.
         if (_arLastX > -9999 && typeof _fieldScanUpdatePreview === 'function') {
             _fieldScanUpdatePreview(_arLastX, _arLastY);
         }

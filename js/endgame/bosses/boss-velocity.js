@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE VELOCITY (boss_velocity)-------------------------
 //------------------------------------------------------------------------
-// Speedway homage: four full-width lanes blow in alternating directions —
-// hard — while the rails top and bottom burn. There is no standing still
+// Speedway homage: four full-width lanes blow in alternating directions -
+// hard - while the rails top and bottom burn. There is no standing still
 // here, only choosing which way to slide.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

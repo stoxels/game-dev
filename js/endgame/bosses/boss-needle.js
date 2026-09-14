@@ -1,31 +1,31 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE NEEDLE (boss_needle)-----------------------
 //------------------------------------------------------------------------
-// REWORK — precision-sewing homage, rebuilt as a full stitchcraft gauntlet.
+// REWORK - precision-sewing homage, rebuilt as a full stitchcraft gauntlet.
 // The Needle treats the arena as cloth: spike gates to thread, pins that
 // rain down and plant themselves, a rolling stitch wave of rising needles,
-// and a pincushion that bursts — then, at the very end, it sews the whole
+// and a pincushion that bursts - then, at the very end, it sews the whole
 // screen shut and only the eye of the needle lets you through.
 //
-//   Phase 1 (100–60%) — SPIKE GATES. Full-height needle gates peek in at
+//   Phase 1 (100–60%) - SPIKE GATES. Full-height needle gates peek in at
 //                       the edge, then scroll across with a single wobbling
 //                       gap. Thread the gap! Two gates per pass; three at
 //                       the end.
 //                       Plus PIN DROPS. Giant pins slam down point-first at
 //                       marked spots and plant themselves as tilted
 //                       hazards. Mind the planted pins!
-//   Phase 2 ( ≤60%)   — STITCH WAVE. The floor flashes a stitch grid, then
+//   Phase 2 ( ≤60%)   - STITCH WAVE. The floor flashes a stitch grid, then
 //                       needles rise lane by lane in a rolling wave. Stay
 //                       ahead of the wave!
 //                       Plus PINCUSHION BURST. A pincushion swells and
-//                       BURSTS — needles fly outward along every spoke.
+//                       BURSTS - needles fly outward along every spoke.
 //                       Slip between them!
-//   Phase 3 ( ≤30%)   — Three gates, four pins, a double stitch wave,
+//   Phase 3 ( ≤30%)   - Three gates, four pins, a double stitch wave,
 //                       faster spokes. The cloth is half-sewn already.
-//   Finale ( ≤10%)    — THE FINAL STITCH (one-shot set-piece): the boss
+//   Finale ( ≤10%)    - THE FINAL STITCH (one-shot set-piece): the boss
 //                       goes immune and shielded and SEWS while a fabric
 //                       weave swallows the arena. On every metronome beat a
-//                       colossal needle stabs the ENTIRE screen — only the
+//                       colossal needle stabs the ENTIRE screen - only the
 //                       glowing EYE of the needle is safe. The eye hops to
 //                       a fresh spot every stab; the last one is smaller
 //                       and sews the screen shut. THREAD THE EYE! Charge
@@ -258,7 +258,7 @@ function _egMechNdPinDrops(monster, phase) {
         pins.push({ x, y, warn, el: null, at: warnMs + pins.length * 350 * _EG_ND_DEBUG_MULT, planted: 0, done: false });
     }
 
-    _egNkToast('eg_mech_nd_pins', '📌 The Needle: PIN DROPS — mind the planted pins!', '#e2e8f0');
+    _egNkToast('eg_mech_nd_pins', '📌 The Needle: PIN DROPS - mind the planted pins!', '#e2e8f0');
 
     let t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -307,7 +307,7 @@ function _egMechNdPinDrops(monster, phase) {
 //-------------------MECHANIC: STITCH WAVE (phase 2+)-----------------------
 //------------------------------------------------------------------------
 // The floor flashes a stitch grid, then needles rise lane by lane in a
-// rolling wave — one pass at 60%, two passes (right→left) at 30%. Stand in
+// rolling wave - one pass at 60%, two passes (right→left) at 30%. Stand in
 // a rising lane and you get stitched.
 const EG_ND_WAVE_LANES = 7;
 const EG_ND_WAVE_LANE_MS = 950;
@@ -346,7 +346,7 @@ function _egMechNdStitchWave(monster, phase) {
         }
     }
 
-    _egNkToast('eg_mech_nd_stitch', '📌 The Needle: STITCH WAVE — stay ahead of the needles!', '#e2e8f0');
+    _egNkToast('eg_mech_nd_stitch', '📌 The Needle: STITCH WAVE - stay ahead of the needles!', '#e2e8f0');
 
     let t = 0, touchCd = 0, gridDown = false;
     _egNkLoop(run, (dtS, now) => {
@@ -388,7 +388,7 @@ function _egMechNdStitchWave(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: PINCUSHION BURST (phase 2+)------------------
 //------------------------------------------------------------------------
-// A pincushion orb drops in, swells — then BURSTS: needles fly outward
+// A pincushion orb drops in, swells - then BURSTS: needles fly outward
 // along every spoke. Slip between them!
 const EG_ND_CUSHION_SPOKES = 8;
 
@@ -411,7 +411,7 @@ function _egMechNdPincushionBurst(monster, phase) {
     orb.style.left = Math.round(cx - 34) + 'px';
     orb.style.top = Math.round(cy - 34) + 'px';
 
-    _egNkToast('eg_mech_nd_cushion', '📌 The Needle: PINCUSHION BURST — slip between the needles!', '#e2e8f0');
+    _egNkToast('eg_mech_nd_cushion', '📌 The Needle: PINCUSHION BURST - slip between the needles!', '#e2e8f0');
 
     const spokes = [];
     let t = 0, touchCd = 0, burst = false;
@@ -461,7 +461,7 @@ function _egMechNdPincushionBurst(monster, phase) {
 //------------------------------------------------------------------------
 // The boss goes immune + shielded and SEWS while a fabric weave swallows
 // the arena. On every metronome beat a colossal needle stabs the ENTIRE
-// screen — everyone outside the glowing EYE of the needle is stitched. The
+// screen - everyone outside the glowing EYE of the needle is stitched. The
 // eye hops to a fresh spot every stab; the last one is smaller and sews the
 // screen shut. Charge bar frozen for the whole set-piece (gate in
 // _egTickPlayer via _egNdFinalActive).
@@ -501,8 +501,8 @@ function _egNdStartFinalWatcher(monster) {
     });
 }
 
-// Mark a fresh eye (safe circle) at a random spot — at least 340px from the
-// player so every stab demands a real dash — and poise the giant needle
+// Mark a fresh eye (safe circle) at a random spot - at least 340px from the
+// player so every stab demands a real dash - and poise the giant needle
 // above it.
 function _egNdMarkEye(g, r) {
     if (g.eyeEl) { try { g.eyeEl.remove(); } catch (e) {} g.eyeEl = null; }
@@ -611,11 +611,11 @@ function _egNdFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-nd-cd-label">🪡 THE FINAL STITCH</div>' +
         '<div class="eg-nd-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-nd-cd-hint">A colossal needle stabs the whole screen — only the EYE is safe!</div>';
+        '<div class="eg-nd-cd-hint">A colossal needle stabs the whole screen - only the EYE is safe!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_nd_final_cd', '🪡💀 THE FINAL STITCH — thread the eye!', '#e2e8f0');
+    _egNkToast('eg_mech_nd_final_cd', '🪡💀 THE FINAL STITCH - thread the eye!', '#e2e8f0');
 
     // Boss immunity so the set-piece reads as a performance (released at the end).
     monster.bossImmune = true;
@@ -634,7 +634,7 @@ function _egNdFinalStart(monster) {
 
     // Metronome: each beat the needle stabs the whole screen (everyone
     // outside the eye is stitched), then a fresh eye is marked. The last
-    // stab's eye is smaller — and sews the screen shut. Pause / death /
+    // stab's eye is smaller - and sews the screen shut. Pause / death /
     // inactive hold the count (debug: extra-long beats).
     const cdTick = EG_ND_FINAL_TICK_MS * (_EG_ND_DEBUG_SLOW ? 8 : 1);
     g.cdTimer = setInterval(() => {
@@ -695,7 +695,7 @@ function _egNdFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egNdTeardown() {
     if (_egNdFinal) { try { _egNdFinalEnd(_egNdFinal); } catch (e) {} _egNdFinal = null; }
@@ -717,8 +717,8 @@ function _egNdTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_ND_DEBUG.fire('gates'|'pins'|'stitch'|'cushion') — runs one now
-//   _EG_ND_DEBUG.final()                                 — FINAL STITCH now
+//   _EG_ND_DEBUG.fire('gates'|'pins'|'stitch'|'cushion') - runs one now
+//   _EG_ND_DEBUG.final()                                 - FINAL STITCH now
 if (typeof window !== 'undefined') {
     window._EG_ND_DEBUG = {
         fire: (name, phase) => {

@@ -6,7 +6,7 @@
 // localStorage key used to persist settings across sessions
 const SETTINGS_KEY = 'stoxels_settings';
 
-// Default values — used as fallback for any missing or corrupt saved data
+// Default values - used as fallback for any missing or corrupt saved data
 const SETTINGS_DEFAULTS = {
     bgmEnabled: true,
     randomBgmEnabled: false,
@@ -56,9 +56,9 @@ const SLIDER_CONFIGS = [
 ];
 
 // Returns the value transforms for a slider config:
-//   toStored — converts the raw 0–100 slider integer to the stored settings value
-//   toRaw    — converts the stored settings value back to the slider integer
-//   label    — formats the stored value for the on-screen text
+//   toStored - converts the raw 0–100 slider integer to the stored settings value
+//   toRaw    - converts the stored settings value back to the slider integer
+//   label    - formats the stored value for the on-screen text
 function _sliderTransforms(cfg) {
     if (cfg.mode === 'seconds') {
         return {
@@ -74,7 +74,7 @@ function _sliderTransforms(cfg) {
     };
 }
 
-// The live settings object — read by other modules throughout the game.
+// The live settings object - read by other modules throughout the game.
 // Relies on function hoisting: loadSettings() is defined further down in
 // this file but is available here because `function` declarations are
 // hoisted before any top-level code runs.
@@ -240,9 +240,9 @@ function initSliderControl(cfg) {
 }
 
 // Registers all settings modal controls.
-// Call once on DOMContentLoaded — before the modal is ever opened.
+// Call once on DOMContentLoaded - before the modal is ever opened.
 function initSettingsControls() {
-    // Toggles — questionMark is visual-only so it skips applySettings
+    // Toggles - questionMark is visual-only so it skips applySettings
     initToggleControl('stt-bgm', 'bgmEnabled');
     initToggleControl('stt-randombgm', 'randomBgmEnabled');
     initToggleControl('stt-sfx', 'sfxEnabled');

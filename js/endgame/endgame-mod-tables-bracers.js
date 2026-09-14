@@ -1,13 +1,13 @@
 //  endgame-mod-tables-bracers.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------BRACERS MODIFIER TABLE-------------------------------
 //------------------------------------------------------------------------
-// Bracers are wrist guards — the point where arm meets weapon. They are
+// Bracers are wrist guards - the point where arm meets weapon. They are
 // the melee-flavoured offensive slot: flat physical damage, crit chance
 // and multiplier, and on-hit status effects (ignite/freeze/shock) all
 // live here as either exclusives or primaries. Defence values are modest
@@ -43,7 +43,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
 
         // --- LOCAL DEFENSES ---
-        // Smaller piece — values sit between cloak and chest.
+        // Smaller piece - values sit between cloak and chest.
         flat_armour: {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
@@ -200,7 +200,7 @@ const EG_MOD_TABLE_BRACERS = {
         },
 
         // --- BRACER-EXCLUSIVE: PHYSICAL DAMAGE ---
-        // The most direct "arm strength" stat — bracers guide the blow.
+        // The most direct "arm strength" stat - bracers guide the blow.
         // Flat physical adds a fixed damage range to all attacks (melee
         // counterattack and ranged). The % multiplier scales everything
         // physical you already have, making it very powerful late game.
@@ -227,7 +227,7 @@ const EG_MOD_TABLE_BRACERS = {
 
         // --- BRACER-EXCLUSIVE: CRITICAL STRIKES ---
         // Bracers steady the hand and guide the killing blow.
-        // Crit appears as a prefix here — on the amulet it was also a
+        // Crit appears as a prefix here - on the amulet it was also a
         // prefix, so stacking both slots into crit is a deliberate build
         // path that costs prefix budget on two pieces.
         crit_chance: {
@@ -343,7 +343,7 @@ const EG_MOD_TABLE_BRACERS = {
                 { tier: 5, min: 2, max: 4, weight: 2400, ilvl: 1 }
             ]
         },
-        // Life leech as a suffix here — draining life through gauntlet
+        // Life leech as a suffix here - draining life through gauntlet
         // contact. Lower ceiling than the chest's prefix version since
         // this is a smaller piece and a suffix slot.
         life_leech: {
@@ -403,7 +403,7 @@ const EG_MOD_TABLE_BRACERS = {
 
         // --- BRACER-EXCLUSIVE: ON-HIT STATUS EFFECTS ---
         // Delivered through direct arm/hand contact. Slightly higher values
-        // than the amulet's enchanted versions — bracers ARE the point of
+        // than the amulet's enchanted versions - bracers ARE the point of
         // impact. Convert is absent here (that's shadow enchantment magic,
         // not raw physical contact), and blind lives on cloaks/amulets.
         chance_to_ignite: {

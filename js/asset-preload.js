@@ -5,16 +5,16 @@
 //
 // Background: browsers only fetch CSS background images once the owning
 // element actually renders. Hidden screens (display:none) therefore fetch
-// their art on first open — mid-transition. This engine warms the HTTP
+// their art on first open - mid-transition. This engine warms the HTTP
 // cache ahead of time:
-//   1. boot list (js/boot-loader.js) — title + title-reachable surfaces,
+//   1. boot list (js/boot-loader.js) - title + title-reachable surfaces,
 //      with progress, before the title is revealed;
-//   2. one-ahead — whenever a surface shows, assets of its likely-next
+//   2. one-ahead - whenever a surface shows, assets of its likely-next
 //      surfaces jump to the front of the queue (see AHEAD);
-//   3. idle rest — everything else streams in, 3-at-a-time, while the
+//   3. idle rest - everything else streams in, 3-at-a-time, while the
 //      player sits on the title screen.
 //
-// Only ever requests files the game would fetch anyway — no extra bytes,
+// Only ever requests files the game would fetch anyway - no extra bytes,
 // just earlier. Failed loads settle silently (never retried, never block).
 
 var AssetPreload = (function () {
@@ -23,7 +23,7 @@ var AssetPreload = (function () {
     var MAX_CONCURRENT = 3;
     var BOOT_TIMEOUT_MS = 12000;
 
-    // Documented 404s (referenced but never shipped) — never requested.
+    // Documented 404s (referenced but never shipped) - never requested.
     var BANNED = {
         'images/Class_Selection/title_banner.png': 1,
         'images/Class_Selection/spells/statistician_momentum.png': 1,
@@ -362,7 +362,7 @@ var AssetPreload = (function () {
     }
 
     // Blocking preload with progress. onProgress(done,total,url),
-    // onDone() — always fires (fail-safe timeout).
+    // onDone() - always fires (fail-safe timeout).
     function preloadBoot(onProgress, onDone) {
         var urls = [];
         BOOT_SURFACES.forEach(function (id) {
@@ -399,7 +399,7 @@ var AssetPreload = (function () {
             urls = urls.concat(_assetsOf(id));
         });
         // Deep sets not tied to one surface (spell upgrades, ascendency,
-        // inference art) — last, still before the player can reach them.
+        // inference art) - last, still before the player can reach them.
         urls = urls.concat(_assetsOf('screen-game'));
         urls = urls.concat(_assetsOf('deep-spells'));
         urls = urls.concat(_assetsOf('deep-ascendency'));

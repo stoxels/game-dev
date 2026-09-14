@@ -6,7 +6,7 @@
 
     Scope for now: just a screen with a WASD-movable player sprite, isolated
     from the legacy world-map/avatar systems. No combat, loot, enemies, or
-    stoxel interactions yet — those come in later steps.
+    stoxel interactions yet - those come in later steps.
 
     Movement is adapted from the WASD pattern in player_sprite.js
     (_initSimpleAvatarWASD / _setAvatarPos), but reimplemented against this

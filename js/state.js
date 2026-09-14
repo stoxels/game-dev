@@ -18,7 +18,7 @@ window.STOX_FLAGS = {
     devTestActive: false,     // js/dev-testing.js harness engaged (never set in normal play)
 };
 
-// Resets every STOX_FLAGS entry — call at level start/end so a flag that
+// Resets every STOX_FLAGS entry - call at level start/end so a flag that
 // was left set (e.g. immunity that outlived the level) can never leak.
 function _resetStoxFlags() {
     window.STOX_FLAGS.cursedImmune = false;
@@ -192,7 +192,7 @@ function setSlotName(slotNum, name) {
     const clean = String(name || '').trim().slice(0, 20);
     if (clean) map[slotNum] = clean;
     else delete map[slotNum];
-    try { localStorage.setItem(SLOT_NAMES_KEY, JSON.stringify(map)); } catch { /* storage full — name is cosmetic */ }
+    try { localStorage.setItem(SLOT_NAMES_KEY, JSON.stringify(map)); } catch { /* storage full - name is cosmetic */ }
 }
 
 
@@ -205,14 +205,14 @@ function setSlotName(slotNum, name) {
 //------------------------------------------------------------------------
 
 
-// _makeEgGrid — builds an empty rows x cols grid (filled with null) for the
+// _makeEgGrid - builds an empty rows x cols grid (filled with null) for the
 // endgame hub's inventory/stash storage. Shared by buildFreshState() and
 // migrateOldSave() so the grid-building logic only lives in one place.
 function _makeEgGrid(rows, cols) {
     return Array.from({ length: rows }, () => Array(cols).fill(null));
 }
 
-// buildFreshState — returns a default STATE object for a brand-new save.
+// buildFreshState - returns a default STATE object for a brand-new save.
 //                  Defines every field and its starting value in one place.
 function buildFreshState() {
     return {
@@ -250,6 +250,17 @@ function buildFreshState() {
         skillHotbarInit: false,   // auto-seed already done for this save
         skillHotbarOwner: null,   // '<class>|<ascendency>' the bar was seeded for
 
+        // Charm system (js/skills/skill-charms.js). Every skill+rank pair is
+        // its own charm item. Picked-up charms land in charmInventory; a
+        // duplicate turns into a shard; 10 shards make an orb; an orb adds
+        // +1% damage to the charm it is applied to. Placing a charm into one
+        // of the 10 spell slots unlocks that spell in the spellbook.
+        charmInventory: [],                        // [{ key, skillId, rank, orbs }]
+        charmSlots: new Array(10).fill(null),      // charm key per spell slot
+        charmShards: 0,                            // 0-9 spare shards (10 = 1 orb)
+        charmOrbs: 0,                              // spendable Charm Orbs
+        charmSeedKey: null,                        // '<class>|<ascendency>' starter charms were granted for
+
         // Class-change tokens (Nexus Ascension Level grants one; future
         // endgame sources may grant more). One token = one base-class switch.
         classChangeTokens: 0,
@@ -265,8 +276,12 @@ function buildFreshState() {
         passiveTreePoints: 0,
         passiveTreeAllocated: new Set(),
 
-        // Convergence levels
+        // Convergence levels (legacy 33%/66% milestone gis) + Convergence
+        // Trials (Leveling Rework mini-maps, one per world, 'trial_<n>') and
+        // Ascension Trials (mini-map chains behind each ascension level).
         convergenceDone: [],
+        trialsDone: [],
+        ascensionTrialsDone: [],
 
         // Nexus World (World 14) / Nexus Point progress.
         // Set to true on the first clear of the Nexus Point level; unlocks
@@ -293,7 +308,7 @@ function buildFreshState() {
             typeof EG_INV_COLS !== 'undefined' ? EG_INV_COLS : 10
         ),
         egMapStash: (function(){
-            // Tiered 16× infinite stashes — each tier is its own grid
+            // Tiered 16× infinite stashes - each tier is its own grid
             const tiers = (typeof EG_MAP_TIER_COUNT !== 'undefined' ? EG_MAP_TIER_COUNT : 16);
             const rows = (typeof EG_MAP_STASH_INITIAL_ROWS !== 'undefined' ? EG_MAP_STASH_INITIAL_ROWS : (typeof EG_MAP_STASH_ROWS !== 'undefined' ? EG_MAP_STASH_ROWS : 4));
             const cols = (typeof EG_MAP_STASH_COLS !== 'undefined' ? EG_MAP_STASH_COLS : 10);
@@ -309,13 +324,13 @@ function buildFreshState() {
             typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8
         ),
         egMapSlotItem: null,
-        // Unique Stash — PoE-style collection tab: one slot per EG_UNIQUE_ITEMS entry
+        // Unique Stash - PoE-style collection tab: one slot per EG_UNIQUE_ITEMS entry
         egUniqueStash: {},
         egUniqueCollected: [],
     };
 }
 
-// _migrateCoreFields — fills in top-level fields missing from an older save.
+// _migrateCoreFields - fills in top-level fields missing from an older save.
 function _migrateCoreFields(s) {
     // Older saves may contain values written while an experimental modifier
     // was present. Keep score data numeric and never let a corrupt value turn
@@ -337,12 +352,14 @@ function _migrateCoreFields(s) {
     if (!s.levelMistakes) s.levelMistakes = {};
     if (!s.achStats) s.achStats = {};
     if (!s.convergenceDone) s.convergenceDone = [];
+    if (!s.trialsDone) s.trialsDone = [];
+    if (!s.ascensionTrialsDone) s.ascensionTrialsDone = [];
     if (s.nexusUnlocked === undefined) s.nexusUnlocked = false;
 
     if (s.totalTimePlayedSecs === undefined) s.totalTimePlayedSecs = 0;
 }
 
-// _migrateClassFields — fills in class-progression fields missing from an older save.
+// _migrateClassFields - fills in class-progression fields missing from an older save.
 function _migrateClassFields(s) {
     if (s.playerClass === undefined) s.playerClass = null;
     if (!s.classPassiveLevel) s.classPassiveLevel = 1;
@@ -367,7 +384,24 @@ function _migrateClassFields(s) {
     }
 }
 
-// _migrateAscendencyFields — fills in ascendency-progression fields missing from an older save.
+// _migrateCharmFields - fills in charm-system fields missing from an older
+//                       save. The starter charms (one per owned skill at its
+//                       current rank) are granted lazily by
+//                       ensureCharmState() once the class defs are loaded, so
+//                       this only has to guarantee the containers exist.
+function _migrateCharmFields(s) {
+    if (!Array.isArray(s.charmInventory)) s.charmInventory = [];
+    if (!Array.isArray(s.charmSlots) || s.charmSlots.length !== 10) {
+        const slots = Array.isArray(s.charmSlots) ? s.charmSlots.slice(0, 10) : [];
+        while (slots.length < 10) slots.push(null);
+        s.charmSlots = slots;
+    }
+    if (!Number.isFinite(Number(s.charmShards))) s.charmShards = 0;
+    if (!Number.isFinite(Number(s.charmOrbs))) s.charmOrbs = 0;
+    if (s.charmSeedKey === undefined) s.charmSeedKey = null;
+}
+
+// _migrateAscendencyFields - fills in ascendency-progression fields missing from an older save.
 function _migrateAscendencyFields(s) {
     if (s.playerAscendency === undefined) s.playerAscendency = null;
     if (!s.ascendencySkill1Level) s.ascendencySkill1Level = 1;
@@ -375,7 +409,7 @@ function _migrateAscendencyFields(s) {
     if (!s.ascendencyWorldsCompleted) s.ascendencyWorldsCompleted = [];
 }
 
-// _migratePassiveTreeFields — fills in passive-tree fields missing from an older save.
+// _migratePassiveTreeFields - fills in passive-tree fields missing from an older save.
 //                            passiveTreeAllocated is stored as a plain array in JSON,
 //                            so it needs to become a Set at runtime.
 function _migratePassiveTreeFields(s) {
@@ -387,7 +421,7 @@ function _migratePassiveTreeFields(s) {
     }
 }
 
-// _migrateEndgameFields — fills in endgame hub fields missing from an older save.
+// _migrateEndgameFields - fills in endgame hub fields missing from an older save.
 function _migrateEndgameFields(s) {
     if (!s.playerLevel) s.playerLevel = 1;
     if (!s.playerXP) s.playerXP = 0;
@@ -467,7 +501,7 @@ function _migrateEndgameFields(s) {
     }
 }
 
-// migrateOldSave — fills in any fields that are missing from an older save.
+// migrateOldSave - fills in any fields that are missing from an older save.
 //                  Called before returning a loaded save so legacy data
 //                  never causes undefined-access errors elsewhere.
 function migrateOldSave(s) {
@@ -476,6 +510,7 @@ function migrateOldSave(s) {
     _migrateAscendencyFields(s);
     _migratePassiveTreeFields(s);
     _migrateEndgameFields(s);
+    _migrateCharmFields(s);
     migrateQuestState(s);
 }
 
@@ -485,8 +520,8 @@ function migrateOldSave(s) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _slotKey — returns the localStorage key for a given slot number.
-//           Slot 1 reuses the ORIGINAL 'stoxels' key on purpose — this is what makes
+// _slotKey - returns the localStorage key for a given slot number.
+//           Slot 1 reuses the ORIGINAL 'stoxels' key on purpose - this is what makes
 //           existing players' progress show up automatically as "Slot 1" with no
 //           migration step required. Slots 2-20 get their own dedicated keys.
 function _slotKey(slotNum) {
@@ -515,7 +550,7 @@ function loadRawSaveFromSlot(slotNum) {
 }
 
 // Migrates a legacy slot name that was stored inside the save blob
-// (raw.slotName) into the dedicated names map — used by getSlotSummary so
+// (raw.slotName) into the dedicated names map - used by getSlotSummary so
 // names written by future in-save storage still show up after the split.
 function _migrateSlotNameFromBlob(slotNum, raw) {
     if (!raw || typeof raw.slotName !== 'string') return;
@@ -527,7 +562,7 @@ function _migrateSlotNameFromBlob(slotNum, raw) {
 // Lightweight summary used to render the save-slot select screen.
 function getSlotSummary(slotNum) {
     const raw = loadRawSaveFromSlot(slotNum);
-    // Legacy blobs may carry a slotName field — promote it to the names map.
+    // Legacy blobs may carry a slotName field - promote it to the names map.
     if (raw && typeof raw.slotName === 'string') _migrateSlotNameFromBlob(slotNum, raw);
     if (!raw) return { slot: slotNum, empty: true, name: getSlotName(slotNum) };
     return {
@@ -543,7 +578,7 @@ function getSlotSummary(slotNum) {
         // --- Extended stats for the save-slot tooltip ---
         // NOTE: sourced from raw.questStats (per-slot), NOT raw.achStats
         // (achStats is a cross-slot/global store and is never populated
-        // per-slot — see achievements.js, which persists to ACH_SAVE_KEY).
+        // per-slot - see achievements.js, which persists to ACH_SAVE_KEY).
         bonusDone: raw.bonusDone || [],
         levelHS: raw.levelHS || {},
         classPassiveLevel: raw.classPassiveLevel || 1,
@@ -565,7 +600,7 @@ function getSlotSummary(slotNum) {
     };
 }
 
-// _stoxAnyItem — true when v (a stash grid / object-of-arrays / item) holds
+// _stoxAnyItem - true when v (a stash grid / object-of-arrays / item) holds
 // at least one real item. Used by the save() degraded-state guard so it can
 // tell "player owns nothing endgame" apart from "hub mirrors failed to load".
 function _stoxAnyItem(v) {
@@ -586,20 +621,45 @@ function _stoxAnyItem(v) {
     return false;
 }
 
-// save — serialises STATE into the currently active slot (defaults to
+// _stoxHasEndgameProgress - true when the save shows any sign the player
+// ever ENGAGED with the endgame (atlas unlocks, gold, hub metadata, an
+// equipped/inventoried item). Campaign-only characters (the normal path
+// since the leveling rework hands out XP from story level 1) legitimately
+// own zero endgame items - the presence of these fields distinguishes
+// "never entered the endgame" from "hub mirrors failed to load".
+function _stoxHasEndgameProgress(v) {
+    return !!v && (
+        (v.egGold !== undefined && v.egGold !== null && Number(v.egGold) !== 0) ||
+        (v.egAtlasCompleted && typeof v.egAtlasCompleted === 'object' && Object.keys(v.egAtlasCompleted).length > 0) ||
+        (v.egHubVisited === true) ||
+        (v.egHighestMapTier !== undefined && v.egHighestMapTier !== null && Number(v.egHighestMapTier) > 0) ||
+        (v.egAttrAllocated && typeof v.egAttrAllocated === 'object' &&
+            Object.values(v.egAttrAllocated).some(n => Number(n) > 0)) ||
+        _stoxAnyItem(v.egEquipped) || _stoxAnyItem(v.egInventory) ||
+        _stoxAnyItem(v.egMapStash) || _stoxAnyItem(v.egCurrencyStash) ||
+        _stoxAnyItem(v.egEssenceStash) || _stoxAnyItem(v.egUniqueStash) ||
+        !!(v.egMapSlotItem && (v.egMapSlotItem.id || v.egMapSlotItem.baseId))
+    );
+}
+
+// save - serialises STATE into the currently active slot (defaults to
 // Slot 1 if nothing has been explicitly chosen yet, matching old behaviour).
 //
 // Safety net (added 2026-09 after a refactor-session incident where a
 // stale/empty hub wiped a leveled character's stash):
-//   1. ROLLING BACKUPS — the first write to a slot in a browser session
+//   1. ROLLING BACKUPS - the first write to a slot in a browser session
 //      snapshots the previous save into <key>_backup_1 (and shifts the old
 //      backup_1 into _backup_2). The last two pre-session states therefore
 //      stay recoverable at all times (see tools/save-doctor.html).
-//   2. DEGRADED-WRITE GUARD — refuses to overwrite a leveled character's
-//      save with one whose ENTIRE endgame inventory is empty (all of
-//      egEquipped/egInventory/egMapStash/egCurrencyStash/egEssenceStash/
-//      egUniqueStash), because that pattern in practice only occurs when
-//      the hub's mirrors failed to load (script error / stale cache).
+//   2. DEGRADED-WRITE GUARD - refuses to overwrite a save with endgame
+//      PROGRESS (see _stoxHasEndgameProgress) whose ENTIRE endgame
+//      inventory is empty (all of egEquipped/egInventory/egMapStash/
+//      egCurrencyStash/egEssenceStash/egUniqueStash), because that pattern
+//      in practice only occurs when the hub's mirrors failed to load
+//      (script error / stale cache). Saves with NO endgame progress are
+//      exempt: a campaign-only character at any level legitimately owns
+//      nothing (fixes the false refusal after the leveling rework made
+//      playerLevel 2+ reachable before the first hub visit).
 //      Intentional resets are unaffected (the slot key is wiped first, so
 //      there is no previous save to compare against).
 function save() {
@@ -613,7 +673,7 @@ function save() {
     try {
         json = JSON.stringify(toSave);
     } catch (e) {
-        console.error('[save] serialisation failed — previous save left untouched', e);
+        console.error('[save] serialisation failed - previous save left untouched', e);
         return;
     }
     const raw = localStorage.getItem(key);
@@ -627,13 +687,13 @@ function save() {
         !_stoxAnyItem(toSave.egEssenceStash) &&
         !_stoxAnyItem(toSave.egUniqueStash) &&
         !(toSave.egMapSlotItem && (toSave.egMapSlotItem.id || toSave.egMapSlotItem.baseId));
-    if (prev && (prev.playerLevel || 0) > 1 && endgameEmpty && !window._stoxAllowDegradedSave) {
-        // Log once per session — a save-deadlock with a spamming console helps
+    if (prev && (prev.playerLevel || 0) > 1 && _stoxHasEndgameProgress(prev) && endgameEmpty && !window._stoxAllowDegradedSave) {
+        // Log once per session - a save-deadlock with a spamming console helps
         // nobody. The override lets a genuinely intentional full reset (or a
         // recovered save) proceed; everything is documented in save-doctor.
         if (!window._stoxSaveRefusalLogged) {
             console.error('[save] REFUSED to overwrite: previous save has playerLevel', prev.playerLevel,
-                'but this save has NO endgame items at all — that pattern means the hub state failed to load,',
+                'but this save has NO endgame items at all - that pattern means the hub state failed to load,',
                 'not that the player sold everything. Previous save left untouched.',
                 'Inspect/recover via tools/save-doctor.html. If this refusal is wrong (you really do own nothing),',
                 'run  window._stoxAllowDegradedSave = true  in this console to override for this session.');
@@ -642,13 +702,13 @@ function save() {
         window._stoxLastSaveRefusal = { at: Date.now(), prevLevel: prev.playerLevel, slot };
         return;
     }
-    // Rolling backups — first write per session snapshots the pre-session state.
+    // Rolling backups - first write per session snapshots the pre-session state.
     if (window._stoxLastSavedKey !== key) {
         try {
             const b1 = localStorage.getItem(key + '_backup_1');
             if (b1) localStorage.setItem(key + '_backup_2', b1);
             if (raw) localStorage.setItem(key + '_backup_1', raw);
-        } catch (e) { /* storage full — the main save still proceeds */ }
+        } catch (e) { /* storage full - the main save still proceeds */ }
     }
     try {
         localStorage.setItem(key, json);
@@ -656,7 +716,7 @@ function save() {
         // failed write (quota) retries the rotation on the next save.
         window._stoxLastSavedKey = key;
     } catch (e) {
-        console.error('[save] write failed (storage full?) — previous save left untouched', e);
+        console.error('[save] write failed (storage full?) - previous save left untouched', e);
         return;
     }
 }
@@ -678,6 +738,26 @@ function loadStateFromSlot(slotNum) {
     // failure bound to the previous slot does not poison this one).
     window._stoxHubStateLoaded = false;
     window._stoxHubLoadFailed = false;
+    // Slot switch resync: the live hub mirrors (_egEquipped, _egInventory,
+    // currency/essence/map stashes, ...) still hold the PREVIOUS slot's data
+    // until something re-runs the load. showEndgameHub does - but the
+    // tutorial never opens the hub before it needs combat stats, so a fresh
+    // character would fight with the old slot's gear (inflated HP / mana /
+    // absorption / damage on the avatar bars, and stash grants landing in
+    // the wrong mirror). Re-sync immediately, mirroring the parse-time
+    // completion pattern in endgame-hub.js.
+    if (typeof _egLoadHubState === 'function') {
+        window._stoxHubLoadInProgress = true;
+        try {
+            _egLoadHubState();
+            window._stoxHubStateLoaded = true;
+        } catch (e) {
+            window._stoxHubLoadFailed = true;
+            console.error('[hub] slot-switch re-sync failed - save-writes BLOCKED until reload', e);
+        } finally {
+            window._stoxHubLoadInProgress = false;
+        }
+    }
     // Re-sync endgame leveling (player level / attribute points) to the newly loaded save.
     if (typeof _egLoadLevelingState === 'function') _egLoadLevelingState();
     save();
@@ -685,7 +765,7 @@ function loadStateFromSlot(slotNum) {
 }
 
 // Wipes ONLY the given slot's save data. Used by the "Reset Progress" flow
-// on the title screen — achievements live in their own global key
+// on the title screen - achievements live in their own global key
 // (ACH_SAVE_KEY, achievements.js) and are never touched by this.
 // The custom slot name is cleared too: a deleted save should not leave a
 // stale label on the now-empty slot.
@@ -695,7 +775,7 @@ function wipeSlot(slotNum) {
     if (typeof resetAllBeatsForSlot === 'function') resetAllBeatsForSlot(slotNum);
 }
 
-// initState — called once at script load, before the player has necessarily
+// initState - called once at script load, before the player has necessarily
 // picked a slot on the new save-select screen. Falls back to the last
 // active slot (persisted across reloads), then to legacy Slot 1 data if
 // present, then to a blank state. The save-select screen overwrites STATE
@@ -717,10 +797,10 @@ function initState() {
     return buildFreshState();
 }
 
-// STATE — the single source of truth for all persistent progress.
+// STATE - the single source of truth for all persistent progress.
 // Declared here (rather than in the CONSTANTS & STATE section) because its
 // initial value depends on initState(), which in turn depends on
-// buildFreshState()/migrateOldSave() — all defined earlier in this file.
+// buildFreshState()/migrateOldSave() - all defined earlier in this file.
 let STATE = initState();
 
 

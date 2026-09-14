@@ -43,7 +43,7 @@ function _skillTooltipTags(def) {
     return `<div class="skl-tip-tags">${def.tags.join(', ')}</div>`;
 }
 
-// Cost line — becomes red when the player cannot currently pay it, and
+// Cost line - becomes red when the player cannot currently pay it, and
 // switches to Life under Blood Magic maps.
 function _skillTooltipCost(def) {
     const cost = (typeof getSkillManaCost === 'function') ? getSkillManaCost(def.id) : 0;
@@ -55,9 +55,23 @@ function _skillTooltipCost(def) {
     return `<div class="skl-tip-stat">${t('skill_tip_cost')}: <b style="color:${affordable ? color : '#ff5252'}">${cost} ${label}</b></div>`;
 }
 
-// Cooldown line — shows the effective cooldown and, when passive nodes or
-// gear reduced it, the base value in parentheses.
+// Cooldown line - shows the effective cooldown and, when passive nodes or
+// gear reduced it, the base value in parentheses. Charge spells (Blink,
+// Dash, …) show their pool instead: charges held, recharge time and - while
+// the pool is empty - the wait for the next charge.
 function _skillTooltipCooldown(def) {
+    const charges = (typeof getUniversalSpellCharges === 'function')
+        ? getUniversalSpellCharges(def.id) : null;
+    if (charges) {
+        const waiting = charges.current === 0;
+        const wait = waiting ? getUniversalSpellChargeRechargeRemaining(def.id) : 0;
+        let line = `⚡ ${t('skill_tip_charges')}: <b style="color:#e8b04b">${charges.current} / ${charges.max}</b>`;
+        line += ` <span style="opacity:.55">· ${t('skill_tip_recharge').replace('{n}', _skillFormatCooldown(charges.recharge))}</span>`;
+        if (waiting && wait > 0) {
+            line += `<br><span style="color:#ffb347">⏳ ${t('skill_tip_next_charge').replace('{n}', _skillFormatCooldown(Math.ceil(wait)))}</span>`;
+        }
+        return `<div class="skl-tip-stat">${line}</div>`;
+    }
     const eff = (typeof getSkillCooldown === 'function') ? getSkillCooldown(def.id) : (def.cooldownSeconds || 0);
     const base = def.cooldownSeconds || 0;
     if (!eff && !base) return '';
@@ -68,23 +82,49 @@ function _skillTooltipCooldown(def) {
     return `<div class="skl-tip-stat">${line}</div>`;
 }
 
-// Cast-time line — every current skill is instant, but future channeled /
-// cast-time spells are supported by SKILL_META.castTime.
+// Cast-time line - instant skills fire on click; timed ones need the button
+// held until the cast bar fills (see js/skills/spell-casttime.js).
 function _skillTooltipCastTime(def) {
     if (!def.castTime) return '';
     const isInstant = def.castTime === 'instant';
+    let holdHint = '';
+    try {
+        if (!isInstant && typeof getSkillCastTimeSeconds === 'function'
+            && getSkillCastTimeSeconds(def.id) > 0) {
+            holdHint = (typeof LANG !== 'undefined' && LANG === 'de') ? ' (halten)' : ' (hold)';
+        }
+    } catch (e) { /* best-effort */ }
     const value = isInstant
         ? t('skill_tip_instant')
-        : `${def.castTime}`;
+        : `${def.castTime}${holdHint}`;
     return `<div class="skl-tip-stat">${t('skill_tip_cast_time')}: <b style="color:#e6e6e6">${value}</b></div>`;
 }
 
-// Damage block — the puzzle-ability equivalent of PoE's "Deals X to Y
+// Damage block - the puzzle-ability equivalent of PoE's "Deals X to Y
 // Physical Damage" lines: each revealed cell fires a reveal projectile.
+// Universal spells get their own direct-damage wording (see below).
 function _skillTooltipDamage(def) {
     if (typeof getSkillDamage !== 'function') return '';
     const dmg = getSkillDamage(def.id);
-    if (!dmg) return '';
+    if (!dmg) {
+        // The self-cast families carry no damage payload at all - describe
+        // exactly what the cast will deliver instead (js/skills/
+        // universal-spells.js). Support: the amount at the current charm rank
+        // and Life/Absorption pools. Movement: the jump distance at the
+        // current rank, plus the live armed-anchor state.
+        if (def.slotKind === 'universal') {
+            if (typeof getUniversalSpellSupportEstimate === 'function') {
+                const sup = getUniversalSpellSupportEstimate(def.id);
+                if (sup) return _uspTooltipSupport(sup);
+            }
+            if (typeof getUniversalSpellMovementEstimate === 'function') {
+                const mov = getUniversalSpellMovementEstimate(def.id);
+                if (mov) return _uspTooltipMovement(mov);
+            }
+        }
+        return '';
+    }
+    if (def.slotKind === 'universal') return _uspTooltipDamage(def, dmg);
     const range = dmg.perHitMin === dmg.perHitMax
         ? `${dmg.perHitMin}`
         : `${dmg.perHitMin} to ${dmg.perHitMax}`;
@@ -95,6 +135,86 @@ function _skillTooltipDamage(def) {
         + `<div class="skl-tip-dmg">${t('skill_tip_deals')} <b>${range}</b> ${t('skill_tip_damage_per_cell')} `
         + `<span style="opacity:.75">(${t('skill_tip_up_to').replace('{n}', dmg.count)})</span></div>`
         + `<div class="skl-tip-dmg">${t('skill_tip_total')}: <b>${total}</b> ${t('skill_tip_damage')}</div>`;
+}
+
+// Direct-damage wording for universal spells: "Deals 24 to 30 Shadow
+// damage" plus a behaviour suffix (volley count, AoE, DoT ticks, chain,
+// delay) and a total line. Bilingual inline so no translation keys are
+// needed for the arsenal.
+function _uspTooltipDamage(def, dmg) {
+    const de = (typeof LANG !== 'undefined' && LANG === 'de');
+    const spell = (typeof getUniversalSpellDef === 'function') ? getUniversalSpellDef(def.id) : null;
+    const elName = { fire: de ? 'Feuer' : 'Fire', cold: de ? 'Kälte' : 'Cold', lightning: de ? 'Blitz' : 'Lightning', shadow: de ? 'Schatten' : 'Shadow', physical: de ? 'physischen' : 'Physical' };
+    const el = (spell && elName[spell.element]) || (de ? 'Schaden' : 'Damage');
+    const range = dmg.perHitMin === dmg.perHitMax
+        ? `${dmg.perHitMin}`
+        : `${dmg.perHitMin} to ${dmg.perHitMax}`;
+    let suffix = '';
+    if (spell) {
+        switch (spell.behavior) {
+            case 'volley': suffix = de ? ` in ${spell.count} Geschossen` : ` across ${spell.count} missiles`; break;
+            case 'nova': suffix = de ? ', jeden Gegner' : ', each enemy'; break;
+            case 'ticks':
+                suffix = spell.hitsAll
+                    ? (de ? `, jeden Gegner, ${spell.ticks + 1} Treffer` : `, each enemy, ${spell.ticks + 1} hits`)
+                    : (de ? ` + ${spell.ticks} Ticks` : ` + ${spell.ticks} ticks`);
+                break;
+            case 'chain': suffix = de ? ', springt abgeschwächt über' : ', leaps weakened across'; break;
+            case 'delayed':
+                suffix = de ? ' nach kurzer Verzögerung' : ' after a short delay';
+                if (spell.hitsAll) suffix += de ? ', jeden Gegner' : ', each enemy';
+                break;
+            case 'starfall': suffix = de ? ` in ${spell.count} Sternensplittern` : ` across ${spell.count} star shards`; break;
+            case 'wild': suffix = de ? ` in ${spell.count} Funken, zufällige Gegner` : ` across ${spell.count} sparks at random enemies`; break;
+            default: break;
+        }
+    }
+    const total = dmg.totalMin === dmg.totalMax
+        ? `${dmg.totalMin}`
+        : `${dmg.totalMin} to ${dmg.totalMax}`;
+    const totalLabel = dmg.perTarget
+        ? (de ? 'Gesamt (pro Gegner)' : 'Total (per enemy)')
+        : (de ? 'Gesamt' : 'Total');
+    let html = `<div class="skl-tip-sep"></div>`
+        + `<div class="skl-tip-dmg">${de ? 'Verursacht' : 'Deals'} <b>${range}</b> ${el} ${de ? 'schaden' : 'damage'}<span style="opacity:.75">${suffix}</span></div>`;
+    if (dmg.count > 1 || dmg.perTarget) {
+        html += `<div class="skl-tip-dmg">${totalLabel}: <b>${total}</b> ${de ? 'Schaden' : 'damage'}</div>`;
+    }
+    return html;
+}
+
+// Support-spell wording: the concrete amount the cast will deliver. The line
+// is built inside getUniversalSpellSupportEstimate so the numbers shown here
+// are the same numbers the cast applies (rank + pools included).
+function _uspTooltipSupport(sup) {
+    const de = (typeof LANG !== 'undefined' && LANG === 'de');
+    const line = de ? sup.lineDe : sup.lineEn;
+    if (!line) return '';
+    const warn = sup.noPool ? ' class="skl-tip-warn"' : ' class="skl-tip-dmg"';
+    return `<div class="skl-tip-sep"></div><div${warn}>${line}</div>`;
+}
+
+// Movement-spell wording: the concrete jump/window the cast will produce, and
+// - while a Rift Anchor is armed - what the NEXT cast does instead of what the
+// spell does in general. Built inside getUniversalSpellMovementEstimate so the
+// numbers cannot drift from the ones the cast applies.
+function _uspTooltipMovement(mov) {
+    const de = (typeof LANG !== 'undefined' && LANG === 'de');
+    const line = de ? mov.lineDe : mov.lineEn;
+    if (!line) return '';
+    // An armed anchor is a different spell: highlight it so the player knows the
+    // tooltip is describing the recall, not the plant.
+    const cls = mov.armed ? ' class="skl-tip-stat" style="color:#7fd9ff"' : ' class="skl-tip-dmg"';
+    return `<div class="skl-tip-sep"></div><div${cls}>${line}</div>`;
+}
+
+// Charm-orb bonus line, shown only when orbs have been applied to the
+// spell's charm (js/skills/skill-charms.js).
+function _skillTooltipCharmBonus(skillId) {
+    if (typeof getCharmSkillOrbBonusPct !== 'function') return '';
+    const pct = getCharmSkillOrbBonusPct(skillId);
+    if (!pct) return '';
+    return `<div class="skl-tip-stat">${t('charm_tip_orb_bonus')}: <b style="color:#7fd9ff">+${pct}%</b></div>`;
 }
 
 // Scaling line: "Scales with: Spell Damage, Cooldown Recovery".
@@ -112,6 +232,29 @@ function _skillTooltipGating(def) {
         : `<div class="skl-tip-warn">⚠ ${t('skill_tip_endgame_only')}</div>`;
 }
 
+// Charm gate note: while the spell's charm sits outside the spell slots the
+// spell cannot be cast, so the tooltip spells that out (the spell book's 🔒
+// badge is decorative and carries no native title tooltip). A slotted but
+// over-level charm names its player-level requirement instead.
+function _skillTooltipCharmLock(skillId) {
+    if (typeof isSkillCharmUnlocked !== 'function') return '';
+    if (isSkillCharmUnlocked(skillId)) return '';
+    try {
+        if (typeof getCharmSlottedRank === 'function' && typeof charmRankMeetsPlayerLevel === 'function') {
+            const slotted = getCharmSlottedRank(skillId);
+            if (slotted && !charmRankMeetsPlayerLevel(slotted)
+                && typeof getCharmRankMinPlayerLevel === 'function') {
+                const need = getCharmRankMinPlayerLevel(slotted);
+                const msg = (typeof t === 'function')
+                    ? t('charm_rank_locked_toast').replace('{r}', slotted).replace('{n}', need)
+                    : `Rank ${slotted} charm needs player level ${need}`;
+                return `<div class="skl-tip-note">🔒 ${msg}</div>`;
+            }
+        }
+    } catch (e) { /* fall through to generic hint */ }
+    return `<div class="skl-tip-note">🔒 ${t('charm_locked_hint')}</div>`;
+}
+
 // Small footer hint telling the player they can drag the skill.
 function _skillTooltipDragHint() {
     return `<div class="skl-tip-foot">${t('skill_tip_drag_hint')}</div>`;
@@ -127,7 +270,10 @@ function buildSkillTooltipHTML(skillId) {
     const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
     if (!def) return '';
 
-    const rank = (typeof getSkillLevel === 'function') ? getSkillLevel(skillId) : 1;
+    // While the spell's charm is slotted, the charm's rank is the rank the
+    // player actually casts at (js/skills/skill-charms.js).
+    const charmRank = (typeof getCharmSlottedRank === 'function') ? getCharmSlottedRank(skillId) : null;
+    const rank = charmRank || ((typeof getSkillLevel === 'function') ? getSkillLevel(skillId) : 1);
     const desc = (typeof getSkillDesc === 'function') ? getSkillDesc(skillId) : '';
 
     return `<div class="skl-tip">`
@@ -140,8 +286,10 @@ function buildSkillTooltipHTML(skillId) {
         + `<div class="skl-tip-sep"></div>`
         + `<div class="skl-tip-desc">${desc}</div>`
         + _skillTooltipDamage(def)
+        + _skillTooltipCharmBonus(skillId)
         + _skillTooltipScaling(def)
         + _skillTooltipGating(def)
+        + _skillTooltipCharmLock(skillId)
         + _skillTooltipDragHint()
         + `</div>`;
 }

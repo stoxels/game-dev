@@ -1,5 +1,5 @@
 ﻿//  passive-tree-dev.js
-//  DEVELOPMENT SANDBOX PASSIVE TREE — deliberately NOT connected to gameplay.
+//  DEVELOPMENT SANDBOX PASSIVE TREE - deliberately NOT connected to gameplay.
 //
 //  Everything in this file is namespaced with _dpt_ / DPT_ so it can never
 //  collide with the live passive tree (_pt_ / PT_). Allocations live in a
@@ -12,7 +12,7 @@
 //  live tree plus a 'tier' field, generated in a POE1-LIKE layout by
 //  tools/generate-poe-layout-dev-data.py). The dev tree is currently in
 //  LAYOUT MODE: real connections exist (wheel-and-spoke skeleton inherited
-//  from the PoE1 tree data) but picking is display-only — allocations never
+//  from the PoE1 tree data) but picking is display-only - allocations never
 //  happen and no gameplay system reads from this tree. Real connections
 //  will be hand-authored in "Passive Tree Editor.html" (project root) and
 //  wired back into the game later.
@@ -34,7 +34,7 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// The Start node id — mirrors PT_START_ID in passive-tree.js.
+// The Start node id - mirrors PT_START_ID in passive-tree.js.
 const DPT_START_ID = 1;
 
 // LAYOUT MODE: the PoE-style layout is a display preview. Connections are
@@ -49,7 +49,7 @@ const DPT_STARTING_POINTS = 100;
 // localStorage key for the sandbox state (NOT part of the game saves).
 const DPT_STORAGE_KEY = 'stoxels_dpt_sandbox_v2_poe_layout';
 
-// Layout dimensions — mirrors the live tree.
+// Layout dimensions - mirrors the live tree.
 const DPT_NODE_RADIUS = 22;
 const DPT_PADDING = 80;
 
@@ -59,7 +59,7 @@ const DPT_ZOOM_MIN = 0.08;
 const DPT_ZOOM_MAX = 3.0;
 const DPT_ZOOM_STEP = 0.12;
 
-// Node colours — one set per state: locked / unlocked / allocated / start.
+// Node colours - one set per state: locked / unlocked / allocated / start.
 const DPT_COL_LOCKED_BG = '#111120';
 const DPT_COL_LOCKED_BORDER = '#3a3350';
 const DPT_COL_LOCKED_DOT = '#3a3350';
@@ -214,7 +214,7 @@ function _dptLoadPersisted() {
     }
 }
 
-// Persists the sandbox state under its own key — deliberately NOT via the
+// Persists the sandbox state under its own key - deliberately NOT via the
 // game's save() so save slots stay clean.
 function _dptPersist() {
     try {
@@ -222,7 +222,7 @@ function _dptPersist() {
             points: _dpt_points,
             allocated: [..._dpt_alloc],
         }));
-    } catch (e) { /* storage unavailable — sandbox just won't persist */ }
+    } catch (e) { /* storage unavailable - sandbox just won't persist */ }
 }
 
 // Restores the persisted sandbox state (called once when the screen opens).
@@ -341,7 +341,7 @@ function _dptIsDeallocatable(id) {
 
 
 //------------------------------------------------------------------------
-//-----------------CLICK HANDLERS — ALLOC / DEALLOC / BRANCH---------------
+//-----------------CLICK HANDLERS - ALLOC / DEALLOC / BRANCH---------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -650,7 +650,7 @@ function _dptApplyTransform() {
     _dptSyncZoomBar();
 }
 
-// Fits the whole tree into the container (centred, no magic offsets —
+// Fits the whole tree into the container (centred, no magic offsets -
 // the dev tree has no "start corner" to anchor on).
 function _dptFitToView(bounds) {
     const treeW = bounds.maxX - bounds.minX + DPT_PADDING * 2 + DPT_NODE_RADIUS * 2;
@@ -667,7 +667,7 @@ function _dptFitToView(bounds) {
     const scaledH = treeH * _dpt_scale;
 
     // Node coordinates already include the padding offset (see
-    // _dptComputeOffsets), so the world spans [0, treeW]×[0, treeH] —
+    // _dptComputeOffsets), so the world spans [0, treeW]×[0, treeH] -
     // plain centering is correct here. No extra offset term.
     _dpt_tx = (cW - scaledW) / 2;
     _dpt_ty = (cH - scaledH) / 2;
@@ -850,7 +850,7 @@ function _dptTooltipResolveDesc(def, lang) {
 // Status line at the bottom of the tooltip.
 function _dptTooltipBuildStatusHtml(id, state, lang) {
     if (DPT_DISPLAY_ONLY) {
-        return `<div style="margin-top:7px;font-size:11px;color:#888;">LAYOUT PREVIEW — picking disabled</div>`;
+        return `<div style="margin-top:7px;font-size:11px;color:#888;">LAYOUT PREVIEW - picking disabled</div>`;
     }
     if (state === 'allocated') {
         if (id === DPT_START_ID) {
@@ -1059,7 +1059,7 @@ function _dptBindNodeEvents(node, skill, isKeystone) {
 // the node div, so DOM order stacks it beneath. The portrait sits further
 // out along the start's radial direction (away from the tree center) so
 // it never hides the node itself. sx/sy are the node's SKILL-space coords
-// (tree center = origin) — the radial direction must come from those, not
+// (tree center = origin) - the radial direction must come from those, not
 // from the pixel position.
 function _dptAppendSprite(def, cx, cy, r, sx, sy) {
     if (!def || !def.sprite) return;
@@ -1246,7 +1246,7 @@ function _dptCreateSearchBar() {
 }
 
 // Injects the search bar into the static #dpt-search-wrap placeholder
-// (idempotent — never duplicates children).
+// (idempotent - never duplicates children).
 function _dptInjectSearchBar() {
     const existingWrap = document.getElementById('dpt-search-wrap');
     if (!existingWrap || existingWrap.hasChildNodes()) return;
@@ -1442,7 +1442,7 @@ function _dptDrawLinks(offsetX, offsetY) {
     });
 }
 
-// Main render entry point — rebuilds the whole sandbox tree.
+// Main render entry point - rebuilds the whole sandbox tree.
 function _dptRender() {
     if (!_dptResetRenderState()) return;
 
@@ -1486,7 +1486,7 @@ function _dptRender() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Entry point — restores the sandbox state, then renders.
+// Entry point - restores the sandbox state, then renders.
 function buildDevPassiveTreeScreen() {
     _dptRestoreState();
     _dptRender();
@@ -1501,7 +1501,7 @@ function showDevPassiveTree() {
     buildDevPassiveTreeScreen();
 }
 
-// BACK button — returns to the select-mode screen.
+// BACK button - returns to the select-mode screen.
 function dptGoBack() {
     screenHistory.pop(); // discard the entry showDevPassiveTree() pushed
     switchScreen('screen-mode-select');

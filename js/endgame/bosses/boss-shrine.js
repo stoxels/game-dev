@@ -1,37 +1,37 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SHRINE MAIDEN (boss_shrine)-----------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK — "The Bound God". The danmaku homage, scaled to an arena:
-// the Maiden no longer sends fans — she sends HERSELF, or rather every
+// TIER 8 REWORK - "The Bound God". The danmaku homage, scaled to an arena:
+// the Maiden no longer sends fans - she sends HERSELF, or rather every
 // mirror-spirit she is bound to. Every ward, every knot, every talisman
 // repeats: that is the whole trick of a bound god. Element: lightning.
 //
-//   • KNOT BARRIERS (signature, all fight) — sacred ropes (shimenawa) drop
+//   • KNOT BARRIERS (signature, all fight) - sacred ropes (shimenawa) drop
 //     anchors and draw TAUt paper barriers between them: crossing bars of
 //     lightning-scribed paper that hum before they light. Safe lanes close
 //     as more barriers cross. Phase 3: a vertical pair crosses the
-//     horizontal one — read the quadrant that stays open.
-//   • MIRROR SPIRITS (60%) — the Maiden fans out five MIRROR SPIRITS
+//     horizontal one - read the quadrant that stays open.
+//   • MIRROR SPIRITS (60%) - the Maiden fans out five MIRROR SPIRITS
 //     (five-way spirit fans, thrown from an anchored ⛩️) while a SPIRIT
-//     SIGNATURE marks your movement: after 2.5s it SHATTERS — a mirror
+//     SIGNATURE marks your movement: after 2.5s it SHATTERS - a mirror
 //     spirit copies your last 1.5s of steps and detonates your route in
 //     reverse. Stop repeating yourself. Phase 3: the shard follows your
 //     route FORWARD as it detonates.
-//   • OFUDA WARD (60%) — the Maiden plants a golden ofuda talisman and
+//   • OFUDA WARD (60%) - the Maiden plants a golden ofuda talisman and
 //     chants; the ward channel ticks shadow damage while up. Body-check
 //     the ofuda 3× to tear it down (+12% maxHP heal) and cancel the chant;
 //     fail and a SHINTO SEAL crosses the whole arena at your row. Phase 3:
 //     the seal returns the other way.
-//   • ⛩️ THOUSAND ARMS (≤10%, one-shot finale) — the bound god unleashes
+//   • ⛩️ THOUSAND ARMS (≤10%, one-shot finale) - the bound god unleashes
 //     every arm at once: eight radial TORII BEAMS sweep like a lighthouse,
-//     and every few seconds a knock comes — 20 TALISMANS land in a grid
+//     and every few seconds a knock comes - 20 TALISMANS land in a grid
 //     with one revealed safe cell; you have 3.5s to reach it before the
 //     grid detonates. Survive three knocks and the Maiden descends: THE
-//     THOUSANDTH ARM — the eight beams sweep one final time and everything
+//     THOUSANDTH ARM - the eight beams sweep one final time and everything
 //     outside a descending safety circle is annulled. Charge bar frozen
 //     (gate in _egTickPlayer via _egShrFinalActive).
 //
-// Shared soul kept: fated_cell still marks fated cells — the Shrine's
+// Shared soul kept: fated_cell still marks fated cells - the Shrine's
 // whole schtick is fate you cannot dodge. corrupt_cells retired (its
 // pressure lives in the barriers and talisman grid).
 //
@@ -63,7 +63,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_shrine — "The Bound God" (rework)
+    // boss_shrine - "The Bound God" (rework)
     // Phase 1 (100% → 60%): Knot Barriers + Fated Cell
     // Phase 2 ( 60% → 30%): immune window; Mirror Spirits + Ofuda Ward join
     // Phase 3 ( 30% →  0%): quadrants, forward-playing mirrors, double
@@ -94,7 +94,7 @@ const EG_SHR_TOUCH_CD_MS = 700;      // shared touch cooldown
 //-------------------SHARED VISUAL HELPERS---------------------------------
 //------------------------------------------------------------------------
 
-// Touch damage helper shared by all Shrine hazards. Lightning-element boss —
+// Touch damage helper shared by all Shrine hazards. Lightning-element boss -
 // hits go in with element 'lightning' so the toast palette stays yellow.
 let _egShrHitCd = 0;
 function _egShrTouch(pct, level, label) {
@@ -128,7 +128,7 @@ function _egShrHeal(amount) {
 // between them (shimenawa knots → taut shide streamers). The bars hum
 // (warn) then LIGHT: crossing lightning paper, tick DoT on contact. The
 // "knot" honours the shimenawa: whichever endpoint the player stands
-// closer to, that side's rope stays — the barrier persists around that
+// closer to, that side's rope stays - the barrier persists around that
 // anchor as a vertical wall segment for 3s before it burns away. Phase 3:
 // a vertical pair crosses the horizontal one (quadrant pressure).
 const EG_SHR_BARS_N    = [0, 2, 3, 3]; // horizontal barriers by phase
@@ -148,7 +148,7 @@ function _egMechShrBarriers(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_shr_bars', '⛩️ KNOT BARRIERS — the shimenawa bind the lanes. Slip between them, then leave before the knot BURNS!', '#fde047');
+    _egNkToast('eg_mech_shr_bars', '⛩️ KNOT BARRIERS - the shimenawa bind the lanes. Slip between them, then leave before the knot BURNS!', '#fde047');
 
     const bars = [];
     const makeBar = (y, vertical) => {
@@ -257,7 +257,7 @@ function _egMechShrBarriers(monster, phase) {
 //------------------------------------------------------------------------
 // The Maiden fans out five mirror spirits from an anchored ⛩️ (the classic
 // five-way spirit fan, kept) while a SPIRIT SIGNATURE records your
-// movement: after 2.5s it SHATTERS — a mirror spirit copies your last
+// movement: after 2.5s it SHATTERS - a mirror spirit copies your last
 // 1.5s of steps and detonates your route in REVERSE. Stand still to feed
 // it nothing; keep your path crossing your old one and you eat both.
 // Phase 3: the shard plays your route FORWARD as it detonates.
@@ -277,7 +277,7 @@ function _egMechShrMirrors(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_shr_mirrors', '⛩️ MIRROR SPIRITS — the fans fly, and your SIGNATURE records. Stop repeating yourself!', '#fde047');
+    _egNkToast('eg_mech_shr_mirrors', '⛩️ MIRROR SPIRITS - the fans fly, and your SIGNATURE records. Stop repeating yourself!', '#fde047');
 
     // ── Anchor + spirit fan (the old soul, kept). ────────────────────────
     const ax = W * 0.15, ay = H * 0.5;
@@ -352,7 +352,7 @@ function _egMechShrMirrors(monster, phase) {
                     });
                 }
                 shard.style.opacity = '1';
-                _egNkToast('eg_mech_shr_shatter', '⛩️ SIGNATURE SHATTERS — your route replays! Break the pattern!', '#f97316');
+                _egNkToast('eg_mech_shr_shatter', '⛩️ SIGNATURE SHATTERS - your route replays! Break the pattern!', '#f97316');
             }
         }
 
@@ -439,7 +439,7 @@ function _egMechShrWard(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_shr_ward', '⛩️ OFUDA WARD — the chant drains you. Tear the talisman down to CANCEL it!', '#fde047');
+    _egNkToast('eg_mech_shr_ward', '⛩️ OFUDA WARD - the chant drains you. Tear the talisman down to CANCEL it!', '#fde047');
 
     // Plant the ward away from the player.
     const pc0 = _egShrPC();
@@ -485,7 +485,7 @@ function _egMechShrWard(monster, phase) {
                 state.torn = true;
                 ward.classList.add('eg-shr-ward-torn');
                 _egShrHeal(_egNkMaxHP() * EG_SHR_HEAL_CANCEL);
-                _egNkToast('eg_mech_shr_torn', '⛩️🧿 OFUDA TORN — the chant is cancelled! (+heal)', '#4ade80');
+                _egNkToast('eg_mech_shr_torn', '⛩️🧿 OFUDA TORN - the chant is cancelled! (+heal)', '#4ade80');
             }
         }
 
@@ -493,7 +493,7 @@ function _egMechShrWard(monster, phase) {
         if (!state.torn && !state.chantDone && chantT >= chantMs) {
             state.chantDone = true;
             ward.classList.add('eg-shr-ward-dim');
-            _egNkToast('eg_mech_shr_seal', '⛩️ THE SHINTO SEAL — the ward closes on your row!', '#f97316');
+            _egNkToast('eg_mech_shr_seal', '⛩️ THE SHINTO SEAL - the ward closes on your row!', '#f97316');
             state.axis = 'v';
             state.dir = state.seals % 2 === 0 ? 1 : -1;
             state.bandX = pc.x;
@@ -549,9 +549,9 @@ function _egMechShrWard(monster, phase) {
 //-------------------FINALE: THOUSAND ARMS (≤10%, one-shot)----------------
 //------------------------------------------------------------------------
 // The bound god unleashes every arm at once: eight radial TORII BEAMS sweep
-// like a lighthouse while every few seconds a KNOCK comes — 20 talismans
+// like a lighthouse while every few seconds a KNOCK comes - 20 talismans
 // land in a grid with ONE revealed safe cell; reach it in 3.5s or the grid
-// detonates. Three knocks and the Maiden descends: THE THOUSANDTH ARM —
+// detonates. Three knocks and the Maiden descends: THE THOUSANDTH ARM -
 // one final beam sweep and everything outside a descending safety circle
 // is annulled. Charge bar frozen (gate in _egTickPlayer via
 // _egShrFinalActive).
@@ -652,11 +652,11 @@ function _egShrFinalStart(monster) {
     ov.className = 'eg-shr-cd';
     ov.innerHTML =
         '<div class="eg-shr-cd-label">⛩️ THOUSAND ARMS</div>' +
-        '<div class="eg-shr-cd-hint">Eight torii beams sweep the shrine and every few seconds a KNOCK comes: 20 talismans land with ONE safe cell — reach it before the grid detonates. Survive three knocks for THE THOUSANDTH ARM: only the descending circle is safe!</div>';
+        '<div class="eg-shr-cd-hint">Eight torii beams sweep the shrine and every few seconds a KNOCK comes: 20 talismans land with ONE safe cell - reach it before the grid detonates. Survive three knocks for THE THOUSANDTH ARM: only the descending circle is safe!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_shr_final_cd', '⛩️💀 THOUSAND ARMS — every arm at once. Read the knocks!', '#fde047');
+    _egNkToast('eg_mech_shr_final_cd', '⛩️💀 THOUSAND ARMS - every arm at once. Read the knocks!', '#fde047');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -686,7 +686,7 @@ function _egShrFinalStart(monster) {
         if (g.finished) return;
         g.knock++;
         if (g.knock > EG_SHR_KNOCKS) { runThousandthArm(); return; }
-        _egNkToast('eg_mech_shr_knock', '⛩️ KNOCK ' + g.knock + '/' + EG_SHR_KNOCKS + ' — find the safe cell!', '#fde047');
+        _egNkToast('eg_mech_shr_knock', '⛩️ KNOCK ' + g.knock + '/' + EG_SHR_KNOCKS + ' - find the safe cell!', '#fde047');
 
         // Grid centred on the arena (with a little jitter per knock).
         const cols = EG_SHR_GRID_COLS, rows = EG_SHR_GRID_ROWS;
@@ -740,7 +740,7 @@ function _egShrFinalStart(monster) {
     // ── THE THOUSANDTH ARM: final sweep + descending safety circle. ──────
     const runThousandthArm = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_shr_thousand', '⛩️💀 THE THOUSANDTH ARM — the Maiden descends! The circle is the only safe ground!', '#f97316');
+        _egNkToast('eg_mech_shr_thousand', '⛩️💀 THE THOUSANDTH ARM - the Maiden descends! The circle is the only safe ground!', '#f97316');
         // The safety circle: away from the edges.
         let px = W * 0.5, py = H * 0.5;
         for (let tries = 0; tries < 24; tries++) {
@@ -797,7 +797,7 @@ function _egShrFinalStart(monster) {
             // Failsafe: never spin forever.
             if (now - startAt > EG_SHR_FAILSAFE_MS) { runThousandthArm(); return false; }
         } else {
-            // THE THOUSANDTH ARM is armed — nothing extra to tick; the circle
+            // THE THOUSANDTH ARM is armed - nothing extra to tick; the circle
             // is drawn and the strike is scheduled.
         }
         return true;
@@ -835,7 +835,7 @@ function _egShrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egShrTeardown() {
     if (_egShrFinal) { try { _egShrFinalEnd(_egShrFinal, null); } catch (e) {} _egShrFinal = null; }
@@ -857,8 +857,8 @@ function _egShrTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_SHR_DEBUG.fire('bars'|'mirrors'|'ward', phase) — runs one now
-//   _EG_SHR_DEBUG.final()                              — THOUSAND ARMS now
+//   _EG_SHR_DEBUG.fire('bars'|'mirrors'|'ward', phase) - runs one now
+//   _EG_SHR_DEBUG.final()                              - THOUSAND ARMS now
 if (typeof window !== 'undefined') {
     window._EG_SHR_DEBUG = {
         fire: (name, phase) => {

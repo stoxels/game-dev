@@ -1,6 +1,6 @@
 ﻿//========================================================================
 //  scouts-primer.js
-//  Scout's Primer — pre-game bonus question chain that rewards the player
+//  Scout's Primer - pre-game bonus question chain that rewards the player
 //  with pre-solved rows and columns before the nonogram starts.
 //========================================================================
 
@@ -109,7 +109,7 @@ function getPrimerQuestion() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// NOTE (flagged, not removed — see refactor summary "Suspected dead code"):
+// NOTE (flagged, not removed - see refactor summary "Suspected dead code"):
 // the four helpers below (_primerBuildProgressLabel, _primerBuildStreakDots,
 // _primerBuildFooterText, _primerBuildAnswerHtml) are not called by
 // _primerBuildModalHtml or anywhere else in this file. _primerBuildModalHtml
@@ -117,7 +117,7 @@ function getPrimerQuestion() {
 // of mg-*/quiz-*), so these look like leftovers from an earlier modal design.
 
 // Returns the progress label string shown above the streak dots.
-// e.g. "Question 2 of 5 — On correct answer: +1 row & +1 column pre-solved"
+// e.g. "Question 2 of 5 - On correct answer: +1 row & +1 column pre-solved"
 function _primerBuildProgressLabel(streak) {
     return t('itm_primer_progress_full')
         .replace('{n}', streak + 1)
@@ -162,10 +162,10 @@ function _primerBuildAnswerHtml(question) {
 
 // Assembles and returns the full inner HTML string for the primer modal box.
 // Matches the quiz / math-gate redesign: stone X close button top-right (here
-// it IS the skip action — closing applies any earned headstart), tutor chip
+// it IS the skip action - closing applies any earned headstart), tutor chip
 // on the top-left gem, and a minimal "n/m" counter chip on the top frame band
 // between the portrait and the close button. No bottom button row and no
-// streak dots — the counter chip carries all the progress info.
+// streak dots - the counter chip carries all the progress info.
 function _primerBuildModalHtml(question, streak) {
     const counterLabel = `${streak + 1}/${PRIMER_MAX}`;
 
@@ -391,7 +391,7 @@ function _primerHandleCorrectAnswer(fb, newStreak) {
     updateQuestStats('questionCorrect', { source: 'primer' });
 
     if (newStreak >= PRIMER_MAX) {
-        // All questions answered correctly — maximum headstart
+        // All questions answered correctly - maximum headstart
         fb.textContent = t('itm_primer_perfect')
             .replace('{n}', newStreak)
             .replace('{m}', PRIMER_MAX);
@@ -461,7 +461,7 @@ function skipPrimer() {
 
 
 //------------------------------------------------------------------------
-//-------------------PASSIVE TREE — HEADSTART BONUSES---------------------
+//-------------------PASSIVE TREE - HEADSTART BONUSES---------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -990,7 +990,7 @@ function primerUseTutor() {
         .primer-perfect-glow { animation: primerBoardGlow   2.8s ease-in-out !important; }
 
 
-        /* ── Per-cell flare — shared base ───────────────────────────────── */
+        /* ── Per-cell flare - shared base ───────────────────────────────── */
         @keyframes scoutFlareBase {
             0%   { transform: scale(0.3);  opacity: 1;    border-radius: 3px; }
             40%  { transform: scale(1.25); opacity: 0.85; }

@@ -4,14 +4,14 @@
     Styles for the Changelog modal window.
 
     Visual family: same stone/parchment chrome as the settings, how-to-play
-    and replay modals — the settings_background.png frame, the
+    and replay modals - the settings_background.png frame, the
     settings_title_plague.png title plaque and the settings_close_button.png
     stone X (the plaque geometry is shared with .tut-box .modal-title and
     .replay-header in css/modals.css / css/replay.css).
 
     UNIQUE to this modal: the version history itself, rendered by
     js/changelog.js as scrollable parchment version cards (one card per
-    game version, with category headings and bullet lists) — mirroring the
+    game version, with category headings and bullet lists) - mirroring the
     How-To-Play modal's parchment section cards.
 
     Content colors flip to the parchment scheme (dark stone-brown text on
@@ -143,7 +143,7 @@
     scrollbar-width: thin;
 }
 
-/* WebKit (Chrome/Edge/Safari) — parchment-toned scrollbar (same as tut-scroll) */
+/* WebKit (Chrome/Edge/Safari) - parchment-toned scrollbar (same as tut-scroll) */
 .changelog-scroll-area::-webkit-scrollbar {
     width: clamp(6px, 0.7vw, 10px);
 }
@@ -165,7 +165,7 @@
     ------------------------------------------------------------------------
 */
 
-/* Outer container for a single version entry — mirrors .tut-section */
+/* Outer container for a single version entry - mirrors .tut-section */
 .cl-version-block {
     background: rgba(255, 248, 220, 0.55);
     border: 2px solid rgba(44, 26, 12, 0.4);
@@ -217,7 +217,7 @@
         margin-bottom: 0;
     }
 
-/* Category heading (e.g. "New Features", "Bug Fixes") — gold like the
+/* Category heading (e.g. "New Features", "Bug Fixes") - gold like the
    plaque title, with a subtle dark edge so it reads on the light card */
 .cl-category-label {
     font-family: var(--PX);
@@ -273,7 +273,7 @@
 */
 
 /* Very narrow: drop the fixed aspect ratio and grow with the viewport, and
-   switch top/bottom padding to vh units — a single tall column makes the
+   switch top/bottom padding to vh units - a single tall column makes the
    frame art's top/bottom border (11%/10% of HEIGHT) outgrow width-based
    padding (same fix as the tut-box portrait breakpoint). */
 @media (max-width: 700px) {

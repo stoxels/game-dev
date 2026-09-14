@@ -1,5 +1,5 @@
 /* -----------------------------------------------------------------------
-   GAME SETUP SCREEN — scaled book layout.
+   GAME SETUP SCREEN - scaled book layout.
    The book is rendered at its natural 1376x768 design size and scaled with
    transform:scale() to fit the viewport (see _fitSetupBook in screens.js).
    Because the whole book scales as one unit, EVERY inner size below is a
@@ -26,7 +26,7 @@
     pointer-events: none;
 }
 
-/* Invisible full-screen anchor — all setup elements are children of this */
+/* Invisible full-screen anchor - all setup elements are children of this */
 .setup-box {
     position: absolute;
     inset: 0;
@@ -36,7 +36,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   THE BOOK — fixed design-size canvas, scaled to the viewport by JS.
+   THE BOOK - fixed design-size canvas, scaled to the viewport by JS.
    ----------------------------------------------------------------------- */
 .setup-book {
     position: absolute;
@@ -61,7 +61,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   CONTENT PAGES — boxes the visible parchment area. Sized as % of the book
+   CONTENT PAGES - boxes the visible parchment area. Sized as % of the book
    from the measured parchment bounds (x 14->92, y 12->81). Everything that
    must stay on the pages is a child of this.
    ----------------------------------------------------------------------- */
@@ -75,7 +75,7 @@
 }
 
 /* =========================================================================
-   ZONES — positioned as % of .setup-pages
+   ZONES - positioned as % of .setup-pages
    ========================================================================= */
 .setup-zone {
     position: absolute;
@@ -237,7 +237,7 @@
 }
 
 /* =========================================================================
-   MOD WRAPPER — title plate (top), tombstone slab with icon, score tag.
+   MOD WRAPPER - title plate (top), tombstone slab with icon, score tag.
    ========================================================================= */
 .mod-wrapper {
     display: flex;
@@ -280,7 +280,7 @@
 .mod-title-cyan   { color: var(--accent); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 .mod-title-green  { color: var(--green); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 
-/* The tombstone slab — big and buff, holds the icon */
+/* The tombstone slab - big and buff, holds the icon */
 .setup-opt-mod {
     box-sizing: border-box;
     background-image: url('../images/Game_Setup/Modifier-Block-1.webp');
@@ -312,7 +312,7 @@
         filter: brightness(1.08) drop-shadow(0 0 12px rgba(102,252,241,0.5));
     }
 
-/* Icon — big and clear, centred on the slab */
+/* Icon - big and clear, centred on the slab */
 .mod-icon {
     flex: 0 0 auto;
     background-size: contain;
@@ -342,7 +342,7 @@
     margin-top: 4px;
 }
 
-/* Per-tombstone description — shown only when selected */
+/* Per-tombstone description - shown only when selected */
 .mod-per-desc {
     display: none;
     font-size: 13px;
@@ -382,7 +382,7 @@
     z-index: 10;
 }
 
-/* SELECT LEVEL is the primary CTA — the strongest element on screen */
+/* SELECT LEVEL is the primary CTA - the strongest element on screen */
 .setup-btn-img {
     font-family: var(--PX);
     font-size: 22px;
@@ -413,7 +413,7 @@
     }
 
 /* =========================================================================
-   BACK BUTTON (top-left corner) — now the unified .back-btn slab from
+   BACK BUTTON (top-left corner) - now the unified .back-btn slab from
    base.css (positioning comes from .back-btn-corner); this block only
    keeps the setup screen's slightly larger label.
    ========================================================================= */

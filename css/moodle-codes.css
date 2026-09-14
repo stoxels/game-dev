@@ -1,12 +1,12 @@
 /*
     ============================================================
     moodle-codes.css
-    Redesigned Moodle Codes Screen — overlay on background image
+    Redesigned Moodle Codes Screen - overlay on background image
     ============================================================
 */
 
 /* -----------------------------------------------------------------------
-   SCREEN ROOT — background image fills everything, content overlays it
+   SCREEN ROOT - background image fills everything, content overlays it
    ----------------------------------------------------------------------- */
 
 #screen-codes {
@@ -24,7 +24,7 @@
     }
 
 /* -----------------------------------------------------------------------
-   MOODLE CODES LOGO — top center, overlays the title area of background2
+   MOODLE CODES LOGO - top center, overlays the title area of background2
    ----------------------------------------------------------------------- */
 
 .mc-logo {
@@ -58,7 +58,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   BACK BUTTON — top-left corner. Now the unified .back-btn stone slab
+   BACK BUTTON - top-left corner. Now the unified .back-btn stone slab
    (base.css) with .back-btn-corner anchoring; this block is retired.
    ----------------------------------------------------------------------- */
 
@@ -137,7 +137,7 @@
     gap: 10px;
     font-family: var(--C, 'Cinzel', serif);
     font-size: clamp(10px, 1.3vw, 18px);
-    color: #3a2510; /* dark brown — readable on parchment */
+    color: #3a2510; /* dark brown - readable on parchment */
     letter-spacing: 0.5px;
     line-height: 1;
 }
@@ -237,7 +237,7 @@
         }
 
 /* -----------------------------------------------------------------------
-   FOOTER TEXT — overlays the stone base engraving at bottom
+   FOOTER TEXT - overlays the stone base engraving at bottom
    Sits at ~84–89% from top, centered.
    ----------------------------------------------------------------------- */
 

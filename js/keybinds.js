@@ -7,9 +7,9 @@
 const KEYBINDS_KEY = 'stoxels_keybinds';
 
 // Canonical action list. Each entry:
-//   id      — stable action identifier (persisted in localStorage)
-//   label   — display name in the keybind setup screen
-//   keys    — default key (KeyboardEvent.key, lowercased). Use 'escape',
+//   id      - stable action identifier (persisted in localStorage)
+//   label   - display name in the keybind setup screen
+//   keys    - default key (KeyboardEvent.key, lowercased). Use 'escape',
 //             'space', 'arrowup'… for named keys; single chars otherwise.
 const KEYBIND_DEFAULTS = [
     // Sprite movement (WASD by default). The sprite systems read these
@@ -22,10 +22,10 @@ const KEYBIND_DEFAULTS = [
 
     // Endgame parry (hold R by default) and manual weapon attack (E).
     // The attack swings the equipped weapon toward the facing direction
-    // with a pure-CSS effect (see js/endgame/endgame-weapon-swing.js) —
+    // with a pure-CSS effect (see js/endgame/endgame-weapon-swing.js) -
     // no per-character/per-class weapon art needed.
-    { id: 'eg-parry',    label: 'Endgame parry (hold)',  keys: 'r' },
-    { id: 'eg-attack',   label: 'Endgame attack (weapon swing)', keys: 'e' },
+    { id: 'eg-parry',    label: 'Parry (hold)',  keys: 'r' },
+    { id: 'eg-attack',   label: 'Melee Attack (spends charge %)', keys: 'e' },
 
     // Target cycling (Tab by default).
     { id: 'cycle-target', label: 'Cycle Target', keys: 'tab' },
@@ -54,8 +54,17 @@ const KEYBIND_DEFAULTS = [
     { id: 'hotbar-9',  label: 'Hotbar Slot 9',  keys: '9' },
     { id: 'hotbar-10', label: 'Hotbar Slot 10', keys: '0' },
 
-    // Spell book (P by default — Path-of-Exile/WoW-style spellbook key).
+    // Spell book (P by default - Path-of-Exile/WoW-style spellbook key).
     { id: 'spellbook', label: 'Toggle Spellbook', keys: 'p' },
+
+    // Probability tree (K by default) - opens the tree over a running
+    // puzzle (game pauses silently, K again resumes) or from menu screens.
+    { id: 'passive-tree', label: 'Probability Tree', keys: 'k' },
+
+    // Character sheet + inventory (B by default) - opens the synchronized
+    // endgame character sheet from the game screen (introduced by the
+    // interactive tutorial's gear intermission).
+    { id: 'char-sheet', label: 'Character Sheet & Inventory', keys: 'b' },
 ];
 
 // Live keybind map: action id -> key string. Rebuilt by loadKeybinds().
@@ -90,7 +99,7 @@ function loadKeybinds() {
         // One-time migration (2026-09-11): parry moved from E to R so E
         // could become the weapon-attack key. Players with a saved layout
         // from before eg-attack existed keep their custom parry key unless
-        // it is still the old 'e' default — then parry slides to 'r' and
+        // it is still the old 'e' default - then parry slides to 'r' and
         // the new attack takes 'e'. Fresh profiles just get the defaults.
         if (saved && typeof saved === 'object' && !('eg-attack' in saved)) {
             if (KEYBINDS['eg-parry'] === 'e') {
@@ -100,7 +109,7 @@ function loadKeybinds() {
             }
         }
     } catch {
-        // corrupt payload — defaults already applied above
+        // corrupt payload - defaults already applied above
     }
     _rebuildKeybindIndex();
     return KEYBINDS;
@@ -183,7 +192,7 @@ function keybindDisplayLabel(key) {
 //   {k1}…{k4} → hotbar-1…hotbar-4, {k5} → 'escape' (hard pause key).
 const KEYBIND_TUT_ACTIONS = [
     'hotbar-1', 'hotbar-2', 'hotbar-3', 'hotbar-4',
-    null, // {k5} — the pause key is fixed, shown as its key-cap label
+    null, // {k5} - the pause key is fixed, shown as its key-cap label
 ];
 
 function tutUpdateKeybinds() {
@@ -195,7 +204,7 @@ function tutUpdateKeybinds() {
             const actionId = KEYBIND_TUT_ACTIONS[i - 1];
             if (actionId) return keybindDisplayLabel(keybindKeyFor(actionId));
             if (i === 5) return keybindDisplayLabel('escape');
-            return m; // unknown placeholder — leave it visible
+            return m; // unknown placeholder - leave it visible
         });
         el.innerHTML = filled;
     });
@@ -228,13 +237,13 @@ function renderKeybindsUI() {
         row.appendChild(btn);
         list.appendChild(row);
     }
-    // Keep {k*} placeholders in help screens (How-To-Play etc.) in sync —
+    // Keep {k*} placeholders in help screens (How-To-Play etc.) in sync -
     // this also fires after captures, resets and cross-tab storage sync,
     // since they all re-render through here.
     if (typeof tutUpdateKeybinds === 'function') tutUpdateKeybinds();
 
     // Hotbar slots print their bound key on the slot, so refresh them too
-    // whenever a binding changed (make sure the function exists — skills are
+    // whenever a binding changed (make sure the function exists - skills are
     // an optional layer).
     if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
 }
@@ -384,6 +393,6 @@ function openKeybindsModal() {
 
 // Load bindings immediately so the map is ready before any screen boots;
 // the keydown listener is installed here too (capture phase, before the
-// per-screen listeners registered later — they check KEYBINDS themselves
+// per-screen listeners registered later - they check KEYBINDS themselves
 // where needed).
 initKeybinds();

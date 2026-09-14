@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------
 // Platforming homage without jumping: four safe platforms hover over a sea
 // of burning ground. Every few seconds one platform sinks and a new one
-// rises elsewhere — telegraphed, so keep an exit route in mind.
+// rises elsewhere - telegraphed, so keep an exit route in mind.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
 //   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)

@@ -792,7 +792,7 @@
         <div id="panel">
             <div id="panel-header">
                 <span>Node Properties</span>
-                <span id="node-id-badge" class="node-id-badge" style="display:none">ID: —</span>
+                <span id="node-id-badge" class="node-id-badge" style="display:none">ID: -</span>
             </div>
             <div id="panel-body">
                 <div id="panel-empty">
@@ -883,7 +883,7 @@
     <div id="statusbar">
         <div>Nodes: <span id="st-nodes">0</span></div>
         <div>Connections: <span id="st-conns">0</span></div>
-        <div>Selected: <span id="st-sel">—</span></div>
+        <div>Selected: <span id="st-sel">-</span></div>
         <div id="st-msg" style="margin-left:auto;color:var(--green)"></div>
     </div>
 
@@ -930,7 +930,7 @@
     </div>
 
     <script>// ═══════════════════════════════════════════════════════════════════════
-//  PASSIVE TREE EDITOR — main.js (embedded)
+//  PASSIVE TREE EDITOR - main.js (embedded)
 // ═══════════════════════════════════════════════════════════════════════
 
 // ── DATA MODEL ──────────────────────────────────────────────────────────
@@ -1254,7 +1254,7 @@ function renderAllConns() {
 function refreshStatus() {
   stNodes.textContent   = nodes.length;
   stConns.textContent   = conns.length;
-  stSel.textContent     = selectedId != null ? ('#' + selectedId) : '—';
+  stSel.textContent     = selectedId != null ? ('#' + selectedId) : '-';
   nodeCountEl.textContent = nodes.length + ' nodes · ' + conns.length + ' connections';
   scheduleSave();
 }
@@ -1312,7 +1312,7 @@ function renderConnList(id) {
 
     const item = document.createElement('div');
     item.className = 'conn-item';
-    item.innerHTML = `<span>⟷ ${otherId} — ${label}</span>`;
+    item.innerHTML = `<span>⟷ ${otherId} - ${label}</span>`;
     const btn = document.createElement('button');
     btn.className = 'conn-del';
     btn.textContent = '✕';
@@ -1436,7 +1436,7 @@ function selectNode(id) {
   selectedId = id;
   if (id != null && nodeEls[id]) nodeEls[id].classList.add('selected');
   if (id != null) openPanel(id); else closePanel();
-  stSel.textContent = id != null ? ('#' + id) : '—';
+  stSel.textContent = id != null ? ('#' + id) : '-';
 }
 
 // ── CONNECT MODE ──────────────────────────────────────────────────────────
@@ -1485,7 +1485,7 @@ function showTooltip(node, e) {
       ${node.nameEn || '(unnamed)'}
     </div>
     <div style="font-size:15px;color:var(--text2);margin-bottom:3px">
-      ID: ${node.id} &nbsp;·&nbsp; ${node.statKey || '—'}
+      ID: ${node.id} &nbsp;·&nbsp; ${node.statKey || '-'}
     </div>
     ${node.descEn ? `<div style="font-size:15px;color:var(--gold);line-height:1.5">${node.descEn.replace(/\n/g,'<br>')}</div>` : ''}
   `;
@@ -1527,7 +1527,7 @@ function onNodeClick(e, id) {
     if (connectSrcId === null) {
       connectSrcId = id;
       if (nodeEls[id]) nodeEls[id].classList.add('connect-src');
-      flashMsg('Source: node ' + id + ' — now click target node');
+      flashMsg('Source: node ' + id + ' - now click target node');
     } else if (connectSrcId !== id) {
       const srcId = connectSrcId;
       addConn(srcId, id);
@@ -1564,7 +1564,7 @@ canvasWrap.addEventListener('dblclick', e => {
 canvasWrap.addEventListener('click', e => {
   if (e.target.closest('.node')) return;
   if (connectMode) {
-    // clicked empty space while connecting — cancel
+    // clicked empty space while connecting - cancel
     if (connectSrcId !== null) {
       if (nodeEls[connectSrcId]) nodeEls[connectSrcId].classList.remove('connect-src');
       connectSrcId = null;
@@ -1778,7 +1778,7 @@ document.getElementById('import-ok').addEventListener('click', () => {
       importFromLegacyFormat(data.FullData);
     }
     else {
-      flashMsg('Unrecognised format — see hint text.', 'var(--red)');
+      flashMsg('Unrecognised format - see hint text.', 'var(--red)');
       return;
     }
     document.getElementById('import-modal').style.display = 'none';
@@ -1866,7 +1866,7 @@ document.getElementById('btn-export').addEventListener('click', () => {
         connections: conns.map(c => ({ ...c }))
     };
     openExportModal(
-        '↓ Export — Full Editor JSON',
+        '↓ Export - Full Editor JSON',
         'Import this back into the editor at any time. Also contains all data needed for your game.',
         'const TALENT_TREE_DATA = ' + JSON.stringify(data, null, 2) + ';'
     );
@@ -1905,7 +1905,7 @@ document.getElementById('btn-export-skills').addEventListener('click', () => {
   lines.push('// const PT_CONNECTIONS = ' + JSON.stringify(conns.map(c=>({from:c.from,to:c.to,dotted:c.dotted||undefined})).map(c=>{const o={from:c.from,to:c.to};if(c.dotted)o.dotted=true;return o;}), null, 2) + ';');
 
   openExportModal(
-    '↓ Export — PT_SKILL_DEFS (JavaScript)',
+    '↓ Export - PT_SKILL_DEFS (JavaScript)',
     'Paste this into passive-tree-skills.js. Each skill now includes x, y, and connections.',
     lines.join('\n')
   );
@@ -1932,7 +1932,7 @@ document.getElementById('export-copy').addEventListener('click', () => {
       document.execCommand('copy');
       flashMsg('Copied to clipboard!');
     }
-  } catch(e) { flashMsg('Copy failed — select manually', 'var(--red)'); }
+  } catch(e) { flashMsg('Copy failed - select manually', 'var(--red)'); }
 });
 
 // close modals on overlay click
@@ -1978,7 +1978,7 @@ refreshStatus();
         flashMsg('Restored previous session (' + nodes.length + ' nodes)');
         return;
       }
-    } catch (e) { /* corrupt save — fall through to starter */ }
+    } catch (e) { /* corrupt save - fall through to starter */ }
   }
 
   // Fresh start: create the default Start node (id 11, matching game data)

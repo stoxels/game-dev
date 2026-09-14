@@ -1,37 +1,37 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE STORMCALLER (boss_sirus)--------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK — "The Eye of the Storm". PoE Sirus homage, deepened: the
-// sky no longer sends storms — the sky IS the weapon. Every mechanic
+// TIER 8 REWORK - "The Eye of the Storm". PoE Sirus homage, deepened: the
+// sky no longer sends storms - the sky IS the weapon. Every mechanic
 // electrifies the arena and every mechanic answers to the other: currents
 // charge you, being charged draws the chains, standing in water while
 // charged is suicide, and in the finale the storm turns YOUR stored charge
 // into the kill. Element: lightning.
 //
-//   • ION CURRENT (signature, all fight) — two glowing ion fronts slide
+//   • ION CURRENT (signature, all fight) - two glowing ion fronts slide
 //     across the arena on telegraphed lanes, split by a solid line: the
 //     TANGENT is the only instant a lane is safe (2 hot bands + 1 cool).
 //     Crossing a tangent puts CHARGE on you; while charged you tick to
 //     EVERYTHING nearby. Phase 3: the fronts close from both sides at
-//     once — the whole arena goes hot in a pincer.
-//   • CHAIN LIGHTNING (60%) — a ⚡ hunting bolt tracks you; you cannot
-//     outwalk it, only outposition it. Broken by the WATER LINE — blue
+//     once - the whole arena goes hot in a pincer.
+//   • CHAIN LIGHTNING (60%) - a ⚡ hunting bolt tracks you; you cannot
+//     outwalk it, only outposition it. Broken by the WATER LINE - blue
 //     currents sweep and leave standing water; a bolt that reaches you
 //     over water grounds itself at the shore. Cold pools (shared
-//     frozen_cells) always ground the bolt — ice doesn't conduct.
-//   • STORM EYE (60%, once) — the Stormcaller descends to the centre in a
+//     frozen_cells) always ground the bolt - ice doesn't conduct.
+//   • STORM EYE (60%, once) - the Stormcaller descends to the centre in a
 //     16-cell grid: he casts 7 hot cells, then the SAFE tiles are the ones
-//     connected to the eye — the dead zones are the ones he's already
-//     charged. Spends phase 3 for phase 1 — never moves again. Safe cells
+//     connected to the eye - the dead zones are the ones he's already
+//     charged. Spends phase 3 for phase 1 - never moves again. Safe cells
 //     protect from EVERYTHING (a true succ zone).
-//   • ⛈️ PERFECT STORM (≤10%, one-shot finale) — four ion currents enclose
+//   • ⛈️ PERFECT STORM (≤10%, one-shot finale) - four ion currents enclose
 //     a shrinking box; the eye tracks you while the eye of the box closes;
-//     then the STORM GROWS TEETH: your CHARGE becomes bullets — every
+//     then the STORM GROWS TEETH: your CHARGE becomes bullets - every
 //     charged tick fires a hunting bullet at your last position. Die by
 //     your own stored charge. Charge bar frozen (gate in _egTickPlayer
 //     via _egSirFinalActive).
 //
-// Shared soul kept: probability_shift still turns the puzzle's clues —
+// Shared soul kept: probability_shift still turns the puzzle's clues -
 // fitting for a boss about charge vs. potential. frozen_cells (cold
 // pools) retained as a bolt-grounding interaction. corrupt_cells retired.
 //
@@ -63,7 +63,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_sirus — "The Eye of the Storm" (rework)
+    // boss_sirus - "The Eye of the Storm" (rework)
     // Phase 1 (100% → 60%): Ion Current + Probability Shift
     // Phase 2 ( 60% → 30%): immune window; Chain Lightning + Storm Eye join
     // Phase 3 ( 30% →  0%): pincer currents, faster chains, eye never moves
@@ -95,7 +95,7 @@ const EG_SIR_TOUCH_CD_MS = 700;      // shared touch cooldown
 //------------------------------------------------------------------------
 
 // Touch damage helper shared by all Stormcaller hazards. Lightning-element
-// boss — hits go in with element 'lightning' so the toast palette stays
+// boss - hits go in with element 'lightning' so the toast palette stays
 // yellow.
 let _egSirHitCd = 0;
 function _egSirTouch(pct, level, label) {
@@ -126,11 +126,11 @@ function _egSirHeal(amount) {
 //-------------------SIGNATURE: ION CURRENT (all fight)---------------------
 //------------------------------------------------------------------------
 // Two glowing ion fronts slide across the arena on telegraphed lanes. Each
-// lane is split by a solid line: the TANGENT — the only instant a lane is
+// lane is split by a solid line: the TANGENT - the only instant a lane is
 // safe, between the hot band behind the front and the cool band ahead.
 // Crossing a tangent puts CHARGE on you: 5 stacks max, decaying 1/4s, and
 // while charged you tick to EVERYTHING nearby (aura ticks stronger the
-// more stacks). Phase 3: the fronts close from both sides at once — a
+// more stacks). Phase 3: the fronts close from both sides at once - a
 // pincer.
 const EG_SIR_ION_N      = [0, 2, 2, 2]; // lanes per cast (pincer = 2×2)
 const EG_SIR_ION_WARN   = 1500;         // dashed telegraph before the front moves
@@ -182,7 +182,7 @@ function _egMechSirIon(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_sir_ion', '⛈️ ION CURRENT — the fronts split the lanes. Cross at the TANGENT — charge draws the storm!', '#fde047');
+    _egNkToast('eg_mech_sir_ion', '⛈️ ION CURRENT - the fronts split the lanes. Cross at the TANGENT - charge draws the storm!', '#fde047');
 
     // Lanes: phase 1/2 two horizontal fronts; phase 3 a pincer (a horizontal
     // pair closing inward + a vertical pair closing inward).
@@ -249,7 +249,7 @@ function _egMechSirIon(monster, phase) {
             }
 
             // Hot inside the band, EXCEPT the tangent sliver (±8px around
-            // the lane centre): the one instant a lane is safe — and the
+            // the lane centre): the one instant a lane is safe - and the
             // only place that doesn't build charge.
             let inBand = false, onTangent = false;
             for (const l of lanes) {
@@ -289,7 +289,7 @@ function _egMechSirIon(monster, phase) {
 // A ⚡ hunting bolt tracks you; you cannot outwalk it, only outposition it.
 // BROKEN BY WATER: blue currents sweep and leave standing water; a bolt
 // that must cross water grounds itself at the shore. Cold pools (shared
-// frozen_cells) always ground the bolt — ice doesn't conduct. Phase 3:
+// frozen_cells) always ground the bolt - ice doesn't conduct. Phase 3:
 // TWO bolts.
 const EG_SIR_BOLT_SPD   = [0, 150, 165, 185]; // px/s hunting bolt
 const EG_SIR_BOLT_DMG   = [0, 0, 0.16, 0.20]; // %maxHP bolt hit
@@ -307,7 +307,7 @@ function _egMechSirChain(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_sir_chain', '⛈️ CHAIN LIGHTNING — the bolt hunts. Water grounds it — lure it across a river!', '#fde047');
+    _egNkToast('eg_mech_sir_chain', '⛈️ CHAIN LIGHTNING - the bolt hunts. Water grounds it - lure it across a river!', '#fde047');
 
     // ── Water lines: rivers sweep across and LEAVE standing water. ───────
     const rivers = [];
@@ -360,7 +360,7 @@ function _egMechSirChain(monster, phase) {
                 r.sweepEl.style.opacity = '0';
             }
         }
-        // (Rivers keep their pools for the rest of the cast — terrain.)
+        // (Rivers keep their pools for the rest of the cast - terrain.)
 
         // Bolts hunt. Grounding: over standing water or a cold pool, the bolt
         // grounds itself at the shore (the pool edge nearest the bolt).
@@ -370,7 +370,7 @@ function _egMechSirChain(monster, phase) {
                 const d = r.axis === 'h' ? Math.abs(by - r.pos) : Math.abs(bx - r.pos);
                 if (d < EG_SIR_GROUND_R) return r;
             }
-            // Cold pools (frozen_cells visuals) — check for the tint class.
+            // Cold pools (frozen_cells visuals) - check for the tint class.
             const cold = document.querySelectorAll('.eg-frozen-cell, .eg-nk-frozen-cell');
             for (const c of cold) {
                 const cr = c.getBoundingClientRect();
@@ -417,9 +417,9 @@ function _egMechSirChain(monster, phase) {
 //-------------------ACT II: STORM EYE (60%, once)-------------------------
 //------------------------------------------------------------------------
 // The Stormcaller descends to the centre in a 4×4 grid of storm cells. He
-// casts 7 hot cells; the SAFE tiles are the ones connected to the eye —
+// casts 7 hot cells; the SAFE tiles are the ones connected to the eye -
 // the dead zones are the ones he's already charged. Spends phase 3 for
-// phase 1: he NEVER MOVES AGAIN — the finale will have to come to him.
+// phase 1: he NEVER MOVES AGAIN - the finale will have to come to him.
 const EG_SIR_EYE_N      = 4;     // 4×4 grid
 const EG_SIR_EYE_HOT    = 7;     // hot cells
 const EG_SIR_EYE_DPS    = [0, 0, 7.5, 9.0]; // %/s in a hot cell
@@ -434,7 +434,7 @@ function _egMechSirEye(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_sir_eye', '⛈️ STORM EYE — the eye settles. The cells CONNECTED to it are safe. Stay in the web!', '#fde047');
+    _egNkToast('eg_mech_sir_eye', '⛈️ STORM EYE - the eye settles. The cells CONNECTED to it are safe. Stay in the web!', '#fde047');
 
     // The 4×4 grid, centred.
     const cell = Math.min(W, H) * 0.15;
@@ -445,7 +445,7 @@ function _egMechSirEye(monster, phase) {
     const cells = [];
     for (let r = 0; r < EG_SIR_EYE_N; r++) {
         for (let c = 0; c < EG_SIR_EYE_N; c++) {
-            // Safe: the web CONNECTED to the eye — the eye itself, its four
+            // Safe: the web CONNECTED to the eye - the eye itself, its four
             // orthogonal neighbours, and the two far arms of the cross.
             const isEye = (r === eyeR && c === eyeC);
             const isSafe = isEye || (Math.abs(r - eyeR) + Math.abs(c - eyeC) === 1) || (r === eyeR && c === eyeC + 2) || (c === eyeC && r === eyeR + 2);
@@ -458,7 +458,7 @@ function _egMechSirEye(monster, phase) {
         }
     }
     // Exactly EG_SIR_EYE_HOT hot cells: the non-web cells CLOSEST to the
-    // eye — the two farthest stay inert (even the storm's charge has
+    // eye - the two farthest stay inert (even the storm's charge has
     // limits, and inert cells read as neither safe nor lethal).
     cells.filter(c => !c.safe && !c.eye)
         .map(c => ({ c, d: Math.abs(c.r - eyeR) + Math.abs(c.c - eyeC) }))
@@ -495,7 +495,7 @@ function _egMechSirEye(monster, phase) {
 //------------------------------------------------------------------------
 // Four ion currents enclose a shrinking box; the eye of the box tracks you
 // while it closes; then the STORM GROWS TEETH: your CHARGE becomes
-// bullets — every charged tick fires a hunting bullet at your last
+// bullets - every charged tick fires a hunting bullet at your last
 // position. Die by your own stored charge. Charge bar frozen (gate in
 // _egTickPlayer via _egSirFinalActive).
 const EG_SIR_FIN_BOXES    = 3;      // enclosing box waves
@@ -586,11 +586,11 @@ function _egSirFinalStart(monster) {
     ov.className = 'eg-sir-cd';
     ov.innerHTML =
         '<div class="eg-sir-cd-label">⛈️ PERFECT STORM</div>' +
-        '<div class="eg-sir-cd-hint">Four ion currents enclose the arena in a shrinking box — stay OUTSIDE it as it closes. Then the storm grows TEETH: your own CHARGE becomes bullets. Empty your charge before the box closes!</div>';
+        '<div class="eg-sir-cd-hint">Four ion currents enclose the arena in a shrinking box - stay OUTSIDE it as it closes. Then the storm grows TEETH: your own CHARGE becomes bullets. Empty your charge before the box closes!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_sir_final_cd', '⛈️💀 PERFECT STORM — the currents close in. Your charge is your doom!', '#fde047');
+    _egNkToast('eg_mech_sir_final_cd', '⛈️💀 PERFECT STORM - the currents close in. Your charge is your doom!', '#fde047');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -610,7 +610,7 @@ function _egSirFinalStart(monster) {
         if (g.finished) return;
         g.wave++;
         if (g.wave > EG_SIR_FIN_BOXES) { runTeeth(); return; }
-        _egNkToast('eg_mech_sir_wave', '⛈️ STORM WALL ' + g.wave + '/' + EG_SIR_FIN_BOXES + ' — stay outside the currents!', '#fde047');
+        _egNkToast('eg_mech_sir_wave', '⛈️ STORM WALL ' + g.wave + '/' + EG_SIR_FIN_BOXES + ' - stay outside the currents!', '#fde047');
 
         // The box starts at the arena edge and shrinks to a centre square.
         const box = { l: 0, t: 0, r: W, b: H, closing: true };
@@ -655,14 +655,14 @@ function _egSirFinalStart(monster) {
     // ── THE STORM GROWS TEETH: charge becomes bullets. ───────────────────
     const runTeeth = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_sir_teeth', '⛈️🦷 THE STORM GROWS TEETH — your CHARGE is firing at you!', '#f97316');
+        _egNkToast('eg_mech_sir_teeth', '⛈️🦷 THE STORM GROWS TEETH - your CHARGE is firing at you!', '#f97316');
         g.teeth = true;
         // Teeth phase lasts the rest of the set-piece; the main loop below
         // spawns a bullet per charged tick at your last position.
         _egSirAfter(g, 6000 * _EG_SIR_DEBUG_MULT, () => {
             if (g.finished) return;
             // Final judgement: the whole arena detonates (the storm is
-            // perfect — you were always part of it).
+            // perfect - you were always part of it).
             document.querySelectorAll('.eg-sir-box').forEach(el => el.classList.add('eg-sir-box-final'));
             const dealt = _egNkHit(0.30, 'lightning', level);
             _egNkAbilityHitToast(dealt, 'The Stormcaller', 'Perfect Storm');
@@ -748,7 +748,7 @@ function _egSirFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egSirTeardown() {
     if (_egSirFinal) { try { _egSirFinalEnd(_egSirFinal, null); } catch (e) {} _egSirFinal = null; }
@@ -757,7 +757,7 @@ function _egSirTeardown() {
     _egSirChipRun = null;
     _egSirCharge = 0; _egSirChargeUntil = 0;
     document.querySelectorAll('.eg-sir-charge-chip').forEach(el => { try { el.remove(); } catch (e) {} });
-    // The Storm Eye grants immunity while it stands — release it if the
+    // The Storm Eye grants immunity while it stands - release it if the
     // fight ended mid-cast (teardown kills the run before its loop ends).
     try {
         if (typeof _egMonsters !== 'undefined') {
@@ -780,8 +780,8 @@ function _egSirTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_SIR_DEBUG.fire('ion'|'chain'|'eye', phase) — runs one now
-//   _EG_SIR_DEBUG.final()                          — PERFECT STORM now
+//   _EG_SIR_DEBUG.fire('ion'|'chain'|'eye', phase) - runs one now
+//   _EG_SIR_DEBUG.final()                          - PERFECT STORM now
 if (typeof window !== 'undefined') {
     window._EG_SIR_DEBUG = {
         fire: (name, phase) => {

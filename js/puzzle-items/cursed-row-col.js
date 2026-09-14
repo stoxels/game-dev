@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------CURSED ROW COL — CHAOS GRID----------------------
+//-------------------CURSED ROW COL - CHAOS GRID----------------------
 //------------------------------------------------------------------------
 
-// cursedRowCol — solves 4 rows and 4 cols; downside blacks out column clues.
+// cursedRowCol - solves 4 rows and 4 cols; downside blacks out column clues.
 function _useCursedRowCol(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -44,7 +44,7 @@ function _fxDetonateBlast(container, r) {
     });
 }
 
-// 💥 Chaos Grid — multicolour explosions detonate across the entire grid.
+// 💥 Chaos Grid - multicolour explosions detonate across the entire grid.
 function _fxChaosGrid() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

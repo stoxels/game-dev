@@ -17,16 +17,16 @@
 
 #screen-hs.hs-redesign {
     /* parchment-legible display colors */
-    --hs-diff-easy: #1d6b3e;     /* easy      — deep green   */
-    --hs-diff-normal: #4a4237;   /* normal    — warm grey    */
-    --hs-diff-hard: #8f1d1d;     /* hard      — deep red     */
+    --hs-diff-easy: #1d6b3e;     /* easy      - deep green   */
+    --hs-diff-normal: #4a4237;   /* normal    - warm grey    */
+    --hs-diff-hard: #8f1d1d;     /* hard      - deep red     */
     --hs-mod-tt: #a35413;        /* Time Trial  (TT)        */
     --hs-mod-hc: #8f1d1d;        /* Hardcore    (HC)        */
     --hs-mod-im: #6b3fa0;        /* Ironman     (IM)        */
     --hs-mod-cl: #16606b;        /* Classless   (CL)        */
     --hs-mod-tl: #1d6b3e;        /* Treeless    (TL)        */
-    --hs-score: #8a5a00;         /* score numbers — old gold */
-    --hs-slot-text: #5d5346;     /* slot column — quiet ink  */
+    --hs-score: #8a5a00;         /* score numbers - old gold */
+    --hs-slot-text: #5d5346;     /* slot column - quiet ink  */
     --hs-row: #2b2620;           /* default row text         */
     --hs-row-alt: rgba(120, 90, 40, 0.08);   /* zebra stripe */
     --hs-row-hover: rgba(120, 90, 40, 0.16); /* hover wash   */
@@ -47,7 +47,7 @@
 
 
 /* ---------------------------------------------------------------------- */
-/* 1. SCROLL FRAME — locked to the artwork's real aspect ratio (1376x768)  */
+/* 1. SCROLL FRAME - locked to the artwork's real aspect ratio (1376x768)  */
 /*    so the box letterboxes/pillarboxes within the screen instead of the  */
 /*    image itself being cropped by background-size:cover. Because the box */
 /*    ratio matches the image ratio exactly, "cover" fills it with zero    */
@@ -75,7 +75,7 @@
 
 
 /* ---------------------------------------------------------------------- */
-/* 2. TOP ROW — menu button (left) + title plaque (center)                 */
+/* 2. TOP ROW - menu button (left) + title plaque (center)                 */
 /* ---------------------------------------------------------------------- */
 
 .hs-top-row {
@@ -88,7 +88,7 @@
     flex-shrink: 0;
 }
 
-/* ---- Menu/back button — now the unified .back-btn stone slab (base.css).
+/* ---- Menu/back button - now the unified .back-btn stone slab (base.css).
       Anchored to the screen's top-left corner (the screen itself is the
       positioning context), out of the centered .hs-top-row flow. ---- */
 
@@ -102,7 +102,7 @@
 
 /* ---- Title plaque (carved stone banner, from the ledger/modal header) ----
    Reused the warm carved-stone banner (inference-header.png) instead of the
-   plain grey-blue slab — it matches the parchment + grey menhir columns on
+   plain grey-blue slab - it matches the parchment + grey menhir columns on
    this screen and carries the title on a readable gold serif (Cinzel). */
 
 .hs-title-plaque {
@@ -138,7 +138,7 @@
 
 
 /* ---------------------------------------------------------------------- */
-/* 3. SLOT FILTER — a chip row (ALL + slots 1..20) that narrows the table  */
+/* 3. SLOT FILTER - a chip row (ALL + slots 1..20) that narrows the table  */
 /*    to one save slot or keeps it aggregated across all of them. The row   */
 /*    is a max-content strip centered in a shallow scroll container, so at  */
 /*    wide viewports it sits centered and at narrow ones it scrolls from    */
@@ -199,7 +199,7 @@
 
 
 /* ---------------------------------------------------------------------- */
-/* 4. COLUMN HEADERS — each label sits on its own copy of the carved       */
+/* 4. COLUMN HEADERS - each label sits on its own copy of the carved       */
 /*    stone header bar, laid out with the same 5-column grid as the table  */
 /*    below, so header and rows always line up.                            */
 /* ---------------------------------------------------------------------- */
@@ -254,14 +254,14 @@
 
 
 /* ---------------------------------------------------------------------- */
-/* 5. SCROLLABLE BODY — the table itself, sitting on the open parchment.   */
+/* 5. SCROLLABLE BODY - the table itself, sitting on the open parchment.   */
 /*    The stock <thead> is hidden; .hs-col-headers above replaces it       */
 /*    visually. Column widths are shared with the headers through          */
 /*    --hs-col-widths so the two grids always agree.                       */
 /* ---------------------------------------------------------------------- */
 
 .hs-redesign {
-    /* level | best | diff | mods | slot — single source of truth shared by
+    /* level | best | diff | mods | slot - single source of truth shared by
        the header grid and the table colgroup so they can never drift apart */
     --hs-col1: 16%;
     --hs-col2: 23%;
@@ -274,8 +274,8 @@
 .hs-redesign .hs-body {
     position: absolute;
     top: 32%;     /* just below the header bars and the parchment's rolled top edge */
-    left: 20.8%;  /* parchment left edge — same as .hs-col-headers */
-    width: 58.8%; /* parchment width — same as .hs-col-headers */
+    left: 20.8%;  /* parchment left edge - same as .hs-col-headers */
+    width: 58.8%; /* parchment width - same as .hs-col-headers */
     bottom: 11.5%; /* stop on the parchment, above its curled bottom edge (~89.6%) */
     overflow-y: auto;
     scrollbar-width: none;
@@ -317,7 +317,7 @@
         white-space: nowrap;
     }
 
-        /* five abbreviations + separators are the widest cell content —
+        /* five abbreviations + separators are the widest cell content -
            a slightly smaller size keeps TT+HC+IM+CL+TL on one line, and
            reduced side padding buys the last few pixels (span color is
            set inline by the JS, so only size/spacing live here) */
@@ -332,7 +332,7 @@
             letter-spacing: -0.5px;
         }
 
-        /* subtle zebra striping — makes wide rows easier to track */
+        /* subtle zebra striping - makes wide rows easier to track */
         .hs-redesign .hs-table tbody tr:nth-child(even) td {
             background: var(--hs-row-alt);
         }
@@ -345,7 +345,7 @@
     /* Empty state as a small flourish: the message sits on the ornate
        rolled-end scroll plate (score-pts-scroll.png, the same art as the
        map-view score ribbon), centered on the open parchment via inset:0 +
-       auto margins — the transform-free method, so the pixel font stays
+       auto margins - the transform-free method, so the pixel font stays
        perfectly crisp. No quill art exists in the asset folders, so the
        scroll carries the message alone. */
     position: absolute;
@@ -357,7 +357,7 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    /* keep the ink off the rolled ends — cqw against the frame, because
+    /* keep the ink off the rolled ends - cqw against the frame, because
        percent padding on an abs-pos box resolves against the PARENT's width
        and would eat the plate on wide viewports. The 28px floor forces the
        single-line case to wrap while its ends are still on the flat field. */
@@ -370,7 +370,7 @@
     font-family: var(--PX);
     /* Sized in cqw against the frame (see .hs-scroll-frame) so the type
        tracks the plate itself. Viewport units drift apart from the plate on
-       short/wide windows — the cap must stay low enough that two balanced
+       short/wide windows - the cap must stay low enough that two balanced
        lines still fit the scroll art's flat inner field (~55% plate height). */
     font-size: clamp(6px, 1cqw, 12px);
     line-height: 1.5;
@@ -381,14 +381,14 @@
 
     .hs-redesign .hs-empty-msg strong {
         /* The slot number arrives as an orange <strong> tuned for the tan
-           page background — too faint on the scroll's darker paper, so it
+           page background - too faint on the scroll's darker paper, so it
            becomes deep red ledger ink here instead. */
         color: #8f1d1d !important;
     }
 
 
 /* ---------------------------------------------------------------------- */
-/* 6. SCROLL-MOVER — compact crystal marker riding the carved rod on the    */
+/* 6. SCROLL-MOVER - compact crystal marker riding the carved rod on the    */
 /*    right edge of the parchment (the "pin" groove in the background art). */
 /*    The track is a slim invisible hit zone centered on that rod; the thumb */
 /*    keeps the artwork's real aspect (297x768) and sizes itself from its   */
@@ -401,12 +401,12 @@
     position: absolute;
     /* Art-anchored to the carved brown rod (x 81.2%..84.8% of the frame).
        The rod's ridable surface (between its gold end caps) runs from
-       y ~30% down to ~87%, so the track — and the thumb riding it — stay
+       y ~30% down to ~87%, so the track - and the thumb riding it - stay
        fully inside the rod instead of spilling over the scroll's bottom. */
     right: 15%;
     top: 28%;
     height: 57.5%;   /* groove between the rod's gold end caps (y 28%..85.5%) */
-    width: 2.8%;             /* slim hit zone — kept clear of the SLOT header
+    width: 2.8%;             /* slim hit zone - kept clear of the SLOT header
                                 bar so header clicks are never intercepted */
     pointer-events: auto;      /* interactive: drag / click / wheel */
     cursor: ns-resize;
@@ -418,7 +418,7 @@
     position: absolute;
     left: 50%;
     top: 4%; /* JS sets this to the live scroll percentage */
-    height: 17%; /* compact marker — the artwork fills its own aspect from this */
+    height: 17%; /* compact marker - the artwork fills its own aspect from this */
     width: auto;
     transform: translateX(-50%);
     transition: top .08s linear;
@@ -432,7 +432,7 @@
 
 
 /* ---------------------------------------------------------------------- */
-/* 7. RESPONSIVE — narrow viewports                                        */
+/* 7. RESPONSIVE - narrow viewports                                        */
 /* ---------------------------------------------------------------------- */
 
 /* Short landscape windows: shrink the empty-state scroll so its text can
@@ -461,7 +461,7 @@
         height: 14%;
     }
 
-    /* Keep headers/body pinned to the parchment width at every size —
+    /* Keep headers/body pinned to the parchment width at every size -
        rebalance the column mix instead so the wide MODIFIERS column can
        still hold "TT+HC+IM+CL+TL" on one line. */
     .hs-redesign {

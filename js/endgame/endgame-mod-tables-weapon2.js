@@ -1,26 +1,26 @@
 //  endgame-mod-tables-weapon2.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------WEAPON 2 (OFF-HAND / SHIELD) MODIFIER TABLE----------
 //------------------------------------------------------------------------
 // The off-hand slot accepts either a shield or an offhand item (focus,
 // orb, tome, dagger-grip, etc). Players who dual-wield use two copies
-// of EG_MOD_TABLE_WEAPON1 instead — this table is specifically for
+// of EG_MOD_TABLE_WEAPON1 instead - this table is specifically for
 // the protective/utility off-hand archetype.
 //
 // SHIELD identity:
-//   The shield is the premier block slot — it has the highest block and
+//   The shield is the premier block slot - it has the highest block and
 //   spell block values in the game, beating chest and shoulders. Its
 //   local defences (flat armour, evasion, absorption) rival shoulders
 //   scale. The shield-exclusive mod shield_bash lets it contribute to
 //   offence: when the player blocks, there is a % chance the shield
-//   slams back for damage. Absorption regen mods are strong here —
+//   slams back for damage. Absorption regen mods are strong here -
 //   the shield is the front line of that layer.
-//   Shields use EG_MOD_TABLE_SHIELD below — a defensive-only copy of
+//   Shields use EG_MOD_TABLE_SHIELD below - a defensive-only copy of
 //   this table. The offhand-identity offensive mods (spell_damage,
 //   inc_spell_damage, channel) are stripped from it since shields are
 //   purely protective pieces; those mods remain reserved for actual
@@ -28,7 +28,7 @@
 //
 // OFFHAND identity:
 //   An offhand item (focus, orb, tome, etc.) leans into spell damage,
-//   mana sustain, and the exclusive channel mod — filling correct cells
+//   mana sustain, and the exclusive channel mod - filling correct cells
 //   consecutively charges a damage multiplier that fires on the next
 //   melee strike or projectile. Rewards streak play the same way
 //   precision (chest) does, but as burst output rather than regen.
@@ -44,7 +44,7 @@ const EG_MOD_TABLE_WEAPON2 = {
     prefixes: {
 
         // --- LIFE & MANA ---
-        // Shoulders scale — a large protective piece warrants solid pools.
+        // Shoulders scale - a large protective piece warrants solid pools.
         flat_health: {
             id: 'flat_health',
             label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
@@ -87,7 +87,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
 
         // --- LOCAL DEFENCES ---
-        // All three defence types — a shield can be built in any style.
+        // All three defence types - a shield can be built in any style.
         // Values match shoulders scale since both are major protective
         // pieces. A well-rolled shield competes with chest for raw
         // defensive contribution.
@@ -274,6 +274,35 @@ const EG_MOD_TABLE_WEAPON2 = {
             ]
         },
 
+        // --- OFFHAND-IDENTITY: HEALING POWER ---
+        // A tome or reliquary carried off-hand. Same slot as spell_damage and
+        // the same reason: the offhand is where a caster's ROLE is declared, so
+        // it carries both halves of the support stat. Shields inherit these
+        // two automatically (they strip only the offensive families, see
+        // _egBuildPerModEssences / EG_MOD_TABLE_SHIELD) - a shield that heals
+        // is exactly the support fantasy the slot should allow.
+        healing_power: {
+            id: 'healing_power',
+            label: '+# to Healing Power', labelDe: '+# zu Heilkraft',
+            tiers: [
+                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 80 },
+                { tier: 2, min: 30, max: 44, weight: 250, ilvl: 60 },
+                { tier: 3, min: 16, max: 29, weight: 500, ilvl: 38 },
+                { tier: 4, min: 6, max: 15, weight: 1000, ilvl: 15 },
+                { tier: 5, min: 2, max: 5, weight: 2000, ilvl: 1 }
+            ]
+        },
+        inc_healing_power: {
+            id: 'inc_healing_power',
+            label: '#% increased Healing Power', labelDe: '#% erhöhte Heilkraft',
+            tiers: [
+                { tier: 1, min: 28, max: 40, weight: 80, ilvl: 82 },
+                { tier: 2, min: 16, max: 27, weight: 200, ilvl: 62 },
+                { tier: 3, min: 8, max: 15, weight: 460, ilvl: 38 },
+                { tier: 4, min: 2, max: 7, weight: 1000, ilvl: 14 }
+            ]
+        },
+
         // --- OFFHAND-EXCLUSIVE: CHANNEL ---
         // The offhand focuses power between strikes. Each consecutive
         // correct cell fill without a mistake charges the channel,
@@ -284,7 +313,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // the hit automatically releases.
         // Distinct from precision (chest): precision is a sustained
         // regen/damage buff while cells are revealed; channel is a
-        // burst payoff — save up, then spend. Complementary, not
+        // burst payoff - save up, then spend. Complementary, not
         // redundant, and competing for prefix budget differently.
         channel: {
             id: 'channel',
@@ -334,7 +363,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         // --- ATTRIBUTES ---
         // Strength is primary for shields (the bracing arm),
         // intelligence primary for offhand foci (the channelling hand).
-        // Both roll at standard weights — either build path is valid.
+        // Both roll at standard weights - either build path is valid.
         strength: {
             id: 'strength',
             label: '+# to Strength', labelDe: '+# zu Stärke',
@@ -392,7 +421,7 @@ const EG_MOD_TABLE_WEAPON2 = {
                 { tier: 5, min: 2, max: 4, weight: 2400, ilvl: 1 }
             ]
         },
-        // Absorption regen — strong on shields since the shield IS the
+        // Absorption regen - strong on shields since the shield IS the
         // absorption layer. Better weights than shoulders/chest.
         absorption_regen_rate: {
             id: 'absorption_regen_rate',
@@ -461,7 +490,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
 
         // --- BLOCK & DODGE (shield + offhand) ---
-        // The shield has the highest block values in the game — higher
+        // The shield has the highest block values in the game - higher
         // than chest or shoulders since it is the dedicated blocking
         // piece. A player who invests in a shield and block-focused
         // passive tree can reach meaningful block caps purely through
@@ -489,7 +518,7 @@ const EG_MOD_TABLE_WEAPON2 = {
         block_recovery: {
             id: 'block_recovery',
             // Reduces the window after a block where you cannot deal damage.
-            // Higher ceiling than shoulders/chest — the shield is the
+            // Higher ceiling than shoulders/chest - the shield is the
             // dedicated block piece and should have the best recovery too.
             label: 'Recover from Blocks #% faster', labelDe: 'Erholung nach Blocken #% schneller',
             tiers: [
@@ -521,14 +550,14 @@ const EG_MOD_TABLE_WEAPON2 = {
         },
 
         // --- SHIELD-EXCLUSIVE: SHIELD BASH ---
-        // When the player blocks, the shield retaliates — there is a
+        // When the player blocks, the shield retaliates - there is a
         // % chance the block also deals a flat amount of physical damage
         // back to the attacker. Turns the passive act of blocking into
         // a conditional offensive trigger, rewarding players who build
         // high block chance as an attack vector rather than just defence.
         // The # value is the % chance to bash; the @ value is the
         // flat damage dealt. Competes with block_recovery and spell
-        // block for suffix budget — a true trade-off between passive
+        // block for suffix budget - a true trade-off between passive
         // protection and aggressive counter-play.
         shield_bash: {
             id: 'shield_bash',

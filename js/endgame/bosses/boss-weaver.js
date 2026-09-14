@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE WEAVER (boss_weaver)-----------------------------
 //------------------------------------------------------------------------
-// Thread-trap homage: the Weaver strings a live grid of tripwires — three
-// horizontal, three vertical — and electrifies half of them at a time. Even
+// Thread-trap homage: the Weaver strings a live grid of tripwires - three
+// horizontal, three vertical - and electrifies half of them at a time. Even
 // threads one moment, odd the next; the warning flicker is your only friend.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

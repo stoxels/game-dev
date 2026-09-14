@@ -2,7 +2,7 @@
 //-------------------BOSS: THE ARBITER (boss_arbiter)---------------------------
 //------------------------------------------------------------------------
 // Undertale homage: the Stillness Trial. Each cast is a BLUE wave (hold
-// perfectly still — moving is punished) or an ORANGE wave (keep moving —
+// perfectly still - moving is punished) or an ORANGE wave (keep moving -
 // standing still is punished). Read the color, obey the rule.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -45,8 +45,8 @@ function _egMechStillnessTrial(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const waves = [0, 1, 1, 2][p];
     const warnMs = 1200, activeMs = 2500, gapMs = 800;
-    const moveTol = 24; // px — BLUE forgives tiny jitter, not travel
-    const stillTol = 40; // px — ORANGE demands real travel
+    const moveTol = 24; // px - BLUE forgives tiny jitter, not travel
+    const stillTol = 40; // px - ORANGE demands real travel
     const dmgPct = [0, 0.16, 0.19, 0.24][p];
     const run = _egNkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
@@ -65,8 +65,8 @@ function _egMechStillnessTrial(monster, phase) {
         tint = _egNkEl(run, 'div', blue ? 'eg-nk-trial-blue' : 'eg-nk-trial-orange');
         label = _egNkEl(run, 'div', 'eg-nk-trial-label', blue ? '💙 FREEZE!' : '🧡 MOVE!');
         _egNkToast('eg_mech_stillness', blue
-            ? '⚖️ The Arbiter: BLUE trial — hold perfectly still!'
-            : '⚖️ The Arbiter: ORANGE trial — keep moving!');
+            ? '⚖️ The Arbiter: BLUE trial - hold perfectly still!'
+            : '⚖️ The Arbiter: ORANGE trial - keep moving!');
     };
     _egNkLoop(run, (dtS) => {
         if (stage === 'idle') {

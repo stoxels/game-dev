@@ -5,7 +5,7 @@
     ▶ REPLAY button.
 
     Visual family: same stone/parchment chrome as the settings and
-    how-to-play modals (css/settings.css + css/modals.css) — the
+    how-to-play modals (css/settings.css + css/modals.css) - the
     settings_background.png frame, the settings_title_plague.png title
     plaque and the settings_close_button.png stone X. Only shared class is
     .modal-bg (the dimmed fullscreen backdrop + .show toggle); everything
@@ -26,7 +26,7 @@
 
 
 /* -----------------------------------------------------------------------
-   OUTER STONE FRAME — same settings_background.png asset as the settings /
+   OUTER STONE FRAME - same settings_background.png asset as the settings /
    how-to-play modals, stretched 100%/100%. Its carved border spans
    x 0→9% / 91%→100% and y 0→11% / 90%→100% of the art, so the padding below
    keeps the gallery inside the flat parchment area at every window size.
@@ -53,7 +53,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   TITLE PLAQUE — same asset + geometry as the settings/how-to-play plaques
+   TITLE PLAQUE - same asset + geometry as the settings/how-to-play plaques
    (see .tut-box .modal-title in css/modals.css): settings_title_plague.png
    overhanging the frame's top edge, text centred on the art's flat middle
    (~68% of the plaque width; the ends taper). The .replay-header wrapper
@@ -89,7 +89,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   CLOSE BUTTON — stone square with X icon, top-right corner (same asset and
+   CLOSE BUTTON - stone square with X icon, top-right corner (same asset and
    geometry as the settings/how-to-play modals; the "✕ CLOSE" text is
    hidden, the art shows the X).
    ----------------------------------------------------------------------- */
@@ -301,7 +301,7 @@
 
 
 /* -----------------------------------------------------------------------
-   NARROW-SCREEN FALLBACK — height-driven like the desktop rule: keep the
+   NARROW-SCREEN FALLBACK - height-driven like the desktop rule: keep the
    top/bottom padding on vh units so the gallery never rides over the frame
    art's top/bottom border when the box wraps to multiple rows (same fix as
    the how-to-play modal's portrait breakpoint).
@@ -327,7 +327,7 @@
 
 /* Tiny phones: the plaque's 340px width floor would exceed the box itself
    (box = 92vw − backdrop padding), so pin the plaque to the box and drop
-   the title a step — the German "WIEDERGABE" still fits the flat surface. */
+   the title a step - the German "WIEDERGABE" still fits the flat surface. */
 @media (max-width: 400px) {
     .replay-header {
         width: min(100%, 340px);

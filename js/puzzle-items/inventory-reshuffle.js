@@ -106,7 +106,7 @@ function buildReshuffleModalElement(picks) {
             <div id="rshuffle-cards">${cardsHtml}</div>
         </div>`;
 
-    // Stone X — simply removes the modal; picking a reward handles itself.
+    // Stone X - simply removes the modal; picking a reward handles itself.
     modal.querySelector('#rshuffle-close').addEventListener('click', () => modal.remove());
 
     return modal;
@@ -178,7 +178,7 @@ function reshuffleRightClickItem(uid) {
     const def = removeItemFromInventory(uid);
     if (!def) return;
 
-    reshuffleCount++;               // increment first — badge and toast both read this value
+    reshuffleCount++;               // increment first - badge and toast both read this value
     trackAchStat('itemsSold');
     save();
     buildInventoryPanel();          // calls updateReshuffleCounter() internally

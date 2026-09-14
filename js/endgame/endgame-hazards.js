@@ -2,21 +2,21 @@
 //-------------------ENDGAME MAP ELEMENTAL HAZARDS------------------------
 //------------------------------------------------------------------------
 // Screen-space environmental hazards driven by map modifier families:
-//   map_hazard_lava      — drifting lava balls around the puzzle grid; on player collision
+//   map_hazard_lava      - drifting lava balls around the puzzle grid; on player collision
 //                          the ball fuses for 0.5 s then explodes for heavy fire damage
 //                          (blast radius 140 px, may ignite), despawns for 3 min, then respawns
-//   map_hazard_lightning — telegraphed lightning strikes (shock on hit)
-//   map_hazard_blizzard  — snow overlay + falling icicles (chill on hit)
-//   map_hazard_darkness  — drifting dark clouds obscuring parts of the UI
-//   map_hazard_arcane    — charged arcane beams sweeping right → left
-//   map_hazard_meteor    — telegraphed meteor volleys (ignite on hit)
-//   map_hazard_volatile  — wisps that hunt the player and detonate (shadow burn)
-//   map_hazard_frostnova — freezing novas erupting near the player (chill/freeze)
-//   map_hazard_firewall  — telegraphed fire walls sweeping top → bottom (ignite)
-//   map_hazard_cyclone   — fast-drifting cyclones with continuous wind damage
-//   map_hazard_delirium  — periodic delirium mist that may polymorph the player
+//   map_hazard_lightning - telegraphed lightning strikes (shock on hit)
+//   map_hazard_blizzard  - snow overlay + falling icicles (chill on hit)
+//   map_hazard_darkness  - drifting dark clouds obscuring parts of the UI
+//   map_hazard_arcane    - charged arcane beams sweeping right → left
+//   map_hazard_meteor    - telegraphed meteor volleys (ignite on hit)
+//   map_hazard_volatile  - wisps that hunt the player and detonate (shadow burn)
+//   map_hazard_frostnova - freezing novas erupting near the player (chill/freeze)
+//   map_hazard_firewall  - telegraphed fire walls sweeping top → bottom (ignite)
+//   map_hazard_cyclone   - fast-drifting cyclones with continuous wind damage
+//   map_hazard_delirium  - periodic delirium mist that may polymorph the player
 //
-// Hazards ONLY affect the player — monsters never interact with them.
+// Hazards ONLY affect the player - monsters never interact with them.
 // All damage flows through _egPlayerTakeDamage(amount, true, element) so
 // the player's elemental resistances / flat Arcane Resistance mitigate it,
 // giving a direct incentive to stack resistances on hazard maps.
@@ -28,9 +28,9 @@
 // so pausing the game freezes hazards.
 //
 // Dependencies (loaded before this file):
-//   endgame-map-launch.js — _egGetActiveMapModValue
-//   endgame-encounter.js  — _egPlayerTakeDamage, _egIsActive
-//   endgame-ailments.js   — _egApplyPlayerAilment
+//   endgame-map-launch.js - _egGetActiveMapModValue
+//   endgame-encounter.js  - _egPlayerTakeDamage, _egIsActive
+//   endgame-ailments.js   - _egApplyPlayerAilment
 //------------------------------------------------------------------------
 
 
@@ -47,7 +47,7 @@ const EG_HZ_LAVA_SPEED_MAX = 48;
 const EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT = 20; // % of playerMaxHP dealt when a lava ball explodes (heavy fire)
 const EG_HZ_LAVA_FUSE_MS = 500;           // delay between collision and detonation
 const EG_HZ_LAVA_RESPAWN_MS = 180000;     // 3 minutes until the same ball respawns (gameplay time, paused while game is paused)
-const EG_HZ_LAVA_BLAST_R = 140;           // explosion radius (px) — must evade after the 0.5s fuse
+const EG_HZ_LAVA_BLAST_R = 140;           // explosion radius (px) - must evade after the 0.5s fuse
 const EG_HZ_LAVA_IGNITE_CHANCE_PCT = 55;  // chance to ignite the player if the blast hits
 
 const EG_HZ_LIGHTNING_BASE_DMG_PCT = 8;   // % of playerMaxHP per strike
@@ -100,14 +100,14 @@ const EG_HZ_FROSTNOVA_FREEZE_CHANCE_PCT = 30;
 const EG_HZ_FROSTNOVA_INTERVAL_MIN_MS = 6000;
 const EG_HZ_FROSTNOVA_INTERVAL_MAX_MS = 10000;
 
-const EG_HZ_FIREWALL_BASE_DMG_PCT = 18;    // % of playerMaxHP per wall hit — significant fire wave (was 8, too low)
+const EG_HZ_FIREWALL_BASE_DMG_PCT = 18;    // % of playerMaxHP per wall hit - significant fire wave (was 8, too low)
 const EG_HZ_FIREWALL_HEIGHT = 150;         // flame wave thickness (px)
 const EG_HZ_FIREWALL_WARNING_MS = 5000;    // telegraph before ignition
 const EG_HZ_FIREWALL_SWEEP_MS = 2600;      // sweep duration (direction depends on variant)
 const EG_HZ_FIREWALL_IGNITE_CHANCE_PCT = 50;
 const EG_HZ_FIREWALL_INTERVAL_MIN_MS = 8000;
 const EG_HZ_FIREWALL_INTERVAL_MAX_MS = 12000;
-// Outplay tuning — safe-zone insets and gap geometry for firewall variations
+// Outplay tuning - safe-zone insets and gap geometry for firewall variations
 // Top safe-zone must clear the avatar HUD (wrapper at top:4px + ~150px tall incl.
 // HP/charge bars).  Bottom safe-zone is less constrained so it stays smaller.
 const EG_HZ_FIREWALL_SAFE_MIN = 90;        // legacy generic (kept for compat)
@@ -200,7 +200,7 @@ function _egHzPlayerEl() {
 }
 
 // Tight hitbox derived from the visible sprite image, not the wrapper.
-// The wrapper (#player-avatar-wrapper 100px + HP/charge bars, or
+// The wrapper (#player-avatar-wrapper 128px + HP/charge bars, or
 // #player-avatar-simple 128px) is taller than the artwork, so using its
 // center/bounds misaligns collision by ~30–40px and makes lava/volatile
 // feel "off" while blizzard walls hit the bars.
@@ -250,12 +250,12 @@ function _egHzPlayerRect() {
     };
 }
 
-// Alias used at call-sites for clarity — identical to _egHzPlayerRect().
+// Alias used at call-sites for clarity - identical to _egHzPlayerRect().
 function _egHzPlayerHitbox() {
     return _egHzPlayerRect();
 }
 
-// Bounding box of the puzzle grid INCLUDING row/col clue number cells —
+// Bounding box of the puzzle grid INCLUDING row/col clue number cells -
 // #ptable is one table containing both, so its rect already covers them.
 function _egHzGridRect(pad) {
     const g = document.getElementById('ptable');
@@ -327,7 +327,7 @@ function _egHzSweptCircleRectOverlap(x0, y0, x1, y1, r, rect) {
     if (!rect) return false;
     if (_egHzCircleRectOverlap(x0, y0, r, rect)) return true;
     if (_egHzCircleRectOverlap(x1, y1, r, rect)) return true;
-    // Sample midpoint and check expanded rect fallback — cheap 3-point
+    // Sample midpoint and check expanded rect fallback - cheap 3-point
     // check catches most tunneling without segment math.
     const mx = (x0 + x1) * 0.5, my = (y0 + y1) * 0.5;
     if (_egHzCircleRectOverlap(mx, my, r, rect)) return true;
@@ -338,7 +338,7 @@ function _egHzSweptCircleRectOverlap(x0, y0, x1, y1, r, rect) {
         const sy0 = Math.min(y0, y1) - r, sy1 = Math.max(y0, y1) + r;
         const sweep = { left: sx0, right: sx1, top: sy0, bottom: sy1 };
         if (_egHzRectsOverlap(sweep, rect)) {
-            // Sweep box overlaps — do denser sampling along segment
+            // Sweep box overlaps - do denser sampling along segment
             for (let t = 0.25; t < 1; t += 0.25) {
                 const sx = x0 + (x1 - x0) * t;
                 const sy = y0 + (y1 - y0) * t;
@@ -497,7 +497,7 @@ function _egHazardsShowAfterQuiz() {
     document.querySelectorAll('.eg-hz-darkness-layer, .eg-hz-delirium').forEach(el => { el.style.display = ''; });
 }
 
-// Per-tick driver — called at 10Hz from _egTickLoop.
+// Per-tick driver - called at 10Hz from _egTickLoop.
 function _egHazardsTick() {
     if (!_egHzActive) return;
     if (_egHzPausedForQuiz) return;
@@ -615,7 +615,7 @@ function _egHzRespawnLavaPool(pool) {
     pool.vx = fresh.vx; pool.vy = fresh.vy;
     // fresh already appended its element; steal it
     pool.el = fresh.el;
-    // fresh's element is already in the DOM — no extra append needed
+    // fresh's element is already in the DOM - no extra append needed
     pool.state = 'active';
     pool.fuseT = 0;
     pool.respawnIn = 0;
@@ -648,7 +648,7 @@ function _egHzTickLava(dtMs) {
             return;
         }
 
-        // ── Fusing (about to explode) — frozen in place ─────────────
+        // ── Fusing (about to explode) - frozen in place ─────────────
         if (p.state === 'fusing') {
             p.fuseT -= dtMs;
             if (p.fuseT <= 0) _egHzDetonateLava(p);
@@ -739,7 +739,7 @@ function _egHzTickLightning(dtMs) {
 //------------------------------------------------------------------------
 
 function _egHzInitBlizzard(intensity) {
-    // Full-screen snow layer (visual only — never blocks clicks).
+    // Full-screen snow layer (visual only - never blocks clicks).
     const overlay = document.createElement('div');
     overlay.className = 'eg-hz-blizzard';
     const flakes = 26;
@@ -1112,7 +1112,7 @@ function _egHzTickMeteor(dtMs) {
                 m.fallEl = fallEl;
             }
         } else {
-            // Falling phase — descend towards the target, then detonate.
+            // Falling phase - descend towards the target, then detonate.
             if (!m.fallEl || !m.fallEl.isConnected) { st.pending.splice(i, 1); continue; }
             m.y += (m.fallDist / (EG_HZ_METEOR_FALL_MS / 1000)) * dtS;
             m.fallEl.style.top = (m.y - 23) + 'px';
@@ -1141,7 +1141,7 @@ function _egHzTickMeteor(dtMs) {
 //------------------------------------------------------------------------
 // PoE-style Volatiles: unstable wisps spawn off-screen-ish and slowly home
 // in on the player. When close (or after a lifetime) they flash briefly,
-// then detonate — shadow damage in a blast radius, may inflict Shadow Burn.
+// then detonate - shadow damage in a blast radius, may inflict Shadow Burn.
 
 function _egHzInitVolatile(intensity) {
     const maxWisps = Math.min(6, 1 + Math.round(intensity / 22));
@@ -1245,7 +1245,7 @@ function _egHzTickVolatile(dtMs) {
                 w.x += (dx / dist) * w.speed * dtS;
                 w.y += (dy / dist) * w.speed * dtS;
             } else {
-                // Player rect unavailable — drift gently instead of stalling.
+                // Player rect unavailable - drift gently instead of stalling.
                 w.x += w.speed * 0.2 * dtS;
             }
             w.el.style.transform =
@@ -1360,16 +1360,16 @@ function _egHzTickFrostNova(dtMs) {
 // outplay-able variations each spawn so the mechanic is never an
 // unavoidable full-screen hit:
 //
-//   offsetTop  — wall starts inset from the TOP (185–260 px safe strip
+//   offsetTop  - wall starts inset from the TOP (185–260 px safe strip
 //                at the very top, clears the avatar+HP/charge HUD). Sweeps
 //                TOP → BOTTOM. Dodge by hugging the top edge.
-//   offsetBottom— wall starts inset from the BOTTOM (90–165 px safe strip
+//   offsetBottom- wall starts inset from the BOTTOM (90–165 px safe strip
 //                at the very bottom). Sweeps BOTTOM → TOP. Dodge by
 //                hugging the bottom edge.
-//   gapDown    — full-width wall with a horizontal GAP (180–280 px) that
+//   gapDown    - full-width wall with a horizontal GAP (180–280 px) that
 //                spans the wall's thickness. Starts at the TOP, sweeps
 //                TOP → BOTTOM. Stand in the gap.
-//   gapUp      — same gap wall but mirrored: starts at the BOTTOM and
+//   gapUp      - same gap wall but mirrored: starts at the BOTTOM and
 //                sweeps BOTTOM → TOP.
 //
 // Telegraph (warning) mirrors the wall geometry so the player can read
@@ -1563,7 +1563,7 @@ function _egHzTickFirewall(dtMs) {
         if (!anyConnected && w.t <= 0 && (w.lingerT || 0) <= 0) { st.pending.splice(i, 1); continue; }
         if (w.wallEls.length === 0) { st.pending.splice(i, 1); continue; }
 
-        // Warning phase — telegraph visible, wall hidden.
+        // Warning phase - telegraph visible, wall hidden.
         if (w.t > 0) {
             w.t -= dtMs;
             if (w.t <= 0) {
@@ -1572,7 +1572,7 @@ function _egHzTickFirewall(dtMs) {
             continue;
         }
 
-        // Linger phase (gap variants only) — wall visible at start edge, not sweeping yet.
+        // Linger phase (gap variants only) - wall visible at start edge, not sweeping yet.
         const isGap = w.variant === 'gapDown' || w.variant === 'gapUp';
         if (isGap && w.lingerT > 0) {
             w.lingerT -= dtMs;
@@ -1580,7 +1580,7 @@ function _egHzTickFirewall(dtMs) {
                 // Linger done, sweep will start on next tick.
             }
 
-            // Hit detection during linger — wall is stationary at startY.
+            // Hit detection during linger - wall is stationary at startY.
             const wallTop = w.y;
             const wallBottom = w.y + EG_HZ_FIREWALL_HEIGHT;
             const verticalOverlap = pr && pr.bottom > wallTop && pr.top < wallBottom;
@@ -1615,7 +1615,7 @@ function _egHzTickFirewall(dtMs) {
             continue;
         }
 
-        // Sweeping phase — the wave moves in its variant direction.
+        // Sweeping phase - the wave moves in its variant direction.
         const prevY = w.y;
         const speed = w.totalDist / (EG_HZ_FIREWALL_SWEEP_MS / 1000);
         w.y += w.dir * speed * dtS;
@@ -1644,11 +1644,11 @@ function _egHzTickFirewall(dtMs) {
                     shouldHit = false;
                 } else {
                     // Also consider case where gap is degenerate (no segments):
-                    // if wallEls covers full width there is no safe gap — must hit.
+                    // if wallEls covers full width there is no safe gap - must hit.
                     if (w.wallEls.length === 1 && w.gapW <= 0) shouldHit = true;
                 }
             }
-            // Offset variants use pure vertical check — the top/bottom safe strip
+            // Offset variants use pure vertical check - the top/bottom safe strip
             // is naturally safe because the wall band never covers it.
 
             if (shouldHit) {

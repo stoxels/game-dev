@@ -62,8 +62,8 @@
 }
 
 /* Character portrait shown instead of the raw character name.
-   Fixed width AND height (not just width) so Stox/Trix/Syla — which are
-   all different source resolutions/aspect ratios — end up the same
+   Fixed width AND height (not just width) so Stox/Trix/Syla - which are
+   all different source resolutions/aspect ratios - end up the same
    on-screen size. object-fit: contain scales each image to fit inside
    this box without stretching or cropping it. */
 .ssc-portrait {
@@ -75,21 +75,21 @@
     pointer-events: none;
 }
 
-/* SCORE line — tune independently from the levels-done line below */
+/* SCORE line - tune independently from the levels-done line below */
 .ssc-score {
     font-size: 20px; /* ← score text size */
     color: var(--accent2);
     margin-top: 2px; /* ← score text position */
 }
 
-/* "X LEVELS DONE" line — tune independently from the score line above */
+/* "X LEVELS DONE" line - tune independently from the score line above */
 .ssc-levels {
     font-size: 20px; /* ← levels-done text size */
     color: var(--accent2);
     margin-top: 2px; /* ← levels-done text position */
 }
 
-/* Player level — only shown on save slot if endgame reached and level > 1 */
+/* Player level - only shown on save slot if endgame reached and level > 1 */
 .ssc-player-level {
     font-family: var(--PX);
     font-size: 12px;
@@ -119,7 +119,7 @@
         opacity: 1;
     }
 
-/* ✏️ name-edit button — top-left corner of the card, mirrored from the
+/* ✏️ name-edit button - top-left corner of the card, mirrored from the
    ❌ delete button. Opens the slot-name modal. */
 .ssc-name-btn {
     position: absolute;
@@ -136,7 +136,7 @@
         opacity: 1;
     }
 
-/* Custom slot name — replaces the default heading once the player names
+/* Custom slot name - replaces the default heading once the player names
    the slot (works for empty slots too). The small default slot label stays
    above it so players can still tell which physical slot is which. */
 .ssc-name {
@@ -158,7 +158,7 @@
 
 
 /* ============================================================
-   RESPONSIVE BREAKPOINTS — smaller displays & phones
+   RESPONSIVE BREAKPOINTS - smaller displays & phones
    ============================================================
    The desktop layout above (>900px) is the reference design and
    stays untouched. Everything below only tightens sizes so the
@@ -166,14 +166,14 @@
 
    Bands (mirrors the breakpoints used in class_selection.css,
    title-screen.css, modals.css, ...):
-     ≤900px  tablet band      — same 5-col grid, scaled down
-     ≤700px  phone band       — auto-fill columns, fluid portraits
-     ≤700px + ≤450px height   — phone landscape, extra-compact cards
-     ≤400px  small phones     — micro refinements
+     ≤900px  tablet band      - same 5-col grid, scaled down
+     ≤700px  phone band       - auto-fill columns, fluid portraits
+     ≤700px + ≤450px height   - phone landscape, extra-compact cards
+     ≤400px  small phones     - micro refinements
    ============================================================ */
 
 /* -----------------------------------------------------------------------
-   ≤900px — TABLET BAND
+   ≤900px - TABLET BAND
    Same 5-column desktop grid, but the 1fr tracks are allowed to shrink
    (minmax(0, 1fr)) and the fixed 150px portraits / 20px stats text are
    scaled down so 5 columns still fit without horizontal overflow.
@@ -219,7 +219,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   ≤700px — PHONE BAND
+   ≤700px - PHONE BAND
    Real reflow: columns are chosen by available width (auto-fill) instead
    of a hardcoded 5, the portrait becomes fluid, and the topbar is compacted
    so the back button and title no longer overlap.
@@ -236,7 +236,7 @@
         font-size: 11px;
     }
 
-    /* Scoped shrink of the shared back-slab button (base.css) — other
+    /* Scoped shrink of the shared back-slab button (base.css) - other
        screens are unaffected. */
     #screen-save-slots .back-btn {
         font-size: 10px;
@@ -279,7 +279,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   ≤700px wide AND ≤450px high — PHONE LANDSCAPE
+   ≤700px wide AND ≤450px high - PHONE LANDSCAPE
    Very little vertical space: extra-compact cards so at least two rows
    of slots are visible without scrolling.
    ----------------------------------------------------------------------- */
@@ -323,7 +323,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   ≤400px — SMALL PHONES
+   ≤400px - SMALL PHONES
    Micro refinements: the back slab and title are shrunk once more so even
    a 320px-wide display fits them side by side, and single-column cards
    center their content a bit tighter.
@@ -430,7 +430,7 @@
 
 /* The footer row (SAVE NAME / portal / CANCEL) reuses .reset-footer +
    .reset-btn, but the stone buttons are sized for the 1000px-wide reset
-   modal — shrink them a touch here so two fit the 560px frame. */
+   modal - shrink them a touch here so two fit the 560px frame. */
 .slot-name-box .reset-btn {
     min-width: clamp(120px, 16vw, 180px);
     padding: clamp(10px, 1.6vw, 16px) clamp(14px, 2.4vw, 24px);

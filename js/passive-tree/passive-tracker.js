@@ -2,7 +2,7 @@
 // Passive Tree Effect Tracker Panel
 // Shows live countdowns, fill counters, stacked bonuses, and summaries
 // for all active passive-tree effects during gameplay.
-// Rendered as a floating, draggable panel — position is persisted in localStorage.
+// Rendered as a floating, draggable panel - position is persisted in localStorage.
 
 'use strict';
 
@@ -48,20 +48,20 @@ const PassiveTracker = (() => {
     // Per-level runtime counters. These are reset on each call to init() and
     // updated by the public event hooks (onCorrectFill, onMistake, etc.).
     const _state = {
-        // Countdown timers — seconds remaining until the next automatic trigger.
+        // Countdown timers - seconds remaining until the next automatic trigger.
         randomWalkTimer: 0,
         poissonTimer: 0,
         timedStasisTimer: 0,
         lawOfLargeNumbersTimer: 0,
 
-        // Fill counters — cumulative or streak counts that drive passive effects.
+        // Fill counters - cumulative or streak counts that drive passive effects.
         binomialBurstFills: 0,   // total correct fills; checked mod 10 for burst
         streakBonusFills: 0,   // consecutive correct fills; resets on mistake
         sampleEffFills: 0,   // consecutive correct fills; resets on mistake
         gamblersFills: 0,   // total correct fills since level start
         errorFeedbackMistakes: 0, // total mistakes; checked mod threshold
 
-        // Stacked bonuses — accumulate over time and reset when they trigger.
+        // Stacked bonuses - accumulate over time and reset when they trigger.
         bayesianBonus: 0,   // current stacked bayesian bonus percentage
         asymptoticReductions: 0,  // completed lines count (synced from window global)
 
@@ -110,7 +110,7 @@ const PassiveTracker = (() => {
     function _savePosition(x, y) {
         try {
             localStorage.setItem(STORAGE_KEY_POS, JSON.stringify({ x, y }));
-        } catch (_) { /* storage unavailable — silently ignore */ }
+        } catch (_) { /* storage unavailable - silently ignore */ }
     }
 
     // Loads the saved position from localStorage and clamps it to the current
@@ -384,7 +384,7 @@ const PassiveTracker = (() => {
         header.className = 'pt-tracker-header';
         header.innerHTML = `
             <span class="pt-tracker-title">${t('pt_tracker_title')}</span>
-            <button class="pt-tracker-collapse" title="${t('pt_tracker_toggle')}">−</button>
+            <button class="pt-tracker-collapse" data-tip-t="pt_tracker_toggle" aria-label="${t('pt_tracker_toggle')}">−</button>
         `;
 
         header.querySelector('.pt-tracker-collapse').addEventListener('click', () => {
@@ -454,7 +454,7 @@ const PassiveTracker = (() => {
         if (existing) existing.remove();
 
         const rows = _getActiveRows();
-        if (rows.length === 0) return;  // Nothing to show — skip building.
+        if (rows.length === 0) return;  // Nothing to show - skip building.
 
         _panel = document.createElement('div');
         _panel.id = 'pt-tracker-panel';
@@ -811,7 +811,7 @@ const PassiveTracker = (() => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
     // These rows show their current state visually (color / warn flag) but
-    // do not have a numeric bar — they use the summary dot style.
+    // do not have a numeric bar - they use the summary dot style.
 
     function _getRowOverfitting() {
         if (!ptHasSkill('keystone_overfitting')) return null;
@@ -1185,28 +1185,28 @@ const PassiveTracker = (() => {
     //   5. Static passive summaries
     function _getActiveRows() {
         return [
-            // — Countdown timers —
+            // - Countdown timers -
             _getRowRandomWalk(),
             _getRowPoissonProcess(),
             _getRowTimedStasis(),
             _getRowLawOfLargeNumbers(),
             _getRowEmergencyScan(),
 
-            // — Fill counters —
+            // - Fill counters -
             _getRowBinomialBurst(),
             _getRowSampleEfficiency(),
             _getRowStreakBonus(),
             _getRowGamblersRuin(),
             _getRowErrorFeedback(),
 
-            // — Stacked bonuses —
+            // - Stacked bonuses -
             _getRowBayesianAdjustment(),
             _getRowAsymptoticMastery(),
 
-            // — Dynamic summary rows —
+            // - Dynamic summary rows -
             _getRowOverfitting(),
 
-            // — Static passive summaries —
+            // - Static passive summaries -
             ..._buildSummaryRows(),
         ].filter(Boolean);
     }
@@ -1297,7 +1297,7 @@ const PassiveTracker = (() => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    // Main heartbeat — call this every second from the game timer.
+    // Main heartbeat - call this every second from the game timer.
     // Advances all countdown timers, syncs external state, and redraws rows.
     function onTimerTick() {
         _tickAllCountdowns();
@@ -1338,28 +1338,28 @@ const PassiveTracker = (() => {
         _updatePanel();
     }
 
-    // Binomial Burst passive triggered — reset the fill counter and flash the row.
+    // Binomial Burst passive triggered - reset the fill counter and flash the row.
     function onBinomialTrigger() {
         _state.binomialBurstFills = 0;
         _flashRow('binomial');
         _updatePanel();
     }
 
-    // Streak Bonus (Focused Momentum) triggered — reset streak counter and flash.
+    // Streak Bonus (Focused Momentum) triggered - reset streak counter and flash.
     function onStreakBonusTrigger() {
         _state.streakBonusFills = 0;
         _flashRow('streak');
         _updatePanel();
     }
 
-    // Sample Efficiency triggered — reset consecutive-fill counter and flash.
+    // Sample Efficiency triggered - reset consecutive-fill counter and flash.
     function onSampleEffTrigger() {
         _state.sampleEffFills = 0;
         _flashRow('sample_eff');
         _updatePanel();
     }
 
-    // Bayesian Adjustment triggered — zero out the stacked bonus and flash.
+    // Bayesian Adjustment triggered - zero out the stacked bonus and flash.
     function onBayesianTrigger() {
         _state.bayesianBonus = 0;
         _flashRow('bayesian');

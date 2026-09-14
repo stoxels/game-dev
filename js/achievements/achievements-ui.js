@@ -23,11 +23,11 @@ const ACH_CATEGORIES = [
 
 
 //------------------------------------------------------------------------
-//------------------CATEGORY OVERVIEW — ASSETS & STATE--------------------
+//------------------CATEGORY OVERVIEW - ASSETS & STATE--------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// ACH_CATEGORY_ASSETS — per-category card artwork and accent glow colour,
+// ACH_CATEGORY_ASSETS - per-category card artwork and accent glow colour,
 // keyed by ACH_CATEGORIES key. The colours mirror the glow tones of the
 // category-overview reference art. Categories without an entry fall back
 // to the default glow colour in the card builder.
@@ -63,12 +63,12 @@ let _achToastBusy = false; // true while a toast is currently visible; prevents 
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _getAchLang — returns 'de' or 'en' based on the global LANG variable.
+// _getAchLang - returns 'de' or 'en' based on the global LANG variable.
 function _getAchLang() {
     return (typeof LANG !== 'undefined' && LANG === 'de') ? 'de' : 'en';
 }
 
-// _pickLang — picks the correct localised string from an object that has
+// _pickLang - picks the correct localised string from an object that has
 //   both a labelEn and a labelDE (or nameEn/nameDE, descEn/descDE) field.
 //   Pass the field prefix ('label', 'name', 'desc') and the lang string.
 //   Example: _pickLang(tier, 'label', lang)  →  tier.labelDE or tier.labelEn
@@ -83,14 +83,14 @@ function _pickLang(obj, prefix, lang) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _isTierUnlocked — returns true if the given tier index of a def has been earned.
+// _isTierUnlocked - returns true if the given tier index of a def has been earned.
 //   Single source of truth for tier-unlocked checks; used by both the
 //   counters and the card renderers below.
 function _isTierUnlocked(def, tierIndex) {
     return ACH_STATE.unlocked.includes(`${def.id}__${tierIndex}`);
 }
 
-// _getHighestUnlockedTierIndex — returns the index of the highest earned tier,
+// _getHighestUnlockedTierIndex - returns the index of the highest earned tier,
 //   or -1 if no tier has been unlocked yet.
 function _getHighestUnlockedTierIndex(def) {
     let highest = -1;
@@ -107,7 +107,7 @@ function _getHighestUnlockedTierIndex(def) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _drainAchToastQueue — shows the next queued toast if none is currently visible.
+// _drainAchToastQueue - shows the next queued toast if none is currently visible.
 //   Called after every toast is dismissed and after a new entry is pushed.
 function _drainAchToastQueue() {
     if (_achToastBusy || !_achToastQueue.length) return;
@@ -115,7 +115,7 @@ function _drainAchToastQueue() {
     _showAchToast(def, tier);
 }
 
-// _buildToastRequirementText — formats the requirement line shown inside the toast
+// _buildToastRequirementText - formats the requirement line shown inside the toast
 //   (e.g. "Complete levels  Target: 10").
 function _buildToastRequirementText(def, tier, lang) {
     const baseDesc = _pickLang(def, 'desc', lang);
@@ -123,7 +123,7 @@ function _buildToastRequirementText(def, tier, lang) {
     return `${baseDesc} ${t('qa_target')} ${target}`;
 }
 
-// _buildToastElement — creates and returns the fully populated DOM element for a toast.
+// _buildToastElement - creates and returns the fully populated DOM element for a toast.
 function _buildToastElement(def, tier) {
     const lang = _getAchLang();
     const name = _pickLang(def, 'name', lang);
@@ -144,7 +144,7 @@ function _buildToastElement(def, tier) {
     return el;
 }
 
-// _dismissAchToast — fades the toast out, removes it from the DOM,
+// _dismissAchToast - fades the toast out, removes it from the DOM,
 //   then schedules the next queued toast after a brief gap.
 function _dismissAchToast(el) {
     el.classList.remove('show');
@@ -155,7 +155,7 @@ function _dismissAchToast(el) {
     }, 500); // matches CSS transition-out duration
 }
 
-// _showAchToast — renders and animates a single achievement toast.
+// _showAchToast - renders and animates a single achievement toast.
 //   Visible for ~5 s, then fades out over 0.5 s.
 function _showAchToast(def, tier) {
     _achToastBusy = true;
@@ -170,7 +170,7 @@ function _showAchToast(def, tier) {
     Audio_Manager.playSFX('achievement');
 }
 
-// showAchievementToast — public entry point.
+// showAchievementToast - public entry point.
 //   Enqueues a toast and starts draining the queue if nothing is currently shown.
 function showAchievementToast(def, tier) {
     _achToastQueue.push({ def, tier });
@@ -180,45 +180,45 @@ function showAchievementToast(def, tier) {
 
 
 //------------------------------------------------------------------------
-//------------------ACHIEVEMENT SCREEN — COUNTERS-------------------------
+//------------------ACHIEVEMENT SCREEN - COUNTERS-------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _countCategoryTiers — total tier count across all defs in one category.
+// _countCategoryTiers - total tier count across all defs in one category.
 function _countCategoryTiers(defs) {
     return defs.reduce((sum, def) => sum + def.tiers.length, 0);
 }
 
-// _countTotalTiers — total number of tier entries across every achievement definition.
+// _countTotalTiers - total number of tier entries across every achievement definition.
 function _countTotalTiers() {
     return _countCategoryTiers(ACHIEVEMENT_DEFS);
 }
 
-// _countTotalAchievements — total number of achievement definitions (tiers ignored).
+// _countTotalAchievements - total number of achievement definitions (tiers ignored).
 function _countTotalAchievements() {
     return ACHIEVEMENT_DEFS.length;
 }
 
-// _countFullyUnlockedAchievements — number of defs where every tier has been earned.
+// _countFullyUnlockedAchievements - number of defs where every tier has been earned.
 function _countFullyUnlockedAchievements() {
     return ACHIEVEMENT_DEFS.filter(def =>
         def.tiers.every((_, ti) => _isTierUnlocked(def, ti))
     ).length;
 }
 
-// _countCategoryUnlocked — total unlocked tier count across all defs in one category.
+// _countCategoryUnlocked - total unlocked tier count across all defs in one category.
 function _countCategoryUnlocked(defs) {
     return defs.reduce((sum, def) =>
         sum + def.tiers.filter((_, ti) => _isTierUnlocked(def, ti)).length
         , 0);
 }
 
-// _calcProgressPct — converts an unlocked / total pair into a 0–100 integer.
+// _calcProgressPct - converts an unlocked / total pair into a 0–100 integer.
 function _calcProgressPct(unlocked, total) {
     return Math.round((unlocked / total) * 100);
 }
 
-// _groupDefsByCategory — groups all achievement definitions by their category key.
+// _groupDefsByCategory - groups all achievement definitions by their category key.
 //   Returns a plain object: { categoryKey: [def, def, ...], ... }
 //   Defs without a category fall into 'meta'.
 function _groupDefsByCategory() {
@@ -234,41 +234,41 @@ function _groupDefsByCategory() {
 
 
 //------------------------------------------------------------------------
-//------------------ACHIEVEMENT SCREEN — CARD HELPERS---------------------
+//------------------ACHIEVEMENT SCREEN - CARD HELPERS---------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _getCardClass — returns the CSS class string for a card based on its earned state.
+// _getCardClass - returns the CSS class string for a card based on its earned state.
 function _getCardClass(highestUnlocked, isComplete) {
     if (isComplete) return 'ach-card complete';
     if (highestUnlocked >= 0) return 'ach-card partial';
     return 'ach-card locked';
 }
 
-// _getEarnedLabel — returns the localised label for the highest earned tier,
+// _getEarnedLabel - returns the localised label for the highest earned tier,
 //   or an empty string if nothing has been unlocked yet.
 function _getEarnedLabel(def, highestUnlocked, lang) {
     if (highestUnlocked < 0) return '';
     return _pickLang(def.tiers[highestUnlocked], 'label', lang);
 }
 
-// _buildTierDotsHtml — returns a row of coloured dot spans, one per tier,
+// _buildTierDotsHtml - returns a row of coloured dot spans, one per tier,
 //   indicating which tiers are earned vs. still locked.
 function _buildTierDotsHtml(def, lang) {
     return def.tiers.map((tier, ti) => {
         const unlocked = _isTierUnlocked(def, ti);
         const tierLabel = _pickLang(tier, 'label', lang);
         const stateClass = unlocked ? 'earned' : 'locked';
-        return `<span class="ach-tier-dot ${stateClass}" title="${tierLabel}">●</span>`;
+        return `<span class="ach-tier-dot ${stateClass}" data-tip="${_tipAttr(tierLabel)}" aria-label="${_tipAttr(tierLabel)}">●</span>`;
     }).join('');
 }
 
-// _buildCardProgressHtml — returns a progress bar pointing toward the next tier,
+// _buildCardProgressHtml - returns a progress bar pointing toward the next tier,
 //   or an empty string if every tier is already earned.
 function _buildCardProgressHtml(def, highestUnlocked, currentVal, lang) {
     const nextTierIdx = highestUnlocked + 1;
     const nextTier = def.tiers[nextTierIdx];
-    if (!nextTier) return ''; // all tiers complete — no progress bar needed
+    if (!nextTier) return ''; // all tiers complete - no progress bar needed
 
     const pct = Math.min(100, Math.round((currentVal / nextTier.threshold) * 100));
     const progressLabel = _pickLang(nextTier, 'label', lang);
@@ -279,7 +279,7 @@ function _buildCardProgressHtml(def, highestUnlocked, currentVal, lang) {
                 <div class="ach-card-progress-bar-inner" style="width:${pct}%"></div>
             </div>
             <span class="ach-card-progress-label">
-                ${currentVal.toLocaleString()} / ${nextTier.threshold.toLocaleString()} — <em>${progressLabel}</em>
+                ${currentVal.toLocaleString()} / ${nextTier.threshold.toLocaleString()} - <em>${progressLabel}</em>
             </span>
         </div>`;
 }
@@ -287,11 +287,11 @@ function _buildCardProgressHtml(def, highestUnlocked, currentVal, lang) {
 
 
 //------------------------------------------------------------------------
-//------------------ACHIEVEMENT SCREEN — HTML BUILDERS--------------------
+//------------------ACHIEVEMENT SCREEN - HTML BUILDERS--------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _buildProgressBlockHtml — returns the HTML for a single labelled progress bar block.
+// _buildProgressBlockHtml - returns the HTML for a single labelled progress bar block.
 //   Used twice inside the overall header (once for achievements, once for milestones).
 function _buildProgressBlockHtml(label, current, total, pct, extraBarClass = '') {
     return `
@@ -304,7 +304,7 @@ function _buildProgressBlockHtml(label, current, total, pct, extraBarClass = '')
         </div>`;
 }
 
-// _buildHeaderHtml — renders the overall progress header with two side-by-side bars:
+// _buildHeaderHtml - renders the overall progress header with two side-by-side bars:
 //   left = fully completed achievements, right = total milestone tiers unlocked.
 function _buildHeaderHtml(fullAchs, totalAchs, fullPct, unlockedTiers, totalTiers, milestonePct, lang) {
     const achLabel = t('qa_ach_completed');
@@ -322,7 +322,7 @@ function _buildHeaderHtml(fullAchs, totalAchs, fullPct, unlockedTiers, totalTier
         </div>`;
 }
 
-// _buildCardHtml — returns the full HTML for a single achievement card,
+// _buildCardHtml - returns the full HTML for a single achievement card,
 //   including icon, name, description, tier dots, earned label, and progress bar.
 function _buildCardHtml(def, lang) {
     const val = ACH_STATE.stats[def.stat] || 0;
@@ -350,7 +350,7 @@ function _buildCardHtml(def, lang) {
         </div>`;
 }
 
-// _buildCategoryHtml — returns the HTML for one full category section
+// _buildCategoryHtml - returns the HTML for one full category section
 //   (header strip + card grid). Returns an empty string if the category is empty.
 function _buildCategoryHtml(cat, defs, lang) {
     if (!defs.length) return '';
@@ -376,11 +376,11 @@ function _buildCategoryHtml(cat, defs, lang) {
 
 
 //------------------------------------------------------------------------
-//------------------ACHIEVEMENT SCREEN — MAIN BUILDERS--------------------
+//------------------ACHIEVEMENT SCREEN - MAIN BUILDERS--------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// buildAchievementsScreen — top-level builder.
+// buildAchievementsScreen - top-level builder.
 //   Renders whichever view is currently active: the category overview grid
 //   (default) or the achievement list of one specific category.
 //   Calculates all progress values, assembles the header and every category
@@ -391,7 +391,7 @@ function buildAchievementsScreen() {
 
     const lang = _getAchLang();
     const fixed = document.getElementById('ach-overview-fixed');
-    // The RESET ALL ACHIEVEMENTS button only makes sense on the overview —
+    // The RESET ALL ACHIEVEMENTS button only makes sense on the overview -
     // hide it while a specific category's achievements are shown.
     const footer = document.querySelector('#achievements-modal .ach-frame-footer');
     if (footer) footer.style.display = (_achView === 'category') ? 'none' : '';
@@ -409,7 +409,7 @@ function buildAchievementsScreen() {
     }
 }
 
-// _setAchTopbarTitle — swaps the modal's title plaque between the static
+// _setAchTopbarTitle - swaps the modal's title plaque between the static
 //   "ACHIEVEMENTS" (overview) and the active category's name (detail view).
 function _setAchTopbarTitle(catKey, lang) {
     const titleEl = document.getElementById('ach-frame-title');
@@ -426,7 +426,7 @@ function _setAchTopbarTitle(catKey, lang) {
     }
 }
 
-// showAchievements — opens the Achievements modal.
+// showAchievements - opens the Achievements modal.
 //   Resets to the category grid, then rebuilds all cards and progress bars
 //   so they always reflect the latest stats.
 function showAchievements() {
@@ -436,7 +436,7 @@ function showAchievements() {
     showModal('achievements-modal');
 }
 
-// openAchCategory — shows all achievements of one category inside the
+// openAchCategory - shows all achievements of one category inside the
 //   achievements screen (the per-category detail view).
 function openAchCategory(catKey) {
     _achView = 'category';
@@ -445,7 +445,7 @@ function openAchCategory(catKey) {
     document.getElementById('ach-body')?.scrollTo(0, 0);
 }
 
-// backToAchCategories — returns from a category detail view to the overview.
+// backToAchCategories - returns from a category detail view to the overview.
 function backToAchCategories() {
     _achView = 'overview';
     _achCurrentCategory = null;
@@ -482,11 +482,11 @@ document.addEventListener('keydown', (e) => {
 
 
 //------------------------------------------------------------------------
-//-------------------CATEGORY OVERVIEW — HTML BUILDER---------------------
+//-------------------CATEGORY OVERVIEW - HTML BUILDER---------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _buildOverviewFixedHeaderHtml — the non-scrolling header of the overview:
+// _buildOverviewFixedHeaderHtml - the non-scrolling header of the overview:
 //   the carved grand-totals banner and the "CATEGORY OVERVIEW" caption.
 function _buildOverviewFixedHeaderHtml(lang) {
     // Grand totals across every category
@@ -506,7 +506,7 @@ function _buildOverviewFixedHeaderHtml(lang) {
         <div class="ach-overview-caption">${t('scr_ach_category_overview')}</div>`;
 }
 
-// _buildCategoryGridHtml — the scrolling part of the overview: a responsive
+// _buildCategoryGridHtml - the scrolling part of the overview: a responsive
 //   grid of clickable category cards. Each card shows the category artwork
 //   on its carved panel frame, the two progress counters, and a bar.
 function _buildCategoryGridHtml(lang) {
@@ -520,7 +520,7 @@ function _buildCategoryGridHtml(lang) {
     return `<div class="ach-cat-grid">${cardsHtml}</div>`;
 }
 
-// _buildCategoryCardHtml — one clickable category tile on the overview grid.
+// _buildCategoryCardHtml - one clickable category tile on the overview grid.
 function _buildCategoryCardHtml(cat, defs, lang) {
     const catLabel = _pickLang(cat, 'label', lang);
     const totalAchs = defs.length;
@@ -565,8 +565,8 @@ function _buildCategoryCardHtml(cat, defs, lang) {
         </div>`;
 }
 
-// _buildCategoryDetailHtml — detail view for one category.
-//   A single topbar row (back button — category art — progress numbers with
+// _buildCategoryDetailHtml - detail view for one category.
+//   A single topbar row (back button - category art - progress numbers with
 //   the completion bar underneath), followed by every achievement card of
 //   that category. The category name itself lives on the modal's title
 //   plaque, so no second title row is rendered here.
@@ -587,7 +587,7 @@ function _buildCategoryDetailHtml(catKey, lang) {
         <div class="ach-cat-detail" style="--cat-glow: ${glow}">
             <div class="ach-cat-detail-topbar">
                 <button class="ach-cat-back-btn back-btn" id="btn-ach-cat-back">${t('btn_back')}</button>
-                <span class="ach-cat-detail-count">${unlockedTiers} / ${totalTiers} — ${pct}%</span>
+                <span class="ach-cat-detail-count">${unlockedTiers} / ${totalTiers} - ${pct}%</span>
             </div>
             <div class="ach-cat-detail-bar-outer">
                 <div class="ach-cat-detail-bar-inner" style="width:${pct}%"></div>
@@ -603,12 +603,12 @@ function _buildCategoryDetailHtml(catKey, lang) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// showAchResetModal — opens the achievement-reset confirmation modal.
+// showAchResetModal - opens the achievement-reset confirmation modal.
 function showAchResetModal() {
     document.getElementById('ach-reset-modal').style.display = 'flex';
 }
 
-// hideAchResetModal — closes the achievement-reset confirmation modal.
+// hideAchResetModal - closes the achievement-reset confirmation modal.
 function hideAchResetModal() {
     document.getElementById('ach-reset-modal').style.display = 'none';
 }

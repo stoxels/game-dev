@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MNEMONIC (boss_maven)---------------------------
 //------------------------------------------------------------------------
-// PoE Maven homage: memory rite — visit 3 circles in shown order.
+// PoE Maven homage: memory rite - visit 3 circles in shown order.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
 //   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)

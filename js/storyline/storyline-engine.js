@@ -1,18 +1,18 @@
 ﻿// =============================================================================
-// storyline-engine.js — The Cartographers of Chance
+// storyline-engine.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // The rendering engine for story beats: text pages, image slideshows, and
-// karaoke-style songs. Contains no story CONTENT — only the machinery that
+// karaoke-style songs. Contains no story CONTENT - only the machinery that
 // plays it back.
 //
 // Load order: this file (or its shared constants, see below) must be loaded
 // AFTER all storyline-intro-*.js / storyline-beats.js data files, since
 // showBeat()/StorylineRenderer read STORY_BEATS, INTRO_SONG, etc. lazily
-// inside function bodies — so technically order vs. those doesn't matter at
+// inside function bodies - so technically order vs. those doesn't matter at
 // parse time. The one thing that DOES matter: this file defines
 // _wordsFromLine(), DEFAULT_SLIDE_DURATION_MS, and
 // SLIDE_FADE_MS, which the data files (e.g. storyline-intro.js) call/reference
-// directly inside their own top-level const declarations — so THIS file must
+// directly inside their own top-level const declarations - so THIS file must
 // load BEFORE storyline-intro.js and any other file that calls
 // _wordsFromLine(...) or references these constants at parse time.
 //
@@ -22,10 +22,10 @@
 //   3. storyline-intro-stox.js      (Stox character intro)
 //   4. storyline-intro-trix.js      (Trix character intro)
 //   5. storyline-intro-syla.js      (Syla character intro)
-//   6. storyline-beats.js           (STORY_BEATS — references all of the above)
+//   6. storyline-beats.js           (STORY_BEATS - references all of the above)
 //
 // ---------------------------------------------------------------------------
-// VIDEO BEATS — data shape
+// VIDEO BEATS - data shape
 // ---------------------------------------------------------------------------
 // A video beat's `video` object supports two shapes:
 //
@@ -35,11 +35,11 @@
 //   2) Multi-clip sequence (new):
 //        video: {
 //            clips: [
-//                { videoFile: "video/foo_part1.mp4", audio: "audio/foo_part1.mp3", gapAfterMs: 0 },
-//                { videoFile: "video/foo_part2.mp4", audio: "audio/foo_part2.mp3", gapAfterMs: 2000 },
-//                { videoFile: "video/foo_part3.mp4", audio: "audio/foo_part3.mp3" } // last clip — gapAfterMs ignored
+//                { videoFile: "video/foo_part1.mp4", audio: "audio/foo_part1.ogg", gapAfterMs: 0 },
+//                { videoFile: "video/foo_part2.mp4", audio: "audio/foo_part2.ogg", gapAfterMs: 2000 },
+//                { videoFile: "video/foo_part3.mp4", audio: "audio/foo_part3.ogg" } // last clip - gapAfterMs ignored
 //            ],
-//            captions: [...]     // unchanged — see below
+//            captions: [...]     // unchanged - see below
 //        }
 //
 // Playback behavior for video beats:
@@ -47,30 +47,30 @@
 //     holds on that clip's OWN end frame before the next clip starts. 0 means
 //     jump to the next clip immediately. The gap on the LAST clip is ignored.
 //   - Videos never loop. Once the final clip finishes, playback simply
-//     freezes on that last frame — it does not restart and does not auto-close.
+//     freezes on that last frame - it does not restart and does not auto-close.
 //   - EACH CLIP OWNS ITS OWN AUDIO. If a clip has an `audio` field, that file
-//     starts playing the moment the clip starts playing (in lockstep — same
+//     starts playing the moment the clip starts playing (in lockstep - same
 //     call, same frame), and the clip's own video track is muted so the two
 //     don't overlap. When the sequence advances to the next clip, the
 //     previous clip's audio is stopped and the next clip's audio (if any)
 //     starts. There is no longer a single shared narration track spanning
-//     the whole sequence, and no independent per-line narration queue —
+//     the whole sequence, and no independent per-line narration queue -
 //     audio is scoped 1:1 to whichever clip is currently on screen. A clip
 //     with no `audio` field just plays silently (or with its own embedded
 //     track, if `audio` is omitted and you want the raw video sound).
 //   - The bottom-right button reads "skip" until the final clip has finished
 //     playing, at which point it relabels itself to "continue" (same click
-//     handler either way — it closes the beat). This avoids a "skip" button
+//     handler either way - it closes the beat). This avoids a "skip" button
 //     that doesn't make sense once there's nothing left to skip.
 //   - Captions are unrelated to the per-clip audio and still support TWO
 //     shapes, auto-detected per beat:
 //       a) Per-line narration: { text, audio, durationMs }[]. No `start`
 //          field. Each line gets its OWN short audio clip, played in strict
-//          sequence via _playNarrationLine() — independent of which video
+//          sequence via _playNarrationLine() - independent of which video
 //          clip happens to be on screen at the time.
 //       b) Legacy start-based (still fully supported): each caption's
 //          `start` (ms) is measured from the START of the whole clip
-//          sequence (not any single clip's currentTime) — so `start: 4000`
+//          sequence (not any single clip's currentTime) - so `start: 4000`
 //          always means "4 seconds after this beat began," regardless of
 //          how many clips/gaps came before it. This is driven off a
 //          wall-clock timer started when the beat began (videoSeqStartTime),
@@ -78,11 +78,11 @@
 //          spans the whole sequence, and clip audio is no longer a single
 //          track either.
 //     Caption lines still only ever fade IN once and are never hidden or
-//     dimmed again — the panel just keeps growing.
+//     dimmed again - the panel just keeps growing.
 // =============================================================================
 
 // ---------------------------------------------------------------------------
-// SHARED CONSTANTS — used by storyline-intro*.js data files
+// SHARED CONSTANTS - used by storyline-intro*.js data files
 // ---------------------------------------------------------------------------
 
 // Default time each slide stays on screen (ms) for image-slideshow beats.
@@ -92,11 +92,11 @@ const DEFAULT_SLIDE_DURATION_MS = 10000;
 // How long the text/image fade transition takes (ms) for slideshow beats.
 const SLIDE_FADE_MS = 500;
 
-// _wordsFromLine — PLACEHOLDER-STYLE timestamp generator for karaoke song
+// _wordsFromLine - PLACEHOLDER-STYLE timestamp generator for karaoke song
 // beats. Splits a line into words and spaces their "fully revealed" times
 // evenly between lineStartMs and lineEndMs. When fed real per-LINE timing
 // (e.g. parsed from an .srt file), this still gives accurate line-level
-// sync — only the word-by-word pace within a line is estimated/even, since
+// sync - only the word-by-word pace within a line is estimated/even, since
 // SRT files don't carry per-word timestamps. Swap in literal per-word
 // timestamps for any line where you have them.
 function _wordsFromLine(text, lineStartMs, lineEndMs) {
@@ -244,8 +244,8 @@ const StorylineRenderer = (() => {
         `,
         // -- Media frame: locked to the source images' native aspect ratio
         // (1376x768 = 1.791667). Sized via calc() so it always fits fully
-        // inside the viewport on whichever axis is the tighter constraint —
-        // letterboxed/pillarboxed as needed — the same "contain"-style fix
+        // inside the viewport on whichever axis is the tighter constraint -
+        // letterboxed/pillarboxed as needed - the same "contain"-style fix
         // used for the title screen's .title-canvas. Both slideshow and
         // song beats render their <img> layers inside this frame instead of
         // directly against the full-viewport overlay, so object-fit: cover
@@ -337,7 +337,7 @@ const StorylineRenderer = (() => {
         songLineRevealedActive: `
             color: rgba(0, 0, 0, 0.95);
         `,
-        // Full lines from earlier in the section, already sung — dimmed but
+        // Full lines from earlier in the section, already sung - dimmed but
         // still visible, so the whole section builds up rather than vanishing.
         songLineRevealedPast: `
             color: rgba(0, 0, 0, 0.95);
@@ -374,7 +374,7 @@ const StorylineRenderer = (() => {
             box-sizing: border-box;
             scrollbar-width: none;
         `,
-        // Each accumulated caption line — fades in once, then stays visible
+        // Each accumulated caption line - fades in once, then stays visible
         // (never removed or dimmed) for the rest of the clip.
         videoCaptionLine: `
             font-family: 'Georgia', 'Times New Roman', serif;
@@ -422,15 +422,15 @@ const StorylineRenderer = (() => {
     // started in lockstep with that clip and torn down the moment the
     // sequence advances to the next clip (see _playClip / _stopClipAudio)
     let videoGapTimeout = null;  // setTimeout handle while holding on a finished clip's end frame
-    let videoSeqStartTime = 0;   // performance.now() when the sequence began — wall-clock caption
+    let videoSeqStartTime = 0;   // performance.now() when the sequence began - wall-clock caption
     // master for the legacy start-based caption shape (a single clip's own
     // currentTime can't be used since it resets every time the clip changes,
     // and audio is now scoped per-clip rather than spanning the sequence)
     let videoSeqComplete = false; // true once the final clip has played through to its end frame
     let videoSkipBtnEl = null;    // reference so we can relabel skip -> continue
-    let videoCaptions = [];      // sorted captions — EITHER legacy [{text, start}] shape
+    let videoCaptions = [];      // sorted captions - EITHER legacy [{text, start}] shape
     // (start-based, driven by _videoSyncTick) OR per-line narration
-    // [{text, audio, durationMs}] shape (driven by _playNarrationLine) —
+    // [{text, audio, durationMs}] shape (driven by _playNarrationLine) -
     // see isPerLineNarration(). Independent of per-clip audio above.
     let videoCaptionBoxEl = null;
     let videoCaptionLineEls = []; // one <p> per caption line, index-matched to videoCaptions;
@@ -445,7 +445,7 @@ const StorylineRenderer = (() => {
     let narrationActive = false;  // true while a per-line narration sequence is in flight
 
 
-    // buildSlideshow — returns { slides, imagePath } for a slideshow beat,
+    // buildSlideshow - returns { slides, imagePath } for a slideshow beat,
     // or null if the requested beat/variant isn't a slideshow.
     function buildSlideshow(beatId, options = {}) {
         const beat = STORY_BEATS[beatId];
@@ -475,7 +475,7 @@ const StorylineRenderer = (() => {
         return null;
     }
 
-    // buildSong — returns { audio, images, lines, imagePath } for a song beat,
+    // buildSong - returns { audio, images, lines, imagePath } for a song beat,
     // or null if the requested beat/variant isn't a song.
     function buildSong(beatId, options = {}) {
         const beat = STORY_BEATS[beatId];
@@ -551,7 +551,7 @@ const StorylineRenderer = (() => {
         return beat.pages;
     }
 
-    // isSlideshowBeat — true if this beat (given options) should render as
+    // isSlideshowBeat - true if this beat (given options) should render as
     // an image slideshow rather than a text-page sequence.
     function isSlideshowBeat(beatId, options = {}) {
         const beat = STORY_BEATS[beatId];
@@ -565,7 +565,7 @@ const StorylineRenderer = (() => {
         return false;
     }
 
-    // isSongBeat — true if this beat (given options) should render as a
+    // isSongBeat - true if this beat (given options) should render as a
     // karaoke-style song (independent image timeline + word-by-word lyric reveal).
     function isSongBeat(beatId, options = {}) {
         const beat = STORY_BEATS[beatId];
@@ -580,7 +580,7 @@ const StorylineRenderer = (() => {
     }
 
 
-    // buildVideo — returns { videoFile|clips, audio?, captions? } for a video
+    // buildVideo - returns { videoFile|clips, audio?, captions? } for a video
     // beat, or null if the requested beat/variant isn't a video.
     function buildVideo(beatId, options = {}) {
         const beat = STORY_BEATS[beatId];
@@ -601,7 +601,7 @@ const StorylineRenderer = (() => {
         return null;
     }
 
-    // isVideoBeat — true if this beat (given options) should render as a
+    // isVideoBeat - true if this beat (given options) should render as a
     // video clip (with optional overlaid captions and/or narration track).
     function isVideoBeat(beatId, options = {}) {
         const beat = STORY_BEATS[beatId];
@@ -615,10 +615,10 @@ const StorylineRenderer = (() => {
         return false;
     }
 
-    // _normalizeVideoClips — accepts either shape of a video beat's data and
+    // _normalizeVideoClips - accepts either shape of a video beat's data and
     // always returns a plain, ordered array: [{ videoFile, audio, gapAfterMs }].
     //   - New shape:    video.clips = [{ videoFile, audio, gapAfterMs }, ...]
-    //     `audio` is OPTIONAL per clip — if present, that file plays in
+    //     `audio` is OPTIONAL per clip - if present, that file plays in
     //     lockstep with this clip and the clip's own video track is muted.
     //   - Legacy shape: video.videoFile = "..." (treated as a single 1-clip
     //     sequence, gapAfterMs irrelevant since there's nothing after it).
@@ -717,7 +717,7 @@ const StorylineRenderer = (() => {
         overlay.innerHTML = '';
         slideImgEls = {};
 
-        // Media frame — locked to the images' native aspect ratio so they're
+        // Media frame - locked to the images' native aspect ratio so they're
         // never cropped to fill a mismatched viewport shape (letterboxed/
         // pillarboxed as needed instead).
         const frame = document.createElement('div');
@@ -890,7 +890,7 @@ const StorylineRenderer = (() => {
         overlay.innerHTML = '';
         songImgEls = {};
 
-        // Media frame — locked to the images' native aspect ratio, same
+        // Media frame - locked to the images' native aspect ratio, same
         // fix as the regular slideshow, so song backgrounds aren't cropped.
         const frame = document.createElement('div');
         frame.style.cssText = STYLES.mediaFrame;
@@ -908,8 +908,8 @@ const StorylineRenderer = (() => {
         songImgEls.layers = [imgA, imgB];
         songImgEls.activeLayer = 0;
 
-        // Text overlay box. Holds exactly one row — the line currently
-        // being sung — rebuilt fresh each time the active line changes
+        // Text overlay box. Holds exactly one row - the line currently
+        // being sung - rebuilt fresh each time the active line changes
         // (see _buildSingleLineRow). Width is fixed once here (based on the
         // widest line in the whole song) so the box doesn't resize as
         // different lines appear. Lives inside the frame so it tracks the
@@ -923,7 +923,7 @@ const StorylineRenderer = (() => {
         frame.appendChild(textWrap);
         songImgEls.textBox = textBox;
 
-        // Skip button (no page indicator / click-to-advance hint — song beats
+        // Skip button (no page indicator / click-to-advance hint - song beats
         // are driven by audio playback, not click-through)
         const skipBtn = document.createElement('button');
         skipBtn.style.cssText = STYLES.skipBtn;
@@ -937,7 +937,7 @@ const StorylineRenderer = (() => {
 
         // Music volume slider (bottom-left of the screen). Live-syncs with
         // the global Background Music setting (SETTINGS.bgmVolume), so any
-        // change here is instantly reflected in the settings modal — and
+        // change here is instantly reflected in the settings modal - and
         // the slider opens pre-set to whatever the player had configured.
         const volWrap = document.createElement('div');
         volWrap.style.cssText = STYLES.songVolumeWrap;
@@ -1043,7 +1043,7 @@ const StorylineRenderer = (() => {
     }
 
     // Rebuilds the text block to hold exactly one row, for the line
-    // currently being sung. Called every time the active line changes —
+    // currently being sung. Called every time the active line changes -
     // the box always shows just the current line, never accumulating
     // earlier lines from the same section.
     function _buildSingleLineRow() {
@@ -1098,7 +1098,7 @@ const StorylineRenderer = (() => {
         }
     }
 
-    // The main sync loop — ticks every animation frame while the song plays.
+    // The main sync loop - ticks every animation frame while the song plays.
     // Reads the audio element's real playback time and updates whichever
     // image / lyric line should be showing at that moment.
     function _songSyncTick() {
@@ -1107,6 +1107,9 @@ const StorylineRenderer = (() => {
         const nowMs = songAudioEl.currentTime * 1000;
 
         // -- Image timeline: advance to the latest image whose time has passed --
+        // (The intro → character-select handoff does NOT interfere here:
+        // the final image's cue is timed to the outro vocal, and the song
+        // plays out to its natural end before close() freezes the frame.)
         let targetImageIdx = songCurrentImageIdx;
         for (let i = 0; i < songImages.length; i++) {
             if (songImages[i].time <= nowMs) targetImageIdx = i;
@@ -1134,7 +1137,7 @@ const StorylineRenderer = (() => {
         if (targetLineIdx >= 0 && targetLineIdx !== songCurrentLineIdx && songLines.length > 0) {
             songCurrentLineIdx = targetLineIdx;
 
-            // Always a fresh single-row box — the box only ever shows the
+            // Always a fresh single-row box - the box only ever shows the
             // line currently being sung, never accumulating past lines.
             _buildSingleLineRow();
 
@@ -1154,9 +1157,11 @@ const StorylineRenderer = (() => {
             if (row) _updateLineReveal(row, line, nowMs, lineStartMs);
         }
 
-        // Stop the loop once the track ends (or once it's paused/closed elsewhere)
+        // Stop the loop once the track ends (or once it's paused/closed
+        // elsewhere) - a natural end lets close() freeze the frame exactly
+        // as the final image left it (intro → character-select handoff).
         if (songAudioEl.ended) {
-            close();
+            close(true);
             return;
         }
 
@@ -1179,7 +1184,7 @@ const StorylineRenderer = (() => {
     function startSong(song) {
         songImages = (song.images || []).slice().sort((a, b) => a.time - b.time);
         // Lyric lines arrive as bilingual data entries { section, en, de, s, e }
-        // and are resolved to timed words for the ACTIVE language here — so a
+        // and are resolved to timed words for the ACTIVE language here - so a
         // mid-session language switch is picked up on the next playback.
         const useDe = (typeof LANG !== 'undefined' && LANG === 'de');
         songLines = (song.lines || []).map(l => ({
@@ -1204,12 +1209,15 @@ const StorylineRenderer = (() => {
         // live via the on-screen slider rendered by renderSong)
         songAudioEl.volume = _getIntroSongBaseVolume();
 
+        // The plain close reference keeps stopSong()'s removeEventListener
+        // pairing intact; close() itself detects a natural end via
+        // songAudioEl.ended (the sync tick passes explicit close(true)).
         songAudioEl.addEventListener('ended', close);
 
         songAudioEl.play().then(() => {
             songRafId = requestAnimationFrame(_songSyncTick);
         }).catch(() => {
-            // Autoplay blocked — resume on first user interaction, same
+            // Autoplay blocked - resume on first user interaction, same
             // pattern as Audio_Manager's BGM autoplay-resume fallback.
             const resume = () => {
                 songAudioEl.play().then(() => {
@@ -1238,7 +1246,7 @@ const StorylineRenderer = (() => {
 
     // -------------------------------------------------------------------
     // VIDEO RENDERING (a SEQUENCE of one or more video clips, each with its
-    // own optional audio track, + overlaid captions — captions can either
+    // own optional audio track, + overlaid captions - captions can either
     // ride the legacy wall-clock timeline or run their own independent
     // per-line narration queue)
     // -------------------------------------------------------------------
@@ -1248,19 +1256,19 @@ const StorylineRenderer = (() => {
         if (!overlay) return;
         overlay.innerHTML = '';
 
-        // Media frame — same aspect-ratio-locked container the slideshow
+        // Media frame - same aspect-ratio-locked container the slideshow
         // and song beats use, so the clip is never cropped to fill a
         // mismatched viewport shape.
         const frame = document.createElement('div');
         frame.style.cssText = STYLES.mediaFrame;
         overlay.appendChild(frame);
 
-        // Single persistent <video> element — its `src` is swapped between
+        // Single persistent <video> element - its `src` is swapped between
         // clips as the sequence advances (see _playClip). Never loops: once
         // the final clip's `ended` event fires, we simply stop advancing,
         // so the browser leaves the last frame on screen indefinitely.
         // `muted` is set per-clip in _playClip (muted whenever that specific
-        // clip has its own dedicated audio file), so start unmuted here —
+        // clip has its own dedicated audio file), so start unmuted here -
         // _playClip corrects it before the first clip ever plays.
         videoEl = document.createElement('video');
         videoEl.style.cssText = STYLES.videoEl;
@@ -1270,7 +1278,7 @@ const StorylineRenderer = (() => {
         videoEl.addEventListener('ended', _onClipEnded);
         frame.appendChild(videoEl);
 
-        // Caption box — holds one <p> per caption line, built up front and
+        // Caption box - holds one <p> per caption line, built up front and
         // hidden. Lines fade in one at a time as playback reaches their
         // start time, and are never removed or dimmed afterward, so by the
         // end of the sequence the full accumulated text is visible together.
@@ -1290,7 +1298,7 @@ const StorylineRenderer = (() => {
             return p;
         });
 
-        // Skip / Continue button — reads "skip" while the sequence still has
+        // Skip / Continue button - reads "skip" while the sequence still has
         // clips left to play, and relabels itself to "continue" once the
         // final clip has finished (see _onClipEnded). Either way, clicking
         // it closes the beat.
@@ -1317,7 +1325,7 @@ const StorylineRenderer = (() => {
     }
 
     // Loads and plays the clip at `idx` in videoClips, together with that
-    // clip's own audio file (if it has one) — started in the same call so
+    // clip's own audio file (if it has one) - started in the same call so
     // they begin in lockstep. The clip's video track is muted whenever a
     // dedicated audio file is driving sound for it, so the two never
     // overlap. Falls back to resuming both on first user interaction if
@@ -1327,7 +1335,7 @@ const StorylineRenderer = (() => {
         videoClipIndex = idx;
         const clip = videoClips[idx];
 
-        // The previous clip's audio (if any) has done its job — tear it
+        // The previous clip's audio (if any) has done its job - tear it
         // down before this clip's audio (if any) starts.
         _stopClipAudio();
 
@@ -1365,7 +1373,7 @@ const StorylineRenderer = (() => {
 
     // Fires when the CURRENTLY LOADED clip reaches its end. Either holds on
     // that end frame for `gapAfterMs` (or advances instantly if 0) and then
-    // plays the next clip (and its audio), or — if this was the last clip —
+    // plays the next clip (and its audio), or - if this was the last clip -
     // marks the sequence complete and relabels the skip button to
     // "continue". The video element (and, if the last clip had one, its
     // audio) is left untouched in that case, so playback stays on the last
@@ -1391,16 +1399,16 @@ const StorylineRenderer = (() => {
     // True if this beat's captions use the per-line narration shape
     // ({ text, audio, durationMs }, no `start` field) rather than the
     // legacy start-based shape ({ text, start }). Detected off the first
-    // caption line — a beat is one shape or the other, never mixed. This is
+    // caption line - a beat is one shape or the other, never mixed. This is
     // ENTIRELY INDEPENDENT of per-clip audio: a beat can use per-clip audio
     // for its video sound and still drive captions off either shape.
     function isPerLineNarration() {
         return videoCaptions.length > 0 && typeof videoCaptions[0].start !== 'number';
     }
 
-    // Reveals caption line `idx`, plays its own narration audio, and — once
+    // Reveals caption line `idx`, plays its own narration audio, and - once
     // that audio finishes (or errors out, or the line has no audio at all)
-    // — moves on to line `idx + 1`. This is what makes per-line narration
+    // - moves on to line `idx + 1`. This is what makes per-line narration
     // "just work" for pacing: a long sentence's own (longer) audio file
     // naturally keeps its caption on screen longer, no manual timing needed.
     // Stops cleanly once every line has played.
@@ -1426,7 +1434,7 @@ const StorylineRenderer = (() => {
             narrationAudioEl.volume = 1.0;
             narrationAudioEl.addEventListener('ended', advance, { once: true });
             narrationAudioEl.addEventListener('error', () => {
-                // This line's audio file is missing/failed to load — don't
+                // This line's audio file is missing/failed to load - don't
                 // stall the whole beat on one bad file, fall back to the
                 // word-count-estimated reading time instead (see
                 // _estimateReadMs() in storyline-beats.js).
@@ -1443,27 +1451,27 @@ const StorylineRenderer = (() => {
             });
         } else {
             // No audio for this line at all (e.g. still using a placeholder
-            // beat) — just hold it on screen for its estimated reading time.
+            // beat) - just hold it on screen for its estimated reading time.
             narrationGapTimeout = setTimeout(advance, line.durationMs || 3200);
         }
     }
 
-    // The video sync loop — ticks every frame for as long as the beat is
+    // The video sync loop - ticks every frame for as long as the beat is
     // open. Reveals any caption lines whose start time has been reached.
-    // Lines accumulate — once revealed, a line is never hidden or dimmed
+    // Lines accumulate - once revealed, a line is never hidden or dimmed
     // again. Caption time comes from wall-clock time elapsed since the
-    // sequence started (videoSeqStartTime) — a single clip's own currentTime
+    // sequence started (videoSeqStartTime) - a single clip's own currentTime
     // resets on every clip change and can't represent "time since the whole
     // sequence began," and per-clip audio no longer spans the sequence
     // either, so wall-clock is the only stable master clock left for this
     // legacy caption shape.
-    // This loop deliberately never auto-closes the beat — closing only
+    // This loop deliberately never auto-closes the beat - closing only
     // happens when the user clicks the skip/continue button.
     function _videoSyncTick() {
         if (!overlay) return;
 
         // Per-line narration beats reveal their own captions from inside
-        // _playNarrationLine as each line's audio starts — this tick loop
+        // _playNarrationLine as each line's audio starts - this tick loop
         // only handles the legacy start-based timing shape.
         if (isPerLineNarration()) {
             videoRafId = requestAnimationFrame(_videoSyncTick);
@@ -1494,9 +1502,9 @@ const StorylineRenderer = (() => {
     // Starts a video beat: normalizes the clip list, kicks off the caption
     // path (either the legacy wall-clock sync loop or the independent
     // per-line narration queue), and starts clip 0 (which starts its own
-    // audio in lockstep, if it has one — see _playClip).
+    // audio in lockstep, if it has one - see _playClip).
     function startVideo(video) {
-        // Sort by `start` only for the legacy shape — per-line narration
+        // Sort by `start` only for the legacy shape - per-line narration
         // captions have no `start` field and are already in play order.
         const rawCaptions = video.captions || [];
         videoCaptions = typeof rawCaptions[0]?.start === 'number'
@@ -1561,24 +1569,84 @@ const StorylineRenderer = (() => {
     }
 
 
-    function close() {
+    // naturalEnd - true when a song beat reached here because the track
+    // finished playing (ended event / sync tick), false for skip buttons.
+    // Only a natural end may freeze the frame for the character-select
+    // handoff; skipping must tear down normally.
+    function close(naturalEnd = false) {
         if (!overlay) return;
         if (slideAdvanceTimeout) {
             clearTimeout(slideAdvanceTimeout);
             slideAdvanceTimeout = null;
         }
+        // Read before stopSong() clears the element. The ended-event paths
+        // pass naturalEnd explicitly; the audio.ended fallback covers a
+        // sync tick that notices the track finished a frame late.
+        const songEndedNaturally = naturalEnd === true || !!(songAudioEl && songAudioEl.ended);
         stopSong();
         stopVideo();
+
+        // INTRO → CHARACTER-SELECT HANDOFF - the main intro's onComplete
+        // opens the image-based character select (character-select.js), and
+        // that screen shows the SAME artwork the song ends on (37.webp).
+        // Instead of fading to black between the two, freeze the last frame
+        // exactly as the song left it: strip the overlay chrome (skip
+        // button, volume slider), fade out the lyric box, and hand the
+        // overlay to the select screen via __csiIntroOverlay. The select
+        // screen paints underneath (same image, same letterbox geometry),
+        // holds the bare artwork for a beat, then dissolves the frozen
+        // overlay. Only the song's NATURAL end takes this path - skipping
+        // fades to black and the select screen just appears. The handoff
+        // is armed per-run by the play button flow (ui-events.js) and
+        // consumed here, so replays of the intro from the gallery tear down
+        // normally.
+        const handoffArmed = (typeof window !== 'undefined' && window.__csiHandoffArmed === true);
+        if (handoffArmed) window.__csiHandoffArmed = false;
+        // Clearing the flag unconditionally is safe: a skip leaves it unset,
+        // so the select screen never inherits a stale "final frame" hold.
+        if (typeof window !== 'undefined') window.__csiIntroFinalFrame = false;
+        if (handoffArmed && songEndedNaturally
+            && songImgEls && songImgEls.frame && overlay.contains(songImgEls.frame)) {
+            [...overlay.children].forEach((child) => {
+                if (child !== songImgEls.frame) child.remove();
+            });
+            if (songImgEls.textBox) {
+                songImgEls.textBox.style.transition = 'opacity 0.6s ease';
+                songImgEls.textBox.style.opacity = '0';
+            }
+            overlay.style.cursor = 'default';
+            window.__csiIntroOverlay = overlay;
+            // Marks a natural-end handoff: the select screen holds the bare
+            // artwork for ~1s before dissolving this overlay. The skip path
+            // never sets it - there the screen takes over immediately.
+            window.__csiIntroFinalFrame = true;
+            overlay = null; // the select screen owns removal now
+            const pendingComplete = onComplete;
+            onComplete = null; // consumed here - the select screen owns teardown
+            // Restore the music BEFORE the continuation runs: the next screen
+            // (character select, tutorial, level, setup) asserts its own BGM,
+            // and restoring the stale track afterwards would clobber it (the
+            // tutorial's track lost to 'title' this way).
+            if (typeof Audio_Manager !== 'undefined') {
+                Audio_Manager.unlockBGM();
+                Audio_Manager.playBGM(Audio_Manager._lastBGMKey || 'title');
+            }
+            if (typeof pendingComplete === 'function') pendingComplete();
+            return;
+        }
+
         overlay.style.transition = 'opacity 0.7s ease';
         overlay.style.opacity = '0';
         setTimeout(() => {
             if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
             overlay = null;
-            if (typeof onComplete === 'function') onComplete();
+            // Same ordering as the handoff path above: restore music first so
+            // the continuation's own BGM (tutorial, level, setup) wins.
             if (typeof Audio_Manager !== 'undefined') {
                 Audio_Manager.unlockBGM();
                 Audio_Manager.playBGM(Audio_Manager._lastBGMKey || 'title');
             }
+            if (typeof onComplete === 'function') onComplete();
         }, 720);
     }
 
@@ -1624,13 +1692,17 @@ const StorylineRenderer = (() => {
             }
         }
 
-        // Skip if already seen (unless forced) — but still resolve onComplete,
+        // Skip if already seen (unless forced) - but still resolve onComplete,
         // otherwise any caller waiting on it to navigate forward gets stuck.
         if (!options.force && hasSeen(beatId, options)) {
             if (typeof options.onComplete === 'function') options.onComplete();
             return;
         }
         markSeen(beatId, options);
+
+        // Fresh playback, fresh handoff state: the previous run consumed the
+        // frozen-frame flag in close() (or the dissolve in the select screen).
+        if (typeof window !== 'undefined') window.__csiIntroFinalFrame = false;
 
         onComplete = options.onComplete || null;
 
@@ -1643,11 +1715,11 @@ const StorylineRenderer = (() => {
 
         if (isVideo) {
             startVideo(video);
-            // Clicking/space does NOT skip a video beat — playback drives it.
+            // Clicking/space does NOT skip a video beat - playback drives it.
             // Only the explicit skip/continue button (rendered in renderVideo) closes it early.
         } else if (isSong) {
             startSong(song);
-            // Clicking/space does NOT skip a song beat — playback drives it.
+            // Clicking/space does NOT skip a song beat - playback drives it.
             // Only the explicit skip button (rendered in renderSong) closes it early.
         } else if (isSlideshow) {
             currentSlides = slideshow.slides;
@@ -1682,7 +1754,7 @@ const StorylineRenderer = (() => {
             }
             document.addEventListener('keydown', onKey);
             // Remove listener when overlay closes
-            // (listener is cleaned up when overlay is removed from DOM — acceptable for this use case)
+            // (listener is cleaned up when overlay is removed from DOM - acceptable for this use case)
         }
     }
 
@@ -1692,7 +1764,7 @@ const StorylineRenderer = (() => {
 
 
 // ---------------------------------------------------------------------------
-// SEEN-STATE — uses localStorage so beats only show once per save
+// SEEN-STATE - uses localStorage so beats only show once per save
 // ---------------------------------------------------------------------------
 
 function _seenKey(beatId, options = {}) {
@@ -1718,12 +1790,12 @@ function markSeen(beatId, options = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// GLOBAL REPLAY UNLOCKS — persist independently of the 20 save slots.
+// GLOBAL REPLAY UNLOCKS - persist independently of the 20 save slots.
 //
 // Intro cutscenes (opening cinematic + all three character intros) are
 // unlocked FOREVER as soon as the player starts a game with any character.
 // Keys use their own `replay_unlocked_` prefix (NOT `storyline_seen_`), so
-// wipeSlot()/resetAllBeats() never touch them — the unlocks survive resets
+// wipeSlot()/resetAllBeats() never touch them - the unlocks survive resets
 // and apply to every save slot. Everything else (region beats) stays tied to
 // the per-save "already seen" state.
 // ---------------------------------------------------------------------------
@@ -1746,7 +1818,7 @@ function _setReplayGloballyUnlocked(entryId) {
     } catch (e) { /* storage unavailable */ }
 }
 
-// isReplayEntryUnlocked — an entry is replayable if it is flagged as
+// isReplayEntryUnlocked - an entry is replayable if it is flagged as
 // permanently unlocked (globalUnlock → always available, all save slots),
 // OR carries a persisted global unlock flag, OR has been seen in the
 // current save. Intro cutscenes are meant to be available forever, so they
@@ -1758,7 +1830,7 @@ function isReplayEntryUnlocked(entry) {
     return hasSeen(entry.beatId, entry.options || {});
 }
 
-// unlockReplayIntroBundle — called when the player confirms any character on
+// unlockReplayIntroBundle - called when the player confirms any character on
 // the start-of-game character select. Unlocks every gallery entry flagged
 // `globalUnlock` (the opening cinematic + the three character intros) for
 // good, across all save slots.
@@ -1769,7 +1841,7 @@ function unlockReplayIntroBundle() {
         .forEach(entry => _setReplayGloballyUnlocked(entry.id));
 }
 
-// getUnlockedReplayEntries — subset of REPLAY_GALLERY_ENTRIES (storyline-beats.js)
+// getUnlockedReplayEntries - subset of REPLAY_GALLERY_ENTRIES (storyline-beats.js)
 // the player can replay. Used by the title screen's Replay panel.
 function getUnlockedReplayEntries() {
     if (typeof REPLAY_GALLERY_ENTRIES === 'undefined') return [];
@@ -1810,8 +1882,8 @@ function resetAllBeatsForSlot(slotNum) {
 /**
  * showBeat(beatId, options)
  *
- * beatId      — key from STORY_BEATS (e.g. 'intro_cinematic', 'region_5')
- * options     — {
+ * beatId      - key from STORY_BEATS (e.g. 'intro_cinematic', 'region_5')
+ * options     - {
  *   character:       'stox' | 'trix' | 'syla'      (for character_intro)
  *   className:       'Mathmagician' | ...           (for class_unlock)
  *   ascendencyClass: 'Outlier' | ...                 (for ascendency_unlock)
@@ -1820,15 +1892,15 @@ function resetAllBeatsForSlot(slotNum) {
  * }
  *
  * Beats are shown only once per save by default (localStorage flag).
- * Pass { force: true } to override — handy for replaying in a codex / gallery.
+ * Pass { force: true } to override - handy for replaying in a codex / gallery.
  *
  * Video beats specifically (see the "VIDEO BEATS" comment block near the top
  * of this file for the full data shape): a beat's `video` can be either the
  * legacy single-clip `{ videoFile, audio }` shape, or a new `{ clips: [...] }`
  * shape for playing several clips back-to-back with a configurable pause
- * between each. Each clip can carry its OWN `audio` field — that file plays
+ * between each. Each clip can carry its OWN `audio` field - that file plays
  * in lockstep with its clip and is torn down the moment the sequence moves
- * to the next one. Either way, playback never loops — it freezes on the
+ * to the next one. Either way, playback never loops - it freezes on the
  * final clip's last frame (and whatever its audio was doing), and the
  * corner button switches from "skip" to "continue" once that happens.
  */

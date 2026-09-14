@@ -1,20 +1,20 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MARKSMAN (boss_marksman)---------------------------
 //------------------------------------------------------------------------
-// Aimed strikes land where you stand — never stand still.
+// Aimed strikes land where you stand - never stand still.
 //
 // MARKED STRIKES: a crosshair reticle locks onto the player's position and
-// an arrow flies in on a concave (gravity) arc — damage lands WHEN THE
+// an arrow flies in on a concave (gravity) arc - damage lands WHEN THE
 // ARROW IMPACTS the mark, not at lock-on. The ring is just the aim; the
 // arrow is the hit.
 //
 // ARROW GAUNTLET (HP-gated set-piece at 66% / 33%, Viper Napuatzi-style):
 // a 5-4-3-2-1 countdown announces the gauntlet, then a rectangle of
-// conjured bows walls the player in — impassable until the formation is
+// conjured bows walls the player in - impassable until the formation is
 // survived. The bows fire arrow walls with gaps to dodge through; the 33%
 // gauntlet is faster and meaner than the 66% one. Arrows deal heavy
 // PHYSICAL damage (no element = armour-only mitigation). The auto-attack
-// charge bar is paused for the whole gauntlet (countdown included) — see
+// charge bar is paused for the whole gauntlet (countdown included) - see
 // _egMarksGauntletChargePaused in endgame-encounter.js.
 //
 // This file holds EVERYTHING this boss needs in one place:
@@ -63,8 +63,8 @@ const EG_MARKS_DMG = [0, 0.10, 0.12, 0.15]; // %maxHP per impact (lightning)
 // ── Arrow Gauntlet tuning ───────────────────────────────────────────────
 const EG_GAUNTLET_PCTS = [0.66, 0.33];      // HP gates: stage 2 at 66%, stage 3 at 33%
 const EG_GAUNTLET_CD_SEC = 5;               // 5-4-3-2-1 countdown
-const EG_GAUNTLET_SPEED = [0, 0, 360, 460]; // arrow px/s — 66% easy, 33% hard
-const EG_GAUNTLET_HIT = [0, 0, 0.16, 0.22]; // %maxHP per arrow — HEAVY physical
+const EG_GAUNTLET_SPEED = [0, 0, 360, 460]; // arrow px/s - 66% easy, 33% hard
+const EG_GAUNTLET_HIT = [0, 0, 0.16, 0.22]; // %maxHP per arrow - HEAVY physical
 const EG_GAUNTLET_HIT_CD_MS = 450;          // global player hit cooldown
 const EG_GAUNTLET_ARROW_GAP = 52;           // px between arrows in a wall
 const EG_GAUNTLET_WALL_T = 34;              // wall thickness (bows box)
@@ -75,7 +75,7 @@ let _egMarksWatcher = null;  // per-fight HP-gate watcher state
 let _egMarksGauntlet = null; // non-null while a gauntlet (countdown + waves) runs
 
 
-// Read by endgame-encounter.js: the whole gauntlet — countdown AND waves —
+// Read by endgame-encounter.js: the whole gauntlet - countdown AND waves -
 // is a dodge set-piece, so the auto-attack charge bar stays paused.
 function _egMarksGauntletChargePaused() {
     return !!_egMarksGauntlet;
@@ -99,7 +99,7 @@ function _egMarksGauntletApplyImmunity(monsterId) {
 
 // Releases ONLY the immunity this system applied (framework windows,
 // e.g. a phase transition that ends after the gauntlet, stay untouched).
-// Safe on every path — missing monster (boss died) is a no-op.
+// Safe on every path - missing monster (boss died) is a no-op.
 function _egMarksGauntletReleaseImmunity(monsterId) {
     const m = (typeof _egMonsters !== 'undefined' && _egMonsters)
         ? _egMonsters.find(x => x && x.id === monsterId) : null;
@@ -111,7 +111,7 @@ function _egMarksGauntletReleaseImmunity(monsterId) {
 
 
 // True while a gauntlet (or its countdown) is running. Marked Strikes
-// stand down during it — the bows own the arena.
+// stand down during it - the bows own the arena.
 function _egMarksGauntletActive() {
     return !!_egMarksGauntlet;
 }
@@ -132,7 +132,7 @@ function _egMechMarkedStrikes(monster, phase) {
     _egNkToast('eg_mech_marks', '🎯 The Marksman: Marked Strikes! Never stand still!');
     _egNkLoop(run, (dtS) => {
         if (_egMarksGauntletActive()) {
-            // The gauntlet started mid-volley: the bows own the arena —
+            // The gauntlet started mid-volley: the bows own the arena -
             // abort any in-flight marks so their damage can't stack with
             // the gauntlet walls.
             marks.forEach(m => { try { if (m.arrow) m.arrow.remove(); } catch (e2) {} try { m.el.remove(); } catch (e2) {} });
@@ -143,7 +143,7 @@ function _egMechMarkedStrikes(monster, phase) {
             nextAt = e + EG_MARKS_INTERVAL_MS;
             left--;
             // Aim at where the player IS now: the aim + flight time is the
-            // dodge window — keep moving.
+            // dodge window - keep moving.
             const c = _egNkPlayerCenter();
             const x = c ? c.x : window.innerWidth / 2;
             const y = c ? c.y : window.innerHeight / 2;
@@ -184,7 +184,7 @@ function _egMechMarkedStrikes(monster, phase) {
                 const ang = Math.atan2(vy, vx) * 180 / Math.PI;
                 m.arrow.style.transform = 'translate(' + Math.round(fx) + 'px,' + Math.round(fy) + 'px) rotate(' + Math.round(ang) + 'deg)';
                 if (ft >= 1) {
-                    // IMPACT — this is when the damage happens.
+                    // IMPACT - this is when the damage happens.
                     m.struck = true;
                     m.el.classList.add('eg-nk-mark-hit');
                     try { m.arrow.remove(); } catch (e2) {}
@@ -219,7 +219,7 @@ function _egMarksmanArenaInit(monster) {
     const st = { monsterId, level, fired66: false, fired33: false, missingSince: 0 };
     _egMarksWatcher = st;
     _egNkToast('eg_mech_gauntlet_intro',
-        '🏹 The Marksman: At 66% and 33% the bows surround you — survive the ARROW GAUNTLET!');
+        '🏹 The Marksman: At 66% and 33% the bows surround you - survive the ARROW GAUNTLET!');
     const run = _egNkNewRun(monsterId, false);
     st.run = run;
     run.onKill = () => {
@@ -238,7 +238,7 @@ function _egMarksmanArenaInit(monster) {
         }
         st.missingSince = 0;
         const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
-        // Start() returns false while another gauntlet is still running —
+        // Start() returns false while another gauntlet is still running -
         // retry on later ticks so a burst through both gates fires both.
         if (!st.fired66 && hpPct <= EG_GAUNTLET_PCTS[0]) {
             if (_egMarksGauntletStart(2)) st.fired66 = true;
@@ -251,16 +251,16 @@ function _egMarksmanArenaInit(monster) {
 
 
 // Builds the wave program for one gauntlet. Each event: { t (ms into the
-// wave phase), side ('left'|'right'|'top'|'bottom' — where the bows FIRE
+// wave phase), side ('left'|'right'|'top'|'bottom' - where the bows FIRE
 // FROM), gapFrac (gap width as a fraction of the side span), gapCenter
 // (fractional position of the gap along that side) }.
 function _egMarksGauntletWaves(stage) {
     const W = [];
     const push = (t, side, gapFrac, gapCenter) => W.push({ t, side, gapFrac, gapCenter, armed: false, fired: false });
     if (stage >= 3) {
-        // Stage 3 (33%) — DEADLY VOLLEY: faster arrows, harder patterns.
+        // Stage 3 (33%) - DEADLY VOLLEY: faster arrows, harder patterns.
         push(0, 'left', 0.34, Math.random());
-        // Adjacent pincers — offset gaps, only a diagonal pocket is safe.
+        // Adjacent pincers - offset gaps, only a diagonal pocket is safe.
         push(2400, 'top', 0.38, Math.random());
         push(2400, 'left', 0.38, Math.random());
         // Sweep: the volley rotates around the whole box.
@@ -278,12 +278,12 @@ function _egMarksGauntletWaves(stage) {
         push(8400, 'bottom', 0.36, Math.max(0.08, Math.min(0.92, pinchGap + (Math.random() - 0.5) * 0.16)));
         // Finale: rapid double wall, the gap SHIFTS between volleys. The
         // shift is sized so a base-walk-speed player (320 px/s) can cross
-        // to the new gap inside the 1.7s between volleys — gear must not
+        // to the new gap inside the 1.7s between volleys - gear must not
         // be the price of admission.
         push(10400, 'right', 0.30, 0.25);
         push(12100, 'right', 0.30, 0.75);
     } else {
-        // Stage 2 (66%) — still learnable: one wall at a time, generous
+        // Stage 2 (66%) - still learnable: one wall at a time, generous
         // gaps, a short breather between walls (~2.8s apart, wall crosses
         // in ~2.6s at 360 px/s).
         push(0, 'left', 0.40, Math.random());
@@ -314,7 +314,7 @@ function _egMarksGauntletGridRect() {
 
 
 // Spawns the bow-wall rectangle around the EDGES OF THE PUZZLE GRID (the
-// arena IS the grid — the player is sealed inside the puzzle itself) and
+// arena IS the grid - the player is sealed inside the puzzle itself) and
 // returns its geometry (the wall elements come back too, so per-bow fire
 // telegraphs can address the right wall). Falls back to a viewport-centered
 // box if no grid is measurable (defensive only).
@@ -365,7 +365,7 @@ function _egMarksGauntletBuildWalls(run, box) {
 
 
 // Arms (lights up) exactly the bows whose arrows are about to spawn for
-// this volley — a subtle per-bow tell of which lane turns deadly, not a
+// this volley - a subtle per-bow tell of which lane turns deadly, not a
 // full row/column band. Bows in the gap never arm (they don't shoot).
 function _egMarksGauntletArmBows(g, ev) {
     if (!g.box || !g.box.walls) return;
@@ -381,7 +381,7 @@ function _egMarksGauntletArmBows(g, ev) {
         const bowD = span * (i + 1) / (bows.length + 1);
         const frac = (bowD - min) / Math.max(1, max - min);
         if (frac < -0.05 || frac > 1.05) return;                              // outside the arrow band
-        if (Math.abs(frac - ev.gapCenter) < ev.gapFrac / 2) return;           // the gap — this bow holds fire
+        if (Math.abs(frac - ev.gapCenter) < ev.gapFrac / 2) return;           // the gap - this bow holds fire
         bow.classList.add('eg-gauntlet-bow-arm');
         ev.armedEls.push(bow);
     });
@@ -396,7 +396,7 @@ function _egMarksGauntletDisarmBows(g, ev) {
 }
 
 
-// Volley release sting — the same drawn-bow twang the Probabilist's
+// Volley release sting - the same drawn-bow twang the Probabilist's
 // Precision Mark plays, so every gauntlet volley reads as a bow loosing.
 function _egMarksGauntletVolleySfx() {
     try {
@@ -411,7 +411,7 @@ function _egMarksGauntletGridLockToast() {
     const g = _egMarksGauntlet;
     if (!g || g.gridToastShown) return;
     g.gridToastShown = true;
-    _egNkToast('eg_gauntlet_grid_locked', '🏹 The bows hold the arena — the grid is sealed until the gauntlet ends!');
+    _egNkToast('eg_gauntlet_grid_locked', '🏹 The bows hold the arena - the grid is sealed until the gauntlet ends!');
 }
 
 
@@ -424,20 +424,20 @@ function _egMarksGauntletStart(stage) {
     _egMarksGauntlet = { stage, run, level: w.level, monsterId: w.monsterId };
     run.onKill = () => {
         if (_egMarksGauntlet && _egMarksGauntlet.run === run) _egMarksGauntlet = null;
-        // Gauntlet immunity always releases with the run — boss death,
+        // Gauntlet immunity always releases with the run - boss death,
         // encounter stop or survival can never leave the boss locked.
         _egMarksGauntletReleaseImmunity(w.monsterId);
     };
 
     // The gauntlet owns the fight: the boss draws no auto-attack charge
     // (both bars frozen, see _egMarksGauntletChargePaused) and shrugs off
-    // all damage while the bows hold the arena — beating on him mid-volley
+    // all damage while the bows hold the arena - beating on him mid-volley
     // would skip the set-piece.
     _egMarksGauntletApplyImmunity(w.monsterId);
 
     _egNkToast(stage >= 3 ? 'eg_mech_gauntlet_stage3' : 'eg_mech_gauntlet',
-        stage >= 3 ? '🏹 ARROW GAUNTLET — Deadly Volley! No mercy this time!'
-                   : '🏹 ARROW GAUNTLET — survive the storm of arrows!');
+        stage >= 3 ? '🏹 ARROW GAUNTLET - Deadly Volley! No mercy this time!'
+                   : '🏹 ARROW GAUNTLET - survive the storm of arrows!');
 
     // Countdown UI: "ARROW GAUNTLET" + a big 5-4-3-2-1 above the arena.
     let title = 'ARROW GAUNTLET';
@@ -476,7 +476,7 @@ function _egMarksGauntletStart(stage) {
                 while (cdBox.children.length > 2) cdBox.removeChild(cdBox.children[1]);
             }
             if (!g.box && g.cdTimer <= (EG_GAUNTLET_CD_SEC - 1) * 1000 + 400) {
-                // The bows snap into formation while the countdown runs —
+                // The bows snap into formation while the countdown runs -
                 // the box is sealed from this moment on.
                 g.box = _egMarksGauntletBuildBox(run);
                 g.wallEls = Array.from(document.querySelectorAll('.eg-gauntlet-wall'));
@@ -495,7 +495,7 @@ function _egMarksGauntletStart(stage) {
 
         // ── Wave phase ──
         g.waveT += dtS * 1000;
-        // Arm (glow) every volley whose lead window opened — independent
+        // Arm (glow) every volley whose lead window opened - independent
         // of the fire pointer, so SIMULTANEOUS pincer events (same t) arm
         // together instead of the second one losing its telegraph.
         while (g.armIdx < g.waves.length && g.waveT >= g.waves[g.armIdx].t - EG_GAUNTLET_ARM_LEAD_MS) {
@@ -611,7 +611,7 @@ function _egMarksGauntletEnd() {
     });
     if (g.arrows) g.arrows.forEach(a => { try { a.el.remove(); } catch (e) {} });
     if (g.run) { try { _egNkKillRun(g.run); } catch (e) {} }
-    _egNkToast('eg_mech_gauntlet_done', '🎯 The bows lower — the gauntlet is survived!');
+    _egNkToast('eg_mech_gauntlet_done', '🎯 The bows lower - the gauntlet is survived!');
 }
 
 

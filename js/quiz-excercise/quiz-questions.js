@@ -5,7 +5,7 @@
 
 const BONUS_QUIZ_POOLS = {
 
-    // ── WORLD 1 — Basic Probability ───────────────────────────────────────
+    // ── WORLD 1 - Basic Probability ───────────────────────────────────────
     // Topics: sample spaces, events, power sets, mutually exclusive events,
     //         complement, De Morgan, intersection/union, probability measure
 
@@ -16,8 +16,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["All possible outcomes of an experiment", "Only the likely outcomes", "The set of impossible events", "A single random outcome"],
             optsDE: ["Alle möglichen Ergebnisse eines Experiments", "Nur die wahrscheinlichen Ergebnisse", "Die Menge der unmöglichen Ereignisse", "Ein einzelnes zufälliges Ergebnis"],
             correct: 0,
-            explain: "By definition, the sample space Ω collects every outcome an experiment could possibly produce — likely or unlikely, as long as it's possible.",
-            explainDE: "Per Definition enthält die Ergebnismenge Ω alle Ergebnisse, die ein Experiment überhaupt hervorbringen kann — egal ob wahrscheinlich oder unwahrscheinlich, solange sie möglich sind."
+            explain: "By definition, the sample space Ω collects every outcome an experiment could possibly produce - likely or unlikely, as long as it's possible.",
+            explainDE: "Per Definition enthält die Ergebnismenge Ω alle Ergebnisse, die ein Experiment überhaupt hervorbringen kann - egal ob wahrscheinlich oder unwahrscheinlich, solange sie möglich sind."
         },
         {
             q: "The complement of event A (written Aᶜ) contains:",
@@ -25,8 +25,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["All outcomes NOT in A", "All outcomes in A", "Only impossible outcomes", "The intersection of A with Ω"],
             optsDE: ["Alle Ergebnisse, die NICHT in A liegen", "Alle Ergebnisse in A", "Nur unmögliche Ergebnisse", "Den Schnitt von A mit Ω"],
             correct: 0,
-            explain: "The complement Aᶜ is everything in Ω that is left over once you remove A — i.e. all outcomes where A does not happen.",
-            explainDE: "Das Komplement Aᶜ besteht aus allem, was in Ω übrig bleibt, wenn man A entfernt — also allen Ergebnissen, bei denen A nicht eintritt."
+            explain: "The complement Aᶜ is everything in Ω that is left over once you remove A - i.e. all outcomes where A does not happen.",
+            explainDE: "Das Komplement Aᶜ besteht aus allem, was in Ω übrig bleibt, wenn man A entfernt - also allen Ergebnissen, bei denen A nicht eintritt."
         },
         {
             q: "If A and B are disjoint, then P(A ∩ B) equals:",
@@ -43,8 +43,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Aᶜ ∩ Bᶜ", "Aᶜ ∪ Bᶜ", "A ∩ B", "A ∪ B"],
             optsDE: ["Aᶜ ∩ Bᶜ", "Aᶜ ∪ Bᶜ", "A ∩ B", "A ∪ B"],
             correct: 0,
-            explain: "'Not (A or B)' means neither A nor B happened, which is the same as 'not A AND not B' — that's exactly Aᶜ ∩ Bᶜ.",
-            explainDE: "„Nicht (A oder B)” bedeutet, dass weder A noch B eingetreten ist — also „nicht A UND nicht B”, was genau Aᶜ ∩ Bᶜ entspricht."
+            explain: "'Not (A or B)' means neither A nor B happened, which is the same as 'not A AND not B' - that's exactly Aᶜ ∩ Bᶜ.",
+            explainDE: "„Nicht (A oder B)” bedeutet, dass weder A noch B eingetreten ist - also „nicht A UND nicht B”, was genau Aᶜ ∩ Bᶜ entspricht."
         },
         {
             q: "A probability measure P must satisfy P(Ω) = ?",
@@ -52,8 +52,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["1", "0", "0.5", "Any positive number"],
             optsDE: ["1", "0", "0.5", "Eine beliebige positive Zahl"],
             correct: 0,
-            explain: "Ω contains every possible outcome, so something in Ω is guaranteed to happen — that's why P(Ω) must equal 1 (Kolmogorov's axiom).",
-            explainDE: "Ω enthält alle möglichen Ergebnisse, also tritt garantiert etwas aus Ω ein — deshalb muss P(Ω) = 1 sein (Kolmogorov-Axiom)."
+            explain: "Ω contains every possible outcome, so something in Ω is guaranteed to happen - that's why P(Ω) must equal 1 (Kolmogorov's axiom).",
+            explainDE: "Ω enthält alle möglichen Ergebnisse, also tritt garantiert etwas aus Ω ein - deshalb muss P(Ω) = 1 sein (Kolmogorov-Axiom)."
         },
         {
             q: "Which of these CANNOT be a valid probability?",
@@ -61,8 +61,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["−0.1", "0", "0.5", "1"],
             optsDE: ["−0,1", "0", "0,5", "1"],
             correct: 0,
-            explain: "Probabilities must always lie between 0 and 1, inclusive. −0.1 is negative, which breaks that rule — it can never be a valid probability.",
-            explainDE: "Wahrscheinlichkeiten müssen immer zwischen 0 und 1 liegen. −0,1 ist negativ und verletzt damit diese Regel — es kann nie eine gültige Wahrscheinlichkeit sein."
+            explain: "Probabilities must always lie between 0 and 1, inclusive. −0.1 is negative, which breaks that rule - it can never be a valid probability.",
+            explainDE: "Wahrscheinlichkeiten müssen immer zwischen 0 und 1 liegen. −0,1 ist negativ und verletzt damit diese Regel - es kann nie eine gültige Wahrscheinlichkeit sein."
         },
         {
             q: "The smallest possible σ-algebra on any non-empty Ω is:",
@@ -71,7 +71,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["{∅, Ω}", "Die Potenzmenge von Ω", "{Ω}", "{∅}"],
             correct: 0,
             explain: "A σ-algebra must always contain ∅ and Ω, and be closed under complements/unions. {∅, Ω} already satisfies all of that with nothing extra, so it's the smallest one possible.",
-            explainDE: "Eine σ-Algebra muss immer ∅ und Ω enthalten und unter Komplement/Vereinigung abgeschlossen sein. {∅, Ω} erfüllt das bereits ohne etwas Zusätzliches — deshalb ist es die kleinstmögliche σ-Algebra."
+            explainDE: "Eine σ-Algebra muss immer ∅ und Ω enthalten und unter Komplement/Vereinigung abgeschlossen sein. {∅, Ω} erfüllt das bereits ohne etwas Zusätzliches - deshalb ist es die kleinstmögliche σ-Algebra."
         },
         {
             q: "The inclusion-exclusion formula for P(A ∪ B) is:",
@@ -80,7 +80,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["P(A) + P(B) − P(A ∩ B)", "P(A) + P(B) + P(A ∩ B)", "P(A) · P(B)", "P(A) − P(B)"],
             correct: 0,
             explain: "If you just add P(A) + P(B), you count the overlap P(A ∩ B) twice, so you have to subtract it once to correct for the double-count.",
-            explainDE: "Addiert man einfach P(A) + P(B), wird die Überlappung P(A ∩ B) doppelt gezählt — deshalb muss man sie einmal wieder abziehen."
+            explainDE: "Addiert man einfach P(A) + P(B), wird die Überlappung P(A ∩ B) doppelt gezählt - deshalb muss man sie einmal wieder abziehen."
         },
         {
             q: "Two fair dice are rolled. How many outcomes are in the sample space Ω?",
@@ -115,8 +115,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Aᶜ ∪ Bᶜ", "Aᶜ ∩ Bᶜ", "A ∪ B", "A ∩ B"],
             optsDE: ["Aᶜ ∪ Bᶜ", "Aᶜ ∩ Bᶜ", "A ∪ B", "A ∩ B"],
             correct: 0,
-            explain: "'Not (A and B)' means at least one of them failed to happen — that's 'not A OR not B', which is Aᶜ ∪ Bᶜ.",
-            explainDE: "„Nicht (A und B)” bedeutet, dass mindestens eines der beiden nicht eingetreten ist — also „nicht A ODER nicht B”, was Aᶜ ∪ Bᶜ entspricht."
+            explain: "'Not (A and B)' means at least one of them failed to happen - that's 'not A OR not B', which is Aᶜ ∪ Bᶜ.",
+            explainDE: "„Nicht (A und B)” bedeutet, dass mindestens eines der beiden nicht eingetreten ist - also „nicht A ODER nicht B”, was Aᶜ ∪ Bᶜ entspricht."
         },
         {
             q: "In a Laplace experiment, all elementary events have:",
@@ -142,8 +142,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["0", "1", "0.5", "Undefined"],
             optsDE: ["0", "1", "0,5", "Undefiniert"],
             correct: 0,
-            explain: "∅ contains no outcomes at all, so it can never happen — by the axioms of probability, this always corresponds to probability 0.",
-            explainDE: "∅ enthält keine Ergebnisse und kann daher nie eintreten — nach den Axiomen der Wahrscheinlichkeitsrechnung entspricht das immer der Wahrscheinlichkeit 0."
+            explain: "∅ contains no outcomes at all, so it can never happen - by the axioms of probability, this always corresponds to probability 0.",
+            explainDE: "∅ enthält keine Ergebnisse und kann daher nie eintreten - nach den Axiomen der Wahrscheinlichkeitsrechnung entspricht das immer der Wahrscheinlichkeit 0."
         },
         {
             q: "A coin is flipped twice. How many elementary events are in the sample space?",
@@ -165,7 +165,7 @@ const BONUS_QUIZ_POOLS = {
         },
     ],
 
-    // ── WORLD 2 — Combinatorics & Distributions ───────────────────────────
+    // ── WORLD 2 - Combinatorics & Distributions ───────────────────────────
     // Topics: Laplace probability, combinatorics (ordered/unordered, with/without
     //         replacement), inclusion-exclusion for 3 sets, σ-algebra, binomial coefficient
 
@@ -248,8 +248,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Order does NOT matter and draws are without replacement", "Order matters and draws are with replacement", "Order matters and draws are without replacement", "Order does NOT matter and draws are with replacement"],
             optsDE: ["Reihenfolge KEINE Rolle spielt und ohne Zurücklegen gezogen wird", "Reihenfolge zählt und mit Zurücklegen gezogen wird", "Reihenfolge zählt und ohne Zurücklegen gezogen wird", "Reihenfolge KEINE Rolle spielt und mit Zurücklegen gezogen wird"],
             correct: 0,
-            explain: "The binomial coefficient counts unordered subsets chosen without replacement — which k of the n items end up selected, regardless of the order they were picked in.",
-            explainDE: "Der Binomialkoeffizient zählt ungeordnete Teilmengen ohne Zurücklegen — welche k der n Elemente ausgewählt werden, unabhängig von der Reihenfolge der Auswahl."
+            explain: "The binomial coefficient counts unordered subsets chosen without replacement - which k of the n items end up selected, regardless of the order they were picked in.",
+            explainDE: "Der Binomialkoeffizient zählt ungeordnete Teilmengen ohne Zurücklegen - welche k der n Elemente ausgewählt werden, unabhängig von der Reihenfolge der Auswahl."
         },
         {
             q: "How many ways are there to arrange all 5 elements of a set in a row?",
@@ -336,7 +336,7 @@ const BONUS_QUIZ_POOLS = {
 
     
 
-    // ── WORLD 3 — Random Variables & Distributions ────────────────────────
+    // ── WORLD 3 - Random Variables & Distributions ────────────────────────
     // Topics: conditional probability, law of total probability, Bayes' theorem,
     //         multi-stage probability trees, independence, random variables,
     //         distributions, CDF, quantile function, continuous RV/PDF, exponential distribution
@@ -375,8 +375,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["P(A|B)·P(B) / P(A)", "P(A|B) / P(B)", "P(A|B) + P(B)", "P(B) / P(A)"],
             optsDE: ["P(A|B)·P(B) / P(A)", "P(A|B) / P(B)", "P(A|B) + P(B)", "P(B) / P(A)"],
             correct: 0,
-            explain: "Bayes' theorem comes from writing P(A ∩ B) two ways — as P(A|B)·P(B) and as P(B|A)·P(A) — and solving for P(B|A), which yields P(A|B)·P(B)/P(A).",
-            explainDE: "Der Satz von Bayes ergibt sich, indem man P(A ∩ B) auf zwei Arten schreibt — als P(A|B)·P(B) und als P(B|A)·P(A) — und nach P(B|A) auflöst, was P(A|B)·P(B)/P(A) liefert."
+            explain: "Bayes' theorem comes from writing P(A ∩ B) two ways - as P(A|B)·P(B) and as P(B|A)·P(A) - and solving for P(B|A), which yields P(A|B)·P(B)/P(A).",
+            explainDE: "Der Satz von Bayes ergibt sich, indem man P(A ∩ B) auf zwei Arten schreibt - als P(A|B)·P(B) und als P(B|A)·P(A) - und nach P(B|A) auflöst, was P(A|B)·P(B)/P(A) liefert."
         },
         {
             q: "For a continuous random variable X, P(X = c) for any single value c equals:",
@@ -465,8 +465,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["1/λ", "λ", "λ²", "1/λ²"],
             optsDE: ["1/λ", "λ", "λ²", "1/λ²"],
             correct: 0,
-            explain: "Integrating x·λe^(−λx) over x from 0 to infinity yields the mean 1/λ — a larger rate λ means events happen sooner, so the average waiting time shrinks.",
-            explainDE: "Integriert man x·λe^(−λx) über x von 0 bis unendlich, erhält man den Erwartungswert 1/λ — eine größere Rate λ bedeutet, dass Ereignisse früher eintreten, daher sinkt die durchschnittliche Wartezeit."
+            explain: "Integrating x·λe^(−λx) over x from 0 to infinity yields the mean 1/λ - a larger rate λ means events happen sooner, so the average waiting time shrinks.",
+            explainDE: "Integriert man x·λe^(−λx) über x von 0 bis unendlich, erhält man den Erwartungswert 1/λ - eine größere Rate λ bedeutet, dass Ereignisse früher eintreten, daher sinkt die durchschnittliche Wartezeit."
         },
         {
             q: "The density p(x) of a discrete random variable must satisfy:",
@@ -492,8 +492,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Median", "Mean", "Mode", "Variance"],
             optsDE: ["Median", "Erwartungswert", "Modus", "Varianz"],
             correct: 0,
-            explain: "Q(0.5) is the value below which half the probability lies — exactly the definition of the median.",
-            explainDE: "Q(0,5) ist der Wert, unterhalb dessen die Hälfte der Wahrscheinlichkeit liegt — genau die Definition des Medians."
+            explain: "Q(0.5) is the value below which half the probability lies - exactly the definition of the median.",
+            explainDE: "Q(0,5) ist der Wert, unterhalb dessen die Hälfte der Wahrscheinlichkeit liegt - genau die Definition des Medians."
         },
     ],
 
@@ -627,7 +627,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ['U[0,2]', 'U[0,1]', 'N(0,1)', 'Exp(1)'],
             correct: 0,
             explain: "Doubling a uniform variable on [0,1] stretches its support to [0,2] while keeping the distribution flat, so it stays uniform, just over the wider interval.",
-            explainDE: "Das Verdoppeln einer auf [0,1] gleichverteilten Variable streckt ihren Träger auf [0,2], während die Verteilung flach bleibt — sie bleibt also gleichverteilt, nur über dem breiteren Intervall."
+            explainDE: "Das Verdoppeln einer auf [0,1] gleichverteilten Variable streckt ihren Träger auf [0,2], während die Verteilung flach bleibt - sie bleibt also gleichverteilt, nur über dem breiteren Intervall."
         },
         {
             q: 'Two random variables X and Y are independent if and only if:',
@@ -635,8 +635,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['Their joint density equals the product of the marginals', 'E[X] = E[Y]', 'Var(X) = Var(Y)', 'They take the same values'],
             optsDE: ['Ihre gemeinsame Zähldichte/Dichte dem Produkt der Randdichten entspricht', 'E[X] = E[Y]', 'Var(X) = Var(Y)', 'Sie dieselben Werte annehmen'],
             correct: 0,
-            explain: "This factorization condition means the two variables carry no information about each other — knowing X's value doesn't change the density governing Y, and vice versa.",
-            explainDE: "Diese Faktorisierungsbedingung bedeutet, dass die beiden Variablen keine Information übereinander tragen — das Wissen um den Wert von X ändert die Dichte von Y nicht, und umgekehrt."
+            explain: "This factorization condition means the two variables carry no information about each other - knowing X's value doesn't change the density governing Y, and vice versa.",
+            explainDE: "Diese Faktorisierungsbedingung bedeutet, dass die beiden Variablen keine Information übereinander tragen - das Wissen um den Wert von X ändert die Dichte von Y nicht, und umgekehrt."
         },
         {
             q: 'If X and Y are independent, which formula holds?',
@@ -671,8 +671,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['σ²/n', 'σ²·n', 'σ²', 'σ/n'],
             optsDE: ['σ²/n', 'σ²·n', 'σ²', 'σ/n'],
             correct: 0,
-            explain: "Independence lets variances add: Var(ΣXᵢ) = nσ², and scaling by 1/n squares to 1/n², giving nσ²/n² = σ²/n — the sample mean's spread shrinks as n grows.",
-            explainDE: "Unabhängigkeit erlaubt das Addieren der Varianzen: Var(ΣXᵢ) = nσ², und die Skalierung mit 1/n wird quadriert zu 1/n², was nσ²/n² = σ²/n ergibt — die Streuung des Stichprobenmittelwerts sinkt mit wachsendem n."
+            explain: "Independence lets variances add: Var(ΣXᵢ) = nσ², and scaling by 1/n squares to 1/n², giving nσ²/n² = σ²/n - the sample mean's spread shrinks as n grows.",
+            explainDE: "Unabhängigkeit erlaubt das Addieren der Varianzen: Var(ΣXᵢ) = nσ², und die Skalierung mit 1/n wird quadriert zu 1/n², was nσ²/n² = σ²/n ergibt - die Streuung des Stichprobenmittelwerts sinkt mit wachsendem n."
         },
         {
             q: 'The expected value of a continuous random variable X with density function f is:',
@@ -761,8 +761,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['Var(X+c) = Var(X)', 'Var(X+c) = Var(X) + c', 'Var(X+c) = Var(X) + c²', 'Var(X+c) = c·Var(X)'],
             optsDE: ['Var(X+c) = Var(X)', 'Var(X+c) = Var(X) + c', 'Var(X+c) = Var(X) + c²', 'Var(X+c) = c·Var(X)'],
             correct: 0,
-            explain: "Shifting X by a constant shifts its mean by the same constant, but the deviations from that mean — and hence the spread — stay exactly the same.",
-            explainDE: "Das Verschieben von X um eine Konstante verschiebt auch dessen Mittelwert um dieselbe Konstante, aber die Abweichungen von diesem Mittelwert — und somit die Streuung — bleiben exakt gleich."
+            explain: "Shifting X by a constant shifts its mean by the same constant, but the deviations from that mean - and hence the spread - stay exactly the same.",
+            explainDE: "Das Verschieben von X um eine Konstante verschiebt auch dessen Mittelwert um dieselbe Konstante, aber die Abweichungen von diesem Mittelwert - und somit die Streuung - bleiben exakt gleich."
         },
         {
             q: 'The Shift-Theorem states:',
@@ -797,8 +797,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['Σ g(x)·p(x)', 'g(E[X])', '∫ g(x) dx', 'Σ g(x)'],
             optsDE: ['Σ g(x)·p(x)', 'g(E[X])', '∫ g(x) dx', 'Σ g(x)'],
             correct: 0,
-            explain: "This theorem lets you compute E[g(X)] directly from X's original density, without first deriving the density of g(X) — just weight g(x) by p(x) and sum.",
-            explainDE: "Dieser Satz erlaubt es, E[g(X)] direkt aus der ursprünglichen Dichte von X zu berechnen, ohne zuerst die Dichte von g(X) herzuleiten — man gewichtet einfach g(x) mit p(x) und summiert."
+            explain: "This theorem lets you compute E[g(X)] directly from X's original density, without first deriving the density of g(X) - just weight g(x) by p(x) and sum.",
+            explainDE: "Dieser Satz erlaubt es, E[g(X)] direkt aus der ursprünglichen Dichte von X zu berechnen, ohne zuerst die Dichte von g(X) herzuleiten - man gewichtet einfach g(x) mit p(x) und summiert."
         },
         {
             q: 'For continuous X with density function f, E[g(X)] equals:',
@@ -851,8 +851,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['Order does NOT matter, no replacement', 'Order matters, no replacement', 'Order matters, with replacement', 'Order does NOT matter, with replacement'],
             optsDE: ['Reihenfolge KEINE Rolle spielt, ohne Zurücklegen', 'Reihenfolge zählt, ohne Zurücklegen', 'Reihenfolge zählt, mit Zurücklegen', 'Reihenfolge KEINE Rolle spielt, mit Zurücklegen'],
             correct: 0,
-            explain: "C(n,k) counts unordered subsets of size k chosen without replacement — which items end up in the group, not the sequence in which they were picked.",
-            explainDE: "C(n,k) zählt ungeordnete Teilmengen der Größe k ohne Zurücklegen — welche Elemente in der Gruppe landen, nicht die Reihenfolge, in der sie gewählt wurden."
+            explain: "C(n,k) counts unordered subsets of size k chosen without replacement - which items end up in the group, not the sequence in which they were picked.",
+            explainDE: "C(n,k) zählt ungeordnete Teilmengen der Größe k ohne Zurücklegen - welche Elemente in der Gruppe landen, nicht die Reihenfolge, in der sie gewählt wurden."
         },
         {
             q: 'The binomial coefficient C(n, 0) equals:',
@@ -860,8 +860,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['1 for any n ≥ 0', 'n', '0', 'n!'],
             optsDE: ['1 für beliebiges n ≥ 0', 'n', '0', 'n!'],
             correct: 0,
-            explain: "There is exactly one way to choose nothing — the empty selection — regardless of how large n is, so C(n,0) is always 1.",
-            explainDE: "Es gibt genau eine Möglichkeit, nichts auszuwählen — die leere Auswahl — unabhängig davon, wie groß n ist, daher ist C(n,0) stets 1."
+            explain: "There is exactly one way to choose nothing - the empty selection - regardless of how large n is, so C(n,0) is always 1.",
+            explainDE: "Es gibt genau eine Möglichkeit, nichts auszuwählen - die leere Auswahl - unabhängig davon, wie groß n ist, daher ist C(n,0) stets 1."
         },
         {
             q: 'For the binomial coefficient we have C(n, k) = C(n, n−k). This symmetry means:',
@@ -923,8 +923,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['Drawing without replacement, no order (binomial coefficient)', 'Drawing with replacement, with order', 'Drawing without replacement, with order', 'Drawing with replacement, no order'],
             optsDE: ['Ziehen ohne Zurücklegen, ohne Reihenfolge (Binomialkoeffizient)', 'Ziehen mit Zurücklegen, mit Reihenfolge', 'Ziehen ohne Zurücklegen, mit Reihenfolge', 'Ziehen mit Zurücklegen, ohne Reihenfolge'],
             correct: 0,
-            explain: "The binomial density's C(n,k) term comes from selecting which k of the n trials are successes — an unordered, without-replacement choice of positions.",
-            explainDE: "Der Term C(n,k) in der Binomialdichte stammt aus der Auswahl, welche k der n Versuche Erfolge sind — eine ungeordnete Auswahl von Positionen ohne Zurücklegen."
+            explain: "The binomial density's C(n,k) term comes from selecting which k of the n trials are successes - an unordered, without-replacement choice of positions.",
+            explainDE: "Der Term C(n,k) in der Binomialdichte stammt aus der Auswahl, welche k der n Versuche Erfolge sind - eine ungeordnete Auswahl von Positionen ohne Zurücklegen."
         },
     ],
 
@@ -987,8 +987,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['Memorylessness', 'Symmetry', 'Finite support', 'Unimodality only at 0'],
             optsDE: ['Gedächtnislosigkeit', 'Symmetrie', 'Endlicher Träger', 'Unimodalität nur bei 0'],
             correct: 0,
-            explain: "Both distributions are memoryless: the probability of waiting longer doesn't depend on how long you've already waited — the geometric is the discrete analogue of the continuous exponential.",
-            explainDE: "Beide Verteilungen sind gedächtnislos: Die Wahrscheinlichkeit, noch länger warten zu müssen, hängt nicht davon ab, wie lange man bereits gewartet hat — die geometrische Verteilung ist das diskrete Gegenstück zur stetigen Exponentialverteilung."
+            explain: "Both distributions are memoryless: the probability of waiting longer doesn't depend on how long you've already waited - the geometric is the discrete analogue of the continuous exponential.",
+            explainDE: "Beide Verteilungen sind gedächtnislos: Die Wahrscheinlichkeit, noch länger warten zu müssen, hängt nicht davon ab, wie lange man bereits gewartet hat - die geometrische Verteilung ist das diskrete Gegenstück zur stetigen Exponentialverteilung."
         },
 
         // --- Bernoulli-Folge ---
@@ -1114,8 +1114,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['(a+b)/2', '(b−a)/2', 'a·b', '1/(b−a)'],
             optsDE: ['(a+b)/2', '(b−a)/2', 'a·b', '1/(b−a)'],
             correct: 0,
-            explain: "Because the uniform density is flat across [a,b], its balance point — the expected value — sits exactly in the middle at (a+b)/2.",
-            explainDE: "Da die Gleichverteilungsdichte über [a,b] flach ist, liegt ihr Schwerpunkt — der Erwartungswert — genau in der Mitte bei (a+b)/2."
+            explain: "Because the uniform density is flat across [a,b], its balance point - the expected value - sits exactly in the middle at (a+b)/2.",
+            explainDE: "Da die Gleichverteilungsdichte über [a,b] flach ist, liegt ihr Schwerpunkt - der Erwartungswert - genau in der Mitte bei (a+b)/2."
         },
         {
             q: 'For X ~ U(0, 6), what is Var(X)?',
@@ -1152,8 +1152,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ['P(X > s+t | X > s) = P(X > t)', 'P(X > s+t) = P(X > s) + P(X > t)', 'Past waiting time increases future probability', 'The distribution resets only at integer times'],
             optsDE: ['P(X > s+t | X > s) = P(X > t)', 'P(X > s+t) = P(X > s) + P(X > t)', 'Vergangene Wartezeit erhöht künftige Wahrscheinlichkeit', 'Die Verteilung setzt nur zu ganzzahligen Zeiten zurück'],
             correct: 0,
-            explain: "Memorylessness means the remaining waiting time has the same distribution regardless of how much time has already elapsed — the process never 'ages'.",
-            explainDE: "Gedächtnislosigkeit bedeutet, dass die verbleibende Wartezeit dieselbe Verteilung hat, unabhängig davon, wie viel Zeit bereits verstrichen ist — der Prozess „altert” nie."
+            explain: "Memorylessness means the remaining waiting time has the same distribution regardless of how much time has already elapsed - the process never 'ages'.",
+            explainDE: "Gedächtnislosigkeit bedeutet, dass die verbleibende Wartezeit dieselbe Verteilung hat, unabhängig davon, wie viel Zeit bereits verstrichen ist - der Prozess „altert” nie."
         },
         {
             q: 'For X ~ Exp(2), what is Var(X)?',
@@ -1382,7 +1382,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["f_{X|Y}(x|y) = f(x,y) / f_Y(y)", "f_{X|Y}(x|y) = f_X(x) · f_Y(y)", "f_{X|Y}(x|y) = f_Y(y) / f(x,y)", "f_{X|Y}(x|y) = f(x,y) − f_Y(y)"],
             correct: 0,
             explain: "Conditioning on Y=y restricts attention to that slice of the joint density, so the conditional density normalizes the joint density by dividing out f_Y(y), the continuous analogue of conditional probability.",
-            explainDE: "Die Bedingung auf Y=y beschränkt die Betrachtung auf diesen Schnitt der gemeinsamen Dichte, daher normiert die bedingte Dichte die gemeinsame Dichte, indem sie durch f_Y(y) teilt — das stetige Gegenstück zur bedingten Wahrscheinlichkeit."
+            explainDE: "Die Bedingung auf Y=y beschränkt die Betrachtung auf diesen Schnitt der gemeinsamen Dichte, daher normiert die bedingte Dichte die gemeinsame Dichte, indem sie durch f_Y(y) teilt - das stetige Gegenstück zur bedingten Wahrscheinlichkeit."
         },
         {
             q: "For the conditional density f_{X|Y}(x|y) to be valid, it must satisfy:",
@@ -1526,8 +1526,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Cov(X,Y) = E[(X − E[X])(Y − E[Y])]", "Cov(X,Y) = E[X] · E[Y]", "Cov(X,Y) = E[X²] − E[Y²]", "Cov(X,Y) = Var(X) + Var(Y)"],
             optsDE: ["Cov(X,Y) = E[(X − E[X])(Y − E[Y])]", "Cov(X,Y) = E[X] · E[Y]", "Cov(X,Y) = E[X²] − E[Y²]", "Cov(X,Y) = Var(X) + Var(Y)"],
             correct: 0,
-            explain: "Covariance measures how X and Y move together by averaging the product of their deviations from their own means — positive when they tend to rise and fall together.",
-            explainDE: "Die Kovarianz misst, wie sich X und Y gemeinsam verändern, indem sie das Produkt ihrer Abweichungen von den jeweiligen Mittelwerten mittelt — positiv, wenn sie tendenziell gemeinsam steigen und fallen."
+            explain: "Covariance measures how X and Y move together by averaging the product of their deviations from their own means - positive when they tend to rise and fall together.",
+            explainDE: "Die Kovarianz misst, wie sich X und Y gemeinsam verändern, indem sie das Produkt ihrer Abweichungen von den jeweiligen Mittelwerten mittelt - positiv, wenn sie tendenziell gemeinsam steigen und fallen."
         },
         {
             q: "The computational shortcut for covariance is:",
@@ -1584,8 +1584,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Cov(X,Y) = 0", "E[X] = E[Y]", "Var(X) = Var(Y)", "E[XY] = 0"],
             optsDE: ["Cov(X,Y) = 0", "E[X] = E[Y]", "Var(X) = Var(Y)", "E[XY] = 0"],
             correct: 0,
-            explain: "Uncorrelated is, by definition, exactly the statement that the covariance between the two variables is zero — no linear relationship between them.",
-            explainDE: "Unkorreliert bedeutet per Definition genau, dass die Kovarianz zwischen den beiden Variablen null ist — kein linearer Zusammenhang zwischen ihnen."
+            explain: "Uncorrelated is, by definition, exactly the statement that the covariance between the two variables is zero - no linear relationship between them.",
+            explainDE: "Unkorreliert bedeutet per Definition genau, dass die Kovarianz zwischen den beiden Variablen null ist - kein linearer Zusammenhang zwischen ihnen."
         },
         {
             q: "Independence implies uncorrelatedness, but not vice versa. A counterexample is:",
@@ -1602,8 +1602,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Independence", "E[X] = E[Y]", "Var(X) = Var(Y)", "E[XY] = 1"],
             optsDE: ["Unabhängigkeit", "E[X] = E[Y]", "Var(X) = Var(Y)", "E[XY] = 1"],
             correct: 0,
-            explain: "The bivariate normal density is fully determined by means, variances, and the correlation ρ, so when ρ=0 the joint density factors into the product of the marginals, giving independence — a special property not shared by other distributions.",
-            explainDE: "Die bivariate Normaldichte ist vollständig durch die Mittelwerte, Varianzen und die Korrelation ρ bestimmt, daher zerfällt bei ρ=0 die gemeinsame Dichte in das Produkt der Randdichten, was Unabhängigkeit ergibt — eine Besonderheit, die nicht bei anderen Verteilungen gilt."
+            explain: "The bivariate normal density is fully determined by means, variances, and the correlation ρ, so when ρ=0 the joint density factors into the product of the marginals, giving independence - a special property not shared by other distributions.",
+            explainDE: "Die bivariate Normaldichte ist vollständig durch die Mittelwerte, Varianzen und die Korrelation ρ bestimmt, daher zerfällt bei ρ=0 die gemeinsame Dichte in das Produkt der Randdichten, was Unabhängigkeit ergibt - eine Besonderheit, die nicht bei anderen Verteilungen gilt."
         },
 
         // --- Korrelation ---
@@ -1671,8 +1671,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The mean vector μ and the covariance matrix Σ", "Only the mean vector μ", "Only the covariance matrix Σ", "The marginal distributions alone"],
             optsDE: ["Den Erwartungswertvektor μ und die Kovarianzmatrix Σ", "Nur den Erwartungswertvektor μ", "Nur die Kovarianzmatrix Σ", "Nur die Randverteilungen"],
             correct: 0,
-            explain: "Just as a univariate normal is fully specified by its mean and variance, the multivariate normal is fully specified by its mean vector and covariance matrix — no further information is needed.",
-            explainDE: "Genau wie eine univariate Normalverteilung vollständig durch Erwartungswert und Varianz bestimmt ist, ist die multivariate Normalverteilung vollständig durch ihren Erwartungswertvektor und ihre Kovarianzmatrix bestimmt — keine weitere Information ist nötig."
+            explain: "Just as a univariate normal is fully specified by its mean and variance, the multivariate normal is fully specified by its mean vector and covariance matrix - no further information is needed.",
+            explainDE: "Genau wie eine univariate Normalverteilung vollständig durch Erwartungswert und Varianz bestimmt ist, ist die multivariate Normalverteilung vollständig durch ihren Erwartungswertvektor und ihre Kovarianzmatrix bestimmt - keine weitere Information ist nötig."
         },
         {
             q: "If X ~ N(μ, Σ) and Y = AX + b, then Y follows:",
@@ -1689,15 +1689,15 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Univariate normal distributions", "Uniform distributions", "Exponential distributions", "Possibly non-normal"],
             optsDE: ["Univariate Normalverteilungen", "Gleichverteilungen", "Exponentialverteilungen", "Möglicherweise nicht normalverteilt"],
             correct: 0,
-            explain: "Picking out any single component of a multivariate normal vector and integrating out the rest always leaves a univariate normal distribution — a defining property of the multivariate normal family.",
-            explainDE: "Greift man eine einzelne Komponente eines multivariat normalverteilten Vektors heraus und integriert die übrigen aus, erhält man stets eine univariate Normalverteilung — eine charakteristische Eigenschaft der multivariaten Normalverteilungsfamilie."
+            explain: "Picking out any single component of a multivariate normal vector and integrating out the rest always leaves a univariate normal distribution - a defining property of the multivariate normal family.",
+            explainDE: "Greift man eine einzelne Komponente eines multivariat normalverteilten Vektors heraus und integriert die übrigen aus, erhält man stets eine univariate Normalverteilung - eine charakteristische Eigenschaft der multivariaten Normalverteilungsfamilie."
         },
 
 
     ],
 
 
-    // ── WORLD 7 — Convergence & Limit Theorems ────────────────────────────
+    // ── WORLD 7 - Convergence & Limit Theorems ────────────────────────────
     // Topics: arithmetisches Mittel, schwaches GGZ, Tschebyscheff-Ungleichung,
     //         stochastische Konvergenz, starkes GGZ, Hauptsatz der Statistik,
     //         fast sichere Konvergenz, Zentraler Grenzwertsatz
@@ -1712,8 +1712,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["(x₁ + … + xₙ) / n", "(x₁ + … + xₙ) · n", "√(x₁ · … · xₙ)", "max(x₁, …, xₙ) / n"],
             optsDE: ["(x₁ + … + xₙ) / n", "(x₁ + … + xₙ) · n", "√(x₁ · … · xₙ)", "max(x₁, …, xₙ) / n"],
             correct: 0,
-            explain: "By definition, the sample mean sums all n observations and divides by their count — the standard way to summarize a batch of data with one number.",
-            explainDE: "Per Definition summiert das arithmetische Mittel alle n Beobachtungen und teilt durch ihre Anzahl — die Standardmethode, einen Datensatz mit einer Zahl zusammenzufassen."
+            explain: "By definition, the sample mean sums all n observations and divides by their count - the standard way to summarize a batch of data with one number.",
+            explainDE: "Per Definition summiert das arithmetische Mittel alle n Beobachtungen und teilt durch ihre Anzahl - die Standardmethode, einen Datensatz mit einer Zahl zusammenzufassen."
         },
         {
             q: "For i.i.d. random variables X₁, …, Xₙ with E[Xᵢ] = μ, what is E[X̄ₙ]?",
@@ -1721,8 +1721,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["μ", "μ / n", "n · μ", "0"],
             optsDE: ["μ", "μ / n", "n · μ", "0"],
             correct: 0,
-            explain: "Since expectation is linear, averaging n variables that each have mean μ still gives a mean of μ — the sample mean is an unbiased estimator.",
-            explainDE: "Da der Erwartungswert linear ist, ergibt der Mittelwert von n Variablen mit jeweils Erwartungswert μ wieder μ — das arithmetische Mittel ist ein erwartungstreuer Schätzer."
+            explain: "Since expectation is linear, averaging n variables that each have mean μ still gives a mean of μ - the sample mean is an unbiased estimator.",
+            explainDE: "Da der Erwartungswert linear ist, ergibt der Mittelwert von n Variablen mit jeweils Erwartungswert μ wieder μ - das arithmetische Mittel ist ein erwartungstreuer Schätzer."
         },
         {
             q: "For i.i.d. random variables with variance σ², what is Var(X̄ₙ)?",
@@ -1750,8 +1750,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The variance Var(X)", "The full distribution of X", "The median of X", "The moment generating function"],
             optsDE: ["Die Varianz Var(X)", "Die vollständige Verteilung von X", "Den Median von X", "Die momenterzeugende Funktion"],
             correct: 0,
-            explain: "Chebyshev's bound is built entirely from the variance — no other information about the shape of the distribution is needed or used.",
-            explainDE: "Die Tschebyscheff-Schranke basiert ausschließlich auf der Varianz — keine weitere Information über die Form der Verteilung wird benötigt oder verwendet."
+            explain: "Chebyshev's bound is built entirely from the variance - no other information about the shape of the distribution is needed or used.",
+            explainDE: "Die Tschebyscheff-Schranke basiert ausschließlich auf der Varianz - keine weitere Information über die Form der Verteilung wird benötigt oder verwendet."
         },
 
         // --- Stochastische Konvergenz ---
@@ -1799,8 +1799,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["In probability", "Almost surely", "In distribution only", "In the L² sense only"],
             optsDE: ["In Wahrscheinlichkeit (stochastisch)", "Fast sicher", "Nur in Verteilung", "Nur im L²-Sinne"],
             correct: 0,
-            explain: "The Weak Law specifically establishes convergence in probability — a weaker guarantee than almost sure convergence, which the Strong Law provides instead.",
-            explainDE: "Das schwache Gesetz begründet speziell stochastische Konvergenz — eine schwächere Garantie als die fast sichere Konvergenz, die stattdessen das starke Gesetz liefert."
+            explain: "The Weak Law specifically establishes convergence in probability - a weaker guarantee than almost sure convergence, which the Strong Law provides instead.",
+            explainDE: "Das schwache Gesetz begründet speziell stochastische Konvergenz - eine schwächere Garantie als die fast sichere Konvergenz, die stattdessen das starke Gesetz liefert."
         },
         {
             q: "Which condition is sufficient to prove the Weak Law via Chebyshev's inequality?",
@@ -1809,7 +1809,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["Endliche Varianz σ² < ∞", "Die Verteilung muss normal sein", "Die Variablen müssen beschränkt sein", "Der Erwartungswert muss null sein"],
             correct: 0,
             explain: "Chebyshev's inequality needs only a finite variance to bound the probability of deviation, which is exactly the ingredient needed to prove the Weak Law.",
-            explainDE: "Die Tschebyscheff-Ungleichung benötigt nur eine endliche Varianz, um die Abweichungswahrscheinlichkeit zu beschränken — genau die Zutat, die für den Beweis des schwachen Gesetzes nötig ist."
+            explainDE: "Die Tschebyscheff-Ungleichung benötigt nur eine endliche Varianz, um die Abweichungswahrscheinlichkeit zu beschränken - genau die Zutat, die für den Beweis des schwachen Gesetzes nötig ist."
         },
 
         // --- Starkes Gesetz der großen Zahlen ---
@@ -1819,8 +1819,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Almost surely (with probability 1)", "In probability only", "In distribution only", "For finitely many n"],
             optsDE: ["Fast sicher (mit Wahrscheinlichkeit 1)", "Nur in Wahrscheinlichkeit", "Nur in Verteilung", "Für endlich viele n"],
             correct: 0,
-            explain: "The Strong Law makes the stronger claim that the sample mean converges to μ with probability 1 — not just that large deviations become unlikely, but that the sequence actually settles on μ.",
-            explainDE: "Das starke Gesetz trifft die stärkere Aussage, dass das arithmetische Mittel mit Wahrscheinlichkeit 1 gegen μ konvergiert — nicht nur, dass große Abweichungen unwahrscheinlich werden, sondern dass die Folge tatsächlich bei μ landet."
+            explain: "The Strong Law makes the stronger claim that the sample mean converges to μ with probability 1 - not just that large deviations become unlikely, but that the sequence actually settles on μ.",
+            explainDE: "Das starke Gesetz trifft die stärkere Aussage, dass das arithmetische Mittel mit Wahrscheinlichkeit 1 gegen μ konvergiert - nicht nur, dass große Abweichungen unwahrscheinlich werden, sondern dass die Folge tatsächlich bei μ landet."
         },
         {
             q: "The Strong Law is a stronger statement than the Weak Law because:",
@@ -1837,8 +1837,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["P(lim_{n→∞} Xₙ = X) = 1", "P(|Xₙ − X| ≥ ε) → 0 for all ε > 0", "E[Xₙ] → E[X]", "Xₙ = X for all large n with high probability"],
             optsDE: ["P(lim_{n→∞} Xₙ = X) = 1", "P(|Xₙ − X| ≥ ε) → 0 für alle ε > 0", "E[Xₙ] → E[X]", "Xₙ = X für alle großen n mit hoher Wahrscheinlichkeit"],
             correct: 0,
-            explain: "Almost sure convergence means the set of outcomes where the sequence actually converges to X has probability 1 — convergence happens for essentially every realization.",
-            explainDE: "Fast sichere Konvergenz bedeutet, dass die Menge der Ausgänge, bei denen die Folge tatsächlich gegen X konvergiert, Wahrscheinlichkeit 1 hat — Konvergenz tritt für praktisch jede Realisierung ein."
+            explain: "Almost sure convergence means the set of outcomes where the sequence actually converges to X has probability 1 - convergence happens for essentially every realization.",
+            explainDE: "Fast sichere Konvergenz bedeutet, dass die Menge der Ausgänge, bei denen die Folge tatsächlich gegen X konvergiert, Wahrscheinlichkeit 1 hat - Konvergenz tritt für praktisch jede Realisierung ein."
         },
 
         // --- Fast sichere Konvergenz ---
@@ -1895,8 +1895,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["To 0 almost surely as n → ∞", "To 1 as n → ∞", "To σ² as n → ∞", "To a normal distribution"],
             optsDE: ["Fast sicher gegen 0 für n → ∞", "Gegen 1 für n → ∞", "Gegen σ² für n → ∞", "Gegen eine Normalverteilung"],
             correct: 0,
-            explain: "The uniform convergence in the Fundamental Theorem means the worst-case gap between empirical and true distribution — measured by the supremum — vanishes almost surely.",
-            explainDE: "Die gleichmäßige Konvergenz im Hauptsatz der Statistik bedeutet, dass die größte Abweichung zwischen empirischer und wahrer Verteilung — gemessen durch das Supremum — fast sicher verschwindet."
+            explain: "The uniform convergence in the Fundamental Theorem means the worst-case gap between empirical and true distribution - measured by the supremum - vanishes almost surely.",
+            explainDE: "Die gleichmäßige Konvergenz im Hauptsatz der Statistik bedeutet, dass die größte Abweichung zwischen empirischer und wahrer Verteilung - gemessen durch das Supremum - fast sicher verschwindet."
         },
 
         // --- Zentraler Grenzwertsatz ---
@@ -1915,8 +1915,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The variables are i.i.d. with finite variance", "The variables follow a normal distribution", "The sample size n is exactly 30", "The variables are discrete"],
             optsDE: ["Die Variablen i.i.d. mit endlicher Varianz sind", "Die Variablen normalverteilt sind", "Der Stichprobenumfang n genau 30 beträgt", "Die Variablen diskret sind"],
             correct: 0,
-            explain: "The remarkable power of the CLT is that it holds for i.i.d. variables from almost any distribution, as long as the variance is finite — no normality assumption needed.",
-            explainDE: "Die bemerkenswerte Stärke des ZGS liegt darin, dass er für i.i.d. Variablen aus fast jeder Verteilung gilt, solange die Varianz endlich ist — keine Normalverteilungsannahme nötig."
+            explain: "The remarkable power of the CLT is that it holds for i.i.d. variables from almost any distribution, as long as the variance is finite - no normality assumption needed.",
+            explainDE: "Die bemerkenswerte Stärke des ZGS liegt darin, dass er für i.i.d. Variablen aus fast jeder Verteilung gilt, solange die Varianz endlich ist - keine Normalverteilungsannahme nötig."
         },
         {
             q: "The Central Limit Theorem is used to approximate probabilities about X̄ₙ. Which distribution is used?",
@@ -1950,8 +1950,8 @@ const BONUS_QUIZ_POOLS = {
                 "Daten mit Diagrammen und Grafiken visualisieren"
             ],
             correct: 0,
-            explain: "Inferential statistics goes beyond just summarizing the sample at hand — its purpose is to use that sample to say something about the larger population it came from.",
-            explainDE: "Die schließende Statistik geht über die reine Zusammenfassung der vorliegenden Stichprobe hinaus — ihr Zweck ist es, anhand dieser Stichprobe etwas über die größere Grundgesamtheit auszusagen, aus der sie stammt."
+            explain: "Inferential statistics goes beyond just summarizing the sample at hand - its purpose is to use that sample to say something about the larger population it came from.",
+            explainDE: "Die schließende Statistik geht über die reine Zusammenfassung der vorliegenden Stichprobe hinaus - ihr Zweck ist es, anhand dieser Stichprobe etwas über die größere Grundgesamtheit auszusagen, aus der sie stammt."
         },
         {
             q: "Which of the four tasks of inferential statistics involves choosing which family of distributions could have generated the data?",
@@ -2067,8 +2067,8 @@ const BONUS_QUIZ_POOLS = {
                 "Die Menge aller Schätzer für den unbekannten Parameter"
             ],
             correct: 0,
-            explain: "The sample space describes what a single observation could possibly look like — it's a property of the data, not to be confused with the parameter space, which concerns the unknown parameter.",
-            explainDE: "Der Stichprobenraum beschreibt, wie eine einzelne Beobachtung möglicherweise aussehen könnte — er ist eine Eigenschaft der Daten und nicht mit dem Parameterraum zu verwechseln, der den unbekannten Parameter betrifft."
+            explain: "The sample space describes what a single observation could possibly look like - it's a property of the data, not to be confused with the parameter space, which concerns the unknown parameter.",
+            explainDE: "Der Stichprobenraum beschreibt, wie eine einzelne Beobachtung möglicherweise aussehen könnte - er ist eine Eigenschaft der Daten und nicht mit dem Parameterraum zu verwechseln, der den unbekannten Parameter betrifft."
         },
         {
             q: "We record whether each of 50 patients recovers (yes/no). What is the sample space for a single observation?",
@@ -2086,8 +2086,8 @@ const BONUS_QUIZ_POOLS = {
                 "{ja, nein, vielleicht}"
             ],
             correct: 0,
-            explain: "Since each single patient's outcome can only be yes or no, the sample space for one observation is exactly these two possible values — the 50 only matters for the overall sample size.",
-            explainDE: "Da das Ergebnis eines einzelnen Patienten nur ja oder nein sein kann, besteht der Stichprobenraum für eine Beobachtung genau aus diesen zwei möglichen Werten — die 50 spielt nur für den gesamten Stichprobenumfang eine Rolle."
+            explain: "Since each single patient's outcome can only be yes or no, the sample space for one observation is exactly these two possible values - the 50 only matters for the overall sample size.",
+            explainDE: "Da das Ergebnis eines einzelnen Patienten nur ja oder nein sein kann, besteht der Stichprobenraum für eine Beobachtung genau aus diesen zwei möglichen Werten - die 50 spielt nur für den gesamten Stichprobenumfang eine Rolle."
         },
         {
             q: "We model a sample of size n as n random variables X₁, X₂, …, Xₙ. What assumption do we usually make about these variables?",
@@ -2184,8 +2184,8 @@ const BONUS_QUIZ_POOLS = {
                 "Parameter sind über alle Modellfamilien hinweg gleich"
             ],
             correct: 0,
-            explain: "This is a reminder that all inference happens within an assumed model family — pick a different family and the estimates, tests, and conclusions can genuinely differ, even from the same data.",
-            explainDE: "Dies zeigt, dass jede Inferenz innerhalb einer angenommenen Modellfamilie stattfindet — wählt man eine andere Familie, können sich Schätzungen, Tests und Schlussfolgerungen selbst bei denselben Daten tatsächlich unterscheiden."
+            explain: "This is a reminder that all inference happens within an assumed model family - pick a different family and the estimates, tests, and conclusions can genuinely differ, even from the same data.",
+            explainDE: "Dies zeigt, dass jede Inferenz innerhalb einer angenommenen Modellfamilie stattfindet - wählt man eine andere Familie, können sich Schätzungen, Tests und Schlussfolgerungen selbst bei denselben Daten tatsächlich unterscheiden."
         },
 
         // ── 4. STATISTIK UND SCHÄTZER ─────────────────────────────────────────────
@@ -2206,8 +2206,8 @@ const BONUS_QUIZ_POOLS = {
                 "Eine vom Forscher gewählte feste Konstante"
             ],
             correct: 0,
-            explain: "A statistic must be computable from the data alone — if it required knowing the unknown parameter to evaluate it, it wouldn't be usable in practice as a summary or estimator.",
-            explainDE: "Eine Statistik muss allein aus den Daten berechenbar sein — würde man zu ihrer Berechnung den unbekannten Parameter benötigen, wäre sie in der Praxis als Zusammenfassung oder Schätzer nicht nutzbar."
+            explain: "A statistic must be computable from the data alone - if it required knowing the unknown parameter to evaluate it, it wouldn't be usable in practice as a summary or estimator.",
+            explainDE: "Eine Statistik muss allein aus den Daten berechenbar sein - würde man zu ihrer Berechnung den unbekannten Parameter benötigen, wäre sie in der Praxis als Zusammenfassung oder Schätzer nicht nutzbar."
         },
         {
             q: "Why is an estimator considered a random variable?",
@@ -2225,8 +2225,8 @@ const BONUS_QUIZ_POOLS = {
                 "Weil er nur für stetige Verteilungen definiert ist"
             ],
             correct: 0,
-            explain: "Since an estimator is a function of the sample, and the sample itself is random, a new dataset would generally produce a different estimator value — making the estimator itself random.",
-            explainDE: "Da ein Schätzer eine Funktion der Stichprobe ist und die Stichprobe selbst zufällig ist, würde ein neuer Datensatz im Allgemeinen einen anderen Schätzerwert liefern — der Schätzer selbst ist somit zufällig."
+            explain: "Since an estimator is a function of the sample, and the sample itself is random, a new dataset would generally produce a different estimator value - making the estimator itself random.",
+            explainDE: "Da ein Schätzer eine Funktion der Stichprobe ist und die Stichprobe selbst zufällig ist, würde ein neuer Datensatz im Allgemeinen einen anderen Schätzerwert liefern - der Schätzer selbst ist somit zufällig."
         },
         {
             q: "What does it mean for an estimator to be unbiased?",
@@ -2244,8 +2244,8 @@ const BONUS_QUIZ_POOLS = {
                 "Er ist immer größer als der wahre Parameter"
             ],
             correct: 0,
-            explain: "Unbiasedness is a statement about the average behavior over repeated sampling — the estimator's expected value hits the true parameter, even though any single estimate can still miss it.",
-            explainDE: "Erwartungstreue ist eine Aussage über das durchschnittliche Verhalten bei wiederholter Stichprobenziehung — der Erwartungswert des Schätzers trifft den wahren Parameter, auch wenn ein einzelner Schätzwert davon abweichen kann."
+            explain: "Unbiasedness is a statement about the average behavior over repeated sampling - the estimator's expected value hits the true parameter, even though any single estimate can still miss it.",
+            explainDE: "Erwartungstreue ist eine Aussage über das durchschnittliche Verhalten bei wiederholter Stichprobenziehung - der Erwartungswert des Schätzers trifft den wahren Parameter, auch wenn ein einzelner Schätzwert davon abweichen kann."
         },
         {
             q: "What is the difference between an estimator and an estimate?",
@@ -2254,13 +2254,13 @@ const BONUS_QUIZ_POOLS = {
                 "An estimator is the general rule; an estimate is the specific number obtained after inserting the data",
                 "An estimator is always correct; an estimate may be wrong",
                 "An estimate is a random variable; an estimator is a fixed number",
-                "There is no difference — the terms are interchangeable"
+                "There is no difference - the terms are interchangeable"
             ],
             optsDE: [
                 "Ein Schätzer ist die allgemeine Regel; ein Schätzwert ist die konkrete Zahl nach Einsetzen der Daten",
                 "Ein Schätzer ist immer korrekt; ein Schätzwert kann falsch sein",
                 "Ein Schätzwert ist eine Zufallsvariable; ein Schätzer ist eine feste Zahl",
-                "Es gibt keinen Unterschied — die Begriffe sind austauschbar"
+                "Es gibt keinen Unterschied - die Begriffe sind austauschbar"
             ],
             correct: 0,
             explain: "The estimator is the formula or procedure applied to any sample, while the estimate is just the concrete number that comes out once actual observed data is plugged in.",
@@ -2421,8 +2421,8 @@ const BONUS_QUIZ_POOLS = {
                 "Zwei Datensätze unterschiedlicher Größe immer zu unterschiedlichen Schlüssen führen"
             ],
             correct: 0,
-            explain: "The likelihood principle asserts that the likelihood function alone summarizes everything the data can tell us about the parameter — no additional information from the data is relevant beyond it.",
-            explainDE: "Das Likelihood-Prinzip besagt, dass allein die Likelihood-Funktion alles zusammenfasst, was die Daten über den Parameter aussagen können — keine weitere Information aus den Daten ist darüber hinaus relevant."
+            explain: "The likelihood principle asserts that the likelihood function alone summarizes everything the data can tell us about the parameter - no additional information from the data is relevant beyond it.",
+            explainDE: "Das Likelihood-Prinzip besagt, dass allein die Likelihood-Funktion alles zusammenfasst, was die Daten über den Parameter aussagen können - keine weitere Information aus den Daten ist darüber hinaus relevant."
         },
         {
             q: "Which of the following best describes why the log-likelihood is often used instead of the likelihood?",
@@ -2477,8 +2477,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["E[T] = g(θ) for all θ", "E[T] = θ for all θ", "T = g(θ) always", "Var(T) = g(θ)"],
             optsDE: ["E[T] = g(θ) für alle θ", "E[T] = θ für alle θ", "T = g(θ) immer", "Var(T) = g(θ)"],
             correct: 0,
-            explain: "Unbiasedness is always relative to the target being estimated — if the target is g(θ) rather than θ itself, the expectation of T must match g(θ), not θ.",
-            explainDE: "Erwartungstreue bezieht sich immer auf die zu schätzende Zielgröße — ist das Ziel g(θ) statt θ selbst, muss der Erwartungswert von T mit g(θ) übereinstimmen, nicht mit θ."
+            explain: "Unbiasedness is always relative to the target being estimated - if the target is g(θ) rather than θ itself, the expectation of T must match g(θ), not θ.",
+            explainDE: "Erwartungstreue bezieht sich immer auf die zu schätzende Zielgröße - ist das Ziel g(θ) statt θ selbst, muss der Erwartungswert von T mit g(θ) übereinstimmen, nicht mit θ."
         },
         {
             q: "If X̄ₙ is unbiased for μ, is X̄ₙ² generally unbiased for μ²?",
@@ -2486,8 +2486,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["No, because E[X̄ₙ²] = μ² + Var(X̄ₙ) ≠ μ² in general", "Yes, always", "Yes, but only if μ = 0", "No, because X̄ₙ is never unbiased"],
             optsDE: ["Nein, denn E[X̄ₙ²] = μ² + Var(X̄ₙ) ≠ μ² im Allgemeinen", "Ja, immer", "Ja, aber nur wenn μ = 0", "Nein, denn X̄ₙ ist nie erwartungstreu"],
             correct: 0,
-            explain: "Unbiasedness does not transfer through nonlinear transformations — squaring introduces an extra Var(X̄ₙ) term, so X̄ₙ² is biased upward for μ² unless the variance happens to vanish.",
-            explainDE: "Erwartungstreue überträgt sich nicht durch nichtlineare Transformationen — das Quadrieren führt einen zusätzlichen Var(X̄ₙ)-Term ein, sodass X̄ₙ² für μ² nach oben verzerrt ist, außer die Varianz verschwindet zufällig."
+            explain: "Unbiasedness does not transfer through nonlinear transformations - squaring introduces an extra Var(X̄ₙ) term, so X̄ₙ² is biased upward for μ² unless the variance happens to vanish.",
+            explainDE: "Erwartungstreue überträgt sich nicht durch nichtlineare Transformationen - das Quadrieren führt einen zusätzlichen Var(X̄ₙ)-Term ein, sodass X̄ₙ² für μ² nach oben verzerrt ist, außer die Varianz verschwindet zufällig."
         },
         {
             q: "The sample variance S²ₙ = (1/(n−1))∑(Xᵢ − X̄ₙ)² is used instead of (1/n)∑(Xᵢ − X̄ₙ)² because:",
@@ -2524,8 +2524,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Asymptotically unbiased as well", "Consistent", "Efficient", "MSE-efficient"],
             optsDE: ["Auch asymptotisch erwartungstreu", "Konsistent", "Effizient", "MSE-effizient"],
             correct: 0,
-            explain: "If the bias is exactly zero for every n, its limit as n → ∞ is trivially zero too, so exact unbiasedness always implies asymptotic unbiasedness — the reverse is not guaranteed.",
-            explainDE: "Ist der Bias für jedes n exakt null, so ist auch sein Grenzwert für n → ∞ trivialerweise null — exakte Erwartungstreue impliziert also stets asymptotische Erwartungstreue, die Umkehrung gilt aber nicht."
+            explain: "If the bias is exactly zero for every n, its limit as n → ∞ is trivially zero too, so exact unbiasedness always implies asymptotic unbiasedness - the reverse is not guaranteed.",
+            explainDE: "Ist der Bias für jedes n exakt null, so ist auch sein Grenzwert für n → ∞ trivialerweise null - exakte Erwartungstreue impliziert also stets asymptotische Erwartungstreue, die Umkehrung gilt aber nicht."
         },
 
         // --- MSE und Zerlegung ---
@@ -2627,8 +2627,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["θ̂ₙ is (weakly) consistent for θ", "θ̂ₙ is unbiased for every n", "θ̂ₙ is strongly consistent", "θ̂ₙ is efficient"],
             optsDE: ["θ̂ₙ ist (schwach) konsistent für θ", "θ̂ₙ ist für jedes n erwartungstreu", "θ̂ₙ ist stark konsistent", "θ̂ₙ ist effizient"],
             correct: 0,
-            explain: "MSE going to zero forces both variance and bias to vanish, and by Chebyshev-type arguments this is enough to guarantee convergence in probability — but not the stronger almost sure convergence.",
-            explainDE: "Ein gegen null gehender MSE zwingt sowohl die Varianz als auch den Bias zum Verschwinden, und über Tschebyscheff-artige Argumente genügt dies, um stochastische Konvergenz zu garantieren — nicht jedoch die stärkere fast sichere Konvergenz."
+            explain: "MSE going to zero forces both variance and bias to vanish, and by Chebyshev-type arguments this is enough to guarantee convergence in probability - but not the stronger almost sure convergence.",
+            explainDE: "Ein gegen null gehender MSE zwingt sowohl die Varianz als auch den Bias zum Verschwinden, und über Tschebyscheff-artige Argumente genügt dies, um stochastische Konvergenz zu garantieren - nicht jedoch die stärkere fast sichere Konvergenz."
         },
 
         // --- Effizienz (unter erwartungstreuen Schätzern) ---
@@ -2665,8 +2665,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Efficient", "Consistent", "Biased", "Asymptotically unbiased"],
             optsDE: ["Effizient", "Konsistent", "Verzerrt", "Asymptotisch erwartungstreu"],
             correct: 0,
-            explain: "The Cramér-Rao bound sets the theoretical minimum possible variance for an unbiased estimator, so any unbiased estimator that actually attains it is, by definition, efficient — it can't be beaten.",
-            explainDE: "Die Cramér-Rao-Schranke legt die theoretisch kleinstmögliche Varianz für einen erwartungstreuen Schätzer fest, sodass jeder erwartungstreue Schätzer, der sie tatsächlich erreicht, per Definition effizient ist — er kann nicht unterboten werden."
+            explain: "The Cramér-Rao bound sets the theoretical minimum possible variance for an unbiased estimator, so any unbiased estimator that actually attains it is, by definition, efficient - it can't be beaten.",
+            explainDE: "Die Cramér-Rao-Schranke legt die theoretisch kleinstmögliche Varianz für einen erwartungstreuen Schätzer fest, sodass jeder erwartungstreue Schätzer, der sie tatsächlich erreicht, per Definition effizient ist - er kann nicht unterboten werden."
         },
 
         // --- MSE-Effizienz (beliebige Schätzer) ---
@@ -2676,8 +2676,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["MSE(θ̂₁) ≤ MSE(θ̂₂), with strict inequality for at least one θ", "Var(θ̂₁) ≤ Var(θ̂₂) regardless of bias", "Bias(θ̂₁) = 0 and Bias(θ̂₂) ≠ 0", "E[θ̂₁] = E[θ̂₂]"],
             optsDE: ["MSE(θ̂₁) ≤ MSE(θ̂₂), mit strikter Ungleichung für mindestens ein θ", "Var(θ̂₁) ≤ Var(θ̂₂) unabhängig vom Bias", "Bias(θ̂₁) = 0 und Bias(θ̂₂) ≠ 0", "E[θ̂₁] = E[θ̂₂]"],
             correct: 0,
-            explain: "Because MSE-efficiency doesn't assume unbiasedness, the comparison must use the full MSE — which folds in both variance and bias² — rather than variance alone.",
-            explainDE: "Da MSE-Effizienz keine Erwartungstreue voraussetzt, muss der Vergleich über den vollständigen MSE erfolgen — der sowohl Varianz als auch Bias² enthält — statt allein über die Varianz."
+            explain: "Because MSE-efficiency doesn't assume unbiasedness, the comparison must use the full MSE - which folds in both variance and bias² - rather than variance alone.",
+            explainDE: "Da MSE-Effizienz keine Erwartungstreue voraussetzt, muss der Vergleich über den vollständigen MSE erfolgen - der sowohl Varianz als auch Bias² enthält - statt allein über die Varianz."
         },
         {
             q: "Why is MSE-efficiency a more general comparison criterion than (variance-based) efficiency?",
@@ -2703,8 +2703,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Variance", "Bias", "Sample size", "Consistency"],
             optsDE: ["Varianz", "Bias", "Stichprobenumfang", "Konsistenz"],
             correct: 0,
-            explain: "With bias equal to zero for both, the bias² term drops out of each MSE, leaving variance as the only thing distinguishing them — so MSE-efficiency collapses back to ordinary efficiency.",
-            explainDE: "Ist der Bias bei beiden gleich null, entfällt der Bias²-Term aus jedem MSE, sodass nur noch die Varianz die beiden unterscheidet — MSE-Effizienz reduziert sich damit wieder auf die gewöhnliche Effizienz."
+            explain: "With bias equal to zero for both, the bias² term drops out of each MSE, leaving variance as the only thing distinguishing them - so MSE-efficiency collapses back to ordinary efficiency.",
+            explainDE: "Ist der Bias bei beiden gleich null, entfällt der Bias²-Term aus jedem MSE, sodass nur noch die Varianz die beiden unterscheidet - MSE-Effizienz reduziert sich damit wieder auf die gewöhnliche Effizienz."
         },
 
     ],
@@ -2719,8 +2719,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["It contains the true parameter with probability 1−α (over repeated sampling)", "It contains the true parameter with certainty", "It equals the point estimate exactly", "It always has width 1−α"],
             optsDE: ["Es den wahren Parameter mit Wahrscheinlichkeit 1−α überdeckt (bei wiederholter Stichprobenziehung)", "Es den wahren Parameter mit Sicherheit enthält", "Es genau dem Punktschätzer entspricht", "Es stets die Breite 1−α hat"],
             correct: 0,
-            explain: "The confidence level is a statement about the procedure over repeated sampling — 1−α of all intervals constructed this way would capture the true parameter, not a guarantee for any single interval.",
-            explainDE: "Das Konfidenzniveau ist eine Aussage über das Verfahren bei wiederholter Stichprobenziehung — 1−α aller so konstruierten Intervalle würden den wahren Parameter überdecken, nicht eine Garantie für ein einzelnes Intervall."
+            explain: "The confidence level is a statement about the procedure over repeated sampling - 1−α of all intervals constructed this way would capture the true parameter, not a guarantee for any single interval.",
+            explainDE: "Das Konfidenzniveau ist eine Aussage über das Verfahren bei wiederholter Stichprobenziehung - 1−α aller so konstruierten Intervalle würden den wahren Parameter überdecken, nicht eine Garantie für ein einzelnes Intervall."
         },
         {
             q: "A two-sided confidence interval for a parameter θ has the form:",
@@ -2843,7 +2843,7 @@ const BONUS_QUIZ_POOLS = {
             optsDE: ["Dem Zentralen Grenzwertsatz", "Dem Gesetz der großen Zahlen", "Dem Satz von Bayes", "Dem Hauptsatz der Statistik"],
             correct: 0,
             explain: "Since p̂ is itself an average of Bernoulli trials, the CLT justifies treating it as approximately normal for large n, which is exactly what the Wald interval relies on.",
-            explainDE: "Da p̂ selbst ein Mittelwert von Bernoulli-Versuchen ist, rechtfertigt der ZGS, es für großes n als näherungsweise normalverteilt zu behandeln — genau darauf stützt sich das Wald-Intervall."
+            explainDE: "Da p̂ selbst ein Mittelwert von Bernoulli-Versuchen ist, rechtfertigt der ZGS, es für großes n als näherungsweise normalverteilt zu behandeln - genau darauf stützt sich das Wald-Intervall."
         },
         {
             q: "The approximate two-sided CI for p (Wald interval) at level 1−α is:",
@@ -2907,8 +2907,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The maximum allowed probability of a Type I error", "The probability of a Type II error", "The probability that H₀ is true", "The probability that H₁ is true"],
             optsDE: ["Die maximal zulässige Wahrscheinlichkeit für einen Fehler 1. Art", "Die Wahrscheinlichkeit für einen Fehler 2. Art", "Die Wahrscheinlichkeit, dass H₀ wahr ist", "Die Wahrscheinlichkeit, dass H₁ wahr ist"],
             correct: 0,
-            explain: "By construction, a level-α test is designed so that the probability of falsely rejecting a true H₀ never exceeds α — that's the definition of significance level, not a statement about Type II errors.",
-            explainDE: "Ein Test zum Niveau α ist so konstruiert, dass die Wahrscheinlichkeit, eine wahre H₀ fälschlicherweise zu verwerfen, α nie überschreitet — das ist die Definition des Signifikanzniveaus, keine Aussage über Fehler 2. Art."
+            explain: "By construction, a level-α test is designed so that the probability of falsely rejecting a true H₀ never exceeds α - that's the definition of significance level, not a statement about Type II errors.",
+            explainDE: "Ein Test zum Niveau α ist so konstruiert, dass die Wahrscheinlichkeit, eine wahre H₀ fälschlicherweise zu verwerfen, α nie überschreitet - das ist die Definition des Signifikanzniveaus, keine Aussage über Fehler 2. Art."
         },
         {
             q: "The power of a test is defined as:",
@@ -2916,8 +2916,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["1 minus the probability of a Type II error", "The probability of a Type I error", "The significance level α", "The sample size n"],
             optsDE: ["1 minus die Wahrscheinlichkeit eines Fehlers 2. Art", "Die Wahrscheinlichkeit eines Fehlers 1. Art", "Das Signifikanzniveau α", "Der Stichprobenumfang n"],
             correct: 0,
-            explain: "Power measures the test's ability to correctly detect a false H₀, so it's exactly the complement of the Type II error probability — the chance of correctly rejecting when H₁ is true.",
-            explainDE: "Die Power misst die Fähigkeit des Tests, eine falsche H₀ korrekt zu erkennen, und ist damit genau das Komplement der Wahrscheinlichkeit eines Fehlers 2. Art — die Chance, korrekt zu verwerfen, wenn H₁ wahr ist."
+            explain: "Power measures the test's ability to correctly detect a false H₀, so it's exactly the complement of the Type II error probability - the chance of correctly rejecting when H₁ is true.",
+            explainDE: "Die Power misst die Fähigkeit des Tests, eine falsche H₀ korrekt zu erkennen, und ist damit genau das Komplement der Wahrscheinlichkeit eines Fehlers 2. Art - die Chance, korrekt zu verwerfen, wenn H₁ wahr ist."
         },
         {
             q: "Increasing the sample size n, all else equal, typically has which effect on the power of a test?",
@@ -2963,8 +2963,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["One-sided (upper-tailed) test", "Two-sided test", "Lower-tailed test only", "A test without a rejection region"],
             optsDE: ["Einseitiger Test (oberer Ablehnungsbereich)", "Zweiseitiger Test", "Nur ein unterer Test", "Ein Test ohne Ablehnungsbereich"],
             correct: 0,
-            explain: "Because H₁ only allows deviation in one direction — μ being larger than μ₀ — the entire rejection region sits in the upper tail, making this an upper-tailed one-sided test.",
-            explainDE: "Da H₁ eine Abweichung nur in eine Richtung zulässt — μ größer als μ₀ — liegt der gesamte Ablehnungsbereich im oberen Ende, was diesen Test zu einem einseitigen oberen Test macht."
+            explain: "Because H₁ only allows deviation in one direction - μ being larger than μ₀ - the entire rejection region sits in the upper tail, making this an upper-tailed one-sided test.",
+            explainDE: "Da H₁ eine Abweichung nur in eine Richtung zulässt - μ größer als μ₀ - liegt der gesamte Ablehnungsbereich im oberen Ende, was diesen Test zu einem einseitigen oberen Test macht."
         },
         {
             q: "The Gauß-test (one-sample z-test) for the mean is used when:",
@@ -2997,8 +2997,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The variance σ² is unknown and must be estimated from the sample", "The variance σ² is known exactly", "n is extremely large only", "The data are binomially distributed"],
             optsDE: ["Die Varianz σ² unbekannt ist und aus der Stichprobe geschätzt werden muss", "Die Varianz σ² exakt bekannt ist", "n nur extrem groß ist", "Die Daten binomialverteilt sind"],
             correct: 0,
-            explain: "Whenever the true σ² isn't available and Sₙ has to stand in for it, the extra estimation uncertainty means the t-test — with its t-distributed statistic — is the appropriate choice instead of the Gauß-test.",
-            explainDE: "Wenn das wahre σ² nicht verfügbar ist und Sₙ dafür einspringen muss, bedeutet die zusätzliche Schätzunsicherheit, dass der t-Test — mit seiner t-verteilten Teststatistik — anstelle des Gauß-Tests die passende Wahl ist."
+            explain: "Whenever the true σ² isn't available and Sₙ has to stand in for it, the extra estimation uncertainty means the t-test - with its t-distributed statistic - is the appropriate choice instead of the Gauß-test.",
+            explainDE: "Wenn das wahre σ² nicht verfügbar ist und Sₙ dafür einspringen muss, bedeutet die zusätzliche Schätzunsicherheit, dass der t-Test - mit seiner t-verteilten Teststatistik - anstelle des Gauß-Tests die passende Wahl ist."
         },
         {
             q: "The test statistic of the one-sample t-test for H₀: μ = μ₀ is:",
@@ -3062,8 +3062,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The same test statistic and its sampling distribution", "Completely unrelated statistics", "The p-value alone", "The sample size alone"],
             optsDE: ["Derselben Teststatistik und ihrer Stichprobenverteilung", "Vollkommen unabhängigen Statistiken", "Nur dem p-Wert", "Nur dem Stichprobenumfang"],
             correct: 0,
-            explain: "The duality exists precisely because both procedures start from the same pivotal quantity and its known sampling distribution — they're just two different ways of reading the same underlying calculation.",
-            explainDE: "Die Dualität existiert genau deshalb, weil beide Verfahren von derselben Pivotgröße und ihrer bekannten Stichprobenverteilung ausgehen — es sind lediglich zwei verschiedene Arten, dieselbe zugrunde liegende Berechnung zu lesen."
+            explain: "The duality exists precisely because both procedures start from the same pivotal quantity and its known sampling distribution - they're just two different ways of reading the same underlying calculation.",
+            explainDE: "Die Dualität existiert genau deshalb, weil beide Verfahren von derselben Pivotgröße und ihrer bekannten Stichprobenverteilung ausgehen - es sind lediglich zwei verschiedene Arten, dieselbe zugrunde liegende Berechnung zu lesen."
         },
 
         // --- p-Wert ---
@@ -3073,8 +3073,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The probability, under H₀, of observing a test statistic at least as extreme as the one observed", "The probability that H₀ is true", "The significance level α", "The probability that H₁ is true"],
             optsDE: ["Die Wahrscheinlichkeit unter H₀, eine Teststatistik zu beobachten, die mindestens so extrem ist wie die beobachtete", "Die Wahrscheinlichkeit, dass H₀ wahr ist", "Das Signifikanzniveau α", "Die Wahrscheinlichkeit, dass H₁ wahr ist"],
             correct: 0,
-            explain: "The p-value is calculated assuming H₀ is true, asking how surprising the observed data would be under that assumption — it says nothing directly about the probability of H₀ itself.",
-            explainDE: "Der p-Wert wird unter der Annahme berechnet, dass H₀ wahr ist, und fragt, wie überraschend die beobachteten Daten unter dieser Annahme wären — er sagt nichts direkt über die Wahrscheinlichkeit von H₀ selbst aus."
+            explain: "The p-value is calculated assuming H₀ is true, asking how surprising the observed data would be under that assumption - it says nothing directly about the probability of H₀ itself.",
+            explainDE: "Der p-Wert wird unter der Annahme berechnet, dass H₀ wahr ist, und fragt, wie überraschend die beobachteten Daten unter dieser Annahme wären - er sagt nichts direkt über die Wahrscheinlichkeit von H₀ selbst aus."
         },
         {
             q: "Using the p-value decision rule, H₀ is rejected at significance level α when:",
@@ -3091,8 +3091,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Strong evidence against H₀", "Strong evidence for H₀", "No information at all", "Proof that H₁ is true with certainty"],
             optsDE: ["Starke Evidenz gegen H₀", "Starke Evidenz für H₀", "Überhaupt keine Information", "Den sicheren Beweis, dass H₁ wahr ist"],
             correct: 0,
-            explain: "A p-value this small means data this extreme would be very rare if H₀ were actually true, which counts as strong evidence against H₀ — though it's not absolute proof that H₁ holds.",
-            explainDE: "Ein so kleiner p-Wert bedeutet, dass so extreme Daten sehr selten wären, wenn H₀ tatsächlich wahr wäre, was als starke Evidenz gegen H₀ zählt — jedoch kein absoluter Beweis dafür ist, dass H₁ zutrifft."
+            explain: "A p-value this small means data this extreme would be very rare if H₀ were actually true, which counts as strong evidence against H₀ - though it's not absolute proof that H₁ holds.",
+            explainDE: "Ein so kleiner p-Wert bedeutet, dass so extreme Daten sehr selten wären, wenn H₀ tatsächlich wahr wäre, was als starke Evidenz gegen H₀ zählt - jedoch kein absoluter Beweis dafür ist, dass H₁ zutrifft."
         },
         {
             q: "A common misinterpretation of the p-value is to treat it as:",
@@ -3142,8 +3142,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["n·p₀·(1−p₀) is sufficiently large (e.g. ≥ 9)", "n is at least 1000", "p₀ = 0.5 exactly", "The data must be continuous"],
             optsDE: ["n·p₀·(1−p₀) ist ausreichend groß (z. B. ≥ 9)", "n ist mindestens 1000", "p₀ = 0,5 genau", "Die Daten müssen stetig sein"],
             correct: 0,
-            explain: "This quantity relates to how well the binomial's shape is approximated by the normal curve — a small value means the approximation can be poor regardless of how large n itself is.",
-            explainDE: "Diese Größe hängt damit zusammen, wie gut die Form der Binomialverteilung durch die Normalkurve approximiert wird — ein kleiner Wert bedeutet, dass die Approximation schlecht sein kann, unabhängig davon, wie groß n selbst ist."
+            explain: "This quantity relates to how well the binomial's shape is approximated by the normal curve - a small value means the approximation can be poor regardless of how large n itself is.",
+            explainDE: "Diese Größe hängt damit zusammen, wie gut die Form der Binomialverteilung durch die Normalkurve approximiert wird - ein kleiner Wert bedeutet, dass die Approximation schlecht sein kann, unabhängig davon, wie groß n selbst ist."
         },
 
         // --- Verbundenes Design (paired samples) ---
@@ -3178,8 +3178,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["A one-sample t-test on the differences Dᵢ against H₀: E[D] = 0", "A two-sample F-test", "An unpaired t-test", "A chi-squared test"],
             optsDE: ["Einen Ein-Stichproben-t-Test auf die Differenzen Dᵢ gegen H₀: E[D] = 0", "Einen Zwei-Stichproben-F-Test", "Einen unverbundenen t-Test", "Einen Chi-Quadrat-Test"],
             correct: 0,
-            explain: "By collapsing each pair into a single difference Dᵢ, the two-sample comparison becomes equivalent to asking whether these differences have mean zero — precisely a one-sample t-test.",
-            explainDE: "Indem jedes Paar zu einer einzigen Differenz Dᵢ zusammengefasst wird, wird der Zwei-Stichproben-Vergleich äquivalent zur Frage, ob diese Differenzen den Erwartungswert null haben — genau ein Ein-Stichproben-t-Test."
+            explain: "By collapsing each pair into a single difference Dᵢ, the two-sample comparison becomes equivalent to asking whether these differences have mean zero - precisely a one-sample t-test.",
+            explainDE: "Indem jedes Paar zu einer einzigen Differenz Dᵢ zusammengefasst wird, wird der Zwei-Stichproben-Vergleich äquivalent zur Frage, ob diese Differenzen den Erwartungswert null haben - genau ein Ein-Stichproben-t-Test."
         },
         {
             q: "Under H₀: E[D] = 0, and assuming the Dᵢ are i.i.d. normal, the statistic T = √n · D̄ / S_D follows:",
@@ -3216,8 +3216,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The two groups consist of different, unrelated subjects (e.g. treatment vs. control group)", "The same subjects are measured twice", "The sample sizes must be equal", "There is no variability between groups"],
             optsDE: ["Die beiden Gruppen aus unterschiedlichen, nicht zusammenhängenden Personen bestehen (z. B. Behandlungs- vs. Kontrollgruppe)", "Dieselben Personen zweimal gemessen werden", "Die Stichprobenumfänge gleich sein müssen", "Es keine Variabilität zwischen den Gruppen gibt"],
             correct: 0,
-            explain: "When there's no way to link an observation in one group to a specific observation in the other — as with distinct treatment and control subjects — the unpaired design is the natural choice.",
-            explainDE: "Wenn es keine Möglichkeit gibt, eine Beobachtung in einer Gruppe mit einer bestimmten Beobachtung in der anderen zu verknüpfen — wie bei getrennten Behandlungs- und Kontrollpersonen — ist das unverbundene Design die natürliche Wahl."
+            explain: "When there's no way to link an observation in one group to a specific observation in the other - as with distinct treatment and control subjects - the unpaired design is the natural choice.",
+            explainDE: "Wenn es keine Möglichkeit gibt, eine Beobachtung in einer Gruppe mit einer bestimmten Beobachtung in der anderen zu verknüpfen - wie bei getrennten Behandlungs- und Kontrollpersonen - ist das unverbundene Design die natürliche Wahl."
         },
 
         // --- F-Test auf Varianzhomogenität ---
@@ -3227,8 +3227,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["H₀: σ_X² = σ_Y²", "H₀: μ_X = μ_Y", "H₀: σ_X² = 0", "H₀: p_X = p_Y"],
             optsDE: ["H₀: σ_X² = σ_Y²", "H₀: μ_X = μ_Y", "H₀: σ_X² = 0", "H₀: p_X = p_Y"],
             correct: 0,
-            explain: "This test targets equality of spread between the two populations, not equality of their means or proportions — hence the null hypothesis directly compares the two variances.",
-            explainDE: "Dieser Test zielt auf die Gleichheit der Streuung zwischen den beiden Grundgesamtheiten ab, nicht auf die Gleichheit ihrer Mittelwerte oder Anteile — daher vergleicht die Nullhypothese direkt die beiden Varianzen."
+            explain: "This test targets equality of spread between the two populations, not equality of their means or proportions - hence the null hypothesis directly compares the two variances.",
+            explainDE: "Dieser Test zielt auf die Gleichheit der Streuung zwischen den beiden Grundgesamtheiten ab, nicht auf die Gleichheit ihrer Mittelwerte oder Anteile - daher vergleicht die Nullhypothese direkt die beiden Varianzen."
         },
         {
             q: "The F-test statistic for comparing two variances is:",
@@ -3330,8 +3330,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["The two groups have unequal variances and/or unequal sample sizes", "The two groups have equal variances only", "The data are not normally distributed at all", "The sample sizes must both be small"],
             optsDE: ["Die beiden Gruppen ungleiche Varianzen und/oder ungleiche Stichprobenumfänge haben", "Die beiden Gruppen nur gleiche Varianzen haben", "Die Daten überhaupt nicht normalverteilt sind", "Beide Stichprobenumfänge klein sein müssen"],
             correct: 0,
-            explain: "Because Welch's test never assumes the variances are equal in the first place, it stays valid precisely in the situations — unequal variances, unequal sample sizes — where the pooled t-test would break down.",
-            explainDE: "Da der Welch-Test von vornherein nie gleiche Varianzen annimmt, bleibt er genau in den Situationen gültig — ungleiche Varianzen, ungleiche Stichprobenumfänge — in denen der gepoolte t-Test versagen würde."
+            explain: "Because Welch's test never assumes the variances are equal in the first place, it stays valid precisely in the situations - unequal variances, unequal sample sizes - where the pooled t-test would break down.",
+            explainDE: "Da der Welch-Test von vornherein nie gleiche Varianzen annimmt, bleibt er genau in den Situationen gültig - ungleiche Varianzen, ungleiche Stichprobenumfänge - in denen der gepoolte t-Test versagen würde."
         },
 
         // --- 2-Stichproben-Binomialtest ---
@@ -4016,8 +4016,8 @@ const BONUS_QUIZ_POOLS = {
             opts: ["Median minimizes Σ|xi − m|; mean minimizes Σ(xi − m)²", "Mean minimizes both", "Median minimizes both", "Neither minimizes anything"],
             optsDE: ["Median minimiert Σ|xi − m|; Mittel minimiert Σ(xi − m)²", "Mittel minimiert beides", "Median minimiert beides", "Keiner minimiert etwas"],
             correct: 0,
-            explain: "Absolute vs squared loss — different centres.",
-            explainDE: "Absolut- vs Quadratverlust — verschiedene Zentren."
+            explain: "Absolute vs squared loss - different centres.",
+            explainDE: "Absolut- vs Quadratverlust - verschiedene Zentren."
         },
         {
             q: "Robustness (slide 31): 9 farmers earn 1000, one rich earns 20000.",
@@ -4076,8 +4076,8 @@ const BONUS_QUIZ_POOLS = {
         {
             q: "Five-point summary and boxplot (slide 46):",
             qDE: "Fünf-Punkte-Zusammenfassung und Boxplot (Folie 46):",
-            opts: ["xmin, Q1, median, Q3, xmax — drawn as a boxplot", "Mean, variance, n, min, max", "Five histograms side by side", "Only the three quartiles"],
-            optsDE: ["xmin, Q1, Median, Q3, xmax — dargestellt als Boxplot", "Mittel, Varianz, n, Min, Max", "Fünf Histogramme nebeneinander", "Nur die drei Quartile"],
+            opts: ["xmin, Q1, median, Q3, xmax - drawn as a boxplot", "Mean, variance, n, min, max", "Five histograms side by side", "Only the three quartiles"],
+            optsDE: ["xmin, Q1, Median, Q3, xmax - dargestellt als Boxplot", "Mittel, Varianz, n, Min, Max", "Fünf Histogramme nebeneinander", "Nur die drei Quartile"],
             correct: 0,
             explain: "Ozone example: 26, 49, 66, 86, 188.",
             explainDE: "Ozonbeispiel: 26, 49, 66, 86, 188."

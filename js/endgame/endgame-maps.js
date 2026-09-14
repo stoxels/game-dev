@@ -8,9 +8,9 @@
 //       common (0 mods), uncommon (max 1 pre / 1 suf),
 //       rare (max 3 pre / 3 suf), epic (max 3 pre / 3 suf).
 //   - Every mod family belongs to one of three categories (`affects`):
-//       'player'  — weakens the player character
-//       'monster' — strengthens the monsters
-//       'puzzle'  — changes puzzle behaviour
+//       'player'  - weakens the player character
+//       'monster' - strengthens the monsters
+//       'puzzle'  - changes puzzle behaviour
 //   - Maps drop on the grid like loot; claiming one inserts it into the
 //     map stash (_egMapStash) shown on the Probability Gate screen.
 //
@@ -25,8 +25,8 @@
 //-------------------CONFIGURATION----------------------------------------
 //------------------------------------------------------------------------
 
-const EG_MAP_DROP_CHANCE_NORMAL = 0.055;  // 5.5% per normal monster kill (scaled by Quantity bonus while on a map) — buffed +10%
-const EG_MAP_DROP_CHANCE_BOSS = 0.44;    // 44% per boss kill (also scaled by Quantity; boss always drops at least one map) — buffed +10%
+const EG_MAP_DROP_CHANCE_NORMAL = 0.055;  // 5.5% per normal monster kill (scaled by Quantity bonus while on a map) - buffed +10%
+const EG_MAP_DROP_CHANCE_BOSS = 0.44;    // 44% per boss kill (also scaled by Quantity; boss always drops at least one map) - buffed +10%
 
 // Highest possible map tier (cap for tier upgrades via the Orb of Horizons).
 const EG_MAX_MAP_TIER = 16;
@@ -49,13 +49,13 @@ function egMapBaseQuestionsForTier(tier) {
     return Math.max(1, Math.min(4, 1 + Math.floor((t - 1) * 3 / 15))); 
 }
 
-// Base time limit per tier — derived FROM the objective ramp so early tiers
+// Base time limit per tier - derived FROM the objective ramp so early tiers
 // get proportionally less time:
 //   300 s fixed overhead (drops, transitions, boss intro)
 //   + tier * 30 s (kill & content-density budget; T1 +30 → T16 +480)
 //   + puzzles * 150 s (tracks the 2→6 puzzle ramp)
 //   + questions * 30 s (tracks the 1→4 question ramp)
-// T1 ≈ 11:00 (old 16:00), T8 ≈ 17:30 (old 23:00), T16 = 30:00 (old 31:00 —
+// T1 ≈ 11:00 (old 16:00), T8 ≈ 17:30 (old 23:00), T16 = 30:00 (old 31:00 -
 // ceiling unchanged, since T16 objectives did not change). The time cost of
 // one puzzle stays ~2.5 min at every tier, so difficulty grows only through
 // objective count and monster density.
@@ -64,27 +64,30 @@ function egMapBaseDurationForTier(tier) {
     return 300 + t * 30 + egMapBasePuzzlesForTier(t) * 150 + egMapBaseQuestionsForTier(t) * 30; 
 }
 
-// Base mistake budget per tier — also tracks the objective ramp: roughly one
+// Base mistake budget per tier - also tracks the objective ramp: roughly one
 // allowed mistake per objective, so the per-puzzle forgiveness stays constant
-// while the absolute budget grows with the ramp (T1: 6, T16: 10 — ceiling
+// while the absolute budget grows with the ramp (T1: 6, T16: 10 - ceiling
 // unchanged). The map_fewer_mistakes modifier applies on top (min 3).
 function egMapBaseMistakesForTier(tier) {
     return 4 + egMapBasePuzzlesForTier(tier); 
 }
 
-// PoE-style convex monster-level curve per map tier.
-// Early tiers climb fast (quick leveling through the low tiers), late
-// tiers stretch out. Tier 16 sits at monster level 90 so a character can
-// keep earning meaningful XP all the way to the level-100 cap (the XP
-// safe band at pl 100 still reaches monster level ~91, so T16 stays
-// near-full XP even for end-of-campaign characters).
+// PoE-style monster-level curve per map tier.
+//
+// The atlas now begins at the level the CAMPAIGN ends (see
+// EG_LEVELING_CONFIG.campaignEndLevel = 68), exactly like Path of Exile's
+// first maps: Tier 1 monsters are level 68, and the curve climbs gently to
+// Tier 16 at level 90. A character arriving from the campaign is therefore
+// on-level for T1 (full XP) instead of 60+ levels over it.
+// Tier 16 sits at 90 so a character can keep earning meaningful XP deep into
+// the late 90s (the XP safe band at pl 100 still reaches monster level ~91).
 // Tiers beyond EG_MAX_MAP_TIER only exist on the test screen; they extend
 // gently and clamp at EG_ENDGAME_MONSTER_LEVEL_CAP.
 const EG_MAP_TIER_MONSTER_LEVELS = [
-    /* T1 */ 3, /* T2 */ 6, /* T3 */ 10, /* T4 */ 14,
-    /* T5 */ 19, /* T6 */ 24, /* T7 */ 30, /* T8 */ 36,
-    /* T9 */ 43, /* T10 */ 50, /* T11 */ 57, /* T12 */ 64,
-    /* T13 */ 71, /* T14 */ 78, /* T15 */ 84, /* T16 */ 90,
+    /* T1 */ 68, /* T2 */ 69, /* T3 */ 71, /* T4 */ 72,
+    /* T5 */ 74, /* T6 */ 75, /* T7 */ 77, /* T8 */ 78,
+    /* T9 */ 80, /* T10 */ 81, /* T11 */ 83, /* T12 */ 84,
+    /* T13 */ 86, /* T14 */ 87, /* T15 */ 89, /* T16 */ 90,
 ];
 const EG_ENDGAME_MONSTER_LEVEL_CAP = 95;
 
@@ -245,7 +248,7 @@ const EG_MAP_MOD_TABLES = {
         // ── Curses & Defences-down (PoE-style) ───────────────────────
         map_elem_weakness: {
             id: 'map_elem_weakness', affects: 'player',
-            label: 'Elemental Weakness — #% reduced all Resistances', labelDe: 'Elementarschwäche – #% reduziert alle Widerstände',
+            label: 'Elemental Weakness - #% reduced all Resistances', labelDe: 'Elementarschwäche – #% reduziert alle Widerstände',
             tiers: [
                 { tier: 1, min: 52, max: 65, weight: 90, ilvl: 52 },
                 { tier: 2, min: 32, max: 51, weight: 310, ilvl: 26 },
@@ -254,7 +257,7 @@ const EG_MAP_MOD_TABLES = {
         },
         map_temporal_chains: {
             id: 'map_temporal_chains', affects: 'player',
-            label: 'Temporal Chains — you act #% slower', labelDe: 'Zeitketten – du handelst #% langsamer',
+            label: 'Temporal Chains - you act #% slower', labelDe: 'Zeitketten – du handelst #% langsamer',
             tiers: [
                 { tier: 1, min: 39, max: 49, weight: 85, ilvl: 54 },
                 { tier: 2, min: 23, max: 36, weight: 300, ilvl: 28 },
@@ -263,7 +266,7 @@ const EG_MAP_MOD_TABLES = {
         },
         map_vulnerability: {
             id: 'map_vulnerability', affects: 'player',
-            label: 'Vulnerability — you take #% increased Damage', labelDe: 'Verwundbarkeit – du erleidest #% erhöhten Schaden',
+            label: 'Vulnerability - you take #% increased Damage', labelDe: 'Verwundbarkeit – du erleidest #% erhöhten Schaden',
             tiers: [
                 { tier: 1, min: 46, max: 58, weight: 90, ilvl: 50 },
                 { tier: 2, min: 26, max: 44, weight: 310, ilvl: 24 },
@@ -417,7 +420,7 @@ const EG_MAP_MOD_TABLES = {
         // ── Elemental Hazards (player-only environmental effects) ────
         // The rolled value is the hazard INTENSITY (%): it scales hazard
         // damage, spawn counts and frequency. Mitigated by the matching
-        // player resistance — see endgame-hazards.js.
+        // player resistance - see endgame-hazards.js.
         map_hazard_lava: {
             id: 'map_hazard_lava', affects: 'player',
             label: 'Lava Balls surround the Puzzle (#% intensity)', labelDe: 'Lavakugeln umgeben das Rätsel (#% Intensität)',
@@ -429,7 +432,7 @@ const EG_MAP_MOD_TABLES = {
         },
         map_hazard_blizzard: {
             id: 'map_hazard_blizzard', affects: 'player',
-            label: 'Blizzard — Icicles rain from above (#% intensity)', labelDe: 'Blizzard — Eiszapfen regnen von oben (#% Intensität)',
+            label: 'Blizzard - Icicles rain from above (#% intensity)', labelDe: 'Blizzard - Eiszapfen regnen von oben (#% Intensität)',
             tiers: [
                 { tier: 1, min: 104, max: 130, weight: 90, ilvl: 60 },
                 { tier: 2, min: 65, max: 98, weight: 300, ilvl: 30 },
@@ -469,7 +472,7 @@ const EG_MAP_MOD_TABLES = {
                 { tier: 4, min: 8, max: 20, weight: 1350, ilvl: 1 },
             ],
         },
-        // NOTE: `map_boss_chance` was removed — boss presence is a pure implicit
+        // NOTE: `map_boss_chance` was removed - boss presence is a pure implicit
         // (see `_egRollMapBossStatus` / `_egWithImplicits`). It remains in
         // `EG_MAP_MOD_REWARDS` for legacy maps that already rolled it, but it
         // no longer appears on new maps so orbs cannot influence the boss roll.
@@ -681,7 +684,7 @@ const EG_MAP_MOD_TABLES = {
         },
         map_blood_magic: {
             id: 'map_blood_magic', affects: 'player',
-            label: 'Blood Magic — Class Abilities cost Life instead of Mana', labelDe: 'Blutmagie – Klassenfähigkeiten kosten Leben statt Mana',
+            label: 'Blood Magic - Class Abilities cost Life instead of Mana', labelDe: 'Blutmagie – Klassenfähigkeiten kosten Leben statt Mana',
             tiers: [
                 { tier: 1, min: 1, max: 1, weight: 90, ilvl: 30 },
             ],
@@ -726,7 +729,7 @@ const EG_MAP_MOD_TABLES = {
         },
         map_blood_pact: {
             id: 'map_blood_pact', affects: 'player',
-            label: 'Blood Pact — each solved Puzzle drains #% of maximum Life', labelDe: 'Blutpakt – jedes gelöste Rätsel entzieht #% des maximalen Lebens',
+            label: 'Blood Pact - each solved Puzzle drains #% of maximum Life', labelDe: 'Blutpakt – jedes gelöste Rätsel entzieht #% des maximalen Lebens',
             tiers: [
                 { tier: 1, min: 8, max: 13, weight: 90, ilvl: 50 },
                 { tier: 2, min: 4, max: 6, weight: 320, ilvl: 24 },
@@ -823,9 +826,9 @@ function _egMapModAffects(familyId) {
 //-------------------MAP MOD REWARD BONUSES-------------------------------
 //------------------------------------------------------------------------
 // Every mod family grants run-wide reward bonuses on top of its danger:
-//   xp       — % more experience from kills
-//   quantity — % higher chance for loot/currency/item drops
-//   rarity   — % weight boost for non-common rarities when items drop
+//   xp       - % more experience from kills
+//   quantity - % higher chance for loot/currency/item drops
+//   rarity   - % weight boost for non-common rarities when items drop
 // Values are indexed by (tier - 1); T1 = strongest roll. More dangerous
 // maps are therefore always strictly more rewarding, PoE-style.
 
@@ -898,7 +901,7 @@ const EG_MAP_MOD_REWARDS = {
     map_required_puzzles:    { xp: [27, 15],       quantity: [23, 12],       rarity: [16, 9] },
     map_extra_questions:     { xp: [23, 15, 8],    quantity: [19, 12, 7],    rarity: [14, 8, 5] },
 
-    // ── Elemental Hazards — very rewarding: they demand active play
+    // ── Elemental Hazards - very rewarding: they demand active play
     //    (dodging) AND resistance stacking to mitigate.
     map_hazard_lava:         { xp: [32, 23, 15],   quantity: [26, 18, 11],   rarity: [22, 15, 8] },
     map_hazard_lightning:    { xp: [32, 23, 15],   quantity: [26, 18, 11],   rarity: [22, 15, 8] },
@@ -955,7 +958,7 @@ function _egGetMapGoldRewardRange(map) {
 //------------------------------------------------------------------------
 // Every map rolls a random completion reward: 2–10 copies of one
 // higher-grade orb or essence (orbs of transmutation / augmentation are
-// excluded — too low level). The roll is baked in with the implicits so it
+// excluded - too low level). The roll is baked in with the implicits so it
 // is fixed per map item and shown in its tooltip. Higher tiers unlock the
 // rarer entries via `minTier`.
 
@@ -976,14 +979,14 @@ const EG_MAP_COMPLETION_REWARD_POOL = [
     { id: 'mirror_of_kalandra', weight: 1, minTier: 10 },
 ];
 
-// Map completion essences — one entry per per-modifier essence so every targeted
+// Map completion essences - one entry per per-modifier essence so every targeted
 // essence family can appear as a map completion reward. Weight 5 keeps total
 // essence weight comparable to original legacy pool (≈93×5 = 465 vs old 500).
 const EG_MAP_COMPLETION_ESSENCE_POOL = (typeof _EG_ESSENCE_FAMILIES !== 'undefined'
     ? _EG_ESSENCE_FAMILIES.map(fid => ({ id: 'essence_' + fid, weight: 5 }))
     : []);
 
-// Combined pool used at roll time — orbs plus dynamically built essence entries.
+// Combined pool used at roll time - orbs plus dynamically built essence entries.
 // Keep a static reference for backwards compat, but the live roll builds fresh
 // so new essences (e.g. essence_inc_health) automatically appear.
 const EG_MAP_COMPLETION_REWARD_POOL_STATIC = EG_MAP_COMPLETION_REWARD_POOL.slice();
@@ -1043,11 +1046,11 @@ function _egRollMapCompletionReward(map) {
 // Maps carry five implicit values derived from their tier and shaped by
 // specific mods. They are baked into the item at generation/reroll time so
 // the tooltip always shows exactly what the run will demand:
-//   puzzles          — required puzzles to solve
-//   questions        — quiz questions to answer correctly
-//   mistakes         — allowed mistake count
-//   durationSeconds  — total map time limit
-//   sizeMix          — puzzle count per grid-size bucket
+//   puzzles          - required puzzles to solve
+//   questions        - quiz questions to answer correctly
+//   mistakes         - allowed mistake count
+//   durationSeconds  - total map time limit
+//   sizeMix          - puzzle count per grid-size bucket
 //                      (small / medium / large / massive)
 
 // Grid-size buckets (same thresholds as _gridSizeBucket in quests-stats.js).
@@ -1107,7 +1110,7 @@ function _egRollMapSizeMix(tier, largerPct) {
 // Every device map ends in a boss fight: the boss arena opens once all
 // other objectives (kills / puzzles / questions) are done (see
 // _egCanLeaveMap in endgame-encounter-chain.js). The status is baked as an
-// immutable implicit so tooltips can state it definitively — orbs/mods
+// immutable implicit so tooltips can state it definitively - orbs/mods
 // MUST NOT be able to remove it.
 function _egRollMapBossStatus(map) {
     return { hasBoss: true, maxBosses: 1 };
@@ -1199,16 +1202,16 @@ function _egWithImplicits(map) {
 
 // Rolls a full map item. Rarity and prefix/suffix counts use the exact same
 // rollers as equipment so maps behave identically (max 3 pre + 3 suf = 6 mods).
-// `tierOverride` (optional) forces the map tier — used by the atlas-aware
+// `tierOverride` (optional) forces the map tier - used by the atlas-aware
 // drop logic so maps found during a run match the active node's graph.
 // `opts.forceNormal` skips the rarity/mod rolls entirely and produces a
-// plain Normal (white) map with no modifiers — used for the vendor's free
+// plain Normal (white) map with no modifiers - used for the vendor's free
 // starter map so a fresh character always gets an unmodified baseline run.
 function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) {
     monsterLevel = Math.max(1, Math.round(monsterLevel || 1));
 
     // Forced atlas region (PoE-style drop rules): the drop code resolves
-    // the exact region a map may come from — tier and item level derive
+    // the exact region a map may come from - tier and item level derive
     // from it. Atlas tier override: keep item level / mod rolls consistent
     // with the forced tier (tier N ≈ curve level, inverse of _egRollMapTier).
     let mapTier;
@@ -1302,7 +1305,7 @@ function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) 
 // While a device run is active with a known atlas region, dropped maps are
 // restricted to the active node's own tier plus its connected tiers
 // (PoE-style: you find your own tier and directly adjacent regions).
-// The tier is rolled directly from the allowed set — deriving it from the
+// The tier is rolled directly from the allowed set - deriving it from the
 // monster level via ceil(level/4) could never produce the lower connected
 // tier and made higher tiers vanishingly rare.
 // The share of drops from connected tiers scales with the active node's
@@ -1310,11 +1313,11 @@ function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) 
 // players unlock the atlas (and climb tiers) quickly, while high-tier runs
 // stay focused on their own tier.
 // Resolves the atlas REGION a map dropped inside the active run comes from
-// (PoE-style drop rules — see egAtlasDropNodeIds in endgame-atlas.js):
+// (PoE-style drop rules - see egAtlasDropNodeIds in endgame-atlas.js):
 //   normal kill: linked regions of the same or a lower tier + the active
 //                region itself + completed regions at or below the active
 //                tier
-//   boss kill:   additionally linked regions one tier higher — bosses are
+//   boss kill:   additionally linked regions one tier higher - bosses are
 //                the only source that climbs the atlas
 // Returns a node id, or null when no device run is active / the atlas
 // module isn't loaded (callers then fall back to legacy tier rolling).
@@ -1556,7 +1559,7 @@ function _egAddMapToMapStash(item, tierOverride) {
             _egGetMapTierGrid(tier)[pos.r][pos.c] = item;
             // if the target tier is currently visible, render that cell; otherwise just sync count
             if (tier === (_egMapStashActiveTier || 1) && document.getElementById('eg-map-stash-grid')) {
-                // ensure grid has enough DOM rows — rebuild if needed
+                // ensure grid has enough DOM rows - rebuild if needed
                 const gridLen = _egGetMapTierGrid(tier).length;
                 const domCells = document.querySelectorAll('.eg-map-stash-cell').length;
                 const needed = gridLen * EG_MAP_STASH_COLS;
@@ -1630,8 +1633,8 @@ function _egTryDropMap(isBoss, monsterLevel) {
 // one independent extra roll for an additional ADJACENT map drop. Chance =
 // +1% per completed atlas region (see egAtlasAdjacentBonusChance).
 // The bonus map comes from a region linked to the just-finished run's
-// region — preferring an uncompleted +1-tier link so the bonus can climb
-// to higher tiers (see egAtlasPickAdjacentBonusNodeId) — and is banked
+// region - preferring an uncompleted +1-tier link so the bonus can climb
+// to higher tiers (see egAtlasPickAdjacentBonusNodeId) - and is banked
 // straight into the map stash (+ _egRunMaps so it shows in the leave-map
 // summary). Must be called from _egEndMap() AFTER _egAtlasOnMapCompleted()
 // so a fresh first clear already counts.
@@ -1687,7 +1690,7 @@ function _egSpawnMapDrop(map) {
 
     _egMapDrops.set(key, map);
 
-    // Overlay visual — reuses the loot overlay styling with a map tint class.
+    // Overlay visual - reuses the loot overlay styling with a map tint class.
     // Glow class follows the map's own rarity color.
     const el = document.getElementById(`g-${r}-${c}`);
     if (el) {
@@ -1744,7 +1747,7 @@ function _egCheckMapDropClaim(row, col) {
     const map = _egMapDrops.get(key);
     if (!map) return false;
 
-    // Tiered stashes are infinite — no capacity check needed.
+    // Tiered stashes are infinite - no capacity check needed.
 
     if (typeof _egCancelTrackedExpiry === 'function') _egCancelTrackedExpiry(_egMapDrops, key, map);
     _egMapDrops.delete(key);
@@ -2000,7 +2003,7 @@ function _egBuildMapTooltipBodyHTML(item) {
             const regionName = (typeof egAtlasNodeName === 'function') ? egAtlasNodeName(atlasNode) : atlasNode.name;
             // Required difficulty (region tier band → easy / normal / hard).
             // When the currently selected game difficulty doesn't match and
-            // the region is not completed yet, warn in red — such a run
+            // the region is not completed yet, warn in red - such a run
             // would not count as an atlas clear.
             const reqDiff = atlasNode.difficulty
                 || (typeof egAtlasTierDifficulty === 'function' ? egAtlasTierDifficulty(atlasNode.tier) : 'normal');
@@ -2074,7 +2077,7 @@ function _egBuildMapTooltipBodyHTML(item) {
 //------------------------------------------------------------------------
 //-------------------LEGACY MAP BOSS HEALING-------------------------------
 //------------------------------------------------------------------------
-// Older saves stored maps without `implicits.hasBoss` — and maps created
+// Older saves stored maps without `implicits.hasBoss` - and maps created
 // before the "every map ends in a boss fight" rule may have it baked as
 // false. Patch every persisted map so the boss fight is guaranteed: maps
 // without implicits roll fresh ones (boss always present), and a baked

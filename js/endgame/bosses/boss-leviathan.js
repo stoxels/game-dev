@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE LEVIATHAN (boss_leviathan)-----------------------
 //------------------------------------------------------------------------
-// Rising-tide homage: the sea itself comes for you — a burning tide sweeps
+// Rising-tide homage: the sea itself comes for you - a burning tide sweeps
 // up the screen while wreckage rains from above. Outrun the water, dodge
 // the debris, and do not stop.
 // This file holds EVERYTHING this boss needs in one place:

@@ -9,7 +9,7 @@
     screens-world-levels-config.js (WD_WORLD_CONFIGS).
 
     STATE:
-      STATE.wdSpriteLevel[wi]  — last level index sprite was at (null = entrance)
+      STATE.wdSpriteLevel[wi]  - last level index sprite was at (null = entrance)
 
     SECTION ORDER:
       1. Constants & Module State
@@ -69,7 +69,7 @@ let _wdCurrentWi = null;
 // Level index the sprite is currently standing on (null = at entrance)
 let _wdCurrentLevelIdx = null;
 
-// True while a walk animation is in progress — blocks new walk requests
+// True while a walk animation is in progress - blocks new walk requests
 let _wdWalking = false;
 
 // requestAnimationFrame handle for the current walk animation (used to cancel it)
@@ -129,13 +129,13 @@ function _wdGetImageRectInCanvas(canvasWidth, canvasHeight, imageAspect) {
     let imgW, imgH, imgX, imgY;
 
     if (containerAspect > imageAspect) {
-        // Pillarboxed: image is narrower than the canvas — bars left & right
+        // Pillarboxed: image is narrower than the canvas - bars left & right
         imgH = canvasHeight;
         imgW = canvasHeight * imageAspect;
         imgX = (canvasWidth - imgW) / 2;
         imgY = 0;
     } else {
-        // Letterboxed: image is shorter than the canvas — bars top & bottom
+        // Letterboxed: image is shorter than the canvas - bars top & bottom
         imgW = canvasWidth;
         imgH = canvasWidth / imageAspect;
         imgX = 0;
@@ -154,7 +154,7 @@ function _wdImgPctToCanvasPct(imgPctX, imgPctY, canvas, cfg) {
     const cw = canvas.offsetWidth;
     const ch = canvas.offsetHeight;
 
-    // Canvas has no size yet — return the raw values as a safe fallback
+    // Canvas has no size yet - return the raw values as a safe fallback
     if (!cw || !ch) return { x: imgPctX, y: imgPctY };
 
     const aspect = (cfg && cfg.imageAspect) ? cfg.imageAspect : WD_DEFAULT_IMAGE_ASPECT;
@@ -181,7 +181,7 @@ function _wdImgPctToCanvasPct(imgPctX, imgPctY, canvas, cfg) {
 //       Additional segments drawn alongside the linear chain.
 //       'from'/'to' are 'entrance' or 0-based node indices.
 //       If showAfter is set (a 0-based level index), the segment only appears
-//       once that level is marked done — useful for shortcuts that unlock later.
+//       once that level is marked done - useful for shortcuts that unlock later.
 
 /**
  * Returns the image-relative {x, y} position of a node reference.
@@ -379,7 +379,7 @@ function _wdFindWalkPathWithMarkers(wi, fromNode, toNode) {
 }
 
 /**
- * Marker-free variant of _wdFlattenRouteToPointsWithMarkers — same point
+ * Marker-free variant of _wdFlattenRouteToPointsWithMarkers - same point
  * list, without the per-node marker bookkeeping.
  */
 function _wdFlattenRouteToPoints(routeSegs) {
@@ -387,7 +387,7 @@ function _wdFlattenRouteToPoints(routeSegs) {
 }
 
 /**
- * Marker-free variant of _wdFindWalkPathWithMarkers — same point list,
+ * Marker-free variant of _wdFindWalkPathWithMarkers - same point list,
  * without the per-node marker bookkeeping.
  */
 function _wdFindWalkPath(wi, fromNode, toNode) {
@@ -489,16 +489,13 @@ function _wdRefreshPaths(wi) {
 //------------------------------------------------------------------------
 
 /**
- * Returns true if the given level index is a "convergence" node —
- * a special milestone placed roughly 1/3 and 2/3 through the world,
- * but never on the very last level. Mirrors the logic in screens-level-select.js.
+ * Convergence milestones no longer live on campaign puzzle levels (Leveling
+ * Rework): every former convergence node is a regular puzzle node now -
+ * milestones moved to Convergence Trial nodes (see js/campaign-trials.js).
+ * Always false; kept because node building / tooltips still call it.
  */
 function _wdIsConvergenceNode(li, world) {
-    if (world.data.length <= 2) return false;
-    if (li === world.data.length - 1) return false;
-    const c1 = Math.floor((world.data.length - 1) * (1 / 3));
-    const c2 = Math.floor((world.data.length - 1) * (2 / 3));
-    return li === c1 || li === c2;
+    return false;
 }
 
 /**
@@ -543,20 +540,20 @@ function _wdGetNodeIcon(li, isDone, isLocked, isLastInWorld, isConvergence) {
 // These are layered inside the node's effects container.
 //
 // LAYER ORDER (bottom to top):
-//   1. Stoxel Aura      — void energy knot, present on EVERY node
-//   2. Convergence      — green gyro rings (convergence nodes only)
-//   3. Math Gate        — red cyber cage (math-gated nodes only)
-//   4. Ascension        — purple star + gold beams (last node of world only)
-//   5. Node Circle      — the actual clickable icon, always on top
+//   1. Stoxel Aura      - void energy knot, present on EVERY node
+//   2. Convergence      - green gyro rings (convergence nodes only)
+//   3. Math Gate        - red cyber cage (math-gated nodes only)
+//   4. Ascension        - purple star + gold beams (last node of world only)
+//   5. Node Circle      - the actual clickable icon, always on top
 
 /**
- * Builds the Stoxel Aura effect — a tangled orb of void energy visible on
+ * Builds the Stoxel Aura effect - a tangled orb of void energy visible on
  * every level node. This represents an uncleansed Stoxel corrupting the land.
  *
  * States:
- *   default (unsolved) — full crackling purple/red void energy, sparks, knot
- *   done (solved)      — aura collapses to a faint, calm residual glow
- *   locked             — slightly dimmed but still present (not yet reachable)
+ *   default (unsolved) - full crackling purple/red void energy, sparks, knot
+ *   done (solved)      - aura collapses to a faint, calm residual glow
+ *   locked             - slightly dimmed but still present (not yet reachable)
  *
  * The SVG uses overlapping elliptical paths to mimic the interlocking band
  * structure visible in the reference images. Sparks are small animated circles
@@ -570,7 +567,7 @@ function _wdBuildStoxelAuraHtml(isDone) {
             <!-- Outer crackling void glow -->
             <div class="wd-stoxel-void-glow"></div>
 
-            <!-- The interlocking band knot (SVG) — viewBox matches the larger inset wrapper -->
+            <!-- The interlocking band knot (SVG) - viewBox matches the larger inset wrapper -->
             <svg class="wd-stoxel-knot-svg" viewBox="0 0 104 104" overflow="visible">
                 <defs>
                     <filter id="stoxelGlow" x="-80%" y="-80%" width="260%" height="260%">
@@ -584,7 +581,7 @@ function _wdBuildStoxelAuraHtml(isDone) {
                     </filter>
                 </defs>
 
-                <!-- 5 interlocking bands — thicker and denser to match the reference image -->
+                <!-- 5 interlocking bands - thicker and denser to match the reference image -->
                 <!-- Band 1: primary red loop -->
                 <ellipse class="wd-stoxel-band wd-stoxel-band-1"
                     cx="52" cy="52" rx="36" ry="18"
@@ -847,7 +844,7 @@ function _wdBuildNodeEffectsHtml(icon, stoxelHtml, convergenceHtml, gateHtml, as
 
 /**
  * Builds the inner HTML for a standard level node.
- * Even plain nodes carry the stoxel aura — it is a universal world feature.
+ * Even plain nodes carry the stoxel aura - it is a universal world feature.
  */
 function _wdBuildPlainNodeHtml(icon, stoxelHtml) {
     return `
@@ -940,7 +937,7 @@ function _wdBuildLevelNode(wi, li, pos) {
     const isMaxCleared = _wdIsMaxCleared(gi);
     const icon = isMaxCleared ? '👑' : _wdGetNodeIcon(li, isDone, isLocked, isLastInWorld, isConvergence);
 
-    // Syla — Nature's Aid: forest levels get a nature badge so the player
+    // Syla - Nature's Aid: forest levels get a nature badge so the player
     // knows her vegetation bonus will trigger in this level.
     const isSylaForest = _charIs('syla') && !!(world && world.data[li] && world.data[li].isForestLevel);
 
@@ -951,7 +948,7 @@ function _wdBuildLevelNode(wi, li, pos) {
     _wdPositionNodeOnCanvas(node, wi, pos);
     _wdApplyNodeStateClasses(node, isDone, isLocked, isLastInWorld, isConvergence, isMathGated, isMaxCleared, isNexusPoint);
 
-    // Build inner HTML — the stoxel aura is universal; special effects layer on top
+    // Build inner HTML - the stoxel aura is universal; special effects layer on top
     const stoxelHtml = _wdBuildStoxelAuraHtml(isDone);
 
     if (isConvergence || isMathGated || isLastInWorld) {
@@ -997,7 +994,8 @@ function _wdBuildEntranceMarker(wi, cfg, canvas) {
     marker.textContent = '🛖';
     marker.style.cursor = 'pointer';
     marker.style.pointerEvents = 'auto';
-    marker.title = t('scr_back_to_entrance');
+    marker.setAttribute('data-tip-t', 'scr_back_to_entrance');
+    marker.setAttribute('aria-label', t('scr_back_to_entrance'));
 
     marker.addEventListener('click', () => {
         if (!_wdWalking) _wdWalkSpriteToEntrance();
@@ -1013,7 +1011,7 @@ function _wdBuildEntranceMarker(wi, cfg, canvas) {
 
 /**
  * Creates the player sprite DOM element (wrapper div + character image).
- * Gameplay default: move-down art (never the menu portrait — the menu
+ * Gameplay default: move-down art (never the menu portrait - the menu
  * portrait stays reserved for save slots, level-select topbar and
  * quiz/exercise modals). Falls back to the no-class portrait only for
  * variants without directional art.
@@ -1045,7 +1043,7 @@ function _wdBuildSprite() {
 
 /**
  * Instantly moves the sprite element to the position of the given level index
- * (or to the entrance if levelIdx is null). No animation — used for initial placement.
+ * (or to the entrance if levelIdx is null). No animation - used for initial placement.
  */
 function _wdPlaceSprite(sprite, wi, levelIdx) {
     const cfg = WD_WORLD_CONFIGS[wi];
@@ -1176,7 +1174,7 @@ function _wdWalkAlongPoints(points, markers, segIdx, onComplete) {
         const ease = _wdEaseInOut(t);
         _wdUpdateSpriteFrame(sprite, startPos, endPos, ease);
 
-        // Drive the directional walk set EVERY FRAME while the glide runs —
+        // Drive the directional walk set EVERY FRAME while the glide runs -
         // same pattern as the WASD tick. _playAvatarWalkAnimation no-ops when
         // the same loop already runs, and _scheduleAvatarWalkIdle() re-arms
         // its short idle-debounce timer; calling it only once per segment
@@ -1310,7 +1308,7 @@ function _wdBuildTopBar(wi) {
     _renderTopBarQuestBadge('wd');
     _renderTopBarTreePoints('wd');
     _wireTopBarButtons('wd');
-    // Class-change token entry button — only visible while a token is held.
+    // Class-change token entry button - only visible while a token is held.
     if (typeof updateClassChangeButtons === 'function') updateClassChangeButtons();
 
     if (typeof renderMapViewCharacterPortrait === 'function') renderMapViewCharacterPortrait('wd');
@@ -1391,12 +1389,156 @@ function _wdCreateCanvasElement(cfg) {
 /**
  * Appends all level node elements for a world to the canvas.
  * Respects both the config's node list length and the world's actual level count.
+ * Afterwards appends the world's Convergence Trial node (if configured).
  */
 function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
     const count = Math.min(cfg.nodes.length, levelCount);
     for (let li = 0; li < count; li++) {
         canvas.appendChild(_wdBuildLevelNode(wi, li, cfg.nodes[li]));
     }
+    const trialPos = _wdTrialNodeForWorld(wi);
+    if (trialPos) canvas.appendChild(_wdBuildTrialNode(wi, trialPos));
+}
+
+/**
+ * Returns the Convergence Trial node position for a world, or null when the
+ * world has no trial (e.g. the Nexus World) or the trial system is absent.
+ */
+function _wdTrialNodeForWorld(wi) {
+    const cfg = (typeof WD_WORLD_CONFIGS !== 'undefined') ? WD_WORLD_CONFIGS[wi] : null;
+    if (!cfg || !cfg.trialNode) return null;
+    if (typeof _egTrialWorlds === 'function' && _egTrialWorlds().indexOf(wi) === -1) return null;
+    return cfg.trialNode;
+}
+
+/**
+ * Builds the Convergence Trial node element: same base classes as a level
+ * node (so resize/reposition picks it up automatically) plus the
+ * convergence ring styling, a 🌿 icon and trial tooltip / enter flow.
+ */
+function _wdBuildTrialNode(wi, pos) {
+    const node = document.createElement('div');
+    node.className = 'wd-level-node wd-trial-node';
+    node.dataset.trial = wi;
+    _wdPositionNodeOnCanvas(node, wi, pos);
+
+    const isDone = (typeof _egIsTrialDone === 'function') && _egIsTrialDone(wi);
+    const isLocked = (typeof _egIsTrialUnlocked === 'function') ? !_egIsTrialUnlocked(wi) : false;
+    if (isDone) node.classList.add('done');
+    else if (isLocked) node.classList.add('locked');
+    node.classList.add('convergence');
+
+    const icon = isDone ? `${wi + 1}` : (isLocked ? '🔒' : '🌿');
+    const stoxelHtml = (typeof _wdBuildStoxelAuraHtml === 'function') ? _wdBuildStoxelAuraHtml(isDone) : '';
+    const convHtml = (typeof _wdBuildConvergenceHtml === 'function') ? _wdBuildConvergenceHtml(isDone) : '';
+    node.innerHTML = (typeof _wdBuildNodeEffectsHtml === 'function')
+        ? _wdBuildNodeEffectsHtml(icon, stoxelHtml, convHtml, '', '')
+        : `<span>${icon}</span>`;
+
+    if (!isLocked) {
+        node.addEventListener('click', () => _wdOnTrialNodeClick(wi));
+    }
+    node.addEventListener('mouseenter', (e) => _wdShowTrialTooltip(e, wi, isDone, isLocked));
+    node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
+    node.addEventListener('mouseleave', () => _wdHideTooltip());
+    return node;
+}
+
+/**
+ * Handles a click on a Convergence Trial node: drops any open enter button
+ * and shows the trial enter button (no sprite walk - trial nodes sit
+ * outside the road graph).
+ */
+function _wdOnTrialNodeClick(wi) {
+    const existing = document.getElementById('wd-enter-btn');
+    if (existing) existing.remove();
+    _wdShowTrialEnterButton(wi);
+}
+
+/**
+ * Shows the "Enter Convergence Trial N" button above the trial node.
+ */
+function _wdShowTrialEnterButton(wi) {
+    const existing = document.getElementById('wd-enter-btn');
+    if (existing) existing.remove();
+
+    const cfg = WD_WORLD_CONFIGS[wi];
+    const pos = cfg && cfg.trialNode;
+    if (!pos) return;
+
+    const name = (typeof _egTrialName === 'function') ? _egTrialName(wi) : ('Convergence Trial ' + (wi + 1));
+    const rawEnter = (typeof t === 'function') ? t('scr_enter_trial') : null;
+    const btnText = (rawEnter && rawEnter !== 'scr_enter_trial')
+        ? rawEnter.replace('{n}', name) : ('Enter ' + name);
+
+    const btn = document.createElement('button');
+    btn.id = 'wd-enter-btn';
+    btn.textContent = btnText;
+
+    const canvas = _wdGetCanvas();
+    const pct = _wdImgPctToCanvasPct(pos.x, pos.y, canvas, cfg);
+    btn.style.cssText = `
+        position: absolute;
+        left: ${pct.x}%;
+        top: calc(${pct.y}% - 56px);
+        transform: translateX(-50%);
+        z-index: 10;
+        font-family: var(--PX, monospace);
+        font-size: 11px;
+        padding: 5px 12px;
+        background: #2f7d4f;
+        color: #eafff0;
+        border: none;
+        cursor: pointer;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    `;
+    btn.addEventListener('click', () => {
+        btn.remove();
+        if (typeof _egLaunchCampaignTrial === 'function') _egLaunchCampaignTrial(wi);
+    });
+    _wdWireEnterButtonDismiss(btn);
+    if (canvas) canvas.appendChild(btn);
+}
+
+/**
+ * Trial-node tooltip: trial name, status, monster level / boss preview and
+ * the first-clear reward note.
+ */
+function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
+    const tip = _wdEnsureTooltip();
+    const name = (typeof _egTrialName === 'function') ? _egTrialName(wi) : ('Convergence Trial ' + (wi + 1));
+    let status = '';
+    if (isLocked) status = t('scr_locked');
+    else if (isDone) status = t('scr_trial_done');
+    else status = t('scr_not_completed');
+    if (!status || status.indexOf('scr_') === 0) {
+        status = isLocked ? 'Locked' : (isDone ? 'Completed' : 'Not completed');
+    }
+    let detail = '';
+    if (!isLocked && typeof _egTrialMonsterLevel === 'function') {
+        const ml = _egTrialMonsterLevel(wi, false);
+        let bossName = '';
+        try {
+            if (typeof _egTrialBossId === 'function' && typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS) {
+                const def = EG_BOSS_DEFS[_egTrialBossId(wi, 0)];
+                if (def) bossName = ' · ' + (def.emoji ? def.emoji + ' ' : '') + (def.name || '');
+            }
+        } catch (err) {}
+        const lvlLabel = (typeof t === 'function' ? t('scr_trial_level') : null);
+        detail = `<div class="wd-tip-sub">${(lvlLabel && lvlLabel !== 'scr_trial_level' ? lvlLabel : 'Monster level')}: ${ml}${bossName}</div>`;
+    }
+    let reward = '';
+    if (!isLocked && !isDone) {
+        const rw = (typeof t === 'function') ? t('scr_trial_reward') : null;
+        reward = `<div class="wd-tip-bonus">${(rw && rw !== 'scr_trial_reward' ? rw : '🌿 First clear: +1 passive point')}</div>`;
+    }
+    const badge = (typeof t === 'function' ? t('scr_convergence_badge') : null);
+    tip.innerHTML = `<div class="wd-tip-title">${(badge && badge.indexOf('scr_') !== 0 ? badge + ' · ' : '🌿 ')}${name}</div>`
+        + `<div class="wd-tip-status">${status}</div>${detail}${reward}`;
+    tip.style.display = 'block';
+    _wdMoveTooltip(e);
 }
 
 /**
@@ -1410,7 +1552,7 @@ function _wdRepositionAll(wi) {
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg) return;
 
-    // Level nodes — each stores its image-relative coords in dataset
+    // Level nodes - each stores its image-relative coords in dataset
     canvas.querySelectorAll('.wd-level-node').forEach(node => {
         const { x, y } = _wdImgPctToCanvasPct(
             parseFloat(node.dataset.imgX),
@@ -1747,10 +1889,18 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
         ? `<div class="wd-tip-max">👑 ${t('scr_max_cleared')}</div>`
         : '';
 
-    // Syla — Nature's Aid note on forest levels
+    // Syla - Nature's Aid note on forest levels
     const sylaLine = (_charIs('syla') && levelData && levelData.isForestLevel)
         ? `<div class="wd-tip-bonus syla">🌿 ${t('scr_syla_forest_tip')}</div>`
         : '';
+
+    // Ascension levels are fought as mini-map trial chains ending in a boss.
+    const isAscensionNode = isLastInWorld && !isNexusPoint;
+    let ascLine = '';
+    if (isAscensionNode && !isLocked) {
+        const rawAsc = t('scr_ascension_trial_hint');
+        ascLine = `<div class="wd-tip-bonus">${(rawAsc && rawAsc !== 'scr_ascension_trial_hint') ? rawAsc : '⚗️ Trial chain - ends in a boss fight'}</div>`;
+    }
 
     tip.innerHTML = `
         <div class="wd-tip-header">
@@ -1763,6 +1913,7 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
         ${modTagsHtml}
         ${bonusHtml}
         ${sylaLine}
+        ${ascLine}
     `;
     tip.classList.add('show');
     _wdMoveTooltip(e);
@@ -1835,9 +1986,11 @@ function _wdSyncSpriteToLevel(gi) {
 /**
  * Opens the world-detail screen for the given world.
  * Called from screens-map-view.js when the player clicks "Enter [World]".
- * wi — 0-based world index.
+ * wi - 0-based world index.
  */
 function showWorldDetail(wi) {
+    // Per-world level selection: same overworld music as the map view.
+    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playBGM('overworld');
     _wdCurrentWi = wi;
 
     _wdCurrentLevelIdx = (STATE && STATE.wdSpriteLevel && STATE.wdSpriteLevel[wi] !== undefined)

@@ -1,6 +1,6 @@
-/* Endgame Map Elemental Hazards — visual styles
+/* Endgame Map Elemental Hazards - visual styles
    (see js/endgame/endgame-hazards.js)
-   Everything here is pointer-events: none — hazards never block clicks. */
+   Everything here is pointer-events: none - hazards never block clicks. */
 
 #eg-hazards-layer {
     position: fixed;
@@ -63,7 +63,7 @@
     50%      { transform: translateY(-8px) scale(1.35); opacity: 0.95; }
 }
 
-/* Fuse — rapid flashing/warming before detonation (0.5 s) */
+/* Fuse - rapid flashing/warming before detonation (0.5 s) */
 .eg-hz-lava-fuse {
     animation: eg-hz-lava-wobble 0.22s ease-in-out infinite alternate,
                eg-hz-lava-fuse-flash 0.12s linear infinite !important;
@@ -75,7 +75,7 @@
     50%      { box-shadow: 0 0 34px 14px rgba(255, 220, 120, 0.95), inset 0 0 30px rgba(255, 230, 150, 0.9); }
 }
 
-/* Blast — detached fiery core that puffs up at the detonation point */
+/* Blast - detached fiery core that puffs up at the detonation point */
 .eg-hz-lava-blast {
     position: absolute;
     transform-origin: center center;
@@ -445,7 +445,7 @@
     to   { opacity: 1;   transform: scale(1.15); }
 }
 
-/* Fuse phase — rapid flashing before detonation */
+/* Fuse phase - rapid flashing before detonation */
 .eg-hz-volatile-fuse {
     animation: eg-hz-volatile-flicker 0.12s linear infinite !important;
 }
@@ -515,7 +515,7 @@
    = FIRE WALLS
    ====================================================================== */
 
-/* Telegraph strip — position/width set inline by JS per variant so the safe
+/* Telegraph strip - position/width set inline by JS per variant so the safe
    zone / gap is readable during the 1.3s wind-up. Default is full-width at top. */
 .eg-hz-firewall-warning {
     position: absolute;
@@ -679,7 +679,7 @@
 
 
 /* ======================================================================
-   = SHARED — floating hazard damage label on the player avatar
+   = SHARED - floating hazard damage label on the player avatar
    ====================================================================== */
 
 .eg-hz-hit-text {

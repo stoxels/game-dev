@@ -4,14 +4,14 @@
 // level name, and inventory label.
 
 
-// _wireHoverByRect — tooltip trigger based on manual bounding-box hit
+// _wireHoverByRect - tooltip trigger based on manual bounding-box hit
 // testing instead of native hover events. Needed for elements that must
 // stay pointer-events:none (so they never block clicks on whatever sits
 // beneath them, e.g. the puzzle grid under the fixed corner HUD) but
 // still need a working hover tooltip.
 //
 // OCCLUSION GUARD: for triggers that DO receive pointer events (e.g. the
-// title screen's CARTOGRAPHERS subtitle), a raw rect hit is not enough — the
+// title screen's CARTOGRAPHERS subtitle), a raw rect hit is not enough - the
 // element can sit geometrically under the cursor while being covered by
 // an overlay stacked above it (modal backdrops etc.), which used to fire
 // tooltips "through" the overlay. Those triggers only count as hovered
@@ -58,7 +58,11 @@ function getGameTooltip() {
         tip.id = 'ghud-floating-tip';
         tip.style.cssText = `
             position: fixed;
-            z-index: 10010;
+            /* Above every modal backdrop, matching #chud-floating-tip. The
+               spell book lifts itself to z-index 10000 while open, so a 10010
+               tooltip used to sit UNDER the book's own chrome (scrollbars,
+               sticky headers) on the right-hand edge of the frame. */
+            z-index: 10050;
             background: #12121e;
             border: 1px solid var(--accent, #5555aa);
             border-left: 3px solid var(--accent2, #aaaaff);
@@ -114,6 +118,82 @@ function hideGameTooltip() {
 
 
 //------------------------------------------------------------------------
+//------------------GENERIC data-tip DELEGATED TOOLTIPS--------------------
+//------------------------------------------------------------------------
+// Any element carrying `data-tip-t` (a translation key) or `data-tip`
+// (ready-made HTML) gets the styled tooltip for free, with no per-element
+// wiring and no re-wiring after an innerHTML rebuild.
+//
+// WHY THIS EXISTS: a native title="" renders the OPERATING SYSTEM popup -
+// unthemed, unstyled, force-wrapped, and on a dark canvas often illegible.
+// Every hint in the game routes through this one path instead, so there is
+// exactly one tooltip look and exactly one place to change it.
+//
+//   data-tip-t="key"       translation key; {n} is replaced from data-tip-n
+//   data-tip="<b>&#8230;</b>"  already-translated, already-escaped HTML (wins)
+//   data-tip-n="3"         the value for {n} in data-tip-t
+//
+// `data-tip` deliberately takes priority over `data-tip-t` so a caller can
+// hand over rich markup (dynamic numbers, an item's own name) where a
+// translation key would be a lie.
+const _TIP_SELECTOR = '[data-tip-t],[data-tip]';
+
+// Escapes dynamic text before it goes into a data-tip attribute. Quotes are
+// required for the attribute itself; &< > are required because the resolver
+// feeds the value to innerHTML (a save-slot name is player-typed text).
+function _tipAttr(text) {
+    return String(text == null ? '' : text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function _resolveTipHTML(el) {
+    const raw = el.getAttribute('data-tip');
+    if (raw) return raw;
+    const key = el.getAttribute('data-tip-t');
+    if (!key || typeof t !== 'function') return '';
+    let html = t(key);
+    const n = el.getAttribute('data-tip-n');
+    if (n != null && n !== '') html = html.replace('{n}', n);
+    else html = html.replace(/\s*\(\{n\}\)/, ''); // count unknown → drop the placeholder cleanly
+    return html;
+}
+
+// The element the generic tooltip is currently describing. Hovering is
+// resolved from the live event target on every mousemove rather than from
+// mouseenter/mouseleave pairs, so a panel that re-renders itself (the class
+// HUD, the essence stash, a loot-filter row) cannot leave a stale tooltip
+// floating: the next mouse move resolves to nothing and hides it.
+//
+// Two details make it coexist with the older bespoke tooltips that also draw
+// into this same floating element (hub item chips, skill buttons):
+//   • CAPTURE phase - our hide/„show" runs BEFORE the target's own inline
+//     onmousemove/onmouseenter handlers, so crossing from a data-tip element
+//     to a bespoke-tooltip element never leaves our tip on top of theirs.
+//   • we only ever hide a tooltip this engine itself put up. A bespoke
+//     tooltip that is already showing is left alone.
+let _tipCurrentEl = null;
+
+function _installDelegatedTips() {
+    document.addEventListener('mousemove', (e) => {
+        const el = (e.target && e.target.closest) ? e.target.closest(_TIP_SELECTOR) : null;
+        if (el === _tipCurrentEl) {
+            if (el) moveGameTooltip(e);
+            return;
+        }
+        const owned = _tipCurrentEl !== null;
+        _tipCurrentEl = el;
+        if (!el) { if (owned) hideGameTooltip(); return; }
+        const html = _resolveTipHTML(el);
+        if (!html) { if (owned) hideGameTooltip(); return; }
+        showGameTooltip(html, e);
+    }, true);
+}
+
+
+//------------------------------------------------------------------------
 //----------------------------CONTENT BUILDERS-----------------------------
 //------------------------------------------------------------------------
 
@@ -139,7 +219,7 @@ function _buildMistakesTooltipHTML() {
     const isHardcore = typeof curMods !== 'undefined' && !!curMods.hardcore;
     let html = `<strong style="color:#ff5555">${t('cg_tt_mistakes')}</strong>`;
     if (isHardcore) {
-        html += `<br><span style="color:#ff5555;font-weight:700;">${t('hc_fail_title') || 'HARDCORE'}</span> — <span style="color:#ff7777;">${t('eg_too_many_mistakes') || '0 mistakes allowed — next mistake ends the run!'}</span>`;
+        html += `<br><span style="color:#ff5555;font-weight:700;">${t('hc_fail_title') || 'HARDCORE'}</span> - <span style="color:#ff7777;">${t('eg_too_many_mistakes') || '0 mistakes allowed - next mistake ends the run!'}</span>`;
         // When hardcore is active also show the 0-limit explicitly
         html += `<br>${t('cg_tt_total_level')} <b>${mistakeCount} / 0</b>`;
     } else {
@@ -156,7 +236,7 @@ function _buildMistakesTooltipHTML() {
         const max = _egGetMaxAllowedMistakes();
         if (max != null) {
             const remaining = Math.max(0, max - (typeof mistakeCount !== 'undefined' ? mistakeCount : 0));
-            html += `<br><span style="opacity:.7;">${t('eg_stat_allowed_mistakes') || 'Allowed'}: <b>${max}</b> — ${remaining} ${t('eg_mistakes_warning_1') ? '' : 'remaining'}</span>`;
+            html += `<br><span style="opacity:.7;">${t('eg_stat_allowed_mistakes') || 'Allowed'}: <b>${max}</b> - ${remaining} ${t('eg_mistakes_warning_1') ? '' : 'remaining'}</span>`;
         }
     }
     html += `<br>${t('cg_tt_next_cost')} <b>−${_fmtSecsAsMinSec(nextPenalty)}</b>`;
@@ -311,7 +391,7 @@ function _buildInventoryLabelTooltipHTML() {
         + `<br>${t('cg_inv_reward_pick').replace('{n}', typeof RESHUFFLE_GOAL !== 'undefined' ? RESHUFFLE_GOAL : 3)}`;
 }
 
-// 6. Setup-screen modifier tombstones — shows the same effect text as the
+// 6. Setup-screen modifier tombstones - shows the same effect text as the
 // per-tombstone description that appears underneath a tombstone while it
 // is selected (.mod-per-desc), but as a hover tooltip so the effect can
 // also be read before activating it. Reads the live sibling span, so a
@@ -321,7 +401,7 @@ function _buildModTombstoneTooltipHTML(btn) {
     return desc ? desc.innerHTML : '';
 }
 
-// 7. Title-screen expansion logo — expansion history.
+// 7. Title-screen expansion logo - expansion history.
 // Current expansion first, then older ones:
 // Expansion 2 "Rise of the Beasts" (current), Expansion 1
 // "Cartographers of Chance" (characters, cutscenes, world map,
@@ -376,60 +456,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Quiz / Math-Gate / Scouts Primer corner icon buttons (tutor / explanation /
-    // continue / new-q) describe themselves via a translation key in data-tip-t.
-    // Delegated on the overlays because the modal markup is static but the buttons
-    // are shown/hidden (and the primer rebuilds its overlay per question).
-    // The Tutor button's label is dynamic (item count / super-tutor), so its
-    // data-tip-t is refreshed in JS when it is re-labelled.
-    const showCornerTip = (btn, e) => {
-        let html = t(btn.dataset.tipT || '');
-        const n = btn.dataset.tipN;
-        if (n != null && n !== '') html = html.replace('{n}', n);
-        else html = html.replace(/\s*\(\{n\}\)/, ''); // count unknown → drop the placeholder cleanly
-        showGameTooltip(html, e);
-    };
-    const cornerHosts = [
-        document.getElementById('quiz-overlay'),
-        document.getElementById('mg-modal'),
-    ];
-    cornerHosts.forEach(host => {
-        if (!host) return;
-        host.addEventListener('mouseover', (e) => {
-            const btn = e.target.closest ? e.target.closest('.qr-corner') : null;
-            if (!btn) return;
-            showCornerTip(btn, e);
-        });
-        host.addEventListener('mousemove', (e) => {
-            if (e.target.closest && e.target.closest('.qr-corner')) moveGameTooltip(e);
-        });
-        host.addEventListener('mouseout', (e) => {
-            const btn = e.target.closest ? e.target.closest('.qr-corner') : null;
-            if (!btn) return;
-            const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.qr-corner') : null;
-            if (to !== btn) hideGameTooltip();
-        });
-    });
-
-    // The Scouts Primer overlay is built and appended per question, so it does
-    // not exist at setup time — delegate on the document, scoped to targets
-    // inside #primer-overlay, so quiz/mg hosts above never double-fire.
-    const inPrimer = (e) => e.target.closest && e.target.closest('#primer-overlay');
-    document.addEventListener('mouseover', (e) => {
-        if (!inPrimer(e)) return;
-        const btn = e.target.closest('.qr-corner');
-        if (btn) showCornerTip(btn, e);
-    });
-    document.addEventListener('mousemove', (e) => {
-        if (inPrimer(e) && e.target.closest('.qr-corner')) moveGameTooltip(e);
-    });
-    document.addEventListener('mouseout', (e) => {
-        if (!inPrimer(e)) return;
-        const btn = e.target.closest('.qr-corner');
-        if (!btn) return;
-        const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.qr-corner') : null;
-        if (to !== btn) hideGameTooltip();
-    });
+    // Every hint that used to be a native title="" is now a data-tip / data-tip-t
+    // attribute handled by the one delegated engine below - including the quiz /
+    // Math-Gate / Scouts-Primer corner buttons (tutor / explanation / continue /
+    // new-q), whose translation key lives in data-tip-t and whose item count
+    // lives in data-tip-n. Delegation is what makes this work for the Primer,
+    // which is rebuilt and re-appended per question.
+    _installDelegatedTips();
 
     // Title screen expansion logo ("Rise of the Beasts" EN/DE) → expansion-history tooltip.
     // Uses the bounding-box hover engine so the logo stays interactive
@@ -439,8 +472,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup-screen modifier tombstones → per-tombstone effect text on hover.
     // Delegated on the static #screen-setup element (the tombstones are
     // never re-created); scoped to the setup screen so the compact
-    // tombstones in the retry-setup modal — which have no .mod-per-desc
-    // sibling — stay untouched.
+    // tombstones in the retry-setup modal - which have no .mod-per-desc
+    // sibling - stay untouched.
     const setupScreen = document.getElementById('screen-setup');
     if (setupScreen) {
         setupScreen.addEventListener('mouseover', (e) => {

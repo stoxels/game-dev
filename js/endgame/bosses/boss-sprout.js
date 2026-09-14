@@ -2,26 +2,26 @@
 //-------------------BOSS: THE SPROUT (boss_sprout)-----------------------
 //------------------------------------------------------------------------
 // Garden-siege fight: the Sprout overgrows the PUZZLE itself. You fight
-// by filling cells — it fights by claiming them back.
+// by filling cells - it fights by claiming them back.
 //
 //   PERSISTENT (whole fight):
-//   • ROOT NETWORK — living vines periodically claim unsolved cells. A
+//   • ROOT NETWORK - living vines periodically claim unsolved cells. A
 //     vined cell can't be filled; clicking it PRUNES the vine (one extra
 //     click) before you can fill. Vines wither on their own after a while.
-//   • SPORE DRIFT — puffball spores drift across the screen in wavy lines;
+//   • SPORE DRIFT - puffball spores drift across the screen in wavy lines;
 //     touching one is a light physical hit.
 //
 //   HP GATES (watcher, like Puddle/Marksman):
-//   • 60% — BRAMBLE WALL: thorned brambles grow along all four grid edges.
+//   • 60% - BRAMBLE WALL: thorned brambles grow along all four grid edges.
 //     The grid's outermost ring of cells is locked for ~10s, and thorned
-//     whips lash outward from the brambles — heavy physical hit on contact.
-//   • 30% — BLOOMING DOOM: a giant flower bud grows over the grid, then
+//     whips lash outward from the brambles - heavy physical hit on contact.
+//   • 30% - BLOOMING DOOM: a giant flower bud grows over the grid, then
 //     BURSTS: pollen motes shower outward (contact damage) and nearby cells
-//     get pollen-dusted — disturbing (clicking) a dusted cell bursts pollen
+//     get pollen-dusted - disturbing (clicking) a dusted cell bursts pollen
 //     around YOU. The bud re-grows while phase 3 lasts.
 //
-//   CHARGE ATTACK — VINE LUNGE: when The Sprout's own attack bar fills, it
-//   doesn't fire a generic projectile — it LUNGES: a thorned tendril
+//   CHARGE ATTACK - VINE LUNGE: when The Sprout's own attack bar fills, it
+//   doesn't fire a generic projectile - it LUNGES: a thorned tendril
 //   telegraphs across the whole screen along a line through your current
 //   position (~1s), then whips. Heavy physical hit if it catches you.
 //
@@ -119,12 +119,12 @@ function _egSproutTeardown() {
     _egSproutWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
-    // watcher BEFORE this runs — the overlays must go either way.
+    // watcher BEFORE this runs - the overlays must go either way.
     _egSproutSweep();
 }
 
 
-// Unsolved cells (player value ≠ solution value) — the vine pool.
+// Unsolved cells (player value ≠ solution value) - the vine pool.
 function _egSproutVinePool() {
     if (typeof cur === 'undefined' || !cur || !cur.grid) return [];
     const sol = cur.grid, usr = (typeof userGrid !== 'undefined') ? userGrid : null;
@@ -176,7 +176,7 @@ function _egSproutCellIntercept(row, col) {
         }
     }
     // Pollen dust: disturbing the cell bursts pollen around the player.
-    // Returns false — the fill/mark itself still happens (tempo pressure).
+    // Returns false - the fill/mark itself still happens (tempo pressure).
     if (st.dust.has(`${row}-${col}`)) _egSproutPollenBurst(st);
     return false;
 }
@@ -206,7 +206,7 @@ function _egSproutPollenBurst(st) {
 //------------------------------------------------------------------------
 // The Sprout's own charge-bar attack. A thorned tendril telegraphs across
 // the whole screen along a band through the player's CURRENT position,
-// then whips — Brutus's Ground Slam pattern, but a line instead of a band.
+// then whips - Brutus's Ground Slam pattern, but a line instead of a band.
 // Own dodge-type run: dodge-busy holds so no other mechanic overlaps, and
 // pause-safe (the telegraph freezes with the rest of the game).
 function _egSproutVineLunge(monster) {
@@ -238,7 +238,7 @@ function _egSproutVineLunge(monster) {
         band.style.transform = 'rotate(90deg)';
     }
 
-    _egNkToast('eg_sprout_lunge', '🌱 The Sprout LUNGES — a thorned tendril whips across the screen!');
+    _egNkToast('eg_sprout_lunge', '🌱 The Sprout LUNGES - a thorned tendril whips across the screen!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_thorn'); } catch (e) {}
 
     // warn → strike → fade (Brutus slam state machine).
@@ -290,7 +290,7 @@ function _egSproutArenaInit(monster) {
     // wall/bloom pacing breathe with tier, like the Marksman's aim and the
     // lunge. `now`-stamp hit cooldowns stay real-time (fairness floor).
     // Passive run: the watcher lives the whole fight, so it must not hog
-    // _egNkDodgeBusy() — sproutlings, the lunge, and other set-pieces
+    // _egNkDodgeBusy() - sproutlings, the lunge, and other set-pieces
     // check that flag to avoid stacking on an active dodge set-piece.
     const run = _egNkNewRun(monsterId, true);
     run.passive = true;
@@ -446,7 +446,7 @@ function _egSproutArenaInit(monster) {
             if (st.rebloomAt <= st.rebloomAcc) { st.rebloomAt = 0; _egSproutGrowBud(st); }
         }
 
-        // Pollen dust expiry — blinks while about to clear so "wait it out"
+        // Pollen dust expiry - blinks while about to clear so "wait it out"
         // is a visible, planned option rather than a hidden timer.
         // Dust lives on the run's internal clock (tier-scaled), so the
         // wait-it-out window breathes with difficulty like every telegraph.
@@ -528,7 +528,7 @@ function _egSproutBrambleWall(st) {
     });
     // Root tendrils + cell locks: the wall visibly roots into the outermost
     // ring of cells (connector from the strip into each ring cell) and every
-    // ring cell gets a thorn badge + pulsing green seal — so "these cells are
+    // ring cell gets a thorn badge + pulsing green seal - so "these cells are
     // the ones the wall is blocking" reads at a glance.
     const rows = (typeof cur !== 'undefined' && cur && cur.grid) ? cur.grid.length : 0;
     const cols = rows ? (cur.grid[0] ? cur.grid[0].length : 0) : 0;
@@ -572,7 +572,7 @@ function _egSproutBrambleWall(st) {
         }
     }
     st.bramble = { t: 0, strips, whips, connEls, lockEls };
-    _egNkToast('eg_sprout_bramble', '🌿 Bramble Wall! The edges are overgrown — mind the thorns!');
+    _egNkToast('eg_sprout_bramble', '🌿 Bramble Wall! The edges are overgrown - mind the thorns!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_thorn'); } catch (e) {}
 }
 
@@ -599,7 +599,7 @@ function _egSproutGrowBud(st) {
     el.style.fontSize = EG_SPROUT_BUD_R + 'px';
     el.style.transform = 'translate(-50%,-50%) scale(0.15)';
     st.bud = { r, c, t: 0, el };
-    _egNkToast('eg_sprout_bud', '🌸 A doom bud is swelling — something is about to bloom!');
+    _egNkToast('eg_sprout_bud', '🌸 A doom bud is swelling - something is about to bloom!');
 }
 
 
@@ -647,7 +647,7 @@ function _egSproutBloom(st, br, bc, tNow) {
             born: 0, life: EG_SPROUT_MOTE_LIFE_MS, el,
         });
     }
-    _egNkToast('eg_sprout_bloom', '🌼 The doom bud bursts — ' + dusted + ' cells are dusted! Fill them and the pollen finds you!');
+    _egNkToast('eg_sprout_bloom', '🌼 The doom bud bursts - ' + dusted + ' cells are dusted! Fill them and the pollen finds you!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_bloom'); } catch (e) {}
 }
 
@@ -655,7 +655,7 @@ function _egSproutBloom(st, br, bc, tNow) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: SPROUTLINGS---------------------------------
 //------------------------------------------------------------------------
-// The classic chase — a pack of sproutlings scuttles after the player for
+// The classic chase - a pack of sproutlings scuttles after the player for
 // a while. Kept from the original fight, now phase-scaled and with the
 // polished leaf-wiggle visual.
 function _egMechSproutlings(monster, phase) {

@@ -1,10 +1,10 @@
 //------------------------------------------------------------------------
-//-------------------SHARED — PUZZLE HELPERS----------------------
+//-------------------SHARED - PUZZLE HELPERS----------------------
 //------------------------------------------------------------------------
 
 // Fisher-Yates shuffle, bias-selection plumbing (Targeted Reveal /
 // Dense Marker passives) and grid snapshot helpers (pre-filled rows
-// and cols) — used by several puzzle item files.
+// and cols) - used by several puzzle item files.
 
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -36,7 +36,7 @@ function _findUnsolvedRowByFill(sol, rows, wantMax) {
 }
 
 
-// Column counterpart of _findUnsolvedRowByFill — see that function for the
+// Column counterpart of _findUnsolvedRowByFill - see that function for the
 // wantMax semantics.
 function _findUnsolvedColByFill(sol, cols, wantMax) {
     let bestCol = -1;
@@ -110,7 +110,7 @@ function _getPreFilledRows() {
         for (let c = 0; c < cols; c++) {
             if (sol[r][c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])) {
                 filledRows.add(r);
-                break; // one filled cell is enough — move to the next row
+                break; // one filled cell is enough - move to the next row
             }
         }
     }
@@ -130,7 +130,7 @@ function _getPreFilledCols() {
         for (let r = 0; r < rows; r++) {
             if (sol[r][c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])) {
                 filledCols.add(c);
-                break; // one filled cell is enough — move to the next column
+                break; // one filled cell is enough - move to the next column
             }
         }
     }

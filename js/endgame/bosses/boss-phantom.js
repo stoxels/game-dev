@@ -2,7 +2,7 @@
 //-------------------BOSS: THE PHANTOM (boss_phantom)---------------------------
 //------------------------------------------------------------------------
 // Vent-assassin homage: three vents breathe on the arena floor. The Phantom
-// telegraphs at the vent nearest you — then steps out and slashes. Never
+// telegraphs at the vent nearest you - then steps out and slashes. Never
 // linger beside a breathing vent.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -57,7 +57,7 @@ function _egMechVentAmbush(monster, phase) {
         if (idx >= strikes) return false;
         t += dtS * 1000;
         if (stage === 'pick') {
-            // Strike from the vent nearest the player — always personal.
+            // Strike from the vent nearest the player - always personal.
             const c = _egNkPlayerCenter();
             vent = vents[0];
             if (c) {

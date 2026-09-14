@@ -22,7 +22,7 @@ const EG_LOOT_DROP_CHANCE_NORMAL = 0.35;  // 35% per normal monster kill
 const EG_LOOT_DROP_CHANCE_BOSS = 1.00;  // bosses always drop
 
 // Lifetime of an uncollected loot drop on the grid (ms).
-// Intentionally longer than heart pickups — no rush to grab loot.
+// Intentionally longer than heart pickups - no rush to grab loot.
 const EG_LOOT_DROP_LIFETIME_MS = 60000;
 
 // How long (ms) before a drop expires its countdown timer appears above it.
@@ -81,8 +81,8 @@ function _egManaTierMult() {
 //   scaledBase = round(base * tierMult)
 //   effective  = (scaledBase + flat) * (1 + incPct/100)
 // Gear provides two stats that modify heart healing:
-//   heartHealFlat   — flat +# added to every heart (e.g. "+15 to Heart Heal Amount")
-//   heartHealIncPct — #% increased Heart Heal Amount (multiplier on the total)
+//   heartHealFlat   - flat +# added to every heart (e.g. "+15 to Heart Heal Amount")
+//   heartHealIncPct - #% increased Heart Heal Amount (multiplier on the total)
 function _egCalcHeartHeal(baseAmount) {
     let flat = 0;
     let incPct = 0;
@@ -91,7 +91,7 @@ function _egCalcHeartHeal(baseAmount) {
             const s = _egComputePlayerStats();
             flat = Number(s.heartHealFlat) || 0;
             incPct = Number(s.heartHealIncPct) || 0;
-        } catch (e) { /* stats unavailable (e.g. outside endgame) — use base */ }
+        } catch (e) { /* stats unavailable (e.g. outside endgame) - use base */ }
     }
     const tierMult = _egHeartTierMult();
     const scaledBase = Math.round(baseAmount * tierMult);
@@ -102,9 +102,9 @@ function _egCalcHeartHeal(baseAmount) {
 // Helper: computes the effective mana gain from a mana pickup after map-tier and gear bonuses.
 // Mirrors _egCalcHeartHeal but with a lower tier multiplier so mana sustain grows
 // more slowly than life sustain with map tier.
-//   manaHealFlat   — flat +# added to every mana pickup (e.g. "+15 to Mana Gain")
-//   manaHealIncPct — #% increased Mana Gained (multiplier on the total)
-//   scaledBase = round(base * tierMult)  — skipped for the full-restore orb (base == maxMana)
+//   manaHealFlat   - flat +# added to every mana pickup (e.g. "+15 to Mana Gain")
+//   manaHealIncPct - #% increased Mana Gained (multiplier on the total)
+//   scaledBase = round(base * tierMult)  - skipped for the full-restore orb (base == maxMana)
 //   effective  = (scaledBase + flat) * (1 + incPct/100)
 function _egCalcManaGain(baseAmount) {
     let flat = 0;
@@ -114,10 +114,10 @@ function _egCalcManaGain(baseAmount) {
             const s = _egComputePlayerStats();
             flat = Number(s.manaHealFlat) || 0;
             incPct = Number(s.manaHealIncPct) || 0;
-        } catch (e) { /* stats unavailable (e.g. outside endgame) — use base */ }
+        } catch (e) { /* stats unavailable (e.g. outside endgame) - use base */ }
     }
     let tierMult = _egManaTierMult();
-    // Full-restore orb (base == maxMana) should not be tier-scaled — it already
+    // Full-restore orb (base == maxMana) should not be tier-scaled - it already
     // restores the entire pool and gainMana() clamps to max anyway. Detect it
     // so the toast reflects the true gain instead of an inflated 2× value.
     if (typeof _getPlayerMaxMana === 'function') {
@@ -133,11 +133,11 @@ function _egCalcManaGain(baseAmount) {
 
 // Pickup definitions
 // Each entry describes one pickup type that can appear on grid tiles.
-//   id        — unique key, referenced by EG_PICKUP_WEIGHTS
-//   emoji     — shown on the tile overlay and in the claim toast
-//   label     — human-readable name (for future UI use)
-//   rarity    — 'common' | 'uncommon' | 'rare'  (controls glow CSS class)
-//   onPickup  — called with (row, col) when the player claims the pickup
+//   id        - unique key, referenced by EG_PICKUP_WEIGHTS
+//   emoji     - shown on the tile overlay and in the claim toast
+//   label     - human-readable name (for future UI use)
+//   rarity    - 'common' | 'uncommon' | 'rare'  (controls glow CSS class)
+//   onPickup  - called with (row, col) when the player claims the pickup
 //
 // To add new pickup types (items, currency, etc.) add an entry here and a
 // corresponding weight entry in EG_PICKUP_WEIGHTS. No other code needs changing.
@@ -172,7 +172,7 @@ const EG_PICKUP_DEFS = {
             Audio_Manager.playSFX('heart_heals');
         },
     },
-    // Mana orbs — endgame only (mana system is gated to isEndgameLevel()).
+    // Mana orbs - endgame only (mana system is gated to isEndgameLevel()).
     // gainMana() clamps to max mana, applies the map's "% reduced Mana
     // gained" mod and refreshes the HUD bar; it returns the amount actually
     // gained so the toast stays honest when the pool is nearly full.
@@ -294,11 +294,11 @@ const EG_PICKUP_WEIGHTS = [
     { id: 'heart_small', weight: 60 },
     { id: 'heart_medium', weight: 30 },
     { id: 'heart_large', weight: 10 },
-    { id: 'mana_small', weight: 25 },      // ~17% — mana counterpart to hearts
+    { id: 'mana_small', weight: 25 },      // ~17% - mana counterpart to hearts
     { id: 'mana_medium', weight: 12 },
-    { id: 'mana_full', weight: 4 },        // full restore — rarest pickup
-    { id: 'cooldown_surge', weight: 8 },   // ~7% — a bit more common than eraser
-    { id: 'mistake_eraser', weight: 5 },   // ~4% — somewhat rare
+    { id: 'mana_full', weight: 4 },        // full restore - rarest pickup
+    { id: 'cooldown_surge', weight: 8 },   // ~7% - a bit more common than eraser
+    { id: 'mistake_eraser', weight: 5 },   // ~4% - somewhat rare
 ];
 
 
@@ -337,7 +337,7 @@ function _egPickRandomPickup() {
         roll -= entry.weight;
         if (roll <= 0) return EG_PICKUP_DEFS[entry.id];
     }
-    return EG_PICKUP_DEFS['heart_small']; // fallback — should never be reached
+    return EG_PICKUP_DEFS['heart_small']; // fallback - should never be reached
 }
 
 // Returns true if the cell at (row, col) is eligible to host a pickup.
@@ -367,7 +367,7 @@ function _egBuildPickupEligiblePool() {
 
 // Returns true when ANY drop type (heart pickup, loot, currency, item,
 // map) currently occupies the cell at (row, col). Used by every
-// spawner so two different drops can never stack on the same cell —
+// spawner so two different drops can never stack on the same cell -
 // stacked overlays would leave a stuck visual behind after a claim.
 function _egCellHasAnyDrop(row, col) {
     const key = `${row}-${col}`;
@@ -375,7 +375,8 @@ function _egCellHasAnyDrop(row, col) {
         || _egLootDrops.has(key)
         || _egCurrencyDrops.has(key)
         || _egItemDrops.has(key)
-        || (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key));
+        || (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key))
+        || (typeof _charmCellHasDrop === 'function' && _charmCellHasDrop(row, col));
 }
 
 // Injects the pickup emoji overlay span into the cell's DOM element.
@@ -538,7 +539,7 @@ function _egResumeGridDrops() {
             cd.interval = setInterval(tick, 250);
         };
         if (cd.delayRemaining <= 0) {
-            // warning period already started before pause — start ticking immediately
+            // warning period already started before pause - start ticking immediately
             startInterval();
         } else {
             cd.timeout = setTimeout(() => {
@@ -726,7 +727,7 @@ function _egSpawnPickup() {
     _egSchedulePickupExpiry(key, def);
 }
 
-// Places a healing heart on a random eligible grid cell — used when a
+// Places a healing heart on a random eligible grid cell - used when a
 // sacrificial zombie add is killed by the player. Unlike the ambient
 // spawner this is a direct on-kill reward, so it may sit on the board next
 // to the ambient pickup (total capped at one extra). Returns true when a
@@ -784,6 +785,7 @@ function _egStopPickupSpawner() {
     if (typeof _egStopItemDrops === 'function') _egStopItemDrops();
     if (typeof _egStopGoldDrops === 'function') _egStopGoldDrops();
     if (typeof _egStopMapDrops === 'function') _egStopMapDrops();
+    if (typeof _charmStopDrops === 'function') _charmStopDrops();
 }
 
 
@@ -823,7 +825,7 @@ function _egCheckPickupClaim(row, col) {
 
 // Called when the player makes the WRONG action on a cell that has a pickup.
 // (correct cell + right-click, or wrong cell + left-click)
-// Silently discards the pickup — no reward, no animation.
+// Silently discards the pickup - no reward, no animation.
 function _egDiscardPickup(row, col) {
     if (!_egIsActive()) return;
     const key = `${row}-${col}`;
@@ -846,11 +848,11 @@ function _egDiscardPickup(row, col) {
 //------------------------------------------------------------------------
 // Loot drops are placed on the grid when a monster dies (chance-based).
 // They use the same eligible-cell pool as hearts but have their own
-// lifetime, visual, and — on claim — go into a per-run temp inventory
+// lifetime, visual, and - on claim - go into a per-run temp inventory
 // instead of granting immediate HP.
 //------------------------------------------------------------------------
 
-// Unlimited stash: always has space (grows on demand). Kept for compat — callers no longer need to gate drops.
+// Unlimited stash: always has space (grows on demand). Kept for compat - callers no longer need to gate drops.
 function _egStashHasFreeSlot() {
     return true;
 }
@@ -893,11 +895,11 @@ function _egAnimateLootClaim(row, col, item) {
 }
 
 // Attempts to place one loot drop on the grid after a monster dies.
-// isBoss — pass true for guaranteed drop chance.
+// isBoss - pass true for guaranteed drop chance.
 function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     if (!_egIsActive()) return;
 
-    // Unlimited stash: no longer gated — _egStashHasFreeSlot() always true
+    // Unlimited stash: no longer gated - _egStashHasFreeSlot() always true
 
     const baseChance = isBoss ? EG_LOOT_DROP_CHANCE_BOSS : EG_LOOT_DROP_CHANCE_NORMAL;
     // Active map's loot quantity bonus scales the drop chance up.
@@ -919,7 +921,7 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     // Generate the item that will drop (uses the equipment generator if available,
     // otherwise falls back to a simple placeholder object).
     let item;
-    // Uniques first — a small golden-tier chance replaces the regular roll.
+    // Uniques first - a small golden-tier chance replaces the regular roll.
     if (typeof _egTryGenerateUniqueDrop === 'function') {
         item = _egTryGenerateUniqueDrop(monsterLevel);
     }
@@ -941,7 +943,7 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
 const EG_LOOT_EXPLOSION_EQUIPMENT = 5;      // equipment pieces
 const EG_LOOT_EXPLOSION_STAGGER_MS = 150;   // cascade delay between drops
 
-// Places a single loot item on a free cell — no chance roll, no board cap.
+// Places a single loot item on a free cell - no chance roll, no board cap.
 // Used by the loot explosion. Returns true when the item was placed.
 function _egPlaceLootDropForce(item) {
     const pool = _egBuildPickupEligiblePool();
@@ -1006,13 +1008,13 @@ function _egSpawnLootExplosion(monsterLevel = 1) {
 // Called from renderCell whenever a cell becomes visually revealed
 // (via an ability, passive ability, or item reveal effect).
 // Revealed cells can no longer be filled by the player, so any drop
-// sitting there would be permanently unclaimable — instead it is
+// sitting there would be permanently unclaimable - instead it is
 // automatically picked up using the normal claim flow.
 function _egAutoClaimDropsOnReveal(row, col) {
     if (!_egIsActive()) return;
     const key = `${row}-${col}`;
 
-    // Claim every drop type present (not else-if) — spawn guards now keep
+    // Claim every drop type present (not else-if) - spawn guards now keep
     // drops from stacking, but this stays defensive so a stacked legacy
     // state can never leave a stuck overlay behind.
     if (_egPickups.has(key)) _egCheckPickupClaim(row, col);
@@ -1020,10 +1022,14 @@ function _egAutoClaimDropsOnReveal(row, col) {
     if (_egCurrencyDrops.has(key)) _egCheckCurrencyDropClaim(row, col);
     if (_egItemDrops.has(key)) _egCheckItemDropClaim(row, col);
     if (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key)) _egCheckMapDropClaim(row, col);
+    if (typeof _charmAutoClaimOnReveal === 'function') _charmAutoClaimOnReveal(row, col);
 }
 
 // Called when the player correctly claims the cell that holds a loot drop.
-// Adds the item to the run's temporary loot bag and refreshes the HUD.
+// Adds the item to the run's temporary loot bag AND instantly to the stash
+// (mirroring currency/item drops) so pressing B mid-puzzle shows it at once.
+// The run bag keeps the reference for the leave-map summary; _egFlushRunLootToStash
+// skips already-stashed items via item._egStashed, so no duplication occurs.
 // Returns true if a loot drop was present and claimed.
 function _egCheckLootClaim(row, col) {
     if (!_egIsActive()) return false;
@@ -1050,6 +1056,19 @@ function _egCheckLootClaim(row, col) {
     }
 
     _egRunLoot.push(item);
+    // Instant stash (campaign + endgame): the B overlay reads _egInventory,
+    // so the item must land there now - not only at map clear. Uniques route
+    // to the collection via _egAddItemToStash; failures fall back to the bag.
+    try {
+        if (typeof _egAddItemToStash === 'function') {
+            const prevMute = (typeof window !== 'undefined' ? window._egMuteUniqueToast : false);
+            if (typeof window !== 'undefined') window._egMuteUniqueToast = true;
+            _egAddItemToStash(item);
+            if (typeof window !== 'undefined') window._egMuteUniqueToast = prevMute;
+            item._egStashed = true;
+            if (typeof egSaveHubState === 'function') egSaveHubState();
+        }
+    } catch (e) { /* stash failure must never block the claim - flush retries at map end */ }
     _egUpdateObjectivesHUD();
 
     if (typeof trackAchStat === 'function') try {
@@ -1094,11 +1113,16 @@ function _egStopLootDrops() {
 // Flushes all run loot into the first available stash slots.
 // Call this on successful map clear, BEFORE _egChainCleanup resets the state.
 // Unlimited stash: grows rows as needed so nothing is ever lost.
+// Idempotent: items already stashed instantly on claim (item._egStashed)
+// are skipped so a mid-run B-open flush + the end-of-run flush never duplicate.
 function _egFlushRunLootToStash() {
     if (_egRunLoot.length === 0) return;
 
+    const pending = _egRunLoot.filter((it) => it && !it._egStashed);
+    if (pending.length === 0) return;
+
     let placedInv = 0, placedUniq = 0;
-    for (const item of _egRunLoot) {
+    for (const item of pending) {
         const isUniq = !!(item && item.isUnique);
         if (typeof _egAddItemToStash === 'function') {
             // _egAddItemToStash routes uniques to the collection (which toasts itself); suppress its internal toast during bulk flush
@@ -1107,9 +1131,10 @@ function _egFlushRunLootToStash() {
             if (isUniq && typeof window !== 'undefined') window._egMuteUniqueToast = true;
             _egAddItemToStash(item);
             if (typeof window !== 'undefined') window._egMuteUniqueToast = prevMute;
+            item._egStashed = true;
             if (isUniq) placedUniq++; else placedInv++;
         } else {
-            if (isUniq && typeof _egAddUniqueToCollection === 'function') { _egAddUniqueToCollection(item); placedUniq++; }
+            if (isUniq && typeof _egAddUniqueToCollection === 'function') { _egAddUniqueToCollection(item); item._egStashed = true; placedUniq++; }
             else {
                 let done = false;
                 for (let r = 0; r < _egInventory.length && !done; r++) {
@@ -1120,15 +1145,16 @@ function _egFlushRunLootToStash() {
                     _egInventory[_egInventory.length - 1][0] = item;
                     placedInv++;
                 }
+                item._egStashed = true;
             }
         }
     }
 
     if (placedInv > 0 || placedUniq > 0) {
         if (placedUniq > 0 && placedInv === 0) {
-            // uniques only — single aggregate toast handled via collection helper? Provide one aggregate
+            // uniques only - single aggregate toast handled via collection helper? Provide one aggregate
             showToast(placedUniq === 1
-                ? t('eg_unique_added_to_collection').replace('{name}', _egRunLoot.find(i=>i.isUnique)?.name || 'Unique')
+                ? t('eg_unique_added_to_collection').replace('{name}', pending.find(i=>i.isUnique)?.name || 'Unique')
                 : t('eg_stash_added_many').replace('{n}', placedUniq) + ' → Unique Collection');
         } else if (placedUniq > 0 && placedInv > 0) {
             showToast(t('eg_stash_added_many').replace('{n}', placedInv) + ` + ${placedUniq} Unique(s) → Collection`);
@@ -1152,9 +1178,9 @@ function _egReplaceCarriedLootDrops(items) {
     if (!items || items.length === 0) return;
 
     items.forEach(item => {
-        // Unlimited stash: no cap — always re-place carried loot
+        // Unlimited stash: no cap - always re-place carried loot
 
-        // Carry-over must preserve every pending drop — even the 5-item
+        // Carry-over must preserve every pending drop - even the 5-item
         // loot explosion. The normal "1 on board" cap only applies to
         // fresh spawns, not to loot we are rescuing from a solved grid.
         const pool = _egBuildPickupEligiblePool();
@@ -1184,7 +1210,7 @@ function _egReplaceCarriedLootDrops(items) {
 //-------------------MONSTER CURRENCY DROPS--------------------------------
 //------------------------------------------------------------------------
 // Same idea as loot drops (above), but for currency orbs. Orbs land on
-// the grid and must be claimed by filling the correct cell — they no
+// the grid and must be claimed by filling the correct cell - they no
 // longer go straight into the currency strip on kill.
 
 function _egRenderCurrencyDropOverlay(row, col, def) {
@@ -1351,7 +1377,7 @@ function _egReplaceCarriedCurrencyDrops(defs) {
 //------------------------------------------------------------------------
 
 // Chance (0–1) that a defeated monster drops a regular item onto the grid.
-// Intentionally rare — items are a bonus, not the expected reward.
+// Intentionally rare - items are a bonus, not the expected reward.
 const EG_ITEM_DROP_CHANCE_NORMAL = 0.05;  // 5% per normal monster kill
 const EG_ITEM_DROP_CHANCE_BOSS = 0.25;  // 25% per boss kill
 
@@ -1398,8 +1424,8 @@ function _egAnimateItemDropClaim(row, col, drop) {
 }
 
 // Attempts to place one regular-item drop on the grid after a monster dies.
-// isBoss — pass true for the higher boss drop chance.
-// Ironman: puzzle items never spawn — only currency/equipment/maps/hearts/mana/eraser/surge do.
+// isBoss - pass true for the higher boss drop chance.
+// Ironman: puzzle items never spawn - only currency/equipment/maps/hearts/mana/eraser/surge do.
 function _egSpawnItemDrop(isBoss = false) {
     if (!_egIsActive()) return;
     if (typeof curMods !== 'undefined' && curMods.ironman) return;

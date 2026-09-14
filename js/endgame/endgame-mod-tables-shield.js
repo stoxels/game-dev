@@ -1,8 +1,8 @@
 //  endgame-mod-tables-shield.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------SHIELD MODIFIER TABLE--------------------------------
@@ -10,8 +10,8 @@
 // Defensive-only derivative of EG_MOD_TABLE_WEAPON2. Shields must not
 // roll offensive stats (spell damage / channel are offhand-item identity,
 // attack mods live on WEAPON1), so those families are stripped here while
-// everything else — local defences, block & dodge suffixes, shield_bash,
-// attributes, regen and utility — carries over unchanged.
+// everything else - local defences, block & dodge suffixes, shield_bash,
+// attributes, regen and utility - carries over unchanged.
 
 const EG_MOD_TABLE_SHIELD = (() => {
     const offensivePrefixIds = ['spell_damage', 'inc_spell_damage', 'channel'];
@@ -61,7 +61,7 @@ const EG_MOD_TABLE_RANGED = {
 
         // --- FLAT PHYSICAL DAMAGE ---
         // Lower ceiling than melee weapon since projectiles fire on
-        // every correct cell reveal — high frequency compensates.
+        // every correct cell reveal - high frequency compensates.
         flat_physical_damage: {
             id: 'flat_physical_damage',
             label: 'Adds # to @ Physical Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ physischen Schaden hinzu',
@@ -88,7 +88,7 @@ const EG_MOD_TABLE_RANGED = {
         // --- FLAT ELEMENTAL DAMAGE ---
         // Lower than melee weapon, on par with amulet/ring since
         // projectiles fire frequently. Choose one element per build
-        // — a prefix slot competes with physical damage and crit.
+        // - a prefix slot competes with physical damage and crit.
         fire_damage: {
             id: 'fire_damage',
             label: 'Adds # to @ Fire Damage to Projectiles', labelDe: 'Fügt Projektilen # bis @ Feuerschaden hinzu',
@@ -131,7 +131,7 @@ const EG_MOD_TABLE_RANGED = {
         },
 
         // --- CRITICAL STRIKES ---
-        // On par with bracers — projectiles fire often so crit chance
+        // On par with bracers - projectiles fire often so crit chance
         // translates to frequent procs. Intentionally below melee weapon
         // ceiling since ranged already benefits from sheer frequency.
         crit_chance: {
@@ -160,7 +160,7 @@ const EG_MOD_TABLE_RANGED = {
         // to hit the next monster behind it (in a different spawn
         // location along the same trajectory). A single-target reveal
         // becomes a two-for-one when pierce fires, making it especially
-        // strong on dense maps. Does not chain further — only one extra
+        // strong on dense maps. Does not chain further - only one extra
         // target. Competes with elemental damage and crit for prefix
         // budget.
         pierce: {
@@ -178,7 +178,7 @@ const EG_MOD_TABLE_RANGED = {
     suffixes: {
 
         // --- ATTRIBUTES ---
-        // Agility is primary for a ranged weapon — the steady aim and
+        // Agility is primary for a ranged weapon - the steady aim and
         // quick draw. Rolls with better weight than strength or intelligence.
         agility: {
             id: 'agility',
@@ -215,7 +215,7 @@ const EG_MOD_TABLE_RANGED = {
         },
 
         // --- ACCURACY ---
-        // Projectiles can miss — the highest-weight accuracy slot after
+        // Projectiles can miss - the highest-weight accuracy slot after
         // the melee weapon. A ranged build should invest here to make
         // every reveal count. Better weights than bracers/armour slots.
         accuracy: {
@@ -233,7 +233,7 @@ const EG_MOD_TABLE_RANGED = {
         // --- LIFE LEECH ---
         // Each projectile drains a fraction of the damage dealt as life.
         // Lower ceiling than the melee weapon's leech suffix since
-        // projectiles fire much more often — the frequent procs more
+        // projectiles fire much more often - the frequent procs more
         // than compensate for the smaller per-hit %.
         life_leech: {
             id: 'life_leech',
@@ -248,7 +248,7 @@ const EG_MOD_TABLE_RANGED = {
 
         // --- ON-HIT STATUS EFFECTS ---
         // Lower % than the melee weapon because projectiles fire on
-        // every correct cell reveal — even modest chances produce many
+        // every correct cell reveal - even modest chances produce many
         // procs over a map. Balanced around roughly the same expected
         // procs-per-map as the melee weapon's higher-per-hit values.
         chance_to_ignite: {

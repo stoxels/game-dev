@@ -1,5 +1,5 @@
 //  endgame-hub-uniques.js
-//  UNIQUE COLLECTION — extracted 2026-09-10 from endgame-hub.js
+//  UNIQUE COLLECTION - extracted 2026-09-10 from endgame-hub.js
 //  (unique stash helpers). MUST load BEFORE endgame-hub.js: hub.js's
 //  load-time _egLoadHubState() calls _egEnsureUniqueStash() unguarded.
 //  Load-time code here: none (pure function declarations).
@@ -24,7 +24,7 @@ function _egAddUniqueToCollection(item) {
     if (_egStashTab === 'uniques') _egRenderUniqueStash();
     _egUpdateUniqueTabBadge();
     try { egSaveHubState(); } catch(e) {}
-    // toast — muted during bulk flush
+    // toast - muted during bulk flush
     if (typeof window !== 'undefined' && window._egMuteUniqueToast) return;
     try {
         const nm = item.name || uid;

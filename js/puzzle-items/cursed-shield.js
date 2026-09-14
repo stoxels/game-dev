@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------CURSED SHIELD — DEMON EYE----------------------
+//-------------------CURSED SHIELD - DEMON EYE----------------------
 //------------------------------------------------------------------------
 
-// cursedShield — activates shield and reveals 2 cells; downside blacks out row clues.
+// cursedShield - activates shield and reveals 2 cells; downside blacks out row clues.
 function _useCursedShield(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -31,8 +31,8 @@ function _fxMakeEyeScanLines(container, r) {
     }
 }
 
-// 👁️ Cursed Shield — demonic eye opens, then rows black out.
-// 👁️ Cursed Shield — demonic eye opens, then rows black out.
+// 👁️ Cursed Shield - demonic eye opens, then rows black out.
+// 👁️ Cursed Shield - demonic eye opens, then rows black out.
 function _fxCursedShield() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

@@ -35,7 +35,7 @@ let _egBossFrozen = new Map();    // key:"row-col" → { thawTimer, creepTimer, 
 // Active loot drops on the grid: key "row-col" → item object
 let _egLootDrops = new Map();
 
-// Per-run temporary loot bag — items the player has claimed this map run.
+// Per-run temporary loot bag - items the player has claimed this map run.
 // Flushed to the stash on successful map completion.
 let _egRunLoot = [];
 
@@ -67,7 +67,7 @@ let _egRecentFills = [];
 let _egDragChargeDamage = 0;   // accumulated damage of the current stroke
 let _egDragChargeElements = { fire: 0, cold: 0, lightning: 0, shadow: 0 }; // accumulated per-element share of _egDragChargeDamage
 let _egDragChargeStacks = 0;   // number of painted cells in the current stroke
-let _egDragChargeRow = -1;     // stroke start cell — launch origin of the shot
+let _egDragChargeRow = -1;     // stroke start cell - launch origin of the shot
 let _egDragChargeCol = -1;
 let _egDragChargeWasCrit = false; // true if ANY cell in the current stroke rolled a crit
 
@@ -76,15 +76,25 @@ let _egDragChargeWasCrit = false; // true if ANY cell in the current stroke roll
 let _egMapDef = null;
 
 
-// --- PLAYER MELEE CONSTANTS ---
-// Base auto-strike charge time in seconds when no weapon is equipped.
-// The equipped weapon's attackIntervalSeconds defines the actual base
-// (see _egGetPlayerAttackInterval in endgame-player-stats.js); the
-// weapon's attack_speed mods then subtract seconds from it.
+// --- PLAYER MELEE CONSTANTS (Secret-of-Mana-style manual charge) ---
+// The melee bar charges over time and is spent by MANUAL attacks (E key):
+// the strike deals charge% of full damage (100% charge = 100% damage) and
+// resets the bar to zero. There are no automatic melee strikes.
+// Base charge time in seconds when no weapon is equipped. The equipped
+// weapon's attackIntervalSeconds defines the actual base (see
+// _egGetPlayerAttackInterval in endgame-player-stats.js); the weapon's
+// attack_speed mods then subtract seconds from it, and
+// EG_PLAYER_CHARGE_TIME_MULT shortens the result globally.
 const EG_PLAYER_DEFAULT_ATTACK_INTERVAL = 10;
-const EG_PLAYER_MIN_ATTACK_INTERVAL = 2; // Lower clamp so strikes can't be spammed
-const EG_PLAYER_MELEE_DAMAGE = 10; // Default flat damage
+const EG_PLAYER_MIN_ATTACK_INTERVAL = 2; // Lower clamp so charges can't be spammed
+const EG_PLAYER_MELEE_DAMAGE = 20; // Default flat damage of a fully-charged unarmed strike
 const EG_PLAYER_MELEE_ANIM_DURATION_MS = 500; // Matches monster melee duration
+// Global melee balance for the manual system: manual strikes land far less
+// often than the old auto-strikes did, so the melee channel hits harder.
+const EG_MELEE_DAMAGE_MULT = 2.0;
+// Global charge pacing for the manual system (0.65 = ~35% faster than the
+// old auto-strike intervals, which now serve as time-to-full-charge).
+const EG_PLAYER_CHARGE_TIME_MULT = 0.65;
 
 
 // ── Absorption shield state ───────────────────────────────────────────────
@@ -104,8 +114,13 @@ let _egArcaneSurgeStreak = 0;
 
 // --- NEW STATE VARIABLE ---
 let _egPlayerCurrentCharge = 0;
+// Charge % consumed by the in-flight manual melee swing. _egDoWeaponAttack
+// snapshots it at key-press time so the strike damage matches the bar the
+// player saw; _egApplyPlayerMeleeImpact consumes it at impact (null = no
+// pending swing - legacy callers deal full damage).
+let _egPendingMeleeChargePct = null;
 
-// Hold-parry pause — true while the player holds the parry key (R by default) to freeze their own auto-attack bar
+// Hold-parry pause - true while the player holds the parry key (R by default) to freeze their own melee charge bar
 let _egHoldEPauseActive = false;
 
 // Active currency drops on the grid: key "row-col" → currency def object
@@ -115,21 +130,21 @@ let _egCurrencyDrops = new Map();
 // Claimed items go straight into the player's persistent STATE.inventory.
 let _egItemDrops = new Map();
 
-// Per-run currency tracker — currency picked up during the current map run,
+// Per-run currency tracker - currency picked up during the current map run,
 // aggregated by currency id, shown in the leave-map transition summary.
 // Cleared by _egChainCleanup() alongside _egRunLoot.
 let _egRunCurrency = [];
 
-// Per-run regular-item tracker — ITEM_DEFS items claimed during the current
+// Per-run regular-item tracker - ITEM_DEFS items claimed during the current
 // map run ({ defId, icon, name, rarity }), shown in the leave-map transition
 // summary. Cleared by _egChainCleanup() alongside _egRunLoot.
 let _egRunItems = [];
-// Per-run map-drop tracker — map items (🗺️) claimed during the current map
+// Per-run map-drop tracker - map items (🗺️) claimed during the current map
 // run, shown in the leave-map transition summary. Cleared by
 // _egChainCleanup() alongside _egRunLoot.
 let _egRunMaps = [];
 
-// Per-run essence tracker — essences claimed during the current map run,
+// Per-run essence tracker - essences claimed during the current map run,
 // aggregated by essence id, shown in the leave-map transition summary.
 // Cleared by _egChainCleanup() alongside _egRunLoot.
 let _egRunEssences = [];
@@ -149,6 +164,23 @@ function _egIsActive() {
     return _egEncounterActive
         && typeof cur !== 'undefined' && cur
         && (cur.isMonsterLevel === true);  // check if this level is assigned as a level that contains monsters
+}
+
+// True while the current level is a CAMPAIGN level running its light monster
+// encounter (stamped by _egPrepareCampaignEncounter in endgame-encounter.js).
+// Such levels set isMonsterLevel so the shared combat loop runs, but they
+// must NOT be treated as endgame map runs: no encounter chain, no map
+// objectives, no map-failed flow, no atlas completion.
+function _egIsCampaignRun() {
+    return typeof cur !== 'undefined' && !!cur
+        && cur.campaignMonsters === true
+        && cur.isMapRunSeed !== true
+        && !(typeof window !== 'undefined' && window._egIsMapDeviceRun);
+}
+
+// True while a real endgame map / encounter-chain run is active.
+function _egIsMapRun() {
+    return typeof _egIsActive === 'function' && _egIsActive() && !_egIsCampaignRun();
 }
 
 

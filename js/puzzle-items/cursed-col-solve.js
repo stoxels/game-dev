@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------CURSED COL SOLVE — VORTEX----------------------
+//-------------------CURSED COL SOLVE - VORTEX----------------------
 //------------------------------------------------------------------------
 
-// cursedColSolve — solves 3 columns; downside erases 1 pre-existing column.
+// cursedColSolve - solves 3 columns; downside erases 1 pre-existing column.
 function _useCursedColSolve(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -34,7 +34,7 @@ function _fxMakeVortexStrips(container, r) {
     }
 }
 
-// 🌪️ Vortex — spinning tornado sweeps columns.
+// 🌪️ Vortex - spinning tornado sweeps columns.
 function _fxVortex() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

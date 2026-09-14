@@ -2,7 +2,7 @@
 //-------------------BOSS: THE GUST (boss_gust)---------------------------
 //------------------------------------------------------------------------
 // Storm-front duel, reworked: the arena has NO lanes. Instead, a whole-
-// screen WIND howls across the fight on a fixed cadence — every ~30 s a
+// screen WIND howls across the fight on a fixed cadence - every ~30 s a
 // storm front gathers on one (randomized) side and starts shoving the
 // player toward the opposite wall almost immediately (brief gather
 // preview only, no long wind-up).
@@ -16,7 +16,7 @@
 //
 //   • Wind pushes toward one side; steering against it (holding the
 //     opposite direction) weakens the push enough to make progress.
-//   • While the wind blows, the auto-attack charge bar is PAUSED —
+//   • While the wind blows, the auto-attack charge bar is PAUSED -
 //     storm time is never free DPS time.
 //   • Spikes line both screen edges permanently: contact hit + DoT while
 //     inside, on either side.
@@ -24,11 +24,11 @@
 //     telegraphed wind blades at the player's current row.
 //   • HP-gated tornado volleys remain the phase set-pieces (75/50/25%),
 //     each entry pre-warned by a pulsing edge line, and the funnel on
-//     screen SUCTIONS the player toward it — you must fight to keep
+//     screen SUCTIONS the player toward it - you must fight to keep
 //     your distance:
-//       75% — one tornado from the boss, sweeping left.
-//       50% — boss tornado; as it fades, a return tornado from the left.
-//       25% — boss tornado, left return, then a tornado diving from the top.
+//       75% - one tornado from the boss, sweeping left.
+//       50% - boss tornado; as it fades, a return tornado from the left.
+//       25% - boss tornado, left return, then a tornado diving from the top.
 //
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -68,20 +68,20 @@ Object.assign(EG_BOSS_MECHANICS, {
 // Wind cadence: a storm front rolls in roughly every 30 s (±15% jitter),
 // from a randomized side each time.
 const EG_GUST_WIND_EVERY_MS = 30000;
-const EG_GUST_WIND_WARN_MS = 350;    // brief gather preview (≈ the overlay's fade-in) before the shove — animation and push start together
-const EG_GUST_WIND_RAMP_MS = 500;    // push strength fades in — a slide, not a shove
+const EG_GUST_WIND_WARN_MS = 350;    // brief gather preview (≈ the overlay's fade-in) before the shove - animation and push start together
+const EG_GUST_WIND_RAMP_MS = 500;    // push strength fades in - a slide, not a shove
 const EG_GUST_WIND_DUR = 5200;       // how long the gale blows
 const EG_GUST_STORM_WARN_LEAD_MS = 2000; // lightning pre-warning before a front rolls in
 
-// Wind push in px/s — tuned against the avatar's REAL walk speed (320 px/s
+// Wind push in px/s - tuned against the avatar's REAL walk speed (320 px/s
 // base, up to ~432 with max movement-speed boots). Holding against the gale
 // must never cancel it: the resist path is floored at walk speed + a
 // guaranteed downwind creep (EG_GUST_MIN_NET_DRIFT), so even a fully
-// movement-speed-geared player still drifts toward the spikes — just slower
+// movement-speed-geared player still drifts toward the spikes - just slower
 // than someone who stops fighting the current.
 const EG_GUST_PUSH = [0, 620, 680, 740, 800]; // by boss phase 1–4
 // Riding WITH the wind is a sprint; steering AGAINST it only slows the
-// shove — the current stays stronger than any full walk.
+// shove - the current stays stronger than any full walk.
 const EG_GUST_RIDE_MULT = 1.15;
 const EG_GUST_RESIST_MULT = 0.75;   // fighting the wind trims it to 75%…
 const EG_GUST_MIN_NET_DRIFT = 55;   // …but never below walk speed + this creep
@@ -100,23 +100,23 @@ const EG_GUST_BREAK_FADE_MS = 600; // linger after the wind dies, then vanish
 
 // Wind blades (the boss's direct attack between fronts).
 const EG_GUST_BLADE_INTERVAL = [0, 4200, 3400, 2800, 2300]; // ms by phase
-const EG_GUST_BLADE_SPEED = 520;     // px/s — crosses the arena in ~2.5 s
+const EG_GUST_BLADE_SPEED = 520;     // px/s - crosses the arena in ~2.5 s
 const EG_GUST_BLADE_R = 30;          // hit radius
 const EG_GUST_BLADE_DMG = [0, 0.09, 0.10, 0.11, 0.13]; // %maxHP per hit
 const EG_GUST_BLADE_TELL_MS = 500;   // glint at the boss before launch
 const EG_GUST_BLADE_TWIN_P = [0, 0, 0.35, 0.5, 0.65]; // P2+: chance of a second blade on a nearby row
 
-// Tornadoes (HP-gated volleys) — proper storm set-pieces: a tall funnel
+// Tornadoes (HP-gated volleys) - proper storm set-pieces: a tall funnel
 // column that owns its whole swept band, not a small spinning circle.
 const EG_GUST_TORNADO_SPEED = 340;   // px/s (crosses ~1400px in ~4s)
-const EG_GUST_TORNADO_W = 150;       // visual box width — storm-cloud head
-const EG_GUST_TORNADO_H = 320;       // visual funnel height — a wall of wind
+const EG_GUST_TORNADO_W = 150;       // visual box width - storm-cloud head
+const EG_GUST_TORNADO_H = 320;       // visual funnel height - a wall of wind
 const EG_GUST_TORNADO_HIT_W = 110;   // hit column matches the funnel body
 const EG_GUST_TORNADO_HIT_H = 300;   // the whole funnel height is dangerous
 const EG_GUST_TORNADO_DMG = 0.20;    // heavy hit %maxHP
 const EG_GUST_TORNADO_CD_MS = 900;
 const EG_GUST_TORNADO_WARN_MS = 1600; // edge warning band before each entry
-// Suction: the funnel drags the player toward it while it is on screen —
+// Suction: the funnel drags the player toward it while it is on screen -
 // the set-piece fights you for position. Pull is strongest at the funnel's
 // face and fades with distance; it halves while a storm front blows so
 // wind push + tornado drag can never stack into an unavoidable drift.
@@ -242,7 +242,7 @@ function _egGustArenaInit(monster) {
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(monsterId, false);
 
-    // ── Spike walls (CSS sawtooths draw themselves — no children needed) ──
+    // ── Spike walls (CSS sawtooths draw themselves - no children needed) ──
     const spikeL = _egNkEl(run, 'div', 'eg-nk-gust-spike eg-nk-gust-spike-left');
     const spikeR = _egNkEl(run, 'div', 'eg-nk-gust-spike eg-nk-gust-spike-right');
 
@@ -263,7 +263,7 @@ function _egGustArenaInit(monster) {
         windFx.appendChild(d);
     }
 
-    _egNkToast('eg_mech_gust', '🍃 The Gust: When the storm howls, break the wind — or be thrown into the spikes!');
+    _egNkToast('eg_mech_gust', '🍃 The Gust: When the storm howls, break the wind - or be thrown into the spikes!');
 
     const st = {
         run, monsterId, windFx,
@@ -273,7 +273,7 @@ function _egGustArenaInit(monster) {
         wind: null,            // { side, phase: 'warn'|'blow', t, ramp, wallEl, wallDiesAt }
         blades: [],            // { x, y, vx, el, fireAt, hitCdUntil }
         bladeTimer: 3000,      // ms until next blade volley
-        daggers: [],           // { x, y, side, el, hitCdUntil, rot } — corruption torn loose by the gale
+        daggers: [],           // { x, y, side, el, hitCdUntil, rot } - corruption torn loose by the gale
         daggerTimer: 700,      // ms until the next corruption→dagger conversion attempt
         spikeCdUntil: 0, spikeHotUntil: 0, spikeWarnAt: 0,
         stormWarned: false, nextWindSide: 0, // lightning pre-warning state
@@ -292,7 +292,7 @@ function _egGustArenaInit(monster) {
         } catch (e) {
             // A throwing tick would otherwise be silently swallowed by the
             // nk loop (it kills the run without logging). Surface it once,
-            // keep the arena alive — one bad frame must not end the fight.
+            // keep the arena alive - one bad frame must not end the fight.
             st.errCount = (st.errCount || 0) + 1;
             if (st.errCount <= 3) {
                 try { console.warn('[The Gust] arena tick error:', e); } catch (e2) {}
@@ -310,7 +310,7 @@ function _egGustArenaTick(st, dtS, now) {
     const live = _egGustLiveMonster(st.monsterId);
     if (!live) {
         // Grace window: _egMonsters is rebuilt during encounter setup and
-        // can briefly not contain the boss — killing the arena on the very
+        // can briefly not contain the boss - killing the arena on the very
         // first gap left fights running with a dead wind system.
         st.missingSince = st.missingSince || now;
         if (now - st.missingSince > 3000) {
@@ -450,7 +450,7 @@ function _egGustArenaTick(st, dtS, now) {
                 rows.forEach(ry => { const d = Math.abs(ry - pc.y); if (d < bestD) { bestD = d; aimY = ry; } });
             }
             _egGustBlade(st, aimY);
-            // P2+: often a second blade on an adjacent row — dodge by row-hopping.
+            // P2+: often a second blade on an adjacent row - dodge by row-hopping.
             if (p >= 2 && Math.random() < (EG_GUST_BLADE_TWIN_P[p] || 0)) {
                 const others = rows.filter(ry => Math.abs(ry - aimY) > 90);
                 if (others.length) _egGustBlade(st, others[Math.floor(Math.random() * others.length)]);
@@ -531,7 +531,7 @@ function _egGustWindStart(st, side, now) {
     document.body.classList.add(side === 1 ? 'eg-gust-wind-from-left' : 'eg-gust-wind-from-right');
     _egGustWindToast(side);
     st.daggerToastShown = false; // corruption→dagger notice: once per storm front
-    // Wooden windbreak spawns on the DOWNWIND edge at a random height —
+    // Wooden windbreak spawns on the DOWNWIND edge at a random height -
     // finding the catch spot is the player's job. It exists from the very
     // first frame of the wind so the shove never outruns the telegraph.
     const H = window.innerHeight;
@@ -559,9 +559,9 @@ function _egGustBlade(st, y) {
 
 
 // Fires a tornado volley as its own dodge run:
-//   stage 1 — boss tornado sweeping left.
-//   stage 2 — boss tornado, then a return tornado from the left wall.
-//   stage 3 — boss tornado, left-wall return, then a top-down tornado.
+//   stage 1 - boss tornado sweeping left.
+//   stage 2 - boss tornado, then a return tornado from the left wall.
+//   stage 3 - boss tornado, left-wall return, then a top-down tornado.
 // Every entry is pre-warned by a pulsing edge line so the choreography is
 // readable before the tornado is even on screen. While a funnel is active
 // it drags the player toward it (see EG_GUST_TORNADO_PULL_*).
@@ -612,7 +612,7 @@ function _egGustFireVolley(monsterId, stage, level, bossX, bossY) {
             : (s.vx < 0 ? ' eg-gust-warn-left' : ' eg-gust-warn-right');
         warnEl = _egNkEl(run, 'div', 'eg-gust-warn' + (s.fromTop ? ' eg-gust-warn-v' : ' eg-gust-warn-h') + dirCls);
         // The warning band covers the tornado's full danger column, centered
-        // on the entry point — the telegraph is as tall as the threat.
+        // on the entry point - the telegraph is as tall as the threat.
         if (s.fromTop) warnEl.style.left = Math.round(x - EG_GUST_TORNADO_W / 2) + 'px';
         else warnEl.style.top = Math.round(y - EG_GUST_TORNADO_H / 2) + 'px';
         active = null;
@@ -622,7 +622,7 @@ function _egGustFireVolley(monsterId, stage, level, bossX, bossY) {
             active = mk(x, y);
             active.vx = s.vx;
             active.vy = s.vy;
-            // The funnel's arrival shakes the arena — this is a set-piece.
+            // The funnel's arrival shakes the arena - this is a set-piece.
             document.body.classList.add('eg-screen-shake');
             setTimeout(() => document.body.classList.remove('eg-screen-shake'), 550);
         }, EG_GUST_TORNADO_WARN_MS);
@@ -639,7 +639,7 @@ function _egGustFireVolley(monsterId, stage, level, bossX, bossY) {
         // Suction: the funnel drags the player toward its hit column. The
         // pull vector aims at the nearest point of the column and falls off
         // with distance from its surface. A full walk beats the max pull,
-        // so escape is always possible — but standing still or filling
+        // so escape is always possible - but standing still or filling
         // cells gets dragged toward the swept band. Halved while a storm
         // front blows so wind push + drag can't stack past a walkable net.
         const pc = _egNkPlayerCenter();
@@ -687,7 +687,7 @@ function _egGustFireVolley(monsterId, stage, level, bossX, bossY) {
 
 // ── Corrupted-cell shadow daggers ───────────────────────────────────────
 // Wind × corruption interaction: while the gale blows, lingering corrupted
-// cells periodically tear loose — the corruption transforms into a shadowy
+// cells periodically tear loose - the corruption transforms into a shadowy
 // dagger that is blown at the downwind screen edge and deals shadow damage
 // to the player it touches in flight. The consumed corruption is removed
 // through the shared dispel path so every corruption system stays
@@ -695,7 +695,7 @@ function _egGustFireVolley(monsterId, stage, level, bossX, bossY) {
 const EG_GUST_DAGGER_EVERY_MS = 900; // ms between conversion attempts during a gale
 const EG_GUST_DAGGER_CHANCE = 0.6;   // per attempt, per still-corrupted cell
 const EG_GUST_DAGGER_SPEED = 480;    // px/s downwind
-const EG_GUST_DAGGER_R = 14;         // approx half the glyph — keeps the visual centered on the hit point
+const EG_GUST_DAGGER_R = 14;         // approx half the glyph - keeps the visual centered on the hit point
 const EG_GUST_DAGGER_HIT = 0.07;     // %maxHP per dagger touch (shadow)
 const EG_GUST_DAGGER_CD_MS = 700;    // per-dagger hit cooldown
 
@@ -715,7 +715,7 @@ function _egGustDaggerLaunch(st) {
         const cr = host.getBoundingClientRect();
         if (!cr.width || !cr.height) continue;
 
-        // The corruption is consumed by the storm — remove it exactly as a
+        // The corruption is consumed by the storm - remove it exactly as a
         // dispel/expiry would.
         if (typeof _egRemoveCellCorruption !== 'function') continue;
         try { _egRemoveCellCorruption(key); } catch (e) { continue; }
@@ -733,7 +733,7 @@ function _egGustDaggerLaunch(st) {
     if (launched && !st.daggerToastShown) {
         st.daggerToastShown = true;
         _egNkToast('eg_gust_dagger_convert',
-            '🌪️ The gale tears the corruption from the grid — shadow daggers take flight!');
+            '🌪️ The gale tears the corruption from the grid - shadow daggers take flight!');
     }
 }
 

@@ -4,27 +4,27 @@
 // Football-match fight: the pitch is his arena and the ball never rests.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE MATCH BALL — the giant football never leaves the pitch. It bounces
+//   • THE MATCH BALL - the giant football never leaves the pitch. It bounces
 //     around the arena and steers toward you (loose homing with a turn cap,
 //     so it is always readable). Touching it is a TACKLE: a heavy physical
 //     hit plus a fling away from the impact. Faster every phase.
 //     PARRY KICK: holding the parry key (R by default) when the ball reaches you boots the
-//     ball away instead — no damage, no fling; the kick burst decays back
+//     ball away instead - no damage, no fling; the kick burst decays back
 //     to the phase seek speed and homing resumes.
-//   • THE GOAL — a goal frame stands at a screen edge for the whole fight.
+//   • THE GOAL - a goal frame stands at a screen edge for the whole fight.
 //     Guide the ball into it (home it by baiting, or parry-kick it in) and
-//     it goes OUT OF PLAY for 30s — no ball on the pitch at all — then the
+//     it goes OUT OF PLAY for 30s - no ball on the pitch at all - then the
 //     keeper (🧤) lobs it back onto the pitch from the net.
 //
-//   HP GATES (watcher) — the homing match ball LEAVES the pitch and a
+//   HP GATES (watcher) - the homing match ball LEAVES the pitch and a
 //   stationary ball rests on the grid for a scoring challenge:
-//   • 60% — KICK-OFF CHALLENGE: score 1 goal. Run to the stationary ball,
+//   • 60% - KICK-OFF CHALLENGE: score 1 goal. Run to the stationary ball,
 //     stand NEXT to it to charge (bomb-defuse-style strip), step away to
 //     shoot. Charge time = power; your angle around the ball = aim.
-//   • 30% — HAT-TRICK: score 3 goals in 60s. Same kick rules, more
-//     targets — plan each shot, the ball rolls out and can be re-kicked.
+//   • 30% - HAT-TRICK: score 3 goals in 60s. Same kick rules, more
+//     targets - plan each shot, the ball rolls out and can be re-kicked.
 //
-//   CHARGE ATTACK — FREE KICK: when the boss's attack bar fills, a cone wall
+//   CHARGE ATTACK - FREE KICK: when the boss's attack bar fills, a cone wall
 //   materializes between ball and you, a dotted arc telegraphs the curve
 //   around the wall, then the ball bends around it straight at the marked
 //   spot. Damage lands as the ball arrives.
@@ -90,7 +90,7 @@ const EG_STRK_KICK_SPEED_MAX = 960;          // px/s kick speed at full charge
 const EG_STRK_KICK_DECEL = 300;              // px/s² ball friction (roll-out)
 const EG_STRK_KICK_BOUNCE = 0.78;            // wall bounce restitution
 const EG_STRK_KICK_STOP = 26;                // snap to rest below this speed
-// Goal damage: a scored goal HURTS the boss — the challenge is a scoring
+// Goal damage: a scored goal HURTS the boss - the challenge is a scoring
 // opportunity, not just relief. The kick's charge fraction scales the hit,
 // so full-power shots pay best.
 const EG_STRK_GOAL_DMG_MIN = 0.02;           // %maxHP at a tap kick
@@ -121,7 +121,7 @@ function _egStrikerTeardown() {
     _egStrkWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
-    // watcher BEFORE this runs — the overlays must go either way.
+    // watcher BEFORE this runs - the overlays must go either way.
     _egStrikerSweep();
 }
 
@@ -172,7 +172,7 @@ function _egStrkScoreGoal(st, now) {
             if (g) { try { g.el.classList.remove('scored'); } catch (e) {} }
         }, 700);
         // Return-timer HUD on the goal: a sweeping countdown ring + seconds.
-        // (The ⚽ icon comes from the CSS ::before — no text content here.)
+        // (The ⚽ icon comes from the CSS ::before - no text content here.)
         const timer = _egNkEl(st.run, 'div', 'eg-strk-goal-timer');
         timer.style.left = Math.round((st.goal.x0 + st.goal.x1) / 2) + 'px';
         timer.style.top = Math.round((st.goal.y0 + st.goal.y1) / 2) + 'px';
@@ -203,7 +203,7 @@ function _egStrkGoalTimerTick(st, now) {
 }
 
 
-// Kick-off: the ball returns FROM the goal it was scored in — the keeper
+// Kick-off: the ball returns FROM the goal it was scored in - the keeper
 // (🧤) pops out of the net and lobs it back onto the pitch toward centre.
 // The lob rides the same kick-burst decay as the parry kick (so the gold
 // ghost trail follows it automatically), with a shrinking scale so the
@@ -284,7 +284,7 @@ function _egStrkBallGhost(x, y) {
 
 
 // Advances the match ball: loose homing with a turn cap, wall bounces,
-// tackle on touch (hit + fling away from the impact) — or a parry kick
+// tackle on touch (hit + fling away from the impact) - or a parry kick
 // away from the player while the parry key is held.
 function _egStrkAdvanceBall(st, dtS, now, pr, p) {
     const b = st.ball;
@@ -319,7 +319,7 @@ function _egStrkAdvanceBall(st, dtS, now, pr, p) {
         b.trailAt = now + 55;
         _egStrkBallGhost(b.x, b.y);
     }
-    // Tackle check — or a PARRY KICK while the player holds E: the ball is
+    // Tackle check - or a PARRY KICK while the player holds E: the ball is
     // booted away from the player at kick-burst speed (decaying back to the
     // phase seek speed), no damage, no fling. Same touch cooldown as a
     // tackle so it can't be spammed at point-blank range.
@@ -402,7 +402,7 @@ function _egStrikerArenaInit(monster) {
 
         // ── HP gates ──
         // Goal damage (and any player damage) can shove the boss across the
-        // NEXT gate while a scoring set-piece is still running — queue the
+        // NEXT gate while a scoring set-piece is still running - queue the
         // challenge instead of skipping it, and chain it when the current
         // one ends.
         const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
@@ -450,7 +450,7 @@ function _egStrikerArenaInit(monster) {
 
 function _egStrkScoringStart(st, now, need, budgetMs) {
     if (st.scoring) return; // one set-piece at a time
-    // The homing ball is gone while the challenge runs — remove it and
+    // The homing ball is gone while the challenge runs - remove it and
     // cancel any pending kick-off so it stays off until the set-piece ends.
     if (st.ball) {
         try { st.ball.el.remove(); } catch (e) {}
@@ -466,7 +466,7 @@ function _egStrkScoringStart(st, now, need, budgetMs) {
     };
     st.scoring = sc;
     _egStrkScoringBallSpawn(st, sc, W, H);
-    _egNkToast('eg_striker_scoring_start', '⚽ KICK-OFF CHALLENGE! Score ' + need + ' goal' + (need > 1 ? 's' : '') + ' — run to the ball, stand next to it to charge, step away to shoot!');
+    _egNkToast('eg_striker_scoring_start', '⚽ KICK-OFF CHALLENGE! Score ' + need + ' goal' + (need > 1 ? 's' : '') + ' - run to the ball, stand next to it to charge, step away to shoot!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('striker_kick'); } catch (e) {}
 }
 
@@ -510,7 +510,7 @@ function _egStrkScoringDrawBall(sc, W, H) {
 }
 
 
-// Potential goal damage for a charge fraction — the same formula the real
+// Potential goal damage for a charge fraction - the same formula the real
 // hit uses at goal time, so the preview never lies.
 function _egStrkScoringPotentialDmg(st, charge) {
     const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
@@ -644,13 +644,13 @@ function _egStrkScoringGoal(st, sc, W, H) {
     if (sc.goals >= sc.need) {
         if (sc.need >= 3) {
             _egStrkGoalPop(W / 2, H * 0.3, 'HAT-TRICK!');
-            _egNkToast('eg_striker_hattrick', '🎩 HAT-TRICK! Three goals — the pitch erupts!');
+            _egNkToast('eg_striker_hattrick', '🎩 HAT-TRICK! Three goals - the pitch erupts!');
         } else {
             _egNkToast('eg_striker_scoring_done', '⚽ GOAL! Challenge complete!');
         }
         _egStrkScoringEnd(st, sc, true);
     } else {
-        _egNkToast('eg_striker_scoring_goal', '⚽ GOAL! ' + sc.goals + '/' + sc.need + ' — keep going!');
+        _egNkToast('eg_striker_scoring_goal', '⚽ GOAL! ' + sc.goals + '/' + sc.need + ' - keep going!');
         _egStrkScoringBallSpawn(st, sc, W, H);
     }
 }
@@ -667,19 +667,19 @@ function _egStrkScoringEnd(st, sc, success) {
     try { if (sc.hudEl) sc.hudEl.remove(); } catch (e) {}
     if (st.scoring === sc) st.scoring = null;
     if (!success) {
-        _egNkToast('eg_striker_fulltime', '🟨 FULL TIME! The Striker regroups — the match ball is back!');
+        _egNkToast('eg_striker_fulltime', '🟨 FULL TIME! The Striker regroups - the match ball is back!');
     }
     const pend = st.pendingGates && st.pendingGates.length ? st.pendingGates.shift() : null;
     if (pend) {
         _egStrkScoringStart(st, performance.now(), pend.need, pend.budget);
-        return; // the new set-piece owns the pitch — no homing-ball kickoff
+        return; // the new set-piece owns the pitch - no homing-ball kickoff
     }
     _egStrkKickoff(st); // the homing ball returns either way
 }
 
 
 // Charge-bar freeze gate for _egTickPlayer (endgame-encounter.js): true
-// while a scoring set-piece (Kick-Off Challenge / Hat-Trick) is running —
+// while a scoring set-piece (Kick-Off Challenge / Hat-Trick) is running -
 // chasing, charging and shooting the ball IS the attack, so the auto-attack
 // bar stays frozen (mirrors _egBomberFinalActive). Pending queued gates only
 // exist while st.scoring is live, so st.scoring covers those too.
@@ -792,6 +792,6 @@ function _egStrkFreeKick(monster) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled Striker Ball is now the persistent match ball — keep the
+// The old scheduled Striker Ball is now the persistent match ball - keep the
 // handler name alive so any stale schedule entry no-ops instead of erroring.
 function _egMechStrikerBall() { void 0; }

@@ -5,7 +5,7 @@
     Styles the "CLASS UPGRADE" (data-mode="upgrade") and "ASCENDENCY UPGRADE"
     (data-mode="ascend-upgrade") overlay screens so they match the look of
     the class-selection screen (see class_selection.css): a themed backdrop,
-    a stone title plaque, and a row of glowing cards — one per ability —
+    a stone title plaque, and a row of glowing cards - one per ability -
     each with a "spell locker" that reveals a current -> new comparison
     tooltip on hover instead of always showing the description inline.
 
@@ -247,7 +247,7 @@
     ------------------------------------------------------------------------
     Placeholder art: a glowing glyph inside a generic gradient frame, styled
     the same way as .cs-weapon-locker in class_selection.css. Swap in real
-    per-ability artwork later — see the commented example below.
+    per-ability artwork later - see the commented example below.
 */
 
     #class-selection-overlay[data-mode="upgrade"] .cs-spell-locker,

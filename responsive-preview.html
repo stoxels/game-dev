@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>STOXELS — Responsive Preview Harness</title>
+<title>STOXELS - Responsive Preview Harness</title>
 <!--
   Dev-only test page (like test-sprite-faces.html). NOT linked from the game.
   Renders index.html in same-origin iframes at common device sizes so
   media-query layouts can be verified at a glance.
 
-  ?screen=save-slots (default) — opens the save-slot select screen
-  ?screen=game                — loads slot 1 and jumps straight into level 1-1
+  ?screen=save-slots (default) - opens the save-slot select screen
+  ?screen=game                - loads slot 1 and jumps straight into level 1-1
                                 (actual gameplay puzzle screen)
 
   Each iframe keeps its REAL pixel width (so CSS media queries inside see
@@ -35,7 +35,7 @@
     const MODE = PARAMS.get('screen') || 'save-slots';
     const LEVEL = parseInt(PARAMS.get('level') || '0', 10); // game mode: global level index
     document.getElementById('section-title').textContent =
-        MODE === 'game' ? `GAMEPLAY PUZZLE SCREEN — level gi=${LEVEL}` : 'SAVE SLOT SELECT SCREEN';
+        MODE === 'game' ? `GAMEPLAY PUZZLE SCREEN - level gi=${LEVEL}` : 'SAVE SLOT SELECT SCREEN';
 
     // device, iframeW/H, visual scale
     const DEVICES = [
@@ -89,7 +89,7 @@
             const w = frame.contentWindow;
             // Poll until the frame's scripts are ready, then open the target
             // screen. A single delayed call is unreliable when six game
-            // instances boot simultaneously — keep retrying until the
+            // instances boot simultaneously - keep retrying until the
             // screen actually activates (or ~20s pass).
             const targetId = MODE === 'game' ? 'screen-game' : 'screen-save-slots';
             const deadline = Date.now() + 20000;

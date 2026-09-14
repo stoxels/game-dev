@@ -39,7 +39,7 @@ function _initLevelData(gi) {
 }
 
 // Creates fresh userGrid, wrongGrid, and revealedGrid sized to the current puzzle dimensions.
-// All cells start empty/false — no carry-over from a previous level.
+// All cells start empty/false - no carry-over from a previous level.
 function _initGrids() {
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
@@ -74,7 +74,7 @@ function _resetGameplayFlags() {
     hoverCol = -1;
     shieldActive = false;
     // The Clock's Time Freeze pins the map timer and must survive arena
-    // puzzle transitions during the 30s window — only clear timerFrozen
+    // puzzle transitions during the 30s window - only clear timerFrozen
     // when the freeze isn't running (or on a genuinely fresh level).
     timerFrozen = isChainTransition
         && (typeof window !== 'undefined' && !!window._egClockTimeFreezeActive);
@@ -140,6 +140,11 @@ function _cleanupPreviousLevel() {
         _egResetQuizDamageBuff();
     }
 
+    // Support-spell buffs (js/skills/universal-spells.js) do not carry across
+    // puzzles. Cleared explicitly rather than relying on _egStopEncounter(),
+    // which chain transitions intentionally suppress.
+    if (typeof _uspClearSupportBuffs === 'function') _uspClearSupportBuffs();
+
     if (typeof _fxShieldBorderRemove === 'function') _fxShieldBorderRemove();
 
     // Hide the completion glimpse bar if it was still visible
@@ -164,7 +169,7 @@ function _cleanupPreviousLevel() {
     }
 }
 
-// Full level state reset — runs all three reset helpers in order.
+// Full level state reset - runs all three reset helpers in order.
 function _resetLevelState() {
     _resetGameplayFlags();
     _resetLevelTrackers();
@@ -227,7 +232,7 @@ function _applyExpectedValueBonus() {
 // keystone_dead_reckoning (264) grants +10 minutes (600s), also blocked by gamblers_ruin.
 function _initTimer() {
     if (window._egSuppressEncounterStop) {
-        // Chain puzzle — keep low-time banner state but sync the tracker to
+        // Chain puzzle - keep low-time banner state but sync the tracker to
         // the preserved timer so the next drain is detected correctly.
         if (typeof _lowTimeLastSecs !== 'undefined') _lowTimeLastSecs = timerSecs;
         return;
@@ -253,7 +258,7 @@ function _initTimer() {
         timerSecs += 600;
         _levelTimeAdded += 600;
     }
-    // Fresh level — reset low-time center banners (keeps _lowTimeLastSecs
+    // Fresh level - reset low-time center banners (keeps _lowTimeLastSecs
     // as null so the first updTimer can immediately surface the relevant
     // 300/120/30 banner if the level already starts below a threshold).
     if (typeof _resetLowTimeWarningState === 'function') _resetLowTimeWarningState();
@@ -296,7 +301,7 @@ function _setMistakeCounterText(suffix = '') {
     const isHardcore = typeof curMods !== 'undefined' && !!curMods.hardcore;
     let maxMistakes = null;
     if (isHardcore) {
-        // Hardcore overrides everything — 0 allowed, both in and out of endgame.
+        // Hardcore overrides everything - 0 allowed, both in and out of endgame.
         // _egGetMaxAllowedMistakes already returns 0 for active maps; for
         // campaign (no egMaxMistakes) we synthesize 0 here so the HUD still
         // reads "Mistakes: 0 / 0".
@@ -313,7 +318,7 @@ function _setMistakeCounterText(suffix = '') {
         ? `${t('cg_mistakes_lbl')}: ${mistakeCount} / ${maxMistakes}${suffix}`
         : `${t('cg_mistakes_lbl')}: ${mistakeCount}${suffix}`;
 
-    // Hardcore visual cue — red tint when no mistake is allowed
+    // Hardcore visual cue - red tint when no mistake is allowed
     mc.classList.toggle('hc-zero', !!isHardcore && maxMistakes === 0);
 
     // Endgame: maybe show the 3/2/1/0 mistakes-remaining center overlay
@@ -336,7 +341,7 @@ function _updateHUD() {
 
     // Corner HUD (right): level number + name, mirrors top-id/top-hint above.
     // During an endgame map-device run (_egActiveMapItem) we show the active
-    // MAP's name instead of the seed story level's hint — mousing over it
+    // MAP's name instead of the seed story level's hint - mousing over it
     // opens a tooltip with the map's rolled modifiers.
     const nameEl = document.getElementById('hud-level-name');
     if (nameEl) {
@@ -392,7 +397,7 @@ function _initClassSystems() {
     // Encounter chain (endgame): cooldowns for base + ascendency abilities
     // (active1-4) reset between individual puzzles so each puzzle starts
     // with abilities ready. Mana is the balancing factor and is intentionally
-    // NOT reset — see _cleanupPreviousLevel / _resetPlayerMana which keep
+    // NOT reset - see _cleanupPreviousLevel / _resetPlayerMana which keep
     // playerCurrentMana / playerMaxMana across chain transitions.
     resetActiveCooldown();
     applyClassPassiveOnLevelStart();
@@ -426,10 +431,25 @@ function _checkPrimerPending() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Backgrounds for the interactive tutorial puzzles (world 15). The tutorial
+// ships its own artwork: puzzle 1 (tqPuzzle 0) gets the Puzzle-1 backdrop,
+// puzzles 2 and 3 (tqPuzzle 1/2) share the Puzzle-2/3 backdrop.
+const TUTORIAL_QUEST_BACKGROUNDS = {
+    0: 'images/Tutorial/Puzzle_1_Background.webp',
+    1: 'images/Tutorial/Puzzle_2_3_Background.webp',
+    2: 'images/Tutorial/Puzzle_2_3_Background.webp',
+};
+
 // Applies the background image for the given world number to the game screen.
+// Tutorial quest levels override the world background with their dedicated art.
 function _applyWorldBackground(worldNum) {
     const screen = document.getElementById('screen-game');
-    const bg = WORLD_BACKGROUNDS[worldNum];
+    let bg = null;
+    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest
+        && TUTORIAL_QUEST_BACKGROUNDS[cur.tqPuzzle]) {
+        bg = TUTORIAL_QUEST_BACKGROUNDS[cur.tqPuzzle];
+    }
+    if (!bg) bg = WORLD_BACKGROUNDS[worldNum];
     if (bg) {
         screen.style.backgroundImage = `url('${bg}')`;
         screen.style.backgroundSize = 'cover';
@@ -446,7 +466,7 @@ function _applyWorldBackground(worldNum) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Core level startup — runs every subsystem in the correct order.
+// Core level startup - runs every subsystem in the correct order.
 // Called directly for ungated levels, or as a callback after the gate check passes.
 function _doStartLevel(gi) {
     // 1. Data and grid setup
@@ -464,7 +484,7 @@ function _doStartLevel(gi) {
     _startSystems();
     _entropyDrainInit();
 
-    // 4. Passive node effects — oracle flag must be set before passives run
+    // 4. Passive node effects - oracle flag must be set before passives run
     if (ptHasSkill('keystone_the_oracle') && cur.grid.length * cur.grid[0].length >= 200) {
         window._oracleActive = true;
     }
@@ -496,7 +516,10 @@ function _doStartLevel(gi) {
 
     _applyWorldBackground(cur.world);
 
-    // Show the player's character sprite in the top-left for non-monster levels
+    // Show the player's character sprite in the top-left. Both level kinds
+    // share the same presentation now (Health / Mana / Shield / charge bar
+    // stack - see _avatarBarsHTML in player_sprite.js); monster levels let
+    // the encounter tick build the full avatar so the sprite size is stable.
     if (!cur.isMonsterLevel) {
         _renderPlayerAvatarSimple();
         _showPlayerAvatarSimple();
@@ -505,8 +528,10 @@ function _doStartLevel(gi) {
         _showPlayerAvatar();   // don't rely solely on the tick loop's first tick
     }
 
-    // Character banter — fire the level-start line once the avatar exists.
-    if (typeof triggerBanter === 'function') {
+    // Character banter - fire the level-start line once the avatar exists.
+    // Tutorial-quest levels are Professor lessons, not banter moments.
+    if (typeof triggerBanter === 'function'
+        && !(typeof cur !== 'undefined' && cur && cur.isTutorialQuest)) {
         setTimeout(() => triggerBanter('level_start'), 600);
     }
 
@@ -526,12 +551,24 @@ function _doStartLevel(gi) {
     _applyDegreesOfFreedom();
     _applyTheOracle();
 
-    // Step 8 — Endgame encounter (sandbox and monster levels only)
+    // Step 8 - Monster encounter.
+    //   • Campaign levels (every story level) get a light monster pack:
+    //     _egPrepareCampaignEncounter stamps the level (isMonsterLevel,
+    //     monster list, HP/damage budget) so the shared combat loop can run
+    //     WITHOUT the endgame chain/objectives machinery.
+    //   • Endgame map levels were already stamped by _egLaunchMapFromDevice.
+    if (cur && !dead && typeof _egPrepareCampaignEncounter === 'function'
+        && !window._egSuppressEncounterStart) {
+        _egPrepareCampaignEncounter();
+    }
     if (cur && cur.isMonsterLevel
         && typeof _egStartEncounter === 'function'
         && !window._egSuppressEncounterStart) {
         _egStartEncounter();
-        _egUpdateObjectivesHUD();
+        // Map objectives only belong to real endgame runs.
+        if (typeof _egIsCampaignRun !== 'function' || !_egIsCampaignRun()) {
+            _egUpdateObjectivesHUD();
+        }
         _renderPlayerHealth();
     }
 
@@ -539,7 +576,7 @@ function _doStartLevel(gi) {
     // start-of-level passive reveals (e.g. central_tendency,
     // probabilistic_start, Syla's affinity … stacking to cover the whole
     // board). checkWin() was intentionally suppressed above while
-    // _egIsActive was still false — now that the encounter is live, hand
+    // _egIsActive was still false - now that the encounter is live, hand
     // the solved puzzle to the encounter chain (question modal → countdown
     // → next puzzle) instead of leaving a dead solved grid.
     if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel
@@ -555,13 +592,26 @@ function _doStartLevel(gi) {
     }
 
     // 9. Background music
-    Audio_Manager.playBGM(Audio_Manager.trackForLevel(cur.world, cur.li));
+    // Tutorial quest levels keep the random tutorial track started on entry;
+    // boss-arena chain puzzles keep the boss theme started by
+    // _egSpawnNextArenaBoss - both skip the normal campaign track here.
+    if (cur && (cur.isTutorialQuest || cur.isBossArena)) {
+        // music already set by the entry point - do not override
+    } else {
+        Audio_Manager.playBGM(Audio_Manager.trackForLevel(cur.world, cur.li));
+    }
 }
 
 // Public entry point for starting a level.
 // If the level is math-gated and the gate has not been passed, opens the gate
 // check flow and defers the actual start to its success callback.
 function startLevel(gi) {
+    // Leveling Rework: campaign ascension levels are entered as mini-map
+    // trial chains (boss finale) instead of plain puzzles. The hook is
+    // self-guarding (stamped/chain/suppressed launches are never hijacked).
+    if (typeof _egMaybeLaunchAscensionTrial === 'function') {
+        try { if (_egMaybeLaunchAscensionTrial(gi)) return; } catch (e) {}
+    }
     if (isGatedLevel(gi) && !isMathGatePassed(gi)) {
         tryStartGatedLevel(gi, () => _doStartLevel(gi));
         return;

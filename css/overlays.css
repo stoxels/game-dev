@@ -527,7 +527,7 @@
         gap: 8px;
     }
 
-    /* 3 columns × fixed min-width overflows phones — let the grid wrap
+    /* 3 columns × fixed min-width overflows phones - let the grid wrap
        into two rows and let buttons size to their labels. Slightly tighter
        padding/gap keeps the full LEVELS | REPLAY pair | NEXT row intact
        down to ~400px; narrower phones wrap gracefully below it. */
@@ -555,11 +555,11 @@
 /* ======================================================================== */
 /* QUESTION MODALS HIDE THE CONTROLLABLE AVATAR SPRITE                      */
 /* ======================================================================== */
-/* While a question modal is open (quiz overlay, math gate, scouts primer — */
+/* While a question modal is open (quiz overlay, math gate, scouts primer - */
 /* input or multiple-choice surfaces), the controllable player avatar       */
 /* sprite is hidden so it doesn't peek out from behind the modal backdrop.  */
 /* The character sprite baked into the background (boss card / top-centre   */
-/* stage sprite) is NOT touched — only the WASD-controlled sprite hides.    */
+/* stage sprite) is NOT touched - only the WASD-controlled sprite hides.    */
 body.question-modal-open #player-avatar-wrapper,
 body.question-modal-open #player-avatar-simple {
     display: none !important;

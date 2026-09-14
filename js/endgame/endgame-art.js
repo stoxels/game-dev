@@ -3,13 +3,13 @@
 //------------------------------------------------------------------------
 // Resolves real images for endgame monsters and equipment base items.
 //
-// Convention — drop images in these folders, named after the definition id:
+// Convention - drop images in these folders, named after the definition id:
 //   images/endgame/monsters/<id>.png   (regular monsters AND bosses)
 //       e.g. images/endgame/monsters/slime.png, boss_null.png
 //   images/endgame/items/<id>.png      (equipment base items)
 //       e.g. images/endgame/items/wpn_1h_1.png
 //
-// IMPORTANT — no extension probing!
+// IMPORTANT - no extension probing!
 // The old approach fired one request per id x extension (5x) on every page
 // load, which got this GitHub Pages site rate-limited. Instead we fetch a
 // single manifest file listing what actually exists:
@@ -20,7 +20,7 @@
 //
 // Only ids present in the manifest are ever requested, so a page load costs
 // exactly ONE extra request regardless of how much art exists.
-// If the manifest is missing (e.g. local dev), we fall back to probing —
+// If the manifest is missing (e.g. local dev), we fall back to probing -
 // but lazily (only when a screen actually asks for an id) and through a
 // small concurrency-limited queue.
 // If no image exists for an id, every render call falls back to the
@@ -43,7 +43,7 @@ const EG_ART = (function () {
     // key "<kind>/<id>" -> resolved url, or null while resolving / when missing.
     const _cache = new Map();
 
-    // ids currently being probed (fallback mode) — avoids duplicate requests.
+    // ids currently being probed (fallback mode) - avoids duplicate requests.
     const _probing = new Set();
     const _probeQueue = [];
     let _activeProbes = 0;
@@ -65,8 +65,8 @@ const EG_ART = (function () {
         _cache.set(_key(kind, id), ART_PATHS[kind] + id + '.' + ext);
     }
 
-    // One fetch for the whole game — replaces hundreds of probe requests.
-    // Skipped entirely on file:// — fetch() is blocked by CORS there and the
+    // One fetch for the whole game - replaces hundreds of probe requests.
+    // Skipped entirely on file:// - fetch() is blocked by CORS there and the
     // lazy probe fallback below handles local dev without console noise.
     const _manifestFetch = (location.protocol === 'file:')
         ? Promise.reject(new Error('file protocol'))
@@ -171,7 +171,7 @@ const EG_ART = (function () {
     // Lists every known art id for a base id: [base, base_2, base_3, ...].
     // Variant files are named "<base>_<n>.<ext>" (see tools/process-monster-art.py).
     // Driven by the manifest cache, so no extra requests. Always contains at
-    // least the base id itself — callers fall back to emoji when art is missing.
+    // least the base id itself - callers fall back to emoji when art is missing.
     function variants(kind, baseId) {
         if (!baseId) return [];
         const out = [baseId];
@@ -215,5 +215,5 @@ document.addEventListener('eg-art-loaded', function () {
         if (typeof _egbtRenderGrid === 'function' && document.getElementById('egbt-boss-grid')) {
             _egbtRenderGrid();
         }
-    } catch (e) { /* screens not initialised yet — safe to ignore */ }
+    } catch (e) { /* screens not initialised yet - safe to ignore */ }
 });

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Removes the persisted save from localStorage — targets ONLY the
+// Removes the persisted save from localStorage - targets ONLY the
 // currently active save slot. Achievements (ACH_SAVE_KEY, achievements.js)
 // and all other save slots are untouched.
 function wipeSaveData() {
@@ -26,7 +26,7 @@ function confirmSlotDelete(slotNum) {
     showToast(t('toast_reset'));
 }
 
-// Full reset of the currently active slot — closes the modal, wipes the
+// Full reset of the currently active slot - closes the modal, wipes the
 // active slot's save, rebuilds a blank STATE using the same fresh-state
 // shape as a brand-new save file, persists it back into that slot, then
 // returns to the title screen with a confirmation toast.

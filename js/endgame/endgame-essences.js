@@ -6,7 +6,7 @@
 // ANY equipment item regardless of rarity via right-click-then-left-click
 // ("use mode", same interaction as currency orbs).
 //
-// Essence semantics (NEW — per-modifier v2):
+// Essence semantics (NEW - per-modifier v2):
 //   One essence per individual modifier family (93 total). The target
 //   item is stripped of ALL its modifiers and re-forged into an EPIC
 //   item with exactly ONE guaranteed modifier (the essence's specific
@@ -14,7 +14,7 @@
 //   according to the normal prefix/suffix rules (epic caps, ilvl gating,
 //   no duplicate families, base-stat-gated local defenses).
 //   The guaranteed tier is rolled from the tiers eligible at the item's
-//   level — low ilvl can only reach low tiers.
+//   level - low ilvl can only reach low tiers.
 //   If the target base cannot roll that family at all (wrong slotType or
 //   missing local defense stat) the essence cannot be used and an error
 //   is shown / essence is not consumed.
@@ -33,7 +33,7 @@
 //-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
 
-// Essence stash dimensions — fixed PoE-style tab with pre-assigned slots
+// Essence stash dimensions - fixed PoE-style tab with pre-assigned slots
 // (mirrors the Orbs & Shards currency tab). Every essence id has a
 // dedicated cell; hovering an empty cell still shows its essence tooltip.
 // 12 rows × 8 cols = 96 cells → 93 modifier essences + 3 decorative empties.
@@ -51,7 +51,7 @@ let _egEssenceStash = Array.from({ length: EG_ESSENCE_ROWS }, () => Array(EG_ESS
 //-------------------PER-MODIFIER ESSENCE REGISTRY-------------------------
 //------------------------------------------------------------------------
 
-// Complete list of individual modifier families — one essence per family.
+// Complete list of individual modifier families - one essence per family.
 const _EG_ESSENCE_FAMILIES = [
     'absorption_on_kill', 'absorption_regen_rate', 'accuracy', 'agility', 'arcane_resistance', 'arcane_surge',
     'attack_speed', 'block_chance', 'block_recovery', 'chain', 'chance_for_new_question', 'chance_to_blind',
@@ -59,10 +59,10 @@ const _EG_ESSENCE_FAMILIES = [
     'cold_damage', 'cold_resist', 'crit_chance', 'crit_multiplier', 'deflect', 'deflect_damage', 'dodge', 'echo',
     'faster_absorption_regen_start', 'fate', 'fire_damage', 'fire_resist', 'first_step', 'flat_absorption',
     'flat_armour', 'flat_evasion', 'flat_health', 'flat_mana', 'flat_physical_damage', 'focus', 'grounded',
-    'heart_heal', 'hybrid_armour_absorption', 'hybrid_armour_evasion', 'hybrid_evasion_absorption', 'hybrid_evasion_armour',
+    'heart_heal', 'healing_power', 'hybrid_armour_absorption', 'hybrid_armour_evasion', 'hybrid_evasion_absorption', 'hybrid_evasion_armour',
     'hybrid_life_absorption', 'hybrid_life_armour', 'hybrid_life_evasion', 'hybrid_mana_absorption', 'hybrid_mana_armour',
-    'hybrid_mana_evasion', 'inc_absorption', 'inc_armour', 'inc_evasion', 'inc_health', 'inc_heart_heal', 'inc_mana_heal',
-    'inc_physical_damage', 'inc_spell_damage', 'intelligence', 'life_leech', 'life_on_kill', 'life_regen',
+    'hybrid_mana_evasion', 'inc_absorption', 'inc_armour', 'inc_evasion', 'inc_health', 'inc_healing_power', 'inc_heart_heal',
+    'inc_mana_heal', 'inc_physical_damage', 'inc_spell_damage', 'intelligence', 'life_leech', 'life_on_kill', 'life_regen',
     'lightning_damage', 'lightning_resist', 'mana_heal', 'mana_on_kill', 'mana_on_mistake', 'mana_regen',
     'mana_to_damage', 'mistake_count', 'mistake_not_count', 'movement_speed', 'multishot', 'overkill', 'parry',
     'pierce', 'precision_damage', 'precision_regen', 'preemptive_dodge', 'pushback', 'reveal_hint', 'shadow_damage',
@@ -70,7 +70,7 @@ const _EG_ESSENCE_FAMILIES = [
     'stagger', 'strength', 'time_added', 'warding',
 ];
 
-// Visual variety — cycle through a set of emojis so 93 essences don't all look identical.
+// Visual variety - cycle through a set of emojis so the essences don't all look identical.
 // Kept intentionally diverse (hearts, elements, combat, jewelry) but deterministic.
 const _EG_ESSENCE_ICON_CYCLE = [
     '💚', '💙', '❤️', '🧡', '💛', '💜', '🤍', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚪', '⚫', '🟤',
@@ -107,7 +107,7 @@ function _egEssenceDefForId(id) {
 
 
 // Resolves the guaranteed family for a stash item/def robustly. Never trust
-// only the object's own fields — legacy or partially-constructed stash items
+// only the object's own fields - legacy or partially-constructed stash items
 // (e.g. built from a stripped-down drop "def") can be missing
 // guaranteedFamily/guaranteedFamilies even though the canonical
 // EG_ESSENCE_DEFS entry for the same id has them. Falling back to the
@@ -156,15 +156,15 @@ function _egEssenceCanApplyToItem(familyId, item) {
 
 // Classifies WHY an essence's guaranteed family cannot be applied to an item.
 // Returns null when compatible, otherwise one of:
-//   'no_mod_table'      — item's slotType has no mod table (unknown/odd base)
-//   'family_missing'    — family doesn't exist in the item's slot-type mod table
+//   'no_mod_table'      - item's slotType has no mod table (unknown/odd base)
+//   'family_missing'    - family doesn't exist in the item's slot-type mod table
 //                         (e.g. Essence of Block Chance on a non-shield)
-//   'needs_armour'      — family is a local armour mod, base has no armour
-//   'needs_evasion'     — family is a local evasion mod, base has no evasion
-//   'needs_absorption'  — family is a local absorption mod, base has no absorption
+//   'needs_armour'      - family is a local armour mod, base has no armour
+//   'needs_evasion'     - family is a local evasion mod, base has no evasion
+//   'needs_absorption'  - family is a local absorption mod, base has no absorption
 //   'needs_armour_evasion' / 'needs_armour_absorption' /
-//   'needs_evasion_absorption' — hybrid defence mods, base lacks one/both stats
-//   'no_eligible_tier'  — family exists on this slot, but every tier needs a
+//   'needs_evasion_absorption' - hybrid defence mods, base lacks one/both stats
+//   'no_eligible_tier'  - family exists on this slot, but every tier needs a
 //                         higher item level than the item has
 function _egEssenceIncompatibilityReason(familyId, item) {
     if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return 'no_mod_table';
@@ -331,7 +331,7 @@ function _egApplyEssenceCraft(item, def) {
     const mods = [];
     const chosenFamilyIds = new Set();
     const families = def.guaranteedFamilies || (def.guaranteedFamily ? [def.guaranteedFamily] : []);
-    // 1 guaranteed modifier — must succeed or the craft is incompatible
+    // 1 guaranteed modifier - must succeed or the craft is incompatible
     let preCount = 0;
     let sufCount = 0;
     const guaranteed = _egRollGuaranteedMod(modTable, families, itemLevel, item.defenses);
@@ -375,8 +375,8 @@ function _egApplyEssenceCraft(item, def) {
         });
     }
 
-    // Ensure at least 4 mods for epic feel when pool allowed — if we ended <4 try to fill
-    // (spec: 4-6) — already 1+3 =4 minimum, so okay.
+    // Ensure at least 4 mods for epic feel when pool allowed - if we ended <4 try to fill
+    // (spec: 4-6) - already 1+3 =4 minimum, so okay.
 
     const name = _egBuildItemName(item.baseName || item.name, 'epic', mods);
     return { ...item, rarity: 'epic', mods, name };
@@ -514,7 +514,7 @@ function _egEssenceFamilyDisplayName(familyId) {
         const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
         return isDe ? 'Erhöhtes Leben' : 'Increased Health';
     }
-    // Essence-specific thematic names — more flavourful than raw mod labels
+    // Essence-specific thematic names - more flavourful than raw mod labels
     const essenceNameMap = {
         // Life & Mana hybrids
         hybrid_life_armour: { en: 'Vitality', de: 'Vitalität' },
@@ -549,6 +549,7 @@ function _egEssenceFamilyDisplayName(familyId) {
         attack_speed: { en: 'Haste', de: 'Eile' },
         spell_damage: { en: 'Spell Power', de: 'Zaubermacht' },
         inc_spell_damage: { en: 'Sorcery', de: 'Zauberei' },
+
         fire_damage: { en: 'Fire', de: 'Feuer' },
         cold_damage: { en: 'Cold', de: 'Kälte' },
         lightning_damage: { en: 'Lightning', de: 'Blitz' },
@@ -571,6 +572,8 @@ function _egEssenceFamilyDisplayName(familyId) {
         faster_absorption_regen_start: { en: 'Quick Recovery', de: 'Schnelle Erholung' },
         heart_heal: { en: 'Heart Healing', de: 'Herzheilung' },
         inc_heart_heal: { en: 'Enhanced Heart Healing', de: 'Verbesserte Herzheilung' },
+        healing_power: { en: 'Healing Light', de: 'Heiliges Licht' },
+        inc_healing_power: { en: 'Grace', de: 'Gnade' },
         mana_heal: { en: 'Mana Healing', de: 'Manaheilung' },
         inc_mana_heal: { en: 'Enhanced Mana Healing', de: 'Verbesserte Manaheilung' },
         // Utility / Puzzle
@@ -669,7 +672,7 @@ function _egBuildEssenceDetailHTML(def) {
 //-------------------ESSENCE DROPS FROM MONSTERS---------------------------
 //------------------------------------------------------------------------
 
-// One entry per modifier family — equal weight so every targeted essence is
+// One entry per modifier family - equal weight so every targeted essence is
 // equally likely to drop (rarity differentiation via map tier/loot quantity).
 const EG_ESSENCE_DROP_TABLE = _EG_ESSENCE_FAMILIES.map(fid => ({ id: 'essence_' + fid, weight: 100 }));
 
@@ -785,7 +788,7 @@ function _egBuildEssenceTabHTML() {
 <div class="eg-panel eg-panel-essence">
     <div class="eg-panel-label">
         ${t('eg_essences_tab')}
-        <select id="eg-essence-filter-select" class="eg-essence-filter-select" onchange="_egSetEssenceFilter(this.value)" title="${t('eg_essence_filter_title') || 'Filter essences by item type'}">
+        <select id="eg-essence-filter-select" class="eg-essence-filter-select" onchange="_egSetEssenceFilter(this.value)" data-tip-t="eg_essence_filter_title">
             ${filterOptions}
         </select>
     </div>
@@ -796,7 +799,7 @@ function _egBuildEssenceTabHTML() {
 </div>`;
 }
 
-// Empty-slot hover preview — mirrors Orbs & Shards behavior.
+// Empty-slot hover preview - mirrors Orbs & Shards behavior.
 function _egOnEssenceCellEnter(row, col, e) {
     const stash = (typeof _egEssenceStash !== 'undefined') ? _egEssenceStash : null;
     const item = stash && stash[row] ? stash[row][col] : null;
@@ -818,7 +821,7 @@ function _egOnEssenceCellEnter(row, col, e) {
     <div class="eg-tt-header">
         <div class="eg-tt-icon" style="opacity:0.55;">${ttIcon}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')} — ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
+        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${ttDesc}</div></div>
     ${essenceDetailHTML}
@@ -869,7 +872,7 @@ function _egRenderEssenceCell(row, col) {
         cell.innerHTML = '';
         cell.classList.add('eg-essence-assigned-empty');
         cell.removeAttribute('data-empty-icon');
-        cell.removeAttribute('title');
+        cell.removeAttribute('data-tip');
         return;
     }
 
@@ -877,17 +880,20 @@ function _egRenderEssenceCell(row, col) {
         cell.innerHTML = _dndBuildCurrencyChipHTML(item);
         cell.classList.remove('eg-essence-assigned-empty');
         cell.removeAttribute('data-empty-icon');
-        cell.removeAttribute('title');
+        // The chip carries its own richer tooltip, so the cell-level one must go
+        // - otherwise a leftover data-tip on the parent would keep winning the
+        // closest() lookup for every child of the chip.
+        cell.removeAttribute('data-tip');
     } else if (assignedId && def) {
         cell.innerHTML = '';
         cell.classList.add('eg-essence-assigned-empty');
         if (def.icon) cell.setAttribute('data-empty-icon', def.icon);
-        cell.title = def.name || assignedId;
+        cell.setAttribute('data-tip', _tipAttr(def.name || assignedId));
     } else {
         cell.innerHTML = '';
         cell.classList.remove('eg-essence-assigned-empty');
         cell.removeAttribute('data-empty-icon');
-        cell.removeAttribute('title');
+        cell.removeAttribute('data-tip');
     }
 }
 
@@ -972,7 +978,7 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     }
 
     if (!item || item.category !== 'equip' || item.isUnique) {
-        // Distinct short reasons so the player knows WHY (no item name — the
+        // Distinct short reasons so the player knows WHY (no item name - the
         // target is what's on screen, the essence is still highlighted).
         _egRejectEssenceUse(
             (item && item.isUnique) ? 'eg_essence_unique_reject'
@@ -983,7 +989,7 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
         return;
     }
 
-    // Compatibility check — does this base support the guaranteed family?
+    // Compatibility check - does this base support the guaranteed family?
     const famList = def.guaranteedFamilies || (def.guaranteedFamily ? [def.guaranteedFamily] : []);
     const famForCheck = famList[0];
     if (famForCheck) {
@@ -996,7 +1002,7 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
 
     const newItem = _egApplyEssenceCraft(item, def);
     if (!newItem) {
-        // Fallback — should already be caught by the checks above.
+        // Fallback - should already be caught by the checks above.
         _egRejectEssenceUse(null, chipEl);
         return;
     }

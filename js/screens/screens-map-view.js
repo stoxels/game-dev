@@ -14,8 +14,8 @@
       classic list view and map view
 
     State persisted on STATE:
-      STATE.mapViewEnabled        (boolean) — which view is active
-      STATE.mapSpriteWorldIndex   (number|null) — where the sprite last stood
+      STATE.mapViewEnabled        (boolean) - which view is active
+      STATE.mapSpriteWorldIndex   (number|null) - where the sprite last stood
                                    null = at the Cartographer's Outpost
     ========================================================================
 */
@@ -52,7 +52,7 @@ const MAP_HOME_POS = { x: 7.6, y: 86.3 };
 
 // World node positions and localized names.
 // Index matches the world index (wi) used throughout the codebase.
-// wi=13 is the Nexus World — secret World 14 (Descriptive Statistics).
+// wi=13 is the Nexus World - secret World 14 (Descriptive Statistics).
 // Coordinates are percentages of the background IMAGE.
 const MAP_WORLD_POSITIONS = [
     { x: 25, y: 83.1, labelEN: "Probability Peaks", labelDE: "Probability Peaks" },
@@ -78,7 +78,7 @@ const MAP_WORLD_POSITIONS = [
 //   - a number       : a world index (0-based)
 //   - a string       : a named junction (fork point)
 // The BFS pathfinder traverses this graph in both directions, so order
-// of n1/n2 does not matter for routing — only the waypoint order matters
+// of n1/n2 does not matter for routing - only the waypoint order matters
 // for visual drawing and sprite movement direction.
 // Coordinates are percentages of the background IMAGE.
 const ROAD_SEGMENTS = [
@@ -388,7 +388,7 @@ function _imgPctToCanvasPct(imgPctX, imgPctY, canvas) {
     const cw = canvas.offsetWidth;
     const ch = canvas.offsetHeight;
 
-    // Canvas not yet laid out — return raw values as a safe fallback
+    // Canvas not yet laid out - return raw values as a safe fallback
     if (!cw || !ch) return { x: imgPctX, y: imgPctY };
 
     const containerAspect = cw / ch;
@@ -476,7 +476,7 @@ function _isWorldComplete(wi) {
  * @returns {boolean}
  */
 function _isWorldAccessible(wi) {
-    // Nexus World gate — must come first so it stays locked even while
+    // Nexus World gate - must come first so it stays locked even while
     // earlier worlds are still in progress.
     if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
         return typeof isNexusWorldUnlocked === 'function' ? isNexusWorldUnlocked() : false;
@@ -521,11 +521,11 @@ function _isWorldMaxCleared(wi) {
 
 /**
  * Returns the "healing" tier (0–3) for a world node's corruption-cleansing
- * visual effect — the land recovering from the void as the world is cleared:
- *   0 — not yet fully cleared: corruption remains, no effect
- *   1 — every level cleared at least once: nature begins to return
- *   2 — tier 1 + every bonus claimed: vines and leaves visibly sprout
- *   3 — tier 2 + every level max-cleared (Hard, all mods): full radiant bloom
+ * visual effect - the land recovering from the void as the world is cleared:
+ *   0 - not yet fully cleared: corruption remains, no effect
+ *   1 - every level cleared at least once: nature begins to return
+ *   2 - tier 1 + every bonus claimed: vines and leaves visibly sprout
+ *   3 - tier 2 + every level max-cleared (Hard, all mods): full radiant bloom
  */
 function _getWorldHealingTier(wi) {
     if (!_isWorldFullyDone(wi)) return 0;
@@ -576,7 +576,7 @@ function _buildRoadGraph() {
 
 /**
  * Flattens a BFS segment-path into an ordered array of {x, y} waypoints,
- * plus a list of "markers" — indices into the waypoint array that land
+ * plus a list of "markers" - indices into the waypoint array that land
  * exactly on a real graph node (used to detect mid-walk redirects).
  * Duplicate junction coordinates at segment boundaries are de-duplicated
  * to prevent stuttering.
@@ -586,7 +586,7 @@ function _buildRoadGraph() {
  */
 function _routeSegmentsToWaypointsWithMarkers(routeSegments) {
     const points = [];
-    const markers = []; // { index, key } — index into `points` that sits on a real graph node
+    const markers = []; // { index, key } - index into `points` that sits on a real graph node
 
     routeSegments.forEach(({ segment, reversed }) => {
         const wps = segment.waypoints || [];
@@ -654,7 +654,7 @@ function _findWalkPathWithMarkers(fromNode, toNode) {
 // NOTE: _routeSegmentsToWaypoints() and _findWalkPath() below appear to
 // have been superseded by the "WithMarkers" versions above (needed for
 // mid-walk redirects) and are not called anywhere else in this file.
-// Kept as-is per refactor instructions — see "Suspected dead code" in the
+// Kept as-is per refactor instructions - see "Suspected dead code" in the
 // refactor summary before removing, since other files may still call them.
 
 /**
@@ -726,7 +726,7 @@ function _findWalkPath(fromNode, toNode) {
         }
     }
 
-    // No route found in the graph — fall back to a straight-line teleport
+    // No route found in the graph - fall back to a straight-line teleport
     const startPos = (fromNode === null || fromNode === 'home') ? MAP_HOME_POS : MAP_WORLD_POSITIONS[fromNode];
     const endPos = (toNode === null || toNode === 'home') ? MAP_HOME_POS : MAP_WORLD_POSITIONS[toNode];
     if (!startPos || !endPos) return [];
@@ -1003,7 +1003,7 @@ function _walkSpriteToHome() {
 
 /**
  * Creates and returns the player sprite DOM element.
- * Gameplay default: move-down art (never the menu portrait — the menu
+ * Gameplay default: move-down art (never the menu portrait - the menu
  * portrait stays reserved for save slots, level-select topbar and
  * quiz/exercise modals). Falls back to the no-class portrait only for
  * variants without directional art.
@@ -1099,13 +1099,23 @@ function _getWorldStoxelProgressText(wi) {
 }
 
 /**
- * Counts how many of the world's two convergence points the player has
- * claimed (first clears of the 33% and 66% milestone levels).
+ * Convergence Trial status for the world tooltip (Leveling Rework: the two
+ * legacy 33%/66% convergence points are regular levels now; each world has
+ * one Convergence Trial node instead).
  *
  * @param {number} wi - World index
- * @returns {string} Localised "x/2" convergence text (or '' if unavailable)
+ * @returns {string} Localised trial status text (or '' if unavailable)
  */
 function _getWorldConvergenceText(wi) {
+    // Trial system present: "claimed 1/1" style readout.
+    if (typeof _egTrialIdForWorld === 'function' && typeof STATE !== 'undefined' && STATE) {
+        const id = _egTrialIdForWorld(wi);
+        const done = STATE.trialsDone && STATE.trialsDone.includes(id);
+        const key = done ? 'scr_world_trial_done' : 'scr_world_trial_todo';
+        let label = (typeof t === 'function') ? t(key) : null;
+        if (label && label !== key) return label;
+        return done ? '🌿 Trial: 1/1' : '🌿 Trial: 0/1';
+    }
     const worldData = WORLDS && WORLDS[wi];
     if (!worldData || typeof WORLD_START_GI === 'undefined'
         || typeof isLevelConvergence !== 'function') return '';
@@ -1132,7 +1142,7 @@ function _getWorldConvergenceText(wi) {
  */
 function _getWorldClassUpgradeText(wi) {
     // The Nexus World (secret world 14) grants a one-time CLASS CHANGE on
-    // its Ascension Level instead of a class upgrade — show that instead.
+    // its Ascension Level instead of a class upgrade - show that instead.
     if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
         return t('scr_nexus_ascension_hint');
     }
@@ -1153,7 +1163,7 @@ function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
     const label = _getWorldLabel(wi);
     let statusText;
 
-    // The Nexus World (wi 13) is a regular campaign world — World 14 lives there.
+    // The Nexus World (wi 13) is a regular campaign world - World 14 lives there.
     const worldData = WORLDS && WORLDS[wi];
     const levelCount = worldData ? worldData.data.length : '?';
 
@@ -1197,7 +1207,7 @@ function _buildRemainingWorkText(healingTier) {
     if (healingTier === 2) {
         return t('scr_hard_mods_remaining');
     }
-    // tier 3 — fully maxed out
+    // tier 3 - fully maxed out
     return t('scr_fully_mastered');
 }
 
@@ -1291,7 +1301,7 @@ function _buildEnterButton(wi) {
 
     btn.addEventListener('click', () => {
         btn.remove();
-        // wi 13 is the Nexus World — a regular (secret) campaign world.
+        // wi 13 is the Nexus World - a regular (secret) campaign world.
         // The endgame Nexus screen stays reachable from inside endgame maps
         // (btn-go-nexus) and the endgame chain's back buttons.
         if (typeof showWorldDetail === 'function') {
@@ -1511,7 +1521,7 @@ function _waypointsToSVGPoints(waypoints, canvas, svgW, svgH) {
     }).join(' ');
 }
 
-// NOTE: _drawAllPaths() is not called anywhere in this file — _buildPathsSVG()
+// NOTE: _drawAllPaths() is not called anywhere in this file - _buildPathsSVG()
 // below (its only caller in the original code) currently short-circuits and
 // returns null before drawing anything. Kept as-is; see refactor summary.
 
@@ -1546,7 +1556,7 @@ function _drawAllPaths(svg, w, h) {
 
 /**
  * Creates and returns the SVG layer used for drawing road paths.
- * Path lines are currently disabled — no longer drawing the SVG road overlay.
+ * Path lines are currently disabled - no longer drawing the SVG road overlay.
  *
  * @param {HTMLElement} canvas - Parent canvas element
  * @returns {SVGElement|null}
@@ -1606,7 +1616,7 @@ function _appendWorldNodes(canvas) {
  * Attaches a temporary dev-helper click listener that logs canvas coordinates
  * to the console in waypoint format. Remove when no longer needed.
  * NOTE: the console.log call is currently commented out, so this listener
- * has no observable effect — see refactor summary.
+ * has no observable effect - see refactor summary.
  *
  * @param {HTMLElement} canvas
  */
@@ -1693,7 +1703,7 @@ function _buildMapCanvas() {
     if (!wrap) return;
     wrap.innerHTML = '';
 
-    // Main canvas div — fills the wrap, acts as the coordinate root for all children
+    // Main canvas div - fills the wrap, acts as the coordinate root for all children
     const canvas = document.createElement('div');
     canvas.className = 'mv-canvas';
     canvas.id = 'mv-canvas';
@@ -1712,7 +1722,7 @@ function _buildMapCanvas() {
     _ensureTooltipElement();
     _placeSprite(sprite, _mvCurrentWorldIdx);
 
-    _attachWaypointDebugLogger(canvas);  // TEMP — remove when waypoints are finalised
+    _attachWaypointDebugLogger(canvas);  // TEMP - remove when waypoints are finalised
     _attachResizeObserver(canvas);
 }
 
@@ -1796,7 +1806,7 @@ function _renderTopBarTreePoints(p = 'mv') {
     // so a golden frame is applied via outline/box-shadow in CSS)
     treeBtn.classList.toggle('unspent-points', hasPoints);
 
-    // Yellow point count appended next to the translated label —
+    // Yellow point count appended next to the translated label -
     // appended as a sibling so i18n re-renders cannot wipe it
     let countEl = document.getElementById('ptb-point-count-' + p);
     if (!countEl) {
@@ -1814,6 +1824,7 @@ function _renderTopBarTreePoints(p = 'mv') {
 function _wireTopBarButtons(p = 'mv') {
     const backBtn = document.getElementById(p + '-btn-back');
     const questBtn = document.getElementById(p + '-btn-quest-log');
+    const spellbookBtn = document.getElementById(p + '-btn-spellbook');
     const treeBtn = document.getElementById(p + '-btn-passive-tree');
     const changeBtn = document.getElementById(p + '-btn-class-change');
 
@@ -1823,6 +1834,10 @@ function _wireTopBarButtons(p = 'mv') {
             : () => showSetup();
     }
     if (questBtn) questBtn.onclick = () => showQuestLog();
+    // Spell book from the overworld: openSpellbook() skips its pause dance on
+    // screens with no live level (see skill-spellbook.js) and the book itself
+    // re-renders the hotbar as a drag target while it is open.
+    if (spellbookBtn) spellbookBtn.onclick = () => { if (typeof openSpellbook === 'function') openSpellbook(); };
     if (treeBtn) treeBtn.onclick = () => showPassiveTree();
     if (changeBtn) changeBtn.onclick = () => { if (typeof showClassChange === 'function') showClassChange(); };
 }
@@ -1839,10 +1854,10 @@ function _buildMapViewTopBar() {
     _renderTopBarQuestBadge();
     _renderTopBarTreePoints();
     _wireTopBarButtons();
-    // Class-change token entry button — only visible while a token is held.
+    // Class-change token entry button - only visible while a token is held.
     if (typeof updateClassChangeButtons === 'function') updateClassChangeButtons();
 
-    // Character portrait (replaces the old List-view toggle button) —
+    // Character portrait (replaces the old List-view toggle button) -
     // hovering it shows the character's traits tooltip.
     if (typeof renderMapViewCharacterPortrait === 'function') renderMapViewCharacterPortrait();
 
@@ -1874,7 +1889,7 @@ function _updateToggleButtonLabels() {
  * Toggles between the classic level-select list view and the map view.
  * Persists the preference in STATE.mapViewEnabled and saves.
  * NOTE: calls showMapView(), which is defined below in the "Entry Point"
- * section — see refactor summary for why this forward-reference is kept.
+ * section - see refactor summary for why this forward-reference is kept.
  */
 function toggleMapView() {
     if (!STATE) return;
@@ -1915,6 +1930,8 @@ function initMapViewToggle() {
  * Call this instead of renderLevelSelect() when STATE.mapViewEnabled is true.
  */
 function showMapView() {
+    // Level-selection overworld: play the old title theme (bgm_title1).
+    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playBGM('overworld');
     _mvCurrentWorldIdx = (STATE && STATE.mapSpriteWorldIndex !== undefined)
         ? STATE.mapSpriteWorldIndex
         : null;

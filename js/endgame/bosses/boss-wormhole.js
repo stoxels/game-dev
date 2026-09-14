@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE WORMHOLE (boss_wormhole)-------------------------
 //------------------------------------------------------------------------
-// Portal homage: two wormholes tear open — step into one and you fall out
+// Portal homage: two wormholes tear open - step into one and you fall out
 // of the other. A hungry wisp rides you down the whole time, and it does
 // not do doors. Lose it through the holes.
 // This file holds EVERYTHING this boss needs in one place:

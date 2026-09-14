@@ -2,7 +2,7 @@
 //-------------------SHADOW SEAL----------------------
 //------------------------------------------------------------------------
 
-// shadowSeal — sets the timer to exactly 5 min, permanently hides all
+// shadowSeal - sets the timer to exactly 5 min, permanently hides all
 // clues for the rest of the level, and mass-marks 75 % of empty cells.
 function _useShadowSeal(id, def) {
     questStat_shadowSealUsed();
@@ -64,7 +64,7 @@ function _fxMakeShadowVeil(container, r) {
     container.appendChild(veil);
 }
 
-// 🌑 Shadow Seal — dark void engulfs the puzzle, then disperses.
+// 🌑 Shadow Seal - dark void engulfs the puzzle, then disperses.
 function _fxShadowSeal() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

@@ -240,9 +240,9 @@ const ITEM_DEFS = {
 
     // ----------------------------------------------------------------------------------------
 
-    // PASSIVE-TREE-UNLOCKED ITEMS (weight: 0 — only obtainable when node is active)
+    // PASSIVE-TREE-UNLOCKED ITEMS (weight: 0 - only obtainable when node is active)
 
-    // Pearl of Haste — reduces active1 cooldown to 1 s
+    // Pearl of Haste - reduces active1 cooldown to 1 s
     pearlOfHaste: {
         id: 'pearlOfHaste', icon: '🔵',
         nameEn: 'Pearl of Haste', nameDE: 'Perle der Schnelligkeit',
@@ -251,7 +251,7 @@ const ITEM_DEFS = {
         rarity: 'epic', weight: 0
     },
 
-    // Pearl of Swiftness — reduces active2 cooldown to 1 s
+    // Pearl of Swiftness - reduces active2 cooldown to 1 s
     pearlOfSwiftness: {
         id: 'pearlOfSwiftness', icon: '🟣',
         nameEn: 'Pearl of Swiftness', nameDE: 'Perle der Gewandtheit',
@@ -260,7 +260,7 @@ const ITEM_DEFS = {
         rarity: 'epic', weight: 0
     },
 
-    // Grand Pearl — reduces both cooldowns to 1 s
+    // Grand Pearl - reduces both cooldowns to 1 s
     grandPearl: {
         id: 'grandPearl', icon: '⚪',
         nameEn: 'Grand Pearl', nameDE: 'Große Perle',
@@ -269,7 +269,7 @@ const ITEM_DEFS = {
         rarity: 'legendary', weight: 0
     },
 
-    // The Witch — cursed immunity 60 s, -10 min timer
+    // The Witch - cursed immunity 60 s, -10 min timer
     theWitch: {
         id: 'theWitch', icon: '🧙',
         nameEn: 'The Witch', nameDE: 'Die Hexe',
@@ -278,7 +278,7 @@ const ITEM_DEFS = {
         rarity: 'cursed', weight: 0
     },
 
-    // Golden Clock — stops timer decrease, timer items 100% more effective, max 3 more mistakes
+    // Golden Clock - stops timer decrease, timer items 100% more effective, max 3 more mistakes
     goldenClock: {
         id: 'goldenClock', icon: '🌇',
         nameEn: 'Golden Clock', nameDE: 'Goldene Uhr',
@@ -287,7 +287,7 @@ const ITEM_DEFS = {
         rarity: 'legendary', weight: 0
     },
 
-    // Shadow Seal — hides all clues, marks 75% wrong tiles, sets timer to 5 min
+    // Shadow Seal - hides all clues, marks 75% wrong tiles, sets timer to 5 min
     shadowSeal: {
         id: 'shadowSeal', icon: '🌑',
         nameEn: 'Shadow Seal', nameDE: 'Schattensiegel',

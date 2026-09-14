@@ -29,7 +29,7 @@ Layout Architecture:
     box-sizing: border-box;
 }
 
-/* ── TOP BAR — mirrors ls-topbar ── */
+/* ── TOP BAR - mirrors ls-topbar ── */
 .eg-topbar {
     background: var(--panel);
     border-bottom: 1px solid var(--border);
@@ -40,7 +40,7 @@ Layout Architecture:
     flex-shrink: 0;
 }
 
-/* Endgame back button — the unified .back-btn stone slab (base.css).
+/* Endgame back button - the unified .back-btn stone slab (base.css).
    .eg-back-btn keeps only the size tweak for the slim endgame topbar. */
 .eg-back-btn {
     font-size: 12px;
@@ -70,7 +70,7 @@ Layout Architecture:
         margin-left: 0;
     }
 
-/* ── TOP BAR LEVEL BUTTON — opens the character/attribute window ── */
+/* ── TOP BAR LEVEL BUTTON - opens the character/attribute window ── */
 .eg-level-btn {
     margin-left: auto;
     position: relative;
@@ -118,7 +118,7 @@ Layout Architecture:
     margin-left: auto;
 }
 
-/* ── TOP BAR INFO BUTTON — "?" in the top-right corner ── */
+/* ── TOP BAR INFO BUTTON - "?" in the top-right corner ── */
 .eg-info-btn {
     margin-left: auto;
     width: 24px;
@@ -321,7 +321,7 @@ Layout Architecture:
 
 /* Character panel*/
 /* Grid columns: offense stats | left slots | center puzzle stats | right
-   slots | defense stats — offense/defense fill the former empty corners. */
+   slots | defense stats - offense/defense fill the former empty corners. */
 .eg-char-panel.eg-char-panel-no-model {
     display: grid;
     grid-template-columns: clamp(165px, 18vw, 320px) auto minmax(0, 1fr) auto clamp(165px, 18vw, 320px);
@@ -821,7 +821,7 @@ Layout Architecture:
     box-sizing: border-box;
 }
 
-/* Item level badge — small number in the slot's top-left corner */
+/* Item level badge - small number in the slot's top-left corner */
 .eg-item-chip .eg-item-ilvl {
     position: absolute;
     top: 0;
@@ -915,7 +915,7 @@ img.eg-art-img {
     border-color: rgba(163,53,238,0.4) !important;
 }
 
-/* Stash cells are fully filled with the rarity color — suppress the
+/* Stash cells are fully filled with the rarity color - suppress the
    old per-icon rarity glow inside the main stash grid */
 #eg-inv-grid .eg-item-chip.eg-rarity-uncommon .eg-item-chip-icon,
 #eg-inv-grid .eg-item-chip.eg-rarity-rare .eg-item-chip-icon,
@@ -1053,7 +1053,7 @@ img.eg-art-img {
 
 
 
-/* ── (TOOLTIP PANEL REMOVED — items now use the floating mouseover
+/* ── (TOOLTIP PANEL REMOVED - items now use the floating mouseover
        tooltip from tooltips-hud.js; see endgame-hub.js) ── */
 
 .eg-tooltip-item {
@@ -1145,14 +1145,14 @@ img.eg-art-img {
     padding: 6px 8px 8px;
 }
 
-/* Fallback size for old horizontal layout — overridden inside hub currency grid */
+/* Fallback size for old horizontal layout - overridden inside hub currency grid */
 .eg-currency-cell {
     min-height: 0 !important;
     height: 38px !important;
     aspect-ratio: 1;
 }
 
-/* Hub uses the left-side currency COL instead of the horizontal strip — hide strip there */
+/* Hub uses the left-side currency COL instead of the horizontal strip - hide strip there */
 #screen-endgame-hub .eg-currency-strip {
     display: none !important;
 }
@@ -1185,7 +1185,7 @@ img.eg-art-img {
     pointer-events: none;
 }
 
-/* ── STASH: unlimited rows — vertical scroll ── */
+/* ── STASH: unlimited rows - vertical scroll ── */
 .eg-panel-inv {
     max-height: none; /* override the old 260px cap */
     flex: 1;
@@ -1495,7 +1495,7 @@ img.eg-art-img {
 }
 
 .eg-gate-side-right {
-    /* hosts the potential-drops panel — wider than the left side for readability */
+    /* hosts the potential-drops panel - wider than the left side for readability */
     justify-content: flex-start;
     width: 360px;
 }
@@ -1568,7 +1568,7 @@ img.eg-art-img {
     letter-spacing: 3px;
 }
 
-/* Runes & orbs strip — sizing inside the left-side panel */
+/* Runes & orbs strip - sizing inside the left-side panel */
 #screen-endgame-gate .eg-currency-row {
     gap: 4px;
     padding: 4px 12px 10px;
@@ -1615,7 +1615,7 @@ img.eg-art-img {
     font-size: 9px;
 }
 
-/* ── STASH TABS — Inventory / Uniques ── */
+/* ── STASH TABS - Inventory / Uniques ── */
 .eg-stash-tabs {
     display: flex;
     gap: 6px;

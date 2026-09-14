@@ -1,5 +1,5 @@
 ﻿// ============================================================
-//  audio.js  —  Sound effects and background music manager
+//  audio.js  -  Sound effects and background music manager
 // ============================================================
 //  Structure:
 //    1. Volume & State Variables
@@ -25,7 +25,7 @@ const Audio_Manager = (() => {
     let BGM_VOLUME = 0.4;
     let SFX_VOLUME = 0.7;
 
-    // Master on/off switches — kept in sync with SETTINGS when available
+    // Master on/off switches - kept in sync with SETTINGS when available
     let bgmEnabled = true;
     let sfxEnabled = true;
     let bgmLocked = false;   // true while a story beat/cutscene owns BGM
@@ -148,17 +148,49 @@ const Audio_Manager = (() => {
     }
 
     // Returns an array of all keys in BGM_TRACKS, optionally excluding
-    // special tracks (title, convergence) that are not regular gameplay music.
-    // Tracks whose file previously failed to load (404 / decode error) are
-    // also excluded so the random chain can never get stuck on silence.
+    // special tracks (title, overworld, convergence, tutorial_*) that are
+    // not regular gameplay music. Tracks whose file previously failed to
+    // load (404 / decode error) are also excluded so the random chain can
+    // never get stuck on silence. Campaign level keys (level_*) and boss
+    // keys (boss_*) share the same files - deduped by src so no track is
+    // double-weighted in random mode.
     const _badBgmSrcs = new Set();
     function _getAllBGMKeys(excludeSpecial = true) {
-        const specialKeys = new Set(['title', 'convergence']);
+        const specialKeys = new Set(['title', 'overworld', 'convergence', 'tutorial_1', 'tutorial_2']);
+        const seenSrcs = new Set();
         return Object.keys(BGM_TRACKS).filter(k => {
             if (excludeSpecial && specialKeys.has(k)) return false;
-            if (_badBgmSrcs.has(BGM_TRACKS[k])) return false;
+            const src = BGM_TRACKS[k];
+            if (_badBgmSrcs.has(src)) return false;
+            if (seenSrcs.has(src)) return false;
+            seenSrcs.add(src);
             return true;
         });
+    }
+
+    // Plays one random tutorial track (tutorial_1 / tutorial_2).
+    // Used when the player enters the tutorial. Tutorial tracks bypass the
+    // random-BGM chain below (see playBGM): the tutorial owns the music
+    // channel while it runs, no matter the player's random-BGM setting.
+    function playTutorialBGM() {
+        if (typeof TUTORIAL_BGM === 'undefined' || !TUTORIAL_BGM.length) return;
+        const key = TUTORIAL_BGM[Math.floor(Math.random() * TUTORIAL_BGM.length)];
+        playBGM(key);
+    }
+
+    // Plays the theme music for an endgame boss: one random track from
+    // BOSS_BGM[bossId] (e.g. boss_voidborn → voidborn_1 / voidborn_2).
+    // Unknown ids (e.g. boss_brutus, which ships no music yet) fall back
+    // to a random boss theme so the arena never goes silent.
+    function playBossBGM(bossId) {
+        let keys = (typeof BOSS_BGM !== 'undefined') ? BOSS_BGM[bossId] : null;
+        if (!keys || !keys.length) {
+            const allBossKeys = Object.keys(BGM_TRACKS).filter(k => k.startsWith('boss_'));
+            if (!allBossKeys.length) return;
+            keys = [allBossKeys[Math.floor(Math.random() * allBossKeys.length)]];
+        }
+        const key = keys[Math.floor(Math.random() * keys.length)];
+        playBGM(key);
     }
 
 
@@ -208,7 +240,7 @@ const Audio_Manager = (() => {
 
         _lastBGMKey = trackKey; // always remember the "real" level track
 
-        // While focus-muted, only queue the track — it starts on unmute
+        // While focus-muted, only queue the track - it starts on unmute
         if (focusMuted) return;
 
         // Level track file previously failed to load (missing bgm_48+):
@@ -223,12 +255,13 @@ const Audio_Manager = (() => {
             return;
         }
 
-        if (randomBgmEnabled) {
-            // Already mid-chain — don't interrupt it. playBGM() just means
+        if (randomBgmEnabled && !(typeof trackKey === 'string' && trackKey.indexOf('tutorial_') === 0)) {
+            // Already mid-chain - don't interrupt it. playBGM() just means
             // "make sure appropriate music is playing"; when random mode is
             // on, a currently-playing random track already satisfies that,
             // no matter what triggered this call (level start, next-level,
-            // or anything else).
+            // or anything else). Tutorial tracks are exempt: the tutorial
+            // owns the channel while it runs (see playTutorialBGM).
             if (_randomTrackActive && currentBGM && !currentBGM.paused) return;
             _playRandomBGMTrack();
             return;
@@ -269,7 +302,7 @@ const Audio_Manager = (() => {
     // Picks a random track (excluding special tracks), plays it without looping,
     // and wires an 'ended' listener so the next random track auto-chains.
     // Missing audio files (e.g. unshipped bgm_48+ tracks) fire 'error' instead
-    // of 'ended' — those are remembered in _badBgmSrcs and skipped so the
+    // of 'ended' - those are remembered in _badBgmSrcs and skipped so the
     // chain never gets stuck on silence after a puzzle finishes.
     function _playRandomBGMTrack(attemptsLeft) {
         const keys = _getAllBGMKeys(true);
@@ -288,7 +321,7 @@ const Audio_Manager = (() => {
         _randomTrackActive = true;
         audio.addEventListener('ended', _onRandomTrackEnded);
         audio.addEventListener('error', () => {
-            // File missing / undecodable — never pick it again this session.
+            // File missing / undecodable - never pick it again this session.
             _badBgmSrcs.add(src);
             _randomTrackActive = false;
             if (currentBGM === audio) {
@@ -409,7 +442,7 @@ const Audio_Manager = (() => {
         sfxEnabled = enabled;
     }
 
-    // Locks BGM so playBGM() calls are ignored — used while a story
+    // Locks BGM so playBGM() calls are ignored - used while a story
     // beat/cutscene owns the music.
     function lockBGM() {
         bgmLocked = true;
@@ -447,6 +480,8 @@ const Audio_Manager = (() => {
         // BGM
         playBGM,
         playRandomBGM,
+        playTutorialBGM,
+        playBossBGM,
         stopBGM,
         trackForLevel,
         lockBGM,
@@ -455,7 +490,7 @@ const Audio_Manager = (() => {
         setFocusMuted,
 
         get lastBGMKey() { return _lastBGMKey; },
-        // Legacy alias — storyline-engine.js reads Audio_Manager._lastBGMKey.
+        // Legacy alias - storyline-engine.js reads Audio_Manager._lastBGMKey.
         get _lastBGMKey() { return _lastBGMKey; },
 
         // SFX

@@ -120,7 +120,7 @@ function _buildTooltipCooldownLine(cooldownSeconds, baseSeconds) {
 }
 
 // Builds the cost footer line used inside skill tooltips.
-// e.g. "✦ 50 Mana" — omitted entirely for abilities without a cost.
+// e.g. "✦ 50 Mana" - omitted entirely for abilities without a cost.
 // Under Blood Magic the cost is paid from life instead: "✚ 50 Life".
 function _buildTooltipManaLine(manaCost) {
     if (!manaCost) return '';
@@ -176,7 +176,10 @@ function getHUDTooltip() {
         tip.id = 'chud-floating-tip';
         tip.style.cssText = `
             position: fixed;
-            z-index: 9999;
+            /* Above every modal backdrop. The spell book lifts itself to
+               z-index 10000 (css/pause.css) and the hotbar to 10010 while it
+               is open, which used to render skill tooltips behind the book. */
+            z-index: 10050;
             background: #12121e;
             border: 1px solid var(--accent, #5555aa);
             border-left: 3px solid var(--accent2, #aaaaff);
@@ -250,8 +253,23 @@ function _buildPassiveTooltipHTML(def) {
     const passLv = STATE.classPassiveLevel || 1;
     const passData = def.passive.levels[passLv - 1];
     return `<strong style="color:${HUD_COLOR_PASSIVE}">${getLocalName(def.passive)}</strong>`
-        + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${passLv}</span>`
+        + ` <span style="opacity:.6;font-size:.85em">- ${_getRankWord()} ${passLv}</span>`
         + `<br>${getLocalDesc(passData)}`;
+}
+
+// Rank an active ability is actually CAST at for a HUD slot: the slotted
+// charm's rank when one is placed, otherwise the trained rank. The button
+// fires the charmed variant, so the tooltip must describe the same one
+// (js/skills/skill-charms.js). Returns the trained level when no charm is
+// slotted or the charm system is not loaded yet.
+function _getActiveCastRank(slot, trainedLevel) {
+    if (typeof getSkillCastRankClampedForSlot === 'function') {
+        try {
+            const castRank = getSkillCastRankClampedForSlot(slot);
+            if (castRank) return castRank;
+        } catch (e) { /* fall through to the trained rank */ }
+    }
+    return trainedLevel;
 }
 
 // Builds the tooltip HTML for an active skill button on the compact HUD.
@@ -259,12 +277,12 @@ function _buildPassiveTooltipHTML(def) {
 // and endgame gear reductions (see getEffectiveCooldown in class-cooldown-state.js).
 function _buildActiveTooltipHTML(def, key) {
     const skill = def[key];
-    const skillLv = getActiveSkillLevel(key);
-    const skillData = skill.levels[skillLv - 1];
+    const skillLv = _getActiveCastRank(key, getActiveSkillLevel(key));
+    const skillData = skill.levels[Math.max(1, skillLv) - 1];
     const baseCd = def[key].cooldownSeconds || 0;
     const effCd = _resolveEffectiveTooltipCooldown(key, baseCd);
     return `<strong style="color:${HUD_COLOR_ACTIVE}">${getLocalName(skill)}</strong>`
-        + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${skillLv}</span>`
+        + ` <span style="opacity:.6;font-size:.85em">- ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
         + `<br>${_buildTooltipCooldownLine(effCd, baseCd)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(key) : def[key].manaCost)}`;
 }
@@ -284,13 +302,13 @@ function buildAscendencySkillTooltip(hudSlot) {
 
     const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
     const skill = asc[ascSlot];
-    const skillLv = _getAscendencySkillLevel(ascSlot);
-    const skillData = skill.levels[skillLv - 1];
+    const skillLv = _getActiveCastRank(hudSlot, _getAscendencySkillLevel(ascSlot));
+    const skillData = skill.levels[Math.max(1, skillLv) - 1];
     const baseCd = skill.cooldownSeconds || 0;
     const effCd = _resolveEffectiveTooltipCooldown(hudSlot, baseCd);
 
     return `<strong style="color:#f1c40f">${getLocalName(skill)}</strong>`
-        + ` <span style="opacity:.6;font-size:.85em">— ${_getRankWord()} ${skillLv}</span>`
+        + ` <span style="opacity:.6;font-size:.85em">- ${_getRankWord()} ${skillLv}</span>`
         + `<br>${getLocalDesc(skillData)}`
         + `<br>${_buildTooltipCooldownLine(effCd, baseCd)}${_buildTooltipManaLine((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost(hudSlot) : skill.manaCost)}`;
 }
@@ -331,7 +349,7 @@ function _getSkillBtnState(hudSlot, accentColor) {
     const canAfford = (typeof _abilityCanAfford === 'function') ? _abilityCanAfford(hudSlot) : true;
     const noMana = !canAfford && !isOnCD;
 
-    // Heartbloom (active5) is endgame-only — lock when not on an endgame map.
+    // Heartbloom (active5) is endgame-only - lock when not on an endgame map.
     const isEndgameLocked = hudSlot === 'active5'
         && typeof isEndgameLevel === 'function' && !isEndgameLevel();
     const isLocked = isEndgameLocked && !isOnCD;
@@ -420,7 +438,7 @@ function renderCompactAscBtn(asc, hudSlot, ascSlot) {
     return _buildSkillBtnHTML(hudSlot, idx, '#f1c40f', 'chud-asc-btn');
 }
 
-// Renders the Heartbloom ability button (active5) — third row, first col.
+// Renders the Heartbloom ability button (active5) - third row, first col.
 // Uses a distinct pink/green accent so it reads as a heart/heal ability.
 function renderHeartbloomBtn() {
     return _buildSkillBtnHTML('active5', '5', '#ff6b9d', 'chud-heart-btn');
@@ -442,7 +460,7 @@ function renderAscendencyButtons() {
     if (!asc) return '';
 
     return `
-        <span class="chud-asc-sep" title="${_clsGetLocalizedName(asc)}">${asc.icon}</span>
+        <span class="chud-asc-sep" data-tip="${_tipAttr(_clsGetLocalizedName(asc))}" aria-label="${_tipAttr(_clsGetLocalizedName(asc))}">${asc.icon}</span>
         ${renderCompactAscBtn(asc, 'active3', 'active1')}
         ${renderCompactAscBtn(asc, 'active4', 'active2')}`;
 }
@@ -463,7 +481,7 @@ function _renderShieldPips(stacks) {
     for (let i = 0; i < maxShow; i++) {
         pips += `<span class="chud-shield-pip"></span>`;
     }
-    return `<span class="chud-shield-pips" title="${t('cls_shield_pips_title').replace('{n}', stacks)}">${pips}</span>`;
+    return `<span class="chud-shield-pips" data-tip-t="cls_shield_pips_title" data-tip-n="${stacks}">${pips}</span>`;
 }
 
 
@@ -567,7 +585,7 @@ function renderCompactHUD(def) {
     // They have moved to the skill hotbar (js/skills/skill-hotbar.js) and the
     // player sprite (player_sprite.js) respectively. What remains is the
     // CLASS STATUS widget: drag grip, passive-skill icon + tooltip, the
-    // Variance Shield pips and the Statistician momentum bar — none of which
+    // Variance Shield pips and the Statistician momentum bar - none of which
     // the hotbar can express.
 
     return `
@@ -625,6 +643,12 @@ function buildClassHUD() {
     if (!STATE.playerClass || isClassless()) {
         panel.innerHTML = '';
         panel.style.display = 'none';
+        // No class panel, but the skill hotbar / mana bar live on their own:
+        // pre-class characters still cast universal charm spells, so keep
+        // them in sync (renderSkillHotbar self-hides when there is nothing
+        // to show).
+        if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
+        if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
         return;
     }
 
@@ -646,7 +670,7 @@ function buildClassHUD() {
     injectCompactHUDStyles(def);
     makeClassHUDDraggable();
 
-    // Keep the skill hotbar in sync — it is rebuilt on every class/level/
+    // Keep the skill hotbar in sync - it is rebuilt on every class/level/
     // ability change too, so the two never drift apart.
     if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
 

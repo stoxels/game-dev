@@ -1,5 +1,5 @@
 //  endgame-encounter-overlays.js
-//  WARNINGS & FAIL OVERLAYS — extracted 2026-09-10 from
+//  WARNINGS & FAIL OVERLAYS - extracted 2026-09-10 from
 //  endgame-encounter.js (mistakes / low-health / absorption-broken
 //  banners + the map-failed overlay interceptor). Loads AFTER
 //  endgame-encounter-tick.js (uses its _egClearCenterGridBanners
@@ -18,10 +18,10 @@ function _egShowMistakesWarningBanner(remaining) {
     const sev = Math.max(0, Math.min(3, remaining));
     el.className = `eg-mw-${sev}`;
 
-    // Translation key per threshold — falls back to a plain string if missing
+    // Translation key per threshold - falls back to a plain string if missing
     const key = `eg_mistakes_warning_${sev}`;
     const raw = (typeof t === 'function') ? t(key) : '';
-    const fallback = remaining === 0 ? '☠️ LAST CHANCE — 0 MISTAKES LEFT!'
+    const fallback = remaining === 0 ? '☠️ LAST CHANCE - 0 MISTAKES LEFT!'
         : remaining === 1 ? '⚠️ 1 MISTAKE LEFT!'
         : `⚠️ ${remaining} MISTAKES LEFT`;
     el.textContent = (raw && raw !== key) ? raw : fallback;
@@ -38,7 +38,7 @@ function _egShowMistakesWarningBanner(remaining) {
         el.style.top = '50%';
     }
 
-    // Toast counterpart — brief, color-coded by severity
+    // Toast counterpart - brief, color-coded by severity
     const toastKey = `eg_mistakes_warning_toast_${sev}`;
     const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
     const toastFallback = el.textContent;
@@ -53,7 +53,7 @@ function _egMaybeShowMistakesWarning() {
     if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
     const remaining = _egGetMistakesRemaining();
     if (remaining == null || remaining < 0) {
-        // No limit or already over — keep last remaining for next comparison
+        // No limit or already over - keep last remaining for next comparison
         _egLastMistakesRemaining = remaining;
         return;
     }
@@ -61,7 +61,7 @@ function _egMaybeShowMistakesWarning() {
     _egLastMistakesRemaining = remaining;
 
     if (remaining > 3) {
-        // Out of the 3/2/1/0 window — clear the dedup so re-entering can fire again
+        // Out of the 3/2/1/0 window - clear the dedup so re-entering can fire again
         _egLastMistakesWarningShown = null;
         return;
     }
@@ -108,7 +108,7 @@ function _egShowLowHealthWarningBanner() {
 
     const key = 'eg_low_health_warning_35';
     const raw = (typeof t === 'function') ? t(key) : '';
-    const fallback = '⚠️ LOW HEALTH — 35% REMAINING';
+    const fallback = '⚠️ LOW HEALTH - 35% REMAINING';
     el.textContent = (raw && raw !== key) ? raw : fallback;
     document.body.appendChild(el);
 

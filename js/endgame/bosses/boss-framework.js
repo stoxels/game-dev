@@ -2,7 +2,7 @@
 //-------------------ENDGAME BOSS FRAMEWORK-------------------------------
 //------------------------------------------------------------------------
 // Load order (see index.html):
-//   1. boss-framework.js      (this file — registries, scaling, engine, scheduling)
+//   1. boss-framework.js      (this file - registries, scaling, engine, scheduling)
 //   2. shared-boss-abilities.js (mechanics shared by 2+ bosses + shared engines)
 //   3. boss-<id>.js           (one file per boss: data + mechanics + unique moves)
 //
@@ -23,14 +23,14 @@ const EG_BOSS_MECHANICS = {};
 
 // Boss level scaling 
 // Applied per level above 1. 
-const EG_BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1 — retuned after the
+const EG_BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1 - retuned after the
 
 
 const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
 
 
 // ── Late-endgame HP explosion ────────────────────────────────────────────
-// Linear 28% alone is not enough to outrun late gear scaling — bosses at
+// Linear 28% alone is not enough to outrun late gear scaling - bosses at
 // L85+ die in seconds on well-geared characters (player DPS roughly doubles
 // every ~30 levels from weapon + phys/power creep). A convex multiplier
 // on top of the linear curve keeps early bosses (≈L1-40) almost unchanged
@@ -83,7 +83,7 @@ const EG_BOSS_PHASE_NAMES = ['', 'eg_phase_1', 'eg_phase_2_enrage', 'eg_phase_3_
 const EG_RECENT_FILLS_CAPACITY = 20;
 
 
-// Global boss attack-speed tuning — all bosses charge their attack bar this
+// Global boss attack-speed tuning - all bosses charge their attack bar this
 // much faster than the chargeMax values in their defs (0.8 = 25% faster).
 const EG_BOSS_CHARGE_SPEED_MULT = 0.8;
 
@@ -114,7 +114,7 @@ function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
     const monster = {
         id: `${def.id}_${++_egMonsterSpawnCounter}`,
         baseId: def.id,
-        artId: def.id, // bosses have no variants — always the base id
+        artId: def.id, // bosses have no variants - always the base id
         artScale: 1, // bosses keep their fixed (large) frame size
         name: def.name,
         emoji: def.emoji,
@@ -189,7 +189,7 @@ function _egBossTick() {
 // Attaches boss runtime state to a newly spawned boss monster object
 // and kicks off its phase 1 mechanics.
 function _egBossInit(monster) {
-    // Runtime monster ids are suffixed (e.g. "boss_null_7") — look the
+    // Runtime monster ids are suffixed (e.g. "boss_null_7") - look the
     // mechanics entry up via the unsuffixed base id.
     const def = EG_BOSS_MECHANICS[monster.baseId || monster.id];
     if (!def) return; // not all bosses need special mechanics
@@ -214,13 +214,13 @@ function _egBossInit(monster) {
 // Per-boss teardown hooks: [monsterIdPrefix, globalTeardownFn, exactMatch?].
 // A hook fires when the monster id matches (prefix match unless
 // exactMatch) and the named teardown is a global function. Boss files
-// load AFTER this file, so the functions resolve at cleanup time — that
+// load AFTER this file, so the functions resolve at cleanup time - that
 // is also why every entry keeps the typeof guard (a boss file that fails
 // to load must not break cleanup). Keeps _egBossCleanup free of per-boss
 // if-blocks: a new boss only adds one array entry.
 const EG_BOSS_TEARDOWN_HOOKS = [
     // Brutus: sacrificial zombies roam in their own layer until he dies or
-    // the encounter stops — tear them down exactly when that happens (this
+    // the encounter stops - tear them down exactly when that happens (this
     // hook never fires for individual zombie kills: their ids differ).
     // PREFIX match is required: live boss ids carry a spawn counter suffix
     // (boss_brutus_7), so an exact match would never fire and the roaming
@@ -390,13 +390,13 @@ function _egBossCleanup(monsterId) {
     if (typeof _egTitheTeardown === 'function') _egTitheTeardown(monsterId);
     if (typeof _egNkTeardownBoss === 'function') _egNkTeardownBoss(monsterId);
     if (typeof _egFireflyTeardown === 'function') _egFireflyTeardown(monsterId);
-    // The Snail: slimes + broom live outside nk runs — tear them down too.
+    // The Snail: slimes + broom live outside nk runs - tear them down too.
     if (typeof _egSnailTeardown === 'function') _egSnailTeardown();
     // The Demolitionist: the Bomb Maze owns body-level state (countdown
-    // overlay, banner, charge-bar freeze) while it runs — drop it with the
+    // overlay, banner, charge-bar freeze) while it runs - drop it with the
     // boss. Runs on boss death and on encounter stop via _egBossCleanupAll.
     if (typeof _egCrashTeardown === 'function') _egCrashTeardown();
-    // Per-boss field-effect teardowns — registry-driven
+    // Per-boss field-effect teardowns - registry-driven
     // (EG_BOSS_TEARDOWN_HOOKS above; entries keep their own typeof guard).
     for (let i = 0; i < EG_BOSS_TEARDOWN_HOOKS.length; i++) {
         const hook = EG_BOSS_TEARDOWN_HOOKS[i];
@@ -484,7 +484,7 @@ function _egBossTransition(monster, newPhase) {
     // Optional per-boss phase-enter hook. A boss can define
     // `onPhaseEnter(monster, newPhase)` in its EG_BOSS_MECHANICS entry to run
     // phase-specific logic (gate events, special spawns) right at the moment
-    // the phase begins — before the generic immunity window. Returning true
+    // the phase begins - before the generic immunity window. Returning true
     // takes over the phase entirely: the boss owns its immunity release and
     // mechanic rescheduling (the default immunity timer is skipped). This is
     // how The Jelly keeps its Ice Shell up until a hop blob slips on the ice
@@ -556,11 +556,11 @@ function _egBossScheduleSingleMechanic(monster, mech, phase) {
     // phase2Only mechanics are skipped unless we're already in phase 2 or later
     if (mech.phase2Only && phase < 2) return;
 
-    // Runs one trigger of the mechanic — pause-aware, skipped only when the boss
-    // is gone or mid-immunity — then lines up the next trigger.
+    // Runs one trigger of the mechanic - pause-aware, skipped only when the boss
+    // is gone or mid-immunity - then lines up the next trigger.
     const fireTrigger = () => {
         if (typeof _gamePaused !== 'undefined' && _gamePaused) {
-            // Game is paused — retry after the pause lifts so the trigger isn't lost
+            // Game is paused - retry after the pause lifts so the trigger isn't lost
             const retry = setInterval(() => {
                 if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
                 clearInterval(retry);
@@ -588,7 +588,7 @@ function _egBossScheduleSingleMechanic(monster, mech, phase) {
     };
 
     // The FIRST trigger fires after a short opening delay instead of waiting out
-    // a full interval, so a fresh boss — or a fresh phase — starts using its
+    // a full interval, so a fresh boss - or a fresh phase - starts using its
     // specials a few seconds after arriving. The random spread just staggers a
     // multi-mechanic boss so its abilities don't all fire simultaneously on spawn;
     // every later trigger keeps the full per-mechanic interval above.

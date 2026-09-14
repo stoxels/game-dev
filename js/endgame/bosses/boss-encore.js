@@ -1,32 +1,32 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ENCORE (boss_encore)-----------------------
 //------------------------------------------------------------------------
-// REWORK — showman phantom demanding applause, rebuilt as a full stage
+// REWORK - showman phantom demanding applause, rebuilt as a full stage
 // production. Every mechanic is a musical number, and the house lights do
 // NOT come back up until you earn your seat back.
 //
-//   Phase 1 (100–60%) — ENCORE CIRCLES. The signature inversion of every
+//   Phase 1 (100–60%) - ENCORE CIRCLES. The signature inversion of every
 //                       "stay out" instinct: gold rings close in on marked
-//                       spots — be INSIDE the circle the moment each ring
+//                       spots - be INSIDE the circle the moment each ring
 //                       lands. Miss the moment, eat the chord.
 //                       Plus SOUND BARS: equalizer lanes telegraph on the
 //                       floor, then slam UP as solid sound bars. Out of
 //                       the lane!
-//   Phase 2 ( ≤60%)   — STAGE LIGHTS. Spotlights drift after you, then
-//                       LOCK — a beat later they flash and burn everyone
+//   Phase 2 ( ≤60%)   - STAGE LIGHTS. Spotlights drift after you, then
+//                       LOCK - a beat later they flash and burn everyone
 //                       still inside. Break away before they set!
 //                       Plus BEAT MINES: mines pulse on the beat, then pop
 //                       one after another in sequence. Stand between the
 //                       pops. Everything else gets faster and meaner.
-//   Phase 3 ( ≤30%)   — DOUBLE LIGHTS, fuller mine fields, tighter
+//   Phase 3 ( ≤30%)   - DOUBLE LIGHTS, fuller mine fields, tighter
 //                       circles. The tempo never comes back down.
-//   Finale ( ≤10%)    — CURTAIN CALL (one-shot set-piece): the boss goes
+//   Finale ( ≤10%)    - CURTAIN CALL (one-shot set-piece): the boss goes
 //                       immune and shielded and TAKES A BOW while the
 //                       house goes dark and a single spotlight plays
 //                       MUSICAL CHAIRS. On every metronome beat the old
 //                       light erupts in an applause nova (everyone outside
 //                       is clipped), then the light JUMPS somewhere new.
-//                       3…2…1 — THE OVATION: a white-out flash and a
+//                       3…2…1 - THE OVATION: a white-out flash and a
 //                       triple applause nova; only the final spotlight
 //                       circle is safe. FOLLOW THE LIGHT! Charge bar
 //                       frozen for the whole set-piece (gate in
@@ -129,7 +129,7 @@ function _egEnConfetti(x, y, big) {
     setTimeout(() => { try { layer.remove(); } catch (e) {} }, _EG_EN_DEBUG_SLOW ? 1800 : 1000);
 }
 
-// One applause nova: an expanding gold ring from (x, y). Visual only —
+// One applause nova: an expanding gold ring from (x, y). Visual only -
 // damage is rolled by the caller at the beat the ring launches.
 function _egEnApplause(x, y, big) {
     const ring = document.createElement('div');
@@ -144,7 +144,7 @@ function _egEnApplause(x, y, big) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: ENCORE CIRCLES-------------------------------
 //------------------------------------------------------------------------
-// The signature inversion: gold rings close in on marked spots — be INSIDE
+// The signature inversion: gold rings close in on marked spots - be INSIDE
 // the circle the moment each ring lands. Rings land sequentially with a
 // stagger. Phase 2 throws a fourth, phase 3 a fifth, all faster.
 const EG_EN_CIRCLE_STAGGER_MS = 900;
@@ -245,7 +245,7 @@ function _egMechEnSoundBars(monster, phase) {
         if (lanes.every(l => Math.abs(l - x) > 210)) lanes.push(x);
     }
 
-    _egNkToast('eg_mech_en_bars', '🎵 The Encore: EQ SLAM — out of the lane!', '#e2e8f0');
+    _egNkToast('eg_mech_en_bars', '🎵 The Encore: EQ SLAM - out of the lane!', '#e2e8f0');
 
     const bars = lanes.map(x => {
         const warn = _egNkEl(run, 'div', 'eg-en-eqwarn');
@@ -305,7 +305,7 @@ function _egMechEnSoundBars(monster, phase) {
 //-------------------MECHANIC: STAGE LIGHTS (phase 2+)----------------------
 //------------------------------------------------------------------------
 // Spotlights drift after the player like a chasing rig, then LOCK (ring
-// hardens) — a beat later they flash and burn everyone still inside.
+// hardens) - a beat later they flash and burn everyone still inside.
 // Phase 2 runs one light; phase 3 staggers two so the locks desync.
 const EG_EN_LIGHT_TRACK_MS = 1500;
 const EG_EN_LIGHT_LOCK_MS  = 600;
@@ -321,7 +321,7 @@ function _egMechEnStageLights(monster, phase) {
     const dmgPct = EG_EN_SPOT_DMG[p];
     const count = [0, 0, 1, 2][p];
 
-    _egNkToast('eg_mech_en_spot', '🎵 The Encore: STAGE LIGHTS — out of the lock!', '#fbbf24');
+    _egNkToast('eg_mech_en_spot', '🎵 The Encore: STAGE LIGHTS - out of the lock!', '#fbbf24');
 
     const lights = [];
     for (let i = 0; i < count; i++) {
@@ -374,7 +374,7 @@ function _egMechEnStageLights(monster, phase) {
 //-------------------MECHANIC: BEAT MINES (field, passive)------------------
 //------------------------------------------------------------------------
 // Mines pulse on the beat like metronomes, then pop one after another in
-// sequence with small novas. The run is PASSIVE (field hazard — never
+// sequence with small novas. The run is PASSIVE (field hazard - never
 // blocks other mechanics).
 const EG_EN_MINE_COUNT  = [0, 0, 4, 6];
 const EG_EN_MINE_BEAT_MS = 550;
@@ -395,7 +395,7 @@ function _egMechEnBeatMines(monster, phase) {
     const stagger = EG_EN_MINE_STAGGER_MS * _EG_EN_DEBUG_MULT;
     const dmgPct = EG_EN_MINE_DMG[p];
 
-    _egNkToast('eg_mech_en_mines', '🎵 The Encore: BEAT MINES popping — mind the rhythm!', '#fbbf24');
+    _egNkToast('eg_mech_en_mines', '🎵 The Encore: BEAT MINES popping - mind the rhythm!', '#fbbf24');
 
     const mines = [];
     let guard = 0;
@@ -441,7 +441,7 @@ function _egMechEnBeatMines(monster, phase) {
 // The boss goes immune + shielded and TAKES A BOW while the house goes
 // dark and a single spotlight plays MUSICAL CHAIRS: on every metronome
 // beat the current light erupts in an applause nova (everyone outside is
-// clipped), then the light JUMPS somewhere new. At zero: THE OVATION — a
+// clipped), then the light JUMPS somewhere new. At zero: THE OVATION - a
 // white-out flash and a triple applause nova; only the final spotlight
 // circle is safe. Charge bar frozen for the whole set-piece (gate in
 // _egTickPlayer via _egEnFinalActive).
@@ -557,11 +557,11 @@ function _egEnFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-en-cd-label">🎵 CURTAIN CALL</div>' +
         '<div class="eg-en-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-en-cd-hint">Musical chairs — be INSIDE the spotlight when each beat drops!</div>';
+        '<div class="eg-en-cd-hint">Musical chairs - be INSIDE the spotlight when each beat drops!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_en_final_cd', '🎵💀 CURTAIN CALL — follow the spotlight!', '#e2e8f0');
+    _egNkToast('eg_mech_en_final_cd', '🎵💀 CURTAIN CALL - follow the spotlight!', '#e2e8f0');
 
     // Boss immunity so the set-piece reads as a performance (released at the end).
     monster.bossImmune = true;
@@ -573,7 +573,7 @@ function _egEnFinalStart(monster) {
     g.cdTimer = setInterval(() => {
         if (!_egEnFinal || _egEnFinal !== g || g.finished) return;
         if (_egNkFrozen()) return;
-        // Beat: erupt from the CURRENT spotlight — the one you were told to reach.
+        // Beat: erupt from the CURRENT spotlight - the one you were told to reach.
         _egEnApplause(g.sx, g.sy, false);
         const pr = _egNkPlayerRect();
         if (pr) {
@@ -670,7 +670,7 @@ function _egEnFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egEnTeardown() {
     if (_egEnFinal) { try { _egEnFinalEnd(_egEnFinal); } catch (e) {} _egEnFinal = null; }
@@ -692,8 +692,8 @@ function _egEnTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_EN_DEBUG.fire('circles'|'bars'|'spot'|'mines') — runs one now
-//   _EG_EN_DEBUG.final()                               — CURTAIN CALL now
+//   _EG_EN_DEBUG.fire('circles'|'bars'|'spot'|'mines') - runs one now
+//   _EG_EN_DEBUG.final()                               - CURTAIN CALL now
 if (typeof window !== 'undefined') {
     window._EG_EN_DEBUG = {
         fire: (name, phase) => {

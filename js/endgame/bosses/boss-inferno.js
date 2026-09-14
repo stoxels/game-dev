@@ -1,21 +1,21 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE INFERNO (boss_inferno)----------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK — 🌋 "The Living Volcano". Escalating heat you must
-// actively cool: the arena heats the longer you stand still — movement is
+// TIER 7 REWORK - 🌋 "The Living Volcano". Escalating heat you must
+// actively cool: the arena heats the longer you stand still - movement is
 // survival. Element: fire (unchanged).
-//   • MAGMA TIDES (signature, all fight) — lava floods half the arena in
+//   • MAGMA TIDES (signature, all fight) - lava floods half the arena in
 //     slow alternating tides (left/right, quartered in phase 3). Standing
 //     in lava is a heavy DoT; the tide edge leaves COOLING OBSIDIAN TILES
 //     that are safe to stand on and slowly crack (3 states) before
 //     sinking. Every tile stood on COOLS you: heat is the meter.
-//   • PYROCLASTIC SURGE (60%) — a wall of fire sweeps from one edge with
+//   • PYROCLASTIC SURGE (60%) - a wall of fire sweeps from one edge with
 //     two readable gaps; ash cloud lingers behind it (low visibility, no
-//     damage — pressure, not punish).
-//   • ERUPTION VENTS (60%) — three vents telegraph, then jet upward; the
+//     damage - pressure, not punish).
+//   • ERUPTION VENTS (60%) - three vents telegraph, then jet upward; the
 //     jets leave HEAT HAZE zones that raise your heat meter faster while
 //     inside.
-//   • 💀 SUPERVOLCANIC WINTER (≤10%, one-shot) — inversion twist: the
+//   • 💀 SUPERVOLCANIC WINTER (≤10%, one-shot) - inversion twist: the
 //     Inferno detonates and the arena FREEZES over (fire→ice identity
 //     break). The ice sheet makes your movement DRIFT (momentum), magma
 //     bombs mark landing spots, and you must lure the dying core's three
@@ -32,7 +32,7 @@
 //   3. UNIQUE mechanic handlers (only this boss uses them)
 //
 // Prefix discipline: everything here is _egInfV / eg-infv- (the _egInf stem
-// is shared — do not shorten).
+// is shared - do not shorten).
 //------------------------------------------------------------------------
 
 // DEBUG: slow Inferno's timing 2.5x so manual playtests / screenshot
@@ -50,7 +50,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_inferno — "The Living Volcano" (rework)
+    // boss_inferno - "The Living Volcano" (rework)
     // Phase 1 (100% → 60%): Magma Tides teach the heat economy
     // Phase 2 ( 60% → 30%): immune window, Surge + Vents join
     // Phase 3 ( 30% →  0%): quartered tides, faster heat; at 10% the
@@ -116,7 +116,7 @@ function _egInfVTouch(pct, level, label) {
 function _egInfVPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Prefixed delay for out-of-run callbacks: defers while the game is
-// frozen (visual-only use — the finale uses _egInfVAfter instead).
+// frozen (visual-only use - the finale uses _egInfVAfter instead).
 function _egInfVDelay(ms, fn) {
     setTimeout(() => { if (!_egNkFrozen()) fn(); else setTimeout(() => { if (!_egNkFrozen()) fn(); }, 120); }, ms);
 }
@@ -172,7 +172,7 @@ function _egInfVEnsureHeatRun(monster) {
         });
         _egInfVHazes = _egInfVHazes.filter(h => { if (now >= h.until) { try { h.el.remove(); } catch (e) {} return false; } return true; });
 
-        // Supervolcanic Winter: the ice sheet takes over — heat freezes.
+        // Supervolcanic Winter: the ice sheet takes over - heat freezes.
         if (_egInfVFinalActive()) { _egInfVHeat = 0; _egInfVHudApply(); return true; }
 
         const pc = _egInfVPC();
@@ -200,7 +200,7 @@ function _egInfVEnsureHeatRun(monster) {
         if (_egInfVHeat >= EG_INFV_HEAT_MAX) {
             _egInfVHeat = 0;
             _egInfVTouch(EG_INFV_BURST, level, 'Heat Detonation');
-            _egNkToast('eg_mech_infv_overheat', '🌋💥 OVERHEATED — the volcano detonates under you!', '#f87171');
+            _egNkToast('eg_mech_infv_overheat', '🌋💥 OVERHEATED - the volcano detonates under you!', '#f87171');
         }
         _egInfVHudApply();
         return true;
@@ -221,7 +221,7 @@ function _egMechInfVTides(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_infv_tides', '🌋🌊 MAGMA TIDES — the lava floods! Find obsidian tiles to cool down!', '#fb923c');
+    _egNkToast('eg_mech_infv_tides', '🌋🌊 MAGMA TIDES - the lava floods! Find obsidian tiles to cool down!', '#fb923c');
     _egInfVEnsureHeatRun(monster);
 
     const quartered = p >= 3;
@@ -302,7 +302,7 @@ function _egMechInfVSurge(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_infv_surge', '🌋🔥 PYROCLASTIC SURGE — a wall of fire! Slip through the gaps!', '#f97316');
+    _egNkToast('eg_mech_infv_surge', '🌋🔥 PYROCLASTIC SURGE - a wall of fire! Slip through the gaps!', '#f97316');
     _egInfVEnsureHeatRun(monster);
 
     const vertical = Math.random() < 0.5;          // sweeps across the width or the height
@@ -404,7 +404,7 @@ function _egMechInfVVents(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_infv_vents', '🌋⛰️ ERUPTION VENTS — jets incoming! The haze heats you faster!', '#f97316');
+    _egNkToast('eg_mech_infv_vents', '🌋⛰️ ERUPTION VENTS - jets incoming! The haze heats you faster!', '#f97316');
     _egInfVEnsureHeatRun(monster);
 
     for (let i = 0; i < EG_INFV_VENTS; i++) {
@@ -448,7 +448,7 @@ function _egMechInfVVents(monster, phase) {
 // Inversion twist: the Inferno detonates and the arena FREEZES over
 // (fire→ice identity break). The ice sheet makes movement DRIFT; magma
 // bombs mark landing spots; lure the dying core's three magma surges into
-// the fissure vents to blow its cap — the third detonation is the kill.
+// the fissure vents to blow its cap - the third detonation is the kill.
 const EG_INFV_WINTER_SURGE_Y = [0.3, 0.5, 0.7];   // fixed surge bands (learnable)
 const EG_INFV_WINTER_VENT_X  = [0.18, 0.5, 0.82]; // matching vent columns
 
@@ -460,7 +460,7 @@ function _egInfVFinalActive() {
 }
 
 // Ice momentum: reads the player's velocity into a drift velocity. Called
-// from _avatarGetMoveSpeed-era hooks — actually applied in the drift
+// from _avatarGetMoveSpeed-era hooks - actually applied in the drift
 // watcher below (a per-frame translation of the avatar while on ice).
 let _egInfVDrift = { vx: 0, vy: 0 };
 let _egInfVDriftRun = null;
@@ -550,13 +550,13 @@ function _egInfVFinalStart(monster) {
     ov.className = 'eg-infv-cd';
     ov.innerHTML =
         '<div class="eg-infv-cd-label">🌋❄️ SUPERVOLCANIC WINTER</div>' +
-        '<div class="eg-infv-cd-timer">—</div>' +
-        '<div class="eg-infv-cd-hint">Lure the magma surges into the fissure vents — blow the cap!</div>';
+        '<div class="eg-infv-cd-timer">-</div>' +
+        '<div class="eg-infv-cd-hint">Lure the magma surges into the fissure vents - blow the cap!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.fxRun.els.push(ov);
 
-    _egNkToast('eg_mech_infv_final_cd', '🌋❄️ SUPERVOLCANIC WINTER — the arena freezes! Lure the surges!', '#93c5fd');
+    _egNkToast('eg_mech_infv_final_cd', '🌋❄️ SUPERVOLCANIC WINTER - the arena freezes! Lure the surges!', '#93c5fd');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -629,14 +629,14 @@ function _egInfVFinalStart(monster) {
                 const pc = _egInfVPC();
                 // Player contact: knocks the blob toward the vent (lure).
                 if (Math.hypot(pc.x - bx, pc.y - bandY) < 70) {
-                    // Standing in its path pushes it forward — the lure.
+                    // Standing in its path pushes it forward - the lure.
                     bx += (ventX > bx ? 1 : -1) * 240 * dtS;
                 }
                 // Reaches the vent column: DETONATE (blows the cap a bit).
                 if (Math.abs(bx - ventX) < 30) {
                     try { blob.remove(); } catch (e) {}
                     g.lured++;
-                    _egNkToast('eg_mech_infv_ventblow', '🌋💥 THE VENT BLOWS — ' + g.lured + '/' + EG_INFV_SURGE_GOAL + ' surges lured!', '#fde68a');
+                    _egNkToast('eg_mech_infv_ventblow', '🌋💥 THE VENT BLOWS - ' + g.lured + '/' + EG_INFV_SURGE_GOAL + ' surges lured!', '#fde68a');
                     const flash = _egNkEl(g.fxRun, 'div', 'eg-infv-vent-flash');
                     flash.style.left = Math.round(ventX - 120) + 'px';
                     flash.style.top = Math.round(bandY - 120) + 'px';
@@ -649,7 +649,7 @@ function _egInfVFinalStart(monster) {
                     }
                     return false;
                 }
-                // Off-screen: missed lure — it loops around (no punish).
+                // Off-screen: missed lure - it loops around (no punish).
                 if (bx < -80 || bx > W + 80) {
                     try { blob.remove(); } catch (e) {}
                     _egInfVAfter(g, 1200 * _EG_INFV_DEBUG_MULT, runSurge);
@@ -696,10 +696,10 @@ function _egInfVFallBombs(g, level, n) {
     }
 }
 
-// The last stand: timer died — the core detonates everything but the vents.
+// The last stand: timer died - the core detonates everything but the vents.
 function _egInfVLastStand(g, monster, level) {
     if (g.finished) return;
-    _egNkToast('eg_mech_infv_laststand', '🌋💀 THE CORE DETONATES — get between the vents!', '#f87171');
+    _egNkToast('eg_mech_infv_laststand', '🌋💀 THE CORE DETONATES - get between the vents!', '#f87171');
     const W = window.innerWidth, H = window.innerHeight;
     const flash = _egNkEl(g.fxRun, 'div', 'eg-infv-laststand');
     flash.style.left = '0px'; flash.style.top = '0px';
@@ -717,10 +717,10 @@ function _egInfVLastStand(g, monster, level) {
     });
 }
 
-// Three surges lured: the cap blows — the core pays its own HP.
+// Three surges lured: the cap blows - the core pays its own HP.
 function _egInfVCapBlown(g, monster) {
     if (g.finished) return;
-    _egNkToast('eg_mech_infv_capblown', '🌋💥 THE CAP BLOWS — Supervolcanic Winter ends in fire AND ice!', '#fde68a');
+    _egNkToast('eg_mech_infv_capblown', '🌋💥 THE CAP BLOWS - Supervolcanic Winter ends in fire AND ice!', '#fde68a');
     const flash = document.createElement('div');
     flash.className = 'eg-infv-restart-flash';
     document.body.appendChild(flash);
@@ -763,7 +763,7 @@ function _egInfVFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
 function _egInfVTeardown() {
     if (_egInfVFinal) { try { _egInfVFinalEnd(_egInfVFinal, null); } catch (e) {} _egInfVFinal = null; }
@@ -794,8 +794,8 @@ function _egInfVTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_INFV_DEBUG.fire('tides'|'surge'|'vents'|'final') — run one now
-//   _EG_INFV_DEBUG.heat(n)                               — set the meter by hand
+//   _EG_INFV_DEBUG.fire('tides'|'surge'|'vents'|'final') - run one now
+//   _EG_INFV_DEBUG.heat(n)                               - set the meter by hand
 if (typeof window !== 'undefined') {
     window._EG_INFV_DEBUG = {
         fire: (name, phase) => {

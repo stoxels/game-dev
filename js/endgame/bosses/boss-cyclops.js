@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CYCLOPS (boss_cyclops)---------------------------
 //------------------------------------------------------------------------
-// Bullet-eye homage: the great eye opens and fires radial bursts — eight
+// Bullet-eye homage: the great eye opens and fires radial bursts - eight
 // slow orbs at a time, four volleys deep. The gaps are wide; the punishment
 // for dozing inside one is not.
 // This file holds EVERYTHING this boss needs in one place:

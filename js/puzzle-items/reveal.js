@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------REVEAL — CANDLE / MAGNIFIER / SPYGLASS / SCANNER----------------------
+//-------------------REVEAL - CANDLE / MAGNIFIER / SPYGLASS / SCANNER----------------------
 //------------------------------------------------------------------------
 
-// reveal1 / reveal2 / reveal3 / reveal4 — reveals N random solution cells.
+// reveal1 / reveal2 / reveal3 / reveal4 - reveals N random solution cells.
 function _useReveal(id, def) {
     questStat_revealItemUsed();
 
@@ -29,7 +29,7 @@ function _fxCandleGlow(overlay, cx, cy) {
     "></div>`;
 }
 
-// 🕯️ Candle — warm amber glow slowly blooms across the puzzle.
+// 🕯️ Candle - warm amber glow slowly blooms across the puzzle.
 function _fxCandle() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -47,7 +47,7 @@ function _fxCandle() {
     Audio_Manager.playSFX('candle');
 }
 
-// 🔍 Magnifier — a loupe slides across the grid left→right.
+// 🔍 Magnifier - a loupe slides across the grid left→right.
 function _fxMagnifier() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -79,7 +79,7 @@ function _fxSpawnExpandingRings(container, cx, cy, count, baseSize, className, a
     }
 }
 
-// 🔭 Spyglass — three concentric scan-rings expand from grid centre.
+// 🔭 Spyglass - three concentric scan-rings expand from grid centre.
 function _fxSpyglass() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -108,7 +108,7 @@ function _fxMakeScanBar(container, r, delaySeconds) {
     container.appendChild(bar);
 }
 
-// 📡 Scanner — a horizontal green scan-bar sweeps top-to-bottom twice.
+// 📡 Scanner - a horizontal green scan-bar sweeps top-to-bottom twice.
 function _fxScanner() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

@@ -1,25 +1,25 @@
 //  endgame-mod-tables-arcane.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------ARCANE MODIFIER TABLE--------------------------------
 //------------------------------------------------------------------------
-// The Arcane slot holds a sigil — an inscribed mark of invoked power.
+// The Arcane slot holds a sigil - an inscribed mark of invoked power.
 // It is an offensive magical utility slot: it bends combat rules rather
 // than simply adding stats. Mana is its primary resource; damage
 // amplification and mana-fuelled effects are its output identity.
 // No local defences. Values sit at amulet/ring scale.
 //
 // Arcane-exclusive mods:
-//   arcane_surge — after a streak of # consecutive correct cells with
+//   arcane_surge - after a streak of # consecutive correct cells with
 //                  no mistake, the sigil fires and grants a burst of
 //                  mana. Rewards precision and focus. The streak counter
 //                  resets on any mistake. Pairs naturally with precision
 //                  (chest) for builds that reward long mistake-free runs.
-//   mana_to_damage — a % of your current mana is added as flat bonus
+//   mana_to_damage - a % of your current mana is added as flat bonus
 //                    damage to your next hit, then that mana is consumed.
 //                    A high-risk, high-reward conversion: hoarding mana
 //                    for a single empowered strike. Pairs with high mana
@@ -111,8 +111,38 @@ const EG_MOD_TABLE_ARCANE = {
             ]
         },
 
+        // --- HEALING POWER ---
+        // The support half of the sigil's identity, opposite spell_damage
+        // above. Heals are capped by the Life pool and shields by the
+        // Absorption pool, so overheal is the natural governor here - which is
+        // why these sit close to the spell-damage numbers rather than below
+        // them. Flat AND % live on this slot so a support build can choose
+        // between a strong early curve (flat) and a late ceiling (%); the %
+        // half multiplies the authored magnitude, never the flat bonus.
+        healing_power: {
+            id: 'healing_power',
+            label: '+# to Healing Power', labelDe: '+# zu Heilkraft',
+            tiers: [
+                { tier: 1, min: 45, max: 60, weight: 100, ilvl: 80 },
+                { tier: 2, min: 30, max: 44, weight: 250, ilvl: 60 },
+                { tier: 3, min: 16, max: 29, weight: 500, ilvl: 38 },
+                { tier: 4, min: 6, max: 15, weight: 1000, ilvl: 15 },
+                { tier: 5, min: 2, max: 5, weight: 2000, ilvl: 1 }
+            ]
+        },
+        inc_healing_power: {
+            id: 'inc_healing_power',
+            label: '#% increased Healing Power', labelDe: '#% erhöhte Heilkraft',
+            tiers: [
+                { tier: 1, min: 26, max: 38, weight: 80, ilvl: 82 },
+                { tier: 2, min: 15, max: 25, weight: 200, ilvl: 62 },
+                { tier: 3, min: 7, max: 14, weight: 460, ilvl: 38 },
+                { tier: 4, min: 2, max: 6, weight: 1000, ilvl: 14 }
+            ]
+        },
+
         // --- ELEMENTAL DAMAGE ---
-        // Sigils channel raw elemental force — slightly below amulet
+        // Sigils channel raw elemental force - slightly below amulet
         // values since the arcane slot is more utility than raw offense.
         fire_damage: {
             id: 'fire_damage',
@@ -193,7 +223,7 @@ const EG_MOD_TABLE_ARCANE = {
         // mistake, the sigil ignites and grants a burst of mana.
         // The streak counter resets on any mistake. The # value is
         // the streak length required; the @ value is the mana granted.
-        // Shorter streaks on higher tiers — rarer items fire sooner.
+        // Shorter streaks on higher tiers - rarer items fire sooner.
         // Pairs naturally with precision (chest) and focus (many slots)
         // for builds that thrive on long mistake-free runs.
         arcane_surge: {
@@ -212,7 +242,7 @@ const EG_MOD_TABLE_ARCANE = {
         // on your next hit, consuming that mana in the process.
         // Rewards hoarding mana for an empowered strike. High mana
         // pool builds (stacking flat_mana and mana_regen across slots)
-        // get the most out of this — the conversion fires once per hit
+        // get the most out of this - the conversion fires once per hit
         // and recharges as mana refills. The # value is the conversion %.
         mana_to_damage: {
             id: 'mana_to_damage',

@@ -24,7 +24,7 @@ const TAIL_RISK_COOLDOWN_SLOT = 'active3';
 
 
 //------------------------------------------------------------------------
-//-------------------TAIL RISK — HELPER FUNCTIONS------------------------
+//-------------------TAIL RISK - HELPER FUNCTIONS------------------------
 //------------------------------------------------------------------------
 
 // Formats time cost into MM:SS if over 60 seconds
@@ -183,7 +183,7 @@ function _tailRiskPostReveal(revealedCount, affectedIds, totalCost) {
 
 
 //------------------------------------------------------------------------
-//-------------------TAIL RISK — MAIN FUNCTIONS--------------------------
+//-------------------TAIL RISK - MAIN FUNCTIONS--------------------------
 //------------------------------------------------------------------------
 
 // Spawns the Tail Risk modal overlay and stores the session data globally
@@ -245,7 +245,7 @@ function _executeTailRisk(secondsPerCell, maxCells) {
 
     if (candidates.length === 0) {
         showToast(t('cls_tail_risk_none'));
-        _tailRiskCancel(true); // refund cooldown — nothing to do
+        _tailRiskCancel(true); // refund cooldown - nothing to do
         return;
     }
 
@@ -259,7 +259,7 @@ function _executeTailRisk(secondsPerCell, maxCells) {
 
 
 //------------------------------------------------------------------------
-//-------------------BLACK SWAN — HYPERSPEED HELPERS---------------------
+//-------------------BLACK SWAN - HYPERSPEED HELPERS---------------------
 //------------------------------------------------------------------------
 
 // Creates a single randomised star streak object for the hyperspeed canvas
@@ -366,7 +366,7 @@ function _blackSwanStopHyperspeed() {
 
 
 //------------------------------------------------------------------------
-//-------------------BLACK SWAN — HYPERSPEED MAIN------------------------
+//-------------------BLACK SWAN - HYPERSPEED MAIN------------------------
 //------------------------------------------------------------------------
 
 // Creates the full-screen canvas, spawns stars, runs the animation loop,
@@ -448,7 +448,7 @@ function _blackSwanStartHyperspeed(durationMs) {
 
 
 //------------------------------------------------------------------------
-//-------------------BLACK SWAN — HUD BADGE HELPERS----------------------
+//-------------------BLACK SWAN - HUD BADGE HELPERS----------------------
 //------------------------------------------------------------------------
 
 // Injects the Black Swan badge CSS into <head> once (idempotent)
@@ -495,7 +495,7 @@ function _blackSwanRemoveBadge() {
 
 
 //------------------------------------------------------------------------
-//-------------------BLACK SWAN — HUD BADGE MAIN-------------------------
+//-------------------BLACK SWAN - HUD BADGE MAIN-------------------------
 //------------------------------------------------------------------------
 
 // Creates and appends the pulsing countdown badge to the class HUD.
@@ -514,7 +514,7 @@ function _blackSwanSpawnBadge(remainingSecs) {
 
 
 //------------------------------------------------------------------------
-//-------------------BLACK SWAN — MAIN FUNCTIONS-------------------------
+//-------------------BLACK SWAN - MAIN FUNCTIONS-------------------------
 //------------------------------------------------------------------------
 
 // Tears down the Black Swan effect: stops timers, fades the canvas, removes badge, resumes BGM

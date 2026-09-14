@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------
-//-------------------SHARED — FX HELPERS----------------------
+//-------------------SHARED - FX HELPERS----------------------
 //------------------------------------------------------------------------
 
 // Shared plumbing for every item visual effect: z-index tiers, particle
@@ -125,14 +125,14 @@ function _fxGetGridCorners() {
 }
 
 
-// _fxGetPuzzleRectForWrap — like _fxGetPuzzleRect(), but returns coordinates
+// _fxGetPuzzleRectForWrap - like _fxGetPuzzleRect(), but returns coordinates
 // relative to #puzzle-scaler-wrap instead of #puzzle-scaler, WITHOUT dividing
 // by currentZoom. Use this for any overlay that is attached to the wrap
 // itself (which is never transformed) rather than to #puzzle-scaler (which
 // has the zoom transform applied).
 //
 // Dividing by currentZoom is only valid for elements living *inside* the
-// scaled element (#puzzle-scaler) — for anything living in the unscaled
+// scaled element (#puzzle-scaler) - for anything living in the unscaled
 // wrap, that division introduces zoom-dependent drift that blows up at
 // high zoom levels (this was the cause of the fx-shield-border /
 // variance-shield-bubble mispositioning bug).
@@ -300,15 +300,15 @@ function playFreezeCountdownOverlay(durationMs) {
 // over the effect duration so they don't all appear at once.
 //
 // opts shape:
-//   count    — total particles
-//   chars    — array of text characters to pick from randomly
-//   colors   — array of CSS color strings to pick from randomly
-//   sizeMin / sizeMax — font-size range in px
-//   container — parent element to append particles into
-//   startX / startY — center spawn position (px in container space)
-//   spreadX / spreadY — random offset radius in each axis (px)
-//   duration — base animation duration (ms); individual particles vary ±30%
-//   cssClass — class name applied to each particle (handles the animation)
+//   count    - total particles
+//   chars    - array of text characters to pick from randomly
+//   colors   - array of CSS color strings to pick from randomly
+//   sizeMin / sizeMax - font-size range in px
+//   container - parent element to append particles into
+//   startX / startY - center spawn position (px in container space)
+//   spreadX / spreadY - random offset radius in each axis (px)
+//   duration - base animation duration (ms); individual particles vary ±30%
+//   cssClass - class name applied to each particle (handles the animation)
 function _fxSpawnParticles(opts) {
     const {
         count = 12,
@@ -376,7 +376,7 @@ function _fxMakeClockRays(container, cx, cy, rayLength) {
 }
 
 
-// 🕰️ Clock — clock hands sweep + golden radial burst.
+// 🕰️ Clock - clock hands sweep + golden radial burst.
 function _fxClock() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -394,7 +394,7 @@ function _fxClock() {
 }
 
 
-// _fxShieldBorderAdd — places a persistent glowing border around the puzzle grid.
+// _fxShieldBorderAdd - places a persistent glowing border around the puzzle grid.
 // Uses position:fixed with screen-space coords so it is unaffected by the
 // CSS transform on puzzle-scaler.  A ResizeObserver repositions it whenever
 // the grid is zoomed or the window resizes.
@@ -404,10 +404,10 @@ function _fxShieldBorderAdd() {
     const border = document.createElement('div');
     border.id = 'fx-shield-border';
 
-    // Attach to the WRAP, not the scaler — the wrap is never transformed,
+    // Attach to the WRAP, not the scaler - the wrap is never transformed,
     // so we can position this with plain rect deltas and never touch
     // currentZoom. (Previously attached to #puzzle-scaler and divided by
-    // currentZoom in _repositionShieldBorder — that's what caused the
+    // currentZoom in _repositionShieldBorder - that's what caused the
     // huge bogus `left` value at high zoom.)
     const wrap = document.getElementById('puzzle-scaler-wrap');
     if (!wrap) return;
@@ -429,7 +429,7 @@ function _fxShieldBorderAdd() {
     wrap.appendChild(border);
 
     // Positions the border to match the grid's bounds, in wrap-relative
-    // (unscaled) coordinates — no zoom division required.
+    // (unscaled) coordinates - no zoom division required.
     function _repositionShieldBorder() {
         const r = _fxGetPuzzleRectForWrap();
         if (!r) return;
@@ -445,7 +445,7 @@ function _fxShieldBorderAdd() {
     border._reposition = _repositionShieldBorder;
     window.addEventListener('resize', _repositionShieldBorder, { passive: true });
 
-    // Ctrl+Wheel zoom fires a wheel event on the wrap — reposition then too.
+    // Ctrl+Wheel zoom fires a wheel event on the wrap - reposition then too.
     wrap.addEventListener('wheel', _repositionShieldBorder, { passive: true });
 }
 

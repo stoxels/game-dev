@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------ROW / COL SOLVE — SET SQUARE / RULER----------------------
+//-------------------ROW / COL SOLVE - SET SQUARE / RULER----------------------
 //------------------------------------------------------------------------
 
-// rowSolve — fully reveals one random unsolved row.
+// rowSolve - fully reveals one random unsolved row.
 function _useRowSolve(id, def) {
     const n = solveRows(1, 'item');
     playItemEffect(id);
@@ -12,7 +12,7 @@ function _useRowSolve(id, def) {
         : `${def.icon} ${t('item_row_solved_none')}`;
 }
 
-// colSolve — fully reveals one random unsolved column.
+// colSolve - fully reveals one random unsolved column.
 function _useColSolve(id, def) {
     const n = solveCols(1, 'item');
     playItemEffect(id);
@@ -58,7 +58,7 @@ function _fxMakeRowSolveLines(container, r) {
     }
 }
 
-// 📐 Row Solve — a golden sweep flashes across the full grid height.
+// 📐 Row Solve - a golden sweep flashes across the full grid height.
 function _fxRowSolve() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -106,7 +106,7 @@ function _fxMakeColSolveLines(container, r) {
     }
 }
 
-// 📏 Col Solve — a golden sweep flashes across the full grid width.
+// 📏 Col Solve - a golden sweep flashes across the full grid width.
 function _fxColSolve() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

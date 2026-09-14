@@ -1,24 +1,24 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CREEPER (boss_creeper)---------------------
 //------------------------------------------------------------------------
-// REWORK — green-thing homage. The boss is a nest mother: it sics packs of
+// REWORK - green-thing homage. The boss is a nest mother: it sics packs of
 // stalking creepers on you, chains primed TNT under your feet and, at the
 // very end, swells up and mega-detonates itself.
 //
-//   Phase 1 (100–60%) — CREEPER PACK. 2–3 creepers scuttle in from the
+//   Phase 1 (100–60%) - CREEPER PACK. 2–3 creepers scuttle in from the
 //                       edges and stalk you: their fuse HEATS while you are
 //                       close (white flash + swelling body) and COOLS while
 //                       you keep your distance. Fuse ≥ 1 = detonation.
 //                       Plus FUSE POUNCE: a creeper drops onto your current
 //                       position, hisses briefly, and blows.
-//   Phase 2 ( ≤60%)   — TNT CHAIN. A cluster of primed TNT blocks rains
+//   Phase 2 ( ≤60%)   - TNT CHAIN. A cluster of primed TNT blocks rains
 //                       down around you, flashes faster and faster, then
 //                       detonates in a rolling chain reaction outward from
 //                       the centre block. Leave the cluster entirely!
-//   Phase 3 ( ≤30%)   — bigger packs (one CHARGED creeper with a blue aura,
+//   Phase 3 ( ≤30%)   - bigger packs (one CHARGED creeper with a blue aura,
 //                       faster heat, bigger boom), double pounces, double
 //                       TNT clusters.
-//   Finale ( ≤10%)    — SSSS… BOOM (one-shot set-piece, Bomb-Maze style):
+//   Finale ( ≤10%)    - SSSS… BOOM (one-shot set-piece, Bomb-Maze style):
 //                       the boss goes immune and shields, a 3…2…1 fuse
 //                       counts down while a huge red blast ring telegraph
 //                       grows around it, then it mega-detonates (huge
@@ -102,7 +102,7 @@ function _egCrpGridCenter() {
 // One creeper detonation: white-hot flash + orange core + smoke ring, plus
 // a lingering scorch crater (the creeper signature). Always spawned
 // body-level (run-independent) so the visuals survive the run ending in
-// the same frame — the layer self-removes. pct > 0 damages the player when
+// the same frame - the layer self-removes. pct > 0 damages the player when
 // their hitbox overlaps the blast disc.
 function _egCrpBoom(x, y, radius, pct, level, label) {
     const R = Math.max(10, radius);
@@ -153,7 +153,7 @@ function _egCrpBoom(x, y, radius, pct, level, label) {
 
 // Builds one creeper sprite: a fixed outer dot (translate-positioned) with
 // the classic green cube + face as CHILD elements (scale/filter animations
-// run on the child — never on the fixed wrapper).
+// run on the child - never on the fixed wrapper).
 function _egCrpSprite(run, charged) {
     const dot = _egNkEl(run, 'div', 'eg-nk-dot eg-crp-creeper' + (charged ? ' eg-crp-charged' : ''));
     const body = document.createElement('div');
@@ -177,7 +177,7 @@ function _egCrpFuseVisual(sprite, fuse) {
     }
 }
 
-// Teardown — registered in boss-framework.js cleanup chain (startsWith
+// Teardown - registered in boss-framework.js cleanup chain (startsWith
 // 'boss_creeper'; runtime ids are suffixed). Clears the set-piece.
 function _egCrpTeardown() {
     if (_egCrpFinal) _egCrpFinalEnd(_egCrpFinal);
@@ -207,7 +207,7 @@ function _egMechCreeperPack(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(monster && monster.id, true);
-    // Field mechanic: passive so it never trips _egNkDodgeBusy() — packs
+    // Field mechanic: passive so it never trips _egNkDodgeBusy() - packs
     // overlap TNT chains and pounces instead of starving them (same fix as
     // the Bomber's Mine Collar).
     run.passive = true;
@@ -217,12 +217,12 @@ function _egMechCreeperPack(monster, phase) {
     const durMs = EG_CRP_PACK_DUR_MS * _EG_CRP_DEBUG_MULT;
     const dmgPct = EG_CRP_PACK_DMG[p];
 
-    _egNkToast('eg_mech_creeper_pack', '💥 The Creeper: CREEPER PACK — mind the fuses!', '#22c55e');
+    _egNkToast('eg_mech_creeper_pack', '💥 The Creeper: CREEPER PACK - mind the fuses!', '#22c55e');
 
     const creepers = [];
     for (let i = 0; i < EG_CRP_PACK_COUNT[p]; i++) {
         // One CHARGED creeper joins the pack in phase 3 (blue aura, faster,
-        // bigger boom) — the Minecraft lightning-charged homage.
+        // bigger boom) - the Minecraft lightning-charged homage.
         const charged = p >= 3 && i === EG_CRP_PACK_COUNT[p] - 1;
         const sprite = _egCrpSprite(run, charged);
         const side = i % 4;
@@ -297,7 +297,7 @@ function _egMechCreeperPounce(monster, phase) {
     const fuseMs = EG_CRP_POUNCE_FUSE_MS * _EG_CRP_DEBUG_MULT;
     const dmgPct = EG_CRP_POUNCE_DMG[p];
 
-    _egNkToast('eg_mech_creeper_pounce', '💥 The Creeper: FUSE POUNCE — move from your spot!', '#22c55e');
+    _egNkToast('eg_mech_creeper_pounce', '💥 The Creeper: FUSE POUNCE - move from your spot!', '#22c55e');
 
     for (let i = 0; i < pounces; i++) {
         const at = i * gapMs;
@@ -357,7 +357,7 @@ function _egMechCreeperPounce(monster, phase) {
 // A cluster of primed TNT blocks rains down around your position. The
 // blocks flash faster and faster during the wind-up, then detonate in a
 // rolling CHAIN REACTION outward from the centre block (~85 ms steps).
-// The blast wave travels visibly — leave the cluster entirely.
+// The blast wave travels visibly - leave the cluster entirely.
 const EG_CRP_TNT_COUNT = [0, 0, 6, 9];
 const EG_CRP_TNT_CLUSTER_R = [0, 0, 190, 230];
 const EG_CRP_TNT_WINDUP_MS = 2100;
@@ -378,7 +378,7 @@ function _egMechTntChain(monster, phase) {
     const cx = Math.max(clusterR * 0.7, Math.min(window.innerWidth - clusterR * 0.7, pc.x + (Math.random() * 2 - 1) * 60));
     const cy = Math.max(clusterR * 0.7 + 40, Math.min(window.innerHeight - clusterR * 0.7 - 30, pc.y + (Math.random() * 2 - 1) * 60));
 
-    _egNkToast('eg_mech_creeper_tnt', '💥 The Creeper: TNT CHAIN — get out of the cluster!', '#f87171');
+    _egNkToast('eg_mech_creeper_tnt', '💥 The Creeper: TNT CHAIN - get out of the cluster!', '#f87171');
 
     const blocks = [];
     for (let i = 0; i < count; i++) {
@@ -430,7 +430,7 @@ function _egMechTntChain(monster, phase) {
 // while a huge red blast ring grows around it. At zero: MEGA detonation
 // (huge radius + screen flash + a long-lasting crater) and the immunity
 // releases. The auto-attack charge bar freezes for the whole set-piece
-// (gate in _egTickPlayer, endgame-encounter.js — _egCrpFinalActive).
+// (gate in _egTickPlayer, endgame-encounter.js - _egCrpFinalActive).
 const EG_CRP_FINAL_CD_TICK_MS = 800;
 const EG_CRP_FINAL_CD_TICKS = 3;
 const EG_CRP_FINAL_BLAST_R_PCT = 0.42;              // of min(vw, vh)
@@ -530,11 +530,11 @@ function _egCrpFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-crp-cd-label">💥 SSSS…</div>' +
         '<div class="eg-crp-cd-num eg-crp-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-crp-cd-hint">The Creeper is priming — get OUT of the red ring!</div>';
+        '<div class="eg-crp-cd-hint">The Creeper is priming - get OUT of the red ring!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_creeper_final_cd', '💥 SSSS… BOOM INCOMING — flee the red ring!', '#f87171');
+    _egNkToast('eg_mech_creeper_final_cd', '💥 SSSS… BOOM INCOMING - flee the red ring!', '#f87171');
 
     // Boss immunity so the set-piece reads as a hold (released at the end).
     monster.bossImmune = true;
@@ -628,8 +628,8 @@ function _egCrpFinalEnd(g) {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_CRP_DEBUG.fire('pack'|'chain'|'pounce') — runs one mechanic now
-//   _EG_CRP_DEBUG.final()                       — SSSS…BOOM now
+//   _EG_CRP_DEBUG.fire('pack'|'chain'|'pounce') - runs one mechanic now
+//   _EG_CRP_DEBUG.final()                       - SSSS…BOOM now
 if (typeof window !== 'undefined') {
     window._EG_CRP_DEBUG = {
         fire: (name, phase) => {

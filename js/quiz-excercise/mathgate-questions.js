@@ -57,8 +57,8 @@ const MATH_GATE_POOLS = {
             answer: 3, tolerance: 0, unit: 'outcomes',
             hintEn: 'A = {2, 4, 6}',
             hintDE: 'A = {2, 4, 6}',
-            explain: 'Out of the six faces {1,...,6}, exactly the even ones {2, 4, 6} belong to A — that\'s 3 outcomes.',
-            explainDE: 'Von den sechs Seiten {1,...,6} gehören genau die geraden {2, 4, 6} zu A — das sind 3 Ergebnisse.'
+            explain: 'Out of the six faces {1,...,6}, exactly the even ones {2, 4, 6} belong to A - that\'s 3 outcomes.',
+            explainDE: 'Von den sechs Seiten {1,...,6} gehören genau die geraden {2, 4, 6} zu A - das sind 3 Ergebnisse.'
         },
         {
             q: 'A fair die is rolled. Event B = "number greater than 4". What is P(B)? Enter the numerator of the occurring fraction over 6.',
@@ -189,8 +189,8 @@ const MATH_GATE_POOLS = {
             answer: 0.7, tolerance: 0.001, unit: '',
             hintEn: 'Inclusion-exclusion formula: P(A ∪ B) = P(A) + P(B) − P(A ∩ B).',
             hintDE: 'Siebformel: P(A ∪ B) = P(A) + P(B) − P(A ∩ B).',
-            explain: 'Using inclusion-exclusion: P(A ∪ B) = 0.5 + 0.4 − 0.2 = 0.7 — the overlap is subtracted once so it isn\'t double-counted.',
-            explainDE: 'Mit der Siebformel: P(A ∪ B) = 0,5 + 0,4 − 0,2 = 0,7 — die Überlappung wird einmal abgezogen, damit sie nicht doppelt gezählt wird.'
+            explain: 'Using inclusion-exclusion: P(A ∪ B) = 0.5 + 0.4 − 0.2 = 0.7 - the overlap is subtracted once so it isn\'t double-counted.',
+            explainDE: 'Mit der Siebformel: P(A ∪ B) = 0,5 + 0,4 − 0,2 = 0,7 - die Überlappung wird einmal abgezogen, damit sie nicht doppelt gezählt wird.'
         },
         {
             q: 'P(A ∪ B) = 0.8, P(A) = 0.5, P(B) = 0.6. What is P(A ∩ B)? Round to 3 decimal places.',
@@ -258,8 +258,8 @@ const MATH_GATE_POOLS = {
             answer: 2, tolerance: 0, unit: '',
             hintEn: 'The complement of a union is an intersection.',
             hintDE: 'Das Komplement einer Vereinigung ist ein Schnitt.',
-            explain: '"Not (A or B)" means neither happened, i.e. "not A AND not B" — so the union\'s complement turns into an intersection: Aᶜ ∩ Bᶜ.',
-            explainDE: '„Nicht (A oder B)” bedeutet, dass keines von beiden eintrat, also „nicht A UND nicht B” — das Komplement einer Vereinigung wird so zu einem Schnitt: Aᶜ ∩ Bᶜ.'
+            explain: '"Not (A or B)" means neither happened, i.e. "not A AND not B" - so the union\'s complement turns into an intersection: Aᶜ ∩ Bᶜ.',
+            explainDE: '„Nicht (A oder B)” bedeutet, dass keines von beiden eintrat, also „nicht A UND nicht B” - das Komplement einer Vereinigung wird so zu einem Schnitt: Aᶜ ∩ Bᶜ.'
         },
         {
             q: 'P(Aᶜ) = 0.3, P(Bᶜ) = 0.4, P(Aᶜ ∩ Bᶜ) = 0.1. By De Morgan, what is P((A ∪ B)ᶜ)? Round to 3 decimal places.',
@@ -288,8 +288,8 @@ const MATH_GATE_POOLS = {
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'The distributive law: A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C).',
             hintDE: 'Das Distributivgesetz: A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C).',
-            explain: 'This identity — distributing ∩ over ∪ — is exactly the distributive law for set operations, analogous to multiplication distributing over addition.',
-            explainDE: 'Diese Identität — Verteilen von ∩ über ∪ — ist genau das Distributivgesetz für Mengenoperationen, analog zur Multiplikation, die sich über die Addition verteilt.'
+            explain: 'This identity - distributing ∩ over ∪ - is exactly the distributive law for set operations, analogous to multiplication distributing over addition.',
+            explainDE: 'Diese Identität - Verteilen von ∩ über ∪ - ist genau das Distributivgesetz für Mengenoperationen, analog zur Multiplikation, die sich über die Addition verteilt.'
         },
         {
             q: 'P(A ∩ B) = 0.1, P(A ∩ C) = 0.2, and (A ∩ B) and (A ∩ C) are disjoint. What is P(A ∩ (B ∪ C))? Round to 3 decimal places.',
@@ -304,8 +304,8 @@ const MATH_GATE_POOLS = {
             q: 'Is A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C) true or false? Enter 1 for true, 0 for false.',
             qDE: 'Ist A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C) wahr oder falsch? Gib 1 für wahr, 0 für falsch ein.',
             answer: 1, tolerance: 0, unit: '',
-            hintEn: 'Yes — ∪ distributes over ∩, just as ∩ distributes over ∪.',
-            hintDE: 'Ja — ∪ ist distributiv über ∩, genau wie ∩ über ∪.',
+            hintEn: 'Yes - ∪ distributes over ∩, just as ∩ distributes over ∪.',
+            hintDE: 'Ja - ∪ ist distributiv über ∩, genau wie ∩ über ∪.',
             explain: 'The distributive law works in both directions: ∪ distributes over ∩ just as ∩ distributes over ∪, so this identity is true.',
             explainDE: 'Das Distributivgesetz gilt in beide Richtungen: ∪ verteilt sich über ∩ genau wie ∩ über ∪, also ist diese Identität wahr.'
         },
@@ -318,8 +318,8 @@ const MATH_GATE_POOLS = {
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'Kolmogorov axiom.',
             hintDE: 'Kolmogorov-Axiom.',
-            explain: 'Ω contains every possible outcome, so something in Ω always happens — Kolmogorov\'s axioms require P(Ω) = 1.',
-            explainDE: 'Ω enthält alle möglichen Ergebnisse, also tritt immer etwas aus Ω ein — die Kolmogorov-Axiome fordern P(Ω) = 1.'
+            explain: 'Ω contains every possible outcome, so something in Ω always happens - Kolmogorov\'s axioms require P(Ω) = 1.',
+            explainDE: 'Ω enthält alle möglichen Ergebnisse, also tritt immer etwas aus Ω ein - die Kolmogorov-Axiome fordern P(Ω) = 1.'
         },
         {
             q: 'Events A₁, A₂, A₃ are pairwise disjoint with P(A₁) = 0.25, P(A₂) = 0.55, P(A₃) = 0.1. What is P(A₁ ∪ A₂ ∪ A₃)? Round to 3 decimal places.',
@@ -366,8 +366,8 @@ const MATH_GATE_POOLS = {
             answer: 0.6, tolerance: 0.001, unit: '',
             hintEn: 'Since A ⊆ B, P(A) ≤ P(B).',
             hintDE: 'Da A ⊆ B, gilt P(A) ≤ P(B).',
-            explain: 'Since A is a subset of B, A can\'t contain more probability than B — so P(A) can be at most P(B) = 0.6.',
-            explainDE: 'Da A eine Teilmenge von B ist, kann A nicht mehr Wahrscheinlichkeit enthalten als B — also kann P(A) höchstens P(B) = 0,6 sein.'
+            explain: 'Since A is a subset of B, A can\'t contain more probability than B - so P(A) can be at most P(B) = 0.6.',
+            explainDE: 'Da A eine Teilmenge von B ist, kann A nicht mehr Wahrscheinlichkeit enthalten als B - also kann P(A) höchstens P(B) = 0,6 sein.'
         },
 
     ],
@@ -455,8 +455,8 @@ const MATH_GATE_POOLS = {
             q: 'A fair die is a discrete uniform distribution over {1,…,6}. What is P(X ≥ 5) where X is the dice number? Enter as a fraction over 6.',
             qDE: 'Ein fairer Würfel ist diskret gleichverteilt über {1,…,6}. Was ist P(X ≥ 5) wobei X die Augenzahl ist? Gib den Zähler über 6 ein.',
             answer: 2, tolerance: 0, unit: '/ 6',
-            hintEn: 'Favourable outcomes: {5, 6} — 2 out of 6.',
-            hintDE: 'Günstige Ergebnisse: {5, 6} — 2 von 6.',
+            hintEn: 'Favourable outcomes: {5, 6} - 2 out of 6.',
+            hintDE: 'Günstige Ergebnisse: {5, 6} - 2 von 6.',
             explain: "Only the values 5 and 6 satisfy X ≥ 5, giving exactly 2 favorable outcomes out of the 6 equally likely die faces.",
             explainDE: "Nur die Werte 5 und 6 erfüllen X ≥ 5, was genau 2 günstige Ergebnisse von den 6 gleich wahrscheinlichen Würfelseiten ergibt."
         },
@@ -605,8 +605,8 @@ const MATH_GATE_POOLS = {
             q: 'In the inclusion-exclusion formula for 3 sets, how many pairwise intersection terms are subtracted? Enter a whole number.',
             qDE: 'In der Siebformel für 3 Mengen: Wie viele paarweise Schnittterme werden subtrahiert? Gib eine ganze Zahl ein.',
             answer: 3, tolerance: 0, unit: 'terms',
-            hintEn: 'The three pairwise intersections are P(A∩B), P(A∩C), P(B∩C) — 3 terms.',
-            hintDE: 'Die drei paarweisen Schnitte sind P(A∩B), P(A∩C), P(B∩C) — 3 Terme.',
+            hintEn: 'The three pairwise intersections are P(A∩B), P(A∩C), P(B∩C) - 3 terms.',
+            hintDE: 'Die drei paarweisen Schnitte sind P(A∩B), P(A∩C), P(B∩C) - 3 Terme.',
             explain: "With 3 sets there are exactly 3 distinct ways to choose 2 of them for a pairwise intersection: {A,B}, {A,C}, and {B,C}.",
             explainDE: "Bei 3 Mengen gibt es genau 3 verschiedene Möglichkeiten, 2 davon für eine paarweise Schnittmenge auszuwählen: {A,B}, {A,C} und {B,C}."
         },
@@ -626,8 +626,8 @@ const MATH_GATE_POOLS = {
             q: 'Ω = {1,2,3}. Is ℱ = {∅, {1}, {2}, Ω} a valid σ-algebra? Enter 1 for yes, 0 for no.',
             qDE: 'Ω = {1,2,3}. Ist ℱ = {∅, {1}, {2}, Ω} eine gültige σ-Algebra? Gib 1 für ja, 0 für nein ein.',
             answer: 0, tolerance: 0, unit: '',
-            hintEn: '{1} ∪ {2} = {1,2} is not in ℱ — not closed under unions. Invalid.',
-            hintDE: '{1} ∪ {2} = {1,2} ist nicht in ℱ — nicht abgeschlossen unter Vereinigung. Ungültig.',
+            hintEn: '{1} ∪ {2} = {1,2} is not in ℱ - not closed under unions. Invalid.',
+            hintDE: '{1} ∪ {2} = {1,2} ist nicht in ℱ - nicht abgeschlossen unter Vereinigung. Ungültig.',
             explain: "A σ-algebra must be closed under unions, but {1} ∪ {2} = {1,2} is missing from ℱ, so the closure property fails and ℱ is not a valid σ-algebra.",
             explainDE: "Eine σ-Algebra muss unter Vereinigung abgeschlossen sein, aber {1} ∪ {2} = {1,2} fehlt in ℱ, sodass die Abgeschlossenheitseigenschaft nicht erfüllt ist und ℱ keine gültige σ-Algebra ist."
         },
@@ -666,8 +666,8 @@ const MATH_GATE_POOLS = {
             answer: 0.4, tolerance: 0.001, unit: '',
             hintEn: 'P(A|B) = P(A ∩ B) / P(B)',
             hintDE: 'P(A|B) = P(A ∩ B) / P(B)',
-            explain: "P(A) here is a distractor — conditioning on B only needs the joint probability divided by P(B): 0.2 / 0.5 = 0.4.",
-            explainDE: "P(A) ist hier eine Ablenkung — die Bedingung auf B benötigt nur die gemeinsame Wahrscheinlichkeit geteilt durch P(B): 0,2 / 0,5 = 0,4."
+            explain: "P(A) here is a distractor - conditioning on B only needs the joint probability divided by P(B): 0.2 / 0.5 = 0.4.",
+            explainDE: "P(A) ist hier eine Ablenkung - die Bedingung auf B benötigt nur die gemeinsame Wahrscheinlichkeit geteilt durch P(B): 0,2 / 0,5 = 0,4."
         },
 
         // ── 2. SATZ VON DER TOTALEN WAHRSCHEINLICHKEIT ───────────────────────────
@@ -747,8 +747,8 @@ const MATH_GATE_POOLS = {
             q: 'A coin is flipped twice. In the probability tree, how many paths lead to exactly one head?',
             qDE: 'Eine Münze wird zweimal geworfen. Wie viele Pfade im Wahrscheinlichkeitsbaum führen zu genau einem Kopf?',
             answer: 2, tolerance: 0, unit: 'paths',
-            hintEn: 'The paths Head-Tails and Tails-Head both give exactly one head — 2 paths.',
-            hintDE: 'Die Pfade Kopf-Zahl und Zahl-Kopf ergeben jeweils genau einen Kopf — 2 Pfade.',
+            hintEn: 'The paths Head-Tails and Tails-Head both give exactly one head - 2 paths.',
+            hintDE: 'Die Pfade Kopf-Zahl und Zahl-Kopf ergeben jeweils genau einen Kopf - 2 Pfade.',
             explain: "Out of the 4 possible two-flip sequences, exactly one head occurs along two distinct paths: Head-Tails and Tails-Head.",
             explainDE: "Von den 4 möglichen Sequenzen bei zwei Würfen tritt genau ein Kopf entlang zweier unterschiedlicher Pfade auf: Kopf-Zahl und Zahl-Kopf."
         },
@@ -1952,7 +1952,7 @@ const MATH_GATE_POOLS = {
             hintEn: 'A confounding (lurking) variable creates Simpson\'s Paradox by being correlated with both the grouping and the outcome.',
             hintDE: 'Eine Störvariable (Confounder) erzeugt Simpsons Paradoxon, da sie mit Gruppierung und Ergebnis korreliert.',
             explain: "The hidden variable (here, sex) is correlated with both which treatment a patient tends to receive and the outcome itself, which is precisely what defines a confounding variable.",
-            explainDE: "Die versteckte Variable (hier Geschlecht) korreliert sowohl damit, welche Behandlung ein Patient tendenziell erhält, als auch mit dem Ergebnis selbst — genau das definiert eine Störvariable."
+            explainDE: "Die versteckte Variable (hier Geschlecht) korreliert sowohl damit, welche Behandlung ein Patient tendenziell erhält, als auch mit dem Ergebnis selbst - genau das definiert eine Störvariable."
         },
 
         // ── 2. BEDINGTE DICHTE ────────────────────────────────────────────────────────
@@ -2231,8 +2231,8 @@ const MATH_GATE_POOLS = {
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'For multivariate normal distributions, uncorrelated components (off-diagonal = 0) are also independent.',
             hintDE: 'Bei multivariaten Normalverteilungen sind unkorrelierte Komponenten (Nebendiagonale = 0) auch unabhängig.',
-            explain: "For jointly (multivariate) normal random variables, zero covariance does imply independence — unlike the general case — so X and Y here are independent.",
-            explainDE: "Bei gemeinsam (multivariat) normalverteilten Zufallsvariablen impliziert eine Kovarianz von null tatsächlich Unabhängigkeit — anders als im allgemeinen Fall — sodass X und Y hier unabhängig sind."
+            explain: "For jointly (multivariate) normal random variables, zero covariance does imply independence - unlike the general case - so X and Y here are independent.",
+            explainDE: "Bei gemeinsam (multivariat) normalverteilten Zufallsvariablen impliziert eine Kovarianz von null tatsächlich Unabhängigkeit - anders als im allgemeinen Fall - sodass X und Y hier unabhängig sind."
         },
         {
             q: '(X,Y) ~ bivariate normal with μ_X=2, μ_Y=3, σ_X=1, σ_Y=2, ρ=0.5. What is Cov(X,Y)? Enter as a whole number.',
@@ -2257,7 +2257,7 @@ const MATH_GATE_POOLS = {
 
     //TODO: continue
 
-    // ── WORLD 7 — Convergence & Limit Theorems ────────────────────────────────
+    // ── WORLD 7 - Convergence & Limit Theorems ────────────────────────────────
     // Topics: Arithmetisches Mittel, Schwaches GGZ, Tschebyscheff-Ungleichung,
     //         Stochastische Konvergenz, Starkes GGZ, Hauptsatz der Statistik,
     //         Fast sichere Konvergenz, Zentraler Grenzwertsatz
@@ -2397,8 +2397,8 @@ const MATH_GATE_POOLS = {
             q: 'Xₙ converges in probability to c means P(|Xₙ − c| ≥ ε) → ? for all ε > 0. Enter the limit.',
             qDE: 'Xₙ konvergiert stochastisch gegen c bedeutet P(|Xₙ − c| ≥ ε) → ? für alle ε > 0. Gib den Grenzwert ein.',
             answer: 0, tolerance: 0, unit: '',
-            hintEn: 'This is the definition — the probability of any deviation vanishes.',
-            hintDE: 'Das ist die Definition — die Wahrscheinlichkeit jeder Abweichung verschwindet.',
+            hintEn: 'This is the definition - the probability of any deviation vanishes.',
+            hintDE: 'Das ist die Definition - die Wahrscheinlichkeit jeder Abweichung verschwindet.',
             explain: "This is exactly the definition of convergence in probability: the probability of any deviation of at least ε vanishes as n → ∞.",
             explainDE: "Dies ist genau die Definition der stochastischen Konvergenz: Die Wahrscheinlichkeit einer Abweichung von mindestens ε verschwindet für n → ∞."
         },
@@ -2542,8 +2542,8 @@ const MATH_GATE_POOLS = {
             q: 'In inferential statistics, we observe a sample to draw conclusions about a larger group. This larger group is called the __. Enter 1 for population, 2 for sample, 3 for estimator.',
             qDE: 'In der schließenden Statistik beobachten wir eine Stichprobe, um Rückschlüsse auf eine größere Gruppe zu ziehen. Diese größere Gruppe heißt __. Gib 1 für Grundgesamtheit, 2 für Stichprobe, 3 für Schätzer ein.',
             answer: 1, tolerance: 0, unit: '',
-            hintEn: 'Think about what we are ultimately trying to learn about — it is not what we directly measure.',
-            hintDE: 'Überlege, worüber wir letztlich etwas herausfinden wollen — es ist nicht das, was wir direkt messen.',
+            hintEn: 'Think about what we are ultimately trying to learn about - it is not what we directly measure.',
+            hintDE: 'Überlege, worüber wir letztlich etwas herausfinden wollen - es ist nicht das, was wir direkt messen.',
             explain: "The population is the entire group we want to draw conclusions about, while the sample is only the subset we actually observe.",
             explainDE: "Die Grundgesamtheit ist die gesamte Gruppe, über die wir Rückschlüsse ziehen wollen, während die Stichprobe nur die Teilmenge ist, die wir tatsächlich beobachten."
         },
@@ -2560,8 +2560,8 @@ const MATH_GATE_POOLS = {
             q: 'We want to know whether a new drug lowers blood pressure. We measure 50 patients and compute a test result. Which core task are we performing? Enter 1 for modelling, 2 for estimation, 3 for testing, 4 for model validation.',
             qDE: 'Wir wollen wissen, ob ein neues Medikament den Blutdruck senkt. Wir messen 50 Patienten und berechnen ein Testergebnis. Welche Kernaufgabe führen wir durch? Gib 1 für Modellierung, 2 für Schätzen, 3 für Testen, 4 für Modellvalidierung ein.',
             answer: 3, tolerance: 0, unit: '',
-            hintEn: 'We are making a yes/no decision about a claim — that is different from just computing a numerical value for an unknown quantity.',
-            hintDE: 'Wir treffen eine Ja/Nein-Entscheidung über eine Behauptung — das ist etwas anderes, als nur einen numerischen Wert für eine unbekannte Größe zu berechnen.',
+            hintEn: 'We are making a yes/no decision about a claim - that is different from just computing a numerical value for an unknown quantity.',
+            hintDE: 'Wir treffen eine Ja/Nein-Entscheidung über eine Behauptung - das ist etwas anderes, als nur einen numerischen Wert für eine unbekannte Größe zu berechnen.',
             explain: "Since we are deciding between two competing claims (the drug works vs. it doesn't) based on a computed test result, this is a testing task.",
             explainDE: "Da wir anhand eines berechneten Testergebnisses zwischen zwei konkurrierenden Behauptungen entscheiden (das Medikament wirkt vs. es wirkt nicht), handelt es sich um eine Testaufgabe."
         },
@@ -2621,8 +2621,8 @@ const MATH_GATE_POOLS = {
             q: 'We model the number of defective items in a production line using a Binomial distribution. The Binomial family is described by n (known) and p (unknown). The parameter space for p is the interval [0, 1]. Is p = 1.3 a valid value in this parameter space? Enter 1 for yes, 0 for no.',
             qDE: 'Wir modellieren die Anzahl defekter Teile an einer Produktionslinie mit einer Binomialverteilung. Die Binomialfamilie wird durch n (bekannt) und p (unbekannt) beschrieben. Der Parameterraum für p ist das Intervall [0, 1]. Ist p = 1,3 ein gültiger Wert in diesem Parameterraum? Gib 1 für ja, 0 für nein ein.',
             answer: 0, tolerance: 0, unit: '',
-            hintEn: 'The parameter space defines all values the parameter is allowed to take — check whether 1.3 lies within [0, 1].',
-            hintDE: 'Der Parameterraum legt alle zulässigen Werte des Parameters fest — prüfe, ob 1,3 im Intervall [0, 1] liegt.',
+            hintEn: 'The parameter space defines all values the parameter is allowed to take - check whether 1.3 lies within [0, 1].',
+            hintDE: 'Der Parameterraum legt alle zulässigen Werte des Parameters fest - prüfe, ob 1,3 im Intervall [0, 1] liegt.',
             explain: "Since the parameter space for p is [0, 1] and 1.3 lies outside this interval, it is not a valid value.",
             explainDE: "Da der Parameterraum für p das Intervall [0, 1] ist und 1,3 außerhalb dieses Intervalls liegt, ist es kein gültiger Wert."
         },
@@ -2630,8 +2630,8 @@ const MATH_GATE_POOLS = {
             q: 'We assume waiting times follow an Exponential distribution with unknown rate parameter λ. Since λ must be strictly positive, the parameter space is the set of all positive real numbers. Is λ = 0 a valid element of this parameter space? Enter 1 for yes, 0 for no.',
             qDE: 'Wir nehmen an, dass Wartezeiten einer Exponentialverteilung mit unbekanntem Ratenparameter λ folgen. Da λ strikt positiv sein muss, ist der Parameterraum die Menge aller positiven reellen Zahlen. Ist λ = 0 ein gültiges Element dieses Parameterraums? Gib 1 für ja, 0 für nein ein.',
             answer: 0, tolerance: 0, unit: '',
-            hintEn: 'The parameter space only contains values that make the model well-defined — check whether 0 is strictly positive.',
-            hintDE: 'Der Parameterraum enthält nur Werte, für die das Modell wohldefiniert ist — prüfe, ob 0 strikt positiv ist.',
+            hintEn: 'The parameter space only contains values that make the model well-defined - check whether 0 is strictly positive.',
+            hintDE: 'Der Parameterraum enthält nur Werte, für die das Modell wohldefiniert ist - prüfe, ob 0 strikt positiv ist.',
             explain: "Since the parameter space requires λ to be strictly positive, and 0 is not strictly positive, λ = 0 is not a valid element.",
             explainDE: "Da der Parameterraum verlangt, dass λ strikt positiv ist, und 0 nicht strikt positiv ist, ist λ = 0 kein gültiges Element."
         },
@@ -2738,8 +2738,8 @@ const MATH_GATE_POOLS = {
             q: 'The maximum likelihood estimator chooses the parameter value that maximises the likelihood function. Is the maximum likelihood estimator always the same as the sample mean? Enter 1 for yes, 0 for no.',
             qDE: 'Der Maximum-Likelihood-Schätzer wählt den Parameterwert, der die Likelihood-Funktion maximiert. Ist der Maximum-Likelihood-Schätzer immer gleich dem Stichprobenmittelwert? Gib 1 für ja, 0 für nein ein.',
             answer: 0, tolerance: 0, unit: '',
-            hintEn: 'The maximum likelihood estimator depends on the assumed distribution family — for some families the answer changes.',
-            hintDE: 'Der Maximum-Likelihood-Schätzer hängt von der angenommenen Verteilungsfamilie ab — für manche Familien ändert sich die Antwort.',
+            hintEn: 'The maximum likelihood estimator depends on the assumed distribution family - for some families the answer changes.',
+            hintDE: 'Der Maximum-Likelihood-Schätzer hängt von der angenommenen Verteilungsfamilie ab - für manche Familien ändert sich die Antwort.',
             explain: "The maximum likelihood estimator depends on the assumed distribution family, and while it coincides with the sample mean for some families (like the Normal), this is not true in general.",
             explainDE: "Der Maximum-Likelihood-Schätzer hängt von der angenommenen Verteilungsfamilie ab, und obwohl er für manche Familien (wie die Normalverteilung) mit dem Stichprobenmittelwert übereinstimmt, gilt dies nicht im Allgemeinen."
         },
@@ -2966,8 +2966,8 @@ const MATH_GATE_POOLS = {
             q: 'Two unbiased estimators θ̂₁ and θ̂₂ have Var(θ̂₁) = Var(θ̂₂) = 7. Are they equally efficient? Enter 1 for yes, 0 for no.',
             qDE: 'Zwei erwartungstreue Schätzer θ̂₁ und θ̂₂ haben Var(θ̂₁) = Var(θ̂₂) = 7. Sind sie gleich effizient? Gib 1 für ja, 0 für nein ein.',
             answer: 1, tolerance: 0, unit: '',
-            hintEn: 'Efficiency comparison among unbiased estimators is based purely on variance — compare the two values.',
-            hintDE: 'Der Effizienzvergleich unter erwartungstreuen Schätzern basiert allein auf der Varianz — vergleiche die beiden Werte.',
+            hintEn: 'Efficiency comparison among unbiased estimators is based purely on variance - compare the two values.',
+            hintDE: 'Der Effizienzvergleich unter erwartungstreuen Schätzern basiert allein auf der Varianz - vergleiche die beiden Werte.',
             explain: "Since both unbiased estimators have identical variance (7 = 7), they are equally efficient.",
             explainDE: "Da beide erwartungstreuen Schätzer die gleiche Varianz haben (7 = 7), sind sie gleich effizient."
         },
@@ -2978,10 +2978,10 @@ const MATH_GATE_POOLS = {
             q: 'θ̂₁ (biased) has MSE(θ̂₁) = 4. θ̂₂ (unbiased) has MSE(θ̂₂) = 10. Which is MSE-efficient? Enter 1 for θ̂₁, 2 for θ̂₂.',
             qDE: 'θ̂₁ (verzerrt) hat MSE(θ̂₁) = 4. θ̂₂ (erwartungstreu) hat MSE(θ̂₂) = 10. Welcher ist MSE-effizient? Gib 1 für θ̂₁, 2 für θ̂₂ ein.',
             answer: 1, tolerance: 0, unit: '',
-            hintEn: 'MSE-efficiency compares MSE values directly, regardless of bias — pick the smaller MSE.',
-            hintDE: 'MSE-Effizienz vergleicht die MSE-Werte direkt, unabhängig vom Bias — wähle den kleineren MSE.',
-            explain: "Since 4 < 10, θ̂₁ has the smaller MSE and is therefore MSE-efficient, even though it is biased — a biased estimator can outperform an unbiased one in terms of MSE.",
-            explainDE: "Da 4 < 10 ist, hat θ̂₁ den kleineren MSE und ist daher MSE-effizient, obwohl er verzerrt ist — ein verzerrter Schätzer kann einem erwartungstreuen hinsichtlich des MSE überlegen sein."
+            hintEn: 'MSE-efficiency compares MSE values directly, regardless of bias - pick the smaller MSE.',
+            hintDE: 'MSE-Effizienz vergleicht die MSE-Werte direkt, unabhängig vom Bias - wähle den kleineren MSE.',
+            explain: "Since 4 < 10, θ̂₁ has the smaller MSE and is therefore MSE-efficient, even though it is biased - a biased estimator can outperform an unbiased one in terms of MSE.",
+            explainDE: "Da 4 < 10 ist, hat θ̂₁ den kleineren MSE und ist daher MSE-effizient, obwohl er verzerrt ist - ein verzerrter Schätzer kann einem erwartungstreuen hinsichtlich des MSE überlegen sein."
         },
         {
             q: 'θ̂₁ has Bias = 1 and Var = 5. θ̂₂ has Bias = 0 and Var = 7. Compute MSE(θ̂₁) and MSE(θ̂₂), then enter the smaller of the two MSE values.',
@@ -3207,8 +3207,8 @@ const MATH_GATE_POOLS = {
             answer: 1, tolerance: 0, unit: '',
             hintEn: 'Reject H₀ iff μ₀ lies outside the CI. Here 50 is outside [40, 48].',
             hintDE: 'H₀ wird verworfen, wenn μ₀ außerhalb des KI liegt. Hier liegt 50 außerhalb von [40, 48].',
-            explain: "Since the hypothesized value 50 falls outside the CI [40, 48], H₀ is rejected — this reflects the duality between confidence intervals and hypothesis tests.",
-            explainDE: "Da der hypothetische Wert 50 außerhalb des KI [40, 48] liegt, wird H₀ verworfen — dies spiegelt die Dualität zwischen Konfidenzintervallen und Hypothesentests wider."
+            explain: "Since the hypothesized value 50 falls outside the CI [40, 48], H₀ is rejected - this reflects the duality between confidence intervals and hypothesis tests.",
+            explainDE: "Da der hypothetische Wert 50 außerhalb des KI [40, 48] liegt, wird H₀ verworfen - dies spiegelt die Dualität zwischen Konfidenzintervallen und Hypothesentests wider."
         },
         {
             q: 'A 99% CI for μ is [18, 26]. A two-sided test of H₀: μ = 22 is performed at α = 0.01. Is H₀ rejected? Enter 1 for yes, 0 for no.',
@@ -3480,7 +3480,7 @@ const MATH_GATE_POOLS = {
             explainDE: 'T ~ t(n−2).'
         },
         {
-            q: 'sxy = 12.02, s_x² = 4. Compute b_hat = sxy/(n·s_x²)? No — use b = 12.02/28. Round to 3 decimals.',
+            q: 'sxy = 12.02, s_x² = 4. Compute b_hat = sxy/(n·s_x²)? No - use b = 12.02/28. Round to 3 decimals.',
             qDE: 'b = 12,02/28. Runde auf 3 Dezimalen.',
             answer: 0.429, tolerance: 0.002, unit: '',
             hintEn: '12.02/28 ≈ 0.4293.',

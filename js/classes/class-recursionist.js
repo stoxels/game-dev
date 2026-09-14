@@ -40,7 +40,7 @@ const ZOMBIE_DWELL_MS = 5000;      // ms the zombie stands still before the coun
 const ZOMBIE_COUNTDOWN_SECS = 10;  // seconds the player has to react
 const ZOMBIE_CURSE_RADIUS = 2;     // Chebyshev radius for the fake-mistake reward
 
-// Pause between challenges (ms) — the zombie wanders quietly in between so
+// Pause between challenges (ms) - the zombie wanders quietly in between so
 // the player can focus on puzzling instead of watching the zombie
 const ZOMBIE_CHALLENGE_GRACE_MIN_MS = 25000;
 const ZOMBIE_CHALLENGE_GRACE_MAX_MS = 40000;

@@ -29,7 +29,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   TITLE PLAQUE — overlaps the top edge of the frame, like the mockup
+   TITLE PLAQUE - overlaps the top edge of the frame, like the mockup
    ----------------------------------------------------------------------- */
 .settings-box .modal-title {
     position: absolute;
@@ -54,7 +54,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   CLOSE BUTTON — stone square with X icon, top-right corner
+   CLOSE BUTTON - stone square with X icon, top-right corner
    ----------------------------------------------------------------------- */
 .settings-box .modal-close {
     position: absolute;
@@ -67,7 +67,7 @@
     background-repeat: no-repeat;
     background-color: transparent;
     border: none;
-    font-size: 0; /* the icon art already shows the X — hide the "✕ CLOSE" text */
+    font-size: 0; /* the icon art already shows the X - hide the "✕ CLOSE" text */
     cursor: pointer;
     padding: 0;
     z-index: 4;
@@ -80,7 +80,7 @@
     }
 
 /* -----------------------------------------------------------------------
-   SCROLL PANEL — all setting categories stack in ONE column (reverted
+   SCROLL PANEL - all setting categories stack in ONE column (reverted
    from the 2x2 grid). The panel fills the remaining inner height of the
    frame and scrolls vertically whenever the options exceed it.
    ----------------------------------------------------------------------- */
@@ -105,7 +105,7 @@
     /*scrollbar-color: rgba(44, 26, 12, 0.45) rgba(44, 26, 12, 0.15);*/
 }
 
-/* WebKit (Chrome/Edge/Safari) — parchment-toned scrollbar */
+/* WebKit (Chrome/Edge/Safari) - parchment-toned scrollbar */
 .settings-scroll::-webkit-scrollbar {
     width: clamp(6px, 0.7vw, 10px);
 }
@@ -119,7 +119,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   SECTION — one logical group (AUDIO / VISUALS / CONTROLS)
+   SECTION - one logical group (AUDIO / VISUALS / CONTROLS)
    Targeted via explicit sec-* classes (NOT nth-of-type) so adding,
    removing, or reordering categories never re-routes icons/styles
    to the wrong section.
@@ -129,7 +129,7 @@
 }
 
 /* position:relative anchors the absolutely-positioned icon (::before)
-   below — the icon no longer sits in the flex flow, so its size has
+   below - the icon no longer sits in the flex flow, so its size has
    zero effect on where the title text or anything else sits.
 
    BASE padding-left below shifts ALL section titles right so they
@@ -151,13 +151,13 @@
     border-bottom: 2px solid rgba(44, 26, 12, 0.35);
 }
 
-/* ---- AUDIO title text — nudge independently here ---- */
+/* ---- AUDIO title text - nudge independently here ---- */
 .settings-section.sec-audio .settings-section-title {
     padding-left: clamp(60px, 8vw, 60px); /* ← move "AUDIO" text left/right (larger = further right) */
     top: 0px; /* ← move "AUDIO" text up/down */
 }
 
-/* ---- VISUALS title text — no icon asset yet, so no left clearance
+/* ---- VISUALS title text - no icon asset yet, so no left clearance
    needed. When an icon is added, give it a ::before rule like AUDIO's
    below and bump this padding-left to clear it. ---- */
 .settings-section.sec-visuals .settings-section-title {
@@ -165,7 +165,7 @@
     top: 0px;
 }
 
-/* ---- CONTROLS title text — nudge independently here ---- */
+/* ---- CONTROLS title text - nudge independently here ---- */
 .settings-section.sec-controls .settings-section-title {
     padding-left: clamp(60px, 8vw, 60px); /* ← move "CONTROLS" text left/right (larger = further right).
                                              Keep the max identical to AUDIO/VISUALS so the
@@ -173,14 +173,14 @@
     top: 0px; /* ← move "CONTROLS" text up/down */
 }
 
-/* Icon before the AUDIO title — lute/gears asset. */
+/* Icon before the AUDIO title - lute/gears asset. */
 .settings-section.sec-audio .settings-section-title::before {
     content: '';
     position: absolute;
     top: -30px; /* ← move icon up/down, independent of layout */
     left: -60px; /* ← move icon left/right, independent of layout */
-    width: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
-    height: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
+    width: clamp(60px, 8vw, 140px); /* ← icon size - go as big as you want */
+    height: clamp(60px, 8vw, 140px); /* ← icon size - go as big as you want */
     /*background-image: url('../images/Settings/settings_instrument.webp');*/
     background-size: contain;
     background-repeat: no-repeat;
@@ -189,14 +189,14 @@
     z-index: 1;
 }
 
-/* Icon before the CONTROLS title — compass asset. */
+/* Icon before the CONTROLS title - compass asset. */
 .settings-section.sec-controls .settings-section-title::before {
     content: '';
     position: absolute;
     top: -185%;
     left: -60px;
-    width: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
-    height: clamp(60px, 8vw, 140px); /* ← icon size — go as big as you want */
+    width: clamp(60px, 8vw, 140px); /* ← icon size - go as big as you want */
+    height: clamp(60px, 8vw, 140px); /* ← icon size - go as big as you want */
     /*background-image: url('../images/Settings/settings_compass.webp');*/
     background-size: contain;
     background-repeat: no-repeat;
@@ -246,8 +246,8 @@
 }
 
 /* -----------------------------------------------------------------------
-   TOGGLE SWITCH — stone capsule (on-off-stone.png) with a divider in
-   the middle. No thumb graphic — instead, two text labels sit on the
+   TOGGLE SWITCH - stone capsule (on-off-stone.png) with a divider in
+   the middle. No thumb graphic - instead, two text labels sit on the
    button, one per side. Requires two child spans in the HTML:
      <span class="tgl-on-txt"  data-t="stt_on">ON</span>
      <span class="tgl-off-txt" data-t="stt_off">OFF</span>
@@ -258,7 +258,7 @@
    renders identically whether it's a flex-item of .settings-controls
    (Audio rows) or a direct flex-item of .settings-row (Controls rows).
    Do NOT use percentage-based margin/left/top on the child text spans
-   to nudge them — percentages there are relative to this button's own
+   to nudge them - percentages there are relative to this button's own
    width, so large values (e.g. 40%+) inflate the button's min-content
    size and break the locked width. Use small px offsets instead (see
    the per-section override blocks below the base text rule). */
@@ -289,7 +289,7 @@
         filter: brightness(1.15);
     }
 
-    /* BASE position — flex justify-content:space-between + padding on
+    /* BASE position - flex justify-content:space-between + padding on
        .settings-toggle already places "ON" left / "OFF" right
        correctly for BOTH sections. Leave this rule alone; use the two
        per-section override blocks below to nudge AUDIO or CONTROLS
@@ -308,7 +308,7 @@
         left: 0px;
     }
 
-/* ---- AUDIO toggle text only — nudge here, doesn't touch other sections ---- */
+/* ---- AUDIO toggle text only - nudge here, doesn't touch other sections ---- */
 .settings-section.sec-audio .settings-toggle .tgl-on-txt,
 .settings-section.sec-audio .settings-toggle .tgl-off-txt {
     top: 5%;
@@ -316,7 +316,7 @@
     margin: 15%;
 }
 
-/* ---- VISUALS toggle text only — same centering as CONTROLS ---- */
+/* ---- VISUALS toggle text only - same centering as CONTROLS ---- */
 .settings-section.sec-visuals .settings-toggle .tgl-on-txt,
 .settings-section.sec-visuals .settings-toggle .tgl-off-txt {
     top: 5%; /* ← move VISUALS on/off text up/down (px, not %) */
@@ -324,7 +324,7 @@
     margin: 15%;
 }
 
-/* ---- CONTROLS toggle text only — nudge here, doesn't touch other sections ---- */
+/* ---- CONTROLS toggle text only - nudge here, doesn't touch other sections ---- */
 .settings-section.sec-controls .settings-toggle .tgl-on-txt,
 .settings-section.sec-controls .settings-toggle .tgl-off-txt {
     top: 5%; /* ← move CONTROLS on/off text up/down (px, not %) */
@@ -345,7 +345,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   VOLUME SLIDER — rune-carved track (settings_slider.png) + gem thumb
+   VOLUME SLIDER - rune-carved track (settings_slider.png) + gem thumb
    ----------------------------------------------------------------------- */
 .settings-slider {
     -webkit-appearance: none;
@@ -422,9 +422,9 @@
 
 
 /* -----------------------------------------------------------------------
-   Touchpad FILL/MARK toggle — lives INSIDE #puzzle-scaler-wrap, centred
+   Touchpad FILL/MARK toggle - lives INSIDE #puzzle-scaler-wrap, centred
    below the grid (moved out of the corner HUD so it sits next to the
-   puzzle it acts on — easy to reach for touchpad / touch players).
+   puzzle it acts on - easy to reach for touchpad / touch players).
    Hidden unless Settings → Touchpad Mode is enabled.
    ----------------------------------------------------------------------- */
 .puzzle-scaler-wrap > .touchpad-mode-btn {
@@ -448,7 +448,7 @@
 
     /* Settings-driven visibility (updateTouchpadModeButtonVisibility() in
        js/mouse-button-handlers.js). NOTE: there is no global `.hidden`
-       utility class in this codebase — each component scopes its own. */
+       utility class in this codebase - each component scopes its own. */
     .puzzle-scaler-wrap > .touchpad-mode-btn.hidden {
         display: none;
     }
@@ -474,7 +474,7 @@
     }
 
 
-/* Invisible spacer elements — reuse the slider/value box sizes so a
+/* Invisible spacer elements - reuse the slider/value box sizes so a
    toggle-only row (e.g. Random Music) lines up with rows that do have
    a slider, without duplicating their clamp() math here. */
 .settings-spacer {

@@ -7,7 +7,7 @@
 // survives new playthroughs and save-file resets.
 const ACH_SAVE_KEY = 'stoxels_ach';
 
-// ACH_STATE — live achievement state; all other functions read and write
+// ACH_STATE - live achievement state; all other functions read and write
 //   directly through this reference. Assigned at the bottom of the
 //   PERSISTENCE section below (needs initAchState() to be defined first),
 //   but declared here alongside the rest of the module state.
@@ -20,7 +20,7 @@ let ACH_STATE;
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// loadAchState — reads and parses the raw achievement JSON from localStorage.
+// loadAchState - reads and parses the raw achievement JSON from localStorage.
 //   Returns null on any failure (missing key, malformed JSON, etc.).
 function loadAchState() {
     try {
@@ -30,12 +30,12 @@ function loadAchState() {
     } catch { return null; }
 }
 
-// saveAchState — serialises the current ACH_STATE object back into localStorage.
+// saveAchState - serialises the current ACH_STATE object back into localStorage.
 function saveAchState() {
     localStorage.setItem(ACH_SAVE_KEY, JSON.stringify(ACH_STATE));
 }
 
-// migrateAchState — ensures a loaded state object always has the expected shape.
+// migrateAchState - ensures a loaded state object always has the expected shape.
 //   Adds any missing top-level keys so the rest of the code can assume they exist.
 function migrateAchState(s) {
     if (!s.stats) s.stats = {};
@@ -43,7 +43,7 @@ function migrateAchState(s) {
     return s;
 }
 
-// initAchState — loads persisted progress (migrating if needed) or returns a
+// initAchState - loads persisted progress (migrating if needed) or returns a
 //   fresh empty state when no save exists yet.
 function initAchState() {
     const saved = loadAchState();
@@ -60,17 +60,19 @@ ACH_STATE = initAchState();
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// trackAchStat — increments a stat counter by amount (default 1), then
+// trackAchStat - increments a stat counter by amount (default 1), then
 //   persists and runs the unlock check.
 //   This is the primary entry point other modules should call.
 function trackAchStat(stat, amount = 1) {
+    // Tutorial-quest levels never touch achievement progress.
+    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
     if (!ACH_STATE.stats[stat]) ACH_STATE.stats[stat] = 0;
     ACH_STATE.stats[stat] += amount;
     saveAchState();
     checkAchievements();
 }
 
-// setAchStat — force-sets a stat to an exact value instead of incrementing.
+// setAchStat - force-sets a stat to an exact value instead of incrementing.
 //   Used for boolean flags (e.g. world-complete) and derived counts.
 //   The write is monotonic (never lowers an existing value): several callers
 //   recompute stats from the currently active save slot / tree allocation,
@@ -91,7 +93,7 @@ function setAchStat(stat, value) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _tryUnlockTier — checks a single tier of a single def and, if the threshold
+// _tryUnlockTier - checks a single tier of a single def and, if the threshold
 //   is newly met, records the unlock, queues a toast, and fires quest hooks.
 //   Returns true if the tier was freshly unlocked.
 function _tryUnlockTier(def, tier, tierIndex, currentValue) {
@@ -109,7 +111,7 @@ function _tryUnlockTier(def, tier, tierIndex, currentValue) {
     return true;
 }
 
-// checkSingleAchievementDef — iterates all tiers for one def and attempts to
+// checkSingleAchievementDef - iterates all tiers for one def and attempts to
 //   unlock each one. Returns true if at least one new tier was unlocked.
 function checkSingleAchievementDef(def) {
     const currentValue = ACH_STATE.stats[def.stat] || 0;
@@ -124,7 +126,7 @@ function checkSingleAchievementDef(def) {
     return anyNewTier;
 }
 
-// checkAchievements — scans every definition and unlocks anything newly met.
+// checkAchievements - scans every definition and unlocks anything newly met.
 //   Saves state and schedules the toast drain only when something changed.
 //   The drain is delayed slightly so toasts don't fire mid-action.
 function checkAchievements() {
@@ -141,14 +143,14 @@ function checkAchievements() {
 
 
 //------------------------------------------------------------------------
-//--------------LEVEL-COMPLETE TRACKING — STAT GROUP HELPERS--------------
+//--------------LEVEL-COMPLETE TRACKING - STAT GROUP HELPERS--------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Each helper below tracks one logical group of stats.
 // They are all called in sequence by onLevelCompleteAch().
 
-// trackBaseCompletionStats — core completion counters that apply to every level.
+// trackBaseCompletionStats - core completion counters that apply to every level.
 // NOTE: cellsFilled is tracked per manual fill in handleCorrectFill()
 // (mouse-button-handlers.js) so that item/skill-revealed cells are excluded
 // here. ctx.cellsFilled is still used by trackGridStats() for the dense-grid check.
@@ -159,7 +161,7 @@ function trackBaseCompletionStats(ctx) {
     if (ctx.tilesMarked !== undefined) trackAchStat('tilesMarked', ctx.tilesMarked);
 }
 
-// trackAccuracyStats — tracks perfect runs, no-item runs, and comeback wins.
+// trackAccuracyStats - tracks perfect runs, no-item runs, and comeback wins.
 function trackAccuracyStats(ctx) {
     if (ctx.mistakes === 0) trackAchStat('perfectLevels');
     if (ctx.itemsUsed === 0) trackAchStat('noItemLevels');
@@ -169,14 +171,14 @@ function trackAccuracyStats(ctx) {
     if (ctx.hadPenaltyClutch) trackAchStat('penaltyClutchwins');
 }
 
-// trackDifficultyStats — increments the counter for whichever difficulty was played.
+// trackDifficultyStats - increments the counter for whichever difficulty was played.
 function trackDifficultyStats(ctx) {
     if (ctx.diff === 'easy') trackAchStat('easyLevels');
     if (ctx.diff === 'normal') trackAchStat('normalLevels');
     if (ctx.diff === 'hard') trackAchStat('hardLevels');
 }
 
-// trackModStats — increments counters for each active game modifier.
+// trackModStats - increments counters for each active game modifier.
 function trackModStats(ctx) {
     if (!ctx.mods) return;
     if (ctx.mods.hardcore) trackAchStat('hardcoreLevels');
@@ -186,7 +188,7 @@ function trackModStats(ctx) {
     if (ctx.mods.treeless) trackAchStat('treelessLevels');
 }
 
-// trackClassStats — tracks base-class and ascendency-class level counts,
+// trackClassStats - tracks base-class and ascendency-class level counts,
 //   plus any class-specific special achievements.
 function trackClassStats(ctx) {
     // Base classes
@@ -208,14 +210,14 @@ function trackClassStats(ctx) {
     }
 }
 
-// trackTimeStats — tracks speed-run clears and time-trial clutch wins.
+// trackTimeStats - tracks speed-run clears and time-trial clutch wins.
 function trackTimeStats(ctx) {
     if (ctx.elapsed !== undefined && ctx.elapsed <= 30) trackAchStat('fastClears');
     if (ctx.timerSecs !== undefined && ctx.timerSecs > 1800) trackAchStat('bigTimeLeftWins');
     if (ctx.timerSecs !== undefined && ctx.timerSecs <= 10) trackAchStat('clutchWins');
 }
 
-// trackScoreStats — tracks total score earned, high-score levels, and personal bests.
+// trackScoreStats - tracks total score earned, high-score levels, and personal bests.
 function trackScoreStats(ctx) {
     // Use explicit undefined check so a score of 0 still counts
     if (ctx.scoreEarned !== undefined) trackAchStat('totalScoreEarned', ctx.scoreEarned);
@@ -231,7 +233,7 @@ function trackScoreStats(ctx) {
     if (isNewPersonalBest) trackAchStat('personalBestsBroken');
 }
 
-// _getPerfectClearSizeBucket — classifies a grid by total cell count into one of
+// _getPerfectClearSizeBucket - classifies a grid by total cell count into one of
 //   four size buckets used for the perfect-clear achievements.
 //   Returns the stat key to track, or null if the level was not a perfect clear.
 function _getPerfectClearSizeBucket(totalCells, isPerfect) {
@@ -242,7 +244,7 @@ function _getPerfectClearSizeBucket(totalCells, isPerfect) {
     return 'massivePerfectClears'; // 400+
 }
 
-// trackGridStats — tracks perfect-clear size buckets and dense-grid clears.
+// trackGridStats - tracks perfect-clear size buckets and dense-grid clears.
 function trackGridStats(ctx) {
     const totalCells = ctx.rows * ctx.cols;
     const isPerfect = ctx.mistakes === 0 && ctx.itemsUsed === 0;
@@ -257,7 +259,7 @@ function trackGridStats(ctx) {
     if (isDenseGrid) trackAchStat('denseGridClears');
 }
 
-// countUniqueWorldsPlayed — returns how many distinct worlds the player has
+// countUniqueWorldsPlayed - returns how many distinct worlds the player has
 //   completed at least one level in, based on STATE.done.
 function countUniqueWorldsPlayed() {
     const worldsSeen = new Set();
@@ -277,7 +279,7 @@ function countUniqueWorldsPlayed() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// onLevelCompleteAch — called after a level finishes to record all
+// onLevelCompleteAch - called after a level finishes to record all
 //   relevant achievement stats in one shot.
 //
 // Expected ctx shape:
@@ -300,25 +302,25 @@ function onLevelCompleteAch(ctx) {
 
 
 //------------------------------------------------------------------------
-//--------------WORLD-COMPLETE TRACKING — QUERY HELPERS------------------
+//--------------WORLD-COMPLETE TRACKING - QUERY HELPERS------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// getLevelIndicesForWorld — returns the array of global level indices (gi)
+// getLevelIndicesForWorld - returns the array of global level indices (gi)
 //   belonging to the given world index.
 function getLevelIndicesForWorld(worldIndex) {
     const start = WORLD_START_GI[worldIndex];
     return Array.from({ length: WORLDS[worldIndex].data.length }, (_, i) => start + i);
 }
 
-// areAllLevelsCompleted — returns true if every gi in levelIndices appears
+// areAllLevelsCompleted - returns true if every gi in levelIndices appears
 //   in STATE.done.
 function areAllLevelsCompleted(levelIndices) {
     return typeof STATE !== 'undefined' &&
         levelIndices.every(gi => STATE.done.includes(gi));
 }
 
-// areAllLevelsFlawless — returns true if the sum of recorded mistakes across
+// areAllLevelsFlawless - returns true if the sum of recorded mistakes across
 //   every level in levelIndices is zero. Returns false if mistake data is absent.
 function areAllLevelsFlawless(levelIndices) {
     if (typeof STATE.levelMistakes === 'undefined') return false;
@@ -328,13 +330,13 @@ function areAllLevelsFlawless(levelIndices) {
     return totalMistakes === 0;
 }
 
-// areAllBonusesClaimed — returns true if every gi in levelIndices appears
+// areAllBonusesClaimed - returns true if every gi in levelIndices appears
 //   in STATE.bonusDone.
 function areAllBonusesClaimed(levelIndices) {
     return levelIndices.every(gi => STATE.bonusDone.includes(gi));
 }
 
-// countFullyCompletedWorlds — returns how many non-empty worlds have had
+// countFullyCompletedWorlds - returns how many non-empty worlds have had
 //   every level completed.
 function countFullyCompletedWorlds() {
     return WORLDS.filter((w, wi) => {
@@ -343,7 +345,7 @@ function countFullyCompletedWorlds() {
     }).length;
 }
 
-// countFlawlessWorlds — returns how many non-empty worlds have been fully
+// countFlawlessWorlds - returns how many non-empty worlds have been fully
 //   completed without a single mistake across any level.
 function countFlawlessWorlds() {
     return WORLDS.filter((w, wi) => {
@@ -353,7 +355,7 @@ function countFlawlessWorlds() {
     }).length;
 }
 
-// countWorldsWithAllBonusesClaimed — returns how many fully-completed worlds
+// countWorldsWithAllBonusesClaimed - returns how many fully-completed worlds
 //   also have every bonus objective claimed.
 function countWorldsWithAllBonusesClaimed() {
     return WORLDS.filter((w, wi) => {
@@ -370,7 +372,7 @@ function countWorldsWithAllBonusesClaimed() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// checkWorldCompleteAch — call this after updating STATE.done to check and
+// checkWorldCompleteAch - call this after updating STATE.done to check and
 //   record all world-level completion milestones.
 //   Sets a per-world flag for each completed world, then updates the
 //   cross-world aggregate counts (flawless, all-bonus).
@@ -385,7 +387,7 @@ function checkWorldCompleteAch() {
         }
     });
 
-    // Aggregate counts span all worlds — compute once after the per-world loop.
+    // Aggregate counts span all worlds - compute once after the per-world loop.
     setAchStat('flawlessWorlds', countFlawlessWorlds());
     setAchStat('worldAllBonusClaimed', countWorldsWithAllBonusesClaimed());
 }
@@ -397,13 +399,13 @@ function checkWorldCompleteAch() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// showResetAchievementsModal — opens the confirmation modal before wiping data.
+// showResetAchievementsModal - opens the confirmation modal before wiping data.
 //   The actual reset only fires if the player confirms inside the modal.
 function showResetAchievementsModal() {
     showAchResetModal();
 }
 
-// _doResetAchievements — permanently wipes all achievement progress from
+// _doResetAchievements - permanently wipes all achievement progress from
 //   localStorage and memory, then refreshes the UI to show the cleared state.
 //   Called by the confirm button inside the reset modal.
 function _doResetAchievements() {

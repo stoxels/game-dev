@@ -9,7 +9,7 @@
 //     against the equipped item in the matching paperdoll slot)
 //   - Drag-and-drop is handled in endgame-hub-drag-and-drop.js
 //   - The Probability Gate (map device + map stash) lives on its own
-//     screen — see endgame-gate.js
+//     screen - see endgame-gate.js
 //------------------------------------------------------------------------
 
 
@@ -17,7 +17,7 @@
 //-------------------CONSTANTS--------------------------------------------
 //------------------------------------------------------------------------
 
-// Equipment slot definitions — each entry maps a slot id to its icon and
+// Equipment slot definitions - each entry maps a slot id to its icon and
 // which column of the paperdoll it belongs to (left / right / bottom).
 const EG_EQUIP_SLOTS = [
     // Left column (top → bottom)
@@ -87,7 +87,7 @@ function _egFindFreeInvCell() {
     return { r, c: 0 };
 }
 function _egAddItemToStash(item) {
-    // Uniques never land in the regular inventory — they go to the Unique Collection
+    // Uniques never land in the regular inventory - they go to the Unique Collection
     if (item && item.isUnique && item.baseId) {
         _egAddUniqueToCollection(item);
         return { r: -1, c: -1, unique: true };
@@ -119,34 +119,34 @@ function _egBuildCraftingBenchSlotHTML() {
 // Row 5 (r=4) separator with Mirror at (5,5); shards start at Row 6 (r=5) in orb occurrence order.
 // Orb of Scouring kept at (7,5) to retain functionality; remove its entry to make that cell empty.
 const EG_CURRENCY_SLOT_MAP = {
-    // Row 0 (1,1-1,5) — Transmutation, Augmentation, Alteration, EMPTY, Regal
+    // Row 0 (1,1-1,5) - Transmutation, Augmentation, Alteration, EMPTY, Regal
     'orb_transmutation': { r: 0, c: 0 },
     'orb_augmentation':  { r: 0, c: 1 },
     'orb_alteration':    { r: 0, c: 2 },
     // (0,3) intentionally EMPTY
     'orb_regal':         { r: 0, c: 4 },
-    // Row 1 (2,1-2,5) — Alchemy, Blooming, Chaos, EMPTY, Elevation
+    // Row 1 (2,1-2,5) - Alchemy, Blooming, Chaos, EMPTY, Elevation
     'orb_alchemy':       { r: 1, c: 0 },
     'orb_bloom':         { r: 1, c: 1 },
     'orb_chaos':         { r: 1, c: 2 },
     // (1,3) intentionally EMPTY
     'orb_elevation':     { r: 1, c: 4 },
-    // Row 2 (3,1-3,5) — Ascension, Exalted, Cataclysm, Horizons, Annulment
+    // Row 2 (3,1-3,5) - Ascension, Exalted, Cataclysm, Horizons, Annulment
     'orb_ascension':     { r: 2, c: 0 },
     'orb_exalted':       { r: 2, c: 1 },
     'orb_cataclysm':     { r: 2, c: 2 },
     'orb_horizons':      { r: 2, c: 3 },
     'orb_annulment':     { r: 2, c: 4 },
-    // Row 3 (4,1-4,5) — Blessing, Ancient, Chance, EMPTY, Divine
+    // Row 3 (4,1-4,5) - Blessing, Ancient, Chance, EMPTY, Divine
     'orb_blessing':      { r: 3, c: 0 },
     'orb_ancient':       { r: 3, c: 1 },
     'orb_chance':        { r: 3, c: 2 },
     // (3,3) intentionally EMPTY (Annulment moved to 3,5)
     'orb_divine':        { r: 3, c: 4 },
-    // Row 4 (5,1-5,5) — EMPTY with Mirror at (5,5)
+    // Row 4 (5,1-5,5) - EMPTY with Mirror at (5,5)
     // (4,0)-(4,3) EMPTY, (4,4) Mirror of Vors
     'mirror_of_kalandra':{ r: 4, c: 4 },
-    // Row 5-6 (6,1-7,5) — shards in orb occurrence order (starting at 6,1)
+    // Row 5-6 (6,1-7,5) - shards in orb occurrence order (starting at 6,1)
     'shard_transmutation':{ r: 5, c: 0 },
     'shard_alchemy':     { r: 5, c: 1 },
     'shard_bloom':       { r: 5, c: 2 },
@@ -174,7 +174,7 @@ function _egCurrencyDefForId(id) {
     return null;
 }
 
-// Map stash dimensions — 16 tier-filtered infinite stashes (one per map tier)
+// Map stash dimensions - 16 tier-filtered infinite stashes (one per map tier)
 const EG_MAP_TIER_COUNT = 16;
 const EG_MAP_TIER_ROMANS = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI'];
 const EG_MAP_STASH_COLS = 20;
@@ -202,7 +202,7 @@ let _egMapSlotItem = null;
 let _egCurrencyStash = Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
 
 // Map stash: array of 16 tier-filtered stashes, each a 2D grid (rows × EG_MAP_STASH_COLS)
-// _egMapStash[tierIdx][row][col] — tierIdx 0 = Tier I, 15 = Tier XVI
+// _egMapStash[tierIdx][row][col] - tierIdx 0 = Tier I, 15 = Tier XVI
 function _egMakeMapTierGrid(rows) {
     const r = rows != null ? rows : EG_MAP_STASH_INITIAL_ROWS;
     return Array.from({ length: r }, () => Array(EG_MAP_STASH_COLS).fill(null));
@@ -257,7 +257,7 @@ function _egFindFreeMapCellForTier(tier) {
     _egEnsureMapTierRows(tier, r + 1);
     return { r, c: 0 };
 }
-// Legacy helpers that operated on the flat grid — now tier-aware wrappers
+// Legacy helpers that operated on the flat grid - now tier-aware wrappers
 function _egIsLegacyFlatMapStash(stash) {
     if (!Array.isArray(stash) || stash.length === 0) return false;
     // Flat: stash[0][0] is null or a map object, not an array of rows
@@ -558,7 +558,7 @@ function _egBuildCurrencyStripHTML() {
 </div>`;
 }
 
-// Hover helpers for empty assigned slots — show placeholder name without needing an item.
+// Hover helpers for empty assigned slots - show placeholder name without needing an item.
 function _egOnCurrencyCellEnter(row, col, e) {
     const cell = document.getElementById(`eg-currency-cell-${row}-${col}`);
     const item = _egCurrencyStash[row] && _egCurrencyStash[row][col];
@@ -577,7 +577,7 @@ function _egOnCurrencyCellEnter(row, col, e) {
     <div class="eg-tt-header">
         <div class="eg-tt-icon" style="opacity:0.55;">${ttIcon}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
-        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} — ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
+        <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${ttDesc}</div></div>
 </div>`;
@@ -770,7 +770,7 @@ function _egOnUniqueCellEnter(uid, e) {
         const name = def ? ((LANG==='de'?def.nameDe:def.nameEn)||def.nameEn) : uid;
         const icon = def ? (def.icon || '?') : '?';
         if (isCollected) {
-            const html = `<div class="eg-tt-frame" style="--tt-border:#c8a84b;"><div class="eg-tt-header"><div class="eg-tt-icon" style="opacity:0.6;">${EG_ART ? EG_ART.html('item', uid, icon) : icon}</div><div class="eg-tt-name" style="color:#c8a84b;">${name}</div><div class="eg-tt-rarity-line" style="color:#f5d98a;">${t('eg_unique_in_inventory') || 'Collected — in Inventory (0 remaining)'}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.8;">${t('eg_unique_empty_hint') || 'All copies moved to Inventory. Drag one back or loot another.'}</div></div></div>`;
+            const html = `<div class="eg-tt-frame" style="--tt-border:#c8a84b;"><div class="eg-tt-header"><div class="eg-tt-icon" style="opacity:0.6;">${EG_ART ? EG_ART.html('item', uid, icon) : icon}</div><div class="eg-tt-name" style="color:#c8a84b;">${name}</div><div class="eg-tt-rarity-line" style="color:#f5d98a;">${t('eg_unique_in_inventory') || 'Collected - in Inventory (0 remaining)'}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.8;">${t('eg_unique_empty_hint') || 'All copies moved to Inventory. Drag one back or loot another.'}</div></div></div>`;
             showGameTooltip(html, e);
         } else {
             const html = `<div class="eg-tt-frame" style="--tt-border:#555;"><div class="eg-tt-header"><div class="eg-tt-icon">?</div><div class="eg-tt-name" style="color:#888;">${name}</div><div class="eg-tt-rarity-line" style="color:#888;">${t('eg_unique_not_collected')}</div></div><div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:.6;">${t('eg_unique_stash_hint')}</div></div></div>`;
@@ -798,7 +798,7 @@ function _egOnUniqueCellEnter(uid, e) {
     }
     // Multiple copies: build side-by-side frames – scrollable, stays open while hovering tip
     const frames = arr.map(it=>_egBuildTooltipBodyHTML(it)).join('');
-    const header = `<div style="text-align:center;font-family:var(--PX);font-size:9px;color:#f5d98a;margin-bottom:6px;letter-spacing:1px;">${t('eg_unique_tooltip_count').replace('{n}', arr.length)} — ${t('eg_unique_right_click_hint')}</div>`;
+    const header = `<div style="text-align:center;font-family:var(--PX);font-size:9px;color:#f5d98a;margin-bottom:6px;letter-spacing:1px;">${t('eg_unique_tooltip_count').replace('{n}', arr.length)} - ${t('eg_unique_right_click_hint')}</div>`;
     const html = `<div class="eg-unique-multi-tip">${header}<div class="eg-unique-multi-row">${frames}</div></div>`;
     showGameTooltip(html, e);
     const tip=document.getElementById('ghud-floating-tip');
@@ -951,9 +951,9 @@ function _egBuildTopbarHTML() {
          onmouseleave="hideGameTooltip()">✦ ${t('eg_lvl_button_label')}<span class="eg-level-badge" id="eg-level-badge"></span></button>
     <button class="eg-level-btn" id="eg-btn-passive-tree"
          onclick="showPassiveTree('screen-endgame-hub')">🌿 ${t('scr_probability_tree')}</button>
-    <button class="eg-level-btn"
+    <button class="eg-level-btn" id="eg-btn-atlas"
          onclick="showEndgameAtlas('showEndgameHub')">🗺 ${t('eg_atlas_title')}</button>
-    <button class="eg-level-btn"
+    <button class="eg-level-btn" id="eg-btn-gate"
          onclick="showEndgameGate('showEndgameHub')">🎲 ${t('mg_gate_badge')}</button>
     <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
          onmouseenter="_egShowHubInfoTooltip(event)"
@@ -964,7 +964,7 @@ function _egBuildTopbarHTML() {
 
 // Updates the Probability Tree button highlight based on available points.
 // Shows a golden border/glow and a yellow point count when there are unspent
-// Convergence Points — mirrors renderLSPassiveTreeButton and _renderTopBarTreePoints.
+// Convergence Points - mirrors renderLSPassiveTreeButton and _renderTopBarTreePoints.
 function _egUpdatePassiveTreeButton() {
     const btn = document.getElementById('eg-btn-passive-tree');
     if (!btn) return;
@@ -1045,7 +1045,7 @@ function _egShowMassSellTooltip(e) {
 
 // Builds the tooltip body shown when hovering the "?" info button in the
 // top-right of the Nexus of Worlds screen. Uses the shared game tooltip
-// engine (tooltips-hud.js) — not the browser title tooltip.
+// engine (tooltips-hud.js) - not the browser title tooltip.
 function _egBuildHubInfoTooltipHTML() {
     const line = (key) => {
         const txt = t(key);
@@ -1072,7 +1072,7 @@ function _egBuildHubInfoTooltipHTML() {
 
 function _egShowHubInfoTooltip(e) {
     showGameTooltip(_egBuildHubInfoTooltipHTML(), e);
-    // The controls list needs much more width than the shared default —
+    // The controls list needs much more width than the shared default -
     // without this the tooltip becomes very narrow and very tall.
     // eg-controls-tip is exclusive to this tooltip; the engine's inline
     // max-width only yields to it via the !important rule in CSS.
@@ -1152,7 +1152,7 @@ function _egRenderEquipSlots() {
 //-------------------RENDER: MAIN STASH-----------------------------------
 //------------------------------------------------------------------------
 
-// Full-cell rarity tint used by the main stash — each occupied cell is
+// Full-cell rarity tint used by the main stash - each occupied cell is
 // filled with its item's rarity color (instead of only a chip glow).
 // Items with unmet stat requirements override the rarity tint with red.
 const EG_RARITY_CELL_FILL = {
@@ -1210,7 +1210,7 @@ function _egUpdateInvCount() {
     if (!el) return;
     let used = 0;
     _egInventory.forEach(row => row.forEach(cell => { if (cell) used++; }));
-    // Unlimited stash: show used / capacity (capacity grows with rows) — keeps the familiar counter
+    // Unlimited stash: show used / capacity (capacity grows with rows) - keeps the familiar counter
     el.textContent = `${used} / ${_egGetInvCapacity()}`;
 }
 
@@ -1225,7 +1225,7 @@ function _egUpdateInvCount() {
 // endgame-hub-drag-and-drop.js: it renders a currency-stash cell into BOTH
 // the hub grid (eg-currency-cell-*) and the gate grid
 // (eg-gate-currency-cell-*) using drag-and-drop chips. The earlier copy
-// that lived here (hub-only, non-dnd chips) was removed in 2026-09 — the
+// that lived here (hub-only, non-dnd chips) was removed in 2026-09 - the
 // drag-and-drop version already won via load order, so behaviour is
 // unchanged; hub's stash render loop below calls the shared global.
 // Re-renders the entire currency stash grid.
@@ -1241,7 +1241,7 @@ function _egRenderCurrencyStash() {
 //------------------------------------------------------------------------
 //-------------------RENDER: MAP STASH / MAP DEVICE-----------------------
 //------------------------------------------------------------------------
-// Moved to endgame-gate.js — the map stash and map device live on the
+// Moved to endgame-gate.js - the map stash and map device live on the
 // separate Probability Gate screen. _egRenderAll() still calls
 // _egRenderMapSlot() / _egRenderMapStash(); they no-op while the gate
 // screen is not in the DOM.
@@ -1253,8 +1253,8 @@ function _egRenderCurrencyStash() {
 
 
 // Re-renders the three aggregated stat regions of the character panel:
-//   offense — upper left corner block, defense — upper right corner block,
-//   puzzle  — center column between the paperdoll slots.
+//   offense - upper left corner block, defense - upper right corner block,
+//   puzzle  - center column between the paperdoll slots.
 // Reads live gear via _egComputePlayerStats() / _egBuildGroupedStats()
 // (endgame-player-stats.js) so it always reflects whatever is equipped.
 function _egRenderStatsList() {
@@ -1313,13 +1313,13 @@ function _egBuildStatDescTooltipHTML(descKey, label, row) {
             const capped = total > cap;
             html += `<br><span style="color:var(--accent,#66fcf1)">`
                 + t('eg_statdesc_res_total').replace('{t}', total.toFixed(0))
-                + (capped ? ` — ${t('eg_statdesc_res_capped').replace('{c}', cap.toFixed(0))}` : '')
+                + (capped ? ` - ${t('eg_statdesc_res_capped').replace('{c}', cap.toFixed(0))}` : '')
                 + `</span>`;
         }
         const stats = _egComputePlayerStats();
         // Armour/evasion live values are measured against a representative
         // monster: the current target's level, else the encounter's base
-        // level — same convention as the accuracy tooltip below.
+        // level - same convention as the accuracy tooltip below.
         const hasLevelCtx = typeof _egGetTarget === 'function' && typeof _egGetEncounterBaseLevel === 'function';
         const refMonsterLevel = hasLevelCtx
             ? ((_egGetTarget() && _egGetTarget().level) || _egGetEncounterBaseLevel() || 1)
@@ -1467,7 +1467,7 @@ function _egRenderAll() {
 // Writes all hub state variables back into the global STATE object and saves.
 function egSaveHubState() {
     // Safety interlock (2026-09): refuse to write while the hub load failed
-    // or has not completed — the mirrors may still hold their empty defaults,
+    // or has not completed - the mirrors may still hold their empty defaults,
     // and writing them back would wipe the player's real stash. Writes made
     // FROM INSIDE the load itself are the exception: they persist heal /
     // migration results computed from mirrors that were just read from STATE
@@ -1475,11 +1475,11 @@ function egSaveHubState() {
     // level-97 stash once; it stays closed until the hub load succeeds (the
     // state.js save() degraded guard is the second net).
     if (window._stoxHubLoadFailed) {
-        console.error('[hub] egSaveHubState REFUSED — hub state failed to load this session; reload the page');
+        console.error('[hub] egSaveHubState REFUSED - hub state failed to load this session; reload the page');
         return;
     }
     if (!window._stoxHubStateLoaded && !window._stoxHubLoadInProgress) {
-        console.error('[hub] egSaveHubState REFUSED — hub state has not finished loading');
+        console.error('[hub] egSaveHubState REFUSED - hub state has not finished loading');
         return;
     }
     STATE.egEquipped = _egEquipped;
@@ -1559,12 +1559,12 @@ function _egShowHandMigrationToast(moves) {
                 const mainNm = (_egEquipped.weapon1 && _egEquipped.weapon1.name) || '?';
                 let tpl = null;
                 try { const s = t('eg_migrate_offhand_two_handed'); if (s && s !== 'eg_migrate_offhand_two_handed') tpl = s; } catch (e) {}
-                msg = (tpl || '⚠️ {off} moved to your stash — {main} is two-handed and needs a free off-hand')
+                msg = (tpl || '⚠️ {off} moved to your stash - {main} is two-handed and needs a free off-hand')
                     .replace('{off}', nm).replace('{main}', mainNm);
             } else {
                 let tpl = null;
                 try { const s = t('eg_migrate_hand_generic'); if (s && s !== 'eg_migrate_hand_generic') tpl = s; } catch (e) {}
-                msg = (tpl || '⚠️ {name} moved to your stash — it cannot stay equipped in that slot')
+                msg = (tpl || '⚠️ {name} moved to your stash - it cannot stay equipped in that slot')
                     .replace('{name}', nm);
             }
         } catch (e) {
@@ -1583,7 +1583,7 @@ function _egLoadHubState() {
     // page is reloaded and the load succeeds.
     if (window._stoxHubStateLoaded) return;
     if (window._stoxHubLoadFailed) {
-        console.error('[hub] skipping _egLoadHubState — previous attempt failed midway; save-writes stay blocked until reload');
+        console.error('[hub] skipping _egLoadHubState - previous attempt failed midway; save-writes stay blocked until reload');
         return;
     }
     // Mark the load as in progress: egSaveHubState's interlock must ALLOW the
@@ -1644,9 +1644,9 @@ function _egLoadHubState() {
                 }
             }
             // also migrate any maps that might be in wrong tier (e.g. tier changed via Horizons)
-            // we leave them where they are — player can manually move via device
+            // we leave them where they are - player can manually move via device
         } else if (Array.isArray(saved) && saved.length > 0 && Array.isArray(saved[0]) && !Array.isArray(saved[0][0])) {
-            // legacy flat grid (e.g. 4×20) — distribute maps into tiered stashes by mapTier
+            // legacy flat grid (e.g. 4×20) - distribute maps into tiered stashes by mapTier
             _egMapStash = _egMakeAllMapStashes();
             for (let r = 0; r < saved.length; r++) {
                 if (!Array.isArray(saved[r])) continue;
@@ -1732,7 +1732,7 @@ function _egLoadHubState() {
         }
         for (const [id, total] of merged.entries()) {
             const pos = _egCurrencySlotForId(id);
-            if (!pos) continue; // unknown / unassigned currency — drop (should not happen)
+            if (!pos) continue; // unknown / unassigned currency - drop (should not happen)
             const def = _egCurrencyDefForId(id);
             // Preserve first item's full object as template (with heals)
             const template = items.find(x => x.id === id) || { id, category: 'currency', rarity: 'currency' };
@@ -1771,7 +1771,7 @@ function _egLoadHubState() {
         while(_egCurrencyStash.length < EG_CURRENCY_ROWS) _egCurrencyStash.push(Array(EG_CURRENCY_COLS).fill(null));
     }
     // EG_ESSENCE_ROWS/COLS are defined in endgame-essences.js which loads
-    // after this file — guard so first-load initialisation never throws.
+    // after this file - guard so first-load initialisation never throws.
     // The stash is always normalised to the CURRENT grid dimensions: saves
     // created with an older (smaller) essence tab would otherwise leave
     // rows/cols undefined and crash the essence renderer.
@@ -1816,7 +1816,7 @@ function _egLoadHubState() {
                 const leftover = []; // items with no assigned slot
                 const LEGACY_ESSENCE_DISCARD = new Set(['essence_vitality','essence_might','essence_sorcery','essence_swiftness','essence_fortress','essence_elements','essence_puzzle']);
                 for (const it of allItems) {
-                    if (LEGACY_ESSENCE_DISCARD.has(it.id)) continue; // drop legacy group essences — replaced by per-modifier essences
+                    if (LEGACY_ESSENCE_DISCARD.has(it.id)) continue; // drop legacy group essences - replaced by per-modifier essences
                     const pos = _egEssenceSlotForId(it.id);
                     if (!pos) { leftover.push(it); continue; }
                     const cnt = it.count || 1;
@@ -1878,9 +1878,9 @@ function _egLoadHubState() {
             }
         }
     }
-    // Mass-sell filter — load (or default-initialise) from the persisted save.
+    // Mass-sell filter - load (or default-initialise) from the persisted save.
     _egLoadMassSellSettings();
-    // Loot filter — load (or default-initialise) from the persisted save.
+    // Loot filter - load (or default-initialise) from the persisted save.
     if (typeof _egLoadLootFilter === 'function') _egLoadLootFilter();
 
     // Heal legacy equipment items that were saved before implicits existed.
@@ -1936,8 +1936,9 @@ function _egLoadHubState() {
                     if (!Array.isArray(grid[r])) continue;
                     for (let c = 0; c < grid[r].length; c++) {
                         const it = grid[r][c];
-                        if (it && !_egHealWeaponHands(it)) continue;
-                        handsChanged = true;
+                        // _egHealWeaponHands returns TRUE when it CHANGED the
+                        // item - non-weapon items must NOT count as changed.
+                        if (it && _egHealWeaponHands(it)) handsChanged = true;
                     }
                 }
             };
@@ -2041,7 +2042,7 @@ function _egLoadHubState() {
         }
     } catch(e) { /* never break hub load for a bench cleanup */ }
 
-    // Endgame achievements — retroactive sync for existing saves
+    // Endgame achievements - retroactive sync for existing saves
     try {
         if (typeof setAchStat === 'function' && typeof egAtlasProgress === 'function' && STATE.egAtlasCompleted) {
             const _ap = egAtlasProgress();
@@ -2062,7 +2063,7 @@ function _egLoadHubState() {
             setAchStat('egPlayerLevel', _egGetPlayerLevel());
         }
         if (typeof setAchStat === 'function' && typeof egGetGold === 'function') {
-            // gold earned is cumulative — can't reconstruct, seed with current balance as floor
+            // gold earned is cumulative - can't reconstruct, seed with current balance as floor
             const _curGold = egGetGold();
             if (_curGold > 0 && (!ACH_STATE.stats.egGoldEarned || ACH_STATE.stats.egGoldEarned < _curGold)) {
                 // use setAchStat to at least reflect balance; real earned will grow via _egAddGold
@@ -2086,7 +2087,7 @@ try {
     window._stoxHubStateLoaded = true;
 } catch (e) {
     window._stoxHubLoadFailed = true;
-    console.error('[hub] load failed — save-writes BLOCKED for this session to protect your stash (reload the page)', e);
+    console.error('[hub] load failed - save-writes BLOCKED for this session to protect your stash (reload the page)', e);
 } finally {
     window._stoxHubLoadInProgress = false;
 }
@@ -2131,6 +2132,7 @@ function showEndgameHub() {
     _egLoadHubState();
     _egUpdateItemLevelToggleButton();
     _egRenderAll();
+    _egApplyOverlayChrome();
     // Flush any deferred legacy-hand-migration notice on the visible sheet.
     try {
         if (_egPendingHandMigrationToast && _egPendingHandMigrationToast.length
@@ -2144,9 +2146,162 @@ function showEndgameHub() {
 
 // Navigates back from the character sheet & inventory screen.
 // The Nexus of Worlds screen is the parent of all endgame screens,
-// so the back button always returns there.
+// so the back button returns there - EXCEPT in game-overlay mode (B
+// keybind mid-puzzle), where it returns to the running puzzle instead:
+// the Nexus path would strand the paused run with no way back.
 function safeGoBackFromHub() {
+    if (_egHubGameOverlay) { closeHubToGame(); return; }
     showEndgameNexus();
+}
+
+
+//------------------------------------------------------------------------
+//-------------------GAME OVERLAY MODE (B KEYBIND)-------------------------
+//------------------------------------------------------------------------
+// The hub has two entry paths, discriminated by _egHubGameOverlay:
+//   Normal  - from the mode-select / level-select / Nexus screens. The hub
+//             is a full screen; BACK returns to the Nexus.
+//   Overlay - via the B keybind mid-puzzle. The run keeps living underneath:
+//             the game is paused silently (no pause overlay), the avatar
+//             sprite is hidden (it is body-anchored and would float above the
+//             sheet), and B (or BACK) returns straight to the running puzzle
+//             exactly where it was.
+
+let _egHubGameOverlay = false;
+// True only if THIS overlay open paused the game (a pause menu may already
+// have been up when B was pressed - then pause state is left untouched).
+let _egHubOverlayPaused = false;
+
+// True while the hub is open as an overlay over a running puzzle.
+function isHubGameOverlay() {
+    return _egHubGameOverlay === true;
+}
+
+// Hides the exits to other progression screens (probability tree, atlas of
+// statistica, probability gate) while the sheet floats over a paused run -
+// leaving them would strand that run with no way back. Restores them on
+// every normal open (the hub DOM persists across opens, so this must run
+// both ways on every showEndgameHub).
+function _egApplyOverlayChrome() {
+    const hide = _egHubGameOverlay === true;
+    ['eg-btn-passive-tree', 'eg-btn-atlas', 'eg-btn-gate'].forEach((id) => {
+        const btn = document.getElementById(id);
+        if (btn) btn.style.display = hide ? 'none' : '';
+    });
+}
+
+// Silently pauses the run WITHOUT the pause overlay (same recipe the
+// tutorial's _tqSetPaused uses). No-op unless a level is actually running.
+function _egHubOverlayPause() {
+    _egHubOverlayPaused = false;
+    try {
+        if (typeof dead !== 'undefined' && dead) return;
+        if (typeof cur === 'undefined' || !cur) return;
+        if (typeof _gamePaused !== 'undefined' && _gamePaused) return;  // pause menu already up
+        if (typeof pauseTimer === 'function') pauseTimer();
+        _gamePaused = true;
+        if (typeof _egOnPause === 'function') { try { _egOnPause(); } catch (e) {} }
+        _egHubOverlayPaused = true;
+    } catch (e) {}
+}
+
+// Resumes a run paused by _egHubOverlayPause. Never touches pause state
+// owned by someone else (pause menu, tutorial lessons).
+function _egHubOverlayResume() {
+    if (!_egHubOverlayPaused) return;
+    _egHubOverlayPaused = false;
+    try {
+        _gamePaused = false;
+        if (typeof _egOnResume === 'function') { try { _egOnResume(); } catch (e) {} }
+        if (typeof resumeTimer === 'function') resumeTimer();
+    } catch (e) {}
+}
+
+function _egHubHideAvatars() {
+    try { if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple(); } catch (e) {}
+    try { if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar(); } catch (e) {}
+}
+
+function _egHubShowAvatars() {
+    try { if (typeof _showPlayerAvatarSimple === 'function') _showPlayerAvatarSimple(); } catch (e) {}
+    try { if (typeof _showPlayerAvatar === 'function') _showPlayerAvatar(); } catch (e) {}
+}
+
+// Opens the sheet over a running puzzle (B keybind path).
+function openHubFromGame() {
+    _egHubGameOverlay = true;
+    _egHubOverlayPause();
+    _egHubHideAvatars();
+    // Safety net: loot claimed this run must already be visible. Claims now
+    // stash instantly (see _egCheckLootClaim), but a pending item from an
+    // older save or a pre-flush code path would otherwise stay hidden in
+    // _egRunLoot until map clear. The flush is idempotent (_egStashed skip).
+    try { if (typeof _egFlushRunLootToStash === 'function') _egFlushRunLootToStash(); } catch (e) {}
+    showEndgameHub();
+}
+
+// Reconciles the live combat pools with the loadout edited in the overlay.
+// Damage done/received already read _egComputePlayerStats() live, but the
+// snapshotted pools (max HP / max mana / absorption) are only set at level
+// start - equipping +health/+mana/+absorption mid-puzzle would otherwise do
+// nothing until the next level. Grants max-increases to the current pool
+// (PoE-style) and clamps decreases, then refreshes every combat HUD element
+// so the new values are visible the instant B closes the sheet.
+function _egSyncOverlayGearPools() {
+    try {
+        if (typeof _egComputePlayerStats !== 'function') return;
+        if (typeof cur === 'undefined' || !cur) return;
+        const stats = _egComputePlayerStats() || {};
+        // ── HP ──
+        if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
+            const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
+            let newMax = baseHP + (Number(stats.health) || 0);
+            if (typeof _egMapPlayerLifeMult === 'function') {
+                try { newMax = Math.round(newMax * _egMapPlayerLifeMult()); } catch (e) {}
+            }
+            newMax = Math.max(1, newMax);
+            const delta = newMax - playerMaxHP;
+            playerMaxHP = newMax;
+            if (delta > 0) playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + delta);
+            else playerCurrentHP = Math.max(0, Math.min(playerMaxHP, playerCurrentHP));
+        }
+        // ── Mana snapshot (bar itself reads live max, snapshot keeps regen/clamp sane) ──
+        if (typeof playerMaxMana !== 'undefined' && typeof playerCurrentMana !== 'undefined'
+            && typeof _getPlayerMaxMana === 'function') {
+            try {
+                const newManaMax = _getPlayerMaxMana();
+                const deltaM = newManaMax - playerMaxMana;
+                playerMaxMana = newManaMax;
+                if (deltaM > 0) playerCurrentMana = Math.min(playerMaxMana, playerCurrentMana + deltaM);
+                else playerCurrentMana = Math.max(0, Math.min(playerMaxMana, playerCurrentMana));
+            } catch (e) {}
+        }
+        // ── Absorption shield ──
+        // Regen caps at the live stats max, so clamping is enough: a raised
+        // cap refills via regen, a lowered cap trims the current shield now.
+        if (typeof _egPlayerAbsorptionCurrent !== 'undefined') {
+            try {
+                const newAbs = Math.max(0, Number(stats.absorption) || 0);
+                _egPlayerAbsorptionCurrent = Math.max(0, Math.min(newAbs, _egPlayerAbsorptionCurrent));
+            } catch (e) {}
+        }
+    } catch (e) {}
+}
+
+// Closes the overlay and returns to the running puzzle exactly where it was.
+function closeHubToGame() {
+    _egHubGameOverlay = false;
+    if (typeof switchScreen === 'function') switchScreen('screen-game');
+    _egHubShowAvatars();
+    // Gear edited mid-puzzle must apply instantly: sync pools first, then
+    // repaint every HUD surface that displays damage done/received or pools.
+    try { _egSyncOverlayGearPools(); } catch (e) {}
+    try { if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth(); } catch (e) {}
+    try { if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar(); } catch (e) {}
+    try { if (typeof _egRenderPanel === 'function') _egRenderPanel(); } catch (e) {}
+    try { if (typeof buildClassHUD === 'function') buildClassHUD(); } catch (e) {}
+    try { if (typeof renderSkillHotbar === 'function') renderSkillHotbar(); } catch (e) {}
+    _egHubOverlayResume();
 }
 
 
@@ -2192,7 +2347,7 @@ function egAddTestItems() {
 // Two buttons live in the stash header ("STASH" row):
 //   ⚙  opens the filter modal where the player marks which rarities are
 //      PROTECTED (kept). Unchecked rarities are sold.
-//   ⚒  sells every non-protected item in the stash in one go — same effect
+//   ⚒  sells every non-protected item in the stash in one go - same effect
 //      as Ctrl+Click (shard or no-value destroy), but batched with a single
 //      confirmation and a single save.
 
@@ -2210,7 +2365,7 @@ function _egEnsureMassSellModal() {
         <span class="eg-ms-head-icon">⚒</span>
         <span class="eg-ms-head-title">${t('eg_mass_sell_modal_title')}</span>
         <button class="eg-ms-close" onclick="_egCloseMassSellModal()"
-                title="${t('eg_mass_sell_close')}" aria-label="${t('eg_mass_sell_close')}">✕</button>
+                data-tip-t="eg_mass_sell_close" aria-label="${t('eg_mass_sell_close')}">✕</button>
     </div>
     <div class="eg-ms-body">
         <div class="eg-ms-how">
@@ -2371,7 +2526,8 @@ function _egMassSellRenderStaticText(modal) {
     if (title) title.textContent = t('eg_mass_sell_modal_title');
     const close = modal.querySelector('.eg-ms-close');
     if (close) {
-        close.title = t('eg_mass_sell_close');
+        // The hint is data-tip-t (resolved live at hover time), so only the
+        // accessible name needs re-applying on a language switch.
         close.setAttribute('aria-label', t('eg_mass_sell_close'));
     }
     const howTitle = modal.querySelector('.eg-ms-how-title');
@@ -2468,7 +2624,7 @@ function _egCancelMassSellConfirm() {
     const confirm = document.getElementById('eg-mass-sell-confirm');
     if (box) box.style.display = '';
     if (confirm) confirm.style.display = 'none';
-    // stay open on the filter view (user can tweak and sell again) — alternatively close:
+    // stay open on the filter view (user can tweak and sell again) - alternatively close:
     // _egCloseMassSellModal();
 }
 
@@ -2509,7 +2665,7 @@ function _egExecuteMassSell() {
     // which would toast + save each time.
     for (const { r, c, item } of targets) {
         // Item may have been moved/cleared already if a previous failure left
-        // it — verify the slot still holds the same item.
+        // it - verify the slot still holds the same item.
         if (_egInventory[r][c] !== item) continue;
         if (item.noSellValue) {
             _egInventory[r][c] = null;
@@ -2517,7 +2673,7 @@ function _egExecuteMassSell() {
             continue;
         }
         // Try to grant a shard; if the shard stash is blocked the spec says
-        // to keep the item and flash — mirror _egSellStashItem behaviour.
+        // to keep the item and flash - mirror _egSellStashItem behaviour.
         // Unique items always grant an Ancient Shard.
         let shardDef = null;
         try {
@@ -2528,7 +2684,7 @@ function _egExecuteMassSell() {
             }
         } catch (e) { shardDef = null; }
         if (!shardDef) {
-            // shard system unavailable — treat as no-value destroy so the
+            // shard system unavailable - treat as no-value destroy so the
             // inventory does not get stuck
             _egInventory[r][c] = null;
             sold++; noValue++;
@@ -2850,7 +3006,7 @@ function _egInjectMassSellStyles() {
             font-family: var(--F, monospace); font-size: 13px; line-height: 1.5;
             color: var(--accent2, #fff); text-align: center;
         }
-        /* Destructive action — red fill, matching the game's delete-confirm button */
+        /* Destructive action - red fill, matching the game's delete-confirm button */
         .eg-mass-sell-btn.eg-mass-sell-confirm {
             color: #fff; background: var(--red, #e74c3c);
             border-color: var(--red, #e74c3c); font-weight: 700;

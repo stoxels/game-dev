@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SERAPH (boss_seraph)-----------------------------
 //------------------------------------------------------------------------
-// Pinnacle judgment: pillars of light strike at random across the arena —
-// no pattern, no mercy, only the half-second flicker — while radiant fans
+// Pinnacle judgment: pillars of light strike at random across the arena -
+// no pattern, no mercy, only the half-second flicker - while radiant fans
 // close every escape you plan. Pray in motion.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -57,7 +57,7 @@ function _egMechJudgmentPillars(monster, phase) {
         pilEl.style.display = 'none';
         pillars.push({ x, t: -i * staggerMs, stage: 'warn', hitDone: false, warnEl, pilEl });
     }
-    _egNkToast('eg_mech_seraph', '😇 The Seraph: Judgment Pillars! No pattern — only the flicker!');
+    _egNkToast('eg_mech_seraph', '😇 The Seraph: Judgment Pillars! No pattern - only the flicker!');
     _egNkLoop(run, (dtS) => {
         let allDone = true;
         const pr = _egNkPlayerRect();

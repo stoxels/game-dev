@@ -12,7 +12,7 @@
 //      in index.html AFTER shared-boss-abilities.js
 //
 // Handler-name strings are resolved via window[handler] at fire time, so a
-// typo fails silently (mechanic never fires) — double-check the names.
+// typo fails silently (mechanic never fires) - double-check the names.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {

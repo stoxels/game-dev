@@ -1,21 +1,21 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE PUDDLE (boss_puddle)-----------------------------
 //------------------------------------------------------------------------
-// Weather fight — the arena slowly drowns while the sky never stops:
+// Weather fight - the arena slowly drowns while the sky never stops:
 //   • RAIN: drops fall from the top of the screen for the whole fight and
 //     deal cold damage on impact. A quarter of them drift toward you.
 //   • RISING WATER: at 75% / 50% / 25% boss HP the lower 1/6 / 2/6 / 3/6
 //     of the screen floods. Standing in water ticks cold damage.
 //   • FOUNTAINS: every drop that lands in the water erupts a crown splash
-//     (thin column + wide draping canopy) — 2s of cold spray on contact.
+//     (thin column + wide draping canopy) - 2s of cold spray on contact.
 //   The flood never climbs above the puzzle grid's lower border.
 //   • GATE WAVE (signature): each HP gate, after the flood rises, a curling
 //     wave crest charges at a screen edge (~1.3s telegraph) then sweeps the
 //     whole water surface. Its crest reaches above the waterline into the
-//     grid's lowest rows — one heavy cold hit if it catches you.
+//     grid's lowest rows - one heavy cold hit if it catches you.
 //   • AIR BUBBLES: three glossy bubbles drift around the arena (faster
 //     than they used to wander). A raindrop or fountain jet that touches
-//     one pops it — bubble shrapnel flies off toward the screen sides and
+//     one pops it - bubble shrapnel flies off toward the screen sides and
 //     damages the player. A fresh bubble respawns after 40s.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -51,7 +51,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Weather tuning ──────────────────────────────────────────────────────
-const EG_PUD_RAIN_INTERVAL_MS = [0, 1150, 950, 800]; // per boss phase — rain thickens (kept light)
+const EG_PUD_RAIN_INTERVAL_MS = [0, 1150, 950, 800]; // per boss phase - rain thickens (kept light)
 const EG_PUD_RAIN_SPEED = 640;        // px/s fall speed
 const EG_PUD_RAIN_R = 7;              // drop hit radius
 const EG_PUD_RAIN_DMG = 0.035;        // %maxHP per drop impact (cold)
@@ -60,8 +60,8 @@ const EG_PUD_WATER_PCT = [0, 1 / 6, 2 / 6, 3 / 6]; // of viewport height per ban
 const EG_PUD_WATER_RISE = 130;        // px/s the flood visibly rises
 const EG_PUD_WATER_DOT = [0, 7, 9, 12];  // %maxHP/s standing in the water
 const EG_PUD_FOUNTAIN_DMG = 8;        // %maxHP/s touching a fountain jet
-const EG_PUD_FOUNTAIN_MS = 2000;      // fountain lifetime — quick crown splash
-const EG_PUD_FOUNTAIN_H = 260;        // full jet height (px) — tall, since the flood stays low
+const EG_PUD_FOUNTAIN_MS = 2000;      // fountain lifetime - quick crown splash
+const EG_PUD_FOUNTAIN_H = 260;        // full jet height (px) - tall, since the flood stays low
 const EG_PUD_FOUNTAIN_CANOPY_W = 3.4; // canopy spread at full flare (× stem width)
 const EG_PUD_FOUNTAIN_W = 14;         // jet width (hitbox half = W/2 + pad)
 const EG_PUD_BUBBLE_N = 3;            // air bubbles airborne at once
@@ -71,7 +71,7 @@ const EG_PUD_BUBBLE_RESPAWN_MS = 40000; // new bubble this long after a burst
 const EG_PUD_SHARD_SPEED = 300;       // px/s burst shrapnel
 const EG_PUD_SHARD_DMG = 0.05;        // %maxHP per shrapnel (cold)
 const EG_PUD_SHARD_CD_MS = 450;       // global shrapnel-hit cooldown
-// Gate wave — sweeps the flood surface after each HP gate rise.
+// Gate wave - sweeps the flood surface after each HP gate rise.
 const EG_PUD_WAVE_TELEGRAPH_MS = 1300; // crest looms at the edge before sweeping
 const EG_PUD_WAVE_SPEED = 430;         // px/s sweep across the screen
 const EG_PUD_WAVE_W = 96;              // crest width (visual + hitbox)
@@ -120,7 +120,7 @@ function _egPudSpawnBubble(st, now) {
         // during heavy fountain barrage isn't popped the frame it appears.
         graceUntil: (typeof now === 'number' ? now : performance.now()) + 3000,
     };
-    // Air bubbles float — never below the water surface, and respawns bias
+    // Air bubbles float - never below the water surface, and respawns bias
     // toward the upper sky where fountains can't reach.
     const ceilY = 50 + r;
     const maxY = Math.max(ceilY + 40, Math.min(window.innerHeight * 0.5, (st.waterY != null ? st.waterY : window.innerHeight)) - r - 8);
@@ -186,7 +186,7 @@ function _egPudSpawnFountain(st, x, now) {
 
 
 function _egPudSplash(st, x, y) {
-    // No water yet — drops still leave a small ground splash.
+    // No water yet - drops still leave a small ground splash.
     const el = _egNkEl(st.run, 'div', 'eg-pud-splash');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
@@ -251,12 +251,12 @@ function _egPuddleArenaInit(monster) {
         rainAcc: 0, rainCd: 0, shardCd: 0, fountainSfxAt: 0, warnAt: 0,
     };
     _egPudWatcher = st;
-    _egNkToast('eg_mech_puddle', '💧 The Puddle: The sky opens — rain, rising water and drifting bubbles. Stay dry!');
+    _egNkToast('eg_mech_puddle', '💧 The Puddle: The sky opens - rain, rising water and drifting bubbles. Stay dry!');
     // Tier-scaled clock: the gate wave's 1.3s telegraph breathes with tier,
     // like the Marksman's aim and the Sprout's whips. `now`-stamp hit
     // cooldowns and the bubble respawn queue stay real-time (fairness floor).
     // Passive run: the watcher lives the whole fight, so it must not hog
-    // _egNkDodgeBusy() — only its set-pieces should.
+    // _egNkDodgeBusy() - only its set-pieces should.
     const run = _egNkNewRun(monsterId, true);
     run.passive = true;
     st.run = run;
@@ -283,7 +283,7 @@ function _egPuddleArenaInit(monster) {
             st.waterBand = band;
             _egNkToast('eg_pud_water' + (band > 1 ? band : ''), '🌊 The water rises!', '#7dd3fc');
             // Signature: once the flood settles, a wave sweeps the surface.
-            // 2.6s on the internal clock — tier-scaled like every telegraph.
+            // 2.6s on the internal clock - tier-scaled like every telegraph.
             st.waveQ = 2600;
         }
         // Cap: surface may touch the grid's bottom edge, no higher.
@@ -321,7 +321,7 @@ function _egPuddleArenaInit(monster) {
             wv.el.style.left = Math.round(wv.x) + 'px';
             wv.el.style.top = Math.round(st.waterY) + 'px';
             st.wave = wv;
-            _egNkToast('eg_pud_wave', '🌊 A wave is charging — get out of the water!', '#38bdf8');
+            _egNkToast('eg_pud_wave', '🌊 A wave is charging - get out of the water!', '#38bdf8');
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('pud_wave'); } catch (e) {}
         }
         if (st.wave) {
@@ -374,7 +374,7 @@ function _egPuddleArenaInit(monster) {
             d.el.style.transform = 'translate(' + Math.round(d.x) + 'px,' + Math.round(d.y) + 'px)';
 
             let consumed = false;
-            // Impact with the player — this is when the damage happens.
+            // Impact with the player - this is when the damage happens.
             if (pr && now >= st.rainCd && _egNkCircleHit(d.x, d.y, EG_PUD_RAIN_R, pr, 0)) {
                 st.rainCd = now + EG_PUD_RAIN_HIT_CD_MS;
                 const dealt = _egNkHit(EG_PUD_RAIN_DMG, 'cold', level);
@@ -401,7 +401,7 @@ function _egPuddleArenaInit(monster) {
             if (consumed) _egPudConsumeDrop(st, i);
         }
 
-        // ── Fountains: crown splashes — grow, flare, collapse; damage on contact ──
+        // ── Fountains: crown splashes - grow, flare, collapse; damage on contact ──
         for (let i = st.fountains.length - 1; i >= 0; i--) {
             const f = st.fountains[i];
             f.t += dtS * 1000;

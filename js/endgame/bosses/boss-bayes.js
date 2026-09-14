@@ -1,32 +1,32 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: BAYES (boss_bayes)------------------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK — "The Grand Prior". Evidence updates beliefs — the fight
+// TIER 7 REWORK - "The Grand Prior". Evidence updates beliefs - the fight
 // literally re-weights. Bayes holds a visible BELIEF METER between two
 // hypotheses (SAFE LEFT / SAFE RIGHT); its casts strike the side the meter
 // currently favours. Your job is feeding evidence to flip the meter before
 // each big cast. Element: lightning.
-//   • POSTERIOR BOLTS (signature, all fight) — every cast, lightning waves
+//   • POSTERIOR BOLTS (signature, all fight) - every cast, lightning waves
 //     land across the currently-BELIEVED-SAFE side in wide columns; the
 //     meter then shifts toward the OTHER side (getting hit by your own
 //     belief's evidence). A glowing EVIDENCE RING spawns on the opposite
 //     side: stand in it when a bolt lands to shift the meter strongly your
-//     way — risk = reward, because that side is being punished next.
-//   • EVIDENCE WISPS (60%) — 🔮 wisps drift along wide readable loops;
+//     way - risk = reward, because that side is being punished next.
+//   • EVIDENCE WISPS (60%) - 🔮 wisps drift along wide readable loops;
 //     touching one flips the meter 15 points toward the wisp's own side
 //     (pull the next cast away from you). Wisps on the non-favoured side
-//     glow — those are the free flips; wisps on the favoured side sting.
-//   • BELIEF VEIL (60%, once) — the classic Grid Veil returns, upgraded:
-//     the puzzle grid is hidden AS BAYES BELIEVES IT — the veil is tinted
+//     glow - those are the free flips; wisps on the favoured side sting.
+//   • BELIEF VEIL (60%, once) - the classic Grid Veil returns, upgraded:
+//     the puzzle grid is hidden AS BAYES BELIEVES IT - the veil is tinted
 //     toward the favoured side, and a belief chip shows the current lean.
 //     The closer the meter sits to 50/50, the clearer the veil reads
-//     (a balanced belief sees clearly — the hidden lesson of the boss).
-//   • 🔮 THEOMERE'S GAMBIT (≤10%, one-shot finale) — Bayes bets everything
+//     (a balanced belief sees clearly - the hidden lesson of the boss).
+//   • 🔮 THEOMERE'S GAMBIT (≤10%, one-shot finale) - Bayes bets everything
 //     on one final hypothesis: the arena splits into a 3×3 of districts,
 //     each showing a truthful danger-probability chip. Stand on a chip to
-//     flip it to its complement (one flip per district — a gamble). Three
+//     flip it to its complement (one flip per district - a gamble). Three
 //     cast waves strike the true danger districts; survive all three and
-//     Bayes updates its prior to "the player wins" and CONCEDES — every
+//     Bayes updates its prior to "the player wins" and CONCEDES - every
 //     chip reveals, and the boss takes its own remaining HP as the price
 //     of a lost bet. Charge bar frozen (gate in _egTickPlayer via
 //     _egBayFinalActive).
@@ -58,7 +58,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_bayes — "The Grand Prior" (rework)
+    // boss_bayes - "The Grand Prior" (rework)
     // Phase 1 (100% → 60%): Posterior Bolts + Prior Bomb
     // Phase 2 ( 60% → 30%): immune window, Belief Veil activates, Evidence Wisps join
     // Phase 3 ( 30% →  0%): everything intensifies; at 10% the GAMBIT begins
@@ -128,7 +128,7 @@ function _egBayMeterHide() {
 }
 
 // Which side does the meter currently favour? (0 → coin flip, that IS the
-// 50/50 state — Bayes must still believe something.)
+// 50/50 state - Bayes must still believe something.)
 function _egBayFavouredSide() {
     if (_egBayLean < 0) return 'left';
     if (_egBayLean > 0) return 'right';
@@ -185,7 +185,7 @@ function _egMechBayBolts(monster, phase) {
     const run = _egNkNewRun(monster && monster.id, true);
     const favoured = _egBayFavouredSide();
     const punished = favoured === 'left' ? 'right' : 'left';
-    _egNkToast('eg_mech_bay_bolts', '🔮⚡ POSTERIOR BOLTS — Bayes strikes its ' + favoured.toUpperCase() + ' belief!', '#c4b5fd');
+    _egNkToast('eg_mech_bay_bolts', '🔮⚡ POSTERIOR BOLTS - Bayes strikes its ' + favoured.toUpperCase() + ' belief!', '#c4b5fd');
 
     // Evidence ring on the punished side (hold it = flip the meter your way).
     const ringX = _egBaySideX(punished) + (Math.random() * 120 - 60);
@@ -262,7 +262,7 @@ function _egMechBayBolts(monster, phase) {
 //------------------------------------------------------------------------
 // 🔮 wisps drift along wide readable loops. Touching one flips the meter
 // 15 points toward the wisp's own side of the screen: wisps on the
-// non-favoured side glow (free evidence — pull the next cast away from
+// non-favoured side glow (free evidence - pull the next cast away from
 // you); wisps on the favoured side sting on contact. Two spawn on the
 // non-favoured side, one on the favoured side.
 const EG_BAY_WISP_COUNT = 3;
@@ -274,7 +274,7 @@ function _egMechBayWisps(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
     const favoured = _egBayFavouredSide();
-    _egNkToast('eg_mech_bay_wisps', '🔮 EVIDENCE WISPS — touch the glowing side to flip the belief!', '#c4b5fd');
+    _egNkToast('eg_mech_bay_wisps', '🔮 EVIDENCE WISPS - touch the glowing side to flip the belief!', '#c4b5fd');
 
     const wisps = [];
     for (let i = 0; i < EG_BAY_WISP_COUNT; i++) {
@@ -308,7 +308,7 @@ function _egMechBayWisps(monster, phase) {
                 if (w.glow) {
                     // Free evidence: flip toward the wisp's side.
                     _egBayMeterShift(w.cx < W / 2 ? -EG_BAY_WISP_FLIP : EG_BAY_WISP_FLIP);
-                    _egNkToast('eg_mech_bay_evidence', '🔮 Evidence accepted — the belief shifts!', '#4ade80');
+                    _egNkToast('eg_mech_bay_evidence', '🔮 Evidence accepted - the belief shifts!', '#4ade80');
                 } else {
                     _egBayTouch(EG_BAY_WISP_DMG, level, 'Belief Wisp');
                 }
@@ -351,7 +351,7 @@ function _egActivateVeil() {
 
 // Removes the veil overlay element entirely (framework calls on any cleanup).
 // _egRemoveVeil is defined ONCE, in shared-boss-abilities.js (consolidated
-// 2026-09 from this file and boss-bloom.js — the copies used to shadow
+// 2026-09 from this file and boss-bloom.js - the copies used to shadow
 // each other via load order, and bloom's superset already won).
 
 
@@ -359,7 +359,7 @@ function _egActivateVeil() {
 //-------------------ACT II: BELIEF VEIL (60%, once)-----------------------
 //------------------------------------------------------------------------
 // The classic Grid Veil, upgraded: the puzzle grid is hidden AS BAYES
-// BELIEVES IT — the veil tints toward the favoured side and a belief chip
+// BELIEVES IT - the veil tints toward the favoured side and a belief chip
 // shows the lean. Near 50/50 the tint fades (clarity = balance).
 function _egMechBayVeil(monster, phase) {
     if (_egVeilActive) return;
@@ -392,7 +392,7 @@ function _egMechBayVeil(monster, phase) {
 //------------------------------------------------------------------------
 // Bayes bets everything: a 3×3 of districts, each with a truthful danger-
 // probability chip. Stand on a chip to flip it to its complement (once per
-// district — a gamble). Three cast waves strike the TRUE danger districts.
+// district - a gamble). Three cast waves strike the TRUE danger districts.
 // Survive all three → Bayes concedes: full-board reveal, and the boss pays
 // its own remaining HP for the lost bet. Charge bar frozen (gate in
 // _egTickPlayer via _egBayFinalActive).
@@ -479,11 +479,11 @@ function _egBayFinalStart(monster) {
     ov.className = 'eg-bay-cd';
     ov.innerHTML =
         '<div class="eg-bay-cd-label">🔮 THEOMERE\u2019S GAMBIT</div>' +
-        '<div class="eg-bay-cd-hint">Chips show TRUE danger — stand on one to gamble on its complement!</div>';
+        '<div class="eg-bay-cd-hint">Chips show TRUE danger - stand on one to gamble on its complement!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_bay_final_cd', '🔮💀 THEOMERE\u2019S GAMBIT — read the board, flip the odds!', '#c4b5fd');
+    _egNkToast('eg_mech_bay_final_cd', '🔮💀 THEOMERE\u2019S GAMBIT - read the board, flip the odds!', '#c4b5fd');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -524,7 +524,7 @@ function _egBayFinalStart(monster) {
             _egBayConcede(g, monster);
             return;
         }
-        _egNkToast('eg_mech_bay_wave', '🔮 Wave ' + g.wave + '/' + EG_BAY_WAVES + ' — the board shows the TRUE odds!', '#c4b5fd');
+        _egNkToast('eg_mech_bay_wave', '🔮 Wave ' + g.wave + '/' + EG_BAY_WAVES + ' - the board shows the TRUE odds!', '#c4b5fd');
 
         // Choose 3 strike districts; chips show TRUTHFUL probabilities
         // (strikes read hot, safes read cool) until the player flips them.
@@ -544,7 +544,7 @@ function _egBayFinalStart(monster) {
 
         _egBayAfter(g, EG_BAY_WAVE_GAP * _EG_BAY_DEBUG_MULT, () => {
             if (g.finished) return;
-            // STRIKE the true danger districts (a flipped chip never lies —
+            // STRIKE the true danger districts (a flipped chip never lies -
             // the district beneath it still burns).
             g.districts.forEach(d => {
                 if (d.strike) d.el.classList.add('eg-bay-district-strike');
@@ -583,8 +583,8 @@ function _egBayFinalStart(monster) {
                 d.shown = 100 - d.shown;
                 d.chipEl.textContent = d.shown + '%';
                 d.el.classList.add('eg-bay-district-flipped');
-                _egNkToast('eg_mech_bay_flip', '🔮 Chip flipped — you bet on the complement!', '#facc15');
-                break;  // one flip per moment — re-evaluate next frame
+                _egNkToast('eg_mech_bay_flip', '🔮 Chip flipped - you bet on the complement!', '#facc15');
+                break;  // one flip per moment - re-evaluate next frame
             }
         }
         return true;
@@ -593,11 +593,11 @@ function _egBayFinalStart(monster) {
     runWave();
 }
 
-// Concession: the lost bet — full reveal, release, and the boss pays its
+// Concession: the lost bet - full reveal, release, and the boss pays its
 // own remaining HP through the canonical damage path (a real kill).
 function _egBayConcede(g, monster) {
     if (g.finished) return;
-    _egNkToast('eg_mech_bay_concede', '🔮 THE PRIOR COLLAPSES — Bayes concedes the round!', '#4ade80');
+    _egNkToast('eg_mech_bay_concede', '🔮 THE PRIOR COLLAPSES - Bayes concedes the round!', '#4ade80');
     // Full-board reveal: every true probability laid bare.
     g.districts.forEach(d => {
         d.chipEl.textContent = d.strike ? '100%' : '0%';
@@ -644,7 +644,7 @@ function _egBayFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egBayTeardown() {
     if (_egBayFinal) { try { _egBayFinalEnd(_egBayFinal, null); } catch (e) {} _egBayFinal = null; }
@@ -668,9 +668,9 @@ function _egBayTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_BAY_DEBUG.fire('bolts'|'wisps'|'veil', phase) — runs one now
-//   _EG_BAY_DEBUG.lean(n)                             — set the meter by hand
-//   _EG_BAY_DEBUG.final()                             — THE GAMBIT now
+//   _EG_BAY_DEBUG.fire('bolts'|'wisps'|'veil', phase) - runs one now
+//   _EG_BAY_DEBUG.lean(n)                             - set the meter by hand
+//   _EG_BAY_DEBUG.final()                             - THE GAMBIT now
 if (typeof window !== 'undefined') {
     window._EG_BAY_DEBUG = {
         fire: (name, phase) => {

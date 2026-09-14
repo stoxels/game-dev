@@ -3740,7 +3740,7 @@ const W_ENDGAME = [
     },
 
 
-    {   // 10x10 — Endgame Sandbox Test Puzzle
+    {   // 10x10 - Endgame Sandbox Test Puzzle
         hint: "Endgame Test",
         hintDE: "Endgame Test",
         reveal: "",
@@ -3802,7 +3802,7 @@ const WORLDS = [
     { label: 'NEXUS WORLD', labelDE: 'NEXUS WORLD', data: W14 },
 
     /*
-    // TEMP TESTING — remove when done: makes the Nexus enterable
+    // TEMP TESTING - remove when done: makes the Nexus enterable
     { label: '⚔ ENDGAME SANDBOX', labelDE: '⚔ ENDGAME SANDBOX', data: W_ENDGAME },
 
     

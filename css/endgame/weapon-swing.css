@@ -1,26 +1,26 @@
 /* ============================================================================
    WEAPON SWING EFFECTS (endgame)
    ============================================================================
-   Pure-CSS weapon attack visuals — one shared overlay anchored to the
+   Pure-CSS weapon attack visuals - one shared overlay anchored to the
    player avatar, skinned per weapon family. This deliberately avoids
    per-character / per-class weapon sprite art: the effect is drawn from
    gradients + clip-path + box-shadow only, and rotates toward the
    direction the player is facing (eg-dir-up/down/left/right).
 
    Families (resolved in js/endgame/endgame-weapon-swing.js):
-     sword   — broad silver slash arc
-     dagger  — fast double thrust
-     axe     — heavy overhead chop
-     mace    — blunt slam + shockwave ring
-     wand    — arcane bolt flick
-     staff   — long spinning sweep
-     bow     — loosed arrow
-     unarmed — bare-handed jab puff (no weapon equipped)
+     sword   - broad silver slash arc
+     dagger  - fast double thrust
+     axe     - heavy overhead chop
+     mace    - blunt slam + shockwave ring
+     wand    - arcane bolt flick
+     staff   - long spinning sweep
+     bow     - loosed arrow
+     unarmed - bare-handed jab puff (no weapon equipped)
 
    DOM contract (built by _egShowWeaponSwing):
      .eg-weapon-swing.eg-swing-<family>.eg-dir-<dir>
        > .egw-rot              (direction rotator: right 0, down 90,
-                                left 180, up 270 — shape drawn aiming +x)
+                                left 180, up 270 - shape drawn aiming +x)
          > family-specific parts (.egw-arc, .egw-blade, ...)
    The JS removes the node after the family duration; every animation
    below is fire-once (forwards) so no cleanup state lingers.
@@ -113,7 +113,7 @@
 }
 
 /* ── DAGGER: fast double thrust ─────────────────────────────────────────
-   Short ice-blue needle jabbing twice — quick and stabby. */
+   Short ice-blue needle jabbing twice - quick and stabby. */
 .eg-swing-dagger .egw-blade {
     left: 70px;
     top: 70px;
@@ -311,7 +311,7 @@
 }
 
 /* ── BOW: loosed arrow ──────────────────────────────────────────────────
-   Slender shaft streaking far forward — the bow-bash at melee range. */
+   Slender shaft streaking far forward - the bow-bash at melee range. */
 .eg-swing-bow .egw-blade {
     left: 70px;
     top: 71px;

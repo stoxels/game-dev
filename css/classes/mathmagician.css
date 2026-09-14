@@ -1,6 +1,6 @@
 ﻿/*
     ------------------------------------------------------------------------
-    -------------------ARCANE REVEAL: STAGE 1 — INVOCATION------------------
+    -------------------ARCANE REVEAL: STAGE 1 - INVOCATION------------------
     ------------------------------------------------------------------------
 */
 
@@ -147,7 +147,7 @@
 
 /*
     ------------------------------------------------------------------------
-    -------------------ARCANE REVEAL: STAGE 2 — FIELD FORMATION-------------
+    -------------------ARCANE REVEAL: STAGE 2 - FIELD FORMATION-------------
     ------------------------------------------------------------------------
 */
 
@@ -264,7 +264,7 @@
 
 /*
     ------------------------------------------------------------------------
-    -------------------ARCANE REVEAL: STAGE 3 — REVELATION------------------
+    -------------------ARCANE REVEAL: STAGE 3 - REVELATION------------------
     ------------------------------------------------------------------------
 */
 
@@ -544,7 +544,7 @@
     ------------------------------------------------------------------------
     -------------------ABSOLUTE ZERO: BLIZZARD OVERLAY----------------------
     ------------------------------------------------------------------------
-    Moved here from class.css — this effect is exclusive to the Mathmagician.
+    Moved here from class.css - this effect is exclusive to the Mathmagician.
     ------------------------------------------------------------------------
 */
 
@@ -625,7 +625,7 @@
     ------------------------------------------------------------------------
     -------------------ARCANE REVEAL: SPARKLE BURST-------------------------
     ------------------------------------------------------------------------
-    Moved here from class.css — this effect is exclusive to the Mathmagician.
+    Moved here from class.css - this effect is exclusive to the Mathmagician.
     ------------------------------------------------------------------------
 */
 
@@ -670,10 +670,10 @@
     ------------------------------------------------------------------------
     -------------------ARCANE REVEAL: LIVE AREA PREVIEW---------------------
     ------------------------------------------------------------------------
-    Shown while Arcane Reveal is armed, tracking the mouse — mirrors
+    Shown while Arcane Reveal is armed, tracking the mouse - mirrors
     .fs-scan-preview-outline in probabilist.css, reskinned purple to match
     the rest of the Arcane Reveal VFX (balloons, shockwave ring, sparkles).
-    Positioned/sized inline by JS — see _arcaneReveal_updatePreview in
+    Positioned/sized inline by JS - see _arcaneReveal_updatePreview in
     class-mathmagician.js.
     ------------------------------------------------------------------------
 */

@@ -1,9 +1,9 @@
 ﻿// =============================================================================
-// storyline-intro-trix.js — The Cartographers of Chance
+// storyline-intro-trix.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // Character intro data for Trix ("The Trickster").
 // Depends on: storyline-engine.js (_wordsFromLine, MAX_SONG_SECTION_LINES,
-// DEFAULT_SLIDE_DURATION_MS etc.) — must load AFTER that file.
+// DEFAULT_SLIDE_DURATION_MS etc.) - must load AFTER that file.
 //
 // =============================================================================
 
@@ -14,10 +14,10 @@ const TRIX_INTRO_IMAGE_PATH = "images/Intro/Trix_Intro/";
 
 
 // ---------------------------------------------------------------------------
-// SONG BEAT — karaoke-style Trix intro
+// SONG BEAT - karaoke-style Trix intro
 // ---------------------------------------------------------------------------
 //
-// TRIX_INTRO_SONG — timed from Trix_Intro_Song.srt. Each line's start AND
+// TRIX_INTRO_SONG - timed from Trix_Intro_Song.srt. Each line's start AND
 // end time is rounded DOWN to the nearest 0.5s (e.g. 12223ms -> 12000ms)
 // so line-changes land on clean half-second beats. Word-level reveal within
 // each line is interpolated evenly across that line's window via
@@ -29,13 +29,13 @@ const TRIX_INTRO_IMAGE_PATH = "images/Intro/Trix_Intro/";
 //
 // The `images` timeline below uses placeholder filenames (1.jpeg ... 30.jpeg)
 // spaced roughly every 10 seconds across the song's ~300s runtime. Replace
-// filenames and adjust times once the actual image set exists — the array
+// filenames and adjust times once the actual image set exists - the array
 // just needs to stay sorted by ascending `time`.
 const TRIX_INTRO_SONG = {
-    audio: "audio/Intro/Trix_Intro_Song.mp3",
+    audio: "audio/Intro/Trix_Intro_Song.ogg",
     imagePath: TRIX_INTRO_IMAGE_PATH,
 
-    // Image timeline — placeholders, adjust filenames and times once images exist.
+    // Image timeline - placeholders, adjust filenames and times once images exist.
     // Each entry fires when playback crosses its `time` (ms from song start).
     images: [
         { image: "1.webp", time: 0 },          // establishing shot before vocals
@@ -48,12 +48,12 @@ const TRIX_INTRO_SONG = {
         { image: "8.webp", time: 90500 },      // "Trix was born in the one room still burning light"
         { image: "9.webp", time: 101000 },     // "Raised on ruins, raised on questions"
         { image: "10.webp", time: 111500 },     // "Then the readings started sliding"
-        { image: "11.webp", time: 122000 },     // "Zero isn't quiet — zero's a verdict"
+        { image: "11.webp", time: 122000 },     // "Zero isn't quiet - zero's a verdict"
         { image: "12.webp", time: 135500 },     // "She knew her family wasn't wrong"
         { image: "13.webp", time: 146500 },     // "So she packed a lantern"
         { image: "14.webp", time: 158000 },     // "The guards brought her in to a man called the Warden"
         { image: "15.webp", time: 163000 },     // "Are you here to join us?"
-        { image: "16.webp", time: 174000 },     // "Of course — easier than fighting"
+        { image: "16.webp", time: 174000 },     // "Of course - easier than fighting"
         { image: "17.webp", time: 184500 },     // "A key around his neck, gone before he closed the door"
         { image: "18.webp", time: 194500 },     // "Already counting down the days"
         { image: "19.webp", time: 202000 },     // "She hid the key beneath her pillow"
@@ -70,7 +70,7 @@ const TRIX_INTRO_SONG = {
         { image: "30.webp", time: 298000 },     // TRIX nameplate
     ],
 
-    // Lyric timeline — all 46 lines from the SRT, in order, as bilingual
+    // Lyric timeline - all 46 lines from the SRT, in order, as bilingual
     // entries { section, en, de, s, e }: both start and end times rounded down
     // to the nearest 0.5s from the real SRT values. The engine resolves the
     // active language's text into timed words via _wordsFromLine() at

@@ -1,37 +1,37 @@
 //  endgame-mod-tables-ring.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------RING MODIFIER TABLE----------------------------------
 //------------------------------------------------------------------------
 // Shared between ring1 and ring2
 
-// Rings are magical conduits in permanent skin contact — always active,
+// Rings are magical conduits in permanent skin contact - always active,
 // always channelling. They are pure stat jewelry with no local defences
 // (no armour/evasion/absorption). Values sit between earring and amulet
-// scale — rings are significant but the amulet remains the prestige slot.
+// scale - rings are significant but the amulet remains the prestige slot.
 // Both ring slots (ring1, ring2) share this table, making it possible
 // to double up on any mod at the cost of two ring slots.
 //
 // Ring-exclusive mods:
-//   mana_on_mistake — the ring pulses with energy when you err,
+//   mana_on_mistake - the ring pulses with energy when you err,
 //                     converting the mistake into a mana surge. A
 //                     risk/reward mod that softens mistake punishment
 //                     and rewards builds that can afford to make them.
 //                     Pairs naturally with mistake_count and focus.
-//   echo — a % chance that damage dealt resonates through the ring,
+//   echo - a % chance that damage dealt resonates through the ring,
 //          firing a delayed second hit for a fraction of the original
 //          damage. Stacking two rings with echo lets both proc
-//          independently — a genuine build-enabling double-ring path.
+//          independently - a genuine build-enabling double-ring path.
 //
 // No local defences, no block/dodge, no spell damage multiplier,
 // no precision, no quiz exclusives, no heart_heal multiplier,
 // no pushback/overkill/stagger/grounded/first_step, no chain/splash,
 // no multishot. Elemental damage, crit, and status effects are absent
-// here — those are amulet and bracer/weapon territory. Rings focus on
+// here - those are amulet and bracer/weapon territory. Rings focus on
 // resource sustain, attributes, resistances, and their two unique
 // passive-trigger exclusives.
 
@@ -94,7 +94,7 @@ const EG_MOD_TABLE_RING = {
         },
 
         // --- FLAT ELEMENTAL DAMAGE ---
-        // Rings as elemental foci — smaller values than amulet since
+        // Rings as elemental foci - smaller values than amulet since
         // they're a secondary jewelry slot, but two rings can stack.
         fire_damage: {
             id: 'fire_damage',
@@ -149,7 +149,7 @@ const EG_MOD_TABLE_RING = {
         },
 
         // --- RING-EXCLUSIVE: MANA ON MISTAKE ---
-        // The ring pulses with captured energy when you err — converting
+        // The ring pulses with captured energy when you err - converting
         // the penalty of a mistake into a mana surge. A risk/reward mod
         // that rewards builds built around absorbing mistakes rather than
         // avoiding them. Pairs naturally with mistake_count (more chances
@@ -346,7 +346,7 @@ const EG_MOD_TABLE_RING = {
         },
 
         // --- RING-EXCLUSIVE: ECHO ---
-        // The ring resonates with each blow — a % chance that damage
+        // The ring resonates with each blow - a % chance that damage
         // dealt fires a delayed second instance for a fraction of the
         // original hit. The echo hits independently and can trigger its
         // own on-hit effects (leech, status chances from bracers, etc).

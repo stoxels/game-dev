@@ -6,7 +6,7 @@
 // Maps a saved playerCharacter id to its portrait image, mirroring whatever
 // mapping is used to populate #setup-char-portrait on the Game Setup screen.
 // NOTE: adjust these paths/ids if your character-select code uses different
-// keys or a different image folder — this is a best-effort match based on
+// keys or a different image folder - this is a best-effort match based on
 // the naming convention seen elsewhere (images/Game_Setup/...).
 const CHAR_PORTRAIT_SRC = {
     stox: 'images/sprites/Stox_noclass.webp',
@@ -14,11 +14,11 @@ const CHAR_PORTRAIT_SRC = {
     syla: 'images/sprites/Syla_noclass.webp',
 };
 
-// window._pendingSaveSlotCallback — callback to resume the normal
+// window._pendingSaveSlotCallback - callback to resume the normal
 // intro/tutorial/character-select flow once a slot is chosen. Set in
 // showSaveSlotSelect(), consumed and cleared in onSaveSlotChosen().
 //
-// window._pendingResetSlot — slot number awaiting delete confirmation. Set
+// window._pendingResetSlot - slot number awaiting delete confirmation. Set
 // in showDeleteSlotConfirm(), read by confirmReset() in ui-reset.js to
 // decide whether to wipe just this slot or perform a full reset.
 
@@ -46,19 +46,19 @@ function getCharPortraitSrc(summary) {
 
 // Builds the inner markup for a save-slot card, empty or filled.
 function _buildSlotCardHtml(slotNum, summary) {
-    // Custom slot name — shown instead of the default "SLOT {n}" heading
+    // Custom slot name - shown instead of the default "SLOT {n}" heading
     // whenever the player has named this slot (works for empty slots too,
     // e.g. "Hardcore Run" prepared before the first save).
     const customName = summary.name || '';
     const headingHtml = customName
         ? `<div class="ssc-num ssc-num-named">${t('scr_slot_label').replace('{n}', slotNum)}</div>
-           <div class="ssc-name" title="${customName.replace(/"/g, '&quot;')}">${customName.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`
+           <div class="ssc-name" data-tip="${_tipAttr(customName)}">${customName.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`
         : `<div class="ssc-num">${t('scr_slot_label').replace('{n}', slotNum)}</div>`;
 
     if (summary.empty) {
         return `${headingHtml}
                 <div class="ssc-empty">${t('scr_new_game')}</div>
-                <button class="ssc-name-btn" data-slot="${slotNum}" title="${t('scr_slot_name_edit')}">✏️</button>`;
+                <button class="ssc-name-btn" data-slot="${slotNum}" data-tip-t="scr_slot_name_edit" aria-label="${t('scr_slot_name_edit')}">✏️</button>`;
     }
 
     // UPDATE HERE: Pass the full summary object instead of just the character ID
@@ -77,8 +77,8 @@ function _buildSlotCardHtml(slotNum, summary) {
               <div class="ssc-score">${t('score_lbl')}: ${summary.totalScore}</div>
               <div class="ssc-levels">${t('scr_stoxels_done').replace('{n}', summary.levelsDone)}</div>
               ${levelHtml}
-              <button class="ssc-name-btn" data-slot="${slotNum}" title="${t('scr_slot_name_edit')}">✏️</button>
-              <button class="ssc-delete-btn" data-slot="${slotNum}" title="${t('scr_delete_save')}">❌</button>`;
+              <button class="ssc-name-btn" data-slot="${slotNum}" data-tip-t="scr_slot_name_edit" aria-label="${t('scr_slot_name_edit')}">✏️</button>
+              <button class="ssc-delete-btn" data-slot="${slotNum}" data-tip-t="scr_delete_save" aria-label="${t('scr_delete_save')}">❌</button>`;
 }
 
 
@@ -155,7 +155,7 @@ function renderSaveSlotScreen() {
 }
 
 // Shows the save-slot select screen. `onSlotChosen` runs once the player
-// picks (or creates) a slot — this is where you resume the normal
+// picks (or creates) a slot - this is where you resume the normal
 // intro/tutorial/character-select flow.
 function showSaveSlotSelect(onSlotChosen) {
     window._pendingSaveSlotCallback = onSlotChosen;
@@ -223,7 +223,7 @@ function _setResetModalTextForSlot(slotNum) {
     if (!modal) return;
 
     const title = modal.querySelector('.reset-title');
-    if (title) { title.removeAttribute('data-t'); title.textContent = `DELETE SAVE — SLOT ${slotNum}`; }
+    if (title) { title.removeAttribute('data-t'); title.textContent = `DELETE SAVE - SLOT ${slotNum}`; }
 
     const note1 = modal.querySelector('[data-t="reset_note_1"]');
     if (note1) { note1.removeAttribute('data-t'); note1.textContent = `This will permanently erase Slot ${slotNum} only.`; }

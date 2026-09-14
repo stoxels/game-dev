@@ -13,7 +13,7 @@
 //   shadowburn  (shadow)    – legacy damage-over-time status for compatibility.
 //
 // Puzzle side (applied when a monster shoots the grid centre instead of the
-// player — see EG_PUZZLE_ATTACK_CHANCE_PCT):
+// player - see EG_PUZZLE_ATTACK_CHANCE_PCT):
 //   fire      → lava cells: wrong clicks count as 2 mistakes / double penalty
 //   cold      → ice cells:  clicks may slip onto a random adjacent cell
 //   lightning → shocked cursor: revealing cells may strip ✕ marks nearby
@@ -69,6 +69,13 @@ const EG_AILMENT_ICONS = {
     polymorph: '🌀',
     confused: '❓',
 };
+
+// The display name of an ailment. Only shadowburn needs the mapping (it is
+// one word in the data and two on screen); everything else title-cases.
+function _egAilmentLabel(key) {
+    if (key === 'shadowburn') return 'Shadow Burn';
+    return String(key || '').charAt(0).toUpperCase() + String(key || '').slice(1);
+}
 
 //------------------------------------------------------------------------
 //-------------------RUNTIME STATE---------------------------------------
@@ -169,7 +176,7 @@ function _egApplyPlayerAilment(key, dps) {
     _egShowPlayerAilmentOverlay(key);
     if (key === 'ignite') _egStartPlayerFireDrops();
     if (key === 'shadow') _egStartPlayerShadowClouds();
-    showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph — the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
+    showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph - the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
 }
 
 
@@ -229,8 +236,7 @@ function _egRenderPlayerAilmentChips() {
             chip = document.createElement('div');
             chip.id = `eg-status-ail-${key}`;
             chip.className = `eg-status-chip eg-status-chip-${key}`;
-            chip.title = key === 'shadowburn' ? 'Shadow Burn'
-                : key.charAt(0).toUpperCase() + key.slice(1);
+            chip.setAttribute('data-tip', _tipAttr(_egAilmentLabel(key)));
             chip.innerHTML = `
                 <div class="eg-lockout-icon">${EG_AILMENT_ICONS[key] || ''}</div>
                 <div class="eg-lockout-countdown"></div>`;
@@ -291,7 +297,7 @@ function _egGetPlayerChargeMultiplier() {
 function _egGetMonsterChargeMultiplier(m) {
     let mult = 1;
     if (!m || !m.statuses) {
-        // no statuses — fall through so the feed haste below still applies
+        // no statuses - fall through so the feed haste below still applies
     } else if (_egHasStatus(m.statuses, 'frozen')) {
         mult = 0;
     } else if (_egHasStatus(m.statuses, 'chill')) {
@@ -353,7 +359,7 @@ function _egRollPlayerHitAilments(target, amount, elements) {
     if (lightningShare > 0 && stats.shockPct > 0 && Math.random() * 100 < stats.shockPct) {
         _egApplyMonsterAilment(target, 'shocked');
     }
-    // Endgame achievement — count newly inflicted ailments on this hit
+    // Endgame achievement - count newly inflicted ailments on this hit
     if (typeof trackAchStat === 'function') try {
         let _newAil = 0;
         if (target.statuses) for (const k in target.statuses) if (target.statuses[k] && target.statuses[k].until > Date.now() && !_achPreHas[k]) _newAil++;
@@ -548,11 +554,11 @@ function _egBuildStatusIconsHTML(statusMap) {
     const now = Date.now();
     return Object.keys(statusMap)
         .filter(key => statusMap[key].until > now)
-        .map(key => `<span class="eg-status-icon st-${key}" title="${key}">${EG_AILMENT_ICONS[key] || '?'}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`)
+        .map(key => `<span class="eg-status-icon st-${key}" data-tip="${_tipAttr(_egAilmentLabel(key))}">${EG_AILMENT_ICONS[key] || '?'}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`)
         .join('');
 }
 
-// Per-monster icon strip — cheap DOM update driven by _egUpdateMonsterBars.
+// Per-monster icon strip - cheap DOM update driven by _egUpdateMonsterBars.
 function _egRenderMonsterStatusStrip(m) {
     if (!m || !m.statuses) return;
     const strip = document.getElementById(`eg-status-${m.id}`);
@@ -563,7 +569,7 @@ function _egRenderMonsterStatusStrip(m) {
     strip.innerHTML = _egBuildStatusIconsHTML(m.statuses);
 }
 
-// Player icon strip above the avatar — created lazily, refreshed per tick.
+// Player icon strip above the avatar - created lazily, refreshed per tick.
 function _egRefreshPlayerStatusIcons() {
     if (!_egIsActive()) return;
     let strip = document.getElementById('eg-player-status-strip');
@@ -575,10 +581,15 @@ function _egRefreshPlayerStatusIcons() {
         strip.className = 'eg-status-strip eg-player-status-strip';
         hud.appendChild(strip);
     }
-    const sig = _egStatusSignature(_egPlayerStatuses);
+    // Support-spell buffs (js/skills/universal-spells.js) share this strip:
+    // they are player statuses too, and reusing it keeps them inside the
+    // existing per-tick DOM patch instead of adding a second ticker.
+    const supportSig = (typeof _uspSupportStatusSignature === 'function') ? _uspSupportStatusSignature() : '';
+    const supportHtml = (typeof _uspBuildSupportStatusIconsHTML === 'function') ? _uspBuildSupportStatusIconsHTML() : '';
+    const sig = `${_egStatusSignature(_egPlayerStatuses)}|${supportSig}`;
     if (strip.dataset.sig === sig) return;
     strip.dataset.sig = sig;
-    strip.innerHTML = _egBuildStatusIconsHTML(_egPlayerStatuses);
+    strip.innerHTML = supportHtml + _egBuildStatusIconsHTML(_egPlayerStatuses);
 }
 
 
@@ -587,7 +598,7 @@ function _egRefreshPlayerStatusIcons() {
 //------------------------------------------------------------------------
 // 5% of monster attacks fly to the CENTRE OF THE GRID instead of the player
 // and inflict a puzzle ailment based on the monster's element. Reads as the
-// monster corrupting the puzzle itself — visible, dodgeable-in-spirit, and
+// monster corrupting the puzzle itself - visible, dodgeable-in-spirit, and
 // never a sudden unfair hit.
 //------------------------------------------------------------------------
 
@@ -623,7 +634,7 @@ function _egApplyPuzzleAilment(element) {
         case 'cold': _egPuzzleIce(); break;
         case 'lightning': _egPuzzleShockedCursor(); break;
         case 'shadow': _egPuzzleShadowBlackout(); break;
-        // Arcane has no grid hazard — the chaos curse IS the effect
+        // Arcane has no grid hazard - the chaos curse IS the effect
         case 'arcane': _egApplyPuzzleArcaneBomb(); break;
     }
 }
@@ -711,7 +722,7 @@ function _egPuzzleLava() {
 
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'lava', cells });
-    showToast('🌋 The monster scorched the grid — lava cells punish wrong clicks doubly!');
+    showToast('🌋 The monster scorched the grid - lava cells punish wrong clicks doubly!');
 }
 
 function _egIsLavaCell(row, col) {
@@ -747,7 +758,7 @@ function _egPuzzleIce() {
 
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'ice', cells });
-    showToast('🧊 Ice spreads across the grid — clicks may slip!');
+    showToast('🧊 Ice spreads across the grid - clicks may slip!');
 }
 
 function _egIsIceCell(row, col) {
@@ -793,7 +804,7 @@ function _egPuzzleShockedCursor() {
     if (_egPuzzleEffects.some(e => e.type === 'shockcursor')) return;
     _egStartShockedCursor();
     _egRegisterPuzzleEffect({ type: 'shockcursor' });
-    showToast('⚡ Your cursor is shocked — reveals may scatter your ✕ marks!');
+    showToast('⚡ Your cursor is shocked - reveals may scatter your ✕ marks!');
 }
 
 function _egStartShockedCursor() {
@@ -867,7 +878,7 @@ function _egStopShockedCursor() {
     if (_egSparkMoveHandler) { document.removeEventListener('mousemove', _egSparkMoveHandler); _egSparkMoveHandler = null; }
 }
 
-// Called from handleCorrectFill — while the cursor is shocked, each reveal has
+// Called from handleCorrectFill - while the cursor is shocked, each reveal has
 // a chance to strip a random ✕ mark anywhere on the grid (distance irrelevant).
 function _egOnCorrectCellPuzzleFX(row, col) {
     if (!_egIsActive()) return;
@@ -978,7 +989,7 @@ function _egApplyPuzzleArcaneBomb() {
         _egRemovePuzzleEffect(bomb);
     }, EG_PUZZLE_EFFECT_DURATION_MS);
     _egPuzzleEffects.push(bomb);
-    showToast('🔮 An arcane bomb appeared — remove adjacent ✕ marks before it detonates!');
+    showToast('🔮 An arcane bomb appeared - remove adjacent ✕ marks before it detonates!');
 }
 
 function _egPuzzleShadowBlackout() {
@@ -1019,7 +1030,7 @@ function _egRestoreLineClues(line) {
 //-------------------LIFECYCLE-------------------------------------------
 //------------------------------------------------------------------------
 
-// Full reset — called when a fresh encounter starts.
+// Full reset - called when a fresh encounter starts.
 function _egAilmentsReset() {
     _egPlayerStatuses = {};
     _egClearAllPuzzleEffects();
@@ -1032,7 +1043,7 @@ function _egAilmentsReset() {
     if (strip) strip.remove();
 }
 
-// Cleanup — called when the encounter stops (also covers game over).
+// Cleanup - called when the encounter stops (also covers game over).
 function _egAilmentsCleanup() {
     _egPlayerStatuses = {};
     _egClearAllPuzzleEffects();

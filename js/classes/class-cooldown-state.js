@@ -17,6 +17,8 @@ let cooldownState = {
     active3: { remaining: 0, interval: null },
     active4: { remaining: 0, interval: null },
     active5: { remaining: 0, interval: null },
+    // active6 = Fireball (universal spell granted by the interactive tutorial)
+    active6: { remaining: 0, interval: null },
 };
 
 // Lookup: slot key → display number shown in UI and toasts
@@ -26,10 +28,11 @@ const SLOT_DISPLAY_INDEX = {
     active3: '3',
     active4: '4',
     active5: '5',
+    active6: '6',
 };
 
 // All slot keys in one place so loops don't need to repeat the list
-const ALL_SLOTS = ['active1', 'active2', 'active3', 'active4', 'active5'];
+const ALL_SLOTS = ['active1', 'active2', 'active3', 'active4', 'active5', 'active6'];
 
 
 // Maps each base class to its two ascendency options (IDs)
@@ -204,7 +207,7 @@ function _getClassCooldownReduction(slot) {
 }
 
 // Maps every class/ascendency active slot to its arcane cooldown family.
-// One family per skill — mods roll on the arcane slot (EG_MOD_TABLE_ARCANE).
+// One family per skill - mods roll on the arcane slot (EG_MOD_TABLE_ARCANE).
 const BASE_SKILL_COOLDOWN_FAMILY = {
     mathmagician: { active1: 'cooldown_arcane_reveal', active2: 'cooldown_absolute_zero' },
     statistician: { active1: 'cooldown_data_strike', active2: 'cooldown_diagonal_strike' },
@@ -223,7 +226,7 @@ const ASCENDENCY_SKILL_COOLDOWN_FAMILY = {
 // Returns total flat cooldown reduction (seconds) from equipped arcane items
 // for the given ability slot. Sums all mods whose familyId matches the
 // slot's skill. Handles both the arcane slot and any other slot that might
-// carry the mod (future-proof — loop all equipped items).
+// carry the mod (future-proof - loop all equipped items).
 function _getEquipmentCooldownReduction(slot) {
     if (slot === 'active5') return 0;
     if (typeof _egEquipped === 'undefined' || !_egEquipped) return 0;
@@ -264,7 +267,7 @@ function _getEquipmentCooldownReduction(slot) {
 // Returns the final cooldown duration (in seconds) for a given slot after
 // applying all global, class-specific and equipment reductions.
 // Equipment mods roll on the arcane slot (one family per skill, up to 90s on T1).
-// The result is clamped to a minimum of 0 — cooldowns can't go negative.
+// The result is clamped to a minimum of 0 - cooldowns can't go negative.
 function getEffectiveCooldown(slot, baseSeconds) {
     const globalReduction = _getGlobalCooldownReduction();
     const classReduction = _getClassCooldownReduction(slot);
@@ -281,7 +284,7 @@ function getEffectiveCooldown(slot, baseSeconds) {
 //------------------------------------------------------------------------
 
 // Updates only the cooldown text element inside a single skill button.
-// This avoids rebuilding the entire HUD on every tick — we just swap the text.
+// This avoids rebuilding the entire HUD on every tick - we just swap the text.
 // Falls back silently if the button can't be found (e.g. panel was re-rendered).
 function _patchCooldownButton(slot) {
     // Hotbar slots show the same countdown (skills are cast from the bar now).
@@ -343,7 +346,7 @@ function _showCooldownReadyToast(slot) {
     const slotIndex = SLOT_DISPLAY_INDEX[slot] ?? slot;
     const readyLabel = t('cls_ready_excl');
 
-    showToast(`✅ [${slotIndex}] ${name} — ${readyLabel}`);
+    showToast(`✅ [${slotIndex}] ${name} - ${readyLabel}`);
     Audio_Manager.playSFX('abilityReady');
 }
 
@@ -449,7 +452,10 @@ function _abilityHotkeysBlocked() {
     const tag = document.activeElement?.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA') return true;
     if (_isModalOpen()) return true;
-    if (!STATE.playerClass || isClassless() || dead) return true;
+    // Tutorial exception: puzzle 3 casts Fireball via hotbar keys before any
+    // class is chosen (mirrors the hotbar gate in skill-hotbar.js).
+    const tqActive = (typeof _tqIsTutorialActive === 'function') && _tqIsTutorialActive();
+    if ((!STATE.playerClass && !tqActive) || isClassless() || dead) return true;
     return false;
 }
 

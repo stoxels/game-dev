@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------
 // Dev-time only. Inert for normal players.
 //
-// 1) INSTANT BOOT — every boot screen (save slots, intro cinematic,
+// 1) INSTANT BOOT - every boot screen (save slots, intro cinematic,
 //    character select, tutorial, setup, mode select, maps) can be skipped
 //    by loading a dev URL:
 //
@@ -19,10 +19,10 @@
 //
 //    It calls the same flow functions the buttons call (showSaveSlotSelect,
 //    onSaveSlotChosen, showSetup, launchExistingGame, showWorldDetail,
-//    startLevel) — so the state machine is traversed properly, not
+//    startLevel) - so the state machine is traversed properly, not
 //    simulated. Runs on window 'load', when every game global exists.
 //
-// 2) RUNTIME API — in the console (preview tool / devtools):
+// 2) RUNTIME API - in the console (preview tool / devtools):
 //
 //       DevTest.goto({ screen:'game', world:0, level:2, character:'trix' })
 //       DevTest.map() / DevTest.world(1) / DevTest.game(0, 0)
@@ -31,7 +31,7 @@
 //       DevTest.timeScale(10)                 → 10× all scalable durations
 //       DevTest.wipeSlots([1,2,3])            → wipe dev test slots
 //
-// 3) EFFECT TIME SCALE — short effects (ailments, cooldowns, buffs) are
+// 3) EFFECT TIME SCALE - short effects (ailments, cooldowns, buffs) are
 //    impossible to observe at real speed in a test. Every central duration
 //    site multiplies by window.STOX_EFFECT_TIME_SCALE (default 1 = exact
 //    game behaviour):
@@ -81,14 +81,14 @@ const DevTest = {
 
         const log = (msg) => console.info('%c[devtest] ' + msg, 'color:#7fd4ff');
 
-        // Pick a slot. Default = 20 (the dedicated dev slot — least likely
+        // Pick a slot. Default = 20 (the dedicated dev slot - least likely
         // to collide with a real player save, which the preview browser
         // profile SHARES). Explicit &slot=N is honoured, but a slot that
         // already holds real progress triggers a loud console warning.
         let slotNum = s.slot || 20;
         if (typeof getSlotSummary === 'function') {
             if (getSlotSummary(slotNum).empty) {
-                // requested/dev slot is free — use it
+                // requested/dev slot is free - use it
             } else if (!s.slot) {
                 for (let i = 20; i >= 1; i--) {
                     if (getSlotSummary(i).empty) { slotNum = i; break; }
@@ -105,7 +105,7 @@ const DevTest = {
         // 1. Save slot: load the slot through the real flow so the pending
         //    callback machinery and hub latches behave exactly like a click.
         if (typeof showSaveSlotSelect !== 'function' || typeof onSaveSlotChosen !== 'function') {
-            console.warn('[devtest] save-slot flow unavailable — aborting boot');
+            console.warn('[devtest] save-slot flow unavailable - aborting boot');
             return;
         }
         // Intro cinematic bypass: the title flow shows it only when the
@@ -117,7 +117,7 @@ const DevTest = {
         showSaveSlotSelect(() => {
             // 2. Character + tutorial flags, then straight to setup.
             //    (Bypasses character-select UI and tutorial screens via the
-            //    same STATE fields those screens write — no state is skipped.)
+            //    same STATE fields those screens write - no state is skipped.)
             if (typeof STATE === 'undefined' || !STATE) return;
             STATE.playerCharacter = s.character;
             if (s.skipTutorial) STATE.tutorialDone = true;
@@ -203,7 +203,7 @@ const DevTest = {
 
     // Dispatch a real WASD key event (keyboard-event-equivalent) against the
     // avatar handlers: press('d', 500) holds 'd' for 500 ms and reports the
-    // sampled position before/after — the scripted equivalent of the manual
+    // sampled position before/after - the scripted equivalent of the manual
     // movement checks used during the sprite debugging session.
     press(key, holdMs = 400) {
         return new Promise(resolve => {
@@ -238,7 +238,7 @@ const DevTest = {
         });
         if (typeof renderSaveSlotScreen === 'function') renderSaveSlotScreen();
         let out = 'wiped slots: ' + (wiped.join(', ') || 'none');
-        if (refused.length) out += ' — REFUSED (real progress, pass {force:true} to override): ' + refused.join(', ');
+        if (refused.length) out += ' - REFUSED (real progress, pass {force:true} to override): ' + refused.join(', ');
         return out;
     },
 };
@@ -250,7 +250,7 @@ window.DevTest = DevTest;
 
 (function _devTestAutoBoot() {
     const mode = _devTestParam('devtest', null);
-    if (!mode) return; // normal player boot — harness stays inert
+    if (!mode) return; // normal player boot - harness stays inert
     // Register the session in the game's owned flag namespace (see state.js).
     // _resetStoxFlags() deliberately preserves this entry across levels.
     window.STOX_FLAGS = window.STOX_FLAGS || {};

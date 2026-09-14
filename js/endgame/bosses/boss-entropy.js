@@ -1,35 +1,35 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: ENTROPY (boss_entropy)--------------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK — "The Second Law". Everything winds down; ORDER is a
+// TIER 7 REWORK - "The Second Law". Everything winds down; ORDER is a
 // resource you spend. Entropy attacks the arena itself: cold pools spread
 // and merge (real entropy, not just more circles) while the lit ORDERED
-// ZONES — the only places that keep you crisp — keep shrinking. Element:
+// ZONES - the only places that keep you crisp - keep shrinking. Element:
 // cold (unchanged).
-//   • HEAT DEATH DRIFT (signature, all fight) — cold pools bloom outward
+//   • HEAT DEATH DRIFT (signature, all fight) - cold pools bloom outward
 //     and MERGE into bigger ones when they touch; each cast also plants a
 //     lit ordered zone that shrinks as the pools grow. Pools drain %HP/s;
-//     standing in an ordered zone protects you and refills your ORDER —
+//     standing in an ordered zone protects you and refills your ORDER -
 //     outside the zones your movement turns progressively sluggish (never
 //     fully locked; floors at 55%). Order is the resource: zone time in,
 //     crisp movement out.
-//   • RECURSIVE DECAY (60%) — cursed cells now AGE: every 4s a corrupted
+//   • RECURSIVE DECAY (60%) - cursed cells now AGE: every 4s a corrupted
 //     cell spreads decay to an orthogonal neighbour (cap 9 cells). Stand
-//     ON a cell to burn it out — but burning costs a cold DoT while you
+//     ON a cell to burn it out - but burning costs a cold DoT while you
 //     stand there. Triage: burn the pack before it spreads across the map.
-//   • MAXWELL'S DOOR (60%) — a 🔥 hot door and a ❄ cold door spawn at
+//   • MAXWELL'S DOOR (60%) - a 🔥 hot door and a ❄ cold door spawn at
 //     opposite edges; entering one applies that element to you for 8s
 //     (one use each). HOT: cold pools HEAL you instead of harming (but
-//     heat scatters order — zones stop refilling). COLD: pool-proof (but
-//     cold stiffens — order drains twice as fast). Voluntary swap, real
-//     trade — entropy as choice, not sentence.
-//   • ♾️ THE LAST DEGREE (≤10%, one-shot finale) — absolute zero approaches:
+//     heat scatters order - zones stop refilling). COLD: pool-proof (but
+//     cold stiffens - order drains twice as fast). Voluntary swap, real
+//     trade - entropy as choice, not sentence.
+//   • ♾️ THE LAST DEGREE (≤10%, one-shot finale) - absolute zero approaches:
 //     all decay pauses, the arena becomes one frozen lattice (perfect
-//     order — full movement speed) with only the central SINGULARITY lit.
-//     Shattered ORDER SHARDS rain in telegraphed volleys — touch a shard
+//     order - full movement speed) with only the central SINGULARITY lit.
+//     Shattered ORDER SHARDS rain in telegraphed volleys - touch a shard
 //     and its spark flies to the singularity: each delivered shard is a
 //     staggered 20% damage pop on the boss THROUGH the canonical damage
-//     path. Collect 5 before the timer dies and the universe restarts —
+//     path. Collect 5 before the timer dies and the universe restarts -
 //     the finale IS the kill. Fail the timer → HEAT DEATH: a full-screen
 //     slow wave with only the singularity centre safe (35%). Charge bar
 //     frozen (gate in _egTickPlayer via _egEntrFinalActive).
@@ -43,7 +43,7 @@
 //   3. UNIQUE mechanic handlers (only this boss uses them)
 //
 // Prefix discipline: everything here is _egEntr / eg-entr- (the _egEnt stem
-// collides with _egEnterBossArena elsewhere — do not shorten).
+// collides with _egEnterBossArena elsewhere - do not shorten).
 //------------------------------------------------------------------------
 
 // DEBUG: slow Entropy's timing 2.5x so manual playtests / screenshot
@@ -61,7 +61,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_entropy — "The Second Law" (rework)
+    // boss_entropy - "The Second Law" (rework)
     // Phase 1 (100% → 60%): Heat Death Drift teaches the order economy
     // Phase 2 ( 60% → 30%): immune window, Recursive Decay + Maxwell's Door
     // Phase 3 ( 30% →  0%): pools spread faster, zones shrink; at 10% the
@@ -111,14 +111,14 @@ let _egEntrZones = [];    // { x, y, r, el, until }
 let _egEntrPools = [];    // { x, y, r, el, until, dps }
 let _egEntrCells = [];    // { x, y, el, born, dead }
 let _egEntrOrderRun = null;
-let _egEntrOrder = 100;   // 0..100 — the personal order meter
+let _egEntrOrder = 100;   // 0..100 - the personal order meter
 let _egEntrHotUntil = 0;  // Maxwell hot-state deadline (perf.now ms)
 let _egEntrColdUntil = 0;
 let _egEntrHotAuraTimer = 0;
 let _egEntrColdAuraTimer = 0;
 
 // Movement hook (called from _avatarGetMoveSpeed in player_sprite.js,
-// typeof-guarded there — same pattern as _egSnailBroomHeld). Perfect
+// typeof-guarded there - same pattern as _egSnailBroomHeld). Perfect
 // crystal during the finale: absolute zero is perfect order.
 function _egEntrMoveMult() {
     if (_egEntrFinalActive()) return 1;
@@ -176,7 +176,7 @@ function _egEntrEnsureOrderRun(monster) {
     _egEntrOrderRun = run;
     const level = (monster && monster.level) || 1;
     _egNkLoop(run, (dtS, now) => {
-        // Expiry sweep (always — even during the finale, cells must age out).
+        // Expiry sweep (always - even during the finale, cells must age out).
         const t = now;
         _egEntrZones = _egEntrZones.filter(z => { if (t >= z.until) { try { z.el.remove(); } catch (e) {} return false; } return true; });
         _egEntrPools = _egEntrPools.filter(p => { if (t >= p.until) { try { p.el.remove(); } catch (e) {} return false; } return true; });
@@ -203,7 +203,7 @@ function _egEntrEnsureOrderRun(monster) {
             }
         }
 
-        // The Last Degree: the lattice protects — no meter, no pool DoT.
+        // The Last Degree: the lattice protects - no meter, no pool DoT.
         if (_egEntrFinalActive()) { _egEntrOrder = 100; return true; }
 
         const pc = _egEntrPC();
@@ -251,13 +251,13 @@ function _egMechEntrDrift(monster, phase) {
     void level;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_entr_drift', '♾️❄️ HEAT DEATH DRIFT — the cold spreads! Find the lit zones!', '#93c5fd');
+    _egNkToast('eg_mech_entr_drift', '♾️❄️ HEAT DEATH DRIFT - the cold spreads! Find the lit zones!', '#93c5fd');
     _egEntrEnsureOrderRun(monster);
 
     const poolLife = (p >= 3 ? EG_ENTR_POOL_LIFE - 2 : EG_ENTR_POOL_LIFE) * _EG_ENTR_DEBUG_MULT * 1000;
     const zoneLife = EG_ENTR_ZONE_LIFE * _EG_ENTR_DEBUG_MULT * 1000;
 
-    // Blooms ride the loop clock (pause-safe — no bare setTimeout).
+    // Blooms ride the loop clock (pause-safe - no bare setTimeout).
     const blooms = [];
     for (let i = 0; i < EG_ENTR_DRIFT_BLOOMS[p]; i++) {
         blooms.push({
@@ -291,7 +291,7 @@ function _egMechEntrDrift(monster, phase) {
 }
 
 // Spawn a pool; if it overlaps an existing one, MERGE into a bigger pool
-// (real entropy — the cold consolidates instead of multiplying).
+// (real entropy - the cold consolidates instead of multiplying).
 function _egEntrSpawnPool(x, y, r, lifeMs) {
     const near = _egEntrPools.find(q => Math.hypot(q.x - x, q.y - y) < q.r + r - 24);
     if (near) {
@@ -335,7 +335,7 @@ function _egEntrSpawnZone(x, y, lifeMs) {
 //-------------------ACT II: RECURSIVE DECAY (60%)-------------------------
 //------------------------------------------------------------------------
 // Cursed cells AGE: every 4s each living cell spreads decay to an
-// orthogonal neighbour (cap 9). Stand on a cell to burn it out — the burn
+// orthogonal neighbour (cap 9). Stand on a cell to burn it out - the burn
 // costs a cold DoT while you stand there.
 const EG_ENTR_DECAY_SEEDS = [0, 3, 3, 5];   // cells seeded per cast, by phase
 const EG_ENTR_CELL_CAP    = 9;
@@ -346,7 +346,7 @@ function _egMechEntrDecay(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_entr_decay', '♾️🦠 RECURSIVE DECAY — the cells spread! Stand on them to burn them out!', '#86efac');
+    _egNkToast('eg_mech_entr_decay', '♾️🦠 RECURSIVE DECAY - the cells spread! Stand on them to burn them out!', '#86efac');
     _egEntrEnsureOrderRun(monster);
 
     for (let i = 0; i < EG_ENTR_DECAY_SEEDS[p]; i++) {
@@ -394,7 +394,7 @@ function _egMechEntrDoor(monster, phase) {
     void phase;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_entr_door', '♾️🚪 MAXWELL\u2019S DOOR — choose your element, pay its price!', '#fdba74');
+    _egNkToast('eg_mech_entr_door', '♾️🚪 MAXWELL\u2019S DOOR - choose your element, pay its price!', '#fdba74');
 
     const y = H * (0.3 + Math.random() * 0.4);
     const hot = _egNkEl(run, 'div', 'eg-entr-door eg-entr-door-hot', '🔥');
@@ -425,13 +425,13 @@ function _egMechEntrDoor(monster, phase) {
 
 function _egEntrApplyHot() {
     _egEntrHotUntil = performance.now() + EG_ENTR_DOOR_STATE * _EG_ENTR_DEBUG_MULT;
-    _egNkToast('eg_mech_entr_hot', '🔥 FIRE-STATE — cold pools heal you, but heat scatters order!', '#fdba74');
+    _egNkToast('eg_mech_entr_hot', '🔥 FIRE-STATE - cold pools heal you, but heat scatters order!', '#fdba74');
     _egEntrAura('eg-entr-hot-aura', 'hot');
 }
 
 function _egEntrApplyCold() {
     _egEntrColdUntil = performance.now() + EG_ENTR_DOOR_STATE * _EG_ENTR_DEBUG_MULT;
-    _egNkToast('eg_mech_entr_cold', '❄️ COLD-STATE — pool-proof, but order drains twice as fast!', '#93c5fd');
+    _egNkToast('eg_mech_entr_cold', '❄️ COLD-STATE - pool-proof, but order drains twice as fast!', '#93c5fd');
     _egEntrAura('eg-entr-cold-aura', 'cold');
 }
 
@@ -456,7 +456,7 @@ function _egEntrAura(cls, which) {
 //-------------------FINALE: THE LAST DEGREE (≤10%, one-shot)--------------
 //------------------------------------------------------------------------
 // Absolute zero approaches: the arena becomes one frozen lattice (perfect
-// order — full movement speed). ORDER SHARDS rain in telegraphed volleys;
+// order - full movement speed). ORDER SHARDS rain in telegraphed volleys;
 // each touched shard's spark flies to the central singularity and pops the
 // boss for 20% of ITS maxHP through the canonical damage path. 5 shards =
 // the universe restarts (the kill). Timer fail = HEAT DEATH wave.
@@ -566,14 +566,14 @@ function _egEntrFinalStart(monster) {
     ov.className = 'eg-entr-cd';
     ov.innerHTML =
         '<div class="eg-entr-cd-label">♾️ THE LAST DEGREE</div>' +
-        '<div class="eg-entr-cd-timer">—</div>' +
-        '<div class="eg-entr-cd-hint">Collect the shards — carry the sparks to the singularity!</div>';
+        '<div class="eg-entr-cd-timer">-</div>' +
+        '<div class="eg-entr-cd-hint">Collect the shards - carry the sparks to the singularity!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.timerEl = ov.querySelector('.eg-entr-cd-timer');
     g.fxRun.els.push(ov);
 
-    _egNkToast('eg_mech_entr_final_cd', '♾️💀 THE LAST DEGREE — gather the shards before absolute zero!', '#93c5fd');
+    _egNkToast('eg_mech_entr_final_cd', '♾️💀 THE LAST DEGREE - gather the shards before absolute zero!', '#93c5fd');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -616,7 +616,7 @@ function _egEntrFinalStart(monster) {
                     return false;
                 }
                 if (life >= EG_ENTR_SHARD_LIFE * _EG_ENTR_DEBUG_MULT) {
-                    // Lost shard: it dissolves — another falls after a beat.
+                    // Lost shard: it dissolves - another falls after a beat.
                     _egEntrAfter(g, 700 * _EG_ENTR_DEBUG_MULT, spawnShard);
                     return false;
                 }
@@ -635,7 +635,7 @@ function _egEntrFinalStart(monster) {
     };
     tickTimer();
 
-    // Interference: cursed cells still rain (frozen, they just sit there —
+    // Interference: cursed cells still rain (frozen, they just sit there -
     // standing on them still burns them out, and they never spread).
     const rainCells = () => {
         if (g.finished) return;
@@ -665,12 +665,12 @@ function _egEntrDeliver(g, monster, sx, sy, level) {
     document.body.appendChild(spark);
     setTimeout(() => { try { spark.remove(); } catch (e) {} }, 1300 * _EG_ENTR_DEBUG_MULT);
 
-    _egNkToast('eg_mech_entr_shard', '♾️✨ Shard ' + (g.delivered + 1) + '/' + EG_ENTR_SHARDS + ' delivered — the singularity stirs!', '#fde68a');
+    _egNkToast('eg_mech_entr_shard', '♾️✨ Shard ' + (g.delivered + 1) + '/' + EG_ENTR_SHARDS + ' delivered - the singularity stirs!', '#fde68a');
 
     _egEntrAfter(g, 1150 * _EG_ENTR_DEBUG_MULT, () => {
         if (g.finished) return;
         g.delivered++;
-        // Staggered damage pop on the boss — canonical path so resistances,
+        // Staggered damage pop on the boss - canonical path so resistances,
         // phase checks and the death flow all apply.
         try {
             const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
@@ -705,7 +705,7 @@ function _egEntrDropNext(g, monster) {
     _egEntrSpawnShardFn(g, monster);
 }
 
-// Timer failure: HEAT DEATH — a full-screen slow wave; only the singularity
+// Timer failure: HEAT DEATH - a full-screen slow wave; only the singularity
 // centre is safe.
 function _egEntrHeatDeath(g, monster, level) {
     if (g.finished) return;
@@ -725,16 +725,16 @@ function _egEntrHeatDeath(g, monster, level) {
             const dealt = _egNkHit(EG_ENTR_HEATDEATH, 'cold', level);
             _egNkAbilityHitToast(dealt, 'Entropy', 'Heat Death');
         }
-        // The wave lands, the universe keeps winding down — resume the fight.
+        // The wave lands, the universe keeps winding down - resume the fight.
         _egEntrFinalEnd(g, monster);
     });
 }
 
-// Success: the fifth shard re-ignites the universe — the boss pays its own
+// Success: the fifth shard re-ignites the universe - the boss pays its own
 // remaining HP (through the canonical path, immunity already released).
 function _egEntrRestart(g, monster) {
     if (g.finished) return;
-    _egNkToast('eg_mech_entr_spark', '♾️💥 THE UNIVERSE RESTARTS — Entropy gave everything one last spark!', '#fde68a');
+    _egNkToast('eg_mech_entr_spark', '♾️💥 THE UNIVERSE RESTARTS - Entropy gave everything one last spark!', '#fde68a');
     const flash = document.createElement('div');
     flash.className = 'eg-entr-restart-flash';
     document.body.appendChild(flash);
@@ -776,7 +776,7 @@ function _egEntrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
 function _egEntrTeardown() {
     if (_egEntrFinal) { try { _egEntrFinalEnd(_egEntrFinal, null); } catch (e) {} _egEntrFinal = null; }
@@ -810,8 +810,8 @@ function _egEntrTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_ENTR_DEBUG.fire('drift'|'decay'|'door'|'final') — run one now
-//   _EG_ENTR_DEBUG.order(n)                             — set the meter by hand
+//   _EG_ENTR_DEBUG.fire('drift'|'decay'|'door'|'final') - run one now
+//   _EG_ENTR_DEBUG.order(n)                             - set the meter by hand
 if (typeof window !== 'undefined') {
     window._EG_ENTR_DEBUG = {
         fire: (name, phase) => {

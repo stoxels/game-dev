@@ -1,12 +1,12 @@
 /* -----------------------------------------------------------------------
-   SKILLS — HOTBAR, SPELL BOOK, SKILL TOOLTIP
+   SKILLS - HOTBAR, SPELL BOOK, SKILL TOOLTIP
    -----------------------------------------------------------------------
    Sections:
-     1. HOTBAR SHELL      — fixed bottom-right action bar (2 rows of 5)
-     2. HOTBAR SLOT       — slot box, key label, icon, cooldown / mana states
-     3. DRAG & DROP       — drag ghost + drop-target highlight
-     4. SPELL BOOK        — overlay, groups, draggable entries
-     5. SKILL TOOLTIP     — Path-of-Exile style hover tooltip contents
+     1. HOTBAR SHELL      - fixed bottom-right action bar (2 rows of 5)
+     2. HOTBAR SLOT       - slot box, key label, icon, cooldown / mana states
+     3. DRAG & DROP       - drag ghost + drop-target highlight
+     4. SPELL BOOK        - overlay, groups, draggable entries
+     5. SKILL TOOLTIP     - Path-of-Exile style hover tooltip contents
    ----------------------------------------------------------------------- */
 
 
@@ -42,9 +42,14 @@
    ABOVE its modal backdrop, otherwise the backdrop swallows the drop and
    spells can't be dragged on. */
 body.spellbook-open .skill-hotbar,
-body:has(#spellbook-overlay.show) .skill-hotbar { z-index: 4500; }
+/* While the spell book is open the bar must sit ABOVE the modal backdrop
+   (z 10000) so spells can actually be dropped onto the slots - a backdrop
+   above the bar would swallow elementFromPoint and every drop silently
+   fails. The bar stays below the box itself so the book's content remains
+   the visual focus. */
+body:has(#spellbook-overlay.show) .skill-hotbar { z-index: 10010; }
 
-/* Question modals (quiz / math gate / scouts primer) take over the screen —
+/* Question modals (quiz / math gate / scouts primer) take over the screen -
    hide the action bar entirely so it can't be clicked or clutter the modal. */
 body.question-modal-open .skill-hotbar { display: none !important; }
 
@@ -161,7 +166,64 @@ img.skill-hotbar-icon {
     pointer-events: none;
 }
 
-/* Long cooldowns (m:ss) are wider — shrink slightly so they fit the slot. */
+/* CHARGE PIPS - charge spells (Blink, Dash) show their pool as small pips
+   along the slot's bottom edge instead of a cooldown wash: filled = ready
+   charge, hollow = recharging (the first one carries the countdown). */
+.skill-hotbar-charges {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    pointer-events: none;
+}
+
+.skill-hotbar-charges i {
+    font-style: normal;
+    width: 10px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, .78);
+    border: 1px solid rgba(255, 255, 255, .16);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .6);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.skill-hotbar-charges i.is-full {
+    background: #66fcf1;
+    border-color: rgba(102, 252, 241, .9);
+    box-shadow: 0 0 5px rgba(102, 252, 241, .8), 0 0 0 1px rgba(0, 0, 0, .6);
+}
+
+/* The countdown sits in the first recharging pip - it would never fit at
+   10px, so the text is floated out under the slot row instead. */
+.skill-hotbar-charges i b {
+    position: absolute;
+    left: 50%;
+    bottom: -16px;
+    transform: translateX(-50%);
+    font-family: var(--PX, monospace);
+    font-size: 9px;
+    font-weight: bold;
+    line-height: 1;
+    color: #ffb347;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .95);
+    white-space: nowrap;
+}
+
+/* While the pool is empty the slot keeps the familiar cooldown wash so the
+   player reads "nothing left" at a glance - the pips show WHY. */
+.skill-hotbar-slot.on-cd .skill-hotbar-charges i.is-empty {
+    opacity: .55;
+}
+
+/* Long cooldowns (m:ss) are wider - shrink slightly so they fit the slot. */
 .skill-hotbar-cd.is-long {
     font-size: 12px;
     letter-spacing: 0;
@@ -203,7 +265,7 @@ img.skill-hotbar-icon {
     font-size: 10px;
 }
 
-/* Armed — waiting for the player to click a grid cell. */
+/* Armed - waiting for the player to click a grid cell. */
 .skill-hotbar-slot.armed {
     outline: 2px solid #e74c3c;
     outline-offset: 1px;
@@ -258,113 +320,540 @@ body.skill-dragging { cursor: grabbing; user-select: none; }
    4. SPELL BOOK
    ----------------------------------------------------------------------- */
 
+/* The book wears the same stone-and-parchment chassis as the settings,
+   achievements, changelog and inventory-reshuffle modals: the carved frame
+   (images/Settings/settings_background.webp), the title plaque and the stone
+   close square. Content then sits on the parchment, and the three working
+   areas (spell slots / equipped spells / charms) are the same slate tablets
+   the achievements screen uses, carved with
+   images/Achievement_Screen/Achievements_Category_*.webp. */
 .spellbook-bg { z-index: 4000; }
 
 .spellbook-box {
-    max-width: 720px;
-    width: min(94vw, 720px);
-    border: 1px solid rgba(160, 140, 255, 0.42);
-    background: linear-gradient(180deg, rgba(26, 21, 42, 0.98), rgba(12, 10, 22, 0.98));
-    box-shadow: 0 0 34px -8px rgba(150, 120, 255, 0.65), 0 18px 50px rgba(0, 0, 0, 0.7);
+    position: relative;
+    /* Wide: the charm panel lives to the right of the spell list. The vh cap
+       keeps the frame's borders from outgrowing the window. */
+    width: min(1560px, 97vw, 130vh);
+    max-width: none;              /* override .modal-box's 660px cap */
+    aspect-ratio: 611 / 470;
+    /* Chromium needs this to treat the aspect-ratio-derived height as a
+       DEFINITE height. Without a numeric min-height, .spellbook-frame-body
+       (the only in-flow child) refuses to shrink: it lays out at its natural
+       content height (~850px), overflows the frame by the whole difference,
+       and the footer readout lands on top of the hotbar. With the floor set,
+       the child shrinks to the frame and every panel sits inside it. The
+       value never actually binds where the aspect ratio applies: below
+       ~620px of window height the media queries above switch to explicit
+       heights, and those windows cannot produce a frame shorter than ~440px.
+       It is still a real floor - the book stops shrinking rather than
+       becoming unusable. */
+    min-height: 400px;
+    max-height: calc(100vh - 24px);
+    background-image: url('../images/Settings/settings_background.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    border-left: none;
+    box-shadow: none;
+    /* NO padding here on purpose: the inset that keeps content off the carved
+       band lives on .spellbook-frame-body below, where it can be measured
+       against the FRAME (cqw/cqh) instead of the window. Percentage padding
+       resolves against the containing block - the modal backdrop, i.e. the
+       window - so the old values grew with the viewport and stayed put as the
+       frame shrank, which is how a short/wide window ended up mostly border.
+       Keeping the box's own padding at zero also means the container queries
+       in 4a-1 measure the frame itself rather than a padded interior. */
+    padding: 0;
+    overflow: visible;            /* plaque + close button overhang the frame */
+    display: flex;
+    flex-direction: column;
+    /* A *size* container, not just an inline-size one: the panels inside also
+       need to know how tall the frame ended up, so a short frame can trim
+       itself (see 4a-1). Safe here because the box's height is never derived
+       from its contents - the art's aspect ratio or an explicit
+       height/max-height always settles it first. */
+    container-type: size;
+    color: #4a2c12;               /* parchment ink for shell text */
+    animation: sb-frame-in .38s cubic-bezier(.16, .84, .32, 1.12) both;
 }
 
-/* Header: big book glyph + title + hint, separated from the list by a rule. */
-.spellbook-header {
+@keyframes sb-frame-in {
+    from { opacity: 0; transform: scale(.965); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* HOTBAR RESERVE - the skill hotbar stays on screen while the book is open,
+   because dragging a spell from the list onto a bar slot is the whole point
+   (js/skills/skill-hotbar.js keeps it rendered while `spellbook-open`). Its
+   footprint is deterministic: two rows of 52px slots, one 5px gap between
+   them, 6px of bar padding plus the 6px corner offset = 133px. Reserving
+   exactly that keeps the frame's carved lower border and the footer out from
+   under the bar instead of letting the bar park on top of them. */
+
+/* Short-wide windows: release the art ratio so the carved borders never
+   outgrow the box (same fallback the other framed modals use). */
+@media (min-width: 701px) and (max-height: 620px) {
+    .spellbook-box { aspect-ratio: auto; height: calc(100vh - 24px); }
+}
+
+@media (max-width: 700px) {
+    .spellbook-box { aspect-ratio: auto; height: calc(100vh - 24px); }
+}
+
+/* Keyed on skill-hotbar-visible as well, because that class is set by
+   renderSkillHotbar() exactly when the bar is really on screen - a
+   "classless" challenge run hides the bar even with the book open, and there
+   the frame must keep the full height instead of leaving a dead strip. */
+body.spellbook-open.skill-hotbar-visible .spellbook-box {
+    --sb-reserve: 133px;
+    margin-bottom: var(--sb-reserve);
+    max-height: calc(100vh - var(--sb-reserve) - 24px);
+    /* 611/470 ≈ 1.3, so the height derived from this width lands exactly on
+       the space left above the bar. */
+    width: min(1560px, 97vw, calc((100vh - var(--sb-reserve) - 24px) * 1.3));
+}
+
+/* Narrow viewports shrink the bar's slots to 40px (see section 7), so the
+   strip it needs is correspondingly shorter. */
+@media (max-width: 700px) {
+    body.spellbook-open.skill-hotbar-visible .spellbook-box { --sb-reserve: 103px; }
+}
+
+@media (min-width: 701px) and (max-height: 620px) {
+    body.spellbook-open.skill-hotbar-visible .spellbook-box {
+        width: min(1560px, 97vw);
+        height: calc(100vh - var(--sb-reserve) - 24px);
+    }
+}
+
+@media (max-width: 700px) {
+    body.spellbook-open.skill-hotbar-visible .spellbook-box {
+        width: min(1560px, 97vw);
+        height: calc(100vh - var(--sb-reserve) - 24px);
+    }
+}
+
+/* TITLE PLAQUE - carved stone banner hanging over the frame's top edge,
+   gold Cinzel lettering on it (same asset + geometry as the settings /
+   achievements / inventory plaques). */
+.spellbook-plaque {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max(min(48%, 620px), 320px);
+    height: clamp(50px, 8.2cqw, 104px);
+    background-image: url('../images/Settings/settings_title_plague.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding-bottom: 10px;
-    margin-bottom: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    justify-content: center;
+    gap: clamp(6px, .8cqw, 12px);
+    padding: 0 13%;              /* keep glyphs clear of the tapered ends */
+    font-family: var(--C);
+    font-size: min(clamp(15px, 2.1cqw, 30px), 5vh);
+    letter-spacing: 3px;
+    white-space: nowrap;
+    color: var(--yellow);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .85), 0 0 16px rgba(0, 0, 0, .6);
+    z-index: 3;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .5));
 }
 
-.spellbook-header-icon {
-    flex: 0 0 auto;
-    font-size: 34px;
-    line-height: 1;
-    filter: drop-shadow(0 0 8px rgba(160, 130, 255, 0.8));
+.spellbook-plaque-text { text-transform: uppercase; }
+
+/* CLOSE - the stone X square, pinned inside the frame's top-right corner
+   (the text is hidden; the art already shows the X). */
+.spellbook-box .modal-close {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    width: clamp(34px, 4.2cqw, 50px);
+    height: clamp(34px, 4.2cqw, 50px);
+    background-image: url('../images/Settings/settings_close_button.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    font-size: 0;
+    padding: 0;
+    cursor: pointer;
+    z-index: 4;
+    transition: transform .12s, filter .12s;
 }
 
-.spellbook-header-text { min-width: 0; flex: 1 1 auto; }
+    .spellbook-box .modal-close:hover {
+        filter: brightness(1.2);
+        transform: scale(1.06);
+    }
 
-.spellbook-title {
-    text-align: left;
-    margin-bottom: 2px;
-    background: linear-gradient(180deg, #ffe9a8, #d9a441);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: none;
+/* Parchment column holding the hint, the three panels and the footer. It also
+   carries the frame's inset - the art's carved band (x 9%→91%, y 11%→90%) -
+   measured in the frame's own units, so the border band and the content always
+   scale together however the frame is sized. */
+.spellbook-frame-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 11cqh, 150px) clamp(26px, 9cqw, 132px) clamp(24px, 10cqh, 138px);
 }
 
+/* The "how it works" line. Press Start 2P is a display face built for short
+   uppercase titles - a full sentence in it, at 8-9px, on mottled parchment,
+   is not readable. This runs the UI face (Share Tech Mono) at body size with
+   near-black ink and a parchment halo. */
 .spellbook-hint {
-    margin: 0;
-    font-size: 11px;
-    opacity: .75;
-    text-align: left;
-    font-family: var(--PX, monospace);
-    line-height: 1.4;
+    flex: 0 0 auto;
+    margin: 0 0 clamp(5px, .9cqw, 12px);
+    text-align: center;
+    font-family: var(--F, monospace);
+    font-size: clamp(12px, 1.25cqw, 16px);
+    line-height: 1.55;
+    letter-spacing: .01em;
+    color: #2a1a08;
+    text-shadow: 0 1px 0 rgba(255, 250, 232, .9), 0 0 5px rgba(255, 246, 220, .7);
 }
 
-.spellbook-scroll {
-    max-height: min(62vh, 520px);
+/* ---------- 4a. LAYOUT --------------------------------------------------
+   WIDE frame (the default here): three columns on the parchment - the charm
+   inventory on the LEFT, the 2 × 5 spell-slot grid in the CENTER, and the
+   equipped spell list on the RIGHT. Each is a carved slate tablet, matching
+   the achievements category cards. (The center slots column replaced the old
+   left-wrapper arrangement, where charms sat above the slots in one column
+   and left the charm list with only the height the slots did not need.)
+   Narrower frames rearrange themselves entirely; see 4a-1. */
+.spellbook-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(300px, .78fr)   /* charms   */
+        minmax(0, .82fr)       /* slots    */
+        minmax(300px, 1fr);    /* spells   */
+    gap: clamp(10px, 1.3cqw, 18px);
+}
+
+/* The center slots column pins the 2 × 5 grid. A narrower grid column
+   squeezes the five sockets below name width, so the slots flip to a 2-across
+   arrangement here (the CHARMS_... tier below restores full-width rows). */
+.spellbook-slots-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
     overflow-y: auto;
-    padding: 2px 6px 8px 2px;
     scrollbar-width: thin;
-    scrollbar-color: rgba(150, 130, 230, 0.6) transparent;
+    scrollbar-color: rgba(196, 175, 120, .55) transparent;
+}
+.spellbook-slots-panel .charm-slots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.spellbook-slots-panel::-webkit-scrollbar { width: 7px; }
+.spellbook-slots-panel::-webkit-scrollbar-track { background: rgba(0, 0, 0, .32); border-radius: 6px; }
+.spellbook-slots-panel::-webkit-scrollbar-thumb { background: rgba(196, 175, 120, .5); border-radius: 6px; }
+
+/* The charm inventory is the tall panel here: it takes whatever the slot grid
+   below it does not need, and scrolls internally.
+
+   THE PANEL is the scroller, not the charm list inside it. A list that scrolls
+   inside a panel can only ever be as tall as the panel minus the panel's fixed
+   chrome (heading, currency, filter, carved borders) - ~130px of chrome against
+   a panel that is often 120-260px, so the list was regularly left with a
+   couple of pixels of it, no matter how many charms the player owned. Scroll
+   the panel instead and the chrome scrolls away with the content: the first
+   rows are what the player sees on arrival, and everything below is reachable
+   with the full height of the panel. */
+.spellbook-charms-panel {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    width: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: clamp(4px, .6cqw, 9px) clamp(7px, 1cqw, 14px) clamp(7px, 1cqw, 14px);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(196, 175, 120, .55) transparent;
 }
 
-.spellbook-scroll::-webkit-scrollbar { width: 8px; }
-.spellbook-scroll::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.25); border-radius: 4px; }
+.spellbook-charms-panel::-webkit-scrollbar { width: 7px; }
+.spellbook-charms-panel::-webkit-scrollbar-track { background: rgba(0, 0, 0, .32); border-radius: 6px; }
+.spellbook-charms-panel::-webkit-scrollbar-thumb { background: rgba(196, 175, 120, .5); border-radius: 6px; }
+
+/* (The slots panel's own padding/pinning moved into the 4a layout block
+   above - it is a grid column now, not a stack member.) */
+
+/* ---------- 4a-1. RESPONSIVE TIERS --------------------------------------
+   NOTE: the overrides below are written in place for readability, but the
+   panels they restyle also have base rules further down the file (4c and 8),
+   so each one is scoped with .spellbook-box - two classes beat one whatever
+   the source order. Keep that prefix when adding to these blocks.
+   The book lays itself out from its OWN width - container queries against
+   .spellbook-box - rather than from the window's. That distinction is the
+   whole point: the frame's width is already tied to the space available (see
+   the hotbar reserve above, which derives the width from the height left over
+   above the bar), so a short window hands the book a narrow frame even when
+   the viewport is wide. A viewport media query misses exactly that case and
+   leaves two columns fighting over a strip that is both short and narrow -
+   which is where the charm panel was getting crushed.
+
+   Because the box's own padding is zero (see .spellbook-box), the measured
+   width IS the frame: the carved border band is applied to the content inside
+   .spellbook-frame-body and is therefore not part of this number.
+
+     > 940px   wide    charms | slots | spells - one column each
+     ≤ 940px   split   the slot row spans the full width, the two scrolling
+                       lists sit under it, side by side
+     ≤ 720px   stacked the same, all three regions in one column
+
+   Neither figure is an arbitrary round number; both are where the tier above
+   stops working. Wide needs ~280px each for the charm and spell columns, a
+   2-across slot column, the gaps and the inset - about 940px of frame. Split
+   needs two columns of ~330px, because a slate panel spends ~30px on each
+   side in carved border plus ~20px of its own padding before a spell row even
+   starts; that lands on ~720px. Under it, one column.
+
+   The slot row going full width below 940px is the heart of it. As the center
+   column of the wide tier the ten sockets are 2-across (a five-across row
+   would clip a two-word spell name); full width across the frame restores
+   the familiar five-across 2 × 5 with room for every name. */
+
+@container (max-width: 940px) {
+    /* One grid: the slot row spans both column tracks while the two lists
+       keep scrolling in the row beneath. */
+    .spellbook-body {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+    .spellbook-slots-panel { grid-column: 1 / -1; grid-row: 1; min-height: 0; }
+    .spellbook-charms-panel { grid-column: 1; grid-row: 2; min-height: 0; }
+    .spellbook-scroll { grid-column: 2; grid-row: 2; min-height: 0; max-height: none; }
+    /* Back to the familiar five-across sockets at full width. */
+    .spellbook-slots-panel .charm-slots { grid-template-columns: repeat(var(--charm-slot-cols, 5), minmax(0, 1fr)); }
+}
+
+/* Narrow: one column, three rows. Full width for every region, so a spell
+   name and a charm name read whole instead of eliding into each other; the
+   two lists split whatever the slot row leaves and scroll internally, which
+   keeps a drag source and its slot row on screen together. */
+@container (max-width: 720px) {
+    .spellbook-body {
+        grid-template-columns: minmax(0, 1fr);
+        /* The charm list carries more fixed chrome than the spell list (its
+           heading, currency and filter), so it gets the larger share of the
+           two equal rows - otherwise its list starves first. */
+        grid-template-rows: auto minmax(64px, 1.25fr) minmax(56px, 1fr);
+    }
+    .spellbook-charms-panel { grid-column: 1; grid-row: 2; }
+    .spellbook-scroll { grid-column: 1; grid-row: 3; }
+    /* One column means a full-width charm panel: the currency strip and the
+       rank filter fit side by side here, so they stop stacking into ~45px of
+       chrome above the list. */
+    .spellbook-box .charm-tools { flex-direction: row; align-items: center; }
+    .spellbook-box .charm-tools .charm-currency { flex: 1 1 auto; min-width: 0; }
+    .spellbook-box .charm-tools .charm-filter { flex: 0 0 auto; }
+    /* A step down across the board: the frame is small, so the type, the
+       sockets and the margins give the two scrolling windows every pixel
+       they can.
+
+       These carry the .spellbook-box prefix for a mundane reason: the base
+       rules for the charm tiles, the section bars and the spell rows are
+       written further down this file (sections 4c and 8), and a plain class
+       selector here would lose to them on source order alone. Two classes
+       win outright and say plainly that these overrides are scoped to the
+       book. */
+    .spellbook-box .charm-slot { min-height: clamp(46px, 6cqw, 88px); }
+    .spellbook-box .charm-slot-name { font-size: clamp(6px, .8cqw, 8.5px); }
+    .spellbook-box .charm-currency-item { font-size: clamp(7.5px, .8cqw, 10px); }
+    .spellbook-box .sb-head-bar { font-size: clamp(9px, 1.05cqw, 18px); }
+    .spellbook-box .sb-head-sub { font-size: clamp(7.5px, .8cqw, 11px); }
+    .spellbook-box .spellbook-footer { font-size: clamp(11px, 1.15cqw, 15px); }
+    .spellbook-box .spellbook-entry { gap: clamp(6px, .8cqw, 12px); }
+    .spellbook-box .spellbook-entry-img { width: 32px; height: 32px; }
+}
+
+/* Short frames (any width) compact the book's FIXED chrome, because the fixed
+   chrome is what starves the two scrolling lists when the parchment runs out
+   of height: the slot row cannot scroll, and the charm panel's heading,
+   currency and filter used to take ~130px before its list got a single row.
+   Everything folded away here is still reachable - the socket names and orb
+   bonuses live in the tooltips, and the rank filter is a preference rather
+   than a control you need every visit.
+
+   Keyed on the FRAME's height rather than the window's, because the frame can
+   be short while the window is not: above the hotbar is exactly that case
+   (the reserve takes ~157px off the height budget), and it is the frame that
+   runs out of room. */
+@container (max-height: 700px) {
+    /* Side by side instead of stacked. */
+    .spellbook-box .charm-tools { flex-direction: row; align-items: center; }
+    .spellbook-box .charm-tools .charm-currency { flex: 1 1 auto; min-width: 0; }
+    .spellbook-box .charm-tools .charm-filter { flex: 0 0 auto; }
+    /* Sockets: shallower padding, a smaller glyph, and the same two-line name. */
+    .spellbook-box .charm-slot {
+        min-height: clamp(40px, 5cqw, 74px);
+        padding: clamp(4px, .5cqw, 14px) clamp(2px, .28cqw, 4px) clamp(3px, .4cqw, 8px);
+    }
+    .spellbook-box .charm-slot .charm-icon { font-size: clamp(14px, 1.5cqw, 23px); }
+    /* Section bars and the how-it-works line each give up a line's worth. */
+    .spellbook-box .sb-head-bar { min-height: clamp(22px, 2.4cqw, 40px); }
+    .spellbook-box .spellbook-slots-panel .sb-head-sub { display: none; }
+    .spellbook-box .spellbook-hint { font-size: clamp(11px, 1.1cqw, 16px); line-height: 1.4; }
+
+}
+
+/* Genuinely short: the how-it-works sentence goes too. It is a two-to-three
+   line paragraph of the budget, and every control it describes carries its
+   own hint (empty states, socket tooltips, the How To Play card). */
+@container (max-height: 640px) {
+    .spellbook-box .spellbook-hint { display: none; }
+}
+
+/* Below this the rows above have floors (see the stack tier) that the frame
+   may no longer be able to honour - the two socket rows and the two lists
+   together ask for more than a couple of hundred pixels can hold. Rather than
+   let the footer slide out through the carved border, the frame body itself
+   becomes the scroller: a last resort that keeps every region reachable, and
+   one that never engages on a window the book fits in. */
+@container (max-height: 480px) {
+    .spellbook-box .spellbook-frame-body { overflow-y: auto; }
+}
+
+/* ---------- 4b. CARVED SLATE PANELS -------------------------------------
+   One rule for all three working areas. The tablet art
+   (Achievements_Category_main_Panel.webp) is sliced with border-image so the
+   bevelled stone edge keeps its proportions at any panel size, and `fill`
+   paints the art's flat interior (#222632 - the game's own --panel tone)
+   across the middle, the same slate the achievements cards sit on. */
+.sb-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-style: solid;
+    border-width: clamp(12px, 1.5cqw, 22px) clamp(15px, 1.9cqw, 28px);
+    border-image: url('../images/Achievement_Screen/Achievements_Category_main_Panel.webp') 12.2% 11.3% fill / clamp(12px, 1.5cqw, 22px) clamp(15px, 1.9cqw, 28px) / 0 stretch;
+    box-shadow: 0 6px 18px -6px rgba(0, 0, 0, .55);
+}
+
+/* ---------- 4c. SECTION HEADER BAR -------------------------------------
+   Carved stone title bar (the achievements category header art), sliced the
+   same way so the pointed ends stay pointed however wide the panel is. */
+.sb-head { flex: 0 0 auto; }
+
+.sb-head-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(5px, .7cqw, 10px);
+    min-height: clamp(26px, 3cqw, 40px);
+    box-sizing: content-box;
+    padding: 0 clamp(14px, 2cqw, 30px);
+    border-style: solid;
+    border-width: clamp(8px, 1cqw, 13px) clamp(11px, 1.4cqw, 18px);
+    border-image: url('../images/Achievement_Screen/Achievements_Category_Header.webp') 27% 10% fill / clamp(8px, 1cqw, 13px) clamp(11px, 1.4cqw, 18px) / 0 stretch;
+    font-family: var(--C);
+    font-size: clamp(11px, 1.25cqw, 18px);
+    font-weight: 700;
+    letter-spacing: clamp(.5px, .18cqw, 2px);
+    text-transform: uppercase;
+    color: #e8e0c8;
+    text-shadow: 0 2px 2px rgba(0, 0, 0, .9), 0 0 12px rgba(102, 252, 241, .22);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* The line under a carved section bar sits on the SLATE tablet, not on
+   parchment, so it needs the pale slate palette - the parchment ink used
+   elsewhere in the shell is invisible there. */
+.sb-head-sub {
+    margin: clamp(3px, .4cqw, 6px) 0 0;
+    text-align: center;
+    font-family: var(--PX, monospace);
+    font-size: clamp(8px, .85cqw, 11px);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #bdb49a;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+}
+
+/* The scrolling spell list is itself one of the slate tablets. The inset
+   shadow along the bottom edge reads as the tablet being recessed, so a row
+   cut off by the scroll boundary looks tucked into the panel rather than
+   sliced by it. */
+.spellbook-scroll {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: clamp(6px, .8cqw, 12px) clamp(6px, .8cqw, 12px) clamp(4px, .6cqw, 10px) clamp(9px, 1.1cqw, 16px);
+    box-shadow: inset 0 -16px 14px -14px rgba(0, 0, 0, .7);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(196, 175, 120, .55) transparent;
+}
+
+.spellbook-scroll::-webkit-scrollbar { width: clamp(6px, .7cqw, 10px); }
+.spellbook-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, .32);
+    border-radius: 6px;
+}
 .spellbook-scroll::-webkit-scrollbar-thumb {
-    background: rgba(150, 130, 230, 0.55);
-    border-radius: 4px;
+    background: rgba(196, 175, 120, .5);
+    border-radius: 6px;
 }
-.spellbook-scroll::-webkit-scrollbar-thumb:hover { background: rgba(180, 160, 255, 0.8); }
+.spellbook-scroll::-webkit-scrollbar-thumb:hover { background: rgba(232, 212, 160, .75); }
 
-/* Each section is a subtle framed card so groups read as distinct blocks. */
+/* ---------- 4d. SPELL GROUPS -------------------------------------------
+   Each group is a carved title bar plus the rows of tablets below it, all
+   inside the one big list panel (no nested frames). */
 .spellbook-group {
-    margin-bottom: 12px;
-    padding: 8px 9px 10px;
-    background: rgba(255, 255, 255, 0.028);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 9px;
+    margin-bottom: clamp(8px, 1cqw, 14px);
 }
 
+    .spellbook-group:last-child { margin-bottom: 0; }
+
+.spellbook-group .sb-head { margin-bottom: clamp(6px, .8cqw, 11px); }
+
+/* Legacy header (only used if the shared builder is unavailable). */
 .spellbook-group-title {
     display: flex;
     align-items: center;
     gap: 7px;
-    font-family: var(--PX, monospace);
-    font-size: 11px;
+    font-family: var(--C);
+    font-size: 12px;
     letter-spacing: .1em;
     text-transform: uppercase;
-    color: #b9c8ea;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e8e0c8;
+    border-bottom: 1px solid rgba(232, 224, 200, .18);
     padding: 2px 2px 6px;
     margin-bottom: 8px;
 }
 
-.spellbook-group-icon {
-    font-size: 13px;
-    filter: drop-shadow(0 0 5px rgba(150, 130, 255, 0.7));
-}
-
 .spellbook-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 7px;
+    /* `min(280px, 100%)` so the track can never be wider than the column it
+       sits in: with a bare 280px min, the narrow tiers (where the spell list
+       shares the frame with the charm panel) would push the entry past the
+       panel's inner edge and have it clipped by the scroll container. */
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: clamp(6px, .8cqw, 10px);
 }
 
+/* One spell row: a dark slate tablet on the panel, lifted by a highlight
+   along its top edge and a gold rim when hovered. */
 .spellbook-entry {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 7px 10px;
-    background: linear-gradient(180deg, rgba(30, 26, 46, 0.85), rgba(14, 12, 24, 0.85));
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 8px;
+    gap: clamp(8px, 1cqw, 12px);
+    padding: clamp(6px, .8cqw, 10px) clamp(9px, 1.1cqw, 14px);
+    background: linear-gradient(180deg, rgba(24, 27, 36, .96), rgba(15, 17, 24, .97));
+    border: 1px solid #3a4157;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 2px 7px rgba(0, 0, 0, .5);
     cursor: grab;
     transition: border-color .12s, background .12s, transform .08s, box-shadow .12s;
     touch-action: none;
@@ -383,15 +872,50 @@ body.skill-dragging { cursor: grabbing; user-select: none; }
 }
 
 .spellbook-entry:hover {
-    border-color: var(--accent2, #aaaaff);
-    background: linear-gradient(180deg, rgba(58, 50, 92, 0.92), rgba(24, 20, 40, 0.92));
+    border-color: rgba(245, 197, 24, .75);
+    background: linear-gradient(180deg, rgba(44, 42, 40, .96), rgba(22, 21, 22, .97));
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), 0 0 14px -4px rgba(150, 130, 255, 0.7);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1),
+                0 4px 14px rgba(0, 0, 0, .5),
+                0 0 18px -6px rgba(245, 197, 24, .6);
 }
 
-.spellbook-entry:hover::before { background: var(--accent2, #aaaaff); }
+.spellbook-entry:hover::before { background: var(--yellow); }
 
 .spellbook-entry:active { cursor: grabbing; }
+
+/* SCHOOL ACCENTS - every section passes its colour down as --sb-accent (the
+   class colour for the ownership groups, the school colour for the spell
+   schools; see js/skills/skill-spellbook.js). Entries carry it on their left
+   edge, and the section bar gets a thin underline of the same ink so the
+   loadout reads as a curated set. Groups without an explicit accent fall
+   back to the game's cyan. */
+.spellbook-group { --sb-accent: #66fcf1; }
+
+.spellbook-group .spellbook-entry::before {
+    background: color-mix(in srgb, var(--sb-accent) 55%, transparent);
+}
+
+.spellbook-group .spellbook-entry:hover::before { background: var(--yellow); }
+
+.spellbook-group .sb-head { position: relative; }
+
+.spellbook-group .sb-head::after {
+    content: '';
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    bottom: calc(-1 * clamp(2px, .35cqw, 4px));
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg,
+        transparent,
+        color-mix(in srgb, var(--sb-accent) 80%, transparent) 18%,
+        color-mix(in srgb, var(--sb-accent) 80%, transparent) 82%,
+        transparent);
+    opacity: .85;
+    pointer-events: none;
+}
 
 .spellbook-entry.is-passive,
 .spellbook-entry.is-locked {
@@ -400,7 +924,7 @@ body.skill-dragging { cursor: grabbing; user-select: none; }
     filter: grayscale(.3);
 }
 
-.spellbook-entry.is-trait { border-color: rgba(127, 224, 255, 0.28); }
+.spellbook-entry.is-trait { border-color: rgba(127, 224, 255, 0.3); }
 .spellbook-entry.is-trait .spellbook-entry-tags { color: #7fe0ff; }
 
 .spellbook-entry-icon {
@@ -430,16 +954,18 @@ body.skill-dragging { cursor: grabbing; user-select: none; }
 
 .spellbook-entry-name {
     font-family: var(--PX, monospace);
-    font-size: 12px;
-    color: #fff;
+    font-size: clamp(10px, 1.05cqw, 13px);
+    color: #f3ead2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .spellbook-entry-tags {
-    font-size: 9px;
-    color: #8fb8ff;
+    font-size: clamp(8px, .82cqw, 10px);
+    letter-spacing: .03em;
+    color: #7fded4;               /* the game's cyan accent, muted */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -447,47 +973,63 @@ body.skill-dragging { cursor: grabbing; user-select: none; }
 
 .spellbook-entry-rank {
     font-family: var(--PX, monospace);
-    font-size: 10px;
-    color: #f1c40f;
+    font-size: clamp(8px, .88cqw, 11px);
+    color: #ffe08a;
     flex: 0 0 auto;
-    padding: 1px 6px;
-    border: 1px solid rgba(241, 196, 15, 0.35);
+    padding: 2px 7px;
+    border: 1px solid rgba(245, 197, 24, .4);
     border-radius: 10px;
-    background: rgba(241, 196, 15, 0.08);
+    background: rgba(245, 197, 24, .09);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
 }
 
 .spellbook-entry-onbar {
-    color: #4fc3f7;
-    font-size: 13px;
+    color: #66fcf1;
+    font-size: clamp(11px, 1.1cqw, 14px);
     font-weight: bold;
     flex: 0 0 auto;
-    text-shadow: 0 0 6px rgba(79, 195, 247, 0.8);
+    text-shadow: 0 0 8px rgba(102, 252, 241, .75);
 }
 
-.spellbook-entry-lock { font-size: 13px; flex: 0 0 auto; }
+.spellbook-entry-lock { font-size: clamp(11px, 1.1cqw, 14px); flex: 0 0 auto; }
 
+/* FOOTER - sits on the parchment, so it uses the parchment ink palette
+   instead of the dark-panel greys, and the readable UI face rather than the
+   pixel display font (see .spellbook-hint). */
 .spellbook-footer {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 10px;
-    padding-top: 9px;
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
-    font-family: var(--PX, monospace);
-    font-size: 10px;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: #9fb4d8;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: clamp(6px, .9cqw, 12px);
+    padding-top: clamp(5px, .7cqw, 10px);
+    border-top: 1px solid rgba(74, 44, 18, .32);
+    font-family: var(--F, monospace);
+    font-size: clamp(12px, 1.2cqw, 15px);
+    letter-spacing: .02em;
+    color: #4a2c12;
+    text-shadow: 0 1px 0 rgba(255, 248, 220, .7);
 }
 
-.spellbook-footer-value { color: #f1c40f; font-weight: bold; }
+/* One label + its value, so space-between puts the groups at the two edges
+   (spell slots left, hotbar usage right). */
+.spellbook-footer-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.spellbook-footer-value { color: #8a5a12; font-weight: bold; }
 
 .spellbook-empty {
     text-align: center;
     font-family: var(--PX, monospace);
-    font-size: 12px;
-    opacity: .7;
-    padding: 24px 0;
+    font-size: clamp(9px, 1cqw, 12px);
+    line-height: 1.7;
+    color: #a99c7d;
+    padding: 24px clamp(12px, 3cqw, 40px);
 }
 
 
@@ -549,45 +1091,85 @@ body.skill-dragging { cursor: grabbing; user-select: none; }
    Moved off the class HUD so the hotbar owns all cast feedback.
    ----------------------------------------------------------------------- */
 
+/* The mana bar mirrors the health bar's recipe exactly (dark #111 track,
+   1px black border, 4px radius, bold white value-only label above) - only
+   the fill color differs: the mana blue. Structure: wrap > text + track >
+   fill (see _avatarBarsHTML in player_sprite.js). */
 .avatar-mana-bar-wrap {
     position: relative;
-    width: 120px;
-    height: 13px;
-    /* Sits ABOVE the sprite now, so the gap belongs underneath it. */
-    margin: 0 0 4px;
-    background: rgba(10, 10, 20, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 7px;
-    overflow: hidden;
     pointer-events: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    margin: 0 0 4px;
+}
+
+.avatar-mana-bar-track {
+    background: #111;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #000;
 }
 
 .avatar-mana-bar-fill {
-    position: absolute;
-    top: 0; left: 0; bottom: 0;
     width: 100%;
+    height: 100%;
     background: linear-gradient(180deg, #6ea8ff, #2c5aa0);
-    transition: width .25s ease;
+    transition: width 0.1s;
 }
 
 .avatar-mana-bar-text {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
+    text-align: center;
     font-family: var(--PX, monospace);
-    font-size: 9px;
-    color: #dce8ff;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
     letter-spacing: .04em;
     line-height: 1;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    text-shadow: 1px 1px 2px black;
+    margin-bottom: 1px;
+}
+
+/* Shared recipe for every bar value above the player sprite (HP / mana /
+   shield): one font, one size, one look - the values previously used two
+   different fonts (inline default vs the mana pixel font). The shield value
+   only recolors (and shrinks slightly). Values stay hidden until hovered -
+   the bar shape alone carries the state at a glance (see _avatarBarsHTML,
+   player_sprite.js). */
+.avatar-bar-num {
+    display: block;
+    text-align: center;
+    font-family: var(--PX, monospace);
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    letter-spacing: .04em;
+    line-height: 1.2;
+    text-shadow: 1px 1px 2px black;
+    margin-bottom: 1px;
+}
+.avatar-bar-num.avatar-bar-shield {
+    font-size: 10px;
+    color: #7fd6ff;
+}
+
+/* Bar values above the player sprite (HP / mana / shield) stay hidden
+   until hovered - the bar shape alone carries the state at a glance, and
+   the exact numbers appear on mouseover of the avatar (see
+   .avatar-bar-num in _avatarBarsHTML, player_sprite.js). */
+#player-avatar-simple .avatar-bar-num,
+#player-avatar-wrapper .avatar-bar-num {
+    opacity: 0;
+    transition: opacity .15s;
+}
+#player-avatar-simple:hover .avatar-bar-num,
+#player-avatar-wrapper:hover .avatar-bar-num {
+    opacity: 1;
 }
 
 
 /* -----------------------------------------------------------------------
-   7. NARROW VIEWPORTS — shrink the bar so it never crowds the grid.
+   7. NARROW VIEWPORTS - shrink the bar so it never crowds the grid.
    ----------------------------------------------------------------------- */
 
 @media (max-width: 700px) {
@@ -596,4 +1178,425 @@ body.skill-dragging { cursor: grabbing; user-select: none; }
     .skill-hotbar-cd { font-size: 12px; }
     .skill-hotbar-cd.is-long { font-size: 10px; }
     .skill-hotbar { gap: 3px; padding: 4px; }
+}
+
+
+
+/* -----------------------------------------------------------------------
+   8. CHARMS - spell slots, charm inventory, shards & orbs
+   ----------------------------------------------------------------------- */
+
+/* Shared charm tile: the glyph with a rank badge pinned to its corner. */
+.charm-icon {
+    position: relative;
+    display: inline-block;
+    /* Capped below the chunky end on purpose: on a big frame the glyph, the
+       padding and the two-line name together made a socket ~81px tall, which
+       pushed the slot row to 310px and starved the charm panel above it. */
+    font-size: clamp(17px, 1.9cqw, 21px);
+    line-height: 1;
+    flex: 0 0 auto;
+}
+
+.charm-glyph { filter: drop-shadow(0 0 7px rgba(245, 197, 24, .55)); }
+
+/* The rank indicator - the number of the charm's rank, drawn like a coin.
+   Pinned to the glyph's TOP-right: the slot index already owns the top-left,
+   and the bottom-right corner is where the spell name sits. */
+.charm-rank-badge {
+    position: absolute;
+    right: -6px;
+    top: -5px;
+    min-width: 14px;
+    height: 14px;
+    line-height: 12px;
+    padding: 0 2px;
+    text-align: center;
+    font-family: var(--PX, monospace);
+    font-size: 8px;
+    font-weight: bold;
+    color: #241a05;
+    background: linear-gradient(180deg, #ffe9a8, #d9a441);
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    border-radius: 7px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* ── Panel headings ──────────────────────────────────────────────────────
+   The live markup uses the carved .sb-head bar (see 4c) - these two rules
+   only cover the legacy fallback markup. */
+.charm-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--C);
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #e8e0c8;
+    padding: 2px 2px 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(232, 224, 200, .18);
+}
+
+.charm-panel-sub {
+    margin-left: auto;
+    font-size: 8px;
+    letter-spacing: .04em;
+    text-transform: none;
+    color: #a99c7d;
+}
+
+/* ── The 2 × 5 spell slots ───────────────────────────────────────────── */
+.charm-slots {
+    display: grid;
+    grid-template-columns: repeat(var(--charm-slot-cols, 5), minmax(0, 1fr));
+    gap: clamp(5px, .7cqw, 10px);
+    margin-top: clamp(6px, .8cqw, 11px);
+}
+
+/* One slot: a recessed socket cut into the slate, so an empty slot reads as
+   a place waiting for something rather than a button. Tall enough for the
+   glyph, a two-line spell name and the orb bonus underneath. */
+.charm-slot {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    /* Sized by what a socket holds (glyph, two-line name, orb bonus), not by
+       how big the frame is: pinned to the frame's width it grew to ~86px on a
+       wide frame, which made the whole row 320px tall and left the charm panel
+       above it with 150. */
+    min-height: clamp(62px, 7.2cqw, 74px);
+    padding: clamp(9px, 1.1cqw, 12px) clamp(2px, .28cqw, 4px) clamp(5px, .6cqw, 8px);
+    border: 1px dashed rgba(160, 168, 190, .28);
+    border-radius: 7px;
+    background: linear-gradient(180deg, rgba(8, 9, 13, .55), rgba(18, 20, 27, .5));
+    box-shadow: inset 0 2px 7px rgba(0, 0, 0, .6);
+    touch-action: none;
+}
+
+.charm-slot.is-empty { cursor: default; }
+
+/* Filled: the socket closes up and the rim goes gold, matching the way a
+   slotted charm reads on the hotbar and in the list. */
+.charm-slot.is-filled {
+    cursor: grab;
+    border-style: solid;
+    border-color: rgba(245, 197, 24, .5);
+    background: linear-gradient(180deg, rgba(58, 48, 24, .82), rgba(22, 20, 14, .92));
+    box-shadow: inset 0 1px 0 rgba(255, 236, 180, .16), 0 0 12px -4px rgba(245, 197, 24, .75);
+}
+
+.charm-slot.is-filled:active { cursor: grabbing; }
+
+.charm-slot.drop-target {
+    border-color: #4fc3f7;
+    box-shadow: 0 0 10px rgba(79, 195, 247, 0.8), inset 0 0 10px rgba(79, 195, 247, 0.35);
+    background: rgba(79, 195, 247, 0.16);
+}
+
+.charm-slot-index {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-family: var(--PX, monospace);
+    font-size: clamp(7px, .75cqw, 9px);
+    color: #6f7791;
+}
+
+.charm-slot.is-filled .charm-slot-index { color: #b09a63; }
+
+.charm-slot-empty { font-size: clamp(15px, 1.7cqw, 20px); color: #4d5266; }
+
+/* Slot width is a fifth of the panel, so a longer name does not fit on one
+   line - "Rain of Arrows" truncates to "Rain of …" on one line. Two wrapped
+   lines keep it whole: the break happens at a space when there is one, and a
+   single word too long for the slot is hyphen-less split as a last resort
+   ("Flamest/rike") rather than silently clipped - a wrapped word still names
+   the spell, a clipped one does not. Press Start 2P advances a full em per
+   glyph, so the size is pitched to keep eleven characters within two lines. */
+.charm-slot-name {
+    max-width: 100%;
+    font-family: var(--PX, monospace);
+    /* 8px rather than 8.5 so the two-line clamp still fits the longer spell
+       names ("Probability Bolt") at the widest frames. */
+    font-size: clamp(6.5px, .78cqw, 8px);
+    line-height: 1.3;
+    text-align: center;
+    color: #f3ead2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── Currency: Lemmas → Theorems ─────────────────────────────────────── */
+
+/* The currency strip and the rank filter live in one wrapper so that a frame
+   with little height can put them side by side instead of stacked - together
+   they were ~45px of the panel's ~130px of fixed chrome, which is what left
+   the charm list itself with almost no room on a short frame (see the
+   tight-frame block in 4a-1). */
+.charm-tools {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, .8cqw, 11px);
+    margin-top: clamp(6px, .8cqw, 11px);
+}
+
+.charm-currency {
+    display: flex;
+    gap: clamp(5px, .7cqw, 9px);
+}
+
+/* Currency reads as a pair of inlaid plaques rather than buttons: a gold rim
+   for the Lemma meter (tracks progress) and a violet one for the Theorem
+   (the spendable one), so the two are never confused at a glance. */
+.charm-currency-item {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: clamp(4px, .55cqw, 7px) clamp(6px, .8cqw, 10px);
+    border: 1px solid rgba(245, 197, 24, .35);
+    border-radius: 6px;
+    background: linear-gradient(180deg, rgba(34, 30, 18, .92), rgba(14, 16, 22, .95));
+    box-shadow: inset 0 1px 0 rgba(255, 236, 180, .1), 0 2px 6px rgba(0, 0, 0, .45);
+    font-family: var(--PX, monospace);
+    font-size: clamp(8px, .85cqw, 10px);
+    color: #d8d1bb;
+}
+
+.charm-currency-item.is-orb {
+    border-color: rgba(195, 155, 211, .5);
+    background: linear-gradient(180deg, rgba(38, 28, 46, .92), rgba(16, 14, 22, .95));
+    box-shadow: inset 0 1px 0 rgba(230, 200, 245, .12), 0 2px 6px rgba(0, 0, 0, .45);
+}
+
+.charm-currency-val { color: #ffe08a; font-weight: bold; }
+.charm-currency-max { color: #6d6d85; font-weight: normal; font-size: .8em; }
+.charm-currency-label { margin-left: auto; font-size: .8em; text-transform: uppercase; letter-spacing: .05em; }
+.charm-currency-item.is-orb .charm-currency-val { color: #d9a8ef; }
+
+/* ── "Max rank only" filter ─────────────────────────────────────────────
+   Sits above the charm list so it is always reachable without scrolling the
+   list it filters. The box is themed by hand because the browser default is
+   a light widget that would glow white on the slate tablet. */
+.charm-filter {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 2px;
+    cursor: pointer;
+    user-select: none;
+    font-family: var(--F, monospace);
+    font-size: clamp(10px, 1cqw, 13px);
+    color: #cfc7ae;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .75);
+}
+
+.charm-filter-cb {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    flex: 0 0 auto;
+    width: clamp(13px, 1.4cqw, 17px);
+    height: clamp(13px, 1.4cqw, 17px);
+    margin: 0;
+    border: 1px solid rgba(245, 197, 24, .45);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(10, 11, 16, .9), rgba(20, 22, 30, .9));
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .7);
+    cursor: pointer;
+}
+
+.charm-filter-cb:checked {
+    background: linear-gradient(180deg, #ffe9a8, #d9a441);
+    border-color: rgba(255, 236, 180, .9);
+    box-shadow: 0 0 8px -2px rgba(245, 197, 24, .8);
+}
+
+.charm-filter-cb:checked::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(10px, 1.1cqw, 13px);
+    font-weight: bold;
+    color: #241a05;
+}
+
+/* ── Charm inventory grid ────────────────────────────────────────────── */
+/* Natural height, no scroll of its own: .spellbook-charms-panel scrolls (see
+   4a), and this must not clip what that scroll is supposed to reveal. */
+.charm-inv-panel {
+    flex: 0 0 auto;
+    min-height: 0;
+    margin-top: clamp(6px, .8cqw, 11px);
+    overflow: visible;
+    /* Bottom padding so the last row clears the tablet's carved edge instead
+       of being sliced in half by it. */
+    padding: 0 clamp(4px, .5cqw, 8px) clamp(8px, 1cqw, 14px) 0;
+}
+
+.charm-inv-grid {
+    display: grid;
+    /* 190px is the width a charm row needs to show its name whole (glyph,
+       rank badge, name, orb bonus). The panels here are 250-400px wide in
+       practice, so this normally resolves to one column with readable names;
+       it only becomes two columns once the panel is genuinely wide. */
+    grid-template-columns: repeat(auto-fill, minmax(min(190px, 100%), 1fr));
+    gap: 5px;
+}
+
+/* One owned charm. Same tablet as a spell entry in the list, so the two
+   columns of the book read as the same material. */
+.charm-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* Wide enough to clear the rank badge, which hangs ~6px past the glyph's
+       right edge and would otherwise sit on the first letter of the name. */
+    gap: clamp(11px, 1.25cqw, 16px);
+    padding: clamp(4px, .5cqw, 7px) clamp(7px, .8cqw, 10px);
+    background: linear-gradient(180deg, rgba(24, 27, 36, .96), rgba(15, 17, 24, .97));
+    border: 1px solid #3a4157;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 2px 6px rgba(0, 0, 0, .45);
+    cursor: grab;
+    touch-action: none;
+    transition: border-color .12s, background .12s, box-shadow .12s;
+}
+
+.charm-item:hover {
+    border-color: rgba(245, 197, 24, .75);
+    background: linear-gradient(180deg, rgba(44, 42, 40, .96), rgba(22, 21, 22, .97));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1),
+                0 3px 12px rgba(0, 0, 0, .5),
+                0 0 16px -6px rgba(245, 197, 24, .6);
+}
+
+.charm-item:active { cursor: grabbing; }
+
+/* A charm that currently sits in a spell slot. A cyan rim on EVERY slotted
+   charm turned the list into a wall of cyan, so the state is carried by a
+   small corner tick instead - visible, quiet, and it does not compete with
+   the hover highlight or the spell name. */
+.charm-item.is-slotted { border-color: rgba(102, 252, 241, .38); }
+.charm-item.is-slotted::after {
+    content: '◆';
+    position: absolute;
+    top: 1px;
+    right: 4px;
+    font-size: 8px;
+    line-height: 1;
+    color: #66fcf1;
+    text-shadow: 0 0 6px rgba(102, 252, 241, .9);
+}
+
+.charm-item-name {
+    min-width: 0;
+    flex: 1 1 auto;
+    font-family: var(--PX, monospace);
+    font-size: clamp(8px, .9cqw, 11px);
+    color: #f3ead2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.charm-item-orbs {
+    flex: 0 0 auto;
+    font-family: var(--PX, monospace);
+    font-size: clamp(8px, .85cqw, 10px);
+    color: #7fd9ff;
+    text-shadow: 0 0 7px rgba(127, 217, 255, .6);
+}
+
+.charm-inv-empty {
+    grid-column: 1 / -1;
+    padding: 16px 6px;
+    text-align: center;
+    font-family: var(--PX, monospace);
+    font-size: clamp(8px, .9cqw, 11px);
+    line-height: 1.6;
+    color: #a99c7d;
+}
+
+/* Drag ghost carrying a charm (reuses the skill drag ghost shell). */
+.charm-drag-ghost { font-size: 26px; }
+
+/* Tooltip flavour. */
+.charm-tip .skl-tip-title { color: #f0d090; }
+
+/* -----------------------------------------------------------------------
+   9. CHARM DROPS ON THE GRID (reuses .eg-pickup-overlay)
+   -----------------------------------------------------------------------
+   Compound selectors keep these wins over the base .eg-pickup-overlay rules
+   in css/endgame/monsters.css, which loads after this file.
+   ----------------------------------------------------------------------- */
+
+.eg-pickup-overlay.eg-charm-overlay { z-index: 6; }
+
+.eg-pickup-overlay.eg-charm-overlay .charm-icon { font-size: 1em; }
+
+.eg-pickup-overlay.eg-charm-overlay .charm-rank-badge {
+    min-width: 11px;
+    height: 11px;
+    line-height: 9px;
+    font-size: 7px;
+    right: -4px;
+    bottom: -3px;
+}
+
+.eg-pickup-overlay.eg-charm-overlay.eg-charm-rank-1 {
+    filter: drop-shadow(0 0 4px rgba(176, 176, 176, 0.9));
+}
+
+.eg-pickup-overlay.eg-charm-overlay.eg-charm-rank-2 {
+    filter: drop-shadow(0 0 6px rgba(52, 152, 219, 0.95));
+}
+
+.eg-pickup-overlay.eg-charm-overlay.eg-charm-rank-3 {
+    filter: drop-shadow(0 0 7px rgba(195, 155, 211, 1));
+}
+
+.charm-floater { font-size: 26px; }
+
+/* -----------------------------------------------------------------------
+   HOLD-TO-CAST slot states (see js/skills/spell-casttime.js).
+   .has-cast marks spells that need press-and-hold (corner pip);
+   .is-casting highlights the slot while its cast bar is charging.
+   ----------------------------------------------------------------------- */
+
+.skill-hotbar-slot.has-cast::after {
+    content: '';
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .65);
+    background: radial-gradient(circle at 50% 40%, #fff 0%, #e8b04b 55%, #7a4d12 100%);
+    box-shadow: 0 0 5px rgba(232, 176, 75, .9);
+    pointer-events: none;
+}
+
+.skill-hotbar-slot.is-casting {
+    outline: 2px solid #ffd76b;
+    outline-offset: -2px;
+    box-shadow: 0 0 12px rgba(255, 215, 107, .75);
 }

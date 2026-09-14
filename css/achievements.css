@@ -21,11 +21,11 @@
    pinned above the scrollable body area.
    ------------------------------------------------------------------------- */
 
-/* MODAL SHELL — the stone/parchment frame (settings_background.png),
+/* MODAL SHELL - the stone/parchment frame (settings_background.png),
    same family as the settings / how-to-play / replay modals. Aspect-locked
    to the frame art; width is also capped by viewport HEIGHT so the frame
    always fits vertically. Content sits on the art's flat parchment area
-   (the carved border spans x 9%→91% and y 11%→90% of the asset — the
+   (the carved border spans x 9%→91% and y 11%→90% of the asset - the
    padding clamps below track those lines and cap where the box maxes out). */
 .ach-modal-box {
     position: relative;
@@ -74,7 +74,7 @@
     flex-shrink: 0;
 }
 
-/* TITLE PLAQUE — the carved stone banner (settings_title_plague.png)
+/* TITLE PLAQUE - the carved stone banner (settings_title_plague.png)
    hanging over the modal frame's top edge: its top edge aligns with the
    frame's outer edge (same top: 0 anchor as the settings/how-to-play
    plaques), so it overlaps the carved border band above the parchment. */
@@ -85,7 +85,7 @@
     transform: translateX(-50%);
     /* Sized generously so the plaque reads as a proper carved header on the
        big frame: its height tracks the modal width (cqw) up to ~120px, which
-       at full modal size spans the frame art's whole carved top band — the
+       at full modal size spans the frame art's whole carved top band - the
        same visual weight the settings plaque has on its smaller box. */
     width: max(min(46%, 560px), 340px);
     height: clamp(56px, 9cqw, 120px);
@@ -106,7 +106,7 @@
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
 
-    /* Category names can be long ("MISTAKES & COMEBACKS") — shrink the
+    /* Category names can be long ("MISTAKES & COMEBACKS") - shrink the
        label in lockstep with the plaque instead of spilling onto the taper. */
     .ach-frame-title.ach-frame-title-category {
         white-space: normal;
@@ -115,7 +115,7 @@
         font-size: min(clamp(12px, 1.8cqw, 24px), 4.2vh);
     }
 
-/* CLOSE BUTTON — the stone square with the X icon, pinned inside the
+/* CLOSE BUTTON - the stone square with the X icon, pinned inside the
    frame's top-right corner (same 2%/2% anchor as every modal in the
    settings family, so it sits symmetric to the carved border). */
 .ach-modal-box .modal-close {
@@ -141,7 +141,7 @@
         transform: scale(1.06);
     }
 
-/* FOOTER STRIP — reset button centered on the parchment's bottom edge. */
+/* FOOTER STRIP - reset button centered on the parchment's bottom edge. */
 .ach-frame-footer {
     flex-shrink: 0;
     display: flex;
@@ -160,7 +160,7 @@
     background-repeat: no-repeat;
     background-color: transparent;
     border: none;
-    /* Full frame width: the label always sits on the art's flat middle —
+    /* Full frame width: the label always sits on the art's flat middle -
        its carved side notches (outer ~5–9% each side) stay text-free even
        at the widest size. */
     width: 100%;
@@ -179,7 +179,7 @@
         transform: translateY(1px);
     }
 
-/* Scroll panel inside the frame — the frame's inner parchment area. */
+/* Scroll panel inside the frame - the frame's inner parchment area. */
 .ach-body {
     flex: 1;
     min-height: 0;
@@ -204,7 +204,7 @@
 /* Carved banner holding the grand totals above the category grid.
    Art: the warm carved-stone banner (inference-header.png), gold serif on it.
    Kept at the art's natural aspect (955/260, same treatment as the highscores
-   title plaque) so the carved roll ends aren't squashed — it reads as a real
+   title plaque) so the carved roll ends aren't squashed - it reads as a real
    carved stone slab instead of a thin stretched strip. */
 .ach-total-banner {
     position: relative;
@@ -228,7 +228,7 @@
 
 /* -- Grand-totals banner label: the text itself may wrap to two lines
    ("TOTAL MILESTONES" at narrow widths) while the counters stay vertically
-   centered — the label flex item stretches the banner's full height and the
+   centered - the label flex item stretches the banner's full height and the
    inner span centers itself within it. -- */
 .ach-total-banner-label {
     flex: 1;
@@ -299,7 +299,7 @@
 
 /* Responsive grid: 3 columns so the cards get real width (wider cards keep
    the stat rows clear of the category artwork). Breakpoints are CONTAINER
-   queries against the modal itself — viewport media queries would misjudge
+   queries against the modal itself - viewport media queries would misjudge
    whenever the viewport is much wider than the frame. */
 .ach-cat-grid {
     display: grid;
@@ -375,7 +375,7 @@
     border: 1px solid var(--border);
 }
 
-/* -- Progress bar: fill — defaults to yellow for the achievements bar -- */
+/* -- Progress bar: fill - defaults to yellow for the achievements bar -- */
 .ach-progress-bar-inner {
     height: 100%;
     background: var(--yellow);
@@ -396,12 +396,12 @@
    with a header strip and a responsive card grid below it.
    ------------------------------------------------------------------------- */
 
-/* Outer wrapper for a single category — provides bottom spacing */
+/* Outer wrapper for a single category - provides bottom spacing */
 .ach-category {
     margin-bottom: 28px;
 }
 
-/* Header strip for a category — left accent stripe + bottom border */
+/* Header strip for a category - left accent stripe + bottom border */
 .ach-category-header {
     display: flex;
     align-items: center;
@@ -418,7 +418,7 @@
     font-size: 16px;
 }
 
-/* Category title — pixel font, takes remaining width */
+/* Category title - pixel font, takes remaining width */
 .ach-category-name {
     font-family: var(--PX);
     font-size: 11px;
@@ -437,7 +437,7 @@
 
 /* Responsive grid: fills width, minimum card width 500px.
    (The category DETAIL view overrides this with fixed column tiers so its
-   parchment stripes stay aligned — see the stripe rules further down.) */
+   parchment stripes stay aligned - see the stripe rules further down.) */
 .ach-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
@@ -453,7 +453,7 @@
    their unlock state. State-specific colours live in CARD STATE VARIANTS.
    ------------------------------------------------------------------------- */
 
-/* Card shell — vertical flex column, subtle border transition on hover */
+/* Card shell - vertical flex column, subtle border transition on hover */
 .ach-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -465,7 +465,7 @@
     position: relative;
 }
 
-    /* Default hover — brighten the border slightly */
+    /* Default hover - brighten the border slightly */
     .ach-card:hover {
         border-color: var(--accent2);
     }
@@ -477,7 +477,7 @@
     gap: 12px;
 }
 
-/* Large emoji / icon — fixed size, never shrinks */
+/* Large emoji / icon - fixed size, never shrinks */
 .ach-card-icon {
     font-size: 28px;
     flex-shrink: 0;
@@ -490,7 +490,7 @@
     min-width: 0; /* allows text to truncate inside a flex child */
 }
 
-/* Achievement name — pixel font, accent color */
+/* Achievement name - pixel font, accent color */
 .ach-card-name {
     font-family: var(--PX);
     font-size: 11px;
@@ -506,7 +506,7 @@
     line-height: 1.5;
 }
 
-/* "Earned on …" timestamp — only visible once at least one tier is unlocked */
+/* "Earned on …" timestamp - only visible once at least one tier is unlocked */
 .ach-card-earned {
     font-family: var(--PX);
     font-size: 15px;
@@ -521,19 +521,19 @@
    -------------------------CARD STATE VARIANTS-----------------------------
    -------------------------------------------------------------------------
    Three mutually exclusive states that are applied to .ach-card via JS:
-     .locked  — no tier earned yet   → dimmed opacity, default styling
-     .partial — some tiers earned    → orange accent border & progress
-     .complete— all tiers earned     → gold border, glow, gradient background
+     .locked  - no tier earned yet   → dimmed opacity, default styling
+     .partial - some tiers earned    → orange accent border & progress
+     .complete- all tiers earned     → gold border, glow, gradient background
    All state-driven color overrides for child elements also live here
    so the full visual effect of each state is in one readable place.
    ------------------------------------------------------------------------- */
 
-/* LOCKED — card is dimmed to signal nothing has been earned yet */
+/* LOCKED - card is dimmed to signal nothing has been earned yet */
 .ach-card.locked {
     opacity: 0.55;
 }
 
-/* PARTIAL — at least one tier earned; orange signals "in progress" */
+/* PARTIAL - at least one tier earned; orange signals "in progress" */
 .ach-card.partial {
     border-color: var(--orange);
 }
@@ -552,7 +552,7 @@
         color: var(--orange);
     }
 
-/* COMPLETE — all tiers earned; full gold treatment with glow */
+/* COMPLETE - all tiers earned; full gold treatment with glow */
 .ach-card.complete {
     border-color: var(--yellow);
     background: linear-gradient(160deg, var(--surface) 70%, rgba(253,215,0,0.06) 100%);
@@ -583,27 +583,27 @@
    and which ones have been earned. Each dot is .earned or .locked.
    ------------------------------------------------------------------------- */
 
-/* Row of dots — wraps if there are many tiers */
+/* Row of dots - wraps if there are many tiers */
 .ach-tier-dots {
     display: flex;
     gap: 5px;
     flex-wrap: wrap;
 }
 
-/* Individual dot — no pointer cursor since it's display-only */
+/* Individual dot - no pointer cursor since it's display-only */
 .ach-tier-dot {
     font-size: 14px;
     cursor: default;
     transition: color 0.15s;
 }
 
-    /* Earned tier — gold with a soft glow */
+    /* Earned tier - gold with a soft glow */
     .ach-tier-dot.earned {
         color: var(--yellow);
         text-shadow: 0 0 6px rgba(253,215,0,0.5);
     }
 
-    /* Locked tier — muted border color so it reads as inactive */
+    /* Locked tier - muted border color so it reads as inactive */
     .ach-tier-dot.locked {
         color: var(--border2);
     }
@@ -632,7 +632,7 @@
     border: 1px solid var(--border);
 }
 
-/* -- Bar fill — purple is the default for locked cards --
+/* -- Bar fill - purple is the default for locked cards --
    Color is overridden to orange (partial) or yellow (complete)
    by the rules in CARD STATE VARIANTS above.                   */
 .ach-card-progress-bar-inner {
@@ -650,7 +650,7 @@
 }
 
     /* <em> wraps the tier name in the label; color is overridden per state
-   in CARD STATE VARIANTS — this default covers the locked state only.  */
+   in CARD STATE VARIANTS - this default covers the locked state only.  */
     .ach-card-progress-label em {
         color: var(--purple);
         font-style: normal;
@@ -764,7 +764,7 @@
 
 /* Stat rows run across the FULL card width at the panel's bottom, on a
    darkened plate so the numbers stay readable over any artwork. No more
-   left-column squeeze — artwork and stats never share a row. */
+   left-column squeeze - artwork and stats never share a row. */
 .ach-cat-card-rows {
     position: absolute;
     left: 0;
@@ -847,7 +847,7 @@
     margin: 0 auto;
 }
 
-/* Back button — the unified .back-btn stone slab (base.css).
+/* Back button - the unified .back-btn stone slab (base.css).
    .ach-cat-back-btn remains as an alias for older markup. */
 .ach-cat-back-btn {
     font-size: clamp(11px, 1.15cqw, 14px);
@@ -860,7 +860,7 @@
         filter: brightness(0.95);
     }
 
-/* -- Detail topbar: one single row — back button on the left, the category
+/* -- Detail topbar: one single row - back button on the left, the category
    artwork beside it, progress numbers pushed to the right edge. The
    completion bar renders underneath as a full-width row; the category name
    itself lives on the modal's title plaque. -- */
@@ -907,7 +907,7 @@
 
 /* -- Achievement cards inside the detail view --
    NO image texture: alternating parchment stripes like the how-to-play
-   modal's section cards (css/modals.css .tut-section) — light tint and a
+   modal's section cards (css/modals.css .tut-section) - light tint and a
    deeper parchment tint alternate row by row across the grid. All text
    colors flip to the dark-ink parchment scheme for readability.
 
@@ -938,7 +938,7 @@
 
     /* 2nd, 4th, … rows get the deeper parchment tint, mirroring the
        how-to-play modal's stripes. The cycle follows .ach-grid's fixed
-       column count — 3/2/1 columns at the same container tiers — so all
+       column count - 3/2/1 columns at the same container tiers - so all
        cards of a row share one tint at every width:
          3 columns → a row is 3 cards → even rows are the 6n+4/5/6 cycle
          2 columns → a row is 2 cards → even rows are the 4n+3/4 cycle
@@ -1067,7 +1067,7 @@
    Visibility is toggled by adding / removing the .show class via JS.
    ------------------------------------------------------------------------- */
 
-/* Toast container — parked off-screen to the right by default */
+/* Toast container - parked off-screen to the right by default */
 #ach-toast {
     position: fixed;
     top: 250px;
@@ -1103,7 +1103,7 @@
     filter: drop-shadow(0 0 6px rgba(253,215,0,0.6));
 }
 
-/* Text column — allows truncation if the name is very long */
+/* Text column - allows truncation if the name is very long */
 .ach-toast-text {
     flex: 1;
     min-width: 0;
@@ -1118,14 +1118,14 @@
     margin-bottom: 4px;
 }
 
-/* Achievement name line — muted base color with an accented em for the tier */
+/* Achievement name line - muted base color with an accented em for the tier */
 .ach-toast-name {
     font-size: 12px;
     color: var(--accent2);
     line-height: 1.4;
 }
 
-    /* <em> wraps the tier name inside the toast — brighter accent color */
+    /* <em> wraps the tier name inside the toast - brighter accent color */
     .ach-toast-name em {
         color: var(--accent);
         font-style: normal;

@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 //-------------------ATLAS BOSS ROSTER (86 regions → 86 bosses)------------
 //------------------------------------------------------------------------
-// One specific boss per atlas region — no random rolls. Region ids are
+// One specific boss per atlas region - no random rolls. Region ids are
 // `atlas_t{tier}_{slot}` (slot = order in EG_ATLAS_TIER_NAMES).
 //
 // Difficulty rises with tier: outer tiers (T1–T5) hold simple, readable
@@ -16,7 +16,7 @@
 //------------------------------------------------------------------------
 
 const EG_ATLAS_REGION_BOSSES = {
-    // ── Tier 1 — first steps (simple, forgiving) ──
+    // ── Tier 1 - first steps (simple, forgiving) ──
     'atlas_t1_0': 'boss_ember',
     'atlas_t1_1': 'boss_snail',
     'atlas_t1_2': 'boss_jelly',
@@ -106,21 +106,21 @@ const EG_ATLAS_REGION_BOSSES = {
     'atlas_t14_1': 'boss_arbiter',
     'atlas_t14_2': 'boss_exarch',
     'atlas_t14_3': 'boss_maven',
-    // ── Tier 15 — pinnacle approach (brutal, two signatures each) ──
+    // ── Tier 15 - pinnacle approach (brutal, two signatures each) ──
     'atlas_t15_0': 'boss_nemesis',
     'atlas_t15_1': 'boss_oblivion',
     'atlas_t15_2': 'boss_juggernaut',
     'atlas_t15_3': 'boss_stormqueen',
     'atlas_t15_4': 'boss_dreadnought',
     'atlas_t15_5': 'boss_warlord',
-    // ── Tier 16 — pinnacle (the four hardest fights) ──
+    // ── Tier 16 - pinnacle (the four hardest fights) ──
     'atlas_t16_0': 'boss_seraph',
     'atlas_t16_1': 'boss_chaos',
     'atlas_t16_2': 'boss_voidborn',
     'atlas_t16_3': 'boss_zenith',
 };
 
-// This is the last boss file to load — validate every mechanic handler
+// This is the last boss file to load - validate every mechanic handler
 // name once so a typo surfaces at boot (console warning) instead of
 // silently disabling a mechanic mid-fight.
 if (typeof _egValidateAllBossHandlers === 'function') _egValidateAllBossHandlers();

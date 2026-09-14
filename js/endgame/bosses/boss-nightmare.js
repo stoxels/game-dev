@@ -2,7 +2,7 @@
 //-------------------BOSS: THE NIGHTMARE (boss_nightmare)-----------------------
 //------------------------------------------------------------------------
 // Lights-out hunt: the arena drowns in darkness and something fast starts
-// circling. You can barely see it — but you can hear the toast warnings,
+// circling. You can barely see it - but you can hear the toast warnings,
 // and the dark itself only tickles. The teeth are the thing in the black.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

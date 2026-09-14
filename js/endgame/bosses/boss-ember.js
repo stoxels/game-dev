@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------
 // First-steps fight: slow embers drift straight down with generous
 // telegraphs. Teaches "watch the warnings, keep drifting".
-// Every ember that touches the player ignites them — it IS a flame, and
+// Every ember that touches the player ignites them - it IS a flame, and
 // the boss itself shrugs off fire damage at the 75% resistance cap.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -47,7 +47,7 @@ function _egMechEmberDrift(monster, phase) {
     const speed = [0, 90, 110, 135][p];
     // %maxHP per contact. Tuned after the hit-detection fix: every visible
     // flame contact now lands AND ignites, so per-hit damage sits lower than
-    // the old miss-heavy values — a caught (standing-in-lane) player loses
+    // the old miss-heavy values - a caught (standing-in-lane) player loses
     // roughly a quarter of their HP per wave, a drifting player ~nothing.
     const dmgPct = [0, 0.04, 0.05, 0.06][p];
     const run = _egNkNewRun(monster && monster.id, true);

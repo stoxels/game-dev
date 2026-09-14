@@ -1,4 +1,4 @@
-﻿/* ── Endgame Objectives — Top-Center Single Line ─────────────── */
+﻿/* ── Endgame Objectives - Top-Center Single Line ─────────────── */
 #eg-objectives-strip {
     position: fixed;
     top: 10px;
@@ -80,7 +80,7 @@
     transform: scale(0.97);
 }
 
-/* Enter Boss Arena — red danger pulse */
+/* Enter Boss Arena - red danger pulse */
 .eg-obj-action-boss {
     background: linear-gradient(180deg, #3d1212, #2b0d0d);
     color: #f87171;
@@ -101,7 +101,7 @@
     50%      { box-shadow: 0 0 14px rgba(248, 113, 113, 0.55); }
 }
 
-/* Complete Map — green highlighted, strong pulse when ready */
+/* Complete Map - green highlighted, strong pulse when ready */
 .eg-obj-action-complete {
     background: linear-gradient(180deg, #143522, #0d2b1a);
     color: #4ade80;
@@ -123,7 +123,7 @@
     50%      { box-shadow: 0 0 22px rgba(74, 222, 128, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
 }
 
-/* Trigger Question — blue accent pulse */
+/* Trigger Question - blue accent pulse */
 .eg-obj-action-question {
     background: linear-gradient(180deg, #11264a, #0a1a36);
     color: #7fb8ff;
@@ -145,7 +145,7 @@
     50%      { box-shadow: 0 0 22px rgba(127, 184, 255, 0.7), inset 0 1px 0 rgba(255,255,255,0.1); transform: scale(1.03); }
 }
 
-/* Locked Complete Map — dim, no pulse */
+/* Locked Complete Map - dim, no pulse */
 .eg-obj-action-locked {
     background: #1e293b;
     color: #64748b;
@@ -390,7 +390,7 @@
     Brief overlay centered over the puzzle grid when
     the timer crosses 5 min (300s), 2 min (120s) and
     30s remaining. Works in both endgame and normal
-    levels — same placement/animation as the other
+    levels - same placement/animation as the other
     center-grid warning banners. */
 #eg-low-time-warning-banner {
     position: fixed;

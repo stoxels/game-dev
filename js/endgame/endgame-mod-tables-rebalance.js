@@ -1,8 +1,8 @@
 //  endgame-mod-tables-rebalance.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Post-load attribute affix rebalance — evals every EG_MOD_TABLE_*.
+//  Post-load attribute affix rebalance - evals every EG_MOD_TABLE_*.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //========================================================================
 //-------------------ATTRIBUTE AFFIX REBALANCE (2026)---------------------

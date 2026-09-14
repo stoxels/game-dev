@@ -226,7 +226,7 @@ function _bayesTrapPlacementClick(row, col) {
     const state = window._bayesTrapsState;
     if (!state || state.phase !== 'place') return false;
 
-    // All slots already placed — absorb the click but do nothing
+    // All slots already placed - absorb the click but do nothing
     if (state.currentTrapIdx >= state.trapCount) return true;
 
     // Record the placement position for this trap slot
@@ -241,7 +241,7 @@ function _bayesTrapPlacementClick(row, col) {
     state.currentTrapIdx++;
 
     if (state.currentTrapIdx >= state.trapCount) {
-        // All traps placed — remove the hand follower but keep the fuse ticking on the grid
+        // All traps placed - remove the hand follower but keep the fuse ticking on the grid
         document.getElementById('bayes-trap-cursor-follower')?.remove();
         showToast(t('cls_traps_placed').replace('{n}', state.placedCount));
         trackAchStat('bayesTrapsAllPlaced');
@@ -344,7 +344,7 @@ function _bayesTrapsCancel() {
         // Penalties apply even on manual cancel during placement
         _bayesTrapsApplyUnplacedPenalty(state.trapsQueue);
     } else {
-        // Cancelled before placement started — just reset cooldown cleanly
+        // Cancelled before placement started - just reset cooldown cleanly
         _setAbilityMode(false);
         const cd = cooldownState['active3'];
         if (cd?.interval) { clearInterval(cd.interval); cd.interval = null; }

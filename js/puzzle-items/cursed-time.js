@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------CURSED TIME — CURSED CLOCK----------------------
+//-------------------CURSED TIME - CURSED CLOCK----------------------
 //------------------------------------------------------------------------
 
-// cursedTime — adds 20 min to the timer; downside blacks out all clues.
+// cursedTime - adds 20 min to the timer; downside blacks out all clues.
 function _useCursedTime(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -38,7 +38,7 @@ function _fxMakeFogTendrils(container, r) {
     });
 }
 
-// 💀 Cursed Time — dark miasma + clock hands spin wildly.
+// 💀 Cursed Time - dark miasma + clock hands spin wildly.
 function _fxCursedTime() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

@@ -5,31 +5,31 @@
 // matter how many pieces you cut off.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE WINDING COLONY — the centipede itself never leaves: a segmented
+//   • THE WINDING COLONY - the centipede itself never leaves: a segmented
 //     body (5/7/9 segments per phase) sinuously winds around the arena,
 //     homing loosely toward the player. Touching any segment is a physical
 //     hit. Cutting through the fight means dodging it constantly.
-//   • BURROW HOLES — after Molt, dirt holes surface at random spots and
+//   • BURROW HOLES - after Molt, dirt holes surface at random spots and
 //     stay open for a while. Stand on one to bait the molt mini-centipede
 //     (it homes onto you): if it reaches the hole you're in, it buries
 //     itself and is gone for 15s. Standing in a hole while it BURIES is
-//     harmless — but the hole then collapses and closes for a while.
+//     harmless - but the hole then collapses and closes for a while.
 //
 //   HP GATES (watcher):
-//   • 60% — EXOSKELETON: the boss sheds chitin plates that orbit it in a
-//     wide ring (visible telegraph) — the plates spin outward in a
+//   • 60% - EXOSKELETON: the boss sheds chitin plates that orbit it in a
+//     wide ring (visible telegraph) - the plates spin outward in a
 //     rotating spiral wave you have to weave through, twice.
-//   • 30% — MOLT: the centipede STOPS, swells visibly, then splits: the
+//   • 30% - MOLT: the centipede STOPS, swells visibly, then splits: the
 //     back half detaches and becomes a second, faster mini-centipede for
 //     the rest of the fight, while the main body enrages (faster winding,
 //     more segments).
 //
-//   FINALE — every phase, the boss periodically spits a VENOM BURST: a
+//   FINALE - every phase, the boss periodically spits a VENOM BURST: a
 //   target ring on the player, then a splash of venom blobs that leave
 //   short-lived toxic pools. At 30%+, venom rain joins in (falling drops
 //   with target rings).
 //
-//   CHARGE ATTACK — CENTIPEDE STAMPEDE: the boss's charged attack is a
+//   CHARGE ATTACK - CENTIPEDE STAMPEDE: the boss's charged attack is a
 //   full-screen horizontal dash: a 1s telegraph band at the player's row,
 //   then the whole colony stampedes across it (heavy physical hit).
 //
@@ -75,7 +75,7 @@ const EG_CENT_MOLT_SPEED = 1.35;          // main body speed × after molt
 const EG_CENT_SEG_DMG = [0, 0.05, 0.06, 0.07]; // %maxHP per segment touch
 const EG_CENT_SEG_CD_MS = 700;            // global segment-touch cooldown
 // Burrow holes (post-molt): safe holes that bait the molt mini-centipede
-// into burying itself. Standing on one is harmless — but the hole collapses
+// into burying itself. Standing on one is harmless - but the hole collapses
 // when the mini buries (or expires) and reopens after a while.
 const EG_CENT_MOUND_INTERVAL_MS = [0, 8000, 6200, 4600]; // per boss phase
 const EG_CENT_MOUND_R = 58;               // hole radius (visual + bait check)
@@ -95,7 +95,7 @@ const EG_CENT_SHELL_CD_MS = 500;          // global plate-hit cooldown
 // Molt (30% gate)
 const EG_CENT_MOLT_SWELL_MS = 2200;       // visible swell telegraph
 const EG_CENT_MOLT_MINI_SEGS = 4;         // the detached back half
-const EG_CENT_MOLT_MINI_SPEED = 175;      // px/s — faster than base phase 1
+const EG_CENT_MOLT_MINI_SPEED = 175;      // px/s - faster than base phase 1
 // Venom
 const EG_CENT_VENOM_INTERVAL_MS = [0, 11000, 8500, 6000]; // per boss phase
 const EG_CENT_VENOM_WARN_MS = 1050;       // target ring telegraph
@@ -130,7 +130,7 @@ function _egCentipedeTeardown() {
     _egCentWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
-    // watcher BEFORE this runs — the overlays must go either way.
+    // watcher BEFORE this runs - the overlays must go either way.
     _egCentipedeSweep();
 }
 
@@ -151,7 +151,7 @@ function _egCentSpawnBody(st, cls, n, label, anchor) {
 // Advances one body along a sine path biased toward the player.
 // segHitDmg: %maxHP per touch; null = visual only.
 // body.lock (set on a baited resurface) makes the head charge STRAIGHT at
-// the locked point at full speed — no wobble, no turn delay — so a player
+// the locked point at full speed - no wobble, no turn delay - so a player
 // who baited the pop-out gets a crisp, funnelable charge out of it.
 function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
     const W = window.innerWidth, H = window.innerHeight;
@@ -221,7 +221,7 @@ function _egCentipedeArenaInit(monster) {
         gate60Done: false, gate30Done: false, molted: false,
         everLive: false, bornAt: performance.now(),
     };
-    _egCentWatcher = st;        _egNkToast('eg_cent_intro', '🐛 The Centipede: The colony infests the arena — cut it down!');
+    _egCentWatcher = st;        _egNkToast('eg_cent_intro', '🐛 The Centipede: The colony infests the arena - cut it down!');
     // Tier-scaled clock: mound/venom/shell telegraphs breathe with tier.
     // Passive run: lives the whole fight without hogging _egNkDodgeBusy().
     const run = _egNkNewRun(monsterId, true);
@@ -264,7 +264,7 @@ function _egCentipedeArenaInit(monster) {
         _egCentAdvance(st, st.body, dtS, now, pr, spd, EG_CENT_SEG_DMG[p]);
         if (st.mini) _egCentAdvance(st, st.mini, dtS, now, pr, EG_CENT_MOLT_MINI_SPEED, EG_CENT_SEG_DMG[p] * 0.8);
         // The mini-centipede crawling over an OPEN hole buries itself for
-        // EG_CENT_MOLT_BURY_MS — the rewarded relief from the chase. It
+        // EG_CENT_MOLT_BURY_MS - the rewarded relief from the chase. It
         // homes onto the player, so guide it by standing in a hole.
         if (st.mini && now >= (st.miniBuryGraceUntil || 0)) {
             const hole = _egCentMoundHit(st, st.mini);
@@ -278,7 +278,7 @@ function _egCentipedeArenaInit(monster) {
                 try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
             }
         }
-        // After a burial, the mini breaks back out at a random edge — a
+        // After a burial, the mini breaks back out at a random edge - a
         // rumbling dirt mound telegraphs the exact spot 1s before it pops
         // out. Steer clear (the pop-out bursts for damage if you stand on
         // it) or use the warning to pre-position your next bait.
@@ -297,9 +297,9 @@ function _egCentipedeArenaInit(monster) {
             try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
         }
         // Bait: while the telegraph is live, standing NEAR the mound primes
-        // the pop-out — the mini bursts out in a committed straight charge
+        // the pop-out - the mini bursts out in a committed straight charge
         // at you, so you can funnel it over a nearby open hole. (Standing ON
-        // the mound still eats the pop-out burst — bait from just outside.)
+        // the mound still eats the pop-out burst - bait from just outside.)
         if (st.resurfEl && st.miniBuriedUntil && now < st.miniBuriedUntil) {
             const c = _egNkPlayerCenter();
             const bait = c && Math.hypot(c.x - st.resurfAnchor.x, c.y - st.resurfAnchor.y) <= EG_CENT_RESURF_BAIT_R;
@@ -308,7 +308,7 @@ function _egCentipedeArenaInit(monster) {
                 st.resurfBait = { x: c.x, y: c.y };
                 if (!st.resurfBaitWarned) {
                     st.resurfBaitWarned = true;
-                    _egNkToast('eg_cent_resurf_bait', '🧲 Bait ready! The mini will pop out straight at you — lure it into a hole!');
+                    _egNkToast('eg_cent_resurf_bait', '🧲 Bait ready! The mini will pop out straight at you - lure it into a hole!');
                 }
             } else {
                 st.resurfBait = null;
@@ -324,7 +324,7 @@ function _egCentipedeArenaInit(monster) {
             st.resurfAnchor = null;
             st.resurfWarned = false;
             // Pop-out burst: standing on the telegraphed spot when it
-            // erupts hurts — the old geyser language (dodge the rumble or
+            // erupts hurts - the old geyser language (dodge the rumble or
             // eat the hit), now punishing camping the resurface point.
             if (pr && _egNkCircleHit(anchor.x, anchor.y, EG_CENT_MOUND_R, pr, 0)) {
                 const dealt = _egNkHit(EG_CENT_RESURFACE_DMG, null, st.level);
@@ -451,7 +451,7 @@ function _egCentMound(st, now) {
     // First hole ever → teach the mechanic once, right where it becomes
     // relevant (holes only exist after the Molt).
     if (!st.mounds.length) {
-        _egNkToast('eg_cent_holes_hint', '🕳️ Burrow holes open — lure the mini centipede into one!');
+        _egNkToast('eg_cent_holes_hint', '🕳️ Burrow holes open - lure the mini centipede into one!');
     }
     st.mounds.push({ x, y, t: 0, closed: false, el });
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
@@ -484,7 +484,7 @@ function _egCentMoundHit(st, body) {
 
 
 // ── 60% gate: Exoskeleton ───────────────────────────────────────────────
-// Chitin plates orbit the boss, then spiral outward — weave the gaps.
+// Chitin plates orbit the boss, then spiral outward - weave the gaps.
 function _egCentShell(st, now) {
     if (st.shell) return;
     const c = _egNkPlayerCenter();
@@ -506,7 +506,7 @@ function _egCentShell(st, now) {
     st.shellCd = 0;
     // Delay: plates start expanding after a short beat.
     st.shell.plates.forEach(pl => { pl.vrStart = performance.now() + pl.delay; });
-    _egNkToast('eg_cent_shell', '🛡️ EXOSKELETON! Chitin plates spiral out — weave the gaps!');
+    _egNkToast('eg_cent_shell', '🛡️ EXOSKELETON! Chitin plates spiral out - weave the gaps!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
 }
 
@@ -531,17 +531,17 @@ function _egCentMolt(st, now) {
         // Short grace so a hole that happens to open right on the fresh
         // mini can't bury it before the player ever baited it.
         s.miniBuryGraceUntil = performance.now() + 2500;
-        _egNkToast('eg_cent_molt', '🦋 MOLT! The colony splits — lure the mini into a burrow hole!');
+        _egNkToast('eg_cent_molt', '🦋 MOLT! The colony splits - lure the mini into a burrow hole!');
         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_skitter'); } catch (e) {}
     }, EG_CENT_MOLT_SWELL_MS);
-    _egNkToast('eg_cent_molt_swell', '🐛 The Centipede swells — its shell is cracking!');
+    _egNkToast('eg_cent_molt_swell', '🐛 The Centipede swells - its shell is cracking!');
 }
 
 
 // ── Venom burst ─────────────────────────────────────────────────────────
 function _egCentVenomBurst(st, now) {
     const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    _egNkToast('eg_cent_venom', '🟢 VENOM BURST! Clear the ring — the splash leaves pools!');
+    _egNkToast('eg_cent_venom', '🟢 VENOM BURST! Clear the ring - the splash leaves pools!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_venom'); } catch (e) {}
     const ring = _egNkEl(st.run, 'div', 'eg-cent-ring');
     ring.style.left = c.x + 'px';
@@ -613,6 +613,6 @@ function _egCentStampede(monster) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled crossing is now the persistent arena — keep the handler
+// The old scheduled crossing is now the persistent arena - keep the handler
 // name alive so any stale schedule entry no-ops instead of erroring.
 function _egMechCentipedeCross() { void 0; }

@@ -2,7 +2,7 @@
 //-------------------BOSS: THE HUNTER (boss_hunter)-----------------------------
 //------------------------------------------------------------------------
 // Ambush-predator homage: three seekers sleep in the arena, harmless as
-// stones — until you come close. Then they ignite, scream inward, and burn
+// stones - until you come close. Then they ignite, scream inward, and burn
 // out. Feed them distance and they starve.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

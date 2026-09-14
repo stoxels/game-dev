@@ -282,7 +282,7 @@
     animation: ascension-pulse 2.5s ease-in-out infinite;
 }
 
-    /* Nexus Point card + badge — same frame as Ascension, cyan instead of purple */
+    /* Nexus Point card + badge - same frame as Ascension, cyan instead of purple */
     .level-card.nexus-point {
         border-color: #7fd4ff;
         background: linear-gradient(160deg, var(--surface) 60%, rgba(127, 212, 255, 0.12) 100%);
@@ -312,7 +312,7 @@
 }
 
 
-/* MAX badge — shown when a level has been beaten on Hard + all 3 modifiers */
+/* MAX badge - shown when a level has been beaten on Hard + all 3 modifiers */
 
 
 .lc-max-badge {
@@ -740,6 +740,7 @@ A thin meta-bar sits at the very top of the game content (inside the scroll area
 
 #puzzle-scaler-wrap {
     position: relative;
+    z-index: 10; /* above the monster spawn layers (z 1) so grid cells always win clicks */
     overflow-x: auto;
     overflow-y: visible;
     max-width: 100vw;
@@ -768,7 +769,7 @@ A thin meta-bar sits at the very top of the game content (inside the scroll area
 }
 
 
-/* Timer + hint — centered above puzzle */
+/* Timer + hint - centered above puzzle */
 .puzzle-hud {
     display: flex;
     flex-direction: column;
@@ -882,14 +883,14 @@ A thin meta-bar sits at the very top of the game content (inside the scroll area
 /*
     ------------------------------------------------------------------------
     CONVERGENCE MODAL
-    Milestone reward dialog — green convergence theme with a framed panel,
+    Milestone reward dialog - green convergence theme with a framed panel,
     glowing point badge, corner accents, and a subtle entrance animation.
     ------------------------------------------------------------------------
 */
 
 /*
     ------------------------------------------------------------------------
-    CONVERGENCE MODAL — two-page book composition
+    CONVERGENCE MODAL - two-page book composition
     Built from the images/Convergence_Screen PNG set. The outer frame and the
     open book are layered; the two pages hold the milestone content.
     ------------------------------------------------------------------------

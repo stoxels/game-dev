@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BELT (boss_belt)---------------------------------
 //------------------------------------------------------------------------
-// Asteroid-belt homage: three great rocks tumble through the arena — and
+// Asteroid-belt homage: three great rocks tumble through the arena - and
 // every few seconds each one splits into two fast shards. Kill the clock,
 // not the rocks: everything fades, but not before it multiplies.
 // This file holds EVERYTHING this boss needs in one place:

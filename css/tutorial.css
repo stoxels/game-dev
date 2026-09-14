@@ -13,7 +13,7 @@
 }
 
 /* Locked to the tutorial screenshots' native ratio (1376x768), same fix
-   as .title-canvas — keeps step.box/arrowTo percentages accurate at any
+   as .title-canvas - keeps step.box/arrowTo percentages accurate at any
    viewport size. */
 .tut-canvas {
     position: relative;
@@ -36,7 +36,7 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* safe now — canvas ratio matches image ratio */
+    object-fit: cover; /* safe now - canvas ratio matches image ratio */
 }
 
 .tut-arrow-svg {
@@ -159,3 +159,393 @@
             border-color: var(--accent2);
             background: rgba(0,220,220,.04);
         }
+
+/* ── Interactive tutorial quest ── */
+
+/* Professor avatar + speech bubble - right of the puzzle grid. The bubble
+   reuses the player's banter bubble (.char-speech-bubble in game.css) for
+   the comic look and pop transition; only anchoring differs (it lives in
+   the fixed #tq-professor-wrap instead of being positioned by JS). */
+#tq-professor-wrap {
+    position: fixed;
+    right: 18px;
+    top: 39%;            /* above the monster target bar on combat levels */
+    transform: translateY(-50%);
+    z-index: 1600;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+}
+
+/* Puzzle-3 drag lesson: while the spellbook modal (z 10000) is open, lift
+   the Professor ABOVE it so the assignment stays visible while dragging.
+   Scoped to the tutorial body class so the rest of the game never changes. */
+body.tq-spellbook-open #tq-professor-wrap {
+    z-index: 10050;
+}
+body.tq-spellbook-open #tq-pointer-svg {
+    z-index: 10040;
+}
+body.tq-spellbook-open .tq-aside-bubble {
+    z-index: 10050;
+}
+.tq-professor-avatar {
+    width: clamp(84px, 10vw, 140px);
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 12px rgba(212,175,55,0.45));
+    image-rendering: auto;
+}
+/* Professor variant of .char-speech-bubble. Out of flow (absolute) so the
+   hidden bubble takes no layout space - otherwise the wrap's width would
+   change with each line and shove the Professor's avatar around. Grows
+   leftward from the avatar; the tail (::before/::after) is mirrored to
+   point down-RIGHT at him instead of down-left. Explicit width: an
+   absolutely-positioned right-anchored box shrink-wraps to its minimum
+   content width (its containing block - the narrow avatar wrap - offers no
+   available space), which used to squeeze the text into a skinny column. */
+.tq-bubble {
+    position: absolute;
+    right: calc(100% + 12px);
+    bottom: 14px;                /* bubble spans the Professor's body height,
+                                    not floating far above him */
+    width: min(420px, 46vw);
+    max-width: none;             /* defeat game.css clamp(160px,40vw,220px) */
+    pointer-events: none;        /* invisible bubble must not swallow clicks */
+    transform-origin: bottom right;  /* pop-in grows OUT of the Professor */
+}
+.tq-bubble.show {
+    pointer-events: auto;        /* Continue button clickable only while shown */
+}
+/* Tail on the RIGHT edge of the bubble pointing AT the Professor - he sits
+   to the bubble's right, so game.css's down-left avatar tail is fully
+   re-aimed: apex out of the bubble's right border, reaching his portrait. */
+.tq-bubble::after {
+    left: auto;
+    right: -11px;
+    bottom: auto;
+    bottom: 18px;
+    width: 0;
+    height: 0;
+    border: 9px solid transparent;
+    border-right: 0;
+    border-left-color: #222;     /* apex points right at the Professor */
+}
+.tq-bubble::before {
+    left: auto;
+    right: -9px;
+    bottom: auto;
+    bottom: 20px;
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    border-right: 0;
+    border-left-color: #fdfdfd;
+    z-index: 1;
+}
+.tq-bubble-name {
+    color: #8a6a1c;
+    font-weight: bold;
+    font-size: 0.85em;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+/* Renders the \n in tq_p1_s0 (walk instruction) as a real linebreak. */
+.tq-bubble-text {
+    white-space: pre-line;
+}
+
+/* Professor back-and-forth aside - a small reply bubble that pops up BELOW
+   the main lesson bubble when the Professor answers the player's line.
+   Reuses .char-speech-bubble for the shared comic look; only anchoring,
+   size and tail direction differ. Lives inside #tq-professor-wrap (fixed),
+   so absolute coordinates resolve against the wrap. */
+.tq-aside-bubble {
+    position: absolute;
+    right: 26px;                 /* under the avatar, growing leftward */
+    left: auto;
+    bottom: auto;
+    top: calc(100% + 10px);      /* below the wrap - clear of the main bubble,
+                                    which ends 14px above the wrap's bottom */
+    transform: translate(0, 8px) scale(0.85);   /* hidden: sits low, grows up */
+    transform-origin: top right;
+    width: max-content;
+    max-width: 240px;
+    font-size: clamp(10px, 1.2vw, 12px);
+    z-index: 1601;               /* above the wrap so it layers cleanly */
+}
+.tq-aside-bubble.show {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+}
+/* Tail flipped UP out of the aside's top edge, pointing at the Professor
+   standing above (base game.css tail points down-left at the player). */
+.tq-aside-bubble::after {
+    left: auto;
+    right: 18px;
+    bottom: auto;
+    top: -9px;
+    border: 9px solid transparent;
+    border-top: 0;
+    border-bottom-color: #222;
+}
+.tq-aside-bubble::before {
+    left: auto;
+    right: 20px;
+    bottom: auto;
+    top: -6px;
+    border: 7px solid transparent;
+    border-top: 0;
+    border-bottom-color: #fdfdfd;
+    z-index: 1;
+}
+
+/* Meet-the-Professor circle (puzzle 1 opener): same mechanic/look as the
+   endgame safe circles (.eg-shr-safe-circle in css/endgame/bosses2.css) -
+   golden while waiting, green flash + shrink when the avatar stands inside. */
+.tq-meet-circle {
+    position: fixed;
+    z-index: 1250;               /* below the speech bubble (1300) */
+    pointer-events: none;
+    border-radius: 50%;
+    border: 3px solid rgba(212, 175, 55, 0.9);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0.07) 60%, transparent 75%);
+    box-shadow: 0 0 26px rgba(212, 175, 55, 0.55), inset 0 0 30px rgba(212, 175, 55, 0.25);
+    animation: tq-meet-pulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes tq-meet-pulse {
+    from { transform: scale(0.96); opacity: 0.85; }
+    to   { transform: scale(1.05); opacity: 1; }
+}
+.tq-meet-circle-done {
+    border-color: rgba(74, 222, 128, 0.95);
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.30) 0%, rgba(74, 222, 128, 0.12) 60%, transparent 75%);
+    box-shadow: 0 0 34px rgba(74, 222, 128, 0.8), inset 0 0 34px rgba(74, 222, 128, 0.4);
+    animation: tq-meet-finish 0.65s ease-in forwards;
+}
+@keyframes tq-meet-finish {
+    from { transform: scale(1); opacity: 1; }
+    to   { transform: scale(0.25); opacity: 0; }
+}
+
+/* Professor pointer line - a thin dashed golden line from his pointer hand
+   to whatever he is currently highlighting (demo cell / clue headers / HUD
+   widget / candle slot). The <line> geometry is written by JS every frame
+   (see _tqUpdatePointerLine in js/tutorial-quest.js); only the look is here. */
+#tq-pointer-svg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1590;               /* under the Professor wrap (1600) */
+}.tq-pointer-line {
+    fill: none;                  /* path, not a closed shape */
+    stroke: rgba(212, 175, 55, 0.85);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 8 7;
+    animation: tq-pointer-flow 1.2s linear infinite;
+    filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.65));
+}
+/* Glowing junction dots: one fused onto his drawn stick tip, one hovering
+   just outside whatever he is pointing at. */
+.tq-pointer-dot {
+    fill: #f5d98a;
+    stroke: rgba(212, 175, 55, 0.9);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.9));
+    animation: tq-pointer-pulse 1.2s ease-in-out infinite alternate;
+}
+@keyframes tq-pointer-pulse {
+    from { opacity: 0.65; }
+    to   { opacity: 1; }
+}
+@keyframes tq-pointer-flow {
+    from { stroke-dashoffset: 30; }
+    to   { stroke-dashoffset: 0; }
+}
+.tq-bubble-continue {
+    margin-top: 8px;
+    background: #fdfdfd;
+    color: #1a1a1a;
+    border: 2px solid #222;
+    border-radius: 8px;
+    padding: 5px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-family: var(--F, sans-serif);
+}
+.tq-bubble-continue:hover { background: #f0f0f0; }
+
+/* Tutorial focus highlights - pulse whatever the Professor wants the
+   player to look at (HUD widgets, clue cells, inventory slots). */
+.tq-hl {
+    animation: tq-hl-pulse 1.2s ease-in-out infinite !important;
+    border-radius: 6px;
+}
+/* Inline elements need a layout box for the box-shadow pulse to paint. */
+span.tq-hl,
+button.tq-hl,
+div.tq-hl {
+    display: inline-block;
+}
+@keyframes tq-hl-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.9), 0 0 14px 3px rgba(255, 209, 102, 0.45);
+    }
+    50% {
+        box-shadow: 0 0 0 3px rgba(255, 209, 102, 1), 0 0 22px 6px rgba(255, 209, 102, 0.7);
+    }
+}
+
+/* Focus highlight for one puzzle cell (the .gc div inside its td). */
+.tq-cell-hl {
+    animation: tq-cell-pulse 1.2s ease-in-out infinite !important;
+}
+@keyframes tq-cell-pulse {
+    0%, 100% {
+        box-shadow: inset 0 0 0 2px rgba(255, 209, 102, 0.95), 0 0 12px 2px rgba(255, 209, 102, 0.45);
+    }
+    50% {
+        box-shadow: inset 0 0 0 3px rgba(255, 209, 102, 1), 0 0 18px 4px rgba(255, 209, 102, 0.75);
+    }
+}
+
+/* Red grid-lock pulse (the Professor holds the board). The shield item's
+   gold pulse animates its own box-shadow, so a locked grid would flash
+   gold - this is the red twin used by #tq-grid-lock-border. */
+@keyframes tq-grid-lock-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 3px rgba(255,70,70,0.95), 0 0 12px 4px rgba(255,70,70,0.55), 0 0 28px 8px rgba(255,70,70,0.30);
+    }
+    50% {
+        box-shadow: 0 0 0 3px rgba(255,110,110,1.0), 0 0 20px 8px rgba(255,70,70,0.80), 0 0 40px 14px rgba(255,70,70,0.45);
+    }
+}
+
+/* While the equip intermission runs, the hub's top-bar exits (back, level
+   window, tree, atlas, gate) are hidden: leaving the sheet mid-lesson would
+   strand the tutorial with no way back. Restored when the lesson completes
+   (see _tqShowIntermission in js/tutorial-quest.js). */
+body.tq-intermission-active #screen-endgame-hub .eg-topbar .eg-back-btn,
+body.tq-intermission-active #screen-endgame-hub .eg-topbar .eg-level-btn {
+    display: none !important;
+}
+
+/* Live equip checklist inside the intermission box (updated by the lesson
+   poll - weapon / armor tick to ✓ as they are equipped). */
+.tq-inter-check {
+    font-size: 0.95em;
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+}
+.tq-inter-check-done { color: #7dd87d; }
+.tq-inter-check-open { color: #e08a8a; }
+
+/* Intermission equip overlay */
+#tq-intermission {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    background: rgba(5, 4, 14, 0.82);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+#tq-intermission.show { display: flex; }
+.tq-inter-box {
+    pointer-events: none;
+    max-width: 560px;
+    background: rgba(18, 14, 34, 0.97);
+    border: 2px solid #d4af37;
+    border-radius: 16px;
+    padding: 28px 34px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+}
+.tq-inter-title {
+    color: #d4af37;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+}
+.tq-inter-text {
+    color: #f0ead6;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+.tq-inter-hint {
+    color: #9a8fc0;
+    font-size: 0.88em;
+    font-style: italic;
+}
+
+/* Floating keycap chip: teaches a keyboard action (e.g. P for the Spellbook
+   during puzzle 3). Grid-anchored to the right of the puzzle via
+   .tq-keycap-right; falls back to the fixed bottom-left corner. Shows the
+   action's live keybind so rebindings are honoured. */
+#tq-keycap-chip {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    z-index: 2600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    animation: tq-chip-in .35s cubic-bezier(.34,1.56,.64,1);
+}
+#tq-keycap-chip .tq-keycap-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 9px;
+    background: #1d1a16;
+    border: 2px solid #d4af37;
+    border-bottom-width: 4px;
+    color: #f0ead6;
+    font-size: 1.25rem;
+    font-weight: 700;
+    box-shadow: 0 0 14px rgba(212,175,55,.35), inset 0 -3px 0 rgba(0,0,0,.5);
+}
+#tq-keycap-chip .tq-keycap-text {
+    color: #f0ead6;
+    font-size: .95rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,.9);
+    background: rgba(15,12,9,.72);
+    padding: 6px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(212,175,55,.35);
+}
+@keyframes tq-chip-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* Grid-anchored variant: vertically centred on the grid's right edge, with
+   its own entrance animation (the base keyframes would fight the resting
+   translateY(-50%)). .tq-keycap-below drops it under the grid on narrow
+   screens where it would otherwise overflow the viewport. */
+#tq-keycap-chip.tq-keycap-right {
+    transform: translateY(-50%);
+    animation-name: tq-chip-in-r;
+}
+#tq-keycap-chip.tq-keycap-right.tq-keycap-below {
+    transform: none;
+    animation-name: tq-chip-in;
+}
+@keyframes tq-chip-in-r {
+    from { opacity: 0; transform: translateY(calc(-50% + 14px)); }
+    to   { opacity: 1; transform: translateY(-50%); }
+}
+

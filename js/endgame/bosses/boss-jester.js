@@ -1,35 +1,35 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE JESTER (boss_jester)------------------------
 //------------------------------------------------------------------------
-// REWORK — Boshy homage, rebuilt as a three-act stage performance. The
+// REWORK - Boshy homage, rebuilt as a three-act stage performance. The
 // Jester never stops showboating: every mechanic is a NUMBERED ACT, and the
-// fight literally plays on a stage — a spotlight follows the show, cards
+// fight literally plays on a stage - a spotlight follows the show, cards
 // deal a hand you must survive, and the finale is the show of shows.
 //
-//   Phase 1 (100–60%) — BOUNCING MAYHEM (signature, upgraded). The juggling
+//   Phase 1 (100–60%) - BOUNCING MAYHEM (signature, upgraded). The juggling
 //                       orbs now BOUNCE IN RHYTHM: they stay calm between
 //                       beats, then all HOP on the beat, teleporting their
-//                       velocity to a fresh random angle — the dodge rhythm
+//                       velocity to a fresh random angle - the dodge rhythm
 //                       is the skill. Dense but fair; every orb is slow
 //                       enough to track.
 //                       Plus CLUE SWAP (shared).
-//   Phase 2 ( ≤60%)   — ACT II: CARD TOSS. A fan of oversized playing cards
+//   Phase 2 ( ≤60%)   - ACT II: CARD TOSS. A fan of oversized playing cards
 //                       arcs across the stage and STICKS where they land,
-//                       face-up, as hazards — the arena becomes the Jester's
+//                       face-up, as hazards - the arena becomes the Jester's
 //                       card table. Two volleys; the second aims at you.
 //                       Plus JUGGLER'S Jinx. Three cursed balls (🟣 jinx,
 //                       💛 luck) orbit the stage; touching the JINX ball
 //                       costs a hit, touching the LUCK ball pops a small
-//                       heal — greed bait in the middle of the chaos.
-//   Phase 3 ( ≤30%)   — ACT III: THE ENCORE. Mayhem orbs multiply (8), the
+//                       heal - greed bait in the middle of the chaos.
+//   Phase 3 ( ≤30%)   - ACT III: THE ENCORE. Mayhem orbs multiply (8), the
 //                       card volleys triple, and the jinx orbit tightens.
 //                       The audience is on its feet.
-//   Finale ( ≤10%)    — 🎪 THE GRAND FINALE (one-shot set-piece): the stage
+//   Finale ( ≤10%)    - 🎪 THE GRAND FINALE (one-shot set-piece): the stage
 //                       curtain drops, the boss bows (immune), and the
 //                       FULL HOUSE builds: cards deal onto the grid in a
-//                       closing spiral — every card face is a hazard, and
+//                       closing spiral - every card face is a hazard, and
 //                       the pattern spells one safe suit. STAND ON THE SAFE
-//                       SUIT when the reveal lands — wrong suit = hit, and
+//                       SUIT when the reveal lands - wrong suit = hit, and
 //                       each reveal comes faster. The last reveal is the
 //                       BLACKOUT: all cards flip down except the safe suit,
 //                       then the CURTAIN CALL barrage sweeps the safe lanes.
@@ -97,7 +97,7 @@ const EG_JS_HIT_CD_MS   = 600;                // shared touch cooldown
 //-------------------SHARED VISUAL HELPERS---------------------------------
 //------------------------------------------------------------------------
 
-// Flat heal + HUD refresh (mirrors the Dancer — no shared helper exists).
+// Flat heal + HUD refresh (mirrors the Dancer - no shared helper exists).
 function _egJsHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
@@ -152,7 +152,7 @@ function _egJsConfetti(x, y, big) {
 //------------------------------------------------------------------------
 // The juggling orbs now bounce IN RHYTHM: between beats they glide calmly
 // (easy to track); on each beat (every ~1.1s) they all HOP at once and
-// re-randomize their velocity — the swarm reshuffles its pattern on the
+// re-randomize their velocity - the swarm reshuffles its pattern on the
 // beat, so dodging is about reading the rhythm, not just the vectors.
 const EG_JS_MAYHEM_BEAT = 1100;
 
@@ -184,7 +184,7 @@ function _egMechJsOrbs(monster, phase) {
     _egNkLoop(run, (dtS, now) => {
         e += dtS * 1000;
         const pr = _egNkPlayerRect();
-        // The BEAT: every orb hops at once — a little squash-and-hop pulse
+        // The BEAT: every orb hops at once - a little squash-and-hop pulse
         // plus a fresh random velocity. Reading the rhythm IS the dodge.
         if (e >= nextBeat) {
             nextBeat = e + beatMs;
@@ -218,10 +218,10 @@ function _egMechJsOrbs(monster, phase) {
 
 
 //------------------------------------------------------------------------
-//-------------------MECHANIC: ACT II — CARD TOSS (phase 2+)----------------
+//-------------------MECHANIC: ACT II - CARD TOSS (phase 2+)----------------
 //------------------------------------------------------------------------
 // A fan of oversized playing cards arcs across the stage and STICKS where
-// they land, face-up, as hazards for a while — the arena becomes the
+// they land, face-up, as hazards for a while - the arena becomes the
 // Jester's card table. Volley 1 litters the middle; volley 2 aims at your
 // position. Phase 3 throws a third volley.
 const EG_JS_CARD_LIFE = 6500;
@@ -260,7 +260,7 @@ function _egMechJsCards(monster, phase) {
         }
     };
 
-    _egNkToast('eg_mech_js_cards', '🤹 The Jester: CARD TOSS — the table is set!', '#e9d5ff');
+    _egNkToast('eg_mech_js_cards', '🤹 The Jester: CARD TOSS - the table is set!', '#e9d5ff');
 
     let touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -328,7 +328,7 @@ function _egMechJsCards(monster, phase) {
 //------------------------------------------------------------------------
 // Three balls orbit the stage in wide loops: two JINX balls (🟣, touching
 // them bites) and one LUCK ball (💛, touching it heals a little). The luck
-// ball drifts deliberately THROUGH the mayhem — greed bait. Phase 3 adds a
+// ball drifts deliberately THROUGH the mayhem - greed bait. Phase 3 adds a
 // third jinx ball and tightens the loops.
 const EG_JS_JINX_LIFE = 8000;
 const EG_JS_ORBIT_TURN = 1.4;   // rad/s course change (readable loops)
@@ -358,7 +358,7 @@ function _egMechJsJinx(monster, phase) {
     for (let i = 0; i < nJinx; i++) balls.push(mk('🟣', 'eg-js-ball-jinx', jinxSpeed));
     balls.push(mk('💛', 'eg-js-ball-luck', luckSpeed));
 
-    _egNkToast('eg_mech_js_jinx', '🤹 The Jester: JUGGLER\u2019S JINX — grab the gold, dodge the purple!', '#e9d5ff');
+    _egNkToast('eg_mech_js_jinx', '🤹 The Jester: JUGGLER\u2019S JINX - grab the gold, dodge the purple!', '#e9d5ff');
 
     let t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -413,7 +413,7 @@ function _egMechJsJinx(monster, phase) {
 //-------------------🎪… THE GRAND FINALE (≤10% HP one-shot finale)---------
 //------------------------------------------------------------------------
 // The stage curtain drops, the boss bows (immune), and the FULL HOUSE
-// builds: oversized cards deal onto the grid in a closing spiral — every
+// builds: oversized cards deal onto the grid in a closing spiral - every
 // card shows a suit, and each REVEAL names one SAFE suit. Stand on the
 // safe suit when the reveal lands; wrong suit = hit. Reveals accelerate,
 // then the BLACKOUT: all cards flip face-down except the safe suit, and
@@ -430,7 +430,7 @@ let _egJsFinal = null;
 
 // Pause-safe timeout: while the game is frozen the callback retries every
 // 200ms instead of firing mid-pause (the freeze guard the other finales
-// run inside their loop ticks — this show runs on timeouts instead).
+// run inside their loop ticks - this show runs on timeouts instead).
 function _egJsAfter(g, fn, ms) {
     const id = setTimeout(() => {
         if (!g || g.finished || _egJsFinal !== g) return;
@@ -528,11 +528,11 @@ function _egJsFinalStart(monster) {
     ov.className = 'eg-js-cd';
     ov.innerHTML =
         '<div class="eg-js-cd-label">🎪 THE GRAND FINALE</div>' +
-        '<div class="eg-js-cd-hint">Read the reveal — stand on the safe suit!</div>';
+        '<div class="eg-js-cd-hint">Read the reveal - stand on the safe suit!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_js_final_cd', '🎪💀 THE GRAND FINALE — mind the reveal!', '#e9d5ff');
+    _egNkToast('eg_mech_js_final_cd', '🎪💀 THE GRAND FINALE - mind the reveal!', '#e9d5ff');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -566,7 +566,7 @@ function _egJsFinalStart(monster) {
             if (face === safe) cd.el.classList.add('eg-js-card-faceup');
         });
         g.cards.forEach(cd => cd.el.classList.add('eg-js-card-dealt'));
-        _egNkToast('eg_mech_js_reveal', '🎪 The reveal is coming — stand on the glowing suit!', '#e9d5ff');
+        _egNkToast('eg_mech_js_reveal', '🎪 The reveal is coming - stand on the glowing suit!', '#e9d5ff');
         _egJsAfter(g, () => {
             // REVEAL: cards flip down; the SAFE suit stays lit and judges.
             const pr = _egNkPlayerRect();
@@ -598,7 +598,7 @@ function _egJsFinalStart(monster) {
 }
 
 // The BLACKOUT + CURTAIN CALL: all cards flip face-down except the safe
-// suit; sweeping barrage lanes cross the stage — the last show of shows.
+// suit; sweeping barrage lanes cross the stage - the last show of shows.
 function _egJsBlackout(g, monster, level) {
     if (!g || g.finished) return;
     g.phase = 'blackout';
@@ -620,10 +620,10 @@ function _egJsBlackout(g, monster, level) {
             safeCells.push(cd);
         }
     });
-    _egNkToast('eg_mech_js_blackout', '🎪💀 BLACKOUT + CURTAIN CALL — stand in the lit columns!', '#e9d5ff');
+    _egNkToast('eg_mech_js_blackout', '🎪💀 BLACKOUT + CURTAIN CALL - stand in the lit columns!', '#e9d5ff');
 
     // CURTAIN CALL: 3 barrage waves sweep the rows; standing on a safe cell
-    // inside the swept row shelters you — the show's final read.
+    // inside the swept row shelters you - the show's final read.
     const rows = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
     const waveGap = 900 * _EG_JS_DEBUG_MULT;
     let wi = 0;
@@ -725,7 +725,7 @@ function _egJsFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egJsTeardown() {
     if (_egJsFinal) { try { _egJsFinalEnd(_egJsFinal); } catch (e) {} _egJsFinal = null; }
@@ -746,8 +746,8 @@ function _egJsTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_JS_DEBUG.fire('orbs'|'cards'|'jinx', phase) — runs one now
-//   _EG_JS_DEBUG.final()                            — GRAND FINALE now
+//   _EG_JS_DEBUG.fire('orbs'|'cards'|'jinx', phase) - runs one now
+//   _EG_JS_DEBUG.final()                            - GRAND FINALE now
 if (typeof window !== 'undefined') {
     window._EG_JS_DEBUG = {
         fire: (name, phase) => {

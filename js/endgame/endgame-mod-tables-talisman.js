@@ -1,32 +1,32 @@
 //  endgame-mod-tables-talisman.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------TALISMAN MODIFIER TABLE------------------------------
 //------------------------------------------------------------------------
-// The Talisman is a carried ward — a protective charm that bends
+// The Talisman is a carried ward - a protective charm that bends
 // survival rules rather than amplifying offense. It is the defensive
 // magical utility slot: fate manipulation, elemental warding, and
 // death prevention are its identity. No local defences. Values sit
 // at amulet/ring scale, leaning slightly more defensive.
 //
 // Talisman-exclusive mods:
-//   arcane_resistance — flat reduction to ALL elemental damage received
+//   arcane_resistance - flat reduction to ALL elemental damage received
 //                       (fire, cold, lightning, shadow) simultaneously.
-//                       Unique mechanic — every other resistance mod in
+//                       Unique mechanic - every other resistance mod in
 //                       the game is element-specific. A single talisman
 //                       mod that shores up every element at once, at a
 //                       lower value than any single resist could reach.
-//   warding — once per map, the talisman absorbs a killing blow and
+//   warding - once per map, the talisman absorbs a killing blow and
 //             leaves you at # health instead of dying. Resets each map.
 //             The rarest and most powerful survival mod in the game.
 //             Only one talisman slot exists so it cannot be doubled up.
-//   fate — % chance to completely negate any incoming hit. More random
+//   fate - % chance to completely negate any incoming hit. More random
 //          than block (deterministic with downtime) and dodge (evasion-
-//          based) — fate is pure luck, but it applies to everything
+//          based) - fate is pure luck, but it applies to everything
 //          including charge hits, spells, and attacks with no downside
 //          on proc. Low chances kept intentionally to prevent it
 //          trivialising combat.
@@ -80,11 +80,27 @@ const EG_MOD_TABLE_TALISMAN = {
             ]
         },
 
+        // --- HEALING POWER ---
+        // The talisman already carries heart_heal / mana_heal (the "your
+        // pickups give more" half of a recovery build), so the flat support
+        // stat belongs here too. Deliberately flat-only and one tier below the
+        // amulet's: the talisman is the utility slot, not a second amulet.
+        healing_power: {
+            id: 'healing_power',
+            label: '+# to Healing Power', labelDe: '+# zu Heilkraft',
+            tiers: [
+                { tier: 1, min: 30, max: 42, weight: 120, ilvl: 78 },
+                { tier: 2, min: 20, max: 29, weight: 300, ilvl: 55 },
+                { tier: 3, min: 10, max: 19, weight: 600, ilvl: 30 },
+                { tier: 4, min: 3, max: 9, weight: 1200, ilvl: 1 }
+            ]
+        },
+
         // --- TALISMAN-EXCLUSIVE: ARCANE RESISTANCE ---
         // A flat reduction applied to all elemental damage types at once
         // (fire, cold, lightning, shadow). Every other resistance mod in
         // the game targets a single element. This trades raw per-element
-        // ceiling for universal coverage — invaluable for builds that
+        // ceiling for universal coverage - invaluable for builds that
         // struggle to cap multiple resistances simultaneously.
         // The # value is the flat damage reduced per hit per element.
         arcane_resistance: {
@@ -103,7 +119,7 @@ const EG_MOD_TABLE_TALISMAN = {
         // to zero or below, the talisman absorbs the blow and leaves
         // you at # health instead. The ward shatters and does not
         // refresh until the next map begins. The rarest survival mod
-        // in the game — kept to very low weights and high ilvl floors.
+        // in the game - kept to very low weights and high ilvl floors.
         // The # value is the health you're left with after the ward fires.
         warding: {
             id: 'warding',
@@ -220,7 +236,7 @@ const EG_MOD_TABLE_TALISMAN = {
         },
 
         // --- RESISTANCES ---
-        // All four elements represented — the talisman wards against
+        // All four elements represented - the talisman wards against
         // everything. Slightly better weights than other jewelry since
         // resistance is this slot's primary defensive identity.
         fire_resist: {
@@ -268,10 +284,10 @@ const EG_MOD_TABLE_TALISMAN = {
         },
 
         // --- TALISMAN-EXCLUSIVE: FATE ---
-        // Pure luck woven into the charm — a % chance that any incoming
+        // Pure luck woven into the charm - a % chance that any incoming
         // hit is simply negated entirely. No downtime, no resource cost,
         // no element restriction. Applies to attacks, spells, and charge
-        // hits equally. Deliberately kept at low % values — fate is a
+        // hits equally. Deliberately kept at low % values - fate is a
         // background whisper of protection, not a reliable mechanic.
         // Pairs with warding for the ultimate survival-focused talisman.
         fate: {

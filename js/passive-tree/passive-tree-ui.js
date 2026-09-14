@@ -6,7 +6,7 @@
 // These are set during _ptRender() and shared across all UI/renderer functions.
 // Never access these before _ptRender() has completed at least once.
 
-let _pt_container = null;  // #pt-canvas element — the outermost scrollable frame
+let _pt_container = null;  // #pt-canvas element - the outermost scrollable frame
 let _pt_world = null;  // the zoomable/pannable world <div> inside the container
 let _pt_svg = null;  // SVG overlay that holds all connection <line> elements
 let _pt_nodesLayer = null;  // <div> layer that holds all node <div> elements
@@ -72,7 +72,7 @@ const PT_TIER_KEYSTONE = 'keystone';
 
 // Returns the tier string for a skill definition (see constants above).
 // Keystones win over travel markers by design; anything that is neither is
-// a notable — which matches the data, where every non-marker node carries a
+// a notable - which matches the data, where every non-marker node carries a
 // full mechanical description.
 function _ptGetNodeTier(def) {
     if (_ptIsKeystoneNode(def)) return PT_TIER_KEYSTONE;
@@ -95,7 +95,7 @@ function _ptGetNodeTier(def) {
 
 // --- allocated ---
 function _ptStylePropsAllocated(tier) {
-    // Keystone: ornate amber — radial-lit gem with a double ring frame
+    // Keystone: ornate amber - radial-lit gem with a double ring frame
     if (tier === PT_TIER_KEYSTONE) {
         return {
             bg: 'radial-gradient(circle at 50% 35%, #2a1804 0%, #140a00 60%, #0d0600 100%)',
@@ -116,7 +116,7 @@ function _ptStylePropsAllocated(tier) {
             cursor: 'pointer',
         };
     }
-    // Travel: minimal — small, plain, quietly green
+    // Travel: minimal - small, plain, quietly green
     return {
         bg: '#16220e',
         border: `2px solid ${PT_COL_ALLOCATED_BORDER}`,
@@ -148,7 +148,7 @@ function _ptStylePropsUnlockable(isStart, tier) {
             cursor: 'pointer',
         };
     }
-    // Notable: golden frame with a faint inner ring — richer than travel
+    // Notable: golden frame with a faint inner ring - richer than travel
     if (tier === PT_TIER_NOTABLE) {
         return {
             bg: PT_COL_UNLOCKED_BG,
@@ -306,7 +306,7 @@ function _ptTooltipBuildHtml(id) {
     const desc = _ptTooltipResolveDesc(def, lang);
     const statusHtml = _ptTooltipBuildStatusHtml(id, state, lang);
 
-    // Tier caption above the name — keystones and notables introduce
+    // Tier caption above the name - keystones and notables introduce
     // themselves, plain travel markers stay uncaptioned.
     const tier = _ptGetNodeTier(def);
     let typeHtml = '';
@@ -472,7 +472,7 @@ function _ptDrawConnections(bounds) {
 
 
 //------------------------------------------------------------------------
-//------------------DRAW NODES — SHAPE HELPERS----------------------------
+//------------------DRAW NODES - SHAPE HELPERS----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -521,7 +521,7 @@ function _ptApplyDiamondShape(node, cx, cy, r) {
 
 
 //------------------------------------------------------------------------
-//------------------DRAW NODES — ICON HELPERS-----------------------------
+//------------------DRAW NODES - ICON HELPERS-----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -600,7 +600,7 @@ function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
 
 
 //------------------------------------------------------------------------
-//------------------DRAW NODES — EVENT HELPERS----------------------------
+//------------------DRAW NODES - EVENT HELPERS----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -656,9 +656,9 @@ function _ptBindNodeEvents(node, skill, isKeystone) {
 // Builds and appends a single node <div> for the given skill.
 // Shape, icon, and events are handled by the helpers above.
 // Node size follows the three-tier hierarchy (Path of Exile style):
-//   keystone  1.5x — ornate amber gems, build-defining choices
-//   notable   1.12x — the regular mechanical pickups
-//   travel    0.8x — small connectors (statKey prefix 'travel_')
+//   keystone  1.5x - ornate amber gems, build-defining choices
+//   notable   1.12x - the regular mechanical pickups
+//   travel    0.8x - small connectors (statKey prefix 'travel_')
 // The start node keeps its dedicated 1.4x size.
 function _ptDrawNode(skill, offsetX, offsetY) {
     const cx = skill.x + offsetX;
@@ -703,7 +703,7 @@ function _ptDrawNodes(bounds) {
 
 
 //------------------------------------------------------------------------
-//---------------------SEARCH — NODE HELPERS------------------------------
+//---------------------SEARCH - NODE HELPERS------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -781,7 +781,7 @@ function _ptApplySearch(query) {
     });
 }
 
-// Convenience wrapper — resets the search to the empty state.
+// Convenience wrapper - resets the search to the empty state.
 function _ptClearSearch() {
     _ptApplySearch('');
 }
@@ -803,7 +803,7 @@ function _ptCreateSearchBar() {
         box-shadow: 0 2px 10px rgba(0,0,0,0.5);
     `;
 
-    // Decorative magnifier — not interactive
+    // Decorative magnifier - not interactive
     const icon = document.createElement('span');
     icon.textContent = '🔍';
     icon.style.cssText = 'font-size:14px;opacity:0.7;pointer-events:none;';
@@ -976,7 +976,7 @@ function _ptInjectSearchBar() {
 function _ptRender() {
     if (!_ptResetRenderState()) return;
 
-    // Nothing to show — display a friendly error message instead
+    // Nothing to show - display a friendly error message instead
     if (!_pt_skills.length) {
         _ptRenderEmptyState();
         return;

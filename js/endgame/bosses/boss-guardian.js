@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GUARDIAN (boss_guardian)-------------------------
 //------------------------------------------------------------------------
-// Ancient-machine homage: it paints a lock-on beam that tracks you —
+// Ancient-machine homage: it paints a lock-on beam that tracks you -
 // slowly, inevitably. When the lock completes, the beam FIRES. Break the
 // tracking by forcing it to turn faster than it can.
 // This file holds EVERYTHING this boss needs in one place:

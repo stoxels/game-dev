@@ -9,7 +9,7 @@ const LEDGER_GROUPS = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-//  ATLAS TIER HELPER — used by the 16 Atlas Completion quests (Tiers 1-16)
+//  ATLAS TIER HELPER - used by the 16 Atlas Completion quests (Tiers 1-16)
 //  Returns { current, target } where current = completed atlas nodes of
 //  that tier and target = total atlas nodes of that tier. Reads live from
 //  STATE.egAtlasCompleted and EG_ATLAS_NODES so no extra questStats needed.
@@ -112,7 +112,7 @@ const LEDGER_CATEGORIES = [
     },
 
     //  PARAMETER SPACE (WORLD EXPLORATION) 
-    //  Theme: a complete analysis covers the entire parameter space — finish every world
+    //  Theme: a complete analysis covers the entire parameter space - finish every world
     {
         id: 'parameter_space',
         groupId: 'progression',
@@ -152,7 +152,7 @@ const LEDGER_CATEGORIES = [
         icon: '🔐',
         titleEn: 'Conditional Probability', titleDE: 'Bedingte Wahrscheinlichkeit',
         descEn: 'Given that you reach a probability gate - what are the odds you pass it?',
-        descDE: 'Gegeben, dass du ein Tor erreichst — wie hoch sind deine Chancen es zu überwinden?',
+        descDE: 'Gegeben, dass du ein Tor erreichst - wie hoch sind deine Chancen es zu überwinden?',
         milestones: [
             {
                 id: 'cond_prob_1', labelEn: '5 gates passed', labelDE: '5 Tore bestanden',
@@ -203,7 +203,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  PROBABILITY TREE (PASSIVE SKILL POINTS)
-    //  Theme: the passive skill tree IS a probability tree — branch through it
+    //  Theme: the passive skill tree IS a probability tree - branch through it
     {
         id: 'probability_tree',
         groupId: 'progression',
@@ -231,7 +231,7 @@ const LEDGER_CATEGORIES = [
     },
 
     //  CHOOSE YOUR ESTIMATOR (CLASS SELECTION) 
-    //  Theme: every analysis requires choosing an estimator — select your class
+    //  Theme: every analysis requires choosing an estimator - select your class
     //  Single milestone, instant reward on first class selection.
     {
         id: 'choose_estimator',
@@ -250,7 +250,7 @@ const LEDGER_CATEGORIES = [
     },
 
     //  CHOOSE YOUR ASCENDENCY
-    //  Theme: specialisation beyond the base class — a single permanent choice
+    //  Theme: specialisation beyond the base class - a single permanent choice
     {
         id: 'choose_ascendency',
         groupId: 'progression',
@@ -268,7 +268,7 @@ const LEDGER_CATEGORIES = [
     },
 
     //  MAXIMUM LIKELIHOOD (CLASS UPGRADES) 
-    //  Theme: find the parameters that maximise the likelihood — unlock all upgrades
+    //  Theme: find the parameters that maximise the likelihood - unlock all upgrades
     {
         id: 'max_likelihood',
         groupId: 'progression',
@@ -298,7 +298,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  ASCENDENCY MASTERY (ASCENDENCY UPGRADES)
-    //  Theme: push past the ceiling — fully upgrade both ascendency skills
+    //  Theme: push past the ceiling - fully upgrade both ascendency skills
     {
         id: 'ascendency_mastery',
         groupId: 'progression',
@@ -645,8 +645,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'gameplay',
         icon: '📉',
         titleEn: 'Overfitting Gambler', titleDE: 'Überanpassungs-Spieler',
-        descEn: 'Exploit the free first half — then survive the triple penalties.',
-        descDE: 'Nutze die kostenlose erste Hälfte — dann überlebst du die dreifachen Strafen.',
+        descEn: 'Exploit the free first half - then survive the triple penalties.',
+        descDE: 'Nutze die kostenlose erste Hälfte - dann überlebst du die dreifachen Strafen.',
         milestones: [
             {
                 id: 'overfit_1', labelEn: '1 large grid cleared with Overfitting and 25+ mistakes', labelDE: '1 großes Raster mit Überanpassung und 25+ Fehlern',
@@ -887,8 +887,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'gameplay',
         icon: '🌡️',
         titleEn: 'Entropy Drain Master', titleDE: 'Entropie-Abbau-Meister',
-        descEn: 'Work fast — unfinished lines decay. Complete massive grids despite Entropy Drain.',
-        descDE: 'Arbeite schnell — unfertige Linien zerfallen. Beende massive Raster trotz Entropie-Abbau.',
+        descEn: 'Work fast - unfinished lines decay. Complete massive grids despite Entropy Drain.',
+        descDE: 'Arbeite schnell - unfertige Linien zerfallen. Beende massive Raster trotz Entropie-Abbau.',
         milestones: [
             {
                 id: 'ed_1', labelEn: '3 massive grids with Entropy Drain', labelDE: '3 massive Raster mit Entropie-Abbau',
@@ -997,8 +997,8 @@ const LEDGER_CATEGORIES = [
         groupId: 'gameplay',
         icon: '🫥',
         titleEn: 'Sparse Prior Master', titleDE: 'Schwacher-Prior-Meister',
-        descEn: 'Start blind — let completions reveal the path on massive grids.',
-        descDE: 'Starte blind — lass Abschlüsse den Weg auf massiven Rastern enthüllen.',
+        descEn: 'Start blind - let completions reveal the path on massive grids.',
+        descDE: 'Starte blind - lass Abschlüsse den Weg auf massiven Rastern enthüllen.',
         milestones: [
             {
                 id: 'sp_1', labelEn: '3 massive grids with Sparse Prior', labelDE: '3 massive Raster mit Schwachem Prior',
@@ -1077,7 +1077,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  MINESWEEPER MIND (ADJACENCY MATRIX + LARGE GRIDS) 
-    //  Theme: the adjacency matrix turns every cell into a conditional clue —
+    //  Theme: the adjacency matrix turns every cell into a conditional clue -
     //  master it on large grids where every number counts
     {
         id: 'minesweeper_mind',
@@ -1145,7 +1145,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  13. RESOURCE DISTRIBUTION (ITEM USAGE) 
-    //  Theme: allocating resources across the probability space — use items
+    //  Theme: allocating resources across the probability space - use items
     {
         id: 'item_distribution',
         groupId: 'itemsclasses',
@@ -1179,7 +1179,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  CURSE OF DIMENSIONALITY (CURSED ITEMS) 
-    //  Theme: in high dimensions, strange things happen — embrace cursed items
+    //  Theme: in high dimensions, strange things happen - embrace cursed items
     {
         id: 'curse_dimensionality',
         groupId: 'itemsclasses',
@@ -1208,7 +1208,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  PRIOR DISTRIBUTION (SCOUT'S PRIMER)
-    //  Theme: Bayesian inference starts with a prior — the Primer is your prior
+    //  Theme: Bayesian inference starts with a prior - the Primer is your prior
     {
         id: 'prior_distribution',
         groupId: 'itemsclasses',
@@ -1350,7 +1350,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  REGRESSION TO THE MEAN (TUTOR ITEMS) 
-    //  Theme: extreme mistakes regress toward the mean — use Tutor items
+    //  Theme: extreme mistakes regress toward the mean - use Tutor items
     {
         id: 'tutor_regression',
         groupId: 'itemsclasses',
@@ -1381,7 +1381,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  ACTIVE INFERENCE (CLASS ABILITIES) 
-    //  Theme: an active agent continuously updates its model — use class abilities
+    //  Theme: an active agent continuously updates its model - use class abilities
     {
         id: 'active_inference',
         groupId: 'itemsclasses',
@@ -1501,7 +1501,7 @@ const LEDGER_CATEGORIES = [
     //------------------------------------------------------------------------
 
     //  SIGNIFICANCE LEVEL α (HARD DIFFICULTY)
-    //  Theme: below α, results are statistically significant — and merciless
+    //  Theme: below α, results are statistically significant - and merciless
     {
         id: 'significance_level',
         groupId: 'challenges',
@@ -1531,7 +1531,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  SAMPLING UNDER TIME PRESSURE (TIME TRIAL)
-    //  Theme: real analysts work to deadlines — conquer Time Trial mode
+    //  Theme: real analysts work to deadlines - conquer Time Trial mode
     {
         id: 'time_pressure',
         groupId: 'challenges',
@@ -1560,7 +1560,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  OUTLIER RESISTANCE (HARDCORE)
-    //  Theme: robust estimators ignore extreme outliers — survive Hardcore mode
+    //  Theme: robust estimators ignore extreme outliers - survive Hardcore mode
     {
         id: 'outlier_resistance',
         groupId: 'challenges',
@@ -1589,7 +1589,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  FULL DISTRIBUTION (IRONMAN) 
-    //  Theme: no buffers — see the full range of outcomes in Ironman mode
+    //  Theme: no buffers - see the full range of outcomes in Ironman mode
     {
         id: 'ironman_dist',
         groupId: 'challenges',
@@ -1618,7 +1618,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  PRIOR-FREE ESTIMATION (CLASSLESS MODE)
-    //  Theme: frequentist statistics makes no class assumptions — play without one
+    //  Theme: frequentist statistics makes no class assumptions - play without one
     {
         id: 'prior_free_estimation',
         groupId: 'challenges',
@@ -1646,7 +1646,7 @@ const LEDGER_CATEGORIES = [
     },
 
     //  TABULA RASA (TREELESS MODE)
-    //  Theme: no passive nodes, no advantages — a blank slate
+    //  Theme: no passive nodes, no advantages - a blank slate
     {
         id: 'tabula_rasa',
         groupId: 'challenges',
@@ -1675,7 +1675,7 @@ const LEDGER_CATEGORIES = [
 
 
     //  MONTE CARLO METHOD (TRIPLE MODIFIER) 
-    //  Theme: simulate every worst case at once — Hard + all five modifiers
+    //  Theme: simulate every worst case at once - Hard + all five modifiers
     {
         id: 'monte_carlo',
         groupId: 'challenges',
@@ -1765,7 +1765,7 @@ const LEDGER_CATEGORIES = [
     //------------------------------------------------------------------------
     //----------------------ATLAS TIER COMPLETION QUESTS----------------------
     //------------------------------------------------------------------------
-    //  16 quests — one per Atlas tier (1-16). Each requires completing ALL
+    //  16 quests - one per Atlas tier (1-16). Each requires completing ALL
     //  atlas regions of that tier. Reward: 2 Convergence Points each
     //  (32 total when Tier 16 is done). Grouped under the dedicated
     //  'atlas' ledger tab so they don't flood the existing categories.
@@ -2000,7 +2000,7 @@ const LEDGER_CATEGORIES = [
         id: 'atlas_tier_16',
         groupId: 'atlas',
         icon: '🗺️',
-        titleEn: 'Atlas Tier 16: Overload — Pinnacle', titleDE: 'Atlas Stufe 16: Überladung — Gipfel',
+        titleEn: 'Atlas Tier 16: Overload - Pinnacle', titleDE: 'Atlas Stufe 16: Überladung - Gipfel',
         descEn: 'Chart the pinnacle region of Tier 16. The atlas is complete.',
         descDE: 'Kartiere die Gipfelregion der Stufe 16. Der Atlas ist vollständig.',
         milestones: [
@@ -2021,7 +2021,7 @@ const LEDGER_CATEGORIES = [
 
 
 // ─────────────────────────────────────────────────────────────
-//  FLAT MILESTONE LOOKUP  —  O(1) access by milestone id
+//  FLAT MILESTONE LOOKUP  -  O(1) access by milestone id
 //  Populated once at load time.  { milestoneId → { milestone, category } }
 // ─────────────────────────────────────────────────────────────
 

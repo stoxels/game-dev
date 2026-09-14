@@ -1,6 +1,6 @@
 ﻿// ════════════════════════════════════════════════════════════════════════════
 //
-//  quests-logic.js  —  Milestone evaluation, claiming, banner, badge,
+//  quests-logic.js  -  Milestone evaluation, claiming, banner, badge,
 //                      and achievement tracking for the quest ledger.
 //
 //  Depends on: quests-data.js   (LEDGER_CATEGORIES, _MILESTONE_MAP)
@@ -8,15 +8,15 @@
 //  Depends on: (global)         STATE, LANG, ITEM_DEFS, save(), pickRandomItem()
 //
 //  Public API:
-//    claimQuest(milestoneId)      — claim a completed milestone by id
-//    buildQuestLogButton()        — initialise badge visibility on game start
-//    _refreshQuestBadge()         — update red badge on the quest-log button
+//    claimQuest(milestoneId)      - claim a completed milestone by id
+//    buildQuestLogButton()        - initialise badge visibility on game start
+//    _refreshQuestBadge()         - update red badge on the quest-log button
 //
 //  Used internally by quests-ui.js:
-//    _milestone_isComplete(ms)                    — has the player hit the target?
-//    _milestone_isClaimed(ms)                     — has the reward been collected?
+//    _milestone_isComplete(ms)                    - has the player hit the target?
+//    _milestone_isClaimed(ms)                     - has the reward been collected?
 //    _milestone_getProgress(ms)  → { current, target, pct }
-//    _ledger_hasAnyClaimable()                    — any ready-to-claim milestone?
+//    _ledger_hasAnyClaimable()                    - any ready-to-claim milestone?
 //
 // ════════════════════════════════════════════════════════════════════════════
 
@@ -82,7 +82,7 @@ const CATEGORY_ACHIEVEMENT_MAP = {
 //------------------------------------------------------------------------
 //
 //  Read-only query layer. All UI and claiming code goes through these
-//  functions — nothing should read STATE.questStats or STATE.questsClaimed
+//  functions - nothing should read STATE.questStats or STATE.questsClaimed
 //  directly outside of this section.
 //
 
@@ -283,7 +283,7 @@ function _banner_buildElement(ms, cat, rewardParts) {
     const banner = document.createElement('div');
     banner.id = 'quest-claim-banner';
 
-    // quests-logic.js — inside _banner_buildElement()
+    // quests-logic.js - inside _banner_buildElement()
 
     banner.innerHTML = `
     <div class="qcb-inner">
@@ -353,7 +353,7 @@ function _refreshQuestBadge() {
 }
 
 /**
- * Public initialiser — call this from game init once the toolbar button
+ * Public initialiser - call this from game init once the toolbar button
  * is in the DOM. Sets the correct initial badge visibility on load.
  */
 function buildQuestLogButton() {
@@ -370,12 +370,12 @@ function buildQuestLogButton() {
 //  from achievements.js. Called once per successful claim from claimQuest().
 //
 //  Structure:
-//    _ach_trackGlobalClaim()             — fired for every single claim
-//    _ach_trackPassivePointsEarned()     — only when pt points are in the reward
-//    _ach_trackKeystoneQuest()           — only for keystone category ids
-//    _ach_trackCategoryMilestone()       — increments the per-category stat
-//    _ach_trackFullCategoryCompletion()  — checks if a whole category is now done
-//    _trackInferenceAchievements()       — orchestrator, called by claimQuest()
+//    _ach_trackGlobalClaim()             - fired for every single claim
+//    _ach_trackPassivePointsEarned()     - only when pt points are in the reward
+//    _ach_trackKeystoneQuest()           - only for keystone category ids
+//    _ach_trackCategoryMilestone()       - increments the per-category stat
+//    _ach_trackFullCategoryCompletion()  - checks if a whole category is now done
+//    _trackInferenceAchievements()       - orchestrator, called by claimQuest()
 //
 
 /**

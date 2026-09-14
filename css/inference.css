@@ -114,7 +114,7 @@
     position: absolute;
     top: 14px;
     right: 18px;
-    z-index: 100; /* was 5 — raise above any overlapping elements */
+    z-index: 100; /* was 5 - raise above any overlapping elements */
     width: clamp(30px, 5vw, 46px);
     height: clamp(30px, 5vw, 46px);
     padding: 0;
@@ -492,7 +492,7 @@
     left: 7%;
     transform: translateY(-50%);
     width: clamp(32px, 5.5vw, 64px);
-    aspect-ratio: 1 / 1; /* was width:5% / height:90% — distorted at
+    aspect-ratio: 1 / 1; /* was width:5% / height:90% - distorted at
                              different modal aspect ratios; now a true
                              circle at every size */
     flex-shrink: 0;
@@ -603,7 +603,7 @@
 }
 
 #quest-log-modal .quest-title {
-    position: static; /* was absolute; left:16% — caused the overlap */
+    position: static; /* was absolute; left:16% - caused the overlap */
     flex: 1 1 auto;
     min-width: 0;
     font-family: var(--ledg-font-display);
@@ -640,7 +640,7 @@
 }
 
 #quest-log-modal .quest-obj-count {
-    position: static; /* was absolute; right:10% — caused the overlap */
+    position: static; /* was absolute; right:10% - caused the overlap */
     flex-shrink: 0;
     white-space: nowrap;
     font-family: var(--ledg-font-body);
@@ -656,7 +656,7 @@
 }
 
 #quest-log-modal .quest-prog-bar {
-    position: static; /* was absolute; top:25%; left:15% — no longer needed
+    position: static; /* was absolute; top:25%; left:15% - no longer needed
                           now that .quest-row is a normal flex column */
     height: clamp(10px, 1.8vw, 18px);
     width: 100%;
@@ -783,7 +783,7 @@
 
 
 
-/* Toast root — fixed to the bottom-right, slides up into view via .show */
+/* Toast root - fixed to the bottom-right, slides up into view via .show */
 #quest-toast {
     position: fixed;
     bottom: clamp(16px, 4vw, 40px);

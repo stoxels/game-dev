@@ -5,7 +5,7 @@
 // from the main stash via Ctrl + left-click. The sold item is destroyed
 // without any confirmation popup and grants exactly one shard.
 //
-// Shard quality scales with the number of stats on the sold item — the
+// Shard quality scales with the number of stats on the sold item - the
 // more stats, the higher the chance for a better shard ("better" = a shard
 // that transmutes into an orb affecting epic-grade gear).
 //
@@ -95,7 +95,7 @@ const EG_SHARD_DEFS = {
 //-------------------SHARD ROLL (QUALITY BY STAT COUNT)-------------------
 //------------------------------------------------------------------------
 
-// Base drop weights — ordered from worst to best. `statScale` determines
+// Base drop weights - ordered from worst to best. `statScale` determines
 // how strongly the sold item's stat count boosts that shard's weight:
 // effectiveWeight = weight * (1 + statCount * statScale).
 // The epic-affecting shards (ascension / elevation / cataclysm) have the
@@ -244,7 +244,7 @@ function _egConvertShardsToOrb(shardDef) {
 
 // Destroys the stash item in the given cell and grants one rolled shard.
 // Selling a UNIQUE item always grants an Ancient Shard (10 → Ancient Orb).
-// No confirmation popup — the sale is instant. Returns true on success.
+// No confirmation popup - the sale is instant. Returns true on success.
 function _egSellStashItem(row, col) {
     const item = _egInventory[row][col];
     if (!item) return false;
@@ -270,7 +270,7 @@ function _egSellStashItem(row, col) {
         ? EG_SHARD_DEFS.shard_ancient
         : _egRollShardForItem(item);
     if (!egAddShard(shardDef.id, 1)) {
-        // Could not grant the shard (runes & orbs strip full) — keep the item.
+        // Could not grant the shard (runes & orbs strip full) - keep the item.
         const grid = document.getElementById('eg-inv-grid');
         if (grid) {
             grid.classList.add('eg-slot-reject');
@@ -279,7 +279,7 @@ function _egSellStashItem(row, col) {
         return false;
     }
 
-    // Item is consumed — clear its cell and close any open tooltip.
+    // Item is consumed - clear its cell and close any open tooltip.
     _egInventory[row][col] = null;
     _egRenderInventoryCell(row, col);
     _egUpdateInvCount();
@@ -302,7 +302,7 @@ function _egSellMapItem(map, sourceEl) {
 
     const shardDef = EG_SHARD_DEFS.shard_horizon;
     if (!egAddShard(shardDef.id, 1)) {
-        // Could not grant the fragment (runes & orbs strip full) — keep the map.
+        // Could not grant the fragment (runes & orbs strip full) - keep the map.
         if (sourceEl) {
             sourceEl.classList.add('eg-slot-reject');
             setTimeout(() => sourceEl.classList.remove('eg-slot-reject'), 600);
@@ -356,7 +356,7 @@ function _egSellDeviceMap() {
     return true;
 }
 
-// Capture-phase mousedown handler — intercepts Ctrl + left-click on items
+// Capture-phase mousedown handler - intercepts Ctrl + left-click on items
 // in the MAIN stash, on MAPS in the map stash / map device slot (gate or
 // hub screen). Equipment sells into a random orb shard; maps always sell
 // into a Horizon Fragment. Registered at script load time so it fires
@@ -372,7 +372,7 @@ document.addEventListener('mousedown', function (e) {
         : !!chip.closest('#screen-endgame-hub'));
     if (!onManagedScreen) return;
 
-    // Don't sell while an orb "use mode" selection is active — the click
+    // Don't sell while an orb "use mode" selection is active - the click
     // belongs to applying the orb.
     if (typeof _egPendingCurrencyUse !== 'undefined' && _egPendingCurrencyUse) return;
 

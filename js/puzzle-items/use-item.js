@@ -1,16 +1,16 @@
 //------------------------------------------------------------------------
-//-------------------USE ITEM — PIPELINE----------------------
+//-------------------USE ITEM - PIPELINE----------------------
 //------------------------------------------------------------------------
 
 // Item-use pipeline: dispatch table, achievement tracking, Frugal Use,
 // consumption bookkeeping and the public useItem() entry point.
 // The actual effects live in the per-item files (reveal.js, shield.js,
-// cursed-*.js, ...) — this file only routes to them.
+// cursed-*.js, ...) - this file only routes to them.
 
 // Prefix-matched handler entries.  Each entry has:
-//   prefix  — id must start with this string
-//   handler — the function to call
-//   exclude — exact ids that share the prefix but must NOT use this handler
+//   prefix  - id must start with this string
+//   handler - the function to call
+//   exclude - exact ids that share the prefix but must NOT use this handler
 const ITEM_PREFIX_HANDLERS = [
     { prefix: 'reveal', handler: _useReveal, exclude: ['cursedReveal'] },
     { prefix: 'markWrong', handler: _useMarkWrong, exclude: [] },
@@ -59,7 +59,7 @@ function _dispatchItemEffect(id, def) {
     const handler = ITEM_EFFECT_HANDLERS[id];
     if (handler) return handler(id, def);
 
-    return ''; // unknown item id — no effect
+    return ''; // unknown item id - no effect
 }
 
 
@@ -74,7 +74,7 @@ function _isMistakeEraserItem(id) {
 
 // Fires all relevant achievement and quest-stat calls for the used item.
 function _trackItemAchievements(id, def) {
-    // Universal — every item use
+    // Universal - every item use
     trackAchStat('itemsUsed');
     if (def.rarity === 'cursed') trackAchStat('cursedItemsUsed');
 
@@ -141,7 +141,7 @@ function _consumeItem(idx, def, msg) {
     const frugalChance = _getFrugalUseChance();
 
     if (frugalChance > 0 && Math.random() < frugalChance) {
-        // Frugal Use proc — the item is NOT removed from inventory
+        // Frugal Use proc - the item is NOT removed from inventory
         itemsUsedThisLevel++;
         _trackItemAchievements(def.id, def);
         updateQuestStats('itemUsed', { defId: def.id, rarity: def.rarity });
@@ -151,7 +151,7 @@ function _consumeItem(idx, def, msg) {
         return;
     }
 
-    // Normal path — remove item, track, save, toast
+    // Normal path - remove item, track, save, toast
     STATE.inventory.splice(idx, 1);
     itemsUsedThisLevel++;
     _trackItemAchievements(def.id, def);

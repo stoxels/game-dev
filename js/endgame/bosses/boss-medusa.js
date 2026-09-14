@@ -1,33 +1,33 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MEDUSA (boss_medusa)-----------------------
 //------------------------------------------------------------------------
-// REWORK — gorgon homage, rebuilt as a full petrification gauntlet. The
+// REWORK - gorgon homage, rebuilt as a full petrification gauntlet. The
 // Medusa turns the whole arena into her statue garden: a raking stone gaze
 // from above, snake heads erupting from the floor on a rhythm, rings of
 // creeping petrification with a single rotating gap, and a living coil that
-// closes around you — then, at the very end, she casts THE STARE and only
+// closes around you - then, at the very end, she casts THE STARE and only
 // the shadows of her own statues can shelter you.
 //
-//   Phase 1 (100–60%) — STONE GAZE. The gorgon's eyes scan from above and
+//   Phase 1 (100–60%) - STONE GAZE. The gorgon's eyes scan from above and
 //                       drag a vertical gaze beam across the arena. Caught
 //                       in the beam = stung. Two passes per cast, faster
 //                       and wider every phase.
 //                       Plus SNAKE STRIKES. Marked floor spots erupt into
-//                       snake heads that bite on a rhythm — leave the bite
+//                       snake heads that bite on a rhythm - leave the bite
 //                       circles!
-//   Phase 2 ( ≤60%)   — PETRIFY WAVES. Stone-gray rings expand from near
+//   Phase 2 ( ≤60%)   - PETRIFY WAVES. Stone-gray rings expand from near
 //                       your position with one rotating safe gap. Slip the
 //                       gap or be caught by the creeping stone.
 //                       Plus COIL CAGE. A snake coil forms around you and
-//                       SHRINKS while its gap slowly rotates — escape
+//                       SHRINKS while its gap slowly rotates - escape
 //                       through the gap before it closes on you.
-//   Phase 3 ( ≤30%)   — Everything faster: wider gaze, more snakes, twin
+//   Phase 3 ( ≤30%)   - Everything faster: wider gaze, more snakes, twin
 //                       waves, tighter coils. The garden fills.
-//   Finale ( ≤10%)    — THE STARE (one-shot set-piece): the boss goes
+//   Finale ( ≤10%)    - THE STARE (one-shot set-piece): the boss goes
 //                       immune and shielded and SWAYS while the arena tints
 //                       serpent-green and giant eyes open at the top. On
-//                       every metronome beat a stone statue rises — and
-//                       every statue casts a SHADOW strip. 3…2…1 — THE
+//                       every metronome beat a stone statue rises - and
+//                       every statue casts a SHADOW strip. 3…2…1 - THE
 //                       STARE: a screen-wide gaze wall sweeps from top to
 //                       bottom and everything it touches turns to stone…
 //                       EXCEPT the shadows behind the statues. SHELTER!
@@ -163,7 +163,7 @@ function _egMechMdStoneGaze(monster, phase) {
     let x = fromLeft ? -beamW : W;
     let dir = fromLeft ? 1 : -1;
 
-    _egNkToast('eg_mech_md_gaze', '🐍 The Medusa: STONE GAZE — out of the beam!', '#c4b5fd');
+    _egNkToast('eg_mech_md_gaze', '🐍 The Medusa: STONE GAZE - out of the beam!', '#c4b5fd');
 
     let t = 0, touchCd = 0, sweeps = 0, live = false;
     _egNkLoop(run, (dtS, now) => {
@@ -195,8 +195,8 @@ function _egMechMdStoneGaze(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: SNAKE STRIKES--------------------------------
 //------------------------------------------------------------------------
-// Marked floor spots erupt into snake heads that bite on a rhythm — three
-// bites each, slightly staggered across the brood — then sink away. Leave
+// Marked floor spots erupt into snake heads that bite on a rhythm - three
+// bites each, slightly staggered across the brood - then sink away. Leave
 // the bite circles!
 const EG_MD_SNAKE_COUNT = [0, 3, 4, 5];
 const EG_MD_SNAKE_BITES = 3;
@@ -232,7 +232,7 @@ function _egMechMdSnakeStrikes(monster, phase) {
         spots.push({ x, y, warn, el, risen: false, bites: 0, done: false });
     }
 
-    _egNkToast('eg_mech_md_snakes', '🐍 The Medusa: SNAKE STRIKES — watch the floor!', '#c4b5fd');
+    _egNkToast('eg_mech_md_snakes', '🐍 The Medusa: SNAKE STRIKES - watch the floor!', '#c4b5fd');
 
     let t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -276,7 +276,7 @@ function _egMechMdSnakeStrikes(monster, phase) {
 //-------------------MECHANIC: PETRIFY WAVES (phase 2+)---------------------
 //------------------------------------------------------------------------
 // Stone-gray rings expand from points near the player with ONE rotating
-// safe gap arc. Slip the gap as the ring crosses you — caught by the ring
+// safe gap arc. Slip the gap as the ring crosses you - caught by the ring
 // band anywhere else and the creeping stone bites.
 const EG_MD_WAVE_COUNT = [0, 0, 1, 2];
 const EG_MD_WAVE_SPEED = [0, 0, 300, 335];
@@ -305,7 +305,7 @@ function _egMechMdPetrifyWaves(monster, phase) {
         waves.push({ x: ex, y: ey, r: 30, gap: Math.random() * 360, rot: (Math.random() < 0.5 ? -1 : 1) * EG_MD_WAVE_ROT, t: -i * 800 * _EG_MD_DEBUG_MULT, el, done: false, hit: false });
     }
 
-    _egNkToast('eg_mech_md_waves', '🐍 The Medusa: PETRIFY WAVES — slip the gap!', '#c4b5fd');
+    _egNkToast('eg_mech_md_waves', '🐍 The Medusa: PETRIFY WAVES - slip the gap!', '#c4b5fd');
 
     let touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -353,8 +353,8 @@ function _egMechMdPetrifyWaves(monster, phase) {
 //-------------------MECHANIC: COIL CAGE (field, passive)-------------------
 //------------------------------------------------------------------------
 // A snake coil forms around the player's position and SHRINKS while its
-// single gap slowly rotates. Escape through the gap — every segment bites.
-// The run is PASSIVE (field hazard — never blocks other mechanics).
+// single gap slowly rotates. Escape through the gap - every segment bites.
+// The run is PASSIVE (field hazard - never blocks other mechanics).
 const EG_MD_COIL_SEGS  = 10;
 const EG_MD_COIL_R0    = 230;
 const EG_MD_COIL_R1    = 80;
@@ -383,7 +383,7 @@ function _egMechMdCoilCage(monster, phase) {
     warn.style.width = (EG_MD_COIL_R0 * 2) + 'px';
     warn.style.height = (EG_MD_COIL_R0 * 2) + 'px';
 
-    _egNkToast('eg_mech_md_coil', '🐍 The Medusa: COIL CAGE — escape through the gap!', '#c4b5fd');
+    _egNkToast('eg_mech_md_coil', '🐍 The Medusa: COIL CAGE - escape through the gap!', '#c4b5fd');
 
     const segs = [];
     for (let i = 0; i < EG_MD_COIL_SEGS; i++) {
@@ -442,8 +442,8 @@ function _egMechMdCoilCage(monster, phase) {
 //------------------------------------------------------------------------
 // The boss goes immune + shielded and SWAYS while the arena tints
 // serpent-green and giant eyes open at the top. On every metronome beat a
-// stone statue rises — each statue casts a SHADOW strip. At zero: THE
-// STARE — a screen-wide gaze wall sweeps from top to bottom and everything
+// stone statue rises - each statue casts a SHADOW strip. At zero: THE
+// STARE - a screen-wide gaze wall sweeps from top to bottom and everything
 // it touches petrifies… except the shadows behind the statues. Charge bar
 // frozen for the whole set-piece (gate in _egTickPlayer via
 // _egMdFinalActive).
@@ -562,11 +562,11 @@ function _egMdFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-md-cd-label">🐍 THE STARE</div>' +
         '<div class="eg-md-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-md-cd-hint">Statues cast safe shadows — get BEHIND one before the gaze sweeps!</div>';
+        '<div class="eg-md-cd-hint">Statues cast safe shadows - get BEHIND one before the gaze sweeps!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_md_final_cd', '🐍💀 THE STARE — shelter behind a statue!', '#e2e8f0');
+    _egNkToast('eg_mech_md_final_cd', '🐍💀 THE STARE - shelter behind a statue!', '#e2e8f0');
 
     // Boss immunity so the set-piece reads as a performance (released at the end).
     monster.bossImmune = true;
@@ -605,7 +605,7 @@ function _egMdFinalStart(monster) {
 }
 
 // THE STARE: a screen-wide gaze wall sweeps from the top to the bottom of
-// the arena. Everything it touches petrifies — except the shadows behind
+// the arena. Everything it touches petrifies - except the shadows behind
 // the statues.
 function _egMdStartGazeSweep(g, monster) {
     const level = monster ? monster.level : 1;
@@ -680,7 +680,7 @@ function _egMdFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egMdTeardown() {
     if (_egMdFinal) { try { _egMdFinalEnd(_egMdFinal); } catch (e) {} _egMdFinal = null; }
@@ -703,8 +703,8 @@ function _egMdTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_MD_DEBUG.fire('gaze'|'snakes'|'waves'|'coil') — runs one now
-//   _EG_MD_DEBUG.final()                              — THE STARE now
+//   _EG_MD_DEBUG.fire('gaze'|'snakes'|'waves'|'coil') - runs one now
+//   _EG_MD_DEBUG.final()                              - THE STARE now
 if (typeof window !== 'undefined') {
     window._EG_MD_DEBUG = {
         fire: (name, phase) => {

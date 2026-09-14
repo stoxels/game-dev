@@ -4,22 +4,22 @@
 // Carnival-ring fight: the arena becomes a pinball table that fights you.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • ROAMING BUMPERS — 2–3 carnival bumpers drift around the arena.
+//   • ROAMING BUMPERS - 2–3 carnival bumpers drift around the arena.
 //     Touching one THWACKS you: a heavy fling across the screen plus a
 //     physical hit. They drift faster and fling harder every phase.
-//   • PINBALL SHOWER — steel pinballs roll in from a screen edge on a
+//   • PINBALL SHOWER - steel pinballs roll in from a screen edge on a
 //     phase-scaled cadence, bouncing off the arena walls. Contact hurts.
 //
 //   HP GATES (watcher):
-//   • 60% — TILT! FLIPPER FRENZY: giant flippers materialize in the bottom
+//   • 60% - TILT! FLIPPER FRENZY: giant flippers materialize in the bottom
 //     corners and slap telegraphed arc bands across the lower arena
 //     (warn → strike → retract, alternating). Contact is a heavy physical
 //     hit. While the flippers rage, the bumpers go TILT: red-hot, drifting
 //     faster, flinging farther.
-//   • 30% — MULTIBALL RUSH: the machine coughs up 6–9 live pinballs that
+//   • 30% - MULTIBALL RUSH: the machine coughs up 6–9 live pinballs that
 //     ricochet off every wall at high speed for 12s. Survive the rush.
 //
-//   CHARGE ATTACK — BUMPER SLAM: when the boss's attack bar fills, a target
+//   CHARGE ATTACK - BUMPER SLAM: when the boss's attack bar fills, a target
 //   ring telegraphs on your position (~1s), then a giant bumper slams down:
 //   anyone inside the ring takes a heavy hit AND gets flung away from the
 //   impact. No generic projectile on top.
@@ -72,8 +72,8 @@ const EG_BUMP_BALL_DMG = 0.05;              // %maxHP per ball touch (physical)
 const EG_BUMP_BALL_CD_MS = 450;             // global ball-hit cooldown
 const EG_BUMP_BALL_R = 26;                  // ball radius
 const EG_BUMP_BALL_BOUNCE_BOOST = 55;       // px/s kick when bouncing off a bumper
-const EG_BUMP_BALL_MAX_SPEED = 640;         // px/s hard cap — kicks can't snowball
-// Slingshots: the two diagonal kickers in the bottom corners — real
+const EG_BUMP_BALL_MAX_SPEED = 640;         // px/s hard cap - kicks can't snowball
+// Slingshots: the two diagonal kickers in the bottom corners - real
 // pinball-table physics for pinballs that hit them.
 const EG_BUMP_SLING_LEN = 300;              // kicker length (px)
 const EG_BUMP_SLING_T = 46;                 // collision half-thickness (px)
@@ -130,7 +130,7 @@ function _egBumperTeardown() {
     _egBumpWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
-    // watcher BEFORE this runs — the overlays must go either way.
+    // watcher BEFORE this runs - the overlays must go either way.
     _egBumperSweep();
 }
 
@@ -185,7 +185,7 @@ function _egBumpSpawnSlings(st, run) {
 
 // Slingshot collision for one pinball: treat each kicker as a capsule
 // (segment + half-thickness). On contact, reflect the velocity about the
-// inward normal (like hitting a wall at an angle) and add the kick boost —
+// inward normal (like hitting a wall at an angle) and add the kick boost -
 // the ball gets shot back into the playfield, exactly like a real machine.
 function _egBumpSlingBall(st, b, now, tilting) {
     st.slings.forEach(sl => {
@@ -198,7 +198,7 @@ function _egBumpSlingBall(st, b, now, tilting) {
         const d = Math.hypot(dx, dy) || 1;
         const minD = EG_BUMP_SLING_T + EG_BUMP_BALL_R;
         if (d < minD) {
-            // The kicker's normal always points INTO the playfield — use it
+            // The kicker's normal always points INTO the playfield - use it
             // directly (a radial sign flip here would silently disable the
             // kick for balls approaching from the playfield side).
             const nx = sl.nx, ny = sl.ny;
@@ -234,11 +234,11 @@ function _egBumperArenaInit(monster) {
         everLive: false, bornAt: performance.now(),
     };
     _egBumpWatcher = st;
-    _egNkToast('eg_bump_intro', '🎪 The Bumper: The carnival ring is OPEN — mind the bumpers!');
+    _egNkToast('eg_bump_intro', '🎪 The Bumper: The carnival ring is OPEN - mind the bumpers!');
     // Tier-scaled clock: the flipper-slap telegraph and the slam ring breathe
     // with tier like every other dodge telegraph. `now`-stamp hit cooldowns
     // stay real-time (fairness floor). Passive run: the watcher lives the
-    // whole fight, so it must not hog _egNkDodgeBusy() — the slam and the
+    // whole fight, so it must not hog _egNkDodgeBusy() - the slam and the
     // shared fog-bank mechanic check that flag.
     const run = _egNkNewRun(monsterId, true);
     run.passive = true;
@@ -326,7 +326,7 @@ function _egBumperArenaInit(monster) {
             b.x += b.vx * dtS;
             b.y += b.vy * dtS;
             // Bumpers are solid: a pinball that hits one bounces off exactly
-            // like it hit a wall on the outer edge — reflect about the
+            // like it hit a wall on the outer edge - reflect about the
             // contact normal, seat the ball on the surface, and give it a
             // lively kick away. The bumper flashes like it does on a thwack.
             st.bumpers.forEach(bp => {
@@ -424,7 +424,7 @@ function _egBumperFlipperFrenzy(st, now) {
         document.querySelectorAll('.eg-bump-rail.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
         document.querySelectorAll('.eg-bump-sling.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
     }, EG_BUMP_TILT_MS + 400);
-    _egNkToast('eg_bump_tilt', '⚠️ TILT! The flippers are furious — stay off the lower lanes!');
+    _egNkToast('eg_bump_tilt', '⚠️ TILT! The flippers are furious - stay off the lower lanes!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
 }
 
@@ -474,7 +474,7 @@ function _egBumperMultiball(st, now) {
             life: EG_BUMP_MULTIBALL_MS, el,
         });
     }
-    _egNkToast('eg_bump_multiball', '🎯 MULTIBALL! The machine is going wild — keep moving!');
+    _egNkToast('eg_bump_multiball', '🎯 MULTIBALL! The machine is going wild - keep moving!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
 }
 
@@ -526,6 +526,6 @@ function _egBumperSlam(monster) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent arena — keep the handler
+// The old scheduled mechanic is now the persistent arena - keep the handler
 // name alive so any stale schedule entry no-ops instead of erroring.
 function _egMechBumperParty() { void 0; }

@@ -19,14 +19,14 @@ const CELL_FX_DURATION = {
 //------------------------------------------------------------------------
 //
 // A unified lingering animation applied directly to grid cells
-// touched by an item effect — independent of the overlay system.
+// touched by an item effect - independent of the overlay system.
 //
 // Types:
-//   'reveal'   — green pulse  (tile revealed / row-col solved)
-//   'mark'     — orange pulse (empty tile marked ✕ by item)
-//   'erase'    — red pulse    (filled tile wiped by cursed item)
-//   'artifact' — gold burst   (artifact / primer headstart)
-//   'unmark'   — yellow fade  (✕ marks cleared by cursedReveal)
+//   'reveal'   - green pulse  (tile revealed / row-col solved)
+//   'mark'     - orange pulse (empty tile marked ✕ by item)
+//   'erase'    - red pulse    (filled tile wiped by cursed item)
+//   'artifact' - gold burst   (artifact / primer headstart)
+//   'unmark'   - yellow fade  (✕ marks cleared by cursedReveal)
 //
 // Usage:
 //   _applyCellEffect(['g-3-2', 'g-3-5'], 'reveal');
@@ -39,7 +39,7 @@ function _ensureCellEffectCSS() {
     const style = document.createElement('style');
     style.id = 'cell-effect-style';
     style.textContent = `
-    /* Shared overlay layer — sits on top of the cell's real background
+    /* Shared overlay layer - sits on top of the cell's real background
        instead of replacing it, so fading out never exposes whatever is
        behind the grid (e.g. the level background image). */
     .cell-fx-reveal,
@@ -134,7 +134,7 @@ function _applyCellEffect(cellIds, type, source) {
     _ensureCellEffectCSS();
 
     // Programmatic reveals (items, passives, class abilities) feed the
-    // endgame projectile system — guarded, so it is a no-op outside endgame.
+    // endgame projectile system - guarded, so it is a no-op outside endgame.
     if (type === 'reveal' && typeof _egOnProgrammaticReveal === 'function') {
         _egOnProgrammaticReveal(cellIds, source);
     }

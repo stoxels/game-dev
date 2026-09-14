@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CHAOS (boss_chaos)-------------------------------
 //------------------------------------------------------------------------
-// Pinnacle entropy: a roulette of ruin — shrapnel, orbs, sweeps and pulses
-// in an order even it does not know — punctuated by a war shout that
+// Pinnacle entropy: a roulette of ruin - shrapnel, orbs, sweeps and pulses
+// in an order even it does not know - punctuated by a war shout that
 // empowers it further every time. Adapt or die adapting.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -134,7 +134,7 @@ function _egMechChaosRoulette(monster, phase) {
             ch.remove = () => ch.el.remove();
             bits.push(ch);
         } else {
-            // Pulse ring from a random anchor — outrun the band.
+            // Pulse ring from a random anchor - outrun the band.
             const ax = 100 + Math.random() * Math.max(60, W - 200);
             const ay = 100 + Math.random() * Math.max(60, H - 200);
             const ring = _egNkEl(run, 'div', 'eg-nk-ring');

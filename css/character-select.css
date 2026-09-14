@@ -2,6 +2,24 @@
    CHARACTER SELECTION SCREEN
    ----------------------------------------------------------------------- */
 
+/* CINEMA MODE - the image-based select (intro handoff) takes over the whole
+   screen: black backdrop like the intro overlay, no scrollbars, content
+   centered. The legacy card layout keeps the scrollable column below. */
+#screen-character-select.csi-mode {
+    justify-content: center;
+    background: #000;
+    overflow: hidden;
+    padding: 0;
+}
+
+/* The card layout's 1000px column cap must not shrink the stage - cinema
+   mode goes edge to edge so the stage's own letterbox math is in charge. */
+#screen-character-select.csi-mode #char-select-content {
+    max-width: none;
+    width: 100%;
+    gap: 0;
+}
+
 #screen-character-select {
     flex-direction: column;
     align-items: center;
@@ -17,8 +35,230 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 1000px; /* was invalid ("max-width: px;") and silently ignored — fixed to match .cs-cards' own cap */
+    max-width: 1000px; /* was invalid ("max-width: px;") and silently ignored - fixed to match .cs-cards' own cap */
     gap: clamp(10px, 2.5vw, 16px);
+}
+
+/* =======================================================================
+   IMAGE CHARACTER SELECT (csi-*) - the intro's final frame as the screen
+   =======================================================================
+   The stage is a plain <div> with the artwork's aspect ratio; width is
+   min(viewport width, height × ratio) so it letterboxes exactly like the
+   intro overlay's .mediaFrame - the frozen intro frame dissolving into it
+   is pixel-aligned. Hotspots are % positions on the stage. */
+.csi-title {
+    position: absolute;
+    /* Dead center of the stage - the title reads as part of the scene. */
+    top: 35%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    z-index: 3;
+    pointer-events: none;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, .9), 0 0 24px rgba(0, 0, 0, .7);
+}
+
+.csi-stage {
+    position: relative;
+    aspect-ratio: 1376 / 768;
+    width: min(100%, calc(100vh * 1.791667));
+    max-height: 100vh;
+    overflow: hidden;
+    background: #000;
+}
+
+.csi-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Bottom shading so the title + labels read over the bright artwork. */
+.csi-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(0,0,0,.42) 0%, rgba(0,0,0,0) 22%,
+                        rgba(0,0,0,0) 72%, rgba(0,0,0,.5) 100%);
+}
+
+/* The three heroes - invisible hit zones that come alive on hover: a soft
+   accent glow behind the character, a rim, and the name label underfoot. */
+.csi-hotspot {
+    position: absolute;
+    z-index: 2;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.csi-hotspot::before {
+    content: '';
+    position: absolute;
+    inset: -6% -10%;
+    border-radius: 12px;
+    background: radial-gradient(ellipse at 50% 62%,
+        var(--char-glow, rgba(255,255,255,.35)) 0%, transparent 68%);
+    opacity: 0;
+    transition: opacity .25s ease;
+    pointer-events: none;
+}
+
+.csi-hotspot::after {
+    content: '';
+    position: absolute;
+    inset: -2% -6%;
+    border-radius: 12px;
+    border: 1px solid var(--char-accent, #fff);
+    opacity: 0;
+    transition: opacity .25s ease, box-shadow .25s ease;
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+    pointer-events: none;
+}
+
+.csi-hotspot:hover::before { opacity: 1; }
+
+.csi-hotspot:hover::after {
+    opacity: .55;
+    box-shadow: 0 0 22px -6px var(--char-accent, #fff), inset 0 0 18px -10px var(--char-accent, #fff);
+}
+
+.csi-hotspot.selected::after {
+    opacity: 1;
+    border-width: 2px;
+    box-shadow: 0 0 30px -4px var(--char-accent, #fff), inset 0 0 24px -8px var(--char-accent, #fff);
+}
+
+/* Name label, hidden until hover - the scene stays a pure painting until
+   the player starts exploring. Sits ABOVE the head so it never collides
+   with the hint line at the stage's bottom edge. */
+.csi-hotspot-label {
+    position: absolute;
+    left: 50%;
+    top: -30px;
+    transform: translateX(-50%) translateY(4px);
+    font-family: var(--PX, monospace);
+    font-size: clamp(11px, 1.4vw, 15px);
+    letter-spacing: .22em;
+    color: var(--char-accent, #fff);
+    text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 14px rgba(0,0,0,.8);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .25s ease, transform .25s ease;
+    pointer-events: none;
+}
+
+.csi-hotspot:hover .csi-hotspot-label,
+.csi-hotspot.selected .csi-hotspot-label {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Selection pulse - one soft ripple from the chosen hero. */
+@keyframes csi-pick {
+    0% { box-shadow: 0 0 0 0 var(--char-glow, rgba(255,255,255,.35)); }
+    100% { box-shadow: 0 0 0 26px rgba(0,0,0,0); }
+}
+
+.csi-hotspot.selected::after {
+    animation: csi-pick .8s ease-out;
+}
+
+.csi-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(10px, 3.4vh, 34px);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.csi-bottom .cs-confirm-btn {
+    pointer-events: auto;
+    /* Over the artwork the bare wire-frame button was unreadable - give it
+       a dark pill so it reads at every stage of its enabled/disabled cycle. */
+    background: rgba(10, 8, 4, .82);
+    border-radius: 999px;
+    padding: clamp(8px, 1.8vw, 11px) clamp(26px, 6vw, 44px);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .55);
+    margin-top: 0;
+}
+
+.csi-bottom .cs-confirm-btn:not(.disabled) {
+    background: rgba(20, 16, 8, .9);
+}
+
+/* -----------------------------------------------------------------------
+   SELECT TOOLTIP - the map-view tooltip's parchment look, widened for the
+   full character dossier. Lives on its own #csi-tooltip element so the map
+   view's shared element keeps its 220px width elsewhere.
+   ----------------------------------------------------------------------- */
+.csi-tooltip {
+    /* Wide, not tall: the full dossier at 220px ran ~645px high on a 900px
+       viewport - widening keeps every section on screen without a wall of
+       wrapped text. Width is set on the ID (base + .show) so map-view.css's
+       later-loaded .mv-tooltip / .mv-tooltip.show rules (equal class
+       specificity, 220/280px) can never narrow it regardless of load order. */
+    padding: 12px 16px;
+    border-left-color: var(--tip-accent, #c8a84b);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .6);
+}
+
+#csi-tooltip,
+#csi-tooltip.show {
+    /* Capped to the viewport so the flip logic in _csiTrackTip always has
+       room to reposition on narrow windows. */
+    max-width: min(560px, calc(100vw - 24px));
+}
+
+.csi-tip-section {
+    margin-top: 5px;
+}
+
+.csi-tip-label {
+    display: block;
+    font-size: 8.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--tip-accent, #c8a84b);
+    opacity: .9;
+    margin-bottom: 1px;
+}
+
+.csi-tip-trait {
+    display: flex;
+    gap: 7px;
+    margin-top: 4px;
+}
+
+.csi-tip-trait-icon { flex: 0 0 auto; font-size: 12px; line-height: 1.4; }
+
+.csi-tip-trait-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.csi-tip-trait-name {
+    color: #ffe9ad;
+    font-size: 10px;
+}
+
+.csi-tip-trait-desc {
+    opacity: .82;
 }
 
 /* Title */
@@ -41,7 +281,7 @@
     margin-bottom: 8px;
 }
 
-/* Card row — auto-fits as many ~280px columns as fit, so it naturally
+/* Card row - auto-fits as many ~280px columns as fit, so it naturally
    collapses 3 -> 2 -> 1 as the viewport narrows, no hard breakpoint to
    maintain. minmax()'s lower bound is the "never squeeze narrower than
    this" floor; raise/lower it to tune where columns drop. */
@@ -101,7 +341,7 @@
     opacity: 1;
 }
 
-/* Character image — height now scales with the card's own width via vw,
+/* Character image - height now scales with the card's own width via vw,
    clamped so it never gets absurdly short (narrow card) or huge (wide card) */
 .cs-card-img {
     width: 100%;
@@ -243,7 +483,7 @@
 }
 
 /* -----------------------------------------------------------------------
-   CHARACTER AVATAR — LEVEL SELECT TOP BAR
+   CHARACTER AVATAR - LEVEL SELECT TOP BAR
    ----------------------------------------------------------------------- */
 
 .ls-char-avatar {

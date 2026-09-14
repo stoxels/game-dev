@@ -1766,8 +1766,8 @@ const TALENT_TREE_DATA = {
             "y": 1400,
             "nameEn": "Keystone: Golden Clock",
             "nameDe": "Schlüsselfertigkeit: Goldene Uhr",
-            "descEn": "Enables the Golden Clock as an item reward. The Golden Clock stops the timer — it can no longer decrease, only increase. Timer items are 100% more effective for the remainder of the level. However, the player may only make 3 more mistakes before the level fails.",
-            "descDe": "Ermöglicht die Goldene Uhr als Gegenstandsbelohnung. Die Goldene Uhr stoppt den Timer — er kann nicht mehr sinken, nur noch steigen. Timer-Gegenstände sind für den Rest des Levels 100% effektiver. Allerdings darf der Spieler nur noch 3 weitere Fehler machen, bevor das Level fehlschlägt.",
+            "descEn": "Enables the Golden Clock as an item reward. The Golden Clock stops the timer - it can no longer decrease, only increase. Timer items are 100% more effective for the remainder of the level. However, the player may only make 3 more mistakes before the level fails.",
+            "descDe": "Ermöglicht die Goldene Uhr als Gegenstandsbelohnung. Die Goldene Uhr stoppt den Timer - er kann nicht mehr sinken, nur noch steigen. Timer-Gegenstände sind für den Rest des Levels 100% effektiver. Allerdings darf der Spieler nur noch 3 weitere Fehler machen, bevor das Level fehlschlägt.",
             "icon": "🕰️",
             "statKey": "keystone_golden_clock"
         },
@@ -2866,8 +2866,8 @@ const TALENT_TREE_DATA = {
             "y": -400,
             "nameEn": "Keystone: Overfitting",
             "nameDe": "Schlüsselfertigkeit: Überanpassung",
-            "descEn": "The first 15% of cells you fill are filled for free — mistakes in this phase cost no time. After 50% completion, each mistake costs triple the normal time.",
-            "descDe": "Die ersten 15% der Zellen, die du ausfüllst, sind kostenlos — Fehler in dieser Phase kosten keine Zeit. Nach 50% Abschluss kostet jeder Fehler dreimal so viel Zeit wie normal.",
+            "descEn": "The first 15% of cells you fill are filled for free - mistakes in this phase cost no time. After 50% completion, each mistake costs triple the normal time.",
+            "descDe": "Die ersten 15% der Zellen, die du ausfüllst, sind kostenlos - Fehler in dieser Phase kosten keine Zeit. Nach 50% Abschluss kostet jeder Fehler dreimal so viel Zeit wie normal.",
             "icon": "📉",
             "statKey": "keystone_overfitting"
         },
@@ -3208,7 +3208,7 @@ const TALENT_TREE_DATA = {
             "y": -350,
             "nameEn": "Keystone: Zero Variance",
             "nameDe": "Schlüsselfertigkeit: Nullvarianz",
-            "descEn": "Every mistake costs exactly 45 seconds — no matter how far into the level you are, which class you play or what modifiers are active.",
+            "descEn": "Every mistake costs exactly 45 seconds - no matter how far into the level you are, which class you play or what modifiers are active.",
             "descDe": "Jeder Fehler kostet exakt 45 Sekunden – egal wie weit du im Level bist, welche Klasse du spielst oder welche Modifikatoren aktiv sind.",
             "icon": "➖",
             "statKey": "keystone_zero_variance"
@@ -3582,7 +3582,7 @@ const TALENT_TREE_DATA = {
             "y": -1500,
             "nameEn": "Keystone: Scholar's Debt",
             "nameDe": "Schlüsselfertigkeit: Gelehrten-Schuld",
-            "descEn": "You start every level with double time — but 30 seconds are deducted every 60 seconds.",
+            "descEn": "You start every level with double time - but 30 seconds are deducted every 60 seconds.",
             "descDe": "Du startest jedes Level mit doppelter Zeit – aber alle 60 Sekunden werden 30 Sekunden abgezogen.",
             "icon": "💸",
             "statKey": "keystone_scholars_debt"
@@ -3879,7 +3879,7 @@ const TALENT_TREE_DATA = {
             "y": -380,
             "nameEn": "Peripheral Vision",
             "nameDe": "Peripheres Sehen",
-            "descEn": "Auto-marks have a 25% chance to also mark their horizontal same-row neighbours — but only if those are truly empty.",
+            "descEn": "Auto-marks have a 25% chance to also mark their horizontal same-row neighbours - but only if those are truly empty.",
             "descDe": "Automatische Markierungen haben 25% Chance, auch ihre horizontalen Nachbarn in derselben Reihe zu markieren – aber nur, wenn diese wirklich leer sind.",
             "icon": "👀",
             "statKey": "peripheral_vision"

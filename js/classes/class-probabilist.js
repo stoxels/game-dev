@@ -16,7 +16,7 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Charged arrow timing — deliberately much slower than the small marking
+// Charged arrow timing - deliberately much slower than the small marking
 // arrows fired by _firePrecisionArrow, so it reads as a "wind-up" shot.
 const PM_CHARGED_ARROW_SPEED_PX_S = 160;
 const PM_CHARGED_ARROW_MIN_DURATION_S = 0.7;
@@ -41,7 +41,7 @@ let _fieldScanPreviewKey = null; // last-rendered region, to skip redundant rebu
 // Note: window._pmMomentumActive / _pmMomentumSet / _pmMomentumTimeout are
 // dynamic globals used to communicate the momentum_of_certainty bonus
 // window to other files. They're intentionally left undefined until
-// _precisionMarkStartMomentumWindow first runs (see PRECISION MARK — LOGIC
+// _precisionMarkStartMomentumWindow first runs (see PRECISION MARK - LOGIC
 // below) rather than hoisted here, since they're runtime-triggered state,
 // not fixed constants.
 
@@ -79,14 +79,19 @@ function _pmGetSpriteOrigin() {
 
 
 //------------------------------------------------------------------------
-//------------------------PRECISION MARK — LOGIC--------------------------
+//------------------------PRECISION MARK - LOGIC--------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Computes the maximum number of cells Precision Mark is allowed to mark,
 // based on the player's class level and any relevant passive skills.
 function _precisionMarkComputeMarkCap() {
-    const level = STATE.classActive1Level || 1;
+    // Effect rank follows the slotted charm when one is placed.
+    let level = STATE.classActive1Level || 1;
+    if (typeof getSkillCastRankClamped === 'function') {
+        const charmRank = getSkillCastRankClamped('probabilist_active1');
+        if (charmRank) level = charmRank;
+    }
     let markCap = 3 + (level * 2); // lv1→5, lv2→7, lv3→9
     if (ptHasSkill('probabilistic_sweep')) markCap += 1;
     if (ptHasSkill('expanded_inference')) markCap += 1;
@@ -108,9 +113,9 @@ function _precisionMarkBuildTargets(row, col, extraLines, rows, cols) {
     return { targetRows, targetCols };
 }
 
-// _precisionMarkSelectLine — selects up to `maxCount` empty, unmarked cells
+// _precisionMarkSelectLine - selects up to `maxCount` empty, unmarked cells
 // from a single line (row or column) for Precision Mark to mark. Selection
-// only — does NOT touch userGrid or render anything, since the ✕ now only
+// only - does NOT touch userGrid or render anything, since the ✕ now only
 // appears once that cell's marking arrow actually lands (see
 // _precisionMarkCommitMark). `claimed` tracks cells already picked by other
 // lines in this same call, since userGrid itself isn't updated yet to do
@@ -127,25 +132,25 @@ function _precisionMarkSelectLine(cells, sol, maxCount, affected, claimed) {
     });
 }
 
-// _precisionMarkCommitMark — performs the actual userGrid mutation + render
+// _precisionMarkCommitMark - performs the actual userGrid mutation + render
 // for one Precision Mark cell, called exactly when that cell's marking
 // arrow lands. Re-checks the cell is still empty first, in case the player
 // manually filled or marked it during the arrow's brief flight time.
 function _precisionMarkCommitMark(id) {
     const [, r, c] = id.split('-').map(Number);
-    if (userGrid[r][c] !== 0) return; // no longer eligible — leave it alone
+    if (userGrid[r][c] !== 0) return; // no longer eligible - leave it alone
 
     userGrid[r][c] = 2;
     renderCell(r, c);
     _applyCellEffect([id], 'mark');
 }
 
-// _precisionMarkApply — selects all cells Precision Mark will mark across
+// _precisionMarkApply - selects all cells Precision Mark will mark across
 // the target rows/cols. Selection only; the actual mark is committed later,
 // in sync with the VFX. Returns the list of affected cell id strings.
 // The mark cap is distributed as evenly as possible across ALL lines
 // (rows AND columns, interleaved), so both orientations reliably receive
-// marks — a naive rows-first pass could let rows consume the entire cap
+// marks - a naive rows-first pass could let rows consume the entire cap
 // and leave the columns empty.
 function _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap) {
     const affected = [];
@@ -284,11 +289,11 @@ function _precisionMarkBonusLine(rows, cols, sol, affected) {
 
 
 //------------------------------------------------------------------------
-//--------------------PRECISION MARK — VFX--------------------------------
+//--------------------PRECISION MARK - VFX--------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _pmChargedArrowTrailTick — spawns one fading comet-trail particle at the
+// _pmChargedArrowTrailTick - spawns one fading comet-trail particle at the
 // charged arrow's current on-screen position. Called on an interval while
 // the arrow is in flight.
 function _pmChargedArrowTrailTick(arrowEl) {
@@ -306,7 +311,7 @@ function _pmChargedArrowTrailTick(arrowEl) {
     setTimeout(() => spark.remove(), 520);
 }
 
-// _playChargedArrowImpact — bigger impact burst played when the charged
+// _playChargedArrowImpact - bigger impact burst played when the charged
 // arrow lands on the clicked cell (distinct from _playArrowImpact, which is
 // the smaller burst used for the marking arrows).
 function _playChargedArrowImpact(x, y) {
@@ -323,8 +328,8 @@ function _playChargedArrowImpact(x, y) {
     setTimeout(() => flash.remove(), 480);
 }
 
-// _pmFireChargedArrow — animates the special charged arrow flying from
-// (sx, sy) — the player sprite — to (tx, ty) — the clicked cell. Slower
+// _pmFireChargedArrow - animates the special charged arrow flying from
+// (sx, sy) - the player sprite - to (tx, ty) - the clicked cell. Slower
 // and larger than the small marking arrows, with a glowing comet trail.
 // Calls onArrival() once it lands.
 function _pmFireChargedArrow(sx, sy, tx, ty, onArrival) {
@@ -444,8 +449,8 @@ function _firePrecisionArrow(sx, sy, tx, ty, onImpact) {
     }, duration * 1000 + 30);
 }
 
-// _precisionMarkFireArrowsAtTargets — fires a small green marking arrow at
-// every target cell, originating from (originX, originY) — the point where
+// _precisionMarkFireArrowsAtTargets - fires a small green marking arrow at
+// every target cell, originating from (originX, originY) - the point where
 // the charged arrow just landed. Each cell's ✕ is committed exactly when
 // its own arrow lands, so the mark and the VFX stay in sync.
 function _precisionMarkFireArrowsAtTargets(ids, originX, originY) {
@@ -462,7 +467,7 @@ function _precisionMarkFireArrowsAtTargets(ids, originX, originY) {
     });
 }
 
-// _playPrecisionMarkEffect — fires the full Precision Mark VFX sequence:
+// _playPrecisionMarkEffect - fires the full Precision Mark VFX sequence:
 // a slow charged arrow flies from the player's sprite to the clicked cell,
 // and once it lands, the green marking arrows fan out from that cell to
 // every cell the ability just marked.
@@ -482,7 +487,7 @@ function _playPrecisionMarkEffect(clickRow, clickCol, affectedIds) {
 
 
 //------------------------------------------------------------------------
-//------------------------FIELD SCAN — LOGIC------------------------------
+//------------------------FIELD SCAN - LOGIC------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -579,12 +584,12 @@ function _fieldScanRestore(scanned, prevStates, isClassAbility = false) {
     // The scan may have permanently revealed the last missing filled cells
     // via god_of_probabilities (or the player may have completed the puzzle
     // while the scan was still active). Check for win now that the board
-    // state is final — otherwise the level would appear solved but never
+    // state is final - otherwise the level would appear solved but never
     // trigger the win overlay until the next manual click.
     if (typeof checkWin === 'function' && !dead) checkWin();
 }
 
-// _fieldScanComputeOrigin — centers a scanSize x scanSize region on the
+// _fieldScanComputeOrigin - centers a scanSize x scanSize region on the
 // clicked cell, clamped so the region never runs off the edge of the grid.
 function _fieldScanComputeOrigin(row, col, scanSize, rows, cols) {
     const half = Math.floor((scanSize - 1) / 2);
@@ -595,7 +600,7 @@ function _fieldScanComputeOrigin(row, col, scanSize, rows, cols) {
     return { startRow, startCol };
 }
 
-// _fieldScanComputeTargets — selection only (no mutation): returns every
+// _fieldScanComputeTargets - selection only (no mutation): returns every
 // cell inside the scan region eligible for the scan-reveal treatment (i.e.
 // not already correctly filled or revealed). The length of this list is
 // exactly how many drop-arrows will rain down onto the grid.
@@ -610,7 +615,7 @@ function _fieldScanComputeTargets(startRow, startCol, scanSize, rows, cols, sol)
     return targets;
 }
 
-// _fieldScanCommitCell — performs the actual DOM mutation for one Field Scan
+// _fieldScanCommitCell - performs the actual DOM mutation for one Field Scan
 // cell, called exactly when that cell's drop-arrow lands. Mirrors what the
 // old (synchronous) _fieldScanRevealRegion used to do per cell, just staged
 // in time with the VFX. Re-checks eligibility in case the player changed
@@ -630,7 +635,7 @@ function _fieldScanCommitCell(r, c, sol) {
 
 
 //------------------------------------------------------------------------
-//---------------------FIELD SCAN — VFX----------------------------------
+//---------------------FIELD SCAN - VFX----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -805,20 +810,24 @@ function _scanBeamScheduleRowFlashes(startRow, endRow, startCol, endCol, duratio
     }
 }
 
-// _fieldScanGetEffectiveSizeForPreview — returns the current effective scan
+// _fieldScanGetEffectiveSizeForPreview - returns the current effective scan
 // size (after passive bonuses) for whatever rank Field Scan is at. Kept
 // separate from _fieldScanComputeEffectiveParams since the preview doesn't
 // have a durationMs value yet (the ability hasn't fired).
 function _fieldScanGetEffectiveSizeForPreview() {
     const def = CLASS_DEFS?.probabilist;
     if (!def) return 3;
-    const level = STATE.classActive2Level || 1;
+    let level = STATE.classActive2Level || 1;
+    if (typeof getSkillCastRankClamped === 'function') {
+        const charmRank = getSkillCastRankClamped('probabilist_active2');
+        if (charmRank) level = charmRank;
+    }
     const actData = def.active2.levels[level - 1];
     if (!actData) return 3;
     return _fieldScanComputeEffectiveParams(actData.effect.scanSize, actData.effect.scanDuration).effectiveSize;
 }
 
-// _fieldScanGetHoveredCell — resolves which grid cell is under the given
+// _fieldScanGetHoveredCell - resolves which grid cell is under the given
 // viewport coordinates, or null if the cursor isn't over the grid at all.
 function _fieldScanGetHoveredCell(clientX, clientY) {
     const el = document.elementFromPoint(clientX, clientY);
@@ -829,7 +838,7 @@ function _fieldScanGetHoveredCell(clientX, clientY) {
     return { r: parseInt(m[1], 10), c: parseInt(m[2], 10) };
 }
 
-// _fieldScanBuildPreviewEl — creates the dashed preview outline once and
+// _fieldScanBuildPreviewEl - creates the dashed preview outline once and
 // appends it to #puzzle-scaler. Reused across hover updates rather than
 // recreated every mousemove.
 function _fieldScanBuildPreviewEl(wrap) {
@@ -842,7 +851,7 @@ function _fieldScanBuildPreviewEl(wrap) {
     return el;
 }
 
-// _fieldScanClearPreview — removes the live preview outline. Called when
+// _fieldScanClearPreview - removes the live preview outline. Called when
 // Field Scan is disarmed (cancelled, executed, or the player switches to a
 // different ability/slot) and whenever the cursor leaves the grid while armed.
 function _fieldScanClearPreview() {
@@ -853,7 +862,7 @@ function _fieldScanClearPreview() {
     }
 }
 
-// _fieldScanUpdatePreview — called on every mousemove while any ability is
+// _fieldScanUpdatePreview - called on every mousemove while any ability is
 // armed (see targeting-reticle.js). No-ops unless Field Scan specifically
 // is the one armed. Moves/resizes the dashed rectangle to match whichever
 // NxN region is currently centred under the cursor, using the exact same
@@ -875,7 +884,7 @@ function _fieldScanUpdatePreview(clientX, clientY) {
     const { startRow, startCol } = _fieldScanComputeOrigin(hovered.r, hovered.c, scanSize, rows, cols);
 
     const key = `${startRow}-${startCol}-${scanSize}`;
-    if (key === _fieldScanPreviewKey) return; // region unchanged since last move — skip rebuild
+    if (key === _fieldScanPreviewKey) return; // region unchanged since last move - skip rebuild
     _fieldScanPreviewKey = key;
 
     const wrap = document.getElementById('puzzle-scaler');
@@ -928,7 +937,7 @@ function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
     }, durationMs + 100);
 }
 
-// _fieldScanGetRainOrigin — returns the on-screen "split point" for the
+// _fieldScanGetRainOrigin - returns the on-screen "split point" for the
 // rain-down VFX: horizontally centred on the puzzle grid and floating a
 // little above its top edge (so the arrows visibly drop down onto the scan
 // area instead of flying in from wherever the timer UI happens to sit).
@@ -952,7 +961,7 @@ function _fieldScanGetRainOrigin() {
     return { x: window.innerWidth / 2, y: 60 };
 }
 
-// _fieldScanChargeTrailTick — spawns one fading square "data pixel" behind
+// _fieldScanChargeTrailTick - spawns one fading square "data pixel" behind
 // the charge bolt while it's in flight.
 function _fieldScanChargeTrailTick(boltEl) {
     const rect = boltEl.getBoundingClientRect();
@@ -966,7 +975,7 @@ function _fieldScanChargeTrailTick(boltEl) {
     setTimeout(() => px.remove(), 420);
 }
 
-// _fieldScanPlaySplitBurst — brief radial burst at the rain origin when the
+// _fieldScanPlaySplitBurst - brief radial burst at the rain origin when the
 // charge bolt arrives and splits into the rain-down arrows.
 function _fieldScanPlaySplitBurst(x, y) {
     const burst = document.createElement('div');
@@ -978,7 +987,7 @@ function _fieldScanPlaySplitBurst(x, y) {
     Audio_Manager.playSFX('fieldScan');
 }
 
-// _fieldScanFireChargeArrow — animates the charge bolt flying from the
+// _fieldScanFireChargeArrow - animates the charge bolt flying from the
 // player sprite to the rain origin above the grid. Visually distinct from
 // Precision Mark's
 // charged arrow: a dashed "data bolt" with a square-pixel trail instead of
@@ -1021,7 +1030,7 @@ function _fieldScanFireChargeArrow(sx, sy, tx, ty, onArrival) {
     }, duration * 1000 + 30);
 }
 
-// _fieldScanPlayLandPing — tiny flash where a drop-arrow lands.
+// _fieldScanPlayLandPing - tiny flash where a drop-arrow lands.
 function _fieldScanPlayLandPing(x, y) {
     const ping = document.createElement('div');
     ping.className = 'fs-land-ping';
@@ -1030,7 +1039,7 @@ function _fieldScanPlayLandPing(x, y) {
     setTimeout(() => ping.remove(), 380);
 }
 
-// _fieldScanFireDropArrow — animates one small drop-arrow falling from the
+// _fieldScanFireDropArrow - animates one small drop-arrow falling from the
 // rain origin (sx, sy) onto a target cell (tx, ty), using an accelerating
 // "gravity" ease so it reads as falling rather than flying flat. Calls
 // onLand() the instant it touches down.
@@ -1067,9 +1076,9 @@ function _fieldScanFireDropArrow(sx, sy, tx, ty, onLand) {
     }, duration * 1000 + 20);
 }
 
-// _fieldScanFinishLanding — runs once every drop-arrow has landed: plays the
+// _fieldScanFinishLanding - runs once every drop-arrow has landed: plays the
 // existing beam-sweep VFX, shows the toast/achievement, and schedules the
-// restore exactly as the old (instant) version did — just delayed until the
+// restore exactly as the old (instant) version did - just delayed until the
 // rain-down has actually finished.
 function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
     _playScanBeamEffect(startRow, startCol, scanSize, durationMs);
@@ -1079,7 +1088,7 @@ function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, s
     setTimeout(() => _fieldScanRestore(scanned, prevStates, isClassAbility), durationMs);
 }
 
-// _fieldScanSplitAndRain — fires one drop-arrow per target cell, all
+// _fieldScanSplitAndRain - fires one drop-arrow per target cell, all
 // originating from the rain origin above the grid. Staggered (with a little
 // jitter) for a natural "rain" feel. Once every drop-arrow has landed, the
 // existing beam-sweep scan effect plays and the restore timer is scheduled.
@@ -1110,7 +1119,7 @@ function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanS
     });
 }
 
-// _fieldScanPlayTargetedVFX — full sequence: charge bolt sprite → rain
+// _fieldScanPlayTargetedVFX - full sequence: charge bolt sprite → rain
 // origin (a point centred above the grid), split into one drop-arrow per
 // target cell, rain down, then (once every arrow has landed) the existing
 // beam-sweep effect fires.
@@ -1130,7 +1139,7 @@ function _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, scanSize, d
 //------------------------------------------------------------------------
 
 // The following are earlier, simpler implementations superseded by the
-// targeted/staggered VFX above. Kept commented out for reference only —
+// targeted/staggered VFX above. Kept commented out for reference only -
 // not called anywhere.
 
 // Picks a random top-left corner so the scan region stays fully within grid bounds.
@@ -1174,7 +1183,7 @@ function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
     return { scanned, prevStates };
 }
 
-// Old simpler scan beam — a single glowing band that sweeps top-to-bottom.
+// Old simpler scan beam - a single glowing band that sweeps top-to-bottom.
 // Kept here in case it is useful for other scan-like effects in the future,
 // currently used by _executeFieldScanLegacy (Interquartile Vision).
 function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
@@ -1240,7 +1249,7 @@ function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
     setTimeout(() => { beam.remove(); styleTag.remove(); }, durationMs + 150);
 }
 
-// _executeFieldScanLegacy — synchronous whole-region Field Scan used by the
+// _executeFieldScanLegacy - synchronous whole-region Field Scan used by the
 // Interquartile Vision passive node at level start. Reveals every eligible
 // cell in the region in one pass (no per-cell rain VFX), plays the legacy
 // beam sweep, then restores via the standard scan timer.
@@ -1265,7 +1274,7 @@ function _executeFieldScanLegacy(row, col, scanSize, durationMs) {
 
 
 //------------------------------------------------------------------------
-//--------------------BAYESIAN INSIGHT — VFX------------------------------
+//--------------------BAYESIAN INSIGHT - VFX------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1393,7 +1402,7 @@ function _playBayesianInsightAnimation(markedCellIds) {
 
 
 //------------------------------------------------------------------------
-//---------------------BAYESIAN REVEAL — VFX------------------------------
+//---------------------BAYESIAN REVEAL - VFX------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -1578,7 +1587,7 @@ function _executePrecisionMark(row, col, extraLines) {
     const affected = _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap);
 
     _playPrecisionMarkEffect(row, col, affected);
-    // (the _applyCellEffect(affected, 'mark') call that used to be here is gone —
+    // (the _applyCellEffect(affected, 'mark') call that used to be here is gone -
     // it now fires per-cell, at impact, inside _precisionMarkCommitMark)
     showToast(t('cls_precision_marked').replace('{n}', affected.length));
 
@@ -1591,12 +1600,12 @@ function _executePrecisionMark(row, col, extraLines) {
     }
 }
 
-// _executeFieldScan — main entry point for the (now targeted) Field Scan
+// _executeFieldScan - main entry point for the (now targeted) Field Scan
 // ability. Centers a scanSize x scanSize region on the clicked cell, then
 // plays the "charge → split → rain down" VFX. The scan itself (beam sweep +
 // temporary reveal) only actually triggers once every split arrow has landed.
 // isClassAbility is true only for a real cast of the class ability (not the
-// emergency_scan or Interquartile Vision passive scans) — god_of_probabilities
+// emergency_scan or Interquartile Vision passive scans) - god_of_probabilities
 // uses it to also keep every ✕ mark shown by such a cast.
 function _executeFieldScan(row, col, scanSize, durationMs, isClassAbility = false) {
     if (!cur) return;

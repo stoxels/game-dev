@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------
-//-------------------SHARED — CURSED DOWNSIDE----------------------
+//-------------------SHARED - CURSED DOWNSIDE----------------------
 //------------------------------------------------------------------------
 
 // Centralised cursed-downside resolution: immunity (Witch / Cursed
@@ -30,7 +30,7 @@ function _cursedDownsideDuration(baseMs) {
             questStat_curseBlocked();
             return 0;
         }
-        // Veil is now broken — curse is doubled as punishment
+        // Veil is now broken - curse is doubled as punishment
         showToast(t('itm_veil_broken'));
         return Math.round(baseMs * 2);
     }
@@ -64,11 +64,11 @@ function _cursedDownsideCount(baseCount) {
     // to read it here without toggling it a second time.
     if (ptHasSkill('keystone_veil_of_purity')) {
         if (!window.STOX_FLAGS.veiledCursedUsed) {
-            // First use immunity — toast / flag handled by the duration call
+            // First use immunity - toast / flag handled by the duration call
             questStat_curseBlocked();
             return 0;
         }
-        // Veil broken — double the erase count
+        // Veil broken - double the erase count
         showToast(t('itm_veil_broken'));
         return Math.round(baseCount * 2);
     }

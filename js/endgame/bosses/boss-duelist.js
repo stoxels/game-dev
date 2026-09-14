@@ -2,7 +2,7 @@
 //-------------------BOSS: THE DUELIST (boss_duelist)---------------------------
 //------------------------------------------------------------------------
 // Flurry homage: three blinding slashes chase you down in under two
-// seconds — then a breath, then another flurry. Block with distance, and
+// seconds - then a breath, then another flurry. Block with distance, and
 // never be where you were a heartbeat ago.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

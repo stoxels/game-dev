@@ -14,6 +14,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Probability-Peaks.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 55.8, y: 85.3 },
+        // Convergence Trial 1 node - offset from the old 33% milestone spot.
+        trialNode: { x: 23.6, y: 73.6 },
         nodes: [
             { x: 68.6, y: 82.4 },  // 1-1
             { x: 83.6, y: 75.3 },  // 1-2
@@ -43,6 +45,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Distribution-Den.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 3.9, y: 35.0 },
+        // Convergence Trial 2 node.
+        trialNode: { x: 54.7, y: 50.1 },
         nodes: [
             { x: 17.5, y: 65.9 },  // 2-1
             { x: 31.9, y: 47.5 },  // 2-2
@@ -71,6 +75,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Sampling-Savanna.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 95.0, y: 93.6 },
+        // Convergence Trial 3 node.
+        trialNode: { x: 77.9, y: 41.0 },
         nodes: [
             { x: 89.5, y: 75.0 },  // 1
             { x: 72.2, y: 66.5 },  // 2
@@ -94,6 +100,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Vortex-of-Possibilities.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 5.6, y: 89.2 },
+        // Convergence Trial 4 node.
+        trialNode: { x: 18.6, y: 40.1 },
         nodes: [
             { x: 12.9, y: 90.1 },  // 1
             { x: 24.7, y: 88.0 },  // 2
@@ -128,6 +136,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Regression-Rift.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 54.8, y: 24.9 },
+        // Convergence Trial 5 node.
+        trialNode: { x: 87.5, y: 65.7 },
         nodes: [
             { x: 63.0, y: 38.4 },  // 1
             { x: 74.2, y: 17.3 },  // 2
@@ -157,6 +167,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Frequency-Forest.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 42.3, y: 91.1 },
+        // Convergence Trial 6 node.
+        trialNode: { x: 27.0, y: 63.6 },
         nodes: [
             { x: 43.9, y: 68.4 },  // 1
             { x: 29.3, y: 54.3 },  // 2
@@ -188,6 +200,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Stochapolis.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 50.5, y: 92.7 }, 
+        // Convergence Trial 7 node.
+        trialNode: { x: 19.2, y: 70.7 },
         nodes: [
             { x: 37.1, y: 82.4 },  // 1
             { x: 27.5, y: 71.6 },  // 2
@@ -216,6 +230,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Hypothesis-Hinterlands.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 39.2, y: 27.3 },
+        // Convergence Trial 8 node.
+        trialNode: { x: 25.5, y: 30.2 },
         nodes: [
             { x: 43.7, y: 53.4 },  // 1
             { x: 8.6, y: 63.6 },  // 2
@@ -243,6 +259,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Data-Delta.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 15.8, y: 15.1 },
+        // Convergence Trial 9 node.
+        trialNode: { x: 21.1, y: 56.3 },
         nodes: [
             { x: 25.6, y: 37.0 },  // 1
             { x: 38.8, y: 33.8 },  // 2
@@ -276,6 +294,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Parameter-Plains.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 51.5, y: 91.2 },
+        // Convergence Trial 10 node.
+        trialNode: { x: 23.5, y: 36.0 },
         nodes: [
             
             { x: 42.4, y: 73.4 },  // 1
@@ -305,6 +325,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Null-Hypothesis-Void.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 6.1, y: 88.6 },
+        // Convergence Trial 11 node.
+        trialNode: { x: 58.1, y: 17.1 },
         nodes: [
             
             { x: 26.0, y: 70.4 },  // 1
@@ -335,6 +357,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Bayesian-Bay.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 89.4, y: 35.5 },
+        // Convergence Trial 12 node.
+        trialNode: { x: 52.5, y: 27.0 },
         nodes: [
             { x: 84.0, y: 40.0 },  // 12-1 harbor docks
             { x: 85.0, y: 28.0 },  // 12-2 cliff harbor
@@ -366,6 +390,8 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Expectation-Plateau.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 89.8, y: 92.1 },
+        // Convergence Trial 13 node.
+        trialNode: { x: 62.5, y: 57.0 },
         nodes: [
             { x: 80.0, y: 84.0 },  // 13-1 hamlet ruins
             { x: 88.0, y: 70.0 },  // 13-2 tower base
@@ -391,7 +417,7 @@ const WD_WORLD_CONFIGS = [
 
 
     // -----------------------------------------------------------------------
-    // NEXUS WORLD (secret World 14 — Descriptive Statistics)
+    // NEXUS WORLD (secret World 14 - Descriptive Statistics)
     // -----------------------------------------------------------------------
     {
         bgImage: 'images/The-Nexus.webp',

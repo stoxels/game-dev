@@ -2,7 +2,7 @@
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Mod name words used by the item-name builder (_egBuildItemName).
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 
 // T1 is the highest/best tier.
@@ -75,6 +75,8 @@ const EG_MOD_NAME_WORDS = {
     inc_physical_damage: ['Cruel', 'of Cruelty', 'physischen Schadens'],
     spell_damage: ['Mystic', 'of Mysticism', 'des Zauberschadens'],
     inc_spell_damage: ['Eldritch', 'of Sorcery', 'des Zauberschadens'],
+    healing_power: ['Benedictive', 'of Benediction', 'der Heilkraft'],
+    inc_healing_power: ['Merciful', 'of Mercy', 'der Heilkraft'],
     cold_damage: ['Icy', 'of Cold', 'des Kälteschadens'],
     fire_damage: ['Scorching', 'of Fire', 'des Feuerschadens'],
     lightning_damage: ['Crackling', 'of Lightning', 'des Blitzschadens'],

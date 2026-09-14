@@ -24,17 +24,17 @@
 // from saves made before the layout rework still resolve to the same map.
 //
 // Public API:
-//   egAtlasNodeById(id)            — node lookup (null if unknown)
-//   egAtlasIsCompleted(id)         — node already cleared?
-//   egAtlasIsUnlocked(id)          — node reachable? (tier 1 or completed neighbour)
-//   egAtlasPickNodeIdForTier(tier) — random node id of a tier, prefers unlocked
-//   egAtlasDropNodeIds(id, isBoss) — PoE-style drop pool for kills in that node's map
-//   egAtlasPickDropNodeId(id, isBoss) — pool pick; bosses favour the +1 climb
-//   egAtlasProgress()              — { completed, total, highestTier }
-//   _egAtlasOnMapCompleted(map)    — completion hook (called from _egEndMap)
+//   egAtlasNodeById(id)            - node lookup (null if unknown)
+//   egAtlasIsCompleted(id)         - node already cleared?
+//   egAtlasIsUnlocked(id)          - node reachable? (tier 1 or completed neighbour)
+//   egAtlasPickNodeIdForTier(tier) - random node id of a tier, prefers unlocked
+//   egAtlasDropNodeIds(id, isBoss) - PoE-style drop pool for kills in that node's map
+//   egAtlasPickDropNodeId(id, isBoss) - pool pick; bosses favour the +1 climb
+//   egAtlasProgress()              - { completed, total, highestTier }
+//   _egAtlasOnMapCompleted(map)    - completion hook (called from _egEndMap)
 //
 // Load order: this file runs BEFORE endgame-maps.js / endgame-hub.js, so no
-// top-level code may touch their symbols — everything below only uses LANG,
+// top-level code may touch their symbols - everything below only uses LANG,
 // STATE and its own data at load time.
 //------------------------------------------------------------------------
 
@@ -70,10 +70,10 @@ function egAtlasTierDifficulty(tier) {
 
 // Map regions per tier: [nameEn, nameDe]. Array index = tier - 1.
 // Counts follow the classic two-continent layout. NOTE: the first entries
-// of every tier are the original regions in their original slot order —
+// of every tier are the original regions in their original slot order -
 // keep that order for save compatibility.
 const EG_ATLAS_TIER_NAMES = [
-    // ── Tier 1 — the four outer corners ──────────────────────────────
+    // ── Tier 1 - the four outer corners ──────────────────────────────
     [
         ['Gaussian Grasslands', 'Gaußsche Graslande'],
         ['Variance Valley', 'Varianztal'],
@@ -200,7 +200,7 @@ const EG_ATLAS_TIER_NAMES = [
         ['Measure-One Mesa', 'Mass-Eins-Mesa'],
         ['Epsilon Shore', 'Epsilon-Ufer'],
     ],
-    // ── Tier 16 — the four pinnacle regions at the centre ────────────
+    // ── Tier 16 - the four pinnacle regions at the centre ────────────
     [
         ['Vortex of Possibilities: Overload', 'Wirbel der Möglichkeiten: Überladung'],
         ['The Final Null', 'Die Letzte Null'],
@@ -423,7 +423,7 @@ function egAtlasNodeName(node) {
 //                 tier is at most the active tier (a completed map drops
 //                 from any map at or above its own tier, anywhere on the
 //                 atlas)//    boss kill:    the same pool, plus linked regions exactly one tier
-//                 HIGHER — bosses are the only source that climbs the
+//                 HIGHER - bosses are the only source that climbs the
 //                 atlas (this is how higher tiers are first reached)
 // Returns an array of node ids, or null for unknown nodes.
 function egAtlasDropNodeIds(activeNodeId, isBoss) {
@@ -490,7 +490,7 @@ function egAtlasAdjacentBonusPercent() {
 // Picks the region an atlas-bonus drop comes from: a node LINKED to
 // (adjacent on the atlas graph) the just-completed run's region. Climb
 // priority: when linked regions exactly one tier HIGHER exist that are not
-// yet completed, the bonus targets one of those — so the stacking bonus is
+// yet completed, the bonus targets one of those - so the stacking bonus is
 // an alternate climb path beside boss kills and works on higher tiers too.
 // Otherwise a uniform random linked region (same/lower sustain, or an
 // already-completed +1). Falls back to the active region itself when it has
@@ -521,8 +521,8 @@ function egAtlasPickAdjacentBonusNodeId(activeNodeId) {
 
 // Share of boss drops that target a linked region exactly one tier higher
 // (the atlas-climb path) when such regions exist and are not completed
-// yet. The rest of the pool — the active region itself, linked same/lower
-// tier regions and completed regions — shares the remaining weight, so
+// yet. The rest of the pool - the active region itself, linked same/lower
+// tier regions and completed regions - shares the remaining weight, so
 // boss kills still sustain the current tier most of the time.
 const EG_ATLAS_BOSS_CLIMB_DROP_SHARE = 0.55;
 
@@ -575,7 +575,7 @@ function egAtlasChainSeed(str) {
     return h >>> 0;
 }
 
-// mulberry32 seeded PRNG factory — small, fast, deterministic.
+// mulberry32 seeded PRNG factory - small, fast, deterministic.
 function egAtlasMakeRng(seed) {
     let a = (seed || 0) >>> 0;
     return function () {
@@ -586,7 +586,7 @@ function egAtlasMakeRng(seed) {
     };
 }
 
-// Chain flavours — each region deterministically rolls one, giving maps
+// Chain flavours - each region deterministically rolls one, giving maps
 // distinct personalities: some are generated-grid heavy, some lean on the
 // classic story puzzles, some are pure sigil riddles.
 const EG_ATLAS_CHAIN_FLAVORS = [
@@ -599,7 +599,7 @@ const EG_ATLAS_CHAIN_FLAVORS = [
 
 // Builds the deterministic chain blueprint for a node (null when unknown).
 //   { chainSeed, flavorId, genMode, genShare, bossId, stepSources }
-// stepSources holds 24 'gen' | 'story' entries — enough for the base
+// stepSources holds 24 'gen' | 'story' entries - enough for the base
 // objectives (2–6 puzzles, see egMapBasePuzzlesForTier) plus fully modified
 // runs (≤20 puzzles); runs
 // consume the first N steps, so adding mods never reshuffles earlier steps.
@@ -610,13 +610,13 @@ function egAtlasChainBlueprint(node) {
 
     const flavor = EG_ATLAS_CHAIN_FLAVORS[Math.floor(rng() * EG_ATLAS_CHAIN_FLAVORS.length)];
 
-    // One fixed boss per region — the map's own boss, fought in the arena
+    // One fixed boss per region - the map's own boss, fought in the arena
     // after the chain (like PoE's per-map bosses). The roster in
     // js/endgame/bosses/boss-rosters.js assigns each region its specific
     // boss (easy fights low, brutal fights at the pinnacle).
     const bossIds = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.keys(EG_BOSS_DEFS) : [];
-    // Always consume the roll so the PRNG stream — and therefore every
-    // region's chain flavour and step sources — stays exactly as before,
+    // Always consume the roll so the PRNG stream - and therefore every
+    // region's chain flavour and step sources - stays exactly as before,
     // whether or not the roster overrides the result.
     const rolledBossId = bossIds.length > 0 ? bossIds[Math.floor(rng() * bossIds.length)] : null;
     const bossId = (typeof EG_ATLAS_REGION_BOSSES !== 'undefined' && node && EG_ATLAS_REGION_BOSSES[node.id])
@@ -704,7 +704,7 @@ function _egAtlasOnMapCompleted(mapItem) {
 
     if (typeof STATE === 'undefined') return null;
 
-    // Difficulty gate — the player's selected game difficulty (applies to
+    // Difficulty gate - the player's selected game difficulty (applies to
     // every map run) must exactly match the region's required difficulty.
     const runDiff = (typeof curDiff !== 'undefined' && curDiff) ? curDiff : 'normal';
     if (runDiff !== node.difficulty) {
@@ -737,7 +737,7 @@ function _egAtlasOnMapCompleted(mapItem) {
         });
     }
 
-    // Endgame achievements — atlas progress
+    // Endgame achievements - atlas progress
     if (typeof trackAchStat === 'function' && firstClear) {
         try {
             const prog = (typeof egAtlasProgress === 'function') ? egAtlasProgress() : null;
@@ -755,7 +755,7 @@ function _egAtlasOnMapCompleted(mapItem) {
 
     _egAtlasPersist();
 
-    // Notify the Inference quest system — atlas tier completion quests check
+    // Notify the Inference quest system - atlas tier completion quests check
     // STATE.egAtlasCompleted live via _atlasTierCheck(). Trigger a ledger
     // evaluation so a just-completed tier auto-claims immediately (banner +
     // 2 Convergence Points) without requiring an extra level/event.

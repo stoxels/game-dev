@@ -17,7 +17,7 @@ let _egBossArenaAvailableShown = false; // ensures the BOSS ARENA AVAILABLE bann
 // Bosses are no longer sprinkled into regular puzzles. Once every other
 // objective is done, the player clicks "Enter Boss Arena" in the tracker.
 // That ends the current puzzle and starts a chain of small boss-arena
-// puzzles — one boss per arena — until every map boss is slain. Only then
+// puzzles - one boss per arena - until every map boss is slain. Only then
 // does the Complete Map button unlock.
 let _egBossPhaseActive = false;     // true once the player entered the arena chain
 let _egBossPhaseQueue = [];         // spawn list for the remaining arena bosses
@@ -112,7 +112,7 @@ function _egOnPuzzleComplete() {
     _egPendingPuzzleBonusGain += gain;
     _egUpdateObjectivesHUD();
 
-    // Active map run: Blood Pact — each solved puzzle drains max life.
+    // Active map run: Blood Pact - each solved puzzle drains max life.
     if (typeof _egGetActiveMapModValue === 'function' && _egIsActive()) {
         const pactPct = _egGetActiveMapModValue('map_blood_pact');
         if (pactPct > 0) {
@@ -129,7 +129,7 @@ function _egOnPuzzleComplete() {
     // FIX: if the puzzle is completed while loot is still on the board the
     // `dead` flag set in checkWin() freezes the grid and loot becomes
     // unpickable. Instead carry the loot to the next chained puzzle so it
-    // remains collectable — the Complete Map button stays available there.
+    // remains collectable - the Complete Map button stays available there.
     // The drop may land up to a few hundred ms after the puzzle is marked
     // solved (projectile still in flight for the last kill, or loot
     // explosion stagger), so defer the drop check to catch late spawns.
@@ -137,7 +137,7 @@ function _egOnPuzzleComplete() {
     // non-boss case where the last monster is slain simultaneously with
     // the final puzzle fill.
     if (_egCanLeaveMap()) {
-        // Boss testing: single-arena duel — stay on the board so loot can
+        // Boss testing: single-arena duel - stay on the board so loot can
         // be collected, then leave via Complete Map. Never chain into
         // another puzzle (no quiz interstitial, no countdown).
         if (typeof window !== 'undefined' && window._egIsBossTestRun) return;
@@ -158,15 +158,15 @@ function _egOnPuzzleComplete() {
     }
 
     // Don't queue another puzzle if the Blood Pact (or any other
-    // damage) just killed the player — _egEndMapDefeated already shows
+    // damage) just killed the player - _egEndMapDefeated already shows
     // the map-failed overlay. Check _egIsActive (false after defeat) and
-    // player HP — do NOT check `dead` because checkWin() sets dead=true
+    // player HP - do NOT check `dead` because checkWin() sets dead=true
     // on every solved puzzle, not just on death.
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     if (typeof playerCurrentHP !== 'undefined' && playerCurrentHP <= 0) return;
 
     // Boss arena chain: solving an arena puzzle while a boss is still alive
-    // rolls straight into the next arena — no quiz interstitial here.
+    // rolls straight into the next arena - no quiz interstitial here.
     if (_egBossPhaseActive) {
         _egScheduleArenaAdvance();
         return;
@@ -212,7 +212,7 @@ function _egShowInterstitialQuestion(onDone) {
         try { _egHazardsHideForQuiz(); } catch (e) {}
     }
 
-    // Don't rely on def.world — monster levels have no world property.
+    // Don't rely on def.world - monster levels have no world property.
     // Instead build a pool from ALL worlds that have questions and pick randomly.
     const worldNum = _egPickInterstitialWorldNum();
     showQuiz(worldNum);
@@ -221,9 +221,23 @@ function _egShowInterstitialQuestion(onDone) {
 
 
 // Finds a world number that actually has questions in at least one pool.
+// Campaign trial runs always use the TRIAL'S world (spec) when it has
+// questions, falling back to the random pick below otherwise.
 // Tries BONUS_QUIZ_POOLS and MATH_GATE_POOLS across all worlds.
 // Falls back to 1 if nothing is found (getQuizQuestion handles empty pools gracefully).
 function _egPickInterstitialWorldNum() {
+    // Campaign trial: questions are based on the trial's world.
+    try {
+        const tr = (typeof _egIsTrialRun === 'function') ? _egIsTrialRun() : null;
+        if (tr && tr.quizWorld) {
+            const w = Number(tr.quizWorld);
+            const hasMC = (typeof BONUS_QUIZ_POOLS !== 'undefined')
+                && BONUS_QUIZ_POOLS[w] && BONUS_QUIZ_POOLS[w].length > 0;
+            const hasInput = (typeof MATH_GATE_POOLS !== 'undefined')
+                && MATH_GATE_POOLS[w] && MATH_GATE_POOLS[w].length > 0;
+            if (hasMC || hasInput) return w;
+        }
+    } catch (e) {}
     const candidates = [];
 
     // Collect every world key that has at least one question
@@ -401,11 +415,16 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
     const carriedItems = Array.from(_egItemDrops.values());
     _egItemDrops.clear();
 
+    // Charm drops ride along with the other carried drops (skill-charms.js).
+    const carriedCharms = (typeof _egCharmDrops !== 'undefined')
+        ? Array.from(_egCharmDrops.values()) : [];
+    if (typeof _egCharmDrops !== 'undefined') _egCharmDrops.clear();
+
     const carriedMaps = (typeof _egMapDrops !== 'undefined')
         ? Array.from(_egMapDrops.values()) : [];
     if (typeof _egMapDrops !== 'undefined') _egMapDrops.clear();
 
-    // Clear the stale map entries — overlays are already gone after buildGrid()
+    // Clear the stale map entries - overlays are already gone after buildGrid()
     _egLootDrops.clear();
 
     // Discard instant-effect pickups (hearts, mistake eraser, cooldown surge).
@@ -422,7 +441,7 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
     // collides with the new cell would delete the freshly placed drop early.
     _egPickupTimers.forEach(t => clearTimeout(t));
     _egPickupTimers = [];
-    // NOTE: _egPickupSpawnTimer is intentionally NOT cleared — the spawner's
+    // NOTE: _egPickupSpawnTimer is intentionally NOT cleared - the spawner's
     // recursive loop must survive the transition (_egStartEncounter is
     // suppressed for chained puzzles, so nothing would restart it).
 
@@ -450,7 +469,7 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
         window._egPassiveAppliedForGi = nextGi;
     }
     // Class passives are delayed (Probabilist Bayesian Insight uses 300ms
-    // setTimeout) — verify after that window and re-fire if missed. The
+    // setTimeout) - verify after that window and re-fire if missed. The
     // re-fire is safe: _applyProbabilistPassive guards internally.
     // Classless: never re-apply any class passive, even on chain puzzles.
     setTimeout(() => {
@@ -473,7 +492,7 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
     _egPuzzleCompleteFired = false;
 
     // The Snail (and any other boss field effect tied to grid cells): its
-    // slimed-cell overlays were destroyed with the old table — clear the
+    // slimed-cell overlays were destroyed with the old table - clear the
     // stale state so the fresh grid starts clean and the roaming snail
     // slimes the new puzzle from scratch.
     if (typeof _egSnailOnPuzzleTransition === 'function') _egSnailOnPuzzleTransition();
@@ -502,6 +521,10 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
         setTimeout(() => _egReplaceCarriedMapDrops(carriedMaps), 400);
     }
 
+    if (carriedCharms.length > 0 && typeof _charmReplaceCarriedDrops === 'function') {
+        setTimeout(() => _charmReplaceCarriedDrops(carriedCharms), 400);
+    }
+
     if (typeof _egHazardsShowAfterQuiz === 'function') {
         try { _egHazardsShowAfterQuiz(); } catch (e) {}
     }
@@ -512,7 +535,7 @@ function _egTransitionToChainPuzzle(nextGi, isBossArena) {
 //-------------------BOSS ARENA CHAIN-------------------------------------
 //------------------------------------------------------------------------
 
-// Max grid dimensions for boss-arena puzzles — kept small so the fight
+// Max grid dimensions for boss-arena puzzles - kept small so the fight
 // feels tight and focused.
 const EG_BOSS_ARENA_MAX_ROWS = 15;
 const EG_BOSS_ARENA_MAX_COLS = 25;
@@ -534,7 +557,7 @@ function _egEnterBossArena() {
     let queue = _egBuildBossSpawnListFromDef(_egMapDef, baseLevel);
 
     if (queue.length === 0) {
-        // Map claims hasBoss but defines no list — pick a random boss.
+        // Map claims hasBoss but defines no list - pick a random boss.
         const allBossDefs = Object.values(EG_BOSS_DEFS);
         if (allBossDefs.length > 0) {
             const picked = allBossDefs[Math.floor(Math.random() * allBossDefs.length)];
@@ -549,7 +572,7 @@ function _egEnterBossArena() {
     _egBossKilledCount = 0;
     _egBossPhaseActive = true;
 
-    // Dismiss the "available" banner if still visible — arena is now entered
+    // Dismiss the "available" banner if still visible - arena is now entered
     const availBanner = document.getElementById('eg-boss-arena-available-banner');
     if (availBanner) availBanner.remove();
 
@@ -563,7 +586,7 @@ function _egEnterBossArena() {
 // part of the region's blueprint: seeded from the chain seed + boss index,
 // so the same map always fights its boss on the same (comfortably sized,
 // never trivially small) grid. Boss puzzles stay small enough that the
-// fight stays readable — capped by EG_BOSS_ARENA_MAX_ROWS/COLS and floored
+// fight stays readable - capped by EG_BOSS_ARENA_MAX_ROWS/COLS and floored
 // at EG_BOSS_ARENA_MIN_CELLS so the arena is never a trivial 1-liner.
 const EG_BOSS_ARENA_MIN_CELLS = 36;
 
@@ -598,7 +621,7 @@ function _egFindBossArenaPuzzleGi() {
 }
 
 // Loads the next arena puzzle and spawns its boss. No-op once every boss
-// of the map is dead — the player stays on the board to collect loot.
+// of the map is dead - the player stays on the board to collect loot.
 function _egAdvanceBossArena() {
     if (!_egBossPhaseActive || !_egIsActive()) return;
     if (_egBossDefeated()) return;   // all bosses dead → stay & collect
@@ -614,7 +637,7 @@ function _egAdvanceBossArena() {
 }
 
 // Single-flight scheduler for arena advances. A boss dying and the player
-// solving the arena grid can fire at nearly the same time — without this
+// solving the arena grid can fire at nearly the same time - without this
 // guard the chain would roll two arenas and duplicate the next boss.
 let _egArenaAdvanceTimer = null;
 
@@ -623,7 +646,7 @@ function _egScheduleArenaAdvance() {
     _egArenaAdvanceTimer = setTimeout(() => {
         _egArenaAdvanceTimer = null;
         if (typeof _gamePaused !== 'undefined' && _gamePaused) {
-            // Paused — retry after pause lifts instead of rolling the arena behind the overlay
+            // Paused - retry after pause lifts instead of rolling the arena behind the overlay
             const retry = setInterval(() => {
                 if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
                 clearInterval(retry);
@@ -640,7 +663,7 @@ function _egSpawnNextArenaBoss() {
     if (!_egBossPhaseActive || !_egIsActive()) return;
 
     // Boss arena chain: solving an arena puzzle while the boss is still alive
-    // carries the SAME boss to the next grid — do NOT spawn a duplicate
+    // carries the SAME boss to the next grid - do NOT spawn a duplicate
     // (that bug made arena maps impossible to finish). Only spawn when no
     // living boss remains (i.e. the previous boss was just slain).
     if (_egMonsters.some(m => m.isBoss)) return;
@@ -648,13 +671,20 @@ function _egSpawnNextArenaBoss() {
     const entry = _egBossPhaseQueue[_egBossKilledCount];
     if (!entry) return;
 
+    // Boss arena entry: play this boss's theme (random one of its tracks).
+    // Runs immediately - the spawn itself is delayed below for drama.
+    // Carried-boss case above already has its theme playing, so no replay.
+    if (typeof Audio_Manager !== 'undefined' && typeof Audio_Manager.playBossBGM === 'function') {
+        Audio_Manager.playBossBGM(entry.id);
+    }
+
     const def = EG_BOSS_DEFS[entry.id];
     const name = def ? def.name : entry.id;
 
     setTimeout(() => {
         if (!_egIsActive()) return;
         if (typeof _gamePaused !== 'undefined' && _gamePaused) {
-            // Game is paused — retry after pause instead of spawning behind the overlay
+            // Game is paused - retry after pause instead of spawning behind the overlay
             const retry = setInterval(() => {
                 if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
                 clearInterval(retry);
@@ -675,7 +705,7 @@ function _egSpawnNextArenaBoss() {
 
 // Called when the LAST map boss dies: loot explosion! Rains a pile of
 // equipment, currency and gold onto the arena grid as the run's grand
-// finale — then flips the tracker to Complete Map mode.
+// finale - then flips the tracker to Complete Map mode.
 function _egOnAllBossesDead() {
     const level = (_egMapDef && _egMapDef.monsterLevel) ? _egMapDef.monsterLevel : 1;
 
@@ -827,7 +857,7 @@ function _egPickMapRunPuzzleGi(criteria) {
         const source = plan[stepIdx % plan.length] || 'gen';
 
         // Grid-size bucket for this step (region's size mix, consumed in
-        // order — same queue every run of this region).
+        // order - same queue every run of this region).
         const queue = Array.isArray(criteria.sizeQueue) ? criteria.sizeQueue : [];
         const bucket = queue.length > 0 ? queue.shift() : null;
         const stepCriteria = bucket ? _egBucketCriteria(criteria, bucket) : criteria;
@@ -862,7 +892,7 @@ function _egPickMapRunPuzzleGi(criteria) {
             if (gi !== null) { _egTrackChainRecentGi(gi, criteria.recentWindow); return gi; }
         }
 
-        // Neither source satisfied this step — take any puzzle instead.
+        // Neither source satisfied this step - take any puzzle instead.
         console.warn('EG chain: blueprint step unsatisfiable, using any puzzle:', source, bucket);
         return _egPickStoryChainPuzzleGi(criteria, storyRng);
     }
@@ -870,7 +900,7 @@ function _egPickMapRunPuzzleGi(criteria) {
     // ── Legacy random pull (no size mix / no blueprint) ──────────────
     const queue = Array.isArray(criteria.sizeQueue) ? criteria.sizeQueue : [];
     if (queue.length > 0) {
-        const bucket = queue.shift();   // consumed — shrinks as the run progresses
+        const bucket = queue.shift();   // consumed - shrinks as the run progresses
         const bucketCriteria = _egBucketCriteria(criteria, bucket);
 
         // Coin flip which source leads; the other one is the fallback.
@@ -889,7 +919,7 @@ function _egPickMapRunPuzzleGi(criteria) {
             if (gi !== null) { _egTrackChainRecentGi(gi, criteria.recentWindow); return gi; }
         }
 
-        // Neither source had this bucket — take any puzzle instead.
+        // Neither source had this bucket - take any puzzle instead.
         console.warn('EG chain: size bucket unsatisfiable, using any puzzle:', bucket);
         return _egPickStoryChainPuzzleGi(criteria);
     }
@@ -982,7 +1012,7 @@ function _egRollBonusMapLoot() {
         // normal pickups: rule-matching items are destroyed for a rolled
         // shard (mirrored into the summary's runes & orbs row by the filter)
         // and never reach the run loot bag. A filter failure keeps the item
-        // (defensive — same policy as the pickup claim hook).
+        // (defensive - same policy as the pickup claim hook).
         if (typeof _egLootFilterAutoVendor === 'function') {
             let vendored = false;
             try { vendored = _egLootFilterAutoVendor(item); } catch (e) { vendored = false; }
@@ -1101,7 +1131,7 @@ function _egBuildChainBonusGainHTML() {
     const quizRewardLine = (typeof _egConsumePendingQuizRewardHTML === 'function')
         ? _egConsumePendingQuizRewardHTML() : '';
 
-    // Consume the pending gains — they describe only the previous segment.
+    // Consume the pending gains - they describe only the previous segment.
     _egPendingPuzzleBonusGain = 0;
     _egPendingQuestionBonusGain = 0;
 
@@ -1135,11 +1165,11 @@ function _egEndMap() {
 
     if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
 
-    // Roll for completion bonus loot first — it must land in _egRunLoot
+    // Roll for completion bonus loot first - it must land in _egRunLoot
     // before the transition overlay renders its summary.
     _egRollBonusMapLoot();
 
-    // Grant the map's rolled currency completion reward — it must land in
+    // Grant the map's rolled currency completion reward - it must land in
     // the stash and in _egRunCurrency before the summary renders.
     _egGrantMapCompletionReward();
 
@@ -1159,7 +1189,7 @@ function _egEndMap() {
         try { _egRollAtlasAdjacentBonusDrop(_egActiveMapItem); } catch (e) {}
     }
 
-    // Endgame achievements — map completion
+    // Endgame achievements - map completion
     if (typeof trackAchStat === 'function') try {
         trackAchStat('egMapsCompleted', 1);
         const _egMapTierForAch = (_egActiveMapItem && _egActiveMapItem.mapTier) || (_egMapDef && _egMapDef.mapTier) || 0;
@@ -1172,13 +1202,13 @@ function _egEndMap() {
         const _egMistakesForAch = (typeof mistakeCount !== 'undefined') ? mistakeCount : 999;
         // Use per-map mistake limit tracking: flawless means mistakeCount didn't increase from start of map
         // We approximate via global mistakeCount == 0 at time of completion check (common case for testing)
-        // More accurately, check if mistakeCount still within snapshot — but for achievements we require 0 total mistakes freshly
+        // More accurately, check if mistakeCount still within snapshot - but for achievements we require 0 total mistakes freshly
         // So we check if no mistakes in this session: use _egChainPuzzleSolvedCount hasn't had mistakes.
         // Fallback: if global mistakeCount is 0, count as flawless
         if (_egMistakesForAch === 0) trackAchStat('egMapsFlawless', 1);
     } catch(e){}
 
-    // Show the overlay FIRST — it sits above the puzzle grid with normal
+    // Show the overlay FIRST - it sits above the puzzle grid with normal
     // pointer-events, so it blocks every further click the instant this
     // runs, before any of the cleanup below happens.
     _egShowLeaveMapTransition(atlasResult);
@@ -1191,7 +1221,7 @@ function _egEndMap() {
     // _egStopEncounter was suppressed (e.g. forfeit during chain transition).
     if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
 
-    // Stop the puzzle timer too — otherwise it keeps running behind the
+    // Stop the puzzle timer too - otherwise it keeps running behind the
     // overlay and could trigger a time's-up loss while reading the summary.
     if (typeof stopTimer === 'function') stopTimer();
 
@@ -1202,6 +1232,15 @@ function _egEndMap() {
 
 // Called by the Leave Map button in the HUD.
 function _egTryLeaveMap() {
+    // Campaign trial runs finish through the trial flow (trial rewards +
+    // world-map return) instead of the atlas map flow.
+    try {
+        if (typeof _egIsTrialRun === 'function' && _egIsTrialRun()
+            && typeof _egEndCampaignTrial === 'function') {
+            _egEndCampaignTrial();
+            return;
+        }
+    } catch (e) {}
     if (!_egCanLeaveMap()) {
         showToast(t('eg_objectives_incomplete'));
         return;
@@ -1231,6 +1270,14 @@ function _egUpdateObjectivesHUD() {
     const strip = document.getElementById('eg-objectives-strip');
     if (!strip) return;
 
+    // Campaign levels run monsters but have no map objectives - never show
+    // the objectives strip for them.
+    if (typeof _egIsCampaignRun === 'function' && _egIsCampaignRun()) {
+        strip.classList.add('eg-hidden');
+        if (typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) PassiveTracker.refreshVisibility();
+        return;
+    }
+
     if (!_egIsActive()) {
         strip.classList.add('eg-hidden');
         _egUpdateBonusLootHUD();
@@ -1245,7 +1292,7 @@ function _egUpdateObjectivesHUD() {
 
     const req = _egGetMapRequirements();
 
-    // Build shrinking single-line segments — finished objectives are omitted.
+    // Build shrinking single-line segments - finished objectives are omitted.
     const segs = [];
 
     if (req.totalMonsters > 0) {
@@ -1282,7 +1329,7 @@ function _egUpdateObjectivesHUD() {
     const questionsRemain = req.requiredQuestions > 0 && _egQuestionsAnswered < req.requiredQuestions;
     const nonQuestionObjectivesDone = monstersDone && puzzlesDone;
 
-    // Action button logic — top-center, only when actionable:
+    // Action button logic - top-center, only when actionable:
     //   boss map + non-boss done + not in arena → Enter Boss Arena
     //   all objectives done                       → Complete Map (highlighted)
     //   non-question objectives done + questions remain → Trigger Question
@@ -1297,7 +1344,19 @@ function _egUpdateObjectivesHUD() {
             actionHTML = `<button class="eg-obj-action-btn eg-obj-action-question" onclick="_egTriggerQuestionNow()">${t('eg_trigger_question')}</button>`;
         }
     } else if (canLeave) {
-        actionHTML = `<button class="eg-obj-action-btn eg-obj-action-complete" onclick="_egTryLeaveMap()">${t('eg_complete_map')}</button>`;
+        // Campaign trials relabel the finish button (spec): convergence
+        // trials say "Finish Trial", ascension trials their own label.
+        let leaveLabel = t('eg_complete_map');
+        try {
+            if (typeof _egIsTrialRun === 'function' && _egIsTrialRun()) {
+                const tr = _egIsTrialRun();
+                const key = (tr && tr.kind === 'ascension') ? 'eg_finish_ascension' : 'eg_finish_trial';
+                const alt = t(key);
+                if (alt && alt !== key) leaveLabel = alt;
+                else leaveLabel = (tr && tr.kind === 'ascension') ? 'Finish Ascension' : 'Finish Trial';
+            }
+        } catch (e) {}
+        actionHTML = `<button class="eg-obj-action-btn eg-obj-action-complete" onclick="_egTryLeaveMap()">${leaveLabel}</button>`;
     } else if (questionsRemain && nonQuestionObjectivesDone) {
         actionHTML = `<button class="eg-obj-action-btn eg-obj-action-question" onclick="_egTriggerQuestionNow()">${t('eg_trigger_question')}</button>`;
     }
@@ -1320,7 +1379,7 @@ function _egUpdateObjectivesHUD() {
     const lineHTML = segs.length > 0 ? `<div class="eg-obj-line">${segs.join('')}</div>` : '';
     const actionsHTML = actionHTML ? `<div class="eg-obj-actions">${actionHTML}</div>` : '';
 
-    // Hide strip entirely when nothing to show (no segs and no button) — avoids empty pill.
+    // Hide strip entirely when nothing to show (no segs and no button) - avoids empty pill.
     if (!lineHTML && !actionsHTML) {
         strip.innerHTML = '';
         strip.classList.add('eg-hidden');
@@ -1331,7 +1390,7 @@ function _egUpdateObjectivesHUD() {
 }
 
 // Shows a big green "MAP CLEARED" text centered over the puzzle grid for
-// 3 seconds. Purely cosmetic — pointer-events are disabled via CSS.
+// 3 seconds. Purely cosmetic - pointer-events are disabled via CSS.
 function _egShowMapClearedBanner() {
     if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners('eg-map-cleared-banner');
     const old = document.getElementById('eg-map-cleared-banner');
@@ -1385,7 +1444,7 @@ function _egShowBossArenaAvailableBanner() {
 //------------------------------------------------------------------------
 //-------------------OBJECTIVES HUD: DRAG + MINIMIZE (deprecated)----------
 //------------------------------------------------------------------------
-// Top-center tracker is no longer draggable/collapsible — stubs kept for
+// Top-center tracker is no longer draggable/collapsible - stubs kept for
 // backward compatibility so old saved state does not throw.
 
 const EG_OBJ_STRIP_STORAGE_KEY = 'eg_objectives_strip_state';
@@ -1394,7 +1453,7 @@ function _egSaveObjectivesStripState() {}
 function _egApplySavedObjectivesStripState() { /* no-op: fixed top-center */ }
 function _egBindObjectivesStripBehaviour() { /* no-op: no drag/collapse */ }
 
-// Legacy loot helpers — loot is now tracked in the escape menu; stubs kept for compatibility.
+// Legacy loot helpers - loot is now tracked in the escape menu; stubs kept for compatibility.
 function _egBuildLootItem() { return ''; }
 function _egObjItem() { return ''; }
 
@@ -1454,6 +1513,9 @@ function _egChainCleanup() {
     // runtime modifiers.
     if (typeof _egCleanupMapRunSeedLevel === 'function') _egCleanupMapRunSeedLevel();
 
+    // End of a campaign trial run: restore the stamped seed level.
+    if (typeof _egCleanupCampaignTrialSeed === 'function') _egCleanupCampaignTrialSeed();
+
     // End of a boss-test run: restore the stamped seed level.
     if (typeof _egCleanupBossTestSeedLevel === 'function') _egCleanupBossTestSeedLevel();
 
@@ -1484,7 +1546,7 @@ function _egChainCleanup() {
     _egBossKilledCount = 0;
     _egBossTotalCount = 0;
 
-    // Remove banners if still on screen (all center-grid types — a stale
+    // Remove banners if still on screen (all center-grid types - a stale
     // warning must never survive into the next map)
     if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners();
     const banner = document.getElementById('eg-map-cleared-banner');
@@ -1516,11 +1578,11 @@ function _egChainCleanup() {
 //------------------------------------------------------------------------
 
 // Builds the summary rows (equipment loot + regular items + maps + currency + essences + gold).
-// Reads the passed-in snapshots — must be called while _egRunLoot /
+// Reads the passed-in snapshots - must be called while _egRunLoot /
 // _egRunItems / _egRunMaps / _egRunCurrency / _egRunEssences still hold the run's data.
 // Note: since the loot filter auto-vendors rule-matching drops (including
 // bonus loot) at pickup, manual Ctrl+click selling was removed from this
-// summary — unwanted gear is already converted to shards during the run.
+// summary - unwanted gear is already converted to shards during the run.
 function _egBuildLeaveMapSummaryHTML(loot, items, maps, currency, essences, gold = 0) {
     const lootHTML = loot.map((item, i) => `
         <div class="eg-leave-summary-chip eg-loot-chip eg-rarity-${item.rarity || 'common'}" data-loot-idx="${i}">
@@ -1592,7 +1654,7 @@ function _egLeaveRarityClass(rarity) {
 }
 
 // Builds the hover tooltip body for a currency / shard entry shown in the
-// runes &amp; orbs row — icon, name, rarity line and description, matching
+// runes &amp; orbs row - icon, name, rarity line and description, matching
 // the hub's currency tooltip frame.
 function _egBuildCurrencyTooltipHTML(entry) {
     const countLine = entry.count > 1 ? ` <span class="eg-tooltip-count">×${entry.count}</span>` : '';
@@ -1607,7 +1669,7 @@ function _egBuildCurrencyTooltipHTML(entry) {
 }
 
 // Builds the hover tooltip body for an essence entry shown in the
-// essences row — icon, name, rarity line and description, matching
+// essences row - icon, name, rarity line and description, matching
 // the hub's essence tooltip frame.
 function _egBuildEssenceTooltipHTML(entry) {
     const countLine = entry.count > 1 ? ` <span class="eg-tooltip-count">×${entry.count}</span>` : '';
@@ -1643,7 +1705,7 @@ function _egBuildLeaveItemTooltipHTML(item) {
     </div>`;
 }
 
-// Localised label for the rarities used by regular items — mirrors the
+// Localised label for the rarities used by regular items - mirrors the
 // EG_TT_RARITY_KEYS mapping in _egBuildTooltipBodyHTML().
 function _egLeaveRarityLabel(rarity) {
     const keys = {
@@ -1716,7 +1778,7 @@ function _egWireLeaveMapSummaryTooltips(panel, state) {
 
 // Endgame variant of the pause screen: renders the run's collected items
 // into the pause panel (same chip layout as the win/lose map completion
-// summary) and wires read-only hover tooltips — no ctrl+click selling here,
+// summary) and wires read-only hover tooltips - no ctrl+click selling here,
 // the pause screen is purely informational.
 function _egRenderPauseLootSummary() {
     const container = document.getElementById('pause-loot-summary');
@@ -1725,7 +1787,7 @@ function _egRenderPauseLootSummary() {
     // The chips reuse the leave-map summary styles.
     _egInjectLeaveMapTransitionStyles();
 
-    // Live view of the current run state — safe to read directly while
+    // Live view of the current run state - safe to read directly while
     // paused, nothing wipes it until the run actually ends.
     const state = {
         loot: _egRunLoot || [],
@@ -1759,7 +1821,7 @@ function _egRenderPauseLootSummary() {
 
 // Full-screen blocking overlay. Unlike _egShowChainCountdownOverlay (which
 // deliberately uses pointer-events:none so clicks pass through), this one
-// keeps normal pointer-events so it swallows every click — that's what
+// keeps normal pointer-events so it swallows every click - that's what
 // actually fixes the "puzzle still clickable for 1-2s" issue.
 function _egShowLeaveMapTransition(atlasResult, opts) {
     opts = opts || {};
@@ -1803,7 +1865,7 @@ function _egShowLeaveMapTransition(atlasResult, opts) {
         </div>`;
     el.classList.add('show');
 
-    // Snapshot the run data now — _egStopEncounter() (called by _egEndMap
+    // Snapshot the run data now - _egStopEncounter() (called by _egEndMap
     // right after this) wipes _egRunLoot/_egRunCurrency via _egChainCleanup.
     // Compute the gold reward for this map completion (win path only).
     let goldReward = 0;
@@ -1838,6 +1900,15 @@ function _egShowLeaveMapTransition(atlasResult, opts) {
         _egClearBonusLootFlags();
         _egHideLeaveMapTransition();
         window._egMapDefeatInProgress = false;
+        // Campaign trial (win or defeat): back to the trial's world map.
+        // Consumes the return flags; post-trial flows (convergence modal,
+        // class event) are served once the world screen is visible.
+        try {
+            if (typeof _egRouteTrialReturn === 'function' && _egRouteTrialReturn()) {
+                if (typeof _egServePostTrialFlows === 'function') _egServePostTrialFlows();
+                return;
+            }
+        } catch (e) {}
         // Boss testing: win and defeat both return to the boss selection
         // screen. Captured now (not read lazily) because _egStopEncounter
         // already ran. The flag is consumed here so later campaign runs
@@ -1854,7 +1925,7 @@ function _egShowLeaveMapTransition(atlasResult, opts) {
 }
 
 // Strips the temporary isBonusLoot marker (🎁 badge + tooltip line) from
-// every inventory and equipped item — called once the player leaves the
+// every inventory and equipped item - called once the player leaves the
 // map completion screen so the hub character sheet shows clean tooltips.
 function _egClearBonusLootFlags() {
     if (typeof _egInventory !== 'undefined' && Array.isArray(_egInventory)) {
@@ -1878,12 +1949,12 @@ function _egHideLeaveMapTransition() {
     if (typeof hideGameTooltip === 'function') hideGameTooltip();
 }
 
-// Central defeat handler for endgame map runs — called when the player dies
+// Central defeat handler for endgame map runs - called when the player dies
 // (HP zero), exceeds the mistake limit, or loses through any other path
 // (timer expiry, hardcore fail, golden clock, random walkers, ...).
 //
 // Unlike a voluntary map completion there is no bonus-loot roll, no
-// completion reward and no atlas clear — but the player keeps everything
+// completion reward and no atlas clear - but the player keeps everything
 // already collected during the run: equipment loot is flushed into the stash
 // and unclaimed map drops are banked before cleanup wipes the run state.
 // (Regular items, maps and currency are persisted live on claim.) The
@@ -1903,12 +1974,12 @@ function _egEndMapDefeated(titleText, subText) {
     const ovLose = document.getElementById('ov-lose');
     if (ovLose) ovLose.classList.remove('show', 'eg-map-failed');
 
-    // Keep the run's collected gear — flush BEFORE any cleanup resets it.
+    // Keep the run's collected gear - flush BEFORE any cleanup resets it.
     _egFlushRunLootToStash();
     if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
     if (typeof egSaveHubState === 'function') egSaveHubState();
 
-    // Map-lost variant of the completion screen — must render BEFORE
+    // Map-lost variant of the completion screen - must render BEFORE
     // _egStopEncounter wipes the run arrays it snapshots.
     _egShowLeaveMapTransition(null, { failed: true, titleText, subText });
 
@@ -1931,7 +2002,7 @@ function _egEndMapDefeated(titleText, subText) {
     return true;
 }
 
-// Injects the overlay's CSS once — same pattern as _egInjectCurrencyStyles
+// Injects the overlay's CSS once - same pattern as _egInjectCurrencyStyles
 // / _dndInjectStyles, so nothing needs to be added to your .css files.
 function _egInjectLeaveMapTransitionStyles() {
     if (document.getElementById('eg-leave-map-transition-styles')) return;

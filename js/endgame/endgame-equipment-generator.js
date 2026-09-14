@@ -17,10 +17,10 @@
 // EG_MOD_TABLE_* files.
 //
 // RARITY LADDER:
-//   common   (white)  — 0 mods
-//   uncommon (green)  — 1–2 mods  (max 1 prefix, max 1 suffix)
-//   rare     (blue)   — 3–4 mods  (max 3 prefix, max 3 suffix)
-//   epic     (purple) — 5–6 mods  (max 3 prefix, max 3 suffix)
+//   common   (white)  - 0 mods
+//   uncommon (green)  - 1–2 mods  (max 1 prefix, max 1 suffix)
+//   rare     (blue)   - 3–4 mods  (max 3 prefix, max 3 suffix)
+//   epic     (purple) - 5–6 mods  (max 3 prefix, max 3 suffix)
 //------------------------------------------------------------------------
 
 
@@ -45,7 +45,7 @@ const EG_MOD_CAPS = {
 // Maps every slotType value (from endgame-equipment-base-items.js) to its
 // mod table.  weapon1/weapon2/ranged share separate tables because melee,
 // off-hand, and ranged have different mod pools.
-// NOTE: melee weapons use slotType 'weapon' — 1H rolls WEAPON_1H, 2H rolls
+// NOTE: melee weapons use slotType 'weapon' - 1H rolls WEAPON_1H, 2H rolls
 // the harder-hitting WEAPON_2H table (PoE-style). Shields use slotType
 // 'shield' (→ SHIELD, a defensive-only derivative of WEAPON2).
 const EG_SLOT_MOD_TABLE_MAP = {
@@ -98,7 +98,7 @@ function _egGetModTable(base) {
     const getter = EG_SLOT_MOD_TABLE_MAP[base.slotType];
     if (!getter) return null;
     try { return getter(base); }
-    catch (e) { return null; }  // table constant not yet defined — safe fallback
+    catch (e) { return null; }  // table constant not yet defined - safe fallback
 }
 
 
@@ -192,7 +192,7 @@ function _egGenerateEquipmentDrop(monsterLevel = 1) {
     const baseName = (LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
     const name = _egBuildItemName(baseName, rarity, mods);
 
-    // ── 6b. Roll implicit(s) — scaled by base required level (not item level) ──
+    // ── 6b. Roll implicit(s) - scaled by base required level (not item level) ──
     let implicits = [];
     try {
         if (typeof _egRollImplicitsForBase === 'function') {

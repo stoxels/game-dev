@@ -2,7 +2,7 @@
 //-------------------THE WITCH----------------------
 //------------------------------------------------------------------------
 
-// theWitch — pays −10 min upfront in exchange for 60 s of full cursed
+// theWitch - pays −10 min upfront in exchange for 60 s of full cursed
 // immunity (makes subsequent cursed items downside-free for that window).
 function _useTheWitch(id, def) {
     const before = timerSecs;
@@ -26,7 +26,7 @@ function _useTheWitch(id, def) {
 //-------------------ITEM VISUAL EFFECT-----------------------------------
 //------------------------------------------------------------------------
 
-// 🧙 The Witch — purple smoky swirl of arcane particles.
+// 🧙 The Witch - purple smoky swirl of arcane particles.
 function _fxTheWitch() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

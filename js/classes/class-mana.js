@@ -24,17 +24,17 @@ const MANA_BASE_REGEN = 5;
 // Scales flat ability mana costs up as the pool grows from gear so late-game
 // costs stay meaningful. Below the baseline the def's manaCost is charged as
 // defined; every DIVISOR points of max mana beyond the baseline adds +100%
-// to all ability costs (e.g. ~900 max mana -> 3x base cost).
+// to all ability costs (e.g. ~700 max mana -> 3x base cost).
 // Baseline is the day-one effective pool: 60 base mana + 20 Int x 2.
 const MANA_COST_SCALE_BASELINE = 100;
-const MANA_COST_SCALE_DIVISOR = 400;
+const MANA_COST_SCALE_DIVISOR = 340;
 
 // Lazily created handle for the passive regen tick (null until first use).
 let _manaRegenInterval = null;
 
 
 // Applies the gear-aware cost multiplier to a def's flat manaCost.
-// Active map runs can further inflate costs ("% more Mana" mod) — the
+// Active map runs can further inflate costs ("% more Mana" mod) - the
 // tooltip display and payAbilityCost() both go through here, so they
 // always agree.
 function _scaleAbilityManaCost(cost) {
@@ -52,7 +52,7 @@ function _scaleAbilityManaCost(cost) {
 
 // Mana is active everywhere: the pool, the bar and ability costs all run in
 // story levels as well as endgame maps. (It used to be endgame-only, which
-// meant every story-mode ability was free — the spell hotbar now shows a
+// meant every story-mode ability was free - the spell hotbar now shows a
 // mana cost and an unaffordable indicator for every skill.)
 function _manaEnabled() {
     return true;
@@ -72,11 +72,33 @@ function _getPlayerMaxMana() {
 
 // Returns the mana cost of the ability in the given HUD slot, or 0 when the
 // slot has no cost defined (e.g. legacy defs or missing data).
+//
+// The cost includes the spell's RANK multiplier (js/skills/skill-charms.js):
+// a rank-10 charm costs ~4.45× the rank-1 price. `canAfford` checks, the
+// spellbook/hotbar tooltips and the actual spend all funnel through here,
+// so the displayed cost is always what gets charged.
 function _getAbilityManaCost(hudSlot) {
+    const base = _getAbilityScaledBaseCost(hudSlot);
+    if (!base) return base;
+    const rankMult = (typeof getSkillRankManaMultForSlot === 'function')
+        ? getSkillRankManaMultForSlot(hudSlot) : 1;
+    return Math.round(base * rankMult);
+}
+
+// Gear-scaled cost before the rank multiplier.
+function _getAbilityScaledBaseCost(hudSlot) {
     if (hudSlot === 'active5') {
         if (!STATE.playerClass || !_manaEnabled()) return 0;
         const def = (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
         return _scaleAbilityManaCost((def && def.manaCost) || 0);
+    }
+
+    // Tutorial Fireball (active6): castable before any class is chosen, so
+    // its cost must resolve ahead of the no-class gate. Kept in sync with
+    // _tqEnsureFireball's manaCost in js/tutorial-quest.js.
+    if (hudSlot === 'active6') {
+        if (!_manaEnabled()) return 0;
+        return _scaleAbilityManaCost(16);
     }
 
     if (!STATE.playerClass || !_manaEnabled()) return 0;
@@ -178,7 +200,7 @@ function spendMana(cost) {
 
 // Pays an active ability's cost: from the life pool under Blood Magic
 // (refreshing the HP display), otherwise from mana. Used exclusively by the
-// ability cast paths — gear effects like mana-to-damage keep using spendMana()
+// ability cast paths - gear effects like mana-to-damage keep using spendMana()
 // so they stay mana-based even on Blood Magic maps.
 // Returns false (pools untouched) when the cost can't be covered.
 function payAbilityCost(cost) {
@@ -194,7 +216,7 @@ function payAbilityCost(cost) {
 
 
 // Patches the mana bar that now lives on the player sprite (see
-// _renderPlayerAvatarSimple in player_sprite.js). Safe to call any time —
+// _renderPlayerAvatarSimple in player_sprite.js). Safe to call any time -
 // no-ops when the bar isn't in the DOM yet. The old class-HUD element ids
 // are still honoured in case a stale element lingers during a rebuild.
 function updateClassHUDManaBar() {
@@ -204,15 +226,27 @@ function updateClassHUDManaBar() {
 
     const avatarWrap = document.getElementById('avatar-mana-bar-wrap');
     if (avatarWrap) {
-        // Hide the whole bar while there is no class / pool (menus, classless).
-        if (!STATE.playerClass) {
+        // Hide the whole bar while there is no class / pool (menus, classless) -
+        // EXCEPT during the tutorial (its puzzle-3 mana lesson points at the
+        // bar while the player is still classless) and for pre-class
+        // characters that already own something castable (a hotbar spell, a
+        // slotted charm, or an inventory charm) - universal spells cost mana
+        // and need the bar visible (base pool exists either way).
+        const tqActive = (typeof _tqIsTutorialActive === 'function') && _tqIsTutorialActive();
+        let classlessSpells = false;
+        try {
+            if (typeof _hotbarClasslessHasSpells === 'function') classlessSpells = _hotbarClasslessHasSpells();
+        } catch (e) { /* best-effort */ }
+        if (!STATE.playerClass && !tqActive && !classlessSpells) {
             avatarWrap.style.display = 'none';
         } else {
             avatarWrap.style.display = '';
             const fill = document.getElementById('avatar-mana-fill');
             const text = document.getElementById('avatar-mana-text');
             if (fill) fill.style.width = pct + '%';
-            if (text) text.innerText = `${cur} / ${max}`;
+            // Value only - the bar's shape carries the maximum (same label
+            // recipe as the health bar above the sprite).
+            if (text) text.innerText = `${cur}`;
         }
     }
 
@@ -228,7 +262,7 @@ function updateClassHUDManaBar() {
 }
 
 
-// Passive regen tick — applies the gear manaRegen stat every 5 seconds.
+// Passive regen tick - applies the gear manaRegen stat every 5 seconds.
 // The loop is created once per page load and simply no-ops while the pool
 // is full or empty.
 function _ensureManaRegenLoop() {

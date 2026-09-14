@@ -1,7 +1,7 @@
 ﻿// =============================================================================
-// storyline-beats.js — The Cartographers of Chance
+// storyline-beats.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
-// STORY_BEATS — the registry of every story beat in the game, keyed by
+// STORY_BEATS - the registry of every story beat in the game, keyed by
 // beatId, passed to showBeat(beatId, options) from game.js.
 // =============================================================================
 
@@ -12,7 +12,7 @@
 const STORY_BEATS = {
 
     // -------------------------------------------------------------------------
-    // OPENING FLOW — image slideshow cinematic
+    // OPENING FLOW - image slideshow cinematic
     // -------------------------------------------------------------------------
 
     intro_cinematic: {
@@ -20,7 +20,7 @@ const STORY_BEATS = {
     },
 
     // -------------------------------------------------------------------------
-    // CHARACTER INTROS — pass { character: 'stox' | 'trix' | 'syla' }
+    // CHARACTER INTROS - pass { character: 'stox' | 'trix' | 'syla' }
     // -------------------------------------------------------------------------
 
     character_intro: {
@@ -45,7 +45,7 @@ const STORY_BEATS = {
 // ---------------------------------------------------------------------------
 // Maps world number -> the level index (li, 1-based) within that world whose
 // FIRST clear fires that world's region_N story beat (see checkWin() in
-// scoring.js). Placeholder values below are all `2` — adjust per world once
+// scoring.js). Placeholder values below are all `2` - adjust per world once
 // each world's level design/pacing is finalized. Must not exceed the number
 // of levels actually defined for that world in level-world-data.js.
 // ---------------------------------------------------------------------------
@@ -72,10 +72,10 @@ const REGION_BEAT_TRIGGER_LEVEL = {
 
 
 // ---------------------------------------------------------------------------
-// REGION ENTRY BEATS — each fires once, on first clear of its designated
+// REGION ENTRY BEATS - each fires once, on first clear of its designated
 // trigger level (see REGION_BEAT_TRIGGER_LEVEL above). Rendered as a
 // 3-CLIP video sequence (see storyline-engine.js's video-beat `clips` path)
-// with captions that accumulate on screen — each line fades in and stays,
+// with captions that accumulate on screen - each line fades in and stays,
 // so by the end of the sequence the player has seen the full story text
 // written out together.
 //
@@ -83,10 +83,10 @@ const REGION_BEAT_TRIGGER_LEVEL = {
 // own dedicated audio file (`audio` field on the clip), which starts the
 // instant that clip starts playing and is stopped the instant the sequence
 // moves on to the next clip (see storyline-engine.js's _playClip /
-// _stopClipAudio). So instead of one long narration.mp3 spanning all ~24s,
+// _stopClipAudio). So instead of one long narration.ogg spanning all ~24s,
 // split your narration to match your 3 video parts: part1's narration goes
 // with part1's video, etc. Video and audio for a given clip always start
-// together — there's no separate timing to configure for "when" a clip's
+// together - there's no separate timing to configure for "when" a clip's
 // audio plays; it's implicitly "whenever that clip is on screen."
 //
 // Each region is split into 5 clips (~8s each, matching your generator's
@@ -96,13 +96,13 @@ const REGION_BEAT_TRIGGER_LEVEL = {
 // Each clip's caption/narration is sized to ~18-22 words (~7-7.5s spoken)
 // so it fits comfortably inside that clip's ~8s runtime without leaving an
 // awkward silent gap before the next clip starts.
-// Playback does NOT need to finish inside the ~24s the 3 clips cover — once
+// Playback does NOT need to finish inside the ~24s the 3 clips cover - once
 // the last clip ends it freezes on that frame (with its own audio, if any,
 // left playing) while captions keep going for as long as they need (see
 // storyline-engine.js's _onClipEnded). So a text-heavy region is fine having
 // more caption lines than the video "covers."
 //
-// CAPTION TIMING IS MANUAL — each line is a [text, startMs] pair (see
+// CAPTION TIMING IS MANUAL - each line is a [text, startMs] pair (see
 // _captions() below), where startMs is exactly when that line should
 // appear on screen, measured from the start of the whole clip sequence
 // (wall-clock time, independent of which clip/audio happens to be
@@ -113,10 +113,10 @@ const REGION_BEAT_TRIGGER_LEVEL = {
 //         ["The First Cartographers...", 16000], // shown at 16s
 //     ])
 // The numbers below are auto-generated STARTING POINTS (word-count based,
-// ~165 words/min) — listen to your actual narration once you have it and
+// ~165 words/min) - listen to your actual narration once you have it and
 // adjust every number by hand to match. `videoFile` / `audio` paths are
-// placeholders — replace "video/Regions/region_N_partX.mp4" and
-// "audio/Regions/region_N_partX_narration.mp3" with your real files.
+// placeholders - replace "video/Regions/region_N_partX.mp4" and
+// "audio/Regions/region_N_partX_narration.ogg" with your real files.
 //
 // World order is locked: 1 Probability Peaks, 2 Distribution Den,
 // 3 Sampling Savanna, 4 Vortex of Possibilities, 5 Regression Rift,
@@ -128,11 +128,11 @@ const REGION_BEAT_TRIGGER_LEVEL = {
 // Converts an array of [translationKey, startMs] pairs into the
 // { textKey, start } caption objects the engine expects. The key is resolved
 // to the active language's text via t() at DISPLAY time (see renderVideo in
-// storyline-engine.js) — so a mid-session language switch is picked up on the
-// next playback. This is the ONLY place caption timing is decided — startMs is
+// storyline-engine.js) - so a mid-session language switch is picked up on the
+// next playback. This is the ONLY place caption timing is decided - startMs is
 // exactly when that line appears on screen, in milliseconds from the start of
 // the whole clip sequence. Set every number by hand per line, per region.
-// Caption timing is independent of per-clip audio — a caption line does not
+// Caption timing is independent of per-clip audio - a caption line does not
 // need to "belong" to any particular clip.
 function _captions(entries) {
     return entries.map(([key, start]) => ({ textKey: key, start }));
@@ -140,35 +140,35 @@ function _captions(entries) {
 
 // Builds a standard 5-clip sequence for a region, using the region's number
 // to generate the placeholder file paths:
-//   video/Regions/region_N_part1.mp4  +  audio/Regions/region_N_part1_narration.mp3
-//   video/Regions/region_N_part2.mp4  +  audio/Regions/region_N_part2_narration.mp3
-//   video/Regions/region_N_part3.mp4  +  audio/Regions/region_N_part3_narration.mp3
-//   video/Regions/region_N_part4.mp4  +  audio/Regions/region_N_part4_narration.mp3
-//   video/Regions/region_N_part5.mp4  +  audio/Regions/region_N_part5_narration.mp3
+//   video/Regions/region_N_part1.mp4  +  audio/Regions/region_N_part1_narration.ogg
+//   video/Regions/region_N_part2.mp4  +  audio/Regions/region_N_part2_narration.ogg
+//   video/Regions/region_N_part3.mp4  +  audio/Regions/region_N_part3_narration.ogg
+//   video/Regions/region_N_part4.mp4  +  audio/Regions/region_N_part4_narration.ogg
+//   video/Regions/region_N_part5.mp4  +  audio/Regions/region_N_part5_narration.ogg
 // Each clip's audio starts together with that clip and is swapped out the
 // moment the next clip starts (see storyline-engine.js's _playClip). Swap
-// in real filenames once they exist — or just replace the whole `clips`
+// in real filenames once they exist - or just replace the whole `clips`
 // array per-region if the part count/naming ever differs from this pattern,
 // or if a particular clip should have no audio at all (omit `audio` on
 // that clip's object).
 //
 // Each clip is ~8s of video. Its matching caption line (see each region's
 // `_captions([...])` call below) is written to take roughly 7-7.5s to
-// narrate at a natural reading pace (~18-22 words) — short enough that the
+// narrate at a natural reading pace (~18-22 words) - short enough that the
 // voiceover for that clip finishes with a little headroom before the next
 // clip's own audio starts, instead of running out of words early and
 // leaving several seconds of silence over still-playing video.
 function _regionClips(n) {
     return [
-        { videoFile: `video/Regions/region_${n}_part1.mp4`, audio: `audio/Regions/region_${n}_part1_audio.mp3`, gapAfterMs: 0 },
-        { videoFile: `video/Regions/region_${n}_part2.mp4`, audio: `audio/Regions/region_${n}_part2_audio.mp3`, gapAfterMs: 0 },
-        { videoFile: `video/Regions/region_${n}_part3.mp4`, audio: `audio/Regions/region_${n}_part3_audio.mp3`, gapAfterMs: 0 },
-        { videoFile: `video/Regions/region_${n}_part4.mp4`, audio: `audio/Regions/region_${n}_part4_audio.mp3`, gapAfterMs: 0 },
-        { videoFile: `video/Regions/region_${n}_part5.mp4`, audio: `audio/Regions/region_${n}_part5_audio.mp3` } // last clip — gapAfterMs ignored
+        { videoFile: `video/Regions/region_${n}_part1.mp4`, audio: `audio/Regions/region_${n}_part1_audio.ogg`, gapAfterMs: 0 },
+        { videoFile: `video/Regions/region_${n}_part2.mp4`, audio: `audio/Regions/region_${n}_part2_audio.ogg`, gapAfterMs: 0 },
+        { videoFile: `video/Regions/region_${n}_part3.mp4`, audio: `audio/Regions/region_${n}_part3_audio.ogg`, gapAfterMs: 0 },
+        { videoFile: `video/Regions/region_${n}_part4.mp4`, audio: `audio/Regions/region_${n}_part4_audio.ogg`, gapAfterMs: 0 },
+        { videoFile: `video/Regions/region_${n}_part5.mp4`, audio: `audio/Regions/region_${n}_part5_audio.ogg` } // last clip - gapAfterMs ignored
     ];
 }
 
-// === ACT 1 — "Something Is Wrong Here" (1-5) ===
+// === ACT 1 - "Something Is Wrong Here" (1-5) ===
 // Damage reads as environmental, accidental, passive. No one suspects intent.
 
 STORY_BEATS.region_1 = {
@@ -236,7 +236,7 @@ STORY_BEATS.region_5 = {
     }
 };
 
-// === ACT 2 — "Someone Did This" (6-9) ===
+// === ACT 2 - "Someone Did This" (6-9) ===
 // Tone shifts from passive damage to active, deliberate sabotage.
 
 STORY_BEATS.region_6 = {
@@ -291,7 +291,7 @@ STORY_BEATS.region_9 = {
     }
 };
 
-// === ACT 3 — The Reveal and Climax (10-13 + Nexus) ===
+// === ACT 3 - The Reveal and Climax (10-13 + Nexus) ===
 
 STORY_BEATS.region_10 = {
     video: {
@@ -360,7 +360,7 @@ STORY_BEATS.region_14 = {
 
 
 // ---------------------------------------------------------------------------
-// REPLAY GALLERY — flat registry of beats replayable from the title screen's
+// REPLAY GALLERY - flat registry of beats replayable from the title screen's
 // Replay panel. An entry is shown when it is unlocked: `globalUnlock: true`
 // entries are permanently available (independent of save slots), everything
 // else unlocks once seen in the current save (see storyline-engine.js). Add
@@ -374,18 +374,18 @@ const REPLAY_GALLERY_ENTRIES = [
     // `globalUnlock: true` are unlocked forever the moment the player picks
     // any character (opening cinematic + all three character intros).
     { id: 'opening_cinematic', beatId: 'intro_cinematic', label: 'Opening Cinematic', thumb: 'images/Replay_Cutscene_Screen/Replay_Opening_Camera.webp', descKey: 'scr_replay_desc_cinematic', globalUnlock: true },
-    { id: 'intro_stox', beatId: 'character_intro', label: 'Stox — Character Intro', options: { character: 'stox' }, thumb: 'images/sprites/Stox_noclass.webp', descKey: 'scr_replay_desc_intro_stox', globalUnlock: true },
-    { id: 'intro_trix', beatId: 'character_intro', label: 'Trix — Character Intro', options: { character: 'trix' }, thumb: 'images/sprites/Trix_noclass.webp', descKey: 'scr_replay_desc_intro_trix', globalUnlock: true },
-    { id: 'intro_syla', beatId: 'character_intro', label: 'Syla — Character Intro', options: { character: 'syla' }, thumb: 'images/sprites/Syla_noclass.webp', descKey: 'scr_replay_desc_intro_syla', globalUnlock: true },
+    { id: 'intro_stox', beatId: 'character_intro', label: 'Stox - Character Intro', options: { character: 'stox' }, thumb: 'images/sprites/Stox_noclass.webp', descKey: 'scr_replay_desc_intro_stox', globalUnlock: true },
+    { id: 'intro_trix', beatId: 'character_intro', label: 'Trix - Character Intro', options: { character: 'trix' }, thumb: 'images/sprites/Trix_noclass.webp', descKey: 'scr_replay_desc_intro_trix', globalUnlock: true },
+    { id: 'intro_syla', beatId: 'character_intro', label: 'Syla - Character Intro', options: { character: 'syla' }, thumb: 'images/sprites/Syla_noclass.webp', descKey: 'scr_replay_desc_intro_syla', globalUnlock: true },
 
     // Region interludes (region_1 … region_13) are intentionally NOT listed
-    // yet — their cutscenes don't exist. Re-add each here (with a `thumb` and
+    // yet - their cutscenes don't exist. Re-add each here (with a `thumb` and
     // `descKey`) once the corresponding world intro is built.
 ];
 
 
 // =============================================================================
-// FUTURE STORYLINE — NEXUS ENDGAME & ATLAS (design notes, not yet implemented)
+// FUTURE STORYLINE - NEXUS ENDGAME & ATLAS (design notes, not yet implemented)
 // =============================================================================
 // Everything below is PLANNED narrative material for the post-campaign endgame
 // (Nexus of Worlds, Atlas of Statistica, 16 map tiers, pinnacle bosses). Parked here
@@ -398,7 +398,7 @@ const REPLAY_GALLERY_ENTRIES = [
 // - Reality = the Sample Space (data, not matter), generated by the Apex of
 //   Stochastics, built by the First Cartographers to keep randomness honest.
 // - The Variance Collapse fractured it into 13 distorted regions, bound shut
-//   by Stoxels — collapsed knots of warped probability that cannot be broken,
+//   by Stoxels - collapsed knots of warped probability that cannot be broken,
 //   only solved.
 // - Act 1 (R1-5): damage looks accidental. Act 2 (R6-9): sabotage revealed.
 //   Name fragment surfaces in Data Delta: V_RUN.
@@ -420,11 +420,11 @@ const REPLAY_GALLERY_ENTRIES = [
 // - Bayesian Bay caption line about a Guild that refused to update its beliefs
 //
 // ---------------------------------------------------------------------------
-// 1. THE BRIDGE — WHY THE CAMPAIGN ISN'T THE END
+// 1. THE BRIDGE - WHY THE CAMPAIGN ISN'T THE END
 // ---------------------------------------------------------------------------
-// NEW LORE PRINCIPLE — CONSERVATION OF VARIANCE:
+// NEW LORE PRINCIPLE - CONSERVATION OF VARIANCE:
 //   A Stoxel cannot be destroyed. Solving it doesn't annihilate the
-//   corruption — it REROUTES it back into the Substrate. Probability, like
+//   corruption - it REROUTES it back into the Substrate. Probability, like
 //   energy, is conserved. Every Stoxel the player solves pushes the warped
 //   variance somewhere else.
 // => The campaign was triage, not a cure. For 300 years the Guild believed
@@ -438,20 +438,20 @@ const REPLAY_GALLERY_ENTRIES = [
 // 2. THE NEXUS OF WORLDS
 // ---------------------------------------------------------------------------
 // - The Nexus was not built for the endgame. It is the ORIGIN POINT of First
-//   Cartographer cartography — the survey station from which all thirteen
+//   Cartographer cartography - the survey station from which all thirteen
 //   regions were first measured and named. Every Guild map is a copy of a
 //   copy of charts drafted there.
-// - It sits at the hinge between the observed world and the SUBSTRATE — the
+// - It sits at the hinge between the observed world and the SUBSTRATE - the
 //   layer of raw, unwritten probability underneath reality.
 // - When Verun seeded the Final Null into the Apex he didn't just corrupt the
-//   13 core regions — he corrupted the MASTER INDEX: the Atlas. The Sample
+//   13 core regions - he corrupted the MASTER INDEX: the Atlas. The Sample
 //   Space didn't only crack along its thirteen named wounds; the possibility
 //   space itself shattered into layered, unobserved branches.
 // - The Nexus is the only stable doorway into those branches because it was
 //   engineered (First Cartographer failsafe) to be the one point in reality
-//   that always observes itself — a fixed reference frame amid divergence.
+//   that always observes itself - a fixed reference frame amid divergence.
 // - POST-CAMPAIGN BEAT (new): after Region 13, the player finds the defacers
-//   of the Expectation Plateau proof — survivors of Verun's following —
+//   of the Expectation Plateau proof - survivors of Verun's following -
 //   fleeing into the Nexus doors. Verun himself is gone, subsumed into the
 //   Apex, but his PROOF IS STILL RUNNING. His acolytes carry fragments of the
 //   Final Theorem into the deep atlas layers to finish the deletion from
@@ -462,30 +462,30 @@ const REPLAY_GALLERY_ENTRIES = [
 //   ends and finish the job.
 //
 // ---------------------------------------------------------------------------
-// 3. THE ATLAS & THE 16 TIERS — WHY DEPTH = DANGER
+// 3. THE ATLAS & THE 16 TIERS - WHY DEPTH = DANGER
 // ---------------------------------------------------------------------------
-// CORE IDEA: The Apex renders reality in SIXTEEN PASSES — sixteen sequential
+// CORE IDEA: The Apex renders reality in SIXTEEN PASSES - sixteen sequential
 // computations, coarse structure down to fine detail ("there will be
 // mountains" ... "this grain of sand falls left"). Verun's Final Null
 // infected the pass-stack bottom-up:
 //
 //   TIERS 1-4  OBSERVED ECHOES
 //     Near-coherent copies of known regions (Gaussian Grasslands, Median
-//     Meadows...). Reality with small errors — wrong shadows, dice that land
+//     Meadows...). Reality with small errors - wrong shadows, dice that land
 //     on seven. Where Verun's acolytes start re-seeding parameters.
 //   TIERS 5-8  CONTESTED LAYERS
 //     Regions where the Null's proof and reality's own computation fight
 //     openly. Weather is a live argument. Player intercepts acolyte supply
-//     lines; learns THE WARDEN survived the campaign — and defected to the
+//     lines; learns THE WARDEN survived the campaign - and defected to the
 //     Null, because certainty is the only thing that ever made him feel safe.
 //   TIERS 9-12  UNOBSERVED SPACE
 //     Branches never measured. Nothing here has ever been REAL, because
-//     nothing has ever been seen. Monsters are UNREALIZED OUTCOMES — versions
+//     nothing has ever been seen. Monsters are UNREALIZED OUTCOMES - versions
 //     of events that almost happened. Syla finds her parents' loop stabilized
-//     into a pocket map and can free them. Her fox was never a fox — it's a
+//     into a pocket map and can free them. Her fox was never a fox - it's a
 //     benign unrealized outcome that chose her.
 //   TIERS 13-15  THE PROOF ITSELF
-//     Landscape stops pretending to be geography — the player walks inside
+//     Landscape stops pretending to be geography - the player walks inside
 //     Verun's argument. His three GUARDIANS stand here (existing bosses,
 //     reframed as weaponized axioms):
 //       - ENTROPY: the heat-death clause ("all patterns end")
@@ -493,7 +493,7 @@ const REPLAY_GALLERY_ENTRIES = [
 //         on a dead prior)
 //       - LAPLACE'S DEMON: the determinist's witness (knows every position,
 //         claims chance never existed)
-//     Each guardian drops a FRAGMENT OF THE COUNTER-PROOF — the mathematical
+//     Each guardian drops a FRAGMENT OF THE COUNTER-PROOF - the mathematical
 //     rebuttal the First Cartographers never got to deliver.
 //   TIER 16  THE APEX
 //     One node. Where it all began and ends.
@@ -505,55 +505,55 @@ const REPLAY_GALLERY_ENTRIES = [
 // ---------------------------------------------------------------------------
 // 4. TIER-16 PINNACLE BOSS
 // ---------------------------------------------------------------------------
-// NAME: Ω — The Apex of Stochastics, Executing the Final Null
-// STORYLINE SENSE: Verun is not fought because he is beyond villain now — he
+// NAME: Ω - The Apex of Stochastics, Executing the Final Null
+// STORYLINE SENSE: Verun is not fought because he is beyond villain now - he
 // IS the corruption's argument, fully loaded into the machine that writes
 // reality. The Apex runs his proof to completion: computing a universe with
-// variance set to zero — which is a universe with nothing in it. Not
+// variance set to zero - which is a universe with nothing in it. Not
 // destruction. DELETION BY CONCLUSION.
 // WHY ONLY THE PLAYER: the Apex cannot be fought with force (established in
-// the intro cinematic — force never worked on Stoxels either). It can only be
+// the intro cinematic - force never worked on Stoxels either). It can only be
 // SOLVED. The whole game taught the player to read the language it speaks.
 // The final battle is the exam.
 //
 // FIGHT CONCEPT (narrative-shaped, mechanics TBD):
-//   PHASE 1 — THE INTERROGATION
+//   PHASE 1 - THE INTERROGATION
 //     The Apex tests whether you understand what you're defending. Puzzle-
 //     phases interleaved with combat; mistakes feed a Null bar, correct reads
 //     push back.
-//   PHASE 2 — THE THREE WITNESSES
+//   PHASE 2 - THE THREE WITNESSES
 //     Entropy, Bayes and Laplace return as echoes. Each was defeated earlier
-//     BY FORCE; now each must be defeated BY ARGUMENT — deploy the
+//     BY FORCE; now each must be defeated BY ARGUMENT - deploy the
 //     Counter-Proof fragments collected in tiers 13-15 to unbind them from
 //     Verun's proof. They don't die; they CHANGE SIDES. (Thematic beat:
 //     Bayes updates. That's the whole point of Bayes.)
-//   PHASE 3 — VERUN, THE LAST CARTOGRAPHER
-//     The human remnant, briefly separable from the machine. Not fought —
+//   PHASE 3 - VERUN, THE LAST CARTOGRAPHER
+//     The human remnant, briefly separable from the machine. Not fought -
 //     conversed with through the puzzle interface while the Apex burns down.
 //     Tragic close: he was RIGHT that suffering is guaranteed under
 //     probability. The counter-argument the player delivers is the one the
 //     game opens with: reality is worth generating anyway. Expected value
-//     includes the cost — and it's still positive.
+//     includes the cost - and it's still positive.
 //   ENDING CHOICE HOOK (future expansion fuel):
 //     With the Final Null halted, the Apex offers the victor the First
 //     Cartographers' original chair: RE-TUNE THE CONSTANTS. Accept (NG+ /
 //     altered endgame modifiers) or refuse and leave the Sample Space honestly
-//     random — imperfect, guaranteed to hurt, alive.
+//     random - imperfect, guaranteed to hurt, alive.
 //     Closing line idea: "The dice keep rolling. And for the first time in
 //     three hundred years, nobody is loading them."
 //
 // ---------------------------------------------------------------------------
-// 5. SUPPORTING THREADS — PAYOFF LOCATIONS
+// 5. SUPPORTING THREADS - PAYOFF LOCATIONS
 // ---------------------------------------------------------------------------
 // - The Warden (Trix): tier 5-8 contested-layer arc boss; closure dialogue
 //   for Trix; optionally recruit-able as a map NPC afterwards.
 // - Syla's parents & fox: tier 9-12 pocket map "The Normal Grove, Repeating";
 //   fox reveal.
 // - Defaced Plateau proof: the acolyte faction introduced post-Region 13;
-//   their leader carries the defacing tool — a stylus that writes nulls.
+//   their leader carries the defacing tool - a stylus that writes nulls.
 // - "The Final Theorem" atlas node: becomes the tier-16 arena itself.
 // - Guild's "refused to update its beliefs" (Bayesian Bay): optional dark
-//   note — Guild archives contain a 300-year-old internal memo warning about
+//   note - Guild archives contain a 300-year-old internal memo warning about
 //   Verun, suppressed. Seeds a future "Guild civil war" league/expansion.
 //
 // ---------------------------------------------------------------------------
@@ -568,7 +568,7 @@ const REPLAY_GALLERY_ENTRIES = [
 // IMPLEMENTATION CHECKLIST (for when we build this out)
 // ---------------------------------------------------------------------------
 // [ ] Post-Region-13 bridge beat (beat id candidate: nexus_bridge) firing on
-//     campaign completion / Nexus unlock — introduce Conservation of Variance
+//     campaign completion / Nexus unlock - introduce Conservation of Variance
 //     + acolyte flight into the Nexus.
 // [ ] New caption keys st_nexus_* / st_tier_* / st_pinnacle_* in
 //     translations-strings.js (EN + DE).

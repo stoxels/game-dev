@@ -27,7 +27,7 @@ function hideModal(id) {
 }
 
 
-// Body flag: a QUESTION modal (quiz overlay, math gate, scouts primer —
+// Body flag: a QUESTION modal (quiz overlay, math gate, scouts primer -
 // the input or multiple-choice surfaces) is on screen. While it is set the
 // controllable player avatar sprite is hidden via CSS; the character
 // portrait baked into the background (boss card / top-centre sprite) is
@@ -100,11 +100,16 @@ function showConvergenceModal() {
     }
 }
 
-// Total number of campaign convergence levels across all worlds — the "X" in
-// the "earned / total" readout. Computed from live world data so it stays correct.
+// Total number of Convergence Trials across all worlds - the "X" in the
+// "earned / total" readout. Leveling Rework: milestones moved from puzzle
+// levels (isLevelConvergence is always false now) to trials.
 let _convTotalCache = null;
 function _convergenceTotalMilestones() {
     if (_convTotalCache != null) return _convTotalCache;
+    if (typeof _egTrialCount === 'function') {
+        _convTotalCache = _egTrialCount();
+        return _convTotalCache;
+    }
     if (typeof WORLDS === 'undefined' || typeof isLevelConvergence !== 'function') return 0;
     let total = 0;
     WORLDS.forEach((w) => {
@@ -123,7 +128,8 @@ function _updateConvergenceModalPoints(modal) {
     modal = modal || document.getElementById('convergence-modal');
     const plate = modal && modal.querySelector('.convm-total-plate span');
     if (!plate) return;
-    const total = (typeof STATE !== 'undefined' && STATE.convergenceDone && STATE.convergenceDone.length) || 0;
+    const total = ((typeof STATE !== 'undefined' && STATE.convergenceDone && STATE.convergenceDone.length) || 0)
+        + ((typeof STATE !== 'undefined' && STATE.trialsDone && STATE.trialsDone.length) || 0);
     const cap = _convergenceTotalMilestones();
     const label = t('convergence_total');
     const tmpl = (label && label !== 'convergence_total') ? label : 'TOTAL: {n} / {total}';
@@ -269,6 +275,13 @@ function enterNexusFromSetup() {
 // Navigates to the setup screen and refreshes difficulty/mod descriptions.
 function showSetup() {
     stopTimer();
+    // Clear any leftover WASD avatar from a finished level or tutorial: the
+    // sprite is position:fixed at body level, so without an explicit hide it
+    // floats over the setup screen and stays steerable. Every other screen
+    // switch (level select, convergence modal, ...) hides it; this one simply
+    // never did because the old setup flow never rendered an avatar.
+    if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
+    if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
     // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
     if (typeof syncDiffModButtons === 'function') syncDiffModButtons();
     screenHistory.push('screen-title');
@@ -299,7 +312,7 @@ function confirmSetup() {
 }
 
 // Launches the existing world-map implementation.
-// This is the exact logic that used to run at the end of confirmSetup() —
+// This is the exact logic that used to run at the end of confirmSetup() -
 // unchanged, just moved behind the dev mode-select screen.
 function launchExistingGame() {
     screenHistory.push('screen-mode-select');
@@ -311,6 +324,8 @@ function launchExistingGame() {
     if (typeof showMapView === 'function') {
         showMapView();
     } else {
+        // Classic level select fallback: same overworld music as map view.
+        if (typeof Audio_Manager !== 'undefined') Audio_Manager.playBGM('overworld');
         renderLevelSelect();
         switchScreen('screen-levels');
     }
@@ -377,6 +392,8 @@ function goToLevelSelect() {
                 showMapView();
             }
         } else {
+            // Classic level select fallback: same overworld music as map view.
+            if (typeof Audio_Manager !== 'undefined') Audio_Manager.playBGM('overworld');
             renderLevelSelect();
             switchScreen('screen-levels');
         }
@@ -398,7 +415,7 @@ function goToLevelSelect() {
 function goToPreviousScreen() {
     const openModal = document.querySelector('.modal-bg.show');
     if (openModal) {
-        // The Degrees of Freedom choice is mandatory — never dismiss it via back navigation.
+        // The Degrees of Freedom choice is mandatory - never dismiss it via back navigation.
         if (openModal.id === 'dof-modal') {
             if (typeof _dofNudge === 'function') _dofNudge();
             return;
@@ -434,15 +451,116 @@ function goToPreviousScreen() {
     }
 }
 
+// Snapshots every unclaimed (still on the grid, i.e. unexpired) drop so the
+// NEXT-level path can carry it forward. Mirrors the endgame encounter chain
+// (_egTransitionToChainPuzzle): loot / currency (incl. essences) / regular
+// items / maps / charms ride along, instant-effect pickups (hearts, mana,
+// mistake erasers, cooldown surges) are intentionally left behind. Values are
+// captured by reference; the subsequent startLevel's encounter teardown
+// cancels their old expiry timers, and the restore step below re-places them
+// with fresh lifetimes via the shared _egReplaceCarried* helpers.
+function _campaignSnapshotCarriedDrops() {
+    const carried = { loot: [], currency: [], items: [], maps: [], charms: [] };
+    try {
+        if (typeof _egLootDrops !== 'undefined' && _egLootDrops instanceof Map) {
+            carried.loot = Array.from(_egLootDrops.values());
+        }
+    } catch (e) {}
+    try {
+        if (typeof _egCurrencyDrops !== 'undefined' && _egCurrencyDrops instanceof Map) {
+            carried.currency = Array.from(_egCurrencyDrops.values());
+        }
+    } catch (e) {}
+    try {
+        if (typeof _egItemDrops !== 'undefined' && _egItemDrops instanceof Map) {
+            carried.items = Array.from(_egItemDrops.values());
+        }
+    } catch (e) {}
+    try {
+        if (typeof _egMapDrops !== 'undefined' && _egMapDrops instanceof Map) {
+            carried.maps = Array.from(_egMapDrops.values());
+        }
+    } catch (e) {}
+    try {
+        if (typeof _egCharmDrops !== 'undefined' && _egCharmDrops instanceof Map) {
+            carried.charms = Array.from(_egCharmDrops.values());
+        }
+    } catch (e) {}
+    return carried;
+}
+
+// Re-places a snapshot taken by _campaignSnapshotCarriedDrops onto the fresh
+// grid. Polls briefly for the new puzzle's grid DOM so math-gated levels
+// (startLevel defers _doStartLevel until the gate passes) don't place drops
+// onto the stale grid just to have them wiped. Restores exactly once.
+function _campaignRestoreCarriedDrops(carried, nextIndex) {
+    if (!carried) return;
+    const total = (carried.loot?.length || 0) + (carried.currency?.length || 0)
+        + (carried.items?.length || 0) + (carried.maps?.length || 0)
+        + (carried.charms?.length || 0);
+    if (total === 0) return;
+
+    let attempts = 0;
+    const doRestore = () => {
+        if (carried.loot.length > 0 && typeof _egReplaceCarriedLootDrops === 'function') {
+            try { _egReplaceCarriedLootDrops(carried.loot); } catch (e) {}
+        }
+        if (carried.currency.length > 0 && typeof _egReplaceCarriedCurrencyDrops === 'function') {
+            try { _egReplaceCarriedCurrencyDrops(carried.currency); } catch (e) {}
+        }
+        if (carried.items.length > 0 && typeof _egReplaceCarriedItemDrops === 'function') {
+            try { _egReplaceCarriedItemDrops(carried.items); } catch (e) {}
+        }
+        if (carried.maps.length > 0 && typeof _egReplaceCarriedMapDrops === 'function') {
+            try { _egReplaceCarriedMapDrops(carried.maps); } catch (e) {}
+        }
+        if (carried.charms.length > 0 && typeof _charmReplaceCarriedDrops === 'function') {
+            try { _charmReplaceCarriedDrops(carried.charms); } catch (e) {}
+        }
+    };
+    const poll = () => {
+        attempts++;
+        const gridReady = !!(typeof cur !== 'undefined' && cur && cur.grid
+            && document.getElementById('g-0-0'));
+        const onTarget = (typeof cur !== 'undefined' && cur && cur.gIdx === nextIndex)
+            // Ascension-trial hijack launches a chain instead of the plain
+            // puzzle - still a valid "next puzzle", so accept any fresh grid
+            // after a few polls rather than dropping the items.
+            || attempts >= 6;
+        if ((gridReady && onTarget) || attempts >= 20) {
+            // One extra tick so buildGrid's DOM settles (same 400ms beat the
+            // encounter chain uses for its own re-placement).
+            setTimeout(doRestore, 400);
+            return;
+        }
+        setTimeout(poll, 250);
+    };
+    poll();
+}
+
 // Advances to the next level. If there is no next level, goes to level select.
 // Respects convergence modal and pending class events before transitioning.
+// NEXT carries unclaimed grid drops forward (see helpers above); the LEVELS
+// path (onGoToLevelsFromOverlay → goToLevelSelect) intentionally carries
+// nothing, so those drops are lost on encounter teardown.
 function goToNextLevel() {
     hideResultOverlays();
 
     const nextIndex = cur.gIdx + 1;
     const proceed = () => {
-        if (nextIndex < ALL.length) startLevel(nextIndex);
-        else goToLevelSelect();
+        if (nextIndex >= ALL.length) {
+            goToLevelSelect();
+            return;
+        }
+        // Snapshot inside the innermost proceed so drops that expire while a
+        // convergence / class-event / math-gate modal sits open are NOT
+        // carried - only what is still unclaimed on the grid counts.
+        // Skipped for real endgame map runs: the encounter chain owns that
+        // transition (_egTransitionToChainPuzzle) and would double-place.
+        const isMapRun = (typeof _egIsMapRun === 'function') && _egIsMapRun();
+        const carried = isMapRun ? null : _campaignSnapshotCarriedDrops();
+        startLevel(nextIndex);
+        if (carried) _campaignRestoreCarriedDrops(carried, nextIndex);
     };
 
     _maybeShowConvergenceModal(_buildPostConvergenceCallback(proceed));
@@ -452,7 +570,7 @@ function goToNextLevel() {
 // Respects convergence modal and pending class events before transitioning.
 function replayLevel() {
     hideResultOverlays();
-    // "Restarting the game" should clear any stacked quiz damage buff —
+    // "Restarting the game" should clear any stacked quiz damage buff -
     // this covers the win/lose retry buttons. Chain transitions preserve
     // the buff via _egSuppressEncounterStop, but a manual retry is a map
     // exit and must wipe it.

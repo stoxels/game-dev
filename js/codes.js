@@ -78,8 +78,8 @@ function _buildLockedCodeEntry(wc, tierCounts) {
 }
 
 // Checks every WORLD_CODES entry and sorts them into:
-//   newCodes    — ready to unlock right now
-//   lockedCodes — score met, but not enough achievements yet
+//   newCodes    - ready to unlock right now
+//   lockedCodes - score met, but not enough achievements yet
 // Returns both lists so the caller can act on them.
 function collectCodeUnlockResults() {
     const newCodes = [];
@@ -105,7 +105,7 @@ function collectCodeUnlockResults() {
     return { newCodes, lockedCodes };
 }
 
-// Same eligibility check as collectCodeUnlockResults(), but read-only —
+// Same eligibility check as collectCodeUnlockResults(), but read-only -
 // does not mutate STATE.unlockedCodes. Used for the setup-screen reminder only.
 function collectLockedCodesOnly() {
     const lockedCodes = [];
@@ -129,7 +129,7 @@ function collectLockedCodesOnly() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _pwFireSparkles — one-shot golden sparkle burst over a code display.
+// _pwFireSparkles - one-shot golden sparkle burst over a code display.
 // Each spark is a single absolutely-positioned star (css/modals.css 3j)
 // that fans out from the display's centre and fades; nodes self-remove
 // on animationend.
@@ -184,7 +184,7 @@ function showUnlockedCodesModal(codes) {
 
     // Reward fanfare: the achievement sting plus a golden sparkle burst
     // over each code display, timed to the CSS shine sweep that peaks
-    // ~350ms into its run (css/modals.css 3j — sweep delays are
+    // ~350ms into its run (css/modals.css 3j - sweep delays are
     // 0.5s/0.64s/0.78s/… per card).
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
         Audio_Manager.playSFX('achievement');
@@ -247,7 +247,7 @@ function showLockedCodesModal(lockedCodes) {
 
 
 //------------------------------------------------------------------------
-//-------------------------CODES SCREEN UI — REDESIGNED-------------------
+//-------------------------CODES SCREEN UI - REDESIGNED-------------------
 //------------------------------------------------------------------------
 // The background image (Moodle_Codes_Background.jpeg) already contains:
 //   • The "MOODLE CODES" title
@@ -289,7 +289,7 @@ function _mcBuildReqBlock(label, current, required, met, barClass) {
 
 /**
  * Builds the overlay content for one parchment row.
- * No icon HTML is emitted — icons are already in the background image.
+ * No icon HTML is emitted - icons are already in the background image.
  *
  * @param {object}  wc               - Entry from WORLD_CODES
  * @param {number}  total            - Player's current total score
@@ -355,7 +355,7 @@ function buildCodesScreen() {
             <!-- MOODLE CODES logo image -->
             <img class="mc-logo" src="images/Moodle_Codes_Screen/Moodle_Codes_logo.webp" alt="Moodle Codes">
 
-            <!-- BACK button — top-left (unified .back-btn stone slab) -->
+            <!-- BACK button - top-left (unified .back-btn stone slab) -->
             <button class="back-btn back-btn-corner mc-menu-btn" id="btn-codes-back" data-t="btn_back">◀ BACK</button>
 
 
@@ -376,7 +376,7 @@ function buildCodesScreen() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Main entry point — call this after a level is beaten or a quiz is finished.
+// Main entry point - call this after a level is beaten or a quiz is finished.
 // Checks for newly unlocked codes, persists state, and triggers UI feedback.
 function checkWorldCodes() {
     const { newCodes } = collectCodeUnlockResults();
@@ -384,7 +384,7 @@ function checkWorldCodes() {
     if (newCodes.length) showUnlockedCodesModal(newCodes);
 }
 
-// Synchronous unlock check without UI — call this to persist unlocks immediately.
+// Synchronous unlock check without UI - call this to persist unlocks immediately.
 // Returns the list of newly unlocked codes.
 function checkWorldCodesSync() {
     const { newCodes } = collectCodeUnlockResults();

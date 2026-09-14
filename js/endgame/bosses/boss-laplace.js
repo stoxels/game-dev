@@ -1,28 +1,28 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: LAPLACE'S DEMON (boss_laplace)------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK — 👁️ "It Has Already Seen This". The Demon predicts; you
-// falsify. Every telegraph is CORRECT — but shown twice: once as a ghost
+// TIER 7 REWORK - 👁️ "It Has Already Seen This". The Demon predicts; you
+// falsify. Every telegraph is CORRECT - but shown twice: once as a ghost
 // pre-run ~3s early (the prediction, harmless), then the real one. The
 // skill is reading ghosts fast and using the pre-knowledge to greed DPS
 // windows. Element: fire (unchanged).
-//   • DEMONSTRATED FATE (signature, all fight) — every cast plays the
+//   • DEMONSTRATED FATE (signature, all fight) - every cast plays the
 //     ghost-run then the real-run of a chase-lance that ENDS exactly where
 //     the ghost ended: standing at the ghost's endpoint is precisely the
 //     trap. Move after the ghost dissolves. Phase 3 crosses two lances.
-//   • CONDITIONAL BRANCHES (60%) — three phantom Laplaces walk predictable
+//   • CONDITIONAL BRANCHES (60%) - three phantom Laplaces walk predictable
 //     dashed paths and each places a "future cell". At resolution ONE
-//     detonates softly (the ✅ true future, small hit) — the other two are
+//     detonates softly (the ✅ true future, small hit) - the other two are
 //     fakes: correctly standing on a fake grants 2s GHOST-FORM (immune to
 //     the next signature). 1-in-3 gamble, greedy reward.
-//   • TIMELINE FRAY (60%) — a clone of your avatar walks a recording of
+//   • TIMELINE FRAY (60%) - a clone of your avatar walks a recording of
 //     your own last 6 seconds (path pre-drawn as fading dots). Touch it
-//     and you swap positions with where the clone was 2s ago — no damage,
+//     and you swap positions with where the clone was 2s ago - no damage,
 //     just dizzying repositioning. Your own past is the hazard.
-//   • 💀 THE CLOSED TIMELINE (≤10%, one-shot finale) — the arena loops: the
+//   • 💀 THE CLOSED TIMELINE (≤10%, one-shot finale) - the arena loops: the
 //     same three-mechanic gauntlet repeats on a strict 20s loop with
 //     IDENTICAL telegraphs each loop (learnable!). A timeline node appears
-//     each loop at a new spot — stand on it 1.2s cumulative to break it.
+//     each loop at a new spot - stand on it 1.2s cumulative to break it.
 //     Three breaks close the loop and the Demon pays its own remaining HP.
 //     Dying to a loop failure isn't possible: each failed dodge extends
 //     the loop by 5s and spawns an extra hunting phantom. Charge bar
@@ -54,7 +54,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_laplace — "It Has Already Seen This" (rework)
+    // boss_laplace - "It Has Already Seen This" (rework)
     // Phase 1 (100% → 60%): Demonstrated Fate teaches ghost-reading
     // Phase 2 ( 60% → 30%): immune window, Branches + Fray join
     // Phase 3 ( 30% →  0%): crossed fates; at 10% the CLOSED TIMELINE begins
@@ -99,7 +99,7 @@ const EG_LAP_NODE_GOAL    = 3;      // nodes to close the timeline
 let _egLapHitCd = 0;
 
 // Touch damage helper shared by all Laplace hazards (per-touch cooldown).
-// Ghost-form makes the player immune to these — that is the point of it.
+// Ghost-form makes the player immune to these - that is the point of it.
 function _egLapTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egLapHitCd) return false;
@@ -113,7 +113,7 @@ function _egLapTouch(pct, level, label) {
 }
 
 // Ghost-form: after correctly standing on a fake future, the player is
-// briefly untouchable by the Demon (greed window — stand IN the lance).
+// briefly untouchable by the Demon (greed window - stand IN the lance).
 let _egLapGhostUntil = 0;
 function _egLapGhostForm(ms) {
     _egLapGhostUntil = performance.now() + ms;
@@ -138,7 +138,7 @@ function _egLapPC() { const c = _egNkPlayerCenter(); return c || { x: window.inn
 //-------------------SIGNATURE: DEMONSTRATED FATE (all fight)--------------
 //------------------------------------------------------------------------
 // A chase-lance whose full path is pre-run by a harmless ghost ~3s ahead.
-// The real lance follows the SAME path — its endpoint (the ghost's endpoint)
+// The real lance follows the SAME path - its endpoint (the ghost's endpoint)
 // is exactly where a greedy or inattentive player will be standing.
 const EG_LAP_FATE_PHASE3 = 2;  // crossed lances in phase 3
 
@@ -148,14 +148,14 @@ function _egMechLapFate(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_lap_fate', '👁️🔥 DEMONSTRATED FATE — the ghost shows the future. Do not stand where it ends!', '#f0abfc');
+    _egNkToast('eg_mech_lap_fate', '👁️🔥 DEMONSTRATED FATE - the ghost shows the future. Do not stand where it ends!', '#f0abfc');
     _egLapEnsureRecRun(monster);
 
     const pc = _egLapPC();
     const lanceCount = p >= EG_LAP_FATE_PHASE3 ? 2 : 1;
 
     for (let i = 0; i < lanceCount; i++) {
-        // Path: from an edge through the player, continuing 260px beyond —
+        // Path: from an edge through the player, continuing 260px beyond -
         // the second lance crosses on the mirrored axis.
         let ax, ay;
         if (i === 0) { ax = Math.random() < 0.5 ? -40 : W + 40; ay = pc.y + (Math.random() * 300 - 150); }
@@ -170,7 +170,7 @@ function _egMechLapFate(monster, phase) {
     }
 }
 
-// One ghost + real lance pair on a fixed path — both fly on the run's
+// One ghost + real lance pair on a fixed path - both fly on the run's
 // loop clock (pause-safe, tier-scaled).
 function _egLapLancePair(run, ax, ay, bx, by, delayMs, level) {
     const len = Math.hypot(bx - ax, by - ay);
@@ -180,7 +180,7 @@ function _egLapLancePair(run, ax, ay, bx, by, delayMs, level) {
     // reads before the real lance repeats it.
     const ghostTravelMs = Math.max(travelMs, EG_LAP_GHOST_LEAD * _EG_LAP_DEBUG_MULT);
 
-    // The ghost pre-run (dashed corridor, translucent head — harmless).
+    // The ghost pre-run (dashed corridor, translucent head - harmless).
     const ghost = _egNkEl(run, 'div', 'eg-lap-ghost-corridor');
     _egLapPlaceCorridor(ghost, ax, ay, bx, by);
     const head = _egNkEl(run, 'div', 'eg-lap-ghost-head', '👁️');
@@ -266,7 +266,7 @@ function _egMechLapBranches(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_lap_branches', '👁️👥 CONDITIONAL BRANCHES — one future is real. Choose where to stand!', '#f0abfc');
+    _egNkToast('eg_mech_lap_branches', '👁️👥 CONDITIONAL BRANCHES - one future is real. Choose where to stand!', '#f0abfc');
     _egLapEnsureRecRun(monster);
 
     const branches = [];
@@ -337,7 +337,7 @@ function _egMechLapBranches(monster, phase) {
                 } else if (Math.hypot(pc.x - b.x, pc.y - b.y) < 46) {
                     // Correctly standing on a fake: ghost-form greed window.
                     _egLapGhostForm(EG_LAP_GHOST_FORM * _EG_LAP_DEBUG_MULT);
-                    _egNkToast('eg_mech_lap_ghostform', '👁️ GHOST-FORM — untouchable for 2s! Greed the lance!', '#a7f3d0');
+                    _egNkToast('eg_mech_lap_ghostform', '👁️ GHOST-FORM - untouchable for 2s! Greed the lance!', '#a7f3d0');
                 }
                 try { b.el.remove(); } catch (e) {}
             });
@@ -347,7 +347,7 @@ function _egMechLapBranches(monster, phase) {
 }
 
 // Plain prefixed delay for out-of-run callbacks: defers while the game is
-// frozen (visual-only use — mechanics never wait on this).
+// frozen (visual-only use - mechanics never wait on this).
 function _egLapDelay(ms, fn) {
     setTimeout(() => { if (!_egNkFrozen()) fn(); else setTimeout(() => { if (!_egNkFrozen()) fn(); }, 120); }, ms);
 }
@@ -358,7 +358,7 @@ function _egLapDelay(ms, fn) {
 //------------------------------------------------------------------------
 // A clone of your avatar walks a recording of your own last 6 seconds
 // (path pre-drawn as fading dots). Touch it → swap positions with where
-// the clone was 2s ago. No damage — dizzying but fair.
+// the clone was 2s ago. No damage - dizzying but fair.
 let _egLapRecBuf = [];      // { x, y, t } samples, ~100ms apart
 let _egLapRecRun = null;
 let _egLapFrayCd = 0;
@@ -387,7 +387,7 @@ function _egMechLapFray(monster, phase) {
     void phase;
     if (_egLapRecBuf.length < 20) return;   // not enough recorded yet
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_lap_fray', '👁️🌀 TIMELINE FRAY — your own past walks the arena. Do not touch it!', '#f0abfc');
+    _egNkToast('eg_mech_lap_fray', '👁️🌀 TIMELINE FRAY - your own past walks the arena. Do not touch it!', '#f0abfc');
     _egLapEnsureRecRun(monster);
 
     const buf = _egLapRecBuf.slice();
@@ -432,7 +432,7 @@ function _egMechLapFray(monster, phase) {
                 document.body.classList.add('eg-lap-dizzy');
                 setTimeout(() => { try { document.body.classList.remove('eg-lap-dizzy'); } catch (e) {} }, 600);
             }
-            _egNkToast('eg_mech_lap_swap', '👁️ Your past replaced your present — disoriented!', '#f0abfc');
+            _egNkToast('eg_mech_lap_swap', '👁️ Your past replaced your present - disoriented!', '#f0abfc');
             return false;
         }
         if (elapsed >= dur + 1.2) return false;
@@ -447,7 +447,7 @@ function _egMechLapFray(monster, phase) {
 // The arena loops: the same three-mechanic gauntlet repeats on a strict
 // 20s loop with identical telegraphs each loop (learnable). A timeline
 // node appears each loop at a new spot; stand on it 1.2s cumulative to
-// break it. Three breaks close the loop — the Demon pays its own HP.
+// break it. Three breaks close the loop - the Demon pays its own HP.
 // Failed dodges extend the loop 5s and spawn an extra hunting phantom.
 const EG_LAP_LOOP_LANCE_Y  = [0.34, 0.62];   // fixed lance bands (learnable)
 const EG_LAP_LOOP_BRANCH_X = [0.25, 0.5, 0.75];
@@ -535,15 +535,15 @@ function _egLapFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-lap-cd-label">👁️💀 THE CLOSED TIMELINE</div>' +
         '<div class="eg-lap-cd-loop">LOOP 1</div>' +
-        '<div class="eg-lap-cd-timer">—</div>' +
-        '<div class="eg-lap-cd-hint">The gauntlet repeats — learn it. Break the timeline node each loop!</div>';
+        '<div class="eg-lap-cd-timer">-</div>' +
+        '<div class="eg-lap-cd-hint">The gauntlet repeats - learn it. Break the timeline node each loop!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.loopEl = ov.querySelector('.eg-lap-cd-loop');
     g.timerEl = ov.querySelector('.eg-lap-cd-timer');
     g.fxRun.els.push(ov);
 
-    _egNkToast('eg_mech_lap_final_cd', '👁️💀 THE CLOSED TIMELINE — the loop begins. Learn it. Break it!', '#f0abfc');
+    _egNkToast('eg_mech_lap_final_cd', '👁️💀 THE CLOSED TIMELINE - the loop begins. Learn it. Break it!', '#f0abfc');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -560,7 +560,7 @@ function _egLapFinalStart(monster) {
         if (g.finished) return;
         g.loop++;
         if (g.loopEl) g.loopEl.textContent = 'LOOP ' + g.loop;
-        _egNkToast('eg_mech_lap_loop', '👁️ LOOP {n} — the same fate, again. Break the node!', '#f0abfc');
+        _egNkToast('eg_mech_lap_loop', '👁️ LOOP {n} - the same fate, again. Break the node!', '#f0abfc');
         g.deadline = performance.now() + EG_LAP_LOOP_TIME * _EG_LAP_DEBUG_MULT * 1000;
 
         // Node: spawns each loop at a NEW spot (persist until broken).
@@ -578,7 +578,7 @@ function _egLapFinalStart(monster) {
             _egLapFinalLance(g, bandY, level);
         });
 
-        // 2) Branch volley at the fixed spots — the middle is always true.
+        // 2) Branch volley at the fixed spots - the middle is always true.
         _egLapAfter(g, 7000 * _EG_LAP_DEBUG_MULT, () => {
             if (g.finished) return;
             const cells = EG_LAP_LOOP_BRANCH_X.map(fx => {
@@ -640,11 +640,11 @@ function _egLapFinalStart(monster) {
                     g.broken++;
                     try { n.el.remove(); } catch (e) {}
                     g.nodes = g.nodes.filter(q => q !== n);
-                    _egNkToast('eg_mech_lap_node', '👁️⛓️ TIMELINE NODE BROKEN — ' + g.broken + '/' + EG_LAP_NODE_GOAL + '!', '#a7f3d0');
+                    _egNkToast('eg_mech_lap_node', '👁️⛓️ TIMELINE NODE BROKEN - ' + g.broken + '/' + EG_LAP_NODE_GOAL + '!', '#a7f3d0');
                     if (g.broken >= EG_LAP_NODE_GOAL) { _egLapCloseLoop(g, monster); return false; }
                 }
             } else if (n.prog > 0 && n.prog < EG_LAP_NODE_STAND) {
-                // Progress decays when you leave (but slowly — merciful).
+                // Progress decays when you leave (but slowly - merciful).
                 n.prog = Math.max(0, n.prog - dtS * 0.35);
                 if (n.prog === 0) n.el.classList.remove('eg-lap-node-breaking');
             }
@@ -716,7 +716,7 @@ function _egLapFailPunish(g, label) {
     const was = g.deadline;
     g.deadline += EG_LAP_FAIL_EXTEND * _EG_LAP_DEBUG_MULT;
     if (g.deadline > was) {
-        _egNkToast('eg_mech_lap_extend', '👁️ The loop EXTENDS — the Demon rewrites your mistake!', '#f0abfc');
+        _egNkToast('eg_mech_lap_extend', '👁️ The loop EXTENDS - the Demon rewrites your mistake!', '#f0abfc');
         // Extra hunter: a phantom that walks a random line right now.
         _egLapFinalPhantom(g, 0, false, (function () {
             try {
@@ -730,7 +730,7 @@ function _egLapFailPunish(g, label) {
 // Three nodes broken: the loop closes and the Demon pays its own HP.
 function _egLapCloseLoop(g, monster) {
     if (g.finished) return;
-    _egNkToast('eg_mech_lap_closed', '👁️💥 THE TIMELINE CLOSES — the Demon is trapped in its own loop!', '#a7f3d0');
+    _egNkToast('eg_mech_lap_closed', '👁️💥 THE TIMELINE CLOSES - the Demon is trapped in its own loop!', '#a7f3d0');
     const flash = document.createElement('div');
     flash.className = 'eg-lap-collapse';
     document.body.appendChild(flash);
@@ -772,7 +772,7 @@ function _egLapFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
 function _egLapTeardown() {
     if (_egLapFinal) { try { _egLapFinalEnd(_egLapFinal, null); } catch (e) {} _egLapFinal = null; }
@@ -805,8 +805,8 @@ function _egLapTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_LAP_DEBUG.fire('fate'|'branches'|'fray'|'final') — run one now
-//   _EG_LAP_DEBUG.ghost(ms)                              — ghost-form by hand
+//   _EG_LAP_DEBUG.fire('fate'|'branches'|'fray'|'final') - run one now
+//   _EG_LAP_DEBUG.ghost(ms)                              - ghost-form by hand
 if (typeof window !== 'undefined') {
     window._EG_LAP_DEBUG = {
         fire: (name, phase) => {

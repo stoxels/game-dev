@@ -14,7 +14,7 @@ const DIFF_CFG = {
 };
 
 // Currently toggled optional modifiers. Keys drive UI, scoring and gameplay
-// checks below — order here also determines score-multiplier application
+// checks below - order here also determines score-multiplier application
 // order, so don't reorder without checking scoreMultiplier().
 // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
 let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false, superTutor: false };
@@ -24,8 +24,8 @@ const MOD_MULT = {
     timetrial: 1.2,
     hardcore: 1.3,
     ironman: 1.15,
-    classless: 1.2,   // +20% — disables all class abilities
-    treeless: 1.25,  // +25% — disables all passive tree nodes
+    classless: 1.2,   // +20% - disables all class abilities
+    treeless: 1.25,  // +25% - disables all passive tree nodes
 };
 
 // Short, plain-language warning text shown on the left-page scroll for
@@ -244,7 +244,7 @@ function updateRetryKeepModal() {
 }
 
 // Hides the keep-modal WITHOUT resolving the pending run, so the snapshot
-// stays active. The caller is expected to replay the level immediately —
+// stays active. The caller is expected to replay the level immediately -
 // the prompt will reappear after the next win/fail until the player finally
 // picks KEEP or REVERT. This is the "try the new setup again, decide later"
 // escape hatch for e.g. repeated hardcore fails.

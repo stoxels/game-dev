@@ -7,7 +7,7 @@
 //      _egPickModFromPool, _egRollMods)
 //    - item naming (_egBuildItemName + dictionaries). The naming code existed
 //      twice in generator.js; the duplicate (which read the dictionary in the
-//      wrong slot order) was deleted — this is the documented correct version.
+//      wrong slot order) was deleted - this is the documented correct version.
 //
 //  Load order: after endgame-mod-name-words.js and all EG_MOD_TABLE_* files,
 //  before endgame-equipment-generator.js. External users of these helpers
@@ -18,7 +18,7 @@
 //-------------------LOCAL DEFENSE MOD RESTRICTION------------------------
 //------------------------------------------------------------------------
 // Local defense mods (armour / evasion / absorption) may only roll on base
-// items that actually HAVE the stat — a "30% increased Armour" mod on an
+// items that actually HAVE the stat - a "30% increased Armour" mod on an
 // evasion-only base would be meaningless. Hybrid families count as local
 // for every defense stat they touch, so hybrid_armour_evasion requires the
 // base to have BOTH armour and evasion.
@@ -165,13 +165,13 @@ function _egBuildModPool(modSection, itemLevel, chosenFamilyIds, defenses) {
 //------------------------------------------------------------------------
 // Picks one entry from the pool.  Weight = sum of eligible tier weights
 // for that family (higher-ilvl items get access to rarer tiers, so the
-// effective weight of a family shifts upward — this is intentional).
+// effective weight of a family shifts upward - this is intentional).
 
 function _egPickModFromPool(pool) {
     if (pool.length === 0) return null;
     // Each pool entry contributes the weight of its BEST (lowest-tier-number)
     // eligible tier, so that higher-tier items feel meaningfully different.
-    // Alternatively use total weight across tiers — both are defensible.
+    // Alternatively use total weight across tiers - both are defensible.
     // We use the best eligible tier's weight to keep rare mods rare.
     const total = pool.reduce((s, e) => {
         const best = e.tiers.reduce((b, t) => t.tier < b.tier ? t : b, e.tiers[0]);

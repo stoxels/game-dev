@@ -26,9 +26,9 @@
 
 :root {
     /* --- Colors --- */
-    --quest-color-success: #2ecc71; /* green  — used for claim banner accent  */
-    --quest-color-reward: #f39c12; /* orange — used for reward text and dots */
-    --quest-color-info: #3498db; /* blue   — used for active tab state     */
+    --quest-color-success: #2ecc71; /* green  - used for claim banner accent  */
+    --quest-color-reward: #f39c12; /* orange - used for reward text and dots */
+    --quest-color-info: #3498db; /* blue   - used for active tab state     */
     --quest-color-text-primary: #ffffff;
     --quest-color-text-secondary: #aaaaaa;
     --quest-color-text-muted: #555555;
@@ -196,7 +196,7 @@
     quest categories (e.g. Daily / Weekly / Story).
 
     Structure:
-        .ledger-tabs            flex row — the tab bar container
+        .ledger-tabs            flex row - the tab bar container
             .ledger-tab-btn     individual tab button
                 .ledger-tab-dot optional pulsing dot (claimable indicator)
 */
@@ -251,7 +251,7 @@
 
     Usage (HTML): <button class="ledger-tab-btn">Daily <span class="ledger-tab-dot"></span></button>
 
-    The dot uses the questPulse animation — define that keyframe in
+    The dot uses the questPulse animation - define that keyframe in
     your global/base stylesheet or append it here if quests.css is standalone.
 */
 

@@ -495,8 +495,8 @@ function _ensurePassiveFxStyles() {
 }
 
 // Floating time text ("+30s") that rises from the timer HUD and fades.
-//   label  — text to display (e.g. "+30s")
-//   color  — CSS color of the text/glow
+//   label  - text to display (e.g. "+30s")
+//   color  - CSS color of the text/glow
 function playTimeGainEffect(label, color = '#ffd700') {
     const anchor = document.getElementById('timer-val') || document.querySelector('.timer-val');
     if (!anchor) return;

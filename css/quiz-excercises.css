@@ -8,7 +8,7 @@
     The sprite portrait sits in the small stone medallion box at the top-center.
 
     All three overlays (quiz, gate, primer) share ONE set of classes.
-    No CSS-generated borders, no box-shadows faking a frame — the image
+    No CSS-generated borders, no box-shadows faking a frame - the image
     does all the heavy lifting.
 */
 
@@ -43,17 +43,17 @@
 .qr-panel {
     position: relative;
     /* Enlarged panel: fills the viewport width (cap 1700px), but never
-       taller than the window — the height-aware min() keeps the 16/9 art
+       taller than the window - the height-aware min() keeps the 16/9 art
        fully visible on short windows instead of clipping it. */
     width: min(1700px, 100vw, calc((100vh - 16px) * 16 / 9));
     aspect-ratio: 16 / 9;
     background: url('../images/quiz/quiz-panel-background.webp') center / 125% 100% no-repeat;
-    /* No other border or shadow — the image IS the frame */
+    /* No other border or shadow - the image IS the frame */
 }
 
 
 /* ============================================================
-   CLOSE BUTTON — stone X, top-right corner
+   CLOSE BUTTON - stone X, top-right corner
    Same visual family as the settings modal's close button
    (images/Settings/settings_close_button.webp). Sits on the stone
    frame edge, matching the top-left gem column.
@@ -108,10 +108,10 @@
     top: 7%; /* pulls the sprite up so it sits IN the stone box */
     left: 50%;
     transform: translateX(-50%);
-    width: 11%; /* relative to panel width — matches the stone box size */
+    width: 11%; /* relative to panel width - matches the stone box size */
     aspect-ratio: 1;
     overflow: hidden;
-    /* no border or bg — the panel image already draws the stone box */
+    /* no border or bg - the panel image already draws the stone box */
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -221,7 +221,7 @@
 /* The input-field.png image is the background; the <input> sits on top */
 .qr-input-wrap {
     position: relative;
-    /* input-field.png is 668×373 — the 16:9 art lock made the field ~110px
+    /* input-field.png is 668×373 - the 16:9 art lock made the field ~110px
        tall at typical sizes, starving the feedback band below. A clamped
        height keeps the wooden frame art proportionate AND leaves room. */
     width: 22%;
@@ -267,7 +267,7 @@
     flex-shrink: 0;
 }
 
-/* The check button — check-button.png is the whole button image */
+/* The check button - check-button.png is the whole button image */
 .qr-submit-btn {
     position: relative;
     width: 20%;
@@ -371,13 +371,13 @@
    Holds hint / result / explanation / rewards as a group. Anchored
    to the bottom of the free space above the footer, so the text
    appears just above the buttons and never overlaps the answer
-   options or the input row — regardless of how tall the question
+   options or the input row - regardless of how tall the question
    text or the options grid is.
    ============================================================ */
 
 .qr-feedback-stack {
     /* Sits right under the answer content (options / input row) in normal
-       flow, so the hint/result/explanation reads as part of the answer —
+       flow, so the hint/result/explanation reads as part of the answer -
        not pushed to the bottom by margin-top:auto (which left a big gap
        under the MC options, per the "wrong answer" screenshot). */
     margin-top: 3%;
@@ -506,7 +506,7 @@
         .qr-corner { transition: none; }
     }
 
-/* Corner positions — sit on the stone frame's gemstones, matching the ✕
+/* Corner positions - sit on the stone frame's gemstones, matching the ✕
    close button (top:16.5% right:9.5%). The bottom gems sit a little lower
    than the top ones so the chips read as being on the frame, not the board. */
 .qr-corner--tl {
@@ -524,7 +524,7 @@
     right: 9.5%;
 }
 
-/* Continue chip after a CORRECT answer — big green pulsing "go next"
+/* Continue chip after a CORRECT answer - big green pulsing "go next"
    state so the way forward is impossible to miss. */
 .qr-corner--br.qr-continue-attention {
     width: clamp(44px, 5vw, 72px);
@@ -564,7 +564,7 @@
 
 
 /* ============================================================
-   QUESTION COUNTER  ("1/5")  — Scouts Primer
+   QUESTION COUNTER  ("1/5")  - Scouts Primer
    Sits in the top band, bounded left of the ✕ close button and
    right of the portrait medallion, so it never collides with
    either. Kept minimal: just the fraction, no "of" text.
@@ -590,7 +590,7 @@
     color: #7ee6cf;
     letter-spacing: 0.06em;
     white-space: nowrap;
-    /* counter is informational only — never clicks, so it can't block the
+    /* counter is informational only - never clicks, so it can't block the
        close button's hit area or the portrait below */
     pointer-events: none;
 }
@@ -665,7 +665,7 @@
 
 
 /* ============================================================
-   SCOUTS PRIMER — legacy classes
+   SCOUTS PRIMER - legacy classes
    The modal no longer renders streak dots or the "Question n of m"
    label (replaced by the compact .qr-counter chip on the frame band);
    these rules remain only for safety against any stale markup.

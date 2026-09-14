@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------ADD TIME — HOURGLASS / STOPWATCH / CHRONOBOLT----------------------
+//-------------------ADD TIME - HOURGLASS / STOPWATCH / CHRONOBOLT----------------------
 //------------------------------------------------------------------------
 
-// addTime30 / addTime60 / addTime180 — adds seconds to the timer.
+// addTime30 / addTime60 / addTime180 - adds seconds to the timer.
 function _useAddTime(id, def) {
     if (ptHasSkill('keystone_gamblers_ruin')) {
         return `${def.icon} ${t('itm_blocked_gamblers_ruin')}`;
@@ -13,7 +13,7 @@ function _useAddTime(id, def) {
     // Toast shows minutes instead of seconds (e.g. 90s -> 1.5min)
     const mins = Math.round((secs / 60) * 10) / 10;
 
-    // Countdown Crisis inverts timer items — but the Golden Clock guarantees
+    // Countdown Crisis inverts timer items - but the Golden Clock guarantees
     // the timer can only increase, so the inversion is suppressed while it
     // is active.
     if (ptHasSkill('keystone_countdown_crisis') && !window.STOX_FLAGS.goldenClockActive) {
@@ -73,7 +73,7 @@ function _fxMakeSandParticles(container, cx, cy, count) {
     }
 }
 
-// ⏳ Hourglass — sand streams downward through the centre.
+// ⏳ Hourglass - sand streams downward through the centre.
 function _fxHourglass() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -105,7 +105,7 @@ function _fxMakeTimeRings(container, cx, cy, count, maxSize) {
     }
 }
 
-// ⏱️ Stopwatch — timer rings ripple outward from centre.
+// ⏱️ Stopwatch - timer rings ripple outward from centre.
 function _fxStopwatch() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
@@ -163,7 +163,7 @@ function _fxMakeLightningBolt(container, r, xFraction) {
     container.appendChild(bolt);
 }
 
-// ⚡ Chronobolt — lightning bolts crackle across the puzzle grid.
+// ⚡ Chronobolt - lightning bolts crackle across the puzzle grid.
 function _fxChronobolt() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

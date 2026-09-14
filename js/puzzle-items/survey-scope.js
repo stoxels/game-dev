@@ -2,7 +2,7 @@
 //-------------------SURVEY SCOPE----------------------
 //------------------------------------------------------------------------
 
-// surveyScope — reveals every correct cell inside one random 3×3 area.
+// surveyScope - reveals every correct cell inside one random 3×3 area.
 // Unlike the reveal family (random single tiles) this guarantees spatial
 // density: the whole window is surveyed at once. Blocked by the Ergodic
 // Field keystone and The Oracle, like every programmatic reveal.
@@ -21,7 +21,7 @@ function _useSurveyScope(id, def) {
     const win = 3;
 
     // Pick a 3×3 window that contains at least one revealable cell.
-    // A handful of random attempts is plenty — the board is rarely so
+    // A handful of random attempts is plenty - the board is rarely so
     // complete that every window is exhausted.
     let area = null;
     for (let attempt = 0; attempt < 12; attempt++) {
@@ -103,7 +103,7 @@ function _ensureSurveyScopeStyles() {
     document.head.appendChild(style);
 }
 
-// 🔬 Survey Scope — a cyan bracket frame locks onto the 3×3 window,
+// 🔬 Survey Scope - a cyan bracket frame locks onto the 3×3 window,
 // rings ripple out from its centre and sparkles shower the area.
 function _fxSurveyScope() {
     const r = _fxGetPuzzleRect();

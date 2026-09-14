@@ -15,7 +15,7 @@
 //   - CSS style injection for drag visuals (dragover highlight, reject flash, ghost)
 //
 // Dependencies (must be loaded before this file):
-//   endgame-hub.js — exposes all _eg* state variables and render helpers
+//   endgame-hub.js - exposes all _eg* state variables and render helpers
 //
 // Entry point:
 //   Call initEndgameHubDnD() once after the hub screen has been created.
@@ -38,7 +38,7 @@ const EG_ZONE_CATEGORIES = {
 
 // Maps each paperdoll slot id to the item slotType it accepts.
 // Multi-slot types (rings, earrings) share the same slotType value.
-// weapon1 takes melee weapons (1H or 2H, never shields — so dual shields
+// weapon1 takes melee weapons (1H or 2H, never shields - so dual shields
 // are impossible); weapon2 takes shields or ONE-handed weapons (dual-wield).
 // The 1H/2H distinction is enforced hand-aware in _dndSlotAcceptsItem below
 // (see _egGetWeaponHands in endgame-requirements.js), not by this table alone.
@@ -291,7 +291,7 @@ function _dndPickUp(e, chip) {
 
     e.preventDefault();
 
-    // The origin chip is about to be removed — close any open hover tooltip.
+    // The origin chip is about to be removed - close any open hover tooltip.
     _egClearTooltip();
 
     _dnd = {
@@ -340,7 +340,7 @@ function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
             }
         }
     }
-    // Full — only grow the unlimited main stash
+    // Full - only grow the unlimited main stash
     if (grid === _egInventory && typeof _egEnsureInvRows === 'function') {
         _egEnsureInvRows(actualRows + 1);
         grid[actualRows][0] = item;
@@ -411,7 +411,7 @@ function _dndShowRejectFlash(el) {
 // Finalises a completed drop: saves hub state, resets drag session, updates count label.
 // Re-renders stash + paperdoll because the new loadout can change which
 // items are flagged as requirement-blocked (red cells).
-// Also re-renders the map device slot and map stash — those elements live on
+// Also re-renders the map device slot and map stash - those elements live on
 // the Probability Gate screen and no-op when that screen is not in the DOM.
 function _dndFinalizeDrop() {
     egSaveHubState();
@@ -544,7 +544,7 @@ function _dndDrop(e) {
             // tab of a different tier: dropping a Tier 1 stash map onto a Tier 7
             // device map used to send the Tier 7 map back to the Tier 1 grid
             // (the drag source cell), corrupting the map sort. Route it to a
-            // free cell of its OWN tier instead — the same rule the right-click
+            // free cell of its OWN tier instead - the same rule the right-click
             // quick-load path follows. Same-tier swaps still return to source.
             const draggedTier = (_dnd.item && _dnd.item.mapTier != null) ? _dnd.item.mapTier : null;
             const displacedTier = (displaced.mapTier != null) ? displaced.mapTier : null;
@@ -609,12 +609,12 @@ function _dndDrop(e) {
         if (_dnd.sourceZone === 'equip') {
             // Unequipping by dragging a paperdoll item into the stash. If the
             // target cell is occupied, the displaced stash item will be
-            // swapped INTO the vacated paperdoll slot — so the simulated final
+            // swapped INTO the vacated paperdoll slot - so the simulated final
             // loadout must include it. Checks both stat requirements
             // (endgame-requirements.js) and the slot type of the swapped-in item.
             const displaced = _egInventory[r][c];
             if (displaced && EG_SLOT_ACCEPTS[_dnd.sourceSlot] !== displaced.slotType) {
-                const msg = `⚠️ Cannot unequip ${_dnd.item.name || '?'} — ${displaced.name || '?'} does not fit there`;
+                const msg = `⚠️ Cannot unequip ${_dnd.item.name || '?'} - ${displaced.name || '?'} does not fit there`;
                 if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
                 else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
                 blocked = true;
@@ -668,7 +668,7 @@ function _dndDropOnCurrencyCell(currencyCell) {
         _egCurrencyStash[r][c] = _dnd.item;
         _egRenderCurrencyCell(r, c);
     } else {
-        // Different count object but same id — merge (should already be handled)
+        // Different count object but same id - merge (should already be handled)
         existing.count = (existing.count || 1) + (_dnd.item.count || 1);
         _egCurrencyStash[r][c] = existing;
         _egRenderCurrencyCell(r, c);
@@ -846,7 +846,7 @@ function _dndQuickEquipFromStash(invCell) {
 
     const displaced = _egEquipped[slotId] || null;
     _egEquipped[slotId] = item;
-    _egInventory[r][c] = displaced; // displaced may be null — that's fine
+    _egInventory[r][c] = displaced; // displaced may be null - that's fine
     _egRenderEquipSlot(slotId);
     _egRenderInventoryCell(r, c);
     _egRenderInventory();      // blocked-state flags may change loadout-wide
@@ -884,7 +884,7 @@ function _dndQuickUnequipToStash(equipSlotEl) {
     egSaveHubState();
 }
 
-// Contextmenu handler — dispatches to quick-equip or quick-unequip based on
+// Contextmenu handler - dispatches to quick-equip or quick-unequip based on
 // which zone the right-clicked chip belongs to. On the Probability Gate
 // screen, maps are quick-moved between the map stash and the map device slot.
 function _dndHandleRightClick(e) {
@@ -899,7 +899,7 @@ function _dndHandleRightClick(e) {
     // Items there are only moved by drag-and-drop, so treat it as a pure no-op.
     if (chip.closest && chip.closest('[data-eg-dropzone="crafting"]')) return;
 
-    // The chip may move or vanish (quick-equip/unequip) — close its tooltip.
+    // The chip may move or vanish (quick-equip/unequip) - close its tooltip.
     _egClearTooltip();
 
     const invCell = chip.closest('.eg-inv-cell:not(.eg-currency-cell):not(.eg-map-stash-cell):not(.eg-essence-cell)');
@@ -947,7 +947,7 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
             }
         } catch (e) { }
         if (!placed) {
-            const msg = `⚠️ Cannot swap — device holds Tier ${displaced.mapTier} but stash is on Tier ${activeTier}`;
+            const msg = `⚠️ Cannot swap - device holds Tier ${displaced.mapTier} but stash is on Tier ${activeTier}`;
             if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
             else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
             return;
@@ -971,7 +971,7 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
 }
 
 // Right-click on a map in the map device slot → return it to the first free
-// map stash cell of its own tier (infinite, so always succeeds — expands if needed).
+// map stash cell of its own tier (infinite, so always succeeds - expands if needed).
 function _dndQuickUnloadMapFromDevice() {
     if (typeof _egMapSlotItem === 'undefined' || !_egMapSlotItem) return;
     const map = _egMapSlotItem;
@@ -1031,8 +1031,8 @@ function _dndBuildCurrencyChipHTML(item) {
 
 // Overrides the base _egRenderCurrencyCell from endgame-hub.js.
 // Uses _dndBuildCurrencyChipHTML so stacked currency shows the count badge.
-// Renders BOTH twin grids — hub's left tab (eg-currency-cell-*) and the
-// Probability Gate's strip (eg-gate-currency-cell-*) — because both read
+// Renders BOTH twin grids - hub's left tab (eg-currency-cell-*) and the
+// Probability Gate's strip (eg-gate-currency-cell-*) - because both read
 // from the same _egCurrencyStash. Empty assigned slots get a dashed placeholder.
 function _egRenderCurrencyCell(row, col) {
     const item = _egCurrencyStash[row][col];
@@ -1041,21 +1041,22 @@ function _egRenderCurrencyCell(row, col) {
 
     function applyToCell(cell) {
         if (!cell) return;
+        // No tooltip attribute is written or cleared here: a filled cell gets
+        // its hint from the currency chip's own styled tooltip, and an empty
+        // one shows the icon via data-empty-icon. (This used to clear a native
+        // title that nothing sets any more.)
         if (item) {
             cell.innerHTML = _dndBuildCurrencyChipHTML(item);
             cell.classList.remove('eg-currency-assigned-empty');
             cell.removeAttribute('data-empty-icon');
-            cell.removeAttribute('title');
         } else if (assignedId) {
             cell.innerHTML = '';
             cell.classList.add('eg-currency-assigned-empty');
             if (def && def.icon) cell.setAttribute('data-empty-icon', def.icon);
-            cell.removeAttribute('title');
         } else {
             cell.innerHTML = '';
             cell.classList.remove('eg-currency-assigned-empty');
             cell.removeAttribute('data-empty-icon');
-            cell.removeAttribute('title');
         }
     }
     applyToCell(document.getElementById(`eg-currency-cell-${row}-${col}`));
@@ -1129,7 +1130,7 @@ function egAddCurrency(id, amount = 1, def = null) {
 //------------------------------------------------------------------------
 
 // Injects the minimal CSS rules required for drag visuals.
-// Runs once on init — skips injection if the style tag already exists.
+// Runs once on init - skips injection if the style tag already exists.
 // These rules can be moved to a .css file if preferred.
 function _dndInjectStyles() {
     if (document.getElementById('eg-dnd-styles')) return;
@@ -1158,7 +1159,7 @@ function _dndInjectStyles() {
         /* Prevent text selection while dragging */
         body.eg-dragging * { user-select: none !important; }
 
-        /* Item chip — emoji-only, transparent background, no border or name text */
+        /* Item chip - emoji-only, transparent background, no border or name text */
         .eg-item-chip {
             display: flex;
             align-items: center;
@@ -1176,7 +1177,7 @@ function _dndInjectStyles() {
         .eg-item-chip:hover .eg-item-chip-icon { transform: scale(1.15); }
         .eg-item-chip:active { cursor: grabbing; }
 
-        /* Name label hidden — tooltip panel carries that information */
+        /* Name label hidden - tooltip panel carries that information */
         .eg-item-chip-name { display: none; }
 
         /* Emoji sized large enough to fill the cell */
@@ -1191,7 +1192,7 @@ function _dndInjectStyles() {
         /* Currency count suffix displayed inside the tooltip name line */
         .eg-tooltip-count { font-weight: 700; color: #f5d98a; }
 
-        /* Stack count badge — bottom-right corner of a currency cell */
+        /* Stack count badge - bottom-right corner of a currency cell */
         .eg-stack-badge {
             position: absolute;
             bottom: 1px;
@@ -1228,7 +1229,7 @@ function _dndInjectStyles() {
 
 // Returns the managed screen element (#screen-endgame-hub or
 // #screen-endgame-gate) that contains the given chip, or null. The DnD and
-// currency systems operate on both screens — they share the same state.
+// currency systems operate on both screens - they share the same state.
 function _dndChipScreenEl(chip) {
     if (!chip || typeof chip.closest !== 'function') return null;
     // The crafting bench overlay is appended directly to document.body (see
@@ -1336,13 +1337,13 @@ function egDragOver(event) {
 //-------------------INITIALISATION---------------------------------------
 //------------------------------------------------------------------------
 
-// Entry point — called once after the hub screen DOM has been created.
+// Entry point - called once after the hub screen DOM has been created.
 function initEndgameHubDnD() {
     _dndInjectStyles();
     _dndBindListeners();
 }
 
-// Called from endgame-hub.js _egCreateScreen() — alias so the hub bootstrap
+// Called from endgame-hub.js _egCreateScreen() - alias so the hub bootstrap
 // doesn't need to know whether it's calling the init function or the bind function.
 function _egBindDragEvents() {
     initEndgameHubDnD();

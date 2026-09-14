@@ -18,7 +18,7 @@ const PT_ZOOM_MIN = 0.25;
 const PT_ZOOM_MAX = 3.0;
 const PT_ZOOM_STEP = 0.12;
 
-// Node colours — one set per state: locked / unlocked / allocated / start
+// Node colours - one set per state: locked / unlocked / allocated / start
 const PT_COL_LOCKED_BG = '#111120';
 const PT_COL_LOCKED_BORDER = '#3a3350';
 const PT_COL_LOCKED_DOT = '#3a3350';
@@ -30,12 +30,12 @@ const PT_COL_ALLOCATED_BORDER = '#6dbf40';
 const PT_COL_ALLOCATED_DOT = '#6dbf40';
 const PT_COL_START = '#ffd700';
 
-// Connection line colours — one per state
+// Connection line colours - one per state
 const PT_CONN_LOCKED = 'rgba(80,70,110,0.3)';
 const PT_CONN_UNLOCKED = 'rgba(160,130,80,0.45)';
 const PT_CONN_ALLOCATED = 'rgba(109,191,64,0.7)';
 
-// Tracks which screen — and, if applicable, which world — to return to
+// Tracks which screen - and, if applicable, which world - to return to
 // after closing the Probability Tree. Kept up to date by showWorldDetail(),
 // showMapView(), and toggleMapView()'s classic-view branch.
 let _ptReturnScreen = 'screen-levels';
@@ -78,7 +78,7 @@ function _ptInitConnections() {
     }));
 }
 
-// _ptInitTreeData — called once when the script loads.
+// _ptInitTreeData - called once when the script loads.
 // Populates all shared tree state from the TALENT_TREE_DATA constant.
 function _ptInitTreeData() {
     _ptInitSkills();
@@ -95,7 +95,7 @@ _ptInitTreeData();
 //------------------------------------------------------------------------
 
 // PT is a lightweight module that exposes the public API used by the UI.
-// Tree data is loaded once at startup above — PT itself has no data
+// Tree data is loaded once at startup above - PT itself has no data
 // management responsibility, only rendering and skill lookup.
 
 const PT = (() => {
@@ -137,7 +137,7 @@ function _ptUpdatePointsDisplay(lang, points) {
     pointsEl.textContent = t('pt_points_available').replace('{n}', points);
 }
 
-// buildPassiveTreeScreen — entry point called by the UI.
+// buildPassiveTreeScreen - entry point called by the UI.
 // Updates the points counter, shows a brief loading state,
 // then triggers the full tree render.
 function buildPassiveTreeScreen() {
@@ -152,7 +152,7 @@ function buildPassiveTreeScreen() {
 // Opens the Probability Tree screen, remembering the current screen
 // (via _ptReturnScreen / _ptReturnWorldIndex) so ptGoBack() can restore it.
 // An optional returnScreen argument (e.g. 'screen-endgame-hub') overrides
-// the return target — used when the tree is opened from the endgame hub.
+// the return target - used when the tree is opened from the endgame hub.
 function showPassiveTree(returnScreen) {
     if (typeof returnScreen === 'string') _ptReturnScreen = returnScreen;
     buildPassiveTreeScreen();
@@ -165,6 +165,9 @@ function showPassiveTree(returnScreen) {
 // re-runs the actual screen-build function for the destination so that
 // updated STATE.done / sprite position are reflected immediately.
 function ptGoBack() {
+    // Game-overlay close (K keybind mid-puzzle) - never touches the menu
+    // return path: the paused run continues exactly where it was.
+    if (_ptGameOverlay) { closeTreeToGame(); return; }
     screenHistory.pop(); // discard the entry showPassiveTree() pushed
 
     if (_ptReturnScreen === 'screen-world-detail' && _ptReturnWorldIndex !== null) {
@@ -173,10 +176,161 @@ function ptGoBack() {
         showMapView();
     } else if (_ptReturnScreen === 'screen-endgame-hub' && typeof showEndgameHub === 'function') {
         showEndgameHub();
+    } else if (_ptReturnScreen === 'screen-levels' && typeof renderLevelSelect === 'function') {
+        switchScreen(_ptReturnScreen);
+        renderLevelSelect();
     } else {
         switchScreen(_ptReturnScreen);
-        if (typeof renderLevelSelect === 'function') renderLevelSelect();
     }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------GAME OVERLAY MODE (K KEYBIND)-------------------------
+//------------------------------------------------------------------------
+// Same pattern as the character-sheet overlay (B, see endgame-hub.js) and
+// the spell-book pause (P): K mid-puzzle pauses the run silently (no pause
+// overlay), hides the body-anchored avatars (they would float above the
+// tree), and K (or BACK) returns straight to the running puzzle exactly
+// where it was. Points spent in the tree save immediately (see
+// _ptHandleAllocation), so the run continues with the new allocation -
+// effects that read ptHasSkill() live apply at once, level-start effects
+// (timer bonuses etc.) take effect on the next level.
+
+let _ptGameOverlay = false;
+// True only if THIS overlay open paused the game (a pause menu may already
+// have been up when K was pressed - then pause state is left untouched).
+let _ptOverlayPaused = false;
+
+// True while the tree is open as an overlay over a running puzzle.
+function isTreeGameOverlay() {
+    return _ptGameOverlay === true;
+}
+
+// Silently pauses the run WITHOUT the pause overlay. No-op unless a level
+// is actually running.
+function _ptOverlayPause() {
+    _ptOverlayPaused = false;
+    try {
+        if (typeof dead !== 'undefined' && dead) return;
+        if (typeof cur === 'undefined' || !cur) return;
+        if (typeof _gamePaused !== 'undefined' && _gamePaused) return;  // pause menu already up
+        if (typeof pauseTimer === 'function') pauseTimer();
+        _gamePaused = true;
+        if (typeof _egOnPause === 'function') { try { _egOnPause(); } catch (e) {} }
+        _ptOverlayPaused = true;
+    } catch (e) {}
+}
+
+// Resumes a run paused by _ptOverlayPause. Never touches pause state owned
+// by someone else (pause menu, tutorial lessons, spell book).
+function _ptOverlayResume() {
+    if (!_ptOverlayPaused) return;
+    _ptOverlayPaused = false;
+    try {
+        _gamePaused = false;
+        if (typeof _egOnResume === 'function') { try { _egOnResume(); } catch (e) {} }
+        if (typeof resumeTimer === 'function') resumeTimer();
+    } catch (e) {}
+}
+
+function _ptHideAvatars() {
+    try { if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple(); } catch (e) {}
+    try { if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar(); } catch (e) {}
+}
+
+function _ptShowAvatars() {
+    try { if (typeof _showPlayerAvatarSimple === 'function') _showPlayerAvatarSimple(); } catch (e) {}
+    try { if (typeof _showPlayerAvatar === 'function') _showPlayerAvatar(); } catch (e) {}
+}
+
+// Opens the tree over a running puzzle (K keybind path). Skips the menu
+// screen-history push - the overlay close path restores the game directly.
+function openTreeFromGame() {
+    _ptGameOverlay = true;
+    _ptReturnScreen = 'screen-game';
+    _ptOverlayPause();
+    _ptHideAvatars();
+    try {
+        buildPassiveTreeScreen();
+    } catch (e) {
+        // Build failed: unwind so the run is never left paused with no
+        // overlay on top (the keybind handler retries cleanly on next K).
+        _ptShowAvatars();
+        _ptOverlayResume();
+        _ptGameOverlay = false;
+        throw e;
+    }
+    if (typeof switchScreen === 'function') switchScreen('screen-passive-tree');
+    else document.getElementById('screen-passive-tree').style.display = 'block';
+}
+
+// Closes the overlay and returns to the running puzzle exactly where it was.
+function closeTreeToGame() {
+    _ptGameOverlay = false;
+    if (typeof switchScreen === 'function') switchScreen('screen-game');
+    _ptShowAvatars();
+    // Newly allocated nodes: refresh the in-puzzle tracker so it picks up
+    // newly relevant effects at once (no init() - that would reset the
+    // per-level counters mid-puzzle).
+    try {
+        if (typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) {
+            PassiveTracker.refreshVisibility();
+        }
+    } catch (e) {}
+    _ptOverlayResume();
+}
+
+// K keybind: toggles the tree over a running puzzle, or opens it from menu
+// screens (existing return-screen behaviour untouched there).
+// NOTE: unlike ability hotkeys this deliberately does NOT use
+// _abilityHotkeysBlocked() - that gate blocks classless characters, but the
+// tree needs no class (same reason B opens the sheet classless). Only real
+// blockers are checked: modals, question overlays, text input (already
+// filtered by the dispatcher) and death.
+if (typeof onKeybindAction === 'function') {
+    onKeybindAction('passive-tree', () => {
+        // Toggle-close: the tree screen is not a .modal-bg, so the shared
+        // hotkey gate would not know about it - check first, like P does.
+        try {
+            if (document.getElementById('screen-passive-tree')?.classList.contains('active')) {
+                ptGoBack();
+                return false;
+            }
+        } catch (e) {}
+        // The character-sheet overlay owns its own stack (its tree button is
+        // hidden by design) - B closes it first, K stays out of the way.
+        try {
+            if (typeof isHubGameOverlay === 'function' && isHubGameOverlay()) return false;
+        } catch (e) {}
+        // A question modal (quiz / math gate / scouts primer) is a fixed
+        // overlay that would float above the tree screen - answer it first.
+        try {
+            if (document.getElementById('quiz-overlay')?.classList.contains('show')) return false;
+            if (document.getElementById('mg-modal')?.classList.contains('show')) return false;
+            if (document.getElementById('primer-overlay')) return false;
+        } catch (e) {}
+        // Any modal backdrop (spell book, pause dialogs, ...) owns the keys.
+        try {
+            if (document.querySelector('.modal-bg.show, .cs-overlay.show, #class-selection-overlay.show')) return false;
+        } catch (e) {}
+        try { if (typeof dead !== 'undefined' && dead) return false; } catch (e) {}
+        // Overlay open: only from a live game screen. Any other screen
+        // (mode-select, Nexus, level select, hub, ...) keeps the menu path -
+        // with the CURRENT screen as the return target, so a stale
+        // _ptReturnScreen (e.g. 'screen-game' left over from an earlier
+        // overlay open) can never strand the BACK button.
+        const gameActive = document.getElementById('screen-game')?.classList.contains('active');
+        if (gameActive && typeof cur !== 'undefined' && cur) {
+            try { openTreeFromGame(); } catch (e) {}
+            return false;
+        }
+        try {
+            const activeId = document.querySelector('.screen.active')?.id;
+            showPassiveTree(activeId || undefined);
+        } catch (e) { try { showPassiveTree(); } catch (e2) {} }
+        return false;
+    });
 }
 
 
@@ -218,7 +372,7 @@ function _ptRollGearReward(skillStatKey, chance, itemDefId, msgKey) {
     showToast(t(msgKey));
 }
 
-// Statistician gear drops — base gear: 33% magnifier, improved: 33% error gem
+// Statistician gear drops - base gear: 33% magnifier, improved: 33% error gem
 function _ptApplyStatisticianRewards() {
     _ptRollGearReward('gear_of_the_statistician', 0.33, 'reveal2',
         'pt_gear_statistician_magnifier');
@@ -227,7 +381,7 @@ function _ptApplyStatisticianRewards() {
         'pt_gear_statistician_errorgem');
 }
 
-// Mathmagician gear drops — base gear: 25% professor, improved: 15% chronobolt
+// Mathmagician gear drops - base gear: 25% professor, improved: 15% chronobolt
 function _ptApplyMathmagicianRewards() {
     _ptRollGearReward('gear_of_the_mathmagician', 0.25, 'mistakeEraser4',
         'pt_gear_mathmagician_professor');
@@ -236,7 +390,7 @@ function _ptApplyMathmagicianRewards() {
         'pt_gear_mathmagician_chronobolt');
 }
 
-// Probabilist gear drops — base gear: 25% sweeper, improved: 15% error magnet
+// Probabilist gear drops - base gear: 25% sweeper, improved: 15% error magnet
 function _ptApplyProbabilistRewards() {
     _ptRollGearReward('gear_of_the_probabilist', 0.25, 'markWrong4',
         'pt_gear_probabilist_sweeper');

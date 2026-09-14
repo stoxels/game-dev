@@ -2,11 +2,11 @@
 //-------------------BOSS: THE SNAIL (boss_snail)-------------------------------
 //------------------------------------------------------------------------
 // First-steps fight: a single, VERY slow homing snail. It cannot be
-// outrun forever — but it can barely catch you either. Teaches kiting:
+// outrun forever - but it can barely catch you either. Teaches kiting:
 // keep moving in wide arcs and never corner yourself.
 //
 // The Doom Snail now stays until it is dealt with:
-//   • It has NO duration — it follows you until it crashes into a
+//   • It has NO duration - it follows you until it crashes into a
 //     CORRUPTED grid cell, which banishes it (and cleans that corruption
 //     in the process).
 //   • While it crawls over the grid it randomly SLIMES cells. Slimed
@@ -14,8 +14,8 @@
 //   • The BROOM sits outside the grid. Walk over it to pick it up and
 //     stand on a slimed cell for EG_SNAIL_SWEEP_MS to clean it. Holding
 //     the broom slows you to a crawl and freezes your auto-attack charge
-//     so the snail can catch up — press the parry key (R by default) to drop it.
-//   • At ≤20% HP: SNAILGEDDON — a 5-second warning, then the player is
+//     so the snail can catch up - press the parry key (R by default) to drop it.
+//   • At ≤20% HP: SNAILGEDDON - a 5-second warning, then the player is
 //     yanked to the grid centre while a closing frame of snails traps them.
 //     A wedge of snails lags far behind, tearing a wide, player-sized
 //     escape gap in the ring.
@@ -59,19 +59,19 @@ Object.assign(EG_BOSS_MECHANICS, {
 // boss-framework.js).
 
 let _egSnailDoom = null;        // active Doom Snail { run, el, x, y, ... } or null
-let _egSnailSlimed = new Map(); // "r-c" → { el, fill, r, c } — cells blocked until swept
+let _egSnailSlimed = new Map(); // "r-c" → { el, fill, r, c } - cells blocked until swept
 let _egSnailBroooms = [];       // resting/held brooms: { el, homeX, homeY, held, sweepAcc, sweepKey, sweepFill, chargePauseShown }
 let _egSnailBroomTickTimer = null;
 let _egSnailNextDoomAt = null;      // wall-clock gate: no doom snail right after a banish
 
-// Movement-speed multiplier while holding the broom — read by the avatar
+// Movement-speed multiplier while holding the broom - read by the avatar
 // mover in player_sprite.js (window channel keeps one source of truth).
 // 0.15 ≈ 48 px/s: still a crawl (sweeping forces you to stand still for
 // the full EG_SNAIL_SWEEP_MS, so the snail catches you), but you can
 // reposition between slimed cells without it feeling like molasses.
 window.EG_SNAIL_BROOM_SPEED_MULT = 0.15;
 
-// Knobs (tier-1 friendly — The Snail is a first-steps boss).
+// Knobs (tier-1 friendly - The Snail is a first-steps boss).
 const EG_SNAIL_SLIME_CHANCE = 0.30;     // chance to slime the cell under the snail per new cell
 const EG_SNAIL_SLIME_COOLDOWN_MS = 800; // min gap between slimes
 const EG_SNAIL_SLIME_PER_SNAIL = 7;     // max slimes one doom snail drops before being banished
@@ -166,7 +166,7 @@ function _egSnailRemoveSlime(r, c) {
 
 
 // Rolls a slime drop when the snail's center enters a NEW grid cell.
-// Not every cell gets slimed — a per-cast chance with a cooldown + cap.
+// Not every cell gets slimed - a per-cast chance with a cooldown + cap.
 function _egSnailTrySlime(state, now) {
     if (now < state.slimeCdUntil) return;
     if (state.slimeDropped >= EG_SNAIL_SLIME_PER_SNAIL) return;
@@ -286,7 +286,7 @@ function _egSnailBroomHomes(count) {
         [m, m],
     ];
     corners.forEach(([x, y]) => add(x, y));
-    // Absolute last resort: never return fewer than `count` homes — a spot
+    // Absolute last resort: never return fewer than `count` homes - a spot
     // that grazes a corner beats a missing broom entirely. Steps keep a
     // full box between neighbours so the safety brooms never overlap.
     const sx = EG_SNAIL_BROOM_BOX_W + 10, sy = EG_SNAIL_BROOM_BOX_H + 10;
@@ -321,8 +321,8 @@ function _egSnailRestingBroomOverlapsGrid(b) {
 }
 
 
-// Recomputes every broom's home around the CURRENT grid and — for resting
-// brooms — moves it there. Held brooms just remember the fresh spot so the
+// Recomputes every broom's home around the CURRENT grid and - for resting
+// brooms - moves it there. Held brooms just remember the fresh spot so the
 // next drop lands outside the puzzle. Used on puzzle transitions and as a
 // tick-level safety net whenever a resting broom overlaps the grid.
 function _egSnailRehomeBroooms() {
@@ -340,7 +340,7 @@ function _egSnailRehomeBroooms() {
 }
 
 
-// Creates the brooms (once — EG_SNAIL_BROOM_COUNT of them, spread around
+// Creates the brooms (once - EG_SNAIL_BROOM_COUNT of them, spread around
 // the outside of the grid) and starts the shared pickup/sweep driver.
 // Called by the first Doom Snail cast. Several brooms mean the player can
 // grab one from whichever side is convenient, and a dropped broom is never
@@ -397,7 +397,7 @@ function _egSnailPickupBroom(broom) {
     const lbl = broom.el.querySelector('.eg-snail-broom-label');
     if (lbl) lbl.style.display = 'none';
     host.appendChild(broom.el);
-    _egNkToast('eg_snail_broom_picked', '🧹 You grab the broom — you move much slower!', '#a3e635');
+    _egNkToast('eg_snail_broom_picked', '🧹 You grab the broom - you move much slower!', '#a3e635');
 }
 
 
@@ -464,7 +464,7 @@ function _egSnailSyncSweepLabel(pct) {
 }
 
 
-// Toggles the charge-bar pause style directly (no broom object needed —
+// Toggles the charge-bar pause style directly (no broom object needed -
 // used by drop/teardown after the held broom has been released).
 function _egSnailSetChargePauseClass(active) {
     const bar = document.getElementById('avatar-charge-fill');
@@ -485,7 +485,7 @@ function _egSnailSyncBroomChargePause(active) {
 }
 
 
-// Which slimed cell the player is standing on — deliberately forgiving.
+// Which slimed cell the player is standing on - deliberately forgiving.
 // The hitbox is small and the sprite can straddle two cells, so requiring
 // the exact centre pixel to sit inside the goo made cleaning feel broken:
 // a slimed cell under ANY meaningful part of the player rect now counts
@@ -520,7 +520,7 @@ function _egSnailSweepTarget(pr, currentKey) {
 }
 
 
-// Shared 100 ms driver: broom pickup by touch, and — while held — the
+// Shared 100 ms driver: broom pickup by touch, and - while held - the
 // sweep mechanic (stand on a slimed cell for EG_SNAIL_SWEEP_MS to clean
 // it). Walking off the slime resets the accumulated time.
 function _egSnailBroomTick() {
@@ -530,7 +530,7 @@ function _egSnailBroomTick() {
     if (_egSnailBroooms.length === 0) return;
 
     // Safety net for grid rebuilds: a puzzle transition rebuilds + fits the
-    // board, and layout can settle a beat after the re-home hook ran — so
+    // board, and layout can settle a beat after the re-home hook ran - so
     // any resting broom left overlapping the grid gets moved out now.
     for (const br of _egSnailBroooms) {
         if (_egSnailRestingBroomOverlapsGrid(br)) {
@@ -579,7 +579,7 @@ function _egSnailBroomTick() {
         return;
     }
 
-    // Not on a slimed cell — any in-progress sweep resets.
+    // Not on a slimed cell - any in-progress sweep resets.
     if (b.sweepKey) {
         const prev = _egSnailSlimed.get(b.sweepKey);
         if (prev && prev.el) prev.el.classList.remove('eg-snail-slime-sweeping');
@@ -592,7 +592,7 @@ function _egSnailBroomTick() {
 }
 
 
-// A slimed cell was swept for the full duration — wipe it with a green
+// A slimed cell was swept for the full duration - wipe it with a green
 // flash.
 function _egSnailCleanCell(entry) {
     const b = _egSnailHeldBroom();
@@ -611,7 +611,7 @@ function _egSnailCleanCell(entry) {
 
 // A chained/arena puzzle transition just rebuilt the grid (see
 // _egTransitionToChainPuzzle in endgame-encounter-chain.js): every slimed
-// cell's overlay died with the old table, so drop the stale map entries —
+// cell's overlay died with the old table, so drop the stale map entries -
 // otherwise they would block the NEW puzzle's cells sight-unseen. The
 // roaming snail gets a fresh slate too (slime budget + cell memory reset)
 // so it visibly slimed the new grid, and the broom is re-homed outside it.
@@ -624,7 +624,7 @@ function _egSnailOnPuzzleTransition() {
         _egSnailSyncSweepLabel(null);
     }
     if (_egSnailBroooms.length > 0) {
-        // New grid is already in the DOM — spread every resting broom
+        // New grid is already in the DOM - spread every resting broom
         // around the OUTSIDE of it. Held brooms just remember the fresh
         // home so their next drop lands outside the puzzle too.
         _egSnailRehomeBroooms();
@@ -634,7 +634,7 @@ function _egSnailOnPuzzleTransition() {
         st.slimeDropped = 0;
         st.lastCellKey = null;
     }
-    // An active Snailgeddon RING is anchored to the OLD grid's centre — end
+    // An active Snailgeddon RING is anchored to the OLD grid's centre - end
     // it so the fresh puzzle starts clean. (The countdown phase survives:
     // it re-centres itself on every tick.)
     const gd2 = _egSnailgeddon;
@@ -658,7 +658,7 @@ function _egSnailTeardown() {
     _egSnailDoom = null;
     _egSnailNextDoomAt = null; // banish cooldown is per-encounter
     // Snailgeddon: cancel any countdown/ring still up. Its nk run is
-    // normally killed first by _egNkTeardownBoss — kill it defensively here
+    // normally killed first by _egNkTeardownBoss - kill it defensively here
     // too (killRun + onKill are idempotent).
     const gd = _egSnailgeddon;
     if (gd) {
@@ -685,7 +685,7 @@ function _egSnailTeardown() {
 //-------------------MECHANIC: DOOM SNAIL--------------------------------
 //------------------------------------------------------------------------
 // The classic homing snail, reworked: it no longer despawns. The ONLY way
-// to remove it is to lure it into a corrupted grid cell — the collision
+// to remove it is to lure it into a corrupted grid cell - the collision
 // destroys the snail AND cleans that cell's corruption. While it chases
 // you it randomly slimed the cells it crawls over.
 
@@ -714,7 +714,7 @@ function _egMechDoomSnail(monster, phase) {
     _egSnailEnsureBroom(); // the broom waits outside the grid
     run.onKill = () => { if (_egSnailDoom === state) _egSnailDoom = null; };
     _egNkToast('eg_mech_snail',
-        '🐌 The Snail: Doom Snail! It never leaves — crash it into a corrupted cell!', '#f59e0b');
+        '🐌 The Snail: Doom Snail! It never leaves - crash it into a corrupted cell!', '#f59e0b');
     _egNkLoop(run, (dtS, now) => {
         const c = _egNkPlayerCenter();
         if (c) {
@@ -738,7 +738,7 @@ function _egMechDoomSnail(monster, phase) {
         // The only escape: crash it into a corrupted cell → banished.
         if (_egSnailCrashIntoCorruption(state)) return false;
 
-        return true; // no duration — it follows until it dies
+        return true; // no duration - it follows until it dies
     });
 }
 
@@ -751,10 +751,10 @@ function _egMechDoomSnail(monster, phase) {
 //   1. A big "SNAILGEDDON IN 5…1" countdown covers the centre of the grid.
 //   2. On go, the player is TELEPORTED to the grid centre and a dense ring
 //      of doom snails materialises around them in a rounded-rect FRAME that
-//      hugs just outside the puzzle's edges — no snail starts on a cell,
+//      hugs just outside the puzzle's edges - no snail starts on a cell,
 //      and the whole ring stays on screen for any arena.
 //   3. The frame collapses inward on the centre. Touching the ring hits
-//      hard — one hit per ring-wide cooldown (never a multi-snail burst)
+//      hard - one hit per ring-wide cooldown (never a multi-snail burst)
 //      plus a shove back in, and the snail that hit you recoils outward.
 //      Charging out through the wall is not free. The boss wears an amber
 //      shield dome over its card for the WHOLE set-piece (countdown +
@@ -784,7 +784,7 @@ const EG_SNAILGEDDON_GAP_MARGIN_PX = 60; // extra clearance past the player's hi
 const EG_SNAILGEDDON_RUN_SPEED_PX = 300; // assumed player run speed used when sizing the gap
 const EG_SNAILGEDDON_MAX_MS = 6500;      // hard cap: the boss can never stay immune forever
 const EG_SNAILGEDDON_DMG_PCT = 0.14;     // heavy contact damage per snail hit
-const EG_SNAILGEDDON_HIT_CD_MS = 1000;   // ring-WIDE contact cooldown — never more than one hit
+const EG_SNAILGEDDON_HIT_CD_MS = 1000;   // ring-WIDE contact cooldown - never more than one hit
                                          // per window, even when several snails overlap at once
 const EG_SNAILGEDDON_NUDGE_PX = 70;      // knockback toward the centre per wall hit
 const EG_SNAILGEDDON_NUDGE_MIN_DIST = 90;  // skip the shove when the player already hugs the centre
@@ -815,7 +815,7 @@ function _egSnailgeddonActive() {
 // Positions the dome over the card's emoji (hidden when the card is not
 // currently on screen). Both the synchronous first placement and the
 // per-frame driver share this, so the shield is visible the instant the
-// countdown starts — no waiting for the next animation frame.
+// countdown starts - no waiting for the next animation frame.
 function _egSnailgeddonPlaceShield(g, s) {
     const card = document.getElementById('eg-card-' + g.monsterId);
     const wrap = card ? card.querySelector('.eg-emoji-wrapper') : null;
@@ -868,8 +868,8 @@ function _egSnailgeddonDropShield(g) {
 
 
 // Grid-centre screen point (play cells only; corners measured live so it
-// tracks puzzle transitions). Carries the arena's LOGICAL size too — the
-// rows × cols of cur.grid — so the ring can be shaped by the puzzle's
+// tracks puzzle transitions). Carries the arena's LOGICAL size too - the
+// rows × cols of cur.grid - so the ring can be shaped by the puzzle's
 // actual dimensions instead of a pixel shortcut.
 function _egSnailGridCentre() {
     if (typeof cur === 'undefined' || !cur || !cur.grid || !cur.grid.length || !cur.grid[0]) return null;
@@ -893,7 +893,7 @@ function _egSnailGridCentre() {
 // The Snailgeddon ring is a rounded rectangle centred on the grid, padded
 // EG_SNAILGEDDON_FRAME_PAD beyond the puzzle's edges. A rounded-rect frame
 // can always clear the whole puzzle (a circle around a near-fullscreen
-// arena cannot — its far corner cells sit beyond any on-screen radius), and
+// arena cannot - its far corner cells sit beyond any on-screen radius), and
 // the corner arcs keep the frame from poking out diagonally.
 
 // Outline length of the rounded rect (used for even snail spacing).
@@ -950,7 +950,7 @@ function _egSnailRRContains(px, py, cx, cy, hx, hy, cr) {
 
 
 // Small "pop" when a snail disappears (independent of the nk run so it can
-// never be stranded by run cleanup — it self-removes).
+// never be stranded by run cleanup - it self-removes).
 function _egSnailgeddonBurst(x, y) {
     const s = document.createElement('div');
     s.className = 'eg-snail-squish';
@@ -990,12 +990,12 @@ function _egSnailgeddonShowOverlay(g) {
     ov.querySelector('.eg-snailgeddon-cd-label').textContent =
         (rawLabel && rawLabel !== 'eg_snailgeddon_cd_label') ? rawLabel : 'SNAILGEDDON IN';
     ov.querySelector('.eg-snailgeddon-cd-hint').textContent =
-        (rawHint && rawHint !== 'eg_snailgeddon_hint') ? rawHint : 'The ring is closing — one side lags behind. Escape through the gap!';
+        (rawHint && rawHint !== 'eg_snailgeddon_hint') ? rawHint : 'The ring is closing - one side lags behind. Escape through the gap!';
     _egSnailgeddonPlaceOverlay(g);
 }
 
 
-// Phase-enter hook: phase 4 (≤20% HP) is the Snailgeddon takeover — the
+// Phase-enter hook: phase 4 (≤20% HP) is the Snailgeddon takeover - the
 // boss owns its immunity release. Other phases fall through to the default
 // transition handling.
 function _egSnailOnPhaseEnter(monster, newPhase) {
@@ -1019,13 +1019,13 @@ function _egSnailOnPhaseEnter(monster, newPhase) {
 function _egSnailgeddonStart(monster) {
     if (_egSnailgeddon || !monster) return;
 
-    // Clean slate: the doom snail and the broom have no place here — drop
+    // Clean slate: the doom snail and the broom have no place here - drop
     // the broom and banish the roaming snail so the swarm owns the screen.
     if (_egSnailDoom) { try { _egNkKillRun(_egSnailDoom.run); } catch (e) {} }
     if (_egSnailBroomHeld()) _egSnailDropBroom();
 
     // The auto-attack charge bar freezes for the WHOLE set-piece (countdown
-    // included) — Snailgeddon is a dodge-and-run phase, not free damage
+    // included) - Snailgeddon is a dodge-and-run phase, not free damage
     // time. _egTickPlayer gates on _egSnailgeddonActive(); mirror the pause
     // visually here.
     _egSnailSetChargePauseClass(true);
@@ -1067,7 +1067,7 @@ function _egSnailgeddonStart(monster) {
 
 
 // Countdown finished: teleport the player to the grid centre and spawn the
-// closing ring of snails — a rounded-rect FRAME hugging just outside the
+// closing ring of snails - a rounded-rect FRAME hugging just outside the
 // puzzle's edges.
 function _egSnailgeddonGo(g, monster) {
     if (!g || g.finished) return;
@@ -1110,7 +1110,7 @@ function _egSnailgeddonGo(g, monster) {
     const N = Math.max(EG_SNAILGEDDON_N_MIN,
         Math.min(EG_SNAILGEDDON_N_MAX, Math.round(perim / EG_SNAILGEDDON_SPACING_PX)));
     // Escape-gap guarantee: the wedge opens (arc + 1) frame slots in the
-    // closing wall. A single laggard only leaves ~2 slots — smaller than
+    // closing wall. A single laggard only leaves ~2 slots - smaller than
     // the player's hitbox by the time they reach the ring on large arenas.
     // Size the wedge so the passable gap stays ≥ hitbox width + margin in
     // the worst case: the player sprints from the centre to the farthest
@@ -1182,7 +1182,7 @@ function _egSnailgeddonGo(g, monster) {
         }
 
         // The frame is a wall: heavy contact damage. Hits run on ONE
-        // ring-wide cooldown, not per snail — several snails can overlap the
+        // ring-wide cooldown, not per snail - several snails can overlap the
         // player at once (especially while the ring converges on the
         // centre), and simultaneous hits used to stack damage numbers, red
         // flashes, toasts and nudges into a strobe of fighting effects.
@@ -1205,7 +1205,7 @@ function _egSnailgeddonGo(g, monster) {
                             ((cy - pc.y) / d) * EG_SNAILGEDDON_NUDGE_PX);
                     } catch (e) {}
                 }
-                break; // one hit per window — never a multi-snail burst
+                break; // one hit per window - never a multi-snail burst
             }
         }
 
@@ -1251,11 +1251,11 @@ function _egSnailgeddonEnd(g) {
         }
         if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e) {} }
     }
-    // Charge bar unfreezes — the mechanic is over (also cleared defensively
+    // Charge bar unfreezes - the mechanic is over (also cleared defensively
     // by _egSnailTeardown if the encounter dies mid-set-piece).
     _egSnailSetChargePauseClass(false);
     _egNkToast(g.escaped ? 'eg_snailgeddon_escaped' : 'eg_snailgeddon_over',
-        g.escaped ? '💨 You escaped the Snailgeddon!' : '🐌 The Snailgeddon closes in — the swarm collapses.',
+        g.escaped ? '💨 You escaped the Snailgeddon!' : '🐌 The Snailgeddon closes in - the swarm collapses.',
         g.escaped ? '#4ade80' : '#f59e0b');
     if (_egSnailgeddon === g) _egSnailgeddon = null;
 }

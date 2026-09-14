@@ -4,22 +4,22 @@
 // Serpent-pit fight: the arena is the Coil's nest and it is crawling.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE COILED MAW — the boss itself is a spiral of serpent coils (a
+//   • THE COILED MAW - the boss itself is a spiral of serpent coils (a
 //     rotating 😵-style spiral of 🐍) that slowly slithers around the
 //     arena. Touching it is a BITE: shadow damage + a fling.
-//   • SEEKER SERPENTS — snakes spawn from the maw on a phase cadence and
+//   • SEEKER SERPENTS - snakes spawn from the maw on a phase cadence and
 //     hunt the player. When one gets close it starts FUSING (blinking),
 //     then detonates in a shadow blast. Its path sears a short VENOM
 //     TRAIL that lingers and ticks shadow damage if you walk it.
 //
 //   HP GATES (watcher):
-//   • 60% — CONSTRICTOR: the maw coils into a huge spiral pattern that
-//     contracts toward the arena center in ring waves — stand in the gaps
+//   • 60% - CONSTRICTOR: the maw coils into a huge spiral pattern that
+//     contracts toward the arena center in ring waves - stand in the gaps
 //     between rings or be squeezed (heavy shadow damage per ring).
-//   • 30% — SERPENT TIDE: the pit boils — a wave of fast chargers crosses
+//   • 30% - SERPENT TIDE: the pit boils - a wave of fast chargers crosses
 //     the arena from one edge, aimed at your live row/column. Three tides.
 //
-//   CHARGE ATTACK — COBRA STRIKE: when the boss's attack bar fills, a
+//   CHARGE ATTACK - COBRA STRIKE: when the boss's attack bar fills, a
 //     wide hood-shadow telegraphs a lane through your position, then the
 //     maw rears up and strikes across it in one lightning lash.
 //
@@ -111,7 +111,7 @@ function _egCoilTeardown() {
     _egCoilWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
-    // watcher BEFORE this runs — the overlays must go either way.
+    // watcher BEFORE this runs - the overlays must go either way.
     _egCoilSweep();
 }
 
@@ -129,7 +129,7 @@ function _egCoilArenaInit(monster) {
         everLive: false, bornAt: performance.now(),
     };
     _egCoilWatcher = st;
-    _egNkToast('eg_coil_intro', '🐍 The Coil: The pit wakes — the nest is crawling!');
+    _egNkToast('eg_coil_intro', '🐍 The Coil: The pit wakes - the nest is crawling!');
     // Tier-scaled clock: every telegraph breathes with tier.
     // Passive run: lives the whole fight without hogging _egNkDodgeBusy().
     const run = _egNkNewRun(monsterId, true);
@@ -392,7 +392,7 @@ function _egCoilSpawnSnake(st) {
 
 
 // ── 60% gate: Constrictor ───────────────────────────────────────────────
-// Huge spiral rings contract toward the arena center — stand in the gaps.
+// Huge spiral rings contract toward the arena center - stand in the gaps.
 function _egCoilConstrictor(st, p) {
     if (st.con) return; // re-entry guard: never orphan a running set-piece
     const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -413,7 +413,7 @@ function _egCoilTide(st, p) {
     if (st.tide) return; // re-entry guard: never orphan a running set-piece
     const dirX = Math.random() < 0.5 ? 1 : -1;
     const fx = dirX === 1 ? -30 : window.innerWidth + 30;
-    // Aim the tide lane at the player's live row — a real threat to dodge.
+    // Aim the tide lane at the player's live row - a real threat to dodge.
     const c = _egNkPlayerCenter();
     const fy = c ? Math.max(90, Math.min(window.innerHeight - 90, c.y))
                  : 80 + Math.random() * Math.max(60, window.innerHeight - 220);
@@ -426,7 +426,7 @@ function _egCoilTide(st, p) {
         n: EG_COIL_TIDE_CHARGERS[p],
         dirX, fx, fy, bandEl: band, chargers: [],
     };
-    _egNkToast('eg_coil_tide', '🐍 SERPENT TIDE! The pit boils — dodge the chargers!');
+    _egNkToast('eg_coil_tide', '🐍 SERPENT TIDE! The pit boils - dodge the chargers!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('coil_hiss'); } catch (e) {}
 }
 
@@ -478,6 +478,6 @@ function _egCoilCobraStrike(monster) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled Seeker Snakes are now the persistent nest — keep the
+// The old scheduled Seeker Snakes are now the persistent nest - keep the
 // handler name alive so any stale schedule entry no-ops instead of erroring.
 function _egMechSeekerSnakes() { void 0; }

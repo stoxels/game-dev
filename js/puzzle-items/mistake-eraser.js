@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------MISTAKE ERASER — TUTOR / PROFESSOR / SCHOLAR / GRAND MENTOR----------------------
+//-------------------MISTAKE ERASER - TUTOR / PROFESSOR / SCHOLAR / GRAND MENTOR----------------------
 //------------------------------------------------------------------------
 
-// mistakeEraser / mistakeEraser4 / mistakeEraser6 / mistakeEraserAll —
+// mistakeEraser / mistakeEraser4 / mistakeEraser6 / mistakeEraserAll -
 // reduces the current mistake count, optionally granting bonus time via
 // the Time Well Spent passive.
 function _useMistakeEraser(id, def) {
@@ -69,7 +69,7 @@ function _fxMakeChalkSmears(container, r) {
     }
 }
 
-// 🎓 Mistake Eraser — chalk dust smears clear mistakes from the board.
+// 🎓 Mistake Eraser - chalk dust smears clear mistakes from the board.
 // Variant-specific SFX is chosen via MISTAKE_ERASER_SFX lookup.
 function _fxMistakeEraser(defId) {
     Audio_Manager.playSFX(MISTAKE_ERASER_SFX[defId] || 'tutor');

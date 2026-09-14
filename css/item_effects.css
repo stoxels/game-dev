@@ -48,7 +48,7 @@
     animation: fx-particle-float 900ms ease-out forwards;
 }
 
-/* Icon pop — centered scale-in/bounce/fade used by many item icons.
+/* Icon pop - centered scale-in/bounce/fade used by many item icons.
    Applied directly via JS on positioned absolute elements. */
 @keyframes fx-icon-pop {
     0% {
@@ -84,7 +84,7 @@
    Includes: Candle, Magnifier, Spyglass, Scanner
 ----------------------------------------------------------------------- */
 
-/* ----- Candle — warm amber bloom ----- */
+/* ----- Candle - warm amber bloom ----- */
 
 /* Soft radiating glow that expands and fades, simulating candlelight */
 @keyframes fx-candle-bloom {
@@ -152,7 +152,7 @@
 }
 
 
-/* ----- Magnifier — slides across the board ----- */
+/* ----- Magnifier - slides across the board ----- */
 
 /* Magnifier icon glides from left to right with a wobble.
    Uses --slide-end CSS variable set by JS for the travel distance. */
@@ -189,7 +189,7 @@
 }
 
 
-/* ----- Spyglass — concentric expanding rings ----- */
+/* ----- Spyglass - concentric expanding rings ----- */
 
 /* Each ring expands from center outward then fades.
    Uses --ring-size CSS variable for the final diameter. */
@@ -219,7 +219,7 @@
 }
 
 
-/* ----- Scanner — green horizontal scan bar ----- */
+/* ----- Scanner - green horizontal scan bar ----- */
 
 /* A bright green bar sweeps downward across the target area.
    Uses --scan-distance CSS variable for travel distance. */
@@ -257,7 +257,7 @@
    Includes: Eraser, Sweeper, Error Magnet, Error Gem
 ----------------------------------------------------------------------- */
 
-/* ----- Eraser — pink rubber wipe ----- */
+/* ----- Eraser - pink rubber wipe ----- */
 
 /* A pink streak scales in from the left, slides across, then fades */
 @keyframes fx-eraser-wipe {
@@ -290,7 +290,7 @@
 }
 
 
-/* ----- Sweeper — broom slides across, kicking up dust ----- */
+/* ----- Sweeper - broom slides across, kicking up dust ----- */
 
 /* Broom icon slides from --broom-start to --broom-end (set by JS),
    tilting slightly as it moves to simulate a sweeping motion */
@@ -352,7 +352,7 @@
 }
 
 
-/* ----- Error Magnet — drops in and pulls wrong-answer crosses toward it ----- */
+/* ----- Error Magnet - drops in and pulls wrong-answer crosses toward it ----- */
 
 /* Main magnet icon drops from above with a slight overshoot bounce */
 @keyframes fx-magnet-drop {
@@ -414,7 +414,7 @@
 }
 
 
-/* ----- Error Gem — crystalline burst that absorbs wrong answers ----- */
+/* ----- Error Gem - crystalline burst that absorbs wrong answers ----- */
 
 /* Main gem icon pops in with a rotate-burst then fades */
 @keyframes fx-gem-burst {
@@ -482,10 +482,10 @@
    Includes: Hourglass, Stopwatch, Clock, Chronobolt
 ----------------------------------------------------------------------- */
 
-/* ----- Hourglass — spins 180° while sand grains fall ----- */
+/* ----- Hourglass - spins 180° while sand grains fall ----- */
 
 /* Hourglass icon rotates halfway (flips) to show time being added.
-   Applied directly via JS — no paired class in this file. */
+   Applied directly via JS - no paired class in this file. */
 @keyframes fx-hourglass-spin {
     0% {
         opacity: 0;
@@ -543,7 +543,7 @@
 }
 
 
-/* ----- Stopwatch — golden expanding time rings ----- */
+/* ----- Stopwatch - golden expanding time rings ----- */
 
 /* Each ring expands outward from center and fades.
    Uses --ring-max CSS variable for the final diameter. */
@@ -574,7 +574,7 @@
 }
 
 
-/* ----- Clock — golden core pulse with radiating rays ----- */
+/* ----- Clock - golden core pulse with radiating rays ----- */
 
 /* Central golden dot that expands outward like a shockwave */
 @keyframes fx-clock-core-pulse {
@@ -639,7 +639,7 @@
 }
 
 
-/* ----- Chronobolt — double screen flash with a lightning strike ----- */
+/* ----- Chronobolt - double screen flash with a lightning strike ----- */
 
 /* Full-screen yellow flash that pulses twice to simulate a lightning strike */
 @keyframes fx-bolt-flash {
@@ -677,7 +677,7 @@
 }
 
 /* Lightning bolt icon that pops in at the flash center.
-   Applied directly via JS — no paired class in this file. */
+   Applied directly via JS - no paired class in this file. */
 @keyframes fx-bolt-icon {
     0% {
         opacity: 0;
@@ -701,7 +701,7 @@
 }
 
 /* Lightning strike visual that fades in and holds briefly before fading.
-   Applied directly via JS — no paired class in this file. */
+   Applied directly via JS - no paired class in this file. */
 @keyframes fx-bolt-strike {
     0% {
         opacity: 0;
@@ -733,7 +733,7 @@
    Includes: Shield, Chalk Smear, Scout's Primer
 ----------------------------------------------------------------------- */
 
-/* Shield border — slow golden pulse while active */
+/* Shield border - slow golden pulse while active */
 @keyframes fx-shield-border-pulse {
     0% {
         box-shadow: 0 0 0 3px rgba(255,215,0,0.9), 0 0 12px 4px rgba(255,215,0,0.55), 0 0 28px 8px rgba(255,215,0,0.25);
@@ -748,7 +748,7 @@
     }
 }
 
-/* Shield border — quick flash-out when shield breaks */
+/* Shield border - quick flash-out when shield breaks */
 @keyframes fx-shield-border-shatter {
     0% {
         opacity: 1;
@@ -768,7 +768,7 @@
 }
 
 
-/* ----- Shield — gold border flash with expanding hex rings ----- */
+/* ----- Shield - gold border flash with expanding hex rings ----- */
 
 /* Gold border that pulses on the protected element */
 @keyframes fx-shield-pulse {
@@ -860,7 +860,7 @@
 }
 
 
-/* ----- Chalk Smear (Mistake Eraser) — grey chalk wipe ----- */
+/* ----- Chalk Smear (Mistake Eraser) - grey chalk wipe ----- */
 
 /* A chalky grey smear that wipes from left to right then fades */
 @keyframes fx-chalk-wipe {
@@ -895,7 +895,7 @@
 }
 
 
-/* ----- Scout's Primer — compass arrows shoot outward ----- */
+/* ----- Scout's Primer - compass arrows shoot outward ----- */
 
 /* Arrow emoji that shoots from center toward its target cell.
    Uses --dx and --dy CSS variables (set per-arrow by JS) for direction. */
@@ -938,7 +938,7 @@
    Includes: Row Solve, Column Solve
 ----------------------------------------------------------------------- */
 
-/* ----- Row Solve — golden sweep bar moving left to right ----- */
+/* ----- Row Solve - golden sweep bar moving left to right ----- */
 
 /* Full-width bar that sweeps horizontally across the solved row.
    Uses --sweep-dist CSS variable for horizontal travel distance. */
@@ -985,7 +985,7 @@
 }
 
 
-/* ----- Column Solve — golden sweep bar moving top to bottom ----- */
+/* ----- Column Solve - golden sweep bar moving top to bottom ----- */
 
 /* Full-height bar that sweeps vertically down the solved column.
    Uses --sweep-dist CSS variable for vertical travel distance. */
@@ -1124,7 +1124,7 @@
 }
 
 /* Artifact icon that pops in with a spin and then fades.
-   Applied directly via JS — no paired class in this file. */
+   Applied directly via JS - no paired class in this file. */
 @keyframes fx-artifact-icon {
     0% {
         opacity: 0;
@@ -1155,7 +1155,7 @@
              Tidal Wave, Vortex, Chaos Grid
 ----------------------------------------------------------------------- */
 
-/* ----- Cursed Reveal — toxic green board tint ----- */
+/* ----- Cursed Reveal - toxic green board tint ----- */
 
 /* Green overlay that flashes across the board to signal a cursed reveal */
 @keyframes fx-cursed-green-flash {
@@ -1213,7 +1213,7 @@
 }
 
 
-/* ----- Cursed Time — dark purple fog blobs ----- */
+/* ----- Cursed Time - dark purple fog blobs ----- */
 
 /* A dark purple radial blob that blooms and expands until it disappears */
 @keyframes fx-fog-bloom {
@@ -1249,8 +1249,8 @@
     animation: fx-fog-bloom 1.2s ease-out forwards;
 }
 
-/* Skull icon that rises upward and fades — used by both Cursed Reveal and Cursed Time.
-   Applied directly via JS — no paired class in this file. */
+/* Skull icon that rises upward and fades - used by both Cursed Reveal and Cursed Time.
+   Applied directly via JS - no paired class in this file. */
 @keyframes fx-skull-rise {
     0% {
         opacity: 0;
@@ -1274,10 +1274,10 @@
 }
 
 
-/* ----- Cursed Shield — demon eye opens with a red scanline ----- */
+/* ----- Cursed Shield - demon eye opens with a red scanline ----- */
 
 /* Eye icon that opens from a horizontal slit, glares, then fades out.
-   Applied directly via JS — no paired class in this file. */
+   Applied directly via JS - no paired class in this file. */
 @keyframes fx-eye-open {
     0% {
         opacity: 0;
@@ -1331,7 +1331,7 @@
 }
 
 
-/* ----- Tidal Wave — blue wave bar sweeps across all cells ----- */
+/* ----- Tidal Wave - blue wave bar sweeps across all cells ----- */
 
 /* A wide blue gradient bar that sweeps horizontally across the board.
    Uses --wave-dist CSS variable for horizontal travel distance. */
@@ -1363,7 +1363,7 @@
 }
 
 
-/* ----- Vortex — spinning chaos that scrambles the board ----- */
+/* ----- Vortex - spinning chaos that scrambles the board ----- */
 
 /* Debris emoji/symbol that orbits inward and vanishes */
 @keyframes fx-vortex-swirl {
@@ -1392,7 +1392,7 @@
 }
 
 /* Central vortex icon that spins into existence then out.
-   Applied directly via JS — no paired class in this file. */
+   Applied directly via JS - no paired class in this file. */
 @keyframes fx-vortex-spin {
     0% {
         opacity: 0;
@@ -1446,7 +1446,7 @@
 }
 
 
-/* ----- Chaos Grid — random explosion blasts across cells ----- */
+/* ----- Chaos Grid - random explosion blasts across cells ----- */
 
 /* Circular blast that expands outward from a cell center.
    Uses --blast-color CSS variable (set per-blast by JS) for color. */

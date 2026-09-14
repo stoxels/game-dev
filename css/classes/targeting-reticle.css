@@ -25,8 +25,8 @@
     ------------------------------------------------------------------------
 
     While an ability is armed we hide the native cursor everywhere the
-    player might move the mouse — both the puzzle wrapper AND the rest of
-    the page — so the custom reticle is the only thing visible. ".gc" cells
+    player might move the mouse - both the puzzle wrapper AND the rest of
+    the page - so the custom reticle is the only thing visible. ".gc" cells
     normally force `cursor:pointer`; `cursor:none` here needs to win, so we
     rely on the higher-specificity body-level class plus !important as a
     safety net against any other rule (e.g. .gc:hover) trying to set a
@@ -66,7 +66,7 @@ body.ability-armed * {
         display: block;
     }
 
-    /* Inner stage — this is what actually gets translated to the cursor position.
+    /* Inner stage - this is what actually gets translated to the cursor position.
    Kept separate from the root so the root can stay at (0,0) and let JS do a
    single cheap transform update per mousemove frame. */
     #ability-reticle .ar-stage {
@@ -86,7 +86,7 @@ body.ability-armed * {
     ------------------------------------------------------------------------
 */
 
-/* Soft outer glow ring — slow pulse, gives the reticle some "presence". */
+/* Soft outer glow ring - slow pulse, gives the reticle some "presence". */
 .ar-glow {
     position: absolute;
     inset: 0;
@@ -299,7 +299,7 @@ body.ability-armed * {
 }
 
 
-/* Statistician / Diagonal Strike — matches the red slash VFX in statistician.css */
+/* Statistician / Diagonal Strike - matches the red slash VFX in statistician.css */
 #ability-reticle[data-reticle-theme="statistician"] {
     --ar-glow-color: rgba(231, 76, 60, 0.35);
     --ar-glow-shadow: rgba(231, 76, 60, 0.35);
@@ -310,7 +310,7 @@ body.ability-armed * {
     --ar-tick-counter-color: #f5b7b1;
 }
 
-/* Probabilist / Precision Mark — matches the neon-green bow & arrow VFX in probabilist.css */
+/* Probabilist / Precision Mark - matches the neon-green bow & arrow VFX in probabilist.css */
 #ability-reticle[data-reticle-theme="probabilist"] {
     --ar-glow-color: rgba(0, 255, 136, 0.35);
     --ar-glow-shadow: rgba(0, 255, 136, 0.35);
@@ -321,7 +321,7 @@ body.ability-armed * {
     --ar-tick-counter-color: #a3e9c4;
 }
 
-/* Recursionist / Residual Totem — matches the purple totem & beam VFX in recursionist.css */
+/* Recursionist / Residual Totem - matches the purple totem & beam VFX in recursionist.css */
 #ability-reticle[data-reticle-theme="recursionist"] {
     --ar-glow-color: rgba(187, 143, 206, 0.35);
     --ar-glow-shadow: rgba(142, 68, 173, 0.35);

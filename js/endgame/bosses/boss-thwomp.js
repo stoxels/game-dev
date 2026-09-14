@@ -1,25 +1,25 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE THWOMP (boss_thwomp)------------------------
 //------------------------------------------------------------------------
-// Mario-homage siege fight: the fortress guardian — a giant stone block
+// Mario-homage siege fight: the fortress guardian - a giant stone block
 // that hovers over the arena and never stops trying to flatten you.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE HOVERING BLOCK — the Thwomp itself hangs mid-arena, bobbing and
+//   • THE HOVERING BLOCK - the Thwomp itself hangs mid-arena, bobbing and
 //     glaring (angry face). It never attacks directly; it ORCHESTRATES.
-//   • QUAKE STOMPS — the block periodically SLAMS DOWN where it hovers:
+//   • QUAKE STOMPS - the block periodically SLAMS DOWN where it hovers:
 //     a growing dust ring telegraphs, then the whole block crashes down
 //     with a shockwave. Anyone in the impact circle takes heavy damage and
 //     gets flung outward. It then floats back up, drifting to a new spot.
 //
 //   HP GATES (watcher):
-//   • 60% — CEILING COLLAPSE: rubble warning marks bloom across the arena,
+//   • 60% - CEILING COLLAPSE: rubble warning marks bloom across the arena,
 //     then stones rain down in sequence. Aftershock dust clouds linger.
-//   • 30% — MINI-THWOMP SIEGE: the guardian summons 3–5 mini blocks that
+//   • 30% - MINI-THWOMP SIEGE: the guardian summons 3–5 mini blocks that
 //     hop after you Mario-style, each slamming where it lands. While the
 //     siege runs, the big block quake-stomps on a faster cadence.
 //
-//   CHARGE ATTACK — GRAND SLAM: when the boss's attack bar fills, a shadow
+//   CHARGE ATTACK - GRAND SLAM: when the boss's attack bar fills, a shadow
 //   marker stalks your avatar and LOCKS (the classic Thwomp tell), then
 //   the whole block teleports overhead and crashes down on the mark with
 //   a huge shockwave ring. The block's signature kill move.
@@ -109,7 +109,7 @@ function _egThwompTeardown() {
     _egThwWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
     // Always sweep: on boss death the run's onKill may have nulled the
-    // watcher BEFORE this runs — the overlays must go either way.
+    // watcher BEFORE this runs - the overlays must go either way.
     _egThwompSweep();
 }
 
@@ -125,7 +125,7 @@ function _egThwompArenaInit(monster) {
         everLive: false, bornAt: performance.now(),
     };
     _egThwWatcher = st;
-    _egNkToast('eg_thwomp_intro', '🪨 The Thwomp: The guardian wakes — respect the block!');
+    _egNkToast('eg_thwomp_intro', '🪨 The Thwomp: The guardian wakes - respect the block!');
     // Tier-scaled clock: every telegraph breathes with tier.
     // Passive run: lives the whole fight without hogging _egNkDodgeBusy().
     const run = _egNkNewRun(monsterId, true);
@@ -485,6 +485,6 @@ function _egThwompGrandSlam(monster) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled Crushing Slam is now the persistent arena — keep the
+// The old scheduled Crushing Slam is now the persistent arena - keep the
 // handler name alive so any stale schedule entry no-ops instead of erroring.
 function _egMechThwompSlam() { void 0; }

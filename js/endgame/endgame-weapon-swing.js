@@ -10,7 +10,7 @@
 //  combo would be an enormous art burden, so attacks are a single
 //  character-agnostic CSS overlay anchored to the player avatar
 //  (css/endgame/weapon-swing.css). The overlay is skinned per weapon
-//  FAMILY — not per base item — and rotated toward the facing direction.
+//  FAMILY - not per base item - and rotated toward the facing direction.
 //
 //  CONTROLS: E = manual attack (this file), parry (hold) lives on the
 //  'eg-parry' keybind (R by default) in endgame-encounter-tick.js.
@@ -22,7 +22,38 @@
 const EG_WEAPON_SWING_COOLDOWN_MS = 400;
 let _egWeaponSwingLastAt = 0;
 
-// Per-family visual lifetime (ms) — must cover the longest CSS keyframe
+// Melee reach: the avatar's screen centre must be within this many px of the
+// target card's centre for a strike to land. The avatar roams freely, so the
+// player must walk up to the monster first - no cross-screen hits.
+const EG_MELEE_RANGE_PX = 340;
+// Throttle for the out-of-range toast (E can be held down).
+let _egMeleeRangeToastAt = 0;
+// Throttle for the no-weapon toast (same hold-E protection).
+let _egMeleeNoWeaponToastAt = 0;
+
+// True when the avatar stands close enough to the target to strike it.
+// Missing DOM (tests, teardown) never blocks - fail open.
+function _egMeleeTargetInRange(targetId) {
+    try {
+        const card = document.getElementById(`eg-card-${targetId}`);
+        const avatar = document.getElementById('player-avatar-wrapper')
+            || document.getElementById('player-avatar-simple');
+        if (!card || !avatar) return true;
+        const a = (typeof _egGetElementCentre === 'function')
+            ? _egGetElementCentre(avatar)
+            : avatar.getBoundingClientRect();
+        const b = (typeof _egGetElementCentre === 'function')
+            ? _egGetElementCentre(card)
+            : card.getBoundingClientRect();
+        const ax = (a.x != null) ? a.x : a.left, ay = (a.y != null) ? a.y : a.top;
+        const bx = (b.x != null) ? b.x : b.left, by = (b.y != null) ? b.y : b.top;
+        return Math.hypot(ax - bx, ay - by) <= EG_MELEE_RANGE_PX;
+    } catch (e) {
+        return true;
+    }
+}
+
+// Per-family visual lifetime (ms) - must cover the longest CSS keyframe
 // in weapon-swing.css so the node is removed after the effect finishes.
 const EG_WEAPON_SWING_DURATION_MS = {
     sword: 320, dagger: 260, axe: 400, mace: 420,
@@ -31,7 +62,7 @@ const EG_WEAPON_SWING_DURATION_MS = {
 
 // Maps an equipped weapon item to one of the CSS families. Resolution is
 // deliberately fuzzy (baseId prefix + icon + name keywords) so every
-// current AND future base type — including the wpn_auto_* filler series —
+// current AND future base type - including the wpn_auto_* filler series -
 // lands on a sensible visual without a per-item table.
 function _egWeaponSwingFamily(item) {
     if (!item) return 'unarmed';
@@ -119,7 +150,7 @@ function _egShowWeaponSwing(family, facing) {
 }
 
 // Small hop toward `facing` so the swing has weight. Uses WAAPI on the
-// wrapper (coexists with the auto-attack lunge, which animates later).
+    // wrapper (the old auto-attack lunge is gone - manual strikes hop only).
 function _egWeaponSwingHop(facing) {
     const avatar = document.getElementById('player-avatar-wrapper');
     if (!avatar || typeof avatar.animate !== 'function') return;
@@ -152,10 +183,12 @@ function _egWeaponSwingSound(family) {
 //-------------------MANUAL ATTACK (E)-------------------------------------
 //------------------------------------------------------------------------
 
-// Manual weapon attack: directional CSS swing + hop, damage through the
-// standard melee channel against the CURRENT target (same damage, cleave,
-// accuracy and reflect rules as auto-attacks). Without a target the swing
-// still plays as a whiff — the visual never depends on combat state.
+// Manual weapon attack (Secret-of-Mana-style): directional CSS swing + hop,
+// damage through the standard melee channel against the CURRENT target
+// (same damage, cleave, accuracy and reflect rules as before). The strike
+// deals charge% of full damage - 100% charge = 100% damage - and spends
+// (resets) the charge bar, even on a miss. Without a target the swing
+// still plays as a whiff but costs nothing, so retargeting never punishes.
 function _egDoWeaponAttack() {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     if (typeof dead !== 'undefined' && dead) return;
@@ -168,11 +201,48 @@ function _egDoWeaponAttack() {
     if (now - _egWeaponSwingLastAt < EG_WEAPON_SWING_COOLDOWN_MS) return;
     _egWeaponSwingLastAt = now;
 
+    // Weapon gate: no melee weapon (or bow) equipped → no attack at all.
+    // Previously this fell through to the 'unarmed' family and let a fresh
+    // character (e.g. during the tutorial, before the Professor's sword
+    // lesson) punch monsters with bare fists. The swing visual maps an
+    // absent weapon to 'unarmed', so the lookup must be the item itself.
+    if (!_egGetEquippedWeaponInfo().item) {
+        if (now - _egMeleeNoWeaponToastAt > 1500) {
+            _egMeleeNoWeaponToastAt = now;
+            if (typeof showToast === 'function') showToast('⚔️ ' + t('eg_melee_no_weapon'));
+        }
+        return;
+    }
+
+    // Range gate: too far away → no swing, no charge spent. The toast is
+    // throttled so holding E doesn't spam it.
+    const hasTargetEarly = !(typeof _egTargetId === 'undefined' || !_egTargetId);
+    if (hasTargetEarly && !_egMeleeTargetInRange(_egTargetId)) {
+        if (now - _egMeleeRangeToastAt > 1500) {
+            _egMeleeRangeToastAt = now;
+            if (typeof showToast === 'function') showToast('⚔️ ' + t('eg_melee_too_far'));
+        }
+        return;
+    }
+
     const { family } = _egGetEquippedWeaponInfo();
     const facing = _egGetAttackFacing();
     _egShowWeaponSwing(family, facing);
     _egWeaponSwingHop(facing);
     _egWeaponSwingSound(family);
+
+    // Spend the charge at key-press time so the strike matches the bar the
+    // player saw (charging during the swing flight doesn't inflate it).
+    // No target selected → whiff visual only, charge is kept.
+    const hasTarget = !(typeof _egTargetId === 'undefined' || !_egTargetId);
+    if (hasTarget && typeof _egConsumePlayerCharge === 'function') {
+        try { _egPendingMeleeChargePct = _egConsumePlayerCharge(); } catch (e) { _egPendingMeleeChargePct = 1; }
+    } else {
+        _egPendingMeleeChargePct = null;
+    }
+    if (typeof _egUpdatePlayerChargeBar === 'function') {
+        try { _egUpdatePlayerChargeBar(); } catch (e) {}
+    }
 
     // Damage at swing impact (matches the visual mid-point).
     setTimeout(() => {

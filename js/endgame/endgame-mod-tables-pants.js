@@ -1,27 +1,27 @@
 //  endgame-mod-tables-pants.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------PANTS MODIFIER TABLE---------------------------------
 //------------------------------------------------------------------------
-// Pants are the lower body — legs carry the fighter forward. They sit
+// Pants are the lower body - legs carry the fighter forward. They sit
 // between the belt (primary sustain) in thematic
 // identity. Their defensive emphasis is evasion (you move your legs to
 // avoid blows) while still offering all three defence types. Life values
-// are belt-adjacent — a large piece that wraps the thighs and hips.
+// are belt-adjacent - a large piece that wraps the thighs and hips.
 // Defences are bracer/gloves scale since the legs are less armoured
 // than chest or shoulders.
 //
 // Pants-exclusive mods:
-//   stagger — chance on hit to delay a monster's charge timer by briefly
+//   stagger - chance on hit to delay a monster's charge timer by briefly
 //             staggering them (disrupting their footing). Similar in
-//             concept to pushback (shoulders) but more volatile —
+//             concept to pushback (shoulders) but more volatile -
 //             stagger is a short random interrupt rather than a fixed
 //             pushback amount.
-//   preemptive_dodge — chance to automatically dodge the very first
+//   preemptive_dodge - chance to automatically dodge the very first
 //                      attack from any monster that hasn't yet hit the
 //                      player this map. The legs are coiled, ready.
 //                      Resets per monster instance.
@@ -36,7 +36,7 @@ const EG_MOD_TABLE_PANTS = {
     prefixes: {
 
         // --- LIFE & MANA ---
-        // Belt-adjacent flat life — a large lower-body piece.
+        // Belt-adjacent flat life - a large lower-body piece.
         flat_health: {
             id: 'flat_health',
             label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
@@ -90,7 +90,7 @@ const EG_MOD_TABLE_PANTS = {
         },
 
         // --- LOCAL DEFENSES ---
-        // Evasion is the pants' primary defence — the legs evade.
+        // Evasion is the pants' primary defence - the legs evade.
         // Flat evasion values are slightly above bracer/gloves scale,
         // below the cloak's dedicated evasion numbers.
         flat_evasion: {
@@ -217,7 +217,7 @@ const EG_MOD_TABLE_PANTS = {
         },
 
         // --- HYBRID DEFENSES ---
-        // Evasion pairs are the premium hybrid — pants' primary stat.
+        // Evasion pairs are the premium hybrid - pants' primary stat.
         hybrid_evasion_armour: {
             id: 'hybrid_evasion_armour',
             label: '+# to Evasion\n+@ to Armour', labelDe: '+# zu Ausweichen\n+@ zu Rüstung',
@@ -261,7 +261,7 @@ const EG_MOD_TABLE_PANTS = {
         },
 
         // --- PANTS-EXCLUSIVE: STAGGER ---
-        // A wide stance disrupts the monster's footing on impact —
+        // A wide stance disrupts the monster's footing on impact -
         // each hit has a chance to stagger the target, freezing its
         // charge timer for a brief window before it resumes.
         // Distinct from shoulders' pushback (which always reduces the
@@ -302,7 +302,7 @@ const EG_MOD_TABLE_PANTS = {
     suffixes: {
 
         // --- ATTRIBUTES ---
-        // Agility is the primary attribute for pants — nimble legs.
+        // Agility is the primary attribute for pants - nimble legs.
         // Rolls with better weight than strength or intelligence here.
         agility: {
             id: 'agility',
@@ -364,7 +364,7 @@ const EG_MOD_TABLE_PANTS = {
 
         // --- DODGE (pants' identity defence suffix) ---
         // The legs are what carry you out of harm's way. Pants get dodge
-        // on par with cloak values — both are mobility-focused pieces,
+        // on par with cloak values - both are mobility-focused pieces,
         // but cloaks are the dedicated evasion slot so their flat evasion
         // numbers are still higher. Dodge values match cloak's suffix tier.
         dodge: {
@@ -449,7 +449,7 @@ const EG_MOD_TABLE_PANTS = {
         // --- PANTS-EXCLUSIVE: PREEMPTIVE DODGE ---
         // The legs are always coiled, reading an enemy's stance.
         // The first attack from any monster that hasn't yet struck the
-        // player this encounter is automatically dodged — a reactive
+        // player this encounter is automatically dodged - a reactive
         // reflex that rewards aggression (you engage first, you dodge
         // their opening blow). Resets per-monster, not per-map.
         // Kept as a chance rather than guaranteed to preserve tension.

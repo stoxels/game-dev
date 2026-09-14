@@ -2,7 +2,7 @@
 //-------------------BOSS: THE MECH (boss_mech)---------------------------------
 //------------------------------------------------------------------------
 // Self-destruct homage: the Mech primes a nuke and shows you the blast
-// radius — plus the concrete pillars that can save you. When the countdown
+// radius - plus the concrete pillars that can save you. When the countdown
 // ends, be behind cover: anything with open sky to the blast is ash.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

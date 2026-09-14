@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------
 // Base types now carry ONE (sometimes two) built-in beneficial implicit
 // modifier that scales with the base's required level (NOT item level).
-//   - Values are rolled from a level-interpolated range — higher required
+//   - Values are rolled from a level-interpolated range - higher required
 //     level ⇒ strictly stronger implicits (decently strong at endgame).
 //   - Regular currency orbs NEVER touch implicits; only the Blessing Orb
 //     may reroll them.
@@ -19,10 +19,10 @@
 // Each family defines a localized label template ('#' is the sole numeric
 // placeholder, hybrid families use '#'+'@' and split labels with '\n') and
 // the value ranges at the extremes of the level ladder:
-//   lo — rolled when base required level == 1
-//   hi — rolled when base required level == 90 (clamped above)
+//   lo - rolled when base required level == 1
+//   hi - rolled when base required level == 90 (clamped above)
 // Between those, min and max are linearly interpolated by t.
-// Values are intentionally strong — roughly 60-80% of a top-tier explicit
+// Values are intentionally strong - roughly 60-80% of a top-tier explicit
 // affix at endgame, and ~30% at level 1 so early implicits feel real.
 
 const EG_IMPLICIT_FAMILIES = {
@@ -81,7 +81,7 @@ const EG_IMPLICIT_FAMILIES = {
         label: 'Regenerate # Mana every 5 seconds', labelDe: 'Regeneriere alle 5 Sekunden # Mana',
         lo: { min: 2, max: 4 }, hi: { min: 10, max: 16 },
     },
-    // Local defenses — require base to have the stat (filtered like explicit locals)
+    // Local defenses - require base to have the stat (filtered like explicit locals)
     inc_armour: {
         id: 'inc_armour',
         label: '#% increased Armour', labelDe: '#% erhöhte Rüstung',
@@ -106,7 +106,7 @@ const EG_IMPLICIT_FAMILIES = {
     flat_physical_damage: {
         id: 'flat_physical_damage',
         label: 'Adds # to @ Physical Damage', labelDe: 'Fügt # bis @ physischen Schaden hinzu',
-        // hybrid values — min1/max1 = low of physical range, min2/max2 = high
+        // hybrid values - min1/max1 = low of physical range, min2/max2 = high
         lo: { min1: 2, max1: 4, min2: 5, max2: 9 }, hi: { min1: 14, max1: 22, min2: 28, max2: 44 },
     },
     crit_chance: {
@@ -131,8 +131,8 @@ const EG_IMPLICIT_FAMILIES = {
     },
     attack_speed: {
         id: 'attack_speed',
-        label: 'Melee Strikes occur #s more often', labelDe: 'Nahkampfschläge erfolgen #s häufiger',
-        // float seconds — stored as integer tenths? Keep 2 decimals display.
+        label: 'Melee charges #s faster', labelDe: 'Nahkampf lädt #s schneller auf',
+        // float seconds - stored as integer tenths? Keep 2 decimals display.
         lo: { min: 0.2, max: 0.4 }, hi: { min: 0.9, max: 1.4 },
         isFloat: true,
     },
@@ -178,7 +178,7 @@ const EG_IMPLICIT_POOL_BY_SLOT = {
     shoulders: ['flat_health','strength','agility','intelligence','fire_resist','cold_resist','lightning_resist','inc_armour','inc_evasion','inc_absorption'],
     cloak:     ['flat_health','flat_mana','dodge','shadow_resist','fire_resist','cold_resist','lightning_resist','inc_evasion','inc_absorption'],
     bracers:   ['flat_health','accuracy','crit_chance','strength','agility','inc_armour','inc_evasion','attack_speed'],
-    // jewelry — global only, never local
+    // jewelry - global only, never local
     earring:   ['flat_health','flat_mana','strength','agility','intelligence','fire_resist','cold_resist','lightning_resist','shadow_resist','life_regen','mana_regen','crit_chance','spell_damage','accuracy'],
     ring:      ['flat_health','flat_mana','strength','agility','intelligence','fire_resist','cold_resist','lightning_resist','shadow_resist','life_regen','mana_regen','crit_chance','spell_damage','accuracy'],
     amulet:    ['flat_health','flat_mana','strength','agility','intelligence','fire_resist','cold_resist','lightning_resist','shadow_resist','crit_chance','crit_multiplier','spell_damage','accuracy'],
@@ -338,7 +338,7 @@ function _egRerollImplicits(item) {
     return { ...item, implicits: newImplicits };
 }
 
-// Helper for tooltip merging — returns merged implicit lines (like _egBuildMergedModLines but for implicits)
+// Helper for tooltip merging - returns merged implicit lines (like _egBuildMergedModLines but for implicits)
 function _egBuildMergedImplicitLines(implicits) {
     // Reuse the same merging logic as explicit mods when available
     if (typeof _egBuildMergedModLines === 'function' && Array.isArray(implicits) && implicits.length) {

@@ -22,7 +22,7 @@
             .cs-ascendency-locker (hover -> tooltip)
             .cs-card-cta
         #cs-tooltip.cs-tooltip
-          .cs-ability (x2 — SKILL 1 / SKILL 2)
+          .cs-ability (x2 - SKILL 1 / SKILL 2)
 
     data-classid on the OVERLAY = the player's base class (statistician /
     mathmagician / probabilist), used only for background tinting.
@@ -46,7 +46,7 @@
     backdrop-filter: blur(2px);
 }
 
-    /* Optional per-base-class tint — reusing the class-upgrade backgrounds as
+    /* Optional per-base-class tint - reusing the class-upgrade backgrounds as
        placeholders for now. Swap for dedicated ascend-select art later. */
     #class-selection-overlay[data-mode="ascend-select"][data-classid="statistician"] {
         background-image: url('../images/Class_Ascendency_Selection/statistician_ascendency_selection.webp');
@@ -248,7 +248,7 @@
         }
 
     /* ============ PER-ASCENDENCY LOCKER ARTWORK ============
-       Placeholder images — reusing the base weapon-locker art for now.
+       Placeholder images - reusing the base weapon-locker art for now.
        Swap these urls once real per-ascendency art is ready. */
     #class-selection-overlay[data-mode="ascend-select"] .cs-card[data-classid="outlier"] .cs-ascendency-locker {
         background-image: url('../images/Class_Ascendency_Selection/outlier_weapons.webp');

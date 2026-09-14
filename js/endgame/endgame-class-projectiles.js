@@ -5,22 +5,22 @@
 
 
 
-// Class projectile visuals — drawn entirely in code (nested DOM + CSS, see
+// Class projectile visuals - drawn entirely in code (nested DOM + CSS, see
 // css/endgame/projectiles.css). No emojis: every shape is built pointing
 // RIGHT (+x) inside a 44x28 px box so it can always be rotated exactly along
 // the flight vector toward the targeted creature.
 //
 // Each def:
-//   cssClass  — root element class (carries the glow filter / colour theme)
-//   duration  — flight time in ms
-//   easing    — Web Animations easing for the flight
-//   rotOffset — extra degrees on top of the flight angle (shapes are drawn
+//   cssClass  - root element class (carries the glow filter / colour theme)
+//   duration  - flight time in ms
+//   easing    - Web Animations easing for the flight
+//   rotOffset - extra degrees on top of the flight angle (shapes are drawn
 //               tip-right, so this is normally 0)
-//   spin      — optional ms for a continuous inner tumble while flying
+//   spin      - optional ms for a continuous inner tumble while flying
 //               (outer transform stays aimed at the target)
-//   build(el) — populates the projectile root with the shape's DOM
+//   build(el) - populates the projectile root with the shape's DOM
 const EG_CLASS_PROJECTILES = {
-    // 🎯 Probabilist — golden hunting dart: needle shaft, steel tip, fletching
+    // 🎯 Probabilist - golden hunting dart: needle shaft, steel tip, fletching
     probabilist: {
         cssClass: 'eg-proj-arrow', duration: 900, easing: 'linear', rotOffset: 0,
         build(root) {
@@ -34,7 +34,7 @@ const EG_CLASS_PROJECTILES = {
         },
     },
 
-    // 🔮 Mathmagician — arcane firebolt: white-hot core with a comet tail
+    // 🔮 Mathmagician - arcane firebolt: white-hot core with a comet tail
     mathmagician: {
         cssClass: 'eg-proj-fireball', duration: 1000, easing: 'ease-in', rotOffset: 0,
         build(root) {
@@ -48,7 +48,7 @@ const EG_CLASS_PROJECTILES = {
         },
     },
 
-    // ⚔️ Statistician — thrown blade: full sword silhouette, tip forward
+    // ⚔️ Statistician - thrown blade: full sword silhouette, tip forward
     statistician: {
         cssClass: 'eg-proj-sword', duration: 800, easing: 'ease-out', rotOffset: 0,
         build(root) {
@@ -62,7 +62,7 @@ const EG_CLASS_PROJECTILES = {
         },
     },
 
-    // 📈 Outlier — rogue shooting star: spinning star with a violet streak.
+    // 📈 Outlier - rogue shooting star: spinning star with a violet streak.
     // The outer body stays aimed at the target; only the star tumbles.
     outlier: {
         cssClass: 'eg-proj-dizzy', duration: 1000, easing: 'linear', rotOffset: 0, spin: 700,
@@ -75,7 +75,7 @@ const EG_CLASS_PROJECTILES = {
         },
     },
 
-    // 🛡️ Actuary — served contract: a paper dart (the claim, filed at the enemy)
+    // 🛡️ Actuary - served contract: a paper dart (the claim, filed at the enemy)
     actuary: {
         cssClass: 'eg-proj-scroll', duration: 1000, easing: 'ease-out', rotOffset: 0,
         build(root) {
@@ -89,7 +89,7 @@ const EG_CLASS_PROJECTILES = {
         },
     },
 
-    // 💀 Recursionist — fractal shard: a kite-shaped soul shard with smaller
+    // 💀 Recursionist - fractal shard: a kite-shaped soul shard with smaller
     // self-similar echoes trailing behind it (recursion made visible)
     recursionist: {
         cssClass: 'eg-proj-infinity', duration: 1000, easing: 'linear', rotOffset: 0,
@@ -103,7 +103,7 @@ const EG_CLASS_PROJECTILES = {
         },
     },
 
-    // ⏳ Markovian — chain shot: heavy iron ball towing a short link chain
+    // ⏳ Markovian - chain shot: heavy iron ball towing a short link chain
     markovian: {
         cssClass: 'eg-proj-chain', duration: 1100, easing: 'ease-in', rotOffset: 0,
         build(root) {
@@ -117,7 +117,7 @@ const EG_CLASS_PROJECTILES = {
         },
     },
 
-    // 🧪 Bayesian — alchemical vial: glass capsule dart, reactive green charge
+    // 🧪 Bayesian - alchemical vial: glass capsule dart, reactive green charge
     bayesian: {
         cssClass: 'eg-proj-brain', duration: 1000, easing: 'ease-in', rotOffset: 0,
         build(root) {
@@ -133,7 +133,7 @@ const EG_CLASS_PROJECTILES = {
         },
     },
 
-    // 🐻 Random Walker — tumbling die: pipped cube that rolls as it flies;
+    // 🐻 Random Walker - tumbling die: pipped cube that rolls as it flies;
     // the tumble is an inner animation so the flight vector stays true
     random_walker: {
         cssClass: 'eg-proj-dice', duration: 1000, easing: 'linear', rotOffset: 0, spin: 850,
@@ -299,12 +299,18 @@ function _egOnProgrammaticReveal(cellIds, source) {
         revealModMult = _egMapAbilityRevealMult();
     }
 
+    // Charm orbs applied to the casting skill's charm: +1% damage each
+    // (js/skills/skill-charms.js). Snapshotted here, synchronously, because
+    // the projectiles below fire on a stagger after the ability disarms.
+    const charmMult = (typeof getCharmCastingDamageMult === 'function')
+        ? getCharmCastingDamageMult() : 1;
+
     cellIds.slice(0, EG_REVEAL_PROJECTILE_MAX).forEach((id, i) => {
         const sourceEl = document.getElementById(id);
         if (!sourceEl) return;
         setTimeout(() => {
             if (!_egIsActive()) return;
-            const revealPct = (_egGetRevealProjectileDamagePct() / 100) * revealModMult;
+            const revealPct = (_egGetRevealProjectileDamagePct() / 100) * revealModMult * charmMult;
             const rolled = _egCalcPlayerDamage();
             const damage = Math.max(1, Math.round(rolled * revealPct));
             // Keep the per-element share so monster resistances still apply
@@ -327,7 +333,7 @@ function _egOnProgrammaticReveal(cellIds, source) {
 function _egFlushPendingRevealProjectiles() {
     if (!_egPendingRevealQueue.length) return;
     if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
-    // If no monster has spawned yet, defer flush — projectiles with null target
+    // If no monster has spawned yet, defer flush - projectiles with null target
     // would deal no damage (see _egDamageTargetById guard). Retry shortly.
     if (!_egMonsters || _egMonsters.length === 0) {
         setTimeout(() => _egFlushPendingRevealProjectiles(), 250);

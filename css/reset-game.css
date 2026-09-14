@@ -6,7 +6,7 @@
     This file does NOT reuse .modal-box / .modal-box-danger / .modal-title /
     .modal-section / .modal-actions / .reset-body-text from modals.css.
     The only class still shared with modals.css is .modal-bg (the dimmed
-    fullscreen backdrop + .show toggle) — everything inside the box below
+    fullscreen backdrop + .show toggle) - everything inside the box below
     is scoped to its own classes so it can't leak into or be broken by
     other modals (settings, changelog, achievements-reset, etc).
 
@@ -18,13 +18,13 @@
     --icon-size custom property. This means you can make any single
     icon bigger or smaller (via --icon-size on its own class, near the
     bottom of this file) without shifting any text, other icons, or
-    row heights — the icon simply overflows its slot visually.
+    row heights - the icon simply overflows its slot visually.
     ------------------------------------------------------------------------
 */
 
 
 /* -----------------------------------------------------------------------
-   OUTER STONE FRAME — now the SAME settings_background.png asset as the
+   OUTER STONE FRAME - now the SAME settings_background.png asset as the
    settings / how-to-play / changelog / danger modals, stretched 100%/100%.
    Its carved border spans x 0→9% / 91%→100% and y 0→11% / 90%→100% of the
    art; the padding below keeps the body columns on the flat parchment area.
@@ -50,7 +50,7 @@
 
 
 /* -----------------------------------------------------------------------
-   TITLE PLAQUE — same asset + geometry as the settings / how-to-play /
+   TITLE PLAQUE - same asset + geometry as the settings / how-to-play /
    replay / changelog plaques: settings_title_plague.png overhanging the
    frame's top edge, title centred on the art's flat middle (~68% width;
    the ends taper). Replaces the old inset Title-Plate.png.
@@ -91,7 +91,7 @@
 
 
 /* -----------------------------------------------------------------------
-   CLOSE BUTTON — top-right stone square with X icon (shared asset and
+   CLOSE BUTTON - top-right stone square with X icon (shared asset and
    geometry with the sibling modals; the text is hidden, the art is the X).
    ----------------------------------------------------------------------- */
 .reset-close-btn {
@@ -120,7 +120,7 @@
 
 
 /* -----------------------------------------------------------------------
-   BODY — two-column list of what gets erased.
+   BODY - two-column list of what gets erased.
    Wrapped in a min-height:0 flex context so the whole body can scroll
    inside the frame when the box is height-capped (portrait/short windows).
    ----------------------------------------------------------------------- */
@@ -187,7 +187,7 @@
 
 
 /* -----------------------------------------------------------------------
-   NOTE BANNER — "will NOT reset achievements" strip with trophy + shield.
+   NOTE BANNER - "will NOT reset achievements" strip with trophy + shield.
    Unique to this modal: kept as its own dark stone banner art, floating on
    the parchment frame area (light text stays).
    ----------------------------------------------------------------------- */
@@ -218,7 +218,7 @@
 
 
 /* -----------------------------------------------------------------------
-   FOOTER — YES / portal deco / CANCEL row
+   FOOTER - YES / portal deco / CANCEL row
    ----------------------------------------------------------------------- */
 .reset-footer {
     position: relative;
@@ -286,7 +286,7 @@
 /* =========================================================================
    ICON SLOTS
    Reserve a fixed footprint in the layout. These sizes control row
-   spacing/alignment ONLY — resizing an icon below never touches these.
+   spacing/alignment ONLY - resizing an icon below never touches these.
    ========================================================================= */
 .reset-icon-slot {
     position: relative;
@@ -311,7 +311,7 @@
    Centered on top of their slot, sized independently via --icon-size.
    Default is 100% (fills its slot exactly, same as before). Override
    --icon-size on any single icon class further down to make just that
-   one icon bigger/smaller — nothing else in the layout will move.
+   one icon bigger/smaller - nothing else in the layout will move.
    ========================================================================= */
 .reset-item-icon,
 .reset-header-icon,
@@ -405,7 +405,7 @@
 /* -----------------------------------------------------------------------
    NARROW-SCREEN FALLBACK
    Two columns and the wide footer row don't have room to breathe below
-   ~640px — stack everything vertically instead of shrinking further.
+   ~640px - stack everything vertically instead of shrinking further.
    ----------------------------------------------------------------------- */
 @media (max-width: 640px) {
 
@@ -416,7 +416,7 @@
         overflow-y: auto;
 
         /* Single tall column: the frame art's top/bottom border (11%/10% of
-           HEIGHT) outgrows width-based percent padding — switch those sides
+           HEIGHT) outgrows width-based percent padding - switch those sides
            to vh units (same fix as the sibling modals' portrait breakpoint). */
         padding-top: clamp(48px, 11vh, 164px);
         padding-bottom: clamp(42px, 10vh, 157px);

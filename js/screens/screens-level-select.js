@@ -239,7 +239,7 @@ function renderLSWorlds() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Main entry point — renders all parts of the level select screen.
+// Main entry point - renders all parts of the level select screen.
 // Call this whenever the level select needs to be (re)built from scratch.
 function renderLevelSelect() {
 
@@ -283,13 +283,12 @@ document.addEventListener('DOMContentLoaded', () => {
 //------------------------------------------------------------------------
 
 
-// Returns true if the level at index li is a convergence reward point.
-// Convergence points sit at roughly the 33% and 66% marks of a world's levels.
+// Convergence milestones no longer live on campaign puzzle levels (Leveling
+// Rework): former convergence levels are regular puzzle levels now -
+// milestones moved to Convergence Trials (see js/campaign-trials.js).
+// Always false; kept because the world/map screens still call it.
 function isLevelConvergence(li, w, isLastInWorld) {
-    if (w.data.length <= 2 || isLastInWorld) return false;
-    const c1 = Math.floor((w.data.length - 1) * CONVERGENCE_FRACTION_1);
-    const c2 = Math.floor((w.data.length - 1) * CONVERGENCE_FRACTION_2);
-    return li === c1 || li === c2;
+    return false;
 }
 
 // Returns true if the player has beaten this level on Hard with all modifiers active.
@@ -346,7 +345,7 @@ function buildHSHtml(hs) {
     return hs ? `<div class="lc-hs">${t('ls_hs_best')}: ${hs.score}</div>` : '';
 }
 
-// Returns the bonus objective div — either a "claimed" badge or the objective hint text.
+// Returns the bonus objective div - either a "claimed" badge or the objective hint text.
 function buildBonusHtml(p, gi, isUnlocked) {
     if (!isUnlocked) return `<div class="lc-bonus">???</div>`;
 
@@ -609,7 +608,7 @@ function getTooltipHint(gi) {
 
 
 // Injects the tooltip and items-hint CSS rules once into the document head.
-// Safe to call multiple times — skips injection if the style tag already exists.
+// Safe to call multiple times - skips injection if the style tag already exists.
 function ensureLSTooltipStyles() {
     if (document.getElementById('ls-tooltip-style')) return;
 

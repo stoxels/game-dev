@@ -3,30 +3,30 @@
 //------------------------------------------------------------------------
 // A rework of the old one-shot Battle Intent into a persistent chess
 // siege. The Tactician plays the board and the board is the arena.
-// Fight identity: READ THE BOARD — every attack is a chess move, declared
+// Fight identity: READ THE BOARD - every attack is a chess move, declared
 // in advance, and every declared move is dodgeable if you read it.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE QUEEN'S GUARD — the boss's arena body: a black ♛ queen that
+//   • THE QUEEN'S GUARD - the boss's arena body: a black ♛ queen that
 //     glides around the board like a queen move (axis + diagonal lines).
 //     Touching it is a ROOK'S CHARGE: animated fling + physical damage.
-//   • BATTLE INTENT — the Tactician still telegraphs its plans (the old
+//   • BATTLE INTENT - the Tactician still telegraphs its plans (the old
 //     identity, now constant): a banner declares ⚔️ VOLLEY, 🛡️ TITHE or
 //     😡 ENRAGE, then executes 2s later. Volleys are aimed knight-orbs.
-//   • PAWN MARCHES — ♟️ pawns periodically advance up the board in rank
+//   • PAWN MARCHES - ♟️ pawns periodically advance up the board in rank
 //     columns (telegraphed lane, then a marching wall with one gap).
 //     Physical hits; the gap is the answer.
 //
-//   60% GATE — CHECK: the queen calls CHECK — four rook-slide lanes pin
+//   60% GATE - CHECK: the queen calls CHECK - four rook-slide lanes pin
 //   the board (two horizontal, two vertical, telegraphed), then charge
 //   along them. Each lane is a full-screen rook dash.
 //
-//   30% GATE — ZUGZWANG: every position is losing. Chess-piece hazards
+//   30% GATE - ZUGZWANG: every position is losing. Chess-piece hazards
 //   occupy cells: bishop diagonals scorch the board (telegraphed diagonal
 //   beams), and a knight ♞ appears and leaps in L-shapes at your position,
 //   each landing a burst. Forced movement, forced reads.
 //
-//   CHARGE ATTACK — CHECKMATE: the board flashes, the four board edges
+//   CHARGE ATTACK - CHECKMATE: the board flashes, the four board edges
 //   slam inward as castle walls (like a rook castle from all sides),
 //   crushing anyone caught in the shrinking ring. Escape through the
 //   narrowing gaps before the walls meet.
@@ -38,7 +38,7 @@
 //
 // Shared mechanics live in shared-boss-abilities.js and are referenced
 // by handler-name string. Damage flows through the shared tier curve.
-// NOTE: exactly ONE _egNkLoop runs on the watcher's run — every state
+// NOTE: exactly ONE _egNkLoop runs on the watcher's run - every state
 // machine (intent, pawns, check lanes, zugzwang, checkmate) lives in
 // that single tick.
 //------------------------------------------------------------------------
@@ -60,7 +60,7 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            // Kept for schedule compatibility — the persistent watcher now
+            // Kept for schedule compatibility - the persistent watcher now
             // owns the intent cadence; the handler no-ops (same shim
             // pattern as the other reworked bosses).
             { name: 'battle_intent', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechBattleIntent' },
@@ -118,7 +118,7 @@ const EG_TCT_CM_FLING = [0, 200, 230, 260];   // inward crush fling
 
 let _egTacticianWatcher = null; // per-fight chess state
 
-// Phase lookup helper — resolves the boss's current phase (default 1).
+// Phase lookup helper - resolves the boss's current phase (default 1).
 function _egTctPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
         const m = _egMonsters.find(x => x && x.id === st.monsterId);
@@ -530,11 +530,11 @@ function _egTctQueuePawn(st, W, H) {
 }
 
 
-// ── 60% gate: CHECK — four rook-slide lanes ──────────────────────────────
+// ── 60% gate: CHECK - four rook-slide lanes ──────────────────────────────
 function _egTctCheck(st, W, H) {
     if (st.check) return;
     st.check = { t: 0, wave: 0 };
-    _egNkToast('eg_tct_check', '♟️ CHECK! Read the rook lanes — do not stand in them!');
+    _egNkToast('eg_tct_check', '♟️ CHECK! Read the rook lanes - do not stand in them!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
 }
 
@@ -566,7 +566,7 @@ function _egTctZugzwang(st, p) {
     st.zug = { t: 0 };
     st.zugAcc = 0;
     st.zugKnight = 0;
-    _egNkToast('eg_tct_zug', '♟️ ZUGZWANG! Every move loses — read the bishop lines!');
+    _egNkToast('eg_tct_zug', '♟️ ZUGZWANG! Every move loses - read the bishop lines!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
 }
 
@@ -638,7 +638,7 @@ function _egTacticianCheckmate(monster) {
         els.push(w);
     });
     st.checkmate = { phase: 'warn', t: 0, els, hitCd: 0 };
-    _egNkToast('eg_tct_checkmate', '♛ CHECKMATE! The castle closes — get inside the ring!');
+    _egNkToast('eg_tct_checkmate', '♛ CHECKMATE! The castle closes - get inside the ring!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('tct_move'); } catch (e) {}
 }
 
@@ -646,7 +646,7 @@ function _egTacticianCheckmate(monster) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent intent cadence —
+// The old scheduled mechanic is now the persistent intent cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
 function _egMechBattleIntent(monster, phase) { void monster; void phase; }

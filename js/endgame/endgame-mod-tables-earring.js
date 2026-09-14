@@ -1,13 +1,13 @@
 //  endgame-mod-tables-earring.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------EARRING MODIFIER TABLE-------------------------------
 //------------------------------------------------------------------------
-// Earrings are small jewelry — no local armour/evasion/absorption.
+// Earrings are small jewelry - no local armour/evasion/absorption.
 // They focus on: life/mana pools, regen, leech, attributes,
 // resistances, and puzzle utility. Values are smaller than helmet
 // equivalents to reflect the slot's secondary status.
@@ -65,7 +65,7 @@ const EG_MOD_TABLE_EARRING = {
             tiers: [
                 { tier: 1, min: 2, max: 3, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1, max: 2, weight: 200, ilvl: 60 },
-                // T3 is expressed in tenths for display — store as float
+                // T3 is expressed in tenths for display - store as float
                 { tier: 3, min: 0.5, max: 0.9, weight: 500, ilvl: 15 }
             ]
         },
@@ -218,7 +218,7 @@ const EG_MOD_TABLE_EARRING = {
             ]
         },
 
-        // --- ACCURACY (fits jewelry well — a steady hand) ---
+        // --- ACCURACY (fits jewelry well - a steady hand) ---
         accuracy: {
             id: 'accuracy',
             label: '+# to Accuracy', labelDe: '+# zu Genauigkeit',

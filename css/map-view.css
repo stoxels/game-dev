@@ -1,5 +1,5 @@
 /* =========================================================
-   MAP VIEW — css/map-view.css
+   MAP VIEW - css/map-view.css
    ========================================================= */
 
 /* ---- Toggle button (matches your existing gtb-btn style) ---- */
@@ -272,7 +272,7 @@
 
 
 /* =========================================================
-   WORLD DETAIL SCREEN — wd-* classes
+   WORLD DETAIL SCREEN - wd-* classes
    ========================================================= */
 
 #screen-map-view,
@@ -440,19 +440,19 @@
     margin-top: 1px;
 }
 
-/* Ascension (final) level node — gold ring */
+/* Ascension (final) level node - gold ring */
 .wd-level-node.ascension .wd-node-circle {
     border-color: #f0c040;
     box-shadow: 0 0 10px rgba(240, 192, 64, 0.5);
 }
 
-/* Nexus Point (final node of the Nexus World) — cyan ring instead of gold */
+/* Nexus Point (final node of the Nexus World) - cyan ring instead of gold */
 .wd-level-node.nexus-point .wd-node-circle {
     border-color: #7fd4ff;
     box-shadow: 0 0 12px rgba(127, 212, 255, 0.6);
 }
 
-/* Convergence level node — green ring */
+/* Convergence level node - green ring */
 .wd-level-node.convergence .wd-node-circle {
     border-color: #6fcf6f;
     box-shadow: 0 0 8px rgba(111, 207, 111, 0.4);
@@ -984,8 +984,8 @@
    ========================================================================
    Every level node represents a Stoxel corrupted by void energy.
 
-     - Unsolved (unlocked):  full crackling void — purple/red knot, sparks, bolts, glow
-     - Locked (not yet reachable): EVEN MORE INTENSE — corruption is untouched, spreading
+     - Unsolved (unlocked):  full crackling void - purple/red knot, sparks, bolts, glow
+     - Locked (not yet reachable): EVEN MORE INTENSE - corruption is untouched, spreading
      - Solved:  aura collapses to a faint residual glow (the land is healing)
      - Math-gated: red cage on top + a void contamination ground zone below
 
@@ -1000,7 +1000,7 @@
 
 .wd-stoxel-aura {
     position: absolute;
-    inset: -55px; /* Large bleed — void energy spreads well beyond the node */
+    inset: -55px; /* Large bleed - void energy spreads well beyond the node */
     pointer-events: none;
     z-index: 0;
     overflow: visible;
@@ -1030,9 +1030,9 @@
         animation-duration: 20s !important;
     }
 
-/* ---- Locked state: MORE intense than normal — corruption is untouched ---- */
+/* ---- Locked state: MORE intense than normal - corruption is untouched ---- */
 .wd-level-node.locked .wd-stoxel-aura {
-    /* Do NOT dim — locked = never cleansed, void is at full power */
+    /* Do NOT dim - locked = never cleansed, void is at full power */
     opacity: 1;
 }
 
@@ -1074,7 +1074,7 @@
 
 
 /* ========================================================================
-   OUTER VOID GLOW (base — unlocked unsolved)
+   OUTER VOID GLOW (base - unlocked unsolved)
    ======================================================================== */
 
 .wd-stoxel-void-glow {
@@ -1116,35 +1116,35 @@
     stroke-linecap: round;
 }
 
-/* Band 1 — primary red loop */
+/* Band 1 - primary red loop */
 .wd-stoxel-band-1 {
     stroke: rgba(120, 20, 200, 0.95);
     transform-origin: 52px 52px;
     animation: stoxelBandSpin1 5s linear infinite;
 }
 
-/* Band 2 — bright purple loop */
+/* Band 2 - bright purple loop */
 .wd-stoxel-band-2 {
     stroke: rgba(90, 10, 180, 0.92);
     transform-origin: 52px 52px;
     animation: stoxelBandSpin2 7s linear infinite reverse;
 }
 
-/* Band 3 — dark violet loop */
+/* Band 3 - dark violet loop */
 .wd-stoxel-band-3 {
     stroke: rgba(150, 30, 220, 0.88);
     transform-origin: 52px 52px;
     animation: stoxelBandSpin3 9s linear infinite;
 }
 
-/* Band 4 — extra outer loop for density (matches image) */
+/* Band 4 - extra outer loop for density (matches image) */
 .wd-stoxel-band-4 {
     stroke: rgba(80, 0, 160, 0.80);
     transform-origin: 52px 52px;
     animation: stoxelBandSpin4 11s linear infinite reverse;
 }
 
-/* Band 5 — thin inner loop */
+/* Band 5 - thin inner loop */
 .wd-stoxel-band-5 {
     stroke: rgba(170, 60, 240, 0.70);
     transform-origin: 52px 52px;
@@ -1457,7 +1457,7 @@
 
 
 /* ========================================================================
-   MAX-CLEARED NODE — Crown + Golden Radiant Halo
+   MAX-CLEARED NODE - Crown + Golden Radiant Halo
    A node fully beaten on Hard with all 5 modifiers active.
    ======================================================================== */
 
@@ -1489,7 +1489,7 @@
         z-index: 10;
     }
 
-    /* Second counter-spinning ring — slightly larger, thinner */
+    /* Second counter-spinning ring - slightly larger, thinner */
     .wd-level-node.max-cleared::after {
         content: '';
         position: absolute;
@@ -1571,7 +1571,7 @@
 
 
 /* ========================================================================
-   WORLD DETAIL TOOLTIP — enriched styles
+   WORLD DETAIL TOOLTIP - enriched styles
    ======================================================================== */
 
 .mv-tooltip.show {
@@ -1674,11 +1674,11 @@
 
 
 /* ========================================================================
-   OVERWORLD HEALING EFFECT — corruption receding as worlds are cleared
+   OVERWORLD HEALING EFFECT - corruption receding as worlds are cleared
    ========================================================================
-   Tier 1 — all levels cleared:                a calm green glow returns
-   Tier 2 — + all bonuses claimed:             vines and leaves sprout
-   Tier 3 — + all levels max-cleared:          full radiant bloom
+   Tier 1 - all levels cleared:                a calm green glow returns
+   Tier 2 - + all bonuses claimed:             vines and leaves sprout
+   Tier 3 - + all levels max-cleared:          full radiant bloom
    ======================================================================== */
 
 .mv-node-ring {
@@ -1765,7 +1765,7 @@
     }
 }
 
-/* ---- Tier 3: full radiant bloom — floating petals + golden light ---- */
+/* ---- Tier 3: full radiant bloom - floating petals + golden light ---- */
 .mv-heal-bloom {
     position: absolute;
     inset: -10px;

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------
-//-------------------SHARED — GRID ACTIONS----------------------
+//-------------------SHARED - GRID ACTIONS----------------------
 //------------------------------------------------------------------------
 
 // Core grid manipulation primitives shared by item handlers, class
@@ -265,7 +265,7 @@ function unsolveRowsExcluding(count, allowedSet) {
         if (hasFilled) candidates.push(r);
     }
 
-    // Fallback: board was blank before use — erase any filled row
+    // Fallback: board was blank before use - erase any filled row
     if (!candidates.length) {
         for (let r = 0; r < rows; r++) {
             const hasFilled = sol[r].some((v, c) => v === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c]));
@@ -305,7 +305,7 @@ function unsolveColsExcluding(count, allowedSet) {
         if (hasFilled) candidates.push(c);
     }
 
-    // Fallback: board was blank before use — erase any filled column
+    // Fallback: board was blank before use - erase any filled column
     if (!candidates.length) {
         for (let c = 0; c < cols; c++) {
             const hasFilled = sol.some((row, r) => row[c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c]));

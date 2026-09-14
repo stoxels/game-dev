@@ -4,17 +4,17 @@
 // Implementations for passive tree special nodes:
 //   Nodes 270–272  : Poisson Process
 //   Nodes 282–284  : Binomial Burst
-//   Node  288      : Keystone — Maximum Likelihood
-//   Node  289      : Keystone — Gambler's Ruin
-//   Node  290      : Keystone — Sparse Prior
-//   Node  291      : Keystone — Ergodic Field
-//   Node  293      : Keystone — Entropy Drain
-//   Node  294      : Keystone — Random Walk
-//   Node  295      : Keystone — Frequentist's Burden
-//   Node  296      : Keystone — Signal to Noise
-//   Node  298      : Keystone — Degrees of Freedom
-//   Node  299      : Keystone — Overfitting
-//   Node  300      : Keystone — The Oracle
+//   Node  288      : Keystone - Maximum Likelihood
+//   Node  289      : Keystone - Gambler's Ruin
+//   Node  290      : Keystone - Sparse Prior
+//   Node  291      : Keystone - Ergodic Field
+//   Node  293      : Keystone - Entropy Drain
+//   Node  294      : Keystone - Random Walk
+//   Node  295      : Keystone - Frequentist's Burden
+//   Node  296      : Keystone - Signal to Noise
+//   Node  298      : Keystone - Degrees of Freedom
+//   Node  299      : Keystone - Overfitting
+//   Node  300      : Keystone - The Oracle
 //   Utility        : Interquartile Vision duration helper
 //   Utility        : Global per-level state reset
 //
@@ -47,7 +47,7 @@ window._bayesianBonus = window._bayesianBonus || 0; // Accumulated extra trigger
 // --- Binomial Burst (nodes 282–284) ---
 window._binomialBurstFills = 0; // Correct-fill counter; triggers at every 10th fill
 
-// --- Sparse Prior (node 290) — per-level Set, initialized in reset ---
+// --- Sparse Prior (node 290) - per-level Set, initialized in reset ---
 window._sparsePriorRevealedLines = new Set(); // Keys like "r3" or "c7" to avoid double-reveals
 
 // --- Ergodic Field (node 291) ---
@@ -78,12 +78,12 @@ window._signalToNoiseFakeClues = []; // Array of { spanId, originalVal, fakeVal 
 // --- Degrees of Freedom (node 298) ---
 const DOF_FLASH_INTERVAL_MS = 30 * 1000; // Time between brief reveals
 const DOF_FLASH_DURATION_MS = 5 * 1000;  // How long clues stay visible during flash
-window._degreesOfFreedomChoice = null; // 'row' | 'col' — player's chosen hidden clue axis
+window._degreesOfFreedomChoice = null; // 'row' | 'col' - player's chosen hidden clue axis
 window._degreesOfFreedomNext = null; // Timestamp for next brief clue reveal
 window._degreesOfFreedomFlashTimeout = null; // Pending re-hide timeout of an active flash
 window._dofFlashToken = 0; // Bumps on every choice/reset; stale flash timeouts no-op on mismatch
 
-// --- Overfitting (node 299) — local var, not on window ---
+// --- Overfitting (node 299) - local var, not on window ---
 const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which mistakes stop being free
 const OVERFITTING_HARD_THRESHOLD = 0.50;  // Board fill % at which mistakes cost triple
 let _lastOverfittingPhase = 'free'; // Tracks phase transitions to prevent toast spam
@@ -213,7 +213,7 @@ function _interquartileVisionDuration() {
 //------------------------------------------------------------------------
 //-------------------- SHARED: BAYESIAN UPDATE ---------------------------
 //------------------------------------------------------------------------
-// Nodes 282 / 283 / 284 — Bayesian Update
+// Nodes 282 / 283 / 284 - Bayesian Update
 // Each mistake while any tier is active adds +5% to a shared bonus pool.
 // The pool is consumed the next time a probabilistic trigger fires.
 // Called from: penalty.js after mistakeCount++
@@ -285,7 +285,7 @@ function _poissonCheckBayesianExtra() {
     return 0;
 }
 
-// Main tick — called from the timer interval in timer.js every second.
+// Main tick - called from the timer interval in timer.js every second.
 function _poissonProcessTick() {
     if (!window._poissonNext) return;
     if (Date.now() < window._poissonNext) return;
@@ -443,7 +443,7 @@ function _playBinomialBurstVFX(row, col) {
     animId = requestAnimationFrame(tick);
 }
 
-// Main entry point — called from mouse-button-handlers.js on every correct fill.
+// Main entry point - called from mouse-button-handlers.js on every correct fill.
 function _binomialBurstOnCorrectFill(row, col) {
     if (!ptHasSkill('binomial_burst_1')) return;
     if (_autoActionsBlocked()) return;
@@ -470,7 +470,7 @@ function _binomialBurstOnCorrectFill(row, col) {
 
 
 //------------------------------------------------------------------------
-//----------- NODE 288: KEYSTONE — MAXIMUM LIKELIHOOD -------------------
+//----------- NODE 288: KEYSTONE - MAXIMUM LIKELIHOOD -------------------
 //------------------------------------------------------------------------
 // At level start: deducts 15 minutes from the timer, then reveals
 // all cells in the densest row AND densest column as a bonus.
@@ -529,7 +529,7 @@ function _revealCol(sol, colIndex) {
     return affected;
 }
 
-// Main entry — deducts time and reveals the densest cross of cells.
+// Main entry - deducts time and reveals the densest cross of cells.
 // Called from: start-level.js
 function _applyMaximumLikelihood() {
     if (!ptHasSkill('keystone_maximum_likelihood')) return;
@@ -560,7 +560,7 @@ function _applyMaximumLikelihood() {
 
 
 //------------------------------------------------------------------------
-//----------- NODE 289: KEYSTONE — GAMBLER'S RUIN ----------------------
+//----------- NODE 289: KEYSTONE - GAMBLER'S RUIN ----------------------
 //------------------------------------------------------------------------
 // Trade-off keystone:
 //   Upside  : +3 seconds added to the timer per correct fill
@@ -588,7 +588,7 @@ function _gamblersRuinOnMistake() {
 
 
 //------------------------------------------------------------------------
-//----------- NODE 290: KEYSTONE — SPARSE PRIOR -------------------------
+//----------- NODE 290: KEYSTONE - SPARSE PRIOR -------------------------
 //------------------------------------------------------------------------
 // All clues are hidden at level start. Each time a row or column is fully
 // completed, the clues for that line AND its immediate neighbours are revealed.
@@ -642,7 +642,7 @@ function _sparsePriorOnLineComplete(lineIndex, isRow) {
 
 
 //------------------------------------------------------------------------
-//----------- NODE 291: KEYSTONE — ERGODIC FIELD ------------------------
+//----------- NODE 291: KEYSTONE - ERGODIC FIELD ------------------------
 //------------------------------------------------------------------------
 // Every 3 minutes, the complete solution is flashed on screen for 1 second.
 // While active, all auto-reveal and auto-mark nodes are blocked (see _autoActionsBlocked).
@@ -683,7 +683,7 @@ function _ergodicFieldInit() {
     window._ergodicFieldNext = Date.now() + ERGODIC_FIELD_INTERVAL_MS;
 }
 
-// Main tick — fires the solution flash if enough time has elapsed.
+// Main tick - fires the solution flash if enough time has elapsed.
 // Called from: timer.js setInterval
 function _ergodicFieldTick() {
     if (!ptHasSkill('keystone_ergodic_field')) return;
@@ -703,7 +703,7 @@ function _ergodicFieldTick() {
 
 
 //------------------------------------------------------------------------
-//----------- NODE 293: KEYSTONE — ENTROPY DRAIN ------------------------
+//----------- NODE 293: KEYSTONE - ENTROPY DRAIN ------------------------
 //------------------------------------------------------------------------
 // Any row or column that has been partially filled but not completed for
 // more than 3 minutes has all its reveals and marks reverted.
@@ -798,7 +798,7 @@ function _entropyDrainProcessLine(key, isStalled, revert, now) {
     }
 }
 
-// Main tick — reverts any stalled lines that have exceeded the timeout.
+// Main tick - reverts any stalled lines that have exceeded the timeout.
 // Called from: timer.js setInterval
 function _entropyDrainTick() {
     if (!ptHasSkill('keystone_entropy_drain')) return;
@@ -818,7 +818,7 @@ function _entropyDrainTick() {
 
 
 //------------------------------------------------------------------------
-//----------- NODE 294: KEYSTONE — RANDOM WALK --------------------------
+//----------- NODE 294: KEYSTONE - RANDOM WALK --------------------------
 //------------------------------------------------------------------------
 // Every 30 seconds a random unfilled cell is either auto-filled (if it
 // should be filled) or auto-marked wrong (if it should be empty).
@@ -870,7 +870,7 @@ function _randomWalkRevealCell(r, c) {
 }
 
 // Handles the case where the randomly chosen cell is empty (marks it as wrong).
-// Note: This does NOT increment mistakeCount — it is a neutral wrong mark.
+// Note: This does NOT increment mistakeCount - it is a neutral wrong mark.
 function _randomWalkMarkEmpty(r, c) {
     userGrid[r][c] = 2; // Mark as wrong without counting as a player mistake
     renderCell(r, c);
@@ -889,7 +889,7 @@ function _randomWalkInit() {
     window._randomWalkNext = Date.now() + RANDOM_WALK_INTERVAL_MS;
 }
 
-// Main tick — checks for failures, then fires the next random cell action.
+// Main tick - checks for failures, then fires the next random cell action.
 // Called from: timer.js setInterval
 function _randomWalkTick() {
     if (!ptHasSkill('keystone_random_walk')) return;
@@ -925,7 +925,7 @@ function _randomWalkTick() {
 
 
 //------------------------------------------------------------------------
-//---------- NODE 295: KEYSTONE — FREQUENTIST'S BURDEN ------------------
+//---------- NODE 295: KEYSTONE - FREQUENTIST'S BURDEN ------------------
 //------------------------------------------------------------------------
 // All clues are hidden at level start. Every 5 correct fills, 1 randomly
 // chosen hidden row or column clue is permanently revealed.
@@ -989,7 +989,7 @@ function _frequentistsBurdenOnCorrectFill() {
 
 
 //------------------------------------------------------------------------
-//---------- NODE 296: KEYSTONE — SIGNAL TO NOISE -----------------------
+//---------- NODE 296: KEYSTONE - SIGNAL TO NOISE -----------------------
 //------------------------------------------------------------------------
 // At level start, 15% of all clue numbers are replaced with a nearby
 // incorrect value (shown in red). Once the player reaches 75% completion,
@@ -1075,7 +1075,7 @@ function _signalToNoiseCheckRestore() {
 
 
 //------------------------------------------------------------------------
-//---------- NODE 298: KEYSTONE — DEGREES OF FREEDOM -------------------
+//---------- NODE 298: KEYSTONE - DEGREES OF FREEDOM -------------------
 //------------------------------------------------------------------------
 // At level start the player chooses which axis (rows or columns) to hide.
 // Every 30 seconds the hidden clues flash visible for 5 seconds, then hide again.
@@ -1092,7 +1092,7 @@ function _dofSelectorFor(choice) {
 // Builds the inner HTML for the axis-selection modal.
 // Mirrors the Data Strike row/column choice modal (_dataStrikeOverlayHTML):
 // stone panel + title plaque + prompt + ROWS / COLS buttons. No cancel
-// button — the keystone downside is mandatory, so a choice is required.
+// button - the keystone downside is mandatory, so a choice is required.
 function _dofOverlayHTML() {
     const title = t('pt_dof_title');
     const question = t('pt_dof_question');
@@ -1203,7 +1203,7 @@ function _applyDegreesOfFreedom() {
     _dofShowModal();
 }
 
-// Main tick — briefly flashes the hidden clues on schedule.
+// Main tick - briefly flashes the hidden clues on schedule.
 // Called from: timer.js setInterval
 function _degreesOfFreedomTick() {
     if (!ptHasSkill('keystone_degrees_of_freedom')) return;
@@ -1219,7 +1219,7 @@ function _degreesOfFreedomTick() {
 
 
 //------------------------------------------------------------------------
-//---------- NODE 299: KEYSTONE — OVERFITTING ---------------------------
+//---------- NODE 299: KEYSTONE - OVERFITTING ---------------------------
 //------------------------------------------------------------------------
 // Before 15% board completion: mistakes are free (no time penalty).
 // Between 15% and 50% board completion: mistakes cost the normal penalty.
@@ -1272,7 +1272,7 @@ function resetOverfittingTracker() {
 
 
 //------------------------------------------------------------------------
-//---------- NODE 300: KEYSTONE — THE ORACLE ----------------------------
+//---------- NODE 300: KEYSTONE - THE ORACLE ----------------------------
 //------------------------------------------------------------------------
 // Only activates on puzzles with 200+ cells. At level start, flashes the
 // complete solution for 5 seconds, then hides all clues permanently.

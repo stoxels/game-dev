@@ -66,7 +66,7 @@
        The signature teal and white form the game's core color identity
        ------------------------------------------------------------------- */
 
-    --accent: #66fcf1; /* Signature bright cyan / teal — primary brand color   */
+    --accent: #66fcf1; /* Signature bright cyan / teal - primary brand color   */
     --accent2: #ffffff; /* Pure white, mainly used for readable body text       */
     /* -------------------------------------------------------------------
        2d. SEMANTIC STATUS COLORS
@@ -84,19 +84,19 @@
        Each cell state has a background + border pair so they can be
        applied consistently across the grid renderer.
        ------------------------------------------------------------------- */
-    /* Default state — cell has not been interacted with yet */
+    /* Default state - cell has not been interacted with yet */
     --cell-empty: #242b3d;
     --cell-border: #2c3854;
-    /* Filled state — player correctly filled this cell */
+    /* Filled state - player correctly filled this cell */
     --cell-filled: #66fcf1;
     --cell-filled-border: #40c8c0;
-    /* Wrong state — player filled a cell that should be empty */
+    /* Wrong state - player filled a cell that should be empty */
     --cell-wrong-bg: #2d1414;
     --cell-wrong-border: #802424;
-    /* Revealed state — cell auto-revealed by an item or skill effect */
+    /* Revealed state - cell auto-revealed by an item or skill effect */
     --cell-revealed-bg: #1d4a1d;
     --cell-revealed-border: #45a045;
-    /* Hover highlights — row/column and exact intersection */
+    /* Hover highlights - row/column and exact intersection */
     --cell-hover-row-col: #1e2c45; /* Faint tint for the shared row and column     */
     --cell-hover-intersect: #243552; /* Brighter tint exactly under the cursor       */
     --cell-hover-intersect-border: rgba(102, 252, 241, 0.4);
@@ -126,7 +126,7 @@
     --inv-item-empty: #666666; /* Empty inventory slot placeholder          */
     /* Cursed items are locked for the first 3 minutes of a level */
     --inv-cursed-lock: #770000;
-    /* Rarity badge colors — match conventional game rarity tiers */
+    /* Rarity badge colors - match conventional game rarity tiers */
     --rarity-common: #aaaaaa;
     --rarity-uncommon: #3ddc84;
     --rarity-rare: #5c99ff;
@@ -162,7 +162,7 @@
     --setup-opt-inactive: #8892a3; /* Greyed-out setup/option labels               */
 
     --item-reward-bg: rgba(176, 108, 255, 0.18); /* Purple tint behind item reward display   */
-    /* Animated glow shadow for the puzzle-win animation — two intensity levels */
+    /* Animated glow shadow for the puzzle-win animation - two intensity levels */
     --pw-anim-shadow-lo: rgba(245, 197, 24, 0.4);
     --pw-anim-shadow-hi: rgba(245, 197, 24, 0.7);
     /* -------------------------------------------------------------------
@@ -197,7 +197,7 @@
 
 html, body {
     height: 100%;
-    /* Prevents the page itself from scrolling — the game is designed to
+    /* Prevents the page itself from scrolling - the game is designed to
        fill the viewport exactly without a document-level scrollbar */
     overflow: hidden;
 }
@@ -272,12 +272,12 @@ body {
 }
 
 /* ============================================================
-   UNIFIED BACK BUTTON — the one navigation-back design used on
+   UNIFIED BACK BUTTON - the one navigation-back design used on
    every screen (save slots, setup, mode select, levels, map
    view, world detail, passive tree, achievements detail and
    all endgame screens): the carved stone slab, text '◀ BACK'.
    Art: images/Game_Setup/back-slab.webp (return_to_menu_button
-   cropped to its true bounds — the source is a 668x373
+   cropped to its true bounds - the source is a 668x373
    full-screen canvas; using it stretched at 100%/100% on a
    small box squashed the carving).
    Corner placement is screen-specific: add .back-btn-corner

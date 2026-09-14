@@ -1,21 +1,21 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE COLOSSUS (boss_colossus)--------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK — "The Mountain That Walks". The boss is scenery that
+// TIER 7 REWORK - "The Mountain That Walks". The boss is scenery that
 // attacks; the fight is about reading huge telegraphs and raiding the
-// titan's joints. Elementless: the Colossus deals PURE PHYSICAL — resists
+// titan's joints. Elementless: the Colossus deals PURE PHYSICAL - resists
 // don't help. That is its identity.
-//   • SEISMIC STRIDE (signature, all fight) — the Colossus WALKS: two giant
+//   • SEISMIC STRIDE (signature, all fight) - the Colossus WALKS: two giant
 //     footprints slam down sequentially (rounded band telegraphs), then a
 //     full-screen shockwave ring rolls out of each print with jump-window
 //     gaps. Phase 3 strides cross the arena diagonally.
-//   • BOULDER RAIN (60%) — the shoulder quarries hurl 🪨 boulders that arc
+//   • BOULDER RAIN (60%) - the shoulder quarries hurl 🪨 boulders that arc
 //     in and SHATTER into rolling fragments that keep travelling. Dive
 //     through the fragment lanes, not just the impact ring.
-//   • GRANITE GOLEMS (60%) — two golem statues climb out of cracks and
+//   • GRANITE GOLEMS (60%) - two golem statues climb out of cracks and
 //     slow-push toward you: moving walls that pin you into stride
 //     telegraphs. Body-check a golem 3× to crumble it early.
-//   • 💀 TITAN'S FALL (≤10%, one-shot finale) — the Colossus kneels and the
+//   • 💀 TITAN'S FALL (≤10%, one-shot finale) - the Colossus kneels and the
 //     arena becomes a climb: three glowing JOINT SEALS (shoulder, knee,
 //     chest) light up one at a time; reach and body-check the lit seal
 //     while falling-rock chutes (telegraphed lanes) sweep the arena. Break
@@ -168,7 +168,7 @@ function _egMechSeismicSlam(monster, phase) {
             warned: null, slamEl: null, waveEl: null, r: 40,
         });
     }
-    _egNkToast('eg_mech_quake', '🗿 The Colossus: SEISMIC STRIDE — it walks! Mind the footprints!', '#d6c8a8');
+    _egNkToast('eg_mech_quake', '🗿 The Colossus: SEISMIC STRIDE - it walks! Mind the footprints!', '#d6c8a8');
 
     // ONE loop drives all feet (each footprint's lifecycle is a state).
     _egNkLoop(run, (dtS, now) => {
@@ -250,7 +250,7 @@ function _egMechColoBoulders(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_colo_boulder', '🗿🪨 BOULDER RAIN — the shatter rolls on!', '#d6c8a8');
+    _egNkToast('eg_mech_colo_boulder', '🗿🪨 BOULDER RAIN - the shatter rolls on!', '#d6c8a8');
 
     // ONE loop owns every boulder and every fragment.
     const boulders = [];
@@ -343,7 +343,7 @@ function _egMechColoGolems(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    _egNkToast('eg_mech_colo_golem', '🗿🧱 GRANITE GOLEMS — moving walls! Ram them to crumble them!', '#a8a29e');
+    _egNkToast('eg_mech_colo_golem', '🗿🧱 GRANITE GOLEMS - moving walls! Ram them to crumble them!', '#a8a29e');
     const golems = [];
     for (let i = 0; i < EG_GOLEM_COUNT[Math.max(2, Math.min(3, Number(phase) || 2))]; i++) {
         const el = _egNkEl(run, 'div', 'eg-colo-golem', '🧱');
@@ -509,11 +509,11 @@ function _egColoFinalStart(monster) {
     ov.className = 'eg-colo-cd';
     ov.innerHTML =
         '<div class="eg-colo-cd-label">🗿 TITAN\u2019S FALL</div>' +
-        '<div class="eg-colo-cd-hint">Body-check the lit JOINT SEAL — 3 hits!</div>';
+        '<div class="eg-colo-cd-hint">Body-check the lit JOINT SEAL - 3 hits!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL — break the lit seal!', '#d6c8a8');
+    _egNkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL - break the lit seal!', '#d6c8a8');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -625,7 +625,7 @@ function _egColoFinalStart(monster) {
                     _egColoFinalEnd(g, monster, true);
                     return false;
                 }
-                _egNkToast('eg_mech_colo_seal_down', '🗿 SEAL BROKEN — the titan slumps! Next seal lit!', '#4ade80');
+                _egNkToast('eg_mech_colo_seal_down', '🗿 SEAL BROKEN - the titan slumps! Next seal lit!', '#4ade80');
                 g.sealTimer = 0;
                 return true;
             }
@@ -633,7 +633,7 @@ function _egColoFinalStart(monster) {
 
         // ── Seal budget: fail → punish + next seal. The THIRD expired seal
         // answers with a CAVE-IN (design doc): dust wipes the arena except
-        // the ring around the last seal, 35% if you're outside it — the
+        // the ring around the last seal, 35% if you're outside it - the
         // finale fails and the fight resumes.
         g.sealTimer = (g.sealTimer || 0) + dtS * 1000;
         if (g.sealTimer >= EG_COLO_FINALE_SEAL_MS * _EG_COLO_DEBUG_MULT) {
@@ -646,7 +646,7 @@ function _egColoFinalStart(monster) {
                 _egColoFinalEnd(g, monster, false);
                 return false;
             }
-            _egNkToast('eg_mech_colo_seal_fail', '🗿 The seal collapsed on its own — next seal lit!', '#f59e0b');
+            _egNkToast('eg_mech_colo_seal_fail', '🗿 The seal collapsed on its own - next seal lit!', '#f59e0b');
         }
 
         // Keep the lit-seal visuals honest.
@@ -657,7 +657,7 @@ function _egColoFinalStart(monster) {
     });
 }
 
-// CAVE-IN: the failed finale's punish — dust wipes the arena except the
+// CAVE-IN: the failed finale's punish - dust wipes the arena except the
 // ring around the last seal (35% if you're outside it).
 function _egColoCaveIn(g, seal, level) {
     if (g.finished) return;
@@ -676,7 +676,7 @@ function _egColoCaveIn(g, seal, level) {
     }
 }
 
-// Ends the finale: collapse (seals broken) — releases immunity + charge bar.
+// Ends the finale: collapse (seals broken) - releases immunity + charge bar.
 function _egColoFinalEnd(g, monster, collapsed) {
     if (!g || g.finished) return;
     g.finished = true;
@@ -712,7 +712,7 @@ function _egColoFinalEnd(g, monster, collapsed) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egColoTeardown() {
     if (_egColoFinal) { try { _egColoFinalEnd(_egColoFinal, null, false); } catch (e) {} _egColoFinal = null; }
@@ -733,8 +733,8 @@ function _egColoTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_COLO_DEBUG.fire('stride'|'boulders'|'golems', phase) — runs one now
-//   _EG_COLO_DEBUG.final()                                   — TITAN'S FALL now
+//   _EG_COLO_DEBUG.fire('stride'|'boulders'|'golems', phase) - runs one now
+//   _EG_COLO_DEBUG.final()                                   - TITAN'S FALL now
 if (typeof window !== 'undefined') {
     window._EG_COLO_DEBUG = {
         fire: (name, phase) => {

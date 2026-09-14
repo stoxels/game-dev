@@ -31,7 +31,7 @@
     // as this file loads after all other game scripts (guaranteed by index.html).
     function patch(name, wrapper) {
         const orig = window[name];
-        if (typeof orig !== 'function') return; // function missing — skip silently
+        if (typeof orig !== 'function') return; // function missing - skip silently
         window[name] = function (...args) {
             return wrapper(orig.bind(this), args);
         };
@@ -785,7 +785,7 @@
         const colPerm = shuffleArr([...colTexts]);
         for (let c = 0; c < cols; c++) writeLineSpans('col', c, colPerm[c]);
 
-        toast('❔ Uniform Prior: clues scrambled — solve lines to restore them');
+        toast('❔ Uniform Prior: clues scrambled - solve lines to restore them');
     }
 
     function shuffleArr(arr) {
@@ -816,7 +816,7 @@
             for (const c of Object.keys(S.clueOriginals.cols)) writeLineSpans('col', Number(c), S.clueOriginals.cols[c]);
             S.clueOriginals = null;
             revealTiles(3);
-            toast('🌅 Night lifts — clues restored, 3 reveals granted');
+            toast('🌅 Night lifts - clues restored, 3 reveals granted');
         }, 120000);
     }
 
@@ -876,7 +876,7 @@
             ON_START.forEach(fn => { try { fn(); } catch (e) { /* keep other effects alive */ } });
         } catch (e) { /* ignore */ }
         // Chain guarantee: ON_START must run on every chained puzzle in a map.
-        // Do not gate this patch behind _egSuppressEncounterStop — that flag
+        // Do not gate this patch behind _egSuppressEncounterStop - that flag
         // preserves timer/HP across chain puzzles but reveal/mark passives
         // (skyward_survey, entropy_observer, etc.) intentionally re-roll
         // per puzzle. See _egTransitionToChainPuzzle hardening.

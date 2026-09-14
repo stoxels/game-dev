@@ -2,7 +2,7 @@
 //-------------------BOSS: THE ECLIPSE (boss_eclipse)---------------------------
 //------------------------------------------------------------------------
 // Umbral-dash homage: the Eclipse dissolves at the screen's edge and
-// reappears mid-dash — straight at you, from any angle, four times over.
+// reappears mid-dash - straight at you, from any angle, four times over.
 // There is no lane to memorize. There is only the tell, and moving.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)

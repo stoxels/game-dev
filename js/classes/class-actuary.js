@@ -34,19 +34,19 @@ const REGRESSION_CHAIN_LIFETIME_MS = 1000;
 // These are intentionally on `window` so other files can
 // read them without importing this module.
 //
-//   window._mistakeLog            — Array<{r,c,penaltySecs}>  rolling mistake history
-//   window._dofRevertedCells      — Set<string>               cells cleared by Regression
-//   window._regressionPendingReveals — Set<string> | null     reveal targets reserved during a Regression cast
-//   window._sigThreshArmed        — boolean  Significance Threshold armed (next mistake triggers it)
-//   window._sigThreshLines        — Array<string> | null     rank line config applied on trigger ('row','col','diagonals')
-//   window._sigThresholdProtected — Set<string>               currently active shield line keys
+//   window._mistakeLog            - Array<{r,c,penaltySecs}>  rolling mistake history
+//   window._dofRevertedCells      - Set<string>               cells cleared by Regression
+//   window._regressionPendingReveals - Set<string> | null     reveal targets reserved during a Regression cast
+//   window._sigThreshArmed        - boolean  Significance Threshold armed (next mistake triggers it)
+//   window._sigThreshLines        - Array<string> | null     rank line config applied on trigger ('row','col','diagonals')
+//   window._sigThresholdProtected - Set<string>               currently active shield line keys
 
 
 //------------------------------------------------------------------------
 //----------------------------MISTAKE LOG---------------------------------
 //------------------------------------------------------------------------
 
-// actuaryLogMistake — called by applyPenalty() each time a real penalty
+// actuaryLogMistake - called by applyPenalty() each time a real penalty
 // is deducted. Maintains a rolling window of the last ACTUARY_MISTAKE_LOG_MAX
 // mistakes so Regression To Prior can reference them.
 function actuaryLogMistake(r, c, penaltySecs) {
@@ -64,7 +64,7 @@ function actuaryLogMistake(r, c, penaltySecs) {
 // Reverses the N most-recent mistakes, clears their wrong-cell state, and
 // refunds a percentage of the time penalty that was originally deducted.
 
-// _regressionRevertCell — clears a single mistaken cell and triggers its
+// _regressionRevertCell - clears a single mistaken cell and triggers its
 // visual explosion effect. Returns the amount of time (seconds) to recover.
 function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
     // Clear the mistake flag so the red ✕ disappears.
@@ -91,7 +91,7 @@ function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
     return Math.round(penaltySecs * recoverPct);
 }
 
-// _regressionChainRevealCells — picks up to `count` random, still hidden correct
+// _regressionChainRevealCells - picks up to `count` random, still hidden correct
 // cells on the grid, draws a holy golden chain from the corrected mistake cell
 // to each of them and reveals them once the chain has "arrived".
 // Returns how many cells were actually revealed.
@@ -151,7 +151,7 @@ function _regressionChainRevealCells(fromRow, fromCol, count) {
     return targets.length;
 }
 
-// _regressionDrawChain — builds a positioned SVG containing a golden chain
+// _regressionDrawChain - builds a positioned SVG containing a golden chain
 // (marching link pattern with holy glow) between two cell elements.
 function _regressionDrawChain(fromEl, toEl) {
     const fr = fromEl.getBoundingClientRect();
@@ -200,7 +200,7 @@ function _regressionDrawChain(fromEl, toEl) {
     setTimeout(() => _fadeOutElement(svg, 1, 0.05), REGRESSION_CHAIN_LIFETIME_MS);
 }
 
-// _executeRegressionToPrior — main handler for the Regression To Prior ability.
+// _executeRegressionToPrior - main handler for the Regression To Prior ability.
 // Reverts up to `correctCount` recent mistakes, recovers a fraction of lost time
 // and reveals `revealCount` correct cells per corrected mistake (holy chain).
 function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
@@ -268,7 +268,7 @@ function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
     buildClassHUD();
 }
 
-// _regressionCancel — cancels the Regression ability and refunds its cooldown.
+// _regressionCancel - cancels the Regression ability and refunds its cooldown.
 // Pass noOverlayToRemove = true when cancelling silently (e.g. nothing to correct).
 function _regressionCancel(noOverlayToRemove = false) {
     _setAbilityMode(false);
@@ -293,22 +293,22 @@ function _regressionCancel(noOverlayToRemove = false) {
 // Shielded cells show a golden border instead of a shield emoji.
 
 // Line keys stored in window._sigThresholdProtected:
-//   'row:i'    — row i
-//   'col:j'    — column j
-//   'diagA:k'  — diagonal where r - c === k   (↘)
-//   'diagB:k'  — diagonal where r + c === k   (↗)
+//   'row:i'    - row i
+//   'col:j'    - column j
+//   'diagA:k'  - diagonal where r - c === k   (↘)
+//   'diagB:k'  - diagonal where r + c === k   (↗)
 
 
 //------------------------------------------------------------------------
-//--------SIGNIFICANCE THRESHOLD — LINE HELPERS--------------------------
+//--------SIGNIFICANCE THRESHOLD - LINE HELPERS--------------------------
 //------------------------------------------------------------------------
 
-// _sigThreshDiagKeys — returns both diagonal keys crossing cell (row, col).
+// _sigThreshDiagKeys - returns both diagonal keys crossing cell (row, col).
 function _sigThreshDiagKeys(row, col) {
     return [`diagA:${row - col}`, `diagB:${row + col}`];
 }
 
-// _sigThreshIterateLine — calls cb(r, c) for every grid cell on the given
+// _sigThreshIterateLine - calls cb(r, c) for every grid cell on the given
 // line key ('row:i', 'col:j', 'diagA:k' or 'diagB:k').
 function _sigThreshIterateLine(key, cb) {
     if (!cur) return;
@@ -338,7 +338,7 @@ function _sigThreshIterateLine(key, cb) {
     }
 }
 
-// _sigThreshApplyVisual — adds the golden-border shield class to every cell
+// _sigThreshApplyVisual - adds the golden-border shield class to every cell
 // on the given line key.
 function _sigThreshApplyVisual(key) {
     _sigThreshIterateLine(key, (r, c) => {
@@ -346,7 +346,7 @@ function _sigThreshApplyVisual(key) {
     });
 }
 
-// _sigThreshRemoveVisual — removes the golden-border shield class from every
+// _sigThreshRemoveVisual - removes the golden-border shield class from every
 // cell on the given line key (called when the shield charge is consumed).
 function _sigThreshRemoveVisual(key) {
     _sigThreshIterateLine(key, (r, c) => {
@@ -354,7 +354,7 @@ function _sigThreshRemoveVisual(key) {
     });
 }
 
-// _sigThreshLineName — human-readable name for a line key (for toasts).
+// _sigThreshLineName - human-readable name for a line key (for toasts).
 function _sigThreshLineName(key) {
     const [type, idxStr] = key.split(':');
     const n = parseInt(idxStr, 10) + 1;
@@ -365,10 +365,10 @@ function _sigThreshLineName(key) {
 
 
 //------------------------------------------------------------------------
-//--------SIGNIFICANCE THRESHOLD — ARMING & SHIELD APPLICATION------------
+//--------SIGNIFICANCE THRESHOLD - ARMING & SHIELD APPLICATION------------
 //------------------------------------------------------------------------
 
-// _sigThreshApplyShieldsAt — registers every shield line (per rank config)
+// _sigThreshApplyShieldsAt - registers every shield line (per rank config)
 // that passes through cell (row, col) and applies its visuals.
 function _sigThreshApplyShieldsAt(row, col, lines) {
     if (!window._sigThresholdProtected) window._sigThresholdProtected = new Set();
@@ -386,7 +386,7 @@ function _sigThreshApplyShieldsAt(row, col, lines) {
     });
 }
 
-// _sigThreshConsumeShield — consumes a matching shield charge for the given
+// _sigThreshConsumeShield - consumes a matching shield charge for the given
 // key and removes its visual.
 function _sigThreshConsumeShield(matchKey) {
     window._sigThresholdProtected.delete(matchKey);
@@ -400,10 +400,10 @@ function _sigThreshConsumeShield(matchKey) {
 
 
 //------------------------------------------------------------------------
-//--------SIGNIFICANCE THRESHOLD — SHIELD INTERCEPTION-------------------
+//--------SIGNIFICANCE THRESHOLD - SHIELD INTERCEPTION-------------------
 //------------------------------------------------------------------------
 
-// _sigThresholdIntercept — called BEFORE a wrong fill is committed in the
+// _sigThresholdIntercept - called BEFORE a wrong fill is committed in the
 // input handler. Returns true if a shield intercepted the mistake (caller
 // must bail out early). Returns false otherwise.
 //
@@ -418,7 +418,7 @@ function _sigThresholdIntercept(row, col) {
     if (window._sigThreshArmed) {
         window._sigThreshArmed = false;
 
-        // Prevent the mistake — auto-mark the cell as ✕ (value 2).
+        // Prevent the mistake - auto-mark the cell as ✕ (value 2).
         if (userGrid[row][col] === 0) {
             userGrid[row][col] = 2;
             questStat_classMarkUsed(1);
@@ -450,7 +450,7 @@ function _sigThresholdIntercept(row, col) {
 
     if (!matchKey) return false;
 
-    // Shield triggered — auto-mark the cell as ✕ (value 2) instead of a mistake.
+    // Shield triggered - auto-mark the cell as ✕ (value 2) instead of a mistake.
     if (userGrid[row][col] === 0) {
         userGrid[row][col] = 2;
         questStat_classMarkUsed(1);
@@ -460,15 +460,15 @@ function _sigThresholdIntercept(row, col) {
 
     _sigThreshConsumeShield(matchKey);
 
-    return true; // Intercepted — caller should not record a mistake.
+    return true; // Intercepted - caller should not record a mistake.
 }
 
 
 //------------------------------------------------------------------------
-//--------SIGNIFICANCE THRESHOLD — ENTRY POINT---------------------------
+//--------SIGNIFICANCE THRESHOLD - ENTRY POINT---------------------------
 //------------------------------------------------------------------------
 
-// _executeSignificanceThreshold — main handler for the Significance Threshold
+// _executeSignificanceThreshold - main handler for the Significance Threshold
 // ability. Arms the shield: nothing happens until the player's next mistake,
 // which is then blocked and turns into protection for its surrounding lines.
 function _executeSignificanceThreshold(lines) {
@@ -489,7 +489,7 @@ function _executeSignificanceThreshold(lines) {
 //---------------------SHARED COOLDOWN UTILITY----------------------------
 //------------------------------------------------------------------------
 
-// _refundCooldown — clears an active cooldown timer and resets its remaining
+// _refundCooldown - clears an active cooldown timer and resets its remaining
 // time to 0. Used by both Regression and Significance Threshold cancel paths.
 function _refundCooldown(slotId) {
     const cd = cooldownState[slotId];

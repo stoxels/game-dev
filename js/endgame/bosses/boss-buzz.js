@@ -1,29 +1,29 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BUZZSAW (boss_buzz)------------------------
 //------------------------------------------------------------------------
-// REWORK — IWBTG saw homage, rebuilt as a full sawmill gauntlet. The boss
+// REWORK - IWBTG saw homage, rebuilt as a full sawmill gauntlet. The boss
 // floods the arena with spinning steel: ricocheting blades, sweeping cut
-// lines, embedded saw traps and swinging pendulum saws — then, at the very
+// lines, embedded saw traps and swinging pendulum saws - then, at the very
 // end, it spins up and CUTS THE ROOM IN HALF.
 //
-//   Phase 1 (100–60%) — RICOCHET SAWS. Blades are flung in from the screen
+//   Phase 1 (100–60%) - RICOCHET SAWS. Blades are flung in from the screen
 //                       edges straight at you and bounce off the walls up
 //                       to 3 times before embedding themselves in the floor
 //                       as short-lived spinning hazards.
 //                       Plus CUT LINE: a dashed telegraph band stretches
 //                       across the arena, then a giant saw sweeps along it.
 //                       Step out of the band!
-//   Phase 2 ( ≤60%)   — SAW TRAPS. Half a dozen floor positions flash a saw
+//   Phase 2 ( ≤60%)   - SAW TRAPS. Half a dozen floor positions flash a saw
 //                       silhouette, then erupt into spinning blade hazards
 //                       that linger. Ricochets come in pairs.
-//   Phase 3 ( ≤30%)   — PENDULUM BLADES. Two giant saws on chains swing
+//   Phase 3 ( ≤30%)   - PENDULUM BLADES. Two giant saws on chains swing
 //                       from the top of the arena, scything across it.
 //                       Everything else gets faster and meaner.
-//   Finale ( ≤10%)    — THE FINAL CUT (one-shot set-piece): the boss goes
+//   Finale ( ≤10%)    - THE FINAL CUT (one-shot set-piece): the boss goes
 //                       immune and shields and SPINS UP while four toothed
 //                       wall-saws close in from the four screen edges,
 //                       shrinking the safe pocket around the arena centre.
-//                       3…2…1 — CROSSCUT: two colossal blade streaks slash
+//                       3…2…1 - CROSSCUT: two colossal blade streaks slash
 //                       across the full screen in a giant X. Only the tiny
 //                       centre pocket survives. STAY CENTRED! Charge bar
 //                       frozen for the whole set-piece (gate in
@@ -107,7 +107,7 @@ function _egBzGridCenter() {
 
 // Builds one spinning saw blade: a fixed outer dot (translate-positioned)
 // with the metallic blade disc as a CHILD element (rotate animations run on
-// the child — never on the fixed wrapper). size in px.
+// the child - never on the fixed wrapper). size in px.
 function _egBzSawEl(run, size, cls) {
     const dot = _egNkEl(run, 'div', 'eg-nk-dot eg-bz-saw' + (cls ? ' ' + cls : ''));
     const blade = document.createElement('div');
@@ -158,7 +158,7 @@ function _egBzTouch(pct, element, level, label) {
 //-------------------MECHANIC: RICOCHET SAWS--------------------------------
 //------------------------------------------------------------------------
 // Blades are flung in from a random edge, aimed at the player, and bounce
-// off the screen edges up to 3 times — each impact sparks steel — before
+// off the screen edges up to 3 times - each impact sparks steel - before
 // embedding themselves in the floor where they landed as short-lived
 // spinning hazards. Phase 2+ throws pairs, phase 3 throws a trio.
 const EG_BZ_RIC_BOUNCE_MS = 5200;   // max time spent flying before embedding
@@ -174,7 +174,7 @@ function _egMechBzRicochetSaws(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const count = [0, 1, 2, 3][p];
 
-    _egNkToast('eg_mech_bz_ricochet', '🪚 The Buzzsaw: RICOCHET SAWS — watch the bounce!', '#e2e8f0');
+    _egNkToast('eg_mech_bz_ricochet', '🪚 The Buzzsaw: RICOCHET SAWS - watch the bounce!', '#e2e8f0');
 
     const saws = [];
     for (let i = 0; i < count; i++) {
@@ -278,7 +278,7 @@ function _egMechBzCutLine(monster, phase) {
     const cy = Math.max(80, Math.min(window.innerHeight - 80, pc.y + (Math.random() * 2 - 1) * 90));
     const len = Math.hypot(window.innerWidth, window.innerHeight) + 120;
 
-    _egNkToast('eg_mech_bz_cutline', '🪚 The Buzzsaw: CUT LINE — out of the band!', '#fbbf24');
+    _egNkToast('eg_mech_bz_cutline', '🪚 The Buzzsaw: CUT LINE - out of the band!', '#fbbf24');
 
     const band = document.createElement('div');
     band.className = 'eg-bz-cutband';
@@ -338,7 +338,7 @@ function _egMechBzCutLine(monster, phase) {
 //------------------------------------------------------------------------
 // Half a dozen floor positions flash a saw silhouette for a windup, then
 // erupt into embedded spinning blade hazards that linger a while. The run
-// is PASSIVE (field hazard — never blocks other mechanics).
+// is PASSIVE (field hazard - never blocks other mechanics).
 const EG_BZ_TRAP_COUNT = [0, 0, 5, 7];
 const EG_BZ_TRAP_WINDUP_MS = 2400;
 const EG_BZ_TRAP_LIFE_MS = 8000;
@@ -352,7 +352,7 @@ function _egMechBzSawTraps(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const count = EG_BZ_TRAP_COUNT[p];
 
-    _egNkToast('eg_mech_bz_traps', '🪚 The Buzzsaw: SAW TRAPS erupting — mind the floor!', '#fbbf24');
+    _egNkToast('eg_mech_bz_traps', '🪚 The Buzzsaw: SAW TRAPS erupting - mind the floor!', '#fbbf24');
 
     const traps = [];
     for (let i = 0; i < count; i++) {
@@ -429,7 +429,7 @@ function _egMechBzPendulumBlades(monster, phase) {
     const run = _egNkNewRun(monster && monster.id, true);
     const W = window.innerWidth;
 
-    _egNkToast('eg_mech_bz_pendulum', '🪚 The Buzzsaw: PENDULUM BLADES — time the arcs!', '#e2e8f0');
+    _egNkToast('eg_mech_bz_pendulum', '🪚 The Buzzsaw: PENDULUM BLADES - time the arcs!', '#e2e8f0');
 
     const mkPend = (xCtr, phaseOff) => {
         const wrap = document.createElement('div');
@@ -487,7 +487,7 @@ function _egMechBzPendulumBlades(monster, phase) {
 //------------------------------------------------------------------------
 // The boss goes immune + shielded and SPINS UP while four toothed wall-saws
 // close in from the four screen edges over a 3…2…1 countdown, shrinking the
-// safe pocket around the arena centre. At zero: CROSSCUT — two colossal
+// safe pocket around the arena centre. At zero: CROSSCUT - two colossal
 // blade streaks slash across the full screen in a giant X. Only the centre
 // pocket survives. Charge bar frozen for the whole set-piece (gate in
 // _egTickPlayer via _egBzFinalActive).
@@ -599,11 +599,11 @@ function _egBzFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-bz-cd-label">🪚 THE FINAL CUT</div>' +
         '<div class="eg-bz-cd-num eg-bz-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-bz-cd-hint">The walls are closing in — hold the CENTRE pocket!</div>';
+        '<div class="eg-bz-cd-hint">The walls are closing in - hold the CENTRE pocket!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_bz_final_cd', '🪚💀 THE FINAL CUT — hold the centre!', '#e2e8f0');
+    _egNkToast('eg_mech_bz_final_cd', '🪚💀 THE FINAL CUT - hold the centre!', '#e2e8f0');
 
     // Boss immunity so the set-piece reads as a hold (released at the end).
     monster.bossImmune = true;
@@ -733,7 +733,7 @@ function _egBzFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egBzTeardown() {
     if (_egBzFinal) { try { _egBzFinalEnd(_egBzFinal); } catch (e) {} _egBzFinal = null; }
@@ -754,8 +754,8 @@ function _egBzTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_BZ_DEBUG.fire('ricochet'|'cut'|'traps'|'pendulum') — runs one now
-//   _EG_BZ_DEBUG.final()                                   — FINAL CUT now
+//   _EG_BZ_DEBUG.fire('ricochet'|'cut'|'traps'|'pendulum') - runs one now
+//   _EG_BZ_DEBUG.final()                                   - FINAL CUT now
 if (typeof window !== 'undefined') {
     window._EG_BZ_DEBUG = {
         fire: (name, phase) => {

@@ -48,6 +48,15 @@ function updateLangButtons(lang) {
 
 // Finds all elements marked with data-t and writes their translated string into innerHTML.
 // Skips elements where the translation key has no match, to avoid overwriting fallback content.
+
+// Title-screen buttons show text WITHOUT the leading emoji/icon glyphs that the
+// shared translation strings carry (btn_settings etc. are also used by the pause
+// menu, which keeps its icons). Anything before the first letter/digit is stripped
+// for labels inside .title-overlay-btn - also the shared fallback strings.
+function stripTitleButtonIcon(html) {
+    return html.replace(/^\s*[^\p{L}\p{N}]+/u, '');
+}
+
 function applyTranslationsToDOM() {
     document.querySelectorAll('[data-t]').forEach(el => {
         const key = el.getAttribute('data-t');
@@ -59,6 +68,10 @@ function applyTranslationsToDOM() {
     // Re-fill {k*} keybind placeholders (How-To-Play CONTROLS etc.) with
     // the player's current bindings for the newly active language.
     if (typeof tutUpdateKeybinds === 'function') tutUpdateKeybinds();
+    // Title labels render without their icon glyphs (see stripTitleButtonIcon).
+    document.querySelectorAll('.title-overlay-btn .btn-label').forEach(el => {
+        el.innerHTML = stripTitleButtonIcon(el.innerHTML);
+    });
 }
 
 

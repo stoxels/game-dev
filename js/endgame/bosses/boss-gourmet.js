@@ -3,31 +3,31 @@
 //------------------------------------------------------------------------
 // A rework of the old one-shot Gourmet Gulp into a persistent tasting
 // menu. The Gourmet is a great gourmand that hovers around the table and
-// treats YOU as the main course. Fight identity: APPETITE — it pulls,
+// treats YOU as the main course. Fight identity: APPETITE - it pulls,
 // plates, and devours; everything it eats makes it stronger.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE GOURMAND — the boss's arena body: a giant 👄 mouth drifting
+//   • THE GOURMAND - the boss's arena body: a giant 👄 mouth drifting
 //     around the table. Touching it is a CHOMP: animated fling + physical
-//     damage — and it heals 1% from the bite (it's eating you).
-//   • AROMA INHALE — every few seconds the mouth inhales: a dashed aroma
+//     damage - and it heals 1% from the bite (it's eating you).
+//   • AROMA INHALE - every few seconds the mouth inhales: a dashed aroma
 //     telegraph blooms, then a suction current drags you toward the maw.
 //     When the breath ends it SPITS a fan of food (🍖🍗🧀) back at you.
-//   • SIZZLING PLATE — a roaming 🍳 hot plate slides across the table,
+//   • SIZZLING PLATE - a roaming 🍳 hot plate slides across the table,
 //     leaving grease-fire trails that burn anyone standing in them.
 //
-//   60% GATE — DINNER SERVICE: three giant cloches 🍽️ slam down on
+//   60% GATE - DINNER SERVICE: three giant cloches 🍽️ slam down on
 //   telegraphed rings in sequence, flinging anyone under them and leaving
 //   bubbling grease pools behind.
 //
-//   30% GATE — BANQUET TOSS: the Gourmet gorges — columns telegraph, then
+//   30% GATE - BANQUET TOSS: the Gourmet gorges - columns telegraph, then
 //   dessert courses (🍰🧁🎂) rain down in staggered waves. Pure dodge
 //   pressure, phase-scaled.
 //
-//   CHARGE ATTACK — DEVOUR: the maw locks onto you, then inhales hard
+//   CHARGE ATTACK - DEVOUR: the maw locks onto you, then inhales hard
 //   (strong suction, visible maw ring = the danger zone). When the breath
 //   ends, everything still inside the ring is eaten: heavy damage + fling.
-//   The counterplay is fighting the suction — get out before the swallow.
+//   The counterplay is fighting the suction - get out before the swallow.
 //
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -36,7 +36,7 @@
 //
 // Shared mechanics live in shared-boss-abilities.js and are referenced
 // by handler-name string. Damage flows through the shared tier curve.
-// NOTE: exactly ONE _egNkLoop runs on the watcher's run — every state
+// NOTE: exactly ONE _egNkLoop runs on the watcher's run - every state
 // machine (inhale, cloches, banquet, devour) lives in that single tick.
 //------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            // Kept for schedule compatibility — the persistent watcher now
+            // Kept for schedule compatibility - the persistent watcher now
             // owns the inhale/spit cadence; the handler no-ops (same shim
             // pattern as the other reworked bosses).
             { name: 'gourmet_gulp', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechGourmetGulp' },
@@ -118,7 +118,7 @@ const EG_GMT_DEVOUR_FLING = [0, 190, 215, 240];
 
 let _egGourmetWatcher = null; // per-fight kitchen state
 
-// Phase lookup helper — resolves the boss's current phase (default 1).
+// Phase lookup helper - resolves the boss's current phase (default 1).
 function _egGmtPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
         const m = _egMonsters.find(x => x && x.id === st.monsterId);
@@ -127,7 +127,7 @@ function _egGmtPhase(st) {
     return 1;
 }
 
-// Boss heal (absolute % of its max) — the Gourmet gets stronger by eating.
+// Boss heal (absolute % of its max) - the Gourmet gets stronger by eating.
 function _egGmtHealBoss(monster, pct) {
     try {
         if (!monster || !monster.maxHP) return;
@@ -417,7 +417,7 @@ function _egGourmetArenaInit(monster) {
                     dv.el.classList.add('sucking');
                 }
             } else if (dv.phase === 'suck') {
-                // Strong suction into the maw — fight it or be eaten.
+                // Strong suction into the maw - fight it or be eaten.
                 const c5 = _egNkPlayerCenter();
                 if (c5) {
                     const dx = mh.x - c5.x, dy = mh.y - c5.y;
@@ -518,14 +518,14 @@ function _egGmtDropDish(st, W) {
 
 
 // ── Charge attack: Devour ────────────────────────────────────────────────
-// The maw locks on, then inhales hard — the ring shows the swallow radius.
+// The maw locks on, then inhales hard - the ring shows the swallow radius.
 // Fight the suction and be outside the ring when the breath ends.
 function _egGourmetDevour(monster) {
     const st = _egGourmetWatcher;
     if (!st || st.devour || _egNkDodgeBusy() || _egNkFrozen()) return;
     const el = _egNkEl(st.run, 'div', 'eg-gmt-maw');
     st.devour = { phase: 'lock', t: 0, el };
-    _egNkToast('eg_gmt_devour', '👄 DEVOUR! Fight the suction — get out of the ring!');
+    _egNkToast('eg_gmt_devour', '👄 DEVOUR! Fight the suction - get out of the ring!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gourmet_bite'); } catch (e) {}
 }
 
@@ -533,7 +533,7 @@ function _egGourmetDevour(monster) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent inhale/spit cadence —
+// The old scheduled mechanic is now the persistent inhale/spit cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
 function _egMechGourmetGulp(monster, phase) { void monster; void phase; }

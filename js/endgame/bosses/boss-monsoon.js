@@ -1,29 +1,29 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MONSOON (boss_monsoon)---------------------
 //------------------------------------------------------------------------
-// REWORK — torrential-storm homage, rebuilt as a full flooding season. The
+// REWORK - torrential-storm homage, rebuilt as a full flooding season. The
 // sky opens: diagonal rain curtains pour, thunderbolts hammer the marks,
-// hail pelts wherever you were — and the water itself rises. At the very
+// hail pelts wherever you were - and the water itself rises. At the very
 // end, the levee fails: THE GREAT FLOOD.
 //
-//   Phase 1 (100–60%) — RAIN BANDS. Diagonal rain curtains telegraph near
+//   Phase 1 (100–60%) - RAIN BANDS. Diagonal rain curtains telegraph near
 //                       your position, then pour for a few seconds. Stay
 //                       out of the curtains!
 //                       Plus THUNDERBOLTS. Golden marks flash and lightning
 //                       strikes each one, staggered across the sky. Clear
 //                       the circles!
-//   Phase 2 ( ≤60%)   — STORM SURGE. The water rises from the bottom and
-//                       holds — everything submerged takes repeated hits —
+//   Phase 2 ( ≤60%)   - STORM SURGE. The water rises from the bottom and
+//                       holds - everything submerged takes repeated hits -
 //                       then recedes. Climb!
 //                       Plus HAIL BARRAGE. Hailstones drop onto marked
 //                       spots, most aimed near where you were. Keep moving!
-//   Phase 3 ( ≤30%)   — Higher surges, more bolts, denser hail, a third
+//   Phase 3 ( ≤30%)   - Higher surges, more bolts, denser hail, a third
 //                       curtain. The sky is not finished with you.
-//   Finale ( ≤10%)    — THE GREAT FLOOD (one-shot set-piece): the boss goes
+//   Finale ( ≤10%)    - THE GREAT FLOOD (one-shot set-piece): the boss goes
 //                       immune and shielded and CHURNS while a storm
 //                       swallows the arena and the water rises in three
 //                       surges (30% → 55% → 78%). On every beat a dry
-//                       ISLAND hops to a fresh spot in the high ground —
+//                       ISLAND hops to a fresh spot in the high ground -
 //                       reach it before the next surge! Then THE BREAK: the
 //                       flood swallows everything except the final island.
 //                       CLIMB! Charge bar frozen for the whole set-piece
@@ -102,7 +102,7 @@ function _egMnTouch(pct, level, label) {
     return true;
 }
 
-// One expanding ring (impact/splash) at (x, y) — body-level visual.
+// One expanding ring (impact/splash) at (x, y) - body-level visual.
 function _egMnRing(x, y, cls, lifeMs, run, timers) {
     const el = document.createElement('div');
     el.className = 'eg-mn-icyring' + (cls ? ' ' + cls : '');
@@ -119,7 +119,7 @@ function _egMnRing(x, y, cls, lifeMs, run, timers) {
 //-------------------MECHANIC: RAIN BANDS-----------------------------------
 //------------------------------------------------------------------------
 // Diagonal rain curtains telegraph near the player, then pour for a few
-// seconds — standing inside a curtain stings repeatedly. Phase 1 sends
+// seconds - standing inside a curtain stings repeatedly. Phase 1 sends
 // two, later phases three, all faster.
 const EG_MN_BAND_W    = 92;
 const EG_MN_BAND_LIFE = 3000;
@@ -151,7 +151,7 @@ function _egMechMnRainBands(monster, phase) {
         bands.push({ cx, cy, ang, el, live: false, faded: false });
     }
 
-    _egNkToast('eg_mech_monsoon', '🌧️ The Monsoon: RAIN BANDS — out of the curtains!', '#e2e8f0');
+    _egNkToast('eg_mech_monsoon', '🌧️ The Monsoon: RAIN BANDS - out of the curtains!', '#e2e8f0');
 
     let t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -221,7 +221,7 @@ function _egMechMnThunderbolts(monster, phase) {
         strikes.push({ x, y, warn, at: warnMs + strikes.length * gapMs, done: false });
     }
 
-    _egNkToast('eg_mech_mn_bolts', '🌧️ The Monsoon: THUNDERBOLTS — clear of the marks!', '#e2e8f0');
+    _egNkToast('eg_mech_mn_bolts', '🌧️ The Monsoon: THUNDERBOLTS - clear of the marks!', '#e2e8f0');
 
     let t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -251,9 +251,9 @@ function _egMechMnThunderbolts(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: STORM SURGE (field, passive)-----------------
 //------------------------------------------------------------------------
-// The water rises from the bottom of the arena and holds — everything
-// submerged takes repeated hits — then recedes. The run is PASSIVE (field
-// hazard — never blocks other mechanics).
+// The water rises from the bottom of the arena and holds - everything
+// submerged takes repeated hits - then recedes. The run is PASSIVE (field
+// hazard - never blocks other mechanics).
 const EG_MN_SURGE_PEAK = [0, 0, 0.34, 0.42];
 const EG_MN_SURGE_RISE = 3500;
 const EG_MN_SURGE_HOLD = 2600;
@@ -277,7 +277,7 @@ function _egMechMnStormSurge(monster, phase) {
     document.body.appendChild(water);
     run.els.push(water);
 
-    _egNkToast('eg_mech_mn_surge', '🌧️ The Monsoon: STORM SURGE — the water is rising!', '#e2e8f0');
+    _egNkToast('eg_mech_mn_surge', '🌧️ The Monsoon: STORM SURGE - the water is rising!', '#e2e8f0');
 
     let t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -307,7 +307,7 @@ function _egMechMnStormSurge(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: HAIL BARRAGE (phase 2+)----------------------
 //------------------------------------------------------------------------
-// Hailstones drop onto marked spots — most aimed near where the player was
+// Hailstones drop onto marked spots - most aimed near where the player was
 // when the volley started. The stone falls during the warn, then impacts.
 const EG_MN_HAIL_COUNT = [0, 0, 7, 10];
 const EG_MN_HAIL_R     = 30;
@@ -323,7 +323,7 @@ function _egMechMnHailBarrage(monster, phase) {
     const emitMs = 2600 * _EG_MN_DEBUG_MULT;
     const dmgPct = EG_MN_HAIL_DMG[p];
 
-    _egNkToast('eg_mech_mn_hail', '🌧️ The Monsoon: HAIL BARRAGE — mind the marks!', '#e2e8f0');
+    _egNkToast('eg_mech_mn_hail', '🌧️ The Monsoon: HAIL BARRAGE - mind the marks!', '#e2e8f0');
 
     const drops = [];
     let emitted = 0, emitAcc = 0, touchCd = 0;
@@ -379,7 +379,7 @@ function _egMechMnHailBarrage(monster, phase) {
 // The boss goes immune + shielded and CHURNS while a storm swallows the
 // arena and the water rises in three surges (30% → 55% → 78% of the
 // screen). On every beat a dry ISLAND hops to a fresh spot in the high
-// ground — be on it when the surge lands! Then THE BREAK: the flood
+// ground - be on it when the surge lands! Then THE BREAK: the flood
 // swallows everything except the final island. Charge bar frozen for the
 // whole set-piece (gate in _egTickPlayer via _egMnFinalActive).
 const EG_MN_FINAL_TICK_MS = 1200;
@@ -500,7 +500,7 @@ function _egMnFinalStart(monster) {
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_mn_final_cd', '🌊💀 THE GREAT FLOOD — climb to the island!', '#e2e8f0');
+    _egNkToast('eg_mech_mn_final_cd', '🌊💀 THE GREAT FLOOD - climb to the island!', '#e2e8f0');
 
     // Boss immunity so the set-piece reads as a deluge (released at the end).
     monster.bossImmune = true;
@@ -518,7 +518,7 @@ function _egMnFinalStart(monster) {
 
     // Metronome: each beat the water surges to the next stage and clips
     // everyone below the new waterline (except the island). At zero: THE
-    // BREAK — the flood swallows everything except the island. Pause /
+    // BREAK - the flood swallows everything except the island. Pause /
     // death / inactive hold the count (debug: extra-long beats).
     const cdTick = EG_MN_FINAL_TICK_MS * (_EG_MN_DEBUG_SLOW ? 8 : 1);
     g.cdTimer = setInterval(() => {
@@ -596,7 +596,7 @@ function _egMnFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egMnTeardown() {
     if (_egMnFinal) { try { _egMnFinalEnd(_egMnFinal); } catch (e) {} _egMnFinal = null; }
@@ -618,8 +618,8 @@ function _egMnTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_MN_DEBUG.fire('bands'|'bolts'|'surge'|'hail') — runs one now
-//   _EG_MN_DEBUG.final()                              — THE GREAT FLOOD now
+//   _EG_MN_DEBUG.fire('bands'|'bolts'|'surge'|'hail') - runs one now
+//   _EG_MN_DEBUG.final()                              - THE GREAT FLOOD now
 if (typeof window !== 'undefined') {
     window._EG_MN_DEBUG = {
         fire: (name, phase) => {

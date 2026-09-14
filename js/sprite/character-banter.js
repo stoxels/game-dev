@@ -12,7 +12,7 @@
 // This file owns:
 //   - the line bank (_BANTER_LINES)
 //   - the bubble DOM element (create / position / show / hide)
-//   - triggerBanter(eventKey, ctx) — the single public entry point
+//   - triggerBanter(eventKey, ctx) - the single public entry point
 //   - cooldown + chance gating so lines don't spam every tick
 //
 // All other files just call triggerBanter('some_event') at the moment
@@ -29,6 +29,58 @@
 
 const _BANTER_LINES = {
     stox: {
+        tutorial_reply: [
+            { en: "Understood. The clues are the axioms; the grid is the proof.", de: "Verstanden. Die Hinweise sind die Axiome; das Gitter der Beweis." },
+            { en: "Noted. I'll keep the error margin at zero.", de: "Notiert. Ich halte die Fehlermarge bei null." },
+            { en: "A sound theorem. Proceeding accordingly.", de: "Ein solides Theorem. Ich verfahre entsprechend." },
+            { en: "The Professor's methods align with the archive's. Good.", de: "Die Methoden des Professors decken sich mit denen des Archivs. Gut." },
+            { en: "Hypothesis accepted. Testing now.", de: "Hypothese akzeptiert. Teste jetzt." },
+            { en: "On my way. Estimated arrival: shortly.", de: "Ich bin unterwegs. Geschätzte Ankunft: gleich." },
+            { en: "Acknowledged. Proceeding with the demonstration.", de: "Zur Kenntnis genommen. Ich führe die Demonstration fort." },
+            { en: "The methodology is sound. Continuing.", de: "Die Methodik ist solide. Ich mache weiter." },
+            { en: "That tracks. The archive will hear about this.", de: "Das passt. Das Archiv wird davon hören." },
+            { en: "Understood. My error bars just shrank.", de: "Verstanden. Meine Fehlerbalken sind gerade geschrumpft." },
+            { en: "Sensible. I've logged it in the margin.", de: "Sinnvoll. Habe ich am Rand notiert." },
+            { en: "Very well. Onwards to the next variable.", de: "Nun gut. Weiter zur nächsten Variablen." },
+        ],
+        tutorial_solve: [
+            { en: "Q.E.D. As expected.", de: "Q.E.D. Wie erwartet." },
+            { en: "The proof closed cleanly.", de: "Der Beweis schloss sich sauber." },
+            { en: "Deduction confirmed. Next axiom, please.", de: "Deduktion bestätigt. Nächstes Axiom, bitte." },
+            { en: "Solution verified. Margin of error: zero.", de: "Lösung verifiziert. Fehlertoleranz: null." },
+            { en: "As predicted. A satisfying derivation.", de: "Wie vorhergesagt. Eine befriedigende Herleitung." },
+            { en: "Consistent with the model. Naturally.", de: "Konsistent mit dem Modell. Selbstverständlich." },
+            { en: "Clean solve. I'd give it a 9.8.", de: "Sauber gelöst. Ich gebe 9,8 Punkte." },
+            { en: "The grid yields to rigorous deduction.", de: "Das Gitter ergibt sich strikter Deduktion." },
+            { en: "Another proof for the archive.", de: "Noch ein Beweis fürs Archiv." },
+            { en: "Converged on the first try. Expected.", de: "Beim ersten Versuch konvergiert. Erwartet." },
+        ],
+        tutorial_mistake: [
+            { en: "An outlier. Recalculating.", de: "Ein Ausreißer. Ich berechne neu." },
+            { en: "Error logged. It will not repeat.", de: "Fehler protokolliert. Er wiederholt sich nicht." },
+            { en: "A regrettable sample. Noted.", de: "Eine bedauerliche Stichprobe. Notiert." },
+            { en: "Hypothesis rejected. Adjusting approach.", de: "Hypothese verworfen. Ich passe an." },
+            { en: "That cell lied to me. Noted.", de: "Diese Zelle hat gelogen. Notiert." },
+            { en: "A rounding error in my logic.", de: "Ein Rundungsfehler in meiner Logik." },
+            { en: "Recalculating. The grid remains indifferent.", de: "Neuberechnung läuft. Das Gitter bleibt gleichgültig." },
+            { en: "Statistically, that had to happen once.", de: "Statistisch musste das einmal passieren." },
+            { en: "Improbable, yet here we are.", de: "Unwahrscheinlich, und trotzdem passiert." },
+            { en: "Revising the inference. Give me a moment.", de: "Ich überarbeite den Schluss. Einen Moment." },
+        ],
+        tutorial_cheer: [
+            { en: "Target eliminated. Statistically inevitable.", de: "Ziel eliminiert. Statistisch unvermeidlich." },
+            { en: "The fireball followed its trajectory precisely.", de: "Der Feuerball folgte seiner Bahn exakt." },
+            { en: "Combat resolved within expected parameters.", de: "Kampf innerhalb der erwarteten Parameter beendet." },
+            { en: "Eliminated. The probability mass collapses.", de: "Eliminiert. Die Wahrscheinlichkeitsmasse kollabiert." },
+            { en: "Precisely as the model predicted.", de: "Genau wie das Modell es vorhersagte." },
+            { en: "One fewer unknown in the system.", de: "Eine Unbekannte weniger im System." },
+            { en: "A textbook execution.", de: "Eine lehrbuchreife Ausführung." },
+        ],
+        tutorial_farewell: [
+            { en: "Tutorial complete. Stox signs off - the archive awaits.", de: "Tutorial abgeschlossen. Stox meldet sich ab - das Archiv wartet." },
+            { en: "All hypotheses verified. This was Stox, over and out.", de: "Alle Hypothesen verifiziert. Hier war Stox, bis zum nächsten Mal." },
+            { en: "End of the lesson series. Stox will now apply the theory. Alone. Preferably.", de: "Ende der Lektionen. Stox wird die Theorie nun anwenden. Allein. Vorzugsweise." },
+        ],
         level_start: [
             { en: "Let's see the distribution of this one.", de: "Schauen wir uns die Verteilung an." },
             { en: "Hypothesis: solvable. Let's test it.", de: "Hypothese: lösbar. Testen wir das." },
@@ -152,6 +204,58 @@ const _BANTER_LINES = {
     },
 
     trix: {
+        tutorial_reply: [
+            { en: "Obviously. I knew that already.", de: "Offensichtlich. Das wusste ich schon." },
+            { en: "Yes, yes - I've read the Codex too, Professor.", de: "Ja, ja - ich hab den Kodex auch gelesen, Professor." },
+            { en: "Please. I could teach this lesson.", de: "Bitte. Diese Lektion könnte ich unterrichten." },
+            { en: "Fine, fine. Let's get to the interesting part.", de: "Schon gut, schon gut. Kommen wir zum interessanten Teil." },
+            { en: "I was just about to say that.", de: "Genau das wollte ich gerade sagen." },
+            { en: "Coming, coming. Don't rush me.", de: "Ich komme ja schon. Drängel nicht." },
+            { en: "Obviously. I was two steps ahead.", de: "Offensichtlich. Ich war zwei Schritte voraus." },
+            { en: "I had already deduced that. Out loud, even.", de: "Das hatte ich schon geschlossen. Auch laut." },
+            { en: "You're stalling, Professor. I like it.", de: "Du zögerst, Professor. Gefällt mir." },
+            { en: "Fine. The lecture was almost worthy of me.", de: "Na gut. Die Vorlesung war fast würdig von mir." },
+            { en: "Heard it. Mastered it. Next.", de: "Gehört. Gemeistert. Weiter." },
+            { en: "The Codex covered this. But go on.", de: "Der Kodex behandelt das. Aber fahr fort." },
+        ],
+        tutorial_solve: [
+            { en: "Obviously. Next.", de: "Offensichtlich. Weiter." },
+            { en: "Told you. Too easy.", de: "Ich hab's doch gesagt. Zu einfach." },
+            { en: "That one barely deserved my attention.", de: "Das hier hat meine Aufmerksamkeit kaum verdient." },
+            { en: "Done. What's next?", de: "Fertig. Was kommt als Nächstes?" },
+            { en: "See? Natural talent.", de: "Siehst du? Naturtalent." },
+            { en: "Flawless, as promised.", de: "Makellos, wie versprochen." },
+            { en: "Was that supposed to be hard?", de: "Sollte das schwer sein?" },
+            { en: "Someone frame that grid.", de: "Rahmt dieses Raster ein." },
+            { en: "I make solving look like an art form.", de: "Ich lasse Lösen wie eine Kunstform aussehen." },
+            { en: "First try. As always.", de: "Erster Versuch. Wie immer." },
+        ],
+        tutorial_mistake: [
+            { en: "That was a test. Obviously.", de: "Das war ein Test. Offensichtlich." },
+            { en: "Ugh. The grid tricked me. Never again.", de: "Igitt. Das Raster hat mich reingelegt. Nie wieder." },
+            { en: "I meant to do that. Almost.", de: "Das wollte ich so. Fast." },
+            { en: "Nobody saw that. Right?", de: "Das hat keiner gesehen. Oder?" },
+            { en: "The grid started it.", de: "Das Raster hat angefangen." },
+            { en: "A bold move. Sadly misread.", de: "Ein kühner Zug. Leider missverstanden." },
+            { en: "That mistake is beneath my pay grade.", de: "Dieser Fehler ist unter meinem Gehalt." },
+            { en: "Shh. We don't speak of this cell.", de: "Pst. Über diese Zelle sprechen wir nicht." },
+            { en: "Even my errors look stylish.", de: "Sogar meine Fehler sehen stilvoll aus." },
+            { en: "I'll fix that in post.", de: "Das retuschiere ich nachträglich." },
+        ],
+        tutorial_cheer: [
+            { en: "And THAT is how it's done.", de: "Und SO macht man das." },
+            { en: "Down already? Fetch me something harder.", de: "Schon besiegt? Bringt mir was Härteres." },
+            { en: "I don't even need the Professor for this.", de: "Dafür brauche ich nicht einmal den Professor." },
+            { en: "One down. The rest should be nervous.", de: "Einer weniger. Der Rest sollte nervös werden." },
+            { en: "Too easy. I yawned mid-spell.", de: "Zu einfach. Ich hab mittendrin gegähnt." },
+            { en: "The highlight of this lesson was me.", de: "Der Höhepunkt dieser Lektion war ich." },
+            { en: "Legendary execution. Naturally.", de: "Legendäre Ausführung. Natürlich." },
+        ],
+        tutorial_farewell: [
+            { en: "Graduated with top marks, obviously. Trix never misses.", de: "Mit Bestnoten bestanden, offensichtlich. Trix verfehlt nie." },
+            { en: "That's Trix - first try, every time. The Professor knows by now.", de: "Das ist Trix - erster Versuch, jedes Mal. Das weiß der Professor inzwischen." },
+            { en: "Remember what you saw today. The name is Trix.", de: "Denk dran, was du heute gesehen hast. Der Name ist Trix." },
+        ],
         level_start: [
             { en: "Oh please, this one's basically solved already.", de: "Bitte, das hier ist quasi schon gelöst." },
             { en: "Watch and learn.", de: "Schau und lern." },
@@ -161,7 +265,7 @@ const _BANTER_LINES = {
             { en: "I've broken into harder things than this.", de: "Ich hab schon härtere Sachen geknackt als das." },
             { en: "The Warden thought he was clever too. He wasn't.", de: "Der Warden dachte auch, er wäre clever. War er nicht." },
             { en: "Another lock. Another key I'll find.", de: "Noch ein Schloss. Noch ein Schlüssel, den ich finden werde." },
-            { en: "Try to keep up. Actually — don't bother, I'm fast.", de: "Versuch mitzuhalten. Ach eigentlich — lass es, ich bin schnell." },
+            { en: "Try to keep up. Actually - don't bother, I'm fast.", de: "Versuch mitzuhalten. Ach eigentlich - lass es, ich bin schnell." },
             { en: "I could solve this blindfolded. But where's the show in that?", de: "Könnte das blind lösen. Aber wo bleibt da die Show?" },
             { en: "One look and I already know how this ends. Spoiler: I win.", de: "Ein Blick und ich weiß schon, wie's ausgeht. Spoiler: Ich gewinne." },
             { en: "The Guild's best trainees studied under me. True story.", de: "Die besten Azubis der Gilde haben bei mir gelernt. Wahre Geschichte." },
@@ -182,7 +286,7 @@ const _BANTER_LINES = {
         ],
         mistake_streak: [
             { en: "Okay, dummy... maybe just let me handle this.", de: "Okay, Dummerchen... lass mich das vielleicht einfach machen." },
-            { en: "Wow. Just— wow. Move over.", de: "Wow. Einfach... wow. Mach Platz." },
+            { en: "Wow. Just- wow. Move over.", de: "Wow. Einfach... wow. Mach Platz." },
             { en: "Are you doing this on purpose?", de: "Machst du das mit Absicht?" },
             { en: "Okay, I'm taking over now.", de: "Okay, ich übernehme jetzt." },
             { en: "This is painful to watch.", de: "Das ist schmerzhaft anzusehen." },
@@ -273,6 +377,59 @@ const _BANTER_LINES = {
     },
 
     syla: {
+        tutorial_reply: [
+            { en: "Okay! I'll do my best, Professor!", de: "Okay! Ich gebe mein Bestes, Professor!" },
+            { en: "Wow, that makes so much sense now!", de: "Wow, das ergibt jetzt so viel Sinn!" },
+            { en: "Got it! Thank you for explaining!", de: "Verstanden! Danke für die Erklärung!" },
+            { en: "I'll try really hard, I promise!", de: "Ich werde mich wirklich anstrengen, versprochen!" },
+            { en: "This is fun! Let's keep going!", de: "Das macht Spaß! Weiter geht's!" },
+            { en: "Coming! I'm on my way, Professor!", de: "Ich komme! Bin schon unterwegs, Professor!" },
+            { en: "Ooh, clever! I'll remember that!", de: "Ooh, clever! Das merke ich mir!" },
+            { en: "Wait, wait - I was just about to try that!", de: "Moment, moment - das wollte ich gerade ausprobieren!" },
+            { en: "You explain it so nicely, Professor!", de: "Du erklärst das so schön, Professor!" },
+            { en: "A-ha! So THAT'S how it works!", de: "A-ha! SO funktioniert das also!" },
+            { en: "Okay okay, deep breath... got it!", de: "Okay okay, tief durchatmen... verstanden!" },
+            { en: "I'm listening! Mostly!", de: "Ich höre zu! Größtenteils!" },
+            { en: "Notes taken! In my head!", de: "Notizen gemacht! In meinem Kopf!" },
+        ],
+        tutorial_solve: [
+            { en: "We did it! That felt amazing!", de: "Wir haben es geschafft! Das fühlte sich toll an!" },
+            { en: "Solved it! Professor, did you see?!", de: "Gelöst! Professor, hast du das gesehen?!" },
+            { en: "Yes! The picture is so pretty!", de: "Ja! Das Bild ist so hübsch!" },
+            { en: "I knew we could do it together!", de: "Ich wusste, dass wir das zusammen schaffen!" },
+            { en: "Wooo! Somebody celebrate with me!", de: "Wooo! Feiert mal jemand mit mir!" },
+            { en: "Take that, tricky grid!", de: "Nimm das, gemeines Raster!" },
+            { en: "I want to frame this picture!", de: "Dieses Bild möchte ich einrahmen!" },
+            { en: "My heart is doing a happy dance!", de: "Mein Herz macht einen Freudentanz!" },
+            { en: "That was the best cell ever!", de: "Das war die schönste Zelle aller Zeiten!" },
+            { en: "See? Teamwork! Mostly mine!", de: "Siehst du? Teamwork! Größtenteils meins!" },
+        ],
+        tutorial_mistake: [
+            { en: "Oops... sorry, Professor.", de: "Ups... tut mir leid, Professor." },
+            { en: "Ah no! I'll be more careful, promise!", de: "Ach nein! Ich passe besser auf, versprochen!" },
+            { en: "That one stung. But I'll learn from it!", de: "Das hat wehgetan. Aber ich lerne daraus!" },
+            { en: "Eek! Sorry! It won't happen again!", de: "Igitt! Entschuldigung! Das passiert nicht wieder!" },
+            { en: "The grid bit me! Rude!", de: "Das Raster hat mich gebissen! Gemein!" },
+            { en: "That cell is a meanie.", de: "Diese Zelle ist gemein." },
+            { en: "Not my proudest moment.", de: "Nicht mein stolzester Moment." },
+            { en: "Ahh, I almost had it!", de: "Ahh, ich hatte es fast!" },
+            { en: "Deep breaths. Deep breaths.", de: "Ruhig bleiben. Ruhig bleiben." },
+            { en: "One tiny whoopsie. That's all!", de: "Ein winziges Ups. Mehr nicht!" },
+        ],
+        tutorial_cheer: [
+            { en: "We got it! Take that!", de: "Wir haben es! Nimm das!" },
+            { en: "Yay! The fireball was so pretty!", de: "Juhu! Der Feuerball war so hübsch!" },
+            { en: "Gotcha! That was so cool!", de: "Erwischt! Das war so cool!" },
+            { en: "Bye-bye, monster! Nothing personal!", de: "Tschüss, Monster! Nicht persönlich genommen!" },
+            { en: "Did everyone see that?! Did they?!", de: "Haben alle das gesehen?! Wirklich alle?!" },
+            { en: "I want to do that again!", de: "Das möchte ich nochmal machen!" },
+            { en: "Boom! Best day ever!", de: "Bumm! Bester Tag überhaupt!" },
+        ],
+        tutorial_farewell: [
+            { en: "Bye-bye, Professor! Syla will make you proud!", de: "Tschüss, Professor! Syla macht dich stolz!" },
+            { en: "That was the best lesson ever! - Syla, future legend.", de: "Das war die schönste Lektion aller Zeiten! - Syla, künftige Legende." },
+            { en: "I'm off to an adventure! Signed: Syla.", de: "Ich breche ins Abenteuer auf! Unterschrift: Syla." },
+        ],
         level_start: [
             { en: "Ooh, this grid looks like a little garden plot!", de: "Ooh, dieses Raster sieht aus wie ein kleines Gartenbeet!" },
             { en: "Every puzzle's got something nice hiding in it.", de: "In jedem Rätsel steckt was Schönes." },
@@ -302,7 +459,7 @@ const _BANTER_LINES = {
             { en: "I forgive you, puzzle! You'll forgive me too, right?", de: "Ich vergeb dir, Rätsel! Du mir bestimmt auch, oder?" },
         ],
         mistake_streak: [
-            { en: "No worries, no worries — we'll figure it out together!", de: "Kein Stress, kein Stress — wir kriegen das schon zusammen hin!" },
+            { en: "No worries, no worries - we'll figure it out together!", de: "Kein Stress, kein Stress - wir kriegen das schon zusammen hin!" },
             { en: "Even the grid doesn't mean to be tricky, I think.", de: "Ich glaub, nicht mal das Raster will uns ärgern." },
             { en: "Let's just take a little breath and try again.", de: "Lass uns kurz durchatmen und's nochmal versuchen." },
             { en: "It's okay! Every flower needs a little rain too.", de: "Ist schon okay! Auch jede Blume braucht mal ein bisschen Regen." },
@@ -596,7 +753,7 @@ const _BANTER_ITEM_LINES = {
             { en: "Sixty extra seconds of watching me work.", de: "Sechzig Extra-Sekunden, mir bei der Arbeit zuzusehen." },
         ],
         addTime300: [
-            { en: "Five whole minutes. Generous. Wasted on me though — I'm fast.", de: "Fünf ganze Minuten. Großzügig. Für mich verschwendet — ich bin schnell." },
+            { en: "Five whole minutes. Generous. Wasted on me though - I'm fast.", de: "Fünf ganze Minuten. Großzügig. Für mich verschwendet - ich bin schnell." },
             { en: "More time to admire my technique.", de: "Mehr Zeit, meine Technik zu bewundern." },
         ],
         addTime600: [
@@ -604,7 +761,7 @@ const _BANTER_ITEM_LINES = {
             { en: "The clock bends for Trix. As it should.", de: "Die Uhr beugt sich vor Trix. Wie es sich gehört." },
         ],
         addTime900: [
-            { en: "Fifteen minutes! Now it's officially unfair — for the puzzle.", de: "Fünfzehn Minuten! Jetzt ist es offiziell unfair — für das Rätsel." },
+            { en: "Fifteen minutes! Now it's officially unfair - for the puzzle.", de: "Fünfzehn Minuten! Jetzt ist es offiziell unfair - für das Rätsel." },
             { en: "Quarter hour added. I'd have won without it. Obviously.", de: "Viertelstunde dazu. Ich hätte auch ohne gewonnen. Offensichtlich." },
         ],
         shield: [
@@ -632,7 +789,7 @@ const _BANTER_ITEM_LINES = {
             { en: "Frozen time, flawless Trix. Perfect combination.", de: "Eingefrorene Zeit, makellose Trix. Perfekte Kombination." },
         ],
         cursedReveal: [
-            { en: "Six reveals, some marks lost. Fair trade — I adapt faster than curses.", de: "Sechs Enthüllungen, ein paar Kreuze weg. Fairer Deal — ich passe mich schneller an als Flüche." },
+            { en: "Six reveals, some marks lost. Fair trade - I adapt faster than curses.", de: "Sechs Enthüllungen, ein paar Kreuze weg. Fairer Deal - ich passe mich schneller an als Flüche." },
             { en: "Ooh, spooky lens. It blinked first.", de: "Ooh, gruselige Linse. Sie hat zuerst geblinzelt." },
         ],
         cursedTime: [
@@ -840,16 +997,16 @@ const _BANTER_ITEM_LINES = {
 // gets character-specific lines. At least two per skill per character.
 //
 // Base classes:
-//   mathmagician  — active1 Arcane Reveal,   active2 Absolute Zero
-//   statistician  — active1 Data Strike,     active2 Diagonal Strike
-//   probabilist   — active1 Precision Shot,  active2 Rain of Arrows
+//   mathmagician  - active1 Arcane Reveal,   active2 Absolute Zero
+//   statistician  - active1 Data Strike,     active2 Diagonal Strike
+//   probabilist   - active1 Precision Shot,  active2 Rain of Arrows
 // Ascendencies:
-//   outlier       — active1 Tail Risk,             active2 SPEEDFORCE
-//   actuary       — active1 Regression to Prior,   active2 Significance Threshold
-//   recursionist  — active1 Residual,              active2 Degrees of Freedom
-//   markovian     — active1 State Rollback,        active2 Transition Matrix
-//   bayesian      — active1 Bayes Traps,           active2 Type I Error Shield
-//   random_walker — active1 Brownian Motion,       active2 Drifter
+//   outlier       - active1 Tail Risk,             active2 SPEEDFORCE
+//   actuary       - active1 Regression to Prior,   active2 Significance Threshold
+//   recursionist  - active1 Residual,              active2 Degrees of Freedom
+//   markovian     - active1 State Rollback,        active2 Transition Matrix
+//   bayesian      - active1 Bayes Traps,           active2 Type I Error Shield
+//   random_walker - active1 Brownian Motion,       active2 Drifter
 //------------------------------------------------------------------------
 
 const _BANTER_SKILL_LINES = {
@@ -863,7 +1020,7 @@ const _BANTER_SKILL_LINES = {
             { en: "Thermal motion stopped. The timer will follow.", de: "Thermische Bewegung gestoppt. Der Timer folgt." },
         ],
         statistician_active1: [
-            { en: "Data Strike incoming. Rows or columns — both valid hypotheses.", de: "Datenhieb kommt. Zeilen oder Spalten — beides gültige Hypothesen." },
+            { en: "Data Strike incoming. Rows or columns - both valid hypotheses.", de: "Datenhieb kommt. Zeilen oder Spalten - beides gültige Hypothesen." },
             { en: "Striking the dataset directly. Crude, but effective.", de: "Direkter Schlag in den Datensatz. Ruppig, aber effektiv." },
         ],
         statistician_active2: [
@@ -935,7 +1092,7 @@ const _BANTER_SKILL_LINES = {
         ],
         mathmagician_active2: [
             { en: "Absolute Zero! Coldest trick in my repertoire.", de: "Absoluter Nullpunkt! Der coolste Trick in meinem Repertoire." },
-            { en: "Time frozen. Perfect — it needed to watch me properly.", de: "Zeit eingefroren. Perfekt — sie musste mir endlich ordentlich zusehen." },
+            { en: "Time frozen. Perfect - it needed to watch me properly.", de: "Zeit eingefroren. Perfekt - sie musste mir endlich ordentlich zusehen." },
         ],
         statistician_active1: [
             { en: "Data Strike! I strike, the data trembles.", de: "Datenhieb! Ich schlage zu, die Daten erzittern." },
@@ -943,7 +1100,7 @@ const _BANTER_SKILL_LINES = {
         ],
         statistician_active2: [
             { en: "Diagonal Strike. Angles this sharp should be illegal.", de: "Diagonalschlag. Solch scharfe Winkel sollten verboten sein." },
-            { en: "Watch the blade work. Well — the math-blade.", de: "Sieh dir die Klinge an. Also — die Mathe-Klinge." },
+            { en: "Watch the blade work. Well - the math-blade.", de: "Sieh dir die Klinge an. Also - die Mathe-Klinge." },
         ],
         probabilist_active1: [
             { en: "Precision Shot. Precision is practically my middle name.", de: "Präzisionsschuss. Präzision ist quasi mein Mittelname." },
@@ -994,7 +1151,7 @@ const _BANTER_SKILL_LINES = {
             { en: "Type I Error Shield. Because I'm never wrong twice.", de: "Typ-I-Fehler-Schild. Denn ich liege nie zweimal falsch." },
         ],
         random_walker_active1: [
-            { en: "Brownian Motion! Random paths — all somehow leading to brilliance.", de: "Brownsche Bewegung! Zufällige Pfade — alle irgendwie zur Genialität." },
+            { en: "Brownian Motion! Random paths - all somehow leading to brilliance.", de: "Brownsche Bewegung! Zufällige Pfade - alle irgendwie zur Genialität." },
             { en: "Even randomness cooperates with me. Shocking, I know.", de: "Selbst der Zufall kooperiert mit mir. Schockierend, ich weiß." },
         ],
         random_walker_active2: [
@@ -1061,7 +1218,7 @@ const _BANTER_SKILL_LINES = {
             { en: "The links glow like dewdrops in a row!", de: "Die Verbindungen leuchten wie Tautropfen in einer Reihe!" },
         ],
         bayesian_active1: [
-            { en: "Little traps, set with care! Surprise — but politely!", de: "Kleine Fallen, liebevoll gestellt! Überraschung — aber höflich!" },
+            { en: "Little traps, set with care! Surprise - but politely!", de: "Kleine Fallen, liebevoll gestellt! Überraschung - aber höflich!" },
             { en: "They wait quietly, like frogs on lily pads!", de: "Sie warten still, wie Frösche auf Seerosenblättern!" },
         ],
         bayesian_active2: [
@@ -1114,6 +1271,23 @@ const _BANTER_EVENT_CFG = {
     lucky_tile: { chance: 0.5, cooldownMs: 15000 },
     low_time: { chance: 1.0, cooldownMs: 9999999 }, // effectively once per level (gated by flag too)
     win: { chance: 0.7, cooldownMs: 0 },
+    // Fired from the tutorial quest (js/tutorial-quest.js) after each
+    // Professor explanation - the player character replies to him. Gated
+    // HARD: the quest also runs its own context arbitration, and together
+    // with these rolls only roughly every second or third explanation gets
+    // a reply (the old chance 1.0 / 4s spammed the bubble).
+    tutorial_reply: { chance: 0.45, cooldownMs: 14000 },
+    // Context-aware tutorial replies (also fired from js/tutorial-quest.js):
+    //   tutorial_solve  - congrats right after a tutorial puzzle is solved
+    //   tutorial_mistake - a groan when a mistake is registered mid-lesson
+    //   tutorial_cheer  - celebration when a tutorial monster goes down
+    //     (the puzzle-2 fill-combat kill and the puzzle-3 fireball kill)
+    tutorial_solve: { chance: 0.8, cooldownMs: 20000 },
+    tutorial_mistake: { chance: 0.25, cooldownMs: 22000 },
+    tutorial_cheer: { chance: 0.9, cooldownMs: 0 },
+    // Fired once when the tutorial finishes: the character's final farewell,
+    // signing off BY NAME. chance 1.0 + no cooldown - this moment must land.
+    tutorial_farewell: { chance: 1.0, cooldownMs: 0 },
 };
 
 // Global gate: minimum gap between ANY two banter lines, regardless of
@@ -1131,7 +1305,7 @@ let _banterLowTimeFired = false;
 //-------------------BUBBLE DOM HELPERS-------------------------------------
 //------------------------------------------------------------------------
 
-// Returns the avatar wrapper the bubble should attach to — the simple
+// Returns the avatar wrapper the bubble should attach to - the simple
 // (non-monster level) avatar or the full (monster level) avatar,
 // whichever currently exists.
 function _banterGetAvatarEl() {
@@ -1187,7 +1361,7 @@ function _banterShowBubble(text) {
 
     textEl.textContent = text;
 
-    if (!_banterPositionBubble(bubble)) return; // no avatar on screen — skip
+    if (!_banterPositionBubble(bubble)) return; // no avatar on screen - skip
 
     bubble.classList.add('show');
 
@@ -1211,13 +1385,34 @@ function _banterRepositionBubbleIfVisible() {
 //-------------------LINE SELECTION-----------------------------------------
 //------------------------------------------------------------------------
 
-// Picks a random localized line for the given character + event key.
+// Picks a localized line for the given character + event key.
 // Returns null if no lines are defined (so callers can no-op safely).
-function _banterPickLine(charId, eventKey) {
-    const lines = _BANTER_LINES[charId]?.[eventKey];
+//
+// Selection uses a shuffled deck instead of raw random: every line must be
+// heard once before any line repeats (Fisher-Yates deck, refilled when
+// empty). With the old uniform pick, a 4-line bank had a 1-in-4 chance of
+// repeating the previous line back-to-back - the tutorial felt like a
+// scratched record. Decks also keep no-repeat memory across level resets,
+// so a full tutorial run (3 puzzles) never repeats a reply line at all.
+// Optional `bank` lets the item/skill banks share the mechanism.
+const _banterLineDecks = {};
+function _banterPickLine(charId, eventKey, bank) {
+    const lines = (bank || _BANTER_LINES)[charId]?.[eventKey];
     if (!lines || lines.length === 0) return null;
 
-    const entry = lines[Math.floor(Math.random() * lines.length)];
+    const deckKey = `${charId}:${eventKey}`;
+    let deck = _banterLineDecks[deckKey];
+    if (!deck || !deck.length) {
+        deck = lines.map((_, i) => i);
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = deck[i]; deck[i] = deck[j]; deck[j] = tmp;
+        }
+        _banterLineDecks[deckKey] = deck;
+    }
+
+    const entry = lines[deck.pop()];
+    if (!entry) return null;   // stale deck after a bank change - bail safely
     const lang = typeof LANG !== 'undefined' ? LANG : 'en';
     return (lang === 'de' && entry.de) ? entry.de : entry.en;
 }
@@ -1231,7 +1426,10 @@ function _banterPickLine(charId, eventKey) {
 // eventKey must match a key used in _BANTER_LINES / _BANTER_EVENT_CFG.
 // Handles: character selection check, chance roll, per-event cooldown,
 // and the global minimum gap between any two lines.
-function triggerBanter(eventKey) {
+// `force` skips the global gap check (per-event cooldown + chance still
+// apply) - used by the tutorial replies, which must answer the Professor
+// even when level_start banter fired seconds earlier.
+function triggerBanter(eventKey, force) {
     const charId = STATE?.playerCharacter;
     if (!charId || !_BANTER_LINES[charId]) return; // no character chosen yet
 
@@ -1239,7 +1437,7 @@ function triggerBanter(eventKey) {
     const now = Date.now();
 
     // Global gap: don't show two lines back-to-back regardless of source.
-    if (now - _banterLastShownAt < _BANTER_GLOBAL_MIN_GAP_MS) return;
+    if (!force && now - _banterLastShownAt < _BANTER_GLOBAL_MIN_GAP_MS) return;
 
     // Per-event cooldown.
     const lastForEvent = _banterLastShownByEvent[eventKey] || 0;
@@ -1278,9 +1476,8 @@ function _banterFireFromBank(bank, id, eventKeyPrefix, chance, cooldownMs) {
     // Chance roll.
     if (Math.random() >= chance) return false;
 
-    const entry = charBank[id][Math.floor(Math.random() * charBank[id].length)];
-    const lang = typeof LANG !== 'undefined' ? LANG : 'en';
-    const line = (lang === 'de' && entry.de) ? entry.de : entry.en;
+    // Same no-repeat deck selection as the generic banks.
+    const line = _banterPickLine(charId, eventKey, bank);
     if (!line) return false;
 
     _banterLastShownAt = now;
@@ -1332,24 +1529,24 @@ function resetBanterState() {
 //------------------------------------------------------------------------
 //-------------------EVENT KEY REFERENCE------------------------------------
 //------------------------------------------------------------------------
-// level_start        — fired once when a level/puzzle screen opens
-// mistake_single      — fired on an ordinary (unabsorbed) wrong fill
-// mistake_streak       — fired when several mistakes happen close together
-// mistake_absorbed    — fired when a shield/freeze/CI absorbs a mistake
-// correct_streak       — fired on a long run of consecutive correct fills
-// item_used_generic   — fired when a normal (non-cursed) item is used
-// item_used_cursed    — fired when a cursed item is used
-// lucky_tile           — fired when a lucky tile reward is claimed
-// low_time              — fired once when the timer drops under 60s
-// win                       — fired when the puzzle is solved
+// level_start        - fired once when a level/puzzle screen opens
+// mistake_single      - fired on an ordinary (unabsorbed) wrong fill
+// mistake_streak       - fired when several mistakes happen close together
+// mistake_absorbed    - fired when a shield/freeze/CI absorbs a mistake
+// correct_streak       - fired on a long run of consecutive correct fills
+// item_used_generic   - fired when a normal (non-cursed) item is used
+// item_used_cursed    - fired when a cursed item is used
+// lucky_tile           - fired when a lucky tile reward is claimed
+// low_time              - fired once when the timer drops under 60s
+// win                       - fired when the puzzle is solved
 //
 // Item-specific banter (triggerItemBanter):
-//   item_<ITEM_DEFS id>     — e.g. item_reveal1, item_cursedRowSolve
+//   item_<ITEM_DEFS id>     - e.g. item_reveal1, item_cursedRowSolve
 //   Fired from _consumeItem() in js/puzzle-items/use-item.js
 //   Chance-gated (_BANTER_ITEM_CHANCE) with per-item cooldown.
 //
 // Skill-specific banter (triggerSkillBanter):
-//   skill_<classId>_<slot>  — e.g. skill_mathmagician_active1,
+//   skill_<classId>_<slot>  - e.g. skill_mathmagician_active1,
 //                             skill_markovian_active2
 //   Fired from _dispatchBaseAbility / _dispatchAscendencyAbility in
 //   js/classes/class-abilities.js. Chance-gated (_BANTER_SKILL_CHANCE)

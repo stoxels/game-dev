@@ -2,7 +2,7 @@
 //-------------------GOLDEN CLOCK----------------------
 //------------------------------------------------------------------------
 
-// goldenClock — halts the timer until 3 more mistakes are made.
+// goldenClock - halts the timer until 3 more mistakes are made.
 function _useGoldenClock(id, def) {
     window.STOX_FLAGS.goldenClockActive = true;
     window._goldenClockMistakesLeft = 3;
@@ -18,7 +18,7 @@ function _useGoldenClock(id, def) {
 //-------------------ITEM VISUAL EFFECT-----------------------------------
 //------------------------------------------------------------------------
 
-// 🕰️ Golden Clock — clock effect + persistent golden tint.
+// 🕰️ Golden Clock - clock effect + persistent golden tint.
 function _fxGoldenClock() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

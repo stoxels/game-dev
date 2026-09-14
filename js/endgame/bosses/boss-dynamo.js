@@ -2,7 +2,7 @@
 //-------------------BOSS: THE DYNAMO (boss_dynamo)---------------------------
 //------------------------------------------------------------------------
 // Spark-Mandrill homage: jagged lightning pillars crackle through the
-// arena — vertical in P1, horizontal from 50% HP, diagonal from 25% HP.
+// arena - vertical in P1, horizontal from 50% HP, diagonal from 25% HP.
 // Every pillar is independently randomized (stratified lanes + per-bolt
 // timing offsets) so casts never line up into a grid.
 //
@@ -58,7 +58,7 @@ Object.assign(EG_BOSS_MECHANICS, {
     },
 });
 
-// Lightning Conductor base def — real conductors are built per-spawn below
+// Lightning Conductor base def - real conductors are built per-spawn below
 // (HP scales off the live boss's max HP). This entry keeps any def lookup
 // (art, tooltips) working for the baseId.
 Object.assign(EG_MONSTER_DEFS, {
@@ -79,7 +79,7 @@ Object.assign(EG_MONSTER_DEFS, {
 // P3 (25–15%):  vertical + horizontal + diagonal
 // P4 (<15%):    all three, faster, more pillars
 //
-// Randomization: pillar lanes are STRATIFIED — the arena is split into one
+// Randomization: pillar lanes are STRATIFIED - the arena is split into one
 // band per pillar and each pillar lands randomly inside its own band, so
 // positions are properly random while guaranteed to spread across the whole
 // screen with sane minimum gaps (no clumping, no perfect grids). Every
@@ -92,7 +92,7 @@ const EG_PILLAR_ACTIVE_MS = 620;     // how long the live bolt deals damage
 const EG_PILLAR_STAGGER_SPREAD = 900; // max per-pillar start offset (ms)
 // Shape re-jitter cadence per stage. Warn arcs re-crackle slower (still
 // lively); live bolts crackle faster. Cheaper than the old ~12x/second for
-// EVERY bolt — with 18 pillars up that was 200+ path rebuilds per second.
+// EVERY bolt - with 18 pillars up that was 200+ path rebuilds per second.
 const EG_BOLT_CRACKLE_WARN_MS = [180, 360];
 const EG_BOLT_CRACKLE_ACTIVE_MS = [90, 180];
 
@@ -148,7 +148,7 @@ function _egMechSparkPillars(monster, phase) {
         } else {
             angle = Math.random() < 0.5 ? Math.PI / 4 : -Math.PI / 4;
             pos = dPosRaw[di++] - diagMaxOff;
-            // Perpendicular unit normal — offsetting along it actually moves
+            // Perpendicular unit normal - offsetting along it actually moves
             // the LINE (offsetting along the line direction would not).
             nx = -Math.sin(angle); ny = Math.cos(angle);
             ax = W / 2 + nx * pos;
@@ -220,7 +220,7 @@ function _egMechSparkPillars(monster, phase) {
                 return;
             }
 
-            // Active bolt — damage window.
+            // Active bolt - damage window.
             if (!pl.hitDone && pr && _egDynamoPillarHits(pl, pr)) {
                 pl.hitDone = true;
                 const dealt = _egNkHit(dmgPct, 'lightning', level);
@@ -317,7 +317,7 @@ function _egDynamoPillarHits(pl, pr) {
 // ── Lightning Conductors: charged sockets + beam network ─────────────────
 // ════════════════════════════════════════════════════════════════════════
 // Real monsters (tab-targetable, attackable) rendered on a fixed roaming
-// layer — the panel rebuild skips them, same pattern as Brutus's zombies.
+// layer - the panel rebuild skips them, same pattern as Brutus's zombies.
 // One fixed SVG draws every jagged beam (boss↔conductor, conductor↔
 // conductor) plus the filled convex hull of the network; the hull interior
 // and the beam lines themselves shock the player while the boss lives.
@@ -374,7 +374,7 @@ function _egDynamoSpawnConductor(boss) {
         level: boss.level || 1,
         maxHP,
         currentHP: maxHP,
-        chargeMax: 9999, // charge bar can never fill — conductors never attack
+        chargeMax: 9999, // charge bar can never fill - conductors never attack
         currentCharge: 0,
         damageValue: 0,
         attackType: 'none',
@@ -440,9 +440,6 @@ function _egDynamoRenderConductorCard(m, rec) {
     card.style.top = Math.round(rec.y) + 'px';
     card.setAttribute('onclick', `_egSelectTarget('${m.id}')`);
     card.innerHTML =
-        '<span class="eg-target-arrow eg-dynamo-target-pill" style="display:none">' +
-            '<span class="eg-target-arrow-icon">▼</span> TARGET <span class="eg-target-arrow-icon">▼</span>' +
-        '</span>' +
         '<div class="eg-compact-bars">' +
             '<div class="eg-charge-track-compact"><div class="eg-charge-bar" id="eg-charge-bar-' + m.id + '" style="width:0%"></div></div>' +
             '<div class="eg-hp-track-compact"><div class="eg-hp-bar-compact ' + _egHpBarClass(hpPct) + '" id="eg-hp-bar-' + m.id + '" style="width:' + hpPct + '%"></div></div>' +
@@ -461,15 +458,15 @@ function _egDynamoRenderConductorCard(m, rec) {
 }
 
 // Keeps target feedback on roaming cards current (the panel rebuild never
-// touches this layer). Runs on the damage tick — cheap class toggles.
+// touches this layer). Runs on the damage tick - cheap class toggles.
 function _egDynamoSyncCards() {
     if (typeof _egTargetId === 'undefined') return;
     _egDynamoConductors.forEach((rec) => {
         const card = rec.card || document.getElementById('eg-card-' + rec.monsterId);
         if (!card) return;
         const targeted = _egTargetId === rec.monsterId;
-        const pill = card.querySelector('.eg-dynamo-target-pill');
-        if (pill) pill.style.display = targeted ? '' : 'none';
+        const pill = card.querySelector('.eg-dynamo-target-pill, .eg-target-arrow');
+        if (pill) pill.remove();
         const wrap = card.querySelector('.eg-emoji-wrapper');
         if (wrap) wrap.classList.toggle('eg-compact-targeted', targeted);
     });
@@ -514,7 +511,7 @@ function _egDynamoBeamSegs(nodes) {
 
 // Jagged lightning between two points. Perf: the D (path data) strings are
 // rebuilt from a stored per-segment offset array, so a crackle tick only
-// rewrites the `d` attribute of existing <path> nodes — the SVG structure is
+// rewrites the `d` attribute of existing <path> nodes - the SVG structure is
 // NEVER torn down per tick (innerHTML churn at 130ms was the old FPS sink).
 const EG_DYNAMO_JAG_STEP_PX = 45;   // zigzag resolution per beam length
 
@@ -534,7 +531,7 @@ function _egDynamoNewOffsets(len) {
     return offs;
 }
 
-// Builds a jagged path `d` from endpoints + stored offsets (no randomness —
+// Builds a jagged path `d` from endpoints + stored offsets (no randomness -
 // so position updates can reuse the exact same lightning shape).
 function _egDynamoBuildSegD(a, b, offs) {
     const dx = b.x - a.x, dy = b.y - a.y;
@@ -573,10 +570,10 @@ function _egDynamoEmptySvg(svg) {
 
 // Persistent network render state. The SVG element tree is built ONCE per
 // topology (which conductors exist) and then only mutated in place:
-//   fieldPoly/fieldEdge — hull polygons, `points` updated per tick
-//   beams               — 's<idx>' → {halo, mid, core} path triplets
-//   segs                — [{a, b, key, isBossArc, offs}]
-//   p2pIdx/jitterCursor — round-robin budget so conductor↔conductor arcs
+//   fieldPoly/fieldEdge - hull polygons, `points` updated per tick
+//   beams               - 's<idx>' → {halo, mid, core} path triplets
+//   segs                - [{a, b, key, isBossArc, offs}]
+//   p2pIdx/jitterCursor - round-robin budget so conductor↔conductor arcs
 //                         re-strike a few per tick instead of all at once
 let _egDynamoNet = null;
 
@@ -693,7 +690,7 @@ function _egDynamoStopTicks() {
 function _egDynamoDamageTick() {
     if (typeof _egIsActive === 'function' && !_egIsActive()) { _egClearDynamoConductors(); return; }
     if (typeof dead !== 'undefined' && dead) { _egClearDynamoConductors(); return; }
-    if (_egNkFrozen()) return; // paused — hold damage, keep visuals
+    if (_egNkFrozen()) return; // paused - hold damage, keep visuals
     if (!_egDynamoConductors.size) { _egDynamoStopTicks(); _egDynamoRemoveNet(); return; }
 
     _egDynamoSyncCards();
@@ -707,7 +704,7 @@ function _egDynamoDamageTick() {
     const dt = EG_DYNAMO_TICK_MS / 1000;
     const now = Date.now();
 
-    // Inner field (convex hull of boss + conductors) — the heavy zone.
+    // Inner field (convex hull of boss + conductors) - the heavy zone.
     if (nodes.length >= 3) {
         const hull = _egConvexHull(nodes);
         if (hull && hull.length >= 3) {
@@ -723,7 +720,7 @@ function _egDynamoDamageTick() {
     }
 
     // Beam lines themselves. Reuses the persistent net segments when the
-    // renderer has them (same anchors the visuals draw — no duplicate work).
+    // renderer has them (same anchors the visuals draw - no duplicate work).
     const segs = (_egDynamoNet && _egDynamoNet.segs.length)
         ? _egDynamoNet.segs.map(s => [s.a, s.b])
         : _egDynamoBeamSegs(nodes);
@@ -784,13 +781,13 @@ function _egRemoveConductor(monsterId) {
     try {
         const raw = (typeof t === 'function') ? t('eg_mech_conductor_destroyed') : null;
         showToast(raw && raw !== 'eg_mech_conductor_destroyed'
-            ? raw : '⚡ Lightning Conductor destroyed — the network weakens!');
+            ? raw : '⚡ Lightning Conductor destroyed - the network weakens!');
     } catch (e) {}
 }
 
 // Full teardown: boss death, encounter stop, or the damage-tick guard.
 // Pops every conductor and drops them from the encounter (their charge
-// source is gone — no loot, no kill credit).
+// source is gone - no loot, no kill credit).
 function _egClearDynamoConductors() {
     _egDynamoStopTicks();
 
@@ -855,5 +852,5 @@ function _egPointInPolygon(point, polygon) {
 }
 
 // _egPtSegDist (point-to-segment distance) is defined ONCE, in
-// shared-boss-abilities.js — the identical local copy was removed 2026-09
+// shared-boss-abilities.js - the identical local copy was removed 2026-09
 // (it shadowed the shared one via load order).

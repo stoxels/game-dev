@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MAELSTROM (boss_maelstrom)-----------------------
 //------------------------------------------------------------------------
-// Gravity-well homage: a vortex drags your avatar toward its eye — fight
-// the pull — then detonates in a nova. Be far from the center when it blows.
+// Gravity-well homage: a vortex drags your avatar toward its eye - fight
+// the pull - then detonates in a nova. Be far from the center when it blows.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
 //   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)

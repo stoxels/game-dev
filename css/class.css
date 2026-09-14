@@ -142,7 +142,7 @@
     overflow: hidden;
 }
 
-    /* Subtle top-left shine overlay — purely decorative. */
+    /* Subtle top-left shine overlay - purely decorative. */
     .cs-card::before {
         content: '';
         position: absolute;
@@ -227,7 +227,7 @@
     color: var(--accent2);
 }
 
-/* Ability description line — green tint to distinguish from normal text. */
+/* Ability description line - green tint to distinguish from normal text. */
 .cs-ability-desc {
     font-size: 15px;
     color: #00ff90;
@@ -255,6 +255,138 @@
 }
 
 
+/*
+    ------------------------------------------------------------------------
+    -------------------CHARM REWARD PREVIEW----------------------------------
+    ------------------------------------------------------------------------
+    The charm the choice hands over, shown on the card that commits to it:
+    the Rank 1 charms on a class / ascendency card, the upgraded rank on an
+    ability card. Reuses the charm system's own glyph + gold rank coin so the
+    player recognises the item they are being promised.
+
+    Sits directly above the CTA on every card type, so it reads as
+    "reward -> button". Scoped to nothing, because the class-selection and
+    class-upgrade screens both need it (their card shells differ).
+*/
+
+.cs-charms {
+    width: 100%;
+    box-sizing: border-box;
+    /* The row stretches every card to the same height, so the free space is
+       dumped above this block: that pins the reward + the CTA to the bottom
+       edge, which keeps the three buttons on one line no matter how many
+       lines each description took or whether a card carries the owned-charms
+       footnote. Without it the buttons floated at three different heights. */
+    margin-top: auto;
+    margin-bottom: clamp(8px, 1.2vw, 14px);
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid rgba(143, 211, 255, 0.28);
+    border-radius: 6px;
+    text-align: left;
+}
+
+/* Label above the chips - "Rank 1 charms included" / "Charm reward". */
+.cs-charms-head {
+    font-family: var(--PX);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #8fd3ff;
+    margin-bottom: 5px;
+}
+
+.cs-charms-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+/* One promised charm. */
+.cs-charm {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 100%;
+    padding: 2px 7px 2px 3px;
+    border: 1px solid rgba(143, 211, 255, 0.3);
+    border-radius: 999px;
+    background: rgba(143, 211, 255, 0.08);
+    font-family: var(--F);
+    font-size: clamp(9px, 1.05vw, 12px);
+    color: #e8e0ff;
+    white-space: nowrap;
+}
+
+/* Wrapper cleared so the rank coin can hang off the glyph's top-right corner. */
+.cs-charm-glyph {
+    position: relative;
+    display: inline-block;
+    flex: 0 0 auto;
+    font-size: clamp(12px, 1.4vw, 16px);
+    line-height: 1;
+}
+
+.cs-charm-rank-badge {
+    position: absolute;
+    right: -5px;
+    top: -4px;
+    min-width: 12px;
+    height: 12px;
+    line-height: 10px;
+    padding: 0 2px;
+    font-family: var(--PX);
+    font-size: 7px;
+    font-weight: bold;
+    text-align: center;
+    color: #241a05;
+    background: linear-gradient(180deg, #ffe9a8, #d9a441);
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    border-radius: 7px;
+}
+
+.cs-charm-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Already in the bag: flattened rim, muted name and a green tick. The glyph
+   itself only dims a little - dimming the whole chip to nothing made the
+   charm stop reading as a charm, which is the one thing this block is for. */
+.cs-charm--owned {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.cs-charm--owned .cs-charm-name { color: #b9b3cc; }
+.cs-charm--owned .cs-charm-glyph { opacity: 0.78; }
+
+.cs-charm-owned-mark {
+    flex: 0 0 auto;
+    color: #7fe0a0;
+    font-size: clamp(9px, 1vw, 11px);
+}
+
+/* Footnote under the chips ("already owned - a duplicate becomes a Lemma"). */
+.cs-charms-note {
+    margin-top: 5px;
+    font-family: var(--F);
+    font-size: clamp(8px, 0.95vw, 11px);
+    line-height: 1.35;
+    color: #9f97b5;
+}
+
+/* Passive abilities carry no charm - the block is a single explanatory line. */
+.cs-charms--none {
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.22);
+}
+
+.cs-charms--none .cs-charms-note {
+    margin-top: 0;
+}
 
 
 /*
@@ -279,7 +411,7 @@
     }
 }
 
-/* Individual upgrade card — flex column so the CTA button can pin to the bottom. */
+/* Individual upgrade card - flex column so the CTA button can pin to the bottom. */
 .cs-upgrade-card {
     display: flex;
     flex-direction: column;
@@ -324,7 +456,7 @@
     margin-bottom: 10px;
 }
 
-/* Current rank description row — muted style to distinguish from the "new" row. */
+/* Current rank description row - muted style to distinguish from the "new" row. */
 .cs-upgrade-current {
     font-size: 15px;
     color: #888;
@@ -335,7 +467,7 @@
     border-left: 2px solid #444;
 }
 
-/* Next rank description row — green tint to signal improvement. */
+/* Next rank description row - green tint to signal improvement. */
 .cs-upgrade-new {
     font-size: 15px;
     color: var(--accent2);
@@ -355,7 +487,7 @@
     letter-spacing: 1px;
 }
 
-/* "▶ UPGRADE PASSIVE" call-to-action button — pinned to the bottom via margin-top: auto. */
+/* "▶ UPGRADE PASSIVE" call-to-action button - pinned to the bottom via margin-top: auto. */
 .cs-upgrade-cta {
     font-family: var(--PX);
     font-size: 15px;
@@ -476,7 +608,7 @@
     are kept here.
 */
 
-/* Outer panel — hidden until the player picks a class.
+/* Outer panel - hidden until the player picks a class.
    z-index 15 intentionally below the puzzle wrapper (z-index 50) so
    row/col clue numbers (z-index 950 inside the puzzle's stacking context)
    always paint above the HUD even though the puzzle uses transform:scale. */
@@ -498,7 +630,7 @@
     user-select: none;
 }
 
-/* Drag handle — the clickable row that contains the class icon and skill buttons. */
+/* Drag handle - the clickable row that contains the class icon and skill buttons. */
 #class-hud-drag-handle {
     width: auto;
     padding: 4px 5px;
@@ -575,7 +707,7 @@
     ------------------------------------------------------------------------
 */
 
-/* Horizontal bar shown when the HUD is minimised — displays slot index + cd/ready. */
+/* Horizontal bar shown when the HUD is minimised - displays slot index + cd/ready. */
 #chud-mini-bar {
     display: flex;
     align-items: center;
@@ -587,13 +719,13 @@
     white-space: nowrap;
 }
 
-/* "1: Ready ✓" label — green when an ability is off cooldown. */
+/* "1: Ready ✓" label - green when an ability is off cooldown. */
 .chud-mini-ready {
     color: #2ecc71;
     font-weight: bold;
 }
 
-/* "1: 1:30" countdown label — amber while an ability is on cooldown. */
+/* "1: 1:30" countdown label - amber while an ability is on cooldown. */
 .chud-mini-cd {
     color: #e67e22;
 }
@@ -613,7 +745,7 @@
     ------------------------------------------------------------------------
 
     When the Mathmagician has free-mistake charges (Variance Shield stacks),
-    the drag handle gains coloured box-shadow rings — one ring per stack,
+    the drag handle gains coloured box-shadow rings - one ring per stack,
     up to 3+ stacks where a looping pulse animation kicks in.
     The stack count is stored in data-shield-stacks on #class-hud-panel.
 */
@@ -764,7 +896,7 @@
     color: var(--accent2);
 }
 
-/* Skill description text in the old expanded HUD — green tint. */
+/* Skill description text in the old expanded HUD - green tint. */
 .chud-skill-desc {
     font-size: 12px;
     color: #00ff90;
@@ -896,7 +1028,7 @@
     }
 
 /* ------------------------------------------------------------------
-   Random Walker — Brownian Motion path preview overlay.
+   Random Walker - Brownian Motion path preview overlay.
    On a mistake the red cut-off tail segment wiggles up/down (~0.5 s)
    and then fades out to show that this part of the path is gone.
 ------------------------------------------------------------------ */

@@ -1,34 +1,34 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GRIDLOCK (boss_gridlock)--------------------
 //------------------------------------------------------------------------
-// REWORK — Quick-Man homage, rebuilt as a living circuit board. The
+// REWORK - Quick-Man homage, rebuilt as a living circuit board. The
 // Gridlock never chases: it turns the arena itself into a machine that
 // computes where you are and denies the space you want to stand in.
-// Nothing stays live long, but everything cycles — reading the patterns
+// Nothing stays live long, but everything cycles - reading the patterns
 // while staying mobile is the fight.
 //
-//   Phase 1 (100–60%) — LASER LATTICE (signature, upgraded). Alternating
-//                       full-screen H/V beam waves — now each wave's lines
+//   Phase 1 (100–60%) - LASER LATTICE (signature, upgraded). Alternating
+//                       full-screen H/V beam waves - now each wave's lines
 //                       STAGGER-FIRE across the screen (~260ms apart), so
 //                       a wave sweeps rather than pops. Clear the lit
 //                       lanes before their line's turn comes!
 //                       Plus PROBABILITY SHIFT (shared).
-//   Phase 2 ( ≤60%)   — SIGNAL SCRAMBLE. The boss plants signal towers and
-//                       every one draws a dashed cable to YOUR position —
+//   Phase 2 ( ≤60%)   - SIGNAL SCRAMBLE. The boss plants signal towers and
+//                       every one draws a dashed cable to YOUR position -
 //                       then all fire together. Break the geometry: the
 //                       starburst aims at where you were.
 //                       Plus SURGE CHASER. A roaming ⚡ orb homes slowly
-//                       and sheds a LIVE CABLE TRAIL behind it — the arena
+//                       and sheds a LIVE CABLE TRAIL behind it - the arena
 //                       accumulates hot wires while you kite.
-//   Phase 3 ( ≤30%)   — Everything faster: 4 lattice waves, 6 towers, TWO
+//   Phase 3 ( ≤30%)   - Everything faster: 4 lattice waves, 6 towers, TWO
 //                       surge orbs. The gates will not hold much longer.
-//   Finale ( ≤10%)    — SYSTEM LOCKDOWN (one-shot set-piece): a circuit-
+//   Finale ( ≤10%)    - SYSTEM LOCKDOWN (one-shot set-piece): a circuit-
 //                       board overlay floods the screen and the arena
 //                       becomes a live wire grid. Three beats of charging
-//                       wire batches — then THE JAM: every wire fires at
+//                       wire batches - then THE JAM: every wire fires at
 //                       once EXCEPT one horizontal + one vertical, whose
 //                       intersection is the only safe cell. Then the
-//                       SURGE DIVE: a ⚡ orb dives the safe cell — step off
+//                       SURGE DIVE: a ⚡ orb dives the safe cell - step off
 //                       it, then the lockdown breaks. Charge bar frozen
 //                       for the whole set-piece (gate in _egTickPlayer
 //                       via _egGlFinalActive).
@@ -133,7 +133,7 @@ function _egGlSpark(x, y, big) {
     setTimeout(() => { try { layer.remove(); } catch (e) {} }, _EG_GL_DEBUG_SLOW ? 1800 : 900);
 }
 
-// Point-to-segment distance (px) — hit-tests cables and trails.
+// Point-to-segment distance (px) - hit-tests cables and trails.
 function _egGlDistToSeg(px, py, x0, y0, x1, y1) {
     const dx = x1 - x0, dy = y1 - y0;
     const len2 = dx * dx + dy * dy;
@@ -147,7 +147,7 @@ function _egGlDistToSeg(px, py, x0, y0, x1, y1) {
 //------------------------------------------------------------------------
 // Alternating full-screen H/V beam waves. Upgraded: a wave's three lines
 // STAGGER-FIRE ~260ms apart, so each wave sweeps across the screen instead
-// of popping all at once — clear the lit lane whose turn is coming, and
+// of popping all at once - clear the lit lane whose turn is coming, and
 // mind the NEXT line while the first is still hot.
 function _egMechGlLattice(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
@@ -237,7 +237,7 @@ function _egMechGlLattice(monster, phase) {
 //-------------------MECHANIC: SIGNAL SCRAMBLE (phase 2+)-------------------
 //------------------------------------------------------------------------
 // The Gridlock plants signal towers around the field; every tower draws a
-// dashed cable to YOUR position at cast time — then all cables fire
+// dashed cable to YOUR position at cast time - then all cables fire
 // together. The starburst aims at where you were: break the geometry.
 const EG_GL_SCRAMBLE_WARN = 1150;
 const EG_GL_SCRAMBLE_LIVE = 420;
@@ -278,7 +278,7 @@ function _egMechGlScramble(monster, phase) {
         cables.push({ x0: spot[0], y0: spot[1], x1: c.x, y1: c.y, tower, line });
     }
 
-    _egNkToast('eg_mech_gl_scramble', '📡 The Gridlock: SIGNAL SCRAMBLE — break the cables!', '#a5f3fc');
+    _egNkToast('eg_mech_gl_scramble', '📡 The Gridlock: SIGNAL SCRAMBLE - break the cables!', '#a5f3fc');
 
     let t = 0, fired = false;
     _egNkLoop(run, (dtS, now) => {
@@ -322,7 +322,7 @@ function _egMechGlScramble(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------MECHANIC: SURGE CHASER (phase 2+)----------------------
 //------------------------------------------------------------------------
-// A roaming ⚡ orb homes slowly and sheds a LIVE CABLE TRAIL behind it —
+// A roaming ⚡ orb homes slowly and sheds a LIVE CABLE TRAIL behind it -
 // kiting it wires the arena against you. Trail segments fade after ~1.2s;
 // the orb despawns after its patrol. Phase 3 spawns a second chaser.
 const EG_GL_SURGE_LIFE = 7500;
@@ -361,7 +361,7 @@ function _egMechGlSurge(monster, phase) {
     const nOrbs = p >= 3 ? 2 : 1;
     for (let i = 0; i < nOrbs; i++) spawnChaser(i * 2000 * _EG_GL_DEBUG_MULT);
 
-    _egNkToast('eg_mech_gl_surge', '📡 The Gridlock: SURGE CHASER — the trail is live!', '#a5f3fc');
+    _egNkToast('eg_mech_gl_surge', '📡 The Gridlock: SURGE CHASER - the trail is live!', '#a5f3fc');
 
     let t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -373,7 +373,7 @@ function _egMechGlSurge(monster, phase) {
             if (o.done) return;
             active = true;
             if (!o.born) { o.born = t; o.lastX = o.x; o.lastY = o.y; }
-            // Slow homing with a steering cap — readable, kitable.
+            // Slow homing with a steering cap - readable, kitable.
             if (c) {
                 const want = Math.atan2(c.y - o.y, c.x - o.x);
                 let diff = ((want - o.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
@@ -438,10 +438,10 @@ function _egMechGlSurge(monster, phase) {
 //-------------------🔒… SYSTEM LOCKDOWN (≤10% HP one-shot finale)----------
 //------------------------------------------------------------------------
 // A circuit-board overlay floods the screen and the arena becomes a live
-// wire grid. Three beats of charging wire batches — then THE JAM: every
+// wire grid. Three beats of charging wire batches - then THE JAM: every
 // wire fires at once EXCEPT one horizontal + one vertical, whose
 // intersection is the only safe cell (marked with a pip). Then the SURGE
-// DIVE: a ⚡ orb dives the safe cell — step off it. Charge bar frozen for
+// DIVE: a ⚡ orb dives the safe cell - step off it. Charge bar frozen for
 // the whole set-piece (gate in _egTickPlayer via _egGlFinalActive).
 const EG_GL_FINAL_BEATS = 3;
 const EG_GL_BEAT_CHARGE = 1000;   // ms telegraph per beat batch
@@ -551,11 +551,11 @@ function _egGlFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-gl-cd-label">🔒 SYSTEM LOCKDOWN</div>' +
         '<div class="eg-gl-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-gl-cd-hint">The grid charges — read the wires!</div>';
+        '<div class="eg-gl-cd-hint">The grid charges - read the wires!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_gl_final_cd', '🔒💀 SYSTEM LOCKDOWN — read the grid!', '#a5f3fc');
+    _egNkToast('eg_mech_gl_final_cd', '🔒💀 SYSTEM LOCKDOWN - read the grid!', '#a5f3fc');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -626,7 +626,7 @@ function _egGlFinalStart(monster) {
                 return;
             }
         } else if (g.phase === 'jamprep') {
-            // THE JAM: every wire charges EXCEPT one H + one V — the only
+            // THE JAM: every wire charges EXCEPT one H + one V - the only
             // safe crossing. Mark it with a pip.
             g.phase = 'jam';
             const safeH = g.wiresH[Math.floor(Math.random() * g.wiresH.length)];
@@ -643,7 +643,7 @@ function _egGlFinalStart(monster) {
             document.body.appendChild(pip);
             g.pip = pip;
             g.fxRun.els.push(pip);
-            _egNkToast('eg_mech_gl_jam', '🔒💀 THE JAM — get to the safe intersection!', '#a5f3fc');
+            _egNkToast('eg_mech_gl_jam', '🔒💀 THE JAM - get to the safe intersection!', '#a5f3fc');
             setTimeout(() => {
                 if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
                 setBatch(all, 'eg-gl-wire-jamcharge', false);
@@ -658,7 +658,7 @@ function _egGlFinalStart(monster) {
                 }, EG_GL_JAM_LIVE);
             }, EG_GL_JAM_CHARGE);
         } else if (g.phase === 'surge') {
-            // SURGE DIVE: a ⚡ orb dives the safe cell — step off it.
+            // SURGE DIVE: a ⚡ orb dives the safe cell - step off it.
             g.phase = 'done';
             const sx = g.safeV.x, sy = g.safeH.y;
             // Dive from the nearest screen edge along the safe wire.
@@ -673,7 +673,7 @@ function _egGlFinalStart(monster) {
             document.body.appendChild(warn);
             g.diveline = warn;
             g.fxRun.els.push(warn);
-            _egNkToast('eg_mech_gl_dive', '⚡ SURGE DIVE — off the safe cell!', '#a5f3fc');
+            _egNkToast('eg_mech_gl_dive', '⚡ SURGE DIVE - off the safe cell!', '#a5f3fc');
             setTimeout(() => {
                 if (!_egGlFinal || _egGlFinal !== g || g.finished) return;
                 try { warn.remove(); } catch (e) {}
@@ -740,7 +740,7 @@ function _egGlFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egGlTeardown() {
     if (_egGlFinal) { try { _egGlFinalEnd(_egGlFinal); } catch (e) {} _egGlFinal = null; }
@@ -762,8 +762,8 @@ function _egGlTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_GL_DEBUG.fire('lattice'|'scramble'|'surge', phase) — runs one now
-//   _EG_GL_DEBUG.final()                                   — LOCKDOWN now
+//   _EG_GL_DEBUG.fire('lattice'|'scramble'|'surge', phase) - runs one now
+//   _EG_GL_DEBUG.final()                                   - LOCKDOWN now
 if (typeof window !== 'undefined') {
     window._EG_GL_DEBUG = {
         fire: (name, phase) => {

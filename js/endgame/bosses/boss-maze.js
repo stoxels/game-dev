@@ -1,33 +1,33 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MAZE (boss_maze)---------------------------
 //------------------------------------------------------------------------
-// REWORK — arcade-ghost homage, rebuilt as a full haunted-cabinet gauntlet.
+// REWORK - arcade-ghost homage, rebuilt as a full haunted-cabinet gauntlet.
 // A gang of four ghosts with their own brains hunts you through marching
-// pellet walls, a rising shadow labyrinth and lights-out darkness — then,
+// pellet walls, a rising shadow labyrinth and lights-out darkness - then,
 // at the very end, the arcade finally catches up: GAME OVER.
 //
-//   Phase 1 (100–60%) — GHOST GANG. Four ghosts, four brains: one chases,
+//   Phase 1 (100–60%) - GHOST GANG. Four ghosts, four brains: one chases,
 //                       one ambushes where you are heading, one flanks
 //                       sideways, one wanders hungrily. Every few seconds
 //                       the whole gang SCATTERS to its corners (arcade
-//                       rules) — breathe, then move. Learn all four or be
+//                       rules) - breathe, then move. Learn all four or be
 //                       surrounded.
 //                       Plus DOT WALLS. Walls of glowing pellets march
-//                       across the arena with a single gap. Slip the gap —
+//                       across the arena with a single gap. Slip the gap -
 //                       pellets sting!
-//   Phase 2 ( ≤60%)   — THE LABYRINTH. Shadow wall segments rise out of
+//   Phase 2 ( ≤60%)   - THE LABYRINTH. Shadow wall segments rise out of
 //                       the floor and linger, building a temporary maze
 //                       while the gang keeps hunting. Route around them!
 //                       Plus LIGHTS OUT. The arena goes dark and only
 //                       drifting ghost eyes glow. Do NOT touch the eyes.
 //                       Everything else gets faster and meaner.
-//   Phase 3 ( ≤30%)   — Fuller labyrinths, more eyes, faster walls, a
+//   Phase 3 ( ≤30%)   - Fuller labyrinths, more eyes, faster walls, a
 //                       hungrier gang. The cabinet wants its quarter.
-//   Finale ( ≤10%)    — GAME OVER (one-shot set-piece): the boss goes
+//   Finale ( ≤10%)    - GAME OVER (one-shot set-piece): the boss goes
 //                       immune and shielded and TREMBLES while a CRT
 //                       scanline overlay swallows the arena. On every
 //                       metronome beat a shadow circle marks YOUR position
-//                       and the whole gang CONVERGES on it — 3 slams with
+//                       and the whole gang CONVERGES on it - 3 slams with
 //                       a growing final circle, then one giant CHOMP.
 //                       NEVER stand still! Charge bar frozen for the whole
 //                       set-piece (gate in _egTickPlayer via
@@ -147,7 +147,7 @@ function _egMzSpookBurst(x, y, big) {
 //-------------------MECHANIC: GHOST GANG-----------------------------------
 //------------------------------------------------------------------------
 // Four ghosts, four brains: chase / ambush / flank / wander, with arcade
-// scatter windows — every ~4s the whole gang flees to its corner for a
+// scatter windows - every ~4s the whole gang flees to its corner for a
 // beat (a breather with a telegraph), then resumes the hunt. Speed scales
 // with phase.
 const EG_MZ_GANG_DUR_MS   = 11000;
@@ -285,7 +285,7 @@ function _egMechMzDotWalls(monster, phase) {
         walls.push({ vertical, dir, segs, pos: dir === 1 ? -EG_MZ_WALL_THICK : len, done: false });
     }
 
-    _egNkToast('eg_mech_mz_walls', '👻 The Maze: DOT WALLS — find the gap!', '#e2e8f0');
+    _egNkToast('eg_mech_mz_walls', '👻 The Maze: DOT WALLS - find the gap!', '#e2e8f0');
 
     let t = 0, touchCd = 0, marching = false;
     _egNkLoop(run, (dtS, now) => {
@@ -372,7 +372,7 @@ function _egMechMzMazeWalls(monster, phase) {
         walls.push({ vertical, x, y, len, cx, cy, el });
     }
 
-    _egNkToast('eg_mech_mz_labyrinth', '👻 The Maze: THE LABYRINTH rises — read the walls!', '#e2e8f0');
+    _egNkToast('eg_mech_mz_labyrinth', '👻 The Maze: THE LABYRINTH rises - read the walls!', '#e2e8f0');
 
     let t = 0, touchCd = 0, risen = false;
     _egNkLoop(run, (dtS, now) => {
@@ -414,7 +414,7 @@ function _egMechMzMazeWalls(monster, phase) {
 //-------------------MECHANIC: LIGHTS OUT (field, passive)------------------
 //------------------------------------------------------------------------
 // The arena dims and pairs of glowing ghost eyes drift across the dark.
-// Touching eyes stings. The run is PASSIVE (field hazard — never blocks
+// Touching eyes stings. The run is PASSIVE (field hazard - never blocks
 // other mechanics).
 const EG_MZ_DARK_COUNT = [0, 0, 3, 5];
 const EG_MZ_DARK_LIFE  = 5500;
@@ -450,7 +450,7 @@ function _egMechMzLightsOut(monster, phase) {
         });
     }
 
-    _egNkToast('eg_mech_mz_lights', '👻 The Maze: LIGHTS OUT — eyes in the dark!', '#e2e8f0');
+    _egNkToast('eg_mech_mz_lights', '👻 The Maze: LIGHTS OUT - eyes in the dark!', '#e2e8f0');
 
     let e = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
@@ -482,7 +482,7 @@ function _egMechMzLightsOut(monster, phase) {
 //------------------------------------------------------------------------
 // The boss goes immune + shielded and TREMBLES while a CRT scanline overlay
 // swallows the arena. On every metronome beat a shadow circle marks the
-// player's position and the whole gang CONVERGES on it — three slams with a
+// player's position and the whole gang CONVERGES on it - three slams with a
 // growing final circle, then one giant CHOMP. Charge bar frozen for the
 // whole set-piece (gate in _egTickPlayer via _egMzFinalActive).
 const EG_MZ_FINAL_TICK_MS = 1200;
@@ -618,11 +618,11 @@ function _egMzFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-mz-cd-label">👻 GAME OVER?</div>' +
         '<div class="eg-mz-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-mz-cd-hint">The gang converges on the marked circle — NEVER stand still!</div>';
+        '<div class="eg-mz-cd-hint">The gang converges on the marked circle - NEVER stand still!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_mz_final_cd', '👻💀 GAME OVER? — never stand still!', '#e2e8f0');
+    _egNkToast('eg_mech_mz_final_cd', '👻💀 GAME OVER? - never stand still!', '#e2e8f0');
 
     // Boss immunity so the set-piece reads as a performance (released at the end).
     monster.bossImmune = true;
@@ -639,7 +639,7 @@ function _egMzFinalStart(monster) {
     _egMzMarkTarget(g, EG_MZ_TARGET_R);
 
     // Metronome: each beat, the gang converges on the current mark, then a
-    // fresh circle is drawn (the last one bigger — the CHOMP). Pause /
+    // fresh circle is drawn (the last one bigger - the CHOMP). Pause /
     // death / inactive hold the count (debug: extra-long beats).
     const cdTick = EG_MZ_FINAL_TICK_MS * (_EG_MZ_DEBUG_SLOW ? 8 : 1);
     g.cdTimer = setInterval(() => {
@@ -699,7 +699,7 @@ function _egMzFinalEnd(g) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN-----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egMzTeardown() {
     if (_egMzFinal) { try { _egMzFinalEnd(_egMzFinal); } catch (e) {} _egMzFinal = null; }
@@ -720,8 +720,8 @@ function _egMzTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_MZ_DEBUG.fire('gang'|'walls'|'labyrinth'|'dark') — runs one now
-//   _EG_MZ_DEBUG.final()                                 — GAME OVER now
+//   _EG_MZ_DEBUG.fire('gang'|'walls'|'labyrinth'|'dark') - runs one now
+//   _EG_MZ_DEBUG.final()                                 - GAME OVER now
 if (typeof window !== 'undefined') {
     window._EG_MZ_DEBUG = {
         fire: (name, phase) => {

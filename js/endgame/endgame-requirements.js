@@ -18,11 +18,11 @@
 //     existed can always be dismantled/fixed instead of locking the player in.
 //   - Player level: wired to the leveling system (endgame-leveling.js),
 //     which keeps EG_PLAYER_BASE_ATTRIBUTES synced to STATE.playerLevel
-//     and the allocated attribute points — level requirements therefore
+//     and the allocated attribute points - level requirements therefore
 //     enforce automatically.
 //
 // Dependencies (must be loaded before this file):
-//   endgame-player-stats.js — EG_STAT_KEY_MAP, _egGetAllEquippedItems()
+//   endgame-player-stats.js - EG_STAT_KEY_MAP, _egGetAllEquippedItems()
 //
 // Entry points:
 //   _egCanEquipInSlot(item, slotId)      → { ok, missing[] } for equipping
@@ -39,9 +39,9 @@
 // Character base attributes before any equipment bonuses.
 // These must be >= the lowest tier of attribute requirements in
 // endgame-equipment-base-items.js (~14 at item level 1), otherwise no gear
-// could ever be equipped. Tune freely — 20/20/20 covers early gear outright
+// could ever be equipped. Tune freely - 20/20/20 covers early gear outright
 // and makes higher tiers a gear-investment / self-carry decision.
-// `level: null` means no level system yet — level requirements are skipped.
+// `level: null` means no level system yet - level requirements are skipped.
 const EG_PLAYER_BASE_ATTRIBUTES = {
     level: null,
     str: 20,
@@ -128,7 +128,7 @@ function _egFindUnmetRequirements(items) {
 // copy of the currently equipped map, then returns its unmet requirements.
 // The drag source slot is already empty at check time when dragging from a
 // paperdoll slot (pickup clears the origin immediately), which matches the
-// post-move reality — except for the displaced occupant, whose final resting
+// post-move reality - except for the displaced occupant, whose final resting
 // place (source equip slot vs stash cell) does not change the loadout's
 // total attribute pool.
 function _egSimulateAndCheck(mutateFn) {
@@ -143,7 +143,7 @@ function _egSimulateAndCheck(mutateFn) {
 // violated requirements compared to the current state. In a fully valid
 // loadout this is strict enforcement (any violating move blocks). But if a
 // saved character was built before enforcement existed (or otherwise ended
-// up in an invalid state), the player can never be locked out — moves that
+// up in an invalid state), the player can never be locked out - moves that
 // keep or reduce violations are always allowed, so any broken build can be
 // dismantled and fixed.
 function _egCheckMoveAllowed(mutateFn) {
@@ -257,7 +257,7 @@ function _egShowRequirementsToast(context, missingOrGate, item) {
 // Attribute totals as the equip gate would see them after equipping `item`.
 //   - Equipped item: unchanged live loadout.
 //   - Stash item: the occupant of the target slot is already removed and the
-//     item's own bonuses are included (self-carrying) — matching exactly what
+//     item's own bonuses are included (self-carrying) - matching exactly what
 //     _egCanEquipInSlot will validate, so tooltips never show "requirements
 //     met" for an equip that the gate would reject (or vice versa).
 function _egPreviewEquipAttributes(item) {
@@ -288,7 +288,7 @@ function _egGetSwapChainBreak(item) {
     const gate = _egCanEquipInSlot(item, target);
     if (gate.ok) return null;
     // If the new item itself misses a requirement, the regular
-    // "Missing:" display already covers it — not a chain-break.
+    // "Missing:" display already covers it - not a chain-break.
     if ((gate.missing || []).some(u => u.item === item)) return null;
 
     const broken = (gate.missing || []).filter(u => u.item !== item && equippedList.includes(u.item));
@@ -302,7 +302,7 @@ function _egGetSwapChainBreak(item) {
 //   - Equipped items: red while the item itself currently violates its
 //     requirements against the live loadout.
 //   - Stash items: red when equipping it right now would be rejected by the
-//     requirement gate (grandfather rule included — matches what the game
+//     requirement gate (grandfather rule included - matches what the game
 //     would actually do on right-click / drop).
 // Non-equipment items and items with no requirements are never blocked.
 function _egIsItemBlocked(item) {
@@ -323,7 +323,7 @@ function _egIsItemBlocked(item) {
     }
 
     const target = (typeof _dndFindTargetSlot === 'function') ? _dndFindTargetSlot(item) : null;
-    if (!target) return false; // no matching slot exists — not a requirements question
+    if (!target) return false; // no matching slot exists - not a requirements question
     const gate = _egCanEquipInSlot(item, target);
     if (gate.ok) return false;
     // A 2H weapon whose only obstacle is the occupied off-hand is NOT blocked:
@@ -445,9 +445,9 @@ function _egHandErrorMessage(handError, item) {
             if (s && s !== 'eg_cannot_equip_main_shield') return s.replace('{name}', name);
         }
     } catch (e) {}
-    if (handError === 'two_handed_blocks_offhand') return `⚠️ ${name} is two-handed — free the off-hand first`;
+    if (handError === 'two_handed_blocks_offhand') return `⚠️ ${name} is two-handed - free the off-hand first`;
     if (handError === 'offhand_blocked_by_two_hander') return `⚠️ Cannot use the off-hand while a two-handed weapon is equipped`;
-    if (handError === 'offhand_single_handed_only') return `⚠️ ${name} cannot go in the off-hand — one-handed weapons or shields only`;
+    if (handError === 'offhand_single_handed_only') return `⚠️ ${name} cannot go in the off-hand - one-handed weapons or shields only`;
     return `⚠️ ${name} cannot go into that slot`;
 }
 
@@ -508,8 +508,8 @@ function _egTryAutoUnequipOffhandForTwoHander() {    if (typeof _egEquipped === 
 //------------------------------------------------------------------------
 // One-time repair for saves made before the 1H/2H split: a 2H weapon plus an
 // occupied off-hand (or any other illegal hand combo) can no longer stay
-// equipped. Runs inside _egLoadHubState — i.e. on every character-sheet open,
-// AFTER the hands heal — so the very next sheet visit after the update shows
+// equipped. Runs inside _egLoadHubState - i.e. on every character-sheet open,
+// AFTER the hands heal - so the very next sheet visit after the update shows
 // a legal, working loadout. Displaced items always land in the (unlimited)
 // stash, so nothing is ever lost. Deliberately unconditional (no chain gate):
 // legality is guaranteed and any newly-unmet requirements simply flag red,

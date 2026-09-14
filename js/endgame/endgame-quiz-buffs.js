@@ -21,10 +21,10 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Damage per stack — each correct quiz answer adds +10% additively
+// Damage per stack - each correct quiz answer adds +10% additively
 // (3 stacks = +30%, etc.). Each stack lasts EG_QUIZ_BUFF_DURATION_MS.
 const EG_QUIZ_BUFF_DAMAGE_PER_STACK = 0.10;
-// Legacy constant — single-stack multiplier, kept for backward compatibility.
+// Legacy constant - single-stack multiplier, kept for backward compatibility.
 const EG_QUIZ_BUFF_DAMAGE_MULT = 1 + EG_QUIZ_BUFF_DAMAGE_PER_STACK;
 // Duration of each damage stack (30 minutes).
 const EG_QUIZ_BUFF_DURATION_MS = 30 * 60 * 1000;
@@ -43,7 +43,7 @@ let _egQuizShieldTimer = null;
 // the map_extra_questions mod (+# additional Quiz Questions per Puzzle)
 // which previously overwrote a single string and only the last reward was shown.
 let _egPendingQuizRewardLines = [];
-// Legacy alias — kept for backward compatibility / debug inspection.
+// Legacy alias - kept for backward compatibility / debug inspection.
 let _egPendingQuizRewardLine = '';
 
 // Removes expired stacks and refreshes the derived _egQuizDmgBuffUntil.
@@ -102,7 +102,7 @@ function _egScheduleQuizShieldExpiry() {
         if (remaining === 0) {
             _egRemoveQuizShieldFX(false);
         } else {
-            // Another stack is still active — keep the shield and wait for the next expiry.
+            // Another stack is still active - keep the shield and wait for the next expiry.
             _egScheduleQuizShieldExpiry();
         }
     }, delay);
@@ -146,7 +146,7 @@ function _egConsumePendingQuizRewardHTML() {
         line = coalesced.join('<br>');
         _egPendingQuizRewardLines = [];
     } else if (_egPendingQuizRewardLine) {
-        // Fallback for legacy single-string value — may already contain <br>
+        // Fallback for legacy single-string value - may already contain <br>
         const parts = _egPendingQuizRewardLine.split('<br>');
         const coalesced = _coalesce(parts);
         line = coalesced.join('<br>');
@@ -177,7 +177,7 @@ function _egAddQuizShieldFX(durationMs) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
 
-    // Create wings only if they don't already exist — stacking should not
+    // Create wings only if they don't already exist - stacking should not
     // flicker the visual. Each new stack just refreshes the expiry scheduler.
     if (!document.querySelector('.eg-quiz-shield-wing')) {
         const left = document.createElement('div');
@@ -202,7 +202,7 @@ function _egAddQuizShieldFX(durationMs) {
     }
 }
 
-// Removes the barrier wings — immediately, or after a short fade-out.
+// Removes the barrier wings - immediately, or after a short fade-out.
 function _egRemoveQuizShieldFX(immediate) {
     const wings = document.querySelectorAll('.eg-quiz-shield-wing');
     if (!wings.length) return;
@@ -368,7 +368,7 @@ function _egApplyQuizRewardBuff() {
             _egPendingQuizRewardLines.push(manaLine);
             _egPendingQuizRewardLine = _egPendingQuizRewardLines.join('<br>');
         } else {
-            // No mana gained (e.g. Blood Magic or reduced gain) — fall back
+            // No mana gained (e.g. Blood Magic or reduced gain) - fall back
             // Prefer heal if not at full life, otherwise fall back to damage.
             if (needsHeal) {
                 const heal = Math.max(1, Math.round(playerMaxHP * 0.25));
@@ -381,7 +381,7 @@ function _egApplyQuizRewardBuff() {
                 _egPendingQuizRewardLines.push(fbLine);
                 _egPendingQuizRewardLine = _egPendingQuizRewardLines.join('<br>');
             } else {
-                // Both resources full — give damage instead of wasting the reward
+                // Both resources full - give damage instead of wasting the reward
                 _egGrantQuizDamageReward();
             }
         }

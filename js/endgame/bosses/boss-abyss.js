@@ -2,7 +2,7 @@
 //-------------------BOSS: THE ABYSS (boss_abyss)-------------------------------
 //------------------------------------------------------------------------
 // Delve-darkness homage: the screen drowns in darkness and only a circle of
-// light keeps you safe. The light follows you — but it lags behind sharp
+// light keeps you safe. The light follows you - but it lags behind sharp
 // movement and keeps shrinking. Move smoothly and deliberately.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -42,7 +42,7 @@ function _egMechAbyssDark(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const r0 = 280, r1 = 100;
-    const followSpeed = 260; // px/s — slower than a sprinting avatar
+    const followSpeed = 260; // px/s - slower than a sprinting avatar
     const dotPct = [0, 9, 11, 13][p];
     const durMs = 9000;
     const run = _egNkNewRun(monster && monster.id, true);

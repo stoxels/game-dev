@@ -14,9 +14,9 @@
 // below. The state is cleared by _egChainCleanup() when the run ends.
 //
 // Dependencies (must be loaded before this file):
-//   endgame-maps.js            — EG_MAP_MOD_TABLES / mod shape
-//   endgame-hub.js             — _egMapSlotItem, egSaveHubState()
-//   endgame-encounter-chain.js — _egBuildChainPool, _egChainCleanup hook
+//   endgame-maps.js            - EG_MAP_MOD_TABLES / mod shape
+//   endgame-hub.js             - _egMapSlotItem, egSaveHubState()
+//   endgame-encounter-chain.js - _egBuildChainPool, _egChainCleanup hook
 //
 // Entry point:
 //   egActivateMap() in endgame-gate.js → _egLaunchMapFromDevice(mapItem)
@@ -30,7 +30,7 @@
 // The map item currently driving an active device run (null outside runs).
 let _egActiveMapItem = null;
 
-// Hard on-screen enemy cap for tier 1 maps — keeps early runs readable
+// Hard on-screen enemy cap for tier 1 maps - keeps early runs readable
 // for new players regardless of rolled +monster modifiers.
 const EG_TIER1_MAX_MONSTERS = 3;
 
@@ -40,11 +40,11 @@ const EG_LOW_TIER_MONSTER_STEPS = [0, 0, 1, 2];
 
 // Legacy: percent chance that a device map rolled a boss at all (maps
 // created before the "every map ends in a boss fight" rule). Bosses are
-// now guaranteed in every map (see _egRollMapBossStatus) — the constant is
+// now guaranteed in every map (see _egRollMapBossStatus) - the constant is
 // only kept for the tooltip's legacy-map fallback line.
 const EG_MAP_BASE_BOSS_CHANCE = 50;
 
-// Total non-boss kills required per tier — early tiers stay short so new
+// Total non-boss kills required per tier - early tiers stay short so new
 // players can clear quickly. Caps: T1 ≤15, T2 ≤20.
 const EG_TIER1_MAX_TOTAL_MONSTERS = 15;
 const EG_TIER2_MAX_TOTAL_MONSTERS = 20;
@@ -144,13 +144,13 @@ function _egMapTimeGainMult() {
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
-// "Elemental Weakness — #% reduced all Resistances" → multiplier below 1.
+// "Elemental Weakness - #% reduced all Resistances" → multiplier below 1.
 function _egMapResistMult() {
     const v = _egGetActiveMapModValue('map_elem_weakness');
     return v > 0 ? Math.max(0.25, 1 - v / 100) : 1;
 }
 
-// "Vulnerability — you take #% increased Damage" → amplifier above 1.
+// "Vulnerability - you take #% increased Damage" → amplifier above 1.
 function _egMapDamageTakenAmpMult() {
     const v = _egGetActiveMapModValue('map_vulnerability');
     return v > 0 ? 1 + v / 100 : 1;
@@ -180,7 +180,7 @@ function _egMapBlockMult() {
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
-// "Temporal Chains — you act #% slower" → attack-interval stretch above 1.
+// "Temporal Chains - you act #% slower" → attack-interval stretch above 1.
 function _egMapActionSlowMult() {
     const v = _egGetActiveMapModValue('map_temporal_chains');
     return v > 0 ? 1 + v / 100 : 1;
@@ -273,7 +273,7 @@ function _egApplyMapModsToMonster(monster) {
     const dmgPct = _egGetActiveMapModValue('map_monster_damage');
     if (dmgPct > 0 && monster.damageValue > 0) {
         monster.damageValue = Math.round(monster.damageValue * (1 + dmgPct / 100));
-        // Bosses store their pre-phase base for phase scaling — keep it in sync.
+        // Bosses store their pre-phase base for phase scaling - keep it in sync.
         if (monster.bossBaseDamage != null) monster.bossBaseDamage = monster.damageValue;
     }
 
@@ -294,7 +294,7 @@ function _egApplyMapModsToMonster(monster) {
         });
     }
 
-    // PoE-style behaviour mods — read live by the encounter/ailment systems.
+    // PoE-style behaviour mods - read live by the encounter/ailment systems.
     const critPct = _egGetActiveMapModValue('map_monster_crit');
     if (critPct > 0) monster.critChancePct = critPct;
 
@@ -318,7 +318,7 @@ function _egApplyMapModsToMonster(monster) {
             Math.round(monster.chargeMax * Math.min(95, ambushPct + 5) / 100));
     }
 
-    // PoE-style escalation mods — read live by the encounter systems.
+    // PoE-style escalation mods - read live by the encounter systems.
     const etherealPct = _egGetActiveMapModValue('map_monster_ethereal');
     if (etherealPct > 0) monster.etherealPct = etherealPct;
 
@@ -386,7 +386,7 @@ function _egMapLootRarityWeightMult() {
 // Expands a size mix { small, medium, large, massive } into an ordered
 // queue of bucket names: small puzzles come first, massive ones close out
 // the run. If mods raised the required puzzle count above the mix total,
-// buckets top the queue up — via `rng` (seeded) when a chain blueprint is
+// buckets top the queue up - via `rng` (seeded) when a chain blueprint is
 // present, so extended chains stay deterministic per region.
 function _egBuildSizeQueue(sizeMix, targetLen, rng) {
     const R = rng || Math.random;
@@ -405,7 +405,7 @@ function _egBuildSizeQueue(sizeMix, targetLen, rng) {
 // the progression of the test-map hub (EG_TEST_MAPS). The rolled map mods
 // are applied on top by _egApplyModsToBaseline().
 // Atlas regions additionally contribute their deterministic chain blueprint
-// (fixed story/generated mix, generator flavour, fixed boss) — the same
+// (fixed story/generated mix, generator flavour, fixed boss) - the same
 // region always plays the same chain.
 function _egRollMapRunBaseline(map) {
     const tier = Math.max(1, map.mapTier || 1);
@@ -435,7 +435,7 @@ function _egRollMapRunBaseline(map) {
         hasBoss: true,
         maxBosses: 1,
         // T16 is the ceiling: at most 6 puzzles + 4 questions; lower tiers
-        // ramp down smoothly (puzzles 2→6, questions 1→4 — see
+        // ramp down smoothly (puzzles 2→6, questions 1→4 - see
         // egMapBasePuzzlesForTier / egMapBaseQuestionsForTier in endgame-maps.js).
         requiredPuzzles: (typeof egMapBasePuzzlesForTier === 'function')
             ? egMapBasePuzzlesForTier(tier)
@@ -444,7 +444,7 @@ function _egRollMapRunBaseline(map) {
             ? egMapBaseQuestionsForTier(tier)
             : Math.max(1, Math.min(4, 1 + Math.floor((tier - 1) / 5))),
         // Time limit and mistake budget scale with the same objective ramp
-        // (early tiers get proportionally less; T16 ≈ 30:00 / 10 — see
+        // (early tiers get proportionally less; T16 ≈ 30:00 / 10 - see
         // egMapBaseDurationForTier / egMapBaseMistakesForTier).
         egTimeLimit: (typeof egMapBaseDurationForTier === 'function')
             ? egMapBaseDurationForTier(tier)
@@ -467,7 +467,7 @@ function _egRollMapRunBaseline(map) {
         },
     };
 
-    // Newer maps carry pre-computed implicits — use them verbatim so the
+    // Newer maps carry pre-computed implicits - use them verbatim so the
     // run matches exactly what the tooltip promised (including boss status).
     if (imp) {
         if (imp.puzzles != null) base.requiredPuzzles = Math.max(1, Math.min(20, imp.puzzles));
@@ -515,7 +515,7 @@ function _egApplyModsToBaseline(base, map) {
                 break;
 
             case 'map_boss_chance':
-                // Legacy: boss presence is now a pure implicit — `hasBoss` is
+                // Legacy: boss presence is now a pure implicit - `hasBoss` is
                 // rolled solely from tier via `_egRollMapBossStatus` and then
                 // preserved across all orb rerolls (`_egWithImplicits`). The
                 // `map_boss_chance` modifier is no longer generated and does
@@ -623,6 +623,15 @@ function _egCleanupMapRunSeedLevel() {
 function _egLaunchMapFromDevice(mapItem) {
     if (!mapItem || typeof startLevel !== 'function') return;
 
+    // A device run is never a campaign trial: drop stale trial routing from
+    // an abandoned trial (e.g. left via the pause menu) so the leave-map
+    // return button routes to the Nexus again.
+    if (typeof window !== 'undefined') {
+        window._egCampaignTrial = null;
+        window._egTrialReturnWi = null;
+        window._egTrialReturnKind = null;
+    }
+
     const baseline = _egApplyModsToBaseline(_egRollMapRunBaseline(mapItem), mapItem);
 
     const gi = _egPickMapRunSeedGi(baseline);
@@ -666,11 +675,11 @@ function _egLaunchMapFromDevice(mapItem) {
     // Gate instead of the normal world/level-select screen when the run ends.
     window._egIsMapDeviceRun = true;
 
-    // Gear: warding — its once-per-map killing-blow save refreshes at the
+    // Gear: warding - its once-per-map killing-blow save refreshes at the
     // start of every device-map run.
     _egWardingUsedThisMap = false;
 
-    // Bind the endgame lose-overlay UI (no Retry — only "Return to the Nexus")
+    // Bind the endgame lose-overlay UI (no Retry - only "Return to the Nexus")
     // up front so every defeat path inside the map is covered.
     if (typeof _egEnsureLoseOverlayEndgameUI === 'function') _egEnsureLoseOverlayEndgameUI();
 

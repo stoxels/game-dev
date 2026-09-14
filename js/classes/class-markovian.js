@@ -5,7 +5,7 @@
 //
 // This file implements the two active abilities for the Markovian class:
 //
-//   ACTIVE 1 — STATE ROLLBACK
+//   ACTIVE 1 - STATE ROLLBACK
 //     Records a snapshot of the puzzle state every second (circular buffer).
 //     When activated, rewinds the puzzle back to the snapshot taken
 //     windowSeconds ago, restoring: userGrid, wrongGrid, revealedGrid,
@@ -13,7 +13,7 @@
 //     Rank 3 bonus: also wipes mistake cells that already existed inside
 //     the rollback window (pre-existing mistakes are forgiven).
 //
-//   ACTIVE 2 — TRANSITION MATRIX
+//   ACTIVE 2 - TRANSITION MATRIX
 //     Timed mode. Each correct fill has a cascadeChance of also revealing
 //     a random unfilled correct cardinal neighbour. Rank 3 allows the
 //     cascaded cell to itself cascade once more (maxDepth 2).
@@ -227,9 +227,9 @@ function _rollback_refreshDisplay() {
 //------------------------------------------------------------------------
 
 // Main entry point for the State Rollback ability.
-//   windowSeconds    — how far back in time to seek (rank-dependent).
-//   rewindSeconds    — bonus seconds added on top of the restored timer.
-//   clearOldMistakes — Rank 3 flag: forgive pre-existing mistakes.
+//   windowSeconds    - how far back in time to seek (rank-dependent).
+//   rewindSeconds    - bonus seconds added on top of the restored timer.
+//   clearOldMistakes - Rank 3 flag: forgive pre-existing mistakes.
 function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
     if (!cur) return;
 
@@ -274,7 +274,7 @@ function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
     // ── Refresh all UI that depends on grid state ────────────────
     _rollback_refreshDisplay();
 
-    // Clear stale DoF tracking — the entire grid state just changed.
+    // Clear stale DoF tracking - the entire grid state just changed.
     window._dofRevertedCells = new Set();
     window._mistakeLog = [];
 
@@ -384,7 +384,7 @@ function _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade) {
         }
     }
 
-    // Sweeping purple wave that scrolls left-to-right — only when visible.
+    // Sweeping purple wave that scrolls left-to-right - only when visible.
     if (fade > 0.15) {
         const waveX = (elapsed % 1100) / 1100 * (w + 200) - 100;
         const wg = ctx.createLinearGradient(waveX - 60, 0, waveX + 60, 0);
@@ -561,9 +561,9 @@ function _rollbackPlayVFX(rows, cols) {
 //------------------------------------------------------------------------
 
 // Starts a new Transition Matrix session. Cancels any session already running.
-//   durationMs    — how long the mode stays active.
-//   cascadeChance — probability (0–1) of each correct fill triggering a cascade.
-//   maxDepth      — maximum cascade chain length (1 = rank 1–2, 2 = rank 3).
+//   durationMs    - how long the mode stays active.
+//   cascadeChance - probability (0–1) of each correct fill triggering a cascade.
+//   maxDepth      - maximum cascade chain length (1 = rank 1–2, 2 = rank 3).
 function _executeTransitionMatrix(durationMs, cascadeChance, maxDepth) {
     _clearTransitionMatrix();
 
@@ -752,7 +752,7 @@ function _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade) {
         }
 
         const baseA = col.alpha * fade;
-        // Trail — use single green channel calc, avoid per-glyph floor
+        // Trail - use single green channel calc, avoid per-glyph floor
         for (let i = 0; i < col.len; i++) {
             const a = (1 - i / col.len) * baseA * 0.55;
             if (a < 0.008) continue;
@@ -760,7 +760,7 @@ function _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade) {
             ctx.fillStyle = `rgba(30,${110 + (col.len - i) * 12},70,${a})`;
             ctx.fillText(col.chars[i] || '0', col.x, col.y - i * 14);
         }
-        // Head — brighter, slightly larger alpha
+        // Head - brighter, slightly larger alpha
         ctx.fillStyle = `rgba(130,255,165,${baseA * 1.1})`;
         ctx.fillText(col.chars[0], col.x, col.y);
     }
@@ -785,7 +785,7 @@ function _tmOverlay_drawChains(ctx, chains, fade) {
     }
     ctx.setLineDash([]);
 
-    // Travelling dots — solid fills, no gradient
+    // Travelling dots - solid fills, no gradient
     for (let i = 0; i < chains.length; i++) {
         const ch = chains[i];
         const px = ch.a.x + (ch.b.x - ch.a.x) * ch.progress;
@@ -812,7 +812,7 @@ function _tmOverlay_drawNodes(ctx, nodes, t2, fade) {
         const r = n.active ? 6 + pulse * 3 : 3.5 + pulse;
 
         if (n.active) {
-            // soft halo — solid fill with low alpha instead of gradient
+            // soft halo - solid fill with low alpha instead of gradient
             ctx.fillStyle = `rgba(40,220,110,${0.09 * pulse * fade})`;
             ctx.beginPath();
             ctx.arc(n.x, n.y, 14, 0, Math.PI * 2);
@@ -868,7 +868,7 @@ function _tmOverlay_drawParticles(ctx, particles, nodes, fade) {
 // durationMs of the Transition Matrix session.
 // OPTIMIZED: throttled to ~30fps, reduced overdraw, DPR-aware sizing.
 function _transitionMatrixStartOverlay(durationMs) {
-    // Respect reduced-motion preference — skip heavy canvas entirely
+    // Respect reduced-motion preference - skip heavy canvas entirely
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     document.getElementById('tm-canvas-overlay')?.remove();
 
@@ -946,7 +946,7 @@ function _transitionMatrixStartOverlay(durationMs) {
             return;
         }
 
-        // FPS throttling — skip frame if too soon
+        // FPS throttling - skip frame if too soon
         if (now - lastFrame < FRAME_INTERVAL) {
             animId = requestAnimationFrame(tick);
             return;
@@ -985,8 +985,8 @@ function _transitionMatrixStartOverlay(durationMs) {
 // Called from onCorrectFill() in class-abilities.js whenever the player
 // fills a cell correctly while Transition Matrix is active.
 // Tries to cascade to a random unfilled correct cardinal neighbour.
-//   row / col  — the cell that was just filled correctly.
-//   depth      — remaining cascade depth (decremented on each recursive call).
+//   row / col  - the cell that was just filled correctly.
+//   depth      - remaining cascade depth (decremented on each recursive call).
 function _transitionMatrixCascade(row, col, depth) {
     const tm = window._transitionMatrixActive;
 

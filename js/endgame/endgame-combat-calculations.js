@@ -16,7 +16,7 @@ function _egCalcPlayerDamage() {
     dmg += stats.physFlatMin + (stats.physFlatMax - stats.physFlatMin) * Math.random();
     dmg *= (1 + stats.physIncPct / 100);
 
-    // Elemental damage adds after the physical multiplier — it isn't scaled by inc_physical_damage.
+    // Elemental damage adds after the physical multiplier - it isn't scaled by inc_physical_damage.
     // The per-element breakdown is kept in _egLastHitElements so the impact
     // site can apply the target monster's elemental resistances.
     const elements = _egRollElementalBreakdown(stats);
@@ -38,7 +38,7 @@ function _egCalcPlayerDamage() {
 
     if (critMult > 1 && typeof showToast === 'function') showToast('💥 Critical Hit!');
 
-    // Life leech — heal the player for a % of the damage about to be dealt.
+    // Life leech - heal the player for a % of the damage about to be dealt.
     if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
         const heal = Math.round(dmg * (stats.lifeLeechPct / 100));
         if (heal > 0) {
@@ -58,27 +58,36 @@ let _egLastMeleeElements = null;
 let _egLastMeleeWasCrit = false;
 let _egLastMeleeCritMult = 1;
 
-// Melee auto-strike channel — fully independent from projectiles:
-// rolls the equipped weapon's base damage range plus its "… to Melee
-// Strikes" mods and unscoped sources (bracers/rings/amulet), scaled by
+// Manual melee channel (Secret-of-Mana-style) - fully independent from
+// projectiles: rolls the equipped weapon's base damage range plus its
+// "… to Melee Strikes" mods and unscoped sources (bracers/rings/amulet),
+// already doubled for manual pacing in _egComputePlayerStats, scaled by
 // % increased physical damage and crit. Falls back to the flat base
 // punch when no weapon damage exists. Projectiles use
 // _egCalcPlayerDamage() instead (see _egComputePlayerStats for routing).
-function _egCalcPlayerMeleeDamage() {
+// `chargePct` (0..1) scales the whole roll - callers pass the spent manual
+// charge share (see _egApplyPlayerMeleeImpact in endgame-encounter.js).
+function _egCalcPlayerMeleeDamage(chargePct = 1) {
     const stats = _egComputePlayerStats();
+    // Manual charge share (Secret-of-Mana-style, linear): 1 = fully-charged
+    // full damage. Applied up front so crit, map mods AND life leech below
+    // all operate on the scaled hit - chip hits can't leech full damage.
+    const charge = Math.min(1, Math.max(0, Number(chargePct) || 0));
 
     let dmg;
     if (stats.meleePhysMax > 0) {
         dmg = stats.meleePhysMin + (stats.meleePhysMax - stats.meleePhysMin) * Math.random();
         dmg *= (1 + stats.meleePhysIncPct / 100);
     } else {
-        // Unarmed / no weapon damage — flat fallback strike
+        // Unarmed / no weapon damage - flat fallback strike
         dmg = EG_PLAYER_MELEE_DAMAGE;
     }
+    dmg *= charge;
 
     // Elemental damage adds after the physical multiplier, mirroring the
-    // projectile channel.
-    const rollEl = (min, max) => (min > 0 || max > 0) ? min + Math.random() * (max - min) : 0;
+    // projectile channel - scaled by charge like the physical share so the
+    // stored breakdown stays consistent with the final hit size.
+    const rollEl = (min, max) => (min > 0 || max > 0) ? (min + Math.random() * (max - min)) * charge : 0;
     const elements = {
         fire: rollEl(stats.meleeFireMin, stats.meleeFireMax),
         cold: rollEl(stats.meleeColdMin, stats.meleeColdMax),
@@ -101,9 +110,11 @@ function _egCalcPlayerMeleeDamage() {
 
     dmg = Math.max(1, Math.round(dmg));
 
-    if (critMult > 1 && typeof showToast === 'function') showToast('💥 Critical Hit!');
+    // Crit toast only on (near-)full charges - chip-hit crits would spam it
+    // while machine-tapping E.
+    if (critMult > 1 && charge >= 0.99 && typeof showToast === 'function') showToast('💥 Critical Hit!');
 
-    // Life leech — heal the player for a % of the damage about to be dealt.
+    // Life leech - heal the player for a % of the damage about to be dealt.
     if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
         const heal = Math.round(dmg * (stats.lifeLeechPct / 100));
         if (heal > 0) {
@@ -128,7 +139,7 @@ const EG_RESIST_CAP_PCT = 75;
 
 // Effective resistance cap for one player element: base cap plus the
 // aggregated max-resist bonuses (per-element + the all-elements bucket).
-// Monsters have no max-resist sources — they are hard-capped at the base.
+// Monsters have no max-resist sources - they are hard-capped at the base.
 function _egGetPlayerResistCap(stats, element) {
     const extra = ((stats[element + 'ResistMax']) || 0) + ((stats.allResMax) || 0);
     return EG_RESIST_CAP_PCT + Math.max(0, extra);
@@ -165,7 +176,7 @@ function _egScaleElements(elements, factor) {
 // Applies the target monster's elemental resistances to an incoming hit.
 // `elements` maps each element to the raw elemental damage carried by the hit
 // (proportional to `amount`); everything else counts as physical. Positive
-// resistances reduce; NEGATIVE resistances AMPLIFY (vulnerability) — both
+// resistances reduce; NEGATIVE resistances AMPLIFY (vulnerability) - both
 // clamped to ±EG_RESIST_CAP_PCT. An optional `physical` resistance (heavy
 // armor) reduces only the physical share and applies even when the hit
 // carries no elemental breakdown at all. Monsters without these keys keep
@@ -206,7 +217,7 @@ function _egApplyTargetResistances(amount, target, elements) {
 // Non-elemental hits pass through untouched. Returns the reduced amount.
 function _egCalcPlayerResistanceReduction(amount, stats, element) {
     if (!element || amount <= 0) return amount;
-    // Active map run: Elemental Weakness — #% reduced all Resistances.
+    // Active map run: Elemental Weakness - #% reduced all Resistances.
     const resistMult = (typeof _egMapResistMult === 'function') ? _egMapResistMult() : 1;
     const resMap = {
         fire: (stats.fireResist || 0) * resistMult,

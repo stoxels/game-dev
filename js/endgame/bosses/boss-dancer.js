@@ -4,32 +4,32 @@
 // The ballroom never closes: a rework of the old one-shot Dance Steps
 // mechanic into a persistent rhythm siege. The Dancer herself is a
 // mirror-ball figure drifting above the floor, conducting the fight on a
-// beat. Fight identity: EVERYTHING lands on a beat — telegraphs pulse to
+// beat. Fight identity: EVERYTHING lands on a beat - telegraphs pulse to
 // the tempo, damage hits on the downbeat, and dodging well IS dancing.
 //
 //   PERSISTENT (whole fight, watcher):
-//   • THE MIRROR BALL — the boss hangs mid-arena as a spinning 🪩 figure,
+//   • THE MIRROR BALL - the boss hangs mid-arena as a spinning 🪩 figure,
 //     slowly waltzing to a new spot after every bar. Touching it is a
 //     Twirl: animated fling + lightning on a per-touch cooldown.
-//   • SPOTLIGHT STEPS — the old Dance Steps, now perpetual: footprints
+//   • SPOTLIGHT STEPS - the old Dance Steps, now perpetual: footprints
 //     light up in sequence somewhere on the floor; standing on the lit
 //     step "dances" it away (small heal reward), missing the beat zaps
 //     you. Cadence and step count scale per phase.
-//   • RHYTHM RIBBONS — rotating light beams (like a dance-floor laser
+//   • RHYTHM RIBBONS - rotating light beams (like a dance-floor laser
 //     show) sweep from the ball, telegraphed by a dashed arc before each
 //     sweep. Standing in a live ribbon is a heavy hit.
 //
-//   60% GATE — CURTAIN CALL: the stage lights cut and red curtain drops
+//   60% GATE - CURTAIN CALL: the stage lights cut and red curtain drops
 //   fall at staggered telegraphed marks across the floor, each leaving a
 //   lingering dim "backstage" patch that drags you toward its center.
 //
-//   30% GATE — PETAL STORM: the finale — v-waves of 🌸 petals cross the
+//   30% GATE - PETAL STORM: the finale - v-waves of 🌸 petals cross the
 //   screen over ~8s; petals are small but numerous shadow hits, and a
 //   thin ambient drizzle keeps falling afterwards in phase 3.
 //
-//   CHARGE ATTACK — PIROUETTE: the ball flashes, then spins in place
+//   CHARGE ATTACK - PIROUETTE: the ball flashes, then spins in place
 //   unleashing 3 expanding lightning rings (like a dancer's turns) with
-//   gaps you can stand in — a rhythm dodge.
+//   gaps you can stand in - a rhythm dodge.
 //
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -57,7 +57,7 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            // Kept for schedule compatibility — the persistent watcher now
+            // Kept for schedule compatibility - the persistent watcher now
             // owns footsteps; the handler no-ops (same shim pattern as the
             // other reworked bosses).
             { name: 'dance_steps', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechDanceSteps' },
@@ -120,7 +120,7 @@ const EG_DAN_PIRO_HIT_CD_MS = 800;           // global ring-hit cooldown
 
 let _egDancerWatcher = null; // per-fight ballroom state
 
-// Phase lookup helper — resolves the boss's current phase (default 1).
+// Phase lookup helper - resolves the boss's current phase (default 1).
 function _egDanPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
         const m = _egMonsters.find(x => x && x.id === st.monsterId);
@@ -129,7 +129,7 @@ function _egDanPhase(st) {
     return 1;
 }
 
-// Flat heal + HUD refresh (no shared helper exists — hearts do it inline).
+// Flat heal + HUD refresh (no shared helper exists - hearts do it inline).
 function _egDanHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
@@ -175,7 +175,7 @@ function _egDancerArenaInit(monster) {
     _egDancerWatcher = st;
 
     // Persistent watcher FIRST (elements must hang off a run): tier clock,
-    // but passive (never blocks scheduled mechanics — same pattern as the
+    // but passive (never blocks scheduled mechanics - same pattern as the
     // Puddle/Sprout/Bumper watchers).
     const run = _egNkNewRun(monsterId, true);
     run.passive = true;
@@ -336,7 +336,7 @@ function _egDancerTickSteps(st, dtS, c, p) {
         return;
     }
     if (seq.t >= EG_DAN_BEAT_MS[p]) {
-        // Missed the beat — zap, then move on.
+        // Missed the beat - zap, then move on.
         const dealt = _egNkHit(EG_DAN_STEP_DMG[p], 'lightning', st.level);
         _egNkAbilityHitToast(dealt, 'The Dancer', 'Dance Steps');
         el.classList.remove('on');
@@ -496,7 +496,7 @@ function _egDancerTickCurtains(st, dtS, c, pr) {
 
 // ── 30% gate: Petal Storm ────────────────────────────────────────────────
 // The finale: v-waves of 🌸 petals cross the screen while the ball spins
-// faster. Petals are small shadow hits — numerous, not heavy.
+// faster. Petals are small shadow hits - numerous, not heavy.
 function _egDancerPetalStorm(st, now) {
     if (st.storm) return;
     st.storm = { wave: 0, t: 0 };
@@ -570,7 +570,7 @@ function _egDancerSpawnPetal(st) {
 
 // ── Charge attack: Pirouette ─────────────────────────────────────────────
 // Dispatched from _egFireMonsterAttack: the ball flashes, then 3 expanding
-// lightning rings bloom from it — dodge the rings, stand in the gaps.
+// lightning rings bloom from it - dodge the rings, stand in the gaps.
 function _egDancerPirouette(monster) {
     const st = _egDancerWatcher;
     if (!st || _egNkDodgeBusy() || _egNkFrozen()) return;
@@ -579,7 +579,7 @@ function _egDancerPirouette(monster) {
     st.piro = { phase: 'warn', t: 0, ringsOut: 0, nextRingAt: 0, p, el: st.ball.el };
     st.ball.el.classList.add('piro-warn');
     setTimeout(() => { try { if (_egDancerWatcher === st && st.ball) st.ball.el.classList.remove('piro-warn'); } catch (e) {} }, EG_DAN_PIRO_WARN_MS);
-    _egNkToast('eg_dancer_piro', '💫 PIROUETTE! Dodge the rings — dance the gaps!');
+    _egNkToast('eg_dancer_piro', '💫 PIROUETTE! Dodge the rings - dance the gaps!');
 }
 
 
@@ -588,7 +588,7 @@ function _egDancerPirouette(monster) {
 // ring can't multi-tick while it passes over the player.
 function _egDancerPiroRing(st, pi, p) {
     const x = st.ball.x, y = st.ball.y;
-    // Own run per ring: a run supports exactly ONE rAF loop — registering
+    // Own run per ring: a run supports exactly ONE rAF loop - registering
     // the ring loop on the watcher run would overwrite its raf handle AND
     // kill the whole arena when the ring completes (_egNkKillRun removes
     // every run element, ball included).
@@ -621,7 +621,7 @@ function _egDancerPiroRing(st, pi, p) {
 //------------------------------------------------------------------------
 //-------------------LEGACY COMPAT SHIM------------------------------------
 //------------------------------------------------------------------------
-// The old scheduled mechanic is now the persistent spotlight steps — keep
+// The old scheduled mechanic is now the persistent spotlight steps - keep
 // the handler name alive so any stale schedule entry no-ops instead of
 // erroring.
 function _egMechDanceSteps(monster, phase) { void monster; void phase; }

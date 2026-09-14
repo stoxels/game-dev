@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-//-------------------CURSED REVEAL — CURSED LENS----------------------
+//-------------------CURSED REVEAL - CURSED LENS----------------------
 //------------------------------------------------------------------------
 
-// cursedReveal — reveals 6 cells; downside clears all wrong marks.
+// cursedReveal - reveals 6 cells; downside clears all wrong marks.
 function _useCursedReveal(id, def) {
     _trackWitchImmuneCursedUse();
     questStat_revealItemUsed();
@@ -52,7 +52,7 @@ function _fxMakeCursedTint(container, r) {
     `, 'fx-cursed-tint');
 }
 
-// ☠️ Cursed Reveal — sickly green skull flash + ✕ marks dissolve.
+// ☠️ Cursed Reveal - sickly green skull flash + ✕ marks dissolve.
 function _fxCursedReveal() {
     const r = _fxGetPuzzleRect();
     if (!r) return;

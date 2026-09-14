@@ -20,7 +20,7 @@
 
     The seed level is flagged isTestMapSeed so _egChainCleanup() (extended
     in endgame-encounter-chain.js) strips all the injected fields back off
-    it once the run ends — it returns to being a normal story puzzle.
+    it once the run ends - it returns to being a normal story puzzle.
     ========================================================================
 */
 
@@ -34,13 +34,13 @@
 // Five test maps, roughly increasing in difficulty/juice (PoE-map style).
 // puzzlePool criteria are the same shape _egBuildChainPool() already
 // understands (minCells/maxCells/minRows/maxRows/minCols/maxCols/worlds/
-// excludeWorlds) — see endgame-encounter-chain.js.
-// DISABLED: Old test maps up to level 160 — might revisit in future, but for now we
+// excludeWorlds) - see endgame-encounter-chain.js.
+// DISABLED: Old test maps up to level 160 - might revisit in future, but for now we
 // test the actual map device / map system instead (see endgame-gate.js +
 // endgame-map-launch.js). The legacy map definitions are kept below inside a
-// block comment for easy re-enable — just remove the block wrappers.
+// block comment for easy re-enable - just remove the block wrappers.
 const EG_TEST_MAPS = [
-    /* DISABLED LEGACY TEST MAPS BEGIN — old system up to level 160 (training_grounds → terminus_theorem)
+    /* DISABLED LEGACY TEST MAPS BEGIN - old system up to level 160 (training_grounds → terminus_theorem)
        Might revisit in future; for now we test the actual map device with proper map items.
        To re-enable, remove this block-comment opener and the closer at the end
        of the array and the maps will appear again on the Endgame Test Maps screen.
@@ -774,7 +774,7 @@ function _egtBuildFullScreenHTML() {
 //-------------------STYLES (INJECTED ONCE)---------------------------------
 //------------------------------------------------------------------------
 // Injected via JS, same pattern as ensureLSTooltipStyles() in
-// screens-level-select.js — avoids needing to touch the (large) main CSS file.
+// screens-level-select.js - avoids needing to touch the (large) main CSS file.
 
 function _egtEnsureStyles() {
     if (document.getElementById('egt-test-hub-style')) return;
@@ -857,7 +857,7 @@ function ensureEndgameTestHubScreen() {
     if (!document.getElementById('screen-endgame-test-hub')) _egtCreateScreen();
 }
 
-// Entry point — call this to show the map-select screen.
+// Entry point - call this to show the map-select screen.
 // (History push happens in launchEndgameTestMode() in screens.js on first
 // entry; goToLevelSelect() calls this directly to return here after a run.)
 function showEndgameTestHub() {

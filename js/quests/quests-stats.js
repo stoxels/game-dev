@@ -46,7 +46,7 @@ const _GRID_SIZE_ORDER = ['small', 'medium', 'large', 'massive'];
 
 // Shorthand reference to STATE.questStats. Set at the start of
 // updateQuestStats() and cleared when it returns. Every _inc() call relies
-// on this being set — never valid to read outside that call.
+// on this being set - never valid to read outside that call.
 let _qs = null;
 
 
@@ -65,11 +65,13 @@ function _ensureQuestStats() {
 // Increments a key on STATE.questStats by `by` (default 1), initialising it
 // to 0 first if needed. Safe to call mid-level, outside updateQuestStats.
 function _incDirect(key, by = 1) {
+    // Tutorial-quest levels never touch quest/inference progress.
+    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
     _ensureQuestStats();
     STATE.questStats[key] = (STATE.questStats[key] || 0) + by;
 }
 
-// Increments a questStats counter key. Thin wrapper over _incDirect — only
+// Increments a questStats counter key. Thin wrapper over _incDirect - only
 // valid while _qs is set, i.e. inside an updateQuestStats() call.
 function _inc(key, by = 1) {
     _incDirect(key, by);
@@ -560,7 +562,7 @@ function _questStats_trackComboQuests(payload) {
         _inc('levelsBlockedFifteenCurses');
     }
 
-    // Quest 3: Countdown Crisis keystone — use 30 timer items AND finish with ≤ 30s left
+    // Quest 3: Countdown Crisis keystone - use 30 timer items AND finish with ≤ 30s left
     if (_ptNodeActive('keystone_countdown_crisis') &&
         (qs._ql_timerItemsUsedThisLevel || 0) >= 30 &&
         payload.timerSecsAtWin !== undefined &&
@@ -573,7 +575,7 @@ function _questStats_trackComboQuests(payload) {
         _inc('levelsThirtyClassAbilities');
     }
 
-    // Quest 5: Finish a massive grid using ONLY reveal items — no manual fills, no ability reveals
+    // Quest 5: Finish a massive grid using ONLY reveal items - no manual fills, no ability reveals
     if (isMassive &&
         (qs._ql_revealItemsThisLevel || 0) > 0 &&
         !qs._ql_hasManuallyFilledCell &&
@@ -589,7 +591,7 @@ function _questStats_trackComboQuests(payload) {
         }
     }
 
-    // Ability Harvest — commit the per-level ability reveal/mark counters to
+    // Ability Harvest - commit the per-level ability reveal/mark counters to
     // their persistent global totals. Without this the abilityRevealsTotal /
     // abilityMarksTotal milestones could never be completed.
     if ((qs._ql_abilityRevealsThisLevel || 0) > 0) {
@@ -609,66 +611,66 @@ function _questStats_trackComboQuests(payload) {
 
     // -- Declarative combo conditions --
 
-    // Quest 13: Overfitting keystone — large+ grid with ≥ 25 mistakes
+    // Quest 13: Overfitting keystone - large+ grid with ≥ 25 mistakes
     _checkComboConditions(payload, 'levelsOverfitHighMistakes', [
         { type: 'ptNode', node: 'keystone_overfitting' },
         { type: 'minGridSize', size: 'large' },
         { type: 'minMistakes', value: 25 },
     ]);
 
-    // Quest 15: Completion Glimpse — complete a level while the completion text is visible
+    // Quest 15: Completion Glimpse - complete a level while the completion text is visible
     _checkComboConditions(payload, 'levelsWithGlimpseVisible', [
         { type: 'ptNode', node: 'completion_glimpse_1' },
     ]);
 
-    // Quest 16: Signal to Noise keystone — massive grid
+    // Quest 16: Signal to Noise keystone - massive grid
     _checkComboConditions(payload, 'massiveGridsSignalToNoise', [
         { type: 'ptNode', node: 'keystone_signal_to_noise' },
         { type: 'gridSize', size: 'massive' },
     ]);
 
-    // Quest 17: The Oracle keystone — massive grid
+    // Quest 17: The Oracle keystone - massive grid
     _checkComboConditions(payload, 'massiveGridsOracle', [
         { type: 'ptNode', node: 'keystone_the_oracle' },
         { type: 'gridSize', size: 'massive' },
     ]);
 
-    // Quest 18: Degrees of Freedom keystone — large+ grid
+    // Quest 18: Degrees of Freedom keystone - large+ grid
     _checkComboConditions(payload, 'largeGridsDegreesOfFreedom', [
         { type: 'ptNode', node: 'keystone_degrees_of_freedom' },
         { type: 'minGridSize', size: 'large' },
     ]);
 
-    // Quest 19: Random Walk keystone — large+ grid
+    // Quest 19: Random Walk keystone - large+ grid
     _checkComboConditions(payload, 'largeGridsRandomWalk', [
         { type: 'ptNode', node: 'keystone_random_walk' },
         { type: 'minGridSize', size: 'large' },
     ]);
 
-    // Quest 22: Entropy Drain keystone — massive grid
+    // Quest 22: Entropy Drain keystone - massive grid
     _checkComboConditions(payload, 'massiveGridsEntropyDrain', [
         { type: 'ptNode', node: 'keystone_entropy_drain' },
         { type: 'gridSize', size: 'massive' },
     ]);
 
-    // Quest 23: Dead Reckoning keystone — any level
+    // Quest 23: Dead Reckoning keystone - any level
     _checkComboConditions(payload, 'levelsDeadReckoning', [
         { type: 'ptNode', node: 'keystone_dead_reckoning' },
     ]);
 
-    // Quest 24: Frequentist's Burden keystone — massive grid
+    // Quest 24: Frequentist's Burden keystone - massive grid
     _checkComboConditions(payload, 'massiveGridsFrequentistsBurden', [
         { type: 'ptNode', node: 'keystone_frequentists_burden' },
         { type: 'gridSize', size: 'massive' },
     ]);
 
-    // Quest 27: Sparse Prior keystone — massive grid
+    // Quest 27: Sparse Prior keystone - massive grid
     _checkComboConditions(payload, 'massiveGridsSparsePrior', [
         { type: 'ptNode', node: 'keystone_sparse_prior' },
         { type: 'gridSize', size: 'massive' },
     ]);
 
-    // Quest 29: Adjacency Matrix node — any level
+    // Quest 29: Adjacency Matrix node - any level
     _checkComboConditions(payload, 'levelsAdjacencyMatrix', [
         { type: 'ptNode', node: 'adjacency_matrix' },
     ]);
@@ -732,13 +734,13 @@ function _questStats_onItemUsed(payload) {
     if (id === 'scoutPrimer') _inc('primerItemsUsed');
 }
 
-// Handles the 'classChosen' event. Only sets the flag once — subsequent
+// Handles the 'classChosen' event. Only sets the flag once - subsequent
 // class changes do not re-trigger it.
 function _questStats_onClassChosen() {
     if (!_qs.classChosen) _qs.classChosen = 1;
 }
 
-// Handles the 'ascendencyChosen' event. Only sets the flag once — subsequent
+// Handles the 'ascendencyChosen' event. Only sets the flag once - subsequent
 // ascendency changes do not re-trigger it.
 function _questStats_onAscendencyChosen() {
     if (!_qs.ascendencyChosen) _qs.ascendencyChosen = 1;
@@ -771,9 +773,12 @@ function _questStats_checkNewlyCompleted() {
 // completed milestones, then saves and refreshes the badge.
 
 // Records a game event and updates the relevant quest statistics. Single
-// public API for this module — all other code should call this rather than
+// public API for this module - all other code should call this rather than
 // modifying STATE.questStats directly.
 function updateQuestStats(event, payload = {}) {
+    // Tutorial-quest levels never touch quest/inference progress (also keeps
+    // onLevelCompleteAch, called from the levelComplete case, out of them).
+    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
     _ensureQuestStats();
     _qs = STATE.questStats; // set module-level shorthand for _inc()
 
@@ -798,7 +803,7 @@ function updateQuestStats(event, payload = {}) {
         case 'atlasTierCompleted':
         case 'atlasRetroCheck':
             // Atlas tier quests read STATE.egAtlasCompleted live via _atlasTierCheck();
-            // no stat increment needed — just trigger the completion check below.
+            // no stat increment needed - just trigger the completion check below.
             break;
     }
 

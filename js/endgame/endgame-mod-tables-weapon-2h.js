@@ -1,8 +1,8 @@
 //  endgame-mod-tables-weapon-2h.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------TWO-HANDED MELEE MODIFIER TABLE----------------------
@@ -10,7 +10,7 @@
 // PoE-style: 2H weapons roll the same families as 1H but hit ~45% harder on
 // flat damage (physical + elemental) and ~25% harder on % increased physical.
 // Attack speed / crit / accuracy / status / cleave pools are unchanged, so a
-// 2H weapon feels like a bigger version of a 1H — not a different item class.
+// 2H weapon feels like a bigger version of a 1H - not a different item class.
 const EG_MOD_TABLE_WEAPON_2H = (() => {
     const clone = JSON.parse(JSON.stringify(EG_MOD_TABLE_WEAPON1));
     const scaleTierList = (tiers, factor) => {

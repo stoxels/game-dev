@@ -13,9 +13,9 @@
 // endgame-hub.js (needs egSaveHubState / _egMapStash helpers).
 //
 // Public API:
-//   egGetGold()            — current gold balance
-//   egSpendGold(n)         — try to spend, returns false when too poor
-//   showEndgameVendor()    — opens the vendor screen (endgame-vendor.js)
+//   egGetGold()            - current gold balance
+//   egSpendGold(n)         - try to spend, returns false when too poor
+//   showEndgameVendor()    - opens the vendor screen (endgame-vendor.js)
 //------------------------------------------------------------------------
 
 
@@ -99,7 +99,7 @@ function _egRollGoldAmount(isBoss, monsterLevel) {
 }
 
 // Called by the kill handlers in endgame-encounter.js.
-    // Gold no longer drops from monsters — it's now an innate map completion reward.
+    // Gold no longer drops from monsters - it's now an innate map completion reward.
     // This function is kept as a no-op for API compatibility.
 function _egTryDropGold(isBoss, monsterLevel) {
     return;
@@ -172,7 +172,7 @@ function _egSpawnGoldDrop(amount) {
 }
 
 // Called from _egCheckAllClaims (mouse-button-handlers.js),
-// Gold no longer drops on the grid — these are kept as no-ops for API compatibility.
+// Gold no longer drops on the grid - these are kept as no-ops for API compatibility.
 function _egCheckGoldDropClaim(row, col) { return false; }
 function _egDiscardGoldDrop(row, col) {}
 function _egStopGoldDrops() {

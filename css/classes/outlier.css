@@ -2,7 +2,7 @@
     ------------------------------------------------------------------------
     ------------------------INFINITE HUNGER OVERLAY-------------------------
     ------------------------------------------------------------------------
-    Locked-aspect-ratio canvas approach — same pattern as .title-canvas /
+    Locked-aspect-ratio canvas approach - same pattern as .title-canvas /
     .tut-canvas / .setup-book, so every % coordinate below stays pinned to
     the same point on the artwork at any screen size.
 */
@@ -37,7 +37,7 @@
     user-select: none;
 }
 
-/* ── STONE TABLET — central panel, positioned relative to the canvas ── */
+/* ── STONE TABLET - central panel, positioned relative to the canvas ── */
 .ih-tablet {
     position: absolute;
     bottom: -22%;
@@ -59,7 +59,7 @@
     z-index: 0;
 }
 
-/* ── TITLE — "INFINITE HUNGER" ── */
+/* ── TITLE - "INFINITE HUNGER" ── */
 .ih-title {
     position: absolute;
     top: 14%;
@@ -91,7 +91,7 @@
     z-index: 2;
 }
 
-/* ── SLIDER ROW — track with the clock as the moving thumb ── */
+/* ── SLIDER ROW - track with the clock as the moving thumb ── */
 .ih-slider-row {
     position: absolute;
     top: 46%;
@@ -103,7 +103,7 @@
 .ih-slider-track {
     position: relative;
     width: 100%;
-    /* Bar stays slim regardless of thumb/icon size — tweak these two vars only */
+    /* Bar stays slim regardless of thumb/icon size - tweak these two vars only */
     --ih-track-h: clamp(22px, 3.6%, 32px);
     --ih-thumb-size: clamp(70px, 30%, 200px);
     height: var(--ih-track-h);
@@ -122,7 +122,7 @@
     z-index: 0;
 }
 
-/* Broken clock — static, overlaps the bar's right end, layered on top */
+/* Broken clock - static, overlaps the bar's right end, layered on top */
 .ih-clock-broken-icon {
     position: absolute;
     right: 4%;
@@ -135,7 +135,7 @@
     user-select: none;
 }
 
-/* Native range input — invisible track, clock.png as the thumb */
+/* Native range input - invisible track, clock.png as the thumb */
 .ih-slider {
     position: relative;
     z-index: 1;
@@ -190,7 +190,7 @@
         transform: translateY(30px); /* ← keep in sync with the webkit offset above */
     }
 
-/* ── COST LINE — "Cost: 1:30" ── */
+/* ── COST LINE - "Cost: 1:30" ── */
 .ih-cost-line {
     position: absolute;
     top: 70%;
@@ -205,7 +205,7 @@
     white-space: nowrap;
 }
 
-/* ── BUTTON ROW — SACRIFICE / CANCEL ── */
+/* ── BUTTON ROW - SACRIFICE / CANCEL ── */
 .ih-btns {
     position: absolute;
     top: 78%;
@@ -267,7 +267,7 @@
     color: #ff6b5b;
 }
 
-/* ── NARROW-SCREEN BREAKPOINT — stack instead of overlay-position ── */
+/* ── NARROW-SCREEN BREAKPOINT - stack instead of overlay-position ── */
 @media (max-width: 640px) {
 
     .ih-canvas {

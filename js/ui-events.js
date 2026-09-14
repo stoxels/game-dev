@@ -22,7 +22,7 @@ function _buildReplayRow(entry, unlocked, titleText) {
     const row = document.createElement('div');
     row.className = 'replay-track' + (unlocked ? '' : ' replay-track-locked');
 
-    // Thumbnail — artwork, character sprite, or a placeholder numeral tile
+    // Thumbnail - artwork, character sprite, or a placeholder numeral tile
     const thumbWrap = document.createElement('div');
     thumbWrap.className = 'replay-track-thumb';
     if (entry.thumb) {
@@ -125,7 +125,7 @@ function renderReplayModal() {
 // play buttons are `disabled` and therefore emit no mouse events of their
 // own, so the hovered button is resolved manually via elementFromPoint.
 // showGameTooltip/moveGameTooltip/hideGameTooltip live in tooltips-hud.js,
-// which loads after this file — they are referenced lazily inside the
+// which loads after this file - they are referenced lazily inside the
 // handler (at interaction time), never at wiring time.
 let _replayTipBtn = null;
 
@@ -226,13 +226,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onClick('btn-pause-settings', () => { loadSettingsUI(); showModal('settings-modal'); });
 
-    // Keybinds from the pause menu — the game stays paused behind the modal,
+    // Keybinds from the pause menu - the game stays paused behind the modal,
     // so bindings (including the new hotbar slots and the spellbook key) can
     // be reviewed and rebound mid-puzzle. The modal is raised above the pause
     // overlay in css/pause.css.
     onClick('btn-pause-keybinds', () => { if (typeof openKeybindsModal === 'function') openKeybindsModal(); });
 
-    // Spellbook from the pause menu — the game stays paused behind the book
+    // Spellbook from the pause menu - the game stays paused behind the book
     // so the player can review spells mid-puzzle. The book is raised above
     // the pause overlay in css/pause.css.
     onClick('btn-pause-spellbook', () => { if (typeof openSpellbook === 'function') openSpellbook(); });
@@ -261,8 +261,27 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-play', () => {
         showSaveSlotSelect(() => {
             const proceed = () => maybeShowCharacterSelect(() => showTutorial());
-            if (!hasSeen('intro_cinematic')) {
-                showBeat('intro_cinematic', { onComplete: proceed });
+            // A save WITHOUT a character is a brand-new character creation:
+            // the opening cinematic always plays, even when the seen-flag
+            // survived from an earlier character that was later wiped - the
+            // flag can no longer mean "this player saw it" because there is
+            // no player on this save yet.
+            const isNewCharacter = !STATE.playerCharacter;
+            if (!hasSeen('intro_cinematic') || isNewCharacter) {
+                // Arm the intro → character-select handoff: the cinematic's
+                // final image IS the select screen's backdrop. The song plays
+                // out to its natural end (final image up during the outro
+                // vocal), close() freezes the frame, and the select screen
+                // holds it for a beat before dissolving it in place (see
+                // storyline-engine.js close() and _csiDissolveIntroOverlay
+                // in character-select.js).
+                window.__csiHandoffArmed = true;
+                // force:true - the ENGINE also checks the seen-flag and would
+                // resolve onComplete without ever rendering (this is exactly
+                // why new characters skipped straight to the select screen
+                // when a stale flag survived on the slot). A save without a
+                // character must always PLAY the intro.
+                showBeat('intro_cinematic', { onComplete: proceed, force: isNewCharacter });
             } else {
                 proceed();
             }
@@ -304,12 +323,12 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    // Difficulty selection buttons — each carries a [data-diff] attribute.
+    // Difficulty selection buttons - each carries a [data-diff] attribute.
     document.querySelectorAll('[data-diff]').forEach(btn => {
         btn.addEventListener('click', () => selDiff(btn));
     });
 
-    // Modifier toggle buttons — each carries a [data-mod] attribute.
+    // Modifier toggle buttons - each carries a [data-mod] attribute.
     document.querySelectorAll('[data-mod]').forEach(btn => {
         btn.addEventListener('click', () => togMod(btn));
     });
@@ -325,10 +344,10 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
 
     // Lazy-loads the dev sandbox passive tree (passive-tree-dev-data.js +
-    // passive-tree-dev.js are NOT in index.html — together they are ~41k
+    // passive-tree-dev.js are NOT in index.html - together they are ~41k
     // lines / ~1 MB and would otherwise be parsed on every page load). The
     // first click on the sandbox button injects both scripts sequentially
-    // (data first — dev.js reads it at load time), then opens the tree.
+    // (data first - dev.js reads it at load time), then opens the tree.
     // Subsequent clicks see showDevPassiveTree already defined and go
     // straight to the screen.
     function _loadDevPassiveTreeAndOpen() {
@@ -437,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Shows a "leave map?" confirmation modal for endgame monster levels.
      * Forfeiting keeps everything the player already collected this run
-     * (loot is flushed to the stash and unclaimed map drops are banked —
+     * (loot is flushed to the stash and unclaimed map drops are banked -
      * see the confirm handlers below), so the copy only warns about what
      * is really lost: the consumed map and the unfinished run's rewards.
      * Builds the modal DOM once and reuses it on subsequent calls.
@@ -445,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {Function} onConfirm - Called if the player confirms leaving
      */
     function showEgForfeitConfirm(onConfirm) {
-        // Reuse existing modal infrastructure — build a one-off modal overlay.
+        // Reuse existing modal infrastructure - build a one-off modal overlay.
         let modal = document.getElementById('eg-forfeit-modal');
         if (!modal) {
             modal = document.createElement('div');
@@ -493,12 +512,12 @@ document.addEventListener('DOMContentLoaded', () => {
      * system cleanup before navigating.
      */
     function onGoToLevelsFromGame() {
-        if (cur && cur.isMonsterLevel && typeof _egIsActive === 'function' && _egIsActive()) {
+        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof _egIsActive === 'function' && _egIsActive()) {
             showEgForfeitConfirm(() => {
                 unpauseGame();
                 cleanupActiveGameSystems();
                 stopTimer();
-                // Keep the run's collected loot even on a forfeit — the
+                // Keep the run's collected loot even on a forfeit - the
                 // consumed map is penalty enough (mirrors _egEndMapDefeated).
                 if (typeof _egFlushRunLootToStash === 'function') _egFlushRunLootToStash();
                 if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
@@ -530,12 +549,12 @@ document.addEventListener('DOMContentLoaded', () => {
      * level select screen.
      */
     function onReturnToNexusFromGame() {
-        if (cur && cur.isMonsterLevel && typeof _egIsActive === 'function' && _egIsActive()) {
+        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof _egIsActive === 'function' && _egIsActive()) {
             showEgForfeitConfirm(() => {
                 unpauseGame();
                 cleanupActiveGameSystems();
                 stopTimer();
-                // Keep the run's collected loot even on a forfeit — the
+                // Keep the run's collected loot even on a forfeit - the
                 // consumed map is penalty enough (mirrors _egEndMapDefeated).
                 if (typeof _egFlushRunLootToStash === 'function') _egFlushRunLootToStash();
                 if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
@@ -559,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onClick('btn-go-nexus', onReturnToNexusFromGame);
 
-    // Puzzle table — suppresses the right-click context menu (would interfere
+    // Puzzle table - suppresses the right-click context menu (would interfere
     // with game input) and resets hover state when the cursor leaves the grid.
     if (puzzleTable) {
         puzzleTable.addEventListener('contextmenu', e => e.preventDefault());
@@ -604,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-win-levels', onGoToLevelsFromOverlay);
     onClick('btn-win-retry', onRetryLevelFromOverlay);
 
-    // "Retry with other difficulty/modifier" — opens the settings modal;
+    // "Retry with other difficulty/modifier" - opens the settings modal;
     // the actual replay only starts once the player hits START RETRY.
     onClick('btn-win-retry-setup', openRetrySetupModal);
 
@@ -726,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    // Achievements modal — the stone close button hides it. Category-level
+    // Achievements modal - the stone close button hides it. Category-level
     // back-navigation lives in the delegated handlers in achievements-ui.js.
     onClick('btn-ach-close', () => hideModal('achievements-modal'));
     onClick('btn-reset-achievements', () => showResetAchievementsModal());
@@ -739,7 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onClick('btn-pt-back', () => ptGoBack());
 
-    // DEV SANDBOX passive tree — BACK returns to the select-mode screen.
+    // DEV SANDBOX passive tree - BACK returns to the select-mode screen.
     onClick('btn-dpt-back', () => dptGoBack());
 
     /**
@@ -809,7 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
 //-------------------TOUCHPAD MODE BUTTON (OUTSIDE DOMContentLoaded)------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-// Left outside the DOMContentLoaded closure exactly as in the original —
+// Left outside the DOMContentLoaded closure exactly as in the original -
 // the script tag loads after this button already exists in the DOM, so the
 // binding works immediately. Not moved into the closure to avoid any change
 // in execution timing relative to the rest of the file's bindings.

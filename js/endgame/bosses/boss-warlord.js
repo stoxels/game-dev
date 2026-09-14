@@ -2,7 +2,7 @@
 //-------------------BOSS: THE WARLORD (boss_warlord)---------------------------
 //------------------------------------------------------------------------
 // Pinnacle commander: calls its guard to raise a shield you must break by
-// killing them — while triple shockwave rings roll the arena on a tight
+// killing them - while triple shockwave rings roll the arena on a tight
 // fuse. Two wars at once: the guards, and the ground.
 // This file holds EVERYTHING this boss needs in one place:
 //   1. EG_BOSS_DEFS entry (stats, element, resistances)
@@ -77,7 +77,7 @@ function _egMechGuardCall(monster, phase) {
             boss.bossImmune = false;
             const c2 = document.getElementById('eg-card-' + monster.id);
             if (c2) c2.classList.remove('eg-nk-shielded');
-            _egNkToast('eg_tithe_broken', '🗡️ Guard broken — burn the Warlord!', '#4ade80');
+            _egNkToast('eg_tithe_broken', '🗡️ Guard broken - burn the Warlord!', '#4ade80');
             if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e2) {} }
             return false;
         }

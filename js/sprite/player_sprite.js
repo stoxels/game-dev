@@ -42,6 +42,114 @@ function _charIs(id) {
 
 
 //------------------------------------------------------------------------
+//-------------------SHARED AVATAR BAR STACK------------------------------
+//------------------------------------------------------------------------
+
+// The endgame-style bar stack BOTH avatar variants render (story puzzle
+// levels and endgame monster levels look identical now - the old simple/
+// full split was only ever a markup difference): Health, Mana, Shield
+// (only while absorption is actually up), attack charge - bars above, then
+// the sprite. barWidth pins the stack's width (the simple avatar's wrapper
+// can be wider than the sprite when companions flank it); the full avatar
+// uses the default 100% of its 100px wrapper. The ids are shared, so
+// exactly one avatar may exist at a time (each render removes the other -
+// see _renderPlayerAvatar* below).
+function _avatarBarsHTML(barWidth = '100%') {
+    return `
+            <div style="width: ${barWidth};">
+                <div style="width: 100%; margin-bottom: 4px;">
+                    <span id="avatar-hp-text" class="avatar-bar-num" style=""></span>
+                    <div style="background: #111; width: 100%; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #000;">
+                        <div id="avatar-hp-fill" style="background: red; width: 100%; height: 100%; transition: width 0.1s;"></div>
+                    </div>
+                </div>
+
+                <!-- mana bar (same recipe as the health bar, mana blue) -->
+                <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap" style="width: 100%; margin-bottom: 4px;">
+                    <span id="avatar-mana-text" class="avatar-mana-bar-text avatar-bar-num"></span>
+                    <div class="avatar-mana-bar-track">
+                        <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
+                    </div>
+                </div>
+
+                <!-- absorption / shield bar - only rendered while the player
+                     actually has absorption (see _updateAvatarBarStack) -->
+                <div id="avatar-shield-wrap" style="width: 100%; margin-bottom: 4px; display: none;">
+                    <span id="avatar-shield-text" class="avatar-bar-num avatar-bar-shield" style=""></span>
+                    <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000;">
+                        <div id="avatar-shield-fill" style="background: #3ec6ff; width: 0%; height: 100%; transition: width 0.1s;"></div>
+                    </div>
+                </div>
+
+                <!-- attack charge-up bar (with % readout - see _egUpdatePlayerChargeBar) -->
+                <div style="width: 100%; margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: flex-end; line-height: 1;">
+                        <span id="avatar-charge-text" class="avatar-bar-num avatar-charge-num">0%</span>
+                    </div>
+                    <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
+                        <div id="avatar-charge-fill" style="background: #4ade80; width: 0%; height: 100%; transition: width 0.1s linear;"></div>
+                    </div>
+                </div>
+            </div>`;
+}
+
+// Syncs the shared bar stack from the live globals: health value + fill,
+// shield visibility, charge bar. Mana fill/text are owned by
+// updateClassHUDManaBar() (class-mana.js). Idempotent - call after any
+// avatar (re)build or health change.
+function _updateAvatarBarStack() {
+    // Health - the text shows only the current value (the bar's shape
+    // already communicates the maximum), fill is the percentage.
+    const hpText = document.getElementById('avatar-hp-text');
+    const hpFill = document.getElementById('avatar-hp-fill');
+    if (hpText) hpText.innerText = `${Math.max(0, Math.round(playerCurrentHP))}`;
+    if (hpFill) {
+        const hpPct = (typeof playerMaxHP === 'number' && playerMaxHP > 0)
+            ? Math.max(0, Math.min(100, (playerCurrentHP / playerMaxHP) * 100))
+            : 100;
+        hpFill.style.width = hpPct + '%';
+    }    // Absorption shield - hidden entirely unless the player actually has
+    // some (gear absorption > 0 AND current charge above zero).
+    const absCur = (typeof _egPlayerAbsorptionCurrent === 'number') ? _egPlayerAbsorptionCurrent : 0;
+    const maxAbsorption = (typeof _egComputePlayerStats === 'function') ? (_egComputePlayerStats().absorption || 0) : 0;
+    const shieldWrap = document.getElementById('avatar-shield-wrap');
+    const shieldFill = document.getElementById('avatar-shield-fill');
+    const shieldText = document.getElementById('avatar-shield-text');
+    if (shieldWrap && shieldFill && shieldText) {
+        if (maxAbsorption > 0 && absCur > 0) {
+            shieldWrap.style.display = '';
+            const shieldPct = Math.max(0, Math.min(100, (absCur / maxAbsorption) * 100));
+            shieldText.innerText = `🛡 ${Math.round(absCur)} / ${maxAbsorption}`;
+            shieldFill.style.width = shieldPct + '%';
+        } else {
+            shieldWrap.style.display = 'none';
+        }
+    }
+
+    // Manual melee charge - fills toward 100% during combat and holds until    // an E strike spends it. On puzzle levels the charge stays parked at 0.
+    const chargeFill = document.getElementById('avatar-charge-fill');
+    if (chargeFill) {
+        const chargeCur = (typeof _egPlayerCurrentCharge === 'number') ? _egPlayerCurrentCharge : 0;
+        const chargeMax = (typeof _egGetPlayerAttackInterval === 'function')
+            ? _egGetPlayerAttackInterval()
+            : (typeof EG_PLAYER_DEFAULT_ATTACK_INTERVAL === 'number' ? EG_PLAYER_DEFAULT_ATTACK_INTERVAL : 5000);
+        const chargePct = Math.min(100, Math.max(0, (chargeCur / chargeMax) * 100));
+        chargeFill.style.width = chargePct + '%';
+        // Ready glow at full charge (paused styling is owned centrally by
+        // _egUpdatePlayerChargeBar - only mirror the ready state here).
+        const chargeReady = chargePct >= 100;
+        chargeFill.classList.toggle('eg-charge-ready', chargeReady);
+        const chargeText = document.getElementById('avatar-charge-text');
+        if (chargeText) {
+            chargeText.textContent = `${Math.floor(chargePct)}%`;
+            chargeText.classList.toggle('eg-charge-ready', chargeReady);
+        }
+    }
+}
+
+
+
+//------------------------------------------------------------------------
 //-------------------SIMPLE IN-GAME AVATAR (non-monster levels)-----------
 //------------------------------------------------------------------------
 
@@ -52,7 +160,7 @@ function _charIs(id) {
 // stays in sync and _setAvatarPos() keeps clamping correctly.
 function _avatarResponsiveScale() {
     const vw = window.innerWidth || 1280;
-    if (vw >= 700) return 1;   // desktop anchor — unchanged behaviour
+    if (vw >= 700) return 1;   // desktop anchor - unchanged behaviour
     if (vw >= 480) return 0.8; // large phones / small tablets
     return 0.6;                // phones
 }
@@ -65,7 +173,7 @@ function _avatarResponsiveScale() {
 // The 128px sprite img sits centered inside the (narrower) wrapper, so on a
 // zoom-scaled phone layout its visual box spills past the wrapper's left
 // edge by (128 - wrapperWidth) * scale / 2 px. The anchor compensates for
-// that spill so the ARTWORK — not the wrapper box — keeps an 8px margin.
+// that spill so the ARTWORK - not the wrapper box - keeps an 8px margin.
 function _avatarAnchorLeft() {
     const vw = window.innerWidth || 1280;
     if (vw >= 700) return '250px';
@@ -84,18 +192,25 @@ function _avatarAnchorTop() {
 }
 
 // Applies the responsive anchor + zoom scale to a simple-avatar wrapper.
-// Desktop (>700px) is a no-op — behaviour there is byte-for-byte unchanged.
+// Desktop (>700px) is a no-op - behaviour there is byte-for-byte unchanged.
 function _applyAvatarResponsiveLayout(wrapper) {
     if (!wrapper) return;
     wrapper.style.left = _avatarAnchorLeft();
     wrapper.style.top = _avatarAnchorTop();
+    // Position IS the anchor now, so resize handling may re-anchor freely
+    // (clears the "player placed this" marker set by _setAvatarPos). The
+    // anchored stamp tells the resize handler this sprite's position was
+    // engine-anchored, not placed by another flow's direct style write.
+    delete wrapper.dataset.avatarUserPos;
+    wrapper.dataset.avatarAnchored = '1';
     const scale = _avatarResponsiveScale();
     const zoomSupported = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('zoom', '1');
     wrapper.style.zoom = (zoomSupported && scale !== 1) ? String(scale) : '';
 }
 
-// Renders a small WASD-controlled sprite in the top-left of the game meta bar.
-// No HP or charge bars — those are monster-level only.
+// Renders the WASD-controlled sprite in the top-left with the full
+// Health / Mana / Shield / charge bar stack above it (same presentation as
+// the monster-level avatar - see _avatarBarsHTML).
 function _renderPlayerAvatarSimple() {
     if (typeof dead !== 'undefined' && dead) {
         const _hideSimple = document.getElementById('player-avatar-simple');
@@ -135,7 +250,7 @@ function _renderPlayerAvatarSimple() {
             }
 
             // Viewport may have changed since the wrapper was first built
-            // (e.g. rotating a phone) — re-sync anchor/scale before reuse.
+            // (e.g. rotating a phone) - re-sync anchor/scale before reuse.
             _applyAvatarResponsiveLayout(existing);
 
             // Self-heal: a mid-boot error between wrapper creation and
@@ -147,6 +262,7 @@ function _renderPlayerAvatarSimple() {
             // Keep the mana bar in sync when the avatar is reused (e.g. after
             // a level transition where the pool was reset).
             if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
+            _updateAvatarBarStack();
 
             // Companions don't change image, but re-run facing so order stays correct
             _updateAvatarFacing(existing);
@@ -174,13 +290,13 @@ function _renderPlayerAvatarSimple() {
     // Responsive anchor/scale for narrow viewports (no-op on desktop).
     _applyAvatarResponsiveLayout(wrapper);
 
-    // No character name above the sprite any more: the mana bar sits directly
-    // above the sprite instead (Health order in endgame matches the same idea).
+    // The full endgame-style bar stack (Health / Mana / Shield / charge) -
+    // identical markup and ids to the monster-level avatar, so puzzle levels
+    // and endgame read the same way. Width follows the 128px sprite, not the
+    // (narrower, possibly companion-widened) wrapper - a '100%' here would
+    // resolve to the wrapper and leave the bars hugging a 72px box.
     wrapper.innerHTML = `
-        <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap">
-            <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
-            <span id="avatar-mana-text" class="avatar-mana-bar-text"></span>
-        </div>
+        ${_avatarBarsHTML('128px')}
         <div class="avatar-sprite-row" style="
             display: flex;
             flex-direction: row;
@@ -209,6 +325,10 @@ function _renderPlayerAvatarSimple() {
     `;
 
     document.body.appendChild(wrapper);
+    // Fill the bar stack from the live globals; the mana bar's own sync
+    // (updateClassHUDManaBar) runs inside _updateAvatarBarStack's caller
+    // chain below.
+    _updateAvatarBarStack();
     // Mana bar lives on the sprite now (moved off the class HUD).
     if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
     // Gameplay default: move-down art on first paint (cold cache included),
@@ -219,39 +339,93 @@ function _renderPlayerAvatarSimple() {
     if (_newSimpleImg && typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(_newSimpleImg);
     _initSimpleAvatarWASD(wrapper);
     _updateAvatarFacing(wrapper);
-    // Re-sync anchor/scale once the rest of the level HUD has settled — the
+    // Re-sync anchor/scale once the rest of the level HUD has settled - the
     // touchpad toggle (FÜLLEN button) can appear after this point and grow
     // the left HUD, which the phone anchor is derived from.
-    setTimeout(() => _applyAvatarResponsiveLayout(wrapper), 350);
+    // ... but never yank the sprite back if the player already walked it
+    // during those first 350ms.
+    setTimeout(() => {
+        if (wrapper.isConnected && !wrapper.dataset.avatarUserPos) {
+            _applyAvatarResponsiveLayout(wrapper);
+        }
+    }, 350);
     // Start the idle loop (static portrait until idle frames exist) and
     // warm the frame cache for this character/variant in the background.
     if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation('avatar-sprite-img-simple');
 }
 
-// Keeps the simple avatar's responsive anchor/scale in sync with viewport
-// changes (phone rotation, window resizing). Only repositions when the
-// player hasn't deliberately moved the sprite off its anchor — WASD movement
-// and boss pushes write style.left/top directly and must never be overridden.
+// Keeps the simple avatar in sync with viewport changes (phone rotation,
+// window resizing). Position provenance is tracked explicitly via two
+// dataset stamps:
+//   avatarUserPos   - a deliberate placement happened (_setAvatarPos:
+//                     walk, boss push, teleport). Resize handling must
+//                     preserve the spot and only clamp it back in view.
+//   avatarAnchored  - the position is the engine's responsive anchor
+//                     (_applyAvatarResponsiveLayout). A still-anchored
+//                     sprite follows the anchor when the viewport crosses
+//                     the desktop/phone boundary.
+// A sprite stamped by neither (e.g. placed by the tutorial's direct style
+// writes) is treated as deliberately placed: never re-anchored, only
+// clamped. Before this fix, a resize that dipped the window below 700px
+// snapped the sprite to the phone's top-left anchor, and an early return
+// for vw >= 700 meant it stayed stranded there after the window grew back.
 (function _initAvatarResizeSync() {
     let lastVW = window.innerWidth, lastVH = window.innerHeight;
+    const DESKTOP_MIN_VW = 700;
+    // Cross-frame desktop anchor. Lives on window (not in this closure) so
+    // it survives across sessions of the same wrapper and is not reset when
+    // a new avatar is rendered - a phone edge-anchored avatar that crosses
+    // back over 700px must return to the desktop spot it came from.
+    if (!window._avatarDesktopAnchor) window._avatarDesktopAnchor = { left: '250px', top: '15px' };
+
+    const setDesktopAnchor = (wrapper) => {
+        wrapper.style.left = window._avatarDesktopAnchor.left;
+        wrapper.style.top = window._avatarDesktopAnchor.top;
+        // Desktop scale is 1: drop the phone zoom a dip below 700px applied,
+        // or the sprite would come back correctly anchored but shrunk.
+        wrapper.style.zoom = '';
+        delete wrapper.dataset.avatarUserPos;
+        wrapper.dataset.avatarAnchored = '1';
+    };
+
     window.addEventListener('resize', () => {
         const vw = window.innerWidth, vh = window.innerHeight;
         if (vw === lastVW && vh === lastVH) return;
         const changedW = vw !== lastVW;
         lastVW = vw; lastVH = vh;
-        if (vw >= 700) return; // desktop keeps its free-placement behaviour
+
         const wrapper = document.getElementById('player-avatar-simple');
         if (!wrapper || wrapper.style.display === 'none') return;
-        // Width change = rotation/resize → re-anchor + rescale.
-        // Height-only change → just re-clamp vertically, keep player's X.
-        if (changedW) {
-            _applyAvatarResponsiveLayout(wrapper);
-        } else {
-            const maxX = window.innerWidth - wrapper.offsetWidth - 4;
+
+        const userPlaced = !!wrapper.dataset.avatarUserPos;
+        const anchored = !!wrapper.dataset.avatarAnchored;
+
+        // A still-anchored sprite follows the responsive anchor across the
+        // desktop/phone boundary. A deliberately placed sprite (or one whose
+        // position some other flow wrote directly) is never re-anchored.
+        if (!userPlaced && anchored) {
+            if (vw >= DESKTOP_MIN_VW) {
+                setDesktopAnchor(wrapper);
+                return;
+            }
+            // Phone layout: a desktop-anchored avatar would cover the HUD.
+            // Width change = rotation/resize - re-anchor + rescale;
+            // height-only change - re-clamp vertically, keep the player's X.
+            if (changedW) {
+                _applyAvatarResponsiveLayout(wrapper);
+                return;
+            }
             const maxY = window.innerHeight - wrapper.offsetHeight - 4;
             wrapper.style.top = Math.max(4, Math.min(maxY, parseInt(wrapper.style.top) || 0)) + 'px';
-            wrapper.style.left = Math.max(4, Math.min(maxX, parseInt(wrapper.style.left) || 0)) + 'px';
+            return;
         }
+
+        // Deliberately placed: never yank it - only clamp back inside the
+        // viewport if the resize pushed the sprite partly off-screen.
+        const maxX = window.innerWidth - wrapper.offsetWidth - 4;
+        const maxY = window.innerHeight - wrapper.offsetHeight - 4;
+        wrapper.style.top = Math.max(4, Math.min(maxY, parseInt(wrapper.style.top) || 0)) + 'px';
+        wrapper.style.left = Math.max(4, Math.min(maxX, parseInt(wrapper.style.left) || 0)) + 'px';
     });
 })();
 
@@ -317,21 +491,42 @@ function _avatarGetMoveSpeed() {
     } catch (e) {}
     // The Snail's broom: sweeping slows the player to a crawl so the Doom
     // Snail can catch up while a slimed cell is being cleaned (see
-    // boss-snail.js — EG_SNAIL_BROOM_SPEED_MULT lives on window).
+    // boss-snail.js - EG_SNAIL_BROOM_SPEED_MULT lives on window).
     if (typeof _egSnailBroomHeld === 'function' && _egSnailBroomHeld()) {
         base *= (typeof window.EG_SNAIL_BROOM_SPEED_MULT === 'number')
             ? window.EG_SNAIL_BROOM_SPEED_MULT : 0.10;
     }
     // Entropy's order economy: outside the ordered zones the cold makes you
-    // progressively sluggish (never locked — floors at 55%). Perfect crystal
-    // order during the finale restores full speed (see boss-entropy.js —
+    // progressively sluggish (never locked - floors at 55%). Perfect crystal
+    // order during the finale restores full speed (see boss-entropy.js -
     // _egEntrMoveMult reads the order meter).
     if (typeof _egEntrMoveMult === 'function') {
         const entrMult = _egEntrMoveMult();
         if (entrMult < 1) base *= entrMult;
         else if (entrMult > 1) base = Math.min(base, AVATAR_MOVE_SPEED_PX_PER_SEC * 1.05) * entrMult;
     }
+    // Movement spells (js/skills/universal-spells.js): Windstep and the
+    // Disengage follow-through hand back their speed as a multiplier, so a
+    // movement buff is the same kind of modifier as boots or a boss slow.
+    // typeof-guarded so this file keeps working with the skill system absent.
+    if (typeof _uspMovementSpeedMult === 'function') {
+        try {
+            const m = _uspMovementSpeedMult();
+            if (m && m !== 1) base *= m;
+        } catch (e) { /* a buff lookup must never break walking */ }
+    }
     return base;
+}
+
+// The last direction this sprite actually WALKED (up/down/left/right), or null
+// before the first step. Written by the move loop below, not by keydown: a
+// player holding a key against a UI block is not walking, and the movement
+// spells must aim where the sprite last went, not where a held key points.
+// Read through getAvatarLastMoveDir() (js/skills/universal-spells.js).
+let _avatarLastMoveDir = null;
+
+function getAvatarLastMoveDir() {
+    return _avatarLastMoveDir;
 }
 
 const _avatarMoveState = {
@@ -345,10 +540,10 @@ function _avatarMoveUiBlocked() {
     const tag = document.activeElement ? document.activeElement.tagName : null;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show')) return true;
     // A question modal (quiz overlay / math gate / scouts primer) hides the
-    // avatar via CSS — suspend its movement input along with it. The body
+    // avatar via CSS - suspend its movement input along with it. The body
     // flag can go STALE (an overlay removed without a flag refresh, or an
     // interrupted boot), which used to dead-claim WASD until some unrelated
-    // flow re-synced the flag — verify against the live DOM and self-heal
+    // flow re-synced the flag - verify against the live DOM and self-heal
     // when no question modal is actually visible.
     if (document.body.classList.contains('question-modal-open')) {
         const qz = document.getElementById('quiz-overlay');
@@ -380,6 +575,15 @@ function _avatarMoveTick(ts) {
 
     const el = document.getElementById(_avatarMoveState.elId);
     if (!el) return;
+    // A hidden avatar can never be steered: screens like setup and level
+    // select keep the fixed sprite in the DOM after hiding it, and without
+    // this guard held WASD keys would silently drag it around off-screen
+    // (and any future flow that hides without clearing held keys would leak
+    // movement too). Clear held so the keyup-less case can't linger.
+    if (getComputedStyle(el).display === 'none') {
+        _avatarMoveState.held.clear();
+        return;
+    }
 
     const dt = Math.min((ts - _avatarMoveState.lastTs) / 1000, 0.05);
     _avatarMoveState.lastTs = ts;
@@ -397,8 +601,8 @@ function _avatarMoveTick(ts) {
         if (dx || dy) {
             const dist = _avatarGetMoveSpeed() * dt;
             const norm = Math.hypot(dx, dy);   // keeps diagonal speed equal
-            // Float accumulator (per element) so very slow speeds — e.g. The
-            // Snail's broom at ~10% — still move: a sub-pixel per-frame step
+            // Float accumulator (per element) so very slow speeds - e.g. The
+            // Snail's broom at ~10% - still move: a sub-pixel per-frame step
             // would otherwise be truncated away by re-parsing the integer
             // style position every frame, locking the avatar in place.
             let fx = parseFloat(el.dataset.avatarFx);
@@ -406,11 +610,11 @@ function _avatarMoveTick(ts) {
             if (!isFinite(fx)) fx = parseInt(el.style.left) || 12;
             if (!isFinite(fy)) fy = parseInt(el.style.top) ||
                 (el.id === 'player-avatar-wrapper' ? window.innerHeight - 220 : 80);
-            // Teleports / nudges / knockbacks write style.left/top directly —
+            // Teleports / nudges / knockbacks write style.left/top directly -
             // reseed the accumulator when the rendered position diverges.
             // While a boss-knockback glide is active, style.left/top hold the
             // glide TARGET (the transition animates toward it), so sampling
-            // them mid-glide would snap the sprite to the target instantly —
+            // them mid-glide would snap the sprite to the target instantly -
             // the "knockback looks like a teleport" bug. Sample the RENDERED
             // rect instead and let the inputs blend with the glide.
             if (el.dataset.egFlingActive) {
@@ -434,6 +638,7 @@ function _avatarMoveTick(ts) {
                 if (Math.abs(dx) >= Math.abs(dy)) dirHint = dx > 0 ? 'right' : 'left';
                 else dirHint = dy > 0 ? 'down' : 'up';
             }
+            if (dirHint) _avatarLastMoveDir = dirHint;
             _setAvatarPos(el, fx, fy, dirHint);
         }
     } else if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) {
@@ -513,8 +718,8 @@ function _initSimpleAvatarWASD(wrapper) {
 
 // Returns true when the random_walker companions should be shown.
 // try/typeof-guard: this runs during avatar render, and a mid-boot STATE
-// hiccup here used to abort the whole render — including the WASD listener
-// wiring below it — leaving the sprite permanently unmovable for the
+// hiccup here used to abort the whole render - including the WASD listener
+// wiring below it - leaving the sprite permanently unmovable for the
 // session (the "movement only works after visiting the nexus" report).
 function _hasCompanions() {
     try {
@@ -530,7 +735,7 @@ function _hasCompanions() {
 function _chargeCompanionToCell(companionId, targetR, targetC, onArrival, onReturn) {
     const el = document.getElementById(companionId);
     if (!el) {
-        // No companion visible (e.g. wrong ascendency) — just fire callbacks immediately
+        // No companion visible (e.g. wrong ascendency) - just fire callbacks immediately
         if (onArrival) onArrival();
         return;
     }
@@ -572,7 +777,7 @@ function _chargeCompanionToCell(companionId, targetR, targetC, onArrival, onRetu
             el.style.top = homeRect.top + 'px';
 
             setTimeout(() => {
-                // Re-attach to flex row — clear fixed overrides
+                // Re-attach to flex row - clear fixed overrides
                 el.style.position = '';
                 el.style.left = '';
                 el.style.top = '';
@@ -711,7 +916,7 @@ function _updateAvatarFacing(el, direction) {
 // sprite_animations.js for _playAvatarWalkAnimation). Positional shoves
 // (boss nudges, wormhole pulls) pass no direction and leave the current
 // animation state and facing untouched.
-// direction is optional ('up' | 'down' | 'left' | 'right') — picks the
+// direction is optional ('up' | 'down' | 'left' | 'right') - picks the
 // directional walk set when it exists, omni otherwise.
 function _setAvatarPos(el, x, y, direction) {
     const w = el.offsetWidth || 72;
@@ -721,6 +926,10 @@ function _setAvatarPos(el, x, y, direction) {
     el.style.bottom = 'auto';   // <-- add this
     el.style.left = Math.max(4, Math.min(maxX, x)) + 'px';
     el.style.top = Math.max(4, Math.min(maxY, y)) + 'px';
+    // Deliberate placement (walk, push, teleport): resize handling must
+    // preserve this spot instead of snapping back to the responsive anchor.
+    el.dataset.avatarUserPos = '1';
+    delete el.dataset.avatarAnchored;
     _updateAvatarFacing(el, direction);
 
     if (typeof _banterRepositionBubbleIfVisible === 'function') _banterRepositionBubbleIfVisible();
@@ -784,18 +993,19 @@ function _updateSetupScreenCharacter() {
 
 
 //------------------------------------------------------------------------
-//-------------------FULL ENDGAME AVATAR (monster levels)-----------------
+//-------------------FULL AVATAR (same stack, monster levels)-------------
 //------------------------------------------------------------------------
 
-// Creates and updates the full avatar with HP and charge bars.
-// Used for endgame / monster levels only.
+// Creates and updates the full avatar with the Health / Mana / Shield /
+// charge bar stack. Shares its markup and element ids with the simple
+// avatar (see _avatarBarsHTML), so puzzle levels and monster levels render
+// the exact same sprite presentation - the old endgame-only split is gone.
 function _renderPlayerAvatar() {
     if (typeof dead !== 'undefined' && dead) {
         const _hideEl = document.getElementById('player-avatar-wrapper');
         if (_hideEl) _hideEl.style.display = 'none';
         return;
     }
-    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     _removePlayerAvatarSimple();
 
     let avatar = document.getElementById('player-avatar-wrapper');
@@ -804,6 +1014,10 @@ function _renderPlayerAvatar() {
         avatar = document.createElement('div');
         avatar.id = 'player-avatar-wrapper';
 
+        // 128px wrapper + sprite - MUST match the simple avatar's size
+        // (see _renderPlayerAvatarSimple). The old 100px here made the sprite
+        // visibly shrink whenever a monster level took over from a puzzle
+        // level (tutorial puzzle 1 → 2 is the most obvious case).
         avatar.style.cssText = `
             position: fixed;
             top: 15px;
@@ -812,51 +1026,25 @@ function _renderPlayerAvatar() {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100px;
+            width: 128px;
             cursor: default;
             user-select: none;
         `;
 
-        // Stack order, top → bottom: Health, Mana, Shield, Attack charge, then
-        // the sprite itself. The character name label above the sprite is gone.
+        // Stack order, top → bottom: Health, Mana, Shield (only while
+        // absorption is up), Attack charge, then the sprite itself - the
+        // exact same stack the simple avatar renders.
         avatar.innerHTML = `
-            <div style="width: 100%; margin-bottom: 4px;">
-                <span id="avatar-hp-text" style="font-size: 12px; font-weight: bold; color: white; display: block; text-align: center; text-shadow: 1px 1px 2px black;"></span>
-                <div style="background: #111; width: 100%; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #000;">
-                    <div id="avatar-hp-fill" style="background: red; width: 100%; height: 100%; transition: width 0.1s;"></div>
-                </div>
-            </div>
-
-            <!-- mana bar (moved off the class HUD) -->
-            <div id="avatar-mana-bar-wrap" class="avatar-mana-bar-wrap" style="width: 100%; margin-bottom: 4px;">
-                <div id="avatar-mana-fill" class="avatar-mana-bar-fill"></div>
-                <span id="avatar-mana-text" class="avatar-mana-bar-text"></span>
-            </div>
-
-            <!-- absorption / shield bar -->
-            <div id="avatar-shield-wrap" style="width: 100%; margin-bottom: 4px; display: none;">
-                <span id="avatar-shield-text" style="font-size: 10px; font-weight: bold; color: #7fd6ff; display: block; text-align: center; text-shadow: 1px 1px 2px black;"></span>
-                <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000;">
-                    <div id="avatar-shield-fill" style="background: #3ec6ff; width: 0%; height: 100%; transition: width 0.1s;"></div>
-                </div>
-            </div>
-
-            <!-- attack charge-up bar -->
-            <div style="width: 100%; margin-bottom: 8px;">
-                <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
-                    <div id="avatar-charge-fill" style="background: #4ade80; width: 0%; height: 100%; transition: width 0.1s linear;"></div>
-                </div>
-            </div>
-
+            ${_avatarBarsHTML()}
             <img src="${_getPlayerCharacterImage()}" id="avatar-sprite-img"
-                style="width: 100px; height: 100px; object-fit: contain; pointer-events: none;"
+                style="width: 128px; height: 128px; object-fit: contain; pointer-events: none;"
                 draggable="false" />
         `;
 
         document.body.appendChild(avatar);
 
         // Gameplay default: move-down art on first paint (same as the simple
-        // avatar — the menu portrait stays reserved for menus).
+        // avatar - the menu portrait stays reserved for menus).
         const _newFullImg = avatar.querySelector('#avatar-sprite-img');
         if (_newFullImg && typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(_newFullImg);
         _initFullAvatarWASD(avatar);
@@ -866,38 +1054,16 @@ function _renderPlayerAvatar() {
 
     avatar.style.display = 'flex';   // always ensure visible, regardless of prior hide
 
-    // Update health
-    const hpPct = Math.max(0, (playerCurrentHP / playerMaxHP) * 100);
-    document.getElementById('avatar-hp-text').innerText = `HP: ${playerCurrentHP} / ${playerMaxHP}`;
-    document.getElementById('avatar-hp-fill').style.width = hpPct + '%';
-
-    // Update absorption shield
-    const maxAbsorption = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats().absorption : 0;
-    const shieldWrap = document.getElementById('avatar-shield-wrap');
-    const shieldFill = document.getElementById('avatar-shield-fill');
-    const shieldText = document.getElementById('avatar-shield-text');
-    if (shieldWrap && shieldFill && shieldText) {
-        if (maxAbsorption > 0) {
-            shieldWrap.style.display = '';
-            const shieldPct = Math.max(0, Math.min(100, (_egPlayerAbsorptionCurrent / maxAbsorption) * 100));
-            shieldText.innerText = `🛡 ${Math.round(_egPlayerAbsorptionCurrent)} / ${maxAbsorption}`;
-            shieldFill.style.width = shieldPct + '%';
-        } else {
-            shieldWrap.style.display = 'none';
-        }
-    }
-
-    // Update charge
-    const chargeMax = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
-    const chargePct = Math.min(100, Math.max(0, (_egPlayerCurrentCharge / chargeMax) * 100));
-    document.getElementById('avatar-charge-fill').style.width = chargePct + '%';
+    // Health value + fill, shield visibility, charge bar (mana is synced by
+    // updateClassHUDManaBar below).
+    _updateAvatarBarStack();
 
     // Update the mana bar (shared with the story-mode simple avatar).
     if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar();
 
     if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 
-    // Hold-parry pause — keep sprite label in sync if the avatar was recreated while the parry key is still held
+    // Hold-parry pause - keep sprite label in sync if the avatar was recreated while the parry key is still held
     if (typeof _egHoldEPauseActive !== 'undefined' && typeof _egSetHoldEPauseVisual === 'function') {
         // Avoid redundant DOM churn: _egSetHoldEPauseVisual is idempotent and cheap
         const lbl = document.getElementById('eg-hold-pause-label');
@@ -959,7 +1125,7 @@ function _showPlayerAvatarSimple() {
     if (el) el.style.display = 'flex';
 }
 
-// In js/sprite/player_sprite.js — add to wherever _egStopEncounter cleans up,
+// In js/sprite/player_sprite.js - add to wherever _egStopEncounter cleans up,
 // or add a dedicated hide function mirroring the simple one:
 
 function _hidePlayerAvatar() {
@@ -978,11 +1144,6 @@ function _showPlayerAvatar() {
 
 
 function _renderPlayerHealth() {
-    const hpText = document.getElementById('avatar-hp-text');
-    const hpFill = document.getElementById('avatar-hp-fill');
-    if (!hpText || !hpFill) return;
-    const hpPct = Math.max(0, Math.min(100, (playerCurrentHP / playerMaxHP) * 100));
-    hpText.innerText = `HP: ${playerCurrentHP} / ${playerMaxHP}`;
-    hpFill.style.width = hpPct + '%';
+    _updateAvatarBarStack();
     if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 }

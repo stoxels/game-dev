@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DREADNOUGHT (boss_dreadnought)------------------
 //------------------------------------------------------------------------
-// Pinnacle broadside: the Dreadnought walks its guns along both flanks —
-// alternating port and starboard spreads — while a searchlight tracks you
+// Pinnacle broadside: the Dreadnought walks its guns along both flanks -
+// alternating port and starboard spreads - while a searchlight tracks you
 // and burns whatever it catches. Watch the muzzle sides, kill the light
 // by leaving it.
 // This file holds EVERYTHING this boss needs in one place:
@@ -103,7 +103,7 @@ function _egMechSearchlight(monster, phase) {
     const durMs = 8000;
     const run = _egNkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
-    // The lamp lags a half-second behind you — juke it, don't outrun it.
+    // The lamp lags a half-second behind you - juke it, don't outrun it.
     const lamp = { x: window.innerWidth / 2, y: 100 };
     const beam = _egNkEl(run, 'div', 'eg-nk-searchlight');
     _egNkToast('eg_mech_searchlight', '🛳️ The Dreadnought: Searchlight! Kill it by leaving it!');

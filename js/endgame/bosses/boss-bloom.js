@@ -1,28 +1,28 @@
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BLOOM (boss_bloom)-------------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK — "The Garden's Verdict". Malenia homage, deepened: the
+// TIER 8 REWORK - "The Garden's Verdict". Malenia homage, deepened: the
 // arena is a GARDEN that grows whether you fight or not. Scars you carve
 // by dodging blooms are the only ground you truly own. Element: fire (keep
-// — scarlet rot).
+// - scarlet rot).
 //
-//   • SCARLET BLOOMS (signature, all fight) — flowers open where you STAND
+//   • SCARLET BLOOMS (signature, all fight) - flowers open where you STAND
 //     (not where you were: the marker tracks you until the petal-freeze
 //     instant, then it's yours). The burst is only half of it: each bloom
 //     plants a ROT GARDEN whose stamen sweeps a slow rotor beam and, once
-//     per garden, reaches CRITICAL MASS — it bursts into seed pods, and the
+//     per garden, reaches CRITICAL MASS - it bursts into seed pods, and the
 //     first two pods that settle plant NEW rot gardens. Untended, the
 //     garden takes over.
-//   • SEED VOLLEY (60%) — three seed pods arc across the arena and plant
+//   • SEED VOLLEY (60%) - three seed pods arc across the arena and plant
 //     three fresh rot gardens in a line toward you.
-//   • WITHERING BLOOM (60%, once) — the Scarlet Veil, upgraded: the puzzle
+//   • WITHERING BLOOM (60%, once) - the Scarlet Veil, upgraded: the puzzle
 //     grid is hidden behind a blooming veil. Every cell you fill wilts the
 //     veil a little (visible progress: the veil thins); every mistake
 //     regrows it (petals rain back in). The puzzle is the pruning.
-//   • 🌸 FULMINATION (≤10%, one-shot finale) — the boss curls shut and
+//   • 🌸 FULMINATION (≤10%, one-shot finale) - the boss curls shut and
 //     blooms from EVERY direction: petal-chains crawl along radial lanes
 //     while a judgment-bloom stamps your position each beat. Each dodge
-//     carves one SCAR — three scars open the ONE TRUE GAP, the only safe
+//     carves one SCAR - three scars open the ONE TRUE GAP, the only safe
 //     wedge, and THE LAST BLOOM detonates everything outside it. Charge
 //     bar frozen (gate in _egTickPlayer via _egBlmFinalActive).
 //
@@ -53,7 +53,7 @@ Object.assign(EG_BOSS_DEFS, {
 
 Object.assign(EG_BOSS_MECHANICS, {
 
-    // boss_bloom — "The Garden's Verdict" (rework)
+    // boss_bloom - "The Garden's Verdict" (rework)
     // Phase 1 (100% → 60%): Scarlet Blooms + Corrupt Cells
     // Phase 2 ( 60% → 30%): immune window; Seed Volley + Withering Bloom join
     // Phase 3 ( 30% →  0%): blooms chase in converging pairs; at 10%
@@ -108,13 +108,13 @@ function _egBlmPC() { const c = _egNkPlayerCenter(); return c || { x: window.inn
 //------------------------------------------------------------------------
 //-------------------SIGNATURE: SCARLET BLOOMS (all fight)-----------------
 //------------------------------------------------------------------------
-// Flowers open where you STAND — the marker tracks you until the petal-
+// Flowers open where you STAND - the marker tracks you until the petal-
 // freeze instant, then it locks. Burst plants a ROT GARDEN: a stamen rotor
 // beam sweeps a wedge; once per garden, the core swells (CRITICAL MASS) and
-// bursts into seed pods — the first two pods that settle plant NEW gardens.
+// bursts into seed pods - the first two pods that settle plant NEW gardens.
 // Gardens cap at EG_BLM_MAX_GARDENS (oldest withers first).
 //
-// Phase 3: blooms spawn as CHASING PAIRS — two trackers converge on you and
+// Phase 3: blooms spawn as CHASING PAIRS - two trackers converge on you and
 // freeze the instant they MEET (not when you stop).
 const EG_BLM_FREEZE_MS   = 2600;               // ms the marker tracks before freezing
 const EG_BLM_PAIR_FALLBACK_MS = 7000;          // pair failsafe freeze
@@ -133,7 +133,7 @@ const EG_BLM_PODS        = 5;                     // pods per critical burst
 const EG_BLM_POD_PLANTS  = 2;                     // pods that plant new gardens
 
 // Live rot-garden registry (for the cap). Each garden owns its own PASSIVE
-// dodge run (tier-scaled clock, never trips _egNkDodgeBusy — the Puddle
+// dodge run (tier-scaled clock, never trips _egNkDodgeBusy - the Puddle
 // persistent-watcher pattern) so gardens keep ticking after their planting
 // mechanic's run has ended.
 const _egBlmGardens = [];
@@ -146,7 +146,7 @@ function _egMechBlmBlooms(monster, phase) {
     const run = _egNkNewRun(bossId, true);
     const pairs = p >= 3;
 
-    _egNkToast('eg_mech_blm_blooms', '🌸 SCARLET BLOOMS — they open where you STAND! Keep moving until they freeze!', '#ff7fa5');
+    _egNkToast('eg_mech_blm_blooms', '🌸 SCARLET BLOOMS - they open where you STAND! Keep moving until they freeze!', '#ff7fa5');
 
     const blooms = [];
     if (pairs) {
@@ -344,7 +344,7 @@ function _egBlmSeedBurst(g) {
 //-------------------ACT II: SEED VOLLEY (60%)-----------------------------
 //------------------------------------------------------------------------
 // Three seed pods arc across the arena and plant three fresh rot gardens
-// in a line toward you — the garden is coming to YOU.
+// in a line toward you - the garden is coming to YOU.
 const EG_BLM_VOLLEY_N = 3;
 
 function _egMechBlmVolley(monster, phase) {
@@ -354,7 +354,7 @@ function _egMechBlmVolley(monster, phase) {
     const bossId = monster && monster.id;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(bossId, true);
-    _egNkToast('eg_mech_blm_volley', '🌸🌱 SEED VOLLEY — the garden marches toward you!', '#ff7fa5');
+    _egNkToast('eg_mech_blm_volley', '🌸🌱 SEED VOLLEY - the garden marches toward you!', '#ff7fa5');
 
     const pc = _egBlmPC();
     // Line of landing spots from the far edge toward your position.
@@ -408,7 +408,7 @@ function _egMechBlmVolley(monster, phase) {
 //-------------------ACT II: WITHERING BLOOM (60%, once)-------------------
 //------------------------------------------------------------------------
 // The Scarlet Veil, upgraded: the puzzle grid hides behind a blooming veil.
-// Every cell you FILL wilts the veil (it thins — visible progress); every
+// Every cell you FILL wilts the veil (it thins - visible progress); every
 // MISTAKE regrows it (petals rain back). The puzzle is the pruning.
 function _egMechBlmVeil(monster, phase) {
     if (typeof _egVeilActive === 'undefined' || _egVeilActive) return;
@@ -444,7 +444,7 @@ function _egMechBlmVeil(monster, phase) {
     _egNkLoop(run, () => {
         const v = document.getElementById('eg-grid-veil');
         if (!v) return false;   // veil removed by teardown
-        chip.textContent = '🌸 WILT ' + Math.round(wilt) + '% — fill cells to prune the veil!';
+        chip.textContent = '🌸 WILT ' + Math.round(wilt) + '% - fill cells to prune the veil!';
         v.style.setProperty('--blm-wilt', String(Math.round(wilt)));
         v.classList.toggle('eg-blm-veil-open', wilt >= 90);
         return true;
@@ -472,11 +472,11 @@ function _egMechBlmVeil(monster, phase) {
 
 
 // Removes the veil overlay + bloom tint. NOTE: this deliberately overrides
-// Bayes's copy (boss-bayes.js loads first, boss-bloom.js last) — behaviour
+// Bayes's copy (boss-bayes.js loads first, boss-bloom.js last) - behaviour
 // is a superset: the element goes away either way, and both bosses' tint
 // classes are stripped so either boss's teardown leaves a clean grid.
 // _egRemoveVeil is defined ONCE, in shared-boss-abilities.js (consolidated
-// 2026-09 from this file and boss-bayes.js — this version's behaviour is
+// 2026-09 from this file and boss-bayes.js - this version's behaviour is
 // the merged one).
 
 
@@ -485,7 +485,7 @@ function _egMechBlmVeil(monster, phase) {
 //------------------------------------------------------------------------
 // The boss curls shut and blooms from EVERY direction: petal-chains crawl
 // along radial lanes while a judgment-bloom stamps your position each beat.
-// Each dodge carves one SCAR — three scars open the ONE TRUE GAP (a wide
+// Each dodge carves one SCAR - three scars open the ONE TRUE GAP (a wide
 // safe wedge). THE LAST BLOOM detonates everything outside it. Charge bar
 // frozen (gate in _egTickPlayer via _egBlmFinalActive).
 const EG_BLM_JUDGMENTS = 3;
@@ -567,11 +567,11 @@ function _egBlmFinalStart(monster) {
     ov.className = 'eg-blm-cd';
     ov.innerHTML =
         '<div class="eg-blm-cd-label">🌸 FULMINATION</div>' +
-        '<div class="eg-blm-cd-hint">Dodge each judgment-bloom — every dodge carves a scar. Three scars open the ONE TRUE GAP!</div>';
+        '<div class="eg-blm-cd-hint">Dodge each judgment-bloom - every dodge carves a scar. Three scars open the ONE TRUE GAP!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_blm_final_cd', '🌸💀 FULMINATION — dodge to carve scars; three open the ONE TRUE GAP!', '#ff7fa5');
+    _egNkToast('eg_mech_blm_final_cd', '🌸💀 FULMINATION - dodge to carve scars; three open the ONE TRUE GAP!', '#ff7fa5');
 
     // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
@@ -591,7 +591,7 @@ function _egBlmFinalStart(monster) {
         if (g.finished) return;
         g.judgments++;
         if (g.judgments > EG_BLM_JUDGMENTS + 6) { runLastBloom(); return; }   // failsafe
-        _egNkToast('eg_mech_blm_judgment', '🌸 Judgment ' + g.judgments + ' — dodge to carve a scar!', '#ff7fa5');
+        _egNkToast('eg_mech_blm_judgment', '🌸 Judgment ' + g.judgments + ' - dodge to carve a scar!', '#ff7fa5');
 
         // Each judgment gets its own run: the loop ends at the burst, so a
         // fresh run is needed for the next cycle.
@@ -649,7 +649,7 @@ function _egBlmFinalStart(monster) {
                 } else {
                     // A DODGE (outside at the burst) carves the scar.
                     g.scars++;
-                    _egNkToast('eg_mech_blm_scar', '🌸 Scar carved (' + g.scars + '/' + EG_BLM_JUDGMENTS + ') — the gap opens!', '#ffd166');
+                    _egNkToast('eg_mech_blm_scar', '🌸 Scar carved (' + g.scars + '/' + EG_BLM_JUDGMENTS + ') - the gap opens!', '#ffd166');
                     if (g.scars >= EG_BLM_JUDGMENTS) g.gapOpen = true;
                 }
                 return false;   // this judgment's loop ends; the timer schedules the next
@@ -667,7 +667,7 @@ function _egBlmFinalStart(monster) {
     // ── THE LAST BLOOM: everything detonates except the ONE TRUE GAP. ────
     const runLastBloom = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_blm_last', '🌸💀 THE LAST BLOOM — reach the ONE TRUE GAP!', '#ff7fa5');
+        _egNkToast('eg_mech_blm_last', '🌸💀 THE LAST BLOOM - reach the ONE TRUE GAP!', '#ff7fa5');
         const cx = W / 2, cy = H / 2;
         const lRun = _egNkNewRun(monster.id, true);
         lRun.passive = true;
@@ -731,7 +731,7 @@ function _egBlmFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 //-------------------TEARDOWN----------------------------------------------
 //------------------------------------------------------------------------
-// Called from _egBossCleanup on boss death AND from the encounter stop —
+// Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
 function _egBlmTeardown() {
     if (_egBlmFinal) { try { _egBlmFinalEnd(_egBlmFinal, null); } catch (e) {} _egBlmFinal = null; }
@@ -760,8 +760,8 @@ function _egBlmTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_BLM_DEBUG.fire('blooms'|'volley'|'veil', phase) — runs one now
-//   _EG_BLM_DEBUG.final()                               — FULMINATION now
+//   _EG_BLM_DEBUG.fire('blooms'|'volley'|'veil', phase) - runs one now
+//   _EG_BLM_DEBUG.final()                               - FULMINATION now
 if (typeof window !== 'undefined') {
     window._EG_BLM_DEBUG = {
         fire: (name, phase) => {

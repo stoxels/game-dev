@@ -1,20 +1,21 @@
 //  endgame-mod-tables-weapon1.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------WEAPON 1 (MAIN HAND / MELEE) MODIFIER TABLE----------
 //------------------------------------------------------------------------
-// The melee weapon is the primary offensive slot for the auto-strike
-// system. Every X seconds the player automatically charges the targeted
-// monster and lands a melee strike — the weapon defines how often this
-// happens (attack_speed) and how hard it hits (physical damage, elemental
-// damage, crit). Projectiles from cell reveals fire independently.
+// The melee weapon is the primary offensive slot for the manual
+// Secret-of-Mana-style charge system. The bar charges over time and the
+// player spends it with a manual strike (E) - the weapon defines how fast
+// it recharges (attack_speed) and how hard a fully-charged strike hits
+// (physical damage, elemental damage, crit). Projectiles from cell reveals
+// fire independently.
 //
-// Attack speed is expressed as seconds reduced from the base strike
-// cooldown — higher values mean more frequent strikes.
+// Attack speed is expressed as seconds reduced from the base time to full
+// charge - higher values mean faster recharges.
 //
 // Physical and elemental damage values are the highest of any equipment
 // slot since this is the dedicated melee damage piece. Bracers add flat
@@ -23,8 +24,8 @@
 // to compensate for the narrower trigger condition.
 //
 // Status effect chances are higher than bracers for the same reason:
-// bracers proc on every cell reveal, the weapon only procs on the
-// periodic auto-strike. Higher per-hit chance, lower total frequency.
+// bracers proc on every cell reveal, the weapon only procs on manual
+// melee strikes. Higher per-hit chance, lower total frequency.
 //
 // Cleave is weapon-exclusive: a sweeping strike that hits all monsters
 // sharing the same spawn location as the target.
@@ -32,21 +33,21 @@
 // No local armour/evasion/absorption (weapon slot never grants those).
 // No block/dodge, no puzzle utility beyond the standard set, no spell
 // damage, no precision, no quiz exclusives, no absorption regen.
-// Accuracy applies here — melee strikes can miss.
+// Accuracy applies here - melee strikes can miss.
 
 const EG_MOD_TABLE_WEAPON1 = {
     prefixes: {
 
         // --- ATTACK SPEED ---
-        // The defining stat of the melee weapon slot — reduces the
-        // cooldown between auto-strikes. The # value is seconds removed
-        // from the base cooldown. Stacking multiple attack speed sources
+        // The defining stat of the melee weapon slot - reduces the time to
+        // a fully-charged manual strike. The # value is seconds removed
+        // from the base charge time. Stacking multiple attack speed sources
         // from weapon + passive tree creates a meaningful build path.
         // Kept as a prefix so it competes with physical/elemental damage
-        // for budget — you can't have everything.
+        // for budget - you can't have everything.
         attack_speed: {
             id: 'attack_speed',
-            label: 'Melee Strikes occur #s more often', labelDe: 'Nahkampfschläge erfolgen #s häufiger',
+            label: 'Melee charges #s faster', labelDe: 'Nahkampf lädt #s schneller auf',
             tiers: [
                 { tier: 1, min: 1.8, max: 2.5, weight: 80, ilvl: 82 },
                 { tier: 2, min: 1.1, max: 1.7, weight: 200, ilvl: 62 },
@@ -56,7 +57,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
 
         // --- FLAT PHYSICAL DAMAGE ---
-        // The weapon's raw cutting or blunt force — a fixed damage range
+        // The weapon's raw cutting or blunt force - a fixed damage range
         // added to every melee strike. Higher ceiling than bracers since
         // this is the dedicated melee slot and strikes fire less often
         // than cell reveals.
@@ -72,7 +73,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
 
         // --- % INCREASED PHYSICAL DAMAGE ---
-        // Scales all physical damage on strikes — the more flat physical
+        // Scales all physical damage on strikes - the more flat physical
         // you have from weapon, bracers, and passives, the more valuable
         // this becomes. A multiplier prefix competing with attack_speed
         // and elemental damage for prefix slots creates meaningful choices.
@@ -88,12 +89,12 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
 
         // --- FLAT ELEMENTAL DAMAGE ---
-        // Elemental damage added to melee strikes — higher ceiling than
+        // Elemental damage added to melee strikes - higher ceiling than
         // amulet and ring equivalents since those apply to all hits
         // while this applies only to the periodic melee strike.
         // Builds can choose to go physical (flat_physical + inc_physical)
         // or elemental (one of the four element prefixes + status effects
-        // in suffix slots) — or mix. Only one element can be a prefix
+        // in suffix slots) - or mix. Only one element can be a prefix
         // at a time given the 3-prefix budget shared with attack_speed
         // and inc_physical.
         fire_damage: {
@@ -119,7 +120,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         lightning_damage: {
             id: 'lightning_damage',
             label: 'Adds # to @ Lightning Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Blitzschaden hinzu',
-            // Lightning has a wide spread — high variance, high ceiling.
+            // Lightning has a wide spread - high variance, high ceiling.
             tiers: [
                 { tier: 1, min1: 14, max1: 36, min2: 170, max2: 256, weight: 160, ilvl: 80 },
                 { tier: 2, min1: 8, max1: 24, min2: 108, max2: 168, weight: 370, ilvl: 60 },
@@ -130,7 +131,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         shadow_damage: {
             id: 'shadow_damage',
             label: 'Adds # to @ Shadow Damage to Melee Strikes', labelDe: 'Fügt Nahkampfschlägen # bis @ Schattenschaden hinzu',
-            // Shadow is rarer — lower weight, slightly lower values,
+            // Shadow is rarer - lower weight, slightly lower values,
             // but its status effect (convert) is the most powerful.
             tiers: [
                 { tier: 1, min1: 40, max1: 64, min2: 112, max2: 164, weight: 115, ilvl: 82 },
@@ -142,7 +143,7 @@ const EG_MOD_TABLE_WEAPON1 = {
 
         // --- CRITICAL STRIKES ---
         // Weapon is the natural home for the highest crit values in the
-        // game — the blow itself is what crits. Higher ceiling than
+        // game - the blow itself is what crits. Higher ceiling than
         // amulet, bracers, and arcane since those are secondary sources.
         // Crit as a prefix means stacking crit_chance + crit_multiplier
         // both occupy prefix slots, creating a real trade-off against
@@ -172,7 +173,7 @@ const EG_MOD_TABLE_WEAPON1 = {
     suffixes: {
 
         // --- ATTRIBUTES ---
-        // Strength is primary for a melee weapon — raw physical power.
+        // Strength is primary for a melee weapon - raw physical power.
         // Better weight than agility or intelligence on this slot.
         strength: {
             id: 'strength',
@@ -209,10 +210,10 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
 
         // --- ACCURACY ---
-        // Melee strikes can miss — accuracy is a meaningful suffix here.
+        // Melee strikes can miss - accuracy is a meaningful suffix here.
         // The weapon is the most natural home for melee accuracy, so it
         // rolls with the best weights of any slot for this stat.
-        // Values are higher than bracers/gloves/armour slots — if you
+        // Values are higher than bracers/gloves/armour slots - if you
         // want reliable melee strikes, invest prefix budget in accuracy
         // or accept occasional misses.
         accuracy: {
@@ -229,7 +230,7 @@ const EG_MOD_TABLE_WEAPON1 = {
 
         // --- LIFE LEECH ---
         // The blade draws life from the wound. Higher ceiling than
-        // bracers/earring/ring equivalents — melee strikes fire less
+        // bracers/earring/ring equivalents - melee strikes fire less
         // often but are larger single instances of damage, making
         // leech per-hit more impactful here. Still lower than the
         // chest's prefix version since that is a larger slot.
@@ -248,7 +249,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // Delivered through the weapon itself on every melee strike.
         // Higher % values than bracers (which proc on any hit including
         // the frequent cell-reveal projectiles) to compensate for the
-        // lower strike frequency — the weapon hits hard and less often,
+        // lower strike frequency - the weapon hits hard and less often,
         // so each hit should have a meaningful chance to apply a status.
         // All five status effects are available: the weapon is the
         // primary melee tool and can be built toward any elemental path.
@@ -312,7 +313,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         },
         chance_to_convert: {
             id: 'chance_to_convert',
-            // Shadow-locked, rarest status — only the most powerful
+            // Shadow-locked, rarest status - only the most powerful
             // shadow weapon can compel a monster to turn on its allies.
             label: '#% Chance to Convert on Melee Strike', labelDe: '#% Chance zur Umwandlung bei Nahkampfschlag',
             tiers: [
@@ -327,7 +328,7 @@ const EG_MOD_TABLE_WEAPON1 = {
         // same spawn location as the target. Since each spawn location
         // can hold multiple monsters, this turns the melee strike from
         // a single-target hit into a cluster-clearing blow.
-        // Competes with status effects and leech for suffix budget —
+        // Competes with status effects and leech for suffix budget -
         // you can cleave, or you can reliably ignite, but not both
         // on the same suffix slots. Higher tier values make cleave a
         // build-defining mechanic for dense spawn locations.
@@ -345,11 +346,11 @@ const EG_MOD_TABLE_WEAPON1 = {
 };
 
 // One-handed melee table (main-hand + dual-wield off-hand). Identical to the
-// legacy WEAPON1 pool — kept as an alias so old references keep working.
+// legacy WEAPON1 pool - kept as an alias so old references keep working.
 const EG_MOD_TABLE_WEAPON_1H = EG_MOD_TABLE_WEAPON1;
 
 // 1H-exclusive: Parry (dual-wield defense identity). Two-handed weapons are
-// pure offense and can never roll this — choosing 2H means giving up parry,
+// pure offense and can never roll this - choosing 2H means giving up parry,
 // exactly like giving up block by dropping the shield.
 EG_MOD_TABLE_WEAPON_1H.suffixes.parry = {
     id: 'parry',

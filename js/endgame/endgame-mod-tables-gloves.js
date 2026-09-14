@@ -1,8 +1,8 @@
 //  endgame-mod-tables-gloves.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Slot modifier table(s) — data only, no logic.
+//  Slot modifier table(s) - data only, no logic.
 //  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time — it MUST load last.
+//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
 //
 //------------------------------------------------------------------------
 //-------------------GLOVES MODIFIER TABLE--------------------------------
@@ -16,7 +16,7 @@
 // Their exclusive identity is the quiz/puzzle interaction layer:
 // reveal_hint (chance to show a hint on exercise questions) and
 // chance_for_new_question (retry chance on failed quiz questions) only
-// roll on gloves. Multishot also lives here as a prefix — the gloved
+// roll on gloves. Multishot also lives here as a prefix - the gloved
 // hand that draws the extra arrow. No block/dodge, no pushback/overkill,
 // no chain/splash, no spell damage multiplier, no crit, no status effect
 // chance applications (those are bracers), no precision (that's chest).
@@ -49,7 +49,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
 
         // --- LOCAL DEFENSES ---
-        // Bracer-scale values — modest, not a primary defence slot.
+        // Bracer-scale values - modest, not a primary defence slot.
         flat_armour: {
             id: 'flat_armour',
             label: '+# to Armour', labelDe: '+# zu Rüstung',
@@ -209,7 +209,7 @@ const EG_MOD_TABLE_GLOVES = {
         // Bracers have leech as a suffix. Gloves carry it as a prefix,
         // making the two slots intentionally compete for the same budget
         // differently. The bare hand draws life through the grip.
-        // Ceiling is slightly below bracers' suffix version — prefix slot
+        // Ceiling is slightly below bracers' suffix version - prefix slot
         // is more valuable budget-wise, so we keep the raw number a touch
         // lower to preserve balance across both pieces.
         life_leech: {
@@ -224,7 +224,7 @@ const EG_MOD_TABLE_GLOVES = {
 
         // --- GLOVES-EXCLUSIVE: MULTISHOT ---
         // The gloved hand that draws and nocks the extra arrow.
-        // Cloak has multishot as a suffix. Gloves carry it as a prefix —
+        // Cloak has multishot as a suffix. Gloves carry it as a prefix -
         // a deliberate counterpart that lets dedicated ranged builds stack
         // both pieces at a real cost to their prefix budgets.
         // Values are on par with cloak's suffix version.
@@ -253,7 +253,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- GLOVES-EXCLUSIVE: QUIZ RETRY ---
         // The gloved hand that reaches for a fresh question card.
         // From player stats: "Chance to receive a new question after
-        // failing a question." Exclusive to gloves — they interact with
+        // failing a question." Exclusive to gloves - they interact with
         // the puzzle directly.
         chance_for_new_question: {
             id: 'chance_for_new_question',
@@ -339,7 +339,7 @@ const EG_MOD_TABLE_GLOVES = {
         },
 
         // --- GLOVES-PRIMARY: MANA ON KILL ---
-        // The finishing touch — the hand that delivers the killing blow
+        // The finishing touch - the hand that delivers the killing blow
         // draws mana from the fallen enemy. Earring and chest have this
         // too, but it's a primary identity stat for gloves since it
         // rewards aggressive puzzle play and kill speed. Higher ceiling
@@ -373,7 +373,7 @@ const EG_MOD_TABLE_GLOVES = {
 
         // --- GLOVES-PRIMARY: ACCURACY ---
         // The steady, gloved grip that guides every shot and swing.
-        // Accuracy is a meaningful secondary identity here — bracers and
+        // Accuracy is a meaningful secondary identity here - bracers and
         // other armour slots have it as a minor suffix, but on gloves it
         // rolls with slightly better weights, making them a natural home
         // for accuracy-focused builds. Values identical to helmet/bracers.
@@ -437,7 +437,7 @@ const EG_MOD_TABLE_GLOVES = {
         // --- GLOVES-EXCLUSIVE: REVEAL HINT ---
         // From player stats: "chance to show reveal hint on exercise
         // questions." The gloved hand that reaches into the puzzle and
-        // pulls back the corner of the answer. Gloves-only — the most
+        // pulls back the corner of the answer. Gloves-only - the most
         // direct thematic fit for a piece that literally interfaces with
         // the puzzle grid. Very powerful for quiz modes so it's kept rare
         // and capped at 3 tiers.
