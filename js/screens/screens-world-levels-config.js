@@ -14,8 +14,9 @@ const WD_WORLD_CONFIGS = [
         bgImage: 'images/Probability-Peaks.webp',
         imageAspect: 16 / 9,
         entrancePos: { x: 55.8, y: 85.3 },
-        // Convergence Trial 1 node - offset from the old 33% milestone spot.
-        trialNode: { x: 23.6, y: 73.6 },
+        // Convergence Trial 1 node - top-left of level 1-9 (the 66% milestone
+        // that gates the trial), in the open ground between 7/8 and 9.
+        trialNode: { x: 35.8, y: 48.2 },
         nodes: [
             { x: 68.6, y: 82.4 },  // 1-1
             { x: 83.6, y: 75.3 },  // 1-2

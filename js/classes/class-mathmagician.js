@@ -129,17 +129,6 @@ function _arcaneReveal_collectCells(row, col, radius, rows, cols, sol, maxReveal
 }
 
 
-function _arcaneReveal_findCellElement(row, col) {
-    return (
-        document.getElementById(`g-${row}-${col}`) ||
-        document.querySelector(`#game-grid [id$="-${row}-${col}"]`) ||
-        document.querySelector(`.grid-board [id$="-${row}-${col}"]`) ||
-        document.querySelector(`.grid-cell[id$="-${row}-${col}"]`) ||
-        document.querySelector(`.tile[id$="-${row}-${col}"]`) ||
-        document.querySelector(`.cell[id$="-${row}-${col}"]`) ||
-        document.getElementById(`${row}-${col}`)
-    );
-}
 
 
 //------------------------------------------------------------------------

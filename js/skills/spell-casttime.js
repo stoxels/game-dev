@@ -229,7 +229,7 @@ function _holdCastTick() {
 //-------------------------CAST BAR + CHARGE ORB--------------------------
 //------------------------------------------------------------------------
 
-// Builds (once) the WoW-style cast bar pinned above the hotbar corner.
+// Builds (once) the WoW-style cast bar pinned above the avatar's health bar.
 function _holdCastBarEls() {
     let bar = document.getElementById('spell-castbar');
     if (bar) {
@@ -261,6 +261,25 @@ function _holdCastBarEls() {
         name: bar.querySelector('.spell-castbar-name'),
         icon: bar.querySelector('.spell-castbar-icon'),
     };
+}
+
+// Positions the cast bar directly above the avatar's bar stack (HP bar is
+// the stack's first row), so it reads as one more bar in that stack.
+function _holdCastPositionBar() {
+    const bar = document.getElementById('spell-castbar');
+    if (!bar) return;
+    const avatar = document.getElementById('player-avatar-wrapper')
+        || document.getElementById('player-avatar-simple');
+    if (!avatar) return;
+    // Anchor to the first bar row when it exists (monster-level avatar);
+    // otherwise fall back to the whole avatar wrapper.
+    const hpWrap = avatar.querySelector('#avatar-hp-text')?.parentElement;
+    const anchor = (hpWrap && hpWrap.getBoundingClientRect().width > 0) ? hpWrap : avatar;
+    const rect = anchor.getBoundingClientRect();
+    // Sit the whole bar (label + track) fully above the anchor row with a
+    // 4px gap - matching the stack's own 4px row spacing.
+    bar.style.left = `${rect.left + rect.width / 2}px`;
+    bar.style.top = `${Math.round(rect.top - bar.offsetHeight - 4)}px`;
 }
 
 
@@ -319,6 +338,7 @@ function _holdCastShow(name, theme) {
             if (els.icon) els.icon.textContent = (def && def.icon) || '✦';
         } catch (e) { if (els.icon) els.icon.textContent = '✦'; }
         els.bar.classList.add('show');
+        _holdCastPositionBar();
         _holdCastOrbEl(theme);
         _holdCastPaint(0, theme);
     } catch (e) { /* visuals are best-effort */ }
@@ -333,11 +353,20 @@ function _holdCastPaint(p, theme) {
         const els = _holdCastBarEls();
         if (els.fill) els.fill.style.width = `${Math.round(p * 100)}%`;
         if (els.spark) els.spark.style.left = `${Math.round(p * 100)}%`;
+        _holdCastPositionBar();
         const orb = document.getElementById('spell-charge-orb');
         if (orb) {
             const s = 0.45 + p * 1.65;
             orb.style.transform = `translate(-50%, -50%) scale(${s.toFixed(3)})`;
             orb.style.opacity = `${(0.55 + p * 0.45).toFixed(2)}`;
+            // Track the avatar every frame so the swelling orb travels with
+            // the player while they move during the hold (the orb is
+            // position:fixed, so it must be re-anchored each paint).
+            const centre = _holdCastAvatarCentre();
+            if (centre) {
+                orb.style.left = `${centre.x}px`;
+                orb.style.top = `${centre.y}px`;
+            }
             if (orb.classList.contains('spell-charge-orb-fire')) {
                 orb.style.filter = `blur(${Math.max(0, 0.8 - p * 0.4).toFixed(2)}px) drop-shadow(0 0 ${Math.round(10 + p * 18)}px var(--cast-color))`;
             }

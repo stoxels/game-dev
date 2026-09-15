@@ -173,20 +173,32 @@ function _egIsAscensionTrialDone(wi) {
     return STATE.ascensionTrialsDone.includes('asc_' + (wi + 1));
 }
 
-// Trials unlock once the player has started the world (any level of it
-// cleared) - discoverable early, still gated by world progression. World 1
-// Trial 1 additionally needs the tutorial finished (matches level 1-1).
+// Trials unlock by clearing the world's two convergence milestone levels
+// (the old 33% / 66% rule, see _egTrialTriggerLevels). World 1 Trial 1
+// additionally needs the tutorial finished (matches level 1-1).
 function _egIsTrialUnlocked(wi) {
     if (typeof STATE === 'undefined' || !STATE) return false;
-    if (wi === 0) return !!STATE.tutorialDone;
+    if (wi === 0 && !STATE.tutorialDone) return false;
     const start = _egTrialWorldStartGi(wi);
     if (start < 0 || typeof ALL === 'undefined') return false;
-    const world = WORLDS[wi];
-    if (!world) return false;
-    for (let li = 0; li < world.data.length; li++) {
-        if (STATE.done && STATE.done.includes(start + li)) return true;
-    }
-    return false;
+    const triggers = _egTrialTriggerLevels(wi);
+    if (!triggers) return false;
+    return triggers.every((li) => STATE.done && STATE.done.includes(start + li));
+}
+
+// The two convergence milestone level indices (0-based li inside the world)
+// that gate this world's Convergence Trial - the classic 33% / 66% formula
+// used by the pre-Leveling-Rework convergence levels (last level excluded).
+// Returns null for worlds without a trial (Nexus World / empty data).
+function _egTrialTriggerLevels(wi) {
+    const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
+    if (!world || !world.data || world.data.length < 2) return null;
+    if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) return null;
+    const len = world.data.length;
+    const c1 = Math.floor((len - 1) * (1 / 3));
+    const c2 = Math.floor((len - 1) * (2 / 3));
+    if (c1 === c2) return null;
+    return [c1, c2];
 }
 
 
@@ -448,7 +460,7 @@ function _egEndCampaignTrial() {
         return false;
     }
     if (typeof _egCancelChainCountdown === 'function') _egCancelChainCountdown();
-    if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
+    if (typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
 
     if (typeof _egRollBonusMapLoot === 'function') try { _egRollBonusMapLoot(); } catch (e) {}
 

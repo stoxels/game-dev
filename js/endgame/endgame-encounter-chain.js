@@ -1163,7 +1163,7 @@ function _egEndMap() {
     if (!_egEncounterActive) return;
     _egCancelChainCountdown();
 
-    if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
+    if (typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
 
     // Roll for completion bonus loot first - it must land in _egRunLoot
     // before the transition overlay renders its summary.
@@ -1968,7 +1968,7 @@ function _egEndMapDefeated(titleText, subText) {
     // map-failed summary has been shown.
     window._egMapDefeatInProgress = true;
 
-    if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
+    if (typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
 
     // If a generic defeat opened the lose overlay first, close it.
     const ovLose = document.getElementById('ov-lose');

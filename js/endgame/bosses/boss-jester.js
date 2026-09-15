@@ -51,8 +51,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_JS_DEBUG_SLOW = true;
-const _EG_JS_DEBUG_MULT = _EG_JS_DEBUG_SLOW ? 2.5 : 1;
+const __EG_JS_DEBUG_SLOW = true;
+const _EG_JS_DEBUG_MULT = __EG_JS_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_jester: {
@@ -143,7 +143,7 @@ function _egJsConfetti(x, y, big) {
         s.style.animationDelay = (Math.random() * 110) + 'ms';
         layer.appendChild(s);
     }
-    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _EG_JS_DEBUG_SLOW ? 1900 : 950);
+    setTimeout(() => { try { layer.remove(); } catch (e) {} }, __EG_JS_DEBUG_SLOW ? 1900 : 950);
 }
 
 
@@ -555,7 +555,7 @@ function _egJsFinalStart(monster) {
             return;
         }
         const charge = Math.max(EG_JS_SHOW_CHARGE_MIN,
-            EG_JS_SHOW_CHARGE - idx * 250) * (_EG_JS_DEBUG_SLOW ? 8 : 1);
+            EG_JS_SHOW_CHARGE - idx * 250) * (__EG_JS_DEBUG_SLOW ? 8 : 1);
         // Deal the safe suit onto a random third of the table.
         const safe = suits[Math.floor(Math.random() * suits.length)];
         g.cards.forEach(cd => {
@@ -591,10 +591,10 @@ function _egJsFinalStart(monster) {
             _egJsAfter(g, () => {
                 g.cards.forEach(cd => cd.el.classList.remove('eg-js-card-safe', 'eg-js-card-down'));
                 show(idx + 1);
-            }, EG_JS_DEBUG_SLOW ? 1400 : 700);
+            }, __EG_JS_DEBUG_SLOW ? 1400 : 700);
         }, charge);
     };
-    g.showTimer = _egJsAfter(g, () => show(0), EG_JS_DEBUG_SLOW ? 4000 : 1600);
+    g.showTimer = _egJsAfter(g, () => show(0), __EG_JS_DEBUG_SLOW ? 4000 : 1600);
 }
 
 // The BLACKOUT + CURTAIN CALL: all cards flip face-down except the safe
@@ -630,7 +630,7 @@ function _egJsBlackout(g, monster, level) {
     const sweepNext = () => {
         if (!_egJsFinal || _egJsFinal !== g || g.finished) return;
         if (wi >= rows.length) {
-            _egJsAfter(g, () => _egJsFinalEnd(g), _EG_JS_DEBUG_SLOW ? 5500 : 1200);
+            _egJsAfter(g, () => _egJsFinalEnd(g), __EG_JS_DEBUG_SLOW ? 5500 : 1200);
             return;
         }
         const r = rows[wi++];

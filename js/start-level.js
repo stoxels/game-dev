@@ -132,7 +132,7 @@ function _cleanupPreviousLevel() {
 
     // Stop any active endgame encounter from the previous level
     if (typeof _egStopEncounter === 'function') _egStopEncounter();
-    if (!window._egSuppressEncounterStop && typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
+    if (!window._egSuppressEncounterStop && typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
     // Ensure quiz damage buff does not leak across maps when _egStopEncounter
     // was suppressed (chain transitions preserve it intentionally, but any
     // non-chain start must clear it: winning / losing / restarting a map).
@@ -536,10 +536,13 @@ function _doStartLevel(gi) {
     }
 
     // Remind the player about unspent Convergence Points (delayed so it
-    // appears after the toast queue reset and screen transition).
+    // appears after the toast queue reset and screen transition). {key} is
+    // the player's CURRENT Probability Tree binding (K by default).
     if ((STATE.passiveTreePoints || 0) > 0 && typeof showToast === 'function') {
+        const treeKey = (typeof keybindDisplayLabel === 'function' && typeof keybindKeyFor === 'function')
+            ? keybindDisplayLabel(keybindKeyFor('passive-tree')) : 'K';
         setTimeout(() => {
-            showToast(`🌿 ${t('toast_unspent_convergence').replace('{n}', STATE.passiveTreePoints)}`);
+            showToast(`🌿 ${t('toast_unspent_convergence').replace('{n}', STATE.passiveTreePoints).replace('{key}', treeKey)}`);
         }, 900);
     }
 

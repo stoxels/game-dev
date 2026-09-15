@@ -100,6 +100,17 @@ function showConvergenceModal() {
     }
 }
 
+//------------------------------------------------------------------------
+// Convergence-modal buttons. Were inline onclick= attributes in index.html
+// (moved into JS 2026-09-15 so index.html carries no executable code).
+//------------------------------------------------------------------------
+(function _bindConvergenceModalButtons() {
+    const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+    on('convm-btn-open', () => { hideConvergenceModal(); hideResultOverlays(); showPassiveTree(); });
+    on('convm-btn-next', () => { hideConvergenceModal(); goToNextLevel(); });
+    on('convm-btn-select', () => { hideConvergenceModal(); goToLevelSelect(); });
+})();
+
 // Total number of Convergence Trials across all worlds - the "X" in the
 // "earned / total" readout. Leveling Rework: milestones moved from puzzle
 // levels (isLevelConvergence is always false now) to trials.

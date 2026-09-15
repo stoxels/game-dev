@@ -49,18 +49,6 @@ function _quizCalcEliminationChance() {
     return chance;
 }
 
-// Returns the total probability of receiving a bonus item drop on a
-// correct MC answer (passive-tree roll, separate from the base reward).
-function _quizCalcMcBonusItemChance() {
-    let chance = 0;
-    if (PT.hasSkill('predictive_intelligence')) chance += 0.10;
-    if (PT.hasSkill('bonus_acquisition')) chance += 0.10;
-    if (PT.hasSkill('enhanced_rewards')) chance += 0.10;
-    if (PT.hasSkill('overflowing_spoils')) chance += 0.10;
-    if (PT.hasSkill('multiple_choice_mastery')) chance += 0.10;
-    return chance;
-}
-
 // Returns the total success probability for the Tutor item.
 // Base chance is 10 %; passive skills add on top.
 function _quizCalcTutorSuccessChance() {
@@ -186,7 +174,7 @@ function _quizResetOverlay() {
     document.getElementById('quiz-result').textContent = '';
     const contBtn = document.getElementById('quiz-continue');
     contBtn.style.display = 'none';
-    contBtn.classList.remove('qr-continue-attention');
+    contBtn.classList.remove('qr-continue-attention', 'qr-continue-wrong');
     document.getElementById('quiz-opts').innerHTML = '';
 }
 
@@ -298,61 +286,19 @@ function _quizRefreshWhyButton() {
 //------------------------------------------------------------------------
 //-------------------REWARD HELPERS---------------------------------------
 //------------------------------------------------------------------------
-// Individual helpers for each distinct reward path so _resolveQuizAnswer
-// stays readable. Each helper handles exactly one reward scenario.
+// Quiz answers no longer grant items (Leveling Rework cleanup). The helpers
+// below only handle the score / claim bookkeeping for the answer paths.
 //------------------------------------------------------------------------
 
-// Creates a styled item-reward element and appends it to the reward zone.
-// Used by both the "first correct" and "already claimed" reward paths.
-function _quizAppendItemRewardElement(def, defId, labelHtml) {
-    const irz = document.getElementById('item-reward-zone');
-    if (!irz) return;
-
-    const rc = rarityColors(def.rarity);
-    const rewardEl = document.createElement('div');
-    rewardEl.className = 'item-reward';
-    rewardEl.dataset.rewardDefid = defId;
-    rewardEl.style.cssText = `border-color:${rc.border};color:${rc.color};margin-top:4px;cursor:default;`;
-    rewardEl.innerHTML = labelHtml;
-
-    irz.appendChild(rewardEl);
-    attachItemTooltip(rewardEl, defId);
-}
-
-// Adds an item to STATE.inventory and triggers a UI rebuild.
-function _quizAddItemToInventory(defId) {
-    STATE.inventory.push({
-        uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-        defId,
-    });
-    save();
-    buildInventoryPanel();
-    showItemGainPopup(defId);
-}
-
-// Handles the "already claimed" correct-answer path:
-// 15 % lucky-drop chance for a bonus item, no score awarded.
+// Handles the "already claimed" correct-answer path: message only.
 function _quizHandleAlreadyClaimedReward(resEl) {
     resEl.className = 'quiz-result ok';
     resEl.textContent = t('quiz_correct_claimed');
-
-    if (curMods.ironman || Math.random() >= 0.15) return;
-
-    const defId = pickRandomItem();
-    if (!defId) return;
-    const def = ITEM_DEFS[defId];
-    if (!def) return;
-
-    _quizAddItemToInventory(defId);
-    _quizAppendItemRewardElement(
-        def, defId,
-        `${t('ov_lucky_drop')} ${def.icon} <strong>${itemName(def)}</strong>`
-    );
 }
 
 // Handles the "first correct answer" path:
-// awards +50 score, marks the bonus as claimed, and tries to give one item.
-// Returns the display name of the rewarded item (or null if none given).
+// awards +50 score and marks the bonus as claimed (no item rewards -
+// quiz answers no longer drop items).
 function _quizHandleFirstCorrectReward(resEl) {
     STATE.totalScore += 50;
     document.getElementById('sc-disp').textContent = STATE.totalScore;
@@ -363,55 +309,10 @@ function _quizHandleFirstCorrectReward(resEl) {
     // the "all bonuses in a world" achievement set.
     if (typeof checkWorldCompleteAch === 'function') checkWorldCompleteAch();
 
-    let rewardItemName = null;
-
-    if (!curMods.ironman) {
-        const defId = pickRandomItem();
-        if (defId) {
-            const def = ITEM_DEFS[defId];
-            if (def) {
-                rewardItemName = `${def.icon} ${itemName(def)}`;
-                _quizAddItemToInventory(defId);
-                _quizAppendItemRewardElement(
-                    def, defId,
-                    `${t('ov_quiz_reward')}: ${def.icon} <strong>${itemName(def)}</strong>`
-                );
-            }
-        }
-    }
-
-    // Show result message, including the item name if one was given
     resEl.className = 'quiz-result ok';
-    resEl.textContent = rewardItemName
-        ? t('qz_correct_item').replace('{item}', rewardItemName)
-        : t('quiz_correct');
+    resEl.textContent = t('quiz_correct');
 
     save();
-}
-
-// Passive-tree bonus roll: independent item drop chance after any correct
-// MC answer, layered on top of the base reward. Skipped in Ironman mode.
-function _quizRollMcBonusItemReward() {
-    if (curMods && curMods.ironman) return;
-
-    const chance = _quizCalcMcBonusItemChance();
-    if (chance <= 0 || Math.random() >= chance) return;
-
-    const defId = pickRandomItem();
-    if (!defId) return;
-    const def = ITEM_DEFS[defId];
-    if (!def) return;
-
-    _quizAddItemToInventory(defId);
-
-    // For this roll we write directly to innerHTML (legacy zone approach)
-    const irz = document.getElementById('item-reward-zone');
-    const rc = rarityColors(def.rarity);
-    if (irz) {
-        irz.innerHTML += `<div class="item-reward" style="border-color:${rc.border};color:${rc.color};margin-top:4px;">
-            🎁 ${def.icon} <strong>${LANG === 'de' ? def.nameDE : def.nameEn}</strong>
-        </div>`;
-    }
 }
 
 
@@ -445,7 +346,6 @@ function _resolveQuizAnswer(correct) {
             } else {
                 _quizHandleFirstCorrectReward(resEl);
             }
-            _quizRollMcBonusItemReward();
         }
     } else {
         resEl.className = 'quiz-result bad';
@@ -457,9 +357,11 @@ function _resolveQuizAnswer(correct) {
         }
     }
     document.getElementById('quiz-continue').style.display = 'flex';
-    // After a correct answer the continue chip must demand attention -
-    // pulse green so players never miss the way to the next screen.
-    document.getElementById('quiz-continue').classList.toggle('qr-continue-attention', !!correct);
+    // The continue chip must demand attention after EVERY answer - pulse
+    // green when correct, red when wrong, so the way forward is never missed.
+    const contBtn = document.getElementById('quiz-continue');
+    contBtn.classList.toggle('qr-continue-attention', true);
+    contBtn.classList.toggle('qr-continue-wrong', !correct);
     _quizRefreshWhyButton();
 }
 

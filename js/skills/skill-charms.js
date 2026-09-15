@@ -46,7 +46,7 @@ const CHARM_BASE_ICON = '🧿';
 
 // Monster drop tuning (mirrors the loot-drop constants in
 // endgame-grid-pickups.js).
-const CHARM_DROP_CHANCE_NORMAL = 0.30;   // per normal monster kill
+const CHARM_DROP_CHANCE_NORMAL = 0.15;   // per normal monster kill
 const CHARM_DROP_CHANCE_BOSS = 1.00;     // bosses always drop
 const CHARM_DROP_LIFETIME_MS = 60000;    // uncollected charm lifetime
 const CHARM_DROP_MAX_ON_BOARD = 2;       // simultaneous charm drops
@@ -92,7 +92,7 @@ const SPELL_MAX_RANK = 10;
 
 // Index = rank - 1.
 const SPELL_RANK_DAMAGE_MULT = [1.00, 1.30, 1.65, 2.05, 2.50, 3.00, 3.60, 4.30, 5.10, 6.00];
-const SPELL_RANK_MANA_MULT = [1.00, 1.18, 1.40, 1.65, 1.95, 2.30, 2.72, 3.20, 3.78, 4.45];
+const SPELL_RANK_MANA_MULT = [1.00, 1.22, 1.52, 1.90, 2.40, 3.05, 3.90, 5.00, 6.40, 8.20];
 
 // Relative chance a monster drops each rank's charm. Normal monsters skew hard
 // to low ranks; bosses roll a linear table so high ranks are a boss-farm
@@ -753,30 +753,39 @@ function _charmBuildSlotsHTML() {
         if (!charm) {
             // Empty slots carry the custom hover tooltip too - never the
             // browser's native `title` popup (see the TOOLTIP section).
-            cells.push(`<div class="charm-slot is-empty" data-charm-slot="${i}"`
+            cells.push(`<div class="sb3-slot is-empty" data-charm-slot="${i}"`
                 + ` onmouseenter="handleCharmEmptySlotTip(event,${i})"`
                 + ` onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
-                + `<span class="charm-slot-index">${i + 1}</span>`
-                + `<span class="charm-slot-empty">·</span>`
+                + `<span class="sb3-slot-num">${i + 1}</span>`
                 + `</div>`);
             continue;
         }
-        const bonus = charm.orbs > 0 ? `<span class="charm-item-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</span>` : '';
-        cells.push(`<div class="charm-slot is-filled" data-charm-slot="${i}" data-charm-key="${charm.key}"`
+        const bonus = charm.orbs > 0 ? `<span class="sb3-slot-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</span>` : '';
+        const school = (typeof _sbSpellSchoolKey === 'function') ? _sbSpellSchoolKey(charm.skillId) : '';
+        const schoolAttr = school ? ` data-school="${school}"` : '';
+        cells.push(`<div class="sb3-slot is-filled"${schoolAttr} data-charm-slot="${i}" data-charm-key="${charm.key}"`
             + ` onmouseenter="handleCharmTip(event,'${charm.key}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
-            + `<span class="charm-slot-index">${i + 1}</span>`
-            + _charmIconMarkup(charm)
-            + `<span class="charm-slot-name">${getSkillName(charm.skillId)}</span>`
+            + `<span class="sb3-slot-num">${i + 1}</span>`
+            + `<span class="sb3-slot-icon">${CHARM_BASE_ICON}</span>`
+            + `<span class="sb3-slot-name">${getSkillName(charm.skillId)}</span>`
             + bonus
             + `</div>`);
     }
 
     const head = (typeof buildSpellbookHeadHTML === 'function')
-        ? buildSpellbookHeadHTML(t('charm_slots_title'), t('charm_slots_hint'))
-        : `<div class="charm-panel-title">${t('charm_slots_title')}`
-            + `<span class="charm-panel-sub">${t('charm_slots_hint')}</span></div>`;
+        ? buildSpellbookHeadHTML(t('charm_slots_title'))
+        : `<div class="charm-panel-title">${t('charm_slots_title')}</div>`;
     return head
-        + `<div class="charm-slots" style="--charm-slot-cols:${CHARM_SLOT_COLS}">${cells.join('')}</div>`;
+        + `<div class="sb3-drag-label">${t('charm_slots_hint')}</div>`
+        + `<div class="sb3-slot-grid">${cells.join('')}</div>`
+        + `<div class="sb3-slots-count">${(typeof _charmSlotsCountLabel === 'function') ? _charmSlotsCountLabel() : ''}</div>`;
+}
+
+// "Spell Slots 6 / 10" line under the slot grid.
+function _charmSlotsCountLabel() {
+    const slots = (STATE && Array.isArray(STATE.charmSlots)) ? STATE.charmSlots : [];
+    const used = slots.filter(Boolean).length;
+    return `${t('charm_slots_title')} ${used} / ${CHARM_SLOT_COUNT}`;
 }
 
 // Currency strip: Lemmas (towards the next Theorem) + spendable Theorems.
@@ -790,15 +799,9 @@ function _charmBuildCurrencyHTML() {
     const orbLabel = t(orbs === 1 ? 'charm_currency_orb_one' : 'charm_currency_orbs');
     const tipAttrs = (kind) => ` onmouseenter="handleCharmCurrencyTip(event,'${kind}')"`
         + ` onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
-    return `<div class="charm-currency">`
-        + `<div class="charm-currency-item"${tipAttrs('shards')}>`
-        + `<span class="charm-currency-val">${shards}<span class="charm-currency-max">/${CHARM_SHARDS_PER_ORB}</span></span>`
-        + `<span class="charm-currency-label">${t('charm_currency_shards')}</span>`
-        + `</div>`
-        + `<div class="charm-currency-item is-orb"${tipAttrs('orbs')}>`
-        + `<span class="charm-currency-val">${orbs}</span>`
-        + `<span class="charm-currency-label">${orbLabel}</span>`
-        + `</div>`
+    return `<div class="sb3-charm-tools">`
+        + `<span class="sb3-lemma"${tipAttrs('shards')}><b>${shards}</b>/${CHARM_SHARDS_PER_ORB} ${t('charm_currency_shards')}</span>`
+        + `<span class="sb3-theorem"${tipAttrs('orbs')}><b>${orbs}</b> ${orbLabel}</span>`
         + `</div>`;
 }
 
@@ -807,7 +810,7 @@ function _charmBuildCurrencyHTML() {
 function _charmBuildFilterHTML() {
     ensureCharmState();
     const on = !!(STATE && STATE.charmMaxRankOnly);
-    return `<label class="charm-filter">`
+    return `<label class="sb3-maxrank">`
         + `<input type="checkbox" class="charm-filter-cb"${on ? ' checked' : ''}`
         + ` onchange="handleCharmMaxRankToggle(this.checked)">`
         + `<span class="charm-filter-label">${t('charm_filter_max_rank')}</span>`
@@ -841,24 +844,28 @@ function _charmBuildInventoryHTML() {
     ensureCharmState();
     const charms = (STATE && Array.isArray(STATE.charmInventory)) ? STATE.charmInventory : [];
     if (!charms.length) {
-        return `<div class="charm-inv-grid"><div class="charm-inv-empty">${t('charm_inventory_empty')}</div></div>`;
+        return `<div class="sb3-charm-list"><div class="charm-inv-empty">${t('charm_inventory_empty')}</div></div>`;
     }
     const sorted = _charmApplyRankFilter(charms).sort((a, b) => {
         const an = getSkillName(a.skillId), bn = getSkillName(b.skillId);
         if (an !== bn) return an.localeCompare(bn);
         return a.rank - b.rank;
     });
-    const items = sorted.map((charm) => {
+    const items = sorted.map((charm, index) => {
         const slotted = STATE.charmSlots.includes(charm.key) ? ' is-slotted' : '';
-        const bonus = charm.orbs > 0 ? `<span class="charm-item-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</span>` : '';
-        return `<div class="charm-item${slotted}" data-charm-key="${charm.key}"`
+        const bonus = charm.orbs > 0 ? `<span class="sb3-charm-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</span>` : '';
+        const school = (typeof _sbSpellSchoolKey === 'function') ? _sbSpellSchoolKey(charm.skillId) : '';
+        const schoolAttr = school ? ` data-school="${school}"` : '';
+        return `<div class="sb3-charm-row${slotted}"${schoolAttr} data-charm-key="${charm.key}"`
             + ` onmouseenter="handleCharmTip(event,'${charm.key}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
-            + _charmIconMarkup(charm)
-            + `<span class="charm-item-name">${getSkillName(charm.skillId)}</span>`
+            + `<span class="sb3-charm-num">${index + 1}</span>`
+            + `<span class="sb3-charm-glyph">${CHARM_BASE_ICON}</span>`
+            + `<span class="sb3-charm-name">${getSkillName(charm.skillId)}</span>`
+            + `<span class="sb3-charm-rank">${charm.rank}</span>`
             + bonus
             + `</div>`;
     }).join('');
-    return `<div class="charm-inv-grid">${items}</div>`;
+    return `<div class="sb3-charm-list">${items}</div>`;
 }
 
 // Renders the whole charm side of the spell book into the two hosts
@@ -872,14 +879,12 @@ function renderSpellbookCharmPanel() {
         const head = (typeof buildSpellbookHeadHTML === 'function')
             ? buildSpellbookHeadHTML(t('charm_inventory_title'))
             : `<div class="charm-panel-title">${t('charm_inventory_title')}</div>`;
-        // The shift-click instruction lives in the Theorem tooltip only -
-        // repeating it as a standing line under the list just added noise.
-        // The currency strip and the rank filter share one wrapper (.charm-tools)
-        // so a short panel can lay them out side by side instead of stacked,
-        // which is most of the panel's fixed chrome (see css/skills.css 4a-1).
+        // Currency strip (Lemmas / Theorems) + "max rank only" filter sit
+        // between the header and the list.
         invHost.innerHTML = head
-            + `<div class="charm-tools">${_charmBuildCurrencyHTML()}${_charmBuildFilterHTML()}</div>`
-            + `<div class="charm-inv-panel" id="charm-inv-panel">${_charmBuildInventoryHTML()}</div>`;
+            + _charmBuildCurrencyHTML()
+            + _charmBuildFilterHTML()
+            + _charmBuildInventoryHTML();
     }
 }
 
@@ -1050,8 +1055,8 @@ function _charmMoveGhost(x, y) {
 
 function _charmHighlightDropTarget(x, y) {
     const el = document.elementFromPoint(x, y);
-    document.querySelectorAll('.charm-slot.drop-target').forEach((n) => n.classList.remove('drop-target'));
-    const slot = el && el.closest ? el.closest('.charm-slot') : null;
+    document.querySelectorAll('.sb3-slot.drop-target').forEach((n) => n.classList.remove('drop-target'));
+    const slot = el && el.closest ? el.closest('.sb3-slot') : null;
     if (slot) slot.classList.add('drop-target');
 }
 
@@ -1075,8 +1080,8 @@ function _onCharmDragEnd(e) {
     if (!moved) return;
 
     const el = document.elementFromPoint(e.clientX, e.clientY);
-    const slot = el && el.closest ? el.closest('.charm-slot') : null;
-    const invPanel = el && el.closest ? el.closest('.charm-inv-panel') : null;
+    const slot = el && el.closest ? el.closest('.sb3-slot') : null;
+    const invPanel = el && el.closest ? el.closest('.sb3-charm-list, .sb-page-charms') : null;
 
     if (slot) {
         const slotIndex = Number(slot.getAttribute('data-charm-slot'));
@@ -1094,7 +1099,7 @@ function _charmCleanupDrag() {
     _charmDragState = null;
     if (_charmDragGhost) { _charmDragGhost.remove(); _charmDragGhost = null; }
     document.body.classList.remove('skill-dragging');
-    document.querySelectorAll('.charm-slot.drop-target').forEach((n) => n.classList.remove('drop-target'));
+    document.querySelectorAll('.sb3-slot.drop-target').forEach((n) => n.classList.remove('drop-target'));
     document.removeEventListener('pointermove', _onCharmDragMove, true);
     document.removeEventListener('pointerup', _onCharmDragEnd, true);
     document.removeEventListener('pointercancel', _onCharmDragEnd, true);
@@ -1107,11 +1112,11 @@ function initCharmPanelInteractions(host) {
     if (!host || host.dataset.charmBound === '1') return;
     host.dataset.charmBound = '1';
 
-    // Right-click a charm in the INVENTORY (.charm-item - filled slots use
-    // .charm-slot and are intentionally excluded) to slot it into the first
+    // Right-click a charm in the INVENTORY (.sb3-charm-row - filled slots
+    // use .sb3-slot and are intentionally excluded) to slot it into the first
     // empty spell slot.
     host.addEventListener('contextmenu', (e) => {
-        const target = e.target.closest ? e.target.closest('.charm-item[data-charm-key]') : null;
+        const target = e.target.closest ? e.target.closest('.sb3-charm-row[data-charm-key]') : null;
         if (!target) return;   // anywhere else: leave the menu alone
         e.preventDefault();
         e.stopPropagation();
@@ -1132,7 +1137,7 @@ function initCharmPanelInteractions(host) {
             return;
         }
         if (e.button !== 0) return;
-        const slotEl = target.closest('.charm-slot');
+        const slotEl = target.closest('.sb3-slot');
         const fromSlot = slotEl ? Number(slotEl.getAttribute('data-charm-slot')) : null;
         e.preventDefault();
         startCharmDrag(charmKey, e, Number.isNaN(fromSlot) ? null : fromSlot);

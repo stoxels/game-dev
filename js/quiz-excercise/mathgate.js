@@ -621,67 +621,13 @@ function tryStartGatedLevel(gi, launchFn) {
 //------------------------------------------------------------------------
 
 
-// Creates a new inventory entry for the given item definition ID,
-// then saves state and rebuilds the inventory panel.
-// Used as a shared helper by both mgGrantGateReward() and mgRollPassiveTreeBonusReward().
-function mgAddItemToInventory(defId) {
-    STATE.inventory.push({
-        uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-        defId: defId,
-    });
-    save();
-    buildInventoryPanel();
-    showItemGainPopup(defId);
-}
-
-// Awards a lucky item to the player for passing a gate for the first time.
-// Shows feedback in the modal, a toast notification, and attaches a tooltip
-// to the reward zone element.
+// Math gates no longer grant items (Leveling Rework cleanup): the reward
+// helpers below were removed. Passing a gate just marks it passed and shows
+// the correct feedback; the passive-tree nodes that used to feed the removed
+// bonus rolls stay allocated but are simply inert for items.
 function mgGrantGateReward(gi) {
-    const rewardId = pickLuckyItem();
-    if (!rewardId) { hideMathGate(); return; }
-
-    const def = ITEM_DEFS[rewardId];
-    mgAddItemToInventory(rewardId);
-
-    const itemName = LANG === 'de' ? def.nameDE : def.nameEn;
-    showMgFeedback(`${t('mg_correct')} + ${def.icon} ${itemName}!`, true);
-
+    showMgFeedback(t('mg_correct'), true);
     setTimeout(() => showToast(t('qz_gate_passed_toast')), 1000);
-
-    // Attach the tooltip after the DOM has had a chance to update.
-    setTimeout(() => {
-        const rewardZoneEl = document.getElementById('mg-reward-zone');
-        if (rewardZoneEl) attachItemTooltip(rewardZoneEl, rewardId);
-    }, 0);
-}
-
-// Rolls for a bonus item drop based on the player's passive tree skills.
-// Each relevant node adds to a combined chance pool that is rolled once.
-// Does nothing in Ironman mode.
-function mgRollPassiveTreeBonusReward() {
-    if (curMods && curMods.ironman) return;
-
-    let bonusChance = 0;
-    if (PT.hasSkill('wisdom_through_failure')) bonusChance += 0.10;
-    if (PT.hasSkill('promising_answers')) bonusChance += 0.20;
-    if (PT.hasSkill('rewarding_insight')) bonusChance += 0.20;
-    if (PT.hasSkill('scholars_fortune')) bonusChance += 0.20;
-    if (PT.hasSkill('probability_gate_mastery')) bonusChance += 0.30;
-
-    if (bonusChance <= 0) return;
-
-    if (Math.random() < bonusChance) {
-        const defId = pickRandomItem();
-        if (!defId) return;
-        const def = ITEM_DEFS[defId];
-        if (!def) return;
-
-        mgAddItemToInventory(defId);
-
-        const name = LANG === 'de' ? def.nameDE : def.nameEn;
-        showToast(`🎁 ${def.icon} ${name}`);
-    }
 }
 
 
@@ -713,7 +659,6 @@ function mgHandleCorrectAnswer() {
 
     trackAchStat('questionsCorrect');
     updateQuestStats('questionCorrect', { source: 'gate' });
-    mgRollPassiveTreeBonusReward();
 
     Audio_Manager.playSFX('quizCorrect');
 

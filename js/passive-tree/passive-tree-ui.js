@@ -17,8 +17,8 @@ let _pt_tooltip = null;  // floating tooltip <div> that lives in document.body
 let _pt_nodeEls = {};   // skill id  →  node <div>
 let _pt_connEls = {};   // conn id   →  SVG <line>
 
-// NOTE: _pt_mouseDownTime and _pt_eventsBound are also part of this module's
-// state but are declared in the canvas pan/zoom handler file, not here.
+// NOTE: _pt_mouseDownTime is also part of this module's
+// state but is declared in the canvas pan/zoom handler file, not here.
 
 
 
@@ -878,11 +878,8 @@ function _ptResetRenderState() {
     if (!old) { console.error('[PassiveTree] #pt-canvas not found'); return null; }
 
     _pt_container = old.cloneNode(false);
-    old.parentNode.replaceChild(_pt_container, old);
-
-    _pt_nodeEls = {};
+    old.parentNode.replaceChild(_pt_container, old);    _pt_nodeEls = {};
     _pt_connEls = {};
-    _pt_eventsBound = false;  // declared in the canvas pan-handling file
 
     // Remove any leftover tooltip from a previous render
     if (_pt_tooltip) { _pt_tooltip.remove(); _pt_tooltip = null; }

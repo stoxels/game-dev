@@ -380,7 +380,14 @@ function _egAwardXP(xpGain) {
             if (typeof _egCancelAbsorptionRegen === 'function') _egCancelAbsorptionRegen();
         }
         if (typeof showToast === 'function') {
-            showToast(t('eg_lvl_levelup_toast').replace('{n}', _egGetPlayerLevel()), '#f5b642');
+            // Key label follows the player's CURRENT binding (default K).
+            const treeKey = (typeof keybindDisplayLabel === 'function' && typeof keybindKeyFor === 'function')
+                ? keybindDisplayLabel(keybindKeyFor('passive-tree')) : 'K';
+            const msg = t('eg_lvl_levelup_toast')
+                .replace('{n}', _egGetPlayerLevel())
+                .replace('{pts}', passiveGained)
+                .replace('{key}', treeKey);
+            showToast(msg, '#f5b642');
         }
         if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
         if (typeof _egRenderInventory === 'function') try { _egRenderInventory(); } catch (e) {}

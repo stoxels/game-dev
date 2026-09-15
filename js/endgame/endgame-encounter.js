@@ -75,8 +75,11 @@ const EG_DEFLECT_BASE_DMG_PCT = 30;    // deflected projectile deals 30% of mons
 // a recent block. 0 when not locked out.
 let _egPlayerBlockLockoutUntil = 0;
 
-EG_INITIAL_SPAWN_STAGGER_BASE_MS = 500
-EG_INITIAL_SPAWN_STAGGER_STEP_MS = 200
+// Tuning constants for the initial monster spawn stagger (also used by
+// endgame-encounter-tick.js). Declared with `let` so the rebalance pass
+// can overwrite them at load time.
+let EG_INITIAL_SPAWN_STAGGER_BASE_MS = 500;
+let EG_INITIAL_SPAWN_STAGGER_STEP_MS = 200;
 
 
 //------------------------------------------------------------------------
@@ -661,7 +664,7 @@ function _egStopEncounter() {
     _egTargetId = null;
     if (typeof _egPendingRevealQueue !== 'undefined') _egPendingRevealQueue = [];
 
-    if (typeof clearActiveRandomWalkers === 'function') clearActiveRandomWalkers();
+    if (typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
 
     if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
     _egStopTickLoop();
@@ -1383,7 +1386,10 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
 
     const start = _egGetElementCentre(sourceEl);
     const end = _egGetElementCentre(targetCard);
-    const projDef = _egGetProjectileDef();
+    // Optional explicit visual: callers like the tutorial Fireball pass
+    // opts.projDef so their shot doesn't fall back to the generic/reveal
+    // projectile look (see _tqCastFireball in tutorial-quest.js).
+    const projDef = (opts && opts.projDef) ? opts.projDef : _egGetProjectileDef();
 
     // Pass the whole def: code-built visuals orient themselves onto the
     // flight vector inside _egFireProjectile (they're drawn tip-forward),
@@ -1405,6 +1411,10 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
 //   pierce  - chance to punch through and hit one additional monster anywhere
 function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     const target = _egMonsters.find(m => m.id === targetId);
+
+    // Every projectile landing here is a player MAGIC/ranged source -
+    // Spellproof monsters resist these (melee strikes are exempt).
+    opts = Object.assign({}, opts, { isPlayerSpell: true });
 
     // Accuracy: projectiles can miss (no snipe/splash/chain/pierce on a miss)
     // Drag-painting bonus: longer drags reduce miss chance (threshold-based)
@@ -1752,6 +1762,67 @@ function _egRollPlayerMiss(targetId, opts) {
     return true;
 }
 
+// Battle Trance tuning - the melee-as-mana-battery loop. Melee strikes and
+// melee KILLS restore mana so the player weaves attacks to pay for spells
+// (spells cost, melee earns). Blood Magic builds skip it - their casts are
+// life-based, so mana income would be dead weight.
+const EG_MELEE_MANA_PER_HIT = 6;
+const EG_MELEE_MANA_PER_KILL = 20;
+
+// Execution tuning: a melee strike on a monster below this HP share is a
+// finisher - multiplied damage. Gives melee the "cleanup kill" niche while
+// spells handle wave-clear.
+const EG_MELEE_EXECUTE_HP_PCT = 0.25;
+const EG_MELEE_EXECUTE_MULT = 3;
+
+// Overcharge tuning: the charge bar keeps filling past 100% while held...
+// see _egTickPlayer in endgame-encounter-tick.js. A strike released above
+// the full-charge cap deals proportionally MORE than full damage, up to
+// this multiplier (2 = up to double damage for a patient player).
+const EG_MELEE_OVERCHARGE_MULT = 2;
+const EG_MELEE_OVERCHARGE_RATIO = 2;
+
+// Battle Trance - mana restored by the melee channel. Called once per
+// landed strike with the struck monster; grants the per-hit amount, plus
+// the per-kill amount when the strike just killed it (the monster is no
+// longer in the roster). No-ops outside encounters / without a mana pool
+// / under Blood Magic (casts cost life there - mana income is dead weight).
+function _egGrantMeleeMana(struck) {
+    if (typeof _bloodMagicActive === 'function') {
+        try { if (_bloodMagicActive()) return; } catch (e) { /* fall through */ }
+    }
+    if (typeof gainMana !== 'function' || typeof _getPlayerMaxMana !== 'function') return;
+    if (_getPlayerMaxMana() <= 0 || typeof playerCurrentMana === 'undefined' || playerCurrentMana <= 0) return;
+    if (typeof playerMaxMana === 'undefined' || playerCurrentMana >= playerMaxMana) return;
+
+    const killed = !struck || !_egMonsters.some(m => m.id === struck.id);
+    const amount = EG_MELEE_MANA_PER_HIT + (killed ? EG_MELEE_MANA_PER_KILL : 0);
+    const gained = gainMana(amount);
+    if (gained > 0) {
+        if (typeof _egUpdatePlayerChargeBar === 'function') _egUpdatePlayerChargeBar();
+        const pct = Math.round(gained);
+        if (killed) {
+            showToast(`⚔️ +${pct} ${t('eg_battle_trance_kill')}`);
+        } else {
+            _egShowManaGain(struck.id, gained);
+        }
+    }
+}
+
+// Small floating +N readout over the struck monster (non-kill mana gains -
+// kills get a toast instead so the bigger reward reads as an event).
+function _egShowManaGain(targetId, amount) {
+    try {
+        const card = document.getElementById(`eg-card-${targetId}`);
+        if (!card) return;
+        const el = document.createElement('div');
+        el.className = 'eg-mana-gain-float';
+        el.textContent = `+${amount} mana`;
+        card.appendChild(el);
+        setTimeout(() => el.remove(), 900);
+    } catch (e) { /* cosmetic only */ }
+}
+
 // Applies a manual melee strike at the moment of impact (Secret-of-Mana-
 // style). The strike deals charge% of full damage - linear: 100% charge =
 // 100% damage, 30% charge = 30% damage - and the charge was already spent
@@ -1762,8 +1833,9 @@ function _egApplyPlayerMeleeImpact(targetId) {
     if (!_egIsActive() || !_egMonsters.some(m => m.id === targetId)) return;
 
     // Charge share snapshotted at key-press (null = legacy caller, full hit).
+    // May exceed 1 when the player overcharged past 100% (see _egTickPlayer).
     const chargePct = (typeof _egPendingMeleeChargePct === 'number')
-        ? Math.min(1, Math.max(0, _egPendingMeleeChargePct)) : 1;
+        ? Math.min(EG_MELEE_OVERCHARGE_MULT, Math.max(0, _egPendingMeleeChargePct)) : 1;
     _egPendingMeleeChargePct = null;
 
     // Accuracy: the swing can whiff entirely (no gear procs on a miss).
@@ -1790,13 +1862,26 @@ function _egApplyPlayerMeleeImpact(targetId) {
     // melee roll above is already charge-scaled (including its elemental
     // breakdown and life leech); the consumed gear bonus scales the same
     // way so dumping stacks with 0%-charge taps can't cheat full damage.
-    const dmg = Math.max(1, Math.round(
-        _egCurrentMeleeDamage(chargePct) + _egConsumeOnHitGearBonus() * chargePct));
+    // Execution: a strike on a low-HP monster is a finisher (multiplied).
+    let execMult = 1;
+    if (meleeTarget && (meleeTarget.maxHP || 0) > 0
+        && meleeTarget.currentHP > 0
+        && meleeTarget.currentHP <= meleeTarget.maxHP * EG_MELEE_EXECUTE_HP_PCT) {
+        execMult = EG_MELEE_EXECUTE_MULT;
+        _egShowStatusLabel(targetId, t('eg_execute'));
+    }
+    const dmg = Math.max(1, Math.round((
+        _egCurrentMeleeDamage(chargePct) + _egConsumeOnHitGearBonus() * chargePct) * execMult));
     const elements = _egLastMeleeElements;
     const wasCrit = (typeof _egLastMeleeWasCrit !== 'undefined') ? _egLastMeleeWasCrit : false;
 
-    // Uses the existing damage application logic[cite: 1]
-    _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit });
+    // Uses the existing damage application logic[cite: 1] - tagged isMelee
+    // so Spellproof monsters (spellproofPct) take full melee damage while
+    // all non-melee sources (spells, reveal projectiles, DoTs) are resisted.
+    _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit, isMelee: true });
+
+    // Battle Trance: the strike (and a kill it scored) restores mana.
+    _egGrantMeleeMana(meleeTarget);
 
     // Active map run: monsters reflect #% of melee damage back at you.
     if (typeof _egGetActiveMapModValue === 'function') {
@@ -2080,8 +2165,9 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
     const hpBefore = target.currentHP;
 
     // Elemental resistances reduce only the elemental share of the hit;
-    // the physical portion passes through untouched.
-    amount = _egApplyTargetResistances(amount, target, elements);
+    // the physical portion passes through untouched. opts carries source
+    // tags (isMelee) read by Spellproof inside.
+    amount = _egApplyTargetResistances(amount, target, elements, opts);
 
     // Ailments: shocked monsters take amplified damage; elemental hits can
     // ignite / chill / freeze / shock the monster (gear ailment chances).

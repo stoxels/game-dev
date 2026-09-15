@@ -39,11 +39,10 @@ function _ensureSpellbookOverlay() {
                 <span class="spellbook-plaque-text">${t('spellbook_title')}</span>
             </div>
             <div class="spellbook-frame-body">
-                <p class="spellbook-hint">${t('spellbook_hint')}</p>
                 <div class="spellbook-body">
-                    <aside class="spellbook-charms-panel sb-panel" id="spellbook-charms"></aside>
-                    <div class="spellbook-slots-panel sb-panel" id="spellbook-slots"></div>
-                    <div class="spellbook-scroll sb-panel" id="spellbook-content"></div>
+                    <aside class="spellbook-page sb-page-charms" id="spellbook-charms"></aside>
+                    <div class="spellbook-page sb-page-slots" id="spellbook-slots"></div>
+                    <div class="spellbook-page sb-page-spells" id="spellbook-content"></div>
                 </div>
                 <div class="spellbook-footer" id="spellbook-footer"></div>
             </div>
@@ -191,20 +190,20 @@ function toggleSpellbook() {
 //---------------------------RENDERING------------------------------------
 //------------------------------------------------------------------------
 
-// Carved stone section header, shared by every panel in the book: the spell
-// slots row, each spell group and the charm panel. Art: the same carved
-// banner the achievements screen carves its category titles onto, sliced so
-// the bevelled ends keep their proportions at any width (see css/skills.css).
+// Carved gold section header, shared by every panel in the book: the spell
+// slots row, each spell group and the charm panel. Art: the gold banner from
+// images/Spellbook/spellbook_category_header.webp (same asset the book's
+// title plaque wears).
 function buildSpellbookHeadHTML(title, sub) {
-    return `<div class="sb-head">`
-        + `<div class="sb-head-bar">`
-        + `<span class="sb-head-title">${title}</span>`
+    return `<div class="sb3-head">`
+        + `<span class="sb3-head-text">${title}</span>`
         + `</div>`
-        + (sub ? `<div class="sb-head-sub">${sub}</div>` : '')
-        + `</div>`;
+        + (sub ? `<div class="sb3-head-sub">${sub}</div>` : '');
 }
 
-// Builds the HTML for one spell entry (drag source + hover tooltip).
+// Builds the HTML for one spell entry: a spell stone (drag source + hover
+// tooltip). Art: images/Spellbook/spell_stone.webp, element glow via the
+// group's data-school (css/spellbook-redesign.css).
 function _buildSpellbookEntryHTML(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return '';
@@ -217,28 +216,24 @@ function _buildSpellbookEntryHTML(skillId) {
     const charmLocked = (typeof isSkillCharmUnlocked === 'function') && !isSkillCharmUnlocked(skillId);
     const usable = charmLocked ? false
         : ((typeof isSkillUsableNow === 'function') ? isSkillUsableNow(skillId) : true);
-    const tags = (def.tags || []).join(' · ');
     const image = getSkillImage(skillId);
     const icon = image
-        ? `<img class="spellbook-entry-img" src="${image}" alt="${getSkillName(skillId)}" draggable="false">`
-        : `<span class="spellbook-entry-icon">${def.icon || '✦'}</span>`;
+        ? `<img class="sb3-stone-img" src="${image}" alt="${getSkillName(skillId)}" draggable="false">`
+        : `<span class="sb3-stone-icon">${def.icon || '✦'}</span>`;
     // The ✓ / 🔒 badges are decorative: they use aria-label (never a native
     // `title`, which would pop the browser's own tooltip on top of ours).
     // The lock reason is spelled out in the entry's custom tooltip.
     const lockLabel = charmLocked ? t('charm_locked_hint') : '';
 
-    return `<div class="spellbook-entry ${usable ? '' : 'is-locked'}"
+    return `<div class="sb3-stone ${usable ? '' : 'is-locked'}"
                  data-skill="${skillId}"
                  onmouseenter="handleSkillTip(event,'${skillId}')"
                  onmousemove="handleSkillTipMove(event)"
                  onmouseleave="handleSkillTipLeave()">
         ${icon}
-        <span class="spellbook-entry-info">
-            <span class="spellbook-entry-name">${getSkillName(skillId)}</span>
-            <span class="spellbook-entry-tags">${tags}</span>
-        </span>
-        <span class="spellbook-entry-rank">${t('skill_tip_rank')} ${rank}</span>
-        ${onBar ? `<span class="spellbook-entry-onbar" aria-label="${t('spellbook_on_bar')}">✓</span>` : ''}
+        <span class="sb3-stone-name">${getSkillName(skillId)}</span>
+        <span class="sb3-stone-rank">${t('skill_tip_rank')} ${rank}</span>
+        <span class="sb3-stone-check${onBar ? ' is-on' : ''}"${onBar ? ` aria-label="${t('spellbook_on_bar')}"` : ''}>${onBar ? '✓' : ''}</span>
         ${usable ? '' : `<span class="spellbook-entry-lock"${lockLabel ? ` aria-label="${lockLabel}"` : ''}>🔒</span>`}
     </div>`;
 }
@@ -257,16 +252,14 @@ function _buildSpellbookPassivesHTML() {
         const icon = image
             ? `<img class="spellbook-entry-img" src="${image}" alt="${name}" draggable="false">`
             : `<span class="spellbook-entry-icon">${def.icon}</span>`;
-        entries.push(`<div class="spellbook-entry is-passive"
+        entries.push(`<div class="sb3-stone is-passive"
                      data-passive="${id}"
                      onmouseenter="handleSkillTip(event,'${id}')"
                      onmousemove="handleSkillTipMove(event)"
                      onmouseleave="handleSkillTipLeave()">
             ${icon}
-            <span class="spellbook-entry-info">
-                <span class="spellbook-entry-name">${name}</span>
-                <span class="spellbook-entry-tags">${t('skill_tip_passive_tag')}</span>
-            </span>
+            <span class="sb3-stone-name">${name}</span>
+            <span class="sb3-stone-rank">${t('skill_tip_passive_tag')}</span>
             <span class="spellbook-entry-lock">🔒</span>
         </div>`);
     }
@@ -275,16 +268,14 @@ function _buildSpellbookPassivesHTML() {
     const traits = (typeof getPlayerTraits === 'function') ? getPlayerTraits() : [];
     traits.forEach((trait, index) => {
         const name = LANG === 'de' ? (trait.nameDE || trait.nameEn) : trait.nameEn;
-        entries.push(`<div class="spellbook-entry is-passive is-trait"
+        entries.push(`<div class="sb3-stone is-passive is-trait"
                      data-trait="${index}"
                      onmouseenter="handleTraitTip(event,${index})"
                      onmousemove="handleSkillTipMove(event)"
                      onmouseleave="handleSkillTipLeave()">
-            <span class="spellbook-entry-icon">${trait.icon || '★'}</span>
-            <span class="spellbook-entry-info">
-                <span class="spellbook-entry-name">${name}</span>
-                <span class="spellbook-entry-tags">${t('skill_tip_trait_tag')}</span>
-            </span>
+            <span class="sb3-stone-icon">${trait.icon || '★'}</span>
+            <span class="sb3-stone-name">${name}</span>
+            <span class="sb3-stone-rank">${t('skill_tip_trait_tag')}</span>
             <span class="spellbook-entry-lock">🔒</span>
         </div>`);
     });
@@ -293,9 +284,9 @@ function _buildSpellbookPassivesHTML() {
     // Same carved header bar as the spell groups - a legacy text-only title
     // here made the passives block look like it belonged to a different menu.
     const title = t('spellbook_group_passives');
-    return `<div class="spellbook-group">
+    return `<div class="spellbook-group" data-school="arcane">
         ${(typeof buildSpellbookHeadHTML === 'function') ? buildSpellbookHeadHTML(title) : `<div class="spellbook-group-title">${title}</div>`}
-        <div class="spellbook-grid">${entries.join('')}</div>
+        <div class="sb3-stone-grid">${entries.join('')}</div>
     </div>`;
 }
 
@@ -304,20 +295,13 @@ function _buildSpellbookPassivesHTML() {
 // ascendency → heartbloom, tinted with the class colour), then the utility
 // families (support, movement), then the offensive spells regrouped by their
 // magic school (FIRE, FROST, …) with every spell section sorted by rank,
-// descending. Each entry's left accent bar and its section's underline carry
-// the section colour, so the set is readable at a glance.
+// descending. Each entry's stone carries the school as data-school, so the
+// CSS element glow keys off it.
 //
 // SPELLBOOK_SCHOOL_ORDER doubles as the display order of the school sections
 // (elemental first, physical last). Themes are read defensively:
 // universal-spells.js loads after the registry in some load orders.
 const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'nature', 'holy', 'shadow', 'arcane', 'physical'];
-
-// Display colour per school (element keys double as engine resist keys; the
-// CSS consumes them through the --sb-accent custom property).
-const SPELLBOOK_SCHOOL_COLORS = {
-    fire: '#ff7a45', frost: '#6fc7e8', lightning: '#ffe14d', nature: '#7fd97f',
-    holy: '#ffd76b', shadow: '#b07fe8', arcane: '#c39bd3', physical: '#d8c8a8',
-};
 
 // Bilingual section titles for the school bars. Like the universal-spells
 // group titles (_uspGroupTitle & co.) these are resolved directly so no
@@ -348,16 +332,33 @@ function _sbSortRank(skillId) {
     return charmRank || getSkillLevel(skillId) || 1;
 }
 
-// One curated section: carved bar + entry grid, accent-coloured via the
-// --sb-accent custom property (see css/skills.css).
-function _spellbookGroupHTML(title, ids, accent) {
+// Element/school of a skill for the stone glow. Universal spells read their
+// damageKind (design key: fire/cold/lightning/...), class + ascendency skills
+// fall back to the class colour as data-school so the glow follows the class.
+function _sbSpellSchoolKey(skillId) {
+    const def = getSkillDef(skillId);
+    if (!def) return '';
+    if (typeof UNIVERSAL_SPELL_MAP !== 'undefined' && UNIVERSAL_SPELL_MAP[skillId]) {
+        const spell = UNIVERSAL_SPELL_MAP[skillId];
+        if (spell.damageKind) return spell.damageKind;
+        const school = _sbSpellSchool(skillId);
+        if (school) return school;
+    }
+    if (def.slotKind === 'base1' || def.slotKind === 'base2') return STATE.playerClass || '';
+    if (def.slotKind === 'asc1' || def.slotKind === 'asc2') return STATE.playerAscendency || '';
+    return '';
+}
+
+// One curated section: gold banner + stone grid. data-school on the section
+// carries the element into the CSS glow (see css/spellbook-redesign.css).
+function _spellbookGroupHTML(title, ids, school) {
     const entries = ids.map(_buildSpellbookEntryHTML).join('');
-    const style = accent ? ` style="--sb-accent:${accent}"` : '';
-    return `<div class="spellbook-group"${style}>`
+    const attr = school ? ` data-school="${school}"` : '';
+    return `<div class="spellbook-group"${attr}>`
         + ((typeof buildSpellbookHeadHTML === 'function')
             ? buildSpellbookHeadHTML(title)
             : `<div class="spellbook-group-title">${title}</div>`)
-        + `<div class="spellbook-grid">${entries}</div>`
+        + `<div class="sb3-stone-grid">${entries}</div>`
         + `</div>`;
 }
 
@@ -402,29 +403,21 @@ function renderSpellbook() {
     let html = '';
     for (const group of ownership) {
         group.ids.sort(byRankDesc); // rank-descending inside every section
-        let accent = '';
-        if (group.labelKey === 'spellbook_group_class' && typeof CLASS_DEFS !== 'undefined' && CLASS_DEFS[STATE.playerClass]) {
-            accent = CLASS_DEFS[STATE.playerClass].color || '';
-        } else if (group.labelKey === 'spellbook_group_ascendency' && typeof ASCENDENCY_DEFS !== 'undefined' && ASCENDENCY_DEFS[STATE.playerAscendency]) {
-            accent = ASCENDENCY_DEFS[STATE.playerAscendency].color || '';
-        } else if (group.labelKey === 'spellbook_group_endgame') {
-            accent = '#66fcf1'; // heartbloom - the endgame cyan
-        }
-        html += _spellbookGroupHTML(group.labelFallback || t(group.labelKey), group.ids, accent);
-    }
-    if (supportIds.length) {
-        html += _spellbookGroupHTML(
-            (typeof _uspSupportGroupTitle === 'function') ? _uspSupportGroupTitle() : 'Support Spells',
-            supportIds, '#7fded4');
-    }
-    if (movementIds.length) {
-        html += _spellbookGroupHTML(
-            (typeof _uspMovementGroupTitle === 'function') ? _uspMovementGroupTitle() : 'Movement Spells',
-            movementIds, '#66fcf1');
+        // The section's data-school: the class/ascendency key when every id
+        // in the group shares it (the glow then follows the class colour),
+        // empty otherwise (neutral stones).
+        let school = '';
+        if (group.labelKey === 'spellbook_group_class'
+            || group.labelKey === 'tq_spellbook_group') school = STATE.playerClass || '';
+        else if (group.labelKey === 'spellbook_group_ascendency') school = STATE.playerAscendency || '';
+        else if (group.labelKey === 'spellbook_group_endgame') school = 'holy';
+        else if (group.labelKey === 'spellbook_group_support') school = 'nature';
+        else if (group.labelKey === 'spellbook_group_movement') school = 'arcane';
+        html += _spellbookGroupHTML(group.labelFallback || t(group.labelKey), group.ids, school);
     }
     for (const school of SPELLBOOK_SCHOOL_ORDER) {
         if (!offense[school] || !offense[school].length) continue;
-        html += _spellbookGroupHTML(_sbSchoolTitle(school), offense[school], SPELLBOOK_SCHOOL_COLORS[school]);
+        html += _spellbookGroupHTML(_sbSchoolTitle(school), offense[school], school);
     }
 
     if (!html) {
@@ -450,21 +443,23 @@ function renderSpellbook() {
         const charmUsed = charmSlots.filter(Boolean).length;
         const charmTotal = (typeof CHARM_SLOT_COUNT === 'number') ? CHARM_SLOT_COUNT : 10;
         // Left: the spell slots the charms go into. Right: how full the
-        // hotbar is. Each label travels with its own value as one group.
-        footer.innerHTML = `<span class="spellbook-footer-group">`
-            + `<span class="spellbook-footer-label">${t('charm_slots_title')}</span>`
-            + `<span class="spellbook-footer-value">${charmUsed} / ${charmTotal}</span>`
-            + `</span>`
-            + `<span class="spellbook-footer-group">`
-            + `<span class="spellbook-footer-label">${t('spellbook_hotbar_used')}</span>`
-            + `<span class="spellbook-footer-value">${used} / ${total}</span>`
-            + `</span>`;
+        // hotbar is. Each label travels with its own meter as one group.
+        const slotPct = charmTotal ? Math.round(100 * charmUsed / charmTotal) : 0;
+        const barPct = total ? Math.round(100 * used / total) : 0;
+        footer.innerHTML = `<div class="sb3-meter">`
+            + `<span class="sb3-meter-label">${t('charm_slots_title')} ${charmUsed} / ${charmTotal}</span>`
+            + `<div class="sb3-meter-track"><div class="sb3-meter-fill is-cyan" style="width:${slotPct}%"></div></div>`
+            + `</div>`
+            + `<div class="sb3-meter">`
+            + `<span class="sb3-meter-label">${t('spellbook_hotbar_used')} ${used} / ${total}</span>`
+            + `<div class="sb3-meter-track"><div class="sb3-meter-fill is-purple" style="width:${barPct}%"></div></div>`
+            + `</div>`;
     }
 }
 
 // Wires pointerdown drag + double-click quick-assign on the entries.
 function _initSpellbookDrag(content) {
-    content.querySelectorAll('.spellbook-entry[data-skill]').forEach((el) => {
+    content.querySelectorAll('.sb3-stone[data-skill]').forEach((el) => {
         const skillId = el.getAttribute('data-skill');
         el.addEventListener('pointerdown', (e) => {
             e.preventDefault();
@@ -478,7 +473,7 @@ function _initSpellbookDrag(content) {
     });
 
     // Passives / traits: pressing them explains why they can't be moved.
-    content.querySelectorAll('.spellbook-entry[data-passive], .spellbook-entry[data-trait]').forEach((el) => {
+    content.querySelectorAll('.sb3-stone[data-passive], .sb3-stone[data-trait]').forEach((el) => {
         el.addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (typeof showToast === 'function') showToast(t('skill_passive_not_movable'));

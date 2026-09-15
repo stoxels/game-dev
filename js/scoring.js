@@ -550,6 +550,52 @@ function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusM
     const nextCol = nextBtn ? nextBtn.closest('.ov-btns-col') : null;
     if (nextCol) nextCol.style.display = endOfLine ? 'none' : '';
     _updateNexusWinButton(isNexusPoint);
+    _updateConvergenceTrialWinButton(gi);
+}
+
+// Ensures the win overlay has a dedicated "Enter Convergence Trial" button.
+// Shown after clearing one of the world's two convergence milestone levels
+// (33% / 66% rule) when that completion unlocked (or re-unlocked) the world's
+// trial. Mirrors the Nexus win button pattern: own id, static Next/Levels
+// handlers untouched.
+function _updateConvergenceTrialWinButton(gi) {
+    const container = document.querySelector('#ov-win .ov-btns');
+    if (!container) return;
+    const nextBtn = document.getElementById('btn-next-lvl');
+    const target = (nextBtn && nextBtn.closest('.ov-btns-col')) || container;
+
+    // Show condition: this win IS a trigger level AND the trial is now
+    // unlocked AND not already completed. Everything else hides it.
+    let show = false;
+    let wi = null;
+    try {
+        wi = cur.world - 1;
+        const level = ALL[gi];
+        const triggers = (typeof _egTrialTriggerLevels === 'function') ? _egTrialTriggerLevels(wi) : null;
+        const isTrigger = !!(level && triggers && triggers.includes(level.li - 1));
+        show = isTrigger
+            && typeof _egIsTrialUnlocked === 'function' && _egIsTrialUnlocked(wi)
+            && typeof _egIsTrialDone === 'function' && !_egIsTrialDone(wi);
+    } catch (e) { show = false; }
+
+    let btn = document.getElementById('btn-enter-trial-win');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'btn-enter-trial-win';
+        btn.className = 'ob y';
+        btn.addEventListener('click', () => {
+            hideResultOverlays();
+            if (typeof _egLaunchCampaignTrial === 'function') _egLaunchCampaignTrial(wi);
+            else goToLevelSelect();
+        });
+        target.appendChild(btn);
+    }
+    const label = (typeof t === 'function') ? t('btn_enter_trial_win') : null;
+    btn.textContent = (label && label !== 'btn_enter_trial_win') ? label : '🌿 ENTER CONVERGENCE TRIAL';
+    btn.style.display = show ? '' : 'none';
+    if (show && target.classList && target.classList.contains('ov-btns-col')) {
+        target.style.display = '';
+    }
 }
 
 // Ensures the win overlay has a dedicated "Enter the Nexus" button.
@@ -686,7 +732,7 @@ function checkWin() {
 
 
     // Stop any active visual effects and freeze the game state
-    if (typeof clearActiveRandomWalkers === "function") clearActiveRandomWalkers();
+    if (typeof window.clearActiveRandomWalkers === "function") window.clearActiveRandomWalkers();
     if (typeof resetRecursionistState === "function") resetRecursionistState(); // removes the DoF zombie + Residual skeletons
     dead = true;
     stopTimer();

@@ -1,0 +1,79 @@
+{
+  "generated": "2026-09-15T11:28:13.266Z",
+  "modules": [
+    {
+      "src": "js/audio/audio-data.js",
+      "entryImports": [
+        "BGM_TRACKS",
+        "BOSS_BGM",
+        "TUTORIAL_BGM",
+        "LEVEL_BGM",
+        "WORLD_BGM",
+        "SFX"
+      ],
+      "shims": []
+    },
+    {
+      "src": "js/audio/audio.js",
+      "entryImports": [
+        "Audio_Manager"
+      ],
+      "shims": []
+    },
+    {
+      "src": "js/translation/translations-strings.js",
+      "entryImports": [
+        "T"
+      ],
+      "shims": []
+    },
+    {
+      "src": "js/translation/translations.js",
+      "entryImports": [
+        "LANG",
+        "getActiveDictionary",
+        "t",
+        "updateLangButtons",
+        "stripTitleButtonIcon",
+        "applyTranslationsToDOM",
+        "updateTitleExpansionLogos",
+        "setLang"
+      ],
+      "shims": []
+    },
+    {
+      "src": "js/achievements/achievements-data.js",
+      "entryImports": [
+        "ACHIEVEMENT_DEFS"
+      ],
+      "shims": []
+    },
+    {
+      "src": "js/achievements/achievements.js",
+      "entryImports": [
+        "ACH_SAVE_KEY",
+        "ACH_STATE",
+        "loadAchState",
+        "saveAchState",
+        "migrateAchState",
+        "initAchState",
+        "trackAchStat",
+        "setAchStat",
+        "checkAchievements",
+        "onLevelCompleteAch",
+        "checkWorldCompleteAch",
+        "showResetAchievementsModal",
+        "_doResetAchievements"
+      ],
+      "shims": []
+    },
+    {
+      "src": "js/achievements/achievements-ui.js",
+      "entryImports": [
+        "showAchievements",
+        "showAchievementToast"
+      ],
+      "shims": []
+    }
+  ]
+}

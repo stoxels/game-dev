@@ -673,11 +673,6 @@ function buildClassHUD() {
     // Keep the skill hotbar in sync - it is rebuilt on every class/level/
     // ability change too, so the two never drift apart.
     if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
-
-    // If the Drifter timer is running, keep the badge docked
-    if (window._drifterHudInterval && typeof remainingSeconds !== 'undefined' && remainingSeconds > 0) {
-        _drifterSpawnIndicator(remainingSeconds);
-    }
 }
 
 

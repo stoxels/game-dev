@@ -1,0 +1,671 @@
+/* =========================================================================
+   SPELLBOOK REDESIGN  (css/spellbook-redesign.css)
+   Stone tome + 3 parchment pages, built from the dedicated art in
+   images/Spellbook/. Loaded AFTER css/skills.css; overrides the legacy
+   section-4 spellbook rules by source order (same specificity).
+   ========================================================================= */
+
+/* ---------- overlay + frame -------------------------------------------- */
+.spellbook-bg { z-index: 4000; }
+
+.spellbook-box {
+    position: relative;
+    width: min(1400px, 96vw, calc((100vh - 170px) * 1.792));
+    aspect-ratio: 1376 / 768;
+    min-height: 420px;
+    max-height: calc(100vh - 170px);
+    background-image: url('../images/Spellbook/Spellbook_Background.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    container-type: size;
+    color: #4a2c12;
+    animation: sb-frame-in .38s cubic-bezier(.16, .84, .32, 1.12) both;
+}
+
+@keyframes sb-frame-in {
+    from { opacity: 0; transform: scale(.955) rotate(.3deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+body.spellbook-open.skill-hotbar-visible .spellbook-box {
+    max-height: calc(100vh - 160px);
+}
+
+/* Title - plain gold Cinzel lettering sitting on the frame art's carved top
+   band (the reference carries no plaque image, just the gold word). */
+.spellbook-plaque {
+    position: absolute;
+    top: 4.2%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: auto;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(14px, 2cqw, 30px);
+    letter-spacing: clamp(3px, .5cqw, 9px);
+    white-space: nowrap;
+    color: #f2d283;
+    text-shadow: 0 1px 0 #6b4a12, 0 2px 4px rgba(0, 0, 0, .8), 0 0 18px rgba(245, 205, 120, .35);
+    z-index: 5;
+}
+
+.spellbook-plaque-text { text-transform: uppercase; }
+
+/* Close - dark rounded square with a gold rim + gold X, top-right on the
+   frame art (drawn in CSS; no dedicated art asset exists). */
+.spellbook-box .modal-close {
+    position: absolute;
+    top: 4%;
+    right: 5.2%;
+    width: clamp(24px, 3.4cqw, 44px);
+    height: clamp(24px, 3.4cqw, 44px);
+    background: linear-gradient(180deg, #322c40, #191622);
+    border: 1px solid #a8853c;
+    border-radius: 18%;
+    box-shadow: inset 0 1px 0 rgba(255, 220, 150, .25), 0 2px 6px rgba(0, 0, 0, .7);
+    font-size: 0;
+    padding: 0;
+    cursor: pointer;
+    z-index: 5;
+    transition: transform .12s, filter .12s;
+}
+.spellbook-box .modal-close::after {
+    content: '✕';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(13px, 1.8cqw, 24px);
+    font-weight: bold;
+    color: #f2d283;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
+}
+.spellbook-box .modal-close:hover { filter: brightness(1.35); transform: scale(1.08); }
+
+/* Frame body: content sits on the three parchment pages of the art.
+   Page art regions (measured): left x 18.0-41.3%, mid 42.4-57.9%,
+   right 59.2-82.3%, y 17.2-83.5%. The grid uses those proportions. */
+.spellbook-frame-body {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 17.6% 41.9% 58.6% 82.7% 100%;
+    grid-template-rows: 16.8% 83.2% 89.5%;
+}
+
+/* ---------- the three pages -------------------------------------------- */
+.spellbook-body {
+    position: absolute;
+    display: grid;
+    grid-template-columns: 1fr 1.02fr 1.55fr;
+    left: 17.4%;
+    right: 16.6%;
+    top: 17.4%;
+    bottom: 12.4%;
+    gap: .8%;
+}
+
+.spellbook-page {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(3px, .7cqw, 9px) clamp(4px, .8cqw, 10px);
+    overflow: hidden;
+}
+
+/* Pages scroll without a visible scrollbar (the reference shows none). */
+.sb-page-charms, .sb-page-spells { overflow-y: auto; scrollbar-width: none; }
+.sb-page-charms::-webkit-scrollbar, .sb-page-spells::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ---------- section header plaques (gold banner art) -------------------- */
+.sb3-head {
+    flex: 0 0 auto;
+    height: clamp(24px, 4.2cqw, 52px);
+    margin: 0 auto clamp(4px, .8cqw, 10px);
+    width: clamp(120px, 66%, 260px);
+    background-image: url('../images/Spellbook/spellbook_category_header.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(8px, 1.15cqw, 14px);
+    letter-spacing: clamp(1px, .15cqw, 2px);
+    text-transform: uppercase;
+    color: #f0d896;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 10px rgba(240, 205, 120, .3);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
+}
+
+/* ---------- charms page -------------------------------------------------- */
+/* Currency pills: dark rounded plaques with gold diamonds + gold text. */
+.sb3-charm-tools {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(4px, .6cqw, 9px);
+    margin-bottom: clamp(3px, .45cqw, 7px);
+    font-family: var(--F, monospace);
+    font-weight: bold;
+    font-size: clamp(8px, .9cqw, 12px);
+    color: #f0d896;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
+}
+.sb3-lemma, .sb3-theorem {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: clamp(2px, .3cqw, 5px) clamp(6px, .8cqw, 11px);
+    background: linear-gradient(180deg, #3a3448, #1f1b2b);
+    border: 1px solid #8a6d2f;
+    border-radius: 999px;
+    box-shadow: inset 0 1px 0 rgba(255, 220, 150, .18), 0 1px 3px rgba(0, 0, 0, .5);
+}
+.sb3-lemma::before, .sb3-theorem::before { content: '◆'; font-size: .8em; }
+.sb3-lemma::before { color: #f2c94c; text-shadow: 0 0 6px rgba(245, 197, 24, .9); }
+.sb3-theorem::before { color: #c89bef; text-shadow: 0 0 6px rgba(176, 127, 232, .9); }
+.sb3-lemma b, .sb3-theorem b { color: #ffe9a8; }
+
+/* "Max rank only" - dark checkbox + parchment label, like the reference. */
+.sb3-maxrank {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0 auto clamp(4px, .6cqw, 9px);
+    font-family: var(--F, monospace);
+    font-weight: bold;
+    font-size: clamp(8.5px, .95cqw, 12px);
+    color: #2e1d0c;
+    text-shadow: 0 1px 0 rgba(255, 248, 220, .65);
+    cursor: pointer;
+    user-select: none;
+}
+.sb3-maxrank input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: clamp(10px, 1.15cqw, 15px);
+    height: clamp(10px, 1.15cqw, 15px);
+    margin: 0;
+    border: 1px solid #17141f;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #3a3448, #1f1b2b);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .7);
+    cursor: pointer;
+}
+.sb3-maxrank input:checked::after {
+    content: '✓';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f2d283;
+    font-size: .9em;
+    font-weight: bold;
+    text-shadow: 0 0 4px rgba(245, 205, 120, .8);
+}
+
+.sb3-charm-list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3px, .5cqw, 6px);
+    padding-right: 2px;
+}
+
+/* One charm row: dark slate bar, number disc hanging on the parchment to its
+   left, glyph, large cream serif name, gold rank at the right. */
+.sb3-charm-row {
+    position: relative;
+    margin-left: clamp(13px, 1.6cqw, 22px);
+    display: flex;
+    align-items: center;
+    gap: clamp(5px, .7cqw, 10px);
+    padding: clamp(3px, .45cqw, 6px) clamp(6px, .8cqw, 11px);
+    min-height: clamp(16px, 2.3cqw, 30px);
+    background-image: linear-gradient(rgba(48, 53, 70, .92), rgba(30, 33, 45, .95)),
+        url('../images/Spellbook/charm-stone-texture.webp');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #5a5474;
+    border-radius: clamp(4px, .5cqw, 8px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 2px 5px rgba(0, 0, 0, .55);
+    cursor: grab;
+    touch-action: none;
+    transition: border-color .12s, box-shadow .12s, transform .08s;
+}
+.sb3-charm-row:hover {
+    border-color: rgba(245, 197, 24, .7);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 3px 10px rgba(0, 0, 0, .55),
+        0 0 14px -4px rgba(245, 197, 24, .6);
+    transform: translateY(-1px);
+}
+.sb3-charm-row:active { cursor: grabbing; }
+
+/* Plain regular number badge (no art assets for these). */
+.sb3-charm-num {
+    position: absolute;
+    left: calc(-1 * clamp(13px, 1.6cqw, 22px));
+    top: 50%;
+    transform: translateY(-50%);
+    flex: 0 0 auto;
+    min-width: clamp(12px, 1.35cqw, 18px);
+    height: clamp(12px, 1.35cqw, 18px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--F, monospace);
+    font-weight: bold;
+    font-size: clamp(6.5px, .72cqw, 10px);
+    color: #ece2c8;
+    background: linear-gradient(180deg, #3a3448, #1f1b2b);
+    border: 1px solid #55506a;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .8);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .8);
+}
+
+.sb3-charm-glyph {
+    flex: 0 0 auto;
+    font-size: clamp(12px, 1.4cqw, 18px);
+    line-height: 1;
+    filter: drop-shadow(0 0 5px rgba(176, 127, 232, .5));
+}
+
+.sb3-charm-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-family: var(--C);
+    font-weight: 600;
+    font-size: clamp(8px, 1.05cqw, 14px);
+    letter-spacing: .02em;
+    color: #ece2c8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sb3-charm-rank {
+    flex: 0 0 auto;
+    font-family: var(--F, monospace);
+    font-weight: bold;
+    font-size: clamp(7.5px, .8cqw, 11px);
+    color: #f0c869;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+}
+
+.sb3-charm-orbs {
+    flex: 0 0 auto;
+    font-family: var(--F, monospace);
+    font-weight: bold;
+    font-size: clamp(7px, .75cqw, 10px);
+    color: #7fd9ff;
+    text-shadow: 0 0 6px rgba(127, 217, 255, .7);
+}
+
+/* ---------- spell slots page -------------------------------------------- */
+.sb3-drag-label {
+    flex: 0 0 auto;
+    text-align: center;
+    font-family: var(--C);
+    font-size: clamp(9px, 1.05cqw, 14px);
+    font-weight: 700;
+    letter-spacing: clamp(1px, .15cqw, 2px);
+    text-transform: uppercase;
+    color: #fdf7e3;
+    text-shadow: 0 1px 2px rgba(60, 38, 12, .85), 0 0 6px rgba(60, 38, 12, .4);
+    margin-bottom: clamp(3px, .6cqw, 9px);
+}
+
+.sb3-slot-grid {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    gap: clamp(4px, .8cqw, 12px) clamp(4px, .6cqw, 9px);
+    align-content: center;
+    min-height: 0;
+}
+
+/* One socket: the spell_slot art, element glow when filled. */
+.sb3-slot {
+    position: relative;
+    background-image: url('../images/Spellbook/spell_slot.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    touch-action: none;
+    transition: transform .12s, filter .12s;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
+}
+.sb3-slot.is-filled { cursor: grab; }
+.sb3-slot.is-filled:active { cursor: grabbing; }
+.sb3-slot.is-filled:hover { transform: scale(1.06); z-index: 2; }
+
+.sb3-slot-num {
+    position: absolute;
+    top: 4%;
+    left: 12%;
+    font-family: var(--PX, monospace);
+    font-size: clamp(6px, .65cqw, 9px);
+    color: rgba(220, 210, 235, .55);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
+}
+
+.sb3-slot-icon {
+    font-size: clamp(14px, 1.8cqw, 26px);
+    line-height: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8));
+}
+
+.sb3-slot-name {
+    max-width: 92%;
+    font-family: var(--PX, monospace);
+    font-size: clamp(5.5px, .62cqw, 8px);
+    line-height: 1.25;
+    text-align: center;
+    color: #f3ead2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .95);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sb3-slot-orbs {
+    font-family: var(--PX, monospace);
+    font-size: clamp(5.5px, .6cqw, 8px);
+    color: #7fd9ff;
+    text-shadow: 0 0 5px rgba(127, 217, 255, .7);
+}
+
+/* The in-page slot count is redundant with the footer meter and clipped on
+   short pages - hidden; the footer carries the number. */
+.sb3-slots-count { display: none; }
+
+/* ---------- spells page (stones) ---------------------------------------- */
+.sb3-school-title {
+    flex: 0 0 auto;
+    text-align: center;
+    font-family: var(--C);
+    font-weight: 700;
+    font-size: clamp(10px, 1.25cqw, 17px);
+    letter-spacing: clamp(1.5px, .25cqw, 4px);
+    text-transform: uppercase;
+    margin: clamp(2px, .5cqw, 8px) 0 clamp(4px, .7cqw, 10px);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 0 14px var(--sb-glow, transparent);
+    /* The reference tints each school title with its element but keeps it
+       warm - hence the mix with parchment gold. */
+    color: color-mix(in srgb, var(--sb-title, #8a6a2a) 55%, #e8c987);
+}
+
+.sb3-stone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(4px, .8cqw, 11px);
+    margin-bottom: clamp(4px, .7cqw, 10px);
+    justify-items: center;
+}
+
+/* One spell stone: spell_stone art with icon, check, name. */
+.sb3-stone {
+    position: relative;
+    width: 100%;
+    max-width: 66px;
+    aspect-ratio: 397 / 627;
+    background-image: url('../images/Spellbook/spell_stone.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2%;
+    padding: 14% 10% 26%;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    transition: transform .12s, filter .15s;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .55));
+}
+.sb3-stone:active { cursor: grabbing; }
+.sb3-stone:hover { transform: translateY(-2px) scale(1.04); z-index: 2; }
+
+/* Class-upgrade artwork used as a spell icon: sized to the stone's inner
+   window (the carved recess), never the image's natural size. */
+.sb3-stone-img {
+    flex: 0 0 auto;
+    width: 52%;
+    max-height: 34%;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .8));
+}
+
+.sb3-stone-icon {
+    flex: 0 0 auto;
+    font-size: clamp(9px, 1.35cqw, 18px);
+    line-height: 1;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .8));
+}
+
+.sb3-stone-name {
+    font-family: var(--C);
+    font-weight: 600;
+    font-size: clamp(5.5px, .74cqw, 10px);
+    line-height: 1.25;
+    text-align: center;
+    color: #ece2c8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .95);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sb3-stone-rank {
+    font-family: var(--F, monospace);
+    font-weight: bold;
+    font-size: clamp(4.5px, .5cqw, 7px);
+    color: #d9b871;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
+}
+
+/* on-hotbar checkbox, top-right corner of the stone */
+.sb3-stone-check {
+    position: absolute;
+    top: 12%;
+    right: 5%;
+    width: clamp(9px, 1.15cqw, 15px);
+    height: clamp(9px, 1.15cqw, 15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(7px, .9cqw, 12px);
+    font-weight: bold;
+    color: #ece2c8;
+    background: linear-gradient(180deg, #3a3448, #1f1b2b);
+    border: 1px solid rgba(220, 210, 235, .4);
+    border-radius: 3px;
+    text-shadow: 0 0 4px rgba(240, 210, 140, .5);
+}
+.sb3-stone-check.is-on {
+    color: #241a05;
+    background: linear-gradient(180deg, #ffe9a8, #d9a441);
+    box-shadow: 0 0 9px -1px rgba(245, 197, 24, .9);
+}
+
+/* ---------- ELEMENT GLOWS ------------------------------------------------
+   Every element-carrying node (stone, socket, glyph, section title) passes
+   the element as data-school; the glow colours are defined once here. */
+
+[data-school="fire"]     { --sb-glow: rgba(255, 110, 40, .95); }
+[data-school="frost"]    { --sb-glow: rgba(90, 190, 255, .95); }
+[data-school="cold"]     { --sb-glow: rgba(90, 190, 255, .95); }
+[data-school="lightning"]{ --sb-glow: rgba(190, 140, 255, .95); }
+[data-school="shadow"]   { --sb-glow: rgba(160, 90, 220, .95); }
+[data-school="nature"]   { --sb-glow: rgba(100, 220, 120, .95); }
+[data-school="holy"]     { --sb-glow: rgba(255, 220, 110, .95); }
+[data-school="arcane"]   { --sb-glow: rgba(200, 140, 240, .95); }
+[data-school="physical"] { --sb-glow: rgba(216, 200, 168, .9); }
+[data-school="blood"]    { --sb-glow: rgba(230, 60, 80, .95); }
+[data-school="air"]      { --sb-glow: rgba(160, 235, 255, .95); }
+
+[data-school="fire"]      { --sb-title: #a03010; }
+[data-school="frost"]     { --sb-title: #1a6a9e; }
+[data-school="cold"]      { --sb-title: #1a6a9e; }
+[data-school="lightning"] { --sb-title: #6a3ab0; }
+[data-school="shadow"]    { --sb-title: #5a2a8a; }
+[data-school="nature"]    { --sb-title: #1f7a30; }
+[data-school="holy"]      { --sb-title: #8a6a10; }
+[data-school="arcane"]    { --sb-title: #7a3aa0; }
+[data-school="physical"]  { --sb-title: #5a4a30; }
+[data-school="blood"]     { --sb-title: #8a1020; }
+[data-school="air"]       { --sb-title: #2a7a90; }
+
+/* Class identity glows (class keys land on data-school for class groups). */
+.statistician  { --sb-glow: rgba(120, 190, 255, .9); }
+.mathmagician  { --sb-glow: rgba(255, 170, 90, .9); }
+.probabilist   { --sb-glow: rgba(150, 255, 170, .9); }
+
+/* Filled socket: glowing rim + aura in the element colour. */
+.sb3-slot.is-filled[data-school] {
+    filter: drop-shadow(0 0 9px var(--sb-glow)) drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
+}
+.sb3-slot.is-filled[data-school]::after {
+    content: '';
+    position: absolute;
+    inset: 14% 16%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--sb-glow) 0%, transparent 72%);
+    opacity: .65;
+    pointer-events: none;
+    z-index: 0;
+}
+.sb3-slot.is-filled[data-school] > * { position: relative; z-index: 1; }
+
+/* Spell stone: glowing frame in the element colour. */
+.sb3-stone[data-school] {
+    filter: drop-shadow(0 0 10px var(--sb-glow)) drop-shadow(0 2px 5px rgba(0, 0, 0, .55));
+}
+.sb3-stone[data-school]::before {
+    content: '';
+    position: absolute;
+    inset: 8% 12% 21% 12%;
+    border-radius: 6px;
+    box-shadow: inset 0 0 16px var(--sb-glow), 0 0 14px -1px var(--sb-glow);
+    opacity: .85;
+    pointer-events: none;
+}
+.sb3-stone[data-school]:hover::before { opacity: 1; }
+
+
+/* ---------- footer meters ------------------------------------------------
+   Reference: wide dark meters across the frame's bottom band, cream labels
+   sitting above each bar, the art's center gem between them. */
+.spellbook-footer {
+    position: absolute;
+    left: 19.5%;
+    right: 19%;
+    bottom: 3.4%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: clamp(30px, 8cqw, 130px);
+    z-index: 3;
+}
+
+.sb3-meter {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2px, .35cqw, 5px);
+    min-width: 0;
+}
+
+.sb3-meter-label {
+    flex: 0 0 auto;
+    font-family: var(--F, monospace);
+    font-weight: bold;
+    font-size: clamp(8px, .95cqw, 13px);
+    color: #ece2c8;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .95);
+    white-space: nowrap;
+}
+
+.sb3-meter-track {
+    flex: 1 1 auto;
+    min-width: 40px;
+    height: clamp(7px, 1cqw, 13px);
+    background: linear-gradient(180deg, #14121c, #060509);
+    border: 1px solid #a8853c;
+    border-radius: 999px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, .9), 0 1px 0 rgba(255, 255, 255, .12);
+    overflow: hidden;
+}
+
+.sb3-meter-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width .3s;
+}
+.sb3-meter-fill.is-cyan {
+    background: linear-gradient(180deg, #a5f4ff, #1f8ec4);
+    box-shadow: 0 0 9px rgba(102, 252, 241, .8);
+}
+.sb3-meter-fill.is-purple {
+    background: linear-gradient(180deg, #e0a8ff, #7a2fc9);
+    box-shadow: 0 0 9px rgba(176, 127, 232, .85);
+}
+
+/* ---------- legacy hooks kept quiet -------------------------------------- */
+.spellbook-hint { display: none; }
+
+/* Empty spells page. */
+.spellbook-empty {
+    text-align: center;
+    font-family: var(--PX, monospace);
+    font-size: clamp(8px, .9cqw, 11px);
+    line-height: 1.8;
+    color: #6a4a20;
+    padding: 24px 12px;
+}
+
+/* ---------- compact frames ------------------------------------------------ */
+@container (max-width: 860px) {
+    .spellbook-body { grid-template-columns: 1fr; grid-template-rows: minmax(120px, 1fr) minmax(140px, auto) minmax(160px, 1fr); }
+    .spellbook-page { overflow-y: auto; }
+}
+
+/* Charm drop-target highlight (drag & drop from skill-charms.js). */
+.sb3-slot.drop-target {
+    filter: drop-shadow(0 0 10px rgba(79, 195, 247, .95)) drop-shadow(0 2px 4px rgba(0, 0, 0, .5)) brightness(1.35);
+    transform: scale(1.08);
+}

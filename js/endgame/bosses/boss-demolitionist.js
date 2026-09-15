@@ -1105,7 +1105,7 @@ function _egCrashSuperCatch(g, level) {
         if (stillAlive) {
             try {
                 playerCurrentHP = 0;
-                if (typeof _egRenderPlayerHealth === 'function') _egRenderPlayerHealth();
+                if (typeof window._egRenderPlayerHealth === 'function') window._egRenderPlayerHealth();
             } catch (e) {}
             if (typeof _egGameOver === 'function') { try { _egGameOver(); } catch (e) {} }
         }

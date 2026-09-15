@@ -2492,6 +2492,47 @@
     to { transform: scale(1.3); }
 }
 
+/* OVERCHARGE (hold past 100%): the bar and readout turn fiery orange and
+   the glow intensifies - a strike released in this state deals up to 2x
+   damage (see EG_MELEE_OVERCHARGE_* in endgame-encounter.js). */
+#avatar-charge-fill.eg-charge-overcharged,
+#eg-player-charge-bar.eg-charge-overcharged {
+    background: #fb923c;
+    box-shadow: 0 0 14px rgba(251, 146, 60, 0.95);
+}
+#avatar-charge-text.eg-charge-overcharged {
+    color: #fb923c;
+    animation: eg-charge-overcharge-shake 0.3s linear infinite;
+}
+@keyframes eg-charge-overcharge-shake {
+    0%, 100% { transform: scale(1.15); }
+    50% { transform: scale(1.3); }
+}
+
+/* Battle Trance: small floating "+N mana" readout over the struck monster
+   when a melee hit (non-kill) restores mana. Cosmetic - removed by JS. */
+.eg-mana-gain-float {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #7dd3fc;
+    font-weight: bold;
+    font-size: 13px;
+    text-shadow: 0 0 6px rgba(125, 211, 252, 0.8), 0 1px 2px #000;
+    pointer-events: none;
+    animation: eg-mana-gain-rise 0.9s ease-out forwards;
+    z-index: 5;
+}
+@keyframes eg-mana-gain-rise {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, -22px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .eg-mana-gain-float { animation-duration: 0.01s; }
+    #avatar-charge-text.eg-charge-overcharged { animation: none; }
+}
+
 /* Hold-parry pause - desaturate the player charge bar while held */
 #avatar-charge-fill.eg-charge-paused,
 #eg-player-charge-bar.eg-charge-paused {

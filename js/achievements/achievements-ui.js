@@ -612,3 +612,15 @@ function showAchResetModal() {
 function hideAchResetModal() {
     document.getElementById('ach-reset-modal').style.display = 'none';
 }
+
+//------------------------------------------------------------------------
+// Achievement-reset modal buttons. Were inline onclick= attributes in
+// index.html (moved into JS 2026-09-15 so index.html carries no
+// executable code).
+//------------------------------------------------------------------------
+(function _bindAchResetModalButtons() {
+    const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+    on('ach-reset-close', hideAchResetModal);
+    on('ach-reset-confirm', () => { hideAchResetModal(); _doResetAchievements(); });
+    on('ach-reset-cancel', hideAchResetModal);
+})();

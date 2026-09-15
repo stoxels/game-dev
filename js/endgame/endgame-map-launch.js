@@ -322,6 +322,11 @@ function _egApplyMapModsToMonster(monster) {
     const etherealPct = _egGetActiveMapModValue('map_monster_ethereal');
     if (etherealPct > 0) monster.etherealPct = etherealPct;
 
+    // Spellproof: non-melee player damage (spells, reveal projectiles, DoTs)
+    // is reduced by this %; melee strikes bypass it (isMelee flag).
+    const spellproofPct = _egGetActiveMapModValue('map_monster_spellproof');
+    if (spellproofPct > 0) monster.spellproofPct = spellproofPct;
+
     const snowPct = _egGetActiveMapModValue('map_monster_snowball');
     if (snowPct > 0) {
         monster.snowballPct = snowPct;

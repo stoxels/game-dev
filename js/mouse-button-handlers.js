@@ -192,11 +192,6 @@ function isEraseOnRevealedCell(row, col) {
     return revealedGrid[row][col] && pval === 0;
 }
 
-// No-op: cannot erase a cell that was revealed by an item.
-function isEraseOnRevealedCell(row, col) {
-    return revealedGrid[row][col] && pval === 0;
-}
-
 // No-op: with "Protect Marked Cells" enabled, a fill stroke (single click
 // or drag-paint) cannot paint over a cell currently marked with ✕ - whether
 // the player marked it themselves or it was marked by an item, passive, or
@@ -346,8 +341,8 @@ function breakFillStreaksOnMistake() {
 
     // Animals no longer flee outright on a real mistake - instead they lose
     // remaining time (Browney/Wiener −20 s each, Drifter −5 s)
-    if (typeof penalizeRandomWalkersOnMistake === 'function') {
-        penalizeRandomWalkersOnMistake();
+    if (typeof window.penalizeRandomWalkersOnMistake === 'function') {
+        window.penalizeRandomWalkersOnMistake();
     }
 
 
@@ -613,7 +608,7 @@ function updateDragStrokeCounter(row, col) {
 
 // Fires all class and passive system hooks for a correct fill.
 function fireCorrectFillHooks(row, col) {
-    if (typeof feedDrifter === 'function') feedDrifter();
+    if (typeof window.feedDrifter === 'function') window.feedDrifter();
 
     onCorrectFill(row, col);    // class.js hook
     if (typeof PassiveTracker !== 'undefined') PassiveTracker.onCorrectFill();

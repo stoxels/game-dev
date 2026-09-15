@@ -56,8 +56,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_SIRE_DEBUG_SLOW = true;
-const _EG_SIRE_DEBUG_MULT = _EG_SIRE_DEBUG_SLOW ? 2.5 : 1;
+const __EG_SIRE_DEBUG_SLOW = true;
+const _EG_SIRE_DEBUG_MULT = __EG_SIRE_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_siren: {
@@ -143,7 +143,7 @@ function _egSireSplash(x, y, big) {
         s.style.animationDelay = (Math.random() * 100) + 'ms';
         layer.appendChild(s);
     }
-    setTimeout(() => { try { layer.remove(); } catch (e) {} }, _EG_SIRE_DEBUG_SLOW ? 1900 : 950);
+    setTimeout(() => { try { layer.remove(); } catch (e) {} }, __EG_SIRE_DEBUG_SLOW ? 1900 : 950);
 }
 
 // The shared anchor: the Siren sings from the right side of the stage.
@@ -594,7 +594,7 @@ function _egSireFinalStart(monster) {
             return;
         }
         const charge = Math.max(EG_SIRE_LINE_CHARGE_MIN,
-            EG_SIRE_LINE_CHARGE - g.line * 600) * (_EG_SIRE_DEBUG_SLOW ? 8 : 1);
+            EG_SIRE_LINE_CHARGE - g.line * 600) * (__EG_SIRE_DEBUG_SLOW ? 8 : 1);
         const chain = singLine(4 + g.line);
         if (!chain || chain.length < 2) {
             _egSireCrescendo(g, monster, level);
@@ -623,7 +623,7 @@ function _egSireFinalStart(monster) {
             });
             if (!onFar) _egSireTouch(EG_SIRE_BUBBLE_DMG, level, 'Deadly Aria');
             g.line++;
-            g.lineTimer = setTimeout(sing, EG_SIRE_DEBUG_SLOW ? 1800 : 900);
+            g.lineTimer = setTimeout(sing, __EG_SIRE_DEBUG_SLOW ? 1800 : 900);
         };
         g.lineTimer = setTimeout(() => {
             if (!_egSireFinal || _egSireFinal !== g || g.finished) return;
@@ -631,7 +631,7 @@ function _egSireFinalStart(monster) {
             judge();
         }, charge);
     };
-    g.lineTimer = setTimeout(sing, EG_SIRE_DEBUG_SLOW ? 4000 : 1800);
+    g.lineTimer = setTimeout(sing, __EG_SIRE_DEBUG_SLOW ? 4000 : 1800);
 }
 
 // THE KILLER CRESCENDO: every remaining bubble detonates EXCEPT one far
@@ -648,7 +648,7 @@ function _egSireCrescendo(g, monster, level) {
     far.el.classList.add('eg-sire-bubble-safe');
     alive.forEach(b => { if (b !== far) b.el.classList.add('eg-sire-bubble-doom'); });
     _egNkToast('eg_mech_sire_crescendo', '🌀💀 THE KILLER CRESCENDO - stand on the last bubble!', '#7dd3fc');
-    const warnMs = 2600 * (_EG_SIRE_DEBUG_SLOW ? 8 : 1);
+    const warnMs = 2600 * (__EG_SIRE_DEBUG_SLOW ? 8 : 1);
     g.lineTimer = setTimeout(() => {
         if (!_egSireFinal || _egSireFinal !== g || g.finished) return;
         // Everything but the safe bubble detonates.
@@ -663,7 +663,7 @@ function _egSireCrescendo(g, monster, level) {
         if (c && Math.hypot(c.x - far.x, c.y - far.y) >= 66) {
             _egSireTouch(EG_SIRE_CRESC_DMG, level, 'Killer Crescendo');
         }
-        setTimeout(() => _egSireFinalEnd(g), _EG_SIRE_DEBUG_SLOW ? 5500 : 1200);
+        setTimeout(() => _egSireFinalEnd(g), __EG_SIRE_DEBUG_SLOW ? 5500 : 1200);
     }, warnMs);
 }
 

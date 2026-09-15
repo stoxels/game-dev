@@ -277,3 +277,21 @@ function _charLabWalkDir(dir) {
     _charLabPreview.dir = dir;
     _charLabStartWalk();
 }
+
+//------------------------------------------------------------------------
+// Character Lab buttons. Were inline onclick= attributes in index.html
+// (moved into JS 2026-09-15 so index.html carries no executable code).
+// _charLabWalkDir takes its direction as an argument, so each arrow gets
+// its own listener closing over that value.
+//------------------------------------------------------------------------
+(function _bindCharLabButtons() {
+    const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+    on('btn-char-lab', showCharLab);
+    on('charlab-close', closeCharLab);
+    on('charlab-dir-up', () => _charLabWalkDir('up'));
+    on('charlab-dir-left', () => _charLabWalkDir('left'));
+    on('charlab-dir-down', () => _charLabWalkDir('down'));
+    on('charlab-dir-right', () => _charLabWalkDir('right'));
+    on('charlab-stop', _charLabStopPreview);
+    on('charlab-save', _charLabSaveCurrent);
+})();

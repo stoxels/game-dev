@@ -620,7 +620,7 @@ function _bayesTrapProtectionIntercept(row, col) {
     const lineWord = (type === 'row' ? t('cls_row_word') : t('cls_col_word')) + ' ' + (parseInt(idxStr, 10) + 1);
     showToast(t('cls_protect_triggered').replace('{line}', lineWord));
 
-    if (window.Audio_Manager) Audio_Manager.playSFX('varianceShield');
+    Audio_Manager.playSFX('varianceShield'); // window guard removed: module import is always present
     return true;
 }
 

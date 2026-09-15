@@ -467,8 +467,8 @@ function _isWorldComplete(wi) {
 /**
  * Returns true if the player is allowed to enter a given world.
  *
- * Worlds 1..13 unlock sequentially (previous world's first level clears
- * the way). The Nexus World (World 14, wi 13) is secret: it only opens
+ * Open-world unlock: every world (1..13) is accessible once the tutorial
+ * is done. The Nexus World (World 14, wi 13) is secret: it only opens
  * once the player has finished ALL levels of every other world, making it
  * the last interlude world before the endgame.
  *
@@ -482,13 +482,8 @@ function _isWorldAccessible(wi) {
         return typeof isNexusWorldUnlocked === 'function' ? isNexusWorldUnlocked() : false;
     }
 
-    // World 0 requires tutorial completion
-    if (wi === 0) return !!(STATE && STATE.tutorialDone);
-
-    // All other worlds require at least the first level of the previous world to be done
-    if (!WORLDS || !WORLDS[wi - 1]) return false;
-    const prevFirstGi = WORLD_START_GI[wi - 1];
-    return !!(STATE && STATE.done && STATE.done.includes(prevFirstGi));
+    // All campaign worlds require tutorial completion only
+    return !!(STATE && STATE.tutorialDone);
 }
 
 /**
@@ -1790,8 +1785,8 @@ function _renderTopBarClassStatus(p = 'mv') {
 
 function _renderTopBarQuestBadge(p = 'mv') {
     const badge = document.getElementById(p + '-quest-log-badge');
-    if (badge && typeof hasActiveQuestNotification === 'function') {
-        badge.style.display = hasActiveQuestNotification() ? 'inline' : 'none';
+    if (badge && typeof window.hasActiveQuestNotification === 'function') {
+        badge.style.display = window.hasActiveQuestNotification() ? 'inline' : 'none';
     }
 }
 

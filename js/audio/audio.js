@@ -11,10 +11,17 @@
 //    7. Public API
 //
 //  Track/SFX file registries (BGM_TRACKS, LEVEL_BGM, WORLD_BGM, SFX)
-//  now live in audio-data.js, loaded before this file.
+//  now live in audio-data.js, imported below.
+//
+//  PHASE 3 (2026-09-15): first real ES module. entry.mjs imports
+//  Audio_Manager and (while consumers still read it as a global) keeps
+//  ONE bridge line: globalThis.Audio_Manager = Audio_Manager.
+//  See MIGRATION.md §3.1.
 // ============================================================
 
-const Audio_Manager = (() => {
+import { BGM_TRACKS, BOSS_BGM, TUTORIAL_BGM, LEVEL_BGM, WORLD_BGM, SFX } from './audio-data.js';
+
+export const Audio_Manager = (() => {
 
     //------------------------------------------------------------------------
     //-------------------VOLUME & STATE VARIABLES-----------------------------
@@ -78,15 +85,21 @@ const Audio_Manager = (() => {
     // Reads bgmEnabled from the global SETTINGS object if it exists.
     // This keeps the internal flag in sync even if SETTINGS was changed
     // without going through toggleBGM().
+    //
+    // PHASE3 note: reads go through globalThis so this module can never
+    // capture a TDZ/dead binding from the concatenated core (settings.js
+    // still lives there and exports nothing). When settings.js converts
+    // (Phase 3 step 3) these become a real import; SETTINGS is only ever
+    // MUTATED (never reassigned), so the live-object read stays correct.
     function _syncBGMEnabledFromSettings() {
-        if (typeof SETTINGS !== 'undefined') {
-            bgmEnabled = SETTINGS.bgmEnabled;
+        if (typeof globalThis.SETTINGS !== 'undefined') {
+            bgmEnabled = globalThis.SETTINGS.bgmEnabled;
         }
     }
 
     function _syncRandomBGMFromSettings() {
-        if (typeof SETTINGS !== 'undefined') {
-            randomBgmEnabled = SETTINGS.randomBgmEnabled;
+        if (typeof globalThis.SETTINGS !== 'undefined') {
+            randomBgmEnabled = globalThis.SETTINGS.randomBgmEnabled;
         }
     }
 

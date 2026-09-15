@@ -1812,8 +1812,8 @@ function getUniversalSpellDamageBonus(spell) {
     let flat = 0;
     let incPct = 0;
     try {
-        if (typeof getDevTreeSpellBonus === 'function') {
-            const b = getDevTreeSpellBonus(spell) || {};
+        if (typeof window.getDevTreeSpellBonus === 'function') {
+            const b = window.getDevTreeSpellBonus(spell) || {};
             flat += Number(b.flat) || 0;
             incPct += Number(b.incPct) || 0;
         }
@@ -2183,10 +2183,10 @@ function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
         if (typeof _uspFireThemedProjectile === 'function') {
             _uspFireThemedProjectile(spell, monsterId, hit, fxOpts);
         } else if (typeof _egDamageTargetById === 'function') {
-            _egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit });
+            _egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true });
         }
     } catch (e) {
-        try { _egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit }); } catch (e2) {}
+        try { _egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true }); } catch (e2) {}
     }
 }
 

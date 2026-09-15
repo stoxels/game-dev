@@ -172,8 +172,6 @@ const EG_VENDOR_ESSENCE_PRICES = {
     essence_life_on_kill: 440,
     essence_mana_on_kill: 440,
     essence_mana_on_mistake: 440,
-    essence_absorption_on_kill: 440,
-    essence_absorption_regen_rate: 440,
     essence_faster_absorption_regen_start: 400,
     essence_heart_heal: 400,
     essence_inc_heart_heal: 420,

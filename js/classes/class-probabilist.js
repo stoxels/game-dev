@@ -530,7 +530,7 @@ function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses = false)
 
         // Correct reveals kept by God of Probabilities also feed the
         // Random Walker's Drifter with XP. (✕ marks grant no XP.)
-        if (typeof feedDrifter === 'function') feedDrifter();
+        if (typeof window.feedDrifter === 'function') window.feedDrifter();
     });
 
     if (keepAllCrosses) {

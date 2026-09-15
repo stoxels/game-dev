@@ -1972,7 +1972,7 @@ let _egNkSeq = 0;
 
 // True while any dodge run, crush corridor or screen blast is active.
 function _egNkDodgeBusy() {
-    if (typeof _egCrushState !== 'undefined' && _egCrushState) return true;
+    if (typeof window._egCrushState !== 'undefined' && window._egCrushState) return true;
     if (typeof _egActiveBlasts !== 'undefined' && _egActiveBlasts.size > 0) return true;
     for (const r of _egNkRuns.values()) if (r.dodge && !r.passive) return true;
     return false;

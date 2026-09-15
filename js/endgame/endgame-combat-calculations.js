@@ -72,7 +72,11 @@ function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // Manual charge share (Secret-of-Mana-style, linear): 1 = fully-charged
     // full damage. Applied up front so crit, map mods AND life leech below
     // all operate on the scaled hit - chip hits can't leech full damage.
-    const charge = Math.min(1, Math.max(0, Number(chargePct) || 0));
+    // Values above 1 are OVERCHARGE (held past full) and scale the hit
+    // proportionally up to EG_MELEE_OVERCHARGE_MULT (see endgame-encounter.js).
+    const charge = Math.min(
+        (typeof EG_MELEE_OVERCHARGE_MULT === 'number') ? EG_MELEE_OVERCHARGE_MULT : 1,
+        Math.max(0, Number(chargePct) || 0));
 
     let dmg;
     if (stats.meleePhysMax > 0) {
@@ -181,8 +185,16 @@ function _egScaleElements(elements, factor) {
 // armor) reduces only the physical share and applies even when the hit
 // carries no elemental breakdown at all. Monsters without these keys keep
 // their previous behaviour exactly. Returns the post-resistance total.
-function _egApplyTargetResistances(amount, target, elements) {
-    if (!target || !target.resistances) return amount;
+function _egApplyTargetResistances(amount, target, elements, opts) {
+    if (!target) return amount;
+    // Spellproof monsters: player SPELL/projectile hits (opts.isPlayerSpell)
+    // are heavily reduced; player MELEE strikes (opts.isMelee) hit at full
+    // force. Untagged calls (boss mechanics, monster self-damage) are neutral
+    // and pass untouched so map-mod boss math never breaks.
+    if ((target.spellproofPct || 0) > 0 && opts && opts.isPlayerSpell && !opts.isMelee) {
+        amount = Math.max(1, Math.round(amount * (1 - Math.min(90, target.spellproofPct) / 100)));
+    }
+    if (!target.resistances) return amount;
     const res = target.resistances;
     const clampRes = (v) => Math.max(-EG_RESIST_CAP_PCT, Math.min(EG_RESIST_CAP_PCT, Number(v) || 0));
     const physRes = (typeof res.physical === 'number') ? clampRes(res.physical) : 0;

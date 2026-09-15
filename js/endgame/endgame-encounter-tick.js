@@ -70,13 +70,16 @@ function _egTickMonster(m) {
     }
 }
 
-// Current charge % (0..1) of the manual melee bar. 1 = fully charged and
-// ready for a full-damage strike. Returns 0 outside encounters with no max.
+// Current charge % (0..2) of the manual melee bar. 1 = fully charged and
+// ready for a full-damage strike; above 1 the strike OVERCHARGES (deals
+// proportionally more damage, see EG_MELEE_OVERCHARGE_* in endgame-encounter.js).
+// Returns 0 outside encounters with no max.
 function _egGetPlayerChargePct() {
     if (typeof _egGetPlayerAttackInterval !== 'function') return 0;
     const max = _egGetPlayerAttackInterval();
     if (!max || max <= 0) return 0;
-    return Math.min(1, Math.max(0, _egPlayerCurrentCharge / max));
+    const cap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
+    return Math.min(cap, Math.max(0, _egPlayerCurrentCharge / max));
 }
 
 // Spends the current charge and returns the consumed % (0..1). Manual
@@ -100,6 +103,9 @@ function _egIsPlayerChargePaused() {
 // charges over time up to 100% and STAYS full until spent by a manual
 // melee strike (E) - there are no automatic attacks. The full-charge time
 // comes from the equipped weapon (see _egGetPlayerAttackInterval).
+// OVERCHARGE: past 100% the bar keeps filling up to EG_MELEE_OVERCHARGE_RATIO
+// (200%) - a strike released above the cap deals proportionally more damage
+// (150% charge = 1.5x hit, 200% = 2x). Rewards patience over spam-tapping.
 // NOTE: boss set-piece charge pauses were removed with the manual system -
 // the bar is a charge-up, not free DPS, so finales no longer freeze it and
 // the sprite never lunges on its own. Only the parry hold and ailments
@@ -117,8 +123,10 @@ function _egTickPlayer() {
     if (chargeMult <= 0) return;
     const max = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : 0;
     if (!max || max <= 0) return;
-    // Charge up to full and hold there until a manual strike spends it.
-    _egPlayerCurrentCharge = Math.min(max, _egPlayerCurrentCharge + 0.1 * chargeMult); // Ticks at 10Hz
+    // Charge past full into OVERCHARGE (up to EG_MELEE_OVERCHARGE_RATIO) and
+    // hold there until a manual strike spends it.
+    const overchargeCap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
+    _egPlayerCurrentCharge = Math.min(max * overchargeCap, _egPlayerCurrentCharge + 0.1 * chargeMult); // Ticks at 10Hz
 }
 
 // ── Hold-parry charge pause - freeze own melee charge bar while held ───────
@@ -230,21 +238,25 @@ document.addEventListener('mouseover', (e) => {
 // toggles from the removed set-piece freeze era can't desync the visual:
 // paused reflects ONLY the live pause state (parry hold / frozen).
 function _egUpdatePlayerChargeBar() {
-    const pct = _egGetPlayerChargePct() * 100;
+    const pct = _egGetPlayerChargePct();
+    const overcharged = pct > 1.001;
     const paused = _egIsPlayerChargePaused();
-    const ready = pct >= 100 && !paused;
+    const ready = pct >= 1 && !paused;
     ['eg-player-charge-bar', 'avatar-charge-fill'].forEach(id => {
         const bar = document.getElementById(id);
         if (!bar) return;
-        bar.style.width = pct + '%';
+        // Visual fill caps at 100% - overcharge reads via the glow + label.
+        bar.style.width = Math.min(100, pct * 100) + '%';
         bar.classList.toggle('eg-charge-paused', paused);
         bar.classList.toggle('eg-charge-ready', ready);
+        bar.classList.toggle('eg-charge-overcharged', overcharged);
     });
     // % readout next to the avatar's charge bar (pops at 100% - see CSS).
     const label = document.getElementById('avatar-charge-text');
     if (label) {
-        label.textContent = `${Math.floor(pct)}%`;
+        label.textContent = `${Math.floor(pct * 100)}%`;
         label.classList.toggle('eg-charge-ready', ready);
+        label.classList.toggle('eg-charge-overcharged', overcharged);
     }
 }
 
@@ -386,7 +398,7 @@ function _egOnResume() {
         if (m.staggeredUntil) m.staggeredUntil += delta;
         if (m.statuses) Object.values(m.statuses).forEach(st => { if (st.until) st.until += delta; });
     });
-    if (typeof _egEncounterStartAt !== 'undefined' && _egEncounterStartAt) _egEncounterStartAt += delta;
+    if (typeof window._egEncounterStartAt !== 'undefined' && window._egEncounterStartAt) window._egEncounterStartAt += delta;
     if (typeof _egPlayerBlockLockoutUntil !== 'undefined' && _egPlayerBlockLockoutUntil) _egPlayerBlockLockoutUntil += delta;
     if (typeof _egLastLifeRegenAt !== 'undefined' && _egLastLifeRegenAt) _egLastLifeRegenAt += delta;
     if (typeof _egPlayerStatuses !== 'undefined' && _egPlayerStatuses) {

@@ -2102,8 +2102,13 @@ function _tqCastFireball() {
     const _fbSource = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple')
         || undefined;
+    // Fire the FIRE visual (USP_THEME_PROJ.fire - the molten-comet the
+    // universal fire spells use), not the generic reveal projectile:
+    // _egAnimatePlayerProjectile defaults to the class/reveal look, which
+    // made a cast Fireball indistinguishable from a reveal shot.
+    const _fbProj = (typeof USP_THEME_PROJ !== 'undefined' && USP_THEME_PROJ.fire) ? USP_THEME_PROJ.fire : null;
     try {
-        _egAnimatePlayerProjectile(18, target.id, undefined, undefined, _fbSource, undefined, ['fire']);
+        _egAnimatePlayerProjectile(18, target.id, undefined, undefined, _fbSource, undefined, ['fire'], _fbProj ? { projDef: _fbProj } : undefined);
     } catch (e) {
         try { _egDamageTargetById(target.id, 18, ['fire']); } catch (e2) {}
     }

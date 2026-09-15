@@ -81,14 +81,12 @@ function _avatarBarsHTML(barWidth = '100%') {
                     </div>
                 </div>
 
-                <!-- attack charge-up bar (with % readout - see _egUpdatePlayerChargeBar) -->
-                <div style="width: 100%; margin-bottom: 8px;">
-                    <div style="display: flex; justify-content: flex-end; line-height: 1;">
-                        <span id="avatar-charge-text" class="avatar-bar-num avatar-charge-num">0%</span>
-                    </div>
+                <!-- attack charge-up bar (with % readout to the bar's right - see _egUpdatePlayerChargeBar) -->
+                <div style="width: 100%; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
                     <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
                         <div id="avatar-charge-fill" style="background: #4ade80; width: 0%; height: 100%; transition: width 0.1s linear;"></div>
                     </div>
+                    <span id="avatar-charge-text" class="avatar-bar-num avatar-charge-num" style="flex-shrink: 0; min-width: 4ch; margin-bottom: 0;">0%</span>
                 </div>
             </div>`;
 }

@@ -370,22 +370,12 @@ function submitPrimerAnswer() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Triggers the passive-tree bonus item roll for whichever question type just
-// completed correctly (MC rewards use quiz nodes; numeric rewards use math-gate nodes).
-function _primerRollBonusRewardForType() {
-    if (primerQuestion.isMultiChoice) {
-        _quizRollMcBonusItemReward();
-    } else {
-        mgRollPassiveTreeBonusReward();
-    }
-}
-
 // Handles a correct answer at streak position newStreak.
 // If the chain is complete, triggers the perfect reveal; otherwise chains to
-// the next question.
+// the next question. (Exercise questions no longer roll bonus items - the
+// quiz/math-gate item rewards were removed in the Leveling Rework cleanup.)
 function _primerHandleCorrectAnswer(fb, newStreak) {
     fb.className = 'qr-result ok';
-    _primerRollBonusRewardForType();
     Audio_Manager.playSFX('quizCorrect');
     trackAchStat('primerCorrect');
     updateQuestStats('questionCorrect', { source: 'primer' });

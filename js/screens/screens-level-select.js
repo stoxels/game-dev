@@ -193,6 +193,7 @@ function renderLSPassiveTreeButton() {
 
 
 // Creates the world-block wrapper div (world label heading + empty level grid container).
+// World 14's (Nexus) label is only attached once the world is unlocked.
 function buildWorldBlock(w, wi) {
     const block = document.createElement('div');
     block.className = 'world-block';
@@ -258,7 +259,7 @@ function renderLevelSelect() {
         }
     }
 
-    if (typeof _updateToggleBtnLabels === 'function') _updateToggleBtnLabels();
+    if (typeof window._updateToggleBtnLabels === 'function') window._updateToggleBtnLabels();
     renderLSTopBar();
     renderLSScoreRow();
     renderLSClassStatus();
@@ -443,11 +444,14 @@ function attachLevelCardEvents(card, gi, isDone, isMathGated, tip) {
 
 // Builds and returns a fully constructed level card element.
 // Resolves all state flags, builds the DOM element, and attaches events if unlocked.
-// Levels inside the Nexus World stay locked until the whole campaign is finished.
+// Unlock rules: every WORLD is open once the tutorial is done, but the LEVELS
+// inside a world follow a linear progression path (level N+1 needs level N
+// done). The Nexus World additionally stays locked until the whole campaign
+// (worlds 1..13) is finished.
 function buildLevelCard(p, li, wi, w, tip) {
     const gi = WORLD_START_GI[wi] + li;
     const isNexusPoint = typeof isNexusPointLevel === 'function' && isNexusPointLevel(wi, li);
-    let isUnlocked = li === 0 ? STATE.tutorialDone : STATE.done.includes(gi - 1);
+    let isUnlocked = li === 0 ? !!STATE.tutorialDone : STATE.done.includes(gi - 1);
     if (typeof isNexusWorld === 'function' && isNexusWorld(wi)
         && typeof isNexusWorldUnlocked === 'function' && !isNexusWorldUnlocked()) {
         isUnlocked = false;

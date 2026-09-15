@@ -1,26 +1,50 @@
-# === Stoxels - only this is needed for the game ===
-# animations/, audio/, css/, images/, js/, index.html, main.js
-# Everything below is local/dev-only and will NOT be pushed.
+# ============================================================================
+# PUSH-WHITELIST for GitHub Pages (inverted logic: everything is ignored
+# EXCEPT what the published game needs). GitHub Pages serves the repo as-is,
+# so only true game files may be pushed - nothing else.
+#
+# The game online needs exactly:
+#   index.html, main.js, animations/, audio/, css/, images/, js/,
+#   generated/phase2/entry.mjs + order.json + manifest-imports.json
+#   (index.html loads generated/phase2/entry.mjs), .nojekyll (stops GitHub's
+#   site builder from skipping underscore files like animations/Stox/abilities/_shared)
+#
+# Everything else (tools, tests, docs, notes, art sources, previews) stays
+# local-only and is never committed.
+# ============================================================================
 
-.freebuff/
-.vs/
-turnaround_images/
-walk_videos/
-walk_frames/
-tools/
+# --- ignore everything, then allow the game back in ---
+/*
 
-# local preview server / temp
+# --- the published game ---
+!/.gitattributes
+!/.gitignore
+!/.nojekyll
+!/index.html
+!/main.js
+!/animations/
+!/audio/
+!/css/
+!/images/
+!/js/
+!/generated/
+
+# --- generated/: only the three module files the page loads ---
+/generated/*
+!/generated/phase2/
+/generated/phase2/*
+!/generated/phase2/entry.mjs
+!/generated/phase2/order.json
+!/generated/phase2/manifest-imports.json
+
+# --- junk that must never be pushed even from allowed folders ---
+node_modules/
+dist/
+**/~$*
 *.pid
 .preview_server.pid
-
-# Word lock files like ~$rite-Walking-Prompt (2) (2).docx
-~$*
-*~
-*.bak
-
-# OS junk
+.eslintcache
 .DS_Store
 Thumbs.db
-
-# dev notes, not needed in game
-turnaround_checklist.md
+**/.vs/
+**/.vscode/

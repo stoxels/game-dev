@@ -383,7 +383,7 @@ function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     // DoT ticks: no travel time, just the themed sizzle + damage.
     if (opts.isTick) {
         _uspDotTick(spell, monsterId);
-        damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit });
+        damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit, isPlayerSpell: true });
         return;
     }
 
@@ -392,7 +392,9 @@ function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     const projDef = _uspProjDefFor(spell);
 
     const impact = () => {
-        damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit });
+        // isPlayerSpell: Spellproof monsters resist magic sources (melee
+        // strikes are exempt - see _egApplyTargetResistances).
+        damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit, isPlayerSpell: true });
         _uspImpact(spell, monsterId, opts);
     };
 

@@ -383,7 +383,7 @@ function _egBossCleanup(monsterId) {
     if (typeof _egRemoveGridInvert === 'function') _egRemoveGridInvert();
     if (typeof _egVoidSurgeTeardown === 'function') _egVoidSurgeTeardown();
     if (typeof _egBlastTeardownAll === 'function') _egBlastTeardownAll();
-    if (typeof _egCrushTeardown === 'function') _egCrushTeardown();
+    if (typeof window._egCrushTeardown === 'function') window._egCrushTeardown();
     if (typeof _egClearFateMarks === 'function') _egClearFateMarks();
     if (typeof _egRemoveFogBank === 'function') _egRemoveFogBank();
     if (typeof _egRemoveClueScramble === 'function') _egRemoveClueScramble();

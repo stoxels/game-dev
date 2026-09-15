@@ -140,7 +140,7 @@ function _regressionChainRevealCells(fromRow, fromCol, count) {
             trackAchStat('tilesRevealed', 1);
             _applyCellEffect([`g-${r}-${c}`], 'reveal');
         });
-        if (targets.length > 0 && window.Audio_Manager) {
+        if (targets.length > 0) { // Audio_Manager: Phase 3 module import, always present
             Audio_Manager.playSFX('arcaneReveal');
         }
         questStat_classRevealUsed(targets.length);
@@ -257,10 +257,8 @@ function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
         .replace('{n}', toCorrect.length)
         .replace('{s}', recoveredSecs));
 
-    if (window.Audio_Manager) {
-        Audio_Manager.playSFX('varianceShield');
-        Audio_Manager.playSFX('holyHealing');
-    }
+    Audio_Manager.playSFX('varianceShield'); // window guard removed: module import is always present
+    Audio_Manager.playSFX('holyHealing');
 
     if (recoveredSecs >= 120) trackAchStat('correct120smistake');
 
@@ -395,7 +393,7 @@ function _sigThreshConsumeShield(matchKey) {
 
     showToast(t('cls_thresh_triggered').replace('{line}', _sigThreshLineName(matchKey)));
 
-    if (window.Audio_Manager) Audio_Manager.playSFX('varianceShield');
+    Audio_Manager.playSFX('varianceShield');
 }
 
 
@@ -430,7 +428,7 @@ function _sigThresholdIntercept(row, col) {
         _sigThreshApplyShieldsAt(row, col, window._sigThreshLines || ['row']);
         window._sigThreshLines = null;
 
-        if (window.Audio_Manager) Audio_Manager.playSFX('varianceShield');
+        Audio_Manager.playSFX('varianceShield');
         buildClassHUD();
 
         return true;

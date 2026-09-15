@@ -26,7 +26,7 @@
 // worlds 13-14 re-use a few tracks since there are 184 levels vs 167 tracks).
 // The old bgm_1..bgm_47 files stay on disk as spares/fallbacks.
 
-const BGM_TRACKS = {
+export const BGM_TRACKS = {
     // Special / UI tracks
     // 'title' is the NEW title screen music; 'overworld' is the OLD title
     // theme (bgm_title1), now playing on the level-selection overworld.
@@ -428,7 +428,7 @@ const BGM_TRACKS = {
 // list one key. NOTE: boss_brutus has no music files yet - it is
 // intentionally absent and falls back to a random boss theme at play time.
 
-const BOSS_BGM = {
+export const BOSS_BGM = {
     boss_abyss: ['boss_abyss_1', 'boss_abyss_2'],
     boss_aegis: ['boss_aegis_1', 'boss_aegis_2'],
     boss_arbiter: ['boss_arbiter_1', 'boss_arbiter_2', 'boss_arbiter_3'],
@@ -517,7 +517,7 @@ const BOSS_BGM = {
 };
 
 // Tutorial track keys (random one plays on tutorial entry).
-const TUTORIAL_BGM = ['tutorial_1', 'tutorial_2'];
+export const TUTORIAL_BGM = ['tutorial_1', 'tutorial_2'];
 
 
 //------------------------------------------------------------------------
@@ -528,7 +528,7 @@ const TUTORIAL_BGM = ['tutorial_1', 'tutorial_2'];
 // If a level has no entry here, trackForLevel() falls back to WORLD_BGM,
 // then finally to 'world1' as a last resort.
 
-const LEVEL_BGM = {
+export const LEVEL_BGM = {
     // World 1
     '1-1': 'level_1_1', '1-2': 'level_1_2', '1-3': 'level_1_3',
     '1-4': 'level_1_4', '1-5': 'level_1_5', '1-6': 'level_1_6',
@@ -631,7 +631,7 @@ const LEVEL_BGM = {
 // Fallback BGM per world number, used when a level has no LEVEL_BGM entry.
 // Uncomment and set a BGM_TRACKS key for each world as needed.
 
-const WORLD_BGM = {
+export const WORLD_BGM = {
     1: 'level_1_1',
     //2: 'world2',
     //3: 'world3',
@@ -648,7 +648,7 @@ const WORLD_BGM = {
 // Maps SFX keys to their audio file paths.
 // Keys are used with playSFX(key) and stopSFX(key) throughout the game.
 
-const SFX = {
+export const SFX = {
     // ── UI ───────────────────────────────────────────────
     click: 'audio/sfx/ui/sfx_click.ogg',
     back: 'audio/sfx/ui/sfx_back.ogg',

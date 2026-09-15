@@ -579,6 +579,18 @@ const EG_MAP_MOD_TABLES = {
                 { tier: 3, min: 4, max: 9, weight: 800, ilvl: 1 },
             ],
         },
+        // Spellproof: forces melee engagement - spells / reveal projectiles
+        // are heavily resisted, melee strikes hit at full force. Makes the
+        // melee channel mandatory on these runs instead of optional.
+        map_monster_spellproof: {
+            id: 'map_monster_spellproof', affects: 'monster',
+            label: 'Monsters take #% reduced damage from Spells and Projectiles', labelDe: 'Monster erleiden #% weniger Schaden durch Zauber und Projektile',
+            tiers: [
+                { tier: 1, min: 75, max: 79, weight: 95, ilvl: 48 },
+                { tier: 2, min: 55, max: 74, weight: 320, ilvl: 22 },
+                { tier: 3, min: 35, max: 54, weight: 800, ilvl: 1 },
+            ],
+        },
         map_boss_life: {
             id: 'map_boss_life', affects: 'monster',
             label: 'Bosses have +% increased Life', labelDe: 'Bosse haben +% mehr Leben',
@@ -851,6 +863,7 @@ const EG_MAP_MOD_REWARDS = {
     map_armour_pierce:        { xp: [23, 16, 9],   quantity: [18, 12, 7],    rarity: [14, 8, 4] },
     map_monster_ambush:       { xp: [24, 16, 11],   quantity: [19, 12, 7],    rarity: [15, 9, 4] },
     map_monster_ethereal:     { xp: [22, 15, 9],   quantity: [16, 11, 7],    rarity: [12, 8, 4] },
+    map_monster_spellproof:   { xp: [24, 17, 10],  quantity: [18, 12, 7],    rarity: [14, 9, 5] },
     map_boss_life:            { xp: [26, 18, 11],   quantity: [20, 14, 8],   rarity: [16, 11, 5] },
     map_monster_snowball:     { xp: [27, 19, 12],   quantity: [22, 15, 9],   rarity: [18, 11, 5] },
     map_monster_second_wind:  { xp: [28, 19, 12],   quantity: [22, 15, 9],   rarity: [18, 11, 5] },
@@ -1592,6 +1605,11 @@ function _egAddMapToMapStash(item, tierOverride) {
 // active map's Quantity bonus (EG_MAP_MOD_REWARDS.quantity). Harder maps
 // (more / higher-tier mods) therefore sustain maps much better.
 function _egTryDropMap(isBoss, monsterLevel) {
+    // PoE-style: map items only drop from monsters level 55 or higher
+    // (allows drops in late campaign: World 13 EXPECTATION PLATEAU and Nexus World)
+    const MIN_MONSTER_LEVEL_FOR_MAP_DROPS = 55;
+    if ((monsterLevel || 0) < MIN_MONSTER_LEVEL_FOR_MAP_DROPS) return;
+
     // Resolve Quantity multiplier from the active device map, if any.
     let qtyMult = 1;
     if (typeof _egMapLootQuantityMult === 'function') {

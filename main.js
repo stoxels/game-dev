@@ -119,8 +119,8 @@ function _runEscapeCleanup() {
     if (typeof _bayesTrapsCleanup === 'function') {
         _bayesTrapsCleanup(false);
     }
-    if (typeof clearActiveRandomWalkers === 'function') {
-        clearActiveRandomWalkers();
+    if (typeof window.clearActiveRandomWalkers === 'function') {
+        window.clearActiveRandomWalkers();
     }
 }
 

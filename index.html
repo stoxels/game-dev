@@ -27,7 +27,8 @@
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/class.css?v=5">
     <link rel="stylesheet" href="css/skills.css?v=17">
-    <link rel="stylesheet" href="css/universal-spells.css?v=5">
+    <link rel="stylesheet" href="css/spellbook-redesign.css?v=1">
+    <link rel="stylesheet" href="css/universal-spells.css?v=9">
     <link rel="stylesheet" href="css/achievements.css?v=3">
     <link rel="stylesheet" href="css/item_effects.css">
     <link rel="stylesheet" href="css/probability_tree.css?v=3">
@@ -44,7 +45,7 @@
     <link rel="stylesheet" href="css/classes/recursionist.css">
     <link rel="stylesheet" href="css/classes/statistician.css">
     <link rel="stylesheet" href="css/classes/targeting-reticle.css">
-    <link rel="stylesheet" href="css/endgame/monsters.css">
+    <link rel="stylesheet" href="css/endgame/monsters.css?v=2">
     <!-- bosses2.css (442 KB / 11,290 lines, boss-FX only - verified no
          non-boss code uses its classes; base monster-card styles live in
          monsters.css) is NOT render-blocking: it is warmed up once at idle
@@ -61,7 +62,7 @@
     <link rel="stylesheet" href="css/character-select.css?v=7">
     <link rel="stylesheet" href="css/map-view.css">
     <link rel="stylesheet" href="css/map-view-topbar.css?v=11">
-    <link rel="stylesheet" href="css/quiz-excercises.css?v=4">
+    <link rel="stylesheet" href="css/quiz-excercises.css?v=5">
     <link rel="stylesheet" href="css/highscore.css?v=5">
     <link rel="stylesheet" href="css/moodle-codes.css?v=3">
     <link rel="stylesheet" href="css/inference.css">
@@ -77,7 +78,10 @@
     <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_TitleScreen_Background.webp" fetchpriority="high">
     <link rel="preload" as="image" href="images/Title_Screen/STOXELS.webp" fetchpriority="high">
     <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" fetchpriority="high">
-    <link rel="preload" as="image" href="images/Title_Screen/RiseOfTheBeasts_GermanLogo.webp" fetchpriority="high">
+    <!-- German logo NOT statically preloaded: it only renders after a DE
+         switch, so Chromium logs a "preloaded but not used" warning on every
+         EN boot. It is warmed at idle instead via AssetPreload.startIdle()
+         (see SURFACE_ASSETS['screen-title'] in js/asset-preload.js). -->
     <style>
         /* Boot loader - inline so it paints before stylesheets finish.
            Only the few rules needed for a first paint with zero flash live
@@ -404,7 +408,7 @@
             </div>
 
             <!-- CHEAT: Character Lab - test all 30 char/class combos + animations -->
-            <button class="dms-charlab-btn" id="btn-char-lab" onclick="showCharLab()">🧪 CHARACTER LAB</button>
+            <button class="dms-charlab-btn" id="btn-char-lab">🧪 CHARACTER LAB</button>
         </div>
     </div>
 
@@ -413,7 +417,7 @@
         <div class="cl-box">
             <div class="cl-head">
                 <span class="cl-title">🧪 CHARACTER LAB</span>
-                <button class="cl-close" onclick="closeCharLab()">✕</button>
+                <button class="cl-close" id="charlab-close">✕</button>
             </div>
             <div class="cl-body">
                 <div id="charlab-grid" class="cl-grid"></div>
@@ -424,17 +428,17 @@
                     </div>
                     <div class="cl-preview-state" id="charlab-preview-state">idle (move-down)</div>
                     <div class="cl-dir-row">
-                        <button class="cl-dir" onclick="_charLabWalkDir('up')" data-tip="Walk up" aria-label="Walk up">⬆</button>
+                        <button class="cl-dir" id="charlab-dir-up" data-tip="Walk up" aria-label="Walk up">⬆</button>
                         <div class="cl-dir-mid">
-                            <button class="cl-dir" onclick="_charLabWalkDir('left')" data-tip="Walk left" aria-label="Walk left">⬅</button>
-                            <button class="cl-dir" onclick="_charLabWalkDir('down')" data-tip="Walk down" aria-label="Walk down">⬇</button>
-                            <button class="cl-dir" onclick="_charLabWalkDir('right')" data-tip="Walk right" aria-label="Walk right">➡</button>
+                            <button class="cl-dir" id="charlab-dir-left" data-tip="Walk left" aria-label="Walk left">⬅</button>
+                            <button class="cl-dir" id="charlab-dir-down" data-tip="Walk down" aria-label="Walk down">⬇</button>
+                            <button class="cl-dir" id="charlab-dir-right" data-tip="Walk right" aria-label="Walk right">➡</button>
                         </div>
                     </div>
-                    <button class="cl-stop" onclick="_charLabStopPreview()">■ STOP</button>
+                    <button class="cl-stop" id="charlab-stop">■ STOP</button>
                     <div class="cl-portrait-label">menu portrait</div>
                     <img id="charlab-preview-portrait" class="cl-portrait-img" alt="">
-                    <button class="cl-save" onclick="_charLabSaveCurrent()">💾 SAVE INTO CURRENT SLOT</button>
+                    <button class="cl-save" id="charlab-save">💾 SAVE INTO CURRENT SLOT</button>
                     <div class="cl-hint">◉ directional walk art · ○ missing (omni fallback)</div>
                 </div>
             </div>
@@ -1405,9 +1409,9 @@
                     <div class="convm-msbar" data-t="convergence_kicker">MILESTONE REACHED</div>
                 </div>
                 <div class="convm-tree"><img src="images/Convergence_Screen/convergence-tree.webp" alt=""></div>
-                <button class="convm-btn open" onclick="hideConvergenceModal(); hideResultOverlays(); showPassiveTree();"><img src="images/Game-Reset/Button-Stone.webp" alt=""><span data-t="convergence_open_tree">OPEN PROBABILITY TREE</span></button>
-                <button class="convm-btn next" onclick="hideConvergenceModal(); goToNextLevel();"><img src="images/Game-Reset/Button-Stone.webp" alt=""><span data-t="convergence_next_level">NEXT LEVEL</span></button>
-                <button class="convm-btn select" onclick="hideConvergenceModal(); goToLevelSelect();"><img src="images/Game-Reset/Button-Stone.webp" alt=""><span data-t="convergence_level_select">SELECT LEVEL</span></button>
+                <button class="convm-btn open" id="convm-btn-open"><img src="images/Game-Reset/Button-Stone.webp" alt=""><span data-t="convergence_open_tree">OPEN PROBABILITY TREE</span></button>
+                <button class="convm-btn next" id="convm-btn-next"><img src="images/Game-Reset/Button-Stone.webp" alt=""><span data-t="convergence_next_level">NEXT LEVEL</span></button>
+                <button class="convm-btn select" id="convm-btn-select"><img src="images/Game-Reset/Button-Stone.webp" alt=""><span data-t="convergence_level_select">SELECT LEVEL</span></button>
             </div>
 
             <!-- RIGHT PAGE -->
@@ -1431,7 +1435,7 @@
     <!-- ACHIEVEMENT RESET CONFIRM MODAL -->
     <div id="ach-reset-modal" class="modal-bg safe-center">
         <div class="modal-box modal-box-danger">
-            <button class="modal-close" onclick="hideAchResetModal()" data-t="reset_close">✕ CLOSE</button>
+            <button class="modal-close" id="ach-reset-close" data-t="reset_close">✕ CLOSE</button>
             <div class="modal-title text-red" data-t="scr_reset_ach_title">⚠ RESET ACHIEVEMENTS</div>
             <div class="modal-section">
                 <p class="reset-body-text" data-t="scr_reset_ach_body">
@@ -1440,8 +1444,8 @@
                 </p>
             </div>
             <div class="modal-actions">
-                <button class="title-btn back-btn" onclick="hideAchResetModal(); _doResetAchievements();" data-t="scr_reset_ach_confirm">YES, RESET ACHIEVEMENTS</button>
-                <button class="title-btn back-btn" onclick="hideAchResetModal()" data-t="reset_cancel">CANCEL</button>
+                <button class="title-btn back-btn" id="ach-reset-confirm" data-t="scr_reset_ach_confirm">YES, RESET ACHIEVEMENTS</button>
+                <button class="title-btn back-btn" id="ach-reset-cancel" data-t="reset_cancel">CANCEL</button>
             </div>
         </div>
     </div>
@@ -1547,275 +1551,276 @@
     CACHE-BUSTING: the ?v= param is per-file; bump it whenever that
     file's content changes so players don't run stale scripts.
     ============================================================ -->
-    <script src="js/audio/audio-data.js"></script>
-    <script src="js/audio/audio.js?v=2"></script>
-    <script src="js/settings.js"></script>
-    <script src="js/keybinds.js"></script>
-    <script src="js/translation/translations-strings.js?v=23"></script>
-    <script src="js/translation/translations.js"></script>
-    <script src="js/quests/quests-data.js"></script>
-    <script src="js/quests/quests-stats.js?v=4"></script>
-    <script src="js/quests/quests-logic.js"></script>
-    <script src="js/quests/quests-styles.js"></script>
-    <script src="js/quests/quests-ui.js"></script>
-    <script src="js/screens/screens-save-slots.js?v=3"></script>
-    <script src="js/state.js?v=6"></script>
-    <script src="js/difficulty-modifiers.js"></script>
-    <script src="js/levels/level-world-data.js"></script>
-    <script src="js/levels/levels.js"></script>
-    <script src="js/puzzle-items/item-definitions.js"></script>
-    <script src="js/puzzle-items/item-pool.js"></script>
-    <script src="js/puzzle-items/cell-effects.js"></script>
-    <script src="js/puzzle-items/shared/fx-helpers.js"></script>
-    <script src="js/quiz-excercise/quiz-questions.js"></script>
-    <script src="js/quiz-excercise/quiz.js"></script>
-    <script src="js/timer.js"></script>
-    <script src="js/grid.js"></script>
-    <script src="js/grid-scaling.js"></script>
-    <script src="js/mouse-over.js"></script>
-    <script src="js/mouse-button-handlers.js"></script>
-    <script src="js/penalty.js"></script>
-    <script src="js/scoring.js?v=3"></script>
-    <script src="js/puzzle-items/shared/puzzle-helpers.js"></script>
-    <script src="js/puzzle-items/shared/quest-tracking.js"></script>
-    <script src="js/puzzle-items/shared/clue-blackout.js"></script>
-    <script src="js/puzzle-items/shared/grid-actions.js"></script>
-    <script src="js/puzzle-items/shared/cursed-downside.js"></script>
-    <script src="js/puzzle-items/shared/effect-modifiers.js"></script>
-    <script src="js/puzzle-items/inventory-panel.js"></script>
+    <script type="module" src="./generated/phase2/entry.mjs"></script>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- one file per puzzle item: use handler + visual effect -->
-    <script src="js/puzzle-items/reveal.js"></script>
-    <script src="js/puzzle-items/mark-wrong.js"></script>
-    <script src="js/puzzle-items/add-time.js"></script>
-    <script src="js/puzzle-items/shield.js?v=3"></script>
-    <script src="js/puzzle-items/freeze.js"></script>
-    <script src="js/puzzle-items/mistake-eraser.js"></script>
-    <script src="js/puzzle-items/scouts-primer-item.js"></script>
-    <script src="js/puzzle-items/row-col-solve.js"></script>
-    <script src="js/puzzle-items/survey-scope.js"></script>
-    <script src="js/puzzle-items/artifact-complete.js"></script>
-    <script src="js/puzzle-items/cursed-reveal.js"></script>
-    <script src="js/puzzle-items/cursed-time.js"></script>
-    <script src="js/puzzle-items/cursed-shield.js"></script>
-    <script src="js/puzzle-items/cursed-row-solve.js"></script>
-    <script src="js/puzzle-items/cursed-col-solve.js"></script>
-    <script src="js/puzzle-items/cursed-row-col.js"></script>
-    <script src="js/puzzle-items/pearls.js"></script>
-    <script src="js/puzzle-items/the-witch.js"></script>
-    <script src="js/puzzle-items/golden-clock.js"></script>
-    <script src="js/puzzle-items/shadow-seal.js"></script>
-    <script src="js/puzzle-items/chrono-fracture.js"></script>
-    <script src="js/puzzle-items/fx-dispatch.js"></script>
-    <script src="js/puzzle-items/use-item.js"></script>
-    <script src="js/puzzle-items/inventory-reshuffle.js"></script>
-    <script src="js/puzzle-items/toasts-and-popups.js"></script>
-    <script src="js/codes.js?v=3"></script>
-    <script src="js/screens/screens-highscore.js"></script>
-    <script src="js/screens/screens-map-view.js?v=6"></script>
-    <script src="js/screens/screens-world-levels-config.js"></script>
-    <script src="js/screens/screens-world-levels.js?v=8"></script>
-    <script src="js/screens/screens-level-select.js"></script>
-    <script src="js/screens/screens.js?v=2"></script>
-    <script src="js/puzzle-items/scouts-primer.js?v=3"></script>
-    <script src="js/start-level-passives.js"></script>
-    <script src="js/start-level.js?v=5"></script>
-    <script src="js/ui-reset.js"></script>
-    <script src="js/tutorial.js?v=3"></script>
-    <script src="js/tutorial-quest.js?v=37"></script>
-    <script src="js/quiz-excercise/mathgate-questions.js"></script>
-    <script src="js/quiz-excercise/mathgate.js"></script>
-    <script src="js/classes/class-defs.js"></script>
-    <script src="js/classes/ascendency-defs.js"></script>
-    <script src="js/classes/class-cooldown-state.js?v=4"></script>
-    <script src="js/classes/class-ui.js?v=6"></script>
-    <script src="js/classes/class-hud.js?v=3"></script>
-    <script src="js/classes/class-hud-levelselect-tooltip.js"></script>
-    <script src="js/classes/class-abilities.js"></script>
-    <script src="js/classes/class-mana.js?v=5"></script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- Skill book / hotbar system (registry → tooltip → hotbar → spell book).
          Loaded after the class defs + abilities so the registry can build
          itself from CLASS_DEFS / ASCENDENCY_DEFS / ENDGAME_HEARTBLOOM_DEF. -->
-    <script src="js/skills/skill-registry.js?v=3"></script>
-    <script src="js/skills/skill-tooltip.js?v=5"></script>
-    <script src="js/skills/skill-hotbar.js?v=4"></script>
-    <script src="js/skills/skill-spellbook.js?v=9"></script>
+    
+    
+    
+    
     <!-- Universal spell arsenal (PoE/WoW-inspired): themed FX first, then the
          spell defs + cast engine (registers into SKILL_REGISTRY at load). -->
-    <script src="js/skills/universal-spell-fx.js?v=4"></script>
-    <script src="js/skills/universal-spells.js?v=6"></script>
+    
+    
     <!-- Hold-to-cast engine (WoW-style cast bar + charging orb). Loaded after
          the arsenal so getSkillCastTimeSeconds() sees every registered def. -->
-    <script src="js/skills/spell-casttime.js?v=1"></script>
+    
     <!-- Charm system: per skill+rank charm items, spell slots, shards/orbs
          and the grid drops that feed the spell book's charm panel. Loaded
          last so it can see every registered skill (universal spells too). -->
-    <script src="js/skills/skill-charms.js?v=7"></script>
-    <script src="js/classes/class-statistician.js"></script>
-    <script src="js/classes/class-mathmagician.js"></script>
-    <script src="js/classes/class-probabilist.js"></script>
-    <script src="js/classes/class-outlier.js"></script>
-    <script src="js/classes/class-actuary.js"></script>
-    <script src="js/classes/class-recursionist.js"></script>
-    <script src="js/classes/class-random-walker.js"></script>
-    <script src="js/classes/class-markovian.js"></script>
-    <script src="js/classes/class-bayesian.js"></script>
-    <script src="js/achievements/achievements.js?v=4"></script>
-    <script src="js/achievements/achievements-data.js"></script>
-    <script src="js/achievements/achievements-ui.js?v=4"></script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- Dev sandbox tree (passive-tree-dev-data.js, ~41k lines / 951 KB) is
          NOT loaded here - it is injected on demand the first time the
          sandbox is opened (see _loadDevPassiveTreeAndOpen in ui-events.js). -->
-    <script src="js/passive-tree/passive-tree-data.js?v=3"></script>
-    <script src="js/passive-tree/passive-tree-state-points.js"></script>
-    <script src="js/passive-tree/passive-tree-ui.js?v=3"></script>
-    <script src="js/passive-tree/passive-tree-viewport.js"></script>
-    <script src="js/passive-tree/passive-tree-special-nodes-logic.js"></script>
-    <script src="js/passive-tree/passive-tree.js"></script>
-    <script src="js/passive-tree/passive-tracker.js?v=3"></script>
-    <script src="js/passive-tree/passive-effects.js"></script>
-    <script src="js/passive-tree/passive-tree-expansion.js"></script>
-    <script src="js/sprite/character-select.js?v=10"></script>
-    <script src="js/ui-events.js"></script>
-    <script src="js/tooltips-hud.js?v=4"></script>
-    <script src="js/changelog.js"></script>
-    <script src="js/endgame/endgame-state.js"></script>
-    <script src="js/endgame/endgame-player-stats.js?v=3"></script>
-    <script src="js/endgame/endgame-requirements.js"></script>
-    <script src="js/endgame/endgame-monsters.js"></script>
-    <script src="js/endgame/bosses/boss-framework.js"></script>
-    <script src="js/endgame/bosses/shared-boss-abilities.js"></script>
-    <script src="js/endgame/bosses/boss-null.js"></script>
-    <script src="js/endgame/bosses/boss-bayes.js"></script>
-    <script src="js/endgame/bosses/boss-entropy.js"></script>
-    <script src="js/endgame/bosses/boss-laplace.js"></script>
-    <script src="js/endgame/bosses/boss-overfitter.js"></script>
-    <script src="js/endgame/bosses/boss-vise.js"></script>
-    <script src="js/endgame/bosses/boss-gale.js"></script>
-    <script src="js/endgame/bosses/boss-dynamo.js"></script>
-    <script src="js/endgame/bosses/boss-demolitionist.js"></script>
-    <script src="js/endgame/bosses/boss-lodestone.js"></script>
-    <script src="js/endgame/bosses/boss-coil.js"></script>
-    <script src="js/endgame/bosses/boss-needle.js"></script>
-    <script src="js/endgame/bosses/boss-barrage.js"></script>
-    <script src="js/endgame/bosses/boss-marksman.js"></script>
-    <script src="js/endgame/bosses/boss-aegis.js"></script>
-    <script src="js/endgame/bosses/boss-brutus.js"></script>
-    <script src="js/endgame/bosses/boss-siren.js"></script>
-    <script src="js/endgame/bosses/boss-sirus.js"></script>
-    <script src="js/endgame/bosses/boss-maven.js"></script>
-    <script src="js/endgame/bosses/boss-exarch.js"></script>
-    <script src="js/endgame/bosses/boss-inferno.js"></script>
-    <script src="js/endgame/bosses/boss-monsoon.js"></script>
-    <script src="js/endgame/bosses/boss-buzz.js"></script>
-    <script src="js/endgame/bosses/boss-colossus.js"></script>
-    <script src="js/endgame/bosses/boss-gridlock.js"></script>
-    <script src="js/endgame/bosses/boss-jester.js"></script>
-    <script src="js/endgame/bosses/boss-abyss.js"></script>
-    <script src="js/endgame/bosses/boss-architect.js"></script>
-    <script src="js/endgame/bosses/boss-warden.js"></script>
-    <script src="js/endgame/bosses/boss-maelstrom.js"></script>
-    <script src="js/endgame/bosses/boss-arbiter.js"></script>
-    <script src="js/endgame/bosses/boss-thwomp.js"></script>
-    <script src="js/endgame/bosses/boss-medusa.js"></script>
-    <script src="js/endgame/bosses/boss-razor.js"></script>
-    <script src="js/endgame/bosses/boss-shaper.js"></script>
-    <script src="js/endgame/bosses/boss-bloom.js"></script>
-    <script src="js/endgame/bosses/boss-minotaur.js"></script>
-    <script src="js/endgame/bosses/boss-shrine.js"></script>
-    <script src="js/endgame/bosses/boss-swarm.js"></script>
-    <script src="js/endgame/bosses/boss-stack.js"></script>
-    <script src="js/endgame/bosses/boss-ember.js"></script>
-    <script src="js/endgame/bosses/boss-snail.js"></script>
-    <script src="js/endgame/bosses/boss-jelly.js"></script>
-    <script src="js/endgame/bosses/boss-gust.js"></script>
-    <script src="js/endgame/bosses/boss-sprout.js"></script>
-    <script src="js/endgame/bosses/boss-clock.js"></script>
-    <script src="js/endgame/bosses/boss-puddle.js"></script>
-    <script src="js/endgame/bosses/boss-firefly.js"></script>
-    <script src="js/endgame/bosses/boss-bumper.js"></script>
-    <script src="js/endgame/bosses/boss-striker.js"></script>
-    <script src="js/endgame/bosses/boss-centipede.js"></script>
-    <script src="js/endgame/bosses/boss-dancer.js"></script>
-    <script src="js/endgame/bosses/boss-gambler.js"></script>
-    <script src="js/endgame/bosses/boss-tactician.js"></script>
-    <script src="js/endgame/bosses/boss-gourmet.js"></script>
-    <script src="js/endgame/bosses/boss-encore.js"></script>
-    <script src="js/endgame/bosses/boss-bomber.js"></script>
-    <script src="js/endgame/bosses/boss-creeper.js"></script>
-    <script src="js/endgame/bosses/boss-maze.js"></script>
-    <script src="js/endgame/bosses/boss-tron.js"></script>
-    <script src="js/endgame/bosses/boss-belt.js"></script>
-    <script src="js/endgame/bosses/boss-hunter.js"></script>
-    <script src="js/endgame/bosses/boss-cyclops.js"></script>
-    <script src="js/endgame/bosses/boss-barricade.js"></script>
-    <script src="js/endgame/bosses/boss-guardian.js"></script>
-    <script src="js/endgame/bosses/boss-duelist.js"></script>
-    <script src="js/endgame/bosses/boss-mech.js"></script>
-    <script src="js/endgame/bosses/boss-phantom.js"></script>
-    <script src="js/endgame/bosses/boss-weaver.js"></script>
-    <script src="js/endgame/bosses/boss-velocity.js"></script>
-    <script src="js/endgame/bosses/boss-wormhole.js"></script>
-    <script src="js/endgame/bosses/boss-eclipse.js"></script>
-    <script src="js/endgame/bosses/boss-nightmare.js"></script>
-    <script src="js/endgame/bosses/boss-kraken.js"></script>
-    <script src="js/endgame/bosses/boss-executioner.js"></script>
-    <script src="js/endgame/bosses/boss-leviathan.js"></script>
-    <script src="js/endgame/bosses/boss-nemesis.js"></script>
-    <script src="js/endgame/bosses/boss-oblivion.js"></script>
-    <script src="js/endgame/bosses/boss-juggernaut.js"></script>
-    <script src="js/endgame/bosses/boss-stormqueen.js"></script>
-    <script src="js/endgame/bosses/boss-dreadnought.js"></script>
-    <script src="js/endgame/bosses/boss-warlord.js"></script>
-    <script src="js/endgame/bosses/boss-seraph.js"></script>
-    <script src="js/endgame/bosses/boss-chaos.js"></script>
-    <script src="js/endgame/bosses/boss-voidborn.js"></script>
-    <script src="js/endgame/bosses/boss-zenith.js"></script>
-    <script src="js/endgame/bosses/boss-rosters.js"></script>
-    <script src="js/endgame/endgame-combat-calculations.js"></script>
-    <script src="js/endgame/endgame-class-projectiles.js"></script>
-    <script src="js/endgame/endgame-grid-pickups.js"></script>
-    <script src="js/endgame/endgame-encounter.js"></script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- Split out of endgame-encounter.js 2026-09-10 (Pass 3). MUST load
          AFTER endgame-encounter.js (their load-time code only touches
          window / their own definitions). Tick before overlays: the tick
          file owns the _egClearCenterGridBanners fallback guard. -->
-    <script src="js/endgame/endgame-encounter-tick.js"></script>
+    
     <!-- Monster positioning: static panels + occasional melee sidestep
          (no permanent patrol). After encounter.js (uses its render helpers). -->
-    <script src="js/endgame/endgame-monster-roam.js"></script>
+    
     <!-- Manual weapon attack (E) + shared CSS swing visuals. After tick so
          the parry hotkey owns its key first; typeof-guarded either way. -->
-    <script src="js/endgame/endgame-weapon-swing.js?v=2"></script>
-    <script src="js/endgame/endgame-encounter-overlays.js"></script>
-    <script src="js/endgame/endgame-encounter-chain.js"></script>
-    <script src="js/endgame/endgame-quiz-buffs.js?v=3"></script>
-    <script src="js/endgame/endgame-ailments.js?v=4"></script>
-    <script src="js/endgame/endgame-ui.js"></script>
-    <script src="js/endgame/endgame-screens.js"></script>
-    <script src="js/endgame/endgame-atlas.js"></script>
-    <script src="js/endgame/endgame-atlas-ui.js?v=4"></script>
-    <script src="js/endgame/endgame-equipment-base-items.js"></script>
-    <script src="js/endgame/endgame-implicits.js"></script>
-    <script src="js/endgame/endgame-art.js"></script>
-    <script src="js/endgame/endgame-unique-items.js"></script>
-    <script src="js/endgame/endgame-equipment-tooltip.js"></script>
-    <script src="js/endgame/endgame-leveling.js?v=3"></script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- Split out of endgame-hub.js 2026-09-10 (Pass 3). hub-uniques MUST
          load BEFORE hub.js (hub.js's load-time _egLoadHubState calls
          _egEnsureUniqueStash unguarded); hub-tooltips loads AFTER hub.js. -->
-    <script src="js/endgame/endgame-hub-uniques.js"></script>
-    <script src="js/endgame/endgame-hub.js?v=5"></script>
-    <script src="js/endgame/endgame-hub-tooltips.js"></script>
-    <script src="js/endgame/endgame-hub-drag-and-drop.js?v=3"></script>
-    <script src="js/endgame/endgame-gate.js?v=4"></script>
-    <script src="js/endgame/endgame-nexus.js?v=3"></script>
-    <script src="js/endgame/endgame-boss-test.js?v=4"></script>
-    <script src="js/endgame/endgame-currency.js"></script>
-    <script src="js/endgame/endgame-crafting-costs.js?v=3"></script>
-    <script src="js/endgame/endgame-crafting-bench.js?v=3"></script>
-    <script src="js/endgame/endgame-essences.js?v=4"></script>
-    <script src="js/endgame/endgame-shards.js"></script>
-    <script src="js/endgame/endgame-loot-filter.js?v=3"></script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- endgame-mod-tables.js split per slot 2026-09-10 (Pass 3). Order
          among the tables is free; endgame-mod-tables-rebalance.js MUST
          load after every table (it evals each EG_MOD_TABLE_* at load
@@ -1823,63 +1828,63 @@
          6): endgame-mod-application.js (its naming/mod-application half)
          needs the name-words dictionary, and generator.js calls into it
          at load time via _egGenerateEquipmentDrop. -->
-    <script src="js/endgame/endgame-mod-name-words.js?v=3"></script>
-    <script src="js/endgame/endgame-mod-tables-head.js"></script>
-    <script src="js/endgame/endgame-mod-tables-earring.js"></script>
-    <script src="js/endgame/endgame-mod-tables-amulet.js?v=3"></script>
-    <script src="js/endgame/endgame-mod-tables-shoulders.js"></script>
-    <script src="js/endgame/endgame-mod-tables-cloak.js"></script>
-    <script src="js/endgame/endgame-mod-tables-chest.js?v=3"></script>
-    <script src="js/endgame/endgame-mod-tables-bracers.js"></script>
-    <script src="js/endgame/endgame-mod-tables-gloves.js"></script>
-    <script src="js/endgame/endgame-mod-tables-belt.js"></script>
-    <script src="js/endgame/endgame-mod-tables-pants.js"></script>
-    <script src="js/endgame/endgame-mod-tables-boots.js"></script>
-    <script src="js/endgame/endgame-mod-tables-ring.js"></script>
-    <script src="js/endgame/endgame-mod-tables-arcane.js?v=3"></script>
-    <script src="js/endgame/endgame-mod-tables-talisman.js?v=3"></script>
-    <script src="js/endgame/endgame-mod-tables-weapon1.js"></script>
-    <script src="js/endgame/endgame-mod-tables-weapon-2h.js"></script>
-    <script src="js/endgame/endgame-mod-tables-weapon2.js?v=3"></script>
-    <script src="js/endgame/endgame-mod-tables-shield.js"></script>
-    <script src="js/endgame/endgame-mod-tables-rebalance.js"></script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- Pass 6: mod application + naming extracted from the generator.
          application BEFORE generator (generator's load-time override
          calls _egBuildItemName / _egRollMods from application). -->
-    <script src="js/endgame/endgame-mod-application.js"></script>
-    <script src="js/endgame/endgame-equipment-generator.js"></script>
-    <script src="js/endgame/endgame-maps.js"></script>
-    <script src="js/endgame/endgame-gold.js"></script>
-    <script src="js/endgame/endgame-vendor.js?v=5"></script>
-    <script src="js/sprite/sprite_animations.js"></script>
-    <script src="js/sprite/player_sprite.js?v=13"></script>
-    <script src="js/sprite/cheat-combo-picker.js?v=3"></script>
-    <script src="js/sprite/character-banter.js?v=5"></script>
-    <script src="js/classes/targeting-reticle.js"></script>
-    <script src="js/storyline/storyline-engine.js?v=2"></script>
-    <script src="js/storyline/storyline-intro.js"></script>
-    <script src="js/storyline/storyline-intro-stox.js"></script>
-    <script src="js/storyline/storyline-intro-trix.js"></script>
-    <script src="js/storyline/storyline-intro-syla.js"></script>
-    <script src="js/storyline/storyline-beats.js"></script>
-    <script src="js/endgame-testing-screen.js?v=3"></script>
-    <script src="js/endgame/endgame-puzzle-generator.js"></script>
-    <script src="js/endgame/endgame-map-launch.js"></script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- Campaign trials (Convergence + Ascension mini-maps). After map-launch
          (reuses its seed picker) and after the world screens (uses their nav);
          all cross-calls are typeof-guarded either way. -->
-    <script src="js/campaign-trials.js"></script>
-    <script src="js/endgame/endgame-hazards.js"></script>
-    <script src="js/adventure-mode.js"></script>
+    
+    
+    
 
-    <script src="js/asset-preload.js?v=3"></script>
-    <script src="js/boot-loader.js"></script>
-    <script src="js/dev-testing.js"></script>
+    
+    
+    
     <!-- Dev-only spell rank audit screen (every rank of one spell side by side).
          AFTER dev-testing.js: it registers itself onto that harness's DevTest
          object at load, and DevTest is a script-scope const, so an earlier
          script would hit its temporal dead zone. Nothing else depends on it. -->
-    <script src="js/skills/spell-rank-audit.js?v=4"></script>
-    <script src="main.js"></script>
+    
+    
 </body>
 </html>

@@ -235,7 +235,9 @@ function _wdBuildExtraSegment(cfg, extra) {
 
 /**
  * Builds the full list of road segments that should currently be drawn:
- * the linear chain (minus hideRoad nodes) plus any visible extraRoads.
+ * the linear chain (minus hideRoad nodes), any visible extraRoads, and the
+ * spur from the world's 66% convergence milestone level to its Convergence
+ * Trial node (so the off-road trial site is visibly connected to the map).
  * Returns an array of { n1, n2, waypoints } objects.
  */
 function _wdBuildRoads(cfg, wi) {
@@ -254,6 +256,22 @@ function _wdBuildRoads(cfg, wi) {
                 roads.push(_wdBuildExtraSegment(cfg, extra));
             }
         }
+    }
+
+    // Convergence Trial spur: 66% milestone level → trial node.
+    // 'trial' is only ever a segment endpoint (the trial node itself is not
+    // part of the BFS walk graph - trial entry goes through its own click
+    // flow), but the endpoint key feeds _wdIsNodeReached so the spur can
+    // render as 'travelled' once the trial is cleared.
+    if (cfg.trialNode && _wdTrialNodeForWorld(wi)) {
+        const triggers = (typeof _egTrialTriggerLevels === 'function') ? _egTrialTriggerLevels(wi) : null;
+        const fromLi = (triggers && triggers[1] != null && cfg.nodes[triggers[1]]) ? triggers[1] : (cfg.nodes.length - 1);
+        const fromPos = cfg.nodes[fromLi] || cfg.entrancePos;
+        roads.push({
+            n1: fromLi,
+            n2: 'trial',
+            waypoints: [fromPos, cfg.trialNode],
+        });
     }
 
     return roads;
@@ -424,10 +442,14 @@ function _wdWaypointToSvgPoint(point, canvas, cfg, svgWidth, svgHeight) {
 
 /**
  * Returns true if a node has been reached by the player (entrance is always
- * reached; level nodes are reached once done or currently occupied by the sprite).
+ * reached; level nodes are reached once done or currently occupied by the sprite;
+ * the 'trial' endpoint is reached once the world's Convergence Trial is done).
  */
 function _wdIsNodeReached(n, wi) {
     if (n === 'entrance') return true;
+    if (n === 'trial') {
+        return (typeof _egIsTrialDone === 'function') && _egIsTrialDone(wi);
+    }
     const gi = WORLD_START_GI[wi] + n;
     if (STATE && STATE.done && STATE.done.includes(gi)) return true;
     return _wdCurrentLevelIdx === n;
@@ -500,9 +522,10 @@ function _wdIsConvergenceNode(li, world) {
 
 /**
  * Returns true if the given level is accessible to the player.
- * Level 0 requires the tutorial to be done; all others require the previous level.
- * Any level inside the Nexus World additionally requires the whole
- * campaign (worlds 1..13) to be finished first.
+ * Unlock rules: every WORLD is open once the tutorial is done, but the LEVELS
+ * inside a world follow a linear progression path (level N+1 needs level N
+ * done; level 0 needs the tutorial). The Nexus World additionally requires
+ * the whole campaign (worlds 1..13) to be finished first.
  */
 function _wdIsLevelUnlocked(li, gi, wi) {
     if (typeof wi === 'number' && typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
@@ -1537,7 +1560,9 @@ function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
     const badge = (typeof t === 'function' ? t('scr_convergence_badge') : null);
     tip.innerHTML = `<div class="wd-tip-title">${(badge && badge.indexOf('scr_') !== 0 ? badge + ' · ' : '🌿 ')}${name}</div>`
         + `<div class="wd-tip-status">${status}</div>${detail}${reward}`;
-    tip.style.display = 'block';
+    // The tooltip is opacity-driven via .mv-tooltip.show - use the class,
+    // NOT an inline display style, or the tip stays invisible (opacity 0).
+    tip.classList.add('show');
     _wdMoveTooltip(e);
 }
 

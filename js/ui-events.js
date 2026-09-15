@@ -534,6 +534,11 @@ document.addEventListener('DOMContentLoaded', () => {
         unpauseGame();
         cleanupActiveGameSystems();
         stopTimer();
+        // ALWAYS tear down a running encounter (campaign monster levels too -
+        // they don't take the forfeit branch above but must not keep ticking,
+        // attacking, or re-rendering the player sprite after we leave).
+        if (typeof _egStopEncounter === 'function') _egStopEncounter();
+        if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
         goToLevelSelect();
@@ -571,6 +576,9 @@ document.addEventListener('DOMContentLoaded', () => {
         unpauseGame();
         cleanupActiveGameSystems();
         stopTimer();
+        // ALWAYS tear down a running encounter (see onGoToLevelsFromGame).
+        if (typeof _egStopEncounter === 'function') _egStopEncounter();
+        if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
         showEndgameNexus();

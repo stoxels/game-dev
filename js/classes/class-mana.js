@@ -19,7 +19,7 @@ const MANA_REGEN_INTERVAL_MS = 5000; // Matches "Mana regenerated every 5 second
 
 // Flat regen applied on top of gear manaRegen so the pool always refills
 // outside endgame (story levels have no equipment). Tunable in one place.
-const MANA_BASE_REGEN = 5;
+const MANA_BASE_REGEN = 4;
 
 // Scales flat ability mana costs up as the pool grows from gear so late-game
 // costs stay meaningful. Below the baseline the def's manaCost is charged as
@@ -28,6 +28,12 @@ const MANA_BASE_REGEN = 5;
 // Baseline is the day-one effective pool: 60 base mana + 20 Int x 2.
 const MANA_COST_SCALE_BASELINE = 100;
 const MANA_COST_SCALE_DIVISOR = 340;
+
+// Global mana-cost multiplier - the balance lever for "spells cost too
+// little". Applied inside _scaleAbilityManaCost, so EVERY cost source
+// (class abilities, universal spells, Heartbloom, tutorial Fireball)
+// scales identically and tooltips always match what the cast charges.
+const MANA_COST_GLOBAL_MULT = 1.5;
 
 // Lazily created handle for the passive regen tick (null until first use).
 let _manaRegenInterval = null;
@@ -41,7 +47,7 @@ function _scaleAbilityManaCost(cost) {
     if (!cost || cost <= 0) return 0;
     const maxMana = _getPlayerMaxMana();
     const mult = 1 + Math.max(0, maxMana - MANA_COST_SCALE_BASELINE) / MANA_COST_SCALE_DIVISOR;
-    let scaled = cost * mult;
+    let scaled = cost * mult * MANA_COST_GLOBAL_MULT;
     if (typeof _egGetActiveMapModValue === 'function') {
         const costPct = _egGetActiveMapModValue('map_mana_costs');
         if (costPct > 0) scaled *= (1 + costPct / 100);
