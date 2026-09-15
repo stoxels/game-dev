@@ -7,7 +7,8 @@
 // translations.js. Keep en/de key sets in sync: a key missing (or
 // misspelled) in one locale will silently fall back to nothing at runtime.
 
-const T = {
+// Phase 3 step 2: REAL ES MODULE - pure data, zero imports.
+export const T = {
     en: {
         // Title screen
         tagline: 'STOCHASTICS & STATISTICS NONOGRAMS',
@@ -3985,6 +3986,7 @@ Object.assign(T.de, {
     eg_boss_kill_toast: '🏆 {name} besiegt!',
     eg_char_label: 'CHARAKTER',
     eg_cannot_equip: '⚠️ {name} kann nicht angelegt werden – es fehlt {list}',
+    eg_cannot_equip_chainbreak: '⚠️ {name} kann nicht angelegt werden – ein Ersatz von {equipped} würde die Anforderungen anderer ausgerüsteter Items brechen ({list})',
     eg_cannot_equip_two_handed: '⚠️ {name} ist zweihändig – die Zweithand wurde automatisch befreit, falls möglich, sonst befreie sie zuerst',
     eg_cannot_equip_offhand: '⚠️ {name} passt nicht in die Zweithand – nur einhändige Waffen oder Schilde, und nie mit Zweihandwaffe',
     eg_cannot_equip_main_shield: '⚠️ {name} ist ein Schild – gehört nur in die Zweithand',
@@ -5757,6 +5759,12 @@ Object.assign(T.de, {
     qz_gate_passed_toast: 'Wahrscheinlichkeitstor bestanden!',
     qz_tutor_failed: '🎓 Tutor konnte die Frage nicht lösen…',
     qz_tutor_solved: '🎓 Tutor hat die Frage gelöst!',
+
+    // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
+    qz_super_tutor: '🎓 SUPER TUTOR',
+    mod_super_tutor: 'SUPER TUTOR',
+    mod_super_tutor_tag: 'BETA-FUNKTION',
+    mod_desc_super_tutor: '100 % richtige Antworten; kein Tutor-Gegenstand erforderlich. Temporäre Beta-Funktion.',
     scr_ach_category_overview: 'KATEGORIE-ÜBERSICHT',
     scr_ach_total_milestones: 'MEILENSTEINE GESAMT',
     scr_ach_pct_complete: 'abgeschlossen',

@@ -1,4 +1,5 @@
-﻿const ACHIEVEMENT_DEFS = [
+﻿// Phase 3 step 2: REAL ES MODULE - pure data, zero imports.
+export const ACHIEVEMENT_DEFS = [
 
     //------------------------------------------------------------------------
     //--------------------COMPLETION------------------------------------------

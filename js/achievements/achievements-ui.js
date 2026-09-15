@@ -1,4 +1,11 @@
-﻿//------------------------------------------------------------------------
+﻿// Phase 3 step 2: REAL ES MODULE (tools/module-manifest.json). Imports the
+// achievement data + core state cross-module; core bindings (_tipAttr,
+// showModal) and the audio module go through globalThis. EXTERNAL consumers
+// call the exported UI entry points bare (entry-scope import bindings).
+import { ACHIEVEMENT_DEFS } from './achievements-data.js';
+import { ACH_STATE, _doResetAchievements } from './achievements.js';
+import { t, LANG } from '../translation/translations.js';
+//------------------------------------------------------------------------
 //----------------------------CONSTANTS-----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -53,7 +60,7 @@ let _achView = 'overview';
 let _achCurrentCategory = null;
 
 // Toast queue state
-let _achToastQueue = [];   // pending toasts waiting to be shown one at a time
+export let _achToastQueue = [];   // pending toasts waiting to be shown one at a time
 let _achToastBusy = false; // true while a toast is currently visible; prevents overlap
 
 
@@ -109,7 +116,7 @@ function _getHighestUnlockedTierIndex(def) {
 
 // _drainAchToastQueue - shows the next queued toast if none is currently visible.
 //   Called after every toast is dismissed and after a new entry is pushed.
-function _drainAchToastQueue() {
+export function _drainAchToastQueue() {
     if (_achToastBusy || !_achToastQueue.length) return;
     const { def, tier } = _achToastQueue.shift();
     _showAchToast(def, tier);
@@ -167,12 +174,12 @@ function _showAchToast(def, tier) {
     requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => _dismissAchToast(el), 5000);
 
-    Audio_Manager.playSFX('achievement');
+    globalThis.Audio_Manager.playSFX('achievement'); // audio module (Phase 3 step 1)
 }
 
 // showAchievementToast - public entry point.
 //   Enqueues a toast and starts draining the queue if nothing is currently shown.
-function showAchievementToast(def, tier) {
+export function showAchievementToast(def, tier) {
     _achToastQueue.push({ def, tier });
     setTimeout(_drainAchToastQueue, 0);
 }
@@ -259,7 +266,8 @@ function _buildTierDotsHtml(def, lang) {
         const unlocked = _isTierUnlocked(def, ti);
         const tierLabel = _pickLang(tier, 'label', lang);
         const stateClass = unlocked ? 'earned' : 'locked';
-        return `<span class="ach-tier-dot ${stateClass}" data-tip="${_tipAttr(tierLabel)}" aria-label="${_tipAttr(tierLabel)}">●</span>`;
+        const _tip = globalThis._tipAttr; // core binding (tooltips-hud.js)
+        return `<span class="ach-tier-dot ${stateClass}" data-tip="${_tip(tierLabel)}" aria-label="${_tip(tierLabel)}">●</span>`;
     }).join('');
 }
 
@@ -385,7 +393,7 @@ function _buildCategoryHtml(cat, defs, lang) {
 //   (default) or the achievement list of one specific category.
 //   Calculates all progress values, assembles the header and every category
 //   section in order, then injects the result into #ach-body.
-function buildAchievementsScreen() {
+export function buildAchievementsScreen() {
     const body = document.getElementById('ach-body');
     if (!body) return;
 
@@ -429,16 +437,16 @@ function _setAchTopbarTitle(catKey, lang) {
 // showAchievements - opens the Achievements modal.
 //   Resets to the category grid, then rebuilds all cards and progress bars
 //   so they always reflect the latest stats.
-function showAchievements() {
+export function showAchievements() {
     _achView = 'overview';
     _achCurrentCategory = null;
     buildAchievementsScreen();
-    showModal('achievements-modal');
+    globalThis.showModal('achievements-modal'); // core binding (screens.js)
 }
 
 // openAchCategory - shows all achievements of one category inside the
 //   achievements screen (the per-category detail view).
-function openAchCategory(catKey) {
+export function openAchCategory(catKey) {
     _achView = 'category';
     _achCurrentCategory = catKey;
     buildAchievementsScreen();
@@ -446,7 +454,7 @@ function openAchCategory(catKey) {
 }
 
 // backToAchCategories - returns from a category detail view to the overview.
-function backToAchCategories() {
+export function backToAchCategories() {
     _achView = 'overview';
     _achCurrentCategory = null;
     buildAchievementsScreen();
@@ -604,12 +612,12 @@ function _buildCategoryDetailHtml(catKey, lang) {
 //------------------------------------------------------------------------
 
 // showAchResetModal - opens the achievement-reset confirmation modal.
-function showAchResetModal() {
+export function showAchResetModal() {
     document.getElementById('ach-reset-modal').style.display = 'flex';
 }
 
 // hideAchResetModal - closes the achievement-reset confirmation modal.
-function hideAchResetModal() {
+export function hideAchResetModal() {
     document.getElementById('ach-reset-modal').style.display = 'none';
 }
 

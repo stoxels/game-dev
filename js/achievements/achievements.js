@@ -1,17 +1,26 @@
-﻿//------------------------------------------------------------------------
+﻿// Phase 3 step 2: REAL ES MODULE (tools/module-manifest.json). Exports the
+// achievement API; ACH_STATE reassignment-on-reset stays a plain module
+// assignment - ESM live bindings propagate it to importers. Core names are
+// read through the globalThis bridge: cur, updateQuestStats, STATE, ALL,
+// WORLDS, WORLD_START_GI, showToast (STATE/cur are LIVE accessors in the
+// generated entry - they are reassigned at runtime by save-load/reset).
+import { ACHIEVEMENT_DEFS } from './achievements-data.js';
+import { _achToastQueue, _drainAchToastQueue, showAchResetModal, buildAchievementsScreen, backToAchCategories } from './achievements-ui.js';
+import { t } from '../translation/translations.js';
+//------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Persistence key kept separate from the main save so achievement progress
 // survives new playthroughs and save-file resets.
-const ACH_SAVE_KEY = 'stoxels_ach';
+export const ACH_SAVE_KEY = 'stoxels_ach';
 
 // ACH_STATE - live achievement state; all other functions read and write
 //   directly through this reference. Assigned at the bottom of the
 //   PERSISTENCE section below (needs initAchState() to be defined first),
 //   but declared here alongside the rest of the module state.
-let ACH_STATE;
+export let ACH_STATE;
 
 
 
@@ -22,7 +31,7 @@ let ACH_STATE;
 
 // loadAchState - reads and parses the raw achievement JSON from localStorage.
 //   Returns null on any failure (missing key, malformed JSON, etc.).
-function loadAchState() {
+export function loadAchState() {
     try {
         const raw = localStorage.getItem(ACH_SAVE_KEY);
         if (!raw) return null;
@@ -31,13 +40,14 @@ function loadAchState() {
 }
 
 // saveAchState - serialises the current ACH_STATE object back into localStorage.
-function saveAchState() {
+export function saveAchState() {
     localStorage.setItem(ACH_SAVE_KEY, JSON.stringify(ACH_STATE));
 }
 
 // migrateAchState - ensures a loaded state object always has the expected shape.
 //   Adds any missing top-level keys so the rest of the code can assume they exist.
-function migrateAchState(s) {
+export function migrateAchState(s) {
+    if (!s) s = {}; // tolerate null/undefined (corrupt or absent save)
     if (!s.stats) s.stats = {};
     if (!s.unlocked) s.unlocked = [];
     return s;
@@ -45,7 +55,7 @@ function migrateAchState(s) {
 
 // initAchState - loads persisted progress (migrating if needed) or returns a
 //   fresh empty state when no save exists yet.
-function initAchState() {
+export function initAchState() {
     const saved = loadAchState();
     return saved ? migrateAchState(saved) : { stats: {}, unlocked: [] };
 }
@@ -63,9 +73,10 @@ ACH_STATE = initAchState();
 // trackAchStat - increments a stat counter by amount (default 1), then
 //   persists and runs the unlock check.
 //   This is the primary entry point other modules should call.
-function trackAchStat(stat, amount = 1) {
+export function trackAchStat(stat, amount = 1) {
     // Tutorial-quest levels never touch achievement progress.
-    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
+    const _cur = globalThis.cur; // LIVE accessor in entry (reassigned at runtime)
+    if (typeof _cur !== 'undefined' && _cur && _cur.isTutorialQuest) return;
     if (!ACH_STATE.stats[stat]) ACH_STATE.stats[stat] = 0;
     ACH_STATE.stats[stat] += amount;
     saveAchState();
@@ -77,7 +88,7 @@ function trackAchStat(stat, amount = 1) {
 //   The write is monotonic (never lowers an existing value): several callers
 //   recompute stats from the currently active save slot / tree allocation,
 //   but achievement progress is global and must survive slot switches.
-function setAchStat(stat, value) {
+export function setAchStat(stat, value) {
     const prev = ACH_STATE.stats[stat] || 0;
     ACH_STATE.stats[stat] = Math.max(prev, value);
     if (ACH_STATE.stats[stat] !== prev) {
@@ -106,7 +117,7 @@ function _tryUnlockTier(def, tier, tierIndex, currentValue) {
     ACH_STATE.unlocked.push(unlockKey);
     _achToastQueue.push({ def, tier });
 
-    if (typeof updateQuestStats === 'function') updateQuestStats('achievementUnlocked', {});
+    if (typeof globalThis.updateQuestStats === 'function') globalThis.updateQuestStats('achievementUnlocked', {});
 
     return true;
 }
@@ -129,7 +140,7 @@ function checkSingleAchievementDef(def) {
 // checkAchievements - scans every definition and unlocks anything newly met.
 //   Saves state and schedules the toast drain only when something changed.
 //   The drain is delayed slightly so toasts don't fire mid-action.
-function checkAchievements() {
+export function checkAchievements() {
     const anyNew = ACHIEVEMENT_DEFS.reduce((found, def) => {
         return checkSingleAchievementDef(def) || found;
     }, false);
@@ -263,10 +274,11 @@ function trackGridStats(ctx) {
 //   completed at least one level in, based on STATE.done.
 function countUniqueWorldsPlayed() {
     const worldsSeen = new Set();
-    if (typeof ALL !== 'undefined') {
-        const doneLevels = (typeof STATE !== 'undefined') ? STATE.done : [];
+    if (typeof globalThis.ALL !== 'undefined') {
+        const _STATE = globalThis.STATE; // LIVE accessor
+        const doneLevels = _STATE ? _STATE.done : [];
         doneLevels.forEach(gi => {
-            if (ALL[gi]) worldsSeen.add(ALL[gi].world);
+            if (globalThis.ALL[gi]) worldsSeen.add(globalThis.ALL[gi].world);
         });
     }
     return worldsSeen.size;
@@ -287,7 +299,7 @@ function countUniqueWorldsPlayed() {
 //     absorbedThisLevel, world, gi, cellsFilled, totalCells, rows, cols,
 //     elapsed, timerSecs, pts, prevBest, mult, scoreEarned,
 //     tilesMarked, isFirstClear, isBouncebackWin, hadPenaltyClutch }
-function onLevelCompleteAch(ctx) {
+export function onLevelCompleteAch(ctx) {
     trackBaseCompletionStats(ctx);
     trackAccuracyStats(ctx);
     trackDifficultyStats(ctx);
@@ -309,23 +321,24 @@ function onLevelCompleteAch(ctx) {
 // getLevelIndicesForWorld - returns the array of global level indices (gi)
 //   belonging to the given world index.
 function getLevelIndicesForWorld(worldIndex) {
-    const start = WORLD_START_GI[worldIndex];
-    return Array.from({ length: WORLDS[worldIndex].data.length }, (_, i) => start + i);
+    const start = globalThis.WORLD_START_GI[worldIndex];
+    return Array.from({ length: globalThis.WORLDS[worldIndex].data.length }, (_, i) => start + i);
 }
 
 // areAllLevelsCompleted - returns true if every gi in levelIndices appears
 //   in STATE.done.
 function areAllLevelsCompleted(levelIndices) {
-    return typeof STATE !== 'undefined' &&
-        levelIndices.every(gi => STATE.done.includes(gi));
+    const _s = globalThis.STATE; // LIVE accessor
+    return !!_s && levelIndices.every(gi => _s.done.includes(gi));
 }
 
 // areAllLevelsFlawless - returns true if the sum of recorded mistakes across
 //   every level in levelIndices is zero. Returns false if mistake data is absent.
 function areAllLevelsFlawless(levelIndices) {
-    if (typeof STATE.levelMistakes === 'undefined') return false;
+    const _s = globalThis.STATE; // LIVE accessor
+    if (!_s || typeof _s.levelMistakes === 'undefined') return false;
     const totalMistakes = levelIndices.reduce(
-        (sum, gi) => sum + (STATE.levelMistakes[gi] ?? 999), 0
+        (sum, gi) => sum + (_s.levelMistakes[gi] ?? 999), 0
     );
     return totalMistakes === 0;
 }
@@ -333,13 +346,14 @@ function areAllLevelsFlawless(levelIndices) {
 // areAllBonusesClaimed - returns true if every gi in levelIndices appears
 //   in STATE.bonusDone.
 function areAllBonusesClaimed(levelIndices) {
-    return levelIndices.every(gi => STATE.bonusDone.includes(gi));
+    const _s = globalThis.STATE; // LIVE accessor
+    return !!_s && levelIndices.every(gi => _s.bonusDone.includes(gi));
 }
 
 // countFullyCompletedWorlds - returns how many non-empty worlds have had
 //   every level completed.
 function countFullyCompletedWorlds() {
-    return WORLDS.filter((w, wi) => {
+    return globalThis.WORLDS.filter((w, wi) => {
         if (!w.data.length) return false;
         return areAllLevelsCompleted(getLevelIndicesForWorld(wi));
     }).length;
@@ -348,7 +362,7 @@ function countFullyCompletedWorlds() {
 // countFlawlessWorlds - returns how many non-empty worlds have been fully
 //   completed without a single mistake across any level.
 function countFlawlessWorlds() {
-    return WORLDS.filter((w, wi) => {
+    return globalThis.WORLDS.filter((w, wi) => {
         if (!w.data.length) return false;
         const indices = getLevelIndicesForWorld(wi);
         return areAllLevelsCompleted(indices) && areAllLevelsFlawless(indices);
@@ -358,7 +372,7 @@ function countFlawlessWorlds() {
 // countWorldsWithAllBonusesClaimed - returns how many fully-completed worlds
 //   also have every bonus objective claimed.
 function countWorldsWithAllBonusesClaimed() {
-    return WORLDS.filter((w, wi) => {
+    return globalThis.WORLDS.filter((w, wi) => {
         if (!w.data.length) return false;
         const indices = getLevelIndicesForWorld(wi);
         return areAllLevelsCompleted(indices) && areAllBonusesClaimed(indices);
@@ -376,10 +390,10 @@ function countWorldsWithAllBonusesClaimed() {
 //   record all world-level completion milestones.
 //   Sets a per-world flag for each completed world, then updates the
 //   cross-world aggregate counts (flawless, all-bonus).
-function checkWorldCompleteAch() {
-    if (typeof WORLDS === 'undefined' || typeof WORLD_START_GI === 'undefined') return;
+export function checkWorldCompleteAch() {
+    if (typeof globalThis.WORLDS === 'undefined' || typeof globalThis.WORLD_START_GI === 'undefined') return;
 
-    WORLDS.forEach((w, wi) => {
+    globalThis.WORLDS.forEach((w, wi) => {
         if (!w.data.length) return;
         const levelIndices = getLevelIndicesForWorld(wi);
         if (areAllLevelsCompleted(levelIndices)) {
@@ -401,14 +415,14 @@ function checkWorldCompleteAch() {
 
 // showResetAchievementsModal - opens the confirmation modal before wiping data.
 //   The actual reset only fires if the player confirms inside the modal.
-function showResetAchievementsModal() {
+export function showResetAchievementsModal() {
     showAchResetModal();
 }
 
 // _doResetAchievements - permanently wipes all achievement progress from
 //   localStorage and memory, then refreshes the UI to show the cleared state.
 //   Called by the confirm button inside the reset modal.
-function _doResetAchievements() {
+export function _doResetAchievements() {
     localStorage.removeItem(ACH_SAVE_KEY);
     ACH_STATE = { stats: {}, unlocked: [] };
     saveAchState();
@@ -416,5 +430,5 @@ function _doResetAchievements() {
     // from inside a category detail view.
     if (typeof backToAchCategories === 'function') backToAchCategories();
     else buildAchievementsScreen();
-    if (typeof showToast === 'function') showToast(t('qa_achievements_cleared'));
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(t('qa_achievements_cleared'));
 }
