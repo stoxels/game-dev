@@ -12,7 +12,7 @@ import { _egApplyPlayerHitFeedback, _egPlayerTakeDamage, _egRenderPanel, _egSpaw
 import { _egHzPlayerHitbox, _egHzPlayerRect, _egHzPlayerSpriteRect } from '../endgame-hazards.js';
 import { EG_MAP_TIER_MONSTER_LEVELS, EG_MAX_MAP_TIER, _egRollMapTier } from '../endgame-maps.js';
 import { EG_MAX_CONCURRENT_MONSTERS } from '../endgame-monsters.js';
-import { _egActiveBlasts, _egBossCorrupted, _egBossFrozen, _egIsActive, _egRecentFills } from '../endgame-state.js';
+import { _egActiveBlasts, _egBossCorrupted, _egBossFrozen, _egCellInBounds, _egIsActive, _egRecentFills } from '../endgame-state.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED BOSS ABILITIES--------------------------------
@@ -800,7 +800,8 @@ export function _egPriorBombPool() {
     if (!globalThis.cur || !globalThis.cur.grid) return [];
     const sol = globalThis.cur.grid;
     return [..._egRecentFills].reverse().filter(([r, c]) =>
-        globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
+        _egCellInBounds(r, c)
+        && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
     );
 }
 
@@ -2791,7 +2792,8 @@ export function _egResolveFateMark(key, filled) {
     if (!globalThis.cur || !globalThis.cur.grid || typeof _egUnfillCell !== 'function') return;
     const sol = globalThis.cur.grid;
     const pool = [..._egRecentFills].reverse().filter(([r, c]) =>
-        globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
+        _egCellInBounds(r, c)
+        && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
     );
     pool.slice(0, 2).forEach(([r, c]) => _egUnfillCell(r, c));
 
@@ -3294,7 +3296,8 @@ export function _egMechSoulTithe(monster, phase) {
             if (globalThis.cur && globalThis.cur.grid && typeof _egUnfillCell === 'function') {
                 const sol = globalThis.cur.grid;
                 const pool = [..._egRecentFills].reverse().filter(([r, c]) =>
-                    globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
+                    _egCellInBounds(r, c)
+                    && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
                 );
                 pool.slice(0, 2).forEach(([r, c]) => _egUnfillCell(r, c));
             }

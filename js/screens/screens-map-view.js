@@ -4,6 +4,9 @@ import { LANG, t } from '../translation/translations.js';
 import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextCodeStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
 import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
 import { showSetup, switchScreen } from './screens.js';
+import { showQuestLog } from '../quests/quests-ui.js';
+import { showPassiveTree } from '../passive-tree/passive-tree.js';
+
 /*
     ========================================================================
     SCREENS-MAP-VIEW.JS
@@ -1834,12 +1837,12 @@ export function _wireTopBarButtons(p = 'mv') {
             ? () => { if (typeof wdGoBackToMap === 'function') wdGoBackToMap(); else showMapView(); }
             : () => showSetup();
     }
-    if (questBtn) questBtn.onclick = () => globalThis.showQuestLog();
+    if (questBtn) questBtn.onclick = () => showQuestLog();
     // Spell book from the overworld: openSpellbook() skips its pause dance on
     // screens with no live level (see skill-spellbook.js) and the book itself
     // re-renders the hotbar as a drag target while it is open.
     if (spellbookBtn) spellbookBtn.onclick = () => { if (typeof globalThis.openSpellbook === 'function') globalThis.openSpellbook(); };
-    if (treeBtn) treeBtn.onclick = () => globalThis.showPassiveTree();
+    if (treeBtn) treeBtn.onclick = () => showPassiveTree();
     if (changeBtn) changeBtn.onclick = () => { if (typeof globalThis.showClassChange === 'function') globalThis.showClassChange(); };
 }
 

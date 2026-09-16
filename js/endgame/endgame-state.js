@@ -108,6 +108,25 @@ export const _egActiveBlasts = new Map(); // blast id → { timers:[], poll:null
 // Circular buffer of [row, col] for recently correctly-filled cells.
 export let _egRecentFills = [];
 
+// True when [r, c] refers to a real cell of the CURRENT puzzle grid.
+// Recent-fill coordinates can outlive the grid they were recorded on (the
+// buffer is cleared on encounter start, but boss timers/P3 cascades can
+// still straddle a teardown), so every pool consumer MUST re-validate
+// against the live grids before indexing - otherwise a coordinate from a
+// larger previous level indexes userGrid[r] as undefined and throws
+// "can't access property ..., globalThis.userGrid[r] is undefined".
+// userGrid/revealedGrid/cur.grid are always rebuilt together (start-level.js)
+// with identical dimensions, so one row/col check covers all three.
+export function _egCellInBounds(r, c) {
+    const ug = globalThis.userGrid;
+    if (!Array.isArray(ug) || !Array.isArray(ug[r])) return false;
+    const rg = globalThis.revealedGrid;
+    if (!Array.isArray(rg) || !Array.isArray(rg[r])) return false;
+    const sol = globalThis.cur && globalThis.cur.grid;
+    if (!Array.isArray(sol) || !Array.isArray(sol[r])) return false;
+    return c >= 0 && c < ug[r].length;
+}
+
 // ── Drag-paint charged shot state ────────────────────────────────────────────
 // While the player drag-paints, every correct fill stacks its rolled damage
 // into a single charging projectile. It is released as one combined-damage

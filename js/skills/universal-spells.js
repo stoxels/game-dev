@@ -7,6 +7,8 @@ import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, 
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
 import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspBlinkFX, _uspFireThemedProjectile, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph } from './universal-spell-fx.js';
+import { updateQuestStats } from '../quests/quests-stats.js';
+
 // universal-spells.js
 //------------------------------------------------------------------------
 //--------------------UNIVERSAL SPELL ARSENAL-----------------------------
@@ -2278,7 +2280,7 @@ export function castUniversalSpell(spellId) {
     }
     _uspPlaySfx(spell);
     try {
-        if (typeof globalThis.updateQuestStats === 'function') globalThis.updateQuestStats('classAbilityUsed', {});
+        if (typeof globalThis.updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
         if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter(spellId);
     } catch (e) { /* non-combat progress is best-effort */ }
 

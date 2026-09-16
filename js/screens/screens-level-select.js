@@ -1,6 +1,8 @@
 ﻿import { LANG, t } from '../translation/translations.js';
 import { initMapViewToggle, showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
+import { buildQuestLogButton } from '../quests/quests-logic.js';
+
 //------------------------------------------------------------------------
 //--------------------CONSTANTS-------------------------------------------
 //------------------------------------------------------------------------
@@ -268,7 +270,7 @@ export function renderLevelSelect() {
     renderLSClassStatus();
     renderLSPassiveTreeButton();
     renderLSWorlds();
-    globalThis.buildQuestLogButton();
+    buildQuestLogButton();
     globalThis.renderLSCharacterAvatar();
 }
 

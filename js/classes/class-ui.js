@@ -8,6 +8,8 @@ import { CLASS_DEFS, CLASS_LIST, CLASS_SPELL_ICONS } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
 import { CHARM_BASE_ICON, charmKeyFor, ensureCharmState, getCharmByKey, promoteCharmSlotToRank } from '../skills/skill-charms.js';
 import { getSkillDef, getSkillName } from '../skills/skill-registry.js';
+import { updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS-----------------------------------
 //------------------------------------------------------------------------
@@ -455,7 +457,7 @@ export function confirmClassChange(cid) {
     Audio_Manager.playSFX('classSelected');
     globalThis.showToast(`🔄 ${_clsGetLocalizedName(def)} ${t('cls_selected_toast')}`);
     if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
-    globalThis.updateQuestStats('classChosen', {});
+    updateQuestStats('classChosen', {});
 
     closeClassOverlay();
     buildClassHUD();
@@ -677,7 +679,7 @@ export function confirmClassSelection(cid) {
     // the spell book where they pick and drag their new skills onto the bar.
     if (typeof globalThis.showToast === 'function') globalThis.showToast(t('spellbook_after_class_hint'), '#ffd27f');
     if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
-    globalThis.updateQuestStats('classChosen', {});
+    updateQuestStats('classChosen', {});
 
     closeClassOverlay();
     buildClassHUD();
@@ -862,7 +864,7 @@ export function applyClassUpgrade(type) {
 
     Audio_Manager.playSFX('classUpgraded');
     trackAchStat('classUpgradesApplied');
-    globalThis.updateQuestStats('classUpgradeApplied', {});
+    updateQuestStats('classUpgradeApplied', {});
     closeClassOverlay();
     showClassUpgradeToast(type);
     _showCharmGrantToast(charmSkillId, charmRank, hadCharm, promoted);
@@ -999,7 +1001,7 @@ export function confirmAscendencySelection(aid) {
     Audio_Manager.playSFX('classSelected');
     globalThis.showToast(`✨ ${ascName} ${chosenLabel}`);
     if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
-    globalThis.updateQuestStats('ascendencyChosen', {});
+    updateQuestStats('ascendencyChosen', {});
     trackAchStat('ascendencyChosen');
     closeClassOverlay();
     buildClassHUD();
@@ -1149,7 +1151,7 @@ export function applyAscendencyUpgrade(type) {
     Audio_Manager.playSFX('classUpgraded');
     globalThis.showToast(`✨ ${_clsGetLocalizedName(skillDef)} → ${t('cls_level_word')} ${newLv}!`);
     _showCharmGrantToast(charmSkillId, charmRank, hadCharm, promoted);
-    globalThis.updateQuestStats('ascendencyUpgradeApplied', {});
+    updateQuestStats('ascendencyUpgradeApplied', {});
     trackAchStat('ascendencyUpgradesApplied');
     closeClassOverlay();
     buildClassHUD();

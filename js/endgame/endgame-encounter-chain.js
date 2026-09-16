@@ -9,7 +9,7 @@ import { _applyProbabilistPassive, _getPassiveEffect } from '../classes/class-ab
 import { PassiveTracker } from '../passive-tree/passive-tracker.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';
 import { _charmReplaceCarriedDrops, _egCharmDrops } from '../skills/skill-charms.js';
-import { pauseTimer, resumeTimer, stopTimer } from '../timer.js';
+import { _egClearCenterGridBanners, pauseTimer, resumeTimer, stopTimer } from '../timer.js';
 import { t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
 import { _egAtlasOnMapCompleted, egAtlasMakeRng, egAtlasNodeName } from './endgame-atlas.js';
@@ -1440,7 +1440,7 @@ export function _egUpdateObjectivesHUD() {
 // Shows a big green "MAP CLEARED" text centered over the puzzle grid for
 // 3 seconds. Purely cosmetic - pointer-events are disabled via CSS.
 export function _egShowMapClearedBanner() {
-    if (typeof _egClearCenterGridBanners === 'function') globalThis._egClearCenterGridBanners('eg-map-cleared-banner');
+    if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners('eg-map-cleared-banner');
     const old = document.getElementById('eg-map-cleared-banner');
     if (old) old.remove();
 
@@ -1467,7 +1467,7 @@ export function _egShowMapClearedBanner() {
 // becomes available (all non-boss objectives done). Mirrors the MAP
 // CLEARED banner in placement/animation but uses boss-red styling.
 export function _egShowBossArenaAvailableBanner() {
-    if (typeof _egClearCenterGridBanners === 'function') globalThis._egClearCenterGridBanners('eg-boss-arena-available-banner');
+    if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners('eg-boss-arena-available-banner');
     const old = document.getElementById('eg-boss-arena-available-banner');
     if (old) old.remove();
 
@@ -1596,7 +1596,7 @@ export function _egChainCleanup() {
 
     // Remove banners if still on screen (all center-grid types - a stale
     // warning must never survive into the next map)
-    if (typeof _egClearCenterGridBanners === 'function') globalThis._egClearCenterGridBanners();
+    if (typeof _egClearCenterGridBanners === 'function') _egClearCenterGridBanners();
     const banner = document.getElementById('eg-map-cleared-banner');
     if (banner) banner.remove();
     const bossBanner = document.getElementById('eg-boss-arena-available-banner');

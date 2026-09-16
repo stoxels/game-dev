@@ -9,6 +9,8 @@ import { CLASS_DEFS } from './class-defs.js';
 import { buildClassHUD, updateMomentumBar } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //-----------------STATISTICIAN-------------------------------------------
 //------------------------------------------------------------------------
@@ -879,7 +881,7 @@ export function _diagStrikeUnmarkExcess(markedIds, cap, affected) {
         if (globalThis.userGrid[r][c] === 2) {
             globalThis.userGrid[r][c] = 0;
             renderCell(r, c);
-            globalThis.questStat_classMarkUsed(1);
+            questStat_classMarkUsed(1);
         }
         const idx = affected.indexOf(id);
         if (idx !== -1) affected.splice(idx, 1);
@@ -976,8 +978,8 @@ export function _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealC
 
     globalThis.showToast(msg);
 
-    globalThis.questStat_classRevealUsed(bonusRevealed);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(bonusRevealed);
+    updateQuestStats('classAbilityUsedThisLevel', {});
 
     globalThis.checkWin();
 }
@@ -1070,8 +1072,8 @@ export function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
         _diagStrikeBonusRepeat(diagonalCount, finalRevealCap, finalMarkCap, rows, cols, sol);
     }
 
-    globalThis.questStat_classRevealUsed(diagRevealed);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(diagRevealed);
+    updateQuestStats('classAbilityUsedThisLevel', {});
 
     globalThis.checkWin();
 }
@@ -1282,7 +1284,7 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
 
     trackAchStat('timeAdded', bonus);
     trackAchStat('momentumTriggered');
-    globalThis.updateQuestStats('momentumTriggered', {});
+    updateQuestStats('momentumTriggered', {});
 
     window._momentumThisLevel = (window._momentumThisLevel || 0) + 1;
     if (window._momentumThisLevel === 10) trackAchStat('statistician3MomentumOneLevel');

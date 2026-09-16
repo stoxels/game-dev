@@ -1,49 +1,56 @@
 //------------------------------------------------------------------------
-// PHASE 3 (endgame step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
+// PHASE 4 split (2026-09-16): extracted into a focused module. The original
+// path is now a facade that re-exports this module, so existing import sites
+// are unaffected. See MIGRATION.md "splitting giants".
 //------------------------------------------------------------------------
-import { ACH_STATE, setAchStat } from '../achievements/achievements.js';
-import { Audio_Manager } from '../audio/audio.js';
+
+// ENDGAME HUB SCREEN - facade module. Handles the Endgame Hub UI:
+//   - Character panel with paperdoll equipment slots and stats
+//   - Currency strip (Runes & Orbs row) + full-width equipment stash
+//   - Floating item tooltip on mouseover (+ Alt-hold compare tooltip)
+//   - Drag-and-drop is handled in endgame-hub-drag-and-drop.js
+//   - The Probability Gate (map device + map stash) - see endgame-gate.js
+//
+// Phase 4 split: stash/currency/map-stash/mass-sell/topbar/load/modal
+// now live in their own modules and are re-exported below unchanged.
+// This file keeps screen assembly, render orchestration, overlay control
+// and the stats panel.
+
+// Phase 4 split: write-through globalThis accessors. The facade and sibling
+// split modules rebind these lets through globalThis.<name> assignment
+// (imported module bindings are read-only views) - the established
+// step-9/step-10 pattern.
+try { Object.defineProperty(globalThis, '_egTooltipItem', { get() { return _egTooltipItem; }, set(v) { _egTooltipItem = v; }, configurable: true }); } catch (e) {}
+
 import { buildClassHUD } from '../classes/class-hud.js';
 import { _getPlayerMaxMana, updateClassHUDManaBar } from '../classes/class-mana.js';
 import { switchScreen } from '../screens/screens.js';
 import { renderSkillHotbar } from '../skills/skill-hotbar.js';
-import { save } from '../state.js';
 import { pauseTimer, resumeTimer } from '../timer.js';
 import { LANG, t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
-import { egAtlasNodeById, egAtlasProgress } from './endgame-atlas.js';
-import { EG_CURRENCY_DEFS, _egShowTooltip } from './endgame-currency.js';
+import { _egShowTooltip } from './endgame-currency.js';
 import { _egOnPause, _egOnResume } from './endgame-encounter-tick.js';
 import { _egGetEncounterBaseLevel, _egGetTarget, _egRenderPanel } from './endgame-encounter.js';
-import { EG_ESSENCE_COLS, EG_ESSENCE_DEFS, EG_ESSENCE_ROWS, _egBuildEssenceTabHTML, _egEssenceDefForId, _egEssenceIdForSlot, _egEssenceSlotForId, _egRenderEssenceStash } from './endgame-essences.js';
-import { _egBuildMapStashGridHTMLForTier, _egRenderMapSlot, _egRenderMapStash, _egRenderMapStashForTier } from './endgame-gate.js';
-import { egGetGold } from './endgame-gold.js';
+import { _egBuildEssenceTabHTML, _egRenderEssenceStash } from './endgame-essences.js';
+import { _egRenderMapSlot, _egRenderMapStash } from './endgame-gate.js';
 import { _egFlushRunLootToStash } from './endgame-grid-pickups.js';
-import { _dndPickUp, _egBindDragEvents, _egRenderCurrencyCell } from './endgame-hub-drag-and-drop.js';
+import { _egBindDragEvents, _egRenderCurrencyCell } from './endgame-hub-drag-and-drop.js';
 import { _egBuildTooltipBodyHTML, _egClearTooltip } from './endgame-hub-tooltips.js';
-import { _egAddUniqueToCollection, _egEnsureUniqueStash, _egGetUniqueCount, _egIsUniqueCollected, _egMoveUniqueToInventory, _egUpdateUniqueTabBadge } from './endgame-hub-uniques.js';
-import { _egHealItemImplicits } from './endgame-implicits.js';
+import { _egEnsureUniqueStash, _egGetUniqueCount, _egIsUniqueCollected, _egMoveUniqueToInventory, _egUpdateUniqueTabBadge } from './endgame-hub-uniques.js';
 import { EG_LEVELING_CONFIG, _egGetPlayerLevel, _egRenderLevelHUD } from './endgame-leveling.js';
-import { _egLoadLootFilter } from './endgame-loot-filter.js';
 import { _egMapPlayerLifeMult } from './endgame-map-launch.js';
 import { showEndgameNexus } from './endgame-nexus.js';
 import { EG_PLAYER_STATS, _egBuildGroupedStats, _egCalcAccuracyMissChance, _egCalcArmourReductionPct, _egCalcEvasionDodgeChance, _egComputePlayerStats } from './endgame-player-stats.js';
-import { _egHealWeaponHands, _egIsItemBlocked, _egIsTwoHandedWeapon, _egMigrateIllegalHandsToStash } from './endgame-requirements.js';
-import { EG_SHARD_DEFS, _egRollShardForItem, egAddShard } from './endgame-shards.js';
-import { EG_UNIQUE_ITEMS, _egHealUniqueItem } from './endgame-unique-items.js';
+import { _egIsItemBlocked } from './endgame-requirements.js';
+import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, _egBuildCraftingBenchSlotHTML, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencyStash } from './hub-currency.js';
+import { _egPendingHandMigrationToast, _egShowHandMigrationToast } from './hub-load.js';
+import { _egCancelMassSellConfirm, _egCloseMassSellModal, _egInjectMassSellStyles } from './hub-mass-sell-modal.js';
+import { _egBuildItemChipHTML, _egShowItemLevel } from './hub-mass-sell.js';
+import { EG_INV_COLS, _egEnsureInvRows, _egEquipped, _egGetInvCapacity, _egGetInvRows, _egInventory, _egStashTab } from './hub-stash.js';
+import { _egBuildTopbarHTML, _egUpdateItemLevelToggleButton, _egUpdatePassiveTreeButton } from './hub-topbar.js';
+import { EG_UNIQUE_ITEMS } from './unique-item-data.js';
 
-//------------------------------------------------------------------------
-// Phase 3 step 7: live globalThis accessors for externally-mutated state.
-// (derived from write-site audit by dev/scratch/convert-endgame.mjs)
-//------------------------------------------------------------------------
-try { Object.defineProperty(globalThis, '_egLoadHubState', { get() { return _egLoadHubState; }, set(v) { _egLoadHubState = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, '_egMapSlotItem', { get() { return _egMapSlotItem; }, set(v) { _egMapSlotItem = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, '_egMapStashActiveTier', { get() { return _egMapStashActiveTier; }, set(v) { _egMapStashActiveTier = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, '_egTooltipItem', { get() { return _egTooltipItem; }, set(v) { _egTooltipItem = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, '_egUniqueCollected', { get() { return _egUniqueCollected; }, set(v) { _egUniqueCollected = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, '_egUniqueStash', { get() { return _egUniqueStash; }, set(v) { _egUniqueStash = v; }, configurable: true }); } catch (e) {}
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME HUB SCREEN----------------------------------
@@ -93,395 +100,10 @@ export const EG_EQUIP_SLOTS = [
     { id: 'ranged', icon: '🏹', col: 'bottom' },
 ];
 
-// Main equipment stash dimensions
-export const EG_INV_INITIAL_ROWS = 5;
-export const EG_INV_ROWS = EG_INV_INITIAL_ROWS; // initial/minimum rows; stash grows unlimited beyond this
-export const EG_INV_COLS = 24;
-
-// ── Unique Collection tab state ────────────────────────────────────────
-let _egUniqueStash = {}; // uniqueId -> array of item objects
-let _egUniqueCollected = new Set(); // strings of uniqueIds ever found
-export let _egStashTab = 'inventory'; // 'inventory' | 'uniques'
-
-// ── Unlimited stash helpers (must sit after EG_INV_ROWS/COLS so _egInventory exists) ──
-export function _egGetInvRows() { return _egInventory ? _egInventory.length : EG_INV_INITIAL_ROWS; }
-export function _egGetInvCapacity() { return _egGetInvRows() * EG_INV_COLS; }
-export function _egRebuildInventoryGrid() {
-    const grid = document.getElementById('eg-inv-grid');
-    if (!grid) return;
-    const scrollTop = grid.scrollTop;
-    grid.innerHTML = _egBuildInventoryGridHTML();
-    _egRenderInventory();
-    // keep scroll position stable across rebuilds
-    grid.scrollTop = scrollTop;
-}
-export function _egEnsureInvRows(minRows) {
-    if (!_egInventory) return;
-    if (_egInventory.length >= minRows) return;
-    for (let i = _egInventory.length; i < minRows; i++) _egInventory.push(Array(EG_INV_COLS).fill(null));
-    const grid = document.getElementById('eg-inv-grid');
-    if (grid && grid.children.length < minRows * EG_INV_COLS) {
-        _egRebuildInventoryGrid();
-    }
-}
-export function _egExpandStashByOneRow() { _egEnsureInvRows(_egGetInvRows() + 1); }
-export function _egFindFreeInvCell() {
-    for (let r = 0; r < _egInventory.length; r++) {
-        for (let c = 0; c < EG_INV_COLS; c++) if (!_egInventory[r][c]) return { r, c };
-    }
-    const r = _egInventory.length;
-    _egEnsureInvRows(r + 1);
-    return { r, c: 0 };
-}
-export function _egAddItemToStash(item) {
-    // Uniques never land in the regular inventory - they go to the Unique Collection
-    if (item && item.isUnique && item.baseId) {
-        _egAddUniqueToCollection(item);
-        return { r: -1, c: -1, unique: true };
-    }
-    const pos = _egFindFreeInvCell();
-    _egInventory[pos.r][pos.c] = item;
-    _egRenderInventoryCell(pos.r, pos.c);
-    _egUpdateInvCount();
-    return pos;
-}
-
-
-// ── Orbs & Shards currency tab (PoE-style fixed slots) ──
-// 5 cols × 7 rows = 35 cells; 18 orbs + 9 shards + scouring = 28 assigned.
-// Rows 1-4: orbs with empties at (1,4), (2,4) and (4,4); Row 3,5 is Annulment, Row 5,5 is Mirror.
-// Row 5: separator row (5,1-5,4 EMPTY, 5,5 Mirror). Rows 6-7: shards in orb occurrence order.
-export const EG_CURRENCY_COLS = 5;
-export const EG_CURRENCY_ROWS = 7;
-
-// Equipment currently offered to the crafting bench. The bench UI is opened
-// from the Orbs & Shards tab and accepts an item by drag-and-drop.
-export function _egBuildCraftingBenchSlotHTML() {
-    const item = typeof _egCraftingBenchItem !== 'undefined' ? globalThis._egCraftingBenchItem : null;
-    return `<div class="eg-crafting-launcher"><button class="eg-crafting-open-btn" onclick="_egOpenCraftingBench()">⚒ CRAFTING BENCH</button><div class="eg-crafting-slot" id="eg-crafting-bench-launch-slot" data-eg-dropzone="crafting" ondragover="egDragOver(event)" ondrop="egDropOnCraftingBench(event)">${item ? _egBuildItemChipHTML(item) : 'Drop equipment here'}</div></div>`;
-}
-
-// Fixed assignment: currency id → {r,c}. Mirrors PoE currency tab ordering.
-// Layout as requested: orbs rows 1-4 with empties at (1,4),(2,4),(4,4); (3,5) is Annulment, (5,5) is Mirror.
-// Row 5 (r=4) separator with Mirror at (5,5); shards start at Row 6 (r=5) in orb occurrence order.
-// Orb of Scouring kept at (7,5) to retain functionality; remove its entry to make that cell empty.
-export const EG_CURRENCY_SLOT_MAP = {
-    // Row 0 (1,1-1,5) - Transmutation, Augmentation, Alteration, EMPTY, Regal
-    'orb_transmutation': { r: 0, c: 0 },
-    'orb_augmentation':  { r: 0, c: 1 },
-    'orb_alteration':    { r: 0, c: 2 },
-    // (0,3) intentionally EMPTY
-    'orb_regal':         { r: 0, c: 4 },
-    // Row 1 (2,1-2,5) - Alchemy, Blooming, Chaos, EMPTY, Elevation
-    'orb_alchemy':       { r: 1, c: 0 },
-    'orb_bloom':         { r: 1, c: 1 },
-    'orb_chaos':         { r: 1, c: 2 },
-    // (1,3) intentionally EMPTY
-    'orb_elevation':     { r: 1, c: 4 },
-    // Row 2 (3,1-3,5) - Ascension, Exalted, Cataclysm, Horizons, Annulment
-    'orb_ascension':     { r: 2, c: 0 },
-    'orb_exalted':       { r: 2, c: 1 },
-    'orb_cataclysm':     { r: 2, c: 2 },
-    'orb_horizons':      { r: 2, c: 3 },
-    'orb_annulment':     { r: 2, c: 4 },
-    // Row 3 (4,1-4,5) - Blessing, Ancient, Chance, EMPTY, Divine
-    'orb_blessing':      { r: 3, c: 0 },
-    'orb_ancient':       { r: 3, c: 1 },
-    'orb_chance':        { r: 3, c: 2 },
-    // (3,3) intentionally EMPTY (Annulment moved to 3,5)
-    'orb_divine':        { r: 3, c: 4 },
-    // Row 4 (5,1-5,5) - EMPTY with Mirror at (5,5)
-    // (4,0)-(4,3) EMPTY, (4,4) Mirror of Vors
-    'mirror_of_kalandra':{ r: 4, c: 4 },
-    // Row 5-6 (6,1-7,5) - shards in orb occurrence order (starting at 6,1)
-    'shard_transmutation':{ r: 5, c: 0 },
-    'shard_alchemy':     { r: 5, c: 1 },
-    'shard_bloom':       { r: 5, c: 2 },
-    'shard_chaos':       { r: 5, c: 3 },
-    'shard_elevation':   { r: 5, c: 4 },
-    'shard_ascension':   { r: 6, c: 0 },
-    'shard_cataclysm':   { r: 6, c: 1 },
-    'shard_horizon':     { r: 6, c: 2 },
-    'shard_ancient':     { r: 6, c: 3 },
-    // Orb of Scouring retained at last cell (7,5) to preserve functionality
-    'orb_scouring':      { r: 6, c: 4 },
-};
-// Reverse map: "r-c" → id
-export const EG_CURRENCY_SLOT_REVERSE = (() => {
-    const m = {};
-    for (const [id, pos] of Object.entries(EG_CURRENCY_SLOT_MAP)) m[`${pos.r}-${pos.c}`] = id;
-    return m;
-})();
-
-export function _egCurrencySlotForId(id) { return EG_CURRENCY_SLOT_MAP[id] || null; }
-export function _egCurrencyIdForSlot(r, c) { return EG_CURRENCY_SLOT_REVERSE[`${r}-${c}`] || null; }
-export function _egCurrencyDefForId(id) {
-    if (typeof EG_CURRENCY_DEFS !== 'undefined' && EG_CURRENCY_DEFS[id]) return EG_CURRENCY_DEFS[id];
-    if (typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[id]) return EG_SHARD_DEFS[id];
-    return null;
-}
-
-// Map stash dimensions - 16 tier-filtered infinite stashes (one per map tier)
-export const EG_MAP_TIER_COUNT = 16;
-export const EG_MAP_TIER_ROMANS = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI'];
-export const EG_MAP_STASH_COLS = 20;
-export const EG_MAP_STASH_INITIAL_ROWS = 4;
-export const EG_MAP_STASH_ROWS = EG_MAP_STASH_INITIAL_ROWS; // legacy alias (one tier's initial rows)
-
-export const _egChipRegistry = new Map();
-export let _egChipCounter = 0;
-
-
-//------------------------------------------------------------------------
-//-------------------STATE------------------------------------------------
-//------------------------------------------------------------------------
-
-// Main equipment stash: 2D grid of item objects (null = empty cell)
-export let _egInventory = Array.from({ length: EG_INV_ROWS }, () => Array(EG_INV_COLS).fill(null));
-
-// Equipped items on the paperdoll: keyed by slot id, e.g. { head: {...}, chest: {...} }
-export let _egEquipped = {};
-
-// Single item currently loaded into the Map Device orb slot
-let _egMapSlotItem = null;
-
-// Currency stash: 2D grid of currency item objects (null = empty cell)
-export let _egCurrencyStash = Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
-
-// Map stash: array of 16 tier-filtered stashes, each a 2D grid (rows × EG_MAP_STASH_COLS)
-// _egMapStash[tierIdx][row][col] - tierIdx 0 = Tier I, 15 = Tier XVI
-export function _egMakeMapTierGrid(rows) {
-    const r = rows != null ? rows : EG_MAP_STASH_INITIAL_ROWS;
-    return Array.from({ length: r }, () => Array(EG_MAP_STASH_COLS).fill(null));
-}
-export function _egMakeAllMapStashes() {
-    return Array.from({ length: EG_MAP_TIER_COUNT }, () => _egMakeMapTierGrid());
-}
-export let _egMapStash = _egMakeAllMapStashes();
-// Active tier tab (1..16) shown in the Probability Gate
-let _egMapStashActiveTier = 1;
-
-export function _egMapTierToIndex(tier) {
-    const t = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(tier || 1)));
-    return t - 1;
-}
-export function _egGetMapTierGrid(tier) {
-    const idx = _egMapTierToIndex(tier);
-    if (!_egMapStash[idx] || !Array.isArray(_egMapStash[idx])) _egMapStash[idx] = _egMakeMapTierGrid();
-    return _egMapStash[idx];
-}
-export function _egGetMapStashRowsForTier(tier) {
-    return _egGetMapTierGrid(tier).length;
-}
-export function _egEnsureMapTierRows(tier, minRows) {
-    const idx = _egMapTierToIndex(tier);
-    let grid = _egGetMapTierGrid(tier);
-    if (grid.length >= minRows) return;
-    for (let i = grid.length; i < minRows; i++) grid.push(Array(EG_MAP_STASH_COLS).fill(null));
-    if (tier === _egMapStashActiveTier && typeof _egRebuildMapStashGrid === 'function') {
-        // defer if gate helpers not yet loaded
-        try { _egRebuildMapStashGrid(); } catch(e) {}
-    }
-}
-export function _egRebuildMapStashGrid() {
-    const gridEl = document.getElementById('eg-map-stash-grid');
-    if (!gridEl) return;
-    if (typeof _egBuildMapStashGridHTMLForTier !== 'function' || typeof _egRenderMapStashForTier !== 'function') return;
-    const scrollTop = gridEl.scrollTop;
-    const curTier = _egMapStashActiveTier;
-    gridEl.innerHTML = _egBuildMapStashGridHTMLForTier(curTier);
-    // ensure columns reflect current constant
-    gridEl.style.gridTemplateColumns = `repeat(${EG_MAP_STASH_COLS}, 1fr)`;
-    _egRenderMapStashForTier(curTier);
-    gridEl.scrollTop = scrollTop;
-}
-export function _egFindFreeMapCellForTier(tier) {
-    const grid = _egGetMapTierGrid(tier);
-    for (let r = 0; r < grid.length; r++) {
-        for (let c = 0; c < EG_MAP_STASH_COLS; c++) if (!grid[r][c]) return { r, c };
-    }
-    const r = grid.length;
-    _egEnsureMapTierRows(tier, r + 1);
-    return { r, c: 0 };
-}
-// Legacy helpers that operated on the flat grid - now tier-aware wrappers
-export function _egIsLegacyFlatMapStash(stash) {
-    if (!Array.isArray(stash) || stash.length === 0) return false;
-    // Flat: stash[0][0] is null or a map object, not an array of rows
-    // Tiered: stash[0] is itself a 2D array (first element is an array)
-    return stash.length > 0 && Array.isArray(stash[0]) && stash[0].length > 0 && !Array.isArray(stash[0][0]) && (stash[0][0] === null || typeof stash[0][0] === 'object') && (stash.length !== EG_MAP_TIER_COUNT || !Array.isArray(stash[0][0]));
-}
-// Detect tiered shape: stash.length === 16 and each entry is 2D array
-export function _egIsTieredMapStash(stash) {
-    if (!Array.isArray(stash) || stash.length !== EG_MAP_TIER_COUNT) return false;
-    return stash.every(tierGrid => Array.isArray(tierGrid) && tierGrid.length > 0 && Array.isArray(tierGrid[0]));
-}
 
 // Tooltip state: tracks which item is currently being previewed in the tooltip panel
 let _egTooltipItem = null;
 
-// ── Mass-sell filter state ──────────────────────────────────────────────
-// Which rarities are PROTECTED from mass sell (true = keep, false = sell).
-// Ordered low → high so the modal can simply iterate the array.
-export const EG_MASS_SELL_RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'artifact', 'cursed'];
-// Extra toggle: when true, unique items (isUnique) are never sold even if
-// their underlying rarity would be sold.
-export let _egMassSellKeepUnique = true;
-// Map rarity → bool; initialised in _egLoadMassSellSettings().
-export let _egMassSellKeep = null;
-// Item level filter: keep items with itemLevel >= this value (0 = disabled)
-export let _egMassSellMinItemLevel = 0;
-// Required character level filter: keep items with requirements.level >= this value (0 = disabled)
-export let _egMassSellMinReqLevel = 0;
-
-// ── Item level display toggle ───────────────────────────────────────────
-// true = show item level (itemLevel), false = show required character level (requirements.level)
-export let _egShowItemLevel = true;
-export function _egDefaultMassSellKeep() {
-    return {
-        common: false,
-        uncommon: false,
-        rare: true,
-        epic: true,
-        legendary: true,
-        artifact: true,
-        cursed: false,
-    };
-}
-export function _egNormaliseMassSellKeep(raw) {
-    const def = _egDefaultMassSellKeep();
-    if (!raw || typeof raw !== 'object') return { ...def };
-    const out = { ...def };
-    for (const r of EG_MASS_SELL_RARITIES) {
-        if (typeof raw[r] === 'boolean') out[r] = raw[r];
-    }
-    return out;
-}
-export function _egLoadMassSellSettings() {
-    _egMassSellKeep = _egNormaliseMassSellKeep(globalThis.STATE && globalThis.STATE.egMassSellKeep);
-    if (typeof STATE !== 'undefined' && typeof globalThis.STATE.egMassSellKeepUnique === 'boolean') {
-        _egMassSellKeepUnique = globalThis.STATE.egMassSellKeepUnique;
-    } else {
-        _egMassSellKeepUnique = true;
-    }
-    if (typeof STATE !== 'undefined' && typeof globalThis.STATE.egShowItemLevel === 'boolean') {
-        _egShowItemLevel = globalThis.STATE.egShowItemLevel;
-    }
-    if (typeof STATE !== 'undefined' && typeof globalThis.STATE.egMassSellMinItemLevel === 'number') {
-        _egMassSellMinItemLevel = Math.max(0, Math.floor(globalThis.STATE.egMassSellMinItemLevel));
-    } else {
-        _egMassSellMinItemLevel = 0;
-    }
-    if (typeof STATE !== 'undefined' && typeof globalThis.STATE.egMassSellMinReqLevel === 'number') {
-        _egMassSellMinReqLevel = Math.max(0, Math.floor(globalThis.STATE.egMassSellMinReqLevel));
-    } else {
-        _egMassSellMinReqLevel = 0;
-    }
-}
-export function _egSaveMassSellSettings() {
-    if (typeof STATE !== 'undefined') {
-        globalThis.STATE.egMassSellKeep = { ..._egMassSellKeep };
-        globalThis.STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
-        globalThis.STATE.egShowItemLevel = _egShowItemLevel;
-        globalThis.STATE.egMassSellMinItemLevel = _egMassSellMinItemLevel;
-        globalThis.STATE.egMassSellMinReqLevel = _egMassSellMinReqLevel;
-        if (typeof save === 'function') try { save(); } catch (e) {}
-    }
-    // also persist via the main hub save path
-    if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch (e) {}
-}
-// Returns true when the item should be KEPT (NOT sold) under the current filter.
-// Protection is an OR across all active keep criteria: unique, rarity,
-// itemLevel threshold and required-level threshold. This matches the live
-// preview in _egUpdateMassSellPreview so the confirmation counts and the
-// actual sell agree.
-export function _egIsProtectedFromMassSell(item) {
-    if (!item) return true;
-    if (_egMassSellKeepUnique && item.isUnique) return true;
-    const rarity = (item.rarity || 'common').toLowerCase();
-    if (_egMassSellKeep && _egMassSellKeep[rarity]) return true;
-    // Item level filter: keep items with itemLevel >= minItemLevel (0 = disabled)
-    if (_egMassSellMinItemLevel > 0 && item.itemLevel != null && item.itemLevel >= _egMassSellMinItemLevel) return true;
-    // Required character level filter: keep items with requirements.level >= minReqLevel (0 = disabled)
-    if (_egMassSellMinReqLevel > 0 && item.requirements && item.requirements.level != null && item.requirements.level >= _egMassSellMinReqLevel) return true;
-    return false;
-}
-export function _egMassSellCounts() {
-    let keep = 0, sell = 0;
-    if (!_egInventory) return { keep, sell };
-    for (let r = 0; r < _egInventory.length; r++) {
-        for (let c = 0; c < EG_INV_COLS; c++) {
-            const it = _egInventory[r][c];
-            if (!it) continue;
-            if (_egIsProtectedFromMassSell(it)) keep++; else sell++;
-        }
-    }
-    return { keep, sell };
-}
-// Load mass-sell defaults immediately (STATE may already hold a save).
-_egLoadMassSellSettings();
-
-
-//------------------------------------------------------------------------
-//-------------------HTML HELPERS: ITEM CHIP------------------------------
-//------------------------------------------------------------------------
-
-
-// Builds the draggable item chip markup used in every grid zone.
-// size: 'normal' (default) or 'large' (used inside the map device slot).
-
-export function _egBuildItemChipHTML(item, size = 'normal') {
-    const rarityClass = item.rarity ? `eg-rarity-${item.rarity}` : '';
-    const sizeClass = size === 'large' ? 'eg-item-chip-large' : '';
-    // Items whose stat requirements cannot currently be met get a red flag
-    // (see _egIsItemBlocked in endgame-requirements.js).
-    const blockedClass = _egIsItemBlocked(item) ? 'eg-req-blocked' : '';
-    // Equipment items show either item level or required character level in the top-left corner of the slot.
-    const itemLevel = item.itemLevel;
-    const reqLevel = (item.requirements && item.requirements.level != null) ? item.requirements.level : item.itemLevel;
-    const showLevel = _egShowItemLevel ? itemLevel : reqLevel;
-    const ilvlBadge = (item.category === 'equip' && showLevel != null)
-        ? `<span class="eg-item-ilvl">${showLevel}</span>`
-        : '';
-    // Map items show their map tier instead.
-    const mapTierBadge = (item.category === 'map' && item.mapTier != null)
-        ? `<span class="eg-item-ilvl eg-map-tier-badge">${item.mapTier}</span>`
-        : '';
-    const chipId = `egchip-${++_egChipCounter}`;
-    _egChipRegistry.set(chipId, item);
-
-    return `
-<div class="eg-item-chip ${rarityClass} ${sizeClass} ${blockedClass}"
-     id="${chipId}"
-     onmousedown="_egHandleChipMouseDown(event, '${chipId}')"
-     onmouseenter="_egShowTooltipFromChip('${chipId}', event)"
-     onmousemove="_egMoveTooltip(event)"
-     onmouseleave="_egClearTooltip()">
-    ${ilvlBadge}
-    ${mapTierBadge}
-    <span class="eg-item-chip-icon">${EG_ART.html('item', item.baseId, item.icon || '📦')}</span>
-    <span class="eg-item-chip-name">${item.name || '???'}</span>
-</div>`;
-}
-
-
-
-export function _egShowTooltipFromChip(chipId, e) {
-    const item = _egChipRegistry.get(chipId);
-    if (item) {
-        _egShowTooltip(item, e);
-    }
-}
-
-// Mouse-down handler for item chips - initiates custom drag-and-drop
-export function _egHandleChipMouseDown(e, chipId) {
-    if (e.button !== 0) return; // left-click only
-    const chip = document.getElementById(chipId);
-    if (!chip) return;
-    e.preventDefault();
-    _egClearTooltip();
-    _dndPickUp(e, chip);
-}
 
 
 
@@ -680,7 +302,7 @@ export function _egBuildStashPanelHTML() {
     const invActive = _egStashTab !== 'uniques';
     const uniqActive = _egStashTab === 'uniques';
     const totalUniques = (typeof EG_UNIQUE_ITEMS !== 'undefined' ? EG_UNIQUE_ITEMS.length : 0);
-    const foundUniques = (_egUniqueCollected ? _egUniqueCollected.size : 0);
+    const foundUniques = (globalThis._egUniqueCollected ? globalThis._egUniqueCollected.size : 0);
     return `
 <div class="eg-panel eg-panel-inv">
     <div class="eg-panel-label eg-stash-header">
@@ -726,7 +348,7 @@ export function _egBuildStashPanelHTML() {
 </div>`;
 }
 export function _egSwitchStashTab(tab) {
-    _egStashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
+    globalThis._egStashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
     const invBody = document.getElementById('eg-stash-tab-inventory');
     const uniqBody = document.getElementById('eg-stash-tab-uniques');
     const invTab = document.getElementById('eg-tab-inventory');
@@ -746,7 +368,7 @@ export function _egBuildUniqueGridHTML() {
         const uid = def.uniqueId;
         const collected = _egIsUniqueCollected(uid);
         const count = _egGetUniqueCount(uid);
-        const items = collected ? (_egUniqueStash[uid] || []) : [];
+        const items = collected ? (globalThis._egUniqueStash[uid] || []) : [];
         const displayName = (LANG === 'de' ? (def.nameDe || def.nameEn) : def.nameEn) || uid;
         let cellCls;
         if (!collected) cellCls = 'locked';
@@ -773,7 +395,7 @@ export function _egRenderUniqueStash() {
     if (!grid) return;
     grid.innerHTML = _egBuildUniqueGridHTML();
     const total = (typeof EG_UNIQUE_ITEMS !== 'undefined' ? EG_UNIQUE_ITEMS.length : 0);
-    const found = (_egUniqueCollected ? _egUniqueCollected.size : 0);
+    const found = (globalThis._egUniqueCollected ? globalThis._egUniqueCollected.size : 0);
     const cntEl = document.getElementById('eg-unique-count');
     if (cntEl) cntEl.textContent = t('eg_uniques_collected').replace('{found}', found).replace('{total}', total);
     _egUpdateUniqueTabBadge();
@@ -785,7 +407,7 @@ export function _egOnUniqueCellClick(e, uid) {
 export function _egOnUniqueCellRightClick(e, uid) {
     e.preventDefault();
     _egEnsureUniqueStash();
-    const arr = _egUniqueStash[uid];
+    const arr = globalThis._egUniqueStash[uid];
     if (!arr || arr.length === 0) {
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(t('eg_unique_not_collected'), {type:'info'});
         return;
@@ -797,7 +419,7 @@ export function _egOnUniqueCellRightClick(e, uid) {
 }
 export function _egOnUniqueCellEnter(uid, e) {
     _egEnsureUniqueStash();
-    const arr = _egUniqueStash[uid];
+    const arr = globalThis._egUniqueStash[uid];
     // Ensure previous multi-tip inline overrides don't leak into next tooltip
     const prevTip = document.getElementById('ghud-floating-tip');
     if (prevTip && prevTip.classList.contains('eg-unique-multi')) {
@@ -925,14 +547,6 @@ export function _egOnUniqueCellLeave(uid, e){
     }
 }
 
-//------------------------------------------------------------------------
-//-------------------STASH CENTER INFO OVERLAY-----------------------------
-//------------------------------------------------------------------------
-// Transient feedback line centered in the stash header. Used to explain
-// WHY an action did not work (orb cannot apply, equip/unequip blocked by
-// stat requirements or chain-break, etc.). The element is absolutely
-// positioned so it never shifts the STASH label or action buttons.
-
 export let _egStashInfoTimer = null;
 
 export function _egEnsureStashInfoEl() {
@@ -979,161 +593,6 @@ export function _egClearStashInfo() {
     if (_egStashInfoTimer) { clearTimeout(_egStashInfoTimer); _egStashInfoTimer = null; }
 }
 
-
-//------------------------------------------------------------------------
-//-------------------HTML ASSEMBLY: FULL SCREEN---------------------------
-//------------------------------------------------------------------------
-
-// Builds the top navigation bar with back button, level/attribute window
-// button and hub title.
-export function _egBuildTopbarHTML() {
-    return `
-<div class="eg-topbar">
-    <button class="eg-back-btn back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
-    <span class="eg-topbar-title">${t('eg_char_sheet_title')}</span>
-    <button class="eg-level-btn" id="eg-level-btn"
-         onclick="_egOpenAttributeWindow()"
-         onmouseenter="_egShowLevelBtnTooltip(event)"
-         onmousemove="moveGameTooltip(event)"
-         onmouseleave="hideGameTooltip()">✦ ${t('eg_lvl_button_label')}<span class="eg-level-badge" id="eg-level-badge"></span></button>
-    <button class="eg-level-btn" id="eg-btn-passive-tree"
-         onclick="showPassiveTree('screen-endgame-hub')">🌿 ${t('scr_probability_tree')}</button>
-    <button class="eg-level-btn" id="eg-btn-atlas"
-         onclick="showEndgameAtlas('showEndgameHub')">🗺 ${t('eg_atlas_title')}</button>
-    <button class="eg-level-btn" id="eg-btn-gate"
-         onclick="showEndgameGate('showEndgameHub')">🎲 ${t('mg_gate_badge')}</button>
-    <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
-         onmouseenter="_egShowHubInfoTooltip(event)"
-         onmousemove="moveGameTooltip(event)"
-         onmouseleave="_egHideHubInfoTooltip()">?</button>
-</div>`;
-}
-
-// Updates the Probability Tree button highlight based on available points.
-// Shows a golden border/glow and a yellow point count when there are unspent
-// Convergence Points - mirrors renderLSPassiveTreeButton and _renderTopBarTreePoints.
-export function _egUpdatePassiveTreeButton() {
-    const btn = document.getElementById('eg-btn-passive-tree');
-    if (!btn) return;
-    const points = (typeof STATE !== 'undefined' && globalThis.STATE.passiveTreePoints) || 0;
-    const hasPoints = points > 0;
-    btn.classList.toggle('unspent-points', hasPoints);
-    let countEl = document.getElementById('eg-pt-point-count');
-    if (!countEl) {
-        countEl = document.createElement('span');
-        countEl.id = 'eg-pt-point-count';
-        btn.appendChild(countEl);
-    }
-    countEl.textContent = hasPoints ? ` (${points})` : '';
-}
-
-// Toggles between showing item level and required character level on item chips.
-export function _egToggleItemLevelDisplay() {
-    _egShowItemLevel = !_egShowItemLevel;
-    _egSaveMassSellSettings(); // persists the toggle
-    _egRebuildInventoryGrid(); // re-render stash
-    _egRenderEquipSlots(); // re-render equipped items
-    _egUpdateItemLevelToggleButton();
-}
-
-// Updates the toggle button text/icon to match current state.
-export function _egUpdateItemLevelToggleButton() {
-    const btn = document.getElementById('eg-toggle-ilvl-btn');
-    if (btn) {
-        btn.innerHTML = `${_egShowItemLevel ? '🔢' : '👤'} ${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}`;
-    }
-}
-
-// Tooltip for the item level toggle button.
-export function _egShowItemLevelToggleTooltip(e) {
-    const html = `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">${_egShowItemLevel ? '🔢' : '👤'}</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t(_egShowItemLevel ? 'eg_show_req_level' : 'eg_show_item_level')}</div>
-    </div>
-    <div class="eg-tt-section">
-        <div class="eg-tt-desc">${t(_egShowItemLevel ? 'eg_show_req_level_desc' : 'eg_show_item_level_desc')}</div>
-    </div>
-</div>`;
-    globalThis.showGameTooltip(html, e);
-}
-
-// Tooltip for the mass-sell FILTER button (custom game tooltip instead of native title).
-export function _egShowMassSellConfigTooltip(e) {
-    const html = `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">⚙</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_mass_sell_config')}</div>
-    </div>
-    <div class="eg-tt-section">
-        <div class="eg-tt-desc">${t('eg_mass_sell_config_title')}</div>
-    </div>
-</div>`;
-    globalThis.showGameTooltip(html, e);
-}
-
-// Tooltip for the MASS SELL button (custom game tooltip instead of native title).
-export function _egShowMassSellTooltip(e) {
-    const html = `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">⚒</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_mass_sell_btn')}</div>
-    </div>
-    <div class="eg-tt-section">
-        <div class="eg-tt-desc">${t('eg_mass_sell_title')}</div>
-    </div>
-</div>`;
-    globalThis.showGameTooltip(html, e);
-}
-
-
-// Builds the tooltip body shown when hovering the "?" info button in the
-// top-right of the Nexus of Worlds screen. Uses the shared game tooltip
-// engine (tooltips-hud.js) - not the browser title tooltip.
-export function _egBuildHubInfoTooltipHTML() {
-    const line = (key) => {
-        const txt = t(key);
-        if (!txt) return '';
-        return `<div class="eg-tt-mod">${txt}</div>`;
-    };
-    return `
-<div class="eg-tt-frame" style="--tt-border:#c8a84b;">
-    <div class="eg-tt-header">
-        <div class="eg-tt-icon">❓</div>
-        <div class="eg-tt-name" style="color:#f5d98a;">${t('eg_hub_info_title')}</div>
-    </div>
-    <div class="eg-tt-section" style="display:flex;flex-direction:column;gap:5px;">
-        ${line('eg_hub_info_currency')}
-        ${line('eg_hub_info_sell')}
-        ${line('eg_hub_info_repeat')}
-        ${line('eg_hub_info_craft')}
-        <div style="height:1px;background:var(--border,#4a5475);opacity:.4;margin:2px 0;"></div>
-        ${line('eg_hub_info_dragdrop')}
-        ${line('eg_hub_info_compare')}
-    </div>
-</div>`;
-}
-
-export function _egShowHubInfoTooltip(e) {
-    globalThis.showGameTooltip(_egBuildHubInfoTooltipHTML(), e);
-    // The controls list needs much more width than the shared default -
-    // without this the tooltip becomes very narrow and very tall.
-    // eg-controls-tip is exclusive to this tooltip; the engine's inline
-    // max-width only yields to it via the !important rule in CSS.
-    const tip = document.getElementById('ghud-floating-tip');
-    if (tip) tip.classList.add('eg-wide-tip', 'eg-controls-tip');
-}
-
-// Hides the hub info tooltip AND drops the widened-tip classes again so
-// other tooltips on the shared engine keep their default width.
-export function _egHideHubInfoTooltip() {
-    const tip = document.getElementById('ghud-floating-tip');
-    if (tip) tip.classList.remove('eg-wide-tip', 'eg-controls-tip');
-    globalThis.hideGameTooltip();
-}
 
 // Assembles the complete hub screen layout:
 // topbar → [ Orbs & Shards (left) | character panel (center) | Essence (right) ] → stash.
@@ -1504,655 +963,6 @@ export function _egRenderAll() {
 
 
 
-
-
-
-//------------------------------------------------------------------------
-//-------------------PERSISTENCE------------------------------------------
-//------------------------------------------------------------------------
-
-// Writes all hub state variables back into the global STATE object and saves.
-export function egSaveHubState() {
-    // Safety interlock (2026-09): refuse to write while the hub load failed
-    // or has not completed - the mirrors may still hold their empty defaults,
-    // and writing them back would wipe the player's real stash. Writes made
-    // FROM INSIDE the load itself are the exception: they persist heal /
-    // migration results computed from mirrors that were just read from STATE
-    // (flagged via _stoxHubLoadInProgress). This is the path that destroyed a
-    // level-97 stash once; it stays closed until the hub load succeeds (the
-    // state.js save() degraded guard is the second net).
-    if (window._stoxHubLoadFailed) {
-        console.error('[hub] egSaveHubState REFUSED - hub state failed to load this session; reload the page');
-        return;
-    }
-    if (!window._stoxHubStateLoaded && !window._stoxHubLoadInProgress) {
-        console.error('[hub] egSaveHubState REFUSED - hub state has not finished loading');
-        return;
-    }
-    globalThis.STATE.egEquipped = _egEquipped;
-    globalThis.STATE.egInventory = _egInventory;
-    globalThis.STATE.egMapStash = _egMapStash;
-    globalThis.STATE.egCurrencyStash = _egCurrencyStash;
-    globalThis.STATE.egEssenceStash = globalThis._egEssenceStash;
-    globalThis.STATE.egMapSlotItem = _egMapSlotItem;
-    globalThis.STATE.egMapStashActiveTier = _egMapStashActiveTier;
-    globalThis.STATE.egCraftingBenchItem = globalThis._egCraftingBenchItem;
-    // Unique collection
-    globalThis.STATE.egUniqueStash = _egUniqueStash || {};
-    globalThis.STATE.egUniqueCollected = _egUniqueCollected ? Array.from(_egUniqueCollected) : [];
-    // Mass-sell filter (persisted alongside the stash so reconstructing the
-    // hub after a reload restores the player's protection choices).
-    if (_egMassSellKeep) globalThis.STATE.egMassSellKeep = { ..._egMassSellKeep };
-    if (typeof _egMassSellKeepUnique !== 'undefined') globalThis.STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
-    globalThis.STATE.egMassSellMinItemLevel = _egMassSellMinItemLevel;
-    globalThis.STATE.egMassSellMinReqLevel = _egMassSellMinReqLevel;
-    save();
-}
-
-// Heals a stashed currency/shard item that was persisted without its
-// full fields (legacy saves, vendor/drop race during save). Fills missing
-// name/icon/description/category/rarity from the canonical defs so tooltips
-// and right-click use-mode keep working.
-export function _egHealCurrencyItem(item) {
-    if (!item || !item.id) return item;
-    const def = (typeof EG_CURRENCY_DEFS !== 'undefined' && EG_CURRENCY_DEFS[item.id])
-        || (typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS[item.id])
-        || null;
-    if (!def) return item;
-    if (!item.name) item.name = def.name;
-    if (!item.icon) item.icon = def.icon;
-    if (!item.description) item.description = def.description;
-    if (!item.category) item.category = def.category || 'currency';
-    if (!item.rarity) item.rarity = def.rarity || 'currency';
-    return item;
-}
-export function _egHealEssenceItem(item) {
-    if (!item || !item.id) return item;
-    const def = (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[item.id]) || null;
-    if (!def) return item;
-    if (!item.name) item.name = def.name;
-    if (!item.icon) item.icon = def.icon;
-    if (!item.description) item.description = def.description;
-    if (!item.category) item.category = def.category || 'essence';
-    if (!item.rarity) item.rarity = def.rarity || 'essence';
-    // Critical for slot-type filtering: without these, _egRenderEssenceCell
-    // can't determine what the essence can be applied to, and the item
-    // silently bypasses the filter (shows up under every slot type).
-    if (!item.guaranteedFamily && def.guaranteedFamily) item.guaranteedFamily = def.guaranteedFamily;
-    if ((!item.guaranteedFamilies || !item.guaranteedFamilies.length) && def.guaranteedFamilies) {
-        item.guaranteedFamilies = def.guaranteedFamilies;
-    }
-    return item;
-}
-
-// Deferred notice for the legacy hand migration below: _egLoadHubState also
-// runs at script parse time (no visible screen yet), so the message waits
-// here until showEndgameHub renders the sheet.
-export let _egPendingHandMigrationToast = null;
-
-// Reads hub state from the global STATE object into local variables.
-// Missing entries are initialised to their default empty structures.
-
-// Explains a legacy hand migration (2H + shield equipped before the 1H/2H
-// split): the off-hand was moved to the stash. One toast per moved item.
-export function _egShowHandMigrationToast(moves) {
-    if (!Array.isArray(moves) || !moves.length) return;
-    for (const mv of moves) {
-        const nm = (mv.item && mv.item.name) || '?';
-        let msg = null;
-        try {
-            if (mv.slotId === 'weapon2' && typeof _egIsTwoHandedWeapon === 'function'
-                && _egEquipped && _egIsTwoHandedWeapon(_egEquipped.weapon1)) {
-                const mainNm = (_egEquipped.weapon1 && _egEquipped.weapon1.name) || '?';
-                let tpl = null;
-                try { const s = t('eg_migrate_offhand_two_handed'); if (s && s !== 'eg_migrate_offhand_two_handed') tpl = s; } catch (e) {}
-                msg = (tpl || '⚠️ {off} moved to your stash - {main} is two-handed and needs a free off-hand')
-                    .replace('{off}', nm).replace('{main}', mainNm);
-            } else {
-                let tpl = null;
-                try { const s = t('eg_migrate_hand_generic'); if (s && s !== 'eg_migrate_hand_generic') tpl = s; } catch (e) {}
-                msg = (tpl || '⚠️ {name} moved to your stash - it cannot stay equipped in that slot')
-                    .replace('{name}', nm);
-            }
-        } catch (e) {
-            msg = `⚠️ ${nm} moved to your stash`;
-        }
-        try { if (typeof showToast === 'function') globalThis.showToast(msg, '#f5b642'); } catch (e) {}
-        try { if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'info' }); } catch (e) {}
-    }
-}
-
-function _egLoadHubState() {
-    // Guard (2026-09): a fully loaded session never re-runs this (each re-run
-    // would re-apply migrations against an already-normalised state). If a
-    // previous attempt FAILED midway, also skip: the mirrors may be half-
-    // loaded, and egSaveHubState is interlocked to refuse writes until the
-    // page is reloaded and the load succeeds.
-    if (window._stoxHubStateLoaded) return;
-    if (window._stoxHubLoadFailed) {
-        console.error('[hub] skipping _egLoadHubState - previous attempt failed midway; save-writes stay blocked until reload');
-        return;
-    }
-    // Mark the load as in progress: egSaveHubState's interlock must ALLOW the
-    // internal persistence calls below (heal/migration results), because at
-    // this point the mirrors hold exactly what was just read from STATE.
-    window._stoxHubLoadInProgress = true;
-    _egEquipped = globalThis.STATE.egEquipped || {};
-    // Unlimited stash: keep whatever rows were saved; ensure at least the initial minimum
-    if (Array.isArray(globalThis.STATE.egInventory) && globalThis.STATE.egInventory.length > 0) {
-        _egInventory = globalThis.STATE.egInventory;
-        // Normalise column count and guarantee minimum rows
-        if (_egInventory.length < EG_INV_INITIAL_ROWS) _egEnsureInvRows(EG_INV_INITIAL_ROWS);
-        // Ensure every row has the correct column width
-        for (let r = 0; r < _egInventory.length; r++) {
-            if (!Array.isArray(_egInventory[r])) _egInventory[r] = Array(EG_INV_COLS).fill(null);
-            else if (_egInventory[r].length < EG_INV_COLS) {
-                while (_egInventory[r].length < EG_INV_COLS) _egInventory[r].push(null);
-            } else if (_egInventory[r].length > EG_INV_COLS) {
-                _egInventory[r] = _egInventory[r].slice(0, EG_INV_COLS);
-            }
-        }
-    } else {
-        _egInventory = Array.from({ length: EG_INV_INITIAL_ROWS }, () => Array(EG_INV_COLS).fill(null));
-    }
-    // Heal legacy equipment cells: any item that looks like gear (has a
-    // slotType) but lost its category would be rejected by currency/essence
-    // application with a confusing "cannot be used" error.
-    if (Array.isArray(_egInventory)) {
-        for (let r = 0; r < _egInventory.length; r++) {
-            if (!Array.isArray(_egInventory[r])) continue;
-            for (let c = 0; c < _egInventory[r].length; c++) {
-                const it = _egInventory[r][c];
-                if (it && it.slotType && !it.category) it.category = 'equip';
-            }
-        }
-    }
-    if (_egEquipped && typeof _egEquipped === 'object') {
-        for (const k of Object.keys(_egEquipped)) {
-            const it = _egEquipped[k];
-            if (it && it.slotType && !it.category) it.category = 'equip';
-        }
-    }
-    // ── Map stash: tiered 16× infinite stashes ──
-    (function _migrateMapStash() {
-        const saved = globalThis.STATE.egMapStash;
-        if (_egIsTieredMapStash(saved)) {
-            _egMapStash = saved;
-            // normalise each tier: ensure correct cols and at least initial rows
-            for (let ti = 0; ti < EG_MAP_TIER_COUNT; ti++) {
-                if (!Array.isArray(_egMapStash[ti])) _egMapStash[ti] = _egMakeMapTierGrid();
-                if (_egMapStash[ti].length < EG_MAP_STASH_INITIAL_ROWS) {
-                    for (let i = _egMapStash[ti].length; i < EG_MAP_STASH_INITIAL_ROWS; i++) _egMapStash[ti].push(Array(EG_MAP_STASH_COLS).fill(null));
-                }
-                for (let r = 0; r < _egMapStash[ti].length; r++) {
-                    if (!Array.isArray(_egMapStash[ti][r])) _egMapStash[ti][r] = Array(EG_MAP_STASH_COLS).fill(null);
-                    else if (_egMapStash[ti][r].length < EG_MAP_STASH_COLS) while(_egMapStash[ti][r].length < EG_MAP_STASH_COLS) _egMapStash[ti][r].push(null);
-                    else if (_egMapStash[ti][r].length > EG_MAP_STASH_COLS) _egMapStash[ti][r] = _egMapStash[ti][r].slice(0, EG_MAP_STASH_COLS);
-                }
-            }
-            // also migrate any maps that might be in wrong tier (e.g. tier changed via Horizons)
-            // we leave them where they are - player can manually move via device
-        } else if (Array.isArray(saved) && saved.length > 0 && Array.isArray(saved[0]) && !Array.isArray(saved[0][0])) {
-            // legacy flat grid (e.g. 4×20) - distribute maps into tiered stashes by mapTier
-            _egMapStash = _egMakeAllMapStashes();
-            for (let r = 0; r < saved.length; r++) {
-                if (!Array.isArray(saved[r])) continue;
-                for (let c = 0; c < saved[r].length; c++) {
-                    const it = saved[r][c];
-                    if (!it) continue;
-                    const tier = (it.mapTier != null) ? it.mapTier : 1;
-                    const idx = _egMapTierToIndex(tier);
-                    // find first free slot in that tier (may grow)
-                    let placed = false;
-                    for (let rr = 0; rr < _egMapStash[idx].length && !placed; rr++) {
-                        for (let cc = 0; cc < EG_MAP_STASH_COLS; cc++) {
-                            if (!_egMapStash[idx][rr][cc]) { _egMapStash[idx][rr][cc] = it; placed = true; break; }
-                        }
-                    }
-                    if (!placed) {
-                        _egMapStash[idx].push(Array(EG_MAP_STASH_COLS).fill(null));
-                        _egMapStash[idx][_egMapStash[idx].length-1][0] = it;
-                    }
-                }
-            }
-            globalThis.STATE.egMapStash = _egMapStash;
-            try { if (typeof save === 'function') save(); } catch(e) {}
-        } else {
-            _egMapStash = _egMakeAllMapStashes();
-        }
-        // restore active tier if persisted
-        if (globalThis.STATE.egMapStashActiveTier != null) {
-            const at = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(globalThis.STATE.egMapStashActiveTier)));
-            _egMapStashActiveTier = at;
-        }
-    })();
-    if (globalThis.STATE.egMapStashActiveTier != null) _egMapStashActiveTier = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(globalThis.STATE.egMapStashActiveTier)));
-
-    // ── Currency stash migration to fixed PoE-style slots ──
-    // Old saves were 1×30; new is 6×5 with fixed positions. Migrate by collecting items
-    // and re-inserting them into their assigned slots (stacking counts).
-    (function _migrateCurrency() {
-        const saved = globalThis.STATE.egCurrencyStash;
-        let needMigration = !Array.isArray(saved)
-            || saved.length !== EG_CURRENCY_ROWS
-            || (saved[0] && saved[0].length !== EG_CURRENCY_COLS);
-        // Also migrate when items are not in their assigned fixed slots
-        // (e.g. layout changed from old ordering to new requested ordering).
-        if (!needMigration && Array.isArray(saved)) {
-            outer: for (let r = 0; r < saved.length; r++) {
-                if (!Array.isArray(saved[r])) continue;
-                for (let c = 0; c < saved[r].length; c++) {
-                    const it = saved[r][c];
-                    if (!it || !it.id) continue;
-                    const pos = _egCurrencySlotForId(it.id);
-                    if (!pos || pos.r !== r || pos.c !== c) { needMigration = true; break outer; }
-                }
-            }
-        }
-        if (!needMigration) {
-            _egCurrencyStash = saved;
-            return;
-        }
-        // Collect all items from old grid (flat)
-        const items = [];
-        if (Array.isArray(saved)) {
-            for (let r = 0; r < saved.length; r++) {
-                if (!Array.isArray(saved[r])) continue;
-                for (let c = 0; c < saved[r].length; c++) {
-                    const it = saved[r][c];
-                    if (it && it.id) {
-                        _egHealCurrencyItem(it);
-                        _egHealEssenceItem(it);
-                        items.push(it);
-                    }
-                }
-            }
-        }
-        // Build fresh fixed-slot grid
-        _egCurrencyStash = Array.from({ length: EG_CURRENCY_ROWS }, () => Array(EG_CURRENCY_COLS).fill(null));
-        // Merge stacks by id into assigned slot
-        const merged = new Map(); // id → total count
-        for (const it of items) {
-            const key = it.id;
-            const cnt = it.count || 1;
-            merged.set(key, (merged.get(key) || 0) + cnt);
-        }
-        for (const [id, total] of merged.entries()) {
-            const pos = _egCurrencySlotForId(id);
-            if (!pos) continue; // unknown / unassigned currency - drop (should not happen)
-            const def = _egCurrencyDefForId(id);
-            // Preserve first item's full object as template (with heals)
-            const template = items.find(x => x.id === id) || { id, category: 'currency', rarity: 'currency' };
-            _egCurrencyStash[pos.r][pos.c] = {
-                ...template,
-                id,
-                name: (def && def.name) || template.name,
-                icon: (def && def.icon) || template.icon,
-                description: (def && def.description) || template.description,
-                category: 'currency',
-                rarity: 'currency',
-                count: total,
-            };
-        }
-        // Persist migrated shape immediately
-        globalThis.STATE.egCurrencyStash = _egCurrencyStash;
-        try { if (typeof save === 'function') save(); } catch(e) {}
-    })();
-    // Heal after migration as well
-    if (Array.isArray(_egCurrencyStash)) {
-        for (let r = 0; r < _egCurrencyStash.length; r++) {
-            if (!Array.isArray(_egCurrencyStash[r])) { _egCurrencyStash[r] = Array(EG_CURRENCY_COLS).fill(null); continue; }
-            // ensure row length
-            if (_egCurrencyStash[r].length < EG_CURRENCY_COLS) while(_egCurrencyStash[r].length < EG_CURRENCY_COLS) _egCurrencyStash[r].push(null);
-            if (_egCurrencyStash[r].length > EG_CURRENCY_COLS) _egCurrencyStash[r] = _egCurrencyStash[r].slice(0, EG_CURRENCY_COLS);
-            for (let c = 0; c < _egCurrencyStash[r].length; c++) {
-                const it = _egCurrencyStash[r][c];
-                if (it) {
-                    _egHealCurrencyItem(it);
-                    _egHealEssenceItem(it);
-                }
-            }
-        }
-    }
-    if (_egCurrencyStash.length < EG_CURRENCY_ROWS) {
-        while(_egCurrencyStash.length < EG_CURRENCY_ROWS) _egCurrencyStash.push(Array(EG_CURRENCY_COLS).fill(null));
-    }
-    // EG_ESSENCE_ROWS/COLS are defined in endgame-essences.js which loads
-    // after this file - guard so first-load initialisation never throws.
-    // The stash is always normalised to the CURRENT grid dimensions: saves
-    // created with an older (smaller) essence tab would otherwise leave
-    // rows/cols undefined and crash the essence renderer.
-    {
-        const essR = typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 12;
-        const essC = typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8;
-        const freshEssGrid = Array.from({ length: essR }, () => Array(essC).fill(null));
-        const savedEssGrid = globalThis.STATE.egEssenceStash;
-        let needsFixedMigration = false;
-        if (Array.isArray(savedEssGrid)) {
-            // Detect old fixed-slot vs free-form: if any item is not in its assigned slot, migrate
-            try {
-                if (typeof _egEssenceSlotForId === 'function') {
-                    for (let r = 0; r < savedEssGrid.length; r++) {
-                        if (!Array.isArray(savedEssGrid[r])) continue;
-                        for (let c = 0; c < savedEssGrid[r].length; c++) {
-                            const it = savedEssGrid[r][c];
-                            if (!it || !it.id) continue;
-                            const pos = _egEssenceSlotForId(it.id);
-                            if (!pos || pos.r !== r || pos.c !== c) { needsFixedMigration = true; break; }
-                        }
-                        if (needsFixedMigration) break;
-                    }
-                    // also if grid size differs from current
-                    if (savedEssGrid.length !== essR || (savedEssGrid[0] && savedEssGrid[0].length !== essC)) needsFixedMigration = true;
-                }
-            } catch(e) { needsFixedMigration = false; }
-            if (needsFixedMigration && typeof _egEssenceSlotForId === 'function') {
-                // Collect all essence items and re-insert into correct fixed slots
-                const allItems = [];
-                for (let r = 0; r < savedEssGrid.length; r++) {
-                    if (!Array.isArray(savedEssGrid[r])) continue;
-                    for (let c = 0; c < savedEssGrid[r].length; c++) {
-                        const it = savedEssGrid[r][c];
-                        if (it && it.id) {
-                            if (typeof _egHealEssenceItem === 'function') _egHealEssenceItem(it);
-                            allItems.push(it);
-                        }
-                    }
-                }
-                const merged = new Map(); // id -> total count
-                const leftover = []; // items with no assigned slot
-                const LEGACY_ESSENCE_DISCARD = new Set(['essence_vitality','essence_might','essence_sorcery','essence_swiftness','essence_fortress','essence_elements','essence_puzzle']);
-                for (const it of allItems) {
-                    if (LEGACY_ESSENCE_DISCARD.has(it.id)) continue; // drop legacy group essences - replaced by per-modifier essences
-                    const pos = _egEssenceSlotForId(it.id);
-                    if (!pos) { leftover.push(it); continue; }
-                    const cnt = it.count || 1;
-                    merged.set(it.id, (merged.get(it.id) || 0) + cnt);
-                }
-                for (const [id, total] of merged.entries()) {
-                    const pos = _egEssenceSlotForId(id);
-                    if (!pos) continue;
-                    const def = (typeof _egEssenceDefForId === 'function') ? _egEssenceDefForId(id) : null;
-                    const src = allItems.find(x => x.id === id) || {};
-                    freshEssGrid[pos.r][pos.c] = {
-                        ...src,
-                        id,
-                        name: (def && def.name) || src.name || id,
-                        icon: (def && def.icon) || src.icon || '🧬',
-                        description: (def && def.description) || src.description || '',
-                        category: 'essence',
-                        rarity: 'essence',
-                        count: total,
-                    };
-                }
-                // Leftover unknown essences go to first decorative empty cells
-                for (const it of leftover) {
-                    let placed = false;
-                    for (let r = 0; r < essR && !placed; r++) {
-                        for (let c = 0; c < essC && !placed; c++) {
-                            if (freshEssGrid[r][c]) continue;
-                            const assigned = (typeof _egEssenceIdForSlot === 'function') ? _egEssenceIdForSlot(r,c) : null;
-                            if (assigned) continue; // reserved
-                            freshEssGrid[r][c] = it;
-                            placed = true;
-                        }
-                    }
-                    if (!placed) console.warn('[ESSENCE] leftover essence could not be placed', it.id);
-                }
-                // Persist migrated shape
-                globalThis.STATE.egEssenceStash = freshEssGrid;
-                try { if (typeof save === 'function') save(); } catch(e) {}
-            } else {
-                for (let r = 0; r < Math.min(essR, savedEssGrid.length); r++) {
-                    if (!Array.isArray(savedEssGrid[r])) continue;
-                    for (let c = 0; c < Math.min(essC, savedEssGrid[r].length); c++) {
-                        freshEssGrid[r][c] = savedEssGrid[r][c] || null;
-                    }
-                }
-            }
-        }
-        globalThis._egEssenceStash = freshEssGrid;
-    }
-    _egMapSlotItem = globalThis.STATE.egMapSlotItem || null;
-    globalThis._egCraftingBenchItem = globalThis.STATE.egCraftingBenchItem || null;
-    // Heal legacy essence cells too (description/category missing from old saves).
-    if (Array.isArray(globalThis._egEssenceStash)) {
-        for (let r = 0; r < globalThis._egEssenceStash.length; r++) {
-            if (!Array.isArray(globalThis._egEssenceStash[r])) continue;
-            for (let c = 0; c < globalThis._egEssenceStash[r].length; c++) {
-                const it = globalThis._egEssenceStash[r][c];
-                if (it) _egHealEssenceItem(it);
-            }
-        }
-    }
-    // Mass-sell filter - load (or default-initialise) from the persisted save.
-    _egLoadMassSellSettings();
-    // Loot filter - load (or default-initialise) from the persisted save.
-    if (typeof _egLoadLootFilter === 'function') _egLoadLootFilter();
-
-    // Heal legacy equipment items that were saved before implicits existed.
-    try {
-        if (typeof _egHealItemImplicits === 'function') {
-            if (Array.isArray(_egInventory)) {
-                for (let r = 0; r < _egInventory.length; r++) {
-                    for (let c = 0; c < EG_INV_COLS; c++) {
-                        const it = _egInventory[r][c];
-                        if (it && it.category === 'equip' && !it.isUnique) _egHealItemImplicits(it);
-                    }
-                }
-            }
-            if (typeof _egEquipped === 'object' && _egEquipped) {
-                Object.values(_egEquipped).forEach(it => { if (it && !it.isUnique) _egHealItemImplicits(it); });
-            }
-        }
-    } catch (e) { /* ignore */ }
-
-    // Heal legacy uniques that were saved before base armor/damage was added.
-    // Retroactively fills missing defenses/damage/blockChance from the
-    // updated EG_UNIQUE_ITEMS definitions (or fallback). Persists if changed.
-    try {
-        if (typeof _egHealUniqueItem === 'function') {
-            let uniqueChanged = false;
-            const healGrid = (grid) => {
-                if (!Array.isArray(grid)) return;
-                for (let r = 0; r < grid.length; r++) {
-                    if (!Array.isArray(grid[r])) continue;
-                    for (let c = 0; c < grid[r].length; c++) {
-                        const it = grid[r][c];
-                        if (it && it.isUnique && _egHealUniqueItem(it)) uniqueChanged = true;
-                    }
-                }
-            };
-            healGrid(_egInventory);
-            if (typeof _egEquipped === 'object' && _egEquipped) {
-                for (const it of Object.values(_egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) uniqueChanged = true;
-            }
-            if (_egMapSlotItem && _egMapSlotItem.isUnique && _egHealUniqueItem(_egMapSlotItem)) uniqueChanged = true;
-            if (typeof _egCraftingBenchItem !== 'undefined' && globalThis._egCraftingBenchItem && globalThis._egCraftingBenchItem.isUnique && _egHealUniqueItem(globalThis._egCraftingBenchItem)) uniqueChanged = true;
-            if (uniqueChanged && typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
-        }
-    } catch (e) { /* ignore */ }
-
-    // ── Legacy weapon hands heal (pre-1H/2H saves) ──────────────────────
-    try {
-        if (typeof _egHealWeaponHands === 'function') {
-            let handsChanged = false;
-            const healWeaponGrid = (grid) => {
-                if (!Array.isArray(grid)) return;
-                for (let r = 0; r < grid.length; r++) {
-                    if (!Array.isArray(grid[r])) continue;
-                    for (let c = 0; c < grid[r].length; c++) {
-                        const it = grid[r][c];
-                        // _egHealWeaponHands returns TRUE when it CHANGED the
-                        // item - non-weapon items must NOT count as changed.
-                        if (it && _egHealWeaponHands(it)) handsChanged = true;
-                    }
-                }
-            };
-            healWeaponGrid(_egInventory);
-            if (typeof _egEquipped === 'object' && _egEquipped) {
-                for (const it of Object.values(_egEquipped)) if (it && _egHealWeaponHands(it)) handsChanged = true;
-            }
-            if (typeof _egCraftingBenchItem !== 'undefined' && globalThis._egCraftingBenchItem && _egHealWeaponHands(globalThis._egCraftingBenchItem)) handsChanged = true;
-            if (handsChanged && typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
-        }
-    } catch (e) { /* ignore */ }
-
-    // ── Legacy hand migration (pre-1H/2H saves) ────────────────────────
-    // A 2H weapon + shield equipped before the patch is illegal now. Free the
-    // off-hand into the stash so the very next sheet visit shows a legal,
-    // working loadout (offense without block, as designed). Nothing is lost
-    // (stash is unlimited); the notice toast is deferred to showEndgameHub so
-    // it fires on the visible sheet.
-    try {
-        if (typeof _egMigrateIllegalHandsToStash === 'function') {
-            const _handMoves = _egMigrateIllegalHandsToStash();
-            if (_handMoves && _handMoves.length) {
-                if (typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
-                _egPendingHandMigrationToast = _handMoves;
-            }
-        }
-    } catch (e) { /* ignore */ }
-
-    // ── Unique Collection load + legacy migration ────────────────────────
-    try {
-        _egEnsureUniqueStash();
-        // Load from STATE
-        if (globalThis.STATE.egUniqueStash && typeof globalThis.STATE.egUniqueStash === 'object' && !Array.isArray(globalThis.STATE.egUniqueStash)) {
-            _egUniqueStash = globalThis.STATE.egUniqueStash;
-            // ensure arrays
-            for (const k of Object.keys(_egUniqueStash)) if (!Array.isArray(_egUniqueStash[k])) _egUniqueStash[k] = _egUniqueStash[k] ? [_egUniqueStash[k]] : [];
-        } else {
-            _egUniqueStash = {};
-        }
-        if (Array.isArray(globalThis.STATE.egUniqueCollected)) {
-            _egUniqueCollected = new Set(globalThis.STATE.egUniqueCollected);
-        } else {
-            _egUniqueCollected = new Set();
-        }
-        // Legacy migration: move any isUnique items still sitting in regular inventory into the unique stash
-        let migrated = false;
-        if (Array.isArray(_egInventory)) {
-            for (let r = 0; r < _egInventory.length; r++) {
-                for (let c = 0; c < EG_INV_COLS; c++) {
-                    const it = _egInventory[r][c];
-                    if (it && it.isUnique && it.baseId) {
-                        const uid = it.baseId;
-                        if (!_egUniqueStash[uid]) _egUniqueStash[uid] = [];
-                        _egUniqueStash[uid].push(it);
-                        _egUniqueCollected.add(uid);
-                        _egInventory[r][c] = null;
-                        migrated = true;
-                    }
-                }
-            }
-        }
-        // Also ensure collected set contains every key present in stash
-        for (const uid of Object.keys(_egUniqueStash)) _egUniqueCollected.add(uid);
-        // Heal implicits/downsides on unique stash items as well
-        if (typeof _egHealUniqueItem === 'function') {
-            for (const arr of Object.values(_egUniqueStash)) {
-                for (const it of arr) _egHealUniqueItem(it);
-            }
-        }
-        if (migrated) {
-            globalThis.STATE.egUniqueStash = _egUniqueStash;
-            globalThis.STATE.egUniqueCollected = Array.from(_egUniqueCollected);
-            try { if (typeof save === 'function') save(); } catch(e){}
-            // persist via egSaveHubState shape (ensures other fields consistent)
-            try { egSaveHubState(); } catch(e){}
-        }
-    } catch(e) { /* ignore unique load */ }
-
-    // Evict any unique that leaked onto the crafting bench. Older builds
-    // allowed uniques onto the bench, persisting one in BOTH the bench and
-    // the Unique Collection → a duplicate after reload. Uniques are never
-    // craftable, so clear the slot; if it isn't already collected, recover
-    // it into the collection so nothing is lost. Placed OUTSIDE the unique-
-    // stash try above so a migration hiccup can't skip it.
-    try {
-        if (globalThis._egCraftingBenchItem && globalThis._egCraftingBenchItem.isUnique) {
-            if (typeof _egEnsureUniqueStash === 'function') _egEnsureUniqueStash();
-            const buid = globalThis._egCraftingBenchItem.baseId || globalThis._egCraftingBenchItem.uniqueId || globalThis._egCraftingBenchItem.id;
-            const present = buid && Array.isArray(_egUniqueStash[buid]) && _egUniqueStash[buid].length > 0;
-            if (buid && !present) {
-                if (!_egUniqueStash[buid]) _egUniqueStash[buid] = [];
-                _egUniqueStash[buid].push(globalThis._egCraftingBenchItem);
-                _egUniqueCollected.add(buid);
-            }
-            if (typeof _egHealUniqueItem === 'function') _egHealUniqueItem(globalThis._egCraftingBenchItem);
-            globalThis._egCraftingBenchItem = null;
-            globalThis.STATE.egCraftingBenchItem = null;
-            globalThis.STATE.egUniqueStash = _egUniqueStash;
-            globalThis.STATE.egUniqueCollected = Array.from(_egUniqueCollected || []);
-            try { if (typeof save === 'function') save(); } catch(e){}
-        }
-    } catch(e) { /* never break hub load for a bench cleanup */ }
-
-    // Endgame achievements - retroactive sync for existing saves
-    try {
-        if (typeof setAchStat === 'function' && typeof egAtlasProgress === 'function' && globalThis.STATE.egAtlasCompleted) {
-            const _ap = egAtlasProgress();
-            setAchStat('egAtlasRegions', _ap.completed);
-            setAchStat('egAtlasHighestTier', _ap.highestTier);
-            // count T16 regions separately
-            let _pinn = 0;
-            for (const _id in globalThis.STATE.egAtlasCompleted) {
-                const _node = (typeof egAtlasNodeById === 'function') ? egAtlasNodeById(_id) : null;
-                if (_node && _node.tier === 16 && globalThis.STATE.egAtlasCompleted[_id]) _pinn++;
-            }
-            setAchStat('egAtlasPinnacle', _pinn);
-        }
-        if (typeof setAchStat === 'function' && typeof _egUniqueCollected !== 'undefined' && _egUniqueCollected) {
-            setAchStat('egUniquesCollected', _egUniqueCollected.size);
-        }
-        if (typeof setAchStat === 'function' && typeof _egGetPlayerLevel === 'function') {
-            setAchStat('egPlayerLevel', _egGetPlayerLevel());
-        }
-        if (typeof setAchStat === 'function' && typeof egGetGold === 'function') {
-            // gold earned is cumulative - can't reconstruct, seed with current balance as floor
-            const _curGold = egGetGold();
-            if (_curGold > 0 && (!ACH_STATE.stats.egGoldEarned || ACH_STATE.stats.egGoldEarned < _curGold)) {
-                // use setAchStat to at least reflect balance; real earned will grow via _egAddGold
-                setAchStat('egGoldEarned', _curGold);
-            }
-        }
-    } catch(e){}
-}
-
-// Call this immideatly so the player does NOT have to open the hub first to re-load his item state.
-// This way it runs on game restart automatically.
-// Guard (2026-09): this load must SUCCEED before anything may write back to
-// STATE via egSaveHubState. If it throws, the session is marked degraded:
-// the mirrors may hold half-loaded/empty data, and writing them back would
-// wipe the player's real stash. state.js save() refuses that case as well.
-// _stoxHubLoadInProgress is cleared in finally so the interlock can never be
-// left in "load running" state by a throw midway.
-// Module era: hub.js evaluates inside an import cycle, so running the load
-// HERE would read uninitialized bindings (EG_ART via the render chain) and
-// mark the session load-failed, blocking save-writes. Classic order (art and
-// state long before hub) always succeeded. Defer to DOMContentLoaded: every
-// module plus the concatenated body is initialized by then, still before any
-// user interaction (established step-5 passive-tree pattern).
-function _egBootLoadHubState() {
-    window._stoxHubLoadInProgress = false;
-    try {
-        _egLoadHubState();
-        window._stoxHubStateLoaded = true;
-    } catch (e) {
-        window._stoxHubLoadFailed = true;
-        console.error('[hub] load failed - save-writes BLOCKED for this session to protect your stash (reload the page)', e);
-    } finally {
-        window._stoxHubLoadInProgress = false;
-    }
-}
-if (typeof document !== 'undefined' && document.readyState !== 'complete') {
-    document.addEventListener('DOMContentLoaded', _egBootLoadHubState);
-} else {
-    _egBootLoadHubState();
-}
-
-
 //------------------------------------------------------------------------
 //-------------------SCREEN BOOTSTRAP-------------------------------------
 //------------------------------------------------------------------------
@@ -2189,7 +999,7 @@ export function showEndgameHub() {
         document.getElementById('screen-endgame-hub').style.display = 'block';
     }
 
-    _egLoadHubState();
+    globalThis._egLoadHubState();
     _egUpdateItemLevelToggleButton();
     _egRenderAll();
     _egApplyOverlayChrome();
@@ -2200,7 +1010,7 @@ export function showEndgameHub() {
             _egShowHandMigrationToast(_egPendingHandMigrationToast);
         }
     } catch (e) {}
-    _egPendingHandMigrationToast = null;
+    globalThis._egPendingHandMigrationToast = null;
     _egClearTooltip();
 }
 
@@ -2213,19 +1023,6 @@ export function safeGoBackFromHub() {
     if (_egHubGameOverlay) { closeHubToGame(); return; }
     showEndgameNexus();
 }
-
-
-//------------------------------------------------------------------------
-//-------------------GAME OVERLAY MODE (B KEYBIND)-------------------------
-//------------------------------------------------------------------------
-// The hub has two entry paths, discriminated by _egHubGameOverlay:
-//   Normal  - from the mode-select / level-select / Nexus screens. The hub
-//             is a full screen; BACK returns to the Nexus.
-//   Overlay - via the B keybind mid-puzzle. The run keeps living underneath:
-//             the game is paused silently (no pause overlay), the avatar
-//             sprite is hidden (it is body-anchored and would float above the
-//             sheet), and B (or BACK) returns straight to the running puzzle
-//             exactly where it was.
 
 export let _egHubGameOverlay = false;
 // True only if THIS overlay open paused the game (a pause menu may already
@@ -2394,412 +1191,6 @@ export function egAddTestItems() {
 }
 
 
-
-
-
-
-
-
-
-
-//-------------------MASS SELL (STASH)------------------------------------
-//------------------------------------------------------------------------
-// Two buttons live in the stash header ("STASH" row):
-//   ⚙  opens the filter modal where the player marks which rarities are
-//      PROTECTED (kept). Unchecked rarities are sold.
-//   ⚒  sells every non-protected item in the stash in one go - same effect
-//      as Ctrl+Click (shard or no-value destroy), but batched with a single
-//      confirmation and a single save.
-
-// Builds / returns the shared mass-sell modal element (creates once).
-export function _egEnsureMassSellModal() {
-    _egInjectMassSellStyles();
-    let modal = document.getElementById('eg-mass-sell-modal');
-    if (modal) return modal;
-    modal = document.createElement('div');
-    modal.id = 'eg-mass-sell-modal';
-    modal.className = 'eg-mass-sell-modal-bg';
-    modal.innerHTML = `
-<div class="eg-mass-sell-box" id="eg-mass-sell-box">
-    <div class="eg-ms-head">
-        <span class="eg-ms-head-icon">⚒</span>
-        <span class="eg-ms-head-title">${t('eg_mass_sell_modal_title')}</span>
-        <button class="eg-ms-close" onclick="_egCloseMassSellModal()"
-                data-tip-t="eg_mass_sell_close" aria-label="${t('eg_mass_sell_close')}">✕</button>
-    </div>
-    <div class="eg-ms-body">
-        <div class="eg-ms-how">
-            <div class="eg-ms-how-title">${t('eg_mass_sell_how')}</div>
-            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b1')}</span></div>
-            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b2')}</span></div>
-            <div class="eg-ms-how-li"><span class="eg-ms-how-b">▸</span><span>${t('eg_mass_sell_b3')}</span></div>
-        </div>
-        <div class="eg-ms-section-head">
-            <span class="eg-ms-section-title">${t('eg_mass_sell_rarities_section')}</span>
-            <span class="eg-ms-section-line"></span>
-        </div>
-        <div class="eg-mass-sell-rarities" id="eg-mass-sell-rarities"></div>
-        <label class="eg-ms-toggle eg-ms-toggle-gold">
-            <input type="checkbox" id="eg-mass-sell-keep-unique" class="eg-ms-check">
-            <span>${t('eg_mass_sell_keep_unique')}</span>
-        </label>
-        <div class="eg-ms-section-head">
-            <span class="eg-ms-section-title">${t('eg_mass_sell_levels_section')}</span>
-            <span class="eg-ms-section-line"></span>
-        </div>
-        <div class="eg-ms-level-filters">
-            <div class="eg-ms-field">
-                <label for="eg-mass-sell-min-ilvl">${t('eg_mass_sell_min_ilvl')}</label>
-                <input type="number" id="eg-mass-sell-min-ilvl" min="0" max="100" step="1" value="0">
-                <span class="eg-ms-zero-hint">${t('eg_mass_sell_zero_off')}</span>
-            </div>
-            <div class="eg-ms-field">
-                <label for="eg-mass-sell-min-reqlvl">${t('eg_mass_sell_min_reqlvl')}</label>
-                <input type="number" id="eg-mass-sell-min-reqlvl" min="0" max="100" step="1" value="0">
-                <span class="eg-ms-zero-hint">${t('eg_mass_sell_zero_off')}</span>
-            </div>
-        </div>
-    </div>
-    <div class="eg-ms-foot">
-        <div class="eg-mass-sell-preview" id="eg-mass-sell-preview"></div>
-        <div class="eg-mass-sell-btns">
-            <button class="eg-mass-sell-btn eg-mass-sell-save" onclick="_egSaveMassSellModal()">${t('eg_mass_sell_save')}</button>
-            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCloseMassSellModal()">${t('reset_cancel')}</button>
-        </div>
-    </div>
-</div>
-<div class="eg-mass-sell-confirm" id="eg-mass-sell-confirm" style="display:none;">
-    <div class="eg-ms-head">
-        <span class="eg-ms-head-icon">⚒</span>
-        <span class="eg-ms-head-title">${t('eg_mass_sell_confirm_title')}</span>
-    </div>
-    <div class="eg-ms-confirm-body">
-        <div class="eg-mass-sell-confirm-text" id="eg-mass-sell-confirm-text"></div>
-        <div class="eg-mass-sell-btns">
-            <button class="eg-mass-sell-btn eg-mass-sell-confirm" onclick="_egConfirmMassSell()">${t('eg_mass_sell_confirm_btn')}</button>
-            <button class="eg-mass-sell-btn eg-mass-sell-cancel" onclick="_egCancelMassSellConfirm()">${t('eg_mass_sell_cancel')}</button>
-        </div>
-    </div>
-</div>`;
-    // Clicking the dimmed backdrop closes the modal (but not clicks inside the box).
-    modal.addEventListener('click', (e) => { if (e.target === modal) _egCloseMassSellModal(); });
-    document.body.appendChild(modal);
-    return modal;
-}
-
-export function _egRarityLabel(rarity) {
-    const keys = {
-        common: 'rar_common', uncommon: 'rar_uncommon', rare: 'rar_rare',
-        epic: 'eg_rar_epic', legendary: 'rar_legendary', cursed: 'rar_cursed',
-        artifact: 'eg_rar_artifact',
-    };
-    const k = keys[rarity];
-    if (k) { const tr = t(k); if (tr && tr !== k) return tr; }
-    return rarity.charAt(0).toUpperCase() + rarity.slice(1);
-}
-
-export function _egRarityColor(rarity) {
-    const map = {
-        common: '#b0b0b0', uncommon: '#2ecc71', rare: '#3498db',
-        epic: '#c39bd3', legendary: '#f5b642', cursed: '#e74c3c', artifact: '#f1c40f',
-    };
-    return map[rarity] || '#ccc';
-}
-
-export function _egRenderMassSellModalContent() {
-    const wrap = document.getElementById('eg-mass-sell-rarities');
-    if (!wrap) return;
-    if (!_egMassSellKeep) _egLoadMassSellSettings();
-    const rows = EG_MASS_SELL_RARITIES.map(r => {
-        const checked = _egMassSellKeep[r] ? 'checked' : '';
-        const col = _egRarityColor(r);
-        const label = _egRarityLabel(r);
-        return `<label class="eg-mass-sell-row" style="--rar:${col};">
-            <input type="checkbox" class="eg-ms-check" data-rarity="${r}" ${checked}>
-            <span class="eg-mass-sell-dot"></span>
-            <span class="eg-mass-sell-rarity-name">${label}</span>
-            <span class="eg-mass-sell-keep-hint">${t('eg_mass_sell_keep_label').replace('{rarity}', label)}</span>
-        </label>`;
-    }).join('');
-    wrap.innerHTML = rows;
-    // wire preview updates
-    wrap.querySelectorAll('input[data-rarity]').forEach(cb => {
-        cb.addEventListener('change', _egUpdateMassSellPreview);
-    });
-    const uniqCb = document.getElementById('eg-mass-sell-keep-unique');
-    if (uniqCb) {
-        uniqCb.checked = !!_egMassSellKeepUnique;
-        uniqCb.onchange = _egUpdateMassSellPreview;
-    }
-    // Level filters
-    const minIlvlInput = document.getElementById('eg-mass-sell-min-ilvl');
-    const minReqLvlInput = document.getElementById('eg-mass-sell-min-reqlvl');
-    if (minIlvlInput) {
-        minIlvlInput.value = _egMassSellMinItemLevel || 0;
-        minIlvlInput.onchange = _egUpdateMassSellPreview;
-    }
-    if (minReqLvlInput) {
-        minReqLvlInput.value = _egMassSellMinReqLevel || 0;
-        minReqLvlInput.onchange = _egUpdateMassSellPreview;
-    }
-    _egUpdateMassSellPreview();
-}
-
-export function _egUpdateMassSellPreview() {
-    const preview = document.getElementById('eg-mass-sell-preview');
-    if (!preview) return;
-    // read current UI state (not yet saved) for live numbers
-    const tempKeep = {};
-    document.querySelectorAll('#eg-mass-sell-rarities input[data-rarity]').forEach(cb => {
-        tempKeep[cb.dataset.rarity] = cb.checked;
-    });
-    const tempKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
-    const tempMinItemLevel = parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10);
-    const tempMinReqLevel = parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10);
-    let keep = 0, sell = 0;
-    if (_egInventory) {
-        for (let r = 0; r < _egInventory.length; r++) {
-            for (let c = 0; c < EG_INV_COLS; c++) {
-                const it = _egInventory[r][c];
-                if (!it) continue;
-                const rarity = (it.rarity || 'common').toLowerCase();
-                const protectedByRarity = !!tempKeep[rarity];
-                const protectedByUnique = tempKeepUnique && it.isUnique;
-                const protectedByItemLevel = tempMinItemLevel > 0 && it.itemLevel != null && it.itemLevel >= tempMinItemLevel;
-                const protectedByReqLevel = tempMinReqLevel > 0 && it.requirements && it.requirements.level != null && it.requirements.level >= tempMinReqLevel;
-                if (protectedByRarity || protectedByUnique || protectedByItemLevel || protectedByReqLevel) keep++; else sell++;
-            }
-        }
-    }
-    preview.innerHTML = t('eg_mass_sell_preview')
-        .replace('{keep}', `<span class="eg-ms-n-keep">${keep}</span>`)
-        .replace('{sell}', `<span class="eg-ms-n-sell">${sell}</span>`);
-    // also stash for confirm step
-    preview.dataset.keep = String(keep);
-    preview.dataset.sell = String(sell);
-}
-
-// Re-applies the static shell strings on every open so a language switch
-// mid-session is picked up (the shell markup itself is built only once).
-export function _egMassSellRenderStaticText(modal) {
-    const title = modal.querySelector('.eg-mass-sell-box .eg-ms-head-title');
-    if (title) title.textContent = t('eg_mass_sell_modal_title');
-    const close = modal.querySelector('.eg-ms-close');
-    if (close) {
-        // The hint is data-tip-t (resolved live at hover time), so only the
-        // accessible name needs re-applying on a language switch.
-        close.setAttribute('aria-label', t('eg_mass_sell_close'));
-    }
-    const howTitle = modal.querySelector('.eg-ms-how-title');
-    if (howTitle) howTitle.textContent = t('eg_mass_sell_how');
-    const bullets = ['eg_mass_sell_b1', 'eg_mass_sell_b2', 'eg_mass_sell_b3'];
-    modal.querySelectorAll('.eg-ms-how-li > span:last-child').forEach((el, i) => {
-        if (bullets[i]) el.textContent = t(bullets[i]);
-    });
-    const sections = modal.querySelectorAll('.eg-mass-sell-box .eg-ms-section-title');
-    if (sections[0]) sections[0].textContent = t('eg_mass_sell_rarities_section');
-    if (sections[1]) sections[1].textContent = t('eg_mass_sell_levels_section');
-    const toggleSpan = modal.querySelector('.eg-ms-toggle-gold > span');
-    if (toggleSpan) toggleSpan.textContent = t('eg_mass_sell_keep_unique');
-    const ilvlLabel = modal.querySelector('label[for="eg-mass-sell-min-ilvl"]');
-    if (ilvlLabel) ilvlLabel.textContent = t('eg_mass_sell_min_ilvl');
-    const reqLabel = modal.querySelector('label[for="eg-mass-sell-min-reqlvl"]');
-    if (reqLabel) reqLabel.textContent = t('eg_mass_sell_min_reqlvl');
-    modal.querySelectorAll('.eg-ms-zero-hint').forEach(el => { el.textContent = t('eg_mass_sell_zero_off'); });
-    const saveBtn = modal.querySelector('.eg-mass-sell-btn.eg-mass-sell-save');
-    if (saveBtn) saveBtn.textContent = t('eg_mass_sell_save');
-    const cancelBtn = modal.querySelector('.eg-mass-sell-box .eg-mass-sell-btn.eg-mass-sell-cancel');
-    if (cancelBtn) cancelBtn.textContent = t('reset_cancel');
-    const confirmTitle = modal.querySelector('.eg-mass-sell-confirm .eg-ms-head-title');
-    if (confirmTitle) confirmTitle.textContent = t('eg_mass_sell_confirm_title');
-    const confirmSell = modal.querySelector('.eg-mass-sell-btn.eg-mass-sell-confirm');
-    if (confirmSell) confirmSell.textContent = t('eg_mass_sell_confirm_btn');
-    const confirmCancel = modal.querySelector('.eg-mass-sell-confirm .eg-mass-sell-btn.eg-mass-sell-cancel');
-    if (confirmCancel) confirmCancel.textContent = t('eg_mass_sell_cancel');
-}
-
-export function _egOpenMassSellModal() {
-    _egLoadMassSellSettings();
-    const modal = _egEnsureMassSellModal();
-    _egMassSellRenderStaticText(modal);
-    _egRenderMassSellModalContent();
-    // ensure filter view is visible, confirm hidden
-    const box = modal.querySelector('.eg-mass-sell-box');
-    const confirm = document.getElementById('eg-mass-sell-confirm');
-    if (box) box.style.display = '';
-    if (confirm) confirm.style.display = 'none';
-    modal.classList.add('show');
-}
-
-export function _egCloseMassSellModal() {
-    const modal = document.getElementById('eg-mass-sell-modal');
-    if (modal) modal.classList.remove('show');
-}
-
-export function _egSaveMassSellModal() {
-    // persist checkbox states
-    const keep = {};
-    document.querySelectorAll('#eg-mass-sell-rarities input[data-rarity]').forEach(cb => {
-        keep[cb.dataset.rarity] = cb.checked;
-    });
-    _egMassSellKeep = _egNormaliseMassSellKeep(keep);
-    _egMassSellKeepUnique = !!document.getElementById('eg-mass-sell-keep-unique')?.checked;
-    _egMassSellMinItemLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-ilvl')?.value || '0', 10));
-    _egMassSellMinReqLevel = Math.max(0, parseInt(document.getElementById('eg-mass-sell-min-reqlvl')?.value || '0', 10));
-    _egSaveMassSellSettings();
-    _egCloseMassSellModal();
-    if (typeof showToast === 'function') globalThis.showToast(t('eg_mass_sell_saved'));
-}
-
-// ── Sell execution ───────────────────────────────────────────────────
-export function _egRequestMassSell() {
-    _egLoadMassSellSettings();
-    const { keep, sell } = _egMassSellCounts();
-    if (sell === 0) {
-        if (typeof showToast === 'function') globalThis.showToast(t('eg_mass_sell_nothing_to_sell'));
-        else alert(t('eg_mass_sell_nothing_to_sell'));
-        return;
-    }
-    const modal = _egEnsureMassSellModal();
-    // populate confirm text in the same modal (re-uses the overlay)
-    _egMassSellRenderStaticText(modal);
-    _egRenderMassSellModalContent();
-    const box = modal.querySelector('.eg-mass-sell-box');
-    const confirm = document.getElementById('eg-mass-sell-confirm');
-    const confirmText = document.getElementById('eg-mass-sell-confirm-text');
-    if (confirmText) {
-        confirmText.textContent = t('eg_mass_sell_confirm_text')
-            .replace('{n}', String(sell))
-            .replace('{k}', String(keep));
-    }
-    if (box) box.style.display = 'none';
-    if (confirm) confirm.style.display = '';
-    modal.classList.add('show');
-}
-
-export function _egCancelMassSellConfirm() {
-    const modal = document.getElementById('eg-mass-sell-modal');
-    if (!modal) return;
-    const box = modal.querySelector('.eg-mass-sell-box');
-    const confirm = document.getElementById('eg-mass-sell-confirm');
-    if (box) box.style.display = '';
-    if (confirm) confirm.style.display = 'none';
-    // stay open on the filter view (user can tweak and sell again) - alternatively close:
-    // _egCloseMassSellModal();
-}
-
-export function _egConfirmMassSell() {
-    const modal = document.getElementById('eg-mass-sell-modal');
-    if (modal) modal.classList.remove('show');
-    // Hide confirm sub-panel for next open
-    const box = modal && modal.querySelector('.eg-mass-sell-box');
-    const confirm = document.getElementById('eg-mass-sell-confirm');
-    if (box) box.style.display = '';
-    if (confirm) confirm.style.display = 'none';
-    _egExecuteMassSell();
-}
-
-export function _egExecuteMassSell() {
-    if (!_egInventory) return;
-    _egLoadMassSellSettings();
-    // Snapshot targets first so mutation during iteration is safe.
-    const targets = [];
-    for (let r = 0; r < _egInventory.length; r++) {
-        for (let c = 0; c < EG_INV_COLS; c++) {
-            const it = _egInventory[r][c];
-            if (!it) continue;
-            if (_egIsProtectedFromMassSell(it)) continue;
-            targets.push({ r, c, item: it });
-        }
-    }
-    if (targets.length === 0) {
-        if (typeof showToast === 'function') globalThis.showToast(t('eg_mass_sell_nothing_to_sell'));
-        return;
-    }
-
-    let sold = 0, noValue = 0, failed = 0;
-
-    // Re-use the per-item shard logic: noSellValue → destroy without shard,
-    // otherwise roll a shard. We batch the side-effects (single save, single
-    // render pass at the end) instead of calling _egSellStashItem per cell
-    // which would toast + save each time.
-    for (const { r, c, item } of targets) {
-        // Item may have been moved/cleared already if a previous failure left
-        // it - verify the slot still holds the same item.
-        if (_egInventory[r][c] !== item) continue;
-        if (item.noSellValue) {
-            _egInventory[r][c] = null;
-            sold++; noValue++;
-            continue;
-        }
-        // Try to grant a shard; if the shard stash is blocked the spec says
-        // to keep the item and flash - mirror _egSellStashItem behaviour.
-        // Unique items always grant an Ancient Shard.
-        let shardDef = null;
-        try {
-            if (item.isUnique && typeof EG_SHARD_DEFS !== 'undefined' && EG_SHARD_DEFS.shard_ancient) {
-                shardDef = EG_SHARD_DEFS.shard_ancient;
-            } else {
-                shardDef = (typeof _egRollShardForItem === 'function') ? _egRollShardForItem(item) : null;
-            }
-        } catch (e) { shardDef = null; }
-        if (!shardDef) {
-            // shard system unavailable - treat as no-value destroy so the
-            // inventory does not get stuck
-            _egInventory[r][c] = null;
-            sold++; noValue++;
-            continue;
-        }
-        let granted = false;
-        try {
-            granted = (typeof egAddShard === 'function') ? egAddShard(shardDef.id, 1) : false;
-        } catch (e) { granted = false; }
-        if (!granted) {
-            failed++;
-            continue;
-        }
-        _egInventory[r][c] = null;
-        sold++;
-    }
-
-    if (sold > 0) {
-        _egRenderInventory();
-        _egUpdateInvCount();
-        _egClearTooltip();
-        egSaveHubState();
-        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-            try { Audio_Manager.playSFX('player_equip_pickup'); } catch (e) {}
-        }
-        if (typeof showToast === 'function') {
-            if (failed > 0) {
-                globalThis.showToast(t('eg_mass_sell_done')
-                    .replace('{n}', String(sold))
-                    + ' ' + t('eg_mass_sell_failed_shard_full').replace('{n}', String(failed)));
-            } else if (noValue > 0) {
-                globalThis.showToast(t('eg_mass_sell_done_no_value')
-                    .replace('{n}', String(sold))
-                    .replace('{z}', String(noValue)));
-            } else {
-                globalThis.showToast(t('eg_mass_sell_done').replace('{n}', String(sold)));
-            }
-        }
-        if (failed > 0) {
-            const grid = document.getElementById('eg-inv-grid');
-            if (grid) {
-                grid.classList.add('eg-slot-reject');
-                setTimeout(() => grid.classList.remove('eg-slot-reject'), 600);
-            }
-        }
-    } else if (failed > 0) {
-        if (typeof showToast === 'function') globalThis.showToast(t('eg_mass_sell_failed_shard_full').replace('{n}', String(failed)));
-        const grid = document.getElementById('eg-inv-grid');
-        if (grid) {
-            grid.classList.add('eg-slot-reject');
-            setTimeout(() => grid.classList.remove('eg-slot-reject'), 600);
-        }
-    }
-}
-
 // Global Escape handler for the endgame stash modals (only when open):
 // closes the mass-sell overlay (confirm step steps back to filter view).
 window.addEventListener('keydown', (e) => {
@@ -2819,267 +1210,109 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-export function _egInjectMassSellStyles() {
-    if (document.getElementById('eg-mass-sell-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'eg-mass-sell-styles';
-    style.textContent = `
-        /* ── stash header buttons ── */
-        .eg-stash-header {
-            display: flex; align-items: center; justify-content: space-between; gap: 10px;
-        }
-        .eg-stash-actions { display: flex; gap: 6px; align-items: center; }
-        .eg-stash-btn {
-            font-family: var(--PX, monospace); font-size: 9px; letter-spacing: 1px;
-            padding: 5px 10px; cursor: pointer;
-            border: 1px solid var(--border2, #656f96); color: var(--accent2, #fff);
-            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2)), var(--surface, #303648);
-            transition: all 0.12s;
-            white-space: nowrap;
-        }
-        .eg-stash-btn:hover { color: var(--accent, #66fcf1); border-color: var(--accent, #66fcf1); }
-        .eg-stash-btn-sell { color: var(--yellow, #f5c518); border-color: rgba(245,197,24,0.55); }
-        .eg-stash-btn-sell:hover {
-            box-shadow: 0 0 8px rgba(245,197,24,0.3); color: #fff;
-            border-color: var(--yellow, #f5c518);
-        }
+// ---- re-exports from the focused split modules (public surface preserved) ----
 
-        /* ── backdrop ── */
-        .eg-mass-sell-modal-bg {
-            display: none; position: fixed; inset: 0;
-            background: rgba(5,8,14,0.78);
-            backdrop-filter: blur(2px);
-            z-index: 10001;
-            align-items: center; justify-content: center;
-        }
-        .eg-mass-sell-modal-bg.show { display: flex; }
+export {
+    EG_INV_COLS,
+    EG_INV_INITIAL_ROWS,
+    EG_INV_ROWS,
+    _egAddItemToStash,
+    _egEnsureInvRows,
+    _egEquipped,
+    _egExpandStashByOneRow,
+    _egFindFreeInvCell,
+    _egGetInvCapacity,
+    _egGetInvRows,
+    _egInventory,
+    _egRebuildInventoryGrid,
+    _egStashTab,
+} from './hub-stash.js';
 
-        /* ── shell: fixed header, scrollable body, pinned footer ── */
-        .eg-mass-sell-box {
-            display: flex; flex-direction: column;
-            box-sizing: border-box;
-            background: var(--panel, #222630);
-            border: 1px solid var(--border2, #656f96);
-            border-radius: 8px;
-            width: min(480px, 94vw);
-            max-height: min(640px, 92vh);
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.55),
-                        0 0 26px rgba(102,252,241,0.10),
-                        0 22px 48px rgba(0,0,0,0.55);
-            overflow: hidden;
-        }
-        .eg-mass-sell-confirm {
-            box-sizing: border-box;
-            background: var(--panel, #222630);
-            border: 1px solid var(--border2, #656f96);
-            border-radius: 8px;
-            width: min(420px, 92vw);
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.55),
-                        0 0 26px rgba(102,252,241,0.10),
-                        0 22px 48px rgba(0,0,0,0.55);
-            overflow: hidden;
-        }
+export {
+    EG_CURRENCY_COLS,
+    EG_CURRENCY_ROWS,
+    EG_CURRENCY_SLOT_MAP,
+    EG_CURRENCY_SLOT_REVERSE,
+    _egBuildCraftingBenchSlotHTML,
+    _egCurrencyDefForId,
+    _egCurrencyIdForSlot,
+    _egCurrencySlotForId,
+    _egCurrencyStash,
+} from './hub-currency.js';
 
-        /* ── header ── */
-        .eg-ms-head {
-            display: flex; align-items: center; gap: 10px;
-            padding: 11px 14px;
-            border-bottom: 1px solid var(--border, #4a5475);
-            background: linear-gradient(180deg, rgba(102,252,241,0.07), rgba(102,252,241,0.02));
-            flex-shrink: 0;
-        }
-        .eg-ms-head-icon {
-            font-size: 16px; line-height: 1; color: var(--accent, #66fcf1);
-            text-shadow: 0 0 8px rgba(102,252,241,0.5);
-        }
-        .eg-ms-head-title {
-            flex: 1; min-width: 0;
-            font-family: var(--PX, monospace); font-size: 11px; letter-spacing: 2px;
-            color: var(--accent, #66fcf1);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .eg-ms-close {
-            width: 24px; height: 24px; flex-shrink: 0;
-            font-family: var(--PX, monospace); font-size: 10px; line-height: 1;
-            color: var(--accent2, #fff); background: transparent;
-            border: 1px solid var(--border2, #656f96); border-radius: 4px;
-            cursor: pointer; transition: all 0.12s;
-        }
-        .eg-ms-close:hover {
-            color: #ff6b6b; border-color: rgba(255,107,107,0.6);
-            background: rgba(255,107,107,0.12);
-        }
+export {
+    EG_MAP_STASH_COLS,
+    EG_MAP_STASH_INITIAL_ROWS,
+    EG_MAP_STASH_ROWS,
+    EG_MAP_TIER_COUNT,
+    EG_MAP_TIER_ROMANS,
+    _egEnsureMapTierRows,
+    _egFindFreeMapCellForTier,
+    _egGetMapStashRowsForTier,
+    _egGetMapTierGrid,
+    _egIsLegacyFlatMapStash,
+    _egIsTieredMapStash,
+    _egMakeAllMapStashes,
+    _egMakeMapTierGrid,
+    _egMapStash,
+    _egMapTierToIndex,
+    _egRebuildMapStashGrid,
+} from './hub-map-stash.js';
 
-        /* ── scrollable body ── */
-        .eg-ms-body {
-            flex: 1; min-height: 0;
-            overflow-y: auto; overflow-x: hidden;
-            padding: 12px 14px;
-            display: flex; flex-direction: column; gap: 10px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border2, #656f96) transparent;
-        }
-        .eg-ms-body::-webkit-scrollbar { width: 8px; }
-        .eg-ms-body::-webkit-scrollbar-track { background: transparent; }
-        .eg-ms-body::-webkit-scrollbar-thumb { background: var(--border2, #656f96); border-radius: 4px; }
+export {
+    EG_MASS_SELL_RARITIES,
+    _egBuildItemChipHTML,
+    _egChipCounter,
+    _egChipRegistry,
+    _egDefaultMassSellKeep,
+    _egHandleChipMouseDown,
+    _egIsProtectedFromMassSell,
+    _egLoadMassSellSettings,
+    _egMassSellCounts,
+    _egMassSellKeep,
+    _egMassSellKeepUnique,
+    _egMassSellMinItemLevel,
+    _egMassSellMinReqLevel,
+    _egNormaliseMassSellKeep,
+    _egSaveMassSellSettings,
+    _egShowItemLevel,
+    _egShowTooltipFromChip,
+} from './hub-mass-sell.js';
 
-        /* ── how-it-works ── */
-        .eg-ms-how {
-            border: 1px solid var(--border, #4a5475);
-            border-left: 3px solid var(--accent, #66fcf1);
-            border-radius: 4px;
-            background: rgba(102,252,241,0.04);
-            padding: 8px 10px;
-        }
-        .eg-ms-how-title {
-            font-family: var(--PX, monospace); font-size: 7px; letter-spacing: 2px;
-            color: var(--accent, #66fcf1); opacity: 0.9; margin-bottom: 6px;
-        }
-        .eg-ms-how-li {
-            display: flex; gap: 7px; align-items: baseline;
-            font-family: var(--F, monospace); font-size: 12.5px; line-height: 1.45;
-            color: var(--accent2, #fff); opacity: 0.88;
-        }
-        .eg-ms-how-li + .eg-ms-how-li { margin-top: 3px; }
-        .eg-ms-how-b { color: var(--accent, #66fcf1); flex-shrink: 0; }
+export {
+    _egBuildHubInfoTooltipHTML,
+    _egBuildTopbarHTML,
+    _egHideHubInfoTooltip,
+    _egShowHubInfoTooltip,
+    _egShowItemLevelToggleTooltip,
+    _egShowMassSellConfigTooltip,
+    _egShowMassSellTooltip,
+    _egToggleItemLevelDisplay,
+    _egUpdateItemLevelToggleButton,
+    _egUpdatePassiveTreeButton,
+} from './hub-topbar.js';
 
-        /* ── section headers ── */
-        .eg-ms-section-head { display: flex; align-items: center; gap: 8px; }
-        .eg-ms-section-title {
-            font-family: var(--PX, monospace); font-size: 8px; letter-spacing: 2px;
-            color: var(--accent, #66fcf1);
-        }
-        .eg-ms-section-line { flex: 1; height: 1px; background: var(--border, #4a5475); opacity: 0.6; }
+export {
+    _egHealCurrencyItem,
+    _egHealEssenceItem,
+    _egPendingHandMigrationToast,
+    _egShowHandMigrationToast,
+    egSaveHubState,
+} from './hub-load.js';
 
-        /* ── rarity rows ── */
-        .eg-mass-sell-rarities { display: flex; flex-direction: column; gap: 4px; }
-        .eg-mass-sell-row {
-            display: flex; align-items: center; gap: 9px;
-            padding: 5px 8px; border: 1px solid transparent; border-radius: 3px;
-            background: transparent; cursor: pointer; user-select: none;
-            font-family: var(--F, monospace); font-size: 13px; color: var(--accent2, #fff);
-            transition: background 0.12s, border-color 0.12s;
-        }
-        .eg-mass-sell-row:hover { background: rgba(255,255,255,0.05); border-color: var(--rar, #888); }
-        .eg-mass-sell-dot {
-            width: 10px; height: 10px; border-radius: 2px; background: var(--rar);
-            display: inline-block; flex-shrink: 0;
-            box-shadow: 0 0 5px var(--rar);
-        }
-        .eg-mass-sell-rarity-name { font-weight: 700; color: var(--rar); }
-        .eg-mass-sell-keep-hint {
-            margin-left: auto;
-            font-family: var(--F, monospace); font-size: 11px;
-            opacity: 0.55; letter-spacing: 0.5px;
-        }
-
-        /* ── custom checkboxes (same look as the loot filter) ── */
-        .eg-ms-check {
-            appearance: none; -webkit-appearance: none;
-            width: 15px; height: 15px; flex-shrink: 0; margin: 0;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border2, #656f96); border-radius: 2px;
-            cursor: pointer; position: relative;
-            transition: all 0.12s;
-        }
-        .eg-ms-check:hover { border-color: var(--accent, #66fcf1); }
-        .eg-ms-check:checked {
-            background: var(--accent, #66fcf1); border-color: var(--accent, #66fcf1);
-            box-shadow: 0 0 7px rgba(102,252,241,0.55);
-        }
-        .eg-ms-check:checked::after {
-            content: '✓'; position: absolute; inset: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 700; color: #0c1016;
-        }
-
-        /* ── gold toggle row ── */
-        .eg-ms-toggle {
-            display: flex; align-items: center; gap: 9px;
-            padding: 5px 8px; border-radius: 3px; cursor: pointer; user-select: none;
-            font-family: var(--F, monospace); font-size: 13px; color: var(--accent2, #fff);
-            border: 1px solid transparent;
-            transition: background 0.12s, border-color 0.12s;
-        }
-        .eg-ms-toggle:hover { background: rgba(102,252,241,0.05); border-color: var(--border, #4a5475); }
-        .eg-ms-toggle-gold span { color: var(--yellow, #f5c518); }
-
-        /* ── level filter fields ── */
-        .eg-ms-level-filters { display: flex; flex-direction: column; gap: 8px; }
-        .eg-ms-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-        .eg-ms-field > label {
-            font-family: var(--PX, monospace); font-size: 7px; letter-spacing: 1px;
-            color: var(--setup-opt-inactive, #8892a3); text-transform: uppercase;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .eg-ms-field input[type="number"] {
-            width: 100%; box-sizing: border-box;
-            font-family: var(--F, monospace); font-size: 13px;
-            color: var(--accent, #66fcf1);
-            background: rgba(0,0,0,0.35);
-            border: 1px solid var(--border, #4a5475); border-radius: 3px;
-            padding: 4px 7px;
-            transition: border-color 0.12s, box-shadow 0.12s;
-        }
-        .eg-ms-field input[type="number"]:focus {
-            outline: none; border-color: var(--accent, #66fcf1);
-            box-shadow: 0 0 6px rgba(102,252,241,0.3);
-        }
-        .eg-ms-zero-hint {
-            font-family: var(--F, monospace); font-size: 10px; line-height: 1;
-            color: var(--setup-opt-inactive, #8892a3); opacity: 0.85;
-        }
-
-        /* ── footer (pinned: preview + save/cancel always visible) ── */
-        .eg-ms-foot {
-            flex-shrink: 0;
-            border-top: 1px solid var(--border, #4a5475);
-            background: rgba(0,0,0,0.18);
-            padding: 9px 14px 12px;
-        }
-        .eg-mass-sell-preview {
-            text-align: center; min-height: 17px; margin-bottom: 8px;
-            font-family: var(--F, monospace); font-size: 13px; letter-spacing: 0.5px;
-            color: var(--accent2, #fff);
-        }
-        .eg-ms-n-keep { color: var(--green, #3ddc84); }
-        .eg-ms-n-sell { color: var(--orange, #ff8c42); }
-        .eg-mass-sell-btns { display: flex; gap: 10px; justify-content: center; }
-        .eg-mass-sell-btn {
-            font-family: var(--PX, monospace); font-size: 10px; letter-spacing: 1px;
-            padding: 9px 20px; cursor: pointer;
-            color: var(--accent2, #fff);
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border2, #656f96); border-radius: 4px;
-            transition: all 0.12s;
-        }
-        .eg-mass-sell-btn:hover { border-color: var(--accent, #66fcf1); color: var(--accent, #66fcf1); }
-        .eg-mass-sell-btn.eg-mass-sell-save {
-            color: #0c1016; background: var(--accent, #66fcf1);
-            border-color: var(--accent, #66fcf1); font-weight: 700;
-        }
-        .eg-mass-sell-btn.eg-mass-sell-save:hover { box-shadow: 0 0 12px rgba(102,252,241,0.5); }
-
-        /* ── confirm view ── */
-        .eg-ms-confirm-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
-        .eg-mass-sell-confirm-text {
-            font-family: var(--F, monospace); font-size: 13px; line-height: 1.5;
-            color: var(--accent2, #fff); text-align: center;
-        }
-        /* Destructive action - red fill, matching the game's delete-confirm button */
-        .eg-mass-sell-btn.eg-mass-sell-confirm {
-            color: #fff; background: var(--red, #e74c3c);
-            border-color: var(--red, #e74c3c); font-weight: 700;
-        }
-        .eg-mass-sell-btn.eg-mass-sell-confirm:hover {
-            filter: brightness(1.1); box-shadow: 0 0 10px rgba(231,76,60,0.4);
-        }
-
-        /* ── narrow screens ── */
-        @media (max-width: 500px) {
-            .eg-ms-body { padding: 10px; }
-            .eg-ms-foot { padding: 8px 10px 10px; }
-        }
-    `;
-    document.head.appendChild(style);
-}
+export {
+    _egCancelMassSellConfirm,
+    _egCloseMassSellModal,
+    _egConfirmMassSell,
+    _egEnsureMassSellModal,
+    _egExecuteMassSell,
+    _egInjectMassSellStyles,
+    _egMassSellRenderStaticText,
+    _egOpenMassSellModal,
+    _egRarityColor,
+    _egRarityLabel,
+    _egRenderMassSellModalContent,
+    _egRequestMassSell,
+    _egSaveMassSellModal,
+    _egUpdateMassSellPreview,
+} from './hub-mass-sell-modal.js';

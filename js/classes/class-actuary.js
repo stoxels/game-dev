@@ -8,6 +8,8 @@ import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { _fadeOutElement } from './class-recursionist.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
 //-------------------------------ACTUARY CLASS----------------------------
@@ -95,7 +97,7 @@ export function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
     }
 
     renderCell(r, c);
-    globalThis.questStat_mistakesRemoved(1);
+    questStat_mistakesRemoved(1);
     Audio_Manager.playSFX('actuary_mistake_reversed');
 
     return Math.round(penaltySecs * recoverPct);
@@ -153,8 +155,8 @@ export function _regressionChainRevealCells(fromRow, fromCol, count) {
         if (targets.length > 0) { // Audio_Manager: Phase 3 module import, always present
             Audio_Manager.playSFX('arcaneReveal');
         }
-        globalThis.questStat_classRevealUsed(targets.length);
-        globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+        questStat_classRevealUsed(targets.length);
+        updateQuestStats('classAbilityUsedThisLevel', {});
         globalThis.checkWin();
     }, REGRESSION_CHAIN_REVEAL_DELAY);
 
@@ -429,7 +431,7 @@ export function _sigThresholdIntercept(row, col) {
         // Prevent the mistake - auto-mark the cell as ✕ (value 2).
         if (globalThis.userGrid[row][col] === 0) {
             globalThis.userGrid[row][col] = 2;
-            globalThis.questStat_classMarkUsed(1);
+            questStat_classMarkUsed(1);
             renderCell(row, col);
             trackAchStat('tilesMarkedWrong', 1);
         }
@@ -461,7 +463,7 @@ export function _sigThresholdIntercept(row, col) {
     // Shield triggered - auto-mark the cell as ✕ (value 2) instead of a mistake.
     if (globalThis.userGrid[row][col] === 0) {
         globalThis.userGrid[row][col] = 2;
-        globalThis.questStat_classMarkUsed(1);
+        questStat_classMarkUsed(1);
         renderCell(row, col);
         trackAchStat('tilesMarkedWrong', 1);
     }

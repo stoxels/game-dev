@@ -7,6 +7,10 @@ import { clearHover } from './mouse-over.js';
 import { showHS } from './screens/screens-highscore.js';
 import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/screens-save-slots.js';
 import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchAdventureMode, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
+import { ptGoBack, showPassiveTree } from './passive-tree/passive-tree.js';
+import { showQuestLog } from './quests/quests-ui.js';
+import { _ptRefundAllPoints } from './passive-tree/passive-tree-state-points.js';
+
 //------------------------------------------------------------------------
 //-------------------REPLAY GALLERY (GLOBAL HELPER)-----------------------
 //------------------------------------------------------------------------
@@ -431,8 +435,8 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
 
     onClick('btn-levels-back', () => showSetup());
-    onClick('btn-go-passive-tree', () => globalThis.showPassiveTree());
-    onClick('btn-quest-log', () => globalThis.showQuestLog());
+    onClick('btn-go-passive-tree', () => showPassiveTree());
+    onClick('btn-quest-log', () => showQuestLog());
 
 
     //------------------------------------------------------------------------
@@ -773,7 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('btn-pt-back', () => globalThis.ptGoBack());
+    onClick('btn-pt-back', () => ptGoBack());
 
     // DEV SANDBOX passive tree - BACK returns to the select-mode screen.
     onClick('btn-dpt-back', () => globalThis.dptGoBack());
@@ -824,7 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    onClick('btn-pt-refund-all', () => showPtRefundConfirm(() => globalThis._ptRefundAllPoints()));
+    onClick('btn-pt-refund-all', () => showPtRefundConfirm(() => _ptRefundAllPoints()));
 
 
     //------------------------------------------------------------------------

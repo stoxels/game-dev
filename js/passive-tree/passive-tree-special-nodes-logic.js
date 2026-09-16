@@ -4,6 +4,8 @@ import { stopTimer, updTimer } from '../timer.js';
 import { t } from '../translation/translations.js';
 import { PassiveTracker } from './passive-tracker.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
+import { questStat_gamblersRuinTimeAdded } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //----------------- passive-tree-special-nodes-logic.js ------------------
 //------------------------------------------------------------------------
@@ -581,7 +583,7 @@ export function _applyMaximumLikelihood() {
 export function _gamblersRuinOnCorrectFill() {
     if (!ptHasSkill('keystone_gamblers_ruin')) return;
     globalThis.timerSecs += 3;
-    globalThis.questStat_gamblersRuinTimeAdded(3);
+    questStat_gamblersRuinTimeAdded(3);
     updTimer();
 }
 

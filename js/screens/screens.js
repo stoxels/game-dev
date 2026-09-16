@@ -5,6 +5,9 @@ import { t } from '../translation/translations.js';
 import { isLevelConvergence, renderLevelSelect } from './screens-level-select.js';
 import { showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
+import { showPassiveTree } from '../passive-tree/passive-tree.js';
+import { _dofNudge } from '../passive-tree/passive-tree-special-nodes-logic.js';
+
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'replayLevel', { get() { return replayLevel; }, set(v) { replayLevel = v; }, configurable: true }); } catch (e) {}
 //------------------------------------------------------------------------
@@ -115,7 +118,7 @@ export function showConvergenceModal() {
 //------------------------------------------------------------------------
 (function _bindConvergenceModalButtons() {
     const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
-    on('convm-btn-open', () => { hideConvergenceModal(); hideResultOverlays(); globalThis.showPassiveTree(); });
+    on('convm-btn-open', () => { hideConvergenceModal(); hideResultOverlays(); showPassiveTree(); });
     on('convm-btn-next', () => { hideConvergenceModal(); goToNextLevel(); });
     on('convm-btn-select', () => { hideConvergenceModal(); goToLevelSelect(); });
 })();
@@ -208,7 +211,7 @@ export function _wireConvergenceModalButtons(modal, proceed) {
     const levelsBtn = modal.querySelector('.convm-btn.select');
 
     // Tree button opens the passive tree; navigation continues from there.
-    treeBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { hideResultOverlays(); globalThis.showPassiveTree(); });
+    treeBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { hideResultOverlays(); showPassiveTree(); });
     nextBtn.onclick = _buildConvergenceButtonHandler(proceed);
     levelsBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { goToLevelSelect(); });
 }
@@ -437,7 +440,7 @@ export function goToPreviousScreen() {
     if (openModal) {
         // The Degrees of Freedom choice is mandatory - never dismiss it via back navigation.
         if (openModal.id === 'dof-modal') {
-            if (typeof globalThis._dofNudge === 'function') globalThis._dofNudge();
+            if (typeof globalThis._dofNudge === 'function') _dofNudge();
             return;
         }
         openModal.classList.remove('show');

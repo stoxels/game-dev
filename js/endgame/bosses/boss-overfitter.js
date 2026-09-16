@@ -4,7 +4,7 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { t } from '../../translation/translations.js';
-import { _egRecentFills } from '../endgame-state.js';
+import { _egCellInBounds, _egRecentFills } from '../endgame-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egUnfillCell } from './shared-boss-abilities.js';
 
@@ -298,7 +298,8 @@ export function _egMechPatternBreak(monster, phase) {
     _egOvrEnsureFinalWatcher(monster);
     const sol = globalThis.cur.grid;
     const recent = [..._egRecentFills].reverse().filter(([r, c]) =>
-        globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
+        _egCellInBounds(r, c)
+        && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
     );
     if (recent.length === 0) return;
 

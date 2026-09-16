@@ -8,6 +8,8 @@ import { cooldownState } from './class-cooldown-state.js';
 import { hideLsClassTooltip } from './class-hud-levelselect-tooltip.js';
 import { buildClassHUD, hideHUDTooltip } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
 //-------------------------------BAYESIAN CLASS---------------------------
@@ -471,8 +473,8 @@ export function _bayesTrapReveal(row, col) {
     if (affected.length > 0) {
         globalThis._applyCellEffect(affected, 'reveal');
         trackAchStat('tilesRevealed', affected.length);
-        globalThis.questStat_classRevealUsed(affected.length);
-        globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+        questStat_classRevealUsed(affected.length);
+        updateQuestStats('classAbilityUsedThisLevel', {});
         globalThis.checkWin();
     }
 
@@ -500,7 +502,7 @@ export function _bayesTrapElimination(row, col) {
             // Only mark cells that are empty/unflagged and not already confirmed wrong
             if (sol[r][c] === 0 && (globalThis.userGrid[r][c] === 0 || globalThis.userGrid[r][c] === 3) && !globalThis.wrongGrid[r][c]) {
                 globalThis.userGrid[r][c] = 2; // ✕ mark
-                globalThis.questStat_classMarkUsed(1);
+                questStat_classMarkUsed(1);
                 renderCell(r, c);
                 trackAchStat('tilesMarkedWrong', 1);
             }
@@ -619,7 +621,7 @@ export function _bayesTrapProtectionIntercept(row, col) {
     if (globalThis.userGrid[row][col] === 0) {
         globalThis.userGrid[row][col] = 2;
         renderCell(row, col);
-        globalThis.questStat_classMarkUsed(1);
+        questStat_classMarkUsed(1);
     }
 
     // Consume this line's protection (one protection = one intercept)
@@ -1087,8 +1089,8 @@ export function _typeIBonusRevealCell(row, col) {
 
     globalThis.showToast(t('cls_typei_bonus'));
 
-    globalThis.questStat_classRevealUsed(1);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(1);
+    updateQuestStats('classAbilityUsedThisLevel', {});
 
     globalThis.checkWin();
 }

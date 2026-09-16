@@ -5,6 +5,8 @@ import { handleWrongFill } from '../mouse-button-handlers.js';
 import { t } from '../translation/translations.js';
 import { _refundCooldown } from './class-actuary.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
 //----------------------------RECURSIONIST CLASS-------------------------
@@ -357,8 +359,8 @@ export function _revealCellFromSkeleton(r, c) {
     trackAchStat('tilesRevealed', 1);
     trackAchStat('residualBeamsFired');
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
-    globalThis.questStat_classRevealUsed(1);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(1);
+    updateQuestStats('classAbilityUsedThisLevel', {});
     globalThis.checkWin();
 }
 

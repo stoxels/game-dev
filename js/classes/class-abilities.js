@@ -23,6 +23,8 @@ import { activateTargetingReticle } from './targeting-reticle.js';
 import { playShieldChargePulseEffect, playTimeGainEffect } from '../passive-tree/passive-effects.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getCharmLockedSkillForLegacySlot, getSkillCastRankClampedForSlot, getSkillIdForLegacySlot, noteCharmCast } from '../skills/skill-charms.js';
+import { _incDirect, updateQuestStats } from '../quests/quests-stats.js';
+
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'correctFillStreak', { get() { return correctFillStreak; }, set(v) { correctFillStreak = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'nextPenaltyHalved', { get() { return nextPenaltyHalved; }, set(v) { nextPenaltyHalved = v; }, configurable: true }); } catch (e) {}
@@ -294,7 +296,7 @@ export function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
     } else {
         _dispatchBaseActive2(playerClass, row, col, effect);
     }
-    globalThis.updateQuestStats('classAbilityUsed', {});
+    updateQuestStats('classAbilityUsed', {});
 }
 
 
@@ -327,7 +329,7 @@ export function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect
         try { globalThis._playAvatarSkillAnimationForSlot(hudSlot); } catch (e) {}
     }
 
-    globalThis.updateQuestStats('classAbilityUsed', {});
+    updateQuestStats('classAbilityUsed', {});
 
     switch (ascendency) {
         case 'outlier':
@@ -609,7 +611,7 @@ export function _fireInstantHeartbloomAbility() {
             try { globalThis._playAvatarSkillAnimationForSlot('active5'); } catch (e) {}
         }
         if (typeof trackAchStat === 'function') trackAchStat('skillHeartbloomUsed');
-        if (typeof globalThis.updateQuestStats === 'function') globalThis.updateQuestStats('classAbilityUsed', {});
+        if (typeof globalThis.updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
         if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter('heartbloom');
     } else {
         if (typeof globalThis.showToast === 'function') globalThis.showToast('💚 Heartbloom: no free cells!', '#ff6b9d');
@@ -931,7 +933,7 @@ export function _bayesianRevealOneCell() {
     renderCell(r, c);
     updClues(r, c);
     trackAchStat('tilesRevealed', 1);
-    globalThis._incDirect('lifetimeTilesRevealed', 1);
+    _incDirect('lifetimeTilesRevealed', 1);
 
     if (typeof _playBayesianRevealEffect === 'function') {
         const cellEl = document.getElementById(`g-${r}-${c}`);

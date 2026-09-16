@@ -7,6 +7,8 @@ import { t } from '../translation/translations.js';
 import { _egEndMapDefeated } from './endgame-encounter-chain.js';
 import { _egGetMistakesRemaining } from './endgame-encounter-tick.js';
 import { _egIsActive } from './endgame-state.js';
+import { _egClearCenterGridBanners } from '../timer.js';
+
 
 //  endgame-encounter-overlays.js
 //  WARNINGS & FAIL OVERLAYS - extracted 2026-09-10 from
@@ -17,7 +19,7 @@ import { _egIsActive } from './endgame-state.js';
 //
 export function _egShowMistakesWarningBanner(remaining) {
     // Dismiss any other center-grid banner so concurrent events don't stack
-    globalThis._egClearCenterGridBanners('eg-mistakes-warning-banner');
+    _egClearCenterGridBanners('eg-mistakes-warning-banner');
     // Remove any stale banner so a rapid 3→2→1 cascade always shows the newest count
     const old = document.getElementById('eg-mistakes-warning-banner');
     if (old) old.remove();
@@ -108,7 +110,7 @@ export function _egGetLowHealthWarningTier(pct) {
 }
 
 export function _egShowLowHealthWarningBanner() {
-    globalThis._egClearCenterGridBanners('eg-low-health-warning-banner');
+    _egClearCenterGridBanners('eg-low-health-warning-banner');
     const old = document.getElementById('eg-low-health-warning-banner');
     if (old) old.remove();
 
@@ -177,7 +179,7 @@ export function _egResetLowHealthWarningState() {
 // not at percentage thresholds like the health warning.
 
 export function _egShowAbsorptionBrokenBanner() {
-    globalThis._egClearCenterGridBanners('eg-absorption-broken-banner');
+    _egClearCenterGridBanners('eg-absorption-broken-banner');
     const old = document.getElementById('eg-absorption-broken-banner');
     if (old) old.remove();
 

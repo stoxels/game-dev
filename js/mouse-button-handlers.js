@@ -6,6 +6,11 @@ import { save } from './state.js';
 import { stopTimer, updTimer } from './timer.js';
 import { t } from './translation/translations.js';
 import { _countAdjacentPrefillRun, dragCounterApply, dragCounterClear } from './mouse-over.js';
+import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
+import { _incDirect, questStat_confidenceIntervalIgnored, questStat_hasManuallyFilledCell, questStat_sampleEfficiencyReveal } from './quests/quests-stats.js';
+import { PassiveTracker } from './passive-tree/passive-tracker.js';
+import { _binomialBurstOnCorrectFill, _frequentistsBurdenOnCorrectFill, _gamblersRuinOnCorrectFill, _getBayesianBonus, _resetBayesianBonus } from './passive-tree/passive-tree-special-nodes-logic.js';
+
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'dragAxis', { get() { return dragAxis; }, set(v) { dragAxis = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'touchpadMarkModeActive', { get() { return touchpadMarkModeActive; }, set(v) { touchpadMarkModeActive = v; }, configurable: true }); } catch (e) {}
@@ -240,7 +245,7 @@ export function checkCellGuards(row, col) {
 // Freeze: mark wrong visually but charge no time.
 export function tryAbsorbWithFreeze(row, col) {
     if (!window._freezeActive) return false;
-    if (globalThis.ptHasSkill('keystone_null_hypothesis') || globalThis.ptHasSkill('keystone_asymptotic_mastery')) return false;
+    if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
     globalThis.wrongGrid[row][col] = true;
     renderCell(row, col);
     globalThis.showToast(t('cg_frozen_no_penalty'));
@@ -253,7 +258,7 @@ export function tryAbsorbWithFreeze(row, col) {
 // Shield: absorb the mistake, consume one shield charge.
 export function tryAbsorbWithShield(row, col) {
     if (!globalThis.shieldActive) return false;
-    if (globalThis.ptHasSkill('keystone_null_hypothesis') || globalThis.ptHasSkill('keystone_asymptotic_mastery')) return false;
+    if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
 
     globalThis.wrongGrid[row][col] = true;
     renderCell(row, col);
@@ -272,7 +277,7 @@ export function tryAbsorbWithShield(row, col) {
 
 // Class passive (e.g. Mathmagician): penalty multiplier of 0 means fully absorbed.
 export function tryAbsorbWithClassPassive(row, col) {
-    if (globalThis.ptHasSkill('keystone_null_hypothesis') || globalThis.ptHasSkill('keystone_asymptotic_mastery')) return false;
+    if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
     // Suppress any shield-visibility sync (e.g. inside getClassPenaltyMultiplier)
     // from hiding the bubble before we know this was absorbed, and before the
     // meteor VFX gets a chance to play.
@@ -305,12 +310,12 @@ export function tryAbsorbWithConfidenceInterval(row, col) {
     globalThis._confidenceIntervalActive = false;
     globalThis._confidenceIntervalUsed = true;     // prevent two CI absorbs back-to-back
     globalThis.absorbedMistakes++;
-    globalThis.questStat_confidenceIntervalIgnored();
+    questStat_confidenceIntervalIgnored();
     globalThis.wrongGrid[row][col] = true;
     renderCell(row, col);
     globalThis.consecutiveCorrectFills = 0;        // CI absorption also breaks the correct-fill streak
     globalThis._streakBonusFills = 0;
-    if (typeof globalThis.PassiveTracker !== 'undefined') globalThis.PassiveTracker.onStreakReset();
+    if (typeof globalThis.PassiveTracker !== 'undefined') PassiveTracker.onStreakReset();
     globalThis.showToast(`📐 ${t('cg_ci_absorb')}`);
     return true;
 }
@@ -356,7 +361,7 @@ export function breakFillStreaksOnMistake() {
     // Endgame gear: arcane surge streak + channel stacks break on a mistake
     if (typeof globalThis._egOnMistake === 'function') globalThis._egOnMistake();
 
-    if (typeof globalThis.PassiveTracker !== 'undefined') globalThis.PassiveTracker.onMistake();
+    if (typeof globalThis.PassiveTracker !== 'undefined') PassiveTracker.onMistake();
 
     // Animals no longer flee outright on a real mistake - instead they lose
     // remaining time (Browney/Wiener −20 s each, Drifter −5 s)
@@ -370,10 +375,10 @@ export function breakFillStreaksOnMistake() {
 // Open (or reset) the Confidence Interval grace window after a real mistake.
 // The window gives the player a brief period where the NEXT mistake is absorbed.
 export function openConfidenceIntervalGraceWindow() {
-    if (globalThis.ptHasSkill('confidence_interval_1') && !globalThis._confidenceIntervalUsed) {
+    if (ptHasSkill('confidence_interval_1') && !globalThis._confidenceIntervalUsed) {
         let windowSecs = 1;
-        if (globalThis.ptHasSkill('confidence_interval_2')) windowSecs++;
-        if (globalThis.ptHasSkill('confidence_interval_3')) windowSecs++;
+        if (ptHasSkill('confidence_interval_2')) windowSecs++;
+        if (ptHasSkill('confidence_interval_3')) windowSecs++;
         globalThis._confidenceIntervalActive = true;
         // Soft green glow marks the forgiveness window while it is open
         if (typeof globalThis.playConfidenceIntervalEffect === 'function') {
@@ -495,9 +500,9 @@ export function claimLuckyTileItems() {
     }
 
     // generous_fortune (192-194): each node adds a stacking bonus-item chance
-    const bonusChance = (globalThis.ptHasSkill('generous_fortune_1') ? 0.10 : 0)
-        + (globalThis.ptHasSkill('generous_fortune_2') ? 0.15 : 0)
-        + (globalThis.ptHasSkill('generous_fortune_3') ? 0.25 : 0);
+    const bonusChance = (ptHasSkill('generous_fortune_1') ? 0.10 : 0)
+        + (ptHasSkill('generous_fortune_2') ? 0.15 : 0)
+        + (ptHasSkill('generous_fortune_3') ? 0.25 : 0);
 
     if (bonusChance > 0 && Math.random() < bonusChance) {
         const bonusItemId = globalThis.pickLuckyItem();
@@ -519,7 +524,7 @@ export function claimLuckyTileItems() {
 // Applies the keystone_variance_collapse downside: claiming a lucky tile
 // costs the player 10 minutes. Appends a warning to the toast message.
 export function applyVarianceCollapsePenalty(toastMsg) {
-    if (!globalThis.ptHasSkill('keystone_variance_collapse')) return toastMsg;
+    if (!ptHasSkill('keystone_variance_collapse')) return toastMsg;
     globalThis.timerSecs = Math.max(0, globalThis.timerSecs - 600);
     globalThis._levelTimeLost += 600;
     updTimer();
@@ -530,15 +535,15 @@ export function applyVarianceCollapsePenalty(toastMsg) {
 // unrevealed correct cells from the same row or column.
 export function applyCovarianceShiftReveal(row, col) {
     if (window._oracleActive) return;
-    if (!globalThis.ptHasSkill('covariance_shift_1')) return;
-    if (globalThis.ptHasSkill('keystone_ergodic_field')) return;
+    if (!ptHasSkill('covariance_shift_1')) return;
+    if (ptHasSkill('keystone_ergodic_field')) return;
 
     const sol = globalThis.cur.grid;
     const cols = sol[0].length;
     const rows = sol.length;
 
-    const revealCount = globalThis.ptHasSkill('covariance_shift_3') ? 3
-        : globalThis.ptHasSkill('covariance_shift_2') ? 2
+    const revealCount = ptHasSkill('covariance_shift_3') ? 3
+        : ptHasSkill('covariance_shift_2') ? 2
             : 1;
 
     // Gather unrevealed correct cells in the same row and column
@@ -564,7 +569,7 @@ export function applyCovarianceShiftReveal(row, col) {
     if (affected.length > 0) {
         if (typeof globalThis._applyCellEffect === 'function') {
             globalThis._applyCellEffect(affected, 'reveal');
-            if (globalThis.ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
+            if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
         }
         globalThis.checkWin();
     }
@@ -630,24 +635,24 @@ export function fireCorrectFillHooks(row, col) {
     if (typeof window.feedDrifter === 'function') window.feedDrifter();
 
     globalThis.onCorrectFill(row, col);    // class.js hook
-    if (typeof globalThis.PassiveTracker !== 'undefined') globalThis.PassiveTracker.onCorrectFill();
+    if (typeof globalThis.PassiveTracker !== 'undefined') PassiveTracker.onCorrectFill();
 
-    globalThis._binomialBurstOnCorrectFill(row, col);
-    globalThis._gamblersRuinOnCorrectFill();
-    globalThis._frequentistsBurdenOnCorrectFill();
+    _binomialBurstOnCorrectFill(row, col);
+    _gamblersRuinOnCorrectFill();
+    _frequentistsBurdenOnCorrectFill();
 }
 
 // sample_efficiency (nodes 1-3): after N consecutive correct fills, reveal a tile.
 // The threshold decreases with higher nodes.
 export function checkSampleEfficiency(row, col) {
-    if (!globalThis.ptHasSkill('sample_efficiency_1')) return;
-    if (globalThis.ptHasSkill('keystone_ergodic_field')) return;
+    if (!ptHasSkill('sample_efficiency_1')) return;
+    if (ptHasSkill('keystone_ergodic_field')) return;
 
     globalThis.consecutiveCorrectFills++;
 
     let threshold = 20;
-    if (globalThis.ptHasSkill('sample_efficiency_2')) threshold -= 2;
-    if (globalThis.ptHasSkill('sample_efficiency_3')) threshold -= 3;
+    if (ptHasSkill('sample_efficiency_2')) threshold -= 2;
+    if (ptHasSkill('sample_efficiency_3')) threshold -= 3;
 
     if (globalThis.consecutiveCorrectFills >= threshold) {
         globalThis.consecutiveCorrectFills = 0;
@@ -659,8 +664,8 @@ export function checkSampleEfficiency(row, col) {
         }
 
         // Bayesian bonus: chance to reveal a second tile
-        if (globalThis._getBayesianBonus() > 0 && Math.random() < globalThis._getBayesianBonus()) {
-            globalThis._resetBayesianBonus();
+        if (_getBayesianBonus() > 0 && Math.random() < _getBayesianBonus()) {
+            _resetBayesianBonus();
             const bonusRevealed = globalThis.revealTiles(1);
 
             if (bonusRevealed && bonusRevealed.length > 0) {
@@ -670,44 +675,44 @@ export function checkSampleEfficiency(row, col) {
                     Audio_Manager.playSFX('sample_efficiency');
                 }, 300);
             }
-            globalThis.questStat_sampleEfficiencyReveal();
+            questStat_sampleEfficiencyReveal();
         }
 
         globalThis.showToast(`📈 ${t('cg_sample_efficiency')}`);
-        globalThis.PassiveTracker.onSampleEffTrigger();
+        PassiveTracker.onSampleEffTrigger();
     }
 }
 
 // streak_bonus (nodes 1-3): after 15 consecutive correct fills, add bonus seconds.
 // Keystone gamblers_ruin disables this skill entirely.
 export function checkStreakBonus() {
-    if (!globalThis.ptHasSkill('streak_bonus_1')) return;
-    if (globalThis.ptHasSkill('keystone_gamblers_ruin')) return;
+    if (!ptHasSkill('streak_bonus_1')) return;
+    if (ptHasSkill('keystone_gamblers_ruin')) return;
 
     globalThis._streakBonusFills++;
     if (globalThis._streakBonusFills >= 15) {
         globalThis._streakBonusFills = 0;
 
         let bonus = 15;                                     // streak_bonus_1 base
-        if (globalThis.ptHasSkill('streak_bonus_2')) bonus += 5;
-        if (globalThis.ptHasSkill('streak_bonus_3')) bonus += 10;
+        if (ptHasSkill('streak_bonus_2')) bonus += 5;
+        if (ptHasSkill('streak_bonus_3')) bonus += 10;
 
         globalThis.timerSecs += bonus;
         globalThis._levelTimeAdded += bonus;
         updTimer();
         if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${bonus}s`, '#ffb830');
         globalThis.showToast(`🔥 ${t('cg_streak_bonus').replace('{n}', bonus)}`);
-        globalThis.PassiveTracker.onStreakBonusTrigger();
+        PassiveTracker.onStreakBonusTrigger();
     }
 }
 
 // Orchestrates everything that happens after a verified correct left-click fill.
 export function handleCorrectFill(row, col) {
-    globalThis.questStat_hasManuallyFilledCell();
+    questStat_hasManuallyFilledCell();
     Audio_Manager.playSFX('cellFill');
 
     trackAchStat('cellsFilled');
-    globalThis._incDirect('lifetimeTilesFilled');
+    _incDirect('lifetimeTilesFilled');
 
     // Absolute Zero: leave a persistent frost crust on tiles correctly
     // filled while the freeze is active

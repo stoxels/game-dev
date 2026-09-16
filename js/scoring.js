@@ -4,6 +4,12 @@ import { stopTimer } from './timer.js';
 import { checkWorldCompleteAch, onLevelCompleteAch } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
+import { _incDirect, questStat_luckyDropClaimed, updateQuestStats } from './quests/quests-stats.js';
+import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
+import { goToLevelSelect, hideResultOverlays } from './screens/screens.js';
+import { _wdSyncSpriteToLevel } from './screens/screens-world-levels.js';
+import { _ptApplyLevelCompleteRewards } from './passive-tree/passive-tree.js';
+
 
 //------------------------------------------------------------------------
 // Phase 3 step 3: live globalThis accessors for externally-mutated state.
@@ -255,7 +261,7 @@ export function applyConvergenceReward(gi) {
     const isFirstEver = globalThis.STATE.convergenceDone.length === 0;
     globalThis.STATE.convergenceDone.push(gi);
     globalThis.STATE.passiveTreePoints = (globalThis.STATE.passiveTreePoints || 0) + 1;
-    globalThis._incDirect('lifetimePassivePointsObtained', 1);
+    _incDirect('lifetimePassivePointsObtained', 1);
     save();
     window._pendingConvergenceModal = true;
 
@@ -335,9 +341,9 @@ export function handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, 
 // Base chance is 25%; each bonus_replay node adds an additional percentage.
 export function getLuckyDropChance() {
     let chance = 0.25;
-    if (globalThis.ptHasSkill('bonus_replay_1')) chance += 0.10;
-    if (globalThis.ptHasSkill('bonus_replay_2')) chance += 0.15;
-    if (globalThis.ptHasSkill('bonus_replay_3')) chance += 0.20;
+    if (ptHasSkill('bonus_replay_1')) chance += 0.10;
+    if (ptHasSkill('bonus_replay_2')) chance += 0.15;
+    if (ptHasSkill('bonus_replay_3')) chance += 0.20;
     if (globalThis._charIs('trix')) chance += 0.15;
     return chance;
 }
@@ -345,9 +351,9 @@ export function getLuckyDropChance() {
 // Returns the chance of receiving a second lucky drop item.
 // Each lucky_replay node contributes an additive percentage.
 export function getExtraItemChance() {
-    return (globalThis.ptHasSkill('lucky_replay_1') ? 0.10 : 0)
-        + (globalThis.ptHasSkill('lucky_replay_2') ? 0.15 : 0)
-        + (globalThis.ptHasSkill('lucky_replay_3') ? 0.20 : 0);
+    return (ptHasSkill('lucky_replay_1') ? 0.10 : 0)
+        + (ptHasSkill('lucky_replay_2') ? 0.15 : 0)
+        + (ptHasSkill('lucky_replay_3') ? 0.20 : 0);
 }
 
 // Decides how many lucky drop items to grant this trigger (1 or 2).
@@ -376,10 +382,10 @@ export function grantLuckyDropItem() {
 // Requires the lucky_drops passive node to be allocated.
 // Returns an HTML string of all item-reward divs granted, or '' if none triggered.
 export function rollLuckyDrops() {
-    if (!globalThis.ptHasSkill('lucky_drops') && !globalThis._charIs('trix')) return '';
+    if (!ptHasSkill('lucky_drops') && !globalThis._charIs('trix')) return '';
     if (Math.random() >= getLuckyDropChance()) return '';
 
-    globalThis.questStat_luckyDropClaimed();
+    questStat_luckyDropClaimed();
 
     const count = rollLuckyDropCount();
     let html = '';
@@ -596,9 +602,9 @@ export function _updateConvergenceTrialWinButton(gi) {
         btn.id = 'btn-enter-trial-win';
         btn.className = 'ob y';
         btn.addEventListener('click', () => {
-            globalThis.hideResultOverlays();
+            hideResultOverlays();
             if (typeof globalThis._egLaunchCampaignTrial === 'function') globalThis._egLaunchCampaignTrial(wi);
-            else globalThis.goToLevelSelect();
+            else goToLevelSelect();
         });
         target.appendChild(btn);
     }
@@ -627,9 +633,9 @@ export function _updateNexusWinButton(show) {
         btn.id = 'btn-enter-nexus-win';
         btn.className = 'ob p';
         btn.addEventListener('click', () => {
-            globalThis.hideResultOverlays();
+            hideResultOverlays();
             if (typeof globalThis.showEndgameNexus === 'function') globalThis.showEndgameNexus();
-            else globalThis.goToLevelSelect();
+            else goToLevelSelect();
         });
         target.appendChild(btn);
     } else if (btn.parentElement !== target) {
@@ -678,7 +684,7 @@ export function checkWorldJustCompleted(worldData, isFirstClear) {
 export function checkIsLargeAdjMatrix() {
     const rows = globalThis.cur.grid.length;
     const cols = globalThis.cur.grid[0].length;
-    return (rows * cols >= 200) && globalThis.ptHasSkill('adjacency_matrix');
+    return (rows * cols >= 200) && ptHasSkill('adjacency_matrix');
 }
 
 
@@ -780,7 +786,7 @@ function checkWin() {
     }
     */
 
-    globalThis._wdSyncSpriteToLevel(gi);    // move sprite to the just completed level
+    _wdSyncSpriteToLevel(gi);    // move sprite to the just completed level
 
     // Track per-level mistake record for the "flawless world" achievement.
     // Always keep the best (lowest) mistake count across replays.
@@ -801,7 +807,7 @@ function checkWin() {
     fireAchievements({ gi, rows, cols, elapsed, pts, ptsAwarded, prevBest, mult, isFirstClear });
 
     // Passive tree node rewards (gear_of_the_statistician & improved_gear)
-    globalThis._ptApplyLevelCompleteRewards();
+    _ptApplyLevelCompleteRewards();
 
     // Bonus objective
     const bonusMet = evaluateBonusObjective(elapsed);
@@ -837,7 +843,7 @@ function checkWin() {
     Audio_Manager.playSFX('win');
 
     // Quest stats update
-    globalThis.updateQuestStats('levelComplete', {
+    updateQuestStats('levelComplete', {
         gi,
         world: globalThis.cur.world,
         diff: globalThis.curDiff,

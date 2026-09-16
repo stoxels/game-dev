@@ -7,6 +7,8 @@ import { buildClassHUD } from './class-hud.js';
 import { _playDivineProcEffect } from './class-statistician.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_fieldScanCellRevealed, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //------------------------PROBABILIST-------------------------------------
 //------------------------------------------------------------------------
@@ -204,7 +206,7 @@ export function _precisionMarkApply(targetRows, targetCols, rows, cols, sol, mar
         if (tookThisRound === 0) break; // nothing left to claim anywhere
     }
 
-    globalThis.questStat_classMarkUsed(affected.length);
+    questStat_classMarkUsed(affected.length);
     return affected;
 }
 
@@ -276,7 +278,7 @@ export function _precisionMarkBonusLine(rows, cols, sol, affected) {
             if (sol[pick.idx][c] === 0 && globalThis.userGrid[pick.idx][c] === 0) {
                 globalThis.userGrid[pick.idx][c] = 2;
                 renderCell(pick.idx, c);
-                globalThis.questStat_classMarkUsed(1);
+                questStat_classMarkUsed(1);
                 trackAchStat('tilesMarkedWrong', 1);
                 affected.push(`g-${pick.idx}-${c}`);
             }
@@ -286,7 +288,7 @@ export function _precisionMarkBonusLine(rows, cols, sol, affected) {
             if (sol[r][pick.idx] === 0 && globalThis.userGrid[r][pick.idx] === 0) {
                 globalThis.userGrid[r][pick.idx] = 2;
                 renderCell(r, pick.idx);
-                globalThis.questStat_classMarkUsed(1);
+                questStat_classMarkUsed(1);
                 trackAchStat('tilesMarkedWrong', 1);
                 affected.push(`g-${r}-${pick.idx}`);
             }
@@ -534,8 +536,8 @@ export function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses =
         globalThis.userGrid[r][c] = 1;
         updClues(r, c);
         trackAchStat('tilesRevealed', 1);
-        globalThis.questStat_classRevealUsed(1);
-        globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+        questStat_classRevealUsed(1);
+        updateQuestStats('classAbilityUsedThisLevel', {});
 
         // Correct reveals kept by God of Probabilities also feed the
         // Random Walker's Drifter with XP. (✕ marks grant no XP.)
@@ -550,7 +552,7 @@ export function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses =
             globalThis.userGrid[r][c] = 2;
             globalThis.systemMarkedGrid[r][c] = true;
             renderCell(r, c);
-            globalThis.questStat_classMarkUsed(1);
+            questStat_classMarkUsed(1);
             trackAchStat('tilesMarkedWrong', 1);
         });
     }
@@ -637,7 +639,7 @@ export function _fieldScanCommitCell(r, c, sol) {
 
     el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
     el.classList.add(sol[r][c] === 1 ? 'filled' : 'marked', 'scan-reveal');
-    globalThis.questStat_fieldScanCellRevealed(1);
+    questStat_fieldScanCellRevealed(1);
 
     return el;
 }
@@ -1185,7 +1187,7 @@ export function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols,
             el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
             el.classList.add(sol[r][c] === 1 ? 'filled' : 'marked', 'scan-reveal');
             scanned.push(el);
-            globalThis.questStat_fieldScanCellRevealed(1);
+            questStat_fieldScanCellRevealed(1);
         }
     }
 

@@ -7,6 +7,8 @@ import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
 //------------------------------MARKOVIAN CLASS--------------------------
@@ -200,7 +202,7 @@ export function _rollback_clearPreExistingMistakes(preExistingWrong) {
         if (globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]) {
             globalThis.userGrid[r][c] = 0;
         }
-        globalThis.questStat_mistakesRemoved(1);
+        questStat_mistakesRemoved(1);
     });
 
     globalThis.showToast(t('cls_rollback_old_cleared').replace('{n}', preExistingWrong.length));
@@ -1032,8 +1034,8 @@ export function _transitionMatrixCascade(row, col, depth) {
     renderCell(nr, nc);
     updClues(nr, nc);
     trackAchStat('tilesRevealed', 1);
-    globalThis.questStat_classRevealUsed(1);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(1);
+    updateQuestStats('classAbilityUsedThisLevel', {});
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
 
     _transitionMatrixCellVFX(nr, nc, row, col);

@@ -7,6 +7,8 @@ import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
 //-------------------------------OUTLIER CLASS----------------------------
@@ -181,8 +183,8 @@ export function _tailRiskPostReveal(revealedCount, affectedIds, totalCost) {
 
     Audio_Manager.playSFX('tailRiskResolve');
 
-    globalThis.questStat_classRevealUsed(revealedCount);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(revealedCount);
+    updateQuestStats('classAbilityUsedThisLevel', {});
 
     // Achievement: reveal exactly 20 cells in one use
     if (revealedCount === 20) trackAchStat('outlierInfiniteHunger20Reveals');

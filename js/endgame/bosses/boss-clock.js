@@ -4,7 +4,7 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { Audio_Manager } from '../../audio/audio.js';
-import { updTimer } from '../../timer.js';
+import { _egClearCenterGridBanners, updTimer } from '../../timer.js';
 import { t } from '../../translation/translations.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkEl, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
@@ -195,7 +195,7 @@ export function _egClockPlayerPts(pr) {
 //    colored like its beam (red seconds, cyan minutes, amber hours).
 export function _egClockShowCall(plan) {
     if (typeof _egClearCenterGridBanners === 'function') {
-        globalThis._egClearCenterGridBanners('eg-clock-call-banner');
+        _egClearCenterGridBanners('eg-clock-call-banner');
     }
     const banner = document.createElement('div');
     banner.id = 'eg-clock-call-banner';
@@ -499,7 +499,7 @@ export function _egClockStartTimeFreezeWarn(monster, level) {
     window._egClockTimeFreezeWarn = true;
 
     if (typeof _egClearCenterGridBanners === 'function') {
-        globalThis._egClearCenterGridBanners('eg-clock-freeze-warn-banner');
+        _egClearCenterGridBanners('eg-clock-freeze-warn-banner');
     }
     const face = document.getElementById('eg-nk-clock-face');
     if (face) face.classList.add('eg-clock-freeze-warn');
@@ -544,7 +544,7 @@ export function _egClockStartTimeFreeze(monster, level) {
 
     // Clear center-grid banners so the frozen arena reads clean.
     if (typeof _egClearCenterGridBanners === 'function') {
-        globalThis._egClearCenterGridBanners('eg-clock-freeze-banner');
+        _egClearCenterGridBanners('eg-clock-freeze-banner');
     }
 
     // Own run owned by the boss id - boss death / encounter stop tears it

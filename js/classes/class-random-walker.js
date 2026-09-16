@@ -3,6 +3,8 @@ import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { t } from '../translation/translations.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
 //----------------------------RANDOM WALKER CLASS-------------------------
@@ -101,8 +103,8 @@ export function _revealCellForAgent(r, c) {
     //       userGrid[r][c] = 2; renderCell(r, c); _applyCellEffect([...], 'mark');
     //   }
 
-    globalThis.questStat_classRevealUsed(1);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(1);
+    updateQuestStats('classAbilityUsedThisLevel', {});
     globalThis.checkWin();
 }
 
@@ -575,8 +577,8 @@ export function _drifterPoopExplosion(el, r, c, rows, cols) {
         _drifterPlayExplosionAnimation(el);
 
         if (cellsRevealed > 0) trackAchStat('tilesRevealed', cellsRevealed);
-        globalThis.questStat_classRevealUsed(cellsRevealed);
-        globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+        questStat_classRevealUsed(cellsRevealed);
+        updateQuestStats('classAbilityUsedThisLevel', {});
         globalThis.checkWin();
     }, 1000);
 }

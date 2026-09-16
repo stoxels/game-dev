@@ -9,6 +9,8 @@ import { buildClassHUD } from './class-hud.js';
 import { _shuffleArray } from './class-probabilist.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+
 //------------------------------------------------------------------------
 //----------------------MATHMAGICIAN SKILLS-------------------------------
 //------------------------------------------------------------------------
@@ -322,10 +324,10 @@ export function _arcaneReveal_onCellRevealed(id, sol) {
 
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
 
-    globalThis.updateQuestStats('tilesRevealed', { count: 1 });
+    updateQuestStats('tilesRevealed', { count: 1 });
     trackAchStat('tilesRevealed', 1);
-    globalThis.questStat_classRevealUsed(1);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(1);
+    updateQuestStats('classAbilityUsedThisLevel', {});
 
     globalThis.checkWin();
 }
@@ -456,10 +458,10 @@ export function _arcaneReveal_onBalloonBurst(id) {
 
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
 
-    globalThis.updateQuestStats('tilesRevealed', { count: 1 });
+    updateQuestStats('tilesRevealed', { count: 1 });
     trackAchStat('tilesRevealed', 1);
-    globalThis.questStat_classRevealUsed(1);
-    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+    questStat_classRevealUsed(1);
+    updateQuestStats('classAbilityUsedThisLevel', {});
 
     globalThis.checkWin();
 }
@@ -476,7 +478,7 @@ export function _arcaneReveal_applyExposureMarks(markedIds) {
         if (globalThis.userGrid[r][c] === 0) {
             globalThis.userGrid[r][c] = 2;
             renderCell(r, c);
-            globalThis.questStat_classMarkUsed(1);
+            questStat_classMarkUsed(1);
         }
     });
 
